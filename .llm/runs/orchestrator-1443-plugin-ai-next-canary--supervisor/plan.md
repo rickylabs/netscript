@@ -66,8 +66,12 @@ the protocol change never lands without its consumers.
 
 Consumer inventory that slice 1 must sweep and prove: `install-plugin.ts:618`,
 `plugin-reference-reconciler.ts:47-58,146-179` (its legacy `officialSource` guard requires
-`serviceConfigKey`), `plan-plugin-install.ts:143`, `appsettings-entry-builders.ts:125-155`, and
-`plugin-registry.ts:220-256`.
+`serviceConfigKey`), `plan-plugin-install.ts:143`, `appsettings-entry-builders.ts:125-155`,
+`plugin-registry.ts:220-256`, and — added in v3 per PLAN-EVAL cycle 2 —
+**`packages/cli/src/maintainer/adapters/official-plugin-source.ts:87-107,212-251`**, which models all
+three `officialSource` service fields as required and drives official-plugin discovery/copy. Removing
+them from the AI manifest yields undefined values there unless that consumer is updated and tested in
+the same slice.
 
 **Rejected:** four independent `.optional()` fields (v1's shape) — admits partial service metadata
 that no consumer handles. **Rejected:** a `capabilities.hasService` boolean — duplicates information
@@ -99,18 +103,43 @@ but see D4b, which is what actually keeps them correct.
 D1. `backgroundPort` and the remaining `officialSource` fields stay. The package keeps exporting no
 `/services`; a regression test asserts that.
 
-### D4a — the AI scaffolder emits `ai/mod.ts`
+### D4a — the AI scaffolder emits `ai/mod.ts`, and it **exports a real `PluginManifest`** (v3)
 
-The AI starter resources gain a `mod.ts` emitter producing `ai/mod.ts`, a barrel re-exporting the
-app-owned AI surface. `findGeneratedPluginMod` then resolves the plugin config directory to `ai/`,
-so `netscript.config.ts` receives `'./ai/mod.ts'` and `persistPluginMetadata` writes
-`ai/scaffold.plugin.json` **beside it**.
+The AI starter resources gain a `mod.ts` emitter producing `ai/mod.ts`. `findGeneratedPluginMod`
+resolves the plugin config directory to `ai/`, so `netscript.config.ts` receives `'./ai/mod.ts'` and
+`persistPluginMetadata` writes `ai/scaffold.plugin.json` beside it.
 
-That sibling metadata file is what satisfies the configured-module contract:
-`resolveScaffoldPluginMetadata` (`plugin-registry.ts:191-207`) reads `scaffold.plugin.json` from the
-configured module's own directory and returns before `resolvePluginManifest` is ever reached. This
-is exactly how `workers/mod.ts` — a plain job/task barrel with no manifest export — loads today. See
-§"Evaluator findings — disposition" F1.
+**v2 was wrong about what that module must contain, and PLAN-EVAL cycle 2 was right.** v2 claimed a
+sibling `scaffold.plugin.json` satisfied the loader. It does not — there are **two** loaders:
+
+- `loadRegisteredPluginMetadata` (`plugin-registry.ts:163-184`) uses `resolveScaffoldPluginMetadata`
+  and never imports the module. This is the path v2 cited.
+- `loadRegisteredPlugins` (`:142-160`) → `resolvePluginConfigSnapshot` (`:123-137`) →
+  `resolvePluginManifest` (`:363-377`) **imports every configured module** and throws
+  `Plugin spec "<spec>" does not export a plugin manifest.` if it does not export exactly one
+  `PluginManifest`. There is no metadata fallback on this path, and `generate runtime-schemas` uses
+  it (`public-command-dependencies.ts:329-340`).
+
+Proven empirically, not by reading: in the reproduction project, a module exporting a plain object
+**with a sibling `scaffold.plugin.json` present** is rejected —
+
+```text
+plugins: ['./probe/mod.ts']
+Error: Plugin spec "./probe/mod.ts" does not export a plugin manifest.
+```
+
+So `ai/mod.ts` must export a `PluginManifest` (`name`, `version`, `contributions`) in addition to any
+app-owned re-exports. The generated module re-exports the manifest owned by
+`@netscript/plugin-ai` rather than hand-rolling one, so the plugin package stays the single source of
+its own manifest. Slice 4 asserts the loader path end to end (`loadRegisteredPlugins` succeeds), not
+just file existence.
+
+Host-side companion invariant: `ensureNetScriptConfigPlugin` raises `ScaffoldValidationError` rather
+than registering a specifier whose file does not exist.
+
+**Consequence — see §"Escalation E-1".** The same proof shows `workers/mod.ts` is a plain job/task
+barrel with no manifest export, so `generate runtime-schemas` cannot succeed on **any** project with
+a first-party plugin installed. The configured-module contract is broken repo-wide, not just for AI.
 
 Host-side companion invariant: `ensureNetScriptConfigPlugin` raises `ScaffoldValidationError` rather
 than registering a specifier whose file does not exist.
@@ -133,6 +162,14 @@ This is a **pre-existing** bug (it mis-reports for `workers` today) that D2+D4a 
 from cosmetic into a broken doctor row. Fixing it is what lets acceptance box 5 be true on the valid
 path, not only on the failure paths.
 
+**v3 additions per PLAN-EVAL cycle 2.** (i) The service-less `plugin list` value is locked to `-`;
+the current fallback labels `provider.defaultEntrypoint` as a service
+(`plugin-registry.ts:230-256`, `list-plugins-command.ts:45-61`), which would print a service for a
+plugin that has none. (ii) Slice 5's proof matrix widens beyond workers+AI to cover a
+service-bearing `category: 'plugin'` manifest (`auth`, `streams`) and a dependency/reference-bearing
+reconciliation shape (`workers` and `triggers` both depend on `streams` —
+`plugins/workers/scaffold.plugin.json:49-70`, `plugins/triggers/scaffold.plugin.json:42-53`).
+
 ### D5 — the generated `ai/` namespace becomes a configured workspace member
 
 The AI scaffolder emits `ai/deno.json` declaring what its own emitted files need — `preact`,
@@ -153,12 +190,16 @@ explicit path, and target prefixes are resolved relative to the given `projectRo
 The exact emitted contract, locked here and asserted by slice 6 rather than discovered during
 implementation (`packages/fresh-ui/registry.manifest.ts:633-678`):
 
-| Aspect | Locked value |
+v2 stated this contract from `markdown`'s direct dependencies only; cycle 2 correctly flagged that
+`resolveRegistryItems` closes over the graph **recursively**. The corrected contract below was
+computed by resolving the closure against `packages/fresh-ui/registry.manifest.ts` rather than read
+off one item:
+
+| Aspect | Locked value (v3, computed) |
 | --- | --- |
-| Item files | `ai/components/ui/markdown.tsx`, `ai/components/ui/markdown-pipeline.ts`, `ai/assets/ui/markdown.css` |
-| Transitive registry deps | `theme-seed`, `citation-chip` (their files land too) |
-| Styles aggregator | `installUiRegistryItems` always writes `ai/assets/styles.css` |
-| npm dependencies merged into `ai/deno.json` | `unified@^11`, `remark-parse@^11`, `remark-rehype@^11`, `remark-gfm@^4`, `remark-math@^6`, `rehype-react@^8`, `rehype-katex@^7`, `rehype-highlight@^7`, `rehype-sanitize@^6`, `katex@^0.16`, `highlight.js@^11` (11 total) |
+| Closure items (5) | `markdown`, `citation-chip`, `theme-seed`, `cn`, `public-types` |
+| Emitted files (11) | `ai/components/ui/markdown.tsx`, `ai/components/ui/markdown-pipeline.ts`, `ai/assets/ui/markdown.css`, `ai/components/ui/citation-chip.tsx`, `ai/assets/ui/citation-chip.css`, `ai/lib/cn.ts`, `ai/lib/public-types.ts`, `ai/assets/styles.css`, `ai/assets/theme-bridge.css`, `ai/assets/tokens.css`, `ai/assets/tokens.json` |
+| npm dependencies merged into `ai/deno.json` (**13**) | `unified@^11`, `remark-parse@^11`, `remark-rehype@^11`, `remark-gfm@^4`, `remark-math@^6`, `rehype-react@^8`, `rehype-katex@^7`, `rehype-highlight@^7`, `rehype-sanitize@^6`, `katex@^0.16`, `highlight.js@^11`, **`clsx@^2.1.1`**, **`tailwind-merge@^3.5.0`** |
 
 These land in the **generated project's** `ai/deno.json`. The repository `deno.lock` must remain
 unchanged; if implementation observes otherwise, that is a stop-and-decide with a `drift.md` entry,
@@ -229,7 +270,7 @@ manual evidence, or `DEBT` with an `arch-debt.md` row — never omitted.
 | Doc-lint (full export surface) | `deno task doc:lint` |
 | F-6 publishability / jsr-audit | `deno task publish:dry-run` + `jsr-audit` rubric on **`packages/plugin`, `packages/cli`, `plugins/ai`** |
 | Canonical expensive proof | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` |
-| Consumer proof | `evidence/published-0.0.5-repro.sh` against local-source CLI; all four defects gone |
+| Consumer proof | **`evidence/consumer-verify.sh` (new, v3)** — a parameterized, **assertive** script: takes the CLI entrypoint (published spec or local-source path), and `exit 1`s on each surviving defect. The existing `published-0.0.5-repro.sh` is **observational evidence only** and is never named as a gate: it hardcodes `jsr:@netscript/cli@0.0.5` and ends on a bare `echo`, so it always exits `0` and cannot fail. PLAN-EVAL cycle 2 caught v2 naming it as a gate; that was a real defect in the plan. |
 | Resource hygiene | `deno task agentic:leak-check` |
 | **Post-publish** (`gates/release-gates.md`) | `e2e-cli-prod` bound to the exact canary that carries this merge — a release-lane obligation recorded here, **not** a substitute for `scaffold.runtime` |
 
@@ -273,7 +314,7 @@ Ten slices, ordered so each slice's named gate passes at the moment it lands.
 | # | Slice | Proves | Gate | Files |
 | --- | --- | --- | --- | --- |
 | 1 | Manifest protocol expresses "no service" atomically, and its CLI consumers compile | A manifest declares a complete service or none; partial triples are rejected; existing manifests parse identically; `undefined → null` normalization holds | `deno test packages/plugin` + CLI consumer type-check; scoped wrappers; `quality:scan`; `arch:check`; publish dry-run | `packages/plugin/src/protocol/manifest.ts`, `packages/cli/.../install-plugin.ts` (normalizer) + tests |
-| 2 | Host stops synthesizing service entrypoints, at **both** sites | No appsettings entry and no `/services` specifier for a service-less plugin; service plugins unchanged | `deno test` for `appsettings-entry-builders`, `workspace-mutator`, `generate-register-plugins` | `appsettings-entry-builders.ts`, `generate-register-plugins.ts` + tests |
+| 2 | Host stops synthesizing service entrypoints, at **both** sites | No appsettings entry and no `/services` specifier for a service-less plugin; service plugins unchanged | `deno test` for `appsettings-entry-builders`, `workspace-mutator`, `generate-register-plugins` | `appsettings-entry-builders.ts`, **`workspace-mutator.ts:319-326`** (where the entry is unconditionally inserted — omitted in v2), `generate-register-plugins.ts` + tests |
 | 3 | `plugins/ai` declares its real topology | The AI manifest carries no service block; the package exports no `/services` | `deno test plugins/ai`; publish dry-run; jsr-audit | `plugins/ai/scaffold.plugin.json` + manifest regression test |
 | 4 | The configured module exists and loads | `ai/mod.ts` + sibling `ai/scaffold.plugin.json` are emitted; config points at them; the registry loads the plugin through the metadata path; a dangling specifier fails install | `deno test` plugin-ai resources + `install-plugin` + `plugin-registry` loader test | `plugins/ai/src/adapter/resources/**`, `plugins/ai/src/adapter/plugin.ts`, `workspace-mutator.ts` |
 | 5 | Installed identity follows the configured module | Workdir/rootDir derive from the module's own directory; duplicate install is detected without appsettings; list and doctor are correct for a service-less plugin **and** for workers | `deno test` `plugin-registry`, `plan-plugin-install`, `plugin-reference-reconciler`, `list`, `doctor` | `plugin-registry.ts`, `plan-plugin-install.ts`, `plugin-reference-reconciler.ts` + tests |

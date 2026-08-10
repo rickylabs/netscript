@@ -45,3 +45,24 @@ and the AppHost has been starting an executable that cannot resolve — silently
 `RUNTIME_WAIT_*` resource covers `ai`. #1443's acceptance requires the topology to be valid and the
 files to compile; mounting the island in the Fresh app is recorded as deferred scope plus an
 `arch-debt.md` entry, not smuggled into this PR.
+
+## D-5 · significant · 2026-08-10 · mobile visibility is blocked by a foreign active session, not by this run
+
+Follow-up to D-4. `deno task agentic:runtime repair codex-remote --dry-run` returns
+`status: blocked` / `active_session: Codex remote repair refused because active sessions or child
+commands were observed`. The observed session is **foreign**: a tmux supervisor
+`w6-kimi-codex-supervisor` running `codex resume 019fd5f0-…` in `/home/codex/repos/w6-kimi-supervisor-remote`,
+owned by another run. The documented remote-control repair kills the shared user app-server (pid
+2270), which would disrupt it.
+
+Per `AGENTS.md` § Resource hygiene ("review every foreign/unknown-owner entry and leave it alone")
+and the runtime controller's own refusal, **this run does not perform the repair.** Safe diagnostics
+are exhausted.
+
+**Effect, stated honestly:** every Codex session in this run is daemon-attached, route-validated
+(`provider`/`model`/`effort` observed at `thread/start`), and steerable via `codex-resume.ts`, but
+is **Desktop-visible only — not phone-visible**. The harness forbids claiming mobile visibility
+without proof, so no slice will claim it. The run proceeds on the same lane
+(`lane-policy.md` §"Blocked-lane handling": record the missing mechanism, do not silently
+substitute). Surfaced to the owner; restoring phone visibility needs either the foreign session to
+end or an owner decision to interrupt it.
