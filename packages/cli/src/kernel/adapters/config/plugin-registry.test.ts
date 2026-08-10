@@ -1,5 +1,5 @@
 import { dirname, resolve, toFileUrl } from '@std/path';
-import { loadConfig } from '@netscript/config';
+import { defineConfig, loadConfig } from '@netscript/config';
 import { artifactText, collectInstallArtifacts } from '@netscript/plugin/adapter';
 import { aiAdapterPlugin } from '@netscript/plugin-ai/adapter';
 import { loadRegisteredPluginMetadata, loadRegisteredPlugins } from './plugin-registry.ts';
@@ -207,6 +207,39 @@ Deno.test('loadRegisteredPluginMetadata omits service metadata for a service-les
   const plugins = await loadRegisteredPluginMetadata(projectRoot, config);
   if (plugins['service-less']?.service !== undefined) {
     throw new Error('Service-less scaffold metadata unexpectedly contributed a service');
+  }
+});
+
+Deno.test('loadRegisteredPluginMetadata derives identity from the configured module directory', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  const pluginRoot = resolve(projectRoot, 'extensions/chat');
+  await Deno.mkdir(pluginRoot, { recursive: true });
+  await Deno.writeTextFile(resolve(pluginRoot, 'mod.ts'), 'export {};\n');
+  await Deno.writeTextFile(
+    resolve(pluginRoot, 'scaffold.plugin.json'),
+    JSON.stringify({
+      provider: {
+        displayName: 'Service-less plugin',
+        defaultEntrypoint: 'mod.ts',
+        pluginType: 'utility',
+      },
+      officialSource: { canonicalName: 'service-less' },
+    }),
+  );
+
+  const plugins = await loadRegisteredPluginMetadata(
+    projectRoot,
+    defineConfig({
+      name: 'fixture-app',
+      databases: { config: [] },
+      plugins: ['./extensions/chat/mod.ts'],
+    }),
+  );
+  if (plugins['service-less']?.workdir !== 'extensions/chat') {
+    throw new Error('Configured module directory did not determine the service-less workdir');
+  }
+  if (plugins['service-less']?.rootDir !== pluginRoot) {
+    throw new Error('Configured module directory did not determine the service-less rootDir');
   }
 });
 

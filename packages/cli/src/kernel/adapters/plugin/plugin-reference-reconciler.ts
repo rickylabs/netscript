@@ -1,4 +1,4 @@
-import { join } from '@std/path';
+import { basename, dirname, join, resolve } from '@std/path';
 import {
   parsePluginManifest,
   type PluginManifestLinking,
@@ -7,6 +7,7 @@ import {
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
+import { extractPluginSpecifiers } from './netscript-config-plugin.ts';
 
 const SCAFFOLD_PLUGIN_MANIFEST = 'scaffold.plugin.json';
 
@@ -49,11 +50,17 @@ export async function reconcilePluginReferences(
   const backgroundProcessors = appsettings.NetScript?.BackgroundProcessors ?? {};
   const services = appsettings.NetScript?.Services ?? {};
   const apps = appsettings.NetScript?.Apps ?? {};
-  const installedKeys = new Set([...Object.keys(plugins), ...Object.keys(backgroundProcessors)]);
+  const configuredDirectories = await readConfiguredPluginDirectories(projectRoot, fs);
+  const installedKeys = new Set([
+    ...Object.keys(plugins),
+    ...Object.keys(backgroundProcessors),
+    ...configuredDirectories.map((directory) => basename(directory)),
+  ]);
   const declarations = await readInstalledDeclarations(
     projectRoot,
     plugins,
     backgroundProcessors,
+    configuredDirectories,
     fs,
   );
   const byCanonicalName = new Map(
@@ -105,27 +112,71 @@ async function readInstalledDeclarations(
   projectRoot: string,
   plugins: Readonly<Record<string, ReferenceEntry>>,
   backgroundProcessors: Readonly<Record<string, ReferenceEntry>>,
+  configuredDirectories: readonly string[],
   fs: FileSystemPort,
 ): Promise<InstalledPluginDeclaration[]> {
   const declarations = new Map<string, InstalledPluginDeclaration>();
+  for (const directory of configuredDirectories) {
+    await readDeclarationAt(
+      directory,
+      basename(directory),
+      plugins,
+      backgroundProcessors,
+      fs,
+      declarations,
+    );
+  }
   for (const root of [projectRoot, join(projectRoot, SCAFFOLD_DIRS.PLUGINS)]) {
     if (!await fs.exists(root)) continue;
     for (const entry of await fs.readDir(root)) {
       if (!entry.isDirectory) continue;
-      const path = join(root, entry.name, SCAFFOLD_PLUGIN_MANIFEST);
-      if (!await fs.exists(path)) continue;
-      const declaration = parseDeclaration(
-        JSON.parse(await fs.readFile(path)),
+      await readDeclarationAt(
+        join(root, entry.name),
         entry.name,
         plugins,
         backgroundProcessors,
+        fs,
+        declarations,
       );
-      if (declaration) declarations.set(declaration.canonicalName, declaration);
     }
   }
   return [...declarations.values()].sort((left, right) =>
     left.canonicalName.localeCompare(right.canonicalName)
   );
+}
+
+async function readConfiguredPluginDirectories(
+  projectRoot: string,
+  fs: FileSystemPort,
+): Promise<readonly string[]> {
+  const configPath = join(projectRoot, SCAFFOLD_FILES.NETSCRIPT_CONFIG);
+  if (!await fs.exists(configPath)) return [];
+
+  return extractPluginSpecifiers(await fs.readFile(configPath))
+    .filter((specifier) => specifier.startsWith('.') || specifier.startsWith('/'))
+    .map((specifier) => {
+      const resolved = resolve(projectRoot, specifier);
+      return resolved.endsWith('.ts') ? dirname(resolved) : resolved;
+    });
+}
+
+async function readDeclarationAt(
+  directory: string,
+  instanceName: string,
+  plugins: Readonly<Record<string, ReferenceEntry>>,
+  backgroundProcessors: Readonly<Record<string, ReferenceEntry>>,
+  fs: FileSystemPort,
+  declarations: Map<string, InstalledPluginDeclaration>,
+): Promise<void> {
+  const path = join(directory, SCAFFOLD_PLUGIN_MANIFEST);
+  if (!await fs.exists(path)) return;
+  const declaration = parseDeclaration(
+    JSON.parse(await fs.readFile(path)),
+    instanceName,
+    plugins,
+    backgroundProcessors,
+  );
+  if (declaration) declarations.set(declaration.canonicalName, declaration);
 }
 
 function parseDeclaration(
@@ -146,9 +197,10 @@ function parseDeclaration(
   const officialSource = Reflect.get(value, 'officialSource');
   if (!isOfficialSource(officialSource)) return undefined;
   const backgroundConfigKey = backgroundProcessors[instanceName] ? instanceName : undefined;
+  const serviceConfigKey = officialSource.serviceConfigKey;
   const resourceConfigKey = backgroundConfigKey
-    ? officialSource.serviceConfigKey
-    : (plugins[instanceName] ? instanceName : officialSource.serviceConfigKey);
+    ? serviceConfigKey ?? instanceName
+    : (plugins[instanceName] ? instanceName : serviceConfigKey ?? instanceName);
   return {
     canonicalName: officialSource.canonicalName,
     resourceConfigKey,
@@ -175,10 +227,9 @@ function fromLinkingDeclaration(linking: PluginManifestLinking): InstalledPlugin
 
 function isOfficialSource(
   value: unknown,
-): value is PluginManifestOfficialSource & { readonly serviceConfigKey: string } {
+): value is PluginManifestOfficialSource & { readonly canonicalName: string } {
   return !!value && typeof value === 'object' &&
-    typeof Reflect.get(value, 'canonicalName') === 'string' &&
-    typeof Reflect.get(value, 'serviceConfigKey') === 'string';
+    typeof Reflect.get(value, 'canonicalName') === 'string';
 }
 
 function setPluginReferences(

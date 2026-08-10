@@ -19,6 +19,8 @@ import type { ListPluginsInput, PluginListEntry } from './list-plugins-input.ts'
 export interface ListPluginsCommandDependencies {
   /** Load the project configuration from the supplied project root. */
   readonly loadConfig: (options: { cwd: string }) => Promise<NetScriptConfig>;
+  /** Optional output seam used by command-level tests and embedders. */
+  readonly print?: (line: string) => void;
 }
 
 const CONTRIBUTION_AXIS_BY_PLUGIN: Readonly<Record<string, string>> = {
@@ -48,7 +50,7 @@ function toListEntry(
 ): PluginListEntry {
   const localName = resolvePluginLocalName(plugin.name);
   const contributionAxis = CONTRIBUTION_AXIS_BY_PLUGIN[localName] ?? '-';
-  const service = plugin.service?.entrypoint ?? plugin.entrypoints?.main?.path ?? '-';
+  const service = plugin.service?.entrypoint ?? '-';
   return {
     name: plugin.name,
     displayName: plugin.displayName ?? localName,
@@ -101,13 +103,14 @@ export function createPluginListCommand(
       const plugins = await discoverPlugins(projectRoot, dependencies);
 
       if (plugins.length === 0) {
-        outputText('No plugins configured.');
+        (dependencies.print ?? outputText)('No plugins configured.');
         return;
       }
 
-      outputText('Name\tDisplayName\tType\tEnabled\tWorkdir\tService\tPort\tAxis\tContributions');
+      const print = dependencies.print ?? outputText;
+      print('Name\tDisplayName\tType\tEnabled\tWorkdir\tService\tPort\tAxis\tContributions');
       for (const plugin of plugins) {
-        outputText(
+        print(
           `${plugin.name}\t${plugin.displayName}\t${plugin.type}\t${plugin.enabled}\t${plugin.workdir}\t${plugin.service}\t${plugin.port}\t${plugin.contributionAxis}\t${plugin.contributions}`,
         );
       }

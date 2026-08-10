@@ -2,8 +2,10 @@ import { assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
 import { fromFileUrl } from "@std/path/from-file-url";
 import { join } from "@std/path";
 import { LocalProjectFiles } from "@netscript/plugin/cli";
+import { defineConfig } from '@netscript/config';
 
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
+import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import { createDoctorPluginCommand } from './doctor-plugin-command.ts';
 import { FilesystemDiagnosticEvidence } from '@netscript/mcp';
@@ -15,6 +17,7 @@ import { PLUGIN_PACKAGE_VERSION as WORKERS_PACKAGE_VERSION } from '../../../../.
 import { generateSagaRegistry } from '../../../../../../../plugins/sagas/src/cli/registry-generator.ts';
 import { AspireAppHostDoctorInspector } from '../../../../kernel/adapters/aspire/apphost-doctor-inspector.ts';
 import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/process-port.ts';
+import { loadRegisteredPluginMetadata } from '../../../../kernel/adapters/config/plugin-registry.ts';
 
 const NOOP_EVIDENCE: DiagnosticEvidencePort = {
   read: () => Promise.resolve(undefined),
@@ -36,6 +39,53 @@ Deno.test("plugin doctor writes a successful evidence receipt after an actual ru
     assertEquals(receipt?.exitStatus, 0);
   } finally {
     await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('plugin doctor reports configured-module workdirs across first-party topology shapes', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  const pluginNames = ['ai', 'auth', 'streams', 'workers'];
+  try {
+    for (const pluginName of pluginNames) {
+      const pluginRoot = join(projectRoot, pluginName);
+      await Deno.mkdir(pluginRoot, { recursive: true });
+      await Deno.writeTextFile(join(pluginRoot, 'mod.ts'), 'export {};\n');
+      await Deno.copyFile(
+        fromFileUrl(
+          new URL(`../../../../../../../plugins/${pluginName}/scaffold.plugin.json`, import.meta.url),
+        ),
+        join(pluginRoot, 'scaffold.plugin.json'),
+      );
+    }
+    const config = defineConfig({
+      name: 'fixture-app',
+      databases: { config: [] },
+      plugins: pluginNames.map((pluginName) => `./${pluginName}/mod.ts`),
+    });
+    const registered = await loadRegisteredPluginMetadata(projectRoot, config);
+    const pluginsWithoutDoctor = Object.fromEntries(
+      Object.entries(registered).map(([key, plugin]) => {
+        const { doctor: _doctor, ...pluginWithoutDoctor } = plugin;
+        return [key, pluginWithoutDoctor];
+      }),
+    );
+
+    const reports = await doctorPlugin({ projectRoot }, {
+      fs: new DenoFileSystem(),
+      loadConfig: () => Promise.resolve(config),
+      loadRegisteredPlugins: () => Promise.resolve(pluginsWithoutDoctor),
+    });
+
+    assertEquals(reports.map((report) => report.pluginName).sort(), [...pluginNames]);
+    for (const report of reports) {
+      assertEquals(report.status, 'healthy');
+      assertEquals(
+        report.checks.find((check) => check.id === 'workdir')?.message,
+        report.pluginName,
+      );
+    }
+  } finally {
+    await Deno.remove(projectRoot, { recursive: true });
   }
 });
 

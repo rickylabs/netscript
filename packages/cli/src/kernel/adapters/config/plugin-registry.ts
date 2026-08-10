@@ -4,7 +4,7 @@
  * Helpers for loading and normalizing the local plugin registry.
  */
 
-import { dirname, join, resolve } from '@std/path';
+import { dirname, join, relative, resolve } from '@std/path';
 import { toFileUrl } from '@std/path/to-file-url';
 import type { NetScriptConfig, PathsConfig } from '@netscript/config';
 import type { PluginManifest } from '@netscript/plugin';
@@ -60,6 +60,11 @@ interface ScaffoldPluginMetadata {
     readonly doctorEntrypoint?: string;
     readonly permissions?: readonly string[];
   };
+}
+
+interface ResolvedScaffoldPluginMetadata {
+  readonly metadata: ScaffoldPluginMetadata;
+  readonly moduleDirectory: string;
 }
 
 function normalizePath(path: string): string {
@@ -169,9 +174,13 @@ export async function loadRegisteredPluginMetadata(
   for (const spec of resolvePluginSpecs(config)) {
     let plugin: RegisteredPluginConfig;
     try {
-      const metadata = await resolveScaffoldPluginMetadata(projectRoot, spec);
-      plugin = metadata
-        ? normalizeScaffoldPluginMetadata(projectRoot, metadata, config.paths)
+      const resolvedMetadata = await resolveScaffoldPluginMetadata(projectRoot, spec);
+      plugin = resolvedMetadata
+        ? normalizeScaffoldPluginMetadata(
+          projectRoot,
+          resolvedMetadata.metadata,
+          resolvedMetadata.moduleDirectory,
+        )
         : normalizePluginSpecMetadata(projectRoot, spec, config.paths);
     } catch (error) {
       plugin = {
@@ -191,7 +200,7 @@ function resolvePluginSpecs(config?: NetScriptConfig): readonly string[] {
 async function resolveScaffoldPluginMetadata(
   projectRoot: string,
   spec: string,
-): Promise<ScaffoldPluginMetadata | null> {
+): Promise<ResolvedScaffoldPluginMetadata | null> {
   if (!spec.startsWith('.') && !spec.startsWith('/')) {
     return null;
   }
@@ -203,7 +212,9 @@ async function resolveScaffoldPluginMetadata(
     return null;
   }
   const raw = JSON.parse(rawText);
-  return isScaffoldPluginMetadata(raw) ? raw : null;
+  return isScaffoldPluginMetadata(raw)
+    ? { metadata: raw, moduleDirectory: dirname(resolved) }
+    : null;
 }
 
 async function readOptionalTextFile(path: string): Promise<string | null> {
@@ -220,7 +231,7 @@ async function readOptionalTextFile(path: string): Promise<string | null> {
 function normalizeScaffoldPluginMetadata(
   projectRoot: string,
   metadata: ScaffoldPluginMetadata,
-  paths?: Pick<PathsConfig, 'plugins'>,
+  moduleDirectory: string,
 ): RegisteredPluginConfig {
   const name = metadata.officialSource?.canonicalName ?? metadata.officialSource?.pluginDir;
   if (!name) {
@@ -229,7 +240,7 @@ function normalizeScaffoldPluginMetadata(
 
   const serviceEntrypoint = metadata.officialSource?.serviceEntrypoint ??
     metadata.provider.defaultServiceEntrypoint;
-  const workdir = normalizePath(join(paths?.plugins ?? 'plugins', name));
+  const workdir = normalizePath(relative(projectRoot, moduleDirectory)) || '.';
   const permissions = metadata.officialSource?.permissions ?? metadata.provider.defaultPermissions;
   const infrastructureRequires = normalizeInfrastructureDependencies(
     metadata.provider.infrastructureRequires,
@@ -245,7 +256,7 @@ function normalizeScaffoldPluginMetadata(
       ? 'background-processor'
       : 'utility',
     workdir,
-    rootDir: resolve(projectRoot, workdir),
+    rootDir: moduleDirectory,
     permissions: permissions ? [...permissions] : undefined,
     doctor: metadata.officialSource?.doctorEntrypoint,
     service: serviceEntrypoint

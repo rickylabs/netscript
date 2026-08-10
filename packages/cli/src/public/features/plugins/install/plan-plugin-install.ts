@@ -1,4 +1,4 @@
-import { join } from '@std/path';
+import { basename, dirname, join } from '@std/path';
 
 import { validateResourceName } from '../../../../kernel/adapters/scaffold/workspace-writer.ts';
 import { detectPluginDbRequirement } from '../../../../kernel/adapters/plugin/db-integration.ts';
@@ -9,6 +9,7 @@ import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-f
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { PluginInstallPlan, PluginInstallRequest } from '../../../domain/plugin-install-plan.ts';
+import { extractPluginSpecifiers } from '../../../../kernel/adapters/plugin/netscript-config-plugin.ts';
 
 interface ExistingPluginConfigShape {
   NetScript?: {
@@ -134,6 +135,20 @@ async function assertPluginNameAvailable(
     );
   }
 
+  const netscriptConfigPath = join(projectRoot, SCAFFOLD_FILES.NETSCRIPT_CONFIG);
+  if (!overwrite && await fs.exists(netscriptConfigPath)) {
+    const source = await fs.readFile(netscriptConfigPath);
+    const configuredSpecifier = extractPluginSpecifiers(source).find((specifier) =>
+      configuredPluginInstanceName(specifier) === pluginName
+    );
+    if (configuredSpecifier) {
+      throw new ScaffoldValidationError(
+        `Plugin "${pluginName}" is already registered in ${SCAFFOLD_FILES.NETSCRIPT_CONFIG}.`,
+        { pluginName, configuredSpecifier },
+      );
+    }
+  }
+
   const appsettingsPath = join(projectRoot, SCAFFOLD_FILES.APPSETTINGS);
   if (!await fs.exists(appsettingsPath)) {
     return;
@@ -154,6 +169,25 @@ async function assertPluginNameAvailable(
       { pluginName, companionServiceKey, existsInPlugins, existsInBackground },
     );
   }
+}
+
+function configuredPluginInstanceName(specifier: string): string {
+  const normalized = specifier.replace(/\\/g, '/').replace(/[?#].*$/, '');
+  if (normalized.startsWith('.') || normalized.startsWith('/')) {
+    return basename(normalized.endsWith('.ts') ? dirname(normalized) : normalized);
+  }
+
+  const packageSpecifier = normalized.startsWith('jsr:')
+    ? normalized.slice('jsr:'.length)
+    : normalized;
+  const packageSegment = packageSpecifier.startsWith('@')
+    ? packageSpecifier.split('/')[1] ?? packageSpecifier
+    : packageSpecifier.split('/')[0] ?? packageSpecifier;
+  const versionSeparator = packageSegment.indexOf('@');
+  const versionless = versionSeparator === -1
+    ? packageSegment
+    : packageSegment.slice(0, versionSeparator);
+  return versionless.startsWith('plugin-') ? versionless.slice('plugin-'.length) : versionless;
 }
 
 async function readProjectName(fs: FileSystemPort, projectRoot: string): Promise<string> {

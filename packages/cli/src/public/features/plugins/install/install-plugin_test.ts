@@ -160,6 +160,26 @@ const authProvider: PluginKindProvider = {
   infrastructureOptionalDeps: [],
 };
 
+const serviceLessProvider: PluginKindProvider = {
+  kind: 'ai',
+  displayName: 'AI Chat',
+  category: 'plugin',
+  portRangeKey: 'PLUGIN_API',
+  defaultPermissions: ['--allow-net', '--allow-env', '--allow-read'],
+  watchFlag: '--watch',
+  defaultEntrypoint: 'ai/ai.ts',
+  defaultServiceEntrypoint: null,
+  defaultRequiresDb: false,
+  defaultRequiresKv: false,
+  pluginType: 'utility',
+  supportsConcurrency: false,
+  concurrencyEnvVar: null,
+  defaultConcurrency: null,
+  defaultTelemetry: false,
+  infrastructureRequires: [],
+  infrastructureOptionalDeps: [],
+};
+
 describe('public install plugin flow', () => {
   for (
     const [pluginName, forbiddenSample, requiredGlue] of [
@@ -202,6 +222,34 @@ describe('public install plugin flow', () => {
     assertEquals(plan.kind, 'api');
     assertEquals(plan.projectName, 'alpha-app');
     assertEquals(plan.dbDetection.requiresDb, false);
+  });
+
+  it('rejects a configured service-less plugin without appsettings or a conventional plugin directory', async () => {
+    const fs = new MemoryFileSystemAdapter();
+    await writeProjectFiles(fs);
+    await fs.writeFile(
+      '/workspace/alpha/netscript.config.ts',
+      "export default { plugins: ['./ai/mod.ts'] };\n",
+    );
+    const registry = new PluginKindRegistry([['ai', serviceLessProvider]]);
+
+    const error = await assertRejects(
+      () =>
+        planPluginInstall({
+          kind: 'ai',
+          pluginName: 'ai',
+          serviceReferences: [],
+          pluginReferences: [],
+          noDb: false,
+          includeSamples: true,
+          projectRoot: '/workspace/alpha',
+          overwrite: false,
+        }, { fs, registry }),
+      ScaffoldValidationError,
+    );
+
+    assertStringIncludes(error.message, 'already registered in netscript.config.ts');
+    assertEquals(await fs.exists('/workspace/alpha/plugins/ai'), false);
   });
 
   it('rejects an unresolvable plugin (no JSR/local descriptor) instead of CLI-side rendering', async () => {
