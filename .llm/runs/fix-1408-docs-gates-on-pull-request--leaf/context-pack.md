@@ -6,22 +6,24 @@
 | --- | --- |
 | Run ID | `fix-1408-docs-gates-on-pull-request--leaf` |
 | Branch | `fix/1408-docs-gates-on-pull-request` |
-| Current phase | implement — slice 3.1 |
+| Current phase | implement — slice 3.2 |
 | Archetype | N/A — infrastructure workflow only |
 | Scope overlays | docs |
 
 ## Current State
 
-Baseline and live issue verified. Harness artifacts are scaffolded with D8 locked and PLAN-EVAL N/A. No implementation workflow is changed yet.
+The docs-aware `quality` lane now runs both `check:source-format` and `test:source-format` before workspace installation. Both are conditioned on the existing required job's `RUN` value.
 
 ## Completed
 
 - Required skill/workflow reads, fetch/status, baseline and issue verification, Design checkpoint.
+- Slice 3.1 committed, pushed, and commented on draft PR #1440.
+- Slice 3.2 implementation and local focused gates completed.
 
 ## Next Steps
 
-1. Commit/push slice 3.1, open and label the draft PR, then post slice evidence.
-2. Add option 1 to `ci.yml`.
+1. Commit/push/comment slice 3.2.
+2. Add path-scoped PR full build and deploy guards to `pages.yml`.
 
 ## Key Decisions
 
@@ -33,11 +35,11 @@ Baseline and live issue verified. Harness artifacts are scaffolded with D8 locke
 
 ## Files Changed
 
-Run artifacts only.
+`ci.yml` and run artifacts.
 
 ## Gates
 
-Pending.
+Source checker and focused unit test pass locally; full site build and CI are pending.
 
 ## Open Questions
 

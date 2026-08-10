@@ -46,14 +46,19 @@ Future docs gate routing changes start in `docs/site/deno.json`, then use `ci.ym
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-10 | 3.1 | bootstrap | Fetch/status clean; live issue and baseline verified; PLAN-EVAL N/A recorded. |
+| 2026-08-10 | 3.2 | implement | Added source-format production check and focused checker unit test to the docs-aware quality lane. |
 
 ## Gate Results
 
-Pending implementation.
+| Gate | Command or check | Result | Notes |
+| --- | --- | --- | --- |
+| Source format | `deno task check:source-format` from `docs/site` | PASS | Pure `--no-lock` source walk. |
+| Checker unit test | `deno task test:source-format` from `docs/site` | PASS | Focused positive/negative regression suite. |
 
 ## Reconcile Notes
 
 - 3.1: issue #1408 remains open on milestone 0.0.6; required labels confirmed; draft PR opening follows this commit.
+- 3.2: PR #1440 has no new reviewer comments or issue changes; D8 and the planned slice remain current.
 
 ## Handoff Notes
 
