@@ -19,7 +19,11 @@ import { PluginRegistryScaffolder } from '../../../../kernel/adapters/plugin/reg
 import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
 import type { PluginKindProvider } from '../../../../kernel/domain/plugin-kind.ts';
 import { netscriptJsrSpecifier } from '../../../../kernel/constants/jsr-specifiers.ts';
-import { installPlugin } from './install-plugin.ts';
+import {
+  createPluginOwnedPluginResult,
+  installPlugin,
+  resolvePluginDescriptorBeforePlanning,
+} from './install-plugin.ts';
 import type {
   JsrPluginValidationResult,
   JsrPluginValidatorPort,
@@ -31,6 +35,8 @@ import { dispatchPluginScaffold } from '../dispatch/dispatch-plugin-verb.ts';
 import { freshUiRegistryManifest } from '@netscript/fresh-ui/registry';
 import { resolveRegistryItems } from '../../../../kernel/application/ui/registry.ts';
 import { importEntryForDependency } from '../../../../kernel/application/ui/registry-deno-json.ts';
+import { loadRegisteredPlugins } from '../../../../kernel/adapters/config/plugin-registry.ts';
+import { loadConfig } from '@netscript/config';
 
 // This flow renders plugin/workspace files via sync template generators, which
 // require a previously-awaited registry hydration. The test drives the flow
@@ -699,6 +705,125 @@ describe('public install plugin flow', () => {
         { cwd: projectRoot },
       );
       assertEquals(check.code, 0, check.stderr || check.stdout);
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
+
+  it('keeps the configured AI module resolvable across a forced reinstall', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const aiRoot = repoPath('plugins/ai');
+    try {
+      await writeRealProjectFiles(projectRoot);
+      await Deno.writeTextFile(
+        join(projectRoot, 'netscript.config.ts'),
+        `export default {
+  name: 'fixture-app',
+  databases: { config: [] },
+  plugins: [],
+};
+`,
+      );
+      const fs = new DenoFileSystem();
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+      const installAi = (overwrite: boolean, mcp: boolean) =>
+        installPlugin({
+          kind: 'ai',
+          pluginName: 'ai',
+          serviceReferences: [],
+          pluginReferences: [],
+          noDb: true,
+          includeSamples: false,
+          mcp,
+          localPath: aiRoot,
+          projectRoot,
+          overwrite,
+        }, {
+          fs,
+          scaffolder,
+          templateAdapter,
+          registry: new PluginKindRegistry(),
+          registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+          workspaceMutator: new PluginWorkspaceMutator(fs),
+          processRunner: new DenoProcess(),
+          regenerateHelpers: () => Promise.resolve([]),
+        });
+
+      await installAi(false, false);
+      const firstConfig = await Deno.readTextFile(join(projectRoot, 'netscript.config.ts'));
+      const secondInstall = await installAi(true, true);
+      const secondConfig = await Deno.readTextFile(join(projectRoot, 'netscript.config.ts'));
+
+      assertEquals(
+        [
+          ...secondInstall.pluginOwnedScaffold?.createdFiles ?? [],
+          ...secondInstall.pluginOwnedScaffold?.modifiedFiles ?? [],
+        ].includes('ai/mod.ts'),
+        false,
+      );
+      assertEquals(secondConfig, firstConfig);
+      assertStringIncludes(secondConfig, "'./ai/mod.ts'");
+      assertEquals(await pathExists(join(projectRoot, 'ai/mod.ts')), true);
+      const config = await loadConfig({ cwd: projectRoot });
+      const plugins = await loadRegisteredPlugins(projectRoot, config);
+      assertEquals(plugins.ai?.name, '@netscript/plugin-ai');
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
+
+  it('derives plugin-owned service and background workdirs from existing files after a skipped scaffold', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const fixtureRoot = repoPath('packages/cli/tests/fixtures/plugin-scaffolder');
+    try {
+      await writeRealProjectFiles(projectRoot);
+      const fs = new DenoFileSystem();
+      const registry = new PluginKindRegistry();
+      const request = {
+        kind: 'fixture',
+        pluginName: 'fixture',
+        serviceReferences: [],
+        pluginReferences: [],
+        noDb: true,
+        includeSamples: false,
+        localPath: fixtureRoot,
+        projectRoot,
+        overwrite: true,
+      };
+      const resolved = await resolvePluginDescriptorBeforePlanning(
+        request,
+        registry,
+        undefined,
+        fs,
+      );
+      if (resolved === undefined) throw new Error('fixture plugin descriptor did not resolve');
+      const plan = await planPluginInstall(request, { fs, registry });
+      await Deno.mkdir(join(projectRoot, 'plugins/fixture/services/src'), { recursive: true });
+      await Deno.mkdir(join(projectRoot, 'plugins/fixture/bin'), { recursive: true });
+      await Deno.writeTextFile(join(projectRoot, 'plugins/fixture/services/src/main.ts'), '');
+      await Deno.writeTextFile(join(projectRoot, 'plugins/fixture/bin/combined.ts'), '');
+
+      const first = await createPluginOwnedPluginResult(plan, resolved.descriptor, {
+        status: 'applied',
+        createdFiles: [
+          'plugins/fixture/services/src/main.ts',
+          'plugins/fixture/bin/combined.ts',
+        ],
+        modifiedFiles: [],
+        databaseMigrationsAdded: false,
+      }, fs);
+      const second = await createPluginOwnedPluginResult(plan, resolved.descriptor, {
+        status: 'skipped',
+        createdFiles: [],
+        modifiedFiles: [],
+        databaseMigrationsAdded: false,
+      }, fs);
+
+      assertEquals(second.serviceWorkdir, first.serviceWorkdir);
+      assertEquals(second.backgroundWorkdir, first.backgroundWorkdir);
+      assertEquals(second.serviceWorkdir, 'plugins/fixture');
+      assertEquals(second.backgroundWorkdir, 'plugins/fixture');
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
     }

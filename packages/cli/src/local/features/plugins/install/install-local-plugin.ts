@@ -115,7 +115,12 @@ export async function installLocalPlugin(
         importMode: 'local',
         localBase: ROOT_LOCAL_BASE,
       }),
-      plugin: createPluginOwnedPluginResult(plan, resolvedPlugin.descriptor, pluginOwned),
+      plugin: await createPluginOwnedPluginResult(
+        plan,
+        resolvedPlugin.descriptor,
+        pluginOwned,
+        dependencies.fs,
+      ),
       workspaceMembers: [],
       pluginReferences: mergeUniqueReferences(
         plan.pluginReferences,
@@ -146,7 +151,7 @@ export async function installLocalPlugin(
     plan.pluginName,
     pluginOwned === undefined
       ? rendered.plugin.pluginDir
-      : resolvePluginConfigDirectory(plan, pluginOwned),
+      : await resolvePluginConfigDirectory(plan, dependencies.fs),
   );
   await dependencies.workspaceMutator.ensureRootImportsForPluginKind(plan.projectRoot, plan.kind);
   const provisionedCache = plan.provider.defaultRequiresKv
