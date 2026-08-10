@@ -1,6 +1,7 @@
-# Plan v5 — a valid in-process AI topology **and** a working configured-module contract
+# Plan v6 — a valid in-process AI topology **and** a working configured-module contract
 
-Baseline `2256a67bf612907195ce5e51df1df7326c504f2b`. Research: `research.md` (R-0…R-5).
+Baseline `2256a67bf612907195ce5e51df1df7326c504f2b`. Research: `research.md` (R-0…R-5 for #1443,
+addendum A-1…A-5 for #1445).
 Milestone `0.0.6`. Priority P0 — **Closes #1443 and #1445**; blocks `rickylabs/eis-chat#157`.
 
 **Revision history.**
@@ -11,7 +12,8 @@ Milestone `0.0.6`. Priority P0 — **Closes #1443 and #1445**; blocks `rickylabs
 | v2 | `FAIL_PLAN` (cycle 2, `plan-eval-cycle2.md`) — cycle 2 overturned v2's D4a and was right; the supervisor proved it empirically rather than conceding it. |
 | v3 | Corrected D4a, D1's inventory, D6's closure, S2's file scope, the service-less list value, and an always-exits-zero script v2 had wrongly named as a gate. |
 | v4 | Applied the owner-authorized rescope (`drift.md` D-6) to the shared configured-module contract; #1445 filed. `FAIL_PLAN` (cycle 3, `plan-eval-cycle3.md`) — **no architecture defects**; cycle 3 explicitly found the rescope is not too large to land as one PR and no paper-over is proposed. All seven findings were internal inconsistencies left by incremental editing across three revisions. |
-| **v5 (this)** | Full rewrite for internal consistency. Every stale mechanism, slice number, and dependency count from earlier revisions is gone. This document is the single description of the work; nothing in it defers to a prior revision. |
+| v5 | Full rewrite for internal consistency. `FAIL_PLAN` (cycle 4, `plan-eval-cycle4.md`) — four findings, all substantive: research not re-baselined for the widened scope, the maintainer chain stopping two files short, D6's "final" imports being the registry count rather than the output, and D7 check 2 contradicting the runtime resolver with no recoverable execution contract. |
+| **v6 (this)** | Answers cycle 4. Research addendum A-1…A-5 re-baselines #1445 and inventories all six plugins; S1 carries the full maintainer chain; D6 states the real output (14 final imports, 3 CSS); D7 check 2 now calls the **shared** resolver in a **subprocess**. |
 
 ## Scope
 
@@ -102,6 +104,8 @@ scheduling was cycle 3's finding 3):
 | registry metadata normalizer | `plugin-registry.ts:220-256` |
 | **maintainer official-source adapter** | `official-plugin-source.ts:93-107,219-251` |
 | **official-plugin copy** | `copy-official-plugin.ts:174-176` |
+| **maintainer sync result** | `sync-plugin.ts:32-52` |
+| **official-plugin copier adapter mapping** (unconditional today) | `official-plugin-copier.ts:11-25` |
 
 The service-less **official-source representation** is locked here: an official plugin with no
 service contributes no service entrypoint, port, or config key to `OfficialPluginSource`, and copy
@@ -201,11 +205,12 @@ only numbers in this plan; nothing else states a different count.**
 | --- | --- |
 | Closure items — **5** | `markdown`, `citation-chip`, `theme-seed`, `cn`, `public-types` |
 | Emitted files — **11** | `ai/components/ui/markdown.tsx`, `ai/components/ui/markdown-pipeline.ts`, `ai/assets/ui/markdown.css`, `ai/components/ui/citation-chip.tsx`, `ai/assets/ui/citation-chip.css`, `ai/lib/cn.ts`, `ai/lib/public-types.ts`, `ai/assets/styles.css`, `ai/assets/theme-bridge.css`, `ai/assets/tokens.css`, `ai/assets/tokens.json` |
-| npm dependencies merged into `ai/deno.json` — **13** | `unified@^11`, `remark-parse@^11`, `remark-rehype@^11`, `remark-gfm@^4`, `remark-math@^6`, `rehype-react@^8`, `rehype-katex@^7`, `rehype-highlight@^7`, `rehype-sanitize@^6`, `katex@^0.16`, `highlight.js@^11`, `clsx@^2.1.1`, `tailwind-merge@^3.5.0` |
-| CSS imports | `markdown.css` and `katex/dist/katex.min.css` under the `components` layer, via the styles aggregator |
+| Registry-declared npm dependencies — **13** | `unified@^11`, `remark-parse@^11`, `remark-rehype@^11`, `remark-gfm@^4`, `remark-math@^6`, `rehype-react@^8`, `rehype-katex@^7`, `rehype-highlight@^7`, `rehype-sanitize@^6`, `katex@^0.16`, `highlight.js@^11`, `clsx@^2.1.1`, `tailwind-merge@^3.5.0` |
+| **Final `ai/deno.json` imports — 14** | the 13 above **plus `preact@^10.27.2`**. `mergeDenoJsonImports` seeds `PREACT_IMPORTS` **unconditionally** (`registry-deno-json.ts:6-8,26`), so `preact` is always added regardless of the item set. Verified at source; v5's "13 final" was the registry count, not the output. |
+| CSS imports — **3** | `./ui/citation-chip.css`, `./ui/markdown.css`, and `katex/dist/katex.min.css`, all under the `components` layer, via the styles aggregator (`registry.manifest.ts:451-470,633-678`) |
 
-S6 asserts **all four rows** — resolved items, emitted files, CSS imports, and the final
-`ai/deno.json` imports. These land in the *generated project*; the repository `deno.lock` stays
+S6 asserts **all five rows** — resolved items, emitted files, CSS imports, registry-declared
+dependencies, and the **final** `ai/deno.json` imports. These land in the *generated project*; the repository `deno.lock` stays
 unchanged, and a surviving change is a stop-and-decide with a `drift.md` entry.
 
 **Rejected:** re-implementing `Markdown` inside `plugins/ai` — the registry item carries a
@@ -217,10 +222,23 @@ Host-side, so every plugin is covered. Check names are constants, not string lit
 
 1. **`configured-module-resolves`** — every specifier in `netscript.config.ts` `plugins:` resolves to
    an existing file. Missing → `error`, non-zero exit.
-2. **`configured-module-exports-manifest`** — every configured module **loads and exports exactly one**
-   `PluginManifest`. Zero manifest-shaped exports → `error`; more than one → `error` (ambiguous, per
-   D4a's additivity constraint); a module that throws on import → `error` naming the import failure.
-   This is #1445 acceptance box 4 and was unassigned in v4 (cycle 3 finding 2).
+2. **`configured-module-exports-manifest`** — every configured module loads and yields a
+   `PluginManifest` **under the runtime resolver's own semantics**.
+
+   **It calls the shared resolver, not a doctor-local predicate.** `resolveExportedPluginManifest`
+   (`plugin-registry.ts:378-390`) accepts a **default** export first and only then requires a *sole*
+   named manifest — so a module with a default plus other named manifests resolves fine at runtime.
+   v5's "more than one → ambiguous" rule contradicted that and would have made doctor disagree with
+   the loader it is supposed to police. S8 extracts the resolver into a shared composition point used
+   by both `loadRegisteredPlugins` and doctor, and adds **parity tests** asserting the two never
+   diverge. Doctor reports what the loader would do: unresolvable → `error`, naming whether the cause
+   was zero manifest-shaped exports or multiple named ones with no default.
+
+   **Execution contract — isolated and recoverable.** Doctor must not `import()` a project module
+   in-process: a configured module can hang, exit, or blow the CLI's own graph, and doctor's whole
+   job is to survive a broken project. The load runs in a **subprocess** with a bounded timeout;
+   timeout, non-zero exit, and import failure each map to a distinct `error` message. This is
+   #1445 acceptance box 4.
 3. **`service-entrypoint-resolves`** — every `NetScript.Plugins[*].Entrypoint` is resolvable:
    workspace-relative entrypoints exist on disk; a `jsr:<pkg>@<version>/<subpath>` entrypoint appears
    in that package's export map. Unresolvable → `error`.
@@ -310,7 +328,7 @@ gate anywhere in this plan.
 | 1 | Removing an appsettings entry breaks Aspire helper generation | Verified safe — `generate-register-plugins.ts:43-52` iterates actual entries. Its own `/services` default is removed in S2; the E2E restores and starts Aspire. |
 | 2 | The atomic manifest change alters behavior for existing plugins | S1 asserts all six manifests still parse to identical provider objects and produce identical appsettings entries, rejects partial triples, and covers the maintainer official-source + copy consumers. |
 | 3 | D4b changes installed identity for every plugin | S5 proves all four shapes in D4b's matrix, not just AI + workers. The pre-existing workers workdir mis-report is fixed, not preserved. |
-| 4 | The registry copy emits more than the component | The computed D6 contract (5 items / 11 files / 13 deps / CSS imports) is asserted by S6. A divergence is a `drift.md` entry before proceeding. |
+| 4 | The registry copy emits more than the component | The computed D6 contract (5 items / 11 files / 3 CSS imports / 13 registry deps / **14 final imports incl. `preact`**) is asserted by S6. A divergence is a `drift.md` entry before proceeding. |
 | 5 | The repo `deno.lock` changes | Every slice inspects `git status --short`; a lock change is stop-and-decide and must be explained in the PR. |
 | 6 | `scaffold.runtime` is expensive and late-failing | Slices land smallest-blast-radius first; `consumer-verify.sh` (S9) runs after each subsequent slice to catch regressions before the expensive gate. |
 | 7 | The published-type change reaches consumers ahead of its CLI consumers | S1 lands protocol + normalization + every consumer + type-check as one slice. |
@@ -324,14 +342,14 @@ artifacts → reconcile note.
 
 | # | Slice | Proves | Gate | Files |
 | --- | --- | --- | --- | --- |
-| S1 | Manifest protocol expresses "no service" atomically, and **every** consumer compiles | Complete-or-absent service block; partial triples rejected; all six existing manifests parse identically; `undefined → null` normalization; official-source/copy represent a service-less plugin | `deno test packages/plugin` + `packages/cli` consumer tests; scoped wrappers; `quality:scan`; `arch:check`; publish dry-run | `packages/plugin/src/protocol/manifest.ts`, `install-plugin.ts`, `official-plugin-source.ts`, `copy-official-plugin.ts` + tests |
+| S1 | Manifest protocol expresses "no service" atomically, and **every** consumer compiles | Complete-or-absent service block; partial triples rejected; all six existing manifests parse identically; `undefined → null` normalization; the service-less shape is carried through the **whole** maintainer chain to the public sync result | `deno test packages/plugin` + `packages/cli` consumer/maintainer-sync tests; scoped wrappers; `quality:scan`; `arch:check`; publish dry-run | `packages/plugin/src/protocol/manifest.ts`, `install-plugin.ts`, `official-plugin-source.ts`, `copy-official-plugin.ts`, `sync-plugin.ts:32-52`, `official-plugin-copier.ts:11-25` + tests |
 | S2 | Host stops synthesizing service entrypoints, at all three sites | No appsettings entry and no `/services` specifier for a service-less plugin; service plugins unchanged | `deno test` for `appsettings-entry-builders`, `workspace-mutator`, `generate-register-plugins` | `appsettings-entry-builders.ts`, `workspace-mutator.ts:319-326`, `generate-register-plugins.ts:49` + tests |
 | S3 | `plugins/ai` declares its real topology | The AI manifest carries no service block; the package exports no `./services` | `deno test plugins/ai`; publish dry-run; jsr-audit | `plugins/ai/scaffold.plugin.json` + manifest regression test |
 | S4 | AI's configured module exists **and loads** | `ai/mod.ts` exports exactly one `PluginManifest`; `loadRegisteredPlugins` succeeds against it; a dangling specifier fails install | `deno test` plugin-ai resources + `install-plugin` + a `loadRegisteredPlugins` integration test | `plugins/ai/src/adapter/resources/**`, `plugins/ai/src/adapter/plugin.ts`, `workspace-mutator.ts` |
 | S5 | Installed identity follows the configured module | Workdir/rootDir from the module's own directory; duplicate install detected without appsettings; list/doctor correct across **all four** D4b shapes; service-less list value is `-` | `deno test` `plugin-registry`, `plan-plugin-install`, `plugin-reference-reconciler`, `list`, `doctor` | `plugin-registry.ts`, `plan-plugin-install.ts`, `plugin-reference-reconciler.ts`, `list-plugins-command.ts` + tests |
-| S6 | The Markdown surface is real, single-sourced, and exactly as computed | The D6 contract — 5 items, 11 files, CSS imports, 13 npm deps in `ai/deno.json` — asserted in full | `deno test` install path with the four-row emitted-set assertion | `install-plugin.ts` (+ UI registry wiring) + tests |
+| S6 | The Markdown surface is real, single-sourced, and exactly as computed | The D6 contract — 5 items, 11 files, 3 CSS imports, 13 registry deps, **14 final `ai/deno.json` imports incl. `preact`** — asserted in full | `deno test` install path with the four-row emitted-set assertion | `install-plugin.ts` (+ UI registry wiring) + tests |
 | S7 | The generated AI namespace type-checks end to end | `ai/deno.json` + workspace member + preact/JSX; `deno check ai/**` clean **with markdown present** | AI import-map completeness test; scoped check over the generated namespace | `plugins/ai/src/adapter/resources/**`, `install-plugin.ts` |
-| S8 | Doctor detects all three broken invariants | Non-zero exit for a dangling module, for a module exporting zero **or multiple** manifests, and for an unresolvable entrypoint; healthy on a valid install | `deno test` doctor positive + three negatives | `packages/cli/src/public/features/plugins/doctor/**` + tests |
+| S8 | Doctor detects all three broken invariants, in agreement with the runtime loader | Non-zero exit for a dangling module, for a module the **shared resolver** cannot resolve, and for an unresolvable entrypoint; healthy on a valid install; the subprocess runner maps timeout / non-zero exit / import failure to distinct errors; resolver **parity tests** prove doctor and `loadRegisteredPlugins` never disagree | `deno test` doctor positives + negatives + resolver parity | `packages/cli/src/public/features/plugins/doctor/**`, the extracted shared resolver + its composition point, `plugin-registry.ts:378-390` + tests |
 | S9 | The consumer gate can fail | `consumer-verify.sh` is parameterized over the CLI entrypoint and exits non-zero per surviving defect; verified by running it against published 0.0.5 (must fail) and local source | script self-test: red against 0.0.5, green against fixed local source | `evidence/consumer-verify.sh` (new) |
 | S10 | **Every** first-party plugin satisfies the configured-module contract | All six emit a manifest-exporting `<name>/mod.ts`; exactly one manifest-shaped export each; `publish.include` re-verified per package | one shared table-driven contract test over the six-kind set + per-plugin resource tests | `plugins/{ai,auth,sagas,streams,triggers,workers}/src/**` + one shared test |
 | S11 | **Every** generated plugin namespace has a complete import surface | `deno check` clean per installed plugin namespace; the confirmed `workers`→`zod` gap closed; both local-source and JSR branches covered | generalized import-map completeness test; `consumer-verify.sh` per plugin | `workspace-mutator.ts:64-140,377-428` + tests |

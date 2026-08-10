@@ -174,3 +174,80 @@ Every acceptance item in #1443 is reproduced and mechanically explained; none is
 resolution, UI asset placement across two commands, doctor invariants, and the canonical E2E, and
 questions 1–4 above each have more than one defensible answer with different blast radii. Per
 `run-loop.md` §4 this run therefore **selects PLAN-EVAL** as a hard stop before any source edit.
+
+---
+
+# Research addendum — #1445, the shared configured-module contract
+
+Added after the owner-authorized rescope (`drift.md` D-6). §1–5 above are #1443/AI-scoped; this
+addendum re-baselines the research for the widened scope, per PLAN-EVAL cycle 4 finding 1.
+
+## A-1 — the real loader contract (supersedes the §R-2 workers comparison)
+
+§2's R-2 compared AI against `workers/mod.ts` and read the workers path as correct. It is not. Both
+loaders exist and only one matters for `generate runtime-schemas`:
+
+| Loader | Behavior | Used by |
+| --- | --- | --- |
+| `loadRegisteredPluginMetadata` (`plugin-registry.ts:163-184`) | reads a sibling `scaffold.plugin.json`; never imports the module | metadata-only callers |
+| `loadRegisteredPlugins` (`:142-160` → `:123-137` → `:363-377`) | **imports** the module; resolves via `resolveExportedPluginManifest` (`:378-390`) | `generate runtime-schemas` (`public-command-dependencies.ts:329-340`) |
+
+`resolveExportedPluginManifest` accepts a **default export first**, and only otherwise requires a
+**sole** named manifest-shaped value. A module with a default plus other named manifests resolves
+fine — the "multiple ⇒ ambiguous" reading was wrong and is corrected in D7.
+
+Proven empirically, not read: a probe module exporting a plain object, **with a sibling
+`scaffold.plugin.json` present**, is rejected —
+
+```text
+plugins: ['./probe/mod.ts']
+Error: Plugin spec "./probe/mod.ts" does not export a plugin manifest.
+```
+
+## A-2 — six-plugin manifest inventory (D4a feasibility)
+
+Every first-party package already exports a `PluginManifest`-shaped value, so D4a is a re-export in
+all six cases and no manifest has to be authored:
+
+| Plugin | Exported manifest | Source |
+| --- | --- | --- |
+| `ai` | `aiPlugin` | `plugins/ai/mod.ts` |
+| `auth` | `authPlugin` | `plugins/auth/mod.ts` |
+| `sagas` | `sagasPlugin` | `plugins/sagas/mod.ts` |
+| `streams` | `streamsPlugin` | `plugins/streams/mod.ts` |
+| `triggers` | `triggersPlugin` | `plugins/triggers/mod.ts` |
+| `workers` | `workersPlugin` (`PluginManifest`-annotated at `src/public/mod.ts:149`) | `plugins/workers/mod.ts` |
+
+**Additivity risk:** none of the emitted barrels currently exports a manifest-shaped value, so adding
+one yields exactly one. S10 re-asserts this per package rather than assuming it, and prefers the
+default-export form where a future collision is possible.
+
+## A-3 — generated-namespace import surfaces
+
+`workers` is a confirmed second instance of the AI import defect: `workers/jobs/health-check.ts:8`
+imports `zod`, absent from the generated import map. Observed in the reproduction project:
+
+```text
+Error: Import "zod" not a dependency
+  hint: If you want to use the npm package, try running `deno add npm:zod`
+    at fresh/workers/jobs/health-check.ts:8:19
+```
+
+The seam is the per-kind data registry `PLUGIN_KIND_SOURCE_IMPORTS` / `PLUGIN_KIND_ROOT_IMPORTS`
+(`workspace-mutator.ts:64-140`), already keyed by kind, with a local-source vs JSR branch at
+`:377-428`. Both branches need coverage: kind-source jsr pins are prod/JSR-only, while local-source
+projects resolve the same packages as copied workspace members.
+
+## A-4 — maintainer chain (D1 consumer surface)
+
+The service fields flow further than §3 recorded: `official-plugin-source.ts:93-107,219-251` →
+`copy-official-plugin.ts:174-176` → `official-plugin-copier.ts:11-25` (unconditional mapping) →
+`sync-plugin.ts:32-52` (public result). All four are S1's, and the service-less representation is
+locked in D1.
+
+## A-5 — jsr surface for the widened scope
+
+S10/S11 touch five published connectors beyond AI. Each package's `publish.include` must be
+re-verified per package rather than generalized from `plugins/ai`; a new emitted artifact outside
+`src/`, `deno.json`, or `contracts/` silently fails to ship and reproduces #1443's
+"works from local-path, broken from JSR" signature.
