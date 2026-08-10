@@ -45,6 +45,7 @@
 | 2.3 | Prove current exports and claim substantiation | `deno doc`; scratch `deno check --unstable-kv` | `index.vto` if needed, run artifacts |
 | 2.4 | Prove rendered semantics without checker relaxation | `check:rendered-output`; source diff | run artifacts |
 | 2.5 | Prove full acceptance, browser matrix, links, accuracy, caveats, locks | full prescribed sweep | run artifacts |
+| 2.6 | Prove concise routing after Tier-A review | build, links, semantic DOM, locks | `index.vto`, run artifacts |
 
 ### Deferred Scope
 
@@ -72,6 +73,9 @@ matrix without altering the five-item destination lane.
 | 2026-08-10 | 2.5 | Full gate sweep | Root/site docs gates, six-combination Playwright matrix, 16 route responses, semantic/contrast/overflow checks, and exact lock hashes pass. |
 | 2026-08-10 | 2.5 | #1277 coordination | Recorded pre-existing global light accent contrast; used existing tokenized link treatment for the new surface without CSS/component edits. |
 | 2026-08-10 | 2.5 | Reconcile | PR remains draft at `status:impl`; issue remains open; all implementation slices complete; supervisor-owned IMPL-EVAL is next. |
+| 2026-08-10 | 2.6 | Tier-A A1 finding | Removed duplicate prose links to Fresh UI and durable workflows; their cards retain the routes while forms, workers, streams, and every other additive prose route remain one click away. |
+| 2026-08-10 | 2.6 | Focused validation | Build rendered 220 HTML files successfully; 32,799 internal links resolve; DOM reports 8 cards, 0 nested card anchors, and exactly 5 destination links; lock hashes remain exact. |
+| 2026-08-10 | 2.6 | Reconcile | PR remains draft at `status:impl`; supervisor finding F1 is resolved without scope, checker, component, style, or destination-lane changes. |
 
 ## Decisions
 
@@ -108,6 +112,10 @@ matrix without altering the five-item destination lane.
 | Diagrams | `deno task diagrams:check` | N/A | no `.mmd` or SVG changed; L1 diagram asset is byte-unchanged |
 | Lock diff | `git diff --exit-code -- deno.lock docs/site/deno.lock` | PASS | exit 0 after removing one validation-only wildcard resolution |
 | Lock blobs | `git hash-object deno.lock docs/site/deno.lock` | PASS | `a541d408…c58`, `311255423…dc5` exact |
+| Slice 2.6 build | `cd docs/site && rtk proxy deno task build` | PASS | 617 files generated; `Rendered output: OK` across 220 HTML files |
+| Slice 2.6 links | `cd docs/site && rtk proxy deno task check:links` | PASS | 32,799 internal links across 220 pages; all resolve |
+| Slice 2.6 semantic DOM | `deno eval --no-lock` with `DOMParser` over `_site/index.html` | PASS | `{"cards":8,"nestedCardAnchors":0,"destinations":5}` |
+| Slice 2.6 lock equality | `git diff --exit-code -- deno.lock docs/site/deno.lock` and `git hash-object deno.lock docs/site/deno.lock` | PASS | empty diff; exact blobs `a541d408…c58`, `311255423…dc5` |
 
 ### Playwright matrix
 
@@ -183,5 +191,6 @@ Playwright `page.request.get` returned HTTP 200 for every route:
 
 ## Handoff Notes
 
-- Implementation is complete. IMPL-EVAL is mandatory and must be performed by a separate
-  supervisor-selected session; keep PR #1442 draft and at `status:impl` until then.
+- Implementation and the Tier-A slice 2.6 follow-up are complete. IMPL-EVAL is mandatory and must
+  be performed by a separate supervisor-selected session; keep PR #1442 draft and at `status:impl`
+  until then.

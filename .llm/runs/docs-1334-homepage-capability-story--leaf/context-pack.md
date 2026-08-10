@@ -12,9 +12,10 @@
 
 ## Current State
 
-All five implementation slices are complete locally. Static docs gates, rendered semantics,
-16 canonical HTTP routes, six Playwright viewport/theme combinations, and exact lock hashes pass.
-PR #1442 must remain draft at `status:impl` for the supervisor's separate IMPL-EVAL.
+All five implementation slices and the Tier-A slice 2.6 follow-up are complete locally. Static docs
+gates, rendered semantics, 16 canonical HTTP routes, six Playwright viewport/theme combinations,
+and exact lock hashes pass. PR #1442 must remain draft at `status:impl` for the supervisor's
+separate IMPL-EVAL.
 
 ## Completed
 
@@ -33,10 +34,12 @@ PR #1442 must remain draft at `status:impl` for the supervisor's separate IMPL-E
   correct semantics, and owned-surface contrast ≥6.80:1 light / ≥7.48:1 dark.
 - All 16 canonical capability routes returned HTTP 200.
 - Lock diff is empty; blob hashes exactly match the owner-provided values.
+- Resolved Tier-A finding F1 by removing the two redundant prose links while retaining their card
+  routes and every additive task link. Focused build, links, DOM semantics, and lock gates pass.
 
 ## In Progress
 
-- Commit, push, comment, and update the PR body for slice 2.5.
+- None. Slice 2.6 is ready for commit/push and the supervisor's separate IMPL-EVAL handoff.
 
 ## Next Steps
 
@@ -69,6 +72,7 @@ PR #1442 must remain draft at `status:impl` for the supervisor's separate IMPL-E
 | Rendered semantics | PASS | three expected h2s; 5 destinations; checker unchanged |
 | Browser | PASS | six rows; 16 routes 200; screenshots inspected |
 | Lock hygiene | PASS | empty diff; exact two blob hashes |
+| Tier-A follow-up | PASS | rendered 220 HTML files; 32,799 links; 8 cards / 0 nested anchors / 5 destinations |
 
 ## Open Questions
 
