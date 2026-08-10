@@ -109,3 +109,23 @@ Only one writer is ever active: the evaluator writes no source, and its session 
 the release. Every subsequent evaluator pass (including the mandatory IMPL-EVAL) runs in its **own
 worktree** rather than contending for this lease — the pattern the repo's sender registry already
 shows (`ns1331-qwen-evaluator`, `b10-715-eval`).
+
+## D-8 · significant · 2026-08-10 · owner override — closed model on an OpenRouter relay lane
+
+**Owner instruction (2026-08-10):** if plan v6 fails the final plan-gate, escalate the *scope*
+question to a fresh **OpenRouter Grok 4.5 · high** session to adjudicate whether PR #1444 is too big
+or needs a rescope.
+
+This is an **override of `lane-policy.md` invariant 6**, which restricts OpenRouter relay evaluator
+lanes to **open** models (`minimax/minimax-m3`, `deepseek/deepseek-v4-flash-0731`) on the stated
+grounds that closed models burn paid OpenRouter credit. Grok 4.5 is closed. It is also invariant 4's
+"no implicit paid escalation" — made explicit here by owner authorization, which is exactly the
+mechanism invariant 4 requires.
+
+Recorded rather than silently taken. The model id `x-ai/grok-4.5` is already centralized as `grok`
+in `.llm/tools/agentic/config/models.ts:54`, so no volatile value is hardcoded by this run.
+
+**Scope of the override:** one adjudication turn, one question — `SINGLE_PR` / `SPLIT` / `RESCOPE`
+(brief: `escalations/E-2-scope-adjudication-brief.md`). It is **not** a plan-gate pass, does not
+re-litigate architecture, and does not become the IMPL-EVAL route — that remains native
+opposite-family Fable 5 medium for Codex-authored work.

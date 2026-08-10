@@ -32,5 +32,11 @@ performed by this supervisor before every sign-off commit; no implementation lan
 
 ## Recorded lane/eval overrides
 
-None at run start. OpenHands and OpenRouter are not in use; any fallback will be appended here and
-mirrored in `drift.md`.
+| # | Override | Authorization | Mirrored |
+| --- | --- | --- | --- |
+| 1 | Codex sessions are Desktop-visible only, not phone-visible — `remote-control` is unmanaged and the documented repair is refused because a **foreign** active session shares the app-server | Owner elected to proceed rather than interrupt the foreign run | `drift.md` D-4, D-5 |
+| 2 | Scope widened from the AI plugin to the shared configured-module contract for all six first-party plugins; #1445 filed | Owner decision on escalation E-1 | `drift.md` D-6 |
+| 3 | **Closed model on an OpenRouter relay lane** — `x-ai/grok-4.5` · high for a single scope adjudication, against `lane-policy.md` invariant 6 (relay evaluator lanes are open-models-only) and invariant 4 (no implicit paid escalation) | Explicit owner instruction | `drift.md` D-8 |
+
+OpenHands is not in use. The IMPL-EVAL route is unchanged: native opposite-family **Fable 5 ·
+medium** for Codex-authored work.

@@ -93,7 +93,24 @@ Two supervisor-found gaps were folded in at the same time, independent of the ev
 `/services` synthesis site at `generate-register-plugins.ts:49`, and the `undefined → null`
 normalization boundary.
 
-Plan v2 answers all seven. **Cycle 2 pending** — one `FAIL_PLAN` cycle remains before escalation.
+**Cycles 2–5.** Cycle 2 `FAIL_PLAN` (overturned v2's D4a — the supervisor proved it empirically and
+the evaluator was right; the proof widened the issue to #1445). Cycle 3 `FAIL_PLAN` (no architecture
+defects; seven internal inconsistencies → v5 full rewrite). Cycle 4 `FAIL_PLAN` (four substantive
+findings incl. an in-process-import safety hole in the doctor check → v6). **Cycle 5 `PASS`** —
+all eight plan-gate boxes `PASS` with evidence, and the evaluator independently recomputed the D6
+registry closure (`items=5, files=11, registryDeps=13, finalImports=14`, 3 CSS imports), matching the
+supervisor's computation.
+
+**Finding recorded under the PASS, folded into S8:** `ProcessPort.exec` / `DenoProcess.exec` have no
+cancellation (`process-port.ts:18-24`, `deno-process.ts:8-29`), so D7 check 2's bounded timeout must
+extend that seam or add a kill-capable edge adapter — **not** a `Promise.race` that leaks the child.
+
+**Plan-Gate: PASS. Implementation authorized.**
+
+The owner-authorized Grok 4.5 scope adjudication (`drift.md` D-8, brief
+`escalations/E-2-scope-adjudication-brief.md`) was conditional on a v6 failure. It **did not
+trigger** and no OpenRouter credit was spent; the brief and the recorded override remain in place
+unused.
 
 ## Gate results
 
@@ -105,7 +122,8 @@ Plan v2 answers all seven. **Cycle 2 pending** — one `FAIL_PLAN` cycle remains
 
 | Phase | Thread | Route | cwd | Daemon | Mobile-visible |
 | --- | --- | --- | --- | --- | --- |
-| PLAN-EVAL | `019fec5f-4805-7bc1-8e58-bcb6e048646f` | openai · `gpt-5.6-sol` · high | `/home/codex/repos/ns-1443-plugin-ai-orchestrator` | managed app-server `0.147.0`, `approvalPolicy: never`, `sandbox: dangerFullAccess` | **no** — see `drift.md` D-4 |
+| S1 impl | `019feca2-d7db-7801-b314-42b5c366964b` | openai · `gpt-5.6-sol` · high (observed at `thread/start`) |
+| PLAN-EVAL (cycles 1–5) | `019fec5f-4805-7bc1-8e58-bcb6e048646f` | openai · `gpt-5.6-sol` · high | `/home/codex/repos/ns-1443-plugin-ai-orchestrator` | managed app-server `0.147.0`, `approvalPolicy: never`, `sandbox: dangerFullAccess` | **no** — see `drift.md` D-4 |
 
 Steering command for the PLAN-EVAL thread (never a second `send-message-v2` against this worktree):
 
