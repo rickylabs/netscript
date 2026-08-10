@@ -20,6 +20,11 @@ derived from the filesystem, so a moved route file is a compile error at every c
 
 Import the surface from `@netscript/fresh/route`.
 
+This URL contract is distinct from a service's versioned API contract. In a DB-backed product, the
+API shape normally begins at the [generated `@database/zod` step](/data-persistence/database/#generated-schemas-feed-public-contracts),
+is narrowed into the [public contract](/explanation/contracts/#where-the-public-shape-begins), and
+only then reaches a page whose route contract parses path and search values.
+
 ## What bare Fresh makes you write
 
 Fresh 2 hands you raw request values. A paginated, filtered list route means:

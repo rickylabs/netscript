@@ -5,8 +5,8 @@ templateEngine: [vento, md]
 ---
 
 {{ comp.hero({
-  tagline: "Define the boundary once. NetScript carries it through the stack.",
-  subhead: "NetScript is a meta-framework for Deno. It composes Fresh, Hono, oRPC, and .NET Aspire into one workspace, where a typed contract flows from schema to service to rendered page — and the whole system runs as one observed resource graph.",
+  tagline: "Define the public boundary once. NetScript carries it through the stack.",
+  subhead: "NetScript is a meta-framework for Deno. It composes Fresh, Hono, oRPC, and .NET Aspire into one workspace, where a database-backed shape can flow from a generated model schema into a versioned contract, then through the service to the rendered page — and the whole system runs as one observed resource graph.",
   ctas: [
     { label: "Start a workspace", href: "/quickstart/", primary: true },
     { label: "Why NetScript", href: "/why/" }
@@ -17,15 +17,16 @@ templateEngine: [vento, md]
 Frameworks can supply the web layer, the service layer, and the orchestrator while leaving their
 boundaries to the application. Those boundaries are where request types diverge, where durable
 work is reduced to local retry loops, and where incident evidence splits across disconnected logs,
-resource state, and traces. NetScript gives an operation one contract definition, then uses it to
-type the handler and the client and to generate the OpenAPI description. What is derived from the
-contract cannot drift from it.
+resource state, and traces. NetScript gives an operation one versioned public contract—narrowed or
+extended from a generated model schema when one exists, authored directly when it does not—then
+uses it to type the handler and client and generate the OpenAPI description. What is derived from
+the contract cannot drift from it.
 </p>
 
 {{ comp.featureGrid({ items: [
   {
     title: "The contract is the spine",
-    body: "A zod schema and an oRPC route define the operation once. A service handler supplies the business logic with contract-locked input and output types; OpenAPI and the SDK client are derived from the same definition, so the boundary shape is never declared twice.",
+    body: "When generated schemas exist, a model schema is narrowed into the versioned public shape; without a database, that shape is authored directly, then an oRPC route defines the operation once while its handler, OpenAPI, and SDK client share that boundary.",
     href: "/explanation/contracts/"
   },
   {
@@ -42,35 +43,41 @@ contract cannot drift from it.
 
 ## One definition, carried end to end
 
-{{ comp.diagram({ src: "/assets/diagrams/contract-flow.svg", alt: "One zod schema and oRPC route feed a hand-written but contract-locked service handler, a generated OpenAPI document, and a derived SDK client with query keys; the SDK feeds the page loader and island, so server and callers cannot drift.", caption: "The principle in one picture: declare the boundary once; write the handler against it; derive the OpenAPI document and client from it; consume those types in the page." }) }}
+{{ comp.diagram({ src: "/assets/diagrams/contract-flow.svg", alt: "An optional DB-backed predecessor flows from a database model through db generate and @database/zod into a narrowed or extended versioned API schema. That schema and its oRPC route type the service handler, generated OpenAPI document, derived SDK client, page loader, and island. DB-less products can start at the versioned API schema.", caption: "DB-backed products normally narrow or extend generated model schemas before defining the public contract; DB-less products start at the versioned API schema. From the contract onward, the handler, OpenAPI document, SDK, and page share its types.", wide: true }) }}
 
-The same operation at three authored points in the stack. Tab 1 is the only place its input and
-output shapes are declared; the handler and page remain application code, but their boundary types
-come from that contract.
+The same operation at four points in a DB-backed stack. Tab 0 is the optional generation and
+narrowing step; DB-less products begin at tab 1. The contract owns the public input and output
+shapes; the handler and page remain application code, but their boundary types come from it.
 
 {{ comp.tabbedCode({ tabs: [
   {
+    label: "0 · The database (optional)",
+    lang: "ts",
+    code: "// From the workspace root:\n// netscript db generate --db postgres\n\n// contracts/versions/v1/users.schemas.ts\nimport { UserSchema as DatabaseUserSchema } from '@database/zod';\nimport { z } from 'zod';\n\nexport const UsersListItemSchemaV1 = DatabaseUserSchema\n  .pick({ id: true, name: true })\n  .extend({\n    status: z.enum(['active', 'invited']),\n  });"
+  },
+  {
     label: "1 · The contract",
     lang: "ts",
-    code: "// contracts/versions/v1/users.contract.ts\nimport { z } from 'zod';\nimport { oc } from '@orpc/contract';\nimport { implement } from '@orpc/server';\n\nexport const UsersListInputSchemaV1 = z.object({\n  limit: z.number().int().positive().max(100).default(20),\n});\nexport const UsersListItemSchemaV1 = z.object({\n  id: z.number().int().positive(),\n  name: z.string().min(1),\n  status: z.enum(['active', 'invited']),\n});\n\n// The contract binds method + input + output. No handler yet.\nexport const UsersContractV1 = {\n  list: oc.route({ method: 'POST' })\n    .input(UsersListInputSchemaV1)\n    .output(z.object({ items: z.array(UsersListItemSchemaV1) })),\n};\n\nexport const UsersV1 = implement(UsersContractV1);"
+    code: "// contracts/versions/v1/users.contract.ts\nimport { z } from 'zod';\nimport { oc } from '@orpc/contract';\nimport { implement } from '@orpc/server';\nimport { UsersListItemSchemaV1 } from './users.schemas.ts'; // derived in tab 0, or hand-authored without a database\n\nexport const UsersListInputSchemaV1 = z.object({\n  limit: z.number().int().positive().max(100).default(20),\n});\n\n// The contract binds method + input + output. No handler yet.\nexport const UsersContractV1 = {\n  list: oc.route({ method: 'POST' })\n    .input(UsersListInputSchemaV1)\n    .output(z.object({ items: z.array(UsersListItemSchemaV1) })),\n};\n\nexport const UsersV1 = implement(UsersContractV1);"
   },
   {
     label: "2 · The service",
     lang: "ts",
-    code: "// services/users/src/routers/v1.ts\nimport { v1 } from '@my-app/contracts';\n\n// `input` is typed from the contract. The return value must\n// satisfy the contract's output schema — or it does not compile.\nexport const UsersV1 = {\n  list: v1.users.list.handler(async ({ input }) => {\n    const items = await listUsers({ limit: input.limit });\n    return { items };\n  }),\n};\n\n// services/users/src/main.ts\n// defineService() serves the router with OpenAPI, typed RPC,\n// health endpoints, and request logging wired in.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait defineService(router, { name: 'users', version: '1.0.0' });"
+    code: "// services/users/src/routers/v1.ts\nimport { UsersV1 as usersContract } from '@my-app/contracts';\n\n// `input` is typed from the contract. The return value must\n// satisfy the contract's output schema — or it does not compile.\nexport const UsersV1 = {\n  list: usersContract.list.handler(async ({ input }) => {\n    const items = await listUsers({ limit: input.limit });\n    return { items };\n  }),\n};\n\n// services/users/src/main.ts\n// defineService() serves the router with OpenAPI, typed RPC,\n// health endpoints, and request logging wired in.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait defineService(router, { name: 'users', version: '1.0.0' });"
   },
   {
     label: "3 · The page",
     lang: "tsx",
-    code: "// apps/dashboard/routes/users/index.tsx\nimport { definePage } from '@netscript/fresh/builders';\nimport { usersQueries } from '@app/lib/users.ts'; // derived from the contract\nimport { routes } from '@app/router.ts';\nimport UsersTable from './(_islands)/UsersTable.tsx';\n\nexport const usersPage = definePage()\n  .withRoute(routes.users.$route)\n  .withLayer('users', UsersTable, {\n    loader: async (ctx) => {\n      // Same contract action and input/output types. The server loader\n      // reads the cache; the island receives the result as layer props.\n      const input = { limit: ctx.search.limit };\n      const entry = await usersQueries.list.getCachedEntry(input);\n      if (entry) return { users: entry.data, cachedAt: entry.cachedAt };\n      return {\n        users: await usersQueries.list.queryOptions(input).queryFn(),\n        cachedAt: Date.now(),\n      };\n    },\n  })\n  .withLayout((slots) => <main class='ns-page'>{slots.users()}</main>)\n  .build();\n\nexport const { default: page } = usersPage;\nexport { page as default };"
+    code: "// apps/dashboard/lib/users.ts\nimport { createServiceClient } from '@netscript/sdk/client';\nimport { createQueryFactories } from '@netscript/sdk/query';\nimport { UsersContractV1 } from '@my-app/contracts';\n\nexport const usersName = 'users';\nexport const usersRouterName = 'users';\nexport const usersContract = UsersContractV1;\nexport const usersClient = createServiceClient<typeof usersContract>({\n  contract: usersContract,\n  serviceName: usersName,\n  routerName: usersRouterName,\n});\nexport const usersQueries = createQueryFactories({\n  service: { contract: usersContract, client: usersClient },\n}).service;\n\n// apps/dashboard/routes/users/index.tsx\nimport { definePage } from '@netscript/fresh/builders';\nimport { z } from 'zod';\nimport { usersQueries } from '@app/lib/users.ts';\nimport { routes } from '@app/router.ts';\nimport UsersTable from './(_islands)/UsersTable.tsx';\n\nexport const usersPage = definePage()\n  .withRoute(routes.users.$route)\n  .withSearchParams(z.object({\n    limit: z.coerce.number().int().positive().max(100).default(20),\n  }))\n  .withLayer('users', UsersTable, {\n    loader: async (ctx) => {\n      const input = { limit: ctx.search.limit };\n      // Server-only: getCachedEntry uses the registered cache provider.\n      const entry = await usersQueries.list.getCachedEntry(input);\n      if (entry) return { users: entry.data, cachedAt: entry.cachedAt };\n      return {\n        users: await usersQueries.list.queryOptions(input).queryFn(),\n        cachedAt: Date.now(),\n      };\n    },\n  })\n  .withLayout((slots) => <main class='ns-page'>{slots.users()}</main>)\n  .build();\n\nexport const { default: page } = usersPage;\nexport { page as default };"
   }
 ] }) }}
 
 <p class="ns-lede">
-Change the schema in tab 1 and the handler in tab 2 stops compiling, the OpenAPI document updates,
-and the loader in tab 3 sees the new types — before anything reaches a browser. That propagation is
-the meta-framework: not a bigger library, but ownership of the seams between the libraries you
-already know. <a href="{{ '/explanation/contracts/' |> url }}">How the type flow works</a> ·
+Change the database model and regenerate in tab 0, or change the public schema in tab 1: incompatible
+handler code in tab 2 stops compiling, the OpenAPI document updates, and the loader in tab 3 sees
+the new types before anything reaches a browser. That propagation is the meta-framework: not a
+bigger library, but ownership of the seams between the libraries you already know.
+<a href="{{ '/explanation/contracts/' |> url }}">How the type flow works</a> ·
 <a href="{{ '/web-layer/' |> url }}">how pages consume it</a>.
 </p>
 

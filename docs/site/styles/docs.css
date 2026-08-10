@@ -1421,6 +1421,18 @@ a.ns-card:focus-visible {
   margin: 0 auto;
 }
 
+@media (max-width: 640px) {
+  .ns-diagram__viewport--wide {
+    overflow-x: auto;
+    padding-bottom: var(--ns-space-2);
+  }
+
+  .ns-diagram__viewport--wide .ns-diagram__img {
+    width: 720px;
+    max-width: none;
+  }
+}
+
 .ns-diagram__caption {
   margin-top: var(--ns-space-3);
   font-size: var(--ns-text-sm);
