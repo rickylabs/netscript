@@ -11,6 +11,7 @@ import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/wor
 import { formatGeneratedFiles } from '../../../../kernel/application/scaffold/support/format-generated-files.ts';
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
 import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-dirs.ts';
+import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-files.ts';
 import type {
   PluginInfrastructureDependency,
   PluginKindProvider,
@@ -54,6 +55,7 @@ import {
   type JsrPackageFileFetcher,
   jsrPackageSchemaSearchPath,
 } from '../../../infra/jsr/verify-jsr-package-integrity.ts';
+import { installUiRegistryItems } from '../../../../kernel/application/ui/registry.ts';
 
 export interface PluginOwnedScaffoldDependencies {
   /** Process runner used for plugin-owned scaffold and post-script dispatch. */
@@ -152,6 +154,14 @@ export async function installPlugin(
       { package: request.jsrUrl ?? request.localPath ?? request.kind },
     );
   }
+  const pluginConfigDirectory = resolvePluginConfigDirectory(plan, pluginOwned);
+  if (pluginOwned.uiRegistryItems && pluginOwned.uiRegistryItems.length > 0) {
+    await installUiRegistryItems({
+      projectRoot: pluginConfigDirectory,
+      names: pluginOwned.uiRegistryItems,
+      overwrite: plan.overwrite,
+    }, { fs: dependencies.fs });
+  }
   const rendered = {
     ...await renderPluginSupport(plan, dependencies, { importMode: 'jsr' }),
     plugin: createPluginOwnedPluginResult(plan, resolvedPlugin.descriptor, pluginOwned),
@@ -201,14 +211,22 @@ export async function installPlugin(
   await dependencies.workspaceMutator.ensureNetScriptConfigPlugin(
     plan.projectRoot,
     plan.pluginName,
-    resolvePluginConfigDirectory(plan, pluginOwned),
+    pluginConfigDirectory,
   );
   await dependencies.workspaceMutator.ensureRootImportsForPluginKind(plan.projectRoot, plan.kind);
   const provisionedCache = plan.provider.defaultRequiresKv
     ? await dependencies.workspaceMutator.ensureSharedCache(plan.projectRoot)
     : false;
 
-  await dependencies.workspaceMutator.ensureWorkspaceMember(plan.projectRoot);
+  const extraWorkspaceMembers = await dependencies.fs.exists(
+    join(pluginConfigDirectory, SCAFFOLD_FILES.DENO_JSON),
+  )
+    ? [toWorkspaceRelativePath(plan.projectRoot, pluginConfigDirectory)]
+    : [];
+  await dependencies.workspaceMutator.ensureWorkspaceMember(
+    plan.projectRoot,
+    extraWorkspaceMembers,
+  );
 
   await persistPluginMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs, {
     managedFilesBefore,

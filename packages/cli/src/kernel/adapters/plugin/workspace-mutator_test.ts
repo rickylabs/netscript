@@ -840,6 +840,7 @@ Deno.test('PluginWorkspaceMutator wires every @netscript/* specifier emitted by 
 
   // Exact targets: all three kind-source packages ride the release train.
   assertEquals(config.imports['@netscript/ai'], netscriptJsrSpecifier('ai'));
+  assertEquals(config.imports['@netscript/plugin-ai'], netscriptJsrSpecifier('plugin-ai'));
   assertEquals(
     config.imports['@netscript/plugin-ai-core'],
     netscriptJsrSpecifier('plugin-ai-core'),
@@ -902,7 +903,14 @@ Deno.test('PluginWorkspaceMutator writes no ai kind-source jsr pins into local-s
   // local-source projects: they would shadow the copied workspace members on
   // any version mismatch and wedge release-cut CI on not-yet-published
   // versions. Resolution is provided by the copied members instead.
-  for (const specifier of ['@netscript/ai', '@netscript/plugin-ai-core', '@netscript/fresh']) {
+  for (
+    const specifier of [
+      '@netscript/ai',
+      '@netscript/plugin-ai',
+      '@netscript/plugin-ai-core',
+      '@netscript/fresh',
+    ]
+  ) {
     assertEquals(
       config.imports[specifier],
       undefined,

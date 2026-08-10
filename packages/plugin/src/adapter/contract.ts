@@ -95,6 +95,8 @@ export interface InstallSpec {
   readonly prismaContract?: string;
   /** Optional module path for generated host wiring. */
   readonly wiringEntry?: string;
+  /** First-party UI registry items required by the generated userland surface. */
+  readonly uiRegistryItems?: readonly string[];
 }
 
 /**

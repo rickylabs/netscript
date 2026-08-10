@@ -1,5 +1,11 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import { assertEquals, assertFalse, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
+import {
+  assert,
+  assertEquals,
+  assertFalse,
+  assertRejects,
+  assertStringIncludes,
+} from 'jsr:@std/assert@^1';
 import { dirname, fromFileUrl, join, resolve } from '@std/path';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 
@@ -22,6 +28,9 @@ import type {
 import { planPluginInstall } from './plan-plugin-install.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
 import { dispatchPluginScaffold } from '../dispatch/dispatch-plugin-verb.ts';
+import { freshUiRegistryManifest } from '@netscript/fresh-ui/registry';
+import { resolveRegistryItems } from '../../../../kernel/application/ui/registry.ts';
+import { importEntryForDependency } from '../../../../kernel/application/ui/registry-deno-json.ts';
 
 // This flow renders plugin/workspace files via sync template generators, which
 // require a previously-awaited registry hydration. The test drives the flow
@@ -538,6 +547,160 @@ describe('public install plugin flow', () => {
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
       await Deno.remove(fixtureCopyRoot, { recursive: true });
+    }
+  });
+
+  it('installs the AI markdown registry closure into its generated namespace', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const aiRoot = repoPath('plugins/ai');
+    try {
+      await writeRealProjectFiles(projectRoot);
+      const fs = new DenoFileSystem();
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+
+      const result = await installPlugin({
+        kind: 'ai',
+        pluginName: 'ai',
+        serviceReferences: [],
+        pluginReferences: [],
+        noDb: true,
+        includeSamples: true,
+        localPath: aiRoot,
+        projectRoot,
+        overwrite: false,
+      }, {
+        fs,
+        scaffolder,
+        templateAdapter,
+        registry: new PluginKindRegistry(),
+        registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        processRunner: new DenoProcess(),
+        regenerateHelpers: () => Promise.resolve([]),
+      });
+
+      assertEquals(result.pluginOwnedScaffold?.uiRegistryItems, ['markdown']);
+
+      const resolvedItems = resolveRegistryItems(freshUiRegistryManifest, ['markdown']);
+      assertEquals(resolvedItems.map((item) => item.name).sort(), [
+        'citation-chip',
+        'cn',
+        'markdown',
+        'public-types',
+        'theme-seed',
+      ]);
+
+      const expectedFiles = [
+        'assets/styles.css',
+        'assets/theme-bridge.css',
+        'assets/tokens.css',
+        'assets/tokens.json',
+        'assets/ui/citation-chip.css',
+        'assets/ui/markdown.css',
+        'components/ui/citation-chip.tsx',
+        'components/ui/markdown-pipeline.ts',
+        'components/ui/markdown.tsx',
+        'lib/cn.ts',
+        'lib/public-types.ts',
+      ];
+      for (const path of expectedFiles) {
+        assertEquals(await pathExists(join(projectRoot, 'ai', path)), true, path);
+      }
+
+      const registryDependencies = resolvedItems
+        .flatMap((item) => item.dependencies ?? [])
+        .map(importEntryForDependency)
+        .filter((entry) => entry !== undefined)
+        .map((entry) => entry.key)
+        .sort();
+      assertEquals(registryDependencies, [
+        'clsx',
+        'highlight.js',
+        'katex',
+        'rehype-highlight',
+        'rehype-katex',
+        'rehype-react',
+        'rehype-sanitize',
+        'remark-gfm',
+        'remark-math',
+        'remark-parse',
+        'remark-rehype',
+        'tailwind-merge',
+        'unified',
+      ]);
+
+      const aiDenoJson = JSON.parse(
+        await Deno.readTextFile(join(projectRoot, 'ai/deno.json')),
+      );
+      assertEquals(Object.keys(aiDenoJson.imports).sort(), [
+        'clsx',
+        'highlight.js',
+        'katex',
+        'preact',
+        'rehype-highlight',
+        'rehype-katex',
+        'rehype-react',
+        'rehype-sanitize',
+        'remark-gfm',
+        'remark-math',
+        'remark-parse',
+        'remark-rehype',
+        'tailwind-merge',
+        'unified',
+      ]);
+      assertEquals(aiDenoJson.compilerOptions, {
+        strict: true,
+        jsx: 'precompile',
+        jsxImportSource: 'preact',
+      });
+
+      const styles = await Deno.readTextFile(join(projectRoot, 'ai/assets/styles.css'));
+      const perItemStyles = styles.split('/* Per-item CSS - ui:init writes these @import lines. */')[1] ?? '';
+      assertEquals(
+        [...perItemStyles.matchAll(/@import ['"]([^'"]+)['"]/g)].map((match) => match[1]),
+        [
+          './ui/citation-chip.css',
+          './ui/markdown.css',
+          'katex/dist/katex.min.css',
+        ],
+      );
+
+      const rootDenoJson = JSON.parse(await Deno.readTextFile(join(projectRoot, 'deno.json')));
+      assertEquals(rootDenoJson.workspace.includes('./ai'), true);
+
+      const registryGeneration = await new DenoProcess().exec(
+        'deno',
+        [
+          'run',
+          '--config',
+          join(REPO_ROOT, 'deno.json'),
+          '-A',
+          join(aiRoot, 'src/cli/generate-runtime-registries.ts'),
+          '--manifest',
+          join(aiRoot, 'scaffold.runtime.json'),
+          '--project-root',
+          projectRoot,
+        ],
+        { cwd: projectRoot },
+      );
+      assertEquals(registryGeneration.code, 0, registryGeneration.stderr);
+
+      const aiSources = await collectTypeScriptFiles(join(projectRoot, 'ai'));
+      await assertGeneratedImportsResolve(
+        projectRoot,
+        aiSources,
+        aiDenoJson.imports,
+        rootDenoJson.imports,
+      );
+      const check = await new DenoProcess().exec(
+        'deno',
+        ['check', '--unstable-kv', '--minimum-dependency-age=0', ...aiSources],
+        { cwd: projectRoot },
+      );
+      assertEquals(check.code, 0, check.stderr || check.stdout);
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
     }
   });
 
@@ -1509,6 +1672,54 @@ async function pathExists(path: string): Promise<boolean> {
     if (error instanceof Deno.errors.NotFound) return false;
     throw error;
   }
+}
+
+async function collectTypeScriptFiles(root: string): Promise<readonly string[]> {
+  const files: string[] = [];
+  for await (const entry of Deno.readDir(root)) {
+    const path = join(root, entry.name);
+    if (entry.isDirectory) {
+      files.push(...await collectTypeScriptFiles(path));
+    } else if (entry.isFile && (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx'))) {
+      files.push(path);
+    }
+  }
+  return files.sort();
+}
+
+async function assertGeneratedImportsResolve(
+  projectRoot: string,
+  sourceFiles: readonly string[],
+  memberImports: Readonly<Record<string, string>>,
+  rootImports: Readonly<Record<string, string>>,
+): Promise<void> {
+  const importPattern = /(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s*)['"]([^'"]+)['"]/g;
+  for (const sourcePath of sourceFiles) {
+    const source = await Deno.readTextFile(sourcePath);
+    for (const match of source.matchAll(importPattern)) {
+      const specifier = match[1];
+      if (specifier.startsWith('./') || specifier.startsWith('../')) {
+        const target = resolve(dirname(sourcePath), specifier);
+        assert(
+          await pathExists(target),
+          `${sourcePath} imports missing emitted file ${target}`,
+        );
+        continue;
+      }
+      const importKey = rootImportKey(specifier);
+      assert(
+        memberImports[importKey] !== undefined || rootImports[importKey] !== undefined,
+        `${sourcePath} imports undeclared bare specifier ${specifier} from ${projectRoot}`,
+      );
+    }
+  }
+}
+
+function rootImportKey(specifier: string): string {
+  if (specifier.startsWith('@')) {
+    return specifier.split('/').slice(0, 2).join('/');
+  }
+  return specifier.split('/')[0];
 }
 
 async function assertFalseExists(path: string): Promise<void> {

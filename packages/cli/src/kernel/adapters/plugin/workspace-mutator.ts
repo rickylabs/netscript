@@ -134,6 +134,7 @@ const PLUGIN_SERVICE_BOOTSTRAP_IMPORTS: readonly string[] = [
 const PLUGIN_KIND_SOURCE_IMPORTS: Readonly<Record<string, Readonly<Record<string, string>>>> = {
   ai: {
     '@netscript/ai': netscriptJsrSpecifier('ai'),
+    '@netscript/plugin-ai': netscriptJsrSpecifier('plugin-ai'),
     '@netscript/plugin-ai-core': netscriptJsrSpecifier('plugin-ai-core'),
     '@netscript/fresh': netscriptJsrSpecifier('fresh'),
   },

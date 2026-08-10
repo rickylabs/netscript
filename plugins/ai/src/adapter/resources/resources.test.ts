@@ -25,6 +25,7 @@ Deno.test('ai install emits only userland glue under ai/', () => {
   const artifacts = collectInstallArtifacts(aiAdapterPlugin);
 
   assertEquals(artifacts.map((artifact) => artifact.path), [
+    'ai/deno.json',
     'ai/mod.ts',
     'ai/models.ts',
     'ai/ai.ts',
@@ -38,7 +39,7 @@ Deno.test('ai install emits only userland glue under ai/', () => {
     assertEquals(artifact.path.startsWith('ai/'), true);
     for (const forbidden of FORBIDDEN_PREFIXES) {
       assertEquals(
-        artifact.path.includes(forbidden),
+        artifact.path !== 'ai/deno.json' && artifact.path.includes(forbidden),
         false,
         `artifact ${artifact.path} must not contain ${forbidden}`,
       );
@@ -48,6 +49,7 @@ Deno.test('ai install emits only userland glue under ai/', () => {
 
 Deno.test('ai starter resources cover the current emitters', () => {
   assertEquals(aiStarterResources.map((resource) => resource.scaffolder.name), [
+    'namespace-config',
     'module',
     'models',
     'barrel',
@@ -62,6 +64,15 @@ Deno.test('ai starter resources cover the current emitters', () => {
 Deno.test('ai scaffold emitters have focused golden content', () => {
   const artifacts = collectInstallArtifacts(aiAdapterPlugin);
   const byPath = new Map(artifacts.map((artifact) => [artifact.path, artifactText(artifact)]));
+
+  assertEquals(JSON.parse(byPath.get('ai/deno.json') ?? ''), {
+    imports: { preact: 'npm:preact@^10.27.2' },
+    compilerOptions: {
+      strict: true,
+      jsx: 'precompile',
+      jsxImportSource: 'preact',
+    },
+  });
 
   assertEquals(
     byPath.get('ai/mod.ts'),
@@ -81,6 +92,10 @@ Deno.test('ai scaffold emitters have focused golden content', () => {
   assertStringIncludes(byPath.get('ai/routes/chat-stream.ts') ?? '', 'createAiRouter');
   assertStringIncludes(byPath.get('ai/routes/chat-stream.ts') ?? '', 'toNetScriptChatResponse');
   assertStringIncludes(byPath.get('ai/routes/chat.tsx') ?? '', 'createNetScriptChatConnection');
+});
+
+Deno.test('ai install declares the registry-owned markdown surface', () => {
+  assertEquals(aiAdapterPlugin.install.uiRegistryItems, ['markdown']);
 });
 
 Deno.test('ai default topology is in-process (no gateway config emitted)', () => {
