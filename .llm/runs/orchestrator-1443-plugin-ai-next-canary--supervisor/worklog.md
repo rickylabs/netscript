@@ -7,8 +7,10 @@
 No new public export from any package. The change set is:
 
 - `packages/plugin` — `PluginManifestProvider.defaultServiceEntrypoint` and
-  `PluginManifestOfficialSource.{serviceEntrypoint,serviceConfigKey,servicePort}` become optional in
-  the exported types and their Zod schemas. Same export list, same symbol names.
+  `PluginManifestOfficialSource.{serviceEntrypoint,serviceConfigKey,servicePort}` become an
+  **atomic** all-present-or-all-absent group in the exported types and their Zod schemas (plan v2
+  D1). Same export list, same symbol names — but the published *type* changes, so the PR body says
+  so and slice 1 carries the CLI-consumer normalization and type-check with it.
 - `plugins/ai` — new `ItemScaffolder`s registered in `aiStarterResources`; they are internal to
   `src/adapter/resources/` and reach the outside only through the existing `./scaffold` export.
 - `packages/cli` — internal kernel/application changes plus two new doctor checks and four new e2e
@@ -46,8 +48,8 @@ abstraction is introduced, because no new external dependency or untestable seam
 
 ### Commit slices
 
-The nine ordered slices in `plan.md` §"Commit slices" are the Design's slice list; they are not
-restated here. Each slice: implement → automated gate → **Tier-A supervisor review** → sign-off
+The **ten** ordered slices in `plan.md` §"Commit slices (v2)" are the Design's slice list; they are
+not restated here. Each slice: implement → automated gate → **Tier-A supervisor review** → sign-off
 commit → push → PR comment → run-artifact update → reconcile note.
 
 ### Deferred scope
@@ -72,11 +74,44 @@ lock here is a rewrite, not an edit — which is exactly the condition the Plan-
 Route: Codex · OpenAI · GPT-5.6 Sol · high (`formal_plan_evaluation`, native opposite-family for a
 Claude-authored plan). Hard stop: no source edit until `plan-eval.md` records `PASS`.
 
+**Cycle 1 — `FAIL_PLAN`** (thread `019fec5f-4805-7bc1-8e58-bcb6e048646f`, artifact `plan-eval.md`,
+PR comment `5242768211`). Seven findings; five plan-gate boxes failed. The supervisor verified every
+finding against source before accepting it (Tier-A review of the evaluator, per the run's
+no-agent-at-face-value rule):
+
+| Finding | Supervisor verification |
+| --- | --- |
+| F1 configured-module contract | **Mechanism wrong, concern right.** `plugin-registry.ts:191-207` resolves a sibling `scaffold.plugin.json` *before* `resolvePluginManifest`, so the barrel is valid — that is how `workers/mod.ts` loads. What it really exposed is the hardcoded `workdir = join(paths.plugins, canonicalName)` at `:220-256`, which already mis-reports for workers today. Recorded as plan v2 D4b. |
+| F2 D1 not source-compatible; partial triples | **Confirmed.** `plugin-kind.ts:76` is `string \| null`; a widened `string \| undefined` fails to assign at `install-plugin.ts:618`. Four independent `.optional()` fields admit partial service metadata. |
+| F3 identity/list/doctor/reinstall | **Confirmed.** `plan-plugin-install.ts:129-151` checks only `plugins/<name>` + appsettings. |
+| F4 slice ordering | **Confirmed.** v1 S5 checked `ai/**` before v1 S6 emitted markdown. |
+| F5 archetype/gates | **Confirmed.** `docs/architecture/doctrine/06-archetypes.md` assigns `plugin` to **ARCHETYPE-4**, not 1. |
+| F6 jsr-audit omits `packages/cli` | **Confirmed.** |
+| F7 D6 emitted surface understated | **Confirmed.** `registry.manifest.ts:633-678`: 3 files, `theme-seed` + `citation-chip`, 11 npm deps, plus the always-written styles aggregator. |
+
+Two supervisor-found gaps were folded in at the same time, independent of the evaluator: the second
+`/services` synthesis site at `generate-register-plugins.ts:49`, and the `undefined → null`
+normalization boundary.
+
+Plan v2 answers all seven. **Cycle 2 pending** — one `FAIL_PLAN` cycle remains before escalation.
+
 ## Gate results
 
 | Slice | Gate | Result | Evidence |
 | --- | --- | --- | --- |
 | — | Published-0.0.5 consumer reproduction | 4/4 defects reproduced | `evidence/published-0.0.5-repro.log` |
+
+## Agent sessions
+
+| Phase | Thread | Route | cwd | Daemon | Mobile-visible |
+| --- | --- | --- | --- | --- | --- |
+| PLAN-EVAL | `019fec5f-4805-7bc1-8e58-bcb6e048646f` | openai · `gpt-5.6-sol` · high | `/home/codex/repos/ns-1443-plugin-ai-orchestrator` | managed app-server `0.147.0`, `approvalPolicy: never`, `sandbox: dangerFullAccess` | **no** — see `drift.md` D-4 |
+
+Steering command for the PLAN-EVAL thread (never a second `send-message-v2` against this worktree):
+
+```bash
+deno task agentic:codex-resume -- --thread-id 019fec5f-4805-7bc1-8e58-bcb6e048646f --message '<follow-up>'
+```
 
 ## Reconcile notes
 
