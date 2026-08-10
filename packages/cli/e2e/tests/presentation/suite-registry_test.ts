@@ -122,6 +122,48 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_UI_ADD_AI), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_UI_LOCAL_SOURCE), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.GENERATED_UI_AI_CHECK), true);
+  assertEquals(
+    runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_PLUGIN_AI_APPSETTINGS),
+    true,
+  );
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.GENERATED_RUNTIME_SCHEMAS), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.GENERATED_AI_NAMESPACE_CHECK), true);
+  assertEquals(
+    runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_PLUGIN_DOCTOR_MISSING_MODULE),
+    true,
+  );
+  const aiInstallIndex = runtime.gates.findIndex((gate) => gate.id === 'scaffold.plugin.ai');
+  const appsettingsIndex = runtime.gates.findIndex((gate) =>
+    gate.id === GATE.SCAFFOLD_PLUGIN_AI_APPSETTINGS
+  );
+  const runtimeSchemasIndex = runtime.gates.findIndex((gate) =>
+    gate.id === GATE.GENERATED_RUNTIME_SCHEMAS
+  );
+  const generatedCheckIndex = runtime.gates.findIndex((gate) =>
+    gate.id === GATE.GENERATED_DENO_CHECK
+  );
+  const sixKindInstalls = [
+    'scaffold.plugin.worker',
+    'scaffold.plugin.saga',
+    'scaffold.plugin.trigger',
+    'scaffold.plugin.stream',
+    'scaffold.plugin.auth',
+    'scaffold.plugin.ai',
+  ];
+  assertEquals(
+    sixKindInstalls.every((id) =>
+      runtime.gates.findIndex((gate) => gate.id === id) < runtimeSchemasIndex
+    ),
+    true,
+  );
+  assertEquals(aiInstallIndex < appsettingsIndex, true);
+  assertEquals(appsettingsIndex < runtimeSchemasIndex, true);
+  assertEquals(runtimeSchemasIndex < generatedCheckIndex, true);
+  assertEquals(
+    runtime.gates.findIndex((gate) => gate.id === GATE.GENERATED_SAGAS_REGISTRY) <
+      runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_PLUGIN_DOCTOR_MISSING_MODULE),
+    true,
+  );
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_AUTH_SMOKE_ENV), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_ASPIRE_START), true);
   assertEquals(
