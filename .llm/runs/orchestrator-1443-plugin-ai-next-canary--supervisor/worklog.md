@@ -48,8 +48,8 @@ abstraction is introduced, because no new external dependency or untestable seam
 
 ### Commit slices
 
-The **ten** ordered slices in `plan.md` §"Commit slices (v2)" are the Design's slice list; they are
-not restated here. Each slice: implement → automated gate → **Tier-A supervisor review** → sign-off
+The **thirteen** ordered slices in `plan.md` §"Commit slices" (plan **v5**) are the Design's slice
+list; they are not restated here. `evidence/consumer-verify.sh` is owned by **S9**. Each slice: implement → automated gate → **Tier-A supervisor review** → sign-off
 commit → push → PR comment → run-artifact update → reconcile note.
 
 ### Deferred scope
