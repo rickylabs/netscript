@@ -234,6 +234,9 @@ Deno.test('public plugin install then bare-name remove restores owned state and 
       }),
       doctor: (input) => doctorPlugin(input, {
         fs,
+        process: {
+          exec: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
+        },
         loadConfig: () => Promise.resolve(defineConfig({
           name: 'fixture-app',
           databases: { config: [] },

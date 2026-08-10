@@ -22,6 +22,15 @@ import { createAuthPluginCommand } from './auth-plugin-command.ts';
 import { FetchAuthSessionHttp, parseSessionProjection } from './auth-session-client.ts';
 import type { AuthSessionHttpPort } from './auth-types.ts';
 import { doctorPlugin } from '../doctor/doctor-plugin-use-case.ts';
+import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
+
+const HEALTHY_MODULE_PROCESS: ProcessPort = {
+  exec: () => Promise.resolve({
+    code: 0,
+    stdout: 'NETSCRIPT_PLUGIN_MANIFEST_PROBE={"status":"resolved"}\n',
+    stderr: '',
+  }),
+};
 
 Deno.test('auth backend set reconciles .env and show reports the active backend', async () => {
   const fs = new MemoryFileSystemAdapter();
@@ -47,6 +56,7 @@ Deno.test('plugin doctor reports the configured active auth backend', async () =
   await setAuthBackend('/workspace', 'better-auth', fs);
   const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
     fs,
+    process: HEALTHY_MODULE_PROCESS,
     loadConfig: () => Promise.resolve({ plugins: ['auth'] } as never),
     loadRegisteredPlugins: () => Promise.resolve({
       auth: {

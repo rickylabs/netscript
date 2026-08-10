@@ -5,7 +5,6 @@
  */
 
 import { dirname, join, relative, resolve } from '@std/path';
-import { toFileUrl } from '@std/path/to-file-url';
 import type { NetScriptConfig, PathsConfig } from '@netscript/config';
 import type { PluginManifest } from '@netscript/plugin';
 import type {
@@ -16,6 +15,8 @@ import type { PluginInfrastructureDependency } from '../../domain/plugin-kind.ts
 import { ConfigError } from '../../domain/errors/cli-exit-error.ts';
 import { loadProjectConfig } from './project-config-loader.ts';
 import { DenoProcess } from '../runtime/process/deno-process.ts';
+import { resolveExportedPluginManifest } from '../../application/plugin/exported-plugin-manifest.ts';
+import { resolvePluginImportSpecifier } from '../../application/plugin/configured-plugin-specifier.ts';
 
 const PLUGIN_DEPENDENCY_MISSING_EXIT_CODE = 76;
 const SCAFFOLD_PLUGIN_MANIFEST = 'scaffold.plugin.json';
@@ -383,42 +384,6 @@ async function resolvePluginManifest(
     throw new Error(`Plugin spec "${spec}" does not export a plugin manifest.`);
   }
   return manifest;
-}
-
-function resolveExportedPluginManifest(
-  module: Record<string, unknown>,
-): PluginManifest | undefined {
-  if (isPluginManifest(module.default)) {
-    return module.default;
-  }
-
-  const manifests = Object.values(module).filter(isPluginManifest);
-  if (manifests.length === 1) {
-    return manifests[0];
-  }
-
-  return undefined;
-}
-
-function isPluginManifest(value: unknown): value is PluginManifest {
-  if (!value || typeof value !== 'object') {
-    return false;
-  }
-
-  const manifest = value as Partial<PluginManifest>;
-  return typeof manifest.name === 'string' &&
-    typeof manifest.version === 'string' &&
-    !!manifest.contributions &&
-    typeof manifest.contributions === 'object';
-}
-
-function resolvePluginImportSpecifier(projectRoot: string, spec: string): string {
-  if (spec.startsWith('.') || spec.startsWith('/')) {
-    const resolved = resolve(projectRoot, spec);
-    const modulePath = resolved.endsWith('.ts') ? resolved : join(resolved, 'mod.ts');
-    return toFileUrl(modulePath).href;
-  }
-  return spec;
 }
 
 function validatePluginDependencies(
