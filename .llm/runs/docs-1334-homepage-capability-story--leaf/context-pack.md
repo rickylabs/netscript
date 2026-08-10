@@ -12,9 +12,9 @@
 
 ## Current State
 
-Slice 2.2 adds eight concise outcome cards and adjacent one-click task links without touching L1,
-the destination lane, components, CSS, diagrams, or the rendered checker. Source formatting and the
-site build pass; rendered card bodies contain zero nested anchors.
+Slice 2.3 ties every capability outcome to current `deno doc` exports or live CLI help and to worked
+code/committed diagrams on its canonical task page. No TS/TSX sample changed, so the required D10
+snippet table records scratch checking as not applicable with a focused diff command.
 
 ## Completed
 
@@ -23,16 +23,19 @@ site build pass; rendered card bodies contain zero nested anchors.
 - Selected docs overlay; PLAN-EVAL is N/A with rationale; separate IMPL-EVAL remains mandatory.
 - Opened draft PR #1442 with required labels, milestone, closing keyword, and acceptance map.
 - Added capability presentation; `Docs source format: OK`, build PASS, nested anchors = 0.
+- Verified `definePage`, `freshUiRegistryManifest`, `createQueryFactories`,
+  `createQueryCollection`, `createAuthBackendRegistry`, `definePlugin`, `defineSaga`, `defineJob`,
+  `withSpan`, and `createScalarDocs` with `deno doc`; verified `db generate` and `agent mcp` with
+  live CLI help.
 
 ## In Progress
 
-- Commit, push, and comment slice 2.2.
+- Commit, push, and comment slice 2.3 substantiation.
 
 ## Next Steps
 
-1. Prove every named claim with current export/source evidence and scratch snippet checks.
-2. Prove rendered semantics with the checker unchanged.
-3. Run full docs gates, browser matrix, acceptance mapping, and lock proof.
+1. Prove rendered semantics with the checker unchanged.
+2. Run full docs gates, browser matrix, acceptance mapping, and lock proof.
 
 ## Key Decisions
 

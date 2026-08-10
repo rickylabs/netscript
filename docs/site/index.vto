@@ -94,42 +94,42 @@ bigger library, but ownership of the seams between the libraries you already kno
   {
     eyebrow: "Progressive UI",
     title: "Interaction does not replace the server path",
-    body: "The Fresh UI registry and design route give teams one component vocabulary; forms, optimistic updates, cache-first queries, and partials add progressively without making JavaScript the baseline.",
+    body: "freshUiRegistryManifest and the design route give teams one component vocabulary; forms, optimistic updates, cache-first queries, and partials add progressively without making JavaScript the baseline.",
     href: "/web-layer/fresh-ui/",
     icon: "UI"
   },
   {
     eyebrow: "Generated data",
     title: "The data layer you did not write",
-    body: "netscript db generate produces the Prisma client and Zod model schemas; the SDK supplies cache-aware query factories and collections for callers.",
+    body: "netscript db generate produces the Prisma client and Zod model schemas; createQueryFactories and createQueryCollection supply cache-aware caller views.",
     href: "/data-persistence/database/",
     icon: "DB"
   },
   {
     eyebrow: "Identity",
     title: "Authentication crosses one explicit seam",
-    body: "The auth plugin carries a selected backend, session contract, service, health surface, and audit spans into the workspace instead of leaving each app to integrate them separately.",
+    body: "createAuthBackendRegistry selects one AuthBackendPort while the auth plugin carries its session contract, service, health surface, and audit spans into the workspace.",
     href: "/identity-access/auth/",
     icon: "ID"
   },
   {
     eyebrow: "Plugins",
     title: "Installed capabilities join the whole system",
-    body: "A plugin contributes its services, schemas, background processors, Aspire resources, and diagnostics through one manifest, so adding a capability also adds its operational shape.",
+    body: "definePlugin declares services, schemas, background processors, Aspire resources, and diagnostics in one manifest, so adding a capability also adds its operational shape.",
     href: "/explanation/plugin-system/",
     icon: "+"
   },
   {
     eyebrow: "Durable runtimes",
     title: "Long work keeps its state and evidence",
-    body: "Typed saga definitions, worker jobs, triggers, and streams make retries, correlation, progress, and failure visible beyond the request that started the work.",
+    body: "defineSaga and defineJob give long work typed state and outcomes; triggers and streams keep correlation, progress, and failure visible beyond the request that started it.",
     href: "/durable-workflows/",
     icon: "∞"
   },
   {
     eyebrow: "Observed services",
     title: "One operation leaves one trail",
-    body: "W3C trace context connects service and background spans; Aspire shows the resource graph, while each service can expose its generated OpenAPI contract through Scalar.",
+    body: "withSpan adds evidence to W3C trace context across service and background work; Aspire shows the resource graph, while createScalarDocs renders generated OpenAPI.",
     href: "/observability/telemetry/",
     icon: "O"
   },

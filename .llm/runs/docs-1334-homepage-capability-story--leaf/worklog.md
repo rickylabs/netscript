@@ -65,6 +65,8 @@ matrix without altering the five-item destination lane.
 | 2026-08-10 | 2.1 | Bootstrap | Baseline `714a4ef9b`, live issue, overlay, doctrine boundary, lane identity, and locked plan recorded. |
 | 2026-08-10 | 2.2 | Capability presentation | Added eight grouped outcome cards plus adjacent canonical UI, runtime, Aspire, Scalar, and streams task links. |
 | 2026-08-10 | 2.2 | Reconcile | Issue #1334 remains open; PR #1442 has no implementation feedback; no plan adjustment or drift. |
+| 2026-08-10 | 2.3 | Substantiation | Replaced generic feature nouns with current exported symbols or live CLI commands and traced each outcome to worked code/diagrams. |
+| 2026-08-10 | 2.3 | Reconcile | Issue/PR lifecycle unchanged; no new comments, scope change, or drift. |
 
 ## Decisions
 
@@ -89,6 +91,25 @@ matrix without altering the five-item destination lane.
 | Source format | `cd docs/site && deno task check:source-format` | PASS | `Docs source format: OK` |
 | Site build | `cd docs/site && deno task build` | PASS | 617 files; rendered output OK across 220 HTML files |
 | Card HTML | DOMParser `.ns-cards-grid__card a` probe | PASS | `nested card anchors: 0` |
+
+### Capability claim substantiation
+
+| Homepage claim | Current seam proof | Canonical demonstration |
+| --- | --- | --- |
+| Server-first pages | `deno doc --filter definePage packages/fresh/src/application/builders/mod.ts` → exported `definePage()` | `web-layer/builders.md:54-102` worked page chain; `fresh-page-model.svg` on the server page |
+| Fresh UI and progressive interaction | `deno doc --filter freshUiRegistryManifest packages/fresh-ui/registry.ts` → exported 66-item manifest; full builder docs list `withForm` | `web-layer/fresh-ui.md:167-190`; form/query/query-bridge/partials task pages linked adjacent to grid |
+| Generated and cached data | live `netscript-dev db generate --help` → “Generate Prisma client and Zod schemas”; `deno doc --filter createQueryFactories …`; `deno doc --filter createQueryCollection …` | `database.md:27-30,147,174`; `query.md:142-160`; `query-bridge.md:15-18` |
+| Auth seam | `deno doc --filter createAuthBackendRegistry packages/plugin-auth-core/mod.ts` → exported backend registry over `AuthBackendPort` | `identity-access/auth.md:27-39,91-99`; `auth-flow.svg` |
+| Plugin contributions | `deno doc --filter definePlugin packages/plugin/mod.ts` → exported manifest builder | `explanation/plugin-system.md:25,91-112` diagram and worked manifest |
+| Durable runtimes | `deno doc --filter defineSaga …` and `deno doc --filter defineJob …` → exported typed builders | `sagas.md:29,102-134`; `workers.md:26,139-163`; `streams.md:16`; separate worker/streams task links |
+| Observability, Aspire, Scalar | `deno doc --filter withSpan packages/telemetry/mod.ts`; `deno doc --filter createScalarDocs packages/service/mod.ts` | `telemetry.md:29,197,255`; `expose-openapi-scalar.md:93-116`; `/quickstart/aspire/` |
+| Agent/MCP discovery | live `netscript-dev agent mcp --help` → stdio MCP server with project/docs/telemetry inputs | `ai/agent-tooling.md:72-132`; explicitly not external-MCP consumer page |
+
+### Snippet proof (D10)
+
+| Snippet | Source page:line | Exact proving command | Result |
+| --- | --- | --- | --- |
+| Changed TS/TSX samples | N/A — slice 2.2/2.3 changed card strings and raw HTML links only; L1 tab samples are byte-unchanged | `git diff 714a4ef9b -- docs/site/index.vto` and inspect `comp.tabbedCode` hunk | PASS: no changed TS/TSX sample exists, so no scratch module is applicable |
 
 ## Handoff Notes
 
