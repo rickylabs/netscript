@@ -6,15 +6,15 @@
 | --- | --- |
 | Run ID | `docs-1334-homepage-capability-story--leaf` |
 | Branch | `docs/1334-homepage-capability-story` |
-| Current phase | `implement` |
+| Current phase | `evaluate` |
 | Archetype | N/A — docs-only |
 | Scope overlays | `SCOPE-docs.md` |
 
 ## Current State
 
-Slice 2.4 proves the rendered contract on a fresh 617-file build: semantic h2s are “One definition,
-carried end to end”, “What the framework carries for you”, and “Where to go”; the destination count
-is exactly five; card nested anchors are zero; `check-rendered-output.ts` is byte-unchanged from L1.
+All five implementation slices are complete locally. Static docs gates, rendered semantics,
+16 canonical HTTP routes, six Playwright viewport/theme combinations, and exact lock hashes pass.
+PR #1442 must remain draft at `status:impl` for the supervisor's separate IMPL-EVAL.
 
 ## Completed
 
@@ -28,14 +28,21 @@ is exactly five; card nested anchors are zero; `check-rendered-output.ts` is byt
   `withSpan`, and `createScalarDocs` with `deno doc`; verified `db generate` and `agent mcp` with
   live CLI help.
 - Rendered output PASS across 220 HTML files with the checker unchanged; semantic DOM probe PASS.
+- Full root/site gate sweep PASS; no diagram gate required because no `.mmd` changed.
+- Playwright PASS at 390/1024/1600 × light/dark with zero overflow, working tabs, loaded diagram,
+  correct semantics, and owned-surface contrast ≥6.80:1 light / ≥7.48:1 dark.
+- All 16 canonical capability routes returned HTTP 200.
+- Lock diff is empty; blob hashes exactly match the owner-provided values.
 
 ## In Progress
 
-- Commit, push, and comment slice 2.4 rendered semantics.
+- Commit, push, comment, and update the PR body for slice 2.5.
 
 ## Next Steps
 
-1. Run full docs gates, browser matrix, acceptance mapping, and lock proof.
+1. Supervisor launches a fresh opposite-family IMPL-EVAL session.
+2. Evaluator independently verifies artifacts, commits/comments, claims, and gates.
+3. Supervisor alone advances lifecycle/status, readiness, merge, and issue closure.
 
 ## Key Decisions
 
@@ -60,8 +67,8 @@ is exactly five; card nested anchors are zero; `check-rendered-output.ts` is byt
 | Docs | source/build PASS | `Docs source format: OK`; 617 files; rendered output OK |
 | HTML | PASS | `.ns-cards-grid__card a` count 0 |
 | Rendered semantics | PASS | three expected h2s; 5 destinations; checker unchanged |
-| Browser | pending | slice 2.5 |
-| Lock hygiene | pending final proof | slice 2.5 |
+| Browser | PASS | six rows; 16 routes 200; screenshots inspected |
+| Lock hygiene | PASS | empty diff; exact two blob hashes |
 
 ## Open Questions
 
@@ -69,7 +76,7 @@ is exactly five; card nested anchors are zero; `check-rendered-output.ts` is byt
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: pre-existing global light accent contrast recorded for #1277; owned surface passes without CSS changes.
 - Debt: none created or deepened.
 
 ## Commits

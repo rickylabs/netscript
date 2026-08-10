@@ -69,6 +69,9 @@ matrix without altering the five-item destination lane.
 | 2026-08-10 | 2.3 | Reconcile | Issue/PR lifecycle unchanged; no new comments, scope change, or drift. |
 | 2026-08-10 | 2.4 | Rendered semantics | Fresh Lume build and unchanged checker prove three semantic h2s, exactly five destination links, and zero nested card anchors. |
 | 2026-08-10 | 2.4 | Reconcile | PR remains draft at `status:impl`; issue remains open; no new feedback or drift. |
+| 2026-08-10 | 2.5 | Full gate sweep | Root/site docs gates, six-combination Playwright matrix, 16 route responses, semantic/contrast/overflow checks, and exact lock hashes pass. |
+| 2026-08-10 | 2.5 | #1277 coordination | Recorded pre-existing global light accent contrast; used existing tokenized link treatment for the new surface without CSS/component edits. |
+| 2026-08-10 | 2.5 | Reconcile | PR remains draft at `status:impl`; issue remains open; all implementation slices complete; supervisor-owned IMPL-EVAL is next. |
 
 ## Decisions
 
@@ -96,6 +99,68 @@ matrix without altering the five-item destination lane.
 | Rendered homepage | `cd docs/site && rtk proxy deno task check:rendered-output` | PASS | 220 HTML files; 4 documented-syntax allowances |
 | Semantic DOM | DOMParser heading/destination/card probe | PASS | h2s = required two + capability section; destinations = 5; nested anchors = 0 |
 | Checker integrity | `git diff --exit-code 714a4ef9b -- _plugins/check-rendered-output.ts` from `docs/site` | PASS | exit 0; checker unmodified |
+| Root links | `rtk proxy deno task docs:links` | PASS | 102 docs; 0 broken links/anchors; 0 orphans |
+| Root accuracy | `rtk proxy deno task docs:accuracy` | PASS | 192 published pages; preferred paths and query dialect verified |
+| Site source | `cd docs/site && rtk proxy deno task check:source-format` | PASS | `Docs source format: OK` |
+| Site build | `cd docs/site && rtk proxy deno task build` | PASS | 617 files; rendered output OK |
+| Rendered links | `cd docs/site && rtk proxy deno task check:links` | PASS | 32,801 internal links across 220 pages |
+| Caveats | `cd docs/site && rtk proxy deno task check:caveats` | PASS | 18 markers across 14 pages |
+| Diagrams | `deno task diagrams:check` | N/A | no `.mmd` or SVG changed; L1 diagram asset is byte-unchanged |
+| Lock diff | `git diff --exit-code -- deno.lock docs/site/deno.lock` | PASS | exit 0 after removing one validation-only wildcard resolution |
+| Lock blobs | `git hash-object deno.lock docs/site/deno.lock` | PASS | `a541d408…c58`, `311255423…dc5` exact |
+
+### Playwright matrix
+
+Command: `playwright-cli -s=docs1334 run-code --filename=.llm/tmp/playwright-docs1334.js`
+
+| Width | Theme | h1 / h2s | Destinations / cards | Tabs / diagram | Overflow | Minimum owned contrast | Result |
+| ---: | --- | --- | --- | --- | ---: | ---: | --- |
+| 390 | light | 1 / required 3 | 5 / 8; nested anchors 0 | 4 interactive / loaded | 0px | 6.80:1 | PASS |
+| 390 | dark | 1 / required 3 | 5 / 8; nested anchors 0 | 4 interactive / loaded | 0px | 7.48:1 | PASS |
+| 1024 | light | 1 / required 3 | 5 / 8; nested anchors 0 | 4 interactive / loaded | 0px | 6.80:1 | PASS |
+| 1024 | dark | 1 / required 3 | 5 / 8; nested anchors 0 | 4 interactive / loaded | 0px | 7.48:1 | PASS |
+| 1600 | light | 1 / required 3 | 5 / 8; nested anchors 0 | 4 interactive / loaded | 0px | 6.80:1 | PASS |
+| 1600 | dark | 1 / required 3 | 5 / 8; nested anchors 0 | 4 interactive / loaded | 0px | 7.48:1 | PASS |
+
+All four tabs were clicked in every combination and each became the single selected tab. Six
+full-page screenshots were visually inspected. Correct base-path serving produced zero console
+errors. The pre-existing global accent contrast finding is recorded in `drift.md` for #1277; the
+new capability surface passes the ratios above without CSS/component changes.
+
+### Capability destinations
+
+Playwright `page.request.get` returned HTTP 200 for every route:
+
+| Capability | Destination | Result |
+| --- | --- | --- |
+| Server-first builders/layers | `/web-layer/builders/` | 200 |
+| Fresh UI registry/design | `/web-layer/fresh-ui/` | 200 |
+| Managed forms | `/web-layer/form/` | 200 |
+| Optimistic mutations | `/web-layer/query/` | 200 |
+| Cache-first SDK bridge | `/web-layer/query-bridge/` | 200 |
+| Partials | `/web-layer/partials/` | 200 |
+| Generated DB schemas | `/data-persistence/database/` | 200 |
+| Auth | `/identity-access/auth/` | 200 |
+| Plugin capabilities | `/explanation/plugin-system/` | 200 |
+| Durable definitions | `/durable-workflows/` | 200 |
+| Workers | `/background-processing/workers/` | 200 |
+| Durable streams | `/durable-workflows/streams/` | 200 |
+| Correlated OTEL | `/observability/telemetry/` | 200 |
+| Aspire dashboard | `/quickstart/aspire/` | 200 |
+| Scalar | `/services-sdk/how-to/expose-openapi-scalar/` | 200 |
+| Agent/MCP discovery | `/ai/agent-tooling/` | 200 |
+
+### Acceptance mapping
+
+| #1334 box | Evidence |
+| --- | --- |
+| 1. Concrete outcomes + canonical tasks | Eight outcome cards plus adjacent task links; 16-route Playwright 200 inventory. |
+| 2. Required breadth | Server-first/progressive UI, data/cache, auth, plugins/durable, OTEL/Aspire/Scalar, and agent MCP are all represented. |
+| 3. Generated-schema DB flow | L1 `714a4ef9b` content and contract diagram untouched; fresh build/diagram probe PASS. |
+| 4. Demonstrated/current claims | `deno doc`, live CLI help, worked canonical snippets, and committed diagram mapping in slice 2.3. |
+| 5. Concise/progressive | Eight grouped outcomes, one adjacent task sentence, no new page/reference inventory/comparison/procedure. |
+| 6. Responsive/themes/tabs/diagram | Six Playwright rows, screenshots, no overflow, interactive tabs, loaded diagram; #1277 token finding recorded. |
+| 7. “What for free?” in one click | Outcome titles answer the question; all canonical destinations return 200 directly. |
 
 ### Capability claim substantiation
 
@@ -118,4 +183,5 @@ matrix without altering the five-item destination lane.
 
 ## Handoff Notes
 
-- IMPL-EVAL is mandatory and must be performed by a separate supervisor-selected session.
+- Implementation is complete. IMPL-EVAL is mandatory and must be performed by a separate
+  supervisor-selected session; keep PR #1442 draft and at `status:impl` until then.

@@ -85,56 +85,48 @@ bigger library, but ownership of the seams between the libraries you already kno
 
 {{ comp.cardsGrid({ columns: 3, cards: [
   {
-    eyebrow: "Server-first UI",
     title: "Pages arrive with their data",
     body: "definePage composes route state, server loaders, and layered resources before an island hydrates, so the browser starts from useful HTML instead of rebuilding the page contract.",
     href: "/web-layer/builders/",
     icon: "P"
   },
   {
-    eyebrow: "Progressive UI",
     title: "Interaction does not replace the server path",
     body: "freshUiRegistryManifest and the design route give teams one component vocabulary; forms, optimistic updates, cache-first queries, and partials add progressively without making JavaScript the baseline.",
     href: "/web-layer/fresh-ui/",
     icon: "UI"
   },
   {
-    eyebrow: "Generated data",
     title: "The data layer you did not write",
     body: "netscript db generate produces the Prisma client and Zod model schemas; createQueryFactories and createQueryCollection supply cache-aware caller views.",
     href: "/data-persistence/database/",
     icon: "DB"
   },
   {
-    eyebrow: "Identity",
     title: "Authentication crosses one explicit seam",
     body: "createAuthBackendRegistry selects one AuthBackendPort while the auth plugin carries its session contract, service, health surface, and audit spans into the workspace.",
     href: "/identity-access/auth/",
     icon: "ID"
   },
   {
-    eyebrow: "Plugins",
     title: "Installed capabilities join the whole system",
     body: "definePlugin declares services, schemas, background processors, Aspire resources, and diagnostics in one manifest, so adding a capability also adds its operational shape.",
     href: "/explanation/plugin-system/",
     icon: "+"
   },
   {
-    eyebrow: "Durable runtimes",
     title: "Long work keeps its state and evidence",
     body: "defineSaga and defineJob give long work typed state and outcomes; triggers and streams keep correlation, progress, and failure visible beyond the request that started it.",
     href: "/durable-workflows/",
     icon: "∞"
   },
   {
-    eyebrow: "Observed services",
     title: "One operation leaves one trail",
     body: "withSpan adds evidence to W3C trace context across service and background work; Aspire shows the resource graph, while createScalarDocs renders generated OpenAPI.",
     href: "/observability/telemetry/",
     icon: "O"
   },
   {
-    eyebrow: "Agent discovery",
     title: "Agents inspect the framework before guessing",
     body: "netscript agent mcp exposes bounded diagnostics, telemetry summaries, live operation schemas, and documentation search through the agent-facing MCP server.",
     href: "/ai/agent-tooling/",
@@ -143,16 +135,19 @@ bigger library, but ownership of the seams between the libraries you already kno
 ] }) }}
 
 For the UI path, go directly to the
-<a href="{{ '/web-layer/fresh-ui/' |> url }}">registry and design route</a>,
-<a href="{{ '/web-layer/form/' |> url }}">server-validated forms</a>,
-<a href="{{ '/web-layer/query/' |> url }}">optimistic mutations</a>,
-<a href="{{ '/web-layer/query-bridge/' |> url }}">cache-first SDK bridge</a>, or
-<a href="{{ '/web-layer/partials/' |> url }}">partial updates</a>. For work beyond a request, compare
-the <a href="{{ '/durable-workflows/' |> url }}">durable definitions</a>,
-<a href="{{ '/background-processing/workers/' |> url }}">worker jobs</a>, and
-<a href="{{ '/durable-workflows/streams/' |> url }}">durable streams</a>. Follow a running system in
-the <a href="{{ '/quickstart/aspire/' |> url }}">Aspire dashboard</a> or expose its contract through
-the <a href="{{ '/services-sdk/how-to/expose-openapi-scalar/' |> url }}">Scalar task</a>.
+<a class="ns-md-link" href="{{ '/web-layer/fresh-ui/' |> url }}">registry and design route</a>,
+<a class="ns-md-link" href="{{ '/web-layer/form/' |> url }}">server-validated forms</a>,
+<a class="ns-md-link" href="{{ '/web-layer/query/' |> url }}">optimistic mutations</a>,
+<a class="ns-md-link" href="{{ '/web-layer/query-bridge/' |> url }}">cache-first SDK bridge</a>, or
+<a class="ns-md-link" href="{{ '/web-layer/partials/' |> url }}">partial updates</a>. For work beyond
+a request, compare the
+<a class="ns-md-link" href="{{ '/durable-workflows/' |> url }}">durable definitions</a>,
+<a class="ns-md-link" href="{{ '/background-processing/workers/' |> url }}">worker jobs</a>, and
+<a class="ns-md-link" href="{{ '/durable-workflows/streams/' |> url }}">durable streams</a>. Follow a
+running system in the
+<a class="ns-md-link" href="{{ '/quickstart/aspire/' |> url }}">Aspire dashboard</a> or expose its
+contract through the
+<a class="ns-md-link" href="{{ '/services-sdk/how-to/expose-openapi-scalar/' |> url }}">Scalar task</a>.
 
 ## Where to go
 
