@@ -129,3 +129,36 @@ in `.llm/tools/agentic/config/models.ts:54`, so no volatile value is hardcoded b
 (brief: `escalations/E-2-scope-adjudication-brief.md`). It is **not** a plan-gate pass, does not
 re-litigate architecture, and does not become the IMPL-EVAL route — that remains native
 opposite-family Fable 5 medium for Codex-authored work.
+
+## D-9 · architectural · 2026-08-10 · loading configured modules executes them
+
+The E2E's new `generated.runtime-schemas` gate failed on `Import "zod" not a dependency` from the
+generated `workers/jobs/health-check.ts`. My research (A-3) read that as a missing per-kind
+import-map entry. The implementer's diagnosis is better: `loadRegisteredPlugins` imports project
+modules **in the CLI's own resolution context**, so the project's `deno.json` import map never
+applies. The fix loads them in a child process with the project's config (reusing S8's shared
+resolver).
+
+That fix is **not yet green**, and the failure is informative: S10's table-driven test
+`first-party configured modules preserve app exports and resolve one package manifest` now fails with
+
+```
+[DurableStreamProducer] Missing plugin reference "streams" ... Durable streams URL not found.
+Expected DURABLE_STREAMS_URL or services__streams__http__0 ...
+```
+
+**Importing a plugin barrel executes it**, and some barrels have import-time side effects requiring
+runtime environment. So the configured-module contract has a dimension neither the plan nor five
+plan-gate cycles surfaced: a module that must be *loadable* by the CLI cannot carry import-time
+runtime dependencies.
+
+Open question for the next session — the resolution is a design decision, not a patch:
+
+1. Make the emitted barrels side-effect-free at import (export the manifest and re-export lazily),
+   so loading never touches runtime env; or
+2. have the loader read the manifest without executing the app-owned surface; or
+3. give the child process the env the barrels expect (weakest — makes `generate runtime-schemas`
+   depend on a running stack).
+
+(1) looks right and matches the plugin-thinness law, but it changes what S10 emitted for five
+plugins and needs its own slice. **Do not commit the current working tree: it is red.**
