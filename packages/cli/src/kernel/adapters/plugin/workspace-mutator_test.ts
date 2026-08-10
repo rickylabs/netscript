@@ -50,6 +50,26 @@ const sagaProvider: PluginKindProvider = {
   concurrencyEnvVar: 'SAGA_CONCURRENCY',
 };
 
+const serviceLessProvider: PluginKindProvider = {
+  kind: 'service-less',
+  displayName: 'Service-less plugin',
+  category: 'plugin',
+  portRangeKey: 'PLUGIN_API',
+  defaultPermissions: [],
+  watchFlag: '--watch',
+  defaultEntrypoint: 'mod.ts',
+  defaultServiceEntrypoint: null,
+  defaultRequiresDb: false,
+  defaultRequiresKv: false,
+  pluginType: 'utility',
+  supportsConcurrency: false,
+  concurrencyEnvVar: null,
+  defaultConcurrency: null,
+  defaultTelemetry: true,
+  infrastructureRequires: [],
+  infrastructureOptionalDeps: [],
+};
+
 Deno.test('PluginWorkspaceMutator ensures plugins root and plugin packages are workspace members', async () => {
   const fs = new MemoryFileSystemAdapter();
   await fs.writeFile(
@@ -347,6 +367,39 @@ Deno.test('PluginWorkspaceMutator registers background plugins with companion AP
     Concurrency: 2,
     ConcurrencyEnvVar: 'BACKGROUND_CONCURRENCY',
     PluginReferences: ['billing-worker-api'],
+  });
+});
+
+Deno.test('PluginWorkspaceMutator omits appsettings entries for service-less plugins', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/appsettings.json',
+    JSON.stringify({ NetScript: {} }, null, 2) + '\n',
+  );
+
+  await new PluginWorkspaceMutator(fs).updateAppsettings(
+    '/project',
+    {
+      scaffoldResult: {
+        filesCreated: [],
+        directoriesCreated: [],
+        filesSkipped: [],
+        totalOperations: 0,
+        durationMs: 0,
+      },
+      pluginDir: '/project/plugins/service-less',
+      kind: 'service-less',
+      port: 4400,
+      servicePort: 8091,
+      configSection: 'Plugins',
+      configKey: 'service-less',
+      serviceConfigKey: 'service-less-api',
+    },
+    serviceLessProvider,
+  );
+
+  assertEquals(JSON.parse(await fs.readFile('/project/appsettings.json')), {
+    NetScript: {},
   });
 });
 

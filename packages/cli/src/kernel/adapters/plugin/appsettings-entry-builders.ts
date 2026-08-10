@@ -25,8 +25,11 @@ export function buildPluginEntry(
   scaffoldResult: PluginScaffoldResult,
   provider: PluginKindProvider,
   options: PluginWorkspaceMutationOptions,
-): PluginEntry {
+): PluginEntry | undefined {
   const entry = buildBasePluginEntry(scaffoldResult, provider, options);
+  if (entry === undefined) {
+    return undefined;
+  }
   applySagaStoreBackend(entry, provider, options.sagaStoreBackend);
   if (options.description) {
     entry.Description = options.description;
@@ -41,6 +44,9 @@ export function buildPluginServiceEntry(
   options: PluginWorkspaceMutationOptions,
 ): PluginEntry {
   const entry = buildBasePluginEntry(scaffoldResult, provider, options);
+  if (entry === undefined) {
+    throw new Error('Cannot build a plugin service entry without a declared service entrypoint.');
+  }
   applySagaStoreBackend(entry, provider, options.sagaStoreBackend);
   if (options.description) {
     entry.Description = `${options.description} API`;
@@ -97,7 +103,11 @@ function buildBasePluginEntry(
   scaffoldResult: PluginScaffoldResult,
   provider: PluginKindProvider,
   options: PluginWorkspaceMutationOptions,
-): PluginEntry {
+): PluginEntry | undefined {
+  const entrypoint = resolveServiceEntrypoint(scaffoldResult, provider, options);
+  if (entrypoint === undefined) {
+    return undefined;
+  }
   const entry: PluginEntry = {
     Enabled: options.enabled ?? true,
     Runtime: 'deno',
@@ -105,7 +115,7 @@ function buildBasePluginEntry(
     ...(scaffoldResult.hostPort !== undefined
       ? { HostPort: scaffoldResult.hostPort }
       : {}),
-    Entrypoint: resolveServiceEntrypoint(scaffoldResult, provider, options),
+    Entrypoint: entrypoint,
     Workdir: scaffoldResult.serviceWorkdir ?? PROJECT_ROOT_WORKDIR,
     RequiresKv: provider.defaultRequiresKv,
     RequiresDb: provider.defaultRequiresDb,
@@ -126,14 +136,14 @@ function resolveServiceEntrypoint(
   scaffoldResult: PluginScaffoldResult,
   provider: PluginKindProvider,
   options: PluginWorkspaceMutationOptions,
-): string {
+): string | undefined {
   if (scaffoldResult.serviceWorkdir) {
     return provider.defaultServiceEntrypoint ?? provider.defaultEntrypoint;
   }
-  if (
-    provider.defaultServiceEntrypoint &&
-    isAbsolute(provider.defaultServiceEntrypoint)
-  ) {
+  if (provider.defaultServiceEntrypoint === null) {
+    return undefined;
+  }
+  if (isAbsolute(provider.defaultServiceEntrypoint)) {
     return provider.defaultServiceEntrypoint;
   }
   return servicePackageEntrypoint(

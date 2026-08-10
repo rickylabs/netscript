@@ -24,7 +24,6 @@ import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold
 import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
-import { netscriptJsrSpecifier } from '../../../../constants/jsr-specifiers.ts';
 import { withDatabasePermissions } from './database-permissions.ts';
 import { renderHttpEndpointCall } from './render-http-endpoint.ts';
 
@@ -49,7 +48,10 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
 
   for (const [name, entry] of entries) {
     const workdir = entry.Workdir ?? '.';
-    const entrypoint = entry.Entrypoint ?? netscriptJsrSpecifier(`plugin-${name}`, '/services');
+    if (entry.Entrypoint === undefined) {
+      throw new Error(`Plugin appsettings entry "${name}" is missing Entrypoint.`);
+    }
+    const entrypoint = entry.Entrypoint;
     const entryPermissions = entry.Permissions
       ? withDatabasePermissions(entry.Permissions, databaseEngine)
       : undefined;

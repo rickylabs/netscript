@@ -3,7 +3,11 @@
  */
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import {
+  assert,
+  assertEquals,
+  assertStringIncludes,
+} from 'jsr:@std/assert@^1';
 import type { PluginEntry } from '@netscript/aspire/types';
 import { generateRegisterServices } from '../register/generate-register-services.ts';
 import { generateRegisterPlugins } from '../register/generate-register-plugins.ts';
@@ -499,7 +503,10 @@ describe('generateRegisterPlugins', () => {
       output,
       '// No plugin\u2192plugin cross-references to wire.',
     );
+    assert(!output.includes('builder.addExecutable('));
+    assert(!output.includes('/services'));
   });
+
 });
 // generateRegisterBackground
 // --------------------------------------------------------------------------

@@ -304,7 +304,7 @@ export class PluginWorkspaceMutator {
     scaffoldResult: PluginScaffoldResult,
     provider: PluginKindProvider,
     options: PluginWorkspaceMutationOptions = {},
-  ): Promise<PluginConfigEntry> {
+  ): Promise<PluginConfigEntry | undefined> {
     const configPath = join(projectRoot, SCAFFOLD_FILES.APPSETTINGS);
     if (!await this.fs.exists(configPath)) {
       throw new ScaffoldValidationError(
@@ -316,17 +316,20 @@ export class PluginWorkspaceMutator {
     const raw = JSON.parse(await this.fs.readFile(configPath)) as AppsettingsShape;
     raw.NetScript ??= {};
 
-    const entry = provider.category === 'plugin'
-      ? buildPluginEntry(scaffoldResult, provider, options)
-      : buildBackgroundProcessorEntry(scaffoldResult, provider, options);
+    let entry: PluginConfigEntry | undefined;
 
     if (provider.category === 'plugin') {
-      raw.NetScript.Plugins ??= {};
-      raw.NetScript.Plugins[scaffoldResult.configKey] = entry as PluginEntry;
+      const pluginEntry = buildPluginEntry(scaffoldResult, provider, options);
+      entry = pluginEntry;
+      if (pluginEntry !== undefined) {
+        raw.NetScript.Plugins ??= {};
+        raw.NetScript.Plugins[scaffoldResult.configKey] = pluginEntry;
+      }
     } else {
+      const backgroundEntry = buildBackgroundProcessorEntry(scaffoldResult, provider, options);
+      entry = backgroundEntry;
       raw.NetScript.BackgroundProcessors ??= {};
-      raw.NetScript.BackgroundProcessors[scaffoldResult.configKey] =
-        entry as BackgroundProcessorEntry;
+      raw.NetScript.BackgroundProcessors[scaffoldResult.configKey] = backgroundEntry;
       if (provider.defaultServiceEntrypoint) {
         raw.NetScript.Plugins ??= {};
         raw.NetScript.Plugins[scaffoldResult.serviceConfigKey] = buildPluginServiceEntry(

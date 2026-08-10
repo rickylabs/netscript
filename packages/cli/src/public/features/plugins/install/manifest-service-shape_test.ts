@@ -75,6 +75,35 @@ Deno.test("all shipped manifests preserve their legacy appsettings projections",
         : {}),
     }, `${pluginName} service appsettings projection changed`);
 
+    assertEquals(
+      buildPluginEntry(
+        {
+          ...scaffoldResult,
+          serviceWorkdir: undefined,
+        },
+        provider,
+        {
+          packageSpecifier: resolved.descriptor.manifest.name,
+          packageVersion: resolved.descriptor.manifest.version,
+        },
+      ),
+      {
+        Enabled: true,
+        Runtime: "deno",
+        Port: 8123,
+        Entrypoint:
+          `jsr:${resolved.descriptor.manifest.name}@${resolved.descriptor.manifest.version}/services`,
+        Workdir: ".",
+        RequiresKv: provider.defaultRequiresKv,
+        RequiresDb: provider.defaultRequiresDb,
+        Permissions: [...provider.defaultPermissions],
+        ...(provider.kind === "saga"
+          ? { Sagas: { Store: { Backend: "kv" } } }
+          : {}),
+      },
+      `${pluginName} published service appsettings projection changed`,
+    );
+
     if (provider.category === "background-processor") {
       const expectedPluginReferences = [`${pluginName}-api`];
       assertEquals(
