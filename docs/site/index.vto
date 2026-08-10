@@ -81,6 +81,79 @@ bigger library, but ownership of the seams between the libraries you already kno
 <a href="{{ '/web-layer/' |> url }}">how pages consume it</a>.
 </p>
 
+## What the framework carries for you
+
+{{ comp.cardsGrid({ columns: 3, cards: [
+  {
+    eyebrow: "Server-first UI",
+    title: "Pages arrive with their data",
+    body: "definePage composes route state, server loaders, and layered resources before an island hydrates, so the browser starts from useful HTML instead of rebuilding the page contract.",
+    href: "/web-layer/builders/",
+    icon: "P"
+  },
+  {
+    eyebrow: "Progressive UI",
+    title: "Interaction does not replace the server path",
+    body: "The Fresh UI registry and design route give teams one component vocabulary; forms, optimistic updates, cache-first queries, and partials add progressively without making JavaScript the baseline.",
+    href: "/web-layer/fresh-ui/",
+    icon: "UI"
+  },
+  {
+    eyebrow: "Generated data",
+    title: "The data layer you did not write",
+    body: "netscript db generate produces the Prisma client and Zod model schemas; the SDK supplies cache-aware query factories and collections for callers.",
+    href: "/data-persistence/database/",
+    icon: "DB"
+  },
+  {
+    eyebrow: "Identity",
+    title: "Authentication crosses one explicit seam",
+    body: "The auth plugin carries a selected backend, session contract, service, health surface, and audit spans into the workspace instead of leaving each app to integrate them separately.",
+    href: "/identity-access/auth/",
+    icon: "ID"
+  },
+  {
+    eyebrow: "Plugins",
+    title: "Installed capabilities join the whole system",
+    body: "A plugin contributes its services, schemas, background processors, Aspire resources, and diagnostics through one manifest, so adding a capability also adds its operational shape.",
+    href: "/explanation/plugin-system/",
+    icon: "+"
+  },
+  {
+    eyebrow: "Durable runtimes",
+    title: "Long work keeps its state and evidence",
+    body: "Typed saga definitions, worker jobs, triggers, and streams make retries, correlation, progress, and failure visible beyond the request that started the work.",
+    href: "/durable-workflows/",
+    icon: "∞"
+  },
+  {
+    eyebrow: "Observed services",
+    title: "One operation leaves one trail",
+    body: "W3C trace context connects service and background spans; Aspire shows the resource graph, while each service can expose its generated OpenAPI contract through Scalar.",
+    href: "/observability/telemetry/",
+    icon: "O"
+  },
+  {
+    eyebrow: "Agent discovery",
+    title: "Agents inspect the framework before guessing",
+    body: "netscript agent mcp exposes bounded diagnostics, telemetry summaries, live operation schemas, and documentation search through the agent-facing MCP server.",
+    href: "/ai/agent-tooling/",
+    icon: "MCP"
+  }
+] }) }}
+
+For the UI path, go directly to the
+<a href="{{ '/web-layer/fresh-ui/' |> url }}">registry and design route</a>,
+<a href="{{ '/web-layer/form/' |> url }}">server-validated forms</a>,
+<a href="{{ '/web-layer/query/' |> url }}">optimistic mutations</a>,
+<a href="{{ '/web-layer/query-bridge/' |> url }}">cache-first SDK bridge</a>, or
+<a href="{{ '/web-layer/partials/' |> url }}">partial updates</a>. For work beyond a request, compare
+the <a href="{{ '/durable-workflows/' |> url }}">durable definitions</a>,
+<a href="{{ '/background-processing/workers/' |> url }}">worker jobs</a>, and
+<a href="{{ '/durable-workflows/streams/' |> url }}">durable streams</a>. Follow a running system in
+the <a href="{{ '/quickstart/aspire/' |> url }}">Aspire dashboard</a> or expose its contract through
+the <a href="{{ '/services-sdk/how-to/expose-openapi-scalar/' |> url }}">Scalar task</a>.
+
 ## Where to go
 
 <nav class="ns-destination-list" aria-label="Choose the next page">

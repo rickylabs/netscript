@@ -63,6 +63,8 @@ matrix without altering the five-item destination lane.
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-10 | 2.1 | Bootstrap | Baseline `714a4ef9b`, live issue, overlay, doctrine boundary, lane identity, and locked plan recorded. |
+| 2026-08-10 | 2.2 | Capability presentation | Added eight grouped outcome cards plus adjacent canonical UI, runtime, Aspire, Scalar, and streams task links. |
+| 2026-08-10 | 2.2 | Reconcile | Issue #1334 remains open; PR #1442 has no implementation feedback; no plan adjustment or drift. |
 
 ## Decisions
 
@@ -84,6 +86,9 @@ matrix without altering the five-item destination lane.
 | --- | --- | --- | --- |
 | Baseline | `git fetch origin && git log --oneline -3 origin/main` | PASS | head `714a4ef9b` |
 | L1 inspection | `git show 714a4ef9b --stat` and focused hunks | PASS | acceptance-critical content understood and excluded from edit scope |
+| Source format | `cd docs/site && deno task check:source-format` | PASS | `Docs source format: OK` |
+| Site build | `cd docs/site && deno task build` | PASS | 617 files; rendered output OK across 220 HTML files |
+| Card HTML | DOMParser `.ns-cards-grid__card a` probe | PASS | `nested card anchors: 0` |
 
 ## Handoff Notes
 
