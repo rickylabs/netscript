@@ -12,9 +12,9 @@
 
 ## Current State
 
-Slice 2.3 ties every capability outcome to current `deno doc` exports or live CLI help and to worked
-code/committed diagrams on its canonical task page. No TS/TSX sample changed, so the required D10
-snippet table records scratch checking as not applicable with a focused diff command.
+Slice 2.4 proves the rendered contract on a fresh 617-file build: semantic h2s are “One definition,
+carried end to end”, “What the framework carries for you”, and “Where to go”; the destination count
+is exactly five; card nested anchors are zero; `check-rendered-output.ts` is byte-unchanged from L1.
 
 ## Completed
 
@@ -27,15 +27,15 @@ snippet table records scratch checking as not applicable with a focused diff com
   `createQueryCollection`, `createAuthBackendRegistry`, `definePlugin`, `defineSaga`, `defineJob`,
   `withSpan`, and `createScalarDocs` with `deno doc`; verified `db generate` and `agent mcp` with
   live CLI help.
+- Rendered output PASS across 220 HTML files with the checker unchanged; semantic DOM probe PASS.
 
 ## In Progress
 
-- Commit, push, and comment slice 2.3 substantiation.
+- Commit, push, and comment slice 2.4 rendered semantics.
 
 ## Next Steps
 
-1. Prove rendered semantics with the checker unchanged.
-2. Run full docs gates, browser matrix, acceptance mapping, and lock proof.
+1. Run full docs gates, browser matrix, acceptance mapping, and lock proof.
 
 ## Key Decisions
 
@@ -59,6 +59,7 @@ snippet table records scratch checking as not applicable with a focused diff com
 | Static | baseline PASS | worklog |
 | Docs | source/build PASS | `Docs source format: OK`; 617 files; rendered output OK |
 | HTML | PASS | `.ns-cards-grid__card a` count 0 |
+| Rendered semantics | PASS | three expected h2s; 5 destinations; checker unchanged |
 | Browser | pending | slice 2.5 |
 | Lock hygiene | pending final proof | slice 2.5 |
 

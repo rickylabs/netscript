@@ -67,6 +67,8 @@ matrix without altering the five-item destination lane.
 | 2026-08-10 | 2.2 | Reconcile | Issue #1334 remains open; PR #1442 has no implementation feedback; no plan adjustment or drift. |
 | 2026-08-10 | 2.3 | Substantiation | Replaced generic feature nouns with current exported symbols or live CLI commands and traced each outcome to worked code/diagrams. |
 | 2026-08-10 | 2.3 | Reconcile | Issue/PR lifecycle unchanged; no new comments, scope change, or drift. |
+| 2026-08-10 | 2.4 | Rendered semantics | Fresh Lume build and unchanged checker prove three semantic h2s, exactly five destination links, and zero nested card anchors. |
+| 2026-08-10 | 2.4 | Reconcile | PR remains draft at `status:impl`; issue remains open; no new feedback or drift. |
 
 ## Decisions
 
@@ -91,6 +93,9 @@ matrix without altering the five-item destination lane.
 | Source format | `cd docs/site && deno task check:source-format` | PASS | `Docs source format: OK` |
 | Site build | `cd docs/site && deno task build` | PASS | 617 files; rendered output OK across 220 HTML files |
 | Card HTML | DOMParser `.ns-cards-grid__card a` probe | PASS | `nested card anchors: 0` |
+| Rendered homepage | `cd docs/site && rtk proxy deno task check:rendered-output` | PASS | 220 HTML files; 4 documented-syntax allowances |
+| Semantic DOM | DOMParser heading/destination/card probe | PASS | h2s = required two + capability section; destinations = 5; nested anchors = 0 |
+| Checker integrity | `git diff --exit-code 714a4ef9b -- _plugins/check-rendered-output.ts` from `docs/site` | PASS | exit 0; checker unmodified |
 
 ### Capability claim substantiation
 
