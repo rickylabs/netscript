@@ -58,7 +58,7 @@ shapes; the handler and page remain application code, but their boundary types c
   {
     label: "1 · The contract",
     lang: "ts",
-    code: "// contracts/versions/v1/users.contract.ts\nimport { z } from 'zod';\nimport { oc } from '@orpc/contract';\nimport { implement } from '@orpc/server';\nimport { UsersListItemSchemaV1 } from './users.schemas.ts';\n\nexport const UsersListInputSchemaV1 = z.object({\n  limit: z.number().int().positive().max(100).default(20),\n});\n\n// The contract binds method + input + output. No handler yet.\nexport const UsersContractV1 = {\n  list: oc.route({ method: 'POST' })\n    .input(UsersListInputSchemaV1)\n    .output(z.object({ items: z.array(UsersListItemSchemaV1) })),\n};\n\nexport const UsersV1 = implement(UsersContractV1);"
+    code: "// contracts/versions/v1/users.contract.ts\nimport { z } from 'zod';\nimport { oc } from '@orpc/contract';\nimport { implement } from '@orpc/server';\nimport { UsersListItemSchemaV1 } from './users.schemas.ts'; // derived in tab 0, or hand-authored without a database\n\nexport const UsersListInputSchemaV1 = z.object({\n  limit: z.number().int().positive().max(100).default(20),\n});\n\n// The contract binds method + input + output. No handler yet.\nexport const UsersContractV1 = {\n  list: oc.route({ method: 'POST' })\n    .input(UsersListInputSchemaV1)\n    .output(z.object({ items: z.array(UsersListItemSchemaV1) })),\n};\n\nexport const UsersV1 = implement(UsersContractV1);"
   },
   {
     label: "2 · The service",

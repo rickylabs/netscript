@@ -12,10 +12,14 @@
 
 ## Current State
 
-Draft PR #1441 is live with slices 1.1–1.7 pushed. Slice 1.8 has a green full gate sweep, exact
+Draft PR #1441 is live with slices 1.1–1.8 pushed. Slice 1.8 has a green full gate sweep, exact
 snippet evidence, six responsive/theme browser combinations, and ten rendered cross-link checks.
 Playwright's mobile visual review prompted an opt-in scroll viewport for the wide contract-flow
-diagram; the page retains zero horizontal overflow. No framework behavior changes are in scope.
+diagram; the page retains zero horizontal overflow. The Tier-A supervisor accepted those slices
+in substance and requested slice 1.9: one Tab 1 comment that makes the DB-less schema origin
+explicit, followed by a rebase onto the new CI-gate baseline. That correction is now implemented,
+the branch merge base is `7a379dab3`, and all three mandated post-rebase gates pass. No framework
+behavior changes are in scope.
 
 ## Completed
 
@@ -55,17 +59,25 @@ diagram; the page retains zero horizontal overflow. No framework behavior change
   ignored `.llm/tmp/docs-1332-playwright/` evidence directory.
 - Proved all ten newly added cross-link pairs exist in rendered pages, return HTTP 200, and land on
   their expected anchors.
+- Received substantive supervisor A1 acceptance for slices 1.1–1.8, including explicit acceptance
+  of the narrow responsive-diagram deviation.
+- Added the single requested Tab 1 import comment distinguishing Tab 0 derivation from a DB-less
+  hand-authored schema module.
+- Rebased all nine slice commits without conflict onto `origin/main`
+  `7a379dab36d6823164bbd8dc97f3b1790321a220`.
+- Passed the post-rebase derivation fixture 4/4 with both consumer exits 0, rebuilt 617 site files
+  with rendered-output OK over 220 HTML files, and re-proved 16/16 diagram parity.
 
 ## In Progress
 
-- Slice 1.8 evidence commit, explicit-refspec push, PR body completion, and per-slice evidence comment.
+- Slice 1.9 amended evidence commit, force-with-lease push, PR comment, and live check-status report.
 
 ## Next Steps
 
-1. Commit slice 1.8 with responsive diagram polish and final run evidence.
-2. Push `HEAD:docs/1332-generated-schema-contract-predecessor` and post the final evidence comment.
-3. Update the draft PR slice/DoD checkboxes without changing draft or `status:impl`.
-4. Hand the still-draft PR to the supervisor for separate IMPL-EVAL and leaf-L3 sequencing.
+1. Amend this post-rebase evidence into slice 1.9.
+2. Push with `--force-with-lease` to the existing PR branch.
+3. Update the PR slice map, post the slice evidence comment, and report current required checks.
+4. Leave the PR draft at `status:impl` for separate IMPL-EVAL.
 
 ## Key Decisions
 
@@ -121,11 +133,13 @@ diagram; the page retains zero horizontal overflow. No framework behavior change
 
 ## Commits
 
-- `851c9757aab38c7c91e489b9fa13b8415d0c3d9d` — slice 1.1 bootstrap proof.
-- `5dc1a518a057a5b339594c9af50cacba8ceb0373` — slice 1.2 derivation-alias proof.
-- `cd2ddc49966abe7e450bfb9cd856125da5418046` — slice 1.3 optional diagram proof.
-- `70702c1ac9e7a494d132e11a4ed512c61c0de6a8` — slice 1.4 homepage type-flow proof.
-- `c502e8d60467e2f87091ff9ca89a95067023ece5` — slice 1.5 dual-origin framing proof.
-- `96b4593c76761f8838f49a21bfc0b39d7a8f590c` — slice 1.6 omission/relation proof.
-- `89cf0786354eaa070e76cf43028ff3b8bb36d271` — slice 1.7 cross-link proof.
+- `5529f5c8c` — rebased slice 1.1 bootstrap proof.
+- `08c1161f0` — rebased slice 1.2 derivation-alias proof.
+- `99173e706` — rebased slice 1.3 optional diagram proof.
+- `1dc1a8afe` — rebased slice 1.4 homepage type-flow proof.
+- `4a5fd86e2` — rebased slice 1.5 dual-origin framing proof.
+- `01ac2efea` — rebased slice 1.6 omission/relation proof.
+- `cf49757d0` — rebased slice 1.7 cross-link proof.
+- `e1aaae0bd` — rebased slice 1.8 responsive evidence proof.
+- Slice 1.9 is the current amended head; see draft PR #1441 for its final SHA.
 - See draft PR #1441 for the live commit list and per-slice comments.

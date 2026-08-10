@@ -57,12 +57,13 @@ Recorded before implementation files per `workflow/run-loop.md` §3b.
 | 1.6 | Prove omission and relation composition | `docs:contract-derivation` | `docs/site/explanation/contracts.md`, fixture if needed, run dir |
 | 1.7 | Prove bidirectional navigation | docs/site link gates | database/route/server/builders/services docs, run dir |
 | 1.8 | Prove release-ready implementation evidence | full gate sweep, Playwright matrix, lock hashes | run evidence, PR body, run dir |
+| 1.9 | Prove both homepage schema origins after the CI-base rebase | supervisor F1 line review; post-rebase derivation/diagram/site gates | homepage Tab 1, run dir |
 
 ### Deferred Scope
 
 - Site-wide snippet extraction and census — issue #1374.
 - Framework behavior or export changes — separate package/CLI work if ever required.
-- IMPL-EVAL, ready-review transition, rebase on leaf L3, and merge — supervisor-owned.
+- IMPL-EVAL, ready-review transition, and merge — supervisor-owned.
 
 ### Contributor Path
 
@@ -100,6 +101,12 @@ pages' existing examples as the only prose source rather than duplicating genera
 | 2026-08-10T10:24:21+02:00 | 1.8 | full gate sweep | Root links/accuracy/derivation, site source/build/links/caveats/diagram parity, scoped fixture check/lint/fmt, scratch snippet checks, and exact lock equality all produced their required verdicts. |
 | 2026-08-10T10:24:21+02:00 | 1.8 | browser matrix | Playwright exercised 390/1024/1600 in light and dark, every tab at each combination, semantic invariants, diagram rendering, and document overflow; ten new rendered cross-links returned 200 and resolved their target anchors. |
 | 2026-08-10T10:24:21+02:00 | 1.8 | responsive finding | Visual review found the wide flowchart's labels over-compressed at 390px. Added an opt-in 720px scroll viewport for that diagram; final mobile checks show 324px viewport / 720px content with page overflow still exactly 0. |
+| 2026-08-10T10:34:36+02:00 | 1.9 | supervisor A1 review | Slices 1.1–1.8 accepted in substance; accepted the recorded diagram deviation and returned one focused homepage finding. |
+| 2026-08-10T10:34:36+02:00 | 1.9 | F1 correction | Tab 1 now states on its existing schema import that the module is derived in Tab 0 or hand-authored without a database; no prose or tab expansion. |
+| 2026-08-10T10:34:36+02:00 | 1.9 | rebase preflight | Fetched `origin/main` at `7a379dab3`; prior merge base was `da40fbfe3`; remote PR head remained `a1a48c044`. |
+| 2026-08-10T10:37:08+02:00 | 1.9 | rebase | Rebased all nine slice commits without conflict; `git merge-base HEAD origin/main` is exactly `7a379dab36d6823164bbd8dc97f3b1790321a220`. |
+| 2026-08-10T10:37:08+02:00 | 1.9 | post-rebase derivation | `docs:contract-derivation` passed 4/4; root and contracts-member compile exits are 0 and all three negative fixtures remain non-zero. |
+| 2026-08-10T10:37:08+02:00 | 1.9 | post-rebase site gates | Site build generated 617 files and passed rendered-output over 220 HTML files; `diagrams:check` reports all 16 committed SVGs match. |
 
 ## Decisions
 
@@ -156,6 +163,9 @@ pages' existing examples as the only prose source rather than duplicating genera
 | Final rendered links | `deno task check:links` from `docs/site/` | PASS | 32,783 links across 220 pages; all resolve. |
 | Final diagram parity | `deno task diagrams:check` from `docs/site/` | PASS | 16 committed SVGs byte-match regenerated output. |
 | Final whitespace | `git diff --check` | PASS | Exit 0. |
+| Post-rebase derivation | `rtk proxy deno task docs:contract-derivation` | PASS | 4 passed / 0 failed; root and contracts-member exits 0; all three negatives non-zero. |
+| Post-rebase site build | `rtk proxy deno task build` from `docs/site/` | PASS | 617 files; source format and rendered-output pass across 220 HTML files. |
+| Post-rebase diagram parity | `rtk proxy deno task diagrams:check` from `docs/site/` | PASS | 16/16 committed SVGs match their Mermaid sources. |
 
 ### Fitness Gates
 
@@ -199,7 +209,7 @@ pages' existing examples as the only prose source rather than duplicating genera
 | 1 | Optional DB model → generation → `@database/zod` predecessor in the full flow | `contract-flow.mmd`/SVG and homepage diagram alt/caption; `diagrams:check` 16/16. |
 | 2 | Optional Tab 0 with exact generation/import flow | `index.vto:54-56`; rendered as the first of four accessible tabs and exercised at all six browser combinations. |
 | 3 | Persistence/private fields are deliberately omitted | `explanation/contracts.md:67-107`; fixture compiles picks that exclude `internalCost`, `deletedAt`, and `internalRegionCode`. |
-| 4 | DB-less and DB-backed origins, with generated path normal when available | `explanation/contracts.md:42-63` plus homepage lede/caption. |
+| 4 | DB-less and DB-backed origins, with generated path normal when available | `explanation/contracts.md:42-63`, homepage lede/caption, and the Tab 1 import comment identifying the DB-less hand-authored module origin. |
 | 5 | Forward/back navigation across database, contracts, route, server, builders, and services | Source and rendered link gates pass; Playwright proves all ten new rendered source/target pairs return 200 and resolve their anchors. |
 | 6 | Homepage no longer claims hand-authored Zod is always first | DB-aware hero, lede, feature, diagram, four-tab framing, and closing explanation in `index.vto`. |
 | 7 | Current exports type-check, including a multi-model relation | `docs:contract-derivation` runs the real barrel and both alias emitters; Product + Warehouse explicit relation composition compiles through generated `contracts/deno.json`. |
@@ -209,4 +219,5 @@ pages' existing examples as the only prose source rather than duplicating genera
 
 - Evaluator should inspect the load-bearing contracts-member resolution and three command-level
   negative exits in slice 1.2 first.
+- Supervisor F1 is resolved by the single Tab 1 import comment; post-rebase gates are recorded above.
 - This implementation agent will not write an IMPL-EVAL verdict or advance `status:impl`.
