@@ -42,7 +42,7 @@ contract cannot drift from it.
 
 ## One definition, carried end to end
 
-{{ comp.diagram({ src: "/assets/diagrams/contract-flow.svg", alt: "One zod schema and oRPC route feed a hand-written but contract-locked service handler, a generated OpenAPI document, and a derived SDK client with query keys; the SDK feeds the page loader and island, so server and callers cannot drift.", caption: "The principle in one picture: declare the boundary once; write the handler against it; derive the OpenAPI document and client from it; consume those types in the page." }) }}
+{{ comp.diagram({ src: "/assets/diagrams/contract-flow.svg", alt: "An optional DB-backed predecessor flows from a database model through db generate and @database/zod into a narrowed or extended versioned API schema. That schema and its oRPC route type the service handler, generated OpenAPI document, derived SDK client, page loader, and island. DB-less products can start at the versioned API schema.", caption: "DB-backed products normally narrow or extend generated model schemas before defining the public contract; DB-less products start at the versioned API schema. From the contract onward, the handler, OpenAPI document, SDK, and page share its types." }) }}
 
 The same operation at three authored points in the stack. Tab 1 is the only place its input and
 output shapes are declared; the handler and page remain application code, but their boundary types

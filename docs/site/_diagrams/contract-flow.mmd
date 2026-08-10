@@ -2,7 +2,13 @@
 %% Rendered to a committed static SVG by the SEPARATE dev task in render.ts.
 %% This file is NOT consumed by `deno task build`; the site ships the SVG only.
 flowchart LR
-  schema["zod schema + oc.route<br/><b>the boundary shape you write</b>"]
+  subgraph optional["optional for DB-backed products"]
+    direction LR
+    model["DB model"]
+    generated["db generate<br/><b>@database/zod</b>"]
+    model -. "db generate" .-> generated
+  end
+  schema["narrowed / extended versioned API schema + oc.route<br/><b>the public boundary</b>"]
   subgraph typed["typed from the contract"]
     direction TB
     handler["service handler<br/><b>hand-written logic</b><br/>contract-locked input/output"]
@@ -10,6 +16,7 @@ flowchart LR
     sdk["SDK client + query keys<br/>derived"]
   end
   page["page loader + island<br/>consume contract-derived types"]
+  generated -. "narrow / extend" .-> schema
   schema --> handler
   schema --> openapi
   schema --> sdk

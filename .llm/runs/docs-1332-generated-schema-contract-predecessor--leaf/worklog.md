@@ -80,6 +80,9 @@ pages' existing examples as the only prose source rather than duplicating genera
 | 2026-08-10T09:37:42+02:00 | 1.2 | fixture | Kept the new tool statically checked, loaded unchanged real emitters in a runtime probe, and compiled root plus contracts-member consumers with `--unstable-kv`. |
 | 2026-08-10T09:37:42+02:00 | 1.2 | negative controls | Root alias move, contracts alias move, and `ProductCreateInput` rename each exited 1 with the expected module/export error. |
 | 2026-08-10T09:37:42+02:00 | 1.2 | reconcile | Live PR #1441 remains draft and mergeable at slice-1.1 head; only the implementation agent's slice comment is new, issue #1332 remains open, and `status:impl` remains correct. |
+| 2026-08-10T09:45:07+02:00 | 1.3 | diagram | Added a visually optional DB model → `db generate` / `@database/zod` predecessor while keeping the DB-less contract path direct. |
+| 2026-08-10T09:45:07+02:00 | 1.3 | parity | Regenerated the committed SVG; all 16 Mermaid sources match their committed SVGs and homepage source-format passes. |
+| 2026-08-10T09:45:07+02:00 | 1.3 | reconcile | PR #1441 discussion contains only this implementation agent's slice 1.1 and 1.2 comments; no external findings require action. |
 
 ## Decisions
 
@@ -113,6 +116,9 @@ pages' existing examples as the only prose source rather than duplicating genera
 | API inspection | `deno doc --filter writeCrudZodBarrel`; `generateDenoJson`; `scaffoldContracts` | PASS | Real signatures and source definitions confirmed. |
 | Dependency provenance | `rtk proxy deno task deps:why zod` | PASS | `sourceUsed: true`; 167 source hits; not removable. |
 | Lock equality | `git diff --exit-code -- deno.lock docs/site/deno.lock`; `git hash-object ...` | PASS | No diff; expected `a541d408…` and `311255423…`. |
+| Diagram render | `deno task diagrams:render` from `docs/site/` | PASS | Rendered 16 diagrams; only `contract-flow.svg` changed for this slice. |
+| Diagram parity | `deno task diagrams:check` from `docs/site/` | PASS | All 16 committed SVGs match Mermaid sources. |
+| Site source format | `deno task check:source-format` from `docs/site/` | PASS | `Docs source format: OK`. |
 
 ### Fitness Gates
 
@@ -133,6 +139,7 @@ pages' existing examples as the only prose source rather than duplicating genera
 | --- | --- | --- | --- |
 | Generated root alias | PASS | positive compile plus root-alias negative exit 1 | Real root emitter target is load-bearing. |
 | Generated contract module | PASS | positive compile plus contracts-alias/barrel negatives exit 1 | Resolves through generated `contracts/deno.json`, not the root import map. |
+| Homepage diagram | PASS | `diagrams:check`; updated `alt` and caption | Both DB-backed and direct DB-less origins are described. |
 | Homepage SDK/Fresh module | NOT_RUN | planned slice 1.4 | Requires pre-fix and post-fix evidence. |
 
 ## Handoff Notes

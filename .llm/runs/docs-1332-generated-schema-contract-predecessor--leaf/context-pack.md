@@ -12,10 +12,9 @@
 
 ## Current State
 
-Draft PR #1441 is live with slice 1.1. Slice 1.2 now has a green focused fixture that executes the
-real root and contracts scaffold phases, calls the real CRUD-barrel writer, compiles a root consumer
-and the documented contract module through its generated `contracts/deno.json`, and proves three
-command-level negative exits. No framework behavior changes are in scope.
+Draft PR #1441 is live with slices 1.1 and 1.2 pushed. Slice 1.3 adds the optional generated-database
+predecessor without making the direct DB-less path a detour; its regenerated SVG has byte-parity
+with the Mermaid source. No framework behavior changes are in scope.
 
 ## Completed
 
@@ -29,17 +28,20 @@ command-level negative exits. No framework behavior changes are in scope.
 - Proved both real `@database/zod` targets, the real Product/Warehouse CRUD exports, a
   contracts-member derivation compile, and all three negative cases.
 - Passed scoped check/lint/fmt and re-proved exact lock equality.
+- Added the optional database predecessor to the contract-flow diagram and updated its homepage
+  accessible text for both DB-backed and DB-less origins.
+- Passed diagram render/parity for all 16 committed SVGs and homepage source-format validation.
 
 ## In Progress
 
-- Slice 1.2 commit, explicit-refspec push, PR body slice update, and per-slice evidence comment.
+- Slice 1.3 commit, explicit-refspec push, PR body slice update, and per-slice evidence comment.
 
 ## Next Steps
 
-1. Commit slice 1.2 with the fixture, task wiring, and current run artifacts.
+1. Commit slice 1.3 with the Mermaid, SVG, accessible text, and current run artifacts.
 2. Push `HEAD:docs/1332-generated-schema-contract-predecessor` and comment exact gate output.
 3. Update the draft PR slice list with the commit SHA.
-4. Begin slice 1.3: optional predecessor Mermaid, SVG render/parity, and homepage diagram text.
+4. Begin slice 1.4: optional Tab 0 and the compile-proven SDK/Fresh homepage flow.
 
 ## Key Decisions
 
@@ -59,12 +61,15 @@ command-level negative exits. No framework behavior changes are in scope.
 | `.llm/tools/docs/check-docs-contract-derivation.ts` | new | Real scaffold/barrel compile fixture and CLI verdict. |
 | `.llm/tools/docs/check-docs-contract-derivation_test.ts` | new | Positive case plus three command-level negative fixtures. |
 | `deno.json` | changed | New task and `docs:maintenance` wiring. |
+| `docs/site/_diagrams/contract-flow.mmd` | changed | Optional generated database predecessor. |
+| `docs/site/assets/diagrams/contract-flow.svg` | changed | Regenerated committed diagram. |
+| `docs/site/index.vto` | changed | Accurate diagram alt text and caption. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS | derivation task; scoped check/lint/fmt; API inspection; lock equality |
+| Static | PASS | derivation task; scoped check/lint/fmt; diagram parity; source-format; API inspection; lock equality |
 | Fitness | N/A for package gates | docs-only scope |
 | Runtime | NOT_RUN | browser validation belongs to slice 1.8 |
 | Consumer | PASS for generated contract path | root and contracts-member compile; three negatives exit 1 |
@@ -83,4 +88,5 @@ command-level negative exits. No framework behavior changes are in scope.
 ## Commits
 
 - `851c9757aab38c7c91e489b9fa13b8415d0c3d9d` — slice 1.1 bootstrap proof.
+- `5dc1a518a057a5b339594c9af50cacba8ceb0373` — slice 1.2 derivation-alias proof.
 - See draft PR #1441 for the live commit list and per-slice comments.
