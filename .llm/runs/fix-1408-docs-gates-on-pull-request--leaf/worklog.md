@@ -50,6 +50,7 @@ Future docs gate routing changes start in `docs/site/deno.json`, then use `ci.ym
 | 2026-08-10 | 3.3 | implement | Added path-scoped PR trigger to existing Pages build; guarded all Pages/deploy mutations and keyed concurrency per ref. |
 | 2026-08-10 | 3.4 | RED fixture | Added isolated `issue-1408-red-proof` raw-newline Vento defect; local checker fails with the expected named diagnostic. |
 | 2026-08-10 | 3.5 | GREEN revert | Deleted only the deliberate fixture after capturing the failing run; local checker and full build pass at clean head. |
+| 2026-08-10 | 3.6 | acceptance/locks | Recorded GREEN run, exact lock equality, acceptance mapping, and repo-native current-check PASS; retained draft state for supervisor evaluation. |
 
 ## Gate Results
 
@@ -61,6 +62,10 @@ Future docs gate routing changes start in `docs/site/deno.json`, then use `ci.ym
 | RED negative control | Pages run 31365789097 | PROVEN FAIL | https://github.com/rickylabs/netscript/actions/runs/31365789097; exit 1 with exact raw-newline diagnostic. |
 | GREEN source check | `deno task check:source-format` from `docs/site` | PASS | Deliberate fixture deleted; unique marker absent from docs source. |
 | GREEN full build | `deno task build` from `docs/site` | PASS | Existing full chain passes at clean branch head. |
+| GREEN CI | Pages run 31365881454 | PASS | Build/source/render, links, and caveats pass; Pages/deploy steps skip on PR. |
+| Lock diff | `git diff --exit-code da40fbfe3...HEAD -- deno.lock docs/site/deno.lock` | PASS | Exit 0, no lockfile change. |
+| Lock hashes | `git hash-object deno.lock docs/site/deno.lock` | PASS | `a541d4088071ac84c024ed3497be3d761b6d1c58`; `311255423e2d9e1799d654fefb73f87a6629fdc5`. |
+| Current PR checks | `deno task agentic:pr-checks --repo rickylabs/netscript --pr 1440 --pretty` | PASS | Head `c2c837302...`, 17 checks, zero current failures. Core required contexts remain skipped by the repository's draft policy and must materialize after the supervisor's ready-for-review transition. |
 
 ## Reconcile Notes
 
@@ -69,7 +74,10 @@ Future docs gate routing changes start in `docs/site/deno.json`, then use `ci.ym
 - 3.3: no new reviewer direction; extending the existing Pages workflow remains the smallest single-source implementation of D8.
 - 3.4: no new reviewer direction; the standalone negative-control commit follows the locked acceptance protocol and will remain at branch history only after slice 3.5 deletes the fixture.
 - 3.5: RED run and diagnostic are posted on PR #1440; no reviewer changes; GREEN revert stays within planned scope.
+- 3.6: no reviewer changes; acceptance is evidenced. Mandatory separate-session IMPL-EVAL and the ready-for-review transition remain supervisor-owned, so draft-only skipped core contexts are explicitly not claimed as executed.
 
 ## Handoff Notes
 
 - Evaluator should inspect workflow event/permission/concurrency semantics, RED/GREEN provenance, and lock equality first.
+- RED: https://github.com/rickylabs/netscript/actions/runs/31365789097; GREEN: https://github.com/rickylabs/netscript/actions/runs/31365881454.
+- Implementation is complete; the PR stays draft at `status:impl`. Supervisor must dispatch separate-session IMPL-EVAL, transition lifecycle/readiness, and verify the then-materialized full required contexts.

@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `fix-1408-docs-gates-on-pull-request--leaf` |
 | Branch | `fix/1408-docs-gates-on-pull-request` |
-| Current phase | implement — slice 3.5 GREEN revert |
+| Current phase | gate handoff — slice 3.6 complete |
 | Archetype | N/A — infrastructure workflow only |
 | Scope overlays | docs |
 
 ## Current State
 
-Both D8 paths are implemented. RED is proven by Actions run 31365789097. The deliberate fixture is deleted for the standalone GREEN commit, and local source/full-build gates pass.
+Implementation and generator-owned evidence are complete. RED is proven by run 31365789097 and GREEN by run 31365881454. Locks equal baseline exactly and the repo-native PR-check verdict has zero current failures. The PR remains draft for supervisor-owned IMPL-EVAL.
 
 ## Completed
 
@@ -23,11 +23,13 @@ Both D8 paths are implemented. RED is proven by Actions run 31365789097. The del
 - Slice 3.4 negative control locally fails with the expected diagnostic.
 - Slice 3.4 pushed and proven RED: https://github.com/rickylabs/netscript/actions/runs/31365789097.
 - Slice 3.5 fixture deletion and local GREEN gates completed.
+- Slice 3.5 pushed and proven GREEN: https://github.com/rickylabs/netscript/actions/runs/31365881454.
+- Slice 3.6 exact lock equality and current PR-check PASS recorded.
 
 ## Next Steps
 
-1. Commit/push slice 3.5 and capture its passing Actions run.
-2. Prove unique marker absence and revert diff, then complete slice 3.6 acceptance/lock evidence.
+1. Commit/push/comment slice 3.6 and update the PR acceptance-evidence block.
+2. Supervisor dispatches separate-session IMPL-EVAL, transitions `status:impl` → `status:impl-eval`, and later marks ready so draft-suppressed required contexts materialize.
 
 ## Key Decisions
 
@@ -43,11 +45,11 @@ Both D8 paths are implemented. RED is proven by Actions run 31365789097. The del
 
 ## Gates
 
-RED Actions proof is complete. Local source checker and full build are GREEN after fixture deletion; GREEN Actions URL is pending.
+RED/GREEN Actions proof, local tasks, lock equality, and current PR checks pass. Draft-suppressed core contexts are pending the supervisor's readiness transition by repository policy.
 
 ## Open Questions
 
-None.
+- None for implementation. Supervisor-owned IMPL-EVAL and non-draft full required-context run remain.
 
 ## Drift and Debt
 
