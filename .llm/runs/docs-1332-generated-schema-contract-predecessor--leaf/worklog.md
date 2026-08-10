@@ -83,6 +83,11 @@ pages' existing examples as the only prose source rather than duplicating genera
 | 2026-08-10T09:45:07+02:00 | 1.3 | diagram | Added a visually optional DB model → `db generate` / `@database/zod` predecessor while keeping the DB-less contract path direct. |
 | 2026-08-10T09:45:07+02:00 | 1.3 | parity | Regenerated the committed SVG; all 16 Mermaid sources match their committed SVGs and homepage source-format passes. |
 | 2026-08-10T09:45:07+02:00 | 1.3 | reconcile | PR #1441 discussion contains only this implementation agent's slice 1.1 and 1.2 comments; no external findings require action. |
+| 2026-08-10T09:56:21+02:00 | 1.4 | API proof | `deno doc` confirmed the client/factory action surface and `db generate --help` confirmed `--db` plus `--project-root`. |
+| 2026-08-10T09:56:21+02:00 | 1.4 | pre-fix control | Current `.withRoute()`-only chain exited 1 with exactly two TS2345 errors: `SearchParamValue` is not assignable to `number \| undefined`. |
+| 2026-08-10T09:56:21+02:00 | 1.4 | corrected chain | The same assembled SDK/Fresh module with coercing `.withSearchParams(...)` exited 0; the service implementation module also exited 0. |
+| 2026-08-10T09:56:21+02:00 | 1.4 | rendered homepage | Optional Tab 0 is first, tab 3 constructs the scaffold-shaped SDK factory before `definePage`, and the homepage build/rendered-output gate passes. |
+| 2026-08-10T09:56:21+02:00 | 1.4 | reconcile | PR #1441 discussion contains only this implementation agent's slice 1.1–1.3 comments; no external findings require action. |
 
 ## Decisions
 
@@ -119,6 +124,12 @@ pages' existing examples as the only prose source rather than duplicating genera
 | Diagram render | `deno task diagrams:render` from `docs/site/` | PASS | Rendered 16 diagrams; only `contract-flow.svg` changed for this slice. |
 | Diagram parity | `deno task diagrams:check` from `docs/site/` | PASS | All 16 committed SVGs match Mermaid sources. |
 | Site source format | `deno task check:source-format` from `docs/site/` | PASS | `Docs source format: OK`. |
+| Homepage pre-fix | `deno check --unstable-kv --config .llm/tmp/docs-1332-homepage/deno.json .llm/tmp/docs-1332-homepage/pre-fix.tsx` | EXPECTED FAIL | Exit 1; exactly two TS2345 search/contract input mismatches. |
+| Homepage post-fix | same command with `post-fix.tsx` | PASS | Exit 0; coercion resolves `ctx.search.limit` to `number`. |
+| Homepage service | same scratch config with `service.ts` | PASS | Exit 0; implemented contract handler and `defineService` compile. |
+| Site build | `deno task build` from `docs/site/` | PASS | 617 files generated; homepage semantics and 220 rendered HTML files pass. |
+| Docs accuracy | `rtk proxy deno task docs:accuracy` | PASS | 192 published source pages and documented dialect/import constraints pass. |
+| Fixture scoped wrappers | check/lint/fmt roots for both derivation fixture TS files | PASS | 2 files; 0 diagnostics, rules, or format findings. |
 
 ### Fitness Gates
 
@@ -140,7 +151,16 @@ pages' existing examples as the only prose source rather than duplicating genera
 | Generated root alias | PASS | positive compile plus root-alias negative exit 1 | Real root emitter target is load-bearing. |
 | Generated contract module | PASS | positive compile plus contracts-alias/barrel negatives exit 1 | Resolves through generated `contracts/deno.json`, not the root import map. |
 | Homepage diagram | PASS | `diagrams:check`; updated `alt` and caption | Both DB-backed and direct DB-less origins are described. |
-| Homepage SDK/Fresh module | NOT_RUN | planned slice 1.4 | Requires pre-fix and post-fix evidence. |
+| Homepage SDK/Fresh module | PASS | pre-fix exit 1; post-fix and service exits 0 | Compiled through current package entrypoint modules; server-only cache call is explicit. |
+
+## Snippet Proofs
+
+| Snippet | Source page:line | Exact proving command | Result |
+| --- | --- | --- | --- |
+| Homepage optional database derivation + contract | `docs/site/index.vto:56`, `:61` | `rtk proxy deno task docs:contract-derivation` | PASS; contract member compiles through generated `contracts/deno.json`. |
+| Homepage service handler/bootstrap | `docs/site/index.vto:66` | `deno check --unstable-kv --config .llm/tmp/docs-1332-homepage/deno.json .llm/tmp/docs-1332-homepage/service.ts` | PASS; exit 0. |
+| Homepage page before search coercion | `docs/site/index.vto:71` (same assembled chain without `.withSearchParams`) | `deno check --unstable-kv --config .llm/tmp/docs-1332-homepage/deno.json .llm/tmp/docs-1332-homepage/pre-fix.tsx` | EXPECTED FAIL; exit 1, two TS2345 errors. |
+| Homepage SDK factory + corrected page | `docs/site/index.vto:71` | `deno check --unstable-kv --config .llm/tmp/docs-1332-homepage/deno.json .llm/tmp/docs-1332-homepage/post-fix.tsx` | PASS; exit 0. |
 
 ## Handoff Notes
 

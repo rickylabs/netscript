@@ -60,6 +60,30 @@ export const WarehouseUpdateInputObjectZodSchema = z.object({
 });
 `;
 
+const USER_MODEL = `import { z } from 'zod';
+
+export const UserSchema = z.object({
+  id: z.number().int().positive(),
+  name: z.string().min(1),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+`;
+
+const USER_CREATE_INPUT = `import { z } from 'zod';
+
+export const UserInputSchema = z.object({
+  name: z.string().min(1),
+});
+`;
+
+const USER_UPDATE_INPUT = `import { z } from 'zod';
+
+export const UserUpdateInputObjectZodSchema = z.object({
+  name: z.string().min(1).optional(),
+});
+`;
+
 /**
  * Contract-derivation snippets shared verbatim with the documentation pages.
  *
@@ -95,6 +119,37 @@ export const ProductUpdateApiSchemaV1 = ProductUpdateInput.pick({
 export const ProductResponseSchemaV1 = z.object({
   item: ProductApiSchemaV1,
 });
+`;
+
+/** Homepage Tab 0, compiled as the generated-schema predecessor module. */
+export const DOCUMENTED_HOMEPAGE_DATABASE: string =
+  `import { UserSchema as DatabaseUserSchema } from '@database/zod';
+import { z } from 'zod';
+
+export const UsersListItemSchemaV1 = DatabaseUserSchema
+  .pick({ id: true, name: true })
+  .extend({
+    status: z.enum(['active', 'invited']),
+  });
+`;
+
+/** Homepage Tab 1, compiled against the Tab 0 derivation module. */
+export const DOCUMENTED_HOMEPAGE_CONTRACT: string = `import { z } from 'zod';
+import { oc } from '@orpc/contract';
+import { implement } from '@orpc/server';
+import { UsersListItemSchemaV1 } from './users.schemas.ts';
+
+export const UsersListInputSchemaV1 = z.object({
+  limit: z.number().int().positive().max(100).default(20),
+});
+
+export const UsersContractV1 = {
+  list: oc.route({ method: 'POST' })
+    .input(UsersListInputSchemaV1)
+    .output(z.object({ items: z.array(UsersListItemSchemaV1) })),
+};
+
+export const UsersV1 = implement(UsersContractV1);
 `;
 
 const ROOT_ALIAS_CONSUMER = `import { ProductSchema } from '@database/zod';
@@ -221,6 +276,11 @@ await Promise.all([
   Deno.writeTextFile(join(objectsDir, 'WarehouseUpdateInput.schema.ts'), ${
     JSON.stringify(WAREHOUSE_UPDATE_INPUT)
   }),
+  Deno.writeTextFile(join(modelsDir, 'User.schema.ts'), ${JSON.stringify(USER_MODEL)}),
+  Deno.writeTextFile(join(inputsDir, 'User.input.ts'), ${JSON.stringify(USER_CREATE_INPUT)}),
+  Deno.writeTextFile(join(objectsDir, 'UserUpdateInput.schema.ts'), ${
+    JSON.stringify(USER_UPDATE_INPUT)
+  }),
 ]);
 await writeCrudZodBarrel({ zodOutputDir, modelName: 'Product' });
 await Deno.writeTextFile(
@@ -327,6 +387,18 @@ export async function checkDocsContractDerivation(
       join(root, 'contracts', 'versions', 'v1', 'products.contract.ts'),
       DOCUMENTED_CONTRACT_DERIVATION,
     );
+    await Deno.writeTextFile(
+      join(root, 'contracts', 'versions', 'v1', 'users.schemas.ts'),
+      DOCUMENTED_HOMEPAGE_DATABASE,
+    );
+    await Deno.writeTextFile(
+      join(root, 'contracts', 'versions', 'v1', 'users.contract.ts'),
+      DOCUMENTED_HOMEPAGE_CONTRACT,
+    );
+    await Deno.writeTextFile(
+      join(root, 'contracts', 'versions', 'v1', 'docs-contracts.ts'),
+      "import './products.contract.ts';\nimport './users.contract.ts';\n",
+    );
 
     if (negative === 'root-alias') {
       await moveAlias(rootConfigPath, ROOT_ZOD_TARGET);
@@ -347,7 +419,7 @@ export async function checkDocsContractDerivation(
     const contractsCheck = await runCheck(
       root,
       contractsConfigPath,
-      join(root, 'contracts', 'versions', 'v1', 'products.contract.ts'),
+      join(root, 'contracts', 'versions', 'v1', 'docs-contracts.ts'),
     );
     if (contractsCheck.code !== 0) throw checkFailure('contracts-member compile', contractsCheck);
 
