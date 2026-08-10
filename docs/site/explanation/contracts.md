@@ -9,11 +9,12 @@ order: 2
 
 # Contracts & type flow
 
-This page explains *why* NetScript is contracts-first and *how* a single type definition
-travels from a contract, through a service handler, all the way to a typed client and a UI
-island — with no second source of truth and no code-generation step to drift. It is
-understanding-oriented: read it to build a mental model. When you want exact signatures,
-follow the links to [`reference/contracts/`](/reference/contracts/) and
+This page explains *why* NetScript is contracts-first and *how* one versioned public type definition
+travels from a contract, through a service handler, all the way to a typed client and a UI island —
+with no second boundary definition to drift. In a DB-backed product, generated model schemas are the
+intentional predecessor to that public definition; in a DB-less product, the public schema is
+authored directly. This page is understanding-oriented: read it to build a mental model. When you
+want exact signatures, follow the links to [`reference/contracts/`](/reference/contracts/) and
 [`reference/service/`](/reference/service/); when you want to build the thing, follow the
 [capability hub for services](/capabilities/services/) or the
 [Build a service tutorial](/tutorials/storefront/02-catalog-service/).
@@ -26,11 +27,13 @@ SDK, a hand-written `fetch` wrapper, an OpenAPI document, a GraphQL schema). The
 You change the server, forget the client, and the mismatch surfaces at runtime — in
 production, as a 500 or a silently-wrong field — instead of at your desk, as a red squiggle.
 
-NetScript removes the second source of truth. A **contract** is one TypeScript value that
-declares a route's method, its input shape, and its output shape. The server *implements*
-that exact value; the client is *derived* from that exact value. There is nothing to
-regenerate and nothing to keep in sync, because there is only ever one definition. The
-contract is not documentation about the boundary — it **is** the boundary.
+NetScript removes the second definition of the public boundary. A **contract** is one TypeScript
+value that declares a route's method, its input shape, and its output shape. The server *implements*
+that exact value; the client is *derived* from that exact value. There is no separately generated
+client model to reconcile with the server. DB-backed workspaces do intentionally rerun
+`netscript db generate` when their persistence model changes, then narrow or extend that generated
+shape into the versioned contract. The contract is not documentation about the public boundary —
+it **is** the public boundary.
 
 {{ comp callout { type: "important", title: "One definition, enforced three ways" } }}
 The same contract value is consumed by <strong>zod</strong> (runtime input/output validation),
@@ -38,6 +41,25 @@ by the <strong>TypeScript</strong> type checker (compile-time shape checking on 
 the OpenAPI generator (the published spec). Change the contract and all three move together —
 there is no path where one lags behind.
 {{ /comp }}
+
+## Where the public shape begins
+
+There are two valid origins for a contract schema:
+
+- **DB-backed:** when generated schemas exist, this is the normal path. Run
+  `netscript db generate`, import `<Model>Schema` (and, when needed, `<Model>CreateInput` or
+  `<Model>UpdateInput`) from `@database/zod`, then use `.pick()`, `.omit()`, and `.extend()` to define
+  the versioned public shape. The generator remains authoritative for column types and nullability;
+  the contract decides what may cross the boundary and which public rules are stricter.
+- **DB-less:** author the Zod schema in the versioned contract module. This is the right path for
+  in-memory scaffold stages, external APIs, computed shapes, and products without a persistence
+  model.
+
+The [database generation step](/data-persistence/database/) is therefore an optional predecessor,
+not a competing public API. From the versioned contract onward, both paths are identical: handler,
+OpenAPI document, SDK query factory, and page all project from the same contract value. The
+hand-authored Users schema below illustrates the DB-less origin; DB-backed contracts use the
+generated predecessor described above instead of assuming that a table model is already public API.
 
 ## What a contract actually is
 
@@ -151,8 +173,8 @@ and the builder when you need to add, remove, or reorder a concern. See
 
 ## The type pipeline, end to end (a diagram in prose)
 
-Here is the whole journey of a single field — say `status` on a user — from where it is born to
-where it is consumed, with no manual duplication at any hop:
+Here is the contract-to-consumer journey of a single field — say `status` on a user — from its
+versioned public schema to where it is consumed, with no manual duplication at any downstream hop:
 
 ```text
   zod schema                contract                 server                    client / UI
@@ -165,21 +187,25 @@ where it is consumed, with no manual duplication at any hop:
        │   defines the shape     │   binds verb + io      │  runs your logic        │  args + result
        ▼                         ▼                       ▼   over typed data        ▼   are TYPED from
    one definition          one boundary            one implementation         the SAME schema —
-                                                                              no codegen, no drift
+                                                                              no second boundary copy
 ```
 
-Read it left to right. The `status` field is declared once, in a zod schema. The contract
-references that schema in its `.input()`/`.output()`. `implement()` produces a server object
-whose handler sees `status` as a typed field on `input` and must return it correctly in the
-output. The client — derived from the very same contract value — exposes `client.users.list(...)`
-whose argument type and result type are both projected straight from those schemas. A UI island
-that calls the client (optionally through `@orpc/tanstack-query`) inherits those types yet again.
+Read it left to right. The `status` field is declared once in the versioned public Zod schema. A
+DB-backed product may derive that schema from a generated model and add the public-only status rule;
+a DB-less product authors it directly. The contract references that result in its
+`.input()`/`.output()`. `implement()` produces a server object whose handler sees `status` as a typed
+field on `input` and must return it correctly in the output. The client — derived from the very same
+contract value — exposes `client.users.list(...)` whose argument and result types are projected
+straight from those schemas. A UI island that calls the client (optionally through
+`@orpc/tanstack-query`) inherits those types yet again.
 
-Crucially, no arrow in that diagram is a *copy*. Each hop is a *projection* of the previous
-one — TypeScript reading the contract's types, oRPC reading the contract's routes, zod reading
-the contract's schemas. Because every consumer reads from the same value rather than from a
-duplicated declaration, there is no place for the two to disagree. The contract is the only
-thing anyone authored by hand; everything to its right is inferred.
+Crucially, no arrow to the right of the versioned schema is a *copy*. Each hop is a *projection* of
+the previous one — TypeScript reading the contract's types, oRPC reading the contract's routes, Zod
+reading the contract's schemas. Because every public consumer reads from the same value rather than
+from a duplicated declaration, there is no place for the two to disagree. In the DB-less path the
+schema is authored directly. In the DB-backed path the database model and generated schema precede
+it, while the authored contract narrowing owns the public surface. Everything to the contract's
+right is inferred.
 
 Change `UsersStatusSchemaV1` and the ripple is immediate and compile-time: the handler that
 returns the old shape stops compiling, every client call site that reads the removed field stops
@@ -191,7 +217,7 @@ of step.
 {{ comp.apiTable({
   caption: "What flows through the pipeline — and what never needs hand-syncing",
   rows: [
-    { name: "input / output shapes", type: "zod schema", desc: "Declared once. Validated at runtime by implement(), checked at compile time on both server and client." },
+    { name: "input / output shapes", type: "versioned Zod schema", desc: "Narrowed or extended from generated models when they exist; otherwise authored directly. Validated by implement() and checked on server and client." },
     { name: "route verb + path", type: "oc.route({ method, path })", desc: "Declared on the contract. Drives the OpenAPI document and the REST routes; never re-declared in the handler." },
     { name: "handler argument", type: "{ input }", desc: "Typed from the contract's .input() schema. The handler body operates on already-validated data." },
     { name: "handler return", type: "output type", desc: "Must satisfy the contract's .output() schema or it fails to compile. No hand-written serialization." },
@@ -204,15 +230,21 @@ of step.
 
 The trade-offs, because contracts-first is an opinion, not a free lunch:
 
-- **You write the schema first.** For a trivial one-off endpoint, declaring a zod schema before
-  writing the handler feels like ceremony. The payoff arrives the moment a *second* consumer exists
-  (a client, a UI, another service) — which for a real backend is immediately.
+- **You establish the public schema first.** In DB-backed products that means selecting and refining
+  generated model fields; in DB-less products it means authoring the Zod shape directly. For a
+  trivial one-off endpoint, doing this before the handler feels like ceremony. The payoff arrives
+  the moment a *second* consumer exists (a client, a UI, another service) — which for a real backend
+  is immediately.
 - **Versioning is explicit, not automatic.** A breaking change to a shape is a new contract version
   (`versions/v2/`), not an in-place edit. This is deliberate friction: it forces you to decide
   whether callers can migrate, rather than breaking them silently.
-- **The boundary is the contract, not the database.** At the early scaffold step the `users`
-  handlers return seeded in-memory records — the contract is proven end to end *before* a database
-  is wired. Persistence is a later concern that slots in behind an unchanged contract.
+- **For DB-less work, the boundary is the contract, not a database.** At the early scaffold step the
+  `users` handlers return seeded in-memory records — the contract is proven end to end *before* a
+  database is wired. Persistence can remain absent or slot in later behind that public contract.
+- **For DB-backed work, the database is the persistence predecessor, not the public boundary.** When
+  generated model schemas exist, contracts normally derive from them so column types and
+  nullability stay aligned. The contract still narrows private fields and owns stricter public
+  validation; exposing the generated model unchanged is a deliberate choice, not the default.
 - **zod is the runtime price.** Validation runs on every request. That is a deliberate cost: it is
   also the thing that makes the published OpenAPI document and the compile-time types trustworthy,
   because the wire is checked against the same shape the types describe.

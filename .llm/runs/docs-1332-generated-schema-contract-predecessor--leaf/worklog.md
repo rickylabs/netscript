@@ -88,6 +88,9 @@ pages' existing examples as the only prose source rather than duplicating genera
 | 2026-08-10T09:56:21+02:00 | 1.4 | corrected chain | The same assembled SDK/Fresh module with coercing `.withSearchParams(...)` exited 0; the service implementation module also exited 0. |
 | 2026-08-10T09:56:21+02:00 | 1.4 | rendered homepage | Optional Tab 0 is first, tab 3 constructs the scaffold-shaped SDK factory before `definePage`, and the homepage build/rendered-output gate passes. |
 | 2026-08-10T09:56:21+02:00 | 1.4 | reconcile | PR #1441 discussion contains only this implementation agent's slice 1.1–1.3 comments; no external findings require action. |
+| 2026-08-10T10:02:23+02:00 | 1.5 | origin framing | Separated the normal DB-backed generated predecessor from the valid DB-less authored origin while keeping the versioned contract as the public boundary. |
+| 2026-08-10T10:02:23+02:00 | 1.5 | claims | Removed the five absolute no-generation/hand-authored-first claims and added a back-link to the database generation step. |
+| 2026-08-10T10:02:23+02:00 | 1.5 | reconcile | PR #1441 discussion contains only this implementation agent's slice 1.1–1.4 comments; no external findings require action. |
 
 ## Decisions
 
@@ -130,6 +133,8 @@ pages' existing examples as the only prose source rather than duplicating genera
 | Site build | `deno task build` from `docs/site/` | PASS | 617 files generated; homepage semantics and 220 rendered HTML files pass. |
 | Docs accuracy | `rtk proxy deno task docs:accuracy` | PASS | 192 published source pages and documented dialect/import constraints pass. |
 | Fixture scoped wrappers | check/lint/fmt roots for both derivation fixture TS files | PASS | 2 files; 0 diagnostics, rules, or format findings. |
+| Contracts framing build | `deno task build` from `docs/site/` | PASS | 617 files; rendered homepage semantics and 220 HTML files pass. |
+| Contracts framing links | `deno task check:links` from `docs/site/` | PASS | 32,773 internal links across 220 pages resolve. |
 
 ### Fitness Gates
 
