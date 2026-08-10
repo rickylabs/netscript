@@ -266,6 +266,16 @@ jobs:
         with:
           deno-version: '2.9.5'
 
+      - name: Check docs site source format
+        if: env.RUN == 'true'
+        working-directory: docs/site
+        run: deno task check:source-format
+
+      - name: Test docs site source-format checker
+        if: env.RUN == 'true'
+        working-directory: docs/site
+        run: deno task test:source-format
+
       - name: Install workspace dependencies
         if: env.RUN == 'true'
         run: deno install
