@@ -16,8 +16,12 @@ export function createOfficialPluginCopier(): SyncPluginDependencies['copyPlugin
       pluginName: result.pluginName,
       pluginDir: result.pluginDir,
       backgroundDir: result.backgroundDir,
-      serviceConfigKey: result.serviceConfigKey,
-      servicePort: result.servicePort,
+      ...(result.serviceConfigKey !== undefined && result.servicePort !== undefined
+        ? {
+          serviceConfigKey: result.serviceConfigKey,
+          servicePort: result.servicePort,
+        }
+        : {}),
       backgroundPort: result.backgroundPort,
       workspaceMembers: result.workspaceMembers,
       filesCreated: result.scaffoldResult.filesCreated,

@@ -615,7 +615,7 @@ function normalizeManifestProvider(provider: ValidatedPluginDescriptor['manifest
     defaultPermissions: provider.defaultPermissions,
     watchFlag,
     defaultEntrypoint: provider.defaultEntrypoint,
-    defaultServiceEntrypoint: provider.defaultServiceEntrypoint,
+    defaultServiceEntrypoint: provider.defaultServiceEntrypoint ?? null,
     defaultRequiresDb: provider.defaultRequiresDb,
     defaultRequiresKv: provider.defaultRequiresKv,
     pluginType,

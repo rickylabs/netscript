@@ -134,6 +134,42 @@ Deno.test('loadRegisteredPluginMetadata reads scaffold manifests without importi
   }
 });
 
+Deno.test('loadRegisteredPluginMetadata omits service metadata for a service-less manifest', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  const pluginRoot = resolve(projectRoot, 'service-less');
+  await Deno.mkdir(pluginRoot, { recursive: true });
+  await Deno.writeTextFile(
+    resolve(projectRoot, 'netscript.config.ts'),
+    `export default {
+  name: 'fixture-app',
+  databases: { config: [] },
+  plugins: ['./service-less/mod.ts'],
+};
+`,
+  );
+  await Deno.writeTextFile(resolve(pluginRoot, 'mod.ts'), 'export {};\n');
+  await Deno.writeTextFile(
+    resolve(pluginRoot, 'scaffold.plugin.json'),
+    JSON.stringify({
+      provider: {
+        displayName: 'Service-less plugin',
+        defaultEntrypoint: 'mod.ts',
+        pluginType: 'utility',
+      },
+      officialSource: {
+        canonicalName: 'service-less',
+        backgroundPort: 8124,
+      },
+    }),
+  );
+
+  const config = await loadConfig({ cwd: projectRoot });
+  const plugins = await loadRegisteredPluginMetadata(projectRoot, config);
+  if (plugins['service-less']?.service !== undefined) {
+    throw new Error('Service-less scaffold metadata unexpectedly contributed a service');
+  }
+});
+
 Deno.test('loadRegisteredPluginMetadata isolates malformed scaffold metadata per plugin', async () => {
   const projectRoot = await Deno.makeTempDir();
   for (const name of ['broken', 'healthy']) {

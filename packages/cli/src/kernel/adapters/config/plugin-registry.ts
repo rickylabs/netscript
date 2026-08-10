@@ -228,8 +228,7 @@ function normalizeScaffoldPluginMetadata(
   }
 
   const serviceEntrypoint = metadata.officialSource?.serviceEntrypoint ??
-    metadata.provider.defaultServiceEntrypoint ??
-    metadata.provider.defaultEntrypoint;
+    metadata.provider.defaultServiceEntrypoint;
   const workdir = normalizePath(join(paths?.plugins ?? 'plugins', name));
   const permissions = metadata.officialSource?.permissions ?? metadata.provider.defaultPermissions;
   const infrastructureRequires = normalizeInfrastructureDependencies(

@@ -57,8 +57,8 @@ export interface PluginManifestProvider {
   readonly watchFlag?: string;
   /** Default background or service entrypoint. */
   readonly defaultEntrypoint: string;
-  /** Default service entrypoint. */
-  readonly defaultServiceEntrypoint: string;
+  /** Default service entrypoint, omitted when the plugin has no service. */
+  readonly defaultServiceEntrypoint?: string;
   /** Whether the provider requires database wiring by default. */
   readonly defaultRequiresDb: boolean;
   /** Whether the provider requires Deno KV wiring by default. */
@@ -88,15 +88,15 @@ export interface PluginManifestOfficialSource {
   /** Optional background source directory name. */
   readonly backgroundDir?: string;
   /** Service entrypoint copied or generated for the plugin. */
-  readonly serviceEntrypoint: string;
+  readonly serviceEntrypoint?: string;
   /** Optional background entrypoint copied or generated for the plugin. */
   readonly backgroundEntrypoint?: string;
   /** Plugin adapter module that owns static doctor checks. */
   readonly doctorEntrypoint?: string;
   /** Generated service configuration key. */
-  readonly serviceConfigKey: string;
+  readonly serviceConfigKey?: string;
   /** Generated service port. */
-  readonly servicePort: number;
+  readonly servicePort?: number;
   /** Generated background worker port. */
   readonly backgroundPort: number;
   /** Whether the plugin source requires database wiring. */
@@ -200,7 +200,7 @@ const providerSchema: z.ZodType<PluginManifestProvider> = z.object({
   defaultPermissions: z.array(z.string().min(1)).readonly(),
   watchFlag: z.string().min(1).optional(),
   defaultEntrypoint: z.string().min(1),
-  defaultServiceEntrypoint: z.string().min(1),
+  defaultServiceEntrypoint: z.string().min(1).optional(),
   defaultRequiresDb: z.boolean(),
   defaultRequiresKv: z.boolean(),
   pluginType: z.enum(['background-processor', 'api', 'frontend', 'utility']),
@@ -216,11 +216,11 @@ const officialSourceSchema: z.ZodType<PluginManifestOfficialSource> = z.object({
   canonicalName: z.string().min(1),
   pluginDir: z.string().min(1).optional(),
   backgroundDir: z.string().min(1).optional(),
-  serviceEntrypoint: z.string().min(1),
+  serviceEntrypoint: z.string().min(1).optional(),
   backgroundEntrypoint: z.string().min(1).optional(),
   doctorEntrypoint: z.string().min(1).optional(),
-  serviceConfigKey: z.string().min(1),
-  servicePort: z.number().int().nonnegative(),
+  serviceConfigKey: z.string().min(1).optional(),
+  servicePort: z.number().int().nonnegative().optional(),
   backgroundPort: z.number().int().nonnegative(),
   requiresDb: z.boolean().optional(),
   requiresKv: z.boolean().optional(),
@@ -244,6 +244,11 @@ const linkingSchema: z.ZodType<PluginManifestLinking> = z.object({
   pluginReferences: z.array(linkingIdentifierSchema).readonly().optional(),
   consumers: linkingConsumersSchema,
 }).strict();
+
+const ATOMIC_SERVICE_SHAPE_ERROR =
+  'PLUGIN_OFFICIAL_SOURCE_SERVICE_SHAPE_INCOMPLETE: officialSource.serviceEntrypoint, ' +
+  'officialSource.serviceConfigKey, and ' +
+  'officialSource.servicePort must be provided together or all omitted.';
 
 /** Validation issue exposed by the plugin installer manifest schema. */
 export interface PluginInstallerManifestSchemaIssue {
@@ -280,7 +285,21 @@ export const PluginInstallerManifestSchema: PluginInstallerManifestValidator = z
   provider: providerSchema.optional(),
   officialSource: officialSourceSchema.optional(),
   linking: linkingSchema.optional(),
-}).strict();
+}).strict().superRefine((manifest, context) => {
+  const serviceFields = [
+    manifest.officialSource?.serviceEntrypoint,
+    manifest.officialSource?.serviceConfigKey,
+    manifest.officialSource?.servicePort,
+  ];
+  const presentFields = serviceFields.filter((value) => value !== undefined).length;
+  if (presentFields !== 0 && presentFields !== serviceFields.length) {
+    context.addIssue({
+      code: 'custom',
+      path: ['officialSource'],
+      message: ATOMIC_SERVICE_SHAPE_ERROR,
+    });
+  }
+});
 
 /** Single validation issue returned by plugin manifest parsing. */
 export interface PluginManifestParseIssue {

@@ -173,7 +173,9 @@ function fromLinkingDeclaration(linking: PluginManifestLinking): InstalledPlugin
   };
 }
 
-function isOfficialSource(value: unknown): value is PluginManifestOfficialSource {
+function isOfficialSource(
+  value: unknown,
+): value is PluginManifestOfficialSource & { readonly serviceConfigKey: string } {
   return !!value && typeof value === 'object' &&
     typeof Reflect.get(value, 'canonicalName') === 'string' &&
     typeof Reflect.get(value, 'serviceConfigKey') === 'string';
