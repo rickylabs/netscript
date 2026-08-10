@@ -49,6 +49,7 @@ Future docs gate routing changes start in `docs/site/deno.json`, then use `ci.ym
 | 2026-08-10 | 3.2 | implement | Added source-format production check and focused checker unit test to the docs-aware quality lane. |
 | 2026-08-10 | 3.3 | implement | Added path-scoped PR trigger to existing Pages build; guarded all Pages/deploy mutations and keyed concurrency per ref. |
 | 2026-08-10 | 3.4 | RED fixture | Added isolated `issue-1408-red-proof` raw-newline Vento defect; local checker fails with the expected named diagnostic. |
+| 2026-08-10 | 3.5 | GREEN revert | Deleted only the deliberate fixture after capturing the failing run; local checker and full build pass at clean head. |
 
 ## Gate Results
 
@@ -57,7 +58,9 @@ Future docs gate routing changes start in `docs/site/deno.json`, then use `ci.ym
 | Source format | `deno task check:source-format` from `docs/site` | PASS | Pure `--no-lock` source walk. |
 | Checker unit test | `deno task test:source-format` from `docs/site` | PASS | Focused positive/negative regression suite. |
 | Full docs build | `deno task build` from `docs/site` | PASS | Source format, Lume render, and rendered-output all pass. |
-| RED negative control | `deno task check:source-format` from `docs/site` | EXPECTED FAIL | `_includes/issue-1408-red-proof.vto:1`: raw newline inside quoted Vento string. CI URL pending push. |
+| RED negative control | Pages run 31365789097 | PROVEN FAIL | https://github.com/rickylabs/netscript/actions/runs/31365789097; exit 1 with exact raw-newline diagnostic. |
+| GREEN source check | `deno task check:source-format` from `docs/site` | PASS | Deliberate fixture deleted; unique marker absent from docs source. |
+| GREEN full build | `deno task build` from `docs/site` | PASS | Existing full chain passes at clean branch head. |
 
 ## Reconcile Notes
 
@@ -65,6 +68,7 @@ Future docs gate routing changes start in `docs/site/deno.json`, then use `ci.ym
 - 3.2: PR #1440 has no new reviewer comments or issue changes; D8 and the planned slice remain current.
 - 3.3: no new reviewer direction; extending the existing Pages workflow remains the smallest single-source implementation of D8.
 - 3.4: no new reviewer direction; the standalone negative-control commit follows the locked acceptance protocol and will remain at branch history only after slice 3.5 deletes the fixture.
+- 3.5: RED run and diagnostic are posted on PR #1440; no reviewer changes; GREEN revert stays within planned scope.
 
 ## Handoff Notes
 
