@@ -12,9 +12,10 @@
 
 ## Current State
 
-Slice 1.1 bootstrap is prepared on the exact requested baseline. The owner-supplied plan v2 is the
-implementation contract, no PR existed at the initial live read, and no framework behavior changes
-are in scope. The next action is to commit/push these artifacts and open the labelled draft PR.
+Draft PR #1441 is live with slice 1.1. Slice 1.2 now has a green focused fixture that executes the
+real root and contracts scaffold phases, calls the real CRUD-barrel writer, compiles a root consumer
+and the documented contract module through its generated `contracts/deno.json`, and proves three
+command-level negative exits. No framework behavior changes are in scope.
 
 ## Completed
 
@@ -22,18 +23,23 @@ are in scope. The next action is to commit/push these artifacts and open the lab
 - Verified clean branch, branch name, baseline, merge-base, and live issue acceptance.
 - Recorded requested/observed implementation identity, doctrine boundary, design checkpoint,
   locked decisions, eight commit slices, risks, gates, deferred scope, and evaluator separation.
+- Opened draft PR #1441 with `Closes #1332`, exact acceptance evidence, required labels, and
+  milestone 0.0.6; slice 1.1 is committed, pushed, and commented.
+- Added `docs:contract-derivation` to the root and `docs:maintenance` task graphs.
+- Proved both real `@database/zod` targets, the real Product/Warehouse CRUD exports, a
+  contracts-member derivation compile, and all three negative cases.
+- Passed scoped check/lint/fmt and re-proved exact lock equality.
 
 ## In Progress
 
-- Slice 1.1 commit, explicit-refspec push, draft PR creation, labels/milestone, and phase comment.
+- Slice 1.2 commit, explicit-refspec push, PR body slice update, and per-slice evidence comment.
 
 ## Next Steps
 
-1. Commit the bootstrap artifacts with a proof-oriented message.
-2. Push `HEAD:docs/1332-generated-schema-contract-predecessor`.
-3. Open the draft PR with `Closes #1332` and exact fenced acceptance evidence.
-4. Apply the owner-specified labels and milestone 0.0.6; comment slice evidence.
-5. Begin slice 1.2 before any dependent documentation snippet lands.
+1. Commit slice 1.2 with the fixture, task wiring, and current run artifacts.
+2. Push `HEAD:docs/1332-generated-schema-contract-predecessor` and comment exact gate output.
+3. Update the draft PR slice list with the commit SHA.
+4. Begin slice 1.3: optional predecessor Mermaid, SVG render/parity, and homepage diagram text.
 
 ## Key Decisions
 
@@ -50,15 +56,18 @@ are in scope. The next action is to commit/push these artifacts and open the lab
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/docs-1332-generated-schema-contract-predecessor--leaf/` | new | Six mandatory run artifacts. |
+| `.llm/tools/docs/check-docs-contract-derivation.ts` | new | Real scaffold/barrel compile fixture and CLI verdict. |
+| `.llm/tools/docs/check-docs-contract-derivation_test.ts` | new | Positive case plus three command-level negative fixtures. |
+| `deno.json` | changed | New task and `docs:maintenance` wiring. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS for bootstrap identity/base | worklog branch/base and live GitHub rows |
+| Static | PASS | derivation task; scoped check/lint/fmt; API inspection; lock equality |
 | Fitness | N/A for package gates | docs-only scope |
 | Runtime | NOT_RUN | browser validation belongs to slice 1.8 |
-| Consumer | NOT_RUN | contract derivation begins in slice 1.2 |
+| Consumer | PASS for generated contract path | root and contracts-member compile; three negatives exit 1 |
 
 ## Open Questions
 
@@ -66,9 +75,12 @@ are in scope. The next action is to commit/push these artifacts and open the lab
 
 ## Drift and Debt
 
-- Drift: none at bootstrap.
+- Drift: minor tooling adjustment — unchanged CLI emitters execute in a runtime probe because root
+  declaration mode reports 22 unrelated pre-existing CLI diagnostics; both new TS files still pass
+  the scoped check wrapper.
 - Debt: none created or closed.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments after the first push.
+- `851c9757aab38c7c91e489b9fa13b8415d0c3d9d` — slice 1.1 bootstrap proof.
+- See draft PR #1441 for the live commit list and per-slice comments.

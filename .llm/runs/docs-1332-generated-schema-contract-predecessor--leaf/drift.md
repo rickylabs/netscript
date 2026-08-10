@@ -12,3 +12,19 @@ documentation.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** `worklog.md` bootstrap gate rows; `research.md` re-baseline.
+
+## 2026-08-10 — Real scaffold emitters require runtime loading in the docs fixture
+
+- **What:** A direct static import of the real CLI scaffold path made the new fixture's outer type
+  check traverse unrelated CLI files and fail on 22 pre-existing `isolatedDeclarations`
+  diagnostics before executing the fixture.
+- **Source:** First `rtk proxy deno task docs:contract-derivation` run.
+- **Expected:** The docs tool could statically import the emitters and reach the temp-workspace gate.
+- **Actual:** Root declaration mode failed in existing CLI constants/templates. The final fixture
+  writes a temp runtime probe that imports and executes the unchanged real emitters with
+  `--no-check`; both committed fixture files independently pass the scoped check wrapper, and the
+  generated consumers then run real `deno check --unstable-kv` compilation.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** Final derivation task passes 4/4; scoped check selects 2 files with 0 diagnostics;
+  root and contracts-member compile exits are 0; all three negative commands exit 1.

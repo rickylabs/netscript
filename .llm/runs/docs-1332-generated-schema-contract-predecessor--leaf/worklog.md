@@ -76,6 +76,10 @@ pages' existing examples as the only prose source rather than duplicating genera
 | --- | --- | --- | --- |
 | 2026-08-10T09:24:21+02:00 | 1.1 | bootstrap | Clean requested branch verified at exact `origin/main` baseline; live issue read; no existing head PR. |
 | 2026-08-10T09:24:21+02:00 | 1.1 | plan gate | Owner brief carries locked plan v2 and prior separate PLAN-EVAL correction; implementation session does not self-evaluate. |
+| 2026-08-10T09:37:42+02:00 | 1.2 | first fixture run | Direct static imports reached 22 existing CLI `isolatedDeclarations` diagnostics before the fixture executed; no package source was changed. |
+| 2026-08-10T09:37:42+02:00 | 1.2 | fixture | Kept the new tool statically checked, loaded unchanged real emitters in a runtime probe, and compiled root plus contracts-member consumers with `--unstable-kv`. |
+| 2026-08-10T09:37:42+02:00 | 1.2 | negative controls | Root alias move, contracts alias move, and `ProductCreateInput` rename each exited 1 with the expected module/export error. |
+| 2026-08-10T09:37:42+02:00 | 1.2 | reconcile | Live PR #1441 remains draft and mergeable at slice-1.1 head; only the implementation agent's slice comment is new, issue #1332 remains open, and `status:impl` remains correct. |
 
 ## Decisions
 
@@ -84,12 +88,14 @@ pages' existing examples as the only prose source rather than duplicating genera
 | Treat owner brief as approved implementation contract | It explicitly supplies locked decisions, slices, gates, and a prior PLAN-EVAL correction. | Owner brief; harness evaluator-separation rule |
 | Use docs overlay without package archetype | No framework source/export behavior changes are authorized. | `SCOPE-docs.md`; owner hard constraints |
 | Keep PR draft through handoff | Separate IMPL-EVAL and supervisor sequencing are still required. | Owner brief; `netscript-pr` |
+| Runtime-load the real scaffold emitters | Root declaration mode exposes unrelated pre-existing CLI diagnostics; the generated probe executes unchanged sources while scoped checks still type-check both new committed TS files. | First `docs:contract-derivation` run; `drift.md` |
 
 ## Drift
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | None at bootstrap | — | yes |
+| Transitive CLI declaration diagnostics require a runtime emitter probe | minor | yes |
 
 ## Gate Results
 
@@ -100,6 +106,13 @@ pages' existing examples as the only prose source rather than duplicating genera
 | Branch/base | `git fetch origin && git status --short --branch`; `git rev-parse`; `git merge-base` | PASS | Branch clean; HEAD, merge-base, and `origin/main` all `da40fbfe3…`. |
 | Live issue | GitHub issue fetch #1332 | PASS | Eight acceptance boxes and milestone 0.0.6 confirmed. |
 | Existing PR | GitHub PR search by head branch | PASS | No PR exists before slice 1.1. |
+| Derivation gate | `rtk proxy deno task docs:contract-derivation` | PASS | 4/4 tests; root and contracts-member compile exits 0. |
+| Scoped check | `run-deno-check.ts` over both new TS files | PASS | 2 files, 1 batch, 0 failed, 0 diagnostics. |
+| Scoped lint | `run-deno-lint.ts` over both new TS files | PASS | 2 files, 1 batch, 0 findings. |
+| Scoped format | `run-deno-fmt.ts` over both new TS files | PASS | 2 files, 1 batch, 0 findings after scoped write. |
+| API inspection | `deno doc --filter writeCrudZodBarrel`; `generateDenoJson`; `scaffoldContracts` | PASS | Real signatures and source definitions confirmed. |
+| Dependency provenance | `rtk proxy deno task deps:why zod` | PASS | `sourceUsed: true`; 167 source hits; not removable. |
+| Lock equality | `git diff --exit-code -- deno.lock docs/site/deno.lock`; `git hash-object ...` | PASS | No diff; expected `a541d408…` and `311255423…`. |
 
 ### Fitness Gates
 
@@ -118,10 +131,12 @@ pages' existing examples as the only prose source rather than duplicating genera
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Generated contract module | NOT_RUN | planned slice 1.2 | Must resolve through `contracts/deno.json`. |
+| Generated root alias | PASS | positive compile plus root-alias negative exit 1 | Real root emitter target is load-bearing. |
+| Generated contract module | PASS | positive compile plus contracts-alias/barrel negatives exit 1 | Resolves through generated `contracts/deno.json`, not the root import map. |
 | Homepage SDK/Fresh module | NOT_RUN | planned slice 1.4 | Requires pre-fix and post-fix evidence. |
 
 ## Handoff Notes
 
-- Evaluator should inspect the load-bearing contracts-member resolution in slice 1.2 first.
+- Evaluator should inspect the load-bearing contracts-member resolution and three command-level
+  negative exits in slice 1.2 first.
 - This implementation agent will not write an IMPL-EVAL verdict or advance `status:impl`.
