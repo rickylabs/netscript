@@ -86,3 +86,26 @@ mobile proof.
 
 Per `run-loop.md` §"Rescoping" and `plan-protocol.md`, an owner-authorized rescope resets the
 PLAN-EVAL loop; plan v4 is re-evaluated before implementation.
+
+## D-7 · minor · 2026-08-10 · sender-ownership handoff from evaluator to implementer
+
+`launch-codex-slice.ts` binds one sender per worktree
+(`~/.config/netscript-agentic/runtime/senders/<hash>.json`). This worktree's lease is held by the
+**PLAN-EVAL** thread `019fec5f-4805-7bc1-8e58-bcb6e048646f`, and `decideSenderOwnership` returns
+`blocked` while `sessionActive` is true — which stays true after the turn ends, by design ("a
+returned thread remains the worktree owner so the next operator is directed to resume").
+
+Resuming that thread for implementation would make the evaluator its own generator, violating the
+one hard harness invariant. Launching a second sender here would fork a rival writer.
+
+**Handoff procedure used** — the adapter's own `release(worktree, leaseToken)` API, the same call
+`launch-codex-slice.ts:393` makes for a stale lease, with the real token read from the record:
+
+1. Confirm the evaluator turn is idle (`codex-watch --mode turn`), not merely quiet.
+2. Release this worktree's lease with its recorded `leaseToken`.
+3. Launch the implementation session as a fresh sender; it becomes the worktree owner.
+
+Only one writer is ever active: the evaluator writes no source, and its session is complete before
+the release. Every subsequent evaluator pass (including the mandatory IMPL-EVAL) runs in its **own
+worktree** rather than contending for this lease — the pattern the repo's sender registry already
+shows (`ns1331-qwen-evaluator`, `b10-715-eval`).
