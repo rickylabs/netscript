@@ -1,13 +1,30 @@
-# Plan v2 — #1443 `plugin-ai` in-process topology and compilable scaffold
+# Plan v4 — a valid in-process AI topology **and** a working configured-module contract
 
-Baseline `2256a67bf612907195ce5e51df1df7326c504f2b`. Research: `research.md` (findings R-0…R-5).
-Milestone `0.0.6`. Priority P0 — blocks `rickylabs/eis-chat#157`.
+Baseline `2256a67bf612907195ce5e51df1df7326c504f2b`. Research: `research.md` (R-0…R-5).
+Milestone `0.0.6`. Priority P0 — **Closes #1443 and #1445**; blocks `rickylabs/eis-chat#157`.
 
-**Revision history.** v1 returned `FAIL_PLAN` from PLAN-EVAL (`plan-eval.md`, thread
-`019fec5f-4805-7bc1-8e58-bcb6e048646f`). This version answers findings 1–7. The supervisor
-independently verified every finding against source before accepting it; where the evaluator's
-mechanism was wrong, that is recorded in §"Evaluator findings — disposition" rather than silently
-adopted.
+**Revision history.**
+
+- **v1** → `FAIL_PLAN` (`plan-eval.md`, cycle 1, seven findings).
+- **v2** answered them; → `FAIL_PLAN` (`plan-eval-cycle2.md`, cycle 2). Cycle 2 overturned v2's D4a
+  and was right — proven empirically, not conceded (see D4a).
+- **v3** corrected D4a, D1's consumer inventory, D6's registry closure, slice 2's file scope, the
+  service-less list value, and replaced an always-exits-zero script that v2 had wrongly named as a
+  gate.
+- **v4 (this)** applies the owner-authorized rescope recorded in `drift.md` D-6: the fix covers the
+  **shared configured-module contract for every first-party plugin**, not the AI instance alone.
+  Tracking issue **#1445** was filed after a search found no existing coverage.
+
+The supervisor independently verified every evaluator finding against source before accepting it;
+dispositions are in §"Evaluator findings — disposition".
+
+## Scope (v4)
+
+| In scope | Out of scope |
+| --- | --- |
+| The AI topology/scaffold defect class (#1443, boxes 1–7) | Mounting any plugin's generated routes into the Fresh app |
+| The shared configured-module contract for `ai`, `workers`, `sagas`, `triggers`, `streams`, `auth` (#1445) | Gateway topology / `--gateway` (#260 defers it) |
+| Complete import surfaces for the generated plugin namespaces (the `Import "zod" not a dependency` class) | The R-0 `--node-modules-dir` consumer friction |
 
 ## Archetypes, overlays, doctrine verdict
 
@@ -137,9 +154,28 @@ just file existence.
 Host-side companion invariant: `ensureNetScriptConfigPlugin` raises `ScaffoldValidationError` rather
 than registering a specifier whose file does not exist.
 
-**Consequence — see §"Escalation E-1".** The same proof shows `workers/mod.ts` is a plain job/task
+**Consequence — now in scope (v4).** The same proof shows `workers/mod.ts` is a plain job/task
 barrel with no manifest export, so `generate runtime-schemas` cannot succeed on **any** project with
-a first-party plugin installed. The configured-module contract is broken repo-wide, not just for AI.
+a first-party plugin installed. Per the owner decision in `drift.md` D-6, this PR fixes the contract
+for every first-party plugin — see **D9**.
+
+### D9 — every first-party plugin satisfies the configured-module contract (v4)
+
+For each of `ai`, `workers`, `sagas`, `triggers`, `streams`, `auth`, the plugin's own scaffolder
+emits a `<name>/mod.ts` that exports a valid `PluginManifest` (re-exported from the plugin package,
+so each package remains the single source of its own manifest) **in addition to** the app-owned
+resource re-exports those barrels already carry. Existing barrel exports are preserved — this is
+additive, so nothing a consumer already imports from `<name>/mod.ts` breaks.
+
+Each plugin's generated namespace must also carry a complete import surface. `workers` is a
+confirmed second instance of the AI import defect: `fresh/workers/jobs/health-check.ts:8` imports
+`zod`, which the install never adds to the generated import map. The per-plugin
+`PLUGIN_KIND_SOURCE_IMPORTS` / `PLUGIN_KIND_ROOT_IMPORTS` entries in `workspace-mutator.ts:64-140`
+are the seam; the import-map completeness test generalizes from AI to every plugin kind.
+
+**Not a per-plugin special case.** The contract is asserted by one shared, table-driven test over the
+first-party plugin set and one shared E2E gate — not six hand-written fixtures. A plugin is added to
+the table, not to a conditional.
 
 Host-side companion invariant: `ensureNetScriptConfigPlugin` raises `ScaffoldValidationError` rather
 than registering a specifier whose file does not exist.
@@ -322,7 +358,20 @@ Ten slices, ordered so each slice's named gate passes at the moment it lands.
 | 7 | The generated AI namespace type-checks end to end | `ai/deno.json` + workspace member + preact/JSX; `deno check ai/**` clean **with markdown present** | AI import-map completeness test; consumer repro script | `plugins/ai/src/adapter/resources/**`, `install-plugin.ts` |
 | 8 | Doctor detects both broken invariants | Non-zero exit on a dangling configured module and on an unresolvable entrypoint; healthy on a valid install | `deno test` doctor positive + negative | `packages/cli/src/public/features/plugins/doctor/**` |
 | 9 | The canonical E2E selects the AI surfaces | `runtime-schemas`, full `ai/**` check, appsettings assertion, doctor-negative gates registered | `deno test` e2e suite-registry tests | `e2e/src/domain/cli-surface.ts`, `e2e/src/application/gates/scaffold/*`, `suites/scaffold/capability-suites.ts` |
-| 10 | End-to-end proof + run artifacts | The expensive gate passes with AI installed and its namespace type-checked; no leaked resources | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`; `agentic:leak-check` | run dir artifacts only |
+| 10 | **(v4)** Every first-party plugin satisfies the configured-module contract | `workers`, `sagas`, `triggers`, `streams`, `auth` each emit a manifest-exporting `<name>/mod.ts`; one shared table-driven loader test covers the whole set | `deno test` shared contract test + per-plugin resource tests | `plugins/{workers,sagas,triggers,streams,auth}/src/**` emitters + one shared test |
+| 11 | **(v4)** Every generated plugin namespace has a complete import surface | `deno check` is clean for each installed plugin's namespace; the confirmed `workers`→`zod` gap is closed | generalized import-map completeness test; `consumer-verify.sh` per plugin | `workspace-mutator.ts:64-140` (`PLUGIN_KIND_*_IMPORTS`) + tests |
+| 12 | End-to-end proof + run artifacts | The expensive gate passes with **all five plugins installed**, `generate runtime-schemas` succeeding, and the AI namespace type-checked; no leaked resources | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`; `agentic:leak-check` | run dir artifacts only |
+
+## Acceptance coverage — #1445 (v4)
+
+| # | Acceptance box | Slice(s) |
+| --- | --- | --- |
+| 1 | Every first-party plugin emits a configured module exporting a valid `PluginManifest` | S4 (ai), S10 (the other five) |
+| 2 | `generate runtime-schemas` succeeds after a clean install of each first-party plugin | S10 + S11, gated by S9's `runtime-schemas` gate over the full install set |
+| 3 | Each generated plugin namespace type-checks with all imports declared | S11 |
+| 4 | Doctor fails for a configured module that does not resolve or export a manifest | S8 |
+| 5 | Regression tests assert the loader contract per first-party plugin | S10's shared table-driven test |
+| 6 | `gate:e2e` — `scaffold.runtime` proves the contract for every plugin it installs | S9, proven by S12 |
 
 ## Acceptance coverage — #1443
 

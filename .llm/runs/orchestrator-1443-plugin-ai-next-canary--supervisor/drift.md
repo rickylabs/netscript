@@ -66,3 +66,23 @@ without proof, so no slice will claim it. The run proceeds on the same lane
 (`lane-policy.md` §"Blocked-lane handling": record the missing mechanism, do not silently
 substitute). Surfaced to the owner; restoring phone visibility needs either the foreign session to
 end or an owner decision to interrupt it.
+
+## D-6 · architectural · 2026-08-10 · owner-authorized rescope to the shared configured-module contract
+
+Escalation `escalations/E-1-configured-module-contract.md` asked whether PR #1444 fixes the
+configured-module contract for every first-party plugin or for AI alone.
+
+**Owner decision (2026-08-10): fix the shared contract as part of this PR, and find the related
+issues — otherwise file one for tracking.** Search over open+closed issues found no existing
+coverage (`#1370` is adjacent — pre-randomization ports for sagas/triggers/streams — but a different
+defect), so **#1445** was filed and is now closed by this PR alongside #1443.
+
+Scope moves from "the AI plugin" to "every first-party plugin whose install writes a `<name>/mod.ts`
+specifier into `netscript.config.ts`": `ai`, `workers`, `sagas`, `triggers`, `streams`, `auth`.
+
+Also recorded: the owner elected to **proceed Desktop-only** on the blocked mobile-visibility lane
+(D-4/D-5) rather than interrupt the foreign `w6-kimi-codex-supervisor` session. No slice claims
+mobile proof.
+
+Per `run-loop.md` §"Rescoping" and `plan-protocol.md`, an owner-authorized rescope resets the
+PLAN-EVAL loop; plan v4 is re-evaluated before implementation.
