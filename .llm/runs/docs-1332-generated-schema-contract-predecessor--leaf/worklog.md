@@ -91,6 +91,9 @@ pages' existing examples as the only prose source rather than duplicating genera
 | 2026-08-10T10:02:23+02:00 | 1.5 | origin framing | Separated the normal DB-backed generated predecessor from the valid DB-less authored origin while keeping the versioned contract as the public boundary. |
 | 2026-08-10T10:02:23+02:00 | 1.5 | claims | Removed the five absolute no-generation/hand-authored-first claims and added a back-link to the database generation step. |
 | 2026-08-10T10:02:23+02:00 | 1.5 | reconcile | PR #1441 discussion contains only this implementation agent's slice 1.1–1.4 comments; no external findings require action. |
+| 2026-08-10T10:04:47+02:00 | 1.6 | public selection | Added the verbatim fixture-backed Product derivation; `internalCost`, `deletedAt`, and `internalRegionCode` are explicitly outside the selected API surface. |
+| 2026-08-10T10:04:47+02:00 | 1.6 | relation composition | Composed the public warehouse relation explicitly from `WarehouseSchema.pick(...)` without claiming generated relation-aware schemas. |
+| 2026-08-10T10:04:47+02:00 | 1.6 | reconcile | PR #1441 discussion contains only this implementation agent's slice 1.1–1.5 comments; no external findings require action. |
 
 ## Decisions
 
@@ -135,6 +138,8 @@ pages' existing examples as the only prose source rather than duplicating genera
 | Fixture scoped wrappers | check/lint/fmt roots for both derivation fixture TS files | PASS | 2 files; 0 diagnostics, rules, or format findings. |
 | Contracts framing build | `deno task build` from `docs/site/` | PASS | 617 files; rendered homepage semantics and 220 HTML files pass. |
 | Contracts framing links | `deno task check:links` from `docs/site/` | PASS | 32,773 internal links across 220 pages resolve. |
+| Depth derivation | `rtk proxy deno task docs:contract-derivation` | PASS | 4/4; exact Product/Warehouse snippet compiles through generated contracts alias. |
+| Depth example build | `deno task build` from `docs/site/` | PASS | 617 files; rendered-output checks pass across 220 HTML files. |
 
 ### Fitness Gates
 
@@ -166,6 +171,7 @@ pages' existing examples as the only prose source rather than duplicating genera
 | Homepage service handler/bootstrap | `docs/site/index.vto:66` | `deno check --unstable-kv --config .llm/tmp/docs-1332-homepage/deno.json .llm/tmp/docs-1332-homepage/service.ts` | PASS; exit 0. |
 | Homepage page before search coercion | `docs/site/index.vto:71` (same assembled chain without `.withSearchParams`) | `deno check --unstable-kv --config .llm/tmp/docs-1332-homepage/deno.json .llm/tmp/docs-1332-homepage/pre-fix.tsx` | EXPECTED FAIL; exit 1, two TS2345 errors. |
 | Homepage SDK factory + corrected page | `docs/site/index.vto:71` | `deno check --unstable-kv --config .llm/tmp/docs-1332-homepage/deno.json .llm/tmp/docs-1332-homepage/post-fix.tsx` | PASS; exit 0. |
+| Product private-field omission + Warehouse relation composition | `docs/site/explanation/contracts.md:72` | `rtk proxy deno task docs:contract-derivation` | PASS; exact snippet compiles through generated `contracts/deno.json`. |
 
 ## Handoff Notes
 

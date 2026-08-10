@@ -58,8 +58,52 @@ There are two valid origins for a contract schema:
 The [database generation step](/data-persistence/database/) is therefore an optional predecessor,
 not a competing public API. From the versioned contract onward, both paths are identical: handler,
 OpenAPI document, SDK query factory, and page all project from the same contract value. The
-hand-authored Users schema below illustrates the DB-less origin; DB-backed contracts use the
-generated predecessor described above instead of assuming that a table model is already public API.
+hand-authored Users schema below illustrates the DB-less origin; the following derivation shows the
+DB-backed path without assuming that a table model is already public API.
+
+### DB-backed derivation: select public fields and compose relations
+
+Suppose the generated `ProductSchema` includes `internalCost` and `deletedAt`, while
+`WarehouseSchema` includes `internalRegionCode`. Those are persistence-only or private fields for
+this API, so the contract selects its public fields explicitly. It also constructs the relation
+shape explicitly: the generated barrel promises model schemas and CRUD inputs, not a nested
+relation-aware public response.
+
+```ts
+import { z } from 'zod';
+import {
+  ProductCreateInput,
+  ProductSchema,
+  ProductUpdateInput,
+  WarehouseSchema,
+} from '@database/zod';
+
+export const ProductApiSchemaV1 = ProductSchema.pick({
+  id: true,
+  name: true,
+  warehouseId: true,
+}).extend({
+  warehouse: WarehouseSchema.pick({ id: true, name: true }),
+});
+
+export const ProductCreateApiSchemaV1 = ProductCreateInput.pick({
+  name: true,
+  warehouseId: true,
+});
+
+export const ProductUpdateApiSchemaV1 = ProductUpdateInput.pick({
+  name: true,
+  warehouseId: true,
+});
+
+export const ProductResponseSchemaV1 = z.object({
+  item: ProductApiSchemaV1,
+});
+```
+
+`internalCost`, `deletedAt`, and `internalRegionCode` cannot cross this boundary because none is
+selected. The relation contains only the warehouse's public `id` and `name`, and the versioned API
+can evolve that composed shape independently while retaining generated column types and nullability.
 
 ## What a contract actually is
 

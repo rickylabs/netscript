@@ -12,10 +12,10 @@
 
 ## Current State
 
-Draft PR #1441 is live with slices 1.1–1.4 pushed. Slice 1.5 now makes the contracts explanation
-accurate for both origins: generated persistence schemas normally precede DB-backed contracts,
-while DB-less contracts author the public schema directly. The versioned contract remains the
-public boundary in both paths. No framework behavior changes are in scope.
+Draft PR #1441 is live with slices 1.1–1.5 pushed. Slice 1.6 now shows the fixture-backed depth case:
+Product persistence/private fields are omitted through explicit selection and its Warehouse relation
+is explicitly composed from the second generated model schema. No framework behavior changes are in
+scope.
 
 ## Completed
 
@@ -40,17 +40,20 @@ public boundary in both paths. No framework behavior changes are in scope.
 - Replaced absolute no-generation/hand-authored-first claims in the contracts explanation, preserved
   the valid DB-less framing, and added its DB-backed counterpart plus the database-step back-link.
 - Rebuilt the site and proved all 32,773 internal links resolve.
+- Added the exact fixture-backed Product/Warehouse derivation example and made the three omitted
+  storage fields explicit in prose.
+- Re-ran the 4/4 derivation gate and full site build for the depth example.
 
 ## In Progress
 
-- Slice 1.5 commit, explicit-refspec push, PR body slice update, and per-slice evidence comment.
+- Slice 1.6 commit, explicit-refspec push, PR body slice update, and per-slice evidence comment.
 
 ## Next Steps
 
-1. Commit slice 1.5 with the contracts framing and current run artifacts.
+1. Commit slice 1.6 with the depth example and current run artifacts.
 2. Push `HEAD:docs/1332-generated-schema-contract-predecessor` and comment exact gate output.
 3. Update the draft PR slice list with the commit SHA.
-4. Begin slice 1.6: add compile-proven private-field omission and Product/Warehouse composition.
+4. Begin slice 1.7: add the required database/contract/route/server/builder/service links.
 
 ## Key Decisions
 
@@ -74,7 +77,7 @@ public boundary in both paths. No framework behavior changes are in scope.
 | `docs/site/assets/diagrams/contract-flow.svg` | changed | Regenerated committed diagram. |
 | `.llm/tools/docs/check-docs-contract-derivation.ts` | changed | Adds compile proof for homepage User derivation/contract modules. |
 | `docs/site/index.vto` | changed | Diagram text, optional Tab 0, SDK construction, search coercion, and DB-aware wording. |
-| `docs/site/explanation/contracts.md` | changed | Accurate DB-backed/DB-less origins and generated-step back-link. |
+| `docs/site/explanation/contracts.md` | changed | Dual origins, generated-step back-link, private-field omission, and explicit Product/Warehouse composition. |
 
 ## Gates
 
@@ -83,7 +86,7 @@ public boundary in both paths. No framework behavior changes are in scope.
 | Static | PASS | derivation task; homepage pre/post/service checks; scoped check/lint/fmt; diagram parity; site build; docs accuracy; all internal links; lock equality |
 | Fitness | N/A for package gates | docs-only scope |
 | Runtime | NOT_RUN | browser validation belongs to slice 1.8 |
-| Consumer | PASS for generated contract and homepage code paths | contract member, service, and corrected page compile; required pre-fix exits 1 |
+| Consumer | PASS for generated contract, depth example, and homepage code paths | Product/Warehouse contract member, service, and corrected page compile; required pre-fix exits 1 |
 
 ## Open Questions
 
@@ -102,4 +105,5 @@ public boundary in both paths. No framework behavior changes are in scope.
 - `5dc1a518a057a5b339594c9af50cacba8ceb0373` — slice 1.2 derivation-alias proof.
 - `cd2ddc49966abe7e450bfb9cd856125da5418046` — slice 1.3 optional diagram proof.
 - `70702c1ac9e7a494d132e11a4ed512c61c0de6a8` — slice 1.4 homepage type-flow proof.
+- `c502e8d60467e2f87091ff9ca89a95067023ece5` — slice 1.5 dual-origin framing proof.
 - See draft PR #1441 for the live commit list and per-slice comments.
