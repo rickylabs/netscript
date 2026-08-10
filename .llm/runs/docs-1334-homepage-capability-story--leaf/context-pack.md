@@ -6,16 +6,16 @@
 | --- | --- |
 | Run ID | `docs-1334-homepage-capability-story--leaf` |
 | Branch | `docs/1334-homepage-capability-story` |
-| Current phase | `evaluate` |
+| Current phase | `impl-eval follow-up` |
 | Archetype | N/A — docs-only |
 | Scope overlays | `SCOPE-docs.md` |
 
 ## Current State
 
-All five implementation slices and the Tier-A slice 2.6 follow-up are complete locally. Static docs
-gates, rendered semantics, 16 canonical HTTP routes, six Playwright viewport/theme combinations,
-and exact lock hashes pass. PR #1442 must remain draft at `status:impl` for the supervisor's
-separate IMPL-EVAL.
+All original implementation slices, Tier-A slice 2.6, separate-session IMPL-EVAL, and evaluator
+follow-up slice 2.7 are complete locally. Static docs gates, rendered semantics, 16 canonical HTTP
+routes, six Playwright viewport/theme combinations, and exact lock hashes pass. PR #1442 remains
+draft at `status:impl-eval` for the supervisor's readiness and merge actions.
 
 ## Completed
 
@@ -36,16 +36,20 @@ separate IMPL-EVAL.
 - Lock diff is empty; blob hashes exactly match the owner-provided values.
 - Resolved Tier-A finding F1 by removing the two redundant prose links while retaining their card
   routes and every additive task link. Focused build, links, DOM semantics, and lock gates pass.
+- Separate Claude Fable 5 medium IMPL-EVAL on `eval/1334-impl-eval` returned PASS for all seven
+  acceptance boxes, with two low findings and two no-action observations.
+- Resolved the two low findings: the durable card no longer associates `defineJob` with the wrong
+  hub, and the PR body tracks slices 2.1–2.7 with current DoD wording.
+- Left the auth audit-span and Fresh UI registry observations unchanged as directed.
 
 ## In Progress
 
-- None. Slice 2.6 is ready for commit/push and the supervisor's separate IMPL-EVAL handoff.
+- None. Slice 2.7 is ready for commit/push; the supervisor owns readiness and merge.
 
 ## Next Steps
 
-1. Supervisor launches a fresh opposite-family IMPL-EVAL session.
-2. Evaluator independently verifies artifacts, commits/comments, claims, and gates.
-3. Supervisor alone advances lifecycle/status, readiness, merge, and issue closure.
+1. Supervisor reviews slice 2.7 and its focused evidence.
+2. Supervisor alone advances lifecycle/status, readiness, merge, and issue closure.
 
 ## Key Decisions
 
@@ -73,6 +77,8 @@ separate IMPL-EVAL.
 | Browser | PASS | six rows; 16 routes 200; screenshots inspected |
 | Lock hygiene | PASS | empty diff; exact two blob hashes |
 | Tier-A follow-up | PASS | rendered 220 HTML files; 32,799 links; 8 cards / 0 nested anchors / 5 destinations |
+| IMPL-EVAL | PASS | Claude Fable 5 medium; 7/7 acceptance boxes; two low findings addressed in slice 2.7 |
+| Evaluator follow-up | PASS | rendered 220 HTML files; 32,799 links; docs accuracy PASS; 8 cards / 0 nested anchors / 5 destinations / 2 worker links |
 
 ## Open Questions
 

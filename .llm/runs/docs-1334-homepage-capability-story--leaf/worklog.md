@@ -46,6 +46,7 @@
 | 2.4 | Prove rendered semantics without checker relaxation | `check:rendered-output`; source diff | run artifacts |
 | 2.5 | Prove full acceptance, browser matrix, links, accuracy, caveats, locks | full prescribed sweep | run artifacts |
 | 2.6 | Prove concise routing after Tier-A review | build, links, semantic DOM, locks | `index.vto`, run artifacts |
+| 2.7 | Prove canonical worker routing after IMPL-EVAL | build, links, accuracy, semantic DOM, locks | `index.vto`, run artifacts, PR body |
 
 ### Deferred Scope
 
@@ -76,6 +77,11 @@ matrix without altering the five-item destination lane.
 | 2026-08-10 | 2.6 | Tier-A A1 finding | Removed duplicate prose links to Fresh UI and durable workflows; their cards retain the routes while forms, workers, streams, and every other additive prose route remain one click away. |
 | 2026-08-10 | 2.6 | Focused validation | Build rendered 220 HTML files successfully; 32,799 internal links resolve; DOM reports 8 cards, 0 nested card anchors, and exactly 5 destination links; lock hashes remain exact. |
 | 2026-08-10 | 2.6 | Reconcile | PR remains draft at `status:impl`; supervisor finding F1 is resolved without scope, checker, component, style, or destination-lane changes. |
+| 2026-08-10 | IMPL-EVAL | Separate-session verdict | Claude Fable 5 medium on `eval/1334-impl-eval` returned PASS with 7/7 acceptance boxes, two low findings, and two no-action observations. |
+| 2026-08-10 | 2.7 | Canonical worker route | Removed `defineJob` from the `/durable-workflows/` card; the card now names only `defineSaga`, triggers, and streams, while worker jobs retain their direct `/background-processing/workers/` prose route. |
+| 2026-08-10 | 2.7 | Evaluator observations | Left auth audit-span caveat and Fresh UI registry wording unchanged as explicitly directed; both were judged honest. |
+| 2026-08-10 | 2.7 | Focused validation | Build rendered 220 HTML files successfully; 32,799 internal links resolve; docs accuracy passes; DOM reports 8 cards, 0 nested card anchors, 5 destinations, and 2 worker-route links; lock hashes remain exact. |
+| 2026-08-10 | 2.7 | Reconcile | Both low findings are resolved; PR body slice/DoD bookkeeping is updated through 2.7 after push; PR remains draft at `status:impl-eval` for supervisor readiness and merge. |
 
 ## Decisions
 
@@ -116,6 +122,11 @@ matrix without altering the five-item destination lane.
 | Slice 2.6 links | `cd docs/site && rtk proxy deno task check:links` | PASS | 32,799 internal links across 220 pages; all resolve |
 | Slice 2.6 semantic DOM | `deno eval --no-lock` with `DOMParser` over `_site/index.html` | PASS | `{"cards":8,"nestedCardAnchors":0,"destinations":5}` |
 | Slice 2.6 lock equality | `git diff --exit-code -- deno.lock docs/site/deno.lock` and `git hash-object deno.lock docs/site/deno.lock` | PASS | empty diff; exact blobs `a541d408…c58`, `311255423…dc5` |
+| Slice 2.7 build | `cd docs/site && rtk proxy deno task build` | PASS | 617 files generated; `Rendered output: OK` across 220 HTML files |
+| Slice 2.7 links | `cd docs/site && rtk proxy deno task check:links` | PASS | 32,799 internal links across 220 pages; all resolve |
+| Slice 2.7 accuracy | `rtk proxy deno task docs:accuracy` | PASS | 192 published source pages; preferred paths, worker boundary, and query dialect verified |
+| Slice 2.7 semantic DOM | `deno eval --no-lock` with `DOMParser` over `_site/index.html` | PASS | `{"cards":8,"nestedCardAnchors":0,"destinations":5,"workersLinks":2}` |
+| Slice 2.7 lock equality | `git diff --exit-code -- deno.lock docs/site/deno.lock` and `git hash-object deno.lock docs/site/deno.lock` | PASS | empty diff; exact blobs `a541d408…c58`, `311255423…dc5` |
 
 ### Playwright matrix
 
@@ -179,7 +190,7 @@ Playwright `page.request.get` returned HTTP 200 for every route:
 | Generated and cached data | live `netscript-dev db generate --help` → “Generate Prisma client and Zod schemas”; `deno doc --filter createQueryFactories …`; `deno doc --filter createQueryCollection …` | `database.md:27-30,147,174`; `query.md:142-160`; `query-bridge.md:15-18` |
 | Auth seam | `deno doc --filter createAuthBackendRegistry packages/plugin-auth-core/mod.ts` → exported backend registry over `AuthBackendPort` | `identity-access/auth.md:27-39,91-99`; `auth-flow.svg` |
 | Plugin contributions | `deno doc --filter definePlugin packages/plugin/mod.ts` → exported manifest builder | `explanation/plugin-system.md:25,91-112` diagram and worked manifest |
-| Durable runtimes | `deno doc --filter defineSaga …` and `deno doc --filter defineJob …` → exported typed builders | `sagas.md:29,102-134`; `workers.md:26,139-163`; `streams.md:16`; separate worker/streams task links |
+| Durable runtimes | `deno doc --filter defineSaga …` and `deno doc --filter defineJob …` → exported typed builders | The card's `defineSaga`/triggers/streams route lands on `/durable-workflows/`; the adjacent worker-jobs route lands directly on `/background-processing/workers/` |
 | Observability, Aspire, Scalar | `deno doc --filter withSpan packages/telemetry/mod.ts`; `deno doc --filter createScalarDocs packages/service/mod.ts` | `telemetry.md:29,197,255`; `expose-openapi-scalar.md:93-116`; `/quickstart/aspire/` |
 | Agent/MCP discovery | live `netscript-dev agent mcp --help` → stdio MCP server with project/docs/telemetry inputs | `ai/agent-tooling.md:72-132`; explicitly not external-MCP consumer page |
 
@@ -191,6 +202,6 @@ Playwright `page.request.get` returned HTTP 200 for every route:
 
 ## Handoff Notes
 
-- Implementation and the Tier-A slice 2.6 follow-up are complete. IMPL-EVAL is mandatory and must
-  be performed by a separate supervisor-selected session; keep PR #1442 draft and at `status:impl`
-  until then.
+- Implementation, Tier-A slice 2.6, separate-session IMPL-EVAL PASS, and evaluator follow-up slice
+  2.7 are complete. Keep PR #1442 draft at `status:impl-eval`; the supervisor alone advances it to
+  ready and merges.
