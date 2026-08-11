@@ -31,7 +31,7 @@ Also: **read-only on source.** Never edit \`packages/\`, \`plugins/\`, \`apps/\`
 **Do not run commands that rewrite \`deno.lock\`.**
 
 ## REQUIRED READING
-1. \`${RFC}\` — §13 (packages/archetypes/gates), **§14 (the 15-slice roadmap: W0-a … W6-b)**, §15 (owner forks).
+1. \`${RFC}\` — §13 (packages/archetypes/gates), **§14 (the 16-slice roadmap: W0-a … W6-b)**, §15 (owner forks).
 2. \`${RUN}/plan.md\` — locked decisions L1–L14, the rework audit, the risk register.
 3. \`${RUN}/design/T9-supersession/supersession-map.md\` — dispositions for #400 and children.
 4. \`${RUN}/decision-brief.md\` — what is still owner-gated.

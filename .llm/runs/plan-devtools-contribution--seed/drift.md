@@ -233,3 +233,47 @@ documentation.
   `.llm/tools/agentic/claude/evaluator-model-guard.ts:1,55-80`;
   `.llm/tools/agentic/runtime/provider-profiles.ts:192`;
   `.llm/tools/agentic/runtime/routing-policy.ts:90,171`.
+
+## 2026-08-11 — D-11: the DevTools epic AMENDS #400; it is not a new umbrella
+
+- **What:** The stage-H drafters produced a **new** epic while the supersession map dispositions
+  **#400 as `AMEND`**. Filing both would put **two live DevTools umbrellas** on the board.
+- **Source:** `filing/epic.md` (drafted as new) vs `design/T9-supersession/supersession-map.md`
+  (#400 → `AMEND`); flagged independently by two of the five drafters, including the filing-manifest
+  agent which had already resolved it the other way ("the epic is amended #400, not a new epic").
+- **Expected:** one umbrella.
+- **Actual:** two competing drafts of the same role.
+- **Severity:** significant — this is precisely the board fragmentation the RFC exists to end. It
+  already documents *three* competing seams and *two* epics claiming the same panels; adding a
+  third umbrella while fixing that would be self-defeating.
+- **Decision (supervisor):** **AMEND #400.** `filing/epic.md` is retitled as an **amended body for
+  #400**, not a new issue. Reasons, in order:
+  1. The supersession map — the artifact that actually studied the board — says `AMEND`.
+  2. #400 already carries the ownership thesis this RFC promotes to a normative gate, the
+     `epic:dev-dashboard` label, and the **owner-ratified 2026-07-19 train**. A new epic would
+     strand all three.
+  3. It **removes a label blocker**: `epic:devtools` does not exist in `.github/labels.yml` or live,
+     and creating a repo label is a board mutation the owner has not authorized. `epic:dev-dashboard`
+     exists and already means this.
+  4. Fewer umbrellas is the whole point.
+- **Action:** fix — `filing/epic.md` becomes the amended-#400 body; the filing manifest's epic row
+  becomes an **amend**, not a create; `area:devtools` / `area:frontend` remain **reported blockers**,
+  not invented labels.
+- **Evidence:** `gh label list` → `epic:devtools` MISSING, `area:devtools` MISSING, `area:frontend`
+  MISSING, `epic:dev-dashboard` EXISTS.
+
+## 2026-08-11 — D-12: `.github/labels.yml` has drifted from the live label set
+
+- **What:** The filing-manifest drafter compared `.github/labels.yml` against the live 129-label set
+  and found **19 live labels undocumented** in the file (e.g. `area:packages`,
+  `epic:road-to-stable`).
+- **Source:** `gh label list` versus `.github/labels.yml`, during stage-H drafting.
+- **Expected:** `netscript-pr` states the YAML is the machine-readable mirror and that the two are
+  kept in sync.
+- **Actual:** live has drifted ahead of the file.
+- **Severity:** minor for this run — **no drafted issue uses an undocumented label**, deliberately.
+- **Action:** record and **escalate**, do not fix. Editing `.github/labels.yml` is a repo-surface
+  change outside a planning-only run's mutation boundary, and `netscript-pr` warns that deleting an
+  existing label strips it from live issues. Worth its own parity PR.
+- **Also recorded:** `netscript-pr`'s milestone guidance (`0.0.2`…`0.0.9`) is **stale** — the live
+  board runs `0.0.6`…`0.0.15`. The drafts use live milestones and say so.
