@@ -1,0 +1,175 @@
+---
+outline: deep
+---
+
+# Getting Started
+
+## What is Vite DevTools?
+
+Vite DevTools is a devtools framework for the Vite ecosystem. It provides shared infrastructure — a unified dock, type-safe RPC, shared state, flexible UI hosting — so individual tools compose into one consistent UI and authors focus on what makes their integration unique. Any Vite plugin opts in with a `devtools.setup` hook.
+
+### Built-in integrations
+
+Vite DevTools stays dependency-light and advertises its built-in integrations — [Rolldown](/rolldown/) (build analysis: module graphs, chunks, assets, plugins), [Vite](/vite/) (plugin inspector), [Vitest](/vitest/) (test UI), and [Oxc](/oxc/) (oxlint/oxfmt) — as launchers in the dock. Click one to install its package on demand, then restart the dev server to activate it. Any integration already present in your project is mounted automatically.
+
+### Ecosystem
+
+A growing set of integrations already build on Vite DevTools Kit:
+
+- **[Nuxt DevTools v4](https://github.com/nuxt/devtools)** — built on Vite DevTools Kit
+- **[`@vitejs/devtools-oxc`](https://github.com/vitejs/devtools/tree/main/packages/oxc)** — first-party Oxc toolchain (oxlint/oxfmt) inspector with custom RPC functions
+- **[UnoCSS Inspector](https://github.com/unocss/unocss)** — dock integration for UnoCSS
+- **[vite-plugin-vue-tracer](https://github.com/antfu/vite-plugin-vue-tracer)** — action button that triggers a DOM inspector
+
+## Installation
+
+Vite DevTools is in early preview. Build from source, or install the preview release with the following steps.
+
+Install or upgrade Vite to version 8:
+
+<!-- eslint-skip -->
+```json [package.json]
+{
+  "dependencies": {
+    "vite": "^8.0.0"
+  }
+}
+```
+
+Install the required DevTools package:
+
+```bash
+pnpm add -D @vitejs/devtools
+```
+
+Vite DevTools has two client modes. Pick one.
+
+### Standalone mode
+
+The DevTools client runs in a standalone window.
+
+Configure `vite.config.ts`:
+
+```ts [vite.config.ts] twoslash
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  devtools: {
+    enabled: true,
+  },
+})
+```
+
+Run:
+
+```bash
+pnpm build
+```
+
+After the build completes, open the DevTools URL printed in the terminal.
+
+### Embedded mode
+
+The DevTools client runs as a floating panel inside the user app.
+
+Configure `vite.config.ts`:
+
+```ts [vite.config.ts] twoslash
+import { DevTools } from '@vitejs/devtools'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  plugins: [
+    DevTools(),
+  ],
+  build: {
+    rolldownOptions: {
+      devtools: {}, // enable devtools mode
+    },
+  }
+})
+```
+
+Run:
+
+```bash
+pnpm build
+pnpm dev
+```
+
+Open your app in the browser; the floating docks appear in the corner.
+
+The `visibility` option sets the starting mode. The default `'normal'` shows the docks immediately. `'passive'` keeps them out of the way and prints a console hint to reveal them with <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>D</kbd> (<kbd>⇧</kbd> <kbd>⌥</kbd> <kbd>D</kbd> on macOS); revealing once is remembered in the project's `node_modules`, so later dev sessions on this machine open straight into the docks, and the "Hide DevTools" command returns to passive mode. `'hidden'` also starts hidden but never remembers — the shortcut reveals the docks for the current session only.
+
+```ts [vite.config.ts] twoslash
+import { DevTools } from '@vitejs/devtools'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  plugins: [
+    DevTools({
+      visibility: 'passive',
+    }),
+  ],
+})
+```
+
+#### Projects without an HTML entry
+
+For apps where Vite doesn't serve the HTML (JS-only entries, backend integration, middleware mode), import the client injector from a browser entry instead. One entry per visibility mode — import whichever one you want:
+
+```ts twoslash
+// Normal: docks shown immediately
+import '@vitejs/devtools/client/inject'
+```
+
+```ts twoslash
+// Passive: docks hidden until Shift+Alt+D, then remembered
+import '@vitejs/devtools/client/inject-passive'
+```
+
+```ts twoslash
+// Hidden: docks hidden until Shift+Alt+D, every session
+import '@vitejs/devtools/client/inject-hidden'
+```
+
+See [Client Script & Context](/kit/client-context#client-script-not-injected) for how injection works and the full troubleshooting checklist.
+
+#### Building with the app
+
+Generate a static DevTools build alongside the app build by enabling `build.withApp`:
+
+```ts [vite.config.ts] twoslash
+import { DevTools } from '@vitejs/devtools'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  plugins: [
+    DevTools({
+      build: {
+        withApp: true, // generate DevTools output during `vite build`
+        // outDir: 'custom-dir', // optional, defaults to Vite's build.outDir
+      },
+    }),
+  ],
+  build: {
+    rolldownOptions: {
+      devtools: {},
+    },
+  }
+})
+```
+
+`build.withApp` writes the DevTools static output into the build directory using the same build context, so the analysis panels reflect the real build with no separate command.
+
+## What's next
+
+- **Explore the built-in tools** — open the [DevTools for Rolldown](/rolldown/) panels.
+- **Build custom integrations** — extend DevTools with the [Vite DevTools Kit](/kit/).
+- **Contribute** — see the [contributing guide](https://github.com/antfu/contribute).
+
+## Architecture
+
+Vite DevTools is built on **`@vitejs/devtools-kit`**, the integration hub that owns the dock, command palette, terminal aggregation, and the `Plugin.devtools.setup` hook every integration uses. Kit in turn builds on **Devframe**, a framework-neutral foundation that any single tool can use directly — including standalone CLIs, MCP servers, or static dashboards that have no Vite dependency. See [Devframe](https://devfra.me/guide/) for that path.
+
+Integrations like [Nuxt DevTools](https://github.com/nuxt/devtools) and the first-party [`@vitejs/devtools-oxc`](https://github.com/vitejs/devtools/tree/main/packages/oxc) plug into Kit's plugin API. To extend Vite DevTools, see [Vite DevTools Kit](/kit/).

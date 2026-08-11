@@ -1,0 +1,1582 @@
+# Configuration
+
+You can pass a - what we call universal - configuration object to fine-tune your API reference.
+
+> **Note:** This page covers the runtime configuration object for the API Reference used to control how Scalar displays your API docs.
+>
+> This is NOT the `scalar.config.json` (used for the [Docs](guides/docs/configuration/scalar.config.json.md)).
+
+
+## Universal Configuration
+
+It is universal, because it works in all environments. You can pass it to the JS API directly, or you can use it in one of our integrations.
+
+Let's say you are working with just an HTML file, that's how you pass the configuration:
+
+```javascript
+Scalar.createApiReference('#app', {
+  // Your configuration goes here…
+  url: '…'
+})
+```
+
+Or — just as an example — in the Hono server framework, you would pass the same configuration like this:
+
+```javascript
+app.get(
+  '/doc',
+  Scalar({
+    // Your configuration goes here…
+    url: '…'
+  }),
+)
+```
+
+## OpenAPI Documents
+
+There is just one thing that is really required to render at least something: The content.
+
+There are a bunch of ways to pass your OpenAPI document:
+
+### URL
+
+Pass an absolute or relative URL to your OpenAPI document.
+
+```javascript
+Scalar.createApiReference('#app', {
+  url: '/openapi.json'
+})
+```
+
+This can be JSON or YAML.
+
+It's the recommended way to pass your OpenAPI document. In most cases, the OpenAPI document can be cached by the browser and subsequent requests are pretty fast then, even if the document grows over time.
+
+> No OpenAPI document? All backend frameworks have some kind of OpenAPI generator. Just search for "yourframework generate openapi document".
+
+### Content
+
+> While this approach is convenient for quick setup, it may impact performance for large documents. For optimal performance with extensive OpenAPI specifications, consider using a URL to an external OpenAPI document instead.
+
+You can just directly pass JSON/YAML content:
+
+```javascript
+Scalar.createApiReference('#app', {
+  content: `{
+    "openapi": "3.1.0",
+    "info": {
+      "title": "Hello World",
+      "version": "1.0.0"
+    },
+    "paths": {
+      // …
+    }
+  }`
+})
+```
+
+### Multiple Documents
+
+Add multiple OpenAPI documents to render all of them. We will need a slug and title to distinguish them in the UI and in the URL. You can just omit those attributes, and we will try our best to still distinguish them, though.
+
+```javascript
+Scalar.createApiReference('#app', {
+  sources: [
+    // API #1
+    {
+      title: 'Scalar Galaxy', // optional, would fallback to 'API #1'
+      slug: 'scalar-galaxy', // optional, would be auto-generated from the title or the index
+      url: 'https://registry.scalar.com/@scalar/apis/galaxy?format=json',
+    },
+    // API #2
+    {
+      url: 'https://example.com/openapi.json',
+    },
+    // API #3
+    {
+      content: '{ "openapi": "3.1.1", … }',
+    }
+  ]
+})
+```
+
+The first one in the list is the default one. Sometimes, this list is auto-generated and you might want to explicitly set the default like this:
+
+```javascript
+Scalar.createApiReference('#app', {
+  sources: [
+    // API #1
+    {
+      url: 'https://registry.scalar.com/@scalar/apis/galaxy?format=json',
+    },
+    // API #2
+    {
+      url: 'https://example.com/openapi.json',
+      // This will make it the default OpenAPI document:
+      default: true,
+    }
+  ]
+})
+```
+
+### Multiple Configurations
+
+Sometimes, you want to modify the configuration for your OpenAPI documents. And the good news is: You can.
+
+Pass an array of configurations to render multiple documents with specific configurations:
+
+```javascript
+Scalar.createApiReference('#app', [
+  // Configuration #1
+  {
+    title: 'Scalar Galaxy', // optional, would fallback to 'API #1'
+    slug: 'scalar-galaxy', // optional, would be auto-generated from the title or the index
+    url: 'https://registry.scalar.com/@scalar/apis/galaxy?format=json',
+    customCss: `body { background-color: #BADA55}`
+  },
+  // Configuration #2
+  {
+    url: 'https://example.com/openapi.json',
+    customCss: `body { background-color: #c0ffee}`
+  },
+  // Configuration #3
+  {
+    content: '{ "openapi": "3.1.1", … }',
+    customCss: `body { background-color: #facade}`
+  }
+])
+```
+
+By default, the first one in the list will be the default configuration. You can explicitly set one with `default: true`:
+
+```javascript
+Scalar.createApiReference('#app', [
+  {
+    url: 'https://registry.scalar.com/@scalar/apis/galaxy?format=json',
+  },
+  {
+    url: 'https://example.com/openapi.json',
+  },
+  {
+    // Make this the default configuration:
+    default: true,
+    content: '{ "openapi": "3.1.1", … }',
+  }
+])
+```
+
+### Multiple Configurations with Sources (Advanced)
+
+You can even combine multiple configurations that each have their own set of sources. This gives you maximum flexibility in organizing and configuring your API documents:
+
+```javascript
+Scalar.createApiReference('#app', [
+  // Configuration #1
+  {
+    // With sources! 🤯
+    sources: [
+      // API #1
+      {
+        url: 'https://registry.scalar.com/@scalar/apis/galaxy?format=json',
+      },
+      // API #2
+      {
+        url: 'https://example.com/openapi.json',
+        // This will make it the default OpenAPI document:
+        default: true,
+      }
+    ]
+  },
+  // Configuration #2
+  {
+    url: 'https://example.com/openapi.json',
+  },
+  // Configuration #3
+  {
+    sources: [
+      {
+        content: '{ "openapi": "3.1.1", … }',
+      }
+    ]
+  }
+])
+```
+
+### JSON or YAML
+
+It is completely up to you whether you want to pass JSON or YAML. None of the differences make really a big difference, but here is a short overview:
+
+* JSON is faster to parse for the browser
+* JSON is supported natively in basically any environment
+* YAML is easier to write, especially if you want multiline text (for example for descriptions)
+* YAML is easier to read for humans
+* YAML documents tend to be a little bit smaller
+
+## Agent
+
+Agent adds an AI chat interface to your API reference. Users can ask questions about your API and get contextual answers based on your OpenAPI document.
+
+- Enabled by default on `http://localhost` for testing (10 free messages)
+- Won’t appear in production unless a key is provided
+- Requires an [Agent key](guides/agent/key.md) for production deployments
+- Your OpenAPI document is uploaded on first message
+
+Related: [How to get an Agent key](guides/agent/key.md)
+
+```js
+Scalar.createApiReference('#app', {
+  sources: [
+    {
+      url: 'https://registry.scalar.com/@your-namespace/apis/your-api/latest?format=json',
+      agent: {
+        key: 'put-your-agent-scalar-key-here',
+      },
+    },
+  ],
+})
+```
+
+To disable Agent:
+
+```js
+Scalar.createApiReference('#app', {
+  // Disable Agent entirely
+  agent: {
+    disabled: true,
+  },
+})
+```
+
+## Configuration Options
+
+### Properties
+
+Configuration properties to customize the behavior and appearance of your API reference.
+
+#### authentication
+
+**Type:** `AuthenticationConfiguration`
+
+To make authentication easier you can prefill the credentials for your users:
+
+```javascript
+{
+  authentication: {
+    // The OpenAPI file has keys for all security schemes.
+    // Specify which security scheme(s) should be used by default.
+    // Can be a single string:
+    preferredSecurityScheme: 'my_custom_security_scheme',
+    // Or an array for multiple schemes (OR relationship):
+    preferredSecurityScheme: ['scheme1', 'scheme2'],
+    // Or an array of arrays for complex AND/OR relationships:
+    preferredSecurityScheme: [['scheme1', 'scheme2'], 'scheme3'],
+
+    // Define security scheme configurations:
+    securitySchemes: {
+      // For API Key
+      apiKeyHeader: {
+        name: 'X-API-KEY',
+        in: 'header',
+        value: 'tokenValue',
+      },
+      // For HTTP Bearer
+      httpBearer: {
+        token: 'xyz token value',
+      },
+      // For HTTP Basic
+      httpBasic: {
+        username: 'username',
+        password: 'password',
+      },
+      // For OAuth2
+      oauth2: {
+        flows: {
+          authorizationCode: {
+            // Provide a token that is used instead of calling the auth provider
+            token: 'auth code token',
+            // Prefill client id or secret
+            'x-scalar-client-id': 'your-client-id',
+            clientSecret: 'your-client-secret',
+            // Overwrite values from the OpenAPI document
+            authorizationUrl: 'https://auth.example.com/oauth2/authorize',
+            tokenUrl: 'https://auth.example.com/oauth2/token',
+            'x-scalar-redirect-uri': 'https://your-app.com/callback',
+            // Use PKCE for additional security: 'SHA-256', 'plain', or 'no'
+            // With 'SHA-256' or 'plain', authorizationCode is treated as a public client.
+            // The Client Secret field is hidden and client_secret is not sent in token/refresh requests.
+            'x-usePkce': 'SHA-256',
+            // Preselected scopes
+            selectedScopes: ['profile', 'email'],
+            // Set additional query parameters for the Authorization request
+            'x-scalar-security-query': {
+              prompt: 'consent',
+              audience: 'scalar'
+            },
+            // Set additional body parameters for the Token request
+            'x-scalar-security-body': {
+              audience: 'scalar'
+            },
+            // Custom token name for non-standard OAuth2 responses (default: 'access_token')
+            'x-tokenName': 'custom_access_token',
+            // Specify where OAuth2 credentials should be sent: 'header' or 'body'
+            'x-scalar-credentials-location': 'header'
+          },
+          clientCredentials: {
+            token: 'client credentials token',
+            'x-scalar-client-id': 'your-client-id',
+            clientSecret: 'your-client-secret',
+            tokenUrl: 'https://auth.example.com/oauth2/token',
+            // Preselected scopes
+            selectedScopes: ['profile', 'api:read'],
+            // Custom token name for non-standard OAuth2 responses (default: 'access_token')
+            'x-tokenName': 'custom_access_token',
+            // Specify where OAuth2 credentials should be sent: 'header' or 'body'
+            'x-scalar-credentials-location': 'body'
+          },
+          implicit: {
+            token: 'implicit flow token',
+            'x-scalar-client-id': 'your-client-id',
+            authorizationUrl: 'https://auth.example.com/oauth2/authorize',
+            'x-scalar-redirect-uri': 'https://your-app.com/callback',
+            // Preselected scopes
+            selectedScopes: ['openid', 'profile'],
+            // Custom token name for non-standard OAuth2 responses (default: 'access_token')
+            'x-tokenName': 'custom_access_token'
+          },
+          password: {
+            token: 'password flow token',
+            'x-scalar-client-id': 'your-client-id',
+            clientSecret: 'your-client-secret',
+            tokenUrl: 'https://auth.example.com/oauth2/token',
+            username: 'default-username',
+            password: 'default-password',
+            selectedScopes: ['profile', 'email'],
+            // Custom token name for non-standard OAuth2 responses (default: 'access_token')
+            'x-tokenName': 'custom_access_token',
+            // Specify where OAuth2 credentials should be sent: 'header' or 'body'
+            'x-scalar-credentials-location': 'header'
+          },
+        },
+        // Set default scopes for all flows
+        'x-default-scopes': ['profile', 'email']
+      }
+    },
+  }
+}
+```
+
+For OAuth2 `authorizationCode` flows, when `x-usePkce` is set to `'SHA-256'` or `'plain'`, Scalar treats the flow as a public PKCE client. In that mode, the Client Secret input is hidden in the authentication form, and `client_secret` is not included in token exchange or refresh requests.
+
+The `authentication` configuration accepts:
+
+- `preferredSecurityScheme`: Specifies which security scheme(s) to use by default. Can be:
+  - A single security scheme name (string)
+  - An array of security scheme names (OR relationship)
+  - An array containing strings or arrays of strings (AND/OR relationship)
+- `securitySchemes`: An object mapping security scheme names to their configurations. Each security scheme can be configured with type-specific options.
+- `createAnySecurityScheme`: When `true`, shows generic "Add new authentication" options (API Key, HTTP Basic, OAuth2 flows, etc.) in the auth dropdown alongside the schemes defined in your OpenAPI document. Default: `false`.
+
+#### baseServerURL
+
+**Type:** `string`
+
+If you want to prefix all relative servers with a base URL, you can do so here.
+
+```javascript
+{
+  baseServerURL: 'https://scalar.com'
+}
+```
+
+#### content
+
+**Type:** `string | Record<string, any> | () => Record<string, any>`
+
+Directly pass an OpenAPI/Swagger document (JSON or YAML) as a string:
+
+```javascript
+{
+  content: '{ "openapi": "3.1.1" }'
+}
+```
+
+Or as a JavaScript object:
+
+```javascript
+{
+  content: {
+    openapi: '3.1.1',
+  }
+}
+```
+
+Or as a callback returning the actual document:
+
+```javascript
+{
+  content() {
+    return {
+      openapi: '3.1.1',
+    }
+  }
+}
+```
+
+#### customCss
+
+**Type:** `string`
+
+You can pass custom CSS directly to the component. This is helpful for the integrations for Fastify, Express, Hono and others where it's easier to add CSS to the configuration.
+
+In Vue or React you'd probably use other ways to add custom CSS.
+
+```javascript
+{
+  customCss: `* { font-family: "Comic Sans MS", cursive, sans-serif; }`
+}
+```
+
+#### darkMode
+
+**Type:** `boolean`
+
+Whether dark mode is on or off initially (light mode).
+
+**Default:** `false`
+
+```javascript
+{
+  darkMode: true
+}
+```
+
+#### defaultHttpClient
+
+**Type:** `HttpClientState`
+
+By default, we're using Shell/curl as the default HTTP client. Or, if that's disabled (through `hiddenClients`), we're just using the first available HTTP client.
+
+**Default:** `{ targetKey: 'shell', clientKey: 'curl' }`
+
+You can explicitly set the default HTTP client, though:
+
+```javascript
+{
+  defaultHttpClient: {
+    targetKey: 'node',
+    clientKey: 'undici',
+  }
+}
+```
+
+#### defaultOpenFirstTag
+
+**Type:** `boolean`
+
+Whether to open the first tag if the URL doesn't contain a specific target.
+
+**Default:** `true`
+
+```javascript
+{
+  defaultOpenFirstTag: false
+}
+```
+
+#### defaultOpenAllTags
+
+**Type:** `boolean`
+
+Whether to always start with all tags open, regardless of the URL.
+
+**Default:** `false`
+
+```javascript
+{
+  defaultOpenAllTags: true
+}
+```
+
+#### documentDownloadType
+
+**Type:** `'json' | 'yaml' | 'both' | 'direct' | 'none'`
+
+Sets the file type of the document to download, set to `'none'` to hide the download button.
+
+**Default:** `'both'`
+
+```javascript
+{
+  documentDownloadType: 'json'
+}
+```
+
+When `'direct'` is passed, it just outputs a regular link to the passed URL.
+
+#### expandAllModelSections
+
+**Type:** `boolean`
+
+By default the models are all closed in the model section at the bottom, this flag will open them all by default.
+
+**Default:** `false`
+
+```javascript
+{
+  expandAllModelSections: true
+}
+```
+
+#### expandAllResponses
+
+**Type:** `boolean`
+
+By default response sections are closed in the operations. This flag will open them by default.
+
+**Default:** `false`
+
+```javascript
+{
+  expandAllResponses: true
+}
+```
+
+
+#### expandAllSchemaProperties
+
+**Type:** `boolean`
+
+When true, nested child properties are expanded by default. The
+"Show/Hide Child Attributes" toggle stays available so users can collapse
+sections manually.
+
+Warning: this can cause performance issues on big documents.
+
+**Default:** `false`
+
+```javascript
+{
+  expandAllSchemaProperties: true
+}
+```
+
+#### favicon
+
+**Type:** `string`
+
+You can specify the path to a favicon to be used for the documentation.
+
+```javascript
+{
+  favicon: '/favicon.svg'
+}
+```
+
+#### forceDarkModeState
+
+**Type:** `'dark' | 'light'`
+
+Force dark mode to always be this state no matter what.
+
+```javascript
+{
+  forceDarkModeState: 'dark'
+}
+```
+
+#### hideClientButton
+
+**Type:** `boolean`
+
+Whether to show the client button from the reference sidebar and modal.
+
+**Default:** `false`
+
+```javascript
+{
+  hideClientButton: true
+}
+```
+
+#### hideDarkModeToggle
+
+**Type:** `boolean`
+
+Whether to show the dark mode toggle.
+
+**Default:** `false`
+
+```javascript
+{
+  hideDarkModeToggle: true
+}
+```
+
+#### showOperationId
+
+**Type:** `boolean`
+
+Every operation can have a `operationId`, a unique string used to identify the operation, but it's optional.
+
+By default we don't render it in the UI. If it's helpful to show it to your users, enable it like this:
+
+**Default:** `false`
+
+```javascript
+{
+  showOperationId: true
+}
+```
+
+#### hideModels
+
+**Type:** `boolean`
+
+Whether models (`components.schemas` or `definitions`) should be shown in the sidebar, search and content.
+
+**Default:** `false`
+
+```javascript
+{
+  hideModels: true
+}
+```
+
+#### modelsSectionLabel
+
+**Type:** `'Models' | 'Schemas' | string`
+
+Label for the `components.schemas` section in the sidebar, main content, and search. Use `Schemas` for OpenAPI terminology; `Models` is the default for backward compatibility. Any custom string is supported.
+
+**Default:** `'Models'`
+
+```javascript
+{
+  modelsSectionLabel: 'Schemas'
+}
+```
+
+#### localization
+
+**Type:** `{ locale?: string, direction?: 'ltr' | 'rtl' | 'auto', translations?: object }`
+
+Localizes the API Reference UI and controls text direction (LTR/RTL). See the dedicated
+[Localization](localization.md) page for the full reference, including the built-in locales and how
+to override individual labels.
+
+```javascript
+{
+  localization: {
+    locale: 'de',
+  },
+}
+```
+
+#### hideSearch
+
+**Type:** `boolean`
+
+Whether to show the sidebar search bar.
+
+**Default:** `false`
+
+```javascript
+{
+  hideSearch: true
+}
+```
+
+#### hideTestRequestButton
+
+**Type:** `boolean`
+
+Whether to show the "Test Request" button. When `true`, the authentication panel is also hidden, since it is only relevant when test requests are available.
+
+**Default:** `false`
+
+```javascript
+{
+  hideTestRequestButton: true
+}
+```
+
+#### hiddenClients
+
+**Type:** `array | true | object`
+
+We're generating code examples for a long list of popular HTTP clients. You can control which are shown by passing an array of clients, to hide the given clients.
+
+Pass an empty array `[]` to show all available clients:
+
+```javascript
+{
+  hiddenClients: []
+}
+```
+
+Pass an array of individual clients to hide just those clients:
+
+```javascript
+{
+  hiddenClients: ['fetch']
+}
+```
+
+Here's a list of all clients that you can potentially hide:
+
+<!-- AUTO-GENERATED:CLIENTS START -->
+<!-- This section is automatically generated. Do not edit manually. -->
+<!-- Source: packages/snippetz/src/clients/index.ts -->
+<!-- Generator: packages/snippetz/scripts/generate-markdown-docs.ts -->
+
+```js
+{
+  hiddenClients: {
+    // C
+    c: ['libcurl'],
+    // Clojure
+    clojure: ['clj_http'],
+    // C#
+    csharp: ['httpclient', 'restsharp'],
+    // Dart
+    dart: ['http'],
+    // F#
+    fsharp: ['httpclient'],
+    // Go
+    go: ['native'],
+    // HTTP
+    http: ['http1.1'],
+    // Java
+    java: ['asynchttp', 'nethttp', 'okhttp', 'unirest'],
+    // JavaScript
+    js: ['axios', 'fetch', 'jquery', 'ofetch', 'xhr'],
+    // Kotlin
+    kotlin: ['okhttp'],
+    // Node.js
+    node: ['axios', 'fetch', 'ofetch', 'undici'],
+    // Objective-C
+    objc: ['nsurlsession'],
+    // OCaml
+    ocaml: ['cohttp'],
+    // PHP
+    php: ['curl', 'guzzle', 'laravel'],
+    // PowerShell
+    powershell: ['restmethod', 'webrequest'],
+    // Python
+    python: ['aiohttp', 'httpx_async', 'httpx_sync', 'python3', 'requests'],
+    // R
+    r: ['httr2'],
+    // Ruby
+    ruby: ['native'],
+    // Rust
+    rust: ['reqwest'],
+    // Shell
+    shell: ['curl', 'httpie', 'wget'],
+    // Swift
+    swift: ['nsurlsession'],
+  }
+}
+```
+
+<!-- AUTO-GENERATED:CLIENTS END -->
+
+But you can also pass `true` to **hide all** HTTP clients. If you have any custom code examples (`x-scalar-examples`) in your API definition, these still render:
+
+```javascript
+{
+  hiddenClients: true
+}
+```
+
+---
+
+You can also provide an `object` where each **key** corresponds to a language,
+and each **value** specifies the visibility behavior for the clients of that language.
+
+* `true` — hides all clients for the specified language
+* `false` — shows all clients for the specified language
+* `['client1', 'client2']` — hides only the listed clients for the specified language
+
+```typescript
+{
+  hiddenClients: {
+    c: false,
+    js: true,
+    shell: ['httpie'], // show all except `httpie`
+  },
+}
+```
+
+#### layout
+
+**Type:** `'modern' | 'classic'`
+
+The layout style to use for the API reference.
+
+**Default:** `'modern'`
+
+```javascript
+{
+  layout: 'modern' // or 'classic'
+}
+```
+
+#### metaData
+
+**Type:** `object`
+
+You can pass information to the config object to configure meta information out of the box.
+
+```javascript
+{
+  metaData: {
+    title: 'Page title',
+    description: 'My page description',
+    ogDescription: 'Still about my my page',
+    ogTitle: 'Page title',
+    ogImage: 'https://example.com/image.png',
+    twitterCard: 'summary_large_image',
+    // Add more...
+  }
+}
+```
+
+#### mcp
+
+**Type:** `{ name: string; url: string; disabled?: boolean }` (optional)
+
+MCP (Model Context Protocol) configuration. When provided, enables MCP integration so users can connect their API reference to MCP-compatible tools. Omit this option to leave MCP disabled.
+
+Related: [MCP guide](guides/agent/mcp.md)
+
+- **name** — Display name for the MCP server.
+- **url** — URL of the MCP server.
+- **disabled** — Optional. When `true`, disables the MCP integration.
+
+```javascript
+{
+  mcp: {
+    name: 'My API',
+    url: 'https://mcp.example.com',
+  }
+}
+```
+
+To disable MCP explicitly:
+
+```javascript
+{
+  mcp: {
+    name: 'My API',
+    url: 'https://mcp.example.com',
+    disabled: true,
+  }
+}
+```
+
+#### operationTitleSource
+
+**Type:** `'summary' | 'path'`
+
+Whether the sidebar display text and search should use the operation summary or the operation path.
+
+**Default:** `'summary'`
+
+```javascript
+{
+  operationTitleSource: 'path'
+}
+```
+
+#### orderRequiredPropertiesFirst
+
+**Type:** `boolean`
+
+Whether to order required properties first in schema objects. When enabled, required properties will be displayed before optional properties in model definitions.
+
+**Default:** `true`
+
+```javascript
+{
+  orderRequiredPropertiesFirst: true
+}
+```
+
+#### orderSchemaPropertiesBy
+
+**Type:** `'alpha' | 'preserve'`
+
+Control how schema properties are ordered in model definitions. Can be set to:
+
+- `'alpha'`: Sort properties alphabetically by name
+- `'preserve'`: Preserve the order from the OpenAPI Document
+
+**Default:** `'alpha'`
+
+```javascript
+// Preserve original ordering
+{
+  orderSchemaPropertiesBy: 'preserve'
+}
+```
+
+#### pathRouting
+
+**Type:** `{ basePath: string }`
+
+Configuration for path-based routing instead of hash-based routing. Your server must support this routing method.
+
+```javascript
+{
+  pathRouting: {
+    basePath: '/standalone-api-reference'
+  }
+}
+```
+
+#### persistAuth
+
+**Type:** `boolean`
+
+Whether to persist authentication credentials in local storage. This allows the authentication state to be maintained across page reloads.
+
+**Default:** `false`
+
+```javascript
+{
+  persistAuth: true
+}
+```
+
+> [!WARNING]
+> Persisting authentication information in the browser's local storage may present security risks in certain environments. Use this feature with caution based on your security requirements.
+
+#### telemetry
+
+**Type:** `boolean`
+
+Whether to enable telemetry when an analytics plugin is loaded.
+
+By default, the open-source version of Scalar does not track anything at all. There is an optional analytics plugin that we load on our own platform to get a tiny bit of insight into how people use Scalar. If you self-host Scalar or use it as a library, no tracking happens unless you explicitly load that plugin.
+
+If the analytics plugin is loaded and you still want to disable tracking, set `telemetry: false`. This will opt out of all event capturing.
+
+**Default:** `true`
+
+```javascript
+{
+  telemetry: false
+}
+```
+
+#### plugins
+
+**Type:** `ApiReferencePlugin[]`
+
+Pass an array of custom plugins that you want. [Read more about plugins here.](plugins.md)
+
+```javascript
+{
+  plugins: [
+    XCustomExtensionPlugin(),
+  ],
+}
+```
+
+#### pluginUrls
+
+**Type:** `string[]`
+
+Pass URLs of ESM modules that export a plugin as their default export. The modules are imported before the API reference mounts and their default exports are registered alongside the plugins passed via `plugins`. Unlike `plugins`, this option is JSON-serializable, so it also works in integrations that pass their configuration as JSON. Only supported by the standalone browser build (`Scalar.createApiReference`). [Read more about plugins here.](plugins.md)
+
+```javascript
+{
+  pluginUrls: [
+    'https://cdn.jsdelivr.net/npm/@example/scalar-plugin/dist/plugin.js',
+  ],
+}
+```
+
+#### proxyUrl
+
+**Type:** `string`
+
+Making requests to other domains is restricted in the browser and requires [CORS headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS). It's recommended to use a proxy to send requests to other origins.
+
+```javascript
+{
+  proxyUrl: 'https://proxy.example.com'
+}
+```
+
+You can use our hosted proxy:
+
+```javascript
+{
+  proxyUrl: 'https://proxy.scalar.com'
+}
+```
+
+If you like to run your own, check out our [example proxy written in Go](https://github.com/scalar/scalar/tree/main/projects/proxy-scalar-com).
+
+Please note: You may not use just any reverse proxy, but need to use a proxy that adheres to the Scalar Proxy API. See the example to learn more.
+
+#### oauth2RedirectUri
+
+**Type:** `string`
+
+Default OAuth 2.0 redirect URI used to prefill authorization code and implicit flows in the API client.
+
+This is useful for desktop wrappers like Electron where the page URL is often `file://...`, which OAuth providers usually reject.
+
+```javascript
+{
+  oauth2RedirectUri: 'myapp://oauth/callback'
+}
+```
+
+#### searchHotKey
+
+**Type:** `string`
+
+Key used with CTRL/CMD to open the search modal.
+
+**Default:** `'k'` (e.g. CMD+k)
+
+```javascript
+{
+  searchHotKey: 'l'
+}
+```
+
+#### servers
+
+**Type:** `Server[]`
+
+Pass a list of servers to override the servers in your OpenAPI document.
+
+```javascript
+{
+  servers: [
+    {
+      url: 'https://api.scalar.com',
+      description: 'Production',
+    },
+    {
+      url: 'https://sandbox.scalar.com:{port}',
+      description: 'Development sandboxes',
+      variables: {
+        port: {
+          default: '8080',
+        }
+      }
+    },
+  ]
+}
+```
+
+#### showSidebar
+
+**Type:** `boolean`
+
+Whether the sidebar should be shown.
+
+**Default:** `true`
+
+```javascript
+{
+  showSidebar: true
+}
+```
+
+#### showDeveloperTools
+
+**Type:** `'always' | 'localhost' | 'never'`
+
+Whether and when to show the developer tools. By default only shows on `localhost` (and other domains used for development).
+
+**Default:** `'localhost'`
+
+To disable the toolbar set:
+
+```javascript
+{
+  showDeveloperTools: 'never'
+}
+```
+
+#### theme
+
+**Type:** `string`
+
+You don't like the color scheme? We've prepared some themes for you:
+
+Can be one of: **alternate**, **default**, **moon**, **purple**, **solarized**, **bluePlanet**, **saturn**, **kepler**, **mars**, **deepSpace**, **laserwave**, **none**
+
+**Default:** `'default'`
+
+```javascript
+{
+  theme: 'default'
+}
+```
+
+#### url
+
+**Type:** `string`
+
+Pass the URL of an OpenAPI document (JSON or YAML).
+
+```javascript
+{
+  url: '/openapi.json'
+}
+```
+
+#### withDefaultFonts
+
+**Type:** `boolean`
+
+By default we're using Inter and JetBrains Mono, served from our fonts CDN at `https://fonts.scalar.com`. If you use a different font or just don't want to load web fonts, pass `withDefaultFonts: false` to the configuration.
+
+**Default:** `true`
+
+```javascript
+{
+  withDefaultFonts: false
+}
+```
+
+### Methods
+
+Custom functions to control specific behaviors and URL generation.
+
+#### customFetch
+
+**Type:** `(input: string | URL | globalThis.Request, init?: RequestInit) => Promise<Response>`
+
+Custom [fetch function](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) used both when loading the OpenAPI document and when sending "Test Request" calls from the API client. Can be used to add custom headers, attach credentials (for example `credentials: 'include'`), handle auth, etc.
+
+```javascript
+{
+  customFetch: (input: string | URL | globalThis.Request, init?: RequestInit) => {
+    return window.fetch(input, { ...init, credentials: 'include' })
+  }
+}
+```
+
+> The previous `fetch` option is deprecated. It still works and is migrated automatically (with a console warning), but new code should use `customFetch`.
+
+#### generateHeadingSlug
+
+**Type:** `(heading: Heading) => string`
+
+Customize how heading URLs are generated. This function receives the heading and returns a string ID that controls the entire URL hash.
+
+> Note: This must be passed through JavaScript, setting a data attribute will not work.
+
+```javascript
+// Default behavior - results in hash: #description/heading-slug
+{
+  generateHeadingSlug: (heading) => `#description/${heading.slug}`
+}
+
+// Custom example
+{
+  generateHeadingSlug: (heading) => `#custom-section/${heading.slug}`
+}
+```
+
+#### generateModelSlug
+
+**Type:** `(model: { name: string }) => string`
+
+Customize how model URLs are generated. This function receives the model object and returns a string ID. Note that `model/` will automatically be prepended to the result.
+
+> Note: This must be passed through JavaScript, setting a data attribute will not work.
+
+```javascript
+// Default behavior - results in hash: #model/model-name
+{
+  generateModelSlug: (model) => slug(model.name)
+}
+
+// Custom example - results in hash: #model/custom-prefix-model-name
+{
+  generateModelSlug: (model) => `custom-prefix-${model.name.toLowerCase()}`
+}
+```
+
+#### generateOperationSlug
+
+**Type:** `(operation: Operation) => string`
+
+Customize how operation URLs are generated. This function receives the operation object containing `path`, `operationId`, `method`, and `summary`. Note that `tag/tag-name/` will automatically be prepended to the result.
+
+> Note: This must be passed through JavaScript, setting a data attribute will not work.
+
+```javascript
+// Default behavior - results in hash: #tag/tag-name/post-path
+{
+  generateOperationSlug: (operation) => `${operation.method}${operation.path}`
+}
+
+// Custom example - results in hash: #tag/tag-name/v1-post-users
+{
+  generateOperationSlug: (operation) =>
+    `v1-${operation.method.toLowerCase()}-${operation.path.replace('/', '-')}`
+}
+```
+
+#### generateTagSlug
+
+**Type:** `(tag: Tag) => string`
+
+Customize how tag URLs are generated. This function receives the tag object and returns a string ID. Note that `tag/` will automatically be prepended to the result.
+
+> Note: This must be passed through JavaScript, setting a data attribute will not work.
+
+```javascript
+// Default behavior - results in hash: #tag/tag-name
+{
+  generateTagSlug: (tag) => slug(tag.name)
+}
+
+// Custom example - results in hash: #tag/v1-tag-name
+{
+  generateTagSlug: (tag) => `v1-${tag.name.toLowerCase()}`
+}
+```
+
+#### generateWebhookSlug
+
+**Type:** `(webhook: { name: string; method?: string }) => string`
+
+Customize how webhook URLs are generated. This function receives the webhook object containing the name and an optional HTTP method. Note that `webhook/` will automatically be prepended to the result.
+
+> Note: This must be passed through JavaScript, setting a data attribute will not work.
+
+```javascript
+// Default behavior - results in hash: #webhook/webhook-name
+{
+  generateWebhookSlug: (webhook) => slug(webhook.name)
+}
+
+// Custom example - results in hash: #webhook/v1-post-user-created
+{
+  generateWebhookSlug: (webhook) =>
+    `v1-${webhook.method?.toLowerCase()}-${webhook.name}`
+}
+```
+
+#### setPageTitle
+
+**Type:** `(input: { title: string; document: { title: string; slug: string } }) => string`
+
+Customize the browser tab title. The function is called whenever the section in view changes — on sidebar clicks, on scroll, and when switching documents — and receives the title of the section currently in view together with the active OpenAPI document.
+
+> Note: This must be passed through JavaScript, setting a data attribute will not work.
+
+```js
+// Results in a title like: Scalar Galaxy – Create a user
+{
+  setPageTitle: ({ title, document }) => `${document.title} – ${title}`
+}
+```
+
+#### tagsSorter
+
+**Type:** `'alpha' | (a: Tag, b: Tag) => number`
+
+Sort tags alphanumerically (`'alpha'`):
+
+```javascript
+{
+  tagsSorter: 'alpha'
+}
+```
+
+#### operationsSorter
+
+**Type:** `'alpha' | 'method' | ((a: OperationSortValue, b: OperationSortValue) => number)`
+
+Sort operations alphanumerically (`'alpha'`) or by HTTP method (`'method'`):
+
+**Default:** `'alpha'`
+
+```javascript
+{
+  operationsSorter: 'alpha'
+}
+```
+
+Or specify a custom function to sort the operations:
+
+```javascript
+{
+  operationsSorter: (a, b) => {
+    const methodOrder = ['get', 'post', 'put', 'delete']
+    const methodComparison = methodOrder.indexOf(a.method) - methodOrder.indexOf(b.method)
+
+    if (methodComparison !== 0) {
+      return methodComparison
+    }
+
+    return a.path.localeCompare(b.path)
+  },
+}
+```
+
+> Note: `method` is the HTTP method of the operation, represented as a lowercase string.
+
+#### redirect
+
+**Type:** `(path: string) => string | null | undefined`
+
+Function to handle redirects in the API reference. Receives either:
+- The current path with hash if pathRouting is enabled
+- The current hash if using hashRouting (default)
+
+```javascript
+// Example for hashRouting (default)
+{
+  redirect: (hash) => hash.replace('#v1/old-path', '#v2/new-path')
+}
+
+// Example for pathRouting
+{
+  redirect: (pathWithHash) => {
+    if (pathWithHash.includes('#')) {
+      return pathWithHash.replace('/v1/tags/user#operation/get-user', '/v1/tags/user/operation/get-user')
+    }
+    return null
+  }
+}
+```
+
+### Events
+
+Callback functions that are triggered by user interactions and system events.
+
+#### onBeforeRequest
+
+**Type:** `({ request: Request; requestBuilder: RequestFactory }) => void | Promise<void>`
+
+Callback fired before the outbound request is sent from the embedded API client. Mutate **`requestBuilder`** to change method, path, query, headers, body, and related fields. The [`RequestFactory`](https://github.com/scalar/scalar/blob/main/packages/workspace-store/src/request-example/builder/request-factory.ts) shape is available to TypeScript users as `import type { RequestFactory } from '@scalar/workspace-store/request-example'`.
+
+> **Experimental:** `RequestFactory` may change in minor releases; treat its fields as unstable until the API stabilizes.
+
+**`request`** is a fetch API [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request) built from the builder for backward compatibility. Using it as the primary way to customize outbound traffic is going to be **deprecated**; prefer **`requestBuilder`**. The API Reference passes both `request` and `requestBuilder` to this callback.
+
+> Note: The `request` here is **not** the object that is sent over the wire; the actual request is rebuilt from `requestBuilder` after this callback runs. If you need the exact outgoing request (for example, to hash a `multipart/form-data` body for request signing), use [`onRequestBuilt`](#onrequestbuilt) instead.
+
+```javascript
+{
+  onBeforeRequest: ({ requestBuilder }) => {
+    requestBuilder.headers.set('X-Custom-Header', 'test')
+  }
+}
+```
+
+##### RequestFactory reference
+
+The `requestBuilder` object exposes the following fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `baseUrl` | `string` | The base API server URL (may contain placeholders like `{{version}}`). |
+| `path.raw` | `string` | The raw path string, e.g. `/users/{userId}/settings`. |
+| `path.variables` | `Record<string, string>` | Path variable names and their current values. |
+| `method` | `string` | HTTP method (always uppercase). |
+| `headers` | [`Headers`](https://developer.mozilla.org/en-US/docs/Web/API/Headers) | Headers to send with the request. Supports `.set()`, `.get()`, `.delete()`, `.append()`. |
+| `query` | [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) | Query parameters. Supports `.set()`, `.get()`, `.delete()`, `.append()`. |
+| `body` | `RequestBody \| null` | The request body payload (`raw`, `formdata`, or `urlencoded`), or `null`. |
+| `cookies` | `XScalarCookie[]` | Cookies to include with the request. |
+| `security` | `BuildRequestSecurityResult[]` | The resolved security schemes for this request. Each entry has `in` (`"header"`, `"query"`, or `"cookie"`), `name`, `value`, and an optional `format` (`"basic"` or `"bearer"`). |
+| `options` | `object` | Advanced options (see below). |
+
+**`options`**
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `disableSecurity` | `boolean` | `false` | When `true`, Scalar skips its built-in security handling entirely. Security headers, query parameters, and cookies from the `security` array are **not** applied automatically, giving you full control. |
+| `isElectron` | `boolean` | `false` | Indicates the request runs in an Electron (Node-like) context. |
+
+##### Examples
+
+**Add a custom header**
+
+```javascript
+{
+  onBeforeRequest: ({ requestBuilder }) => {
+    requestBuilder.headers.set('X-Custom-Header', 'my-value')
+  }
+}
+```
+
+**Add a query parameter**
+
+```javascript
+{
+  onBeforeRequest: ({ requestBuilder }) => {
+    requestBuilder.query.set('debug', 'true')
+  }
+}
+```
+
+**Custom auth prefix — disable built-in security and apply your own**
+
+By default, Scalar applies security schemes automatically (e.g. prefixing bearer tokens with `Bearer`). If you need a custom prefix, a different header name, or any other transformation, set `disableSecurity` to `true` and handle the `security` array yourself:
+
+```javascript
+{
+  onBeforeRequest: ({ requestBuilder, envVariables }) => {
+    // Tell Scalar to skip its default security handling
+    requestBuilder.options.disableSecurity = true
+
+    // Apply each security scheme with custom logic
+    for (const security of requestBuilder.security) {
+      const getValue = () => {
+        // use replaced header name so {{ env }} placeholders work
+        const substitutedValue = replaceEnvVariables(security.value, envVariables)
+        if (security.format === 'basic') {
+          return `Basic ${btoa(substitutedValue)}-custom-sufix`
+        }
+
+        if (security.format === 'bearer') {
+          return `MyBearerPrefix <id> ${substitutedValue}`
+        }
+
+        return substitutedValue
+      }
+
+      const value = getValue()
+
+      // Set the security on the correct place
+      if (security.in === 'header') {
+        headers.set(name, securityValue)
+        return
+      }
+
+      if (security.in === 'query') {
+        securityQueryParams.set(name, securityValue)
+        return
+      }
+
+      if (security.in === 'cookie') {
+        securityCookies.push({
+          name: name,
+          value: securityValue,
+          isDisabled: false,
+        })
+      }
+    }
+  }
+}
+```
+
+> When `disableSecurity` is `true`, only the security-related headers, query parameters, and cookies are skipped. All other fields on the request (custom headers, path, body, non-security cookies, etc.) are unaffected.
+
+#### onDocumentSelect
+
+**Type:** `() => Promise<void> | void`
+
+Triggered when multiple documents are configured and the users switches between them.
+
+#### onLoaded
+
+**Type:** `(slug: string) => Promise<void> | void`
+
+Callback that triggers as soon as the references are lazy loaded.
+
+> Note: This must be passed through JavaScript, setting a data attribute will not work.
+
+```javascript
+{
+  onLoaded: () => {
+    console.log('References loaded')
+  }
+}
+```
+
+#### onRequestBuilt
+
+**Type:** `({ request: Request; requestBuilder: RequestFactory; envVariables: Record<string, string> }) => void | Promise<void>`
+
+Callback fired after the outbound fetch [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request) has been built, right before it is sent from the embedded API client. The `request` is the **exact object handed to fetch**: mutating its headers modifies the outgoing request, and hashing its body produces a hash that matches what the server receives.
+
+This makes it the right hook for request signing. A request rebuilt from the builder would not work for `multipart/form-data` bodies, because every rebuild generates a fresh random multipart boundary.
+
+Use [`onBeforeRequest`](#onbeforerequest) instead when you need to mutate the request builder (method, path, query, body, security); those mutations have no effect in `onRequestBuilt` because the request is already built.
+
+> **Experimental:** This API may change in minor releases.
+
+```javascript
+{
+  onRequestBuilt: async ({ request }) => {
+    // Hash the exact body bytes that are sent over the wire
+    const bodyBytes = await request.clone().arrayBuffer()
+    const digest = await crypto.subtle.digest('SHA-256', bodyBytes)
+    const bodyHashB64 = btoa(String.fromCharCode(...new Uint8Array(digest)))
+
+    // Header mutations apply to the outgoing request
+    request.headers.set('X-Body-Hash', bodyHashB64)
+  }
+}
+```
+
+#### onRequestSent
+
+**Type:** `(request: string) => void`
+
+Callback function that is triggered when a request is sent through the API client. The function receives the request details as a string.
+
+```javascript
+{
+  onRequestSent: (request) => {
+    console.log('Request sent:', request)
+  }
+}
+```
+
+#### onServerChange
+
+**Type:** `(server: string) => void`
+
+You can listen to changes with onServerChange that runs on server change.
+
+```javascript
+{
+  onServerChange: (value: string) => {
+    console.log('Server updated:', value)
+  }
+}
+```
+
+#### onShowMore
+
+**Type:** `(tagId: string) => void | Promise<void>`
+
+Callback function that is triggered when a user clicks the "Show more" button in the references. The function receives the ID of the tag that was clicked.
+
+```javascript
+{
+  onShowMore: (tagId) => {
+    console.log('Show more clicked for tag:', tagId)
+  }
+}
+```
+
+#### onSidebarClick
+
+**Type:** `(href: string) => void | Promise<void>`
+
+Callback function that is triggered when a user clicks on any item in the sidebar. The function receives the href of the clicked item.
+
+```javascript
+{
+  onSidebarClick: (href) => {
+    console.log('Sidebar item clicked:', href)
+  }
+}
+```

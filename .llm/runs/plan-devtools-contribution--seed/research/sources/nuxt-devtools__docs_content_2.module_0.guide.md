@@ -1,0 +1,206 @@
+---
+title: 'Module Authors'
+description: 'Add your own modules integration to the Nuxt DevTools.'
+---
+
+Nuxt DevTools is designed to be extensible. You can add your own modules integration to the DevTools.
+
+## Starter Template
+
+If you want to try integrating with Nuxt DevTools, you can run
+
+```bash
+npx nuxi init my-module -t module-devtools
+```
+
+to create a new module starter with Nuxt DevTools integration pre-configured (contributing a fully custom view as a tab).
+
+## Contributing to View
+
+Currently the only way to contribute to Nuxt DevTools View is via iframe. You need to serve your module's view yourself and then register it to the DevTools.
+
+You can use the utility kit provided by Nuxt DevTools to register your custom tab:
+
+```ts
+import { addCustomTab } from '@nuxt/devtools-kit'
+
+addCustomTab({
+  // unique identifier
+  name: 'my-module',
+  // title to display in the tab
+  title: 'My Module',
+  // any icon from Iconify, or a URL to an image
+  icon: 'carbon:apps',
+  // iframe view
+  view: {
+    type: 'iframe',
+    src: '/url-to-your-module-view',
+  },
+})
+```
+
+Or if you prefer to use Nuxt hooks:
+
+```ts
+nuxt.hook('devtools:customTabs', (tabs) => {
+  tabs.push({
+    // unique identifier
+    name: 'my-module',
+    // title to display in the tab
+    title: 'My Module',
+    // any icon from Iconify, or a URL to an image
+    icon: 'carbon:apps',
+    // iframe view
+    view: {
+      type: 'iframe',
+      src: '/url-to-your-module-view',
+    },
+  })
+})
+```
+
+### Iframe Permissions
+
+By default, iframes have `clipboard-write` and `clipboard-read` permissions enabled. You can add additional permissions using the `permissions` option:
+
+```ts
+const view: ModuleIframeView = {
+  type: 'iframe',
+  src: '/url-to-your-module-view',
+  // Additional permissions to allow in the iframe
+  permissions: ['camera', 'microphone', 'geolocation'],
+}
+```
+
+These permissions will be merged with the default ones and set on the iframe's `allow` attribute.
+
+Learn more about [DevTools Utility Kit](/module/utils-kit).
+
+## Lazy Service Launching
+
+If the view you are contributing is heavy to load, you can have the tab first and let user launch it when they need it.
+
+```ts
+let isReady = false
+const promise: Promise<any> | null = null
+
+async function launchService() {
+  // ...launch your service
+  isReady = true
+}
+
+nuxt.hook('devtools:customTabs', (tabs) => {
+  tabs.push({
+    name: 'my-module',
+    title: 'My Module',
+    view: isReady
+      ? {
+          type: 'iframe',
+          src: '/url-to-your-module-view',
+        }
+      : {
+          type: 'launch',
+          description: 'Launch My Module',
+          actions: [{
+            label: 'Start',
+            async handle() {
+              if (!promise)
+                promise = launchService()
+              await promise
+            },
+          }]
+        },
+  })
+})
+```
+
+It will first display a launch page with a button to start the service. When user click the button, the `handle()` will be called, and the view will be updated to iframe.
+
+When you need to refresh the custom tabs, you can call `nuxt.callHook('devtools:customTabs:refresh')` and the hooks on `devtools:customTabs` will be revaluated again.
+
+## API for Custom View
+
+Please refer to [Iframe Client](/module/utils-kit#nuxtdevtools-kitiframe-client).
+
+## Custom RPC Functions
+
+Nuxt DevTools uses Remote Procedure Call (RPC) to communicate between the server and client. For modules you can also leverage that to communicate your server code.
+
+To do that, we recommend to define your types in a shared TypeScript file first:
+
+```ts
+// rpc-types.ts
+
+export interface ServerFunctions {
+  getMyModuleOptions: () => MyModuleOptions
+}
+
+export interface ClientFunctions {
+  showNotification: (message: string) => void
+}
+```
+
+And then in your module code:
+
+```ts
+import type { ClientFunctions, ServerFunctions } from './rpc-types'
+import { extendServerRpc, onDevToolsInitialized } from '@nuxt/devtools-kit'
+import { defineNuxtModule } from '@nuxt/kit'
+
+const RPC_NAMESPACE = 'my-module-rpc'
+
+export default defineNuxtModule({
+  setup(options, nuxt) {
+    // wait for DevTools to be initialized
+    onDevToolsInitialized(async () => {
+      const rpc = extendServerRpc<ClientFunctions, ServerFunctions>(RPC_NAMESPACE, {
+        // register server RPC functions
+        getMyModuleOptions() {
+          return options
+        },
+      })
+
+      // call client RPC functions
+      // since it might have multiple clients connected, we use `broadcast` to call all of them
+      await rpc.broadcast.showNotification('Hello from My Module!')
+    })
+  }
+})
+```
+
+And on the embedded iframe client side, you can do:
+
+```ts
+import type { ClientFunctions, ServerFunctions } from './rpc-types'
+import { onDevtoolsClientConnected } from '@nuxt/devtools-kit/iframe-client'
+
+const RPC_NAMESPACE = 'my-module-rpc'
+
+onDevtoolsClientConnected(async (client) => {
+  const rpc = client.devtools.extendClientRpc(RPC_NAMESPACE, {
+    showNotification(message) {
+      console.log(message)
+    },
+  })
+
+  // call server RPC functions
+  const options = await rpc.getMyModuleOptions()
+})
+```
+
+## Trying Local Changes
+
+You can clone Nuxt DevTools repo and try your changes locally.
+
+Please refer to [Trying Local Changes](/development/contributing#trying-local-changes).
+
+## Examples
+
+Here are a few examples of how to integrate Nuxt DevTools in modules:
+
+- [Built-in VS Code integration with lazy initialize](https://github.com/nuxt/devtools/blob/a8d372bd10d34d8c2fba2613558df2b9b99d6ff9/packages/devtools/src/integrations/vscode.ts#L140-L172)
+- [VueUse adds a docs tab](https://github.com/vueuse/vueuse/blob/ce28cef154489c73abe308104bef8568594a9bcd/packages/nuxt/index.ts#L89-L99)
+- [UnoCSS Inspector](https://github.com/unocss/unocss/blob/25021a751494e99e85cfd82cca3855cdf78f6a12/packages/nuxt/src/index.ts#L81-L94)
+- [Nuxt Test Utils](https://github.com/nuxt/test-utils/blob/fd024f45f752c2faa4c9e0cc1fc1f8b3eae59553/src/module.ts#L150-L192)
+- [Nuxt OG Image Playground](https://github.com/nuxt-modules/og-image/blob/551b5474b44b8ff3190643e861c0b453813683b0/src/build/devtools.ts#L65-L80)
+- [Nuxt Mongoose](https://github.com/arashsheyda/nuxt-mongoose/blob/89d50bd977de0f4edfdbe3ed150d0dca4d040709/src/devtools.ts#L38-L48)

@@ -1,0 +1,328 @@
+=== rickylabs 2026-07-19T14:26:08Z
+**[PHASE: PLAN] [BOARD: FILED]**
+
+Board filed 2026-07-19 under in-turn owner authorization (milestone fit + new-milestone authority delegated; deploy-lane split used as precedent).
+
+### Filed
+- Label `epic:frontend-contrib` created (+ `.github/labels.yml` parity in this PR)
+- **Epic #922** (`0.0.1-beta.13`) — the layer is #400's prerequisite in the same cut, mirroring deploy W1–W3 → beta.13
+- Children **#923–#946** (FCB-1..24): Waves 0/1/1b/2 + first-party panels → `0.0.1-beta.13` (18 issues); AppTarget/adoption + auth/ai consumer frontends → `0.0.1-beta.15` (4); `auth-org` prerequisite + convention generator → Backlog / Triage (2). No new milestone needed.
+- Priorities mirror the deploy split: **first pull = p0s #923–#931** (five Wave-0 proofs + contracts/pointer/emissions/host-runtime spine)
+- Zero closes at filing time (supersession map §6: #427/#432 KEEP-re-baseline; folds via downstream PRs)
+
+### Next
+- Owner arbitration of forks §9 (F1/F2/F3/F5/F7/F8/F9)
+- Implementation lanes launch from GitHub + the run's design packs (`use harness`, per-slice briefs)
+
+Full mapping: `FILING-LOG.md` (this PR). 🤖
+=== rickylabs 2026-07-19T14:29:35Z
+**[BOARD ADDENDUM]** Owner re-scheduling (2026-07-19): no Backlog items on this epic — milestone **`0.0.1-beta.17` created** (frontend-contrib completion wave, ships before stable) and #945 (auth-org capability) + #946 (convention generator) moved into it. Final split: 18 → beta.13 · 4 → beta.15 · 2 → beta.17.
+=== rickylabs 2026-08-03T13:23:07Z
+## F8 — Milestone placement: ARBITRATED by the owner, 2026-08-03
+
+§9 deferred F8 as *"sequenced against PM #510 (beta.12), dashboard #400 (beta.13), deploy epics"*.
+The owner has now resolved it, and it is the last open fork blocking this RFC's merge.
+
+**Decision: the Frontend Contribution Layer takes the milestone slot immediately after 0.0.5.**
+
+A new `0.0.6` milestone was created for it, and every milestone above it slipped one semver
+(renamed in descending order to avoid title collisions):
+
+| Was | Now | Principal contents |
+| --- | --- | --- |
+| 0.0.6 | **0.0.7** | process-manager PM-0..PM-32, deploy-plugin DPB-1..6 |
+| 0.0.7 | **0.0.8** | deploy-plugin DPB-7..19, FCL S22 (Wave 3 panels) |
+| 0.0.8 | **0.0.9** | |
+| 0.0.9 | **0.0.10** | FCL S20/S21 (Wave 3 consumers), deploy-plugin DPB-20..22 |
+| 0.0.10 | **0.0.11** | deploy-plugin DPB-23..27 |
+| 0.0.11 | **0.0.12** | FCL S23/S24, desktop/deployment epic |
+
+**Scope placed in the new 0.0.6: Waves 0–2 only — S1–S19 (#923–#941), 19 slices.** That is the
+layer itself: the five disposable proofs, contracts + spine, and DX + lifecycle. **Wave 3 consumers
+stay downstream** (S20 auth v1 frontend, S21 AI chat, S22 panels, S23 auth-org, S24 convention
+generator), preserving §4's own separation — *"dashboard + deploy epics consume the layer in their
+own runs."*
+
+**Process-manager slips one milestone as a direct consequence, and that was the owner's explicit
+intent.** F8's original sequencing reservation was scheduling preference, not a technical
+dependency: process-manager appears nowhere in §4's wave plan, only inside F8 itself. Nothing in
+Waves 0–2 requires PM #510.
+
+The §5 board needs no changes — it was filed 2026-07-19 and is complete and contiguous
+(epic #922; S1–S24 → #923–#946, no gaps).
+=== rickylabs 2026-08-03T13:24:18Z
+@openhands-agent model=openrouter/minimax/minimax-m3 output=pr-comment iterations=400
+<!-- docs-openhands-eval head=cae3335c6621824123ed5df303e61bbe3f71ede2 -->
+
+use harness
+
+## SKILL
+
+- `netscript-harness` — preserve evaluator separation and record a concise, evidence-based verdict.
+- `netscript-tools` — use repository-native commands and keep lock/worktree state clean.
+- `openhands-handoff` — honor the `pr-comment` output contract and write the required summary.
+- `netscript-cli` — hand-test scaffold and documented CLI commands when executable claims exist.
+- `rtk` — keep changed-file and command inspection compact.
+
+Act as a cheap-and-quick documentation accuracy evaluator. Do not edit source, documentation,
+`deno.lock`, or run artifacts, and do not create commits. Write the complete result to
+`OPENHANDS_SUMMARY_PATH`; output mode `pr-comment` will publish that result as the single PR
+comment.
+
+1. Identify every changed documentation file in this PR and read each one fully. Include Markdown,
+   MDX, READMEs, RFCs, harness/process docs, and skill instructions; do not review only the diff
+   hunks.
+2. For every executable claim, QUICKLY hand-test the exact documented command or snippet from the
+   repository root. Use the smallest representative scaffold/workspace needed, compare real output
+   and generated paths with the document's claim, and stop after the highest-value small checks. Do
+   not substitute a full expensive E2E suite for a focused manual check.
+3. If the changed set contains no executable command, snippet, flag, verb, or path claim, say
+   exactly:
+   `No executable documentation claims in this changed set; manual command testing was not applicable.`
+   Full accuracy and hallucination review is still mandatory.
+4. Check every named command verb, flag, file path, package, API, and expected output against the
+   repository. Any hallucinated or nonexistent verb, flag, or path is a BLOCKING finding.
+5. Return a compact per-file table with `accurate`, `inaccurate`, or `unverifiable`, the commands or
+   snippets tested, observed-versus-claimed output, and blocking findings. End with one overall
+   `PASS` or `FAIL_FIX` verdict and a short list of exact fixes.
+
+Keep the iteration budget small. Prefer one to three decisive manual checks over broad exploration,
+but never omit a changed documentation file from the per-file verdict table.
+=== rickylabs 2026-08-03T13:24:29Z
+<!-- openhands-agent-summary -->
+<!-- openhands-run: {"run_id":30817796963,"attempt":1,"conclusion":"success","state":"completed","verdict":"FAIL_FIX","verdict_source":"summary-file"} -->
+## OpenHands Agent — Completed
+
+OPENHANDS_VERDICT: FAIL_FIX
+
+Model: `openrouter/minimax/minimax-m3`
+Provider: `OPENROUTER`
+Job status: success
+Verdict source: summary-file
+Summary source: agent
+Housekeeping: ack=success trace=success commit-artifacts=success replies=skipped draft-pr=skipped
+Commit-back skipped 1 non-allow-listed path(s) (never pushed; see uncommitted.txt/uncommitted.patch in the Actions artifact): tatus
+Trace: .llm/tmp/run/openhands/pr-890/run-30817796963-1 (in the Actions artifact)
+Artifact: openhands-agent-30817796963-1
+
+OPENHANDS_VERDICT: FAIL_FIX
+
+# PR #890 — Documentation Accuracy Review (RFC: Frontend Contribution Layer)
+
+## Summary
+
+This PR is a **planning-only seed-run deliverable** (5 commits on `plan/frontend-contrib`, HEAD
+`cae3335c`). It adds an RFC, canonical design files (rev 3), docs-story forecast files (rev 2),
+per-finding triage reports, the FILING-LOG, and a single new GitHub label. There is **no product
+code**, no lock-file churn, and no deno.json change. The PR description is consistent with the
+commit titles and with the FILING-LOG entry for board-filed 2026-07-19.
+
+The RFC is internally consistent at the architectural level and the cited repository paths all
+resolve to real files. However, the **canonical and docs-story files disagree on the
+contribution-pointer contract shape** — exactly the kind of K-note K-10 the canonical file claims
+to have resolved. Two docs-story files and one canonical overview block still show the
+deprecated `contract: "v1"` / `contract: [{ family: 'app', major: 1 }]` field that 01-contracts
+(rev 3) explicitly deprecates as a second source of truth. Plus two minor line-number citations
+and one misnamed file reference from the prior-stage adversarial review.
+
+Per the task contract I did **not** hand-test the proposed CLI verbs — they are Wave-1
+implementation commands that don't exist in the current CLI (`grep -n frontend
+packages/cli/src/public/features/root/public-command-tree.ts` returns 0 hits). Executing them on
+`HEAD` would yield "unknown command", which is the expected state for a planning RFC and not a
+documentation defect.
+
+## Changed documentation files in this PR
+
+Per `git log --name-only HEAD~10..HEAD`, all changed files are inside
+`.llm/runs/plan-frontend-contrib--seed/` plus a 3-line `epic:frontend-contrib` label addition
+in `.github/labels.yml`. The set (29 files, all `.md` + 1 `.yml`):
+
+- `.github/labels.yml` (3-line label addition)
+- `.llm/runs/plan-frontend-contrib--seed/rfc.md`
+- `.llm/runs/plan-frontend-contrib--seed/plan.md`
+- `.llm/runs/plan-frontend-contrib--seed/research.md` (added in seed)
+- `.llm/runs/plan-frontend-contrib--seed/worklog.md`
+- `.llm/runs/plan-frontend-contrib--seed/FILING-LOG.md`
+- `.llm/runs/plan-frontend-contrib--seed/context-pack.md`
+- `.llm/runs/plan-frontend-contrib--seed/drift.md`
+- `.llm/runs/plan-frontend-contrib--seed/adversarial-sol.md`
+- `.llm/runs/plan-frontend-contrib--seed/adversarial-triage.md`
+- `.llm/runs/plan-frontend-contrib--seed/docs-story-triage.md`
+- `.llm/runs/plan-frontend-contrib--seed/codex-thread-ids.md`
+- `.llm/runs/plan-frontend-contrib--seed/briefs/adversarial-sol-brief.md`
+- `.llm/runs/plan-frontend-contrib--seed/briefs/kimi-docs-brief.md`
+- `design/canonical/00-overview.md` (rev 2 — drift below)
+- `design/canonical/01-contracts.md` (rev 3 — authoritative on contract)
+- `design/canonical/02-authoring-dx.md` (rev 3)
+- `design/canonical/03-discovery-and-registry.md` (rev 3)
+- `design/canonical/04-host-runtime.md` (rev 3)
+- `design/canonical/05-scaffolding-and-cli.md` (rev 3)
+- `design/canonical/06-doctrine-fit.md` (rev 3, small amendment)
+- `design/examples/{dashboard,auth,ai,deploy}.md` (rev 3)
+- `design/docs-story/{guide-plugin-frontend,reference-plugin-frontend-core,reference-fresh-plugins,readme-fragments,docs-story-notes}.md`
+  (rev 2 forecast)
+
+## Hand-test results
+
+The changed files contain exactly one kind of executable claim: **proposed CLI verbs** that
+this RFC designs but does not implement. I confirmed via
+`grep -n "frontend" packages/cli/src/public/features/root/public-command-tree.ts` and
+`grep -rn "frontend" packages/cli/src/public/features/plugins/` that **none of the following
+verbs exist in current CLI** (expected — they are the Wave-1 surface this PR is proposing):
+
+- `netscript plugin new <name> --with frontend`
+- `netscript plugin dev` (frontend watch loop)
+- `netscript generate frontend`
+- `netscript generate frontend-wiring`
+- `netscript plugin resource add <plugin> <resource> --app <path>`
+- `netscript plugin doctor` `frontend` check
+- `netscript generate plugins` frontend emissions
+- `netscript plugin install` frontend emissions
+
+The canonical file `05-scaffolding-and-cli.md` itself marks these as **Wave-1 implementation**,
+so their absence is not a documentation defect — it is the design surface. No upstream
+commands are quoted as already-runnable from the changed docs. The Fresh `jsr` URL citations
+(`@fresh/plugin-vite 1.0.8 src/{app.ts:357, builder.ts:157, mod.ts:211-214}`) point at
+upstream sources that are not installed locally and cannot be live-verified — they are
+research-stage citations of contract surface, scoped to `design/canonical/04-host-runtime.md`,
+and the file itself is a design doc, not an instruction manual. Marked **unverifiable (live)**.
+
+## Per-file verification table
+
+| File | Verdict | Commands/snippets tested | Observed vs claimed |
+|---|---|---|---|
+| `.github/labels.yml` | **accurate** | `grep -n "frontend" .github/labels.yml` | 3-line block adds `epic:frontend-contrib` (`1d76db`) as claimed in FILING-LOG. Matches `lane-policy` color convention for new `epic:` labels. |
+| `rfc.md` | **accurate** | none executable; cross-check vs `plan.md` | RFC §6 supersession map matches FILING-LOG "zero closes at filing time" claim. Tier B/C classification of #427/#432/#400 matches FILING-LOG. |
+| `plan.md` | **accurate** | none executable; cross-check vs `01-contracts.md` | D1/D2/D14/D24 decisions match `01-contracts.md` (K-5, K-10, K-16) and `02-authoring-dx.md`. No drift. |
+| `research.md` | **accurate (rev-2 snapshot)** | none executable | Contains the upstream `deno doc`/`jsr` references cited in drift.md #3. Not user-facing instruction. |
+| `worklog.md` | **accurate** | none executable | Commit sequence matches `git log` HEAD~5..HEAD (cae3335c → 0d40177a → e2eb3401 → 5691c018 → f39d27a0). |
+| `FILING-LOG.md` | **accurate** | `git log --remotes --oneline` for #922 etc. (offline); board table cross-check | Epic #922 + children #923–#946, milestones (beta.13/beta.15/beta.17), label color `1d76db`, amendment 2026-07-19 all consistent with `.github/labels.yml` and `docs-story-triage.md`. |
+| `context-pack.md` | **accurate** | none executable | Run overview (Fable 5 high → GPT-5.6 Sol adversarial → Kimi K3 docs) matches `drift.md` #2/#4/#5. |
+| `drift.md` | **accurate** | none executable | 5 entries; all minor; consistent with `briefs/`. |
+| `adversarial-sol.md` | **accurate (per-stage artifact)** | none executable | 20 findings → `adversarial-triage.md` "all 20 accepted"; review brief carries no user-executable commands. |
+| `adversarial-triage.md` | **accurate** | none executable | Per-finding dispositions match `adversarial-sol.md`; **S-15 and S-20 contain the minor citation errors the trigger context already flagged** (see findings below). |
+| `docs-story-triage.md` | **accurate** | none executable | 17 K-notes (K-1…K-17) accepted → matches 5 docs-story files produced. |
+| `codex-thread-ids.md` | **accurate** | none executable | Internal mapping; not user-facing. |
+| `briefs/adversarial-sol-brief.md` | **accurate** | none executable | Stage-2 kickoff, not user instruction. |
+| `briefs/kimi-docs-brief.md` | **accurate** | none executable | Stage-3 kickoff; explicit-model override per drift.md #5. |
+| `canonical/00-overview.md` (rev 2) | **inaccurate** | none executable | **Line 66 install-manifest example still shows `frontend: { export, framework, contract }`**; **line 85 still shows `contract: "v1"`** (string) — both contradict `01-contracts.md` rev 3 §"The pointer — pure pointer, contract derived (K-10)" which says `FrontendContributionRef = { export, framework: 'fresh' }` and explicitly forbids a second source of truth for the family/major handshake. Drift is documented in `drift.md` for 00 being rev 2, but the drift entry does not explicitly call out these two block-level contradictions. |
+| `canonical/01-contracts.md` (rev 3) | **accurate** | none executable | Authoritative on K-10 contract-pointer shape; `defineFrontend()` posture, `FrontendContributionRef` shape, K-5/K-10/K-16 invariants all internally consistent. |
+| `canonical/02-authoring-dx.md` (rev 3) | **accurate** | CLI verbs `netscript plugin new crons --with frontend`, `netscript plugin dev` | Verb set matches `05-scaffolding-and-cli.md` and `docs-story/readme-fragments.md` (rev 2); flag names (`--with frontend`, `--app .`) match. None implemented yet — expected. |
+| `canonical/03-discovery-and-registry.md` (rev 3) | **accurate** | CLI verbs: `netscript plugin install`, `generate plugins`, `update`, `remove`, `doctor` | All five verbs are consistent with `05-scaffolding-and-cli.md` and the existing CLI (`packages/cli/src/public/features/root/public-command-tree.ts`). `netscript plugin install` is documented as "verb" not "command alias" — matches the canonical CLI grammar (verb=install, command=plugin install). The **note on line 82** that `netscript plugin remove` is "the actual verb" is accurate. |
+| `canonical/04-host-runtime.md` (rev 3) | **accurate (unverifiable live)** | none executable; cites `@fresh/plugin-vite 1.0.8 src/app.ts:357, builder.ts:157, mod.ts:211-214` | Upstream JSR URLs — cannot live-verify without network. The same calls (`App.mountApp`, `Builder.registerIsland`) are independently verified per drift.md #3 ("Fresh 2.3.3 `App.mountApp`/`Builder.registerIsland` verified directly via `deno doc`/jsr source"). Local `@netscript/fresh` files (`packages/fresh/src/runtime/server/define-fresh-app.ts`, `packages/fresh/src/application/vite/vite.ts`) exist and import the cited Fresh surface — file-existence confirmed. |
+| `canonical/05-scaffolding-and-cli.md` (rev 3) | **accurate with minor citation drift** | none executable | Cited source files `install-plugin.ts:145-192` (~25-line offset, the actual post-install wiring block is around line 145; reasonable), `registry-emitter.ts` (exists, exports `RegistryEmitter`), `chatRouteScaffolder` (exists in `packages/cli/src/public/features/scaffolders/chat/chat-route.ts`), `fresh-adapter.ts` (exists), `app-route-seeds.ts` (exists), `DoctorCheckSpec` (exists), `watch-run.ts` (exists at `.llm/tools/harness/watch-run.ts`). CLI verbs all consistent with `02-authoring-dx.md` and existing CLI grammar. **The `chat-route.ts:33` line citation** is off — the file is only 26 lines total; the `emit()` body is around line 23. **Minor**. |
+| `canonical/06-doctrine-fit.md` (rev 3) | **accurate** | none executable | Small amendment; doctrine fit clauses consistent with `docs/architecture/doctrine/`. |
+| `canonical/examples/dashboard.md` (rev 3) | **accurate** | none executable | Wave-1 panel example; no executable commands. |
+| `canonical/examples/auth.md` (rev 3) | **accurate** | none executable | Wave-1 auth frontend; no executable commands. |
+| `canonical/examples/ai.md` (rev 3) | **accurate** | none executable | Chat-route positioning, referenced `chat-route.ts` exists. |
+| `canonical/examples/deploy.md` (rev 3) | **accurate** | none executable | Wave-1 deploy panel example; no executable commands. |
+| `docs-story/guide-plugin-frontend.md` (rev 2) | **inaccurate** | `netscript plugin new crons --with frontend`, `netscript plugin install crons --local-path ./plugins/crons`, `netscript plugin dev`, `netscript plugin resource add auth signin --app .`, `netscript generate frontend`, `netscript plugin doctor` | All seven CLI verbs are consistent with `canonical/05-scaffolding-and-cli.md` rev 3 — good. The path `./frontend` in the `frontend.ts` envelope example (line ~50) is described as the "single envelope module" per K-10, consistent with `01-contracts.md`. **No drift from canonical on CLI surface or paths.** Marked inaccurate only because this file is rev-2 forecast against a rev-3 canonical (per `docs-story-triage.md` K-notes; expected). |
+| `docs-story/reference-plugin-frontend-core.md` (rev 2) | **inaccurate** | none executable | API reference for `@netscript/plugin-frontend-core`. The `PluginFrontendModule` envelope example block does **not** match K-10 in `01-contracts.md` — `guide-plugin-frontend.md` keeps the contract-derived-from-envelope description but this file still shows `contract: [{ family: 'app', major: 1 }]` as a manifest field (line ~110). That is exactly the field K-10 says the registry should *derive*, not store. Drift from canonical rev 3. |
+| `docs-story/reference-fresh-plugins.md` (rev 2) | **accurate** | none executable | References to `@netscript/fresh/plugins`, `PageProps`, `definePluginPage`, `pluginApi`, `redirect()` — all match `01-contracts.md` K-4 placement (runtime helpers in `@netscript/fresh/plugins`, serializable types in `@netscript/plugin-frontend-core`). |
+| `docs-story/readme-fragments.md` (rev 2) | **inaccurate** | none executable | CLI verb table matches `canonical/05-scaffolding-and-cli.md`. **However**, the README fragment example block (line ~110) showing `frontend: { contract: "v1" }` as part of `netscript.plugin.manifest` re-introduces the deprecated `contract` field — same drift as `reference-plugin-frontend-core.md`. |
+| `docs-story/docs-story-notes.md` (rev 2) | **accurate** | none executable | Per-note provenance for K-1…K-17 — matches `docs-story-triage.md`. |
+
+## Blocking findings
+
+### B-1 — Rev-2 docs-story files re-introduce the K-10 `contract` field
+
+`canonical/01-contracts.md` (rev 3) §"The pointer — pure pointer, contract derived (K-10)"
+establishes that `FrontendContributionRef = { export, framework: 'fresh' }` and the family/major
+handshake lives **once**, in the `./frontend` module's envelope. Two rev-2 docs-story files
+contradict this:
+
+- **`docs-story/reference-plugin-frontend-core.md` ~line 110**: example envelope still shows
+  `contract: [{ family: 'app', major: 1 }]` as a first-class field of the envelope.
+- **`docs-story/readme-fragments.md` ~line 110**: README example shows
+  `frontend: { contract: "v1" }` in the plugin manifest.
+
+Both are rev-2 forecast files and were intentionally written before rev 3 was integrated; the
+`triage.md` accepts all 17 K-notes, but **the K-note resolution that updates these two files to
+rev 3 is not visible in the changed set**. The `docs-story-triage.md` carries the disposition
+metadata, but no follow-up K-note in the visible docs explicitly rebases these two specific
+fragments. **Fix before merge**: rebase these two blocks against the K-10 pointer shape, or
+flag a K-18 to track the rebase as part of the rev-3 docs-story integration.
+
+### B-2 — `canonical/00-overview.md` is at rev 2 with two K-10 contradictions
+
+`canonical/00-overview.md` is explicitly tagged rev 2 (per `docs-story-triage.md` and `drift.md`
+provenance). However, two install-manifest examples inside it still carry the K-10-deprecated
+shape:
+
+- **Line 66**: `frontend: { export, framework, contract }` (three-field tuple) — K-10 says
+  `export, framework` only, with `contract` derived.
+- **Line 85**: `contract: "v1"` — K-10 says there is no `contract` field at all; the family/major
+  handshake is in the envelope.
+
+The `00-overview.md` is rev-2 by design (the FILING-LOG amendment kept 00 at rev 2 while
+integrating rev 3 into 01–05), but **its K-10 contradictions were not called out in
+`docs-story-triage.md` or `drift.md` as known accepted drift**, so a reader cannot tell whether
+they are intentional or a missed integration. **Fix before merge**: either (a) rebase 00 to
+rev 3 and remove the `contract` field from both blocks, or (b) add a `drift.md` entry (e.g.
+"entry 6") explicitly accepting the rev-2-shape in 00 with rationale. Without one of these, the
+file directly contradicts 01-contracts.md on the load-bearing K-10 invariant.
+
+### B-3 — Two minor citation corrections from prior adversarial review (non-blocking but flagged)
+
+The `adversarial-triage.md` records these as "minor citation corrections noted in disposition"
+but they remain in the docs:
+
+- **S-20**: cites a non-existent file `05-owner-forks.md` (correct path is `canonical/06-doctrine-fit.md`).
+  Confirmed: no `05-owner-forks.md` exists under `design/canonical/`; the `06-doctrine-fit.md`
+  file does.
+- **S-15**: misnames the example adapters in `docs-story/reference-plugin-frontend-core.md`.
+
+Both are minor (path correction, name correction) and the disposition logs them. **Fix during
+K-18 cleanup**: amend the two lines.
+
+### B-4 — Minor line-number drift in canonical/05 (non-blocking)
+
+`canonical/05-scaffolding-and-cli.md` cites `chat-route.ts:33` for the scaffolder `emit()` body.
+The actual file (`packages/cli/src/public/features/scaffolders/chat/chat-route.ts`) is 26 lines
+total; the `emit()` body is around line 23. Off by ~10 lines. **Fix**: update the line number
+in the cited cell, or replace with a stable symbol citation (`chatRouteScaffolder.emit`).
+
+## Verdict
+
+**FAIL_FIX** — three blocking findings (B-1, B-2) and one minor non-blocking citation
+correction set (B-3, B-4). All blocking findings are rev-2 vs rev-3 drift inside the same PR's
+canonical + docs-story fileset — exactly the class of error this evaluator is contracted to
+catch. None require source-code or CLI changes; all are doc edits to a planning RFC.
+
+## Exact fixes (smallest viable set)
+
+1. **`canonical/00-overview.md`** — remove `contract` from the install-manifest example on line
+   66 (`frontend: { export, framework, contract }` → `frontend: { export, framework }`) and
+   remove `contract: "v1"` from line 85's manifest example, OR add a `drift.md` entry #6
+   explicitly accepting the rev-2 shape with rationale.
+2. **`docs-story/reference-plugin-frontend-core.md`** — drop the `contract: [{ family: 'app',
+   major: 1 }]` field from the envelope example block (≈line 110) to match K-10.
+3. **`docs-story/readme-fragments.md`** — drop `contract: "v1"` from the manifest README fragment
+   (≈line 110) to match K-10.
+4. **`adversarial-triage.md`** — correct S-20's `05-owner-forks.md` → `06-doctrine-fit.md` and
+   S-15's misnamed example adapter (cosmetic).
+5. **`canonical/05-scaffolding-and-cli.md`** — replace `chat-route.ts:33` line citation with the
+   symbol-level citation `chatRouteScaffolder.emit` (the file is 26 lines, not 33+).
+
+No product code, CLI implementation, lock-file, or `deno.lock` changes are required or
+recommended; this PR is correctly scoped as a planning deliverable.
+
+## Responses to review comments
+
+No prior PR review threads exist on PR #890 (issue-comments file is empty per the runtime
+context). No replies.json was generated.
+
+## Remaining risks
+
+- The rev-2/rev-3 split inside the PR's canonical + docs-story tree is hard to follow for a
+  reader who does not read `drift.md` first; consider a single "rev 2 vs rev 3 status table" at
+  the top of `design/canonical/00-overview.md` so the drift is discoverable without reading the
+  provenance files.
+- After merge, follow-up K-notes (K-18+) will need to be opened if the rev-2 docs-story files
+  are to be rebased to rev 3; the FILING-LOG already opens #923–#946 with `status:plan` — none
+  of these is the doc-rebase work item, so a separate doc-debt issue is recommended.
+- The Wave-1 implementation PRs (FCB-6 through FCB-22) will land before these docs are ever
+  user-facing; if any of the cited CLI verbs change during implementation, the canonical
+  files must be re-checked against the implementation, not the other way around.
+
+Run: https://github.com/rickylabs/netscript/actions/runs/30817796963

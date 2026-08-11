@@ -1,0 +1,482 @@
+[
+  {
+    "name": "ComponentTelemetryContext.cs",
+    "path": "src/Aspire.Dashboard/Components/Pages/ComponentTelemetryContext.cs",
+    "sha": "8bbe771e05dd0cb175123ea8400ff81ccafb7e1b",
+    "size": 4246,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/ComponentTelemetryContext.cs?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/ComponentTelemetryContext.cs",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/8bbe771e05dd0cb175123ea8400ff81ccafb7e1b",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/ComponentTelemetryContext.cs",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/ComponentTelemetryContext.cs?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/8bbe771e05dd0cb175123ea8400ff81ccafb7e1b",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/ComponentTelemetryContext.cs"
+    }
+  },
+  {
+    "name": "ConsoleLogs.razor",
+    "path": "src/Aspire.Dashboard/Components/Pages/ConsoleLogs.razor",
+    "sha": "b4dc5e0c46cb00c4555f84e2e0e45dad730b9ba9",
+    "size": 9366,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/ConsoleLogs.razor?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/ConsoleLogs.razor",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/b4dc5e0c46cb00c4555f84e2e0e45dad730b9ba9",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/ConsoleLogs.razor",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/ConsoleLogs.razor?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/b4dc5e0c46cb00c4555f84e2e0e45dad730b9ba9",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/ConsoleLogs.razor"
+    }
+  },
+  {
+    "name": "ConsoleLogs.razor.cs",
+    "path": "src/Aspire.Dashboard/Components/Pages/ConsoleLogs.razor.cs",
+    "sha": "5770b6629994e4cf71d7d38287f51aa40da6900e",
+    "size": 63208,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/ConsoleLogs.razor.cs?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/ConsoleLogs.razor.cs",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/5770b6629994e4cf71d7d38287f51aa40da6900e",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/ConsoleLogs.razor.cs",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/ConsoleLogs.razor.cs?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/5770b6629994e4cf71d7d38287f51aa40da6900e",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/ConsoleLogs.razor.cs"
+    }
+  },
+  {
+    "name": "Error.razor",
+    "path": "src/Aspire.Dashboard/Components/Pages/Error.razor",
+    "sha": "96d6d6f69c26d4e1b4217f1e44ff9378af608ba7",
+    "size": 942,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Error.razor?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Error.razor",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/96d6d6f69c26d4e1b4217f1e44ff9378af608ba7",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/Error.razor",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Error.razor?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/96d6d6f69c26d4e1b4217f1e44ff9378af608ba7",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Error.razor"
+    }
+  },
+  {
+    "name": "Error.razor.cs",
+    "path": "src/Aspire.Dashboard/Components/Pages/Error.razor.cs",
+    "sha": "646bc80ac9e73d1e35b8478838c91c0baa02baf7",
+    "size": 1511,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Error.razor.cs?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Error.razor.cs",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/646bc80ac9e73d1e35b8478838c91c0baa02baf7",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/Error.razor.cs",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Error.razor.cs?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/646bc80ac9e73d1e35b8478838c91c0baa02baf7",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Error.razor.cs"
+    }
+  },
+  {
+    "name": "Error.razor.css",
+    "path": "src/Aspire.Dashboard/Components/Pages/Error.razor.css",
+    "sha": "d0190bf7337822c8505c07d1e783361681c8bd13",
+    "size": 1098,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Error.razor.css?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Error.razor.css",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/d0190bf7337822c8505c07d1e783361681c8bd13",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/Error.razor.css",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Error.razor.css?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/d0190bf7337822c8505c07d1e783361681c8bd13",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Error.razor.css"
+    }
+  },
+  {
+    "name": "IComponentWithTelemetry.cs",
+    "path": "src/Aspire.Dashboard/Components/Pages/IComponentWithTelemetry.cs",
+    "sha": "ff92b2b0b3ac9d5d25eabd3202deeae687931a68",
+    "size": 763,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/IComponentWithTelemetry.cs?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/IComponentWithTelemetry.cs",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/ff92b2b0b3ac9d5d25eabd3202deeae687931a68",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/IComponentWithTelemetry.cs",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/IComponentWithTelemetry.cs?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/ff92b2b0b3ac9d5d25eabd3202deeae687931a68",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/IComponentWithTelemetry.cs"
+    }
+  },
+  {
+    "name": "IPageWithSessionAndUrlState.cs",
+    "path": "src/Aspire.Dashboard/Components/Pages/IPageWithSessionAndUrlState.cs",
+    "sha": "951a6bf43805d24e46c11aa0127b3c5112d0ec0e",
+    "size": 6088,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/IPageWithSessionAndUrlState.cs?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/IPageWithSessionAndUrlState.cs",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/951a6bf43805d24e46c11aa0127b3c5112d0ec0e",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/IPageWithSessionAndUrlState.cs",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/IPageWithSessionAndUrlState.cs?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/951a6bf43805d24e46c11aa0127b3c5112d0ec0e",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/IPageWithSessionAndUrlState.cs"
+    }
+  },
+  {
+    "name": "Login.razor",
+    "path": "src/Aspire.Dashboard/Components/Pages/Login.razor",
+    "sha": "378aeb93c6c60baf181244f045aa58e9b7815bef",
+    "size": 3431,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Login.razor?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Login.razor",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/378aeb93c6c60baf181244f045aa58e9b7815bef",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/Login.razor",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Login.razor?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/378aeb93c6c60baf181244f045aa58e9b7815bef",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Login.razor"
+    }
+  },
+  {
+    "name": "Login.razor.cs",
+    "path": "src/Aspire.Dashboard/Components/Pages/Login.razor.cs",
+    "sha": "c154cbdcc1aee01b7c39e9434a917448df433f93",
+    "size": 4350,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Login.razor.cs?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Login.razor.cs",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/c154cbdcc1aee01b7c39e9434a917448df433f93",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/Login.razor.cs",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Login.razor.cs?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/c154cbdcc1aee01b7c39e9434a917448df433f93",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Login.razor.cs"
+    }
+  },
+  {
+    "name": "Login.razor.css",
+    "path": "src/Aspire.Dashboard/Components/Pages/Login.razor.css",
+    "sha": "1a4fc0b535f5cacd87256e59518df2e5011a5328",
+    "size": 2138,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Login.razor.css?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Login.razor.css",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/1a4fc0b535f5cacd87256e59518df2e5011a5328",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/Login.razor.css",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Login.razor.css?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/1a4fc0b535f5cacd87256e59518df2e5011a5328",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Login.razor.css"
+    }
+  },
+  {
+    "name": "Login.razor.js",
+    "path": "src/Aspire.Dashboard/Components/Pages/Login.razor.js",
+    "sha": "4c6cf4fec2e66308f6dc0d1d8bee2090ba2fe828",
+    "size": 373,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Login.razor.js?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Login.razor.js",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/4c6cf4fec2e66308f6dc0d1d8bee2090ba2fe828",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/Login.razor.js",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Login.razor.js?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/4c6cf4fec2e66308f6dc0d1d8bee2090ba2fe828",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Login.razor.js"
+    }
+  },
+  {
+    "name": "Metrics.razor",
+    "path": "src/Aspire.Dashboard/Components/Pages/Metrics.razor",
+    "sha": "6c12719bac961fa27adb061d5e20b85d1b2a0014",
+    "size": 10316,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Metrics.razor?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Metrics.razor",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/6c12719bac961fa27adb061d5e20b85d1b2a0014",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/Metrics.razor",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Metrics.razor?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/6c12719bac961fa27adb061d5e20b85d1b2a0014",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Metrics.razor"
+    }
+  },
+  {
+    "name": "Metrics.razor.cs",
+    "path": "src/Aspire.Dashboard/Components/Pages/Metrics.razor.cs",
+    "sha": "1cf0e7542c55505eb37e69ea7498c5fe905f9007",
+    "size": 14725,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Metrics.razor.cs?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Metrics.razor.cs",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/1cf0e7542c55505eb37e69ea7498c5fe905f9007",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/Metrics.razor.cs",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Metrics.razor.cs?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/1cf0e7542c55505eb37e69ea7498c5fe905f9007",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Metrics.razor.cs"
+    }
+  },
+  {
+    "name": "Metrics.razor.css",
+    "path": "src/Aspire.Dashboard/Components/Pages/Metrics.razor.css",
+    "sha": "60d17b18818248943f240bf3cd03dc841b6d9b21",
+    "size": 2293,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Metrics.razor.css?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Metrics.razor.css",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/60d17b18818248943f240bf3cd03dc841b6d9b21",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/Metrics.razor.css",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Metrics.razor.css?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/60d17b18818248943f240bf3cd03dc841b6d9b21",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Metrics.razor.css"
+    }
+  },
+  {
+    "name": "NotFound.razor",
+    "path": "src/Aspire.Dashboard/Components/Pages/NotFound.razor",
+    "sha": "fb704899b302e545a314cffad397c5ab8aeb7b34",
+    "size": 408,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/NotFound.razor?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/NotFound.razor",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/fb704899b302e545a314cffad397c5ab8aeb7b34",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/NotFound.razor",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/NotFound.razor?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/fb704899b302e545a314cffad397c5ab8aeb7b34",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/NotFound.razor"
+    }
+  },
+  {
+    "name": "NotFound.razor.cs",
+    "path": "src/Aspire.Dashboard/Components/Pages/NotFound.razor.cs",
+    "sha": "30fe47ae37b7915ac7dd29e2ef4d7bd82fca84c2",
+    "size": 792,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/NotFound.razor.cs?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/NotFound.razor.cs",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/30fe47ae37b7915ac7dd29e2ef4d7bd82fca84c2",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/NotFound.razor.cs",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/NotFound.razor.cs?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/30fe47ae37b7915ac7dd29e2ef4d7bd82fca84c2",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/NotFound.razor.cs"
+    }
+  },
+  {
+    "name": "NotFound.razor.css",
+    "path": "src/Aspire.Dashboard/Components/Pages/NotFound.razor.css",
+    "sha": "2896a09ee0ffab9a465556518fb6969082310aaf",
+    "size": 407,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/NotFound.razor.css?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/NotFound.razor.css",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/2896a09ee0ffab9a465556518fb6969082310aaf",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/NotFound.razor.css",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/NotFound.razor.css?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/2896a09ee0ffab9a465556518fb6969082310aaf",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/NotFound.razor.css"
+    }
+  },
+  {
+    "name": "Resources.razor",
+    "path": "src/Aspire.Dashboard/Components/Pages/Resources.razor",
+    "sha": "95c8523f20d7d0d015d6bab242fdfe0193d74e2b",
+    "size": 27807,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Resources.razor?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Resources.razor",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/95c8523f20d7d0d015d6bab242fdfe0193d74e2b",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/Resources.razor",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Resources.razor?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/95c8523f20d7d0d015d6bab242fdfe0193d74e2b",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Resources.razor"
+    }
+  },
+  {
+    "name": "Resources.razor.cs",
+    "path": "src/Aspire.Dashboard/Components/Pages/Resources.razor.cs",
+    "sha": "bd8bcb25802b61fd0a4596297ef0493f19869dc7",
+    "size": 43979,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Resources.razor.cs?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Resources.razor.cs",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/bd8bcb25802b61fd0a4596297ef0493f19869dc7",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/Resources.razor.cs",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Resources.razor.cs?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/bd8bcb25802b61fd0a4596297ef0493f19869dc7",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Resources.razor.cs"
+    }
+  },
+  {
+    "name": "Resources.razor.css",
+    "path": "src/Aspire.Dashboard/Components/Pages/Resources.razor.css",
+    "sha": "a153b91bd64b20cab500cd93b5dfb5b0ef2fd1bd",
+    "size": 6765,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Resources.razor.css?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Resources.razor.css",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/a153b91bd64b20cab500cd93b5dfb5b0ef2fd1bd",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/Resources.razor.css",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Resources.razor.css?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/a153b91bd64b20cab500cd93b5dfb5b0ef2fd1bd",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Resources.razor.css"
+    }
+  },
+  {
+    "name": "StructuredLogs.razor",
+    "path": "src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor",
+    "sha": "bcbe7f4ab722486282a0522e2b9a711062935a56",
+    "size": 13010,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/bcbe7f4ab722486282a0522e2b9a711062935a56",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/bcbe7f4ab722486282a0522e2b9a711062935a56",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor"
+    }
+  },
+  {
+    "name": "StructuredLogs.razor.cs",
+    "path": "src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor.cs",
+    "sha": "c385a5a8ba29409ea4a966fd8104c608c4420ebf",
+    "size": 22736,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor.cs?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor.cs",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/c385a5a8ba29409ea4a966fd8104c608c4420ebf",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor.cs",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor.cs?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/c385a5a8ba29409ea4a966fd8104c608c4420ebf",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor.cs"
+    }
+  },
+  {
+    "name": "StructuredLogs.razor.css",
+    "path": "src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor.css",
+    "sha": "0a0e6a57486cd5c666efc63a208f1b8fdaad2bab",
+    "size": 1296,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor.css?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor.css",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/0a0e6a57486cd5c666efc63a208f1b8fdaad2bab",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor.css",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor.css?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/0a0e6a57486cd5c666efc63a208f1b8fdaad2bab",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/StructuredLogs.razor.css"
+    }
+  },
+  {
+    "name": "TraceDetail.razor",
+    "path": "src/Aspire.Dashboard/Components/Pages/TraceDetail.razor",
+    "sha": "2c6b81dd2c7e62adc92f7d055d6b75274742eee9",
+    "size": 32680,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/TraceDetail.razor?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/TraceDetail.razor",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/2c6b81dd2c7e62adc92f7d055d6b75274742eee9",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/TraceDetail.razor",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/TraceDetail.razor?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/2c6b81dd2c7e62adc92f7d055d6b75274742eee9",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/TraceDetail.razor"
+    }
+  },
+  {
+    "name": "TraceDetail.razor.cs",
+    "path": "src/Aspire.Dashboard/Components/Pages/TraceDetail.razor.cs",
+    "sha": "0f8ccaab682757a75610c8d0b29ae5b87442fe31",
+    "size": 33800,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/TraceDetail.razor.cs?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/TraceDetail.razor.cs",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/0f8ccaab682757a75610c8d0b29ae5b87442fe31",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/TraceDetail.razor.cs",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/TraceDetail.razor.cs?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/0f8ccaab682757a75610c8d0b29ae5b87442fe31",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/TraceDetail.razor.cs"
+    }
+  },
+  {
+    "name": "TraceDetail.razor.css",
+    "path": "src/Aspire.Dashboard/Components/Pages/TraceDetail.razor.css",
+    "sha": "8d64cae1716cc8ebdb5537ad47f303f2c91f7256",
+    "size": 10371,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/TraceDetail.razor.css?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/TraceDetail.razor.css",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/8d64cae1716cc8ebdb5537ad47f303f2c91f7256",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/TraceDetail.razor.css",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/TraceDetail.razor.css?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/8d64cae1716cc8ebdb5537ad47f303f2c91f7256",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/TraceDetail.razor.css"
+    }
+  },
+  {
+    "name": "Traces.razor",
+    "path": "src/Aspire.Dashboard/Components/Pages/Traces.razor",
+    "sha": "d30ab02800e53262c0bad389a42816271a531290",
+    "size": 13951,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Traces.razor?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Traces.razor",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/d30ab02800e53262c0bad389a42816271a531290",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/Traces.razor",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Traces.razor?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/d30ab02800e53262c0bad389a42816271a531290",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Traces.razor"
+    }
+  },
+  {
+    "name": "Traces.razor.cs",
+    "path": "src/Aspire.Dashboard/Components/Pages/Traces.razor.cs",
+    "sha": "23fbbbe915afda9ff06063a2ddacb9d584d31785",
+    "size": 17423,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Traces.razor.cs?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Traces.razor.cs",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/23fbbbe915afda9ff06063a2ddacb9d584d31785",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/Traces.razor.cs",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Traces.razor.cs?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/23fbbbe915afda9ff06063a2ddacb9d584d31785",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Traces.razor.cs"
+    }
+  },
+  {
+    "name": "Traces.razor.css",
+    "path": "src/Aspire.Dashboard/Components/Pages/Traces.razor.css",
+    "sha": "465fbfc720e27cccd02c07795553769652ccca6d",
+    "size": 1348,
+    "url": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Traces.razor.css?ref=main",
+    "html_url": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Traces.razor.css",
+    "git_url": "https://api.github.com/repos/microsoft/aspire/git/blobs/465fbfc720e27cccd02c07795553769652ccca6d",
+    "download_url": "https://raw.githubusercontent.com/microsoft/aspire/main/src/Aspire.Dashboard/Components/Pages/Traces.razor.css",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/microsoft/aspire/contents/src/Aspire.Dashboard/Components/Pages/Traces.razor.css?ref=main",
+      "git": "https://api.github.com/repos/microsoft/aspire/git/blobs/465fbfc720e27cccd02c07795553769652ccca6d",
+      "html": "https://github.com/microsoft/aspire/blob/main/src/Aspire.Dashboard/Components/Pages/Traces.razor.css"
+    }
+  }
+]
