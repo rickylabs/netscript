@@ -233,3 +233,186 @@ deference to #890.
    would be a duplication defect. (`p2` F6, OQ2; `p1` OQ5)
 7. **Does P-6's entry criterion gate authoring or only implementation?** Proceeding under "implementation
    only", per RFC:629 — flagged for owner confirmation. (S-3)
+
+---
+
+# Addendum 1 — after `b1` (dashboard board) and `b2` (doctrine + live board)
+
+Corpus read status updated: `r1` ✓ · `r2` ✓ · `r3` ✓ · `r5` ✓ · `p1` ✓ · `p2` ✓ · `b1` ✓ ·
+`b2` ✓ · `r4` ☐ · `p3` ☐ · `m1` ☐ · `m2` ☐ · `m3` ☐ · `m4` ☐
+
+## S-6 — The ownership thesis the charter told me to preserve **exists verbatim**, and it is good
+
+Epic #400's body carries it (`b1` F3), and it is stronger than the charter's paraphrase because it
+is already operationalized into **three enforceable acceptance lines**:
+
+1. **Non-duplication** — no dashboard screen may render as an owned surface an OTLP trace
+   waterfall/gantt, a log tail, a metrics chart, a resource start/stop panel, or an OpenAPI
+   operation list/try-it. *"Every merged panel must pass **'why can't this just deep-link to
+   Aspire/Scalar?'** with a NetScript-only answer recorded in its issue."*
+2. **One generator, two callers** — every mutation invokes the same contract route / CLI scaffolder
+   the terminal does and renders its CLI-equivalent line. No dashboard-only write paths.
+3. **Flow ≠ waterfall** — S13 renders a primitive-grouped causal chain assembled from NetScript's
+   own seam events. No span bars, no time-proportional gantt, no log tails — ever.
+
+Plus a **"Killed / folded surfaces"** list kept explicitly *"so they don't creep back"*.
+
+**This is the single most valuable inheritance from the old board**, and the RFC should adopt these
+as normative acceptance criteria rather than restate the thesis as prose. Line 1's "record a
+NetScript-only answer per panel" is exactly the discipline that stops charter Q3's speculative
+union.
+
+## S-7 — Authority on the dashboard board is unevenly distributed, and the RFC must say so
+
+- **#685 is MERGED** — but what merged is *analysis and Claude-Design prompts*, self-labelled
+  *"analysis only / no product code changed"*, and its label never advanced past `status:research`.
+  Its files have **committed provenance**, not ratified authority. It posted 20 issue comments, so
+  its analyses are **referenced from** the board without having **rewritten** it — #427 still
+  describes a single panel member, not the 7-member family (`b1` F5).
+- **#780 is an OPEN DRAFT with no labels and no milestone**, 158 files all under `.llm/runs/`, zero
+  under `packages/`/`plugins/`/`docs/`, stale since 2026-07-14. Nothing in it is on `main` (`b1` F6).
+- **#506 was CLOSED as superseded by #685** after its value (`tools/design-sync/`) was absorbed
+  (`b1` F8).
+- **The last owner-ratified board event is the 2026-07-06 rescope batch** — 32 mutations, verified
+  live (`b1` F7).
+
+**Consequence.** A supersession map that treats #685 as ratified architecture would be wrong. The
+RFC must distinguish *committed evidence* from *ratified decision* per artifact. This nuance is the
+difference between an honest map and a plausible one.
+
+## S-8 — Three competing seams already claim the same contribution axis
+
+This is the sharpest board finding and it directly serves Q10:
+
+| Claimant | Where | Position |
+| --- | --- | --- |
+| **#427** (DDX-17) | `epic:dev-dashboard`, `0.0.15` | `DashboardPanelContribution` in `plugin-dashboard-core/contracts/v1`; **`@netscript/plugin` gains NO dashboard-coupled axis** (thinness law) |
+| **#890 / #922** | merged RFC, `0.0.9` | Pointer axis `.withFrontend()` on `@netscript/plugin` + generated registry; re-labels #427 *"KEEP, re-baseline — the dashboard epic implements kinds + host, not pipeline"* |
+| **#734** | `0.0.10`, **not labelled `epic:dev-dashboard`** | Proposes a dashboard-panel contribution axis **in the plugin manifest** — the very thing #427 forbids on thinness grounds |
+
+Three positions, one seam. The RFC must pick one and fold the others, or a fourth will appear.
+
+Related overlap: **#933 (`0.0.9`) and #944 (`0.0.11`) already file dashboard-zone panels under epic
+#922** — a *different epic at earlier milestones* than #428–#431 (`0.0.15`). Two boards claim the
+same subject (`b1` D7). And **`CR-DDX-HOSTAGNOSTIC`**, which #544 (process-manager) declares itself
+gated on, appears in **no** #400 body text and in no ratified rescope artifact — a dangling
+dependency (`b1` D8).
+
+## S-9 — The archetype question has **two conflicting in-repo precedents**, and doctrine does not settle it
+
+- **Dashboard precedent**: thin `plugins/dashboard` (**A5**) + fat `packages/plugin-dashboard-core`
+  (**A2 integration**), modelled on `streams`/`plugin-streams-core`.
+- **Frontend-contrib precedent (merged #890)**: `packages/plugin-frontend-core` at **A1 (small
+  contract)**, host runtime as a **subpath of `@netscript/fresh`**, which that design labels **A3**.
+
+They disagree. Worse, the second **contradicts the doctrine's own assignment table**, which lists
+`fresh` as **A4 — DSL/Builder** (`b2` D3, `06-archetypes.md:376`). A3 vs A4 is not cosmetic: **A3
+adds gate F-13** (`stop()` on every long-running runtime; `AbortSignal` on every async public IO
+method). So mounting a DevTools host inside `@netscript/fresh` inherits an *unresolved archetype
+label and an ambiguous gate set*.
+
+The doctrine's own tiebreaker (`06-archetypes.md:348-367`, "pick the larger") makes this decidable
+**only once the RFC states whether the host owns long-running supervised state** — which is exactly
+charter Q1. So Q1 and Q11 are the same decision wearing two hats.
+
+## S-10 — "The archetype gates apply" is **not self-executing**
+
+`deno task arch:check` gates **16 hand-listed roots** out of **36 live units** (`deno.json:156`).
+`fresh`, `fresh-ui`, `telemetry`, `cli`, `sdk`, `service` are all **ungated**. `arch:check:repo` has
+been `DEBT_ACCEPTED` red since 2026-06-21 (`b2` F7).
+
+**Consequence — a concrete, citable RFC deliverable:** adding `--root packages/<devtools-core>` and
+`--root plugins/<devtools>` to `deno.json:156` must be **named as a slice**, or the RFC's gate claim
+is decorative. This is precisely the charter's "do not claim … without executable gates".
+
+Corollary from `b2` F3: the archetype gate matrix has **no row making browser validation required**
+for a UI-serving A2/A3 host — it is `subtype` for A4 and `n/a` elsewhere. The browser gates come
+from the **`SCOPE-frontend` overlay**, so the RFC must *name the overlay*, not the archetype column.
+
+## S-11 — The doctrine names the exact anti-patterns this RFC is most likely to commit
+
+From `b2` F5, ranked by structural likelihood — these should appear in the RFC as explicit
+non-goals/guardrails, each with the gate that catches it:
+
+1. **AP-21 flat command-surface folder** (>12 children in `routes/`/`presentation/`) — a
+   panel-per-seam DevTools hits it immediately. Gate F-16.
+2. **AP-3 god interface** — a single `DevToolsContribution` covering pages + panels + inspectors +
+   actions + data sources + nav + deep-links **is exactly this shape**. Charter Q3 already warns.
+3. **AP-9 premature abstraction** — "one envelope for both the admin console and DevTools" is the
+   move Q4 explicitly separates.
+4. **AP-24 switch-over-tagged-union instead of registry** — `switch (contribution.kind)` in the host
+   renderer is the default wrong answer.
+5. **AP-13 `console.log` in published code** — a diagnostics package is the most tempting violator;
+   two live debt entries already exist for it.
+6. **AP-11 hidden globals** / **AP-25 side effect in a non-edge file** / **AP-19 permissions assumed
+   silently** (DevTools reads Aspire/OTLP over HTTP → F-9 README permission block is a gate).
+
+And a decisive layout rule: **R-FOLD-LAYERING-MODE** says horizontal role layering is *wrong* for
+"command-like surfaces … (CLI commands, HTTP routes, message handlers, **dashboard pages**)" —
+doctrine explicitly names dashboard pages as the **vertical/feature-sliced** case
+(`05-folder-structure.md:188-208`). The RFC's folder design must be vertical, and can cite doctrine
+for it rather than argue it.
+
+## S-12 — The RFC-home fork is bigger than two options, and an authoritative answer is already scheduled
+
+`b2` F9 finds **three** live conventions, not two:
+
+- **A. `rfcs/`** — the only *written* process (`rfcs/README.md`), template + README, **zero numbered
+  RFCs ever merged**. Numbering assigned by a maintainer **at acceptance**, not by the author.
+  Self-declares provisional and defers to a doctrine governance statement **that does not exist**
+  (`b2` D6).
+- **B. `.llm/runs/plan-*--seed/design/canonical/`** — what merged PRs #890/#891/#1123 actually did,
+  and what `.github/labels.yml` descriptions cite as "RFC #890"/"RFC #1123".
+- **C. `docs/architecture/rfc/`** — introduced by **unmerged** PR #1446; its author-assigned number
+  at draft time diverges from `rfcs/README.md`'s assign-at-acceptance rule.
+
+**And issue #1380 (open, milestone `0.0.6`) already carries an acceptance checkbox to resolve the
+RFC-location divergence.** So a DevTools RFC that picks a location either **pre-empts #1380** or
+must be re-homed later.
+
+This materially upgrades owner fork #2: it is not "which directory looks nicer" but "do we pre-empt
+a scheduled governance decision, and if so, deliberately?" The charter directs
+`docs/architecture/rfc/`; this run follows the charter **and** records the pre-emption explicitly so
+the owner can overrule it cheaply.
+
+## S-13 — The SDK cannot carry a DevTools auth principal today
+
+`b2` F10, from the Fable-5 roadmap's RFC-A: `CreateServiceClientOptions` is *"a closed nine-field
+record with no `headers`, `fetch`, `interceptors`, `plugins`, `link`, or context type parameter"*;
+`ServiceClientContext` is a closed interface, not a type parameter; `createHttpClientLink` is
+package-private; and **`createServiceClient` cannot send `Authorization: Bearer …` or `x-api-key`**
+even though `@netscript/service/auth` accepts both.
+
+**Consequence.** Charter Q6/Q7 auth propagation is **blocked on RFC-A / issue #1348** (milestone
+`0.0.6`) unless DevTools bypasses the SDK — and bypassing it would be exactly the "second SDK
+extension mechanism" the charter forbids. This is a hard sequencing dependency and belongs in the
+risk register with a named owner, not in prose.
+
+Also constraining what DevTools can honestly show (`b2` F8): **`plugins/streams` has no oRPC
+contract surface at all** and triggers implements ~3 of 10 business routes. A "contract provenance"
+panel would have **nothing to read** for streams. Any IA that promises per-runtime contract coverage
+must degrade explicitly — which is precisely why charter Q9 demands degraded/empty states.
+
+## Owner-fork list — updated
+
+Superseding the stage-1 list; renumbered and expanded at stage E.
+
+1. **Depend on #890's unbuilt spine (`0.0.9`), or specify a self-contained DevTools family?** (S-2)
+2. **RFC home** — now a three-way fork that **pre-empts scheduled issue #1380** on `0.0.6`. (S-12)
+3. **Where does a family-neutral envelope live** — `plugin-frontend-core` is a poor home for a
+   non-frontend family; #890's fork F3 was never arbitrated. (`p1` OQ2)
+4. **Mount policy** — plugin-preferred base + host remap vs forced `/__devtools/<mountId>`. (`p1` OQ3)
+5. **Trust tier** — #890 parked T1/T2 iframe tiers in "the dashboard epic", i.e. handed them here;
+   T0 is not inheritable if DevTools is ever remote-exposed. (`p1` F10)
+6. **May DevTools use the #934 gateway?** #1446 scopes sufficiency to Surface 1 only. (`p2` F6)
+7. **Does P-6's entry criterion gate authoring or only implementation?** Proceeding under
+   "implementation only". (S-3)
+8. **Which archetype does the DevTools host take** — A2 (dashboard precedent) or A3 (if it owns
+   supervised state)? And **is `@netscript/fresh` A3 or A4?** (S-9)
+9. **Which milestone owns DevTools** — `0.0.14` (whose description claims it but holds zero
+   dashboard issues) or `0.0.15` (where all 28 children sit)? (S-8, `b2` D5)
+10. **Who owns dashboard-zone panels** — epic #400 (#428–#431) or epic #922 (#933/#944)? Two boards
+    claim the subject at different milestones. (S-8)
+11. **#734 — close, fold, or promote?** It is the third competing position on one seam. (S-8)
+12. **Is `CR-DDX-HOSTAGNOSTIC` real?** #544 depends on it; it exists in no ratified artifact. (S-8)
+13. **Does the DevTools data plane wait on RFC-A/#1348** for auth propagation? (S-13)
