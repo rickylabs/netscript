@@ -1,4 +1,5 @@
-import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { fromFileUrl, join } from '@std/path';
 import { artifactText, collectInstallArtifacts, substituteTokens } from '@netscript/plugin/adapter';
 import { aiAdapterPlugin, aiStarterResources } from '../plugin.ts';
 import {
@@ -166,6 +167,30 @@ Deno.test('ai MCP tool is conditional and consumes SkillLoaderPort', () => {
   const source = artifactText(artifact);
   assertStringIncludes(source, "import type { SkillLoaderPort } from '@netscript/ai/skills'");
   assertStringIncludes(source, 'skills.matchByTag(tags)');
+});
+
+Deno.test('ai MCP tool emitted source type-checks against the public AI surface', async () => {
+  const pluginRoot = fromFileUrl(new URL('../../../', import.meta.url));
+  const workspace = await Deno.makeTempDir({ dir: pluginRoot, prefix: '.mcp-stub-check-' });
+  try {
+    const [artifact] = mcpToolScaffolder.emit({ enabled: true });
+    const sourcePath = join(workspace, 'skill-loader.ts');
+    await Deno.writeTextFile(sourcePath, artifactText(artifact));
+
+    const result = await new Deno.Command(Deno.execPath(), {
+      cwd: pluginRoot,
+      args: ['check', '--unstable-kv', sourcePath],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+
+    assert(
+      result.success,
+      `emitted MCP tool failed to type-check: ${new TextDecoder().decode(result.stderr)}`,
+    );
+  } finally {
+    await Deno.remove(workspace, { recursive: true });
+  }
 });
 
 Deno.test('ai resource token map rejects misspelled tokens at compile time', () => {
