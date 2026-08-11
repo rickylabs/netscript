@@ -1,24 +1,31 @@
 /**
  * @module
  *
- * Reads the #1447 evidence out of `aspire describe --format Json`: does the
- * running service resource carry the environment its config declared, did the
- * generated infrastructure value still win its collision, and is the process
- * actually running.
+ * The #1447 verdicts, split from the gate entrypoint so they are testable without
+ * an AppHost: what `aspire describe --format Json` says about a resource, and
+ * what the resource's own process environment says about every documented
+ * precedence category.
  *
- * Split from the gate entrypoint so the parse and the verdict are testable
- * without an AppHost. The expensive suite is the only place this code runs for
- * real, which is exactly why its failure modes are worth pinning cheaply.
+ * The two are not interchangeable. The topology verdict can only show what the
+ * AppHost *intends*; the process verdict shows what the service actually got, and
+ * it is the one that decides the categories. The expensive suite is the only place
+ * this code runs for real, which is exactly why its failure modes are worth
+ * pinning cheaply.
  */
 
-import {
-  DECLARED_SERVICE_ENV,
-  DECLARED_STALE_DATABASE_URL,
-  GENERATED_DATABASE_URL_KEY,
-} from './service-env-contract.ts';
+import type { DeclaredEnvironmentCase } from './service-env-contract.ts';
+import type { ProcessEvidence } from './process-evidence.ts';
 
-/** States that mean the process is no longer running. */
-const TERMINAL_STATES = ['finished', 'exited', 'failedtostart'];
+/**
+ * States that count as "the resource is up".
+ *
+ * An allowlist, not a terminal-state denylist: `Starting`, `Waiting`, `Stopped`,
+ * `Unhealthy` and any spelling nobody thought of must fail, because #1447's whole
+ * symptom was a resource that looked configured and was not serving. Absence of a
+ * published state is handled by the caller, which proves healthiness through
+ * `aspire wait --status healthy` instead of inferring it here.
+ */
+const RUNNING_STATES = ['running', 'healthy'];
 
 /** What one described resource says about itself. */
 export interface DescribedResourceEvidence {
@@ -45,13 +52,20 @@ export function readDescribedResource(
 }
 
 /**
- * Returns one message per way the resource fails the #1447 contract, empty when
- * it holds. Collected rather than thrown one at a time so a failing gate names
- * everything wrong in a run that costs many minutes to reproduce.
+ * Returns one message per way the described topology fails the #1447 contract,
+ * empty when it holds.
+ *
+ * Collected rather than thrown one at a time so a failing gate names everything
+ * wrong in a run that costs many minutes to reproduce.
+ *
+ * @param evidence - What `aspire describe` published for the resource.
+ * @param serviceName - Resource name, for messages.
+ * @param cases - The declared cases the fixture wrote for this resource.
  */
-export function collectServiceEnvironmentFailures(
+export function collectTopologyFailures(
   evidence: DescribedResourceEvidence,
   serviceName: string,
+  cases: readonly DeclaredEnvironmentCase[],
 ): string[] {
   const failures: string[] = [];
   const { environment, state } = evidence;
@@ -61,31 +75,146 @@ export function collectServiceEnvironmentFailures(
     return failures;
   }
 
-  for (const [key, expected] of Object.entries(DECLARED_SERVICE_ENV)) {
-    const actual = environment.get(key);
-    if (actual !== expected) {
+  for (const entry of cases) {
+    const actual = environment.get(entry.key);
+    if (entry.rule === 'declared-wins' && actual !== entry.value) {
       failures.push(
-        `declared ${key} is ${JSON.stringify(actual ?? null)}, expected ${
-          JSON.stringify(expected)
-        }`,
+        `declared ${entry.key} is ${JSON.stringify(actual ?? null)} in the resource model, ` +
+          `expected ${JSON.stringify(entry.value)}`,
+      );
+      continue;
+    }
+    if (entry.rule === 'generated-wins' && actual === entry.value) {
+      failures.push(
+        `precedence inverted for ${entry.key}: the declared literal reached the resource model, ` +
+          `so ${serviceName} points at something the AppHost never allocated`,
+      );
+      continue;
+    }
+    if (entry.rule === 'refused' && actual === entry.value) {
+      failures.push(
+        `${entry.key} was applied with the declared value: Aspire's endpoint allocation owns it, ` +
+          'so the generator must refuse it',
       );
     }
   }
 
-  const databaseUrl = environment.get(GENERATED_DATABASE_URL_KEY);
-  if (databaseUrl === undefined) {
-    failures.push(`generated ${GENERATED_DATABASE_URL_KEY} is missing`);
-  } else if (databaseUrl === DECLARED_STALE_DATABASE_URL) {
+  if (state !== undefined && !RUNNING_STATES.includes(normalizeState(state))) {
     failures.push(
-      `precedence inverted: the declared ${GENERATED_DATABASE_URL_KEY} beat the value the AppHost ` +
-        `allocated, so ${serviceName} points at an address nothing listens on`,
+      `resource state is ${JSON.stringify(state)}; the gate requires one of ${
+        RUNNING_STATES.join(', ')
+      }`,
     );
   }
 
-  if (state && TERMINAL_STATES.includes(normalizeState(state))) {
-    failures.push(
-      `resource is ${state} — it carries its declared environment but is not running`,
-    );
+  return failures;
+}
+
+/**
+ * Returns one message per way the running process fails the #1447 contract, empty
+ * when it holds.
+ *
+ * This is the verdict that decides the precedence categories: it reads what the
+ * process was actually given, so a category whose documented rule stopped holding
+ * fails here even if the resource model still looks right.
+ *
+ * @param process - Environment read from `/proc/<pid>/environ`.
+ * @param serviceName - Resource name, for messages.
+ * @param cases - The declared cases the fixture wrote for this resource.
+ */
+export function collectProcessFailures(
+  process: ProcessEvidence,
+  serviceName: string,
+  cases: readonly DeclaredEnvironmentCase[],
+): string[] {
+  const failures: string[] = [];
+  const where = `${serviceName} process ${process.pid}`;
+  if (cases.length === 0) {
+    failures.push(`${where}: no declared case to verify — this gate must not pass vacuously`);
+    return failures;
+  }
+
+  for (const entry of cases) {
+    const actual = process.environment.get(entry.key);
+    const seen = JSON.stringify(actual ?? null);
+
+    switch (entry.expectation.kind) {
+      case 'declared': {
+        if (actual !== entry.value) {
+          failures.push(
+            `${where} does not observe declared ${entry.key}: ${seen}, expected ${
+              JSON.stringify(entry.value)
+            } (${entry.category})`,
+          );
+        }
+        break;
+      }
+      case 'differs': {
+        if (actual === undefined || actual === '') {
+          failures.push(`${where} has no ${entry.key} at all (${entry.category})`);
+          break;
+        }
+        if (actual === entry.value) {
+          failures.push(
+            `${where} kept the declared ${entry.key} (${seen}); the generated value must win it ` +
+              `(${entry.category})`,
+          );
+          break;
+        }
+        const { prefix } = entry.expectation;
+        if (prefix !== undefined && !actual.startsWith(prefix)) {
+          failures.push(
+            `${where} has ${entry.key}=${seen}, which is not the allocated ${prefix}… value ` +
+              `(${entry.category})`,
+          );
+        }
+        break;
+      }
+      case 'equals': {
+        if (actual !== entry.expectation.value) {
+          failures.push(
+            `${where} has ${entry.key}=${seen}, expected the generated ${
+              JSON.stringify(entry.expectation.value)
+            } (${entry.category})`,
+          );
+        }
+        break;
+      }
+      case 'matches': {
+        const other = process.environment.get(entry.expectation.key);
+        if (actual === entry.value) {
+          failures.push(
+            `${where} kept the declared ${entry.key} (${seen}); the generated value must win it ` +
+              `(${entry.category})`,
+          );
+          break;
+        }
+        if (actual === undefined || actual !== other) {
+          failures.push(
+            `${where} has ${entry.key}=${seen} but ${entry.expectation.key}=${
+              JSON.stringify(other ?? null)
+            }; the generated helper assigns both the same allocated value (${entry.category})`,
+          );
+        }
+        break;
+      }
+      case 'refused': {
+        if (actual === entry.value) {
+          failures.push(
+            `${where} observes the declared ${entry.key} (${seen}); Aspire's endpoint allocation ` +
+              `owns it, so it must never be applied (${entry.category})`,
+          );
+          break;
+        }
+        if (actual === undefined || actual === '') {
+          failures.push(
+            `${where} has no ${entry.key}; refusing the declared value must not stop Aspire from ` +
+              `injecting its own (${entry.category})`,
+          );
+        }
+        break;
+      }
+    }
   }
 
   return failures;

@@ -276,3 +276,66 @@ falsified by the third mutation instead of the second. Both were run rather than
 Slice review (Tier-A): no `any`/cast/suppression added; the refusal list is a typed
 `readonly string[]` over `RESOURCE_DEFAULTS.PortEnvVar`, not a literal; README now documents the rule
 per category with `PORT`'s different rule and its reason called out separately.
+
+### Slice 9 — F1 + F3: process-level observation, discovered identity, explicit health
+
+The findings: the gate proved only that the resource *model* held the values (`aspire describe`), it
+accepted a missing state and every non-terminal state, and both the fixture and the verifier were
+handed the literal `users`.
+
+**F1a — process-level evidence.** New `process-evidence.ts` reads `/proc/<pid>/environ`, which the
+kernel writes at exec time from the environment the parent handed over. A process is bound to a
+resource by two independent facts: its `/proc/<pid>/cwd` is the workdir the generated registration
+passed to `addExecutable`, **and** its own environment carries `OTEL_SERVICE_NAME` equal to the
+resource name — a value the AppHost injects, so a hand-started `deno run` in the same directory does
+not qualify. `requireResourceProcesses` fails when nothing is identified and reports the counts
+(`examined`, `workdirMatches`, `identified`), so "nothing ran there" and "something ran there but was
+not the resource" are different messages instead of an empty loop. Linux-only, and it throws by name
+on any other platform rather than degrading — the CLI E2E suites run on `ubuntu-latest` in CI and
+under WSL locally.
+
+**F1b — explicit healthy state.** The verifier now runs `aspire wait <resource> --status healthy
+--timeout 180` first, for every discovered subject: the AppHost's own verdict, not a state-string
+denylist. The describe state check became an **allowlist** (`Running`/`Healthy`); `Starting`,
+`Waiting`, `Stopped`, `Unhealthy` and unknown spellings now fail. Healthiness is proven before
+anything reads the topology, so a still-starting resource is reported as a timing failure rather than
+as a precedence one.
+
+**F3 — discovery, and a negative discovery test.** New `discover-service-subjects.ts` reads the
+generated `appsettings.json`: the fixture asks it which service to declare on (deterministic, enabled
+only), the verifier asks it which services *did* declare. No gate takes a service name any more, and
+`runtime-gates.ts` keeps its original literal for the pre-existing `behavior.service-health` gate
+rather than acquiring a shared constant. `discoverDeclaringSubjects` **throws** when nothing declares
+an environment, and `collectProcessFailures` **throws** on an empty case list; the verifier also
+refuses a case list that does not cover all three rules. Every per-category expectation is derived
+from the same topology on both sides, so there is no handoff file to fall out of date.
+
+**Executed evidence** (each run, not asserted):
+
+| Check                                                                        | Result                                                                                 |
+| ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `deno test .../service-env/`                                                 | **PASS** — 36 tests, 0 failed                                                           |
+| real `/proc` read: child spawned with a cwd + injected identity, then scanned | **PASS** — the scan found the child by pid and read `NETSCRIPT_E2E_SERVICE_MODE=http` out of the kernel's record |
+| mutation: `identifiesResource` made unconditional                            | **FAIL** — 2 tests, including the real-`/proc` one (the resource-identity half is load-bearing) |
+| fixture smoke on a synthetic project + stub CLI rendering the real generator  | **PASS** — discovered `users`, wrote all 8 category keys, added the self-reference, refused `PORT` |
+| fixture negative: generator applies nothing                                  | **FAIL** — `regenerated helpers do not apply declared Services.users.Env entries: …`    |
+| fixture negative: generator applies the refused `PORT`                        | **FAIL** — `PORT was applied with the declared value 59147; PORT was dropped without saying so` |
+| fixture negative: non-deterministic generator                                | **FAIL** — `regeneration is not deterministic — … register-services.mts`                |
+| verifier negative: project where nothing declares env                        | **FAIL, exit 1** — `refuses to pass by matching nothing` (before `aspire` is invoked)   |
+
+| Gate                                                    | Result                                         |
+| ------------------------------------------------------- | ---------------------------------------------- |
+| `deno test --allow-all --unstable-kv packages/cli`      | **PASS** — exit 0, `758 passed (520 steps)`    |
+| `run-deno-check.ts --root packages/cli --ext ts,tsx`    | **PASS** — 848 files, 8 batches, 0 occurrences |
+| `run-deno-lint.ts --root packages/cli --ext ts,tsx`     | **PASS** — 848 files, 0 occurrences            |
+| `run-deno-fmt.ts --root packages/cli --ext ts,tsx`      | **PASS** — 848 files, 0 findings               |
+
+**Known limit, stated rather than hidden.** The process-evidence leg needs `/proc`, so the
+`behavior.service-env` gate is Linux-only and says so loudly on other platforms. The suites already
+run Linux-only in CI; no fallback was added because a fallback here would be a check that cannot
+fail.
+
+Slice review (Tier-A): no `any`, no casts, no suppressions; all JSON reading goes through `isRecord`
+guards with typed throws. The one deliberate oddity is the fixture adding a **self**
+`ServiceReferences` entry when the discovered subject references nothing — recorded in the module doc:
+skipping the service-discovery category would have left a documented rule untested on the live path.

@@ -1,33 +1,38 @@
 /**
  * @module
  *
- * Pre-start fixture for #1447: declares environment on a scaffolded service and
- * regenerates the Aspire helpers through the real CLI.
+ * Pre-start fixture for #1447: declares environment on a **discovered** scaffolded
+ * service and regenerates the Aspire helpers through the real CLI.
  *
  * This runs on the **consumer path** — edit `appsettings.json`, run
- * `netscript generate aspire`, change nothing under `aspire/.helpers/**` by
- * hand. That is the path the acceptance criterion is about, and it is also
- * where the determinism claim is checked: generation runs twice and the whole
- * helpers directory must come out byte-identical.
+ * `netscript generate aspire`, change nothing under `aspire/.helpers/**` by hand.
+ * That is the path the acceptance criterion is about, and it is also where the
+ * determinism claim is checked: generation runs twice and the whole helpers
+ * directory must come out byte-identical.
+ *
+ * The subject is not passed in. It is read out of the generated `appsettings.json`
+ * (see `discover-service-subjects.ts`), so this fixture and the verification gate
+ * cannot agree on a service that the scaffold no longer produces.
  *
  * The entries are written under the deprecated `Env` spelling on purpose. It is
  * the spelling #1447 reported, it is the one that used to be silently stripped,
- * and a fixture that used the canonical `Environment` name would not exercise
- * the reported defect at all.
+ * and a fixture that used the canonical `Environment` name would not exercise the
+ * reported defect at all.
  */
 
 import { join } from '@std/path';
 import { SCAFFOLD_DIRS } from '../../../../../../src/kernel/constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../../../../../src/kernel/constants/scaffold/scaffold-files.ts';
 import {
-  DECLARED_SERVICE_ENV,
-  DECLARED_STALE_DATABASE_URL,
-  GENERATED_DATABASE_URL_KEY,
+  buildDeclaredEnvironmentCases,
+  declaredEnvironment,
+  type DeclaredEnvironmentCase,
 } from './service-env-contract.ts';
+import { readTopology, selectDeclarationSubject } from './discover-service-subjects.ts';
 
-const [projectRoot, mode, cliEntrypoint, serviceName] = Deno.args;
-if (!projectRoot || !cliEntrypoint || !serviceName) {
-  throw new Error('project root, package mode, CLI entrypoint, and service name are required');
+const [projectRoot, mode, cliEntrypoint] = Deno.args;
+if (!projectRoot || !cliEntrypoint) {
+  throw new Error('project root, package mode, and CLI entrypoint are required');
 }
 if (mode !== 'published' && mode !== 'local') {
   throw new Error(`package mode must be "published" or "local", received ${JSON.stringify(mode)}`);
@@ -36,21 +41,25 @@ if (mode !== 'published' && mode !== 'local') {
 const appsettingsPath = join(projectRoot, SCAFFOLD_FILES.APPSETTINGS);
 const helpersDir = join(projectRoot, SCAFFOLD_DIRS.ASPIRE_TS, SCAFFOLD_DIRS.HELPERS);
 
-const settings: unknown = JSON.parse(await Deno.readTextFile(appsettingsPath));
-if (
-  !isRecord(settings) || !isRecord(settings.NetScript) || !isRecord(settings.NetScript.Services)
-) {
-  throw new Error(`${appsettingsPath} declares no NetScript.Services section`);
-}
-const service = settings.NetScript.Services[serviceName];
-if (!isRecord(service)) {
-  throw new Error(`${appsettingsPath} declares no service named ${serviceName}`);
-}
+const appsettingsText = await Deno.readTextFile(appsettingsPath);
+const settings: unknown = JSON.parse(appsettingsText);
+const topology = readTopology(appsettingsText);
+const subject = selectDeclarationSubject(topology);
 
-service.Env = {
-  ...DECLARED_SERVICE_ENV,
-  [GENERATED_DATABASE_URL_KEY]: DECLARED_STALE_DATABASE_URL,
-};
+// The service-discovery category needs the subject to reference something. Plugin
+// installation usually leaves a reference behind; when it has not, the fixture
+// adds a self-reference rather than skipping the category — a resource
+// referencing its own endpoint is odd but valid, and skipping would leave the
+// documented rule untested on the live path.
+const reference = subject.references[0] ?? subject.name;
+const cases = buildDeclaredEnvironmentCases(subject, topology.primaryDatabase, reference);
+const environment = declaredEnvironment(cases);
+
+const service = readServiceSection(settings, subject.name);
+service.Env = environment;
+if (!subject.references.includes(reference)) {
+  service.ServiceReferences = [...readReferences(service), reference];
+}
 await Deno.writeTextFile(appsettingsPath, `${JSON.stringify(settings, null, 2)}\n`);
 
 await regenerate('first');
@@ -60,12 +69,30 @@ const secondPass = await snapshotHelpers();
 
 assertDeterministic(firstPass, secondPass);
 assertDeclaredEntriesGenerated(firstPass);
+assertRefusedEntriesNotGenerated(firstPass);
 
 console.info(
-  `declared environment wired for ${serviceName}: ${
-    Object.keys(DECLARED_SERVICE_ENV).join(', ')
-  } (+ a stale ${GENERATED_DATABASE_URL_KEY} the generated value must beat)`,
+  `declared environment wired for ${subject.name} (discovered, not named): ${
+    cases.map((entry) => `${entry.key}=${entry.rule}`).join(', ')
+  }`,
 );
+
+/** Reads the mutable service entry out of the parsed settings. */
+function readServiceSection(value: unknown, name: string): Record<string, unknown> {
+  if (!isRecord(value) || !isRecord(value.NetScript) || !isRecord(value.NetScript.Services)) {
+    throw new Error(`${appsettingsPath} declares no NetScript.Services section`);
+  }
+  const entry = value.NetScript.Services[name];
+  if (!isRecord(entry)) throw new Error(`${appsettingsPath} declares no service named ${name}`);
+  return entry;
+}
+
+function readReferences(entry: Record<string, unknown>): string[] {
+  const value = entry.ServiceReferences;
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string')
+    : [];
+}
 
 /** Runs `netscript generate aspire` the way a consumer would. */
 async function regenerate(label: string): Promise<void> {
@@ -123,24 +150,55 @@ function assertDeterministic(first: Map<string, string>, second: Map<string, str
 }
 
 /**
- * Fails when the declared entries never reached the generated registration.
+ * Fails when a declared entry the generator is supposed to apply never reached the
+ * generated registration.
  *
- * Matched per line rather than per file: `generate aspire` formats what it
- * writes, so a declared pair lands on one line — while a whole-file substring
- * search for a value as ordinary as `http` would pass on any generated helper.
+ * Matched per line rather than per file: `generate aspire` formats what it writes,
+ * so a declared pair lands on one line — while a whole-file substring search for a
+ * value as ordinary as `http` would pass on any generated helper.
  */
 function assertDeclaredEntriesGenerated(snapshot: Map<string, string>): void {
-  const lines = [...snapshot.values()].flatMap((content) => content.split('\n'));
-  const missing = Object.entries(DECLARED_SERVICE_ENV)
-    .filter(([key, value]) => !lines.some((line) => line.includes(key) && line.includes(value)))
-    .map(([key]) => key);
+  const lines = generatedLines(snapshot);
+  const missing = applied(cases)
+    .filter((entry) =>
+      !lines.some((line) => line.includes(entry.key) && line.includes(entry.value))
+    )
+    .map((entry) => entry.key);
   if (missing.length > 0) {
     throw new Error(
-      `regenerated helpers do not apply declared Services.${serviceName}.Env entries: ${
+      `regenerated helpers do not apply declared Services.${subject.name}.Env entries: ${
         missing.join(', ')
       }`,
     );
   }
+}
+
+/**
+ * Fails when a refused key was applied anyway, or when its refusal was not
+ * recorded where a consumer would look for the value they wrote.
+ */
+function assertRefusedEntriesNotGenerated(snapshot: Map<string, string>): void {
+  const lines = generatedLines(snapshot);
+  const failures: string[] = [];
+  for (const entry of cases.filter((item) => item.rule === 'refused')) {
+    if (lines.some((line) => line.includes(entry.value))) {
+      failures.push(`${entry.key} was applied with the declared value ${entry.value}`);
+    }
+    if (!lines.some((line) => line.includes(`Declared \`${entry.key}\` is not applied`))) {
+      failures.push(`${entry.key} was dropped without saying so in the generated helper`);
+    }
+  }
+  if (failures.length > 0) {
+    throw new Error(`refused declared entries are mishandled: ${failures.join('; ')}`);
+  }
+}
+
+function generatedLines(snapshot: Map<string, string>): string[] {
+  return [...snapshot.values()].flatMap((content) => content.split('\n'));
+}
+
+function applied(entries: readonly DeclaredEnvironmentCase[]): DeclaredEnvironmentCase[] {
+  return entries.filter((entry) => entry.rule !== 'refused');
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
