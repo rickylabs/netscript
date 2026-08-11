@@ -180,7 +180,7 @@ The `.strict()` fact is load-bearing and corrects a merged claim elsewhere. **Dr
 contract C8 asserts that a manifest pointer block "bumps additively; older CLIs ignore the block".
 They do not — Zod `.strict()` hard-rejects any unknown top-level key, so an older CLI fails manifest
 parsing outright and takes the whole plugin down rather than degrading
-(`drift.md` D-6; `packages/plugin/src/protocol/manifest.ts:271,282`). A third file,
+(`drift.md` D-6; `packages/plugin/src/protocol/manifest.ts:271,283`). A third file,
 `scaffold.runtime.json`, *looks* versioned — `"schemaVersion": 1`
 (`plugins/workers/scaffold.runtime.json:2`) — but `readRuntimeManifest` never reads it
 (`installed-runtime-registry-generator.ts:320-359`), so incompatible runtime manifests are silently
@@ -383,7 +383,7 @@ than the capability name implies. `absent` = verified negative (grep or read).
 | UI distribution to an app | **exists**, by **copy** only (`ui:add`, five alias prefixes) | `kernel/application/ui/registry.ts:67-73`; `r2` F4-F5 |
 | Plugin contributes a UI/registry item | **absent** — installer manifest has no UI/registry/theme/token field; `--registry-root` **replaces**, never merges | `packages/plugin/src/protocol/manifest.ts:17-140`; `registry.ts:203-214`; `r2` F10 |
 | Versioned contribution envelope | **absent in code** — `FrontendManifestEnvelope` is design text only, in an unimplemented RFC | `.llm/runs/plan-frontend-contrib--seed/design/canonical/01-contracts.md:62-110`; `r3` F6 |
-| Additive manifest evolution | **absent** — `.strict()` hard-rejects unknown top-level keys | `drift.md` D-6; `protocol/manifest.ts:271,282` |
+| Additive manifest evolution | **absent** — `.strict()` hard-rejects unknown top-level keys | `drift.md` D-6; `protocol/manifest.ts:271,283` |
 | Third-party contribution axis | **absent** — `cli.doctorChecks: readonly 'auth-backend'[]`; six framework files to add a kind | `plugin-contributions.ts:13-16`; `r4` F11 |
 | Plugin lifecycle hooks | **partial** — declared, typed, produced, invoked by nothing | `r3` F4; `plugin-builder.ts:326` |
 | Duplicate-plugin-identity guard | **partial** — exists (`DuplicatePluginError`) but off the load path; silent last-wins | `application/plugin-registry.ts:9-14` vs `kernel/adapters/config/plugin-registry.ts:150-159` |
@@ -464,7 +464,8 @@ Two consequences worth stating as rules rather than observations:
 - **R-SURFACE-1.** A single plugin may contribute to several surfaces at once; it does so by
   exporting several envelopes, one per family — #890's ratified multi-family export form is a plain
   array (`export default [defineFrontend(appDefinition), defineFrontend(devtoolsDefinition)];`,
-  `01-contracts.md:109-114` via `p1` C1). There is no universal envelope and no widened union. The
+  `01-contracts.md:109-114` via `p1` C1 — that source's own example reads
+`defineFrontend(dashboardDefinition)`; the DevTools family is the same shape with a different payload). There is no universal envelope and no widened union. The
   widened-union model in `#890`'s own `design/examples/dashboard.md:74-78`
   (`DashboardContribution = FrontendContribution | …`) contradicts #890's ratified decision D3 and
   is recorded drift inside its merged record (`p1` F11, D-4) — **it must not be copied.**
@@ -495,7 +496,8 @@ named artifact is absent, checkably:
 
 1. **The spine is a specification, not an import.** What transfers is payload-agnostic by
    construction — envelope, identity quartet, host-surface descriptor, transactional replace-set,
-   five-state diagnosis taxonomy (`p1` F14) — and this RFC pins it in a family-neutral home whose
+   five-state diagnosis taxonomy (`p1` F14 — **#890's** five; this RFC's own taxonomy is **six**,
+   §6) — and this RFC pins it in a family-neutral home whose
    first implementation is a DevTools slice. The dependency direction, the package home, and the
    re-baselining obligation on #922's spine children (#928–#931) are decided in "The DevTools
    contribution family"; this section only records that the edge is a *co-dependency*.
@@ -1095,8 +1097,10 @@ precondition, not a footnote.
 
 ### Discovery and the generated registry
 
-The devtools family uses the **manifest-driven, host-emitted** pipeline: the generator imports the
-plugin's pointed-to export in-process and the **host** writes every artifact.
+The devtools family uses the **manifest-driven, host-emitted** pipeline: the generator reads the
+plugin's pointed-to envelope **without executing contributor code in its own process** — per
+**INV-9** (§9), by static parse or by a permission-scoped short-lived subprocess whose only output is
+the serialized envelope — and the **host** writes every artifact.
 
 ```mermaid
 flowchart TD
@@ -1298,7 +1302,7 @@ The family keys on host-assigned `mountId` only.
 
 ### Quarantine
 
-The five-state taxonomy is adopted as **product surface, not internal vocabulary**
+The six-state taxonomy is adopted as **product surface, not internal vocabulary**
 (`03-discovery-and-registry.md:89-95`), and this RFC adds a **sixth state** the upstream taxonomy
 could not express: with version-suffixed zone ids (see the matching rule above), "the zone name is
 right but the zone-contract version is not served" is distinguishable from a typo, and an earlier
@@ -1922,7 +1926,7 @@ export interface DevToolsDataProtocol {
   readonly major: 1;
 }
 
-/** `<pluginId>/<panel>/v<major>` — version-suffixed ids, Grafana's compatibility story (m2 F16). */
+/** `<mountId>/<id>/v<apiMajor>` — see §6 identity, Grafana's compatibility story (m2 F16). */
 // Identity per §6: host-assigned mountId + local slug id + apiMajor field.
 // Fully-qualified form `<mountId>/<id>/v<apiMajor>` is derived by the host, never authored.
 export type DevToolsPanelRef = { readonly mountId: string; readonly id: string; readonly apiMajor: number };
@@ -2259,7 +2263,9 @@ plugin code runs at manifest-read time (§6). Landing it at all requires the rat
 ```
 
 **Step 2 — the pointed-to export** (`@acme/plugin-crons/devtools.ts`). Default-exports the
-envelope. The generator imports this module in-process at generate time (§6 discovery pipeline):
+envelope. The generator reads this module's envelope **without executing it in the generator's own
+process** — INV-9 (§9): static parse, or a permission-scoped subprocess emitting only the serialized
+envelope:
 
 ```ts
 import { DEVTOOLS_FAMILY } from '@netscript/devtools-core/contracts/v1';
@@ -2614,7 +2620,7 @@ read-kind allowlist) and each requires an executable gate to become evidence:
 `DevToolsProcedureReference` rides the envelope behind the manifest-visible pointer block
 (D-6.4b), so the pointer is what the manifest must tolerate. `PluginInstallerManifestSchema` ends in
 `.strict()` and pins `schemaVersion: z.literal(1)`
-(`packages/plugin/src/protocol/manifest.ts:271,282`; drift **D-6**), so an unknown top-level block
+(`packages/plugin/src/protocol/manifest.ts:271,283`; drift **D-6**), so an unknown top-level block
 does **not** degrade — an older CLI fails manifest parsing outright. Any manifest-visible DevTools
 pointer therefore requires an explicit schema-evolution precondition slice sequenced *before* it.
 The mechanism is decided in § *The contribution family*; this section only records that the data
@@ -2798,7 +2804,7 @@ Every row's mitigation is UNPROVEN at baseline; the column states the gate that 
 | **T-7** | Secret leakage through display or recording — request headers, credentials, the Aspire `Dashboard:Api:PrimaryApiKey` reaching the browser. | INV-7 redaction absolutes; the telemetry key stays server-side behind `TelemetryQueryPort` (`r5` F10-F11) — the browser never holds it. | **UNPROVEN** until **G-7**. *How the host obtains the auto-generated key at runtime is unresolved (`m4` OQ2) — `unverified`.* |
 | **T-8** | One bad panel takes down the shell or the app being debugged. TanStack has no error boundary anywhere on its mount path (`m2` F11, marked inference there); #890 documents that an SSR render-time throw in a zone component fails the page response (`p1` C9 guarantee 4). | INV-6 per-contribution error boundary with **dev polarity** — loud error card, never silent `null` (`m2` F23 mechanism, inverted); host failure degrades to empty-list + logged error (`m2` F18). | Threat evidence-backed. **UNPROVEN** until **G-8**. |
 | **T-9** | Identity collision silently swaps a contribution. Baseline: duplicate plugin identity collapses last-writer-wins on a lossy local name (`r3` F9); registry-item collision is silent last-wins at three layers and the winner **flips** under `--force` (`r2` F11). | INV-8 namespaced, version-suffixed ids; duplicate id within a family is a generate-time error (`m2` F13/F16/F22). | Shipped defect. **UNPROVEN** until **G-9**. |
-| **T-10** | Half-written generated state misrepresents the system (integrity): per-target `Deno.writeTextFile` with no temp+rename, existence-only post-checks, walker registries leaking on `plugin remove` (`r3` F8; `research.md` F17). | Transactional staged → check → atomic swap. **Owned by the build-and-dev-loop section.** T6 records only the trust consequence: a diagnostics surface whose own registry can be half-written cannot be trusted to report drift. | Gate owned elsewhere. **UNPROVEN**. |
+| **T-8b** | Half-written generated state misrepresents the system (integrity): per-target `Deno.writeTextFile` with no temp+rename, existence-only post-checks, walker registries leaking on `plugin remove` (`r3` F8; `research.md` F17). | Transactional staged → check → atomic swap. **Owned by the build-and-dev-loop section.** This row records only the trust consequence: a diagnostics surface whose own registry can be half-written cannot be trusted to report drift. | Gate owned elsewhere. **UNPROVEN**. |
 
 **T-10 — generate-time in-process import of third-party contribution code.** The registry generator
 imports each plugin's pointed-to `devtools` export **in the generator's own process** (§6) to read
@@ -3089,18 +3095,21 @@ specifiers** derived from `source.kind`:
 
 ```ts
 // .netscript/generated/devtools/devtools.registry.ts — emitted, do not edit
-import type { DevToolsContributionRecord } from '@netscript/devtools/contract';
+import type { DevToolsContributionRecord } from '@netscript/devtools-core/contracts/v1';
 
 export const devtoolsContributions: readonly DevToolsContributionRecord[] = Object.freeze([
   {
-    id: 'workers.queue-inspector@1',
-    pluginName: 'workers',
+    // Identity per §6: host-assigned mountId + local slug id + apiMajor FIELD.
+    mountId: 'workers',
+    id: 'queue-inspector',
+    apiMajor: 1,
     // local-path install → workspace-relative specifier
     load: () => import('../../../plugins/workers/devtools/queue-inspector.tsx'),
   },
   {
-    id: 'acme.trace-explorer@2',
-    pluginName: 'acme',
+    mountId: 'acme-trace',
+    id: 'trace-explorer',
+    apiMajor: 2,
     // jsr install → exact installed version; lockfile pins transitives
     load: () => import('jsr:@acme/plugin-trace@1.4.2/devtools/trace-explorer'),
   },
@@ -3148,7 +3157,7 @@ Additions land in two places, **neither of which is the closed literal**:
 | --- | --- | --- | --- |
 | `devtools:registry-drift` | error | regenerate the replace-set in memory, byte-compare against disk | `Run: netscript generate plugins` — mirrors the existing `manifest` check's remediation form (r4 F2 #4) |
 | `devtools:staging-residue` | warning | a leftover `.staging/devtools-*` directory | names the interrupted transaction; safe to delete |
-| `devtools:contribution:<state>` | per state | the five-state contribution taxonomy, reported verbatim | see below |
+| `devtools:contribution:<state>` | per state | the six-state contribution taxonomy, reported verbatim | see below |
 | `devtools:prod-gate` | error | both exclusion mechanisms present in the app | restores the guard the `(design)` tree never got (r1 F13) |
 
 The five contribution states, whose vocabulary is owned by *Contribution family* and whose reporting
@@ -3627,7 +3636,7 @@ built by the helper in §11.6 — never hand-concatenated in a panel.
 | **Streams** | Fan-out/delivery state per subscriber as framework run-state (#431). Contract-provenance column renders the **labelled `partial` state** of §11.7 | per delivery → trace detail; subscriber resource → `/consolelogs/resource/{name}` |
 | **Contracts / SDK** | Provenance chain schema → router → OpenAPI → Scalar, and per-service coverage/duality; powered by the pure, IO-free `@netscript/mcp/openapi-projection` (`packages/mcp/openapi-projection.ts:8-38`) — no MCP process required | per operation → Scalar `#tag/{tag}/{method}{path}`; per schema → `#model/{slug}`. **Try-it is always an out-link** (killed surface, §11.1) |
 | **Plugin registry** | Installed plugins, contribution-axis map including *dead* axes (ten enum names vs twelve interface keys, `research.md` F18), doctor rows through the existing contributed-checks seam (`r4` F2), JSR version drift, silent-duplicate-identity detection (`r3` F9) | plugin's service resource → `/?resource={name}`; plugin's service API → its Scalar mount |
-| **Generated artifacts** | Registry freshness per generator path (manifest-driven vs SDK walker — two mechanisms, two paths, `r4` F3); registries leaked by the walker after `plugin remove` (`r4` F10); migration applied-vs-pending and drift (#552); confirm-gated `migrate`/`seed` rendering the exact CLI line (AC-2) | **none upstream** — this surface has no Aspire/Scalar analogue; links are internal (to `plugins/:id`, to file paths) |
+| **Generated artifacts** | Registry freshness per generator path (manifest-driven vs SDK walker — two mechanisms, two paths, `r4` F3); registries leaked by the walker after `plugin remove` (`r4` F10); migration applied-vs-pending and drift (#552); migration applied-vs-pending state; **`migrate`/`seed` are staged actions, not v1** — v1 renders the exact CLI line for the developer to run (AC-2), it does not execute it (read-only, §7) | **none upstream** — this surface has no Aspire/Scalar analogue; links are internal (to `plugins/:id`, to file paths) |
 | **Runtime automation** | Convergence state and audit/history *as diagnostics correlated to flows* — read-only projections of #1446's four contracts (`p2` F2-F3) | automation action in a journey → trace detail; operator management → the userland admin console route, as an out-link, never an embed |
 
 ### 11.6 Deep-link helper
@@ -3779,7 +3788,7 @@ specification).
 | Flows (index + detail) | shared | index: recent-journey window (§11.3 decision 4); detail: the causal chain | index: "no journeys in the current window" + window chip; detail: "no journey recorded" — both name **which sources were queried** | (a) until the #557 seam-event plane lands, the chain is a correlation-only join and labels itself "correlation fidelity", not "boundary-event fidelity"; (b) evicted spans → chain nodes without trace out-links; no filtered-log round-trip (above) | shared | telemetry endpoint down → launch card | not entered: both routes are host-owned screens | shared | shared |
 | Contracts | shared | provenance chain + coverage/duality per service | service with zero contract routes → coverage 0% (real, for streams) — a true reading, not this arm's "nothing exists" card | per-service spec fetch failure degrades that row only; other services render | spec cache older than the last generate → age chip | shared launch card | Scalar operation anchors flagged unverified until OQ8 closes; helper falls back to `#tag/{tag}` | shared | shared |
 | Plugins | shared | axis map, doctor rows, drift, contributions | no plugins → `netscript plugin add` line | doctor needs a running app → axis map renders from **static registries**, doctor rows show "requires running app" (`partial`, not `not-running`: the static half is real data) | shared | only when even static registries are unreadable | contributed panels on `plugin.detail/v1` render the shared card per contribution | shared | duplicate plugin identity (`r3` F9) renders a loud conflict row, never last-writer-wins silence |
-| Generated | shared | per-generator freshness + migration applied-vs-pending | nothing generated → per-generator "never run" + CLI line | leaked registries after `plugin remove` (`r4` F10) → drift rows naming the owning generator; the existence-only write assertion is labelled as such | registry older than its manifest → **stale generated host**: this arm raises the shell-level banner (K-m2 above) | not applicable: reads the filesystem, not a process — states so in a muted note | shared | shared | `migrate`/`seed` confirm dialog shows the exact CLI line; DB unreachable → failure naming the connection source |
+| Generated | shared | per-generator freshness + migration applied-vs-pending | nothing generated → per-generator "never run" + CLI line | leaked registries after `plugin remove` (`r4` F10) → drift rows naming the owning generator; the existence-only write assertion is labelled as such | registry older than its manifest → **stale generated host**: this arm raises the shell-level banner (K-m2 above) | not applicable: reads the filesystem, not a process — states so in a muted note | shared | shared | **v1 is read-only**: the row renders the exact `migrate`/`seed` CLI line to copy, and does **not** execute it — the confirm-dialog flow arrives with the staged action kind (§7); DB unreachable → failure naming the connection source |
 | Automation | shared | post-promotion: read-only projections with per-contract availability chips | post-promotion: "no executions/audit records yet" + which contracts were queried | convergence readable but audit store empty → per-contract chips | shared | shared | pre-promotion: the **whole surface** renders §11.3.4's `not-configured` card naming its blocking dependencies — the surface-level analogue of this arm | management oRPC needs the RFC-A auth chain (§8 D-6.9 v3); projections state their principal | shared |
 
 ### 11.8 Owner forks raised by this section
@@ -4199,7 +4208,7 @@ the cost would be speculative design.
 
 | # | Mechanism | Source | NetScript-scale version |
 | --- | --- | --- | --- |
-| P-1 | **Declared contribution manifest cross-checked against runtime registration** | `m2` F12, F20 (`sources/grafana/plugin-json.html`; `src_AddedComponentsRegistry.ts:47-58`) | Take the double-declaration idea for static auditability. **Precondition:** `PluginInstallerManifestSchema` ends in `.strict()` and pins `schemaVersion: z.literal(1)` (`packages/plugin/src/protocol/manifest.ts:271,282`), so an added top-level block **hard-fails older CLIs** rather than being ignored — drift `D-6`. Any manifest-visible pointer needs a schema-evolution slice sequenced first |
+| P-1 | **Declared contribution manifest cross-checked against runtime registration** | `m2` F12, F20 (`sources/grafana/plugin-json.html`; `src_AddedComponentsRegistry.ts:47-58`) | Take the double-declaration idea for static auditability. **Precondition:** `PluginInstallerManifestSchema` ends in `.strict()` and pins `schemaVersion: z.literal(1)` (`packages/plugin/src/protocol/manifest.ts:271,283`), so an added top-level block **hard-fails older CLIs** rather than being ignored — drift `D-6`. Any manifest-visible pointer needs a schema-evolution slice sequenced first |
 | P-2 | **Zone/target vocabulary** | `m3` M-2, S-2, X-1 | Take **Medusa's closed host-owned vocabulary**, not Strapi's plugin-minted one. Closed means collision is impossible by construction and no two-phase lifecycle or caller-side `if (plugin)` guard is needed (`m3` S-3). Budget moves to ordering (see O-1) |
 | P-3 | **Build-time validation of the target id** | `m3` M-4 (fetch-log F3) | Take the AST-gate *idea* — a statically-checkable literal target, template literals rejected — but **invert the failure mode**: Medusa drops silently with a warning; NetScript's operator is the author, so the failure must be loud (`m3` X-2). This is a deliberate departure from all four consoles and is argued, not assumed |
 | P-4 | **DOM-mount contract with a framework adapter** | `m2` F2, F4 (`…devtools-context.tsx:21-77`; `…react-devtools_src_devtools.tsx:174-216`) | Keep the shell framework-agnostic; the React `createPortal` bridge is a direct template for a Preact/Fresh island adapter |
@@ -4272,10 +4281,10 @@ package is **A3** and F-13 (`stop()` on every long-running runtime; `AbortSignal
 public IO method) applies from its first slice.
 
 **This also closes owner fork O-2.** The neutral contracts package is `packages/devtools-core`,
-owned by this RFC. It is deliberately **not** named `devtools-core`: a family-neutral spine is
-#890's to own if and when its spine is built, and naming one here would claim territory this RFC
-does not own. If F-1 later selects convergence onto a shared spine, `devtools-core` re-exports from
-it — a change of import source, not of contract shape.
+owned by this RFC. It is deliberately **not** named `contribution-core` or any family-neutral name:
+under ratified **F-1** this spine is DevTools' own, and claiming a neutral name would assert
+territory over a shared spine #890 may yet build. If a later decision converges the two,
+`devtools-core` re-exports from that spine — a change of import source, not of contract shape.
 
 **Why not a `@netscript/fresh` subpath.** Doctrine's assignment table lists `fresh` as **Archetype 4**;
 #890's design labels it **Archetype 3**. That contradiction is unresolved (run `drift`/`b2` D3), and
@@ -4385,7 +4394,7 @@ graph TD
   W1c[W1-c containment invariant + test] --> W2a
   W1d[W1-d manifest schema-evolution precondition] --> W2a
   W2a[W2-a transactional registry replace-set] --> W2b
-  W2b[W2-b doctor wiring + five-state taxonomy] --> W3a
+  W2b[W2-b doctor wiring + six-state taxonomy] --> W3a
   W3a[W3-a CLI-generated devtools host root] --> W3b
   W3b[W3-b dual production-exclusion + e2e] --> W4a
   W4a[W4-a panel kind: UiNode render] --> W5a
@@ -4407,9 +4416,9 @@ and the PLAN-EVAL rejected it.
 | **W1-a** | Contracts unit + gate wiring | **new** `packages/devtools-core/` (`mod.ts`, `contracts/v1/`, `deno.json`); **edit** root `deno.json` `arch:check` (+2 `--root`) | `ContributionEnvelope`, `DevToolsContributionBase`, `DevToolsZoneId`/`DevToolsZoneContextMap` + the §8 `*Data` wire shapes, `DevToolsUiNode`/`DevToolsCell`, `orderContributions()` | `deno task arch:check && deno doc --lint packages/devtools-core/mod.ts && deno task quality:scan` | — |
 | **W1-b** | Typed deep-link helper | `packages/devtools-core/contracts/v1/links.ts` | `DevToolsLink`, `resolveDevToolsLink()` | unit tests over the Aspire/Scalar grammars **incl. a case asserting `?filters=` is unrepresentable**; base read from config, never hardcoded | W1-a |
 | **W1-c** | Containment invariant + generator scoping (**INV-1/INV-2**) | `packages/cli/src/kernel/application/ui/registry.ts`; `.../generate/plugins/installed-runtime-registry-generator.ts` | a shared path-containment resolver | **G-1/G-2**: unit tests for `/etc/x`, `../../x`, `@ui/../../x`, symlink escape; argv test asserting **no bare** `--allow-read`/`--allow-write` | W1-a |
-| **W1-d** | Manifest schema-evolution precondition (**drift D-6**) | `packages/plugin/src/protocol/manifest.ts` | the chosen compatibility contract (`.passthrough()`/catchall **or** `schemaVersion: 2`) | contract test: an older-CLI parse of a manifest carrying an unknown block **does not hard-reject** | **fork F-3** |
+| **W1-d** | Manifest schema-evolution precondition (**drift D-6**) | `packages/plugin/src/protocol/manifest.ts` | **ratified (F-3, D-19)**: top-level `.strict()` → `.passthrough()`, `schemaVersion` stays `1` | three tests per §6: unknown key parses; the same fixture **fails** under `.strict()` (regression guard); a malformed pointer block is a generate-time error, not a parse failure | — (F-3 ratified) |
 | **W2-a** | Transactional replace-set generator | `packages/cli/src/public/features/generate/devtools/` (new) | staged→`deno check`→atomic-swap emission; deterministic empty set | test: kill mid-generation ⇒ **no partial registry**; regenerate byte-identical ⇒ skip; remove ⇒ empty emission, no dangling import | W1-a, W1-c |
-| **W2-b** | Doctor wiring + five-state taxonomy | `packages/cli/src/public/features/plugins/doctor/` | quarantine diagnosis over the existing `extraChecks` seam | `netscript plugin doctor` prints all five states; e2e asserts a window-mismatch contribution is quarantined, **not** silently dropped | W2-a |
+| **W2-b** | Doctor wiring + six-state taxonomy | `packages/cli/src/public/features/plugins/doctor/` | quarantine diagnosis over the existing `extraChecks` seam | `netscript plugin doctor` prints all six states; e2e asserts a window-mismatch contribution is quarantined, **not** silently dropped | W2-a |
 | **W3-a** | CLI-generated DevTools host root | `packages/cli/src/kernel/assets/devtools/` (new templates); `devtools` command group | the generated host app | `deno task e2e:cli run scaffold.runtime --cleanup` — host starts on its port, loopback-bound | W2-a |
 | **W3-b** | Dual production exclusion | generated `main.ts` + app build graph | the two independent mechanisms (**L2**) | **G-5** e2e: production build contains **no** DevTools module **and** the runtime refuses when mode ≠ `development` | W3-a |
 | **W4-a** | `panel` kind | `packages/devtools-core/contracts/v1/panel.ts`; host renderer | `DevToolsPanelContribution`, `UiNode` render, per-contribution error boundary | e2e: a plugin panel renders with **zero client code**; a throwing panel shows an error card and **does not** take down the shell | W3-a |
@@ -4432,13 +4441,16 @@ runtime-automation state waits on #1446's A2b/A3b/A2d, per its P-6 entry criteri
 Every genuine fork. **No decision that would force rework is filed under "safe to defer."** Each row
 carries this RFC's recommendation, so a silent owner default is a *decision*, not an omission.
 
-### 15.1 Must resolve before implementation begins
+### 15.1 Ratified before implementation — closed 2026-08-11 (drift D-19)
+
+**F-1 and F-3 are RATIFIED by the owner and are no longer forks.** They are listed here as the
+record of what was decided; the remaining rows are the ones ratification still touches.
 
 | # | Fork | Recommendation | Cost if deferred |
 | --- | --- | --- | --- |
-| **F-1** | **Depend on #890's unbuilt spine, or specify a self-contained DevTools family?** | Sibling family on a family-neutral spine **this lane builds first** — reversible until the first emitter slice merges | Serializes DevTools behind 24 unstarted issues, or forks a fourth seam |
+| **F-1** | ~~Depend on #890's unbuilt spine, or self-contained family?~~ | **RATIFIED: self-contained DevTools family and spine, built first in `packages/devtools-core`**, not serialized behind #890's 24 unimplemented children | Closed — unblocks W1-a |
 | **F-2** | **RFC home** — `docs/architecture/rfc/` (charter + unmerged #1446) vs shipped `rfcs/` vs the `.llm/runs/` convention every merged "RFC" actually used | Follow the charter; **record that it pre-empts issue #1380**, which already schedules this decision on `0.0.6` | A re-home later, or a fourth divergent convention |
-| **F-3** | **Manifest schema-evolution precondition** (drift D-6) | Land it **before** any manifest-visible pointer | An older CLI hard-rejects the manifest and the plugin fails to parse |
+| **F-3** | ~~Manifest schema-evolution precondition~~ | **RATIFIED: `.passthrough()`**, `schemaVersion` stays `1`, landing before any manifest-visible pointer, with the three tests specified in §6 | Closed — unblocks W1-d |
 | **F-4** | **Three-seam verdict** — #890's pointer axis wins; #427 folds in; **#734 closes** | Ratify | A fourth position appears |
 | **F-5** | **Zone-vocabulary ownership** — host-owned closed (Medusa) vs plugin-minted (Strapi) | Host-owned closed | Collision becomes a real problem, and a two-phase register/bootstrap lifecycle becomes necessary |
 | **F-6** | **Ordering rule** — net-new design; no surveyed system solved it | Host anchors, then clamped `(order, mountId, id)` | Tab order becomes plugin load order, i.e. arbitrary |
