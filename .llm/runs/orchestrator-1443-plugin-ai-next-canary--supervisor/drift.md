@@ -162,3 +162,38 @@ Open question for the next session — the resolution is a design decision, not 
 
 (1) looks right and matches the plugin-thinness law, but it changes what S10 emitted for five
 plugins and needs its own slice. **Do not commit the current working tree: it is red.**
+
+## D-10 · architectural · 2026-08-11 · owner decision — control-plane / runtime split
+
+Resolves D-9. **Owner chose option 1, refined:** an explicit control-plane vs runtime split.
+
+**Standing constraint, stated by the owner:** runtime-versioned workers/tasks and triggers are an
+**intentional differentiating capability**. Operators must ultimately be able to add, update and
+roll back versioned tasks and triggers on a running deployed stack, including polyglot or legacy
+wrappers. That runtime surface must **not** be deleted, neutered, or folded into static
+configuration to make schema generation green. D-9's option 3 (injecting runtime env) and any
+static-config collapse are both rejected.
+
+**Shape:**
+
+- **Keep the child-process loader** — project modules must resolve through the *consumer's* Deno
+  config and import map, which was the correct half of the previous diagnosis.
+- The **configured module** becomes a dedicated manifest-only, import-safe module
+  (`<name>/plugin.ts`), registered in `netscript.config.ts`. It must load under an **empty**
+  runtime/Aspire environment and export **exactly one** package-owned `PluginManifest`, constructing
+  no producers, clients, or adapters.
+- `<name>/mod.ts` and `<name>/runtime.ts` are **preserved unchanged** as the application/runtime
+  surfaces. This is a split, not a migration: nothing a consumer imports today moves or disappears.
+
+**Prohibited:** static TypeScript parsing; reintroducing JSON metadata as a competing runtime source
+of truth; injecting fake runtime environment variables to make a load succeed.
+
+**Required proof** — one shared all-first-party contract test: the configured module loads with empty
+env; exactly one manifest resolves; no runtime initialization or environment lookup occurs; and the
+existing runtime/application exports remain reachable through their separate barrel.
+
+**Scope boundary.** A separate full RFC orchestrator is being launched to map legacy
+`netscript-start` runtime tasks/triggers and cockpit against the current `runtime-config`, workers,
+triggers, schema generation, deployment, sandboxing, versioning, DB synchronization, security and
+management surfaces. **#1444 preserves the boundary and fixes its immediate contract; it does not
+absorb that redesign.** Anything discovered here that belongs to it is recorded, not built.
