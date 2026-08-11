@@ -339,3 +339,56 @@ Slice review (Tier-A): no `any`, no casts, no suppressions; all JSON reading goe
 guards with typed throws. The one deliberate oddity is the fixture adding a **self**
 `ServiceReferences` entry when the discovered subject references nothing — recorded in the module doc:
 skipping the service-discovery category would have left a documented rule untested on the live path.
+
+### Slice 10 — F4 records + F5 reconciliation, measured rather than asserted
+
+**Archetype (F4).** `plan.md` recorded A4 for `packages/cli`; the governing profile is
+`ARCHETYPE-6-cli-tooling.md`. Corrected in place with the correction called out rather than
+overwritten, and the A6 gate evidence table added — including the two A6-specific gates that actually
+bite here, F-CLI-2 (500-LOC hard cap) and F-CLI-25/F-16 (≤ 12 children).
+
+Measuring against A6 found a violation this run had introduced and nobody had flagged:
+`service-environment-runtime_test.ts` was **536 lines**. Trimmed to **499** by compressing prose and
+moving the per-category rationale to the README (which is where the owner's "document why per
+category" requirement lives) — not accepted as debt. Every other file this branch adds or touches is
+under 500; the one remaining over-cap file is `packages/aspire/config.ts`.
+
+**Debt (F4).** Both entries are measured, not asserted:
+
+| Entry                           | State                                                                                                                                              |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `scaffold-runtime-a8-f16-1333`  | **not deepened** — a stop-condition encounter note records `runtime-gates.ts` at 906 lines (byte-identical to baseline) and 44 direct children (43 + one bounded subdirectory), against the 943/48 measured in cycle 1. Stays **open**: the pre-existing over-cap registry is untouched, so the split is still owed. |
+| `aspire-config-length-1447` (new) | `packages/aspire/config.ts` **812 → 855** lines against the 500-line cap. Owner, target ("before the next contract member is added"), rationale, linked run/issue/PR, and a split gate recorded. |
+
+**History (F5).** `plan.md` § Commit slices now carries an actual-shape table: five commits for six
+planned slices, with slices 2 and 3 sharing `5df14ebc8` and why (the contract change alone does not
+type-check against the slice-1 test). Nothing was back-dated; the four follow-up commits are listed
+with their hashes. `context-pack.md` had already recorded the 2–3 combination — the plan table was the
+artifact that disagreed, and it is the one that changed. `drift.md` gains three entries: the `PORT`
+rule amendment, the archetype correction with its measured consequence, and the Linux-only limit of
+the process-evidence gate.
+
+| Gate                                                  | Result                                                                                 |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `deno test --allow-all --unstable-kv packages/cli`    | **PASS** — exit 0, `758 passed (520 steps)`                                            |
+| `deno test --allow-all --unstable-kv packages/aspire` | **PASS** — exit 0, `19 passed (72 steps)`                                              |
+| `run-deno-check.ts --root packages/cli --ext ts,tsx`  | **PASS** — 848 files, 0 occurrences, exit 0                                            |
+| `run-deno-lint.ts --root packages/cli --ext ts,tsx`   | **PASS** — 848 files, 0 occurrences, exit 0                                            |
+| `run-deno-fmt.ts --root packages/cli --ext ts,tsx`    | **PASS** — 848 files, 0 findings, exit 0                                               |
+| `rtk proxy deno task quality:scan`                    | **PASS** — exit 0, `"ok":true`, 0 findings, 7 pre-existing allowances (none added)      |
+| `rtk proxy deno task arch:check`                      | **PASS** — exit 0, no `FAIL=` entry, no `aspire` finding                                |
+| `git diff --exit-code origin/main...HEAD -- deno.lock` | **PASS** — exit 0, lock unchanged                                                      |
+
+Slice review (Tier-A): `arch-debt.md` is not deno-fmt-clean on `main` (verified: `deno fmt --check`
+exits 1 at baseline), so only the added blocks were wrapped to the repo's 100-column width; the file
+was not reformatted, which would have produced unrelated churn.
+
+## Cycle-1 finding → evidence index
+
+| Finding                              | Where it is answered                                                                                                 |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| F1 — gate never proved observation   | slice 9: `aspire wait --status healthy`, `Running`/`Healthy` allowlist, `/proc/<pid>/environ` read of the AppHost-started process |
+| F2 — precedence model owned by tests | slice 8: one executed test per category, real `@netscript/aspire` helpers, `wireServiceReferences` executed, endpoint options recorded, `PORT` refused; live process is the resolution authority |
+| F3 — hardcoded resource              | slice 9: `discover-service-subjects.ts`; both gates take no service name; negative discovery throws and is tested     |
+| F4 — debt deepened past stop condition | slice 7 (measured non-deepening) + slice 10 (stop-condition note, new aspire entry, A6 correction + gate evidence)  |
+| F5 — record vs. history              | slice 10: actual slice/commit table in `plan.md`, no back-dating                                                      |

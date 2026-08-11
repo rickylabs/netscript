@@ -7,10 +7,36 @@ Issue: rickylabs/netscript#1447 (P0, milestone 0.0.6). Branch `fix/1447-service-
 
 - `packages/aspire` — **ARCHETYPE-2 (contract/data package)**: Zod schemas + plain-data interfaces,
   no I/O beyond `parseAppSettings`. The change is two optional fields on two entry interfaces.
-- `packages/cli` — **ARCHETYPE-4 (application/CLI)**, scope overlay **SCOPE-service.md**: the change
-  is inside the Aspire helpers code generator and its E2E runtime gates.
+- `packages/cli` — **ARCHETYPE-6 (CLI tooling)**, scope overlay **SCOPE-service.md**: the change is
+  inside the Aspire helpers code generator and its E2E runtime gates.
+
+  **Correction (IMPL-EVAL cycle 1, F4).** This plan originally recorded A4 for `packages/cli`. That
+  was wrong: `.llm/harness/archetypes/ARCHETYPE-6-cli-tooling.md` is the governing profile for this
+  package, and it is stricter in the two places this run touches — F-CLI-2 (hard 500-LOC cap on any
+  `.ts` outside `kernel/assets/`) and F-CLI-25/F-16 (≤ 12 immediate children per directory). Both were
+  re-measured against A6 after the correction; see § A6 gate evidence.
 - Doctrine verdict (`docs/architecture/doctrine/10-codebase-verdict-and-handoff.md`) is unchanged by
-  this run; no new debt is created and no existing entry is closed.
+  this run. Debt: `scaffold-runtime-a8-f16-1333` is **not** deepened (measured, see its stop-condition
+  note), and one new entry — `aspire-config-length-1447` — records `packages/aspire/config.ts` going
+  812 → 855 lines. No existing entry is closed.
+
+## A6 gate evidence (`packages/cli`)
+
+The F-CLI-* gates have no dedicated script (`gates/fitness-gates.md`): they are recorded as
+`PENDING_SCRIPT` with manual/structural evidence, backed by the mechanical `arch:check`.
+
+| Gate                                    | Result                                                                                                                                                            |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Static (`check`, `lint`, `fmt:check`)   | PASS — scoped wrappers over `packages/cli`: 848 files, 0 occurrences / 0 findings                                                                                 |
+| F-CLI-2 (500-LOC hard cap)              | PASS as measured — the largest file this run adds is `service-environment-runtime_test.ts` at **499** lines; it was 536 and was trimmed rather than accepted as debt |
+| F-CLI-25 / F-16 (≤ 12 children)         | PASS for the added directory — `gates/scaffold/service-env/` holds 10 files; the pre-existing over-cap scaffold directory is unchanged at 43 + 1 subdirectory       |
+| F-CLI-22 (`.template` under assets)     | PASS — no template file added or moved                                                                                                                            |
+| F-CLI-23 (no ≥ 20-line backtick string) | PASS — generated source is assembled line-by-line, as the neighbouring generators do                                                                              |
+| F-CLI-26 (console.\* placement)         | PASS — the two gate scripts use `console.info`, matching every existing E2E gate entrypoint; no `console.log/error/warn` added                                     |
+| F-CLI-16 (`Deno.*` placement)           | PENDING_SCRIPT, unchanged surface — E2E gate entrypoints under `e2e/**` call `Deno.Command`/`Deno.readDir` directly, which is the established shape of that harness (it is a test surface, not the published CLI); no `Deno.*` call was added under `src/public/**` or `src/kernel/**` |
+| Mechanical `arch:check`                 | PASS — exit 0, no new failure (see worklog slice 10)                                                                                                               |
+| Runtime gates (A6 §4)                   | Required and provided: `runtime.service-env-fixture` + `behavior.service-env`; the owner runs the one-pass `scaffold.runtime` suite                               |
+| Consumer gates (A6 §5)                  | Required and provided: the fixture regenerates through the real CLI on the scaffolded project and byte-compares two passes                                          |
 
 ## PLAN-EVAL
 
@@ -106,6 +132,28 @@ environment) is not asserted by either, and that limit is stated in the PR body 
 over.
 
 ## Commit slices
+
+**Actual shape, reconciled after IMPL-EVAL cycle 1 (F5).** The table below was the plan. The branch
+does **not** have one commit per row, and the record now says so rather than being back-dated:
+
+| Planned slice                       | Actual commit                                                                    |
+| ----------------------------------- | -------------------------------------------------------------------------------- |
+| 1 — RED generator test              | `21cf655f5` (test-only, as planned)                                              |
+| 2 — contract (`Environment`/`Env`)   | **combined into `5df14ebc8`**                                                    |
+| 3 — generator + shared resolver      | **combined into `5df14ebc8`** — the contract change alone does not type-check against the slice-1 test, so the two were landed together |
+| 4 — executing runtime test           | `41cf0075b`                                                                      |
+| 5 — E2E fixture + behavior gate      | `fa9ba9573`                                                                      |
+| 6 — docs                             | `dbd7cd9d1`                                                                      |
+
+Five commits for six planned slices. The RED-before-implementation ordering is intact; the deviation
+is that slices 2 and 3 share a commit. IMPL-EVAL cycle 1 then added four more commits:
+
+| Follow-up slice                                        | Commit      |
+| ------------------------------------------------------ | ----------- |
+| 7 — F4 no-deepen restructure                           | `b7a5e55e4` |
+| 8 — F2 per-category precedence + `PORT` refused        | `2297651c7` |
+| 9 — F1/F3 process-level observation + discovery        | `e9d22d9b5` |
+| 10 — F4 debt/archetype records + F5 record reconciliation | this commit |
 
 | # | Slice                                                                                                                   | What it proves                                                                    | Gate                                                                                             |
 | - | ----------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |

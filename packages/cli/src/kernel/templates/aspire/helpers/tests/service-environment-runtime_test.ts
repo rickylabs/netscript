@@ -5,43 +5,26 @@
  * every documented precedence category is asserted on the calls it actually
  * made — one test per category, in both directions.
  *
- * ## Which authority decides what
+ * **Which authority decides what.** This file is deliberately not the authority on
+ * how Aspire resolves two assignments to the same key — a test that reduced the
+ * recorded calls itself would keep passing if that resolution changed. Here: what
+ * the generated program *does* (which keys, which values, in which order);
+ * `lastAssigned()` reads the final assignment in call order and every assertion
+ * using it also pins that order. In `behavior.service-env` (E2E,
+ * `gates/scaffold/service-env/`): what the AppHost-started process ends up with,
+ * read from its own environment — the authority for resolution, which fails if
+ * Aspire ever stops being last-write-wins per key. `PORT` needs no ordering at
+ * all: the generator refuses it because the endpoint binding owns it, asserted
+ * here as "no assignment was made, and the endpoint still carries `env: 'PORT'`".
  *
- * This file is deliberately *not* the authority on how Aspire resolves two
- * assignments to the same key. It cannot be: the resolution happens inside the
- * Aspire runtime, and a test that reduced the recorded calls itself would keep
- * passing if that resolution changed. So the split is:
- *
- * - **here** — what the generated program *does*: which keys it assigns, with
- *   which values, and in which order. That is a property of the code under test
- *   and is fully observable. `lastAssigned()` reads the final assignment in call
- *   order; the assertions always also pin the *order*, so the claim is
- *   "the generated value is assigned after the declared one", not "Aspire
- *   resolves it that way".
- * - **`behavior.service-env`** (E2E, `gates/scaffold/service-env/`) — what the
- *   running service process actually ends up with, read out of the AppHost-started
- *   process's own environment. That gate is the authority for resolution, and it
- *   fails if Aspire ever stops being last-write-wins per key.
- *
- * `PORT` is the one category with a different rule, and it does not depend on
- * Aspire's ordering at all: the generator refuses a declared `PORT` because the
- * endpoint binding owns it (see `resolve-resource-environment.ts`). Here that is
- * asserted as "no assignment was made, and the endpoint is still registered with
- * `env: 'PORT'`".
- *
- * ## What is real here and what is a double
- *
- * - **real** — the generated `register-services.mts`, produced by the generator
- *   under test and imported as a module; `buildOtelEnvVars`,
- *   `extractServiceReferences` and `extractPluginReferences`, re-exported into
- *   the double from `@netscript/aspire/application`, which is what the generated
- *   compat module is a Node-compatible copy of. So the OTel key names and the
- *   reference extraction in this test are the shipped ones, not invented.
- * - **doubles** — `../.aspire/modules/aspire.mts` (the third-party SDK) and the
- *   compat-only helpers that have no `@netscript/aspire` counterpart. Those
- *   compute their values from the config they are handed, mirroring
- *   `_aspire-compat.ts.template`, and no assertion treats a double's value as the
- *   expected one without also pinning call order.
+ * **Real vs. double.** Real: the generated `register-services.mts`, plus
+ * `buildOtelEnvVars` / `extractServiceReferences` / `extractPluginReferences`
+ * re-exported into the double from `@netscript/aspire/application` — the module the
+ * generated compat file copies — so OTel key names and reference extraction are the
+ * shipped ones. Doubles: `../.aspire/modules/aspire.mts` (third-party SDK) and the
+ * compat-only helpers with no package counterpart, which derive their values from
+ * the config they are handed as the template does. No assertion treats a double's
+ * value as expected without also pinning call order.
  */
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
@@ -58,17 +41,18 @@ const MCP_SERVICE = 'excalidraw-mcp';
 const SIBLING_SERVICE = 'reports';
 const PRIMARY_DATABASE = 'main';
 
-/** The value the AppHost allocates at start — what a declared literal loses to. */
+/** Values the AppHost allocates at start — what a declared literal loses to. */
 const ALLOCATED_DATABASE_URL = 'postgres://allocated-by-apphost:5432/main';
-/** Endpoint the recording builder allocates for the referenced sibling service. */
 const ALLOCATED_SIBLING_ENDPOINT = `http://127.0.0.1/${SIBLING_SERVICE}/http`;
-
-/** Discovery key Aspire's service-discovery convention gives the sibling reference. */
+/** Keys the discovery convention and the compat helper derive from the topology. */
 const DISCOVERY_KEY = `services__${SIBLING_SERVICE}__http__0`;
-/** Engine URI key the compat helper derives from the primary database name. */
 const DATABASE_URI_KEY = `${PRIMARY_DATABASE.toUpperCase()}_URI`;
 
-/** One documented precedence category, and what the generated program must do with it. */
+/**
+ * One documented precedence category and what the generated program must do with
+ * it. The *reason* each category has its rule is documented once, per category, in
+ * `packages/aspire/README.md` § Resource environment.
+ */
 interface PrecedenceCase {
   /** Documented category name, as `packages/aspire/README.md` names it. */
   readonly category: string;
@@ -80,8 +64,6 @@ interface PrecedenceCase {
   readonly rule: 'declared-wins' | 'generated-wins' | 'refused';
   /** Value the generated registration assigns after the declared one, when it does. */
   readonly generated?: string;
-  /** Why this category has this rule — mirrored from the README table. */
-  readonly why: string;
 }
 
 const PRECEDENCE_CASES: readonly PrecedenceCase[] = [
@@ -90,14 +72,12 @@ const PRECEDENCE_CASES: readonly PrecedenceCase[] = [
     key: 'MCP_TRANSPORT',
     declared: 'http',
     rule: 'declared-wins',
-    why: 'nothing generated owns this key, so the declared value must reach the resource untouched',
   },
   {
     category: 'plain (second control)',
     key: 'MCP_SESSION_MODE',
     declared: 'stateless',
     rule: 'declared-wins',
-    why: 'a control per emitted block, so a category test cannot pass by the block being empty',
   },
   {
     category: 'OTel',
@@ -105,7 +85,6 @@ const PRECEDENCE_CASES: readonly PrecedenceCase[] = [
     declared: 'declared-otel-name',
     rule: 'generated-wins',
     generated: MCP_SERVICE,
-    why: 'telemetry identity is the resource identity; a declared literal would mislabel every span',
   },
   {
     category: 'database URL',
@@ -113,7 +92,6 @@ const PRECEDENCE_CASES: readonly PrecedenceCase[] = [
     declared: 'postgres://declared-by-appsettings:5432/stale',
     rule: 'generated-wins',
     generated: ALLOCATED_DATABASE_URL,
-    why: 'the connection string is allocated at AppHost start and is not knowable when config is written',
   },
   {
     category: 'database engine URI',
@@ -121,7 +99,6 @@ const PRECEDENCE_CASES: readonly PrecedenceCase[] = [
     declared: 'postgres://declared-by-appsettings:5432/stale-uri',
     rule: 'generated-wins',
     generated: ALLOCATED_DATABASE_URL,
-    why: 'the engine-specific alias carries the same allocated connection string',
   },
   {
     category: 'database provider',
@@ -129,7 +106,6 @@ const PRECEDENCE_CASES: readonly PrecedenceCase[] = [
     declared: 'declared-provider',
     rule: 'generated-wins',
     generated: PRIMARY_DATABASE,
-    why: 'the provider names the resource the AppHost actually wired, not a consumer preference',
   },
   {
     category: 'service discovery',
@@ -137,16 +113,12 @@ const PRECEDENCE_CASES: readonly PrecedenceCase[] = [
     declared: 'http://declared-by-appsettings:9/stale',
     rule: 'generated-wins',
     generated: ALLOCATED_SIBLING_ENDPOINT,
-    why: 'the referenced endpoint URL is allocated at start; a stale literal points at nothing',
   },
   {
     category: 'PORT / endpoint',
     key: 'PORT',
     declared: '59147',
     rule: 'refused',
-    why:
-      'Aspire injects PORT from the endpoint binding, a different mechanism than withEnvironment, ' +
-      'so the generator refuses it instead of relying on an ordering it cannot observe',
   },
 ];
 
@@ -253,12 +225,7 @@ function assignmentIndexes(resource: RecordingResource, key: string): number[] {
     .filter((index) => index >= 0);
 }
 
-/**
- * The value of the final assignment for a key, in call order.
- *
- * Not a claim about Aspire's resolution: every assertion that uses it also pins
- * the order of the assignments it read. See the module doc.
- */
+/** Final assignment for a key, in call order — see the module doc on authority. */
 function lastAssigned(resource: RecordingResource, key: string): string | undefined {
   const indexes = assignmentIndexes(resource, key);
   const last = indexes.at(-1);
@@ -273,13 +240,10 @@ const ASPIRE_SDK_DOUBLE = [
 ].join('\n');
 
 /**
- * Builds the `_aspire-compat.mts` stand-in.
- *
- * The three helpers that decide key names or reference sets come from
- * `@netscript/aspire/application` — the module the generated compat file copies —
- * so this test does not get to invent them. The rest are compat-only helpers with
- * no package counterpart; they derive their values from the config they are
- * handed, exactly as `_aspire-compat.ts.template` does.
+ * Builds the `_aspire-compat.mts` stand-in: the three helpers that decide key
+ * names or reference sets come from `@netscript/aspire/application`, so this test
+ * does not invent them; the rest derive their values from the config they are
+ * handed, as `_aspire-compat.ts.template` does.
  */
 function aspireCompatDouble(): string {
   const applicationModule = import.meta.resolve('@netscript/aspire/application');
@@ -331,9 +295,8 @@ function configFor(services: Record<string, ServiceEntry>): NetScriptConfig {
 
 /**
  * Writes the generated helper next to its two doubles, imports it, and runs both
- * registration passes — `registerServices` and then `wireServiceReferences`, so
- * the service-discovery category is exercised by the same real code path the
- * AppHost uses rather than skipped.
+ * registration passes — `registerServices` then `wireServiceReferences`, so the
+ * service-discovery category runs through the same code path the AppHost uses.
  */
 async function runGeneratedRegistration(
   config: NetScriptConfig,
@@ -432,7 +395,7 @@ describe('generated service registration, executed (#1447)', () => {
 
 describe('declared environment precedence, per documented category (#1447)', () => {
   for (const entry of PRECEDENCE_CASES) {
-    it(`should honor the ${entry.category} rule: ${entry.rule} — ${entry.why}`, async () => {
+    it(`should honor the ${entry.category} rule: ${entry.rule}`, async () => {
       const subject = await subjectResource();
       const indexes = assignmentIndexes(subject, entry.key);
 

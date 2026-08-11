@@ -26,3 +26,37 @@ It is redundant on the parsed path and has no services counterpart, so services 
 schema parsing (which this run fixes). Not touched: out of scope for a P0 fix, and changing it risks
 the plugin regeneration path. Deferred, no debt entry filed — it is a redundancy, not a doctrine
 violation.
+
+## 2026-08-11 — IMPL-EVAL cycle 1 `FAIL_FIX`: precedence rule amended for `PORT` (severity: significant)
+
+`plan.md` D2 documented `PORT` as "Aspire wins because endpoint allocation supplies it", with the
+declared value emitted and expected to lose. Cycle-1 finding F2 required a falsifiable both-directions
+test for that category, and building it exposed the flaw in the decision: the endpoint binding and
+`withEnvironment` are **two different mechanisms** writing the same key, and their relative order is
+internal to Aspire. The documented rule was therefore unverifiable, and if the order ran the other way
+a consumer declaring `PORT` would get a process listening where nothing proxies — configured-looking
+and unreachable.
+
+Amended: the generator now **refuses** a declared `PORT`, naming it in a generated comment (silent
+stripping is the #1447 failure mode itself). The rule is then true by construction rather than by
+race, and it is asserted at both levels — no `withEnvironment` call for `PORT` while the endpoint
+still carries `env: 'PORT'` (unit), and the declared literal absent from the running process's
+environment while Aspire's own value is present (E2E). README § Resource environment documents the
+category separately with the reason.
+
+## 2026-08-11 — archetype correction: `packages/cli` is A6, not A4 (severity: significant)
+
+Cycle-1 finding F4. `plan.md` recorded ARCHETYPE-4 for `packages/cli`; the governing profile is
+`.llm/harness/archetypes/ARCHETYPE-6-cli-tooling.md`. Consequence, not just bookkeeping: A6 adds
+F-CLI-2 (hard 500-LOC cap outside `kernel/assets/`) and F-CLI-25 (≤ 12 immediate children). Measuring
+against A6 found `service-environment-runtime_test.ts` at 536 lines — over the cap and introduced by
+this run. Trimmed to 499 rather than recorded as debt. Also measured and **recorded** rather than left
+silent: `packages/aspire/config.ts` 812 → 855 lines (new entry `aspire-config-length-1447`).
+
+## 2026-08-11 — process-level evidence is Linux-only (severity: minor)
+
+`behavior.service-env` reads `/proc/<pid>/environ` to prove the AppHost-started process observed the
+declared values. There is no portable equivalent that is not weaker, so the gate throws by name on a
+platform without `/proc` instead of degrading to a check that cannot fail. Accepted because the CLI
+E2E suites run on `ubuntu-latest` in CI and under WSL locally. Recorded here so a future Windows or
+macOS E2E lane knows this gate is a deliberate platform gap, not an oversight.
