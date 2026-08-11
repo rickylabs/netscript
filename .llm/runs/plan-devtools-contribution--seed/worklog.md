@@ -139,3 +139,25 @@ packs' `deno doc` / module-resolution runs (`jsr:@fresh/plugin-vite@^1.1.2`, `js
 docs run has no business mutating the workspace lock, and `AGENTS.md` operating rule 6 plus the
 `netscript-tools` lock-hygiene rule both bind here. Verified afterwards that nothing outside the run
 directory remains modified.
+
+## Stage-G — formal PLAN-EVAL identity proof
+
+The harness requires requested-versus-observed identity, a concrete thread id, and a worktree — not
+prose claiming an evaluator ran.
+
+| Field | Value |
+| --- | --- |
+| Lane | `formal_plan_evaluation` — opposite-family (Codex evaluates Claude-authored work) |
+| Requested route | provider `openai` · model `gpt-5.6-sol` · effort `high` |
+| **Observed route** | provider `openai` · model `gpt-5.6-sol` · effort `high` — **route verdict: matched** |
+| Thread / session id | `019ff05b-cf8b-7051-b66a-fdc52683b2f0` |
+| Rollout | `~/.codex/sessions/2026/08/11/rollout-2026-08-11T12-26-16-019ff05b-…jsonl` |
+| Worktree | `/home/codex/repos/ns-devtools-planeval` — **its own**, detached |
+| Evaluated commit | `b7cd6206762bc8f7a681526a993082c20e4cddfc` — **immutable**; cannot move under the evaluator |
+| Steering | `codex exec resume 019ff05b-cf8b-7051-b66a-fdc52683b2f0 -- "<follow-up>"` — one sender per worktree |
+| Launch path | `.llm/tools/agentic/codex/run-codex-slice.ts` via `deno task` — never ad-hoc `wsl.exe` |
+
+Dry-run preceded the real launch and validated the brief contract (`use harness` + `## SKILL`) and
+the git-safety check. **Generator ≠ evaluator holds**: every authoring lane in this run was Claude
+(Opus 5 supervisor, Fable 5 packs and sections) or Sonnet 5 (stage F); the evaluator is OpenAI Codex
+in a session that authored nothing.
