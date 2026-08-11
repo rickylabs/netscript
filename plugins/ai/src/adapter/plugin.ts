@@ -3,7 +3,13 @@
  * @module
  */
 
-import type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/adapter';
+import {
+  type InstallStarterResource,
+  type ItemScaffolder,
+  type NetScriptPlugin,
+  type ScaffoldArtifact,
+  textArtifact,
+} from '@netscript/plugin/adapter';
 import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import {
   agentResource,
@@ -28,6 +34,55 @@ import { diagnoseAiProject } from '../cli/ai-project.ts';
 
 export type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/adapter';
 
+const AI_UI_REGISTRY_ITEMS: readonly string[] = ['markdown'];
+const AI_NAMESPACE_DENO_JSON: string = JSON.stringify(
+  {
+    imports: {
+      preact: 'npm:preact@^10.27.2',
+    },
+    compilerOptions: {
+      strict: true,
+      jsx: 'precompile',
+      jsxImportSource: 'preact',
+    },
+  },
+  null,
+  2,
+) + '\n';
+
+const namespaceConfigScaffolder: ItemScaffolder<Readonly<Record<string, never>>> = {
+  name: 'namespace-config',
+  emit(): readonly ScaffoldArtifact[] {
+    return [
+      textArtifact('ai/deno.json', AI_NAMESPACE_DENO_JSON),
+    ];
+  },
+};
+
+const applicationModuleScaffolder: ItemScaffolder<Readonly<Record<string, never>>> = {
+  name: 'application-module',
+  emit(): readonly ScaffoldArtifact[] {
+    return [
+      textArtifact(
+        'ai/mod.ts',
+        `/** Generated AI application module. */\n\nexport * from './models.ts';\n`,
+      ),
+    ];
+  },
+};
+
+const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never>>> = {
+  name: 'control-plane-module',
+  emit(): readonly ScaffoldArtifact[] {
+    return [
+      textArtifact(
+        'ai/plugin.ts',
+        `/** Generated AI control-plane module. */\n\nexport { aiPlugin } from '@netscript/plugin-ai';\n`,
+      ),
+    ];
+  },
+};
+
 /**
  * Starter resources emitted by the AI install command. Default topology is
  * fully in-process: the barrel wires `@netscript/ai`, the stream route calls it
@@ -35,6 +90,9 @@ export type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/
  * persistence is intentionally excluded (opt-in via `--persist-threads`).
  */
 export const aiStarterResources: readonly InstallStarterResource[] = [
+  { scaffolder: namespaceConfigScaffolder, input: {} },
+  { scaffolder: applicationModuleScaffolder, input: {} },
+  { scaffolder: controlPlaneModuleScaffolder, input: {} },
   // Structural: model configuration is required independently of sample tools and agents.
   { scaffolder: modelsScaffolder, input: DEFAULT_MODELS_INPUT },
   {
@@ -81,6 +139,7 @@ export const aiAdapterPlugin: NetScriptPlugin = {
   install: {
     dependencySpecifier: `jsr:@netscript/plugin-ai@${PLUGIN_PACKAGE_VERSION}`,
     starterResources: aiStarterResources,
+    uiRegistryItems: AI_UI_REGISTRY_ITEMS,
     configParams: ['AI_MODEL', 'ANTHROPIC_API_KEY'],
   },
   doctor: {

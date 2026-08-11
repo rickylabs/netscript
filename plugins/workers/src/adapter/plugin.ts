@@ -3,11 +3,14 @@
  * @module
  */
 
-import type {
-  DoctorCheckSpec,
-  InstallStarterResource,
-  NetScriptPlugin,
-  PluginCommandContext,
+import {
+  type DoctorCheckSpec,
+  type InstallStarterResource,
+  type ItemScaffolder,
+  type NetScriptPlugin,
+  type PluginCommandContext,
+  type ScaffoldArtifact,
+  textArtifact,
 } from '@netscript/plugin/adapter';
 import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import { WORKERS_JOB_REGISTRY_PATH } from '../runtime/generated-jobs.ts';
@@ -25,8 +28,21 @@ import {
   workflowResource,
 } from './resources/mod.ts';
 
+const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never>>> = {
+  name: 'control-plane-module',
+  emit(): readonly ScaffoldArtifact[] {
+    return [
+      textArtifact(
+        'workers/plugin.ts',
+        `/** Generated workers control-plane module. */\n\nexport { workersPlugin } from '@netscript/plugin-workers';\n`,
+      ),
+    ];
+  },
+};
+
 /** Starter resources emitted by the workers install command. */
 export const workersStarterResources: readonly InstallStarterResource[] = [
+  { scaffolder: controlPlaneModuleScaffolder, input: {} },
   { scaffolder: jobResource.scaffolder, input: DEFAULT_JOB_INPUT, samples: { kind: 'omit' } },
   { scaffolder: taskResource.scaffolder, input: DEFAULT_TASK_INPUT, samples: { kind: 'omit' } },
   {

@@ -1,4 +1,4 @@
-import { resolve } from '@std/path';
+import { fromFileUrl, isAbsolute, resolve } from '@std/path';
 import { toFileUrl } from '@std/path/to-file-url';
 import type { NetScriptConfig } from '@netscript/config';
 import type {
@@ -9,8 +9,20 @@ import type {
 
 import type { RegisteredPluginConfig } from '../../../../kernel/domain/resolved-config.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
+import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import { loadRegisteredPluginMetadata } from '../../../../kernel/adapters/config/plugin-registry.ts';
+import { probeConfiguredPluginManifest } from '../../../../kernel/adapters/config/configured-plugin-manifest-probe.ts';
+import { resolvePluginImportSpecifier } from '../../../../kernel/application/plugin/configured-plugin-specifier.ts';
+import { getPluginServiceLookupName } from '../../../../kernel/adapters/config/plugin-registry.ts';
 import { showAuthBackend } from '../auth/auth-config.ts';
+
+export const CONFIGURED_MODULE_RESOLVES_CHECK = 'configured-module-resolves';
+export const CONFIGURED_MODULE_EXPORTS_MANIFEST_CHECK = 'configured-module-exports-manifest';
+export const SERVICE_ENTRYPOINT_RESOLVES_CHECK = 'service-entrypoint-resolves';
+
+const CONFIGURED_MODULE_RESOLVES_TITLE = 'Configured module resolves';
+const CONFIGURED_MODULE_EXPORTS_MANIFEST_TITLE = 'Configured module exports manifest';
+const SERVICE_ENTRYPOINT_RESOLVES_TITLE = 'Service entrypoint resolves';
 
 /** Health status for one plugin doctor check. */
 export type PluginDoctorCheckStatus = 'healthy' | 'warning' | 'error';
@@ -54,6 +66,15 @@ export interface PluginDoctorDependencies {
     projectRoot: string,
     config?: NetScriptConfig,
   ) => Promise<Record<string, RegisteredPluginConfig>>;
+  /** Execute configured modules in a bounded child process. */
+  readonly process: ProcessPort;
+  /** Override the configured-module probe timeout in contract tests. */
+  readonly configuredModuleTimeoutMs?: number;
+  /** Load the declared exports for one exact JSR package version. */
+  readonly loadJsrExportMap?: (
+    packageSpecifier: string,
+    version: string,
+  ) => Promise<ReadonlySet<string>>;
   /** Inspect the running Aspire AppHost for configured resource truth. */
   readonly inspectAppHost?: AppHostInspector;
 }
@@ -91,10 +112,19 @@ export async function doctorPlugin(
   }
 
   const pluginSpecs = resolvePluginSpecs(config);
+  const configuredModuleChecks = await Promise.all(
+    pluginSpecs.map((spec) => checkConfiguredModule(input.projectRoot, spec, dependencies)),
+  );
+  const serviceChecks = await checkServiceEntrypoints(input.projectRoot, dependencies);
   const appHostReport = dependencies.inspectAppHost
     ? await diagnoseAppHost(input.projectRoot, config, dependencies.inspectAppHost)
     : undefined;
-  if (pluginSpecs.length === 0) return appHostReport ? [appHostReport] : [];
+  if (pluginSpecs.length === 0) {
+    const serviceReport = serviceChecks.some((entry) => entry.check.status === 'error')
+      ? workspaceChecksReport(serviceChecks)
+      : undefined;
+    return [appHostReport, serviceReport].filter(isPluginDoctorReport);
+  }
 
   let plugins: Record<string, RegisteredPluginConfig>;
   try {
@@ -105,10 +135,25 @@ export async function doctorPlugin(
     return [workspaceErrorReport('manifest-resolution', 'Could not resolve plugin manifests.', error)];
   }
 
-  const reports = await Promise.all(
-    Object.values(plugins).map((plugin) => diagnosePlugin(input.projectRoot, plugin, dependencies)),
+  const pluginEntries = Object.entries(plugins);
+  const pluginKeys = new Set(pluginEntries.map(([key]) => key));
+  const unmatchedServiceChecks = serviceChecks.filter((entry) =>
+    entry.pluginKey !== undefined && !pluginKeys.has(getPluginServiceLookupName(entry.pluginKey))
   );
-  return appHostReport ? [appHostReport, ...reports] : reports;
+  const reports = await Promise.all(
+    pluginEntries.map(([key, plugin], index) =>
+      diagnosePlugin(input.projectRoot, plugin, dependencies, [
+        ...(configuredModuleChecks[index] ?? []),
+        ...serviceChecks.filter((check) =>
+          check.pluginKey === undefined || getPluginServiceLookupName(check.pluginKey) === key
+        ).map((check) => check.check),
+      ])
+    ),
+  );
+  const unmatchedServiceReport = unmatchedServiceChecks.length > 0
+    ? workspaceChecksReport(unmatchedServiceChecks)
+    : undefined;
+  return [appHostReport, ...reports, unmatchedServiceReport].filter(isPluginDoctorReport);
 }
 
 async function diagnoseAppHost(
@@ -192,9 +237,10 @@ async function diagnosePlugin(
   projectRoot: string,
   plugin: RegisteredPluginConfig,
   dependencies: PluginDoctorDependencies,
+  invariantChecks: readonly PluginDoctorCheck[],
 ): Promise<PluginDoctorReport> {
   if (plugin.manifestError) {
-    const checks: PluginDoctorCheck[] = [{
+    const checks: PluginDoctorCheck[] = [...invariantChecks, {
       id: 'manifest-resolution',
       title: 'Manifest resolved',
       status: 'error',
@@ -204,6 +250,7 @@ async function diagnosePlugin(
   }
 
   const checks: PluginDoctorCheck[] = [
+    ...invariantChecks,
     {
       id: 'manifest',
       title: 'Manifest resolved',
@@ -221,6 +268,233 @@ async function diagnosePlugin(
     status: aggregateStatus(checks),
     checks,
   };
+}
+
+async function checkConfiguredModule(
+  projectRoot: string,
+  spec: string,
+  dependencies: PluginDoctorDependencies,
+): Promise<readonly PluginDoctorCheck[]> {
+  const importSpecifier = resolvePluginImportSpecifier(projectRoot, spec);
+  const localModule = importSpecifier.startsWith('file:');
+  if (localModule) {
+    const path = fromFileUrl(importSpecifier);
+    if (!await dependencies.fs.exists(path)) {
+      return [
+        check(CONFIGURED_MODULE_RESOLVES_CHECK, CONFIGURED_MODULE_RESOLVES_TITLE, 'error',
+          `Configured plugin module "${spec}" does not exist at ${path}.`),
+        check(
+          CONFIGURED_MODULE_EXPORTS_MANIFEST_CHECK,
+          CONFIGURED_MODULE_EXPORTS_MANIFEST_TITLE,
+          'error',
+          `Manifest export was not checked because configured module "${spec}" is missing.`,
+        ),
+      ];
+    }
+  }
+
+  const probe = await probeConfiguredPluginManifest(projectRoot, spec, dependencies.process, {
+    timeoutMs: dependencies.configuredModuleTimeoutMs,
+  });
+  const resolves = check(
+    CONFIGURED_MODULE_RESOLVES_CHECK,
+    CONFIGURED_MODULE_RESOLVES_TITLE,
+    localModule || probe.status === 'resolved' || probe.status === 'missing' ||
+        probe.status === 'ambiguous'
+      ? 'healthy'
+      : 'error',
+    localModule || probe.status === 'resolved' || probe.status === 'missing' ||
+        probe.status === 'ambiguous'
+      ? spec
+      : formatProbeFailure(spec, probe),
+  );
+  const exportsManifest = probe.status === 'resolved'
+    ? check(
+      CONFIGURED_MODULE_EXPORTS_MANIFEST_CHECK,
+      CONFIGURED_MODULE_EXPORTS_MANIFEST_TITLE,
+      'healthy',
+      spec,
+    )
+    : check(
+      CONFIGURED_MODULE_EXPORTS_MANIFEST_CHECK,
+      CONFIGURED_MODULE_EXPORTS_MANIFEST_TITLE,
+      'error',
+      formatProbeFailure(spec, probe),
+    );
+  return [resolves, exportsManifest];
+}
+
+function formatProbeFailure(
+  spec: string,
+  probe: Awaited<ReturnType<typeof probeConfiguredPluginManifest>>,
+): string {
+  switch (probe.status) {
+    case 'timeout':
+      return `Configured plugin module "${spec}" timed out after ${probe.timeoutMs}ms.`;
+    case 'non-zero':
+      return `Configured plugin module "${spec}" exited non-zero (${probe.code}): ${probe.message}`;
+    case 'import-failure':
+      return `Configured plugin module "${spec}" failed to import: ${probe.message}`;
+    case 'missing':
+      return `Configured plugin module "${spec}" exports no manifest-shaped value.`;
+    case 'ambiguous':
+      return `Configured plugin module "${spec}" exports ${probe.count} named manifest-shaped values and no default manifest.`;
+    case 'resolved':
+      return spec;
+  }
+}
+
+interface ServiceEntrypointCheck {
+  readonly pluginKey?: string;
+  readonly check: PluginDoctorCheck;
+}
+
+async function checkServiceEntrypoints(
+  projectRoot: string,
+  dependencies: PluginDoctorDependencies,
+): Promise<readonly ServiceEntrypointCheck[]> {
+  const appsettingsPath = resolve(projectRoot, 'appsettings.json');
+  if (!await dependencies.fs.exists(appsettingsPath)) {
+    return [{
+      check: check(
+        SERVICE_ENTRYPOINT_RESOLVES_CHECK,
+        SERVICE_ENTRYPOINT_RESOLVES_TITLE,
+        'healthy',
+        'No plugin service entrypoints are configured.',
+      ),
+    }];
+  }
+
+  let document: unknown;
+  try {
+    document = JSON.parse(await dependencies.fs.readFile(appsettingsPath));
+  } catch (error) {
+    return [{
+      check: check(
+        SERVICE_ENTRYPOINT_RESOLVES_CHECK,
+        SERVICE_ENTRYPOINT_RESOLVES_TITLE,
+        'error',
+        `Could not read appsettings plugin entrypoints: ${errorMessage(error)}`,
+      ),
+    }];
+  }
+  const entries = readPluginEntries(document);
+  if (entries.length === 0) {
+    return [{
+      check: check(
+        SERVICE_ENTRYPOINT_RESOLVES_CHECK,
+        SERVICE_ENTRYPOINT_RESOLVES_TITLE,
+        'healthy',
+        'No plugin service entrypoints are configured.',
+      ),
+    }];
+  }
+
+  return await Promise.all(entries.map(async (entry): Promise<ServiceEntrypointCheck> => ({
+    pluginKey: entry.key,
+    check: await checkServiceEntrypoint(projectRoot, entry, dependencies),
+  })));
+}
+
+interface AppsettingsPluginEntrypoint {
+  readonly key: string;
+  readonly entrypoint: string;
+  readonly workdir: string;
+}
+
+function readPluginEntries(value: unknown): readonly AppsettingsPluginEntrypoint[] {
+  if (!value || typeof value !== 'object') return [];
+  const netscript = Reflect.get(value, 'NetScript');
+  if (!netscript || typeof netscript !== 'object') return [];
+  const plugins = Reflect.get(netscript, 'Plugins');
+  if (!plugins || typeof plugins !== 'object') return [];
+  return Object.entries(plugins).flatMap(([key, entry]) => {
+    if (!entry || typeof entry !== 'object') return [];
+    const entrypoint = Reflect.get(entry, 'Entrypoint');
+    const workdir = Reflect.get(entry, 'Workdir');
+    return typeof entrypoint === 'string'
+      ? [{ key, entrypoint, workdir: typeof workdir === 'string' ? workdir : '.' }]
+      : [];
+  });
+}
+
+async function checkServiceEntrypoint(
+  projectRoot: string,
+  entry: AppsettingsPluginEntrypoint,
+  dependencies: PluginDoctorDependencies,
+): Promise<PluginDoctorCheck> {
+  const jsr = parseJsrEntrypoint(entry.entrypoint);
+  if (jsr) {
+    try {
+      if (!dependencies.loadJsrExportMap) {
+        throw new Error('JSR export-map loader is unavailable.');
+      }
+      const exports = await dependencies.loadJsrExportMap(jsr.packageSpecifier, jsr.version);
+      const exists = exports.has(jsr.exportKey);
+      return check(
+        SERVICE_ENTRYPOINT_RESOLVES_CHECK,
+        SERVICE_ENTRYPOINT_RESOLVES_TITLE,
+        exists ? 'healthy' : 'error',
+        exists
+          ? entry.entrypoint
+          : `${entry.entrypoint} is not declared in ${jsr.packageSpecifier}@${jsr.version}'s export map.`,
+      );
+    } catch (error) {
+      return check(
+        SERVICE_ENTRYPOINT_RESOLVES_CHECK,
+        SERVICE_ENTRYPOINT_RESOLVES_TITLE,
+        'error',
+        `Could not verify ${entry.entrypoint}: ${errorMessage(error)}`,
+      );
+    }
+  }
+
+  const path = isAbsolute(entry.entrypoint)
+    ? entry.entrypoint
+    : resolve(projectRoot, entry.workdir, entry.entrypoint);
+  const exists = await dependencies.fs.exists(path);
+  return check(
+    SERVICE_ENTRYPOINT_RESOLVES_CHECK,
+    SERVICE_ENTRYPOINT_RESOLVES_TITLE,
+    exists ? 'healthy' : 'error',
+    exists ? entry.entrypoint : `${entry.entrypoint} does not exist at ${path}.`,
+  );
+}
+
+function parseJsrEntrypoint(value: string): {
+  readonly packageSpecifier: string;
+  readonly version: string;
+  readonly exportKey: string;
+} | undefined {
+  const match = /^jsr:(@[^/]+\/[^@/]+)@([^/]+)(\/.*)?$/.exec(value);
+  if (!match) return undefined;
+  return {
+    packageSpecifier: match[1],
+    version: match[2],
+    exportKey: match[3] ? `.${match[3]}` : '.',
+  };
+}
+
+function check(
+  id: string,
+  title: string,
+  status: PluginDoctorCheckStatus,
+  message: string,
+): PluginDoctorCheck {
+  return { id, title, status, message };
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function workspaceChecksReport(checks: readonly ServiceEntrypointCheck[]): PluginDoctorReport {
+  const flattened = checks.map((entry) => entry.check);
+  return { pluginName: 'workspace', status: aggregateStatus(flattened), checks: flattened };
+}
+
+function isPluginDoctorReport(value: PluginDoctorReport | undefined): value is PluginDoctorReport {
+  return value !== undefined;
 }
 
 async function checkAuthBackend(
@@ -344,7 +618,7 @@ function isNetScriptPlugin(value: unknown): value is NetScriptPlugin {
 }
 
 function resolvePluginSpecs(config: NetScriptConfig): readonly string[] {
-  return (config as NetScriptConfig & { readonly plugins?: readonly string[] }).plugins ?? [];
+  return config.plugins;
 }
 
 function workspaceErrorReport(

@@ -14,10 +14,10 @@ export interface OfficialPluginSource {
   readonly canonicalName: string;
   readonly pluginDir: string;
   readonly backgroundDir?: string;
-  readonly serviceEntrypoint: string;
+  readonly serviceEntrypoint?: string;
   readonly backgroundEntrypoint?: string;
-  readonly serviceConfigKey: string;
-  readonly servicePort: number;
+  readonly serviceConfigKey?: string;
+  readonly servicePort?: number;
   readonly backgroundPort: number;
   readonly dependencies: readonly OfficialPluginDependency[];
   readonly pluginReferences?: readonly string[];
@@ -46,12 +46,12 @@ export interface OfficialPluginCopyResult {
   readonly pluginDir: string;
   /** Optional root background workspace directory. */
   readonly backgroundDir: string | null;
-  /** Plugin API config key. */
-  readonly serviceConfigKey: string;
-  /** Plugin API port. */
-  readonly servicePort: number;
-  /** Entrypoint used by the plugin API service. */
-  readonly serviceEntrypoint: string;
+  /** Plugin API config key, omitted when the plugin has no service. */
+  readonly serviceConfigKey?: string;
+  /** Plugin API port, omitted when the plugin has no service. */
+  readonly servicePort?: number;
+  /** Entrypoint used by the plugin API service, omitted when no service exists. */
+  readonly serviceEntrypoint?: string;
   /** Background processor port from the official source. */
   readonly backgroundPort: number;
   /** Optional background processor entrypoint. */
@@ -94,10 +94,10 @@ interface OfficialSourceManifest {
   readonly canonicalName: string;
   readonly pluginDir?: string;
   readonly backgroundDir?: string;
-  readonly serviceEntrypoint: string;
+  readonly serviceEntrypoint?: string;
   readonly backgroundEntrypoint?: string;
-  readonly serviceConfigKey: string;
-  readonly servicePort: number;
+  readonly serviceConfigKey?: string;
+  readonly servicePort?: number;
   readonly backgroundPort: number;
   readonly requiresDb?: boolean;
   readonly requiresKv?: boolean;
@@ -218,7 +218,7 @@ async function discoverOfficialPluginSources(
 
   for (const entry of entries) {
     const source = entry.manifest.officialSource;
-    if (!source) continue;
+    if (!source || !hasOfficialService(source)) continue;
     sourcesByPluginDir.set(source.pluginDir ?? entry.pluginDir, {
       pluginDir: source.pluginDir ?? entry.pluginDir,
       configKey: source.serviceConfigKey,
@@ -239,10 +239,14 @@ async function discoverOfficialPluginSources(
       canonicalName: source.canonicalName,
       pluginDir: source.pluginDir ?? entry.pluginDir,
       backgroundDir: source.backgroundDir,
-      serviceEntrypoint: source.serviceEntrypoint,
       backgroundEntrypoint: source.backgroundEntrypoint,
-      serviceConfigKey: source.serviceConfigKey,
-      servicePort: source.servicePort,
+      ...(hasOfficialService(source)
+        ? {
+          serviceEntrypoint: source.serviceEntrypoint,
+          serviceConfigKey: source.serviceConfigKey,
+          servicePort: source.servicePort,
+        }
+        : {}),
       backgroundPort: source.backgroundPort,
       dependencies: (source.dependencies ?? []).map((pluginDir) =>
         resolveDependency(sourcesByPluginDir, pluginDir)
@@ -252,6 +256,18 @@ async function discoverOfficialPluginSources(
   }
 
   return result;
+}
+
+function hasOfficialService(
+  source: OfficialSourceManifest,
+): source is OfficialSourceManifest & {
+  readonly serviceEntrypoint: string;
+  readonly serviceConfigKey: string;
+  readonly servicePort: number;
+} {
+  return source.serviceEntrypoint !== undefined &&
+    source.serviceConfigKey !== undefined &&
+    source.servicePort !== undefined;
 }
 
 function resolveDependency(

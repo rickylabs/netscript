@@ -2,8 +2,10 @@ import { assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
 import { fromFileUrl } from "@std/path/from-file-url";
 import { join } from "@std/path";
 import { LocalProjectFiles } from "@netscript/plugin/cli";
+import { defineConfig } from '@netscript/config';
 
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
+import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import { createDoctorPluginCommand } from './doctor-plugin-command.ts';
 import { FilesystemDiagnosticEvidence } from '@netscript/mcp';
@@ -15,11 +17,21 @@ import { PLUGIN_PACKAGE_VERSION as WORKERS_PACKAGE_VERSION } from '../../../../.
 import { generateSagaRegistry } from '../../../../../../../plugins/sagas/src/cli/registry-generator.ts';
 import { AspireAppHostDoctorInspector } from '../../../../kernel/adapters/aspire/apphost-doctor-inspector.ts';
 import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/process-port.ts';
+import { loadRegisteredPluginMetadata } from '../../../../kernel/adapters/config/plugin-registry.ts';
 
 const NOOP_EVIDENCE: DiagnosticEvidencePort = {
   read: () => Promise.resolve(undefined),
   write: () => Promise.resolve(),
   appendDrift: () => Promise.resolve(),
+};
+
+const HEALTHY_MODULE_PROCESS: ProcessPort = {
+  exec: () =>
+    Promise.resolve({
+      code: 0,
+      stdout: 'NETSCRIPT_PLUGIN_MANIFEST_PROBE={"status":"resolved"}\n',
+      stderr: '',
+    }),
 };
 
 Deno.test("plugin doctor writes a successful evidence receipt after an actual run", async () => {
@@ -39,10 +51,59 @@ Deno.test("plugin doctor writes a successful evidence receipt after an actual ru
   }
 });
 
+Deno.test('plugin doctor reports configured-module workdirs across first-party topology shapes', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  const pluginNames = ['ai', 'auth', 'streams', 'workers'];
+  try {
+    for (const pluginName of pluginNames) {
+      const pluginRoot = join(projectRoot, pluginName);
+      await Deno.mkdir(pluginRoot, { recursive: true });
+      await Deno.writeTextFile(join(pluginRoot, 'mod.ts'), 'export {};\n');
+      await Deno.copyFile(
+        fromFileUrl(
+          new URL(`../../../../../../../plugins/${pluginName}/scaffold.plugin.json`, import.meta.url),
+        ),
+        join(pluginRoot, 'scaffold.plugin.json'),
+      );
+    }
+    const config = defineConfig({
+      name: 'fixture-app',
+      databases: { config: [] },
+      plugins: pluginNames.map((pluginName) => `./${pluginName}/mod.ts`),
+    });
+    const registered = await loadRegisteredPluginMetadata(projectRoot, config);
+    const pluginsWithoutDoctor = Object.fromEntries(
+      Object.entries(registered).map(([key, plugin]) => {
+        const { doctor: _doctor, ...pluginWithoutDoctor } = plugin;
+        return [key, pluginWithoutDoctor];
+      }),
+    );
+
+    const reports = await doctorPlugin({ projectRoot }, {
+      fs: new DenoFileSystem(),
+      process: HEALTHY_MODULE_PROCESS,
+      loadConfig: () => Promise.resolve(config),
+      loadRegisteredPlugins: () => Promise.resolve(pluginsWithoutDoctor),
+    });
+
+    assertEquals(reports.map((report) => report.pluginName).sort(), [...pluginNames]);
+    for (const report of reports) {
+      assertEquals(report.status, 'healthy');
+      assertEquals(
+        report.checks.find((check) => check.id === 'workdir')?.message,
+        report.pluginName,
+      );
+    }
+  } finally {
+    await Deno.remove(projectRoot, { recursive: true });
+  }
+});
+
 Deno.test("plugin doctor exits non-zero when generated registries are absent", async () => {
   const projectRoot = "/workspace";
   const fs = new MemoryFileSystemAdapter();
   await fs.createDir(`${projectRoot}/plugins/workers`);
+  await fs.writeFile(`${projectRoot}/plugins/workers/mod.ts`, 'export {};\n');
   const workersRoot = fromFileUrl(
     new URL("../../../../../../../plugins/workers/", import.meta.url),
   );
@@ -54,6 +115,7 @@ Deno.test("plugin doctor exits non-zero when generated registries are absent", a
     doctor: (input) =>
       doctorPlugin(input, {
         fs,
+        process: HEALTHY_MODULE_PROCESS,
         loadConfig: () =>
           Promise.resolve({ plugins: ["./plugins/workers/mod.ts"] } as never),
         loadRegisteredPlugins: () =>
@@ -161,6 +223,7 @@ Deno.test("plugin doctor accepts the real shared sagas generator output and exit
 Deno.test("plugin doctor reports visible validation issues by field", async () => {
   const reports = await doctorPlugin({ projectRoot: "/workspace" }, {
     fs: new MemoryFileSystemAdapter(),
+    process: HEALTHY_MODULE_PROCESS,
     loadConfig: () =>
       Promise.reject({
         issues: [{
@@ -176,6 +239,7 @@ Deno.test("plugin doctor reports visible validation issues by field", async () =
 Deno.test('plugin doctor distinguishes an absent AppHost from unhealthy resources', async () => {
   const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
     fs: new MemoryFileSystemAdapter(),
+    process: HEALTHY_MODULE_PROCESS,
     loadConfig: () => Promise.resolve(configWithResources()),
     inspectAppHost: { inspect: () => Promise.resolve({ status: 'not-running' }) },
   });
@@ -192,6 +256,7 @@ Deno.test('plugin doctor warns and exits zero when Aspire inspection is unavaila
     doctor: (input) =>
       doctorPlugin(input, {
         fs: new MemoryFileSystemAdapter(),
+        process: HEALTHY_MODULE_PROCESS,
         loadConfig: () => Promise.resolve(configWithResources()),
         inspectAppHost: new AspireAppHostDoctorInspector(new MissingAspireProcess()),
       }),
@@ -235,6 +300,7 @@ Deno.test('plugin doctor reports normally when diagnostic evidence cannot be wri
 Deno.test('plugin doctor reports configured resources missing from the running AppHost by name', async () => {
   const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
     fs: new MemoryFileSystemAdapter(),
+    process: HEALTHY_MODULE_PROCESS,
     loadConfig: () => Promise.resolve(configWithResources()),
     inspectAppHost: {
       inspect: () => Promise.resolve({
@@ -255,6 +321,7 @@ Deno.test('plugin doctor reports configured resources missing from the running A
 Deno.test('plugin doctor reports a running but unhealthy AppHost resource', async () => {
   const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
     fs: new MemoryFileSystemAdapter(),
+    process: HEALTHY_MODULE_PROCESS,
     loadConfig: () => Promise.resolve(configWithResources()),
     inspectAppHost: {
       inspect: () => Promise.resolve({
@@ -275,6 +342,7 @@ Deno.test('plugin doctor reports a running but unhealthy AppHost resource', asyn
 Deno.test('plugin doctor does not certify healthy without readiness evidence', async () => {
   const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
     fs: new MemoryFileSystemAdapter(),
+    process: HEALTHY_MODULE_PROCESS,
     loadConfig: () => Promise.resolve(configWithResources()),
     inspectAppHost: {
       inspect: () => Promise.resolve({
@@ -295,6 +363,7 @@ Deno.test('plugin doctor does not certify healthy without readiness evidence', a
 Deno.test('plugin doctor maps realistic database config names without inventing section resources', async () => {
   const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
     fs: new MemoryFileSystemAdapter(),
+    process: HEALTHY_MODULE_PROCESS,
     loadConfig: () => Promise.resolve(configWithResources()),
     inspectAppHost: {
       inspect: () => Promise.resolve({
@@ -321,6 +390,7 @@ Deno.test('plugin doctor maps realistic database config names without inventing 
 Deno.test('plugin manifest import failures degrade to an error report', async () => {
   const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
     fs: new MemoryFileSystemAdapter(),
+    process: HEALTHY_MODULE_PROCESS,
     loadConfig: () =>
       Promise.resolve({ plugins: ["./plugins/broken/mod.ts"] } as never),
     loadRegisteredPlugins: () =>
@@ -339,6 +409,7 @@ Deno.test("one unloadable plugin doctor does not suppress a healthy plugin repor
   await fs.createDir("/workspace/plugins/healthy");
   const reports = await doctorPlugin({ projectRoot: "/workspace" }, {
     fs,
+    process: HEALTHY_MODULE_PROCESS,
     loadConfig: () =>
       Promise.resolve({ plugins: ["broken", "healthy"] } as never),
     loadRegisteredPlugins: () =>
@@ -376,6 +447,7 @@ async function assertWorkersCommandPasses(
   const projectRoot = "/workspace";
   const fs = new MemoryFileSystemAdapter();
   await fs.createDir(`${projectRoot}/plugins/workers`);
+  await fs.writeFile(`${projectRoot}/plugins/workers/mod.ts`, 'export {};\n');
   await fs.writeFile(
     `${projectRoot}/.netscript/generated/plugin-workers/job-registry.ts`,
     registrySource,
@@ -390,6 +462,7 @@ async function assertWorkersCommandPasses(
     doctor: (input) =>
       doctorPlugin(input, {
         fs,
+        process: HEALTHY_MODULE_PROCESS,
         loadConfig: () =>
           Promise.resolve({ plugins: ["./plugins/workers/mod.ts"] } as never),
         loadRegisteredPlugins: () =>
@@ -428,6 +501,7 @@ async function assertSagaCommandPasses(registrySource: string): Promise<void> {
   const projectRoot = "/workspace";
   const fs = new MemoryFileSystemAdapter();
   await fs.createDir(`${projectRoot}/plugins/sagas`);
+  await fs.writeFile(`${projectRoot}/plugins/sagas/mod.ts`, 'export {};\n');
   await fs.writeFile(
     `${projectRoot}/.netscript/generated/plugin-sagas/sagas.registry.ts`,
     registrySource,
@@ -442,6 +516,7 @@ async function assertSagaCommandPasses(registrySource: string): Promise<void> {
     doctor: (input) =>
       doctorPlugin(input, {
         fs,
+        process: HEALTHY_MODULE_PROCESS,
         loadConfig: () =>
           Promise.resolve({ plugins: ["./plugins/sagas/mod.ts"] } as never),
         loadRegisteredPlugins: () =>

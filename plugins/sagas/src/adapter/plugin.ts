@@ -3,11 +3,14 @@
  * @module
  */
 
-import type {
-  DoctorCheckSpec,
-  InstallStarterResource,
-  NetScriptPlugin,
-  PluginCommandContext,
+import {
+  type DoctorCheckSpec,
+  type InstallStarterResource,
+  type ItemScaffolder,
+  type NetScriptPlugin,
+  type PluginCommandContext,
+  type ScaffoldArtifact,
+  textArtifact,
 } from '@netscript/plugin/adapter';
 import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import { SAGAS_REGISTRY_PATH } from '../cli/registry-generator.ts';
@@ -22,8 +25,21 @@ import {
   sagaResource,
 } from './resources/mod.ts';
 
+const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never>>> = {
+  name: 'control-plane-module',
+  emit(): readonly ScaffoldArtifact[] {
+    return [
+      textArtifact(
+        'sagas/plugin.ts',
+        `/** Generated sagas control-plane module. */\n\nexport { sagasPlugin } from '@netscript/plugin-sagas';\n`,
+      ),
+    ];
+  },
+};
+
 /** Starter resources emitted by the sagas install command. */
 export const sagasStarterResources: readonly InstallStarterResource[] = [
+  { scaffolder: controlPlaneModuleScaffolder, input: {} },
   { scaffolder: sagaResource.scaffolder, input: DEFAULT_SAGA_INPUT, samples: { kind: 'omit' } },
   {
     scaffolder: barrelScaffolder,

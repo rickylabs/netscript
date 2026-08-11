@@ -22,6 +22,8 @@ export interface ScaffoldResult {
   readonly modifiedFiles: readonly string[];
   /** Whether database migration or schema files were added or planned. */
   readonly databaseMigrationsAdded: boolean;
+  /** Optional first-party UI registry items required by the emitted userland surface. */
+  readonly uiRegistryItems?: readonly string[];
 }
 
 /** Entrypoint signature implemented by plugin-owned `./scaffold` exports. */

@@ -7,6 +7,9 @@ import { runScaffoldTest } from '../test-scaffold/run-scaffold-test.ts';
 import { syncPackages } from '../sync/packages/sync-packages.ts';
 import { syncPlugin } from '../sync/plugin/sync-plugin.ts';
 import { syncTemplates } from '../sync/templates/sync-templates.ts';
+import { getOfficialPluginSource } from '../../adapters/official-plugin-source.ts';
+import { createOfficialPluginCopier } from '../../infra/official-plugin-copier.ts';
+import { writeSourceFile } from '../sync/plugin/copy-official-plugin-test-support.ts';
 
 describe('maintainer application services', () => {
   it('syncPackages delegates to the package copier port', async () => {
@@ -55,6 +58,63 @@ describe('maintainer application services', () => {
     assertEquals(result.sourceRoot, '/repo');
     assertEquals(result.pluginName, 'workers');
     assertEquals(result.workspaceMembers, ['./workers']);
+  });
+
+  it('syncPlugin carries a service-less official source without service metadata', async () => {
+    const sourceRoot = await Deno.makeTempDir();
+    const targetPath = await Deno.makeTempDir();
+    await writeSourceFile(sourceRoot, 'packages/cli/bin/netscript.ts', 'export {};\n');
+    await writeSourceFile(sourceRoot, 'plugins/service-less/mod.ts', 'export {};\n');
+    await writeSourceFile(
+      sourceRoot,
+      'plugins/service-less/deno.json',
+      JSON.stringify({ name: '@netscript/plugin-service-less', imports: {} }),
+    );
+    await writeSourceFile(
+      sourceRoot,
+      'plugins/service-less/scaffold.plugin.json',
+      JSON.stringify({
+        provider: {
+          kind: 'service-less',
+          displayName: 'Service-less plugin',
+          category: 'plugin',
+          portRangeKey: 'PLUGIN_API',
+          defaultPermissions: [],
+          watchFlag: '--watch',
+          defaultEntrypoint: 'mod.ts',
+          defaultRequiresDb: false,
+          defaultRequiresKv: false,
+          pluginType: 'utility',
+          supportsConcurrency: false,
+          concurrencyEnvVar: null,
+          defaultConcurrency: null,
+          defaultTelemetry: true,
+          infrastructureRequires: [],
+          infrastructureOptionalDeps: [],
+        },
+        officialSource: {
+          canonicalName: 'service-less',
+          pluginDir: 'service-less',
+          backgroundPort: 8124,
+        },
+      }),
+    );
+
+    const result = await syncPlugin({
+      sourceRoot,
+      targetPath,
+      projectName: 'demo',
+      kind: 'service-less',
+    }, {
+      getSource: getOfficialPluginSource,
+      findSourceRoot: () => Promise.resolve(null),
+      copyPlugin: createOfficialPluginCopier(),
+    });
+
+    assertEquals(result.pluginName, 'service-less');
+    assertEquals(Object.hasOwn(result, 'serviceConfigKey'), false);
+    assertEquals(Object.hasOwn(result, 'servicePort'), false);
+    assertEquals(Object.hasOwn(result, 'serviceEntrypoint'), false);
   });
 
   it('syncTemplates runs all registered steps in order', async () => {

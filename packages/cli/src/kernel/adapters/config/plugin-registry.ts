@@ -4,8 +4,7 @@
  * Helpers for loading and normalizing the local plugin registry.
  */
 
-import { dirname, join, resolve } from '@std/path';
-import { toFileUrl } from '@std/path/to-file-url';
+import { dirname, join, relative, resolve } from '@std/path';
 import type { NetScriptConfig, PathsConfig } from '@netscript/config';
 import type { PluginManifest } from '@netscript/plugin';
 import type {
@@ -16,9 +15,17 @@ import type { PluginInfrastructureDependency } from '../../domain/plugin-kind.ts
 import { ConfigError } from '../../domain/errors/cli-exit-error.ts';
 import { loadProjectConfig } from './project-config-loader.ts';
 import { DenoProcess } from '../runtime/process/deno-process.ts';
+import { resolveExportedPluginManifest } from '../../application/plugin/exported-plugin-manifest.ts';
+import { resolvePluginImportSpecifier } from '../../application/plugin/configured-plugin-specifier.ts';
 
 const PLUGIN_DEPENDENCY_MISSING_EXIT_CODE = 76;
 const SCAFFOLD_PLUGIN_MANIFEST = 'scaffold.plugin.json';
+const CONFIGURED_PLUGIN_MANIFEST_RESULT_PREFIX = 'NETSCRIPT_CONFIGURED_PLUGIN_MANIFESTS=';
+const CONFIGURED_PLUGIN_MANIFEST_LOAD_TIMEOUT_MS = 30_000;
+const CONFIGURED_PLUGIN_MANIFEST_LOADER = new URL(
+  './configured-plugin-manifest-loader-child.ts',
+  import.meta.url,
+).href;
 
 type RegisteredPluginSnapshot = Pick<
   RegisteredPluginConfig,
@@ -60,6 +67,11 @@ interface ScaffoldPluginMetadata {
     readonly doctorEntrypoint?: string;
     readonly permissions?: readonly string[];
   };
+}
+
+interface ResolvedScaffoldPluginMetadata {
+  readonly metadata: ScaffoldPluginMetadata;
+  readonly moduleDirectory: string;
 }
 
 function normalizePath(path: string): string {
@@ -124,10 +136,10 @@ async function resolvePluginConfigSnapshot(
   projectRoot: string,
   config?: NetScriptConfig,
 ): Promise<RegisteredPluginSnapshot[]> {
-  const manifests: PluginManifest[] = [];
-  for (const spec of resolvePluginSpecs(config)) {
-    manifests.push(await resolvePluginManifest(projectRoot, spec));
-  }
+  const specs = resolvePluginSpecs(config);
+  const manifests = await readOptionalTextFile(join(projectRoot, 'deno.json')) === null
+    ? await resolvePluginManifestsInProcess(projectRoot, specs)
+    : await resolvePluginManifestsWithProjectConfig(projectRoot, specs);
 
   const installedPluginNames = new Set(manifests.map((manifest) => manifest.name));
   for (const manifest of manifests) {
@@ -135,6 +147,72 @@ async function resolvePluginConfigSnapshot(
   }
 
   return manifests.map((manifest) => resolveRegisteredPluginSnapshot(manifest, config));
+}
+
+async function resolvePluginManifestsInProcess(
+  projectRoot: string,
+  specs: readonly string[],
+): Promise<PluginManifest[]> {
+  const manifests: PluginManifest[] = [];
+  for (const spec of specs) {
+    manifests.push(await resolvePluginManifest(projectRoot, spec));
+  }
+  return manifests;
+}
+
+async function resolvePluginManifestsWithProjectConfig(
+  projectRoot: string,
+  specs: readonly string[],
+): Promise<PluginManifest[]> {
+  const moduleSpecifiers = specs.map((spec) => resolvePluginImportSpecifier(projectRoot, spec));
+  const result = await new DenoProcess().exec(
+    'deno',
+    [
+      'run',
+      '--no-check',
+      '--allow-read',
+      '--allow-net',
+      '--deny-env',
+      '--minimum-dependency-age=0',
+      '--config',
+      join(projectRoot, 'deno.json'),
+      CONFIGURED_PLUGIN_MANIFEST_LOADER,
+      JSON.stringify(moduleSpecifiers),
+    ],
+    {
+      cwd: projectRoot,
+      clearEnv: true,
+      timeoutMs: CONFIGURED_PLUGIN_MANIFEST_LOAD_TIMEOUT_MS,
+    },
+  );
+  if (result.timedOut) {
+    throw new Error(
+      `Configured plugin modules did not load within ${CONFIGURED_PLUGIN_MANIFEST_LOAD_TIMEOUT_MS}ms.`,
+    );
+  }
+  if (result.code !== 0) {
+    throw new Error(result.stderr.trim() || result.stdout.trim() || 'Configured plugin load failed.');
+  }
+
+  const line = result.stdout.split('\n').findLast((candidate) =>
+    candidate.startsWith(CONFIGURED_PLUGIN_MANIFEST_RESULT_PREFIX)
+  );
+  if (!line) {
+    throw new Error('Configured plugin loader returned no manifest result.');
+  }
+  const parsed: unknown = JSON.parse(line.slice(CONFIGURED_PLUGIN_MANIFEST_RESULT_PREFIX.length));
+  if (!Array.isArray(parsed) || !parsed.every(isSerializedPluginManifest)) {
+    throw new Error('Configured plugin loader returned an invalid manifest result.');
+  }
+  return parsed;
+}
+
+function isSerializedPluginManifest(value: unknown): value is PluginManifest {
+  return !!value && typeof value === 'object' &&
+    typeof Reflect.get(value, 'name') === 'string' &&
+    typeof Reflect.get(value, 'version') === 'string' &&
+    !!Reflect.get(value, 'contributions') &&
+    typeof Reflect.get(value, 'contributions') === 'object';
 }
 
 export async function loadRegisteredPlugins(
@@ -169,9 +247,13 @@ export async function loadRegisteredPluginMetadata(
   for (const spec of resolvePluginSpecs(config)) {
     let plugin: RegisteredPluginConfig;
     try {
-      const metadata = await resolveScaffoldPluginMetadata(projectRoot, spec);
-      plugin = metadata
-        ? normalizeScaffoldPluginMetadata(projectRoot, metadata, config.paths)
+      const resolvedMetadata = await resolveScaffoldPluginMetadata(projectRoot, spec);
+      plugin = resolvedMetadata
+        ? normalizeScaffoldPluginMetadata(
+          projectRoot,
+          resolvedMetadata.metadata,
+          resolvedMetadata.moduleDirectory,
+        )
         : normalizePluginSpecMetadata(projectRoot, spec, config.paths);
     } catch (error) {
       plugin = {
@@ -191,7 +273,7 @@ function resolvePluginSpecs(config?: NetScriptConfig): readonly string[] {
 async function resolveScaffoldPluginMetadata(
   projectRoot: string,
   spec: string,
-): Promise<ScaffoldPluginMetadata | null> {
+): Promise<ResolvedScaffoldPluginMetadata | null> {
   if (!spec.startsWith('.') && !spec.startsWith('/')) {
     return null;
   }
@@ -203,7 +285,9 @@ async function resolveScaffoldPluginMetadata(
     return null;
   }
   const raw = JSON.parse(rawText);
-  return isScaffoldPluginMetadata(raw) ? raw : null;
+  return isScaffoldPluginMetadata(raw)
+    ? { metadata: raw, moduleDirectory: dirname(resolved) }
+    : null;
 }
 
 async function readOptionalTextFile(path: string): Promise<string | null> {
@@ -220,7 +304,7 @@ async function readOptionalTextFile(path: string): Promise<string | null> {
 function normalizeScaffoldPluginMetadata(
   projectRoot: string,
   metadata: ScaffoldPluginMetadata,
-  paths?: Pick<PathsConfig, 'plugins'>,
+  moduleDirectory: string,
 ): RegisteredPluginConfig {
   const name = metadata.officialSource?.canonicalName ?? metadata.officialSource?.pluginDir;
   if (!name) {
@@ -228,9 +312,8 @@ function normalizeScaffoldPluginMetadata(
   }
 
   const serviceEntrypoint = metadata.officialSource?.serviceEntrypoint ??
-    metadata.provider.defaultServiceEntrypoint ??
-    metadata.provider.defaultEntrypoint;
-  const workdir = normalizePath(join(paths?.plugins ?? 'plugins', name));
+    metadata.provider.defaultServiceEntrypoint;
+  const workdir = normalizePath(relative(projectRoot, moduleDirectory)) || '.';
   const permissions = metadata.officialSource?.permissions ?? metadata.provider.defaultPermissions;
   const infrastructureRequires = normalizeInfrastructureDependencies(
     metadata.provider.infrastructureRequires,
@@ -246,7 +329,7 @@ function normalizeScaffoldPluginMetadata(
       ? 'background-processor'
       : 'utility',
     workdir,
-    rootDir: resolve(projectRoot, workdir),
+    rootDir: moduleDirectory,
     permissions: permissions ? [...permissions] : undefined,
     doctor: metadata.officialSource?.doctorEntrypoint,
     service: serviceEntrypoint
@@ -373,42 +456,6 @@ async function resolvePluginManifest(
     throw new Error(`Plugin spec "${spec}" does not export a plugin manifest.`);
   }
   return manifest;
-}
-
-function resolveExportedPluginManifest(
-  module: Record<string, unknown>,
-): PluginManifest | undefined {
-  if (isPluginManifest(module.default)) {
-    return module.default;
-  }
-
-  const manifests = Object.values(module).filter(isPluginManifest);
-  if (manifests.length === 1) {
-    return manifests[0];
-  }
-
-  return undefined;
-}
-
-function isPluginManifest(value: unknown): value is PluginManifest {
-  if (!value || typeof value !== 'object') {
-    return false;
-  }
-
-  const manifest = value as Partial<PluginManifest>;
-  return typeof manifest.name === 'string' &&
-    typeof manifest.version === 'string' &&
-    !!manifest.contributions &&
-    typeof manifest.contributions === 'object';
-}
-
-function resolvePluginImportSpecifier(projectRoot: string, spec: string): string {
-  if (spec.startsWith('.') || spec.startsWith('/')) {
-    const resolved = resolve(projectRoot, spec);
-    const modulePath = resolved.endsWith('.ts') ? resolved : join(resolved, 'mod.ts');
-    return toFileUrl(modulePath).href;
-  }
-  return spec;
 }
 
 function validatePluginDependencies(

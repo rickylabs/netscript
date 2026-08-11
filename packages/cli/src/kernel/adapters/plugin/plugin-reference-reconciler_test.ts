@@ -65,6 +65,49 @@ Deno.test('reconcilePluginReferences maps canonical dependencies to renamed inst
   ]);
 });
 
+Deno.test('reconcilePluginReferences uses configured modules and accepts service-less declarations', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/appsettings.json',
+    `${JSON.stringify({
+      NetScript: {
+        Plugins: {
+          'workers-api': { Enabled: true },
+          'triggers-api': { Enabled: true },
+        },
+        BackgroundProcessors: {
+          workers: { Enabled: true },
+          triggers: { Enabled: true },
+        },
+      },
+    }, null, 2)}\n`,
+  );
+  await fs.writeFile(
+    '/project/netscript.config.ts',
+    `export default {
+  plugins: ['./ai/mod.ts', './streams/mod.ts', './triggers/mod.ts', './workers/mod.ts'],
+};
+`,
+  );
+  await writeDeclaration(fs, 'ai', undefined, [], []);
+  await writeDeclaration(fs, 'streams', 'streams', [], []);
+  await writeDeclaration(fs, 'triggers', 'triggers-api', ['streams'], []);
+  await writeDeclaration(fs, 'workers', 'workers-api', ['streams'], []);
+
+  await reconcilePluginReferences('/project', fs);
+  const entries = await readEntries(fs);
+  assertEquals(entries.Plugins['workers-api'].PluginReferences, ['streams']);
+  assertEquals(entries.Plugins['triggers-api'].PluginReferences, ['streams']);
+  assertEquals(entries.BackgroundProcessors.workers.PluginReferences, [
+    'streams',
+    'workers-api',
+  ]);
+  assertEquals(entries.BackgroundProcessors.triggers.PluginReferences, [
+    'streams',
+    'triggers-api',
+  ]);
+});
+
 Deno.test('reconcilePluginReferences wires a fixture third-party plugin to declared services and apps', async () => {
   const fs = new MemoryFileSystemAdapter();
   await fs.writeFile(
@@ -214,7 +257,7 @@ async function writeAppsettings(
 async function writeDeclaration(
   fs: MemoryFileSystemAdapter,
   canonicalName: string,
-  serviceConfigKey: string,
+  serviceConfigKey: string | undefined,
   dependencies: readonly string[],
   pluginReferences: readonly string[],
   manifestCanonicalName = canonicalName,

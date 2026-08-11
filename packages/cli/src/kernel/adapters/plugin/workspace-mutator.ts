@@ -79,7 +79,7 @@ const PLUGIN_KIND_ROOT_IMPORTS: Readonly<Record<string, readonly string[]>> = {
     SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE,
     SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE_DOMAIN,
   ],
-  stream: [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN],
+  stream: [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN, SCAFFOLD_PACKAGES.ZOD],
   trigger: [
     SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_RUNTIME,
     SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE,
@@ -101,6 +101,7 @@ const PLUGIN_KIND_ROOT_IMPORTS: Readonly<Record<string, readonly string[]>> = {
     SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS,
     SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_RUNTIME,
     SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_SCHEMAS,
+    SCAFFOLD_PACKAGES.ZOD,
   ],
 };
 
@@ -134,8 +135,24 @@ const PLUGIN_SERVICE_BOOTSTRAP_IMPORTS: readonly string[] = [
 const PLUGIN_KIND_SOURCE_IMPORTS: Readonly<Record<string, Readonly<Record<string, string>>>> = {
   ai: {
     '@netscript/ai': netscriptJsrSpecifier('ai'),
+    '@netscript/plugin-ai': netscriptJsrSpecifier('plugin-ai'),
     '@netscript/plugin-ai-core': netscriptJsrSpecifier('plugin-ai-core'),
     '@netscript/fresh': netscriptJsrSpecifier('fresh'),
+  },
+  auth: {
+    '@netscript/plugin-auth': netscriptJsrSpecifier('plugin-auth'),
+  },
+  saga: {
+    '@netscript/plugin-sagas': netscriptJsrSpecifier('plugin-sagas'),
+  },
+  stream: {
+    '@netscript/plugin-streams': netscriptJsrSpecifier('plugin-streams'),
+  },
+  trigger: {
+    '@netscript/plugin-triggers': netscriptJsrSpecifier('plugin-triggers'),
+  },
+  worker: {
+    '@netscript/plugin-workers': netscriptJsrSpecifier('plugin-workers'),
   },
 };
 
@@ -304,7 +321,7 @@ export class PluginWorkspaceMutator {
     scaffoldResult: PluginScaffoldResult,
     provider: PluginKindProvider,
     options: PluginWorkspaceMutationOptions = {},
-  ): Promise<PluginConfigEntry> {
+  ): Promise<PluginConfigEntry | undefined> {
     const configPath = join(projectRoot, SCAFFOLD_FILES.APPSETTINGS);
     if (!await this.fs.exists(configPath)) {
       throw new ScaffoldValidationError(
@@ -316,17 +333,20 @@ export class PluginWorkspaceMutator {
     const raw = JSON.parse(await this.fs.readFile(configPath)) as AppsettingsShape;
     raw.NetScript ??= {};
 
-    const entry = provider.category === 'plugin'
-      ? buildPluginEntry(scaffoldResult, provider, options)
-      : buildBackgroundProcessorEntry(scaffoldResult, provider, options);
+    let entry: PluginConfigEntry | undefined;
 
     if (provider.category === 'plugin') {
-      raw.NetScript.Plugins ??= {};
-      raw.NetScript.Plugins[scaffoldResult.configKey] = entry as PluginEntry;
+      const pluginEntry = buildPluginEntry(scaffoldResult, provider, options);
+      entry = pluginEntry;
+      if (pluginEntry !== undefined) {
+        raw.NetScript.Plugins ??= {};
+        raw.NetScript.Plugins[scaffoldResult.configKey] = pluginEntry;
+      }
     } else {
+      const backgroundEntry = buildBackgroundProcessorEntry(scaffoldResult, provider, options);
+      entry = backgroundEntry;
       raw.NetScript.BackgroundProcessors ??= {};
-      raw.NetScript.BackgroundProcessors[scaffoldResult.configKey] =
-        entry as BackgroundProcessorEntry;
+      raw.NetScript.BackgroundProcessors[scaffoldResult.configKey] = backgroundEntry;
       if (provider.defaultServiceEntrypoint) {
         raw.NetScript.Plugins ??= {};
         raw.NetScript.Plugins[scaffoldResult.serviceConfigKey] = buildPluginServiceEntry(
@@ -478,6 +498,7 @@ export class PluginWorkspaceMutator {
     projectRoot: string,
     pluginName: string,
     pluginDir?: string,
+    moduleFile = 'mod.ts',
   ): Promise<boolean> {
     const configPath = join(projectRoot, 'netscript.config.ts');
     if (!await this.fs.exists(configPath)) {
@@ -487,7 +508,16 @@ export class PluginWorkspaceMutator {
     const relativePluginDir = pluginDir
       ? normalizeWorkspaceRelativePath(projectRoot, pluginDir)
       : join(SCAFFOLD_DIRS.PLUGINS, pluginName);
-    const specifier = `./${normalizePath(join(relativePluginDir, 'mod.ts'))}`;
+    const relativeModulePath = normalizePath(join(relativePluginDir, moduleFile));
+    const modulePath = join(projectRoot, relativeModulePath);
+    if (!await this.fs.exists(modulePath)) {
+      throw new ScaffoldValidationError(
+        `Cannot register plugin "${pluginName}" because its configured module was not found at ${relativeModulePath}.`,
+        { projectRoot, pluginName, modulePath },
+      );
+    }
+
+    const specifier = `./${relativeModulePath}`;
     const quotedSpecifier = `'${specifier}'`;
     const source = await this.fs.readFile(configPath);
     if (source.includes(quotedSpecifier) || source.includes(`"${specifier}"`)) {
@@ -513,6 +543,8 @@ export class PluginWorkspaceMutator {
 
     const source = await this.fs.readFile(configPath);
     const updated = removePluginSpecifiers(source, [
+      `./${normalizePath(join(SCAFFOLD_DIRS.PLUGINS, pluginName, 'plugin.ts'))}`,
+      `./${normalizePath(join(pluginName, 'plugin.ts'))}`,
       `./${normalizePath(join(SCAFFOLD_DIRS.PLUGINS, pluginName, 'mod.ts'))}`,
       `./${normalizePath(join(pluginName, 'mod.ts'))}`,
     ]);

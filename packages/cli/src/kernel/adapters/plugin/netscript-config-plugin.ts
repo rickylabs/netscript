@@ -28,6 +28,15 @@ export function insertPluginSpecifier(source: string, quotedSpecifier: string): 
   return source;
 }
 
+/** Read literal plugin module specifiers from a generated `netscript.config.ts` source string. */
+export function extractPluginSpecifiers(source: string): readonly string[] {
+  const pluginsPattern = /plugins:\s*\[([\s\S]*?)\]/;
+  const body = source.match(pluginsPattern)?.[1];
+  if (body === undefined) return [];
+
+  return [...body.matchAll(/(['"])(.*?)\1/g)].map((match) => match[2]);
+}
+
 /** Remove exact plugin module specifiers from a generated `netscript.config.ts` source string. */
 export function removePluginSpecifiers(
   source: string,

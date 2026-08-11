@@ -35,6 +35,7 @@ export async function runInstallCommand(
     artifacts,
     context: options.context,
     fileSystem: options.context.fileSystem,
+    uiRegistryItems: options.plugin.install.uiRegistryItems,
   });
 }
 
@@ -101,6 +102,7 @@ interface WriteArtifactsOptions {
   readonly artifacts: readonly ScaffoldArtifact[];
   readonly context: PluginCommandContext;
   readonly fileSystem: FileSystemPort;
+  readonly uiRegistryItems?: readonly string[];
 }
 
 async function writeArtifacts(options: WriteArtifactsOptions): Promise<ScaffoldResult> {
@@ -138,5 +140,8 @@ async function writeArtifacts(options: WriteArtifactsOptions): Promise<ScaffoldR
     databaseMigrationsAdded: options.artifacts.some((artifact) =>
       artifact.databaseMigration === true
     ),
+    ...(options.uiRegistryItems && options.uiRegistryItems.length > 0
+      ? { uiRegistryItems: options.uiRegistryItems }
+      : {}),
   };
 }

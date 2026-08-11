@@ -171,9 +171,15 @@ export async function copyOfficialPlugin(
       source.pluginDir,
     ),
     backgroundDir,
-    serviceConfigKey: source.serviceConfigKey,
-    servicePort: source.servicePort,
-    serviceEntrypoint: source.serviceEntrypoint,
+    ...(source.serviceEntrypoint !== undefined &&
+        source.serviceConfigKey !== undefined &&
+        source.servicePort !== undefined
+      ? {
+        serviceConfigKey: source.serviceConfigKey,
+        servicePort: source.servicePort,
+        serviceEntrypoint: source.serviceEntrypoint,
+      }
+      : {}),
     backgroundPort: source.backgroundPort,
     backgroundEntrypoint: source.backgroundEntrypoint ?? null,
     dependencies: source.dependencies,

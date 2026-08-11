@@ -37,10 +37,10 @@ export interface SyncPluginCopyResult {
   readonly pluginDir: string;
   /** Optional background workspace directory. */
   readonly backgroundDir: string | null;
-  /** Service config key written for the copied plugin. */
-  readonly serviceConfigKey: string;
-  /** Service port written for the copied plugin. */
-  readonly servicePort: number;
+  /** Service config key written for the copied plugin, when it has a service. */
+  readonly serviceConfigKey?: string;
+  /** Service port written for the copied plugin, when it has a service. */
+  readonly servicePort?: number;
   /** Background processor port from the official source. */
   readonly backgroundPort: number;
   /** Root workspace members that must exist after the copy. */

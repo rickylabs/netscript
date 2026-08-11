@@ -28,7 +28,7 @@
       "dir": "workers/jobs",
       "registryPath": ".netscript/generated/plugin-workers/job-registry.ts",
       "fileSuffixes": [".ts"],
-      "exclude": ["_registry.ts", "job-tools.ts", "mod.ts", "types.ts"],
+      "exclude": ["_registry.ts", "job-tools.ts", "mod.ts", "plugin.ts", "types.ts"],
       "registryKey": "id",
       "varPrefix": "job",
       "typeImport": {

@@ -1,0 +1,76 @@
+╔═════════════════════════════════════════════════════════════╗
+║              NetScript — Scaffold New Project               ║
+╚═════════════════════════════════════════════════════════════╝
+
+📁 Creating project "fresh"...
+   ✓ Project root (deno.json, netscript.config.ts, .gitignore, README.md)
+   ✓ Aspire orchestration (TypeScript AppHost, .helpers/, package.json)
+   ✓ Database workspace (sqlite)
+   ✓ Frontend app "fresh-web" (Fresh framework)
+   ✓ Contracts (v1 with users stub)
+   ✓ Example service "users" (oRPC handler, Aspire assigns its port)
+   ✓ Plugins (empty registry)
+   ✓ Output formatted (deno fmt)
+
+✅ Project scaffolded successfully in 1.3s
+
+  Created: 208 files, 45 directories
+
+Next steps:
+  1. cd fresh
+  2. cd aspire  # TS AppHost lives here, isolated from the Deno workspace
+  3. aspire restore  # download TypeScript AppHost SDK modules (run once)
+  4. cd ..
+  5. deno task aspire:start  # 300s cold-start budget; override ASPIRE_CLI_START_TIMEOUT if needed
+  6. netscript db init --name init
+  7. netscript db generate
+  8. netscript db seed
+  9. # oRPC service "users" at the URL shown for it in the Aspire dashboard, path /api/rpc
+  10. # Sqlite provisioned by Aspire (see "Databases" in appsettings.json)
+
+Installed ai plugin "ai" on port 55974.
+Created 10 plugin files.
+Regenerated 13 Aspire helper files.
+PASS: plugin install ai
+PASS: no synthesized /services specifier
+PASS: no NetScript.Plugins.ai entry
+PASS: configured ai/mod.ts exists
+Schema generation complete: 0 written.
+PASS: generate runtime-schemas
+generated .netscript/generated/plugin-ai/tools.registry.ts (1 ai-tools)
+generated .netscript/generated/plugin-ai/agents.registry.ts (1 ai-agents)
+PASS: generate AI runtime registries
+Initialize @durable-streams/tanstack-ai-transport@0.0.8
+Initialize @tanstack/ai-anthropic@0.15.13
+Initialize @anthropic-ai/sdk@0.97.1
+Initialize standardwebhooks@1.0.0
+Initialize json-schema-to-ts@3.1.1
+Initialize fast-sha256@1.3.0
+Initialize @stablelib/base64@1.0.1
+Initialize @babel/runtime@7.29.7
+Initialize ts-algebra@2.0.0
+Check ai/agents/assistant.ts
+Check ai/ai.ts
+Check ai/components/ui/citation-chip.tsx
+Check ai/components/ui/markdown-pipeline.ts
+Check ai/components/ui/markdown.tsx
+Check ai/lib/cn.ts
+Check ai/lib/public-types.ts
+Check ai/mcp/registry.ts
+Check ai/mod.ts
+Check ai/models.ts
+Check ai/plugin.ts
+Check ai/routes/chat-stream.ts
+Check ai/routes/chat.tsx
+Check ai/tools/echo.ts
+PASS: deno check generated ai namespace
+Plugin	Status	Check	Message
+apphost	warning	Aspire AppHost running	No AppHost is running for this project. Start it and rerun plugin doctor.
+ai	healthy	Configured module resolves	./ai/plugin.ts
+ai	healthy	Configured module exports manifest	./ai/plugin.ts
+ai	healthy	Service entrypoint resolves	No plugin service entrypoints are configured.
+ai	healthy	Manifest resolved	AI Chat
+ai	healthy	Workspace directory	ai
+ai	healthy	Permission metadata	--allow-net --allow-env --allow-read
+PASS: plugin doctor valid install
+consumer verification passed

@@ -1,4 +1,5 @@
-import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { fromFileUrl, join } from '@std/path';
 import { artifactText, collectInstallArtifacts, substituteTokens } from '@netscript/plugin/adapter';
 import { aiAdapterPlugin, aiStarterResources } from '../plugin.ts';
 import {
@@ -25,6 +26,9 @@ Deno.test('ai install emits only userland glue under ai/', () => {
   const artifacts = collectInstallArtifacts(aiAdapterPlugin);
 
   assertEquals(artifacts.map((artifact) => artifact.path), [
+    'ai/deno.json',
+    'ai/mod.ts',
+    'ai/plugin.ts',
     'ai/models.ts',
     'ai/ai.ts',
     'ai/tools/echo.ts',
@@ -37,7 +41,7 @@ Deno.test('ai install emits only userland glue under ai/', () => {
     assertEquals(artifact.path.startsWith('ai/'), true);
     for (const forbidden of FORBIDDEN_PREFIXES) {
       assertEquals(
-        artifact.path.includes(forbidden),
+        artifact.path !== 'ai/deno.json' && artifact.path.includes(forbidden),
         false,
         `artifact ${artifact.path} must not contain ${forbidden}`,
       );
@@ -47,6 +51,9 @@ Deno.test('ai install emits only userland glue under ai/', () => {
 
 Deno.test('ai starter resources cover the current emitters', () => {
   assertEquals(aiStarterResources.map((resource) => resource.scaffolder.name), [
+    'namespace-config',
+    'application-module',
+    'control-plane-module',
     'models',
     'barrel',
     'tool',
@@ -61,6 +68,23 @@ Deno.test('ai scaffold emitters have focused golden content', () => {
   const artifacts = collectInstallArtifacts(aiAdapterPlugin);
   const byPath = new Map(artifacts.map((artifact) => [artifact.path, artifactText(artifact)]));
 
+  assertEquals(JSON.parse(byPath.get('ai/deno.json') ?? ''), {
+    imports: { preact: 'npm:preact@^10.27.2' },
+    compilerOptions: {
+      strict: true,
+      jsx: 'precompile',
+      jsxImportSource: 'preact',
+    },
+  });
+
+  assertEquals(
+    byPath.get('ai/mod.ts'),
+    `/** Generated AI application module. */\n\nexport * from './models.ts';\n`,
+  );
+  assertEquals(
+    byPath.get('ai/plugin.ts'),
+    `/** Generated AI control-plane module. */\n\nexport { aiPlugin } from '@netscript/plugin-ai';\n`,
+  );
   assertStringIncludes(byPath.get('ai/models.ts') ?? '', 'DEFAULT_CHAT_MODEL');
   assertStringIncludes(byPath.get('ai/ai.ts') ?? '', 'createAiRuntime');
   assertStringIncludes(
@@ -75,6 +99,10 @@ Deno.test('ai scaffold emitters have focused golden content', () => {
   assertStringIncludes(byPath.get('ai/routes/chat-stream.ts') ?? '', 'createAiRouter');
   assertStringIncludes(byPath.get('ai/routes/chat-stream.ts') ?? '', 'toNetScriptChatResponse');
   assertStringIncludes(byPath.get('ai/routes/chat.tsx') ?? '', 'createNetScriptChatConnection');
+});
+
+Deno.test('ai install declares the registry-owned markdown surface', () => {
+  assertEquals(aiAdapterPlugin.install.uiRegistryItems, ['markdown']);
 });
 
 Deno.test('ai default topology is in-process (no gateway config emitted)', () => {
@@ -139,6 +167,30 @@ Deno.test('ai MCP tool is conditional and consumes SkillLoaderPort', () => {
   const source = artifactText(artifact);
   assertStringIncludes(source, "import type { SkillLoaderPort } from '@netscript/ai/skills'");
   assertStringIncludes(source, 'skills.matchByTag(tags)');
+});
+
+Deno.test('ai MCP tool emitted source type-checks against the public AI surface', async () => {
+  const pluginRoot = fromFileUrl(new URL('../../../', import.meta.url));
+  const workspace = await Deno.makeTempDir({ dir: pluginRoot, prefix: '.mcp-stub-check-' });
+  try {
+    const [artifact] = mcpToolScaffolder.emit({ enabled: true });
+    const sourcePath = join(workspace, 'skill-loader.ts');
+    await Deno.writeTextFile(sourcePath, artifactText(artifact));
+
+    const result = await new Deno.Command(Deno.execPath(), {
+      cwd: pluginRoot,
+      args: ['check', '--unstable-kv', sourcePath],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+
+    assert(
+      result.success,
+      `emitted MCP tool failed to type-check: ${new TextDecoder().decode(result.stderr)}`,
+    );
+  } finally {
+    await Deno.remove(workspace, { recursive: true });
+  }
 });
 
 Deno.test('ai resource token map rejects misspelled tokens at compile time', () => {

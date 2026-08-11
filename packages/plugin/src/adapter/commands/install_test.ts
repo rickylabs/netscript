@@ -77,3 +77,17 @@ Deno.test('runInstallCommand preserves emit-all behavior when samples policy is 
 
   assertEquals(result.createdFiles, ['src/jobs/starter.ts']);
 });
+
+Deno.test('runInstallCommand reports plugin-declared UI registry requirements', async () => {
+  const fileSystem = new MemoryFileSystem();
+  const plugin = createTestPlugin();
+  const result = await runInstallCommand({
+    plugin: {
+      ...plugin,
+      install: { ...plugin.install, uiRegistryItems: ['markdown'] },
+    },
+    context: createTestContext(fileSystem),
+  });
+
+  assertEquals(result.uiRegistryItems, ['markdown']);
+});

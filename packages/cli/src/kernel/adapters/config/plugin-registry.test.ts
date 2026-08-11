@@ -1,5 +1,7 @@
-import { resolve } from '@std/path';
-import { loadConfig } from '@netscript/config';
+import { dirname, resolve, toFileUrl } from '@std/path';
+import { defineConfig, loadConfig } from '@netscript/config';
+import { artifactText, collectInstallArtifacts } from '@netscript/plugin/adapter';
+import { aiAdapterPlugin } from '@netscript/plugin-ai/adapter';
 import { loadRegisteredPluginMetadata, loadRegisteredPlugins } from './plugin-registry.ts';
 
 Deno.test('loadRegisteredPlugins returns normalized background processor metadata', async () => {
@@ -72,6 +74,44 @@ Deno.test('loadRegisteredPlugins preserves registry output shape from explicit c
   }
 });
 
+Deno.test('loadRegisteredPlugins resolves the generated AI configured module', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  const artifacts = collectInstallArtifacts(aiAdapterPlugin);
+  for (const artifact of artifacts) {
+    const artifactPath = resolve(projectRoot, artifact.path);
+    await Deno.mkdir(dirname(artifactPath), { recursive: true });
+    await Deno.writeTextFile(artifactPath, artifactText(artifact));
+  }
+  await Deno.writeTextFile(
+    resolve(projectRoot, 'netscript.config.ts'),
+    `export default {
+  name: 'fixture-app',
+  databases: { config: [] },
+  plugins: ['./ai/plugin.ts'],
+};
+`,
+  );
+
+  const module = await import(toFileUrl(resolve(projectRoot, 'ai/plugin.ts')).href);
+  const manifests = Object.values(module).filter((value: unknown) =>
+    value !== null && typeof value === 'object' &&
+    typeof Reflect.get(value, 'name') === 'string' &&
+    typeof Reflect.get(value, 'version') === 'string' &&
+    typeof Reflect.get(value, 'contributions') === 'object'
+  );
+  if (manifests.length !== 1) {
+    throw new Error(
+      `Expected exactly one manifest-shaped export from generated AI module, got ${manifests.length}`,
+    );
+  }
+
+  const config = await loadConfig({ cwd: projectRoot });
+  const plugins = await loadRegisteredPlugins(projectRoot, config);
+  if (plugins.ai?.name !== '@netscript/plugin-ai') {
+    throw new Error('Expected generated AI configured module to resolve through the plugin loader');
+  }
+});
+
 Deno.test('loadRegisteredPluginMetadata reads scaffold manifests without importing plugin modules', async () => {
   const projectRoot = await Deno.makeTempDir();
   const pluginRoot = resolve(projectRoot, 'plugins/workers');
@@ -131,6 +171,75 @@ Deno.test('loadRegisteredPluginMetadata reads scaffold manifests without importi
   }
   if (plugins.workers.doctor !== './src/adapter/plugin.ts') {
     throw new Error('Expected static scaffold metadata to carry the doctor adapter path');
+  }
+});
+
+Deno.test('loadRegisteredPluginMetadata omits service metadata for a service-less manifest', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  const pluginRoot = resolve(projectRoot, 'service-less');
+  await Deno.mkdir(pluginRoot, { recursive: true });
+  await Deno.writeTextFile(
+    resolve(projectRoot, 'netscript.config.ts'),
+    `export default {
+  name: 'fixture-app',
+  databases: { config: [] },
+  plugins: ['./service-less/mod.ts'],
+};
+`,
+  );
+  await Deno.writeTextFile(resolve(pluginRoot, 'mod.ts'), 'export {};\n');
+  await Deno.writeTextFile(
+    resolve(pluginRoot, 'scaffold.plugin.json'),
+    JSON.stringify({
+      provider: {
+        displayName: 'Service-less plugin',
+        defaultEntrypoint: 'mod.ts',
+        pluginType: 'utility',
+      },
+      officialSource: {
+        canonicalName: 'service-less',
+        backgroundPort: 8124,
+      },
+    }),
+  );
+
+  const config = await loadConfig({ cwd: projectRoot });
+  const plugins = await loadRegisteredPluginMetadata(projectRoot, config);
+  if (plugins['service-less']?.service !== undefined) {
+    throw new Error('Service-less scaffold metadata unexpectedly contributed a service');
+  }
+});
+
+Deno.test('loadRegisteredPluginMetadata derives identity from the configured module directory', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  const pluginRoot = resolve(projectRoot, 'extensions/chat');
+  await Deno.mkdir(pluginRoot, { recursive: true });
+  await Deno.writeTextFile(resolve(pluginRoot, 'mod.ts'), 'export {};\n');
+  await Deno.writeTextFile(
+    resolve(pluginRoot, 'scaffold.plugin.json'),
+    JSON.stringify({
+      provider: {
+        displayName: 'Service-less plugin',
+        defaultEntrypoint: 'mod.ts',
+        pluginType: 'utility',
+      },
+      officialSource: { canonicalName: 'service-less' },
+    }),
+  );
+
+  const plugins = await loadRegisteredPluginMetadata(
+    projectRoot,
+    defineConfig({
+      name: 'fixture-app',
+      databases: { config: [] },
+      plugins: ['./extensions/chat/mod.ts'],
+    }),
+  );
+  if (plugins['service-less']?.workdir !== 'extensions/chat') {
+    throw new Error('Configured module directory did not determine the service-less workdir');
+  }
+  if (plugins['service-less']?.rootDir !== pluginRoot) {
+    throw new Error('Configured module directory did not determine the service-less rootDir');
   }
 });
 

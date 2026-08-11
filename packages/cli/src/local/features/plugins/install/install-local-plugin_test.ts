@@ -1,8 +1,11 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assertEquals, assertFalse, assertStringIncludes } from 'jsr:@std/assert@^1';
-import { dirname, resolve } from '@std/path';
+import { dirname, join, resolve } from '@std/path';
+import { fromFileUrl } from '@std/path/from-file-url';
 
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
+import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
+import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
 import { Scaffolder } from '../../../../kernel/adapters/scaffold/scaffolder.ts';
 import { StringTemplateAdapter } from '../../../../kernel/adapters/scaffold/template-adapter.ts';
 import { PluginKindRegistry } from '../../../../kernel/application/registries/plugin-kind-registry.ts';
@@ -178,6 +181,100 @@ describe('local contributor install plugin flow', () => {
     );
     assertFalse(rootDenoJson.workspace.includes('./workers'));
     assertFalse(await fs.exists('/workspace/alpha/workers'));
+  });
+
+  it('keeps the plugin-owned AI namespace configured in local-source installs', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const aiRoot = fromFileUrl(
+      new URL('../../../../../../../plugins/ai/', import.meta.url),
+    );
+    try {
+      await Deno.writeTextFile(
+        join(projectRoot, 'appsettings.json'),
+        JSON.stringify({ NetScript: { Plugins: {}, BackgroundProcessors: {} } }, null, 2) + '\n',
+      );
+      await Deno.writeTextFile(
+        join(projectRoot, 'deno.json'),
+        JSON.stringify({ workspace: ['./apps/web'] }, null, 2) + '\n',
+      );
+      await Deno.writeTextFile(
+        join(projectRoot, 'netscript.config.ts'),
+        `export default {
+  name: 'local-ai-fixture',
+  databases: { config: [] },
+  plugins: [],
+};
+`,
+      );
+      const fs = new DenoFileSystem();
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+      const registry = new PluginKindRegistry();
+      const installAi = (mcp: boolean) =>
+        installLocalPlugin({
+          kind: 'ai',
+          pluginName: 'ai',
+          serviceReferences: [],
+          pluginReferences: [],
+          noDb: true,
+          includeSamples: true,
+          mcp,
+          localPath: aiRoot,
+          projectRoot,
+          overwrite: true,
+        }, {
+          fs,
+          scaffolder,
+          templateAdapter,
+          registry,
+          pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
+          registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+          workspaceMutator: new PluginWorkspaceMutator(fs),
+          processRunner: new DenoProcess(),
+          regenerateHelpers: () => Promise.resolve([]),
+        });
+
+      await installAi(false);
+      await installAi(true);
+
+      const rootConfig: { readonly workspace: readonly string[] } = JSON.parse(
+        await Deno.readTextFile(join(projectRoot, 'deno.json')),
+      );
+      const aiConfig: {
+        readonly imports: Readonly<Record<string, string>>;
+        readonly compilerOptions: Readonly<Record<string, unknown>>;
+      } = JSON.parse(await Deno.readTextFile(join(projectRoot, 'ai/deno.json')));
+      assertEquals(rootConfig.workspace.includes('./ai'), true);
+      assertEquals(Object.keys(aiConfig.imports).sort(), [
+        'clsx',
+        'highlight.js',
+        'katex',
+        'preact',
+        'rehype-highlight',
+        'rehype-katex',
+        'rehype-react',
+        'rehype-sanitize',
+        'remark-gfm',
+        'remark-math',
+        'remark-parse',
+        'remark-rehype',
+        'tailwind-merge',
+        'unified',
+      ]);
+      assertEquals(aiConfig.compilerOptions, {
+        strict: true,
+        jsx: 'precompile',
+        jsxImportSource: 'preact',
+      });
+      const check = await new DenoProcess().exec(
+        'deno',
+        ['check', '--unstable-kv', './ai/routes/chat.tsx'],
+        { cwd: projectRoot },
+      );
+      assertEquals(check.code, 0, check.stderr || check.stdout);
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
   });
 
   it('skips the target generated project when discovering the official plugin source root', async () => {

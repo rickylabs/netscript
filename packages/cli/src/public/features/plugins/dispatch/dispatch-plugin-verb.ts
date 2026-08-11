@@ -266,10 +266,14 @@ function isScaffoldResult(value: unknown): value is ScaffoldResult {
   }
   if (!('databaseMigrationsAdded' in value)) return false;
   const status = value.status;
+  const uiRegistryItems = 'uiRegistryItems' in value ? value.uiRegistryItems : undefined;
   return (
     (status === 'applied' || status === 'planned' || status === 'skipped' || status === 'failed') &&
     Array.isArray(value.createdFiles) &&
     Array.isArray(value.modifiedFiles) &&
-    typeof value.databaseMigrationsAdded === 'boolean'
+    typeof value.databaseMigrationsAdded === 'boolean' &&
+    (uiRegistryItems === undefined ||
+      (Array.isArray(uiRegistryItems) &&
+        uiRegistryItems.every((item) => typeof item === 'string')))
   );
 }

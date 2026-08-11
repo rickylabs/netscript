@@ -32,10 +32,10 @@ Deno.test('auth is install-only and exposes no add resources', () => {
   assertEquals(authAdapterPlugin.resources, []);
 });
 
-Deno.test('auth install emits only the userland barrel under auth', () => {
+Deno.test('auth install emits separate control-plane and userland modules under auth', () => {
   const artifacts = collectInstallArtifacts(authAdapterPlugin);
 
-  assertEquals(artifacts.map((artifact) => artifact.path), ['auth/mod.ts']);
+  assertEquals(artifacts.map((artifact) => artifact.path), ['auth/plugin.ts', 'auth/mod.ts']);
   for (const artifact of artifacts) {
     assertEquals(artifact.path.startsWith('auth/'), true);
     for (const forbidden of FORBIDDEN_PREFIXES) {

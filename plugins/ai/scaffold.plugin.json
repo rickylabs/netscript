@@ -29,7 +29,6 @@
     "defaultPermissions": ["--allow-net", "--allow-env", "--allow-read"],
     "watchFlag": "--watch",
     "defaultEntrypoint": "ai/ai.ts",
-    "defaultServiceEntrypoint": "ai/routes/chat-stream.ts",
     "defaultRequiresDb": false,
     "defaultRequiresKv": false,
     "pluginType": "utility",
@@ -43,9 +42,6 @@
   "officialSource": {
     "canonicalName": "ai",
     "pluginDir": "ai",
-    "serviceEntrypoint": "ai/routes/chat-stream.ts",
-    "serviceConfigKey": "ai",
-    "servicePort": 8095,
     "backgroundPort": 8095,
     "requiresDb": false,
     "requiresKv": false,
