@@ -1,0 +1,84 @@
+# Supervisor Identity — plan-devtools-contribution--seed
+
+Written at run start per `workflow/lane-policy.md` § Supervisor identity. A run dir without this
+file is not activated. Other supervisors cross-peek a run by reading this file — it is how a run's
+operating identity is discoverable without chat memory.
+
+| Field | Value |
+| --- | --- |
+| Model | Claude Opus 5 (`claude-opus-5`), effort **high** |
+| Session | `session_01DChBXWYP9LStvjQztUJV5b` — https://claude.ai/code/session_01DChBXWYP9LStvjQztUJV5b (native Claude Code, bypass permissions, Remote Control enabled on this session) |
+| Host | WSL2 (Linux 6.18.33.2-microsoft-standard-WSL2), user `codex` |
+| Checkout | `/home/codex/repos/netscript-547-lffix` (main checkout) |
+| Worktree | `/home/codex/repos/ns-rfc-devtools-contribution` |
+| Branch | `plan/devtools-contribution` |
+| Baseline | `2256a67bf` — `docs(home): complete the capability outcome story (#1442)`, `origin/main` verified by `git fetch` on 2026-08-11 |
+| Run ID | `plan-devtools-contribution--seed` |
+| Run shape | Seed run (`workflow/seed-run.md`), stages A–I, **planning-only** |
+| Profile | `SCOPE-docs.md` overlay + `SCOPE-frontend.md` overlay; archetypes described (not built): ARCHETYPE-5 (plugin) and the host package archetype for the proposed DevTools surfaces |
+
+## Charter
+
+Tier-A planning orchestrator for the **NetScript DevTools Contribution Architecture RFC**. Deliverable
+is a canonical RFC under `docs/architecture/rfc/` plus a full seed-run planning corpus, design packs,
+supersession map, draft filing manifest, and an owner decision brief. **No framework/product source
+implementation. No board mutation before owner ratification in-turn.**
+
+Charter source: `.llm/devtools-rfc-orchestrator-brief.md` (committed with the bootstrap).
+
+## Routes in force
+
+Reference `.llm/harness/workflow/lane-policy.md`; the complete route table is not copied here.
+
+| Task lane | Provider / model / effort | Role in this run |
+| --- | --- | --- |
+| `planning_decisions` | Anthropic · Claude **Opus 5** · high | This supervisor session: bootstrap, synthesis, plan lock, RFC authoring, triage, sign-off commits |
+| `deep_analysis` | Anthropic · Claude **Fable 5** · medium | Stage-D deep-dive design packs — complex architecture/technical decisions, one sub-agent per topic |
+| `claude_workflow` | Anthropic · Claude **Opus 5** · low | Stage-B parallel discovery/synthesis fan-out only, and only with the generated `workflow.js` committed under `<run-dir>/workflows/` **before** it executes |
+| `major_ui_ux_design` | Claude · OpenRouter · **GLM 5.2** · `claude-design-glm-5-2` preset · xhigh | Mandatory pure-design pass for this major UI/UX architecture. **Transport fact of record: tools + streaming, NO reasoning trace.** Never cited as reasoning evidence; never the formal evaluator |
+| `adversarial_design_eval` | OpenCode · OpenRouter · **Kimi K3** vision · high | Conditional. Added only if screenshots/visual artifacts materially improve architectural judgment. Complements, never replaces, the GLM pass |
+| Stage-F adversarial reviewer | Model distinct from every authoring lane, unoriented, separate session | Severity-tagged findings only; supervisor triages and commits fixes |
+| `formal_plan_evaluation` | Codex · OpenAI · **GPT-5.6 Sol** · high (fresh daemon-attached WSL session, own worktree) | Formal PLAN-EVAL of record against an immutable commit, per `evaluator/plan-protocol.md` + `gates/plan-gate.md` |
+| `formal_impl_evaluation` | — | **N/A.** This run produces no implementation. Recorded rather than skipped silently; the docs/RFC changeset instead takes the docs accuracy/link/format gates plus the opposite-family PLAN-EVAL above |
+
+### Route prohibitions in force for this run
+
+- **No OpenHands.** Cloud agent lanes are owner-paused (`lane-policy.md`, 2026-08-06) and the charter
+  independently forbids them here.
+- **OpenRouter is limited** to the required `major_ui_ux_design` GLM pass, the conditional Kimi
+  vision-evidence lane, and a genuinely authorized fallback/third opinion. Any other OpenRouter use
+  is an override that must be recorded in `drift.md` before it happens.
+- **GLM 5.2 is never the formal evaluator** and its output is never cited as reasoning-trace evidence.
+
+## Mutation boundary (planning-only)
+
+| Surface | Writable in this run? |
+| --- | --- |
+| Branch `plan/devtools-contribution` + its commits | **Yes** |
+| The run's own draft PR: body, phase comments, PR labels, PR milestone | **Yes** |
+| `docs/architecture/rfc/**` (new RFC) and `.llm/runs/plan-devtools-contribution--seed/**` | **Yes** |
+| Framework/product source (`packages/**`, `plugins/**`, `apps/**`) | **No — never** |
+| GitHub issues, epics, milestones, repo label set, other PRs | **No — until the owner ratifies the decision brief in-turn (stage H)** |
+| Merging this RFC PR | **No — the run never merges itself** |
+
+## Recorded lane/eval overrides
+
+- **IMPL-EVAL = N/A by run shape**, not by owner waiver: the run commits no implementation. The
+  substitute assurance is (a) the formal Codex Sol high PLAN-EVAL at stage G and (b) the docs gate
+  set on the RFC changeset. Mirrored in `drift.md`.
+- **Stage-F reviewer tier is a diversity choice**, not a source-lane requirement (`seed-run.md`
+  § Stage F). The concrete model is recorded in `drift.md` at the time of dispatch, and must differ
+  from Opus 5 (supervisor), Fable 5 (stage D), and GLM 5.2 (stage D2).
+- **`major_ui_ux_*` GLM lanes are marked dormant** in `lane-policy.md` while the Dev Dashboard is
+  paused (epic #400 → `0.0.1-beta.13`). This run reactivates the lane for its charter-mandated design
+  pass. Authorization: the orchestrator brief's explicit instruction. Mirrored in `drift.md`.
+
+## Hard invariants acknowledged
+
+1. Generator session ≠ evaluator session. This session never evaluates its own plan.
+2. No lane self-certifies. Every sub-agent/workflow output is substantively reviewed by this
+   supervisor before its sign-off commit.
+3. Stage-B Tier-C workflows commit `workflow.js` before executing.
+4. Every claim in the corpus is cited (file path + line, `deno doc` surface, saved fetched artifact,
+   or external URL). Uncited load-bearing claims are a legitimate PLAN-EVAL failure.
+5. Stage G is a hard stop. No board mutation before `plan-eval.md` = `PASS` **and** owner ratification.
