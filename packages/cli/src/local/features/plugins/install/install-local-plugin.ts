@@ -9,6 +9,7 @@ import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/works
 import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import { formatGeneratedFiles } from '../../../../kernel/application/scaffold/support/format-generated-files.ts';
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
+import { installUiRegistryItems } from '../../../../kernel/application/ui/registry.ts';
 import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-files.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
@@ -36,6 +37,7 @@ import { renderPluginSupport } from '../../../../public/features/plugins/install
 import {
   ensurePluginServiceContext,
   mergeUniqueReferences,
+  toWorkspaceRelativePath,
 } from './install-local-plugin-helpers.ts';
 import { resolveOfficialPluginSourceRoot } from './install-local-plugin-helpers.ts';
 
@@ -108,6 +110,19 @@ export async function installLocalPlugin(
   const pluginOwned = resolvedPlugin === undefined || dependencies.processRunner === undefined
     ? undefined
     : await runPluginOwnedScaffold(plan, resolvedPlugin, descriptorRequest, dependencies);
+  const pluginConfigDirectory = pluginOwned === undefined
+    ? undefined
+    : await resolvePluginConfigDirectory(plan, dependencies.fs);
+  if (
+    pluginOwned?.uiRegistryItems && pluginOwned.uiRegistryItems.length > 0 &&
+    pluginConfigDirectory !== undefined
+  ) {
+    await installUiRegistryItems({
+      projectRoot: pluginConfigDirectory,
+      names: pluginOwned.uiRegistryItems,
+      overwrite: plan.overwrite,
+    }, { fs: dependencies.fs });
+  }
   const rendered = pluginOwned === undefined || resolvedPlugin === undefined
     ? await renderLocalPlugin(plan, dependencies)
     : {
@@ -151,7 +166,7 @@ export async function installLocalPlugin(
     plan.pluginName,
     pluginOwned === undefined
       ? rendered.plugin.pluginDir
-      : await resolvePluginConfigDirectory(plan, dependencies.fs),
+      : pluginConfigDirectory,
     pluginOwned === undefined ? 'mod.ts' : 'plugin.ts',
   );
   await dependencies.workspaceMutator.ensureRootImportsForPluginKind(plan.projectRoot, plan.kind);
@@ -159,10 +174,13 @@ export async function installLocalPlugin(
     ? await dependencies.workspaceMutator.ensureSharedCache(plan.projectRoot)
     : false;
 
-  await dependencies.workspaceMutator.ensureWorkspaceMember(
-    plan.projectRoot,
-    rendered.workspaceMembers,
-  );
+  const pluginWorkspaceMembers = pluginConfigDirectory !== undefined &&
+      await dependencies.fs.exists(join(pluginConfigDirectory, SCAFFOLD_FILES.DENO_JSON))
+    ? mergeUniqueReferences(rendered.workspaceMembers, [
+      toWorkspaceRelativePath(plan.projectRoot, pluginConfigDirectory),
+    ])
+    : rendered.workspaceMembers;
+  await dependencies.workspaceMutator.ensureWorkspaceMember(plan.projectRoot, pluginWorkspaceMembers);
 
   if (pluginOwned !== undefined && resolvedPlugin !== undefined) {
     await persistPluginMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs);
