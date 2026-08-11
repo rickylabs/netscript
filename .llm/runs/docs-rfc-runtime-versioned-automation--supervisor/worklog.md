@@ -157,3 +157,17 @@ designs live inside the RFC and are re-checkpointed by their own future runs).
 - **Protocol stop:** two FAIL_PLAN cycles consumed → escalate to owner per
   `evaluator/plan-protocol.md` (no automatic third cycle). Fix state is complete and pushed; the
   owner may authorize PLAN-EVAL cycle 3 or review directly.
+
+## 2026-08-11 S6 — Competitive architecture study (owner directive D-8)
+
+- Primary-source study of Temporal, Restate, Inngest, Trigger.dev, Hatchet, Windmill, Azure
+  Durable Functions, AWS Step Functions, Kestra + n8n across the 12 owner-named dimensions →
+  `evidence/competitive-architecture-study.md` (per-system cited profiles, 12×9 matrix,
+  synthesis: 8 adopted patterns, 4 non-goals, 4 differentiators, benchmark gates BG-1..BG-5,
+  limitations incl. point-in-time retrieval and no hands-on deployment).
+- RFC integration: new §14.1 (adopt/non-goal/differentiator synthesis with §-mappings), §13.1
+  executable benchmark gates (no empirical claims), §11 P-5 (weighted/canary activation, Step
+  Functions alias precedent) + P-4 note (durable-saga versioning lessons), header evidence row.
+- Wording corrections per D-8: §11 P-2 "Market survey done" → isolation-technology survey,
+  explicitly scoped; sandbox survey file scoped to isolation with cross-ref to the study.
+- Gates: `docs:links` OK; `deno fmt` clean.

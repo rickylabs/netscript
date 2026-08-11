@@ -63,6 +63,8 @@ dogfood zone panel/console route/island) is the natural adjacency for the cockpi
 
 - `evidence/legacy-capability-map.md` — G1, Codex Sol medium (thread in `codex-thread-ids.md`).
 - `evidence/current-state-matrix.md` — G2, Codex Sol medium.
+- `evidence/competitive-architecture-study.md` — S6, supervisor-authored on primary sources (D-8).
+- `evidence/sandbox-isolation-survey.md` — isolation-scoped external survey (committed S5 fix cycle).
 
 ## Open questions the plan must close
 

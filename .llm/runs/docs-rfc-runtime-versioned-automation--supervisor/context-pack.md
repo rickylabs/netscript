@@ -21,5 +21,6 @@ Resume here. State as of 2026-08-11 (post PLAN-EVAL cycle 1 fix).
   FAIL_PLAN (old text + new findings) → corrected fix set applied with per-edit verification and
   pushed. **Two-FAIL protocol stop reached: owner escalation pending** — owner authorizes cycle 3
   (resume thread `019fef2b-…03fc` in `/home/codex/repos/ns-rfc-plan-eval`) or reviews directly.
+- **S6 (D-8)**: competitive architecture study landed (`evidence/competitive-architecture-study.md`), integrated as RFC §14.1 + §13.1 benchmark gates + P-5; overbroad wording corrected. Cycle 3 authorized by owner.
 - **Hard rules**: draft PR only; no issue filing; no ready-for-review until owner ratifies;
   never write in ns-1443 worktree or netscript-start-ref.

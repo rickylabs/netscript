@@ -30,7 +30,7 @@ facts preferred; comparison-table numbers are vendor/practitioner-reported, trea
 | WASM/WASI component model | <1ms | <1–5MB | capability deny-by-default, no ambient authority | polyglot-if-compiled (Rust/Go/Py/JS/C); no GPU; wasmtime/wasmCloud; Microsoft Wassette (2025) = wasmtime + MCP for agent tools |
 
 - Managed sandbox products (E2B Firecracker SDK, Modal gVisor, Northflank Kata/FC/gVisor,
-  Fly Sprites, Beam) demonstrate a mature buy-option market; all are cloud-hosted — self-host fit
+  Fly Sprites, Beam) demonstrate a mature buy-option market **for isolation/sandbox execution specifically** (this file's scope is isolation technology only — the broader runtime/workflow product comparison lives in `competitive-architecture-study.md`); all are cloud-hosted — self-host fit
   varies (Northflank BYOC, Beam self-host).
 - Recurring architecture: separate "execution adapter" from "security boundary"; layer primitives
   (defense in depth); pick per-workload isolation level by trust tier.

@@ -1,12 +1,12 @@
 # RFC-0001 — Runtime-Versioned Automation: operator-managed workers, tasks, and triggers
 
-|                   |                                                                                                                                                                                                                                               |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**        | **Proposed** — awaiting owner ratification; final adversarial PLAN-EVAL (Codex GPT-5.6 Sol · xhigh) recorded on PR #1446                                                                                                                      |
-| **Run record**    | `.llm/runs/docs-rfc-runtime-versioned-automation--supervisor/` — research, evidence reports, drift, briefs                                                                                                                                    |
-| **Tracking**      | Refs #1443 · #1445 · PR #1444 (control-plane split, D-10) · downstream of RFC [#890](https://github.com/rickylabs/netscript/pull/890) (merged 2026-08-03) and epic [#922](https://github.com/rickylabs/netscript/issues/922) (open)           |
-| **Evidence base** | `evidence/legacy-capability-map.md` (netscript-start @ `6ba9ba0`, 15 sections, 3 operator journeys) · `evidence/current-state-matrix.md` (this repo @ `2256a67bf`, hypotheses H1–H6, probes P1–P5) · both Codex-authored, supervisor-verified |
-| **Authority**     | This RFC establishes `docs/architecture/rfc/` as the in-repo RFC home. On ratification, the roadmap in §12 is filed as a draft epic/issue graph; nothing files before that.                                                                   |
+|                   |                                                                                                                                                                                                                                                                                                                                                                                        |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**        | **Proposed** — awaiting owner ratification; final adversarial PLAN-EVAL (Codex GPT-5.6 Sol · xhigh) recorded on PR #1446                                                                                                                                                                                                                                                               |
+| **Run record**    | `.llm/runs/docs-rfc-runtime-versioned-automation--supervisor/` — research, evidence reports, drift, briefs                                                                                                                                                                                                                                                                             |
+| **Tracking**      | Refs #1443 · #1445 · PR #1444 (control-plane split, D-10) · downstream of RFC [#890](https://github.com/rickylabs/netscript/pull/890) (merged 2026-08-03) and epic [#922](https://github.com/rickylabs/netscript/issues/922) (open)                                                                                                                                                    |
+| **Evidence base** | `evidence/legacy-capability-map.md` (netscript-start @ `6ba9ba0`, 15 sections, 3 operator journeys) · `evidence/current-state-matrix.md` (this repo @ `2256a67bf`, hypotheses H1–H6, probes P1–P5) — both Codex-authored, supervisor-verified · `evidence/competitive-architecture-study.md` (9-system primary-source comparison, 2026-08-11) · `evidence/sandbox-isolation-survey.md` |
+| **Authority**     | This RFC establishes `docs/architecture/rfc/` as the in-repo RFC home. On ratification, the roadmap in §12 is filed as a draft epic/issue graph; nothing files before that.                                                                                                                                                                                                            |
 
 ---
 
@@ -568,12 +568,13 @@ their current form doesn't fit.
 
 ## 11. Staged decisions — prerequisite RFCs, not faked certainty
 
-| ID  | Question                                                                                                     | Why staged                                                                                                            | Entry criterion                                                                   |
-| --- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| P-1 | Distributed single-fire (leader lease vs lock vs queue-delay) for schedules/file-watches across replicas     | Correctness under partitions deserves its own adversarial review; single-replica constraint is a safe interim         | before the stack advertises horizontal scaling of scheduled/file-watch processors |
-| P-2 | T2 boundary selection (gVisor vs Firecracker-class vs managed sandbox service) + T3 WASM/WASI component tier | Market survey done (run extract); selection depends on deployment targets (self-host vs cloud) the owner hasn't fixed | before any marketplace/tenant-facing definition source                            |
-| P-3 | Definition provenance/signing for third-party definition bundles                                             | No third-party source exists yet                                                                                      | with P-2                                                                          |
-| P-4 | Saga/stream automation families (`saga@1`, `stream@1`)                                                       | Prove the model on task/trigger first; family mechanism makes this additive                                           | after task@1 + trigger@1 ship                                                     |
+| ID  | Question                                                                                                     | Why staged                                                                                                                                                                                                                                          | Entry criterion                                                                   |
+| --- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| P-1 | Distributed single-fire (leader lease vs lock vs queue-delay) for schedules/file-watches across replicas     | Correctness under partitions deserves its own adversarial review; single-replica constraint is a safe interim                                                                                                                                       | before the stack advertises horizontal scaling of scheduled/file-watch processors |
+| P-2 | T2 boundary selection (gVisor vs Firecracker-class vs managed sandbox service) + T3 WASM/WASI component tier | **Isolation-technology** survey done (`evidence/sandbox-isolation-survey.md` — scoped to isolation options, not a general market study); selection depends on deployment targets (self-host vs cloud) the owner hasn't fixed                        | before any marketplace/tenant-facing definition source                            |
+| P-3 | Definition provenance/signing for third-party definition bundles                                             | No third-party source exists yet                                                                                                                                                                                                                    | with P-2                                                                          |
+| P-4 | Saga/stream automation families (`saga@1`, `stream@1`)                                                       | Prove the model on task/trigger first; family mechanism makes this additive. If `saga@1` adopts durable/replayed execution, the studied systems' versioning lessons (Temporal pinning, DF breaking-change taxonomy — competitive study) apply there | after task@1 + trigger@1 ship                                                     |
+| P-5 | Weighted/canary activation (route a fraction of dispatches to a newer revision)                              | Proven pointer-model extension (AWS Step Functions weighted aliases — competitive study §Synthesis-8); needs convergence tracking first                                                                                                             | after A2d lands                                                                   |
 
 ## 12. Roadmap (draft — files only on owner ratification)
 
@@ -648,6 +649,21 @@ stack with the automation connector + workers + triggers installed, Aspire-start
 Suite cost places it in the release-gate class (`.llm/harness/gates/release-gates.md`), not the
 per-slice loop.
 
+### 13.1 Benchmark gates (executable, implementation-stage)
+
+Per the competitive study's no-empirical-claims rule, performance enters this RFC only as **gates**:
+each ships as a reproducible measurement against a pinned reference environment (documented in its
+slice PR), with an owner-ratified budget asserted in CI — the gate is the existence and enforcement
+of the measurement, not a number claimed today.
+
+| Gate | Measures                                                                              | Lands in                  |
+| ---- | ------------------------------------------------------------------------------------- | ------------------------- |
+| BG-1 | activation → all-replica convergence latency (p50/p95, 3 replicas) with SLO assertion | A2d, exercised in A8      |
+| BG-2 | per-dispatch overhead of revision-pinned lookup vs direct registry read (warm cache)  | A3a micro-bench           |
+| BG-3 | epoch commit transaction latency (publish+activate+audit) on the reference Postgres   | A1a conformance perf case |
+| BG-4 | sustained execution-history write rate without queue growth on the reference stack    | A8                        |
+| BG-5 | T1 boundary spawn overhead per runtime (deno/python/shell) vs bare subprocess         | A5a                       |
+
 ## 14. Alternatives considered
 
 - **Evolutionary repair** (wire `runtime-config` into the engines, add mutation endpoints to the
@@ -663,6 +679,49 @@ per-slice loop.
   prohibited by the owner (D-10) — it deletes the differentiating capability.
 - **Bespoke sandbox**: rejected per the survey; every tier maps to maintained technology behind a
   port (§5.4), and Deno's own documentation directs untrusted execution to OS/VM isolation.
+
+### 14.1 Competitive architecture study (owner-directed; evidence: `evidence/competitive-architecture-study.md`)
+
+Nine directly analogous systems were compared on primary sources across twelve dimensions
+(definition/versioning, activation/rollback, live mutation, scheduling ownership, consistency,
+idempotency/retries, history/audit/telemetry, isolation, control/data plane, extensibility, cockpit
+UX, self-hosting): Temporal, Restate, Inngest, Trigger.dev, Hatchet, Windmill, Azure Durable
+Functions, AWS Step Functions, and the operator/low-code group Kestra + n8n. The full matrix,
+per-system profiles, and citations live in the study; the load-bearing conclusions:
+
+**Adopted established patterns** (independent convergence across vendors, each mapped to the section
+that already specifies it): immutable versions + explicit activation pointer with
+rollback-as-re-point (Step Functions versions/aliases; Trigger.dev `--skip-promotion`/`promote`;
+Restate immutable deployments; Kestra/n8n revisions → §5.2); **in-flight work pinned to its starting
+version** (Temporal pinned workflows, Restate pinned invocations, Durable Functions instance-version
+association → §5.3 step 6); database as transactional system of record with file trees demoted to
+authoring/interchange (Hatchet, Inngest self-host, Windmill; none of the nine consumes watched files
+at runtime → §5.2); server-owned scheduling attached to definitions (uniform → §5.1, P-1);
+app-hosted execution with explicit sync/poll convergence (Inngest app sync, Temporal workers →
+§5.3); draft→publish cockpit UX with version history (Windmill, Kestra, n8n → §8.2);
+plugin-versioned extensibility precedent (Kestra plugin versioning/hot-reload → §5.1);
+weighted/canary activation as a staged pointer-model extension (Step Functions weighted aliases →
+§11 P-5).
+
+**Deliberate non-goals (v1)**: replay-determinism durable execution for tasks/triggers — the studied
+durable-execution systems pay a permanent versioning tax for it (Durable Functions maintains a
+breaking-change taxonomy and four mitigation strategies); `task@1` is single-shot with engine
+retries, and durable multi-step orchestration stays in the saga domain (P-4 imports these lessons if
+`saga@1` goes durable). Also non-goals: an external/managed control plane (Step Functions' model is
+managed-only; NetScript's control plane ships inside the stack), node-graph visual programming as
+the authoring model, and a compute marketplace before P-2/P-3.
+
+**NetScript differentiators the study defends**: in-framework composition (definitions live in the
+consumer's app and compose with auth/DB/streams/sagas/Aspire — every studied system is an adjacent
+server or SaaS); operator wrapping of **existing project-local polyglot scripts** with declared,
+per-tier-honest capability grants (Windmill is nearest but owns code in its own workspace model);
+**contribution-family extensibility** (third-party plugins add definition _families_, schema-first);
+one control plane across heterogeneous engines.
+
+**No empirical performance claims** are made about NetScript or any studied system. Performance is
+expressed only as the executable benchmark gates BG-1…BG-5 (§13.1), each landing in a named slice
+with a pinned reference environment and CI-enforced regression.
+
 - **Buy a managed sandbox service** (E2B/Modal-class): viable only for cloud deployments; noted as a
   possible T2 adapter in P-2, not a foundation — NetScript stacks must remain self-hostable.
 
