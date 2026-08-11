@@ -41,7 +41,7 @@ export function createPluginContractGates(): readonly GateDefinition[] {
           doctorMissingModuleScript(
             cli(context, 'plugin', 'doctor', '--project-root', context.project.projectRoot),
             context.project.projectRoot,
-            join(context.project.projectRoot, 'ai', 'mod.ts'),
+            join(context.project.projectRoot, 'ai', 'plugin.ts'),
           ),
         ),
       (context) => context.project.repoRoot,

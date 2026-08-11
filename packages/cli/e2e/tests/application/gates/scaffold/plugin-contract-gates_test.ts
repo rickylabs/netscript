@@ -82,7 +82,7 @@ Deno.test('doctor negative gate observes failure and restores the configured mod
   const root = await Deno.makeTempDir({ prefix: 'netscript-doctor-negative-gate-' });
   try {
     const context = createContext(root, 'fake-cli.ts');
-    const modulePath = join(root, 'ai', 'mod.ts');
+    const modulePath = join(root, 'ai', 'plugin.ts');
     await Deno.mkdir(dirname(modulePath), { recursive: true });
     await Deno.writeTextFile(modulePath, 'export const manifest = {};\n');
     await Deno.writeTextFile(

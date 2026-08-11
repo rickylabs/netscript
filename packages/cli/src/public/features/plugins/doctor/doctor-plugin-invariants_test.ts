@@ -1,4 +1,4 @@
-import { assertEquals, assertStringIncludes } from '@std/assert';
+import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { join } from '@std/path';
 import { defineConfig } from '@netscript/config';
 
@@ -6,11 +6,14 @@ import { loadRegisteredPlugins } from '../../../../kernel/adapters/config/plugin
 import { probeConfiguredPluginManifest } from '../../../../kernel/adapters/config/configured-plugin-manifest-probe.ts';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
+import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import type { RegisteredPluginConfig } from '../../../../kernel/domain/resolved-config.ts';
+import { createDoctorPluginCommand } from './doctor-plugin-command.ts';
 import {
   CONFIGURED_MODULE_EXPORTS_MANIFEST_CHECK,
   CONFIGURED_MODULE_RESOLVES_CHECK,
   doctorPlugin,
+  type PluginDoctorReport,
   SERVICE_ENTRYPOINT_RESOLVES_CHECK,
 } from './doctor-plugin-use-case.ts';
 
@@ -42,6 +45,11 @@ Deno.test('plugin doctor rejects a dangling configured module', async () => {
     const check = findCheck(reports[0].checks, CONFIGURED_MODULE_RESOLVES_CHECK);
     assertEquals(check.status, 'error');
     assertStringIncludes(check.message ?? '', 'does not exist');
+    await assertDoctorCommandExitsOne(
+      projectRoot,
+      reports,
+      CONFIGURED_MODULE_RESOLVES_CHECK,
+    );
   });
 });
 
@@ -52,6 +60,11 @@ Deno.test('plugin doctor rejects a configured module with no manifest export', a
     const check = findCheck(reports[0].checks, CONFIGURED_MODULE_EXPORTS_MANIFEST_CHECK);
     assertEquals(check.status, 'error');
     assertStringIncludes(check.message ?? '', 'no manifest-shaped value');
+    await assertDoctorCommandExitsOne(
+      projectRoot,
+      reports,
+      CONFIGURED_MODULE_EXPORTS_MANIFEST_CHECK,
+    );
   });
 });
 
@@ -97,6 +110,11 @@ Deno.test('plugin doctor rejects a service entrypoint absent from a JSR export m
     const check = findCheck(reports[0].checks, SERVICE_ENTRYPOINT_RESOLVES_CHECK);
     assertEquals(check.status, 'error');
     assertStringIncludes(check.message ?? '', 'is not declared');
+    await assertDoctorCommandExitsOne(
+      projectRoot,
+      reports,
+      SERVICE_ENTRYPOINT_RESOLVES_CHECK,
+    );
   });
 });
 
@@ -167,7 +185,7 @@ function projectConfig() {
   return defineConfig({
     name: 'doctor-fixture',
     databases: { config: [] },
-    plugins: ['./extension/mod.ts'],
+    plugins: ['./extension/plugin.ts'],
   });
 }
 
@@ -183,7 +201,7 @@ function registeredPlugin(projectRoot: string): RegisteredPluginConfig {
 
 async function writeModule(projectRoot: string, source: string): Promise<void> {
   await Deno.mkdir(join(projectRoot, 'extension'), { recursive: true });
-  await Deno.writeTextFile(join(projectRoot, 'extension', 'mod.ts'), source);
+  await Deno.writeTextFile(join(projectRoot, 'extension', 'plugin.ts'), source);
 }
 
 async function writeAppsettings(
@@ -207,6 +225,28 @@ function findCheck(
   const result = checks.find((check) => check.id === id);
   if (!result) throw new Error(`Missing doctor check ${id}.`);
   return result;
+}
+
+async function assertDoctorCommandExitsOne(
+  projectRoot: string,
+  reports: readonly PluginDoctorReport[],
+  checkId: string,
+): Promise<void> {
+  const command = createDoctorPluginCommand({
+    resolveProjectRoot: () => Promise.resolve(projectRoot),
+    doctor: () => Promise.resolve(reports),
+    print: () => {},
+    diagnosticEvidence: () => ({
+      read: () => Promise.resolve(undefined),
+      write: () => Promise.resolve(),
+      appendDrift: () => Promise.resolve(),
+    }),
+  });
+  const error = await assertRejects(
+    () => command.parse(['--project-root', projectRoot]),
+    RemoteError,
+  );
+  assertEquals(error.exitCode, 1, `${checkId} must fail the doctor command`);
 }
 
 async function withProject(run: (projectRoot: string) => Promise<void>): Promise<void> {
