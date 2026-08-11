@@ -1,0 +1,96 @@
+title:	RFC: Typed SDK client contributions
+state:	DRAFT
+author:	rickylabs
+labels:	area:plugins, area:sdk, ci:skip-e2e, ci:skip-scaffold, priority:p1, rfc, status:review, type:docs, type:test
+assignees:	
+reviewers:	
+projects:	
+milestone:	
+number:	1390
+url:	https://github.com/rickylabs/netscript/pull/1390
+additions:	3686
+deletions:	0
+auto-merge:	disabled
+--
+## Summary
+
+Draft RFC for a minimal typed SDK client contribution seam. Formal Claude Fable 5 PLAN-EVAL cycle
+1 returned `FAIL_PLAN / CHANGES_REQUESTED`; this branch now remediates F-A1 through F-A10 while
+preserving the typed request-header/context contribution axis and stable-v1/upstream-major-neutral
+decision.
+
+## Scope
+
+- RFC tracking issue: #1348 (reference only; this draft does not close it)
+- Source roadmap: #1347
+- Harness: Archetypes 2, 4, 5, and 6 under `SCOPE-docs`
+- No framework implementation, RFC numbering, issue creation/closure, merge, evaluator launch, or
+  milestone mutation
+
+## Slices
+
+- [x] S1 harness bootstrap — `158849031`
+- [x] S2 repository/upstream re-baseline and RFC authorship — `89ae608ea`
+- [x] S3 initial gate/handoff record — `e78ac0a65`
+- [x] S4 root-requested oRPC v2 audit amendment — `7a0d39808`
+- [x] Formal PLAN-EVAL cycle-1 verdict artifact — `f1a29fe1a`
+- [x] S5 F-A1–F-A10 RFC/type-fixture remediation — `78a7cecd1`
+- [x] S5 author handoff record — `bc9554590`
+- [x] S5 live PR reconciliation and cycle-2 entry — `4978f7d84`
+- [x] S5 aggregate base-to-HEAD diff hygiene — `9f45404ac`
+
+## Cycle-1 corrections
+
+- Scope zero-oRPC inspection to named new RFC-A nodes and generated client declarations, under a
+  non-growing #1350/#1278 baseline.
+- Preserve exact three-element default server keys and define exact five-element partitioned keys
+  across factories, cache bridge/persister/collections, and recursive TanStack wrappers.
+- Default every widened public generic.
+- Prepare once for unary retries and re-prepare fresh credentials for iterator-phase reconnect
+  epochs.
+- Reject HTTP contributions on Desktop MessagePort clients.
+- Place private ports only under `src/internal/client-contributions/` and prove doc/packed absence.
+- Expose contributors only to declared context plus signal; keep retry/cache/trace/dedupe semantics
+  and the prepared-call channel private.
+- Correct the v2 fork: v1 has GET today; v2 must replace inference plus configure
+  `allowMethods`/CSRF or retire GET and replace dedupe. The separate spike owns the complete
+  migration gate matrix.
+- Commit an in-tree real-surface inference/default/key fixture and split #1350 Stage 1a error repair
+  from Stage 1b metadata ownership.
+
+## Validation
+
+- real-surface fixture check — PASS
+- scoped fixture lint — PASS, 1 file / 0 findings
+- RFC/harness/fixture format — PASS, 9 files
+- focused RFC links — PASS, 1 document / 0 broken
+- repository docs links — PASS, 102 documents / 0 broken
+- docs accuracy — PASS
+- doctrine — PASS, exit 0; warning-only baseline unchanged
+- diff hygiene — PASS
+- review-thread gate — PASS, 0 total / 0 unanswered
+
+Package publish/JSR/doc-lint baselines from the initial RFC remain recorded and unwaived. CLI/
+scaffold runtime E2E remains an implementation merge-readiness gate, not a docs-only RFC gate.
+
+## Harness and review boundary
+
+- Run: `.llm/runs/docs-rfc-sdk-client-contribution--rfc/`
+- Verdict: `.llm/runs/docs-rfc-sdk-client-contribution--rfc/plan-eval.md`
+- Handoff: `.llm/runs/docs-rfc-sdk-client-contribution--rfc/final-handoff.md`
+- Phase: `status:review`; Fable cycle 2 and Qwen final evaluation both passed; formal FCP opened 2026-08-08
+- The root orchestrator must steer the existing Fable session for cycle 2, then own the later Qwen
+  pass. This generator launched neither.
+
+## Definition of Done
+
+- [x] Every F-A1–F-A10 correction is normative or has an executable future gate.
+- [x] The fixture models real current contract/client/query/key/Desktop surfaces in-tree.
+- [x] Board-stage reconciliation preserves live issue ownership without mutation.
+- [x] Exact cycle-2 reviewer instructions are in the final handoff.
+- [x] Formal cycle-2 verdict is recorded by the owner-designated evaluator.
+
+Keep this PR draft. Do not number or merge the RFC until maintainer acceptance and the remaining
+owner-directed review passes complete.
+
+

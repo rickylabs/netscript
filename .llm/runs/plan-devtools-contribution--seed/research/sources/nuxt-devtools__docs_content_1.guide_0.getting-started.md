@@ -1,0 +1,114 @@
+---
+title: Getting Started
+description: Nuxt DevTools is shipped with Nuxt. Enable it in your config to get started.
+---
+
+## Installation
+
+Nuxt DevTools is shipped with Nuxt. To enable it, set `devtools` to `true` in your `nuxt.config`:
+
+```ts [nuxt.config.ts]
+export default defineNuxtConfig({
+  devtools: { enabled: true },
+})
+```
+
+### Open the DevTools Panel
+
+Restart your Nuxt server and open your app in browser. Click the Nuxt icon on the bottom (or press :kbd{value="Shift"} + :kbd{value="Alt"} / :kbd{value="⇧ Shift"} + :kbd{value="⌥ Option"} + :kbd{value="D"}) to toggle the DevTools.
+
+### Opting in to v4.0
+
+Nuxt DevTools v4.0 is currently in alpha and requires Vite 8 — it integrates
+with [Vite DevTools](https://github.com/vitejs/devtools), whose Code Server
+dock only peers with Vite 8. Since Nuxt ships with a built-in version of
+DevTools, you can opt-in to v4.0 by using package manager resolutions to
+override the bundled version:
+
+::code-group
+
+```json [npm]
+{
+  "overrides": {
+    "@nuxt/devtools": "npm:@nuxt/devtools-nightly@latest"
+  }
+}
+```
+
+```json [yarn]
+{
+  "resolutions": {
+    "@nuxt/devtools": "npm:@nuxt/devtools-nightly@latest"
+  }
+}
+```
+
+```json [pnpm]
+{
+  "pnpm": {
+    "overrides": {
+      "@nuxt/devtools": "npm:@nuxt/devtools-nightly@latest"
+    }
+  }
+}
+```
+
+::
+
+Remove lockfile (`package-lock.json`, `yarn.lock`, or `pnpm-lock.yaml`) and reinstall dependencies.
+
+### Nightly Release Channel
+
+Similar to [Nuxt's Nightly Channel](https://nuxt.com/docs/guide/going-further/nightly-release-channel), DevTools also offers a nightly release channel, that automatically releases for every commit to `main` branch.
+
+You can opt-in to the nightly release channel by using package manager resolutions:
+
+::code-group
+
+```json [npm]
+{
+  "overrides": {
+    "@nuxt/devtools": "npm:@nuxt/devtools-nightly@latest"
+  }
+}
+```
+
+```json [yarn]
+{
+  "resolutions": {
+    "@nuxt/devtools": "npm:@nuxt/devtools-nightly@latest"
+  }
+}
+```
+
+```json [pnpm]
+{
+  "pnpm": {
+    "overrides": {
+      "@nuxt/devtools": "npm:@nuxt/devtools-nightly@latest"
+    }
+  }
+}
+```
+
+::
+
+Remove lockfile (`package-lock.json`, `yarn.lock`, or `pnpm-lock.yaml`) and reinstall dependencies.
+
+### Module Options
+
+To configure Nuxt DevTools, you can pass the `devtools` options.
+
+```ts [nuxt.config.ts]
+export default defineNuxtConfig({
+  devtools: {
+    // Enable devtools (default: true)
+    enabled: true,
+    // Coder code-server options (enabled by default)
+    codeServer: {},
+    // ...other options
+  }
+})
+```
+
+For all options available, please refer to TSDocs in your IDE, or the [type definition file](https://github.com/nuxt/devtools/blob/main/packages/devtools-kit/src/_types/options.ts#L6).

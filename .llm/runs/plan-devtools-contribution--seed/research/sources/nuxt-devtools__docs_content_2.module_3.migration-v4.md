@@ -1,0 +1,332 @@
+---
+title: Migration to v4
+description: 'Breaking changes and migration guide for Nuxt DevTools v4.'
+---
+
+## `vscode` option removed {#ndt_dep_0008}
+
+The bespoke `devtools.vscode` integration has been replaced by the Code Server
+Devframe plugin. Supplying `vscode` emits `NDT_DEP_0008`; the complete value is
+ignored and is not translated, because partially mapping the old modes would
+silently change their behavior.
+
+```diff
+export default defineNuxtConfig({
+  devtools: {
+-   vscode: { enabled: true },
++   codeServer: { enabled: true },
+  },
+})
+```
+
+The replacement supports only a locally installed Coder
+[`code-server`](https://coder.com/docs/code-server/install), detected at setup
+and started on demand. These legacy capabilities were removed:
+
+- Microsoft `code serve-web` and Microsoft `code-server serve-local`;
+- VS Code tunnels;
+- reusing an existing server;
+- starting the server on boot;
+- installing the `vscode-server-controller` extension;
+- opening a specific file through that controller extension.
+
+The generic open-in-editor feature remains available. For the new integration,
+configure only `enabled`, `bin`, `cwd`, `serverPort`, `host`, `args`, `env`,
+`cookieSuffix`, or `startTimeout` under `devtools.codeServer`.
+
+## `startSubprocess()` API Changes
+
+The subprocess system has been migrated from `execa` to `tinyexec`.
+
+### `SubprocessOptions` no longer extends `ExecaOptions`
+
+Previously, `SubprocessOptions` extended `ExecaOptions` from `execa`, allowing you to pass any execa option directly. It now has its own interface:
+
+```ts
+interface SubprocessOptions {
+  command: string
+  args?: string[]
+  cwd?: string
+  env?: Record<string, string | undefined>
+  nodeOptions?: SpawnOptions // from 'node:child_process'
+}
+```
+
+Common fields like `cwd` and `env` are still available as top-level options. Other execa-specific options should be migrated to `nodeOptions` (Node.js `SpawnOptions`):
+
+```diff
+startSubprocess({
+  command: 'my-command',
+  args: ['--flag'],
+  cwd: '/some/path',
+- stdio: 'pipe',
++ nodeOptions: {
++   stdio: 'pipe',
++ },
+})
+```
+
+### `startSubprocess()` is deprecated {#ndt_dep_0004}
+
+`startSubprocess()` is soft-deprecated in favour of the Vite DevTools terminals
+host, used from the [`onDevtoolsReady`](/module/utils-kit#ondevtoolsready) hook.
+It still works as a shim, but emits the `NDT_DEP_0004` deprecation diagnostic.
+
+```diff
+- import { startSubprocess } from '@nuxt/devtools-kit'
++ import { onDevtoolsReady } from '@nuxt/devtools-kit'
+
+- const subprocess = startSubprocess(
+-   { command: 'vite', args: ['build', '--watch'] },
+-   { id: 'my-module:build', name: 'Build', icon: 'ph:terminal-duotone' },
+- )
++ onDevtoolsReady(async (ctx) => {
++   const session = await ctx.terminals.startChildProcess(
++     { command: 'vite', args: ['build', '--watch'], cwd: process.cwd() },
++     { id: 'my-module:build', title: 'Build', icon: 'ph:terminal-duotone' },
++   )
++ })
+```
+
+The terminals host session exposes `terminate()`, `restart()`,
+`getChildProcess()`, and `getResult()` — a `tinyexec`-style awaitable handle that
+resolves to `{ stdout, stderr, exitCode }` — so the `startSubprocess().getResult()`
+ergonomics carry over:
+
+```ts
+onDevtoolsReady(async (ctx) => {
+  const session = await ctx.terminals.startChildProcess(
+    { command: 'npm', args: ['install'] },
+    { id: 'my-module:install', title: 'Install' },
+  )
+  const { exitCode, stderr } = await session.getResult()
+  if (exitCode !== 0)
+    console.error(stderr)
+})
+```
+
+### Direct `devtools:terminal:*` hooks are legacy (output-only bridge)
+
+Calling the `devtools:terminal:register` / `:write` / `:exit` / `:remove` hooks
+directly (including via `startSubprocess()`, which emits them internally) is
+legacy. Nuxt DevTools no longer ships its own xterm terminal UI; instead these
+hooks are **bridged onto the built-in Vite DevTools Terminals dock**.
+
+The bridge is **output + final status only**:
+
+- terminal output (`:write`) and the final `stopped`/`error` status (`:exit`)
+  appear live in the Terminals dock;
+- the legacy `restartable` / `terminatable` flags and the
+  `onActionRestart` / `onActionTerminate` callbacks are **ignored** — Devframe
+  cannot attach action controls to an externally registered session, so no
+  restart/terminate button is shown for a bridged terminal;
+- re-registering the same id (`clear()` / `restart()`) is surfaced as a new
+  session; the previous run's output is not reset in place.
+
+Programmatic control (`terminate()` / `restart()` on a `startSubprocess()`
+handle) keeps working because that helper owns its process. Only the old Nuxt UI
+controls are gone.
+
+This compatibility bridge, the `devtools:terminal:*` hooks, and the deprecated
+`TerminalState` action fields are scheduled for **removal in v5**. Spawn
+terminals through `ctx.terminals.startChildProcess()` / `startPtySession()` from
+`onDevtoolsReady` instead — those are owned by Devframe and keep full controls.
+
+### `getProcess()` is deprecated {#ndt_dep_0001}
+
+The return value of `startSubprocess()` now also provides `getResult()`; use it instead of the deprecated `getProcess()` method.
+
+- `getProcess()` still works but emits the `NDT_DEP_0001` deprecation diagnostic and returns `ChildProcess | undefined` (was `ExecaChildProcess<string>`)
+- `getResult()` returns a tinyexec `Result` object with `.kill()`, `.process`, `.pipe()`, and more
+
+```diff
+const subprocess = startSubprocess(/* ... */)
+
+- const proc = subprocess.getProcess()
+- proc.stdout.on('data', handler)
++ const result = subprocess.getResult()
++ result.process?.stdout?.on('data', handler)
+```
+
+## `extendServerRpc()` is deprecated {#ndt_dep_0003}
+
+`extendServerRpc()` is soft-deprecated in favour of the Vite DevTools RPC
+registration, done from the [`onDevtoolsReady`](/module/utils-kit#ondevtoolsready)
+hook. It still works as a shim, but emits the `NDT_DEP_0003` deprecation
+diagnostic.
+
+```diff
+- import { extendServerRpc } from '@nuxt/devtools-kit'
++ import { onDevtoolsReady } from '@nuxt/devtools-kit'
++ import { defineRpcFunction } from '@vitejs/devtools-kit'
+
+- const rpc = extendServerRpc('my-module', {
+-   async getData() {
+-     return 'hello'
+-   },
+- })
++ onDevtoolsReady((ctx) => {
++   ctx.rpc.register(defineRpcFunction({
++     name: 'my-module:get-data',
++     type: 'query',
++     setup: () => ({ handler: async () => 'hello' }),
++   }))
++ })
+```
+
+To broadcast to clients from the same context, use `ctx.rpc.broadcast({ method, args, event })`.
+
+## `nuxt.devtools.rpc` direct access is deprecated {#ndt_dep_0007}
+
+Directly accessing `nuxt.devtools.rpc.broadcast` or `nuxt.devtools.rpc.functions`
+is deprecated (`NDT_DEP_0007`). They still work as a shim, but you should use the
+connected `ctx.rpc` (the devframe `RpcFunctionsHost`) from the
+[`onDevtoolsReady`](/module/utils-kit#ondevtoolsready) hook instead:
+
+```diff
+- nuxt.devtools.rpc.broadcast.myEvent.asEvent(payload)
++ onDevtoolsReady((ctx) => {
++   ctx.rpc.broadcast({ method: 'myEvent', args: [payload], event: true })
++ })
+
+- nuxt.devtools.rpc.functions.myFn = handler
++ onDevtoolsReady((ctx) => {
++   ctx.rpc.register({ name: 'myFn', handler })
++ })
+```
+
+## `addCustomTab()` is deprecated {#ndt_dep_0005}
+
+`addCustomTab()` is soft-deprecated in favour of registering a dock entry on the
+Vite DevTools docks host, from the
+[`onDevtoolsReady`](/module/utils-kit#ondevtoolsready) hook. It still works as a
+shim, but emits the `NDT_DEP_0005` deprecation diagnostic.
+
+```diff
+- import { addCustomTab } from '@nuxt/devtools-kit'
++ import { onDevtoolsReady } from '@nuxt/devtools-kit'
+
+- addCustomTab({
+-   name: 'my-module',
+-   title: 'My Module',
+-   icon: 'carbon:apps',
+-   view: { type: 'iframe', src: '/url-to-your-module-view' },
+- })
++ onDevtoolsReady((ctx) => {
++   ctx.docks.register({
++     id: 'my-module',
++     title: 'My Module',
++     icon: 'carbon:apps',
++     type: 'iframe',
++     url: '/url-to-your-module-view',
++   })
++ })
+```
+
+::warning
+The docks host does not yet cover the Nuxt-specific custom-tab features such as
+`vnode` views or tab categories. If you rely on those, keep using
+`addCustomTab()` for now.
+::
+
+## `refreshCustomTabs()` is deprecated {#ndt_dep_0006}
+
+`refreshCustomTabs()` is soft-deprecated (`NDT_DEP_0006`). With the docks host you
+no longer re-run a hook to refresh — update the dock entry directly via the
+handle returned by `register()` inside the
+[`onDevtoolsReady`](/module/utils-kit#ondevtoolsready) hook:
+
+```ts
+onDevtoolsReady((ctx) => {
+  const entry = ctx.docks.register({ id: 'my-module', /* ... */ })
+  entry.update({ title: 'My Module (updated)' })
+})
+```
+
+## `getServerData()` RPC is deprecated {#ndt_dep_0009}
+
+The read-only **Nuxt Options Viewer** page has been replaced by the [Data Inspector](/guide/features#data-inspector) panel in the `Nuxt` group, backed by the `@devframes/plugin-data-inspector` `Nuxt Application` source. Its live jora workbench supersedes the pre-serialized snapshot the old page rendered.
+
+The `getServerData` server RPC that fed the old page is deprecated (`NDT_DEP_0009`). It still works as a compatibility shim — returning the legacy `NuxtServerData` shape (`{ nuxt, nitro, vite: { server, client } }`) with the Vite configs normalized for transport — but emits the diagnostic on first use and will be removed in a future major. Query the Data Inspector's `Nuxt Application` source instead of calling the RPC.
+
+To expose your own inspectable data, install [`@devframes/plugin-data-inspector`](https://npmx.dev/package/@devframes/plugin-data-inspector) and register a source through its native `registerDataSource` API; there is no Nuxt-specific wrapper.
+
+## Global Install Support Removed
+
+Nuxt DevTools no longer supports being installed globally.
+
+- The `devtoolsGlobal` Nuxt config option (with `projects` whitelist) is no longer supported
+- The `-g` flag is no longer used when installing/uninstalling `@nuxt/devtools` via the DevTools UI
+- The `isGlobalInstall` property has been removed from `NuxtDevtoolsInfo`
+
+## `@nuxt/devtools-wizard` Package and `nuxi devtools` Removed
+
+The `@nuxt/devtools-wizard` package, its CLI, and the `nuxi devtools enable/disable` subcommand have been removed. DevTools is shipped with Nuxt — to enable or disable it, update your `nuxt.config.ts` directly:
+
+```ts
+export default defineNuxtConfig({
+  devtools: { enabled: true }, // or false
+})
+```
+
+## `runWizard` RPC Removed
+
+The `runWizard` server RPC function has been removed from `ServerFunctions`. The `enablePages` action is now available as a direct RPC function:
+
+```diff
+- await rpc.runWizard(token, 'enablePages')
++ await rpc.enablePages(token)
+```
+
+The `WizardFunctions`, `WizardActions`, and `GetWizardArgs` types have been removed from `@nuxt/devtools-kit`.
+
+## Vite DevTools Integration is Now Always Enabled
+
+The `viteDevTools` module option has been removed. Nuxt DevTools now always integrates with [Vite DevTools](https://github.com/vitejs/devtools) as a dock entry, nested under a `Nuxt` framework group. The built-in floating panel has been removed — DevTools is accessed through the Vite DevTools panel instead.
+
+`@nuxt/devtools` now requires Vite 8 (`peerDependencies.vite` narrowed from
+`>=6.0` to `^8.0.14`), matching the Vite DevTools plugins it depends on. Join
+the `Nuxt` group from your own module by pointing a dock entry's `groupId` at
+`'nuxt'`:
+
+```ts
+import { onDevtoolsReady } from '@nuxt/devtools-kit'
+
+onDevtoolsReady((ctx) => {
+  ctx.docks.register({
+    id: 'my-module',
+    type: 'iframe',
+    title: 'My Module',
+    icon: 'i-ph-puzzle-piece',
+    url: '/my-module/',
+    groupId: 'nuxt',
+  })
+})
+```
+
+```diff
+export default defineNuxtConfig({
+  devtools: {
+    enabled: true,
+-   viteDevTools: true,
+  },
+})
+```
+
+### `client.devtools` Methods Now Control Vite DevTools
+
+The `client.devtools.open()`, `client.devtools.close()`, and `client.devtools.toggle()` methods still work but now control the Vite DevTools panel:
+
+- `open()` opens the Vite DevTools panel and switches to the Nuxt DevTools dock entry
+- `close()` closes the Vite DevTools panel
+- `toggle()` toggles the Nuxt DevTools dock entry in the Vite DevTools panel
+
+The `Shift+Alt+D` keyboard shortcut now toggles the Nuxt DevTools entry in the Vite DevTools panel.
+
+### `client.devtools.popup` Removed
+
+The Picture-in-Picture popup feature (`client.devtools.popup`) has been removed. This was an experimental feature that required Chrome 111+.
+
+### `showPanel` and `minimizePanelInactive` Settings Removed
+
+The `showPanel` and `minimizePanelInactive` UI settings have been removed from `NuxtDevToolsOptions` as the built-in floating panel no longer exists.

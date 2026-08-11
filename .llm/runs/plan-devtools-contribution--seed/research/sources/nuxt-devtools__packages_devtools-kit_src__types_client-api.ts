@@ -1,0 +1,158 @@
+import type {} from '@nuxt/schema'
+import type { DevToolsRpcClient } from '@vitejs/devtools-kit/client'
+import type { Hookable } from 'hookable'
+import type { NuxtApp } from 'nuxt/app'
+import type { AppConfig } from 'nuxt/schema'
+import type { $Fetch } from 'ofetch'
+import type { BuiltinLanguage } from 'shiki'
+import type { Ref } from 'vue'
+import type { HookInfo, LoadingTimeMetric, PluginMetric } from './integrations'
+import type { NuxtDevtoolsNotifyInput } from './notify'
+import type { ServerFunctions } from './rpc'
+import type { TimelineMetrics } from './timeline-metrics'
+
+export interface DevToolsFrameState {
+  width: number
+  height: number
+  top: number
+  left: number
+  open: boolean
+  route: string
+  position: 'left' | 'right' | 'bottom' | 'top'
+  closeOnOutsideClick: boolean
+  minimizePanelInactive: number
+}
+
+export interface NuxtDevtoolsClientHooks {
+  /**
+   * When the DevTools navigates, used for persisting the current tab
+   */
+  'devtools:navigate': (path: string) => void
+  /**
+   * Event emitted when the component inspector is clicked
+   */
+  'host:inspector:click': (path: string) => void
+  /**
+   * Event to close the component inspector
+   */
+  'host:inspector:close': () => void
+  /**
+   * Triggers reactivity manually, since Vue won't be reactive across frames)
+   */
+  'host:update:reactivity': () => void
+  /**
+   * Host action to control the DevTools navigation
+   */
+  'host:action:navigate': (path: string) => void
+  /**
+   * Host action to reload the DevTools
+   */
+  'host:action:reload': () => void
+}
+
+/**
+ * Host client from the App
+ */
+export interface NuxtDevtoolsHostClient {
+  nuxt: NuxtApp
+  hooks: Hookable<NuxtDevtoolsClientHooks>
+
+  getIframe: () => HTMLIFrameElement | undefined
+
+  inspector?: {
+    enable: () => void
+    disable: () => void
+    toggle: () => void
+    isEnabled: Ref<boolean>
+    isAvailable: Ref<boolean>
+  }
+
+  devtools: {
+    close: () => void
+    open: () => void
+    toggle: () => void
+    reload: () => void
+    navigate: (path: string) => void
+  }
+
+  app: {
+    reload: () => void
+    navigate: (path: string, hard?: boolean) => void
+    appConfig: AppConfig
+    colorMode: Ref<'dark' | 'light'>
+    frameState: Ref<DevToolsFrameState>
+    $fetch: $Fetch
+  }
+
+  metrics: {
+    clientHooks: () => HookInfo[]
+    clientPlugins: () => PluginMetric[] | undefined
+    clientTimeline: () => TimelineMetrics | undefined
+    loading: () => LoadingTimeMetric
+  }
+
+  /**
+   * A counter to trigger reactivity updates
+   */
+  revision: Ref<number>
+
+  /**
+   * Update client
+   * @internal
+   */
+  syncClient: () => NuxtDevtoolsHostClient
+}
+
+export interface CodeHighlightOptions {
+  grammarContextCode?: string
+}
+
+export type AsyncServerFunctions = {
+  [K in keyof ServerFunctions]: (...args: Parameters<ServerFunctions[K]>) => Promise<Awaited<ReturnType<ServerFunctions[K]>>>
+}
+
+export interface NuxtDevtoolsClient {
+  rpc: AsyncServerFunctions
+  renderCodeHighlight: (code: string, lang?: BuiltinLanguage, options?: CodeHighlightOptions) => {
+    code: string
+    supported: boolean
+  }
+  renderMarkdown: (markdown: string) => string
+  colorMode: string
+
+  /**
+   * Push a notification through the devframe Messages system.
+   *
+   * Routes to the shared Messages host, so it surfaces in the Vite DevTools
+   * **Messages** dock and/or as a transient toast (when `notify` is set — the
+   * default). Use this from custom tabs / in-client code to give feedback
+   * through the same notification system as the rest of DevTools.
+   */
+  notify: (input: NuxtDevtoolsNotifyInput) => Promise<void>
+
+  /**
+   * The connected Vite DevTools RPC client, mirroring `nuxt.devtools.devtoolsKit`
+   * on the server. Use it for full devframe-native access — register client RPC
+   * functions (`devtoolsKit.client.register(...)`), call server functions
+   * (`devtoolsKit.call(...)`), shared state, streaming, scoping, etc.
+   *
+   * `undefined` until the DevTools client has connected.
+   */
+  devtoolsKit: DevToolsRpcClient | undefined
+
+  /**
+   * @deprecated Use `onDevtoolsReady((kit) => kit.client.register(...))` from
+   * `@nuxt/devtools-kit/iframe-client`, or the exposed `devtoolsKit` client
+   * directly (`client.devtools.devtoolsKit?.client.register(...)`).
+   */
+  extendClientRpc: <ServerFunctions extends object = Record<string, unknown>, ClientFunctions extends object = Record<string, unknown>>(name: string, functions: ClientFunctions) => ServerFunctions
+}
+
+export interface NuxtDevtoolsIframeClient {
+  host: NuxtDevtoolsHostClient
+  devtools: NuxtDevtoolsClient
+}
+
+export interface NuxtDevtoolsGlobal {
+  setClient: (client: NuxtDevtoolsHostClient) => void
+}
