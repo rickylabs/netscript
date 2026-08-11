@@ -353,3 +353,32 @@ documentation.
   deliverable obtained on an owner-approved substitute route"*. Risk **R12** is updated accordingly —
   it is **not** silently closed, because the substitution is a recorded deviation from
   `lane-policy` invariant 5, not a satisfaction of it.
+
+## 2026-08-11 — D-16: owner-directed lane split — Kimi K3 takes the pure UI/UX review
+
+- **What:** The owner refined the D-15 override: *"if it pure UX UI use Kimi K3"*. Stage D2 is
+  therefore split by **subject**, not merged into one pass.
+- **Source:** owner instruction in-turn, 2026-08-11, immediately following the D-15 override.
+- **The split:**
+  | Lane | Model | Owns |
+  | --- | --- | --- |
+  | Architecture / contracts | `openrouter/qwen/qwen3.8-max`, variant `max` | Contribution model, identity/ordering, cross-RFC coherence (#890 / RFC-0001 / RFC-A), the declines, worked-example non-duplication |
+  | **Pure UI/UX** | `openrouter/moonshotai/kimi-k3`, variant `high` | Information architecture, the state matrix, the `DevToolsUiNode` closed vocabulary, contributor DX, hierarchy and density |
+  Each prompt tells its reviewer to **stay in its lane** and skip findings belonging to the other, so
+  the two passes complement rather than duplicate.
+- **Why this is a better shape than one pass:** `lane-policy.md` already defines
+  `adversarial_design_eval` (Kimi) as *complementing* the design lane rather than replacing it. The
+  owner's split uses each model where it is strongest instead of asking one reviewer to be both an
+  architecture critic and a UX critic — the failure mode that produces broad, soft findings.
+- **Honest limitation, recorded rather than glossed:** Kimi K3 is the **vision-capable** lane, but
+  this run is planning-only — **no screenshots, mockups, or rendered artifacts exist**, because
+  nothing is implemented. Kimi therefore reviews the information architecture **as text** and its
+  vision capability is **unused**. Its prompt says so explicitly, so no downstream artifact can imply
+  a visual review happened. If the IA is ever prototyped, a follow-up Kimi pass *with* images would
+  be materially different evidence.
+- **Severity:** minor — a lane refinement within an already-authorized override.
+- **Action:** accept and execute. Both passes run on **separate** fresh read-only worktrees
+  (`ns-devtools-d2-qwen`, `ns-devtools-d2-kimi`), both findings-only with no edit rights, both
+  advisory. The **Codex PLAN-EVAL remains the sole verdict of record** — unchanged by either.
+- **Evidence:** `design/ux-evidence/{qwen,kimi}-prompt.md`; model ids resolved from
+  `.llm/tools/agentic/config/models.ts:52,81`, not hardcoded.
