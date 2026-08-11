@@ -94,15 +94,17 @@ designs live inside the RFC and are re-checkpointed by their own future runs).
    (body + per-slice phase comments); PR #1444 comment 5248826402 (early impact memo).
 2. **Domain vocabulary** — capability status tags (IMPLEMENTED/PARTIAL/ASPIRATIONAL/DEAD;
    PROVEN/IMPLEMENTED-UNPROVEN/ABSENT), operator journeys J1–J3, contribution families
-   (`task@1`, `trigger@1`), activation epochs/sets, trust tiers T0–T3, threat items TM1–TM9,
-   waves A0–A8, prerequisite RFCs P-1–P-4.
+   (`task@1`, `trigger@1`), activation epochs/sets (complete desired state, revision-pinned
+   dispatch, leased registration, outage contract), trust tiers T0–T3, threat items TM1–TM9,
+   waves A0–A8 (incl. A2d, A6a–c), prerequisite/staged items P-1–P-5, benchmark gates BG-1–BG-5,
+   competitive-study verdict classes (adopt / non-goal / differentiator).
 3. **Ports** — none created (docs run). The RFC *specifies* ports (store/boundary/reload/feed)
    for future implementation runs.
 4. **Constants** — slice IDs S1–S5; evidence file names fixed in briefs; RFC section anchors
    cited by plan-eval.
 5. **Commit slices** — S1–S5 as in plan.md §Commit slices, each with files + proving gate.
 6. **Deferred scope** — implementation of the selected architecture (owner-gated); issue filing
-   (owner-gated); §11 P-1..P-4 prerequisite RFCs; §15 classified deferrals.
+   (owner-gated); §11 P-1..P-5 staged items; §15 classified deferrals.
 7. **Contributor path** — a reader starts at the RFC abstract → §4 overview → the section for
    their concern; an implementer starts at §12's slice table, which names files + gates per
    slice; evidence traceability runs RFC claim → evidence file § → path:line.
@@ -171,3 +173,26 @@ designs live inside the RFC and are re-checkpointed by their own future runs).
 - Wording corrections per D-8: §11 P-2 "Market survey done" → isolation-technology survey,
   explicitly scoped; sandbox survey file scoped to isolation with cross-ref to the study.
 - Gates: `docs:links` OK; `deno fmt` clean.
+
+## 2026-08-11 PLAN-EVAL cycle 3 (owner-authorized) — FAIL_PLAN, all six findings fixed; holding for ratification
+
+- Cycle 3 at `811373a87`: 5 of 9 prior findings PASS (ownership/thinness, honest T1, evidence
+  scoping, TM9/C8 core, deferred scope); FAIL_PLAN on 6 narrowed items. Fixes (this commit):
+  1. §5.3 step 8 **availability contract decided**: bounded last-good serving, never self-drain;
+     leases gate admission not serving; step 6 pinned-lookup failures classified
+     transient (queue retry+backoff) vs terminal (DLQ) with a never-invalidating revision cache
+     pre-warmed by snapshots; outage tests + risk row assigned to A1c/A2d/A3a/A8.
+  2. §5.5 secret guarantee made bounded (aligns with §6 trust assumptions).
+  3. §10 cleanup table completed: triggers enabled-state ports/stores/testing/public exports +
+     consumers; Windows env-file-content/values/template/generated asset; live
+     `NETSCRIPT_TASKS_DIR` readers (path-resolution.ts, job-execution.ts).
+  4. §12 every row now carries its full matrix gate set (F/P added across core/plugin rows) +
+     release class on A1a (DB), A2a (Aspire/scaffold), A2c (published CLI), A6a, A6b, A8.
+  5. Study: isolation / control-data-plane / cockpit-UX matrix rows added; exhaustive negatives
+     narrowed to retrieved-doc scope (study + RFC §14.1); non-primary-source rule stated (HN +
+     n8n community = color only, never load-bearing); RFC T3 "sub-ms" empirical claim removed.
+  6. plan.md (status/risks/sweep/slices S6), worklog Design vocabulary, context-pack, PR body
+     reconciled to cycle-3 state.
+- Per the owner's D-8 directive (address findings, leave PR current but draft), the run holds
+  here — no cycle 4 was ordered; evaluator thread + worktree retained for one on request.
+- Gates re-run: `docs:links` OK; fmt clean.

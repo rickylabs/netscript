@@ -131,3 +131,80 @@ The package spelling, two-person default, retention defaults, and P-1–P-4 rema
 - This is the second `FAIL_PLAN`; per `plan-protocol.md:52-55` the unresolved blockers now escalate to the owner rather than entering an automatic third fix cycle.
 
 PLAN-EVAL: FAIL_PLAN
+
+## Cycle 3
+
+- Plan evaluator session: same dedicated Codex GPT-5.6 Sol · xhigh evaluator session / 2026-08-11 (owner override D-2), Cycle 3 explicitly authorized by the owner after the two-FAIL protocol stop
+- Evaluator worktree: `/home/codex/repos/ns-rfc-plan-eval`, branch `eval/rfc-runtime-versioned-automation`, clean at `811373a8741554b096a488d15c64e5fb21864392`
+- Author worktree: `/home/codex/repos/ns-rfc-runtime-versioned-automation`, same source commit before this verdict append
+- Surface / archetype: docs RFC planning future ARCHETYPE-1/2/3/5/6 package, runtime, plugin, CLI, scaffold, DB, Aspire, and frontend waves
+- Scope overlays: `SCOPE-docs`; adversarial RFC architecture review; owner-directed competitive-study review; no implementation evaluation
+
+### Cycle-1 and Cycle-2 finding resolution audit
+
+| Prior finding | Cycle-3 result | Evidence |
+| --- | --- | --- |
+| Cycle-1 F1 — Design checkpoint, context pack, PR review surface | PARTIAL | The required artifacts exist (`worklog.md:86-108`; `context-pack.md:1-26`) and the live PR is draft with `status:plan-eval`, DoD, and Drift/Debt. They are not current: `plan.md:3-6,83,96-97` still says Cycle 2 is pending and P-1..P-4; `context-pack.md:3,19-23` says post-Cycle-1/two-FAIL escalation pending; the Design checkpoint omits P-5/S6 (`worklog.md:95-105`); the PR body omits S6/D-8/P-5/BG-1..BG-5 and still presents the owner escalation as current. |
+| Cycle-1 F2 — binding ownership decision | PASS | §9 now says O2+O4 is binding with no live fallback and evaluates the withdrawn fallback at equal fidelity (`rfc-0001-runtime-versioned-automation.md:474-521`). |
+| Cycle-1 F3 — doctrine-valid ownership / plugin thinness | PASS | Contracts contain no ports/adapters (`:193-197`, `:491-494`); runtime behavior, ports, and adapters are core-owned (`:495-500`); the connector is composition-only and names each wired axis (`:501-507`). |
+| Cycle-1 F4 / Cycle-2 F2 — complete activation state, pinned dispatch, rejoin admission | PARTIAL | Complete desired-state epochs, carry-forward/tombstones, monotonic application, revision-pinned dispatch, and leased rejoin validation are now real text (`:267-280`, `:302-343`). The corrected protocol introduces an unresolved control-plane-outage failure described in finding 1 below. |
+| Cycle-1 F5 — honest T1 contract | PASS | J2, the tier table, the blunt perimeter statement, TM1/TM2, and E2E-5 consistently state that non-Deno T1 grants are not enforced and T1 is not a tenancy boundary (`:61-66`, `:350-378`, `:403-406`, `:640-643`). |
+| Cycle-1 F6 / Cycle-2 F3 — C8/TM9 and bounded security guarantees | PARTIAL | TM9 now covers the #1444 loader, warm-cache `--cached-only`, explicit cold-cache network use, loud failure, capability-prompt staging, and A2a's offline gate (`:413`, `:594`). Trust assumptions correctly narrow hashes, audit, and redaction (`:415-424`), but §5.5 retains an absolute secret-history claim contradicted by that residual-risk text (finding 2). |
+| Cycle-1 F7 — evidence claim strength | PASS | Claims remain scoped to the inspected commits; partial control-plane surfaces and #1444's draft state are explicit; Appendix A still limits direct adapter proof to Deno+shell (`:15-28`, `:96-113`, `:759-776`). Focused `rtk grep` and `deno doc` checks reconfirmed the disconnected loader and the `RuntimeTask`/executor-contract mismatch. |
+| Cycle-1 F8 / Cycle-2 F4 — file-level clean-break inventory | PARTIAL | §10 now has a useful file-level table and resolves most named surfaces (`:542-564`), but it is not the complete file-level inventory it claims; concrete survivors are omitted (finding 3). |
+| Cycle-1 F9 / Cycle-2 F5 — PR-sized roadmap, dependencies, gates, JSR scan | PARTIAL | A0 owns the contract; A2d and A6a-c are split; corrected dependency edges and a real JSR pre-scan exist (`:588-623`). Required fitness/publish/release gates are still omitted from multiple rows despite the RFC's opposite assertion (finding 4). |
+| Cycle-2 F6 — live PR reconciliation | PARTIAL | The PR is draft, its sole status label is `status:plan-eval`, and DoD/Drift/Debt exist. The body was reconciled to `af4f20f1e` but not to the Cycle-3 head/study, and its S5 state is stale (finding 6). |
+
+### Checklist results
+
+| Plan-Gate item | Result | Evidence / location |
+| --- | --- | --- |
+| Research present and current | FAIL | The repository archaeology is present, scoped, and re-baselined (`research.md:6-13`; current matrix `:22-26`). The newly required competitive research is materially incomplete against its claimed 12 owner-named dimensions and contains unsupported/exhaustive claims (finding 5; competitive study `:123-141,145-200`). |
+| Decisions locked | FAIL | Ownership, cron, T1, store parity, epoch totals, and schema admission are locked. Control-plane outage behavior is not: lease expiry drains serving replicas while pinned-revision fetch failure immediately dead-letters work (`rfc-0001-runtime-versioned-automation.md:331-343`), with no availability/retry decision. |
+| Open-decision sweep | FAIL | `plan.md:77-84` and RFC §15 do not identify the outage/lease/pinned-lookup decision, although choosing fail-closed fleet drain versus last-good availability changes core runtime behavior and tests. |
+| Commit slices (< 30, gate + files each) | FAIL | There are fewer than 30 ordered implementation slices with file groups, but several lack their required proving gate classes and the docs-run slice inventory omits S6/Cycle 3 (`rfc-0001-runtime-versioned-automation.md:588-608`; `plan.md:86-99`). |
+| Risk register | FAIL | The register covers prior race/security categories but not management/feed outage causing lease-expiry fleet drain or transient immutable-revision lookup causing DLQ (`plan.md:58-75`; RFC `:331-343`). |
+| Gate set selected | FAIL | Rows touching public packages/plugins omit `F` and/or `P`, and rows changing DB/Aspire/published CLI shape omit the orthogonal release class (`rfc-0001-runtime-versioned-automation.md:591-608`; `archetype-gate-matrix.md:20-40,60-76`). |
+| Deferred scope explicit | PASS | P-1..P-5 have rationale and entry criteria (`rfc-0001-runtime-versioned-automation.md:569-577`), and the remaining naming/policy/default questions are classified with entry criteria (`:728-746`). |
+| jsr-audit surface scan (pkg/plugin) | PASS | The pre-scan names Zod/isolated-declaration slow types, explicit oRPC route types, driver-type leakage, and connector re-export risks and assigns them to A0/A1a/connector work (`rfc-0001-runtime-versioned-automation.md:611-619`). This does not cure the missing `P` gates in the slice table. |
+
+### Open-decision sweep (evaluator-run)
+
+One must-resolve-now decision remains: define the execution-plane availability contract when the
+management service/store is unreachable. The present combination self-drains replicas after a
+registration lease lapses and immediately dead-letters a revision-pinned dispatch when its immutable
+lookup cannot be fetched (`rfc-0001-runtime-versioned-automation.md:331-343`). The plan must choose
+and specify bounded last-good serving versus fail-closed drain, lease-renewal grace/fencing behavior,
+and retryable-unavailable versus terminal-not-found/hash-mismatch lookup outcomes. This changes the
+runtime state machine, queue semantics, SLOs, and tests, so it is not safe to defer implicitly.
+
+All owner questions explicitly listed in §15 remain safe to defer under their entry criteria. P-1
+through P-5 remain staged scope, not hidden implementation decisions.
+
+### Verdict
+
+`FAIL_PLAN`
+
+### If FAIL_PLAN — required fixes
+
+1. **[BLOCKER] Decide the control-plane-outage and pinned-lookup failure protocol.** A management/feed outage eventually expires every lease, after which replicas “must re-register ... before serving”; independently, any inability to fetch a pinned revision is sent directly to DLQ (`rfc-0001-runtime-versioned-automation.md:331-343`). Distinguish transient unavailable/timeouts from terminal absent/hash/schema failures, define queue retry/backoff and immutable-revision caching, and decide whether a replica with a valid last-good snapshot may serve during a bounded control-plane outage or must self-drain. Add the risk, SLO, and failure tests to A1c/A2d/A3a/A8.
+
+2. **[BLOCKER] Remove the remaining absolute secret-history guarantee.** §5.5 says secret material “never enters ... history records” (`rfc-0001-runtime-versioned-automation.md:387-397`), while the threat-model trust statement correctly admits a child can transform and print a secret past best-effort redaction (`:415-421`). Make §5.5 use the same bounded guarantee: secrets are not deliberately persisted as definition/audit fields, captured output is best-effort redacted, and residual disclosure remains possible.
+
+3. **[BLOCKER] Complete the cleanup table against the actual tree.** The generic enabled-state row (`rfc-0001-runtime-versioned-automation.md:557-558`) does not disposition the port/store/testing/public exports and service/runtime consumers under `packages/plugin-triggers-core/src/{ports,stores,testing,public}/**` and `plugins/triggers/{services,src/runtime}/**`. The Windows/environment row (`:559-560`) omits `packages/cli/src/kernel/adapters/windows/environment/env-file-content.ts`, `env-file-values.ts`, `kernel/assets/windows/env.template`, the generated embedded asset, and the live `NETSCRIPT_TASKS_DIR` readers in `packages/plugin-workers-core/src/executor/adapters/path-resolution.ts` and `plugins/workers/worker/job-execution.ts`. Name each file group with keep/fold/delete/rewrite and an owning slice; otherwise D-5 still allows competing runtime-config behavior to survive.
+
+4. **[BLOCKER] Apply the gate matrix to every roadmap row, not only in prose.** The RFC asserts every package/plugin slice carries `P` (`rfc-0001-runtime-versioned-automation.md:611-619`), but A2d, A2c, A3a/b, A4a/b, and A5a/b omit it; A2d and several later core/plugin rows also omit required `F` (`:596-603`). A1a changes DB wiring, A2a declares Aspire resources/migrations, and A2c changes the published CLI, yet none names the orthogonal release-gate class required by `archetype-gate-matrix.md:67-76`. Add `S/F/R/C/P` as applicable to every row and the release class wherever DB/Aspire/scaffold/published CLI/plugin shape changes; then make the prose and table agree.
+
+5. **[BLOCKER] Make the competitive study satisfy the owner-directed dimensions and evidence standard.** The study says it compares twelve named dimensions (`competitive-architecture-study.md:9-12,123-141`), but its matrix replaces the required isolation, control/data-plane, and cockpit-UX rows with four separate versioning rows; several per-system profiles likewise do not cover the missing dimensions. It also uses a Hacker News post and n8n community guidance despite describing the study as primary-source-based (`:3-7,67-74,109-121,218-226`), and elevates unproven exhaustive negatives such as “none of the nine uses watched files” and “uniform across all nine” (`:155-160`; RFC `:698-700`). Add the three missing comparison dimensions, cite official product docs/repositories for load-bearing cells (or mark unknown), and narrow exhaustive conclusions to what the sources establish. Finally remove or gate the RFC's remaining empirical technology assertion “sub-ms start” (`rfc-0001-runtime-versioned-automation.md:365`), which contradicts “performance enters this RFC only as gates” (`:652-657`) and the no-empirical-claims statement (`:721-723`).
+
+6. **[HIGH] Reconcile all resumability/review artifacts to Cycle 3.** Update `plan.md:3-15,77-99`, `worklog.md:95-105`, and `context-pack.md:3,19-24` so they name P-5, S6, the owner-authorized Cycle 3, the current archetypes, and the current slice/gate state. Reconcile the live PR body likewise: add S6/D-8 and the benchmark/P-5 scope, replace the stale “owner escalation” S5 text with Cycle-3 state, and mark completed DoD boxes accurately. Keep the PR draft and the sole `status:plan-eval` label.
+
+### Notes
+
+- The corrected `af4f20f1e` changes are present in the actual file; this evaluation does not rely on the Cycle-2 fix narrative. Ownership/thinness, complete desired-state epochs, revision-pinned dispatch, leased rejoin validation, TM9/C8, `expectedEpoch`, honest T1 wording, A0 contract ownership, and A6 splitting were all verified directly.
+- The D-10 differentiator, D-4 clean-sheet authority, D-5 no-compat direction, and D-3 frontend dependency cut remain intact. No hardcoded plugin names were introduced in the proposed contribution model.
+- Primary-source spot checks confirmed the Temporal pinning, Restate immutable-deployment, Hatchet Postgres, Trigger.dev atomic-deploy, Durable Functions versioning, AWS Step Functions weighted-alias, Kestra revision/plugin-version, Windmill draft/deploy, and Inngest self-host claims. The problem is the study's missing dimensions and claims stronger than those sources, not that every cited comparison is wrong.
+- The live PR body, all five comments, labels, milestone assignment, draft state, and head SHA were re-inspected. No GitHub mutation was performed.
+- No RFC, plan, worklog, context-pack, source, issue, comment, label, commit, or branch was changed. This Cycle-3 append is the only filesystem mutation.
+
+PLAN-EVAL: FAIL_PLAN

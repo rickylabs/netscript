@@ -1,7 +1,7 @@
 # Competitive architecture study — runtime/workflow systems vs RFC-0001
 
 Owner-directed (drift D-8), retrieved 2026-08-11 via primary sources (vendor documentation;
-one HN engineering post used only for Hatchet architecture color and marked as such). Scope:
+two lighter-weight sources are used ONLY for color/representative-UX and never for a load-bearing matrix cell: a Hatchet HN engineering post and n8n vendor-community guidance; every load-bearing cell cites vendor documentation, or the cell is marked ◐/unknown). Scope:
 architecture comparison ONLY — **no empirical performance claims are made anywhere in this
 study**; performance is handled exclusively as executable implementation-stage benchmark gates
 (§Benchmark gates). Each claim carries its source URL; quotes are from the retrieved pages.
@@ -139,6 +139,9 @@ position.
 | History/audit/telemetry | ● event history | ● SQL introspection | ● | ● runs+replay | ● | ● runs/audit (EE) | ● | ● | ● | ● history+audit stores (5.2, 7) |
 | Plugin/extension contribution | ○ | ○ | ○ | ○ | ○ | ◐ hub items | ○ | ○ | ● versioned plugins, hot reload | ● contribution families (5.1) |
 | Self-host | ● OSS server | ● single binary | ● single node (PG/Redis) | ● (pinned version) | ● | ● Docker/K8s | ◐ Azure-bound | ○ managed only | ● / ● | ● in-stack, Aspire-composed (4) |
+| Isolation of executed code | app-owned workers (platform's job) | app-owned endpoints (platform's job) | app-owned (HTTP/workers) | managed/self-hosted worker containers | app-owned workers | worker fleet executes scripts (per-language runtimes; deployment-level isolation) | Azure Functions sandbox | managed service states (Lambda etc.) own isolation | server executes plugins/nodes (deployment-level) | tiered boundary port T0–T3, honesty per tier (5.4) |
+| Control/data-plane split | ● server vs workers | ● broker/log vs endpoints | ● server vs app | ● platform vs workers | ● engine vs workers | ◐ server+workers one product | ● runtime vs app | ● managed plane | ◐ single server | ● management service vs engine replicas (4) |
+| Cockpit / operator UX | exec ops (signal/cancel/reset), no def editing | CLI/SQL introspection | runs UI | runs UI + replay + promote | runs UI | ● full editor + deploy history | Azure portal ops | console editor + publish | ● editor + revisions / ● editor + publish | list/detail/run/history + draft→activate flows, #922-gated (8.2) |
 
 ## Synthesis
 
@@ -153,11 +156,14 @@ position.
    association, Trigger.dev running tasks. RFC: revision-pinned dispatch (§5.3 step 6) is the
    same principle applied at task granularity.
 3. **Database as transactional system of record for definitions + execution state** — Hatchet
-   (explicitly), Inngest self-host (Postgres), Windmill. RFC §5.2. None of the nine uses
-   watched files as a runtime source; file trees appear only as authoring/interchange formats
-   (Kestra YAML, SFN ASL, Windmill git sync) — exactly RFC-0001's demotion of the filesystem.
-4. **Server-owned scheduling attached to definitions; single-fire is the platform's job** —
-   uniform across all nine. RFC: trigger-family cron ownership (§5.1) + P-1.
+   (explicitly), Inngest self-host (Postgres), Windmill. RFC §5.2. In none of the retrieved
+   documentation does a studied system consume watched files as its runtime definition source;
+   where file formats appear (Kestra YAML, SFN ASL, Windmill git sync) they are
+   authoring/interchange surfaces — consistent with RFC-0001's demotion of the filesystem.
+   (Scoped to the retrieved docs, not an exhaustive product-wide negative.)
+4. **Server-owned scheduling attached to definitions; single-fire is the platform's job** — in
+   every studied system whose scheduling is documented in the retrieved sources, schedules attach
+   to definitions and fire server-side; no counterexample was found. RFC: trigger-family cron ownership (§5.1) + P-1.
 5. **App-hosted execution with server-side orchestration and explicit app/worker sync** —
    Inngest app sync/poll, Temporal workers, Restate endpoints, Hatchet workers. RFC: snapshot
    client + change feed + poll fallback (§5.3) is the same control/data split.

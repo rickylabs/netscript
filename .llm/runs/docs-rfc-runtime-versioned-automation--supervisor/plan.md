@@ -1,9 +1,14 @@
 # Plan — docs-rfc-runtime-versioned-automation--supervisor
 
-Status: **LOCKED** (fix cycle 1 after PLAN-EVAL cycle 1 FAIL_PLAN). Architecture decisions are
-locked in the RFC itself (ownership §9; epoch consistency §5.2/5.3; fleet admission §5.3; adapter
-parity/narrowing §5.2; T1 enforcement contract §5.4; cron ownership §5.1). PLAN-EVAL (Sol ·
-xhigh, owner override D-2) is this run's formal gate; cycle 2 evaluates the fixed package.
+Status: **LOCKED** (post owner-authorized PLAN-EVAL cycle 3 + fix cycle). Architecture decisions
+locked in the RFC: ownership §9; epoch consistency + complete-desired-state §5.2/5.3; fleet
+admission + leased registration §5.3; **control-plane-outage availability contract §5.3-8
+(bounded last-good serving, never self-drain; pinned-lookup transient/terminal classes)**;
+adapter parity/narrowing §5.2; T1 enforcement contract §5.4; cron ownership §5.1; competitive
+positioning §14.1 (D-8 study: adopted patterns / non-goals / differentiators; benchmark gates
+§13.1; P-5 staged). PLAN-EVAL (Sol·xhigh, D-2): cycles 1–3 all FAIL_PLAN with monotonically
+narrowing findings; every cycle-3 finding is fixed; final acceptance is the owner's ratification
+call per their directive (address findings, leave PR current + draft).
 
 ## Profile
 
@@ -73,6 +78,7 @@ xhigh, owner override D-2) is this run's formal gate; cycle 2 evaluates the fixe
 | Cron subsystem duplication deepened | task@1 has no schedule; scheduled trigger is the only operator cron; CRON-SUBSYSTEM-DUP untouched for T0 (§5.1) |
 | Sub-agent worktree contention | G1→G2 serialized; evaluator in dedicated worktree |
 | Evaluator route blocked | record in drift + lane-policy fallbacks |
+| Management/feed outage → lease expiry or pinned-lookup DLQ | §5.3-8 availability contract: last-good serving never drains; lookup failures classified transient (queue retry) vs terminal (DLQ); revision cache pre-warmed by snapshots; outage tests in A1c/A2d/A3a/A8 (BG-1) |
 
 ## Open-decision sweep (plan-gate requirement)
 
@@ -80,8 +86,11 @@ Must-resolve-now items are **resolved in the RFC** (ownership §9; activation co
 §5.2/5.3; replica admission §5.3; store parity §5.2; T1 contract §5.4; cron ownership §5.1).
 Remaining open decisions, each classified: naming → defer to A0 (safe; spelling only);
 two-person activation default → defer to A2b (policy hook exists either way); retention defaults
-→ defer to A3b (conservative caps shipped behind config). P-1..P-4 deferred with entry criteria
-(§11). No open decision forces rework if deferred as classified.
+→ defer to A3b (conservative caps shipped behind config). P-1..P-5 deferred with entry criteria
+(§11). The cycle-3 must-resolve item — execution-plane availability during control-plane outage +
+pinned-lookup failure classes — is **resolved** in §5.3 steps 6/8 (bounded last-good serving,
+transient-vs-terminal classification, revision cache). No open decision forces rework if
+deferred as classified.
 
 ## Commit slices (docs-only run; files + proving gate per slice)
 
@@ -93,7 +102,12 @@ two-person activation default → defer to A2b (policy hook exists either way); 
    gate: probe exit codes recorded + supervisor A1 review. DONE (`f5997b6a2`).
 4. **S4 RFC** — files: `docs/architecture/rfc/rfc-0001-runtime-versioned-automation.md`; gates:
    `docs:links`, `deno fmt --check` on the file, PR body reconciliation. DONE + fix cycle 1.
-5. **S5 PLAN-EVAL cycles** — files: `plan-eval.md` (evaluator-written), fix-cycle diffs; gate:
-   `PLAN-EVAL: PASS` (≤2 cycles then escalate). Cycle 1 FAIL_PLAN consumed; cycle 2 pending.
+5. **S5 PLAN-EVAL cycles** — files: `plan-eval.md` (evaluator-written, cycles 1–3), fix-cycle
+   diffs; gate: verdict recorded per cycle. Cycles 1–2 FAIL_PLAN → protocol escalation; owner
+   authorized cycle 3; cycle 3 FAIL_PLAN with 6 findings → all fixed (worklog). Owner
+   ratification is the closing gate per D-8 directive.
+6. **S6 competitive study (D-8)** — files: `evidence/competitive-architecture-study.md`, RFC
+   §14.1/§13.1/P-5, wording corrections; gates: `docs:links` + fmt + cycle-3 evaluator review of
+   the study. DONE (`811373a87` + fix commit).
 
 Each slice: commit → push (explicit refspec) → draft-PR comment with evidence.

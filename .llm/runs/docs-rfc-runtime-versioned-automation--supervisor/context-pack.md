@@ -17,10 +17,15 @@ Resume here. State as of 2026-08-11 (post PLAN-EVAL cycle 1 fix).
   three-package ownership (automation-core contracts / automation-runtime behavior+adapters /
   thin connector plugin) — LOCKED; T1 honesty contract; TM1–TM9; cleanup inventory; slices
   A0–A8 with files+gates; E2E model; P-1..P-4 staged RFCs.
-- **Eval state**: cycle 1 FAIL_PLAN → fix cycle (3 edits silently no-opped, drift D-7); cycle 2
-  FAIL_PLAN (old text + new findings) → corrected fix set applied with per-edit verification and
-  pushed. **Two-FAIL protocol stop reached: owner escalation pending** — owner authorizes cycle 3
-  (resume thread `019fef2b-…03fc` in `/home/codex/repos/ns-rfc-plan-eval`) or reviews directly.
+- **Eval state**: cycles 1–2 FAIL_PLAN (cycle-2 partly caused by silently no-opped edits, D-7)
+  → protocol escalation; **owner authorized cycle 3** (with the D-8 study added first); cycle 3
+  FAIL_PLAN with 6 narrowed findings (5 prior findings PASS) → all six fixed: §5.3-8 outage
+  availability contract + pinned-lookup classes + revision cache; §5.5 bounded secret guarantee;
+  cleanup table completed (triggers enabled-state full surface, Windows env files,
+  NETSCRIPT_TASKS_DIR readers); gate letters + release classes on every roadmap row; study got
+  isolation/control-plane/cockpit matrix rows + narrowed negatives + citation rule; artifacts/PR
+  reconciled. Per D-8 the run now **holds current-but-draft for owner ratification** (a cycle 4
+  was not ordered; evaluator thread `019fef2b-…03fc` + worktree ns-rfc-plan-eval retained).
 - **S6 (D-8)**: competitive architecture study landed (`evidence/competitive-architecture-study.md`), integrated as RFC §14.1 + §13.1 benchmark gates + P-5; overbroad wording corrected. Cycle 3 authorized by owner.
 - **Hard rules**: draft PR only; no issue filing; no ready-for-review until owner ratifies;
   never write in ns-1443 worktree or netscript-start-ref.
