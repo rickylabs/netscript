@@ -224,3 +224,55 @@ subdirectory), rather than by re-authorizing the growth:
 Slice review (Tier-A): moves are `git mv` renames plus one import-depth correction; the only
 behavioral change is where the gate definitions are constructed. Measured, not asserted:
 `wc -l runtime-gates.ts` = 906 and `ls | wc -l` = 44.
+
+### Slice 8 — F2: one authoritative test per documented category, and `PORT` refused
+
+The finding: only `DATABASE_URL` got a declared collision; OTel, provider/engine URI, discovery and
+`PORT` had none; discovery was disabled by the double; endpoint options were discarded; and the test
+reduced the recorded calls itself, so it could not fail if Aspire's resolution changed.
+
+**Generator change — `PORT` is refused, not overridden.** Every other category resolves through one
+mechanism (successive `withEnvironment` calls, last write wins). `PORT` does not: Aspire injects it
+from `withHttpEndpoint({ env: 'PORT' })`, so two mechanisms write that key and their relative order
+is Aspire-internal. Rather than document an ordering this generator cannot observe, the declared
+block now **refuses** `PORT` and names it in a generated comment (silent stripping is the #1447
+failure mode, so the omission is visible where the value was written). New
+`partitionDeclaredEnvironment` / `ENDPOINT_OWNED_ENVIRONMENT_KEYS` in
+`resolve-resource-environment.ts`; services and plugins share it, so parity holds.
+
+**Test change — the authority split is now explicit.** `service-environment-runtime_test.ts` states
+which claim each level owns: this file asserts what the generated program *does* (which keys, which
+values, in which order — always pinning order, never asserting "Aspire resolves it this way"), and
+`behavior.service-env` asserts what the running process ends up with. One `it(...)` per category
+from a `PRECEDENCE_CASES` table: plain ×2 (control), OTel, database URL, engine URI, provider,
+discovery, `PORT`. Also fixed: `wireServiceReferences` is now executed (discovery was previously
+unreachable), endpoint options are recorded (`PORT` was previously discarded), and the double
+re-exports the **real** `buildOtelEnvVars` / `extractServiceReferences` /
+`extractPluginReferences` from `@netscript/aspire/application` — the module the generated compat file
+is a Node copy of — so OTel key names and reference extraction are the shipped ones. The remaining
+compat-only stubs derive their values from the config they are handed, as the template does.
+
+**Falsifiability, measured by mutation** (each mutation applied, run, then reverted):
+
+| Mutation                                                                       | Result                                                                       |
+| ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| `ENDPOINT_OWNED_ENVIRONMENT_KEYS = []` (stop refusing `PORT`)                   | **FAIL** — `PORT must not be assigned at all; the endpoint binding owns it`   |
+| move the declared block *after* the OTel/database emission (invert precedence)  | **FAIL** — OTel, database URL, engine URI, provider cases all fail            |
+| break the discovery key in the embedded generated template                      | **FAIL** — `services__reports__http__0 kept its declared literal`             |
+
+The inverted-order mutation leaves the discovery case green, which is correct and worth naming: Pass
+2 runs after all of Pass 1 regardless of where inside Pass 1 the declared block sits, so discovery is
+falsified by the third mutation instead of the second. Both were run rather than assumed.
+
+| Gate                                                    | Result                                              |
+| ------------------------------------------------------- | --------------------------------------------------- |
+| `deno test --allow-all --unstable-kv packages/cli`      | **PASS** — exit 0, `731 passed (520 steps)`         |
+| `deno test --allow-all --unstable-kv packages/aspire`   | **PASS** — exit 0, `19 passed (72 steps)`           |
+| `run-deno-check.ts --root packages/cli --ext ts,tsx`    | **PASS** — 844 files, 8 batches, 0 occurrences      |
+| `run-deno-lint.ts --root packages/cli --ext ts,tsx`     | **PASS** — 844 files, 0 occurrences                 |
+| `run-deno-fmt.ts --root packages/cli` / `packages/aspire` | **PASS** — 844 and 45 files, 0 findings            |
+| `deno fmt --check packages/aspire/README.md`            | **PASS** after formatting the widened table          |
+
+Slice review (Tier-A): no `any`/cast/suppression added; the refusal list is a typed
+`readonly string[]` over `RESOURCE_DEFAULTS.PortEnvVar`, not a literal; README now documents the rule
+per category with `PORT`'s different rule and its reason called out separately.

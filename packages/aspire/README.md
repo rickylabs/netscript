@@ -161,18 +161,27 @@ generated telemetry, database, and service-discovery variables, and Aspire's `wi
 last-write-wins per key. So declaring `DATABASE_URL`, `OTEL_SERVICE_NAME`, or
 `services__<name>__http__0` does not override the generated one:
 
-| Key                                               | Who wins            | Why                                                                                                             |
-| ------------------------------------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Any key the generator does not write              | the declared value  | nothing else claims it                                                                                          |
-| `DATABASE_URL`, the engine URI key, `DB_PROVIDER` | the generated value | the connection string is allocated when the AppHost starts a container, not when `appsettings.json` is written  |
-| `OTEL_*`                                          | the generated value | the exporter endpoint and service identity come from the running dashboard                                      |
-| `services__<name>__http__0`                       | the generated value | the endpoint is allocated at start; a literal would point at a port nothing listens on                          |
-| `PORT`                                            | Aspire              | it comes from endpoint allocation, not from a generated environment assignment — pin it with `HostPort` instead |
+| Category          | Keys                                              | Who wins             | Why                                                                                                            |
+| ----------------- | ------------------------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------- |
+| plain             | any key the generator does not write              | the declared value   | nothing else claims it                                                                                         |
+| database          | `DATABASE_URL`, the engine URI key, `DB_PROVIDER` | the generated value  | the connection string is allocated when the AppHost starts a container, not when `appsettings.json` is written |
+| OTel              | `OTEL_*`                                          | the generated value  | the exporter endpoint and service identity come from the running dashboard                                     |
+| service discovery | `services__<name>__http__0`                       | the generated value  | the endpoint is allocated at start; a literal would point at a port nothing listens on                         |
+| endpoint          | `PORT`                                            | Aspire — **refused** | see below: it is not applied at all                                                                            |
 
 The rule is deliberately not "explicit configuration always wins". Those generated values are
 _allocated_, not authored: honoring a stale literal would leave a resource pointing at an address
 nothing serves while the configuration still looked valid. To change one of them, change the
 resource it comes from — the `Databases` entry, the `Otel` section, the referenced service.
+
+**`PORT` is refused rather than overridden.** Every other row above resolves through one mechanism —
+successive `withEnvironment` calls, last write wins. `PORT` does not: Aspire injects it from the
+endpoint binding (`withHttpEndpoint({ env: 'PORT' })`), so two different mechanisms write that key
+and their relative order is Aspire's internal business. A declared `PORT` that won would leave the
+process listening on one port while Aspire probes and proxies another — configured-looking and
+unreachable. So a declared `PORT` is **not applied**, and the generated helper names it in a comment
+at the resource it was declared on, so the omission is visible where the value was expected. Pin a
+host port with `HostPort`.
 
 To supply a value the generator also writes, use a different key and read it in your entrypoint.
 

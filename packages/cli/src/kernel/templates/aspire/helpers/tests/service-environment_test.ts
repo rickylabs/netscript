@@ -186,6 +186,26 @@ describe('declared service environment (#1447)', () => {
     );
   });
 
+  it('should refuse a declared PORT and say so in the generated helper', async () => {
+    const config = await parseFixture({
+      [MCP_SERVICE]: service({ Env: { ...MCP_ENV, PORT: '59147' } }),
+    });
+    const block = serviceBlock(renderServices(config), MCP_SERVICE);
+
+    // Refused, not applied: Aspire injects PORT from the endpoint binding, so a
+    // declared value that won would leave the process on a port nothing proxies.
+    assert(
+      !block.includes('59147'),
+      'a declared PORT must not be applied — the endpoint binding owns it',
+    );
+    assertStringIncludes(block, "Declared `PORT` is not applied");
+    assertStringIncludes(block, 'HostPort');
+    // …and the endpoint that does own it is still registered.
+    assertStringIncludes(block, "withHttpEndpoint({ env: 'PORT' })");
+    // …while everything else the same entry declared still reaches the resource.
+    assertStringIncludes(block, JSON.stringify(MCP_ENV));
+  });
+
   it('should prefer Environment over the deprecated Env alias', async () => {
     const config = await parseFixture({
       [MCP_SERVICE]: service({
@@ -253,5 +273,16 @@ describe('declared plugin environment parity (#1447)', () => {
     assert(declared >= 0, 'declared plugin environment was not emitted');
     assert(database >= 0, 'generated plugin DATABASE_URL assignment is missing');
     assert(declared < database, 'generated values must win a declared collision on plugins too');
+  });
+
+  it('should refuse a declared PORT on plugin resources too', async () => {
+    const config = await parseFixture({}, {
+      'excalidraw-plugin': plugin({ Env: { ...MCP_ENV, PORT: '59147' } }),
+    });
+    const block = pluginBlock(renderPlugins(config), 'excalidraw-plugin');
+
+    assert(!block.includes('59147'), 'a declared PORT must be refused on plugins as well');
+    assertStringIncludes(block, "Declared `PORT` is not applied");
+    assertStringIncludes(block, JSON.stringify(MCP_ENV));
   });
 });
