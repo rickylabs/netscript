@@ -117,22 +117,37 @@ _Stage E output._
 
 ## Validation Plan
 
-The gate set for a **docs/RFC changeset**. Full evidence tables land in `worklog.md`; the wrapper
-invocations are owned by `.agents/skills/netscript-tools` and not restated here.
+The gate set for a **docs/RFC changeset**, derived from the repo's real configuration rather than
+assumed. Full evidence tables land in `worklog.md`; wrapper invocations are owned by
+`.agents/skills/netscript-tools` and not restated here.
+
+**Correction recorded at stage B.** An earlier draft of this table listed "scoped `deno fmt` over the
+changed docs + run dir" as the format gate. That is **not** a gate in this repo: `deno.json`'s
+`fmt.include` is `packages/**` and `plugins/**` `.ts`/`.tsx` only, so `deno task fmt:check` never
+inspects Markdown. Forcing the scoped wrapper at a Markdown root produces findings that no repo gate
+asks for — and, worse, would rewrite the verbatim upstream artifacts saved under
+`research/sources/`, corrupting the very evidence the citations point at. Those files are evidence
+and are excluded from formatting by intent.
 
 | Order | Gate | Command or check | Expected |
 | ----- | ---- | ---------------- | -------- |
-| 1 | Markdown format | `.llm/tools/run-deno-fmt.ts` scoped to the changed docs + run dir | PASS |
-| 2 | Doc lint / links | `deno task doc:lint` | PASS |
-| 3 | Docs source + rendered gates | the CI gates added by #1440 for pull requests | PASS |
-| 4 | Citation gate | every load-bearing claim traces to path:line, `deno doc`, a saved artifact, or a URL | PASS (manual, evaluator-checkable) |
+| 1 | Internal doc links + code-span paths | `deno task docs:links` **scoped** via `--root docs/architecture/rfc` (the default roots are `.llm/harness` + `docs/architecture/doctrine` and do not cover a new RFC dir) | PASS |
+| 2 | Docs accuracy / discoverability | `deno task docs:accuracy` | PASS |
+| 3 | CI `quality` job | fires on the PR via `needs_docs` once the changeset touches `docs/**` | PASS |
+| 4 | Citation gate | every load-bearing claim traces to `path:line`, a `deno doc` surface, a saved artifact, or a URL | PASS (manual, evaluator-checkable) |
 | 5 | Live-board dedup | every issue draft checked against live GitHub before entering the filing manifest | PASS (manual) |
 | 6 | Planned-surface `jsr-audit` | rubric applied to the RFC's **proposed** public API sketches | PASS / documented risk |
 | 7 | PLAN-EVAL | Codex GPT-5.6 Sol high, separate session, against an immutable commit | `PASS` |
 
-`deno task check` / `test` / `lint` / `arch:check` / `quality:scan` / `e2e:cli` are **N/A**: the
-changeset contains no TypeScript and no `packages/**` or `plugins/**` source. This is why the PR
-carries the docs-only CI labels.
+`deno task check` / `test` / `lint` / `fmt:check` / `arch:check` / `quality:scan` / `e2e:cli` are
+**N/A**: the changeset contains no TypeScript and no `packages/**` or `plugins/**` source. This is
+why the PR carries the docs-only CI labels.
+
+**OpenHands docs-accuracy gate — no conflict.** `.github/workflows/docs-openhands-eval.yml`
+dispatches only on `pull_request: [ready_for_review]` (plus an owner `/docs-eval rerun` comment).
+This PR stays **draft** for the entire run, so that workflow never dispatches and the charter's "do
+not use OpenHands" boundary is satisfied structurally — not by a label suppressing a gate. No
+`docs-eval:skip` is applied, because none is needed.
 
 ## Dependencies
 

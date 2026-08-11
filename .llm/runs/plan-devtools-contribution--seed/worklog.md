@@ -52,6 +52,10 @@
 | 2026-08-11 | A | Draft PR opened | [#1450](https://github.com/rickylabs/netscript/pull/1450) → `main`, draft, milestone `Backlog / Triage`; labels `type:docs`, `rfc`, `status:research` (exactly one `status:`), `ci:skip-e2e`, `ci:skip-scaffold`, `area:docs/fresh/fresh-ui/plugins`, `priority:p1`, `epic:dev-dashboard`, `epic:frontend-contrib` |
 | 2026-08-11 | A | Opening phase comment | Charter read-back, verified baseline, routes in force, evaluation posture, CI-lane rationale, pre-registered drift — [comment](https://github.com/rickylabs/netscript/pull/1450#issuecomment-5251257498) |
 | 2026-08-11 | A→B | **Stage A closed** | Seed-run stage A contract satisfied: `supervisor.md` + run dir + draft PR + charter read-back → opening PR comment |
+| 2026-08-11 | B | Workflow committed before execution | `workflows/stage-b-discovery-workflow.js` @ `d5852188b`, per the Tier-C hard rule that an uncommitted workflow does not run and its corpus does not count as stage-B proof |
+| 2026-08-11 | B | Discovery fan-out launched | Workflow run `wf_a9f80af4-2af`, 14 agents: 5 repo surfaces, 3 prior RFCs, 2 board/doctrine, 4 market teardowns. Read-only on source and on GitHub |
+| 2026-08-11 | B | Downstream lane pre-flight | `deno task agentic:runtime doctor` → `no_change`, 18 components, foundation healthy (stage-G Codex launch path viable). `agentic:claude-openrouter` usage confirmed for the stage-D2 GLM lane; ids resolved from `config/models.ts` (`z-ai/glm-5.2`, `openrouter/moonshotai/kimi-k3`) rather than hardcoded |
+| 2026-08-11 | B | Evidence-input worktrees verified | `ns-rfc-runtime-versioned-automation` head = `6cb79675c` — **exactly** the charter's stated final evaluated head for #1446. `ns-rfc-sdk-client` present @ `14b5c858c`. `.llm/runs/dashboard-rescope--seed/` present |
 
 ## Decisions
 

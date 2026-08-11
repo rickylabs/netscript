@@ -45,3 +45,38 @@ documentation.
 - **Action:** accept — every citation of the stage-D2 pass states "tools + streaming, no reasoning
   trace" and never "GLM 5.2 · xhigh reasoning". GLM is never this run's formal evaluator.
 - **Evidence:** `lane-policy.md:185-198`.
+
+## 2026-08-11 — D-4: the assumed Markdown format gate does not exist
+
+- **What:** The run's stage-A validation plan named a scoped `deno fmt` pass over the changed docs and
+  the run dir as its format gate.
+- **Source:** `deno.json` § `fmt.include`; `.github/workflows/ci.yml` § `quality`;
+  `.llm/tools/validation/check-internal-doc-links.ts:104-108`.
+- **Expected:** A Markdown formatting gate covering docs and run artifacts.
+- **Actual:** `fmt.include` is `packages/**/*.ts(x)` and `plugins/**/*.ts(x)` **only** — `deno task
+  fmt:check` never inspects Markdown. Running the scoped wrapper at a Markdown root manufactures 29
+  findings that no repo gate asks for, and would rewrite the verbatim upstream artifacts under
+  `research/sources/` — corrupting the evidence the corpus cites. The real docs gates are
+  `docs:links` (default roots `.llm/harness` + `docs/architecture/doctrine`, so a new RFC dir needs
+  an explicit `--root`), `docs:accuracy`, and the CI `quality` job gated on `needs_docs`.
+- **Severity:** significant — an unexamined gate list is how a run reports false-green evidence, and
+  this one would have damaged its own citations.
+- **Action:** fix — `plan.md` § Validation Plan replaced with the real gate set, with the correction
+  recorded in place rather than silently swapped. `research/sources/**` is designated
+  evidence: never formatted.
+- **Evidence:** `deno eval` over `deno.json` (fmt include/exclude); `.github/workflows/ci.yml:243-297`.
+
+## 2026-08-11 — D-5: the OpenHands docs gate cannot fire on a draft PR
+
+- **What:** Checked whether the repo's automatic OpenHands docs-accuracy gate would collide with the
+  charter's "Do not use OpenHands" boundary.
+- **Source:** `.github/workflows/docs-openhands-eval.yml:8-40`.
+- **Expected:** A docs-labelled PR might auto-dispatch an OpenHands evaluator.
+- **Actual:** Dispatch requires `pull_request: [ready_for_review]` (or an owner `/docs-eval rerun`
+  comment). This PR carries `type:docs` and `area:docs` but stays **draft** for the whole run, so the
+  workflow never dispatches.
+- **Severity:** minor
+- **Action:** accept — the boundary holds **structurally**, not by suppression. Deliberately **not**
+  applying `docs-eval:skip`: a label that silences a gate which was never going to fire would be
+  misleading evidence in the PR's own record.
+- **Evidence:** workflow `on:`/`if:` conditions as cited.
