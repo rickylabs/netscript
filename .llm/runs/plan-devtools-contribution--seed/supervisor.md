@@ -37,7 +37,7 @@ Reference `.llm/harness/workflow/lane-policy.md`; the complete route table is no
 | `claude_workflow` | Anthropic · Claude **Opus 5** · low | Stage-B parallel discovery/synthesis fan-out only, and only with the generated `workflow.js` committed under `<run-dir>/workflows/` **before** it executes |
 | `major_ui_ux_design` | Claude · OpenRouter · **GLM 5.2** · `claude-design-glm-5-2` preset · xhigh | Mandatory pure-design pass for this major UI/UX architecture. **Transport fact of record: tools + streaming, NO reasoning trace.** Never cited as reasoning evidence; never the formal evaluator |
 | `adversarial_design_eval` | OpenCode · OpenRouter · **Kimi K3** vision · high | Conditional. Added only if screenshots/visual artifacts materially improve architectural judgment. Complements, never replaces, the GLM pass |
-| Stage-F adversarial reviewer | Model distinct from every authoring lane, unoriented, separate session | Severity-tagged findings only; supervisor triages and commits fixes |
+| Stage-F adversarial reviewer | Anthropic · Claude **Sonnet 5** · high — unoriented, separate session (**bound 2026-08-11**, see below) | Severity-tagged findings only; supervisor triages and commits fixes |
 | `formal_plan_evaluation` | Codex · OpenAI · **GPT-5.6 Sol** · high (fresh daemon-attached WSL session, own worktree) | Formal PLAN-EVAL of record against an immutable commit, per `evaluator/plan-protocol.md` + `gates/plan-gate.md` |
 | `formal_impl_evaluation` | — | **N/A.** This run produces no implementation. Recorded rather than skipped silently; the docs/RFC changeset instead takes the docs accuracy/link/format gates plus the opposite-family PLAN-EVAL above |
 
@@ -66,9 +66,19 @@ Reference `.llm/harness/workflow/lane-policy.md`; the complete route table is no
 - **IMPL-EVAL = N/A by run shape**, not by owner waiver: the run commits no implementation. The
   substitute assurance is (a) the formal Codex Sol high PLAN-EVAL at stage G and (b) the docs gate
   set on the RFC changeset. Mirrored in `drift.md`.
-- **Stage-F reviewer tier is a diversity choice**, not a source-lane requirement (`seed-run.md`
-  § Stage F). The concrete model is recorded in `drift.md` at the time of dispatch, and must differ
-  from Opus 5 (supervisor), Fable 5 (stage D), and GLM 5.2 (stage D2).
+- **Stage-F reviewer bound to Claude Sonnet 5 · high.** `seed-run.md` § Stage F fixes three
+  properties — unoriented, separate session, and a model **distinct from every lane that authored
+  the plan** — and leaves the tier as per-run configuration. The authoring lanes here are **Opus 5**
+  (supervisor spine, synthesis, plan lock), **Fable 5** (stage-D packs and stage-E sections), and
+  **GLM 5.2** (stage-D2 design pass). Sonnet 5 is distinct from all three.
+
+  Codex GPT-5.6 Sol was considered and **rejected for stage F**: it is the stage-G formal evaluator,
+  and spending it twice would collapse the review chain's diversity — the opposite-family look is
+  worth more as the *verdict of record* than as a preliminary pass. The resulting chain is
+  Opus → Fable → GLM → **Sonnet** → **Codex Sol**, with no model reviewing its own output.
+
+  OpenRouter was **not** used here: `lane-policy.md` and the charter confine it to the design lane
+  plus an authorized fallback/third opinion, and a routine stage-F review is neither.
 - **`major_ui_ux_*` GLM lanes are marked dormant** in `lane-policy.md` while the Dev Dashboard is
   paused (epic #400 → `0.0.1-beta.13`). This run reactivates the lane for its charter-mandated design
   pass. Authorization: the orchestrator brief's explicit instruction. Mirrored in `drift.md`.

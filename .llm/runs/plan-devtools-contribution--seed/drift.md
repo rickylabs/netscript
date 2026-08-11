@@ -186,3 +186,50 @@ documentation.
   corrected anchor.
 - **Evidence:** `packages/plugin/src/protocol/manifest.ts:271,283`; `grep -n 'strict()'` over the
   same file returns nine hits.
+
+## 2026-08-11 — D-10: the mandated GLM 5.2 design lane is BLOCKED by a tooling gap
+
+- **What:** The charter **requires** a GLM 5.2 xhigh pure-design pass via the canonical
+  `major_ui_ux_design` / `major_ui_ux_adversarial_review` route. **It could not be executed.** Two
+  attempts, both failed in under a second with zero tokens.
+- **Source:** `deno task agentic:claude-openrouter --model z-ai/glm-5.2 --effort xhigh …`, attempts
+  1 and 2. Raw transcripts preserved as `design/ux-evidence/glm-attempt-{1,2}-FAILED.jsonl`.
+- **Expected:** a severity-tagged design-findings file.
+- **Actual:** attempt 1 returned `is_error: true`, `terminal_reason: "aborted_streaming"`, 0 tokens.
+  Attempt 2 surfaced the real cause on stderr:
+
+  ```text
+  evaluator model request denied: model=z-ai/glm-5.2 requesting_session=8ced7882-...
+  ```
+
+  **Root cause — a policy/tooling gap, not a transient error.** `openrouter-run.ts` is the only
+  OpenRouter-through-Claude transport in the `claude/` lane, and its own doc comment states the
+  evaluator model guard "is never optional here". The guard
+  (`claude/evaluator-model-guard.ts:68-80`) enforces `OPEN_EVALUATOR_MODEL_IDS` at the HTTP request
+  boundary and denies anything outside it. GLM 5.2 is **correctly** absent from that allowlist —
+  `lane-policy.md` invariant 6 restricts relay **evaluator** lanes to open models
+  (`minimax/minimax-m3`, `deepseek/deepseek-v4-flash-0731`).
+
+  So the block is right in its own terms and still wrong in outcome: the **design** preset
+  `claude-design-glm-5-2` exists in `runtime/provider-profiles.ts:192` and is bound to
+  `major_ui_ux_design` in `runtime/routing-policy.ts:90,171`, but **no launcher can execute a design
+  lane** — the only available transport applies an *evaluator* guard to a *design* request. Policy
+  declares a lane the execution surface cannot run.
+- **Severity:** **significant** — a charter-mandated deliverable is not produced.
+- **Action:** **escalate, do not substitute.** Specifically:
+  1. The run does **not** fabricate the pass, and does **not** relabel another model's output as the
+     GLM pass. There is no authorized fallback: `lane-policy.md` lists no token-limit fallback for
+     the `major_ui_ux_*` lanes, and the Kimi K3 vision lane is defined as *complementing, never
+     replacing*, the GLM review.
+  2. Design scrutiny is still obtained — the design questions are folded into the **stage-F**
+     adversarial brief (Sonnet 5) and labelled there **explicitly as a substitute for design review
+     only, and NOT the mandated GLM pass**.
+  3. The outstanding pass is raised as an **owner escalation** in the decision brief and the PR
+     comment, together with the tooling gap, which is a **repo-level defect worth its own issue**:
+     either the guard needs a design-lane path, or `openrouter-run.ts` needs a non-evaluator mode,
+     or `lane-policy.md` must stop declaring a lane that cannot be launched.
+- **Evidence:** `design/ux-evidence/glm-attempt-1-FAILED.jsonl`, `...-2-FAILED.jsonl`;
+  `.llm/tools/agentic/claude/openrouter-run.ts:7-9,85`;
+  `.llm/tools/agentic/claude/evaluator-model-guard.ts:1,55-80`;
+  `.llm/tools/agentic/runtime/provider-profiles.ts:192`;
+  `.llm/tools/agentic/runtime/routing-policy.ts:90,171`.
