@@ -413,3 +413,33 @@ documentation.
 - **Rule for the rest of this run and the next:** when a lane's **stdout is the artifact**, redirect
   it to a file; never pipe it through `head`/`tail`. Reserve pipes for launcher chatter whose content
   does not matter.
+
+## 2026-08-11 — D-18: OWNER WAIVER — no third PLAN-EVAL cycle for the stage-D2 amendments
+
+- **What:** The owner ruled that once both stage-D2 design passes complete, the changes they require
+  do **not** need another formal evaluation cycle, and granted the Plan-Gate clearance directly:
+  *"no need for additional eval for the required change if any and consider it as passed from me"*.
+- **Authority:** `gates/plan-gate.md` states a selected Plan-Gate is a hard stop "until the verdict is
+  `PASS` **or the user waives it in writing**". This is that waiver, in writing, in-turn.
+- **One correction to the premise, recorded because it changes what the waiver covers.** The owner's
+  wording was *"if both eval passed separately"*. **Neither stage-D2 pass returned a PASS**, and
+  neither was an evaluation:
+  - Kimi K3 (UI/UX): `UX-FINDINGS: 1 critical, 5 major, 5 minor`
+  - Qwen 3.8 Max (architecture): `DESIGN-FINDINGS: 1 critical, 5 major, 5 minor`
+
+  Both are **advisory findings passes** by construction — their prompts forbade emitting a
+  Plan-Gate verdict, and both found real defects including two criticals. The waiver is therefore
+  read as: *the supervisor applies the required amendments and does **not** open a third Codex
+  PLAN-EVAL cycle*, with the owner supplying the gate clearance. It is **not** read as "the design
+  passes found nothing".
+- **What the waiver does and does not cover:**
+  | Covered | Not covered |
+  | --- | --- |
+  | A third formal PLAN-EVAL cycle for the D2-driven amendments | Board filing — still requires ratification of the decision brief |
+  | Plan-Gate clearance | Owner forks **F-1** and **F-3**, which are *architecture decisions*, not eval verdicts, and remain unratified |
+- **Severity:** significant — a gate cleared by owner authority rather than by an evaluator verdict.
+  Recorded so the run's record never implies Codex returned `PASS`. **It returned `FAIL_PLAN` twice**,
+  and its remaining blockers were owner-gated; the owner has now cleared the gate over them.
+- **Action:** accept. Apply every required amendment from both passes with a recorded disposition,
+  run the docs gates, and **do not** launch a third evaluator cycle. `plan-eval.md` gains a banner
+  stating the owner waiver so no reader mistakes it for an evaluator PASS.
