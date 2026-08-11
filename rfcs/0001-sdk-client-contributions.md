@@ -1,7 +1,7 @@
 ---
-rfc: 0000
+rfc: 0001
 title: Typed SDK client contributions
-status: Draft
+status: Accepted
 authors: ['@rickylabs']
 created: 2026-08-08
 tracking-issue: https://github.com/rickylabs/netscript/issues/1348
