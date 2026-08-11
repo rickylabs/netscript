@@ -17,8 +17,8 @@
 
 - `ResourceEnvironmentEntry` — the structural parameter type of the resolver
   (`{ Environment?: Readonly<Record<string,string>>; Env?: Readonly<Record<string,string>> }`).
-  Declared in the resolver module, used by both register generators. Not a config-contract type;
-  it exists so the resolver does not depend on which entry kind it was handed.
+  Declared in the resolver module, used by both register generators. Not a config-contract type; it
+  exists so the resolver does not depend on which entry kind it was handed.
 
 ### Ports
 
@@ -27,17 +27,17 @@ rendering port (`renderTemplateAssetSync`).
 
 ### Constants
 
-- `DECLARED_ENVIRONMENT_CONST` — the identifier the generated block binds
-  (`configuredEnvironment`), already used by the plugin generator; kept as the shared literal so
-  services and plugins emit the same shape.
+- `DECLARED_ENVIRONMENT_CONST` — the identifier the generated block binds (`configuredEnvironment`),
+  already used by the plugin generator; kept as the shared literal so services and plugins emit the
+  same shape.
 - E2E: `GATE.RUNTIME_SERVICE_ENV_FIXTURE = 'runtime.service-env-fixture'`,
   `GATE.BEHAVIOR_SERVICE_ENV = 'behavior.service-env'`. Service resource name and env keys are
   passed as gate arguments, never hardcoded in the generator.
 
 ### Commit slices
 
-See `plan.md` § Commit slices (6 slices). Each slice: gate → Tier-A review → sign-off commit →
-push → PR phase comment → worklog/context-pack update.
+See `plan.md` § Commit slices (6 slices). Each slice: gate → Tier-A review → sign-off commit → push
+→ PR phase comment → worklog/context-pack update.
 
 ### Deferred scope
 
@@ -57,15 +57,16 @@ both directions, determinism).
 ## Slice log
 
 <!-- appended per slice -->
+
 ### Slice 1 — RED (`21cf655f5`)
 
 `packages/cli/.../tests/service-environment_test.ts`. Starts at the appsettings text, parses with
 the real parser, asserts on generated output.
 
-| Gate | Result |
-| --- | --- |
-| `deno test --allow-all --unstable-kv <file>` | **FAIL** — `0 passed (3 steps) | 2 failed (7 steps)`, exit 1 |
-| same, with type-checking | **FAIL** — `TS2339: Property 'Env' does not exist on type 'ServiceEntry'` |
+| Gate                                         | Result                                                                    |
+| -------------------------------------------- | ------------------------------------------------------------------------- |
+| `deno test --allow-all --unstable-kv <file>` | **FAIL** — `0 passed (3 steps)                                            |
+| same, with type-checking                     | **FAIL** — `TS2339: Property 'Env' does not exist on type 'ServiceEntry'` |
 
 The 3 already-passing steps are determinism, "no declared environment emits nothing", and the
 existing plugin `Environment` path — kept so slices 2–3 cannot regress them.
@@ -82,9 +83,9 @@ exported symbol, so the `deno doc`-generated reference tables are unaffected).
 `packages/aspire/tests/config_test.ts` — 5 new steps: service `Environment`, service `Env` alias,
 plugin `Env` alias, and a non-string value rejected.
 
-| Gate | Result |
-| --- | --- |
-| `deno test --allow-all --unstable-kv packages/aspire` | **PASS** — `19 passed (72 steps) | 0 failed` |
+| Gate                                                  | Result                           |
+| ----------------------------------------------------- | -------------------------------- |
+| `deno test --allow-all --unstable-kv packages/aspire` | **PASS** — `19 passed (72 steps) |
 
 ### Slice 3 — generator (shared resolver, services emission, plugins routed through it)
 
@@ -94,13 +95,13 @@ New `register/resolve-resource-environment.ts` (`resolveResourceEnvironment` +
 same renderer, so both kinds emit byte-identical shapes and the existing plugin assertion in
 `generators-service-plugin_test.ts` is untouched and still green.
 
-| Gate | Result |
-| --- | --- |
-| `deno test --allow-all --unstable-kv packages/cli` | **PASS** — `718 passed (505 steps) | 0 failed (1m31s)`, exit 0 |
-| `run-deno-check.ts --root packages/cli` | **PASS** — 837 files, 0 occurrences, exit 0 |
-| `run-deno-lint.ts --root packages/cli` | **PASS** — 837 files, 0 occurrences, exit 0 |
-| `run-deno-check.ts --root packages/aspire` | **PASS** — 45 files, 0 occurrences |
-| `run-deno-fmt.ts --root packages/cli` / `--root packages/aspire` | **PASS** — 0 findings |
+| Gate                                                             | Result                                      |
+| ---------------------------------------------------------------- | ------------------------------------------- |
+| `deno test --allow-all --unstable-kv packages/cli`               | **PASS** — `718 passed (505 steps)          |
+| `run-deno-check.ts --root packages/cli`                          | **PASS** — 837 files, 0 occurrences, exit 0 |
+| `run-deno-lint.ts --root packages/cli`                           | **PASS** — 837 files, 0 occurrences, exit 0 |
+| `run-deno-check.ts --root packages/aspire`                       | **PASS** — 45 files, 0 occurrences          |
+| `run-deno-fmt.ts --root packages/cli` / `--root packages/aspire` | **PASS** — 0 findings                       |
 
 Slice review (Tier-A): generated block inspected by eye for a service declaring `Env` — the block
 sits after `withHttpHealthCheck` and before `buildOtelEnvVars`, binds `configuredEnvironment`, and
@@ -120,11 +121,11 @@ Why executed rather than string-matched: the precedence rule is a claim about `w
 being last-write-wins. A test comparing string offsets would keep passing if that stopped being
 true; this one fails.
 
-| Gate | Result |
-| --- | --- |
-| `deno test --allow-all --unstable-kv .../helpers/tests/` | **PASS** — `22 passed (188 steps) | 0 failed` |
-| `run-deno-fmt.ts --root packages/cli` | **PASS** — 838 files, 0 findings |
-| `run-deno-lint.ts --root packages/cli` | **PASS** — 838 files, 0 occurrences |
+| Gate                                                     | Result                              |
+| -------------------------------------------------------- | ----------------------------------- |
+| `deno test --allow-all --unstable-kv .../helpers/tests/` | **PASS** — `22 passed (188 steps)   |
+| `run-deno-fmt.ts --root packages/cli`                    | **PASS** — 838 files, 0 findings    |
+| `run-deno-lint.ts --root packages/cli`                   | **PASS** — 838 files, 0 occurrences |
 
 Slice review (Tier-A): no `any`, no casts — the dynamic import is narrowed by an `in`-based type
 guard; temp dirs removed in a `finally` after the module graph resolves.
@@ -146,25 +147,43 @@ Two gates plus a shared contract module, so the fixture and the verifier cannot 
   entries, that `DATABASE_URL` is the allocated value and not the declared stale one, and that the
   resource is not in a terminal state (the #1447 symptom: `Finished` within a second).
 - `service-env-evidence_test.ts` — 9 cases pinning the gate's failure modes (record- and
-  array-shaped environment, DCP-suffixed instance id, missing entries, inverted precedence,
-  terminal state as string and as object, absent resource, non-JSON output).
+  array-shaped environment, DCP-suffixed instance id, missing entries, inverted precedence, terminal
+  state as string and as object, absent resource, non-JSON output).
 
-**Ordering correction found during the slice review.** The fixture was first placed beside the
-other pre-start fixtures. That is wrong: `generate aspire` rewrites *every* helper, and both
+**Ordering correction found during the slice review.** The fixture was first placed beside the other
+pre-start fixtures. That is wrong: `generate aspire` rewrites _every_ helper, and both
 `runtime.flow-b-fixture` and `runtime.readiness-fixture` hand-patch a generated helper — running
-after them would have silently erased their patches and broken unrelated gates. Moved to
-immediately after `runtime.aspire-restore`, which also puts the generated environment block under
-the `generated.*` check/lint/fmt gates. The invariant is now asserted in `suite-registry_test.ts`
-rather than left to placement.
+after them would have silently erased their patches and broken unrelated gates. Moved to immediately
+after `runtime.aspire-restore`, which also puts the generated environment block under the
+`generated.*` check/lint/fmt gates. The invariant is now asserted in `suite-registry_test.ts` rather
+than left to placement.
 
-| Gate | Result |
-| --- | --- |
-| `deno test --allow-all --unstable-kv packages/cli/e2e` | **PASS** — `183 passed | 0 failed (20s)` |
-| `run-deno-check.ts --root packages/cli` | **PASS** — 843 files, 0 occurrences |
-| `run-deno-lint.ts --root packages/cli` | **PASS** — 843 files, 0 occurrences |
-| `run-deno-fmt.ts --root packages/cli` | **PASS** — 843 files, 0 findings |
+| Gate                                                                         | Result                                                                                                     |
+| ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `deno test --allow-all --unstable-kv packages/cli/e2e`                       | **PASS** — `183 passed                                                                                     |
+| `run-deno-check.ts --root packages/cli`                                      | **PASS** — 843 files, 0 occurrences                                                                        |
+| `run-deno-lint.ts --root packages/cli`                                       | **PASS** — 843 files, 0 occurrences                                                                        |
+| `run-deno-fmt.ts --root packages/cli`                                        | **PASS** — 843 files, 0 findings                                                                           |
 | fixture script smoke (arg validation, bad mode, missing service, patch step) | **PASS** — each path fails with its own message; the patched `appsettings.json` carries the declared `Env` |
 
 Reconcile note: no new issue/PR comments. `plan.md` slice 5 amended in effect by the ordering
 correction above; recorded here rather than as drift because it is a placement decision inside the
 slice, not a divergence from the plan's intent.
+
+### Slice 6 — documentation and the repo-wide quality gates
+
+`packages/aspire/README.md` gains a **Resource environment** section next to the existing "Host
+ports" section it is modelled on: the canonical `Environment` name, the deprecated `Env` alias, and
+a table of who wins each key with the reason (allocated vs. authored), including `PORT` as the case
+Aspire owns outright.
+
+| Gate                                          | Result                                                                                                                                            |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rtk proxy deno task quality:scan`            | **PASS** — `"ok":true`, 0 findings, 7 pre-existing allowances (none added)                                                                        |
+| `rtk proxy deno task arch:check`              | **PASS** — exit 0, no `FAIL=` entries, no aspire findings                                                                                         |
+| `deno task docs:readme:check`                 | **PASS for the touched package** — 1/36 non-conformant is the pre-existing `packages/bench/README.md` missing `## Install`, untouched by this run |
+| `run-deno-doc-lint.ts --root packages/aspire` | **PASS** — `totalErrors: 0`                                                                                                                       |
+
+Slice review (Tier-A): the added contract members are optional, explicitly typed, and JSDoc'd; the
+doc-lint surface is unchanged in error count; no new exported symbol, so the `deno doc`-generated
+reference tables need no regeneration.

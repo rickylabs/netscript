@@ -135,6 +135,47 @@ host port, and it keeps behaving exactly as before, so an `appsettings.json` wri
 release needs no migration. Prefer `HostPort` in new configuration — the old name reads as the port
 the process listens on, which is the misreading that made pinned defaults look harmless.
 
+## Resource environment
+
+Service and plugin entries declare environment variables under `Environment`:
+
+```jsonc
+{
+  "NetScript": {
+    "Services": {
+      "excalidraw-mcp": {
+        "Entrypoint": "tools/excalidraw-mcp.ts",
+        "Environment": { "MCP_TRANSPORT": "http" }
+      }
+    }
+  }
+}
+```
+
+`Env` is a deprecated alias for `Environment`, read when `Environment` is absent. Both spellings are
+accepted on both entry kinds, so a service and a plugin take exactly the same shape. Prefer
+`Environment` in new configuration.
+
+**Generated values win a collision.** Every declared entry is applied to the resource _before_ the
+generated telemetry, database, and service-discovery variables, and Aspire's `withEnvironment` is
+last-write-wins per key. So declaring `DATABASE_URL`, `OTEL_SERVICE_NAME`, or
+`services__<name>__http__0` does not override the generated one:
+
+| Key                                               | Who wins            | Why                                                                                                             |
+| ------------------------------------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Any key the generator does not write              | the declared value  | nothing else claims it                                                                                          |
+| `DATABASE_URL`, the engine URI key, `DB_PROVIDER` | the generated value | the connection string is allocated when the AppHost starts a container, not when `appsettings.json` is written  |
+| `OTEL_*`                                          | the generated value | the exporter endpoint and service identity come from the running dashboard                                      |
+| `services__<name>__http__0`                       | the generated value | the endpoint is allocated at start; a literal would point at a port nothing listens on                          |
+| `PORT`                                            | Aspire              | it comes from endpoint allocation, not from a generated environment assignment — pin it with `HostPort` instead |
+
+The rule is deliberately not "explicit configuration always wins". Those generated values are
+_allocated_, not authored: honoring a stale literal would leave a resource pointing at an address
+nothing serves while the configuration still looked valid. To change one of them, change the
+resource it comes from — the `Databases` entry, the `Otel` section, the referenced service.
+
+To supply a value the generator also writes, use a different key and read it in your entrypoint.
+
 ## API at a glance
 
 | Entry           | What it gives you                                                                 |
