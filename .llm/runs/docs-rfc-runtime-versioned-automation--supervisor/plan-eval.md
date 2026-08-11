@@ -208,3 +208,129 @@ through P-5 remain staged scope, not hidden implementation decisions.
 - No RFC, plan, worklog, context-pack, source, issue, comment, label, commit, or branch was changed. This Cycle-3 append is the only filesystem mutation.
 
 PLAN-EVAL: FAIL_PLAN
+## Cycle 4
+
+- Plan evaluator session: same dedicated Codex GPT-5.6 Sol · xhigh evaluator session / 2026-08-11
+  (owner override D-2), Cycle 4 explicitly authorized by the owner
+- Evaluator worktree: `/home/codex/repos/ns-rfc-plan-eval`, branch
+  `eval/rfc-runtime-versioned-automation`, clean at
+  `774f3ee194a854b24576b3e47a304ff979d64ae9`
+- Author worktree: `/home/codex/repos/ns-rfc-runtime-versioned-automation`, same source commit before
+  this verdict append
+- Surface / archetype: docs RFC planning future ARCHETYPE-1/2/3/5/6 package, runtime, plugin, CLI,
+  scaffold, DB, Aspire, and frontend waves
+- Scope overlays: `SCOPE-docs`; adversarial RFC architecture and competitive-evidence review; no
+  implementation evaluation
+
+### Prior-finding resolution audit
+
+| Prior finding | Cycle-4 result | Evidence |
+| --- | --- | --- |
+| Cycle-1 F1 / Cycle-3 F6 — Design checkpoint and current review artifacts | PARTIAL | The artifacts and live PR exist, and PR #1446 is draft at the evaluated head with one `status:plan-eval` label, a milestone, DoD, and Drift/Debt. They are not current: the plan profile still names the superseded existing-package archetypes rather than the selected automation-core/runtime/connector archetypes (`plan.md:15-20`); the context pack says P-1..P-4 and that Cycle 4 was not ordered (`context-pack.md:14-29`); the phase registry says G6 is done after three cycles (`phase-registry.md:13`); and the live PR checks S5 complete while describing Cycle 4 only as a future request. |
+| Cycle-1 F2/F3 — binding ownership and doctrine-valid thinness | PASS | O2+O4 is expressly binding with no live fallback; ARCHETYPE-1 is contracts/data only, ARCHETYPE-2/3 owns behavior/ports/adapters, and the ARCHETYPE-5 connector owns composition only (`rfc-0001-runtime-versioned-automation.md:508-541`). |
+| Cycle-1 F4 / Cycle-2 F2 / Cycle-3 F1 — activation consistency and outage protocol | PARTIAL | Complete desired-state epochs, carry-forward/tombstones, monotonic swaps, revision-pinned dispatch, cache behavior, transient/terminal failure classes, and leased rejoin validation are present (`:267-280`, `:302-348`). The outage contract is still internally inconsistent and its promised end-to-end proof is absent (finding 1). |
+| Cycle-1 F5 — honest T1 contract | PASS | The runtime table, blunt perimeter statement, TM1/TM2, and acceptance test consistently say native-runtime grants are not enforced at T1 and T1 is not a tenancy boundary (`:373-395`, `:423-444`, `:663-666`). |
+| Cycle-1 F6 / Cycle-2 F3 / Cycle-3 F2 — C8/TM9 and bounded security claims | PASS | §5.5 now distinguishes deliberate persistence from best-effort captured-output redaction (`:404-417`), matching the threat-model residual-risk statement (`:435-444`). TM9 still pins warm-cache offline loading and loud cold-cache behavior to A2a (`:433`). |
+| Cycle-1 F7 — evidence claim strength | PASS | Repository claims remain scoped to inspected commits and status tags; Appendix A still limits execution proof to Deno+shell. Focused tree searches reconfirmed the loader/discovery and cleanup surfaces rather than relying on the fix narrative. |
+| Cycle-1 F8 / Cycle-2 F4 / Cycle-3 F3 — complete clean-break inventory | PARTIAL | The requested trigger-enabled, Windows-environment, and `NETSCRIPT_TASKS_DIR` groups are now named (`:562-586`), but additional live runtime-config CLI/deploy plumbing remains undispositioned (finding 2). |
+| Cycle-1 F9 / Cycle-2 F5 / Cycle-3 F4 — roadmap gates and sizing | PARTIAL | A2d/A6a-c, file groups, release classes, dependency edges, and the JSR pre-scan are present (`:602-646`), but the table still omits matrix-required gate families for several package/plugin slices (finding 3). |
+| Cycle-3 F5 — competitive study integrity | PARTIAL | The missing isolation/control-plane/cockpit rows were added, exhaustive negatives were narrowed, the lighter-source rule is stated, and the T3 empirical number is gone. The expanded study now contradicts its own dimension count and primary-source/citation guarantee, and one new isolation cell is materially weaker than official documentation (finding 4). |
+
+### Checklist results
+
+| Plan-Gate item | Result | Evidence / location |
+| --- | --- | --- |
+| Research present and current | FAIL | Repository research is present and exactly re-baselined to current `origin/main` (`research.md:6-13`; verified base and merge-base `2256a67bf`). The competitive research overstates its citation coverage and mislabels a 15-row matrix as 12 dimensions (`competitive-architecture-study.md:3-7,123-144`; finding 4). |
+| Decisions locked | FAIL | Ownership, store parity, activation totals, cron, and T1 are locked. “Bounded last-good serving” and “never self-drain” specify different stale-serving contracts, and the text supplies no bound or expiry action (`rfc-0001-runtime-versioned-automation.md:349-360`; finding 1). |
+| Open-decision sweep | FAIL | The plan declares the outage question resolved as bounded serving (`plan.md:83-93`), while the RFC specifies indefinite serving with alerts. Choosing a stale-serving bound versus no bound changes runtime state, SLOs, and tests and is therefore not safe to leave contradictory. |
+| Commit slices (< 30, gate + files each) | FAIL | The slice count and ordering are acceptable, but required consumer/publish proof is missing from implementation rows (finding 3), the promised outage E2E is absent (finding 1), and the docs S6 fmt gate claimed at `plan.md:109-111` is not green: focused `deno fmt --check` exits 1 for the study plus plan/worklog/context pack. |
+| Risk register | FAIL | The outage row exists (`plan.md:81`) but repeats the contradictory contract and assigns A8 outage tests that neither A8 nor §13 names (`rfc-0001-runtime-versioned-automation.md:631,648-673`). |
+| Gate set selected | FAIL | Consumer validation is required for ARCHETYPE-2/3/5 and publish validation for touched public packages/plugins (`archetype-gate-matrix.md:60-76`), yet §12 omits `C` from A1a/A1b/A1c/A3a/A4a/A5a and omits `P` from the package/plugin/scaffold-changing A6b (`rfc-0001-runtime-versioned-automation.md:614-628`). |
+| Deferred scope explicit | PASS | P-1..P-5 have rationales and entry criteria (`:592-600`); naming, two-person policy, and retention defaults have explicit safe-deferral criteria (`:752-770`). |
+| jsr-audit surface scan (pkg/plugin) | PASS | The pre-scan names Zod slow types, isolated declarations, explicit oRPC route types, driver-type leakage, and connector re-export risks with owning slices (`:634-642`). |
+
+### Open-decision sweep (evaluator-run)
+
+One implementation-shaping decision remains contradictory: whether a previously admitted replica
+serves last-good indefinitely during a control-plane outage or stops serving after a defined bound.
+The RFC says both “bounded” and “never self-drain,” then describes only indefinite serving plus a
+staleness alert (`rfc-0001-runtime-versioned-automation.md:349-360`). The operator-configured bound,
+expiry behavior, and cold-start/no-valid-registration behavior must be explicit if serving is truly
+bounded; otherwise the plan and RFC must consistently call the chosen contract unbounded
+last-good availability. The chosen behavior needs the promised failure test in A8/§13.
+
+The §15 owner questions and P-1..P-5 remain safe to defer under their stated entry criteria.
+
+### Verdict
+
+`FAIL_PLAN`
+
+### If FAIL_PLAN — required fixes
+
+1. **[BLOCKER] Make the outage availability contract singular and prove it end to end.** §5.3 calls
+   serving “bounded” while requiring replicas never to self-drain and defining no maximum or expiry
+   transition (`rfc-0001-runtime-versioned-automation.md:349-360`). Choose an actual bound and its
+   post-bound behavior, or explicitly choose indefinite last-good serving and remove every “bounded”
+   claim from the RFC, plan, risk row, and PR. Specify cold-start/no-current-registration behavior.
+   Add the promised management/feed/store-outage scenario—cached revision succeeds, unseen revision
+   retries then exhausts, reconnect validates/converges—to §13 and A8; today §13 has no outage case
+   and A8 merely references §13/BG-1 (`:648-673`, `:631`).
+
+2. **[BLOCKER] Finish the file-level D-5 cleanup inventory, including live CLI and deploy
+   consumers.** The table removes the store/override directory and Windows writer but omits the
+   dependency composition that imports/constructs/exports `runtimeConfigStore`
+   (`packages/cli/src/public/features/root/public-command-dependencies.ts:14-15,87-88,198,260`) and
+   the public deploy flags/options `--force-runtime-config`, `--fail-on-drift`, `--keep-runtime`,
+   `forceRuntimeConfig`, plus the runtime-path merge loop
+   (`packages/cli/src/public/features/deploy/build/build-deploy-command.ts:39-47,61`,
+   `build-windows-options.ts:1-15`, `build-deploy.ts:23-24`,
+   `build-windows-runtime.ts:82-116`). Add explicit delete/rewrite dispositions and owning A6 slices
+   for that complete option/DI/merge surface; otherwise legacy runtime-config controls and compile
+   dependencies survive the claimed clean break (`rfc-0001-runtime-versioned-automation.md:568-586`).
+
+3. **[BLOCKER] Apply the selected gate matrix to the table rather than declaring it complete in
+   prose.** Add required consumer gates to the public ARCHETYPE-2/3/5 slices A1a/A1b/A1c/A3a/A4a/A5a,
+   and publishability to A6b because it rewrites published CLI/plugin composition and scaffold
+   output (`rfc-0001-runtime-versioned-automation.md:614-628`;
+   `archetype-gate-matrix.md:60-76`). Recheck every row by its actual touched archetype and keep
+   release-class overlays orthogonal. This is the same Cycle-3 gate finding, not genuinely resolved.
+
+4. **[BLOCKER] Repair the competitive study's evidence contract.** The heading still says “12
+   dimensions” although the matrix contains 15 dimension rows after adding isolation,
+   control/data-plane, and cockpit UX (`competitive-architecture-study.md:123-144`); RFC §14.1 and
+   the live PR repeat twelve. More importantly, the study promises that every load-bearing cell is
+   vendor-cited or marked partial/unknown (`:3-7`), but the three added rows contain uncited absolute
+   cells. For example, Windmill is reduced to “deployment-level isolation” (`:142`) even though its
+   official security documentation describes configurable per-job PID-namespace and NSJAIL
+   isolation, with important default/host distinctions
+   (https://www.windmill.dev/docs/advanced/security_isolation). Cite official sources for every new
+   load-bearing cell and encode configuration/default nuance or mark the cell unknown/partial. Then
+   correct the dimension count everywhere. The narrowed negative claims and no-empirical-performance
+   rule may remain.
+
+5. **[HIGH] Reconcile and format the complete review surface after the authorized Cycle 4.** Update
+   the selected archetypes and evaluation state in `plan.md:3-20,95-113`, P-5/Cycle-4 state in
+   `context-pack.md:3,14-29`, G6 in `phase-registry.md:13`, the stale hold text in
+   `worklog.md:177-198`, and PR #1446's checked S5/current-state wording. The PR's head SHA, draft
+   state, labels, milestone, DoD, and Drift/Debt structure are otherwise correct. Run the claimed
+   focused fmt gate: `docs:links` passes, but `deno fmt --check` currently fails on
+   `plan.md`, `worklog.md`, `context-pack.md`, and `competitive-architecture-study.md`, contradicting
+   `plan.md:109-111` and `worklog.md:175,198`.
+
+### Notes
+
+- The actual `3c918a64e` text—not its close-out narrative—was evaluated. Secret wording, TM9/C8,
+  complete activation snapshots, pinned dispatch classifications, leased rejoin validation,
+  requested trigger/Windows/task-dir inventory additions, release-class additions, and the three
+  new study dimensions were all verified directly.
+- D-10 runtime-versioned differentiation, D-4 clean-sheet authority, D-5 no-compat direction, D-3
+  frontend dependency cut, contract-first ownership, plugin thinness, and the prohibition on
+  hardcoded plugin names remain intact.
+- `docs:links` passed with zero broken links/anchors/orphans. Focused formatting failed as reported;
+  no formatter was run in write mode. The evaluator worktree remained clean.
+- Live PR #1446 was re-inspected read-only at head `774f3ee19`: open, mergeable, draft, sole
+  `status:plan-eval`, milestone assigned, six comments, and no GitHub mutation performed.
+- No RFC, plan, worklog, context pack, source, issue, comment, label, commit, or branch was changed.
+  This Cycle-4 append is the only filesystem mutation.
+
+PLAN-EVAL: FAIL_PLAN
