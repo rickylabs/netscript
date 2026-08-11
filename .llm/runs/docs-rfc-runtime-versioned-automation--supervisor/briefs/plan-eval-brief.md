@@ -10,7 +10,14 @@ Load: `netscript-harness` (evaluator separation), `.llm/harness/evaluator/plan-p
 your route to **Codex GPT-5.6 Sol · xhigh** (run drift D-2). You are a fresh evaluator session:
 you did NOT write this RFC; attack it.
 
-## Inputs (read all)
+## Session shape
+
+You run in the dedicated evaluator worktree `/home/codex/repos/ns-rfc-plan-eval` (branch
+`eval/rfc-runtime-versioned-automation`, same commit as the RFC branch). You are NOT the research
+thread and NOT the authoring session. Never write in `/home/codex/repos/ns-rfc-runtime-versioned-automation`
+except the single verdict file named below; never commit or push in either worktree.
+
+## Inputs (read all — paths relative to your worktree unless absolute)
 
 Run dir `.llm/runs/docs-rfc-runtime-versioned-automation--supervisor/`:
 `supervisor.md`, `drift.md` (owner directives D-1…D-6), `research.md`, `plan.md`,
@@ -48,7 +55,7 @@ plus draft PR #1446 body/comments.
 
 ## Output contract
 
-- Write `plan-eval.md` in the run dir from `.llm/harness/templates/plan-eval.md`, verdict
+- Write your verdict to the ABSOLUTE path `/home/codex/repos/ns-rfc-runtime-versioned-automation/.llm/runs/docs-rfc-runtime-versioned-automation--supervisor/plan-eval.md` using the template `.llm/harness/templates/plan-eval.md`, verdict
   `PASS` or `FAIL_PLAN` with numbered, actionable findings (severity-tagged; cite file:line).
 - Do not edit the RFC or any other file. Do not commit or push.
 - Final line exactly: `PLAN-EVAL: PASS` or `PLAN-EVAL: FAIL_PLAN`.

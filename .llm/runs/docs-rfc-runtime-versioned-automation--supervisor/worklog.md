@@ -82,3 +82,52 @@
   (#923–#932 + #934, #933 adjacency), ownership decision O2+O4 with recorded fallback,
   cleanup inventory (D-5 clean break), staged RFCs P-1…P-4, roadmap A0–A8, E2E acceptance model,
   alternatives. Gates: `docs:links` green; `deno fmt` clean; PLAN-EVAL brief prepared.
+
+## Design
+
+Design checkpoint for this docs-only run (the deliverable is the RFC package; implementation
+designs live inside the RFC and are re-checkpointed by their own future runs).
+
+1. **Public surface** — `docs/architecture/rfc/rfc-0001-runtime-versioned-automation.md`
+   (status Proposed; establishes `docs/architecture/rfc/` as the RFC home); run-dir artifacts
+   (`research.md`, `plan.md`, `evidence/*`, `1444-impact.md`, `plan-eval.md`); draft PR #1446
+   (body + per-slice phase comments); PR #1444 comment 5248826402 (early impact memo).
+2. **Domain vocabulary** — capability status tags (IMPLEMENTED/PARTIAL/ASPIRATIONAL/DEAD;
+   PROVEN/IMPLEMENTED-UNPROVEN/ABSENT), operator journeys J1–J3, contribution families
+   (`task@1`, `trigger@1`), activation epochs/sets, trust tiers T0–T3, threat items TM1–TM9,
+   waves A0–A8, prerequisite RFCs P-1–P-4.
+3. **Ports** — none created (docs run). The RFC *specifies* ports (store/boundary/reload/feed)
+   for future implementation runs.
+4. **Constants** — slice IDs S1–S5; evidence file names fixed in briefs; RFC section anchors
+   cited by plan-eval.
+5. **Commit slices** — S1–S5 as in plan.md §Commit slices, each with files + proving gate.
+6. **Deferred scope** — implementation of the selected architecture (owner-gated); issue filing
+   (owner-gated); §11 P-1..P-4 prerequisite RFCs; §15 classified deferrals.
+7. **Contributor path** — a reader starts at the RFC abstract → §4 overview → the section for
+   their concern; an implementer starts at §12's slice table, which names files + gates per
+   slice; evidence traceability runs RFC claim → evidence file § → path:line.
+
+## 2026-08-11 PLAN-EVAL cycle 1 — FAIL_PLAN, fix cycle applied
+
+- Evaluator: fresh Codex Sol·xhigh thread `019fef2b-…03fc` in dedicated worktree
+  `ns-rfc-plan-eval` (route matched; verified generator≠evaluator). Verdict FAIL_PLAN, 9
+  findings (7 blockers + 1 high + checklist fails). Endorsed: D-10 preservation, clean-break
+  direction, contribution model, #922 cut modeling.
+- Fixes applied (all findings):
+  F1 Design checkpoint added (above), context-pack.md created, PR body reconciled;
+  F2/F3 ownership DECIDED and re-archetyped (contracts-only core / behavioral runtime core with
+  store adapters per relocation-debt law / thin connector; no-connector fallback withdrawn with
+  same-fidelity analysis);
+  F4 activation-set manifest + monotonic epochs + fleet admission/ack/convergence + adapter
+  conformance suite + honest KV narrowing;
+  F5 T1 enforcement contract stated bluntly (non-Deno grants declarative+audited, NOT enforced;
+  T2 for untrusted polyglot); J2/TM1/TM2/E2E-5 rewritten; per-runtime negative tests;
+  F6 TM9 child-loader threat added (C8 honored); explicit v1 trust assumptions; redaction
+  bounded; audit not tamper-proof vs DB admin;
+  F7 evidence claims scoped to inspected commits; partial operator surfaces acknowledged; #1444
+  described as open-draft dependency; polyglot matrix row downgraded to deno+shell proven;
+  F8 cleanup inventory expanded (sagas emissions, workers local discovery path, generated
+  trigger registry, KV enabled-state fold, Windows env keys, T0 boundary) + cron ownership
+  resolved (task@1 has no schedule; scheduled trigger is the only operator cron surface);
+  F9 roadmap re-sliced A0–A8 into PR-sized slices with files + gate classes and corrected edges.
+- Gates re-run after fixes: `docs:links` green; `deno fmt --check` clean on RFC.

@@ -1,7 +1,9 @@
 # Plan — docs-rfc-runtime-versioned-automation--supervisor
 
-Status: **provisional draft** — locks after G1/G2 evidence lands. PLAN-EVAL (Sol · xhigh, owner
-override D-2) runs at the end against the finished RFC package; it is this run's formal gate.
+Status: **LOCKED** (fix cycle 1 after PLAN-EVAL cycle 1 FAIL_PLAN). Architecture decisions are
+locked in the RFC itself (ownership §9; epoch consistency §5.2/5.3; fleet admission §5.3; adapter
+parity/narrowing §5.2; T1 enforcement contract §5.4; cron ownership §5.1). PLAN-EVAL (Sol ·
+xhigh, owner override D-2) is this run's formal gate; cycle 2 evaluates the fixed package.
 
 ## Profile
 
@@ -53,22 +55,45 @@ override D-2) runs at the end against the finished RFC package; it is this run's
 - Draft PR only; no epic/issue filing; no ready-for-review until owner ratifies.
 - #1444 keeps its D-10 boundary; this RFC does not ask it for redesign work.
 
-## Risk register
+## Risk register (expanded per PLAN-EVAL cycle 1)
 
-| Risk | Mitigation |
+| Risk | Mitigation (RFC §, owning slice) |
 | --- | --- |
-| RFC claims drift from code reality | every capability claim carries a status tag + path evidence; Codex Sol sub-agents independently derived; 5-weakest-claims lists re-verified by supervisor |
-| Over-design (faking certainty on staged questions) | explicit "prerequisite RFC required" markers; staged decisions with entry criteria |
-| Cockpit dependency mis-modeled | dependency cut cites live issue states (verified OPEN 2026-08-11); roadmap edges explicit |
-| Sub-agent worktree contention (one Codex thread per worktree) | G1 → G2 serialized; supervisor works read-only in between |
-| Evaluator route blocked | record in drift + escalate per lane-policy fallbacks |
+| RFC claims drift from code reality | status tags + path evidence; independent Codex derivation; supervisor spot-checks; F7 scope corrections applied |
+| Over-design (faking certainty on staged questions) | §11 prerequisite RFCs with entry criteria; §15 classified deferrals |
+| Cockpit dependency mis-modeled | live issue states verified; explicit A7 edges (#923–#932 + #934, plus A3b/A4b/A5b) |
+| Cross-family partial activation observed by replicas | single transactional activation-set manifest + epoch (§5.2, A1a) |
+| Out-of-order feed vs poll overwrites newer state | strictly monotonic epoch application, stale rejection (§5.3, A1c) |
+| Schema-skew split fleet after partial deploy | fleet registration + admission-at-commit + convergence status/SLO + force-drain override (§5.3, A2b) |
+| KV/Postgres semantic divergence | one adapter-conformance suite; KV narrowed to single-writer dev, refuses fleet features (§5.2, A1a/A1b) |
+| Non-Deno T1 escape / overclaimed sandbox | T1 enforcement contract stated bluntly; per-runtime negative tests incl. honest non-enforcement pins; T2 required for untrusted polyglot (§5.4/§6, A5a) |
+| Snapshot integrity vs malicious store/MITM | trust assumptions explicit (TLS + content hashes = integrity-of-identity); signed snapshots bundled with P-3 (§6) |
+| Secret leakage via captured output | bounded best-effort redaction, residual risk documented (§6, A5b) |
+| Control-plane child loader executes consumer code with net | TM9: lockfile-pinned + --cached-only default, warm-cache-offline acceptance gate (§6, A2a) |
+| Cron subsystem duplication deepened | task@1 has no schedule; scheduled trigger is the only operator cron; CRON-SUBSYSTEM-DUP untouched for T0 (§5.1) |
+| Sub-agent worktree contention | G1→G2 serialized; evaluator in dedicated worktree |
+| Evaluator route blocked | record in drift + lane-policy fallbacks |
 
-## Commit slices (docs-only)
+## Open-decision sweep (plan-gate requirement)
 
-1. Run-dir bootstrap + research + briefs (this scaffolding).
-2. Evidence: legacy capability map (G1 report + supervisor review note).
-3. Evidence: current-state matrix (G2 report + supervisor review note).
-4. RFC document + matrix + diagrams + roadmap.
-5. PLAN-EVAL verdict + any FAIL_PLAN fix cycles.
+Must-resolve-now items are **resolved in the RFC** (ownership §9; activation consistency
+§5.2/5.3; replica admission §5.3; store parity §5.2; T1 contract §5.4; cron ownership §5.1).
+Remaining open decisions, each classified: naming → defer to A0 (safe; spelling only);
+two-person activation default → defer to A2b (policy hook exists either way); retention defaults
+→ defer to A3b (conservative caps shipped behind config). P-1..P-4 deferred with entry criteria
+(§11). No open decision forces rework if deferred as classified.
+
+## Commit slices (docs-only run; files + proving gate per slice)
+
+1. **S1 bootstrap** — files: run dir (`supervisor.md`, `drift.md`, `phase-registry.md`, briefs,
+   `1444-impact.md`); gate: harness activation checklist. DONE (`e7378bf7c`).
+2. **S2 legacy evidence** — files: `evidence/legacy-capability-map.md`; gate: supervisor A1
+   review + 2 verbatim spot-checks. DONE (`e7378bf7c`).
+3. **S3 current evidence** — files: `evidence/current-state-matrix.md`, `evidence/current-state-probes/**`;
+   gate: probe exit codes recorded + supervisor A1 review. DONE (`f5997b6a2`).
+4. **S4 RFC** — files: `docs/architecture/rfc/rfc-0001-runtime-versioned-automation.md`; gates:
+   `docs:links`, `deno fmt --check` on the file, PR body reconciliation. DONE + fix cycle 1.
+5. **S5 PLAN-EVAL cycles** — files: `plan-eval.md` (evaluator-written), fix-cycle diffs; gate:
+   `PLAN-EVAL: PASS` (≤2 cycles then escalate). Cycle 1 FAIL_PLAN consumed; cycle 2 pending.
 
 Each slice: commit → push (explicit refspec) → draft-PR comment with evidence.
