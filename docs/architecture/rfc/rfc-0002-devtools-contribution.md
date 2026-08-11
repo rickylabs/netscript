@@ -658,7 +658,7 @@ dashboard host (research.md F26, `m4` F15).
   routes/          # the HOST's own tree — vertical feature slices
     _layout.tsx
     index.tsx
-    traces/  runtime/  contracts/
+    runtime/  flows/  contracts/  plugins/  generated/  automation/
   islands/
 ```
 
@@ -1491,9 +1491,23 @@ type DevToolsUiNode =
   | { readonly kind: 'stack'; readonly direction?: 'row' | 'column'; readonly children: readonly DevToolsUiNode[] }
   | { readonly kind: 'text'; readonly text: string; readonly tone?: 'default' | 'muted' | 'danger' }
   | { readonly kind: 'keyValue'; readonly entries: readonly { readonly key: string; readonly value: string }[] }
-  | { readonly kind: 'table'; readonly columns: readonly string[]; readonly rows: readonly (readonly string[])[] }
+  | { readonly kind: 'table'; readonly columns: readonly string[];
+      /** Cells are nodes, not strings — the canonical devtools table is
+       *  `id | status-badge | trace-link`, which a string matrix cannot express. */
+      readonly rows: readonly (readonly DevToolsCell[])[];
+      readonly emptyText?: string }
   | { readonly kind: 'badge'; readonly text: string; readonly tone: 'ok' | 'warn' | 'error' }
-  | { readonly kind: 'link'; readonly link: DevToolsLink; readonly label: string };
+  | { readonly kind: 'link'; readonly link: DevToolsLink; readonly label: string }
+  /** Required by AC-2: every mutation surface renders its CLI-equivalent line.
+   *  Without this element that acceptance line is unsatisfiable. */
+  | { readonly kind: 'code'; readonly text: string; readonly lang?: 'shell' | 'json' | 'ts' };
+
+/** The subset of nodes allowed inside a table cell. Deliberately narrow. */
+export type DevToolsCell =
+  | { readonly kind: 'text'; readonly text: string; readonly tone?: 'default' | 'muted' | 'danger' }
+  | { readonly kind: 'badge'; readonly text: string; readonly tone: 'ok' | 'warn' | 'error' }
+  | { readonly kind: 'link'; readonly link: DevToolsLink; readonly label: string }
+  | { readonly kind: 'code'; readonly text: string };
 ```
 
 **Host behavior.** A registry keyed by zone — registry-over-switch, per AP-24 (`09-…md:165`);
@@ -2786,6 +2800,9 @@ for a contributed-route kind should one survive **Contribution kinds**.
                                          Each row deep-links to the owning surface below.
                                          Only-NetScript stats and contributed home cards sit
                                          BELOW the feed, not above it.
+                                         The feed ALWAYS renders its own coverage strip —
+                                         which sources reported, which are unreachable —
+                                         because an empty feed must never be ambiguous.
 <base>/runtime/                          Primitive run-state — one vertical slice per primitive
   workers/
     jobs/:jobId/executions/:execId       entity URL for one execution (attempts, steps)
@@ -2836,6 +2853,52 @@ flowchart LR
    covers wiring facts.*
 3. **`/automation/` exists from day one as a staged placeholder** rather than appearing later, so
    the two-hosts boundary is documented inside the product (**OF-IA-4**).
+
+#### 11.3.1 Feed coverage — an empty Home must never be ambiguous
+
+**The failure this prevents.** A ranked problem feed that renders empty has two possible meanings —
+*nothing is broken*, or *DevTools cannot see anything*. A debugging tool that cannot tell a developer
+which one it is has failed at its single most important moment, and it fails **silently**. This RFC
+names stale/false-done reporting as its own motivation (§11.7); an ambiguous empty state is the same
+defect at the top level.
+
+**Normative rule.** The Home feed is a function of a **declared source set**, and it always renders
+that set's status alongside the rows:
+
+```ts
+/** Every seam the feed aggregates. Closed set — adding a source is a host release. */
+export type FeedSource =
+  | 'contributions'   // quarantined / window-mismatched contributions
+  | 'runs'            // failed + compensating runs across primitives
+  | 'generated'       // registry / schema drift
+  | 'doctor'          // plugin doctor errors
+  | 'convergence'     // replicas off the current epoch (staged; needs #1446)
+  | 'contracts';      // coverage regressions
+
+export interface FeedSourceStatus {
+  readonly source: FeedSource;
+  readonly state: 'reported' | 'unreachable' | 'not-configured' | 'stale';
+  /** Present for 'reported' and 'stale'. Drives the age shown in the coverage strip. */
+  readonly observedAt?: string;
+  /** Required when state is 'unreachable' — shown to the developer, not swallowed. */
+  readonly reason?: string;
+}
+```
+
+- **`all-clear` is only reachable when every source is `reported`.** If any source is `unreachable`
+  or `stale`, the feed renders **`partial`** and names the gap — *"3 of 6 sources reporting; runs and
+  convergence unreachable"* — never a clean empty state.
+- **`not-configured` is distinct from `unreachable`.** A convergence source with no automation
+  installed is not a failure; an installed one that cannot be reached is. Collapsing them would
+  either cry wolf or hide a real outage.
+- **First run is `not-configured` across the board**, which is what makes the onboarding card in
+  §11.7 correct rather than a special case bolted on.
+- The coverage strip is **host-owned**; contributions cannot write to it, and a contributed panel
+  failing does not silently shrink the feed — it appears as a `contributions` row.
+
+**Gate.** `SCOPE-frontend` browser validation asserts all three shapes — `all-clear`, `partial` with
+a named unreachable source, and first-run `not-configured` — as distinct rendered states. This is a
+required acceptance for the Home surface, not a nice-to-have.
 
 ### 11.4 The AC-1 record: why each surface is NetScript-only
 
