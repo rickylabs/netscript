@@ -169,3 +169,39 @@ Dry-run preceded the real launch and validated the brief contract (`use harness`
 the git-safety check. **Generator ≠ evaluator holds**: every authoring lane in this run was Claude
 (Opus 5 supervisor, Fable 5 packs and sections) or Sonnet 5 (stage F); the evaluator is OpenAI Codex
 in a session that authored nothing.
+
+## Stage-G outcome — two cycles, both `FAIL_PLAN`, escalation reached
+
+| Cycle | Thread | Commit evaluated | Verdict | Outcome |
+| --- | --- | --- | --- | --- |
+| 1 | `019ff05b-cf8b-7051-b66a-fdc52683b2f0` | `b7cd62067` | **`FAIL_PLAN`** | 7 of 8 boxes failed; 8 required fixes. All four independent gates passed |
+| 2 | `019ff075-d2e0-7823-9572-0648e158cc16` | `143c31574` | **`FAIL_PLAN`** | Confirmed cycle-1 fixes landed in the RFC but found the **section sources and packs still carried the old boundary** — two corpora. Remaining blockers classified **owner-gated** |
+
+Both cycles ran on the recorded route (`openai` / `gpt-5.6-sol` / `high`, requested == observed),
+each in its **own** worktree, each against an **immutable** commit.
+
+### Supervisor-fixable findings — all closed
+
+| Finding | Fix | Verified by |
+| --- | --- | --- |
+| Two identity laws, two ordering laws | One law each, stated once in §6 | cross-file search → **0** surviving variants |
+| Archetype A2 failed doctrine's trigger | A1 contracts + A6 CLI emission + A5 plugin; host app is userland; A3 trigger written down | doctrine `06-archetypes.md:41-77` |
+| Gate union omitted the CLI surface | Redrawn from A1+A6+A5 with F-2/F-3/F-4/F-9, consumer and e2e-CLI gates | §13.3 |
+| Slices were outcomes, not slices | 16 slices, each with files, contract, and one proving command | §14 |
+| Partial JSR rubric | Full audit-skill checklist, 11 rows | §13.2 |
+| `worklog.md` claimed work that never happened | Rewritten to actual status incl. two `NOT DONE` rows | this file |
+| F-1 called reversible | Withdrawn; classified must-resolve; R1 corrected | `plan.md` rework audit |
+| Seed deliverables missing | 25 drafts produced, no board mutation | `filing/` |
+| **Two corpora** (RFC vs `rfc-sections/`) | Scaffold **deleted**; `RFC-AUTHORITY.md` states the authority order | cross-file search |
+
+### Owner-gated — the run cannot clear these
+
+1. **D-10 / GLM 5.2 design pass.** Unlaunchable. Needs a launcher repair **or an explicit owner
+   waiver** of the charter and `lane-policy` invariant 5. Not substitutable — the run refused to
+   relabel Sonnet's scrutiny as the mandated pass.
+2. **F-1 — package/spine ownership.** Fixes public specifiers and emitter ownership; blocks W1-a.
+3. **F-3 — manifest schema evolution.** `.passthrough()` vs `schemaVersion: 2` have different
+   old-CLI behavior *and different tests*; blocks the pointer and emitter slices.
+
+**Escalated per `run-loop.md` §4: two `FAIL_PLAN` cycles, then the user decides.** No third cycle was
+opened, and no board entry was filed.

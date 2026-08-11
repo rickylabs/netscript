@@ -7,7 +7,7 @@
 | Run ID | `plan-devtools-contribution--seed` |
 | Branch | `plan/devtools-contribution` |
 | Worktree | `/home/codex/repos/ns-rfc-devtools-contribution` |
-| Current phase | `research` (seed stage B — discovery corpus) |
+| Current phase | `plan-eval` — **ESCALATED after two FAIL_PLAN cycles** (harness limit reached) |
 | Draft PR | [#1450](https://github.com/rickylabs/netscript/pull/1450) — draft, `status:research`, `Backlog / Triage` |
 | Archetype | Described, not built |
 | Scope overlays | `docs` + `frontend` |
@@ -15,10 +15,13 @@
 
 ## Current State
 
-Seed run **activated**. `supervisor.md` is written (Opus 5 · high, this session, Remote Control on),
-the baseline is verified against live `origin/main` with no divergence, and the mandatory run
-artifacts are scaffolded. The charter is committed to the branch as
-`.llm/devtools-rfc-orchestrator-brief.md` so the run is reconstructible without chat history.
+**Stages A–G complete; the run is STOPPED at the escalation boundary.** RFC-0002 is committed, the
+plan is locked, 25 filing drafts exist, and PLAN-EVAL ran twice. Both cycles returned `FAIL_PLAN`.
+The harness allows two before escalation, so the run does **not** open a third cycle.
+
+Every **supervisor-fixable** finding from both cycles is fixed and verified. What remains is
+**owner-gated only**: the unlaunchable GLM design pass (D-10), fork F-1 (package/spine ownership),
+and fork F-3 (manifest schema evolution). No board mutation has occurred; PR #1450 is still draft.
 
 **Nothing is locked yet.** `plan.md` carries the twelve charter questions as an open-decision docket;
 `research.md` carries the evidence-input register (E1–E7) with every entry `pending`.
