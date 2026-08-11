@@ -107,3 +107,26 @@
 - The two things most worth attacking: (1) whether each retained contribution kind has a **real**
   first-party consumer rather than a speculative union, and (2) whether the Aspire/Scalar/DevTools
   ownership boundary holds without cloning upstream UIs.
+
+## Stage-D slice review — supervisor verification log
+
+Amendment A1: no lane self-certifies. Before the stage-D sign-off commit the Tier-A supervisor
+independently verified the **load-bearing** claims each pack rests on, in source, rather than
+relaying them. Verification found one pack right and my own committed corpus wrong, which is the
+point of the gate.
+
+| # | Claim (pack) | Verification | Result |
+| - | ------------ | ------------ | ------ |
+| V1 | #890's manifest pointer block is "safely additive; older CLIs ignore it" (**T2** disputes) | `packages/plugin/src/protocol/manifest.ts:271,282` | **T2 correct.** Schema ends in `.strict()` with `schemaVersion: z.literal(1)` → unknown top-level key is hard-rejected, not ignored. → drift **D-6**, escalated as a cross-RFC defect in #890/#922 slice #929 |
+| V2 | Generator subprocess permissions are whole-**filesystem**, not project-scoped (**T6** vs my corpus `r3` F10) | `installed-runtime-registry-generator.ts:416-417`; `grep` for `allow-net`/`allow-env` | **T6 correct, my corpus understated it.** Flags are bare `--allow-read`/`--allow-write` with no `=<path>` → global grant. No `--allow-net`/`--allow-env`, so default-deny blocks exfiltration. → drift **D-7** |
+| V3 | `createSSEStream`/`createKvWatchSSE` ship but are unexported with zero importers (**T5**) | `packages/fresh/src/runtime/server/sse.ts` exists (12.6 KB); `deno eval` over `packages/fresh/deno.json` → 15 export subpaths, **none** is `sse`; only importer is its own `sse_test.ts` | **Confirmed.** A promotion slice, not new design |
+| V4 | NetScript is in the documented `transformIndexHtml` injection no-op bucket (**T1**, closing research OQ1) | `find` for `index.html*` under the scaffold → none; `grep -rn transformIndexHtml packages plugins` → **zero matches repo-wide** | **Confirmed** on the locally checkable half. The upstream half (`@fresh/plugin-vite` catch-all middleware calling `mod.default.fetch`) is cited to a pinned JSR path and remains a Wave-0 probe |
+
+**Consequence of V4:** research open question 1 — flagged at stage C as *the single most
+decision-relevant unknown* — is **closed**. A Vite-`transformIndexHtml`-shaped mount is not
+available to NetScript, which removes an entire branch of the T1 option space rather than leaving it
+as a risk.
+
+**Not verified, carried as named probes** (recorded rather than glossed): `fresh({ islandSpecifiers })`
+end-to-end with JSR specifiers under Deno resolution; whether the Vite dev server's own endpoints
+(HMR WS, `/@fs`) are auth-gated when non-loopback.
