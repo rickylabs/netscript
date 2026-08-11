@@ -277,3 +277,21 @@ documentation.
   existing label strips it from live issues. Worth its own parity PR.
 - **Also recorded:** `netscript-pr`'s milestone guidance (`0.0.2`…`0.0.9`) is **stale** — the live
   board runs `0.0.6`…`0.0.15`. The drafts use live milestones and say so.
+
+## 2026-08-11 — D-13: one sender per worktree — cycle-2 eval refused reuse, correctly
+
+- **What:** PLAN-EVAL cycle 2 was launched against the **same** evaluator worktree used for cycle 1,
+  after checking it out to the new commit. The launch **failed**.
+- **Source:** `run-codex-slice.ts:124` →
+  `launch failed: … already has a sender; resume session 019ff05b-cf8b-7051-b66a-fdc52683b2f0`.
+- **Expected:** a fresh evaluator thread at the same worktree.
+- **Actual:** the durable sender registry refused. The guard exists because **two concurrent sends
+  at one worktree fork rival agents that fight over the git index** — a documented landmine in
+  `.llm/tools/agentic/README.md`.
+- **Severity:** minor — a **correct refusal**, caught at launch rather than producing a corrupted
+  run. Recording it because the failure mode it prevents is expensive and invisible.
+- **Action:** fix — cycle 2 runs in its **own** worktree, `/home/codex/repos/ns-devtools-planeval-c2`,
+  at commit `143c315741fc4bc9d0c5069d6cb3c69321c7762b`. The harness rule is now concretely evidenced,
+  not just quoted: *an evaluator cycle gets its own worktree*, and reusing one is refused by design.
+- **Note for the run record:** cycle 1's worktree is left intact at its own commit so its verdict and
+  transcript remain independently inspectable.
