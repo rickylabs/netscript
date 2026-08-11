@@ -1,15 +1,17 @@
 # Plan — docs-rfc-runtime-versioned-automation--supervisor
 
-Status: **LOCKED** (post owner-authorized PLAN-EVAL cycles 3–6 + fix cycles; cycle 6 found no
-unresolved architecture decision — remaining findings were record bookkeeping, fixed in this slice).
+Status: **LOCKED** (post owner-authorized PLAN-EVAL cycles 3–8 + fix cycles; cycle 6 found "no
+unresolved runtime architecture decision remains" and every later finding has been record
+bookkeeping, each fixed in the following slice; cycle 8's plan/status items are fixed in this edit).
 Architecture decisions locked in the RFC: ownership §9; epoch consistency + complete-desired-state
 §5.2/5.3; fleet admission + leased registration §5.3; **control-plane-outage availability contract
 §5.3-8 (**indefinite** last-good serving, never self-drain, idle-and-loud cold start; pinned-lookup
 transient/terminal classes)**; adapter parity/narrowing §5.2; T1 enforcement contract §5.4; cron
 ownership §5.1; competitive positioning §14.1 (D-8 study: adopted patterns / non-goals /
-differentiators; benchmark gates §13.1; P-5 staged). PLAN-EVAL (Sol·xhigh, D-2): cycles 1–4 all
-FAIL_PLAN with monotonically narrowing findings; every finding of every cycle is fixed in-tree;
-cycle 5 (owner-ordered "one more eval") is the deciding pass, and on PASS the RFC is produced for
+differentiators; benchmark gates §13.1; P-5 staged; two-frontend boundary §8.2 per D-9, P-6 staged).
+PLAN-EVAL (Sol·xhigh, D-2): eight cycles to date, all FAIL_PLAN with monotonically narrowing
+findings (9 → 6 → 5 → 2 → bookkeeping-only from cycle 6 onward); every finding of every cycle is
+fixed in-tree; the next pass closes on the reconciled record, and on PASS the RFC is produced for
 the owner. PR stays draft until ratification.
 
 ## Profile
@@ -114,10 +116,11 @@ rework if deferred as classified.
    (`f5997b6a2`).
 4. **S4 RFC** — files: `docs/architecture/rfc/rfc-0001-runtime-versioned-automation.md`; gates:
    `docs:links`, `deno fmt --check` on the file, PR body reconciliation. DONE + fix cycle 1.
-5. **S5 PLAN-EVAL cycles** — files: `plan-eval.md` (evaluator-written, cycles 1–5), fix-cycle diffs;
-   gate: verdict recorded per cycle. Cycles 1–2 FAIL_PLAN → protocol escalation; owner authorized
-   cycle 3; cycle 3 FAIL_PLAN with 6 findings → all fixed (worklog). Owner ratification is the
-   closing gate per D-8 directive.
+5. **S5 PLAN-EVAL cycles** — files: `plan-eval.md` (evaluator-written, append-only, cycles 1–8 to
+   date), fix-cycle diffs; gate: verdict recorded per cycle. History: C1 9 findings → C2 (partly
+   stale-text, D-7) → protocol escalation → owner-authorized C3 6 → C4 5 → C5 2 → C6
+   architecture-clean (bookkeeping) → C7/C8 residual record items; every finding fixed in the slice
+   that followed its cycle. Owner ratification is the closing gate.
 6. **S6 competitive study (D-8)** — files: `evidence/competitive-architecture-study.md`, RFC
    §14.1/§13.1/P-5, wording corrections; gates: `docs:links` + fmt + cycle-3 evaluator review of the
    study. DONE (`811373a87` + fix commit).
