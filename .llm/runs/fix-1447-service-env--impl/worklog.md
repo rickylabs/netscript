@@ -107,3 +107,26 @@ sits after `withHttpHealthCheck` and before `buildOtelEnvVars`, binds `configure
 loops `withEnvironment`. `deno.lock` unchanged.
 
 Reconcile note: no new issue/PR comments; no drift beyond the entries already recorded.
+
+### Slice 4 — executing runtime test
+
+`tests/service-environment-runtime_test.ts`. Writes the generated `register-services.mts` to a temp
+dir beside doubles for its two relative value imports (`../.aspire/modules/aspire.mts`,
+`./_aspire-compat.mts`), imports it, runs `registerServices(...)` against a recording builder, and
+reduces the recorded `withEnvironment` calls last-write-wins. Then spawns a real `deno` process with
+the resolved map and asserts the child reads the declared values back out of its own environment.
+
+Why executed rather than string-matched: the precedence rule is a claim about `withEnvironment`
+being last-write-wins. A test comparing string offsets would keep passing if that stopped being
+true; this one fails.
+
+| Gate | Result |
+| --- | --- |
+| `deno test --allow-all --unstable-kv .../helpers/tests/` | **PASS** — `22 passed (188 steps) | 0 failed` |
+| `run-deno-fmt.ts --root packages/cli` | **PASS** — 838 files, 0 findings |
+| `run-deno-lint.ts --root packages/cli` | **PASS** — 838 files, 0 occurrences |
+
+Slice review (Tier-A): no `any`, no casts — the dynamic import is narrowed by an `in`-based type
+guard; temp dirs removed in a `finally` after the module graph resolves.
+
+Reconcile note: no new issue/PR comments; no plan readjustment.
