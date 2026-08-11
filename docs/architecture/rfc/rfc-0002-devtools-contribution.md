@@ -865,11 +865,15 @@ TypeScript block below is a proposed contract, not a description of shipped code
 ### Decision
 
 DevTools ships as a **sibling payload family** — `{ family: 'devtools', major: 1 }` — riding a
-**family-neutral envelope spine** that this RFC pins and the DevTools lane implements first. The
-envelope, identity quartet, host-descriptor negotiation, and transactional replace-set are adopted
-as a *specification* from RFC #890's merged design record (contracts C1–C5, C8); they are
+**family-neutral envelope spine that is self-contained and built first in
+`packages/devtools-core`** (owner-ratified fork **F-1**, 2026-08-11; run drift D-19).
+`devtools-core` owns the envelope and identity types outright — this is not a dependency on #890.
+The envelope, identity quartet, host-descriptor negotiation, and transactional replace-set are
+adopted as a *specification* from RFC #890's merged design record (contracts C1–C5, C8); they are
 payload-agnostic by construction, so adopting them costs nothing and diverging from them would
-manufacture a second dialect.
+manufacture a second dialect. Adoption is of the *spec text only*: no #890 code exists to depend
+on, and if #890's `app` family ever ships a shared spine, convergence onto it is a **re-export
+change, not a dependency** — the contracts are byte-identical by adoption.
 
 Of the three seams already claiming this axis, **#890's pointer axis wins**: #427's thinness law
 (no dashboard-specific field in the plugin manifest) survives intact under it, and **#734 is
@@ -877,9 +881,11 @@ superseded** — it proposes exactly the in-manifest axis #427 forbids and the p
 unnecessary (`research.md` F10; `b1-dashboard-board.md` D2, F4). Ratification of that arbitration
 is Owner fork **O-1**; the supersession section carries the board mechanics.
 
-### Owner fork O-1 (restated) and Owner fork O-2 — the #890 dependency decision
+### The #890 dependency decision — RATIFIED (F-1), with owner fork O-1 restated
 
-This is a real fork with a default, stated openly rather than smuggled in as structure.
+An earlier draft carried this as an open fork with a stated default. **The owner ratified the
+default on 2026-08-11 (F-1; run drift D-19).** The option table is kept as the decision record, not
+as an open question.
 
 RFC #890 merged **design text only** — 32 files, all under `.llm/runs/` plus `labels.yml`, zero
 source. All 24 children and epic #922 are OPEN at `status:plan`, milestone `0.0.9`, and not even
@@ -890,32 +896,37 @@ F5). "Reuse #890's envelope" therefore means co-depending on unbuilt, unproven w
 | --- | --- | --- |
 | **(a)** Hard-depend on #890's spine | DevTools waits for #928–#931 | Serialized behind 24 unstarted issues four milestones out; DevTools becomes the first consumer of a spine whose own proofs never ran (`p1` F4, F5) |
 | **(b)** Fully self-contained DevTools envelope | Own envelope, own emitter | Creates a **fourth** seam on one axis; two emitters that must later converge or stay duplicated forever |
-| **(b′)** Shared spec, DevTools-built spine — **default** | This RFC pins the neutral contracts; the DevTools lane implements them scoped to `devtools`; #890's `app` family re-bases onto the neutral package when its waves run | DevTools absorbs the Wave-0-class proving risk #922 scheduled for itself; #928–#931 must be re-baselined to *consume* the neutral package — a board mutation only the owner can ratify |
+| **(b′)** Shared spec, DevTools-built spine — **RATIFIED (F-1)** | This RFC pins the neutral contracts; the DevTools lane implements them scoped to `devtools`, self-contained in `packages/devtools-core`; #890's `app` family re-bases onto the neutral package when its waves run | DevTools absorbs the Wave-0-class proving risk #922 scheduled for itself; #928–#931 re-baseline later to *consume* the neutral package — a re-export change on their side, not a dependency on this one |
 
 **(b′) is licensed by #890's own ratified decision D3**: a second family "extends nothing at the
 schema level; it shares the envelope, discovery pipeline, identity model, and host-surface
 negotiation" (`plan-frontend-contrib--seed/design/canonical/01-contracts.md:84-87`). Sibling
 payload, not widened union.
 
-**Reversibility (the reason this is a fork and not a foundation).** The devtools payload schema,
-host descriptor, ordering rule, and diagnosis taxonomy below are byte-identical under (a), (b), and
-(b′). Only two things move with the choice: the neutral package's home and name, and which lane
-builds the emitter first. The decision stays reversible until the first emitter slice merges.
+**What the ratification pins, and what stays free.** The devtools payload schema, host descriptor,
+ordering rule, and diagnosis taxonomy below are byte-identical under (a), (b), and (b′) — which is
+why ratifying (b′) changed no contract text in this section. What F-1 pins: the neutral contracts
+live in `packages/devtools-core`, `devtools-core` owns the envelope and identity types outright,
+and the DevTools lane builds the emitter first — **not serialized behind #890's 24 open children**.
+The honest residual: if #890 ever ships a shared spine, convergence onto it is a **re-export
+change, not a dependency**.
 
-**Owner fork O-2 — the neutral package's home and name.** `@netscript/devtools-core`
-(proposed) vs `@netscript/plugin-frontend-core` (#890's own fork F3, never arbitrated —
-`p1` F9). A1 small-contract archetype either way. Also in scope: whether the manifest pointer block
-reuses #890's `frontend` name verbatim (default — a devtools panel *is* UI, and renaming
-re-litigates a settled name) or takes a family-neutral name while nothing is built.
+**Owner fork O-2 — resolved by F-1.** The neutral package's home is `packages/devtools-core`
+(`@netscript/devtools-core`); #890's own fork F3 (`@netscript/plugin-frontend-core`, never
+arbitrated — `p1` F9) is not adopted. A1 small-contract archetype unchanged. The sub-question —
+whether the manifest pointer block reuses #890's `frontend` name — keeps its default (reuse
+`frontend`; a devtools panel *is* UI, and renaming re-litigates a settled name) and was not
+separately re-litigated by F-1.
 
-**Owner fork O-3 — spine ownership transfer.** Under (b′), #922's spine children re-baseline to
-consume the DevTools-built neutral package. This inverts that epic's build order and is a board
-mutation this run may propose but not perform.
+**Owner fork O-3 — mooted by F-1.** There is no spine-ownership transfer to perform:
+`devtools-core` owns its spine outright, and #922's spine children re-baseline (if their waves ever
+run) as *consumers* via re-export — a board note, not a build-order inversion. The supersession
+section carries the board mechanics.
 
 ### The envelope
 
 ```ts
-// @netscript/devtools-core/contracts/v1   (home/name = owner fork O-2)
+// @netscript/devtools-core/contracts/v1   (home ratified by F-1; O-2 resolved)
 
 export interface FamilyRef {
   readonly family: string; // 'app' | 'devtools' | future siblings
@@ -1048,17 +1059,38 @@ recorded as run drift **D-6** and escalated as a cross-RFC finding against #890/
 (D-6 cites the `.strict()` call as `:282`; at baseline it is `:283` — `:282` is
 `linking: linkingSchema.optional()`. The finding is unaffected.)
 
-**Normative consequence.** Any manifest-visible DevTools pointer is blocked behind an explicit
-**schema-evolution precondition slice**, sequenced before the pointer lands. Two acceptable shapes,
-owner's choice (**Owner fork O-5**):
+**Normative consequence — RATIFIED (F-3, 2026-08-11; run drift D-19).** An earlier draft left this
+as an owner fork (**O-5**) between a `.passthrough()` relaxation and a `schemaVersion` bump. The
+owner ratified the first shape. The precondition slice is normative and sequences **before** any
+manifest-visible pointer lands:
 
-1. Relax `PluginInstallerManifestSchema` to tolerate declared optional extension blocks
-   (`.passthrough()` or a `catchall` on a reserved namespace), with a compatibility test asserting
-   that an unknown block parses rather than throws; or
-2. Bump `PLUGIN_MANIFEST_SCHEMA_VERSION` with a documented migration and a **structured** old-CLI
-   error ("plugin requires manifest schema v2; upgrade the CLI") in place of a raw zod issue list.
+- **The exact change.** `PluginInstallerManifestSchema`'s top-level terminator changes
+  `.strict()` → `.passthrough()` (`packages/plugin/src/protocol/manifest.ts:283`).
+  `schemaVersion` **stays `z.literal(1)`** (`:271`) — no bump. Tolerating unknown top-level keys
+  *without* a version dance is the point of passthrough: the version literal is reserved for
+  changes an old CLI cannot safely ignore.
+- **Old CLI + new manifest** (manifest carries a `devtools` pointer block; the CLI predates it):
+  the manifest **parses successfully**, the unknown key is ignored, and — because the old CLI has
+  no devtools generate step — ignoring produces **no half-wired state**. This is exactly the
+  property `.strict()` denied (drift D-6): under `.strict()` the same manifest fails parsing
+  outright and takes the whole plugin down.
+- **New CLI + old manifest** (no pointer block): parses; no devtools contributions are discovered;
+  doctor reports nothing. **Absence is not an error.**
+- **New CLI + malformed pointer block:** the *pointer* is validated by **its own schema at
+  generate time**, never by the installer manifest — a malformed block is a **generate-time error
+  naming the plugin**, and can never be a manifest parse failure that takes the whole plugin down.
+- **Slice acceptance tests (required, named):**
+  1. a fixture manifest with an unknown top-level key **parses** under the new schema;
+  2. the same fixture **fails** under `.strict()` — a regression guard proving the precondition
+     is what changed, not something else;
+  3. a malformed pointer block produces a **generate-time error**, not a parse failure.
+- **The trade, stated honestly.** `.passthrough()` loses typo detection on unknown *top-level*
+  keys — a misspelled optional block name would silently pass where `.strict()` rejected it. The
+  compensating control: the pointer block's **own schema is strict**, so typos *inside* the block
+  are caught at generate time, and every key the CLI acts on remains explicitly enumerated in the
+  installer schema.
 
-Until one of those merges, additive manifest evolution is not available to any family. This is a
+Until that slice merges, additive manifest evolution is not available to any family. This is a
 precondition, not a footnote.
 
 ### Discovery and the generated registry
@@ -1108,7 +1140,7 @@ import:
 | `devtools.islands.ts` | island specifiers for the vite feed |
 | `devtools.routes.ts` | typed route refs for contributed pages |
 | `devtools.check.ts` | static-import module referencing every referenced module — the type gate's teeth |
-| `devtools.diagnosis.json` | machine-readable five-state record, consumed by the doctor check |
+| `devtools.diagnosis.json` | machine-readable six-state record (see Quarantine), consumed by the doctor check |
 
 Lazy loaders are **literal, never computed**, so the staged `deno check` can see them
 (`03-discovery-and-registry.md:43-53`):
@@ -1139,8 +1171,13 @@ export interface DevToolsHostDescriptor {
 }
 
 export interface DevToolsZoneDescriptor {
-  /** Version-suffixed, host-owned id: 'devtools.capability.panel/v1'. The suffix versions the
-   *  ZONE's props/context contract independently of the family major. */
+  /**
+   * Version-suffixed, host-owned id: 'workers.console/v1'. ONE rule for every zone id —
+   * `<zoneName>/v<major>` — applied in the vocabulary itself (§7's `DevToolsZoneId`).
+   * The suffix versions the ZONE's props/context contract independently of the family major.
+   * (An earlier draft suffixed only this doc-comment's example while §7's actual vocabulary
+   * went bare — Q-M4; the suffix now exists where contributions actually target it.)
+   */
   readonly id: string;
   readonly capacity?: number;
   /**
@@ -1160,6 +1197,23 @@ Grafana derived its whole compatibility story from version-suffixed contribution
 (`m2` F13, F16); the suffix is kept exactly where it uniquely earns its place — versioning a host
 slot's props/context contract — and rejected as a per-contribution compatibility mechanism, where
 the `(family, major)` handshake already does the job with quarantine semantics Grafana lacks.
+
+**Zone matching rule (normative).** A contribution's target zone id is matched against
+`descriptor.zones[].id` by **exact, case-sensitive string equality on the full version-suffixed
+id** — no prefix match, no highest-version fallback. When no exact match exists, diagnosis is
+ordered:
+
+- the full suffixed id is a member of the family's vocabulary (§7's `DevToolsZoneId`) but absent
+  from this host's `zones` → **`known-but-unmounted`** (state 2, info only — not quarantine);
+- otherwise split on the trailing `/v<major>`: a *name* matching neither the vocabulary nor any
+  descriptor zone → **`unknown-zone`** (state 1, the typo class);
+- a known name whose *version* the host does not serve → **`zone-contract-mismatch`**
+  (quarantine state 6, added below), carrying the declared version, the versions the host serves,
+  and the remediation command.
+
+A host may serve at most **two consecutive versions of a zone** through a one-major deprecation
+window, mirroring the family negotiation rule above. Serving both means listing both suffixed ids
+in `zones`; a contribution targets exactly one.
 
 ### Ordering
 
@@ -1244,16 +1298,20 @@ The family keys on host-assigned `mountId` only.
 
 ### Quarantine
 
-The five-state taxonomy is adopted verbatim as **product surface, not internal vocabulary**
-(`03-discovery-and-registry.md:89-95`):
+The five-state taxonomy is adopted as **product surface, not internal vocabulary**
+(`03-discovery-and-registry.md:89-95`), and this RFC adds a **sixth state** the upstream taxonomy
+could not express: with version-suffixed zone ids (see the matching rule above), "the zone name is
+right but the zone-contract version is not served" is distinguishable from a typo, and an earlier
+draft's table conflated them (Q-M4).
 
 | # | State | Class | Meaning |
 | - | --- | --- | --- |
-| 1 | `unknown-zone` | excluded + error | target id not in the host descriptor (typo) |
+| 1 | `unknown-zone` | excluded + error | target's *name* not in the host descriptor (typo) |
 | 2 | `known-but-unmounted` | info only — **not** quarantine | zone valid for the family, absent from this host; skipped |
 | 3 | `capacity-rejected` | excluded + overflow report | volume/capacity loser, named |
 | 4 | `window-mismatch` | **quarantine** | `(family, major)` outside the host window |
 | 5 | `load-failure` | **quarantine** | staged check or import failed |
+| 6 | `zone-contract-mismatch` | **quarantine** | zone *name* known, but the contribution targets a zone-contract version the host does not serve; card names declared vs served versions |
 
 Quarantine entries are emitted into `devtools.registry.ts` **as data**, so the shell renders each
 as a card deep-linking `netscript plugin doctor`. Each contribution additionally renders inside a
@@ -1268,13 +1326,13 @@ has no boundary anywhere on its mount path — a documented gap, not a model (`m
 "Doctor checks are read-only."
 (`packages/cli/src/public/features/plugins/doctor/doctor-plugin-use-case.ts:299-312`). The DevTools
 host plugin ships exactly one contributed check: it reads `devtools.diagnosis.json` and the
-generated registry, replays the five states as doctor rows, and flags staleness (registry entries
+generated registry, replays the six states as doctor rows, and flags staleness (registry entries
 with no installed plugin).
 
 **Honest limitation.** A contributed check returns `{ name, ok, message }` and is mapped
 `status: check.ok ? 'healthy' : 'error'` — **binary, with no warning tier**
-(`doctor-plugin-use-case.ts:314-318`). So states 1, 3, 4, and 5 report as `ok: false`, and state 2
-reports as `ok: true` with an informational message. A capacity loser and a load failure are
+(`doctor-plugin-use-case.ts:314-318`). So states 1, 3, 4, 5, and 6 report as `ok: false`, and
+state 2 reports as `ok: true` with an informational message. A capacity loser and a load failure are
 therefore indistinguishable by severity in the doctor summary; the detail lives only in the
 message text. Widening `ok` to a tri-state is a candidate one-line framework improvement and is
 explicitly **not** required by this design.
@@ -1320,20 +1378,20 @@ walker-leak defect (`r4` F10).
 
 ### Owner forks raised by this section
 
-| # | Fork | Default |
+| # | Fork | Status / default |
 | - | --- | --- |
 | O-1 | Seam arbitration: pointer axis wins; #427 folds in; **#734 closes as superseded** | as stated |
-| O-2 | Neutral package home/name, and whether the manifest block keeps #890's `frontend` name | `@netscript/devtools-core`; reuse `frontend` |
-| O-3 | Spine ownership transfer — #922's spine children re-baseline onto the DevTools-built package | (b′) |
+| O-2 | Neutral package home/name, and whether the manifest block keeps #890's `frontend` name | **RESOLVED by F-1 (2026-08-11)** — `packages/devtools-core` / `@netscript/devtools-core`; `frontend` block name keeps its default |
+| O-3 | Spine ownership transfer — #922's spine children re-baseline onto the DevTools-built package | **MOOTED by F-1** — convergence is a re-export change, not a transfer |
 | O-4 | Advisory-install for the devtools family; per-family `onInvalid` knob or hardcoded | advisory-install, knob deferred |
-| O-5 | Manifest schema-evolution precondition slice — relax `.strict()` or bump `schemaVersion` | required before any pointer lands |
+| O-5 | Manifest schema-evolution precondition slice — relax `.strict()` or bump `schemaVersion` | **RATIFIED as F-3 (2026-08-11)** — `.passthrough()`, `schemaVersion` stays `1`; still sequenced before any pointer lands |
 | O-6 | Anchor governance — host curation of first positions vs pure-triple ordering | anchors retained |
 
 ### Open risks
 
 | Risk | What would prove it |
 | --- | --- |
-| The pointer block cannot land at all until the manifest schema evolves; every downstream slice inherits that dependency (drift D-6) | The precondition slice of O-5, with an old-CLI/new-manifest compatibility test |
+| The pointer block cannot land at all until the manifest schema evolves; every downstream slice inherits that dependency (drift D-6) | The ratified F-3 `.passthrough()` slice, with its three named acceptance tests (unknown-key parses; same fixture fails under `.strict()`; malformed pointer is a generate-time error) |
 | "Containment by construction" for the emitter is a design property with no gate yet | The path-containment test on the host emitter, asserting every emitted path resolves under `.netscript/generated/devtools/` |
 | Determinism is asserted, not gated | The shuffle test: permuted envelope input ⇒ byte-identical registry |
 | Two-major serving is a policy, not a mechanism | The old-host/new-plugin and new-host/old-plugin contract tests named under Negotiation |
@@ -1388,17 +1446,17 @@ verdict so a reader can see what was considered, not only what survived.
 
 | Candidate | Real first-party consumer? | Host behavior | Verdict | Reason |
 | --- | --- | --- | --- | --- |
-| **Zones/panels** | **Yes** — workers console (#428, #933); sagas instances incl. `compensating` (#429); triggers firing history (#430); streams deliveries (#431), all reading runtime state that exists today (`r1` F10; `b1` F4) | Render a JSON element tree into a host-owned zone; per-contribution error boundary; §6's anchors-then-`(order, mountId, id)` sort; per-zone per-plugin volume cap (`m2` F15) | **KEEP-v1** (`json-render` tier only) | The zero-client-code tier is *"server-side TypeScript only"* (`m1` F3) and most plugin panels are key/value + table + list. It sidesteps the VNode-serialization dead end Nuxt hit (`m1` F23) and — decisively — needs **none** of #890's unbuilt envelope/mount/registry spine (`research.md` F1, F2) |
-| **Island / client-code panel tier** | Named but unbuilt — #933's "island" half | Would need plugin client bundles, mount glue, Preact-singleton discipline (`r1` F16) | **STAGE** | Exactly the machinery #890's spine was to provide, and #890 merged **docs only: 32 files, all under `.llm/runs/` plus `labels.yml`, zero source**, with all 24 children open at `status:plan`/`0.0.9` (`research.md` F2). Staging keeps v1 buildable without first resolving the family fork (see *Contribution family*) |
+| **Zones/panels** | **Yes** — workers console (#428, #933); sagas instances incl. `compensating` (#429); triggers firing history (#430); streams deliveries (#431), all reading runtime state that exists today (`r1` F10; `b1` F4) | Render a JSON element tree into a host-owned zone; per-contribution error boundary; §6's anchors-then-`(order, mountId, id)` sort; per-zone per-plugin volume cap (`m2` F15) | **KEEP-v1** (`json-render` tier only) | The zero-client-code tier is *"server-side TypeScript only"* (`m1` F3) and most plugin panels are key/value + table + list. It sidesteps the VNode-serialization dead end Nuxt hit (`m1` F23) and — decisively — needs **none** of #890's unbuilt envelope/mount/registry spine (`research.md` F1, F2); the spine it does need is the F-1-ratified self-contained `devtools-core` one (§6) |
+| **Island / client-code panel tier** | Named but unbuilt — #933's "island" half | Would need plugin client bundles, mount glue, Preact-singleton discipline (`r1` F16) | **STAGE** | Exactly the machinery #890's spine was to provide, and #890 merged **docs only: 32 files, all under `.llm/runs/` plus `labels.yml`, zero source**, with all 24 children open at `status:plan`/`0.0.9` (`research.md` F2). The family fork is now ratified (F-1, §6: self-contained `devtools-core` spine), so staging is about the client-code machinery, not the fork |
 | **Pages/routes** | **No** — the four consoles are host-owned screens; the dashboard epic implements kinds *and* host (`b1` F10) | n/a in v1 | **STAGE** | A contributed route needs route-manifest integration that mutates page modules (`r1` F8) plus a visible-tree convention (`r1` F4) — #890-spine territory — and is the fastest road to AP-21 (`09-…md:141`) |
 | **Inspectors / entity-tabs** | Yes, but *as panels*: run inspector #419, plugin detail #420 | Entity-scoped **zones** whose context carries a host-fetched typed slice — Medusa's `DetailWidgetProps<T>` transfer (`m3` M-7) | **FOLD into `panel`** | An inspector is a panel whose zone is entity-scoped and whose context is typed per zone. A separate kind would duplicate the panel contract (AP-9) |
 | **Visualizers** | **No** — the S13 flow chain is the host-owned flagship (#418), and #400 keeps a *killed-surfaces* list (waterfall, log tail) precisely so such renderers cannot creep back (`b1` F3) | n/a | **REJECT** | The visual extension seam is the host-owned `DevToolsUiNode` vocabulary, which grows by host release. A plugin-supplied renderer is Vite's `custom-render` type, documented as *"skip[s] iframe isolation"* and painting *"directly into the DevTools panel DOM"* (`m1` F3, citing `vite-devtools__docs_kit_dock-system.md:251`) — the point where "a contribution throws" becomes "the shell is dead" |
 | **Actions / commands** | Named but **blocked**: gated rerun/cancel (#428), trigger enable/disable (#430), runtime-config write-back (#551) — each gated on unbuilt co-reqs #554/#555/#556, on runtime-config being read+watch only (`b1` F7/D6), and on SDK auth (`research.md` F15) | Staged contract preserves #400 acceptance line 2: invoke the same contract route/CLI scaffolder the terminal does, and render the `cliEquivalent` | **STAGE** | v1 is read-only by decision, not omission — see *Read-only by default* below |
-| **Diagnostics / data sources** | **Yes** — the `auth-backend` check ships today (`r3` F2); `plugin doctor` already dynamically imports and runs plugin-contributed `extraChecks` under a read-only `dryRun: true` context (`r4` F2) | DevTools renders each plugin's doctor rows in the five-state diagnosis taxonomy; the CLI prints the same rows (one generator, two callers) | **KEEP-v1 as reuse** — no new type | Minting a parallel DevTools diagnostic kind would duplicate a shipped seam — the "reimplement rather than consume" trap `r5` D1 records in the scaffolded telemetry example |
+| **Diagnostics / data sources** | **Yes** — the `auth-backend` check ships today (`r3` F2); `plugin doctor` already dynamically imports and runs plugin-contributed `extraChecks` under a read-only `dryRun: true` context (`r4` F2) | DevTools renders each plugin's doctor rows in the six-state diagnosis taxonomy (§6); the CLI prints the same rows (one generator, two callers) | **KEEP-v1 as reuse** — no new type | Minting a parallel DevTools diagnostic kind would duplicate a shipped seam — the "reimplement rather than consume" trap `r5` D1 records in the scaffolded telemetry example |
 | **Navigation** | **No** distinct consumer — sidebar entries are derivable from the zone vocabulary plus registered panels | Host derives nav from zones + registrations | **REJECT** | With routes staged, a nav contribution has nothing to point at that a panel registration does not already imply. It is union filler — the AP-3 shape (`09-…md:46`) |
 | **External deep-links** | **Yes** — trace/logs/metrics jumps, grammar verified from fetched Aspire `.razor` sources (`m4` F6-F11); Scalar operation anchors (`r5` F26) | Resolve base URLs, build typed URLs, render disabled-with-reason when unresolvable; **never** construct opaque `?filters=` (`m4` F11) | **KEEP-v1** | #400's non-duplication acceptance line — *"why can't this just deep-link to Aspire/Scalar?"* (`b1` F3) — makes deep-links the enforcement mechanism of the entire ownership thesis. No helper exists today (`research.md` F7): small, load-bearing, zero unbuilt dependencies |
 | **Setup / onboarding** | **No** — plugin setup is owned by `plugin install` + doctor; the home "wiring" grid is host-owned (#415) | n/a | **REJECT** | "Is this plugin set up" is answered by the diagnostic reuse; an onboarding kind duplicates doctor with weaker authority |
-| **`launcher`** (Vite dock type) | Yes — but as a *state*: every telemetry-backed panel fronts an ephemeral AppHost endpoint (`r5` F11) and must degrade when it is down | Panel availability includes `unavailable` with an optional launch card; swap-back-when-the-process-dies adopted (`m1` F15) | **FOLD into `panel` as a lifecycle state** | Vite models launch as a first-class state of a dock entry, not a kind (`m1` F15). No v1 consumer needs DevTools to *own* process launch — Aspire's runtime port does (`r5` F2) — and v1 is read-only, so the card shows the command instead of executing it |
+| **`launcher`** (Vite dock type) | Yes — but as a *state*: every telemetry-backed panel fronts an ephemeral AppHost endpoint (`r5` F11) and must degrade when it is down | The canonical state union includes `not-running` with the launch card; swap-back-when-the-process-dies adopted (`m1` F15) | **FOLD into `panel` as a lifecycle state** | Vite models launch as a first-class state of a dock entry, not a kind (`m1` F15). No v1 consumer needs DevTools to *own* process launch — Aspire's runtime port does (`r5` F2) — and v1 is read-only, so the card shows the command instead of executing it |
 | **`exposedComponent`** (plugin↔plugin UI) | **No** — no plugin consumes another plugin's UI; no plugin has UI at all (`research.md` F1) | n/a | **DEFER, explicitly** | `m2`'s own adapt-list: it is a second, distinct feature (plugin↔plugin) layered on the first (plugin↔host). Deferral is *stated* per `m2` OQ8, not silently omitted. If ever adopted, take singleton-key + first-registration-wins verbatim (`m2` F22) |
 | **`ai-tool`** (unratified union) | **No** — the agent surface is MCP: 22 tools with typed input *and* output schemas plus `ToolKind` read/mutate/meta already exist (`r5` F17-F18) | n/a | **REJECT** | See *Why `ai-tool` is rejected* below |
 | **`home-card`** (unratified union) | Weak — the home stats grid is host-owned (#415); no per-plugin card issue is filed | Would be a `home` zone entry, not a kind | **STAGE as a zone id** | Under a closed zone vocabulary this is a one-line vocabulary addition, not a contract change. Add the zone when a first-party card issue is actually filed |
@@ -1448,45 +1506,88 @@ import type { DevToolsContributionBase } from '@netscript/devtools-core/contract
 ```ts
 /**
  * Host-owned CLOSED zone vocabulary (Medusa model, m3 M-2/M-4). Plugins cannot mint zones.
- * Initial set is deliberately minimal; each entry names its context type.
+ * ONE rule, applied in the vocabulary itself: every zone id is `<zoneName>/v<major>` (§6's
+ * matching rule). An earlier draft version-suffixed only §6's descriptor example and left
+ * this vocabulary bare, so the suffix existed nowhere a contribution could target (Q-M4);
+ * this is the correction. The map below is ALSO the context-type contract: a panel author
+ * gets a real type per zone, not a comment. The `*Data` wire shapes are owned by §8
+ * (Data plane); §7 owns this zone→type binding.
  */
-type DevToolsZone =
-  | 'workers.console'   // ctx.data: WorkersConsoleData (host-fetched)
-  | 'sagas.console'
-  | 'triggers.console'
-  | 'streams.console'
-  | 'plugin.detail'     // entity zone — ctx.data: PluginDetailData (typed slice, m3 M-7)
-  | 'run.detail';       // entity zone — ctx.data: RunDetailData
+import type {
+  PluginDetailData, RunDetailData, SagasConsoleData,
+  StreamsConsoleData, TriggersConsoleData, WorkersConsoleData,
+} from '@netscript/devtools-core/contracts/v1/data'; // wire shapes: §8's contract
 
-interface DevToolsPanelContribution extends DevToolsContributionBase {
-  readonly zone: DevToolsZone | readonly [DevToolsZone, ...DevToolsZone[]];
+export interface DevToolsZoneContextMap {
+  readonly 'workers.console/v1': WorkersConsoleData;
+  readonly 'sagas.console/v1': SagasConsoleData;
+  readonly 'triggers.console/v1': TriggersConsoleData;
+  readonly 'streams.console/v1': StreamsConsoleData;
+  /** Entity zone — typed slice scoped to one plugin (m3 M-7, Medusa's DetailWidgetProps transfer). */
+  readonly 'plugin.detail/v1': PluginDetailData;
+  /** Entity zone — typed slice scoped to one run. */
+  readonly 'run.detail/v1': RunDetailData;
+}
+
+export type DevToolsZoneId = keyof DevToolsZoneContextMap;
+
+interface DevToolsPanelContribution<Z extends DevToolsZoneId = DevToolsZoneId>
+  extends DevToolsContributionBase {
+  readonly zone: Z | readonly [Z, ...Z[]];
   /**
    * Server-side only. No client code, no bundle, no island (m1 F3: "server-side TypeScript only").
    * Runs in-process in the DevTools host under an AbortSignal.
    */
-  readonly render: (ctx: DevToolsPanelContext) => Promise<DevToolsUiNode>;
-  /** Optional probe; drives the degraded/launch card (m1 F15). Default: 'ready'. */
-  readonly availability?: (ctx: DevToolsPanelContext) => Promise<PanelAvailability>;
+  readonly render: (ctx: DevToolsPanelContext<Z>) => Promise<DevToolsUiNode>;
+  /** Optional probe reporting the contribution-observable arms below. Default: 'ready'. */
+  readonly availability?: (ctx: DevToolsPanelContext<Z>) => Promise<DevToolsPanelProbeState>;
 }
 
-type PanelAvailability =
-  | { readonly state: 'ready' }
-  /** Truthful empty state — e.g. plugins/streams has no oRPC contract surface to read (F15). */
-  | { readonly state: 'empty'; readonly reason: string }
-  /** Backing dependency down (ephemeral AppHost endpoint, r5 F11). Renders the launch card. */
-  | {
-      readonly state: 'unavailable';
-      readonly reason: string;
-      /** v1 SHOWS the command; it never executes it (read-only surface). */
-      readonly remedy?: { readonly cliEquivalent: string };
-    };
+/**
+ * THE canonical panel state union — the single vocabulary for every panel-bearing surface.
+ * It replaces this section's earlier `PanelAvailability` (deleted by this amendment) AND
+ * §11.7's separate `PanelState` (K-M3/Q-M5: two vocabularies, no mapping, and neither
+ * modelled `not-running`). §11's state matrix is the RENDERING CHECKLIST for this union;
+ * it defines no state vocabulary of its own.
+ */
+export type DevToolsPanelState<T> =
+  | { readonly kind: 'loading' }
+  | { readonly kind: 'ready'; readonly data: T }
+  /** Honest all-clear: every source was read and there is genuinely nothing. A panel that
+   *  cannot see renders `partial`, never `empty` — §11.3.1's all-clear rule, per panel. */
+  | { readonly kind: 'empty'; readonly entity: string; readonly cliEquivalent: string }
+  /** Partially blind: renders what it has and NAMES which sources are missing.
+   *  Absorbs §11.7's former `degraded` arm (its `label` becomes `reason`; `citation` kept). */
+  | { readonly kind: 'partial'; readonly data: T; readonly missing: readonly string[];
+      readonly reason: string; readonly citation?: string }
+  /** Data shown is real but old; the age is rendered, never implied fresh. */
+  | { readonly kind: 'stale'; readonly data: T; readonly observedAt: string }
+  /** Backing process down (ephemeral AppHost endpoint, r5 F11). Folds in the launcher card
+   *  (m1 F15): v1 SHOWS the command; it never executes it (read-only surface). */
+  | { readonly kind: 'not-running'; readonly reason: string;
+      readonly remedy: { readonly cliEquivalent: string } }
+  /** Contribution's apiMajor outside the host's (family, major) window — §6 negotiation. */
+  | { readonly kind: 'incompatible'; readonly id: string; readonly declared: number;
+      readonly hostWindow: readonly number[] }
+  | { readonly kind: 'unauthorized'; readonly blockedBy: string; readonly remedy: string }
+  | { readonly kind: 'failure'; readonly message: string; readonly endpoint?: string;
+      readonly source?: string; readonly logsLink?: DevToolsLink };
 
-interface DevToolsPanelContext {
-  readonly zone: DevToolsZone;
+/** The arms a contribution's probe may report about itself. The host alone produces the rest:
+ *  `loading`/`stale`/`partial` from the data plane, `incompatible` from negotiation,
+ *  `unauthorized` from auth, `failure` from the per-contribution error boundary. */
+export type DevToolsPanelProbeState = Extract<
+  DevToolsPanelState<undefined>,
+  { kind: 'ready' | 'empty' | 'not-running' }
+>;
+
+interface DevToolsPanelContext<Z extends DevToolsZoneId = DevToolsZoneId> {
+  readonly zone: Z;
   readonly pluginId: string;
   readonly signal: AbortSignal;
-  /** Zone-scoped, host-fetched typed data (entity zones); full shape owned by *Data plane*. */
-  readonly data?: unknown;
+  /** Typed per zone via the map above — the `data?: unknown` escape hatch is deleted (Q-M4).
+   *  Wire shapes and fetching are owned by §8 (Data plane); the binding is owned here. */
+  readonly data: DevToolsZoneContextMap[Z];
 }
 
 /**
@@ -1515,6 +1616,19 @@ export type DevToolsCell =
   | { readonly kind: 'link'; readonly link: DevToolsLink; readonly label: string }
   | { readonly kind: 'code'; readonly text: string };
 ```
+
+**Where a third-party contributor mounts (Q-m4 correction).** An earlier draft's closed vocabulary
+was sized for first-party primitives only, leaving this RFC's own worked example —
+`@acme/plugin-crons`, whose lazy loader appears in §6 — with no zone to mount into. The rule,
+consistent with the host-owned closed vocabulary: **`plugin.detail/v1` is the universal mount.**
+Every installed plugin owns a detail page (a host-owned screen), and a plugin's own contributions
+always have standing to mount there; the context's `PluginDetailData` is scoped to the contributing
+plugin's `mountId`, so a third-party panel reads its own typed slice. **No vocabulary change is
+required for any contributor to ship a panel.** Promotion to a dedicated zone (a hypothetical
+`crons.console/v1`) is a **host release**: the devtools host package owner adds the suffixed id to
+the vocabulary, the context map, and the descriptor — a data change per §6 — against a filed issue
+naming a real consumer, exactly the staged `home` zone's rule below. Plugins never mint zones; they
+petition, and the host adds.
 
 **Host behavior.** A registry keyed by zone — registry-over-switch, per AP-24 (`09-…md:165`);
 §6's anchors-then-`(order, mountId, id)` sort applied per zone; a per-zone per-plugin volume cap (Grafana's `limitPerPlugin`, `m2` F15);
@@ -1559,7 +1673,7 @@ type DevToolsLink =
   | { readonly target: 'external'; readonly href: string };
 
 interface DevToolsLinkContribution extends DevToolsContributionBase {
-  readonly zone: DevToolsZone | readonly [DevToolsZone, ...DevToolsZone[]];
+  readonly zone: DevToolsZoneId | readonly [DevToolsZoneId, ...DevToolsZoneId[]];
   /** Static, or derived from zone context (e.g. an execution row's traceId). */
   readonly link: DevToolsLink | ((ctx: DevToolsPanelContext) => DevToolsLink | undefined);
 }
@@ -1587,9 +1701,9 @@ No payload type is minted. The contract **is** the existing `plugin doctor` `ext
 checks are dynamically imported from the plugin and run under a read-only `dryRun: true` context
 (`r4` F2). What this RFC adds:
 
-- **Host behavior.** The `plugin.detail` zone renders each plugin's doctor rows mapped to the
-  five-state diagnosis taxonomy; the CLI prints the same rows from the same generator. A throwing
-  check becomes an `error` row, never a shell crash.
+- **Host behavior.** The `plugin.detail/v1` zone renders each plugin's doctor rows mapped to the
+  six-state diagnosis taxonomy (§6); the CLI prints the same rows from the same generator. A
+  throwing check becomes an `error` row, never a shell crash.
 - **A named follow-up slice (not v1-blocking).** Widen `cli.doctorChecks` from the closed literal
   `readonly 'auth-backend'[]` (`r3` F2) so third-party plugins can contribute checks without the
   six-framework-file edit (`r4` F11). That literal is the sharpest shipped proof that the current
@@ -1629,8 +1743,9 @@ of the following hold, and the RFC states them as an entry criterion rather than
 | The action's trust design exists | *Trust model* section's invariants, including a scoped generator spawn (D-7) and `resolveTarget` containment (F19) |
 | Every action renders its `cliEquivalent` and routes through the same scaffolder the terminal uses | #400 acceptance line 2 (`b1` F3) |
 
-Until then the honest form of a mutation in DevTools is the `unavailable`/`remedy.cliEquivalent`
-card: the surface **shows the command and does not run it**.
+Until then the honest form of a mutation in DevTools is the `not-running`/`remedy.cliEquivalent`
+card (the canonical state union's arm — an earlier draft called it `unavailable`): the surface
+**shows the command and does not run it**.
 
 `unverified` — this RFC asserts no isolation, sandboxing, or production-safety property for any kind.
 Three upstream assumptions the market study falsified are recorded as live risks, not as inherited
@@ -1678,18 +1793,20 @@ data — resolved in *Data plane* — but it is not an argument for minting a De
 | Kind | Entry criterion |
 | --- | --- |
 | `action` | The four-row table in *Read-only by default* is fully satisfied |
-| `route` (plugin-contributed pages) | #890's spine lands **or** the DevTools host ships its own mount/registry slice (owner fork 1). Until then every page is host-owned |
+| `route` (plugin-contributed pages) | The DevTools host ships its own mount/registry slice on the F-1-ratified self-contained spine (§6) — no longer alternatively gated on #890's spine landing. Until that slice ships, every page is host-owned |
 | island / client-code panel tier | Same blocker as `route`, plus the Preact-singleton constraint (`r1` F16) and the trust-tier decision #890 parked "in the dashboard epic" (`p1` F10) |
-| `home` zone id | A first-party home-card issue is actually filed; a one-line vocabulary addition thereafter |
+| `home` zone id | A first-party home-card issue is actually filed; a one-line vocabulary + context-map addition thereafter (suffixed per the zone rule, e.g. `home.overview/v1`) |
 | `exposedComponent` (plugin↔plugin) | **Explicitly deferred**, per `m2` OQ8's requirement that deferral be stated. Adopt only when one plugin genuinely consumes another's UI; then take singleton-key + first-registration-wins verbatim (`m2` F22) |
 
 Any manifest-visible pointer for any of these carries a hard precondition recorded as drift **D-6**:
 `PluginInstallerManifestSchema` ends in **`.strict()`** and pins `schemaVersion: z.literal(1)`
-(`packages/plugin/src/protocol/manifest.ts:271,282`), so an older CLI does **not** ignore a new
-top-level block — it fails manifest parsing outright and takes the whole plugin down. #890's contract
-C8 claims the opposite; this RFC does not inherit that claim. A schema-evolution slice
-(`.passthrough()`/`catchall` with a compatibility test, or a `schemaVersion` bump with a documented
-migration) sequences **before** any pointer lands. Packaging is decided in *Contribution family*.
+(`packages/plugin/src/protocol/manifest.ts:271,283` — an earlier draft of this paragraph cited
+`:282`, which is `linking`; the finding is unaffected), so an older CLI does **not** ignore a new
+top-level block — it fails manifest parsing outright and takes the whole plugin down. #890's
+contract C8 claims the opposite; this RFC does not inherit that claim. The schema-evolution slice
+is **ratified (F-3, §6): the top-level `.strict()` becomes `.passthrough()`, `schemaVersion` stays
+`1`**, with the three named acceptance tests, and it sequences **before** any pointer lands.
+Packaging is decided in *Contribution family*.
 
 ### Open owner forks
 
@@ -1702,7 +1819,8 @@ migration) sequences **before** any pointer lands. Packaging is decided in *Cont
 3. **Ship `link` Aspire-only if OQ-8 stays open?** `scalar.operation` anchors are unstable until the
    `tags` emitted by `@orpc/openapi` are known (`research.md` open question 8).
 4. **Confirm the zone vocabulary is host-owned and closed** (Medusa's real model), and confirm the
-   initial six zones listed in `DevToolsZone`.
+   initial six version-suffixed zones listed in `DevToolsZoneContextMap` (`DevToolsZoneId`),
+   including `plugin.detail/v1` as the universal third-party mount.
 5. **Choose the `json-render` ceiling policy.** When a first-party panel outgrows `DevToolsUiNode`:
    (a) grow the vocabulary by host release, or (b) accelerate the staged island tier. This RFC
    recommends (a); `m1` OQ7 notes even Vite's own ceiling is undocumented.
