@@ -48,6 +48,10 @@
 | 2026-08-11 | A | Baseline verified | `git fetch origin`; `origin/main` = `2256a67bf`, matching the charter. No divergence, no rebase |
 | 2026-08-11 | A | `supervisor.md` written | Identity, routes, mutation boundary, prohibitions, invariants recorded **first**, per `seed-run.md` hard invariants |
 | 2026-08-11 | A | Run artifacts scaffolded | `research.md`, `plan.md`, `worklog.md`, `context-pack.md`, `drift.md`, `phase-registry.md` |
+| 2026-08-11 | A | Bootstrap commit + push | `ccc4c0a70`, pushed with explicit refspec `plan/devtools-contribution:plan/devtools-contribution` |
+| 2026-08-11 | A | Draft PR opened | [#1450](https://github.com/rickylabs/netscript/pull/1450) → `main`, draft, milestone `Backlog / Triage`; labels `type:docs`, `rfc`, `status:research` (exactly one `status:`), `ci:skip-e2e`, `ci:skip-scaffold`, `area:docs/fresh/fresh-ui/plugins`, `priority:p1`, `epic:dev-dashboard`, `epic:frontend-contrib` |
+| 2026-08-11 | A | Opening phase comment | Charter read-back, verified baseline, routes in force, evaluation posture, CI-lane rationale, pre-registered drift — [comment](https://github.com/rickylabs/netscript/pull/1450#issuecomment-5251257498) |
+| 2026-08-11 | A→B | **Stage A closed** | Seed-run stage A contract satisfied: `supervisor.md` + run dir + draft PR + charter read-back → opening PR comment |
 
 ## Decisions
 

@@ -7,7 +7,8 @@
 | Run ID | `plan-devtools-contribution--seed` |
 | Branch | `plan/devtools-contribution` |
 | Worktree | `/home/codex/repos/ns-rfc-devtools-contribution` |
-| Current phase | `bootstrap` (seed stage A) → `research` (stage B) |
+| Current phase | `research` (seed stage B — discovery corpus) |
+| Draft PR | [#1450](https://github.com/rickylabs/netscript/pull/1450) — draft, `status:research`, `Backlog / Triage` |
 | Archetype | Described, not built |
 | Scope overlays | `docs` + `frontend` |
 | Baseline | `2256a67bf` (`origin/main`, verified 2026-08-11) |
@@ -24,28 +25,28 @@ artifacts are scaffolded. The charter is committed to the branch as
 
 ## Completed
 
-- Stage A — charter read in full; harness contracts read (`activation.md`, `run-loop.md`,
-  `lane-policy.md`, `seed-run.md`, `gates/plan-gate.md`); baseline verified; `supervisor.md` written
-  first; run artifacts scaffolded; drift D-1/D-2/D-3 pre-registered.
+- **Stage A — done.** Charter read in full; harness contracts read (`activation.md`, `run-loop.md`,
+  `lane-policy.md`, `seed-run.md`, `gates/plan-gate.md`); baseline verified against live `origin/main`;
+  `supervisor.md` written first; run artifacts scaffolded; drift D-1/D-2/D-3 pre-registered;
+  bootstrap commit `ccc4c0a70` pushed; draft PR **#1450** opened against `main` with the docs-only CI
+  lane + RFC/status taxonomy + `Backlog / Triage` milestone; opening phase comment posted with the
+  charter read-back.
 
 ## In Progress
 
-- Stage A — bootstrap commit, draft PR against `main`, opening phase comment with charter read-back.
+- Stage B — discovery corpus across evidence inputs E1–E7, every claim cited.
 
 ## Next Steps
 
-1. Commit the bootstrap slice; push with an explicit refspec.
-2. Open the **draft** PR against `main`; apply docs-only CI labels + RFC/status taxonomy; post the
-   opening phase comment (charter read-back + selected CI lane rationale).
-3. Stage B — discovery corpus across E1–E7, every claim cited; commit any Tier-C `workflow.js`
+1. Stage B — discovery corpus across E1–E7, every claim cited; commit any Tier-C `workflow.js`
    **before** it executes.
-4. Stage C — synthesis into `research.md`; name the stage-D deep-dive topics.
-5. Stage D / D2 — design packs (Fable 5 · medium) + the mandatory GLM 5.2 · xhigh design pass.
-6. Stage E — canonical RFC + plan lock; all twelve questions resolved or escalated as numbered forks.
-7. Stage F — unoriented adversarial review on a distinct model; triage + fixes.
-8. Stage G — formal Codex GPT-5.6 Sol high PLAN-EVAL, separate daemon-attached session, against an
+2. Stage C — synthesis into `research.md`; name the stage-D deep-dive topics.
+3. Stage D / D2 — design packs (Fable 5 · medium) + the mandatory GLM 5.2 · xhigh design pass.
+4. Stage E — canonical RFC + plan lock; all twelve questions resolved or escalated as numbered forks.
+5. Stage F — unoriented adversarial review on a distinct model; triage + fixes.
+6. Stage G — formal Codex GPT-5.6 Sol high PLAN-EVAL, separate daemon-attached session, against an
    immutable commit. **Hard stop until `PASS`.**
-9. Stage H-prep — supersession map, filing manifest, agent briefs, owner decision brief. **Stop for
+7. Stage H-prep — supersession map, filing manifest, agent briefs, owner decision brief. **Stop for
    owner ratification.**
 
 ## Key Decisions

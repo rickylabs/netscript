@@ -14,7 +14,8 @@
 | Run ID | `plan-devtools-contribution--seed` |
 | Branch | `plan/devtools-contribution` (single branch — no integration branch) |
 | Base branch | `main` @ `2256a67bf` |
-| Draft PR | _(filled at stage A completion)_ |
+| Draft PR | [#1450](https://github.com/rickylabs/netscript/pull/1450) — draft, `Backlog / Triage`, `status:research` |
+| Bootstrap commit | `ccc4c0a70` |
 
 ## Status Legend
 
@@ -30,8 +31,8 @@
 
 | Stage | Contract (produce → proof) | Lane | Status |
 | --- | --- | --- | --- |
-| **A — Bootstrap** | `supervisor.md` + run dir + draft PR + charter read-back → opening PR comment | Opus 5 · high (this session) | `active` |
-| **B — Discovery corpus** | Multi-surface deep search across repo source, docs, and external/market solutions; structured per-topic outputs; drift-candidate ledger → committed corpus, every claim cited | Opus 5 · high + `claude_workflow` (Opus 5 · low) with `workflow.js` committed before execution | `planned` |
+| **A — Bootstrap** | `supervisor.md` + run dir + draft PR + charter read-back → opening PR comment | Opus 5 · high (this session) | `done` — commit `ccc4c0a70`, PR #1450, [comment](https://github.com/rickylabs/netscript/pull/1450#issuecomment-5251257498) |
+| **B — Discovery corpus** | Multi-surface deep search across repo source, docs, and external/market solutions; structured per-topic outputs; drift-candidate ledger → committed corpus, every claim cited | Opus 5 · high + `claude_workflow` (Opus 5 · low) with `workflow.js` committed before execution | `active` |
 | **C — Synthesis** | Supervisor reads the **full** corpus; synthesis naming deep-dive topics + resolutions of delegated decisions → committed `research.md` | Opus 5 · high | `planned` |
 | **D — Deep-dive packs** | One focused sub-agent per topic; each returns `proposal` + `epic-and-issues` (draft text only) + `agent-briefs` + `open-questions` → committed `design/<topic>/` | Fable 5 · medium (`deep_analysis`) | `planned` |
 | **D2 — Design/UX pass** | Mandatory major-UI/UX design route + optional vision-evidence lane → `design/ux-evidence/` with per-finding dispositions | GLM 5.2 · xhigh (`major_ui_ux_design`); Kimi K3 vision conditional | `planned` |
@@ -65,8 +66,8 @@ will be amended in place when stage C lands.
 
 | Stage | Status | Depends on | Output |
 | --- | --- | --- | --- |
-| A | `active` | — | `supervisor.md`, run dir, draft PR |
-| B | `planned` | A | corpus + citations |
+| A | `done` | — | `supervisor.md`, run dir, draft PR #1450 |
+| B | `active` | A | corpus + citations |
 | C | `planned` | B | `research.md` |
 | D / D2 | `planned` | C | `design/**` |
 | E | `planned` | D, D2 | RFC + locked `plan.md` |
