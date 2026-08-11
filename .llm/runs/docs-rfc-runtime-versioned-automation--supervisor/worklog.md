@@ -88,8 +88,8 @@
 Design checkpoint for this docs-only run (the deliverable is the RFC package; implementation designs
 live inside the RFC and are re-checkpointed by their own future runs).
 
-1. **Public surface** — `docs/architecture/rfc/rfc-0001-runtime-versioned-automation.md` (status
-   Proposed; establishes `docs/architecture/rfc/` as the RFC home); run-dir artifacts
+1. **Public surface** — `rfcs/0000-runtime-versioned-automation.md` (status Draft; canonical `rfcs/`
+   process per `rfcs/README.md`, number `0000` until assigned at acceptance); run-dir artifacts
    (`research.md`, `plan.md`, `evidence/*`, `1444-impact.md`, `plan-eval.md`); draft PR #1446
    (body + per-slice phase comments); PR #1444 comment 5248826402 (early impact memo).
 2. **Domain vocabulary** — capability status tags (IMPLEMENTED/PARTIAL/ASPIRATIONAL/DEAD;
@@ -261,3 +261,20 @@ live inside the RFC and are re-checkpointed by their own future runs).
   focused fmt, git diff --check) — all green.
 - Run closes: RFC produced for the owner (PR #1446 stays draft pending ratification; artifact + file
   delivered to the owner). Nine-cycle history preserved append-only in `plan-eval.md`.
+
+## 2026-08-11 S7 — RFC process normalization (owner-directed, pre-merge)
+
+- Owner directive: normalize PR #1446 to the canonical in-repo RFC process before merge; no
+  issue/milestone mutation.
+- `git mv docs/architecture/rfc/rfc-0001-runtime-versioned-automation.md
+  rfcs/0000-runtime-versioned-automation.md`
+  — number stays `0000` until a maintainer assigns one at acceptance per `rfcs/README.md`. Added the
+  `0000-template.md` YAML frontmatter (status `Draft`, target-milestone Backlog / Triage; tracking
+  issue deferred — filing stays owner-gated) and replaced the "establishes `docs/architecture/rfc/`"
+  authority claim with a pointer to the canonical process.
+- Living records updated: plan.md (deliverable, S4, new S7), context-pack.md, phase-registry.md G4,
+  plan-eval brief, evidence identifiers (`RFC-0001` → `RFC-0000`), 1444-impact.md tail, the
+  `.llm/2026-08-11-…` run summary, and the PR #1446 body. Preserved verbatim: `plan-eval.md`
+  (evaluator-authored, append-only — its `rfc-0001-…:line` citations anchor to historical revisions)
+  and dated historical worklog entries/PR comments. Recorded as drift D-10.
+- Gates: `deno task docs:links` + `deno fmt --check` on touched files.

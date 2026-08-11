@@ -27,10 +27,10 @@ the owner. PR stays draft until ratification.
 
 ## Deliverable set (locked)
 
-1. `docs/architecture/rfc/rfc-0001-runtime-versioned-automation.md` — primary RFC, status
-   `Proposed`. (Locked decision: create `docs/architecture/rfc/` as the RFC home; no prior RFC/ADR
-   tree exists in-repo; the #890 precedent lived only in a run dir, which made it hard to cite —
-   this RFC establishes the in-repo location and back-links #890's record.)
+1. `rfcs/0000-runtime-versioned-automation.md` — primary RFC, status `Draft`. (The run authored it
+   under `docs/architecture/rfc/` when no in-repo RFC home existed; the canonical `rfcs/` process
+   has since landed, and owner directive D-10 normalized the file into it — number `0000` until a
+   maintainer assigns one at acceptance.)
 2. Capability matrix (legacy → current → gap → recommendation) — RFC appendix, sourced from
    `evidence/legacy-capability-map.md` + `evidence/current-state-matrix.md`.
 3. `1444-impact.md` — delivered early (PR #1444 comment 5248826402). Folded into the RFC.
@@ -114,8 +114,8 @@ rework if deferred as classified.
 3. **S3 current evidence** — files: `evidence/current-state-matrix.md`,
    `evidence/current-state-probes/**`; gate: probe exit codes recorded + supervisor A1 review. DONE
    (`f5997b6a2`).
-4. **S4 RFC** — files: `docs/architecture/rfc/rfc-0001-runtime-versioned-automation.md`; gates:
-   `docs:links`, `deno fmt --check` on the file, PR body reconciliation. DONE + fix cycle 1.
+4. **S4 RFC** — files: `rfcs/0000-runtime-versioned-automation.md`; gates: `docs:links`,
+   `deno fmt --check` on the file, PR body reconciliation. DONE + fix cycle 1.
 5. **S5 PLAN-EVAL cycles** — files: `plan-eval.md` (evaluator-written, append-only, cycles 1–8 to
    date), fix-cycle diffs; gate: verdict recorded per cycle. History: C1 9 findings → C2 (partly
    stale-text, D-7) → protocol escalation → owner-authorized C3 6 → C4 5 → C5 2 → C6
@@ -124,5 +124,10 @@ rework if deferred as classified.
 6. **S6 competitive study (D-8)** — files: `evidence/competitive-architecture-study.md`, RFC
    §14.1/§13.1/P-5, wording corrections; gates: `docs:links` + fmt + cycle-3 evaluator review of the
    study. DONE (`811373a87` + fix commit).
+
+7. **S7 RFC process normalization (D-10)** — files: `git mv` to
+   `rfcs/0000-runtime-versioned-automation.md` + canonical `0000-template.md` frontmatter +
+   reference sweep across living run records and the PR body; gates: `docs:links` +
+   `deno fmt --check` on touched files. DONE.
 
 Each slice: commit → push (explicit refspec) → draft-PR comment with evidence.

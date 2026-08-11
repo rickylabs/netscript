@@ -88,4 +88,4 @@ sandbox/RBAC design, no static-config collapse, no deletion/neutering of runtime
 gate. Anything in that list discovered mid-slice: record it and hand it to this RFC run.
 
 — End of memo. Full RFC (with evidence-backed legacy/current matrix) follows in
-`docs/architecture/rfc/` on branch `docs/rfc-runtime-versioned-automation`.
+`rfcs/0000-runtime-versioned-automation.md` on branch `docs/rfc-runtime-versioned-automation`.

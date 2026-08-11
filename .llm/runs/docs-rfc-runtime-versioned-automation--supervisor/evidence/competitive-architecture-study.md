@@ -1,4 +1,4 @@
-# Competitive architecture study — runtime/workflow systems vs RFC-0001
+# Competitive architecture study — runtime/workflow systems vs RFC-0000
 
 Owner-directed (drift D-8), retrieved 2026-08-11 via primary sources (vendor documentation; two
 lighter-weight sources are used ONLY for color/representative-UX and never for a load-bearing matrix
@@ -11,7 +11,7 @@ URL; quotes are from the retrieved pages.
 Systems: Temporal, Restate, Inngest, Trigger.dev, Hatchet, Windmill, Azure Durable Functions (DF),
 AWS Step Functions (SFN), and the operator/low-code group Kestra + n8n.
 
-## Per-system profiles (dimensions relevant to RFC-0001)
+## Per-system profiles (dimensions relevant to RFC-0000)
 
 ### Temporal — durable code workflows, worker-deployment versioning
 
@@ -105,7 +105,7 @@ AWS Step Functions (SFN), and the operator/low-code group Kestra + n8n.
   https://docs.aws.amazon.com/step-functions/latest/dg/version-rolling-deployment.html ·
   https://docs.aws.amazon.com/step-functions/latest/dg/execution-alias-version-associate.html
 - Managed-only (non-goal for NetScript self-hosting, but the versioning model is the cleanest
-  published analogue to RFC-0001 epochs).
+  published analogue to RFC-0000 epochs).
 
 ### Kestra / n8n — operator/low-code group
 
@@ -127,7 +127,7 @@ AWS Step Functions (SFN), and the operator/low-code group Kestra + n8n.
 rollback — so the row count exceeds the dimension count by design.)
 
 Legend: ● first-class · ◐ partial/strategy-level **or not assessed from dedicated sources** · ○
-absent/out-of-model. "NS" = RFC-0001 position. Cells in the three later-added rows (isolation,
+absent/out-of-model. "NS" = RFC-0000 position. Cells in the three later-added rows (isolation,
 control/data plane, cockpit UX) are either tied to a citation, derived from the cited architecture
 structure, or explicitly marked ◐ not assessed — no absolute claim rests on an uncited cell.
 
@@ -151,7 +151,7 @@ structure, or explicitly marked ◐ not assessed — no absolute claim rests on 
 
 ## Synthesis
 
-### Established patterns RFC-0001 adopts (independent convergence, now cited)
+### Established patterns RFC-0000 adopts (independent convergence, now cited)
 
 1. **Immutable version + explicit activation pointer + rollback-as-re-point** — SFN
    versions/aliases, Trigger.dev deploy/promote, Restate immutable deployments, Kestra/n8n
@@ -165,7 +165,7 @@ structure, or explicitly marked ◐ not assessed — no absolute claim rests on 
    (explicitly), Inngest self-host (Postgres), Windmill. RFC §5.2. In none of the retrieved
    documentation does a studied system consume watched files as its runtime definition source; where
    file formats appear (Kestra YAML, SFN ASL, Windmill git sync) they are authoring/interchange
-   surfaces — consistent with RFC-0001's demotion of the filesystem. (Scoped to the retrieved docs,
+   surfaces — consistent with RFC-0000's demotion of the filesystem. (Scoped to the retrieved docs,
    not an exhaustive product-wide negative.)
 4. **Server-owned scheduling attached to definitions; single-fire is the platform's job** — in every
    studied system whose scheduling is documented in the retrieved sources, schedules attach to
