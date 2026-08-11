@@ -392,3 +392,104 @@ was not reformatted, which would have produced unrelated churn.
 | F3 — hardcoded resource              | slice 9: `discover-service-subjects.ts`; both gates take no service name; negative discovery throws and is tested     |
 | F4 — debt deepened past stop condition | slice 7 (measured non-deepening) + slice 10 (stop-condition note, new aspire entry, A6 correction + gate evidence)  |
 | F5 — record vs. history              | slice 10: actual slice/commit table in `plan.md`, no back-dating                                                      |
+
+## Slice 11 — the gate command's permissions are proven, not declared
+
+**Trigger.** The run supervisor executed the full `scaffold.runtime` at `48bee97b2`:
+`62 passed; behavior.service-env FAILED; cleanup passed`, with
+`NotCapable: Requires all access to /proc`. A bounded, real gate failure — the gate was registered
+with a permission set nobody had verified, and it could not fail until an AppHost was running.
+
+### The refused call, measured
+
+Reproduced in isolation on Deno 2.9.5 before changing anything. Every `/proc` call
+`process-evidence.ts` makes is refused under the shipped flags, not just one:
+
+| Call                                | Under `--allow-read`                                        |
+| ----------------------------------- | ------------------------------------------------------------ |
+| `Deno.readDir('/proc')`             | `NotCapable: Requires all access to "/proc"`                 |
+| `Deno.readLink('/proc/self/cwd')`   | `NotCapable: Requires all access to "/proc/self/cwd"`        |
+| `Deno.readFile('/proc/self/environ')` | `NotCapable: Requires all access to "/proc/self/environ"`  |
+| `Deno.realPath('/proc/self')`       | `NotCapable: Requires all access to "/proc/self"`            |
+
+The first refusal in the gate is `Deno.realPath(workdir)` → `Deno.readDir('/proc')` at
+`process-evidence.ts:106,111`. Deno gates `/proc` on `check_all` rather than on read permission,
+because `/proc/<pid>/environ` would otherwise leak another process's environment — and its own
+environment — to a program holding only `--allow-read`, defeating `--allow-env`.
+
+### Why the narrow set genuinely cannot work
+
+Measured, not assumed. Each row is a real `deno run` against the same probe:
+
+| Permission set                                                        | `/proc` readable |
+| --------------------------------------------------------------------- | ---------------- |
+| `--allow-read`                                                        | no               |
+| `--allow-read=/proc` (scoped to the exact path)                        | no               |
+| `--allow-read --allow-env` / `--allow-sys` / `--allow-run`             | no               |
+| `--allow-all --deny-write` (any `--deny-*` at all)                     | no               |
+| all eight units unscoped, no `--allow-all` flag                        | **yes**          |
+| `--allow-all`                                                         | **yes**          |
+
+Leave-one-out across the eight units: dropping **any one** of read, write, net, env, run, sys, ffi,
+import loses `/proc`. Scoping any one of them loses it too — including `--allow-run=aspire`, the flag
+the gate already had. So the minimal sufficient set is *all eight units, unscoped*, which is the
+definition of `--allow-all`. Spelling it as eight flags would grant exactly the same thing while
+looking like a narrowing, so the gate carries `--allow-all` with the measurement recorded next to it.
+
+`--allow-all` is therefore the **minimum** here, not the blunt instrument. The evidence is unchanged:
+the `/proc` read is still the gate's F1 proof, still unguarded, still the only thing that separates
+"the AppHost intended to pass the value" from "the process got it".
+
+### The regression
+
+`service-env-gates_test.ts` (new) + `gate-permission-probe.ts` (new). It does not compare the flags
+to a list — a list is the same unverified claim written twice, which is the defect. It takes the
+flags out of the **real gate command**, launches a real `deno run` with exactly those flags, and
+makes the subprocess perform the capability the gate script performs, through the real
+`scanResourceProcesses`.
+
+Mutation-proved — each mutation applied to `service-env-gates.ts`, test run, then reverted:
+
+| Mutation                                                 | Result                                                                              |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| behavior gate back to the shipped `--allow-read --allow-run=aspire` | **FAILED** — `probe exited 1 … NotCapable: Requires all access to "/proc"` |
+| fixture gate loses `--allow-write`                       | **FAILED** — `… leaves "write" ungranted`                                            |
+| fixture gate loses `--allow-run=deno`                    | **FAILED** — `regenerates through a spawned deno run, which […] does not permit`      |
+| fixture gate loses `--allow-env`                         | **FAILED** — `… leaves "env" ungranted`                                              |
+
+A fourth test is the guard on the guard: `--allow-read` alone must *fail* to read `/proc`, so the
+probe cannot pass vacuously. `readReport` requires a state for every expected key, so a probe that
+printed `{}` fails instead of letting the assertion loops iterate zero times.
+
+### Sibling gate `runtime.service-env-fixture`
+
+Checked, **no change**. `configure-service-env.ts` never touches `/proc`; it reads and rewrites
+`appsettings.json` and spawns `deno run … netscript generate aspire`. Its declared
+`--allow-read --allow-write --allow-run=deno --allow-env` covers exactly that, which the full-suite
+run corroborates — it is inside the 62 that passed. It is now covered by the regression so it cannot
+acquire the same gap silently.
+
+| Gate                                                  | Result                                                                            |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `deno test --allow-all --unstable-kv packages/cli`    | **PASS** — exit 0, `762 passed (520 steps) | 0 failed`                             |
+| `deno test --allow-all --unstable-kv packages/aspire` | **PASS** — exit 0, `19 passed (72 steps) | 0 failed`                               |
+| `run-deno-check.ts --root packages/cli --ext ts,tsx`  | **PASS** — exit 0, 850 files, 0 occurrences                                        |
+| `run-deno-lint.ts --root packages/cli --ext ts,tsx`   | **PASS** — exit 0, 850 files, 0 occurrences                                        |
+| `run-deno-fmt.ts --root packages/cli --ext ts,tsx`    | **PASS** — exit 0, 850 files, 0 findings                                           |
+| `rtk proxy deno task quality:scan`                    | **PASS** — exit 0, `"ok":true`, 0 findings, 7 pre-existing allowances (none added) |
+| `rtk proxy deno task arch:check`                      | **PASS** — exit 0, no `FAIL=` entry                                                |
+| `git diff --exit-code origin/main...HEAD -- deno.lock` | **PASS** — exit 0, lock unchanged                                                  |
+
+Constraints held: no `any`, no casts, no `@ts-ignore`, no suppressions, no skipped or deleted tests,
+no hardcoded resource names. The probe builds its two records key-by-key against a declared return
+type rather than casting an empty object, so exhaustiveness is the compiler's job.
+
+**Slice review (Tier-A).** The `--allow-all` is load-bearing and justified in place with the
+measurement, not with an assertion of convenience. Both new files are reachable: the probe from the
+test, the test from `deno test`. `A6 F-CLI-2` holds — probe 108 lines, test 213 lines,
+`service-env-gates.ts` 94. The `service-env/` subdirectory gains two files and stays one bounded
+child of `scaffold/`, so `scaffold-runtime-a8-f16-1333` is not deepened.
+
+**Reconcile note.** #1447 unchanged (P0, milestone 0.0.6, open); #1449 stays draft with `Closes
+#1447`. No new issue/PR comments since the last sweep other than the supervisor's failure report,
+which this slice answers. `scaffold.runtime` is explicitly the supervisor's to rerun at the new head.

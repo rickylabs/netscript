@@ -69,11 +69,19 @@ export function createServiceEnvironmentGates(): readonly GateDefinition[] {
       (context) => [
         'deno',
         'run',
-        // `--allow-read` covers both appsettings.json and `/proc/<pid>/environ`:
-        // the process environment is the only evidence that the value reached
-        // the service rather than only the resource model.
-        '--allow-read',
-        '--allow-run=aspire',
+        // `--allow-all` is the *minimum* here, not a shortcut. Deno treats
+        // `/proc` as a permission-bypass surface — `/proc/<pid>/environ` would
+        // otherwise hand out another process's environment under plain
+        // `--allow-read` — so every `/proc` access is gated on `check_all`
+        // rather than on read permission. Measured on Deno 2.9.5: `--allow-read`,
+        // `--allow-read=/proc`, and every individual `--allow-*` flag with any
+        // one of them scoped or absent are all refused with
+        // `NotCapable: Requires all access to "/proc"`. Granting all eight units
+        // unscoped is accepted and is exactly what `--allow-all` means, so
+        // spelling it out as eight flags would narrow nothing and only add
+        // surface to get wrong. `service-env-gates_test.ts` proves this flag set
+        // still reaches `/proc`.
+        '--allow-all',
         `${context.project.repoRoot}/${GATE_DIR}/verify-service-env.ts`,
         context.project.projectRoot,
         context.project.appHost,

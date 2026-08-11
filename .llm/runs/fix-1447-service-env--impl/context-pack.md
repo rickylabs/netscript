@@ -7,7 +7,7 @@
 | Issue             | rickylabs/netscript#1447 (P0, milestone 0.0.6)                  |
 | Branch / worktree | `fix/1447-service-env` @ `/home/codex/repos/ns-1447-aspire-env` |
 | Baseline          | `2256a67bf` (`origin/main`)                                     |
-| Phase             | IMPL-EVAL cycle 1 `FAIL_FIX` remediated (slices 7–10); awaiting re-evaluation |
+| Phase             | IMPL-EVAL cycle 1 `FAIL_FIX` remediated (slices 7–10); slice 11 fixes the `scaffold.runtime` gate failure at `48bee97b2`; awaiting re-evaluation |
 | PLAN-EVAL         | `N/A` — justified in `plan.md` § PLAN-EVAL                      |
 | PR                | #1449 (draft, `Closes #1447`, milestone 0.0.6, `status:impl`)   |
 
@@ -64,7 +64,8 @@ execute, not this session's.
 | 7     | `b7a5e55e4` | F4: `runtime-gates.ts` back to its baseline 906 lines; #1447 gates behind `service-env/` (44 children)                        |
 | 8     | `2297651c7` | F2: one executed test per documented category, real `@netscript/aspire` helpers in the double, `PORT` refused                 |
 | 9     | `e9d22d9b5` | F1/F3: `aspire wait --status healthy`, state allowlist, `/proc/<pid>/environ` evidence, discovery + negative discovery        |
-| 10    | this commit | F4/F5 records: debt stop-condition note, new `aspire-config-length-1447` entry, A6 archetype correction + gate evidence, slice/commit reconciliation |
+| 10    | `48bee97b2` | F4/F5 records: debt stop-condition note, new `aspire-config-length-1447` entry, A6 archetype correction + gate evidence, slice/commit reconciliation |
+| 11    | this commit | `behavior.service-env` carries the permissions `/proc` actually requires, plus the regression that proves any gate command's flags satisfy its script |
 
 ## Next action
 
@@ -74,7 +75,11 @@ explicitly withheld from running it. The new E2E gates (`runtime.service-env-fix
 `behavior.service-env`) are part of that suite in both the Postgres and SQLite tiers.
 
 **Read before re-evaluating:** `behavior.service-env` now needs `/proc`, so it is Linux-only and
-throws by name elsewhere; the suites already run Linux-only. The fixture declares a colliding
+throws by name elsewhere; the suites already run Linux-only. It also carries `--allow-all`, which is
+the *measured minimum* for `/proc` on Deno 2.9.5 and not a relaxation — Deno gates `/proc` on
+`check_all`, so `--allow-read`, `--allow-read=/proc`, and any scoped or partial set are all refused.
+See `drift.md` and worklog slice 11 for the leave-one-out measurement, and
+`service-env-gates_test.ts` for the regression that fails if any flag is dropped or narrowed. The fixture declares a colliding
 `OTEL_SERVICE_NAME`, `DB_PROVIDER`, engine URI, discovery key and `PORT` on the discovered service —
 if any of those documented rules does not hold on the live AppHost, the gate is designed to fail
 loudly rather than to be trimmed.

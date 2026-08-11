@@ -60,3 +60,27 @@ declared values. There is no portable equivalent that is not weaker, so the gate
 platform without `/proc` instead of degrading to a check that cannot fail. Accepted because the CLI
 E2E suites run on `ubuntu-latest` in CI and under WSL locally. Recorded here so a future Windows or
 macOS E2E lane knows this gate is a deliberate platform gap, not an oversight.
+
+## 2026-08-11 — Deno refuses `/proc` to anything but full access (severity: significant)
+
+The `behavior.service-env` gate was registered with `--allow-read`, on the stated assumption that
+bare `--allow-read` is unscoped and therefore covers `/proc/<pid>/environ`. It is unscoped, and it
+does not cover it. Deno gates every `/proc` access on `check_all` — the whole-program "all
+permissions" state — because `/proc/<pid>/environ` would otherwise hand a program holding only
+`--allow-read` both its own and other processes' environments, defeating `--allow-env`.
+
+Measured on Deno 2.9.5 rather than inferred: `--allow-read`, `--allow-read=/proc`, every individual
+`--allow-*` flag, and `--allow-all` combined with *any* `--deny-*` are all refused with
+`NotCapable: Requires all access to "/proc"`. Granting all eight units unscoped works and is
+precisely what `--allow-all` means. Leave-one-out shows every one of the eight is load-bearing, and
+scoping any one — including the `--allow-run=aspire` the gate already carried — loses `/proc` again.
+
+Consequence for the plan: the gate carries `--allow-all`, and that is the narrowest set that exists
+for this evidence, not a relaxation. The `/proc` read itself is untouched — it remains the only
+proof that the declared value reached the started process rather than the resource model.
+
+Second-order drift, and the more general lesson: a gate's permission set was a claim no test made.
+Every unit test of the `/proc` reader passed because `deno test` runs under `--allow-all`, so the
+gate's own permissions were never the thing under test, and the mismatch could not fail until the
+full `scaffold.runtime` suite had built and started an AppHost. `service-env-gates_test.ts` closes
+that class for both #1447 gates by executing the real flags against the real reader.
