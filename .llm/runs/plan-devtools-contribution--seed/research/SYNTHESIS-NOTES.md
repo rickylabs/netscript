@@ -644,3 +644,122 @@ obvious, small, high-value first slice.
     explicitly? Bears on whether DevTools needs its own agent affordances at all. (S-19)
 20. **Scalar bundle bump** — is "contribute into Scalar" in scope at all, given `1.44.15` predates
     `pluginUrls`? Recommend rejecting it and deep-linking instead. (S-19)
+
+---
+
+# Addendum 4 — after `m2` (TanStack / Grafana) and `m3` (admin consoles). **Corpus complete: 14/14.**
+
+## S-20 — "Inspired by Medusa zones" is factually wrong about Medusa, and that changes the design budget
+
+`m3` X-1 and its first drift candidate. **Medusa's injection zones are a closed, core-owned
+`{page}.{location}` vocabulary. A plugin cannot mint a zone.** Validity is enforced at *build* time
+by an AST pass (`isValidInjectionZone()`); a template-literal zone is rejected outright, and an
+invalid zone is **silently dropped with a warning** — never a runtime error (`m3` M-2, M-4).
+
+The plugin-declared, namespaced-zone model that #890's framing implies is **Strapi's**, not
+Medusa's: Strapi plugins mint their own `injectionZones` in `register()`, other plugins inject in
+`bootstrap()` behind a caller-side `if (plugin)` guard, and an unknown zone lookup returns an empty
+array (`m3` S-2, S-3, S-4).
+
+**Two consequences that save real design budget:**
+
+1. **In a closed vocabulary, name collision is impossible by construction.** "Collision" degenerates
+   to "several contributions in one zone". So if the RFC adopts a host-owned zone vocabulary — which
+   `m4` shows the Aspire/Scalar boundary already pushes toward — then charter Q2's "collision policy"
+   is mostly a *non-problem*, and the design budget should move to **ordering**.
+2. **Nobody solved ordering.** Grafana concats in plugin load order with no priority API
+   (`m2` F21); TanStack's identity is positional-index-based when `id` is omitted (`m2` F3); Medusa
+   documents no ordering at all (`m3` M-8, unverified). This is the clearest place where copying the
+   market leaves a hole, and where NetScript must design rather than borrow. #890's
+   `(order, mountId, id)` deterministic sort is therefore **ahead of the market**, not derivative.
+
+Medusa also walked back positional sub-slots: `.before`/`.after` suffixes were **deprecated** in
+v2.17.2 in favour of plain `.details`/`.list` (`m3` M-3). Ordering-in-the-id was tried and rejected.
+
+## S-21 — The Q4 separation verdict is now evidence-backed, and it tells us what NOT to build
+
+`m3`'s separation table is the charter Q4 answer. The sharp form:
+
+> The admin consoles pay for **untrusted third-party code deployed into a long-lived, RBAC-governed,
+> production-data surface**. Sandboxing, manifest host ranges, per-contribution permissions, and
+> runtime module federation are all costs of that **one condition**. A developer diagnostics tool
+> satisfies **none** of the antecedents — first-party code, ephemeral process, no role model,
+> non-production.
+
+Copying the mechanisms without the antecedent imports Backstage's cost for none of its benefit — and
+Backstage's cost is documented: plugin install became a rebuild-and-redeploy event, which is exactly
+why Red Hat Developer Hub bolted on Scalprum/module-federation runtime loading plus declarative
+`dynamicRoutes`/`mountPoints` (`m3` B-4, B-5, B-6).
+
+**What this licenses the RFC to explicitly decline**, with citation rather than assertion:
+per-contribution RBAC (`m3` S-6, D-7 — correlates with *reads production business data*, not with
+*is an admin UI*), VM/iframe sandboxing (`m3` D-5, D-6 — and note even Directus defaults to full
+trust; the sandbox is for marketplace code), a manifest `host` semver range (`m3` D-3 — ceremony for
+in-workspace contributions sharing one lockfile), and runtime module federation (`m3` B-5).
+
+**What transfers is the cheap part:** a declarative target id resolved at build time with
+validation (`m3` M-1, M-4), **host-owned typed data flow to the contributed component**
+(`DetailWidgetProps<T> = { data: T }` — the host fetches, the widget receives a typed slice;
+`m3` M-7), and a shared component kit for legibility (`m3` F2).
+
+**But note the one place the admin-console contract does not stretch:** Medusa's "host fetches,
+props flow down" models request/response, **not a live feed** (`m3` separation table, Data
+freshness). Diagnostics data is streaming and continuously invalidated. **No admin console surveyed
+documents a push/stream contract to contributed UI.** That gap is DevTools-specific design work.
+
+## S-22 — Two mechanisms are worth adopting almost verbatim, and both are tiny
+
+From `m2`'s adopt list — these are the highest value-per-line findings in the whole corpus:
+
+1. **Per-contribution error boundary: log loud in dev, render `null` in production.** Grafana's
+   `ExtensionErrorBoundary` logs `Extension "${pluginId}/${extensionTitle}" failed to load.` with the
+   component stack and renders the alert **only** when `isGrafanaDevMode()` (`m2` F23). *"A broken
+   third-party panel is invisible to end users and loud to developers."* TanStack has **no** such
+   boundary anywhere on its mount path — a throwing panel takes down the surrounding tree (`m2` F11).
+   For NetScript the polarity inverts (dev *is* the audience) but the mechanism is the same and the
+   absence is fatal.
+
+2. **Version-suffixed contribution ids** (`myorg-foo-app/toolbar/v1`). Grafana got its **entire**
+   compatibility story out of putting the major version in the string that already had to be unique
+   (`m2` F13, F16). Costs one convention; buys the ability to ship a breaking panel contract later
+   with both majors served concurrently through a deprecation window.
+
+Three more cheap adopts: **failure mode = empty list + logged error, never throw** (`m2` F18 — "the
+host degrades, it does not crash"); **dev-only strictness with a documented tightening path** (`m2`
+F19 — Grafana's own error strings say production enforcement is future work; copy the *posture*);
+and **`limitPerPlugin`-style volume capping**, ~8 lines (`m2` F15).
+
+### Production exclusion: use two independent mechanisms, because upstream learned not to trust one
+
+TanStack does **both**: a `process.env.NODE_ENV !== 'development'` ternary that folds to a no-op and
+tree-shakes, **and** a Vite transform (`@tanstack/devtools:remove-devtools-on-build`) that strips
+devtools call sites from user source. The inline comment names the reason: *"Some providers
+(Cloudflare, Netlify, Heroku) might not use 'build' command but will always set mode to
+'production'"* (`m2` F6, F7). Note the polarity too — the check is `!== 'development'`, so anything
+not literally development is a no-op: **fail-safe, not fail-open**.
+
+NetScript ships to Deno Deploy / containers / Aspire and will hit the same variance. Combined with
+`m1` D4 (upstream Vite DevTools actually *ships* into production builds with client auth disabled),
+the RFC's production posture should be **stricter than every system surveyed**, and should say so.
+
+### And a warning about what a devtools channel can become
+
+TanStack's dev-server plugin accepts an `install-devtools` event **from the panel** and installs an
+npm package on the developer's machine (`m2` F10, and its drift row: *"a devtools event channel is
+read-only telemetry"* — expected; actual, it isn't). Gated purely on "dev server only", with no
+per-plugin permission concept. If NetScript's DevTools ever exposes framework *actions*, this is the
+precedent for how quickly a diagnostics channel becomes a privileged one.
+
+## Corpus-complete owner-fork additions
+
+21. **Zone-namespace ownership** — host-owned closed vocabulary (Medusa), plugin-minted open
+    namespace (Strapi), or extension tree with overrides (Backstage)? Determines whether collision
+    is a problem at all, and whether a two-phase register/bootstrap lifecycle is needed. (S-20)
+22. **Ordering** — no surveyed system solved it. Adopt #890's deterministic `(order, mountId, id)`,
+    or a host-owned canonical order? Must be decided, not inherited. (S-20)
+23. **Confirm the declines** — per-contribution RBAC, sandboxing, manifest host ranges, and runtime
+    module federation are all recommended *out* of scope on cited antecedent-failure grounds. Owner
+    should ratify the declines explicitly, because each is easy to re-request later. (S-21)
+24. **Live-data contract** — no admin console surveyed models a push/stream contract to contributed
+    UI, and Medusa's typed-prop flow only covers request/response. The streaming contract is
+    net-new design. (S-21)
