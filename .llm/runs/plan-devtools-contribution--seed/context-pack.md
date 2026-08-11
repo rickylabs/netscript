@@ -39,13 +39,28 @@ an evaluator PASS), and **board filing**.
 | **Sweep** | 22 findings: **21 fixed, 1 declined with re-entry, 0 deferred** |
 | **Cross-ref** | **0 contradictions, 0 duplications** vs #890 / RFC-0001 / RFC-A; 21 internal defects fixed |
 
-## Next Steps
+## Next Steps — **all executed 2026-08-11; the run is closed**
 
-1. **File once** from `filing/filing-manifest.md` — 14 new issues, 1 not filed, 6 existing amended
-   via 4 rows. **Preserve the 2026-07-19 train. Do not touch #922's children. Do not create labels.**
-2. Write `FILING-LOG.md` mapping every draft ID → live issue number; commit it.
-3. Post the filing ledger as a PR comment; update the PR body; advance `status:`.
-4. Close the run: `arch-debt.md` entries if any, session record.
+1. ~~File once from `filing/filing-manifest.md`~~ — **done.** #1468–#1481 filed, #400 amended, 6
+   existing amended via 4 rows. Train preserved (no issue re-milestoned), #922's 24 children
+   untouched, no labels created. Record: `filing/FILING-LOG.md`.
+2. ~~Write `FILING-LOG.md`~~ — **done**, with both deviations recorded (DT-8 six-state; `rfcs/0005`
+   links).
+3. ~~Post the ledger; update the PR~~ — **done**:
+   https://github.com/rickylabs/netscript/pull/1450#issuecomment-5258590797
+4. ~~Close the run~~ — **done.** `agentic:leak-check` clean (`survivors: []`); session record at
+   `.llm/2026-08-11-devtools-contribution-rfc-seed.md`; **no `arch-debt.md` entry written** — one is
+   warranted for #1481 but that file is outside this run's mutation boundary, so the obligation is
+   recorded in the session record instead of being taken silently.
+
+### Left for the owner
+
+- **#1468** was closed as `DUPLICATE` by the owner 9 min after filing → the RFC's `tracking-issue`
+  frontmatter on `main` still reads `pending`; repointing it at **#400** needs a follow-up PR.
+- **#734** folds but stays open pending owner confirmation (fork **F-4**).
+- **#507** / **PR #780** are close-later; #780 needs its two-file salvage into the #509 lane first.
+- **D-0b** undecided → **DT-18 unfiled**, deliberately.
+- One `arch-debt.md` entry for **#1481**, per the obligation above.
 
 ## Gates
 
