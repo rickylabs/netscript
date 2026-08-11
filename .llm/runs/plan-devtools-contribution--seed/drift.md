@@ -109,3 +109,27 @@ documentation.
 - **Evidence:** `packages/plugin/src/protocol/manifest.ts:271,282`;
   `.llm/runs/plan-frontend-contrib--seed/design/canonical/01-contracts.md:336-344`;
   `research/r3-plugin-contribution-axes.md` F5.
+
+## 2026-08-11 — D-7: correcting my own corpus — the generator spawn is whole-filesystem, not project-scoped
+
+- **What:** The stage-B corpus recorded that the runtime-registry generator subprocess is spawned
+  with "flat `--allow-read --allow-write` over the whole **project root**"
+  (`research/r3-plugin-contribution-axes.md` F10). The stage-D `T6-trust-model` pack asserted the
+  broader claim — whole **filesystem**. The supervisor verified rather than picking a side.
+- **Source:** `packages/cli/src/public/features/generate/plugins/installed-runtime-registry-generator.ts:416-417`.
+- **Expected:** permissions scoped to the project root.
+- **Actual:** the flags are bare `'--allow-read'` and `'--allow-write'` with **no `=<path>` value**.
+  In Deno a valueless permission flag grants the permission **globally**, so the plugin-authored
+  generator subprocess receives whole-filesystem read *and* write — not project-root scope. The
+  corpus understated it; `T6` is correct.
+  Mitigating fact, also verified: **no `--allow-net` and no `--allow-env`** appear in that argument
+  list, so Deno's default-deny blocks network exfiltration from the same subprocess.
+- **Severity:** significant. This is a security-relevant claim, and the charter forbids asserting
+  security properties without cited evidence — which cuts both ways: an *understated* finding is as
+  much a defect as an overstated one.
+- **Action:** fix — `r3` F10's scope wording is superseded by this entry (the corpus file is
+  immutable stage-B evidence and is **not** rewritten; drift is the correction mechanism). The RFC
+  carries the corrected claim, and `T6`'s invariant INV-2 (scope the generator spawn) is retained
+  with this evidence rather than the weaker one.
+- **Evidence:** `installed-runtime-registry-generator.ts:416-417` (flag list);
+  `grep -n 'allow-net\|allow-env'` over the same file → no matches.
