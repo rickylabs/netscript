@@ -34,13 +34,13 @@ criticised false-green reporting elsewhere. **Status is now what actually happen
 | 2 | Stage-B discovery corpus, `workflow.js` committed before execution | **DONE** `d5852188b` (workflow), `06b3c480f` (corpus) | citation gate; corpus committed before synthesis | `research/*.md` (14), `research/sources/` (78), `workflows/stage-b-*.js` |
 | 3 | Stage-C synthesis | **DONE** `ca15ac2c2`…`fc375ec23` | `research.md` findings table populated with citations | `research.md`, `research/SYNTHESIS-NOTES.md` |
 | 4 | Stage-D design packs | **DONE** `7d23809a8` | supervisor slice review V1–V4 before sign-off | `design/T{1,2,3,5,6,7,8,9}/*.md` — **proposals + open questions only** |
-| 4b | Draft epic + one-file-per-issue set + agent briefs | **NOT DONE — outstanding** | — | *(none — see PLAN-EVAL required fix 7)* |
+| 4b | Draft epic + one-file-per-issue set + agent briefs | **DONE** `143c31574` | no board mutation; labels verified against `labels.yml` | `filing/epic.md`, `filing/issues/` (16), `filing/briefs/` (7) |
 | 5 | Stage-D2 GLM 5.2 design pass | **FAILED — lane unlaunchable** | none; **zero tokens, both attempts** | `design/ux-evidence/glm-attempt-{1,2}-FAILED.jsonl`, `glm-prompt.md`. **No findings file exists** (drift D-10) |
 | 6 | Stage-E canonical RFC + plan lock | **DONE** `a7e49d525`, `9e1b828c5` | `docs:links --root docs/architecture/rfc` PASS; `docs:accuracy` PASS. **`doc:lint` is not a task in this repo and the Markdown fmt gate does not exist** (drift D-4) | `docs/architecture/rfc/rfc-0002-devtools-contribution.md`, `plan.md` |
 | 7 | Stage-F adversarial findings + triage + fixes | **DONE** `b7cd62067` | per-finding disposition recorded; docs gates re-run | `adversarial-sonnet.md` (**not** `adversarial.md`), `adversarial-triage.md` |
 | 8 | Stage-G PLAN-EVAL | **DONE — verdict `FAIL_PLAN`** `5202ff205` | evaluator re-ran all gates independently | `plan-eval.md`, `planeval/codex-thread-ids.md` |
-| 9 | Stage-G fix cycle 1 | **IN PROGRESS** | re-run docs gates + cross-file variant search | this commit |
-| 10 | Stage-H-prep: filing manifest, agent briefs | **PARTIAL** — `decision-brief.md` and the supersession map exist; the filing manifest and per-issue briefs do not | live-board dedup **not yet run** | `decision-brief.md`, `design/T9-supersession/supersession-map.md` |
+| 9 | Stage-G fix cycles 1 and 2 | **DONE** `996d47923`, `504ddc559` | docs gates re-run; cross-file sweep → 0 surviving variants | RFC, `plan.md`, `RFC-AUTHORITY.md`; `rfc-sections/` **deleted** (two-corpora fix) |
+| 10 | Stage-H-prep | **DONE (drafts)** `143c31574` | live-board dedup run per manifest row | `decision-brief.md`, `filing/filing-manifest.md`, `design/T9-supersession/supersession-map.md` |
 
 ### Deferred Scope
 
@@ -76,11 +76,25 @@ criticised false-green reporting elsewhere. **Status is now what actually happen
 
 ## Drift
 
-| Drift | Severity | Logged in drift.md |
-| --- | --- | --- |
-| D-1 GLM `major_ui_ux_*` lane reactivated from dormant | minor | yes |
-| D-2 IMPL-EVAL N/A by run shape | minor | yes |
-| D-3 GLM transport has no reasoning trace (pre-registered) | minor | yes |
+Fourteen entries. **Six correct the run's own earlier claims** — that is the point of the log.
+
+| # | Drift | Severity |
+| - | ----- | -------- |
+| D-1 | GLM `major_ui_ux_*` lane reactivated from dormant | minor |
+| D-2 | IMPL-EVAL `N/A` by run shape | minor |
+| D-3 | GLM transport has no reasoning trace (pre-registered) | minor |
+| D-4 | **self-correction** — the Markdown format gate this run planned does not exist | significant |
+| D-5 | OpenHands docs gate cannot fire on a draft PR | minor |
+| D-6 | **#890's additive-manifest claim is false** (`.strict()`) — cross-RFC defect | significant |
+| D-7 | **self-correction** — generator spawn is whole-filesystem, my corpus understated it | significant |
+| D-8 | **self-correction** — comment threads reversed a board recommendation | significant |
+| D-9 | **self-correction** — off-by-one citation in D-6 | minor |
+| D-10 | **mandated GLM design lane is unlaunchable** — owner-gated | **significant** |
+| D-11 | epic AMENDS #400 rather than creating a second umbrella | significant |
+| D-12 | `.github/labels.yml` drifted from live; `netscript-pr` milestones stale | minor |
+| D-13 | one-sender-per-worktree guard correctly refused cycle-2 reuse | minor |
+| D-14 | **self-correction** — cycle-2 evaluator spent its budget reading; my brief was unbounded | significant |
+
 
 ## Gate Results
 

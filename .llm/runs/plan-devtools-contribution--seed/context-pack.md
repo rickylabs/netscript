@@ -7,93 +7,87 @@
 | Run ID | `plan-devtools-contribution--seed` |
 | Branch | `plan/devtools-contribution` |
 | Worktree | `/home/codex/repos/ns-rfc-devtools-contribution` |
-| Current phase | `plan-eval` — **ESCALATED after two FAIL_PLAN cycles** (harness limit reached) |
-| Draft PR | [#1450](https://github.com/rickylabs/netscript/pull/1450) — draft, `status:research`, `Backlog / Triage` |
-| Archetype | Described, not built |
-| Scope overlays | `docs` + `frontend` |
-| Baseline | `2256a67bf` (`origin/main`, verified 2026-08-11) |
+| Current phase | `plan-eval` — **ESCALATED**: two `FAIL_PLAN` cycles, harness limit reached |
+| Draft PR | [#1450](https://github.com/rickylabs/netscript/pull/1450) — **draft**, `status:plan-eval`, `Backlog / Triage` |
+| Baseline | `2256a67bf` (`origin/main`, verified 2026-08-11) — unchanged all run |
+| Authority | `RFC-AUTHORITY.md` — the RFC is normative; `drift.md` beats the corpus; GitHub beats all after filing |
 
 ## Current State
 
-**Stages A–G complete; the run is STOPPED at the escalation boundary.** RFC-0002 is committed, the
-plan is locked, 25 filing drafts exist, and PLAN-EVAL ran twice. Both cycles returned `FAIL_PLAN`.
-The harness allows two before escalation, so the run does **not** open a third cycle.
+**Stages A–G are complete. The run is STOPPED at the escalation boundary and is waiting on the
+owner.** RFC-0002 is committed, the plan is locked, 25 filing drafts exist, and PLAN-EVAL ran twice.
+Both cycles returned `FAIL_PLAN`; `run-loop.md` allows two before escalation, so **no third cycle was
+opened**.
 
-Every **supervisor-fixable** finding from both cycles is fixed and verified. What remains is
-**owner-gated only**: the unlaunchable GLM design pass (D-10), fork F-1 (package/spine ownership),
-and fork F-3 (manifest schema evolution). No board mutation has occurred; PR #1450 is still draft.
-
-**Nothing is locked yet.** `plan.md` carries the twelve charter questions as an open-decision docket;
-`research.md` carries the evidence-input register (E1–E7) with every entry `pending`.
+**Every supervisor-fixable finding from both cycles is closed and verified.** What remains is
+**owner-gated only**. No board mutation has occurred.
 
 ## Completed
 
-- **Stage A — done.** Charter read in full; harness contracts read (`activation.md`, `run-loop.md`,
-  `lane-policy.md`, `seed-run.md`, `gates/plan-gate.md`); baseline verified against live `origin/main`;
-  `supervisor.md` written first; run artifacts scaffolded; drift D-1/D-2/D-3 pre-registered;
-  bootstrap commit `ccc4c0a70` pushed; draft PR **#1450** opened against `main` with the docs-only CI
-  lane + RFC/status taxonomy + `Backlog / Triage` milestone; opening phase comment posted with the
-  charter read-back.
+- **A — Bootstrap.** `supervisor.md` first; baseline verified against live `origin/main`; draft PR
+  #1450 with docs-only CI lane and RFC taxonomy; charter committed and read back.
+- **B — Discovery corpus.** 14 agents, 0 errors; `workflow.js` committed *before* execution; 6,327
+  corpus lines + 78 saved upstream artifacts; every claim cited.
+- **C — Synthesis.** Full corpus read by the supervisor; 26 cited findings; 22 numbered syntheses.
+- **D — Design packs.** 8 packs; supervisor verified V1–V4 in source before sign-off; two
+  verifications corrected the run's own corpus.
+- **D2 — GLM design pass. FAILED, lane unlaunchable** (drift D-10). Not substituted, not fabricated.
+- **E — RFC + plan lock.** `rfc-0002-devtools-contribution.md`, 15 sections; 14 locked decisions; all
+  12 charter questions closed or escalated.
+- **F — Adversarial review.** Sonnet 5, unoriented; 1 critical + 2 major found and fixed; 12/13
+  citation spot-checks passed.
+- **G — PLAN-EVAL ×2.** Both `FAIL_PLAN`. Fix cycles 1 and 2 applied and committed.
+- **H-prep — drafts only.** Epic body, 16 issue drafts, 7 agent briefs, filing manifest, decision
+  brief, supersession map. **Zero board mutation.**
 
-## In Progress
+## Blocked on the owner — the only remaining work
 
-- Stage B — discovery corpus across evidence inputs E1–E7, every claim cited.
+1. **D-10 / GLM 5.2 design pass.** Policy declares a design lane the execution surface cannot launch.
+   Needs a launcher repair **or an explicit owner waiver** of the charter and `lane-policy`
+   invariant 5. Decisions **D-0a / D-0b** in `decision-brief.md`.
+2. **F-1 — package/spine ownership.** Fixes public specifiers and emitter ownership; blocks W1-a.
+3. **F-3 — manifest schema evolution.** The two options have different old-CLI behavior *and
+   different tests*; blocks the pointer and emitter slices.
 
-## Next Steps
+## Next steps, once the owner rules
 
-1. Stage B — discovery corpus across E1–E7, every claim cited; commit any Tier-C `workflow.js`
-   **before** it executes.
-2. Stage C — synthesis into `research.md`; name the stage-D deep-dive topics.
-3. Stage D / D2 — design packs (Fable 5 · medium) + the mandatory GLM 5.2 · xhigh design pass.
-4. Stage E — canonical RFC + plan lock; all twelve questions resolved or escalated as numbered forks.
-5. Stage F — unoriented adversarial review on a distinct model; triage + fixes.
-6. Stage G — formal Codex GPT-5.6 Sol high PLAN-EVAL, separate daemon-attached session, against an
-   immutable commit. **Hard stop until `PASS`.**
-7. Stage H-prep — supersession map, filing manifest, agent briefs, owner decision brief. **Stop for
-   owner ratification.**
+1. Apply the ratified answers to F-1 / F-3 and either run or waive the GLM pass.
+2. Re-run PLAN-EVAL — and **bound its reading**: point it at a *diff* plus the specific claims to
+   re-verify, not the whole corpus (drift D-14). Use a **new** worktree (drift D-13) and
+   `--max-turns 26+`.
+3. On `PASS` **and** in-turn ratification: one-shot filing from `filing/filing-manifest.md`, then
+   `FILING-LOG.md`.
 
-## Key Decisions
+## Key decisions
 
-| Decision | Source | Notes |
-| --- | --- | --- |
-| Seed run, stages A–I | `seed-run.md` | Deliverable is a board + RFC |
-| PLAN-EVAL selected; IMPL-EVAL `N/A` by run shape | `run-loop.md` §4/§7, `drift.md` D-2 | Substitute assurance = PLAN-EVAL + docs gates |
-| Planning-only mutation boundary | charter; `supervisor.md` | Board untouchable before owner ratification |
-
-## Files Changed
-
-| Path | Status | Notes |
-| --- | --- | --- |
-| `.llm/runs/plan-devtools-contribution--seed/supervisor.md` | new | Written first — run activation |
-| `.llm/runs/plan-devtools-contribution--seed/research.md` | new | Re-baseline + E1–E7 evidence register |
-| `.llm/runs/plan-devtools-contribution--seed/plan.md` | new | Scope + twelve-question docket |
-| `.llm/runs/plan-devtools-contribution--seed/worklog.md` | new | Slice plan + gate tables |
-| `.llm/runs/plan-devtools-contribution--seed/context-pack.md` | new | This file |
-| `.llm/runs/plan-devtools-contribution--seed/drift.md` | new | D-1/D-2/D-3 pre-registered |
-| `.llm/runs/plan-devtools-contribution--seed/phase-registry.md` | new | Stage A–I registry |
-| `.llm/devtools-rfc-orchestrator-brief.md` | new | The charter, committed for reconstructibility |
+| Decision | Source |
+| --- | --- |
+| 14 locked architecture decisions (L1–L14) | `plan.md` |
+| A1 contracts + A6 CLI emission + A5 plugin; host app is userland | RFC §13.1 (corrected from A2) |
+| Identity `(mountId, id, apiMajor)`; ordering anchors-then-`(order, mountId, id)` | RFC §6 |
+| v1 kinds: `panel` + `link` + `diagnostic` (reuse) | RFC §7 |
+| PLAN-EVAL selected; IMPL-EVAL `N/A` by run shape | `drift.md` D-2 |
+| Planning-only mutation boundary held all run | `supervisor.md` |
 
 ## Gates
 
-| Gate family | Current status | Evidence |
+| Gate | Status | Evidence |
 | --- | --- | --- |
-| Static (fmt / doc:lint) | `NOT_RUN` | Stage I |
-| Fitness (citation, dedup, planned-surface jsr rubric) | `NOT_RUN` | Stages B / E / H-prep |
-| Runtime / Consumer | `N/A` | No source in the changeset |
-| PLAN-EVAL | `NOT_RUN` | Stage G — hard stop |
+| `docs:links --root docs/architecture/rfc` | **PASS** | 0 broken links/anchors, re-run after every fix cycle |
+| `docs:accuracy` | **PASS** | re-run after every fix cycle |
+| Lock hygiene | **PASS** | `deno.lock` clean; one incidental churn caught and reverted |
+| Citation gate | **PASS** | 12/13 adversarial spot-checks; evaluator verified independently |
+| Cross-file variant sweep | **PASS** | 0 surviving identity/ordering/package-name variants |
+| **PLAN-EVAL** | **`FAIL_PLAN` ×2 — owner-gated remainder** | `plan-eval.md` |
+| `check`/`test`/`lint`/`arch:check`/`quality:scan`/`e2e:cli` | `N/A` | no TypeScript, no `packages/**` source in the changeset |
 
-## Open Questions
+## Drift and debt
 
-The twelve charter questions (`plan.md` § Open-Decision Sweep) are all open. No research-side
-questions yet.
-
-## Drift and Debt
-
-- Drift: D-1 (GLM lane reactivated), D-2 (IMPL-EVAL N/A by run shape), D-3 (GLM transport has no
-  reasoning trace) — all `minor`, all accepted.
-- Debt: none created. Any doctrine violation the RFC chooses to defer lands in
-  `.llm/harness/debt/arch-debt.md` at stage E, not silently in the RFC.
+**D-1 … D-14.** Six correct the run's *own* earlier claims: D-4 (a gate that does not exist), D-6
+(#890's false compatibility claim), D-7 (my corpus understated a security finding), D-8 (comment
+threads reversed a board recommendation), D-9 (off-by-one citation), D-14 (evaluator budget).
+D-10 is the blocking one. Debt: none created.
 
 ## Commits
 
-See the draft PR's commit list + per-stage PR comments (V3 retired `commits.md`).
+The draft PR's commit list plus its per-stage comments are the commit trail.
