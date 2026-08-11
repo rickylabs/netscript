@@ -57,3 +57,53 @@ both directions, determinism).
 ## Slice log
 
 <!-- appended per slice -->
+### Slice 1 — RED (`21cf655f5`)
+
+`packages/cli/.../tests/service-environment_test.ts`. Starts at the appsettings text, parses with
+the real parser, asserts on generated output.
+
+| Gate | Result |
+| --- | --- |
+| `deno test --allow-all --unstable-kv <file>` | **FAIL** — `0 passed (3 steps) | 2 failed (7 steps)`, exit 1 |
+| same, with type-checking | **FAIL** — `TS2339: Property 'Env' does not exist on type 'ServiceEntry'` |
+
+The 3 already-passing steps are determinism, "no declared environment emits nothing", and the
+existing plugin `Environment` path — kept so slices 2–3 cannot regress them.
+
+Reconcile note: #1447 read live (`gh issue view 1447`); labels `status:plan` on the issue, PR #1449
+opened draft with `status:impl`, milestone 0.0.6, `Closes #1447` in the body. No new comments on
+#1447 since the run brief. No plan readjustment.
+
+### Slice 2 — contract (`Environment` + deprecated `Env` on both entries)
+
+`packages/aspire/config.ts` — private `EnvironmentFields` Zod shape spread into `ServiceEntryZod`
+and `PluginEntryZod`; interface members declared inline on `ServiceEntry` and `PluginEntry` (no new
+exported symbol, so the `deno doc`-generated reference tables are unaffected).
+`packages/aspire/tests/config_test.ts` — 5 new steps: service `Environment`, service `Env` alias,
+plugin `Env` alias, and a non-string value rejected.
+
+| Gate | Result |
+| --- | --- |
+| `deno test --allow-all --unstable-kv packages/aspire` | **PASS** — `19 passed (72 steps) | 0 failed` |
+
+### Slice 3 — generator (shared resolver, services emission, plugins routed through it)
+
+New `register/resolve-resource-environment.ts` (`resolveResourceEnvironment` +
+`renderDeclaredEnvironmentLines`). Services emit the declared block after the health probe and
+**before** OTel/database. The plugin generator's inline `entry.Environment` read is replaced by the
+same renderer, so both kinds emit byte-identical shapes and the existing plugin assertion in
+`generators-service-plugin_test.ts` is untouched and still green.
+
+| Gate | Result |
+| --- | --- |
+| `deno test --allow-all --unstable-kv packages/cli` | **PASS** — `718 passed (505 steps) | 0 failed (1m31s)`, exit 0 |
+| `run-deno-check.ts --root packages/cli` | **PASS** — 837 files, 0 occurrences, exit 0 |
+| `run-deno-lint.ts --root packages/cli` | **PASS** — 837 files, 0 occurrences, exit 0 |
+| `run-deno-check.ts --root packages/aspire` | **PASS** — 45 files, 0 occurrences |
+| `run-deno-fmt.ts --root packages/cli` / `--root packages/aspire` | **PASS** — 0 findings |
+
+Slice review (Tier-A): generated block inspected by eye for a service declaring `Env` — the block
+sits after `withHttpHealthCheck` and before `buildOtelEnvVars`, binds `configuredEnvironment`, and
+loops `withEnvironment`. `deno.lock` unchanged.
+
+Reconcile note: no new issue/PR comments; no drift beyond the entries already recorded.

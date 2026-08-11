@@ -170,6 +170,24 @@ export interface ServiceEntry extends BaseEntry, ReferenceEntry, HostPortEntry {
    * `RESOURCE_DEFAULTS.AppHealthCheckPath`; set `false` for a custom entrypoint with no health route.
    */
   HealthCheckPath?: string | false;
+  /**
+   * Environment variables supplied to the service resource.
+   *
+   * Applied before the generated telemetry, database, and service-discovery
+   * variables, which therefore win a key collision — those values are allocated
+   * at AppHost start, not authored, so a declared literal for one of them would
+   * point the resource at an address nothing listens on. `PORT` is allocated by
+   * Aspire's endpoint binding and is pinned with {@link HostPortEntry.HostPort},
+   * not here.
+   */
+  Environment?: Readonly<Record<string, string>>;
+  /**
+   * Deprecated alias for {@link ServiceEntry.Environment}, read when
+   * `Environment` is absent.
+   *
+   * @deprecated Use {@link ServiceEntry.Environment}.
+   */
+  Env?: Readonly<Record<string, string>>;
 }
 
 /** Frontend, desktop, or task application entry. */
@@ -218,8 +236,21 @@ export interface PluginEntry extends BaseEntry, ReferenceEntry, HostPortEntry {
   RequiresKv: boolean;
   /** Whether the plugin requires database access. */
   RequiresDb: boolean;
-  /** Environment variables supplied to the plugin service resource. */
+  /**
+   * Environment variables supplied to the plugin service resource.
+   *
+   * Same precedence as {@link ServiceEntry.Environment}: applied before the
+   * generated telemetry, database, and service-discovery variables, which
+   * therefore win a key collision.
+   */
   Environment?: Readonly<Record<string, string>>;
+  /**
+   * Deprecated alias for {@link PluginEntry.Environment}, read when
+   * `Environment` is absent.
+   *
+   * @deprecated Use {@link PluginEntry.Environment}.
+   */
+  Env?: Readonly<Record<string, string>>;
   /** Saga-specific metadata for saga plugin resources. */
   Sagas?: SagaResourceConfig;
 }
@@ -446,6 +477,17 @@ const HostPortFields = {
   Port: z.number().int().positive().optional(),
 } as const satisfies z.ZodRawShape;
 
+/**
+ * Declared environment fields shared by the resource kinds whose generated
+ * registration applies environment variables. `Env` is the deprecated alias,
+ * read only when `Environment` is absent — the same pairing as
+ * {@link HostPortFields}.
+ */
+const EnvironmentFields = {
+  Environment: z.record(z.string(), z.string()).optional(),
+  Env: z.record(z.string(), z.string()).optional(),
+} as const satisfies z.ZodRawShape;
+
 const SagaResourceConfigZod = z.object({
   Store: z.object({
     Backend: z.enum(['kv', 'prisma']).optional(),
@@ -460,6 +502,7 @@ const ServiceEntryZod = z.object({
   ...BaseEntryFields,
   ...ReferenceFields,
   ...HostPortFields,
+  ...EnvironmentFields,
   Runtime: z.string().default('deno'),
   Entrypoint: z.string().default('src/main.ts'),
   Workdir: z.string().optional(),
@@ -496,13 +539,13 @@ const PluginEntryZod = z.object({
   ...BaseEntryFields,
   ...ReferenceFields,
   ...HostPortFields,
+  ...EnvironmentFields,
   Runtime: z.string().default('deno'),
   Entrypoint: z.string().default('src/main.ts'),
   Workdir: z.string().optional(),
   HealthCheckPath: z.union([z.string().min(1), z.literal(false)]).optional(),
   RequiresKv: z.boolean().default(false),
   RequiresDb: z.boolean().default(false),
-  Environment: z.record(z.string(), z.string()).optional(),
   Sagas: SagaResourceConfigZod.optional(),
 }).meta({ title: 'PluginEntry', description: 'Configuration for a plugin service resource' });
 /** Plugin entry schema. */
