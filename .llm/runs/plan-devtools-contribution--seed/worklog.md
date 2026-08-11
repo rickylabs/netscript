@@ -23,16 +23,24 @@
 
 ### Commit Slices (planned)
 
-| # | Slice | Proves | Gate | Files |
-| - | ----- | ------ | ---- | ----- |
-| 1 | Bootstrap: supervisor identity, run artifacts, charter, draft PR | The run is activated with a recorded identity, a verified baseline, and a live commit trail | run dir contains `supervisor.md`; draft PR open with docs-only CI labels | `.llm/runs/plan-devtools-contribution--seed/*`, `.llm/devtools-rfc-orchestrator-brief.md` |
-| 2 | Stage-B discovery corpus (repo + docs + market), with committed `workflow.js` if Tier-C is used | Every load-bearing claim is cited and re-baselined against `2256a67bf` | citation gate; corpus committed before synthesis | run `research/`, `matrix/`, `workflows/` |
-| 3 | Stage-C synthesis | The supervisor read the full corpus and named the deep-dive topics | `research.md` findings table populated with citations | `research.md` |
-| 4 | Stage-D design packs (one per topic) | Each topic has a proposal + draft epic/issues + agent briefs + open questions | supervisor substantive review before sign-off commit (no lane self-certifies) | `design/<topic>/**` |
-| 5 | Stage-D2 design/UX evidence pack (GLM 5.2 pass, optional Kimi visual lane) | The mandatory major-UI/UX design route ran, with per-finding dispositions | pack records requested vs observed identity; transport caveat stated | `design/ux-evidence/**` |
-| 6 | Stage-E: canonical RFC + plan lock | All twelve charter questions resolve to a locked decision or a numbered owner fork | `deno task doc:lint`; scoped fmt wrapper; plan-gate self-check | `docs/architecture/rfc/**`, `plan.md` |
-| 7 | Stage-F adversarial findings + triage dispositions + fixes | An unoriented distinct-model reviewer found nothing unaddressed | per-finding disposition recorded | `adversarial.md`, `adversarial-triage.md` |
-| 8 | Stage-H-prep: supersession map, filing manifest, agent briefs, owner decision brief | The board can be filed in one shot after ratification, with #400 reconciled | live-board dedup check | `supersession-map.md`, `filing-manifest.md`, `briefs/**`, `decision-brief.md` |
+**Corrected after PLAN-EVAL cycle 1.** The table below previously described *intent* and was never
+brought current — it claimed the GLM pass ran, named superseded gates, and listed files that do not
+exist. The evaluator caught it, and it was the fairest hit in the verdict: this run has repeatedly
+criticised false-green reporting elsewhere. **Status is now what actually happened.**
+
+| # | Slice | Status | Gate actually run | Files that actually exist |
+| - | ----- | ------ | ----------------- | ------------------------- |
+| 1 | Bootstrap: supervisor identity, run artifacts, charter, draft PR | **DONE** `ccc4c0a70`, `ecae44017` | run dir has `supervisor.md`; draft PR #1450 with docs-only labels | run dir `*`, `.llm/devtools-rfc-orchestrator-brief.md` |
+| 2 | Stage-B discovery corpus, `workflow.js` committed before execution | **DONE** `d5852188b` (workflow), `06b3c480f` (corpus) | citation gate; corpus committed before synthesis | `research/*.md` (14), `research/sources/` (78), `workflows/stage-b-*.js` |
+| 3 | Stage-C synthesis | **DONE** `ca15ac2c2`…`fc375ec23` | `research.md` findings table populated with citations | `research.md`, `research/SYNTHESIS-NOTES.md` |
+| 4 | Stage-D design packs | **DONE** `7d23809a8` | supervisor slice review V1–V4 before sign-off | `design/T{1,2,3,5,6,7,8,9}/*.md` — **proposals + open questions only** |
+| 4b | Draft epic + one-file-per-issue set + agent briefs | **NOT DONE — outstanding** | — | *(none — see PLAN-EVAL required fix 7)* |
+| 5 | Stage-D2 GLM 5.2 design pass | **FAILED — lane unlaunchable** | none; **zero tokens, both attempts** | `design/ux-evidence/glm-attempt-{1,2}-FAILED.jsonl`, `glm-prompt.md`. **No findings file exists** (drift D-10) |
+| 6 | Stage-E canonical RFC + plan lock | **DONE** `a7e49d525`, `9e1b828c5` | `docs:links --root docs/architecture/rfc` PASS; `docs:accuracy` PASS. **`doc:lint` is not a task in this repo and the Markdown fmt gate does not exist** (drift D-4) | `docs/architecture/rfc/rfc-0002-devtools-contribution.md`, `plan.md` |
+| 7 | Stage-F adversarial findings + triage + fixes | **DONE** `b7cd62067` | per-finding disposition recorded; docs gates re-run | `adversarial-sonnet.md` (**not** `adversarial.md`), `adversarial-triage.md` |
+| 8 | Stage-G PLAN-EVAL | **DONE — verdict `FAIL_PLAN`** `5202ff205` | evaluator re-ran all gates independently | `plan-eval.md`, `planeval/codex-thread-ids.md` |
+| 9 | Stage-G fix cycle 1 | **IN PROGRESS** | re-run docs gates + cross-file variant search | this commit |
+| 10 | Stage-H-prep: filing manifest, agent briefs | **PARTIAL** — `decision-brief.md` and the supersession map exist; the filing manifest and per-issue briefs do not | live-board dedup **not yet run** | `decision-brief.md`, `design/T9-supersession/supersession-map.md` |
 
 ### Deferred Scope
 

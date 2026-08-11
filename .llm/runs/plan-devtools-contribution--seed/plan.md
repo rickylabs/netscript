@@ -38,6 +38,9 @@ The primary deliverable is **architecture and contribution mechanics**. Visually
 - A five-surface frontend contribution map (below) with dependencies and proven non-overlap.
 - A DevTools host/contribution-family design pack with worked plugin examples and contributor DX.
 - A design/UX evidence pack incorporating the mandatory GLM 5.2 pass, with per-finding dispositions.
+  **STATUS: NOT DELIVERED.** The lane is unlaunchable (drift D-10); substitute stage-F scrutiny was
+  obtained and is explicitly *not* the mandated pass. Clearing this needs a fixed launcher or an
+  explicit owner waiver — see `decision-brief.md` D-0a/D-0b and risk R12.
 - A file-level and issue-level supersession map for the existing dashboard epic/issues/PRs.
 - Draft epic + one-file-per-issue set, milestone proposal, dependency DAG, agent briefs, and a
   committed one-shot filing manifest — **draft text only**.
@@ -86,7 +89,7 @@ Locked at stage E from the corpus and the eight design packs. Each is normative 
 | -- | -------- | --------- | ----- |
 | **L1** | DevTools is a **separate first-party host process** — CLI-generated root, own Vite process, own port, loopback-bound — not an app-mounted mode and not a `@netscript/fresh` subpath | A Vite-injection mount is **unavailable** (zero `transformIndexHtml` repo-wide, no scaffold `index.html`); an app-mounted tree inherits the full-reload watcher and page-module rewriting; a `fresh` subpath inherits the unresolved A3/A4 archetype dispute and a package already carrying a **Restructure** verdict | §5, §13.1 |
 | **L2** | **No production DevTools tier**, enforced by **two independent** mechanisms — structural absence from the app build graph *and* a fail-safe `!== 'development'` runtime refusal | Upstream ships devtools into production builds **with client auth disabled**; TanStack distrusted a single signal because hosting providers set build command/mode inconsistently | §5 |
-| **L3** | Contributions are a **sibling `{ family: 'devtools', major: 1 }` payload on a family-neutral envelope**; the envelope validates **no** payload — only the registered family schema does | AP-3 guard. Keeps the #890 dependency **reversible** rather than structural | §6 |
+| **L3** | Contributions are a **sibling `{ family: 'devtools', major: 1 }` payload on a family-neutral envelope**; the envelope validates **no** payload — only the registered family schema does | AP-3 guard. Keeps the #890 payload *schema* independent of the spine — but note the **package home is not** independent, so F-1 remains a must-resolve fork (see the rework audit) | §6 |
 | **L4** | **#890's pointer axis wins** the three-seam contest; #427 folds in as the family definition; **#734 closes** as superseded | It is the only merged, owner-arbitrated layer, and #427's thinness law *agrees* with it | §4, §6 |
 | **L5** | **Host-owned closed zone vocabulary** (Medusa's actual model), not plugin-minted zones (Strapi's) | Makes name collision impossible by construction and avoids a two-phase register/bootstrap lifecycle | §6, §7 |
 | **L6** | **Ordering** = host-curated anchors first, then clamped `(order, mountId, id)`; out-of-range `order` is a **generate-time error** | Net-new design: no surveyed system solved ordering. Tab order is host product data, not plugin load order | §6 |
@@ -94,7 +97,7 @@ Locked at stage E from the corpus and the eight design packs. Each is normative 
 | **L8** | **Read-only by default.** Mutating actions are staged, not shipped in v1 | Auth propagation is blocked on the RFC-A chain; a mutation surface drags in an unbounded audit story | §7, §8 |
 | **L9** | **Host-owned, enumerated, deny-by-default read contract**, served same-origin; MCP composed **in-process** (read-kind only), never exposed over HTTP; one-directional SSE; no WebSocket, no MessagePort | No URL-shaped input exists anywhere → the confused-deputy shape is structurally removed. One-directional SSE forecloses the TanStack `install-devtools` class | §8 |
 | **L10** | **Aspire / Scalar / DevTools boundary** as an evidence-backed table, with **#400's three acceptance lines adopted verbatim as normative gates** | The thesis is correct and already operationalized; deep-link grammars were verified from Aspire's own `.razor` sources | §11 |
-| **L11** | Packages: `packages/plugin-devtools-core` (**Archetype 2**) + `plugins/devtools` (**Archetype 5**), with the A2→A3 trigger written down | The core reads through ports and emits a registry; it owns no supervised state **in v1**, so gate F-13 does not apply yet | §13.1 |
+| **L11** | Packages: `packages/devtools-core` (**Archetype 1 — small contract**) + `packages/cli` additive (**A6**, owns registry emission) + `plugins/devtools` (**A5** thin); the generated host app is **userland, not a package**. A3 trigger written down | **Corrected after PLAN-EVAL cycle 1.** The earlier A2 assignment failed doctrine's own trigger — A2 wraps *one external system behind a port with adapters*, and this unit wraps none and names none. A1 fits ("types and small invariants, almost no runtime"), matching #890's choice for `plugin-frontend-core`. Emission is generator behavior → A6. This also closes owner fork O-2 | §13.1 |
 | **L12** | **Registry writes are transactional** — stage → `deno check` a `*.check.ts` importing every referenced module → atomic swap or rollback; deterministic empty emissions | Argued from the **shipped defect class** (non-transactional per-target writes, existence-only verification, two divergent generators, a regex "AstExtractor", registries leaking on remove), not from deference to #890 | §10 |
 | **L13** | **Adding the new roots to `deno.json`'s `arch:check` is a named slice (W1-a)** | `arch:check` gates 16 of 36 live units; without this line every gate claim in the RFC is decorative | §13.3 |
 | **L14** | **Declines carry their cited antecedent**: sandboxing, signing, per-contribution RBAC, capability grammars, host semver load-gates, module federation, and #890's parked T1/T2 iframe tiers — **closed here, not inherited** | Each is a cost of *untrusted third-party code in a long-lived RBAC-governed production-data surface* — a condition DevTools does not satisfy | §9, §12 |
@@ -128,18 +131,32 @@ a stated cost of deferral**, not an unmade decision.
 
 ### Would any deferral force rework?
 
-`gates/plan-gate.md` fails a plan if a deferred decision would force rework. Audited explicitly:
+**Corrected after PLAN-EVAL cycle 1. My earlier answer here was wrong, and the correction matters
+more than the original claim.**
 
-- **F-1 (#890 dependency)** — the highest-risk fork, and it is **deliberately reversible**: the
-  payload schema, host descriptor, and ordering rule are identical under every option, so the choice
-  only becomes binding when the first emitter slice merges. Deferring it does **not** force rework
-  before that point.
-- **F-3 (manifest schema-evolution precondition)** — must land **before** any manifest-visible
-  pointer, and is sequenced that way in W1. Deferring the *pointer* is safe; deferring the
-  *precondition* while shipping the pointer is not, which is why they are ordered.
-- **F-5 (zone-vocabulary ownership)** and **F-6 (ordering)** — both would force rework if deferred,
-  which is why both are **locked now** (L5, L6) rather than escalated.
-- Everything else in §15 is a scope or board decision whose deferral costs schedule, not rework.
+I previously argued that **F-1 (#890 dependency) is "deliberately reversible"** because payload
+schema, host descriptor, and ordering are identical under every option. The evaluator rejected that,
+and is right: F-1 changes **the public package home and import specifiers, emitter ownership, the
+dependency graph, and whether #922 needs re-baselining**. Similar payload *fields* do not make those
+implementation artifacts interchangeable. A consumer importing from `@netscript/devtools-core`
+versus a shared spine package is a **breaking change**, not a refactor.
+
+So the honest classification is:
+
+| Fork | Classification | Consequence |
+| ---- | -------------- | ----------- |
+| **F-1** | **MUST RESOLVE — would force rework** | Blocks the first contracts slice (W1-a). Not deferrable to stage H |
+| **F-3** manifest schema evolution | **MUST RESOLVE — would force rework** | The `.passthrough()`-vs-schema-v2 choice has different old-CLI behavior *and different tests*. Blocks the pointer and emitter slices |
+| **F-8** package/archetype boundary | **RESOLVED in this cycle** — §13.1 now locks A1 contracts + A6 CLI + A5 plugin, with the A3 trigger written down and O-2 closed | — |
+| **F-5** zone ownership, **F-6** ordering | **LOCKED** (L5, L6) — precisely because deferring them would force rework | — |
+| **F-7** read-only v1, and the DT1/import-mode/INV-2-retrofit questions | **MUST RESOLVE or be explicitly removed from tranche 1** | Each changes files, dependencies, and acceptance gates. The plan takes the second option: they are **out of the first implementation tranche**, with entry criteria in RFC §14 |
+| Board decisions **F-9…F-13, F-20** | **May remain owner-ratified at stage H** | Their deferral changes *schedule*, not implementation contracts |
+
+**The rule this makes explicit:** a board/scheduling decision may wait for ratification; an
+architectural fork may not be *called closed* because it has a recommendation. `plan.md` previously
+blurred those, listing recommended-but-unratified forks in the same breath as decided ones. The
+table above separates them, and the "closed" column in the charter-question sweep now means
+**decided**, not **recommended**.
 
 ## Risk Register
 
@@ -148,7 +165,7 @@ not yet built" is an honest state; "mitigated" without a gate would not be.
 
 | # | Risk | Mitigation | Exists today? |
 | - | ---- | ---------- | ------------- |
-| R1 | **#890's spine never lands**, stranding a DevTools family that assumed it | Sibling family on a spine this lane builds first; the choice stays reversible until the first emitter slice merges (fork F-1) | **Yes** — a design property, not a future gate |
+| R1 | **#890's spine never lands**, stranding a DevTools family that assumed it | Sibling family on a spine this lane builds first. **Correction (PLAN-EVAL cycle 1): this is NOT reversible** — F-1 changes the public package home, import specifiers, emitter ownership, and the #922 re-baseline. It is a must-resolve fork blocking W1-a | **No** — the mitigation is *resolving F-1 before slicing*, which has not happened |
 | R2 | **Arbitrary write** via a contribution's filesystem target — `resolveTarget` has no containment assertion; inert only while first-party | Normative containment invariant + its test (slice W1-c) | **No** — named gate, not built. Labelled UNPROVEN in RFC §9 |
 | R3 | **Generator subprocess runs whole-filesystem** (bare `--allow-read`/`--allow-write`, drift D-7) | Scope the spawn (slice W1-c) | **No** — named gate. Mitigant that *does* exist: no `--allow-net`/`--allow-env`, so default-deny blocks exfiltration |
 | R4 | **DevTools reaches production** — upstream ships it with auth disabled, and `/design` already ships ungated in-repo | Two independent exclusion mechanisms + e2e (slice W3-b) | **No** — named gate. `/design` recorded as fork F-20, filed separately |
@@ -158,6 +175,8 @@ not yet built" is an honest state; "mitigated" without a gate would not be.
 | R8 | **Speculative kinds accrete** back into a union | Every kind needs a named first-party consumer; AP-3/AP-24 guards; the rejected list is written into the RFC so it cannot creep back silently | **Yes** — a review checklist |
 | R9 | **The board fragments further** — three seams already claimed one axis, two epics claim the same panels | L4 + forks F-9…F-13; #922's children explicitly **untouched** | **Yes** — as a drafted map; binding only on ratification |
 | R10 | **Gate claims are decorative** — `arch:check` covers 16 of 36 units | Adding the new roots is a named slice (L13, W1-a) | **No** — named slice |
+| R12 | **A charter-mandated deliverable is missing** — the GLM 5.2 design pass is unlaunchable (drift D-10), and `lane-policy` invariant 5 requires it for major UI/UX work with no declared fallback | Escalated to the owner as **D-0a/D-0b** in `decision-brief.md`; substitute stage-F scrutiny obtained and explicitly labelled as *not* the mandated pass | **No** — honest escalation is not completion. Clearing this needs either a fixed launcher **or an explicit owner waiver of the charter and the lane-policy invariant** |
+| R13 | **Seed-contract deliverables outstanding** — draft epic/issues, per-issue agent briefs, and the one-shot filing manifest do not exist | Produce them in fix cycle 1, preserving the no-board-mutation boundary | **No** — in progress |
 | R11 | **`plugins/streams` has no oRPC contract surface**, so a provenance panel has nothing to read | Modelled as a permanently degraded state in the §11 state matrix, not hidden | **Yes** — a design property |
 
 ## Validation Plan

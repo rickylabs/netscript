@@ -378,7 +378,7 @@ than the capability name implies. `absent` = verified negative (grep or read).
 | --- | --- | --- |
 | Plugin contributes a page / route / island to the app | **absent** | no registry kind emits routes/pages/islands (`plugins/workers/scaffold.runtime.json:24-55`); `r1` F10-F11 |
 | Plugin contributes a Vite plugin | **absent** | chain is static template text; repo-wide grep for `createNetScriptVitePlugin` finds no plugin (`vite.config.ts.template:41-56`; `r1` F6) |
-| Any DevTools host, path, or mode flag | **absent** | `grep -rn "devtools\|DevTools"` over `packages`/`plugins`/`docs/site` → 0 (`r1` F14) |
+| Any DevTools host, path, or mode flag | **absent** | `grep -rniE 'devtools|_devtools' … packages plugins docs/site` → 0 (`r1` F14) |
 | Plugin client code reaches the app | **partial** — three hardcoded aliases + a manual import | `vite.config.ts.template:20-32` |
 | UI distribution to an app | **exists**, by **copy** only (`ui:add`, five alias prefixes) | `kernel/application/ui/registry.ts:67-73`; `r2` F4-F5 |
 | Plugin contributes a UI/registry item | **absent** — installer manifest has no UI/registry/theme/token field; `--registry-root` **replaces**, never merges | `packages/plugin/src/protocol/manifest.ts:17-140`; `registry.ts:203-214`; `r2` F10 |
@@ -442,7 +442,7 @@ resolution R3).
 | 1 | Userland frontend code — routes/islands/nav/theme/zones | RFC #890 (merged) → epic #922, children #923–#946, milestone `0.0.9` | **Design-only.** #890's changeset is 32 files: `.github/labels.yml` plus `.llm/runs/plan-frontend-contrib--seed/**` — zero `packages/`, `plugins/`, `apps/`, `docs/` lines (`gh pr view 890 --json files`; `p1` F1). Epic + all 24 children OPEN at `status:plan`; not even the disposable Wave-0 proofs (S1–S5, #923–#927) have run (`p1` F4, F5) | **Co-depend, do not consume.** Adopt its payload-agnostic spine *as a specification* and build the first implementation in the DevTools lane; never assert it as an existing surface. See "The DevTools contribution family" |
 | 2 | Fresh UI registry / component / style-dictionary contributions | Unassigned (`p2` F4 inference); mechanically owned by `packages/fresh-ui` + the five `ui:*` CLI commands | **No plugin-facing hook exists.** The registry is a single hardcoded TS manifest (`packages/fresh-ui/registry.manifest.ts`, 74 `name:` keys) inlined into a generated embed; the plugin installer manifest has no UI/registry field; the only extension seam is `--registry-root`, which **replaces** the manifest wholesale rather than merging, with silent last-wins collision at three layers (`r2` summary, F11) | **Bound against + defer** to a named follow-up RFC with entry criteria. This RFC contributes **no** registry items, adds **no** `ui:*` command, and does not widen `RegistryItemKind` |
 | 3 | Vite plugin contributions | Unassigned (`p2` F4 inference); mechanically owned by `packages/fresh`'s build pipeline | **No contribution seam of any kind.** `vite.config.ts` is static template text with three hardcoded aliases; no plugin references `createNetScriptVitePlugin` (`r1` F6, F11 — the "real mechanism" fact behind `research.md` F1). The ecosystem's shape (`@vitejs/devtools-kit`, `Plugin.devtools.setup(ctx)`) floors at **Vite 8** while NetScript pins **7.2.2** (`deno.json:248`, `packages/fresh/deno.json:56`; `m1` F28/D2) | **Bound against + defer**, and design v1 so it never becomes a retroactive prerequisite: DevTools contributions enter the build as **generated source modules**, so no third-party code joins the Vite plugin chain (T7 recommendation 1; see "Build and dev integration") |
-| 4 | **DevTools contributions** | **This RFC** (staged by RFC-0001 as P-6, `RFC:638`) | **Nothing exists.** `grep -rn "devtools\|DevTools"` across `packages/`, `plugins/`, `docs/site` → **0 matches**; there is no plugin→UI channel of any kind (`research.md` F1) | **Own.** Host, family, kinds, data plane, trust model, build integration, IA, and acceptance are specified in the sections that follow |
+| 4 | **DevTools contributions** | **This RFC** (staged by RFC-0001 as P-6, `RFC:638`) | **Nothing exists.** `grep -rniE 'devtools|_devtools' … packages plugins docs/site` → **0 matches**; there is no plugin→UI channel of any kind (`research.md` F1) | **Own.** Host, family, kinds, data plane, trust model, build integration, IA, and acceptance are specified in the sections that follow |
 | 5 | SDK contributions | RFC-A, PR #1390 / issue #1348 | **Accepted-in-principle, unmerged, unbuilt.** PR #1390 is DRAFT/OPEN, still numbered `0000`; FCP disposition **accept** with objection deadline **2026-08-15 22:00 Europe/Zurich** (open as of 2026-08-11); implementation children #1349–#1353 all OPEN on milestone `0.0.7`; `rg 'SdkClientContribution\|contributions' packages/sdk/src` → 0 matches (`p3` F1, F2, F12) | **Consume the vocabulary, never duplicate the axis.** Align on `protocol {family, major}`, namespaced ids, duplicate rejection, and static module references — the only part available before merge (`p3` F13) |
 
 ### Why the seams do not overlap
@@ -854,7 +854,8 @@ kinds*), the host's mount path and routing (see *Host shape*), the data channel 
 
 **Nothing specified here exists at baseline `2256a67bf`.** There is no plugin→UI channel of any
 kind: `capabilities.hasRoutes` means service HTTP endpoints, no registry kind emits routes, pages,
-or islands, and `grep -rn "devtools\|DevTools"` across `packages/`, `plugins/`, and `docs/site`
+or islands, and `grep -rniE 'devtools|_devtools' --include=*.ts --include=*.tsx --include=*.json
+--include=*.template packages plugins docs/site`
 returns zero matches (`research.md` F1; `packages/plugin/src/protocol/manifest.ts:20-21`). Every
 TypeScript block below is a proposed contract, not a description of shipped code.
 
@@ -1378,7 +1379,7 @@ verdict so a reader can see what was considered, not only what survived.
 
 | Candidate | Real first-party consumer? | Host behavior | Verdict | Reason |
 | --- | --- | --- | --- | --- |
-| **Zones/panels** | **Yes** — workers console (#428, #933); sagas instances incl. `compensating` (#429); triggers firing history (#430); streams deliveries (#431), all reading runtime state that exists today (`r1` F10; `b1` F4) | Render a JSON element tree into a host-owned zone; per-contribution error boundary; `(order, id)` sort; per-zone per-plugin volume cap (`m2` F15) | **KEEP-v1** (`json-render` tier only) | The zero-client-code tier is *"server-side TypeScript only"* (`m1` F3) and most plugin panels are key/value + table + list. It sidesteps the VNode-serialization dead end Nuxt hit (`m1` F23) and — decisively — needs **none** of #890's unbuilt envelope/mount/registry spine (`research.md` F1, F2) |
+| **Zones/panels** | **Yes** — workers console (#428, #933); sagas instances incl. `compensating` (#429); triggers firing history (#430); streams deliveries (#431), all reading runtime state that exists today (`r1` F10; `b1` F4) | Render a JSON element tree into a host-owned zone; per-contribution error boundary; §6's anchors-then-`(order, mountId, id)` sort; per-zone per-plugin volume cap (`m2` F15) | **KEEP-v1** (`json-render` tier only) | The zero-client-code tier is *"server-side TypeScript only"* (`m1` F3) and most plugin panels are key/value + table + list. It sidesteps the VNode-serialization dead end Nuxt hit (`m1` F23) and — decisively — needs **none** of #890's unbuilt envelope/mount/registry spine (`research.md` F1, F2) |
 | **Island / client-code panel tier** | Named but unbuilt — #933's "island" half | Would need plugin client bundles, mount glue, Preact-singleton discipline (`r1` F16) | **STAGE** | Exactly the machinery #890's spine was to provide, and #890 merged **docs only: 32 files, all under `.llm/runs/` plus `labels.yml`, zero source**, with all 24 children open at `status:plan`/`0.0.9` (`research.md` F2). Staging keeps v1 buildable without first resolving the family fork (see *Contribution family*) |
 | **Pages/routes** | **No** — the four consoles are host-owned screens; the dashboard epic implements kinds *and* host (`b1` F10) | n/a in v1 | **STAGE** | A contributed route needs route-manifest integration that mutates page modules (`r1` F8) plus a visible-tree convention (`r1` F4) — #890-spine territory — and is the fastest road to AP-21 (`09-…md:141`) |
 | **Inspectors / entity-tabs** | Yes, but *as panels*: run inspector #419, plugin detail #420 | Entity-scoped **zones** whose context carries a host-fetched typed slice — Medusa's `DetailWidgetProps<T>` transfer (`m3` M-7) | **FOLD into `panel`** | An inspector is a panel whose zone is entity-scoped and whose context is typed per zone. A separate kind would duplicate the panel contract (AP-9) |
@@ -1397,7 +1398,11 @@ verdict so a reader can see what was considered, not only what survived.
 
 Two rules bind every kind, so they live once here rather than three times below.
 
-- **Identity — version-suffixed ids.** `'<plugin>/<name>/v1'`. Grafana derived its entire
+- **Identity — defined once in §6, not here.** A contribution is identified by the host-assigned
+  `mountId` plus a local slug `id`, with its payload-contract major carried in the **`apiMajor`
+  field**; the fully-qualified form is `<mountId>/<id>/v<apiMajor>`. The major lives in a field,
+  not inside `id`, because every generated key derives from `mountId` and never from a package
+  name (#890 identity quartet, `p1` C3). Grafana derived its entire
   compatibility story from this one convention (`m2` F13, F16; `research.md` F24).
 - **Ordering — defined once in §6, not here.** The rule is two-tier: host-curated **anchors**
   render first (tab order is host product data), then the remainder sorts by
@@ -1489,7 +1494,7 @@ type DevToolsUiNode =
 ```
 
 **Host behavior.** A registry keyed by zone — registry-over-switch, per AP-24 (`09-…md:165`);
-per-zone `(order, id)` sort; a per-zone per-plugin volume cap (Grafana's `limitPerPlugin`, `m2` F15);
+§6's anchors-then-`(order, mountId, id)` sort applied per zone; a per-zone per-plugin volume cap (Grafana's `limitPerPlugin`, `m2` F15);
 every panel rendered inside a per-contribution error boundary (`m2` F23 — note **TanStack has no
 boundary anywhere on its mount path**, `m2` F11).
 
@@ -1717,10 +1722,23 @@ exist is § *Information architecture and staging*.
 
 Stated plainly, because it is the security-relevant claim of this section:
 
-> **No URL-shaped input exists anywhere in the data plane.** No devtools procedure, event, manifest
+> **No URL-shaped INPUT exists anywhere in the data plane.** No devtools procedure, event, manifest
 > field, or context method accepts a URL, an origin, a host, a port, or a path as input.
 > `serviceName → origin` resolution happens **server-side only**, through the identity-bound
 > `ServiceEndpointDirectoryPort`.
+
+**Input, not output — the distinction is load-bearing and was previously blurred.** DevTools does
+emit URLs: §7's `link` kind exists precisely to produce Aspire and Scalar deep-links. The invariant
+is asymmetric on purpose:
+
+| Direction | Rule |
+| --- | --- |
+| **Into** the data plane | **No URL-shaped input, ever.** A contribution names a *procedure id* or a *typed link descriptor*; it never supplies a target |
+| **Out of** the data plane | URLs are **constructed host-side** from a configured base plus typed parameters, and rendered as links a human clicks — never fetched by the host on a contribution's behalf |
+
+The second row is what keeps deep-links from re-opening the confused-deputy class: the host builds
+the URL, but it never *dereferences* it with its own authority. If a future kind ever needs the host
+to fetch a contributed target, that is a **new trust decision**, not an extension of this one.
 
 A deputy is confused when *the caller chooses the target* and *the server supplies the authority*.
 Here the authority (an Aspire dashboard API key today; an authenticated principal in v2/v3) is held
@@ -1764,7 +1782,9 @@ export interface DevToolsDataProtocol {
 }
 
 /** `<pluginId>/<panel>/v<major>` — version-suffixed ids, Grafana's compatibility story (m2 F16). */
-export type DevToolsPanelId = `${string}/${string}/v${number}`;
+// Identity per §6: host-assigned mountId + local slug id + apiMajor field.
+// Fully-qualified form `<mountId>/<id>/v<apiMajor>` is derived by the host, never authored.
+export type DevToolsPanelRef = { readonly mountId: string; readonly id: string; readonly apiMajor: number };
 
 /** `<namespace>:<kebab-name>` — closed vocabulary, enumerated at generation time. Never a URL. */
 export type DevToolsProcedureId = `${string}:${string}`;
@@ -2223,7 +2243,7 @@ arch:check` gates 16 hand-listed roots of 36 live units and `arch:check:repo` ha
 | **INV-5** | **Mutating-endpoint origin discipline.** Every non-GET DevTools endpoint verifies `Origin`/`Host` against the bound address and requires a per-process token (generated at startup) in a custom header. **Cookies alone never authorize a mutation.** | **G-4**: handler tests — cross-origin POST without token → 403; same-origin with token → 200; GET never requires the token, so read paths stay friction-free. |
 | **INV-6** | **Per-contribution failure containment.** Every panel renders inside an error boundary; a throw logs `plugin/<id> panel failed` with the component stack and renders a visible error card; host resolution failures degrade to empty-list + logged error, never a throw; a data-resolution failure never fails the page response. | **G-8**: browser-level test mounting a deliberately-throwing panel; assert siblings render, shell survives, error card present. |
 | **INV-7** | **Redaction absolutes.** Anything DevTools records, streams, or renders from request/response machinery excludes header values, inputs, context objects, credentials, and source error causes — adopted verbatim from RFC-A (`research.md` S-14, rfc:1091-1110); **no debug flag relaxes it**. Cache partitions remain the one quotable green light ("intentionally visible in … developer tools", rfc:1117-1119). Secrets (Aspire API key, browser tokens) never enter generated files, registries, or client-delivered payloads. | **G-7**: serializer unit test — a request carrying `Authorization`/`x-api-key` yields panel payloads with those values absent; fitness check that generated DevTools registries contain no token/key material. |
-| **INV-8** | **Identity is collision-checked and versioned.** Ids are namespaced `<plugin>/<name>/v<major>`; duplicate id within a family is a generate-time error naming both providers. | **G-9**: registry test on duplicate id; id-format validation test. |
+| **INV-8** | **Identity is collision-checked and versioned.** Identity is `(mountId, id, apiMajor)` per §6; `id` is unique within `(plugin, family)` and a duplicate is a generate-time error naming both providers. | **G-9**: registry test on duplicate id; id-format validation test. |
 
 **Auditability.** Action invocations log structured events joined by `netscript.correlation.id`
 (`r5` F12) and render their CLI-equivalent line, so every mutation performed through DevTools is
@@ -3444,16 +3464,36 @@ does this code live, what shape must it take, and what proves it works."
 
 | Unit | Archetype | Owns | Must not |
 | --- | --- | --- | --- |
-| `packages/plugin-devtools-core` | **2 — Integration** | The contribution contracts (`contracts/v1`), the host descriptor and zone vocabulary, the `DevToolsUiNode` element vocabulary, the ordering function, the registry-emission domain model, and the read ports it consumes (telemetry, tools, endpoint directory) | Depend on `@netscript/fresh` or `@netscript/fresh-ui`; own a background processor; own a DB schema |
-| `plugins/devtools` | **5 — Plugin** | Thin composition: `scaffold.plugin.json`, `definePlugin(...)`, adapter install/doctor/info/update/remove, re-export of the core's contracts | Redefine a contract or re-implement a core convention (the Archetype-5 **thinness law**) |
-| `packages/cli` (additive) | 6 — existing | The `devtools` command group, the CLI-generated `.netscript/devtools/` root, and the transactional registry generator | Deepen `@netscript/cli`'s existing **Restructure** verdict |
+| `packages/devtools-core` | **1 — Small Contract** | `contracts/v1`: the envelope and identity types, the closed `DevToolsZone` vocabulary, the closed `DevToolsUiNode` element vocabulary, the link grammar types, the budget/limit constants, and **`orderContributions()`** as a pure total function | Hold ports, adapters, DI, base classes, or any IO. Depend on `@netscript/fresh` or `@netscript/fresh-ui` |
+| `packages/cli` (additive) | **6 — existing** | The `devtools` command group; the CLI-generated `.netscript/devtools/` root; the **transactional registry generator** (emission is a generator concern and belongs beside the existing plugin-registry generators) | Deepen `@netscript/cli`'s existing **Restructure** verdict |
+| `plugins/devtools` | **5 — Plugin** | Thin composition: `scaffold.plugin.json`, `definePlugin(...)`, adapter install/doctor/info/update/remove, re-export of `devtools-core`'s contracts | Redefine a contract or re-implement a core convention (the Archetype-5 **thinness law**) |
+| The generated DevTools host app | *not a package* | The read-contract server, the SSE feed, and rendering — it is CLI-generated userland the developer owns, exactly like the scaffolded app | Become a published package without a fresh archetype decision |
 
-**Why Archetype 2 and not 3.** Doctrine's decision order asks whether the package "owns long-running
-behavior with state, lifecycle, and supervised execution." In v1 the core does not: it reads through
-ports and emits a registry. That keeps it out of gate **F-13** (`stop()` on every long-running
-runtime; `AbortSignal` on every async public IO method). §8's SSE feed is owned by the *host app*,
-not the core. **If a future wave moves supervised subscriptions into the core, the archetype becomes
-3 and F-13 applies** — recorded here so the re-evaluation is a decision rather than a drift.
+**Correction, and why it matters.** An earlier draft of this section assigned the core **Archetype 2
+(Integration)**. That was wrong against doctrine's own trigger: A2 is "for packages that wrap an
+external system behind a small port and provide one or more adapters"
+(`06-archetypes.md:41-43`) — and the unit described here wraps **no** external system and names **no**
+adapter set. Doctrine also warns that "a package with one adapter and no foreseeable second adapter
+does *not* introduce a port" (`:74-77`), so inventing ports to justify A2 would have been the Wet
+Codebase failure it names.
+
+The corrected split follows the decision order honestly: the contracts unit "publishes *types and
+small invariants* and almost no runtime" — **A1** (`:13-15`), which is also what #890 chose for
+`plugin-frontend-core`. Registry **emission** is generator behavior, so it lives in the CLI (A6)
+next to the generators that already exist rather than manufacturing a new runtime package. And the
+host's serving behavior lives in **generated userland**, which is why no unit here needs A3 — and
+therefore why gate **F-13** does not apply.
+
+**The A3 trigger, written down so it is a decision and not a drift.** If a later wave moves
+supervised subscriptions, connection lifecycle, or restart policy into a *published package*, that
+package is **A3** and F-13 (`stop()` on every long-running runtime; `AbortSignal` on every async
+public IO method) applies from its first slice.
+
+**This also closes owner fork O-2.** The neutral contracts package is `packages/devtools-core`,
+owned by this RFC. It is deliberately **not** named `contribution-core`: a family-neutral spine is
+#890's to own if and when its spine is built, and naming one here would claim territory this RFC
+does not own. If F-1 later selects convergence onto a shared spine, `devtools-core` re-exports from
+it — a change of import source, not of contract shape.
 
 **Why not a `@netscript/fresh` subpath.** Doctrine's assignment table lists `fresh` as **Archetype 4**;
 #890's design labels it **Archetype 3**. That contradiction is unresolved (run `drift`/`b2` D3), and
@@ -3478,15 +3518,28 @@ export function orderContributions(/* … */): readonly unknown[]
 export function resolveDevToolsLink(/* … */): URL
 ```
 
-**Publishability risks identified up front**, so they are designed against rather than discovered at
-publish time:
+**The full `jsr-audit` rubric, applied to the planned surface.** An earlier draft listed only four
+slow-type/quality risks; that is a partial rubric, and the audit skill's checklist is wider. Every
+row below is a **planned** commitment with the gate that will prove it — this is a pre-publish audit
+of a surface that does not exist yet, not a claim that it passes today.
 
-| Risk | Mitigation |
-| --- | --- |
-| Slow types from inferred returns | Every exported function declares an explicit return type; `deno doc --lint` is a per-slice gate |
-| A closed union exported as `string` | `DevToolsZone` and the `UiNode` tag set are `const`-derived unions, not free `string` |
-| `any` / casting leaking into the public surface | `deno task quality:scan` is a required gate on every `packages/**` slice — it fails on `any` + casting, which is one of the two classes that reached `main` in #745 |
-| Host-side hardcoded plugin names | Same gate; the host resolves by `mountId`, never by plugin name |
+| Rubric area | Planned commitment | Proving gate |
+| --- | --- | --- |
+| **Package metadata** | `name: '@netscript/devtools-core'`, `version` tracked with the workspace release, a tagline within the JSR byte cap, `license`, `exports` | `deno task docs:tagline:check`; `publish:dry-run` |
+| **Export / subpath map** | Exactly two subpaths at v1 — `.` (types + `orderContributions`) and `./contracts/v1`. No barrel re-export of upstream (AP-14 / F-15) | `publish:dry-run`; F-15 |
+| **Publish include/exclude** | `publish.exclude` covers `*_test.ts`, fixtures, and scratch; the emitted file list is asserted, not assumed | `deno publish --dry-run` file listing reviewed per slice |
+| **ESM-only shape** | No CJS interop, no `node:` builtins in the contracts unit; Web Platform + `@std/*` first (axiom A7) | `deno check`; F-2 |
+| **Module docs** | Every entrypoint carries a module doc-comment; `deno doc` output is non-empty and describes the family | `deno doc --lint` over **every** entrypoint |
+| **Symbol docs + examples** | Every exported symbol has a JSDoc one-liner; the envelope and each kind carry a worked `@example` | `deno doc --lint`; F-7 doc score |
+| **README** | Required-permissions block (F-9), install line, one worked contribution, and the deprecation policy for `apiMajor` | F-9; `docs:readme:check` |
+| **Slow types** | Every exported function has an explicit return type; the closed unions are `const`-derived, never widened to `string` | `deno doc --lint` — slow types fail the publish bar |
+| **`any` / casting** | None in the public surface; a new `// deno-lint-ignore` or `as unknown as` added to green a wrapper is a review-blocking finding, not a pass | `deno task quality:scan` |
+| **Host-side plugin-name coupling** | The host resolves by `mountId`, never by plugin name — the second class that reached `main` in #745 | `deno task quality:scan` |
+| **Provenance + runtime compatibility** | Published via the repo's OIDC release path; Deno-only runtime declared, with no implied Node support | `netscript-release` publish path; `publish:dry-run` |
+
+**Sequencing note.** This audit is only stable once package ownership is locked. §13.1 now locks it
+(A1 contracts unit + A6 CLI + A5 plugin), which is what makes the metadata and export-map rows
+answerable rather than provisional.
 
 ### 13.3 Gate set
 
@@ -3495,14 +3548,23 @@ overlay** — which is where the browser gates actually come from. The matrix ha
 browser validation required** for a UI-serving A2/A3 package (it is `subtype` only under A4), so
 naming the overlay is load-bearing rather than decorative.
 
+The union below is derived from the **corrected** package boundary — A1 + A6 + A5, plus the
+`SCOPE-frontend` and `SCOPE-docs` overlays. An earlier draft derived it from A2+A5 only and omitted
+the CLI surface entirely; that is fixed here.
+
 | Gate | Applies to | Evidence |
 | --- | --- | --- |
-| F-1, F-5…F-8, F-10…F-12, F-14…F-19 | every archetype in scope | scoped wrappers per slice |
-| F-2, F-3, F-4, F-9 | A2 core | `check-doctrine.ts`; F-9 = the README "Required permissions" block |
-| F-13 | **not required in v1** | conditional on the A2→A3 re-evaluation in §13.1 |
-| `deno task quality:scan` + `arch:check` | every `packages/**` / `plugins/**` slice | required — a green scoped wrapper is **not** sufficient |
-| `jsr-audit` rubric | package waves | §13.2 |
-| `SCOPE-frontend`: route check · **browser validation** · **loading/empty/error states** · responsive · contract check | the host and every panel | Playwright; the §11 state matrix is the checklist |
+| F-1, F-5…F-8, F-10…F-12, F-14…F-19 | **every** unit in scope (A1, A5, A6) | scoped check/lint/fmt wrappers per slice |
+| **F-2 (helper reinvention), F-3 (layering), F-4 (inheritance)** | **A6 CLI slices** — the generator and the `devtools` command group | `check-doctrine.ts --root packages/cli`; these are *required* for A6 and were missing from the earlier union |
+| **F-9 (permission declaration)** | **A5 plugin + A6 CLI** | README "Required permissions" block; **doubly load-bearing here** because INV-2 makes declared permissions *enforced* rather than advisory |
+| F-2/F-3/F-4/F-9 | **not** applicable to the A1 contracts unit | doctrine: A1 has "no base classes, no DI, no adapters" (`06-archetypes.md:35`) |
+| **F-13** | **not required in v1** — no unit is A3 | conditional on the A3 trigger stated in §13.1 |
+| **A6 CLI-specific** — the E2E CLI surface | any slice changing scaffold output, plugin scaffolding, or generated registries | `deno task e2e:cli run scaffold.runtime --cleanup` at the merge-readiness pass, per `netscript-cli`; **not** per intermediate slice |
+| `deno task quality:scan` + `deno task arch:check` | every `packages/**` / `plugins/**` slice | required — a green scoped wrapper is **not** sufficient, and this is the pair that catches the two classes that reached `main` in #745 |
+| **Consumer gate** — downstream contract change | any slice changing `devtools-core`'s exports | `deno task publish:dry-run`; `deno doc --lint` over every entrypoint |
+| `jsr-audit` full rubric | package waves | §13.2 |
+| `SCOPE-frontend`: route check · **browser validation** · **loading/empty/error/degraded states** · responsive · contract check | the generated host and every panel | Playwright; the §11 state matrix **is** the checklist |
+| `SCOPE-docs`: source alignment · drift log | this RFC and every doc slice | every prescriptive claim points at doctrine, RFC, or code |
 
 **The gate claim is not self-executing, and this RFC commits to fixing that.** `deno task arch:check`
 iterates **16 hand-listed roots out of 36 live units**; `fresh`, `fresh-ui`, `telemetry`, `cli`,
@@ -3551,15 +3613,32 @@ graph TD
   W6b[W6-b sagas / triggers / streams consoles]
 ```
 
-| Wave | Slice | Proves |
-| --- | --- | --- |
-| **W0** | Two disposable probes: package-shipped island specifiers; a second route/island root in one Vite process | The two facts §5 and §10 could not verify from source. **These gate the plan lock of any slice that depends on them** — they are cheap and they are not optional |
-| **W1** | Core package + `contracts/v1` + **`arch:check` roots**; the typed deep-link helper; the containment invariant with its test; the manifest schema-evolution precondition | The contracts type-check and are gated; a deep-link exists (today none does); an escaping target is rejected; a pointer block can land without hard-rejecting older CLIs |
-| **W2** | Transactional replace-set generator + `devtools.check.ts`; doctor wiring | A crash mid-generation cannot leave a partial registry; removal cannot dangle; a bad contribution is diagnosed, not silently dropped |
-| **W3** | The CLI-generated host root; dual production exclusion + e2e | The host runs in dev and is **structurally absent** from a production build |
-| **W4** | `panel` and `link` kinds | A plugin contributes a panel with zero client code, and a deep-link resolves |
-| **W5** | The read contract, in-process MCP composition, SSE promotion | A panel gets typed data without ever holding a URL |
-| **W6** | Workers console, then sagas/triggers/streams | The design survives a **real** consumer — the only test that matters |
+Each slice names **the files/roots it touches**, **the contract it introduces**, and **the single
+command or manual check that proves it**. Outcomes are not slices; an earlier draft listed outcomes
+and the PLAN-EVAL rejected it.
+
+| # | Slice | Files / roots | Introduces | Proving gate (command) | Depends on |
+| - | ----- | ------------- | ---------- | ---------------------- | ---------- |
+| **W0-a** | Probe: can a package ship island specifiers consumable under Deno resolution? | throwaway branch; `packages/cli/src/kernel/assets/app/vite.config.ts.template` (read) | nothing — a **disposable proof** | manual: island from a package hydrates in a scaffolded app; result recorded in `drift.md` | — |
+| **W0-b** | Probe: second route/island root in one Vite process | throwaway branch | nothing — disposable | manual: two route roots resolve without `.generated/` contention | — |
+| **W1-a** | Contracts unit + gate wiring | **new** `packages/devtools-core/` (`mod.ts`, `contracts/v1/`, `deno.json`); **edit** root `deno.json` `arch:check` (+2 `--root`) | `ContributionEnvelope`, `DevToolsContributionBase`, `DevToolsZone`, `DevToolsUiNode`, `orderContributions()` | `deno task arch:check && deno doc --lint packages/devtools-core/mod.ts && deno task quality:scan` | — |
+| **W1-b** | Typed deep-link helper | `packages/devtools-core/contracts/v1/links.ts` | `DevToolsLink`, `resolveDevToolsLink()` | unit tests over the Aspire/Scalar grammars **incl. a case asserting `?filters=` is unrepresentable**; base read from config, never hardcoded | W1-a |
+| **W1-c** | Containment invariant + generator scoping (**INV-1/INV-2**) | `packages/cli/src/kernel/application/ui/registry.ts`; `.../generate/plugins/installed-runtime-registry-generator.ts` | a shared path-containment resolver | **G-1/G-2**: unit tests for `/etc/x`, `../../x`, `@ui/../../x`, symlink escape; argv test asserting **no bare** `--allow-read`/`--allow-write` | W1-a |
+| **W1-d** | Manifest schema-evolution precondition (**drift D-6**) | `packages/plugin/src/protocol/manifest.ts` | the chosen compatibility contract (`.passthrough()`/catchall **or** `schemaVersion: 2`) | contract test: an older-CLI parse of a manifest carrying an unknown block **does not hard-reject** | **fork F-3** |
+| **W2-a** | Transactional replace-set generator | `packages/cli/src/public/features/generate/devtools/` (new) | staged→`deno check`→atomic-swap emission; deterministic empty set | test: kill mid-generation ⇒ **no partial registry**; regenerate byte-identical ⇒ skip; remove ⇒ empty emission, no dangling import | W1-a, W1-c |
+| **W2-b** | Doctor wiring + five-state taxonomy | `packages/cli/src/public/features/plugins/doctor/` | quarantine diagnosis over the existing `extraChecks` seam | `netscript plugin doctor` prints all five states; e2e asserts a window-mismatch contribution is quarantined, **not** silently dropped | W2-a |
+| **W3-a** | CLI-generated DevTools host root | `packages/cli/src/kernel/assets/devtools/` (new templates); `devtools` command group | the generated host app | `deno task e2e:cli run scaffold.runtime --cleanup` — host starts on its port, loopback-bound | W2-a |
+| **W3-b** | Dual production exclusion | generated `main.ts` + app build graph | the two independent mechanisms (**L2**) | **G-5** e2e: production build contains **no** DevTools module **and** the runtime refuses when mode ≠ `development` | W3-a |
+| **W4-a** | `panel` kind | `packages/devtools-core/contracts/v1/panel.ts`; host renderer | `DevToolsPanelContribution`, `UiNode` render, per-contribution error boundary | e2e: a plugin panel renders with **zero client code**; a throwing panel shows an error card and **does not** take down the shell | W3-a |
+| **W4-b** | `link` kind wiring | host renderer | link rendering + disabled-with-reason | e2e: journey step deep-links to `/traces/detail/{traceId}?spanId=` | W1-b, W3-a |
+| **W5-a** | DevTools read contract + in-process MCP | `packages/cli/.../devtools/server/` | enumerated deny-by-default procedures | contract test asserting **no** procedure input accepts a url/origin/host/path-shaped string (the §8 invariant) | W3-a |
+| **W5-b** | SSE promotion + live feed | `packages/fresh/deno.json` export map; `src/runtime/server/sse.ts` | `createSSEStream` promoted to public | consumer gate: `deno task publish:dry-run`; e2e asserts a live panel updates | W5-a |
+| **W6-a** | Workers console — **the first real consumer** | `plugins/workers/` devtools contribution | proof the family works end to end | e2e: workers console renders from the plugin's own contribution; `SCOPE-frontend` state matrix walked in Playwright | W4-a, W5-a |
+| **W6-b** | Sagas / triggers / streams consoles | respective `plugins/*` | breadth | same, per plugin; **streams asserts the degraded contract-provenance state** (it has no oRPC surface) | W6-a |
+
+**W0 outcomes are hard dependencies, not information.** If W0-a fails, W4-a's rendering strategy
+changes from package-shipped islands to copy-mode, which changes W4-a's files. That is why the
+probes are first and disposable.
 
 **Sequencing constraints inherited, not invented:** anything needing a credential-bearing typed
 client waits on the RFC-A chain (which includes an **unfiled** metadata child); anything reading
