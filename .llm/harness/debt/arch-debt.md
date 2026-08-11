@@ -2246,8 +2246,13 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   its state before the PR (the two gate declarations live in the role-named
   `gates/scaffold/service-env/service-env-gates.ts`, registered from
   `scaffold-capability-gates.ts`); the scaffold gate directory holds **44 direct children** — the
-  baseline 43 plus the one bounded `service-env/` subdirectory, whose own 10 files are inside the
-  12-child cap. IMPL-EVAL cycle 1 had measured 943 lines and 48 children before this correction. The
+  baseline 43 plus the one bounded `service-env/` subdirectory, whose own **12** files sit **exactly
+  at** the 12-child cap — not comfortably inside it. IMPL-EVAL recorded 10 here; the remediation
+  slices then added `gate-permission-probe.ts` and `service-env-gates_test.ts`, and the count was
+  not re-measured, so the record was a false-done. Corrected by measurement at head.
+  **Stop condition:** `service-env/` is full. A thirteenth file in it, or a further gate needing a
+  sibling directory, requires the owed `runtime-gates.ts` split first rather than another bounded
+  subdirectory. IMPL-EVAL cycle 1 had measured 943 lines and 48 children before this correction. The
   entry stays **open**: the pre-existing 906-line registry and 43 over-cap children are untouched,
   so the full split is still owed, and the next gate faces the same condition.
 
