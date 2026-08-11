@@ -1,0 +1,16 @@
+{
+  "tasks": [
+    {
+      "id": "runtime-two",
+      "name": "Runtime two",
+      "runtime": "deno",
+      "entrypoint": "./two.ts"
+    },
+    {
+      "id": "runtime-three",
+      "name": "Runtime three",
+      "runtime": "shell",
+      "entrypoint": "./three.sh"
+    }
+  ]
+}

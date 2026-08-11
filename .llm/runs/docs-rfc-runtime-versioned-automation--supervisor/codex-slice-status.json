@@ -1,0 +1,7 @@
+{
+  "threadId": "019fef2b-3b13-7bd2-a07e-24a4d9db03fc",
+  "turns": 8,
+  "lastState": "budget_exhausted",
+  "reason": "max turns reached",
+  "quotaEvents": []
+}

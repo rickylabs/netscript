@@ -1,0 +1,396 @@
+{
+  "version": "5",
+  "specifiers": {
+    "jsr:@std/fs@1": "1.0.24",
+    "jsr:@std/internal@^1.0.14": "1.0.14",
+    "jsr:@std/jsonc@1": "1.0.2",
+    "jsr:@std/path@1": "1.1.6",
+    "jsr:@std/path@^1.1.5": "1.1.6",
+    "npm:zod@^4.4.3": "4.4.3"
+  },
+  "jsr": {
+    "@std/fs@1.0.24": {
+      "integrity": "f3061b45b81673a2bece689da041df32d174be064c89eb6397fb5718d3fb7877",
+      "dependencies": [
+        "jsr:@std/internal",
+        "jsr:@std/path@^1.1.5"
+      ]
+    },
+    "@std/internal@1.0.14": {
+      "integrity": "291516b3d4c35024d6ffbc0a9df5bf4c64116e05b50012cf846710152d2ffdf7"
+    },
+    "@std/jsonc@1.0.2": {
+      "integrity": "909605dae3af22bd75b1cbda8d64a32cf1fd2cf6efa3f9e224aba6d22c0f44c7"
+    },
+    "@std/path@1.1.6": {
+      "integrity": "c68485c2a4dfbb5ae3cc74fae4e8c4e5d874cf8a8ed12927917235c758b46cbe",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    }
+  },
+  "npm": {
+    "zod@4.4.3": {
+      "integrity": "sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ=="
+    }
+  },
+  "workspace": {
+    "links": {
+      "jsr:@netscript/ai@0.0.5": {
+        "dependencies": [
+          "jsr:@standard-schema/spec@1.1.0",
+          "jsr:@std/assert@1",
+          "npm:@tanstack/ai-anthropic@~0.15.13",
+          "npm:@tanstack/ai-mcp@0.2.1",
+          "npm:@tanstack/ai-openai@~0.15.10",
+          "npm:@tanstack/ai@0.39"
+        ]
+      },
+      "jsr:@netscript/aspire@0.0.5": {
+        "dependencies": [
+          "jsr:@std/assert@1",
+          "jsr:@std/fs@1",
+          "jsr:@std/path@1"
+        ]
+      },
+      "jsr:@netscript/auth-better-auth@0.0.5": {
+        "dependencies": [
+          "jsr:@std/assert@1"
+        ]
+      },
+      "jsr:@netscript/auth-kv-oauth@0.0.5": {
+        "dependencies": [
+          "jsr:@panva/oauth4webapi@^3.8.6",
+          "jsr:@std/assert@1"
+        ]
+      },
+      "jsr:@netscript/auth-workos@0.0.5": {
+        "dependencies": [
+          "jsr:@std/assert@1"
+        ]
+      },
+      "jsr:@netscript/bench@0.0.5": {
+        "dependencies": [
+          "jsr:@cliffy/command@^1.0.0-rc.7",
+          "jsr:@std/assert@1",
+          "jsr:@std/fs@1",
+          "jsr:@std/path@1",
+          "jsr:@std/streams@1",
+          "npm:@orpc/server@^1.14.6"
+        ]
+      },
+      "jsr:@netscript/cli-e2e@0.0.5": {
+        "dependencies": [
+          "jsr:@cliffy/command@^1.0.0-rc.7",
+          "jsr:@std/assert@1",
+          "jsr:@std/fs@1",
+          "jsr:@std/path@1",
+          "npm:@orpc/server@^1.14.6"
+        ]
+      },
+      "jsr:@netscript/cli@0.0.5": {
+        "dependencies": [
+          "jsr:@cliffy/command@^1.0.0-rc.7",
+          "jsr:@cliffy/prompt@1",
+          "jsr:@david/dax@0.48",
+          "jsr:@netscript/aspire@0.0.5",
+          "jsr:@netscript/config@0.0.5",
+          "jsr:@netscript/fresh-ui@0.0.5",
+          "jsr:@netscript/mcp@0.0.5",
+          "jsr:@netscript/plugin@0.0.5",
+          "jsr:@netscript/sdk@0.0.5",
+          "jsr:@std/async@1",
+          "jsr:@std/cli@1",
+          "jsr:@std/collections@1",
+          "jsr:@std/fmt@1",
+          "jsr:@std/fs@1",
+          "jsr:@std/json@1",
+          "jsr:@std/jsonc@1",
+          "jsr:@std/net@1",
+          "jsr:@std/path@1",
+          "jsr:@std/semver@1",
+          "jsr:@std/text@1"
+        ]
+      },
+      "jsr:@netscript/config@0.0.5": {
+        "dependencies": [
+          "jsr:@std/fs@1",
+          "jsr:@std/jsonc@1",
+          "jsr:@std/path@1"
+        ]
+      },
+      "jsr:@netscript/contracts@0.0.5": {
+        "dependencies": [
+          "npm:@orpc/contract@^1.14.6"
+        ]
+      },
+      "jsr:@netscript/cron@0.0.5": {
+        "dependencies": [
+          "jsr:@std/assert@1",
+          "jsr:@std/async@1"
+        ]
+      },
+      "jsr:@netscript/database@0.0.5": {},
+      "jsr:@netscript/fresh-ui@0.0.5": {
+        "dependencies": [
+          "jsr:@netscript/sdk@0.0.5",
+          "jsr:@std/assert@1",
+          "npm:preact@^10.29.2"
+        ]
+      },
+      "jsr:@netscript/fresh@0.0.5": {
+        "dependencies": [
+          "jsr:@fresh/core@^2.3.3",
+          "jsr:@netscript/ai@0.0.5",
+          "jsr:@netscript/plugin-streams-core@0.0.5",
+          "jsr:@netscript/sdk@0.0.5",
+          "jsr:@netscript/telemetry@0.0.5",
+          "jsr:@std/assert@1",
+          "jsr:@std/http@1",
+          "jsr:@std/path@1",
+          "jsr:@std/text@1",
+          "npm:@durable-streams/state@~0.3.1",
+          "npm:@durable-streams/tanstack-ai-transport@^0.0.8",
+          "npm:@orpc/server@^1.14.6",
+          "npm:@preact/signals@2.9.2",
+          "npm:@tanstack/ai-preact@~0.10.1",
+          "npm:@tanstack/ai@0.39",
+          "npm:@tanstack/preact-query@^5.101.0",
+          "npm:@tanstack/query-core@^5.101.0",
+          "npm:@tanstack/react-db@~0.1.95",
+          "npm:preact-render-to-string@^6.7.0",
+          "npm:preact@^10.29.2",
+          "npm:vite@7.2.2"
+        ]
+      },
+      "jsr:@netscript/kv@0.0.5": {
+        "dependencies": [
+          "jsr:@olli/kvdex@^3.6.7",
+          "jsr:@std/assert@1",
+          "jsr:@std/async@1",
+          "jsr:@std/collections@1",
+          "jsr:@std/data-structures@1",
+          "jsr:@std/ulid@1"
+        ]
+      },
+      "jsr:@netscript/logger@0.0.5": {
+        "dependencies": [
+          "jsr:@hono/hono@4.12.24",
+          "jsr:@logtape/logtape@2",
+          "jsr:@std/assert@1",
+          "npm:@orpc/server@^1.14.6"
+        ]
+      },
+      "jsr:@netscript/mcp@0.0.5": {
+        "dependencies": [
+          "jsr:@netscript/aspire@0.0.5",
+          "jsr:@netscript/telemetry@0.0.5",
+          "jsr:@standard-schema/spec@1.1.0",
+          "jsr:@std/assert@1",
+          "jsr:@std/path@1"
+        ]
+      },
+      "jsr:@netscript/plugin-ai-core@0.0.5": {
+        "dependencies": [
+          "jsr:@netscript/ai@0.0.5",
+          "jsr:@netscript/plugin@0.0.5",
+          "jsr:@std/assert@1",
+          "npm:@orpc/contract@^1.14.6",
+          "npm:@orpc/server@^1.14.6"
+        ]
+      },
+      "jsr:@netscript/plugin-ai@0.0.5": {
+        "dependencies": [
+          "jsr:@netscript/plugin-ai-core@0.0.5",
+          "jsr:@netscript/plugin@0.0.5",
+          "jsr:@std/assert@1"
+        ]
+      },
+      "jsr:@netscript/plugin-auth-core@0.0.5": {
+        "dependencies": [
+          "jsr:@std/assert@1",
+          "npm:@orpc/contract@^1.14.6",
+          "npm:@orpc/server@^1.14.6"
+        ]
+      },
+      "jsr:@netscript/plugin-auth@0.0.5": {
+        "dependencies": [
+          "jsr:@netscript/auth-better-auth@0.0.5",
+          "jsr:@netscript/auth-kv-oauth@0.0.5",
+          "jsr:@netscript/auth-workos@0.0.5",
+          "jsr:@netscript/contracts@0.0.5",
+          "jsr:@netscript/kv@0.0.5",
+          "jsr:@netscript/plugin-auth-core@0.0.5",
+          "jsr:@netscript/plugin-streams-core@0.0.5",
+          "jsr:@netscript/plugin@0.0.5",
+          "jsr:@netscript/service@0.0.5",
+          "jsr:@netscript/telemetry@0.0.5"
+        ]
+      },
+      "jsr:@netscript/plugin-sagas-core@0.0.5": {
+        "dependencies": [
+          "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/kv@0.0.5",
+          "jsr:@netscript/telemetry@0.0.5",
+          "jsr:@std/assert@1"
+        ]
+      },
+      "jsr:@netscript/plugin-sagas@0.0.5": {
+        "dependencies": [
+          "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/contracts@0.0.5",
+          "jsr:@netscript/kv@0.0.5",
+          "jsr:@netscript/plugin-sagas-core@0.0.5",
+          "jsr:@netscript/plugin-streams-core@0.0.5",
+          "jsr:@netscript/plugin@0.0.5",
+          "jsr:@netscript/queue@0.0.5",
+          "jsr:@netscript/service@0.0.5",
+          "jsr:@netscript/telemetry@0.0.5",
+          "jsr:@std/async@1"
+        ]
+      },
+      "jsr:@netscript/plugin-streams-core@0.0.5": {
+        "dependencies": [
+          "jsr:@netscript/telemetry@0.0.5",
+          "jsr:@std/assert@1"
+        ]
+      },
+      "jsr:@netscript/plugin-streams@0.0.5": {
+        "dependencies": [
+          "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/aspire@0.0.5",
+          "jsr:@netscript/contracts@0.0.5",
+          "jsr:@netscript/plugin-streams-core@0.0.5",
+          "jsr:@netscript/plugin@0.0.5",
+          "jsr:@netscript/service@0.0.5",
+          "jsr:@standard-schema/spec@1.1.0",
+          "jsr:@std/net@1"
+        ]
+      },
+      "jsr:@netscript/plugin-triggers-core@0.0.5": {
+        "dependencies": [
+          "jsr:@netscript/cron@0.0.5",
+          "jsr:@netscript/kv@0.0.5",
+          "jsr:@netscript/watchers@0.0.5",
+          "jsr:@std/assert@1"
+        ]
+      },
+      "jsr:@netscript/plugin-triggers@0.0.5": {
+        "dependencies": [
+          "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/contracts@0.0.5",
+          "jsr:@netscript/kv@0.0.5",
+          "jsr:@netscript/plugin-triggers-core@0.0.5",
+          "jsr:@netscript/plugin-workers-core@0.0.5",
+          "jsr:@netscript/plugin@0.0.5",
+          "jsr:@netscript/queue@0.0.5",
+          "jsr:@netscript/service@0.0.5",
+          "jsr:@netscript/telemetry@0.0.5",
+          "jsr:@std/assert@1",
+          "jsr:@std/path@1"
+        ]
+      },
+      "jsr:@netscript/plugin-workers-core@0.0.5": {
+        "dependencies": [
+          "jsr:@david/dax@0.48",
+          "jsr:@netscript/kv@0.0.5",
+          "jsr:@netscript/plugin@0.0.5",
+          "jsr:@netscript/telemetry@0.0.5",
+          "jsr:@standard-schema/spec@1.1.0",
+          "jsr:@std/assert@1",
+          "jsr:@std/path@1",
+          "npm:@orpc/contract@^1.14.6",
+          "npm:@orpc/server@^1.14.6"
+        ]
+      },
+      "jsr:@netscript/plugin-workers@0.0.5": {
+        "dependencies": [
+          "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/contracts@0.0.5",
+          "jsr:@netscript/cron@0.0.5",
+          "jsr:@netscript/kv@0.0.5",
+          "jsr:@netscript/plugin-streams-core@0.0.5",
+          "jsr:@netscript/plugin-workers-core@0.0.5",
+          "jsr:@netscript/plugin@0.0.5",
+          "jsr:@netscript/queue@0.0.5",
+          "jsr:@netscript/service@0.0.5",
+          "jsr:@netscript/telemetry@0.0.5",
+          "jsr:@standard-schema/spec@1.1.0",
+          "jsr:@std/async@1",
+          "jsr:@std/path@1"
+        ]
+      },
+      "jsr:@netscript/plugin@0.0.5": {
+        "dependencies": [
+          "jsr:@netscript/contracts@0.0.5",
+          "jsr:@netscript/service@0.0.5",
+          "jsr:@standard-schema/spec@1.1.0",
+          "jsr:@std/assert@1",
+          "jsr:@std/path@1",
+          "npm:@orpc/contract@^1.14.6",
+          "npm:@orpc/server@^1.14.6"
+        ]
+      },
+      "jsr:@netscript/prisma-adapter-mysql@0.0.5": {},
+      "jsr:@netscript/queue@0.0.5": {
+        "dependencies": [
+          "jsr:@fedify/amqp@^2.2.5",
+          "jsr:@fedify/denokv@^2.2.5",
+          "jsr:@fedify/fedify@^2.2.5",
+          "jsr:@fedify/redis@^2.2.5",
+          "jsr:@std/assert@1",
+          "jsr:@std/async@1"
+        ]
+      },
+      "jsr:@netscript/runtime-config@0.0.5": {
+        "dependencies": [
+          "jsr:@std/path@1"
+        ]
+      },
+      "jsr:@netscript/sdk@0.0.5": {
+        "dependencies": [
+          "jsr:@netscript/service@0.0.5",
+          "jsr:@standard-schema/spec@1.1.0",
+          "jsr:@std/assert@1",
+          "npm:@orpc/client@^1.14.6",
+          "npm:@orpc/contract@^1.14.6",
+          "npm:@orpc/openapi@^1.14.6",
+          "npm:@orpc/server@^1.14.6",
+          "npm:@orpc/tanstack-query@^1.14.6",
+          "npm:@orpc/zod@^1.14.6",
+          "npm:@tanstack/db@~0.6.8",
+          "npm:@tanstack/query-core@^5.101.0",
+          "npm:@tanstack/query-db-collection@^1.2.1"
+        ]
+      },
+      "jsr:@netscript/service@0.0.5": {
+        "dependencies": [
+          "jsr:@hono/hono@4.12.24",
+          "jsr:@std/assert@1",
+          "npm:@orpc/client@^1.14.6",
+          "npm:@orpc/openapi@^1.14.6",
+          "npm:@orpc/server@^1.14.6",
+          "npm:@orpc/zod@^1.14.6"
+        ]
+      },
+      "jsr:@netscript/telemetry@0.0.5": {
+        "dependencies": [
+          "jsr:@hono/otel@^1.1.2",
+          "jsr:@standard-schema/spec@1.1.0",
+          "jsr:@std/assert@1",
+          "npm:@opentelemetry/semantic-conventions@1.41.1"
+        ]
+      },
+      "jsr:@netscript/watchers@0.0.5": {
+        "dependencies": [
+          "jsr:@std/assert@1",
+          "jsr:@std/async@1",
+          "jsr:@std/fs@1",
+          "jsr:@std/path@1"
+        ]
+      },
+      "npm:@netscript/plugin-ai-core@0.0.1-alpha.0": {},
+      "npm:@netscript/plugin-auth-core@0.0.1-alpha.0": {}
+    }
+  }
+}

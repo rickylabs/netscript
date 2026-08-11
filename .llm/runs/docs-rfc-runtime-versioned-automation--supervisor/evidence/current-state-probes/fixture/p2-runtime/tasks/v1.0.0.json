@@ -1,0 +1,10 @@
+{
+  "tasks": [
+    {
+      "id": "runtime-only",
+      "name": "Runtime only",
+      "runtime": "deno",
+      "entrypoint": "./runtime-only.ts"
+    }
+  ]
+}

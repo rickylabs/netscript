@@ -1,0 +1,95 @@
+# rfc-plan-eval — Codex implementation thread
+
+- **Thread / session id:** `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`
+- **Rollout:**
+  `/home/codex/.codex/sessions/2026/08/11/rollout-2026-08-11T06-53-35-019fef2b-3b13-7bd2-a07e-24a4d9db03fc.jsonl`
+- **Worktree:** `/home/codex/repos/ns-rfc-plan-eval`
+- **Branch:** `eval/rfc-runtime-versioned-automation` (NO upstream by design).
+- **Push rule:** explicit refspec only —
+  `git push origin HEAD:refs/heads/eval/rfc-runtime-versioned-automation`.
+- **Requested route:** provider=openai · model=gpt-5.6-sol · effort=xhigh
+- **Observed route:** provider=openai · model=gpt-5.6-sol · effort=xhigh
+- **Route verdict:** matched
+- **Runtime:** approval=never · sandbox=dangerFullAccess
+- **Brief (staged):** `/home/codex/rfc-plan-eval-brief.md`
+
+## Steering (same thread — never a second send-message-v2 at this worktree)
+
+```bash
+codex exec resume 019fef2b-3b13-7bd2-a07e-24a4d9db03fc -- "<follow-up>"
+```
+
+_Written by `.llm/tools/agentic/codex/launch-codex-slice.ts`._- 2026-08-11T05:07:49.687Z — thread
+`019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 1, state running
+
+- 2026-08-11T05:09:12.137Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 2, state running
+- 2026-08-11T05:09:54.039Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 3, state running
+- 2026-08-11T05:10:20.660Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 4, state running
+- 2026-08-11T05:10:30.493Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 5, state running
+- 2026-08-11T05:10:37.190Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 6, state running
+- 2026-08-11T05:10:43.930Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 7, state running
+- 2026-08-11T05:10:50.975Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 8, state running
+- 2026-08-11T05:26:06.319Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 1, state running
+- 2026-08-11T05:26:35.895Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 2, state running
+- 2026-08-11T05:27:01.066Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 3, state running
+- 2026-08-11T05:27:25.143Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 4, state running
+- 2026-08-11T05:27:46.459Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 5, state running
+- 2026-08-11T05:28:04.652Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 6, state running
+- 2026-08-11T05:28:21.886Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 7, state running
+- 2026-08-11T05:28:36.819Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 8, state running
+- 2026-08-11T05:51:22.250Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 1, state running
+- 2026-08-11T05:52:19.434Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 2, state running
+- 2026-08-11T05:52:30.137Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 3, state running
+- 2026-08-11T05:52:38.715Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 4, state running
+- 2026-08-11T05:52:46.048Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 5, state running
+- 2026-08-11T05:52:55.561Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 6, state running
+- 2026-08-11T05:53:03.471Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 7, state running
+- 2026-08-11T05:53:15.098Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 8, state running
+- 2026-08-11T06:58:35.718Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 1, state running
+- 2026-08-11T06:59:01.334Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 2, state running
+- 2026-08-11T06:59:12.243Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 3, state running
+- 2026-08-11T06:59:21.665Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 4, state running
+- 2026-08-11T06:59:34.650Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 5, state running
+- 2026-08-11T06:59:45.500Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 6, state running
+- 2026-08-11T06:59:57.510Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 7, state running
+- 2026-08-11T07:00:10.595Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 8, state running
+- 2026-08-11T07:07:29.176Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 1, state running
+- 2026-08-11T07:07:39.190Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 2, state running
+- 2026-08-11T07:07:49.575Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 3, state running
+- 2026-08-11T07:08:00.810Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 4, state running
+- 2026-08-11T07:08:10.301Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 5, state running
+- 2026-08-11T07:08:23.421Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 6, state running
+- 2026-08-11T07:08:33.631Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 7, state running
+- 2026-08-11T07:08:43.610Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 8, state running
+- 2026-08-11T07:18:39.782Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 1, state running
+- 2026-08-11T07:19:01.332Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 2, state running
+- 2026-08-11T07:19:17.510Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 3, state running
+- 2026-08-11T07:19:33.553Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 4, state running
+- 2026-08-11T07:19:42.228Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 5, state running
+- 2026-08-11T07:19:49.666Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 6, state running
+- 2026-08-11T07:20:01.502Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 7, state running
+- 2026-08-11T07:20:10.107Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 8, state running
+- 2026-08-11T07:24:45.582Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 1, state running
+- 2026-08-11T07:24:54.619Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 2, state running
+- 2026-08-11T07:25:03.746Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 3, state running
+- 2026-08-11T07:25:13.951Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 4, state running
+- 2026-08-11T07:25:23.221Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 5, state running
+- 2026-08-11T07:25:31.144Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 6, state running
+- 2026-08-11T07:25:40.743Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 7, state running
+- 2026-08-11T07:25:49.147Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 8, state running
+- 2026-08-11T07:29:04.167Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 1, state running
+- 2026-08-11T07:29:15.056Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 2, state running
+- 2026-08-11T07:29:23.448Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 3, state running
+- 2026-08-11T07:29:34.346Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 4, state running
+- 2026-08-11T07:29:43.434Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 5, state running
+- 2026-08-11T07:29:53.425Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 6, state running
+- 2026-08-11T07:30:04.406Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 7, state running
+- 2026-08-11T07:30:13.774Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 8, state running
+- 2026-08-11T07:32:55.945Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 1, state running
+- 2026-08-11T07:33:07.279Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 2, state running
+- 2026-08-11T07:33:18.624Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 3, state running
+- 2026-08-11T07:33:29.103Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 4, state running
+- 2026-08-11T07:33:38.244Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 5, state running
+- 2026-08-11T07:33:50.263Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 6, state running
+- 2026-08-11T07:34:03.482Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 7, state running
+- 2026-08-11T07:34:13.324Z — thread `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`, turn 8, state running
