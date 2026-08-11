@@ -400,10 +400,16 @@ documentation.
   moment the command's output *is* the artifact. The stage-B corpus avoided this only because those
   agents wrote their own files; here the reviewer's reply **is** the deliverable, so stdout had to be
   captured whole.
-- **Action:** fix — both passes re-run with output redirected to
-  `design/ux-evidence/{kimi,qwen}-findings.md` in full, no pipe. The truncated tail is **kept** as
-  `kimi-findings-PARTIAL-tail.md` rather than deleted: it is evidence that the first run happened and
-  what it concluded, and deleting it would hide the mistake.
+- **Action:** fix, staged honestly rather than claimed wholesale:
+  - **Kimi — re-run done.** Relaunched with stdout redirected to
+    `design/ux-evidence/kimi-findings.md` in full, no pipe.
+  - **Qwen — still on its original (truncating) invocation** at the time of writing. It had not
+    returned, and killing a long reasoning pass to fix the capture would have cost more than letting
+    it finish; if its output arrives truncated it is re-run the same way. **Status is tracked in the
+    receipt, not assumed here.**
+  - The truncated tail is **kept** as `kimi-findings-PARTIAL-tail.md` rather than deleted: it is
+    evidence that the first run happened and what it concluded, and deleting it would hide the
+    mistake.
 - **Rule for the rest of this run and the next:** when a lane's **stdout is the artifact**, redirect
   it to a file; never pipe it through `head`/`tail`. Reserve pipes for launcher chatter whose content
   does not matter.
