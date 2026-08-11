@@ -905,3 +905,65 @@ Cycle-5 state despite the Cycle-7 fix note claiming they were updated.
   branch was changed. This Cycle-8 append is the only filesystem mutation.
 
 PLAN-EVAL: FAIL_PLAN
+
+## Cycle 9
+
+- Plan evaluator session: same dedicated Codex GPT-5.6 Sol · xhigh evaluator session / 2026-08-11
+  (owner override D-2), Cycle 9 explicitly ordered by the owner as the closing pass
+- Evaluator worktree: `/home/codex/repos/ns-rfc-plan-eval`, branch
+  `eval/rfc-runtime-versioned-automation`, clean at `28830c88ae01efad76ea1403784fde881289d555`
+- Author worktree: `/home/codex/repos/ns-rfc-runtime-versioned-automation`, same source commit
+  before this verdict append
+- Surface / archetype: docs RFC planning future ARCHETYPE-1/2/3/5/6 package, runtime, plugin, CLI,
+  scaffold, DB, Aspire, production-console, and staged DevTools work
+- Scope overlays: `SCOPE-docs`; full adversarial plan gate and Cycle-8 resolution audit; no
+  implementation evaluation
+
+### Cycle-8 finding resolution audit
+
+| Cycle-8 finding                         | Cycle-9 result | Evidence                                                                                                                                                                                                                                                                   |
+| --------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F1 — `plan.md` status and S5 provenance | PASS           | The status now records Cycles 3–8, the Cycle-6 architecture-clean judgment, bookkeeping-only later findings, and the closing-pass condition; S5 names append-only `plan-eval.md` Cycles 1–8 and carries the complete 9→6→5→2→bookkeeping history (`plan.md:3-15,119-123`). |
+| F2 — phase-registry closing-pass state  | PASS           | G6 now records Cycles 1–8, architecture clean since Cycle 6, fixed Cycle-7/8 bookkeeping, Cycle 9 as the closing pass, and append-only evaluator evidence through Cycle 8 (`phase-registry.md:13`).                                                                        |
+
+### Checklist results
+
+| Plan-Gate item                          | Result | Evidence / location                                                                                                                                                                                                                                                                                                                                                                       |
+| --------------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Research present and current            | PASS   | `research.md:6-13` explicitly re-baselines to `origin/main`; HEAD's merge-base and current `origin/main` both resolve to `2256a67bf`. Fresh `deno doc packages/runtime-config/mod.ts` and focused production-use search reconfirmed the exported loader/watcher and absence of production composition. RFC/evidence files remain unchanged since the Cycle-6 architecture-clean judgment. |
+| Decisions locked                        | PASS   | The RFC and plan lock ownership, complete activation epochs/CAS, pinned dispatch, leased admission versus serving, store parity, T1 limits, cron ownership, cleanup, and the D-9 two-frontend boundary with rationale (`plan.md:3-15,49-70`; RFC §§5–10).                                                                                                                                 |
+| Open-decision sweep                     | PASS   | Naming, two-person policy, and retention defaults are safely assigned to slices; P-1..P-6 have rationale and entry criteria; P-6 names consumed stable contracts and cannot force runtime rework (`plan.md:92-106`; RFC `rfc-0001-runtime-versioned-automation.md:629-638,802-822`). The evaluator found no must-resolve decision.                                                        |
+| Commit slices (< 30, gate + files each) | PASS   | S1–S6 are ordered, file-scoped, and name proving gates with current append-only evaluator provenance (`plan.md:108-128`); future A0–A8 slices remain below 30, dependency-ordered, file-scoped, and gated (RFC `:640-670`). The Design checkpoint agrees on S1–S6 (`worklog.md:103-105`).                                                                                                 |
+| Risk register                           | PASS   | The plan covers evidence drift, activation atomicity, feed/poll ordering, schema skew, adapter divergence, T1/security, integrity, secrets, loader policy, cron duplication, outage serving, and frontend sequencing with mitigations and owning slices (`plan.md:72-90`).                                                                                                                |
+| Gate set selected                       | PASS   | `SCOPE-docs`, docs-source gates, intentional CI skips, and final PLAN-EVAL are explicit; RFC §12 applies S/F/R/C/P, frontend dependency, and release classes to future package/plugin slices (`plan.md:17-26`; RFC `:640-680`).                                                                                                                                                           |
+| Deferred scope explicit                 | PASS   | Design, plan, and RFC consistently identify P-1..P-6 and owner-gated implementation/issue filing, while §15 classifies the remaining spelling/policy/default choices (`worklog.md:95-107`; `plan.md:92-106`; RFC `:629-638,802-822`).                                                                                                                                                     |
+| jsr-audit surface scan (pkg/plugin)     | PASS   | The pre-scan names Zod/isolated-declaration, explicit oRPC-route, driver-type leakage, connector-thinness, and publish risks and assigns them to implementation slices (`rfc-0001-runtime-versioned-automation.md:672-680`).                                                                                                                                                              |
+
+### Open-decision sweep (evaluator-run)
+
+None. All architecture decisions that would force rework are resolved. The remaining P-1..P-6 and
+§15 choices are safe to defer under their recorded rationale, consumed contracts, owning slices, and
+entry criteria.
+
+### Verdict
+
+`PASS`
+
+### Notes
+
+- The actual `28830c88a` files—not the fix summary—were evaluated. Both Cycle-8 record findings are
+  resolved, every plan-gate checklist item is checked, and no regression was found.
+- The RFC and evidence did not change after Cycle 6; its clean judgments on evidence integrity,
+  O2+O4 ownership, epoch/convergence consistency, security honesty, cleanup completeness, roadmap,
+  doctrine fit, plugin thinness, and competitive-study scope therefore stand.
+- `docs:links` passed with zero broken links/anchors/orphans; focused `deno fmt --check` passed on
+  the RFC, plan, worklog, context pack, phase registry, and competitive study;
+  `git diff --check
+  209961433..HEAD` passed. The evaluator worktree remained clean.
+- Live PR #1446 was re-inspected read-only at head `28830c88a`: open, mergeable, draft, sole
+  `status:plan-eval`, milestone assigned, six comments; its S5/DoD and D-9 decision remain current.
+  No GitHub mutation was performed.
+- No RFC, plan, worklog, context pack, phase registry, source, issue, comment, label, commit, or
+  branch was changed. This Cycle-9 append is the only filesystem mutation.
+
+PLAN-EVAL: PASS

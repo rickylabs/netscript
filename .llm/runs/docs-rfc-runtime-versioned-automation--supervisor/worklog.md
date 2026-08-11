@@ -252,3 +252,12 @@ live inside the RFC and are re-checkpointed by their own future runs).
   cycle count. Fixed with grep verification: vocabulary now P-1–P-6; plan status + S5 slice text
   describe cycles 1–7; context pack opens post-cycle-7; PR S5/DoD progress fields updated. Cycle 8
   is the closing pass on the reconciled record.
+
+## 2026-08-11 PLAN-EVAL cycle 9 — **PASS**
+
+- Closing pass at `28830c88a`: both cycle-8 record findings PASS; **every plan-gate checklist item
+  PASS; open-decision sweep: none**; the cycle-6 architecture-clean judgment stands (RFC/evidence
+  unchanged since). Verdict appended by the evaluator; gates re-verified by it (`docs:links`,
+  focused fmt, git diff --check) — all green.
+- Run closes: RFC produced for the owner (PR #1446 stays draft pending ratification; artifact + file
+  delivered to the owner). Nine-cycle history preserved append-only in `plan-eval.md`.

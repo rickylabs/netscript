@@ -1,6 +1,7 @@
 # Context Pack — docs-rfc-runtime-versioned-automation--supervisor
 
-Resume here. State as of 2026-08-11 (post PLAN-EVAL cycle 7; D-8 + D-9 applied).
+Resume here. State as of 2026-08-11: **PLAN-EVAL PASS (cycle 9)**; D-8 + D-9 applied; RFC produced;
+awaiting owner ratification (PR #1446 draft).
 
 - **What this run is**: research + architecture RFC for runtime-versioned workers/tasks/triggers
   (operator capability on a running stack). No implementation. Draft PR #1446 vs main.
