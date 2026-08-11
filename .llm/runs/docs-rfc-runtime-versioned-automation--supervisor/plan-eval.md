@@ -668,3 +668,93 @@ All §15 owner questions and P-1..P-5 remain safe to defer under their recorded 
   This Cycle-5 append is the only filesystem mutation.
 
 PLAN-EVAL: FAIL_PLAN
+
+## Cycle 6
+
+- Plan evaluator session: same dedicated Codex GPT-5.6 Sol · xhigh evaluator session / 2026-08-11
+  (owner override D-2), Cycle 6 explicitly ordered by the owner as the deciding pass on the
+  D-9-amended head
+- Evaluator worktree: `/home/codex/repos/ns-rfc-plan-eval`, branch
+  `eval/rfc-runtime-versioned-automation`, clean at `2518791f3fa65de4bbcfe440998cf9b68c48544a`
+- Author worktree: `/home/codex/repos/ns-rfc-runtime-versioned-automation`, same source commit
+  before this verdict append
+- Surface / archetype: docs RFC planning future ARCHETYPE-1/2/3/5/6 package, runtime, plugin, CLI,
+  scaffold, DB, Aspire, production-console, and staged DevTools work
+- Scope overlays: `SCOPE-docs`; full adversarial plan gate, Cycle-5 resolution audit, and D-9
+  amendment review; no implementation evaluation
+
+### Cycle-5 finding resolution audit
+
+| Cycle-5 finding                         | Cycle-6 result | Evidence                                                                                                                                                                                                                                                                                                                                                                              |
+| --------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F1 — one lease/serving transition model | PASS           | §5.3 now makes local hash/schema-major validation the sole serving precondition and control-plane currentness only a convergence precondition. It explicitly covers lease expiry while serving, persisted-last-good restart without control-plane contact, and empty/corrupt cold start; §13 test 8 exercises all three (`rfc-0001-runtime-versioned-automation.md:344-373,700-718`). |
+| F2 — current review surfaces            | PARTIAL        | The context pack and live PR body now carry Cycle 5/D-9 and the PR is at the evaluated head. The Design checkpoint still says P-1..P-5 and S1-S5 while naming S1-S6 elsewhere, the locked plan sweep still stops at P-5, and the phase registry still calls Cycle 5 the deciding future pass (`worklog.md:95-107`; `plan.md:3-12,89-99,112-118`; `phase-registry.md:13`; finding 1).  |
+
+### D-9 amendment audit
+
+| Required relationship                                                      | Result | Evidence                                                                                                                                                                                                                                                                      |
+| -------------------------------------------------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Two operator surfaces, with #890/#922 sufficient only for production/admin | PASS   | §8.2 distinguishes the userland-app production/admin console from a separate DevTools family/host and narrows the #922 minimum cut to surface 1 (`rfc-0001-runtime-versioned-automation.md:489-523`).                                                                         |
+| DevTools staged rather than silently designed here                         | PASS   | P-6 requires a dedicated DevTools RFC, treats #400/#685/#780/#506 as evidence rather than ratified architecture, names consumed stable contracts, and has an implementation-dependent entry criterion (`:514-523,629-638`).                                                   |
+| Roadmap consistency                                                        | PASS   | A7 contains list/detail/run/history and lifecycle flows only, explicitly excludes diagnostics/journey views, and carries the #922/#934 dependency cut; P-1..P-6 is a separate staged row (`:649-670`). Backend slices A0-A6 remain frontend-independent (`:525-527,640-670`). |
+| General frontend contribution mechanisms not pre-empted                    | PASS   | §8.2 enumerates the five candidate surfaces, says this RFC designs none of their general mechanisms, consumes only the ratified app family, and stages DevTools (`:496-501`).                                                                                                 |
+| Cross-artifact lock record                                                 | FAIL   | The hard constraint is updated for D-9, but the formal plan sweep and Design checkpoint omit P-6 and the phase registry is stale (`plan.md:59-65,89-99`; `worklog.md:95-107`; `phase-registry.md:13`).                                                                        |
+
+### Checklist results
+
+| Plan-Gate item                          | Result | Evidence / location                                                                                                                                                                                                                                                                                                                                                                                                  |
+| --------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Research present and current            | PASS   | `research.md:6-13` still re-baselines to `origin/main`; HEAD's merge-base and current `origin/main` both resolve to `2256a67bf`. Fresh `deno doc packages/runtime-config/mod.ts` plus focused production-use searches reconfirmed the exported loader/watcher, fail-empty behavior, distinct `RuntimeTask` model, and lack of a production consumer. Competitive claims remain qualified and primary-source bounded. |
+| Decisions locked                        | PASS   | Ownership, complete activation epochs, revision-pinned dispatch, lease/serving transitions, store parity, T1 limits, cron ownership, and the two-frontend boundary are now unambiguous in the RFC (`rfc-0001-runtime-versioned-automation.md:196-378,489-565`).                                                                                                                                                      |
+| Open-decision sweep                     | FAIL   | The locked plan explicitly says only P-1..P-5 are deferred, despite new P-6 being a staged decision. P-6 is substantively classified in RFC §11, but it is absent from the artifact the plan-gate designates as the complete sweep (`plan.md:89-99`; RFC `:629-638`).                                                                                                                                                |
+| Commit slices (< 30, gate + files each) | FAIL   | The RFC's A0-A8 roadmap remains PR-sized, ordered, file-scoped, and gated (`rfc-0001-runtime-versioned-automation.md:640-670`). The docs-run Design checkpoint still says “Commit slices — S1-S5” while the locked plan and constants contain S1-S6, so its claimed reconciliation is false (`worklog.md:103-107`; `plan.md:101-118`).                                                                               |
+| Risk register                           | PASS   | The expanded register covers evidence drift, partial activation, feed/poll ordering, schema skew, store divergence, T1, integrity, secrets, loader policy, cron duplication, outage serving, and frontend dependency sequencing with owners/mitigations (`plan.md:69-87`). D-9's DevTools boundary is also a hard constraint (`:59-65`).                                                                             |
+| Gate set selected                       | PASS   | §12 defines and applies S/F/R/C/P, frontend dependency, and release classes to the future package/plugin slices (`rfc-0001-runtime-versioned-automation.md:640-670`).                                                                                                                                                                                                                                                |
+| Deferred scope explicit                 | PASS   | P-1..P-6 each have rationale and entry criteria in §11; §15 separately classifies the only spelling/policy/default questions (`:629-638,802-822`).                                                                                                                                                                                                                                                                   |
+| jsr-audit surface scan (pkg/plugin)     | PASS   | The pre-scan continues to cover Zod slow types, isolated declarations, explicit oRPC route types, driver leakage, connector thinness, and publish gates before implementation (`:672-680`).                                                                                                                                                                                                                          |
+
+### Open-decision sweep (evaluator-run)
+
+No unresolved runtime architecture decision remains. The Cycle-5 serving-state blocker is genuinely
+closed, and D-9 makes the production-console/DevTools ownership boundary a decided split. P-6 is a
+safe staged prerequisite because its rationale, consumed contracts, and entry criterion are explicit
+in RFC §11. The failure is record integrity: the locked plan's mandatory sweep still claims the
+staged set is P-1..P-5, so it is not a complete sweep of the amended plan.
+
+### Verdict
+
+`FAIL_PLAN`
+
+### If FAIL_PLAN — required fixes
+
+1. **[BLOCKER] Reconcile the formal plan record with D-9/P-6 and the actual slice set.** Change the
+   locked plan's open-decision sweep from P-1..P-5 to P-1..P-6 and record P-6's safe-deferral
+   rationale/entry criterion; bring the plan status and G6 phase-registry state through Cycle 6;
+   change the Design checkpoint's domain vocabulary to P-1..P-6 and “Commit slices — S1-S6.” These
+   are not optional progress prose: the open-decision sweep and Design checkpoint are plan-gate
+   inputs, and their current statements contradict RFC §11 and the plan's own S6 row
+   (`plan.md:3-12,89-99,101-118`; `worklog.md:95-107`; `phase-registry.md:13`).
+
+2. **[MEDIUM] Finish D-9 terminology reconciliation in the live PR body.** The new locked-decision
+   item correctly describes two surfaces, but the summary still says a singular “management
+   cockpit,” old item 9 still says the cockpit as a whole is downstream of #890/#922, and items 12
+   and 11 are out of order. Rename those old references to the production/admin console and order
+   the decision list so the public review surface cannot be read as granting #890/#922 authority
+   over DevTools. Keep the PR draft and retain `status:plan-eval`.
+
+### Notes
+
+- The actual `2518791f3` files—not the fix summary—were evaluated. The lease/serving model, test 8,
+  D-9 split, A7 narrowing, P-6 staging, backend independence, evidence qualifications, cleanup
+  inventory, gate letters, security bounds, and competitive-study integration were verified directly
+  and introduced no architecture regression.
+- `docs:links` passed with zero broken links/anchors/orphans; focused `deno fmt --check` passed on
+  the RFC, plan, worklog, context pack, phase registry, and competitive study;
+  `git diff --check
+  cd3fd1e58..HEAD` passed. The evaluator worktree remained clean.
+- Live PR #1446 was re-inspected read-only at head `2518791f3`: open, mergeable, draft, sole
+  `status:plan-eval`, milestone assigned, six comments. No GitHub mutation was performed.
+- No RFC, plan, worklog, context pack, phase registry, source, issue, comment, label, commit, or
+  branch was changed. This Cycle-6 append is the only filesystem mutation.
+
+PLAN-EVAL: FAIL_PLAN

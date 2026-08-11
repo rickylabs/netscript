@@ -102,7 +102,7 @@ live inside the RFC and are re-checkpointed by their own future runs).
    future implementation runs.
 4. **Constants** — slice IDs S1–S6; evidence file names fixed in briefs; RFC section anchors cited
    by plan-eval.
-5. **Commit slices** — S1–S5 as in plan.md §Commit slices, each with files + proving gate.
+5. **Commit slices** — S1–S6 as in plan.md §Commit slices, each with files + proving gate.
 6. **Deferred scope** — implementation of the selected architecture (owner-gated); issue filing
    (owner-gated); §11 P-1..P-6 staged items; §15 classified deferrals.
 7. **Contributor path** — a reader starts at the RFC abstract → §4 overview → the section for their
@@ -232,3 +232,14 @@ live inside the RFC and are re-checkpointed by their own future runs).
   Five-surface taxonomy recorded; this RFC designs none of the general frontend mechanisms. plan.md
   D-3 constraint refined; P ranges P-1..P-6.
 - Gates: `docs:links` green; `deno fmt --check` green on RFC + run-dir files.
+
+## 2026-08-11 PLAN-EVAL cycle 6 — architecture clean; record-bookkeeping findings fixed
+
+- Cycle 6 at `2518791f3`: lease/serving unification PASS; the whole D-9 amendment audit PASS (two
+  surfaces, P-6 staging, roadmap consistency, no mechanism pre-emption); "no unresolved runtime
+  architecture decision remains." FAIL_PLAN only on record integrity: plan sweep said P-1..P-5,
+  Design checkpoint said S1–S5/P-1..P-5, phase registry stale, PR body used singular "cockpit" and
+  mis-scoped item 9. All fixed here: sweep now P-1..P-6 with P-6 safe-deferral rationale; Design
+  constants/slices S1–S6 + P-1..P-6; phase registry through cycle 6; PR body reworded (two surfaces,
+  #890/#922 sufficiency scoped to surface 1 only).
+- Cycle 7 launched as the final pass.

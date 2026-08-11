@@ -1,9 +1,10 @@
 # Plan — docs-rfc-runtime-versioned-automation--supervisor
 
-Status: **LOCKED** (post owner-authorized PLAN-EVAL cycles 3–4 + fix cycles). Architecture decisions
-locked in the RFC: ownership §9; epoch consistency + complete-desired-state §5.2/5.3; fleet
-admission + leased registration §5.3; **control-plane-outage availability contract §5.3-8
-(**indefinite** last-good serving, never self-drain, idle-and-loud cold start; pinned-lookup
+Status: **LOCKED** (post owner-authorized PLAN-EVAL cycles 3–6 + fix cycles; cycle 6 found no
+unresolved architecture decision — remaining findings were record bookkeeping, fixed in this slice).
+Architecture decisions locked in the RFC: ownership §9; epoch consistency + complete-desired-state
+§5.2/5.3; fleet admission + leased registration §5.3; **control-plane-outage availability contract
+§5.3-8 (**indefinite** last-good serving, never self-drain, idle-and-loud cold start; pinned-lookup
 transient/terminal classes)**; adapter parity/narrowing §5.2; T1 enforcement contract §5.4; cron
 ownership §5.1; competitive positioning §14.1 (D-8 study: adopted patterns / non-goals /
 differentiators; benchmark gates §13.1; P-5 staged). PLAN-EVAL (Sol·xhigh, D-2): cycles 1–4 all
@@ -92,11 +93,15 @@ Must-resolve-now items are **resolved in the RFC** (ownership §9; activation co
 replica admission §5.3; store parity §5.2; T1 contract §5.4; cron ownership §5.1). Remaining open
 decisions, each classified: naming → defer to A0 (safe; spelling only); two-person activation
 default → defer to A2b (policy hook exists either way); retention defaults → defer to A3b
-(conservative caps shipped behind config). P-1..P-5 deferred with entry criteria (§11). The cycle-3
+(conservative caps shipped behind config). **P-1..P-6 deferred with entry criteria (§11)** — P-6
+(DevTools RFC, owner directive D-9) is safe to defer because its rationale, the stable contracts it
+consumes (A2b management, A3b history, A2d convergence, §7 OTel vocabulary), and its entry criterion
+(after those land) are explicit in RFC §11, and no runtime slice depends on its outcome. The cycle-3
 must-resolve item — execution-plane availability during control-plane outage + pinned-lookup failure
-classes — is **resolved** in §5.3 steps 6/8 (indefinite last-good serving with no expiry transition,
-transient-vs-terminal classification, revision cache). No open decision forces rework if deferred as
-classified.
+classes — is **resolved** in §5.3 steps 6–8 (indefinite last-good serving with no expiry transition;
+local validation gates serving, currentness gates convergence; transient-vs-terminal classification;
+revision cache). The two-frontend boundary (D-9) is **decided** in §8.2. No open decision forces
+rework if deferred as classified.
 
 ## Commit slices (docs-only run; files + proving gate per slice)
 
