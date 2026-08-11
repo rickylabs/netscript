@@ -12,10 +12,15 @@ if (!Array.isArray(rawSpecifiers) || !rawSpecifiers.every((value) => typeof valu
   throw new Error('Configured plugin manifest loader requires an array of module specifiers.');
 }
 
+/** Narrow an imported module to the record shape the shared resolver consumes. */
+function isModuleNamespace(value: unknown): value is Readonly<Record<string, unknown>> {
+  return value !== null && typeof value === 'object';
+}
+
 const manifests = [];
 for (const specifier of rawSpecifiers) {
   const imported: unknown = await import(specifier);
-  if (!imported || typeof imported !== 'object') {
+  if (!isModuleNamespace(imported)) {
     throw new Error(`Plugin spec "${specifier}" does not export a plugin manifest.`);
   }
   const manifest = resolveExportedPluginManifest(imported);

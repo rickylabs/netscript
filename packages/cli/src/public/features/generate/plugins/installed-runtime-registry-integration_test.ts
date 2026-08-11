@@ -34,10 +34,17 @@ if (import.meta.main) {
 }
 `;
 
-Deno.test('generated trigger registry loads valid definitions and excludes scaffold runtime glue', async () => {
+Deno.test('generated trigger registry loads definitions and excludes control-plane and runtime modules', async () => {
   await withTempProject(async (projectRoot) => {
     await writeWorkspaceProject(projectRoot, ['plugin-triggers'], {
       'triggers/generic-inbound-webhook.ts': VALID_TRIGGER,
+      'triggers/plugin.ts': `
+export const triggersPlugin = {
+  name: '@netscript/plugin-triggers',
+  version: '0.0.5',
+  contributions: {},
+};
+`,
       'triggers/runtime.ts': RUNTIME_GLUE,
     });
     const generate = createInstalledRuntimeRegistryGenerator({
@@ -52,6 +59,9 @@ Deno.test('generated trigger registry loads valid definitions and excludes scaff
     assert(module.registry instanceof Map);
     assertEquals(module.registry.has('generic-inbound-webhook'), true);
     assertEquals(module.registry.size, 1);
+    const source = await Deno.readTextFile(join(projectRoot, TRIGGER_REGISTRY_PATH));
+    assertEquals(source.includes('triggers/plugin.ts'), false);
+    assertEquals(source.includes('triggers/runtime.ts'), false);
   });
 });
 

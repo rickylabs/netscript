@@ -2,7 +2,6 @@ import { join } from '@std/path';
 
 import { GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
-import type { RunContext } from '../../../domain/run-context.ts';
 import { cli, commandGate, denoCommand } from './gate-factory.ts';
 
 /** Create gates for the configured-module and service-less plugin contracts. */

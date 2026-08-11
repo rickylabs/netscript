@@ -26,7 +26,15 @@
       "dir": "triggers",
       "registryPath": ".netscript/generated/plugin-triggers/triggers.registry.ts",
       "fileSuffixes": [".ts"],
-      "exclude": ["_jobs.ts", "_registry.ts", "mod.ts", "types.ts", "csv-import-trigger.ts", "runtime.ts"],
+      "exclude": [
+        "_jobs.ts",
+        "_registry.ts",
+        "mod.ts",
+        "plugin.ts",
+        "types.ts",
+        "csv-import-trigger.ts",
+        "runtime.ts"
+      ],
       "registryKey": "id",
       "varPrefix": "trigger",
       "typeImport": {

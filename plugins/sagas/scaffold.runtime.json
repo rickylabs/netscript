@@ -19,7 +19,7 @@
       "dir": "sagas",
       "registryPath": ".netscript/generated/plugin-sagas/sagas.registry.ts",
       "fileSuffixes": ["-saga.ts"],
-      "exclude": ["_registry.ts", "mod.ts", "types.ts"],
+      "exclude": ["_registry.ts", "mod.ts", "plugin.ts", "types.ts"],
       "registryKey": "id",
       "varPrefix": "saga",
       "typeImport": {
