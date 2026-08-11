@@ -35,18 +35,56 @@
 | **B — Discovery corpus** | Multi-surface deep search across repo source, docs, and external/market solutions; structured per-topic outputs; drift-candidate ledger → committed corpus, every claim cited | Opus 5 · high + `claude_workflow` (Opus 5 · low) with `workflow.js` committed before execution | `active` |
 | **C — Synthesis** | Supervisor reads the **full** corpus; synthesis naming deep-dive topics + resolutions of delegated decisions → committed `research.md` | Opus 5 · high | `planned` |
 | **D — Deep-dive packs** | One focused sub-agent per topic; each returns `proposal` + `epic-and-issues` (draft text only) + `agent-briefs` + `open-questions` → committed `design/<topic>/` | Fable 5 · medium (`deep_analysis`) | `planned` |
-| **D2 — Design/UX pass** | Mandatory major-UI/UX design route + optional vision-evidence lane → `design/ux-evidence/` with per-finding dispositions | GLM 5.2 · xhigh (`major_ui_ux_design`); Kimi K3 vision conditional | `planned` |
+| **D2 — Design/UX pass** | Mandatory major-UI/UX route + optional vision-evidence lane → `design/ux-evidence/` with per-finding dispositions | GLM 5.2 · xhigh — **`major_ui_ux_adversarial_review`**, not `major_ui_ux_design` (see note); Kimi K3 vision conditional | `planned` — **sequenced after the stage-E RFC draft** |
 | **E — Plan lock + RFC** | Canonical RFC + integrated `plan.md`: locked decisions, numbered owner-fork sweep, cross-epic DAG, milestone train, risk register, gate matrix → PR body refreshed + stage comment | Opus 5 · high | `planned` |
 | **F — Adversarial** | Unoriented review of the locked plan on a model distinct from every authoring lane; severity-tagged findings → findings file + per-finding disposition + fix commits | distinct-model reviewer, then Opus 5 · high | `planned` |
 | **G — PLAN-EVAL** | Separate-session verdict of record → `plan-eval.md` = `PASS`. **Hard stop**: no stage H before PASS | Codex · GPT-5.6 Sol · high, fresh daemon-attached session, own worktree | `planned` |
 | **H — Ratify + file** | Owner decision brief (numbered forks) → owner picks → one-shot filing from a committed manifest → `FILING-LOG.md` + supersession map | owner, then Opus 5 · high | `blocked` (owner gate) |
 | **I — Handoff** | Implementation lanes launched from GitHub + the design packs, not this run's chat history; per-epic briefs carry `use harness` + a `## SKILL` chapter | Opus 5 · high | `planned` |
 
-## Stage-D topic fan-out (provisional)
+### Stage-D2 lane correction, recorded 2026-08-11
 
-Topics are **finalized at stage C** from the corpus, not guessed at bootstrap. The provisional set
-below maps the charter's twelve questions onto focused packs so the fan-out is reviewable early; it
-will be amended in place when stage C lands.
+`lane-policy.md` offers two GLM routes for major UI/UX work: `major_ui_ux_design` when GLM **leads**
+the design, and `major_ui_ux_adversarial_review` as the **minimum when another lane leads**. In this
+run the design is led by the Opus supervisor and the Fable stage-D packs, so the correct binding is
+**`major_ui_ux_adversarial_review`**. Recording this rather than defaulting to the lead route, since
+the charter names both and the distinction changes what the pass is for.
+
+Consequence: the pass is sequenced **after** the stage-E RFC draft exists — an adversarial design
+review needs a design to review. Running it at stage D against research notes would produce
+generic advice and would misrepresent the lane. The transport caveat (tools + streaming, **no
+reasoning trace**) is pre-registered as `drift.md` D-3 so no downstream artifact can cite it as
+reasoning evidence.
+
+## Stage-D topic fan-out — **finalized at stage C**
+
+Eleven provisional topics collapsed to **eight** after the full-corpus read: `T4-boundaries` closed
+outright (charter Q4 answered by #1446's decision sentence, Q5 answered by the fetched Aspire
+`.razor` deep-link evidence — both become *constraints* carried into T1/T8, not open topics), and
+`T11-staged-rfcs` folded into `T8`. `T10-packaging-and-roadmap` (Q11) is **not** a topic: it is the
+integration output the supervisor assembles at stage E from every pack.
+
+| Topic | Charter Qs | Lane | Status |
+| --- | --- | --- | --- |
+| `T1-host-shape` | Q1 | Fable 5 · medium | `active` |
+| `T2-contribution-family` | Q2 | Fable 5 · medium | `active` |
+| `T3-contribution-kinds` | Q3 | Fable 5 · medium | `active` |
+| `T5-data-plane` | Q6 | Fable 5 · medium | `active` |
+| `T6-trust-model` | Q7 | Fable 5 · medium | `active` |
+| `T7-build-dev` | Q8 + surface #3 | Fable 5 · medium | `active` |
+| `T8-ia-and-staging` | Q9, Q12 | Fable 5 · medium | `active` |
+| `T9-supersession` | Q10 | Fable 5 · medium | `active` |
+
+<details>
+<summary>Superseded provisional set (kept for provenance)</summary>
+
+The bootstrap-time guess mapped the twelve charter questions onto eleven topics: `T1-host-shape`,
+`T2-contribution-family`, `T3-contribution-kinds`, `T4-boundaries`, `T5-data-plane`,
+`T6-trust-model`, `T7-build-dev`, `T8-information-architecture`, `T9-supersession`,
+`T10-packaging-and-roadmap`, `T11-staged-rfcs`. Amended above once the corpus showed which questions
+the evidence had already closed.
+
+</details>
 
 | Topic | Charter questions covered | Status |
 | --- | --- | --- |
