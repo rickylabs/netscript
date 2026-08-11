@@ -131,3 +131,29 @@ designs live inside the RFC and are re-checkpointed by their own future runs).
   resolved (task@1 has no schedule; scheduled trigger is the only operator cron surface);
   F9 roadmap re-sliced A0–A8 into PR-sized slices with files + gate classes and corrected edges.
 - Gates re-run after fixes: `docs:links` green; `deno fmt --check` clean on RFC.
+
+## 2026-08-11 PLAN-EVAL cycle 2 — FAIL_PLAN; corrected fix set applied; escalation point reached
+
+- Cycle 2 verdict appended by the same Sol·xhigh evaluator thread at `382795e4a`: FAIL_PLAN.
+  Root causes split in two: (a) three cycle-1 fixes had silently no-opped (drift D-7 — my patch
+  strings missed the fmt-rewrapped text), so F2/F3/F6 were evaluated against the OLD text; (b)
+  genuinely new findings: complete-desired-state snapshot semantics, cross-engine dispatch race
+  (trigger@N+1 → worker@N), admission time-of-check gap, contract-owning slice missing, gate-set
+  completeness (fitness/publish per slice; release class for scaffold-changing cleanup),
+  file-level §10 inventory, PR-surface reconciliation (labels/DoD/claims).
+- Full corrected fix set applied WITH per-edit verification (assert-on-miss + grep audit):
+  §5.1 contracts bullet (no ports/state machine; management contract added); §5.2 ports/adapters
+  in runtime core; epoch = complete active desired state w/ carry-forward, tombstones, idempotent
+  reactivation; §5.3 steps 6–7: revision-pinned cross-engine dispatch + leased registration with
+  rejoin validation; blunt T1 perimeter paragraph; TM1/TM2 corrected (no "jail" overclaim);
+  TM8 narrowed + TM9 added w/ loader policy + A2a proving gate; §9 DECIDED/binding, fallback
+  withdrawn at equal fidelity; O4 row corrected; §10 file-level disposition table (incl. plugin
+  runtime-config-topic axis, trigger registry path, Windows emitters, T0 boundary); §12 re-sliced
+  (A2b split into A2b/A2d; A6 into A6a/A6b/A6c w/ release class on A6b; ports moved to A1a; full
+  gate letters; A7 edges incl. A2d); jsr-audit pre-scan recorded (slow-type risks named);
+  E2E-2 expectedEpoch; E2E-5 per-runtime honesty pins; survey extract committed to
+  `evidence/sandbox-isolation-survey.md` (was uncommitted `.llm/tmp`).
+- Gates re-run: `docs:links` OK; `deno fmt --check` clean.
+- **Protocol stop:** two FAIL_PLAN cycles consumed → escalate to owner per
+  `evaluator/plan-protocol.md` (no automatic third cycle). Fix state is complete and pushed; the
+  owner may authorize PLAN-EVAL cycle 3 or review directly.

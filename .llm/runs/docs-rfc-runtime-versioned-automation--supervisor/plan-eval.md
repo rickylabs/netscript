@@ -63,3 +63,71 @@ Safe to defer only with the RFC's stated entry criteria: P-1 through P-4 (`rfc-0
 - No RFC/source edits, commits, pushes, issue mutations, labels, or PR comments were performed by this evaluator.
 
 PLAN-EVAL: FAIL_PLAN
+
+## Cycle 2
+
+- Plan evaluator session: same dedicated Codex GPT-5.6 Sol · xhigh evaluator session / 2026-08-11 (owner override D-2), fresh judgment at Cycle-2 commit
+- Evaluator worktree: `/home/codex/repos/ns-rfc-plan-eval`, branch `eval/rfc-runtime-versioned-automation`, clean at `382795e4a87891c21a602d7874e24db3db10ded9`
+- Author worktree: `/home/codex/repos/ns-rfc-runtime-versioned-automation`, clean at the same commit before this verdict append
+- Surface / archetype: docs RFC planning future ARCHETYPE-1/2/3/5/6 package, runtime, plugin, and CLI waves
+- Scope overlays: `SCOPE-docs`; adversarial RFC architecture review; no implementation evaluation
+
+### Cycle-1 finding resolution audit
+
+| Cycle-1 finding | Cycle-2 result | Evidence |
+| --- | --- | --- |
+| F1 — Design checkpoint, context pack, PR reconciliation | PARTIAL | `worklog.md:86-108` now has `## Design`, and `context-pack.md:1-25` exists. The live PR body is updated, but it and the Cycle-1 comment assert decisions/fixes that the RFC does not contain; the PR still carries `status:research` while its body says Plan & Design is ready and Cycle 2 is running. |
+| F2 — lock O2+O4 ownership | FAIL | §9 still calls O2+O4 a recommendation and explicitly keeps the no-connector fallback available to this evaluator (`rfc-0001-runtime-versioned-automation.md:460-467`), contradicting §15's claim that ownership is locked (`:594-597`). |
+| F3 — doctrine-valid archetypes / thin connector | FAIL | ARCHETYPE-1 still owns the lifecycle state machine and store/boundary/reload ports (`:193-195`, `:460-464`), contrary to the no-DI/no-adapter, types-and-small-invariants boundary (`docs/architecture/doctrine/06-archetypes.md:13-39`). §9 also still assigns Postgres/KV adapters to the connector (`rfc-0001-runtime-versioned-automation.md:452-464`), contradicting §5.2 and A1a/A1b, which put them in `automation-runtime` (`:252-255`, `:513-515`). |
+| F4 — activation-set/fleet consistency and adapter parity | FAIL | Monotonic epochs and adapter narrowing were added (`:264-290`, `:294-318`), but the manifest is described as only the entries/families an activation “touches,” while a snapshot contains only “every entry” in that manifest (`:264-272`, `:294-304`). It is not specified as the complete desired state, so a one-definition activation either drops untouched definitions on swap or requires an unspecified merge. More importantly, replicas apply asynchronously: a trigger replica at N+1 can enqueue `taskId` while a worker at N resolves that ID from its current snapshot (`:309-322`), so cross-family visibility is not fleet-atomic. |
+| F5 — honest T1 contract | PARTIAL | J2, §5.4, and E2E-5 now correctly say non-Deno T1 grants are not enforced (`:61-66`, `:329-351`, `:549-552`). The threat table regresses to “T1 env/cwd jail” and “entrypoint resolution jailed” (`:378-380`) even though §5.4 expressly says entrypoint-root resolution is not an OS jail (`:342`). |
+| F6 — C8 and security guarantee narrowing | FAIL | DB/transport/redaction trust assumptions were added (`:387-396`), but §6 has TM1–TM8 only (`:372-385`). It never models #1444's control-plane child loader executing consumer code with `--allow-read --allow-net`, never states the promised lockfile/`--cached-only` loader policy, and has no capability-prompt deferral or acceptance gate required by `1444-impact.md:76-80`. `plan.md:72`, `worklog.md:125-126`, and `context-pack.md:18` falsely claim TM9 exists. |
+| F7 — evidence claim strength | PASS | The abstract is scoped to the two inspected commits (`rfc-0001-runtime-versioned-automation.md:15-28`), partial KV/operator surfaces and #1444's draft state are acknowledged (`:96-113`), and Appendix A now distinguishes Deno/shell proof from five implemented-unproven adapters (`:610-619`). Focused `rtk grep` and `deno doc` spot-checks reconfirmed the disconnected runtime-config surface and the `RuntimeTask`/`TaskDefinition` mismatch. |
+| F8 — complete clean-break inventory / cron ownership | FAIL | `task@1` no longer owns scheduling, so the new operator cron path is resolved without deleting the live T0 `.schedule()` surface (`:241-248`). The §10 inventory remains incomplete: it does not disposition the current `runtime-config-topic` contribution axis/builder (`packages/plugin/src/domain/constants.ts:15-40`, `packages/plugin/src/config/domain/plugin-contributions.ts:11-37`, `packages/plugin/src/config/builders/plugin-builder.ts:204-216`), workers project-file discovery/direct execution (`plugins/workers/src/cli/local-runtime-backend.ts:276-319`), or generated trigger-registry loader/fallback (`plugins/triggers/src/runtime/project-trigger-registry.ts:6-39`, `:69-95`). Saga emissions, trigger enabled-state retirement, and Windows env-key cleanup appear only as broad roadmap phrases, not as the promised exact §10 inventory (`rfc-0001-runtime-versioned-automation.md:469-490`, `:520-525`). |
+| F9 — PR-sized roadmap, gates, dependencies | FAIL | The table is improved, but A2b still combines lifecycle, two propagation modes, and fleet admission across package/plugin roots; A6 is a repository-wide package/CLI/scaffold/Windows/docs/test purge; neither is credibly PR-sized (`:517-525`). The gate mapping is incomplete: A1b/A1c omit required fitness, publishability, and consumer gates; A2b omits fitness/publishability; A6 changes scaffold output but selects only `scaffold-static`, not the mandatory release-gate class (`:503-528`; `archetype-gate-matrix.md:20-40`, `:60-76`). A0 also does not name the oRPC management contract later “hosted” by A2a (`rfc-0001-runtime-versioned-automation.md:418-420`, `:512-517`). |
+
+### Checklist results
+
+| Plan-Gate item | Result | Evidence / location |
+| --- | --- | --- |
+| Research present and current | PASS | `research.md:6-13` and `evidence/current-state-matrix.md:22-26` name and rebaseline the current source baseline. I repeated focused tree searches and `deno doc` checks. Live #922 children #923–#934 and draft PR #1446 were re-inspected on 2026-08-11. |
+| Decisions locked | FAIL | Ownership is simultaneously “locked,” a recommendation, and subject to a fallback (`plan.md:3-6`; RFC `:460-467`, `:594-597`). The activation-set state model and fleet-atomic behavior are also not decided sufficiently to implement. |
+| Open-decision sweep | FAIL | `plan.md:77-84` declares no must-resolve decision open, but the evaluator sweep below finds decisions that change package boundaries and persisted/dispatch contracts. |
+| Commit slices (< 30, gate + files each) | FAIL | The current docs-only S1–S5 list is adequate (`plan.md:86-99`), but the RFC's implementation roadmap—the plan being ratified—is not independently landable at A2b/A6 and omits a contract-owning slice (`rfc-0001-runtime-versioned-automation.md:510-528`). |
+| Risk register | FAIL | It names the relevant categories, but its child-loader mitigation cites nonexistent TM9/gates (`plan.md:72`), and its partial-activation mitigation does not cover asynchronous cross-engine replicas or complete-snapshot semantics (`:65-68`). |
+| Gate set selected | FAIL | §12's abbreviations are defined, but multiple package/plugin slices omit matrix-required fitness, consumer, and publishability gates; scaffold-changing A6 omits the release-gate class (`rfc-0001-runtime-versioned-automation.md:503-528`; `archetype-gate-matrix.md:20-40`, `:60-76`). |
+| Deferred scope explicit | PASS | P-1–P-4 have rationale and entry criteria (`rfc-0001-runtime-versioned-automation.md:492-499`), and §15 classifies naming, two-person default, and retention (`:579-597`). |
+| jsr-audit surface scan (pkg/plugin) | FAIL | Naming `P`/`jsr-audit` as a future gate is not the required pre-slice application of the rubric to the planned public surfaces. No slow-type/export/import-permission risk scan is recorded, and several public package/plugin slices omit `P` entirely (`plan-gate.md:32-34`; RFC `:503-528`). |
+
+### Open-decision sweep (evaluator-run)
+
+The following remain **must resolve now** because deferral changes package boundaries or runtime correctness:
+
+1. Decide whether O2+O4 is binding or whether the fallback remains live. If binding, put lifecycle/runtime ports and adapters in a doctrine-valid runtime/integration core and make every §9/PR statement agree that the connector composes them only.
+2. Define an epoch snapshot as the complete active desired state, including carry-forward and disable/delete semantics, or explicitly define a deterministic merge protocol. Then close the cross-replica task/trigger race with revision/epoch-pinned dispatch or a rollout barrier; per-replica monotonic application is not fleet atomicity.
+3. Define how fleet admission treats temporarily absent/stale registrations and schema downgrade/rollback. “Registered live replica” admission has a time-of-check gap when an old replica rejoins after activation.
+4. Decide and slice the management oRPC contract owner before A2a, rather than having a plugin host a contract no preceding slice creates.
+
+The package spelling, two-person default, retention defaults, and P-1–P-4 remain safe to defer under the RFC's stated entry criteria once the above are resolved.
+
+### Verdict
+
+`FAIL_PLAN`
+
+### If FAIL_PLAN — required fixes
+
+1. **[BLOCKER] Make ownership genuinely singular and doctrine-valid.** Remove the live fallback or fully choose it; move store/boundary/reload ports out of the ARCHETYPE-1 contract package, keep store adapters and lifecycle behavior in an ARCHETYPE-2/3 core, and remove every statement assigning those adapters to `plugins/automation`. Reconcile §5.1, §5.2, §9, §12, §15, the plan/worklog/context pack, and PR body/comment.
+2. **[BLOCKER] Close the remaining activation races.** Specify that each epoch snapshot materializes the complete active set; define carry-forward, disable/delete, idempotent reactivation, and rollback semantics. Add a protocol that prevents a trigger at epoch N+1 from dispatching by bare ID to a worker at N (for example revision/content-hash-pinned messages with immutable lookup, or a proven activation barrier). Add absent/rejoining replica admission semantics and correct E2E-2's stale `expectedActiveRevision` to the RFC's `expectedEpoch` contract (`rfc-0001-runtime-versioned-automation.md:264-290`, `:294-322`, `:541-543`).
+3. **[BLOCKER] Actually honor C8 and remove the T1 jail overclaim.** Add a control-plane loader threat covering consumer-controlled module execution with read/network access, lockfile and cached-only behavior, cold-cache failure/allow policy, capability-prompt staging, and a proving gate. Replace “env/cwd jail”/“resolution jailed” in TM1/TM2 with the actual controls. Cite durable primary evidence; the RFC's `.llm/tmp/docs/sandbox-isolation-survey-2026-08.md` reference (`:346`) is absent from the evaluator worktree and is not a reviewable committed/run artifact. Official Deno documentation confirms subprocesses run independently of the parent permission sandbox and that `--cached-only` only requires dependencies to be cached.
+4. **[BLOCKER] Finish §10 as a file-level replacement inventory.** Include the plugin runtime-config contribution axis/builder/public exports, generated trigger registry/fallback and its generation path, workers project-file discovery/direct execution, saga sample/schema emissions, trigger KV enabled-state port/store, all Windows/environment emitters, tests, generated docs/assets, and the exact retained T0 job surface. Give each keep/fold/delete/rewrite disposition and one owning slice.
+5. **[BLOCKER] Re-slice and select every required gate.** Split A2b and A6 into reviewable PRs; add the management contract to A0 or a preceding explicit slice; apply all archetype-required fitness/publish/consumer/runtime gates to every touched public package/plugin; and assign the full release-gate class to scaffold/DB/Aspire/published-CLI changing slices. Record the jsr-audit rubric findings, including slow-type and public-export risks, before those slices are authorized.
+6. **[HIGH] Reconcile the live review surface.** The PR body and Cycle-1 comment must not say “all findings addressed,” “ownership locked,” “connector composition only,” or “TM1–TM9” until the RFC says those things. Add the canonical checkable Definition of Done and Drift/Debt sections required by `netscript-pr`, use structured phase tokens, and advance the sole `status:` label from stale `status:research` to the actual phase when the supervisor posts the next phase comment. Keep the PR draft and do not claim ready-for-review contrary to `plan.md:55`.
+
+### Notes
+
+- The revised RFC still correctly preserves D-10, the clean-break/no-compat direction, the frontend dependency cut (#923–#932 plus #934, with #933 as the adjacent dogfood surface), the narrowed development-KV posture, and the honest core statement that non-Deno T1 grants are unenforced.
+- The live GitHub PR body, all three comments, labels, draft state, and #922 child issue states were re-inspected. No GitHub mutation was performed.
+- No RFC, plan, worklog, context-pack, source, or other file was edited. No commit or push was made. This append is the only Cycle-2 filesystem mutation.
+- This is the second `FAIL_PLAN`; per `plan-protocol.md:52-55` the unresolved blockers now escalate to the owner rather than entering an automatic third fix cycle.
+
+PLAN-EVAL: FAIL_PLAN

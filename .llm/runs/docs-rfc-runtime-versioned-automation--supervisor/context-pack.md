@@ -17,9 +17,9 @@ Resume here. State as of 2026-08-11 (post PLAN-EVAL cycle 1 fix).
   three-package ownership (automation-core contracts / automation-runtime behavior+adapters /
   thin connector plugin) — LOCKED; T1 honesty contract; TM1–TM9; cleanup inventory; slices
   A0–A8 with files+gates; E2E model; P-1..P-4 staged RFCs.
-- **Eval state**: cycle 1 FAIL_PLAN (9 findings) → all fixed (see worklog). Cycle 2 pending =
-  next action: relaunch Sol·xhigh evaluator (worktree `/home/codex/repos/ns-rfc-plan-eval`,
-  thread registry may require resume of `019fef2b-3b13-7bd2-a07e-24a4d9db03fc`); two-FAIL limit
-  then owner escalation.
+- **Eval state**: cycle 1 FAIL_PLAN → fix cycle (3 edits silently no-opped, drift D-7); cycle 2
+  FAIL_PLAN (old text + new findings) → corrected fix set applied with per-edit verification and
+  pushed. **Two-FAIL protocol stop reached: owner escalation pending** — owner authorizes cycle 3
+  (resume thread `019fef2b-…03fc` in `/home/codex/repos/ns-rfc-plan-eval`) or reviews directly.
 - **Hard rules**: draft PR only; no issue filing; no ready-for-review until owner ratifies;
   never write in ns-1443 worktree or netscript-start-ref.

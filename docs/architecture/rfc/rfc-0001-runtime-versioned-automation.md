@@ -191,8 +191,10 @@ registries; nothing is hardcoded per plugin. RFC #890's specific contracts are *
 _pattern_ is:
 
 - **New ARCHETYPE-1 contracts package** (working name `@netscript/automation-core`; final name at
-  implementation): serializable types + Zod schemas + the lifecycle state machine + ports. No engine
-  code, no fresh/preact/DB deps, JSR-clean.
+  implementation): serializable types, the Zod family schemas, the family envelope, the **management
+  oRPC contract**, the lifecycle state-transition table (as data), and the error vocabulary. **No
+  engine code, no ports, no adapters**, no fresh/preact/DB deps, JSR-clean — types and small
+  invariants only, the same boundary `@netscript/plugin-frontend-core` holds.
 - **Family-versioned envelope.** A `DefinitionFamilyDescriptor` identifies `(family, major)` —
   initial families `task@1` (workers) and `trigger@1` (triggers). A plugin declares the families it
   owns via a **declarative manifest field** (per `1444-impact.md` C2/C3: data, additively
@@ -249,12 +251,13 @@ neither preempts it nor adds a third cron path.
 
 ### 5.2 Definition store — immutable revisions, atomic activation, real audit
 
-**Port + adapters (port types in the contracts package; behavioral adapters in the runtime core
-package — §9, per the thin-connector law and the recorded adapter-relocation debt).** The system of
-record is the **project database (Postgres)** in production; a **KV adapter** serves local
-development and DB-less scaffolds. The filesystem is demoted from source of truth to **interchange
-format**: `netscript automation export/import` moves definition sets as git-friendly JSON for review
-workflows, but the running system never watches files.
+**Port + adapters — both live in the runtime core package `@netscript/automation-runtime` (§9), per
+the thin-connector law and the recorded adapter-relocation debt; the contracts package carries only
+the data shapes they exchange.** The system of record is the **project database (Postgres)** in
+production; a **KV adapter** serves local development and DB-less scaffolds. The filesystem is
+demoted from source of truth to **interchange format**: `netscript automation export/import` moves
+definition sets as git-friendly JSON for review workflows, but the running system never watches
+files.
 
 Store semantics (all families, uniformly):
 
@@ -270,6 +273,11 @@ Store semantics (all families, uniformly):
   trigger revision can never become visible before the task revision it references (referential
   validation runs at commit); there is no whole-directory pointer whose promotion can outrun its
   content (legacy defect §2.5), and no per-family snapshot that can be observed out of order.
+  **Every epoch materializes the complete active desired state**: entries the activation does not
+  touch are carried forward automatically by the store into the new epoch's snapshot (operators
+  activate deltas; replicas only ever see totals). Disable is a carried flag on the active revision;
+  removal is an explicit tombstone entry in the set; re-activating the already-active revision is an
+  idempotent no-op that issues no new epoch.
 - **Rollback = activate an older revision.** Nothing is ever deleted by rollback; retention is a
   policy on drafts and execution history only.
 - **Audit is an append-only event stream** on the same transaction: actor identity (from the auth
@@ -320,6 +328,19 @@ bodies of every entry, content-addressed as a whole. Replica convergence:
    (scheduled-trigger adapters refresh timers — fixing "timers load once", evidence §2.3; trigger
    processors re-install definitions). Executors need nothing: they resolve definitions per dispatch
    from the current snapshot, the one property the legacy KV path already had right.
+6. **Cross-engine dispatch is revision-pinned, not name-pinned.** Convergence is asynchronous, so a
+   trigger replica at epoch N+1 may enqueue work while a worker replica still runs epoch N. Trigger
+   actions therefore enqueue `(taskId, revision, contentHash)` — never a bare id — and the worker
+   dispatcher resolves the **pinned revision** from the immutable revision store (cache-through;
+   revisions never change, so the lookup is always safe) regardless of its own epoch. A worker that
+   cannot fetch the pinned revision dead-letters the message loudly instead of guessing. Fleet
+   atomicity is therefore not required for correctness — only for freshness, which convergence
+   tracking already bounds.
+7. **Registration is leased.** Replica registrations carry a heartbeat TTL. Admission (step 4)
+   evaluates replicas with live leases; a replica whose lease lapsed must re-register and **validate
+   the current snapshot before serving** — if its schema majors cannot accept it, it stays drained
+   (last-good only, loud) rather than silently serving stale definitions. This closes the
+   time-of-check gap between admission and a stale replica rejoining.
 
 Multi-instance single-fire semantics for schedules and file-watches (leader lease vs distributed
 lock vs queue-native delay) is **staged** — see §11 prerequisite RFC P-1. Until it lands, the
@@ -343,12 +364,18 @@ differentiator). The redesign separates what the legacy code conflated:
 | T2   | Untrusted / multi-tenant / marketplace definitions | **container / microVM boundary** | gVisor or Firecracker-class isolation behind the same port; staged (§11 P-2) — required before any marketplace or tenant-facing story                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | T3   | Capability-scoped pure compute                     | **WASM/WASI component**          | staged research (§11 P-2); attractive (sub-ms start, deny-by-default ABI) but polyglot-incomplete                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 
-Grounding (run extract `.llm/tmp/docs/sandbox-isolation-survey-2026-08.md`): Deno's own security
+Grounding (run evidence `evidence/sandbox-isolation-survey.md`, committed in the run dir, plus
+Deno's primary documentation — https://docs.deno.com/runtime/fundamentals/security/ and
+https://docs.deno.com/runtime/reference/permissions/#subprocesses): Deno's own security
 documentation states `--allow-run` subprocesses escape the permission sandbox and recommends OS or
 VM isolation for genuinely untrusted code — so T1 is honest about being a _scoping_ boundary for
 semi-trusted operator content, and T2 exists as a port adapter rather than a bespoke sandbox. A
 child process with Deno flags is a permission scope, **not** a tenancy boundary; the RFC never
-claims otherwise.
+claims otherwise. Stated once, bluntly: **T1's enforceable perimeter is exactly (a) Deno-runtime
+permission flags, (b) environment content, (c) resolution-time path confinement, (d) lifetime and
+resource caps.** Everything else at T1 — filesystem/network scoping for native runtimes — is a
+declared, audited intent that only T2 can enforce. The management API surfaces each definition's
+tier so this is a visible operational fact, not fine print.
 
 Reliability semantics (uniform, in the dispatcher not the adapters): deadlines enforced by the
 boundary; **retry driven by the queue's native nack/redelivery** — the dispatcher rethrows task
@@ -373,16 +400,17 @@ concurrency caps and per-family quotas.
 
 Assets: host integrity, project data, secrets, stack availability, audit integrity.
 
-| #   | Threat                                                    | Vector                                                    | Mitigation (§)                                                                                                                                                 |
-| --- | --------------------------------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TM1 | Malicious/compromised operator publishes a hostile task   | Management API                                            | RBAC + two-person activation (5.5); capability deny-by-default (5.4); T1 env/cwd jail; T2 for untrusted tenancy; full audit (5.2)                              |
-| TM2 | Task escapes its scope                                    | `--allow-run`/FFI, host env, path traversal in entrypoint | capabilities grammar forbids `run`/`ffi` at T1 by default; entrypoint resolution jailed to bundle root (5.1); `clearEnv` (5.4); T2 boundary for real hostility |
-| TM3 | Poisoned definition alters behavior in flight             | store tampering, snapshot MITM                            | immutable content-addressed revisions; snapshot hash verification before swap (5.3); DB as single writer                                                       |
-| TM4 | Replay/duplication floods workers                         | webhook replay, replica double-fire                       | trigger idempotency keys + KV claims (proven engine, 5.4); single-fire staging constraint (5.3); per-family quotas                                             |
-| TM5 | Secret exfiltration via definitions or logs               | env dumps, history output capture                         | secrets-by-name resolution (5.5); history redaction of granted-secret env names (7); audit never stores bodies of secret values                                |
-| TM6 | Availability: runaway task starves the stack              | fork bombs, infinite loops                                | deadlines + kill-tree + cgroup caps (5.4); concurrency caps; DLQ isolates poison messages                                                                      |
-| TM7 | Supply chain: task pulls hostile dependencies at run time | `deno run` remote imports, pip                            | T1 Deno: `--cached-only`/`--frozen` per Deno guidance; polyglot runtimes documented as trusting their local toolchain until T2; staged marketplace trust = P-3 |
-| TM8 | Audit evasion                                             | direct DB writes, log tampering                           | audit appended in the same transaction as the mutation (5.2); management service is the only writer role in production                                         |
+| #   | Threat                                                    | Vector                                                                                       | Mitigation (§)                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| --- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TM1 | Malicious/compromised operator publishes a hostile task   | Management API                                                                               | RBAC + two-person activation (5.5); capability deny-by-default where enforceable (5.4 tier table); clearEnv + env allowlist + resolution-time path confinement at T1; T2 for untrusted tenancy; full audit (5.2)                                                                                                                                                                                                                                        |
+| TM2 | Task escapes its scope                                    | `--allow-run`/FFI, host env, path traversal in entrypoint                                    | capabilities grammar forbids `run`/`ffi` at T1 by default (Deno-enforced); entrypoint-root confinement at resolution time — not an OS jail (5.4); `clearEnv` (5.4); non-Deno scope escape is possible by design at T1 (unenforced grants, 5.4) — T2 boundary for real hostility                                                                                                                                                                         |
+| TM3 | Poisoned definition alters behavior in flight             | store tampering, snapshot MITM                                                               | immutable content-addressed revisions; snapshot hash verification before swap (5.3); DB as single writer                                                                                                                                                                                                                                                                                                                                                |
+| TM4 | Replay/duplication floods workers                         | webhook replay, replica double-fire                                                          | trigger idempotency keys + KV claims (proven engine, 5.4); single-fire staging constraint (5.3); per-family quotas                                                                                                                                                                                                                                                                                                                                      |
+| TM5 | Secret exfiltration via definitions or logs               | env dumps, history output capture                                                            | secrets-by-name resolution (5.5); history redaction of granted-secret env names (7); audit never stores bodies of secret values                                                                                                                                                                                                                                                                                                                         |
+| TM6 | Availability: runaway task starves the stack              | fork bombs, infinite loops                                                                   | deadlines + kill-tree + cgroup caps (5.4); concurrency caps; DLQ isolates poison messages                                                                                                                                                                                                                                                                                                                                                               |
+| TM7 | Supply chain: task pulls hostile dependencies at run time | `deno run` remote imports, pip                                                               | T1 Deno: `--cached-only`/`--frozen` per Deno guidance; polyglot runtimes documented as trusting their local toolchain until T2; staged marketplace trust = P-3                                                                                                                                                                                                                                                                                          |
+| TM8 | Audit evasion                                             | direct DB writes, log tampering                                                              | audit appended in the same transaction as the mutation (5.2); management service is the only writer role in production; not tamper-evident against a hostile DB admin (trust assumptions below); independent audit sink staged with P-3                                                                                                                                                                                                                 |
+| TM9 | Control-plane code execution at manifest load             | configured `plugin.ts` modules run in the #1444 child loader with `--allow-read --allow-net` | per `1444-impact.md` C8: `clearEnv` child + 30s timeout (shipped in #1444); this RFC adds the loader policy — lockfile-pinned resolution with `--cached-only` as the warm-cache default, network permitted only for an explicit cold-cache install step, cold-cache failure is a loud error (never a silent fallback); capability prompt staged with P-3; proving gate: manifest load succeeds with network disabled once the cache is warm (slice A2a) |
 
 **Trust assumptions (v1, explicit):** the project database and its admins are trusted (audit is
 recorded evidence, not a tamper-proof ledger); the management-service transport is authenticated TLS
@@ -449,22 +477,48 @@ Five options were compared (per owner directive; evaluation criteria: doctrine f
 direction, JSR packaging, plugin extensibility, deployment topology, trust boundaries, DX/token
 cost, whether a central service is genuinely needed):
 
-| Option | Shape                                                                                                                                                                             | Verdict                                                                                                                                                                                       |
-| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| O1     | Extend `runtime-config` + workers/triggers in place                                                                                                                               | ✗ — preserves the split-brain and hardcoded topics; `runtime-config`'s contract (silent-empty fs snapshots) is the opposite of §5.3; retired instead                                          |
-| O2     | One framework-neutral core package (contracts, lifecycle, ports)                                                                                                                  | ✓ as the foundation — but contracts alone ship no service, storage, or UI                                                                                                                     |
-| O3     | Split contracts / control-plane / client / runtime packages day one                                                                                                               | ✗ now — speculative package multiplication before a consumer exists (doctrine anti-pattern); revisit only if dependency direction forces it                                                   |
-| O4     | Thin central **connector plugin** contributing management service, store adapters, Aspire resources, telemetry, and (post-#922) frontend — engines stay in workers/triggers cores | ✓ — matches the existing plugin contribution machinery (services, migrations, Aspire, frontend-to-be); gives the control plane a deployable home without welding it into either engine plugin |
-| O5     | No central home; host app composes axes directly                                                                                                                                  | ✗ — every consumer re-implements lifecycle/API/cockpit; the "each host re-invents discovery" failure #890 §1 already documented                                                               |
+| Option | Shape                                                                                                                                                                                                                   | Verdict                                                                                                                                                                                       |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| O1     | Extend `runtime-config` + workers/triggers in place                                                                                                                                                                     | ✗ — preserves the split-brain and hardcoded topics; `runtime-config`'s contract (silent-empty fs snapshots) is the opposite of §5.3; retired instead                                          |
+| O2     | One framework-neutral core package (contracts, lifecycle, ports)                                                                                                                                                        | ✓ as the foundation — but contracts alone ship no service, storage, or UI                                                                                                                     |
+| O3     | Split contracts / control-plane / client / runtime packages day one                                                                                                                                                     | ✗ now — speculative package multiplication before a consumer exists (doctrine anti-pattern); revisit only if dependency direction forces it                                                   |
+| O4     | Thin central **connector plugin** composing the management service, Aspire resources, migrations, telemetry, and (post-#922) frontend — adapters/ports live in the runtime core; engines stay in workers/triggers cores | ✓ — matches the existing plugin contribution machinery (services, migrations, Aspire, frontend-to-be); gives the control plane a deployable home without welding it into either engine plugin |
+| O5     | No central home; host app composes axes directly                                                                                                                                                                        | ✗ — every consumer re-implements lifecycle/API/cockpit; the "each host re-invents discovery" failure #890 §1 already documented                                                               |
 
-**Recommendation: O2 + O4.** `@netscript/automation-core` (ARCHETYPE-1: contracts, family envelope,
-lifecycle state machine, store/boundary/reload ports) plus an **automation connector plugin**
-(ARCHETYPE-5: management service, Postgres/KV store adapters, Aspire resource, cockpit contributions
-later). `plugin-workers-core` and `plugin-triggers-core` register their families and implement the
-engine-side reload/dispatch ports. The workers/triggers plugins stay thin (plugin-thinness law).
-This is the RFC's most contestable decision and is flagged for the PLAN-EVAL to attack; the fallback
-position recorded is O2 + engine-hosted management (no connector), accepted if the evaluator shows
-the connector's deployment value doesn't cover its surface cost.
+**DECIDED: O2 + O4, corrected to doctrine. This is binding; there is no live fallback.** Three
+homes, each inside its archetype's limits:
+
+1. **`@netscript/automation-core` — ARCHETYPE-1, contracts only**: family envelope, `task@1` /
+   `trigger@1` Zod schemas, the management oRPC contract, lifecycle state-transition table (data),
+   error vocabulary. No ports, no adapters, no engine code — doctrine limits ARCHETYPE-1 to types
+   and small invariants (`docs/architecture/doctrine/06-archetypes.md`).
+2. **`@netscript/automation-runtime` — ARCHETYPE-2/3 behavioral core**: the **ports**
+   (store/boundary/reload/feed), the lifecycle engine, validation pipeline, epoch/snapshot builder
+   and client, the adapter-conformance suite, and the **store adapters (Postgres, narrowed dev-KV)**
+   on `@netscript/kv`/db primitives. Port→backend adapters live in a core package — the placement
+   law the open `PLUGIN-RUNTIME-ADAPTER-RELOCATION` debt (`.llm/harness/debt/arch-debt.md`) already
+   established; this RFC follows it from day one.
+3. **`plugins/automation` — ARCHETYPE-5 thin connector, composition only**: hosts the management
+   service entry that binds the automation-core contract to automation-runtime lifecycle calls,
+   declares Aspire resources and the store migrations, re-exports the consumer surface, and
+   (post-#922) carries the cockpit frontend contributions. It owns **no adapter, no port, no
+   lifecycle logic**. Each connector axis names what it wires: service → runtime lifecycle engine;
+   migrations → runtime store schema; telemetry → core span vocabulary; frontend → management
+   contract procedures.
+
+`plugin-workers-core` / `plugin-triggers-core` register their families and implement the engine-side
+reload/dispatch ports; the workers/triggers connector plugins stay thin. The control plane's
+deployment unit is the connector's declared management service — one per stack, horizontally passive
+(any instance serves; the store serializes epochs).
+
+The previously recorded no-connector fallback is **withdrawn**, with the comparison made at equal
+fidelity: without `plugins/automation`, the management service and migrations would live in workers
+or triggers (wrong owner — each drags the other's families in, inverting dependency direction), in
+the host app (every consumer re-composes the control plane — the O5 failure #890 §1 documented), or
+in a required core service package (a deployment unit the plugin system already expresses as a
+connector). Only the connector keeps `plugins/automation →
+automation-runtime → automation-core`
+acyclic and installation optional. Naming is the sole open item (§15), deferred safely to A0.
 
 ## 10. Replacement and cleanup inventory (clean break, D-5)
 
@@ -484,6 +538,29 @@ experimental surface survives:
 | Legacy trigger cockpit contract (`triggers.contract.ts` v1, unimplemented server)                                                                                 | **Supersede** by the management contract; the trigger _engine_ contracts remain                                                                                                                                                     |
 | README/doc claims of deploy-free operator behavior (`runtime-config`, workers, triggers READMEs) + the Windows env-builder comment claiming loader/watcher wiring | **Rewrite** with the shipped reality — docs may not promise what no composition delivers (evidence: G2 "documented but unproven" list)                                                                                              |
 | Tests locking the above (e.g. the empty-`schemas` snapshot test)                                                                                                  | **Rewrite** with their surfaces; the PLAN-EVAL green-gate rule (no test deleted without recorded rationale) applies per slice                                                                                                       |
+
+**File-level dispositions** (the working checklist wave A6a–A6c executes; `del` = delete, `fold` =
+behavior moves into the new architecture then the file goes, `rw` = rewrite in place, `keep` =
+survives as-is):
+
+| Files (current repo)                                                                                                                                                                                                                                                                                                   | Disposition → owning slice                                                                                |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `packages/runtime-config/**` (loader, watcher, types, tests, README)                                                                                                                                                                                                                                                   | del → A6a                                                                                                 |
+| `packages/cli/src/kernel/ports/runtime-config-store-port.ts`, `kernel/adapters/config/runtime-config/**`, `kernel/adapters/config/runtime-override.ts`                                                                                                                                                                 | del → A6a                                                                                                 |
+| `packages/cli/src/public/features/config/override/**` (`override-group`, `runtime-lifecycle-command`, `manage-runtime-overrides` + tests)                                                                                                                                                                              | del → A6a (CLI replaced by `netscript automation`, A2c)                                                   |
+| `plugins/workers/src/cli/local-runtime-backend.ts` project-file discovery + direct-execute + `config-edit`/`config-publish`                                                                                                                                                                                            | fold (dry-run via management API; optional `automation import` authoring aid) → A5b/A6a                   |
+| `packages/plugin/src/domain/constants.ts` `runtime-config-topic` axis entry, `config/domain/runtime-config-topic-contribution.ts`, `config/domain/plugin-contributions.ts` topic wiring, `config/builders/plugin-builder.ts` topic builder, `abstracts/plugin-runtime-config-topic-contribution.ts`, public re-exports | fold → the family-declaration manifest field (§5.1) in A0/A2a, then del → A6a                             |
+| `packages/cli/src/kernel/adapters/config/plugin-registry.ts` `{ schemas: [] }` projection + `plugin-registry.test.ts` placeholder pin                                                                                                                                                                                  | rw → A6a (family-schema discovery; test rewritten with rationale)                                         |
+| `packages/cli/src/public/features/generate/runtime-schemas/**`                                                                                                                                                                                                                                                         | rw over family schemas (keep planner/duplicate-owner/dry-run behaviors) → A6a                             |
+| `plugins/workers/src/cli/official-sample-configuration.ts` runtime-tree/sample emissions (workers + sagas + triggers docs, dangling `$schema` refs) + `copy-official-plugin-samples*` tests                                                                                                                            | del emissions, rw tests → A6b                                                                             |
+| `plugins/workers/src/adapter/resources/glue/runtime.stub.ts`, `plugins/triggers/src/adapter/resources/glue/runtime.stub.ts`                                                                                                                                                                                            | rw → snapshot-client bootstrap (A3a/A4a); scaffold emission updated → A6b                                 |
+| `plugins/triggers/src/runtime/project-trigger-registry.ts` (+ `.netscript/generated/plugin-triggers/**` generation path, `triggers/mod.ts` fallback)                                                                                                                                                                   | fold → `automation import --from-registry` authoring input (A4a); load-once boot path del → A6b           |
+| Trigger KV enabled-state store + `routers/v1.ts` enable/disable backing                                                                                                                                                                                                                                                | fold → revision lifecycle (A4b); store del → A6b                                                          |
+| `packages/cli/src/kernel/adapters/windows/runtime/runtime-config-writer.ts`, `windows/runtime/runtime-config-schema.ts`, `servy-environment.ts` `NETSCRIPT_RUNTIME_CONFIG_DIR`/`NETSCRIPT_TASKS_DIR` emission + wiring comment, `deploy/build/build-windows-runtime.ts` runtime-config passes                          | del/rw → A6b                                                                                              |
+| `packages/runtime-config` references in `kernel/constants/jsr-specifiers.ts`, `scaffold-workspace-packages.ts`, `maintainer/domain/local-packages.ts`, `kernel/assets/agent-docs.generated.ts`                                                                                                                         | rw (regenerate) → A6b                                                                                     |
+| `RuntimeTask`/`TriggerOverride` types and every import site                                                                                                                                                                                                                                                            | del with the package → A6a (family schemas are the one model)                                             |
+| READMEs claiming deploy-free operator behavior (`packages/runtime-config/README.md`, `plugins/workers/README.md`, `plugins/triggers/README.md`) + doc-site pages citing them                                                                                                                                           | rw to shipped reality → A6c                                                                               |
+| T0 job surface: code-defined jobs + `.schedule()` + KV job CRUD routes                                                                                                                                                                                                                                                 | keep, with CRUD narrowed to read/enable/disable → A3b; `.schedule()` fate stays with `CRON-SUBSYSTEM-DUP` |
 
 `generate runtime-schemas`, the executor adapters/argv builder, the KV idempotency/DLQ machinery,
 and Aspire contribution shapes are **kept as concepts** and rebuilt against the new contracts where
@@ -507,25 +584,38 @@ tests), **C** = consumer (clean-consumer install/E2E selection), **P** = publish
 `publish:dry-run`). **FE** marks the frontend dependency edge (blocked by the #922 minimum cut,
 §8.2); everything else is frontend-independent. File groups name the primary touched roots.
 
-| Slice     | Scope (files)                                                                                                                                                                                                                                                                                                                                                                 | Gates                                            | Depends on                               |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | ---------------------------------------- |
-| A0        | `packages/automation-core/`: family envelope + `task@1`/`trigger@1` Zod schemas + lifecycle state-transition table + port types + error vocabulary                                                                                                                                                                                                                            | S F P (jsr-audit on the new ARCHETYPE-1 surface) | —                                        |
-| A1a       | `packages/automation-runtime/`: store port conformance suite + Postgres adapter + migrations schema (`stores/`, `adapters/postgres/`); epoch transaction + audit + CAS race tests (the P1 20/20 race becomes a regression test)                                                                                                                                               | S F R P                                          | A0                                       |
-| A1b       | `packages/automation-runtime/adapters/kv/`: narrowed dev-KV adapter passing the conformance suite's single-writer subset; explicit refusal of fleet features                                                                                                                                                                                                                  | S R                                              | A1a                                      |
-| A1c       | `packages/automation-runtime/`: snapshot builder + snapshot client (epoch ordering, verify, last-good, ack) with simulated-feed race tests                                                                                                                                                                                                                                    | S R                                              | A1a                                      |
-| A2a       | `plugins/automation/`: connector skeleton — manifest (`plugin.ts` per #1444), management service composition hosting the oRPC contract, Aspire resource + migration declarations                                                                                                                                                                                              | S F R C P                                        | A1a                                      |
-| A2b       | `packages/automation-runtime/` + `plugins/automation/`: lifecycle engine end-to-end (draft/validate/publish/activate/rollback), change feed (SSE + poll), fleet registration/admission                                                                                                                                                                                        | S R C                                            | A2a, A1c                                 |
-| A2c       | `packages/cli/`: `netscript automation` command group over the management contract (no direct store access)                                                                                                                                                                                                                                                                   | S R C                                            | A2b                                      |
-| A3a       | `packages/plugin-workers-core/` + `plugins/workers/`: snapshot client wiring + per-dispatch task resolution from the active epoch; dispatcher rethrow so queue-native retry works (removes the swallow)                                                                                                                                                                       | S F R                                            | A1c                                      |
-| A3b       | `packages/plugin-workers-core/`: execution history store (CAS transitions, revision+epoch linkage, bounded capture) + OTel attributes; run-now/trigger APIs return the execution id; KV job CRUD narrowed to read/enable/disable (§10)                                                                                                                                        | S R C                                            | A3a                                      |
-| A4a       | `packages/plugin-triggers-core/` + `plugins/triggers/`: trigger reload port + snapshot-driven definitions; durable scheduled/file-watch event path (uniform history)                                                                                                                                                                                                          | S F R                                            | A1c, A3a                                 |
-| A4b       | `plugins/automation/` + `plugins/triggers/`: management fire/test that dispatches through the real processor; enabled-state folded into revision lifecycle (KV enabled-store retired)                                                                                                                                                                                         | S R C                                            | A2b, A4a                                 |
-| A5a       | `packages/plugin-workers-core/executor/`: T1 boundary — deny-by-default Deno flags, clearEnv/env allowlist, entrypoint-root confinement, kill-tree, cgroup caps; per-runtime negative tests including the honest non-Deno non-enforcement pins                                                                                                                                | S R                                              | A3a                                      |
-| A5b       | `plugins/automation/` + executor: secrets-by-name resolution + bounded output redaction; dry-run executions through the boundary via the management API                                                                                                                                                                                                                       | S R C                                            | A2b, A5a                                 |
-| A6        | Cleanup (§10 inventory executed file-by-file): retire `runtime-config` pkg, `config override` group + store, workers duplicate CLI, scaffold/sample tree emissions incl. sagas, Windows writer/env keys, dual task models; `generate runtime-schemas` re-pointed at family schemas; docs/READMEs rewritten to shipped reality; every test deletion carries recorded rationale | S F C (scaffold-static)                          | A2c, A3b, A4b, A5b                       |
-| A7 **FE** | `plugins/automation/frontend/`: cockpit contributions (list/detail/run/history + draft/validate/activate/rollback flows) via the #890 layer + #934 gateway; extends #933's workers dogfood surface                                                                                                                                                                            | S F R C + #890 design gates                      | A2b, A3b, A4b, A5b, **#923–#932 + #934** |
-| A8        | `packages/cli/e2e/`: §13 acceptance suite selected into `e2e:cli`; release-gate registration                                                                                                                                                                                                                                                                                  | R C (release class)                              | A2–A6 (A7 for cockpit journeys)          |
-| P-1..P-4  | Prerequisite RFCs as staged (§11)                                                                                                                                                                                                                                                                                                                                             | —                                                | as stated in §11                         |
+| Slice     | Scope (files)                                                                                                                                                                                                                                                                                | Gates                                                                                    | Depends on                                    |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------- |
+| A0        | `packages/automation-core/`: family envelope + `task@1`/`trigger@1` Zod schemas + **management oRPC contract** + lifecycle state-transition table (data) + error vocabulary — no ports (§9)                                                                                                  | S F P                                                                                    | —                                             |
+| A1a       | `packages/automation-runtime/`: the **ports** (store/boundary/reload/feed) + store conformance suite + Postgres adapter + migrations schema; epoch transaction incl. carry-forward totals + audit + CAS race tests (the P1 20/20 race becomes a regression test)                             | S F R P                                                                                  | A0                                            |
+| A1b       | `packages/automation-runtime/adapters/kv/`: narrowed dev-KV adapter passing the conformance suite's single-writer subset; explicit refusal of fleet features                                                                                                                                 | S F R P                                                                                  | A1a                                           |
+| A1c       | `packages/automation-runtime/`: snapshot builder + client (epoch ordering, verify, last-good, ack, revision-pinned lookup) with simulated-feed race tests                                                                                                                                    | S F R P                                                                                  | A1a                                           |
+| A2a       | `plugins/automation/`: connector skeleton — manifest (`plugin.ts` per #1444), management service composition binding the A0 contract to runtime-core calls, Aspire resource + migration declarations; TM9 loader-policy gate (warm-cache offline load)                                       | S F R C P                                                                                | A1a                                           |
+| A2b       | `packages/automation-runtime/` + `plugins/automation/`: lifecycle engine end-to-end (draft/validate/publish/activate/rollback) bound to the A0 contract                                                                                                                                      | S F R C P                                                                                | A2a, A1c                                      |
+| A2d       | `packages/automation-runtime/` + `plugins/automation/`: change feed (SSE + poll) + leased fleet registration/admission/convergence surface                                                                                                                                                   | S R C                                                                                    | A2b, A1c                                      |
+| A2c       | `packages/cli/`: `netscript automation` command group over the management contract (no direct store access)                                                                                                                                                                                  | S R C                                                                                    | A2b                                           |
+| A3a       | `packages/plugin-workers-core/` + `plugins/workers/`: snapshot client wiring + revision-pinned per-dispatch task resolution; dispatcher rethrow so queue-native retry works (removes the swallow)                                                                                            | S F R                                                                                    | A1c                                           |
+| A3b       | `packages/plugin-workers-core/`: execution history store (CAS transitions, revision+epoch linkage, bounded capture) + OTel attributes; run-now/trigger APIs return the execution id; KV job CRUD narrowed to read/enable/disable (§10)                                                       | S R C                                                                                    | A3a                                           |
+| A4a       | `packages/plugin-triggers-core/` + `plugins/triggers/`: trigger reload port + snapshot-driven definitions; durable scheduled/file-watch event path (uniform history)                                                                                                                         | S F R                                                                                    | A1c, A3a                                      |
+| A4b       | `plugins/automation/` + `plugins/triggers/`: management fire/test that dispatches through the real processor; enabled-state folded into revision lifecycle (KV enabled-store retired)                                                                                                        | S R C                                                                                    | A2b, A4a                                      |
+| A5a       | `packages/plugin-workers-core/executor/`: T1 boundary — deny-by-default Deno flags, clearEnv/env allowlist, entrypoint-root confinement, kill-tree, cgroup caps; per-runtime negative tests including the honest non-Deno non-enforcement pins                                               | S R                                                                                      | A3a                                           |
+| A5b       | `plugins/automation/` + executor: secrets-by-name resolution + bounded output redaction; dry-run executions through the boundary via the management API                                                                                                                                      | S R C                                                                                    | A2b, A5a                                      |
+| A6a       | §10 purge, package/CLI half: `runtime-config` pkg, CLI override group/store/loaders, workers duplicate CLI + discovery source, plugin `runtime-config-topic` axis, dual task models; `generate runtime-schemas` re-pointed at family schemas; every test deletion carries recorded rationale | S F C P                                                                                  | A2c, A3b, A4b, A5b                            |
+| A6b       | §10 purge, scaffold/deploy half: sample/runtime-tree emissions (workers/sagas/triggers), glue stubs re-pointed, generated trigger-registry boot path removed, Windows writer/schema/env emitters, regenerated constants/assets                                                               | S C + **release class** (`scaffold.runtime` + scaffold-static — scaffold output changes) | A6a                                           |
+| A6c       | §10 docs half: READMEs + doc-site pages rewritten to shipped reality                                                                                                                                                                                                                         | docs-source gates                                                                        | A6a, A6b                                      |
+| A7 **FE** | `plugins/automation/frontend/`: cockpit contributions (list/detail/run/history + draft/validate/activate/rollback flows) via the #890 layer + #934 gateway; extends #933's workers dogfood surface                                                                                           | S F R C + #890 design gates                                                              | A2b, A2d, A3b, A4b, A5b, **#923–#932 + #934** |
+| A8        | `packages/cli/e2e/`: §13 acceptance suite selected into `e2e:cli`; release-gate registration                                                                                                                                                                                                 | R C (release class)                                                                      | A2–A6 (A7 for cockpit journeys)               |
+| P-1..P-4  | Prerequisite RFCs as staged (§11)                                                                                                                                                                                                                                                            | —                                                                                        | as stated in §11                              |
+
+**jsr-audit pre-scan (rubric applied to the planned public surfaces, recorded now):** the two new
+packages publish Zod schema **values** — the known slow-type risk class — so A0/A1a must export
+explicit inferred types (`export type Task = z.infer<…>`) with `isolatedDeclarations`-clean
+signatures and keep schema values typed, never anonymous; the oRPC contract export must carry
+explicit route types (the `plugin-triggers-core` sanctioned-cast lesson); `automation-runtime`'s
+Postgres adapter must not leak driver types across its public surface (structural delegate pattern,
+per the sagas Prisma-store precedent); the connector surface stays re-exports only. Every
+package/plugin slice carries `P` (jsr-audit + `publish:dry-run`) before merge; findings at slice
+time are review-blocking, not notes.
 
 Corrected edges called out from evaluation: A4b (management fire/test) depends on **A2b**, not only
 the engine work; A5b (dry-run + secrets policy) depends on **A2b**; A7 requires **A3b/A4b/A5b**
@@ -539,7 +629,7 @@ stack with the automation connector + workers + triggers installed, Aspire-start
 1. **Live add (J2):** publish + activate a `python` task via the management API; assert execution
    without any process restart; assert history record carries revision + capture.
 2. **Live update + rollback (J1):** activate revision 2 (changed schedule), assert timers refreshed;
-   roll back to revision 1 with a stale `expectedActiveRevision` (assert CAS failure), then
+   roll back to revision 1 with a stale `expectedEpoch` (assert precondition failure), then
    correctly; assert audit trail shows both operators.
 3. **Trigger wiring (J3):** activate a webhook trigger; POST an event twice with one idempotency
    key; assert single job execution, durable event records, and correlation from event → execution →
@@ -578,16 +668,16 @@ per-slice loop.
 
 ## 15. Open questions for the owner — classified
 
-Every decision this RFC leaves open, with its deferral class (per the plan-gate open-decision
-sweep; everything else in this document is **decided**):
+Every decision this RFC leaves open, with its deferral class (per the plan-gate open-decision sweep;
+everything else in this document is **decided**):
 
 1. **Package/plugin naming** (`@netscript/automation-core`, `@netscript/automation-runtime`,
-   `plugins/automation`) — **safe to defer to slice A0** (pure spelling; structure is locked in
-   §9). Entry criterion: named before the A0 PR opens.
-2. **Two-person activation default** (author ≠ activator on production scaffolds) — **safe to
-   defer to slice A2b** (the lifecycle engine carries the policy hook either way). Entry
-   criterion: default chosen before A2b merges; shipping default-off requires an owner sentence
-   in the A2b PR body.
+   `plugins/automation`) — **safe to defer to slice A0** (pure spelling; structure is locked in §9).
+   Entry criterion: named before the A0 PR opens.
+2. **Two-person activation default** (author ≠ activator on production scaffolds) — **safe to defer
+   to slice A2b** (the lifecycle engine carries the policy hook either way). Entry criterion:
+   default chosen before A2b merges; shipping default-off requires an owner sentence in the A2b PR
+   body.
 3. **History/output retention defaults** (size caps, TTL) — **safe to defer to slice A3b**, which
    ships conservative caps behind config; entry criterion: defaults ratified in the A3b review.
 
