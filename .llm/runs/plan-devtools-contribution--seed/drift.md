@@ -443,3 +443,28 @@ documentation.
 - **Action:** accept. Apply every required amendment from both passes with a recorded disposition,
   run the docs gates, and **do not** launch a third evaluator cycle. `plan-eval.md` gains a banner
   stating the owner waiver so no reader mistakes it for an evaluator PASS.
+
+## 2026-08-11 — D-19: OWNER RATIFICATION — F-1 and F-3 decided; board filing authorized
+
+- **What:** The owner ratified the two blocking architecture forks exactly as recommended, directed a
+  single coherent state-and-DX amendment resolving **every** accepted stage-D2 finding, and
+  **authorized one-shot board filing** from `filing/filing-manifest.md`.
+- **Source:** owner directive in-turn, 2026-08-11.
+- **F-1 — RATIFIED.** A **self-contained DevTools family and spine, built first in
+  `packages/devtools-core`**, **not** serialized behind #890's 24 unimplemented children. This closes
+  the run's highest-risk fork and unblocks slice W1-a. Consequence: `devtools-core` owns the envelope
+  and identity types outright; convergence onto a shared spine, if #890 ever ships one, becomes a
+  re-export change rather than a dependency.
+- **F-3 — RATIFIED.** Land the manifest schema-evolution precondition using **`.passthrough()`**
+  before any manifest-visible pointer, with **explicit old/new CLI behavior and tests specified**.
+  This closes the defect recorded in D-6, where #890's "older CLIs ignore an unknown block" claim was
+  false against a `.strict()` schema.
+- **Board filing — AUTHORIZED**, once, from the committed manifest, **preserving the 2026-07-19
+  owner-ratified milestone train** and **not duplicating existing issues**. This is the stage-H
+  ratification `seed-run.md` requires; the mutation boundary opens for the first time in this run.
+- **Standing instruction:** do not re-ask about F-1/F-3 or about whether to fix accepted findings.
+  Stop only for a **genuinely new architecture fork** or an **authorization boundary**, and report
+  precisely what remains.
+- **Severity:** significant — this is the ratification event the entire run was gated on.
+- **Action:** execute. No deferred acceptance may remain: all **22** findings (11 Qwen + 11 Kimi)
+  are swept to `fixed` or `declined` with a normative anchor.
