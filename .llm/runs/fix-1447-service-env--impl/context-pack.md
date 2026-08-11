@@ -37,7 +37,7 @@ values. `PluginEntry` already has the same concept under the name `Environment`.
 
 | What                        | Path                                                                                                                                         |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Config contract             | `packages/aspire/config.ts` (`ServiceEntry` :161, `PluginEntry` :205, Zod :459 / :495)                                                       |
+| Config contract             | `packages/aspire/config.ts` — `ServiceEntry`, `PluginEntry`, and their Zod schemas. Line offsets are not recorded: they move on every edit to the file and were already stale here                                                       |
 | Services generator          | `packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-services.ts`                                                    |
 | Plugins generator           | `.../register/generate-register-plugins.ts` (`Environment` emission :100-105)                                                                |
 | Alias-resolver precedent    | `.../register/render-http-endpoint.ts` (`resolveHostPort`)                                                                                   |
@@ -61,11 +61,11 @@ execute, not this session's.
 | 4     | `41cf0075b` | executing runtime test: generated module + recording builder + real subprocess                                               |
 | 5     | `fa9ba9573` | E2E `runtime.service-env-fixture` + `behavior.service-env` and their evidence unit tests                                     |
 | 6     | `dbd7cd9d1` | `packages/aspire/README.md` § Resource environment; repo quality gates                                                       |
-| 7     | `b7a5e55e4` | F4: `runtime-gates.ts` back to its baseline 906 lines; #1447 gates behind `service-env/` (44 children)                        |
+| 7     | `b7a5e55e4` | F4: `runtime-gates.ts` back to its baseline 906 lines; #1447 gates behind `service-env/`; the 44-child count belongs to the **parent** `gates/scaffold/` directory, not to `service-env/`, which held 6 files at this slice and 12 at head                        |
 | 8     | `2297651c7` | F2: one executed test per documented category, real `@netscript/aspire` helpers in the double, `PORT` refused                 |
 | 9     | `e9d22d9b5` | F1/F3: `aspire wait --status healthy`, state allowlist, `/proc/<pid>/environ` evidence, discovery + negative discovery        |
 | 10    | `48bee97b2` | F4/F5 records: debt stop-condition note, new `aspire-config-length-1447` entry, A6 archetype correction + gate evidence, slice/commit reconciliation |
-| 11    | this commit | `behavior.service-env` carries the permissions `/proc` actually requires, plus the regression that proves any gate command's flags satisfy its script |
+| 11    | `2781bb2b1` | `behavior.service-env` carries the permissions `/proc` actually requires, plus the regression that proves any gate command's flags satisfy its script |
 
 ## Next action
 

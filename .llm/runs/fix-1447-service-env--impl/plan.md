@@ -27,7 +27,7 @@ The F-CLI-* gates have no dedicated script (`gates/fitness-gates.md`): they are 
 
 | Gate                                    | Result                                                                                                                                                            |
 | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Static (`check`, `lint`, `fmt:check`)   | PASS — scoped wrappers over `packages/cli`: 848 files, 0 occurrences / 0 findings                                                                                 |
+| Static (`check`, `lint`, `fmt:check`)   | PASS — scoped wrappers over `packages/cli`: 0 occurrences / 0 findings. The selected-file count is not recorded: it is not a gate, and it drifts whenever a file is added                                                                                 |
 | F-CLI-2 (500-LOC hard cap)              | PASS as measured — the largest file this run adds is `service-environment-runtime_test.ts` at **499** lines; it was 536 and was trimmed rather than accepted as debt |
 | F-CLI-25 / F-16 (≤ 12 children)         | PASS for the added directory — `gates/scaffold/service-env/` holds **12** files, **exactly at** the 12-child cap rather than inside it (measured at head; the remediation slices added `gate-permission-probe.ts` and `service-env-gates_test.ts` after this table first said 10). **Stop condition:** the directory is full — a thirteenth file, or a sibling directory, requires the owed `runtime-gates.ts` split first. The pre-existing over-cap scaffold directory is unchanged at 43 + 1 subdirectory       |
 | F-CLI-22 (`.template` under assets)     | PASS — no template file added or moved                                                                                                                            |
@@ -123,12 +123,19 @@ inline `entry.Environment` read is replaced by it.
 2. **E2E behavior gate (the supervisor's `scaffold.runtime` run).** A pre-start fixture gate writes
    `Env` + a colliding `DATABASE_URL` into the scaffolded `appsettings.json` and regenerates through
    the real CLI (twice, byte-compared — the determinism criterion, proven on the consumer path); a
-   behavior gate then reads the **live** AppHost via `aspire describe --format Json` and asserts the
-   running service resource carries the declared values and the generated `DATABASE_URL`.
+   behavior gate then reads the **live** AppHost via `aspire describe --format Json` **and asserts
+   the started process's own environment**: `scanResourceProcesses` / `requireResourceProcesses`
+   match a process to its resource by working directory and entrypoint, then read
+   `/proc/<pid>/environ`, which the kernel writes at exec time and nothing in this repository can
+   spoof.
 
 Neither leg alone proves the whole chain; together they cover config → generator → generated module
-→ live resource → process environment. The seam between them (a live Aspire process's own `/proc`
-environment) is not asserted by either, and that limit is stated in the PR body rather than papered
+→ live resource → process environment. **Amended at head:** this plan originally recorded that the live process's own `/proc`
+environment was *not* asserted, and stated that limit rather than papering over it. The F1
+remediation closed exactly that seam, so the limitation no longer exists and the description above
+supersedes it. The chain is now covered end to end: config → generator → generated module → live
+resource → started-process environment. The prior wording is kept in this note rather than deleted,
+because the record should show the gap and its closure rather than only the closure
 over.
 
 ## Commit slices
@@ -153,7 +160,7 @@ is that slices 2 and 3 share a commit. IMPL-EVAL cycle 1 then added four more co
 | 7 — F4 no-deepen restructure                           | `b7a5e55e4` |
 | 8 — F2 per-category precedence + `PORT` refused        | `2297651c7` |
 | 9 — F1/F3 process-level observation + discovery        | `e9d22d9b5` |
-| 10 — F4 debt/archetype records + F5 record reconciliation | this commit |
+| 10 — F4 debt/archetype records + F5 record reconciliation | `48bee97b2` | landed |
 
 | # | Slice                                                                                                                   | What it proves                                                                    | Gate                                                                                             |
 | - | ----------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
