@@ -3,7 +3,7 @@
 > **DRAFT — not filed. No GitHub mutation has occurred.**
 
 Run `plan-devtools-contribution--seed` · draft PR #1450 · baseline `main` @ `2256a67bf` ·
-RFC `docs/architecture/rfc/rfc-0002-devtools-contribution.md`.
+RFC `rfcs/0000-devtools-contribution.md`.
 
 Every `gh` invocation behind this draft was a read. Nothing below creates, edits, closes, retitles,
 re-milestones, labels, or comments on any issue or PR. Filing happens only after the owner ratifies
@@ -247,7 +247,7 @@ launcher gap is filed as its own issue. Risk **R12** stays open until then.
 ## Harness
 
 - Run dir: `.llm/runs/plan-devtools-contribution--seed/`
-- RFC: `docs/architecture/rfc/rfc-0002-devtools-contribution.md`
+- RFC: `rfcs/0000-devtools-contribution.md`
 - Owner brief: `.llm/runs/plan-devtools-contribution--seed/decision-brief.md`
 - Supersession map: `.llm/runs/plan-devtools-contribution--seed/design/T9-supersession/supersession-map.md`
 - Seed PR: #1450 (draft for the whole run)

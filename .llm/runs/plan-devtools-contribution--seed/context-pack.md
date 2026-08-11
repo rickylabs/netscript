@@ -51,7 +51,7 @@ an evaluator PASS), and **board filing**.
 
 | Gate | Status | Evidence |
 | --- | --- | --- |
-| `docs:links --root docs/architecture/rfc` | **PASS** | 0 broken links/anchors/orphans; re-run after every amendment |
+| `docs:links --root rfcs` | **PASS** | 0 broken links/anchors/orphans; re-run after every amendment |
 | `docs:accuracy` | **PASS** | re-run after every amendment |
 | Code-fence balance | **PASS** | 90, balanced |
 | Cross-file consistency sweep | **PASS** | 0 retired-vocabulary residue outside self-documenting correction notes |

@@ -468,3 +468,44 @@ documentation.
 - **Severity:** significant — this is the ratification event the entire run was gated on.
 - **Action:** execute. No deferred acceptance may remain: all **22** findings (11 Qwen + 11 Kimi)
   are swept to `fixed` or `declined` with a normative anchor.
+
+## 2026-08-11 — D-20: OWNER DECISION — fork F-2 resolved to the canonical `rfcs/` process
+
+- **What:** The owner directed the RFC be normalized to the repository's **canonical** RFC process:
+  moved from `docs/architecture/rfc/rfc-0002-devtools-contribution.md` to
+  **`rfcs/0000-devtools-contribution.md`**, with every internal/run/PR reference updated.
+- **Source:** owner directive in-turn, 2026-08-11. Reason given: root is coordinating **acceptance
+  numbering and merge order** so that issue links can target immutable `main`.
+- **This closes owner fork F-2** — the three-way RFC-home contest recorded at `research.md` F14 and
+  synthesis `S-12`:
+  | Convention | Outcome |
+  | --- | --- |
+  | `rfcs/` — the documented process, `rfcs/README.md`, zero numbered RFCs ever merged | **CHOSEN** |
+  | `.llm/runs/*/design/canonical/` — what merged PRs #890/#891/#1123 actually did | not chosen |
+  | `docs/architecture/rfc/` — introduced by **unmerged** PR #1446 | **abandoned** (this run's earlier home) |
+- **Two things the move corrects, not just relocates:**
+  1. **The self-assigned number is withdrawn.** `rfcs/README.md` § Numbering is explicit: numbers are
+     assigned **by a maintainer at acceptance**, and `0000` is kept while drafting *"to avoid number
+     races between concurrent drafts"*. This run had taken `rfc-0002-` itself. The filename is now
+     `0000-`, and the frontmatter carries `rfc: 0000`.
+  2. **The frontmatter contract is now honoured exactly** — `rfc`, `title`, `status`, `authors`,
+     `created`, `tracking-issue`, `target-milestone`, per `rfcs/0000-template.md`.
+- **Deliberate, disclosed divergence:** the RFC **keeps its own numbered section structure** rather
+  than the template's ten headings. The template suits a proposal of a few hundred lines; this is a
+  ~4,500-line architecture RFC whose sections are cross-referenced by anchor throughout the evidence
+  corpus, the findings sweep, and both design-pass triages. Restructuring would break every citation
+  for no gain in reviewability. Stated in a process note at the top of the RFC so no reader mistakes
+  it for an oversight.
+- **Severity:** significant — it changes the deliverable's canonical location and withdraws a number.
+- **Consequence for #1380** (the open issue scheduling an RFC-location decision on `0.0.6`): this run
+  no longer **pre-empts** it — it now *conforms* to the only documented convention, which is the
+  outcome #1380 would most plausibly reach. The earlier concern recorded in `S-12` is resolved.
+- **Reference-update policy applied:** live/normative artifacts (RFC, `plan.md`, `worklog.md`,
+  `context-pack.md`, `decision-brief.md`, `supervisor.md`, `research.md`, `RFC-AUTHORITY.md`,
+  `FINDINGS-SWEEP.md`, the supersession map, and **all** `filing/` drafts) were updated. **Immutable
+  evidence was not rewritten** — the stage-B corpus, the design packs, both design-pass
+  prompts/outputs, the evaluator record, the committed workflows, and the owner's charter all keep
+  their original text, exactly as `RFC-AUTHORITY.md` prescribes.
+- **Gates after the move:** `docs:links --root rfcs` → **`docs=3, 0 broken`** (it now covers the
+  README and template too, not just the RFC); `docs:accuracy` **PASS**; 90 balanced fences; nothing
+  modified outside `rfcs/` and the run dir.

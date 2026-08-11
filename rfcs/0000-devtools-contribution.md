@@ -1,8 +1,30 @@
-# RFC-0002 — NetScript DevTools contribution architecture
+---
+rfc: 0000            # assigned by a maintainer at acceptance; kept 0000 while drafting
+title: NetScript DevTools contribution architecture
+status: Draft
+authors: ["@rickylabs"]
+created: 2026-08-11
+tracking-issue: pending — opened with the ratified board filing
+target-milestone: 0.0.6
+---
+
+# NetScript DevTools contribution architecture
+
+> **Process note.** This RFC follows the repository's canonical process
+> ([`rfcs/README.md`](./README.md)): it lives at `rfcs/0000-<slug>.md` and keeps `0000` until a
+> maintainer assigns a number **at acceptance**. An earlier draft of this run placed it at
+> `rfcs/rfc-0002-…` — the convention introduced by unmerged PR #1446 — and
+> self-assigned a number. Both were corrected by owner decision (fork **F-2**; drift **D-20**).
+>
+> It **diverges from `0000-template.md` in section structure**, deliberately and with the owner's
+> knowledge: the template's ten headings suit a proposal of a few hundred lines, and this document
+> is a ~4,500-line architecture RFC whose sections are cross-referenced by anchor throughout the
+> run's evidence corpus. Restructuring would break every citation for no gain in reviewability. The
+> template's **frontmatter contract is honoured exactly**; the body keeps its own numbered sections.
 
 | | |
 | --- | --- |
-| **Status** | **Proposed** — awaiting owner ratification. Nothing in §14 files to GitHub before that. |
+| **Status** | **Draft** — content ratified by the owner 2026-08-11; acceptance numbering and merge order coordinated separately. |
 | **Run record** | `.llm/runs/plan-devtools-contribution--seed/` (charter, corpus, design packs, drift) |
 | **Tracking** | Draft PR #1450. Re-evaluates epic #400 and its children. |
 | **Evidence base** | 14-agent discovery corpus (6,327 lines) + 78 saved upstream artifacts under the run's `research/sources/`; 8 design packs; every load-bearing claim cited to `path:line`, a `deno doc` surface, a saved artifact, or a URL. |
@@ -4449,7 +4471,7 @@ record of what was decided; the remaining rows are the ones ratification still t
 | # | Fork | Recommendation | Cost if deferred |
 | --- | --- | --- | --- |
 | **F-1** | ~~Depend on #890's unbuilt spine, or self-contained family?~~ | **RATIFIED: self-contained DevTools family and spine, built first in `packages/devtools-core`**, not serialized behind #890's 24 unimplemented children | Closed — unblocks W1-a |
-| **F-2** | **RFC home** — `docs/architecture/rfc/` (charter + unmerged #1446) vs shipped `rfcs/` vs the `.llm/runs/` convention every merged "RFC" actually used | Follow the charter; **record that it pre-empts issue #1380**, which already schedules this decision on `0.0.6` | A re-home later, or a fourth divergent convention |
+| **F-2** | **RFC home** — `rfcs/` (charter + unmerged #1446) vs shipped `rfcs/` vs the `.llm/runs/` convention every merged "RFC" actually used | Follow the charter; **record that it pre-empts issue #1380**, which already schedules this decision on `0.0.6` | A re-home later, or a fourth divergent convention |
 | **F-3** | ~~Manifest schema-evolution precondition~~ | **RATIFIED: `.passthrough()`**, `schemaVersion` stays `1`, landing before any manifest-visible pointer, with the three tests specified in §6 | Closed — unblocks W1-d |
 | **F-4** | **Three-seam verdict** — #890's pointer axis wins; #427 folds in; **#734 closes** | Ratify | A fourth position appears |
 | **F-5** | **Zone-vocabulary ownership** — host-owned closed (Medusa) vs plugin-minted (Strapi) | Host-owned closed | Collision becomes a real problem, and a two-phase register/bootstrap lifecycle becomes necessary |

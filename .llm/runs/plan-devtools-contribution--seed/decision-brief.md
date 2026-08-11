@@ -5,7 +5,7 @@
 > `filing/filing-manifest.md`.
 
 **Run:** `plan-devtools-contribution--seed` · **PR:** #1450 · **RFC:**
-`docs/architecture/rfc/rfc-0002-devtools-contribution.md` · **Baseline:** `main` @ `2256a67bf`
+`rfcs/0000-devtools-contribution.md` · **Baseline:** `main` @ `2256a67bf`
 
 ---
 

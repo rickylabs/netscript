@@ -1,6 +1,6 @@
 # RFC authority — one corpus, not two
 
-**`docs/architecture/rfc/rfc-0002-devtools-contribution.md` is the single normative authority.**
+**`rfcs/0000-devtools-contribution.md` is the single normative authority.**
 
 ## Why `rfc-sections/` no longer exists
 
@@ -20,7 +20,7 @@ and `workflows/stage-e-rfc-authoring-workflow.js`, which is committed and re-run
 
 ## Authority order, for anything that disagrees
 
-1. `docs/architecture/rfc/rfc-0002-devtools-contribution.md` — normative.
+1. `rfcs/0000-devtools-contribution.md` — normative.
 2. `plan.md` — the run's locked decisions and gates.
 3. `drift.md` — **wins over the stage-B corpus and the stage-D packs** wherever they conflict; that
    is what drift is for.

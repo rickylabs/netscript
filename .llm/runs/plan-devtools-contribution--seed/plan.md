@@ -13,7 +13,7 @@
 | Run ID | `plan-devtools-contribution--seed` |
 | Branch | `plan/devtools-contribution` |
 | Phase | `bootstrap` → `research` |
-| Target | RFC / docs (`docs/architecture/rfc/`) — **planning only, no source** |
+| Target | RFC / docs (`rfcs/`) — **planning only, no source** |
 | Archetype | Described, not built: `ARCHETYPE-5` (plugin) for the proposed DevTools plugin surface, plus the host-package archetype selected at stage E for the DevTools host |
 | Scope overlays | `SCOPE-docs.md` (the changeset is docs) + `SCOPE-frontend.md` (the subject is a frontend host) |
 | Run shape | Seed run — `workflow/seed-run.md` stages A–I |
@@ -31,16 +31,17 @@ The primary deliverable is **architecture and contribution mechanics**. Visually
 
 ## Scope
 
-- A canonical RFC under `docs/architecture/rfc/` with diagrams, normative contracts, API examples,
+- A canonical RFC under `rfcs/` with diagrams, normative contracts, API examples,
   explicit alternatives, threat model, lifecycle, failure behavior, package ownership, frontend host
   split, and an implementation roadmap.
 - A cited current-state matrix and a primary-source market/competitor architecture study.
 - A five-surface frontend contribution map (below) with dependencies and proven non-overlap.
 - A DevTools host/contribution-family design pack with worked plugin examples and contributor DX.
-- A design/UX evidence pack incorporating the mandatory GLM 5.2 pass, with per-finding dispositions.
-  **STATUS: NOT DELIVERED.** The lane is unlaunchable (drift D-10); substitute stage-F scrutiny was
-  obtained and is explicitly *not* the mandated pass. Clearing this needs a fixed launcher or an
-  explicit owner waiver — see `decision-brief.md` D-0a/D-0b and risk R12.
+- A design/UX evidence pack with per-finding dispositions. **DELIVERED via the owner-approved
+  substitute route** (drift **D-15/D-16**): the GLM lane was unlaunchable (**D-10**), so the owner
+  replaced it with **Qwen 3.8 Max** (architecture) + **Kimi K3** (pure UI/UX). Both ran read-only and
+  findings-only; 22 findings closed in `FINDINGS-SWEEP.md`. The lane substitution is a recorded
+  deviation from `lane-policy` invariant 5, **not** a satisfaction of it.
 - A file-level and issue-level supersession map for the existing dashboard epic/issues/PRs.
 - Draft epic + one-file-per-issue set, milestone proposal, dependency DAG, agent briefs, and a
   committed one-shot filing manifest — **draft text only**.
@@ -83,7 +84,7 @@ each. Collapsing them into one vague `frontend` axis is a plan failure.
 ## Locked Decisions
 
 Locked at stage E from the corpus and the eight design packs. Each is normative in
-`docs/architecture/rfc/rfc-0002-devtools-contribution.md`; the section reference is the authority.
+`rfcs/0000-devtools-contribution.md`; the section reference is the authority.
 
 | ID | Decision | Rationale | RFC § |
 | -- | -------- | --------- | ----- |
@@ -195,7 +196,7 @@ and are excluded from formatting by intent.
 
 | Order | Gate | Command or check | Expected |
 | ----- | ---- | ---------------- | -------- |
-| 1 | Internal doc links + code-span paths | `deno task docs:links` **scoped** via `--root docs/architecture/rfc` (the default roots are `.llm/harness` + `docs/architecture/doctrine` and do not cover a new RFC dir) | PASS |
+| 1 | Internal doc links + code-span paths | `deno task docs:links` **scoped** via `--root rfcs` (the default roots are `.llm/harness` + `docs/architecture/doctrine` and cover neither `rfcs/` nor any new RFC dir) | PASS |
 | 2 | Docs accuracy / discoverability | `deno task docs:accuracy` | PASS |
 | 3 | CI `quality` job | fires on the PR via `needs_docs` once the changeset touches `docs/**` | PASS |
 | 4 | Citation gate | every load-bearing claim traces to `path:line`, a `deno doc` surface, a saved artifact, or a URL | PASS (manual, evaluator-checkable) |

@@ -36,7 +36,7 @@ criticised false-green reporting elsewhere. **Status is now what actually happen
 | 4 | Stage-D design packs | **DONE** `7d23809a8` | supervisor slice review V1–V4 before sign-off | `design/T{1,2,3,5,6,7,8,9}/*.md` — **proposals + open questions only** |
 | 4b | Draft epic + one-file-per-issue set + agent briefs | **DONE** `143c31574` | no board mutation; labels verified against `labels.yml` | `filing/epic.md`, `filing/issues/` (16), `filing/briefs/` (7) |
 | 5 | Stage-D2 adversarial design pass | **DONE via owner-approved substitute route** (D-15/D-16). GLM lane unlaunchable (D-10) → **Qwen 3.8 Max** + **Kimi K3**, read-only, findings-only | observed identity **matched** requested on both; 2 criticals found and fixed | `design/ux-evidence/{qwen,kimi}-{prompt,findings,triage}.md`, `qwen-receipt.md`, `FINDINGS-SWEEP.md`; failed GLM attempts kept as evidence |
-| 6 | Stage-E canonical RFC + plan lock | **DONE** `a7e49d525`, `9e1b828c5` | `docs:links --root docs/architecture/rfc` PASS; `docs:accuracy` PASS. **`doc:lint` is not a task in this repo and the Markdown fmt gate does not exist** (drift D-4) | `docs/architecture/rfc/rfc-0002-devtools-contribution.md`, `plan.md` |
+| 6 | Stage-E canonical RFC + plan lock | **DONE** `a7e49d525`, `9e1b828c5` | `docs:links --root rfcs` PASS; `docs:accuracy` PASS. **`doc:lint` is not a task in this repo and the Markdown fmt gate does not exist** (drift D-4) | `rfcs/0000-devtools-contribution.md`, `plan.md` |
 | 7 | Stage-F adversarial findings + triage + fixes | **DONE** `b7cd62067` | per-finding disposition recorded; docs gates re-run | `adversarial-sonnet.md` (**not** `adversarial.md`), `adversarial-triage.md` |
 | 8 | Stage-G PLAN-EVAL | **DONE — verdict `FAIL_PLAN`** `5202ff205` | evaluator re-ran all gates independently | `plan-eval.md`, `planeval/codex-thread-ids.md` |
 | 9 | Stage-G fix cycles 1 and 2 | **DONE** `996d47923`, `504ddc559` | docs gates re-run; cross-file sweep → 0 surviving variants | RFC, `plan.md`, `RFC-AUTHORITY.md`; `rfc-sections/` **deleted** (two-corpora fix) |
@@ -240,7 +240,7 @@ opened, and no board entry was filed.
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
-| `deno task docs:links --root docs/architecture/rfc --pretty` | **PASS** | `docs=1 broken-links=0 broken-anchors=0 orphans=0` |
+| `deno task docs:links --root rfcs --pretty` | **PASS** | `docs=1 broken-links=0 broken-anchors=0 orphans=0` |
 | `deno task docs:accuracy` | **PASS** | exit 0; 192 published source pages checked |
 | Code-fence balance | **PASS** | 90, balanced |
 | Retired-vocabulary sweep | **PASS** | `PanelAvailability`/`DevToolsPanelId`/`plugin-devtools-core`/`contribution-core` → 0 outside correction notes |

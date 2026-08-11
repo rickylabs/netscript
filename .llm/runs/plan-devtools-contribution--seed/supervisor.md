@@ -20,7 +20,7 @@ operating identity is discoverable without chat memory.
 ## Charter
 
 Tier-A planning orchestrator for the **NetScript DevTools Contribution Architecture RFC**. Deliverable
-is a canonical RFC under `docs/architecture/rfc/` plus a full seed-run planning corpus, design packs,
+is a canonical RFC under `rfcs/` plus a full seed-run planning corpus, design packs,
 supersession map, draft filing manifest, and an owner decision brief. **No framework/product source
 implementation. No board mutation before owner ratification in-turn.**
 
@@ -60,7 +60,7 @@ Reference `.llm/harness/workflow/lane-policy.md`; the complete route table is no
 | --- | --- |
 | Branch `plan/devtools-contribution` + its commits | **Yes** |
 | The run's own draft PR: body, phase comments, PR labels, PR milestone | **Yes** |
-| `docs/architecture/rfc/**` (new RFC) and `.llm/runs/plan-devtools-contribution--seed/**` | **Yes** |
+| `rfcs/**` (new RFC) and `.llm/runs/plan-devtools-contribution--seed/**` | **Yes** |
 | Framework/product source (`packages/**`, `plugins/**`, `apps/**`) | **No — never** |
 | GitHub issues, epics, milestones, repo label set, other PRs | **No — until the owner ratifies the decision brief in-turn (stage H)** |
 | Merging this RFC PR | **No — the run never merges itself** |

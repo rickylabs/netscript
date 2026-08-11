@@ -1,7 +1,7 @@
 # T9 — Supersession map for epic #400 and the Dev Dashboard record (charter Q10)
 
 > **HISTORICAL EVIDENCE — frozen at authoring time.** Where this pack disagrees with
-> `docs/architecture/rfc/rfc-0002-devtools-contribution.md`, **the RFC wins**. Notably the package
+> `rfcs/0000-devtools-contribution.md`, **the RFC wins**. Notably the package
 > boundary was later corrected from `A2 plugin-devtools-core` to **A1 `packages/devtools-core` +
 > A6 CLI emission + A5 plugin**, and identity/ordering were unified on `(mountId, id, apiMajor)`
 > and anchors-then-`(order, mountId, id)`. See `RFC-AUTHORITY.md` and `drift.md`.

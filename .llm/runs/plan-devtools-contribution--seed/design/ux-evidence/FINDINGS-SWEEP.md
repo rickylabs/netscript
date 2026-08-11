@@ -5,7 +5,7 @@ normative anchor — no deferred acceptance remains."*
 
 **Result: 22 findings — 21 `FIXED`, 1 `DECLINED` with reason. Zero deferred.**
 
-Anchors are to `docs/architecture/rfc/rfc-0002-devtools-contribution.md` unless stated. Adjudication
+Anchors are to `rfcs/0000-devtools-contribution.md` unless stated. Adjudication
 detail and the verification of each anchor lives in `qwen-triage.md` / `kimi-triage.md`; this file is
 the closure ledger.
 

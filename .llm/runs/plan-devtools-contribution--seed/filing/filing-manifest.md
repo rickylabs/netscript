@@ -13,7 +13,7 @@
 > supervisor — never by the agent editing this file.
 
 Run `plan-devtools-contribution--seed` · draft PR **#1450** · baseline `main` @ `2256a67bf` ·
-RFC `docs/architecture/rfc/rfc-0002-devtools-contribution.md`.
+RFC `rfcs/0000-devtools-contribution.md`.
 
 This file is the **executable-by-a-human ordered plan** for filing *after* owner ratification.
 Every `gh` invocation cited below was a **read**. Every label and milestone named here was verified
@@ -245,7 +245,7 @@ turned the two spine-overlap rows into boundary-stating new filings rather than 
 - Archetype / area: <A1 packages/devtools-core | A6 packages/cli | A5 plugins/devtools>
 - Part of #400
 - Depends on #<draft-id resolved to a live number>
-- RFC: `docs/architecture/rfc/rfc-0002-devtools-contribution.md` §<n>
+- RFC: `rfcs/0000-devtools-contribution.md` §<n>
 
 ## Files / roots
 
@@ -407,7 +407,7 @@ PASS exists; do not cite one**
 **Repo (baseline `main` @ `2256a67bf`):**
 
 - `.github/labels.yml`
-- `docs/architecture/rfc/rfc-0002-devtools-contribution.md` §13, §14, §15
+- `rfcs/0000-devtools-contribution.md` §13, §14, §15
 - `.llm/runs/plan-devtools-contribution--seed/plan.md` (L1–L14, rework audit, risk register)
 - `.llm/runs/plan-devtools-contribution--seed/design/T9-supersession/supersession-map.md`
 - `.llm/runs/plan-devtools-contribution--seed/decision-brief.md`
