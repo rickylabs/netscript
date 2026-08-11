@@ -130,3 +130,41 @@ Slice review (Tier-A): no `any`, no casts — the dynamic import is narrowed by 
 guard; temp dirs removed in a `finally` after the module graph resolves.
 
 Reconcile note: no new issue/PR comments; no plan readjustment.
+
+### Slice 5 — E2E: declared environment on the consumer path, verified on the live AppHost
+
+Two gates plus a shared contract module, so the fixture and the verifier cannot drift apart:
+
+- `service-env-contract.ts` — the declared entries and the deliberately stale `DATABASE_URL`.
+- `configure-service-env.ts` (`runtime.service-env-fixture`) — writes `Env` (the deprecated
+  spelling, because that is what #1447 reported) into the scaffolded `appsettings.json`, runs
+  `netscript generate aspire` **twice**, asserts the whole `aspire/.helpers` directory is
+  byte-identical across the two runs, and asserts the declared pairs reached the generated helper.
+  Nothing under `aspire/.helpers/**` is hand-edited.
+- `service-env-evidence.ts` + `verify-service-env.ts` (`behavior.service-env`) — reads the live
+  topology via `aspire describe --format Json`, asserts the running resource carries the declared
+  entries, that `DATABASE_URL` is the allocated value and not the declared stale one, and that the
+  resource is not in a terminal state (the #1447 symptom: `Finished` within a second).
+- `service-env-evidence_test.ts` — 9 cases pinning the gate's failure modes (record- and
+  array-shaped environment, DCP-suffixed instance id, missing entries, inverted precedence,
+  terminal state as string and as object, absent resource, non-JSON output).
+
+**Ordering correction found during the slice review.** The fixture was first placed beside the
+other pre-start fixtures. That is wrong: `generate aspire` rewrites *every* helper, and both
+`runtime.flow-b-fixture` and `runtime.readiness-fixture` hand-patch a generated helper — running
+after them would have silently erased their patches and broken unrelated gates. Moved to
+immediately after `runtime.aspire-restore`, which also puts the generated environment block under
+the `generated.*` check/lint/fmt gates. The invariant is now asserted in `suite-registry_test.ts`
+rather than left to placement.
+
+| Gate | Result |
+| --- | --- |
+| `deno test --allow-all --unstable-kv packages/cli/e2e` | **PASS** — `183 passed | 0 failed (20s)` |
+| `run-deno-check.ts --root packages/cli` | **PASS** — 843 files, 0 occurrences |
+| `run-deno-lint.ts --root packages/cli` | **PASS** — 843 files, 0 occurrences |
+| `run-deno-fmt.ts --root packages/cli` | **PASS** — 843 files, 0 findings |
+| fixture script smoke (arg validation, bad mode, missing service, patch step) | **PASS** — each path fails with its own message; the patched `appsettings.json` carries the declared `Env` |
+
+Reconcile note: no new issue/PR comments. `plan.md` slice 5 amended in effect by the ordering
+correction above; recorded here rather than as drift because it is a placement decision inside the
+slice, not a divergence from the plan's intent.

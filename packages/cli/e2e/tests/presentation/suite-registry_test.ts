@@ -252,6 +252,36 @@ Deno.test('sqlite runtime suite resolves its reduced-container defaults without 
   }
 });
 
+Deno.test('runtime suites declare service environment before start and verify it after (#1447)', () => {
+  for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
+    const ids = resolveSuite(suiteId).gates.map((gate) => gate.id);
+    const fixture = ids.indexOf(GATE.RUNTIME_SERVICE_ENV_FIXTURE);
+    const start = ids.indexOf(GATE.RUNTIME_ASPIRE_START);
+    const verify = ids.indexOf(GATE.BEHAVIOR_SERVICE_ENV);
+    const patchesGeneratedHelpers = [
+      ids.indexOf(GATE.RUNTIME_FLOW_B_FIXTURE),
+      ids.indexOf(GATE.RUNTIME_READINESS_FIXTURE),
+    ];
+
+    // The fixture edits appsettings.json and regenerates; a declaration written
+    // after the AppHost is already up would prove nothing about the running
+    // resource, and the verification only means something once it is up.
+    assertEquals(fixture >= 0, true, `${suiteId} is missing the service env fixture`);
+    assertEquals(fixture < start, true, `${suiteId} declares service env after AppHost start`);
+    assertEquals(start < verify, true, `${suiteId} verifies service env before AppHost start`);
+
+    // Regeneration rewrites every helper, so it must not run after a fixture
+    // that hand-patched one — that would silently erase the patch.
+    for (const patched of patchesGeneratedHelpers) {
+      assertEquals(
+        fixture < patched,
+        true,
+        `${suiteId} regenerates helpers after a fixture that patches them`,
+      );
+    }
+  }
+});
+
 Deno.test('sqlite runtime suite excludes Postgres-only database evidence gates', () => {
   const sqlite = resolveSuite(SCAFFOLD.RUNTIME_SQLITE);
   const postgres = resolveSuite(SCAFFOLD.RUNTIME);

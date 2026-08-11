@@ -80,6 +80,12 @@ const RUNTIME_GATES = [
   GATE.GENERATED_WORKERS_REGISTRY,
   GATE.GENERATED_SAGAS_REGISTRY,
   GATE.RUNTIME_ASPIRE_RESTORE,
+  // Declared service environment is wired here, not next to the other pre-start
+  // fixtures: it regenerates every helper from appsettings.json, so it has to
+  // run before the fixtures that hand-patch a generated helper — and running it
+  // here also puts the generated environment block under the generated-quality
+  // gates below.
+  GATE.RUNTIME_SERVICE_ENV_FIXTURE,
   GATE.GENERATED_QUALITY_NEGATIVE,
   GATE.GENERATED_DENO_CHECK,
   GATE.GENERATED_DENO_LINT,
@@ -115,6 +121,7 @@ const RUNTIME_GATES = [
   GATE.BEHAVIOR_WORKERS_EXECUTIONS,
   GATE.BEHAVIOR_MCP_ENDPOINT_DIRECTORY,
   GATE.BEHAVIOR_SERVICE_HEALTH,
+  GATE.BEHAVIOR_SERVICE_ENV,
   GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
   GATE.BEHAVIOR_SAGAS_HEALTH,
   GATE.BEHAVIOR_SAGAS_LIST,

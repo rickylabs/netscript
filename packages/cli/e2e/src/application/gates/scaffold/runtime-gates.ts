@@ -22,6 +22,9 @@ const ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS: Partial<
 
 const KV_BACKGROUND_RUNTIME_WAIT_TIMEOUT_SECONDS = 300;
 
+/** The example service `netscript init` scaffolds; the subject of the service gates. */
+const SCAFFOLDED_SERVICE_RESOURCE = 'users';
+
 /** A feed stall gets three short chances instead of consuming two suite-wide 15-minute budgets. */
 export const ASPIRE_RESTORE_ATTEMPT_TIMEOUT_MS = 180_000;
 export const ASPIRE_RESTORE_MAX_RETRIES = 2;
@@ -216,6 +219,26 @@ export function createRuntimeGates(
       ],
     ),
     commandGate(
+      GATE.RUNTIME_SERVICE_ENV_FIXTURE,
+      'Declare service environment and regenerate on the consumer path',
+      GATE_PHASE.RUNTIME,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-read',
+        '--allow-write',
+        '--allow-run=deno',
+        '--allow-env',
+        'packages/cli/e2e/src/application/gates/scaffold/configure-service-env.ts',
+        context.project.projectRoot,
+        context.request.options.packageSource === PACKAGE_SOURCE.JSR ? 'published' : 'local',
+        context.project.cliEntrypoint.startsWith('jsr:')
+          ? context.project.cliEntrypoint
+          : resolve(context.project.repoRoot, context.project.cliEntrypoint),
+        SCAFFOLDED_SERVICE_RESOURCE,
+      ],
+    ),
+    commandGate(
       GATE.RUNTIME_ASPIRE_START,
       'Start generated Aspire AppHost',
       GATE_PHASE.RUNTIME,
@@ -348,9 +371,23 @@ export function createRuntimeGates(
         'eval',
         PROBE_SERVICE_HEALTH_SCRIPT,
         context.project.appHost,
-        'users',
+        SCAFFOLDED_SERVICE_RESOURCE,
         database,
       ],
+    ),
+    commandGate(
+      GATE.BEHAVIOR_SERVICE_ENV,
+      'Users service runs with its declared environment',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-run=aspire',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/verify-service-env.ts`,
+        context.project.appHost,
+        SCAFFOLDED_SERVICE_RESOURCE,
+      ],
+      (context) => context.project.projectRoot,
     ),
     commandGate(
       GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
