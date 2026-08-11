@@ -486,8 +486,13 @@ type rather than casting an empty object, so exhaustiveness is the compiler's jo
 
 **Slice review (Tier-A).** The `--allow-all` is load-bearing and justified in place with the
 measurement, not with an assertion of convenience. Both new files are reachable: the probe from the
-test, the test from `deno test`. `A6 F-CLI-2` holds — probe 108 lines, test 213 lines,
-`service-env-gates.ts` 94. The `service-env/` subdirectory gains two files and stays one bounded
+test, the test from `deno test`. `A6 F-CLI-2` holds — every file this slice adds or touches in
+`service-env/` is comfortably under the 500-LOC cap, verified by measurement at head. Exact per-file
+line counts are deliberately **not** recorded: they churn on every subsequent edit, and this trio
+(recorded as 108/213/94, actually 112/237/92) went stale within the same PR and produced a finding.
+The durable measurements that gate something are kept and remain correct: `runtime-gates.ts` 906
+lines, `packages/aspire/config.ts` 855, `service-environment-runtime_test.ts` 499, and the
+`service-env/` child count of 12 exactly at its cap. The `service-env/` subdirectory gains two files and stays one bounded
 child of `scaffold/`, so `scaffold-runtime-a8-f16-1333` is not deepened.
 
 **Reconcile note.** #1447 unchanged (P0, milestone 0.0.6, open); #1449 stays draft with `Closes
