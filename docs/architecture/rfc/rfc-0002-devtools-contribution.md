@@ -1143,7 +1143,13 @@ export interface DevToolsZoneDescriptor {
    *  ZONE's props/context contract independently of the family major. */
   readonly id: string;
   readonly capacity?: number;
-  /** Host-curated order pins: fully-qualified '<pluginKind>/<contributionId>' entries. */
+  /**
+   * Host-curated order pins, in the SAME fully-qualified form identity produces:
+   * `<mountId>/<id>/v<apiMajor>` (§6 identity). An earlier draft wrote these as
+   * '<pluginKind>/<contributionId>', a form nothing emits — so no anchor could ever
+   * match and the anchor tier was silently dead. Anchors are validated at generate
+   * time: an anchor matching no contribution is a **warning**, never a silent no-op.
+   */
   readonly anchors?: readonly string[];
 }
 ```
@@ -1818,7 +1824,7 @@ export type DevToolsProcedureResult<TOut> =
 /** What a DevTools route handler / server-rendered panel section receives. */
 export interface DevToolsServerPanelContext {
   readonly protocol: DevToolsDataProtocol;
-  readonly panelId: DevToolsPanelId;
+  readonly panel: DevToolsPanelRef;
   /** Consumed, not rebuilt: packages/telemetry/src/ports/telemetry-query-port.ts:23-71 (verified). */
   readonly telemetry: TelemetryQueryPort;
   /** In-process invoker bound to read-kind MCP flows only (D-6.4). */
@@ -1841,7 +1847,7 @@ export interface DevToolsServerPanelContext {
  *  RFC-A's environment-neutral construction rule (rfc:321-324). */
 export interface DevToolsClientPanelContext {
   readonly protocol: DevToolsDataProtocol;
-  readonly panelId: DevToolsPanelId;
+  readonly panel: DevToolsPanelRef;
   /** Same-origin, typed, closed-vocabulary query invoker. */
   readonly query: DevToolsQueryInvoker;
   /** SSE-backed, one-directional event feed (D-6.6). */
@@ -2133,13 +2139,37 @@ behaviour. Nothing in this RFC may be quoted as "DevTools is isolated/safe/produ
 Every surveyed system that grades *contributors* — sandboxing, signing, per-contribution RBAC,
 capability grammars — pays that cost for one antecedent: **untrusted third-party code in a
 long-lived, RBAC-governed, production-data surface** (`research/m3-admin-consoles.md` separation
-verdict; `research.md` F23). NetScript DevTools does not satisfy it. A DevTools contribution is a
-workspace package whose *server* code the developer already runs with full permissions
-(`research/p1-rfc-890-frontend-contrib.md` C9 — #890's T0 rationale), and whose scaffolder already
-receives whole-filesystem write (T-2 below). A panel cannot gain what its own package already has.
+verdict; `research.md` F23).
 
-So the contribution trust model stays a **single class — "installed workspace code"** — and the
-entire security budget goes to boundaries that are real *regardless* of contributor trust:
+**Correction — the antecedent is narrower than an earlier draft of this section claimed, and the
+difference is load-bearing.** That draft asserted contributions are *workspace* packages the
+developer already runs. **That is false by this RFC's own pipeline.** §10 pins installed plugins to
+`source = {kind:'jsr', specifier: 'jsr:<pkg>@<version>'}` and emits literal loaders such as
+`import('jsr:@acme/plugin-trace@1.4.2/devtools/trace-explorer')`; §6's worked example is
+`@acme/plugin-crons`. **A third party can ship a DevTools contribution over JSR**, and §6 states the
+generator **imports the pointed-to export in-process**. So third-party code both *exists* and
+*executes* in the developer's own process at generate time.
+
+Restated honestly, the antecedent splits in two, and only one half survives:
+
+| Surface | Is third-party code executed? | Decline still justified? |
+| --- | --- | --- |
+| **Panel rendering** (browser) | **No.** A panel contributes a `DevToolsUiNode` **data tree**; the host owns rendering. No contributed code reaches the browser in v1 — the island tier is staged, not shipped (§7) | **Yes.** Sandboxing a data structure buys nothing |
+| **Generate-time import** (dev machine) | **Yes.** The generator imports a possibly-third-party JSR module **in-process** — no subprocess, so **not even the weak boundary INV-2 scopes** | **No.** This is a real execution surface and is now modelled as **T-10** below |
+
+**What actually justifies the declines**, restated without the false premise: installing a plugin
+*already* grants it server code, a scaffolder with whole-filesystem write (T-2), and a place in the
+runtime registries — **before DevTools exists**. DevTools does not *introduce* the trust decision;
+it inherits one the plugin install already made. Sandboxing only the DevTools slice of an already
+fully-trusted install would be security theatre. **That is a narrower and defensible claim than
+"there is no third-party code", and it is the one this RFC makes.**
+
+What it does **not** license is leaving generate-time execution unmodelled, which is why T-10 and
+its gate exist rather than an assurance.
+
+So the contribution trust model stays a **single class — "installed plugin code, first- or
+third-party"** — and the security budget goes to boundaries that are real *regardless* of
+contributor trust:
 filesystem containment, read-only default, browser-origin discipline, and production absence.
 
 | Tier | Boundary | Posture |
@@ -2243,6 +2273,24 @@ Every row's mitigation is UNPROVEN at baseline; the column states the gate that 
 | **T-8** | One bad panel takes down the shell or the app being debugged. TanStack has no error boundary anywhere on its mount path (`m2` F11, marked inference there); #890 documents that an SSR render-time throw in a zone component fails the page response (`p1` C9 guarantee 4). | INV-6 per-contribution error boundary with **dev polarity** — loud error card, never silent `null` (`m2` F23 mechanism, inverted); host failure degrades to empty-list + logged error (`m2` F18). | Threat evidence-backed. **UNPROVEN** until **G-8**. |
 | **T-9** | Identity collision silently swaps a contribution. Baseline: duplicate plugin identity collapses last-writer-wins on a lossy local name (`r3` F9); registry-item collision is silent last-wins at three layers and the winner **flips** under `--force` (`r2` F11). | INV-8 namespaced, version-suffixed ids; duplicate id within a family is a generate-time error (`m2` F13/F16/F22). | Shipped defect. **UNPROVEN** until **G-9**. |
 | **T-10** | Half-written generated state misrepresents the system (integrity): per-target `Deno.writeTextFile` with no temp+rename, existence-only post-checks, walker registries leaking on `plugin remove` (`r3` F8; `research.md` F17). | Transactional staged → check → atomic swap. **Owned by the build-and-dev-loop section.** T6 records only the trust consequence: a diagnostics surface whose own registry can be half-written cannot be trusted to report drift. | Gate owned elsewhere. **UNPROVEN**. |
+
+**T-10 — generate-time in-process import of third-party contribution code.** The registry generator
+imports each plugin's pointed-to `devtools` export **in the generator's own process** (§6) to read
+its envelope. For a JSR-installed third-party plugin that is **arbitrary third-party code executing
+on the developer's machine with the generator's permissions**, and unlike the T-2 scaffolder path
+there is **no subprocess at all**, so INV-2's scoping cannot apply to it.
+
+- **Status: UNPROVEN, and newly modelled.** An earlier draft did not contain this threat, because it
+  rested on the false "workspace-only" antecedent corrected above.
+- **Mitigation (INV-9):** the generator must read the envelope **without executing contributor code
+  in its own process** — either by parsing the pointed-to module statically, or by importing it in a
+  **short-lived subprocess** whose permissions are scoped exactly as INV-2 requires and whose only
+  output is the serialized envelope. Import-in-generator-process is forbidden.
+- **Gate G-10:** a test asserting the generator completes with contributor code executed **outside**
+  its process, plus a negative test in which a contribution module with a module-level side effect
+  (a write, a `fetch`) cannot affect the generator.
+- **Honest note:** this raises the cost of §10's pipeline. It is still the right trade — a design
+  whose stated antecedent is false is worse than one that costs a subprocess.
 
 ### D-4. Normative invariants and their gates
 
@@ -2921,7 +2969,7 @@ built by the helper in §11.6 — never hand-concatenated in a panel.
 | --- | --- | --- |
 | **Workers** | Job/task registry with schedule intent vs observed drift; execution feed with attempts/retries as `RunRecord` semantics (#428). Empty state renders the `netscript scaffold job …` CLI-equivalent line | per execution → `/traces/detail/{traceId}?spanId=`; per resource → `/structuredlogs/resource/{n}?traceId=&logLevel=error`; queue-depth instrument → `/metrics/resource/{r}/meter/{m}/instrument/{i}` — rendered **only if** `queryMetrics` returns the instrument; whether NetScript emits OTel metrics at all is **unverified** (`r5` OQ7) |
 | **Sagas** | Instance table incl. `compensating`; from→to transition/compensation timeline as a state machine, not spans (#429) | per transition → trace/span detail; instance's journey → `<base>/flows/:correlationId` (internal) |
-| **Triggers** | Firing history across 8 trigger kinds; enable/disable rendering its CLI-equivalent line; cron preview (#430) | per firing → trace detail; misfire → correlated structured-logs link |
+| **Triggers** | Firing history across the **six** canonical trigger kinds (`TRIGGER_KINDS` — webhook, file-watch, scheduled, queue, stream, manual); enable/disable rendering its CLI-equivalent line; cron preview (#430) | per firing → trace detail; misfire → correlated structured-logs link |
 | **Streams** | Fan-out/delivery state per subscriber as framework run-state (#431). Contract-provenance column renders the **labelled degraded state** of §11.6 | per delivery → trace detail; subscriber resource → `/consolelogs/resource/{name}` |
 | **Contracts / SDK** | Provenance chain schema → router → OpenAPI → Scalar, and per-service coverage/duality; powered by the pure, IO-free `@netscript/mcp/openapi-projection` (`packages/mcp/openapi-projection.ts:8-38`) — no MCP process required | per operation → Scalar `#tag/{tag}/{method}{path}`; per schema → `#model/{slug}`. **Try-it is always an out-link** (killed surface, §11.1) |
 | **Plugin registry** | Installed plugins, contribution-axis map including *dead* axes (ten enum names vs twelve interface keys, `research.md` F18), doctor rows through the existing contributed-checks seam (`r4` F2), JSR version drift, silent-duplicate-identity detection (`r3` F9) | plugin's service resource → `/?resource={name}`; plugin's service API → its Scalar mount |

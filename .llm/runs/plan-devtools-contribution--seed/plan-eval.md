@@ -1,5 +1,17 @@
 # PLAN-EVAL — plan-devtools-contribution--seed — cycle 2
 
+> **OWNER WAIVER — 2026-08-11.** This file records the Codex evaluator's **cycle-2 `FAIL_PLAN`**.
+> After the stage-D2 design passes ran, the owner cleared the Plan-Gate directly and waived a third
+> evaluation cycle (`gates/plan-gate.md`: a Plan-Gate clears on `PASS` **or a written owner waiver**).
+> See `drift.md` **D-18**.
+>
+> **This is not an evaluator `PASS`.** The evaluator returned `FAIL_PLAN` twice. Its remaining
+> blockers were owner-gated (the unlaunchable design lane, forks F-1 and F-3), and the owner has
+> cleared the gate over them. Every supervisor-fixable finding was closed before the waiver, and the
+> stage-D2 amendments were applied after it.
+
+
+
 PLAN-EVAL-VERDICT: FAIL_PLAN
 
 - Plan evaluator session: separate Codex evaluator-of-record session, cycle 2, 2026-08-11
