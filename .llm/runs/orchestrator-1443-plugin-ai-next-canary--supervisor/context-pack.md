@@ -16,9 +16,9 @@ the merge SHA to the **existing** release lane for the next canary. Do not cut a
 | Research | done — `research.md`, evidence preserved under `evidence/` |
 | Plan & Design | done — `plan.md` **v6** (D1–D9), 13 slices, Design in `worklog.md` |
 | Plan-Gate | **PASS** (cycle 5 of 5; cycles 1–4 `FAIL_PLAN`) — `plan-eval-cycle5.md` |
-| Implement | **in progress — S1–S5 of 13 landed** (Codex GPT-5.6 Sol high, thread `019feca2-d7db-7801-b314-42b5c366964b`) |
-| Gate | not started |
-| Evaluate | not started (IMPL-EVAL: Fable 5 medium) |
+| Implement | **complete — S1–S13 plus 6 E2E-driven fixes landed** (Codex GPT-5.6 Sol high, thread `019feca2-d7db-7801-b314-42b5c366964b`; the last fix authored by the supervisor while that thread was writer-locked) |
+| Gate | unit/scoped/quality/arch **green**; `scaffold.runtime` in re-run (last full pass reached 70/1; the one red was the trigger-discovery regression, since fixed) |
+| Evaluate | IMPL-EVAL cycle 1 = **FAIL_FIX** (Fable 5, worktree `/home/codex/repos/ns-1443-impl-eval`); all 4 findings fixed; **re-eval required** |
 | Release | hand off merge SHA to the active release lane |
 | Close | arch-debt entry + follow-up issue for the unmounted chat island |
 
@@ -71,10 +71,17 @@ before the expensive E2E.
 
 | Slice | Commit | Gate evidence |
 | --- | --- | --- |
-| S1 manifest can express "no service" | `da7245561` | plugin 82/0, cli 719/0, quality clean, arch 0 |
-| S2 host stops synthesizing entrypoints (3 sites) | `cc1e5ddf4` | cli 720/0, plugin 82/0 |
-| S3+S4 AI declares truth; `ai/mod.ts` loads | `fed46cfc5` | cli 722/0, ai 29/0, plugin 82/0 |
+| S1 manifest can express "no service" | `da7245561` | plugin 82/0, cli 719/0 |
+| S2 host stops synthesizing entrypoints (3 sites) | `cc1e5ddf4` | cli 720/0 |
+| S3+S4 AI declares truth; configured module loads | `fed46cfc5` | cli 722/0, ai 29/0 |
 | S5 identity follows the configured module | `e5ac71c28` | cli 726/0 |
+| S6+S7 AI namespace complete + compilable | `31cd83e95` | cli 726/0, ai 30/0 |
+| S8+S9 doctor checks + assertive consumer gate | `9fab42043` | cli 735/0; consumer-verify red vs 0.0.5, green vs local |
+| S10+S11 shared contract, all six plugins | `6d3ef496e` | cli 736/0; six plugin suites green |
+| S12 E2E gates registered | `da866797c` | cli 739/0 |
+| E2E fix: re-install idempotency (disk truth) | `55fcbcefa` | cli 739/0 (500 steps) |
+| S14 control-plane/runtime split (owner D-10) | `0c3641de1`…`0282b04d8` | cli 740/0; six plugin suites green |
+| IMPL-EVAL + trigger-discovery fixes | head | cli 740/0 (501 steps); scoped check/lint clean |
 
 `deno.lock` unchanged throughout; `quality:scan` `findings:[]` and `arch:check` exit 0 on every
 slice. **#1443 acceptance box 1 is true** (no gateway/service/AppHost resource by default).

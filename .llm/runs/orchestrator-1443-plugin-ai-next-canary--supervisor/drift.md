@@ -197,3 +197,29 @@ existing runtime/application exports remain reachable through their separate bar
 triggers, schema generation, deployment, sandboxing, versioning, DB synchronization, security and
 management surfaces. **#1444 preserves the boundary and fixes its immediate contract; it does not
 absorb that redesign.** Anything discovered here that belongs to it is recorded, not built.
+
+## D-11 · minor · 2026-08-11 · two limitations disclosed rather than fixed
+
+Surfaced by IMPL-EVAL and recorded rather than silently carried:
+
+- **C8 — the configured-module loader child executes consumer-controlled code.** Resolving a
+  manifest imports the project's own module in a subprocess, with network permission, at
+  control-plane time. That is inherent to resolving a manifest the consumer authored in TypeScript,
+  and the subprocess plus bounded timeout is the containment. Disclosed in the PR body so it is a
+  known property rather than a surprise.
+- **C5 — `plugin-registry.ts:140` falls back silently when `deno.json` is absent**, so a
+  `deno.jsonc`-only project takes the in-process path without saying so. Not triggered by any
+  first-party scaffold, which always emits `deno.json`. Left as a limitation; a doctor hint is the
+  natural follow-up.
+
+## D-12 · significant · 2026-08-11 · owner directive — #1447 is a separate lane, and this lane cuts the canary
+
+Owner directive 2026-08-11:
+
+- **#1447** (`fix(cli/aspire): generated service resources drop Services[].Env`) must ship in the
+  same canary but **must not** be folded into PR #1444, and #1444's gated head must not move for it.
+  It runs as a fresh harness slice on branch `fix/1447-service-env`, worktree
+  `/home/codex/repos/ns-1447-aspire-env`, with its own draft PR against current `main`.
+- Its IMPL-EVAL is the **opposite-family Codex lane**.
+- **This supersedes the launch brief's "do not cut a competing canary."** The owner now directs this
+  lane to hand both merge SHAs to the release lane and cut the next canary containing both fixes.

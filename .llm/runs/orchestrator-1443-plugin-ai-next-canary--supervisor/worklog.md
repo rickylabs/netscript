@@ -48,7 +48,7 @@ abstraction is introduced, because no new external dependency or untestable seam
 
 ### Commit slices
 
-The **thirteen** ordered slices in `plan.md` §"Commit slices" (plan **v5**) are the Design's slice
+The **thirteen** ordered slices in `plan.md` §"Commit slices" (plan **v6**) are the Design's slice
 list; they are not restated here. `evidence/consumer-verify.sh` is owned by **S9**. Each slice: implement → automated gate → **Tier-A supervisor review** → sign-off
 commit → push → PR comment → run-artifact update → reconcile note.
 
@@ -134,3 +134,48 @@ deno task agentic:codex-resume -- --thread-id 019fec5f-4805-7bc1-8e58-bcb6e04864
 ## Reconcile notes
 
 _(one per slice, from the post-slice reconcile loop)_
+
+
+## IMPL-EVAL
+
+**Cycle 1 — `FAIL_FIX`** (Claude Fable 5, fresh session, worktree
+`/home/codex/repos/ns-1443-impl-eval`, artifact `evaluate.md`, PR comment `5249343467`).
+
+| # | Finding | Disposition |
+| --- | --- | --- |
+| 1 | `configured-plugin-manifest-loader-child.ts:21` narrowed to `object` for a resolver requiring `Readonly<Record<string, unknown>>`; hidden because the child is spawned `--no-check`, so the suite was green while the scoped check gate was red | **fixed** — explicit type predicate, no cast; scoped check `failedBatches: 0` |
+| 2 | Unused `RunContext` import in the new `plugin-contract-gates.ts`; scoped lint red | **fixed** — scoped lint `0` occurrences |
+| 3 | Commit trail stops six commits before head — missing per-slice PR comments | **outstanding** |
+| 4 | Run artifacts contradict head (worklog v5, context-pack "S1–S5 of 13", PR body "plan-eval") | **fixed here** |
+
+Independently verified green by the evaluator: cli 740/0, plugin 83/0, all six plugin suites,
+`quality:scan`, `arch:check`, `doc:lint`, `publish:dry-run` without `--allow-slow-types`, scoped fmt,
+and **`deno.lock` byte-identical to `2256a67bf`**. It confirmed **D-10 preserved** — every
+`mod.ts`/`runtime.ts` emitter and `workers|triggers/runtime/**` surface byte-identical to baseline —
+that the import-safety test cannot be satisfied by handing it env, and that the doctor timeout is a
+real SIGKILL rather than a `Promise.race`.
+
+**Re-evaluation required**: findings 1–2 and the trigger-discovery fix were authored by the
+supervisor while the implementer thread was writer-locked, so that commit has not yet been reviewed
+by any second session.
+
+### IMPL-EVAL cycle 2 — `FAIL_FIX` (artifact hygiene only, zero code findings)
+
+| # | Finding | Disposition |
+| --- | --- | --- |
+| 1 | Run artifacts stale at head; the v6/S1–S14 sync existed only as **uncommitted** edits; worklog's cycle-1 table recorded 4 of 6 findings | **fixed** — committed here, table completed below |
+| 2 | PR body untouched since the plan phase (says "plan v5", all boxes unchecked) on a PR carrying `Closes` keywords; C8 disclosure absent | **fixed** — body synced, DoD checked with evidence, C8 + C5 recorded |
+| 3 | `scaffold-runtime-GREEN.log` cited as "preserved at" a repo path but **untracked**; `leak-report.md` likewise | **fixed** — both committed to `evidence/` |
+| 4 | Committed `consumer-verify-local-GREEN.log` is the pre-split version showing `./ai/mod.ts` | **fixed** — regenerated at head |
+| 5 | Second consecutive `FAIL_FIX` → owner escalation required | **recorded** — see below |
+
+Cycle-1 findings 5 and 6, omitted from the earlier table: (5) the stale committed consumer-verify
+log — now regenerated; (6) memo obligations C5 (`deno.jsonc` silent fallback at
+`plugin-registry.ts:140`) and C8 (the child loader executes consumer-controlled code with
+`--allow-net` at control-plane time) unrecorded — both now in the PR body and `drift.md` D-11.
+
+**Owner escalation (protocol: two consecutive `FAIL_FIX`).** Recorded rather than skipped. Every
+code, test and gate surface is green and independently verified by the evaluator, including a green
+`scaffold.runtime` (84/0/2). Both cycle-2 verdicts contain **no source findings** — the complete
+remaining fix set was one artifact-hygiene commit plus a PR-body edit. The re-evaluation is
+therefore artifact-only, and the E2E-gated source tree is byte-identical across it.
