@@ -295,3 +295,26 @@ documentation.
   not just quoted: *an evaluator cycle gets its own worktree*, and reusing one is refused by design.
 - **Note for the run record:** cycle 1's worktree is left intact at its own commit so its verdict and
   transcript remain independently inspectable.
+
+## 2026-08-11 — D-14: PLAN-EVAL cycle 2 exhausted its budget reading, producing no verdict
+
+- **What:** Cycle 2 launched cleanly in its own worktree (thread `019ff075-d2e0-7823-9572-0648e158cc16`,
+  route **matched**), ran the full **26** turns, and wrote **nothing**. Worktree clean afterwards; the
+  `plan-eval.md` present is cycle 1's, restored by checkout.
+- **Source:** runner result `{"turns":26,"lastState":"budget_exhausted","reason":"max turns reached"}`;
+  `git status --porcelain` in the cycle-2 worktree → empty.
+- **Expected:** a cycle-2 verdict file.
+- **Actual:** the evaluator consumed its entire budget on **reading**. The artifact set has grown to
+  a ~3,600-line RFC plus 14 corpus files, 8 design packs, 25 filing drafts, and a 14-entry drift log —
+  and the cycle-2 brief asked it to verify *nine* separate change areas. It is a plausible
+  budget-planning failure by the **supervisor**, not evaluator misbehavior: I raised `--max-turns`
+  from 12 to 26 to fix cycle 1's cut-off, but did not shrink the reading surface at the same time.
+- **Severity:** significant — a required gate produced no verdict.
+- **Action:** fix by **steering the same thread**, not by relaunching. The registry allows one sender
+  per worktree, and the thread already holds the analysis; a fresh launch would repeat the reading
+  and fail identically. The steer instructs it to stop reading, write from what it has, and mark any
+  unexamined checklist box **`NOT_ASSESSED`** rather than guessing — with an explicit statement that
+  `NOT_ASSESSED` will **not** be treated as a pass.
+- **Lesson for the next cycle:** an evaluator brief must bound its own reading. Re-evaluation should
+  point at a **diff** plus the specific claims to re-verify, not re-present the whole corpus. Recorded
+  because this run is now the second data point (cycle 1 also hit its cap).
