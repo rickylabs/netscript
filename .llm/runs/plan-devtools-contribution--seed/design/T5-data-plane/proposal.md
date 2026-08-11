@@ -1,5 +1,12 @@
 # T5 — Data plane: how DevTools panels get data (charter Q6)
 
+> **HISTORICAL EVIDENCE — frozen at authoring time.** Where this pack disagrees with
+> `docs/architecture/rfc/rfc-0002-devtools-contribution.md`, **the RFC wins**. Notably the package
+> boundary was later corrected from `A2 plugin-devtools-core` to **A1 `packages/devtools-core` +
+> A6 CLI emission + A5 plugin**, and identity/ordering were unified on `(mountId, id, apiMajor)`
+> and anchors-then-`(order, mountId, id)`. See `RFC-AUTHORITY.md` and `drift.md`.
+
+
 Stage-D deep-dive pack, run `plan-devtools-contribution--seed`, baseline `main` @ `2256a67bf`.
 Planning-only; nothing outside this run dir was written. Citations: `path:line` are baseline repo
 paths; `rfc:NNN` = RFC-A text at `14b5c858c` (per corpus `p3`); `RFC:NNN` = RFC-0001 at `6cb79675c`

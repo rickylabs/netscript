@@ -1,136 +1,110 @@
-# PLAN-EVAL — plan-devtools-contribution--seed
+# PLAN-EVAL — plan-devtools-contribution--seed — cycle 2
 
 PLAN-EVAL-VERDICT: FAIL_PLAN
 
-- Plan evaluator session: Codex separate evaluator session (session id not exposed), 2026-08-11
-- Evaluated commit: `b7cd6206762bc8f7a681526a993082c20e4cddfc`
+- Plan evaluator session: separate Codex evaluator-of-record session, cycle 2, 2026-08-11
+- Evaluated commit: `143c315741fc4bc9d0c5069d6cb3c69321c7762b`
 - Baseline: `main` @ `2256a67bf`
 - Run: `plan-devtools-contribution--seed`
-- Surface / archetype: planning-only RFC describing a proposed contribution core, DevTools host,
-  Archetype-5 plugin, and Archetype-6 CLI additions; the proposed core's archetype is not yet validly
-  locked
+- Surface / archetype: proposed A1 `packages/devtools-core` contracts + existing A6 CLI emission +
+  A5 `plugins/devtools`; generated host app described as userland; conditional A3 trigger
 - Scope overlays: `SCOPE-docs.md` + `SCOPE-frontend.md`
+
+## Cycle-2 result
+
+The Plan-Gate is not cleared. The mandatory GLM 5.2 design pass remains absent, the execution
+surface is still unlaunchable, and no owner amendment or waiver exists. **That item alone blocks
+`PASS`.** Honest escalation in `decision-brief.md` and risk R12 is correct evidence of the blocker;
+it is not evidence that the required design lane ran or that its requirement was waived.
+
+Independent verification also found supervisor-fixable residuals: the authoritative corpus still
+contains incompatible package/archetype, identity, and ordering variants; the A1+A6+A5 gate union
+omits required families; the 16 implementation rows do not each name an executable proving command
+or exact file set; and the newly added filing artifacts are not reconciled with `worklog.md`, the
+filing manifest, or drift D-11.
 
 ## Checklist results
 
 | Plan-Gate item | Result | Evidence / location |
 | --- | --- | --- |
-| Research present and current | **PASS** | `research.md` exists, records the `2256a67bf` re-baseline and three changed assumptions, and links 26 findings to the committed corpus. Independent checks confirmed the `.strict()`/schema-version finding, the whole-filesystem Deno grant, the CLI contribution-merger omission, three hard-coded Vite aliases, the 16-of-36 `arch:check` census, the unexported SSE primitives, and the SDK/telemetry public surfaces. Live read-only GitHub checks confirmed D-8's #400 comment-thread corrections and current child milestones. |
-| Decisions locked | **FAIL** | The evaluated corpus still specifies incompatible identity and ordering contracts: RFC `:963-1000` uses host `mountId` + local slug `id` + separate `apiMajor`; `:1400-1401`, `:1766-1767`, and `:2226` use namespaced/version-suffixed ids; `:1491-1492` retains a flat `(order,id)` panel sort despite the §6 anchor + `(order,mountId,id)` authority. The package boundary is also unlocked: §6 proposes an A1 `@netscript/contribution-core` (`:901-914`), while §13 omits that unit and exports `ContributionEnvelope` from A2 `plugin-devtools-core` (`:3443-3478`). |
-| Open-decision sweep | **FAIL** | `plan.md:109-112` redefines a numbered owner fork as a closed decision, but RFC §15.1 explicitly lists F-1…F-8 as "Must resolve before implementation" (`:3573-3584`). F-1 changes the public package/import home, emitter ownership, dependency graph, and #922 re-baseline (`:885-914`), so it is not reversible without rework merely because payload fields are similar. The design packs retain additional implementation-shaping owner questions, including T2 O-2/O-3/O-5, T3 questions 1/3/4/6, T6 questions 2/3/6, and T7 questions 1/5/6. |
-| Commit slices (< 30, gate + files each) | **FAIL** | `worklog.md:24-35` has eight run-document slices, but it is stale and does not satisfy the implementation-board plan: slice 5 claims the GLM pass ran although both attempts produced zero tokens; slice 6 names the superseded `doc:lint`/Markdown-format checks; slice 7 names a nonexistent `adversarial.md`; and slice 8 claims filing-manifest/brief/decision files that do not exist. RFC §14's actual implementation slices (`:3528-3562`) name outcomes but not files or an individual proving gate/command per slice. The Stage-D folders contain proposals/open questions only, not the seed-run-required draft epic/issues and agent briefs claimed by `worklog.md:31`. |
-| Risk register | **FAIL** | Risks are enumerated, and most future mitigations are honestly marked absent. However R1 calls F-1 reversibility an existing mitigation (`plan.md:149-151`) even though the choice changes public package location/imports and emitter ownership. The significant D-10 missing-design-pass risk is not added to the register, while the plan's Scope still promises a design/UX pack incorporating that pass (`plan.md:31-33`). |
-| Gate set selected | **FAIL** | The docs gates are correct and independently green, but the implementation gate set is based only on A2+A5+frontend (`RFC:3491-3505`) while the plan also changes the A6 CLI and names no applicable F-CLI gates. The A2 selection itself does not meet doctrine yet: Archetype 2 wraps one external system behind a package-owned port and named adapter(s), whereas `plugin-devtools-core` is assigned contracts, UI vocabulary, ordering, registry emission, and several internal read ports with no named adapter set (`RFC:3443-3456`; doctrine `06-archetypes.md:41-76`; `ARCHETYPE-2-integration.md`). Until package boundaries/archetypes are corrected, the matrix-derived gate union is not trustworthy. |
-| Deferred scope explicit | **FAIL** | Implementation and board filing are explicit deferrals, but a charter-mandated deliverable is missing without an authorized scope change. D-10 correctly records that the GLM 5.2 pass did not run and that Sonnet scrutiny is not a substitute. `lane-policy.md` has no GLM fallback and invariant 5 requires the pass. Honest escalation is necessary but is not equivalent to completion or an owner waiver. The absent Stage-D draft epic/issues/agent briefs and Stage-H-prep manifest/brief artifacts are likewise neither present nor authorized out of scope. |
-| jsr-audit surface scan (pkg/plugin) | **FAIL** | RFC §13.2 checks explicit returns, closed unions, `any`/casts, and hard-coded plugin names (`:3464-3489`), but that is only a partial risk list. The required planned-surface rubric also covers package metadata/name/description, complete export and subpath map, publish include/exclude and file list, ESM-only shape, module docs for every entrypoint, symbol docs/examples, README, provenance, and runtime compatibility (`.agents/skills/jsr-audit/SKILL.md:41-71`). Package ownership is unresolved, so even the metadata/export audit target is not stable. |
+| Research present and current | **PASS** | `research.md` remains tied to baseline `2256a67bf` and provides cited current-state findings. Independent source checks reconfirmed the top-level manifest schema is `.strict()` at `packages/plugin/src/protocol/manifest.ts:271-283` and the generator subprocess receives bare `--allow-read` / `--allow-write` at `packages/cli/src/public/features/generate/plugins/installed-runtime-registry-generator.ts:413-418`. The cycle-1 citation sampling therefore remains reproducible at the evaluated commit. |
+| Decisions locked | **FAIL** | The corrected ownership table in RFC §13.1 (`:3463-3496`) is doctrinally coherent in isolation: A1 contracts, A6 emission, A5 thin plugin, generated userland host, and an A3 trigger. It is not the sole authority in the committed corpus. The same normative RFC still assigns host runtime/panels to A2 `packages/plugin-devtools-core` (`:629-632`), keeps O-2/O-3 open and `@netscript/contribution-core` (`:897-915`, `:1312-1320`), imports `plugin-devtools-core` (`:978`, `:1434`, `:3510`), derives gates from A2+A5 (`:3546`), wires the old root (`:3572`), and says F-8 is “A2 now” (`:3663`). `decision-brief.md:44-49`, `rfc-sections/05-host.md`, `06-family.md`, `13-integration.md`, and T1/T2 retain the old boundary too. The identity/order authority at RFC `:964-1001`, `:1164-1200`, and `:1401-1412` is contradicted by the surviving compound-id statements at `:1784`, `:2227`, `rfc-sections/08-data-plane.md:79`, `09-trust.md:112,131`, `11-ia.md:304`, T3/T5/T6/T8, and flat `(order,id)` variants in T3 and `rfc-sections/07-kinds.md`. |
+| Open-decision sweep | **FAIL** | `plan.md:134-159` now correctly classifies F-1 and F-3 as `MUST RESOLVE — would force rework`; `filing/filing-manifest.md:22-25` confirms owner ratification, D-10, F-1, and F-3 are all `NOT MET`. No owner decision is recorded. The GLM requirement likewise needs either a working launcher and completed pass or an explicit owner amendment/waiver. These are implementation-shaping decisions, not board-only scheduling choices. |
+| Commit slices (< 30, gate + files each) | **FAIL** | RFC §14 has exactly 16 rows (`:3622-3637`), below the limit, and every row has columns for roots, introduced contract, gate, and dependency. The claimed per-row proving-command standard is not met: W1-b/c/d, W2-a, W3-b, W4-a/b, W5-a, and W6-a/b describe tests/evidence without naming the command that runs them; W0-a/b are manual probes, which is acceptable only as an explicitly reproducible manual gate. Several roots are not exact (`throwaway branch`, `host renderer`, `packages/cli/...`, `respective plugins/*`). `worklog.md:37,43` is also stale at this commit, reporting the epic/issues/briefs/manifest absent after they were added. |
+| Risk register | **FAIL** | R1 is correctly changed to non-reversible and unmitigated, and R12 accurately records the GLM blocker (`plan.md:168,178`). R13 is now factually stale: it says the filing deliverables do not exist (`:179`), although `filing/` contains the epic, 16 issue drafts, 7 briefs, and manifest. `decision-brief.md:44` also still calls F-1 reversible. A risk register whose current-state fields disagree with the committed deliverables and owner brief does not pass the current-plan gate. |
+| Gate set selected | **FAIL** | RFC §13.3 claims the A1+A6+A5 union (`:3551-3567`) but omits required gates. The matrix requires A5 F-3, runtime/Aspire validation, and consumer validation (`.llm/harness/gates/archetype-gate-matrix.md:20-40,60-65`; A5 profile `:70-78`), while RFC `:3558` limits F-3 to A6 and names no A5 runtime gate. The matrix also says A6-specific F-CLI-1…F-CLI-31 extend the universal gates (`:42-46`); RFC substitutes the scaffold-runtime E2E surface at `:3562` without selecting/reporting those gates. The absence of a script permits `PENDING_SCRIPT` plus manual evidence, not omission (`matrix:78-91`). |
+| Deferred scope explicit | **FAIL** | Implementation and board mutation are explicitly deferred, and read-only checks found no filing mutation. But the charter-mandated GLM 5.2 pass is a selected design deliverable, not ordinary deferred scope. `plan.md:40-43`, drift D-10, `decision-brief.md:12-34`, and risk R12 all prove it did not run and has not been waived. Under lane-policy invariant 5, this alone prevents `PASS`. |
+| jsr-audit surface scan (pkg/plugin) | **FAIL** | RFC §13.2 (`:3521-3538`) now contains the full package checklist: metadata, exports/subpaths, publish filtering/file list, ESM shape, module/symbol docs and examples, README, slow types, `any`/casts, coupling, provenance, and runtime compatibility. The scan is not yet coherent for the selected published surface: its API sketch still targets `@netscript/plugin-devtools-core` (`:3510`) while its metadata targets `@netscript/devtools-core` (`:3528`), and it does not apply the rubric or an explicit N/A disposition to planned published A5 `plugins/devtools`. Package/plugin ownership must be singular before this gate can pass. |
+
+## Verification of the cycle-1 fixes and new claims
+
+| Claim | Result | Independent evidence |
+| --- | --- | --- |
+| 1. One identity law and one ordering law | **FAIL** | The canonical RFC sections now state `mountId` + slug `id` + `apiMajor` and anchors then `(order,mountId,id)`, but the cross-file searches above found surviving compound/version-suffixed identity and flat-sort variants in normative RFC text, `rfc-sections/`, and design packs. |
+| 2. A1 + A6 + A5 boundary; A3 trigger; O-2 closed | **FAIL** | RFC §13.1 passes the doctrine trigger test, but RFC §§5–6, §13.3, §15, the owner brief, intermediate sections, and design packs still specify A2 / `plugin-devtools-core` / `contribution-core`; the corpus still labels O-2 open. |
+| 3. Gate union redrawn | **FAIL** | A6 is mentioned, but F-CLI-1…F-CLI-31 are omitted; A5 F-3 and its runtime/consumer family are not completely selected. |
+| 4. Sixteen slices with files, contract, and proving command | **FAIL** | The count is 16 and the columns exist. Not every row names exact files/roots or the command that executes the described proving test. |
+| 5. Full JSR rubric | **PARTIAL** | The checklist content is materially complete for an A1 package. Its package name/API sketch conflict and the lack of an A5 plugin disposition leave the planned package/plugin scan incomplete. |
+| 6. `worklog.md` reflects actual status | **FAIL** | `worklog.md:37` and `:43` still say the draft epic/issues/briefs/manifest are absent, although the evaluated commit added them. |
+| 7. F-1 reversibility withdrawn; R1 corrected; R12/R13 added | **PARTIAL** | `plan.md:134-149,168,178-179` contains those changes. `decision-brief.md:44` still recommends F-1 as reversible, and R13 is stale after the filing commit. |
+| 8. Seed deliverables added, draft-only, no mutation, valid-label blockers | **PARTIAL** | `filing/` contains one epic draft, 16 issue drafts, 7 wave briefs, and a manifest. All 16 issue drafts have `## Acceptance`; no closing keyword was found in the issue bodies. Read-only live searches found no matching newly filed W-slice issues; #400's update timestamp predates this cycle; PR #1450 remains draft; and the forbidden labels are absent from both `.github/labels.yml` and the live set. However `filing/epic.md:18-45,271-276` still proposes a second epic and invented `epic:devtools-contribution`, contrary to manifest §4.0's AMEND-#400 default. Several issue-draft label/type/priority fields also disagree with the manifest's ordered table. |
+| 9. Drift D-11/D-12 recorded | **PARTIAL** | Both entries exist. D-12 honestly records label-file/live-label and milestone-guidance drift without mutating either. D-11 says #400 is AMEND rather than a second umbrella, but that resolution was not propagated to `filing/epic.md`. |
 
 ## Open-decision sweep (evaluator-run)
 
-The following decisions would force rework if deferred past this gate:
+These still force rework if deferred:
 
-1. **F-1 / O-2 / O-3 — spine and package ownership.** Option (a), (b), or (b′) changes package
-   creation, public specifiers, emitter ownership, dependencies, and the #922 plan. Similar payload
-   fields do not make those implementation artifacts byte-identical. Resolve the option and the
-   neutral package's name/home before slicing.
-2. **Identity and ordering.** Select one identity law and propagate it through §§6–9, G-9, and the
-   T2/T3/T5/T6/T8 packs. Select one ordering law and remove the surviving `(order,id)` variants.
-3. **Manifest evolution (F-3/O-5).** `.passthrough()`/reserved catchall versus schema v2 has
-   different old-CLI behavior and tests. Choose the compatibility contract before the pointer and
-   emitter slices are considered locked.
-4. **Package/archetype boundary (F-8).** Decide whether the neutral contracts are an A1 package,
-   what external system (if any) makes `plugin-devtools-core` A2, where adapters live, and which unit
-   owns host/runtime behavior. Then derive A1/A2/A3/A5/A6 gates from that result.
-5. **Scope-changing owner questions.** Read-only v1 versus pulling `action` forward, DT1 auth versus
-   hard refusal, import-mode versus copy-mode after the island probe, and framework-wide INV-2
-   retrofit versus separate debt all change files, dependencies, and acceptance gates. Resolve them
-   now or explicitly remove the affected work from the first implementation tranche with stable
-   entry criteria.
+1. **F-1 — package/spine ownership and imports (owner-gated).** `plan.md` correctly acknowledges
+   that the choice changes public import specifiers, emitter ownership, dependency graph, and #922
+   re-baselining. The owner has not selected an option.
+2. **F-3 — manifest evolution compatibility (owner-gated).** `.passthrough()`/reserved catchall and
+   schema v2 produce different old-CLI behavior and tests. The owner has not selected the contract.
+3. **D-10 / GLM 5.2 design pass (owner-gated or launcher repair).** No authorized fallback exists.
+   A repaired launcher plus the actual pass, or an explicit owner amendment/waiver, is required.
 
-Board-only scheduling/disposition choices may remain owner-ratified at Stage H if their deferral
-cannot change implementation contracts. They must not be used to classify the architectural forks
-above as closed.
+Board-only dispositions may wait for owner ratification because they do not determine implementation
+contracts. They remain protected by the manifest's no-filing preconditions.
 
-## Independent gate results
+## Independent verification evidence
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Immutable input | **PASS** | Initial and pre-write `git rev-parse HEAD` = `b7cd6206762bc8f7a681526a993082c20e4cddfc`; worktree initially clean. |
-| RFC links | **PASS** | `deno task docs:links --root docs/architecture/rfc --pretty` exited 0: 1 doc, 0 broken links, 0 broken anchors, 0 orphans. |
+| Immutable evaluation input | **PASS** | Initial and final pre-write `git rev-parse HEAD` were `143c315741fc4bc9d0c5069d6cb3c69321c7762b`; worktree was clean. |
+| Cross-file contract search | **FAIL (plan claim)** | `rg` over the RFC, run Markdown, `rfc-sections/`, and design packs found the residual package/A2, compound-id, and flat-sort forms listed above. |
+| RFC links | **PASS** | `deno task docs:links --root docs/architecture/rfc --pretty` exited 0: 1 document, 0 broken links, 0 broken anchors, 0 orphans. |
 | Docs accuracy | **PASS** | `deno task docs:accuracy` exited 0. |
-| Lock hygiene | **PASS** | `deno.lock` SHA-256 was `d4d00f600bd9cc9ae3c468e46bb2fa603e578da31a383ce13fdc110917fef35a` before and after `deno doc` and both gates. |
-
-## Citation and claim spot-check
-
-### Checks that passed
-
-- **D-6 / D-9:** `PluginInstallerManifestSchema` pins the schema version at
-  `packages/plugin/src/protocol/manifest.ts:271` and the top-level `.strict()` is exactly `:283`.
-- **D-7:** `installed-runtime-registry-generator.ts:416-417` passes bare `--allow-read` and
-  `--allow-write`. `deno help run` confirms the path values are optional; absent values grant global
-  filesystem access. No `--allow-net`, `--allow-env`, or `--allow-run` occurs in that argv path.
-- **D-8:** read-only GitHub API checks found the owner-authored `CR-DDX-HOSTAGNOSTIC` comment at
-  `2026-07-06T12:30:28Z`, the `CommandInvokePort` acknowledgement two seconds later, and the
-  owner-ratified train comment at `2026-07-19T14:40:43Z`; sampled children #410/#432/#551 are on
-  `0.0.15` and #400 remains on `Backlog / Triage`.
-- `deno doc --filter TelemetryQueryPort packages/telemetry/query.ts` confirms seven methods.
-- `deno doc --filter CreateServiceClientOptions packages/sdk/src/ports/service-client.ts` confirms
-  no authorization/header option.
-- The three Vite aliases are exactly at `vite.config.ts.template:20-32`; `mergeContributions`
-  omits `cli` at `contribution-merger.ts:8-26`; the SSE functions exist at `sse.ts:148,339,416` and
-  are absent from the package export map; `arch:check` names 16 roots while 36 package/plugin units
-  have `deno.json`.
-
-### Checks that failed or exposed residual drift
-
-- D-9 is correct in `drift.md`, but the RFC still cites `.strict()` as line 282 at
-  `RFC:183,386,1660,2048,3400`; only `RFC:1044` acknowledges the correct `:283` anchor.
-- The Stage-F grep fix was not propagated to §6: `RFC:856-857` still claims the broad
-  `grep -rn "devtools\|DevTools" packages plugins docs/site` returns zero, but the literal command
-  finds two `packages/fresh-ui/deno.lock` hits. The scoped `-rniE` source-only command elsewhere does
-  return zero.
-- The strong data-plane statement at `RFC:1720-1729` says no manifest field accepts a URL/path and
-  the target vocabulary is closed, while `DevToolsLink` retains
-  `{ target: 'external'; href: string }` at `RFC:1531`. If links are outside the security claim,
-  narrow the claim; otherwise remove or constrain the arbitrary URL arm and add its gate.
-- The UNPROVEN discipline is otherwise explicit and substantially honest: threats T-1…T-10 are
-  labelled at `RFC:2193-2208`, and gates G-1…G-9 are named. The residual identity conflict means
-  G-9 is not implementable consistently, and the URL contradiction means the stated confused-deputy
-  invariant is not yet a coherent contract.
+| Seed artifact census | **PASS (existence only)** | 16 issue drafts, 7 briefs, one epic body, and one filing manifest exist. Existence does not cure the consistency findings above. |
+| GitHub no-mutation boundary | **PASS (no contrary evidence found)** | Read-only `gh` checks found no newly filed matching issue set, no forbidden label, no cycle update to #400, and PR #1450 still draft. No GitHub write command was run by this evaluator. |
+| Lock hygiene | **PASS** | `deno.lock` SHA-256 remained `d4d00f600bd9cc9ae3c468e46bb2fa603e578da31a383ce13fdc110917fef35a`; no lock-rewriting command was run. |
 
 ## Verdict
 
-The Plan-Gate is not cleared. No board filing may occur from this evaluation.
+`FAIL_PLAN`
 
-### Required fixes
+This is the second formal failure. Per the Plan-Eval protocol, the unresolved owner-gated items are
+escalated rather than routed around. No board filing may occur from this verdict.
 
-1. **Lock the architecture before re-evaluation.** Resolve F-1/O-2/O-3 and all other
-   implementation-shaping owner forks listed above. Update `plan.md` so "closed" means decided,
-   not merely recommended pending owner choice.
-2. **Reconcile one contract corpus.** Pick one identity and one ordering model; update §§6–9,
-   the public API sketch, G-9, and every affected design pack. Remove the surviving compound-id,
-   `(order,id)`, and package-home variants. Re-run a cross-file search proving no third form remains.
-3. **Correct doctrine selection and gates.** Re-draw the package boundaries, justify each archetype
-   against doctrine's actual trigger, and include the complete matrix union, the A6/F-CLI surface,
-   frontend/browser gates, quality gates, consumer gates, and any A3/F-13 trigger.
-4. **Replace the slice plan with implementation-ready PR slices.** Keep fewer than 30; for every
-   slice name exact files/roots, the contract it introduces, and the command/manual gate that proves
-   it. Make W0 probe outcomes explicit dependencies. Bring `worklog.md` current and remove stale gate
-   and filename claims.
-5. **Complete the planned-surface JSR audit.** After package ownership is locked, document metadata,
-   exports/subpaths, README/module/symbol docs and examples, publish filtering/file list, ESM shape,
-   provenance/runtime compatibility, slow-type risk, and the full-export `doc:lint`/publish gates.
-6. **Satisfy or explicitly waive the GLM requirement.** Fix the design-lane launcher and run the
-   mandated GLM 5.2 pass with dispositions, or obtain an explicit owner amendment/waiver of the
-   charter and lane-policy invariant before another Plan-Gate. Sonnet Stage-F scrutiny is useful but
-   is not the required GLM evidence.
-7. **Complete the seed design deliverables.** Add the claimed draft epic/issues, per-issue agent
-   briefs, and one-shot filing manifest (or record an owner-authorized seed-contract amendment),
-   while preserving the no-board-mutation boundary.
-8. **Repair citation and security-claim residue.** Correct every `:282` anchor, the broad §6 grep,
-   and the arbitrary-URL versus no-URL invariant. Re-run the manual citation sweep and record it in
-   the current worklog.
+### If FAIL_PLAN — required fixes still unmet
+
+1. **Owner-gated — satisfy or waive the mandatory GLM pass.** Repair the declared GLM 5.2 design
+   launcher and run/disposition the pass, or obtain an explicit owner amendment/waiver of the
+   charter and lane-policy invariant. **This item alone blocks `PASS`.**
+2. **Owner-gated — resolve F-1 and F-3.** Record the package/spine/import decision and manifest
+   compatibility decision before implementation slices are treated as locked.
+3. **Supervisor-fixable — make the committed corpus singular.** Propagate the A1+A6+A5 boundary,
+   `packages/devtools-core` name, identity law, and two-tier ordering law through the normative RFC,
+   owner brief, `rfc-sections/`, design packs, filing drafts, and JSR target; then re-run the
+   cross-file variant searches.
+4. **Supervisor-fixable — complete the derived gate union and slices.** Select A5 F-3/runtime/
+   consumer gates and A6 F-CLI-1…F-CLI-31 with `PENDING_SCRIPT`/manual dispositions where needed.
+   Give each of the 16 slices exact files/roots and one exact executable command or reproducible
+   manual gate.
+5. **Supervisor-fixable — reconcile current-state and filing artifacts.** Update `worklog.md`, R13,
+   `decision-brief.md`, `filing/epic.md`, issue metadata, and the manifest so they agree that #400 is
+   AMEND by default, use only verified labels, and accurately describe the deliverables now present.
 
 ## Notes
 
-The independent docs gates being green does not cure a Plan-Gate failure: they prove link and
-discoverability mechanics, not that the architecture decisions are closed or mutually consistent.
+The independently green documentation gates prove link and source-alignment mechanics. They do not
+override the Plan-Gate requirement that the architecture, gate union, slices, planned publish
+surface, and mandatory design evidence be complete and mutually consistent.

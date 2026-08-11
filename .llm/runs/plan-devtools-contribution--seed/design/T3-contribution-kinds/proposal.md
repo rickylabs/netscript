@@ -1,5 +1,12 @@
 # T3 — Contribution kinds (charter Q3)
 
+> **HISTORICAL EVIDENCE — frozen at authoring time.** Where this pack disagrees with
+> `docs/architecture/rfc/rfc-0002-devtools-contribution.md`, **the RFC wins**. Notably the package
+> boundary was later corrected from `A2 plugin-devtools-core` to **A1 `packages/devtools-core` +
+> A6 CLI emission + A5 plugin**, and identity/ordering were unified on `(mountId, id, apiMajor)`
+> and anchors-then-`(order, mountId, id)`. See `RFC-AUTHORITY.md` and `drift.md`.
+
+
 Stage-D deep-dive, run `plan-devtools-contribution--seed`, baseline `main` @ `2256a67bf`.
 Planning-only. Every load-bearing claim cites a corpus file (which cites `path:line` / saved
 artifact) or a repo path verified in this pass. Unmarked claims are `observed` via the cited

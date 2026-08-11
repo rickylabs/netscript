@@ -1,5 +1,12 @@
 # T8 — Information architecture and staged follow-up RFCs (charter Q9, Q12)
 
+> **HISTORICAL EVIDENCE — frozen at authoring time.** Where this pack disagrees with
+> `docs/architecture/rfc/rfc-0002-devtools-contribution.md`, **the RFC wins**. Notably the package
+> boundary was later corrected from `A2 plugin-devtools-core` to **A1 `packages/devtools-core` +
+> A6 CLI emission + A5 plugin**, and identity/ordering were unified on `(mountId, id, apiMajor)`
+> and anchors-then-`(order, mountId, id)`. See `RFC-AUTHORITY.md` and `drift.md`.
+
+
 > Stage-D deep-dive pack for run `plan-devtools-contribution--seed` (PR #1450, baseline `main` @
 > `2256a67bf`). Planning only. Every load-bearing claim cites a corpus file (which itself cites
 > `path:line`, a fetched artifact, or a `gh` read) or is marked `inference` / `unverified`.

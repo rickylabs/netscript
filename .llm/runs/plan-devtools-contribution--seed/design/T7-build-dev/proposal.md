@@ -1,5 +1,12 @@
 # T7 — Build & dev integration (charter Q8 + frontend contribution surface #3: Vite)
 
+> **HISTORICAL EVIDENCE — frozen at authoring time.** Where this pack disagrees with
+> `docs/architecture/rfc/rfc-0002-devtools-contribution.md`, **the RFC wins**. Notably the package
+> boundary was later corrected from `A2 plugin-devtools-core` to **A1 `packages/devtools-core` +
+> A6 CLI emission + A5 plugin**, and identity/ordering were unified on `(mountId, id, apiMajor)`
+> and anchors-then-`(order, mountId, id)`. See `RFC-AUTHORITY.md` and `drift.md`.
+
+
 Stage-D deep-dive pack, run `plan-devtools-contribution--seed`, baseline `main` @ `2256a67bf`.
 Planning only; no source or GitHub mutation. Citation convention: `rN`/`mN`/`pN` are corpus files
 under `research/`, each of which carries `path:line` evidence; where a claim is load-bearing the
