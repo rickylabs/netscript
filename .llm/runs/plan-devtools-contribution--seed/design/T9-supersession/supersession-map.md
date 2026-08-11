@@ -11,6 +11,18 @@
 > retitles, re-milestones, labels, or comments on any issue or PR. Every `gh` command cited below
 > was a read. Nothing is filed before the owner ratifies at stage H.
 
+> **AMENDMENT C (2026-08-11) — fork F-1 RATIFIED (drift D-19).** The owner ratified a
+> **self-contained DevTools family and spine, built first in `packages/devtools-core`**, not
+> serialized behind #890's 24 unimplemented children; F-3 (`.passthrough()` manifest
+> schema-evolution precondition) was ratified in the same event. This amendment sweeps that
+> decision through the dispositions below: **#412 moves AMEND → SUPERSEDE** (superseded in
+> substance by `packages/devtools-core` — Qwen finding Q-m5: two package homes for one role is the
+> fragmentation this RFC exists to end), and every row that hedged on a #890-spine dependency is
+> re-stated as self-contained. Standing constraints unchanged: **D-11** — the epic AMENDS #400,
+> never a new umbrella; **D-8/F-9** — the children stay on the owner-ratified 2026-07-19 milestone
+> train (re-verified live this pass: 29 open children on `0.0.15`, #400 on `Backlog / Triage`);
+> **#922's children (#933, #944) remain untouched** — this run does not re-scope another epic.
+
 Stage-D deep-dive pack for run `plan-devtools-contribution--seed` (draft PR #1450), baseline
 `main` @ `2256a67bf`. All live GitHub reads re-executed 2026-08-11 from this worktree; every
 disposition below was deduplicated against that live state (issue/PR states, milestones, labels
@@ -74,16 +86,17 @@ live reads, matching b1's inventory with zero drift). "What must be true first" 
 precondition for the stage-H mutation. Dispositions marked *(b1 first-pass)* adopt
 b1's recommendation unchanged; deviations are flagged.
 
-**Counts: 15 KEEP (+3 already-closed no-action) · 13 AMEND · 2 FOLD · 1 SUPERSEDE · 1 CLOSE-LATER.**
+**Counts (post-Amendment C): 15 KEEP (+3 already-closed no-action) · 12 AMEND · 2 FOLD ·
+2 SUPERSEDE · 1 CLOSE-LATER.** *(#412 moved AMEND → SUPERSEDE under ratified F-1; see its row.)*
 
 | # | Title (short) | Live state · milestone · status | Disposition | Reason (one line) | What must be true before it changes |
 | --- | --- | --- | --- | --- | --- |
 | 400 | epic: Dev Dashboard | OPEN · Backlog/Triage · `status:plan` | **AMEND** | Ownership thesis + 3 acceptance lines + killed-list survive verbatim (b1 F3); the invent-your-own-discovery premise, dead `beta.6` prose, and screen list do not | RFC ratified at stage H; rewrite preserves the thesis as normative acceptance criteria (research.md R2) |
 | 410 | DDX-0 fresh-ui L3 `blocks/` | OPEN · 0.0.15 · plan | KEEP *(b1)* | Host-agnostic, still unbuilt (`ls packages/fresh-ui/registry` → no `blocks/`, b1 F1/D9); unaffected by contribution redesign | — |
 | 411 | DDX-1 Aspire `command`+`app` kinds | OPEN · 0.0.15 · plan | KEEP *(b1)* | The out-link/embed seam; independent of the contribution family; `withCommand` is a mirror, never the home (research.md F6) | — |
-| 412 | DDX-2 `plugin-dashboard-core` seam | OPEN · 0.0.15 · plan | AMEND *(b1)* | Core package survives; its owned-model set must be re-derived from the RFC's family, not from the 7-member analysis draft (b1 D3) | RFC's contribution-family section (T2/T3 packs) locked |
+| 412 | DDX-2 `plugin-dashboard-core` seam | OPEN · 0.0.15 · plan | **SUPERSEDE** (**Amendment C** — was AMEND *(b1)*; Qwen Q-m5) | Superseded **in substance** by RFC-0002's package boundary: contracts live in **`packages/devtools-core`** (A1) with CLI emission (A6) and a thin plugin (A5) — `plugin-dashboard-core` as a second package home for the same role is exactly the fragmentation the RFC exists to end. Its seam re-files as slice W1-a (manifest DT-3) | F-1 ratified ✅ (D-19, 2026-08-11); board change waits for the stage-H filing pass: supersede **comment** naming DT-3 as the re-file and RFC A1 as the package home; #412 closes **only after** DT-3 is live (same precondition pattern as #424/DT-4) |
 | 413 | DDX-3 `TelemetryQueryPort` adapter | OPEN · 0.0.15 · plan | KEEP *(b1)* | Correlation-only port is the non-duplication thesis in code; largely shipped already as `@netscript/telemetry/query` (research.md F5) — body should note the shipped surface | — (the note rides the #400 amendment batch) |
-| 414 | DDX-4 `plugins/dashboard` thin plugin | OPEN · 0.0.15 · plan | AMEND *(b1)* | Thin plugin survives; manifest/axis wiring re-baselines onto the RFC's axis decision (pointer axis, §C1) | Three-seam resolution ratified (C1) |
+| 414 | DDX-4 `plugins/dashboard` thin plugin | OPEN · 0.0.15 · plan | AMEND *(b1)* | Thin plugin survives as RFC **A5** over the self-contained `packages/devtools-core` spine (F-1 ratified, D-19); pointer-axis wiring per §C1, with F-3's `.passthrough()` precondition landing first. **No dependency on #890's unbuilt implementation** — convergence, if #922 ever ships a shared spine, is a later re-export change | Three-seam resolution ratified ✅ (C1 + D-19); body edit rides the stage-H amendment batch |
 | 415 | DDX-5 shell + IA | OPEN · 0.0.15 · plan | AMEND *(b1)* | Shell survives; must adopt the RFC's IA (T8 pack) and host contributed nav; the `_app`/`_layout` split is re-derived, not inherited from the unratified resort | T8 IA locked |
 | 416 | DDX-6 Stack Map | OPEN · 0.0.15 · plan | KEEP *(b1)* | Declared-vs-running wiring is uniquely NetScript-owned | — |
 | 417 | DDX-7 Service & Contract Catalog | OPEN · 0.0.15 · plan | KEEP *(b1)* | Above the Scalar boundary by construction; degraded state for streams (no oRPC contract surface, b2 F8) must be stated in the RFC, not here | — |
@@ -92,11 +105,11 @@ b1's recommendation unchanged; deviations are flagged.
 | 420 | DDX-10 Plugin Control host | OPEN · 0.0.15 · plan | AMEND *(b1)* | Becomes the host mount for the DevTools contribution family; scope grows toward the `/extensions` manager the coverage matrix says nobody owns (b1 F9) | RFC family + IA locked |
 | 421 | DDX-11 Logs panel | CLOSED/NOT_PLANNED | KEEP (closed; no action) | Kill stays documented in the RFC non-goals so it cannot creep back (#400 killed-list) | — |
 | 422 | DDX-12 Resource Control | CLOSED/NOT_PLANNED | KEEP (closed; no action) | Same — superseded by `withCommand` rendered inside Aspire | — |
-| 423 | DDX-13 `/_netscript/*` introspection | OPEN · 0.0.15 · plan | AMEND *(b1)* | Survives as the read plane; must serve `GET /contributions` + entity reads and reconcile with #1446/#1390 data-plane decisions (T5 pack) | T5 data-plane design locked |
+| 423 | DDX-13 `/_netscript/*` introspection | OPEN · 0.0.15 · plan | AMEND *(b1)* | Survives as the read plane; serves `GET /contributions` + entity reads **from the DevTools family's own registry in `packages/devtools-core`** (F-1 ratified, D-19 — entry no longer waits on #922's waves or #934's gateway) and reconciles with #1446/#1390 data-plane decisions (T5 pack). The amendment names the #934 boundary as a statement, not a gate; #934 itself is untouched | T5 data-plane design locked ✅ (RFC); amendment rides stage H |
 | 424 | DDX-14 CLI + URL scheme | OPEN · 0.0.15 · plan | **SUPERSEDE** *(b1)* | The board's one recorded outright contradiction: `coverage-matrix.md` marks its flat URL scheme "the one true contradiction" against the merged routing resort (b1 F9/D4) — and the resort itself is unratified, so *neither* is the contract; the RFC defines the URL contract and #424 re-files against it | RFC URL-contract section exists; re-filed issue drafted before #424 closes |
 | 425 | DDX-15 design-sync artifact | CLOSED/NOT_PLANNED | KEEP (closed; no action) | Settled by the rescope batch; the `Closes`-on-closed-PR lesson stays recorded (b1 F8) | — |
 | 426 | DDX-16 E2E join + panel smoke | OPEN · 0.0.15 · plan | AMEND *(b1)* | Gate survives; add contribution-render + quarantine-state assertions; keep the "no owned waterfall" assertion | RFC gate section locked |
-| 427 | DDX-17 `DashboardPanelContribution` | OPEN · 0.0.15 · plan | **FOLD** *(b1)* | #890's merged map already re-baselined it to "kinds + host, not pipeline" (`plan-frontend-contrib--seed/rfc.md:236-240`); the RFC defines the family (host-agnostic per C3), so #427 becomes an implementation slice of the RFC, not an independent design | RFC family section ratified; fold recorded on #427 with the CR resolution (C3) |
+| 427 | DDX-17 `DashboardPanelContribution` | OPEN · 0.0.15 · plan | **FOLD** *(b1)* | #890's merged map already re-baselined it to "kinds + host, not pipeline" (`plan-frontend-contrib--seed/rfc.md:236-240`); the RFC defines the family (host-agnostic per C3) **in the self-contained `packages/devtools-core` spine (F-1 ratified, D-19)**, so #427 becomes the `panel`-kind implementation slice (W4-a) of *our* spine — the fold no longer waits on #922's waves and the contribution seam is DevTools-owned from day one | RFC family section ratified ✅ (F-1, D-19); fold recorded on #427 with the CR resolution (C3) at stage H |
 | 428 | DDX-18a Workers console | OPEN · 0.0.15 · plan | AMEND *(b1)* | Survives as first-party dogfood consumer; body must state the #933 boundary (C2) and the delivery mechanism per the RFC | Two-epic boundary ratified (C2) |
 | 429 | DDX-18b Sagas console | OPEN · 0.0.15 · plan | AMEND *(b1)* | Same, against #944 | Same |
 | 430 | DDX-18c Triggers console | OPEN · 0.0.15 · plan | AMEND *(b1)* | Same, against #944; also inherits the triggers SOUND-convergence hole (b2 F8) as an explicit degraded state | Same |
@@ -113,7 +126,7 @@ b1's recommendation unchanged; deviations are flagged.
 | 557 | DDX-23 seam-event flow plane | OPEN · 0.0.15 · triage | KEEP *(b1)* | Upgrades S13 from correlation-join to boundary-event fidelity; pure backend | — |
 | 734 | dashboard-panel axis **in the manifest** | OPEN · **0.0.10** · `status:triage`, **not** `epic:dev-dashboard` | **FOLD** *(b1)* | The third competing seam; its placement (fat manifest axis) loses to the pointer-axis decision (C1), but its requirement (a discoverable dashboard-panel contribution) is absorbed by the RFC. The 2026-07-19 owner comment already flags it for review | Three-seam resolution ratified; fold comment cross-refs #890 §2.3 + the RFC before closing |
 | 544 | PM-33 Process Control panel | OPEN · 0.0.15 · plan · `epic:process-manager` | AMEND — **coordinate; body edit belongs to epic #510** | Un-dangles once the RFC resolves `CR-DDX-HOSTAGNOSTIC` (C3); the RFC records the CR resolution, #510's lane updates #544 | CR resolution ratified; #510 owner-ack |
-| 922 / 933 / 944 | frontend-contrib epic + zone-panel children | OPEN · 0.0.9 / 0.0.9 / 0.0.11 | **coordinate, do not touch** (no disposition — another epic's children) | The RFC states the ownership boundary (C2) instead of re-scoping #922's children; charter directive | — |
+| 922 / 933 / 944 | frontend-contrib epic + zone-panel children | OPEN · 0.0.9 / 0.0.9 / 0.0.11 | **coordinate, do not touch** (no disposition — another epic's children) | The RFC states the ownership boundary (C2) instead of re-scoping #922's children; charter directive. **F-1's ratified self-contained spine (D-19) removes any DevTools dependency on their waves — which makes not touching them cheaper, not optional: #933/#944 remain untouched, on their own milestones** | — |
 
 *(Dedup note: `gh issue list --label epic:dev-dashboard --state all` on 2026-08-11 returned exactly
 the 33 issues above — no new children since b1; #218 is the only closed historical "devtools" issue
@@ -152,11 +165,15 @@ layer, and its supersession row already re-scoped #427 to "kinds + host, not pip
 (b) #427's thinness law and #890's pointer axis **agree** with each other and jointly reject
 #734's fat-manifest placement — there are really two positions, not three, and the merged one
 subsumes the ratified-older one; (c) #734's *need* (a discoverable panel contribution) is met by
-the pointer axis, so folding loses nothing. **Honesty caveat:** the winning seam is merged design
-text with **zero implementation** (p1 F1/F5) — so the RFC's dependency fork (owner fork 1,
-SYNTHESIS-NOTES: depend on #890's spine vs self-contained family) decides *when* this seam is
-real, not *whether* it is the seam. #734 must not close until the RFC section that absorbs it is
-ratified, and the fold comment must cross-reference #890 §2.3 and the 2026-07-19 owner flag.
+the pointer axis, so folding loses nothing. **Honesty caveat — resolved by Amendment C:** the
+winning seam is merged design text with **zero implementation** (p1 F1/F5), so the RFC's
+dependency fork (owner fork **F-1**: depend on #890's spine vs self-contained family) decided
+*when* this seam becomes real. **F-1 is now RATIFIED (D-19, 2026-08-11): the DevTools family and
+spine are self-contained and built first in `packages/devtools-core`** — the seam becomes real on
+the DevTools train, not behind #890's 24 unimplemented children; convergence onto a shared spine,
+if #922 ever ships one, is a later re-export change. #734 must still not close until the RFC
+section that absorbs it is ratified, and the fold comment must cross-reference #890 §2.3 and the
+2026-07-19 owner flag.
 
 ### C2 — Two epics claim dashboard-zone panels (#933/#944 vs #428–#431)
 
@@ -171,7 +188,9 @@ epic #400 owns DevTools-host consoles; the DevTools family is a sibling payload 
 envelope, exactly as #890's map already casts #400 ("CONSUMER: starts on this layer's pipeline…
 instead of inventing discovery"). The AMEND rows for #428–#431 add one boundary sentence each
 ("consumes learnings from #933/#944; does not re-ship their zone panels"); nothing on #933/#944
-moves. If the owner instead wants one epic to own *all* four-capability UI, that is an owner fork
+moves. F-1's ratified self-contained spine (D-19) strengthens this: the DevTools consoles no
+longer share even a build-order dependency with #922's waves, so the boundary is purely a
+statement of ownership, never a schedule coupling. If the owner instead wants one epic to own *all* four-capability UI, that is an owner fork
 (§Open questions Q3) — this map does not silently re-scope another epic's children (charter
 directive; also the sequencing bill b2 F10 assigns to "whoever schedules #922's Wave 3").
 
@@ -198,8 +217,9 @@ console). The resolution is recorded in the RFC's family section and in the stag
 
 Facts, all live 2026-08-11: `0.0.14`'s description says *"Dev dashboard (thin,
 contribution-based) + auth/deploy tail"* yet holds 11 open issues, **all** deploy (#915–#919) or
-enterprise-auth (#881–#886) and zero dashboard issues; all 28 open `epic:dev-dashboard` children
-sit on `0.0.15`; #400 sits on `Backlog / Triage`. **The live find resolves the incoherence's
+enterprise-auth (#881–#886) and zero dashboard issues; all 29 open `epic:dev-dashboard` children
+sit on `0.0.15` (live re-count this pass; earlier passes said 28); #400 sits on
+`Backlog / Triage`. **The live find resolves the incoherence's
 direction:** the children's `0.0.15` placement is the owner-ratified 2026-07-19 train
 ("ships after everything else"; beta.18 → `0.0.15` per the cascade note in `0.0.15`'s own
 description), and #400's Backlog/Triage placement matches both that comment and Backlog/Triage's
@@ -235,8 +255,10 @@ stale** — a leftover from an earlier train, contradicted by the later ratified
 ## Open questions for the owner
 
 1. **Ratify the three-seam verdict (C1):** pointer axis wins; #427 folds into the RFC's family
-   section; #734 folds and closes at ratification. Also decide the linked run-level fork: does
-   the DevTools family *depend on* #890's unbuilt spine (`0.0.9`) or ship self-contained?
+   section; #734 folds and closes at ratification. ~~Also decide the linked run-level fork: does
+   the DevTools family *depend on* #890's unbuilt spine (`0.0.9`) or ship self-contained?~~
+   **RESOLVED — F-1 RATIFIED (D-19, 2026-08-11): self-contained, built first in
+   `packages/devtools-core`.**
 2. **Ratify the milestone verdict (C4):** children stay `0.0.15` + `0.0.14` description edit —
    or deliberately reverse the 2026-07-19 train and pull the tranche into `0.0.14`?
 3. **Ratify the two-epic boundary (C2):** #922 owns app-surface zone panels, #400 owns
