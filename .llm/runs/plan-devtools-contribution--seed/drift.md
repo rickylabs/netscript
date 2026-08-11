@@ -80,3 +80,32 @@ documentation.
   applying `docs-eval:skip`: a label that silences a gate which was never going to fire would be
   misleading evidence in the PR's own record.
 - **Evidence:** workflow `on:`/`if:` conditions as cited.
+
+## 2026-08-11 — D-6: #890's additive-pointer-block compatibility claim is false at baseline
+
+- **What:** RFC #890's contract C8 states that `PLUGIN_MANIFEST_SCHEMA_VERSION` "bumps additively;
+  older CLIs ignore the block, and because the older host also lacks the frontend generate step,
+  ignoring is safe (no half-wired state)." A DevTools family adding a pointer block to
+  `scaffold.plugin.json` would inherit the same assumption.
+- **Source:** surfaced by the stage-D `T2-contribution-family` pack; **independently verified by the
+  supervisor** rather than accepted on the agent's word.
+- **Expected:** an unknown top-level manifest field is ignored by an older CLI.
+- **Actual:** `PluginInstallerManifestSchema` ends in **`.strict()`**
+  (`packages/plugin/src/protocol/manifest.ts:282`) and pins `schemaVersion: z.literal(1)` (`:271`).
+  Zod `.strict()` **hard-rejects** any unknown top-level key. An older CLI therefore does not ignore
+  a new pointer block — it **fails manifest parsing outright**, taking the whole plugin down rather
+  than degrading. Corroborated by the stage-B corpus (`r3` F5), which independently recorded that
+  `.strict()` makes additive evolution impossible without a major bump.
+- **Severity:** significant — and it is **not scoped to this run**. It is a live defect in RFC #890's
+  ratified compatibility story, which epic #922 slice #929 (the `.withFrontend()` pointer axis) is
+  planned to implement.
+- **Action:** fix, in two places.
+  1. This RFC does not inherit the claim. Any manifest-visible DevTools pointer requires an explicit
+     **schema-evolution precondition slice** (either a `.passthrough()`/`catchall` relaxation with its
+     own compatibility test, or a `schemaVersion` bump with a documented migration) sequenced *before*
+     the pointer lands. Recorded as an owner fork in the stage-H brief.
+  2. Surface it to the owner as a **cross-RFC finding** so #890/#922 can correct their own plan. This
+     run does not edit another epic's board — recording and escalating is the whole permitted action.
+- **Evidence:** `packages/plugin/src/protocol/manifest.ts:271,282`;
+  `.llm/runs/plan-frontend-contrib--seed/design/canonical/01-contracts.md:336-344`;
+  `research/r3-plugin-contribution-axes.md` F5.
