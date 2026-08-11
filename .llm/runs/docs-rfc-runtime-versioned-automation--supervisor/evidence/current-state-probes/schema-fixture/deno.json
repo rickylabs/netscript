@@ -1,0 +1,14 @@
+{
+  "name": "runtime-schema-probe",
+  "version": "0.0.0",
+  "exports": "./netscript.config.ts",
+  "catalog": {
+    "zod": "^4.4.3"
+  },
+  "imports": {
+    "@netscript/config": "file:///home/codex/repos/ns-rfc-runtime-versioned-automation/packages/config/mod.ts",
+    "@netscript/plugin-workers": "file:///home/codex/repos/ns-rfc-runtime-versioned-automation/plugins/workers/mod.ts",
+    "@netscript/plugin-triggers": "file:///home/codex/repos/ns-rfc-runtime-versioned-automation/plugins/triggers/mod.ts",
+    "@netscript/plugin-streams": "file:///home/codex/repos/ns-rfc-runtime-versioned-automation/plugins/streams/mod.ts"
+  }
+}

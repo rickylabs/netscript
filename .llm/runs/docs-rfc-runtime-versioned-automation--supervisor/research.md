@@ -1,8 +1,7 @@
 # Research — docs-rfc-runtime-versioned-automation--supervisor
 
 Deep findings feeding the RFC. Sub-agent reports live in `evidence/`; this file is the supervisor
-synthesis + verification layer. Status: **in progress** (G1 legacy report pending, G2 current-state
-report pending).
+synthesis + verification layer. Status: **complete** — G1 + G2 landed and supervisor-reviewed; synthesis in the RFC.
 
 ## Re-baseline
 

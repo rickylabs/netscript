@@ -53,3 +53,32 @@
 - External isolation-tech survey extracted to `.llm/tmp/docs/sandbox-isolation-survey-2026-08.md`
   (Deno security docs primary; gVisor/Firecracker/WASM-WASI/V8-isolate comparison; managed
   sandbox market scan).
+
+## 2026-08-11 G2 — current-state matrix landed (slice review PASS)
+
+- Same Codex thread resumed with the G2 brief (fresh-launch attempts hit `duplicate_sender_risk`;
+  registry-sanctioned resume used instead — recorded, not hidden). 10 turns, report complete:
+  `evidence/current-state-matrix.md` (255 lines) + probes under `evidence/current-state-probes/`.
+- All hypotheses H1–H6 **confirmed** with behavioral proofs: P1 publish/rollback works but
+  concurrent topic promotion lost an update **20/20 trials** (read-merge-write pointer, no CAS);
+  P2 watcher reloads and malformed JSON silently yields empty topics; P3 real CLI
+  `generate runtime-schemas` exits 0 with **0 written** on baseline; P4 versioned `RuntimeTask`
+  is rejected by the executor (`supports()` false — schema drift proven live); P5 deno+shell
+  execute through `MultiRuntimeTaskExecutor`. Targeted suites: 22 passed / 0 failed.
+- New current-state facts folded into the RFC: trigger v1 router genuinely backs
+  introspection/event-reads/webhook/enable-disable (honest-pending pattern for the rest); false
+  immutability (republish overwrites topic doc); loader pointer paths not root-confined; official
+  samples emit dangling `$schema` refs.
+- Supervisor slice review: full read + 2 verbatim spot-checks (`manage-runtime-overrides.ts`
+  read-merge-write; `routers/v1.ts` enable/disable KV-backed). PASS.
+
+## 2026-08-11 S4 — RFC authored
+
+- `docs/architecture/rfc/rfc-0001-runtime-versioned-automation.md`: two-plane architecture,
+  runtime contribution families (#890 pattern extracted), immutable-revision store + CAS
+  activation + audit, snapshot propagation (no fs-watch), execution boundary tiers T0–T3 over
+  established isolation tech (survey extract in `.llm/tmp/docs/`), threat model TM1–TM8,
+  observability/history, management API, cockpit downstream of #922 minimum cut
+  (#923–#932 + #934, #933 adjacency), ownership decision O2+O4 with recorded fallback,
+  cleanup inventory (D-5 clean break), staged RFCs P-1…P-4, roadmap A0–A8, E2E acceptance model,
+  alternatives. Gates: `docs:links` green; `deno fmt` clean; PLAN-EVAL brief prepared.
