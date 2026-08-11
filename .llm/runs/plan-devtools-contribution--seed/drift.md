@@ -91,7 +91,7 @@ documentation.
   supervisor** rather than accepted on the agent's word.
 - **Expected:** an unknown top-level manifest field is ignored by an older CLI.
 - **Actual:** `PluginInstallerManifestSchema` ends in **`.strict()`**
-  (`packages/plugin/src/protocol/manifest.ts:282`) and pins `schemaVersion: z.literal(1)` (`:271`).
+  (`packages/plugin/src/protocol/manifest.ts:283`) and pins `schemaVersion: z.literal(1)` (`:271`).
   Zod `.strict()` **hard-rejects** any unknown top-level key. An older CLI therefore does not ignore
   a new pointer block — it **fails manifest parsing outright**, taking the whole plugin down rather
   than degrading. Corroborated by the stage-B corpus (`r3` F5), which independently recorded that
@@ -106,7 +106,7 @@ documentation.
      the pointer lands. Recorded as an owner fork in the stage-H brief.
   2. Surface it to the owner as a **cross-RFC finding** so #890/#922 can correct their own plan. This
      run does not edit another epic's board — recording and escalating is the whole permitted action.
-- **Evidence:** `packages/plugin/src/protocol/manifest.ts:271,282`;
+- **Evidence:** `packages/plugin/src/protocol/manifest.ts:271,283`;
   `.llm/runs/plan-frontend-contrib--seed/design/canonical/01-contracts.md:336-344`;
   `research/r3-plugin-contribution-axes.md` F5.
 
@@ -168,3 +168,21 @@ documentation.
   unresolved cross-epic change request the DevTools design must answer explicitly.
 - **Evidence:** `gh issue view 400 --comments` — comments at `2026-07-06T12:30:28Z`,
   `2026-07-06T12:30:30Z`, `2026-07-19T14:40:43Z`.
+
+## 2026-08-11 — D-9: citation precision correction to D-6 (off-by-one)
+
+- **What:** Drift **D-6** cited the top-level `.strict()` at
+  `packages/plugin/src/protocol/manifest.ts:282`. Correct line is **`:283`**; `:282` is
+  `linking: linkingSchema.optional(),`.
+- **Source:** flagged by the stage-E `06-family` authoring agent while writing against D-6; verified
+  by the supervisor (`sed -n '280,284p'` plus `grep -n 'strict()'`).
+- **Expected / Actual:** the **finding is unaffected** — `PluginInstallerManifestSchema` does end in
+  `.strict()` and does pin `schemaVersion: z.literal(1)` at `:271`. Only the line anchor was wrong.
+- **Severity:** minor — but recorded rather than silently patched, because the file contains **nine**
+  `.strict()` calls (`:172, :179, :188, :193, :213, :230, :237, :246, :283`) and only the last is the
+  top-level installer schema. An off-by-one here would send a reviewer to a nested sub-schema and
+  make a correct finding look wrong.
+- **Action:** fix — D-6's citation updated in place to `:283`. The RFC and worklog carry the
+  corrected anchor.
+- **Evidence:** `packages/plugin/src/protocol/manifest.ts:271,283`; `grep -n 'strict()'` over the
+  same file returns nine hits.
