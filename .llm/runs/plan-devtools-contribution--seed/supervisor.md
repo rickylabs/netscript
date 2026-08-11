@@ -35,7 +35,8 @@ Reference `.llm/harness/workflow/lane-policy.md`; the complete route table is no
 | `planning_decisions` | Anthropic · Claude **Opus 5** · high | This supervisor session: bootstrap, synthesis, plan lock, RFC authoring, triage, sign-off commits |
 | `deep_analysis` | Anthropic · Claude **Fable 5** · medium | Stage-D deep-dive design packs — complex architecture/technical decisions, one sub-agent per topic |
 | `claude_workflow` | Anthropic · Claude **Opus 5** · low | Stage-B parallel discovery/synthesis fan-out only, and only with the generated `workflow.js` committed under `<run-dir>/workflows/` **before** it executes |
-| `major_ui_ux_design` | Claude · OpenRouter · **GLM 5.2** · `claude-design-glm-5-2` preset · xhigh | Mandatory pure-design pass for this major UI/UX architecture. **Transport fact of record: tools + streaming, NO reasoning trace.** Never cited as reasoning evidence; never the formal evaluator |
+| ~~`major_ui_ux_design` — GLM 5.2 xhigh~~ | **SUPERSEDED — lane unlaunchable** (drift D-10) | The `claude-design-glm-5-2` preset exists in policy but no launcher can execute it; `agentic:claude-openrouter` applies an open-**evaluator** guard that correctly excludes GLM |
+| **Stage-D2 adversarial design pass** *(owner override, 2026-08-11)* | **OpenCode · OpenRouter · Qwen 3.8 Max (`qwen/qwen3.8-max`) · variant `max`** | **Explicit owner-approved route override.** Replaces GLM 5.2 **for Stage D2 only**. Read-only evaluator surface, own worktree, findings-only — **no edits by the evaluator**. Requested vs observed identity recorded in `drift.md` D-15 |
 | `adversarial_design_eval` | OpenCode · OpenRouter · **Kimi K3** vision · high | Conditional. Added only if screenshots/visual artifacts materially improve architectural judgment. Complements, never replaces, the GLM pass |
 | Stage-F adversarial reviewer | Anthropic · Claude **Sonnet 5** · high — unoriented, separate session (**bound 2026-08-11**, see below) | Severity-tagged findings only; supervisor triages and commits fixes |
 | `formal_plan_evaluation` | Codex · OpenAI · **GPT-5.6 Sol** · high (fresh daemon-attached WSL session, own worktree) | Formal PLAN-EVAL of record against an immutable commit, per `evaluator/plan-protocol.md` + `gates/plan-gate.md` |
@@ -80,8 +81,19 @@ Reference `.llm/harness/workflow/lane-policy.md`; the complete route table is no
   OpenRouter was **not** used here: `lane-policy.md` and the charter confine it to the design lane
   plus an authorized fallback/third opinion, and a routine stage-F review is neither.
 - **`major_ui_ux_*` GLM lanes are marked dormant** in `lane-policy.md` while the Dev Dashboard is
-  paused (epic #400 → `0.0.1-beta.13`). This run reactivates the lane for its charter-mandated design
-  pass. Authorization: the orchestrator brief's explicit instruction. Mirrored in `drift.md`.
+  paused (epic #400 → `0.0.1-beta.13`). This run reactivated the lane for its charter-mandated design
+  pass. Authorization: the orchestrator brief's explicit instruction. Mirrored in `drift.md` D-1.
+- **OWNER ROUTE OVERRIDE, 2026-08-11 — Stage D2 runs on Qwen 3.8 Max, not GLM 5.2.** The owner
+  reviewed the D-10 escalation and ruled: **do not waive the adversarial design pass**; replace GLM
+  5.2 with **`qwen/qwen3.8-max` at `max` reasoning**, launched through the repository agentic
+  toolchain on a **fresh read-only evaluator surface** — natively via **OpenCode/OpenRouter**,
+  because `agentic:claude-openrouter`'s open-evaluator guard does not admit Qwen.
+  - **Scope of the override: Stage D2 only.** It does **not** touch the formal evaluator lane. The
+    Codex GPT-5.6 Sol PLAN-EVAL remains the separate verdict of record, and the Qwen pass is
+    advisory design evidence, never a Plan-Gate verdict.
+  - The evaluator is **findings-only and makes no edits**; the supervisor adjudicates and amends.
+  - Prompt, output, and receipt are persisted under this run.
+  - Requested vs observed identity recorded in `drift.md` **D-15**.
 
 ## Hard invariants acknowledged
 

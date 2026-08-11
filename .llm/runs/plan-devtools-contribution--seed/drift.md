@@ -318,3 +318,38 @@ documentation.
 - **Lesson for the next cycle:** an evaluator brief must bound its own reading. Re-evaluation should
   point at a **diff** plus the specific claims to re-verify, not re-present the whole corpus. Recorded
   because this run is now the second data point (cycle 1 also hit its cap).
+
+## 2026-08-11 — D-15: OWNER ROUTE OVERRIDE — Qwen 3.8 Max replaces GLM 5.2 for Stage D2
+
+- **What:** The owner reviewed the D-10 escalation and **declined to waive** the adversarial design
+  pass. Instead they authorized a **route override**: run Stage D2 on
+  **`qwen/qwen3.8-max` at `max` reasoning**, launched through the repository agentic toolchain on a
+  **fresh read-only evaluator surface**, natively via **OpenCode/OpenRouter**.
+- **Source:** owner instruction in-turn, 2026-08-11. This is the explicit authorization
+  `lane-policy.md` § Selection and handoff rules requires for a lane override, and the
+  owner-authorized fallback that `netscript-harness` § Blocked-lane handling requires before a
+  blocked lane may be substituted.
+- **Expected (lane-policy default):** `major_ui_ux_design` / `major_ui_ux_adversarial_review` bind to
+  GLM 5.2 via the `claude-design-glm-5-2` preset, with **no declared fallback**.
+- **Actual:** that lane is unlaunchable (D-10) — `agentic:claude-openrouter` applies an
+  open-**evaluator** guard that correctly refuses GLM, and it equally would not admit Qwen. The owner
+  therefore routed the pass to the **OpenCode** transport, which is the repo's native
+  WSL/OpenRouter surface and is not behind the evaluator guard.
+- **Severity:** significant — a lane binding changed by owner decision, which is exactly the class of
+  thing that must be recorded rather than absorbed.
+- **Scope, stated narrowly on purpose:**
+  - **Stage D2 only.** The override does **not** touch the formal evaluator lane. The **Codex
+    GPT-5.6 Sol PLAN-EVAL remains separate and remains the verdict of record**; nothing Qwen returns
+    is a Plan-Gate verdict, and a Qwen `PASS`-shaped statement would carry no gate authority.
+  - **Findings-only.** The evaluator makes **no edits** to any artifact. The supervisor adjudicates
+    each finding and applies amendments.
+  - **Read-only surface**, its own worktree, separate from every authoring lane.
+- **Action:** accept and execute. `supervisor.md` § Routes in force and § Recorded lane/eval
+  overrides updated. Prompt, raw output, and a launch receipt (requested vs observed identity) are
+  persisted under `design/ux-evidence/`.
+- **Requested identity:** provider `openrouter` · model `qwen/qwen3.8-max` · variant `max`.
+  **Observed identity:** recorded in `design/ux-evidence/qwen-receipt.md` at launch.
+- **Consequence for the gate:** D-10 moves from *"mandated deliverable missing"* to *"mandated
+  deliverable obtained on an owner-approved substitute route"*. Risk **R12** is updated accordingly —
+  it is **not** silently closed, because the substitution is a recorded deviation from
+  `lane-policy` invariant 5, not a satisfaction of it.
