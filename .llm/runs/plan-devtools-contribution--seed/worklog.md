@@ -35,7 +35,7 @@ criticised false-green reporting elsewhere. **Status is now what actually happen
 | 3 | Stage-C synthesis | **DONE** `ca15ac2c2`…`fc375ec23` | `research.md` findings table populated with citations | `research.md`, `research/SYNTHESIS-NOTES.md` |
 | 4 | Stage-D design packs | **DONE** `7d23809a8` | supervisor slice review V1–V4 before sign-off | `design/T{1,2,3,5,6,7,8,9}/*.md` — **proposals + open questions only** |
 | 4b | Draft epic + one-file-per-issue set + agent briefs | **DONE** `143c31574` | no board mutation; labels verified against `labels.yml` | `filing/epic.md`, `filing/issues/` (16), `filing/briefs/` (7) |
-| 5 | Stage-D2 GLM 5.2 design pass | **FAILED — lane unlaunchable** | none; **zero tokens, both attempts** | `design/ux-evidence/glm-attempt-{1,2}-FAILED.jsonl`, `glm-prompt.md`. **No findings file exists** (drift D-10) |
+| 5 | Stage-D2 adversarial design pass | **DONE via owner-approved substitute route** (D-15/D-16). GLM lane unlaunchable (D-10) → **Qwen 3.8 Max** + **Kimi K3**, read-only, findings-only | observed identity **matched** requested on both; 2 criticals found and fixed | `design/ux-evidence/{qwen,kimi}-{prompt,findings,triage}.md`, `qwen-receipt.md`, `FINDINGS-SWEEP.md`; failed GLM attempts kept as evidence |
 | 6 | Stage-E canonical RFC + plan lock | **DONE** `a7e49d525`, `9e1b828c5` | `docs:links --root docs/architecture/rfc` PASS; `docs:accuracy` PASS. **`doc:lint` is not a task in this repo and the Markdown fmt gate does not exist** (drift D-4) | `docs/architecture/rfc/rfc-0002-devtools-contribution.md`, `plan.md` |
 | 7 | Stage-F adversarial findings + triage + fixes | **DONE** `b7cd62067` | per-finding disposition recorded; docs gates re-run | `adversarial-sonnet.md` (**not** `adversarial.md`), `adversarial-triage.md` |
 | 8 | Stage-G PLAN-EVAL | **DONE — verdict `FAIL_PLAN`** `5202ff205` | evaluator re-ran all gates independently | `plan-eval.md`, `planeval/codex-thread-ids.md` |
@@ -45,7 +45,9 @@ criticised false-green reporting elsewhere. **Status is now what actually happen
 ### Deferred Scope
 
 - All implementation. Every proposed package/plugin is a **sketch** in this run.
-- Board filing (stage H) — blocked on `plan-eval.md` = `PASS` **and** owner ratification in-turn.
+- ~~Board filing blocked~~ — **UNBLOCKED 2026-08-11.** The owner ratified F-1/F-3, waived the third
+  PLAN-EVAL cycle, and authorized one-shot filing (drift **D-18**, **D-19**). Note the gate was
+  cleared by **owner waiver**, not by an evaluator `PASS`.
 
 ## Progress Log
 
