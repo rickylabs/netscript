@@ -46,10 +46,13 @@ Reference `.llm/harness/workflow/lane-policy.md`; the complete route table is no
 
 - **No OpenHands.** Cloud agent lanes are owner-paused (`lane-policy.md`, 2026-08-06) and the charter
   independently forbids them here.
-- **OpenRouter is limited** to the required `major_ui_ux_design` GLM pass, the conditional Kimi
-  vision-evidence lane, and a genuinely authorized fallback/third opinion. Any other OpenRouter use
-  is an override that must be recorded in `drift.md` before it happens.
-- **GLM 5.2 is never the formal evaluator** and its output is never cited as reasoning-trace evidence.
+- **OpenRouter is limited** to the stage-D2 design lanes and a genuinely authorized fallback/third
+  opinion. As of the owner override (D-15/D-16) those lanes are **Qwen 3.8 Max** (architecture) and
+  **Kimi K3** (pure UI/UX), both via OpenCode. Any other OpenRouter use is an override that must be
+  recorded in `drift.md` **before** it happens.
+- **No stage-D2 reviewer is ever the formal evaluator.** Qwen and Kimi produce advisory design
+  evidence only; the Codex GPT-5.6 Sol PLAN-EVAL is the sole verdict of record. A `PASS`-shaped
+  statement from a design lane carries no gate authority.
 
 ## Mutation boundary (planning-only)
 
@@ -70,13 +73,15 @@ Reference `.llm/harness/workflow/lane-policy.md`; the complete route table is no
 - **Stage-F reviewer bound to Claude Sonnet 5 · high.** `seed-run.md` § Stage F fixes three
   properties — unoriented, separate session, and a model **distinct from every lane that authored
   the plan** — and leaves the tier as per-run configuration. The authoring lanes here are **Opus 5**
-  (supervisor spine, synthesis, plan lock), **Fable 5** (stage-D packs and stage-E sections), and
-  **GLM 5.2** (stage-D2 design pass). Sonnet 5 is distinct from all three.
+  (supervisor spine, synthesis, plan lock) and **Fable 5** (stage-D packs and stage-E sections).
+  Sonnet 5 is distinct from both. *(An earlier version of this note also listed GLM 5.2 as an
+  authoring lane; **GLM never ran** — the lane was unlaunchable, D-10 — so it authored nothing.)*
 
   Codex GPT-5.6 Sol was considered and **rejected for stage F**: it is the stage-G formal evaluator,
   and spending it twice would collapse the review chain's diversity — the opposite-family look is
   worth more as the *verdict of record* than as a preliminary pass. The resulting chain is
-  Opus → Fable → GLM → **Sonnet** → **Codex Sol**, with no model reviewing its own output.
+  Opus → Fable → **Sonnet** → **Codex Sol**, with no model reviewing its own output — plus the
+  advisory stage-D2 pair, **Qwen 3.8 Max** and **Kimi K3**, neither of which authored anything.
 
   OpenRouter was **not** used here: `lane-policy.md` and the charter confine it to the design lane
   plus an authorized fallback/third opinion, and a routine stage-F review is neither.
