@@ -758,3 +758,78 @@ staged set is P-1..P-5, so it is not a complete sweep of the amended plan.
   branch was changed. This Cycle-6 append is the only filesystem mutation.
 
 PLAN-EVAL: FAIL_PLAN
+
+## Cycle 7
+
+- Plan evaluator session: same dedicated Codex GPT-5.6 Sol · xhigh evaluator session / 2026-08-11
+  (owner override D-2), Cycle 7 explicitly ordered by the owner as the final pass
+- Evaluator worktree: `/home/codex/repos/ns-rfc-plan-eval`, branch
+  `eval/rfc-runtime-versioned-automation`, clean at `ed978eb689c69fe98dfd4a72cf642dab209844a8`
+- Author worktree: `/home/codex/repos/ns-rfc-runtime-versioned-automation`, same source commit
+  before this verdict append
+- Surface / archetype: docs RFC planning future ARCHETYPE-1/2/3/5/6 package, runtime, plugin, CLI,
+  scaffold, DB, Aspire, production-console, and staged DevTools work
+- Scope overlays: `SCOPE-docs`; full adversarial plan gate and Cycle-6 resolution audit; no
+  implementation evaluation
+
+### Cycle-6 finding resolution audit
+
+| Cycle-6 finding                                                   | Cycle-7 result | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ----------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F1 — formal plan/design/phase record reconciliation               | PARTIAL        | The plan sweep now classifies P-1..P-6 with P-6's consumed contracts and entry criterion, commit slices now say S1–S6, and G6 is current through Cycle 6 (`plan.md:90-104`; `worklog.md:103-107`; `phase-registry.md:13`). The same Design checkpoint still defines the staged vocabulary as P-1..P-5, its fix note falsely claims P-1..P-6, and the plan/context status narratives still call Cycle 5 the deciding pass (`worklog.md:95-100,236-245`; `plan.md:3-13`; `context-pack.md:3,21-32`; finding 1). |
+| F2 — D-9 terminology and decision-list reconciliation in PR #1446 | PASS           | The live summary names a production/admin operator console plus separately staged DevTools; locked decision 9 now contains the complete two-surface decision, scopes #890/#922 sufficiency to surface 1, stages DevTools behind P-6, and the list is ordered 1–11 without the old duplicate. The PR remains draft at head `ed978eb68`.                                                                                                                                                                        |
+
+### Checklist results
+
+| Plan-Gate item                          | Result | Evidence / location                                                                                                                                                                                                                                                                                                                      |
+| --------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Research present and current            | PASS   | `research.md:6-13` still re-baselines to `origin/main`; HEAD's merge-base and current `origin/main` are both `2256a67bf`. Fresh `deno doc packages/runtime-config/mod.ts` and focused production-use search reconfirmed the exported loader/watcher and absence of a production consumer. No RFC or evidence file changed after Cycle 6. |
+| Decisions locked                        | PASS   | The RFC continues to lock ownership, activation totals/CAS, revision pinning, leased admission versus serving, store parity, T1 limits, cron ownership, and the two-frontend boundary with rationale. Cycle 6 already found no unresolved runtime architecture decision, and `2518791f3..ed978eb68` contains no RFC change.              |
+| Open-decision sweep                     | PASS   | The plan now covers P-1..P-6, states why P-6 is safe to defer, names the stable contracts it consumes and its entry criterion, and confirms no runtime slice depends on its outcome (`plan.md:90-104`; RFC §11 `rfc-0001-runtime-versioned-automation.md:629-638`). The evaluator sweep found no must-resolve decision.                  |
+| Commit slices (< 30, gate + files each) | PASS   | S1–S6 are ordered and name files plus proving gates (`plan.md:106-125`); the RFC's future A0–A8 slices remain below 30, file-scoped, dependency-ordered, and fully gated (`rfc-0001-runtime-versioned-automation.md:640-670`). The Design checkpoint now agrees on S1–S6 (`worklog.md:103-105`).                                         |
+| Risk register                           | PASS   | The register continues to cover evidence drift, partial activation, feed/poll ordering, schema skew, adapter divergence, T1, integrity, secrets, loader policy, cron duplication, outage behavior, and frontend sequencing with mitigations/owners (`plan.md:69-88`).                                                                    |
+| Gate set selected                       | PASS   | The docs-source gates and CI skips are explicit, while §12 defines S/F/R/C/P, frontend edges, and release classes for future package/plugin slices (`plan.md:15-23`; RFC `:640-670`).                                                                                                                                                    |
+| Deferred scope explicit                 | FAIL   | The Design checkpoint contradicts itself: domain vocabulary says prerequisite/staged items P-1..P-5, while its deferred-scope row and the locked plan say P-1..P-6 (`worklog.md:95-107`; `plan.md:90-104`). Because P-6 is the owner-directed D-9 boundary, the plan package does not yet state one unambiguous deferred set.            |
+| jsr-audit surface scan (pkg/plugin)     | PASS   | The pre-scan still names Zod/isolated-declaration, explicit oRPC-route, driver-type leakage, connector-thinness, and publish risks and assigns them to future slices (`rfc-0001-runtime-versioned-automation.md:672-680`).                                                                                                               |
+
+### Open-decision sweep (evaluator-run)
+
+None. P-6 is safe to defer: the RFC defines its purpose, consumes already-scoped management,
+history, convergence, and OTel contracts, and prevents this RFC from pre-empting the DevTools host.
+The only failure is that the Design checkpoint still omits P-6 from its own domain-vocabulary list
+while claiming that omission was fixed.
+
+### Verdict
+
+`FAIL_PLAN`
+
+### If FAIL_PLAN — required fixes
+
+1. **[BLOCKER] Complete the Cycle-6 record reconciliation against the actual text.** Change the
+   Design checkpoint's domain-vocabulary range from P-1..P-5 to P-1..P-6 so it agrees with its own
+   deferred-scope row, the locked plan, RFC §11, and the Cycle-6 fix note
+   (`worklog.md:95-107,236-245`). Remove the remaining stale evaluation narratives: the locked plan
+   still calls Cycle 5 the deciding pass and describes S5 only through earlier cycles
+   (`plan.md:10-13,117-120`), while the context pack still opens post-Cycle-5 and ends at Cycle 5
+   (`context-pack.md:3,21-32`). Bring those through Cycle 7 without changing any architecture.
+
+2. **[HIGH] Reconcile the live PR's evaluation-progress fields after this verdict.** The D-9 wording
+   fix itself passes, but S5 and Definition of Done still say Cycle 6 is the deciding future pass,
+   even though Cycle 6 returned FAIL_PLAN and Cycle 7 is now complete. Update only those progress
+   fields; preserve the corrected two-surface decision, draft state, and sole `status:plan-eval`.
+
+### Notes
+
+- The actual `ed978eb68` files—not the fix summary—were evaluated. The plan open-decision sweep,
+  S1–S6 list, phase registry, and live PR D-9 wording were verified directly. The RFC did not change
+  after Cycle 6, so its clean architecture judgment stands.
+- `docs:links` passed with zero broken links/anchors/orphans; focused `deno fmt --check` passed on
+  the RFC, plan, worklog, context pack, phase registry, and competitive study;
+  `git diff --check
+  2518791f3..HEAD` passed. The evaluator worktree remained clean.
+- Live PR #1446 was re-inspected read-only at head `ed978eb68`: open, mergeable, draft, sole
+  `status:plan-eval`, milestone assigned, six comments. No GitHub mutation was performed.
+- No RFC, plan, worklog, context pack, phase registry, source, issue, comment, label, commit, or
+  branch was changed. This Cycle-7 append is the only filesystem mutation.
+
+PLAN-EVAL: FAIL_PLAN

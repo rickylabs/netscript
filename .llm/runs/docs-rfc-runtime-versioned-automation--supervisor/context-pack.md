@@ -1,6 +1,6 @@
 # Context Pack — docs-rfc-runtime-versioned-automation--supervisor
 
-Resume here. State as of 2026-08-11 (post PLAN-EVAL cycle 5 + owner directive D-9).
+Resume here. State as of 2026-08-11 (post PLAN-EVAL cycle 7; D-8 + D-9 applied).
 
 - **What this run is**: research + architecture RFC for runtime-versioned workers/tasks/triggers
   (operator capability on a running stack). No implementation. Draft PR #1446 vs main.
@@ -18,20 +18,11 @@ Resume here. State as of 2026-08-11 (post PLAN-EVAL cycle 5 + owner directive D-
   plugin) — LOCKED; T1 honesty contract; TM1–TM9; cleanup inventory; slices A0–A8 with files+gates;
   E2E model incl. outage test 8; P-1..P-6 staged items (P-6 = DevTools RFC per D-9; §8.2 = two
   decided operator surfaces).
-- **Eval state**: cycles 1–2 FAIL_PLAN (cycle-2 partly caused by silently no-opped edits, D-7) →
-  protocol escalation; **owner authorized cycle 3** (with the D-8 study added first); cycle 3
-  FAIL_PLAN with 6 narrowed findings (5 prior findings PASS) → all six fixed: §5.3-8 outage
-  availability contract + pinned-lookup classes + revision cache; §5.5 bounded secret guarantee;
-  cleanup table completed (triggers enabled-state full surface, Windows env files,
-  NETSCRIPT_TASKS_DIR readers); gate letters + release classes on every roadmap row; study got
-  isolation/control-plane/cockpit matrix rows + narrowed negatives + citation rule; artifacts/PR
-  reconciled. Owner then ordered **cycle 4**: FAIL_PLAN, 5 further-narrowed findings (outage
-  contract made singular = indefinite last-good + idle-and-loud cold start + §13 test 8; CLI
-  DI/deploy-flag cleanup rows; C/P gate letters completed; study evidence contract repaired, 15-row
-  count + Windmill isolation citation; artifacts+fmt reconciled) → all fixed; cycle 5 is the
-  deciding pass, after which the RFC is produced for the owner on PASS.
-- **S6 (D-8)**: competitive architecture study landed
-  (`evidence/competitive-architecture-study.md`), integrated as RFC §14.1 + §13.1 benchmark gates +
-  P-5; overbroad wording corrected. Cycle 3 authorized by owner.
+- **Eval state**: seven Sol·xhigh cycles (same dedicated evaluator thread `019fef2b-…03fc`, worktree
+  ns-rfc-plan-eval). C1 9 findings → C3 6 → C4 5 → C5 2 → C6 "no unresolved runtime architecture
+  decision remains" (bookkeeping only) → C7 one Design-vocabulary line + progress narratives (this
+  fix). Every finding of every cycle is fixed in-tree; the final pass closes on the reconciled
+  record; on PASS the RFC is produced and the owner ratifies.
+
 - **Hard rules**: draft PR only; no issue filing; no ready-for-review until owner ratifies; never
   write in ns-1443 worktree or netscript-start-ref.

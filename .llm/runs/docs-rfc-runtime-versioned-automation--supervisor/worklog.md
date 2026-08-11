@@ -96,7 +96,7 @@ live inside the RFC and are re-checkpointed by their own future runs).
    PROVEN/IMPLEMENTED-UNPROVEN/ABSENT), operator journeys J1–J3, contribution families (`task@1`,
    `trigger@1`), activation epochs/sets (complete desired state, revision-pinned dispatch, leased
    registration, outage contract), trust tiers T0–T3, threat items TM1–TM9, waves A0–A8 (incl. A2d,
-   A6a–c), prerequisite/staged items P-1–P-5, benchmark gates BG-1–BG-5, competitive-study verdict
+   A6a–c), prerequisite/staged items P-1–P-6, benchmark gates BG-1–BG-5, competitive-study verdict
    classes (adopt / non-goal / differentiator).
 3. **Ports** — none created (docs run). The RFC _specifies_ ports (store/boundary/reload/feed) for
    future implementation runs.
@@ -243,3 +243,12 @@ live inside the RFC and are re-checkpointed by their own future runs).
   constants/slices S1–S6 + P-1..P-6; phase registry through cycle 6; PR body reworded (two surfaces,
   #890/#922 sufficiency scoped to surface 1 only).
 - Cycle 7 launched as the final pass.
+
+## 2026-08-11 PLAN-EVAL cycle 7 — D-9 PR wording PASS; last vocabulary line + narratives fixed
+
+- Cycle 7 at `ed978eb68`: PR terminology finding PASS; architecture judgment stands (RFC unchanged
+  since cycle 6). Remaining: the Design domain-vocabulary line still read P-1–P-5 (same fmt-rewrap
+  trap as D-7 — the fix note claimed it fixed) and plan/context/PR progress narratives lagged the
+  cycle count. Fixed with grep verification: vocabulary now P-1–P-6; plan status + S5 slice text
+  describe cycles 1–7; context pack opens post-cycle-7; PR S5/DoD progress fields updated. Cycle 8
+  is the closing pass on the reconciled record.
