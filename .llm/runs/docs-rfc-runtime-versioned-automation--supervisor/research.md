@@ -74,3 +74,17 @@ dogfood zone panel/console route/island) is the natural adjacency for the cockpi
 - OQ4: triggers runtime processor parity with workers (stores, idempotency, dead-letter reality).
 - OQ5: legacy cockpit workflows — which were wired vs aspirational (G1).
 - OQ6: multi-instance propagation — what happens today with >1 replica and a pointer flip?
+
+## Open questions — CLOSED (by G1/G2 evidence)
+
+- OQ1: **nothing** consumes loader/watcher in any production composition (H1 confirmed; scaffold
+  glue starts package runtimes without runtime-config).
+- OQ2: fs-only `DenoRuntimeConfigStore` (temp+rename pointer activation, read-merge-write pointer
+  update; P1 race 20/20; no revision/audit fields on the port).
+- OQ3: real generator, but baseline snapshots collapse contributions to `schemas: []` → 0 files
+  written (P3); no admission validation anywhere; sample `$schema` refs dangle.
+- OQ4: triggers processor is the strongest engine (tested idempotency/retry/DLQ/defer/enabled);
+  gap is definitions-static + non-uniform history, not processing.
+- OQ5: legacy cockpit — workers list/detail/run wired, no create; triggers pages dead vs service.
+- OQ6: nothing propagates; replicas would each need an unregistered watcher; cron/file-watch
+  would duplicate per replica.
