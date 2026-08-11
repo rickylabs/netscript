@@ -1,100 +1,87 @@
 # Owner decision brief — DevTools contribution architecture RFC
 
-> **Nothing has been filed.** No issue, epic, milestone, or repo label outside draft PR #1450 has
-> been created, edited, closed, moved, or commented on. This brief is what I need from you before
-> any of that happens.
+> **STATUS: RATIFIED 2026-08-11.** This was a request for decisions; it is now the **record of
+> decisions taken**. Every fork below is closed. Board filing is authorized and executes once from
+> `filing/filing-manifest.md`.
 
 **Run:** `plan-devtools-contribution--seed` · **PR:** #1450 · **RFC:**
 `docs/architecture/rfc/rfc-0002-devtools-contribution.md` · **Baseline:** `main` @ `2256a67bf`
 
 ---
 
-## Read this first: one mandated deliverable is missing
+## What the owner decided
 
-**The charter-required GLM 5.2 design pass could not be run.** Not skipped — **unlaunchable**.
+| # | Fork | **Ratified decision** | Recorded |
+| - | ---- | --------------------- | -------- |
+| **D-0a** | The mandated design pass could not be launched — waive it, or hold? | **Neither.** Do **not** waive; **replace GLM 5.2 with Qwen 3.8 Max at `max`**, plus **Kimi K3** for the pure UI/UX lane, via OpenCode/OpenRouter on read-only surfaces | drift **D-15**, **D-16** |
+| **F-1** | Depend on #890's unbuilt spine, or self-contained? | **Self-contained DevTools family and spine, built first in `packages/devtools-core`** — not serialized behind #890's 24 unimplemented children | drift **D-19**; RFC §6, §13.1 |
+| **F-3** | Manifest schema-evolution precondition | **`.passthrough()`**, `schemaVersion` stays `1`, landing **before** any manifest-visible pointer, with three named tests | drift **D-19**; RFC §6 |
+| **Plan-Gate** | A third PLAN-EVAL cycle for the amendments? | **Waived in writing.** Owner supplies the gate clearance | drift **D-18** |
+| **Board filing** | — | **Authorized**, once, from the committed manifest, preserving the 2026-07-19 train, no duplicates | drift **D-19** |
 
-`openrouter-run.ts` is the only OpenRouter-through-Claude transport and applies the evaluator model
-guard unconditionally ("never optional here", its own doc comment). That guard's allowlist correctly
-excludes GLM, because `lane-policy` invariant 6 restricts relay *evaluator* lanes to open models.
-Meanwhile the **design** preset `claude-design-glm-5-2` exists in `provider-profiles.ts:192` and is
-bound to `major_ui_ux_design` in `routing-policy.ts:90`.
-
-**Policy declares a lane the execution surface cannot launch.** Both failed transcripts are preserved
-as evidence; full analysis in `drift.md` **D-10**.
-
-I did **not** fabricate the pass or relabel another model's output as GLM's. There is no authorized
-fallback, and the Kimi vision lane is defined as *complementing, never replacing* it. Design scrutiny
-was obtained from the stage-F reviewer instead, **labelled explicitly as not the mandated pass** — and
-it produced the sharpest design finding in the run (the IA answered "what exists?" instead of "what
-is broken?").
-
-| # | Decision | Options | My recommendation |
-| - | -------- | ------- | ----------------- |
-| **D-0a** | Accept the RFC with substitute design scrutiny, or hold it open until the design lane works? | (a) accept and proceed · (b) hold stage H until GLM runs | **(a) accept.** The substitute found a real design defect, and holding a completed RFC hostage to a launcher bug costs more than it buys. Re-run GLM when the lane is fixed and treat its findings as an amendment. |
-| **D-0b** | File the launcher gap as its own issue now? | (a) file it · (b) fold into this RFC's roadmap · (c) leave it | **(a) file it.** It blocks *every* future major-UI/UX run, not just this one, and the fix is small: a design-lane path in the guard, or a non-evaluator mode on the launcher, or stop declaring an unlaunchable lane in `lane-policy`. |
+**One thing this record deliberately does not say.** The Codex evaluator **never returned `PASS`** —
+it returned `FAIL_PLAN` twice, and its remaining blockers were owner-gated. The gate was cleared by
+**owner waiver**, not by an evaluator verdict, and `plan-eval.md` carries a banner saying so. Anyone
+reading this run later should not mistake one for the other.
 
 ---
 
-## The decisions that gate implementation
+## Decisions carried forward as recommended, now in force
 
-Ordered by cost of getting them wrong. Each is expanded in RFC §15.1 with its cost of deferral.
+These were recommendations in the pre-ratification brief; ratification of the whole brief adopts
+them. Each is normative in the RFC.
 
-| # | Fork | Recommendation | Why it matters |
-| - | ---- | -------------- | -------------- |
-| **F-1** | **Depend on #890's spine, or build a self-contained DevTools family?** #890 is **merged design text with zero implementation** — 24 children open, none started | Sibling family on a spine **this lane builds first**, in `packages/devtools-core` | **Correction: this is NOT reversible**, as I first argued and PLAN-EVAL rejected. It fixes the public package home, import specifiers, emitter ownership and whether #922 needs re-baselining. Option (a) serializes DevTools behind 24 unstarted issues; option (b) risks a fourth competing seam. **It blocks the first contracts slice and must be decided before implementation** |
-| **F-3** | **Manifest schema-evolution precondition.** #890's "older CLIs ignore an unknown block" claim is **false** — the schema is `.strict()`, so an unknown key hard-rejects and the plugin fails to parse | Land the precondition **before** any manifest-visible pointer | This is a defect in **#890/#922's own plan** (slice #929 is built on it), surfaced by this run and escalated. It is not ours to fix unilaterally |
-| **F-4** | **Three seams claim one axis**: #427, #890's pointer axis, #734 | #890's pointer axis wins; #427 folds in as the family definition; **#734 closes** | Left alone, a fourth position appears. #427's thinness law actually *agrees* with the pointer axis |
-| **F-5 / F-6** | **Zone ownership** (host-owned closed vs plugin-minted) and **ordering** | Host-owned closed; ordering = anchors, then clamped `(order, mountId, id)` | Both would force rework if deferred, which is why the RFC **locks** them rather than escalating. Flagged here only so you can overrule |
-| **F-7** | **Read-only v1** — no mutating actions | Ratify | Actions drag in auth (blocked on the RFC-A chain, which includes an **unfiled** child) and an unbounded audit story |
-| **F-8** | **Archetype** — **resolved in-RFC after PLAN-EVAL**: A1 contracts (`packages/devtools-core`) + A6 CLI emission + A5 thin plugin; host app is generated userland. A3 trigger written down | Ratify the resolution and the trigger | The earlier A2 assignment failed doctrine's own trigger — A2 wraps one external system behind a port with adapters, and this unit wraps none |
-
----
-
-## Board decisions — nothing filed until you say so
-
-| # | Fork | Recommendation |
-| - | ---- | -------------- |
-| **F-9** | **Milestone.** `0.0.14`'s description claims the dev dashboard but holds **zero** dashboard issues; all children sit on `0.0.15` | **Do not re-milestone.** Their placement is your own **2026-07-19 owner-ratified train**. Fix `0.0.14`'s stale description instead. *(I nearly recommended the opposite until I read the comment thread — see drift D-8)* |
-| **F-10** | **Two epics claim dashboard-zone panels** — #933/#944 under #922 vs #428–#431 under #400 | Both survive; different artifacts on different hosts. **#922's children untouched** — this run does not re-scope another epic |
-| **F-11** | **`CR-DDX-HOSTAGNOSTIC`** — real, on #400 since 2026-07-06, from epic #510, and **never resolved** | Accept it: host-neutral descriptor + host-provided context. Un-dangles #544 |
-| **F-12** | **PR #780** — unlabelled, unmilestoned, stale since 2026-07-14, encoding the superseded flat IA | Salvage its design-language specs, then close |
-| **F-13** | **Was the 7-member `DashboardContribution` family ever ratified?** No such event found anywhere | Treat as **unratified analysis**. This is an unverified *negative* and stated as one |
-| **F-20** | **`/design` ships ungated today** — the same defect class this RFC guards against | Record and **file separately**. Not fixed inside this RFC's scope |
-
-Full dispositions — every `KEEP` / `AMEND` / `FOLD` / `SUPERSEDE` / `CLOSE-LATER` with its reason —
-are in `design/T9-supersession/supersession-map.md`.
+| # | Decision |
+| - | -------- |
+| **F-4** | #890's pointer axis wins the three-seam contest; **#427 folds in**, **#734 closes** |
+| **F-5 / F-6** | Host-owned **closed** zone vocabulary; ordering = host anchors, then clamped `(order, mountId, id)` |
+| **F-7** | **Read-only v1.** Mutating actions staged — v1 renders the CLI-equivalent line, it does not execute it |
+| **F-8** | **A1** contracts (`packages/devtools-core`) + **A6** CLI emission + **A5** thin plugin; host app is generated userland; A3 trigger written down |
+| **F-9** | **Do not re-milestone.** The 2026-07-19 owner-ratified train stands; `0.0.14`'s stale description is the real defect |
+| **F-10** | Two epics both survive; **#922's children untouched** |
+| **F-11** | `CR-DDX-HOSTAGNOSTIC` **accepted** — host-neutral descriptor + host-provided context; un-dangles #544 |
+| **F-12** | PR #780 — salvage the design-language specs, then close |
+| **F-13** | The 7-member family was never ratified; treated as **unratified analysis** |
+| **F-14 / F-15 / F-16** | Vite 8 a non-goal with a re-entry condition; generic Vite and Fresh-UI contribution deferred to their own RFCs **with entry criteria** |
+| **F-17** | Contribute-into-Scalar **declined**, not deferred |
+| **F-18** | **MCP is the agent surface, DevTools the human surface** |
+| **F-19** | Production posture **stricter than every system surveyed** — no production tier, dual exclusion |
+| **F-20** | `/design` ships ungated today — recorded and **filed separately**, not fixed here |
 
 ---
 
-## Scope boundaries to confirm
+## What the design passes changed
 
-| # | Fork | Recommendation |
-| - | ---- | -------------- |
-| **F-14** | Vite 8 / `@vitejs/devtools-kit` | **Non-goal** with a re-entry condition. The ecosystem needs Vite 8; we pin 7.2.2. Imitate the contracts, implement natively |
-| **F-15 / F-16** | Generic Vite contribution; Fresh UI registry contribution | Deferred to their own RFCs, each with **entry criteria and an owning dependency** — not a vague "later" |
-| **F-17** | Contribute-into-Scalar | **Declined**, not deferred — the vendored bundle predates `pluginUrls` |
-| **F-18** | MCP as the agent surface, DevTools as the human surface | Adopt, following Aspire's own 13.3 Copilot-removal precedent |
-| **F-19** | Production posture stricter than every system surveyed | Ratify |
+The passes the owner refused to waive found **two criticals**, and both changed the RFC:
 
----
+- **Kimi K3 (UI/UX):** Home could not distinguish *"nothing is broken"* from *"DevTools is blind"*.
+  Fixed by §11.3.1 — `all-clear` is reachable only when **every** source reported.
+- **Qwen 3.8 Max (architecture):** the trust antecedent was **false** — the RFC's own pipeline
+  installs third-party JSR plugins and imported their code **in-process**. Fixed by splitting the
+  antecedent, adding **T-10 / INV-9 / G-10**, and forbidding in-generator-process execution.
 
-## What I am explicitly **not** claiming
-
-Five mitigations are **named gates that do not exist yet**: containment, generator scoping,
-production absence, schema evolution, and `arch:check` coverage. The RFC marks them `UNPROVEN`
-throughout §9. The charter forbids claiming security or production readiness without an executable
-gate, and this is what honouring that looks like — the gates are slice deliverables in §14, not
-assertions.
-
-Two host facts are **unverified** and carried as deliberately cheap W0 probes, sequenced first:
-package-shipped island specifiers, and a second route/island root in one Vite process.
+**22 findings: 21 fixed, 1 declined with a re-entry condition, 0 deferred** — `FINDINGS-SWEEP.md`.
 
 ---
 
-## What happens when you ratify
+## Open items that are *not* forks
 
-One-shot filing from a committed manifest, in dependency order: labels → milestones → epic →
-sub-issues (`Part of #<epic>`, full taxonomy, milestone) → reconciliation of pre-existing issues per
-the supersession map → `FILING-LOG.md` mapping every draft ID to its live issue number.
+Recorded so nothing looks hidden. None blocks filing.
 
-**Until then the board is untouched, and this PR stays draft.**
+| Item | Status |
+| ---- | ------ |
+| **Three labels do not exist** — `epic:devtools`, `area:devtools`, `area:frontend` | Filing uses **`epic:dev-dashboard`**, which does exist. Creating repo labels is a different mutation class and was **not** authorized; flagged, not assumed |
+| **`.github/labels.yml` drifted** 19 labels behind live; `netscript-pr` milestone guidance stale | Recorded as **D-12**; a parity PR is someone else's lane |
+| **The design-lane launcher gap** (**D-0b**) | Policy declares `claude-design-glm-5-2`, no launcher can run it. Still worth its own issue — it blocks every future major-UI/UX run |
+| **Vision pass on a prototype** | Kimi's vision capability was unused because nothing is implemented. Re-entry at roadmap wave W4/W6 |
+| Five mitigations **UNPROVEN** — containment, generator scoping, production absence, schema evolution, `arch:check` coverage | Named gates in §14, not assertions. Plus **G-10** for the new generate-time surface |
+
+---
+
+## What happens now
+
+One-shot filing from `filing/filing-manifest.md`: **14 new issues**, **1 not filed** (the launcher
+gap, pending D-0b), **6 existing amended via 4 rows**, `#922`'s children untouched, the 2026-07-19
+train preserved, then `FILING-LOG.md` mapping every draft ID to its live number.
+
+**After filing, GitHub is authoritative** over this run's documents, per the seed-run rule.

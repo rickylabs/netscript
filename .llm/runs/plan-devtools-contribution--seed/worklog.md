@@ -76,25 +76,27 @@ criticised false-green reporting elsewhere. **Status is now what actually happen
 
 ## Drift
 
-Fourteen entries. **Six correct the run's own earlier claims** — that is the point of the log.
+**Nineteen entries. Seven correct the run's own earlier claims** — that is the point of the log.
 
 | # | Drift | Severity |
 | - | ----- | -------- |
-| D-1 | GLM `major_ui_ux_*` lane reactivated from dormant | minor |
-| D-2 | IMPL-EVAL `N/A` by run shape | minor |
-| D-3 | GLM transport has no reasoning trace (pre-registered) | minor |
+| D-1…D-3 | GLM lane reactivated; IMPL-EVAL `N/A` by run shape; GLM has no reasoning trace | minor |
 | D-4 | **self-correction** — the Markdown format gate this run planned does not exist | significant |
 | D-5 | OpenHands docs gate cannot fire on a draft PR | minor |
 | D-6 | **#890's additive-manifest claim is false** (`.strict()`) — cross-RFC defect | significant |
-| D-7 | **self-correction** — generator spawn is whole-filesystem, my corpus understated it | significant |
+| D-7 | **self-correction** — generator spawn is whole-filesystem; my corpus understated it | significant |
 | D-8 | **self-correction** — comment threads reversed a board recommendation | significant |
 | D-9 | **self-correction** — off-by-one citation in D-6 | minor |
-| D-10 | **mandated GLM design lane is unlaunchable** — owner-gated | **significant** |
-| D-11 | epic AMENDS #400 rather than creating a second umbrella | significant |
-| D-12 | `.github/labels.yml` drifted from live; `netscript-pr` milestones stale | minor |
+| D-10 | **mandated GLM design lane unlaunchable** — policy declares a lane nothing can run | significant |
+| D-11 | epic **AMENDS #400** rather than creating a second umbrella | significant |
+| D-12 | `.github/labels.yml` drifted 19 behind live; `netscript-pr` milestones stale | minor |
 | D-13 | one-sender-per-worktree guard correctly refused cycle-2 reuse | minor |
 | D-14 | **self-correction** — cycle-2 evaluator spent its budget reading; my brief was unbounded | significant |
-
+| D-15 | **OWNER OVERRIDE** — Qwen 3.8 Max replaces GLM for stage D2 | significant |
+| D-16 | **OWNER LANE SPLIT** — Kimi K3 takes the pure UI/UX review | minor |
+| D-17 | **self-correction** — I truncated my own design-review evidence with `tail -40` | significant |
+| D-18 | **OWNER WAIVER** — no third PLAN-EVAL cycle; gate cleared by owner, not by a verdict | significant |
+| D-19 | **OWNER RATIFICATION** — F-1, F-3 decided; board filing authorized | significant |
 
 ## Gate Results
 
@@ -219,3 +221,30 @@ each in its **own** worktree, each against an **immutable** commit.
 
 **Escalated per `run-loop.md` §4: two `FAIL_PLAN` cycles, then the user decides.** No third cycle was
 opened, and no board entry was filed.
+
+## Post-ratification execution (2026-08-11)
+
+| Step | Outcome |
+| --- | --- |
+| Stage-D2, owner-directed | **Qwen 3.8 Max** (architecture) + **Kimi K3** (pure UI/UX), read-only surfaces, findings-only. Observed identity **matched** requested on both. Each found a **critical** |
+| Evidence capture | First launches truncated by my own `tail -40` (**D-17**); both re-run with full redirection; truncated tails **kept** as evidence |
+| Amendment A (§6/§7) | F-3 `.passthrough()` normative; one zone rule with typed contexts + 6th quarantine state; canonical `DevToolsPanelState<T>`; third-party mount; F-1 propagated |
+| Amendment B (§8/§11) | Six `*Data` wire shapes; **worked end-to-end contributor data path**; matrix consumes the canonical union (10 surfaces × 9 arms, no blanks); ranked row schema + deterministic order; `/flows` index; density + truncation disclosure; `/automation` staged behaviour |
+| Amendment C (map/manifest) | **#412 `AMEND` → `SUPERSEDE`**; every #890-dependency hedge rewritten under ratified F-1; live re-read corrected the child count 28 → **29** |
+| Findings sweep | **22 findings — 21 fixed, 1 declined with re-entry, 0 deferred** (`FINDINGS-SWEEP.md`) |
+| Cross-reference sweep | **`CROSSREF: 0 contradictions, 0 duplications`** vs #890 / RFC-0001 / RFC-A; **21 internal defects** found and fixed, incl. §6/§8 contradicting the new INV-9 |
+
+### Gate results — final
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| `deno task docs:links --root docs/architecture/rfc --pretty` | **PASS** | `docs=1 broken-links=0 broken-anchors=0 orphans=0` |
+| `deno task docs:accuracy` | **PASS** | exit 0; 192 published source pages checked |
+| Code-fence balance | **PASS** | 90, balanced |
+| Retired-vocabulary sweep | **PASS** | `PanelAvailability`/`DevToolsPanelId`/`plugin-devtools-core`/`contribution-core` → 0 outside correction notes |
+| Identity / ordering residue | **PASS** | 0 compound-id, 0 flat-sort |
+| Lock hygiene | **PASS** | `deno.lock` clean |
+| PLAN-EVAL | `FAIL_PLAN` ×2 → **owner waiver** (D-18) | `plan-eval.md` banner states it is **not** an evaluator PASS |
+
+`check`/`test`/`lint`/`arch:check`/`quality:scan`/`e2e:cli` remain **N/A**: the changeset is Markdown
+only, with no `packages/**` or `plugins/**` source.
