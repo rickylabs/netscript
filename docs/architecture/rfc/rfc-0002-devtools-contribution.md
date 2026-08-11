@@ -2027,6 +2027,413 @@ export interface DevToolsProcedureReference {
    inverted, `m2` F23; TanStack has no boundary anywhere on its mount path, research F24). The host
    degrades; it never crashes.
 
+### D-6.4a — Contracts: the six zone `*Data` wire shapes
+
+§7's `DevToolsZoneContextMap` binds each version-suffixed zone id to a per-zone context type and
+imports those types from `@netscript/devtools-core/contracts/v1/data`. An earlier draft referenced
+the six types without defining them anywhere — a zone map whose value types do not exist is the
+comment-only-`unknown` defect Q-M4 named, moved one file over. This amendment defines them. The
+module lives at `contracts/v1/data` and ships as part of the `./contracts/v1` publish surface
+(§13.2), so the export map stays two subpaths.
+
+The shapes are deliberately minimal: every field is traceable to a runtime source named in §3 or
+this section, and a field with no v1 producer is omitted rather than reserved. Two shared laws,
+stated once:
+
+- **Every history is windowed.** Unbounded history is not available upstream — Aspire's telemetry
+  store caps `MaxLogCount`/`MaxTraceCount` at 10,000 entries *shared across resources*, oldest
+  evicted (`m4` F5) — so an unbounded wire shape would be a lie at the type level. Every
+  list-bearing history rides `DevToolsWindow`; §11.3.3's density contract makes the bound visible
+  in the UI.
+- **`traceId` is always optional.** A telemetry-derived join can be evicted (`m4` F5). An absent
+  `traceId` renders §11.6's `telemetry evicted` marker, never a broken link.
+
+```ts
+// @netscript/devtools-core/contracts/v1/data — the per-zone wire shapes consumed by
+// §7's DevToolsZoneContextMap. All timestamps are ISO-8601 strings.
+
+/** Bounded window for every history the data plane serves. §11.3.3 owns the disclosure rule. */
+export interface DevToolsWindow<TRow> {
+  readonly rows: readonly TRow[];
+  /** Server-enforced page size actually applied (§11.3.3: default 50, max 200). */
+  readonly limit: number;
+  /** True when rows were cut at `limit`. A truncated window MUST be disclosed in the UI. */
+  readonly truncated: boolean;
+  /** Opaque next-page cursor; absent on the last page. Mirrors the SSE cursor discipline (D-6.6). */
+  readonly cursor?: string;
+}
+
+/**
+ * 'workers.console/v1'. Sources: the job/task registry generated from the plugin's declared
+ * `runtimeRegistries` (`plugins/workers/scaffold.runtime.json:24-55`, §3.1/§3.5); the execution
+ * feed from the host's own run-state read model (§11.2 boundary fact 1 — never a projection of
+ * the lossy dashboard store) joined to `TelemetryQueryPort.querySpans` on the `netscript.*`
+ * attribute domains (§3.7).
+ */
+export interface WorkersConsoleData {
+  readonly jobs: readonly {
+    readonly jobId: string;
+    /** Declared schedule intent, verbatim from the registry; drift vs observed is host-computed. */
+    readonly schedule?: string;
+  }[];
+  readonly executions: DevToolsWindow<{
+    readonly executionId: string;
+    readonly jobId: string;
+    readonly status: 'running' | 'succeeded' | 'failed' | 'retrying';
+    readonly attempt: number;
+    readonly startedAt: string;
+    readonly endedAt?: string;
+    /** Present ⇒ the row in-links to `/flows/:correlationId` (§11.3, decision 4). */
+    readonly correlationId?: string;
+    /** Present ⇒ the row renders a `{ target: 'aspire.trace' }` link cell (§7). */
+    readonly traceId?: string;
+  }>;
+}
+
+/**
+ * 'sagas.console/v1'. Sources: saga registry (generated runtime registries, §3.1) and the
+ * run-state read model. `compensating` is first-class — it is the #429 consumer's whole point.
+ */
+export interface SagasConsoleData {
+  readonly instances: DevToolsWindow<{
+    readonly instanceId: string;
+    readonly sagaId: string;
+    /** Saga-defined state name — a domain string, not a host vocabulary. */
+    readonly state: string;
+    readonly status: 'active' | 'completed' | 'compensating' | 'failed';
+    readonly startedAt: string;
+    readonly updatedAt: string;
+    readonly correlationId?: string;
+    readonly traceId?: string;
+  }>;
+}
+
+/**
+ * 'triggers.console/v1'. Sources: trigger registry and firing history from the run-state read
+ * model. The kind union is the canonical SIX — `TRIGGER_RUNTIME_KINDS` (3) +
+ * `TRIGGER_RESERVED_KINDS` (3), `packages/plugin-triggers-core/src/domain/constants.ts:5-29`
+ * (the Q-m3 correction, verified at source).
+ */
+export interface TriggersConsoleData {
+  readonly triggers: readonly {
+    readonly triggerId: string;
+    readonly kind: 'webhook' | 'file-watch' | 'scheduled' | 'queue' | 'stream' | 'manual';
+    readonly enabled: boolean;
+    /** Present for 'scheduled': next-firing preview derived host-side from the declared cron. */
+    readonly nextFiringAt?: string;
+  }[];
+  readonly firings: DevToolsWindow<{
+    readonly triggerId: string;
+    readonly firedAt: string;
+    readonly outcome: 'delivered' | 'misfired';
+    readonly correlationId?: string;
+    readonly traceId?: string;
+  }>;
+}
+
+/**
+ * 'streams.console/v1'. Sources: stream registry and per-subscriber delivery state from the
+ * run-state read model (#431). Contract-provenance is deliberately ABSENT from this shape:
+ * streams has no oRPC contract surface (arch-debt `streams-connector-sound-deferred`), and the
+ * panel renders that as §7's `partial` arm (§11.7) rather than carrying a field that would
+ * always be empty.
+ */
+export interface StreamsConsoleData {
+  readonly streams: readonly {
+    readonly streamId: string;
+    readonly subscriberCount: number;
+  }[];
+  readonly deliveries: DevToolsWindow<{
+    readonly streamId: string;
+    readonly subscriber: string;
+    readonly status: 'delivered' | 'pending' | 'failed';
+    readonly at: string;
+    readonly correlationId?: string;
+    readonly traceId?: string;
+  }>;
+}
+
+/**
+ * 'plugin.detail/v1' — the entity zone scoped to one plugin, and the universal third-party
+ * mount (§7, Q-m4). Scoped to the CONTRIBUTING plugin's `mountId`: a third-party panel reads
+ * its own typed slice, never another plugin's. Sources: the resolved plugin set (`r3` F7a),
+ * the doctor `extraChecks` seam (`r4` F2; row shape per
+ * `doctor-plugin-use-case.ts:314-318` — binary `ok`, §6's honest limitation), the generated
+ * `devtools.diagnosis.json` six-state record (§6), the dead-axis map (`research.md` F18), and
+ * JSR version drift via the deps toolbelt (§11.5).
+ */
+export interface PluginDetailData {
+  readonly identity: ContributionIdentity; // §6's quartet
+  readonly version: { readonly installed: string; readonly latest?: string };
+  /** The axis map including dead axes — ten enum names vs twelve interface keys (§3.3). */
+  readonly axes: readonly { readonly axis: string; readonly consumed: boolean }[];
+  readonly doctor: readonly {
+    readonly name: string;
+    readonly ok: boolean;
+    readonly message?: string;
+  }[];
+  /** This plugin's devtools contributions with their §6 diagnosis state. */
+  readonly contributions: readonly {
+    readonly fullyQualifiedId: string; // `<mountId>/<id>/v<apiMajor>`
+    readonly kind: 'panel' | 'link';
+    readonly state: 'active' | 'quarantined' | 'excluded' | 'skipped';
+    readonly diagnosis?: string; // §6 taxonomy state name, when not 'active'
+  }[];
+  /**
+   * Results of THIS plugin's own contributed read procedures (D-6.4b), invoked host-side and
+   * keyed by procedure id. This is the slot a contributed panel reads its own runtime state
+   * from — the K-M5 connection. Values are narrowed by the plugin's own contract types.
+   */
+  readonly procedures: Readonly<Record<DevToolsProcedureId, DevToolsProcedureResult<unknown>>>;
+  /** Aspire resource name for the service deep-link, when the plugin ships a service. */
+  readonly serviceResource?: string;
+}
+
+/**
+ * 'run.detail/v1' — the entity zone scoped to one run record (the run inspector, #419).
+ * Sources: the run-state read model plus `querySpans`/`queryLogs` filtered on the run's
+ * correlation id (§3.7).
+ */
+export interface RunDetailData {
+  readonly runId: string;
+  readonly primitive: 'worker' | 'saga' | 'trigger' | 'stream';
+  /** The owning jobId / sagaId / triggerId / streamId. */
+  readonly entityId: string;
+  readonly status: 'running' | 'succeeded' | 'failed' | 'compensating' | 'retrying';
+  readonly startedAt: string;
+  readonly endedAt?: string;
+  readonly attempts: readonly {
+    readonly attempt: number;
+    readonly startedAt: string;
+    readonly outcome: 'succeeded' | 'failed' | 'retried';
+    readonly traceId?: string;
+    readonly spanId?: string;
+  }[];
+  /** Present ⇒ in-links to `/flows/:correlationId`. */
+  readonly correlationId?: string;
+}
+```
+
+**Honesty note on the run-state read model.** The executions/instances/firings/deliveries fields
+above name "the host's run-state read model" as their source. That read model is a **build item of
+this RFC** (it is what §11.2 boundary fact 1 requires: run-state must survive Aspire's eviction, so
+it cannot be a projection of the dashboard store), fed by the primitives' runtime registries and
+telemetry. It is not shipped code at `2256a67bf`, and no field above claims otherwise.
+
+### D-6.4b — The worked contributor data-access path, end to end
+
+This is the section an adopter actually reads (K-M5 — the adoption blocker). Before this
+amendment, §7 carried typed `data` and this section defined `DevToolsProcedureReference`, but
+nothing connected them: a plugin author could ship a panel and still have no path to their own
+runtime state. The connection is the envelope's `requires` block, which §6 declares and defers
+here:
+
+```ts
+/**
+ * §6's `ContributionEnvelope.requires`, defined here (§6: "ports/procedures — see Data plane").
+ * The ONLY carrier of contributed procedure declarations. Procedure references ride the
+ * envelope behind the pointed-to export — never the installer manifest, which stays a
+ * parse-only pointer (§6's thinness law). An earlier draft of D-6.10/D-6.11 called
+ * `DevToolsProcedureReference` a "manifest axis"; under the ratified pointer design (F-3, §6)
+ * only the pointer block itself is manifest-visible, and D-6.11's precondition attaches to it.
+ */
+export interface ContributionRequires {
+  readonly procedures?: readonly DevToolsProcedureReference[];
+}
+```
+
+The walkthrough follows one fictional third-party plugin — `@acme/plugin-crons` (`mountId`
+`crons`), the same contributor §6's emitted-loader example and §7's Q-m4 correction already use —
+from manifest to rendered pixels. Every file and type it passes through is named.
+
+**Step 1 — the manifest pointer** (`@acme/plugin-crons/scaffold.plugin.json`). Parse-only; no
+plugin code runs at manifest-read time (§6). Landing it at all requires the ratified F-3
+`.passthrough()` precondition slice (§6, D-6.11):
+
+```jsonc
+{
+  "schemaVersion": 1,
+  // …existing installer fields unchanged…
+  "frontend": { "export": "./devtools.ts", "framework": "fresh" }
+}
+```
+
+**Step 2 — the pointed-to export** (`@acme/plugin-crons/devtools.ts`). Default-exports the
+envelope. The generator imports this module in-process at generate time (§6 discovery pipeline):
+
+```ts
+import { DEVTOOLS_FAMILY } from '@netscript/devtools-core/contracts/v1';
+import type { ContributionEnvelope } from '@netscript/devtools-core/contracts/v1';
+import { cronsQueuePanel } from './devtools/panels/queue.ts';
+
+const envelope: ContributionEnvelope = {
+  contract: DEVTOOLS_FAMILY, // { family: 'devtools', major: 1 } — the negotiation handshake (§6)
+  pluginKind: 'crons',
+  contributions: [cronsQueuePanel], // validated by the devtools family schema, not the envelope
+  requires: {
+    procedures: [{
+      protocol: { family: 'netscript.devtools-data', major: 1 },
+      id: 'crons:queue-snapshot', // MUST be prefixed `<pluginId>:` — enforced at generation (D-6.4)
+      module: '@acme/plugin-crons/devtools/procedures',
+      export: 'queueSnapshotProcedure',
+      kind: 'read', // v1 is read-only; 'mutate' is owner fork OF-D3
+    }],
+  },
+};
+export default envelope;
+```
+
+**Step 3 — the contributed procedure** (`@acme/plugin-crons/devtools/procedures.ts`). A named
+export of an oRPC contract procedure binding (`DevToolsProcedureReference.export`). Server-side
+only; it reads the plugin's own runtime state and never accepts or emits a URL (D-6.2):
+
+```ts
+import { defineDevToolsReadProcedure } from '@netscript/devtools-core/contracts/v1';
+import type { DevToolsWindow } from '@netscript/devtools-core/contracts/v1/data';
+
+export const QUEUE_SNAPSHOT = 'crons:queue-snapshot' as const;
+
+/** The plugin's OWN wire shape — typed on both sides by its oRPC output schema. */
+export interface CronsQueueSnapshot {
+  readonly entries: DevToolsWindow<{
+    readonly entryId: string;
+    readonly status: 'queued' | 'running' | 'failed';
+    readonly scheduledFor: string;
+    readonly traceId?: string;
+  }>;
+}
+
+export const queueSnapshotProcedure = defineDevToolsReadProcedure({
+  id: QUEUE_SNAPSHOT,
+  input: cronsQueueQuerySchema, // enumerated typed fields only — never a URL-shaped input
+  output: cronsQueueSnapshotSchema, // parses to CronsQueueSnapshot
+  handler: ({ input, signal }) => readQueueSnapshot(input, { signal }),
+});
+```
+
+`defineDevToolsReadProcedure` is part of the net-new devtools contract build item (D-6.10); it
+produces the binding the host mounts, and its `kind` is structurally `'read'`.
+
+**Step 4 — the panel** (`@acme/plugin-crons/devtools/panels/queue.ts`). Mounts into
+`plugin.detail/v1`, the universal third-party mount (§7). Its typed context slot is
+`PluginDetailData` (D-6.4a), whose `procedures` record carries the step-3 result:
+
+```ts
+import type { DevToolsPanelContribution, DevToolsUiNode } from '@netscript/devtools-core/contracts/v1';
+import { QUEUE_SNAPSHOT, type CronsQueueSnapshot } from '../procedures.ts';
+
+export const cronsQueuePanel: DevToolsPanelContribution<'plugin.detail/v1'> = {
+  id: 'queue',
+  apiMajor: 1,
+  title: 'Cron queue',
+  zone: 'plugin.detail/v1',
+  render: async (ctx): Promise<DevToolsUiNode> => {
+    // ctx.data is PluginDetailData — typed by §7's DevToolsZoneContextMap, defined in D-6.4a.
+    const result = ctx.data.procedures[QUEUE_SNAPSHOT];
+    if (result === undefined || !result.ok) {
+      // The HOST has already resolved this panel to the `partial` arm naming the missing
+      // procedure (step 6); this branch only renders the in-panel remainder.
+      return { kind: 'text', text: 'queue snapshot unavailable', tone: 'muted' };
+    }
+    const q = result.value as CronsQueueSnapshot; // narrowed by the plugin's own contract type
+    return {
+      kind: 'stack',
+      direction: 'column',
+      children: [
+        {
+          kind: 'table',
+          columns: ['entry', 'status', 'trace'],
+          rows: q.entries.rows.map((e) => [
+            { kind: 'text', text: e.entryId },
+            { kind: 'badge', text: e.status, tone: e.status === 'failed' ? 'error' : 'ok' },
+            e.traceId
+              ? { kind: 'link', label: 'trace', link: { target: 'aspire.trace', traceId: e.traceId } }
+              : { kind: 'text', text: '—', tone: 'muted' },
+          ]),
+          emptyText: 'no queued entries',
+        },
+        { kind: 'code', text: 'netscript crons list --status failed', lang: 'shell' },
+      ],
+    };
+  },
+};
+```
+
+**Step 5 — the generated registry entry** (`.netscript/generated/devtools/devtools.registry.ts`,
+emitted by the §6 transactional replace-set — illustrative excerpt). The generator validated the
+envelope against the family schema, enforced the `crons:` id prefix, rejected duplicate ids
+(contract law 1), and emitted literal lazy loaders (§6's law: literal, never computed):
+
+```ts
+{
+  identity: {
+    packageName: '@acme/plugin-crons', pluginKind: 'crons',
+    installationId: 'crons', mountId: 'crons',
+  },
+  fullyQualifiedId: 'crons/queue/v1', // <mountId>/<id>/v<apiMajor> (§6 identity)
+  zone: 'plugin.detail/v1',
+  load: () => import('@acme/plugin-crons/devtools/panels/queue').then((m) => m.cronsQueuePanel),
+  procedures: [{
+    id: 'crons:queue-snapshot',
+    load: () => import('@acme/plugin-crons/devtools/procedures')
+      .then((m) => m.queueSnapshotProcedure),
+  }],
+}
+```
+
+`devtools.check.ts` statically imports both modules, so the staged `deno check` gate has teeth
+before the atomic swap (§6). How the emitter records each contribution's source module so its
+loader stays literal is the W2-a emitter's concern (§14); the emitted shape above is the contract.
+
+**Step 6 — the host resolves, invokes, and assembles the state.** At runtime the generated
+DevTools host mounts `crons:queue-snapshot` on its same-origin oRPC route group as one more
+enumerated, deny-by-default procedure — the caller names an id, never a target (D-6.2, D-6.5).
+When it serves the `plugin.detail/v1` zone for `crons`, the host invokes the plugin's declared
+procedures server-side under an `AbortSignal`, assembles `PluginDetailData`, and resolves §7's
+canonical state:
+
+```ts
+// Generated DevTools host (userland, §13.1) — per-panel assembly, simplified.
+const snapshot = await invokeRegisteredProcedure('crons:queue-snapshot', input, { signal });
+const data: PluginDetailData = {
+  ...hostAssembledPluginDetail, // identity, axes, doctor, contributions, version
+  procedures: { 'crons:queue-snapshot': snapshot },
+};
+const state: DevToolsPanelState<PluginDetailData> = snapshot.ok
+  ? { kind: 'ready', data }
+  : {
+    kind: 'partial',
+    data,
+    missing: ['crons:queue-snapshot'],
+    reason: snapshot.error.message,
+  };
+```
+
+**Step 7 — what renders.** In the `ready` arm the panel's `render(ctx)` returns the
+`DevToolsUiNode` tree of step 4: a table whose cells are `text`/`badge`/`link` nodes (the
+`DevToolsCell` vocabulary — the per-row trace deep-link K-M1 existed for) plus the AC-2 `code`
+line. A failed procedure renders the `partial` arm naming the missing source; a throwing `render`
+flips to the per-contribution error boundary's `failure` card (§7) and never takes the shell down.
+
+**The full pass-through, in one table:**
+
+| # | File | Type it carries |
+| - | ---- | --------------- |
+| 1 | `@acme/plugin-crons/scaffold.plugin.json` | the parse-only `frontend` pointer block (§6; F-3 precondition) |
+| 2 | `@acme/plugin-crons/devtools.ts` | `ContributionEnvelope` + `ContributionRequires` + `DevToolsProcedureReference` |
+| 3 | `@acme/plugin-crons/devtools/procedures.ts` | `DevToolsProcedureId`, the oRPC binding, `CronsQueueSnapshot` |
+| 4 | `@acme/plugin-crons/devtools/panels/queue.ts` | `DevToolsPanelContribution<'plugin.detail/v1'>` → `DevToolsUiNode`/`DevToolsCell` |
+| 5 | `.netscript/generated/devtools/devtools.registry.ts` | `ContributionIdentity`, fully-qualified id, literal loaders |
+| 6 | `.netscript/generated/devtools/devtools.check.ts` | static imports — the type gate's teeth (§6) |
+| 7 | DevTools host route group (generated userland) | `DevToolsProcedureResult<CronsQueueSnapshot>` over same-origin oRPC |
+| 8 | DevTools host panel assembly | `PluginDetailData` → `DevToolsPanelState<PluginDetailData>` |
+| 9 | Browser | server-rendered `DevToolsUiNode` tree — zero client code (§7's `json-render` tier) |
+
+Failure at each stage maps onto an already-specified state, not a new one: a malformed pointer is
+a generate-time error naming the plugin (§6, F-3); a bad zone or window mismatch is §6 quarantine
+rendered as a diagnosis card; a module that fails the staged check is `load-failure` quarantine; a
+failing procedure is the panel's `partial` arm; a throwing render is the `failure` boundary.
+
 ### D-6.5 — Transport decision
 
 **Decision: same-origin HTTP (oRPC) for reads, one-directional SSE for push, MCP composed
@@ -2197,14 +2604,15 @@ read-kind allowlist) and each requires an executable gate to become evidence:
 | DevTools oRPC contract (enumerated procedures + error codes) | **Build** (net-new) | this RFC |
 | `DevToolsServerPanelContext` / `DevToolsClientPanelContext` | **Build** (net-new — the seam RFC-A licenses but does not define) | this RFC |
 | `DevToolsEventFeed` + topic/cursor/invalidation contract | **Build** (net-new — no market precedent) | `m3` data-freshness row |
-| `DevToolsProcedureReference` manifest axis + generated static registry | **Build**, mirroring rfc:1136-1176 discipline | this RFC · see D-6.11 |
+| `DevToolsProcedureReference` envelope axis (`requires.procedures`, D-6.4b) + generated static registry | **Build**, mirroring rfc:1136-1176 discipline | this RFC · see D-6.11 |
 
 **Named framework-source slices** (WSL Codex lane, not design work): (1) promote `sse.ts` to
 `@netscript/fresh/server`; (2) the typed Aspire/Scalar deep-link helper.
 
 ### D-6.11 — Manifest precondition, inherited from drift
 
-`DevToolsProcedureReference` is manifest-visible. `PluginInstallerManifestSchema` ends in
+`DevToolsProcedureReference` rides the envelope behind the manifest-visible pointer block
+(D-6.4b), so the pointer is what the manifest must tolerate. `PluginInstallerManifestSchema` ends in
 `.strict()` and pins `schemaVersion: z.literal(1)`
 (`packages/plugin/src/protocol/manifest.ts:271,282`; drift **D-6**), so an unknown top-level block
 does **not** degrade — an older CLI fails manifest parsing outright. Any manifest-visible DevTools
@@ -2978,7 +3386,9 @@ for a contributed-route kind should one survive **Contribution kinds**.
     :triggerId/firings                   firing history, cron preview
   streams/
     :streamId/deliveries                 fan-out / delivery state per subscriber
-<base>/flows/:correlationId              Journey view — primitive-grouped causal chain (AC-3)
+<base>/flows/                             Journey index — the way IN without holding a
+                                         correlation id (recent journeys, bounded window)
+  :correlationId                         Journey view — primitive-grouped causal chain (AC-3)
 <base>/contracts/                        Contract provenance / coverage / REST-RPC duality
   :serviceId/:operationId                per-operation provenance chain → Scalar out-link
 <base>/plugins/                          Plugin registry wiring, doctor, contribution axes
@@ -2993,7 +3403,7 @@ for a contributed-route kind should one survive **Contribution kinds**.
 ```mermaid
 flowchart LR
   H["&lt;base&gt;/ — wiring home"] --> R["/runtime/*"]
-  H --> F["/flows/:correlationId"]
+  H --> F["/flows/*"]
   H --> C["/contracts/*"]
   H --> P["/plugins/*"]
   H --> G["/generated/*"]
@@ -3018,7 +3428,21 @@ flowchart LR
    segment. *Inference: it is a read-only wiring overview, and Home's NetScript-only answer already
    covers wiring facts.*
 3. **`/automation/` exists from day one as a staged placeholder** rather than appearing later, so
-   the two-hosts boundary is documented inside the product (**OF-IA-4**).
+   the two-hosts boundary is documented inside the product (**OF-IA-4**). Its concrete staged
+   behaviour — what it renders before #1446's contracts exist, and what promotes it — is
+   §11.3.4.
+4. **`/flows/` has an index (K-M2 correction).** An earlier draft's only flows route was
+   `/flows/:correlationId`, so the journey view was reachable only by already holding a
+   correlation id — a surface with in-links but no way in. The index lists **recent journeys**:
+   one row per correlation id observed in the window, assembled by §8's journey machinery from
+   `querySpans` filtered on `netscript.correlation.id`, carrying first/last observed time, the
+   primitives involved, and the worst step status. It is bounded by the density contract
+   (§11.3.3) and inherits Aspire's 10,000-entry shared eviction upstream (`m4` F5), so it is
+   honestly a *recent-window* index and its truncation chip says so. **In-link consistency is
+   normative:** any row anywhere that carries a `correlationId` — a Workers execution row
+   exactly as a Sagas instance row — in-links to `/flows/:correlationId`; the Aspire trace
+   out-link is an addition, never the substitute. The `*Data` wire shapes carry the optional
+   `correlationId` field for precisely this (§8 D-6.4a).
 
 #### 11.3.1 Feed coverage — an empty Home must never be ambiguous
 
@@ -3066,6 +3490,118 @@ export interface FeedSourceStatus {
 a named unreachable source, and first-run `not-configured` — as distinct rendered states. This is a
 required acceptance for the Home surface, not a nice-to-have.
 
+#### 11.3.2 The ranked feed — row schema, severity, and a deterministic total order
+
+§11.3.1 made the feed's *coverage* honest; "ranked" itself still had no rule — no row schema, no
+severity vocabulary, no tiebreak (Q-M2, K-m1). This subsection supplies all three, extending
+§11.3.1 rather than restating it.
+
+**Row schema.**
+
+```ts
+export type FeedSeverity = 'critical' | 'error' | 'warning' | 'info';
+
+/** One problem row. Everything is renderable data; nothing here is a hand-built URL. */
+export interface FeedRow {
+  readonly source: FeedSource; // §11.3.1's closed set
+  readonly severity: FeedSeverity;
+  /** Stable reference to the entity the row is ABOUT,
+   *  e.g. { kind: 'contribution', id: 'crons/queue/v1' } or { kind: 'saga-instance', id: '…' }. */
+  readonly entity: { readonly kind: string; readonly id: string };
+  /** One plain-text line. */
+  readonly summary: string;
+  /** Internal route into the owning surface, or a typed external link (§7's `DevToolsLink`,
+   *  resolved through §11.6's helper) — never a concatenated href. */
+  readonly link: { readonly route: string } | { readonly external: DevToolsLink };
+  readonly observedAt: string; // ISO-8601
+}
+```
+
+**Severity vocabulary.** Severity is assigned by the host's per-source adapter from a fixed table
+— a source cannot invent a severity per row:
+
+| Source | `critical` | `error` | `warning` |
+| --- | --- | --- | --- |
+| `contributions` | — | quarantine states 1, 4, 5, 6 (§6) | `capacity-rejected` (state 3). State 2 is info-only and produces **no** feed row |
+| `runs` | saga instances currently `compensating` | failed runs | runs in `retrying` |
+| `generated` | — | leaked/drifted registries (`r4` F10) | per-generator "never run" |
+| `doctor` | — | any `ok: false` row — doctor's contract is binary, with no warning tier (§6's honest limitation) | — |
+| `convergence` *(staged)* | replicas off the current epoch | convergence feed errors | — |
+| `contracts` *(staged)* | — | — | coverage regression vs the stored baseline |
+
+`info` is reserved for host notices (e.g. an anchor matching no contribution, §6); it never
+outranks a problem row.
+
+**Deterministic total order.** Rows sort by, in sequence:
+
+1. **severity rank** — `critical` (0) < `error` (1) < `warning` (2) < `info` (3);
+2. **`observedAt` descending** — newer first;
+3. **`source`**, in the declaration order of §11.3.1's `FeedSource` union;
+4. **`entity.kind` then `entity.id`**, ascending code-unit lexicographic — never locale-sensitive
+   collation, mirroring §6's ordering law.
+
+Step 4 is a total tiebreak over distinct rows, so identical input yields an identical rendered
+feed; the same shuffle gate as §6's determinism law applies (permuted input rows ⇒ byte-identical
+ordering).
+
+**Computability, stated per source (Q-M2's second half).** Two of the six sources are not
+computable in v1 — confirming Qwen's count — and a staged source renders as `not-configured` in
+the coverage strip (§11.3.1), **never a silently missing row**:
+
+| Source | v1? | Basis |
+| --- | --- | --- |
+| `contributions` | **yes** | `devtools.diagnosis.json` exists from the first generate (§6) |
+| `runs` | **yes** | the run-state read model + `querySpans` (§8 D-6.4a) |
+| `generated` | **yes** | registry freshness/leak detection is a filesystem + registry read (`r4` F3/F10) |
+| `doctor` | **yes** | the shipped `extraChecks` seam (`r4` F2) |
+| `convergence` | **staged** | needs #1446's convergence contract (A2b/A3b/A2d) and §8 D-6.9's v3 auth stage |
+| `contracts` | **staged** | a *regression* needs a persisted prior coverage snapshot to regress from, and no such baseline store exists at `2256a67bf`. v1 renders the coverage fraction on `/contracts/` but cannot honestly rank a regression row. Entry criterion: the host persists per-service coverage snapshots across generates |
+
+#### 11.3.3 Density — page size, sort, filter, pagination, truncation disclosure
+
+A diagnostic surface that renders unbounded histories lies at scale by silently showing a subset
+(K-m5). Upstream removes the temptation to promise more: Aspire's own store caps
+`MaxLogCount`/`MaxTraceCount` at 10,000 entries *shared across resources*, oldest evicted
+(`m4` F5), so unbounded history is not available to serve even if the UI wanted it. This contract
+is normative for every list-bearing surface; the wire half is §8 D-6.4a's `DevToolsWindow`.
+
+| Dial | Rule |
+| --- | --- |
+| **Page size** | Default **50** rows, server-enforced maximum **200**. The wire carries the applied `limit` |
+| **Pagination** | Cursor-based (`DevToolsWindow.cursor`, opaque), never offset — offsets shear under a live feed. The cursor discipline mirrors the SSE feed's (§8 D-6.6) |
+| **Sort** | Server-side on the surface's primary time column, newest first, with §11.3.2's deterministic tiebreak (entity id, code-unit order). Client-side re-sort applies within the fetched window only, and the UI labels it "this page" |
+| **Filter** | v1 filters are **enumerated typed fields** (status, entity id, kind) — never a free-text query DSL, which would rebuild the killed log-search surface (§11.1) |
+| **Truncation disclosure** | Whenever `truncated` is true, the surface renders a window chip adjacent to the table — "latest 50 · window bounded" (plus the total when cheaply countable) — and an evicted upstream join renders the `telemetry evicted` marker (§11.6). **A bounded window that does not say so is a false-done state**, the same class as §11.7's stale-data guard |
+
+**Gate.** The `SCOPE-frontend` browser validation asserts the window chip on a fixture exceeding
+one page, alongside §11.3.1's three coverage shapes.
+
+#### 11.3.4 `/automation` — staged behaviour, not a blank seat
+
+K-m4's charge was fair: a placeholder holding a top-level nav seat from day one is the "generic
+IA" smell the charter warns about. The answer is not dropping the seat — OF-IA-4's rationale
+stands; the two-hosts boundary is documented inside the product — but making the placeholder
+explain itself. A placeholder that explains itself is not filler; a blank seat is. Normative,
+until the entry criterion below is met:
+
+- **The nav entry carries a `staged` badge.** It never renders an empty page or a spinner.
+- **The surface renders exactly one host-owned card in the `not-configured` shape** (the same
+  vocabulary as §11.3.1's source status), stating:
+  1. what the surface will render when live — read-only projections of #1446's four stable
+     contracts: management oRPC, audit/history, convergence, OTel vocabulary (`p2` F2);
+  2. the blocking dependencies **by name**: RFC-0001 (#1446) slices A2b + A3b + A2d (its own P-6
+     entry criterion, RFC:638), and — because automation reads require an authenticated
+     principal — §8 D-6.9's v3 auth stage;
+  3. the boundary sentence verbatim — "production operator management and developer diagnostics
+     are two distinct hosts and two distinct contribution surfaces — not one ambiguous
+     'cockpit'" (RFC:491-493) — with the operator console named as where management verbs live;
+  4. the coverage-strip linkage: Home's `convergence` source reads `not-configured` for exactly
+     as long as this card is up — one fact, two renderings, and they may never disagree.
+- **Entry criterion (what promotes it).** #1446's A2b/A3b/A2d merged with their contracts
+  readable on `main`, the D-6.6 server-to-server change-feed bridge in place, and D-6.9's v3
+  gate satisfied. Promotion swaps the card for the read-only projections in one release; there
+  is no interim half-state.
+
 ### 11.4 The AC-1 record: why each surface is NetScript-only
 
 | Surface | NetScript-only answer (AC-1, recorded here and repeated in each filed issue) |
@@ -3085,10 +3621,10 @@ built by the helper in §11.6 — never hand-concatenated in a panel.
 
 | Seam | What only NetScript can show | Links out to |
 | --- | --- | --- |
-| **Workers** | Job/task registry with schedule intent vs observed drift; execution feed with attempts/retries as `RunRecord` semantics (#428). Empty state renders the `netscript scaffold job …` CLI-equivalent line | per execution → `/traces/detail/{traceId}?spanId=`; per resource → `/structuredlogs/resource/{n}?traceId=&logLevel=error`; queue-depth instrument → `/metrics/resource/{r}/meter/{m}/instrument/{i}` — rendered **only if** `queryMetrics` returns the instrument; whether NetScript emits OTel metrics at all is **unverified** (`r5` OQ7) |
+| **Workers** | Job/task registry with schedule intent vs observed drift; execution feed with attempts/retries as `RunRecord` semantics (#428). Empty state renders the `netscript scaffold job …` CLI-equivalent line | execution's journey → `<base>/flows/:correlationId` (internal, whenever the row carries a `correlationId` — the same in-link rule as Sagas, §11.3 decision 4); per execution → `/traces/detail/{traceId}?spanId=`; per resource → `/structuredlogs/resource/{n}?traceId=&logLevel=error`; queue-depth instrument → `/metrics/resource/{r}/meter/{m}/instrument/{i}` — rendered **only if** `queryMetrics` returns the instrument; whether NetScript emits OTel metrics at all is **unverified** (`r5` OQ7) |
 | **Sagas** | Instance table incl. `compensating`; from→to transition/compensation timeline as a state machine, not spans (#429) | per transition → trace/span detail; instance's journey → `<base>/flows/:correlationId` (internal) |
 | **Triggers** | Firing history across the **six** canonical trigger kinds (`TRIGGER_KINDS` — webhook, file-watch, scheduled, queue, stream, manual); enable/disable rendering its CLI-equivalent line; cron preview (#430) | per firing → trace detail; misfire → correlated structured-logs link |
-| **Streams** | Fan-out/delivery state per subscriber as framework run-state (#431). Contract-provenance column renders the **labelled degraded state** of §11.6 | per delivery → trace detail; subscriber resource → `/consolelogs/resource/{name}` |
+| **Streams** | Fan-out/delivery state per subscriber as framework run-state (#431). Contract-provenance column renders the **labelled `partial` state** of §11.7 | per delivery → trace detail; subscriber resource → `/consolelogs/resource/{name}` |
 | **Contracts / SDK** | Provenance chain schema → router → OpenAPI → Scalar, and per-service coverage/duality; powered by the pure, IO-free `@netscript/mcp/openapi-projection` (`packages/mcp/openapi-projection.ts:8-38`) — no MCP process required | per operation → Scalar `#tag/{tag}/{method}{path}`; per schema → `#model/{slug}`. **Try-it is always an out-link** (killed surface, §11.1) |
 | **Plugin registry** | Installed plugins, contribution-axis map including *dead* axes (ten enum names vs twelve interface keys, `research.md` F18), doctor rows through the existing contributed-checks seam (`r4` F2), JSR version drift, silent-duplicate-identity detection (`r3` F9) | plugin's service resource → `/?resource={name}`; plugin's service API → its Scalar mount |
 | **Generated artifacts** | Registry freshness per generator path (manifest-driven vs SDK walker — two mechanisms, two paths, `r4` F3); registries leaked by the walker after `plugin remove` (`r4` F10); migration applied-vs-pending and drift (#552); confirm-gated `migrate`/`seed` rendering the exact CLI line (AC-2) | **none upstream** — this surface has no Aspire/Scalar analogue; links are internal (to `plugins/:id`, to file paths) |
@@ -3171,35 +3707,46 @@ mismatch that is a silent fetch failure (`r5` drift 2,
 
 ### 11.7 State matrix
 
-Mandatory and normative: **a surface ships only with all six states specified.** Happy-path
+Mandatory and normative: **a surface ships only with all nine state arms specified.** Happy-path
 screenshots do not satisfy this section, and the repo's own frontend scope doc names the false-done
 modes we are guarding against — "main route works but subpages broken; static check passes but
 browser render blocks or shows stale data" (`b2` F12, `SCOPE-frontend.md:32-36`).
 
-```ts
-// The state a panel resolves to. Exhaustive — the host renders a case for every arm.
-export type PanelState<T> =
-  | { readonly kind: 'loading' }
-  | { readonly kind: 'empty'; readonly entity: string; readonly cliEquivalent: string }
-  | { readonly kind: 'ready'; readonly data: T }
-  | { readonly kind: 'degraded'; readonly data: T; readonly label: string; readonly citation: string }
-  | { readonly kind: 'incompatible'; readonly id: string; readonly declared: number; readonly hostWindow: readonly number[] }
-  | { readonly kind: 'unauthorized'; readonly blockedBy: string; readonly remedy: string }
-  | { readonly kind: 'failure'; readonly endpoint: string; readonly source: string; readonly logsLink: DeepLink };
-```
+**This section defines no state vocabulary of its own.** An earlier draft carried a local
+seven-arm `PanelState<T>` here beside §7's `PanelAvailability` — two vocabularies with no mapping
+(K-M3), and neither able to express staleness (K-M4) or a down backing process (Q-M5). Both are
+deleted; the single canonical union is §7's **`DevToolsPanelState<T>`**, and this matrix is its
+**rendering checklist** — it consumes that contract and adds no arm. The corrections, recorded
+in-line so the earlier draft cannot be quoted: `degraded` was renamed **`partial`** (its `label`
+became `reason`; `citation` kept); the failure arm's link type is §7's **`DevToolsLink`** — the
+earlier draft's reference to the local `DeepLink` is gone (§11.6's helper keeps `DeepLink` as its
+*resolution result*, a distinct role: a `DevToolsLink` names a target, a `DeepLink` is the
+resolved-or-disabled outcome); and **`stale`** and **`not-running`** were added, with **`empty`**
+now the honest all-clear, distinct from **`partial`** (blind).
 
-**Shared state contracts (every surface):**
+**Shared arm contracts (every surface, all nine arms):**
 
-| State | Contract |
+| Arm | Contract |
 | --- | --- |
-| **Loading** | `fresh-ui` skeletons. Any live-fed panel shows a "connecting" chip carrying the resolved endpoint **and its source** — `resolveTelemetryEndpoint` already returns `source: 'explicit' \| 'netscript_env' \| 'aspire_port' \| 'default'` (`packages/mcp/src/domain/telemetry-endpoint.ts:22-39`), which is exactly the "where is my data coming from" affordance. |
-| **Empty** | Never blank. The state names the entity and renders the CLI-equivalent creation command — AC-2 extended from mutations to empty states (**OF-IA-3**). |
-| **Degraded** | A *labelled* partial render carrying its citation, never a silently empty panel. The two honest cases are below. |
-| **Incompatible** | A contribution whose version-suffixed id falls outside the host's supported window renders a labelled card (id, declared major, host window) in place of the panel. **Never silently dropped** — a deliberate departure from every surveyed system, where bad-target failures are quiet (`m3` X-2); see **OF-IA-2**. |
-| **Unauthorized** | Two distinct cases. (a) *Upstream*: Aspire deep-links land on `/login`; with a configured browser token the helper emits `login?t=`, otherwise the link is annotated "will prompt for dashboard token". Telemetry-API reads without the key render an unauthorized state naming `Dashboard:Api:AuthMode=ApiKey` (`m4` F20). (b) *Framework*: any panel needing a credential-bearing typed client renders a blocked state naming the dependency — `createServiceClient` cannot send `Authorization` or `x-api-key` until the RFC-A/#1348 chain lands (`b2` F10, `research.md` F15). |
-| **Failure** | Per-contribution error boundary: a loud diagnostic panel with component stack in dev (the polarity is inverted from Grafana's prod-quiet posture because here the operator *is* the author), and the host tree never crashes (`m2` F23/F18 — TanStack's missing boundary is the cautionary absence). Data-plane failures render the failed endpoint, its source, a retry affordance, and the correlated structured-logs out-link. |
+| **`loading`** | `fresh-ui` skeletons. Any live-fed panel shows a "connecting" chip carrying the resolved endpoint **and its source** — `resolveTelemetryEndpoint` already returns `source: 'explicit' \| 'netscript_env' \| 'aspire_port' \| 'default'` (`packages/mcp/src/domain/telemetry-endpoint.ts:22-39`), which is exactly the "where is my data coming from" affordance. |
+| **`ready`** | Data plus provenance: the panel renders where its data came from (§8 D-6.7) and, for any windowed list, §11.3.3's truncation chip when `truncated` is true. |
+| **`empty`** | The honest all-clear — reachable **only when every declared source reported** (§11.3.1's all-clear rule, applied per panel). A panel that cannot see renders `partial`, never `empty`. Never blank: the arm names the entity and renders the CLI-equivalent creation command — AC-2 extended from mutations to empty states (**OF-IA-3**). |
+| **`partial`** | Partially blind: renders what it has and **names** the missing sources, with `reason` and its `citation` where one exists. The two modelled degradations are below. |
+| **`stale`** | Real data, old: the age (`observedAt`) is rendered, never implied fresh. Entered when the live feed is `latched-off` and the polling fallback is serving cache (§8 D-6.7), or when a feed-level source status is `stale` (§11.3.1). |
+| **`not-running`** | The backing process is down — every telemetry-backed panel fronts an ephemeral AppHost endpoint (`r5` F11). Renders the launch card with `remedy.cliEquivalent` naming the AppHost start command: v1 **shows** the command and never executes it (`m1` F15 adopted as a state, §7). |
+| **`incompatible`** | A contribution whose `apiMajor` falls outside the host's `(family, major)` window renders a labelled card (id, declared major, host window) in place of the panel. **Never silently dropped** — a deliberate departure from every surveyed system, where bad-target failures are quiet (`m3` X-2); see **OF-IA-2**. |
+| **`unauthorized`** | Two distinct cases. (a) *Upstream*: Aspire deep-links land on `/login`; with a configured browser token the helper emits `login?t=`, otherwise the link is annotated "will prompt for dashboard token". Telemetry-API reads without the key render an unauthorized state naming `Dashboard:Api:AuthMode=ApiKey` (`m4` F20). (b) *Framework*: any panel needing a credential-bearing typed client renders a blocked state naming the dependency — `createServiceClient` cannot send `Authorization` or `x-api-key` until the RFC-A/#1348 chain lands (`b2` F10, `research.md` F15). |
+| **`failure`** | Per-contribution error boundary: a loud diagnostic panel with component stack in dev (the polarity is inverted from Grafana's prod-quiet posture because here the operator *is* the author), and the host tree never crashes (`m2` F23/F18 — TanStack's missing boundary is the cautionary absence). Data-plane failures render the failed endpoint, its source, a retry affordance, and the correlated structured-logs out-link — a typed `{ target: 'aspire.structuredLogs' }` `DevToolsLink` resolved through §11.6's helper, which degrades to disabled-with-reason when no base is configured. |
 
-**The two honest degradations, modelled explicitly:**
+**Two shell-level sessions, named (K-m2).** The two most common real sessions now have a
+first-class rendering instead of falling between arms: (1) **the app is down** — every
+runtime-backed surface resolves `not-running`, and the shell renders **one** launch card at shell
+level rather than N per-panel copies (the per-panel arm still exists; the shell dedupes it);
+(2) **the generated host is stale** — the Generated surface's `stale` arm (registry emitted
+against a manifest that has since changed) additionally raises a shell-level banner naming
+`netscript generate plugins`, because a stale registry silently mis-renders every other surface.
+
+**The two honest degradations, modelled explicitly (both kept under the `partial` arm):**
 
 1. **`plugins/streams` has no oRPC contract surface at all.** "Streams is the one plugin with NO oRPC
    contract surface — `@netscript/plugin-streams-core` exposes producer ports … but no
@@ -3207,7 +3754,7 @@ export type PanelState<T> =
    catch-all "cannot be expressed as an oRPC router"
    (`.llm/harness/debt/arch-debt.md:450-485`, entry `streams-connector-sound-deferred`). The streams
    contract-provenance panel therefore renders
-   `{ kind: 'degraded', label: 'no contract surface — connector is a transparent proxy', citation: 'arch-debt.md#streams-connector-sound-deferred' }`.
+   `{ kind: 'partial', data, missing: ['contracts'], reason: 'no contract surface — connector is a transparent proxy', citation: 'arch-debt.md#streams-connector-sound-deferred' }`.
    It is not an empty list and not an error. The sibling case is a *fraction*, not an absence:
    triggers has "only ~3 of the 10 business routes … implemented"
    (`.llm/harness/debt/arch-debt.md:424-448`), so its contract column renders a coverage fraction
@@ -3217,20 +3764,23 @@ export type PanelState<T> =
    offers a "see all related logs, filtered" affordance** — promising a filtered round-trip we cannot
    construct is the failure mode this rule exists to prevent.
 
-**Per-surface deltas** (only where a surface differs from the shared contracts):
+**Per-surface matrix — every surface specifies all nine arms.** `shared` means the shared arm
+contract above applies with no delta; every other cell is that surface's delta. A cell may not be
+blank: an arm a surface genuinely cannot enter must say so and why (that is itself the
+specification).
 
-| Surface | Empty | Degraded | Incompatible / Unauthorized / Failure delta |
-| --- | --- | --- | --- |
-| Home | First run, all wiring facts zero → onboarding card with `netscript plugin add …` | Registry freshness unknown because a generator never ran → "never generated" chip, not a stale number | Per-card boundaries: one failing stat never blanks the grid |
-| Workers | No jobs → scaffold CLI line | Metrics column hidden entirely when `queryMetrics` returns nothing (`r5` OQ7, unverified) — no empty chart, which would be a killed surface | Execution feed drop → "reconnecting" with a stale-data timestamp |
-| Sagas | No instances → scaffold line | Steps older than Aspire's 10k eviction window (`m4` F5) → timeline marks "telemetry evicted"; run-state itself survives because it is not derived from the dashboard store | — |
-| Triggers | "No firings yet" and "no triggers defined" are **distinct** states | Contract coverage fraction (~3 of 10 routes) with a link to the debt entry | Enable/disable disabled until its contract route exists, naming the co-requisite issue ("no panel before its route", #553) |
-| Streams | No streams → scaffold line | The labelled no-contract-surface state above | — |
-| Flows | No correlated events → "no journey recorded" plus which sources were queried | Two: (a) until the #557 seam-event plane lands, the chain is a correlation-only join and labels itself "correlation fidelity" rather than "boundary-event fidelity"; (b) no filtered-log round-trip (above) | Steps whose spans were evicted render as chain nodes without trace out-links |
-| Contracts | Service with zero contract routes → coverage 0% (real, for streams) | Per-service spec fetch failure degrades that row only; other services render | Scalar operation anchors flagged unverified until OQ8 closes; helper falls back to `#tag/{tag}` |
-| Plugins | No plugins → `netscript plugin add` line | Doctor unavailable (no AppHost running) → axis map renders from static registries, doctor rows show "requires running app" | Duplicate plugin identity (`r3` F9) renders a loud conflict row, never last-writer-wins silence |
-| Generated | Nothing generated → per-generator "never run" + CLI line | Registries leaked after `plugin remove` (`r4` F10) → drift rows naming the owning generator; the existence-only write assertion is labelled as such | `migrate`/`seed` confirm dialog shows the exact CLI line; DB unreachable → failure state naming the connection source |
-| Automation | #1446's contracts not landed → the whole surface renders a staged "awaiting runtime-automation contracts" card naming the RFC — this is a *surface-level* incompatible state | Convergence readable but audit store empty → partial render with per-contract availability chips | Unauthorized: management oRPC needs the RFC-A auth chain; read-only projections state their principal |
+| Surface | `loading` | `ready` | `empty` | `partial` | `stale` | `not-running` | `incompatible` | `unauthorized` | `failure` |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Home | skeleton feed + coverage strip | feed rows (§11.3.2) above stats, coverage strip always on | all-clear **only at 6/6 `reported`** (§11.3.1); first run → onboarding card with `netscript plugin add …` | "N of 6 sources reporting", gaps named; staged sources read `not-configured`, never missing | per-source age in the coverage strip; "never generated" chip, not a stale number | AppHost down → static sources (`contributions`, `generated`, `doctor`) still report; runtime sources go `unreachable` → `partial` + the shell launch card | not entered: Home is host-owned with no contributed payload — a quarantined contribution surfaces as a **feed row**, not this arm | shared | per-card boundaries: one failing stat never blanks the grid |
+| Workers | shared | jobs + windowed executions (§11.3.3 chip) | "no jobs" (scaffold CLI line) and "jobs defined, no executions yet" are **distinct** | metrics column hidden entirely when `queryMetrics` returns nothing (`r5` OQ7, unverified) — no empty chart, which would be a killed surface | feed drop → "reconnecting" + cached window with its age | shared launch card | shared | shared | shared + structured-logs out-link |
+| Sagas | shared | instance window incl. `compensating` badge | no instances → scaffold line | steps older than Aspire's 10k eviction (`m4` F5) → timeline marks "telemetry evicted", `missing: ['telemetry']`; run-state survives because it is not derived from the dashboard store | shared | shared launch card | shared | shared | shared |
+| Triggers | shared | six-kind registry + windowed firings | "no triggers defined" and "no firings yet" are **distinct** | contract coverage fraction (~3 of 10 routes) with a link to the debt entry | shared | shared launch card | shared | enable/disable affordance disabled until its contract route exists, naming the co-requisite ("no panel before its route", #553) | shared |
+| Streams | shared | streams + windowed deliveries | no streams → scaffold line | the modelled no-contract-surface state above | shared | shared launch card | shared | shared | shared |
+| Flows (index + detail) | shared | index: recent-journey window (§11.3 decision 4); detail: the causal chain | index: "no journeys in the current window" + window chip; detail: "no journey recorded" — both name **which sources were queried** | (a) until the #557 seam-event plane lands, the chain is a correlation-only join and labels itself "correlation fidelity", not "boundary-event fidelity"; (b) evicted spans → chain nodes without trace out-links; no filtered-log round-trip (above) | shared | telemetry endpoint down → launch card | not entered: both routes are host-owned screens | shared | shared |
+| Contracts | shared | provenance chain + coverage/duality per service | service with zero contract routes → coverage 0% (real, for streams) — a true reading, not this arm's "nothing exists" card | per-service spec fetch failure degrades that row only; other services render | spec cache older than the last generate → age chip | shared launch card | Scalar operation anchors flagged unverified until OQ8 closes; helper falls back to `#tag/{tag}` | shared | shared |
+| Plugins | shared | axis map, doctor rows, drift, contributions | no plugins → `netscript plugin add` line | doctor needs a running app → axis map renders from **static registries**, doctor rows show "requires running app" (`partial`, not `not-running`: the static half is real data) | shared | only when even static registries are unreadable | contributed panels on `plugin.detail/v1` render the shared card per contribution | shared | duplicate plugin identity (`r3` F9) renders a loud conflict row, never last-writer-wins silence |
+| Generated | shared | per-generator freshness + migration applied-vs-pending | nothing generated → per-generator "never run" + CLI line | leaked registries after `plugin remove` (`r4` F10) → drift rows naming the owning generator; the existence-only write assertion is labelled as such | registry older than its manifest → **stale generated host**: this arm raises the shell-level banner (K-m2 above) | not applicable: reads the filesystem, not a process — states so in a muted note | shared | shared | `migrate`/`seed` confirm dialog shows the exact CLI line; DB unreachable → failure naming the connection source |
+| Automation | shared | post-promotion: read-only projections with per-contract availability chips | post-promotion: "no executions/audit records yet" + which contracts were queried | convergence readable but audit store empty → per-contract chips | shared | shared | pre-promotion: the **whole surface** renders §11.3.4's `not-configured` card naming its blocking dependencies — the surface-level analogue of this arm | management oRPC needs the RFC-A auth chain (§8 D-6.9 v3); projections state their principal | shared |
 
 ### 11.8 Owner forks raised by this section
 
@@ -3696,7 +4246,7 @@ does this code live, what shape must it take, and what proves it works."
 
 | Unit | Archetype | Owns | Must not |
 | --- | --- | --- | --- |
-| `packages/devtools-core` | **1 — Small Contract** | `contracts/v1`: the envelope and identity types, the closed `DevToolsZone` vocabulary, the closed `DevToolsUiNode` element vocabulary, the link grammar types, the budget/limit constants, and **`orderContributions()`** as a pure total function | Hold ports, adapters, DI, base classes, or any IO. Depend on `@netscript/fresh` or `@netscript/fresh-ui` |
+| `packages/devtools-core` | **1 — Small Contract** | `contracts/v1`: the envelope and identity types, the closed version-suffixed `DevToolsZoneId` vocabulary with its `DevToolsZoneContextMap` binding and the six `*Data` wire shapes (`contracts/v1/data`, §8 D-6.4a — an earlier draft of this row cited a stale bare `DevToolsZone` name), the closed `DevToolsUiNode`/`DevToolsCell` element vocabulary, the link grammar types, the budget/limit constants, and **`orderContributions()`** as a pure total function | Hold ports, adapters, DI, base classes, or any IO. Depend on `@netscript/fresh` or `@netscript/fresh-ui` |
 | `packages/cli` (additive) | **6 — existing** | The `devtools` command group; the CLI-generated `.netscript/devtools/` root; the **transactional registry generator** (emission is a generator concern and belongs beside the existing plugin-registry generators) | Deepen `@netscript/cli`'s existing **Restructure** verdict |
 | `plugins/devtools` | **5 — Plugin** | Thin composition: `scaffold.plugin.json`, `definePlugin(...)`, adapter install/doctor/info/update/remove, re-export of `devtools-core`'s contracts | Redefine a contract or re-implement a core convention (the Archetype-5 **thinness law**) |
 | The generated DevTools host app | *not a package* | The read-contract server, the SSE feed, and rendering — it is CLI-generated userland the developer owns, exactly like the scaffolded app | Become a published package without a fresh archetype decision |
@@ -3742,8 +4292,9 @@ The `jsr-audit` publishability rubric is applied here to the **planned** surface
 // @netscript/devtools-core — contracts/v1 (explicit return types, no slow types)
 export interface ContributionEnvelope { /* §6 */ }
 export interface DevToolsHostDescriptor { /* §6 */ }
-export type DevToolsZone = /* closed union, §7 */ string
-export type DevToolsUiNode = /* closed element vocabulary, §7 */ unknown
+export type DevToolsZoneId = /* keyof DevToolsZoneContextMap — closed, version-suffixed, §7 */ string
+export interface DevToolsZoneContextMap { /* zone id → *Data wire shape; §7 binding, §8 shapes */ }
+export type DevToolsUiNode = /* closed element vocabulary incl. DevToolsCell, §7 */ unknown
 export interface DevToolsPanelContribution { /* §7 */ }
 export interface DevToolsLinkContribution { /* §7 */ }
 export function orderContributions(/* … */): readonly unknown[]
@@ -3853,7 +4404,7 @@ and the PLAN-EVAL rejected it.
 | - | ----- | ------------- | ---------- | ---------------------- | ---------- |
 | **W0-a** | Probe: can a package ship island specifiers consumable under Deno resolution? | throwaway branch; `packages/cli/src/kernel/assets/app/vite.config.ts.template` (read) | nothing — a **disposable proof** | manual: island from a package hydrates in a scaffolded app; result recorded in `drift.md` | — |
 | **W0-b** | Probe: second route/island root in one Vite process | throwaway branch | nothing — disposable | manual: two route roots resolve without `.generated/` contention | — |
-| **W1-a** | Contracts unit + gate wiring | **new** `packages/devtools-core/` (`mod.ts`, `contracts/v1/`, `deno.json`); **edit** root `deno.json` `arch:check` (+2 `--root`) | `ContributionEnvelope`, `DevToolsContributionBase`, `DevToolsZone`, `DevToolsUiNode`, `orderContributions()` | `deno task arch:check && deno doc --lint packages/devtools-core/mod.ts && deno task quality:scan` | — |
+| **W1-a** | Contracts unit + gate wiring | **new** `packages/devtools-core/` (`mod.ts`, `contracts/v1/`, `deno.json`); **edit** root `deno.json` `arch:check` (+2 `--root`) | `ContributionEnvelope`, `DevToolsContributionBase`, `DevToolsZoneId`/`DevToolsZoneContextMap` + the §8 `*Data` wire shapes, `DevToolsUiNode`/`DevToolsCell`, `orderContributions()` | `deno task arch:check && deno doc --lint packages/devtools-core/mod.ts && deno task quality:scan` | — |
 | **W1-b** | Typed deep-link helper | `packages/devtools-core/contracts/v1/links.ts` | `DevToolsLink`, `resolveDevToolsLink()` | unit tests over the Aspire/Scalar grammars **incl. a case asserting `?filters=` is unrepresentable**; base read from config, never hardcoded | W1-a |
 | **W1-c** | Containment invariant + generator scoping (**INV-1/INV-2**) | `packages/cli/src/kernel/application/ui/registry.ts`; `.../generate/plugins/installed-runtime-registry-generator.ts` | a shared path-containment resolver | **G-1/G-2**: unit tests for `/etc/x`, `../../x`, `@ui/../../x`, symlink escape; argv test asserting **no bare** `--allow-read`/`--allow-write` | W1-a |
 | **W1-d** | Manifest schema-evolution precondition (**drift D-6**) | `packages/plugin/src/protocol/manifest.ts` | the chosen compatibility contract (`.passthrough()`/catchall **or** `schemaVersion: 2`) | contract test: an older-CLI parse of a manifest carrying an unknown block **does not hard-reject** | **fork F-3** |
