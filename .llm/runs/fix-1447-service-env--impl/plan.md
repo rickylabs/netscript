@@ -125,8 +125,8 @@ inline `entry.Environment` read is replaced by it.
    the real CLI (twice, byte-compared — the determinism criterion, proven on the consumer path); a
    behavior gate then reads the **live** AppHost via `aspire describe --format Json` **and asserts
    the started process's own environment**: `scanResourceProcesses` / `requireResourceProcesses`
-   match a process to its resource by working directory and entrypoint, then read
-   `/proc/<pid>/environ`, which the kernel writes at exec time and nothing in this repository can
+   match a process to its resource by **resolved working directory and injected
+   `OTEL_SERVICE_NAME` resource identity**, then read `/proc/<pid>/environ`, which the kernel writes at exec time and nothing in this repository can
    spoof.
 
 Neither leg alone proves the whole chain; together they cover config → generator → generated module
