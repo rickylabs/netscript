@@ -528,3 +528,119 @@ read-only `dryRun: true` context.** That is a genuine reuse, not an aspiration.
 15. **Does DevTools require inventing a `plugin dev` watch loop**, given none exists? (S-15)
 16. **Which registry generator owns a DevTools family** — manifest-driven or walker — given the two
     write to different paths and only one is declared authoritative? (S-16)
+
+---
+
+# Addendum 3 — after `m1` (Nuxt / Vite DevTools) and `m4` (Aspire / Scalar boundary)
+
+Corpus read status: `r1`–`r5` ✓ `p1`–`p3` ✓ `b1` `b2` ✓ `m1` ✓ `m4` ✓ · `m2` ☐ `m3` ☐
+
+## S-18 — The closest analogue **deleted its own shell**. That is the market study's headline
+
+Nuxt DevTools v4 removed the floating panel entirely. Nuxt DevTools is now a **dock entry nested
+under a `Nuxt` group inside the Vite DevTools panel**, and every Nuxt-specific contribution
+primitive — `addCustomTab()`, `extendServerRpc()`, `startSubprocess()`, `refreshCustomTabs()`,
+direct `nuxt.devtools.rpc` — is soft-deprecated with coded diagnostics `NDT_DEP_0003`–`NDT_DEP_0007`
+in favour of the generic Vite DevTools hosts (`m1` F1, D1). `vite-plugin-inspect` made the same move
+at v12: its standalone `/__inspect/` route disappeared and it became a panel inside Vite DevTools
+(`m1` F25).
+
+Nuxt built five bespoke things — a shell, an RPC namespace mechanism, a subprocess/terminal system,
+a VS Code integration, and a global-install mode — and **deprecated or deleted all five**.
+
+**This is the cheapest lesson available to this RFC**, and it cuts both ways:
+
+- It is a strong argument *against* NetScript building a bespoke devtools shell…
+- …except that the thing Nuxt consolidated onto is **Vite-8-bound**, and **NetScript pins Vite
+  7.2.2** (`deno.json:248`, `packages/fresh/deno.json:56`) while Vite DevTools, `@nuxt/devtools` v4
+  and `vite-plugin-inspect` v12 all require **Vite 8** (`m1` F28, D2).
+
+So "just adopt `@vitejs/devtools-kit`" is **not buildable at this baseline**. The honest synthesis is:
+**imitate the contract shapes, implement natively on Deno/Fresh** — and treat a Vite-8 migration as a
+named prerequisite if the kit itself is ever to be adopted. `m1`'s applicability verdict already
+splits this cleanly into transfers (setup-hook seam, dock descriptor as serializable data, named
+prefixed RPC with four function kinds, handle-based update, launcher tier, `json-render`
+zero-client-code tier, `invokeLocal`, `WeakMap`-keyed plugin state) versus does-not-transfer
+(the kit as a dependency, `transformIndexHtml` injection, Node process primitives, Iconify, the fat
+`ServerFunctions` god-interface, build-mode devtools output).
+
+### Three market facts that overturn common assumptions
+
+- **"Devtools are stripped in production" is false upstream.** Vite DevTools *re-targets* to a
+  static dump: RPC results are pre-computed at build time into `__rpc-dump/*.json`, `build.withApp`
+  writes devtools output into the app build dir — and **build mode disables client auth by
+  construction** (`DTK0008`). NetScript should be **stricter than upstream** here, not equal (`m1`
+  D4, F10, F11).
+- **"iframe ⇒ sandboxed" is false.** Nuxt deliberately injects `__NUXT_DEVTOOLS__` into same-origin
+  contributed iframes, giving them live access to the running app's Vue instance; no `sandbox`
+  attribute is documented, only an `allow` permission allowlist. Vite DevTools additionally offers
+  `custom-render`, which explicitly *skips* iframe isolation (`m1` D3, F13, F14).
+- **`transformIndexHtml` injection silently no-ops** for backend-integration / middleware-mode /
+  JS-entry apps. **Fresh 2 renders its own HTML**, so NetScript almost certainly lands in exactly
+  that documented failure bucket — meaning mounting must be a NetScript-owned route/middleware, not
+  an HTML-transform hook (`m1` F9, and its open question 6, which is flagged as the single most
+  decision-relevant unknown and must be closed before the claim is asserted as fact).
+
+## S-19 — The Aspire/Scalar boundary is now **evidence-backed**, with real URL grammars
+
+`m4` fetched the actual Aspire dashboard `.razor` sources and Scalar's configuration docs, so Q5
+stops being a thesis and becomes a table.
+
+**Deep-linking into Aspire is real and cheap** for the cases that matter:
+
+| Target | Link |
+| --- | --- |
+| Resource detail | `/?resource={name}` |
+| Console logs | `/consolelogs/resource/{name}` |
+| Structured logs, correlated | `/structuredlogs/resource/{name}?traceId=&spanId=&logLevel=` |
+| Trace / span detail | `/traces/detail/{traceId}?spanId={id}` |
+| Metric instrument | `/metrics/resource/{r}/meter/{m}/instrument/{i}?duration=` |
+
+The log↔trace correlation query (`?traceId&spanId&logLevel&logEntryId`) is **the single most
+valuable link for a "journey → logs" jump** and it exists.
+
+**What is NOT deep-linkable:** a *filtered* log/trace view — `?filters=` is an opaque internal
+serialization (`m4` F11, verified negatively: the formatter file 404s). A DevTools design must use
+the typed route/query parameters and must not promise filter round-tripping.
+
+**Aspire has no page/panel/plugin extension point at all.** Its UI configuration is purely
+*subtractive* (`DisableResourceGraph`, `DisableImport`, `DisableAgentHelp`). The only additive
+contribution is **custom resource commands** — and those are **local-dashboard-only, explicitly
+unavailable when deployed** (`m4` F13-15). So `withCommand` is a *mirror*, never the home, for a
+framework action.
+
+**Precedent worth quoting:** Aspire **removed its in-dashboard Copilot UI in 13.3** and redirected
+agents to the CLI/MCP server (`m4` F15). The trajectory is *dashboard = fixed human viewer;
+agent/tool integration = external API*. That is a direct precedent for NetScript DevTools = human UI
+and MCP = agent surface — and it pairs with `r5`'s finding that MCP is stdio-only.
+
+**Two hard constraints for embedding:** the dashboard frontend defaults to `BrowserToken` auth
+(there *is* a sanctioned automation path — `{PublicUrl}/login?t={token}` — explicitly provided "so
+tooling can automate logging in"), and links must be built from **`Dashboard:Frontend:PublicUrl`**,
+never a hardcoded `localhost:18888` (`m4` F12, F17-18).
+
+**Scalar**: the anchor grammar is rich and documented (`#tag/{tag}/{method}{path}`, `#model/{slug}`,
+`#webhook/{slug}`, `#description/{heading}`) — but NetScript **throws nearly all of Scalar away**:
+`ScalarDocsOptions` is three fields (`specUrl`, `title?`, `theme?` narrowed to 5 of Scalar's 12
+themes), and the vendored bundle is pinned at `@scalar/api-reference@1.44.15`, which **predates
+`pluginUrls`** — so any "contribute into Scalar" thesis is blocked until the bundle is bumped
+(`m4` F25, F30-33, D3). Also a concrete offline defect: the "no CDN dependency" comment is true of
+the JS but **not the fonts**, which default to `https://fonts.scalar.com` (`m4` D2).
+
+And the load-bearing gap: **no deep-link helper exists anywhere in `packages/`** for either
+upstream, despite both URL grammars being stable and documented (`m4` D5, corroborating `r5` F8-9).
+The hand-off thesis has **no implementation seam today** — which makes "a typed deep-link helper" an
+obvious, small, high-value first slice.
+
+## Owner forks — additions
+
+17. **Vite 8 prerequisite?** Does the RFC scope a Vite-8 migration so `@vitejs/devtools-kit` becomes
+    adoptable, or commit to a NetScript-native surface that merely imitates its contract shapes?
+    (S-18)
+18. **Production posture** — upstream ships devtools into production builds with auth disabled.
+    Confirm NetScript's stricter "absent from production by default" stance, and decide whether a
+    static/offline dump mode is ever wanted. (S-18)
+19. **MCP as the agent surface, DevTools as the human surface** — adopt Aspire's 13.3 precedent
+    explicitly? Bears on whether DevTools needs its own agent affordances at all. (S-19)
+20. **Scalar bundle bump** — is "contribute into Scalar" in scope at all, given `1.44.15` predates
+    `pluginUrls`? Recommend rejecting it and deep-linking instead. (S-19)
