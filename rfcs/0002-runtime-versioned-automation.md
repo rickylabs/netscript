@@ -1,10 +1,10 @@
 ---
-rfc: 0000 # assigned by a maintainer at acceptance; keep 0000 while drafting
+rfc: 0002
 title: Runtime-Versioned Automation — operator-managed workers, tasks, and triggers
-status: Draft # Draft | Discussion | FCP | Accepted | Rejected | Withdrawn
+status: Accepted
 authors: ['@rickylabs']
 created: 2026-08-11
-tracking-issue: (opened at ratification — issue filing is owner-gated for this run)
+tracking-issue: https://github.com/rickylabs/netscript/issues/1464
 target-milestone: Backlog / Triage
 ---
 
@@ -12,7 +12,7 @@ target-milestone: Backlog / Triage
 
 |                   |                                                                                                                                                                                                                                                                                                                                                                                        |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**        | **Draft** — awaiting owner ratification; final adversarial PLAN-EVAL (Codex GPT-5.6 Sol · xhigh) recorded on PR #1446                                                                                                                                                                                                                                                                  |
+| **Status**        | **Accepted** — owner-ratified; final adversarial PLAN-EVAL (Codex GPT-5.6 Sol · xhigh) recorded on PR #1446                                                                                                                                                                                                                                                                            |
 | **Run record**    | `.llm/runs/docs-rfc-runtime-versioned-automation--supervisor/` — research, evidence reports, drift, briefs                                                                                                                                                                                                                                                                             |
 | **Tracking**      | Refs #1443 · #1445 · PR #1444 (control-plane split, D-10) · downstream of RFC [#890](https://github.com/rickylabs/netscript/pull/890) (merged 2026-08-03) and epic [#922](https://github.com/rickylabs/netscript/issues/922) (open)                                                                                                                                                    |
 | **Evidence base** | `evidence/legacy-capability-map.md` (netscript-start @ `6ba9ba0`, 15 sections, 3 operator journeys) · `evidence/current-state-matrix.md` (this repo @ `2256a67bf`, hypotheses H1–H6, probes P1–P5) — both Codex-authored, supervisor-verified · `evidence/competitive-architecture-study.md` (9-system primary-source comparison, 2026-08-11) · `evidence/sandbox-isolation-survey.md` |
