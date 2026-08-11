@@ -133,3 +133,38 @@ documentation.
   with this evidence rather than the weaker one.
 - **Evidence:** `installed-runtime-registry-generator.ts:416-417` (flag list);
   `grep -n 'allow-net\|allow-env'` over the same file → no matches.
+
+## 2026-08-11 — D-8: two corpus claims about the board were wrong; comment threads settled both
+
+- **What:** The stage-D `T9-supersession` pack contradicted two claims in my committed stage-B
+  corpus. The supervisor verified both against live GitHub. **T9 is right on both.**
+- **Source:** `gh issue view 400 --comments`, re-read live 2026-08-11.
+- **Expected (my corpus, `b1` D8 and F7):** (a) `CR-DDX-HOSTAGNOSTIC` "appears in no #400 body text
+  and no ratified rescope artifact" — a dangling dependency for #544; (b) "the last owner-ratified
+  board event is the 2026-07-06 rescope batch", implying the children's `0.0.15` placement was drift.
+- **Actual:**
+  - **(a) `CR-DDX-HOSTAGNOSTIC` exists.** Owner comment on #400, `2026-07-06T12:30:28Z`: *"Change
+    request from the process-manager epic (#510) — CR-DDX-HOSTAGNOSTIC"*, arriving from epic #510
+    (seed-run PR #504, PLAN-EVAL PASS) and asking for a host-neutral panel descriptor with a
+    host-provided `setup()` context. It is **recorded but never resolved** — no later comment accepts
+    or declines it. So #544's dependency is real and *unanswered*, not imaginary.
+  - **(b) A later owner-ratified board event exists.** `2026-07-19T14:40:43Z`: *"Train
+    (owner-ratified 2026-07-19). The dev dashboard ships **after everything else** — umbrella tracked
+    on Backlog / Triage; all children move to 0.0.1-beta.18"*. The children's present `0.0.15`
+    placement is the cascade of that ratified train. **It is deliberate, not drift.** 2026-07-06
+    remains the last ratified *content* rescope; 2026-07-19 is a later ratified *scheduling* event.
+  - Bonus, same thread (`2026-07-06T12:30:30Z`): a cross-epic **`CommandInvokePort` first-definer**
+    acknowledgement between this epic and #510 — relevant to any DevTools action/command kind.
+- **Why the corpus was wrong:** the `b1` agent read issue **bodies and PR threads but not issue
+  comment threads**, and said so — `b1` open question 10 flagged exactly this gap. The gap was
+  recorded honestly, and stage D closed it. This is the citation discipline working as intended: a
+  scoped claim with its scope stated, later corrected by evidence, rather than an unscoped assertion
+  that would have propagated silently.
+- **Severity:** significant. (b) in particular reverses a recommendation: the supersession map must
+  **not** propose re-milestoning the children, because their placement is owner-ratified. Proposing
+  to "fix" it would have been this run overturning an owner decision it never read.
+- **Action:** fix — the map keeps children on `0.0.15` and instead flags **`0.0.14`'s stale
+  description** as the real defect; `CR-DDX-HOSTAGNOSTIC` is carried into the RFC as a live,
+  unresolved cross-epic change request the DevTools design must answer explicitly.
+- **Evidence:** `gh issue view 400 --comments` — comments at `2026-07-06T12:30:28Z`,
+  `2026-07-06T12:30:30Z`, `2026-07-19T14:40:43Z`.
