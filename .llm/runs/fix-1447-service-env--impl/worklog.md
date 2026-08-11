@@ -187,3 +187,40 @@ Aspire owns outright.
 Slice review (Tier-A): the added contract members are optional, explicitly typed, and JSDoc'd; the
 doc-lint surface is unchanged in error count; no new exported symbol, so the `deno doc`-generated
 reference tables need no regeneration.
+
+---
+
+## IMPL-EVAL cycle 1 — `FAIL_FIX` follow-up slices
+
+`evaluate.md` (opposite-family Codex/Sol xhigh, head `dbd7cd9d1`) returned `FAIL_FIX` with F1–F5.
+Slices 7–10 below address them. Each is committed, pushed, and commented on #1449 separately.
+
+### Slice 7 — F4 (no-deepen): the #1447 gate surface moves behind one bounded subdirectory
+
+The finding: debt `scaffold-runtime-a8-f16-1333` says the scaffold runtime registry and gate
+directory must be split "before the next scaffold runtime gate or probe is added", and this PR is
+that next gate — it grew `runtime-gates.ts` 906 → 943 lines and the gate directory 43 → 48 direct
+children while reporting no deepened debt.
+
+Fixed in the shape the debt entry's own **Gate** line prescribes (role-named module + bounded
+subdirectory), rather than by re-authorizing the growth:
+
+- `runtime-gates.ts` restored byte-for-byte to its baseline content (`git checkout 2256a67bf --`),
+  so it is **906 lines again** — the two gate declarations and the `SCAFFOLDED_SERVICE_RESOURCE`
+  constant are gone from it, and `behavior.service-health` keeps its original literal argument.
+- New `gates/scaffold/service-env/service-env-gates.ts` declares both #1447 gates and is registered
+  by `scaffold-capability-gates.ts`. Suite ordering is unaffected: `resolveSuite` orders by the id
+  lists in `capability-suites.ts`, and the catalog only has to contain the gate.
+- The five #1447 gate files moved into `gates/scaffold/service-env/` via `git mv`, so the scaffold
+  gate directory is **44 direct children** (baseline 43 + this one subdirectory) instead of 48.
+
+| Gate                                                       | Result                                             |
+| ---------------------------------------------------------- | -------------------------------------------------- |
+| `deno test --allow-all --unstable-kv packages/cli`         | **PASS** — exit 0, `729 passed (510 steps)`        |
+| `run-deno-check.ts --root packages/cli/e2e --ext ts`       | **PASS** — 155 files, 0 occurrences, exit 0        |
+| `run-deno-lint.ts --root packages/cli --ext ts,tsx`        | **PASS** — 844 files, 0 occurrences, exit 0        |
+| `run-deno-fmt.ts --root packages/cli --ext ts,tsx`         | **PASS** — 844 files, 0 findings, exit 0           |
+
+Slice review (Tier-A): moves are `git mv` renames plus one import-depth correction; the only
+behavioral change is where the gate definitions are constructed. Measured, not asserted:
+`wc -l runtime-gates.ts` = 906 and `ls | wc -l` = 44.

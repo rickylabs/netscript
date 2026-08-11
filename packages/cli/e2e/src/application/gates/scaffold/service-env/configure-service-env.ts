@@ -17,8 +17,8 @@
  */
 
 import { join } from '@std/path';
-import { SCAFFOLD_DIRS } from '../../../../../src/kernel/constants/scaffold/scaffold-dirs.ts';
-import { SCAFFOLD_FILES } from '../../../../../src/kernel/constants/scaffold/scaffold-files.ts';
+import { SCAFFOLD_DIRS } from '../../../../../../src/kernel/constants/scaffold/scaffold-dirs.ts';
+import { SCAFFOLD_FILES } from '../../../../../../src/kernel/constants/scaffold/scaffold-files.ts';
 import {
   DECLARED_SERVICE_ENV,
   DECLARED_STALE_DATABASE_URL,
