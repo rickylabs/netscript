@@ -16,8 +16,8 @@
 NetScript has no way for a plugin to contribute developer-facing UI. Not a weak one — **none**. The
 manifest's `capabilities.hasRoutes` describes *service HTTP endpoints*; no generated registry kind
 emits a route, page, or island; and the only path by which first-party plugin client code currently
-reaches the running app is **three hardcoded Vite aliases in a scaffold template**. A repo-wide
-search for `devtools` returns zero matches.
+reaches the running app is **three hardcoded Vite aliases in a scaffold template**. A search for `devtools`
+across `packages/`, `plugins/`, and `docs/site` source returns zero matches.
 
 This RFC therefore does not extend an extension point. **It defines the first one.**
 
@@ -137,7 +137,7 @@ NetScript app. This is not "weakly supported" — the mechanism does not exist.
   `vite.config.ts` (`packages/cli/src/kernel/assets/app/vite.config.ts.template:41-56`); a repo-wide
   grep for `createNetScriptVitePlugin` hits only the package, the template, its tests and docs — no
   plugin (`r1` F6).
-- `grep -rn "devtools|_devtools|DevTools"` across `packages`, `plugins`, `docs/site` → **zero
+- `grep -rniE 'devtools|_devtools' --include=*.ts --include=*.tsx --include=*.json --include=*.template packages plugins docs/site` → **zero
   matches** (`r1` F14). There is no DevTools host, path, mode flag, or feature branch to extend.
 
 **The real mechanism today is three hardcoded Vite aliases.** A plugin's client code reaches the app
@@ -950,9 +950,9 @@ populated at composition — never `switch (contribution.kind)` in a renderer
 anti-pattern and the registry as its remediation).
 
 ```ts
-export interface DevtoolsKindRegistry {
-  register<K extends DevtoolsKind>(kind: K, renderer: DevtoolsRenderer<K>): void;
-  resolve(kind: string): DevtoolsRenderer<DevtoolsKind> | undefined;
+export interface DevToolsKindRegistry {
+  register<K extends DevToolsKind>(kind: K, renderer: DevToolsRenderer<K>): void;
+  resolve(kind: string): DevToolsRenderer<DevToolsKind> | undefined;
 }
 ```
 
@@ -977,14 +977,27 @@ export interface ContributionIdentity {
 // @netscript/plugin-devtools-core/contracts/v1   (A2 core package; kinds are the kinds section)
 export const DEVTOOLS_FAMILY = { family: 'devtools', major: 1 } as const;
 
-/** Base fields every devtools kind extends. */
-export interface DevtoolsContributionBase {
-  /** Unique within (plugin, family). Pattern ^[a-z][a-z0-9-]*$ .
-   *  Fully-qualified form is `<mountId>/<id>`. */
+/**
+ * Base fields every devtools kind extends. This is the SINGLE definition —
+ * §7's kinds extend this type; they do not restate it.
+ */
+export interface DevToolsContributionBase {
+  /** Unique within (plugin, family). Pattern ^[a-z][a-z0-9-]*$ . */
   readonly id: string;
+  /**
+   * Major version of THIS contribution's payload contract. Grafana's whole
+   * compatibility story comes from putting the major in the identity (m2 F16),
+   * so we keep the property — but as a field, not baked into `id`, because
+   * every generated key derives from the host-assigned `mountId` and never
+   * from a package name (#890 identity quartet, p1 C3).
+   *
+   * Fully-qualified form: `<mountId>/<id>/v<apiMajor>`.
+   */
+  readonly apiMajor: number;
   readonly title: string;  // plain string; the devtools family pins English (p1 F10, i18n row)
+  readonly description?: string;
   readonly icon?: string;  // fresh-ui IconName
-  readonly order?: number; // hint, clamped to [-100, 100] — see Ordering
+  readonly order?: number; // hint, clamped to [-100, 100] — see Ordering below
 }
 ```
 
@@ -1109,11 +1122,11 @@ the envelope input order and the emitted registry is byte-identical. Generation 
 ### Host capabilities — the descriptor
 
 ```ts
-export interface DevtoolsHostDescriptor {
+export interface DevToolsHostDescriptor {
   readonly host: 'devtools';
   /** Supported (family, major) windows. v1: [DEVTOOLS_FAMILY]. */
   readonly families: readonly FamilyRef[];
-  readonly zones: readonly DevtoolsZoneDescriptor[];
+  readonly zones: readonly DevToolsZoneDescriptor[];
   readonly navGroups: readonly string[];
   /** '/_fresh', the devtools base itself, the gateway prefix — collision inputs for the mount. */
   readonly reservedPaths: readonly string[];
@@ -1121,7 +1134,7 @@ export interface DevtoolsHostDescriptor {
   readonly limitPerPlugin?: number; // default 16
 }
 
-export interface DevtoolsZoneDescriptor {
+export interface DevToolsZoneDescriptor {
   /** Version-suffixed, host-owned id: 'devtools.capability.panel/v1'. The suffix versions the
    *  ZONE's props/context contract independently of the family major. */
   readonly id: string;
@@ -1164,7 +1177,7 @@ The devtools rule is **host-anchored, two-tier, and fully deterministic**:
 
 ```ts
 export function orderContributions(
-  zone: DevtoolsZoneDescriptor,
+  zone: DevToolsZoneDescriptor,
   items: readonly ResolvedContribution[],
 ): readonly ResolvedContribution[] {
   const rank = new Map(zone.anchors?.map((fq, i) => [fq, i]));
@@ -1351,7 +1364,7 @@ so it is treated below as a candidate list to test, not as inherited scope.
 
 Why smallness is the point, not thrift: **there is no plugin→UI channel of any kind at baseline** —
 `capabilities.hasRoutes` means service HTTP endpoints, no registry kind emits routes/pages/islands,
-and `grep -rn "devtools\|DevTools"` across `packages`/`plugins`/`docs/site` returns **zero matches**
+and `grep -rniE 'devtools|_devtools' --include=*.ts --include=*.tsx --include=*.json --include=*.template packages plugins docs/site` returns **zero matches**
 (`research.md` F1, `r1` F9-F11/F14). Adding one axis to the current model costs **six framework file
 edits** (`r4` F11; `research.md` F18). A nine-member union would therefore be nine untested contracts
 shipped simultaneously into a surface with no existing consumers — the precise AP-9 premature
@@ -1386,7 +1399,13 @@ Two rules bind every kind, so they live once here rather than three times below.
 
 - **Identity — version-suffixed ids.** `'<plugin>/<name>/v1'`. Grafana derived its entire
   compatibility story from this one convention (`m2` F13, F16; `research.md` F24).
-- **Ordering — host-owned deterministic `(order ?? 0, id)` sort.** This is designed, not borrowed:
+- **Ordering — defined once in §6, not here.** The rule is two-tier: host-curated **anchors**
+  render first (tab order is host product data), then the remainder sorts by
+  **`(order, mountId, id)`** with `order` clamped to `[-100, 100]` and an out-of-range value a
+  **generate-time error**. This bullet deliberately does not restate the algorithm — an earlier
+  draft of this section carried a flattened `(order ?? 0, id)` variant, and a reader implementing
+  from §7 alone would have got the wrong sort. §6 is the only authority. What matters *here* is
+  **why** ordering needed designing at all:
   **no surveyed system solved ordering** (`m2` F21/F3; `m3` M-8). Under a host-owned closed zone
   vocabulary, *name collision is impossible by construction*, which is why collision policy is not a
   major design area in this RFC and ordering inherits the budget (`research.md` R5). Note the zone
@@ -1403,16 +1422,11 @@ data context is decided in *Data plane*. Names below are the RFC's proposal pend
 #### Shared base
 
 ```ts
-/** Version-suffixed identity: Grafana's compatibility story in one string (m2 F16). */
-type DevToolsContributionId = `${string}/${string}/v${number}`; // '<plugin>/<name>/v1'
-
-interface DevToolsContributionBase {
-  readonly id: DevToolsContributionId;
-  readonly title: string;
-  readonly description: string;
-  /** Host sorts deterministically by (order ?? 0, id). Net-new — no market precedent (m2 F21). */
-  readonly order?: number;
-}
+// `DevToolsContributionBase` is defined ONCE, in §6 ("The DevTools contribution family").
+// It carries `id`, `apiMajor`, `title`, `description?`, `icon?`, and `order?`.
+// The kinds below extend it; they do not redefine it, and they do not restate
+// the ordering rule — §6's `(anchors, then order, mountId, id)` is the only one.
+import type { DevToolsContributionBase } from '@netscript/plugin-devtools-core/contracts/v1';
 ```
 
 #### `panel` — server-rendered JSON spec, zone-targeted
@@ -1744,38 +1758,38 @@ in § *The host shape* / § *The contribution family* — do not treat the name 
 
 ```ts
 /** Protocol handshake. RFC-A's `{family, major}` vocabulary (rfc:405-408, rfc:1179-1187). */
-export interface DevtoolsDataProtocol {
+export interface DevToolsDataProtocol {
   readonly family: 'netscript.devtools-data';
   readonly major: 1;
 }
 
 /** `<pluginId>/<panel>/v<major>` — version-suffixed ids, Grafana's compatibility story (m2 F16). */
-export type DevtoolsPanelId = `${string}/${string}/v${number}`;
+export type DevToolsPanelId = `${string}/${string}/v${number}`;
 
 /** `<namespace>:<kebab-name>` — closed vocabulary, enumerated at generation time. Never a URL. */
-export type DevtoolsProcedureId = `${string}:${string}`;
+export type DevToolsProcedureId = `${string}:${string}`;
 
 /** Discriminated result mirroring MCP's ToolSuccess | ToolFailure
  *  (packages/mcp/src/domain/tool-types.ts:34-58, verified). */
-export type DevtoolsProcedureResult<TOut> =
+export type DevToolsProcedureResult<TOut> =
   | { readonly ok: true; readonly value: TOut }
   | {
     readonly ok: false;
-    readonly error: { readonly code: DevtoolsErrorCode; readonly message: string };
+    readonly error: { readonly code: DevToolsErrorCode; readonly message: string };
   };
 
 /** What a DevTools route handler / server-rendered panel section receives. */
-export interface DevtoolsServerPanelContext {
-  readonly protocol: DevtoolsDataProtocol;
-  readonly panelId: DevtoolsPanelId;
+export interface DevToolsServerPanelContext {
+  readonly protocol: DevToolsDataProtocol;
+  readonly panelId: DevToolsPanelId;
   /** Consumed, not rebuilt: packages/telemetry/src/ports/telemetry-query-port.ts:23-71 (verified). */
   readonly telemetry: TelemetryQueryPort;
   /** In-process invoker bound to read-kind MCP flows only (D-6.4). */
-  readonly tools: DevtoolsToolInvoker;
+  readonly tools: DevToolsToolInvoker;
   /** Names, sources, and conflicts — for display. Origins never cross into client context. */
   readonly endpoints: Pick<ServiceEndpointDirectoryPort, 'list'>;
   /** Typed Aspire/Scalar deep-link builders over the verified URL grammars (m4 F6-F11). */
-  readonly links: DevtoolsDeepLinks;
+  readonly links: DevToolsDeepLinks;
   /** The journey join key, as data:
    *  packages/telemetry/src/domain/telemetry-convention.ts:51-53 (verified). */
   readonly correlation: { readonly attribute: 'netscript.correlation.id' };
@@ -1788,32 +1802,32 @@ export interface DevtoolsServerPanelContext {
 ```ts
 /** What an island panel receives. No ports, no env, no module-scope `window` reads —
  *  RFC-A's environment-neutral construction rule (rfc:321-324). */
-export interface DevtoolsClientPanelContext {
-  readonly protocol: DevtoolsDataProtocol;
-  readonly panelId: DevtoolsPanelId;
+export interface DevToolsClientPanelContext {
+  readonly protocol: DevToolsDataProtocol;
+  readonly panelId: DevToolsPanelId;
   /** Same-origin, typed, closed-vocabulary query invoker. */
-  readonly query: DevtoolsQueryInvoker;
+  readonly query: DevToolsQueryInvoker;
   /** SSE-backed, one-directional event feed (D-6.6). */
-  readonly events: DevtoolsEventFeed;
-  readonly links: DevtoolsDeepLinks;
+  readonly events: DevToolsEventFeed;
+  readonly links: DevToolsDeepLinks;
 }
 
-export interface DevtoolsQueryInvoker {
+export interface DevToolsQueryInvoker {
   invoke<TOut = unknown>(
-    procedure: DevtoolsProcedureId,
+    procedure: DevToolsProcedureId,
     input: unknown,
     options?: { readonly signal?: AbortSignal },
-  ): Promise<DevtoolsProcedureResult<TOut>>;
+  ): Promise<DevToolsProcedureResult<TOut>>;
   /** TanStack Query bridge; keys are ['devtools', procedure, input] (D-6.7). */
   queryOptions<TOut = unknown>(
-    procedure: DevtoolsProcedureId,
+    procedure: DevToolsProcedureId,
     input: unknown,
-  ): DevtoolsQueryOptions<TOut>;
+  ): DevToolsQueryOptions<TOut>;
 }
 
 /** Server-side only. Bound to ToolKind 'read' (packages/mcp/src/domain/tool-types.ts:32, verified). */
-export interface DevtoolsToolInvoker {
-  invoke<N extends DevtoolsReadToolName>(
+export interface DevToolsToolInvoker {
+  invoke<N extends DevToolsReadToolName>(
     name: N,
     input: ToolInputOf<N>,
     options?: { readonly signal?: AbortSignal },
@@ -1824,10 +1838,10 @@ export interface DevtoolsToolInvoker {
  *  SdkClientContributionReference discipline (rfc:1136-1159): a static module+export
  *  reference that "does not contain a serialized function and does not automatically
  *  activate it" — declarative, never a callable smuggled through a manifest. */
-export interface DevtoolsProcedureReference {
-  readonly protocol: DevtoolsDataProtocol;
+export interface DevToolsProcedureReference {
+  readonly protocol: DevToolsDataProtocol;
   /** MUST be prefixed `<pluginId>:` — enforced at generation, not advisory (m2 F13). */
-  readonly id: DevtoolsProcedureId;
+  readonly id: DevToolsProcedureId;
   readonly module: string; // plugin-package module specifier
   readonly export: string; // named export of an oRPC contract procedure binding
   readonly kind: 'read'; // v1 is read-only; 'mutate' is owner fork OF-D3
@@ -1896,10 +1910,10 @@ request/response only (`m3` data-freshness row). The **contract** is therefore n
 
 ```ts
 /** `<pluginId>:<topic>` or `netscript:<topic>` — enforced namespacing (m2 F8). */
-export type DevtoolsTopic = `${string}:${string}`;
+export type DevToolsTopic = `${string}:${string}`;
 
-export interface DevtoolsEvent<TPayload = unknown> {
-  readonly topic: DevtoolsTopic;
+export interface DevToolsEvent<TPayload = unknown> {
+  readonly topic: DevToolsTopic;
   /** Opaque resume cursor, carried as the SSE id → `Last-Event-ID` on reconnect. */
   readonly cursor: string;
   readonly at: string; // ISO-8601
@@ -1910,8 +1924,8 @@ export interface DevtoolsEvent<TPayload = unknown> {
   readonly payload: TPayload;
 }
 
-export interface DevtoolsEventFeed {
-  subscribe(topics: readonly DevtoolsTopic[], onEvent: (e: DevtoolsEvent) => void): () => void;
+export interface DevToolsEventFeed {
+  subscribe(topics: readonly DevToolsTopic[], onEvent: (e: DevToolsEvent) => void): () => void;
   readonly state: 'connecting' | 'live' | 'reconnecting' | 'latched-off';
 }
 ```
@@ -1932,7 +1946,7 @@ and auth permits (D-6.9).
   subpath (`packages/fresh/deno.json` exports, **verified**). No second cache is introduced.
 - **Keys** are `['devtools', procedureId, input]` — stable, enumerable, and *permitted to be
   visible*: partitions are the one deliberately-inspectable value class (rfc:1117-1119).
-- **Invalidation is event-driven.** `DevtoolsEvent.invalidates` maps a topic to key prefixes; the
+- **Invalidation is event-driven.** `DevToolsEvent.invalidates` maps a topic to key prefixes; the
   feed client calls prefix invalidation on the query cache. Per-panel polling fallback with a visible
   staleness indicator when the feed is `latched-off`.
 - **Every panel renders its data provenance.** `resolveTelemetryEndpoint` already returns its
@@ -1954,7 +1968,7 @@ and auth permits (D-6.9).
   and `/structuredlogs/resource/{n}?traceId=&spanId=&logLevel=` (`m4` F6-F11, research F6) — built
   from `Dashboard:Frontend:PublicUrl`, never a hardcoded localhost. Filtered Aspire views are **not**
   constructible (`?filters=` is opaque, research F6); the RFC does not promise them. No deep-link
-  helper exists anywhere in `packages/` today (research F7), so `DevtoolsDeepLinks` is a named
+  helper exists anywhere in `packages/` today (research F7), so `DevToolsDeepLinks` is a named
   build item.
 - **Observer effect.** DevTools' own outbound queries default to *not* emitting spans into the
   dashboard they render. `propagateTraceContext` exists on `CreateServiceClientOptions`
@@ -2019,17 +2033,17 @@ read-kind allowlist) and each requires an executable gate to become evidence:
 | RFC-A vocabulary (`{family, major}`, namespaced ids, duplicate rejection, static references) | **Consume the vocabulary, never the unmerged symbols** | rfc:1179-1187 (`p3` F13) |
 | RFC-0001 contracts (management oRPC, audit, history, convergence feed, OTel names) | **Consume, staged to v3**; bridge the change feed server-to-server | RFC:283-285, 300-379, 465-487 (`p2` C1-C6) |
 | Aspire/Scalar deep-link URL grammars | **Consume the grammar; build the typed helper** | `m4` F6-F11, F17-F18; absence: research F7 |
-| Devtools oRPC contract (enumerated procedures + error codes) | **Build** (net-new) | this RFC |
-| `DevtoolsServerPanelContext` / `DevtoolsClientPanelContext` | **Build** (net-new — the seam RFC-A licenses but does not define) | this RFC |
-| `DevtoolsEventFeed` + topic/cursor/invalidation contract | **Build** (net-new — no market precedent) | `m3` data-freshness row |
-| `DevtoolsProcedureReference` manifest axis + generated static registry | **Build**, mirroring rfc:1136-1176 discipline | this RFC · see D-6.11 |
+| DevTools oRPC contract (enumerated procedures + error codes) | **Build** (net-new) | this RFC |
+| `DevToolsServerPanelContext` / `DevToolsClientPanelContext` | **Build** (net-new — the seam RFC-A licenses but does not define) | this RFC |
+| `DevToolsEventFeed` + topic/cursor/invalidation contract | **Build** (net-new — no market precedent) | `m3` data-freshness row |
+| `DevToolsProcedureReference` manifest axis + generated static registry | **Build**, mirroring rfc:1136-1176 discipline | this RFC · see D-6.11 |
 
 **Named framework-source slices** (WSL Codex lane, not design work): (1) promote `sse.ts` to
 `@netscript/fresh/server`; (2) the typed Aspire/Scalar deep-link helper.
 
 ### D-6.11 — Manifest precondition, inherited from drift
 
-`DevtoolsProcedureReference` is manifest-visible. `PluginInstallerManifestSchema` ends in
+`DevToolsProcedureReference` is manifest-visible. `PluginInstallerManifestSchema` ends in
 `.strict()` and pins `schemaVersion: z.literal(1)`
 (`packages/plugin/src/protocol/manifest.ts:271,282`; drift **D-6**), so an unknown top-level block
 does **not** degrade — an older CLI fails manifest parsing outright. Any manifest-visible DevTools
@@ -2165,6 +2179,16 @@ reads, and sub-spawning on this path. Manifest `scaffolder.requiredPermissions` 
 today and is never translated into spawn flags; INV-2 makes it enforced. In-repo precedent for
 validating declared paths exists — `isSafeExportPath`,
 `packages/plugin/src/protocol/manifest.ts:340-349` (`r3` F10).
+
+**Scope honesty about INV-2.** This is a **pre-existing defect in the shared plugin-registry
+generator**, not a DevTools-introduced one — and §10's DevTools pipeline, which imports the family
+module in-process rather than spawning a plugin-authored subprocess, **does not exercise it**. So
+INV-2 is not load-bearing for DevTools' own threat surface; it is load-bearing for the *contribution
+model as a whole*, because the moment any contribution kind is generated by a plugin-owned
+subprocess the grant becomes reachable. It is listed here rather than quietly omitted because this
+RFC found it, and dropping a verified whole-filesystem grant on the grounds that our own path avoids
+it would be exactly the kind of scoped-away finding the citation discipline exists to prevent. **Who
+fixes it is owner fork D-6.3** — this RFC's roadmap or the CLI's own remediation lane.
 
 ### D-3. Threat model
 
@@ -2731,10 +2755,14 @@ Two doctrine rules bind the tree:
 for a contributed-route kind should one survive **Contribution kinds**.
 
 ```text
-<base>/                                  Home — "wiring home": only-NetScript stats
-                                         (plugins installed, axes wired, contract coverage,
-                                         generated-registry freshness, declared-vs-running config)
-                                         + contributed home cards
+<base>/                                  Home — answers "WHAT IS BROKEN?" first, "what exists"
+                                         second. Ranked problem feed across every seam:
+                                         quarantined contributions, failed/compensating runs,
+                                         generated-registry drift, doctor errors, replicas off
+                                         the current epoch, contract-coverage regressions.
+                                         Each row deep-links to the owning surface below.
+                                         Only-NetScript stats and contributed home cards sit
+                                         BELOW the feed, not above it.
 <base>/runtime/                          Primitive run-state — one vertical slice per primitive
   workers/
     jobs/:jobId/executions/:execId       entity URL for one execution (attempts, steps)
@@ -3556,6 +3584,12 @@ carries this RFC's recommendation, so a silent owner default is a *decision*, no
 | **F-8** | **Archetype** — A2 now, re-evaluate to A3 (+F-13) if supervised state moves into the core | Ratify with the trigger written down | Gate-set ambiguity at the first runtime slice |
 
 ### 15.2 Board decisions (no mutation until ratified)
+
+The full issue-level and file-level map — every `KEEP` / `AMEND` / `FOLD` /
+`SUPERSEDE` / `CLOSE-LATER` disposition, with its reason and what must be true before it
+changes — is committed at `.llm/runs/plan-devtools-contribution--seed/design/T9-supersession/supersession-map.md`.
+It is **draft text only**; nothing is filed before ratification.
+
 
 | # | Fork | Recommendation |
 | --- | --- | --- |
