@@ -18,6 +18,7 @@ import { createOtelGates } from './otel-gates.ts';
 import { createPluginContractGates } from './plugin-contract-gates.ts';
 import { createCleanupGates, createRuntimeGates } from './runtime-gates.ts';
 import { createPreflightGates, createScaffoldGates } from './scaffold-gates.ts';
+import { createServiceEnvironmentGates } from './service-env/service-env-gates.ts';
 import { createUiAiGates } from './ui-ai-gates.ts';
 
 /** Build the scaffold capability gate list. */
@@ -53,6 +54,9 @@ export function createScaffoldCapabilityGates(
     ...runtimeGates.slice(startIndex + 1),
     ...createBehaviorPluginHealthGates(),
     ...createOtelGates(),
+    // Registration only — the suite gate lists in `capability-suites.ts` decide
+    // where the fixture and the verification run relative to AppHost start.
+    ...createServiceEnvironmentGates(),
     ...createCleanupGates(),
   ];
 }

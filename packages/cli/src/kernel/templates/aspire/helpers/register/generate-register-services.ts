@@ -28,6 +28,7 @@ import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
 import { withDatabasePermissions } from './database-permissions.ts';
 import { renderHttpEndpointCall } from './render-http-endpoint.ts';
+import { renderDeclaredEnvironmentLines } from './resolve-resource-environment.ts';
 
 /**
  * Generates the `register-services.mts` file content for a scaffolded Aspire
@@ -87,6 +88,15 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
       lines.push(
         `    await resource.withHttpHealthCheck({ path: '${healthCheckPath}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
       );
+    }
+
+    // Declared environment — applied before the generated values below, which
+    // therefore win a key collision (see resolve-resource-environment.ts).
+    const declaredEnvironmentLines = renderDeclaredEnvironmentLines(entry);
+    if (declaredEnvironmentLines.length > 0) {
+      lines.push(``);
+      lines.push(`    // Declared environment (config \`Services.${name}\`)`);
+      lines.push(...declaredEnvironmentLines);
     }
 
     // OTEL telemetry (full executable env set)

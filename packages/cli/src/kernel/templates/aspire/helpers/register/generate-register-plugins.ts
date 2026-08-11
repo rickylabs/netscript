@@ -26,6 +26,7 @@ import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
 import { withDatabasePermissions } from './database-permissions.ts';
 import { renderHttpEndpointCall } from './render-http-endpoint.ts';
+import { renderDeclaredEnvironmentLines } from './resolve-resource-environment.ts';
 
 const DENO_NO_LEGACY_ABORT_FLAG = '--unstable-no-legacy-abort';
 
@@ -99,12 +100,9 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     lines.push(
       `    await resource.withEnvironment('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE', bootstrapModule);`,
     );
-    if (entry.Environment && Object.keys(entry.Environment).length > 0) {
-      lines.push(`    const configuredEnvironment = ${JSON.stringify(entry.Environment)};`);
-      lines.push(`    for (const [key, value] of Object.entries(configuredEnvironment)) {`);
-      lines.push(`      await resource.withEnvironment(key, value);`);
-      lines.push(`    }`);
-    }
+    // Declared environment — same resolver, same shape, same precedence as
+    // service resources (see resolve-resource-environment.ts).
+    lines.push(...renderDeclaredEnvironmentLines(entry));
     if (isTriggersApiResource(name, entrypoint)) {
       lines.push(
         `    const triggerRegistryModule = new URL('../../.netscript/generated/plugin-triggers/triggers.registry.ts', import.meta.url).href;`,

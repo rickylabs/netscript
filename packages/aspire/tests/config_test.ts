@@ -98,6 +98,40 @@ Deno.test('config', async (t) => {
     assertEquals(plugin.Environment, { NETSCRIPT_AUTH_BACKEND: 'kv-oauth' });
   });
 
+  await t.step('ServiceEntrySchema: preserves configured environment (#1447)', () => {
+    const service = ServiceEntrySchema.parse({
+      Entrypoint: 'tools/excalidraw-mcp.ts',
+      Environment: { MCP_TRANSPORT: 'http', MCP_SESSION_MODE: 'stateless' },
+    });
+    assertEquals(service.Environment, {
+      MCP_TRANSPORT: 'http',
+      MCP_SESSION_MODE: 'stateless',
+    });
+  });
+
+  await t.step('ServiceEntrySchema: keeps the deprecated Env alias (#1447)', () => {
+    const service = ServiceEntrySchema.parse({
+      Entrypoint: 'tools/excalidraw-mcp.ts',
+      Env: { MCP_TRANSPORT: 'http' },
+    });
+    assertEquals(service.Env, { MCP_TRANSPORT: 'http' });
+    assertEquals(service.Environment, undefined);
+  });
+
+  await t.step('PluginEntrySchema: keeps the deprecated Env alias (#1447)', () => {
+    const plugin = PluginEntrySchema.parse({ Env: { NETSCRIPT_AUTH_BACKEND: 'kv-oauth' } });
+    assertEquals(plugin.Env, { NETSCRIPT_AUTH_BACKEND: 'kv-oauth' });
+    assertEquals(plugin.Environment, undefined);
+  });
+
+  await t.step('parseAppSettings: rejects a non-string environment value (#1447)', () => {
+    const result = ServiceEntrySchema.safeParse({
+      Entrypoint: 'src/main.ts',
+      Env: { MCP_PORT: 8096 },
+    });
+    assertEquals(result.success, false);
+  });
+
   await t.step('AppSettingsSchema: preserves saga store metadata', () => {
     const result = AppSettingsSchema.parse({
       NetScript: {

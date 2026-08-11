@@ -2234,7 +2234,45 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Linked plan:** `.llm/runs/release-0.0.5--orchestration/slices/scaffold-1333/plan.md`; issue #1333;
   PR #1427.
 - **Created:** 2026-08-09
-- **Status:** open, DEBT_ACCEPTED for #1427; registry entry added after IMPL-EVAL cycle 1.
+- **Status:** open, DEBT_ACCEPTED for #1427; registry entry added after IMPL-EVAL cycle 1. **Not
+  deepened by PR #1449** (2026-08-11) — see the stop-condition note below.
 - **Gate:** Split the BEHAVIOR gate declarations and probe registration into role-named modules and
   group scaffold probes behind a bounded subdirectory surface; focused CLI E2E tests, doctrine,
   scoped check/lint/fmt, and the one-pass `scaffold.runtime` suite must remain green.
+- **Stop-condition encounter — PR #1449 / issue #1447 (2026-08-11):** this PR is the "next scaffold
+  runtime gate" the target names. It adds `runtime.service-env-fixture` and `behavior.service-env`,
+  and it honors the stop condition in the shape this **Gate** line prescribes rather than
+  re-authorizing further growth. Measured: `runtime-gates.ts` is **906 lines**, byte-identical to
+  its state before the PR (the two gate declarations live in the role-named
+  `gates/scaffold/service-env/service-env-gates.ts`, registered from
+  `scaffold-capability-gates.ts`); the scaffold gate directory holds **44 direct children** — the
+  baseline 43 plus the one bounded `service-env/` subdirectory, whose own **12** files sit **exactly
+  at** the 12-child cap — not comfortably inside it. IMPL-EVAL recorded 10 here; the remediation
+  slices then added `gate-permission-probe.ts` and `service-env-gates_test.ts`, and the count was
+  not re-measured, so the record was a false-done. Corrected by measurement at head.
+  **Stop condition:** `service-env/` is full. A thirteenth file in it, or a further gate needing a
+  sibling directory, requires the owed `runtime-gates.ts` split first rather than another bounded
+  subdirectory. IMPL-EVAL cycle 1 had measured 943 lines and 48 children before this correction. The
+  entry stays **open**: the pre-existing 906-line registry and 43 over-cap children are untouched,
+  so the full split is still owed, and the next gate faces the same condition.
+
+## packages/aspire — `config.ts` grows further past the 500-line cap (`aspire-config-length-1447`)
+
+- **Reason:** PR #1449 (issue #1447) adds the `Environment` / deprecated `Env` contract to
+  `ServiceEntry` and `PluginEntry`, taking `packages/aspire/config.ts` from **812 to 855 lines**
+  against the 500-line AP-1/F-1 cap. The file was already 312 lines over at baseline. The added 43
+  lines are the private `EnvironmentFields` Zod shape plus two documented interface member pairs, in
+  the same place as the existing `HostPortFields` / `Port` pairing they are modelled on; splitting
+  the single-file config contract of an A2 package would move every exported schema's module path
+  and is a restructure, not a P0 environment fix.
+- **Owner:** `@netscript/aspire` contract maintainers.
+- **Target:** Before the next contract member is added to `config.ts` — this entry exists so that
+  addition is a decision rather than a default.
+- **Linked plan:** `.llm/runs/fix-1447-service-env--impl/plan.md`; issue #1447; PR #1449.
+- **Created:** 2026-08-11
+- **Status:** open, DEBT_ACCEPTED for #1449; recorded during IMPL-EVAL cycle 1 remediation after the
+  measurement was taken rather than assumed.
+- **Gate:** Split `config.ts` into role-named schema modules behind the existing `./config` subpath
+  export (entry schemas, infrastructure schemas, root config), keeping the public surface and the
+  generated `appsettings.schema.json` byte-identical; `deno test packages/aspire`, doc-lint, publish
+  dry-run, and `arch:check` must remain green.
