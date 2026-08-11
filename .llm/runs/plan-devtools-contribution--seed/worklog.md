@@ -130,3 +130,12 @@ as a risk.
 **Not verified, carried as named probes** (recorded rather than glossed): `fresh({ islandSpecifiers })`
 end-to-end with JSR specifiers under Deno resolution; whether the Vite dev server's own endpoints
 (HMR WS, `/@fs`) are auth-gated when non-loopback.
+
+### Stage-D lock hygiene
+
+`git status` after the fan-out showed `deno.lock` modified (+386/−9) — incidental churn from the
+packs' `deno doc` / module-resolution runs (`jsr:@fresh/plugin-vite@^1.1.2`, `jsr:@fresh/core@2`,
+`jsr:@deno/loader@0.4` entries added). **Reverted with `git checkout -- deno.lock`.** A planning-only
+docs run has no business mutating the workspace lock, and `AGENTS.md` operating rule 6 plus the
+`netscript-tools` lock-hygiene rule both bind here. Verified afterwards that nothing outside the run
+directory remains modified.
