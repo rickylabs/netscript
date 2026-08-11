@@ -416,3 +416,115 @@ Superseding the stage-1 list; renumbered and expanded at stage E.
 11. **#734 — close, fold, or promote?** It is the third competing position on one seam. (S-8)
 12. **Is `CR-DDX-HOSTAGNOSTIC` real?** #544 depends on it; it exists in no ratified artifact. (S-8)
 13. **Does the DevTools data plane wait on RFC-A/#1348** for auth propagation? (S-13)
+
+---
+
+# Addendum 2 — after `p3` (SDK RFC-A) and `r4` (CLI plugin flows)
+
+Corpus read status: `r1` ✓ `r2` ✓ `r3` ✓ `r4` ✓ `r5` ✓ `p1` ✓ `p2` ✓ `p3` ✓ `b1` ✓ `b2` ✓ ·
+`m1` ☐ `m2` ☐ `m3` ☐ `m4` ☐
+
+## S-14 — RFC-A does **not** close the loop DevTools needs. This is the run's sharpest data-plane fact
+
+`p3` F8 traces it end to end: a plugin exports a contribution descriptor and declares it in its
+manifest → discovery (#1093, *not* RFC-A) collects references → **a generator or the application
+author writes a literal `defineServices({ … contributions: [...] as const })`** → **call sites pass
+a composed context object per call**.
+
+The chain therefore terminates at *a statically generated services map plus a caller-supplied
+context object*. RFC-A explicitly rejects a runtime registry, a locator, a `useClient()`, and any
+ambient/global client (`rfc:1501-1506`). It contains zero occurrences of "devtool".
+
+**Consequence.** *"A plugin-contributed DevTools panel obtains a typed client for its own plugin's
+service"* is **not** solved by #1390 and cannot be assumed. DevTools must define its own
+**host → panel context contract** — and doing so is *not* a second SDK extension mechanism, because
+RFC-A itself says "UI contributions and SDK request contributions are separate named extension axes,
+not one universal envelope" (`rfc:1179-1187`). That sentence is the licence to define the host→panel
+seam without violating the charter's don't-duplicate-#1390 boundary. It should be quoted in the RFC.
+
+What DevTools may safely take from RFC-A **today**, before it merges, is its **vocabulary**:
+`protocol { family, major }`, namespaced `id`, duplicate rejection, static module reference +
+explicit selection — which RFC-A already declares shared with #928 (`rfc:1179-1187`). Depending on
+the vocabulary carries shape risk ≈ 0; depending on the *symbol* carries high availability risk.
+
+### Hard limits RFC-A imposes on what a DevTools panel may show
+
+- **No response hook.** The descriptor patches request headers only (`SdkClientRequestPatch {
+  headers }`). A network-inspector-style panel needs a *different* seam (`p3` F14).
+- **Redaction is absolute**: header values, input, context, credentials and source error causes MUST
+  NOT be recorded, and **debug mode does not relax this** (`rfc:1091-1110`).
+- **Partitions are explicitly non-secret and "intentionally visible in query keys and developer
+  tools"** (`rfc:1117-1119`) — a narrow, quotable green light for cache introspection.
+- **HTTP-only.** Desktop MessagePort contributions are normatively rejected; a MessagePort seam
+  "requires a separate RFC" (`rfc:983-998`). If any DevTools transport is in-process/MessagePort,
+  RFC-A is structurally inapplicable and #451 is the relevant issue.
+
+### Sequencing risk, quantified
+
+FCP disposition **accept**, objection deadline **2026-08-15 22:00 Europe/Zurich** — i.e. **4 days
+after this run's baseline date**. On expiry the maintainer assigns number 0001 and merges. But the
+implementation chain is: FCP close → #1350 error repair → **an unfiled metadata child** (disposition
+6) → #1351 stable oRPC v1.15.0 family move (disposition 8) → #1349 client seam → #1352 auth dogfood.
+All on milestone `0.0.7`. **A DevTools deliverable needing a credential-bearing typed client cannot
+ship before #1352.**
+
+## S-15 — `plugin dev` does not exist
+
+Charter Q8 asks the RFC to decide build/dev mechanics including "`plugin dev`". `r4` F6 establishes
+by negative search that **there is no `plugin dev` / watch loop anywhere in the CLI**. The only
+"watch" is a `--watch`/`--watch-hmr` *flag string* a kind provider emits into generated Aspire
+registration. Regeneration is always explicit and command-triggered.
+
+So Q8 is not "how does DevTools fit the dev loop" — it is "does DevTools require inventing one".
+That is a materially different, and larger, question than the charter's phrasing implies.
+
+## S-16 — There are **two divergent registry generators**, writing to different paths
+
+`r4` F3 / D4 — architectural:
+
+- **`generate plugins`** (and `plugin sync`, a thin alias) runs the *manifest-driven* generator:
+  reads each installed package's `scaffold.runtime.json`, shells out to the **plugin's own**
+  generator subprocess, then asserts the declared `registryPath` files exist.
+- **`plugin update`** and **`plugin item-add`** run the *SDK walker* pipeline
+  (`FilesystemWalker → AstExtractor → RegistryEmitter`) emitting
+  `.netscript/generated/<axis>.registry.ts`.
+
+A plugin's registry can therefore be written by **two mechanisms at two different paths**. Worse:
+**`AstExtractor` is a regex over comment/string-stripped text, not an AST parse**, and recognizes
+exactly three hardcoded builders (`defineJob`/`defineSaga`/`defineWebhook`). And the walker-emitted
+axis registries are **not** cleaned by `plugin remove`, which only deletes
+`.netscript/generated/<name>` and `plugin-<name>` (`r4` F10, OQ2).
+
+**Consequence.** Charter Q8's "generated registry transactions" and Q5's "generated-surface drift"
+both land on a substrate that is currently non-transactional, dual-pathed, regex-parsed, and leaks
+artifacts on removal. The RFC must say which generator a DevTools family uses and must not assume
+drift detection is currently reliable. This also independently reinforces S-2's conclusion that
+#890's transactional staged→check→atomic-swap replace-set is a **fix**, not gold-plating.
+
+## S-17 — Adding a contribution kind today costs six framework file edits
+
+`r4` F11 enumerates the minimum set a contributor edits for a first-party new kind:
+`kernel/adapters/plugin/kinds/<kind>.kind.ts` (new), `kinds/plugin-kind-providers.ts`,
+`application/registries/plugin-kind-registry.ts`, `install/plugin-package-resolver.ts` (bare alias),
+`plugin/sdk/discovery/ast-extractor.ts` (if a new axis), `list/list-plugins-command.ts` (axis
+display). Only `api` is compiled in; every other kind is a **bare alias to a `@netscript/plugin-*`
+JSR package**.
+
+This is the concrete, citable cost of *not* having an open contribution model — useful motivation
+prose for the RFC, and it pairs with `r3`'s `cli.doctorChecks: readonly 'auth-backend'[]` closed
+literal as the second proof that the current axis set is closed to third parties.
+
+`plugin doctor`'s existing check inventory (`r4` F2 — config load, AppHost inspection, manifest
+resolution, per-plugin manifest, workdir, permissions, auth-backend, and dynamically-imported
+plugin-contributed `extraChecks`) is the natural host for the RFC's five-state contribution
+diagnosis taxonomy: **the extension point already exists and already runs contributed checks with a
+read-only `dryRun: true` context.** That is a genuine reuse, not an aspiration.
+
+## Owner forks — additions
+
+14. **Does the DevTools host→panel data context become a new contract** (permitted by RFC-A's own
+    "separate named extension axes" sentence), and if so does it wrap the SDK client or pass one in?
+    (S-14)
+15. **Does DevTools require inventing a `plugin dev` watch loop**, given none exists? (S-15)
+16. **Which registry generator owns a DevTools family** — manifest-driven or walker — given the two
+    write to different paths and only one is declared authoritative? (S-16)
