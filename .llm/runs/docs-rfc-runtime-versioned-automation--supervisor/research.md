@@ -1,14 +1,15 @@
 # Research — docs-rfc-runtime-versioned-automation--supervisor
 
 Deep findings feeding the RFC. Sub-agent reports live in `evidence/`; this file is the supervisor
-synthesis + verification layer. Status: **complete** — G1 + G2 landed and supervisor-reviewed; synthesis in the RFC.
+synthesis + verification layer. Status: **complete** — G1 + G2 landed and supervisor-reviewed;
+synthesis in the RFC.
 
 ## Re-baseline
 
 - Branch == `origin/main` @ `2256a67bf` (2026-08-11). No carried-in plan; the launch brief is the
   owner's intent statement, verified against the repos below.
-- Legacy subject: `/home/codex/repos/netscript-start-ref` @ `6ba9ba0` (= `origin/master`,
-  refreshed read-only at run start).
+- Legacy subject: `/home/codex/repos/netscript-start-ref` @ `6ba9ba0` (= `origin/master`, refreshed
+  read-only at run start).
 - Interacting run: `/home/codex/repos/ns-1443-plugin-ai-orchestrator` (PR #1444, S1–S10 landed,
   child-process manifest loader uncommitted at inspection time).
 
@@ -19,8 +20,8 @@ synthesis + verification layer. Status: **complete** — G1 + G2 landed and supe
 `packages/runtime-config/src/application/loader.ts`: env-resolved dir
 (`NETSCRIPT_RUNTIME_CONFIG_DIR`, fallback `dirname(NETSCRIPT_TASKS_DIR)`, fallback `cwd()/runtime`);
 `current` pointer file supports **JSON pointer object** or **legacy plain-text version** (mapped to
-`<topic>/v<version>.json` for topics jobs/sagas/tasks/triggers/features); malformed/missing
-anything → silent empty defaults. `watcher.ts`: `Deno.watchFs` recursive + 300ms debounce →
+`<topic>/v<version>.json` for topics jobs/sagas/tasks/triggers/features); malformed/missing anything
+→ silent empty defaults. `watcher.ts`: `Deno.watchFs` recursive + 300ms debounce →
 `loadRuntimeConfig()` → consumer callback; errors swallowed. **No write path, no schema validation,
 no history, no audit, no multi-instance story in the package itself.**
 
@@ -44,9 +45,9 @@ importer** seam for runtime job handlers. G2 to enumerate full adapter set + per
 
 Owner D-10 decision locks the split: `plugin.ts` manifest-only control plane (child-process load
 under consumer deno.json, `clearEnv`, 30s timeout, JSON manifests over stdout marker);
-`mod.ts`/`runtime.ts` and `workers|triggers/runtime/**` preserved. Constraints C1–C8 issued to
-#1444 (PR comment 5248826402). The RFC builds on: manifests-as-data, additive manifest schema
-extension, `generate runtime-schemas` control-plane-only.
+`mod.ts`/`runtime.ts` and `workers|triggers/runtime/**` preserved. Constraints C1–C8 issued to #1444
+(PR comment 5248826402). The RFC builds on: manifests-as-data, additive manifest schema extension,
+`generate runtime-schemas` control-plane-only.
 
 ### F5 — Frontend Contribution Layer dependency (owner directive D-3)
 
@@ -54,8 +55,8 @@ RFC PR #890 **merged** 2026-08-03 (design record `.llm/runs/plan-frontend-contri
 plugins ship UI via `defineFrontend()` contributions — data contracts in
 `@netscript/plugin-frontend-core`, generated transactional registry, `App.mountApp` sub-apps,
 deny-by-default procedure gateway (#934). Implementation epic **#922 open** (milestone 0.0.9), all
-children #923–#934 verified OPEN on 2026-08-11. Consequence: the cockpit is specified in this RFC
-as a **downstream consumer** of that layer; minimum dependency cut evaluated in plan.md; no cockpit
+children #923–#934 verified OPEN on 2026-08-11. Consequence: the cockpit is specified in this RFC as
+a **downstream consumer** of that layer; minimum dependency cut evaluated in plan.md; no cockpit
 frontend slice before the required #922 foundation lands; no parallel dashboard seam. #933 (workers
 dogfood zone panel/console route/island) is the natural adjacency for the cockpit's first surface.
 
@@ -64,12 +65,13 @@ dogfood zone panel/console route/island) is the natural adjacency for the cockpi
 - `evidence/legacy-capability-map.md` — G1, Codex Sol medium (thread in `codex-thread-ids.md`).
 - `evidence/current-state-matrix.md` — G2, Codex Sol medium.
 - `evidence/competitive-architecture-study.md` — S6, supervisor-authored on primary sources (D-8).
-- `evidence/sandbox-isolation-survey.md` — isolation-scoped external survey (committed S5 fix cycle).
+- `evidence/sandbox-isolation-survey.md` — isolation-scoped external survey (committed S5 fix
+  cycle).
 
 ## Open questions the plan must close
 
-- OQ1: what actually consumes `loadRuntimeConfig`/`watchRuntimeConfig` in scaffolded apps and
-  plugin runtime barrels today (is the hot path live end-to-end on a deployed stack)?
+- OQ1: what actually consumes `loadRuntimeConfig`/`watchRuntimeConfig` in scaffolded apps and plugin
+  runtime barrels today (is the hot path live end-to-end on a deployed stack)?
 - OQ2: `RuntimeConfigStorePort` adapter reality (fs-only? DB? object store?) and its atomicity.
 - OQ3: does `generate runtime-schemas` regenerate `schema.json` for the versioned trees, and does
   anything validate version documents against it at publish or load time?
@@ -85,8 +87,8 @@ dogfood zone panel/console route/island) is the natural adjacency for the cockpi
   update; P1 race 20/20; no revision/audit fields on the port).
 - OQ3: real generator, but baseline snapshots collapse contributions to `schemas: []` → 0 files
   written (P3); no admission validation anywhere; sample `$schema` refs dangle.
-- OQ4: triggers processor is the strongest engine (tested idempotency/retry/DLQ/defer/enabled);
-  gap is definitions-static + non-uniform history, not processing.
+- OQ4: triggers processor is the strongest engine (tested idempotency/retry/DLQ/defer/enabled); gap
+  is definitions-static + non-uniform history, not processing.
 - OQ5: legacy cockpit — workers list/detail/run wired, no create; triggers pages dead vs service.
-- OQ6: nothing propagates; replicas would each need an unregistered watcher; cron/file-watch
-  would duplicate per replica.
+- OQ6: nothing propagates; replicas would each need an unregistered watcher; cron/file-watch would
+  duplicate per replica.

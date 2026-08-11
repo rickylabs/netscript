@@ -1,6 +1,6 @@
 # Context Pack — docs-rfc-runtime-versioned-automation--supervisor
 
-Resume here. State as of 2026-08-11 (post PLAN-EVAL cycle 1 fix).
+Resume here. State as of 2026-08-11 (post PLAN-EVAL cycle 5 + owner directive D-9).
 
 - **What this run is**: research + architecture RFC for runtime-versioned workers/tasks/triggers
   (operator capability on a running stack). No implementation. Draft PR #1446 vs main.
@@ -16,7 +16,8 @@ Resume here. State as of 2026-08-11 (post PLAN-EVAL cycle 1 fix).
   cron); immutable revisions + transactional activation-set epochs + fleet admission; three-package
   ownership (automation-core contracts / automation-runtime behavior+adapters / thin connector
   plugin) — LOCKED; T1 honesty contract; TM1–TM9; cleanup inventory; slices A0–A8 with files+gates;
-  E2E model; P-1..P-4 staged RFCs.
+  E2E model incl. outage test 8; P-1..P-6 staged items (P-6 = DevTools RFC per D-9; §8.2 = two
+  decided operator surfaces).
 - **Eval state**: cycles 1–2 FAIL_PLAN (cycle-2 partly caused by silently no-opped edits, D-7) →
   protocol escalation; **owner authorized cycle 3** (with the D-8 study added first); cycle 3
   FAIL_PLAN with 6 narrowed findings (5 prior findings PASS) → all six fixed: §5.3-8 outage

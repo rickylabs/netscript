@@ -100,11 +100,11 @@ live inside the RFC and are re-checkpointed by their own future runs).
    classes (adopt / non-goal / differentiator).
 3. **Ports** — none created (docs run). The RFC _specifies_ ports (store/boundary/reload/feed) for
    future implementation runs.
-4. **Constants** — slice IDs S1–S5; evidence file names fixed in briefs; RFC section anchors cited
+4. **Constants** — slice IDs S1–S6; evidence file names fixed in briefs; RFC section anchors cited
    by plan-eval.
 5. **Commit slices** — S1–S5 as in plan.md §Commit slices, each with files + proving gate.
 6. **Deferred scope** — implementation of the selected architecture (owner-gated); issue filing
-   (owner-gated); §11 P-1..P-5 staged items; §15 classified deferrals.
+   (owner-gated); §11 P-1..P-6 staged items; §15 classified deferrals.
 7. **Contributor path** — a reader starts at the RFC abstract → §4 overview → the section for their
    concern; an implementer starts at §12's slice table, which names files + gates per slice;
    evidence traceability runs RFC claim → evidence file § → path:line.
@@ -212,3 +212,23 @@ live inside the RFC and are re-checkpointed by their own future runs).
   5. Artifacts reconciled (plan profile archetypes = selected future shape; context-pack,
      phase-registry, this worklog) and `deno fmt` actually run over the run-dir files —
      `deno fmt --check` now green on the previously failing five; `docs:links` green.
+
+## 2026-08-11 PLAN-EVAL cycle 5 + owner directive D-9 — combined fix slice
+
+- Cycle 5 at `cd3fd1e58`: FAIL_PLAN with only 2 findings (F2 cleanup + F3 gates + F4 study all
+  PASS). Fixed here:
+  1. §5.3 steps 7/8 unified into one transition model: local validation (hash + schema-major) is the
+     only precondition to SERVING; control-plane currentness gates only CONVERGENCE; three cases (a)
+     lease-expiry-while-serving keeps executing and leaves the admission quorum, (b)
+     restart-with-persisted-last-good locally validates and serves without control-plane contact,
+     (c) no locally valid snapshot = idle-and-loud. §13 test 8 exercises all three.
+  2. Review-surface staleness: context-pack opener/state, Design constants S1–S6, PR body (updated
+     below) brought current.
+- Owner directive **D-9** applied (drift log): §8.2 rewritten as **two decided operator surfaces** —
+  (1) production/admin automation console in the userland app, the only surface #890/#922 are
+  sufficient for (A7 narrowed accordingly: no diagnostics/journey views); (2) developer DevTools
+  behind new staged **P-6 DevTools RFC** re-evaluating epic #400 (+ #685/#780/#506 as evidence, not
+  ratified architecture), consuming this RFC's management/ history/convergence/OTel contracts.
+  Five-surface taxonomy recorded; this RFC designs none of the general frontend mechanisms. plan.md
+  D-3 constraint refined; P ranges P-1..P-6.
+- Gates: `docs:links` green; `deno fmt --check` green on RFC + run-dir files.

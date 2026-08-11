@@ -56,10 +56,13 @@ the owner. PR stays draft until ratification.
 - **No backward-compatibility/migration layer** (D-5): clean break authorized; transition plan is a
   codebase replacement/cleanup plan with an explicit obsolete-surface inventory; compatibility only
   with stable doctrine and active framework seams.
-- Cockpit = downstream consumer of Frontend Contribution Layer: RFC PR #890 (merged), epic #922
-  (open). Minimum dependency cut to evaluate: #923–#927 (Wave-0 proofs), #928–#932 (contracts /
-  pointer / registry / host runtime / scaffold wiring), #934 (procedure gateway); #933 workers
-  dogfood as adjacency. No parallel Fresh/dashboard seam. (Drift D-3.)
+- Frontend sequencing (D-3, refined by D-9): #890/#922 (minimum cut #923–#932 + #934; #933
+  adjacency) are sufficient **only** for the production/admin userland automation console (RFC §8.2
+  surface 1). Developer DevTools (diagnostics, live definitions/state, execution journeys, dev
+  management affordances) are a distinct host/contribution surface behind the staged P-6 DevTools
+  RFC, which re-evaluates epic #400 (+ #685/#780/#506 as evidence, not ratified architecture) and
+  consumes this RFC's management/observability contracts. Two hosts decided, not one ambiguous
+  cockpit. No parallel Fresh/dashboard seam; backend slices stay frontend-independent.
 - Draft PR only; no epic/issue filing; no ready-for-review until owner ratifies.
 - #1444 keeps its D-10 boundary; this RFC does not ask it for redesign work.
 
