@@ -382,3 +382,28 @@ documentation.
   advisory. The **Codex PLAN-EVAL remains the sole verdict of record** — unchanged by either.
 - **Evidence:** `design/ux-evidence/{qwen,kimi}-prompt.md`; model ids resolved from
   `.llm/tools/agentic/config/models.ts:52,81`, not hardcoded.
+
+## 2026-08-11 — D-17: I truncated my own evidence capture with `tail -40`
+
+- **What:** Both stage-D2 launches were piped through `| tail -40`. Kimi K3 completed and returned a
+  full review — **1 critical, 5 major, 4 minor** — but only the last 40 lines survived. The captured
+  file begins mid-finding, and five of the ten findings are simply gone.
+- **Source:** the launch commands; `design/ux-evidence/kimi-findings-PARTIAL-tail.md` (8,763 bytes,
+  5 severity headers against a verdict line claiming 10 findings).
+- **Expected:** the complete findings text persisted under the run, per the owner's instruction to
+  persist prompt/output/receipt.
+- **Actual:** a truncated tail. No OpenCode session store exists to recover from
+  (`~/.opencode` holds only the install; nothing under `~/.local/share/opencode`).
+- **Severity:** significant — this is **evidence loss on the deliverable the owner specifically
+  refused to waive**, caused by the supervisor, not by any lane.
+- **Root cause:** `tail` was habit from reading noisy launcher output. It is the wrong tool the
+  moment the command's output *is* the artifact. The stage-B corpus avoided this only because those
+  agents wrote their own files; here the reviewer's reply **is** the deliverable, so stdout had to be
+  captured whole.
+- **Action:** fix — both passes re-run with output redirected to
+  `design/ux-evidence/{kimi,qwen}-findings.md` in full, no pipe. The truncated tail is **kept** as
+  `kimi-findings-PARTIAL-tail.md` rather than deleted: it is evidence that the first run happened and
+  what it concluded, and deleting it would hide the mistake.
+- **Rule for the rest of this run and the next:** when a lane's **stdout is the artifact**, redirect
+  it to a file; never pipe it through `head`/`tail`. Reserve pipes for launcher chatter whose content
+  does not matter.
