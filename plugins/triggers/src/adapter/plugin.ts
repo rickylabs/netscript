@@ -3,7 +3,13 @@
  * @module
  */
 
-import type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/adapter';
+import {
+  type InstallStarterResource,
+  type ItemScaffolder,
+  type NetScriptPlugin,
+  type ScaffoldArtifact,
+  textArtifact,
+} from '@netscript/plugin/adapter';
 import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import {
   barrelScaffolder,
@@ -20,8 +26,21 @@ import {
   webhookResource,
 } from './resources/mod.ts';
 
+const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never>>> = {
+  name: 'control-plane-module',
+  emit(): readonly ScaffoldArtifact[] {
+    return [
+      textArtifact(
+        'triggers/plugin.ts',
+        `/** Generated triggers control-plane module. */\n\nexport { triggersPlugin } from '@netscript/plugin-triggers';\n`,
+      ),
+    ];
+  },
+};
+
 /** Starter resources emitted by the triggers install command. */
 export const triggersStarterResources: readonly InstallStarterResource[] = [
+  { scaffolder: controlPlaneModuleScaffolder, input: {} },
   {
     scaffolder: webhookResource.scaffolder,
     input: DEFAULT_WEBHOOK_INPUT,

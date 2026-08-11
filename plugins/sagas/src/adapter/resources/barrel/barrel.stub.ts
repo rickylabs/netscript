@@ -11,7 +11,6 @@ export const barrelStub: StubSource<
 > = defineStub({
   source: `export { %%SAGA_EXPORT%% } from './%%SAGA_FILE%%.ts';
 export { %%CONFIG_EXPORT%% } from './%%CONFIG_FILE%%.ts';
-export { sagasPlugin } from '@netscript/plugin-sagas';
 `,
   tokens: ['CONFIG_EXPORT', 'CONFIG_FILE', 'SAGA_EXPORT', 'SAGA_FILE'] as const,
 });

@@ -26,6 +26,8 @@ export interface ProcessPort {
     options?: {
       readonly cwd?: string;
       readonly env?: Readonly<Record<string, string>>;
+      /** Whether the child starts without inheriting the parent environment. */
+      readonly clearEnv?: boolean;
       /** Maximum runtime before the adapter kills and awaits the child. */
       readonly timeoutMs?: number;
     },

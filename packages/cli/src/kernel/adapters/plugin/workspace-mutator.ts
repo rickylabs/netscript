@@ -498,6 +498,7 @@ export class PluginWorkspaceMutator {
     projectRoot: string,
     pluginName: string,
     pluginDir?: string,
+    moduleFile = 'mod.ts',
   ): Promise<boolean> {
     const configPath = join(projectRoot, 'netscript.config.ts');
     if (!await this.fs.exists(configPath)) {
@@ -507,7 +508,7 @@ export class PluginWorkspaceMutator {
     const relativePluginDir = pluginDir
       ? normalizeWorkspaceRelativePath(projectRoot, pluginDir)
       : join(SCAFFOLD_DIRS.PLUGINS, pluginName);
-    const relativeModulePath = normalizePath(join(relativePluginDir, 'mod.ts'));
+    const relativeModulePath = normalizePath(join(relativePluginDir, moduleFile));
     const modulePath = join(projectRoot, relativeModulePath);
     if (!await this.fs.exists(modulePath)) {
       throw new ScaffoldValidationError(
@@ -542,6 +543,8 @@ export class PluginWorkspaceMutator {
 
     const source = await this.fs.readFile(configPath);
     const updated = removePluginSpecifiers(source, [
+      `./${normalizePath(join(SCAFFOLD_DIRS.PLUGINS, pluginName, 'plugin.ts'))}`,
+      `./${normalizePath(join(pluginName, 'plugin.ts'))}`,
       `./${normalizePath(join(SCAFFOLD_DIRS.PLUGINS, pluginName, 'mod.ts'))}`,
       `./${normalizePath(join(pluginName, 'mod.ts'))}`,
     ]);

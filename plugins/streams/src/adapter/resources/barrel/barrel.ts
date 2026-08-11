@@ -34,12 +34,7 @@ export const EMPTY_BARREL_INPUT: EmptyBarrelInput = {};
 export const emptyBarrelScaffolder: ItemScaffolder<EmptyBarrelInput> = {
   name: 'empty-barrel',
   emit(): readonly ScaffoldArtifact[] {
-    return [
-      textArtifact(
-        'streams/mod.ts',
-        "/** @module Generated streams. */\n\nexport { streamsPlugin } from '@netscript/plugin-streams';\n",
-      ),
-    ];
+    return [textArtifact('streams/mod.ts', '/** @module Generated streams. */\n\nexport {};\n')];
   },
 };
 

@@ -38,12 +38,7 @@ export const EMPTY_BARREL_INPUT: EmptyBarrelInput = {};
 export const emptyBarrelScaffolder: ItemScaffolder<EmptyBarrelInput> = {
   name: 'empty-barrel',
   emit(): readonly ScaffoldArtifact[] {
-    return [
-      textArtifact(
-        'workers/mod.ts',
-        "/** @module Generated workers. */\n\nexport { workersPlugin } from '@netscript/plugin-workers';\n",
-      ),
-    ];
+    return [textArtifact('workers/mod.ts', '/** @module Generated workers. */\n\nexport {};\n')];
   },
 };
 

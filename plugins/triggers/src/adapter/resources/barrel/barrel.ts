@@ -51,12 +51,7 @@ export const EMPTY_BARREL_INPUT: EmptyBarrelInput = {};
 export const emptyBarrelScaffolder: ItemScaffolder<EmptyBarrelInput> = {
   name: 'empty-barrel',
   emit(): readonly ScaffoldArtifact[] {
-    return [
-      textArtifact(
-        'triggers/mod.ts',
-        "/** @module Generated triggers. */\n\nexport { triggersPlugin } from '@netscript/plugin-triggers';\n",
-      ),
-    ];
+    return [textArtifact('triggers/mod.ts', '/** @module Generated triggers. */\n\nexport {};\n')];
   },
 };
 

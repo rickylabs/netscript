@@ -117,6 +117,7 @@ Deno.test('triggers install emits only userland glue under triggers', () => {
   const artifacts = collectInstallArtifacts(triggersAdapterPlugin);
 
   assertEquals(artifacts.map((artifact) => artifact.path), [
+    'triggers/plugin.ts',
     'triggers/generic-inbound-webhook.ts',
     'triggers/daily-maintenance.ts',
     'triggers/incoming-file-watch.ts',

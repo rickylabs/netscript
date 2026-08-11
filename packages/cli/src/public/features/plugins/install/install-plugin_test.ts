@@ -244,7 +244,7 @@ describe('public install plugin flow', () => {
     await writeProjectFiles(fs);
     await fs.writeFile(
       '/workspace/alpha/netscript.config.ts',
-      "export default { plugins: ['./ai/mod.ts'] };\n",
+      "export default { plugins: ['./ai/plugin.ts'] };\n",
     );
     const registry = new PluginKindRegistry([['ai', serviceLessProvider]]);
 
@@ -759,11 +759,12 @@ describe('public install plugin flow', () => {
         [
           ...secondInstall.pluginOwnedScaffold?.createdFiles ?? [],
           ...secondInstall.pluginOwnedScaffold?.modifiedFiles ?? [],
-        ].includes('ai/mod.ts'),
+        ].includes('ai/plugin.ts'),
         false,
       );
       assertEquals(secondConfig, firstConfig);
-      assertStringIncludes(secondConfig, "'./ai/mod.ts'");
+      assertStringIncludes(secondConfig, "'./ai/plugin.ts'");
+      assertEquals(await pathExists(join(projectRoot, 'ai/plugin.ts')), true);
       assertEquals(await pathExists(join(projectRoot, 'ai/mod.ts')), true);
       const config = await loadConfig({ cwd: projectRoot });
       const plugins = await loadRegisteredPlugins(projectRoot, config);

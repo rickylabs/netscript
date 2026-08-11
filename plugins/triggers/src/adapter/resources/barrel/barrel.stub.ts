@@ -17,7 +17,6 @@ export const barrelStub: StubSource<
   source: `export { %%WEBHOOK_EXPORT%% } from './%%WEBHOOK_FILE%%.ts';
 export { %%SCHEDULED_EXPORT%% } from './%%SCHEDULED_FILE%%.ts';
 export { %%FILE_WATCH_EXPORT%% } from './%%FILE_WATCH_FILE%%.ts';
-export { triggersPlugin } from '@netscript/plugin-triggers';
 `,
   tokens: [
     'FILE_WATCH_EXPORT',

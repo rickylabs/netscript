@@ -58,6 +58,7 @@ Deno.test('streams install emits only userland glue under streams', () => {
   const artifacts = collectInstallArtifacts(streamsAdapterPlugin);
 
   assertEquals(artifacts.map((artifact) => artifact.path), [
+    'streams/plugin.ts',
     'streams/notifications-stream.ts',
     'streams/mod.ts',
   ]);

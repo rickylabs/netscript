@@ -13,6 +13,7 @@ export class DenoProcess implements ProcessPort {
     options?: {
       readonly cwd?: string;
       readonly env?: Readonly<Record<string, string>>;
+      readonly clearEnv?: boolean;
       readonly timeoutMs?: number;
     },
   ): Promise<ProcessResult> {
@@ -20,6 +21,7 @@ export class DenoProcess implements ProcessPort {
       args: [...args],
       cwd: options?.cwd,
       env: options?.env,
+      clearEnv: options?.clearEnv,
       stdout: 'piped',
       stderr: 'piped',
     }).spawn();

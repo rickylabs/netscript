@@ -40,6 +40,7 @@ Deno.test('workers install emits only userland glue under workers', () => {
   const artifacts = collectInstallArtifacts(workersAdapterPlugin);
 
   assertEquals(artifacts.map((artifact) => artifact.path), [
+    'workers/plugin.ts',
     'workers/jobs/health-check.ts',
     'workers/tasks/validate-payload.ts',
     'workers/mod.ts',

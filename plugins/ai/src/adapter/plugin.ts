@@ -59,13 +59,25 @@ const namespaceConfigScaffolder: ItemScaffolder<Readonly<Record<string, never>>>
   },
 };
 
-const moduleScaffolder: ItemScaffolder<Readonly<Record<string, never>>> = {
-  name: 'module',
+const applicationModuleScaffolder: ItemScaffolder<Readonly<Record<string, never>>> = {
+  name: 'application-module',
   emit(): readonly ScaffoldArtifact[] {
     return [
       textArtifact(
         'ai/mod.ts',
-        `/** Generated AI plugin entry module. */\n\nexport * from './models.ts';\nexport { aiPlugin } from '@netscript/plugin-ai';\n`,
+        `/** Generated AI application module. */\n\nexport * from './models.ts';\n`,
+      ),
+    ];
+  },
+};
+
+const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never>>> = {
+  name: 'control-plane-module',
+  emit(): readonly ScaffoldArtifact[] {
+    return [
+      textArtifact(
+        'ai/plugin.ts',
+        `/** Generated AI control-plane module. */\n\nexport { aiPlugin } from '@netscript/plugin-ai';\n`,
       ),
     ];
   },
@@ -79,7 +91,8 @@ const moduleScaffolder: ItemScaffolder<Readonly<Record<string, never>>> = {
  */
 export const aiStarterResources: readonly InstallStarterResource[] = [
   { scaffolder: namespaceConfigScaffolder, input: {} },
-  { scaffolder: moduleScaffolder, input: {} },
+  { scaffolder: applicationModuleScaffolder, input: {} },
+  { scaffolder: controlPlaneModuleScaffolder, input: {} },
   // Structural: model configuration is required independently of sample tools and agents.
   { scaffolder: modelsScaffolder, input: DEFAULT_MODELS_INPUT },
   {

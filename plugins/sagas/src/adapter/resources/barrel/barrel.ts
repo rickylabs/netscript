@@ -34,12 +34,7 @@ export const EMPTY_BARREL_INPUT: EmptyBarrelInput = {};
 export const emptyBarrelScaffolder: ItemScaffolder<EmptyBarrelInput> = {
   name: 'empty-barrel',
   emit(): readonly ScaffoldArtifact[] {
-    return [
-      textArtifact(
-        'sagas/mod.ts',
-        "/** @module Generated sagas. */\n\nexport { sagasPlugin } from '@netscript/plugin-sagas';\n",
-      ),
-    ];
+    return [textArtifact('sagas/mod.ts', '/** @module Generated sagas. */\n\nexport {};\n')];
   },
 };
 

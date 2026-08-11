@@ -217,6 +217,7 @@ export async function installPlugin(
     plan.projectRoot,
     plan.pluginName,
     pluginConfigDirectory,
+    'plugin.ts',
   );
   await dependencies.workspaceMutator.ensureRootImportsForPluginKind(plan.projectRoot, plan.kind);
   const provisionedCache = plan.provider.defaultRequiresKv
@@ -592,8 +593,8 @@ export async function resolvePluginConfigDirectory(
   plan: PluginInstallPlan,
   fs: FileSystemPort,
 ): Promise<string> {
-  const generatedMod = join(plan.projectRoot, plan.pluginName, 'mod.ts');
-  const pluginDir = await fs.exists(generatedMod)
+  const generatedControlPlaneModule = join(plan.projectRoot, plan.pluginName, 'plugin.ts');
+  const pluginDir = await fs.exists(generatedControlPlaneModule)
     ? plan.pluginName
     : join(SCAFFOLD_DIRS.PLUGINS, plan.pluginName);
   return join(plan.projectRoot, pluginDir);

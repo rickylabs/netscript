@@ -152,6 +152,7 @@ export async function installLocalPlugin(
     pluginOwned === undefined
       ? rendered.plugin.pluginDir
       : await resolvePluginConfigDirectory(plan, dependencies.fs),
+    pluginOwned === undefined ? 'mod.ts' : 'plugin.ts',
   );
   await dependencies.workspaceMutator.ensureRootImportsForPluginKind(plan.projectRoot, plan.kind);
   const provisionedCache = plan.provider.defaultRequiresKv

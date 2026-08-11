@@ -87,12 +87,12 @@ Deno.test('loadRegisteredPlugins resolves the generated AI configured module', a
     `export default {
   name: 'fixture-app',
   databases: { config: [] },
-  plugins: ['./ai/mod.ts'],
+  plugins: ['./ai/plugin.ts'],
 };
 `,
   );
 
-  const module = await import(toFileUrl(resolve(projectRoot, 'ai/mod.ts')).href);
+  const module = await import(toFileUrl(resolve(projectRoot, 'ai/plugin.ts')).href);
   const manifests = Object.values(module).filter((value: unknown) =>
     value !== null && typeof value === 'object' &&
     typeof Reflect.get(value, 'name') === 'string' &&

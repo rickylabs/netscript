@@ -39,6 +39,7 @@ interface FirstPartyPluginCase {
   readonly packageName: string;
   readonly manifestExport: string;
   readonly packageDir: string;
+  readonly applicationExports: readonly string[];
 }
 
 const FIRST_PARTY_PLUGIN_CASES: readonly FirstPartyPluginCase[] = [
@@ -49,6 +50,7 @@ const FIRST_PARTY_PLUGIN_CASES: readonly FirstPartyPluginCase[] = [
     packageName: '@netscript/plugin-ai',
     manifestExport: 'aiPlugin',
     packageDir: 'ai',
+    applicationExports: ['DEFAULT_CHAT_MODEL'],
   },
   {
     adapter: authAdapterPlugin,
@@ -57,6 +59,7 @@ const FIRST_PARTY_PLUGIN_CASES: readonly FirstPartyPluginCase[] = [
     packageName: '@netscript/plugin-auth',
     manifestExport: 'authPlugin',
     packageDir: 'auth',
+    applicationExports: ['AUTH_SESSION_STATES'],
   },
   {
     adapter: sagasAdapterPlugin,
@@ -65,6 +68,7 @@ const FIRST_PARTY_PLUGIN_CASES: readonly FirstPartyPluginCase[] = [
     packageName: '@netscript/plugin-sagas',
     manifestExport: 'sagasPlugin',
     packageDir: 'sagas',
+    applicationExports: ['UserRegistrationSaga'],
   },
   {
     adapter: streamsAdapterPlugin,
@@ -73,6 +77,7 @@ const FIRST_PARTY_PLUGIN_CASES: readonly FirstPartyPluginCase[] = [
     packageName: '@netscript/plugin-streams',
     manifestExport: 'streamsPlugin',
     packageDir: 'streams',
+    applicationExports: ['notificationsStream'],
   },
   {
     adapter: triggersAdapterPlugin,
@@ -81,6 +86,7 @@ const FIRST_PARTY_PLUGIN_CASES: readonly FirstPartyPluginCase[] = [
     packageName: '@netscript/plugin-triggers',
     manifestExport: 'triggersPlugin',
     packageDir: 'triggers',
+    applicationExports: ['inboundGenericTrigger'],
   },
   {
     adapter: workersAdapterPlugin,
@@ -89,6 +95,7 @@ const FIRST_PARTY_PLUGIN_CASES: readonly FirstPartyPluginCase[] = [
     packageName: '@netscript/plugin-workers',
     manifestExport: 'workersPlugin',
     packageDir: 'workers',
+    applicationExports: ['healthCheckJob'],
   },
 ];
 
@@ -701,17 +708,26 @@ Deno.test('PluginWorkspaceMutator appends project-local plugin config specs', as
       '',
     ].join('\n'),
   );
-  await fs.writeFile('/project/plugins/workers/mod.ts', 'export {};\n');
-  await fs.writeFile('/project/plugins/sagas/mod.ts', 'export {};\n');
+  await fs.writeFile('/project/plugins/workers/plugin.ts', 'export {};\n');
+  await fs.writeFile('/project/plugins/sagas/plugin.ts', 'export {};\n');
 
   const mutator = new PluginWorkspaceMutator(fs);
-  assertEquals(await mutator.ensureNetScriptConfigPlugin('/project', 'workers'), true);
-  assertEquals(await mutator.ensureNetScriptConfigPlugin('/project', 'workers'), false);
-  assertEquals(await mutator.ensureNetScriptConfigPlugin('/project', 'sagas'), true);
+  assertEquals(
+    await mutator.ensureNetScriptConfigPlugin('/project', 'workers', undefined, 'plugin.ts'),
+    true,
+  );
+  assertEquals(
+    await mutator.ensureNetScriptConfigPlugin('/project', 'workers', undefined, 'plugin.ts'),
+    false,
+  );
+  assertEquals(
+    await mutator.ensureNetScriptConfigPlugin('/project', 'sagas', undefined, 'plugin.ts'),
+    true,
+  );
 
   const config = await fs.readFile('/project/netscript.config.ts');
-  assertEquals(config.includes("'./plugins/workers/mod.ts',"), true);
-  assertEquals(config.includes("'./plugins/sagas/mod.ts',"), true);
+  assertEquals(config.includes("'./plugins/workers/plugin.ts',"), true);
+  assertEquals(config.includes("'./plugins/sagas/plugin.ts',"), true);
 });
 
 Deno.test('PluginWorkspaceMutator registers generated plugin glue entrypoints', async () => {
@@ -731,20 +747,30 @@ Deno.test('PluginWorkspaceMutator registers generated plugin glue entrypoints', 
       '',
     ].join('\n'),
   );
-  await fs.writeFile('/project/workers/mod.ts', 'export {};\n');
+  await fs.writeFile('/project/workers/plugin.ts', 'export {};\n');
 
   const mutator = new PluginWorkspaceMutator(fs);
   assertEquals(
-    await mutator.ensureNetScriptConfigPlugin('/project', 'workers', '/project/workers'),
+    await mutator.ensureNetScriptConfigPlugin(
+      '/project',
+      'workers',
+      '/project/workers',
+      'plugin.ts',
+    ),
     true,
   );
   assertEquals(
-    await mutator.ensureNetScriptConfigPlugin('/project', 'workers', '/project/workers'),
+    await mutator.ensureNetScriptConfigPlugin(
+      '/project',
+      'workers',
+      '/project/workers',
+      'plugin.ts',
+    ),
     false,
   );
 
   const config = await fs.readFile('/project/netscript.config.ts');
-  assertEquals(config.includes("'./workers/mod.ts'"), true);
+  assertEquals(config.includes("'./workers/plugin.ts'"), true);
 });
 
 Deno.test('PluginWorkspaceMutator rejects a missing configured plugin module', async () => {
@@ -762,9 +788,15 @@ Deno.test('PluginWorkspaceMutator rejects a missing configured plugin module', a
   await fs.writeFile(configPath, original);
 
   await assertRejects(
-    () => new PluginWorkspaceMutator(fs).ensureNetScriptConfigPlugin('/project', 'missing'),
+    () =>
+      new PluginWorkspaceMutator(fs).ensureNetScriptConfigPlugin(
+        '/project',
+        'missing',
+        undefined,
+        'plugin.ts',
+      ),
     ScaffoldValidationError,
-    'configured module was not found at plugins/missing/mod.ts',
+    'configured module was not found at plugins/missing/plugin.ts',
   );
   assertEquals(await fs.readFile(configPath), original);
 });
@@ -816,7 +848,7 @@ Deno.test('PluginWorkspaceMutator removes generated root-level plugin glue decla
   );
 });
 
-Deno.test('first-party configured modules preserve app exports and resolve one package manifest', async () => {
+Deno.test('first-party control-plane modules are import-safe and preserve application barrels', async () => {
   const projectRoot = await Deno.makeTempDir({ prefix: 'first-party-contract-' });
   const configuredModules: string[] = [];
   await Deno.writeTextFile(
@@ -833,7 +865,7 @@ Deno.test('first-party configured modules preserve app exports and resolve one p
 
   for (const plugin of FIRST_PARTY_PLUGIN_CASES) {
     const artifacts = collectInstallArtifacts(plugin.adapter);
-    const modulePath = `${plugin.namespace}/mod.ts`;
+    const modulePath = `${plugin.namespace}/plugin.ts`;
     configuredModules.push(`./${modulePath}`);
 
     for (const artifact of artifacts) {
@@ -851,15 +883,21 @@ Deno.test('first-party configured modules preserve app exports and resolve one p
       ),
       `${modulePath} must re-export ${plugin.manifestExport} from ${plugin.packageName}`,
     );
+    assertEquals(
+      emittedModuleSpecifiers(moduleSource),
+      [plugin.packageName],
+      `${modulePath} must import only its package-owned manifest`,
+    );
+    assertEquals(
+      moduleSource.includes('./mod.ts') || moduleSource.includes('./runtime.ts'),
+      false,
+      `${modulePath} must not load application or runtime modules`,
+    );
 
     const moduleUrl = toFileUrl(resolve(projectRoot, modulePath)).href;
-    const inspection = await new Deno.Command(Deno.execPath(), {
-      args: [
-        'eval',
-        '--minimum-dependency-age=0',
-        '--config',
-        resolve(projectRoot, 'deno.json'),
-        `const imported = await import(${JSON.stringify(moduleUrl)});
+    const controlPlaneProbeSource = `const permission = await Deno.permissions.query({ name: 'env' });
+if (permission.state !== 'denied') throw new Error('control-plane env access is not denied');
+const imported = await import(${JSON.stringify(moduleUrl)});
 const manifests = Object.values(imported).filter((value) =>
   value !== null && typeof value === 'object' &&
   typeof Reflect.get(value, 'name') === 'string' &&
@@ -871,6 +909,38 @@ if (!Reflect.has(imported, ${JSON.stringify(plugin.manifestExport)})) {
 }
 if (manifests.length !== 1) {
   throw new Error(\`expected one manifest-shaped export, got \${manifests.length}\`);
+}`;
+    const inspection = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        '--no-check',
+        '--allow-read',
+        '--allow-net',
+        '--deny-env',
+        '--minimum-dependency-age=0',
+        '--config',
+        resolve(projectRoot, 'deno.json'),
+        `data:application/typescript,${encodeURIComponent(controlPlaneProbeSource)}`,
+      ],
+      clearEnv: true,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assert(
+      inspection.success,
+      `${modulePath} additivity check failed: ${new TextDecoder().decode(inspection.stderr)}`,
+    );
+
+    const applicationModuleUrl = toFileUrl(resolve(projectRoot, plugin.namespace, 'mod.ts')).href;
+    const applicationInspection = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'eval',
+        '--minimum-dependency-age=0',
+        '--config',
+        resolve(projectRoot, 'deno.json'),
+        `const imported = await import(${JSON.stringify(applicationModuleUrl)});
+for (const name of ${JSON.stringify(plugin.applicationExports)}) {
+  if (!Reflect.has(imported, name)) throw new Error(\`missing application export \${name}\`);
 }`,
       ],
       env: { DURABLE_STREAMS_URL: 'http://127.0.0.1:8090' },
@@ -878,8 +948,10 @@ if (manifests.length !== 1) {
       stderr: 'piped',
     }).output();
     assert(
-      inspection.success,
-      `${modulePath} additivity check failed: ${new TextDecoder().decode(inspection.stderr)}`,
+      applicationInspection.success,
+      `${plugin.namespace}/mod.ts application export check failed: ${
+        new TextDecoder().decode(applicationInspection.stderr)
+      }`,
     );
 
     const packageConfig: unknown = JSON.parse(
@@ -896,14 +968,6 @@ if (manifests.length !== 1) {
       include.includes('src/**/*.ts'),
       `${plugin.packageName} publish.include must ship its scaffold emitters`,
     );
-  }
-
-  for (const plugin of FIRST_PARTY_PLUGIN_CASES) {
-    for (const artifact of collectInstallArtifacts(plugin.adapter, false)) {
-      const outputPath = resolve(projectRoot, artifact.path);
-      await Deno.mkdir(dirname(outputPath), { recursive: true });
-      await Deno.writeTextFile(outputPath, artifactText(artifact));
-    }
   }
 
   await Deno.writeTextFile(

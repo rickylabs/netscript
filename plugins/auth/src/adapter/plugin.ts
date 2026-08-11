@@ -3,12 +3,31 @@
  * @module
  */
 
-import type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/adapter';
+import {
+  type InstallStarterResource,
+  type ItemScaffolder,
+  type NetScriptPlugin,
+  type ScaffoldArtifact,
+  textArtifact,
+} from '@netscript/plugin/adapter';
 import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import { authBarrelScaffolder, DEFAULT_AUTH_BARREL_INPUT } from './resources/mod.ts';
 
+const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never>>> = {
+  name: 'control-plane-module',
+  emit(): readonly ScaffoldArtifact[] {
+    return [
+      textArtifact(
+        'auth/plugin.ts',
+        `/** Generated auth control-plane module. */\n\nexport { authPlugin } from '@netscript/plugin-auth';\n`,
+      ),
+    ];
+  },
+};
+
 /** Starter resources emitted by the auth install command. */
 export const authStarterResources: readonly InstallStarterResource[] = [
+  { scaffolder: controlPlaneModuleScaffolder, input: {} },
   { scaffolder: authBarrelScaffolder, input: DEFAULT_AUTH_BARREL_INPUT },
 ];
 

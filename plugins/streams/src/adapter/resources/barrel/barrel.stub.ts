@@ -20,7 +20,6 @@ export const barrelStub: StubSource<'PRODUCER_EXPORT' | 'SCHEMA_EXPORT' | 'STREA
  */
 
 export { %%PRODUCER_EXPORT%%, %%SCHEMA_EXPORT%% } from './%%STREAM_FILE%%.ts';
-export { streamsPlugin } from '@netscript/plugin-streams';
 `,
     tokens: ['PRODUCER_EXPORT', 'SCHEMA_EXPORT', 'STREAM_FILE'] as const,
   });
