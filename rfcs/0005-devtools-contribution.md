@@ -1,18 +1,18 @@
 ---
-rfc: 0000            # assigned by a maintainer at acceptance; kept 0000 while drafting
+rfc: 0005
 title: NetScript DevTools contribution architecture
-status: Draft
+status: Accepted
 authors: ["@rickylabs"]
 created: 2026-08-11
-tracking-issue: pending — opened with the ratified board filing
+tracking-issue: https://github.com/rickylabs/netscript/issues/1465
 target-milestone: 0.0.6
 ---
 
 # NetScript DevTools contribution architecture
 
 > **Process note.** This RFC follows the repository's canonical process
-> ([`rfcs/README.md`](./README.md)): it lives at `rfcs/0000-<slug>.md` and keeps `0000` until a
-> maintainer assigns a number **at acceptance**. An earlier draft of this run placed it at
+> ([`rfcs/README.md`](./README.md)): it was drafted at `rfcs/0000-<slug>.md` and assigned RFC 0005
+> **at acceptance**. An earlier draft of this run placed it at
 > `rfcs/rfc-0002-…` — the convention introduced by unmerged PR #1446 — and
 > self-assigned a number. Both were corrected by owner decision (fork **F-2**; drift **D-20**).
 >
