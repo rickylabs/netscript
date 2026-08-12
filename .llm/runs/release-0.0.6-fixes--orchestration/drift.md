@@ -16,8 +16,45 @@ is not available.
 Claude/OpenCode OpenRouter session with the NetScript toolchain, in a session separate from the
 generator. This is a documented fallback, not an unplanned deviation.
 
-**Status:** no escalation has been needed yet. If #1524 lands mid-run, the transport becomes
-available and that change is recorded here rather than assumed.
+**RESOLVED mid-run, 2026-08-12.** #1524 passed and landed as `7837ef470 feat(agentic): automate
+formal evaluator phases`, which adds `.github/workflows/openhands-phase-eval.yml`. Owner policy
+issued the same day: **never manually dispatch OpenHands for formal PLAN/IMPL eval.** The
+label-driven mechanism is now the only route —
+
+- **PLAN-EVAL** — triggered exactly once by the `openhands` + `status:plan-eval` label pair (either
+  label may complete it). Rerun only by moving away from `status:plan-eval` and re-adding it.
+- **IMPL-EVAL** — initial run triggers automatically on **draft → ready**, unless the PR carries
+  `impl-eval:skip`. Rerun only by moving away from `status:impl-eval` and re-adding it.
+- `eval:model:minimax|deepseek|qwen` is a **one-shot** model override.
+
+**Consequence this lane must record honestly.** All four of this lane's branches were cut from
+`01aa12b67`, which **predates** that workflow:
+
+```
+openhands-phase-eval.yml on origin/main        → YES
+openhands-phase-eval.yml on #1539 (5350d01fc)  → NO — branch predates it
+openhands-phase-eval.yml on baseline 01aa12b67 → NO
+```
+
+So the automatic IMPL-EVAL **never fired on this lane**, which is the real explanation for the
+`agent: SKIPPED` result observed on every PR after draft→ready and for `gh-pr verdict` reporting
+"no OpenHands comment yet". It was not suppressed; the workflow did not exist on those branches.
+
+**Therefore the three landed PRs (#1534, #1535, #1538) were gated by local evaluation plus the
+orchestrator's seven-check pre-merge gate only** — not by the automatic evaluator that current
+policy would give them. Recorded rather than left implied, because a reader comparing this lane
+against the policy would otherwise assume an automatic verdict existed for each.
+
+**Compliance actions taken:** this lane has never manually dispatched OpenHands, and did not do so
+after the policy issued. The cycle-2 local IMPL-EVAL on #1539 was already running when the policy
+arrived; per the owner's instruction it is being allowed to finish and is **not** duplicated by
+cycling `status:impl-eval`. #1539 already carries `status:impl-eval`, so that trigger is spent.
+
+**One artefact to flag for future readers:** merging #1539 moves `status:impl-eval` →
+`status:ready-merge` as part of the close-gate sequence. Under the new policy that is the
+"move away" half of the rerun mechanism. If `status:impl-eval` is ever re-added to a merged PR of
+this lane, it will re-trigger an evaluation — that would be the mechanism firing, not a manual
+dispatch.
 
 ## D-2 — PLAN-EVAL waived for the wave plan and all slices
 
@@ -85,6 +122,34 @@ generated outputs in non-mutating check mode (`gen:publish-assets --check`,
 undeclared path, dirty tracked checkout, or failed reproduction still rejects inheritance. This is
 the explicit handling requested by #1438; the global byte check was not widened to arbitrary
 content.
+
+### IMPL-EVAL correction — agent-docs requires a parent anchor
+
+**Recorded:** 2026-08-12, after PR #1539 IMPL-EVAL `FAIL_FIX` B-1.
+
+The preceding implementation claim was incomplete for `.llm/assets/agent-docs/prose.json.gz`.
+`gen:publish-assets --check` re-read that committed blob and, when its provenance already carried
+the stable version, rewrote the version to itself. Provenance and the published barrel were then
+derived from the same unanchored blob. Therefore a mutually consistent arbitrary prose mutation
+could pass every HEAD-only writer check and inherit canary evidence. The evaluator reproduced that
+unsafe direction with a marker injection, matching provenance hash/byte counts, and a synchronized
+barrel.
+
+The repair selects evaluator option 1: the gzip payload is read as raw bytes at the canary parent
+and stable HEAD, decompressed, and the only accepted current payload is the exact result of applying
+`bump-version.ts::rewriteNetScriptVersion` to the parent's file contents. The existing HEAD writer
+checks still run afterward and remain responsible for provenance and generated consumers. This
+keeps the complete chain anchored to content that actually received the canary pair without
+expanding the slice into a new raw-docs build pipeline.
+
+### Non-blocking evaluator finding B-2 — export-corpus reproduction may be environment-sensitive
+
+The evaluator's clean Deno 2.9.5 environment reported
+`deno task check:mcp-export-corpus` stale because `deno doc` produced different gzip/base64/hash
+bytes. This remains fail-closed: it cannot authorize unverified content. If the real release CI
+cannot reproduce the committing environment byte-for-byte, however, the D-6 inheritance path will
+always reject and #1438 will be operationally inert. Per slice scope this determinism issue is
+recorded only; no corpus-generator change or bypass is attempted here.
 
 ## D-4 — #1417 mutation source is mixed; preferred isolation remains viable
 

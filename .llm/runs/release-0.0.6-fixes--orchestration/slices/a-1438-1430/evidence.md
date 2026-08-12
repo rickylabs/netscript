@@ -351,3 +351,214 @@ $ gh pr view 1539 --json ...
 {"base":"main","closes":[1430,1438],"head":"fix/1438-release-cut-canary-pair-inheritance","isDraft":true,"labels":["type:fix","status:impl-eval","area:tooling","priority:p1","area:release"],"milestone":"0.0.6","number":1539,"state":"OPEN","statusLabels":["status:impl-eval"],"url":"https://github.com/rickylabs/netscript/pull/1539"}
 exit 0
 ```
+
+## IMPL-EVAL FAIL_FIX repair — B-1 agent-docs parent anchor
+
+The separate Fable evaluator demonstrated that the original D-6 HEAD-only reproduction was
+self-referential for the agent-docs bundle. A regression with the evaluator's exact attack shape was
+added before the repair: a non-version marker was injected into the gzip payload, provenance was
+updated to the injected blob's SHA-256 and byte counts while keeping the stable version unchanged,
+and the published barrel was synchronized to that gzip and provenance. The simulated HEAD writer
+checks explicitly verified the three injected files were mutually consistent.
+
+Before the parent-to-HEAD guard was added, the inheritance call returned the green parent rather
+than rejecting, so the new assertion was red:
+
+```text
+$ deno test --allow-read --allow-write --allow-run .llm/tools/release/github-release_test.ts --filter 'self-consistent non-version agent-docs injection'
+Check .llm/tools/release/github-release_test.ts
+running 1 test from ./.llm/tools/release/github-release_test.ts
+parent canary evidence rejects self-consistent non-version agent-docs injection ... FAILED (10ms)
+
+ERRORS
+
+parent canary evidence rejects self-consistent non-version agent-docs injection => ./.llm/tools/release/github-release_test.ts:247:6
+error: AssertionError: Expected function to reject.
+    throw new AssertionError(
+          ^
+    at assertRejects (https://jsr.io/@std/assert/1.0.19/rejects.ts:118:11)
+    at async file:///home/codex/repos/ns006-f-a-release-tooling/.llm/tools/release/github-release_test.ts:324:3
+
+FAILURES
+
+parent canary evidence rejects self-consistent non-version agent-docs injection => ./.llm/tools/release/github-release_test.ts:247:6
+
+FAILED | 0 passed | 1 failed | 21 filtered out (15ms)
+
+error: Test failed
+exit 1
+```
+
+Option 1 from the evaluator verdict was selected. The verifier now reads the agent-docs gzip as raw
+bytes from both the canary parent and stable HEAD, decompresses them, reuses
+`bump-version.ts::rewriteNetScriptVersion` to derive the only permitted next payload, and requires
+the stable uncompressed bytes to equal that derivation exactly. HEAD writer reproduction remains in
+force afterward for provenance and generated consumers. This is smaller than introducing a new raw
+docs build input into `release:cut`, and directly proves the invariant being authorized: stable
+agent-docs content equals canary-parent content plus only the coordinated version rewrite.
+
+After the repair, the attack is rejected:
+
+```text
+$ deno test --allow-read --allow-write --allow-run .llm/tools/release/github-release_test.ts --filter 'self-consistent non-version agent-docs injection'
+Check .llm/tools/release/github-release_test.ts
+running 1 test from ./.llm/tools/release/github-release_test.ts
+parent canary evidence rejects self-consistent non-version agent-docs injection ... ok (10ms)
+
+ok | 1 passed | 0 failed | 21 filtered out (15ms)
+exit 0
+```
+
+The positive side was checked against the measured v0.0.5 release-cut commit, not only a fixture:
+
+```text
+$ deno eval '<invoke isExactAgentDocsVersionReplacement on git-show bytes for 6ec75573d^ and 6ec75573d>'
+{"cut":"6ec75573d","previousVersion":"0.0.4","nextVersion":"0.0.5","agentDocsDeltaAccepted":true}
+exit 0
+```
+
+### B-1 repair gates
+
+```text
+$ deno test --allow-read --allow-write --allow-run .llm/tools/release/github-release_test.ts
+Check .llm/tools/release/github-release_test.ts
+running 22 tests from ./.llm/tools/release/github-release_test.ts
+toVersion strips a single leading v; toTag re-adds it ... ok
+version-only diff accepts the complete release version surface only ... ok
+version-only diff accepts a realistic coordinated release cut and rejects source drift ... ok
+green canary pair accepts current SHA or a version-only immediate parent ... ok
+parent canary evidence checks every release path and reproduces derived writer outputs ... ok
+parent canary evidence fails when derived writer outputs cannot be reproduced ... ok
+parent canary evidence rejects self-consistent non-version agent-docs injection ... ok
+canary pair gate fails closed for source drift and API failure ... ok
+parent canary evidence rejects seeded manifest drift inside a version file ... ok
+formatClosedIssues renders a bulleted list, empty when none ... ok
+composeReleaseBody orders intro, changelog, closed issues and drops blanks ... ok
+--prev-tag resolves a dated window and queries closed issues ... ok
+known previous tag with empty since fails loudly before reporting closed issues ... ok
+explicit previous tag uses release date with commit-date fallback ... ok
+parseArgs: version positional or flag, defaults to non-prerelease Latest ... ok
+parseArgs: --prerelease implies not-Latest; explicit --latest with it throws ... ok
+parseArgs: --no-latest overrides the default ... ok
+parseArgs: every documented release:publish invocation is accepted ... ok
+parseArgs: intro is required (the deliberate manual step) ... ok
+parseArgs: version is required ... ok
+parseArgs: notes-file and message are mutually exclusive ... ok
+parseArgs: unknown flag and missing value are rejected ... ok
+
+ok | 22 passed | 0 failed (28ms)
+exit 0
+```
+
+```text
+$ deno test --quiet --allow-all .llm/tools/release/
+ok | 102 passed | 0 failed (1s)
+exit 0
+```
+
+```text
+$ rtk proxy deno task check
+Task check deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude "^(.*(?:^|/)\.generated/|.*(?:^|/)node_modules/)" (cached, inputs unchanged)
+exit 0
+
+$ rtk proxy deno task lint
+Task lint deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\.generated/|.*(?:^|/)node_modules/)" (cached, inputs unchanged)
+exit 0
+
+$ rtk proxy deno task fmt:check
+Task fmt:check deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\.generated/|.*(?:^|/)node_modules/)" --ignore-line-endings (cached, inputs unchanged)
+exit 0
+```
+
+The root wrapper inputs are `packages/**` and `plugins/**`, which the repair did not change. The
+owned release-tool files were re-executed uncached through the scoped wrappers:
+
+```text
+$ deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/release --ext ts
+{"source":{"mode":"selection","cwd":"/home/codex/repos/ns006-f-a-release-tooling"},"command":"deno check --unstable-kv <files>","selection":{"filesSelected":40,"batches":1,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+exit 0
+
+$ deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .llm/tools/release --ext ts
+{"source":{"mode":"command","cwd":"/home/codex/repos/ns006-f-a-release-tooling","exitCode":0},"selection":{"filesSelected":40,"batches":1},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+exit 0
+
+$ deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools/release --ext ts
+{"command":"deno fmt --check","cwd":"/home/codex/repos/ns006-f-a-release-tooling","mode":"check","summary":{"filesSelected":40,"batches":1,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+exit 0
+```
+
+```text
+$ rtk proxy deno task test
+Task test deno test --allow-all
+ok | 3189 passed (617 steps) | 0 failed | 17 ignored (2m59s)
+exit 0
+```
+
+```text
+$ git diff --check
+exit 0
+
+$ git status --porcelain
+exit 0; stdout bytes: 0
+
+$ git diff --exit-code 01aa12b67 HEAD -- deno.lock
+exit 0; stdout bytes: 0
+
+$ git log --oneline 01aa12b67..HEAD
+5350d01fc fix(release): anchor agent docs inheritance to parent
+c0b98d93d fix(release): date explicit changelog ranges
+a0c298fb5 fix(release): inherit canary pair across coordinated cuts
+exit 0
+```
+
+### B-1 push and PR handoff
+
+```text
+$ git push origin HEAD:refs/heads/fix/1438-release-cut-canary-pair-inheritance
+To https://github.com/rickylabs/netscript.git
+   c0b98d93d..5350d01fc  HEAD -> fix/1438-release-cut-canary-pair-inheritance
+exit 0
+
+$ gh pr edit 1539 --body-file .llm/tmp/pr-a-body.md
+ok edited #1539
+exit 0
+```
+
+The PR body now states Option 1 and its rationale, adds the B-1 attack regression and measured-cut
+positive control to acceptance, points to D-6, and records B-2 without changing it. The fresh
+separate-session IMPL-EVAL checkbox remains unchecked. An implementation handoff comment for
+`5350d01fc` was posted; no evaluator verdict was asserted by this session.
+
+Post-update readback found the PR had been switched out of draft during the evaluator cycle. Because
+fresh IMPL-EVAL is still pending, it was restored to draft and re-audited:
+
+```text
+$ gh pr ready 1539 --undo
+✓ Pull request rickylabs/netscript#1539 is converted to "draft"
+exit 0
+
+$ gh pr view 1539 --json ...
+{"base":"main","closes":[1430,1438],"head":"fix/1438-release-cut-canary-pair-inheritance","headSha":"5350d01fc9f045d0302590a59c91281ea9d0f572","isDraft":true,"labels":["type:fix","status:impl-eval","area:tooling","priority:p1","area:release"],"milestone":"0.0.6","number":1539,"state":"OPEN","statusLabels":["status:impl-eval"],"url":"https://github.com/rickylabs/netscript/pull/1539"}
+exit 0
+```
+
+Final audit:
+
+```text
+$ git status --porcelain
+exit 0; stdout bytes: 0
+
+$ git diff --exit-code 01aa12b67 HEAD -- deno.lock
+exit 0; stdout bytes: 0
+
+$ git rev-parse HEAD
+5350d01fc9f045d0302590a59c91281ea9d0f572
+exit 0
+
+$ gh pr view 1539 --json isDraft,state,body --jq '<contract assertions>'
+{"b1Regression":true,"implEvalUnchecked":true,"isDraft":true,"optionOne":true,"state":"OPEN"}
+exit 0
+```
+
+No publication, `release:publish`, `deno publish`, tag creation/push, canary, cache reload, lock
+mutation, scaffold runtime, or merge was performed during the repair.
