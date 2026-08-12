@@ -1,16 +1,16 @@
-# ns006-1459 — Codex implementation thread
-- **Thread / session id:** `019ff5e6-812b-7c03-8815-d4c93d984a1d`
-- **Rollout:** `/home/codex/.codex/sessions/2026/08/12/rollout-2026-08-12T14-15-52-019ff5e6-812b-7c03-8815-d4c93d984a1d.jsonl`
-- **Worktree:** `/home/codex/repos/ns006-1459`
-- **Branch:** `fix/1459-defer-island-hydration` @ `4f93a0c2e` (NO upstream by design).
-- **Push rule:** explicit refspec only — `git push origin HEAD:refs/heads/fix/1459-defer-island-hydration`.
-- **Requested route:** provider=openai · model=gpt-5.6-sol · effort=high
-- **Observed route:** provider=openai · model=gpt-5.6-sol · effort=high
+# ns006-1571 — Codex implementation thread
+- **Thread / session id:** `019ff621-00ba-7323-8353-a1e9c5654390`
+- **Rollout:** `/home/codex/.codex/sessions/2026/08/12/rollout-2026-08-12T15-19-45-019ff621-00ba-7323-8353-a1e9c5654390.jsonl`
+- **Worktree:** `/home/codex/repos/ns006-1571`
+- **Branch:** `fix/1571-plugin-vite-lock-closure` @ `415b7f1b7` (NO upstream by design).
+- **Push rule:** explicit refspec only — `git push origin HEAD:refs/heads/fix/1571-plugin-vite-lock-closure`.
+- **Requested route:** provider=openai · model=gpt-5.6-sol · effort=low
+- **Observed route:** provider=openai · model=gpt-5.6-sol · effort=low
 - **Route verdict:** matched
 - **Runtime:** approval=never · sandbox=dangerFullAccess
-- **Brief (staged):** `/home/codex/ns006-1459-brief.md`
+- **Brief (staged):** `/home/codex/ns006-1571-brief.md`
 ## Steering (same thread — never a second send-message-v2 at this worktree)
 ```bash
-codex exec resume 019ff5e6-812b-7c03-8815-d4c93d984a1d -- "<follow-up>"
+codex exec resume 019ff621-00ba-7323-8353-a1e9c5654390 -- "<follow-up>"
 ```
 _Written by `.llm/tools/agentic/codex/launch-codex-slice.ts`._

@@ -877,3 +877,60 @@ cleanup.
 Filed from inside the reopen: **#1542**, **#1543**, **#1557**, **#1561**, **#1563**.
 
 **Next and last: #1562**, now unblocked — no competing writer remains.
+
+## 2026-08-12 — Canary.3 FAILED before mint; my lock call was wrong
+
+`release-canary.yml` run **`31600415045`** failed at **step 6, "Cut ephemeral canary branch and tag"**:
+
+```
+error: The lockfile is out of date. Run `deno install --frozen=false` …
+error: deno ci --prod failed with exit 1.
+```
+
+**Nothing was published.** Steps 7–19 skipped, including step 13 (real upload). Step 4 (JSR budget)
+had already passed, so **no publish attempt was consumed**; only `v0.0.6-canary.1`/`.2` exist and no
+`release/canary-*` branch remains. The canary did its job — it caught this before minting.
+
+### The root cause is my own earlier decision, stated plainly
+
+`packages/fresh/deno.json` declares `@fresh/plugin-vite@^1.1.2`, but `main`'s lock carries **only**
+the workspace-member dependency line and **none of the resolution closure**, so the lock is
+internally inconsistent and `deno ci --prod` correctly refuses it.
+
+I measured the correct state in a disposable worktree: regenerating with the repo-pinned **Deno
+2.9.5** yields **386 insertions / 9 deletions** — `jsr:@fresh/plugin-vite@^1.1.2`, `npm:@babel/core`,
+`npm:@prefresh/vite`, `npm:@remix-run/node-fetch-server`, `npm:@types/babel__core`, `npm:rollup`,
+`npm:vite`, plus `jsr:@fresh/core@2`, `jsr:@deno/loader@0.4`, `@std/dotenv`, `@std/fmt`,
+`@std/media-types` and the derived Babel/Vite graph — and **`deno ci --prod` then passes**.
+
+**That is the same content I rejected as "incidental harness churn" during #1459.** It was never
+noise. Its composition *looks* like build-toolchain noise, and a real `vite build` did write it — but
+what the build wrote was the **required closure of the newly declared dependency**. Reducing it by
+hand to one line, and then adding `--no-lock` to stop the fixture regenerating it, produced an
+incomplete lock that looked settled and broke the release two merges later.
+
+**The corrected rule:** when a manifest gains a direct dependency, the lock delta is whatever Deno
+deterministically produces. "Minimal" is not a target to hand-tune toward, and a lone
+workspace-member line is a **symptom of an incomplete lock**, not evidence of a clean one. My
+narrow-delta enforcement was right about hygiene and wrong about this case, and it cost a canary
+cycle.
+
+### Repair delegated, not absorbed
+
+Per the process guard, I keep orchestrator/reviewer/release-owner role and **delegate the repair**.
+Reproduction and measurement stayed with me; the disposable measurement worktree was **removed** so
+its regenerated lock could not be mistaken for the deliverable.
+
+- Issue **#1571** filed (`type:fix`, `area:deps`, **`priority:p0`**, milestone 0.0.6).
+- Fresh worktree `/home/codex/repos/ns006-1571`, branch `fix/1571-plugin-vite-lock-closure`, cut from
+  the exact blocked SHA `5705aeb19`.
+- **Codex · GPT-5.6 Sol · low** dispatched with a bounded brief that states the expected delta shape
+  and makes a mismatch a **stop-and-report**, requires **frozen** `deno ci --prod`, requires
+  **second-run lock neutrality**, forbids hand-tuning the lock, and limits the PR to `deno.lock`.
+
+### Scope additions queued (not started)
+
+**#1568** (native `definePartial` generated-route binding) and **#1569** (managed-form redirects
+under inherited Fresh client navigation) joined this lane. With **#1562**, three items are queued
+**behind terminal-green Canary.3**. #1569 looks adjacent to #1459's `f-client-nav` work — worth
+checking for overlap at triage. Fable prohibited; automatic evaluator lifecycle only.
