@@ -29,7 +29,8 @@ Push with an explicit refspec: `git push origin HEAD:refs/heads/docs/1377-refere
 | S1 four `-core` reference pages + reference index | `e22a2f952` | landed, gated, commented |
 | S2 `packages/sdk/README.md` query dialect | `68cf6f2e5` | landed, gated, commented |
 | S3 root `README.md` scaffold count + specifier | `617b74884` | landed, gated, commented |
-| S4 CLI reference — six verbs + two wrong claims | — | in progress |
+| S4 CLI reference — six verbs + two wrong claims | `f3893df5b` | landed, gated, commented |
+| Audit corrections | `077a75716`, `13b6d118a` | landed, gated, commented; follow-up xref fix pending commit |
 
 ## Measurements that must not be re-derived
 
@@ -39,6 +40,9 @@ Push with an explicit refspec: `git push origin HEAD:refs/heads/docs/1377-refere
 - **Reference pages: 35 effective-publish members, 0 missing** after S1 (was 4 missing).
 - **Path convention:** 31 name-exact, 4 exceptions — the *deployable* plugins drop `plugin-`.
 - **No generator writes into `docs/site/reference/`.** Pages are hand-written.
+- **Reference xref registry:** navigation is folder-derived, but `_data/xref.ts` separately registers
+  all 36 reference directories. The audit follow-up restored exact 36-directory/36-key parity and
+  added the four new `plugin-*-core` keys.
 - **Deploy target operations, measured from source:**
 
   | Target(s) | Class | Operations |

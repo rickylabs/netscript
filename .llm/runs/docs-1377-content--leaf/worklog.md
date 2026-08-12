@@ -258,3 +258,20 @@ description alone would have been misleading:
 | Docs source format | `docs/site/_plugins/check-source-format.ts .` | 0 | `Docs source format: OK` |
 | Six-verb coverage | own grep over `docs/site/` | — | all six present in `reference/cli/commands.md`; five also on `cli-reference.md` |
 | Stale-claim removal | own grep | — | `not wired` / `only print help` gone from `docs/site/` |
+
+## Opposite-family audit follow-up — xref wiring
+
+The orchestrator found that Gate 7 had verified folder-derived navigation but not the independent
+hand-maintained `REFERENCE_UNITS` registry in `docs/site/_data/xref.ts`. The four new core-reference
+directories were absent, so their `ref:` shortcuts could not resolve. The same file also contained
+stale `32` and `28 generated` count/provenance comments.
+
+`_data.ts` has no mirrored executable reference-unit list: its source comment explicitly says the
+nav is folder-derived and the `ref:` keys live in `_data/xref.ts`. The fix therefore keeps behavior
+unchanged, adds the four missing registry entries, and documents the real two-surface relationship.
+
+| Gate | Command | Exit | Result |
+| --- | --- | --- | --- |
+| Xref parity | `deno eval` import of `xref` plus directory/key set comparison | 0 | 36 directories, 36 registered `ref:` units, zero missing/extra; all four new URLs exact |
+| Internal doc links | `deno task docs:links` | 0 | `docs=102 broken-links=0 broken-anchors=0 orphans=0` |
+| Site build | `cd docs/site && deno task build` | 0 | source format OK; 630 files generated; rendered output OK for 224 HTML files |

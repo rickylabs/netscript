@@ -32,7 +32,11 @@ export interface XrefTarget {
   label: string;
 }
 
-/** The 32 reference units. */
+/**
+ * The 36 hand-maintained reference xref units. Navigation is independently
+ * folder-derived in `_data.ts`, so keep this registry aligned with the
+ * directories under `docs/site/reference/`.
+ */
 const REFERENCE_UNITS = [
   "ai",
   "auth",
@@ -55,6 +59,10 @@ const REFERENCE_UNITS = [
   "plugin-ai-core",
   "plugin-auth",
   "plugin-auth-core",
+  "plugin-sagas-core",
+  "plugin-streams-core",
+  "plugin-triggers-core",
+  "plugin-workers-core",
   "prisma-adapter-mysql",
   "queue",
   "runtime-config",
@@ -198,7 +206,7 @@ export const xref: Record<string, XrefTarget> = {
   "cli:reference": { href: "/cli-reference/", label: "CLI reference" },
   "glossary:": { href: "/glossary/", label: "Glossary" },
 
-  // ─── Reference index + the 28 generated units (ref:) ───────────────────────
+  // ─── Reference index + the 36 registered units (ref:) ──────────────────────
   "ref:index": { href: "/reference/", label: "Reference index" },
   ...refEntries(),
 };
