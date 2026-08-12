@@ -6,8 +6,7 @@ title: "Auth reference"
 # Auth reference
 
 NetScript auth is split across one plugin manifest package, one core contract package, and
-three backend adapters. This hub is generated from the public surfaces verified with
-`deno doc`.
+three backend adapters. This hub is written against the public surfaces reported by `deno doc`.
 
 For capability guidance, start with [Authentication](/capabilities/auth/). For the
 runtime service builder used by auth-api, see [@netscript/service](/reference/service/).

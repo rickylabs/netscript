@@ -7,8 +7,8 @@ title: "@netscript/ai"
 
 The provider-agnostic AI engine core for NetScript: a composition root, a global model
 registry, the domain vocabulary and capability ports for chat/embeddings/vision/tools/agents/MCP,
-and a set of opt-in provider adapters. This page is generated from the package's public surface
-with `deno doc` (US-2). For the full index of packages and plugins return to the
+and a set of opt-in provider adapters. This page is written against the package's public surface
+reported by `deno doc`. For the full index of packages and plugins return to the
 [reference overview](/reference/).
 
 The base `@netscript/ai` entrypoint takes **no** `@netscript/*` runtime dependency and pulls no
@@ -26,7 +26,7 @@ const handle = await getModel("anthropic:claude-sonnet-4-5");
 
 ## Export map
 
-The package publishes the following entrypoints. Each is generated from its own `deno doc`
+The package publishes the following entrypoints. Each is documented against its own `deno doc`
 surface.
 
 | Export | Entrypoint | Purpose |

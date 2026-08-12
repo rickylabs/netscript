@@ -13,13 +13,14 @@ logic. The engine (providers, tools, agent loop, embeddings) lives in
 the versioned `/v1/ai` contract lives in
 [`@netscript/plugin-ai-core`](#internals-netscriptplugin-ai-core). This package is a manifest, a
 connector, and a set of scaffolders that emit typesafe userland glue importing those installed
-dependencies directly. This page is generated from the package public surface with `deno doc`
-(US-2). For the full index of packages and plugins return to the
+dependencies directly. This page is written against the package public surface reported by
+`deno doc`. For the full index of packages and plugins return to the
 [reference overview](/reference/).
 
 ## Entrypoints
 
-The plugin publishes the following entrypoints. Each is generated from its own `deno doc` surface.
+The plugin publishes the following entrypoints. Each is documented against its own `deno doc`
+surface.
 
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
@@ -336,7 +337,7 @@ export const summarizeTool = defineAiTool("summarize")
 > implementer factory. `@netscript/plugin-ai` re-exports its contract through
 > `@netscript/plugin-ai/contracts`, and the generated stream route imports `createAiRouter`,
 > `aiContractV1`, and `AiRouterImplementation` from it directly. It is published separately and
-> documented on its own [reference page](/reference/plugin-ai-core/) (US-8). The runtime AI engine
+> documented on its own [reference page](/reference/plugin-ai-core/). The runtime AI engine
 > itself — providers, the tool registry, the agent loop, and embeddings — lives in the separate
 > `@netscript/ai` package, and the durable-chat client/server runtime in `@netscript/fresh/ai`.
 

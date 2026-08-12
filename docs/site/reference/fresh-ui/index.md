@@ -5,8 +5,8 @@ title: "@netscript/fresh-ui"
 
 # `@netscript/fresh-ui`
 
-Fresh UI registry seams and interactive foundations for NetScript. This page is generated
-from the package public surface with `deno doc` (US-2). For the full index of packages and
+Fresh UI registry seams and interactive foundations for NetScript. This page is written against
+the package public surface reported by `deno doc`. For the full index of packages and
 plugins return to the [reference overview](/reference/).
 
 The root entrypoint (`@netscript/fresh-ui`) intentionally stays small: copy-based registry

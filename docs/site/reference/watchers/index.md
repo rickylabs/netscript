@@ -7,8 +7,8 @@ title: "@netscript/watchers"
 
 Reusable file-watching primitives for NetScript: composable strategies, filters, and a
 pipeline-based `FileWatcher` for detecting file-system changes across local and network
-filesystems. This page is generated from the package's public surface with `deno doc`
-(US-2). For the full index of packages and plugins return to the
+filesystems. This page is written against the package's public surface reported by `deno doc`.
+For the full index of packages and plugins return to the
 [reference overview](/reference/).
 
 The package exposes a single root entrypoint (`@netscript/watchers` -> `./mod.ts`). There are

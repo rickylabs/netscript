@@ -8,8 +8,8 @@ title: "@netscript/cron"
 Runtime-agnostic cron scheduling abstraction for NetScript applications. Provides a
 consistent interface across different backends (native `Deno.cron` and an in-memory
 scheduler) with timezone support, job-lifecycle event emission, and runtime
-auto-detection. This page is generated from the package public surface with `deno doc`
-(US-2). For the full index of packages and plugins return to the
+auto-detection. This page is written against the package public surface reported by `deno doc`.
+For the full index of packages and plugins return to the
 [reference overview](/reference/).
 
 The root entrypoint (`@netscript/cron`) exposes the scheduler factory, the shared-instance
@@ -85,7 +85,7 @@ Concrete implementations of `CronScheduler`, exported from `@netscript/cron/adap
 ## Sub-path exports
 
 The following entrypoints are published alongside the root export. Their reference surface is
-generated from their own `deno doc` output.
+documented against their own `deno doc` output.
 
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |

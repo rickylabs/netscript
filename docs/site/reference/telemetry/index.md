@@ -6,8 +6,8 @@ title: '@netscript/telemetry'
 # `@netscript/telemetry`
 
 OpenTelemetry tracing primitives, context propagation, instrumentation registries, and NetScript
-runtime adapters for jobs, queues, RPC, and SSE. This page is generated from the package's public
-surface with `deno doc` (US-2). For the full index of packages and plugins return to the
+runtime adapters for jobs, queues, RPC, and SSE. This page is written against the package's public
+surface reported by `deno doc`. For the full index of packages and plugins return to the
 [reference overview](/reference/).
 
 The root entrypoint (`@netscript/telemetry`) exposes the stable package diagnostic and
@@ -209,8 +209,8 @@ Tracing and error-handling plugins for the NetScript oRPC handler.
 
 ## Sub-path exports
 
-The following entrypoints are published alongside the root export. Each is generated from its own
-`deno doc` surface.
+The following entrypoints are published alongside the root export. Each is documented against its
+own `deno doc` surface.
 
 | Export                                 | Entrypoint             | Purpose                                                             |
 | -------------------------------------- | ---------------------- | ------------------------------------------------------------------- |

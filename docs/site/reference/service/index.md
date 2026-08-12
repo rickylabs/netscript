@@ -6,8 +6,8 @@ title: "@netscript/service"
 # `@netscript/service`
 
 Service bootstrap builders, health probes, and Hono/oRPC runtime wiring for NetScript
-applications. This page is generated from the package's public surface with `deno doc`
-(US-2). For the full index of packages and plugins return to the
+applications. This page is written against the package's public surface reported by `deno doc`.
+For the full index of packages and plugins return to the
 [reference overview](/reference/).
 
 The package has three layers. **Layer 1** exposes small primitives for health, error, RPC,

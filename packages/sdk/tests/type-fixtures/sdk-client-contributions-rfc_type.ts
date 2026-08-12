@@ -346,7 +346,7 @@ const directOnly = defineRfcContribution<{ opaqueSession: string }>()({
 
 const rejectedDesktopOptions: CreateDesktopServiceClientOptions<typeof serviceContract> = {
   contract: serviceContract,
-  // @ts-expect-error RFC-A keeps HTTP contributions off the Desktop MessagePort options surface
+  // @ts-expect-error RFC-A keeps HTTP contributions off the Desktop MessagePort options surface // quality-allow: negative compile fixture proves CreateDesktopServiceClientOptions rejects RFC HTTP contributions on the MessagePort transport
   contributions: [auth],
 };
 void rejectedDesktopOptions;
@@ -362,7 +362,7 @@ const duplicateAuthContext = defineRfcContribution<{ auth?: { readonly apiKey: s
   prepare: () => undefined,
 });
 
-// @ts-expect-error duplicate context ownership is rejected at the tuple boundary
+// @ts-expect-error duplicate context ownership is rejected at the tuple boundary // quality-allow: negative compile fixture proves tuple validation rejects two contributions that both claim the auth context key
 acceptRfcContributions([auth, duplicateAuthContext]);
 
 type RfcDefineServiceConfig<
@@ -442,7 +442,7 @@ services.clients.accounts.orders.list({ page: 1 }, {
   },
 });
 
-// @ts-expect-error required auth context makes the request options mandatory
+// @ts-expect-error required auth context makes the request options mandatory // quality-allow: negative compile fixture proves a generated client call rejects omission of options when contribution context contains a required key
 services.clients.accounts.orders.list({ page: 1 });
 
 services.queryUtils.accounts.orders.list.queryOptions({
@@ -462,7 +462,7 @@ declare const contributedQueryUtils: RfcServiceQueryUtils<
 >;
 void contributedQueryUtils;
 
-// @ts-expect-error direct-only services are omitted from the generated query-utils map
+// @ts-expect-error direct-only services are omitted from the generated query-utils map // quality-allow: negative compile fixture proves mapped query-utils keys exclude a service whose contribution declares direct-only response caching
 services.queryUtils.desktopOnly;
 
 type SyntheticContribution<TNumber extends string> = RfcContribution<
@@ -499,5 +499,5 @@ declare const seventeen: readonly [
   SyntheticContribution<'17'>,
 ];
 
-// @ts-expect-error the RFC-A public inference budget is sixteen contributions per service
+// @ts-expect-error the RFC-A public inference budget is sixteen contributions per service // quality-allow: negative compile fixture proves tuple validation rejects a seventeenth contribution while accepting sixteen
 acceptRfcContributions(seventeen);
