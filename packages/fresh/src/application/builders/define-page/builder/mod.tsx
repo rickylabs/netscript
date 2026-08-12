@@ -66,6 +66,7 @@ import type {
   DefinePageWithSearchParams,
   EmptyRecord,
   PathParamSchema,
+  RouteParserTarget,
   SearchParamSchema,
 } from '../types.ts';
 function createBuilder<TTypes extends AnyDefinePageTypeState, THasConfiguredRoute extends boolean>(
@@ -445,7 +446,7 @@ function createBuilder<TTypes extends AnyDefinePageTypeState, THasConfiguredRout
     }
     return buildDefinition(undefined);
   }
-  function withRoute<TRoute extends TypedRouteTarget<object, object>>(
+  function withRoute<TRoute extends TypedRouteTarget<object, object> & RouteParserTarget>(
     route: TRoute,
   ): DefinePageBuilder<DefinePageWithRoute<TTypes, TRoute>, true> {
     type TRouteTypes = DefinePageWithRoute<TTypes, TRoute>;

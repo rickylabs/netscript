@@ -30,8 +30,8 @@ export async function prepareRequestState<
   runtimeCtx: DefinePageLayoutContextBase<TTypes, THasRoute>;
   resources: DefinePageResourcesOf<TTypes>;
 }> {
-  const path = resolvePathParams(config.pathSchema, ctx.params);
-  const search = resolveSearchParams(config.searchSchema, ctx.url.searchParams);
+  const path = resolvePathParams(config.pathSchema, ctx.params, config.route);
+  const search = resolveSearchParams(config.searchSchema, ctx.url.searchParams, config.route);
   const controller = new AbortController();
   const resourceStore: Record<string, unknown> = {};
   const resources = resourceStore as DefinePageResourcesOf<TTypes>;
