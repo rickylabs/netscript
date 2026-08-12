@@ -370,3 +370,46 @@ Note the reflexivity and design the test around it: this fix changes the machine
 it. Its regression evidence must demonstrate a duplicate `(generation, phase, head)` being
 **refused**, and must not be a test that merely passes because no second trigger happened to be
 emitted during the run.
+
+## Wave 3 — owner decisions recorded (2026-08-12)
+
+1. **#1597 stays in this lane through merge.** Release-critical and a **prerequisite for the stable
+   cut**, so it is not handed to the release lane despite that lane owning the cut sequence it
+   protects. Priority is **p0** on the live issue; the slice brief's `priority:p1` was an
+   orchestrator transcription error, corrected in the artifact (`8d4e3bf92`) and armed for correction
+   on the PR label without disturbing the attached session.
+2. **#1594 stays narrowly scoped** to atomic pre-spend evaluator claiming and its recovery semantics.
+   Nothing else folds in.
+3. **The mirror-throw sibling goes to #1561, not #1594.** Recorded as a concrete repro
+   (comment 5269853965) rather than absorbed into the cost fix.
+
+### Why the split is the right one, recorded so it is not re-litigated
+
+Both defects live in evaluator machinery and it would have been easy to bundle them. They are
+different failure classes with different blast radii:
+
+- **#1594** is a **cost** defect — a non-atomic read-then-write between `listComments` and
+  `createComment` lets two runs both claim one logical phase transition and **spend twice**.
+- **#1561** is a **legibility** defect — a reportable condition raised as an uncaught throw, so the
+  PR shows `close-gate FAILURE` with the real cause visible only in the job log.
+
+Bundling would have widened a p0 cost fix into general evaluator robustness, which is the scope creep
+this lane has refused three times already (#1540's signal handler, #1454's F-8 dead helper, #1454's
+F-6 release sequencing).
+
+### What the sibling repro cost, and what it says about the convention
+
+Three `close-gate` cycles on #1574, each presenting identically as `FAILURE`: mirror skipped for a
+missing label, a stale read predating the label and box tick, and the throw. **Only the third was a
+defect in the PR's content.**
+
+The throw's input was not a malformed hand-edit — it arose from following the **better** convention.
+`box-index` keys are recommended precisely because exact-text matching is brittle against issue line
+wrapping the author never sees. This orchestrator instructed the slice to use `box-index` without
+first checking whether #1454 had any boxes; it had zero. So a well-formed block pointed at boxes that
+do not exist, and the tool crashed rather than reporting it.
+
+**Rule adopted for the remaining slices:** check the issue's checkbox count *before* requiring a
+structured evidence block, and require none where the issue is box-less — the PR-body checklist is
+the acceptance record there, which `check-close-gate` validates directly. Already written into both
+wave-3 briefs.
