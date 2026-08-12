@@ -163,3 +163,48 @@ and no paid or higher-effort escalation is introduced.
 low". **That binding was never exercised** — every slice review in this lane, #1398 included, was
 performed by this Opus orchestrator session. The record advertised a Fable route that never ran.
 Corrected here rather than left to imply Fable usage that did not happen.
+
+## D-7 — commit-boundary guard failed: `deno.lock` reached the PR head (significant)
+
+**Date** 2026-08-12. Commit **`1a5c1d688`** on `fix/1459-defer-island-hydration` includes
+`deno.lock` (+385/−9) and became the PR head, despite **two** explicit orchestrator steers requiring
+restore-to-HEAD before any commit.
+
+**Advancement stopped.** PR #1558 is **not** flipped to ready and **no evaluation was triggered** — it
+remains `draft` at `status:plan-eval`, so the automatic IMPL-EVAL never fired on the bad head. Nothing
+has merged; nothing has left the branch.
+
+### Root cause of the churn, and of the guard failure
+
+- **The churn:** the B3 client-bundle fixture runs a real `vite build`, which writes the workspace
+  lock (`npm:vite`, `npm:rollup`, `npm:@babel/preset-react`, `npm:@prefresh/vite`,
+  `@types/babel__core`). A plain revert can never hold — the next test run regenerates it. That is why
+  the first restoration did not survive to the audit boundary.
+- **The guard:** my steers said "restore before commit" but the commit step evidently staged
+  everything (the tree was clean afterwards, so the commit swept the lock in). **A prohibition stated
+  in prose is not a mechanism.** Nothing in the slice prevented `deno.lock` from being staged; the
+  guard depended entirely on the agent remembering it at the right moment, twice.
+
+**My share of this:** I mandated B3 without considering that a real Vite build mutates the lock, so I
+created the tension the guard was then asked to hold shut by discipline alone. Recorded because the
+next brief should make it structural — e.g. require explicit-path staging, or `--no-lock` isolation
+specified up front — rather than repeating a prose prohibition.
+
+### Corrective slice delegated, not self-performed
+
+`agentic:codex-status` showed the thread **still working** in that worktree
+(`019ff5e6-812b-7c03-8815-d4c93d984a1d`, "Including supplemental assets-barrel output"). Editing it
+concurrently would have made me a second writer to a live agent's worktree — the exact concurrent-
+writer hazard this harness warns about. So the correction was **delegated to the current writer** via
+`codex-resume` on the same thread rather than performed directly.
+
+Required of it, in order: restore `deno.lock` byte-for-byte from parent `4f93a0c2e` in a **new**
+commit (**history preserved — no amend, no rebase, no force-push**); fix the fixture's build isolation
+so the test cannot rewrite the lock; re-run the exact client-bundle test and required gates and
+**prove with pasted `git status` + `git diff --stat HEAD -- deno.lock` that the lock survives them**;
+audit `agent-docs.generated.ts` against a named generator command (`embedded.generated.ts` is expected
+to be legitimate — it embeds the edited template); push and report the corrected head.
+
+**Explicitly accepted alternative:** if isolation cannot be achieved, report that B3 is not viable
+under the lock policy. The fixture is then removed from this PR and the client-bundle assertion joins
+#1557. Choosing that is not a failure; leaving the lock mutated to keep the test would be.
