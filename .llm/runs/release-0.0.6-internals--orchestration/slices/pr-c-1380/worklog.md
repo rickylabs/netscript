@@ -60,8 +60,9 @@ Update top-level units, then run the doctrine contract tests; the measured table
 | 2026-08-12 | S1 | Implement + focused gate | `arch:check:repo` now selects all roots; leading quote/backtick fixture data ignored; real unresolved global remains red. |
 | 2026-08-12 | S2 | Measurement + doc contracts | Doctrine 06/10 now enumerate 36 roots; removed-row provenance, debt closure, gated-set exclusion, dated reference plan, and RFC mapping are executable documentation contracts. |
 | 2026-08-12 | S3 | Operator guidance + mirror | Source/mirrored skill and close-gate hint now require rerunning existing CI after labeling, without a verdict-invalidating push. |
-| 2026-08-12 | S4 | Final gate matrix | All requested gates passed on source head `bef1d9b4806b04da51d0120de6d9df08f0699bde`; this evidence-only update is the final planned commit. |
+| 2026-08-12 | S4 | Initial gate matrix | All requested gates passed on source head `bef1d9b4806b04da51d0120de6d9df08f0699bde`. |
 | 2026-08-12 | S3b | Live-preflight drift repair | Acceptance-mirror dry-run exposed the same stale labeled-event claim; notice and regression test corrected without workflow changes. |
+| 2026-08-12 | S4b | Post-repair gate matrix | All requested gates plus the focused mirror-notice regression passed on source head `0074927605fb53a5ad9c2ca8375b4e97ed03b35f`; the worktree remained clean. |
 
 ## Decisions
 
@@ -90,6 +91,8 @@ and recorded in `drift.md`.
 | Claude skill mirror | PASS, exit 0 | sync updated one stale skill; `agentic:check-claude` all checks OK |
 
 ### Final requested gate matrix
+
+Recorded after the S3b repair on source head `0074927605fb53a5ad9c2ca8375b4e97ed03b35f`.
 
 | # | Command | Exit | Literal summary |
 | --- | --- | --- | --- |

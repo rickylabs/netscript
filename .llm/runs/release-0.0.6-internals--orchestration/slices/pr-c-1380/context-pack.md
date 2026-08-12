@@ -6,7 +6,8 @@ Draft PR #1585 contains green S1 and S2 changes. The repo gate uses the discover
 doctrine verdict/archetype tables measure the same 36 roots; the provenance, debt, gated-set,
 engineering-reference, and RFC-location records have executable content tests. S3 corrects the
 close-gate rerun guidance and its Claude mirror. A live acceptance preflight found and corrected the
-same stale claim in the mirror's own notice. The complete matrix must be rerun on that final repair.
+same stale claim in the mirror's own notice. The complete matrix passed on the repaired source head
+`0074927605fb53a5ad9c2ca8375b4e97ed03b35f`.
 
 ## Completed
 
@@ -17,6 +18,8 @@ same stale claim in the mirror's own notice. The complete matrix must be rerun o
   documented gate coverage, dated engineering-reference plan, canonical RFC mapping, and six doc tests.
 - Implemented and verified S3: label/rerun guidance, repair hint contract, and regenerated Claude skill.
 - Completed S4 gate matrix: all eight requested gate families passed with literal exit evidence.
+- Re-ran the complete matrix after the S3b drift repair; all gates and the focused mirror-notice
+  regression passed with a clean worktree.
 
 ## In Progress
 
@@ -24,9 +27,7 @@ same stale claim in the mirror's own notice. The complete matrix must be rerun o
 
 ## Next Steps
 
-1. Commit/push this evidence-only update.
-2. Re-run the complete matrix on that final commit without changing files.
-3. Update the draft PR body/comment with acceptance evidence and hand off; do not flip ready.
+1. Update the draft PR body/comment with final acceptance evidence and hand off; do not flip ready.
 
 ## Key Decisions
 
@@ -36,7 +37,8 @@ same stale claim in the mirror's own notice. The complete matrix must be rerun o
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: the live acceptance-mirror notice repeated the stale labeled-event claim; S3b corrected it
+  without changing workflow triggers.
 - Debt: the 2026-06-21 accepted-red repo-doctrine entry is resolved by this PR; no new debt.
 
 ## Commits
