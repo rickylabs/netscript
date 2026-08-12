@@ -1146,3 +1146,21 @@ completed/failure   59e435c5d   12:03:58Z
   (`3c9dc1f39`). Without that note, two lanes could arrive at the owner with cut recommendations, which is the
   exact collision the directive guards against. Payload facts were sent to them; the cut decision is not
   this lane's to route.
+
+## D-35 — #1566 closed; the deliberate follow-up is now unblocked, in the order that failed the first time
+
+- **Recorded:** 2026-08-12
+- **Merge:** PR #1567 → `b79eca5d6`, closing **#1566** (`CLOSED/COMPLETED`, `status:shipped`). Merged by the
+  release coordinator during a Claude 529 outage on this session. **Independently re-verified here rather than
+  accepted:** `origin/main` contains `b79eca5d6`; `.github/scripts/phase-eval-status.mjs` is present on main;
+  #1566 and PR #1567 both carry `status:shipped`.
+- **The follow-up is now valid, and only now.** PR #1567 landed the workflow carrying a **transcription** of
+  the helper rather than importing it, because importing a module absent from trusted `main` is what made the
+  first attempt self-block (`ERR_MODULE_NOT_FOUND` → no `status:impl-eval` → no labeled-event generation → no
+  evaluator). The helper is now reachable from trusted `main`, so a follow-up may switch the workflow to
+  import it and delete the inline copy. Same two stages, in the order that works.
+- **Worth keeping as the general shape:** a change that introduces a trusted-path dependency cannot also be
+  the change that first consumes it. The consuming edit has to come after the dependency is on the protected
+  branch. That is not a quirk of this workflow — it applies to any `getContent`/checkout-from-base pattern,
+  and this lane paid one full ready-flip cycle to learn it.
+- **Lane state:** #1436, #1415, #1530, #1566 **closed**. Remaining: **#1403** (PR #1570), **#1380**, **#1549**.
