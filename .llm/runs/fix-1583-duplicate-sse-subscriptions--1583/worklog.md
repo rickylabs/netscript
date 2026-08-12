@@ -56,6 +56,7 @@ Read `createNetScriptChatConnection` for handle lifecycle, then the adjacent sub
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-12 | 1 | research/design | Pinned Preact effect and ChatClient dedupe verified; NetScript handle has no active-owner guard. |
+| 2026-08-12 | 2 | RED tests | Required package task exited 1: 227 passed, exactly the three new physical-subscription tests failed. |
 
 ## Decisions
 
@@ -72,9 +73,32 @@ Read `createNetScriptChatConnection` for handle lifecycle, then the adjacent sub
 
 ## Gate Results
 
-Pending implementation.
+### RED evidence (before production change)
+
+Command: `deno task --cwd packages/fresh test`
+
+```text
+one mounted chat connection shares one live request across repeated subscribe attempts ... FAILED
+  Actual 2 / Expected 1 (create-chat-connection_test.ts:339)
+
+stop aborts the one physically in-flight shared live request ... FAILED
+  Actual 2 / Expected 1 (create-chat-connection_test.ts:366)
+
+re-subscribing after every prior subscriber explicitly stops opens a fresh request ... FAILED
+  Actual 3 / Expected 2 (create-chat-connection_test.ts:403)
+
+FAILED | 227 passed | 3 failed (15s)
+error: Test failed
+```
+
+Each failure is causal to the missing ownership guard: two concurrent logical consumers opened two physical upstream iterators; teardown therefore aborted two physical requests; the later legitimate subscription was the third upstream call instead of the second.
+
+### Static Gates
+
+| Gate | Command or check | Result | Notes |
+| --- | --- | --- | --- |
+| Package tests (RED) | `deno task --cwd packages/fresh test` | EXPECTED_FAIL | 227 existing tests passed; all three new tests failed. |
 
 ## Handoff Notes
 
 - Evaluator should inspect subscription acquisition/retirement races and confirm all three new tests fail on the parent baseline.
-

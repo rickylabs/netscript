@@ -10,3 +10,12 @@
 - **Action:** fix before finalizing the draft PR evidence map; never emit an empty `entries` list.
 - **Evidence:** https://github.com/rickylabs/netscript/issues/1583
 
+## 2026-08-12 — Acceptance checklist reconciled
+
+- **What:** Added the three slice-brief acceptance checks to #1583 and authored a non-empty `box-index` map in draft PR #1593.
+- **Source:** User-required tests and `netscript-pr` close-gate contract.
+- **Expected:** Mappable acceptance evidence.
+- **Actual:** Boxes 1-3 now cover one physical upstream, physical abort, and re-subscribe.
+- **Severity:** minor
+- **Action:** fix
+- **Evidence:** https://github.com/rickylabs/netscript/issues/1583; https://github.com/rickylabs/netscript/pull/1593
