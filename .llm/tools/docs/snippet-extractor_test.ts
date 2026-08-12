@@ -182,3 +182,19 @@ Deno.test('negative task rejects missing and unknown fixture names with complete
     }
   }
 });
+
+Deno.test('site analysis excludes Lume build output without shrinking source coverage', async () => {
+  const temp = await Deno.makeTempDir();
+  const site = `${temp}/docs/site`;
+  try {
+    await Deno.mkdir(`${site}/_site`, { recursive: true });
+    await Deno.writeTextFile(`${site}/page.md`, '```ts\nconst source = true;\n```\n');
+    await Deno.writeTextFile(`${site}/_site/generated.md`, '```ts\nconst generated = true;\n');
+
+    const analysis = await analyzeSnippetSite(site, { enforceCoverage: false });
+    assertEquals(analysis.census.scanned, 1);
+    assertEquals(analysis.blocks.map((block) => block.sourcePath), ['page.md']);
+  } finally {
+    await Deno.remove(temp, { recursive: true });
+  }
+});

@@ -47,12 +47,38 @@ async function collectSourceFiles(directory: string): Promise<string[]> {
   const files: string[] = [];
   for await (const entry of Deno.readDir(directory)) {
     const path = `${directory}/${entry.name}`;
-    if (entry.isDirectory) files.push(...await collectSourceFiles(path));
-    else if (entry.isFile && (entry.name.endsWith('.md') || entry.name.endsWith('.vto'))) {
+    if (entry.isDirectory && !await isGeneratedOrIgnoredDirectory(path, entry.name)) {
+      files.push(...await collectSourceFiles(path));
+    } else if (entry.isFile && (entry.name.endsWith('.md') || entry.name.endsWith('.vto'))) {
       files.push(path);
     }
   }
   return files.sort();
+}
+
+async function isGeneratedOrIgnoredDirectory(path: string, name: string): Promise<boolean> {
+  // `_site` is Lume's build output. Keep this fallback independent of Git so the gate remains
+  // correct in source archives, containers, and other checkouts without repository metadata.
+  if (name === '_site') return true;
+
+  try {
+    const result = await new Deno.Command('git', {
+      args: ['check-ignore', '--quiet', '--', path],
+      stdout: 'null',
+      stderr: 'null',
+    }).output();
+    return result.code === 0;
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return false;
+    throw error;
+  }
+}
+
+function generatedPathDiagnostic(sourcePath: string, message: string): string {
+  if (sourcePath.split('/').includes('_site')) {
+    return `${message} (path is under generated Lume build output; the source walker must exclude _site)`;
+  }
+  return message;
 }
 
 function toSourcePath(siteRoot: string, path: string): string {
@@ -75,7 +101,12 @@ export async function analyzeSnippetSite(
   const blocks: FencedBlock[] = [];
   for (const path of files) {
     const sourcePath = toSourcePath(siteRoot, path);
-    blocks.push(...extractFencedBlocks(await Deno.readTextFile(path), sourcePath));
+    try {
+      blocks.push(...extractFencedBlocks(await Deno.readTextFile(path), sourcePath));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(generatedPathDiagnostic(sourcePath, message));
+    }
   }
 
   const tier1Pages = new Set<string>(TIER_1_PAGES);
