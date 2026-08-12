@@ -400,6 +400,24 @@ Deno.test('registered custom providers cannot bypass the telemetry boundary', as
   assert(!JSON.stringify(span).includes('private-key'));
 });
 
+Deno.test('provider boundary does not double-wrap package-owned cache telemetry', async () => {
+  const telemetry = new RecordingCacheTelemetry();
+  const provider = new CacheQuery(new MemoryCacheStore(), new Map(), telemetry);
+  const boundary = createProviderBoundary(provider, telemetry);
+
+  assertEquals(
+    await boundary.query(['orders'], {
+      operationId: 'orders.list',
+      queryFn: () => Promise.resolve('loaded'),
+    }),
+    'loaded',
+  );
+
+  assertEquals(telemetry.spans.length, 1);
+  assertEquals(telemetry.spans[0].name, CacheOperations.READ);
+  assertEquals(telemetry.spans[0].attributes[CacheAttributes.BACKEND_EXECUTED], true);
+});
+
 function createOtelCacheTelemetry(tracer: Tracer): CacheTelemetry {
   return {
     withSpan: <T>(

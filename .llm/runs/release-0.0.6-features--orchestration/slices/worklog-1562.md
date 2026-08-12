@@ -194,3 +194,30 @@ No Fresh-owned path was touched, and partial-request behavior was not conditione
 No dependency or module-local mutable singleton was added; `deno.lock` has no Git delta. PR #1605
 remains draft. Separate-session IMPL-EVAL is pending and was not launched by this implementation
 session.
+
+## Marker review follow-up
+
+- Kept `cacheTelemetryOwner` as `Symbol()` deliberately. The #1589 closure gate rejects split SDK
+  closures; using `Symbol.for()` would make incompatible cross-version closures quietly share the
+  ownership marker. In the unsupported split-closure state, duplicate spans are the visible failure
+  mode rather than silent interoperability.
+- Added a focused regression proving `createProviderBoundary()` delegates a package-owned
+  `CacheQuery` without creating a second cache span.
+- Verified the live PR body keeps `Separate-session IMPL-EVAL records PASS` unchecked. Its five
+  `acceptance-evidence` entries map all five #1562 acceptance bullets by index with concrete
+  evidence and contain no placeholder text.
+
+### Marker follow-up gate evidence
+
+| Gate                         | Result                                                        |
+| ---------------------------- | ------------------------------------------------------------- |
+| SDK+telemetry scoped check   | exit 0; 184 files, 2 batches, 0 findings                      |
+| SDK+telemetry scoped lint    | exit 0; 184 files, 0 findings                                 |
+| SDK+telemetry scoped format  | exit 0; 184 files, 0 findings                                 |
+| SDK package test task        | exit 0; 57 passed, 0 failed, including the ownership test     |
+| telemetry package test task  | exit 0; 54 passed, 0 failed                                   |
+| `quality:gate`               | exit 0; quality scan clean, doctrine FAIL=0; baseline warnings |
+
+`deno.lock` retained SHA-256
+`73be92b116b9065372505157da4f6729176e975aa118e9944746317887e9a4c4` with no Git delta. No evaluator,
+Fable, OpenHands, ready transition, merge, E2E, or canary action was launched.
