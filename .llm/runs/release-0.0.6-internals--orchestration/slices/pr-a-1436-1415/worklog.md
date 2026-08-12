@@ -88,10 +88,11 @@ The predicate remains narrow: factual sentences containing marker words later in
 
 ## S5 — gate evidence
 
-- Gate 1 exact command: exit 1, 39 passed / 9 failed. Every failure is `NotCapable: Requires write
-  access to <TMP>` from pre-existing tests using `Deno.makeTempDir()`; see `drift.md`.
-- Gate 1 supplementary command with the permissions required by the existing suite
-  (`--allow-write --allow-run`): exit 0, 48 passed / 0 failed.
+- Superseded Gate 1 command from the original brief: exit 1, 39 passed / 9 failed. Every failure was
+  `NotCapable: Requires write access to <TMP>` from pre-existing tests; see `drift.md`.
+- Amended Gate 1:
+  `deno test --allow-read --allow-env --allow-write --allow-run .llm/tools/validation/` — exit 0,
+  48 passed / 0 failed at final head `9c7eba4e74`.
 - Gate 2 scoped check: exit 0; 18 files, 1 batch, 0 failed batches, 0 findings.
 - Gate 3 scoped lint: exit 0; 18 files, 1 batch, 0 findings.
 - Gate 4 scoped format: exit 0; 18 files, 1 batch, 0 findings.
@@ -111,7 +112,8 @@ The predicate remains narrow: factual sentences containing marker words later in
   "resolves https://github.com/rickylabs/netscript/issues/333" -> [333]
   ```
 
-- Gate 6 live mirror dry-run against PR #1527: exit 0, no changes. Snapshots for #1436 and #1415
+- Gate 6 live mirror dry-run against PR #1527 at final head `9c7eba4e74`: exit 0, no changes.
+  Snapshots for #1436 and #1415
   were read; illustrative `fix #1431` was classified as a pull request and excluded visibly, while
   both real closing issues were classified as issues and retained. Mirror skipped mutation because
   `status:ready-merge` is correctly absent; the implementation agent did not apply it.
