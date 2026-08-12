@@ -403,3 +403,31 @@ cancelled, and both were re-triggered through the **label** path. Both re-dispat
 
 The invariant in one line: **the evaluator's head must equal the merge head.** This lane had been
 checking that the verdict *said* PASS, not that it described the commit about to land.
+
+---
+
+## D-12 — correcting D-11: `run.headSha` is not evidence of what an evaluator read
+
+**Severity: significant. Recorded 2026-08-12. This entry supersedes D-11's standing rule.**
+
+D-11 concluded that draft→ready-triggered evaluations "do not bind to the PR head" because their run
+metadata reported the base or merge ref while label-triggered runs reported the branch head. **That
+inference was wrong.** For a `pull_request` event, `github.sha` is the merge ref **by GitHub's
+design**; the checkout the evaluator actually performs is a separate matter. The metadata never
+described what the evaluator read, so it could not support the conclusion drawn from it.
+
+The cost: #1595 was rolled back off `status:ready-merge` and re-triggered, and #1602's in-flight
+evaluation was cancelled — both on a PASS that was already valid. The owner caught it and restored
+#1595's original verdict (`31622416983`, exact head `cbf6d5c27`), which then merged unchanged.
+
+**Corrected rule, replacing D-11's:**
+
+1. The authority on what was evaluated is the **verdict's own declared head**, not `run.headSha`.
+2. Re-trigger a new evaluation generation **only** for a genuinely new head, or a prior run that
+   failed or returned no verdict. Not for metadata that merely looks inconsistent.
+3. A post-ready change that alters the tree still voids the prior verdict — that part of D-11 stands.
+
+The general lesson is the one this lane keeps relearning from the other direction: **an inference
+drawn from a proxy field is not evidence.** D-11 was written while arguing that a PASS which cannot
+be shown to describe the merge commit is a plausible-looking artefact — and then treated a proxy
+field as if it were the thing itself. Verify against the artefact, not the metadata about it.
