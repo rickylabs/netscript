@@ -89,6 +89,17 @@ terminal states.
 - **D3** — The hook publishes under an OTel context extracted from the execution record's stored
   `traceparent`/`tracestate`, so the publish span joins the `job.execute` trace. This is the
   join mechanism; it is not optional and it is what the new unit test pins.
+
+  **Amended after PLAN-EVAL (finding F1 — verified).** The mechanism is now explicit rather than
+  implied: `StreamsTracerPort.startSpan`
+  (`packages/plugin-streams-core/src/telemetry/instrumentation.ts:92-102`) takes **no parent-context
+  argument**, so the *only* way for the publish span to inherit the stored trace id is for
+  `createStreamMutationHook` (`packages/plugin-workers-core/src/streams/producer.ts:108-118`) to wrap
+  its `producer.upsert(...)` call in
+  `context.with(extractContext({ traceparent, tracestate }), () => producer.upsert(...))`. Today that
+  call has no wrapping at all. An implementation that installs the hook without this wrapping will
+  appear to work and will fail TC-14 on the `create()` record — the exact trap this plan exists to
+  avoid.
 - **D4** — **No change to `WorkerExecutionZodSchema`** and no new public export. If implementation
   shows the join cannot be made without a schema field, that is a stop-and-report, not a decision to
   take in-slice.
@@ -126,6 +137,15 @@ endpoint at wiring time. That is a runtime observation for S3, not a design unkn
 **S1 — hook installation + trace-context join** (D1, D2, D3) with unit tests.
 
 **S2 — un-defer the two OTEL gates** (D5) and make `suite-registry_test.ts` assert the new state.
+
+**Amended after PLAN-EVAL (finding F2 — verified).** This plan originally named only
+`suite-registry_test.ts:204-215`. There is a **second** test that also pins the deferral and must be
+updated in the *same commit*: `suite-registry_test.ts:209-234`,
+`'runtime suites pin the exact #1398 OTEL deferral without widening it'`, which asserts
+`SCAFFOLD_RUNTIME_DEFERRED_GATES` equals the exact two-entry list (`:210-221`) **and** that neither
+runtime tier executes a deferred gate (`:223-233`). Both tiers reference the constant
+(`capability-suites.ts:211,218`). Emptying the constant without rewriting this test leaves S2 red.
+Confirmed by reading both tests directly.
 
 **S3 — live runtime evidence**: one `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`
 run, with the two previously-deferred gates passing, plus the Aspire trace showing producer →
