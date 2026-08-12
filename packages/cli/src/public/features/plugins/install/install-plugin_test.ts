@@ -239,6 +239,100 @@ describe('public install plugin flow', () => {
     assertEquals(plan.dbDetection.requiresDb, false);
   });
 
+  for (const prefix of ['jsr:', ''] as const) {
+    const spelling = prefix === 'jsr:' ? 'jsr:-prefixed' : 'prefixless';
+    it(`preserves a ${spelling} exact canary through validation, scaffold dispatch, and generated state`, async () => {
+      const requestedVersion = '0.0.6-canary.2';
+      const requestedSpec = `${prefix}@netscript/plugin-workers@${requestedVersion}`;
+      const fs = new MemoryFileSystemAdapter();
+      await writeProjectFiles(fs);
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+      const descriptor: ValidatedPluginDescriptor = {
+        ...workersDescriptor(),
+        package: {
+          ...workersDescriptor().package,
+          requestedSpec,
+          source: prefix === 'jsr:' ? 'explicit-jsr' : 'scoped-name',
+          requestedVersion,
+          jsrSpecifier: `jsr:@netscript/plugin-workers@${requestedVersion}`,
+        },
+        version: requestedVersion,
+        manifest: { ...workersDescriptor().manifest, version: requestedVersion },
+        packageMetadata: { latest: '0.0.5', isYanked: false },
+        versionMetadata: { ...workersDescriptor().versionMetadata, files: {} },
+      };
+      let validatedPackage: ValidatedPluginDescriptor['package'] | undefined;
+      const processCalls: Array<{ readonly command: string; readonly args: readonly string[] }> =
+        [];
+
+      const result = await installPlugin({
+        kind: 'workers',
+        pluginName: 'workers',
+        serviceReferences: [],
+        pluginReferences: [],
+        noDb: true,
+        includeSamples: false,
+        skipConfirmation: true,
+        jsrUrl: requestedSpec,
+        projectRoot: '/workspace/alpha',
+        overwrite: false,
+      }, {
+        fs,
+        scaffolder,
+        templateAdapter,
+        registry: new PluginKindRegistry(),
+        registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        pluginValidator: {
+          validate: (resolvedPackage) => {
+            validatedPackage = resolvedPackage;
+            return Promise.resolve({ ok: true, descriptor });
+          },
+        },
+        processRunner: {
+          exec: (command, args) => {
+            processCalls.push({ command, args });
+            return Promise.resolve({
+              code: 0,
+              stdout: JSON.stringify({
+                status: 'applied',
+                createdFiles: [],
+                modifiedFiles: [],
+                databaseMigrationsAdded: false,
+              }),
+              stderr: '',
+            });
+          },
+        },
+        regenerateHelpers: () => Promise.resolve([]),
+      });
+
+      assertEquals(validatedPackage?.requestedVersion, requestedVersion);
+      assertEquals(
+        processCalls[0].args.includes(
+          `jsr:@netscript/plugin-workers@${requestedVersion}/scaffold`,
+        ),
+        true,
+      );
+      assertEquals(result.resolvedPlugin?.version, requestedVersion);
+      const denoJson = JSON.parse(await fs.readFile('/workspace/alpha/deno.json'));
+      assertEquals(
+        denoJson.imports['@netscript/plugin-workers'],
+        `jsr:@netscript/plugin-workers@${requestedVersion}`,
+      );
+      const appsettings = await fs.readFile('/workspace/alpha/appsettings.json');
+      assertStringIncludes(
+        appsettings,
+        `jsr:@netscript/plugin-workers@${requestedVersion}/services`,
+      );
+      const installedManifest = JSON.parse(
+        await fs.readFile('/workspace/alpha/plugins/workers/scaffold.plugin.json'),
+      );
+      assertEquals(installedManifest.version, requestedVersion);
+    });
+  }
+
   it('rejects a configured service-less plugin without appsettings or a conventional plugin directory', async () => {
     const fs = new MemoryFileSystemAdapter();
     await writeProjectFiles(fs);

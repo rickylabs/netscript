@@ -219,7 +219,14 @@ export async function installPlugin(
     pluginConfigDirectory,
     'plugin.ts',
   );
-  await dependencies.workspaceMutator.ensureRootImportsForPluginKind(plan.projectRoot, plan.kind);
+  await dependencies.workspaceMutator.ensureRootImportsForPluginKind(
+    plan.projectRoot,
+    plan.kind,
+    {
+      packageSpecifier: resolvedPlugin.descriptor.package.packageSpecifier,
+      version: resolvedPlugin.descriptor.version,
+    },
+  );
   const provisionedCache = plan.provider.defaultRequiresKv
     ? await dependencies.workspaceMutator.ensureSharedCache(plan.projectRoot)
     : false;

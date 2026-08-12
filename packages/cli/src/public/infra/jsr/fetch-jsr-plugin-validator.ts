@@ -42,13 +42,24 @@ export class FetchJsrPluginValidator implements JsrPluginValidatorPort {
         `JSR package metadata for ${resolvedPackage.packageSpecifier} is invalid.`,
       );
     }
-    if (packageMeta.isYanked) {
+    const resolvedVersion = resolvedPackage.requestedVersion ??
+      resolveInstallVersion(packageMeta, NETSCRIPT_RELEASE_VERSION);
+    if (!Object.hasOwn(packageMeta.versions, resolvedVersion)) {
+      return {
+        ok: false,
+        error: {
+          code: 'not-found',
+          message:
+            `JSR package ${resolvedPackage.packageSpecifier}@${resolvedVersion} was not found.`,
+        },
+      };
+    }
+    if (asRecord(packageMeta.versions[resolvedVersion]).yanked === true) {
       return {
         ok: false,
         error: {
           code: 'version-yanked',
-          message:
-            `JSR package ${resolvedPackage.packageSpecifier}@${packageMeta.latest} is yanked.`,
+          message: `JSR package ${resolvedPackage.packageSpecifier}@${resolvedVersion} is yanked.`,
         },
       };
     }
@@ -60,7 +71,6 @@ export class FetchJsrPluginValidator implements JsrPluginValidatorPort {
     // Only the metadata/file URLs are pinned; generated import specifiers are untouched, so the
     // identity-based `minimumDependencyAge` exclusion in generated projects still applies and a
     // freshly published version is not subject to the age window.
-    const resolvedVersion = resolveInstallVersion(packageMeta, NETSCRIPT_RELEASE_VERSION);
     const versionResponse = await this.http.fetch(
       jsrVersionMetaUrl(resolvedPackage, resolvedVersion),
       {
@@ -114,6 +124,20 @@ export class FetchJsrPluginValidator implements JsrPluginValidatorPort {
         },
       };
     }
+    if (
+      manifestResult.manifest.name !== resolvedPackage.packageSpecifier ||
+      manifestResult.manifest.version !== resolvedVersion
+    ) {
+      return {
+        ok: false,
+        error: {
+          code: 'invalid-manifest',
+          message:
+            `scaffold.plugin.json identity ${manifestResult.manifest.name}@${manifestResult.manifest.version} ` +
+            `does not match requested ${resolvedPackage.packageSpecifier}@${resolvedVersion}.`,
+        },
+      };
+    }
 
     return {
       ok: true,
@@ -121,7 +145,7 @@ export class FetchJsrPluginValidator implements JsrPluginValidatorPort {
         package: resolvedPackage,
         version: resolvedVersion,
         manifest: manifestResult.manifest,
-        packageMetadata: packageMeta,
+        packageMetadata: { latest: packageMeta.latest, isYanked: false },
         versionMetadata,
         details,
       },
@@ -173,17 +197,14 @@ function readPackageMeta(
   if (latest === undefined) {
     return undefined;
   }
-  const latestMetadata = asRecord(versions[latest]);
   return {
     latest,
-    isYanked: latestMetadata.yanked === true,
     versions,
   };
 }
 
 interface PackageMeta {
   readonly latest: string;
-  readonly isYanked: boolean;
   readonly versions: Readonly<Record<string, unknown>>;
 }
 
