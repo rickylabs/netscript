@@ -633,3 +633,38 @@ where the label alone does nothing). This is the third time in this lane that or
 whole difference between a red close-gate and a green one.
 
 4 of 6 owned issues now closed: #1397, #1399, #1428, #1417.
+
+## 2026-08-12 — Correction: my rule-3 falsification was overstated
+
+Earlier in this run I recorded cut-trace rule 3 as DISPROVED, claiming #1535's green `close-gate`
+"asserted nothing about acceptance — there were no boxes to check, so the gate had no work to do
+and passed trivially."
+
+**That was too strong and partly wrong.** `close-gate` validates **PR-body** checkboxes as well as
+issue checkboxes. The proof arrived from #1539, which failed close-gate on its own PR body:
+
+```
+close-gate FAIL rickylabs/netscript#1539
+unchecked PR body: #1539 line 28 [Acceptance] "Separate Fable 5 medium IMPL-EVAL returns PASS.
+Pending by design; evaluator separation forbids this implementation session from self-certifying it."
+```
+
+So for #1535 the gate *did* do work — it read that PR's acceptance checklist and found it fully
+ticked. What survives, in weaker and accurate form:
+
+- **What close-gate proves:** every box, on the closing issues **and** on the PR body, is ticked.
+- **What it cannot prove:** that a ticked box is *true*. Ticking is an authorial assertion; the gate
+  verifies presence, not assertion — which is precisely #1415's open subject.
+- **For a box-less issue** (#1438, #1430, #1428) its acceptance signal reduces to the PR-body
+  checklist with no issue-side cross-check, so pre-merge checks 5 and 7 do carry more weight there.
+  That part of the original entry stands.
+
+Recorded as a correction rather than edited in place. An orchestrator who overstates a
+falsification and then quietly tidies it away has destroyed the same evidence as one who patches
+over a real falsification — and this lane's whole subject is checks that look better than they are.
+
+**#1539's close-gate failure is the honesty rule working as designed.** The implementation session
+refused to tick its own IMPL-EVAL box ("Pending by design; evaluator separation forbids this
+implementation session from self-certifying it"), and the gate then refused to pass the PR. The box
+becomes tickable only when a separate-session verdict actually returns PASS — which is the correct
+merge ordering for #1539 and is what this lane is waiting on.
