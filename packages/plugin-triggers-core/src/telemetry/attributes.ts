@@ -23,9 +23,9 @@ export const TriggerSpanNames: TriggerSpanNamesMap = Object.freeze(
 /**
  * Trigger attribute keys emitted on spans and metrics.
  *
- * Namespaced under `netscript.trigger.*` per the #402 two-tier namespacing law.
+ * Namespaced under `netscript.trigger.*` by the two-tier namespacing rule.
  * `http.status_code` intentionally retains the standard OpenTelemetry semantic
- * convention key. Pre-#402 bare `trigger.*` keys shipped in `0.0.1-beta.5` and
+ * convention key. The bare `trigger.*` keys shipped in `0.0.1-beta.5` and
  * remain available through {@link DeprecatedTriggerAttributes} during the
  * deprecation window.
  */
@@ -65,7 +65,7 @@ export const TriggerAttributes: TriggerAttributesMap = Object.freeze(
 );
 
 /**
- * Deprecated pre-#402 bare `trigger.*` attribute keys, keyed by canonical
+ * Deprecated bare `trigger.*` attribute keys, keyed by canonical
  * {@link TriggerAttributes} value.
  *
  * These shipped in `0.0.1-beta.5`. Trigger instrumentation emits them alongside

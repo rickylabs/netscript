@@ -16,14 +16,14 @@ export type SagaPublishOptions = Readonly<{
   tracestate?: string;
 }>;
 
-/** Signal dispatch request reserved for Phase 7d runtime support. */
+/** Dispatch envelope for the reserved signal axis. */
 export type SagaSignalDispatch<TPayload = unknown, TName extends string = string> = Readonly<{
   instanceId: SagaInstanceId;
   signal: SignalDefinition<TPayload, TName> | SagaSignal<TPayload>;
   payload: TPayload;
 }>;
 
-/** Query dispatch request reserved for Phase 7d runtime support. */
+/** Dispatch envelope for the reserved query axis. */
 export type SagaQueryDispatch<TResult = unknown, TName extends string = string> = Readonly<{
   instanceId: SagaInstanceId;
   query: QueryDefinition<TResult, TName>;

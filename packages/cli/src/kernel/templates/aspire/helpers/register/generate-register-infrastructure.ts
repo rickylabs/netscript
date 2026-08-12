@@ -406,7 +406,7 @@ function denokvContainerSetup(
 /**
  * Emits the Garnet executable setup lines (shared by the Executable arm and the
  * Docker-less branch of the Auto arm). Runs `garnet-server` as a self-provisioned
- * dotnet tool (no Docker) over a Redis-compatible TCP endpoint (#372). The tool
+ * dotnet tool (no Docker) over a Redis-compatible TCP endpoint. The tool
  * version pins from `CacheEntry.ToolVersion`, falling back to the scaffold pin.
  */
 function garnetExecutableSetup(

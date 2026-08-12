@@ -123,7 +123,7 @@ export type ManualTriggerDefinition<
     auditRequired: boolean;
   }>;
 
-/** Trigger definitions implemented by the Group F runtime. */
+/** Trigger definitions accepted by the current runtime processor. */
 export type RuntimeTriggerDefinition<
   TId extends string = string,
   TEvent = unknown,
@@ -133,7 +133,7 @@ export type RuntimeTriggerDefinition<
   | FileWatchDefinition<TId, TEvent, TContext>
   | ScheduledTriggerDefinition<TId, TEvent, TContext>;
 
-/** Trigger definitions known by the Group F public surface. */
+/** Implemented and reserved trigger definitions exposed by the public API. */
 export type TriggerDefinition<
   TId extends string = string,
   TEvent = unknown,
