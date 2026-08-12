@@ -1323,3 +1323,53 @@ verdict the re-trigger existed to replace — and this time it would have blocke
 already fixed. The workaround remains: **wait on the Actions run id**, then match the verdict comment's
 `run_id` against it. One trigger marker was verified at the new head (`gen=29350385980`), so exactly-once
 holds.
+
+## D-40 — explicit orchestrator scope authorization on PR #1596 (#1549), both escalations granted narrowly
+
+- **Severity:** significant (authorized scope expansion, recorded rather than absorbed)
+- **Recorded:** 2026-08-12, owner decision relayed as orchestrator authorization
+- Both escalations are contradictions **in this lane's brief**, not defects in the implementation. The
+  implementer refused to resolve either silently and blocked on direction, which is the correct behaviour and
+  the fifth time on this lane that escalation has found the brief wrong rather than the code.
+
+### D-2 — the generated derivative: AUTHORIZED
+
+`deno task gen:assets-barrel` regenerates `packages/cli/src/kernel/assets/agent-tools.generated.ts` (2
+insertions, 2 deletions) because the embedded `quality/scan-code-quality.ts` payload and bundle hash changed.
+My brief's **gate** list demanded an empty `git status` after the generator while my **boundary** list omitted
+that file — self-contradictory by construction.
+
+Authorized: commit the deterministic output. It is a **mandatory generated derivative of the owned embedded
+tool change**, not scope drift. Constraint: only the generator output, with a **second** generator run proving
+`git status --porcelain` empty — the idempotence proof is what distinguishes a generated commit from a
+hand-edit.
+
+**This is the same coupling as `drift.md` D-22**, which cost PR-E a CI cycle and which I then recorded — and I
+still failed to add the generated file to PR-D's boundary list while copying the gate across. Recording a
+lesson is not the same as applying it.
+
+### D-1 — the three newly surfaced findings: AUTHORIZED, exactly three
+
+Treating `docs/site/**/*_test.ts` companions as docs fixtures rather than exempt tests surfaced three
+pre-existing `explicit-any` violations in `docs/site/reference/contracts/examples_test.ts` (lines 13, 22, 43 —
+Prisma-shaped fixture signatures, a sort callback, a count signature). My brief simultaneously required all
+docs companions to be scanned, forbade fixing surfaced findings, and required both scans green. Those cannot
+all hold at this baseline.
+
+Authorized: **fix exactly those three**, with sound `unknown`/input narrowing or a properly typed fixture.
+**No casts, suppressions, or allowances** — any of those would satisfy the scan while defeating its purpose.
+
+The governing reason, which generalises past this PR: **a gate that deliberately widens coverage cannot ship
+red while deferring the first findings that widening exposes.** Landing it red would have the PR prove the
+gate now sees docs companions *and* demonstrate the repo cannot satisfy it — the false-done shape inverted.
+Fixing them is the smallest connected integrity fix, so it is in scope **by consequence** rather than by
+original scope. Anything beyond those three is not: a fourth finding is triaged, not fixed.
+
+Additional constraint recorded because the file is documentation: it must still compile **and still teach what
+the page teaches**. If proper typing would change what the snippet demonstrates, stop and report rather than
+silently alter documentation semantics.
+
+### Accepted drift, not a defect
+
+The trigger defect moved from `index.md:310` to line 173; symbol and executable twin still match. My brief
+pinned a stale line number. The identity of a defect is the symbol, not the line.
