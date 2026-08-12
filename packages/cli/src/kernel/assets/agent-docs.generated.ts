@@ -254,6 +254,7 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
     './ai/sandbox',
     './builders',
     './defer',
+    './defer/island',
     './desktop',
     './error',
     './form',

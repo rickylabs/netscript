@@ -11,6 +11,7 @@
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { ScaffoldResult } from '../../domain/core-types.ts';
 import type { PackageSourceMode } from '../../domain/scaffold/scaffold-options.ts';
+import { SCAFFOLD_APP_CATALOG } from '../../constants/scaffold/scaffold-app-catalog.ts';
 
 // ============================================================================
 // TYPES
@@ -142,7 +143,7 @@ export async function normalizeFreshOutput(
 
       // Ensure Vite and Fresh plugin imports exist
       config.imports ??= {};
-      config.imports['@fresh/plugin-vite'] ??= 'jsr:@fresh/plugin-vite@^1.0.8';
+      config.imports['@fresh/plugin-vite'] ??= SCAFFOLD_APP_CATALOG.FRESH_PLUGIN_VITE;
       config.imports['vite'] ??= 'npm:vite@^7.2.2';
 
       await fs.writeFile(denoJsonPath, JSON.stringify(config, null, 2) + '\n');

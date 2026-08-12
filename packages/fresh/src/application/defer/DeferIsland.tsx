@@ -219,7 +219,7 @@ export function DeferComponent({
       method='GET'
       action={action}
       f-partial={`${partial}${partialSearchParamsString}`}
-      f-client-nav={!(isPartialRequest && !hasCachedData)}
+      f-client-nav
       style={{ display: 'none' }}
       aria-hidden='true'
     >
