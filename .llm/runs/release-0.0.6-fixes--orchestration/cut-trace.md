@@ -128,3 +128,56 @@ existing thread with their in-progress work intact (A: modified `github-release_
 modified `publish-workspace.ts` plus a new `publish-workspace_test.ts`). Nothing was lost but time,
 because the work was on disk in the worktree rather than only in the turn.
 
+
+## Canary checkpoint — v0.0.6-canary.2 (2026-08-12)
+
+First intermediary canary under the owner's checkpoint authorization. This lane acted as
+release-checkpoint coordinator; the cut was reported to the owner and authorized before dispatch.
+
+| Field | Value |
+| --- | --- |
+| Tag | `v0.0.6-canary.2` |
+| Tag commit | `89184c1bd200` (coordinated version-only bump) |
+| **Content SHA** | **`e67c1ba1317e`** — the tag's parent, exactly the authorized `main` |
+| Workflow | `release-canary.yml` run `31596869408`, dispatched `--ref main` |
+| Pinned prod E2E | `e2e-cli-prod` run `31597418450` — **success** |
+| `release/canary-pair` | **success** on `e67c1ba13` — "Canary 0.0.6-canary.2 publish + pinned production E2E passed" |
+| Package completeness | **35 / 35** publishable members present at `0.0.6-canary.2`, zero missing |
+| Excluded | #1539 (unmerged at cut time), per owner instruction |
+
+**Publication route.** Dispatched through the checked-in workflow via OIDC. **No local publish and
+no hand-run publish script** — `netscript-release` prohibits ad-hoc publication, and the JSR budget
+gate (step 4) ran inside the workflow with a token this orchestrator deliberately does not hold.
+
+**Pre-cut evidence, executed at the validated SHA:**
+
+```
+clean tree                0 dirty files
+publish:readiness         EXIT 0 — all 8 gates PASS (35 effective members matched)
+release:preflight         text-imports · import-attributes · file-url-import-meta · self-imports  ALL PASS
+publish:dry-run           EXIT 0, tree clean after, deno.lock unchanged
+current-main SHA check    0 commits advanced between authorization and dispatch
+```
+
+**Step 14 skipped** (`Detect exact-version registry outcome after publish failure`) — no
+partial-publish path was entered, which is the distinction the beta.10 incident made load-bearing.
+
+**Why this checkpoint was meaningful rather than arbitrary** — the reason came from the internals
+lane and was verified here: `code-quality-repo` on `main` was RED for **nine consecutive pushes**
+(back through `84dd44ae7`, which was this lane's own #1538 merge) and went green at `e67c1ba13`.
+A canary cut during that streak would have shipped repo-wide quality evidence that was *unreadable*
+rather than failing — red for a fixture-scanning defect, not a payload defect. Verified
+independently: `quality:scan:repo` at merged main → `ok:true, findings:[], allowCount:8, EXIT 0`.
+
+**Stated limitation carried into the payload note.** The shipped `@netscript/mcp` agent-docs corpus
+is a 0.0.5-era snapshot (provenance `version 0.0.5`, `sourceCommit eda49bb2e`, extracted
+2026-08-09) carrying **60 `api-clients` references across 11 files** that `docs/site` no longer
+contains — verified by this lane at the docs lane's prompting. That is the state `main` has held
+since 2026-08-09, so it is a continuation rather than a regression, and the docs lane's #1531 is the
+merge that closes it. The next checkpoint after #1531 is the first whose shipped corpus and
+documentation site agree.
+
+**Cut property stated in advance, and it held.** Because #1539 was unmerged, `isVersionOnlyReleaseDiff`
+could not authorize inheritance, so the pair had to be proven directly rather than inherited — which
+is exactly what the workflow did by writing the pair on the pre-bump content SHA. 0.0.5 paid an
+extra canary cycle for discovering this at publish time; here it was predicted before dispatch.
