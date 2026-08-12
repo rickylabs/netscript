@@ -76,6 +76,10 @@ the gap is not wide; fixture narrowing is rejected because rank three can remain
 | 2026-08-12 | S0 | bootstrap | `supervisor.md` created first; required skills, workflow, doctrine, issue, package surface, and sibling PR read. |
 | 2026-08-12 | S0 | measurement | Instrumentation matched `GuidanceIndex.find()` and printed both candidates on base and fresh corpora. |
 | 2026-08-12 | S0 | design | Locked transitive close-score grouping; PLAN-EVAL recorded N/A with concrete rationale. |
+| 2026-08-12 | S1 | implementation | Added leader-anchored close-score grouping by route/document and preserved maximum-score confidence. |
+| 2026-08-12 | S1 | focused validation | Seven focused tests passed; all eight fresh fixture cases passed across two corpus constructions × two query reruns. |
+| 2026-08-12 | S1 | slice review | Reviewed the source/test diff for transitivity, route precedence, same-page scoring, confidence preservation, public-surface stability, and scope boundaries; no overreach or generated/lock churn found. |
+| 2026-08-12 | S1 | reconcile | Live issue #1615 remains open; draft PR #1617 has exactly `status:impl`, required labels/milestone/closing keyword, and no new evaluator or reviewer comments. |
 
 ## Decisions
 
@@ -99,6 +103,8 @@ the gap is not wide; fixture narrowing is rejected because rank three can remain
 | Gate | Command or check | Result | Notes |
 | ---- | ---------------- | ------ | ----- |
 | score measurement | scratch instrumentation, base + PR #1608 blob | PASS | raw exit 0; public/instrumented top three agree |
+| focused MCP guidance | `deno test ... guidance-retrieval_test.ts guidance-evaluation_test.ts` | PASS | exit 0; 7 passed, 0 failed |
+| requested guidance filter | `rtk proxy deno task test --filter guidance` | PASS | exit 0; 13 passed, 0 failed, 3326 filtered (before test title was renamed to include `guidance`; focused run includes it) |
 
 ### Fitness Gates
 
@@ -110,16 +116,15 @@ the gap is not wide; fixture narrowing is rejected because rank three can remain
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| guidance behavior | NOT_RUN | pending S1 | both adapters and both corpora required |
+| guidance behavior | PASS | base focused test + fresh scratch loader | base adapters agree twice; fresh 8 cases pass for 2 corpus constructions × 2 reruns |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| `find_guidance` callers | NOT_RUN | pending S1/S2 | public result shape unchanged |
+| `find_guidance` callers | PASS | guidance contract/filter tests | public result shape unchanged; exact golden preserved |
 
 ## Handoff Notes
 
 - Evaluator should inspect the grouping boundary/transitivity tests, the fresh corpus proof, and
   the raw negative-control exit first.
-

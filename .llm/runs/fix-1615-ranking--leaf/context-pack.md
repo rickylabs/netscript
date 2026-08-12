@@ -6,14 +6,15 @@
 | ----- | ----- |
 | Run ID | `fix-1615-ranking--leaf` |
 | Branch | `fix/1615-guidance-ranking-determinism` |
-| Current phase | `plan` |
+| Current phase | `implement` |
 | Archetype | `2 — Integration` |
 | Scope overlays | none |
 
 ## Current State
 
-Run activated and measurement/design locked. The fresh direct/plugin absolute score gap is
-`0.3019801981861221`, selecting a deterministic close-score tie-break. No product code has changed.
+S1 implementation and focused validation are complete. The fresh direct/plugin absolute score gap
+is `0.3019801981861221`; leader-anchored close-score groups now restore the unchanged exact golden
+on both base and fresh corpora without changing public contracts.
 
 ## Completed
 
@@ -22,16 +23,19 @@ Run activated and measurement/design locked. The fresh direct/plugin absolute sc
   ranking implementation, fixture, and relevant debt.
 - Printed and cross-checked base and fresh candidate scores.
 - Recorded PLAN-EVAL N/A; mandatory separate-session IMPL-EVAL remains with the orchestrator.
+- Opened draft PR #1617 with `Closes #1615`, exactly `status:impl`, requested labels, milestone 0.0.6.
+- Implemented and focused-tested close-score grouping; fresh 8-case fixture passed twice across two
+  independently constructed corpora.
 
 ## In Progress
 
-- S0 bootstrap commit, explicit push, and draft PR creation.
+- S1 implementation commit and PR comment.
 
 ## Next Steps
 
-1. Commit/push S0 and open the labeled draft PR at `status:impl`.
-2. Implement transitive close-score grouping with focused tests.
-3. Prove all eight fixtures on base and fresh corpus, then run requested negative/full gates.
+1. Commit/push S1 and post its PR phase comment.
+2. Run the throwaway-commit negative control and record the raw exit.
+3. Run repository, scoped static/doc-lint, and quality gates; finalize S2 evidence.
 
 ## Key Decisions
 
@@ -46,16 +50,18 @@ Run activated and measurement/design locked. The fresh direct/plugin absolute sc
 | Path | Status | Notes |
 | ---- | ------ | ----- |
 | `.llm/runs/fix-1615-ranking--leaf/**` | new | run identity, research, design, decisions, and resumable state |
+| `packages/mcp/src/domain/docs/guidance-index.ts` | changed | measured transitive close-score ordering policy |
+| `packages/mcp/tests/guidance-retrieval_test.ts` | changed | grouping/no-chaining/same-page ordering proof |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
 | Measurement | pass | base and fresh scores printed; instrumentation cross-check passed |
-| Static | pending | S1/S2 |
+| Static | partial pass | focused guidance test: 7 passed; requested guidance filter: 13 passed |
 | Fitness | pending | S2 |
-| Runtime | pending | guidance and fresh-corpus tests |
-| Consumer | pending | public shape unchanged; behavioral gates remain |
+| Runtime | pass | base adapter parity/rerun plus fresh 8 cases × 2 corpora × 2 reruns |
+| Consumer | pass | unchanged exact fixture and guidance contract tests |
 
 ## Open Questions
 
@@ -69,4 +75,3 @@ Run activated and measurement/design locked. The fresh direct/plugin absolute sc
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments.
-
