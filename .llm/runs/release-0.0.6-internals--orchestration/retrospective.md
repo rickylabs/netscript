@@ -3,11 +3,19 @@
 Written at lane close by the orchestrating session. Measured, not celebratory: the useful output of a run like
 this is the list of things it got wrong early enough to fix, plus the assumptions it destroyed.
 
-**Final state.** Six PRs merged, seven issues closed (#1436, #1415, #1530, #1566, #1403, #1380, #1549), all
-directly against `main`, no umbrella implementation. The four owned issues (#1380, #1403, #1549, #1566) are each
-`CLOSED/COMPLETED`, milestone 0.0.6, exactly one `status:shipped`. 49 drift entries. Verified on merged `main`
-`c7fc45318`: `quality:scan:repo` exit 0 `allowCount` **8**, `arch:check` 0, `arch:check:repo` 0, import-closure
-guard 3/3.
+**Final state.** **Seven PRs merged, eight issues closed** (#1436, #1415, #1530, #1566, #1403, #1380, #1549,
+#1612), all directly against `main`, no umbrella implementation. Every one is `CLOSED/COMPLETED`, milestone 0.0.6,
+with exactly one `status:shipped`. **51 drift entries.** Verified on merged `main`:
+
+| Claim | Verified at | Result |
+| --- | --- | --- |
+| `quality:scan:repo` | `c7fc45318` | exit 0, `allowCount` **8** (from 10) |
+| `arch:check` / `arch:check:repo` | `c7fc45318` | exit 0 / exit 0 |
+| consumer bundle import-closure guard | `c7fc45318` | 3 passed / 0 failed |
+| published-JSDoc codename guard | `6b29d12ea` | **4 passed / 0 failed** (main was 3 passed / 1 **failed**) |
+
+The last row is the one that matters operationally: the lane's final leaf (#1612) took `main` from red to green on
+`deno task test`, which unblocked #1599's otherwise-3340/3340 run.
 
 ## What the lane actually delivered
 
@@ -199,3 +207,60 @@ a guess).
 - **Re-evaluate after a required fix, and bind the verdict to a head.** It caught a red close-gate on PR #1560 the
   one time it was tested, and it is the reason the flake window could not smuggle a stale PASS into a merge.
 - **`box-index` over exact box text**, and pre-validating the mapping locally before spending a CI round trip.
+
+## The acceptance mirror failed twice, in two different ways
+
+Worth separating, because fixing the first does nothing for the second and I initially assumed it would:
+
+| | #1560 | #1614 |
+| --- | --- | --- |
+| Symptom | mapping matched **0 of 6** boxes | mapping parsed **6 entries for 3** boxes |
+| Cause | exact box text is brittle — `acceptanceCheckboxes` keeps only each box's **first raw line, backticks preserved**, so any box that wraps in the issue body is unmatchable, and the author cannot see the wrapping | the fenced block existed **twice** — canonical in the PR body *and* repeated in a `[PHASE: IMPL]` comment; the mirror parses the body **plus every comment** |
+| Fix | `box-index: 1..N` | exactly one parseable block per issue, canonically in the PR body |
+| Cost | a full failed IMPL-EVAL cycle | one close-gate rerun — caught by local pre-flight before CI |
+
+**`box-index` does not protect against duplication.** The mapping is per-box-per-*document-set*, not
+per-document. Both rules are needed, and the standing form is: index the boxes, and never let a per-slice comment
+repeat the body's evidence block.
+
+The local `validateEvidenceMapping` pre-flight — established after #1560 — is now **two for two** at catching
+mapping defects before CI. It is the cheapest gate this lane added, and the only reason the second failure cost a
+rerun rather than a cycle. Note the mirror's own `--dry-run` cannot substitute for it: it short-circuits on the
+missing `status:ready-merge` label *before* parsing, so it validates nothing pre-label.
+
+## Skipping an evaluation, done as a decision rather than a shortcut
+
+The lane skipped exactly one IMPL-EVAL (#1612), under owner authorization to document a skip "if warranted". What
+made it defensible was **fixing the condition before reading the diff**: for a one-line prose change the only real
+evaluation surface is *whether the prose is true*, everything else being machine-checked by a deterministic guard
+and an exhaustive sweep.
+
+The reword introduced no claim — it was entailed by the preceding sentence — and I verified it against the package
+rather than the prose: `packages/fresh-ui/deno.json` exposes exactly `auto-update` and `desktop`, with no
+`sdk/cache`/`sdk/query` import anywhere in `fresh-ui`. Had it added an unsupported mechanism claim, the automatic
+evaluation would have run.
+
+Two details that keep a skip honest rather than convenient:
+
+- **The escape was available and refused.** A backticked `` `#1589` `` passes the guard, because the scanner strips
+  inline code spans. Using it would have satisfied the letter of the guard while leaving an unresolvable internal
+  pointer in published JSR output. Guard-clean is not the goal; resolvable published documentation is.
+- **The PR body had to be corrected, not just labelled.** It asserted "do not merge until the mandatory
+  separate-session IMPL-EVAL is complete". Applying a skip without editing that would have merged a body
+  contradicting what happened — which is precisely what pre-merge check 7 exists to catch.
+
+## Closing note on the control PR
+
+This lane's control PR (**#1553**) carried orchestration evidence only — the tracked run dir — with **no**
+implementation and **no** closing keyword, and was **closed unmerged by design**. Every issue closed through its
+own leaf PR against `main`, which is what kept each merge independently revertible and each verdict bound to a
+real implementation head.
+
+Worth flagging as a small taxonomy gap rather than silently picking a label: the `status:` lifecycle defines a
+*completed* close (terminal `status:shipped`) and a *not-planned/wontfix* close (no `status:` label, "because it
+did not ship"), and a by-design non-merge record is neither. Literally it shipped no code; in substance it did
+exactly what it existed for. I applied `status:shipped` on the reasoning that the exception is scoped
+specifically to not-planned/wontfix, and leaving it unlabelled would file a completed orchestration record
+alongside abandoned work. The milestone stays `0.0.6` because that is the release it records.
+
+Release ownership sits with **ns006-fixes**. This lane dispatched no release and holds no publish authority.
