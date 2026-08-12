@@ -1219,3 +1219,33 @@ Both lock closures are merged and proven. The remaining input is internals' gree
 on #1570 → attach proof to #1580 → tick → close. The re-cut note must be **measured at the re-cut
 SHA**: main has moved well past the failed attempt's `5705aeb19`, and the payload now includes #1541's
 docs changes and the rewritten `packages/sdk/README.md` JSR landing page.
+
+## 2026-08-12 — independent coordinator proof corroborates exact-main validation
+
+Coordinator measured `50739a7aecc8cc92eb689546bf8225fd6b7bc62c` from a detached checkout at
+`/tmp/ns006-main-check.LOCEdE`, independently of my own worktree:
+
+| Measure | Coordinator | Mine |
+| --- | --- | --- |
+| `deno ci --prod` | PASS | PASS |
+| `deno task --cwd packages/fresh-ui check` | PASS — 150 files / 2 batches / 0 failures | `failedBatches: 0` |
+| root lock sha256 | `73be92b1…9a4c4` | same |
+| private lock sha256 | `77de591c…58c7c8` | same |
+| worktree | clean | clean |
+
+**The load-bearing detail:** those two hashes are **identical to the ones I recorded pre-merge** —
+`73be92b1…` during #1572's second-run neutrality proof, `77de591c…` during #1580's byte-stability
+check. Two independent checkouts, measured before and after merge, agreeing byte-for-byte. That is
+stronger than either measurement alone: it shows the merges introduced **no drift**, which a
+single-observer "gates are green" claim cannot establish.
+
+Recorded as additional preflight evidence for Canary.3.
+
+**Still owed before Canary.3 is eligible:**
+
+1. Internals-owned **#1570** fresh CI proof (green `fresh-ui-quality`) — **theirs to produce; I do not
+   write to that PR.**
+2. Attach that proof to **#1580**, tick its final box, close it.
+3. Confirm **no newer unvalidated `main` commit** has landed between this validation and the cut — the
+   proof above binds to `50739a7ae` specifically, and `main` moves quickly in this repo (it advanced
+   twice during the last two merges alone).
