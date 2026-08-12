@@ -310,3 +310,38 @@ a full-strength opposite-family one.
 - **IMPL-EVAL is unaffected**: #1454's implementation still faces the normal automatic evaluator,
   which is DeepSeek — genuinely opposite-family to Codex. The weakened link is confined to the plan
   phase.
+
+### CORRECTION — the Codex fallback was the wrong route and is non-authoritative
+
+**Recorded 2026-08-12, same day, on owner correction.** I launched a same-family Codex Sol
+evaluator as the fallback. **That was my error.** `lane-policy.md` already documents the correct
+route for exactly this situation:
+
+> *"The phase-bound OpenRouter presets remain available only for a genuine third opinion or when the
+> native opposite-family route is quota-blocked … If that escalation hits an OpenRouter limit, the
+> final fallback is a fresh AGY Gemini 3.6 Flash high session on the Google subscription."*
+
+So the documented ladder is **native opposite-family → OpenRouter preset → AGY Gemini**. Fable is
+prohibited (D-7) and the OpenRouter lane exhausted, which lands squarely on **AGY Gemini 3.6 Flash
+high** — a route that **preserves evaluator independence without Fable**.
+
+I reasoned from "Fable is prohibited, therefore no opposite-family option exists" and reached for
+Codex. The premise was wrong: the policy's own final rung is a different family entirely, and I had
+read that paragraph earlier in this run. **The trade-off I documented above as necessary was not
+necessary** — I traded away opposite-family review when the documented path did not require it.
+
+**Actions taken:**
+
+- The Codex evaluator (thread `019ff65b-4a5f-…`, worktree `ns006-w2h-planeval`) was **stopped before
+  any verdict was consumed**, targeted by its exact `--cwd` argument rather than a host-wide string
+  match — the F-3 lesson applied.
+- **Anything it produced is non-authoritative** and must not be cited as a PLAN-EVAL verdict, in this
+  run or later. It adjudicates nothing.
+- One read-only **AGY Gemini 3.6 Flash · high** evaluator launches against the same immutable head
+  `ad7574bb70dbba8ad3de28ff699c484fd97583e6`.
+
+**What this means for the invariant.** The paragraph above claiming opposite-family review was
+"traded here as an owner decision under a quota constraint" is **withdrawn**. With AGY Gemini,
+generator ≠ evaluator **and** opposite-family both hold. No invariant is traded. The bounds on scope
+still apply: the fallback adjudicates the four hygiene amendments; cycle 1's architectural verdict
+stands; IMPL-EVAL remains DeepSeek.
