@@ -184,6 +184,7 @@ Deno.test('generic OpenHands stays fail-closed to current open evaluator models'
 Deno.test('generic OpenHands delegates comment authorization to the tested policy module', async () => {
   const workflow = await Deno.readTextFile('.github/workflows/openhands-agent.yml');
   assertStringIncludes(workflow, 'id: policy');
+  assertStringIncludes(workflow, "if: github.event_name == 'issue_comment'");
   assertStringIncludes(
     workflow,
     "'.trigger-policy-trusted/.github/scripts/openhands-comment-trigger.mjs'",
