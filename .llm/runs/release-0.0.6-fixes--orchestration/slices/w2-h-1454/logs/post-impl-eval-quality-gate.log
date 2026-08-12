@@ -1,0 +1,366 @@
+Task quality:gate deno task quality:scan && deno task arch:check
+Task quality:scan deno run --allow-read .llm/tools/quality/scan-code-quality.ts
+{"ok":true,"mode":"repository","scanned":["packages/cli/src","plugins"],"findings":[],"allowCount":7,"allowances":[{"file":"packages/cli/src/public/features/root/public-command-dependencies.ts","line":363,"reason":"service manifest loader resolves a runtime module whose structural service contract is wider than the public loader port"},{"file":"packages/cli/src/public/public-api.ts","line":135,"reason":"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification"},{"file":"packages/cli/src/public/public-api.ts","line":136,"reason":"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification"},{"file":"packages/cli/src/public/public-api.ts","line":158,"reason":"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification"},{"file":"packages/cli/src/public/public-api.ts","line":275,"reason":"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification"},{"file":"packages/cli/src/public/public-api.ts","line":276,"reason":"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification"},{"file":"plugins/workers/streams/producer.ts","line":52,"reason":"durable-stream mutation hook upstream type omits the worker execution extension fields"}]}
+Task arch:check deno task deps:check && deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots
+Task deps:check deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/audit-file-link.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts && deno task deps:check:zod
+WARN DEPS-NPM-CATALOG packages/ai/deno.json:31 packages/ai uses npm:@tanstack/ai@^0.39.0 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/ai/deno.json:32 packages/ai uses npm:@tanstack/ai-anthropic@^0.15.13 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/ai/deno.json:33 packages/ai uses npm:@tanstack/ai-mcp@0.2.1 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/ai/deno.json:34 packages/ai uses npm:@tanstack/ai-openai@^0.15.10 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/bench/deno.json:15 packages/bench uses npm:@orpc/server@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/cli/e2e/deno.json:14 packages/cli/e2e uses npm:@orpc/server@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/cli/e2e/fixtures/desktop-native/src/router.ts:2 packages/cli uses npm:@orpc/server@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/cli/e2e/fixtures/desktop-native/src/router.ts:2 packages/cli/e2e uses npm:@orpc/server@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/cli/e2e/src/application/gates/scaffold/consume-flow-b-stream.ts:10 packages/cli uses npm:@opentelemetry/api@^1.9.0 outside package.json catalog: (catalog has ^1.9.1, inline use has ^1.9.0)
+WARN DEPS-NPM-CATALOG packages/cli/e2e/src/application/gates/scaffold/consume-flow-b-stream.ts:10 packages/cli/e2e uses npm:@opentelemetry/api@^1.9.0 outside package.json catalog: (catalog has ^1.9.1, inline use has ^1.9.0)
+WARN DEPS-NPM-CATALOG packages/cli/e2e/src/application/gates/scaffold/consume-flow-b-stream.ts:11 packages/cli uses npm:@opentelemetry/sdk-trace-base@^2.5.0 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/cli/e2e/src/application/gates/scaffold/consume-flow-b-stream.ts:11 packages/cli/e2e uses npm:@opentelemetry/sdk-trace-base@^2.5.0 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/cli/e2e/src/application/gates/scaffold/ui-ai-gates.ts:140 packages/cli uses npm:preact-render-to-string@^6.7.0 outside package.json catalog: (catalog has ^6.7.0)
+WARN DEPS-NPM-CATALOG packages/cli/e2e/src/application/gates/scaffold/ui-ai-gates.ts:140 packages/cli/e2e uses npm:preact-render-to-string@^6.7.0 outside package.json catalog: (catalog has ^6.7.0)
+WARN DEPS-NPM-CATALOG packages/cli/e2e/src/application/gates/scaffold/ui-ai-gates.ts:174 packages/cli uses npm:preact-render-to-string@^6.7.0 outside package.json catalog: (catalog has ^6.7.0)
+WARN DEPS-NPM-CATALOG packages/cli/e2e/src/application/gates/scaffold/ui-ai-gates.ts:174 packages/cli/e2e uses npm:preact-render-to-string@^6.7.0 outside package.json catalog: (catalog has ^6.7.0)
+WARN DEPS-NPM-CATALOG packages/contracts/deno.json:13 packages/contracts uses npm:@orpc/contract@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/fresh-ui/deno.json:19 packages/fresh-ui uses npm:preact@^10.29.2 outside package.json catalog: (catalog has ^10.29.2)
+WARN DEPS-NPM-CATALOG packages/fresh-ui/scripts/build-tokens.ts:1 packages/fresh-ui uses npm:style-dictionary@5.4.4 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/fresh-ui/tests/registry/components/ui/desktop.test.tsx:2 packages/fresh-ui uses npm:preact-render-to-string@^6.7.0 outside package.json catalog: (catalog has ^6.7.0)
+WARN DEPS-NPM-CATALOG packages/fresh-ui/tests/registry/islands/desktop-only.test.tsx:3 packages/fresh-ui uses npm:preact-render-to-string@^6.7.0 outside package.json catalog: (catalog has ^6.7.0)
+WARN DEPS-NPM-CATALOG packages/fresh-ui/tests/runtime/accordion/accordion-render.test.tsx:2 packages/fresh-ui uses npm:preact-render-to-string@^6.7.0 outside package.json catalog: (catalog has ^6.7.0)
+WARN DEPS-NPM-CATALOG packages/fresh/deno.json:41 packages/fresh uses npm:preact@^10.29.2 outside package.json catalog: (catalog has ^10.29.2)
+WARN DEPS-NPM-CATALOG packages/fresh/deno.json:42 packages/fresh uses npm:preact-render-to-string@^6.7.0 outside package.json catalog: (catalog has ^6.7.0)
+WARN DEPS-NPM-CATALOG packages/fresh/deno.json:44 packages/fresh uses npm:@durable-streams/state@^0.3.1 outside package.json catalog: (catalog has ^0.3.1)
+WARN DEPS-NPM-CATALOG packages/fresh/deno.json:45 packages/fresh uses npm:@durable-streams/tanstack-ai-transport@^0.0.8 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/fresh/deno.json:51 packages/fresh uses npm:@orpc/server@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/fresh/deno.json:52 packages/fresh uses npm:@preact/signals@2.9.2 outside package.json catalog: (catalog has 2.9.2)
+WARN DEPS-NPM-CATALOG packages/fresh/deno.json:53 packages/fresh uses npm:@tanstack/ai@^0.39.0 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/fresh/deno.json:54 packages/fresh uses npm:@tanstack/ai-preact@^0.10.1 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/fresh/deno.json:55 packages/fresh uses npm:@tanstack/preact-query@^5.101.0 outside package.json catalog: (catalog has ^5.101.0)
+WARN DEPS-NPM-CATALOG packages/fresh/deno.json:56 packages/fresh uses npm:@tanstack/query-core@^5.101.0 outside package.json catalog: (catalog has ^5.101.0)
+WARN DEPS-NPM-CATALOG packages/fresh/deno.json:57 packages/fresh uses npm:@tanstack/react-db@^0.1.95 outside package.json catalog: (catalog has ^0.1.95)
+WARN DEPS-NPM-CATALOG packages/fresh/deno.json:58 packages/fresh uses npm:vite@7.2.2 outside package.json catalog: (catalog has 7.2.2)
+WARN DEPS-NPM-CATALOG packages/fresh/src/application/vite/vite.test.ts:367 packages/fresh uses npm:/preact@10.29.7/hooks outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/logger/deno.json:20 packages/logger uses npm:@orpc/server@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/plugin-ai-core/deno.json:11 packages/plugin-ai-core uses npm:@orpc/contract@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/plugin-ai-core/deno.json:12 packages/plugin-ai-core uses npm:@orpc/server@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/plugin-auth-core/deno.json:18 packages/plugin-auth-core uses npm:@orpc/contract@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/plugin-auth-core/deno.json:19 packages/plugin-auth-core uses npm:@orpc/server@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/plugin-sagas-core/src/stores/prisma-saga-store_integration_test.ts:2 packages/plugin-sagas-core uses npm:@prisma/adapter-pg@7.8.0 outside package.json catalog: (catalog has ^7.8.0, inline use has 7.8.0)
+WARN DEPS-NPM-CATALOG packages/plugin-workers-core/deno.json:34 packages/plugin-workers-core uses npm:@orpc/contract@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/plugin-workers-core/deno.json:35 packages/plugin-workers-core uses npm:@orpc/server@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/plugin-workers-core/tests/executor/multi-runtime-task-executor_test.ts:1 packages/plugin-workers-core uses npm:@opentelemetry/api@^1.9.1 outside package.json catalog: (catalog has ^1.9.1)
+WARN DEPS-NPM-CATALOG packages/plugin-workers-core/tests/executor/multi-runtime-task-executor_test.ts:2 packages/plugin-workers-core uses npm:@opentelemetry/sdk-trace-base@^2.5.0 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/plugin-workers-core/tests/streams/workers-streams_test.ts:1 packages/plugin-workers-core uses npm:@opentelemetry/api@^1.9.1 outside package.json catalog: (catalog has ^1.9.1)
+WARN DEPS-NPM-CATALOG packages/plugin-workers-core/tests/streams/workers-streams_test.ts:2 packages/plugin-workers-core uses npm:@opentelemetry/context-async-hooks@^2.9.0 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/plugin-workers-core/tests/streams/workers-streams_test.ts:3 packages/plugin-workers-core uses npm:@opentelemetry/core@^2.5.0 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/plugin-workers-core/tests/streams/workers-streams_test.ts:4 packages/plugin-workers-core uses npm:@opentelemetry/sdk-trace-base@^2.5.0 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/plugin/deno.json:28 packages/plugin uses npm:@orpc/contract@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/plugin/deno.json:29 packages/plugin uses npm:@orpc/server@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/queue/adapters/amqp.adapter.ts:10 packages/queue uses npm:amqplib@^0.10.3 outside package.json catalog: (catalog has ^2.0.1, inline use has ^0.10.3)
+WARN DEPS-NPM-CATALOG packages/queue/adapters/amqp.adapter.ts:11 packages/queue uses npm:amqplib@^0.10.3 outside package.json catalog: (catalog has ^2.0.1, inline use has ^0.10.3)
+WARN DEPS-NPM-CATALOG packages/queue/adapters/postgres.adapter.ts:9 packages/queue uses npm:pg@^8.21.0 outside package.json catalog: (catalog has ^8.21.0)
+WARN DEPS-NPM-CATALOG packages/sdk/deno.json:31 packages/sdk uses npm:@orpc/client@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/sdk/deno.json:32 packages/sdk uses npm:@orpc/contract@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/sdk/deno.json:33 packages/sdk uses npm:@orpc/openapi@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/sdk/deno.json:34 packages/sdk uses npm:@orpc/server@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/sdk/deno.json:35 packages/sdk uses npm:@orpc/tanstack-query@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/sdk/deno.json:36 packages/sdk uses npm:@orpc/zod@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/sdk/deno.json:37 packages/sdk uses npm:@tanstack/db@^0.6.8 outside package.json catalog: (catalog has ^0.6.8)
+WARN DEPS-NPM-CATALOG packages/sdk/deno.json:38 packages/sdk uses npm:@tanstack/query-core@^5.101.0 outside package.json catalog: (catalog has ^5.101.0)
+WARN DEPS-NPM-CATALOG packages/sdk/deno.json:39 packages/sdk uses npm:@tanstack/query-db-collection@^1.2.1 outside package.json catalog: (catalog has ^1.2.1)
+WARN DEPS-NPM-CATALOG packages/sdk/tests/type-fixtures/service-query-utils-upstream_type.ts:1 packages/sdk uses npm:@orpc/client@1.14.6 outside package.json catalog: (catalog has ^1.14.6, inline use has 1.14.6)
+WARN DEPS-NPM-CATALOG packages/sdk/tests/type-fixtures/service-query-utils-upstream_type.ts:2 packages/sdk uses npm:@orpc/tanstack-query@1.14.6 outside package.json catalog: (catalog has ^1.14.6, inline use has 1.14.6)
+WARN DEPS-NPM-CATALOG packages/service/deno.json:22 packages/service uses npm:@orpc/server@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/service/deno.json:23 packages/service uses npm:@orpc/openapi@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/service/deno.json:24 packages/service uses npm:@orpc/client@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/service/deno.json:25 packages/service uses npm:@orpc/zod@^1.14.6 outside package.json catalog: (catalog has ^1.14.6)
+WARN DEPS-NPM-CATALOG packages/service/tests/hono-tracing_test.ts:2 packages/service uses npm:@opentelemetry/api@^1.9.1 outside package.json catalog: (catalog has ^1.9.1)
+WARN DEPS-NPM-CATALOG packages/service/tests/hono-tracing_test.ts:3 packages/service uses npm:@opentelemetry/core@^2.5.0 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/service/tests/hono-tracing_test.ts:4 packages/service uses npm:@opentelemetry/context-async-hooks@^2.9.0 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/service/tests/hono-tracing_test.ts:5 packages/service uses npm:@opentelemetry/sdk-trace-base@^2.5.0 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/telemetry/deno.json:28 packages/telemetry uses npm:@opentelemetry/semantic-conventions@1.41.1 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/telemetry/tests/adapters/otel_ai_telemetry_test.ts:2 packages/telemetry uses npm:@opentelemetry/sdk-trace-base@^2.5.0 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/telemetry/tests/adapters/otel_ai_telemetry_test.ts:6 packages/telemetry uses npm:@opentelemetry/sdk-trace-base@^2.5.0 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/telemetry/tests/hono/otel_middleware_test.ts:4 packages/telemetry uses npm:@opentelemetry/core@^2.5.0 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/telemetry/tests/hono/otel_middleware_test.ts:5 packages/telemetry uses npm:@opentelemetry/context-async-hooks@^2.9.0 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG packages/telemetry/tests/hono/otel_middleware_test.ts:6 packages/telemetry uses npm:@opentelemetry/sdk-trace-base@^2.5.0 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG plugins/workers/jobs/job-tools_test.ts:2 plugins/workers uses npm:@opentelemetry/api@^1.9.1 outside package.json catalog: (catalog has ^1.9.1)
+WARN DEPS-NPM-CATALOG plugins/workers/jobs/job-tools_test.ts:3 plugins/workers uses npm:@opentelemetry/context-async-hooks@^2.9.0 outside package.json catalog: (no root catalog entry exists)
+WARN DEPS-NPM-CATALOG plugins/workers/jobs/job-tools_test.ts:4 plugins/workers uses npm:@opentelemetry/sdk-trace-base@^2.5.0 outside package.json catalog: (no root catalog entry exists)
+Task deps:check:zod deno run --allow-read .llm/tools/deps/check-zod-alignment.ts
+zod-alignment PASS instances=zod@3.25.76,zod@4.4.3 residual-v3=@ag-ui/core@0.0.52,@olli/kvdex@3.6.7
+# Doctrine readiness — ai
+  FAIL=0 WARN=1 INFO=0
+  WARN F-16: directory has 13 immediate children; doctrine cap is 12 (src/ports)
+# Doctrine readiness — aspire
+  FAIL=0 WARN=1 INFO=1
+  WARN A8/AP-1/F-1: file is 856 lines (cap 500) — split into smaller single-reason files (config.ts)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — auth-better-auth
+  FAIL=0 WARN=1 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — auth-kv-oauth
+  FAIL=0 WARN=1 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — auth-workos
+  FAIL=0 WARN=1 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — bench
+  FAIL=0 WARN=2 INFO=1
+  WARN A3: README has only 0 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (src/presentation/cli.ts)
+# Doctrine readiness — cli
+  FAIL=0 WARN=52 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  WARN A5/AP-5/F-4: class ScaffoldError sits 3+ levels deep in inheritance chain — prefer composition
+  WARN A5/AP-5/F-4: class ScaffoldDirExistsError sits 3+ levels deep in inheritance chain — prefer composition
+  WARN A5/AP-5/F-4: class ScaffoldValidationError sits 3+ levels deep in inheritance chain — prefer composition
+  WARN A5/AP-5/F-4: class ScaffoldTemplateError sits 3+ levels deep in inheritance chain — prefer composition
+  WARN A5/AP-5/F-4: class ScaffoldGitError sits 3+ levels deep in inheritance chain — prefer composition
+  WARN A5/AP-5/F-4: class ConfigNotFoundError sits 3+ levels deep in inheritance chain — prefer composition
+  WARN A5/AP-5/F-4: class ConfigInvalidError sits 3+ levels deep in inheritance chain — prefer composition
+  WARN A5/AP-5/F-4: class CompileError sits 3+ levels deep in inheritance chain — prefer composition
+  WARN A5/AP-5/F-4: class CompileTimeoutError sits 3+ levels deep in inheritance chain — prefer composition
+  WARN A5/AP-5/F-4: class ServyNotFoundError sits 3+ levels deep in inheritance chain — prefer composition
+  WARN A5/AP-5/F-4: class WindowsRequiredError sits 3+ levels deep in inheritance chain — prefer composition
+  WARN A5/AP-5/F-4: class AdminRequiredError sits 3+ levels deep in inheritance chain — prefer composition
+  WARN A5/AP-5/F-4: class ServiceExistsError sits 3+ levels deep in inheritance chain — prefer composition
+  WARN AP-16/F-11: forbidden folder name 'helpers' — split into domain/, application/, or adapters/ aligned to a real concern (src/kernel/templates/aspire/helpers)
+  WARN AP-16/F-11: forbidden folder name 'helpers' — split into domain/, application/, or adapters/ aligned to a real concern (src/kernel/assets/generated/aspire/helpers)
+  WARN AP-16/F-11: forbidden folder name 'helpers' — split into domain/, application/, or adapters/ aligned to a real concern (src/kernel/assets/aspire/helpers)
+  WARN A1/A2/A7: exports Result/Either/Option-style contract — keep it package-specific, documented, and inline unless multiple real consumers justify a shared contract (src/kernel/domain/core-types.ts)
+  WARN A8/AP-1/F-1: file is 765 lines (cap 500) — split into smaller single-reason files (src/public/features/plugins/doctor/doctor-plugin-use-case.ts)
+  WARN A8/AP-1/F-1: file is 788 lines (cap 500) — split into smaller single-reason files (src/public/features/plugins/new/new-plugin-use-case.ts)
+  WARN A8/AP-1/F-1: file is 698 lines (cap 500) — split into smaller single-reason files (src/public/features/plugins/install/install-plugin.ts)
+  WARN A8/AP-1/F-1: file is 681 lines (cap 500) — split into smaller single-reason files (src/kernel/adapters/plugin/workspace-mutator.ts)
+  WARN A8/AP-1/F-1: file is 592 lines (cap 500) — split into smaller single-reason files (src/kernel/adapters/config/plugin-registry.ts)
+  WARN A8/AP-1/F-1: file is 385 lines (cap 300) — split into smaller single-reason files (src/kernel/domain/resolved-config.ts)
+  WARN A8/AP-1/F-1: file is 907 lines (cap 500) — split into smaller single-reason files (e2e/src/application/gates/scaffold/runtime-gates.ts)
+  WARN F-16: directory has 14 immediate children; doctrine cap is 12
+  WARN F-16: directory has 16 immediate children; doctrine cap is 12 (src/public/features/db)
+  WARN F-16: directory has 14 immediate children; doctrine cap is 12 (src/public/features/plugins)
+  WARN F-16: directory has 14 immediate children; doctrine cap is 12 (src/public/features/plugins/install)
+  WARN F-16: directory has 14 immediate children; doctrine cap is 12 (src/public/features/deploy)
+  WARN F-16: directory has 16 immediate children; doctrine cap is 12 (src/kernel/adapters)
+  WARN F-16: directory has 14 immediate children; doctrine cap is 12 (src/kernel/adapters/database)
+  WARN F-16: directory has 14 immediate children; doctrine cap is 12 (src/kernel/adapters/plugin)
+  WARN F-16: directory has 22 immediate children; doctrine cap is 12 (src/kernel/adapters/config)
+  WARN F-16: directory has 24 immediate children; doctrine cap is 12 (src/kernel/domain/deploy)
+  WARN F-16: directory has 13 immediate children; doctrine cap is 12 (src/kernel/templates/workspace)
+  WARN F-16: directory has 14 immediate children; doctrine cap is 12 (src/kernel/assets)
+  WARN F-16: directory has 13 immediate children; doctrine cap is 12 (src/kernel/application/scaffold)
+  WARN F-16: directory has 46 immediate children; doctrine cap is 12 (e2e/src/application/gates/scaffold)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (src/public/features/plugins/new/new-plugin-use-case.ts)
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (src/kernel/adapters/config/configured-plugin-manifest-probe-child.ts)
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (src/kernel/templates/workspace/quality-runner.ts)
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (src/kernel/templates/workspace/aspire-cli-task.ts)
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (src/kernel/assets/agent-tools.generated.ts)
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (src/kernel/assets/embedded.generated.ts)
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (e2e/src/application/gates/scaffold/ui-ai-gates.ts)
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (e2e/src/application/gates/scaffold/runtime-gates.ts)
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (e2e/src/application/gates/scaffold/verify-endpoint-readiness.ts)
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (e2e/src/application/gates/scaffold/database-gates.ts)
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (e2e/suites/scaffold/true-userland-install-suite.ts)
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (e2e/suites/quickstart/quickstart-walk-suite.ts)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (src/kernel/adapters/database/scaffolder.ts:43)
+# Doctrine readiness — config
+  FAIL=0 WARN=2 INFO=1
+  WARN A8/AP-1/F-1: file is 635 lines (cap 300) — split into smaller single-reason files (src/domain/config-section-types.ts)
+  WARN A8/AP-1/F-1: file is 317 lines (cap 300) — split into smaller single-reason files (src/domain/schemas/deploy-schema.ts)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — contracts
+  FAIL=0 WARN=2 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  WARN A1/A2/A7: exports Result/Either/Option-style contract — keep it package-specific, documented, and inline unless multiple real consumers justify a shared contract (src/domain/result.ts)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — cron
+  FAIL=0 WARN=1 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — database
+  FAIL=0 WARN=7 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  WARN A8/AP-1/F-1: file is 529 lines (cap 500) — split into smaller single-reason files (adapters/mssql.adapter.ts)
+  WARN A8/AP-1/F-1: file is 640 lines (cap 500) — split into smaller single-reason files (extensions/sql-json.extension.ts)
+  WARN A8/AP-1/F-1: file is 555 lines (cap 500) — split into smaller single-reason files (scripts/fix-zod-imports.ts)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (scripts/migrate.ts)
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (scripts/generate-zod.ts)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (extensions/sql-json.extension.ts:639)
+# Doctrine readiness — fresh
+  FAIL=0 WARN=3 INFO=1
+  WARN A8/AP-1/F-1: file is 685 lines (cap 500) — split into smaller single-reason files (src/runtime/ai/create-chat-connection.ts)
+  WARN A8/AP-1/F-1: file is 604 lines (cap 500) — split into smaller single-reason files (src/application/route/manifest.ts)
+  WARN F-16: directory has 13 immediate children; doctrine cap is 12 (src/runtime/ai)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — fresh-ui
+  FAIL=0 WARN=5 INFO=1
+  WARN AP-16/F-11: forbidden folder name 'lib' — split into domain/, application/, or adapters/ aligned to a real concern (registry/lib)
+  WARN A8/AP-1/F-1: file is 669 lines (cap 500) — split into smaller single-reason files (src/chat/parse-blocks.ts)
+  WARN A8/AP-1/F-1: file is 1512 lines (cap 500) — split into smaller single-reason files (registry.manifest.ts)
+  WARN F-16: directory has 16 immediate children; doctrine cap is 12
+  WARN F-16: directory has 99 immediate children; doctrine cap is 12 (registry/components/ui)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — kv
+  FAIL=0 WARN=5 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  WARN A8/AP-1/F-1: file is 827 lines (cap 500) — split into smaller single-reason files (adapters/redis.adapter.ts)
+  WARN A8/AP-1/F-1: file is 674 lines (cap 500) — split into smaller single-reason files (adapters/denokv-bridge.ts)
+  WARN A8/AP-1/F-1: file is 541 lines (cap 500) — split into smaller single-reason files (adapters/memory.adapter.ts)
+  WARN A8/AP-1/F-1: file is 592 lines (cap 500) — split into smaller single-reason files (adapters/deno-kv.adapter.ts)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — logger
+  FAIL=0 WARN=1 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — mcp
+  FAIL=0 WARN=3 INFO=1
+  WARN A8/AP-1/F-1: file is 367 lines (cap 300) — split into smaller single-reason files (src/domain/tool-contracts.ts)
+  WARN F-16: directory has 14 immediate children; doctrine cap is 12 (src/domain)
+  WARN F-16: directory has 16 immediate children; doctrine cap is 12 (src/application/flows)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — plugin
+  FAIL=0 WARN=3 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  WARN F-16: directory has 17 immediate children; doctrine cap is 12 (src)
+  WARN F-16: directory has 15 immediate children; doctrine cap is 12 (src/config/domain)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — plugin-ai-core
+  FAIL=0 WARN=1 INFO=0
+  WARN A8/AP-1/F-1: file is 310 lines (cap 300) — split into smaller single-reason files (src/contracts/v1/ai.contract-schemas.ts)
+# Doctrine readiness — plugin-auth-core
+  FAIL=0 WARN=2 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  WARN A8/AP-1/F-1: file is 519 lines (cap 500) — split into smaller single-reason files (src/contracts/v1/auth.contract.ts)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — plugin-sagas-core
+  FAIL=0 WARN=2 INFO=2
+  WARN A8/AP-1/F-1: file is 739 lines (cap 500) — split into smaller single-reason files (src/contracts/v1/sagas.contract.ts)
+  WARN F-16: directory has 19 immediate children; doctrine cap is 12 (src)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+  INFO A12: package implements durable workflow concepts — verify state machine model is documented in docs/architecture.md
+# Doctrine readiness — plugin-streams-core
+  FAIL=0 WARN=1 INFO=1
+  WARN A8/AP-1/F-1: file is 515 lines (cap 500) — split into smaller single-reason files (src/application/durable-stream-producer-supervisor.ts)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — plugin-triggers-core
+  FAIL=0 WARN=3 INFO=2
+  WARN A8/AP-1/F-1: file is 722 lines (cap 500) — split into smaller single-reason files (src/contracts/v1/triggers.contract.ts)
+  WARN F-16: directory has 13 immediate children; doctrine cap is 12 (src/ports)
+  WARN F-16: directory has 15 immediate children; doctrine cap is 12 (src/runtime)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+  INFO A12: package implements durable workflow concepts — verify state machine model is documented in docs/architecture.md
+# Doctrine readiness — plugin-workers-core
+  FAIL=0 WARN=5 INFO=2
+  WARN A8/AP-1/F-1: file is 305 lines (cap 300) — split into smaller single-reason files (src/domain/job-spec.ts)
+  WARN A8/AP-1/F-1: file is 426 lines (cap 300) — split into smaller single-reason files (src/domain/task.ts)
+  WARN A8/AP-1/F-1: file is 574 lines (cap 500) — split into smaller single-reason files (src/contracts/v1/workers.contract-definition.ts)
+  WARN F-16: directory has 18 immediate children; doctrine cap is 12 (src)
+  WARN F-16: directory has 15 immediate children; doctrine cap is 12 (src/executor/adapters)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+  INFO A12: package implements durable workflow concepts — verify state machine model is documented in docs/architecture.md
+# Doctrine readiness — prisma-adapter-mysql
+  FAIL=0 WARN=2 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  WARN A8/AP-1/F-1: file is 743 lines (cap 500) — split into smaller single-reason files (src/adapter.ts)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — queue
+  FAIL=0 WARN=2 INFO=1
+  WARN A8/AP-1/F-1: file is 785 lines (cap 500) — split into smaller single-reason files (adapters/kv-polling.adapter.ts)
+  WARN A8/AP-1/F-1: file is 582 lines (cap 500) — split into smaller single-reason files (adapters/postgres.adapter.ts)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — runtime-config
+  FAIL=0 WARN=1 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — sdk
+  FAIL=0 WARN=1 INFO=1
+  WARN F-16: directory has 13 immediate children; doctrine cap is 12 (src)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — service
+  FAIL=0 WARN=3 INFO=1
+  WARN A5/AP-5/F-4: class Gq sits 3+ levels deep in inheritance chain — prefer composition
+  WARN A5/AP-5/F-4: class dW sits 3+ levels deep in inheritance chain — prefer composition
+  WARN A8/AP-1/F-1: file is 531 lines (cap 500) — split into smaller single-reason files (src/builder/service-builder-impl.ts)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — telemetry
+  FAIL=0 WARN=5 INFO=1
+  WARN A8/AP-1/F-1: file is 539 lines (cap 500) — split into smaller single-reason files (src/instrumentation/scheduler.ts)
+  WARN A8/AP-1/F-1: file is 670 lines (cap 500) — split into smaller single-reason files (src/instrumentation/worker.ts)
+  WARN F-16: directory has 15 immediate children; doctrine cap is 12
+  WARN F-16: directory has 13 immediate children; doctrine cap is 12 (src/attributes)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (src/adapters/otel/otel-sdk.ts)
+# Doctrine readiness — watchers
+  FAIL=0 WARN=1 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+# Doctrine readiness — ai
+  FAIL=0 WARN=5 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (cli.ts)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (src/adapter/resources/chat-route/chat-route.stub.ts:41)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (scaffold.ts:40)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (cli.ts:25)
+# Doctrine readiness — auth
+  FAIL=0 WARN=5 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  WARN F-16: directory has 13 immediate children; doctrine cap is 12
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (services/src/main.ts:54)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (scaffold.ts:23)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (cli.ts:18)
+# Doctrine readiness — sagas
+  FAIL=0 WARN=8 INFO=2
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  WARN A8/AP-1/F-1: file is 374 lines (cap 300) — split into smaller single-reason files (services/src/routers/v1-types.ts)
+  WARN F-16: directory has 15 immediate children; doctrine cap is 12
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+  INFO A12: package implements durable workflow concepts — verify state machine model is documented in docs/architecture.md
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (services/src/main.ts:46)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (src/adapter/resources/saga/saga.stub.ts:60)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (src/adapter/resources/saga/saga.stub.ts:95)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (scaffold.ts:23)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (cli.ts:18)
+# Doctrine readiness — streams
+  FAIL=0 WARN=5 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (src/adapter/resources/stream/stream.stub.ts:84)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (src/adapter/resources/consumer/consumer.stub.ts:78)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (scaffold.ts:23)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (cli.ts:18)
+# Doctrine readiness — triggers
+  FAIL=0 WARN=13 INFO=2
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  WARN F-16: directory has 18 immediate children; doctrine cap is 12
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+  INFO A12: package implements durable workflow concepts — verify state machine model is documented in docs/architecture.md
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (src/adapter/resources/scheduled/scheduled.stub.ts:43)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (src/adapter/resources/file-watch/file-watch.stub.ts:43)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (src/adapter/resources/webhook/webhook.stub.ts:46)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (src/adapter/resources/webhook/webhook.stub.ts:109)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (jobs/file-relay.ts:167)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (jobs/staged-cleanup.ts:72)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (jobs/file-import.ts:177)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (generic-webhook.ts:44)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (webhook-validate-data.ts:35)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (scaffold.ts:23)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (cli.ts:18)
+# Doctrine readiness — workers
+  FAIL=0 WARN=9 INFO=2
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  WARN F-16: directory has 19 immediate children; doctrine cap is 12
+  WARN F-16: directory has 19 immediate children; doctrine cap is 12 (worker)
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+  INFO A12: package implements durable workflow concepts — verify state machine model is documented in docs/architecture.md
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (test-api.ts)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (services/src/main.ts:45)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (src/cli/official-sample-configuration.ts:409)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (jobs/health-check.ts:246)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (scaffold.ts:23)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (cli.ts:18)
