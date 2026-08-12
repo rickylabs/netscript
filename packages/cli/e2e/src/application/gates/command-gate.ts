@@ -49,8 +49,9 @@ export class CommandGate {
       const missingOutput = (this.definition.stdoutIncludes ?? []).filter((value) =>
         !result.stdout.includes(value)
       );
-      const passed = result.code === expectedExitCode && !result.timedOut &&
-        missingOutput.length === 0;
+      const skipped = result.code === this.definition.skip?.exitCode && !result.timedOut;
+      const passed = skipped || result.code === expectedExitCode && !result.timedOut &&
+          missingOutput.length === 0;
       const failureClass = passed
         ? undefined
         : this.definition.failureClass ?? classifyFailure(result);
@@ -81,6 +82,13 @@ export class CommandGate {
         ? 'Harness command invocation failed before product execution.'
         : `Command exited ${result.code}; expected ${expectedExitCode}.`;
 
+      if (skipped) {
+        return {
+          ...gateResult(this.definition, attempts, evidence),
+          verdict: 'skipped',
+          message: this.definition.skip?.message,
+        };
+      }
       if (passed) {
         return gateResult(this.definition, attempts, evidence);
       }
@@ -94,7 +102,7 @@ export class CommandGate {
 function classifyFailure(
   result: { readonly timedOut: boolean; readonly code: number; readonly stderr: string },
 ): GateFailureClass {
-  if (result.timedOut) return 'timeout';
+  if (result.timedOut || result.code === 124) return 'timeout';
   if (result.code === CANCELED_EXIT_CODE && CANCELED_MARKER.test(result.stderr)) return 'canceled';
   if (DENO_USAGE_MARKER.test(result.stderr) && ARGUMENT_PARSER_MARKER.test(result.stderr)) {
     return 'harness-invocation';

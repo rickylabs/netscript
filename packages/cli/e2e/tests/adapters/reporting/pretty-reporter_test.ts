@@ -146,3 +146,30 @@ Deno.test('pretty reporter prints every attempt duration when retries fail', asy
   assertStringIncludes(output.join(''), 'attempt durations: 900s + 900s');
   assertStringIncludes(output.join(''), 'failure class: infrastructure');
 });
+
+Deno.test('pretty reporter explains an intentionally skipped command gate', async () => {
+  const output: string[] = [];
+  const reporter = new PrettyReporter((text) => {
+    output.push(text);
+    return Promise.resolve();
+  });
+  await reporter.emit({
+    type: 'gate-end',
+    result: {
+      id: 'quickstart.pgdata-integrity-after-teardown',
+      title: 'Validate resident Postgres PGDATA after Aspire teardown',
+      critical: true,
+      verdict: 'skipped',
+      durationMs: 2,
+      attempts: [{ attempt: 1, verdict: 'passed', durationMs: 2, exitCode: 78 }],
+      retried: false,
+      message: 'PGDATA integrity skipped: setup state was never created.',
+      evidence: [],
+    },
+  });
+
+  assertEquals(
+    output.join(''),
+    '  SKIPPED 2ms\n    PGDATA integrity skipped: setup state was never created.\n',
+  );
+});

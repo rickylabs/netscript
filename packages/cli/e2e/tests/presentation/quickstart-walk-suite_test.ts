@@ -1,6 +1,12 @@
 import { assertEquals, assertThrows } from '@std/assert';
+import { CommandGate } from '../../src/application/gates/command-gate.ts';
 import { GATE, QUICKSTART } from '../../src/domain/cli-surface.ts';
 import { PACKAGE_SOURCE } from '../../src/domain/extension-axes.ts';
+import type {
+  CommandExecutor,
+  CommandRequest,
+  CommandResult,
+} from '../../src/ports/command-executor.ts';
 import { createQuickstartWalkSuite } from '../../suites/quickstart/quickstart-walk-suite.ts';
 
 const EXACT_CLI = 'jsr:@netscript/cli@0.0.5-canary.1';
@@ -86,6 +92,62 @@ Deno.test('quickstart commands reject a local CLI entrypoint', () => {
   );
 });
 
+Deno.test('quickstart restore retries canceled exit 6 and passes on a later attempt', async () => {
+  const executor = new SequenceCommandExecutor([
+    commandResult(6, false, 'Failed to prepare: A task was canceled.'),
+    commandResult(0),
+  ]);
+  const result = await executeQuickstartGate(GATE.QUICKSTART_ASPIRE, executor);
+
+  assertEquals(executor.requests.length, 2);
+  assertEquals(result.verdict, 'passed');
+  assertEquals(result.attempts.map((attempt) => attempt.failureClass), [
+    'canceled',
+    undefined,
+  ]);
+});
+
+Deno.test('quickstart restore retries timeout exit 124 and passes on a later attempt', async () => {
+  const executor = new SequenceCommandExecutor([
+    commandResult(124),
+    commandResult(0),
+  ]);
+  const result = await executeQuickstartGate(GATE.QUICKSTART_ASPIRE, executor);
+
+  assertEquals(executor.requests.length, 2);
+  assertEquals(result.verdict, 'passed');
+  assertEquals(result.attempts.map((attempt) => attempt.failureClass), [
+    'timeout',
+    undefined,
+  ]);
+});
+
+Deno.test('quickstart restore exhausts exactly maxRetries plus one attempts', async () => {
+  const executor = new SequenceCommandExecutor([
+    commandResult(124),
+    commandResult(124),
+    commandResult(124),
+  ]);
+  const result = await executeQuickstartGate(GATE.QUICKSTART_ASPIRE, executor);
+
+  assertEquals(executor.requests.length, 3);
+  assertEquals(result.verdict, 'failed');
+  assertEquals(result.attempts.length, 3);
+  assertEquals(result.attempts.map((attempt) => attempt.attempt), [1, 2, 3]);
+});
+
+Deno.test('quickstart PGDATA teardown skips with a message when setup state is absent', async () => {
+  const executor = new SequenceCommandExecutor([commandResult(78)]);
+  const result = await executeQuickstartGate(GATE.QUICKSTART_DATABASE_INTEGRITY, executor);
+
+  assertEquals(result.verdict, 'skipped');
+  assertEquals(
+    Reflect.get(result, 'message'),
+    'PGDATA integrity skipped: setup state was never created.',
+  );
+  assertEquals(result.error, undefined);
+});
+
 function command(
   suite: ReturnType<typeof createQuickstartWalkSuite>,
   id: string,
@@ -108,4 +170,40 @@ function contextFor(options: ReturnType<typeof createQuickstartWalkSuite>['defau
       appHost: '/repo/.llm/tmp/my-app/aspire/apphost.mts',
     },
   } as const;
+}
+
+function executeQuickstartGate(id: string, executor: CommandExecutor) {
+  const suite = createQuickstartWalkSuite({
+    packageSource: PACKAGE_SOURCE.JSR,
+    cliEntrypoint: EXACT_CLI,
+  });
+  const gate = suite.gates.find((candidate) => candidate.id === id);
+  if (!gate || gate.kind !== 'command') throw new Error(`${id} command gate missing`);
+  return new CommandGate(gate, executor).execute(
+    contextFor(suite.defaultOptions),
+  );
+}
+
+function commandResult(code: number, timedOut = false, stderr = ''): CommandResult {
+  return {
+    command: ['deno', 'run', 'aspire-walk.ts'],
+    cwd: '/repo/.llm/tmp/my-app',
+    code,
+    stdout: '',
+    stderr,
+    timedOut,
+  };
+}
+
+class SequenceCommandExecutor implements CommandExecutor {
+  readonly requests: CommandRequest[] = [];
+
+  constructor(private readonly results: readonly CommandResult[]) {}
+
+  run(request: CommandRequest): Promise<CommandResult> {
+    this.requests.push(request);
+    const result = this.results[this.requests.length - 1];
+    if (!result) throw new Error('No fake command response configured.');
+    return Promise.resolve(result);
+  }
 }

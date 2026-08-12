@@ -30,6 +30,12 @@ export interface CommandGateRetryPolicy {
   readonly maxRetries: 1 | 2;
 }
 
+/** Maps one intentional command exit to an explicit skipped gate verdict. */
+export interface CommandGateSkipPolicy {
+  readonly exitCode: number;
+  readonly message: string;
+}
+
 /** Build a command from the current run context. */
 export type CommandFactory = (context: RunContext) => readonly string[];
 
@@ -48,6 +54,7 @@ export interface GateResult {
   readonly evidence: readonly Evidence[];
   readonly attempts: GateAttempt[];
   readonly retried: boolean;
+  readonly message?: string;
   readonly error?: string;
 }
 
@@ -72,6 +79,7 @@ export interface CommandGateDefinition extends BaseGateDefinition {
   /** Substrings that must all appear in captured standard output. */
   readonly stdoutIncludes?: readonly string[];
   readonly retry?: CommandGateRetryPolicy;
+  readonly skip?: CommandGateSkipPolicy;
   /** Gate-specific timeout override; defaults to the suite command timeout. */
   readonly timeoutMs?: number;
   /** Stable failure class for commands whose boundary is known before execution. */
