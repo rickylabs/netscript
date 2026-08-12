@@ -106,18 +106,36 @@ for (const mode of ['publish', 'preflight'] as const) {
       publishRoot = handshake.cwd;
       child.kill('SIGKILL');
       const status = await child.status;
+      const sourceStatus = await gitOutput(sourceRoot, ['status', '--porcelain']);
+      const sourceManifest = await Deno.readTextFile(servicePath);
+      const lockAfter = await Deno.readTextFile(lockPath);
+      const sourceHasCatalog = sourceManifest.includes('"zod": "catalog:"');
+      const stageHasMaterializedCatalog = handshake.serviceManifest.includes(
+        '"zod": "npm:zod@^4.4.3"',
+      );
+      const stageOutsideSource = !isPathInside(sourceRoot, handshake.cwd);
 
       assertEquals(status.success, false, 'the helper must be terminated by SIGKILL');
       assertEquals(
-        await gitOutput(sourceRoot, ['status', '--porcelain']),
+        sourceStatus,
         '',
         `${mode} left tracked source files dirty after SIGKILL`,
       );
-      assertStringIncludes(await Deno.readTextFile(servicePath), '"zod": "catalog:"');
-      assertEquals(await Deno.readTextFile(lockPath), lockBefore);
-      assertStringIncludes(handshake.serviceManifest, '"zod": "npm:zod@^4.4.3"');
-      assertEquals(isPathInside(sourceRoot, handshake.cwd), false);
+      assertEquals(sourceHasCatalog, true);
+      assertEquals(lockAfter, lockBefore);
+      assertEquals(stageHasMaterializedCatalog, true);
+      assertEquals(stageOutsideSource, true);
       assertEquals(handshake.args, expectedPublishArgs(mode));
+      console.log(JSON.stringify({
+        mode,
+        signal: 'SIGKILL',
+        sourceStatus,
+        sourceHasCatalog,
+        lockUnchanged: lockAfter === lockBefore,
+        stageHasMaterializedCatalog,
+        stageOutsideSource,
+        publisherArgs: handshake.args,
+      }));
     } finally {
       if (publishRoot && !isPathInside(sourceRoot, publishRoot)) {
         await removeFixtureWorktree(sourceRoot, publishRoot);
