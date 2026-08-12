@@ -1,0 +1,140 @@
+Check packages/cli/src/public/features/agent/init/init-agent_test.ts
+running 19 tests from ./packages/cli/src/public/features/agent/init/init-agent_test.ts
+agent init writes Claude config, skills, and marked AGENTS section idempotently ... FAILED (31ms)
+agent init selects VS Code and detect-or-all host table ... FAILED (22ms)
+agent init applies native editor configuration for none, Zed, and VS Code ... FAILED (34ms)
+agent init detects one existing editor and rejects an ambiguous project ... ok (20ms)
+S-18 prior-release host stays pinned until agent init and restart exposes the tool triad ... FAILED (18ms)
+VS Code-only agent init never delegates to the Claude skill tree ... ok (28ms)
+agent init rejects a bundle whose manifest hash does not match ... ok (1ms)
+installed skill routing resolves to installed skills or help ... ok (17ms)
+aspire delegation is skipped when Playwright CLI is already installed ... ok (21ms)
+aspire delegation timeout is swallowed after cancelling the fake ... ok (17ms)
+aspire delegation errors are swallowed with unconditional MCP config ... ok (15ms)
+agent init installs the complete diagnostic surface ... ok (16ms)
+agent init installs the consumer tool surface for every host ... ok (22ms)
+installed consumer tools resolve from the project when process CWD differs ... ok (476ms)
+agent init leaves the offline docs corpus absent unless requested ... ok (12ms)
+agent init --with-docs installs a path-closed local corpus ... ok (22ms)
+generated project search_docs reaches its installed corpus after host restart ... FAILED (40ms)
+agent init --with-docs gives Claude, VS Code, and Zed the same docs root ... ok (41ms)
+offline docs failure occurs before any project write ... ok (1ms)
+
+ ERRORS 
+
+agent init writes Claude config, skills, and marked AGENTS section idempotently => ./packages/cli/src/public/features/agent/init/init-agent_test.ts:48:6
+error: AssertionError: Values are not equal.
+
+
+    [Diff] Actual / Expected
+
+
+    [
+      "run",
++     "--no-lock",
++     "--minimum-dependency-age=0",
+      "--config",
+      "/tmp/79f95247fef8a6fb/deno.json",
+      "-A",
+      "jsr:@netscript/cli@0.0.5",
+      "agent",
+      "mcp",
+      "--project-root",
+      "/tmp/79f95247fef8a6fb",
+    ]
+
+  throw new AssertionError(message);
+        ^
+    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:67:9)
+    at file:///home/codex/repos/ns006-w2-1460/packages/cli/src/public/features/agent/init/init-agent_test.ts:62:5
+
+agent init selects VS Code and detect-or-all host table => ./packages/cli/src/public/features/agent/init/init-agent_test.ts:114:6
+error: AssertionError: Values are not equal.
+
+
+    [Diff] Actual / Expected
+
+
+    [
+      "run",
++     "--no-lock",
++     "--minimum-dependency-age=0",
+      "--config",
+      "/tmp/f21d0c90194dbd71/deno.json",
+      "-A",
+      "jsr:@netscript/cli@0.0.5",
+      "agent",
+      "mcp",
+      "--project-root",
+      "/tmp/f21d0c90194dbd71",
+    ]
+
+  throw new AssertionError(message);
+        ^
+    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:67:9)
+    at file:///home/codex/repos/ns006-w2-1460/packages/cli/src/public/features/agent/init/init-agent_test.ts:131:5
+
+agent init applies native editor configuration for none, Zed, and VS Code => ./packages/cli/src/public/features/agent/init/init-agent_test.ts:168:6
+error: AssertionError: Values are not equal.
+
+
+    [Diff] Actual / Expected
+
+
+    [
+      "run",
+-     "--config",
+-     "/tmp/9023acead640542d/deno.json",
++     "--no-lock",
++     "--minimum-dependency-age=0",
+    ]
+
+  throw new AssertionError(message);
+        ^
+    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:67:9)
+    at file:///home/codex/repos/ns006-w2-1460/packages/cli/src/public/features/agent/init/init-agent_test.ts:196:5
+
+S-18 prior-release host stays pinned until agent init and restart exposes the tool triad => ./packages/cli/src/public/features/agent/init/init-agent_test.ts:251:6
+error: AssertionError: Values are not equal.
+
+
+    [Diff] Actual / Expected
+
+
+-   mcp
++   jsr:@netscript/cli@0.0.6
+
+
+  throw new AssertionError(message);
+        ^
+    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:67:9)
+    at file:///home/codex/repos/ns006-w2-1460/packages/cli/src/public/features/agent/init/init-agent_test.ts:278:5
+
+generated project search_docs reaches its installed corpus after host restart => ./packages/cli/src/public/features/agent/init/init-agent_test.ts:709:6
+error: AssertionError: Values are not equal: error: Attempted to load JSON module without specifying "type": "json" attribute in the import statement.
+
+
+
+    [Diff] Actual / Expected
+
+
+-   1
++   0
+
+  throw new AssertionError(message);
+        ^
+    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:67:9)
+    at callToolFromGeneratedHost (file:///home/codex/repos/ns006-w2-1460/packages/cli/src/public/features/agent/init/init-agent_test.ts:879:3)
+    at async file:///home/codex/repos/ns006-w2-1460/packages/cli/src/public/features/agent/init/init-agent_test.ts:719:20
+
+ FAILURES 
+
+agent init writes Claude config, skills, and marked AGENTS section idempotently => ./packages/cli/src/public/features/agent/init/init-agent_test.ts:48:6
+agent init selects VS Code and detect-or-all host table => ./packages/cli/src/public/features/agent/init/init-agent_test.ts:114:6
+agent init applies native editor configuration for none, Zed, and VS Code => ./packages/cli/src/public/features/agent/init/init-agent_test.ts:168:6
+S-18 prior-release host stays pinned until agent init and restart exposes the tool triad => ./packages/cli/src/public/features/agent/init/init-agent_test.ts:251:6
+generated project search_docs reaches its installed corpus after host restart => ./packages/cli/src/public/features/agent/init/init-agent_test.ts:709:6
+
+FAILED | 14 passed | 5 failed (875ms)
+
+error: Test failed

@@ -1415,3 +1415,77 @@ extra canary cycle.
 coordinated version-only commit can now inherit its parent's pair, because the verifier accepts the
 full coordinated-bump output derived from the writer rather than `deno.json` files alone. That is
 the fix #1438 delivered, and canary.3 is the first cut able to use it.
+
+## 2026-08-12 — Wave 2 landings 1 and 2
+
+### PR #1579 → `4637e9f41` (closes #1456)
+
+p1. Exact JSR plugin install versions preserved. 7 files, +248/−15, all `packages/cli`, no lock
+churn, no public-surface change.
+
+Automatic IMPL-EVAL PASS, **head-matched**: the verdict states "Evaluated base `db1d79c6` → head
+`b80e5624`" against PR head `b80e56249`. Zero non-green checks on latest-per-name; `close-gate`
+SUCCESS; `review-threads` PASS; current-main guard zero overlap.
+
+**The negative control is why this one counts.** The regression was reproduced **red first** in an
+isolated detached worktree at the recorded baseline —
+
+```
+preserves an explicit exact version when stable latest differs ... FAILED
+error: Invalid JSR plugin package spec "jsr:@netscript/plugin-workers@0.0.6-canary.2". Expected @scope/package.
+```
+
+— then green after the fix, and critically it used a package whose **live JSR `latest` is `0.0.5`**
+while requesting `0.0.6-canary.2`. A test asserting an exact version equal to `latest` would have
+passed before and after and proven nothing. That the canary this lane published earlier made the
+case testable at all is incidental luck worth noting.
+
+### PR #1578 → `efb5182f1` (closes #1460)
+
+p1. Generated agent MCP config is lock-neutral by construction. 5 files.
+
+Automatic IMPL-EVAL PASS, head-matched `fe2b3262d`, verdict noting "None outstanding at head; no
+review threads required resolution." Mirror ticked **5/5** issue boxes after the label/rerun
+sequence; zero non-green; `review-threads` PASS.
+
+**Solved structurally rather than by patching twice.** The slice found **two** MCP emission sites,
+not one, and collapsed both into a single `netscriptMcpArgs()` helper, so acceptance box 4 ("every
+generated surface, not only `.mcp.json`") holds by construction — a future emission site cannot
+drift. `--no-lock --minimum-dependency-age=0` is emitted at `init-agent.ts:315`.
+
+Its `dispatch: SUCCESS` also confirms the fresh-base practice working: this is the check that failed
+on #1539 because that branch carried a stale base and could not resolve the trusted evaluator prompt.
+
+### A lifecycle error I made and corrected
+
+On #1456 I applied `status:shipped` **without removing** `status:triage`, leaving two `status:`
+labels — the exact single-status violation I had just spent a wave-1 closeout fixing across ten
+items. Caught immediately, fixed, and I audited all eight wave-2 items rather than assuming it was
+isolated.
+
+The durable fix is the **shape of the call**, not vigilance: one
+`--remove-label X --add-label Y` invocation, then assert the count is 1. Applied that way on #1578
+and it was clean.
+
+### Ordering confirmed for the third time
+
+`close-gate` red → apply `status:ready-merge` → **re-run `ci`** → mirror ticks → green. The label
+alone does nothing because `ci.yml` has no `labeled` trigger; the mirror reads labels live, which is
+why a rerun works. Third occurrence in this run; it is now reflex rather than discovery.
+
+### Main after these landings
+
+```
+50739a7ae  fix(fresh-ui): regenerate the stale private lock … (#1581)   ← Runtime lane
+efb5182f1  fix(cli): keep generated agent MCP lock-neutral (#1578)      ← this lane
+4637e9f41  fix(cli): preserve exact plugin install versions (#1579)     ← this lane
+a553afef4  fix(release): regenerate the deno.lock closure … (#1572)     ← Runtime lane
+```
+
+Both of this lane's merges verified present in `origin/main` first-parent history. The Runtime
+lane's #1581 private Fresh UI lock repair landed immediately after — that lock work is theirs
+(#1580/#1581), not this lane's, and the slices were told to record any Fresh-UI lock complaint as an
+external blocker rather than attempt it.
+
+**Wave 2: 2 of 4 closed.** #1540 implementing on a passed plan; #1454 in automatic PLAN-EVAL cycle 2
+on amended head `ad7574bb7`.

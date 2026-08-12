@@ -1,0 +1,2 @@
+Task fmt:check deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\.generated/|.*(?:^|/)node_modules/)" --ignore-line-endings
+{"command":"deno fmt --check","cwd":"/home/codex/repos/ns006-w2-1460","mode":"check","summary":{"filesSelected":2013,"batches":11,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}

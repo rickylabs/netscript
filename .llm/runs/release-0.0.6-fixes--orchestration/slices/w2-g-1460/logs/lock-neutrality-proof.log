@@ -1,0 +1,7 @@
+fixture_commit=2f82763497e763a48689f63b05898e46c12a0546
+before=2535d5eae5abb105055327c35e8964e662cbe24f9a1d2a8fbaa1245cb87b3d75
+after=2535d5eae5abb105055327c35e8964e662cbe24f9a1d2a8fbaa1245cb87b3d75
+command_exit=0
+lock_diff_exit=0
+response_ids=[1,2,3,4]
+response_errors=0

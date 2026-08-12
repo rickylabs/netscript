@@ -13,6 +13,8 @@ milestone's rules are earned from evidence rather than memory.
 | 2 | 2026-08-12 08:36:22Z | `cd24e1679` | #1534 | **#1397, #1399** (both auto-closed COMPLETED) | 7/7 — see `worklog.md` stage D |
 | 3 | 2026-08-12 08:57:53Z | `84dd44ae7` | #1538 | **#1417** (auto-closed COMPLETED) | 7/7 + focused IMPL-EVAL PASS (Fable 5 medium, separate session) |
 | 4 | 2026-08-12 12:54:23Z | `3c9dc1f39` | #1539 | **#1438, #1430** (both auto-closed COMPLETED) | 7/7 + automatic IMPL-EVAL PASS, head-matched at `070eabb61`; runtime tiers recorded as did-not-run with reason |
+| 5 | 2026-08-12 (wave 2) | `4637e9f41` | #1579 | **#1456** (auto-closed COMPLETED) | 7/7 + automatic IMPL-EVAL PASS head-matched `b80e56249`; zero non-green; negative control proven against a package whose live `latest` differs |
+| 6 | 2026-08-12 (wave 2) | `efb5182f1` | #1578 | **#1460** (auto-closed COMPLETED) | 7/7 + automatic IMPL-EVAL PASS head-matched `fe2b3262d`; mirror ticked 5/5 issue boxes; zero non-green |
 | _(none yet)_ | | | | | |
 
 Captured from `git log origin/main --first-parent` after each merge, never from recollection. Both

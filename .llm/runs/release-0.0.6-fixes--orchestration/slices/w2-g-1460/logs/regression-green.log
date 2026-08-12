@@ -1,0 +1,23 @@
+running 19 tests from ./packages/cli/src/public/features/agent/init/init-agent_test.ts
+agent init writes Claude config, skills, and marked AGENTS section idempotently ... ok (46ms)
+agent init selects VS Code and detect-or-all host table ... ok (55ms)
+agent init applies native editor configuration for none, Zed, and VS Code ... ok (91ms)
+agent init detects one existing editor and rejects an ambiguous project ... ok (32ms)
+S-18 prior-release host stays pinned until agent init and restart exposes the tool triad ... ok (709ms)
+VS Code-only agent init never delegates to the Claude skill tree ... ok (36ms)
+agent init rejects a bundle whose manifest hash does not match ... ok (1ms)
+installed skill routing resolves to installed skills or help ... ok (19ms)
+aspire delegation is skipped when Playwright CLI is already installed ... ok (21ms)
+aspire delegation timeout is swallowed after cancelling the fake ... ok (19ms)
+aspire delegation errors are swallowed with unconditional MCP config ... ok (16ms)
+agent init installs the complete diagnostic surface ... ok (19ms)
+agent init installs the consumer tool surface for every host ... ok (28ms)
+installed consumer tools resolve from the project when process CWD differs ... ok (581ms)
+agent init leaves the offline docs corpus absent unless requested ... ok (15ms)
+agent init --with-docs installs a path-closed local corpus ... ok (22ms)
+generated project search_docs reaches its installed corpus after host restart ... ok (1s)
+agent init --with-docs gives Claude, VS Code, and Zed the same docs root ... ok (47ms)
+offline docs failure occurs before any project write ... ok (2ms)
+
+ok | 19 passed | 0 failed (3s)
+
