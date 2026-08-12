@@ -1661,3 +1661,30 @@ now in one afternoon: `gh-watch` three times, my own poller once.
 equal the generation under consideration **and** its `conclusion` to be terminal **and** the verdict to be in
 **that same** comment body. Never grep two facts out of a concatenated blob and treat them as related — that is
 not a detection heuristic, it is a coincidence generator.
+
+## D-49 — a GitHub transport flake window cost three job outcomes in 75 minutes (severity: moderate)
+
+Extends D-47. `Error: socket hang up` killed three unrelated jobs between 16:40Z and 17:54Z:
+
+| Time | Job | What died | Consequence |
+| --- | --- | --- | --- |
+| 16:40:56Z | `scaffold-static (deno-only)` on PR #1596 | job setup | a red check on a head I then deliberately did not re-run, because the correction was going to produce a new head anyway |
+| 17:27:57Z | `OpenHands Agent` bootstrap, run `31622691685` | `setup-deno` downloading `deno-x86_64-unknown-linux-gnu.zip`, 3 attempts | **consumed the authorized evaluation generation** and delivered `verdict:NONE` |
+| 17:53:58Z | `close-gate` on the ready-merge re-run | job step | blocked merge readiness; **#1549 boxes confirmed 0/7 ticked**, so the mirror never ran and no partial state needed repair |
+
+All three died **before doing any work**, which is what makes them cleanly separable from task outcomes — and why the
+middle one self-describes as "a workflow failure, not a task verdict".
+
+**Operational rules this window confirms.**
+
+1. **Check whether a red is transport before reading it as a finding.** The distinguishing evidence is that the
+   job produced no work product: no test output, no scan result, no verdict body.
+2. **Re-run, never push.** A push would have moved the head and invalidated the IMPL-EVAL `PASS` bound to
+   `a1010e314`. Every recovery here used `gh run rerun`.
+3. **`gh run rerun --failed` is refused while any job in the run is still in flight** ("This workflow is already
+   running"), so recovery waits on the whole run, not just the failed job.
+4. **Verify partial mutation before re-running a mutating job.** `close-gate` runs *after* the acceptance mirror,
+   so a mid-run death could have left #1549 half-ticked. Confirming 0/7 first is what made a plain re-run safe
+   rather than a guess.
+
+No code, plan, or evidence defect is implicated in any of the three.
