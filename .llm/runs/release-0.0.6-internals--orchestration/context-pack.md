@@ -14,10 +14,11 @@ stable cut.
 
 | Stage | Status |
 | --- | --- |
-| A — Bootstrap | **done** — identity/worktree proved, five issue bodies read live, 30 acceptance boxes inventoried, run dir written |
-| B — Wave plan | **done** — `plan.md` committed; dispatch preconditions executed and GREEN; wave-plan PLAN-EVAL decision recorded |
-| C/D — Wave 1 (PR-A) | next |
-| C/D — Wave 2 (PR-B → PR-C → PR-D) | pending |
+| A — Bootstrap | **done** — identity/worktree proved, five issue bodies read live, acceptance inventoried, run dir written |
+| B — Wave plan | **done** — `plan.md` + `plan-quality-rail.md` + `research.md` + `worklog.md` § Design; dispatch preconditions executed and GREEN |
+| C/D — Wave 1 (PR-A) | **DONE — PR #1527 merged `63cd1cd58`**, closing #1436 + #1415, pre-merge gate 7/7 |
+| B — Rail PLAN-EVAL | cycle 1 `FAIL_PLAN` (6 blocking, all answered); **cycle 2 in flight** on thread `019ff508-…` → `plan-eval-cycle2.md`. Two-cycle limit. |
+| C/D — Wave 2 (PR-E → PR-B → PR-C → PR-D) | blocked on the cycle-2 verdict. No implementation dispatches on a `FAIL_PLAN`. |
 | E — Canary | N/A for this lane (`drift.md` D-3) |
 | G — Close | pending |
 
@@ -25,12 +26,21 @@ stable cut.
 
 | PR | Branch | Closes | Lane | Eval |
 | --- | --- | --- | --- | --- |
-| PR-A | `fix/1436-1415-close-gate-trust` | #1436, #1415 | Sol · low | both waived (owner, `drift.md` D-1); negative cases proven instead |
+| ~~PR-A~~ | `fix/1436-1415-close-gate-trust` | #1436, #1415 | Sol · low | **MERGED `63cd1cd58`** — both evals owner-waived (`drift.md` D-1), negative cases proven instead |
+| PR-E | `fix/1530-type-fixture-scan-scope` | #1530 | Sol · low | rail PLAN-EVAL + own IMPL-EVAL. **Must land before PR-D** (rail R-1) |
 | PR-B | `fix/1403-quality-gate-coverage` | #1403 | Sol · low | rail PLAN-EVAL + own IMPL-EVAL |
 | PR-C | `fix/1380-doctrine-verdict-and-repo-gate` | #1380 | Sol · medium | rail PLAN-EVAL + own IMPL-EVAL |
 | PR-D | `fix/1378-quality-scan-rule-power` | #1378 | Sol · high | rail PLAN-EVAL + own IMPL-EVAL |
 
 Strictly sequential (one active implementation thread). Sequencing locks S-1…S-6 in `plan.md`.
+
+## Owner decisions in force (do not relitigate)
+
+1. **#1529 dropped** — the observed core-CI skip is intended; it was closed not-planned. No skip or
+   visibility behaviour was changed. Two incidental observations are parked unacted in `drift.md` D-7.
+2. **#1380 box 2 amended** — admits "never present under that name", requires per-row git evidence.
+3. **#1374 owns the docs-fence extractor**; PR-D consumes it and sequences after PR #1537.
+4. **The `labeled`-trigger defect is fixed in the documents, not the workflow** (rail R-11, slice C7).
 
 ## The three facts most likely to be lost
 
