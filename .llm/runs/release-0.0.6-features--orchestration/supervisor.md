@@ -148,3 +148,52 @@ Nothing is technically inseparable → **three independent PRs**, dispatchable i
 
 Reruns only by moving away from and back to the relevant `status:` label. One-shot
 `eval:model:*` overrides applied per PR only where a specific model is wanted.
+
+---
+
+# Scope addition — #1562 (queued behind #1459)
+
+**Owner-approved 2026-08-12.** `#1562 feat(observability): trace data-cache tier topology and
+hit/miss outcomes beneath deferred page layers` — milestone `0.0.6`, `priority:p1`, `type:feat`,
+`area:telemetry`.
+
+## Sequencing — held, not started
+
+**Not begun.** #1459 is still active (PR #1558 at `status:impl-eval`, IMPL-EVAL run `31598821606`
+in flight at head `2d515de75`). The instruction is explicit: no competing writer while #1459 is
+active. Verified `agentic:codex-status` → **0 live writers** on `ns006-1459`, so nothing is racing;
+#1562 simply waits its turn.
+
+Ownership begins when #1459 reaches a terminal merge/eval state. Until then: no worktree, no branch,
+no Codex dispatch. Read-only re-baselining only.
+
+## Shape (from the live issue body, read 2026-08-12)
+
+This is a **telemetry contract**, not a bug fix. Today `defer.cache.read` already exposes region,
+cached-data/freshness presence, `cached_at`, age, stale threshold/decision, fallback visibility,
+revalidation, prewarm policy, and partial completion timing — the issue is explicit that those spans
+are useful and must be **preserved and made parents/links**, not replaced.
+
+What the trace cannot currently answer: which provider/tier served the read, L1/L2 lookup order and
+per-tier outcome, normalized key identity, whether an authoritative DB/service call was **avoided or
+executed**, and write/promotion/invalidation outcome.
+
+## Non-negotiable constraints carried from the owner instruction
+
+- **Bounded cardinality.** Every proposed attribute (`cache.system`, `cache.tier`, `cache.namespace`,
+  `cache.outcome`, `cache.lookup_index`, `cache.backend_executed`, …) must be provably bounded.
+  Attribute cardinality is the classic way telemetry becomes a cost incident.
+- **No raw keys, no user data.** A hashed correlation attribute is optional, raw keys are not
+  permitted.
+- **Seven paths must be provable, not asserted:** cold · warm-fresh · stale/revalidate ·
+  provider-error · promotion/write-through · invalidation · backend-executed. The acceptance also
+  requires a **cold-then-warm Aspire/OTel example on the same operation**, which means live evidence,
+  not unit assertions alone.
+
+## Routing
+
+- Plan authored in this lane, then **automatic PLAN-EVAL** via the `openhands` + `status:plan-eval`
+  label pair — the contract is substantive and decision-heavy.
+- Implementation delegated to **Codex** at an effort matched to the finding; **automatic IMPL-EVAL**
+  on draft → ready.
+- **No Fable** (D-6 remains in force). Orchestrator review stays on Opus 5 · high.
