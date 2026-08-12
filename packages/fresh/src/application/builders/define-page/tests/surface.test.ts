@@ -1,4 +1,5 @@
 import { assertEquals } from '@std/assert';
+import { definePage } from '../mod.ts';
 import type {
   ComponentLike,
   DefinedPartialRoute,
@@ -171,6 +172,8 @@ type AnyTarget = {
     readonly path: object;
     readonly search: object;
   };
+  safeParsePath(input: PathParamInput): SchemaParseResult<object>;
+  safeParseSearch(input: URLSearchParams | SearchParamInput): SchemaParseResult<object>;
 };
 type AnyDefinition = DefinePageDefinitionFor<AnyTypes>;
 type AnyLayerMap = DefinePageLayerMap;
@@ -178,6 +181,17 @@ type AnyRenderable = PageRenderable;
 type AnyFormState = RuntimeFormState<Record<string, string>>;
 type BuildersModule = typeof import('../../mod.ts');
 type DefinePageModule = typeof import('../mod.ts');
+
+function assertRouteParserCapabilityIsRequired(): void {
+  const compileTimeOnlyTarget = {
+    routePattern: '/orders/[id]',
+  } as PageRouteTarget<{ id: string }>;
+
+  // @ts-expect-error A route carrying inferred path state must also carry runtime parsers.
+  definePage().withRoute(compileTimeOnlyTarget);
+}
+
+void assertRouteParserCapabilityIsRequired;
 
 type BuildersSurfaceSnapshot = [
   ComponentLike<{ readonly children?: AnyRenderable }>,

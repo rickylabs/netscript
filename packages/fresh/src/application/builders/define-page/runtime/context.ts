@@ -12,6 +12,7 @@ import type {
   DefinePageSearchOf,
   DefinePageStateOf,
   PathParamSchema,
+  SchemaParseResult,
   SearchParamInput,
   SearchParamSchema,
   UnknownRecord,
@@ -73,12 +74,13 @@ export function searchParamsToObject(searchParams: URLSearchParams): SearchParam
 export function resolvePathParams<TPath extends object>(
   schema: PathParamSchema<TPath> | undefined,
   params: Record<string, string | undefined>,
+  route?: { safeParsePath(input: Record<string, string | undefined>): SchemaParseResult<TPath> },
 ): TPath {
-  if (!schema) {
+  const result = schema?.safeParse(params) ?? route?.safeParsePath(params);
+  if (!result) {
     return {} as TPath;
   }
 
-  const result = schema.safeParse(params);
   if (!result.success) {
     throw new Response(null, { status: 404 });
   }
@@ -90,14 +92,25 @@ export function resolvePathParams<TPath extends object>(
 export function resolveSearchParams<TSearch extends object>(
   schema: SearchParamSchema<TSearch> | undefined,
   searchParams: URLSearchParams,
+  route?: {
+    safeParseSearch(
+      input: URLSearchParams | SearchParamInput,
+    ): SchemaParseResult<TSearch>;
+  },
 ): TSearch {
-  if (!schema) {
+  const parse = schema
+    ? (input: URLSearchParams | SearchParamInput) =>
+      schema.safeParse(
+        input instanceof URLSearchParams ? searchParamsToObject(input) : input,
+      )
+    : route?.safeParseSearch.bind(route);
+  if (!parse) {
     return {} as TSearch;
   }
 
-  const result = schema.safeParse(searchParamsToObject(searchParams));
+  const result = parse(searchParams);
   if (!result.success) {
-    const fallbackResult = schema.safeParse({});
+    const fallbackResult = parse({});
     if (!fallbackResult.success) {
       throw new Response(null, { status: 400 });
     }

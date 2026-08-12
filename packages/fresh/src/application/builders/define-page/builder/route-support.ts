@@ -16,22 +16,27 @@ import type {
   DefinePageWithRoute,
   DefinePageWithRouteContract,
   PathParamSchema,
+  RouteParserTarget,
   SearchParamSchema,
 } from '../types.ts';
 import type { InferRoutePath, InferRouteSearch, TypedRouteTarget } from '../navigation/mod.ts';
 
-function isRouteReference<TRoute extends TypedRouteTarget<object, object>>(
+function isRouteReference<
+  TRoute extends TypedRouteTarget<object, object> & RouteParserTarget,
+>(
   route: TRoute,
 ): route is TRoute & RouteReference<InferRoutePath<TRoute>, InferRouteSearch<TRoute>> {
   return 'nav' in route && 'href' in route && typeof route.href === 'function' &&
     'parsePath' in route && typeof route.parsePath === 'function' &&
-    'parseSearch' in route && typeof route.parseSearch === 'function';
+    'safeParsePath' in route && typeof route.safeParsePath === 'function' &&
+    'parseSearch' in route && typeof route.parseSearch === 'function' &&
+    'safeParseSearch' in route && typeof route.safeParseSearch === 'function';
 }
 
 /** Promote an unrouted page config to a routed page config. */
 export function promoteRouteConfig<
   TTypes extends AnyDefinePageTypeState,
-  TRoute extends TypedRouteTarget<object, object>,
+  TRoute extends TypedRouteTarget<object, object> & RouteParserTarget,
   THasConfiguredRoute extends boolean,
 >(
   config: RuntimePageConfig<TTypes, THasConfiguredRoute>,

@@ -17,8 +17,10 @@ import {
   type InferDefinePageTypes,
   paginationSearchSchema,
 } from '../mod.ts';
+import type { RuntimeFormState } from '../../../form/runtime/types.ts';
 import {
   bindRoutePattern,
+  createRouteReference,
   defineRouteContract,
   enumPathParamSchema,
 } from '../../../route/_internal/contract-runtime.ts';
@@ -430,6 +432,138 @@ Deno.test('definePage withRoute(route) supports implicit createNav and build()',
   assert(
     handlerHref.includes('page=5'),
     `Expected handler href to use ctx.search.page: ${handlerHref}`,
+  );
+});
+Deno.test('definePage withRoute generated dynamic reference resolves path across the page pipeline', async () => {
+  type OrderFormValues = { note?: string };
+  function Panel({ id }: { id: string }) {
+    return <div>{id}</div>;
+  }
+  function OrderForm(_props: RuntimeFormState<OrderFormValues>) {
+    return <form />;
+  }
+
+  const seen = new Map<string, string>();
+  const orderRoute = createRouteReference('/orders/[id]');
+  const route = definePage<{ requestId: string }>()
+    .withRoute(orderRoute)
+    .withResource('order', (ctx) => {
+      seen.set('resource', ctx.path.id);
+      return { id: ctx.path.id };
+    })
+    .withLayer('panel', Panel, {
+      loader: (ctx) => {
+        seen.set('layer', ctx.path.id);
+        return { id: ctx.path.id };
+      },
+      partial: (ctx) => {
+        seen.set('partial', ctx.path.id);
+        return `/partials/orders/${ctx.path.id}`;
+      },
+      fallback: <span>Loading</span>,
+    })
+    .withForm('form', OrderForm, {
+      schema: z.object({ note: z.string().optional() }),
+      initial: (ctx) => {
+        seen.set('form', ctx.path.id);
+        return { note: ctx.path.id };
+      },
+      mutate: () => ({}),
+      csrf: false,
+    })
+    .withLayout((slots, ctx) => {
+      seen.set('layout', ctx.path.id);
+      return <main>{slots.panel()}{slots.form()}</main>;
+    })
+    .withMeta((ctx) => {
+      seen.set('metadata', ctx.path.id);
+      return { title: `Order ${ctx.path.id}` };
+    })
+    .withHandler('POST', (ctx) => {
+      seen.set('handler', ctx.path.id);
+      return new Response(null, { status: 204 });
+    })
+    .build();
+
+  const ctx = createRequestContext({
+    params: { id: 'order-42' },
+    url: new URL('http://localhost/orders/order-42'),
+  });
+  await route.page(ctx);
+  await route.handler?.POST?.(ctx);
+
+  for (
+    const stage of ['resource', 'layer', 'partial', 'form', 'layout', 'metadata', 'handler']
+  ) {
+    assert(seen.get(stage) === 'order-42', `Expected ${stage} to receive generated path state`);
+  }
+});
+Deno.test('definePage withRoute generated references resolve dynamic and catch-all path matrices', async () => {
+  const cases = [
+    {
+      route: createRouteReference('/orders/[id]'),
+      params: { id: 'order-7' },
+      expected: JSON.stringify({ id: 'order-7' }),
+    },
+    {
+      route: createRouteReference('/files/[...segments]'),
+      params: { segments: 'one/two' },
+      expected: JSON.stringify({ segments: ['one', 'two'] }),
+    },
+    {
+      route: createRouteReference('/docs/[[...slug]]'),
+      params: {},
+      expected: JSON.stringify({}),
+    },
+  ] as const;
+
+  for (const testCase of cases) {
+    let resolved = '';
+    const route = definePage<{ requestId: string }>()
+      .withRoute(testCase.route)
+      .withResource('capture', (ctx) => {
+        resolved = JSON.stringify(ctx.path);
+        return null;
+      })
+      .build();
+    await route.page(createRequestContext({ params: testCase.params }));
+    assert(
+      resolved === testCase.expected,
+      `Unexpected path state for ${testCase.route.routePattern}`,
+    );
+  }
+});
+Deno.test('definePage withRoute generated reference rejects missing dynamic params with 404', async () => {
+  const route = definePage<{ requestId: string }>()
+    .withRoute(createRouteReference('/orders/[id]'))
+    .withLayer('panel', () => <div />)
+    .build();
+
+  let thrown: unknown;
+  try {
+    await route.page(createRequestContext({ params: {} }));
+  } catch (error: unknown) {
+    thrown = error;
+  }
+
+  assert(thrown instanceof Response, 'Expected missing generated path state to throw a Response');
+  assert(thrown.status === 404, `Unexpected missing generated path status: ${thrown.status}`);
+});
+Deno.test('definePage explicit path schema configured after withRoute takes parser precedence', async () => {
+  let resolved = '';
+  const route = definePage<{ requestId: string }>()
+    .withRoute(createRouteReference('/orders/[id]'))
+    .withPathParams(z.object({ id: z.string().transform((value) => `schema:${value}`) }))
+    .withResource('capture', (ctx) => {
+      resolved = ctx.path.id;
+      return null;
+    })
+    .build();
+
+  await route.page(createRequestContext({ params: { id: 'order-9' } }));
+  assert(
+    resolved === 'schema:order-9',
+    `Expected explicit schema precedence, received ${resolved}`,
   );
 });
 Deno.test('definePage withRouteContract({ pathSchema }) promotes path type-state and binds the route', async () => {

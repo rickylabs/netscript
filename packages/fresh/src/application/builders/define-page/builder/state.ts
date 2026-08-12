@@ -34,6 +34,7 @@ import type {
   DefinePageWithSearchParams,
   EmptyRecord,
   PathParamSchema,
+  RouteParserTarget,
   SearchParamSchema,
 } from '../types.ts';
 
@@ -84,7 +85,7 @@ export interface DefinePageBuilder<
   ): DefinePageBuilder<DefinePageWithSearchParams<TTypes, TSchema>, THasConfiguredRoute>;
 
   /** Bind the page to a generated typed route target. */
-  withRoute<TRoute extends TypedRouteTarget<object, object>>(
+  withRoute<TRoute extends TypedRouteTarget<object, object> & RouteParserTarget>(
     route: TRoute,
   ): DefinePageBuilder<DefinePageWithRoute<TTypes, TRoute>, true>;
 
