@@ -1244,3 +1244,32 @@ defers the close by hand. This lane's `[post-merge]` marker (#1530 box 7, workin
 prints "excluded post-merge box(es) … verify in a follow-up comment and tick after merge") keeps the closing
 keyword and the auto-close instead. The distinction they drew back is the right one: the marker fits a
 **genuinely post-merge-only** fact; `Refs` fits a box blocked on **another PR**.
+
+## D-38 — #1403 closed; `arch:check` now gates 36 units, verified on merged main
+
+- **Recorded:** 2026-08-12
+- **Merge:** PR #1570 → `e391f3aec`, closing **#1403** (`CLOSED/COMPLETED`, `status:shipped`), 8/8 boxes
+  mirrored from `box-index` evidence.
+- **Verified on merged `main`, not inferred from the PR:**
+
+```text
+deno task arch:check        → exit 0      ← now iterating 36 discovered roots
+deno task quality:scan:repo → exit 0
+```
+
+  `arch:check` was previously green only because it gated **16** hand-listed roots; `packages/cli` was not
+  among them, which is why 54 A14 findings were invisible to it. Green at 36 with A14 origin-aware is a
+  materially different claim from green at 16.
+- **Three defects on one gate, all closed:** the curated root omission; the PR gate never scanning
+  `.llm/tools/**` **and** skipping entirely on an empty set (`if ((${#args[@]}))` — no command, reported
+  success); and the two-dot range that enumerated other lanes' merged files.
+- **The plan error, and why the escalation mattered.** `R-6` put the 36-root expansion here and `R-5` (A14
+  origin-awareness) in PR-C. Incoherent: the expansion is exactly what surfaces A14's false positives to
+  `arch:check`. The implementer escalated rather than silently fixing A14 or shipping a red gate, `R-5` moved
+  into PR-B, and the gate is green. **#1380 box 5 is therefore implemented by PR-B**, referenced without a
+  closing keyword; PR-C ticks it citing `e391f3aec`.
+- **Allowance count rises 8 → 10**, stated on the PR rather than discovered: two `explicit-any` false
+  positives where the scanner matches the English word "any" in comments, routed to **#1549**, deleted when
+  that lands comment-awareness. First time this lane's count has risen, and it is reversible by construction.
+- **Lane state: #1436, #1415, #1530, #1566, #1403 closed.** Remaining owned: **#1380** (PR-C), **#1549**
+  (PR-D).
