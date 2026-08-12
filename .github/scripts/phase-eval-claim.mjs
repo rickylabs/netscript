@@ -48,6 +48,44 @@ export async function claimPhaseEvaluation(operations, key) {
   return { claimed: false, ref };
 }
 
+/**
+ * Claim one evaluator generation and create its paid trigger.
+ *
+ * A trigger failure releases the claim so a transient API error can be retried. A process crash
+ * cannot run this cleanup; recovery from that residual case requires a new status generation.
+ *
+ * @template T
+ * @param {{
+ *   createRef: (input: { ref: string, sha: string }) => Promise<void>,
+ *   getRef: (input: { ref: string }) => Promise<{ sha: string }>,
+ *   deleteRef: (input: { ref: string }) => Promise<void>,
+ * }} operations
+ * @param {{ generation: number, phase: 'plan' | 'impl', head: string }} key
+ * @param {() => Promise<T>} createTrigger
+ * @returns {Promise<
+ *   { claimed: false, ref: string } |
+ *   { claimed: true, ref: string, trigger: T }
+ * >}
+ */
+export async function dispatchClaimedPhaseEvaluation(operations, key, createTrigger) {
+  const claim = await claimPhaseEvaluation(operations, key);
+  if (!claim.claimed) return claim;
+
+  try {
+    return { ...claim, trigger: await createTrigger() };
+  } catch (triggerError) {
+    try {
+      await operations.deleteRef({ ref: claim.ref.slice('refs/'.length) });
+    } catch (releaseError) {
+      throw new AggregateError(
+        [triggerError, releaseError],
+        `Evaluator trigger failed and claim ${claim.ref} could not be released`,
+      );
+    }
+    throw triggerError;
+  }
+}
+
 /** @param {unknown} error */
 function isAlreadyExistingRefError(error) {
   if (!isRecord(error) || error.status !== 422) return false;

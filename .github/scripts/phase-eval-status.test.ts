@@ -103,21 +103,20 @@ Deno.test('terminal decision contains exactly one status label', () => {
 
 Deno.test('atomic generation claim remains before trigger creation', async () => {
   const workflow = await Deno.readTextFile('.github/workflows/openhands-phase-eval.yml');
-  const claim = 'await github.rest.git.createRef({';
-  const collision = "error?.response?.data?.message === 'Reference already exists'";
-  const earlyReturn = 'core.notice(`This phase transition is already claimed by ${claimRef}.`);';
+  const importPrimitive = 'const { dispatchClaimedPhaseEvaluation } = await import(';
+  const claim = 'const outcome = await dispatchClaimedPhaseEvaluation(';
+  const earlyReturn = 'if (!outcome.claimed) {';
   const marker =
     'const marker = `<!-- openhands-phase-eval generation=${generationEvent.id} phase=${phase} head=${pr.head.sha} -->`;';
   const create = 'github.rest.issues.createComment({';
 
   assertStringIncludes(workflow, claim);
-  assertStringIncludes(workflow, collision);
   assertStringIncludes(workflow, earlyReturn);
   assertStringIncludes(workflow, marker);
   assertStringIncludes(workflow, create);
-  assertEquals(workflow.indexOf(claim) < workflow.indexOf(collision), true);
-  assertEquals(workflow.indexOf(collision) < workflow.indexOf(earlyReturn), true);
-  assertEquals(workflow.indexOf(earlyReturn) < workflow.indexOf(create), true);
+  assertEquals(workflow.indexOf(importPrimitive) < workflow.indexOf(claim), true);
+  assertEquals(workflow.indexOf(claim) < workflow.indexOf(create), true);
+  assertEquals(workflow.indexOf(create) < workflow.indexOf(earlyReturn), true);
 });
 
 Deno.test('status bookkeeping failures are attributed and dispatch remains conditionally eligible', async () => {
@@ -140,7 +139,7 @@ Deno.test('status bookkeeping failures are attributed and dispatch remains condi
   assertStringIncludes(dispatch, '!cancelled()');
   assertStringIncludes(
     dispatch,
-    "steps.require_chainable_trigger_token.outcome == 'success'",
+    "steps.checkout_trusted_primitive.outcome == 'success'",
   );
   assertEquals(dispatch.includes('enter_impl_eval_status.outcome'), false);
 });

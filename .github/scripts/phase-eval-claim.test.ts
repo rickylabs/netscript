@@ -1,6 +1,7 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import {
   claimPhaseEvaluation,
+  dispatchClaimedPhaseEvaluation,
   phaseEvalClaimRef,
   REFERENCE_ALREADY_EXISTS_MESSAGE,
 } from './phase-eval-claim.mjs';
@@ -45,6 +46,10 @@ function atomicRefOperations(waitAtCreate?: () => Promise<void>) {
         if (!sha) return Promise.reject(new Error(`Missing ref: ${ref}`));
         return Promise.resolve({ sha });
       },
+      deleteRef({ ref }: { ref: string }) {
+        if (!refs.delete(`refs/${ref}`)) return Promise.reject(new Error(`Missing ref: ${ref}`));
+        return Promise.resolve();
+      },
     },
   };
 }
@@ -77,11 +82,14 @@ Deno.test('atomic claim: concurrent attempts on one tuple create one trigger and
   const paidRuns: string[] = [];
 
   async function attempt(id: string) {
-    const claim = await claimPhaseEvaluation(operations, key);
-    if (!claim.claimed) return { id, claimed: false, commented: false, spent: false };
-    comments.push(id);
-    paidRuns.push(id);
-    return { id, claimed: true, commented: true, spent: true };
+    const outcome = await dispatchClaimedPhaseEvaluation(operations, key, () => {
+      comments.push(id);
+      paidRuns.push(id);
+      return Promise.resolve(id);
+    });
+    return outcome.claimed
+      ? { id, claimed: true, commented: true, spent: true }
+      : { id, claimed: false, commented: false, spent: false };
   }
 
   const outcomes = await Promise.all([attempt('one'), attempt('two')]);
@@ -108,7 +116,7 @@ Deno.test('atomic claim: head, phase, and generation each identify a distinct cl
   ];
 
   const outcomes: Array<{ claimed: boolean; ref: string }> = await Promise.all(
-    keys.map((key) => claimPhaseEvaluation(operations, key)),
+    keys.map((key) => dispatchClaimedPhaseEvaluation(operations, key, () => Promise.resolve(key))),
   );
   assertEquals(outcomes.map((outcome: { claimed: boolean }) => outcome.claimed), [
     true,
@@ -119,6 +127,33 @@ Deno.test('atomic claim: head, phase, and generation each identify a distinct cl
   assertEquals(new Set(outcomes.map((outcome: { ref: string }) => outcome.ref)).size, 4);
   assertEquals(refs.size, 4);
   console.log('distinct tuples: base + varied head + varied phase + varied generation -> 4 claims');
+});
+
+Deno.test('trigger failure releases the claim and the same tuple can retry', async () => {
+  const key: ClaimKey = { generation: 1594001, phase: 'impl', head: HEAD_A };
+  const { operations, refs } = atomicRefOperations();
+
+  await assertRejects(
+    () =>
+      dispatchClaimedPhaseEvaluation(
+        operations,
+        key,
+        () => Promise.reject(new Error('transient comment failure')),
+      ),
+    Error,
+    'transient comment failure',
+  );
+  assertEquals(refs.size, 0);
+
+  const retry = await dispatchClaimedPhaseEvaluation(
+    operations,
+    key,
+    () => Promise.resolve('trigger-created'),
+  );
+  assertEquals(retry.claimed, true);
+  assertEquals(retry.claimed && retry.trigger, 'trigger-created');
+  assertEquals(refs.size, 1);
+  console.log('trigger failure: claim released; same tuple retry -> claimed');
 });
 
 Deno.test('claim validation and non-collision failures fail closed', async () => {
