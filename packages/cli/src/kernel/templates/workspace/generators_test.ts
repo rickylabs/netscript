@@ -62,7 +62,11 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
   ]);
   assertEquals(
     result.tasks.dev,
-    'deno task deps:verify && deno run --allow-all apps/dashboard/main.ts',
+    'deno task deps:closure && deno task deps:verify && deno run --allow-all apps/dashboard/main.ts',
+  );
+  assertEquals(
+    result.tasks['deps:closure'],
+    'deno task --cwd apps/dashboard deps:closure',
   );
   assertEquals(
     result.tasks['deps:verify'],
@@ -86,6 +90,7 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
   );
   assertEquals(Object.keys(result.tasks), [
     'dev',
+    'deps:closure',
     'deps:verify',
     'aspire:start',
     'aspire:start:isolated',
@@ -267,7 +272,7 @@ Deno.test('generateDenoJson keeps the same root-only shape in local mode', () =>
   assertEquals(result.workspace, ['./contracts', './plugins']);
   assertEquals(
     result.tasks.dev,
-    'deno task deps:verify && deno run --allow-all apps/dashboard/main.ts',
+    'deno task deps:closure && deno task deps:verify && deno run --allow-all apps/dashboard/main.ts',
   );
   assert(!('imports' in result), 'root deno.json must not carry import maps');
   assert(

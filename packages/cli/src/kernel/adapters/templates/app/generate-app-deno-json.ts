@@ -12,6 +12,7 @@ import { SCAFFOLD_APP_IMPORTS } from '../../../constants/scaffold/scaffold-app-c
 import { SCAFFOLD_PACKAGES } from '../../../constants/scaffold/scaffold-packages.ts';
 import type { JsrResolverPort } from '../../../ports/jsr-resolver-port.ts';
 import type { PackageSourceMode } from '../../../domain/scaffold/scaffold-options.ts';
+import { assertCoherentNetScriptWebRuntimeImports } from '../../../domain/dependency-closures/netscript-web-runtime-closure.ts';
 
 /** Options for generating the app-level `deno.json`. */
 export interface AppDenoJsonOptions {
@@ -105,6 +106,8 @@ export function generateAppDenoJson(options: AppDenoJsonOptions): string {
       : {}),
   };
 
+  assertCoherentNetScriptWebRuntimeImports(directNetScriptImports);
+
   const config = {
     name: `@${options.projectName}/${options.appName}`,
     version: '0.0.0',
@@ -115,8 +118,10 @@ export function generateAppDenoJson(options: AppDenoJsonOptions): string {
     // in Deno 2.x.
     tasks: {
       check: 'deno fmt --check . && deno lint . && deno check',
-      dev: 'deno task --cwd ../.. deps:verify && deno run -A npm:vite --configLoader native',
-      build: 'deno run -A npm:vite build',
+      'deps:closure': 'deno run --allow-read .netscript/verify-dependency-closure.ts',
+      dev:
+        'deno task deps:closure && deno task --cwd ../.. deps:verify && deno run -A npm:vite --configLoader native',
+      build: 'deno task deps:closure && deno run -A npm:vite build',
       serve: 'deno run -A npm:vite preview',
       start: 'deno serve -A _fresh/server.js',
       update: 'deno run -A -r jsr:@fresh/update .',

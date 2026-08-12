@@ -82,7 +82,8 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
     unstable: ['raw-imports', 'kv'],
     tasks: {
       dev:
-        `deno task deps:verify && deno run --allow-all ${SCAFFOLD_DIRS.APPS}/${options.appName}/main.ts`,
+        `deno task deps:closure && deno task deps:verify && deno run --allow-all ${SCAFFOLD_DIRS.APPS}/${options.appName}/main.ts`,
+      'deps:closure': `deno task --cwd ${SCAFFOLD_DIRS.APPS}/${options.appName} deps:closure`,
       'deps:verify':
         'deno run --allow-read --allow-env=DENO_DIR,LOCALAPPDATA,XDG_CACHE_HOME,HOME,USERPROFILE .netscript/verify-node-modules.ts',
       ...(!options.noAspire
