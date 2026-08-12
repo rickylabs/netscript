@@ -1,11 +1,14 @@
+import { JsrExportMapHttpError } from '../../features/plugins/doctor/jsr-export-map-loader-port.ts';
+
 /** Read one published JSR package version's declared export keys. */
 export async function fetchJsrExportMap(
   packageSpecifier: string,
   version: string,
+  fetcher: typeof fetch = fetch,
 ): Promise<ReadonlySet<string>> {
-  const response = await fetch(`https://jsr.io/${packageSpecifier}/${version}_meta.json`);
+  const response = await fetcher(`https://jsr.io/${packageSpecifier}/${version}_meta.json`);
   if (!response.ok) {
-    throw new Error(`JSR metadata request failed with HTTP ${response.status}.`);
+    throw new JsrExportMapHttpError(response.status);
   }
   const value: unknown = await response.json();
   if (!value || typeof value !== 'object') {

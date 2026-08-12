@@ -75,6 +75,44 @@ The focused three-test set is red before the fix. Only the contract being change
 fail; the other two cases are preservation controls, so claiming they were individually red would
 be false evidence.
 
+### Post-fix focused run
+
+Command:
+
+```text
+NO_COLOR=1 deno test --allow-all packages/cli/src/public/features/plugins/doctor/doctor-plugin-invariants_test.ts packages/cli/src/public/infra/jsr/fetch-jsr-export-map_test.ts
+```
+
+Raw exit code: `0`
+
+Untruncated output:
+
+```text
+Check packages/cli/src/public/features/plugins/doctor/doctor-plugin-invariants_test.ts
+Check packages/cli/src/public/infra/jsr/fetch-jsr-export-map_test.ts
+running 12 tests from ./packages/cli/src/public/features/plugins/doctor/doctor-plugin-invariants_test.ts
+plugin doctor reports all three host invariants healthy for a valid install ... ok (24ms)
+plugin doctor rejects a dangling configured module ... ok (6ms)
+plugin doctor rejects a configured module with no manifest export ... ok (16ms)
+plugin doctor distinguishes a configured module import failure ... ok (15ms)
+plugin doctor kills and reports a configured module that times out ... ok (58ms)
+plugin doctor distinguishes a configured module non-zero exit ... ok (17ms)
+plugin doctor reports an exact unpublished service entrypoint as a named exclusion ... ok (17ms)
+plugin doctor fully checks a published service entrypoint and rejects a missing export ... ok (18ms)
+plugin doctor keeps a non-404 service entrypoint registry failure hard ... ok (15ms)
+plugin doctor warns when an explicit permission override differs from manifest truth ... ok (16ms)
+doctor subprocess and runtime loader have manifest-resolution parity ... ok (111ms)
+plugin doctor treats a bare package alias as package-backed despite an incidental directory ... ok (29ms)
+running 2 tests from ./packages/cli/src/public/infra/jsr/fetch-jsr-export-map_test.ts
+fetch JSR export map exposes the exact 404 response status ... ok (4ms)
+fetch JSR export map preserves a non-404 response status ... ok (89µs)
+
+ok | 14 passed | 0 failed (410ms)
+```
+
+The adapter test also asserts the exact request URL:
+`https://jsr.io/@example/plugin-fixture/0.0.6-unpublished_meta.json`.
+
 ## Gate output
 
 Untruncated command output and raw exit codes will be appended after implementation.

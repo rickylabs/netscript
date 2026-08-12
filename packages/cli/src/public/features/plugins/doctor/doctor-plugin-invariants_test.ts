@@ -19,6 +19,7 @@ import {
   type PluginDoctorReport,
   SERVICE_ENTRYPOINT_RESOLVES_CHECK,
 } from './doctor-plugin-use-case.ts';
+import { JsrExportMapHttpError } from './jsr-export-map-loader-port.ts';
 
 const MANIFEST_SOURCE = `
 const manifest = {
@@ -121,7 +122,7 @@ Deno.test('plugin doctor reports an exact unpublished service entrypoint as a na
     const check = findCheck(reports[0].checks, SERVICE_ENTRYPOINT_RESOLVES_CHECK);
     assertEquals(requested, ['@example/plugin-fixture@0.0.6-unpublished']);
     assertEquals(check.status, 'warning');
-    assertStringIncludes(check.message ?? '', 'excluded');
+    assertStringIncludes(check.message ?? '', 'Excluded');
     assertStringIncludes(check.message ?? '', '@example/plugin-fixture@0.0.6-unpublished');
     await assertDoctorCommandSucceeds(projectRoot, reports);
   });
@@ -379,8 +380,8 @@ async function assertDoctorCommandSucceeds(
   await command.parse(['--project-root', projectRoot]);
 }
 
-function registryHttpError(status: number): Error & { readonly status: number } {
-  return Object.assign(new Error(`JSR metadata request failed with HTTP ${status}.`), { status });
+function registryHttpError(status: number): JsrExportMapHttpError {
+  return new JsrExportMapHttpError(status);
 }
 
 async function withProject(run: (projectRoot: string) => Promise<void>): Promise<void> {

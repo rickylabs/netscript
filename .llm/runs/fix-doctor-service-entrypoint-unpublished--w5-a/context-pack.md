@@ -24,13 +24,12 @@ path; #1597's E2E availability predicate is already exact-404-only and remains o
 
 ## In Progress
 
-- Exact-404-only implementation.
+- Required repository gates.
 
 ## Next Steps
 
-1. Add three discriminating tests and capture their pre-fix failures.
-2. Implement structured exact-404 degradation.
-3. Run gates and automatic IMPL-EVAL.
+1. Run required gates and record untruncated output.
+2. Trigger the automatic IMPL-EVAL.
 
 ## Key Decisions
 
@@ -45,6 +44,11 @@ path; #1597's E2E availability predicate is already exact-404-only and remains o
 | --- | --- | --- |
 | `.llm/runs/fix-doctor-service-entrypoint-unpublished--w5-a/` | new | Harness state |
 | `slices/w5-a-doctor/evidence.md` | new | Required evidence ledger |
+| `packages/cli/src/public/features/plugins/doctor/jsr-export-map-loader-port.ts` | new | Typed exact-response failure boundary |
+| `packages/cli/src/public/features/plugins/doctor/doctor-plugin-use-case.ts` | changed | Exact 404 warning exclusion |
+| `packages/cli/src/public/infra/jsr/fetch-jsr-export-map.ts` | changed | Preserves received HTTP status |
+| `packages/cli/src/public/infra/jsr/fetch-jsr-export-map_test.ts` | new | Exact URL/status adapter tests |
+| `packages/cli/src/public/features/plugins/doctor/doctor-plugin-invariants_test.ts` | changed | Three doctor-boundary controls |
 
 ## Gates
 

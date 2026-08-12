@@ -29,7 +29,7 @@
 ### Constants
 
 - `SERVICE_ENTRYPOINT_RESOLVES_CHECK` — unchanged critical check identity.
-- A named exclusion message constant may be added for stable reporting/tests.
+- `JsrExportMapHttpError.status` — received HTTP status from the exact-version metadata request.
 
 ### Archetype 6 checkpoint
 
@@ -70,12 +70,17 @@ transport behavior.
 | --- | --- | --- | --- |
 | 2026-08-12 | 0 | bootstrap | Clean requested branch confirmed at exact baseline; research and design recorded. |
 | 2026-08-12 | 1 | pre-fix test | Focused set exited 1: unpublished 404 expected warning but received error; published-defect and 503 controls passed. |
+| 2026-08-12 | 2 | implementation | Added a typed loader-port HTTP error; only `instanceof` plus status 404 produces the named warning exclusion. |
+| 2026-08-12 | 2 | focused gate | Doctor and adapter files passed 14/14 tests; exact URL, 404, published missing export, and 503 are covered. |
+| 2026-08-12 | 2 | slice review | Verified typed `instanceof`+404 predicate, unchanged published export lookup, hard non-404/network path, visible warning rendering, bounded feature folder, and no public export change. |
+| 2026-08-12 | 2 | reconcile | PR #1625 remains the only leaf PR; PR #1624 is still the release blocker; no closing issue/checklist or new reviewer comment changes scope. |
 
 ## Gate Results
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
 | Focused discriminating pre-fix test | EXPECTED RED (exit 1; 2 pass / 1 fail) | `slices/w5-a-doctor/evidence.md` |
+| Focused doctor + export-map tests | PASS (exit 0; 14 pass / 0 fail) | `slices/w5-a-doctor/evidence.md` |
 
 Remaining gates are not run yet.
 
