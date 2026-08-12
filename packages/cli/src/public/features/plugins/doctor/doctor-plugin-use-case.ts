@@ -16,6 +16,10 @@ import { resolvePluginImportSpecifier } from '../../../../kernel/application/plu
 import { getPluginServiceLookupName } from '../../../../kernel/adapters/config/plugin-registry.ts';
 import { showAuthBackend } from '../auth/auth-config.ts';
 import { resolveEffectivePluginPermissions } from '../../../../kernel/adapters/config/deploy-config-resolvers.ts';
+import {
+  JsrExportMapHttpError,
+  type JsrExportMapLoader,
+} from './jsr-export-map-loader-port.ts';
 
 export const CONFIGURED_MODULE_RESOLVES_CHECK = 'configured-module-resolves';
 export const CONFIGURED_MODULE_EXPORTS_MANIFEST_CHECK = 'configured-module-exports-manifest';
@@ -72,10 +76,7 @@ export interface PluginDoctorDependencies {
   /** Override the configured-module probe timeout in contract tests. */
   readonly configuredModuleTimeoutMs?: number;
   /** Load the declared exports for one exact JSR package version. */
-  readonly loadJsrExportMap?: (
-    packageSpecifier: string,
-    version: string,
-  ) => Promise<ReadonlySet<string>>;
+  readonly loadJsrExportMap?: JsrExportMapLoader;
   /** Inspect the running Aspire AppHost for configured resource truth. */
   readonly inspectAppHost?: AppHostInspector;
 }
@@ -443,6 +444,15 @@ async function checkServiceEntrypoint(
           : `${entry.entrypoint} is not declared in ${jsr.packageSpecifier}@${jsr.version}'s export map.`,
       );
     } catch (error) {
+      if (error instanceof JsrExportMapHttpError && error.status === 404) {
+        return check(
+          SERVICE_ENTRYPOINT_RESOLVES_CHECK,
+          SERVICE_ENTRYPOINT_RESOLVES_TITLE,
+          'warning',
+          `Excluded ${SERVICE_ENTRYPOINT_RESOLVES_CHECK} for ${jsr.packageSpecifier}@${jsr.version}: ` +
+            'the exact pinned version is not published on JSR (HTTP 404). Rerun after publication.',
+        );
+      }
       return check(
         SERVICE_ENTRYPOINT_RESOLVES_CHECK,
         SERVICE_ENTRYPOINT_RESOLVES_TITLE,

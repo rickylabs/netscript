@@ -19,6 +19,7 @@ import {
   type PluginDoctorReport,
   SERVICE_ENTRYPOINT_RESOLVES_CHECK,
 } from './doctor-plugin-use-case.ts';
+import { JsrExportMapHttpError } from './jsr-export-map-loader-port.ts';
 
 const MANIFEST_SOURCE = `
 const manifest = {
@@ -105,14 +106,61 @@ Deno.test('plugin doctor distinguishes a configured module non-zero exit', async
   });
 });
 
-Deno.test('plugin doctor rejects a service entrypoint absent from a JSR export map', async () => {
+Deno.test('plugin doctor reports an exact unpublished service entrypoint as a named exclusion', async () => {
+  await withProject(async (projectRoot) => {
+    await writeModule(projectRoot, `${MANIFEST_SOURCE}\nexport default manifest;\n`);
+    await writeAppsettings(
+      projectRoot,
+      'jsr:@example/plugin-fixture@0.0.6-unpublished/services',
+      '.',
+    );
+    const requested: string[] = [];
+    const reports = await runDoctor(projectRoot, undefined, (packageSpecifier, version) => {
+      requested.push(`${packageSpecifier}@${version}`);
+      return Promise.reject(registryHttpError(404));
+    });
+    const check = findCheck(reports[0].checks, SERVICE_ENTRYPOINT_RESOLVES_CHECK);
+    assertEquals(requested, ['@example/plugin-fixture@0.0.6-unpublished']);
+    assertEquals(check.status, 'warning');
+    assertStringIncludes(check.message ?? '', 'Excluded');
+    assertStringIncludes(check.message ?? '', '@example/plugin-fixture@0.0.6-unpublished');
+    await assertDoctorCommandSucceeds(projectRoot, reports);
+  });
+});
+
+Deno.test('plugin doctor fully checks a published service entrypoint and rejects a missing export', async () => {
   await withProject(async (projectRoot) => {
     await writeModule(projectRoot, `${MANIFEST_SOURCE}\nexport default manifest;\n`);
     await writeAppsettings(projectRoot, 'jsr:@example/plugin-fixture@1.0.0/services', '.');
-    const reports = await runDoctor(projectRoot, undefined, () => Promise.resolve(new Set(['.'])));
+    const requested: string[] = [];
+    const reports = await runDoctor(projectRoot, undefined, (packageSpecifier, version) => {
+      requested.push(`${packageSpecifier}@${version}`);
+      return Promise.resolve(new Set(['.']));
+    });
     const check = findCheck(reports[0].checks, SERVICE_ENTRYPOINT_RESOLVES_CHECK);
+    assertEquals(requested, ['@example/plugin-fixture@1.0.0']);
     assertEquals(check.status, 'error');
     assertStringIncludes(check.message ?? '', 'is not declared');
+    await assertDoctorCommandExitsOne(
+      projectRoot,
+      reports,
+      SERVICE_ENTRYPOINT_RESOLVES_CHECK,
+    );
+  });
+});
+
+Deno.test('plugin doctor keeps a non-404 service entrypoint registry failure hard', async () => {
+  await withProject(async (projectRoot) => {
+    await writeModule(projectRoot, `${MANIFEST_SOURCE}\nexport default manifest;\n`);
+    await writeAppsettings(projectRoot, 'jsr:@example/plugin-fixture@1.0.0/services', '.');
+    const reports = await runDoctor(
+      projectRoot,
+      undefined,
+      () => Promise.reject(registryHttpError(503)),
+    );
+    const check = findCheck(reports[0].checks, SERVICE_ENTRYPOINT_RESOLVES_CHECK);
+    assertEquals(check.status, 'error');
+    assertStringIncludes(check.message ?? '', 'HTTP 503');
     await assertDoctorCommandExitsOne(
       projectRoot,
       reports,
@@ -313,6 +361,27 @@ async function assertDoctorCommandExitsOne(
     RemoteError,
   );
   assertEquals(error.exitCode, 1, `${checkId} must fail the doctor command`);
+}
+
+async function assertDoctorCommandSucceeds(
+  projectRoot: string,
+  reports: readonly PluginDoctorReport[],
+): Promise<void> {
+  const command = createDoctorPluginCommand({
+    resolveProjectRoot: () => Promise.resolve(projectRoot),
+    doctor: () => Promise.resolve(reports),
+    print: () => {},
+    diagnosticEvidence: () => ({
+      read: () => Promise.resolve(undefined),
+      write: () => Promise.resolve(),
+      appendDrift: () => Promise.resolve(),
+    }),
+  });
+  await command.parse(['--project-root', projectRoot]);
+}
+
+function registryHttpError(status: number): JsrExportMapHttpError {
+  return new JsrExportMapHttpError(status);
 }
 
 async function withProject(run: (projectRoot: string) => Promise<void>): Promise<void> {
