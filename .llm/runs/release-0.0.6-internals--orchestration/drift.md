@@ -1273,3 +1273,53 @@ deno task quality:scan:repo → exit 0
   that lands comment-awareness. First time this lane's count has risen, and it is reversible by construction.
 - **Lane state: #1436, #1415, #1530, #1566, #1403 closed.** Remaining owned: **#1380** (PR-C), **#1549**
   (PR-D).
+
+## D-39 — the shallow-clone trap, and `gh-watch`'s stale match for the third time
+
+- **Severity:** architectural (methodology), recorded at the owner's instruction
+- **Recorded:** 2026-08-12, PR #1585
+
+### F1 was correct and my rebuttal was false
+
+The evaluator flagged the doctrine's `@netscript/shared` provenance as a false-done state. I rebutted it with
+three probes and was **wrong**. These worktrees are **shallow clones**:
+
+```text
+git rev-parse --is-shallow-repository                → true
+gh api …/commits/317e4b509 → parents: 6a4ca79de       ← the shallow BOUNDARY, not a root
+gh api compare/0ef13de359...4a5a28b8 → merge_base=0ef13de359b  ahead_by=2050
+gh api compare/fd8259b76...4a5a28b8  → merge_base=fd8259b76d8
+```
+
+Both commits **are** canonical ancestors, so `@netscript/shared` did exist in reachable history. Corrected at
+`b409498a8` across all three surfaces F1 named (doctrine prose, the doc-contract test's expected strings — it
+would otherwise have kept a false statement green — and box-2 evidence), plus a diagnostic note in the
+doctrine so the next re-walk does not reach for the same commands. Rebuttal retracted publicly
+(`5269078936`); provenance corrected at the issue (`5269095079`); the run's own artifacts corrected.
+
+### The methodological finding, which is the one worth keeping
+
+I ran **three** probes and called them independent. They were three expressions of **one premise** — that the
+local object graph is complete. **Independence of method is not independence of premise.** A shallow clone
+breaks that premise *silently*: `rev-list --max-parents=0` reports the boundary as a root and
+`merge-base --is-ancestor` returns false for absent objects, with no error. So the wrong answer was **stable
+across repetition**, which is what made it persuasive enough to rebut a correct verdict.
+
+Fourth instance of one pattern on this lane: an absence asserted without the probe that finds the presence;
+a mechanism asserted without running the range; an outcome asserted without tracing the data flow; and now
+ancestry asserted from a clone that structurally cannot answer it. **Standing rule:** check
+`git rev-parse --is-shallow-repository` before any history-shaped claim, and use
+`gh api /repos/:o/:r/compare/A...B` for anything load-bearing. Treat `--all` and `for-each-ref --contains` as
+statements about **local refs**, never ancestry.
+
+### `gh-watch` matched a superseded verdict — third occurrence
+
+After re-triggering at head `0b34371c2`, `gh-watch` printed `TERMINAL PR #1585: FAIL_FIX after 0s`, citing run
+`31611977212` — the **cycle-1** verdict at the old head `4a5a28b8a`. The cycle-2 evaluator (`31614677830`) was
+still in progress and had emitted nothing.
+
+That is the same defect as D-24, now seen three times on this lane. Consuming it would have re-consumed the
+verdict the re-trigger existed to replace — and this time it would have blocked a PR whose finding was
+already fixed. The workaround remains: **wait on the Actions run id**, then match the verdict comment's
+`run_id` against it. One trigger marker was verified at the new head (`gen=29350385980`), so exactly-once
+holds.
