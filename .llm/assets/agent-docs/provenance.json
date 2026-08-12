@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "0.0.5",
+  "version": "0.0.6",
   "sourceCommit": "657b3b9d6",
   "extractionTimestamp": "2026-08-12T20:31:25.357Z",
   "files": [
@@ -184,6 +184,6 @@
     "pages/why/index.md"
   ],
   "uncompressedBytes": 4720171,
-  "compressedBytes": 1352791,
-  "sha256": "fc121f9c0bb737e3776d64c03f6d940d7a5e1b14d5e35100c9923a3602a10da3"
+  "compressedBytes": 1352846,
+  "sha256": "af73132af11d708e14690840847bbcb9f167d68514c27cb4ec5bc429085eb9ea"
 }
