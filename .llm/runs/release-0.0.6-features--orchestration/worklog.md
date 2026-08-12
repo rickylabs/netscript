@@ -157,3 +157,54 @@ M3 high (208 stream events at 07:59Z) and IMPL-EVAL #1405 on DeepSeek V4 Flash 0
 events). Preset validation ran first — `agentic:provider-canary --all` reported all six presets
 `passed`, with `claude-evaluator-minimax-m3` and `claude-evaluator-deepseek-v4-flash-0731` both
 `liveEligible: true`, `agenticTurn: supported`.
+
+## 2026-08-12 — #1398 PLAN-EVAL PASS, plan amended, slice dispatched
+
+**PLAN-EVAL verdict: PASS** (MiniMax M3 high, fresh session, worktree
+`/home/codex/repos/ns006-1398-planeval` @ `01aeafbfa`, 562,947 ms, `is_error: False`, 215 stream
+events — a real agentic turn, not a nominal one). Verbatim verdict in `plan-eval.md`; a leaked
+one-line preamble before the verdict token was stripped and that edit is disclosed in the file.
+
+It confirmed the causal chain one hop deeper than I had traced it — through `withSpan` into
+`packages/telemetry/src/application/span.ts:38-43`, where `parentContext` is passed as the third
+argument to `tracer.startSpan` — and confirmed TC-14 compares **trace id only**
+(`select-flow-b-stream-change.ts:131-153`) and that the selector returns the **first**
+`correlationId` match (`:96-105`). It also answered S0 `yes` by a **different route** than I did
+(`plugin-reference-reconciler.ts:70-91` rather than `install-plugin_test.ts`), so that precondition
+is now confirmed twice from two directions.
+
+**Two findings folded into the plan after I verified each myself:**
+
+- **F1** — the join mechanism was implicit and would have failed silently.
+  `StreamsTracerPort.startSpan` (`instrumentation.ts:92-102`) takes **no** parent-context argument,
+  so only an explicit `context.with(extractContext({traceparent, tracestate}), …)` wrapper around
+  `producer.upsert` makes the publish span inherit the job trace. `createStreamMutationHook`
+  (`plugin-workers-core/src/streams/producer.ts:108-118`) does no wrapping today. D3 now says so.
+- **F2** — the plan named one of the **two** tests that pin the deferral. The second,
+  `suite-registry_test.ts:209-234`, asserts `SCAFFOLD_RUNTIME_DEFERRED_GATES` equals the exact
+  two-entry list and that neither runtime tier executes a deferred gate. I read both tests directly
+  to confirm. Emptying the constant without rewriting that test leaves S2 red. D5 now names both.
+
+Neither was blocking; both earned the pass.
+
+**Slice dispatched (Tier-D, mobile-visible).**
+
+| Field | Value |
+| --- | --- |
+| Worktree | `/home/codex/repos/ns006-1398` (fresh leaf, upstream cleared before launch) |
+| Branch | `fix/1398-publish-job-executions-to-durable-stream` @ `01aa12b67` |
+| Thread id | `019ff4ff-a633-7062-ae9c-21930930b5d6` |
+| Rollout | `/home/codex/.codex/sessions/2026/08/12/rollout-2026-08-12T10-03-42-019ff4ff-a633-7062-ae9c-21930930b5d6.jsonl` |
+| Requested / observed route | openai · gpt-5.6-sol · **medium** — **verdict: matched** |
+| Steering | `codex exec resume 019ff4ff-a633-7062-ae9c-21930930b5d6 -- "<follow-up>"` |
+| Brief | `slices/implement-1398.md` |
+
+The brief carries F1 and F2 as locked requirements, names the `create()` trap explicitly (install the
+hook without D3's wrapping and it looks correct, then fails TC-14 on the first matched record),
+corrects the `--allow-env` gate-command defect from the previous brief instead of repeating it,
+fences the out-of-scope items (#1405's surface, the undeclared imports, any schema change), and
+requires the expensive `scaffold.runtime` gate to be confirmed un-contended before it runs.
+
+**Note on tooling:** `slices/codex-thread-ids.md` is written per slice-dir and was **overwritten** by
+the second launch, so it now shows only the #1398 thread. The #1405 identity is preserved in this
+worklog above; nothing was lost, but the file is not an accumulating registry.
