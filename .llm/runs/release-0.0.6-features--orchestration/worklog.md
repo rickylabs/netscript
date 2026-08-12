@@ -1294,3 +1294,51 @@ issue open by hand. Applied to this lane:
 Re-measured immediately: `main` is still **`50739a7ae`** — unchanged since validation, so the
 frozen-clean proof and both corroborated lock hashes still bind. No newer unvalidated commit
 intervenes. #1580 closed; **#1571 remains open**, its box 5 awaiting the canary itself.
+
+## 2026-08-12 — Canary.3 re-cut dispatched: run `31605906943`
+
+**Run ID recorded immediately, before supervision begins.**
+
+| Field | Value |
+| --- | --- |
+| Run | **`31605906943`** |
+| Workflow | `release-canary.yml`, `workflow_dispatch`, `--ref main` |
+| Target | `0.0.6` (stable target; the workflow derives `-canary.3`) |
+| Head SHA | **`50739a7aecc8cc92eb689546bf8225fd6b7bc62c`** |
+| Created | 2026-08-12T14:16:48Z |
+
+**Preconditions verified live, not accepted from the brief:**
+
+- `main` == `50739a7ae` — unchanged since validation, so the frozen-clean proof still binds.
+- Both frozen locks pass on that SHA; both lock `sha256`s match pre-merge measurements from a
+  separate checkout, independently corroborated by the coordinator.
+- Existing tags are `canary.1` and `canary.2` → **`canary.3` is the correct N.**
+- No competing release dispatch in flight; the most recent `release-canary.yml` run is my own failed
+  `31600415045`.
+
+**One premise in the brief did not hold, and I checked rather than assumed:** it stated #1571 was
+closed/shipped. **#1571 is OPEN** — which is *correct by design*: its box 5 is "Canary.3 is
+re-dispatched from the corrected `main` SHA and reaches terminal green", i.e. precisely what this run
+must produce. Closing it beforehand would have ticked an unproven box. #1580 **is** CLOSED/COMPLETED
+as stated. The discrepancy does not block the cut, so the cut proceeded.
+
+**Supervision plan, applying the fixes lane's hard-won distinctions:**
+
+- **Step 4** — JSR publish-attempt budget. Rolling seven-day window; canary.2 consumed 35 attempts
+  earlier today, and the failed `31600415045` passed step 4 without reaching publish, so no attempt
+  was consumed there.
+- **Steps 12 and 13 read separately.** Step 12 ("Publish preflight, real graph build, no upload")
+  runs with a deliberately invalid token; **its token failures are not registry outcomes.** Step 13 is
+  the real upload. Summing them is what made the beta.10 partial publish unreadable.
+- **Step 14 `SKIPPED`** is the signal that no partial-publish path was entered.
+- **Member completeness verified myself** — enumerate from the workspace globs and `curl`
+  `jsr.io/<pkg>/meta.json` for the exact canary version. The fixes lane's probe returned "0
+  discovered" then "35 missing" before the true 35/35; each wrong answer looked authoritative.
+- **If interrupted mid-publish**, check `git status` **first** — #1540 is still open, so publish can
+  strand `catalog:` expansions in the live tree that afterwards look like unrelated churn.
+- **A failed canary is not an incident.** If publish succeeds and the pinned prod E2E then fails:
+  preserve the tag and every published member version, fix forward, mint `canary.4`. **Do not yank.**
+
+**The note must be measured at this SHA, not copied from the failed attempt.** This payload includes
+#1541 — 46 `docs/site` files and the rewritten `packages/sdk/README.md`, the public JSR landing page —
+which `5705aeb19` did not carry.
