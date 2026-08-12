@@ -557,3 +557,58 @@ gate proving the lane's own fix.
 | #1417 | — | slice B working, 1 commit, branch pushed, no PR yet |
 
 3 of 6 owned issues landed on `main`. No canary declared by this lane; root owns cadence and cut.
+
+## 2026-08-12 — IMPL-EVAL verdict, PR #1538 (slice B, #1417): PASS WITH FINDINGS
+
+Separate native opposite-family session (Claude · Fable 5 · medium) in its own detached worktree
+`/home/codex/repos/ns006-f-b-impleval` at `1a05934e9`, verified equal to the PR head. The
+generator's worktree was never touched — no second writer.
+
+**No blocking findings.** All five #1417 acceptance boxes verified by the evaluator's own executed
+commands, not from the generator's transcript.
+
+The highest-value check is the one the issue itself demanded — *"do not fix this by removing the
+dry-run from the validation sequence; the defect is the mutation, not the check."* The evaluator
+constructed a publish-invalid state rather than reasoning about it:
+
+```
+$ (injected: import "./this-module-does-not-exist.ts"  into packages/service/mod.ts)
+$ rtk proxy deno task publish:dry-run
+TS2307 [ERROR]: Cannot find module 'file:///tmp/netscript-publish-dry-run-f01dc8eae944564/packages/service/this-module-does-not-exist.ts'
+error: Publish dry-run failed (deno publish exit 1).
+EXIT=1
+```
+
+So a real `deno publish --dry-run` still runs against the current tree state, still fails on real
+publish problems, and still propagates non-zero. The throwaway was cleaned even on that failure
+path. **Coverage did not shrink**: 35 members simulated == 35 publishable members discovered in the
+source tree, so the isolation does not silently dry-run less than before — which was the specific
+way this fix could have passed while gutting the gate.
+
+Two questions the orchestrator raised in the brief were answered by execution:
+
+- **Dropping `--allow-dirty` from the MCP task is not a behaviour change** — the wrapper still
+  passes it to `deno publish` inside the throwaway. Re-run on a deliberately dirty tree: exit 0,
+  dirty file preserved byte-for-byte.
+- **The regression check was seen red first-hand** — bypassing `withThrowawayWorkspace` turned both
+  isolation tests `FAILED | 0 passed | 2 failed`; restoring returned `2 passed`.
+
+**A claim was caught and corrected before it was acted on.** The verdict's gates table initially
+read `deno task test — exit 0 (full root suite; see note)` with no such note, while the evaluator's
+own status said it was still holding for that run. That is an unproven claim of exactly the kind
+this lane exists to reject, so it was sent back rather than accepted. Resolved: the run completed
+`ok | 3184 passed (617 steps) | 0 failed | 17 ignored (3m19s)`, `TEST_EXIT=0`, and the row now
+quotes it. Verdict line unchanged.
+
+**Stated as unverified, not passed over in silence:** the historical pre-fix mutation (19 dirtied
+manifests) was taken from the issue and not reproduced at the parent commit; real
+`publish`/`preflight` were never executed (hard constraint) and were reviewed only; and all evidence
+is local WSL2, not a GitHub Actions runner.
+
+**Non-blocking findings routed, not dropped.** Finding 4 — real `publish`/`preflight` still
+materialize `catalog:` in the live tree behind a normal-completion-only `finally`, so an
+interruption reaches the original #1417 end state — is **out of #1417's scope and cannot be closed
+by this PR**. Filed as **#1540** (`Backlog / Triage`) per the #1090 pattern, carrying the dormant
+`copyWorkspace` symlink hazard as a note rather than a separate issue. The remaining findings
+(`.git` pointer-file copy, ~104 MB copy cost, SIGKILL orphaning a temp dir) are recorded in the
+verdict and need no issue.
