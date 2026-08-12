@@ -1342,3 +1342,73 @@ as stated. The discrepancy does not block the cut, so the cut proceeded.
 **The note must be measured at this SHA, not copied from the failed attempt.** This payload includes
 #1541 — 46 `docs/site` files and the rewritten `packages/sdk/README.md`, the public JSR landing page —
 which `5705aeb19` did not carry.
+
+## 2026-08-12 — Canary.3 PUBLISHED; pinned production E2E FAILED
+
+Run **`31605906943`**, head `50739a7ae`. **The lock fix worked** — step 6 ("Cut ephemeral canary
+branch and tag") succeeded, which is exactly where the previous attempt died.
+
+### Steps read separately, not summed
+
+| Step | Outcome | Meaning |
+| --- | --- | --- |
+| 4 Check JSR publish-attempt budget | success | budget sufficient |
+| 6 Cut ephemeral canary branch and tag | **success** | past the previous blocker |
+| 11 Publish dry-run | success | |
+| 12 Publish preflight (real graph build, **no upload**) | success | deliberately invalid token — **not** a registry outcome |
+| **13 Publish canary through the production path** | **success** | **the real upload; canary.3 is published** |
+| **14 Detect exact-version registry outcome after publish failure** | **SKIPPED** | **no partial-publish path was entered** |
+| 15 Label published canary payload and verify drift | success | |
+| 16 Dispatch exact canary production E2E | success | |
+| **17 Await canary-pinned production E2E** | **FAILURE** | **the actual failure** |
+| 19 / 20 | skipped / success | no green pair; failed pair recorded |
+
+### Evidence preserved, nothing yanked
+
+- **`git status` checked first**, per #1540 — **clean**, no stranded `catalog:` expansion.
+- Tag **`v0.0.6-canary.3`** exists and is **preserved**. Canary versions are immutable; a failed
+  canary is **not** an incident and is **not** yanked — it is inert for consumers (normal semver never
+  selects a prerelease) and useful as audit evidence.
+
+### Member completeness — verified myself, and the count needs reading
+
+Enumerated from the workspace globs and checked each against `jsr.io/<pkg>/0.0.6-canary.3_meta.json`:
+**35 of 37 present.** The two absent are `@netscript/bench` and `@netscript/cli-e2e`, which
+`publish:readiness` **explicitly excludes** ("internal benchmark workspace"; "internal production-E2E
+fixture workspace"). So this is **35/35 of the effective publish set** — complete, and matching
+canary.2.
+
+Recording the reading explicitly because "35/37" invites a false "2 missing" conclusion. This is the
+probe trap the fixes lane warned about, in a different guise.
+
+### The E2E failure is environmental, not a payload defect
+
+Job `scaffold-runtime (published JSR CLI)`, step 15 *"Quickstart walk E2E (published CLI, seven
+verdicts)"*:
+
+```
+FAILED GATE: quickstart.4-aspire-restore-start
+  aspire restore failed (6): Failed to prepare: A task was canceled.
+  Failed to prepare AppHost server.
+FAILED GATE: quickstart.pgdata-integrity-after-teardown
+  NotFound: No such file or directory (os error 2): readfile '.llm/tmp/cli-e2e/…'
+```
+
+The first gate is an **Aspire AppHost prepare cancellation**; the second is its **downstream
+consequence** — the teardown-integrity gate reads a fixture path that the aborted start never created.
+One root failure, one cascade. Neither implicates the published payload: publication itself completed
+cleanly (step 13 success, step 14 skipped).
+
+**Not yet proven environmental.** This resembles the `triggers-api` timeout seen earlier in this lane,
+which a clean CI control later established as environmental — but that control does not transfer.
+The honest status is *consistent with* an Aspire-prepare flake, **unverified**.
+
+### Next per policy
+
+A failed canary is the canary doing its job. Preserve tag and published members (done), fix forward,
+and mint `canary.4` when there is something to change or a control showing the failure was
+environmental. `release/canary-pair` was correctly recorded as **failed**, so the stable channel
+remains blocked — which is the gate working.
+
+**#1571 stays OPEN**: its box 5 requires terminal-green Canary.3, and this canary is published but not
+green.
