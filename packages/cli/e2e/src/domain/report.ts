@@ -12,6 +12,7 @@ export interface StepResult {
   readonly evidence: readonly Evidence[];
   readonly attempts: readonly GateAttempt[];
   readonly retried: boolean;
+  readonly message?: string;
   readonly error?: string;
 }
 
