@@ -115,3 +115,7 @@ One `NetScriptChatConnection` owns at most one physical live upstream subscripti
 ## PLAN-EVAL
 
 `PLAN-EVAL: N/A` — this is one focused internal lifecycle fix with a complete issue contract, fixed public surface, locked ownership layer, explicit RED tests, and prescribed gates. No unresolved decision would force implementation rework.
+
+## Correction Cycle 2
+
+The fallback IMPL-EVAL accepted the implementation and returned `FAIL_FIX` for one blocking test-coverage finding: the multicast `publish`/wake path had no value or error delivery assertion while two logical subscribers were attached. Cycle 2 is limited to an emitting test probe, two RED-without-hub fan-out tests, and documentation of the already-shipped suffix-only late-join rule. Hub behavior, replay policy, retirement, SR2, projection, and public shape remain locked.

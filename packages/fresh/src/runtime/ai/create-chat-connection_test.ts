@@ -1,4 +1,10 @@
-import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import {
+  assert,
+  assertEquals,
+  assertRejects,
+  assertStrictEquals,
+  assertStringIncludes,
+} from '@std/assert';
 import {
   createNetScriptChatConnection,
   type NetScriptChatMessage,
@@ -13,6 +19,19 @@ async function collect(iterable: AsyncIterable<unknown>): Promise<unknown[]> {
   const out: unknown[] = [];
   for await (const item of iterable) out.push(item);
   return out;
+}
+
+async function collectWithTerminal(iterable: AsyncIterable<unknown>): Promise<{
+  readonly values: unknown[];
+  readonly terminal: IteratorResult<unknown>;
+}> {
+  const values: unknown[] = [];
+  const iterator = iterable[Symbol.asyncIterator]();
+  while (true) {
+    const result = await iterator.next();
+    if (result.done) return { values, terminal: result };
+    values.push(result.value);
+  }
 }
 
 async function waitFor(predicate: () => boolean, message: string): Promise<void> {
@@ -66,6 +85,76 @@ function createHeldSubscriptionProbe(): {
             stats.openRequests -= 1;
           }
           if (!signal?.aborted) yield undefined;
+        })();
+      },
+      send: () => Promise.resolve(),
+    },
+  };
+}
+
+function createEmittingSubscriptionProbe(): {
+  readonly connection: {
+    readonly subscribe: (signal?: AbortSignal) => AsyncIterable<unknown>;
+    readonly send: () => Promise<void>;
+  };
+  readonly stats: { subscribeCalls: number };
+  readonly emit: (...values: readonly unknown[]) => void;
+  readonly finish: () => void;
+  readonly fail: (error: unknown) => void;
+} {
+  type Event =
+    | { readonly kind: 'value'; readonly value: unknown }
+    | { readonly kind: 'done' }
+    | { readonly kind: 'error'; readonly error: unknown };
+  interface Stream {
+    readonly events: Event[];
+    wake?: () => void;
+  }
+
+  const stats = { subscribeCalls: 0 };
+  const streams = new Set<Stream>();
+  const publish = (event: Event): void => {
+    for (const stream of streams) {
+      stream.events.push(event);
+      stream.wake?.();
+    }
+  };
+
+  return {
+    stats,
+    emit: (...values) => values.forEach((value) => publish({ kind: 'value', value })),
+    finish: () => publish({ kind: 'done' }),
+    fail: (error) => publish({ kind: 'error', error }),
+    connection: {
+      subscribe(signal) {
+        return (async function* () {
+          stats.subscribeCalls += 1;
+          const stream: Stream = { events: [] };
+          const wake = (): void => stream.wake?.();
+          streams.add(stream);
+          signal?.addEventListener('abort', wake, { once: true });
+          try {
+            while (!signal?.aborted) {
+              const event = stream.events.shift();
+              if (!event) {
+                await new Promise<void>((resolve) => {
+                  stream.wake = resolve;
+                  if (stream.events.length > 0 || signal?.aborted) resolve();
+                });
+                stream.wake = undefined;
+                continue;
+              }
+              if (event.kind === 'value') {
+                yield event.value;
+                continue;
+              }
+              if (event.kind === 'error') throw event.error;
+              return;
+            }
+          } finally {
+            signal?.removeEventListener('abort', wake);
+            streams.delete(stream);
+          }
         })();
       },
       send: () => Promise.resolve(),
@@ -344,6 +433,56 @@ Deno.test('one mounted chat connection shares one live request across repeated s
     connection.dispose();
     await Promise.all([pendingFirst, pendingSecond]);
   }
+});
+
+Deno.test('concurrent subscribers receive identical values and terminal from one physical subscription', async () => {
+  const probe = createEmittingSubscriptionProbe();
+  const connection = createNetScriptChatConnection({
+    target: baseTarget,
+    createConnection: () => probe.connection,
+  });
+  const first = collectWithTerminal(connection.subscribe());
+  const second = collectWithTerminal(connection.subscribe());
+
+  await waitFor(
+    () => probe.stats.subscribeCalls > 0,
+    'the physical emitting subscription did not open',
+  );
+  await Promise.resolve();
+  probe.emit('first', { token: 'second' });
+  probe.finish();
+
+  const [firstResult, secondResult] = await Promise.all([first, second]);
+  assertEquals(firstResult.values, ['first', { token: 'second' }]);
+  assertEquals(secondResult.values, firstResult.values);
+  assertEquals(firstResult.terminal, { done: true, value: undefined });
+  assertEquals(secondResult.terminal, firstResult.terminal);
+  assertEquals(probe.stats.subscribeCalls, 1);
+});
+
+Deno.test('upstream error reaches both concurrent subscribers from one physical subscription', async () => {
+  const probe = createEmittingSubscriptionProbe();
+  const connection = createNetScriptChatConnection({
+    target: baseTarget,
+    createConnection: () => probe.connection,
+  });
+  const first = collect(connection.subscribe());
+  const second = collect(connection.subscribe());
+
+  await waitFor(
+    () => probe.stats.subscribeCalls > 0,
+    'the physical emitting subscription did not open',
+  );
+  await Promise.resolve();
+  const upstreamError = new Error('fan-out failed');
+  probe.fail(upstreamError);
+
+  const [firstResult, secondResult] = await Promise.allSettled([first, second]);
+  assertEquals(firstResult.status, 'rejected');
+  assertEquals(secondResult.status, 'rejected');
+  if (firstResult.status === 'rejected') assertStrictEquals(firstResult.reason, upstreamError);
+  if (secondResult.status === 'rejected') assertStrictEquals(secondResult.reason, upstreamError);
+  assertEquals(probe.stats.subscribeCalls, 1);
 });
 
 Deno.test('stop aborts the one physically in-flight shared live request', async () => {

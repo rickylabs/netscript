@@ -209,7 +209,11 @@ export interface NetScriptChatConnection {
    * Subscribe to live chunks for the session. SR2-tolerant: a first-subscribe
    * that races a not-yet-created stream is re-polled with backoff rather than
    * throwing. The stream ends when the caller aborts `signal`, the connection is
-   * disposed, or (post-establishment) the upstream subscription completes.
+   * disposed, or (post-establishment) the upstream subscription completes. A
+   * subscriber joining an active subscription receives only the suffix emitted
+   * after it attaches; there is no in-memory replay. Inconsistently, joining
+   * after the prior subscription retires opens a fresh upstream subscription,
+   * which may replay from `initialOffset`.
    */
   readonly subscribe: (signal?: AbortSignal) => AsyncIterable<unknown>;
   /** Append client messages to the durable session stream. */

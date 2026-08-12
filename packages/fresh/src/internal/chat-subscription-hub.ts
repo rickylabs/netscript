@@ -27,7 +27,14 @@ interface SubscriptionRetryOptions {
   readonly maxDelayMs?: number;
 }
 
-/** Shares one upstream async subscription among every active logical subscriber. */
+/**
+ * Shares one upstream async subscription among every active logical subscriber.
+ *
+ * A subscriber joining an active subscription receives only values published
+ * after it attaches: the hub has no replay buffer, so the result is a suffix.
+ * By contrast, a subscriber joining after the prior subscription retires opens
+ * a fresh upstream subscription, which may replay from its configured offset.
+ */
 export function createChatSubscriptionHub<T>(
   open: (signal: AbortSignal) => AsyncIterable<T>,
   lifetimeSignal: AbortSignal,

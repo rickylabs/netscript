@@ -39,3 +39,13 @@
 - **Severity:** minor
 - **Action:** accepted implementation-structure refinement; no public surface or replay semantic change.
 - **Evidence:** `create-chat-connection_test.ts` SR2 tests and final package run.
+
+## 2026-08-12 — Late-join suffix semantics made explicit
+
+- **What:** A subscriber joining an active hub receives only values published after attachment because the hub has no replay buffer. A subscriber joining after retirement opens a fresh upstream that may replay from `initialOffset`.
+- **Source:** Fallback IMPL-EVAL C2 and direct inspection of `acquire`/`publish`.
+- **Expected:** The public subscribe documentation should state delivery semantics.
+- **Actual:** Before correction cycle 2, neither the internal hub nor `NetScriptChatConnection.subscribe` documented the suffix/full-replay inconsistency.
+- **Severity:** significant documentation gap; behavior change explicitly out of scope.
+- **Action:** document both sides plainly; do not add a replay buffer until external transport behavior establishes the correct policy.
+- **Evidence:** `packages/fresh/src/internal/chat-subscription-hub.ts`; `packages/fresh/src/runtime/ai/create-chat-connection.ts`.

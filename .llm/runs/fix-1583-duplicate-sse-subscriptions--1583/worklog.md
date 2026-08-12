@@ -60,6 +60,11 @@ Read `createNetScriptChatConnection` for handle lifecycle, then the adjacent sub
 | 2026-08-12 | 3 | implementation | Added one per-handle multicast hub; caller abort detaches one logical consumer, last detach retires the pump, and connection teardown aborts the physical request. |
 | 2026-08-12 | 3 | slice review | Reviewed acquisition/retirement races, terminal error delivery, lifetime abort, export reachability, forbidden paths, public-surface delta, and lock hygiene. No new surface, casts, lint suppressions, dependency changes, or sibling-tree edits. |
 | 2026-08-12 | 3 | reconcile | #1583 remains open with the three acceptance boxes and required labels/milestone; draft PR #1593 remains `status:impl`. No new review comments required scope adjustment. |
+| 2026-08-12 | 4 | fallback IMPL-EVAL | PR comment `#issuecomment-5269616340` returned `FAIL_FIX`: implementation accepted; one blocking gap was missing concurrent value/error fan-out coverage. C2 required documenting suffix-only mid-stream joins. |
+| 2026-08-12 | 5 | correction design | Keep behavior fixed. Add an emitting physical-stream probe, assert two concurrent logical collectors see identical values + `done`, assert the same upstream error reaches both, and document no-replay late joins on internal/public surfaces. |
+| 2026-08-12 | 5 | RED correction | With `create-chat-connection.ts` temporarily restored to pre-hub `07cb3fd76`, package task exited 1: 227 passed / 5 failed. Both new tests failed independently at physical count `Actual 2 / Expected 1`; accepted implementation was then restored. |
+| 2026-08-12 | 5 | final gates | Restored accepted implementation: scoped check/lint/fmt all exit 0 with zero findings; package task exits 0 at 232 passed / 0 failed. |
+| 2026-08-12 | 5 | reconcile | Read the fallback IMPL-EVAL comment first; limited correction to C1/C2. PR remains draft and `status:impl`; no evaluator or OpenHands trigger was launched for this cycle. |
 
 ## Decisions
 
@@ -121,6 +126,32 @@ multi-tab convergence, and multibyte fidelity ... ok
 
 ok | 230 passed | 0 failed (10s)
 ```
+
+### Correction-cycle RED evidence (without hub wiring)
+
+Command: `deno task --cwd packages/fresh test` with `create-chat-connection.ts` temporarily at `07cb3fd76` and cycle-2 tests present.
+
+```text
+concurrent subscribers receive identical values and terminal from one physical subscription ... FAILED
+  Actual 2 / Expected 1 (create-chat-connection_test.ts:460)
+
+upstream error reaches both concurrent subscribers from one physical subscription ... FAILED
+  Actual 2 / Expected 1 (create-chat-connection_test.ts:485)
+
+FAILED | 227 passed | 5 failed (14s)
+error: Test failed
+```
+
+The other three failures are the original cycle's expected no-hub regressions. The emitting probe broadcasts into every physical iterable, so without the hub both logical collectors still receive the controlled values/error; each new test fails specifically because two physical subscriptions open. With the hub, the same assertions additionally guard value multicast, terminal `done`, wake-up, and error fan-out.
+
+### Correction-cycle final gates
+
+| Gate | Result | Verbatim summary |
+| --- | --- | --- |
+| Check | PASS (0) | `{"filesSelected":189,"batches":2,"failedBatches":0}`; `"totalOccurrences":0` |
+| Lint | PASS (0) | `{"filesSelected":189,"batches":1}`; `"totalOccurrences":0` |
+| Format | PASS (0) | `{"filesSelected":189,"batches":1,"failedBatches":0,"findings":0,"ignoredFindings":0}` |
+| Package tests | PASS (0) | `ok | 232 passed | 0 failed (14s)` |
 
 ### Lock and scope checks
 
