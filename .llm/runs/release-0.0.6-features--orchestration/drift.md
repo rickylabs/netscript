@@ -122,3 +122,44 @@ discovered by timeout.
 
 **Not actioned by this lane.** The label re-entry is root's, per D-4. This orchestrator has not
 touched #1536's head, labels, or body.
+
+## D-6 — Fable 5 fully prohibited for this lane (significant)
+
+**Date** 2026-08-12. **Owner policy:** Fable is prohibited for this 0.0.6 lane — planning, research,
+implementation, review, and evaluation alike — until explicitly lifted (95% quota consumed, through
+Saturday). Approved routes continue: Opus, Codex, OpenHands, and the automatic evaluator workflow. If
+a configured route would select Fable, the dispatch stops and is reported.
+
+### Audit: zero Fable usage has occurred in this lane
+
+Checked rather than assumed:
+
+| Work | Route actually used | Fable? |
+| --- | --- | --- |
+| Research #1405, #1398, #1459, #1548 | Claude · Opus 5 (D-1 owner override) | no |
+| Tier-A slice reviews, all five slices | Claude · Opus 5 · high — this orchestrator session | no |
+| PLAN-EVAL #1398, #1459 | MiniMax M3 | no |
+| IMPL-EVAL #1405 | DeepSeek V4 Flash 0731 | no |
+| IMPL-EVAL #1398, #1457, #1548 | Qwen 3.8 Max via the automatic dispatcher | no |
+| Implementation, all slices | Codex GPT-5.6 Sol (low/medium/high) | no |
+
+No Fable process or session is running. **Nothing needs to be stopped or unwound.**
+
+### One configured route would have selected Fable — stopped and reported
+
+`lane-policy.md:32,84` binds **`review_codex_complex` → Claude · Fable 5 · medium** as the adversarial
+review paired to a `complex_implementation` (Sol · high) slice. **#1459 is exactly that case** — it is
+in flight right now on Sol high (thread `019ff5e6-812b-7c03-8815-d4c93d984a1d`).
+
+That review has **not** been dispatched and now will not be. Its slice review will be performed by
+this orchestrator on **Opus 5 · high**, which is also the route's own documented fallback
+(`Claude · Anthropic · Opus 5 · medium`, `lane-policy.md:32`). Invariants preserved: the review stays
+**Claude-family** (opposite-family to the Codex implementation), the generator does not review itself,
+and no paid or higher-effort escalation is introduced.
+
+### Correction to this lane's own record
+
+`supervisor.md:49` binds "Slice review of #1398 (Sol·med pair) → `review_codex`: Claude · Fable 5 ·
+low". **That binding was never exercised** — every slice review in this lane, #1398 included, was
+performed by this Opus orchestrator session. The record advertised a Fable route that never ran.
+Corrected here rather than left to imply Fable usage that did not happen.

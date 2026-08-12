@@ -46,7 +46,7 @@ Routes selected from `.llm/harness/workflow/lane-policy.md`. Deviations are reco
 | Implementation #1405                   | Codex · GPT-5.6 Sol · **low** (`light_implementation`), mobile-visible |
 | Implementation #1398                   | Codex · GPT-5.6 Sol · **medium** (`normal_implementation`), escalate to high only on genuine complexity |
 | Slice review of #1405 (Sol·low pair)   | `review_codex_light`: Claude · Opus 5 · high — this session            |
-| Slice review of #1398 (Sol·med pair)   | `review_codex`: Claude · Fable 5 · low                                 |
+| Slice review of #1398 (Sol·med pair)   | ~~`review_codex`: Claude · Fable 5 · low~~ → **never exercised**; performed by this Opus 5 · high session. Fable is prohibited lane-wide from 2026-08-12 — see `drift.md` D-6 |
 | PLAN-EVAL (#1398 only)                 | `formal_plan_evaluation` — MiniMax M3 high, fresh session              |
 | IMPL-EVAL #1405 (small)                | `formal_impl_evaluation` small — DeepSeek V4 Flash 0731 max            |
 | IMPL-EVAL #1398 (broad/complex)        | `formal_impl_evaluation` complex — Qwen 3.8 Max                        |
