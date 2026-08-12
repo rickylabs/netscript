@@ -755,3 +755,45 @@ rebuild). Slice A instructed: do not weaken any existing check to pass; the fix 
 the evaluator's attack has been reproduced and shown to **reject**, with that red output in
 `evidence.md`; and do not tick the PR's IMPL-EVAL box — that stays unticked until a fresh
 separate-session verdict returns PASS, which is why close-gate is honestly red.
+
+## 2026-08-12 — #1539's runtime gates are SUCCESS-by-short-circuit, not real green
+
+Pre-verifying a merge condition ahead of the cycle-2 verdict, against e2e run `31582372124`
+(headSha `5350d01fc` == PR #1539 head, confirmed):
+
+```
+scaffold-runtime (aspire + docker + postgres): success
+   2. Skipped by policy: SUCCESS      ← escape hatch TAKEN
+  10. Full scaffold runtime E2E:      skipped
+scaffold-runtime-sqlite (aspire + sqlite + garnet): success
+   2. Skipped by policy: SUCCESS      ← escape hatch TAKEN
+  10. SQLite scaffold runtime E2E:    skipped
+```
+
+Compare #1534, where the same jobs were genuine: step 2 `Skipped by policy` was itself **skipped**
+and step 10 ran ~5 minutes.
+
+**So both runtime tiers on #1539 are false greens.** The rollup reads `SUCCESS`; nothing ran. This
+is the lane's own subject appearing one more time, and it is worth stating that the orchestrator's
+earlier status report to the owner described #1539 as having "both runtime tiers SUCCESS" — which
+was true of the label and false of the substance. Corrected here rather than left standing.
+
+**Is the gate required for this PR?** No, and for a stated reason rather than convenience. #1539's
+entire diff is 4 files under `.llm/tools/` (`github-release.ts`, `github-release_test.ts`,
+`prepare-release.ts`, `generate-cli-assets-barrel.ts`). It touches no `packages/**`, no
+`plugins/**`, and no scaffold template, and it commits **no regenerated assets** — so
+`scaffold.runtime`, which exercises scaffolded app runtime behaviour, has nothing of this change to
+exercise. The classifier's short-circuit is the designed behaviour for a non-scaffold-relevant diff.
+
+**Recorded as a did-not-run with a reason, exactly as #1535's CANCELLED runtime job was** — not
+counted as a passing expensive gate. The merge condition stated to the owner ("runtime tiers
+genuinely SUCCESS, confirmed to have done real work") is **not** met on #1539 and is not being
+quietly relaxed: it is replaced by the narrower, honest claim that the gate is not applicable to
+this diff, and the applicable gates (`check-test`, `code-quality`, `quality`, `surface-diff`,
+`deps-report`, plus the slice's 21 focused / 101 release-suite / 3188 repo tests, and the
+evaluator's independent reproduction of those) are what carry it.
+
+One consequence worth carrying forward: **`scaffold-runtime: SUCCESS` in a PR rollup means nothing
+on its own.** Whether it ran is only visible in step 2 versus step 10 of the job. Any pre-merge
+gate that reads the rollup alone will accept a short-circuit as a pass — which is check 4's exact
+failure mode, hiding one level deeper than the rollup.
