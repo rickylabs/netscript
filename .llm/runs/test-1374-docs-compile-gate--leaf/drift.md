@@ -68,3 +68,15 @@ Drift is append-only.
 - **Disposition:** materialize both modules from Zod/oRPC contracts plus public
   `createServiceClient` and `createQueryFactories` APIs. They contain no casts or `any`. The same
   35/21/14 corpus then exits 0; no fence was exempted to accommodate the harness.
+
+## 2026-08-12 — Orchestrator pre-merge F-1 negative-task entry point
+
+- **Severity:** significant fail-open control-entry drift; the three named raw controls remained
+  valid and were independently reproduced, but the aggregate task name was misleading.
+- **Observed:** `deno task docs:snippets:negative` supplied `--negative` without a value. The CLI
+  interpreted the missing value as positive mode, enforced the ordinary corpus floor, printed
+  `PASS`, and exited 0. That invocation proved no negative predicate.
+- **Disposition:** the presence of `--negative` now requires one of the five declared fixture
+  names before any corpus analysis starts. Missing and unknown names exit 1 with
+  `deno task docs:snippets:negative <case>` usage and the complete fixture list. A task-level
+  regression test exercises both fail-closed paths.

@@ -29,6 +29,20 @@ below 35 candidates or 21 checked blocks, above 14 exemptions, or on a malformed
 Every exemption is printed as `page:line — reason`, so the 14-block prose-only remainder stays
 visible and may shrink without weakening the gate.
 
+## Fixture controls
+
+Run one fixture explicitly as `deno task docs:snippets:negative <case>`, where `<case>` is one of:
+
+- `non-exported-symbol`
+- `empty-exemption-reason`
+- `dialect-a-object-input`
+- `dialect-a-positional`
+- `dialect-b-object-input`
+
+The first three are required raw red controls; the last two prove the checker accepts the valid
+dialect-A and dialect-B shapes. A missing or unknown case exits non-zero and prints this complete
+usage list. The `:negative` task never falls back to the ordinary positive corpus gate.
+
 ## Expanding the floor
 
 Expansion proceeds in coherent page families. Each wave adds pages to the checked policy, compiles

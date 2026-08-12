@@ -12,9 +12,11 @@
 
 ## Current State
 
-All four slices are committed, explicitly pushed, and commented. The draft PR body and every
-truthfully completed #1374 acceptance box carry evidence. The PR remains draft at `status:impl` and
-the implementation session is stopped for separate-session IMPL-EVAL.
+All four planned slices are committed, explicitly pushed, and commented. Orchestrator pre-merge
+verification found one fail-open task entry point: bare `docs:snippets:negative` fell through to
+the positive corpus gate. Its narrow remediation now requires a declared fixture name and adds
+task-level regression coverage. The PR remains draft at `status:impl`; the orchestrator owns the
+draft-to-ready transition that automatically starts IMPL-EVAL.
 
 ## Completed
 
@@ -38,16 +40,17 @@ the implementation session is stopped for separate-session IMPL-EVAL.
   before Lume; its structural assertion passes in the focused and root suites.
 - Final repo suite: 3,193 passed (617 steps), 0 failed, 17 ignored. All three raw negative controls
   exit 1 with source-fence diagnostics. Tracked `deno.lock` is clean.
+- F-1 remediation: bare and unknown negative-task cases both exit 1 with complete usage; focused
+  tests pass 10/10 and all three scoped wrappers pass over 22 files without lock drift.
 
 ## In Progress
 
-- None in the implementation session; awaiting fresh opposite-family IMPL-EVAL.
+- None in the implementation session after the F-1 commit/push/comment boundary.
 
 ## Next Steps
 
-1. Fresh opposite-family session performs IMPL-EVAL and writes `evaluate.md`.
-2. Orchestrator decides any remediation and merge readiness.
-3. Keep the PR draft until that authority acts; do not merge from this session.
+1. Stop with the PR still draft; the orchestrator performs the ready transition.
+2. Owner automation starts the first IMPL-EVAL on that transition; do not dispatch another.
 
 ## Key Decisions
 
@@ -68,6 +71,7 @@ the implementation session is stopped for separate-session IMPL-EVAL.
 | S2 compiler/import resolution | COMMITTED | `5c828856b`; focused tests/scoped wrappers green; raw export and dialect controls exit 1 with mapped source fences. |
 | S3 Tier-1/accuracy/coverage | COMMITTED | `983cf3464`; exact census, docs accuracy/links, scoped wrappers, and focused suite green. |
 | S4 Pages/final gates | COMMITTED | `5ce34c089`; focused 9/9; final green/docs/scoped gates; three raw exit-1 controls; repository suite 3,193/0. |
+| F-1 negative entrypoint remediation | COMMITTED | Bare/unknown raw exits 1; focused 10/10; scoped check/lint/fmt pass; lock clean. |
 
 ## Files Changed
 
@@ -87,6 +91,7 @@ the implementation session is stopped for separate-session IMPL-EVAL.
 | Plan-Gate cycle 1 | `FAIL_PLAN` | Four blocking and four non-blocking findings returned; revised without implementation. |
 | Plan-Gate cycle 2 | PASS | Fresh opposite-family session; cycle-1 fixes verified by execution. |
 | Static/fitness/consumer | PASS through S4 | All requested gates green; three required negative controls red. |
+| F-1 focused remediation | PASS | Missing/unknown task inputs red; exact regression and scoped wrappers green; no lock drift. |
 | Runtime | N/A | Compilation-only slice. |
 
 ## Open Questions
@@ -106,3 +111,4 @@ None.
 - `5c828856b` — public-entrypoint synthetic compiler.
 - `983cf3464` — Tier-1 docs floor, expansion plan, and accuracy demotion.
 - `5ce34c089` — Pages package/plugin revalidation and final workflow assertion.
+- Final remediation commit — fail-close the negative fixture entry point.

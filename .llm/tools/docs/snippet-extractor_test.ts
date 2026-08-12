@@ -151,3 +151,34 @@ Deno.test('empty-reason fixture exits the actual CLI non-zero and names its fenc
   assertEquals(output.code, 1);
   assertStringIncludes(new TextDecoder().decode(output.stderr), 'page.md:1: malformed ts fence');
 });
+
+Deno.test('negative task rejects missing and unknown fixture names with complete usage', async () => {
+  for (
+    const args of [
+      ['task', 'docs:snippets:negative'],
+      ['task', 'docs:snippets:negative', 'not-a-fixture'],
+    ]
+  ) {
+    const output = await new Deno.Command(Deno.execPath(), {
+      cwd: repositoryRoot,
+      args,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    const stderr = new TextDecoder().decode(output.stderr);
+
+    assertEquals(output.code, 1);
+    assertStringIncludes(stderr, 'usage: deno task docs:snippets:negative <case>');
+    for (
+      const fixture of [
+        'non-exported-symbol',
+        'empty-exemption-reason',
+        'dialect-a-object-input',
+        'dialect-a-positional',
+        'dialect-b-object-input',
+      ]
+    ) {
+      assertStringIncludes(stderr, fixture);
+    }
+  }
+});

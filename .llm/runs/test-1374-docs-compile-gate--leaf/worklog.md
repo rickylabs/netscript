@@ -18,8 +18,8 @@ returns `PASS`.
 
 - Root task `docs:snippets` — scan, compile, and print the Tier-1/corpus census.
 - Root task `docs:snippets:test` — focused parser/compiler/fixture tests.
-- Root task/CLI fixture mode `docs:snippets:negative -- <case>` — run exactly one real red control
-  and preserve its non-zero exit.
+- Root task/CLI fixture mode `docs:snippets:negative <case>` — require one of five fixture names,
+  run exactly one control, and preserve its raw exit.
 - Internal checker exports used by its tests: fence extraction, exact workspace export-map
   derivation, synthetic workspace assembly, and check-result/census reporting.
 
@@ -47,8 +47,9 @@ returns `PASS`.
 - `NO_CHECK_MARKER` — exact `no-check:<nonblank reason>` grammar from plan D3.
 - `TIER_1_MINIMUM_CHECKED` / `TIER_1_MINIMUM_CANDIDATES` — 21 / 35 at the initial floor.
 - `TIER_1_EXEMPTION_BUDGET` — maximum 14 at the initial floor.
-- `NEGATIVE_FIXTURES` — `non-exported-symbol`, `empty-exemption-reason`,
-  `dialect-a-object-input`.
+- `NEGATIVE_FIXTURES` — the three red controls (`non-exported-symbol`,
+  `empty-exemption-reason`, `dialect-a-object-input`) and two green dialect discriminators
+  (`dialect-a-positional`, `dialect-b-object-input`).
 
 ### Commit Slices
 
@@ -88,6 +89,7 @@ focused negative controls before the repo suite.
 | 2026-08-12 | Slice 3 | Tier-1 and demotion | Applied 14 structural reasons, fixed the barrel binding, compiled 21 fences, wrote the five-wave ratchet, retained vocabulary/Fresh/export guards, and removed only the named positive needles. |
 | 2026-08-12 | Slice 4 | Pages and final gates | Added both package/plugin trigger arms, the root snippet step before Lume, an unconditional structural workflow test, three raw red exits, and a green 3,193-test repository verdict. |
 | 2026-08-12 | Phase 2 handoff | STOP | All four slices committed/pushed/commented; PR body and all 11 truthfully completed #1374 acceptance boxes carry evidence; draft remains at `status:impl` for separate IMPL-EVAL. |
+| 2026-08-12 | Pre-merge F-1 | Remediation | Made missing/unknown negative fixture names fail closed with complete usage; added exact task-level regression coverage. Draft remains at `status:impl`; readiness stays orchestrator-owned. |
 
 ## Decisions
 
@@ -105,6 +107,7 @@ focused negative controls before the repo suite.
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | Cycle-1 plan assumptions failed concrete evaluator probes | Significant | Yes — D2 frozen lock, catalog fallback, containment, alias bypass, and exemption disposition are recorded. |
+| Bare `docs:snippets:negative` fell through to the positive gate | Significant | Yes — missing/unknown cases now fail before analysis and are task-tested. |
 
 ## Gate Results
 
@@ -219,9 +222,27 @@ External evidence mirror: the draft PR body now records commits, census, gates, 
 and the unchecked IMPL-EVAL step. All 11 #1374 acceptance boxes are checked with one evidence line
 each. The issue remains open and the PR remains draft; no readiness or merge transition was made.
 
+### Orchestrator pre-merge F-1 — fail-closed negative task
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Bare negative task | EXPECTED_RED | Raw `deno task docs:snippets:negative`: exit 1; `missing negative fixture name`; complete five-case usage printed. |
+| Unknown negative fixture | EXPECTED_RED | Raw task with `not-a-fixture`: exit 1; `unknown negative fixture name`; complete five-case usage printed. |
+| Focused snippet tests | PASS | `deno task docs:snippets:test`: 10 passed, 0 failed; exact task-level missing/unknown regression included. |
+| Scoped type-check | PASS | Wrapper selected 22 docs-tool TS files; 0 diagnostics; exit 0. |
+| Scoped lint | PASS | Wrapper selected 22 docs-tool TS files; 0 findings; exit 0. |
+| Scoped format | PASS | Wrapper selected 22 docs-tool TS files; 0 findings after formatting only the two owned TS files; exit 0. |
+| Lock hygiene | PASS | Raw `git diff --exit-code -- deno.lock`: exit 0. |
+
+Remediation review: `--negative` is now a strict mode switch, not an optional fixture hint. Its
+argument is validated against the finite five-case vocabulary before site-root selection or
+coverage analysis, so neither omission nor invention can reach the positive PASS path. The test
+spawns the exact root task for both failures and verifies the complete usage list.
+
 ## Handoff Notes
 
 - Phase 2 is complete; Slice 4 is `5ce34c089` and its push/comment boundary is closed.
-- IMPL-EVAL must run in a fresh opposite-family session and should independently rerun the green
-  gate, all three raw red controls, the workflow mutation assertion, and lock-hygiene check.
-- Keep the PR draft; the implementation agent does not mark ready or merge.
+- F-1 is focused, gated, committed, explicitly pushed, and recorded in the final PR implementation
+  comment.
+- Keep the PR draft. The orchestrator owns the ready transition, which starts the automatic initial
+  IMPL-EVAL; this session must not dispatch a duplicate evaluator or merge.
