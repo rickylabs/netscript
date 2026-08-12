@@ -221,3 +221,32 @@ session.
 `deno.lock` retained SHA-256
 `73be92b116b9065372505157da4f6729176e975aa118e9944746317887e9a4c4` with no Git delta. No evaluator,
 Fable, OpenHands, ready transition, merge, E2E, or canary action was launched.
+
+## Published-semantics correction
+
+- **C1:** successful unowned-provider operations now omit `netscript.cache.outcome`; they retain
+  `netscript.cache.topology_complete=false` as the sole unknowable-chain signal. Genuine provider
+  failures still report `outcome=error`. Focused tests pin both cases.
+- **C2:** the forwarding object returned for an already-owned provider now carries the same
+  immutable `cacheTelemetryOwner` marker. A re-registration test proves
+  `setCacheProvider(getCacheProvider())` still produces one logical span.
+- **C3:** corrected the marker comment: split closures duplicate spans with incomplete topology;
+  a versioned `Symbol.for()` value is a real cross-instance/version-discriminating alternative,
+  deliberately not adopted because closure compatibility remains the #1589 gate's contract.
+- The correction follows fallback IMPL-EVAL PASS at `a8f4b1ba6`; this implementation session did
+  not launch or repeat evaluation. The PR's separate-session IMPL-EVAL checkbox remains
+  orchestrator-owned and unchecked.
+
+### Correction gate evidence
+
+| Gate                        | Result                                    |
+| --------------------------- | ----------------------------------------- |
+| SDK+telemetry scoped check  | exit 0; 184 files, 2 batches, 0 findings  |
+| SDK+telemetry scoped lint   | exit 0; 184 files, 0 findings             |
+| SDK+telemetry scoped format | exit 0; 184 files, 0 findings             |
+| SDK package test task       | exit 0; 59 passed, 0 failed               |
+| telemetry package test task | exit 0; 54 passed, 0 failed               |
+
+`deno.lock` retained SHA-256
+`73be92b116b9065372505157da4f6729176e975aa118e9944746317887e9a4c4` with no Git delta. No Fresh or
+CLI source was edited, and `e2e:cli` was not run.

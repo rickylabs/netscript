@@ -18,7 +18,7 @@ import type { QueryKey } from '../ports/query-key.ts';
 import type { CacheQueryOptions } from '../ports/query-options.ts';
 import type { CacheProviderDescriptor } from '../ports/cache-topology.ts';
 import { CacheOperations } from '@netscript/telemetry/attributes';
-import { ownsCacheTelemetry } from './cache-provider-marker.ts';
+import { cacheTelemetryOwner, ownsCacheTelemetry } from './cache-provider-marker.ts';
 import {
   CacheEvents,
   type CacheTelemetry,
@@ -27,6 +27,7 @@ import {
   normalizeCacheNamespace,
   recordCacheExecutionState,
   recordCacheProviderError,
+  recordCacheProviderTopologyUnknown,
 } from './cache-telemetry.ts';
 
 /**
@@ -59,7 +60,7 @@ export function createProviderBoundary(
   telemetry: CacheTelemetry = createDefaultCacheTelemetry(),
 ): CacheProvider {
   if (ownsCacheTelemetry(provider)) {
-    return {
+    const boundary = {
       get descriptor(): CacheProviderDescriptor {
         return provider.descriptor;
       },
@@ -76,6 +77,8 @@ export function createProviderBoundary(
       invalidateQueries: (prefix: QueryKey, operationId?: string): Promise<void> =>
         provider.invalidateQueries(prefix, operationId),
     };
+    Object.defineProperty(boundary, cacheTelemetryOwner, { value: true });
+    return boundary;
   }
 
   const traceUnsupported = async <T>(
@@ -98,9 +101,18 @@ export function createProviderBoundary(
             false,
           );
         try {
-          return await callback(markBackendExecuted);
-        } finally {
+          const result = await callback(markBackendExecuted);
+          recordCacheProviderTopologyUnknown(
+            span,
+            operation,
+            namespace,
+            provider.descriptor,
+            event,
+          );
+          return result;
+        } catch (error) {
           recordCacheProviderError(span, operation, namespace, provider.descriptor, event);
+          throw error;
         }
       },
     );

@@ -20,7 +20,13 @@ import {
   SimpleSpanProcessor,
 } from 'npm:@opentelemetry/sdk-trace-base@^2.5.0';
 import { CacheQuery } from '../../src/cache/cache-query.ts';
-import { type CacheProvider, createProviderBoundary } from '../../src/cache/cache-provider.ts';
+import {
+  type CacheProvider,
+  createProviderBoundary,
+  getCacheProvider,
+  resetCacheProvider,
+  setCacheProvider,
+} from '../../src/cache/cache-provider.ts';
 import {
   CACHE_NAMESPACE_MAX_LENGTH,
   CacheEvents,
@@ -369,7 +375,7 @@ Deno.test('cache namespaces are bounded normalized operation identities', () => 
   assertEquals(normalizeCacheNamespace(undefined, ' Composite View '), 'composite.view');
 });
 
-Deno.test('registered custom providers cannot bypass the telemetry boundary', async () => {
+Deno.test('successful unowned providers report unknown topology without an error outcome', async () => {
   const telemetry = new RecordingCacheTelemetry();
   const customProvider: CacheProvider = {
     descriptor: { system: 'custom', tier: 'l2' },
@@ -395,9 +401,44 @@ Deno.test('registered custom providers cannot bypass the telemetry boundary', as
   const span = telemetry.spans[0];
   assertEquals(span.attributes[CacheAttributes.BACKEND_EXECUTED], true);
   assertEquals(span.attributes[CacheAttributes.TOPOLOGY_COMPLETE], false);
-  assertEquals(span.attributes[CacheAttributes.OUTCOME], CacheOutcomes.ERROR);
+  assertEquals(span.attributes[CacheAttributes.OUTCOME], undefined);
   assertEquals(findEvent(span, CacheEvents.LOOKUP).attributes[CacheAttributes.SYSTEM], 'custom');
+  assertEquals(
+    findEvent(span, CacheEvents.LOOKUP).attributes[CacheAttributes.OUTCOME],
+    undefined,
+  );
   assert(!JSON.stringify(span).includes('private-key'));
+});
+
+Deno.test('failing unowned providers retain the error outcome', async () => {
+  const telemetry = new RecordingCacheTelemetry();
+  const providerError = new Error('provider unavailable');
+  const customProvider: CacheProvider = {
+    descriptor: { system: 'custom', tier: 'l2' },
+    query: () => Promise.reject(providerError),
+    prefetch: () => Promise.reject(providerError),
+    getCachedData: () => Promise.reject(providerError),
+    getCachedEntry: () => Promise.reject(providerError),
+    invalidateQueries: () => Promise.reject(providerError),
+  };
+  const boundary = createProviderBoundary(customProvider, telemetry);
+
+  await assertRejects(
+    () =>
+      boundary.query(['private-key'], {
+        operationId: 'orders.list',
+        queryFn: () => Promise.resolve('unused'),
+      }),
+    Error,
+    'provider unavailable',
+  );
+
+  assertEquals(telemetry.spans.length, 1);
+  const span = telemetry.spans[0];
+  assertEquals(span.attributes[CacheAttributes.BACKEND_EXECUTED], false);
+  assertEquals(span.attributes[CacheAttributes.TOPOLOGY_COMPLETE], false);
+  assertEquals(span.attributes[CacheAttributes.OUTCOME], CacheOutcomes.ERROR);
+  assertEquals(findEvent(span, CacheEvents.LOOKUP).attributes[CacheAttributes.OUTCOME], 'error');
 });
 
 Deno.test('provider boundary does not double-wrap package-owned cache telemetry', async () => {
@@ -416,6 +457,28 @@ Deno.test('provider boundary does not double-wrap package-owned cache telemetry'
   assertEquals(telemetry.spans.length, 1);
   assertEquals(telemetry.spans[0].name, CacheOperations.READ);
   assertEquals(telemetry.spans[0].attributes[CacheAttributes.BACKEND_EXECUTED], true);
+});
+
+Deno.test('re-registering the package-owned boundary remains single-span', async () => {
+  const telemetry = new RecordingCacheTelemetry();
+  const provider = new CacheQuery(new MemoryCacheStore(), new Map(), telemetry);
+
+  try {
+    setCacheProvider(provider);
+    setCacheProvider(getCacheProvider());
+
+    assertEquals(
+      await getCacheProvider().query(['orders'], {
+        operationId: 'orders.list',
+        queryFn: () => Promise.resolve('loaded'),
+      }),
+      'loaded',
+    );
+    assertEquals(telemetry.spans.length, 1);
+    assertEquals(telemetry.spans[0].name, CacheOperations.READ);
+  } finally {
+    resetCacheProvider();
+  }
 });
 
 function createOtelCacheTelemetry(tracer: Tracer): CacheTelemetry {

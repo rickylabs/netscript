@@ -426,3 +426,21 @@ export function recordCacheProviderError(
   span.setAttributes(attributes);
   span.addEvent(event, attributes);
 }
+
+/** Mark a successful provider operation whose internal tier topology is unavailable. */
+export function recordCacheProviderTopologyUnknown(
+  span: CacheTelemetrySpan,
+  operation: CacheOperation,
+  namespace: string,
+  descriptor: CacheProviderDescriptor,
+  event: string,
+): void {
+  const attributes = createCacheAttributes({
+    operation,
+    namespace,
+    ...descriptor,
+    topologyComplete: false,
+  });
+  span.setAttributes(attributes);
+  span.addEvent(event, attributes);
+}

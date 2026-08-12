@@ -3,9 +3,12 @@ import type { CacheProvider } from './cache-provider.ts';
 /**
  * Internal marker proving that a provider owns the package cache span.
  *
- * This identity is deliberately package-instance-local. Incoherent SDK closures are rejected by
- * the #1589 gate; a global symbol would instead mask incompatible cross-version closures. An
- * unsupported split closure may therefore duplicate spans rather than silently interoperate.
+ * This identity is deliberately package-instance-local because the #1589 gate, not this marker,
+ * owns coherent SDK closure enforcement. An unsupported split closure treats a foreign
+ * `CacheQuery` as unowned and wraps it again, producing duplicate spans with incomplete topology;
+ * successful calls omit outcome rather than masquerading as provider errors. A contract-version
+ * value stored under `Symbol.for()` could provide cross-instance recognition and version
+ * discrimination, but that would create a separate split-closure compatibility contract.
  */
 export const cacheTelemetryOwner: unique symbol = Symbol('netscript.cache.telemetry-owner');
 
