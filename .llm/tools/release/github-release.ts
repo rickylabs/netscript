@@ -40,10 +40,16 @@ import {
   type GitHubResponse,
   resolveGithubToken,
 } from '../agentic/lib/agentic-lib.ts';
-import { discoverVersionFiles } from '../deps/bump-version.ts';
+import {
+  discoverPreparedReleaseFiles,
+  PREPARED_RELEASE_GENERATED_OUTPUTS,
+} from './prepare-release.ts';
+import { rewriteNetScriptVersion } from '../deps/bump-version.ts';
 
 const DEFAULT_REPO = 'rickylabs/netscript';
 export const CANARY_PAIR_STATUS_CONTEXT = 'release/canary-pair';
+const AGENT_DOCS_PROSE_PATH = '.llm/assets/agent-docs/prose.json.gz';
+const AGENT_DOCS_PROVENANCE_PATH = '.llm/assets/agent-docs/provenance.json';
 
 export interface ClosedIssue {
   readonly number: number;
@@ -115,20 +121,28 @@ export function toTag(version: string): string {
 export interface CanaryPairDependencies {
   readonly revParse: (root: string, revision: string) => Promise<string>;
   readonly changedFiles: (root: string) => Promise<readonly string[]>;
-  readonly versionFiles: (root: string) => Promise<readonly string[]>;
+  readonly releaseFiles: (root: string) => Promise<readonly string[]>;
   readonly fileAtRevision: (root: string, revision: string, path: string) => Promise<string>;
+  readonly fileBytesAtRevision?: (
+    root: string,
+    revision: string,
+    path: string,
+  ) => Promise<Uint8Array>;
+  readonly generatedOutputsFresh?: (root: string) => Promise<void>;
   readonly request: typeof githubRequest;
 }
 
 const defaultCanaryPairDependencies: CanaryPairDependencies = {
   revParse: runGitRevParse,
   changedFiles: runGitChangedFiles,
-  versionFiles: discoverVersionFiles,
+  releaseFiles: discoverPreparedReleaseFiles,
   fileAtRevision: runGitFileAtRevision,
+  fileBytesAtRevision: runGitFileBytesAtRevision,
+  generatedOutputsFresh: assertPreparedReleaseGeneratedOutputsFresh,
   request: githubRequest,
 };
 
-/** True only when the current commit changed release-version files and nothing else. */
+/** True only when the current commit changed writer-declared release files and nothing else. */
 export function isVersionOnlyReleaseDiff(
   root: string,
   changedFiles: readonly string[],
@@ -174,19 +188,92 @@ export async function verifyGreenCanaryPair(
   if (await hasGreenCanaryPair(repo, token, current, dependencies.request)) return current;
 
   const changed = await dependencies.changedFiles(root);
-  const versionFiles = await dependencies.versionFiles(root);
-  if (isVersionOnlyReleaseDiff(root, changed, versionFiles)) {
+  const releaseFiles = await dependencies.releaseFiles(root);
+  if (isVersionOnlyReleaseDiff(root, changed, releaseFiles)) {
     const parent = await dependencies.revParse(root, 'HEAD^');
     const parentRoot = await dependencies.fileAtRevision(root, parent, 'deno.json');
     const currentRoot = await dependencies.fileAtRevision(root, current, 'deno.json');
     const previousVersion = readManifestVersion(parentRoot, `${parent}:deno.json`);
     const nextVersion = readManifestVersion(currentRoot, `${current}:deno.json`);
+    const inexactGeneratedPaths: string[] = [];
     const exactReplacement = await everyAsync(changed, async (path) => {
       const before = await dependencies.fileAtRevision(root, parent, path);
       const after = await dependencies.fileAtRevision(root, current, path);
-      return isExactVersionReplacement(before, after, previousVersion, nextVersion);
+      if (isExactVersionReplacement(before, after, previousVersion, nextVersion)) return true;
+      if (isPreparedReleaseGeneratedOutput(path)) {
+        inexactGeneratedPaths.push(path);
+        return true;
+      }
+      return false;
     });
     if (exactReplacement) {
+      if (inexactGeneratedPaths.length > 0) {
+        if (
+          inexactGeneratedPaths.some((path) => normalizeGitPath(path) === AGENT_DOCS_PROSE_PATH)
+        ) {
+          const readBytes = dependencies.fileBytesAtRevision;
+          if (!readBytes) {
+            throw new Error(
+              'Stable publication blocked: agent-docs prose requires a binary parent-to-HEAD ' +
+                'comparison before canary evidence can be inherited.',
+            );
+          }
+          const [before, after] = await Promise.all([
+            readBytes(root, parent, AGENT_DOCS_PROSE_PATH),
+            readBytes(root, current, AGENT_DOCS_PROSE_PATH),
+          ]);
+          if (
+            !(await isExactAgentDocsVersionReplacement(
+              before,
+              after,
+              previousVersion,
+              nextVersion,
+            ))
+          ) {
+            throw new Error(
+              'Stable publication blocked: agent-docs prose contains non-version changes, so ' +
+                'the parent canary evidence cannot authorize this content.',
+            );
+          }
+        }
+        if (
+          inexactGeneratedPaths.some((path) =>
+            normalizeGitPath(path) === AGENT_DOCS_PROVENANCE_PATH
+          )
+        ) {
+          const readBytes = dependencies.fileBytesAtRevision;
+          if (!readBytes) {
+            throw new Error(
+              'Stable publication blocked: agent-docs provenance requires binary parent-to-HEAD ' +
+                'prose comparisons before canary evidence can be inherited.',
+            );
+          }
+          const [beforeProvenance, afterProvenance, beforeProse, afterProse] = await Promise.all([
+            dependencies.fileAtRevision(root, parent, AGENT_DOCS_PROVENANCE_PATH),
+            dependencies.fileAtRevision(root, current, AGENT_DOCS_PROVENANCE_PATH),
+            readBytes(root, parent, AGENT_DOCS_PROSE_PATH),
+            readBytes(root, current, AGENT_DOCS_PROSE_PATH),
+          ]);
+          if (
+            !(await isExactAgentDocsProvenanceReplacement(
+              beforeProvenance,
+              afterProvenance,
+              beforeProse,
+              afterProse,
+              previousVersion,
+              nextVersion,
+            ))
+          ) {
+            throw new Error(
+              'Stable publication blocked: agent-docs provenance contains non-version changes, ' +
+                'so the parent canary evidence cannot authorize this content.',
+            );
+          }
+        }
+        const assertFresh = dependencies.generatedOutputsFresh ??
+          assertPreparedReleaseGeneratedOutputsFresh;
+        await assertFresh(root);
+      }
       if (await hasGreenCanaryPair(repo, token, parent, dependencies.request)) return parent;
       throw new Error(
         `Stable publication blocked: neither ${current} nor its exact version-only parent ${parent} ` +
@@ -205,6 +292,222 @@ export async function verifyGreenCanaryPair(
       'and the immediate parent cannot be used because the current commit contains non-version ' +
       'changes. Run a new canary pair for this exact content.',
   );
+}
+
+/** True only when the current prose payload is the writer's version rewrite of its canary parent. */
+export async function isExactAgentDocsVersionReplacement(
+  beforeCompressed: Uint8Array,
+  afterCompressed: Uint8Array,
+  previousVersion: string,
+  nextVersion: string,
+): Promise<boolean> {
+  if (previousVersion === nextVersion) return false;
+  try {
+    const [before, after] = await Promise.all([
+      decompressGzip(beforeCompressed),
+      decompressGzip(afterCompressed),
+    ]);
+    const payload: unknown = JSON.parse(new TextDecoder().decode(before));
+    if (!isAgentDocsPayload(payload)) return false;
+    const files = Object.fromEntries(
+      Object.entries(payload.files).map(([path, source]) => [
+        path,
+        rewriteNetScriptVersion(source, previousVersion, nextVersion),
+      ]),
+    );
+    const expected = new TextEncoder().encode(JSON.stringify({ schemaVersion: 1, files }));
+    return bytesEqual(expected, after);
+  } catch {
+    return false;
+  }
+}
+
+function isAgentDocsPayload(
+  value: unknown,
+): value is { readonly schemaVersion: 1; readonly files: Readonly<Record<string, string>> } {
+  return isRecord(value) && value.schemaVersion === 1 && isRecord(value.files) &&
+    Object.values(value.files).every((source) => typeof source === 'string');
+}
+
+async function decompressGzip(compressed: Uint8Array): Promise<Uint8Array> {
+  const copy = new Uint8Array(compressed);
+  const stream = new Blob([copy.buffer]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+function bytesEqual(left: Uint8Array, right: Uint8Array): boolean {
+  return left.byteLength === right.byteLength && left.every((byte, index) => byte === right[index]);
+}
+
+interface AgentDocsProvenance {
+  readonly schemaVersion: 1;
+  readonly version: string;
+  readonly sourceCommit: string;
+  readonly extractionTimestamp: string;
+  readonly files: readonly string[];
+  readonly uncompressedBytes: number;
+  readonly compressedBytes: number;
+  readonly sha256: string;
+}
+
+const AGENT_DOCS_PROVENANCE_KEYS = [
+  'schemaVersion',
+  'version',
+  'sourceCommit',
+  'extractionTimestamp',
+  'files',
+  'uncompressedBytes',
+  'compressedBytes',
+  'sha256',
+] as const;
+
+/** True only when HEAD provenance is the closed, integrity-derived successor of its parent. */
+export async function isExactAgentDocsProvenanceReplacement(
+  beforeSource: string,
+  afterSource: string,
+  beforeProse: Uint8Array,
+  afterProse: Uint8Array,
+  previousVersion: string,
+  nextVersion: string,
+): Promise<boolean> {
+  if (previousVersion === nextVersion) return false;
+  try {
+    const before = parseAgentDocsProvenance(beforeSource);
+    const after = parseAgentDocsProvenance(afterSource);
+    if (!before || !after || before.version !== previousVersion) return false;
+    const [beforePayload, afterPayload] = await Promise.all([
+      decompressGzip(beforeProse),
+      decompressGzip(afterProse),
+    ]);
+    const beforeFiles = agentDocsPayloadFiles(beforePayload);
+    const afterFiles = agentDocsPayloadFiles(afterPayload);
+    if (!beforeFiles || !afterFiles) return false;
+    const beforeExpected = await deriveAgentDocsProvenance(
+      before,
+      previousVersion,
+      beforeFiles,
+      beforePayload,
+      beforeProse,
+    );
+    const afterExpected = await deriveAgentDocsProvenance(
+      before,
+      nextVersion,
+      afterFiles,
+      afterPayload,
+      afterProse,
+    );
+    return provenanceEquals(before, beforeExpected) && provenanceEquals(after, afterExpected) &&
+      JSON.stringify(before.files) === JSON.stringify(after.files);
+  } catch {
+    return false;
+  }
+}
+
+function parseAgentDocsProvenance(source: string): AgentDocsProvenance | undefined {
+  const value: unknown = JSON.parse(source);
+  if (
+    !isRecord(value) || value.schemaVersion !== 1 || typeof value.version !== 'string' ||
+    typeof value.sourceCommit !== 'string' || typeof value.extractionTimestamp !== 'string' ||
+    !Array.isArray(value.files) || !value.files.every((path) => typeof path === 'string') ||
+    typeof value.uncompressedBytes !== 'number' || typeof value.compressedBytes !== 'number' ||
+    typeof value.sha256 !== 'string' ||
+    Object.keys(value).sort().join('\0') !== [...AGENT_DOCS_PROVENANCE_KEYS].sort().join('\0')
+  ) return undefined;
+  return {
+    schemaVersion: 1,
+    version: value.version,
+    sourceCommit: value.sourceCommit,
+    extractionTimestamp: value.extractionTimestamp,
+    files: [...value.files],
+    uncompressedBytes: value.uncompressedBytes,
+    compressedBytes: value.compressedBytes,
+    sha256: value.sha256,
+  };
+}
+
+function agentDocsPayloadFiles(payloadBytes: Uint8Array): readonly string[] | undefined {
+  const value: unknown = JSON.parse(new TextDecoder().decode(payloadBytes));
+  return isAgentDocsPayload(value) ? Object.keys(value.files) : undefined;
+}
+
+async function deriveAgentDocsProvenance(
+  parent: AgentDocsProvenance,
+  version: string,
+  files: readonly string[],
+  uncompressed: Uint8Array,
+  compressed: Uint8Array,
+): Promise<AgentDocsProvenance> {
+  return {
+    schemaVersion: 1,
+    version,
+    sourceCommit: parent.sourceCommit,
+    extractionTimestamp: parent.extractionTimestamp,
+    files,
+    uncompressedBytes: uncompressed.byteLength,
+    compressedBytes: compressed.byteLength,
+    sha256: await sha256Hex(compressed),
+  };
+}
+
+function provenanceEquals(left: AgentDocsProvenance, right: AgentDocsProvenance): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
+async function sha256Hex(bytes: Uint8Array): Promise<string> {
+  const copy = new Uint8Array(bytes);
+  return [...new Uint8Array(await crypto.subtle.digest('SHA-256', copy.buffer))]
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+function isPreparedReleaseGeneratedOutput(path: string): boolean {
+  const normalized = normalizeGitPath(path);
+  return PREPARED_RELEASE_GENERATED_OUTPUTS.some(
+    (generatedPath) => normalizeGitPath(generatedPath) === normalized,
+  );
+}
+
+/**
+ * Derived gzip/base64/hash outputs cannot satisfy a plain-text replacement.
+ * Keep the byte check as the first rule. The prose blob is separately anchored
+ * to its canary parent; these clean-checkout reproductions then prove the
+ * current provenance and remaining outputs match the release:cut writers.
+ */
+async function assertPreparedReleaseGeneratedOutputsFresh(root: string): Promise<void> {
+  const dirty = await runGit(root, ['status', '--porcelain', '--untracked-files=no']);
+  if (dirty) {
+    throw new Error(
+      'Stable publication blocked: generated release outputs require a clean tracked worktree ' +
+        'before their writer-derived content can be verified.',
+    );
+  }
+  await runCheckedCommand(root, ['task', 'gen:publish-assets', '--check']);
+  await runCheckedCommand(root, ['task', 'check:mcp-export-corpus']);
+  await runCheckedCommand(root, [
+    'run',
+    '--no-lock',
+    '--allow-read',
+    '--allow-run=deno',
+    '.llm/tools/generate-cli-assets-barrel.ts',
+    '--check',
+  ]);
+}
+
+async function runCheckedCommand(root: string, args: readonly string[]): Promise<void> {
+  const result = await new Deno.Command('deno', {
+    args: [...args],
+    cwd: root,
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  if (!result.success) {
+    const stdout = new TextDecoder().decode(result.stdout).trim();
+    const stderr = new TextDecoder().decode(result.stderr).trim();
+    throw new Error(
+      `Stable publication blocked: deno ${args.join(' ')} did not reproduce the generated ` +
+        `release outputs.${stdout ? `\n${stdout}` : ''}${stderr ? `\n${stderr}` : ''}`,
+    );
+  }
 }
 
 async function hasGreenCanaryPair(
@@ -246,6 +549,26 @@ async function runGitFileAtRevision(
   path: string,
 ): Promise<string> {
   return await runGit(root, ['show', `${revision}:${normalizeGitPath(path)}`], false);
+}
+
+async function runGitFileBytesAtRevision(
+  root: string,
+  revision: string,
+  path: string,
+): Promise<Uint8Array> {
+  const result = await new Deno.Command('git', {
+    args: ['show', `${revision}:${normalizeGitPath(path)}`],
+    cwd: root,
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  if (!result.success) {
+    const stderr = new TextDecoder().decode(result.stderr).trim();
+    throw new Error(
+      `git show ${revision}:${normalizeGitPath(path)} failed: ${stderr || `exit ${result.code}`}`,
+    );
+  }
+  return result.stdout;
 }
 
 async function runGit(root: string, args: readonly string[], trim = true): Promise<string> {
@@ -391,7 +714,7 @@ export function parseArgs(argv: readonly string[]): ReleasePlan {
 // GitHub API (impure)
 // ---------------------------------------------------------------------------
 
-interface PreviousRelease {
+export interface PreviousRelease {
   readonly tag: string;
   readonly since: string;
 }
@@ -401,8 +724,9 @@ async function fetchPreviousRelease(
   repo: string,
   token: string,
   currentTag: string,
+  request: typeof githubRequest = githubRequest,
 ): Promise<PreviousRelease | null> {
-  const res = await githubRequest('GET', `/repos/${repo}/releases?per_page=20`, token);
+  const res = await request('GET', `/repos/${repo}/releases?per_page=20`, token);
   if (!res.ok || !Array.isArray(res.body)) {
     return null;
   }
@@ -417,18 +741,62 @@ async function fetchPreviousRelease(
   return null;
 }
 
+/** Resolve an explicit changelog tag to its release date, or its commit date when unreleased. */
+export async function resolvePreviousTag(
+  repo: string,
+  token: string,
+  tag: string,
+  request: typeof githubRequest = githubRequest,
+): Promise<PreviousRelease> {
+  const encodedTag = encodeURIComponent(tag);
+  const release = await request('GET', `/repos/${repo}/releases/tags/${encodedTag}`, token);
+  if (release.ok && isRecord(release.body)) {
+    const since = release.body.published_at ?? release.body.created_at;
+    if (typeof since === 'string' && since.trim()) return { tag, since };
+  } else if (release.status !== 404) {
+    throw new Error(
+      `Previous release lookup failed for ${tag}: HTTP ${release.status} ` +
+        `${JSON.stringify(release.body)}.`,
+    );
+  }
+
+  const commit = await request('GET', `/repos/${repo}/commits/${encodedTag}`, token);
+  const commitRecord = isRecord(commit.body) && isRecord(commit.body.commit)
+    ? commit.body.commit
+    : null;
+  const committer = commitRecord && isRecord(commitRecord.committer)
+    ? commitRecord.committer.date
+    : undefined;
+  const author = commitRecord && isRecord(commitRecord.author)
+    ? commitRecord.author.date
+    : undefined;
+  const since = typeof committer === 'string' && committer.trim()
+    ? committer
+    : typeof author === 'string' && author.trim()
+    ? author
+    : '';
+  if (!commit.ok || !since) {
+    throw new Error(
+      `Previous tag ${tag} is known but its release/commit date could not be resolved: ` +
+        `HTTP ${commit.status} ${JSON.stringify(commit.body)}.`,
+    );
+  }
+  return { tag, since };
+}
+
 /** GitHub's auto-generated "What's Changed" body (merged PRs + Full Changelog link). */
 async function generateWhatsChanged(
   repo: string,
   token: string,
   tag: string,
   previousTag?: string,
+  request: typeof githubRequest = githubRequest,
 ): Promise<string> {
   const payload: Record<string, unknown> = { tag_name: tag };
   if (previousTag) {
     payload.previous_tag_name = previousTag;
   }
-  const res = await githubRequest('POST', `/repos/${repo}/releases/generate-notes`, token, payload);
+  const res = await request('POST', `/repos/${repo}/releases/generate-notes`, token, payload);
   if (!res.ok) {
     throw new Error(
       `generate-notes failed: HTTP ${res.status} ${JSON.stringify(res.body)}. ` +
@@ -444,11 +812,12 @@ async function fetchClosedIssues(
   repo: string,
   token: string,
   since: string,
+  request: typeof githubRequest = githubRequest,
 ): Promise<ClosedIssue[]> {
   const range = since ? ` closed:>${since}` : '';
   const query = `repo:${repo} is:issue is:closed${range}`;
   const path = `/search/issues?q=${encodeURIComponent(query)}&per_page=100&sort=updated&order=desc`;
-  const res = await githubRequest('GET', path, token);
+  const res = await request('GET', path, token);
   const items = githubField(res.body, 'items');
   if (!res.ok || !Array.isArray(items)) {
     return [];
@@ -464,6 +833,71 @@ async function fetchClosedIssues(
     }
   }
   return issues;
+}
+
+export interface ReleaseNotesDependencies {
+  readonly fetchPreviousRelease: (
+    repo: string,
+    token: string,
+    currentTag: string,
+  ) => Promise<PreviousRelease | null>;
+  readonly resolvePreviousTag: (
+    repo: string,
+    token: string,
+    tag: string,
+  ) => Promise<PreviousRelease>;
+  readonly generateWhatsChanged: (
+    repo: string,
+    token: string,
+    tag: string,
+    previousTag?: string,
+  ) => Promise<string>;
+  readonly fetchClosedIssues: (
+    repo: string,
+    token: string,
+    since: string,
+  ) => Promise<ClosedIssue[]>;
+}
+
+export interface ReleaseNotes {
+  readonly previous: PreviousRelease | null;
+  readonly whatsChanged: string;
+  readonly closed: readonly ClosedIssue[];
+}
+
+const defaultReleaseNotesDependencies: ReleaseNotesDependencies = {
+  fetchPreviousRelease,
+  resolvePreviousTag,
+  generateWhatsChanged,
+  fetchClosedIssues,
+};
+
+/** Resolve one changelog window and query every generated release-notes section for it. */
+export async function collectReleaseNotes(
+  plan: ReleasePlan,
+  token: string,
+  tag: string,
+  dependencies: ReleaseNotesDependencies = defaultReleaseNotesDependencies,
+): Promise<ReleaseNotes> {
+  const previous = plan.prevTag
+    ? await dependencies.resolvePreviousTag(plan.repo, token, plan.prevTag)
+    : await dependencies.fetchPreviousRelease(plan.repo, token, tag);
+  if (previous?.tag && !previous.since.trim()) {
+    throw new Error(
+      `Previous tag ${previous.tag} is known but its since timestamp is empty; ` +
+        'closed-issue collection refuses to report a false zero.',
+    );
+  }
+  const whatsChanged = await dependencies.generateWhatsChanged(
+    plan.repo,
+    token,
+    tag,
+    previous?.tag,
+  );
+  const closed = previous
+    ? await dependencies.fetchClosedIssues(plan.repo, token, previous.since)
+    : [];
+  return { previous, whatsChanged, closed };
 }
 
 async function createRelease(
@@ -519,15 +953,10 @@ async function main(): Promise<void> {
     `[release:publish] green canary pair: ${canaryContentSha} (${CANARY_PAIR_STATUS_CONTEXT})`,
   );
 
-  const previous = plan.prevTag
-    ? { tag: plan.prevTag, since: '' }
-    : await fetchPreviousRelease(plan.repo, token, tag);
+  const { previous, whatsChanged, closed } = await collectReleaseNotes(plan, token, tag);
   if (previous?.tag) {
     console.error(`[release:publish] previous release: ${previous.tag}`);
   }
-
-  const whatsChanged = await generateWhatsChanged(plan.repo, token, tag, previous?.tag);
-  const closed = previous?.since ? await fetchClosedIssues(plan.repo, token, previous.since) : [];
   console.error(`[release:publish] closed issues since previous release: ${closed.length}`);
 
   const body = composeReleaseBody({
