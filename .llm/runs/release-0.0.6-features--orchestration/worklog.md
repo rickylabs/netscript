@@ -1598,3 +1598,48 @@ fixed, closed**.
 
 **Next: #1589** (P0, split SDK cache-provider singleton), then #1583, the Fresh group
 (#1576/#1568/#1569), #1577 after a cross-lane writer check, and #1562.
+
+## 2026-08-12 — runtime train resumed from the canary.4 checkpoint
+
+Base for all remaining work is **`fc312f211`** — the terminal-green canary.4 SHA.
+
+**Ownership confirmed to the fixes lane:** all seven remaining 0.0.6 leaves (#1589, #1583, #1577,
+#1576, #1569, #1568, #1562) are **this lane's**. They asked rather than inferring from the board,
+which is the right instinct — a wrong read there costs either duplicated work or a dropped leaf. #1589
+was the one they flagged as most contestable; it is mine and is the next blocker.
+
+**Grouping — one meaningful PR per connected group:**
+
+| Group | Issues | Surface |
+| --- | --- | --- |
+| SDK closure | **#1589** | `packages/sdk/src/cache/**` + closure/build enforcement |
+| AI/streams | **#1583** | `packages/fresh/src/runtime/ai/**` |
+| Fresh route/partial | **#1576 + #1568 + #1569** | `packages/fresh/src/application/{defer,builders/define-page}/**` |
+| Telemetry | **#1562** | cache-topology spans |
+| Aspire | **#1577** | generator `withBrowserLogs()` — **cross-lane check before dispatch** |
+
+**Surface separation verified before parallel dispatch:** #1583 and the Fresh group both live in
+`packages/fresh` but in **unrelated subtrees** (`runtime/ai` vs `application/defer` +
+`define-page`) — the same shape as #1457 vs #1459 earlier this session, which coexisted without
+conflict. #1589 is a different package entirely.
+
+**Wave A dispatched:** #1583 (Sol medium, research-then-fix — the issue gives symptoms, not a
+mechanism). #1589 gets a plan + automatic PLAN-EVAL because choosing among build/init rejection, a
+declared peer closure, and moving provider ownership off module-local state is a genuine design
+decision.
+
+### Intel adopted from the fixes lane
+
+1. **#1540 merged**, so the `catalog:` materialization exposure is closed — publish/preflight now run
+   from an isolated worktree at HEAD. Their proof was **executed, not reasoned**: SIGKILL
+   mid-materialize left `git status --porcelain` empty with `"zod": "catalog:"` intact. Residual
+   orphaned-staging-worktree risk is declared rather than hidden.
+2. **Wall time is the cheapest short-circuit detector for `scaffold.runtime`.** A run returning in
+   seconds did nothing regardless of the rollup; the CI-side tell is step 2 *"Skipped by policy"*
+   reporting **success** while step 10 is **skipped**. Their baseline: **~5m34s, 90 PASSED, zero
+   SKIPPED/CANCELLED**.
+
+   This is the same family as two traps that already bit this lane — every check reading `skipping` on
+   a draft PR, and cancelled scaffold rows that check 4 treats as *absent* rather than passing. Having
+   a **duration baseline** turns "looks green" into a comparable number. **Applied to every remaining
+   canary in this lane.**
