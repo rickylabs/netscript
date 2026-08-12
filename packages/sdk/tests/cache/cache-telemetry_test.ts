@@ -20,13 +20,7 @@ import {
   SimpleSpanProcessor,
 } from 'npm:@opentelemetry/sdk-trace-base@^2.5.0';
 import { CacheQuery } from '../../src/cache/cache-query.ts';
-import {
-  type CacheProvider,
-  createProviderBoundary,
-  getCacheProvider,
-  resetCacheProvider,
-  setCacheProvider,
-} from '../../src/cache/cache-provider.ts';
+import { type CacheProvider, createProviderBoundary } from '../../src/cache/cache-provider.ts';
 import {
   CACHE_NAMESPACE_MAX_LENGTH,
   CacheEvents,
@@ -410,6 +404,34 @@ Deno.test('successful unowned providers report unknown topology without an error
   assert(!JSON.stringify(span).includes('private-key'));
 });
 
+Deno.test('successful unowned invalidation reports unknown topology without an error outcome', async () => {
+  const telemetry = new RecordingCacheTelemetry();
+  const customProvider: CacheProvider = {
+    descriptor: { system: 'custom', tier: 'l2' },
+    query: (_key, options) => options.queryFn(),
+    prefetch: async (_key, options) => {
+      await options.queryFn();
+    },
+    getCachedData: () => Promise.resolve(null),
+    getCachedEntry: () => Promise.resolve(null),
+    invalidateQueries: () => Promise.resolve(),
+  };
+  const boundary = createProviderBoundary(customProvider, telemetry);
+
+  await boundary.invalidateQueries(['orders'], 'orders.invalidate');
+
+  assertEquals(telemetry.spans.length, 1);
+  const span = telemetry.spans[0];
+  assertEquals(span.name, CacheOperations.INVALIDATE);
+  assertEquals(span.attributes[CacheAttributes.BACKEND_EXECUTED], false);
+  assertEquals(span.attributes[CacheAttributes.TOPOLOGY_COMPLETE], false);
+  assertEquals(span.attributes[CacheAttributes.OUTCOME], undefined);
+  assertEquals(
+    findEvent(span, CacheEvents.INVALIDATE).attributes[CacheAttributes.OUTCOME],
+    undefined,
+  );
+});
+
 Deno.test('failing unowned providers retain the error outcome', async () => {
   const telemetry = new RecordingCacheTelemetry();
   const providerError = new Error('provider unavailable');
@@ -459,26 +481,21 @@ Deno.test('provider boundary does not double-wrap package-owned cache telemetry'
   assertEquals(telemetry.spans[0].attributes[CacheAttributes.BACKEND_EXECUTED], true);
 });
 
-Deno.test('re-registering the package-owned boundary remains single-span', async () => {
+Deno.test('re-wrapping the package-owned boundary remains single-span', async () => {
   const telemetry = new RecordingCacheTelemetry();
   const provider = new CacheQuery(new MemoryCacheStore(), new Map(), telemetry);
+  const registeredBoundary = createProviderBoundary(provider, telemetry);
+  const outerBoundary = createProviderBoundary(registeredBoundary, telemetry);
 
-  try {
-    setCacheProvider(provider);
-    setCacheProvider(getCacheProvider());
-
-    assertEquals(
-      await getCacheProvider().query(['orders'], {
-        operationId: 'orders.list',
-        queryFn: () => Promise.resolve('loaded'),
-      }),
-      'loaded',
-    );
-    assertEquals(telemetry.spans.length, 1);
-    assertEquals(telemetry.spans[0].name, CacheOperations.READ);
-  } finally {
-    resetCacheProvider();
-  }
+  assertEquals(
+    await outerBoundary.query(['orders'], {
+      operationId: 'orders.list',
+      queryFn: () => Promise.resolve('loaded'),
+    }),
+    'loaded',
+  );
+  assertEquals(telemetry.spans.length, 1);
+  assertEquals(telemetry.spans[0].name, CacheOperations.READ);
 });
 
 function createOtelCacheTelemetry(tracer: Tracer): CacheTelemetry {

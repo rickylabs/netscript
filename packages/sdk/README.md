@@ -146,9 +146,10 @@ loader-error paths. Misses, durations, and revalidation flags are never proxies 
 
 Custom high-level `CacheProvider` objects registered without the package-owned `CacheQuery` marker
 still receive a logical span from the registration boundary. Because that interface cannot prove an
-internal tier chain, the boundary honestly reports `topology_complete=false` and outcome `error`
-while measuring loader entry. Migrate such providers to a `CacheStore` with mandatory reports and
-register a `CacheQuery` to produce complete topology.
+internal tier chain, a successful operation reports `topology_complete=false` with no `outcome`;
+`outcome=error` is reported only when the operation throws. The boundary still measures loader
+entry. Migrate such providers to a `CacheStore` with mandatory reports and register a `CacheQuery`
+to produce complete topology.
 
 ### Desktop RPC bindings
 

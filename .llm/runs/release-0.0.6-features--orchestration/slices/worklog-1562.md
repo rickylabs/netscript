@@ -250,3 +250,35 @@ Fable, OpenHands, ready transition, merge, E2E, or canary action was launched.
 `deno.lock` retained SHA-256
 `73be92b116b9065372505157da4f6729176e975aa118e9944746317887e9a4c4` with no Git delta. No Fresh or
 CLI source was edited, and `e2e:cli` was not run.
+
+## Published-semantics documentation correction
+
+- Updated both published READMEs to state the implemented unowned-provider shape: success emits
+  `topology_complete=false` with no `outcome`; only a thrown operation emits `outcome=error`.
+- Replaced the insensitive re-registration assertion with a shared-recorder nested-boundary test.
+  With `Object.defineProperty(boundary, cacheTelemetryOwner, { value: true })` temporarily removed,
+  the focused package task exited 1 with `Actual 2 / Expected 1`; after restoration, the identical
+  command exited 0 with `1 passed | 0 failed | 59 filtered out`.
+- Added a successful unowned `invalidateQueries` case asserting an INTERNAL `cache.invalidate`
+  span, `topology_complete=false`, no span/event `outcome`, and a `cache.invalidate` event.
+- Replaced the published JSDoc issue number with the mechanism name, “dependency-closure coherence
+  gate.” A diff-wide scan of added lines under `packages/sdk` and `packages/telemetry` found no
+  remaining `#<number>` references.
+- Cycle-2 IMPL-EVAL returned `FAIL_FIX` at `1e8768bc1`; this session did not launch evaluation. The
+  orchestrator-owned separate-session IMPL-EVAL checkbox remains unchecked.
+
+### Cycle-2 correction gate evidence
+
+| Gate                            | Result                                   |
+| ------------------------------- | ---------------------------------------- |
+| SDK+telemetry scoped check      | exit 0; 184 files, 2 batches, 0 findings |
+| SDK+telemetry scoped lint       | exit 0; 184 files, 0 findings            |
+| SDK+telemetry scoped format     | exit 0; 184 files, 0 findings            |
+| SDK package test task           | exit 0; 60 passed, 0 failed              |
+| telemetry package test task     | exit 0; 54 passed, 0 failed              |
+| published-JSDoc codename tests  | exit 0; 4 passed, 0 failed               |
+
+`deno.lock` retained SHA-256
+`73be92b116b9065372505157da4f6729176e975aa118e9944746317887e9a4c4` with no Git delta. No Fresh,
+CLI, cache-provider implementation, or cache-telemetry implementation file changed; `e2e:cli` was
+not run.

@@ -138,6 +138,8 @@ One logical operation uses one INTERNAL span. `cache.lookup`, `cache.write`, `ca
 `netscript.cache.lookup_index` orders lookups; `entry_age_ms` and `ttl_ms` describe freshness;
 `write_through` distinguishes propagation/promotion; `inflight_joined` identifies a trace that
 awaited work owned elsewhere; and `topology_complete=false` makes missing provider evidence visible.
+For an unowned provider, a successful operation has `topology_complete=false` with no `outcome`;
+`outcome=error` appears only when the operation throws.
 Stale background completion may use one captured-context `cache.write` follow-up span.
 
 ## Public surface
