@@ -86,3 +86,45 @@ The brief locks both reason decisions (reuse `producer-stopping`; add exactly on
 `transport-refused`), names the gates as deliverables including the mandatory `quality:gate`,
 pre-empts the known `deno fmt` rewrap hazard, and forbids the agent from merging or flipping to
 ready.
+
+## 2026-08-12 — #1405 slice landed on its branch; Tier-A review done
+
+Codex thread `019ff4f0-0e1c-7333-8138-bbb107e4f1b3` completed its turn (detected by
+`agentic:codex-watch --mode turn`, not by polling). Commit `c491c6989`, pushed by explicit refspec,
+**draft PR #1528** open against `main` carrying `Closes #1405`, a fenced `acceptance-evidence` block
+mapping all five boxes, and a DoD whose last two boxes (IMPL-EVAL, orchestrator review) are
+correctly left unticked.
+
+**Independent re-verification (not read off the slice report):**
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Package suite | `deno task --cwd packages/plugin-streams-core test` | **33 passed, 0 failed** |
+| Negative case | both fixes reverted, suite re-run | **29 passed, 5 failed** — the guards fire |
+| Restore | `git checkout` + re-run | 33/33, clean tree |
+
+The negative-case run is the `milestone-run.md` gate-integrity rule applied: a guard enters only
+with its predicate demonstrated. 0.0.4 shipped two guards that could never fire and looked correct;
+this one was checked rather than assumed.
+
+**Diff conforms to the locked decisions.** `transport-refused` is the only public-surface addition;
+close-drain reuses `producer-stopping`; `#failActive` branches on `isRetryable`; the conflated
+connect guard is split. The façade's duplicate `stateRejection()` was **deleted** and both write
+entry points delegate to `supervisor.writeRejectionReason()` — so the two selectors that drifted
+apart to produce this defect can no longer drift again.
+
+**Two advisory findings, neither blocking** (posted to #1528): the reverted-state failure arrives as
+an uncaught-error cascade rather than four individual assertion failures; and `arch:check` carries
+`WARN=1` because the supervisor file is now 515 lines against a 500-line advisory cap (`FAIL=0`).
+
+**A defect in my own brief, surfaced by the implementer.** The brief's gate list named
+`deno test packages/plugin-streams-core`, which exits 1 with 19 `NotCapable` failures for want of
+`--allow-env`. The slice reported the red with its cause instead of hiding it and used the
+package-declared task. The brief was wrong; corrected before the #1398 brief goes out.
+
+**IMPL-EVAL dispatched** — separate session, separate worktree `/home/codex/repos/ns006-1405-impleval`
+at `c491c6989`, DeepSeek V4 Flash 0731 max (small-impl evaluator lane, local fallback transport per
+D-2). Its prompt (`slices/impl-eval-1405-prompt.md`) directs it at the highest-value failure mode —
+whether a genuinely failed producer can now be masked as merely closing, which would be a worse
+defect than the one being fixed — and requires it to revert each fix **individually** to prove each
+test fails for its own reason.
