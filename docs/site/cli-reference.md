@@ -175,7 +175,8 @@ internals stay in the installed dependency.
     { name: "Wire the registry", type: "netscript generate plugins", desc: "Regenerate the plugin registries from project source. Run this after every <code>plugin install</code>." },
     { name: "Check health", type: "netscript plugin list · netscript plugin doctor · netscript plugin info workers", desc: "List registered plugins, run the wiring sanity check, and show a single plugin's details." },
     { name: "Author your own", type: "netscript plugin new billing", desc: "Scaffold a new two-tier plugin: a JSR-publishable core package plus a thin connector. See <a href=\"/orchestration-runtime/how-to/author-a-plugin/\">author a plugin</a>." },
-    { name: "Discover & maintain", type: "netscript marketplace search <query> · netscript plugin update <name> · netscript plugin remove <name>", desc: "Search the plugin marketplace, re-pin and regenerate an installed plugin, or remove one and update workspace registration." }
+    { name: "Discover & maintain", type: "netscript marketplace search <query> · netscript plugin update <name> · netscript plugin remove <name>", desc: "Search the plugin marketplace, re-pin and regenerate an installed plugin, or remove one and update workspace registration." },
+    { name: "Configure the AI plugin", type: "netscript plugin ai <verb> [...args]", desc: "Configure AI tools, agents, models, providers, and MCP servers. A pass-through: every argument after the verb is forwarded verbatim to the installed <code>@netscript/plugin-ai</code> CLI, so its verbs are documented by that plugin, not here. Only <code>--project-root</code> is consumed by NetScript." }
   ]
 }) }}
 
@@ -244,23 +245,29 @@ The frontend is copy-source: components are copied into your repo under
 
 ## Deploy
 
-Two deploy paths are wired today: the **Deno Deploy** cloud target and the
-**Windows Service** (Servy) path. `netscript deploy docker` and `deploy compose` exist as
-command groups but are not wired — they only print help. See
+Deploy carries several paths: the **Deno Deploy** cloud target, the **OS service** (Servy)
+path, the **container and cloud targets** routed through Aspire, and two packaging verbs
+for shipping a binary. `netscript deploy list` prints every registered target with the
+operations it advertises — start there rather than guessing. See
 [deploy]({{ "howto:deploy" |> xref }}) for the portability story.
 
 {{ comp.apiTable({
   caption: "Deploy commands",
   rows: [
+    { name: "Discover targets", type: "netscript deploy list [--json]", desc: "List every registered deploy target with its label and advertised operations. <code>--json</code> emits machine-readable descriptors." },
     { name: "Deno Deploy: preflight", type: "netscript deploy deno-deploy plan", desc: "Run the unstable-API guard (scans for <code>Deno.openKv</code>, <code>Deno.cron</code>, <code>BroadcastChannel</code>, <code>Temporal</code>) without pushing. The same guard <strong>blocks</strong> <code>up --prod</code> on a violation; a preview push warns but proceeds." },
     { name: "Deno Deploy: lifecycle", type: "netscript deploy deno-deploy up [--prod] · down · status · logs", desc: "Push, delete, and inspect the deployment. A thin router over the native <code>deno deploy</code> CLI — it must be on your PATH and handles authentication." },
-    { name: "Windows Service: build", type: "netscript deploy build", desc: "Build the Windows Service deployment artifacts from a deployment manifest via Servy." },
-    { name: "Windows Service: lifecycle", type: "netscript deploy install · start · stop · status · logs · upgrade · uninstall", desc: "Install, run, inspect, upgrade, and remove Windows Services from the manifest." }
+    { name: "OS service: build", type: "netscript deploy build", desc: "Compile services and generate the deployment artifacts from a deployment manifest via Servy." },
+    { name: "OS service: lifecycle", type: "netscript deploy install · start · stop · status · logs · upgrade · uninstall", desc: "Register, run, inspect, upgrade, and remove OS services from the manifest." },
+    { name: "Containers: Docker & Compose", type: "netscript deploy docker <verb> · netscript deploy compose <verb>", desc: "Aspire-backed container targets. Both expose <code>plan · up · down · status · logs</code> — the bare group prints help, as every command group does, but the verbs run against a real adapter." },
+    { name: "Cloud targets", type: "netscript deploy kubernetes · azure-aca · azure-app-service · azure-aks · cloud-run", desc: "Aspire-backed cloud targets, each exposing <code>plan · up · down</code>. See the <a href=\"/reference/cli/commands/\">command reference</a> for why their verb list is shorter." },
+    { name: "Package a desktop app", type: "netscript deploy desktop package · netscript deploy desktop release", desc: "Package an enabled desktop app into native Deno Desktop formats for the host OS/arch, and prepare, sign, and serve a native release." },
+    { name: "Package the CLI", type: "netscript deploy package-cli", desc: "Compile the NetScript CLI into a self-shippable Windows <code>.exe</code>. Flags: <code>-o, --output-dir &lt;dir&gt;</code> (default <code>./.deploy/windows</code>), <code>--target &lt;triple&gt;</code> (default <code>x86_64-pc-windows-msvc</code>), <code>--no-bundle</code>, <code>-v, --verbose</code>." }
   ]
 }) }}
 
 The shared flags (`--org`, `--app`, `--entrypoint`, `--env-file`, `--project-root`), the
-planning-only cloud targets, and the artifact-copy verbs are in the
+per-target verb flags, and the artifact-copy verbs are in the
 [command reference](/reference/cli/commands/).
 
 ## Agent tooling
@@ -269,7 +276,8 @@ planning-only cloud targets, and the artifact-copy verbs are in the
   caption: "AI agent commands",
   rows: [
     { name: "Install agent tooling", type: "netscript agent init", desc: "Install NetScript MCP, consumer tools, and skills. Use <code>--editor none|zed|vscode</code> to apply editor-native setup to a new or existing project; one existing editor directory is detected by default. Use <code>--host claude|vscode|all</code> for agent hosts and <code>--with-docs</code> for the exact-version offline corpus." },
-    { name: "Run the MCP server", type: "netscript agent mcp", desc: "Start the NetScript MCP server over standard input/output." }
+    { name: "Run the MCP server", type: "netscript agent mcp", desc: "Start the NetScript MCP server over standard input/output." },
+    { name: "Record drift", type: "netscript agent drift record --resource <name> --summary <text>", desc: "Record an evidence-gated drift note after a fresh successful diagnostic pass. The record is rejected unless the evidence for <code>--resource</code> is present on disk, so it cannot be written from memory. <code>--details &lt;text&gt;</code> is optional." }
   ]
 }) }}
 

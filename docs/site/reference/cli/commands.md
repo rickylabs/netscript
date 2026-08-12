@@ -56,6 +56,23 @@ the [quickstart](/quickstart/); every flag is:
 | --- | --- |
 | `netscript agent init` | Install NetScript MCP, consumer diagnostic tools, and skills for detected agent hosts, and apply editor setup to a new or existing project. Claude Code writes `.mcp.json` and installs the skill bundle; VS Code writes `.vscode/mcp.json`; Zed writes `.zed/settings.json` `context_servers`. Flags: `--host <host>` (`claude`, `vscode`, or `all`); `--editor <editor>` (`none`, `zed`, or `vscode`, inferred from one existing editor directory when omitted); `--with-docs` installs the expanded exact-version corpus. Unsupported editors fail with manual-configuration guidance. |
 | `netscript agent mcp` | Start the stdio MCP server for an MCP client. Interactive use prints Zed/VS Code setup guidance; see [Agent tooling](/ai/agent-tooling/). Flags: `--endpoint <url>` (telemetry endpoint), `--project-root <path>`, `--docs-root <path>` (public documentation root). |
+| `netscript agent drift <sub>` | Manage evidence-gated agent drift records. The group itself prints help; `record` is its only subcommand. |
+
+### `agent drift` subcommands
+
+| Command | Description |
+| --- | --- |
+| `netscript agent drift record` | Record drift after a fresh successful diagnostic pass. Flags: `--resource <name>` (**required**), `--summary <text>` (**required**), `--details <text>`. |
+
+The gate is the point. `record` appends an entry only when a diagnostic **receipt** for
+`--resource` exists, exited `0`, and is **less than 15 minutes old**; the receipt itself is
+embedded in the entry. Anything else — no receipt, a failed one, a future timestamp, or a
+stale one — is refused with a non-zero exit and a message naming how to produce a fresh
+receipt (`netscript plugin doctor --resource <name>`, or the MCP `doctor`, telemetry, API
+introspection, or `execute_command` tools). A drift note therefore cannot be written from
+an agent's recollection of a run it did not just perform.
+
+The same gate backs the MCP `record_drift` tool, so both surfaces refuse identically.
 
 ## `config` — inspect and mutate configuration
 
@@ -65,6 +82,7 @@ runtime overrides.
 | Command | Description |
 | --- | --- |
 | `netscript config inspect` | Inspect the resolved project configuration. Flags: `--project-root <path>`, `--json` (emit the JSON-stable inspection report). |
+| `netscript config list [filter]` | List the canonical `appsettings` paths the generator reads, with each path's current value. The optional positional `[filter]` narrows the listing. Paths present in `appsettings.json` but **not** read by the generator are marked `(not read by the generator)` — which is what makes this the command for finding a setting that is being ignored. Flags: `--project-root <path>`, `--json`. |
 | `netscript config get <path>` | Read a resolved configuration value. Flags: `--project-root <path>`, `--json`. |
 | `netscript config set <path> <value>` | Set a generated `appsettings` configuration value. Flag: `--project-root <path>`. |
 | `netscript config override <sub>` | Manage runtime overrides (see below). |
@@ -125,6 +143,15 @@ the [CLI reference](/cli-reference/#plugins). The full group also carries:
 | `netscript plugin disable <pkg> [args...]` | Run a plugin's published `disable` command. Flag: `--project-root <path>`. |
 | `netscript plugin setup <pkg> [args...]` | Run a plugin's published `setup` command. Flag: `--project-root <path>`. |
 | `netscript plugin auth <sub>` | Configure auth and manage sessions (see below). |
+| `netscript plugin ai <verb> [...args]` | Configure AI tools, agents, models, providers, and MCP servers. Flag: `--project-root <path>` (the only flag NetScript consumes). |
+
+`plugin ai` is a **pass-through**, not a command group with its own verbs. NetScript strips
+`--project-root`, then runs the installed `@netscript/plugin-ai` package's CLI in a child
+`deno run` process and forwards every remaining argument verbatim, printing its output and
+propagating its exit code. The verb vocabulary therefore belongs to that plugin's release,
+not to this reference — run `netscript plugin ai --help` against your installed version, and
+see the [`@netscript/plugin-ai` reference](/reference/plugin-ai/). Invoking it with no verb
+is an error.
 
 ### `plugin auth` subcommands
 
@@ -200,34 +227,69 @@ modified — your edits are never overwritten. See
 
 ## `deploy` — cloud and container targets
 
-The [CLI reference](/cli-reference/#deploy) covers the wired Deno Deploy and Windows
-Service (Servy) paths. The `deploy` group also exposes a family of cloud and container
-targets, plus artifact-copy and log verbs.
+The [CLI reference](/cli-reference/#deploy) covers the Deno Deploy and OS service (Servy)
+paths. The `deploy` group also exposes a family of routed cloud and container targets, the
+packaging verbs, and artifact-copy and log verbs.
 
-### Cloud and container targets
+### Discovering targets
 
-Each target below shares the same three-verb lifecycle — `plan`, `up`, `down`:
-
-| Command group | Description |
+| Command | Description |
 | --- | --- |
-| `netscript deploy kubernetes <verb>` | Manage the Kubernetes deployment target. |
-| `netscript deploy azure-aca <verb>` | Manage the Azure Container Apps deployment target. |
-| `netscript deploy azure-app-service <verb>` | Manage the Azure App Service deployment target. |
-| `netscript deploy azure-aks <verb>` | Manage the Azure Kubernetes Service deployment target. |
-| `netscript deploy cloud-run <verb>` | Manage the Google Cloud Run deployment target. |
+| `netscript deploy list` | List registered deploy targets and operations. Prints `key`, advertised operations, and label per line. Flag: `--json` (emit machine-readable target descriptors). |
 
-The three lifecycle verbs are:
+`deploy list` reads the live registry, so it is the authoritative answer to "which targets
+exist and what can each one do" for the CLI you actually have installed. Ten targets are
+registered by default: `azure-aca`, `azure-aks`, `azure-app-service`, `cloud-run`,
+`compose`, `deno-deploy`, `docker`, `kubernetes`, `linux-service`, `windows-service`.
+
+### Routed cloud and container targets
+
+These seven groups are generated by one router. Each is a thin command that parses flags and
+dispatches to a registry-resolved adapter; the adapter holds all target-specific logic.
+
+| Command group | Verbs | Description |
+| --- | --- | --- |
+| `netscript deploy docker <verb>` | `plan` `up` `down` `status` `logs` | Manage the Docker image deployment target. |
+| `netscript deploy compose <verb>` | `plan` `up` `down` `status` `logs` | Manage the Docker Compose deployment target. |
+| `netscript deploy kubernetes <verb>` | `plan` `up` `down` | Manage the Kubernetes deployment target. |
+| `netscript deploy azure-aca <verb>` | `plan` `up` `down` | Manage the Azure Container Apps deployment target. |
+| `netscript deploy azure-app-service <verb>` | `plan` `up` `down` | Manage the Azure App Service deployment target. |
+| `netscript deploy azure-aks <verb>` | `plan` `up` `down` | Manage the Azure Kubernetes Service deployment target. |
+| `netscript deploy cloud-run <verb>` | `plan` `up` `down` | Manage the Google Cloud Run deployment target. |
+
+The verb lists differ because **a target only gets a subcommand for an operation it
+advertises**. The router walks a fixed candidate list — `plan`, `up`, `down`, `status`,
+`logs`, `rollback`, `secrets` — and skips any operation missing from the adapter's
+`operations`, so a target never exposes a verb it cannot perform. The two container targets
+advertise `status` and `logs`; the five cloud targets do not.
+
+Running a target group with no verb prints help, as every command group in the CLI does.
+That is the group's default action, not a sign that the target is unimplemented.
 
 | Verb | Description |
 | --- | --- |
 | `plan` | Emit or preflight deployment artifacts. |
 | `up` | Bring the deployment up. |
 | `down` | Bring the deployment down. |
+| `status` | Show deployment status. |
+| `logs` | Show deployment logs. |
 
-Every verb on every target shares the same flags: `--project-root <dir>`,
+Every routed verb on every target shares the same flags: `--project-root <dir>`,
 `--output-dir <dir>` (directory for emitted deployment artifacts),
 `--environment <name>` (deployment environment passed to the target), `--clear-cache`
 (clear target deployment state and do not persist new values), and `--non-interactive`.
+
+### Packaging
+
+| Command | Description |
+| --- | --- |
+| `netscript deploy desktop <sub>` | Package and publish native Deno Desktop applications. The group prints help; `package` and `release` do the work. |
+| `netscript deploy desktop package` | Package an enabled desktop app into Deno Desktop native formats. The target OS and architecture are the host's, resolved at run time; an unsupported host fails rather than producing a wrong artifact. |
+| `netscript deploy desktop release <sub>` | Prepare, sign, and serve a native release. |
+| `netscript deploy package-cli` | Compile the NetScript CLI itself into a self-shippable Windows `.exe`. Flags: `-o, --output-dir <dir>` (default `./.deploy/windows`; a `scripts/` subdirectory is used), `--target <triple>` (default `x86_64-pc-windows-msvc`), `--no-bundle` (compile directly from source — larger output), `-v, --verbose`. |
+
+`package-cli` bundles before compiling by default and falls back to compiling from source if
+the bundle step fails, so `--no-bundle` is a size/behaviour trade-off rather than a repair.
 
 ### Artifact copy, logs, and upgrade
 
