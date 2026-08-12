@@ -124,7 +124,7 @@ Written at lane close. Release ownership hands to **ns006-fixes**; this lane dis
 | #1607 | #1577 | `1f9efb4d` |
 | #1600 | #1569 | `6aee2b414` |
 | #1602 | #1576, #1568 | `1ed78f508` |
-| #1605 | #1562 | at ready-merge on `6a5692d84` |
+| #1605 | #1562 | `bfcf4ed11` |
 
 Earlier in the run: #1457, #1459, #1548, #1571, #1580, #1227, plus Canary.3 and the terminal-green
 Canary.4.
@@ -187,5 +187,22 @@ being named.
 
 ## Handover
 
-Canary.5's blockers are #1599 (merged, `canary:0.0.6-canary.5`) and #1605. After #1605 lands, 0.0.6
-holds only docs-owned #1531. **No release dispatched from this lane.**
+Canary.5's blockers are both cleared: #1599 merged with `canary:0.0.6-canary.5`, and #1605 merged at
+`bfcf4ed11`. **The runtime / public-surface lane is empty.**
+
+0.0.6 now holds one open issue, docs-owned **#1531**, with its PR **#1608** non-draft.
+
+**No release was dispatched from this lane**, and none should be inferred from these artifacts.
+Release ownership hands to **ns006-fixes**.
+
+## Control PR #1555 — closed, not merged
+
+Closed as a non-merge orchestration record at owner direction, so it does not sit open against the
+milestone. It carried **only** `.llm/runs/**` — verified at `4560ef9e5`, 72 commits ahead of `main`,
+with **0** non-run-artifact files in its diff.
+
+**Consequence worth stating: the artifacts live only on `chore/release-0.0.6-runtime-reopen`.** The
+lane's first control PR (#1525) was merged at `0f0b6b6a3`, so that evidence reached `main`; this one
+did not. Deleting the branch would destroy the whole reopen evidence trail — every drift entry (D-1
+through D-14), every slice brief, every pre-merge gate record, and this retrospective. **Do not prune
+it as a stale chore branch.**
