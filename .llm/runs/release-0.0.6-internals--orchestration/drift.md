@@ -1071,3 +1071,59 @@ completed/failure   59e435c5d   12:03:58Z
 - **Acceptance:** box 1 stands as worded — the concurrent-removal case is handled inside the caller so the
   transition completes normally; the non-fatal path applies only to other failures. The implementer defended
   the stronger reading with a reason instead of stretching the box.
+
+## D-33 — the two steps were never independent: dispatch depends on the transition through GitHub's event history
+
+- **Severity:** significant (falsifies my own review claim and the slice's independence test)
+- **Recorded:** 2026-08-12, run `31598386001`, PR #1567 head `5b4d8caf5`
+- **What I predicted:** that `continue-on-error` on the transition step would let dispatch proceed, so the
+  bootstrap `ERR_MODULE_NOT_FOUND` would be cosmetic and the PR would demonstrate its own fix. **Wrong.**
+- **What actually happened, step by step:**
+
+```text
+4. success   Check out trusted phase-eval scripts
+5. success   Enter IMPL-EVAL status on ready transition        (conclusion success, outcome failure)
+6. success   Record attributed IMPL-EVAL status-transition failure   <- the diagnostic fired correctly
+7. FAILURE   Resolve and dispatch exactly one evaluator
+             Error: No labeled-event generation found for status:impl-eval.
+```
+
+  So the `continue-on-error` design worked exactly as built — the transition failed truthfully, the attributed
+  diagnostic fired, and **dispatch did run**. Dispatch then failed on its own.
+
+- **The real dependency, and why it was invisible.** Dispatch resolves
+  `expectedStatus = phase === 'plan' ? 'status:plan-eval' : 'status:impl-eval'` and then requires a
+  **labeled-event generation** for it. That generation only exists if the label was actually applied,
+  producing a `labeled` event. The transition failed, so `status:impl-eval` was never applied, so no
+  generation existed, so dispatch threw.
+
+  The two steps are therefore **not independent**: dispatch has a runtime data dependency on the transition,
+  mediated through **GitHub's event history** rather than through step `if:` conditions. The implementer's
+  claim that dispatch "has no dependency on checkout or transition outcomes" was true of the *conditions* and
+  false of the *data flow*, and my review repeated it.
+- **This is exactly the gap the slice's own test could not close, and the implementer said so.** Its
+  workflow-policy test extracts named step blocks and asserts *declared* independence; it flagged that as
+  "static workflow-policy evidence, not a simulation of runner semantics". That caveat turned out to name the
+  decisive limitation. A test that asserts what the YAML declares cannot see a dependency carried in
+  repository state.
+- **My error, for the third time this session:** I traced the step conditions, saw no dependency, and asserted
+  dispatch would *succeed* — reasoning one step past what I had verified. The first two were asserting an
+  absence without the probe that finds the presence (the sagas supersession record) and asserting a mechanism
+  without the probe that identifies it (the stale-base attribution). Same shape each time, and each time the
+  missing step was cheap: read the run, run the range, trace the data flow.
+- **Owner direction:** return #1567 to draft/`status:impl` (done), fix the bootstrap shape before retry —
+  either keep the trusted workflow **self-contained** for the first landing (inline the narrow
+  live-label/idempotent cleanup, with its helper contract still independently tested) or split a helper-only
+  landing ahead of workflow adoption. No manual OpenHands trigger, no Fable.
+- **Chosen: self-contained first landing.** It removes the import, so there is no bootstrap problem to work
+  around rather than a smaller one; the helper and its tests still land so acceptance boxes 2–5 stay provable;
+  and it is one PR rather than two. A follow-up can switch the workflow to import the helper **once it is
+  reachable from trusted `main`**, deleting the inline copy — the ordering that was wrong here, done in the
+  right order.
+- **Declining the offered IMPL-EVAL waiver.** The owner offered `impl-eval:skip` under the small-deterministic
+  waiver. **Not taking it.** This PR changes the evaluator dispatch path itself, and `drift.md` D-14 records
+  this lane's position that a PR changing gate semantics is exactly the class needing an independent pass — a
+  position that has now been vindicated twice on this PR alone, since both the bootstrap self-block and this
+  event-history dependency were found by running the thing rather than reading it. With the import removed the
+  transition succeeds, the label is applied, the generation exists, and automatic DeepSeek runs exactly once.
+  The waiver would save one run and remove the only check that has caught anything here.
