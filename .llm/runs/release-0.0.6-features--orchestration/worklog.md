@@ -1643,3 +1643,44 @@ decision.
    a draft PR, and cancelled scaffold rows that check 4 treats as *absent* rather than passing. Having
    a **duration baseline** turns "looks green" into a comparable number. **Applied to every remaining
    canary in this lane.**
+
+## 2026-08-12 — #1589 dispatched in parallel; independence verified, not assumed
+
+The #1589 worktree existed at `fc312f211` with **no implementation process** while #1583 ran — the P0
+singleton closure was one step from disappearing behind the task list. Caught by supervision, not by
+me.
+
+**Independence checked concretely before dispatching in parallel:**
+
+| | #1583 (live) | #1589 |
+| --- | --- | --- |
+| Files | `packages/fresh/src/runtime/ai/**` only — currently `create-chat-connection_test.ts` | `packages/sdk/src/cache/cache-provider.ts`, `.llm/tools/validation/**` |
+| Test suite | `deno task --cwd packages/fresh test` | `--cwd packages/sdk` + validator tests |
+| Shared file | **none** | |
+
+The one theoretical overlap — a peer-closure declaration touching `packages/fresh/deno.json` —
+**does not exist**: that manifest does not declare `@netscript/sdk` at all. So they are **file and
+suite independent** and run concurrently.
+
+Each brief also fences the other's subtree explicitly, so independence is enforced by instruction as
+well as by observation.
+
+### Dispatched plan-first, not implementation-first
+
+#1589's brief is **plan-first by design**: research + concrete plan + draft PR at plan phase, then
+**stop**. Implementation waits on PLAN-EVAL, because choosing among (1) build/init rejection of
+incoherent closures, (2) a declared peer closure, and (3) moving the provider off module-local state
+is a genuine design decision. Option (3) in particular raises a question nobody has answered — with
+two versions loaded, **which implementation legitimately owns the singleton?** — and that is not a
+call to make inside a P0 implementation slice.
+
+The brief carries the located mechanism so it is not re-derived, ranks the options, requires a
+**false-positive analysis** (legitimate multi-version cases must not break), and requires the new
+failure message to **name the incoherent closure and versions** — the whole point is to eliminate a
+runtime "Cache provider not initialized" in favour of an actionable one.
+
+It also states the `isPartial` trap explicitly: #1589's symptom appears on partial navigation, and
+"guard the cache access on `isPartial`" would implement the forbidden pattern while appearing to fix
+it. **Any plan containing that shape is wrong.**
+
+Both P0s are now live and visible: **#1583** implementing, **#1589** planning.
