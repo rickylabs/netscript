@@ -23,3 +23,13 @@ out-of-scope `.llm/tools/harness/extract-verdict.ts`. PR-B boundaries allow chan
 fitness and quality tool subtrees, so this slice does not edit that file. A focused format check of
 all owned TypeScript is green; the root-wrapper residue is escalated rather than folded into this
 PR.
+
+## D-3 — significant: repaired PR scan truthfully reds on two pre-existing comment false positives
+
+The exact workflow-equivalent changed-file scan at `ca52c3a8f` executes and exits **1** on
+`.llm/tools/fitness/check-doctrine.ts:169` and `:237`. Both lines contain the English word “any” in
+comments; neither is TypeScript `any`. They predate PR-B's semantic changes but become visible
+because the repaired gate scans the changed tool file. C6 forbids fixing surfaced findings here,
+and the boundaries forbid allowance comments, so both are recorded in `triage.md` without a fix.
+This is evidence that C4 is no longer silently green, but it also prevents the workflow job from
+being green at this head.

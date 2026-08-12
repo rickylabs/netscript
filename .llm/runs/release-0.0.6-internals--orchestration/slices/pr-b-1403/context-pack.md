@@ -17,8 +17,9 @@
 - The PR selector includes `packages`, `plugins`, and `.llm/tools`, reports empty explicitly, and
   diffs `BASE...HEAD`.
 - Findings are triaged only; package/plugin source is out of scope.
-- `triage.md` records exactly 1 actionable `plugin-streams-core` doctrine finding; the focused
-  quality scan is green with zero findings and zero allowances.
+- `triage.md` records 3 surfaced findings: 1 actionable `plugin-streams-core` doctrine warning and
+  2 changed-tool scanner false positives in existing comments. The focused package quality scan is
+  green with zero findings and zero allowances.
 
 ## Next
 

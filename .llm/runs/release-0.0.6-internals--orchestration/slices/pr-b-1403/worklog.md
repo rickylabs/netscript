@@ -63,3 +63,10 @@ fixtures, not inferred from the final implementation.
 - Scoped format wrapper (`--root .llm/tools --ext ts`) — exit **1** solely for pre-existing,
   out-of-scope `.llm/tools/harness/extract-verdict.ts`; every owned TS file passes. See D-2.
 - `code-quality.yml` — `@std/yaml` parse exit **0**; draft workflow policy tests 3/3 pass.
+- Workflow-equivalent changed-file scan at `ca52c3a8f` — exit **1** on 2 pre-existing comment false
+  positives, both recorded in `triage.md`; see D-3.
+- `deno task quality:gate` — exit **1**: default quality scan is green, then the discovered-root
+  doctrine half fails on the 54 known A14 findings from D-1.
+- `deno task quality:scan:repo` — exit **0**, 0 findings, 8 allowances.
+- `deno task gen:assets-barrel` second run — exit **0** and `git status --porcelain` empty;
+  generated assets are fresh and idempotent.
