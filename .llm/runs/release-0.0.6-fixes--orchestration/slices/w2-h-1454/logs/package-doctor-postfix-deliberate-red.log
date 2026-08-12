@@ -1,0 +1,37 @@
+Task e2e:cli deno run --allow-all packages/cli/e2e/cli.ts 'gate' 'scaffold.plugins' 'behavior.package-backed-plugin-doctor' '--cleanup' '--format' 'pretty'
+Running scaffold.plugins
+> behavior.package-backed-plugin-doctor: Validate package-backed plugin doctor truth
+  FAILED 1884ms
+    Command exited 1; expected 0.
+    PACKAGE_BACKED_PLUGIN_DOCTOR_FAIL
+    - doctor did not report published permissions: @netscript/plugin-workers	healthy	Permission metadata	--unstable-kv --allow-net --allow-env --allow-read --allow-write --allow-run
+    - doctor did not report published permissions: @netscript/plugin-streams	healthy	Permission metadata	--allow-net --allow-env --allow-read --allow-write --allow-sys --allow-ffi
+    - generated plugin AppHost helper lacks workers manifest permissions
+    - generated plugin AppHost helper lacks streams manifest permissions
+    - generated background AppHost helper lacks workers manifest permissions
+    --- doctor output ---
+    Plugin	Status	Check	Message
+    apphost	warning	Aspire AppHost running	No AppHost is running for this project. Start it and rerun plugin doctor.
+    @netscript/plugin-workers	healthy	Configured module resolves	jsr:@netscript/plugin-workers@0.0.5
+    @netscript/plugin-workers	healthy	Configured module exports manifest	jsr:@netscript/plugin-workers@0.0.5
+    @netscript/plugin-workers	healthy	Service entrypoint resolves	jsr:@netscript/plugin-workers@0.0.5/services
+    @netscript/plugin-workers	healthy	Manifest resolved	Background Workers
+    @netscript/plugin-workers	healthy	Installation source	Package-backed (jsr:@netscript/plugin-workers@0.0.5); no local workdir required
+    @netscript/plugin-workers	healthy	Permission metadata	--allow-net
+    @netscript/plugin-workers	healthy	generated job registry exists	.netscript/generated/plugin-workers/job-registry.ts
+    @netscript/plugin-workers	healthy	generated job registry is non-empty	Generated job definitions are present.
+    @netscript/plugin-workers	healthy	every declared job is registered	1 declared job(s) are present in handler and definition maps.
+    @netscript/plugin-streams	healthy	Configured module resolves	jsr:@netscript/plugin-streams@0.0.5
+    @netscript/plugin-streams	healthy	Configured module exports manifest	jsr:@netscript/plugin-streams@0.0.5
+    @netscript/plugin-streams	healthy	Service entrypoint resolves	jsr:@netscript/plugin-streams@0.0.5/services
+    @netscript/plugin-streams	healthy	Manifest resolved	Durable Streams
+    @netscript/plugin-streams	healthy	Installation source	Package-backed (jsr:@netscript/plugin-streams@0.0.5); no local workdir required
+    @netscript/plugin-streams	healthy	Permission metadata	--allow-net
+Summary: passed=0 failed=1 skipped=0
+error: Uncaught (in promise) RemoteError: CLI E2E gate failed
+      if (!report.ok) throw new RemoteError(1, 'CLI E2E gate failed');
+                            ^
+    at Command.<anonymous> (file:///home/codex/repos/ns006-w2-1454/packages/cli/e2e/src/presentation/cli/commands/gate-command.ts:29:29)
+    at async Command.execute (https://jsr.io/@cliffy/command/1.2.1/command.ts:2431:5)
+    at async Command.parseCommand (https://jsr.io/@cliffy/command/1.2.1/command.ts:2246:14)
+    at async file:///home/codex/repos/ns006-w2-1454/packages/cli/e2e/cli.ts:12:3

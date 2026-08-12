@@ -1544,3 +1544,47 @@ call" does not prevent it. **Verifying the count after every transition** is wha
 | #1460 | #1578 | `efb5182f1` | shipped |
 | #1540 | #1573 | `7aa4aadfd` | shipped |
 | #1454 | #1574 | — | plan PASS (Opus 5 medium, opposite-family), implementing |
+
+## 2026-08-12 — Retracted: a proposed silent downgrade of #1454's runtime acceptance row
+
+I told the owner that if the serialized `scaffold.runtime` slot proved unobtainable I would land
+#1454's doctor fix on its focused red→green evidence and route runtime-tier verification to a
+follow-up issue.
+
+**Retracted.** That is a silent downgrade of a required acceptance row, and the owner correctly
+rejected it. Contention is a **scheduling** problem; it is not a reason to weaken what the issue must
+prove. #1454's own plan makes the composite E2E — `behavior.package-backed-plugin-doctor` over
+published workers + streams, generated registries, permission metadata, and doctor output/exit code
+— the **enforcement lever** for the issue. An issue whose enforcement lever is deferred is not
+closed, it is asserted.
+
+Note the shape of my error: I proposed the downgrade *pre-emptively*, before any contention had
+actually blocked anything. The slot was in fact **free** — zero `e2e-cli` runs in flight, and the
+other lane's current slice (#1584, `fix/1227-quickstart-restore-retry`) is unit/static and holds no
+runtime slot. I was budgeting for a blocker that did not exist and pricing it in acceptance.
+
+### Corrected sequence, sent to the slice
+
+1. Focused unit/contract/static gates green, including `quality:gate` (required — `packages/**` and
+   `plugins/**`).
+2. E2E negative case demonstrated **at the focused level**: gate landed before the product fix and
+   shown red against the baseline, then a narrow-seam break shown red post-fix. Untruncated both
+   times.
+3. Slice **asks** for the runtime slot; the orchestrator acquires and holds it. The slice never
+   starts `scaffold.runtime` itself.
+4. Composite gate run, untruncated result recorded.
+
+### If the runtime proof is genuinely blocked after a bounded attempt
+
+- **Leave the runtime acceptance row unticked.** Focused red→green proves the guard works; it does
+  not prove the published-package runtime path.
+- **File and evidence the blocker** — attempts, run ids, exact failure or contention, what remains
+  unproven.
+- **Do not merge while claiming it proven.** Whether to hold the PR or convert `Closes #1454` to
+  `Refs #1454` with remaining scope on the issue is an orchestrator/owner decision, not something the
+  slice routes around by rewording a box.
+
+Restated to the slice: a CANCELLED or SKIPPED runtime job is a **did-not-run, not a pass**. This lane
+has watched that gate produce a non-verdict three separate ways — SKIPPED while draft,
+SUCCESS-by-classifier-short-circuit (only step 2 vs step 10 distinguishes it from a real run), and
+CANCELLED by cross-lane contention.

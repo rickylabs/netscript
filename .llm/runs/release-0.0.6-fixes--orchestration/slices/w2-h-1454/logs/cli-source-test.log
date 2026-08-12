@@ -1,0 +1,187 @@
+Check packages/cli/module_import_side_effect_test.ts
+Check packages/cli/scaffolding_test.ts
+Check packages/cli/src/kernel/adapters/aspire/apphost-doctor-inspector_test.ts
+Check packages/cli/src/kernel/adapters/aspire/aspire-cloud-deploy-target_test.ts
+Check packages/cli/src/kernel/adapters/aspire/aspire-compose-deploy-target_test.ts
+Check packages/cli/src/kernel/adapters/config/configured-plugin-manifest-summary_test.ts
+Check packages/cli/src/kernel/adapters/config/deploy-config-resolvers.test.ts
+Check packages/cli/src/kernel/adapters/config/deploy-config-resolvers_test.ts
+Check packages/cli/src/kernel/adapters/config/plugin-permission-precedence_test.ts
+Check packages/cli/src/kernel/adapters/config/plugin-registry.test.ts
+Check packages/cli/src/kernel/adapters/config/project-config-loader_test.ts
+Check packages/cli/src/kernel/adapters/contracts/contract-source_test.ts
+Check packages/cli/src/kernel/adapters/database/apphost-lifecycle-lock_test.ts
+Check packages/cli/src/kernel/adapters/database/operation-runner-helpers_test.ts
+Check packages/cli/src/kernel/adapters/database/operation-runner_test.ts
+Check packages/cli/src/kernel/adapters/database/scaffolder_test.ts
+Check packages/cli/src/kernel/adapters/database/workspace-mutator_remove_test.ts
+Check packages/cli/src/kernel/adapters/database/workspace-resolver_test.ts
+Check packages/cli/src/kernel/adapters/deno-deploy/deno-deploy-cli_test.ts
+Check packages/cli/src/kernel/adapters/deploy/compile/compile-platform_test.ts
+Check packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+Check packages/cli/src/kernel/adapters/deploy/runtime-detect_test.ts
+Check packages/cli/src/kernel/adapters/health/fetch-health-probe_test.ts
+Check packages/cli/src/kernel/adapters/linux/systemd/systemd-environment_test.ts
+Check packages/cli/src/kernel/adapters/linux/systemd/systemd_test.ts
+Check packages/cli/src/kernel/adapters/plugin/db-integration_test.ts
+Check packages/cli/src/kernel/adapters/plugin/plugin-reference-reconciler_test.ts
+Check packages/cli/src/kernel/adapters/plugin/scaffolder_test.ts
+Check packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts
+Check packages/cli/src/kernel/adapters/runtime/file-system/deno-file-system_test.ts
+Check packages/cli/src/kernel/adapters/runtime/process/deno-process_test.ts
+Check packages/cli/src/kernel/adapters/scaffold/tests/dry-run-fs_test.ts
+Check packages/cli/src/kernel/adapters/scaffold/tests/fresh-adapter_test.ts
+Check packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts
+Check packages/cli/src/kernel/adapters/scaffold/tests/scaffolder_test.ts
+Check packages/cli/src/kernel/adapters/scaffold/tests/template-adapter_test.ts
+Check packages/cli/src/kernel/adapters/scaffold/tests/workspace-writer_test.ts
+Check packages/cli/src/kernel/adapters/secrets/env-file-secrets-store_test.ts
+Check packages/cli/src/kernel/adapters/service/client-scaffolder_test.ts
+Check packages/cli/src/kernel/adapters/service/router-source_test.ts
+Check packages/cli/src/kernel/adapters/service/scaffolder_test.ts
+Check packages/cli/src/kernel/adapters/templates/template-asset_test.ts
+Check packages/cli/src/kernel/adapters/windows/manifest/manifest-resolver_test.ts
+Check packages/cli/src/kernel/application/plugin/registered-plugin-source_test.ts
+Check packages/cli/src/kernel/application/registries/template-registry_test.ts
+Check packages/cli/src/kernel/application/scaffold/orchestrate-init_test.ts
+Check packages/cli/src/kernel/application/scaffold/plan-init_test.ts
+Check packages/cli/src/kernel/application/scaffold/support/format-generated-files_test.ts
+Check packages/cli/src/kernel/application/scaffold/writers/write-app-files_test.ts
+Check packages/cli/src/kernel/application/ui/registry-deno-json_test.ts
+Check packages/cli/src/kernel/application/ui/registry-lifecycle_test.ts
+Check packages/cli/src/kernel/application/ui/registry-styles.test.ts
+Check packages/cli/src/kernel/application/ui/web-scaffold_test.ts
+Check packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog_test.ts
+Check packages/cli/src/kernel/constants/version-drift_test.ts
+Check packages/cli/src/kernel/domain/deploy/activation-convention_test.ts
+Check packages/cli/src/kernel/domain/deploy/deno-deploy-target_test.ts
+Check packages/cli/src/kernel/domain/deploy/deploy-target-port_test.ts
+Check packages/cli/src/kernel/domain/deploy/health-gate_test.ts
+Check packages/cli/src/kernel/domain/deploy/observability-convention_test.ts
+Check packages/cli/src/kernel/domain/deploy/rollback-convention_test.ts
+Check packages/cli/src/kernel/domain/deploy/secrets-convention_test.ts
+Check packages/cli/src/kernel/domain/deploy/unstable-api-guard_test.ts
+Check packages/cli/src/kernel/domain/scaffold/app-name_test.ts
+Check packages/cli/src/kernel/domain/scaffold/default-port-allocation_test.ts
+Check packages/cli/src/kernel/templates/app/generators-config_test.ts
+Check packages/cli/src/kernel/templates/app/route-templates_test.ts
+Check packages/cli/src/kernel/templates/aspire/generate-aspire-config_test.ts
+Check packages/cli/src/kernel/templates/aspire/generators_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/database-permissions_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/generators-pipeline_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/register-http-endpoint_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/service-environment-runtime_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/service-environment_test.ts
+Check packages/cli/src/kernel/templates/aspire/pristine-scaffold-ports_test.ts
+Check packages/cli/src/kernel/templates/database/generators_test.ts
+Check packages/cli/src/kernel/templates/plugins/generate-plugin-service_test.ts
+Check packages/cli/src/kernel/templates/service/generators_test.ts
+Check packages/cli/src/kernel/templates/workspace/generators_test.ts
+Check packages/cli/src/kernel/templates/workspace/node-modules-verifier_test.ts
+Check packages/cli/src/kernel/templates/workspace/quality-runner_test.ts
+Check packages/cli/src/local/composition/local-contributor-command-tree_test.ts
+Check packages/cli/src/local/features/plugins/install/install-local-plugin_test.ts
+Check packages/cli/src/maintainer/adapters/official-plugin-source_test.ts
+Check packages/cli/src/maintainer/adapters/packages-copier_test.ts
+Check packages/cli/src/maintainer/features/init/init-command_test.ts
+Check packages/cli/src/maintainer/features/root/maintainer-services_test.ts
+Check packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-copy_test.ts
+Check packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-samples_test.ts
+Check packages/cli/src/public/adapters/agent/deno-agent-docs-generator_test.ts
+Check packages/cli/src/public/adapters/jsr-import-resolver_test.ts
+Check packages/cli/src/public/adapters/os-service-factory_test.ts
+Check packages/cli/src/public/adapters/service-activation-port_test.ts
+Check packages/cli/src/public/adapters/systemd-os-service_test.ts
+Check packages/cli/src/public/composition/run-public-cli_test.ts
+Check packages/cli/src/public/domain/scaffold-plan_test.ts
+Check packages/cli/src/public/features/agent/drift/record-drift-command_test.ts
+Check packages/cli/src/public/features/agent/init/init-agent-command_test.ts
+Check packages/cli/src/public/features/agent/init/init-agent_test.ts
+Check packages/cli/src/public/features/agent/mcp/agent-mcp-command_test.ts
+Check packages/cli/src/public/features/agent/mcp/cli-mcp-adapters_test.ts
+Check packages/cli/src/public/features/agent/mcp/command-policy-parity_test.ts
+Check packages/cli/src/public/features/config/override/manage-runtime-overrides_test.ts
+Check packages/cli/src/public/features/config/project/list-appsettings-paths_test.ts
+Check packages/cli/src/public/features/config/project/project-config-ops_test.ts
+Check packages/cli/src/public/features/config/project/resolve-appsettings-path_test.ts
+Check packages/cli/src/public/features/contracts/add-route/add-contract-route_test.ts
+Check packages/cli/src/public/features/contracts/add/add-contract_test.ts
+Check packages/cli/src/public/features/contracts/remove/remove-contract_test.ts
+Check packages/cli/src/public/features/contracts/version-add/add-contract-version_test.ts
+Check packages/cli/src/public/features/db/add/add-db_test.ts
+Check packages/cli/src/public/features/db/operations/db-operation-command_test.ts
+Check packages/cli/src/public/features/deploy/build/deploy_test.ts
+Check packages/cli/src/public/features/deploy/build/prepare-deploy-build_test.ts
+Check packages/cli/src/public/features/deploy/list/list-deploy-targets_test.ts
+Check packages/cli/src/public/features/deploy/target/desktop/desktop-group_test.ts
+Check packages/cli/src/public/features/deploy/target/desktop/package/package-desktop-command_test.ts
+Check packages/cli/src/public/features/deploy/target/desktop/package/package-desktop_test.ts
+Check packages/cli/src/public/features/deploy/target/desktop/package/plan-desktop-packages_test.ts
+Check packages/cli/src/public/features/deploy/target/desktop/release/prepare-native-release_test.ts
+Check packages/cli/src/public/features/deploy/target/desktop/release/prepare-release-command_test.ts
+Check packages/cli/src/public/features/deploy/target/desktop/release/release-store_test.ts
+Check packages/cli/src/public/features/deploy/target/desktop/release/server/release-handler_test.ts
+Check packages/cli/src/public/features/deploy/target/desktop/release/server/serve-release-command_test.ts
+Check packages/cli/src/public/features/deploy/target/desktop/release/sign-release_test.ts
+Check packages/cli/src/public/features/deploy/target/target-deploy-command_test.ts
+Check packages/cli/src/public/features/generate/plugins/generate-plugin-registries-command_test.ts
+Check packages/cli/src/public/features/generate/plugins/installed-runtime-registry-generator_test.ts
+Check packages/cli/src/public/features/generate/plugins/installed-runtime-registry-integration_test.ts
+Check packages/cli/src/public/features/generate/runtime-schemas/generate-runtime-schemas_test.ts
+Check packages/cli/src/public/features/init/init-command_test.ts
+Check packages/cli/src/public/features/marketplace/marketplace-group_test.ts
+Check packages/cli/src/public/features/plugins/ai/ai-plugin-command_test.ts
+Check packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts
+Check packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts
+Check packages/cli/src/public/features/plugins/doctor/doctor-plugin-command_test.ts
+Check packages/cli/src/public/features/plugins/doctor/doctor-plugin-invariants_test.ts
+Check packages/cli/src/public/features/plugins/host/plugin-loader_test.ts
+Check packages/cli/src/public/features/plugins/install/confirm-plugin-install_test.ts
+Check packages/cli/src/public/features/plugins/install/install-plugin_test.ts
+Check packages/cli/src/public/features/plugins/install/manifest-service-shape_test.ts
+Check packages/cli/src/public/features/plugins/install/plugin-package-resolver_test.ts
+Check packages/cli/src/public/features/plugins/install/plugin-trust-tier_test.ts
+Check packages/cli/src/public/features/plugins/list/list-plugins-command_test.ts
+Check packages/cli/src/public/features/plugins/new/new-plugin_test.ts
+Check packages/cli/src/public/features/plugins/remove/remove-plugin_test.ts
+Check packages/cli/src/public/features/plugins/scaffold/scaffold-plugin_test.ts
+Check packages/cli/src/public/features/root/command-registry_test.ts
+Check packages/cli/src/public/features/root/public-command-tree_test.ts
+Check packages/cli/src/public/features/services/add-handler/add-service-handler_test.ts
+Check packages/cli/src/public/features/services/add/add-service_test.ts
+Check packages/cli/src/public/features/services/configure/mutate-service-config_test.ts
+Check packages/cli/src/public/features/services/remove/remove-service_test.ts
+Check packages/cli/src/public/features/ui/add/add-ui-command_test.ts
+Check packages/cli/src/public/features/ui/registry.test.ts
+Check packages/cli/src/public/features/ui/ui-app-root-command_test.ts
+Check packages/cli/src/public/infra/jsr/fetch-jsr-plugin-validator_test.ts
+Check packages/cli/src/public/infra/jsr/verify-jsr-package-integrity_test.ts
+Check packages/cli/src/public/infra/permissions/plugin-scaffold-permissions_test.ts
+Check packages/cli/testing_test.ts
+TS2322 [ERROR]: Type '() => Promise<{ auth: { name: string; workdir: string; rootDir: string; permissions: string[]; cli: { doctorChecks: "auth-backend"[]; }; }; }>' is not assignable to type '(projectRoot: string, config?: NetScriptConfig | undefined) => Promise<Record<string, RegisteredPluginConfig>>'.
+  Type 'Promise<{ auth: { name: string; workdir: string; rootDir: string; permissions: string[]; cli: { doctorChecks: "auth-backend"[]; }; }; }>' is not assignable to type 'Promise<Record<string, RegisteredPluginConfig>>'.
+    Type '{ auth: { name: string; workdir: string; rootDir: string; permissions: string[]; cli: { doctorChecks: "auth-backend"[]; }; }; }' is not assignable to type 'Record<string, RegisteredPluginConfig>'.
+      Property 'auth' is incompatible with index signature.
+        Property 'source' is missing in type '{ name: string; workdir: string; rootDir: string; permissions: string[]; cli: { doctorChecks: "auth-backend"[]; }; }' but required in type 'RegisteredPluginConfig'.
+    loadRegisteredPlugins: () => Promise.resolve({
+    ~~~~~~~~~~~~~~~~~~~~~
+    at file:///home/codex/repos/ns006-w2-1454/packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts:61:5
+
+    'source' is declared here.
+      source: RegisteredPluginSource;
+      ~~~~~~
+        at file:///home/codex/repos/ns006-w2-1454/packages/cli/src/kernel/domain/resolved-config.ts:172:3    The expected type comes from property 'loadRegisteredPlugins' which is declared here on type 'PluginDoctorDependencies'
+      readonly loadRegisteredPlugins?: (
+               ~~~~~~~~~~~~~~~~~~~~~
+        at file:///home/codex/repos/ns006-w2-1454/packages/cli/src/public/features/plugins/doctor/doctor-plugin-use-case.ts:66:12
+
+error: Type checking failed.
+
+  [33minfo:[39m The program failed type-checking, but it still might work correctly.
+  [36mhint:[39m Re-run with [4m--no-check[24m to skip type-checking.

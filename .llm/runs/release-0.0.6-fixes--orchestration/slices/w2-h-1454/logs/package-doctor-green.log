@@ -1,0 +1,5 @@
+Task e2e:cli deno run --allow-all packages/cli/e2e/cli.ts 'gate' 'scaffold.plugins' 'behavior.package-backed-plugin-doctor' '--cleanup' '--format' 'pretty'
+Running scaffold.plugins
+> behavior.package-backed-plugin-doctor: Validate package-backed plugin doctor truth
+  PASSED 1777ms
+Summary: passed=1 failed=0 skipped=0

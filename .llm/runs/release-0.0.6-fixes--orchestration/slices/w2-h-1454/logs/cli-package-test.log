@@ -1,0 +1,491 @@
+Task test (@netscript/cli-e2e) deno test --allow-all tests/
+Task test (@netscript/cli) deno test --allow-all
+[@netscript/cli-e2e#test] Check tests/adapters/commands/docker-resource-cleaner_test.ts
+[@netscript/cli-e2e#test] Check tests/adapters/reporting/pretty-reporter_test.ts
+[@netscript/cli-e2e#test] Check tests/agent/agent-mcp-stdio_test.ts
+[@netscript/cli-e2e#test] Check tests/application/builders/runtime-gates_test.ts
+[@netscript/cli-e2e#test] Check tests/application/builders/suite-builder_test.ts
+[@netscript/cli-e2e#test] Check tests/application/builders/workspace-options_test.ts
+[@netscript/cli-e2e#test] Check tests/application/gates/aspire-dashboard-telemetry_test.ts
+[@netscript/cli-e2e#test] Check tests/application/gates/command-gate_test.ts
+[@netscript/cli-e2e#test] Check tests/application/gates/configure-published-workers-block_test.ts
+[@netscript/cli-e2e#test] Check tests/application/gates/generated-app-endpoint_test.ts
+[@netscript/cli-e2e#test] Check tests/application/gates/http-gate_test.ts
+[@netscript/cli-e2e#test] Check tests/application/gates/local-source-fixture_test.ts
+[@netscript/cli-e2e#test] Check tests/application/gates/probe-app-reference_test.ts
+[@netscript/cli-e2e#test] Check tests/application/gates/quickstart-aspire-walk_test.ts
+[@netscript/cli-e2e#test] Check tests/application/gates/scaffold-gates_test.ts
+[@netscript/cli-e2e#test] Check tests/application/gates/scaffold/generated-app-identity-source-policy_test.ts
+[@netscript/cli-e2e#test] Check tests/application/gates/scaffold/plugin-contract-gates_test.ts
+[@netscript/cli-e2e#test] Check tests/application/gates/scaffold/ui-ai-gates_test.ts
+[@netscript/cli-e2e#test] Check tests/application/gates/verify-live-db-endpoint_test.ts
+[@netscript/cli-e2e#test] Check tests/application/runner/gate-runner_test.ts
+[@netscript/cli-e2e#test] Check tests/application/runner/suite-lease_test.ts
+[@netscript/cli-e2e#test] Check tests/application/runner/suite-runner_test.ts
+[@netscript/cli-e2e#test] Check tests/application/verify-clean-clone-readme_test.ts
+[@netscript/cli-e2e#test] Check tests/presentation/cli-options_test.ts
+[@netscript/cli-e2e#test] Check tests/presentation/cli-program_test.ts
+[@netscript/cli-e2e#test] Check tests/presentation/init-json_test.ts
+[@netscript/cli-e2e#test] Check tests/presentation/quickstart-command-drift_test.ts
+[@netscript/cli-e2e#test] Check tests/presentation/quickstart-walk-suite_test.ts
+[@netscript/cli-e2e#test] Check tests/presentation/suite-registry_test.ts
+    [@netscript/cli#test] Check module_import_side_effect_test.ts
+    [@netscript/cli#test] Check scaffolding_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/aspire/apphost-doctor-inspector_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/aspire/aspire-cloud-deploy-target_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/aspire/aspire-compose-deploy-target_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/config/configured-plugin-manifest-summary_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/config/deploy-config-resolvers.test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/config/deploy-config-resolvers_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/config/plugin-permission-precedence_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/config/plugin-registry.test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/config/project-config-loader_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/contracts/contract-source_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/database/apphost-lifecycle-lock_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/database/operation-runner-helpers_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/database/operation-runner_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/database/scaffolder_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/database/workspace-mutator_remove_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/database/workspace-resolver_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/deno-deploy/deno-deploy-cli_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/deploy/compile/compile-platform_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/deploy/compile/compile_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/deploy/runtime-detect_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/health/fetch-health-probe_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/linux/systemd/systemd-environment_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/linux/systemd/systemd_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/plugin/db-integration_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/plugin/plugin-reference-reconciler_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/plugin/scaffolder_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/plugin/workspace-mutator_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/runtime/file-system/deno-file-system_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/runtime/process/deno-process_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/scaffold/tests/dry-run-fs_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/scaffold/tests/fresh-adapter_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/scaffold/tests/import-resolver_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/scaffold/tests/scaffolder_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/scaffold/tests/template-adapter_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/scaffold/tests/workspace-writer_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/secrets/env-file-secrets-store_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/service/client-scaffolder_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/service/router-source_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/service/scaffolder_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/templates/template-asset_test.ts
+    [@netscript/cli#test] Check src/kernel/adapters/windows/manifest/manifest-resolver_test.ts
+    [@netscript/cli#test] Check src/kernel/application/plugin/registered-plugin-source_test.ts
+    [@netscript/cli#test] Check src/kernel/application/registries/template-registry_test.ts
+    [@netscript/cli#test] Check src/kernel/application/scaffold/orchestrate-init_test.ts
+    [@netscript/cli#test] Check src/kernel/application/scaffold/plan-init_test.ts
+    [@netscript/cli#test] Check src/kernel/application/scaffold/support/format-generated-files_test.ts
+    [@netscript/cli#test] Check src/kernel/application/scaffold/writers/write-app-files_test.ts
+    [@netscript/cli#test] Check src/kernel/application/ui/registry-deno-json_test.ts
+    [@netscript/cli#test] Check src/kernel/application/ui/registry-lifecycle_test.ts
+    [@netscript/cli#test] Check src/kernel/application/ui/registry-styles.test.ts
+    [@netscript/cli#test] Check src/kernel/application/ui/web-scaffold_test.ts
+    [@netscript/cli#test] Check src/kernel/constants/scaffold/scaffold-app-catalog_test.ts
+    [@netscript/cli#test] Check src/kernel/constants/version-drift_test.ts
+    [@netscript/cli#test] Check src/kernel/domain/deploy/activation-convention_test.ts
+    [@netscript/cli#test] Check src/kernel/domain/deploy/deno-deploy-target_test.ts
+    [@netscript/cli#test] Check src/kernel/domain/deploy/deploy-target-port_test.ts
+    [@netscript/cli#test] Check src/kernel/domain/deploy/health-gate_test.ts
+    [@netscript/cli#test] Check src/kernel/domain/deploy/observability-convention_test.ts
+    [@netscript/cli#test] Check src/kernel/domain/deploy/rollback-convention_test.ts
+    [@netscript/cli#test] Check src/kernel/domain/deploy/secrets-convention_test.ts
+    [@netscript/cli#test] Check src/kernel/domain/deploy/unstable-api-guard_test.ts
+    [@netscript/cli#test] Check src/kernel/domain/scaffold/app-name_test.ts
+    [@netscript/cli#test] Check src/kernel/domain/scaffold/default-port-allocation_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/app/generators-config_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/app/route-templates_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/aspire/generate-aspire-config_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/aspire/generators_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/aspire/helpers/tests/database-permissions_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/aspire/helpers/tests/generators-pipeline_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/aspire/helpers/tests/register-http-endpoint_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/aspire/helpers/tests/service-environment-runtime_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/aspire/helpers/tests/service-environment_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/aspire/pristine-scaffold-ports_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/database/generators_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/plugins/generate-plugin-service_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/service/generators_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/workspace/generators_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/workspace/node-modules-verifier_test.ts
+    [@netscript/cli#test] Check src/kernel/templates/workspace/quality-runner_test.ts
+    [@netscript/cli#test] Check src/local/composition/local-contributor-command-tree_test.ts
+    [@netscript/cli#test] Check src/local/features/plugins/install/install-local-plugin_test.ts
+    [@netscript/cli#test] Check src/maintainer/adapters/official-plugin-source_test.ts
+    [@netscript/cli#test] Check src/maintainer/adapters/packages-copier_test.ts
+    [@netscript/cli#test] Check src/maintainer/features/init/init-command_test.ts
+    [@netscript/cli#test] Check src/maintainer/features/root/maintainer-services_test.ts
+    [@netscript/cli#test] Check src/maintainer/features/sync/plugin/copy-official-plugin-copy_test.ts
+    [@netscript/cli#test] Check src/maintainer/features/sync/plugin/copy-official-plugin-samples_test.ts
+    [@netscript/cli#test] Check src/public/adapters/agent/deno-agent-docs-generator_test.ts
+    [@netscript/cli#test] Check src/public/adapters/jsr-import-resolver_test.ts
+    [@netscript/cli#test] Check src/public/adapters/os-service-factory_test.ts
+    [@netscript/cli#test] Check src/public/adapters/service-activation-port_test.ts
+    [@netscript/cli#test] Check src/public/adapters/systemd-os-service_test.ts
+    [@netscript/cli#test] Check src/public/composition/run-public-cli_test.ts
+    [@netscript/cli#test] Check src/public/domain/scaffold-plan_test.ts
+    [@netscript/cli#test] Check src/public/features/agent/drift/record-drift-command_test.ts
+    [@netscript/cli#test] Check src/public/features/agent/init/init-agent-command_test.ts
+    [@netscript/cli#test] Check src/public/features/agent/init/init-agent_test.ts
+    [@netscript/cli#test] Check src/public/features/agent/mcp/agent-mcp-command_test.ts
+    [@netscript/cli#test] Check src/public/features/agent/mcp/cli-mcp-adapters_test.ts
+    [@netscript/cli#test] Check src/public/features/agent/mcp/command-policy-parity_test.ts
+    [@netscript/cli#test] Check src/public/features/config/override/manage-runtime-overrides_test.ts
+    [@netscript/cli#test] Check src/public/features/config/project/list-appsettings-paths_test.ts
+    [@netscript/cli#test] Check src/public/features/config/project/project-config-ops_test.ts
+    [@netscript/cli#test] Check src/public/features/config/project/resolve-appsettings-path_test.ts
+    [@netscript/cli#test] Check src/public/features/contracts/add-route/add-contract-route_test.ts
+    [@netscript/cli#test] Check src/public/features/contracts/add/add-contract_test.ts
+    [@netscript/cli#test] Check src/public/features/contracts/remove/remove-contract_test.ts
+    [@netscript/cli#test] Check src/public/features/contracts/version-add/add-contract-version_test.ts
+    [@netscript/cli#test] Check src/public/features/db/add/add-db_test.ts
+    [@netscript/cli#test] Check src/public/features/db/operations/db-operation-command_test.ts
+    [@netscript/cli#test] Check src/public/features/deploy/build/deploy_test.ts
+    [@netscript/cli#test] Check src/public/features/deploy/build/prepare-deploy-build_test.ts
+    [@netscript/cli#test] Check src/public/features/deploy/list/list-deploy-targets_test.ts
+    [@netscript/cli#test] Check src/public/features/deploy/target/desktop/desktop-group_test.ts
+    [@netscript/cli#test] Check src/public/features/deploy/target/desktop/package/package-desktop-command_test.ts
+    [@netscript/cli#test] Check src/public/features/deploy/target/desktop/package/package-desktop_test.ts
+    [@netscript/cli#test] Check src/public/features/deploy/target/desktop/package/plan-desktop-packages_test.ts
+    [@netscript/cli#test] Check src/public/features/deploy/target/desktop/release/prepare-native-release_test.ts
+    [@netscript/cli#test] Check src/public/features/deploy/target/desktop/release/prepare-release-command_test.ts
+    [@netscript/cli#test] Check src/public/features/deploy/target/desktop/release/release-store_test.ts
+    [@netscript/cli#test] Check src/public/features/deploy/target/desktop/release/server/release-handler_test.ts
+    [@netscript/cli#test] Check src/public/features/deploy/target/desktop/release/server/serve-release-command_test.ts
+    [@netscript/cli#test] Check src/public/features/deploy/target/desktop/release/sign-release_test.ts
+    [@netscript/cli#test] Check src/public/features/deploy/target/target-deploy-command_test.ts
+    [@netscript/cli#test] Check src/public/features/generate/plugins/generate-plugin-registries-command_test.ts
+    [@netscript/cli#test] Check src/public/features/generate/plugins/installed-runtime-registry-generator_test.ts
+    [@netscript/cli#test] Check src/public/features/generate/plugins/installed-runtime-registry-integration_test.ts
+    [@netscript/cli#test] Check src/public/features/generate/runtime-schemas/generate-runtime-schemas_test.ts
+    [@netscript/cli#test] Check src/public/features/init/init-command_test.ts
+    [@netscript/cli#test] Check src/public/features/marketplace/marketplace-group_test.ts
+    [@netscript/cli#test] Check src/public/features/plugins/ai/ai-plugin-command_test.ts
+    [@netscript/cli#test] Check src/public/features/plugins/auth/auth-plugin-command_test.ts
+    [@netscript/cli#test] Check src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts
+    [@netscript/cli#test] Check src/public/features/plugins/doctor/doctor-plugin-command_test.ts
+    [@netscript/cli#test] Check src/public/features/plugins/doctor/doctor-plugin-invariants_test.ts
+    [@netscript/cli#test] Check src/public/features/plugins/host/plugin-loader_test.ts
+    [@netscript/cli#test] Check src/public/features/plugins/install/confirm-plugin-install_test.ts
+    [@netscript/cli#test] Check src/public/features/plugins/install/install-plugin_test.ts
+    [@netscript/cli#test] Check src/public/features/plugins/install/manifest-service-shape_test.ts
+    [@netscript/cli#test] Check src/public/features/plugins/install/plugin-package-resolver_test.ts
+    [@netscript/cli#test] Check src/public/features/plugins/install/plugin-trust-tier_test.ts
+    [@netscript/cli#test] Check src/public/features/plugins/list/list-plugins-command_test.ts
+    [@netscript/cli#test] Check src/public/features/plugins/new/new-plugin_test.ts
+    [@netscript/cli#test] Check src/public/features/plugins/remove/remove-plugin_test.ts
+    [@netscript/cli#test] Check src/public/features/plugins/scaffold/scaffold-plugin_test.ts
+    [@netscript/cli#test] Check src/public/features/root/command-registry_test.ts
+    [@netscript/cli#test] Check src/public/features/root/public-command-tree_test.ts
+    [@netscript/cli#test] Check src/public/features/services/add-handler/add-service-handler_test.ts
+    [@netscript/cli#test] Check src/public/features/services/add/add-service_test.ts
+    [@netscript/cli#test] Check src/public/features/services/configure/mutate-service-config_test.ts
+    [@netscript/cli#test] Check src/public/features/services/remove/remove-service_test.ts
+    [@netscript/cli#test] Check src/public/features/ui/add/add-ui-command_test.ts
+    [@netscript/cli#test] Check src/public/features/ui/registry.test.ts
+    [@netscript/cli#test] Check src/public/features/ui/ui-app-root-command_test.ts
+    [@netscript/cli#test] Check src/public/infra/jsr/fetch-jsr-plugin-validator_test.ts
+    [@netscript/cli#test] Check src/public/infra/jsr/verify-jsr-package-integrity_test.ts
+    [@netscript/cli#test] Check src/public/infra/permissions/plugin-scaffold-permissions_test.ts
+    [@netscript/cli#test] Check testing_test.ts
+[@netscript/cli-e2e#test] running 4 tests from ./tests/adapters/commands/docker-resource-cleaner_test.ts
+[@netscript/cli-e2e#test] docker cleaner treats an absent docker binary as an empty snapshot ... ok (1ms)
+[@netscript/cli-e2e#test] docker cleaner treats a non-zero docker ps as an empty snapshot ... ok (324µs)
+[@netscript/cli-e2e#test] docker cleaner returns no resources when the snapshot has no new containers ... ok (370µs)
+[@netscript/cli-e2e#test] docker cleaner still throws when removing a created container fails ... ok (987µs)
+[@netscript/cli-e2e#test] running 4 tests from ./tests/adapters/reporting/pretty-reporter_test.ts
+[@netscript/cli-e2e#test] pretty reporter aggregate exposes skipped and deferred gate count ... ok (84ms)
+[@netscript/cli-e2e#test] pretty reporter surfaces a failed command reason and stderr ... ok (557µs)
+[@netscript/cli-e2e#test] pretty reporter distinguishes a retried pass ... ok (193µs)
+[@netscript/cli-e2e#test] pretty reporter prints every attempt duration when retries fail ... ok (182µs)
+[@netscript/cli-e2e#test] running 1 test from ./tests/agent/agent-mcp-stdio_test.ts
+[@netscript/cli-e2e#test] agent mcp real CLI stdio smoke ...
+[@netscript/cli-e2e#test] ------- post-test output -------
+[@netscript/cli-e2e#test] ╔═════════════════════════════════════════════════════════════╗
+[@netscript/cli-e2e#test] ║              NetScript — Scaffold New Project               ║
+[@netscript/cli-e2e#test] ╚═════════════════════════════════════════════════════════════╝
+[@netscript/cli-e2e#test] 
+[@netscript/cli-e2e#test] 📁 Creating project "stdio-scaffold"...
+[@netscript/cli-e2e#test]    ✓ Project root (deno.json, netscript.config.ts, .gitignore, README.md)
+[@netscript/cli-e2e#test]    ✓ Frontend app "dashboard" (Fresh framework)
+[@netscript/cli-e2e#test]    ✓ Contracts (v1 stub)
+[@netscript/cli-e2e#test]    ✓ Plugins (empty registry)
+[@netscript/cli-e2e#test]    ✓ Output formatted (deno fmt)
+[@netscript/cli-e2e#test] 
+[@netscript/cli-e2e#test] ✅ Project scaffolded successfully in 0.2s
+[@netscript/cli-e2e#test] 
+[@netscript/cli-e2e#test]   Created: 149 files, 23 directories
+[@netscript/cli-e2e#test] 
+[@netscript/cli-e2e#test] Next steps:
+[@netscript/cli-e2e#test]   1. cd stdio-scaffold
+[@netscript/cli-e2e#test]   2. deno task --cwd apps/dashboard dev  # start Fresh dev server
+[@netscript/cli-e2e#test] 
+[@netscript/cli-e2e#test] ----- post-test output end -----
+[@netscript/cli-e2e#test] agent mcp real CLI stdio smoke ... ok (3s)
+[@netscript/cli-e2e#test] running 18 tests from ./tests/application/builders/runtime-gates_test.ts
+[@netscript/cli-e2e#test] runtime Aspire restore has a bounded infrastructure retry budget ... ok (2ms)
+[@netscript/cli-e2e#test] runtime aspire start gate captures detached endpoint metadata ... ok (312µs)
+[@netscript/cli-e2e#test] live DB endpoint gate reads the detached dashboard metadata path ... ok (250µs)
+[@netscript/cli-e2e#test] app home gate hands the probe a project and an AppHost to resolve the port from ... ok (381µs)
+[@netscript/cli-e2e#test] app home gate can reach a localhost endpoint, not only 127.0.0.1 ... ok (186µs)
+[@netscript/cli-e2e#test] app reference gate runs the real browser probe for the project-derived app ... ok (197µs)
+[@netscript/cli-e2e#test] runtime gates wait for postgres resource by default ... ok (107µs)
+[@netscript/cli-e2e#test] runtime app wait derives the resource name from the scaffold project ... ok (112µs)
+[@netscript/cli-e2e#test] runtime gates include durable workers and sagas CLI parity ... ok (324µs)
+[@netscript/cli-e2e#test] runtime gates prove MCP Aspire endpoint discovery against the live AppHost ... ok (145µs)
+[@netscript/cli-e2e#test] project boundary gate requires the project-derived app name ... ok (347µs)
+[@netscript/cli-e2e#test] workers wait gate requires runtime startup evidence before behavior gates ... ok (142µs)
+[@netscript/cli-e2e#test] runtime gates enumerate every KV-backed first-party background runtime ... ok (186µs)
+[@netscript/cli-e2e#test] AI chat route gate captures generated registry import failures ... ok (75µs)
+[@netscript/cli-e2e#test] runtime gates wait for mysql resource when mysql is selected ... ok (73µs)
+[@netscript/cli-e2e#test] runtime gates skip database resource wait for sqlite ... ok (203µs)
+[@netscript/cli-e2e#test] runtime service health gate asserts only the selected sqlite adapter ... ok (265µs)
+[@netscript/cli-e2e#test] runtime gates wait for mssql resource with extended timeout when mssql is selected ... ok (204µs)
+[@netscript/cli-e2e#test] running 3 tests from ./tests/application/builders/suite-builder_test.ts
+[@netscript/cli-e2e#test] defineCliE2eSuite materializes scaffold.plugins with gates ... ok (3ms)
+[@netscript/cli-e2e#test] defineCliE2eSuite rejects suites without gates ... ok (874µs)
+[@netscript/cli-e2e#test] defineCliE2eSuite rejects an empty suite id ... ok (610µs)
+[@netscript/cli-e2e#test] running 2 tests from ./tests/application/builders/workspace-options_test.ts
+[@netscript/cli-e2e#test] defaultRunOptions targets the maintainer binary entrypoint ... ok (1ms)
+[@netscript/cli-e2e#test] withRepoRootOption derives the maintainer binary entrypoint from the repo root ... ok (1ms)
+[@netscript/cli-e2e#test] running 1 test from ./tests/application/gates/aspire-dashboard-telemetry_test.ts
+[@netscript/cli-e2e#test] live Aspire fetch normalizes trace and log OTLP envelopes ... ok (13ms)
+[@netscript/cli-e2e#test] running 9 tests from ./tests/application/gates/command-gate_test.ts
+[@netscript/cli-e2e#test] command gate never retries an assertion failure ... ok (1ms)
+[@netscript/cli-e2e#test] command gate retries a timeout and records a passing second attempt ... ok (365µs)
+[@netscript/cli-e2e#test] command gate classifies the Deno cancellation marker and retries it ... ok (318µs)
+[@netscript/cli-e2e#test] command gate treats exit 6 without the cancellation marker as an assertion ... ok (240µs)
+[@netscript/cli-e2e#test] command gate distinguishes Deno argument parsing from a product assertion ... ok (311µs)
+[@netscript/cli-e2e#test] command gate keeps an immediate non-parser failure classified as a product assertion ... ok (134µs)
+[@netscript/cli-e2e#test] command gate preserves both timeout durations after retries are exhausted ... ok (206µs)
+[@netscript/cli-e2e#test] command gate without retry configuration executes once ... ok (134µs)
+[@netscript/cli-e2e#test] command gate honors a per-gate timeout and three-attempt infrastructure budget ... ok (171µs)
+[@netscript/cli-e2e#test] running 5 tests from ./tests/application/gates/configure-published-workers-block_test.ts
+[@netscript/cli-e2e#test] published workers rewrite preserves one existing dependency-age argument ... ok (1ms)
+[@netscript/cli-e2e#test] published workers rewrite adds one missing dependency-age argument ... ok (244µs)
+[@netscript/cli-e2e#test] published workers rewrite accepts a formatted Deno argument array ... ok (153µs)
+[@netscript/cli-e2e#test] published workers rewrite adds dependency age to a formatted argument array ... ok (143µs)
+[@netscript/cli-e2e#test] published workers rewrite rejects a block without the Deno config pair ... ok (1ms)
+[@netscript/cli-e2e#test] running 19 tests from ./tests/application/gates/generated-app-endpoint_test.ts
+[@netscript/cli-e2e#test] readPinnedAppPort returns the port the project declares, not a default ... ok (7ms)
+[@netscript/cli-e2e#test] readPinnedAppPort still honours the legacy Port spelling ... ok (1ms)
+[@netscript/cli-e2e#test] the app home URL follows a pinned port rather than a guessed one ... ok (1ms)
+[@netscript/cli-e2e#test] a pristine scaffold pins no port, and that is not an error ... ok (1ms)
+[@netscript/cli-e2e#test] an app absent from appsettings pins nothing ... ok (1ms)
+[@netscript/cli-e2e#test] a non-numeric pinned port is reported, never coerced ... ok (1ms)
+[@netscript/cli-e2e#test] readPinnedAppPort reports an unreadable appsettings rather than guessing ... ok (2ms)
+[@netscript/cli-e2e#test] the app endpoint comes from the resource's declared urls[] ... ok (683µs)
+[@netscript/cli-e2e#test] resolution never returns the dashboard link or a sibling service URL ... ok (361µs)
+[@netscript/cli-e2e#test] a resource resolves by displayName even though name is suffixed ... ok (178µs)
+[@netscript/cli-e2e#test] a relationship stub is never mistaken for the resource ... ok (141µs)
+[@netscript/cli-e2e#test] appUrlsFromDescribeOutput tolerates a banner before the JSON ... ok (116µs)
+[@netscript/cli-e2e#test] appUrlsFromDescribeOutput names what was missing ... ok (504µs)
+[@netscript/cli-e2e#test] app-home probe does not retry terminal endpoint resolution failures ... ok (2ms)
+[@netscript/cli-e2e#test] app-home probe retries while aspire describe has not registered the endpoint ... ok (4ms)
+[@netscript/cli-e2e#test] app-home probe bounds a resource endpoint that never appears ... ok (1ms)
+[@netscript/cli-e2e#test] app-home diagnostics extract the Fresh overlay error and stack ... ok (497µs)
+[@netscript/cli-e2e#test] app-home diagnostics retain a useful bounded fallback for unknown responses ... ok (189µs)
+[@netscript/cli-e2e#test] app-home exhaustion includes the app resource logs ... ok (1ms)
+[@netscript/cli-e2e#test] running 1 test from ./tests/application/gates/http-gate_test.ts
+[@netscript/cli-e2e#test] HTTP gate retries transient request failures within the gate deadline ... ok (262ms)
+[@netscript/cli-e2e#test] running 3 tests from ./tests/application/gates/local-source-fixture_test.ts
+[@netscript/cli-e2e#test] resolveLocalSourceImports maps an explicit package set from its source base ... ok (1ms)
+[@netscript/cli-e2e#test] prepareLocalSourceFixture rewrites selected generated workspace targets ... ok (10ms)
+[@netscript/cli-e2e#test] localSourceFixtureScript prepares a generated project through deno eval ... ok (39ms)
+[@netscript/cli-e2e#test] running 3 tests from ./tests/application/gates/probe-app-reference_test.ts
+[@netscript/cli-e2e#test] reference probe renders every named state at desktop and mobile viewports ... ok (2ms)
+[@netscript/cli-e2e#test] reference probe rejects the old route with no rendered state marker ... ok (956µs)
+[@netscript/cli-e2e#test] reference probe reports a missing semantic marker from the rendered browser DOM ... ok (388µs)
+[@netscript/cli-e2e#test] running 3 tests from ./tests/application/gates/quickstart-aspire-walk_test.ts
+[@netscript/cli-e2e#test] bounded Aspire walk runs restore, start, then waits for postgres ... ok (1ms)
+[@netscript/cli-e2e#test] bounded Aspire walk classifies restore timeout with #1227 and stops ... ok (507µs)
+[@netscript/cli-e2e#test] bounded Aspire walk classifies start timeout independently ... ok (356µs)
+[@netscript/cli-e2e#test] running 10 tests from ./tests/application/gates/scaffold-gates_test.ts
+[@netscript/cli-e2e#test] generated explicit-any probe source remains byte-identical ... ok (1ms)
+[@netscript/cli-e2e#test] --source jsr accepts the local public CLI binary ... ok (1ms)
+[@netscript/cli-e2e#test] scaffold init default command remains byte-identical ... ok (216µs)
+[@netscript/cli-e2e#test] scaffold runtime exercises the generated service port default ... ok (324µs)
+[@netscript/cli-e2e#test] scaffold init disables the cache exactly once ... ok (342µs)
+[@netscript/cli-e2e#test] --source jsr rejects the local contributor CLI binary ... ok (791µs)
+[@netscript/cli-e2e#test] generated check runs the fresh scaffold workspace check task ... ok (743µs)
+[@netscript/cli-e2e#test] generated quality probes cover TS, TSX, plugin, background, and AppHost surfaces ... ok (516µs)
+[@netscript/cli-e2e#test] scaffold contract add gate targets the generated workspace ... ok (614µs)
+[@netscript/cli-e2e#test] published AI lifecycle gate reuses the published CLI version ... ok (393µs)
+[@netscript/cli-e2e#test] running 2 tests from ./tests/application/gates/scaffold/generated-app-identity-source-policy_test.ts
+[@netscript/cli-e2e#test] scaffold gate scripts do not assume the legacy generated app identity ... ok (18ms)
+    [@netscript/cli#test] Check e2e/fixtures/desktop-native/tests/fixture-contract_test.ts
+    [@netscript/cli#test] Check e2e/src/application/gates/quickstart/database-integrity-walk_test.ts
+    [@netscript/cli#test] Check e2e/src/application/gates/scaffold/run-documented-stream-example_test.ts
+    [@netscript/cli#test] Check e2e/src/application/gates/scaffold/select-flow-b-stream-change_test.ts
+    [@netscript/cli#test] Check e2e/src/application/gates/scaffold/service-env/discover-service-subjects_test.ts
+    [@netscript/cli#test] Check e2e/src/application/gates/scaffold/service-env/process-evidence_test.ts
+    [@netscript/cli#test] Check e2e/src/application/gates/scaffold/service-env/service-env-evidence_test.ts
+    [@netscript/cli#test] Check e2e/src/application/gates/scaffold/service-env/service-env-gates_test.ts
+    [@netscript/cli#test] Check e2e/src/application/gates/scaffold/validate-aspire-task-traces_test.ts
+    [@netscript/cli#test] Check e2e/src/application/gates/scaffold/validate-flow-b-traces_test.ts
+    [@netscript/cli#test] Check e2e/src/application/gates/scaffold/verify-producer-reconnect_test.ts
+    [@netscript/cli#test] Check e2e/tests/adapters/commands/docker-resource-cleaner_test.ts
+    [@netscript/cli#test] Check e2e/tests/adapters/reporting/pretty-reporter_test.ts
+    [@netscript/cli#test] Check e2e/tests/agent/agent-mcp-stdio_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/builders/runtime-gates_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/builders/suite-builder_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/builders/workspace-options_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/gates/aspire-dashboard-telemetry_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/gates/command-gate_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/gates/configure-published-workers-block_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/gates/generated-app-endpoint_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/gates/http-gate_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/gates/local-source-fixture_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/gates/probe-app-reference_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/gates/quickstart-aspire-walk_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/gates/scaffold-gates_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/gates/scaffold/generated-app-identity-source-policy_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/gates/scaffold/plugin-contract-gates_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/gates/scaffold/ui-ai-gates_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/gates/verify-live-db-endpoint_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/runner/gate-runner_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/runner/suite-lease_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/runner/suite-runner_test.ts
+    [@netscript/cli#test] Check e2e/tests/application/verify-clean-clone-readme_test.ts
+    [@netscript/cli#test] Check e2e/tests/presentation/cli-options_test.ts
+    [@netscript/cli#test] Check e2e/tests/presentation/cli-program_test.ts
+    [@netscript/cli#test] Check e2e/tests/presentation/init-json_test.ts
+    [@netscript/cli#test] Check e2e/tests/presentation/quickstart-command-drift_test.ts
+    [@netscript/cli#test] Check e2e/tests/presentation/quickstart-walk-suite_test.ts
+    [@netscript/cli#test] Check e2e/tests/presentation/suite-registry_test.ts
+[@netscript/cli-e2e#test] repo tests that scaffold a default app do not assume the legacy app directory ... ok (401ms)
+[@netscript/cli-e2e#test] running 3 tests from ./tests/application/gates/scaffold/plugin-contract-gates_test.ts
+[@netscript/cli-e2e#test] plugin contract gates select runtime schemas and the complete AI namespace ... ok (1ms)
+[@netscript/cli-e2e#test] AI appsettings gate rejects only service configuration attributed to AI ... ok (103ms)
+[@netscript/cli-e2e#test] doctor negative gate observes failure and restores the configured module ... ok (84ms)
+[@netscript/cli-e2e#test] running 3 tests from ./tests/application/gates/scaffold/ui-ai-gates_test.ts
+[@netscript/cli-e2e#test] ui AI gate rejects the old workspace-root layout and accepts the Fresh app layout ... ok (99ms)
+[@netscript/cli-e2e#test] ui AI install gate selects the generated Fresh app from the workspace ... ok (393µs)
+[@netscript/cli-e2e#test] every UI AI assertion runs in the app and local imports stay workspace-relative ... ok (275µs)
+[@netscript/cli-e2e#test] running 7 tests from ./tests/application/gates/verify-live-db-endpoint_test.ts
+[@netscript/cli-e2e#test] database endpoint ports match across URL and keyword dialects ... ok (1ms)
+[@netscript/cli-e2e#test] database endpoint comparison rejects deliberately mismatched ports ... ok (372µs)
+[@netscript/cli-e2e#test] database endpoint comparison names an unparseable side and its value ... ok (256µs)
+[@netscript/cli-e2e#test] database health matcher accepts the captured users response contract ... ok (236µs)
+[@netscript/cli-e2e#test] database health matcher rejects an unhealthy database fixture ... ok (151µs)
+[@netscript/cli-e2e#test] users telemetry correlation reports the compared ids and candidate spans ... ok (499µs)
+[@netscript/cli-e2e#test] users telemetry correlation polls until logs and traces converge ... ok (426µs)
+[@netscript/cli-e2e#test] running 1 test from ./tests/application/runner/gate-runner_test.ts
+[@netscript/cli-e2e#test] platform-inapplicable gate emits machine-readable NOT_RUN without execution ... ok (960µs)
+[@netscript/cli-e2e#test] running 2 tests from ./tests/application/runner/suite-lease_test.ts
+[@netscript/cli-e2e#test] second acquire refuses while the recorded holder pid is alive ... ok (1ms)
+[@netscript/cli-e2e#test] dead holder is declared stale, removed, and replaced ... ok (746µs)
+[@netscript/cli-e2e#test] running 9 tests from ./tests/application/runner/suite-runner_test.ts
+[@netscript/cli-e2e#test] suite runner reports no skipped steps after the #1398 deferrals are removed ... ok (6ms)
+[@netscript/cli-e2e#test] suite runner emits a failed report and prunes only created Docker resources ... ok (2ms)
+[@netscript/cli-e2e#test] suite runner skips cleanup phase when cleanup is disabled ... ok (3ms)
+[@netscript/cli-e2e#test] suite runner completes cleanup with a Docker-less cleaner ... ok (2ms)
+[@netscript/cli-e2e#test] suite runner cleans up after a targeted non-cleanup gate when cleanup is enabled ... ok (457µs)
+[@netscript/cli-e2e#test] suite runner can target cleanup gate without suite cleanup enabled ... ok (406µs)
+[@netscript/cli-e2e#test] suite runner releases the expensive-suite lease when suite execution throws ... ok (817µs)
+[@netscript/cli-e2e#test] expensive runtime suites contend for one lease in both directions ... ok (1ms)
+[@netscript/cli-e2e#test] suite runner does not interact with the lease for a cheap suite ... ok (666µs)
+[@netscript/cli-e2e#test] running 1 test from ./tests/application/verify-clean-clone-readme_test.ts
+[@netscript/cli-e2e#test] clean-clone README gate reports a missing binary ... ok (124ms)
+[@netscript/cli-e2e#test] running 9 tests from ./tests/presentation/cli-options_test.ts
+[@netscript/cli-e2e#test] mapRunOptions keeps defaults by omitting undefined values ... ok (1ms)
+[@netscript/cli-e2e#test] mapRunOptions accepts sqlite database axis ... ok (192µs)
+[@netscript/cli-e2e#test] mapRunOptions maps --no-cache ... ok (138µs)
+[@netscript/cli-e2e#test] mapRunOptions maps --cache ... ok (143µs)
+[@netscript/cli-e2e#test] mapRunOptions rejects unsupported database values ... ok (851µs)
+[@netscript/cli-e2e#test] mapRunOptions rejects unsupported plugin values ... ok (272µs)
+[@netscript/cli-e2e#test] mapRunOptions accepts ai plugin axis ... ok (205µs)
+[@netscript/cli-e2e#test] mapRunOptions accepts mssql database axis ... ok (91µs)
+[@netscript/cli-e2e#test] mapRunOptions reports all supported database axes ... ok (122µs)
+[@netscript/cli-e2e#test] running 4 tests from ./tests/presentation/cli-program_test.ts
+[@netscript/cli-e2e#test] bare CLI command runs the full scaffold runtime suite with cleanup ... ok (8ms)
+[@netscript/cli-e2e#test] full CLI command accepts run options and runs runtime suite ... ok (2ms)
+[@netscript/cli-e2e#test] run command lets sqlite runtime suite defaults win unless flags override them ... ok (1ms)
+[@netscript/cli-e2e#test] run command keeps explicit postgres above sqlite runtime suite default ... ok (682µs)
+[@netscript/cli-e2e#test] running 1 test from ./tests/presentation/init-json_test.ts
+[@netscript/cli-e2e#test] netscript init --json emits a single structured object ... ok (505ms)
+[@netscript/cli-e2e#test] running 1 test from ./tests/presentation/quickstart-command-drift_test.ts
+[@netscript/cli-e2e#test] Quickstart executable commands stay aligned with quickstart.walk ... FAILED (2ms)
+[@netscript/cli-e2e#test] running 5 tests from ./tests/presentation/quickstart-walk-suite_test.ts
+[@netscript/cli-e2e#test] quickstart walk exposes exactly seven independently named verdicts before cleanup ... ok (2ms)
+[@netscript/cli-e2e#test] quickstart service-add verdict initializes first, adds users, and checks that service ... ok (829µs)
+[@netscript/cli-e2e#test] quickstart project-check verdict runs the documented command exactly ... ok (520µs)
+[@netscript/cli-e2e#test] quickstart service-response verdict accepts service health without a database assertion ... ok (512µs)
+[@netscript/cli-e2e#test] quickstart commands reject a local CLI entrypoint ... ok (1ms)
+[@netscript/cli-e2e#test] running 19 tests from ./tests/presentation/suite-registry_test.ts
+[@netscript/cli-e2e#test] registry exposes scaffold capability suites from constants ... ok (708µs)
+[@netscript/cli-e2e#test] native desktop suite is registered with an honest fixture preflight ... ok (1ms)
+[@netscript/cli-e2e#test] capability suites select only their scoped gates ... ok (2ms)
+[@netscript/cli-e2e#test] plugin suite includes all official plugin and generated-check gates ... FAILED (1ms)
+[@netscript/cli-e2e#test] true userland suite runs init, four no-samples plugin installs, assertion, and cleanup ... ok (830µs)
+[@netscript/cli-e2e#test] runtime suite includes full scaffold, database, runtime, and behavior gates ... ok (1ms)
+[@netscript/cli-e2e#test] runtime suites execute the formerly deferred #1398 OTEL gates ... ok (526µs)
+[@netscript/cli-e2e#test] every registered suite pins its exact deferred-gate set and owning issues ... ok (2ms)
+[@netscript/cli-e2e#test] runtime suite waits for the generated app and requests its home page ... ok (506µs)
+[@netscript/cli-e2e#test] runtime DB mutations run only after the resident AppHost starts ... ok (516µs)
+[@netscript/cli-e2e#test] runtime suite omits database resource wait for sqlite ... ok (382µs)
+[@netscript/cli-e2e#test] sqlite runtime suite resolves its reduced-container defaults without mutating cache mode ... ok (405µs)
+[@netscript/cli-e2e#test] runtime suites declare service environment before start and verify it after (#1447) ... ok (386µs)
+[@netscript/cli-e2e#test] runtime database overrides preserve service health and the Postgres gate set ... ok (1ms)
+[@netscript/cli-e2e#test] sqlite runtime suite keeps explicit database overrides above suite defaults ... ok (143µs)
+[@netscript/cli-e2e#test] runtime suite wait matrices match runtime resources for postgres and sqlite ... ok (477µs)
+[@netscript/cli-e2e#test] runtime suite selects mssql database resource wait for mssql ... ok (643µs)
+[@netscript/cli-e2e#test] capability defaults are a baseline and caller overrides select database gates ... ok (496µs)
+[@netscript/cli-e2e#test] existing built-in suites preserve their exact resolved options ... ok (1ms)
+[@netscript/cli-e2e#test] 
+[@netscript/cli-e2e#test]  ERRORS 
+[@netscript/cli-e2e#test] 
+[@netscript/cli-e2e#test] Quickstart executable commands stay aligned with quickstart.walk => ./tests/presentation/quickstart-command-drift_test.ts:4:6
+[@netscript/cli-e2e#test] error: NotFound: No such file or directory (os error 2): readfile 'docs/site/quickstart.vto'
+[@netscript/cli-e2e#test]   const page = await Deno.readTextFile('docs/site/quickstart.vto');
+[@netscript/cli-e2e#test]                ^
+[@netscript/cli-e2e#test]     at async Object.readTextFile (ext:deno_fs/30_fs.js:1:10081)
+[@netscript/cli-e2e#test]     at async file:///home/codex/repos/ns006-w2-1454/packages/cli/e2e/tests/presentation/quickstart-command-drift_test.ts:5:16
+[@netscript/cli-e2e#test] 
+[@netscript/cli-e2e#test] plugin suite includes all official plugin and generated-check gates => ./tests/presentation/suite-registry_test.ts:65:6
+[@netscript/cli-e2e#test] error: AssertionError: Values are not equal.
+[@netscript/cli-e2e#test] 
+[@netscript/cli-e2e#test] 
+[@netscript/cli-e2e#test]     [Diff] Actual / Expected
+[@netscript/cli-e2e#test] 
+[@netscript/cli-e2e#test] 
+[@netscript/cli-e2e#test]     [
+[@netscript/cli-e2e#test]       "preflight.deno",
+[@netscript/cli-e2e#test]       "scaffold.init",
+[@netscript/cli-e2e#test]       "scaffold.plugin.worker",
+[@netscript/cli-e2e#test]       "scaffold.plugin.saga",
+[@netscript/cli-e2e#test]       "scaffold.plugin.trigger",
+[@netscript/cli-e2e#test]       "scaffold.plugin.stream",
+[@netscript/cli-e2e#test]       "scaffold.plugin.auth",
+[@netscript/cli-e2e#test]       "scaffold.plugin.ai",
+[@netscript/cli-e2e#test]       "scaffold.plugin.ai.mcp",
+[@netscript/cli-e2e#test]       "scaffold.plugin.ai.lifecycle",
+[@netscript/cli-e2e#test]       "scaffold.plugin-list",
+[@netscript/cli-e2e#test]       "behavior.plugins-unhealthy",
+[@netscript/cli-e2e#test]       "generated.plugins-check",
+[@netscript/cli-e2e#test]       "generated.workers-registry",
+[@netscript/cli-e2e#test]       "generated.sagas-registry",
+[@netscript/cli-e2e#test]       "behavior.plugins-health",
+[@netscript/cli-e2e#test] -     "behavior.package-backed-plugin-doctor",
+[@netscript/cli-e2e#test]     ]
+[@netscript/cli-e2e#test] 
+[@netscript/cli-e2e#test]   throw new AssertionError(message);
+[@netscript/cli-e2e#test]         ^
+[@netscript/cli-e2e#test]     at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:67:9)
+[@netscript/cli-e2e#test]     at file:///home/codex/repos/ns006-w2-1454/packages/cli/e2e/tests/presentation/suite-registry_test.ts:67:3
+[@netscript/cli-e2e#test] 
+[@netscript/cli-e2e#test]  FAILURES 
+[@netscript/cli-e2e#test] 
+[@netscript/cli-e2e#test] Quickstart executable commands stay aligned with quickstart.walk => ./tests/presentation/quickstart-command-drift_test.ts:4:6
+[@netscript/cli-e2e#test] plugin suite includes all official plugin and generated-check gates => ./tests/presentation/suite-registry_test.ts:65:6
+[@netscript/cli-e2e#test] 
+[@netscript/cli-e2e#test] FAILED | 151 passed | 2 failed (9s)
+[@netscript/cli-e2e#test] 
+[@netscript/cli-e2e#test] error: Test failed
