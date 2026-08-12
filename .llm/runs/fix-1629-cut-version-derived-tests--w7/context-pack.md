@@ -6,25 +6,26 @@
 | --- | --- |
 | Run ID | `fix-1629-cut-version-derived-tests--w7` |
 | Branch | `fix/1629-cut-version-derived-tests` |
-| Current phase | `plan` |
+| Current phase | `implement` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `none` |
 
 ## Current State
 
-The requested base is clean and matches `origin/main`. Research identified literal version
-expectations in four CLI test files and registry-backed current-tree imports in real plugin-install
-fixtures. No implementation has begun.
+The arbitrary 0.0.7 bumped-copy discriminator is captured. Version-bearing diagnostic assertions
+now derive from `NETSCRIPT_RELEASE_VERSION`; cut-local workspace mapping is implemented and targeted
+plugin resolution tests are green but not yet committed.
 
 ## Completed
 
 - Harness/CLI/release/tools/PR/RTK/doctrine/JSR instructions loaded.
 - Issue #1629 and requested baseline verified.
 - Research, plan, and design recorded; PLAN-EVAL justified N/A.
+- Pre-fix arbitrary-bump failures recorded and version assertions corrected.
 
 ## In Progress
 
-- Bootstrap commit and draft PR.
+- Cut-local import resolution slice.
 
 ## Next Steps
 
@@ -67,4 +68,3 @@ fixtures. No implementation has begun.
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments.
-

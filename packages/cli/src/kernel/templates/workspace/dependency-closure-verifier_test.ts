@@ -24,12 +24,12 @@ Deno.test('generated closure verifier rejects split JSR identities with version-
     const stderr = new TextDecoder().decode(output.stderr);
     assert(!output.success, 'a split closure must fail before Vite');
     assertStringIncludes(stderr, 'NetScript dependency closure is incoherent.');
-    assertStringIncludes(stderr, '@netscript/fresh@0.0.5');
+    assertStringIncludes(stderr, `@netscript/fresh@${NETSCRIPT_RELEASE_VERSION}`);
     assertStringIncludes(stderr, '@netscript/fresh@0.0.6-canary.3/defer');
-    assertStringIncludes(stderr, '@netscript/sdk@0.0.5');
+    assertStringIncludes(stderr, `@netscript/sdk@${NETSCRIPT_RELEASE_VERSION}`);
     assertStringIncludes(
       stderr,
-      'different exact versions: 0.0.5, 0.0.6-canary.3',
+      `different exact versions: ${NETSCRIPT_RELEASE_VERSION}, ${CANARY_VERSION}`,
     );
     assertStringIncludes(stderr, 'to one exact release, then rerun.');
   } finally {
@@ -68,7 +68,7 @@ Deno.test('generated closure verifier fails closed on a range pin', async () => 
     assert(!output.success);
     assertStringIncludes(
       stderr,
-      '@netscript/fresh uses non-exact version "^0.0.5"',
+      `@netscript/fresh uses non-exact version "^${NETSCRIPT_RELEASE_VERSION}"`,
     );
     assertStringIncludes(stderr, 'pin this member exactly');
   } finally {
@@ -93,7 +93,7 @@ Deno.test('generated closure verifier accepts one coherent local package graph',
         join(packageRoot, 'deno.json'),
         JSON.stringify({
           name: packageName,
-          version: '0.0.5',
+          version: NETSCRIPT_RELEASE_VERSION,
           exports: './mod.ts',
         }),
       );
@@ -108,7 +108,7 @@ Deno.test('generated closure verifier accepts one coherent local package graph',
     const output = await runVerifier(fixture);
     const stdout = new TextDecoder().decode(output.stdout);
     assert(output.success, new TextDecoder().decode(output.stderr));
-    assertStringIncludes(stdout, 'exact release 0.0.5 (local)');
+    assertStringIncludes(stdout, `exact release ${NETSCRIPT_RELEASE_VERSION} (local)`);
   } finally {
     await Deno.remove(root, { recursive: true });
   }

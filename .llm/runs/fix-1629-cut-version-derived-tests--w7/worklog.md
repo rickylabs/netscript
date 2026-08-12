@@ -60,6 +60,7 @@ cut-local fixture helper only for tests that intentionally exercise pre-publish 
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-13 | 1 | research/design | Re-baselined issue against requested base; PLAN-EVAL N/A because the issue fully enumerates contract, exclusions, discriminators, and gates. |
+| 2026-08-13 | 2 | red/green | Disposable 0.0.7 bump produced six literal-version assertion failures; all now interpolate `NETSCRIPT_RELEASE_VERSION`. |
 
 ## Decisions
 
@@ -67,6 +68,7 @@ cut-local fixture helper only for tests that intentionally exercise pre-publish 
 | --- | --- | --- |
 | PLAN-EVAL N/A | Small bounded correctness fix with owner-enumerated properties and no open architectural decision. | issue #1629 / run-loop §4 |
 | Automatic IMPL-EVAL only | Owner controls draft→ready and explicitly prohibited this session from flipping. | user directive |
+| Version fixtures interpolate the generated CLI version | Inputs and expectations share the exercised manifest authority. | targeted bumped-copy failures |
 
 ## Drift
 
@@ -81,4 +83,3 @@ Pending implementation.
 ## Handoff Notes
 
 - Inspect strictness preservation and the disposable 0.0.7 full-test evidence first.
-

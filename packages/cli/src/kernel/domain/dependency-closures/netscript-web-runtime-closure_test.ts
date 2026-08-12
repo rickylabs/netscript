@@ -35,9 +35,12 @@ Deno.test('rejects a split root and subpath with every involved version', () => 
     Error,
     'NetScript dependency closure is incoherent.',
   );
-  assertStringIncludes(error.message, '@netscript/fresh@0.0.5');
+  assertStringIncludes(error.message, `@netscript/fresh@${NETSCRIPT_RELEASE_VERSION}`);
   assertStringIncludes(error.message, '@netscript/fresh@0.0.6-canary.3/defer/island');
-  assertStringIncludes(error.message, 'different exact versions: 0.0.5, 0.0.6-canary.3');
+  assertStringIncludes(
+    error.message,
+    `different exact versions: ${NETSCRIPT_RELEASE_VERSION}, ${CANARY_VERSION}`,
+  );
 });
 
 Deno.test('fails closed on a non-exact closure member', () => {
@@ -49,7 +52,10 @@ Deno.test('fails closed on a non-exact closure member', () => {
       }),
     Error,
   );
-  assertStringIncludes(error.message, '@netscript/fresh uses non-exact version "^0.0.5"');
+  assertStringIncludes(
+    error.message,
+    `@netscript/fresh uses non-exact version "^${NETSCRIPT_RELEASE_VERSION}"`,
+  );
   assertStringIncludes(error.message, 'pin this member exactly');
 });
 
