@@ -14,7 +14,8 @@
 
 Draft PR #1608 received an exact-head native Opus 5 `FAIL_FIX`. The corpus mechanism, negative
 control, determinism, and shipped-vocabulary accuracy defense were independently confirmed. Cycle 2
-rebases onto `origin/main@6aee2b414`, refreshes moving-base generated outputs, corrects ownership to
+first rebased onto `origin/main@6aee2b414`, then reconciled again after `main` advanced to
+`6b29d12ea` through PR #1614. Cycle 2 refreshes moving-base generated outputs, corrects ownership to
 #1615, and records two non-blocking check/provenance limitations.
 
 ## Completed
@@ -26,8 +27,8 @@ rebases onto `origin/main@6aee2b414`, refreshes moving-base generated outputs, c
   MCP; `@contracts` fell 8→0.
 - Negative source-drift control returned raw exit 1, then restoration reran green.
 - Focused, generated-asset, docs, scoped static, and root-test gates recorded in `worklog.md`.
-- Rebased cleanly onto `origin/main@6aee2b414` and regenerated corpus plus both dependent generated
-  assets without touching `deno.lock`.
+- Rebased cleanly onto latest `origin/main@6b29d12ea` and regenerated corpus plus both dependent
+  generated assets without touching `deno.lock`; the intervening PR #1614 has no `docs/site` diff.
 
 ## In Progress
 
@@ -66,7 +67,7 @@ rebases onto `origin/main@6aee2b414`, refreshes moving-base generated outputs, c
 | Fitness/docs | partial | Cycle-2 corpus, snippets, and accuracy pass; links retains two unchanged-base anchor failures and is not workflow-called. |
 | Runtime | N/A | No runtime behavior. |
 | Consumer | pass | MCP generated asset has zero `api-clients`; asset checks pass. |
-| Repo tests | partial | 3300 pass; one unchanged-base fitness failure and one #1615 corpus-ranking drift. |
+| Repo tests | not rerun cycle 2 | Earlier run had 3300 pass plus the now-main-fixed #1612 finding and the remaining #1615 ranking drift. |
 
 ## Open Questions
 
@@ -81,6 +82,8 @@ rebases onto `origin/main@6aee2b414`, refreshes moving-base generated outputs, c
 
 ## Commits
 
-- `429dbfdfb` — rebased bootstrap/harness activation commit.
-- `53bd62062` — rebased corpus freshness implementation commit.
-- `d07384b38` — rebased cycle-1 handoff-evidence commit and cycle-2 normal-generation provenance source.
+- `149894121` — latest-rebased bootstrap/harness activation commit.
+- `e90ce21e8` — latest-rebased corpus freshness implementation commit.
+- `11c54621e` — latest-rebased cycle-1 handoff-evidence commit.
+- `c0b7bdf25` — latest-rebased cycle-2 regeneration/evidence commit and final normal-generation
+  provenance source before the handoff commit.

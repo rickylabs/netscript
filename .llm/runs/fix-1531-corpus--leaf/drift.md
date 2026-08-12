@@ -83,6 +83,20 @@ documentation.
 - **Action:** record only for this PR; do not redesign the confirmed gate mechanism in #1531.
 - **Evidence:** Generator control flow and negative-control worktree behavior.
 
+## 2026-08-12 — `main` advances again during cycle-2 handoff
+
+- **What:** After the requested rebase to `6aee2b414`, `main` advanced to `6b29d12ea` through
+  PR #1614 while PR evidence was being updated.
+- **Source:** Live PR base SHA and `git fetch origin` reconciliation.
+- **Expected:** Exact-head evaluation should receive a branch based on current `main`.
+- **Actual:** PR #1614 changes only the published JSDoc and harness evidence, not `docs/site` or the
+  corpus inputs. The branch was rebased again and normal generation was repeated so provenance is
+  ancestral to the latest base; corpus content SHA-256 remains unchanged.
+- **Severity:** expected/moving-base
+- **Action:** accept and hand off the new immutable head; no corpus-mechanism change.
+- **Evidence:** `git diff 6aee2b414..6b29d12ea -- docs/site` is empty; corpus SHA-256 remains
+  `105b8e0a081249ae5b93d58fc87ca3dbdbe79de7aa2ef140d0629b29e8757908`.
+
 ## 2026-08-12 — provenance fields are not independently freshness-gated
 
 - **What:** Check mode pins `version`, `sourceCommit`, and `extractionTimestamp` from committed

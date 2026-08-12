@@ -67,6 +67,7 @@ Update `docs/site`, run `deno task gen:agent-docs-prose`, then run
 | 2026-08-12 | 2 | Exact-head evaluation | Native Opus 5 read-only fallback returned `FAIL_FIX`: mechanism and negative control confirmed; requested moving-base regeneration and corrected deferred ownership. |
 | 2026-08-12 | 2 | Rebase/regeneration | Rebased cleanly onto `origin/main@6aee2b414`, regenerated the corpus and both dependent generated assets, and preserved a clean `deno.lock`. The triggers reference entry now contains two `TriggerEventSubscriptionMessage` occurrences, matching the source page. |
 | 2026-08-12 | 2 | Targeted validation | Freshness, asset-barrel, publish-asset, snippets, and accuracy checks all exit 0; direct census remains zero for stale terms and the triggers entry is 2/2. Root tests were not rerun because the cycle brief restricts reruns to rebase-invalidated gates; the known ranking failure is tracked by #1615. |
+| 2026-08-12 | 2 | Latest-base reconcile | While PR evidence was being updated, `main` advanced again to `6b29d12ea` through PR #1614. That commit does not touch `docs/site`; rebased again, reran normal generation so provenance is ancestral to the latest base, and rebuilt both dependent assets. |
 
 ## Decisions
 
@@ -111,7 +112,7 @@ After regeneration, provenance reports version `0.0.5`, extraction timestamp
 | `from "@contracts"` in decompressed corpus | 0 |
 | `TriggerEventSubscriptionMessage` in source triggers page | 2 |
 | `TriggerEventSubscriptionMessage` in the matching corpus page entry | 2 |
-| Provenance source commit | `d07384b38` (descendant of `origin/main@6aee2b414`) |
+| Provenance source commit | `c0b7bdf25` (descendant of `origin/main@6b29d12ea`) |
 
 Cycle-2 provenance reports version `0.0.5`, extraction timestamp
 `2026-08-12T18:49:44.899Z`, uncompressed bytes `4716931`, compressed bytes `1351792`, and SHA-256
@@ -151,7 +152,8 @@ Cycle-2 provenance reports version `0.0.5`, extraction timestamp
 The root-test failures are:
 
 1. `published JSDoc excludes internal workstream codenames`: unchanged base source contains `#1589`
-   in `netscript-web-runtime-closure.ts:6`.
+   in `netscript-web-runtime-closure.ts:6`. This was the earlier-base result; #1612 / PR #1614 now
+   supply the fix on latest `main`, without any change from this PR.
 2. `locked release-corpus guidance is deterministic and equal across both adapters`: the fresh
    snapshot ranks the plugin-system page where the existing fixture expects the external-database
    page. This is a real consequence of regeneration tracked by #1615; the docs content and fixture
