@@ -76,34 +76,47 @@ Cost avoided: had this been read as a dead slice, the correct-looking response w
 which would have put **two senders on one worktree**, the exact condition the one-sender rule
 exists to prevent.
 
-### F-2 — do not wrap the slice launcher in a short `timeout` `[observed]`
+### F-2 — wrapping the slice launcher in a `timeout` KILLS THE TURN `[observed]`
 
-**2026-08-12, wave 1.** Slice A's launcher was invoked under `timeout 300` and was killed at the
-deadline (`exit code 143`, SIGTERM). The **Codex thread survived** — it lives in the app-server
-daemon, not in the launcher process — and A continued working, writing
-`.llm/tools/release/github-release_test.ts`.
+**Recorded 2026-08-12 wave 1; CORRECTED 2026-08-12 10:08 after the evidence contradicted the first
+reading. The original text is superseded, not deleted, because the mistake is the finding.**
 
-So the kill was harmless to the slice but destroyed the launch log, and with it the launcher's own
-record of the thread id; identity had to be recovered from `codex-status` instead. Wave 2 was
-launched without a `timeout` wrapper.
+**First (wrong) reading.** Slices A and B were launched under `timeout 300`; both launchers were
+SIGTERM'd at the deadline (`exit code 143`). Immediately afterwards `codex-status` still showed A
+`working` and writing `github-release_test.ts`, so this was recorded as "the launcher dies, the
+thread survives in the daemon — judge dispatch by the thread, never the launcher exit code."
 
-The trap is that `exit 143` on the launcher **looks like a failed dispatch**. It is not. Judge
-dispatch success by the attached thread, never by the launcher's exit code — the same
-"verify the artefact, never the exit code" rule that caught three agents falsely claiming to have
-stopped their AppHost in 0.0.4.
+**What the evidence actually shows.** Sixteen minutes later, A and B had both gone silent while C
+and D — launched *without* a `timeout` wrapper — were still writing. Correlating the last rollout
+write against each launcher's SIGTERM deadline:
 
-## Re-planning events
+```
+A  launcher started 09:46:06  + timeout 300  = 09:51:06     last rollout write 09:51:31  (+25s)
+B  launcher started 09:47:00  + timeout 300  = 09:52:00     last rollout write 09:52:27  (+27s)
+C  launcher started 09:52:13  no timeout                    still writing at 10:07:41
+D  launcher started 09:52:15  no timeout                    still writing at 10:07:41
+```
 
-| # | When | Event | Effect on the plan |
-| --- | --- | --- | --- |
-| R-1 | 2026-08-12, wave 1 in flight | **Owner instruction to dispatch wave 2 immediately**, in the already-prepared worktrees, while wave 1 continues. | The two-wave dispatch schedule in `plan.md` collapses to a single four-slice fan-out. The wave *plan* is not rewritten — it records what was intended; this row records what happened. No clustering, ordering, or scope changed: the same four PRs, the same issue groups, the same #1397→#1399 internal order. |
+Both turns died ~25 seconds after their launcher was killed. Neither rollout ends in a
+`task_complete`; A's simply stops mid-turn after a successful `patch_apply_end`, followed by a
+final `token_count`. The launcher is the **message sender holding the turn**, not a detachable
+wrapper. Killing it kills the turn.
 
-R-1 notes: the hold being lifted was a **caution** hold (validate the brief format on wave 1 first),
-not a dependency hold — wave 2 was already independent of wave 1 by construction, which is why
-dispatching early is safe. The cost of lifting it is that a brief-format defect, if one exists, is
-now paid four times instead of once. The benefit is wall-clock. Owner's call, taken as given.
+The brief survival window is exactly what made the first reading plausible: for ~25 seconds after
+the SIGTERM the thread still reports `working` and still emits artifacts, so a status check taken
+in that window shows a healthy slice that is already dead.
 
-Load check at the moment of the four-slice fan-out: 4 Codex slices from this lane plus 2 from
-sibling 0.0.6 lanes and 3 idle `agy` sessions on the same host. Well below the ~160 load that froze
-0.0.4's host, and the expensive `scaffold.runtime` gate remains serialised by brief instruction, so
-the fan-out does not multiply the gate that actually contends.
+**Rule.** Never wrap `agentic:launch-codex-slice` in `timeout`, and never SIGTERM it. If a launch
+must be bounded, bound it by watching the thread, not by killing the sender.
+
+**Corollary — this refines F-1 rather than contradicting it.** F-1 says absence from the bounded
+status list is not evidence of death. That stands: B was alive when it vanished from the list. But
+liveness needs a *positive* artifact signal, and the signal must be **fresh**. A rollout that has
+not grown in 16 minutes while sibling slices write every few seconds is a dead turn, and the
+correct diagnostic is the **age** of the last write, not its presence.
+
+**Cost.** ~16 minutes of wall clock on two slices, both recovered by `agentic:codex-resume` on the
+existing thread with their in-progress work intact (A: modified `github-release_test.ts`; B:
+modified `publish-workspace.ts` plus a new `publish-workspace_test.ts`). Nothing was lost but time,
+because the work was on disk in the worktree rather than only in the turn.
+

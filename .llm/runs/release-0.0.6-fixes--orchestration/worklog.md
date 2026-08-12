@@ -180,3 +180,169 @@ D 019ff4f5-27a0  rollout 157221 B  mtime 09:52:49   (now 09:52:50 +0200)
 `packages/cli/e2e/**`, D is `packages/cli/src/**`. C and D touch disjoint trees and cannot conflict.
 Every brief forbids starting `scaffold.runtime` on the slice's own initiative, so the expensive gate
 stays serialised under orchestrator control even with four slices in flight.
+
+## 2026-08-12 10:08 — Stale-loop detection: slices A and B were dead, recovered
+
+**Detected by artifact age, not by status display.** A routine liveness sweep showed A and B absent
+from `codex-status`'s bounded 8-entry list, with no process in either worktree and rollout files
+untouched for ~16 minutes, while C and D wrote every few seconds.
+
+The first reading (recorded as cut-trace F-2) was that killing a launcher is harmless because the
+thread lives in the daemon. **That reading was wrong**, and the correction is in `cut-trace.md`
+F-2. Correlating each launcher's SIGTERM deadline against its slice's last rollout write:
+
+```
+A  launcher +timeout 300 → 09:51:06     last rollout write 09:51:31  (+25s)  DEAD
+B  launcher +timeout 300 → 09:52:00     last rollout write 09:52:27  (+27s)  DEAD
+C  launched with no timeout             writing at 10:07:41                  ALIVE
+D  launched with no timeout             writing at 10:07:41                  ALIVE
+```
+
+Neither dead rollout ends in `task_complete` — A's stops mid-turn after a successful
+`patch_apply_end`. The launcher is the message sender holding the turn; killing it kills the turn
+~25 seconds later. The delay is what made the wrong reading plausible: a status check inside that
+window shows a healthy, working slice that is already dead.
+
+**Recovery.** Both threads resumed in place via `agentic:codex-resume` (never a rival second send,
+never a relaunch — a relaunch would have created a second sender on the same worktree). All
+in-progress work was intact on disk, so only wall clock was lost:
+
+| Slice | Preserved work at resume |
+| --- | --- |
+| A | `M .llm/tools/release/github-release_test.ts` — had already imported `discoverPreparedReleaseFiles` from `prepare-release.ts`, which is the required derive-from-the-writer construction |
+| B | `M .llm/tools/release/publish-workspace.ts`, `?? .llm/tools/release/publish-workspace_test.ts` |
+
+Resume messages restated the full acceptance and gate set so the recovered turns are not working
+from a truncated memory of the brief, and explicitly told each agent the termination was an
+orchestrator-side error rather than a rejection of its work.
+
+**Cost: ~16 minutes on two slices. Nothing lost but time.** Recorded because the next orchestrator
+will otherwise repeat it: `timeout` around a launcher looks like ordinary defensive shell hygiene.
+
+## Slice progress at 10:08
+
+| Slice | HEAD | Working tree | State |
+| --- | --- | --- | --- |
+| A (#1438+#1430) | `01aa12b67` (no commits yet) | `M github-release_test.ts` | resumed |
+| B (#1417) | `01aa12b67` (no commits yet) | `M publish-workspace.ts`, `?? publish-workspace_test.ts` | resumed |
+| C (#1397+#1399) | `86d265f74` | clean | **both commits landed, in required order**, running gates |
+| D (#1428) | `01aa12b67` (no commits yet) | `M public-command-tree_test.ts` | working |
+
+C's two commits are in the order the brief required — `78d587ac9 fix(cli-e2e): keep service health
+across database overrides (#1397)` then `86d265f74 test(cli-e2e): pin deferred gates for every
+suite (#1399)` — so #1399's pins were written against the corrected gate sets. C's #1397 commit
+title indicates it chose to **keep** `behavior.service-health` executing across database overrides
+rather than declaring a stated exclusion; that is the stronger of the two acceptable outcomes, and
+the pre-merge gate will verify the postgres set is genuinely unchanged.
+
+## 2026-08-12 — Stage D: pre-merge gate, PR #1534 (slice C, #1397 + #1399)
+
+Turn completed 08:12:58Z. PR **#1534** `fix(cli-e2e): make runtime gate sets explicit`, draft →
+marked ready. Two commits in the required order (`78d587ac9` #1397, then `86d265f74` #1399).
+
+Gate run per `milestone-run.md`. **Verified by the orchestrator, not accepted from the slice's
+report.**
+
+| # | Check | Verdict | Evidence |
+| --- | --- | --- | --- |
+| 1 | close-gate green | **BLOCKED — `SKIPPED`** | see check 4 |
+| 2 | zero unticked boxes on closed issues | pending close-gate | PR body reproduces all 8 boxes ticked with `acceptance-evidence` blocks for both issues |
+| 3 | no new `deno-lint-ignore`/`as unknown as`/`@ts-ignore` (excl. `.llm/runs/**`) | **PASS** | `git diff origin/main..HEAD -- . ':(exclude).llm/runs/**' \| grep -E "^\+.*(…)"` → no matches |
+| 4 | named expensive gates report SUCCESS | **FAIL — every check `SKIPPED`** | 18 checks, all `SKIPPED`, including `close-gate`, `code-quality`, `check-test`, `scaffold-runtime`, `scaffold-runtime-sqlite` |
+| 5 | decisive claim per issue, re-verified independently | **PASS — see below** | orchestrator read the gate implementation |
+| 6 | changed-file audit | **PASS** | 2 files, both `packages/cli/e2e/**`: `capability-suites.ts` (−1 line), `suite-registry_test.ts` (+71/−6). No stray framework source, no lock, no generated assets |
+| 7 | PR body checklist matches what shipped | **PASS with one scope note** | see below |
+
+### Check 4 — the lane's own failure class, firing on the lane's own PR
+
+Every check on #1534 reported `SKIPPED` while the PR was a draft — `close-gate`, `code-quality`,
+`code-quality-repo`, `check-test`, `quality`, `surface-diff`, `scaffold-runtime`,
+`scaffold-runtime-sqlite`, `scaffold-static`, `deps-report`, and the rest. This is precisely the
+#778/#775 precedent that check 4 exists to catch: **"clean" meaning "nothing ran."**
+
+Merging on that rollup would have been indistinguishable from merging a fully green PR. The PR was
+marked ready-for-review to make CI actually execute; the gate is re-run against real verdicts
+before any merge. **No merge occurs on a skipped rollup.**
+
+Worth noting the irony for the retrospective: a PR whose entire subject is "a green aggregate that
+asserts less than it appears to" arrived with a green-looking aggregate that asserted nothing.
+
+### Check 5 — decisive claim for #1397, verified independently
+
+The PR's decisive claim is that `behavior.service-health` is **engine-agnostic**, justifying its
+removal from `POSTGRES_ONLY_RUNTIME_GATES` rather than declaring a stated exclusion. The slice
+asserted this; it did **not** prove it by execution (the runtime smoke was correctly not run).
+
+Verified by reading the implementation rather than accepting the claim:
+
+```
+packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts:660  PROBE_SERVICE_HEALTH_SCRIPT
+  'const urls = collectHttpUrls(resource);'
+  'for (const baseUrl of urls) {'
+  '  const healthUrl = new URL("/health", baseUrl).toString();'
+```
+
+The probe resolves the app's HTTP URLs from `aspire describe` and issues a GET to `/health`. It has
+**no database coupling of any kind**. The claim holds.
+
+Corroborating evidence that the fix is correctly *scoped* rather than merely permissive: the three
+genuinely Postgres-specific gates — `DATABASE_MIGRATION_ARTIFACTS`,
+`RUNTIME_CAPTURE_DB_ALLOCATION_FIRST/_SECOND` — and `BEHAVIOR_LIVE_DB_ENDPOINT` all **remain** in
+`POSTGRES_ONLY_RUNTIME_GATES`. Exactly one gate was removed, and it is the one that was
+miscategorized. This is the strong form of #1397's acceptance, not the weaker "stated exclusion"
+escape.
+
+### Check 7 — scope note: the sqlite tier gains a gate
+
+`#1397` is written about mysql/mssql. Removing `BEHAVIOR_SERVICE_HEALTH` from
+`POSTGRES_ONLY_RUNTIME_GATES` also adds it to the **sqlite** runtime tier, and the slice updated
+the sqlite assertion accordingly:
+
+```
+- assertEquals(sqlite.gates.some((g) => g.id === GATE.BEHAVIOR_SERVICE_HEALTH), false);
++ assertEquals(sqlite.gates.some((g) => g.id === GATE.BEHAVIOR_SERVICE_HEALTH), true);
+```
+
+This is **defensible and arguably required** — the gate was in a set named "postgres only", so
+correcting the categorisation necessarily reaches every non-postgres tier, and leaving sqlite
+silently excluded would reproduce #1397's own defect one tier over. The PR body states it
+("keeps `behavior.service-health` for MySQL, MSSQL, SQLite, and Postgres"), so check 7 is satisfied:
+the body matches what shipped.
+
+**But it is unproven by execution.** `scaffold-runtime-sqlite` is `SKIPPED`, so nothing yet
+demonstrates that `/health` actually answers on the sqlite tier. That gate is the one CI job that
+would prove it, and it is exactly the job the draft state suppressed. **This is the specific reason
+#1534 does not merge until CI has genuinely run** — a widened gate set that turns the sqlite tier
+red would be a worse outcome than the defect being fixed.
+
+Negative controls accepted as strong (they are quoted with real red output in the slice's
+`evidence.md`): the old service-health drop fails the new database-matrix test; a throwaway
+deferral fails the all-suite pin; a removed expectation entry fails type-checking. The IMPL-EVAL
+owner waiver (drift D-3) is therefore **provisionally earned** for slice C, pending the CI verdict.
+
+## 2026-08-12 — Stage D: pre-merge gate, PR #1535 (slice D, #1428)
+
+Turn completed. PR **#1535** `fix(cli): guard DB-backed island emitted imports`, one commit
+`8ce131234`, draft → marked ready.
+
+| # | Check | Verdict | Evidence |
+| --- | --- | --- | --- |
+| 3 | no banned constructs (excl. `.llm/runs/**`) | **PASS** | no matches in diff |
+| 6 | changed-file audit | **PASS** | exactly **one** file: `packages/cli/src/public/features/root/public-command-tree_test.ts` (+63/−10). Test-only. |
+| 4 | expensive gates SUCCESS | pending — CI triggered by ready | was `SKIPPED` as draft, same as #1534 |
+
+**Riskiest claim, verified independently.** The brief required D to deliberately break templates to
+prove the guard fires, and warned that a left-behind break ships a real regression. The slice
+claims all breaks were restored. Verified by the diff rather than the claim: the changed-file list
+contains **no template and no `.tsx` file at all** — only the test. Restoration is confirmed by
+absence, which is the strongest available form of that check.
+
+Negative controls reported, and they include the one that matters most: **the pre-fix DB break
+stayed green** (proving the gap #1428 describes was real), then went **red** post-fix; the
+memory-island break still goes red (unchanged coverage); a broken non-relative import goes red; and
+legitimate `npm:`/`jsr:` imports do **not** false-positive. Focused runtime 415–429 ms → 792–825 ms,
+so the guard stays cheap — which was the point of #1428, since its whole value is catching this
+class *without* `scaffold.runtime`.
+
+Both slices correctly declined to run the serialized `scaffold.runtime` gate without an
+orchestrator grant, as their briefs required. Neither self-merged.
