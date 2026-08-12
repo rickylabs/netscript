@@ -9,7 +9,7 @@
  * @example Create a typed client inside the webview
  * ```ts
  * import { createDesktopServiceClient } from '@netscript/sdk/desktop';
- * import { ordersContract } from './contracts/orders.ts';
+ * import { ordersContract } from '@my-app/contracts';
  *
  * const orders = createDesktopServiceClient({ contract: ordersContract });
  * const order = await orders.get({ id: 'order-42' });
