@@ -56,7 +56,12 @@ export const PUBLISH_ASSET_OUTPUTS = [
 interface AgentDocsProvenance {
   readonly schemaVersion: 1;
   readonly version: string;
-  readonly [key: string]: unknown;
+  readonly sourceCommit: string;
+  readonly extractionTimestamp: string;
+  readonly files: readonly string[];
+  readonly uncompressedBytes: number;
+  readonly compressedBytes: number;
+  readonly sha256: string;
 }
 
 interface AgentDocsPayload {
@@ -141,6 +146,39 @@ function recordStalePath(foundStalePaths: string[], path: string): void {
   if (!foundStalePaths.includes(path)) foundStalePaths.push(path);
 }
 
+function closeAgentDocsProvenance(
+  value: unknown,
+  overrides: Partial<
+    Pick<AgentDocsProvenance, 'version' | 'uncompressedBytes' | 'compressedBytes' | 'sha256'>
+  > = {},
+): AgentDocsProvenance {
+  if (
+    typeof value !== 'object' || value === null || Array.isArray(value) ||
+    Reflect.get(value, 'schemaVersion') !== 1 ||
+    typeof Reflect.get(value, 'version') !== 'string' ||
+    typeof Reflect.get(value, 'sourceCommit') !== 'string' ||
+    typeof Reflect.get(value, 'extractionTimestamp') !== 'string' ||
+    !Array.isArray(Reflect.get(value, 'files')) ||
+    !(Reflect.get(value, 'files') as unknown[]).every((path) => typeof path === 'string') ||
+    typeof Reflect.get(value, 'uncompressedBytes') !== 'number' ||
+    typeof Reflect.get(value, 'compressedBytes') !== 'number' ||
+    typeof Reflect.get(value, 'sha256') !== 'string'
+  ) {
+    throw new Error('agent docs provenance must contain the complete schema-version 1 field set');
+  }
+  return {
+    schemaVersion: 1,
+    version: overrides.version ?? String(Reflect.get(value, 'version')),
+    sourceCommit: String(Reflect.get(value, 'sourceCommit')),
+    extractionTimestamp: String(Reflect.get(value, 'extractionTimestamp')),
+    files: [...Reflect.get(value, 'files') as string[]],
+    uncompressedBytes: overrides.uncompressedBytes ??
+      Number(Reflect.get(value, 'uncompressedBytes')),
+    compressedBytes: overrides.compressedBytes ?? Number(Reflect.get(value, 'compressedBytes')),
+    sha256: overrides.sha256 ?? String(Reflect.get(value, 'sha256')),
+  };
+}
+
 async function write(
   path: string,
   source: string,
@@ -166,11 +204,11 @@ export async function refreshAgentDocsProvenance(
   const version = await readVersionFromRoot(root, 'packages/cli/deno.json');
   const path = '.llm/assets/agent-docs/provenance.json';
   const url = new URL(path, root);
-  const provenance = JSON.parse(await Deno.readTextFile(url)) as AgentDocsProvenance;
-  if (provenance.schemaVersion !== 1 || typeof provenance.version !== 'string') {
-    throw new Error(`${path} must contain schemaVersion 1 and a string version`);
-  }
-  const expected = `${JSON.stringify({ ...provenance, version }, null, 2)}\n`;
+  const parsed: unknown = JSON.parse(await Deno.readTextFile(url));
+  const provenance = closeAgentDocsProvenance(parsed);
+  const expected = `${
+    JSON.stringify(closeAgentDocsProvenance(provenance, { version }), null, 2)
+  }\n`;
   if (check) {
     if (await Deno.readTextFile(url) !== expected) recordStalePath(stalePaths, path);
     return provenance.version;
@@ -207,21 +245,17 @@ export async function rebaseAgentDocsProse(
   const nextCompressed = bytesEqual(nextUncompressed, uncompressed)
     ? compressed
     : await compressGzip(nextUncompressed);
-  const provenance = JSON.parse(
-    await Deno.readTextFile(provenanceUrl),
-  ) as AgentDocsProvenance;
-  if (provenance.schemaVersion !== 1 || typeof provenance.version !== 'string') {
-    throw new Error(`${provenancePath} must contain schemaVersion 1 and a string version`);
-  }
+  const provenance = closeAgentDocsProvenance(
+    JSON.parse(await Deno.readTextFile(provenanceUrl)) as unknown,
+  );
   const nextProvenance = `${
     JSON.stringify(
-      {
-        ...provenance,
+      closeAgentDocsProvenance(provenance, {
         version,
         uncompressedBytes: nextUncompressed.byteLength,
         compressedBytes: nextCompressed.byteLength,
         sha256: hex(await crypto.subtle.digest('SHA-256', copiedBuffer(nextCompressed))),
-      },
+      }),
       null,
       2,
     )

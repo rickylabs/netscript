@@ -1,6 +1,7 @@
 import {
   type BumpResult,
   coordinateVersionBump,
+  discoverVersionFiles,
   findVersionResidue,
   type VersionBumpMode,
 } from '../deps/bump-version.ts';
@@ -31,6 +32,30 @@ const defaultDependencies: PrepareReleaseDependencies = {
   findResidue: findVersionResidue,
   runCommand,
 };
+
+/** Generator-owned outputs staged by every stable or canary release preparation. */
+export const PREPARED_RELEASE_GENERATED_OUTPUTS: readonly string[] = [
+  ...PUBLISH_ASSET_OUTPUTS,
+  EXPORT_SURFACE_CORPUS_OUTPUT,
+];
+
+/** Combine the bump writer's discovered files with every generator-owned release output. */
+export function collectPreparedReleaseFiles(
+  root: string,
+  versionFiles: readonly string[],
+): string[] {
+  return [
+    ...new Set([
+      ...versionFiles,
+      ...PREPARED_RELEASE_GENERATED_OUTPUTS.map((path) => join(root, path)),
+    ]),
+  ];
+}
+
+/** Discover the complete file set that the shared release writer may stage. */
+export async function discoverPreparedReleaseFiles(root: string): Promise<string[]> {
+  return collectPreparedReleaseFiles(root, await discoverVersionFiles(root));
+}
 
 /**
  * Apply a workspace version and run the preparation gates shared by stable and
@@ -94,11 +119,7 @@ export async function prepareRelease(
   await runGate(label, 'deno ci --prod', 'deno', ['ci', '--prod'], root, dependencies);
   return {
     ...bump,
-    files: [
-      ...bump.files,
-      ...PUBLISH_ASSET_OUTPUTS.map((path) => join(root, path)),
-      join(root, EXPORT_SURFACE_CORPUS_OUTPUT),
-    ],
+    files: collectPreparedReleaseFiles(root, bump.files),
   };
 }
 

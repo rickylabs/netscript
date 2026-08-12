@@ -74,6 +74,9 @@ Deno.test('top-level generation refreshes provenance before MCP reads it', async
   const root = await Deno.makeTempDir();
   const rootUrl = toFileUrl(`${root}/`);
   try {
+    const checkedInProvenance = JSON.parse(
+      await Deno.readTextFile(new URL('../assets/agent-docs/provenance.json', import.meta.url)),
+    );
     await Promise.all([
       Deno.mkdir(`${root}/packages/cli`, { recursive: true }),
       Deno.mkdir(`${root}/packages/mcp/src`, { recursive: true }),
@@ -101,6 +104,7 @@ Deno.test('top-level generation refreshes provenance before MCP reads it', async
         `${
           JSON.stringify(
             {
+              ...checkedInProvenance,
               schemaVersion: 1,
               version: '0.0.4',
               sourceCommit: 'stale-fixture',

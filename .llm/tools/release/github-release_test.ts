@@ -6,15 +6,72 @@ import {
 } from 'jsr:@std/assert@^1';
 import {
   CANARY_PAIR_STATUS_CONTEXT,
+  collectReleaseNotes,
   composeReleaseBody,
   formatClosedIssues,
   isExactVersionReplacement,
   isVersionOnlyReleaseDiff,
   parseArgs,
+  resolvePreviousTag,
   toTag,
   toVersion,
   verifyGreenCanaryPair,
 } from './github-release.ts';
+import { discoverPreparedReleaseFiles } from './prepare-release.ts';
+import { rebaseAgentDocsProse } from '../generate-publish-assets.ts';
+
+interface TestAgentDocsPayload {
+  readonly schemaVersion: 1;
+  readonly files: Readonly<Record<string, string>>;
+}
+
+async function gzipJson(value: unknown): Promise<Uint8Array> {
+  const source = new TextEncoder().encode(JSON.stringify(value));
+  const stream = new Blob([source]).stream().pipeThrough(new CompressionStream('gzip'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+async function gunzipJson(bytes: Uint8Array): Promise<TestAgentDocsPayload> {
+  const copy = new Uint8Array(bytes);
+  const stream = new Blob([copy.buffer]).stream().pipeThrough(new DecompressionStream('gzip'));
+  const decoded = new Uint8Array(await new Response(stream).arrayBuffer());
+  return JSON.parse(new TextDecoder().decode(decoded)) as TestAgentDocsPayload;
+}
+
+async function sha256(bytes: Uint8Array): Promise<string> {
+  const copy = new Uint8Array(bytes);
+  return [...new Uint8Array(await crypto.subtle.digest('SHA-256', copy.buffer))]
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+function bytesToBase64(bytes: Uint8Array): string {
+  return btoa(String.fromCharCode(...bytes));
+}
+
+async function testAgentDocsProvenance(
+  version: string,
+  prose: Uint8Array,
+  files: readonly string[] = ['llms.txt'],
+): Promise<Record<string, unknown>> {
+  const raw = await gunzipBytes(prose);
+  return {
+    schemaVersion: 1,
+    version,
+    sourceCommit: 'canary-source',
+    extractionTimestamp: '2026-08-12T00:00:00Z',
+    files,
+    uncompressedBytes: raw.byteLength,
+    compressedBytes: prose.byteLength,
+    sha256: await sha256(prose),
+  };
+}
+
+async function gunzipBytes(bytes: Uint8Array): Promise<Uint8Array> {
+  const copy = new Uint8Array(bytes);
+  const stream = new Blob([copy.buffer]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
 
 Deno.test('toVersion strips a single leading v; toTag re-adds it', () => {
   assertEquals(toVersion('v0.0.1-alpha.20'), '0.0.1-alpha.20');
@@ -47,6 +104,50 @@ Deno.test('version-only diff accepts the complete release version surface only',
   );
 });
 
+Deno.test('version-only diff accepts a realistic coordinated release cut and rejects source drift', async () => {
+  const root = await Deno.makeTempDir({ prefix: 'netscript-release-files-' });
+  try {
+    await Deno.mkdir(`${root}/packages/a`, { recursive: true });
+    await Deno.mkdir(`${root}/plugins/workers`, { recursive: true });
+    await Deno.writeTextFile(
+      `${root}/deno.json`,
+      JSON.stringify({ version: '1.0.0', workspace: ['packages/*', 'plugins/*'] }),
+    );
+    await Deno.writeTextFile(`${root}/deno.lock`, '{}');
+    await Deno.writeTextFile(`${root}/packages/a/deno.json`, '{"version":"1.0.0"}');
+    await Deno.writeTextFile(`${root}/plugins/workers/deno.json`, '{"version":"1.0.0"}');
+    await Deno.writeTextFile(
+      `${root}/plugins/workers/scaffold.plugin.json`,
+      '{"version":"1.0.0"}',
+    );
+
+    const releaseFiles = await discoverPreparedReleaseFiles(root);
+    const changedFiles = releaseFiles.map((path) => path.slice(`${root}/`.length));
+
+    for (
+      const expected of [
+        'deno.json',
+        'deno.lock',
+        'packages/a/deno.json',
+        '.llm/assets/agent-docs/prose.json.gz',
+        '.llm/assets/agent-docs/provenance.json',
+        'packages/cli/src/kernel/assets/agent-tools.generated.ts',
+        'packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts',
+        'plugins/workers/scaffold.plugin.json',
+      ]
+    ) {
+      assertEquals(changedFiles.includes(expected), true, `missing writer output ${expected}`);
+    }
+    assertEquals(isVersionOnlyReleaseDiff(root, changedFiles, releaseFiles), true);
+    assertEquals(
+      isVersionOnlyReleaseDiff(root, [...changedFiles, 'packages/a/mod.ts'], releaseFiles),
+      false,
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
 Deno.test('green canary pair accepts current SHA or a version-only immediate parent', async () => {
   const request = (
     _method: string,
@@ -64,7 +165,7 @@ Deno.test('green canary pair accepts current SHA or a version-only immediate par
     });
   const base = {
     changedFiles: () => Promise.resolve(['deno.json']),
-    versionFiles: () => Promise.resolve(['/repo/deno.json']),
+    releaseFiles: () => Promise.resolve(['/repo/deno.json']),
     fileAtRevision: (_root: string, revision: string) =>
       Promise.resolve(revision === 'content-sha' ? '{"version":"1"}\n' : '{"version":"2"}\n'),
     request,
@@ -87,6 +188,302 @@ Deno.test('green canary pair accepts current SHA or a version-only immediate par
   );
 });
 
+Deno.test('parent canary evidence checks every release path and reproduces derived writer outputs', async () => {
+  const parentProse = await gzipJson({
+    schemaVersion: 1,
+    files: { 'llms.txt': 'Install jsr:@netscript/cli@1.0.0-canary.1' },
+  });
+  const currentProse = await gzipJson({
+    schemaVersion: 1,
+    files: { 'llms.txt': 'Install jsr:@netscript/cli@1.0.0' },
+  });
+  const parentProvenance = await testAgentDocsProvenance('1.0.0-canary.1', parentProse);
+  const currentProvenance = await testAgentDocsProvenance('1.0.0', currentProse);
+  const changedFiles = [
+    'deno.json',
+    'deno.lock',
+    '.llm/assets/agent-docs/prose.json.gz',
+    '.llm/assets/agent-docs/provenance.json',
+    'packages/cli/src/kernel/assets/agent-tools.generated.ts',
+    'plugins/workers/scaffold.plugin.json',
+  ];
+  let generatedChecks = 0;
+  const result = await verifyGreenCanaryPair('owner/repo', 'token', '/repo', {
+    revParse: (_root, revision) =>
+      Promise.resolve(revision === 'HEAD' ? 'stable-sha' : 'canary-content-sha'),
+    changedFiles: () => Promise.resolve(changedFiles),
+    releaseFiles: () => Promise.resolve(changedFiles.map((path) => `/repo/${path}`)),
+    fileAtRevision: (_root, revision, path) => {
+      if (path === 'deno.json') {
+        return Promise.resolve(
+          revision === 'canary-content-sha'
+            ? '{"version":"1.0.0-canary.1"}'
+            : '{"version":"1.0.0"}',
+        );
+      }
+      if (path === '.llm/assets/agent-docs/provenance.json') {
+        return Promise.resolve(JSON.stringify(
+          revision === 'canary-content-sha' ? parentProvenance : currentProvenance,
+        ));
+      }
+      if (path.endsWith('.gz') || path.endsWith('.generated.ts')) {
+        return Promise.resolve(`${revision}:${path}:derived-by-writer`);
+      }
+      return Promise.resolve(
+        revision === 'canary-content-sha'
+          ? 'jsr:@netscript/a@1.0.0-canary.1'
+          : 'jsr:@netscript/a@1.0.0',
+      );
+    },
+    fileBytesAtRevision: (_root, revision, path) => {
+      assertEquals(path, '.llm/assets/agent-docs/prose.json.gz');
+      return Promise.resolve(revision === 'canary-content-sha' ? parentProse : currentProse);
+    },
+    generatedOutputsFresh: () => {
+      generatedChecks += 1;
+      return Promise.resolve();
+    },
+    request: (_method, path) =>
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        body: {
+          statuses: path.includes('canary-content-sha')
+            ? [{ context: CANARY_PAIR_STATUS_CONTEXT, state: 'success' }]
+            : [],
+        },
+      }),
+  });
+
+  assertEquals(result, 'canary-content-sha');
+  assertEquals(generatedChecks, 1);
+});
+
+Deno.test('parent canary evidence fails when derived writer outputs cannot be reproduced', async () => {
+  const parentProse = await gzipJson({
+    schemaVersion: 1,
+    files: { 'llms.txt': 'Install jsr:@netscript/cli@1.0.0-canary.1' },
+  });
+  const currentProse = await gzipJson({
+    schemaVersion: 1,
+    files: { 'llms.txt': 'Install jsr:@netscript/cli@1.0.0' },
+  });
+  await assertRejects(
+    () =>
+      verifyGreenCanaryPair('owner/repo', 'token', '/repo', {
+        revParse: (_root, revision) =>
+          Promise.resolve(revision === 'HEAD' ? 'stable-sha' : 'canary-content-sha'),
+        changedFiles: () => Promise.resolve(['deno.json', '.llm/assets/agent-docs/prose.json.gz']),
+        releaseFiles: () =>
+          Promise.resolve([
+            '/repo/deno.json',
+            '/repo/.llm/assets/agent-docs/prose.json.gz',
+          ]),
+        fileAtRevision: (_root, revision, path) => {
+          if (path === 'deno.json') {
+            return Promise.resolve(
+              revision === 'canary-content-sha'
+                ? '{"version":"1.0.0-canary.1"}'
+                : '{"version":"1.0.0"}',
+            );
+          }
+          return Promise.resolve(`${revision}:not-reproducible`);
+        },
+        fileBytesAtRevision: (_root, revision, path) => {
+          assertEquals(path, '.llm/assets/agent-docs/prose.json.gz');
+          return Promise.resolve(revision === 'canary-content-sha' ? parentProse : currentProse);
+        },
+        generatedOutputsFresh: () => Promise.reject(new Error('writer output is stale')),
+        request: () => Promise.resolve({ status: 200, ok: true, body: { statuses: [] } }),
+      }),
+    Error,
+    'writer output is stale',
+  );
+});
+
+Deno.test('parent canary evidence rejects self-consistent non-version agent-docs injection', async () => {
+  const previousVersion = '1.0.0-canary.1';
+  const nextVersion = '1.0.0';
+  const marker = 'MALICIOUS-NON-VERSION-CONTENT-INJECTED-BY-EVALUATOR';
+  const prosePath = '.llm/assets/agent-docs/prose.json.gz';
+  const provenancePath = '.llm/assets/agent-docs/provenance.json';
+  const barrelPath = 'packages/cli/src/kernel/assets/agent-docs.generated.ts';
+  const documentPath = 'context/01-how-the-web-became-the-default.mdx';
+  const parentPayload: TestAgentDocsPayload = {
+    schemaVersion: 1,
+    files: { [documentPath]: `Install jsr:@netscript/cli@${previousVersion}` },
+  };
+  const injectedPayload: TestAgentDocsPayload = {
+    schemaVersion: 1,
+    files: {
+      [documentPath]: `Install jsr:@netscript/cli@${nextVersion}\n${marker}`,
+    },
+  };
+  const parentProse = await gzipJson(parentPayload);
+  const injectedProse = await gzipJson(injectedPayload);
+  const injectedRaw = new TextEncoder().encode(JSON.stringify(injectedPayload));
+  const injectedProvenance = {
+    schemaVersion: 1,
+    version: nextVersion,
+    files: [documentPath],
+    uncompressedBytes: injectedRaw.byteLength,
+    compressedBytes: injectedProse.byteLength,
+    sha256: await sha256(injectedProse),
+  };
+  const injectedBarrel = [
+    `export const EMBEDDED_AGENT_DOCS_GZIP_BASE64 = ${
+      JSON.stringify(bytesToBase64(injectedProse))
+    };`,
+    `export const EMBEDDED_AGENT_DOCS_PROVENANCE = ${JSON.stringify(injectedProvenance)};`,
+  ].join('\n');
+  const parentProvenance = JSON.stringify({ ...injectedProvenance, version: previousVersion });
+  const parentBarrel = 'parent canary barrel';
+  const changedFiles = ['deno.json', prosePath, provenancePath, barrelPath];
+  let reproducedHead = false;
+  const dependencies = {
+    revParse: (_root: string, revision: string) =>
+      Promise.resolve(revision === 'HEAD' ? 'stable-sha' : 'canary-content-sha'),
+    changedFiles: () => Promise.resolve(changedFiles),
+    releaseFiles: () => Promise.resolve(changedFiles.map((path) => `/repo/${path}`)),
+    fileAtRevision: (_root: string, revision: string, path: string) => {
+      const parent = revision === 'canary-content-sha';
+      if (path === 'deno.json') {
+        return Promise.resolve(JSON.stringify({ version: parent ? previousVersion : nextVersion }));
+      }
+      if (path === prosePath) return Promise.resolve(parent ? 'parent gzip' : 'injected gzip');
+      if (path === provenancePath) {
+        return Promise.resolve(parent ? parentProvenance : JSON.stringify(injectedProvenance));
+      }
+      return Promise.resolve(parent ? parentBarrel : injectedBarrel);
+    },
+    fileBytesAtRevision: (_root: string, revision: string, path: string) => {
+      assertEquals(path, prosePath);
+      return Promise.resolve(revision === 'canary-content-sha' ? parentProse : injectedProse);
+    },
+    generatedOutputsFresh: async () => {
+      const decoded = await gunzipJson(injectedProse);
+      assertEquals(decoded.files[documentPath]?.includes(marker), true);
+      assertEquals(injectedProvenance.sha256, await sha256(injectedProse));
+      assertStringIncludes(injectedBarrel, bytesToBase64(injectedProse));
+      assertStringIncludes(injectedBarrel, injectedProvenance.sha256);
+      reproducedHead = true;
+    },
+    request: (_method: string, path: string) =>
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        body: {
+          statuses: path.includes('canary-content-sha')
+            ? [{ context: CANARY_PAIR_STATUS_CONTEXT, state: 'success' }]
+            : [],
+        },
+      }),
+  };
+
+  await dependencies.generatedOutputsFresh();
+  assertEquals(reproducedHead, true, 'the attack must be self-consistent at HEAD');
+  await assertRejects(
+    () => verifyGreenCanaryPair('owner/repo', 'token', '/repo', dependencies),
+    Error,
+    'agent-docs prose contains non-version changes',
+  );
+});
+
+Deno.test('parent canary evidence rejects writer-preserved non-version provenance injection', async () => {
+  const version = '1.0.0';
+  const marker = 'MALICIOUS_PROVENANCE_FIELD_INJECTED_BY_EVALUATOR';
+  const prosePath = '.llm/assets/agent-docs/prose.json.gz';
+  const provenancePath = '.llm/assets/agent-docs/provenance.json';
+  const barrelPath = 'packages/cli/src/kernel/assets/agent-docs.generated.ts';
+  const documentPath = 'context/01-how-the-web-became-the-default.mdx';
+  const prose = await gzipJson({
+    schemaVersion: 1,
+    files: { [documentPath]: 'Canary-verified prose.' },
+  });
+  const raw = new TextEncoder().encode(JSON.stringify({
+    schemaVersion: 1,
+    files: { [documentPath]: 'Canary-verified prose.' },
+  }));
+  const parentProvenance = {
+    schemaVersion: 1,
+    version,
+    sourceCommit: 'canary-source',
+    extractionTimestamp: '2026-08-12T00:00:00Z',
+    files: [documentPath],
+    uncompressedBytes: raw.byteLength,
+    compressedBytes: prose.byteLength,
+    sha256: await sha256(prose),
+  };
+  const injectedProvenance = { ...parentProvenance, [marker]: true };
+  const injectedBarrel = `export const EMBEDDED_AGENT_DOCS_PROVENANCE = ${
+    JSON.stringify(injectedProvenance)
+  };`;
+  const root = await Deno.makeTempDir({ prefix: 'netscript-provenance-injection-' });
+  try {
+    await Deno.mkdir(`${root}/packages/cli`, { recursive: true });
+    await Deno.mkdir(`${root}/.llm/assets/agent-docs`, { recursive: true });
+    await Deno.writeTextFile(`${root}/packages/cli/deno.json`, JSON.stringify({ version }));
+    await Deno.writeFile(`${root}/${prosePath}`, prose);
+    await Deno.writeTextFile(
+      `${root}/${provenancePath}`,
+      `${JSON.stringify(injectedProvenance, null, 2)}\n`,
+    );
+
+    const stalePaths: string[] = [];
+    await rebaseAgentDocsProse(version, new URL(`file://${root}/`), true, stalePaths);
+    assertEquals(
+      stalePaths,
+      [provenancePath],
+      'the closed writer schema must reject the injected field',
+    );
+    assertStringIncludes(await Deno.readTextFile(`${root}/${provenancePath}`), marker);
+    assertStringIncludes(injectedBarrel, marker);
+
+    const changedFiles = [provenancePath, barrelPath];
+    await assertRejects(
+      () =>
+        verifyGreenCanaryPair('owner/repo', 'token', root, {
+          revParse: (_root, revision) =>
+            Promise.resolve(revision === 'HEAD' ? 'stable-sha' : 'canary-content-sha'),
+          changedFiles: () => Promise.resolve(changedFiles),
+          releaseFiles: () => Promise.resolve(changedFiles.map((path) => `${root}/${path}`)),
+          fileAtRevision: (_root, revision, path) => {
+            if (path === 'deno.json') return Promise.resolve(JSON.stringify({ version }));
+            if (path === provenancePath) {
+              return Promise.resolve(
+                JSON.stringify(
+                  revision === 'canary-content-sha' ? parentProvenance : injectedProvenance,
+                ),
+              );
+            }
+            return Promise.resolve(
+              revision === 'canary-content-sha' ? 'canary barrel' : injectedBarrel,
+            );
+          },
+          fileBytesAtRevision: (_root, _revision, path) => {
+            assertEquals(path, prosePath);
+            return Promise.resolve(prose);
+          },
+          generatedOutputsFresh: () => Promise.resolve(),
+          request: (_method, path) =>
+            Promise.resolve({
+              status: 200,
+              ok: true,
+              body: {
+                statuses: path.includes('canary-content-sha')
+                  ? [{ context: CANARY_PAIR_STATUS_CONTEXT, state: 'success' }]
+                  : [],
+              },
+            }),
+        }),
+      Error,
+      'agent-docs provenance contains non-version changes',
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
 Deno.test('canary pair gate fails closed for source drift and API failure', async () => {
   const noStatuses = () => Promise.resolve({ status: 200, ok: true, body: { statuses: [] } });
   await assertRejects(
@@ -94,7 +491,7 @@ Deno.test('canary pair gate fails closed for source drift and API failure', asyn
       verifyGreenCanaryPair('owner/repo', 'token', '/repo', {
         revParse: () => Promise.resolve('source-sha'),
         changedFiles: () => Promise.resolve(['packages/a/mod.ts']),
-        versionFiles: () => Promise.resolve(['/repo/deno.json']),
+        releaseFiles: () => Promise.resolve(['/repo/deno.json']),
         fileAtRevision: () => Promise.resolve('{"version":"1"}\n'),
         request: noStatuses,
       }),
@@ -106,7 +503,7 @@ Deno.test('canary pair gate fails closed for source drift and API failure', asyn
       verifyGreenCanaryPair('owner/repo', 'token', '/repo', {
         revParse: () => Promise.resolve('source-sha'),
         changedFiles: () => Promise.resolve(['deno.json']),
-        versionFiles: () => Promise.resolve(['/repo/deno.json']),
+        releaseFiles: () => Promise.resolve(['/repo/deno.json']),
         fileAtRevision: () => Promise.resolve('{"version":"1"}\n'),
         request: () => Promise.resolve({ status: 403, ok: false, body: { message: 'forbidden' } }),
       }),
@@ -122,7 +519,7 @@ Deno.test('parent canary evidence rejects seeded manifest drift inside a version
         revParse: (_root, revision) =>
           Promise.resolve(revision === 'HEAD' ? 'stable-sha' : 'content-sha'),
         changedFiles: () => Promise.resolve(['deno.json']),
-        versionFiles: () => Promise.resolve(['/repo/deno.json']),
+        releaseFiles: () => Promise.resolve(['/repo/deno.json']),
         fileAtRevision: (_root, revision) =>
           Promise.resolve(
             revision === 'content-sha'
@@ -166,6 +563,96 @@ Deno.test('composeReleaseBody orders intro, changelog, closed issues and drops b
     closedIssues: '',
   });
   assertEquals(noIssues, "Intro.\n\n## What's Changed\n");
+});
+
+Deno.test('--prev-tag resolves a dated window and queries closed issues', async () => {
+  const plan = parseArgs([
+    'v1.0.0',
+    '--message',
+    'Release intro.',
+    '--prev-tag',
+    'v0.9.0',
+  ]);
+  const calls: string[] = [];
+  const notes = await collectReleaseNotes(plan, 'token', 'v1.0.0', {
+    fetchPreviousRelease: () => {
+      throw new Error('auto-detection must not run with --prev-tag');
+    },
+    resolvePreviousTag: (_repo, _token, tag) => {
+      calls.push(`resolve:${tag}`);
+      return Promise.resolve({ tag, since: '2026-08-01T12:00:00Z' });
+    },
+    generateWhatsChanged: (_repo, _token, _tag, previousTag) => {
+      calls.push(`notes:${previousTag}`);
+      return Promise.resolve("## What's Changed");
+    },
+    fetchClosedIssues: (_repo, _token, since) => {
+      calls.push(`closed:${since}`);
+      return Promise.resolve([{ number: 1430, title: 'Closed issues were silently skipped' }]);
+    },
+  });
+
+  assertEquals(notes.closed.length, 1);
+  assertEquals(calls, [
+    'resolve:v0.9.0',
+    'notes:v0.9.0',
+    'closed:2026-08-01T12:00:00Z',
+  ]);
+});
+
+Deno.test('known previous tag with empty since fails loudly before reporting closed issues', async () => {
+  const plan = parseArgs(['v1.0.0', '--message', 'Release intro.', '--prev-tag', 'v0.9.0']);
+  let queriedClosedIssues = false;
+  await assertRejects(
+    () =>
+      collectReleaseNotes(plan, 'token', 'v1.0.0', {
+        fetchPreviousRelease: () => Promise.resolve(null),
+        resolvePreviousTag: (_repo, _token, tag) => Promise.resolve({ tag, since: '' }),
+        generateWhatsChanged: () => Promise.resolve(''),
+        fetchClosedIssues: () => {
+          queriedClosedIssues = true;
+          return Promise.resolve([]);
+        },
+      }),
+    Error,
+    'since timestamp is empty',
+  );
+  assertEquals(queriedClosedIssues, false);
+});
+
+Deno.test('explicit previous tag uses release date with commit-date fallback', async () => {
+  const releaseCalls: string[] = [];
+  const released = await resolvePreviousTag('owner/repo', 'token', 'v0.9.0', (
+    method,
+    path,
+  ) => {
+    releaseCalls.push(`${method} ${path}`);
+    return Promise.resolve({
+      status: 200,
+      ok: true,
+      body: { published_at: '2026-07-31T10:00:00Z' },
+    });
+  });
+  assertEquals(released, { tag: 'v0.9.0', since: '2026-07-31T10:00:00Z' });
+  assertEquals(releaseCalls.length, 1);
+
+  const fallbackCalls: string[] = [];
+  const unreleased = await resolvePreviousTag('owner/repo', 'token', 'v0.9.0', (
+    method,
+    path,
+  ) => {
+    fallbackCalls.push(`${method} ${path}`);
+    if (path.includes('/releases/tags/')) {
+      return Promise.resolve({ status: 404, ok: false, body: { message: 'Not Found' } });
+    }
+    return Promise.resolve({
+      status: 200,
+      ok: true,
+      body: { commit: { committer: { date: '2026-07-30T09:00:00Z' } } },
+    });
+  });
+  assertEquals(unreleased, { tag: 'v0.9.0', since: '2026-07-30T09:00:00Z' });
+  assertEquals(fallbackCalls.length, 2);
 });
 
 Deno.test('parseArgs: version positional or flag, defaults to non-prerelease Latest', () => {

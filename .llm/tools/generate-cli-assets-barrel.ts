@@ -388,6 +388,21 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
 `;
 }
 
+async function writeOrCheckGeneratedAsset(
+  output: URL,
+  expected: string,
+  check: boolean,
+): Promise<void> {
+  if (check) {
+    const actual = await Deno.readTextFile(output).catch(() => '');
+    if (actual !== expected) {
+      throw new Error(`${output.pathname} is stale; run deno task gen:assets-barrel`);
+    }
+    return;
+  }
+  await Deno.writeTextFile(output, expected);
+}
+
 if (import.meta.main) {
   if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
     console.log(
@@ -399,38 +414,49 @@ if (import.meta.main) {
         '  deno run --allow-read --allow-write --allow-run \\',
         '    .llm/tools/generate-cli-assets-barrel.ts',
         '',
-        'Takes no flags (other than --help). Rewrites the *.generated.ts barrels in place.',
+        '--check compares every generated barrel without writing it.',
+        'Without --check, rewrites the *.generated.ts barrels in place.',
       ].join('\n'),
     );
     Deno.exit(0);
   }
+  const check = Deno.args.includes('--check');
+  const unknownArgs = Deno.args.filter((arg) => arg !== '--check');
+  if (unknownArgs.length > 0) throw new Error(`Unknown argument: ${unknownArgs[0]}`);
 
-  await Deno.writeTextFile(
+  await writeOrCheckGeneratedAsset(
     CLI_OUTPUT_URL,
     await formatTypeScript(await renderCliEmbeddedContent()),
+    check,
   );
-  await Deno.writeTextFile(
+  await writeOrCheckGeneratedAsset(
     PLUGIN_OUTPUT_URL,
     await formatTypeScript(await renderPluginEmbeddedContent()),
+    check,
   );
-  await Deno.writeTextFile(
+  await writeOrCheckGeneratedAsset(
     FRESH_UI_OUTPUT_URL,
     await formatTypeScript(await renderFreshUiRegistryContent()),
+    check,
   );
-  await Deno.writeTextFile(
+  await writeOrCheckGeneratedAsset(
     SERVICE_OUTPUT_URL,
     await formatTypeScript(await renderServiceEmbeddedContent()),
+    check,
   );
-  await Deno.writeTextFile(
+  await writeOrCheckGeneratedAsset(
     SKILL_OUTPUT_URL,
     await formatTypeScript(await renderSkillEmbeddedContent()),
+    check,
   );
-  await Deno.writeTextFile(
+  await writeOrCheckGeneratedAsset(
     AGENT_TOOL_OUTPUT_URL,
     await formatTypeScript(await renderAgentToolEmbeddedContent()),
+    check,
   );
-  await Deno.writeTextFile(
+  await writeOrCheckGeneratedAsset(
     AGENT_DOCS_OUTPUT_URL,
     await formatTypeScript(await renderAgentDocsEmbeddedContent()),
+    check,
   );
 }
