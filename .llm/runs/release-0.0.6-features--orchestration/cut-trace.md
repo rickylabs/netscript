@@ -26,6 +26,8 @@ owns the canary and the stable cut.
 
 | 5 | 2026-08-12T13:11:29Z | `5705aeb19` — `fix(fresh): hydrate the deferred refresh coordinator so partial-miss regions settle (#1558)` | #1558 | **#1459** (closed by hand — PR carried `Refs`, observational criterion routed to #1557) | `slices/pre-merge-gate-1558.md` — 7 checks PASS at head `2d515de75` |
 
+| 6 | 2026-08-12T13:59:13Z | `a553afef4` — `fix(release): regenerate the deno.lock closure for the packages/fresh plugin-vite dependency (#1572)` | #1572 | **none** — carries `Refs #1571`, which stays open pending Canary.3 | `slices/pre-merge-gate-1558.md` pattern; overlap guard clean, 387/9 lock-only |
+
 Rows captured from `git log origin/main --first-parent -1` **after** each merge, per the
 profile's merge-derived rule. Issue states re-read live: both `CLOSED` / `COMPLETED`, with
 `status:shipped` applied to each issue and PR.

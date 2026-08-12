@@ -1093,3 +1093,53 @@ land before Canary.3.
 **Internals notified** on #1570: its `fresh-ui-quality` red is owned by #1580, not by its code, with
 the measurements quoted. Explicitly asked them **not** to regenerate the lock from their branch —
 parallel writers on the same derived file would conflict.
+
+## 2026-08-12 — #1572 MERGED (`a553afef4`); release blocker cleared
+
+IMPL-EVAL **PASS** (`31602156674`). Both merge blockers were **artifacts, not defects**, and
+diagnosing beat retrying:
+
+- **`close-gate` was stale by nine minutes** — it ran 13:35:00Z, my lifecycle edit landed 13:44:12Z.
+  Its log showed it gating on `#1571`'s boxes (body still said `Closes`) and on a DoD line since moved
+  to post-merge. Re-running `ci` returned `completed/success`, **confirming** the fix rather than
+  assuming it.
+- **Both `scaffold-runtime` tiers were `CANCELLED`**, which pre-merge check 4 treats as *absent*, not
+  passing. The eval had completed and a required gate was still missing — the documented condition
+  for a rerun. Both returned `SUCCESS`. **No runtime code was ever touched**; a cancelled row was
+  never a product signal.
+
+### A false green I caught in my own gate run
+
+My first overlap-guard attempt **errored** — `origin/fix/1571-...` was not fetched in this checkout —
+and `GATE 3: CLEAN` printed from the `||` branch of a **failed** command rather than from a real scan.
+I re-fetched the ref explicitly and re-ran. The corrected guard: merge-base `5705aeb19`, main
+`db1d79c68`, 2 commits since, **no file overlap**, `deno.lock` only, scan genuinely executed
+(`rc=1` = no matches), delta **still exactly 387/9 against the new main**.
+
+Worth recording plainly: a gate that reports CLEAN because its command failed is the same class of
+defect as a gate that never ran. I nearly merged on one.
+
+### Merge and validation
+
+Normalized to exactly one `status:` label (automation had re-added `status:augment-review` — **fifth**
+occurrence). Squash-merged head `9ccb4db4b` → **`a553afef4`**.
+
+Exact-new-main validation: all three plugin-vite entries present (`:34` exact, `:35` range, `:4222`
+workspace member), and **`deno ci --prod` frozen PASSES on the new main** with a clean tree. The
+release blocker is cleared.
+
+**#1571 remains OPEN**, box 5 unticked, awaiting Canary.3 proof.
+
+## 2026-08-12 — #1580 verified; documented IMPL-EVAL skip exercised
+
+Slice delta is exactly as specified: **one line**, `packages/fresh-ui/deno.lock` only,
+`+ "jsr:@fresh/plugin-vite@^1.1.2",`. Private frozen check now `failedBatches: 0` (was 2 of 2).
+
+Verified independently: PR diff vs main is that lock alone, tree clean, and **byte-identical**
+`sha256` across a second full `check` + `test` pass
+(`77de591c…58c7c8` both times).
+
+**First use of the documented `impl-eval:skip` hatch in this lane.** Applied the label **before** the
+ready transition — the dispatcher computes its skip from the label at the `ready_for_review` event, so
+the order is load-bearing. Result: dispatcher `completed/success` with **zero agent summaries** — an
+attributed skip, no evaluator spent. `PLAN-EVAL: N/A`.
