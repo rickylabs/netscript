@@ -515,3 +515,37 @@ The disposition does not change — criterion 5 stays unticked and #1602 still m
 provenance for a hand-authored fixture. What changes is the follow-up: **#1616 now states it closes
 Reading A**, and records that Reading B is the cheaper fix and should be done first, since it would
 replace `tests/fixtures/route-binding-browser/routes.ts` with real generator output.
+
+---
+
+## D-14 — my briefs put issue numbers into published JSDoc, twice
+
+**Severity: significant. Recorded 2026-08-12. Caught by the owner both times.**
+
+Since **#1587** landed the published-JSDoc codename fitness gate, an internal issue reference in a
+doc comment on published surface is a CI failure. `#1589` has now reached published JSDoc **twice**,
+and both times the wording came from a brief I wrote:
+
+| Occurrence | File | Consequence |
+| --- | --- | --- |
+| via #1595 | `packages/cli/src/kernel/domain/dependency-closures/netscript-web-runtime-closure.ts:6` | broke `check-test` on #1602; fixed on `main` by another lane in #1614 |
+| via #1605 | `packages/sdk/src/cache/cache-provider-marker.ts:6` | fails the codename gate and `quality` at head `1e8768bc1` |
+
+**Mechanism.** I use issue numbers as shorthand for context in briefs — "the #1589 gate", "closed-invalid
+#1550" — because they are precise and the implementer can look them up. Implementers reasonably carry
+that shorthand into the code comment when the brief asks them to *record the reasoning in source*.
+That is the exact instruction I gave for the marker rationale.
+
+The shorthand is correct **for a brief** and wrong **for published JSDoc**: a consumer reading
+`@netscript/sdk` docs has no access to this repo's issue tracker, so the reference is noise to them and
+a gate failure to us.
+
+**Rule for my own briefs from now on:** when asking for reasoning to be recorded *in published source*,
+state the mechanism by name, not by issue number — "the dependency-closure coherence gate", not "the
+#1589 gate". Issue numbers stay in the brief, the run artifacts, and the PR body, where they are useful
+and ungated. Where a brief quotes wording destined for a source comment, that wording must itself be
+codename-free.
+
+The correction here is narrow and text-only: rewrite the clause to name the mechanism. The reasoning
+the comment records — that closure coherence is enforced elsewhere and this marker deliberately does
+not attempt cross-instance recognition — is unchanged and still correct.
