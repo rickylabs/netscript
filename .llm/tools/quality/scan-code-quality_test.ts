@@ -89,13 +89,16 @@ Deno.test('scanner catches plugin-identity via const/array indirection (Opus IMP
 Deno.test('scanner catches @ts-error suppressions and `as never` (source-side type escapes)', async () => {
   const root = await Deno.makeTempDir();
   await Deno.mkdir(`${root}/packages/cli/src`, { recursive: true });
-  await Deno.writeTextFile(`${root}/packages/cli/src/escape.ts`, [
-    '// @ts-expect-error upstream type mismatch',
-    'const a = wrong();',
-    'const b = value as never;',
-    '// @ts-ignore',
-    'const c = other();',
-  ].join('\n'));
+  await Deno.writeTextFile(
+    `${root}/packages/cli/src/escape.ts`,
+    [
+      '// @ts-expect-error upstream type mismatch',
+      'const a = wrong();',
+      'const b = value as never;',
+      '// @ts-ignore',
+      'const c = other();',
+    ].join('\n'),
+  );
   const rules = (await scanCodeQuality(['packages/cli/src'], root)).map((f) => f.rule);
   assertEquals(rules.filter((r) => r === 'ts-error-suppression').length, 2);
   assertEquals(rules.filter((r) => r === 'unsafe-cast').length, 1);
@@ -120,7 +123,8 @@ Deno.test('type-fixture exemption requires both its directory and suffix', async
   const fixtureDir = join(testsDir, 'type-fixtures');
   await Deno.mkdir(sourceDir, { recursive: true });
   await Deno.mkdir(fixtureDir, { recursive: true });
-  const directive = '// @ts-expect-error negative compile fixture assertion\nconst value: string = 1;\n';
+  const directive =
+    '// @ts-expect-error negative compile fixture assertion\nconst value: string = 1;\n';
   await Deno.writeTextFile(join(sourceDir, 'ordinary-source.ts'), directive);
   await Deno.writeTextFile(join(testsDir, 'outside-directory_type.ts'), directive);
   await Deno.writeTextFile(join(fixtureDir, 'missing-suffix.ts'), directive);

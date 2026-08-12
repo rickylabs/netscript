@@ -13,3 +13,9 @@ The dispatch and live issue name
 repository search locate the stated allowance at
 `packages/sdk/tests/type-fixtures/desktop-consumer_type.ts:42`. The Fresh file has no such allowance.
 E4 will remove the actual SDK allowance so the required scan-owned count can fall 10 → 8.
+
+## D-3 — scoped format initially exposed adjacent legacy formatting
+
+The required scoped format wrapper initially exited 1 because the existing `escape.ts` fixture setup
+in `scan-code-quality_test.ts` was not in current formatter shape. Since E1/E3 already own that file,
+`deno fmt` was applied to that file only. The wrapper rerun exits 0; no other file was formatted.

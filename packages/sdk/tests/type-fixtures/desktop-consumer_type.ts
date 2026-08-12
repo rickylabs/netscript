@@ -39,7 +39,7 @@ const client = createDesktopServiceClient({ contract: ordersContract, invoke });
 const typedClient: ServiceClient<typeof ordersContract> = client;
 const order: Promise<Order> = typedClient.get({ id: 'ord_1' });
 
-// @ts-expect-error id must remain a string across the Desktop transport. // quality-allow: negative compile fixture proves contract input remains enforced without bindings.d.ts
+// @ts-expect-error id must remain a string across the Desktop transport.
 typedClient.get({ id: 42 });
 
 void link;

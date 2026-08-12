@@ -44,3 +44,26 @@ PLAN-EVAL: PASS in the orchestrator rail plan; PR #1553 run 31589648809 at `69ef
 - Quality tool tests: 8 passed, 0 failed, exit 0.
 - Reconcile: live contract coverage now proves both sides of the conjunction. PR #1560 remains
   draft; E4 owns redundant-comment removal and final gates.
+
+## E4 — redundant allowances and final gates
+
+- Removed only the trailing `quality-allow:` clauses from the two actual SDK fixture directives;
+  the `@ts-expect-error` assertions and their assertion reasons remain unchanged.
+- Base repo scan at `84dd44ae7`: exit 1, five findings, `allowCount: 10`.
+- Head repo scan: exit 0, no findings, `allowCount: 8`.
+- Fixture diff audit: only the two named trailing allowance clauses changed across all `*_type.ts`
+  files. `deno.lock` is unchanged. No new suppression/cast/allowance construct was introduced.
+
+| Gate | Result |
+| --- | --- |
+| Quality tool tests | exit 0; 8 passed, 0 failed |
+| `quality:scan:repo` | exit 0; `findings: []`; `allowCount: 8` |
+| `quality:scan` | exit 0; `findings: []`; `allowCount: 7` |
+| `quality:gate` | exit 0; scanner and doctrine chain green (warnings non-blocking) |
+| Scoped check | exit 0; 2 files, 0 findings |
+| Scoped lint | exit 0; 2 files, 0 findings |
+| Scoped fmt | initial exit 1 on the pre-existing test block adjacent to E1; file-only formatting applied; rerun exit 0, 2 files, 0 findings |
+
+Reconcile: all six pre-merge acceptance boxes have evidence. Box 7 remains intentionally unmapped
+and unchecked because it is marked `[post-merge]`. PR #1560 remains draft for orchestrator-owned
+IMPL-EVAL and merge handling.
