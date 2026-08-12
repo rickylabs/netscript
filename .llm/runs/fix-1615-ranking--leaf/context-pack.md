@@ -39,13 +39,12 @@ orchestrator's separate native Opus 5 read-only evaluation.
 
 ## In Progress
 
-- S3 evidence commit/push and PR body correction.
+- No implementation work remains; awaiting the orchestrator's immutable-head evaluation.
 
 ## Next Steps
 
-1. Commit/push the S3 review correction and update the draft PR body/comment.
-2. Stop with the PR still draft and exactly `status:impl`.
-3. Orchestrator dispatches mandatory native Opus 5 IMPL-EVAL against the immutable head.
+1. Stop with the PR still draft and exactly `status:impl`.
+2. Orchestrator dispatches mandatory native Opus 5 IMPL-EVAL against the immutable head.
 
 ## Key Decisions
 
@@ -91,5 +90,5 @@ orchestrator's separate native Opus 5 read-only evaluation.
 - `b943392d7` — S1 implementation and focused proof.
 - `5d7ca0f46` — negative-control perturbation (intentionally reverted).
 - `c86a4080f` — negative-control restoration.
-- Final S2 evidence — this handoff commit; use the immutable draft PR head as the authoritative
-  hash.
+- `7933e044c` — restore route-ranked confidence, add its regression test, and record S3 evidence.
+- Final handoff artifact commit — use the immutable draft PR head as the authoritative hash.

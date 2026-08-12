@@ -89,6 +89,7 @@ the gap is not wide; fixture narrowing is rejected because rank three can remain
 | 2026-08-12 | S3    | confidence test       | Added a real-index regression: the unhinted global scorer wins with `high`; activating a route promotes a lower scorer and yields `medium`.                                                                                         |
 | 2026-08-12 | S3    | negative control      | Re-perturbed the same expectation without committing it; guidance evaluation exited raw `1`, and restoring the fixture returned it to green in the package test run.                                                                |
 | 2026-08-12 | S3    | corpus-growth bound   | The slug tie-break is deterministic but arbitrary. A newly added close-scoring document whose slug sorts earlier can change the locked order; the fixture then needs semantic review rather than an automatic relock.               |
+| 2026-08-12 | S3    | reconcile             | Draft PR #1617 body/comment now state confidence semantics, arbitrary tie order, corpus-growth limits, and #1618 format scope; it remains draft with exactly `status:impl`.                                                         |
 
 ## Decisions
 
