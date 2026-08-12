@@ -27,10 +27,12 @@ and deployed endpoints without a registry or a config file.
   shared contract router; input and output types come from the contract, never from you.
 - **Aspire service discovery** — `./discovery` resolves service URLs and database/KV connections
   from orchestrator-injected environment variables, lazily at call time.
-- **Cache-aware query factories** — `createQueryFactory` generates server-side query helpers backed
-  by the shared KV cache with stale-while-revalidate semantics.
-- **TanStack Query integration** — `createNetScriptQueryClient` and `createServiceQueryUtils` give
-  browser and island code server-first defaults, invalidation bridging, and KV-backed persistence.
+- **Cache-aware query factories** — `createQueryFactories` is the golden path: one call over a
+  resource-to-config map returns server-side query helpers for every resource, backed by the shared
+  KV cache with stale-while-revalidate semantics. Each generated action takes its input directly —
+  `queryOptions(input)`. `createQueryFactory` builds the same helpers for a single resource.
+- **TanStack Query integration** — `createNetScriptQueryClient` gives browser and island code
+  server-first defaults, invalidation bridging, and KV-backed persistence.
 - **Distributed tracing built in** — every client call is wrapped in an outbound span and carries
   the W3C `traceparent` header, so client and server spans join one distributed trace.
 - **Native auto-update configuration** — `./auto-update` validates the app-pinned release endpoint
@@ -92,6 +94,22 @@ const ordersQueryUtils = queryUtils.orders;
 
 Drop to a focused subpath when an app only needs part of the surface — `./client`, `./query`, and
 `./query-client` carry the three pieces individually.
+
+### Two query dialects — pick one per data layer
+
+`queries.*` and `queryUtils.*` are not interchangeable, and their call shapes differ by exactly one
+pair of braces.
+
+|                      | `queries.*` (`createQueryFactories`)                                                                      | `queryUtils.*` (`createServiceQueryUtils`)                        |
+| -------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Call shape           | `queryOptions(input)`                                                                                     | `queryOptions({ input })`                                         |
+| Server KV cache tier | yes — stale-while-revalidate, `prefetch`, `getCachedData`, `invalidate`                                   | **no**                                                            |
+| Use it for           | the golden path: server and framework-neutral code, and islands that should read through the shared cache | a thin oRPC-to-TanStack remap when no server cache tier is wanted |
+
+Prefer `queries.*`. Reach for `queryUtils.*` only when the narrower surface is what you actually
+want, and do not mix the two call shapes within one data layer: they address different key spaces,
+which is why `./query-client` ships `toClientKeyPrefix` and `bridgeInvalidation` to cross between
+them deliberately.
 
 ### Desktop RPC bindings
 

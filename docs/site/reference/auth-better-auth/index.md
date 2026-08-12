@@ -5,8 +5,8 @@ title: "@netscript/auth-better-auth"
 
 # `@netscript/auth-better-auth`
 
-Better Auth integration, authenticator, and backend adapter for NetScript auth. This
-page is generated from the package's public surface with `deno doc`.
+Better Auth integration, authenticator, and backend adapter for NetScript auth. This page is
+written against the package's public surface reported by `deno doc`.
 
 ## Factories
 

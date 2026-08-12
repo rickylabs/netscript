@@ -7,8 +7,8 @@ title: "@netscript/plugin-ai-core"
 
 The contract-only core for the NetScript AI plugin: the oRPC `/v1/ai` route surface — an
 SSE-framed `chat` stream plus `models`, `tools/{name}`, `embed`, and `transcribe` — that a
-connector implements and the typed client calls. This page is generated from the package's
-public surface with `deno doc` (US-2). For the full index of packages and plugins return to the
+connector implements and the typed client calls. This page is written against the package's
+public surface reported by `deno doc`. For the full index of packages and plugins return to the
 [reference overview](/reference/).
 
 The package ships **zero service implementation** (Archetype 1 — Small Contract). It declares the
@@ -20,7 +20,7 @@ contract.
 
 ## Entrypoints
 
-The package publishes two entrypoints. Each is generated from its own `deno doc` surface.
+The package publishes two entrypoints. Each is documented against its own `deno doc` surface.
 
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |

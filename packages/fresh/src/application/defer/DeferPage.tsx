@@ -258,20 +258,19 @@ export function DeferPage({
     <div>
       <Partial name={name}>
         {hasCachedData ? component : fallback || null}
+        <DeferComponent
+          action={action}
+          partial={partial}
+          partialSearchParams={partialSearchParams}
+          isPartialRequest={isPartialRequest}
+          hasCachedData={hasCachedData}
+          cachedAt={cachedAt}
+          staleTime={resolvedPolicy.staleTimeMs}
+          serverRevalidating={!isPrewarmRequest && (shouldPrewarmStale || shouldPrewarmMiss)}
+          searchParams={searchParams}
+          policy={resolvedPolicy}
+        />
       </Partial>
-
-      <DeferComponent
-        action={action}
-        partial={partial}
-        partialSearchParams={partialSearchParams}
-        isPartialRequest={isPartialRequest}
-        hasCachedData={hasCachedData}
-        cachedAt={cachedAt}
-        staleTime={resolvedPolicy.staleTimeMs}
-        serverRevalidating={!isPrewarmRequest && (shouldPrewarmStale || shouldPrewarmMiss)}
-        searchParams={searchParams}
-        policy={resolvedPolicy}
-      />
     </div>
   );
 }

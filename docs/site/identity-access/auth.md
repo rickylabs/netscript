@@ -362,7 +362,7 @@ Aspire-first ordering every plugin schema follows.</li>
 ## Reference
 
 The auth runtime is a `@netscript/service`; the auth plugin, core contract package, and backend
-adapters now have dedicated generated reference pages.
+adapters now have dedicated reference pages.
 
 {{ comp.xref({ key: "ref:auth" }) }}
 {{ comp.xref({ key: "ref:service" }) }}

@@ -6,8 +6,8 @@ title: "@netscript/kv"
 # `@netscript/kv`
 
 Reactive key-value storage with a unified API across Deno KV, Redis, and in-memory
-backends. This page is generated from the package's public surface with `deno doc`
-(US-2). For the full index of packages and plugins return to the
+backends. This page is written against the package's public surface reported by `deno doc`.
+For the full index of packages and plugins return to the
 [reference overview](/reference/).
 
 The root entrypoint (`@netscript/kv`) exposes the stable shared lifecycle API, the

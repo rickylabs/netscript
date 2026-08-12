@@ -37,7 +37,7 @@ export default defineConfig(({ mode }) => {
       host: env.NETSCRIPT_VITE_HOST ?? '0.0.0.0',
     },
     plugins: [
-      fresh(),
+      fresh({ islandSpecifiers: ['@netscript/fresh/defer/island'] }),
       tailwindCSS(),
       createNetScriptVitePlugin({
         appRoot,

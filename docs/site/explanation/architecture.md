@@ -71,7 +71,7 @@ This is why "change the shape" is a type error you see at compile time rather
 than a 500 you discover in production. The contract machinery —
 `@orpc/contract`, zod, and `implement()` — is the subject of
 [Contracts &amp; type flow]({{ comp.xref({ key: "explain:contracts" }) }}); the
-generated reference is [`@netscript/contracts`]({{ comp.xref({ key: "ref:contracts" }) }}).
+API reference is [`@netscript/contracts`]({{ comp.xref({ key: "ref:contracts" }) }}).
 
 ### 2. Packages and plugins — composing the substrate
 

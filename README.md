@@ -39,8 +39,14 @@ deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>
 netscript init my-app --db postgres --service --yes
 ```
 
-The scaffold reports **183 files, 44 directories** and prints your numbered next steps — follow
-them:
+Replace `<version>` with the current release — the
+[latest tag](https://github.com/rickylabs/netscript/releases/latest), or the version shown on
+[jsr.io/@netscript/cli](https://jsr.io/@netscript/cli). Bare `jsr:@netscript/*` specifiers do not
+resolve on the pre-release line, so the pin is required rather than cosmetic.
+
+The scaffold reports its own file and directory totals — they vary with the database, service,
+editor, and agent-tooling options you chose, so the printed output is the authority — and ends with
+your numbered next steps. Follow them:
 
 ```bash
 # 3. Boot the whole stack: Postgres, cache, and every service come up together
@@ -61,7 +67,8 @@ netscript db seed
 ```
 
 The payoff: the Aspire dashboard shows every resource, trace, and log in one place, and your typed
-service answers on its health probe (replace `<port>` with the port assigned to your service in the scaffold console output or Aspire dashboard):
+service answers on its health probe (replace `<port>` with the port assigned to your service in the
+scaffold console output or Aspire dashboard):
 
 ```bash
 curl http://localhost:<port>/health
@@ -121,13 +128,11 @@ gets there through the plugin system. A plugin is, at its core, a manifest: plai
 declaring what it contributes, inspected by hosts without executing plugin code. One manifest can
 contribute across **every layer** — CLI verbs, scaffolded code, runtime services, storage, stream
 topics, telemetry, Aspire resources — and the host materializes whatever it declares. One command,
-four plugin files scaffolded and twelve Aspire helpers regenerated:
+and every scaffolded plugin file and regenerated Aspire helper is itemized in its output:
 
 ```bash
 netscript plugin install worker --name workers
 # Installed worker plugin "workers" on port 49152. (Note: your scaffold's port will differ)
-# Created 4 plugin files.
-# Regenerated 12 Aspire helper files.
 ```
 
 The same mechanism that ships the six first-party plugins below is how a team extends the framework

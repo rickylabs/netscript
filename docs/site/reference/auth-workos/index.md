@@ -5,8 +5,8 @@ title: "@netscript/auth-workos"
 
 # `@netscript/auth-workos`
 
-WorkOS-backed authenticator and backend adapter for NetScript auth. This page is
-generated from the package's public surface with `deno doc`.
+WorkOS-backed authenticator and backend adapter for NetScript auth. This page is written against
+the package's public surface reported by `deno doc`.
 
 ## Factories
 

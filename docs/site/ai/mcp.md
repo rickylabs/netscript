@@ -175,7 +175,7 @@ published and gate-tested.
   },
   {
     title: "Look up — @netscript/ai",
-    body: "The generated reference for the engine package, including every ./mcp export.",
+    body: "The API reference for the engine package, including every ./mcp export.",
     href: "/reference/ai/",
     icon: "≡"
   }
