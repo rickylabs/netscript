@@ -182,3 +182,45 @@ documentation site agree.
 could not authorize inheritance, so the pair had to be proven directly rather than inherited — which
 is exactly what the workflow did by writing the pair on the pre-bump content SHA. 0.0.5 paid an
 extra canary cycle for discovering this at publish time; here it was predicted before dispatch.
+
+### F-3 — I killed watchers by host-wide string match, which is the anti-pattern I was warned about `[observed]`
+
+**2026-08-12, wave 2.** I armed four turn-watchers inside a single command using `&` and redirected
+their output to `/dev/null`. Both halves were wrong:
+
+- backgrounding with `&` inside one Bash call means the watchers are not tracked per-command, so no
+  task notification fires;
+- `>/dev/null` discards the very output that would have carried the wake signal.
+
+They ran. They would have exited silently. **A watcher that cannot wake you is worse than no
+watcher, because it looks like coverage** — the same shape as every false-green in this milestone,
+now in my own supervision plumbing.
+
+**The cleanup was worse than the mistake.** I cleared them with:
+
+```
+pkill -f "codex-watch"
+```
+
+That is a **host-wide string match**. It does not distinguish my watchers from any other lane's, and
+five lanes are active on this host. `agent-milestone-orchestrator` states the rule directly —
+*never establish ownership by string match* — with the inverse example of a liveness check matching
+worktree paths quoted inside other agents' brief text. I ran the same class of command against a
+shared host without checking ownership first.
+
+**Blast radius, established rather than assumed:** a `codex-watch` is a **read-only observer**. All
+four of my slices continued writing across the kill (`last_write` 0–13s afterwards) and the daemon
+stayed healthy at `app-server-procs=3`. Any other lane's watcher I killed likewise cost them a wake
+signal, not a thread, a worktree, or any work. Nothing was destroyed; some lane may simply not be
+woken by a watcher it thought it had — which is precisely the failure I had just created for myself,
+propagated to a neighbour.
+
+**Rules earned:**
+
+1. Arm one watcher per tracked background command, never `&`-fanned inside one call, and never with
+   output discarded.
+2. To stop a watcher, target it by **PID captured at launch**, never by `pkill -f` on a shared host.
+   If ownership cannot be proven, leave it alone — the same rule the resource-hygiene tooling
+   applies to containers and worktrees.
+
+Reported to the peer lanes rather than left for them to discover a dead watcher.
