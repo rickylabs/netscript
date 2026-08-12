@@ -1,6 +1,6 @@
 {
   "name": "@netscript/auth-better-auth",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "better-auth integration helpers for NetScript services.",
   "license": "Apache-2.0",
   "exports": {
