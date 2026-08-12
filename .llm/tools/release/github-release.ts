@@ -49,6 +49,7 @@ import { rewriteNetScriptVersion } from '../deps/bump-version.ts';
 const DEFAULT_REPO = 'rickylabs/netscript';
 export const CANARY_PAIR_STATUS_CONTEXT = 'release/canary-pair';
 const AGENT_DOCS_PROSE_PATH = '.llm/assets/agent-docs/prose.json.gz';
+const AGENT_DOCS_PROVENANCE_PATH = '.llm/assets/agent-docs/provenance.json';
 
 export interface ClosedIssue {
   readonly number: number;
@@ -235,6 +236,40 @@ export async function verifyGreenCanaryPair(
             );
           }
         }
+        if (
+          inexactGeneratedPaths.some((path) =>
+            normalizeGitPath(path) === AGENT_DOCS_PROVENANCE_PATH
+          )
+        ) {
+          const readBytes = dependencies.fileBytesAtRevision;
+          if (!readBytes) {
+            throw new Error(
+              'Stable publication blocked: agent-docs provenance requires binary parent-to-HEAD ' +
+                'prose comparisons before canary evidence can be inherited.',
+            );
+          }
+          const [beforeProvenance, afterProvenance, beforeProse, afterProse] = await Promise.all([
+            dependencies.fileAtRevision(root, parent, AGENT_DOCS_PROVENANCE_PATH),
+            dependencies.fileAtRevision(root, current, AGENT_DOCS_PROVENANCE_PATH),
+            readBytes(root, parent, AGENT_DOCS_PROSE_PATH),
+            readBytes(root, current, AGENT_DOCS_PROSE_PATH),
+          ]);
+          if (
+            !(await isExactAgentDocsProvenanceReplacement(
+              beforeProvenance,
+              afterProvenance,
+              beforeProse,
+              afterProse,
+              previousVersion,
+              nextVersion,
+            ))
+          ) {
+            throw new Error(
+              'Stable publication blocked: agent-docs provenance contains non-version changes, ' +
+                'so the parent canary evidence cannot authorize this content.',
+            );
+          }
+        }
         const assertFresh = dependencies.generatedOutputsFresh ??
           assertPreparedReleaseGeneratedOutputsFresh;
         await assertFresh(root);
@@ -302,6 +337,118 @@ async function decompressGzip(compressed: Uint8Array): Promise<Uint8Array> {
 
 function bytesEqual(left: Uint8Array, right: Uint8Array): boolean {
   return left.byteLength === right.byteLength && left.every((byte, index) => byte === right[index]);
+}
+
+interface AgentDocsProvenance {
+  readonly schemaVersion: 1;
+  readonly version: string;
+  readonly sourceCommit: string;
+  readonly extractionTimestamp: string;
+  readonly files: readonly string[];
+  readonly uncompressedBytes: number;
+  readonly compressedBytes: number;
+  readonly sha256: string;
+}
+
+const AGENT_DOCS_PROVENANCE_KEYS = [
+  'schemaVersion',
+  'version',
+  'sourceCommit',
+  'extractionTimestamp',
+  'files',
+  'uncompressedBytes',
+  'compressedBytes',
+  'sha256',
+] as const;
+
+/** True only when HEAD provenance is the closed, integrity-derived successor of its parent. */
+export async function isExactAgentDocsProvenanceReplacement(
+  beforeSource: string,
+  afterSource: string,
+  beforeProse: Uint8Array,
+  afterProse: Uint8Array,
+  previousVersion: string,
+  nextVersion: string,
+): Promise<boolean> {
+  if (previousVersion === nextVersion) return false;
+  try {
+    const before = parseAgentDocsProvenance(beforeSource);
+    const after = parseAgentDocsProvenance(afterSource);
+    if (!before || !after || before.version !== previousVersion) return false;
+    const [beforePayload, afterPayload] = await Promise.all([
+      decompressGzip(beforeProse),
+      decompressGzip(afterProse),
+    ]);
+    const beforeFiles = agentDocsPayloadFiles(beforePayload);
+    const afterFiles = agentDocsPayloadFiles(afterPayload);
+    if (!beforeFiles || !afterFiles) return false;
+    const beforeExpected = await deriveAgentDocsProvenance(
+      before,
+      previousVersion,
+      beforeFiles,
+      beforePayload,
+      beforeProse,
+    );
+    const afterExpected = await deriveAgentDocsProvenance(
+      before,
+      nextVersion,
+      afterFiles,
+      afterPayload,
+      afterProse,
+    );
+    return provenanceEquals(before, beforeExpected) && provenanceEquals(after, afterExpected) &&
+      JSON.stringify(before.files) === JSON.stringify(after.files);
+  } catch {
+    return false;
+  }
+}
+
+function parseAgentDocsProvenance(source: string): AgentDocsProvenance | undefined {
+  const value: unknown = JSON.parse(source);
+  if (
+    !isRecord(value) || value.schemaVersion !== 1 || typeof value.version !== 'string' ||
+    typeof value.sourceCommit !== 'string' || typeof value.extractionTimestamp !== 'string' ||
+    !Array.isArray(value.files) || !value.files.every((path) => typeof path === 'string') ||
+    typeof value.uncompressedBytes !== 'number' || typeof value.compressedBytes !== 'number' ||
+    typeof value.sha256 !== 'string' ||
+    Object.keys(value).sort().join('\0') !== [...AGENT_DOCS_PROVENANCE_KEYS].sort().join('\0')
+  ) return undefined;
+  return value as unknown as AgentDocsProvenance;
+}
+
+function agentDocsPayloadFiles(payloadBytes: Uint8Array): readonly string[] | undefined {
+  const value: unknown = JSON.parse(new TextDecoder().decode(payloadBytes));
+  return isAgentDocsPayload(value) ? Object.keys(value.files) : undefined;
+}
+
+async function deriveAgentDocsProvenance(
+  parent: AgentDocsProvenance,
+  version: string,
+  files: readonly string[],
+  uncompressed: Uint8Array,
+  compressed: Uint8Array,
+): Promise<AgentDocsProvenance> {
+  return {
+    schemaVersion: 1,
+    version,
+    sourceCommit: parent.sourceCommit,
+    extractionTimestamp: parent.extractionTimestamp,
+    files,
+    uncompressedBytes: uncompressed.byteLength,
+    compressedBytes: compressed.byteLength,
+    sha256: await sha256Hex(compressed),
+  };
+}
+
+function provenanceEquals(left: AgentDocsProvenance, right: AgentDocsProvenance): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
+async function sha256Hex(bytes: Uint8Array): Promise<string> {
+  const copy = new Uint8Array(bytes);
+  return [...new Uint8Array(await crypto.subtle.digest('SHA-256', copy.buffer))]
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
 }
 
 function isPreparedReleaseGeneratedOutput(path: string): boolean {

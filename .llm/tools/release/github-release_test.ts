@@ -18,6 +18,7 @@ import {
   verifyGreenCanaryPair,
 } from './github-release.ts';
 import { discoverPreparedReleaseFiles } from './prepare-release.ts';
+import { rebaseAgentDocsProse } from '../generate-publish-assets.ts';
 
 interface TestAgentDocsPayload {
   readonly schemaVersion: 1;
@@ -46,6 +47,30 @@ async function sha256(bytes: Uint8Array): Promise<string> {
 
 function bytesToBase64(bytes: Uint8Array): string {
   return btoa(String.fromCharCode(...bytes));
+}
+
+async function testAgentDocsProvenance(
+  version: string,
+  prose: Uint8Array,
+  files: readonly string[] = ['llms.txt'],
+): Promise<Record<string, unknown>> {
+  const raw = await gunzipBytes(prose);
+  return {
+    schemaVersion: 1,
+    version,
+    sourceCommit: 'canary-source',
+    extractionTimestamp: '2026-08-12T00:00:00Z',
+    files,
+    uncompressedBytes: raw.byteLength,
+    compressedBytes: prose.byteLength,
+    sha256: await sha256(prose),
+  };
+}
+
+async function gunzipBytes(bytes: Uint8Array): Promise<Uint8Array> {
+  const copy = new Uint8Array(bytes);
+  const stream = new Blob([copy.buffer]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
 }
 
 Deno.test('toVersion strips a single leading v; toTag re-adds it', () => {
@@ -172,10 +197,13 @@ Deno.test('parent canary evidence checks every release path and reproduces deriv
     schemaVersion: 1,
     files: { 'llms.txt': 'Install jsr:@netscript/cli@1.0.0' },
   });
+  const parentProvenance = await testAgentDocsProvenance('1.0.0-canary.1', parentProse);
+  const currentProvenance = await testAgentDocsProvenance('1.0.0', currentProse);
   const changedFiles = [
     'deno.json',
     'deno.lock',
     '.llm/assets/agent-docs/prose.json.gz',
+    '.llm/assets/agent-docs/provenance.json',
     'packages/cli/src/kernel/assets/agent-tools.generated.ts',
     'plugins/workers/scaffold.plugin.json',
   ];
@@ -192,6 +220,11 @@ Deno.test('parent canary evidence checks every release path and reproduces deriv
             ? '{"version":"1.0.0-canary.1"}'
             : '{"version":"1.0.0"}',
         );
+      }
+      if (path === '.llm/assets/agent-docs/provenance.json') {
+        return Promise.resolve(JSON.stringify(
+          revision === 'canary-content-sha' ? parentProvenance : currentProvenance,
+        ));
       }
       if (path.endsWith('.gz') || path.endsWith('.generated.ts')) {
         return Promise.resolve(`${revision}:${path}:derived-by-writer`);
@@ -354,6 +387,101 @@ Deno.test('parent canary evidence rejects self-consistent non-version agent-docs
     Error,
     'agent-docs prose contains non-version changes',
   );
+});
+
+Deno.test('parent canary evidence rejects writer-preserved non-version provenance injection', async () => {
+  const version = '1.0.0';
+  const marker = 'MALICIOUS_PROVENANCE_FIELD_INJECTED_BY_EVALUATOR';
+  const prosePath = '.llm/assets/agent-docs/prose.json.gz';
+  const provenancePath = '.llm/assets/agent-docs/provenance.json';
+  const barrelPath = 'packages/cli/src/kernel/assets/agent-docs.generated.ts';
+  const documentPath = 'context/01-how-the-web-became-the-default.mdx';
+  const prose = await gzipJson({
+    schemaVersion: 1,
+    files: { [documentPath]: 'Canary-verified prose.' },
+  });
+  const raw = new TextEncoder().encode(JSON.stringify({
+    schemaVersion: 1,
+    files: { [documentPath]: 'Canary-verified prose.' },
+  }));
+  const parentProvenance = {
+    schemaVersion: 1,
+    version,
+    sourceCommit: 'canary-source',
+    extractionTimestamp: '2026-08-12T00:00:00Z',
+    files: [documentPath],
+    uncompressedBytes: raw.byteLength,
+    compressedBytes: prose.byteLength,
+    sha256: await sha256(prose),
+  };
+  const injectedProvenance = { ...parentProvenance, [marker]: true };
+  const injectedBarrel = `export const EMBEDDED_AGENT_DOCS_PROVENANCE = ${
+    JSON.stringify(injectedProvenance)
+  };`;
+  const root = await Deno.makeTempDir({ prefix: 'netscript-provenance-injection-' });
+  try {
+    await Deno.mkdir(`${root}/packages/cli`, { recursive: true });
+    await Deno.mkdir(`${root}/.llm/assets/agent-docs`, { recursive: true });
+    await Deno.writeTextFile(`${root}/packages/cli/deno.json`, JSON.stringify({ version }));
+    await Deno.writeFile(`${root}/${prosePath}`, prose);
+    await Deno.writeTextFile(
+      `${root}/${provenancePath}`,
+      `${JSON.stringify(injectedProvenance, null, 2)}\n`,
+    );
+
+    const stalePaths: string[] = [];
+    await rebaseAgentDocsProse(version, new URL(`file://${root}/`), true, stalePaths);
+    assertEquals(
+      stalePaths,
+      [provenancePath],
+      'the closed writer schema must reject the injected field',
+    );
+    assertStringIncludes(await Deno.readTextFile(`${root}/${provenancePath}`), marker);
+    assertStringIncludes(injectedBarrel, marker);
+
+    const changedFiles = [provenancePath, barrelPath];
+    await assertRejects(
+      () =>
+        verifyGreenCanaryPair('owner/repo', 'token', root, {
+          revParse: (_root, revision) =>
+            Promise.resolve(revision === 'HEAD' ? 'stable-sha' : 'canary-content-sha'),
+          changedFiles: () => Promise.resolve(changedFiles),
+          releaseFiles: () => Promise.resolve(changedFiles.map((path) => `${root}/${path}`)),
+          fileAtRevision: (_root, revision, path) => {
+            if (path === 'deno.json') return Promise.resolve(JSON.stringify({ version }));
+            if (path === provenancePath) {
+              return Promise.resolve(
+                JSON.stringify(
+                  revision === 'canary-content-sha' ? parentProvenance : injectedProvenance,
+                ),
+              );
+            }
+            return Promise.resolve(
+              revision === 'canary-content-sha' ? 'canary barrel' : injectedBarrel,
+            );
+          },
+          fileBytesAtRevision: (_root, _revision, path) => {
+            assertEquals(path, prosePath);
+            return Promise.resolve(prose);
+          },
+          generatedOutputsFresh: () => Promise.resolve(),
+          request: (_method, path) =>
+            Promise.resolve({
+              status: 200,
+              ok: true,
+              body: {
+                statuses: path.includes('canary-content-sha')
+                  ? [{ context: CANARY_PAIR_STATUS_CONTEXT, state: 'success' }]
+                  : [],
+              },
+            }),
+        }),
+      Error,
+      'agent-docs provenance contains non-version changes',
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
 });
 
 Deno.test('canary pair gate fails closed for source drift and API failure', async () => {
