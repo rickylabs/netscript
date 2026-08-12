@@ -39,7 +39,7 @@ await Deno.writeTextFile(
   join(options.projectRoot, 'netscript.config.ts'),
   `import { defineConfig } from '@netscript/config';
 
-export default defineConfig({
+const config = defineConfig({
   name: 'package-backed-doctor',
   version: '1.0.0',
   databases: { config: [] },
@@ -48,6 +48,8 @@ export default defineConfig({
     '${streamsSpecifier}',
   ],
 });
+
+export { config as default };
 `,
 );
 await Deno.writeTextFile(
@@ -177,7 +179,7 @@ if (failures.length > 0) {
   for (const failure of failures) console.error(`- ${failure}`);
   console.error('--- doctor output ---');
   console.error(doctor.output);
-  Deno.exit(1);
+  throw new Error('Package-backed plugin doctor assertions failed.');
 }
 
 console.log('PACKAGE_BACKED_PLUGIN_DOCTOR_PASS');
