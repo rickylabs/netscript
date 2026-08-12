@@ -42,6 +42,8 @@ const PACKAGE_TO_LOCAL_PATH: Readonly<Record<string, string>> = {
   [SCAFFOLD_PACKAGES.NETSCRIPT_PRISMA_ADAPTER_MYSQL]: 'packages/prisma-adapter-mysql/src/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_ASPIRE]: 'packages/aspire/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH]: 'packages/fresh/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_DEFER_ISLAND]:
+    'packages/fresh/src/application/defer/island.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_BUILDERS]: 'packages/fresh/src/application/builders/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_QUERY]: 'packages/fresh/src/application/query/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_ROUTE]: 'packages/fresh/src/application/route/mod.ts',
