@@ -21,15 +21,20 @@ Sequencing locks S-1…S-6 live in `plan.md`; ordered file-scoped commit slices 
 
 ## The one PR order
 
-**PR-E (#1530) → PR-B (#1403) → PR-C (#1380) → PR-D (#1378 + #1545).** Strictly sequential, one active
+**PR-E (#1530) → PR-B (#1403) → PR-C (#1380) → PR-D (#1549).** Strictly sequential, one active
 implementation thread. PR-D is additionally gated on PR **#1537** (docs lane) landing.
+
+**Revision 4 — rescope, not another rewrite.** After a third `FAIL_PLAN` the owner authorized rescoping
+the *issues* rather than the plan. **#1378 and #1545 moved to 0.0.7** because export-reachability severity
+and allowance issue-state verification were measured unimplementable at this baseline; **#1549** carries
+the provable half and stays in 0.0.6. Written reasons are on all three issues. `drift.md` D-16, D-17.
 
 | PR | Closes | Lane | Why here |
 | --- | --- | --- | --- |
 | PR-E | #1530 | Sol · low | Clears a gate red on `main` for 7 pushes; nothing downstream can report an honest `quality:scan:repo` until it lands |
 | PR-B | #1403 | Sol · low | p0, and owns the **single** transition to discovery-based doctrine roots |
 | PR-C | #1380 | Sol · medium | Consumes PR-B's selector unchanged; adds origin-awareness and the doctrine documents |
-| PR-D | #1378, #1545 | Sol · high | Depends on PR-E (green repo scan), PR-B/C (settled roots), and #1537 (extractor) |
+| PR-D | **#1549** | Sol · **medium** (was high; export-reachability was the complex half and it moved) | Depends on PR-E (green repo scan), PR-B/C (settled roots), and #1537 (extractor) |
 
 ## Executed baseline
 
@@ -45,7 +50,7 @@ Measured at `01aa12b67`, re-confirmed at `84dd44ae7` (contains PR #1527).
 | Verdict table | 28 rows; **6** name non-live units; **14** live units have no row |
 | `*-soundness_test.ts` / `*_type.ts` | **6** / **12** (all under `tests/type-fixtures/`, **3** with `@ts-expect-error`) |
 | `deno doc --json` over all 30 export maps | **3.733 s**, exit 0, **567** `Failed resolving types` warnings |
-| Repository history | root `317e4b509` (2026-07-06, "cut 0.0.1-beta.5"), **374** commits |
+| Repository history | root `317e4b509` (2026-07-06, "cut 0.0.1-beta.5"); **374** commits **measured at `84dd44ae7`** — the count moves with `main`, so it is only meaningful pinned to a sha (cycle 3 finding 7) |
 
 ### A14 has three identifier origins, not two
 
@@ -75,8 +80,9 @@ beta.5 release cut) with 374 commits, and `git ls-tree 317e4b509:packages/` alre
 | --- | --- |
 | `@netscript/triggers` | not present anywhere in this repository's history (begins `317e4b509`); superseded by `packages/plugin-triggers-core` per `arch-debt.md:385`, predating this history |
 | `@netscript/workers` | same, per `arch-debt.md:561` → `packages/plugin-workers-core` |
-| `@netscript/sagas`, `@netscript/streams` | not present in this history; successors exist; **no** checked-in supersession record found — PR-C states that absence rather than inferring a rename |
-| `@netscript/shared` | not present in this history; 10 commits touch `packages/shared/**` on non-ancestor refs only — PR-C cites that and claims no removal commit on `main` |
+| `@netscript/sagas` | not present in this history; **a checked-in supersession record exists** — `arch-debt.md:583-584` reads "the top-level `packages/sagas` directory named in this heading no longer exists — the code and this resolved debt live entirely in `packages/plugin-sagas-core`". Cycle 3 finding 3: revision 3 asserted no record existed, which was **false**. Verified by the orchestrator. |
+| `@netscript/streams` | not present in this history; successor `packages/plugin-streams-core` exists; no supersession record found — PR-C states that absence **after** running the same `arch-debt.md` probe that found the sagas one |
+| `@netscript/shared` | not present in HEAD's history; **added at `0ef13de35`, deleted at `fd8259b76`** (`feat(contracts): consolidate shared foundation package`, 2026-06-05, which deletes `packages/shared/deno.json` and 25 further `packages/shared/**` paths) — both on **non-ancestor** history. Cycle 3 finding 3: revision 3 said only "no removal commit on `main`", true but omitting the load-bearing commit. PR-C cites the commit **and** the ancestry qualifier. |
 | `plugins/hello-world` | not present in this history; no successor and no supersession record |
 
 #1380 box 2 was **amended with owner authorization** to require per-row evidence and admit "never present
@@ -96,11 +102,11 @@ Revision 1 inherited that claim without re-measuring and was failed on it (`drif
 | --- | --- |
 | `R-1` | **PR-E lands first.** #1378's `gate:` box needs `quality:scan:repo` green; it is red for a reason that is not a defect. PR-E fixes scanner **scope**, not the findings. |
 | `R-2` | Type-fixture exemption keyed on **directory AND suffix** (`tests/type-fixtures/` + `_type.ts`), asserted by test, with leakage controls **both** ways — dir-only and suffix-only must still be reported. |
-| `R-3` | Export-awareness uses `deno doc --json` over each package's `exports` map. **Fail-closed is scoped to the intersecting set:** PR-D first measures how many of the 567 warnings touch a declaration the any-rule actually inspects, fails closed on **that** set, and enumerates the non-intersecting residue in `arch-debt.md` with a date. Blanket fail-closed on all 567 makes #1378's own green gate unreachable — cycle 2 finding 1, and why revision 2's R-3 was wrong. A re-exported `any` must be attributed to the published entrypoint (fixture required). |
+| ~~`R-3`~~ | **WITHDRAWN by rescope (revision 4).** Export-awareness moved to 0.0.7 with #1378. Cycle 3 measured the premise: 567 warnings on an exit-0 run and **1,714 published symbol records with unresolved type references** (3,945 occurrences), with warning text naming the dependency module rather than the dependent declaration — so there is no deterministic attribution to build the rule on. PR-D does **not** attempt it. Superseded rationale: Export-awareness uses `deno doc --json` over each package's `exports` map. **Fail-closed is scoped to the intersecting set:** PR-D first measures how many of the 567 warnings touch a declaration the any-rule actually inspects, fails closed on **that** set, and enumerates the non-intersecting residue in `arch-debt.md` with a date. Blanket fail-closed on all 567 makes #1378's own green gate unreachable — cycle 2 finding 1, and why revision 2's R-3 was wrong. A re-exported `any` must be attributed to the published entrypoint (fixture required). |
 | `R-4` | Doctrine root selector is **expanded top-level `packages/*` + `plugins/*`** — the 36 units — **not** every workspace member (root `deno.json:3-9` also lists `packages/cli/e2e`, `examples/*`, `apps/*`). `packages/cli/e2e` is excluded and the exclusion is stated in the doctrine. |
 | `R-5` | A14 resolves `imported` \| `locally-bound` \| `unresolved` by lexical import **and** binding collection (no type checker), firing **only** on `unresolved`. All three origins tested; origin 3 needs a synthetic fixture. |
 | `R-6` | **PR-B owns the single transition.** PR-B introduces `discoverDoctrineRoots()` returning the final 36-unit selector and repoints `arch:check` at it in one step — **no** interim 17-root list, **no** checked-in root data file. PR-C consumes the same function unchanged for `arch:check:repo`. This retires the two-step that cycle 1 finding 9 and cycle 2 finding 4 both rejected; S-4 holds because the coverage predicate is preserved around one function. |
-| `R-7` | `--max-allow` is wired at **8** (after PR-E removes two redundant allowances) and all 8 survivors reference **#1545**, the umbrella registration issue filed for this (owner decision). Without it, #1378's linked-issue rule reds the gate on day one — cycle 2 finding 2. |
+| `R-7` | **[rescoped, revision 4]** `--max-allow` is wired at the count measured in the implementing PR (**8** after PR-E), and in 0.0.6 it carries **no issue-id requirement** — the scanner has `--allow-read` only and cannot verify an issue is open and milestoned (cycle 3 finding 2). The registration rule and #1545 moved to 0.0.7. The budget still only falls. Superseded text: wired at **8** (after PR-E removes two redundant allowances) and all 8 survivors reference **#1545**, the umbrella registration issue filed for this (owner decision). Without it, #1378's linked-issue rule reds the gate on day one — cycle 2 finding 2. |
 | `R-8` | Findings surfaced by newly-covered scans are **triaged into issues, never fixed in the surfacing PR**. |
 | `R-9` | Accepted RFCs are promoted to numbered `rfcs/NNNN-*.md`; `.llm/runs/*/design/canonical/` bundles are provenance/draft. PR-C records this in `rfcs/README.md` and maps the five `DECISION_PENDING` entries onto it **without filing them**. |
 | `R-10` | **#1374 owns the `docs/site/**` fenced-TS extractor; PR-D consumes it** and sequences after PR #1537 (owner decision; PR #1537 comment `5264583905`). **If that surface stays private:** slice D5 and #1378 box 3 move with the issue, **and PR-D references `#1378` without a closing keyword**, stating the remaining scope. It closes #1545 either way. Cycle 2 finding 9 — a fallback that moves a box while keeping `Closes` would auto-close an issue with undelivered acceptance. |
