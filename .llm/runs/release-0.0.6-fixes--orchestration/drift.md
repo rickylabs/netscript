@@ -61,6 +61,31 @@ changed-file list rather than its own report.
 
 Automated gates are unchanged by this waiver: they are evidence, not sign-off.
 
+## D-6 — #1438 derived binary/hash outputs require writer reproduction
+
+> **Numbering note.** Slices A and B wrote to this shared file concurrently and both filed their
+> entry as `D-4`. This one (slice A / #1438) was renumbered to **D-6** to resolve the collision;
+> PR #1539's body cites it as "D-4". Slice B's entry keeps `D-4`, as PR #1538 cites. Renumbering
+> rather than merging keeps both PR-body references resolvable.
+
+**Recorded:** 2026-08-12, PR A implementation. Severity: significant implementation detail, no
+scope expansion.
+
+The issue required `isExactVersionReplacement` to remain in force for every newly admitted path,
+while naming gzip as a design question rather than permission to weaken the guard. Measurement of
+the real v0.0.5 cut found 56 text files satisfy the exact `0.0.4` → `0.0.5` byte replacement, but
+six writer-owned outputs do not: agent-docs gzip/provenance plus generated barrels whose gzip,
+base64, byte-count, or SHA-256 fields are necessarily derived from the rewritten content.
+
+The implementation keeps exact replacement as the first predicate on every changed path. An
+inexact path is admitted only when it is declared by `prepareRelease`'s generator-owned output set,
+the tracked worktree is clean, and the same three writers used by `release:cut` reproduce all
+generated outputs in non-mutating check mode (`gen:publish-assets --check`,
+`check:mcp-export-corpus`, and the assets-barrel generator's new `--check`). Any source path,
+undeclared path, dirty tracked checkout, or failed reproduction still rejects inheritance. This is
+the explicit handling requested by #1438; the global byte check was not widened to arbitrary
+content.
+
 ## D-4 — #1417 mutation source is mixed; preferred isolation remains viable
 
 **Recorded:** 2026-08-12, Slice B implementation.
@@ -76,3 +101,29 @@ normal-completion restore.
 throwaway workspace. The source tree is never a command working directory, while the same catalog
 materialization and real Deno dry-run gate continue to execute. A hard kill may abandon temporary
 data, but cannot abandon expanded source manifests.
+
+## D-5 — Slice A's observed effort drifted from medium to high after resume
+
+**Recorded:** 2026-08-12, during slice A recovery.
+
+Slice A was launched with `--effort medium` (`normal_implementation`) and the launcher recorded
+requested == observed == `openai / gpt-5.6-sol / medium`. After the turn was killed by the launcher
+SIGTERM (cut-trace F-2) and resumed via `agentic:codex-resume`, `codex-status` reports the thread as
+`gpt-5.6-sol / high`.
+
+`codex-resume` takes no `--model`/`--effort` flags, so the resumed turn's effort was not asserted by
+the orchestrator. Observed identity therefore no longer matches the requested route.
+
+**Assessment.** Sol · high is the `complex_implementation` lane — in-plan and not a paid escalation,
+so `lane-policy.md` invariant 4 (no implicit *paid* escalation) is not breached. But it is an
+implicit **higher-effort** escalation that this orchestrator did not request, and invariant 3
+requires requested-versus-observed identity to be recorded rather than assumed. It is recorded here.
+
+**Consequence for review pairing.** The effort-paired ladder maps Sol·high to
+`review_codex_complex` → **Fable 5 · medium**. Slice A's focused IMPL-EVAL was already routed to
+Fable 5 · medium, so the pairing remains correct under the drifted effort by coincidence rather
+than by design. Had the drift gone the other way this would have mismatched the ladder.
+
+**Follow-up for the next run:** either `codex-resume` should accept and assert an explicit route
+identity, or a resume should be treated as a new launch edge that re-validates it. Filed as an
+observation here rather than a code change, since this lane does not own the agentic suite.

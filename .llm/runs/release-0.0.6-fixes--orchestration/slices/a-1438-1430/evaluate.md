@@ -1,0 +1,132 @@
+use harness
+
+# IMPL-EVAL — Slice A / PR #1539 / issues #1438 + #1430
+
+You are the **formal IMPL-EVAL evaluator** for this slice. You did not write this code and you must
+not fix it. Your output is a verdict with evidence.
+
+| Field | Value |
+| --- | --- |
+| Lane | `formal_impl_evaluation` — native opposite-family (Claude evaluating Codex-authored work) |
+| Your route | Claude · Fable 5 · medium |
+| Generator | Codex · GPT-5.6 Sol (separate session — you are not it) |
+| Evaluator worktree | `/home/codex/repos/ns006-f-a-impleval` (detached at `c0b98d93d`) — **work here** |
+| Generator worktree | `/home/codex/repos/ns006-f-a-release-tooling` — **do not touch it** |
+| PR | #1539 `fix(release): restore release-cut truth` |
+| Issues | #1438 (p1), #1430 (p2) |
+| Verdict file | `verdict.md` in this file's directory |
+
+## SKILL
+
+- `netscript-harness` — evaluator protocol, evidence discipline.
+- `netscript-release` — **the authority on release-tree identity, canary-pair invariants, and what
+  a legitimate `release:cut` produces.** Read it before judging the path set.
+- `netscript-deno-toolchain` — Deno 2.9 bump/publish behaviour.
+- `netscript-tools` — validation wrappers, git ground truth.
+- `rtk` — `rtk git`, `rtk grep`, `rtk proxy deno task`.
+
+## Why this slice gets the most adversarial evaluation in the lane
+
+`isVersionOnlyReleaseDiff` decides whether **a stable publication may inherit its parent's green
+canary-pair evidence**. Today it fails closed — annoying but safe; 0.0.5 paid an extra canary cycle
+for it. This PR widens it.
+
+**A mistake here inverts the failure direction: from "blocks a good release" to "authorizes
+publishing content that was never canary-verified."** That is the worst outcome available in this
+lane, and it would look correct while doing it — the 0.0.4 signature failure (two guards shipped
+whose predicate could never fire). Weigh your PASS accordingly.
+
+## What the slice did
+
+**#1438** — derives the admissible path set from `prepare-release.ts` (the writer), rather than
+hand-listing paths, so generator and verifier cannot drift apart. Keeps
+`isExactVersionReplacement` as the **first** predicate on every changed path.
+
+**The part that needs your hardest look — drift D-6.** The slice measured the real v0.0.5 cut: 56
+text files satisfy exact `0.0.4`→`0.0.5` byte replacement, but **six writer-owned outputs cannot**
+— agent-docs gzip + provenance, and generated barrels carrying gzip/base64/byte-count/SHA-256
+fields derived from rewritten content.
+
+Its handling: an inexact path is admitted **only** when all of these hold —
+1. it is declared by `prepareRelease`'s generator-owned output set,
+2. the tracked worktree is clean, and
+3. the three writers used by `release:cut` reproduce all generated outputs in **non-mutating check
+   mode** (`gen:publish-assets --check`, `check:mcp-export-corpus`, and a **new** `--check` flag on
+   the assets-barrel generator).
+
+Any source path, undeclared path, dirty checkout, or failed reproduction still rejects inheritance.
+
+**#1430** — `--prev-tag` resolves the named release date (falling back to the tag's commit date),
+uses it as `since`, and fails loudly when a known tag yields an empty `since`.
+
+## Attack these, in order
+
+1. **Can a source file reach the inheritance path?** This is the whole ballgame. Try to construct a
+   changed-file set that gets admitted while containing content that is *not* a pure version bump.
+   Probe specifically:
+   - a `packages/**/*.ts` edit mixed into an otherwise-valid cut;
+   - a file that is *declared* by the writer set but whose content was tampered with beyond what
+     the writer would produce;
+   - a path that collides with or spoofs a declared generator output (path normalization, `..`
+     segments, case, trailing slash, glob-ish names);
+   - an empty changed set, and a set containing only the six inexact paths.
+2. **Is the reproduction check real?** Verify `--check` mode genuinely **does not mutate** and
+   genuinely **fails** when the generated output does not match. Tamper with a generated barrel and
+   confirm rejection. A check that cannot fail is the exact defect class this lane exists to
+   remove, and the assets-barrel `--check` flag is **new code written by this slice** — it has no
+   prior track record. Verify it independently.
+3. **Is the writer-derived set actually derived?** Confirm the verifier reads the writer's declared
+   output surface rather than a copy of it. Then prove the claim the PR makes: that the **test
+   fails if writer output and verifier knowledge diverge**. Add a path to the writer's output and
+   confirm a test goes red.
+4. **Clean-worktree precondition.** Confirm a dirty tracked checkout really does reject. Consider
+   whether "clean" is checked for *tracked* files only, and whether an untracked file could
+   influence a reproduction.
+5. **`generate-cli-assets-barrel.ts` (+42 lines).** Note `tooling.md`: its path is embedded as a
+   `// @generated by …` provenance header in four out-of-surface `packages/**/*.generated.ts`
+   files. The slice did not move it (good) — confirm the provenance headers are still accurate and
+   that `--check` did not change emitted content.
+6. **#1430.** Verify the `--prev-tag` path actually queries closed issues (the old bug was
+   `since: ''` being falsy, so `fetchClosedIssues` never ran and `0` looked like a real answer).
+   Verify the loud failure fires. Check the commit-date fallback when no release exists for the tag.
+7. **Scope.** Diff against the **merge-base**, not `origin/main` — `origin/main` moves during this
+   milestone and a two-dot range falsely renders other lanes' merged work as deletions.
+
+## Gates you must execute yourself
+
+```
+rtk proxy deno task check
+rtk proxy deno task test
+rtk proxy deno task lint
+rtk proxy deno task fmt:check
+deno test --allow-all .llm/tools/release/
+deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/release --ext ts
+rtk git status --porcelain     # must be empty afterwards; deno.lock unmodified
+```
+
+Verdicts come from commands **you ran**. Quote real output. The PR claims 21 focused / 101
+release-suite / 3188 repo tests — reproduce, don't relay.
+
+## Hard constraints
+
+- **No publication, ever.** No `deno publish`, no `release:publish`, no tag push, no canary. Prove
+  everything with tests and dry-runs.
+- Do not commit to the generator's branch, do not push, do not merge.
+- Do not fix the code. Describe defects precisely instead.
+- Do not run `deno cache --reload`; do not commit `deno.lock`.
+- `deno fmt` rewraps prose and can silently undo a scripted edit — verify any edit you make.
+
+## Verdict format
+
+`verdict.md` with:
+
+- **VERDICT: PASS** / **PASS WITH FINDINGS** / **FAIL** — one line, up front.
+- Per acceptance item in the PR body: satisfied / not, with proving output.
+- Findings, each blocking or non-blocking, each with a concrete failure scenario.
+- A specific, explicit answer to: **can any non-version-bump content be admitted for canary-pair
+  inheritance?** If you could not fully establish this, say so plainly — do not let it pass by
+  silence.
+- What you executed, verbatim; and what you could **not** verify.
+
+Be adversarial. A PASS here authorizes merging a change to the guard that stands between the repo
+and publishing unverified content.
