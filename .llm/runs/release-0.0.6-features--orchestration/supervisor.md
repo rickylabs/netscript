@@ -76,9 +76,15 @@ Generator and evaluator never share a session. No implementation lane self-certi
 
 ## IMPL-EVAL decision
 
-- **#1405** — owner brief permits an IMPL-EVAL waiver *provided exact negative tests exist*. Default
-  is still to run the small IMPL-EVAL lane; the waiver is only exercised if the evaluator transport
-  is genuinely blocked, and then recorded in `drift.md` with the passing negative-test evidence.
+- **#1405** — **owner ruling 2026-08-12 (supersedes the reading below):** for this class — small,
+  deterministic, fully specified taxonomy fixes — do **not** dispatch a separate evaluator. Sufficient
+  evidence is focused negative tests + CI + close-gate + the orchestrator's independent diff review.
+  This ruling arrived **after** #1405 had already been evaluated and merged (`8ff1bcb8f`), so it does
+  not change that outcome; it governs this class from here. See `drift.md` D-3.
+- ~~#1405 — owner brief permits an IMPL-EVAL waiver *provided exact negative tests exist*. Default is
+  still to run the small IMPL-EVAL lane; the waiver is only exercised if the evaluator transport is
+  genuinely blocked.~~ — my reading treated the waiver as a fallback rather than the default for the
+  class. That was the wrong default and it cost one unnecessary evaluator dispatch.
 - **#1398** — IMPL-EVAL mandatory, separate session, with live runtime evidence attached.
 
 ## Merge authority
