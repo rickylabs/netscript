@@ -31,9 +31,9 @@ Severity: significant (final gate contradiction)
 `packages/cli/src/kernel/assets/agent-tools.generated.ts` because the embedded
 `quality/scan-code-quality.ts` payload and bundle hash changed. The resulting delta is 2 insertions
 and 2 deletions. The required gate says the command must be followed by an empty
-`git status --porcelain`, but the slice boundary says to touch only quality tools, one workflow,
-the two trigger files, the two doctrine allowance lines, and this slice directory. The generated
-package file is not in that list.
+`git status --porcelain`, but the slice boundary says to touch only quality tools, one workflow, the
+two trigger files, the two doctrine allowance lines, and this slice directory. The generated package
+file is not in that list.
 
 The generated delta is left uncommitted pending orchestrator direction; it is not folded into the
 slice silently. Green freshness requires explicit authorization to add that generated file (the
@@ -56,5 +56,16 @@ This authorizes only the deterministic `gen:assets-barrel` output at
 `packages/cli/src/kernel/assets/agent-tools.generated.ts`, followed by a second generator run and
 empty `git status --porcelain` as the idempotence proof.
 
-The orchestrator also accepted the stale trigger line as non-defective: the symbol remained the
-same while `index.md:310` moved to line 173. No further action is required for that location drift.
+The orchestrator also accepted the stale trigger line as non-defective: the symbol remained the same
+while `index.md:310` moved to line 173. No further action is required for that location drift.
+
+## 2026-08-12 — D-4: authorized scope complete
+
+D-1 closed in `bd95998fd9d73565f0e5454559db8c536474db79`: the three Prisma-shaped fixture findings
+now use `unknown` inputs, record/key narrowing, a typed sort comparator, and `Promise<MockItem[]>`.
+The direct scanner reports zero findings, the file type-checks, and its three pagination tests pass.
+No additional finding surfaced.
+
+D-2 closed in derivative-only commit `b82d2086eacb65552552f933c441ff8ca2e7b177`. The first generator
+run produced only the expected generated file; the second generator run exited 0 and
+`git status --porcelain` was empty. The generated asset was not hand-edited.
