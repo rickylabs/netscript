@@ -483,3 +483,29 @@ tool actually reports, not left running on a false assumption.
 
 CI is also re-running against `f7d503fee`; the previously proven OTEL gate evidence must be
 re-established on this head before merge, and the earlier job ids no longer describe what would land.
+
+## 2026-08-12 — CI evidence re-established on the merging head `f7d503fee`
+
+The pre-sync evidence was **not** carried forward. Both OTEL gates were re-read by name from the new
+head's job logs:
+
+| Tier | Job (head `f7d503fee`) | Gates observed | Summary |
+| --- | --- | --- | --- |
+| `scaffold-runtime (aspire + docker + postgres)` | `94073971396` | `behavior.otel.stream-consumer`, `behavior.otel.traces` | `passed=88 failed=0 skipped=0` |
+| `scaffold-runtime-sqlite (aspire + sqlite + garnet)` | `94073971501` | both, same | `passed=83 failed=0 skipped=0` |
+
+**These are different job ids** from the pre-sync run (`94062070840` / `94062070984`), which is the
+concrete proof that reusing the earlier verification would have cited evidence for a head no longer
+on the PR. The staged body transform now takes head SHA and both job ids as **required arguments**
+and asserts that none of `94062070840`, `94062070984`, or `e4319c685` survives anywhere in the
+resulting body — it fails loudly rather than silently carrying a stale citation.
+
+Full CI on `f7d503fee`: terminal after 300 s, every check green except `close-gate` (expected — DoD
+box 5 and the issue's acceptance boxes are not yet updated). `agent` ×2 and `code-quality-repo`
+report `skipping`; none is in the named-gate set for this change, and `code-quality` itself passed.
+
+The `dispatch` job also shows `pass` — that is the phase-eval dispatcher, present and running on this
+head, which it was not on the previous one.
+
+**Qwen evaluator still `in_progress`** (run `31584188459`, summary comment marker still
+`"conclusion":"running"`). Nothing is applied to the PR body or labels until that verdict lands.
