@@ -51,6 +51,7 @@ export const SCAFFOLD_PACKAGES = {
   STD_ASSERT: '@std/assert',
   NETSCRIPT_ASPIRE: '@netscript/aspire',
   NETSCRIPT_FRESH: '@netscript/fresh',
+  NETSCRIPT_FRESH_DEFER_ISLAND: '@netscript/fresh/defer/island',
   NETSCRIPT_FRESH_BUILDERS: '@netscript/fresh/builders',
   NETSCRIPT_FRESH_QUERY: '@netscript/fresh/query',
   NETSCRIPT_FRESH_ROUTE: '@netscript/fresh/route',

@@ -88,6 +88,7 @@ describe('generateAppDenoJson', () => {
       importMode: 'jsr',
     }));
     assert(config.imports['@netscript/fresh']);
+    assert(config.imports['@netscript/fresh/defer/island']);
     assert(config.imports['@netscript/fresh-ui']);
     assert(config.imports['@test/contracts']);
     assert(config.imports['@netscript/sdk']);
@@ -132,10 +133,11 @@ describe('generateAppDenoJson', () => {
       'update',
     ]);
     assertEquals(config.exclude, ['**/_fresh/*']);
-    assertEquals(Object.keys(config.imports).slice(0, 6), [
+    assertEquals(Object.keys(config.imports).slice(0, 7), [
       '@app/',
       '@my-project/contracts',
       '@netscript/fresh',
+      '@netscript/fresh/defer/island',
       '@netscript/fresh-ui',
       '@netscript/sdk',
       'fresh',
@@ -155,6 +157,10 @@ describe('generateAppDenoJson', () => {
       importMode: 'local',
       localBase: '../..',
     }));
+    assertEquals(
+      config.imports['@netscript/fresh/defer/island'],
+      '../../packages/fresh/src/application/defer/island.ts',
+    );
     assertEquals(
       config.imports['@netscript/fresh/vite'],
       '../../packages/fresh/src/application/vite/vite.ts',
@@ -245,6 +251,10 @@ describe('generateAppViteConfig', () => {
       appPort: 50_123,
     });
     assertStringIncludes(output, 'createNetScriptVitePlugin');
+    assertStringIncludes(
+      output,
+      "fresh({ islandSpecifiers: ['@netscript/fresh/defer/island'] })",
+    );
     assertStringIncludes(output, "resolve(workspaceRoot, 'packages')");
     assertStringIncludes(output, "resolve(workspaceRoot, 'contracts')");
     assertStringIncludes(output, "resolve(workspaceRoot, 'plugins')");
@@ -279,7 +289,8 @@ describe('generateAppViteConfig', () => {
           output.indexOf("{ find: '@app/routes'"),
     );
     assert(
-      output.indexOf('fresh(),') < output.indexOf('tailwindCSS(),') &&
+      output.indexOf("fresh({ islandSpecifiers: ['@netscript/fresh/defer/island'] }),") <
+          output.indexOf('tailwindCSS(),') &&
         output.indexOf('tailwindCSS(),') <
           output.indexOf('createNetScriptVitePlugin({'),
     );

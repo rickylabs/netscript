@@ -46,6 +46,7 @@ export function generateAppDenoJson(options: AppDenoJsonOptions): string {
   const resolvedImports = options.importMode === 'jsr' && options.jsrResolver
     ? options.jsrResolver.resolveImports([
       SCAFFOLD_PACKAGES.NETSCRIPT_FRESH,
+      SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_DEFER_ISLAND,
       SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_BUILDERS,
       SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_QUERY,
       SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_ROUTE,
@@ -64,6 +65,9 @@ export function generateAppDenoJson(options: AppDenoJsonOptions): string {
   };
   const directNetScriptImports = {
     [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH]: resolvedImports[SCAFFOLD_PACKAGES.NETSCRIPT_FRESH],
+    [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_DEFER_ISLAND]: resolvedImports[
+      SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_DEFER_ISLAND
+    ],
     [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_UI]: resolvedImports[
       SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_UI
     ],
