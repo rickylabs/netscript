@@ -36,7 +36,7 @@ export interface CreateServiceQueryUtilsOptions {
  *
  * @example
  * ```ts
- * import { ordersClient } from './api-clients.ts';
+ * import { ordersClient } from '@app/lib/orders.ts';
  *
  * const ordersQueryUtils = createServiceQueryUtils(ordersClient, {
  *   path: ['orders'],

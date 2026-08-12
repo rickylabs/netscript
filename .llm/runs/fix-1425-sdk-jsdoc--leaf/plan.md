@@ -54,7 +54,7 @@ module path while preserving the documented `queryOptions({ input })` call shape
 
 | ID | Decision | Rationale |
 | -- | -------- | --------- |
-| D1 | Import `ordersClient` from `../../../apps/playground/lib/orders.ts`. | It names the shipped `apps/<app>/lib/<service>.ts` layout concretely and replaces the removed catch-all module. |
+| D1 | Import `ordersClient` from `@app/lib/orders.ts`. | The shipped app alias resolves to `apps/<app>/lib/<service>.ts` and replaces the removed catch-all module. |
 | D2 | Preserve `ordersQueryUtils.list.queryOptions({ input: ... })`. | The named consistency page explicitly distinguishes this helper's options-object call shape. |
 | D3 | Touch only the JSDoc comment body in package source. | The issue forbids runtime behavior changes. |
 
