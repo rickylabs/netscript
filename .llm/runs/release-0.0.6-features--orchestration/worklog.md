@@ -377,3 +377,27 @@ the CI job evidence, and rewrites the four acceptance-evidence entries to `box-i
 #1398's boxes wrap across lines and the mirror matches on a checkbox's first line. Every edit asserts
 it matched and the script refuses to finish with an unticked DoD box or a surviving stale claim.
 It is **not applied**: DoD box 6 asserts IMPL-EVAL passed, which is not true until the verdict lands.
+
+## 2026-08-12 — #1524 landed; watching for the automatic verdict
+
+`gh pr view 1524` → **MERGED** `7837ef470` at 2026-08-12T09:24:15Z. The automatic phase dispatcher is
+live, so D-4's routing is now in force: phase evaluations go through the automatic status workflow
+unless the owner documents a local route or skip.
+
+Per D-4, **root re-enters `status:impl-eval` with the Qwen override** to fire the dispatcher — that
+is root's action. This lane does not touch the label, the head, or the body, and does not launch a
+local evaluator or an OpenHands comment. #1536 verified unchanged at the moment #1524 landed: head
+`e4319c685`, labels `type:fix, status:impl-eval, area:plugins, area:telemetry`, 5 comments.
+
+Now watching #1536 for the automatic verdict — a new comment carrying an `IMPL-EVAL`/`VERDICT`
+marker, and any label transition — from a recorded baseline of 5 comments and the exact current
+label set, so a change is detected as a change rather than inferred.
+
+On a PASS the merge gate finishes in this order: apply the staged body transform (already dry-run
+against a copy), move to `status:ready-merge` so the mirror populates #1398's four issue boxes from
+the `box-index` entries, confirm `close-gate` flips green, run and record the seven-check pre-merge
+gate plus `review-threads`, merge, then append the row to `cut-trace.md` captured from
+`git log origin/main` **after** the merge.
+
+On findings, none of that runs; the findings go to the slice thread for a fix cycle and the eval loop
+limit of two failures applies before escalation.
