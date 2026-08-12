@@ -79,3 +79,46 @@ the documented local route. They are inert; nothing reads them.
 **Interaction with D-3.** D-3 waives formal evaluation for the small deterministic class. D-4 does
 not widen that waiver — #1398 still gets a formal IMPL-EVAL; it now arrives through the automatic
 dispatcher rather than a manual launch.
+
+## D-5 — automation trigger contract for formal evaluation (significant)
+
+**Date** 2026-08-12. **Owner policy.** Formal PLAN/IMPL evaluation is triggered by labels, never by a
+manual OpenHands dispatch:
+
+| Phase | Initial trigger | Rerun |
+| --- | --- | --- |
+| PLAN-EVAL | the `openhands` + `status:plan-eval` label **pair**, exactly once | move away from `status:plan-eval`, then re-add |
+| IMPL-EVAL | automatically on **draft → ready**, unless `impl-eval:skip` | move away from `status:impl-eval`, then re-add |
+
+`eval:model:minimax|deepseek|qwen` is an optional **one-shot** override. A local eval already running
+may finish, but must never be duplicated. Manual `@openhands-agent` dispatch for formal PLAN/IMPL
+eval is prohibited. Merge continues to go through normal harness authority.
+
+**This lane complies with no change required:** no manual OpenHands dispatch was made for #1536 (or
+for anything else this run), and no local evaluator was launched for #1536 — the prompt and worktree
+were prepared and the dispatch deliberately withheld (D-4). The two local evaluator sessions this run
+did spend — PLAN-EVAL #1398 (MiniMax M3) and IMPL-EVAL #1405 (DeepSeek) — both **completed** well
+before this policy and are not duplicated.
+
+### Timing finding: #1536's automatic IMPL-EVAL could not have fired
+
+Measured from the issue timeline rather than assumed:
+
+| Event | UTC |
+| --- | --- |
+| #1536 `ready_for_review` | **2026-08-12T08:53:43Z** |
+| #1536 `status:impl` removed, `status:impl-eval` applied | 2026-08-12T08:53:45Z |
+| #1524 (the dispatcher) merged | **2026-08-12T09:24:15Z** |
+
+Both candidate triggers precede the dispatcher's existence by ~30½ minutes. The draft → ready
+transition therefore had nothing to fire, and the initial automatic IMPL-EVAL for #1536 **did not
+run and will not run on its own**.
+
+Under this policy the rerun path is the only one left: move #1536 away from `status:impl-eval`, then
+re-add it. That matches what root already stated it would do with the Qwen override, so the
+conclusion is unchanged — but it is now a **requirement** rather than a preference, and a watcher
+waiting for a spontaneous verdict would wait forever. Recorded so that is visible rather than
+discovered by timeout.
+
+**Not actioned by this lane.** The label re-entry is root's, per D-4. This orchestrator has not
+touched #1536's head, labels, or body.
