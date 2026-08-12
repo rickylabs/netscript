@@ -716,3 +716,86 @@ Trusted base SHA: d7e2b67b2be535c9ca13449f97f8f4585344030a
   something other than what it appeared to (cancelled-vs-superseded checks nearly manufacturing a false red
   on PR #1527; the phase-eval workflow succeeding while dispatching nothing on an incomplete label pair; and
   now this). Reading the *provenance* rather than the *status* has caught all three.
+
+## D-25 — three of four watcher findings resolved differently than reported; one instruction pair is jointly unsatisfiable
+
+- **Severity:** significant (instruction reconciliation, recorded rather than silently picked)
+- **Recorded:** 2026-08-12, PR #1560
+
+### 1. Barrel staleness — already fixed before the report arrived
+
+The watcher reported `ci.yml`'s `quality` job failing on stale
+`packages/cli/src/kernel/assets/agent-tools.generated.ts`. True at head `49e2b86e9`; **already fixed** at
+the current head. Commit `9ab361440` regenerated it, the orchestrator verified idempotence (a second
+`deno task gen:assets-barrel` left `git status --porcelain` empty) and confined scope (only
+`agent-tools.generated.ts`; `skills.generated.ts` did not need to change). Executed at head `9ab361440`,
+ci run `31593153002`:
+
+```text
+success  quality              <- the reported failure, now green
+success  check-test
+success  classify changes
+success  deps-report
+success  core CI lane visibility
+failure  close-gate           <- the only remaining failure
+```
+
+### 2. The duplicate eval run — already cancelled, not by this lane
+
+Instruction: "cancel pending duplicate `31592081043` before it consumes capacity." Queried before acting:
+
+```text
+31592060933  completed  success    head=f99cb4fbf  created=11:29:21Z
+31592081043  completed  cancelled  head=f99cb4fbf  created=11:29:38Z   <- already cancelled
+31593326538  in_progress    -      head=5db37e7bb  created=11:46:00Z
+```
+
+`31592081043` was **already `cancelled`** — almost certainly by the workflow's own concurrency group, 17
+seconds after the first run started. No action was taken and none was needed. Recorded because claiming
+to have cancelled it would be a false record of a mitigation.
+
+### 3. The verdict instruction and the barrel instruction cannot both be satisfied
+
+This is the one that needs an owner decision rather than a choice by me.
+
+- "Use only the first run's final verdict" — run `31592060933`, which returned `PASS` against PR head
+  **`49e2b86e9`**.
+- "Regenerate the canonical agent-tools asset and commit it" — that commit is **`9ab361440`**, which is
+  what will merge.
+
+So the authoritative verdict names a head that is *not* the head being merged, and the reason it does is
+the other instruction. `milestone-run.md` treats a gate that did not execute against what ships as
+**unproven, not clean**, which is why this lane re-triggered at the final head (`drift.md` D-23) — that
+re-trigger predates the "do not retrigger" directive and is run `31593326538`, currently in flight.
+
+**Position taken:** nothing further is launched, no fourth run is created, and the in-flight
+`31593326538` is allowed to finish because it is the only evaluation covering the merged tree. Its verdict
+is **not** consumed as authoritative without owner confirmation; the merge decision is held pending that.
+Both verdicts and both heads are recorded here so the choice is the owner's and is visible either way.
+
+### 4. Close-gate — the remaining failure, reconciled from posted evidence only
+
+Six #1530 boxes unchecked. Reconciled the sanctioned way and no other: applied `status:ready-merge` and
+**re-ran** ci run `31593153002` (`gh run rerun`), so the mirror observes the label live with the head
+unchanged at `9ab361440`. No box is hand-ticked, no evidence is authored at merge time — the mirror maps
+from the `acceptance-evidence` block already in the PR body. Box 7 keeps its `[post-merge]` marker and is
+neither mapped nor ticked. Re-running rather than pushing is deliberate (D-21/D-23): a push would move the
+head and invalidate *both* verdicts.
+
+## D-26 — release strategy: 0.0.6 may cut intermediary canaries; this lane reports checkpoints
+
+- **Severity:** minor (supersedes part of D-3)
+- **Recorded:** 2026-08-12, owner directive
+- **Policy:** 0.0.6 may publish intermediary canaries at meaningful green checkpoints. This lane keeps
+  landing coherent quality/internal PRs independently and **reports each merged gate-trust checkpoint to
+  the fixes/release coordinator**. It does **not** cut releases.
+- **Effect on D-3:** D-3 recorded "no canary declared by this lane; root owns canary/stable". Still true —
+  this lane declares and cuts nothing. What changes is that merges are now **actively reported as canary
+  checkpoints** rather than merely appended to `cut-trace.md` for someone else to discover.
+- **Checkpoints to report:**
+  1. **PR #1527 → `63cd1cd58`** — closed #1436 + #1415. Gate-trust checkpoint: the close-gate no longer
+     invents closing requirements from hyphenated prose, and the acceptance mirror no longer accepts
+     not-yet-done evidence. Both proven on live data, including #1436's original incident (`#1431`
+     classified as a pull request and excluded) firing on the PR that fixed it.
+  2. **PR #1560** — pending the verdict question in D-25. Restores `main`'s blocking
+     `code-quality-repo` job, red for seven consecutive pushes.
