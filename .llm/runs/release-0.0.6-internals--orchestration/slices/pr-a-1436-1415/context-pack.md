@@ -15,4 +15,5 @@ changed yet. PR #1527 is the sole draft PR; the orchestrator retains merge autho
 
 ## Next
 
-Execute and commit RED evidence, then land S2 through S4 in order and finish the six requested gates.
+S1 RED is committed as `a927790eb`. S2 changes only the keyword boundary to `(?<![\w-])`; next land
+PR classification and mirror consistency, then evidence assertion and the six requested gates.

@@ -44,3 +44,15 @@ explicit gates. Separate-session review remains the orchestrator's authority.
 
 PR #1527 remains draft with `status:impl`, the required labels/milestone, and both closing keywords.
 No scope adjustment is required.
+
+## S2 — keyword boundary
+
+- Replaced the leading word boundary with `(?<![\w-])`; trailing number boundary is unchanged.
+- The focused parser corpus proves hyphen/word prefixes reject while line start and punctuation
+  prefixes still resolve.
+- Gate: `deno test --allow-read --allow-env --filter 'closing keywords reject'
+  acceptance-evidence_test.ts` — exit 0, 1 passed, 10 filtered out.
+
+### Reconcile
+
+The implementation matches the corrected #1436 contract without preserving the prose workaround.
