@@ -26,6 +26,7 @@ report; you do not merge.
 | Branch | `fix/1530-type-fixture-scan-scope` |
 | Base | **`84dd44ae7`** = `origin/main` at dispatch. Contains PR #1527 (`63cd1cd58`, the gate-trust fix). Verified at this base: `deno task quality:scan:repo` still exits **1**, so the defect is live here. |
 | Slice dir | `.llm/runs/release-0.0.6-internals--orchestration/slices/pr-e-1530/` |
+| Draft PR | **#1560** — already open, already labelled, body already written. Comment on it; do not open another, and do not flip it out of draft. |
 | Closes | #1530 |
 | Route | Codex · gpt-5.6-sol · **low** |
 | Plan | `plan-quality-rail.md` (incl. § Revision 2) · slices **E1–E4** in `worklog.md` § Design |

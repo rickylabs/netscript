@@ -602,3 +602,31 @@ Trusted base SHA: d7e2b67b2be535c9ca13449f97f8f4585344030a
   where it is cheapest to pay.
 - **Implementation is now authorized.** PR-E dispatches first. F-5 of cycle 4 (no committed slice)
   discharges on that dispatch, as the evaluator stated.
+
+## D-21 — D-10's remedy refined: re-run the workflow, do not push, once an IMPL-EVAL verdict exists
+
+- **Severity:** significant (sequencing; the naive remedy destroys evaluation evidence)
+- **Recorded:** 2026-08-12, taking PR #1560 through the gate
+- **The tension.** D-10 established that `status:ready-merge` triggers no `ci.yml` run, so the acceptance
+  mirror does not fire, and prescribed **label then push**. That was correct for PR #1527, which had no
+  formal IMPL-EVAL (owner-waived). It is **wrong** now that the initial IMPL-EVAL fires on draft → ready
+  (D-14): a push moves the head, and the IMPL-EVAL verdict was issued against the pre-push head. Pushing to
+  make the mirror run would invalidate the very verdict that authorizes the merge.
+- **The correct remedy, and it was in the skill all along.** `netscript-pr` states that the mirror and
+  checker "fetch the PR, its labels/body/head, comments, and every closing issue **live** through the API at
+  execution time … a re-run after labeling now works (labels are read live, so **a manual rerun also
+  works**)". So the sequence is:
+  1. IMPL-EVAL returns `PASS` at head *H*.
+  2. Apply `status:ready-merge`.
+  3. **Re-run the existing `ci.yml` run** (`gh run rerun <id>`), which re-reads live labels and mirrors the
+     acceptance evidence. Head stays *H*; the verdict stays valid.
+  4. Merge.
+- **Why this matters beyond convenience.** "Push to re-trigger" is the reflex, and here it silently trades a
+  formal evaluation for a workflow trigger. The provenance fields the gate prints (`headSha`,
+  `evaluatedAt`, per-issue `updatedAt`/`bodySha256`) exist precisely so a verdict evaluated against a
+  superseded head is detectable — a push would make every one of them stale in one step.
+- **Effect on `R-11` / PR-C slice C7.** The documentation correction grows one clause. The three true
+  statements are: `openhands-phase-eval.yml` **does** listen to `labeled`; `ci.yml` **does not**; and the
+  way to make the close-gate and mirror observe a new label is to **re-run** the existing run, not to push —
+  explicitly so an existing IMPL-EVAL verdict is not invalidated. That is strictly more useful than the flat
+  "label, then push" this lane started with, and it is the version C7 ships.
