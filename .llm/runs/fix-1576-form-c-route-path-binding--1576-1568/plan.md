@@ -46,12 +46,12 @@ parser, then expose that same binding natively through `definePartial()`.
 
 ## Open-Decision Sweep
 
-| Decision                  | Status        | Notes                                                                                  |
-| ------------------------- | ------------- | -------------------------------------------------------------------------------------- |
-| Page/reference precedence | resolved now  | D1                                                                                     |
-| Partial API shape         | resolved now  | D2                                                                                     |
-| Search failure convention | resolved now  | Reuse existing page resolver/400 behavior.                                             |
-| Browser/scaffold E2E      | safe to defer | Explicitly prohibited `e2e:cli`; package runtime fixtures cover the binding mechanism. |
+| Decision                  | Status       | Notes                                                                               |
+| ------------------------- | ------------ | ----------------------------------------------------------------------------------- |
+| Page/reference precedence | resolved now | D1                                                                                  |
+| Partial API shape         | resolved now | D2                                                                                  |
+| Search failure convention | resolved now | Reuse existing page resolver/400 behavior.                                          |
+| Browser partial request   | resolved     | Cycle 3 uses the package's required Chromium harness; `e2e:cli` remains prohibited. |
 
 ## Risk Register
 
@@ -78,6 +78,10 @@ parser, then expose that same binding natively through `definePartial()`.
 2. **#1568:** route option, inferred partial context, shared path/search resolution, handler
    wrapping, mutation fixture/docs; gate with package tests and all required final gates; commit
    second.
+3. **Correction cycle 2:** preserve omitted inline-contract schemas and align malformed partial
+   references with the page guard.
+4. **Correction cycle 3:** add browser-only evidence that a generated dynamic Form-C reference
+   survives real Fresh client partial navigation with its typed path value intact.
 
 ## PLAN-EVAL
 
@@ -99,3 +103,17 @@ evaluation reach the draft PR only through the automatic label-driven lifecycle.
   malformed partial reference before running the owner-specified final gate set.
 - **Non-scope:** No redesign of `withRoute`, no route-inference C3 work, no browser/CLI E2E, and no
   local evaluator or lifecycle transition.
+
+## Correction Cycle 3
+
+- **Evidence fixture:** Represent the generated `routes.orders.$id.$route` tree shape with
+  `createRouteReference('/orders/[id]')`, then bind it through the accepted `.withRoute(...)`
+  surface in a real Fresh/Vite app.
+- **Transport:** Drive a generated `f-client-nav` link in Chromium and capture the actual dynamic
+  response whose URL carries `fresh-partial=true`.
+- **Assertions:** Require response 200, rendered `order-42`, a self-href rebuilt from the typed
+  path, the clean final URL, and no `pageerror` or console-error events.
+- **Counterfactual:** Temporarily remove only the route-parser fallback, run the focused browser
+  test to capture `actual 500 / expected 200`, then restore the accepted runtime before gates.
+- **Non-scope:** No product/runtime change, no C1/C4 reopening, no #1610 inference work, no
+  `e2e:cli`, and no local evaluator or lifecycle transition.

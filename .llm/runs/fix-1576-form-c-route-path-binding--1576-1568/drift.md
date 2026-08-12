@@ -20,3 +20,15 @@
 - **Severity:** minor
 - **Action:** apply C1/C4 only, preserve settled behavior, and leave re-evaluation to the automatic
   label-driven lifecycle per owner prohibition.
+
+## 2026-08-12 — browser evidence became locally executable
+
+- **What:** The original plan deferred browser evidence because the required package harness did not
+  exist; the merge from current `main` added #1600's `test:browser` Fresh/Vite/Chromium lane.
+- **Source:** Correction-cycle-3 owner brief and merge head `831460b64`.
+- **Expected:** Criterion 5 remained unverified by this lane.
+- **Actual:** A bounded browser fixture can now drive and inspect a real `fresh-partial=true`
+  response without invoking prohibited CLI E2E.
+- **Severity:** minor
+- **Action:** add evidence only, retain all accepted runtime behavior, and execute `test:browser` as
+  an explicit gate.

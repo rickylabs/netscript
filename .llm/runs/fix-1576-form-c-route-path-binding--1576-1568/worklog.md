@@ -80,6 +80,10 @@ resolver, and extend the page/partial matrix together so their runtime policy st
 | 2026-08-12 | cycle 2   | reviewed    | Confirmed inline contract schemas retain precedence, prior schemas feed both config and the framework-built reference, `withRoute` and 404/400 code are untouched, and malformed partials fail before materialization. Generator review only. |
 | 2026-08-12 | cycle 2   | validated   | All specified gates pass; raw diff/lock/scope inspection is clean, with no new quality allowance and no prohibited path touched.                                                                                                              |
 | 2026-08-12 | cycle 2   | reconcile   | Read current PR comments and orchestrator disposition: C3 is #1610/non-scope, #1576 criterion 5 stays unticked, status remains `status:impl`, and automatic re-evaluation waits for this new head.                                            |
+| 2026-08-12 | cycle 3   | resynced    | Owner resynced the branch to `831460b64`; #1600's required package browser harness is now available. Accepted C1/C4 and all product runtime behavior remain locked.                                                                           |
+| 2026-08-12 | cycle 3   | red browser | With only the reference fallback removed from `resolvePathParams`, `browser: generated Form-C dynamic route resolves path during fresh partial navigation` captured the real partial response as 500 versus expected 200.                     |
+| 2026-08-12 | cycle 3   | implemented | Added an isolated Form-C route-tree fixture and Chromium contract that captures `/orders/order-42?fresh-partial=true`, asserts response 200, rendered `order-42`, rebuilt self-href, final URL, and zero browser errors.                      |
+| 2026-08-12 | cycle 3   | validated   | Scoped check/lint/fmt, 245-test package suite, two-test browser suite, exact requested quality task, explicit Fresh-only zero-allowance scan, diff/lock/scope hygiene all pass.                                                               |
 
 ## Gate Results
 
@@ -124,10 +128,26 @@ resolver, and extend the page/partial matrix together so their runtime policy st
 | Explicit Fresh quality scan  | PASS     | `ok: true`, 0 findings, 0 allowances                                                |
 | Diff/lock/scope hygiene      | PASS     | `git diff --check` clean; `deno.lock` unchanged; no prohibited path in owned diff   |
 
+### Correction cycle 3
+
+| Gate                         | Result   | Evidence                                                                                        |
+| ---------------------------- | -------- | ----------------------------------------------------------------------------------------------- |
+| Real partial browser request | RED→PASS | `browser: generated Form-C dynamic route resolves path during fresh partial navigation`         |
+| Counterfactual failure       | RED      | Removing only reference fallback yields assertion diff: actual 500, expected 200                |
+| Typed rendered path          | PASS     | Chromium observes `order-42` and a rebuilt `/orders/order-42` href after the partial navigation |
+| Browser runtime errors       | PASS     | Captured `pageerror` and console-error arrays are empty                                         |
+| Fresh scoped check           | PASS     | 197 files, 2 batches, 0 failed batches, 0 occurrences                                           |
+| Fresh scoped lint            | PASS     | 197 files, 1 batch, exit 0, 0 occurrences                                                       |
+| Fresh scoped format          | PASS     | 197 files, 1 batch, 0 failed batches, 0 findings                                                |
+| Fresh package tests          | PASS     | `245 passed                                                                                     |
+| Fresh browser tests          | PASS     | `2 passed                                                                                       |
+| Requested quality task       | PASS     | Exit 0; aggregate has 7 existing allowances from task-prepended non-Fresh roots                 |
+| Explicit Fresh quality scan  | PASS     | `ok: true`, 0 findings, `allowCount: 0`                                                         |
+| Diff/lock/scope hygiene      | PASS     | `git diff --check` clean; `deno.lock` unchanged; no prohibited path in owned diff               |
+
 ## Handoff Notes
 
 - Automatic evaluation is required and intentionally not arranged by this session.
-- Browser scaffold E2E and publish dry-run were not run; the former is explicitly prohibited and
-  neither is part of the owner-specified gate set.
-- #1576 criterion 5 remains without executed browser/scaffold evidence and must not be mirrored as
-  completed by this lane.
+- CLI scaffold E2E and publish dry-run were not run; `e2e:cli` remains explicitly prohibited and
+  neither is part of the cycle-3 gate set.
+- #1568 criterion 5 remains unclaimed because it depends on #1610 and is outside this PR cycle.
