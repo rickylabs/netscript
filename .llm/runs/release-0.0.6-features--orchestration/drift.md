@@ -208,3 +208,56 @@ to be legitimate — it embeds the edited template); push and report the correct
 **Explicitly accepted alternative:** if isolation cannot be achieved, report that B3 is not viable
 under the lock policy. The fixture is then removed from this PR and the client-bundle assertion joins
 #1557. Choosing that is not a failure; leaving the lock mutated to keep the test would be.
+
+## D-8 — Fable evaluator spawned under a Codex leaf; my briefs were the gap (significant)
+
+**Date** 2026-08-12. A Fable subprocess spawned under the **#1583** Codex leaf and was terminated
+without touching its work. On auditing, I found a **second, still-running** one and terminated it too.
+
+### What was actually live
+
+`ps` showed PIDs **816603 / 816700**, started 18:14, `--model fable --effort medium --name
+1583-impl-eval-retry` — the `-retry` name indicating it was a **second attempt** after the first was
+stopped. Its prompt declared it *"the mandatory separate-session IMPL-EVAL evaluator for NetScript PR
+#1593 … native opposite-family evaluator: Claude Fable 5, medium, lane `formal_impl_evaluation`."*
+
+Three violations at once: a **prohibited model**, a **prohibited local evaluator path**, and a
+**duplicate** of the automatic DeepSeek lifecycle already running on #1593.
+
+Terminated with `TERM`, verified zero survivors, `KILL` held in reserve and not needed.
+
+**No damage:** leaf head `b96b5a58e` intact, working tree clean, and **no `evaluate.md` was ever
+written** — the run dir contains only the Codex slice's own `plan/research/worklog/supervisor` files.
+#1593 remains ready at `status:impl-eval` with automatic run `31616560752` in flight.
+
+### The gap was mine
+
+I audited my own dispatched briefs for the prohibition:
+
+| Brief | Fable mentions |
+| --- | --- |
+| `implement-1583.md` | **0** |
+| `implement-1571.md` | **0** |
+| `implement-1580.md` | **0** |
+| `implement-1589.md` | 1 |
+| `implement-1227.md` | 1 |
+
+**Three of five carried no prohibition at all**, including #1583's — the leaf that spawned one. I had
+been treating "no Fable" as an *orchestrator-level* constraint I personally honoured, and recorded it
+in `drift.md` D-6 and the worklog. But a constraint the implementing agent never reads cannot bind
+the implementing agent. The leaf reasonably concluded that a formal IMPL-EVAL needed an
+opposite-family evaluator and spawned the canonical one from `lane-policy.md`.
+
+**This is the same failure shape as D-7**, one layer up: *a prohibition stated where the actor cannot
+see it is not a mechanism.* There I wrote a commit-boundary guard in prose and nothing stopped the
+lock being staged; here I held a model prohibition in my own context and nothing stopped a leaf
+spawning that model. Recorded together because the lesson generalises: **constraints must travel to
+the agent that can violate them.**
+
+### Fix forward
+
+Every future slice brief carries a standard, non-optional block —
+`slices/BRIEF-STANDARD-PROHIBITIONS.md` — prohibiting Fable and `deep_analysis` sub-agents outright,
+forbidding any locally launched evaluator, and stating that evaluation arrives **only** through the
+automatic label-driven lifecycle. Existing live briefs (#1589) already carry the clause; #1583's leaf
+is past implementation and its evaluation is now automatic-only.
