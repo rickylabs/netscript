@@ -33,15 +33,15 @@ milestone by the owner — this lane does not touch it.
 | Task lane | Provider / model / effort | Role in this run |
 | --- | --- | --- |
 | `planning_decisions` | Claude · Anthropic · Opus 5 · high | This orchestrator session. Coordinates; does not write framework or tooling implementation code. |
-| `deep_analysis` | Claude · Anthropic · Fable 5 · medium | Optional sub-agent for rail design questions (rename-vs-deletion policy, export-reachability strategy). |
+| ~~`deep_analysis`~~ | **PROHIBITED — Fable barred for this lane (owner, 2026-08-12)**. Never dispatched in this run. If deep analysis is needed it stays Claude-family on **Opus 5**, so opposite-family analysis of Codex work is not traded away. |
 | `light_implementation` | Codex · OpenAI · GPT-5.6 Sol · low | Default implementer: PR-A, PR-B. Mobile-visible WSL daemon-attached thread. |
 | `normal_implementation` | Codex · OpenAI · GPT-5.6 Sol · medium | PR-C (decision-heavy: per-row rename-vs-deletion, RFC-location resolution). |
 | `complex_implementation` | Codex · OpenAI · GPT-5.6 Sol · high | PR-D (#1378 — export-reachability via `deno doc --json`, allowance registry, docs-fence extraction). |
 | `review_codex_light` | Claude · Anthropic · Opus 5 · high | Orchestrator slice review of Sol·low work (PR-A, PR-B). |
-| `review_codex` | Claude · Anthropic · Fable 5 · low | Adversarial review of Sol·medium work (PR-C). |
-| `review_codex_complex` | Claude · Anthropic · Fable 5 · medium | Adversarial review of Sol·high work (PR-D). |
+| `review_codex` | ~~Fable 5 · low~~ → **Claude · Anthropic · Opus 5 · low** | Adversarial review of Sol·medium work (PR-C, PR-D). Rebound to the **documented token-limit fallback** in `lane-policy.md` § Review-pairing ladder, which is Claude-family by design. |
+| ~~`review_codex_complex`~~ | **not used** | PR-D dropped to Sol·medium in the rescope (export-reachability moved to 0.0.7), so its pairing is `review_codex` above. Had it stayed Sol·high, the binding would be **Opus 5 · medium**, the documented fallback. |
 | `formal_plan_evaluation` | Codex · OpenAI · GPT-5.6 Sol · high | PLAN-EVAL of the quality-rail plan — Claude-authored plan ⇒ opposite family is Codex. |
-| `formal_impl_evaluation` | Codex · OpenAI · GPT-5.6 Sol · xhigh **or** Claude · Fable 5 · medium | Per PR: whichever family is opposite the author of that PR's code. Codex-authored PRs ⇒ Fable 5 · medium. |
+| `formal_impl_evaluation` | **automated — model resolved by the workflow** | Verified at source: `openhands-phase-eval.yml:103-106` can select only `minimax-m3`, `deepseek-v4-flash-0731`, or `qwen3.8-max`. **No Fable path exists**, so the prohibition does not touch the automatic evaluator. Observed: MiniMax M3 for PLAN, DeepSeek V4 Flash 0731 for IMPL. |
 | `light_implementation` (watcher) | Codex · OpenAI · GPT-5.6 Sol · low | CI watcher / minor green-up to merge-ready. |
 
 Routes are read from `.llm/harness/workflow/lane-policy.md`; the table above records only which

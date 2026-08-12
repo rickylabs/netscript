@@ -997,3 +997,38 @@ completed/failure   59e435c5d   12:03:58Z
   it in advance bought.
 - **Lane status:** #1436, #1415, #1530 closed. Remaining in 0.0.6: **#1403** (PR-B, next), **#1380** (PR-C),
   **#1549** (PR-D). #1378 and #1545 in 0.0.7.
+
+## D-31 — Fable prohibited for this lane; two review bindings moved to their documented Opus fallbacks
+
+- **Severity:** significant (route change), **minor in effect** (no dispatch was pending on Fable)
+- **Recorded:** 2026-08-12, owner directive — Fable fully prohibited for the 0.0.6 lane until explicitly
+  lifted (95% quota until Saturday). No Fable for planning, research, implementation, review or evaluation;
+  if a configured route would select Fable, stop that dispatch and report it.
+- **Nothing to stop.** Zero live sessions in this lane at the time of the directive (`agentic:codex-status`
+  filtered to this lane's worktrees → 0). PR-E was already merged; no Fable dispatch had ever been made in
+  this run — the `deep_analysis` lane was carried as "optional" and never used.
+- **Three bindings named Fable; each rebound to the route `lane-policy.md` already documents:**
+
+| Lane | Was | Now | Why this is the sanctioned substitution |
+| --- | --- | --- | --- |
+| `review_codex` (PR-C, PR-D) | Fable 5 · low | **Opus 5 · low** | The § Review-pairing ladder lists Opus 5 · low as this lane's token-limit fallback |
+| `review_codex_complex` | Fable 5 · medium | **not used** | PR-D dropped to Sol·medium in the rescope, so it pairs on `review_codex`. Had it stayed Sol·high the fallback is Opus 5 · medium |
+| `deep_analysis` | Fable 5 · medium | **Opus 5** if needed | Kept Claude-family deliberately — see below |
+
+- **The invariant that must not be lost in the substitution.** `lane-policy.md` is explicit that the
+  Codex-review lanes fall back to **Claude · Opus** rather than to a Codex model, "so an OpenAI-authored
+  change is never reviewed by an OpenAI-family model — opposite-family review is never traded away for a
+  token-limit fallback". Every substitution above is Claude-family for exactly that reason. The tempting
+  cheap move — reviewing Codex work with Codex Sol because Claude capacity is constrained — is the one thing
+  the policy forbids, and it is worth naming so a future capacity squeeze does not quietly take it.
+  Note `deep_analysis`'s *published* fallback is Codex Sol · high; that is fine for orchestrator analysis in
+  general, but in this lane deep analysis would be analysing **Codex-authored** artifacts, so it stays on
+  Opus.
+- **The automatic evaluator is unaffected, verified at source rather than assumed.**
+  `openhands-phase-eval.yml:103-106` maps only `eval:model:minimax` → `minimax-m3`,
+  `eval:model:deepseek` → `deepseek-v4-flash-0731`, `eval:model:qwen` → `qwen3.8-max`, and throws on any
+  unknown label. **There is no Fable path.** So PLAN-EVAL and IMPL-EVAL continue on the automated route
+  untouched — as already observed: MiniMax M3 for PLAN, DeepSeek V4 Flash 0731 for IMPL.
+- **Effect on the remaining rail:** none on capability. PR-B is `light_implementation` (Sol · low), whose
+  pairing is `review_codex_light` → **Opus 5 · high**, which never involved Fable. PR-C and PR-D now review
+  on Opus 5 · low. Implementation stays Codex; formal evaluation stays automated.
