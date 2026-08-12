@@ -57,7 +57,8 @@ are not `RegisteredPluginConfig` callers.
 
 ## Negative control 1 — baseline RED before product implementation
 
-The composite gate was committed first at `668b3b3d6`, then executed before any product fix. The
+The composite gate was committed first (rebased commit `5addf89bd`), then executed before any
+product fix. The
 fixture completed registry and Aspire helper generation; it failed specifically because doctor
 invented local directories, discarded published permissions, and skipped the workers adapter.
 
@@ -402,3 +403,29 @@ All implementation claims are pre-merge proven. The six explicit PR-body accepta
 implemented and covered by the focused gate and the substantive serialized runtime pass. Formal
 separate-session IMPL-EVAL remains pending; this implementation session does not self-certify that
 box.
+
+## Final synchronization
+
+Immediately before the ready transition, the branch rebased cleanly onto `origin/main` at
+`fc312f211` (#1584). Post-rebase verification retained the substantive runtime result and produced:
+
+```text
+$ deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx
+filesSelected=867 batches=8 failedBatches=0 occurrences=0
+EXIT_CODE=0
+
+$ deno task e2e:cli gate scaffold.plugins behavior.package-backed-plugin-doctor --cleanup --format pretty
+> behavior.package-backed-plugin-doctor: Validate package-backed plugin doctor truth
+  PASSED 3198ms
+Summary: passed=1 failed=0 skipped=0
+EXIT_CODE=0
+
+$ git diff --check
+EXIT_CODE=0
+
+$ git diff --stat -- deno.lock packages/fresh-ui/deno.lock
+EXIT_CODE=0
+```
+
+The last two commands had empty output. The post-rebase owned-file forbidden-pattern scan also had
+no matches.
