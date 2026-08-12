@@ -1,49 +1,78 @@
 import { assertEquals } from '@std/assert';
 import {
-  paginatedQuery,
-  offsetPaginatedQuery,
   cursorPaginatedQuery,
+  offsetPaginatedQuery,
+  paginatedQuery,
   type PrismaModelDelegate,
 } from '@netscript/contracts/query';
 
+type MockItem = Readonly<{ id: number; name: string; createdAt: Date }>;
+type MockItemKey = keyof MockItem;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isMockItemKey(value: unknown): value is MockItemKey {
+  return value === 'id' || value === 'name' || value === 'createdAt';
+}
+
+function compareItems(left: MockItem, right: MockItem, field: MockItemKey): number {
+  switch (field) {
+    case 'id':
+      return left.id - right.id;
+    case 'name':
+      return left.name.localeCompare(right.name);
+    case 'createdAt':
+      return left.createdAt.getTime() - right.createdAt.getTime();
+  }
+}
+
 // A minimal Prisma-shaped delegate fixture
 class MockPrismaDelegate implements PrismaModelDelegate {
-  constructor(private items: Array<{ id: number; name: string; createdAt: Date }>) {}
+  constructor(private items: MockItem[]) {}
 
-  async findMany(args: any = {}): Promise<any[]> {
+  async findMany(args: unknown = {}): Promise<MockItem[]> {
+    const input = isRecord(args) ? args : {};
+    const where = isRecord(input.where) ? input.where : {};
     let result = [...this.items];
-    if (args.where?.name) {
-      result = result.filter(item => item.name === args.where.name);
+    if (typeof where.name === 'string') {
+      result = result.filter((item) => item.name === where.name);
     }
     // Sorting
-    if (args.orderBy) {
-      const field = Object.keys(args.orderBy)[0];
-      const direction = args.orderBy[field];
-      result.sort((a: any, b: any) => {
-        if (a[field] < b[field]) return direction === 'asc' ? -1 : 1;
-        if (a[field] > b[field]) return direction === 'asc' ? 1 : -1;
-        return 0;
-      });
+    const orderBy = isRecord(input.orderBy) ? Object.entries(input.orderBy)[0] : undefined;
+    if (orderBy) {
+      const [field, direction] = orderBy;
+      if (isMockItemKey(field) && (direction === 'asc' || direction === 'desc')) {
+        result.sort((left, right) => {
+          const comparison = compareItems(left, right, field);
+          return direction === 'asc' ? comparison : -comparison;
+        });
+      }
     }
     // Cursor
-    if (args.cursor) {
-      const cursorVal = Number(args.cursor[args.cursorField ?? 'id']);
-      const index = result.findIndex(item => item.id === cursorVal);
+    const cursor = isRecord(input.cursor) ? input.cursor : undefined;
+    const cursorField = isMockItemKey(input.cursorField) ? input.cursorField : 'id';
+    if (cursor) {
+      const cursorValue = cursor[cursorField];
+      const index = result.findIndex((item) => String(item[cursorField]) === String(cursorValue));
       if (index !== -1) {
         result = result.slice(index);
       }
     }
     // Skip / Take
-    const skip = args.skip ?? 0;
-    const take = args.take ?? result.length;
+    const skip = typeof input.skip === 'number' ? input.skip : 0;
+    const take = typeof input.take === 'number' ? input.take : result.length;
     result = result.slice(skip, skip + take);
     return result;
   }
 
-  async count(args: any = {}): Promise<number> {
+  async count(args: unknown = {}): Promise<number> {
+    const input = isRecord(args) ? args : {};
+    const where = isRecord(input.where) ? input.where : {};
     let result = [...this.items];
-    if (args.where?.name) {
-      result = result.filter(item => item.name === args.where.name);
+    if (typeof where.name === 'string') {
+      result = result.filter((item) => item.name === where.name);
     }
     return result.length;
   }

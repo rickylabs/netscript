@@ -8,7 +8,7 @@ export interface InitPreset {
   readonly label: string;
 }
 
-/** Empty Wave 6 registry for future init presets. */
+/** Registry of init presets; empty until presets are registered. */
 export class PresetRegistry extends Registry<string, InitPreset> {
   override readonly id = 'init-presets';
   readonly #presets = new Map<string, InitPreset>();

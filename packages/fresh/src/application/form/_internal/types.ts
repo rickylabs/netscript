@@ -53,6 +53,8 @@ export type {
   FormEnhancementOptions,
   FormEnhancementSnapshot,
   FormEnhancementState,
+  FormNavigationMode,
+  FormNavigationStrategy,
   RuntimeFormState,
 } from './runtime-types.ts';
 export type { FormPageInvalidateContext, FormPageProps } from './page-types.ts';

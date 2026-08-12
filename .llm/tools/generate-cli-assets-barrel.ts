@@ -245,15 +245,34 @@ export const EMBEDDED_SKILL_BUNDLE_HASH: string = '${hash}';
 `;
 }
 
-async function renderAgentToolEmbeddedContent(): Promise<string> {
+/** Source files and canonical path order used to render the embedded agent-tool bundle. */
+export interface AgentToolEmbeddedBundle {
+  readonly files: Readonly<Record<string, string>>;
+  readonly orderedPaths: readonly string[];
+}
+
+interface AgentToolManifestFile {
+  readonly source: string;
+  readonly path: string;
+}
+
+interface AgentToolManifest {
+  readonly schemaVersion: number;
+  readonly supportFiles: readonly string[];
+  readonly modules: readonly AgentToolManifestFile[];
+  readonly tools: readonly AgentToolManifestFile[];
+}
+
+/** Read the exact consumer agent-tool bundle inputs used by the generated CLI barrel. */
+export async function readAgentToolEmbeddedBundle(): Promise<AgentToolEmbeddedBundle> {
   const cliManifest = JSON.parse(
     await Deno.readTextFile(new URL('../../packages/cli/deno.json', import.meta.url)),
   ) as { readonly version: string };
   const manifestText = await Deno.readTextFile(AGENT_TOOL_MANIFEST_URL);
-  const manifest = JSON.parse(manifestText) as {
-    readonly supportFiles: readonly string[];
-    readonly tools: readonly { source: string; path: string }[];
-  };
+  const manifest = JSON.parse(manifestText) as AgentToolManifest;
+  if (manifest.schemaVersion !== 2) {
+    throw new Error(`consumer-tools.json must use schemaVersion 2, got ${manifest.schemaVersion}`);
+  }
   const files: Record<string, string> = {
     'consumer-tools.json': manifestText,
     'README.md': await Deno.readTextFile(AGENT_TOOL_README_URL),
@@ -261,12 +280,21 @@ async function renderAgentToolEmbeddedContent(): Promise<string> {
       JSON.stringify({ cli: `jsr:@netscript/cli@${cliManifest.version}` }, null, 2)
     }\n`,
   };
-  for (const tool of manifest.tools) {
-    files[tool.path] = await Deno.readTextFile(
-      new URL(`../../${tool.source}`, import.meta.url),
+  for (const file of [...manifest.modules, ...manifest.tools]) {
+    files[file.path] = await Deno.readTextFile(
+      new URL(`../../${file.source}`, import.meta.url),
     );
   }
-  const orderedPaths = [...manifest.supportFiles, ...manifest.tools.map((tool) => tool.path)];
+  const orderedPaths = [
+    ...manifest.supportFiles,
+    ...manifest.modules.map((module) => module.path),
+    ...manifest.tools.map((tool) => tool.path),
+  ];
+  return { files, orderedPaths };
+}
+
+async function renderAgentToolEmbeddedContent(): Promise<string> {
+  const { files, orderedPaths } = await readAgentToolEmbeddedBundle();
   const canonical = orderedPaths.map((path) => `${path}\0${files[path] ?? ''}`).join('\0');
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(canonical));
   const hash = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join(

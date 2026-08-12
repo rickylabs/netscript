@@ -74,6 +74,25 @@ The route action should parse `FormData`, verify the submitted CSRF token agains
 normalize values with `formDataToRawValues()` and `normalizeFormValues()`, and return a
 `replyFor<TValues>()` result for the next render.
 
+## Redirect navigation
+
+Managed forms inherit Fresh client navigation by default. Keep that default—or select it explicitly
+with `strategy={{ navigation: 'client' }}`—when the POST response renders managed validation state,
+updates a compatible partial, or redirects to a page that Fresh can revive safely.
+
+Choose document navigation when a successful mutation redirects to a new full-document destination:
+
+```tsx
+<Form state={state} strategy={{ navigation: 'document' }}>
+  <button type='submit'>Create channel</button>
+</Form>;
+```
+
+The document strategy reliably overrides an inherited `<body f-client-nav>` opt-in. Callers do not
+need to pass or understand Fresh's raw transport attribute. Because it selects native browser
+submission for that form, use the default client strategy when invalid POST responses must update
+managed form state without a document reload.
+
 ## Entry Points
 
 The `./form` subpath exports these groups:

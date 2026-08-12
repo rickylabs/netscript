@@ -45,11 +45,10 @@ export interface DenoDeployTargetDeps {
  * `uninstall` are N/A for a hosted platform.
  *
  * `rollback` and `secrets` are intentionally omitted: per R-DEPLOY-3 they route
- * through the deploy **core** conventions, which are not yet on `main` (owned by
- * the #341/#364 hardening slice). Per the port docstring, an adapter declares
- * such ops unsupported by omission rather than shipping a silent no-op or a
- * forked per-target implementation — they slot in by delegation when the core
- * seam lands. See run drift D-IMPL-1.
+ * through reserved deploy **core** conventions. Per the port docstring, an
+ * adapter declares such ops unsupported by omission rather than shipping a
+ * silent no-op or a forked per-target implementation; they slot in by
+ * delegation when the core seam is implemented.
  */
 export class DenoDeployTarget implements DeployTargetPort {
   readonly key = 'deno-deploy';

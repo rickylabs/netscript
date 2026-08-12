@@ -24,7 +24,7 @@ export interface AppsettingsServiceOption {
   /**
    * Aspire host port to pin. Omit — the default — so Aspire allocates the host
    * and target ports and `aspire start --isolated` can run two workspaces at
-   * once (#952).
+   * once.
    */
   readonly hostPort?: number
 }
@@ -37,7 +37,7 @@ export interface AppsettingsOptions {
   readonly appName?: string
   /**
    * Aspire host port to pin for the app. Omit — the default — so Aspire
-   * allocates it (#952).
+   * allocates it.
    */
   readonly appPort?: number
   /** OTEL collector endpoint port. Defaults to PORT_RANGES.OTEL_COLLECTOR. */

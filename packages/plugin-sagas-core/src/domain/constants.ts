@@ -24,7 +24,7 @@ export const SAGA_INSTANCE_STATUSES: readonly [
   'cancelled',
 ] = ['pending', 'running', 'completed', 'failed', 'compensating', 'cancelled'];
 
-/** Default durability tier for Group E saga definitions. */
+/** Default durability tier for saga definitions. */
 export const DEFAULT_SAGA_DURABILITY_TIER: SagaDurabilityTier = 't1';
 
 /** Default idempotency deduplication window in milliseconds. */

@@ -1,12 +1,18 @@
 import { assertEquals, assertExists } from '@std/assert';
-import { defineWebhook } from '@netscript/plugin-triggers-core';
-import { MemoryTriggerEventStore, InlineTriggerProcessor } from '@netscript/plugin-triggers-core/testing';
+import {
+  defineWebhook,
+  type TriggerEventSubscriptionMessage,
+} from '@netscript/plugin-triggers-core';
+import {
+  InlineTriggerProcessor,
+  MemoryTriggerEventStore,
+} from '@netscript/plugin-triggers-core/testing';
 import { HmacSha256WebhookVerifier } from '@netscript/plugin-triggers-core/adapters';
 import {
+  createEventSubscription,
+  createManualDispatcher,
   createTriggerIngress,
   createWebhookTestDelivery,
-  createManualDispatcher,
-  createEventSubscription,
 } from '@netscript/plugin-triggers-core';
 
 Deno.test('Trigger operator, manual dispatch, test delivery, and lifecycle subscriptions', async () => {
@@ -62,7 +68,7 @@ Deno.test('Trigger operator, manual dispatch, test delivery, and lifecycle subsc
 
   // 3. Lifecycle event observation via createEventSubscription
   const subscriptionHub = createEventSubscription();
-  const observedEvents: any[] = [];
+  const observedEvents: TriggerEventSubscriptionMessage[] = [];
   const abortController = new AbortController();
 
   const subscriptionPromise = (async () => {

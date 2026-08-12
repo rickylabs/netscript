@@ -37,7 +37,7 @@ export interface SagaBuilder<
   TState,
   TMessage extends SagaMessage,
 > {
-  /** Set the durability tier for this saga. Defaults to T1. */
+  /** Set the durability tier for this saga. Defaults to `'t1'`. */
   durability(tier: SagaDurabilityTier): SagaBuilder<TId, TPhase, TState, TMessage>;
   /** Set the initial state. This must happen before registering handlers. */
   state<TNextState extends SagaState>(

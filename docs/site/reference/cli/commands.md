@@ -5,11 +5,11 @@ title: "netscript command reference"
 
 # `netscript` command reference
 
-The complete verb-and-flag surface of the published `netscript` binary
-(`@netscript/cli`). The [CLI reference](/cli-reference/) is the curated
-tour of the everyday path; this page is the exhaustive companion — every command group,
-subcommand, and flag, spelled exactly as the installed CLI prints it. For the package API
-surface (the embeddable helpers, not the command tree) see the
+The detailed verb-and-flag companion for the published `netscript` binary
+(`@netscript/cli`). Together with the curated [CLI reference](/cli-reference/), these two
+pages cover every public command group and direct subcommand; this page concentrates the extended
+groups and flags while the curated page carries the everyday flows. For the package API surface
+(the embeddable helpers, not the command tree) see the
 [`@netscript/cli` package page](/reference/cli/).
 
 This page documents the **public `netscript` binary** — the CLI published as
@@ -299,5 +299,9 @@ the bundle step fails, so `--no-bundle` is a size/behaviour trade-off rather tha
 | Command | Description |
 | --- | --- |
 | `netscript deploy copy` | Copy build artifacts to the install directory (no Servy registration). Flags: `--deploy-dir <path>` (default `./.deploy/windows`), `--install-dir <path>` (default auto-resolved from the manifest), `--verbose`, `--dry-run`. |
+| `netscript deploy start [service]` | Start all registered Windows services, or one named service, via Servy. Flags: `--install-dir <dir>`, `--deploy-dir <dir>`, `--servy-cli <path>`, `--no-health-check`, `--verbose`. |
+| `netscript deploy stop [service]` | Stop all registered Windows services in reverse manifest order, or stop one named service. Flags: `--install-dir <dir>`, `--deploy-dir <dir>`, `--servy-cli <path>`, `--verbose`. |
+| `netscript deploy status [service]` | Show Servy status for all registered Windows services, or one named service. Flags: `--install-dir <dir>`, `--deploy-dir <dir>`, `--servy-cli <path>`, `--verbose`. |
 | `netscript deploy logs <service>` | Show recent logs for a service. Flags: `--install-dir <dir>`, `--deploy-dir <dir>` (default `./.deploy/windows`), `-n, --lines <n>` (default 50), `--errors` (show the error log instead of stdout), `--list` (list available log files), `-f, --follow` (tail the log). |
+| `netscript deploy uninstall [service]` | Stop and remove all registered Windows services, or one named service, from the service manager. Flags: `--install-dir <dir>`, `--deploy-dir <dir>`, `--no-stop`. |
 | `netscript deploy upgrade` | Build, sync, reinstall, and restart services in one step. Flags: `--deploy-dir <path>` (default `./.deploy/windows`), `--install-dir <path>`, `--servy-cli <path>`, `--skip-compile`, `--skip-install`, `--skip-start`, `--verbose`, `--dry-run`. |

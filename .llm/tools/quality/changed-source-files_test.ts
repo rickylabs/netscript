@@ -86,4 +86,10 @@ Deno.test('code-quality workflow executes the selector for every .llm/tools chan
     'changed_files=$(deno run --allow-run .llm/tools/quality/changed-source-files.ts',
   );
   assertStringIncludes(workflow, 'deno task quality:scan --pretty "${args[@]}"');
+  assertStringIncludes(
+    workflow,
+    'deno run --allow-run .llm/tools/quality/check-allowance-budget-diff.ts',
+  );
+  assertStringIncludes(workflow, 'github.event.pull_request.base.sha');
+  assertStringIncludes(workflow, 'github.event.pull_request.head.sha');
 });

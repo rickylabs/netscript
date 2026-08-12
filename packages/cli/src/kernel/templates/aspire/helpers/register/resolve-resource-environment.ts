@@ -121,7 +121,7 @@ export function partitionDeclaredEnvironment(
  *
  * A refused key is named in a generated comment rather than dropped in silence:
  * a consumer reading the generated helper has to be able to see why the value
- * they wrote is not there. Silent stripping is the #1447 failure mode.
+ * they wrote is not there; values must never be stripped silently.
  *
  * @param entry - Config entry that may carry `Environment` or the `Env` alias
  * @returns Source lines for the registration block, already indented

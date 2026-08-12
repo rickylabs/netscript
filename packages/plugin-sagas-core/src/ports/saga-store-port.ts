@@ -19,7 +19,7 @@ export type SagaCorrelationIndexEntry = Readonly<{
   instanceId: SagaInstanceId;
 }>;
 
-/** Persistent state store boundary for T1 saga runtime guarantees. */
+/** Persistent boundary for saga state, transitions, and correlation indexes. */
 export interface SagaStorePort {
   /** Stable adapter identifier used by runtime diagnostics and plugin registration. */
   readonly id: string;
