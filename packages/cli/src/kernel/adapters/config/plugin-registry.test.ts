@@ -18,9 +18,9 @@ Deno.test('loadRegisteredPlugins returns normalized background processor metadat
     throw new Error('Expected workers plugin to be registered as a background processor');
   }
 
-  if (workers.workdir !== 'plugins/workers') {
+  if (workers.source.kind !== 'package') {
     throw new Error(
-      `Expected workers workdir to normalize to plugins/workers, got ${workers.workdir}`,
+      `Expected configured package to retain package source, got ${workers.source.kind}`,
     );
   }
 
@@ -43,8 +43,8 @@ Deno.test('loadRegisteredPlugins loads plugin specs from netscript config when o
     throw new Error('Expected background processor plugins to load from netscript.config.ts');
   }
 
-  if (plugins.workers.workdir !== 'plugins/workers') {
-    throw new Error('Expected internally loaded config to preserve normalized workdir');
+  if (plugins.workers.source.kind !== 'package') {
+    throw new Error('Expected internally loaded config to preserve package source');
   }
 });
 
@@ -65,8 +65,8 @@ Deno.test('loadRegisteredPlugins preserves registry output shape from explicit c
     throw new Error(`Expected only workers plugin, got ${Object.keys(plugins).join(',')}`);
   }
 
-  if (workers.rootDir !== resolve(projectRoot, 'plugins/workers')) {
-    throw new Error(`Expected workers rootDir to preserve old shape, got ${workers.rootDir}`);
+  if (workers.source.kind !== 'package' || workers.source.configuredSpecifier !== '@netscript/plugin-workers') {
+    throw new Error('Expected workers to preserve the configured package contract');
   }
 
   if (workers.service?.entrypoint !== './services/src/main.ts') {
@@ -235,10 +235,13 @@ Deno.test('loadRegisteredPluginMetadata derives identity from the configured mod
       plugins: ['./extensions/chat/mod.ts'],
     }),
   );
-  if (plugins['service-less']?.workdir !== 'extensions/chat') {
+  if (
+    plugins['service-less']?.source.kind !== 'local-workdir' ||
+    plugins['service-less'].source.workdir !== 'extensions/chat'
+  ) {
     throw new Error('Configured module directory did not determine the service-less workdir');
   }
-  if (plugins['service-less']?.rootDir !== pluginRoot) {
+  if (plugins['service-less']?.source.kind !== 'local-workdir' || plugins['service-less'].source.rootDir !== pluginRoot) {
     throw new Error('Configured module directory did not determine the service-less rootDir');
   }
 });
@@ -297,9 +300,9 @@ Deno.test('loadRegisteredPluginMetadata falls back when userland scaffold manife
     throw new Error('Expected workers metadata fallback to be derived from the registered spec');
   }
 
-  if (plugins.workers.workdir !== 'workers') {
+  if (plugins.workers.source.kind !== 'local-workdir' || plugins.workers.source.workdir !== 'workers') {
     throw new Error(
-      `Expected workers fallback workdir to be workers, got ${plugins.workers.workdir}`,
+      'Expected workers fallback source to retain the local workers workdir',
     );
   }
 });

@@ -60,3 +60,31 @@ Deno.test('plugin list reports configured-module identity across first-party top
     await Deno.remove(projectRoot, { recursive: true });
   }
 });
+
+Deno.test('plugin list renders package-backed source truth deliberately', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  try {
+    await Deno.writeTextFile(
+      join(projectRoot, 'plugin.ts'),
+      `export default { name: '@example/plugin-chat', version: '1.0.0', contributions: {} };\n`,
+    );
+    await Deno.writeTextFile(
+      join(projectRoot, 'deno.json'),
+      JSON.stringify({ imports: { '@example/plugin-chat': './plugin.ts' } }),
+    );
+    const output: string[] = [];
+    await createPluginListCommand({
+      loadConfig: () =>
+        Promise.resolve(defineConfig({
+          name: 'fixture-app',
+          databases: { config: [] },
+          plugins: ['@example/plugin-chat'],
+        })),
+      print: (line) => output.push(line),
+    }).parse(['--project-root', projectRoot]);
+
+    assertEquals(output[1]?.split('\t')[4], 'package:@example/plugin-chat');
+  } finally {
+    await Deno.remove(projectRoot, { recursive: true });
+  }
+});

@@ -15,6 +15,7 @@ import { probeConfiguredPluginManifest } from '../../../../kernel/adapters/confi
 import { resolvePluginImportSpecifier } from '../../../../kernel/application/plugin/configured-plugin-specifier.ts';
 import { getPluginServiceLookupName } from '../../../../kernel/adapters/config/plugin-registry.ts';
 import { showAuthBackend } from '../auth/auth-config.ts';
+import { resolveEffectivePluginPermissions } from '../../../../kernel/adapters/config/deploy-config-resolvers.ts';
 
 export const CONFIGURED_MODULE_RESOLVES_CHECK = 'configured-module-resolves';
 export const CONFIGURED_MODULE_EXPORTS_MANIFEST_CHECK = 'configured-module-exports-manifest';
@@ -257,8 +258,8 @@ async function diagnosePlugin(
       status: 'healthy',
       message: plugin.displayName ?? plugin.name,
     },
-    await checkWorkdir(projectRoot, plugin, dependencies.fs),
-    checkPermissions(plugin),
+    ...await checkPluginSource(projectRoot, plugin, dependencies.fs),
+    await checkPermissions(projectRoot, plugin, dependencies.fs),
     ...await checkAuthBackend(projectRoot, plugin, dependencies.fs),
     ...await checkPluginDoctor(projectRoot, plugin, dependencies.fs),
   ];
@@ -335,6 +336,8 @@ function formatProbeFailure(
       return `Configured plugin module "${spec}" exited non-zero (${probe.code}): ${probe.message}`;
     case 'import-failure':
       return `Configured plugin module "${spec}" failed to import: ${probe.message}`;
+    case 'malformed-payload':
+      return `Configured plugin module "${spec}" returned invalid manifest metadata: ${probe.message}`;
     case 'missing':
       return `Configured plugin module "${spec}" exports no manifest-shaped value.`;
     case 'ambiguous':
@@ -521,29 +524,119 @@ async function checkAuthBackend(
   }
 }
 
-async function checkWorkdir(
+async function checkPluginSource(
+  projectRoot: string,
+  plugin: RegisteredPluginConfig,
+  fs: FileSystemPort,
+): Promise<readonly PluginDoctorCheck[]> {
+  if (plugin.source.kind === 'package') {
+    return [{
+      id: 'source',
+      title: 'Installation source',
+      status: 'healthy',
+      message: `Package-backed (${plugin.source.configuredSpecifier}); no local workdir required`,
+    }];
+  }
+  const workdir = resolve(projectRoot, plugin.source.workdir);
+  const exists = await fs.exists(workdir);
+  return [{
+    id: 'workdir',
+    title: 'Workspace directory',
+    status: exists ? 'healthy' : 'warning',
+    message: exists ? plugin.source.workdir : `${plugin.source.workdir} does not exist`,
+  }];
+}
+
+async function checkPermissions(
   projectRoot: string,
   plugin: RegisteredPluginConfig,
   fs: FileSystemPort,
 ): Promise<PluginDoctorCheck> {
-  const workdir = resolve(projectRoot, plugin.workdir);
-  const exists = await fs.exists(workdir);
-  return {
-    id: 'workdir',
-    title: 'Workspace directory',
-    status: exists ? 'healthy' : 'warning',
-    message: exists ? plugin.workdir : `${plugin.workdir} does not exist`,
-  };
-}
-
-function checkPermissions(plugin: RegisteredPluginConfig): PluginDoctorCheck {
-  const permissions = plugin.permissions ?? [];
+  const appsettings = await readPermissionSettings(projectRoot, fs);
+  const localName = pluginLocalName(plugin.name);
+  const configured = appsettings.plugins.get(localName) ??
+    [...appsettings.plugins.entries()].find(([name]) =>
+      getPluginServiceLookupName(name) === localName
+    )?.[1] ?? appsettings.background.get(localName);
+  const permissions = resolveEffectivePluginPermissions(
+    configured,
+    plugin.service?.permissions,
+    plugin.permissions,
+    appsettings.defaults,
+  );
+  const published = resolveEffectivePluginPermissions(
+    undefined,
+    plugin.service?.permissions,
+    plugin.permissions,
+    appsettings.defaults,
+  );
+  if (configured && !samePermissions(permissions, published)) {
+    return {
+      id: 'permissions',
+      title: 'Permission metadata',
+      status: 'warning',
+      message: `${permissions.join(' ')} (explicit override differs from published default: ${published.join(' ')})`,
+    };
+  }
   return {
     id: 'permissions',
     title: 'Permission metadata',
     status: permissions.length > 0 ? 'healthy' : 'warning',
     message: permissions.length > 0 ? permissions.join(' ') : 'No plugin permissions declared',
   };
+}
+
+interface PermissionSettings {
+  readonly defaults: readonly string[];
+  readonly plugins: ReadonlyMap<string, readonly string[]>;
+  readonly background: ReadonlyMap<string, readonly string[]>;
+}
+
+async function readPermissionSettings(
+  projectRoot: string,
+  fs: FileSystemPort,
+): Promise<PermissionSettings> {
+  const empty: PermissionSettings = { defaults: [], plugins: new Map(), background: new Map() };
+  const path = resolve(projectRoot, 'appsettings.json');
+  if (!await fs.exists(path)) return empty;
+  try {
+    const document: unknown = JSON.parse(await fs.readFile(path));
+    if (!isRecord(document) || !isRecord(document.NetScript)) return empty;
+    const defaults = isRecord(document.NetScript.Defaults) &&
+        isRecord(document.NetScript.Defaults.Deno)
+      ? stringArray(document.NetScript.Defaults.Deno.Permissions) ?? []
+      : [];
+    return {
+      defaults,
+      plugins: permissionEntries(document.NetScript.Plugins),
+      background: permissionEntries(document.NetScript.BackgroundProcessors),
+    };
+  } catch {
+    return empty;
+  }
+}
+
+function permissionEntries(value: unknown): ReadonlyMap<string, readonly string[]> {
+  if (!isRecord(value)) return new Map();
+  return new Map(Object.entries(value).flatMap(([name, entry]) => {
+    if (!isRecord(entry)) return [];
+    const permissions = stringArray(entry.Permissions);
+    return permissions ? [[name, permissions] as const] : [];
+  }));
+}
+
+function stringArray(value: unknown): readonly string[] | undefined {
+  return Array.isArray(value) && value.every((entry) => typeof entry === 'string')
+    ? value
+    : undefined;
+}
+
+function samePermissions(left: readonly string[], right: readonly string[]): boolean {
+  return left.length === right.length && left.every((permission, index) => permission === right[index]);
+}
+
+function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
 function aggregateStatus(checks: readonly PluginDoctorCheck[]): PluginDoctorCheckStatus {
@@ -559,9 +652,9 @@ async function checkPluginDoctor(
 ): Promise<readonly PluginDoctorCheck[]> {
   if (!plugin.doctor) return [];
   try {
-    const moduleUrl = isModuleSpecifier(plugin.doctor)
+    const moduleUrl = isModuleSpecifier(plugin.doctor) || plugin.source.kind === 'package'
       ? plugin.doctor
-      : toFileUrl(resolve(plugin.rootDir, plugin.doctor)).href;
+      : toFileUrl(resolve(plugin.source.rootDir, plugin.doctor)).href;
     const module = await import(moduleUrl) as Record<string, unknown>;
     const adapter = Object.values(module).find((value): value is NetScriptPlugin =>
       isNetScriptPlugin(value) && pluginLocalName(value.name) === pluginLocalName(plugin.name)

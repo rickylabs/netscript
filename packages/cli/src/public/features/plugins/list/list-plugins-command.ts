@@ -56,7 +56,9 @@ function toListEntry(
     displayName: plugin.displayName ?? localName,
     type: plugin.type ?? '-',
     enabled: true,
-    workdir: plugin.workdir,
+    workdir: plugin.source.kind === 'local-workdir'
+      ? plugin.source.workdir
+      : `package:${plugin.source.configuredSpecifier}`,
     service,
     port: String(plugin.service?.port ?? plugin.infrastructure?.port ?? '-'),
     contributionAxis,
@@ -89,7 +91,7 @@ export function createPluginListCommand(
 ) {
   return new Command()
     .name('list')
-    .description('List configured NetScript plugins')
+    .description('List configured plugins and their local or package-backed source')
     .option('--project-root <path:string>', 'Project root directory')
     .action(async (flags: ListPluginsInput): Promise<void> => {
       const projectRoot = flags.projectRoot ? resolve(flags.projectRoot) : await findProjectRoot();

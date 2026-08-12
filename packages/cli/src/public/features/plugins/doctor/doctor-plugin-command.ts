@@ -52,7 +52,7 @@ export function createDoctorPluginCommand(
   const print = dependencies.print ?? outputText;
   return new Command()
     .name("doctor")
-    .description("Check installed NetScript plugin health")
+    .description("Check local-workdir and package-backed NetScript plugin health")
     .option("--project-root <path:string>", "Project root directory")
     .option(
       "--resource <name:string>",

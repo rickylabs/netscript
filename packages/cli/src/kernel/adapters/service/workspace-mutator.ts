@@ -15,6 +15,14 @@ import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../ports/template-port.ts';
 import type { ServiceConfigEntry } from '../../domain/service-shape.ts';
 import { reconcilePluginReferences } from '../plugin/plugin-reference-reconciler.ts';
+import {
+  getPluginServiceLookupName,
+  loadRegisteredPluginMetadata,
+} from '../config/plugin-registry.ts';
+import { loadProjectConfig } from '../config/project-config-loader.ts';
+import { DenoProcess } from '../runtime/process/deno-process.ts';
+import { resolveEffectivePluginPermissions } from '../config/deploy-config-resolvers.ts';
+import type { RegisteredPluginConfig } from '../../domain/resolved-config.ts';
 
 /** Project metadata needed to scaffold service resources. */
 export interface ServiceProjectMetadata {
@@ -159,7 +167,12 @@ export async function regenerateAspireHelpers(
 
   const parsed = await parseAppSettings(appsettingsPath);
   const rawAppsettings = JSON.parse(await fs.readFile(appsettingsPath)) as unknown;
-  const config = preservePluginEnvironment(parsed.config, rawAppsettings);
+  const projectConfig = await loadProjectConfig({ cwd: projectRoot }, { process: new DenoProcess() });
+  const registeredPlugins = await loadRegisteredPluginMetadata(projectRoot, projectConfig);
+  const config = applyRegisteredPluginPermissions(
+    preservePluginEnvironment(parsed.config, rawAppsettings),
+    registeredPlugins,
+  );
   const pipeline = new HelpersGeneratorPipeline(templateAdapter);
   const files = await pipeline.execute({
     config,
@@ -176,6 +189,60 @@ export async function regenerateAspireHelpers(
   }
 
   return written;
+}
+
+function applyRegisteredPluginPermissions<TConfig extends {
+  Plugins: Record<string, unknown>;
+  BackgroundProcessors: Record<string, unknown>;
+  Defaults: unknown;
+}>(
+  config: TConfig,
+  registeredPlugins: Readonly<Record<string, RegisteredPluginConfig>>,
+): TConfig {
+  const defaults = readDefaultPermissions(config.Defaults);
+  const plugins = { ...config.Plugins };
+  for (const [name, entry] of Object.entries(plugins)) {
+    if (!isRecord(entry)) continue;
+    const plugin = registeredPlugins[getPluginServiceLookupName(name)];
+    if (!plugin) continue;
+    plugins[name] = {
+      ...entry,
+      Permissions: resolveEffectivePluginPermissions(
+        stringArray(entry.Permissions),
+        plugin.service?.permissions,
+        plugin.permissions,
+        defaults,
+      ),
+    };
+  }
+
+  const backgroundProcessors = { ...config.BackgroundProcessors };
+  for (const [name, entry] of Object.entries(backgroundProcessors)) {
+    if (!isRecord(entry)) continue;
+    const plugin = registeredPlugins[name];
+    if (!plugin) continue;
+    backgroundProcessors[name] = {
+      ...entry,
+      Permissions: resolveEffectivePluginPermissions(
+        stringArray(entry.Permissions),
+        undefined,
+        plugin.permissions,
+        defaults,
+      ),
+    };
+  }
+  return { ...config, Plugins: plugins, BackgroundProcessors: backgroundProcessors };
+}
+
+function readDefaultPermissions(value: unknown): readonly string[] {
+  if (!isRecord(value) || !isRecord(value.Deno)) return [];
+  return stringArray(value.Deno.Permissions) ?? [];
+}
+
+function stringArray(value: unknown): readonly string[] | undefined {
+  return Array.isArray(value) && value.every((entry) => typeof entry === 'string')
+    ? value
+    : undefined;
 }
 
 function preservePluginEnvironment<TConfig extends { Plugins: Record<string, unknown> }>(
