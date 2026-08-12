@@ -6,11 +6,13 @@ import {
 } from 'jsr:@std/assert@^1';
 import {
   CANARY_PAIR_STATUS_CONTEXT,
+  collectReleaseNotes,
   composeReleaseBody,
   formatClosedIssues,
   isExactVersionReplacement,
   isVersionOnlyReleaseDiff,
   parseArgs,
+  resolvePreviousTag,
   toTag,
   toVersion,
   verifyGreenCanaryPair,
@@ -292,6 +294,96 @@ Deno.test('composeReleaseBody orders intro, changelog, closed issues and drops b
     closedIssues: '',
   });
   assertEquals(noIssues, "Intro.\n\n## What's Changed\n");
+});
+
+Deno.test('--prev-tag resolves a dated window and queries closed issues', async () => {
+  const plan = parseArgs([
+    'v1.0.0',
+    '--message',
+    'Release intro.',
+    '--prev-tag',
+    'v0.9.0',
+  ]);
+  const calls: string[] = [];
+  const notes = await collectReleaseNotes(plan, 'token', 'v1.0.0', {
+    fetchPreviousRelease: () => {
+      throw new Error('auto-detection must not run with --prev-tag');
+    },
+    resolvePreviousTag: (_repo, _token, tag) => {
+      calls.push(`resolve:${tag}`);
+      return Promise.resolve({ tag, since: '2026-08-01T12:00:00Z' });
+    },
+    generateWhatsChanged: (_repo, _token, _tag, previousTag) => {
+      calls.push(`notes:${previousTag}`);
+      return Promise.resolve("## What's Changed");
+    },
+    fetchClosedIssues: (_repo, _token, since) => {
+      calls.push(`closed:${since}`);
+      return Promise.resolve([{ number: 1430, title: 'Closed issues were silently skipped' }]);
+    },
+  });
+
+  assertEquals(notes.closed.length, 1);
+  assertEquals(calls, [
+    'resolve:v0.9.0',
+    'notes:v0.9.0',
+    'closed:2026-08-01T12:00:00Z',
+  ]);
+});
+
+Deno.test('known previous tag with empty since fails loudly before reporting closed issues', async () => {
+  const plan = parseArgs(['v1.0.0', '--message', 'Release intro.', '--prev-tag', 'v0.9.0']);
+  let queriedClosedIssues = false;
+  await assertRejects(
+    () =>
+      collectReleaseNotes(plan, 'token', 'v1.0.0', {
+        fetchPreviousRelease: () => Promise.resolve(null),
+        resolvePreviousTag: (_repo, _token, tag) => Promise.resolve({ tag, since: '' }),
+        generateWhatsChanged: () => Promise.resolve(''),
+        fetchClosedIssues: () => {
+          queriedClosedIssues = true;
+          return Promise.resolve([]);
+        },
+      }),
+    Error,
+    'since timestamp is empty',
+  );
+  assertEquals(queriedClosedIssues, false);
+});
+
+Deno.test('explicit previous tag uses release date with commit-date fallback', async () => {
+  const releaseCalls: string[] = [];
+  const released = await resolvePreviousTag('owner/repo', 'token', 'v0.9.0', (
+    method,
+    path,
+  ) => {
+    releaseCalls.push(`${method} ${path}`);
+    return Promise.resolve({
+      status: 200,
+      ok: true,
+      body: { published_at: '2026-07-31T10:00:00Z' },
+    });
+  });
+  assertEquals(released, { tag: 'v0.9.0', since: '2026-07-31T10:00:00Z' });
+  assertEquals(releaseCalls.length, 1);
+
+  const fallbackCalls: string[] = [];
+  const unreleased = await resolvePreviousTag('owner/repo', 'token', 'v0.9.0', (
+    method,
+    path,
+  ) => {
+    fallbackCalls.push(`${method} ${path}`);
+    if (path.includes('/releases/tags/')) {
+      return Promise.resolve({ status: 404, ok: false, body: { message: 'Not Found' } });
+    }
+    return Promise.resolve({
+      status: 200,
+      ok: true,
+      body: { commit: { committer: { date: '2026-07-30T09:00:00Z' } } },
+    });
+  });
+  assertEquals(unreleased, { tag: 'v0.9.0', since: '2026-07-30T09:00:00Z' });
+  assertEquals(fallbackCalls.length, 2);
 });
 
 Deno.test('parseArgs: version positional or flag, defaults to non-prerelease Latest', () => {

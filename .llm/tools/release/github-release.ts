@@ -457,7 +457,7 @@ export function parseArgs(argv: readonly string[]): ReleasePlan {
 // GitHub API (impure)
 // ---------------------------------------------------------------------------
 
-interface PreviousRelease {
+export interface PreviousRelease {
   readonly tag: string;
   readonly since: string;
 }
@@ -467,8 +467,9 @@ async function fetchPreviousRelease(
   repo: string,
   token: string,
   currentTag: string,
+  request: typeof githubRequest = githubRequest,
 ): Promise<PreviousRelease | null> {
-  const res = await githubRequest('GET', `/repos/${repo}/releases?per_page=20`, token);
+  const res = await request('GET', `/repos/${repo}/releases?per_page=20`, token);
   if (!res.ok || !Array.isArray(res.body)) {
     return null;
   }
@@ -483,18 +484,62 @@ async function fetchPreviousRelease(
   return null;
 }
 
+/** Resolve an explicit changelog tag to its release date, or its commit date when unreleased. */
+export async function resolvePreviousTag(
+  repo: string,
+  token: string,
+  tag: string,
+  request: typeof githubRequest = githubRequest,
+): Promise<PreviousRelease> {
+  const encodedTag = encodeURIComponent(tag);
+  const release = await request('GET', `/repos/${repo}/releases/tags/${encodedTag}`, token);
+  if (release.ok && isRecord(release.body)) {
+    const since = release.body.published_at ?? release.body.created_at;
+    if (typeof since === 'string' && since.trim()) return { tag, since };
+  } else if (release.status !== 404) {
+    throw new Error(
+      `Previous release lookup failed for ${tag}: HTTP ${release.status} ` +
+        `${JSON.stringify(release.body)}.`,
+    );
+  }
+
+  const commit = await request('GET', `/repos/${repo}/commits/${encodedTag}`, token);
+  const commitRecord = isRecord(commit.body) && isRecord(commit.body.commit)
+    ? commit.body.commit
+    : null;
+  const committer = commitRecord && isRecord(commitRecord.committer)
+    ? commitRecord.committer.date
+    : undefined;
+  const author = commitRecord && isRecord(commitRecord.author)
+    ? commitRecord.author.date
+    : undefined;
+  const since = typeof committer === 'string' && committer.trim()
+    ? committer
+    : typeof author === 'string' && author.trim()
+    ? author
+    : '';
+  if (!commit.ok || !since) {
+    throw new Error(
+      `Previous tag ${tag} is known but its release/commit date could not be resolved: ` +
+        `HTTP ${commit.status} ${JSON.stringify(commit.body)}.`,
+    );
+  }
+  return { tag, since };
+}
+
 /** GitHub's auto-generated "What's Changed" body (merged PRs + Full Changelog link). */
 async function generateWhatsChanged(
   repo: string,
   token: string,
   tag: string,
   previousTag?: string,
+  request: typeof githubRequest = githubRequest,
 ): Promise<string> {
   const payload: Record<string, unknown> = { tag_name: tag };
   if (previousTag) {
     payload.previous_tag_name = previousTag;
   }
-  const res = await githubRequest('POST', `/repos/${repo}/releases/generate-notes`, token, payload);
+  const res = await request('POST', `/repos/${repo}/releases/generate-notes`, token, payload);
   if (!res.ok) {
     throw new Error(
       `generate-notes failed: HTTP ${res.status} ${JSON.stringify(res.body)}. ` +
@@ -510,11 +555,12 @@ async function fetchClosedIssues(
   repo: string,
   token: string,
   since: string,
+  request: typeof githubRequest = githubRequest,
 ): Promise<ClosedIssue[]> {
   const range = since ? ` closed:>${since}` : '';
   const query = `repo:${repo} is:issue is:closed${range}`;
   const path = `/search/issues?q=${encodeURIComponent(query)}&per_page=100&sort=updated&order=desc`;
-  const res = await githubRequest('GET', path, token);
+  const res = await request('GET', path, token);
   const items = githubField(res.body, 'items');
   if (!res.ok || !Array.isArray(items)) {
     return [];
@@ -530,6 +576,71 @@ async function fetchClosedIssues(
     }
   }
   return issues;
+}
+
+export interface ReleaseNotesDependencies {
+  readonly fetchPreviousRelease: (
+    repo: string,
+    token: string,
+    currentTag: string,
+  ) => Promise<PreviousRelease | null>;
+  readonly resolvePreviousTag: (
+    repo: string,
+    token: string,
+    tag: string,
+  ) => Promise<PreviousRelease>;
+  readonly generateWhatsChanged: (
+    repo: string,
+    token: string,
+    tag: string,
+    previousTag?: string,
+  ) => Promise<string>;
+  readonly fetchClosedIssues: (
+    repo: string,
+    token: string,
+    since: string,
+  ) => Promise<ClosedIssue[]>;
+}
+
+export interface ReleaseNotes {
+  readonly previous: PreviousRelease | null;
+  readonly whatsChanged: string;
+  readonly closed: readonly ClosedIssue[];
+}
+
+const defaultReleaseNotesDependencies: ReleaseNotesDependencies = {
+  fetchPreviousRelease,
+  resolvePreviousTag,
+  generateWhatsChanged,
+  fetchClosedIssues,
+};
+
+/** Resolve one changelog window and query every generated release-notes section for it. */
+export async function collectReleaseNotes(
+  plan: ReleasePlan,
+  token: string,
+  tag: string,
+  dependencies: ReleaseNotesDependencies = defaultReleaseNotesDependencies,
+): Promise<ReleaseNotes> {
+  const previous = plan.prevTag
+    ? await dependencies.resolvePreviousTag(plan.repo, token, plan.prevTag)
+    : await dependencies.fetchPreviousRelease(plan.repo, token, tag);
+  if (previous?.tag && !previous.since.trim()) {
+    throw new Error(
+      `Previous tag ${previous.tag} is known but its since timestamp is empty; ` +
+        'closed-issue collection refuses to report a false zero.',
+    );
+  }
+  const whatsChanged = await dependencies.generateWhatsChanged(
+    plan.repo,
+    token,
+    tag,
+    previous?.tag,
+  );
+  const closed = previous
+    ? await dependencies.fetchClosedIssues(plan.repo, token, previous.since)
+    : [];
+  return { previous, whatsChanged, closed };
 }
 
 async function createRelease(
@@ -585,14 +696,10 @@ async function main(): Promise<void> {
     `[release:publish] green canary pair: ${canaryContentSha} (${CANARY_PAIR_STATUS_CONTEXT})`,
   );
 
-  const previous = plan.prevTag
-    ? { tag: plan.prevTag, since: '' }
-    : await fetchPreviousRelease(plan.repo, token, tag);
+  const { previous, whatsChanged, closed } = await collectReleaseNotes(plan, token, tag);
   if (previous?.tag) {
     console.error(`[release:publish] previous release: ${previous.tag}`);
   }
-  const whatsChanged = await generateWhatsChanged(plan.repo, token, tag, previous?.tag);
-  const closed = previous?.since ? await fetchClosedIssues(plan.repo, token, previous.since) : [];
   console.error(`[release:publish] closed issues since previous release: ${closed.length}`);
 
   const body = composeReleaseBody({
