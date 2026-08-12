@@ -289,3 +289,84 @@ shipped surfaces.
    needs it; it asks before taking it.
 6. **Verify a slice's liveness by a fresh growing rollout**, never by absence from the bounded
    status list (F-1).
+
+---
+
+# Wave 3 — #1594, the final fixes-lane leaf (owner assignment, 2026-08-12)
+
+**Accepted, to start only after #1454 is terminal.** Unclaimed at time of writing: `#1594` OPEN,
+`type:fix`, `area:tooling`, `priority:p0`, `status:plan`, **no assignees**.
+
+`fix(agentic): fallback evaluator comments recursively trigger duplicate paid OpenHands runs`
+
+## What happened
+
+Two **paid** OpenHands runs fired from `issue_comment` on `main`, one second apart, after the
+originals hung:
+
+```
+31615108125  2026-08-12T15:57:30Z  [issue_comment]  cancelled by owner
+31615110254  2026-08-12T15:57:31Z  [issue_comment]  cancelled by owner
+```
+
+This is a **cost** defect, not merely a correctness one — the recursion spends real money per
+iteration, and it fires precisely when something has already gone wrong (an original run hanging),
+so it compounds an incident rather than reporting it.
+
+## Not caused by this lane's provenance comment — checked, not assumed
+
+I posted a fallback-provenance comment on #1574 shortly before these fired, so the first thing I
+checked was whether I caused it:
+
+```
+'@openhands-agent' occurrences in the fixes-lane provenance comment: 0
+```
+
+Zero. It cannot satisfy the trigger predicate. Recorded because "my comment was nearby and something
+expensive happened" is exactly the kind of coincidence that should be settled with a grep rather than
+a disclaimer.
+
+## Mechanism, scoped from the workflow rather than guessed
+
+`.github/workflows/openhands-agent.yml` fires on:
+
+```yaml
+github.event_name == 'issue_comment' &&
+  contains(github.event.comment.body, '@openhands-agent') &&
+  contains(fromJson('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)
+```
+
+Measured on #1574's own comments:
+
+| Comment kind | `@openhands-agent` occurrences | Triggers? |
+| --- | --- | --- |
+| `openhands-phase-eval` **trigger** comment | **3** | yes — by design |
+| `openhands-agent-summary` **status** comment | **0** | no |
+
+So the plain status comment is *not* self-triggering today. The defect therefore lives in one of:
+a status/failure variant that **echoes or quotes the trigger line** (the hang path emits a different
+shape than the healthy summary I measured), a re-post/edit of the trigger comment, or any
+human/agent comment that quotes a trigger body verbatim. **The slice diagnoses which; it does not
+assume.**
+
+## Required invariant (owner-specified, non-negotiable)
+
+1. **Trigger comments, status comments, and provenance comments are trigger-immune.** A comment the
+   automation itself authored must never be able to start a run — regardless of what text it
+   contains, including a verbatim quote of a trigger line.
+2. **A duplicate `(generation, phase, head)` is rejected *before spend*.** Not deduplicated after
+   launch, not cancelled by concurrency after the model has been billed — refused before the paid
+   work starts.
+
+Point 2 is the one that must not be weakened into a concurrency group: `cancel-in-progress` stops a
+*running* job, which is already spend. The rejection has to happen at the predicate.
+
+## Shape
+
+One focused PR, `area:tooling`, p0. Not bundled with anything. Branch from current `main`, re-sync
+before draft → ready, automatic IMPL-EVAL only — **no manual OpenHands, no Fable**.
+
+Note the reflexivity and design the test around it: this fix changes the machinery that evaluates
+it. Its regression evidence must demonstrate a duplicate `(generation, phase, head)` being
+**refused**, and must not be a test that merely passes because no second trigger happened to be
+emitted during the run.
