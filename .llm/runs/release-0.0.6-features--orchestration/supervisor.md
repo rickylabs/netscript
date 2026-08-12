@@ -212,3 +212,38 @@ executed**, and write/promotion/invalidation outcome.
 - Implementation delegated to **Codex** at an effort matched to the finding; **automatic IMPL-EVAL**
   on draft → ready.
 - **No Fable** (D-6 remains in force). Orchestrator review stays on Opus 5 · high.
+
+---
+
+# Owned sequencing — updated 2026-08-12
+
+**Blocker first, everything else behind it.**
+
+| # | Item | Why here |
+| --- | --- | --- |
+| **0** | **#1227** — quickstart `aspire restore` retry | **Canary.4 blocker.** In flight, Codex Sol medium. Nothing else starts until this merges and Canary.4 is terminal green. |
+| 1 | **#1583** (P0) — duplicate durable SSE subscriptions | Runtime/AI-stream correctness; **mine outright**. Adjacent to merged #1457 (chat stream proxy), same surface family. |
+| 2 | **Fresh group: #1576 (P0) + #1568 + #1569** | Grouped as instructed. #1576's symptom — `makeHref()` missing a path param, client partial request 500 — sits on the **same partial/defer path** as merged #1459, so triage them together rather than in isolation. |
+| 3 | **#1577** (P1) — restore `withBrowserLogs()` child | **Coordinate before dispatching.** Aspire generator regression touching `packages/aspire` and generator templates, where another lane plausibly has a writer. Check `codex-status` and ask before creating a worktree. |
+| — | **#1562** — cache-topology telemetry | Still queued; substantive contract, plan + automatic PLAN-EVAL when reached. |
+
+**Constraints carried:**
+
+- **No current PR is expanded to absorb any of these.** Each gets its own branch and PR.
+- **One writer at a time per worktree**; #1577 additionally needs a cross-lane check because its
+  surface is shared.
+- **No Fable, no manual OpenHands** — automatic evaluator lifecycle only.
+- Canary cuts remain mine and mine alone; nothing is cut before #1227 lands.
+
+**Shapes, recorded from the live bodies so triage does not re-read them:**
+
+- **#1576** — `withRoute(createRouteReference(dynamicPattern))` infers `ctx.path` at compile time, but
+  `resolvePathParams(config.pathSchema, ctx.params)` returns `{}` because Form-C references carry
+  `parsePath`/`safeParsePath` and **no `pathSchema`**. Compile-time contract and runtime behaviour
+  disagree; consumers add route sidecars purely to recreate schemas the reference already owns.
+- **#1583** — one mounted ChatPane island produced **1 mount, 3 renders, 0 unmounts, and 2 simultaneous
+  live SSE GETs** to the same durable stream, from a single Playwright CDP target (so not the desktop
+  CEF client). Consumes two of ~6 per-origin HTTP/1.1 slots and risks duplicate transcript entries.
+- **#1577** — the pinned `Aspire.Hosting.Browsers@13.4.6-preview.1.26319.6` **does** expose
+  `withBrowserLogs()` on `ExecutableResource`; the generator stopped calling it for `Type: 'app'`.
+  A generator regression, not an Aspire limitation.
