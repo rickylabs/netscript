@@ -509,3 +509,42 @@ head, which it was not on the previous one.
 
 **Qwen evaluator still `in_progress`** (run `31584188459`, summary comment marker still
 `"conclusion":"running"`). Nothing is applied to the PR body or labels until that verdict lands.
+
+## 2026-08-12 — #1398 MERGED (`d7e2b67b2`) — lane complete
+
+**IMPL-EVAL: PASS** — `OPENHANDS_VERDICT: PASS`, automatic phase dispatcher,
+`openrouter/qwen/qwen3.8-max`, run `31584188459`, evaluated at head `f7d503fee` against trusted base
+`281ab76887`. Triggered by the label pair alone; no manual OpenHands dispatch and no local evaluator,
+per D-5.
+
+It independently traced the join mechanism end-to-end — hook → `producer.upsert` →
+`DurableStreamProducer#startPublish` → `instrumentation.startPublish` (`tracer.startSpan` on ambient
+context) — which is precisely the link no unit test in this slice could settle and which would have
+failed silently if wrong. Its three advisories were all pre-existing and already tracked (#1542,
+#1543) or resolved by the merge sequence itself.
+
+### Finishing the gate exposed two real problems, both caught rather than merged past
+
+1. **A second `status:` label.** Automation applied `status:augment-review` one second after I moved
+   off `status:impl-eval`, so the PR briefly carried two `status:` labels against the
+   exactly-one-status rule. Removed to restore the invariant before merging.
+2. **A stale close-gate result.** `gh pr checks` reported `close-gate` red, but that job ran at
+   09:42:44Z — before `status:ready-merge` (10:22:50Z) and before the body update. Reading the job
+   log rather than the summary showed the mirror's own notice: *"Mirror skipped because live PR
+   labels do not include status:ready-merge"*. The red was genuine **against the body as it then
+   was**, listing all four unticked issue boxes and all three unticked DoD boxes by line — not a
+   flake to retry past. A re-run with the live labels turned it green and the mirror ticked all four
+   #1398 boxes from the `box-index` entries.
+
+**Stale evidence was actively prevented, not merely avoided.** The head changed mid-flight
+(`e4319c685` → `f7d503fee`), so both OTEL gates were re-read by name from the new head's logs —
+postgres `94073971396` (`passed=88 failed=0 skipped=0`), sqlite `94073971501`
+(`passed=83 failed=0 skipped=0`). These job ids differ from the pre-sync pair, which is the concrete
+proof the earlier citation would have described a head no longer on the PR. The body transform takes
+head and job ids as required arguments and asserts no pre-sync reference survives.
+
+**Pre-merge gate:** `slices/pre-merge-gate-1536.md`, all seven checks PASS with named sources, plus
+`review-threads` → `PASS threads=0 unanswered=0`. Merged squash → `d7e2b67b2`; #1398 auto-closed
+`COMPLETED`; `status:shipped` on both.
+
+**Both owned issues are now on `main`.** #1405 → `8ff1bcb8f`; #1398 → `d7e2b67b2`.
