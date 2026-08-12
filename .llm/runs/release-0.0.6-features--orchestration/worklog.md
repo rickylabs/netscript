@@ -444,3 +444,42 @@ head — and invalidates the present green CI, forcing a full re-run including b
 taken. The prior green evidence (both OTEL gates passing by name on both tiers) would need to be
 re-established against the new head, which is arguably better evidence anyway since it would match
 what actually merges.
+
+## 2026-08-12 — branch synced (owner-approved head change); dispatcher fired; Qwen evaluator running
+
+Owner selected "sync branch with main, then re-enter", accepting the head change and the full CI
+re-run. Executed:
+
+| Step | Result |
+| --- | --- |
+| `git merge origin/main` into the slice branch | new head **`f7d503fee`** |
+| Dispatcher present in head? | `git cat-file -e HEAD:.github/workflows/openhands-phase-eval.yml` → **PRESENT** (was ABSENT at `e4319c685`) |
+| #1547 token fix included? | yes — `281ab7688 fix(agentic): use chainable token for eval statuses` |
+| #1398 changes survived the merge? | verified: `withContext` ×2, `setMutationHook(createStreamMutationHook())` ×2, deferral list still `= []`, `streams/schema.ts` still 0 changes, 7 non-run-artifact files unchanged in set |
+| Re-entered `status:impl-eval` | move away → re-add, exactly one `status:` at each point |
+
+**The dispatcher then fired and succeeded**: `OpenHands phase evaluation` at 09:42:56Z →
+`completed/success` (the 09:42:49Z run correctly skipped — that was the move-away event). Contrast
+with the previous attempt on `e4319c685`, where this workflow produced **no run at all**. That is the
+control proving the diagnosis: same labels, same sequence, different head — the only variable was
+whether the workflow existed in the merge ref.
+
+**Automatic evaluator is running on the requested override:** `openrouter/qwen/qwen3.8-max`,
+provider `OPENROUTER`, output `pr-comment`, run `31584188459`. No manual OpenHands dispatch was made;
+the trigger was the label pair alone, per D-5.
+
+### Watcher corrected — a counting watcher would never have fired
+
+The dispatcher's comment carries `<!-- openhands-agent-summary -->` and
+`<!-- openhands-run: {…,"conclusion":"running"} -->`, i.e. OpenHands **updates that comment in place**
+rather than posting a new one on completion. The original watcher keyed on *comment count* and would
+have polled to timeout while the verdict sat in an edited comment — the same silence-looks-like-
+waiting failure that already bit this lane twice today (draft CI `skipping`, and the dispatcher not
+existing on the old head).
+
+That watcher was stopped and replaced with **one** watcher keyed on the run's terminal status and the
+comment's `conclusion` marker. Still exactly one active watch, as instructed — corrected for how the
+tool actually reports, not left running on a false assumption.
+
+CI is also re-running against `f7d503fee`; the previously proven OTEL gate evidence must be
+re-established on this head before merge, and the earlier job ids no longer describe what would land.
