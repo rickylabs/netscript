@@ -1384,3 +1384,34 @@ the paired effort per D-7 — which preserves opposite-family review rather than
 
 If any route not covered by D-7's table resolves to Fable, that dispatch **halts and is reported**
 rather than silently substituted.
+
+## 2026-08-12 — Release authority handed off: runtime lane owns Canary.3
+
+**Owner decision.** The **runtime lane alone** owns the Canary.3 cut after merged #1558. This lane
+does **not** start a competing release.
+
+This supersedes, for canary.3, the release-checkpoint-coordinator role assigned to this lane
+earlier. That role produced exactly one cut — `v0.0.6-canary.2` from `e67c1ba13`, 35/35 members,
+`release/canary-pair` green — and it is now closed out rather than paused: this lane initiates no
+further canary, dispatches no `release-canary.yml`, and creates no release.
+
+**In-flight check at handoff: nothing to stop.** No release workflow of this lane's is running; the
+canary.2 run `31596869408` completed green and its pinned production E2E `31597418450` succeeded.
+There is no half-started cut to hand over — only information, sent to the runtime lane so canary.3
+does not rediscover what canary.2 paid for.
+
+**This lane's remaining scope is unchanged:** issues #1540, #1456, #1460, #1454 (wave 2, four slices
+dispatched). Fable remains prohibited.
+
+### The one thing that changed for canary.3, and it is in this lane's favour
+
+`v0.0.6-canary.2` had to prove its canary pair **directly on the bumped commit**, because #1539 was
+unmerged and `isVersionOnlyReleaseDiff` could not authorize inheritance — the cut-property this lane
+predicted before dispatch rather than discovering at publish time, as 0.0.5 did at the cost of an
+extra canary cycle.
+
+**#1539 has since merged (`3c9dc1f39`).** So for canary.3 the documented
+`release:cut` → merge → `release:publish` inheritance path is **live for the first time**: a stable
+coordinated version-only commit can now inherit its parent's pair, because the verifier accepts the
+full coordinated-bump output derived from the writer rather than `deno.json` files alone. That is
+the fix #1438 delivered, and canary.3 is the first cut able to use it.
