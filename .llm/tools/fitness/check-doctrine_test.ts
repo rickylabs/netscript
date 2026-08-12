@@ -47,8 +47,14 @@ Deno.test('A14 distinguishes imported, locally-bound, and unresolved test identi
       code: 0,
     },
     {
+      name: 'fixture-data',
+      source:
+        'const fixtureSource =\n  "describe(\'bare global in fixture data\', () => {});";\nexport { fixtureSource };\n',
+      code: 0,
+    },
+    {
       name: 'unresolved',
-      source: "describe('bare global', () => {});\n",
+      source: "describe('bare global in real source', () => {});\n",
       code: 1,
     },
   ] as const;
