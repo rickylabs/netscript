@@ -64,3 +64,42 @@ Negative guard evidence:
 
 Reconcile note: issue #1398 is open with milestone `0.0.6` and already carries `type:fix`,
 `area:plugins`, `area:telemetry`, `priority:p1`, and exactly one lifecycle label, `status:impl`.
+
+## S2 — restore the two OTEL runtime gates
+
+Changed in one slice, per PLAN-EVAL F2:
+
+- Added `behavior.otel.stream-consumer` and `behavior.otel.traces` to `RUNTIME_GATES`, which also
+  carries them into the SQLite runtime tier.
+- Emptied `SCAFFOLD_RUNTIME_DEFERRED_GATES` while preserving the shared explicit deferral surface.
+- Flipped the main runtime-suite presence assertions to `true`.
+- Rewrote the exact-deferral test to assert both runtime tiers have no #1398 deferral and execute
+  both gates.
+
+First full-package check: RED. An empty `as const satisfies readonly DeferredGate[]` inferred the
+constant's element as `never`, so existing runner-test fixture code could not read `issue` or
+`reason`. Fixed by declaring the empty value against the explicit `readonly DeferredGate[]`
+contract; no runtime behavior or assertion was relaxed.
+
+Second full-package test: RED with one in-scope and one unrelated failure. The in-scope failure was
+a third stale #1398 pin in `suite-runner_test.ts`, which still expected two deferred skipped steps;
+it now asserts zero deferrals, steps, skipped summary entries, and deferred reporter events. This
+test was not named in the approved plan or PLAN-EVAL F2 and is recorded as minor factual drift. The
+unrelated `quickstart-command-drift_test.ts` failure came from the package task changing cwd while
+the test reads `docs/site/quickstart.vto` relative to the repository root; verify it from root and
+do not absorb that task/path defect into #1398.
+
+Final S2 evidence:
+
+| Gate | Result |
+| --- | --- |
+| suite-runner + registry focused tests | PASS — 27 passed, 0 failed |
+| CLI E2E test tree from repository root | PASS — 152 passed, 0 failed |
+| CLI E2E scoped check | PASS — 163 files, 0 findings |
+| CLI E2E scoped lint | PASS — 163 files, 0 findings |
+| CLI E2E scoped format | PASS — 163 files, 0 findings |
+| explicit CLI E2E quality scan | PASS — 0 findings, 0 allowances |
+
+Negative guard evidence: temporarily removing both OTEL gates from `RUNTIME_GATES` made the main
+runtime presence test and the both-tier execution test fail (exit 1, actual `false`, expected
+`true`).

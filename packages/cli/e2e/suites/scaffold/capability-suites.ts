@@ -20,19 +20,8 @@ export interface ScaffoldCapabilitySuite {
   readonly defaults?: Partial<RunOptions>;
 }
 
-/** Runtime gates deferred until workers-combined publishes execution mutations (#1398). */
-export const SCAFFOLD_RUNTIME_DEFERRED_GATES = [
-  {
-    id: GATE.BEHAVIOR_OTEL_STREAM_CONSUMER,
-    issue: '#1398',
-    reason: 'workers-combined does not install the stream mutation hook',
-  },
-  {
-    id: GATE.BEHAVIOR_OTEL_TRACES,
-    issue: '#1398',
-    reason: 'TC-14 requires the deferred Flow-B stream-consumer record',
-  },
-] as const satisfies readonly DeferredGate[];
+/** Runtime gates with explicitly accepted temporary deferrals. */
+export const SCAFFOLD_RUNTIME_DEFERRED_GATES: readonly DeferredGate[] = [];
 
 const SERVICE_GATES = [
   GATE.PREFLIGHT_DENO,
@@ -143,6 +132,8 @@ const RUNTIME_GATES = [
   GATE.BEHAVIOR_MCP_WIDGET_ROUNDTRIP,
   GATE.BEHAVIOR_PLUGINS_HEALTH,
   GATE.BEHAVIOR_OTEL_WEBHOOK,
+  GATE.BEHAVIOR_OTEL_STREAM_CONSUMER,
+  GATE.BEHAVIOR_OTEL_TRACES,
   GATE.BEHAVIOR_STREAMS_PRODUCER_RECONNECT,
   GATE.BEHAVIOR_OTEL_TASK_TRACES,
   GATE.CLEANUP_ASPIRE_STOP,
@@ -207,14 +198,12 @@ export const scaffoldCapabilitySuites: readonly ScaffoldCapabilitySuite[] = [
     id: SCAFFOLD.RUNTIME,
     title: SCAFFOLD_TITLE.RUNTIME,
     gates: RUNTIME_GATES,
-    // Explicit release deferral: #1398 must restore both gates to RUNTIME_GATES.
     deferredGates: SCAFFOLD_RUNTIME_DEFERRED_GATES,
   },
   {
     id: SCAFFOLD.RUNTIME_SQLITE,
     title: SCAFFOLD_TITLE.RUNTIME_SQLITE,
     gates: RUNTIME_SQLITE_GATES,
-    // Keep both runtime tiers honest about the same #1398 coverage gap.
     deferredGates: SCAFFOLD_RUNTIME_DEFERRED_GATES,
     defaults: { database: DATABASE.SQLITE, cache: false },
   },
