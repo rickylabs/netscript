@@ -1,7 +1,8 @@
 # W2-E implementation evidence — interrupted publish/preflight tree safety (#1540)
 
 **Branch:** `fix/1540-publish-interrupt-tree-safety`\
-**Implementation commit after final rebase:** `7beab3cda`\
+**Implementation commit:** `fix(release): isolate real publish from source tree` on the current PR
+head\
 **Draft PR:** [#1573](https://github.com/rickylabs/netscript/pull/1573)\
 **PLAN-EVAL:** PASS at `4970ad86f`; MiniMax M3, run `31601287489`, evaluated against `5705aeb19`.
 
@@ -201,9 +202,11 @@ diff. `git diff --check` also exits 0.
 
 ## Final-head re-sync and verification
 
-Immediately before the ready transition, `origin/main` had advanced to `a553afef4`. The branch
-rebased cleanly; all required gates were then rerun against the rebased implementation head. The
-final-head verdicts supersede the earlier counts where main added files or tests:
+During the ready transition, `origin/main` advanced repeatedly through unrelated merged work. Each
+guarded rebase was clean. The complete required gate set was rerun after the first rebase, and the
+static, interruption, release-check, and publish-dry-run gates were repeated after each subsequent
+upstream-only rebase. The verdicts below supersede the earlier counts where main added files or
+tests:
 
 ```text
 $ rtk proxy deno task check
@@ -238,6 +241,11 @@ stage outside the source. Its aggregate was `5 passed | 0 failed (366ms)`.
 After the final dry-run, raw `git status --porcelain=v1`, `git diff --stat -- deno.lock`, and
 `git diff --check` all exited 0 with empty output. The service catalog sentinel remained at line 27;
 the forbidden-pattern and temporary-worktree searches both exited 1 with empty output.
+
+Subsequent main movement comprised merged CLI-only fixes plus root/private lock regeneration. The
+root test aggregate above was not repeated for each isolated upstream merge; it ran on the first
+rebased head. All gates that exercise this release-tool diff and publish shape were repeated after
+the last rebase, including the full workspace dry-run.
 
 ## Acceptance map
 

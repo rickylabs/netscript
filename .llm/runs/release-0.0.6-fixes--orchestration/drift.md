@@ -263,3 +263,50 @@ formal evaluation is automatic and Fable-free.
 is reported rather than silently substituted. The substitutions above are recorded *in advance* so
 that no wave-3/4 dispatch has to make that call ad hoc — but any route not in this table that
 resolves to Fable halts and comes to the owner.
+
+## D-8 — PLAN-EVAL cycle 2 returned NONE on evaluator exhaustion; fallback is same-family
+
+**Recorded:** 2026-08-12. Authority: owner.
+
+`openhands-phase-eval` run `31603823679` on PR #1574 returned
+`{"conclusion":"failure","state":"agent-failed","verdict":"NONE","verdict_source":"none"}` —
+**MiniMax M3 hit its 500-iteration limit.** This is **evaluator infrastructure exhaustion, not a
+verdict on the amended plan.** The amended plan was never adjudicated.
+
+Recorded as such rather than as a failure, because the two are not interchangeable: a `FAIL_PLAN`
+means the plan was judged and found wanting; a `NONE` means nothing was judged. Treating the second
+as the first would send a slice to rework a plan no one had assessed — and treating it as a pass
+would be worse.
+
+**Owner-directed fallback:** one fresh **Codex GPT-5.6 Sol** evaluator, launched locally through the
+shared daemon, **read-only**, against the immutable head `ad7574bb70dbba8ad3de28ff699c484fd97583e6`.
+Not a manual OpenHands dispatch; not Fable (prohibited, D-7).
+
+### The invariant this trades away, stated plainly
+
+`lane-policy.md` routes `formal_plan_evaluation` for a **Codex-authored** plan to a **native
+opposite-family** evaluator — Fable 5 · medium. Fable is prohibited (D-7) and the OpenHands
+transport has now exhausted, so the opposite-family option does not exist for this evaluation.
+
+The fallback is therefore **Codex evaluating a Codex-authored plan: same family.** What is preserved
+and what is not:
+
+- **Preserved — generator ≠ evaluator.** A fresh session that did not write the plan, read-only,
+  pinned to an immutable head. The lane's no-self-certification rule holds.
+- **Not preserved — opposite-family review.** This is a real reduction in the evidence's
+  independence, and it is the invariant `lane-policy.md` says is "never traded away."
+
+It is being traded here as an owner decision under a quota constraint, with the alternative being
+**no adjudication at all** of a p1 plan. Recorded so a later reader does not mistake this verdict for
+a full-strength opposite-family one.
+
+### Bounds on what this verdict may authorize
+
+- It adjudicates **the amended plan only** — the four hygiene amendments (risk register,
+  open-decision sweep, canonical precedence chain, named ARCHETYPE-5 / `jsr-audit` authorities).
+- The **architecture was already independently verified** by cycle 1's MiniMax verdict, which
+  confirmed every load-bearing claim against the tree and judged the fix surface correct. That
+  opposite-family assessment stands and is not re-litigated here.
+- **IMPL-EVAL is unaffected**: #1454's implementation still faces the normal automatic evaluator,
+  which is DeepSeek — genuinely opposite-family to Codex. The weakened link is confined to the plan
+  phase.
