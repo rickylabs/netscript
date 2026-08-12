@@ -68,7 +68,7 @@ The root helpers operate over arrays of these entries:
 A loader can read its cache entries, check completeness, and derive freshness
 before deciding whether to refetch:
 
-```ts
+```ts no-check:uses cache entries defined earlier in the surrounding application
 import {
   hasAllCacheEntries,
   minCachedAt,

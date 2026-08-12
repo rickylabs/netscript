@@ -87,7 +87,7 @@ The root entry itself centres on cache projection — composing a derived
 cache entry from a cached list response so a detail view can reuse a list query's
 data without a second round trip:
 
-```ts
+```ts no-check:uses cached values supplied by the surrounding page loader
 import {
   hasAllCacheEntries,
   minCachedAt,

@@ -85,6 +85,7 @@ focused negative controls before the repo suite.
 | 2026-08-12 | PLAN-EVAL cycle 2 | `PASS` | Fresh opposite-family session verified every cycle-1 fix by execution. Two mandatory additive D2 mechanics were recorded before implementation: carry the root catalog section and canonicalize equivalent import ranges. |
 | 2026-08-12 | Slice 1 | Extractor contract | Added stable source/fence provenance, backtick/tilde parsing, `ts`/`tsx`/`typescript` recognition, exact reason markers, bidirectional coverage floors, the real-corpus census test, and the empty-reason CLI fixture. |
 | 2026-08-12 | Slice 2 | Compiler contract | Added exact public-export resolution, canonicalized root/member imports, root-catalog fallback and copied catalog, disposable copied-lock compilation, page-isolated modules, typed query support, and real export/dialect controls. |
+| 2026-08-12 | Slice 3 | Tier-1 and demotion | Applied 14 structural reasons, fixed the barrel binding, compiled 21 fences, wrote the five-wave ratchet, retained vocabulary/Fresh/export guards, and removed only the named positive needles. |
 
 ## Decisions
 
@@ -159,10 +160,35 @@ Reconcile: PR #1537 remains draft at `status:impl`; the only cross-lane instruct
 #1378 consumes the stable extractor provenance surface and does not fork the parser. No new reviewer
 comment changed the locked slice plan.
 
+### Slice 3 — Tier-1 floor, expansion plan, and accuracy demotion
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Tier-1 snippet gate | PASS | `deno task docs:snippets`: exit 0; `scanned=578 ts=211 tsx=77 typescript=7 ts_like=295 tier1=35 checked=21 exempt=14 outside_floor=260 malformed=0`; all 14 reasons printed. |
+| Focused snippet tests | PASS | `deno task docs:snippets:test`: 8 passed, 0 failed, including independent candidate/checked/exemption floors and the `typescript` alias regression. |
+| Accuracy unit tests | PASS | Focused accuracy test: 4 passed, 0 failed; covers stale saga claims, golden-path containment, Fresh-root imports, and mutation-map columns. |
+| Docs accuracy | PASS | `deno task docs:accuracy`: exit 0; 4 saga pages, 192 published pages, exact query exception page, mutation columns, 3 Fresh-root imports; export drift subprocess remains green. |
+| Docs links | PASS | `deno task docs:links`: exit 0; 102 docs, 0 broken links, 0 broken anchors. |
+| Scoped type-check | PASS | Wrapper selected 21 docs-tool TS files; 0 diagnostics; exit 0. |
+| Scoped lint | PASS | Wrapper selected 21 docs-tool TS files; 0 findings; exit 0. |
+| Scoped format | PASS | Wrapper selected 21 docs-tool TS files; 0 findings; exit 0. |
+| Lock hygiene | PASS | `deno.lock` remains clean. |
+
+The first real-corpus compile was usefully red: TS2307 named the missing documented relative support
+modules at `web-layer/examples.md:40` and `web-layer/interactive.md:92`. Both are now generated from
+typed public contracts/client/query factories with no casts or `any`; the checked count stayed 21.
+The add-service barrel correction compiles unmarked. The expansion document records all five waves
+and the deliberate wave-4 positive-reference-presence window.
+
+Accuracy demotion preserved the four orphan-send forms, object-form `defineSaga`, the stale service
+kind, all golden-path forbidden aliases/CSS-client claims, exact one-page
+`createServiceQueryUtils` containment, the five mutation-map columns, site-wide Fresh-root imports,
+and the unchanged export-drift subprocess. Only the named positive API/presence needles were removed.
+
 ## Handoff Notes
 
 - Slice 3 applies the 14 structural markers, fixes the barrel binding, compiles the real Tier-1
   floor through the checked support modules, writes the expansion ratchet, and demotes only the
-  named positive `docs:accuracy` assertions.
-- Keep `createServiceQueryUtils` page containment, the site-wide Fresh-root guard, and
-  `check-exports-drift` unchanged.
+  named positive `docs:accuracy` assertions. Complete in commit pending at this boundary.
+- Slice 4 adds both Pages trigger arms, the snippet step before Lume, and the unconditional
+  structural workflow test before the final full gate set.

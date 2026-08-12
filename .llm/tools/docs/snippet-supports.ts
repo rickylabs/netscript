@@ -128,6 +128,42 @@ export const todosQueries = createQueryFactories({
 `,
   );
   await writeSnippetFile(
+    join(pageRoot, 'apps/dashboard/lib/orders.ts'),
+    `import { oc } from '@orpc/contract';
+import { z } from 'zod';
+import { createServiceClient } from '@netscript/sdk/client';
+import { createQueryFactories } from '@netscript/sdk/query';
+
+const OrdersContract = {
+  list: oc.route({ method: 'POST' })
+    .input(z.object({ limit: z.number().int().positive() }))
+    .output(z.array(z.object({ id: z.string(), reference: z.string() }))),
+};
+const ordersClient = createServiceClient({ contract: OrdersContract, serviceName: 'orders' });
+export const ordersQueries = createQueryFactories({
+  orders: { contract: OrdersContract, client: ordersClient },
+}).orders;
+`,
+  );
+  await writeSnippetFile(
+    join(pageRoot, 'apps/dashboard/lib/widgets.ts'),
+    `import { oc } from '@orpc/contract';
+import { z } from 'zod';
+import { createServiceClient } from '@netscript/sdk/client';
+import { createQueryFactories } from '@netscript/sdk/query';
+
+const WidgetsContract = {
+  list: oc.route({ method: 'POST' })
+    .input(z.object({}))
+    .output(z.array(z.object({ id: z.string(), name: z.string() }))),
+};
+const widgetsClient = createServiceClient({ contract: WidgetsContract, serviceName: 'widgets' });
+export const widgetsQueries = createQueryFactories({
+  widgets: { contract: WidgetsContract, client: widgetsClient },
+}).widgets;
+`,
+  );
+  await writeSnippetFile(
     join(pageRoot, 'routes/(_components)/ContactForm.tsx'),
     `export default function ContactForm() { return null; }
 `,

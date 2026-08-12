@@ -12,8 +12,8 @@
 
 ## Current State
 
-PLAN-EVAL cycle 2 returned `PASS`. The two mandatory additive D2 amendments are recorded before
-slice 2; phase 2 may now implement slices 1–4 in order.
+Slices 1 and 2 are committed, pushed, and commented. Slice 3 is green locally and awaiting its
+commit/push/comment boundary. The PR remains draft at `status:impl`.
 
 ## Completed
 
@@ -29,17 +29,20 @@ slice 2; phase 2 may now implement slices 1–4 in order.
   copying and canonicalized merge comparison are mandatory implementation details.
 - Revised locked plan: 21 Tier-1 checked, 14 reason-marked exemptions, 260 TS-like blocks outside
   the floor.
+- Extractor and marker/census contract committed as `b1129dd7b`.
+- Exact public-entrypoint synthetic compiler committed as `5c828856b`.
+- Real Tier-1 gate is green at the exact 35/21/14 census; the 14 structural markers and barrel fix
+  are applied, and the accuracy checker is demoted only where planned.
 
 ## In Progress
 
-- Slice 1 complete locally; commit/push/comment boundary next, then slice 2 compiler contract.
+- Slice 3 commit/push/comment boundary.
 
 ## Next Steps
 
-1. Commit/push the mandatory D2/drift amendment without implementation code.
-2. Switch PR #1537 to `status:impl` and implement slices 1–4 in order.
-3. After every slice: run its named gate, commit, push explicit refspec, comment the PR, and perform
-   the reconcile sweep.
+1. Commit/push/comment Slice 3.
+2. Implement the Pages trigger/step and unconditional workflow test in Slice 4.
+3. Run the final scoped/docs/test gates and all three raw red controls, then stop for IMPL-EVAL.
 
 ## Key Decisions
 
@@ -56,9 +59,9 @@ slice 2; phase 2 may now implement slices 1–4 in order.
 
 | Slice | State | Evidence |
 | --- | --- | --- |
-| S1 extractor/marker/census | COMPLETE_LOCAL | Focused tests 4/4; scoped check/lint/fmt exits 0; empty-reason raw exit 1 naming `page.md:1`. |
-| S2 compiler/import resolution | PENDING | — |
-| S3 Tier-1/accuracy/coverage | PENDING | — |
+| S1 extractor/marker/census | COMMITTED | `b1129dd7b`; focused tests and scoped wrappers green; empty-reason raw exit 1 naming `page.md:1`. |
+| S2 compiler/import resolution | COMMITTED | `5c828856b`; focused tests/scoped wrappers green; raw export and dialect controls exit 1 with mapped source fences. |
+| S3 Tier-1/accuracy/coverage | COMPLETE_LOCAL | Exact census green; docs accuracy/links and scoped wrappers green; focused suite 8/8. |
 | S4 Pages/final gates | PENDING | — |
 
 ## Files Changed
@@ -78,20 +81,21 @@ slice 2; phase 2 may now implement slices 1–4 in order.
 | --- | --- | --- |
 | Plan-Gate cycle 1 | `FAIL_PLAN` | Four blocking and four non-blocking findings returned; revised without implementation. |
 | Plan-Gate cycle 2 | PASS | Fresh opposite-family session; cycle-1 fixes verified by execution. |
-| Static/fitness/consumer | NOT_RUN | Implementation has not begun. |
+| Static/fitness/consumer | PASS through S3 | Scoped wrappers, snippets, accuracy, links, and focused tests green. |
 | Runtime | N/A | Compilation-only slice. |
 
 ## Open Questions
 
-None in the revised generator plan. Cycle-2 evaluator may return findings.
+None.
 
 ## Drift and Debt
 
-- Drift: cycle-1 evaluator disproved several plan assumptions; all are recorded in `drift.md` and
-  remediated in the revised plan.
+- Drift: cycle-1 assumptions and the bounded Slice-3 support inventory miss are recorded in
+  `drift.md` with implemented dispositions.
 - Debt: none created; named boundary issues remain external.
 
 ## Commits
 
-- See the draft PR's commit list + phase comments. Phase 1 has the original plan commit and one
-  cycle-1 remediation commit; no implementation commit exists.
+- `ef64ea55c` — mandatory D2 plan amendment.
+- `b1129dd7b` — extractor/marker/census contract.
+- `5c828856b` — public-entrypoint synthetic compiler.

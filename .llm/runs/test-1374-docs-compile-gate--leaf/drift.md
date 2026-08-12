@@ -57,3 +57,14 @@ Drift is append-only.
 - **Disposition:** ran `deno fmt` only on the six selected TypeScript files. The two pre-existing
   files changed formatting only; their checker behavior, mapping, and tests were not altered. The
   exact scoped wrapper then exited 0.
+
+## 2026-08-12 — Slice 3 real-corpus support inventory
+
+- **Severity:** bounded implementation drift; no contract or coverage change.
+- **Observed:** the first real Tier-1 compile reached two checked island fences whose documented
+  relative imports (`apps/dashboard/lib/orders.ts` and `apps/dashboard/lib/widgets.ts`) were not in
+  the planned support inventory. The gate exited 1 with TS2307 at
+  `web-layer/examples.md:40` and `web-layer/interactive.md:92`, followed by response-type errors.
+- **Disposition:** materialize both modules from Zod/oRPC contracts plus public
+  `createServiceClient` and `createQueryFactories` APIs. They contain no casts or `any`. The same
+  35/21/14 corpus then exits 0; no fence was exempted to accommodate the harness.

@@ -64,8 +64,8 @@ Deno.test('real corpus census recognizes aliases and protects the Tier-1 candida
     typescript: 7,
     tsLike: 295,
     tier1: 35,
-    checked: 35,
-    exempt: 0,
+    checked: 21,
+    exempt: 14,
     outsideFloor: 260,
     malformed: 0,
   });
@@ -98,6 +98,37 @@ Deno.test('real corpus census recognizes aliases and protects the Tier-1 candida
       Error,
       'candidate count 0 is below floor 35',
     );
+
+    const quickstart = join(site, 'quickstart.vto');
+    await Deno.writeTextFile(
+      quickstart,
+      `${'```ts no-check:structural fragment\nvalue;\n```\n'.repeat(15)}${
+        '```ts\nconst value = 1;\n```\n'.repeat(20)
+      }`,
+    );
+    await assertRejects(
+      () => analyzeSnippetSite(site),
+      Error,
+      'checked count 20 is below floor 21',
+    );
+
+    await Deno.writeTextFile(
+      quickstart,
+      `${'```ts no-check:structural fragment\nvalue;\n```\n'.repeat(15)}${
+        '```ts\nconst value = 1;\n```\n'.repeat(21)
+      }`,
+    );
+    await assertRejects(
+      () => analyzeSnippetSite(site),
+      Error,
+      'exemption count 15 exceeds budget 14',
+    );
+
+    await Deno.writeTextFile(
+      quickstart,
+      '```typescript\nconst value = 1;\n```\n'.repeat(35),
+    );
+    assertEquals((await analyzeSnippetSite(site)).census.checked, 35);
   } finally {
     await Deno.remove(temp, { recursive: true });
   }

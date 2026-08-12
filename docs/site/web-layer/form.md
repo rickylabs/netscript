@@ -26,7 +26,7 @@ page assumes it.
 Fresh 2 hands you a `Request` and a render function. Everything between them is yours. A minimal
 server-validated contact form is roughly this:
 
-```tsx
+```tsx no-check:counter-example intentionally omits bare Fresh setup
 // routes/contact.tsx — bare Fresh
 export const handler = define.handlers({
   GET(_ctx) {
@@ -276,7 +276,7 @@ the browser's own validation bubbles unless you override `noValidate`.
 A schema field typed as an array gets a `CollectionDescriptor` merged into its descriptor —
 `list`, `length`, `minItems`/`maxItems`, collection-level errors, and four button builders.
 
-```tsx
+```tsx no-check:partial field-array fragment uses the surrounding form state
 const lines = state.fields.items;
 
 <fieldset>
@@ -350,7 +350,7 @@ client-side before the network, focusing the first invalid control by default.
 The managed `Form` component renders the hidden submission-id and CSRF inputs for you and accepts an
 `enhancement` prop to merge those props in:
 
-```tsx
+```tsx no-check:partial JSX fragment uses the surrounding form state
 const formOverrides = { class: 'stack' };
 
 <Form state={state} formProps={formOverrides}>
