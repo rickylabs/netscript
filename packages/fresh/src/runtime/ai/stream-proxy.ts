@@ -178,11 +178,9 @@ export function createNetScriptChatStreamProxy(
       : configuredStreamPath;
     const upstreamUrl = new URL(resolveChatSessionUrl(target, { streamPath }));
     const incomingQuery = new URL(request.url).searchParams;
-    const forwardedQuery = options.query
-      ? options.query(incomingQuery)
-      : new URLSearchParams(
-        [...incomingQuery].filter(([name]) => name !== 'id'),
-      );
+    const forwardedQuery = options.query ? options.query(incomingQuery) : new URLSearchParams(
+      [...incomingQuery].filter(([name]) => name !== 'id'),
+    );
     const resolvedQueryNames = new Set(upstreamUrl.searchParams.keys());
     for (const [name, value] of forwardedQuery) {
       if (!resolvedQueryNames.has(name)) {

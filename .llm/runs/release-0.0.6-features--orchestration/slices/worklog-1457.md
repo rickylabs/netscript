@@ -26,7 +26,34 @@ The first package test run was red with two test-fixture expectation failures:
 - The pre-existing eis-chat test expected the incoming `session` parameter to disappear; D1 now
   intentionally forwards it, so the expected injected-fetch URL includes `?session=eis-123`.
 
-No implementation behavior or assertion strength was relaxed. Required gates remain pending.
+No implementation behavior or assertion strength was relaxed.
+
+Final gate evidence on the formatted head:
+
+| Gate | Result |
+| --- | --- |
+| Fresh scoped check | PASS — 182 files, 2 batches, 0 findings |
+| Fresh scoped lint | PASS — 182 files, 0 findings |
+| Fresh scoped format | PASS after formatting the one owned file — 182 files, 0 findings |
+| post-format parameter grep | PASS — `offset`, `live`, `handle`, `cursor`, `forwardedQuery`, `resolvedQueryNames`, and the `query` option remain present |
+| `quality:gate` | PASS — exit 0; configured quality and doctrine roots omit `packages/fresh` |
+| explicit Fresh quality scan | PASS — 0 findings; one pre-existing allowance in route-support |
+| explicit Fresh doctrine scan | PASS — `FAIL=0`; three pre-existing warnings and one info finding |
+| Fresh package tests | PASS — 223 passed, 0 failed |
+| Fresh doc lint | exit 0; AI entrypoint 0 findings, package aggregate 44 pre-existing findings in untouched query/route/streams surfaces |
+
+The first format-wrapper invocation was red with one finding in the newly added `forwardedQuery`
+expression. Only `stream-proxy.ts` was formatted, after which the wrapper passed. The mandatory
+post-format grep confirmed every introduced protocol parameter and merge symbol remained present.
+
+`quality:gate` confirmed #1542's coverage gap in its own output: `quality:scan` scanned only
+`packages/cli/src` and `plugins`, while `arch:check` did not include `packages/fresh`. Explicit Fresh
+quality and doctrine scans therefore provide the package-specific evidence.
+
+`doc:lint` returned exit code 0 while reporting 44 findings: 27 private-type references and 17
+missing JSDoc items, all in untouched query, route, and streams files. The changed
+`src/runtime/ai/mod.ts` entrypoint reported zero findings. This slice did not hide or repair those
+out-of-scope legacy findings.
 
 ## GitHub reconciliation
 
