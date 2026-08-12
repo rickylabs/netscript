@@ -612,3 +612,24 @@ by this PR**. Filed as **#1540** (`Backlog / Triage`) per the #1090 pattern, car
 `copyWorkspace` symlink hazard as a note rather than a separate issue. The remaining findings
 (`.git` pointer-file copy, ~104 MB copy cost, SIGKILL orphaning a temp dir) are recorded in the
 verdict and need no issue.
+
+## 2026-08-12 08:57:53Z — Landing 3: PR #1538 → `84dd44ae7` (closes #1417)
+
+p1 release blocker. Full seven-check gate green **plus** a focused separate-session IMPL-EVAL PASS.
+
+```
+close-gate: SUCCESS              #1417 acceptance boxes: 5/5 ticked by the mirror
+check-test: SUCCESS              code-quality: SUCCESS        quality: SUCCESS
+scaffold-runtime: SUCCESS        scaffold-runtime-sqlite: SUCCESS
+scaffold-static: SUCCESS         surface-diff: SUCCESS        deps-report: SUCCESS
+non-green checks (latest per name): 0
+review-threads: PASS (0 threads)
+```
+
+Sequence that made close-gate pass, for the next run: the acceptance mirror refuses to run without
+`status:ready-merge`, and `ci.yml` does not fire on `labeled` — so the working order is
+**label first, then re-run `ci`** (the mirror reads labels live, which is why a rerun succeeds
+where the label alone does nothing). This is the third time in this lane that ordering was the
+whole difference between a red close-gate and a green one.
+
+4 of 6 owned issues now closed: #1397, #1399, #1428, #1417.
