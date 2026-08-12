@@ -38,6 +38,13 @@ export interface AgentDocsProseProvenance {
   readonly sha256: string;
 }
 
+/** Semantic freshness result for a checked-in agent-docs prose corpus. */
+export interface AgentDocsProseFreshness {
+  readonly fresh: boolean;
+  readonly stalePaths: readonly string[];
+  readonly provenance: AgentDocsProseProvenance;
+}
+
 async function collectFiles(root: string, directory = root): Promise<string[]> {
   const files: string[] = [];
   for await (const entry of Deno.readDir(directory)) {
@@ -73,36 +80,137 @@ async function readCorpus(path: string): Promise<AgentDocsProseCorpus> {
   return JSON.parse(decoded) as AgentDocsProseCorpus;
 }
 
-async function writeCorpus(
-  contents: Readonly<Record<string, string>>,
-  metadata: AgentDocsSiteMetadata,
-  outputRoot: string,
-): Promise<AgentDocsProseProvenance> {
+function bytesEqual(left: Uint8Array, right: Uint8Array): boolean {
+  return left.byteLength === right.byteLength && left.every((byte, index) => byte === right[index]);
+}
+
+async function sha256(bytes: Uint8Array): Promise<string> {
+  const copy = new Uint8Array(bytes);
+  return hex(await crypto.subtle.digest('SHA-256', copy.buffer));
+}
+
+function canonicalCorpus(contents: Readonly<Record<string, string>>): {
+  readonly files: readonly string[];
+  readonly encoded: Uint8Array;
+} {
   const files = Object.keys(contents).sort();
   const orderedContents: Record<string, string> = {};
   for (const path of files) orderedContents[path] = contents[path];
-  const encoded = new TextEncoder().encode(
-    JSON.stringify({ schemaVersion: 1, files: orderedContents }),
-  );
-  const compressed = await gzip(encoded);
-  const provenance: AgentDocsProseProvenance = {
+  return {
+    files,
+    encoded: new TextEncoder().encode(JSON.stringify({ schemaVersion: 1, files: orderedContents })),
+  };
+}
+
+async function expectedProvenance(
+  files: readonly string[],
+  encoded: Uint8Array,
+  compressedBytes: number,
+  metadata: AgentDocsSiteMetadata,
+): Promise<AgentDocsProseProvenance> {
+  return {
     schemaVersion: 1,
     version: metadata.version,
     sourceCommit: metadata.sourceCommit,
     extractionTimestamp: metadata.extractionTimestamp,
     files,
     uncompressedBytes: encoded.byteLength,
-    compressedBytes: compressed.byteLength,
-    sha256: hex(await crypto.subtle.digest('SHA-256', new Uint8Array(compressed).buffer)),
+    compressedBytes,
+    sha256: await sha256(encoded),
   };
+}
+
+function sameSemanticProvenance(
+  actual: AgentDocsProseProvenance,
+  expected: AgentDocsProseProvenance,
+): boolean {
+  return actual.schemaVersion === expected.schemaVersion && actual.version === expected.version &&
+    actual.sourceCommit === expected.sourceCommit &&
+    actual.extractionTimestamp === expected.extractionTimestamp &&
+    JSON.stringify(actual.files) === JSON.stringify(expected.files) &&
+    actual.uncompressedBytes === expected.uncompressedBytes && actual.sha256 === expected.sha256;
+}
+
+async function existingEquivalentTransport(
+  path: string,
+  encoded: Uint8Array,
+): Promise<Uint8Array | undefined> {
+  try {
+    const compressed = await Deno.readFile(path);
+    return bytesEqual(await gunzip(compressed), encoded) ? compressed : undefined;
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return undefined;
+    return undefined;
+  }
+}
+
+async function writeCorpus(
+  contents: Readonly<Record<string, string>>,
+  metadata: AgentDocsSiteMetadata,
+  outputRoot: string,
+): Promise<AgentDocsProseProvenance> {
+  const { files, encoded } = canonicalCorpus(contents);
+  const prosePath = join(outputRoot, 'prose.json.gz');
+  const existing = await existingEquivalentTransport(prosePath, encoded);
+  const compressed = existing ?? await gzip(encoded);
+  let stableMetadata = metadata;
+  if (existing) {
+    try {
+      const previous = JSON.parse(
+        await Deno.readTextFile(join(outputRoot, 'provenance.json')),
+      ) as AgentDocsProseProvenance;
+      stableMetadata = {
+        ...metadata,
+        sourceCommit: previous.sourceCommit,
+        extractionTimestamp: previous.extractionTimestamp,
+      };
+    } catch {
+      // A missing or malformed sidecar is repaired from the supplied metadata.
+    }
+  }
+  const provenance = await expectedProvenance(
+    files,
+    encoded,
+    compressed.byteLength,
+    stableMetadata,
+  );
 
   await Deno.mkdir(outputRoot, { recursive: true });
-  await Deno.writeFile(join(outputRoot, 'prose.json.gz'), compressed);
+  await Deno.writeFile(prosePath, compressed);
   await Deno.writeTextFile(
     join(outputRoot, 'provenance.json'),
     `${JSON.stringify(provenance, null, 2)}\n`,
   );
   return provenance;
+}
+
+async function checkCorpus(
+  contents: Readonly<Record<string, string>>,
+  metadata: AgentDocsSiteMetadata,
+  outputRoot: string,
+): Promise<AgentDocsProseFreshness> {
+  const { files, encoded } = canonicalCorpus(contents);
+  const prosePath = join(outputRoot, 'prose.json.gz');
+  const provenancePath = join(outputRoot, 'provenance.json');
+  const stalePaths: string[] = [];
+  let compressedBytes = 0;
+  try {
+    const compressed = await Deno.readFile(prosePath);
+    compressedBytes = compressed.byteLength;
+    if (!bytesEqual(await gunzip(compressed), encoded)) stalePaths.push('prose.json.gz');
+  } catch {
+    stalePaths.push('prose.json.gz');
+  }
+  const expected = await expectedProvenance(files, encoded, compressedBytes, metadata);
+  try {
+    const actual = JSON.parse(
+      await Deno.readTextFile(provenancePath),
+    ) as AgentDocsProseProvenance;
+    if (!sameSemanticProvenance(actual, expected)) stalePaths.push('provenance.json');
+  } catch {
+    stalePaths.push('provenance.json');
+  }
+  return { fresh: stalePaths.length === 0, stalePaths, provenance: expected };
 }
 
 function manifestValue(manifest: string, label: string): string {
@@ -173,6 +281,35 @@ export async function buildAgentDocsProseFromSite(
   return await writeCorpus(contents, metadata, outputRoot);
 }
 
+/** Check site-derived corpus freshness by canonical content without mutating checked-in assets. */
+export async function checkAgentDocsProseFromSite(
+  siteRoot: string,
+  metadata: AgentDocsSiteMetadata,
+  outputRoot: string = OUTPUT_ROOT,
+): Promise<AgentDocsProseFreshness> {
+  const root = resolve(siteRoot);
+  const allFiles = await collectFiles(root);
+  if (!allFiles.includes('llms.txt') || !allFiles.includes('llms-full.txt')) {
+    throw new Error('Rendered docs site must contain llms.txt and llms-full.txt');
+  }
+  const preserved = await readCorpus(metadata.preservedCorpusPath ?? PROSE_PATH);
+  const contents: Record<string, string> = {};
+  for (const [path, content] of Object.entries(preserved.files)) {
+    if (path !== 'llms.txt' && path !== 'llms-full.txt' && !path.startsWith('pages/')) {
+      contents[path] = content;
+    }
+  }
+  contents['llms.txt'] = await Deno.readTextFile(join(root, 'llms.txt'));
+  contents['llms-full.txt'] = await Deno.readTextFile(join(root, 'llms-full.txt'));
+  for (const path of allFiles.filter((path) => path === 'index.md' || path.endsWith('/index.md'))) {
+    contents[`pages/${path}`] = await Deno.readTextFile(join(root, path));
+  }
+  if (!/^## Task router$/m.test(contents['llms.txt'])) {
+    throw new Error('Rendered docs site does not contain the #1068 task router in llms.txt');
+  }
+  return await checkCorpus(contents, metadata, outputRoot);
+}
+
 async function gitSourceCommit(): Promise<string> {
   const command = new Deno.Command('git', {
     args: ['rev-parse', '--short=9', 'HEAD'],
@@ -209,11 +346,19 @@ if (import.meta.main) {
     const rootConfig = JSON.parse(
       await Deno.readTextFile(join(REPO_ROOT, 'deno.json')),
     ) as { readonly version?: string };
-    const provenance = await buildAgentDocsProseFromSite(siteRoot!, {
+    const metadata = {
       version: check ? previous.version : (rootConfig.version ?? previous.version),
       sourceCommit: check ? previous.sourceCommit : await gitSourceCommit(),
       extractionTimestamp: check ? previous.extractionTimestamp : new Date().toISOString(),
-    });
-    console.log(JSON.stringify(provenance));
+    };
+    if (check) {
+      const freshness = await checkAgentDocsProseFromSite(siteRoot!, metadata);
+      console.log(JSON.stringify(freshness));
+      if (!freshness.fresh) {
+        throw new Error(`Agent docs prose is stale: ${freshness.stalePaths.join(', ')}`);
+      }
+    } else {
+      console.log(JSON.stringify(await buildAgentDocsProseFromSite(siteRoot!, metadata)));
+    }
   }
 }

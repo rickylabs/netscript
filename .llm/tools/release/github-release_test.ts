@@ -63,7 +63,7 @@ async function testAgentDocsProvenance(
     files,
     uncompressedBytes: raw.byteLength,
     compressedBytes: prose.byteLength,
-    sha256: await sha256(prose),
+    sha256: await sha256(raw),
   };
 }
 
@@ -328,7 +328,7 @@ Deno.test('parent canary evidence rejects self-consistent non-version agent-docs
     files: [documentPath],
     uncompressedBytes: injectedRaw.byteLength,
     compressedBytes: injectedProse.byteLength,
-    sha256: await sha256(injectedProse),
+    sha256: await sha256(injectedRaw),
   };
   const injectedBarrel = [
     `export const EMBEDDED_AGENT_DOCS_GZIP_BASE64 = ${
@@ -363,7 +363,7 @@ Deno.test('parent canary evidence rejects self-consistent non-version agent-docs
     generatedOutputsFresh: async () => {
       const decoded = await gunzipJson(injectedProse);
       assertEquals(decoded.files[documentPath]?.includes(marker), true);
-      assertEquals(injectedProvenance.sha256, await sha256(injectedProse));
+      assertEquals(injectedProvenance.sha256, await sha256(injectedRaw));
       assertStringIncludes(injectedBarrel, bytesToBase64(injectedProse));
       assertStringIncludes(injectedBarrel, injectedProvenance.sha256);
       reproducedHead = true;
@@ -412,7 +412,7 @@ Deno.test('parent canary evidence rejects writer-preserved non-version provenanc
     files: [documentPath],
     uncompressedBytes: raw.byteLength,
     compressedBytes: prose.byteLength,
-    sha256: await sha256(prose),
+    sha256: await sha256(raw),
   };
   const injectedProvenance = { ...parentProvenance, [marker]: true };
   const injectedBarrel = `export const EMBEDDED_AGENT_DOCS_PROVENANCE = ${

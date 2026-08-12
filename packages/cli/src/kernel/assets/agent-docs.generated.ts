@@ -193,7 +193,7 @@ export const EMBEDDED_AGENT_DOCS_PROVENANCE = {
   ],
   'uncompressedBytes': 4720171,
   'compressedBytes': 1352791,
-  'sha256': 'fc121f9c0bb737e3776d64c03f6d940d7a5e1b14d5e35100c9923a3602a10da3',
+  'sha256': '6edddd572ce21179cec9939e67232ee931e33358f75a68389791f722f6d8a088',
 } as const;
 
 /** Same-release package export subpaths used for exact installed-version API generation. */

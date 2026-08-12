@@ -14,6 +14,44 @@ import {
 
 const NOOP_GENERATOR = async (): Promise<void> => {};
 
+Deno.test('CLI corpus integrity follows canonical content across gzip transport variance', async () => {
+  const root = await Deno.makeTempDir();
+  const rootUrl = toFileUrl(`${root}/`);
+  try {
+    await Promise.all([
+      Deno.mkdir(`${root}/packages/cli`, { recursive: true }),
+      Deno.mkdir(`${root}/.llm/assets/agent-docs`, { recursive: true }),
+    ]);
+    const payload = { schemaVersion: 1, files: { 'llms.txt': '## Task router\n' } } as const;
+    const canonical = new TextEncoder().encode(JSON.stringify(payload));
+    const alternateTransport = await gzip(canonical);
+    alternateTransport[4] = alternateTransport[4] === 0 ? 1 : 0;
+    await Promise.all([
+      Deno.writeTextFile(`${root}/packages/cli/deno.json`, JSON.stringify({ version: '0.0.5' })),
+      Deno.writeFile(`${root}/.llm/assets/agent-docs/prose.json.gz`, alternateTransport),
+      Deno.writeTextFile(
+        `${root}/.llm/assets/agent-docs/provenance.json`,
+        JSON.stringify({
+          schemaVersion: 1,
+          version: '0.0.5',
+          sourceCommit: 'fixture',
+          extractionTimestamp: '2026-08-12T00:00:00Z',
+          files: ['llms.txt'],
+          uncompressedBytes: canonical.byteLength,
+          compressedBytes: alternateTransport.byteLength,
+          sha256: await digest(canonical),
+        }),
+      ),
+    ]);
+
+    const bundle = await readAgentDocsEmbeddedBundle(rootUrl);
+    assertEquals(bundle.compressed, alternateTransport);
+    assertEquals(bundle.provenance.sha256, await digest(canonical));
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
 Deno.test('MCP fallback is generated from the locked release prose within 256 KiB', async () => {
   const generated = await buildMcpEmbeddedDocs();
   assertEquals(generated.provenance.paths, MCP_EMBEDDED_DOC_PATHS);
@@ -185,7 +223,7 @@ Deno.test('release bump rebases one shared corpus before CLI and MCP consume it'
     );
     const uncompressed = new TextEncoder().encode(JSON.stringify({ schemaVersion: 1, files }));
     const compressed = await gzip(uncompressed);
-    const sha256 = await digest(compressed);
+    const sha256 = await digest(uncompressed);
     await Promise.all([
       Deno.writeFile(`${root}/.llm/assets/agent-docs/prose.json.gz`, compressed),
       Deno.writeTextFile(
@@ -242,7 +280,10 @@ Deno.test('release bump rebases one shared corpus before CLI and MCP consume it'
       ).byteLength,
     );
     assertEquals(cli.provenance.compressedBytes, cli.compressed.byteLength);
-    assertEquals(cli.provenance.sha256, await digest(cli.compressed));
+    assertEquals(
+      cli.provenance.sha256,
+      await digest(new TextEncoder().encode(JSON.stringify(cliPayload))),
+    );
   } finally {
     await Deno.remove(root, { recursive: true });
   }

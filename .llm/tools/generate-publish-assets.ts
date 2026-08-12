@@ -254,7 +254,7 @@ export async function rebaseAgentDocsProse(
         version,
         uncompressedBytes: nextUncompressed.byteLength,
         compressedBytes: nextCompressed.byteLength,
-        sha256: hex(await crypto.subtle.digest('SHA-256', copiedBuffer(nextCompressed))),
+        sha256: hex(await crypto.subtle.digest('SHA-256', copiedBuffer(nextUncompressed))),
       }),
       null,
       2,
