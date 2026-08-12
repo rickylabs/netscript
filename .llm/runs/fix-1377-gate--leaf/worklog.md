@@ -11,8 +11,8 @@
 
 ## Design
 
-Recorded before implementation. PLAN-EVAL is selected and implementation is forbidden until a
-separate session writes `plan-eval.md` with `PASS`.
+Recorded before implementation. Separate-session PLAN-EVAL cycle 2 passed head `706c2bf05`; Phase 2
+began only after that verdict.
 
 ### Public Surface
 
@@ -94,6 +94,10 @@ and coverage diagnostic name any missing path. Do not edit a command list in the
 | 2026-08-12 | P | Arrival checks | Baseline exact; PR-C ancestor; alias convention yields 35/35 reference coverage. |
 | 2026-08-12 | P | Design | Locked alias, check placement, release unblock, command-tree scope, census, and negative controls. |
 | 2026-08-12 | P | FAIL_PLAN revision | Locked the two-page corpus, exact 91 equality, structural root plus tokenized path matching, four-row S2 unblock, and retracted the false sagas-path premise. |
+| 2026-08-12 | P | PLAN-EVAL cycle 2 | Native Opus 5 read-only fallback returned PASS on immutable head `706c2bf05`; cloud evaluators had stalled and were cancelled. |
+| 2026-08-12 | S1 | Start | Began whole-publish-set reference existence implementation after PASS. |
+| 2026-08-12 | S1 | Implement | Added the independent `docs-reference` row over `publishSet.effective`, four declared aliases, and removed page existence from first-publish policy. |
+| 2026-08-12 | S1 | Reconcile | PR #1586 remains draft with `Closes #1377`; issue #1377 remains open. Read current PR/issue comments; no new blocker or scope change. Labels were observed but not changed. |
 
 ## Decisions
 
@@ -115,9 +119,19 @@ All implementation gates are `NOT_RUN` by design in phase 1.
 | Baseline identity | PASS | branch `fix/1377-docs-reference-gate-scope`; head `fa5d0d411…` |
 | PR-C landed | PASS | `db1d79c68…` is an ancestor of HEAD |
 | Reference arrival coverage | PASS | 35 effective, 35 present under locked alias resolver, 0 missing |
-| PLAN-EVAL | FAIL_PLAN → REVISION_READY | Fallback evaluation failed head `5ba4bc339`; revised head requires a new automatic status-driven evaluation; this generator cannot self-evaluate |
+| PLAN-EVAL | FAIL_PLAN → PASS | Native Opus 5 read-only fallback: cycle 1 failed `5ba4bc339`; cycle 2 passed `706c2bf05`. The generator did not self-evaluate. |
 | Type/lint/fmt/docs/publish/tests | NOT_RUN | Phase 2 only after PLAN-EVAL PASS |
 | Raw negative controls | NOT_RUN | Phase 2 only; both raw exit codes and diagnostics required |
+
+### S1 gate evidence
+
+| Gate | Result | Evidence / notes |
+| --- | --- | --- |
+| Release unit | PASS | `deno test --allow-all .llm/tools/release/publish-readiness_test.ts` — 15 passed, 0 failed |
+| Missing-page raw control | EXPECTED FAIL, exit 1 | Exported `auditReferencePages()` over published `@netscript/published`; diagnostic: `@netscript/published docs/site/reference/published/index.md [docs-reference] docs-site reference page is required` |
+| Scoped release check | PASS | 42 files selected; 0 findings |
+| Scoped release lint | PASS | 42 files selected; 0 findings |
+| Scoped release format | PASS | 42 files selected; 0 findings after targeted formatting |
 
 ## Handoff Notes
 

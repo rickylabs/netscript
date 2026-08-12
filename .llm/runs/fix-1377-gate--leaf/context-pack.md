@@ -6,18 +6,17 @@
 | --- | --- |
 | Run ID | `fix-1377-gate--leaf` |
 | Branch | `fix/1377-docs-reference-gate-scope` |
-| Current phase | `plan-eval` pending |
+| Current phase | `implement` — S1 |
 | Archetype | 6 — CLI / tooling |
 | Scope overlays | Docs |
 
 ## Current State
 
-Fallback PLAN-EVAL returned `FAIL_PLAN` on `5ba4bc339`; the plan is revised and no implementation
-file has changed. It retains the confirmed alias and whole-publish-set design, locks command
-coverage to the exact union of `docs/site/reference/cli/commands.md` and
-`docs/site/cli-reference.md`, requires structural root matching plus tokenized path resolution and
-exact equality with 91 root/direct obligations, and makes the four missing deploy rows bounded S2
-scope. A new automatic PLAN-EVAL on this immutable head must PASS before implementation.
+Fallback PLAN-EVAL cycle 1 returned `FAIL_PLAN` on `5ba4bc339`; cycle 2 returned `PASS` on
+`706c2bf05`. Phase 2 is active in S1. The implementation retains the confirmed alias and
+whole-publish-set design, locks command coverage to the exact two-page union, requires structural
+root matching plus tokenized path resolution and exact equality with 91 root/direct obligations,
+and makes the four missing deploy rows bounded S2 scope.
 
 ## Completed
 
@@ -27,17 +26,17 @@ scope. A new automatic PLAN-EVAL on this immutable head must PASS before impleme
   docs checker/tests, and live public command catalog inspected.
 - 35/35 alias-resolved reference arrival coverage verified.
 - FAIL_PLAN B1–B3 and non-blocking findings resolved in the revised plan.
+- Native Opus 5 fallback PLAN-EVAL cycle 2 passed immutable head `706c2bf05`.
 
 ## In Progress
 
-- Commit/push the revised plan; stop for a new automatic PLAN-EVAL.
+- S1 is gate-green and ready for its sign-off commit/push/comment.
 
 ## Next Steps
 
-1. Orchestrator triggers the automatic status-driven PLAN-EVAL via the status-label mechanism and
-   records the verdict.
-2. Resolve any further `FAIL_PLAN`; do not implement meanwhile.
-3. On PASS, the orchestrator may advance the lifecycle; implement S1–S3 in order only after resume.
+1. Complete S1 gates, commit, explicit push, and PR comment.
+2. Complete S2 command-coverage gate and bounded docs corrections.
+3. Complete S3 composed gates and stop for native Opus 5 IMPL-EVAL fallback.
 
 ## Key Decisions
 
@@ -51,17 +50,20 @@ scope. A new automatic PLAN-EVAL on this immutable head must PASS before impleme
 
 ## Files Changed
 
-Only `.llm/runs/fix-1377-gate--leaf/{supervisor,research,plan,worklog,context-pack,drift}.md` are
-created in phase 1.
+- S1: release readiness tool/test, reference index convention, and run artifacts including
+  `plan-eval.md`.
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Plan | READY_FOR_EVAL | Plan-Gate inputs complete |
+| Plan | PASS | Native Opus 5 fallback, cycle 2, head `706c2bf05` |
 | Static / Fitness | NOT_RUN | Phase 2 |
 | Docs / Release | NOT_RUN | Phase 2 |
 | Negative controls | NOT_RUN | Phase 2; raw exits mandatory |
+
+S1 release unit, scoped check/lint/format, and raw missing-page exit 1 are PASS/expected-fail with
+diagnostics recorded in `worklog.md`.
 
 ## Open Questions
 

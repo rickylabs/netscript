@@ -30,8 +30,9 @@ exceptions, the deployable plugins, which drop the `plugin-` prefix:
 
 Their `-core` counterparts use the name-exact form, so `@netscript/plugin-sagas-core` is at
 [`/reference/plugin-sagas-core/`](/reference/plugin-sagas-core/) while `@netscript/plugin-sagas` is at
-`/reference/sagas/`. This is a description of what the site does today, not a rule to follow when the
-two forms disagree.
+`/reference/sagas/`. The release-readiness gate treats the four table entries as declared aliases;
+all other publishable members use the name-exact segment. A maintainer adding or changing an
+exception must update this table and the gate together.
 
 Each publishable workspace member's own page is canonical for its exported API. The four deployable
 plugin pages describe their manifests and integration entrypoints, then link to their separately

@@ -50,11 +50,22 @@ export interface FirstPublishViolation {
   readonly message: string;
 }
 
+export interface ReferencePageViolation {
+  readonly packageName: string;
+  readonly path: string;
+  readonly rule: 'docs-reference';
+  readonly message: string;
+}
+
 export interface PublishReadinessDependencies {
   readonly auditPublishSet: (root: string) => Promise<PublishSetAuditResult>;
   readonly auditMarkdownPins: (root: string, version: string) => Promise<MarkdownPreflightResult>;
   readonly auditVersions: (root: string, version: string) => Promise<readonly VersionFinding[]>;
   readonly scanSpecifiers: (roots: readonly string[], root: string) => Promise<SpecifierScanResult>;
+  readonly auditReferencePages: (
+    root: string,
+    members: readonly PublishableMember[],
+  ) => Promise<readonly ReferencePageViolation[]>;
   readonly readRegistryVersions: (packageName: string) => Promise<readonly string[] | null>;
   readonly auditFirstPublish: (
     root: string,
@@ -69,6 +80,7 @@ const defaultDependencies: PublishReadinessDependencies = {
   auditMarkdownPins,
   auditVersions: auditLockstepAndResidue,
   scanSpecifiers: scanNetscriptJsrSpecifiers,
+  auditReferencePages,
   readRegistryVersions,
   auditFirstPublish: auditFirstPublishPackages,
   runProvisioningDryCheck,
@@ -80,6 +92,14 @@ const INTERNAL_SPECIFIER =
 
 const IMPORT_ATTRIBUTE_SUNSET =
   'Import-attribute publication remains prohibited until denoland/deno#35546 is fixed, merged, released, and an authenticated canary text-import probe is green.';
+
+/** Declared package-name exceptions to the scoped-name reference path convention. */
+export const REFERENCE_PAGE_ALIASES: Readonly<Record<string, string>> = {
+  '@netscript/plugin-sagas': 'sagas',
+  '@netscript/plugin-streams': 'streams',
+  '@netscript/plugin-triggers': 'triggers',
+  '@netscript/plugin-workers': 'workers',
+};
 
 /** Collect every pre-publish check without hiding later independent evidence. */
 export async function collectPublishReadiness(
@@ -107,6 +127,27 @@ export async function collectPublishReadiness(
       details: publishSet.excluded.map((entry) => `EXCLUDED ${entry.path}: ${entry.reason}`),
     };
   });
+
+  if (!publishSet) {
+    checks.push(skip('docs-reference', 'publish-set evidence unavailable'));
+  } else {
+    await capture(checks, 'docs-reference', async () => {
+      const violations = await dependencies.auditReferencePages(root, publishSet!.effective);
+      if (violations.length > 0) {
+        throw new Error(
+          violations.map((violation) =>
+            `${violation.packageName} ${violation.path} [${violation.rule}] ${violation.message}`
+          ).join('; '),
+        );
+      }
+      return {
+        summary: `${publishSet!.effective.length} publishable package reference page(s) present`,
+        details: publishSet!.effective.map((member) =>
+          `${member.name} (${referencePagePath(member.name)})`
+        ),
+      };
+    });
+  }
 
   await capture(checks, 'markdown-pins', async () => {
     const result = await dependencies.auditMarkdownPins(root, version);
@@ -251,7 +292,7 @@ export async function auditLockstepAndResidue(
   return findings.sort((left, right) => left.path.localeCompare(right.path));
 }
 
-/** Apply first-publish-only README, tagline, manifest, export, and docs checks. */
+/** Apply first-publish-only README, tagline, manifest, and export checks. */
 export async function auditFirstPublishPackages(
   root: string,
   members: readonly PublishableMember[],
@@ -298,12 +339,25 @@ export async function auditFirstPublishPackages(
     if (!isJsonObject(manifest) || !hasExports(manifest.exports)) {
       violations.push(violation(member, 'deno.json', 'exports', 'non-empty exports are required'));
     }
+  }
+  return violations;
+}
 
-    const docsPath = `docs/site/reference/${packageSegment(member.name)}/index.md`;
-    if (!(await exists(join(root, docsPath)))) {
-      violations.push(
-        violation(member, docsPath, 'docs-reference', 'docs-site reference page is required'),
-      );
+/** Audit reference-page existence for every member in the coordinated publish set. */
+export async function auditReferencePages(
+  root: string,
+  members: readonly PublishableMember[],
+): Promise<readonly ReferencePageViolation[]> {
+  const violations: ReferencePageViolation[] = [];
+  for (const member of members) {
+    const path = referencePagePath(member.name);
+    if (!(await exists(join(root, path)))) {
+      violations.push({
+        packageName: member.name,
+        path,
+        rule: 'docs-reference',
+        message: 'docs-site reference page is required',
+      });
     }
   }
   return violations;
@@ -412,6 +466,11 @@ function packageSegment(packageName: string): string {
   const segment = packageName.split('/').at(-1);
   if (!segment) throw new Error(`Invalid scoped package name: ${packageName}`);
   return segment;
+}
+
+function referencePagePath(packageName: string): string {
+  const segment = REFERENCE_PAGE_ALIASES[packageName] ?? packageSegment(packageName);
+  return `docs/site/reference/${segment}/index.md`;
 }
 
 function publishRoots(result: PublishSetAuditResult): readonly string[] {

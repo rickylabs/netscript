@@ -35,3 +35,15 @@ Append-only.
   deferred the four rows externally; the original finding remains as historical provenance.
 - **Evidence:** revised `research.md` findings 9/11 and `plan.md` D-1/D-4/D-6–D-9 on the
   superseding plan head.
+
+## 2026-08-12 — cloud evaluators stalled; native fallback completed PLAN-EVAL
+
+- **What:** Forward-looking run artifacts named an automatic status-driven evaluator and paid
+  retrigger that did not complete either plan cycle.
+- **Source:** orchestrator Phase-2 resume after native Opus 5 read-only fallback verdicts.
+- **Expected:** A separate evaluator verdict for each immutable plan head.
+- **Actual:** Cloud evaluators stalled and were cancelled; the orchestrator dispatched native Opus 5
+  fallbacks without label cycling. Cycle 1 failed `5ba4bc339`; cycle 2 passed `706c2bf05`.
+- **Severity:** procedural.
+- **Action:** correct active routing instructions and preserve both verdicts in `plan-eval.md`.
+- **Evidence:** `supervisor.md`, `plan-eval.md`, `worklog.md`, and `context-pack.md`.
