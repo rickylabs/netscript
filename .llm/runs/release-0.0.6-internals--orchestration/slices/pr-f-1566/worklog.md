@@ -145,9 +145,11 @@ acceptance criteria, and required gates fully specified in issue #1566 and `impl
 | Scoped type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .github/scripts --ext ts` — exit 0; 6 files, 0 findings |
 | Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .github/scripts --ext ts` — exit 0; 6 files, 0 findings |
 | Scoped format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .github/scripts --ext ts` — exit 0; 6 files, 0 findings |
-| Asset barrel | `deno task gen:assets-barrel` — exit 0; no generated file changed. Empty-status proof follows the committed head. |
+| Asset barrel | `deno task gen:assets-barrel` — exit 0; after implementation commit `d7ea38f1cd`, `git status --porcelain` was empty with exit 0 |
 | Workflow YAML | `deno eval --no-lock` with `jsr:@std/yaml@^1.0.10` — exit 0, `YAML_PARSE_OK` |
 
 - Self-contained landing reconcile: PR #1567 is draft with exactly `status:impl`; the failed run
   facts changed the design but not issue #1566's six-box acceptance mapping. No manual OpenHands
   trigger, ready transition, waiver label, merge, #1541 action, or out-of-scope change occurred.
+- Self-contained implementation commit: `d7ea38f1cd`; pushed with explicit refspec. The orchestrator
+  owns the ready flip and automatic DeepSeek retry.
