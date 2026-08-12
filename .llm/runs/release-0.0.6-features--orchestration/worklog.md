@@ -299,3 +299,38 @@ working.
 PR #1536 flipped to ready to trigger the blocking tier, held at `status:impl-eval` (**not**
 `ready-merge`) so it cannot be mistaken for merge-ready. IMPL-EVAL is still required — the D-3 owner
 ruling waives evaluation only for the small deterministic class, explicitly not for this issue.
+
+## 2026-08-12 — #1398 live gates PASS in CI, both tiers
+
+The two gates deferred against #1398 ran **by name** and passed in CI, verified from job logs rather
+than inferred from a suite-level green:
+
+| Tier | Job | Gates observed | Summary |
+| --- | --- | --- | --- |
+| `scaffold-runtime (aspire + docker + postgres)` | `94062070840` | `behavior.otel.stream-consumer`, `behavior.otel.traces` | `passed=88 failed=0 skipped=0` |
+| `scaffold-runtime-sqlite (aspire + sqlite + garnet)` | `94062070984` | both, same | `passed=83 failed=0 skipped=0` |
+
+`skipped=0` matters as much as `failed=0`: a silently skipped gate is the exact false-green the
+deferral list existed to prevent. Confirmed the SQLite tier really carries them —
+`POSTGRES_ONLY_RUNTIME_GATES` (`capability-suites.ts:146-151`) lists only the four DB-specific gates,
+so `RUNTIME_SQLITE_GATES` inherits both OTEL gates. Both tiers is stronger than the plan required.
+
+**This retires the open question about the two red local runs.** I had recorded that the
+`triggers-api` timeout was *consistent with* an environmental failure but not proven to be one, since
+I had not reproduced the suite on a clean `main`. CI now runs the same suite **with this change**
+through `runtime.flow-b-fixture` and past `triggers-api` to a clean finish on both tiers. That is the
+missing control: the failures were local-host environmental, not caused by the change. Upgraded from
+"consistent with" to "established", with the evidence named.
+
+**#1398 acceptance criterion 3 is now live-verified** — a subscription opened before the trigger
+observes the execution record within a bounded time, proven by the gate's own live SSE loop
+(`consume-flow-b-stream.ts:203-230`), not by asserted timing.
+
+**CI state:** every check green except `close-gate`, which is correctly red — DoD box 5 unticked and
+#1398's acceptance boxes unmirrored. Both are now truthfully tickable and will be handled when the
+merge gate is finished.
+
+**Held, deliberately.** Per D-4 the PR stays on head `e4319c685` at `status:impl-eval`. I have made
+no label change, no body edit, no OpenHands trigger, and no local evaluator launch. IMPL-EVAL will
+arrive via the automatic dispatcher after #1524 lands; root re-enters the label to fire it. This
+lane's remaining work is to watch that verdict, then run and record the seven-check pre-merge gate.
