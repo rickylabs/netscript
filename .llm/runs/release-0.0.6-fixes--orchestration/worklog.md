@@ -1489,3 +1489,58 @@ external blocker rather than attempt it.
 
 **Wave 2: 2 of 4 closed.** #1540 implementing on a passed plan; #1454 in automatic PLAN-EVAL cycle 2
 on amended head `ad7574bb7`.
+
+## 2026-08-12 — Wave 2 landing 3: PR #1573 → `7aa4aadfd` (closes #1540)
+
+Automatic IMPL-EVAL PASS, run `31605952862`, head-matched `7ba8d10c4`; head never altered. Full
+gate green, `review-threads` PASS, current-main guard zero overlap.
+
+**Both halves of close-gate demonstrated in one PR.** The mirror ticked #1540's **4/4 issue boxes**
+after the `status:ready-merge` + `ci` rerun. close-gate stayed red on the **PR-body** half:
+
+```
+unchecked PR body: #1573 line 86 [Definition of Done] "Separate-session IMPL-EVAL records PASS."
+```
+
+That box is **unticked by construction at hand-off** — it asserts a verdict that only exists after
+the orchestrator's ready transition, so the implementer cannot truthfully tick it. Once DeepSeek
+returned PASS the claim became true and it was ticked **as a body edit**, which does not move the
+head, so the head-matched verdict survived. Pushing instead is what cost the internals lane a second
+eval cycle on #1560.
+
+**The evidence this slice produced is the lane's strongest.** Acceptance box 2 demanded the
+interruption be executed rather than reasoned about:
+
+```
+RED against the prior in-place implementation:
+  AssertionError: publish left tracked source files dirty after SIGKILL
+  AssertionError: preflight left tracked source files dirty after SIGKILL
+GREEN after, both modes:
+  {"signal":"SIGKILL","sourceStatus":"","sourceHasCatalog":true,"lockUnchanged":true,
+   "stageHasMaterializedCatalog":true,"stageOutsideSource":true}
+```
+
+`stageHasMaterializedCatalog: true` **with** `stageOutsideSource: true` is the pair that matters: it
+proves materialization genuinely happened, so the clean source tree is not a pass-because-nothing-ran.
+The slice applied this lane's own distinguish-pass-from-did-not-run discipline to its own assertion
+without being told to for that specific check.
+
+It also held its plan's line: no signal handler bolted on, `SIGKILL` acknowledged untrappable, and
+the orphaned staging worktree declared as bounded debt. The fix is structural — the source checkout
+is never the mutation target.
+
+### Label race, distinct from the earlier slip
+
+My `status:impl-eval → status:ready-merge` swap **raced the workflow**, which added
+`status:augment-review` after the PASS. Result: two `status:` labels. This is *not* the malformed
+call that produced the #1456 double-label — it is a genuine concurrent write, so "use one atomic
+call" does not prevent it. **Verifying the count after every transition** is what catches it.
+
+## Wave 2 status
+
+| Issue | PR | Commit | State |
+| --- | --- | --- | --- |
+| #1456 | #1579 | `4637e9f41` | shipped |
+| #1460 | #1578 | `efb5182f1` | shipped |
+| #1540 | #1573 | `7aa4aadfd` | shipped |
+| #1454 | #1574 | — | plan PASS (Opus 5 medium, opposite-family), implementing |

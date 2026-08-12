@@ -15,6 +15,7 @@ milestone's rules are earned from evidence rather than memory.
 | 4 | 2026-08-12 12:54:23Z | `3c9dc1f39` | #1539 | **#1438, #1430** (both auto-closed COMPLETED) | 7/7 + automatic IMPL-EVAL PASS, head-matched at `070eabb61`; runtime tiers recorded as did-not-run with reason |
 | 5 | 2026-08-12 (wave 2) | `4637e9f41` | #1579 | **#1456** (auto-closed COMPLETED) | 7/7 + automatic IMPL-EVAL PASS head-matched `b80e56249`; zero non-green; negative control proven against a package whose live `latest` differs |
 | 6 | 2026-08-12 (wave 2) | `efb5182f1` | #1578 | **#1460** (auto-closed COMPLETED) | 7/7 + automatic IMPL-EVAL PASS head-matched `fe2b3262d`; mirror ticked 5/5 issue boxes; zero non-green |
+| 7 | 2026-08-12 (wave 2) | `7aa4aadfd` | #1573 | **#1540** (auto-closed COMPLETED) | 7/7 + automatic IMPL-EVAL PASS head-matched `7ba8d10c4`; mirror 4/4 issue boxes + PR-body DoD box ticked by body edit (head unchanged); executed SIGKILL interruption proof red→green |
 | _(none yet)_ | | | | | |
 
 Captured from `git log origin/main --first-parent` after each merge, never from recollection. Both

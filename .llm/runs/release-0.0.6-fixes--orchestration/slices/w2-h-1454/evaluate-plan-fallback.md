@@ -7,7 +7,7 @@ change it. Your output is a verdict with evidence.
 
 | Field | Value |
 | --- | --- |
-| Route | Codex · OpenAI · GPT-5.6 Sol · **high** (owner-directed fallback, drift D-8) |
+| Route | **Claude · Anthropic · Opus 5 · medium** (owner-directed fallback after AGY route failure — drift D-8, D-9) |
 | Your worktree | `/home/codex/repos/ns006-w2h-planeval` — detached at `ad7574bb7`, **read-only** |
 | Author's worktree | `/home/codex/repos/ns006-w2-1454` — **never touch it** |
 | Plan under evaluation | `.llm/runs/release-0.0.6-fixes--orchestration/slices/w2-h-1454/plan.md` at that head |
@@ -27,14 +27,26 @@ change it. Your output is a verdict with evidence.
 The automatic evaluator adjudicated this plan **once** (MiniMax M3, cycle 1) and returned
 **FAIL_PLAN** — on checklist hygiene, not substance. It verified every load-bearing architectural
 claim against the tree and judged the root cause, fix surface, and published-surface answer
-**correct**. The author then amended the plan. Cycle 2 was dispatched and returned **NONE**: the
-evaluator hit its 500-iteration limit and failed. **The amended plan has never been adjudicated.**
+**correct**. The author then amended the plan.
 
-You are the owner-directed fallback. One consequence you must know: `lane-policy.md` routes
-formal plan evaluation of a Codex-authored plan to an **opposite-family** evaluator, and you are
-Codex evaluating Codex. That independence is genuinely reduced. It is recorded as drift D-8, and it
-is why your job is narrow and your evidence standard is high — you are not a rubber stamp brought in
-because the real evaluator was unavailable.
+Two fallback attempts since then produced **no verdict**:
+
+- **Cycle 2 (MiniMax M3)** returned `NONE` — the evaluator hit its 500-iteration limit and failed.
+  Infrastructure exhaustion, not a judgement.
+- **AGY Gemini** could not be launched at its required identity: `--model gemini-3.6-flash-high` was
+  not honoured and every session reported `Gemini 3.5 Flash (Low)`. Halted rather than accepted.
+
+A same-family Codex attempt was also started and **stopped before producing any verdict**; it is
+non-authoritative and you should ignore any traces of it.
+
+**So the amended plan has never been adjudicated.** You are the evaluation.
+
+**You are opposite-family and at full strength.** The plan is Codex-authored; you are Claude. Both
+harness invariants hold — generator ≠ evaluator, and opposite-family review. Fable specifically is
+prohibited by owner policy; Claude Opus is not. You are not a degraded stand-in, and you should not
+grade generously because earlier attempts failed. If anything, the opposite: this plan has absorbed
+three failed evaluation attempts, and the temptation to wave it through is exactly what you exist to
+resist.
 
 ## Scope — evaluate the amendments, do not re-litigate the architecture
 
@@ -113,7 +125,7 @@ Write `verdict-plan-fallback.md`:
   that you found none.
 - Findings, each blocking or non-blocking, each with a concrete consequence.
 - What you executed, verbatim; and what you could **not** verify.
-- An explicit note that you are a **same-family** evaluator per drift D-8, so a reader weighs your
-  verdict accordingly.
+- An explicit note of your route (Claude Opus 5 medium, opposite-family to a Codex-authored plan)
+  so a reader can weigh the verdict's independence.
 
 A PASS releases a p1 slice to implement against this plan. Make it earned.
