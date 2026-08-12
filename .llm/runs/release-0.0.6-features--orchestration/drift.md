@@ -261,3 +261,20 @@ Every future slice brief carries a standard, non-optional block —
 forbidding any locally launched evaluator, and stating that evaluation arrives **only** through the
 automatic label-driven lifecycle. Existing live briefs (#1589) already carry the clause; #1583's leaf
 is past implementation and its evaluation is now automatic-only.
+
+### Collateral check after the termination sweep
+
+My background **dispatch wrapper** for #1583 exited **143 (SIGTERM)** in the sweep. Verified nothing
+of consequence was lost:
+
+| Check | Result |
+| --- | --- |
+| #1583 leaf head | `b96b5a58e`, tree clean |
+| PR #1593 | OPEN, ready, `status:impl-eval`, head unchanged |
+| Automatic IMPL-EVAL `31616560752` | **still `in_progress`** |
+| #1583 Codex thread | alive |
+
+The wrapper's useful work — launching the slice — had already completed, and the automatic evaluation
+runs in GitHub Actions, so a local kill could not reach it. **The sanctioned path was never at risk;
+only the prohibited one was stopped.** Worth stating because "I killed processes and something exited
+143" is exactly the kind of event that should be checked rather than assumed benign.
