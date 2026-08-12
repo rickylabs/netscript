@@ -237,7 +237,7 @@ function readConfiguredProvider(): string | undefined {
  * - An unset provider falls back to the legacy default (`mysql`) to preserve
  *   existing MySQL deployments that do not export the provider.
  * - Any other (unrecognized) value is skipped rather than probing MySQL, so a
- *   sqlite-configured service never logs a spurious MySQL `ERR` (#175).
+ *   sqlite-configured service never logs a spurious MySQL `ERR`.
  *
  * Exported for unit testing.
  */

@@ -86,13 +86,13 @@ A handler does not perform work directly; it returns **actions** the dispatcher 
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `TriggerDefinition` | type alias | Trigger definitions known by the Group F public surface. |
+| `TriggerDefinition` | type alias | Implemented and reserved trigger definitions exposed by the public API. |
 | `TriggerDefinitionBase` | type alias | Common immutable fields shared by trigger definitions. |
 | `TriggerKind` | type alias | Open trigger discriminator. |
 | `TriggerKnownKind` | type alias | Canonical known trigger kind. |
-| `TRIGGER_KINDS` | variable | Canonical trigger kinds known by Group F. |
+| `TRIGGER_KINDS` | variable | Canonical trigger kinds exposed by trigger definitions. |
 | `ProcessableTriggerDefinition` | type alias | Trigger definition accepted by runtime processor ports. |
-| `RuntimeTriggerDefinition` | type alias | Trigger definitions implemented by the Group F runtime. |
+| `RuntimeTriggerDefinition` | type alias | Trigger definitions accepted by the current runtime processor. |
 | `RuntimeWebhookDefinition` | type alias | Webhook definition shape accepted by the trigger ingress runtime. |
 | `TriggerId` | type alias | Branded trigger definition identifier. |
 | `WebhookId` | type alias | Branded webhook definition identifier. |
@@ -104,7 +104,7 @@ core does not implement, and only the known kinds narrow into `RuntimeTriggerDef
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `TriggerPayload` | type alias | Payload union for known Group F trigger kinds. |
+| `TriggerPayload` | type alias | Payload union for canonical trigger kinds. |
 | `WebhookTriggerPayload` | type alias | HTTP payload captured by webhook ingress before processing. |
 | `ScheduledTriggerPayload` | type alias | Scheduled payload emitted by a scheduler adapter. |
 | `FileWatchTriggerPayload` | type alias | Filesystem payload captured by a file-watch adapter. |
@@ -143,8 +143,8 @@ the stored event rather than losing it.
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `createTriggerProcessor` | function | Create a trigger processor runtime from explicit dependencies. |
-| `TriggerProcessor` | class | T1 trigger processor with idempotency, retry, concurrency, DLQ, and circuit breaker handling. |
-| `TriggerProcessorPort` | interface | Processes unified trigger events through the T1 dispatch pipeline. |
+| `TriggerProcessor` | class | Trigger processor with idempotency, retry, concurrency, DLQ, and circuit breaker handling. |
+| `TriggerProcessorPort` | interface | Processes unified trigger events through the runtime dispatch pipeline. |
 | `TriggerProcessorOptions` | type alias | Options accepted by the trigger processor runtime. |
 | `TriggerProcessorStopOptions` | type alias | Stop options for processor drain. |
 | `TriggerProcessResult` | type alias | Result returned after processing a trigger event. |

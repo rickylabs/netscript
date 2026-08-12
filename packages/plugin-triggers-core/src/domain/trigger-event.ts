@@ -54,7 +54,7 @@ export type ManualTriggerPayload<TPayload = unknown> = Readonly<{
   firedAt: string;
 }>;
 
-/** Payload union for known Group F trigger kinds. */
+/** Payload union for canonical trigger kinds. */
 export type TriggerPayload =
   | WebhookTriggerPayload
   | FileWatchTriggerPayload

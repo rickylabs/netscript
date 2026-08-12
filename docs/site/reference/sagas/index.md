@@ -77,7 +77,7 @@ root wires together. It also re-exports the userland DSL types and cascaded-mess
 | `SagaRuntime` | interface | Runtime facade returned by the composition root. |
 | `SagaRuntimeAdapter` | type alias | Adapter selected by the saga runtime composition root. |
 | `SagaBusPort` | interface | Replaceable bus contract implemented by the native saga adapter. |
-| `SagaStorePort` | interface | Persistent state store boundary for T1 saga runtime guarantees. |
+| `SagaStorePort` | interface | Persistent boundary for saga state, transitions, and correlation indexes. |
 | `SagaPublisherPort` | interface | Explicit publisher boundary implemented by plugin-layer HTTP clients. |
 | `SagaIdempotencyPort` | interface | Durable idempotency boundary for saga publish and cascade deduplication. |
 | `CreateSagaRuntimeOptions` | type alias | Options accepted by `createSagaRuntime()`. |

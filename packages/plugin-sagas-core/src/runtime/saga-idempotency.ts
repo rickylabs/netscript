@@ -11,7 +11,7 @@ export type SagaIdempotencyTarget = Readonly<{
 /** Clock boundary used by the idempotency table. */
 export type SagaIdempotencyClock = () => Date;
 
-/** Options for the in-memory T1 idempotency table. */
+/** Options for the in-memory saga idempotency table. */
 export type SagaIdempotencyDedupTableOptions = Readonly<{
   ttlMs?: number;
   now?: SagaIdempotencyClock;

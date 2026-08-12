@@ -1,4 +1,10 @@
-import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import {
+  assert,
+  assertEquals,
+  assertRejects,
+  assertStrictEquals,
+  assertStringIncludes,
+} from '@std/assert';
 import {
   createNetScriptChatConnection,
   type NetScriptChatMessage,
@@ -13,6 +19,147 @@ async function collect(iterable: AsyncIterable<unknown>): Promise<unknown[]> {
   const out: unknown[] = [];
   for await (const item of iterable) out.push(item);
   return out;
+}
+
+async function collectWithTerminal(iterable: AsyncIterable<unknown>): Promise<{
+  readonly values: unknown[];
+  readonly terminal: IteratorResult<unknown>;
+}> {
+  const values: unknown[] = [];
+  const iterator = iterable[Symbol.asyncIterator]();
+  while (true) {
+    const result = await iterator.next();
+    if (result.done) return { values, terminal: result };
+    values.push(result.value);
+  }
+}
+
+async function waitFor(predicate: () => boolean, message: string): Promise<void> {
+  const deadline = Date.now() + 1_000;
+  while (!predicate()) {
+    if (Date.now() >= deadline) throw new Error(message);
+    await new Promise((resolve) => setTimeout(resolve, 1));
+  }
+}
+
+function createHeldSubscriptionProbe(): {
+  readonly connection: {
+    readonly subscribe: (signal?: AbortSignal) => AsyncIterable<unknown>;
+    readonly send: () => Promise<void>;
+  };
+  readonly stats: {
+    subscribeCalls: number;
+    openRequests: number;
+    maxOpenRequests: number;
+    abortedRequests: number;
+  };
+} {
+  const stats = {
+    subscribeCalls: 0,
+    openRequests: 0,
+    maxOpenRequests: 0,
+    abortedRequests: 0,
+  };
+
+  return {
+    stats,
+    connection: {
+      subscribe(signal) {
+        return (async function* () {
+          stats.subscribeCalls += 1;
+          stats.openRequests += 1;
+          stats.maxOpenRequests = Math.max(stats.maxOpenRequests, stats.openRequests);
+          try {
+            await new Promise<void>((resolve) => {
+              if (signal?.aborted) {
+                stats.abortedRequests += 1;
+                resolve();
+                return;
+              }
+              signal?.addEventListener('abort', () => {
+                stats.abortedRequests += 1;
+                resolve();
+              }, { once: true });
+            });
+          } finally {
+            stats.openRequests -= 1;
+          }
+          if (!signal?.aborted) yield undefined;
+        })();
+      },
+      send: () => Promise.resolve(),
+    },
+  };
+}
+
+function createEmittingSubscriptionProbe(): {
+  readonly connection: {
+    readonly subscribe: (signal?: AbortSignal) => AsyncIterable<unknown>;
+    readonly send: () => Promise<void>;
+  };
+  readonly stats: { subscribeCalls: number };
+  readonly emit: (...values: readonly unknown[]) => void;
+  readonly finish: () => void;
+  readonly fail: (error: unknown) => void;
+} {
+  type Event =
+    | { readonly kind: 'value'; readonly value: unknown }
+    | { readonly kind: 'done' }
+    | { readonly kind: 'error'; readonly error: unknown };
+  interface Stream {
+    readonly events: Event[];
+    wake?: () => void;
+  }
+
+  const stats = { subscribeCalls: 0 };
+  const streams = new Set<Stream>();
+  const publish = (event: Event): void => {
+    for (const stream of streams) {
+      stream.events.push(event);
+      stream.wake?.();
+    }
+  };
+
+  return {
+    stats,
+    emit: (...values) => values.forEach((value) => publish({ kind: 'value', value })),
+    finish: () => publish({ kind: 'done' }),
+    fail: (error) => publish({ kind: 'error', error }),
+    connection: {
+      subscribe(signal) {
+        return (async function* () {
+          stats.subscribeCalls += 1;
+          const stream: Stream = { events: [] };
+          const wake = (): void => stream.wake?.();
+          streams.add(stream);
+          signal?.addEventListener('abort', wake, { once: true });
+          try {
+            while (!signal?.aborted) {
+              const event = stream.events.shift();
+              if (!event) {
+                await new Promise<void>((resolve) => {
+                  stream.wake = resolve;
+                  if (stream.events.length > 0 || signal?.aborted) resolve();
+                });
+                stream.wake = undefined;
+                continue;
+              }
+              if (event.kind === 'value') {
+                yield event.value;
+                continue;
+              }
+              if (event.kind === 'error') throw event.error;
+              return;
+            }
+          } finally {
+            signal?.removeEventListener('abort', wake);
+            streams.delete(stream);
+          }
+        })();
+      },
+      send: () => Promise.resolve(),
+    },
+  };
 }
 
 Deno.test('resolveChatSnapshot wires session URL + auth and reduces via projectChatSnapshot', async () => {
@@ -260,6 +407,170 @@ Deno.test('createNetScriptChatConnection exposes idempotent close/stop/dispose (
     Error,
     'disposed',
   );
+});
+
+Deno.test('one mounted chat connection shares one live request across repeated subscribe attempts', async () => {
+  const probe = createHeldSubscriptionProbe();
+  const connection = createNetScriptChatConnection({
+    target: baseTarget,
+    createConnection: () => probe.connection,
+  });
+  const first = connection.subscribe()[Symbol.asyncIterator]();
+  const second = connection.subscribe()[Symbol.asyncIterator]();
+  const pendingFirst = first.next();
+  const pendingSecond = second.next();
+
+  try {
+    await waitFor(
+      () => probe.stats.openRequests > 0,
+      'the physical live request did not open',
+    );
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    assertEquals(probe.stats.subscribeCalls, 1);
+    assertEquals(probe.stats.openRequests, 1);
+    assertEquals(probe.stats.maxOpenRequests, 1);
+  } finally {
+    connection.dispose();
+    await Promise.all([pendingFirst, pendingSecond]);
+  }
+});
+
+Deno.test('concurrent subscribers receive identical values and terminal from one physical subscription', async () => {
+  const probe = createEmittingSubscriptionProbe();
+  const connection = createNetScriptChatConnection({
+    target: baseTarget,
+    createConnection: () => probe.connection,
+  });
+  const first = collectWithTerminal(connection.subscribe());
+  const second = collectWithTerminal(connection.subscribe());
+
+  await waitFor(
+    () => probe.stats.subscribeCalls > 0,
+    'the physical emitting subscription did not open',
+  );
+  await Promise.resolve();
+  probe.emit('first', { token: 'second' });
+  probe.finish();
+
+  const [firstResult, secondResult] = await Promise.all([first, second]);
+  assertEquals(firstResult.values, ['first', { token: 'second' }]);
+  assertEquals(secondResult.values, firstResult.values);
+  assertEquals(firstResult.terminal, { done: true, value: undefined });
+  assertEquals(secondResult.terminal, firstResult.terminal);
+  assertEquals(probe.stats.subscribeCalls, 1);
+});
+
+Deno.test('upstream error reaches both concurrent subscribers from one physical subscription', async () => {
+  const probe = createEmittingSubscriptionProbe();
+  const connection = createNetScriptChatConnection({
+    target: baseTarget,
+    createConnection: () => probe.connection,
+  });
+  const first = collect(connection.subscribe());
+  const second = collect(connection.subscribe());
+
+  await waitFor(
+    () => probe.stats.subscribeCalls > 0,
+    'the physical emitting subscription did not open',
+  );
+  await Promise.resolve();
+  const upstreamError = new Error('fan-out failed');
+  probe.fail(upstreamError);
+
+  const [firstResult, secondResult] = await Promise.allSettled([first, second]);
+  assertEquals(firstResult.status, 'rejected');
+  assertEquals(secondResult.status, 'rejected');
+  if (firstResult.status === 'rejected') assertStrictEquals(firstResult.reason, upstreamError);
+  if (secondResult.status === 'rejected') assertStrictEquals(secondResult.reason, upstreamError);
+  assertEquals(probe.stats.subscribeCalls, 1);
+});
+
+Deno.test('stop aborts the one physically in-flight shared live request', async () => {
+  const serverController = new AbortController();
+  let openedRequests = 0;
+  let abortedRequests = 0;
+  const server = Deno.serve(
+    { port: 0, signal: serverController.signal, onListen() {} },
+    (_request, info) => {
+      openedRequests += 1;
+      void info.completed.then(() => (abortedRequests += 1));
+      return new Response(new ReadableStream({ start() {} }));
+    },
+  );
+
+  try {
+    const { port } = server.addr as Deno.NetAddr;
+    const connection = createNetScriptChatConnection({
+      target: { sessionId: 'physical-abort', baseUrl: `http://127.0.0.1:${port}` },
+      createConnection(input) {
+        return {
+          subscribe(signal) {
+            return (async function* () {
+              const response = await fetch(input.readUrl, { signal });
+              await response.body?.getReader().read();
+              if (!signal?.aborted) yield undefined;
+            })();
+          },
+          send: () => Promise.resolve(),
+        };
+      },
+    });
+    const first = connection.subscribe()[Symbol.asyncIterator]();
+    const second = connection.subscribe()[Symbol.asyncIterator]();
+    const pendingFirst = first.next();
+    const pendingSecond = second.next();
+
+    await waitFor(() => openedRequests > 0, 'the physical live GET did not open');
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    connection.stop();
+    await Promise.all([pendingFirst, pendingSecond]);
+    await waitFor(() => abortedRequests > 0, 'the server did not observe the live GET abort');
+
+    assertEquals(openedRequests, 1);
+    assertEquals(abortedRequests, 1);
+  } finally {
+    serverController.abort();
+    await server.finished.catch(() => undefined);
+  }
+});
+
+Deno.test('re-subscribing after every prior subscriber explicitly stops opens a fresh request', async () => {
+  const probe = createHeldSubscriptionProbe();
+  const connection = createNetScriptChatConnection({
+    target: baseTarget,
+    createConnection: () => probe.connection,
+  });
+  const abortFirst = new AbortController();
+  const abortSecond = new AbortController();
+  const first = connection.subscribe(abortFirst.signal)[Symbol.asyncIterator]();
+  const second = connection.subscribe(abortSecond.signal)[Symbol.asyncIterator]();
+  const pendingFirst = first.next();
+  const pendingSecond = second.next();
+
+  await waitFor(
+    () => probe.stats.openRequests > 0,
+    'the first physical live request did not open',
+  );
+  abortFirst.abort();
+  abortSecond.abort();
+  await Promise.all([pendingFirst, pendingSecond]);
+  await waitFor(
+    () => probe.stats.openRequests === 0,
+    'the first physical live request did not stop',
+  );
+
+  const third = connection.subscribe()[Symbol.asyncIterator]();
+  const pendingThird = third.next();
+  await waitFor(
+    () => probe.stats.openRequests > 0,
+    'the replacement physical live request did not open',
+  );
+
+  assertEquals(probe.stats.subscribeCalls, 2);
+  assertEquals(probe.stats.maxOpenRequests, 1);
+  connection.dispose();
+  await pendingThird;
+  assertEquals(probe.stats.abortedRequests, 2);
 });
 
 Deno.test('subscribe re-polls a transient empty first-subscribe (SR2)', async () => {

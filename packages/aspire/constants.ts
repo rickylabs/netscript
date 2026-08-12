@@ -120,7 +120,7 @@ export const RESOURCE_DEFAULTS = {
    *
    * Scaffolded Fresh apps and NetScript service/plugin builders serve this route. Without a
    * registered health check Aspire treats a merely-running process as healthy, so an executable
-   * can show green before its advertised endpoint is ready (#954, #1012).
+   * can show green before its advertised endpoint is ready.
    */
   AppHealthCheckPath: '/health',
 } as const;

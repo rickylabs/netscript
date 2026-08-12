@@ -60,7 +60,7 @@ type ConcurrencySlot = Readonly<{
 
 const RESERVED_KINDS = new Set<TriggerKnownKind>(['queue', 'stream', 'manual']);
 
-/** T1 trigger processor with idempotency, retry, concurrency, DLQ, and circuit breaker handling. */
+/** Trigger processor with idempotency, retry, concurrency, DLQ, and circuit breaker handling. */
 export class TriggerProcessor implements TriggerProcessorPort {
   readonly #idempotency: TriggerIdempotencyPort;
   readonly #dlq: TriggerDlqPort;
@@ -85,7 +85,7 @@ export class TriggerProcessor implements TriggerProcessorPort {
     this.#eventSubscription = options.eventSubscription;
   }
 
-  /** Process a unified trigger event through the T1 pipeline. */
+  /** Process a unified trigger event through the runtime dispatch pipeline. */
   async process<TDefinition extends ProcessableTriggerDefinition>(
     event: TriggerEvent,
     definition: TDefinition,

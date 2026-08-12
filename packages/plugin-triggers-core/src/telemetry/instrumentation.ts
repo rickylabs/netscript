@@ -277,7 +277,7 @@ function triggerAttributes(input: TriggerSpanInput): TriggerTelemetryAttributes 
 }
 
 /**
- * Return the attribute bag with deprecated pre-#402 bare `trigger.*` aliases
+ * Return the attribute bag with deprecated bare `trigger.*` aliases
  * mirrored from their canonical `netscript.trigger.*` keys.
  *
  * Emitted during the deprecation window so consumers keyed on the old names
@@ -299,7 +299,7 @@ function withDeprecatedAliases(
 
 /**
  * Set a span attribute under both its canonical key and, when one exists, the
- * deprecated pre-#402 alias.
+ * deprecated bare alias.
  */
 function setSpanAttribute(
   span: TriggerTelemetrySpan,
