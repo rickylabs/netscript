@@ -7,7 +7,7 @@ import type {
   SagaStateEnvelope,
 } from '../domain/mod.ts';
 
-/** Event types reserved for T3 replay history. */
+/** Event types retained for deterministic saga replay. */
 export type SagaHistoryEventType =
   | 'message-received'
   | 'state-committed'
@@ -15,7 +15,7 @@ export type SagaHistoryEventType =
   | 'signal-received'
   | 'query-served';
 
-/** Event-sourced history record reserved for T3 durability. */
+/** Event-sourced history record retained for deterministic saga replay. */
 export type SagaHistoryEvent<TState extends SagaState = SagaState> = Readonly<{
   sagaId: SagaId;
   instanceId: SagaInstanceId;
@@ -27,7 +27,7 @@ export type SagaHistoryEvent<TState extends SagaState = SagaState> = Readonly<{
   cascaded?: readonly CascadedMessage[];
 }>;
 
-/** Reserved T3 port for deterministic replay and audit history. */
+/** Reserved port for deterministic replay and audit history. */
 export interface SagaHistoryStorePort {
   /** Stable adapter identifier used by runtime diagnostics and plugin registration. */
   readonly id: string;

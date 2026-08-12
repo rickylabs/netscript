@@ -12,8 +12,9 @@
 
 ## Current State
 
-Harness bootstrap and research are complete at the exact dispatch baseline. The source/reference
-edits have not begun. PLAN-EVAL is recorded N/A because the owner contract is complete and bounded.
+Slice 2 source truth and regression work is complete and locally gated. All 26 JSDoc codename
+tokens are fixed; the JSDoc-only test passes and generic identifiers remain untouched. Reference
+alignment is edited but awaits authoritative JSON comparison and the full docs/repo gate set.
 
 ## Completed
 
@@ -21,16 +22,18 @@ edits have not begun. PLAN-EVAL is recorded N/A because the owner contract is co
 - Required skills, harness workflow, doctrine, archetypes, gate matrix, and JSR rubric read.
 - Baseline `deno doc` and exact comment census captured.
 - Source matches classified into JSDoc versus executable strings.
+- Source JSDoc corrected in both packages with no declaration/signature changes.
+- Focused negative test passes (2/2); package check/lint/fmt wrappers pass.
 
 ## In Progress
 
-- Commit/bootstrap push and draft PR opening.
+- Slice 2 commit/push/comment, followed by reference alignment validation.
 
 ## Next Steps
 
-1. Open the draft PR from the bootstrap commit with required labels/milestone.
-2. Edit source JSDoc and add the focused regression test.
-3. Run source gates, align reference tables, then run docs/repo gates.
+1. Commit/push/comment slice 2.
+2. Compare reference descriptions directly with `deno doc --json`.
+3. Run quality, docs, and repository gates; finalize artifacts/PR body.
 
 ## Key Decisions
 
@@ -45,13 +48,16 @@ edits have not begun. PLAN-EVAL is recorded N/A because the owner contract is co
 | Path | Status | Notes |
 | ---- | ------ | ----- |
 | `.llm/runs/docs-1554-codenames--leaf/*` | new | Harness bootstrap, research, plan, design, drift, resumable state. |
+| `packages/plugin-{sagas,triggers}-core/src/**` | changed | JSDoc prose only. |
+| `.llm/tools/fitness/check-public-jsdoc-codenames_test.ts` | new | JSDoc-only recurrence policy test. |
+| `docs/site/reference/plugin-triggers-core/index.md` | changed | Pending JSON-alignment validation. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | pending | — |
-| Fitness | pending | — |
+| Static | slice pass | Focused test and both scoped wrapper trios pass. |
+| Fitness | partial pass | JSDoc census 0; full quality gate pending. |
 | Runtime | N/A | Comments/test only; no behavior change. |
 | Consumer | pending | `deno doc`/reference comparison planned. |
 

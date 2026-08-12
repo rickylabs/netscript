@@ -15,7 +15,7 @@ export type TriggerProcessorStopOptions = Readonly<{
   drainTimeoutMs?: number;
 }>;
 
-/** Processes unified trigger events through the T1 dispatch pipeline. */
+/** Processes unified trigger events through the runtime dispatch pipeline. */
 export interface TriggerProcessorPort {
   /** Process one trigger event against its runtime definition. */
   process<TDefinition extends ProcessableTriggerDefinition>(

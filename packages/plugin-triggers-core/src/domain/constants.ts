@@ -1,7 +1,7 @@
 /** Durability tiers supported by trigger definitions. */
 export const TRIGGER_DURABILITY_TIERS: readonly ['t1', 't2', 't3'] = ['t1', 't2', 't3'];
 
-/** Trigger kinds implemented by the Group F T1 runtime. */
+/** Trigger kinds implemented by the current trigger processor. */
 export const TRIGGER_RUNTIME_KINDS: readonly ['webhook', 'file-watch', 'scheduled'] = [
   'webhook',
   'file-watch',
@@ -15,7 +15,7 @@ export const TRIGGER_RESERVED_KINDS: readonly ['queue', 'stream', 'manual'] = [
   'manual',
 ];
 
-/** Canonical trigger kinds known by Group F. */
+/** Canonical trigger kinds exposed by trigger definitions. */
 export const TRIGGER_KINDS: readonly [
   'webhook',
   'file-watch',
@@ -38,7 +38,7 @@ export const TRIGGER_EVENT_STATUSES: readonly [
   'dlq',
 ] = ['pending', 'in-flight', 'deferred', 'completed', 'failed', 'dlq'];
 
-/** Default durability tier for Group F trigger definitions. */
+/** Default durability tier for trigger definitions. */
 export const DEFAULT_TRIGGER_DURABILITY_TIER: TriggerDurabilityTier = 't1';
 
 /** Default idempotency deduplication window in milliseconds. */
@@ -95,7 +95,7 @@ export const TRIGGERS_ERROR_CODES: readonly [
 /** Trigger durability tier. */
 export type TriggerDurabilityTier = (typeof TRIGGER_DURABILITY_TIERS)[number];
 
-/** Trigger kind implemented by the Group F T1 runtime. */
+/** Trigger kind implemented by the current trigger processor. */
 export type TriggerRuntimeKind = (typeof TRIGGER_RUNTIME_KINDS)[number];
 
 /** Trigger kind reserved for a later runtime group. */

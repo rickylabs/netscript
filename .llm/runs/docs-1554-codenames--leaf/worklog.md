@@ -65,6 +65,9 @@ The policy test walks published-source JSDoc and reports exact file/line finding
 | ---- | ----- | ---- | ----- |
 | 2026-08-12 | 1 | Bootstrap | Created `supervisor.md` first; read live #1554, doctrine, harness, tooling, PR, RTK, and JSR guidance. |
 | 2026-08-12 | 1 | Census | Found 26 JSDoc tokens in 14 files across two packages; classified two executable-string exclusions. |
+| 2026-08-12 | 2 | Source truth | Replaced all 26 JSDoc tokens with mechanism/public-value descriptions; post-edit JSDoc census is zero. |
+| 2026-08-12 | 2 | Regression | Added a focused JSDoc-block test; 2 tests passed, including the generic-identifier exclusion fixture. |
+| 2026-08-12 | 2 | Package gates | Both package wrapper trios passed. Full-export doc-lint commands exited 0 while reporting existing private-type-ref diagnostics (trigger 2, saga 9), all in untouched contract/telemetry/store files. |
 
 ## Decisions
 
@@ -82,7 +85,17 @@ The policy test walks published-source JSDoc and reports exact file/line finding
 
 ## Gate Results
 
-Pending implementation.
+### Slice 2 evidence
+
+| Gate | Result | Evidence |
+| ---- | ------ | -------- |
+| Focused negative test | PASS | 2 passed / 0 failed |
+| Post-edit JSDoc census | PASS | 0 findings (26/26 fixed) |
+| Executable-diff boundary | PASS | `git diff --unified=0 -- packages/plugin-{sagas,triggers}-core` contains comment lines only |
+| Trigger check/lint/fmt wrappers | PASS | 80 files selected; 0 failed batches/findings |
+| Saga check/lint/fmt wrappers | PASS | 111 files selected; 0 failed batches/findings |
+| Trigger full-export doc-lint | PASS with baseline diagnostics | Exit 0; 0 missing JSDoc; 2 private-type-ref in untouched `triggers.contract.ts` |
+| Saga full-export doc-lint | PASS with baseline diagnostics | Exit 0; 0 missing JSDoc; 9 private-type-ref in untouched telemetry/contract/store files |
 
 ## Handoff Notes
 
