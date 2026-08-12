@@ -10,6 +10,7 @@
     "./builders": "./src/application/builders/mod.ts",
     "./route": "./src/application/route/mod.ts",
     "./defer": "./src/application/defer/mod.ts",
+    "./defer/island": "./src/application/defer/island.ts",
     "./form": "./src/application/form/mod.ts",
     "./error": "./src/diagnostics/error/mod.ts",
     "./streams": "./src/runtime/streams/mod.ts",
@@ -31,6 +32,7 @@
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
   "imports": {
+    "@fresh/plugin-vite": "jsr:@fresh/plugin-vite@^1.1.2",
     "@std/assert": "jsr:@std/assert@^1",
     "@std/http": "jsr:@std/http@^1",
     "@std/path": "jsr:@std/path@^1",

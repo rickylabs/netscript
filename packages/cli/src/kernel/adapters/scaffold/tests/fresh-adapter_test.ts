@@ -95,7 +95,10 @@ describe('normalizeFreshOutput', () => {
     assertEquals(config.tasks.build, 'deno run -A npm:vite build');
     assertEquals(config.tasks.serve, 'deno run -A npm:vite preview');
     // Vite and Fresh plugin imports should be added
-    assert(config.imports['@fresh/plugin-vite']);
+    assertEquals(
+      config.imports['@fresh/plugin-vite'],
+      'jsr:@fresh/plugin-vite@^1.1.2',
+    );
     assert(config.imports['vite']);
   });
 

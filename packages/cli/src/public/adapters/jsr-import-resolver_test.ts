@@ -17,6 +17,10 @@ describe('JsrImportResolver', () => {
       netscriptJsrSpecifier('fresh', '/vite'),
     );
     assertEquals(
+      resolver.resolveImport(SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_DEFER_ISLAND),
+      netscriptJsrSpecifier('fresh', '/defer/island'),
+    );
+    assertEquals(
       resolver.resolveImport(SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_UI_INTERACTIVE),
       netscriptJsrSpecifier('fresh-ui', '/interactive'),
     );
