@@ -101,6 +101,9 @@ and coverage diagnostic name any missing path. Do not edit a command list in the
 | 2026-08-12 | S2 | Implement | Added the two-file `COMMAND_REFERENCE_PATHS` gate over the live recursive catalog, exact 91 census, strict structural roots, tokenized direct-parent projection, colon handling, and new-path diagnostics. Added four deploy rows and bounded union-contract corrections in the two corpus pages plus the reference index. |
 | 2026-08-12 | S2 | Toolchain seam | Static imports pulled unrelated existing CLI `isolatedDeclarations` failures into the focused docs test. Switched only module loading to dynamic structural types; runtime still materializes `createPublicCommandRegistry()` through `PublicCliCommandCatalog`, with no source parser or literal verb list. |
 | 2026-08-12 | S2 | Reconcile | PR remains draft and issue #1377 remains open with `Closes #1377` in the PR body. No labels changed; the orchestrator retains lifecycle ownership. |
+| 2026-08-12 | S3 | Publish composition | `publish:dry-run` passed. The immediate raw status check was clean: #1417 produced no manifest or lock churn, so nothing was restored. |
+| 2026-08-12 | S3 | Repository composition | Repeated both scoped wrapper families plus docs links/accuracy; all passed. The full repository suite passed 3,258 tests (622 steps), with 0 failures and 17 ignored. The snippet extractor's real-corpus test explicitly confirmed Lume `_site` output remains excluded. |
+| 2026-08-12 | S3 | Reconcile | Final implementation evidence is complete. PR #1586 remains draft; no `status:` label, ready-state, or merge mutation was performed. Native Opus 5 IMPL-EVAL remains an orchestrator-owned next step on the final immutable head. |
 
 ## Decisions
 
@@ -115,7 +118,7 @@ and coverage diagnostic name any missing path. Do not edit a command list in the
 
 ## Gate Results
 
-All implementation gates are `NOT_RUN` by design in phase 1.
+All planned implementation and composition gates completed after the cycle-2 PLAN-EVAL PASS.
 
 | Gate | Result | Evidence / notes |
 | --- | --- | --- |
@@ -123,7 +126,7 @@ All implementation gates are `NOT_RUN` by design in phase 1.
 | PR-C landed | PASS | `db1d79c68…` is an ancestor of HEAD |
 | Reference arrival coverage | PASS | 35 effective, 35 present under locked alias resolver, 0 missing |
 | PLAN-EVAL | FAIL_PLAN → PASS | Native Opus 5 read-only fallback: cycle 1 failed `5ba4bc339`; cycle 2 passed `706c2bf05`. The generator did not self-evaluate. |
-| Type/lint/fmt/docs/publish/tests | NOT_RUN | Phase 2 only after PLAN-EVAL PASS |
+| Type/lint/fmt/docs/publish/tests | PASS | S1/S2 focused gates and S3 composed gates are recorded below |
 | Raw negative controls | COMPLETE | Missing page exit 1 in S1; missing command exit 1 in S2; diagnostics below |
 
 ### S1 gate evidence
@@ -149,8 +152,32 @@ All implementation gates are `NOT_RUN` by design in phase 1.
 | Scoped docs lint | PASS | 22 files selected; 0 findings |
 | Scoped docs format | PASS | 22 files selected; 0 findings |
 
+### S3 composed gate evidence
+
+| Gate | Result | Evidence / notes |
+| --- | --- | --- |
+| Docs accuracy | PASS | 91/91 root/direct commands from 149 recursive paths; baseline peer-dependency warning remained non-verdict |
+| Docs links | PASS | 102 docs; 0 broken links, 0 broken anchors, 0 enforced orphans |
+| Scoped release check/lint/format | PASS | 42 files selected per wrapper; 0 findings in each |
+| Scoped docs check/lint/format | PASS | 22 files selected per wrapper; 0 findings in each |
+| Publish dry-run | PASS, exit 0 | `rtk proxy deno task publish:dry-run`; dry run completed successfully |
+| Immediate post-dry-run status | PASS | Raw `git status --short` was empty; no catalog-backed manifest churn and no `deno.lock` churn occurred |
+| Repository tests | PASS, exit 0 | `rtk proxy deno task test` — 3,258 passed (622 steps), 0 failed, 17 ignored in 8m46s |
+| Snippet `_site` exclusion | PASS | Repository suite ran `site analysis excludes Lume build output without shrinking source coverage`; it passed |
+
+### Raw negative-control evidence
+
+The controls invoked the exported production audits directly, one seeded failure at a time. They
+were not tests that converted an expected failure into exit 0.
+
+| Control | Raw result | Diagnostic |
+| --- | --- | --- |
+| Published package without reference page | exit 1 | `@netscript/published docs/site/reference/published/index.md [docs-reference] docs-site reference page is required` |
+| Live-tree subcommand absent from locked two-file corpus | exit 1 | `public command reference covers 90/91; missing netscript deploy uninstall` |
+
 ## Handoff Notes
 
-- Evaluator should verify the exact two-file corpus, structural root plus tokenized path matching,
-  exact 91 equality, and bounded four-row ownership satisfy B1–B3 without expanding into #1108.
-- No implementation file has been edited.
+- Native Opus 5 IMPL-EVAL should verify the exact two-file corpus, structural root plus tokenized
+  path matching, exact 91 equality, bounded four-row ownership, and both raw exit-1 controls.
+- The PR remains draft. The orchestrator owns the IMPL-EVAL dispatch, any `status:` transition, and
+  the ready/merge decision.
