@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertStringIncludes } from '@std/assert';
 import { join } from '@std/path';
 import { scanCodeQuality } from './scan-code-quality.ts';
 
@@ -140,4 +140,147 @@ Deno.test('type-fixture exemption requires both its directory and suffix', async
     'ts-error-suppression',
     'ts-error-suppression',
   ]);
+});
+
+Deno.test('scanner reports TypeScript findings inside docs/site fences at source lines', async () => {
+  const root = await Deno.makeTempDir();
+  const docsDir = join(root, 'docs/site/reference/example');
+  await Deno.mkdir(docsDir, { recursive: true });
+  await Deno.writeTextFile(
+    join(docsDir, 'index.md'),
+    ['# Example', '', '```ts', 'const unsafe = value as any;', '```'].join('\n'),
+  );
+
+  assertEquals(await scanCodeQuality(['docs/site'], root), [{
+    rule: 'unsafe-cast',
+    file: 'docs/site/reference/example/index.md',
+    line: 4,
+    text: 'const unsafe = value as any;',
+    fenceOrdinal: 1,
+  }]);
+});
+
+Deno.test('scanner respects extractor exemptions and scans docs test companions', async () => {
+  const root = await Deno.makeTempDir();
+  const docsDir = join(root, 'docs/site/reference/example');
+  await Deno.mkdir(docsDir, { recursive: true });
+  await Deno.writeTextFile(
+    join(docsDir, 'index.md'),
+    ['```ts no-check: intentionally incomplete fragment', 'const exempt = value as any;', '```']
+      .join('\n'),
+  );
+  await Deno.writeTextFile(
+    join(docsDir, 'examples_test.ts'),
+    'const unsafe: any = value;\n',
+  );
+
+  assertEquals(await scanCodeQuality(['docs/site'], root), [{
+    rule: 'explicit-any',
+    file: 'docs/site/reference/example/examples_test.ts',
+    line: 1,
+    text: 'const unsafe: any = value;',
+  }]);
+});
+
+Deno.test('soundness fixtures exempt negative-type directives but no other quality rule', async () => {
+  const root = await Deno.makeTempDir();
+  const fixtureDir = join(root, 'packages/contracts/tests/contracts');
+  await Deno.mkdir(fixtureDir, { recursive: true });
+  await Deno.writeTextFile(
+    join(fixtureDir, 'contract-soundness_test.ts'),
+    [
+      '// @ts-expect-error - intentional negative type assertion',
+      'const expectedFailure: string = 1;',
+      'const stillUnsafe: any = value;',
+    ].join('\n'),
+  );
+
+  assertEquals(await scanCodeQuality(['packages'], root), [{
+    rule: 'explicit-any',
+    file: 'packages/contracts/tests/contracts/contract-soundness_test.ts',
+    line: 3,
+    text: 'const stillUnsafe: any = value;',
+  }]);
+});
+
+Deno.test('all six repository soundness fixtures retain their explicit scanner exemption', async () => {
+  const soundnessFiles: string[] = [];
+  for (const root of ['packages', 'plugins']) {
+    for await (const entry of Deno.readDir(root)) {
+      if (!entry.isDirectory) continue;
+      const pending = [join(root, entry.name)];
+      while (pending.length > 0) {
+        const directory = pending.pop()!;
+        for await (const child of Deno.readDir(directory)) {
+          const path = join(directory, child.name);
+          if (child.isDirectory) pending.push(path);
+          else if (child.isFile && child.name.endsWith('-soundness_test.ts')) {
+            soundnessFiles.push(path);
+          }
+        }
+      }
+    }
+  }
+
+  assertEquals(soundnessFiles.length, 6);
+  assertEquals(await scanCodeQuality(soundnessFiles), []);
+});
+
+Deno.test('explicit-any ignores comment-only prose but catches code before trailing comments', async () => {
+  const root = await Deno.makeTempDir();
+  const source = join(root, 'packages/sdk/src/comment-awareness.ts');
+  await Deno.mkdir(join(root, 'packages/sdk/src'), { recursive: true });
+  await Deno.writeTextFile(
+    source,
+    [
+      '// Heuristic: any exported contract must remain typed.',
+      '/* any value described in prose */',
+      'const unsafe: any = value; // any trailing explanation',
+    ].join('\n'),
+  );
+
+  assertEquals(await scanCodeQuality(['packages'], root), [{
+    rule: 'explicit-any',
+    file: 'packages/sdk/src/comment-awareness.ts',
+    line: 3,
+    text: 'const unsafe: any = value; // any trailing explanation',
+  }]);
+});
+
+Deno.test('quality tools consume the shared docs extractor and contain no fence parser', async () => {
+  const scanner = await Deno.readTextFile('.llm/tools/quality/scan-code-quality.ts');
+  assertStringIncludes(scanner, "from '../docs/snippet-extractor.ts'");
+
+  for await (const entry of Deno.readDir('.llm/tools/quality')) {
+    if (!entry.isFile || !entry.name.endsWith('.ts') || entry.name.endsWith('_test.ts')) continue;
+    const source = await Deno.readTextFile(join('.llm/tools/quality', entry.name));
+    assertEquals(source.includes('OPENING_FENCE'), false, entry.name);
+    assertEquals(source.includes('REASONED_MARKER'), false, entry.name);
+    assertEquals(/`\{3,\}|~\{3,\}/.test(source), false, entry.name);
+  }
+});
+
+Deno.test('scanner CLI fails when an allowance fixture exceeds --max-allow', async () => {
+  const root = await Deno.makeTempDir();
+  const fixture = join(root, 'allowed.ts');
+  await Deno.writeTextFile(
+    fixture,
+    'const boundary: any = value; // quality-allow: fixture proves budget overflow\n',
+  );
+  const output = await new Deno.Command(Deno.execPath(), {
+    cwd: root,
+    args: [
+      'run',
+      '--allow-read',
+      join(Deno.cwd(), '.llm/tools/quality/scan-code-quality.ts'),
+      '--changed-file',
+      fixture,
+      '--max-allow',
+      '0',
+    ],
+  }).output();
+
+  assertEquals(output.code, 1);
+  const result = JSON.parse(new TextDecoder().decode(output.stdout));
+  assertEquals(result.allowLimitExceeded, { limit: 0, count: 1 });
 });
