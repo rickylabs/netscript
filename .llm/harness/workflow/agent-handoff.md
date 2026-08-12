@@ -20,19 +20,25 @@ Preferred formal-phase triggers:
 - PLAN-EVAL: `openhands` + `status:plan-eval`, with at most one optional `eval:model:*` override,
 - IMPL-EVAL: draft→ready, with at most one optional `eval:model:*` override or the attributed
   `impl-eval:skip` waiver,
-- phase rerun: move away from and back to the phase's eval status (`openhands` remains required
-  only for PLAN-EVAL),
+- phase rerun: move away from and back to the phase's eval status (`openhands` remains required only
+  for PLAN-EVAL),
 
 Manual/non-phase compatibility triggers:
 
 - label `fix-me` or an approved open `agent:*` profile; `openhands` directly on issues only,
-- comment `@openhands-agent model=<provider/model> output=<mode> ...`,
+- comment with command line `@openhands-agent model=<provider/model> output=<mode>`, followed by the
+  prose prompt on the next line,
 - commit message `[openhands model=<provider/model> output=<mode>] ...`,
 - manual `OpenHands Agent` workflow dispatch.
 
-For harness work, prefer `.llm/tools/agentic/openhands/dispatch-openhands.ts` with explicit provider, model,
-and effort selected from `workflow/lane-policy.md`. The legacy triggers above are transport syntax,
-not canonical routing policy.
+Manual comment grammar is intentionally strict: the command token must be the first token of the
+first line, every remaining first-line field must be a unique recognized `name=value` argument, and
+the prose prompt must begin on a following line. Malformed, unknown, or duplicate first-line
+arguments are refused without dispatch.
+
+For harness work, prefer `.llm/tools/agentic/openhands/dispatch-openhands.ts` with explicit
+provider, model, and effort selected from `workflow/lane-policy.md`. The legacy triggers above are
+transport syntax, not canonical routing policy.
 
 The canonical details live in `AGENTS-handoff.md` and `.agents/skills/openhands-handoff/SKILL.md`.
 
@@ -41,8 +47,8 @@ The canonical details live in `AGENTS-handoff.md` and `.agents/skills/openhands-
 - The phrase `use harness` still activates the normal harness run loop.
 - PLAN-EVAL and IMPL-EVAL remain separate sessions. A cloud OpenHands run can perform one of those
   roles, but it must not self-certify work it generated in the same session.
-- Cloud agents must update the normal run artifacts under `.llm/runs/<run-id>/` when the task is
-  a harness run.
+- Cloud agents must update the normal run artifacts under `.llm/runs/<run-id>/` when the task is a
+  harness run.
 - The OpenHands workflow summary artifact is additional handoff evidence, not a replacement for
   `worklog.md`, `evaluate.md`, or `drift.md`.
 - If a cloud run discovers plan drift, it records drift in the harness artifact first, then reports
@@ -65,7 +71,8 @@ This **replaces** the older ad-hoc `.llm/tmp/run/openhands/…` and `.llm/tmp/op
 paths: those remain git-ignored per-run scratch only and are never the harness verdict of record.
 The workflow still posts the summary comment back to the issue or PR unless output mode is
 `summary-only`. Dispatch the run and read its verdict through the agentic suite
-(`.llm/tools/agentic/openhands/dispatch-openhands.ts`, `.llm/tools/agentic/openhands/openhands-status.ts`).
+(`.llm/tools/agentic/openhands/dispatch-openhands.ts`,
+`.llm/tools/agentic/openhands/openhands-status.ts`).
 
 For review-comment response loops:
 
