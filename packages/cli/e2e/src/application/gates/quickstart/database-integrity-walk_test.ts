@@ -1,6 +1,10 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { join } from '@std/path';
-import { pgDataFromEnv, resolvePgDataPath } from './database-integrity-walk.ts';
+import {
+  pgDataFromEnv,
+  resolvePgDataPath,
+  verifyPgDataAfterTeardown,
+} from './database-integrity-walk.ts';
 
 Deno.test('pgDataFromEnv reads PGDATA from docker inspect Env', () => {
   assertEquals(
@@ -80,6 +84,19 @@ Deno.test('resolvePgDataPath fails closed when pg_control is absent', async () =
       Error,
       'no global/pg_control',
     );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('verifyPgDataAfterTeardown reports setup-not-created without a second failure', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const actual: unknown = await verifyPgDataAfterTeardown(root);
+    assertEquals(actual, {
+      verdict: 'skipped',
+      message: 'PGDATA integrity skipped: setup state was never created.',
+    });
   } finally {
     await Deno.remove(root, { recursive: true });
   }

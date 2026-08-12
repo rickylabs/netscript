@@ -1,6 +1,7 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import {
   ASPIRE_TIMEOUT_CLASSIFICATION,
+  AspireCommandFailure,
   type AspireCommandResult,
   runBoundedAspireWalk,
 } from '../../../src/application/gates/quickstart/aspire-walk.ts';
@@ -35,19 +36,37 @@ Deno.test('bounded Aspire walk classifies restore timeout with #1227 and stops',
     ASPIRE_TIMEOUT_CLASSIFICATION.RESTORE,
   );
   assertEquals(error.message, ASPIRE_TIMEOUT_CLASSIFICATION.RESTORE);
+  assertEquals((error as AspireCommandFailure).exitCode, 124);
   assertEquals(calls, 1);
+});
+
+Deno.test('bounded Aspire walk preserves canceled restore exit 6 for centralized retry', async () => {
+  const error = await assertRejects(
+    () =>
+      runBoundedAspireWalk('/project/aspire/apphost.mts', '/project', 1, () =>
+        Promise.resolve({
+          ...PASS,
+          code: 6,
+          stderr: 'Failed to prepare: A task was canceled.',
+        })),
+    AspireCommandFailure,
+    'aspire restore failed (6)',
+  );
+  assertEquals(error.exitCode, 6);
 });
 
 Deno.test('bounded Aspire walk classifies start timeout independently', async () => {
   let calls = 0;
-  await assertRejects(
+  const error = await assertRejects(
     () =>
       runBoundedAspireWalk('/project/aspire/apphost.mts', '/project', 1, () => {
         calls++;
         return Promise.resolve(calls === 2 ? { ...PASS, code: 124, timedOut: true } : PASS);
       }),
-    Error,
+    AspireCommandFailure,
     ASPIRE_TIMEOUT_CLASSIFICATION.START,
   );
+  // Start/wait failures keep their independent diagnostics but are not restore-retry candidates.
+  assertEquals(error.exitCode, 1);
   assertEquals(calls, 2);
 });

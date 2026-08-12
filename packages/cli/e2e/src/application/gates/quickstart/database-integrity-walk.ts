@@ -19,6 +19,13 @@ interface IntegrityState {
 }
 
 const STATE_FILE = '.netscript-quickstart-pgdata.json';
+export const PGDATA_SETUP_NOT_CREATED_EXIT_CODE = 78;
+export const PGDATA_SETUP_NOT_CREATED_MESSAGE =
+  'PGDATA integrity skipped: setup state was never created.';
+
+export type PgDataVerificationResult =
+  | { readonly verdict: 'passed' }
+  | { readonly verdict: 'skipped'; readonly message: string };
 
 /** Run the documented DB workflow while proving one resident container owns PGDATA. */
 export async function runDatabaseIntegrityWalk(
@@ -77,9 +84,19 @@ export async function runDatabaseIntegrityWalk(
 }
 
 /** After Aspire teardown, validate the same PGDATA checkpoint without starting a postmaster. */
-export async function verifyPgDataAfterTeardown(projectRoot: string): Promise<void> {
+export async function verifyPgDataAfterTeardown(
+  projectRoot: string,
+): Promise<PgDataVerificationResult> {
   const statePath = resolve(projectRoot, STATE_FILE);
-  const state = JSON.parse(await Deno.readTextFile(statePath)) as IntegrityState;
+  let state: IntegrityState;
+  try {
+    state = JSON.parse(await Deno.readTextFile(statePath)) as IntegrityState;
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) {
+      return { verdict: 'skipped', message: PGDATA_SETUP_NOT_CREATED_MESSAGE };
+    }
+    throw error;
+  }
   const pgDataPath = state.pgDataPath ??
     await resolvePgDataPath({
       image: state.image,
@@ -104,6 +121,7 @@ export async function verifyPgDataAfterTeardown(projectRoot: string): Promise<vo
       if (!(error instanceof Deno.errors.NotFound)) throw error;
     });
   }
+  return { verdict: 'passed' };
 }
 
 export interface ResolvePgDataOptions {
@@ -285,6 +303,11 @@ if (import.meta.main) {
   const [mode, projectRoot, cliSpecifier] = Deno.args;
   if (!projectRoot) throw new Error('mode and projectRoot are required');
   if (mode === 'run' && cliSpecifier) await runDatabaseIntegrityWalk(projectRoot, cliSpecifier);
-  else if (mode === 'verify') await verifyPgDataAfterTeardown(projectRoot);
-  else throw new Error(`unknown database integrity mode: ${mode}`);
+  else if (mode === 'verify') {
+    const result = await verifyPgDataAfterTeardown(projectRoot);
+    if (result.verdict === 'skipped') {
+      console.info(result.message);
+      Deno.exitCode = PGDATA_SETUP_NOT_CREATED_EXIT_CODE;
+    }
+  } else throw new Error(`unknown database integrity mode: ${mode}`);
 }

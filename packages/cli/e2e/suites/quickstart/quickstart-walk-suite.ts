@@ -8,8 +8,13 @@ import type { GateDefinition } from '../../src/domain/gate-definition.ts';
 import type { RunContext, RunOptions } from '../../src/domain/run-context.ts';
 import type { SuiteDefinition } from '../../src/domain/suite-definition.ts';
 import { defaultRunOptions } from '../../src/application/builders/workspace/suite-builder-options.ts';
+import {
+  PGDATA_SETUP_NOT_CREATED_EXIT_CODE,
+  PGDATA_SETUP_NOT_CREATED_MESSAGE,
+} from '../../src/application/gates/quickstart/database-integrity-walk.ts';
 
 const ASPIRE_STEP_TIMEOUT_MS = 180_000;
+const ASPIRE_RESTORE_MAX_RETRIES = 2;
 
 /** Ordered executable commands mirrored by the Quickstart page. */
 export const QUICKSTART_DOCUMENTED_COMMANDS = [
@@ -164,6 +169,12 @@ function createQuickstartGates(): readonly GateDefinition[] {
         String(ASPIRE_STEP_TIMEOUT_MS),
       ],
       (context) => context.project.projectRoot,
+      undefined,
+      undefined,
+      {
+        classes: ['timeout', 'canceled'],
+        maxRetries: ASPIRE_RESTORE_MAX_RETRIES,
+      },
     ),
     commandGate(
       GATE.QUICKSTART_DATABASE,
@@ -208,11 +219,13 @@ function createQuickstartGates(): readonly GateDefinition[] {
 }
 
 function createPgDataIntegrityGate(): GateDefinition {
-  return commandGate(
-    GATE.QUICKSTART_DATABASE_INTEGRITY,
-    'Validate resident Postgres PGDATA after Aspire teardown',
-    GATE_PHASE.CLEANUP,
-    (context) => [
+  return {
+    id: GATE.QUICKSTART_DATABASE_INTEGRITY,
+    title: 'Validate resident Postgres PGDATA after Aspire teardown',
+    phase: GATE_PHASE.CLEANUP,
+    kind: 'command',
+    critical: true,
+    command: (context) => [
       'deno',
       'run',
       '--allow-run=docker',
@@ -225,6 +238,10 @@ function createPgDataIntegrityGate(): GateDefinition {
       'verify',
       context.project.projectRoot,
     ],
-    (context) => context.project.projectRoot,
-  );
+    cwd: (context) => context.project.projectRoot,
+    skip: {
+      exitCode: PGDATA_SETUP_NOT_CREATED_EXIT_CODE,
+      message: PGDATA_SETUP_NOT_CREATED_MESSAGE,
+    },
+  };
 }

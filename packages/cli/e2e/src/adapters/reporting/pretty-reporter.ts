@@ -13,6 +13,7 @@ export class PrettyReporter implements Reporter {
       await write(`> ${event.gateId}: ${event.title}\n`);
     } else if (event.type === 'gate-end') {
       await this.output(formatVerdict(event.result));
+      if (event.result.message) await this.output(indent(event.result.message));
       if (event.result.verdict === 'failed') {
         if (event.result.error) await this.output(indent(event.result.error));
         const command = event.result.evidence.find((item) => item.kind === 'command');

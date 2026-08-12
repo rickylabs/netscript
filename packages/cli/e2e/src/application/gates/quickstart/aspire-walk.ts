@@ -13,6 +13,14 @@ export interface AspireCommandResult {
   readonly timedOut: boolean;
 }
 
+/** Failure from one bounded Aspire subprocess, including the wrapper's exit code. */
+export class AspireCommandFailure extends Error {
+  constructor(message: string, readonly exitCode: number) {
+    super(message);
+    this.name = 'AspireCommandFailure';
+  }
+}
+
 /** Runs one Aspire command with a deadline. */
 export type AspireCommandRunner = (
   command: readonly string[],
@@ -34,6 +42,7 @@ export async function runBoundedAspireWalk(
     timeoutMs,
     ASPIRE_TIMEOUT_CLASSIFICATION.RESTORE,
     run,
+    true,
   );
   await requireAspireSuccess(
     ['aspire', 'start', '--apphost', appHost, '--non-interactive', '--nologo'],
@@ -41,6 +50,7 @@ export async function runBoundedAspireWalk(
     timeoutMs,
     ASPIRE_TIMEOUT_CLASSIFICATION.START,
     run,
+    false,
   );
   await requireAspireSuccess(
     [
@@ -60,6 +70,7 @@ export async function runBoundedAspireWalk(
     timeoutMs,
     ASPIRE_TIMEOUT_CLASSIFICATION.WAIT,
     run,
+    false,
   );
 }
 
@@ -69,11 +80,17 @@ async function requireAspireSuccess(
   timeoutMs: number,
   timeoutClassification: string,
   run: AspireCommandRunner,
+  retryableRestore: boolean,
 ): Promise<void> {
   const result = await run(command, cwd, timeoutMs);
-  if (result.timedOut) throw new Error(timeoutClassification);
+  if (result.timedOut) {
+    throw new AspireCommandFailure(timeoutClassification, retryableRestore ? 124 : 1);
+  }
   if (result.code !== 0) {
-    throw new Error(`${command[0]} ${command[1]} failed (${result.code}): ${result.stderr}`);
+    throw new AspireCommandFailure(
+      `${command[0]} ${command[1]} failed (${result.code}): ${result.stderr}`,
+      retryableRestore ? result.code : 1,
+    );
   }
   if (result.stdout) console.info(result.stdout);
 }
@@ -112,5 +129,14 @@ async function runAspireCommand(
 if (import.meta.main) {
   const [appHost, projectRoot, timeout] = Deno.args;
   if (!appHost || !projectRoot) throw new Error('appHost and projectRoot are required');
-  await runBoundedAspireWalk(appHost, projectRoot, Number(timeout));
+  try {
+    await runBoundedAspireWalk(appHost, projectRoot, Number(timeout));
+  } catch (error) {
+    if (error instanceof AspireCommandFailure) {
+      console.error(error.message);
+      Deno.exitCode = error.exitCode;
+    } else {
+      throw error;
+    }
+  }
 }

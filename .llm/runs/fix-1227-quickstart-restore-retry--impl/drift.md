@@ -10,3 +10,15 @@
 - **Action:** accept the newer baseline and reuse the working mechanism; do not reimplement it.
 - **Evidence:** `origin/main@7aa4aadfd`; `command-gate_test.ts` retry tests.
 
+## 2026-08-12 — package test task is cwd-sensitive
+
+- **What:** The required `deno task --cwd packages/cli test` command fails three tests that use
+  repo-root-relative docs/script paths.
+- **Source:** Exact package task output.
+- **Expected:** Package task green.
+- **Actual:** 791 passed / 3 failed; root-cwd `deno test --allow-all --quiet packages/cli` passes
+  794/794, including every changed test.
+- **Severity:** minor.
+- **Action:** report; do not expand this P0 retry slice into unrelated test-path cleanup.
+- **Evidence:** failures in `run-documented-stream-example_test.ts`,
+  `service-env-gates_test.ts`, and `quickstart-command-drift_test.ts`.
