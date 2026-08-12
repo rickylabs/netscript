@@ -160,8 +160,9 @@ evaluates Codex-authored work; Codex GPT-5.6 Sol high (PLAN) or xhigh (IMPL) eva
 Claude-authored work. The generator session never evaluates itself.
 
 The phase-bound OpenRouter presets remain available only for a genuine third opinion or when the
-native opposite-family route is quota-blocked: Minimax M3 high for PLAN-EVAL and DeepSeek V4 Flash
-0731 max for IMPL-EVAL. If that escalation hits an OpenRouter limit, the final fallback is a fresh
+native opposite-family route is quota-blocked: Minimax M3 high for PLAN-EVAL, DeepSeek V4 Flash
+0731 max for small/simple IMPL-EVAL, and Qwen 3.8 Max for broader or complex IMPL-EVAL. If that
+escalation hits an OpenRouter limit, the final fallback is a fresh
 AGY Gemini 3.6 Flash high session on the Google subscription. OpenHands is reserved for explicitly
 cloud-driven work.
 

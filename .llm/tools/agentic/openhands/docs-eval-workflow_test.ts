@@ -1,4 +1,20 @@
 import { assert, assertEquals } from '@std/assert';
+import { OPEN_EVALUATOR_MODEL_IDS } from '../config/models.ts';
+
+Deno.test('generic OpenHands is fail-closed to current open evaluator models', async () => {
+  const workflow = await Deno.readTextFile('.github/workflows/openhands-agent.yml');
+  for (const model of OPEN_EVALUATOR_MODEL_IDS) {
+    const liteLlmModel = `openrouter/${model}`;
+    assert(
+      workflow.includes(`'${liteLlmModel}'`),
+      `missing approved OpenHands model ${liteLlmModel}`,
+    );
+  }
+  assert(workflow.includes('default: qwen'));
+  assert(!workflow.includes("['sonnet', 'anthropic/claude-sonnet-4']"));
+  assert(!workflow.includes("['gpt', 'openai/gpt-5.1']"));
+  assert(!workflow.includes("['gemini', 'gemini/gemini-2.5-pro']"));
+});
 
 type Event = {
   kind: 'ready_for_review' | 'comment' | 'synchronize' | 'labeled';

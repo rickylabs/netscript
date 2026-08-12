@@ -30,7 +30,8 @@ required summary artifacts keep local and cloud agents synchronized.
 
 OpenHands is **not** the evaluator for local runs. Two hard rules:
 
-1. **OpenHands runs OPEN models only** — e.g. `minimax/minimax-m3`, `qwen/qwen3.8-max`. NEVER
+1. **OpenHands runs OPEN models only** — MiniMax M3 for PLAN-EVAL, DeepSeek V4 Flash 0731 for
+   small/simple IMPL-EVAL, and Qwen 3.8 Max for broader/complex IMPL-EVAL. NEVER
    dispatch OpenHands with a closed/paid model (Claude/`sonnet`, GPT/`gpt`, Gemini/`gemini`). Closed
    models on OpenHands route through paid OpenRouter/LiteLLM credit and can silently burn the
    owner's balance — this is prohibited.
@@ -69,7 +70,7 @@ the supervisor decide — never self-certify.
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Actions agent    | `.github/workflows/openhands-agent.yml`, used for short cloud runs.                                                                                                          |
 | VPS session      | Long-running OpenHands Web UI/SDK deployment from `ops/openhands/docker-compose.yml`.                                                                                        |
-| Model profile    | OPEN models only (e.g. `minimax/minimax-m3`, `qwen/qwen3.8-max`). Closed models (`sonnet`/`gpt`/`gemini`) are PROHIBITED on OpenHands — see the routing policy above.        |
+| Model profile    | OPEN models only: MiniMax M3 (PLAN), DeepSeek V4 Flash 0731 (small IMPL), Qwen 3.8 Max (broader/complex IMPL). Closed models are PROHIBITED on OpenHands.        |
 | Literal model    | Any LiteLLM-compatible `provider/model` string supplied with `model=...`.                                                                                                    |
 | Provider secret  | `LLM_API_KEY_<PROVIDER>`, inferred from the model prefix, with `LLM_API_KEY` fallback.                                                                                       |
 | Output mode      | `pr-comment`, `respond-comments`, `thread-replies`, or `summary-only`.                                                                                                       |

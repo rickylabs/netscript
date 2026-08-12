@@ -82,12 +82,12 @@ on:
       model_profile:
         description: Model profile to use when model is empty.
         required: false
-        default: sonnet
+        default: qwen
         type: choice
         options:
-          - sonnet
-          - gpt
-          - gemini
+          - qwen
+          - minimax
+          - deepseek
       target_pr:
         description: Optional PR number to inspect/comment on.
         required: false
@@ -146,7 +146,7 @@ jobs:
       issues: write # acknowledge + final status comments
       pull-requests: write # draft PR for non-PR triggers, review-thread replies
     env:
-      DEFAULT_OPENHANDS_MODEL: ${{ vars.OPENHANDS_DEFAULT_MODEL || 'anthropic/claude-sonnet-4' }}
+      DEFAULT_OPENHANDS_MODEL: ${{ vars.OPENHANDS_DEFAULT_MODEL || 'openrouter/qwen/qwen3.8-max' }}
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
@@ -170,10 +170,9 @@ jobs:
             const eventName = context.eventName;
 
             const modelProfiles = new Map([
-              ['sonnet', 'anthropic/claude-sonnet-4'],
-              ['gpt', 'openai/gpt-5.1'],
-              ['gemini', 'gemini/gemini-2.5-pro'],
-              ['openrouter', 'openrouter/anthropic/claude-sonnet-4'],
+              ['qwen', 'openrouter/qwen/qwen3.8-max'],
+              ['minimax', 'openrouter/minimax/minimax-m3'],
+              ['deepseek', 'openrouter/deepseek/deepseek-v4-flash-0731'],
             ]);
 
             const labels = new Set();
@@ -282,6 +281,14 @@ jobs:
               || paramText;
 
             const selectedModel = pickModel();
+            const allowedModels = new Set([
+              'openrouter/minimax/minimax-m3',
+              'openrouter/deepseek/deepseek-v4-flash-0731',
+              'openrouter/qwen/qwen3.8-max',
+            ]);
+            if (!allowedModels.has(selectedModel)) {
+              throw new Error(`OpenHands model is not in the approved open-evaluator allowlist: ${selectedModel}`);
+            }
             core.setOutput('model', selectedModel);
             core.setOutput('provider', inferProvider(selectedModel));
             core.setOutput('output_mode', outputMode);
