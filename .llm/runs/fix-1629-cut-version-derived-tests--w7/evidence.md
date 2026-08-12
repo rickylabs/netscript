@@ -4,6 +4,25 @@ This file records pre-fix discriminators, implementation gates, and the disposab
 release-cut rehearsal. Every verdict block below includes the complete command summary and exit
 status; no verdict line is elided.
 
+## Provenance correction
+
+The line `Release version coherence: FAIL (expected 0.0.5; 3 of 3 manifests mismatch)` is not a
+release-cut failure. It is expected post-test output from the passing negative control `release
+version coherence reports every coordinated manifest mismatch` in
+`.llm/tools/release/assert-release-version_test.ts`. This slice does not modify that test, its
+intentional `0.0.4`/`0.0.5` data, or the coherence mechanism.
+
+## Version-literal scope audit
+
+| Location | Touched literal | Why derived or fixed |
+| --- | --- | --- |
+| `netscript-web-runtime-closure_test.ts` split diagnostic | active `fresh` and version-list expectations | Derived: the corresponding fixture inputs call `jsr(..., NETSCRIPT_RELEASE_VERSION)`; the fixed `0.0.6-canary.3` mismatch side remains unchanged. |
+| `netscript-web-runtime-closure_test.ts` range diagnostic | `^<active>` expectation | Derived: the input constructs the range from `NETSCRIPT_RELEASE_VERSION`. |
+| `generators-config_test.ts` split and range diagnostics | active-side expectations | Derived: the injected resolver constructs those exact inputs from `NETSCRIPT_RELEASE_VERSION`; fixed canary data remains unchanged. |
+| `dependency-closure-verifier_test.ts` split and range diagnostics | active-side expectations | Derived: the generated verifier fixture inputs use `NETSCRIPT_RELEASE_VERSION`; fixed canary data remains unchanged. |
+| `dependency-closure-verifier_test.ts` coherent local graph | fixed `0.0.5` input and output | Fixed: this isolated synthetic graph tests coherence for arbitrary local data, not the checkout release. Restored unchanged after refinement audit. |
+| `.llm/tools/release/assert-release-version_test.ts` | fixed `0.0.4`/`0.0.5` mismatch controls | Fixed and untouched: these literals define the passing negative control cited in the provenance correction. |
+
 ## Pre-fix red — arbitrary coordinated bump
 
 Disposable copy `/tmp/netscript-1629-prefix.6YQXIY/repo` at bootstrap commit `cb12adb29`:
@@ -116,6 +135,41 @@ the root workspace import/catalog contract into the temporary project, and calls
 each export target. It therefore cannot convert a real missing first-party package/export into a
 green result.
 
+One shared test-only seam, `useLocalWorkspaceImports`, serves every affected family. Call-site
+ordering was audited after the orchestrator refinement:
+
+| Affected path | Seam placement before execution that resolves first-party imports |
+| --- | --- |
+| control-plane module probe | after fixture import-map creation, before generated module inspection/import |
+| public AI registry closure | before generated-source import resolution and `deno check` |
+| public forced reinstall | before `loadConfig` and `loadRegisteredPlugins` |
+| local contributor install | before generated route `deno check` |
+| AI `--no-samples` CLI integration | before the install command, hence before install-time config/plugin loading |
+
+The seam lives only under `packages/cli/tests/support/` and is imported only by test modules; no
+consumer or product code path calls it. No exit-78 or named-exclusion behavior was introduced.
+
+Refinement audit gate after restoring the intentional fixed local-graph fixture:
+
+```text
+$ deno test --allow-all <eight affected test modules>
+generated closure verifier rejects split JSR identities with version-bearing output ... ok
+generated closure verifier fails closed on a range pin ... ok
+generated closure verifier accepts one coherent local package graph ... ok
+first-party control-plane modules are import-safe and preserve application barrels ... ok
+installs the AI markdown registry closure into its generated namespace ... ok
+keeps the configured AI module resolvable across a forced reinstall ... ok
+keeps the plugin-owned AI namespace configured in local-source installs ... ok
+cut-local imports fail closed when a first-party export target is missing ... ok
+plugin install ai --no-samples omits samples and type-checks the generated workspace ... ok
+ok | 35 passed (55 steps) | 0 failed (22s)
+exit: 0
+
+$ deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --root plugins/ai --ext ts,tsx
+{"command":"deno fmt --check","cwd":"/home/codex/repos/ns006-w7","mode":"check","summary":{"filesSelected":917,"batches":5,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+exit: 0
+```
+
 ```text
 $ deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx
 {"command":"deno fmt --check","cwd":"/home/codex/repos/ns006-w7","mode":"check","summary":{"filesSelected":878,"batches":5,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
@@ -152,6 +206,11 @@ $ deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages
 {"source":{"mode":"selection","cwd":"/home/codex/repos/ns006-w7"},"command":"deno check --unstable-kv <files>","selection":{"filesSelected":878,"batches":8,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
 exit: 0
 ```
+
+The static/fitness commands were rerun after the owner refinement with the same verdicts: check
+2917 files / 25 batches / 0 diagnostics; lint 2034 files / 0 findings; format 2034 files / 0
+findings; focused CLI check 878 files / 8 batches / 0 diagnostics; `quality:gate` exit 0 with no
+new quality findings and no architecture FAIL findings.
 
 The full live-tree test gate completed before the last two-line fixture hookup; that hookup then
 passed its focused test above, and the final bumped-tree full suite below exercises the complete

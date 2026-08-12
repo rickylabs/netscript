@@ -93,7 +93,8 @@ Deno.test('generated closure verifier accepts one coherent local package graph',
         join(packageRoot, 'deno.json'),
         JSON.stringify({
           name: packageName,
-          version: NETSCRIPT_RELEASE_VERSION,
+          // This is synthetic coherent-graph data, not the checkout's active release version.
+          version: '0.0.5',
           exports: './mod.ts',
         }),
       );
@@ -108,7 +109,7 @@ Deno.test('generated closure verifier accepts one coherent local package graph',
     const output = await runVerifier(fixture);
     const stdout = new TextDecoder().decode(output.stdout);
     assert(output.success, new TextDecoder().decode(output.stderr));
-    assertStringIncludes(stdout, `exact release ${NETSCRIPT_RELEASE_VERSION} (local)`);
+    assertStringIncludes(stdout, 'exact release 0.0.5 (local)');
   } finally {
     await Deno.remove(root, { recursive: true });
   }

@@ -60,10 +60,12 @@ cut-local fixture helper only for tests that intentionally exercise pre-publish 
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-13 | 1 | research/design | Re-baselined issue against requested base; PLAN-EVAL N/A because the issue fully enumerates contract, exclusions, discriminators, and gates. |
-| 2026-08-13 | 2 | red/green | Disposable 0.0.7 bump produced six literal-version assertion failures; all now interpolate `NETSCRIPT_RELEASE_VERSION`. |
+| 2026-08-13 | 2 | red/green | Disposable 0.0.7 bump produced six literal-version assertion failures; only expectations paired with active-version-derived inputs now interpolate `NETSCRIPT_RELEASE_VERSION`. |
 | 2026-08-13 | 3 | red/green | Temporary cut projects now import every real first-party manifest export from the checkout and inherit root catalog/imports; 34 targeted tests/55 steps pass. |
 | 2026-08-13 | 3 | decisive correction | First disposable full run exposed the standalone AI `--no-samples` fixture applying local aliases too late; moved the shared mapper before install and its focused test passed. |
 | 2026-08-13 | 4 | gates/proof | Final static, lint, format, quality, and focused CLI checks passed. A fresh disposable 0.0.7 cut dry-run and full suite passed 3386/3386 tests. |
+| 2026-08-13 | refinement | provenance/scope audit | Retracted the coherence negative-control failure claim, confirmed that test is untouched, restored the verifier's intentional fixed `0.0.5` coherent-local fixture, and audited all shared local-resolution seam placements. |
+| 2026-08-13 | refinement | focused/static gates | 35 affected tests/55 steps pass; check, lint, fmt, quality, and focused CLI check all exit 0. |
 
 ## Decisions
 
@@ -71,14 +73,14 @@ cut-local fixture helper only for tests that intentionally exercise pre-publish 
 | --- | --- | --- |
 | PLAN-EVAL N/A | Small bounded correctness fix with owner-enumerated properties and no open architectural decision. | issue #1629 / run-loop §4 |
 | Automatic IMPL-EVAL only | Owner controls draft→ready and explicitly prohibited this session from flipping. | user directive |
-| Version fixtures interpolate the generated CLI version | Inputs and expectations share the exercised manifest authority. | targeted bumped-copy failures |
+| Only active-derived expectations interpolate the generated CLI version | Each touched expectation has a corresponding input built from `NETSCRIPT_RELEASE_VERSION`; historical/mismatch/canary fixtures remain fixed. | targeted bumped-copy failures + refinement literal audit |
 | Local helper validates every export target | A missing package/export remains an immediate `NotFound`, while existing range/split guards stay unchanged. | `local-workspace-imports_test.ts` |
 
 ## Drift
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
-| None | minor | no |
+| Owner refined version-literal scope and retracted one cited failure provenance; one unnecessary interpolation in a synthetic local fixture was restored. | minor | yes |
 
 ## Gate Results
 
@@ -91,6 +93,7 @@ cut-local fixture helper only for tests that intentionally exercise pre-publish 
 | `deno task quality:gate` | PASS — no quality findings; architecture gate exited 0 |
 | focused `packages/cli` check | PASS — 878 files, 8 batches, 0 diagnostics |
 | disposable 0.0.7 cut + full test | PASS — dry-run skipped branch/commit/push/PR; 3386 tests, 0 failed |
+| refinement audit | PASS — 35 affected tests/55 steps; static/fitness gates refreshed after restoring fixed fixture |
 
 ## Handoff Notes
 

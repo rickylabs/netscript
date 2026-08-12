@@ -17,6 +17,10 @@ mapping derives all first-party export aliases from manifests, carries root cata
 fails on missing targets. Final gates are green, including a fresh disposable 0.0.7 release-cut
 dry-run and full 3386-test suite with zero failures.
 
+The refinement audit confirms interpolation is limited to expectations paired with active-derived
+inputs. Intentional fixed historical/mismatch/canary fixtures remain fixed, including the untouched
+release-coherence negative control and the restored synthetic coherent-local-graph `0.0.5` fixture.
+
 ## Completed
 
 - Harness/CLI/release/tools/PR/RTK/doctrine/JSR instructions loaded.
@@ -25,15 +29,17 @@ dry-run and full 3386-test suite with zero failures.
 - Pre-fix arbitrary-bump failures recorded and version assertions corrected.
 - All cut-local plugin install fixtures use the shared manifest-derived workspace mapper.
 - Requested gates and the final disposable 0.0.7 proof passed.
+- Owner refinement audited: coherence provenance corrected; shared test-only seam and call ordering
+  verified; no exit-78/product fallback exists.
 
 ## In Progress
 
-- Final evidence commit, PR body, and acceptance mirror validation.
+- Refinement gate rerun, evidence commit, and draft PR narrative update.
 
 ## Next Steps
 
-1. Commit and push final evidence.
-2. Update the draft PR body and validate acceptance mappings.
+1. Run the focused verifier and final disposable bumped-tree proof after restoring fixed fixture data.
+2. Commit/push the refinement evidence and update the draft PR narrative.
 3. Stop without changing draft state or labels.
 
 ## Key Decisions

@@ -38,7 +38,8 @@ strictness for range pins, split identities, and missing packages.
 ## Scope
 
 - Add discriminating regression coverage that is red on the baseline.
-- Replace literal active-version expectations with tree-derived expectations.
+- Replace only expectations whose corresponding fixture inputs already come from the active tree
+  version; preserve fixed historical/mismatch fixture versions.
 - Make cut-like real plugin-install/import probes resolve first-party modules from local workspace
   sources in an explicitly test-scoped way.
 - Preserve published-consumer strictness and prove it with negative assertions.
@@ -60,7 +61,7 @@ strictness for range pins, split identities, and missing packages.
 
 | ID | Decision | Rationale |
 | --- | --- | --- |
-| D1 | Derive diagnostic expectations from `NETSCRIPT_RELEASE_VERSION`. | It is generated from the exercised CLI manifest and avoids a second source of truth. |
+| D1 | Derive a diagnostic expectation from `NETSCRIPT_RELEASE_VERSION` only when its corresponding input is already derived from that active version. | It avoids a second source of truth without erasing intentional historical, mismatch, or canary fixture data. |
 | D2 | Localize first-party resolution only in cut/test fixtures. | The release tree exists locally before publication; published-consumer behavior must remain registry-strict. |
 | D3 | Keep explicit negative tests for range, split, and missing identities. | A green bump alone cannot distinguish a fix from disabled validation. |
 
@@ -122,4 +123,3 @@ strictness for range pins, split identities, and missing packages.
 ## Drift Watch
 
 - Any required production behavior change, package-doctor edit, or agent-doc change triggers rescope.
-
