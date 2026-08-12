@@ -18,7 +18,7 @@ export interface ScaffoldServicePlan {
   readonly port: number;
   /**
    * Aspire host port to pin, set only when `--service-port` was passed.
-   * Undefined by default so `aspire start --isolated` can allocate (#952).
+   * Undefined by default so `aspire start --isolated` can allocate it.
    */
   readonly hostPort?: number;
 }

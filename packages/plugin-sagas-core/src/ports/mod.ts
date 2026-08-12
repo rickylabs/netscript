@@ -2,7 +2,7 @@
  * @module @netscript/plugin-sagas-core/ports
  *
  * Consumed contracts for saga bus, transport, storage, clocks, transactional
- * outbox delivery, replay history, and agent runtime integration.
+ * outbox delivery, replay history, and reserved agent runtime integration.
  */
 
 export {

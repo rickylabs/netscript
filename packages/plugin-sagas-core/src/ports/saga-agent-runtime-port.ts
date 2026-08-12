@@ -3,7 +3,7 @@ import type { SagaContext } from '../domain/mod.ts';
 /** Branded AI agent identifier reserved for the future agent plugin. */
 export type SagaAgentId<TId extends string = string> = TId & { readonly __brand: 'SagaAgentId' };
 
-/** Branded agent conversation identifier for durable agent history. */
+/** Branded agent conversation identifier reserved for durable agent history. */
 export type SagaAgentConversationId<TId extends string = string> = TId & {
   readonly __brand: 'SagaAgentConversationId';
 };
@@ -11,7 +11,7 @@ export type SagaAgentConversationId<TId extends string = string> = TId & {
 /** Agent input payload accepted by the reserved agent runtime axis. */
 export type SagaAgentInput = Readonly<Record<string, unknown>>;
 
-/** Serialized agent runtime state retained in durable history. */
+/** Serialized agent runtime state reserved for durable history. */
 export type SagaAgentRuntimeState = Readonly<Record<string, unknown>>;
 
 /** Agent step result emitted back into saga orchestration. */

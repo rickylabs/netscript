@@ -36,7 +36,8 @@
 
 ### Constants
 
-- No runtime constants change. The test owns only its forbidden JSDoc regexes and publish roots.
+- No runtime constants change. The test owns only its forbidden JSDoc regexes, publish roots, and
+  exclusions for non-published test/fixture source plus JSDoc code contexts.
 
 ### Commit Slices
 
@@ -49,8 +50,9 @@
 ### Deferred Scope
 
 - Executable Zod/template strings — prohibited by the comments-only boundary.
-- Broader semantic classifier for every possible internal planning phrase — would inflate into its
-  own tool; the measured codename class is locked here.
+- A semantic classifier for arbitrary planning phrases outside the enumerated
+  group/phase/wave/epic, tier/wave shorthand, and issue-number forms — that would inflate into its
+  own tool; the issue-defined class is locked here.
 - MCP agent-docs regeneration — issue #1531 owns it.
 
 ### Contributor Path
@@ -71,6 +73,11 @@ The policy test walks published-source JSDoc and reports exact file/line finding
 | 2026-08-12 | 2 | Reconcile | Pushed `05108d655`, posted the slice evidence to draft PR #1587, and rechecked live issue/PR state. |
 | 2026-08-12 | 3 | Reference truth | Six trigger reference summaries match root `deno doc --json` byte-for-byte; saga root JSON has zero internal terms and its page needs no edit. CLI's page likewise contains no stale term. |
 | 2026-08-12 | 3 | Full gates | Quality, snippets, links, accuracy, and repository tests all exited 0. Snippets scanned 578 blocks and did not inspect/fail on `_site`. |
+| 2026-08-12 | 4 | FALLBACK IMPL-EVAL | Received `FAIL_FIX` at `944dbbe07`: the earlier `Group X`/`Tn` census did not prove the full issue-defined class. Tier wording judgement was upheld and left unchanged. |
+| 2026-08-12 | 4 | Guard red proof | Widened the predicate before source fixes. The focused guard exited 1 with 52 findings: 48 issue-number references, three phase names, and one wave name across 24 files in seven publish roots. |
+| 2026-08-12 | 4 | Source truth | Replaced all 52 findings by mechanism, restored `reserved` on the four saga agent-axis descriptions, and aligned the stale `SagaStorePort` reference row to `deno doc`. |
+| 2026-08-12 | 4 | Guard green proof | Focused guard exited 0 with 2 passed / 0 failed after formatting; code-context fixtures cover `@template T1`, inline generics/links, and fenced examples. |
+| 2026-08-12 | 4 | Full revalidation | Seven scoped check/lint/fmt wrapper trios, seven doc-lint roots, quality, all docs gates, and 3,255 repository tests exited 0. |
 
 ## Decisions
 
@@ -85,6 +92,8 @@ The policy test walks published-source JSDoc and reports exact file/line finding
 | ----- | -------- | ------------------ |
 | Census expands dispatch's examples to 26 JSDoc tokens | minor | yes |
 | Two executable-string matches cannot change under comments-only authority | significant | yes |
+| Fallback evaluation expands the measured class by 52 JSDoc tokens | blocking, fixed | yes |
+| The source correction exposed one stale saga reference-table row | minor, fixed | yes |
 
 ## Gate Results
 
@@ -93,22 +102,56 @@ The policy test walks published-source JSDoc and reports exact file/line finding
 | Gate | Result | Evidence |
 | ---- | ------ | -------- |
 | Focused negative test | PASS | 2 passed / 0 failed |
-| Post-edit JSDoc census | PASS | 0 findings (26/26 fixed) |
-| Executable-diff boundary | PASS | `git diff --unified=0 -- packages/plugin-{sagas,triggers}-core` contains comment lines only |
+| Post-edit original-pattern census | PASS | 0 findings for `Group [A-Z]` / `Tn` (26/26 fixed) |
+| Executable-diff boundary | PASS | `git diff --unified=0 -- packages plugins` contains comment lines only across all seven touched publish roots |
 | Trigger check/lint/fmt wrappers | PASS | 80 files selected; 0 failed batches/findings |
 | Saga check/lint/fmt wrappers | PASS | 111 files selected; 0 failed batches/findings |
 | Trigger full-export doc-lint | PASS with baseline diagnostics | Exit 0; 0 missing JSDoc; 2 private-type-ref in untouched `triggers.contract.ts` |
 | Saga full-export doc-lint | PASS with baseline diagnostics | Exit 0; 0 missing JSDoc; 9 private-type-ref in untouched telemetry/contract/store files |
 
-### Final codename census
+### Final issue-defined census
 
 | Measure | Count | Notes |
 | ------- | ----- | ----- |
-| JSDoc tokens found | 26 | 9 `Group X`, 17 `Tn`; 14 files; 2 packages |
-| JSDoc tokens fixed | 26 | Trigger core 12; saga core 14 |
-| JSDoc tokens remaining | 0 | Proved by focused scanner and independent final census |
-| Raw executable-string exclusions | 2 | Saga Zod description (`T1`); CLI generated CONTRIBUTING template (`Group B`) |
-| Real generic-type-parameter matches | 0 | No repository source occurrence matched the measured pattern as a generic; regression fixture proves generic `T1`/`T2` identifiers are excluded from the JSDoc policy. |
+| Original narrow-pattern tokens found/fixed | 26 | 9 `Group X`, 17 `Tn`; 14 files; 2 packages |
+| Fallback class-expansion tokens found/fixed | 52 | 48 issue refs, 3 phase names, 1 wave name; 24 files; 7 roots |
+| Total published-JSDoc tokens found/fixed | 78 | Enumerated workstream-name, tier/wave shorthand, and issue-number class |
+| Published-JSDoc tokens remaining | 0 | Proved by the widened focused scanner after formatting and in the repository suite |
+| Raw executable-string exclusions | 3 | Saga Zod description (`T1`); CLI generated CONTRIBUTING template (`Group B`); CLI agent-docs error text (`#1068`) |
+| Real generic-type-parameter matches | 0 | No publish-source generic matched; fixtures prove `@template T1`, inline `Pair<T1, T2>`, links, and fenced examples are excluded. |
+| Non-JSDoc source-comment exclusions | 14 | Raw sweep finds ordinary `//` planning references; they do not render through `deno doc` and are outside the published-JSDoc acceptance surface. |
+
+The widened pattern class is: title-cased `Group`/`Phase`/`Wave`/`Epic` planning labels,
+exact `Tn` and `Wn` shorthand, and `#n`/`netscript#n` issue references. The scanner walks
+non-generated `.ts`/`.tsx` JSDoc in package/plugin `src`, excluding publish-config-equivalent
+test, E2E, and fixture paths. It ignores JSDoc tag lines, `@example` bodies/fences, inline code,
+and inline JSDoc links so generic identifiers are not treated as planning prose.
+
+### Fallback guard proof
+
+Before the 52 source fixes, the widened guard returned exit 1 and named all findings. The decisive
+tail was:
+
+```text
+packages/cli/src/kernel/application/registries/preset-registry.ts:11 Wave 6
+packages/plugin-sagas-core/src/ports/saga-bus-port.ts:19 Phase 7d
+packages/plugin-sagas-core/src/ports/saga-bus-port.ts:26 Phase 7d
+packages/fresh/src/application/form/runtime/intent.ts:81 Phase A
+... plus 48 #n/netscript#n JSDoc references across CLI, config, service,
+    plugin-triggers-core, fresh, and plugins/streams
+FAILED | 1 passed | 1 failed
+error: Test failed
+```
+
+After the fixes and formatting, the same command returned exit 0:
+
+```text
+running 2 tests from ./.llm/tools/fitness/check-public-jsdoc-codenames_test.ts
+published JSDoc excludes internal workstream codenames ... ok
+published JSDoc codename scan flags prose and ignores JSDoc code contexts ... ok
+
+ok | 2 passed | 0 failed
+```
 
 ### Final gate table
 
@@ -126,9 +169,26 @@ The policy test walks published-source JSDoc and reports exact file/line finding
 | `deno task test` | PASS (exit 0) | Repository test run includes the new two-case JSDoc policy suite |
 | Diff/lock hygiene | PASS | `git diff --check` clean; `deno.lock` unchanged; package diff is comments only |
 
+### Fallback revalidation
+
+| Gate | Result | Output / notes |
+| ---- | ------ | -------------- |
+| Widened JSDoc guard | PASS after proved red | Red: 1 passed / 1 failed with 52 findings; green: 2 passed / 0 failed |
+| Seven check wrappers | PASS | CLI 861, config 34, Fresh 188, saga 111, trigger 80, service 45, streams 54 files; 0 failed batches/findings |
+| Seven lint wrappers | PASS | Same roots; 0 failed batches/findings |
+| Seven fmt wrappers | PASS | Same roots; 0 failed batches/findings |
+| Seven doc-lint roots | PASS (exit 0) | CLI/config/service clean; existing Fresh 44, saga 9, trigger 2, streams 2 diagnostics remain in untouched declarations |
+| `deno doc --json` / saga reference | PASS | Store, signal, and query descriptions match source; stale `SagaStorePort` table row corrected |
+| `quality:gate` | PASS | Code-quality scan 0 findings; doctrine warnings only |
+| `docs:snippets` | PASS | scanned=578, checked=21, malformed=0; no `_site` regression |
+| `docs:links` | PASS | docs=102, broken links/anchors/orphans=0 |
+| `docs:accuracy` | PASS | 4 saga pages and 196 published-source pages checked |
+| `deno task test` | PASS | 3,255 passed (622 steps), 0 failed, 17 ignored in 5m23s |
+| Diff/lock hygiene | PASS | Package/plugin diff contains comment lines only; `git diff --check` clean; `deno.lock` unchanged |
+
 ## Handoff Notes
 
-- Evaluator should inspect the final comment census, executable-diff proof, and `deno doc`/reference
-  comparison first.
+- Evaluator should inspect the fallback red/green guard proof, expanded 78-token census,
+  executable-diff proof, and `deno doc`/reference comparison first.
 - No occurrence was left because its meaning was uncertain; every JSDoc replacement traces to the
-  declaration/runtime mechanism. Only the two explicitly out-of-authority executable strings remain.
+  declaration/runtime mechanism. Only the three explicitly out-of-authority executable strings remain.

@@ -6,8 +6,8 @@
  * map onto the canonical ops as: `build` → `plan`/`emit`, `install` → `up`,
  * `uninstall` → `down`. `status`, `logs`, `rollback`, and `secrets` are net-new
  * lifecycle ops the legacy 3-op seed did not have. `rollback`/`secrets` bodies
- * land with the deployment hardening slice (#341); until then adapters may
- * declare them unsupported (omit the method) rather than provide a silent no-op.
+ * are reserved for deployment hardening; adapters may declare them unsupported
+ * (omit the method) rather than provide a silent no-op.
  */
 export type DeployOperation =
   | 'plan'
@@ -115,9 +115,9 @@ export interface DeployTargetPort {
   readonly status?: DeployTargetOperationHandler;
   /** Stream or tail deployment logs for this target. */
   readonly logs?: DeployTargetOperationHandler;
-  /** Roll the deployment back to a previous revision (bodies → #341). */
+  /** Reserved operation for rolling a deployment back to a previous revision. */
   readonly rollback?: DeployTargetOperationHandler;
-  /** Reconcile deployment secrets for this target (bodies → #341). */
+  /** Reserved operation for reconciling deployment secrets for this target. */
   readonly secrets?: DeployTargetOperationHandler;
 
   /** Legacy alias of `plan`/`emit`: build deployment assets for this target. */

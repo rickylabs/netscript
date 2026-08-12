@@ -82,7 +82,7 @@ export interface DiscoveredService {
   readonly runtime: 'deno';
   /**
    * Pinned Aspire host port, when the entry pins one. Undefined means Aspire
-   * allocates the port at start-up — the default since #952.
+   * allocates the port at start-up, which is the default.
    */
   readonly port?: number;
   /** Service entrypoint relative to workdir. */

@@ -56,3 +56,24 @@ Package split:
 - A compact source-policy test is warranted by explicit acceptance and does not require a new
   standalone tool. It will parse JSDoc blocks only, so generic parameters and executable literals
   are deliberate exclusions.
+
+## Fallback re-baseline at `944dbbe07`
+
+The fallback evaluator upheld every original replacement but demonstrated that the measured regex
+was narrower than #1554's class. The regression predicate was therefore widened before source
+changes to cover:
+
+- title-cased `Group` / `Phase` / `Wave` / `Epic` planning labels;
+- exact `Tn` tier and `Wn` wave shorthand;
+- bare `#n` and `netscript#n` issue references in JSDoc prose.
+
+The required red run found 52 additional tokens in 24 files across CLI, config, Fresh, service,
+plugin-sagas-core, plugin-triggers-core, and the streams plugin. Classification was 48 issue
+references, `Phase 7d` twice, `Phase A` once, and `Wave 6` once. All 52 were reworded by mechanism.
+Combined with the earlier 26-token sweep, the issue-defined JSDoc census is 78 found, 78 fixed,
+0 remaining.
+
+The scanner now excludes publish-config-equivalent test, E2E, fixture, and generated files. Within
+JSDoc it excludes tag lines, `@example` bodies/fences, inline code, and inline links; the test fixture
+proves `@template T1`, `Pair<T1, T2>`, and `{@link T1}` are not treated as planning prose. The raw
+repository sweep found no real generic type-parameter occurrence in the publish source.
