@@ -1275,7 +1275,7 @@ jobs:
             const destination = phase === 'plan'
               ? verdict === 'PASS' ? 'status:impl' : 'status:plan'
               : verdict === 'PASS'
-              ? 'status:ready-merge'
+              ? 'status:augment-review'
               : ['FAIL_RESCOPE', 'FAIL_PLAN'].includes(verdict)
               ? 'status:plan'
               : 'status:impl';

@@ -46,7 +46,7 @@ function nextStatus(
 ): string | null {
   if (verdict === 'NONE') return null;
   if (phase === 'plan') return verdict === 'PASS' ? 'status:impl' : 'status:plan';
-  if (verdict === 'PASS') return 'status:ready-merge';
+  if (verdict === 'PASS') return 'status:augment-review';
   return verdict === 'FAIL_RESCOPE' || verdict === 'FAIL_PLAN' ? 'status:plan' : 'status:impl';
 }
 
@@ -118,7 +118,7 @@ Deno.test('formal verdicts advance or return the harness status deterministicall
   assertEquals(nextStatus('plan', 'PASS'), 'status:impl');
   assertEquals(nextStatus('plan', 'FAIL_PLAN'), 'status:plan');
   assertEquals(nextStatus('plan', 'FAIL_RESCOPE'), 'status:plan');
-  assertEquals(nextStatus('impl', 'PASS'), 'status:ready-merge');
+  assertEquals(nextStatus('impl', 'PASS'), 'status:augment-review');
   assertEquals(nextStatus('impl', 'FAIL_FIX'), 'status:impl');
   assertEquals(nextStatus('impl', 'FAIL_DEBT'), 'status:impl');
   assertEquals(nextStatus('impl', 'FAIL_RESCOPE'), 'status:plan');
@@ -143,7 +143,7 @@ Deno.test('workflow source encodes trusted, exactly-once phase dispatch', async 
   assertStringIncludes(phase, 'name: selectedLabel');
   assertStringIncludes(runner, "steps.request.outputs.eval_phase != ''");
   assertStringIncludes(runner, "steps.request.outputs.eval_phase == ''");
-  assertStringIncludes(runner, "'status:ready-merge'");
+  assertStringIncludes(runner, "'status:augment-review'");
   assertStringIncludes(runner, 'pr.head.sha !== evaluatedHead');
   assertStringIncludes(
     runner,
