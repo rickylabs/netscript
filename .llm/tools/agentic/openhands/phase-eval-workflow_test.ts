@@ -181,6 +181,24 @@ Deno.test('generic OpenHands stays fail-closed to current open evaluator models'
   assert(!workflow.includes("['gemini', 'gemini/gemini-2.5-pro']"));
 });
 
+Deno.test('generic OpenHands delegates comment authorization to the tested policy module', async () => {
+  const workflow = await Deno.readTextFile('.github/workflows/openhands-agent.yml');
+  assertStringIncludes(workflow, 'id: policy');
+  assertStringIncludes(
+    workflow,
+    "'.trigger-policy-trusted/.github/scripts/openhands-comment-trigger.mjs'",
+  );
+  assertStringIncludes(workflow, 'const { evaluateOpenHandsCommentTrigger } = await import(');
+  assertStringIncludes(workflow, 'const decision = evaluateOpenHandsCommentTrigger({');
+  assertStringIncludes(workflow, "if: needs.authorize.outputs.dispatch == 'true'");
+  assertStringIncludes(
+    workflow,
+    'MANUAL_TRIGGER_LINE: ${{ needs.authorize.outputs.trigger_line }}',
+  );
+  assert(!workflow.includes('contains(github.event.comment.body'));
+  assert(!workflow.includes("line.includes('@openhands-agent')"));
+});
+
 Deno.test('formal evaluator prompts are trusted read-only harness contracts', async () => {
   for (
     const path of [

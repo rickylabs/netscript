@@ -1,16 +1,17 @@
 # OpenHands Agent (v2) — cloud agent runner for NetScript.
 #
-# Public trigger contract (unchanged from v1; extend, don't break):
-#   - `@openhands-agent [model=<litellm-id>] [provider=<name>] [output=<mode>]
-#      [iterations=<n>]` in a PR/issue comment from OWNER/MEMBER/COLLABORATOR.
+# Public manual-comment trigger contract:
+#   - The command token is the first token of the first line, followed only by recognized
+#     `name=value` arguments, in a PR/issue comment from OWNER/MEMBER/COLLABORATOR.
+#   - Any prompt starts on the following line. Quoted commands and prose mentions do not dispatch.
 #   - workflow_dispatch with explicit inputs.
 #   - `fix-me` / `agent:<profile>` labels on issues/PRs; `openhands` directly on issues.
 #     On PRs, `openhands` is reserved for the formal phase dispatcher.
 #   - `[openhands ...]` in a pushed commit message.
 #
 # Parameter parsing (hardened vs v1): for comment triggers, `key=value` params
-# are read ONLY from the trigger line itself (the first line containing
-# `@openhands-agent`), never from the prompt body below it. Template/example
+# are read ONLY from the trigger line authorized by openhands-comment-trigger.mjs,
+# never from the prompt body below it. Template/example
 # text in a dispatched prompt (e.g. "output=pr-comment" inside instructions, or
 # `[VERDICT: <verdict>]` placeholders) can no longer hijack the run parameters.
 # Label- and push-triggered runs keep the legacy body/commit-message scan since
@@ -131,17 +132,61 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  agent:
+  authorize:
     if: |
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'push' && contains(github.event.head_commit.message, '[openhands')) ||
       (github.event_name == 'issue_comment' &&
-        contains(github.event.comment.body, '@openhands-agent') &&
         contains(fromJson('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)) ||
       ((github.event_name == 'issues' || github.event_name == 'pull_request') &&
         (github.event.label.name == 'fix-me' ||
          (github.event.label.name == 'openhands' && github.event_name == 'issues') ||
          startsWith(github.event.label.name, 'agent:')))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      dispatch: ${{ steps.policy.outputs.dispatch }}
+      trigger_line: ${{ steps.policy.outputs.trigger_line }}
+    steps:
+      - name: Check out trusted manual-trigger policy
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          path: .trigger-policy-trusted
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Evaluate trusted manual-trigger policy
+        id: policy
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          script: |
+            if (context.eventName !== 'issue_comment') {
+              core.setOutput('dispatch', 'true');
+              core.setOutput('trigger_line', '');
+              return;
+            }
+            const path = require('path');
+            const { pathToFileURL } = require('url');
+            const policyPath = path.join(
+              process.env.GITHUB_WORKSPACE,
+              '.trigger-policy-trusted/.github/scripts/openhands-comment-trigger.mjs',
+            );
+            const { evaluateOpenHandsCommentTrigger } = await import(
+              pathToFileURL(policyPath).href
+            );
+            const decision = evaluateOpenHandsCommentTrigger({
+              body: context.payload.comment?.body,
+              authorAssociation: context.payload.comment?.author_association,
+            });
+            core.setOutput('dispatch', String(decision.dispatch));
+            core.setOutput('trigger_line', decision.triggerLine);
+            core.notice(`Manual comment policy: ${decision.reason}`);
+
+  agent:
+    needs: authorize
+    if: needs.authorize.outputs.dispatch == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 300
     permissions:
@@ -165,6 +210,7 @@ jobs:
           DISPATCH_OUTPUT_MODE: ${{ inputs.output_mode }}
           DISPATCH_ITERATIONS: ${{ inputs.iterations }}
           DEFAULT_OPENHANDS_MODEL: ${{ env.DEFAULT_OPENHANDS_MODEL }}
+          MANUAL_TRIGGER_LINE: ${{ needs.authorize.outputs.trigger_line }}
         with:
           script: |
             const payload = context.payload;
@@ -190,8 +236,9 @@ jobs:
             // Label/push triggers have no trigger line and keep the legacy
             // body/commit-message scan.
             const commentBody = payload.comment?.body ?? '';
-            const triggerLine =
-              commentBody.split('\n').find((line) => line.includes('@openhands-agent')) ?? '';
+            const triggerLine = eventName === 'issue_comment'
+              ? process.env.MANUAL_TRIGGER_LINE ?? ''
+              : '';
             const paramText = triggerLine || [
               payload.head_commit?.message,
               payload.issue?.body,
