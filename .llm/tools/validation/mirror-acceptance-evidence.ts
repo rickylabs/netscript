@@ -45,6 +45,11 @@ const MAX_MIRROR_ATTEMPTS = 2;
 
 type ClosingReferenceClassification = 'issue' | 'pull request' | 'lookup failed';
 
+/** Explains how to refresh the CI-owned mirror after the ready label is applied. */
+export function readyLabelRepairNotice(): string {
+  return `Mirror skipped because live PR labels do not include ${READY_LABEL}; apply the label, then rerun the existing CI workflow with "gh run rerun <run-id>" so its live reads observe the label without moving the evaluated head.`;
+}
+
 /** Selects mirror targets from resolved classifications without performing network access. */
 export function closingMirrorIssues(
   numbers: readonly number[],
@@ -102,7 +107,7 @@ async function main(): Promise<void> {
       issues: snapshots,
       warnings: [
         ...classified.notices,
-        `Mirror skipped because live PR labels do not include ${READY_LABEL}; apply the label and the labeled event triggers a fresh run (labels are read live, so a manual rerun also works).`,
+        readyLabelRepairNotice(),
       ],
     }, options.pretty);
     return;

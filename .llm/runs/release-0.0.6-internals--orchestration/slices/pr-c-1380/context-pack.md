@@ -5,8 +5,8 @@
 Draft PR #1585 contains green S1 and S2 changes. The repo gate uses the discovered-root path; the
 doctrine verdict/archetype tables measure the same 36 roots; the provenance, debt, gated-set,
 engineering-reference, and RFC-location records have executable content tests. S3 corrects the
-close-gate rerun guidance and its Claude mirror. The complete requested gate matrix is green; the
-branch is ready for parent-orchestrator review while remaining draft.
+close-gate rerun guidance and its Claude mirror. A live acceptance preflight found and corrected the
+same stale claim in the mirror's own notice. The complete matrix must be rerun on that final repair.
 
 ## Completed
 

@@ -61,6 +61,7 @@ Update top-level units, then run the doctrine contract tests; the measured table
 | 2026-08-12 | S2 | Measurement + doc contracts | Doctrine 06/10 now enumerate 36 roots; removed-row provenance, debt closure, gated-set exclusion, dated reference plan, and RFC mapping are executable documentation contracts. |
 | 2026-08-12 | S3 | Operator guidance + mirror | Source/mirrored skill and close-gate hint now require rerunning existing CI after labeling, without a verdict-invalidating push. |
 | 2026-08-12 | S4 | Final gate matrix | All requested gates passed on source head `bef1d9b4806b04da51d0120de6d9df08f0699bde`; this evidence-only update is the final planned commit. |
+| 2026-08-12 | S3b | Live-preflight drift repair | Acceptance-mirror dry-run exposed the same stale labeled-event claim; notice and regression test corrected without workflow changes. |
 
 ## Decisions
 
@@ -72,7 +73,8 @@ Update top-level units, then run the doctrine contract tests; the measured table
 
 ## Drift
 
-None as of S1.
+Minor D-1: the live acceptance-mirror notice repeated R-11's stale labeled-event claim. Fixed in S3b
+and recorded in `drift.md`.
 
 ## Gate Results
 
