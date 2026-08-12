@@ -28,7 +28,7 @@ recorded N/A; the orchestrator owns the separate native Opus 5 read-only IMPL-EV
 
 ## In Progress
 
-- Commit/push the immutable implementation head and publish the implementation evidence comment.
+- None in this implementation session; the draft PR is handed back to the orchestrator.
 
 ## Next Steps
 
@@ -76,4 +76,5 @@ recorded N/A; the orchestrator owns the separate native Opus 5 read-only IMPL-EV
 
 ## Commits
 
-- See draft PR #1608 commit list + per-slice comments.
+- `73ed851d3` — activate the harness run and draft PR.
+- `26b759023` — implement, regenerate, and validate the corpus freshness gate.

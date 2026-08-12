@@ -62,6 +62,7 @@ Update `docs/site`, run `deno task gen:agent-docs-prose`, then run
 | 2026-08-12 | 1 | Regeneration | Rebuilt the corpus and both CLI/MCP embedded generated assets. The after census is zero `api-clients` and zero `@contracts`; provenance now identifies commit `73ed851d3` and 178 files. |
 | 2026-08-12 | 1 | Negative proof | Added one temporary sentence to `docs/site/ai/agent-tooling.md` without regenerating. `deno task check:agent-docs-prose` returned raw exit `1`; restored the page and reran the check green. No `docs/site` or `deno.lock` diff remains. |
 | 2026-08-12 | 1 | Validation | Focused/scoped checks and corpus gates pass. `docs:links` retains two base-existing broken doctrine anchors. Root tests finish with 3300 passed and two failures: one base-existing JSDoc codename and one refreshed-corpus ranking mismatch outside this leaf's content-selection scope. |
+| 2026-08-12 | 1 | Commit/handoff | Committed implementation as `26b759023`, pushed with the required explicit refspec, and posted the structured IMPL evidence comment to draft PR #1608. |
 
 ## Decisions
 
