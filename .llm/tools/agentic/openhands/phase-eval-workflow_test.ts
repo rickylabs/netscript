@@ -141,10 +141,12 @@ Deno.test('workflow source encodes trusted, exactly-once phase dispatch', async 
   assertStringIncludes(phase, '@openhands-agent model=${model}');
   assertStringIncludes(phase, 'head=${pr.head.sha}');
   assertStringIncludes(phase, 'name: selectedLabel');
+  assertStringIncludes(phase, 'github-token: ${{ secrets.PAT_TOKEN }}');
   assertStringIncludes(runner, "steps.request.outputs.eval_phase != ''");
   assertStringIncludes(runner, "steps.request.outputs.eval_phase == ''");
   assertStringIncludes(runner, "'status:augment-review'");
   assertStringIncludes(runner, 'pr.head.sha !== evaluatedHead');
+  assertStringIncludes(runner, 'github-token: ${{ secrets.PAT_TOKEN }}');
   assertStringIncludes(
     runner,
     "label.name == 'openhands' && github.event_name == 'issues'",

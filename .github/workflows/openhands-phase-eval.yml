@@ -70,7 +70,9 @@ jobs:
         if: env.SKIP_IMPL != 'true' && github.event.action == 'ready_for_review'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # This transition must use the same chainable token as dispatch. Repository Actions
+          # policy may make GITHUB_TOKEN read-only even when workflow permissions request writes.
+          github-token: ${{ secrets.PAT_TOKEN }}
           script: |
             const owner = context.repo.owner;
             const repo = context.repo.repo;

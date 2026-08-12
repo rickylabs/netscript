@@ -1245,9 +1245,11 @@ jobs:
           EVAL_HEAD: ${{ steps.request.outputs.eval_head }}
           VERDICT: ${{ steps.finalize.outputs.verdict }}
         with:
-          # GITHUB_TOKEN label writes deliberately do not emit recursive workflow triggers. A
-          # maintainer retriggers by moving away from and back to the phase status label.
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # Use the chainable repository token: this repository may issue a read-only
+          # GITHUB_TOKEN. Destination statuses do not match a phase-dispatch condition, so this
+          # cannot recursively launch another evaluator. A maintainer retriggers by moving away
+          # from and back to the phase status label.
+          github-token: ${{ secrets.PAT_TOKEN }}
           script: |
             const owner = context.repo.owner;
             const repo = context.repo.repo;
