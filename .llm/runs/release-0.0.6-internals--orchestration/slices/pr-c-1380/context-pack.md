@@ -2,25 +2,28 @@
 
 ## Current State
 
-Draft PR #1585 is open from the required bootstrap commit. S1 makes `arch:check:repo` reuse the
-already-landed discovered-root path and applies the narrow leading quote/backtick guard to A14
-fixture-data lines. The focused tests and repo gate pass; S2 doctrine measurement work is next.
+Draft PR #1585 contains green S1 and S2 changes. The repo gate uses the discovered-root path; the
+doctrine verdict/archetype tables measure the same 36 roots; the provenance, debt, gated-set,
+engineering-reference, and RFC-location records have executable content tests. S3 close-gate
+operator guidance is next.
 
 ## Completed
 
 - Read the five named skills, harness activation/run-loop/gates, doctrine 01/06/09/10, relevant debt, and live issue/comments.
 - Opened and labelled draft PR #1585 with milestone 0.0.6; no CI-skip labels.
 - Implemented and verified S1.
+- Implemented and verified S2: 36-unit tables, reconciled provenance, accepted-red debt closure,
+  documented gate coverage, dated engineering-reference plan, canonical RFC mapping, and six doc tests.
 
 ## In Progress
 
-- S2: measured doctrine tables, provenance, debt closure, engineering-reference plan, RFC mapping, and tests.
+- S3: close-gate label/rerun guidance and regenerated Claude mirror.
 
 ## Next Steps
 
-1. Enumerate and classify the 36 live roots from current files.
-2. Refresh doctrine 06/10 and add executable doc contracts.
-3. Update debt/RFC records, then run and commit S2 gates.
+1. Correct `netscript-pr` and the close-gate repair hint to say label then rerun the existing CI run.
+2. Add/adjust validation coverage for that operator instruction.
+3. Sync and check the Claude skill mirror, then commit and comment S3.
 
 ## Key Decisions
 

@@ -531,9 +531,13 @@ finding into a debt entry.
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`.
 - **Created:** 2026-06-21
-- **Status:** open, DEBT_ACCEPTED.
-- **Gate:** `deno task arch:check:repo`; close by reducing unrelated root failures or by replacing
-  the legacy root scan with debt-aware package selection.
+- **Status:** RESOLVED 2026-08-12 by #1585 — `arch:check:repo` now iterates the same
+  `discoverDoctrineRoots()` selector as the curated task instead of evaluating the repository root
+  as a package. Its only remaining mechanical A14 failure was the checker's own negative-control
+  fixture string; the narrow leading quote/backtick data-line guard removes that self-reference
+  while a real unresolved global remains a failing control. The task exits 0 across all 36 roots.
+- **Gate:** `deno task arch:check:repo` exits 0 with no root-as-package A1 finding and no
+  self-referential A14 finding; `deno task arch:check` remains green.
 
 ## release provenance — OIDC publish workflow deferred
 

@@ -19,62 +19,94 @@ The verdict is one of:
   inside a doctrine-aligned skeleton is faster than refactoring.
 - **Defer** — the package is barely used; verdict pending real use.
 
-| Package                       | Archetype | LOC    | Verdict     | Headline action                                                        |
-| ----------------------------- | --------- | ------ | ----------- | ---------------------------------------------------------------------- |
-| `@netscript/streams`          | 1         | 393    | Keep        | Document delivery semantics in README.                                 |
-| `@netscript/runtime-config`   | 1         | 415    | Refactor    | Split single-file `mod.ts`; add subpaths if exports grow.               |
-| `@netscript/config`           | 1         | 1,968  | Refactor    | Split `schema.ts` (945) by concept; types per file.                     |
-| `@netscript/aspire`           | 2         | 1,859  | Keep        | Rename `helpers/` to role-named folders.                                |
-| `@netscript/cron`             | 2         | 1,732  | Refactor    | Rename `interfaces/` → `ports/`; rename adapter classes by tech.        |
-| `@netscript/database`         | 2         | 3,336  | Refactor    | Same `ports/` rename; ensure single composition root.                   |
-| `@netscript/queue`            | 2         | 3,534  | Refactor    | Lift `internal/` and `utils/` into role-named folders.                  |
-| `@netscript/kv`               | 2         | 5,919  | Refactor    | Split `bridge_test.ts` (1,039); audit adapters.                         |
-| `@netscript/prisma-adapter-mysql` | 2     | 1,340  | Keep        | Verify it implements a port owned by `@netscript/database`.             |
-| `@netscript/logger`           | 2         | 1,203  | Keep        | Confirm port shape; consider folding into `telemetry`.                  |
-| `@netscript/telemetry`        | 2         | 4,634  | Refactor    | Confirm port + adapter split; OTEL adapter as subpath export.           |
-| `@netscript/watchers`         | 3         | 1,608  | Keep        | Confirm `AbortSignal` propagation; add `stop()` handle.                 |
-| `@netscript/triggers`         | 3         | 3,637  | Restructure | Lift flat `*.ts` into `application/`, `state/`, `runtime/`.             |
-| `@netscript/workers`          | 3         | 13,062 | Restructure | Split `task-executor.ts` (1,287); supervisor as separate module.        |
-| `@netscript/sagas`            | 3         | 6,462  | Refactor    | Split `list-transport.ts` (847); compensation as builder method.        |
-| `@netscript/fresh`            | 4         | 11,658 | Restructure | Split `builders/mod.ts` (1,110) per builder concern; subpath exports.   |
-| `@netscript/fresh-ui`         | 4         | 2,911  | Keep        | Confirm runtime registry shape.                                         |
-| `@netscript/sdk`              | 4         | 3,080  | Keep        | High cohesion already; minor naming review.                             |
-| `@netscript/service`          | 4         | 1,633  | Refactor    | `presets/` named, `assets/` clarified.                                  |
-| `@netscript/contracts`        | 4         | 1,484  | Keep        | Confirm version-axis shape; `crud/` folder review.                      |
-| `@netscript/plugin`           | 4         | 1,951  | Restructure | Split `types.ts` (1,005); introduce `domain/` + `ports/`.               |
-| `@netscript/cli`              | 6         | 38,436 | Restructure | Split `pipeline.ts` (1,869), `official-plugin-copier.ts` (1,203). Apply Archetype-6 layout. |
-| `@netscript/shared`           | special   | 2,347  | Rewrite     | Replace `utils/datetime.ts` (1,112) with `@std/datetime`/`Temporal`; shrink to cross-package identifiers only. |
-| `plugins/hello-world`         | 5         | 234    | Keep        |                                                                         |
-| `plugins/sagas`               | 5         | 1,683  | Keep        | Doctrine-aligned shape already.                                         |
-| `plugins/streams`             | 5         | 255    | Keep        |                                                                         |
-| `plugins/triggers`            | 5         | 3,170  | Refactor    | Confirm `verify-plugin.ts` exists.                                      |
-| `plugins/workers`             | 5         | 4,345  | Refactor    | Confirm `verify-plugin.ts` exists; review `worker/` vs `jobs/` split.   |
+Measured 2026-08-12. A row is a top-level directory with a named `deno.json`; nested workspaces are
+not separate units. Paths, rather than remembered package names, are the executable denominator.
+
+| Path | Package | Archetype | Verdict | Headline action |
+| --- | --- | --- | --- | --- |
+| `packages/ai` | `@netscript/ai` | 4 | Keep | Preserve the engine/port/composition split. |
+| `packages/aspire` | `@netscript/aspire` | 2 | Keep | Keep SDK-independent contribution ports. |
+| `packages/auth-better-auth` | `@netscript/auth-better-auth` | 2 | Keep | Keep provider wiring behind auth-owned ports. |
+| `packages/auth-kv-oauth` | `@netscript/auth-kv-oauth` | 2 | Keep | Preserve the KV-backed auth adapter boundary. |
+| `packages/auth-workos` | `@netscript/auth-workos` | 2 | Keep | Keep WorkOS-specific behavior in the adapter. |
+| `packages/bench` | `@netscript/bench` | 6 | Keep | Keep benchmark execution isolated as tooling. |
+| `packages/cli` | `@netscript/cli` | 6 | Keep | Preserve the Archetype-6 kernel/surface split. |
+| `packages/config` | `@netscript/config` | 1 | Keep | Keep schemas and project configuration contracts cohesive. |
+| `packages/contracts` | `@netscript/contracts` | 1 | Keep | Keep contract primitives free of runtime ownership. |
+| `packages/cron` | `@netscript/cron` | 2 | Keep | Preserve the runtime-agnostic scheduling seam. |
+| `packages/database` | `@netscript/database` | 2 | Refactor | Finish the adapter/extension file splits without changing its port contract. |
+| `packages/fresh` | `@netscript/fresh` | 4 | Keep | Preserve per-concern builders and route contracts. |
+| `packages/fresh-ui` | `@netscript/fresh-ui` | 4 | Keep | Keep registry and interactive foundations explicit. |
+| `packages/kv` | `@netscript/kv` | 2 | Refactor | Split oversized adapters while preserving the provider-neutral port. |
+| `packages/logger` | `@netscript/logger` | 2 | Keep | Preserve structured logging adapters and integrations. |
+| `packages/mcp` | `@netscript/mcp` | 2 | Keep | Keep MCP transports behind token-bounded tool contracts. |
+| `packages/plugin` | `@netscript/plugin` | 4 | Keep | Preserve manifest, discovery, validation, and host contracts. |
+| `packages/plugin-ai-core` | `@netscript/plugin-ai-core` | 1 | Keep | Keep the versioned AI contract surface contract-only. |
+| `packages/plugin-auth-core` | `@netscript/plugin-auth-core` | 2 | Keep | Preserve auth contracts, backend ports, and testing seams. |
+| `packages/plugin-sagas-core` | `@netscript/plugin-sagas-core` | 3 | Keep | Preserve saga state-machine/runtime ownership. |
+| `packages/plugin-streams-core` | `@netscript/plugin-streams-core` | 3 | Keep | Preserve producer, schema, telemetry, and diagnostics seams. |
+| `packages/plugin-triggers-core` | `@netscript/plugin-triggers-core` | 3 | Keep | Preserve trigger DSL/runtime ports and adapters. |
+| `packages/plugin-workers-core` | `@netscript/plugin-workers-core` | 3 | Refactor | Reduce contract/domain cardinality without moving conventions into the plugin. |
+| `packages/prisma-adapter-mysql` | `@netscript/prisma-adapter-mysql` | 2 | Keep | Keep the MySQL implementation behind the database-owned port. |
+| `packages/queue` | `@netscript/queue` | 2 | Keep | Preserve the provider-neutral queue abstraction. |
+| `packages/runtime-config` | `@netscript/runtime-config` | 3 | Keep | Keep watcher lifecycle and diagnostics explicit. |
+| `packages/sdk` | `@netscript/sdk` | 2 | Keep | Preserve discovery/client/cache adapter boundaries. |
+| `packages/service` | `@netscript/service` | 4 | Refactor | Finish builder separation while preserving bootstrap/runtime wiring. |
+| `packages/telemetry` | `@netscript/telemetry` | 2 | Keep | Preserve the OpenTelemetry adapter subpaths. |
+| `packages/watchers` | `@netscript/watchers` | 3 | Keep | Preserve stop semantics and signal propagation. |
+| `plugins/ai` | `@netscript/plugin-ai` | 5 | Keep | Remain thin glue over AI and Fresh primitives. |
+| `plugins/auth` | `@netscript/plugin-auth` | 5 | Keep | Remain thin glue over auth-core contracts and backends. |
+| `plugins/sagas` | `@netscript/plugin-sagas` | 5 | Keep | Keep runtime conventions in `plugin-sagas-core`. |
+| `plugins/streams` | `@netscript/plugin-streams` | 5 | Keep | Keep stream conventions in `plugin-streams-core`. |
+| `plugins/triggers` | `@netscript/plugin-triggers` | 5 | Refactor | Complete connector thinness without relocating core conventions. |
+| `plugins/workers` | `@netscript/plugin-workers` | 5 | Refactor | Complete connector thinness and the jobs/worker contribution split. |
+
+## Provenance for removed rows
+
+This repository's reachable history begins at
+`317e4b509704877f30ef901a4e5db3bedc8db43e` (2026-07-06, beta.5). The `plugin-*-core` tier is
+already present in that root tree, so “not present in this repository's history” does not mean the
+named capability never existed before the truncated history.
+
+- `@netscript/triggers` (`packages/triggers`) is absent from every reachable commit. It was
+  superseded before this history by `packages/plugin-triggers-core`, recorded in the
+  [resolved triggers debt](../../../.llm/harness/debt/arch-debt.md#packagestriggers--doctrine-verdict-restructure).
+- `@netscript/workers` (`packages/workers`) is absent from every reachable commit. It was
+  superseded before this history by `packages/plugin-workers-core`, recorded in the
+  [resolved workers debt](../../../.llm/harness/debt/arch-debt.md#packagesworkers--ap-1--doctrine-verdict-restructure-task-executorts-1287-loc).
+- `@netscript/sagas` (`packages/sagas`) is absent from every reachable commit. Its checked-in
+  supersession record says the former top-level directory and resolved debt now live entirely in
+  `packages/plugin-sagas-core`.
+- `@netscript/streams` (`packages/streams`) is absent from every reachable commit. The successor
+  `packages/plugin-streams-core` is present in the root tree, but the same `arch-debt.md` probe that
+  finds the sagas record finds no top-level streams supersession record; no stronger provenance is
+  asserted.
+- `@netscript/shared` (`packages/shared`) exists only on non-ancestor history: added at
+  `0ef13de359b1eb1cdd653ab4400ae57fd19644f6` and deleted at
+  `fd8259b76d8e71ee76eadd56ce94160de004fc32` (`feat(contracts): consolidate shared foundation
+  package`, including `packages/shared/deno.json` and its tree). Neither commit is an ancestor of
+  this branch.
+- `plugins/hello-world` is absent from every reachable commit, with no successor and no
+  supersession record in `arch-debt.md`.
+
+## Doctrine gate coverage
+
+Both `deno task arch:check` and `deno task arch:check:repo` iterate `discoverDoctrineRoots()` and
+therefore gate exactly the 36 paths in the verdict table above. The nested `packages/cli/e2e`
+workspace is intentionally outside that set: it is the CLI's end-to-end harness, not a top-level
+published doctrine unit. See the corresponding [F-19 exclusion](./09-anti-patterns-and-fitness-functions.md#f-19-scoped-source-gate-runners).
 
 Tracked `@netscript/fresh` restructure debt (2026-07-12): consolidate the public route-contract
-documentation surface exposed by the typed implementation boundary. Ownership stays with the
-existing `@netscript/fresh` Restructure verdict. The closing gate is
+documentation surface exposed by the typed implementation boundary. This focused documentation
+debt does not reopen the package's current Keep verdict. The closing gate is
 `deno task doc:lint --root packages/fresh` returning zero route-entrypoint diagnostics without
 restoring compatibility casts or adding scanner allowances.
 
-## Top-priority remediations
+## Open verdict remediations
 
-1. **`@netscript/cli`** — the CLI is the largest single package and
-   the CLI E2E refactor is the proving ground. Its `pipeline.ts` and
-   plugin-copier are the most expensive monoliths in the repo.
-2. **`@netscript/workers`** — second-largest, with the
-   `task-executor` monolith. The supervisor / executor / dispatcher
-   split is the doctrine's exemplar for runtime/behavior packages.
-3. **`@netscript/shared`** — replacing `utils/datetime.ts` with
-   `@std/datetime` is the cleanest demonstration of A6 + A7 in the
-   whole repo.
-4. **`@netscript/plugin`** — `types.ts` 1,005-LOC split is the
-   exemplar for "types come first; split per concept."
-5. **`@netscript/fresh`** — `builders/mod.ts` 1,110-LOC split is
-   the exemplar for Archetype 4 (DSL/Builder).
-
-These five touch every doctrine concern: surface, base classes,
-modules, folder structure, runtime, fitness functions. Doing them
-first creates the templates the rest of the repo follows.
+The current denominator carries six Refactor rows: `packages/database`, `packages/kv`,
+`packages/plugin-workers-core`, `packages/service`, `plugins/triggers`, and `plugins/workers`.
+Their implementation belongs to separate slices; this measurement does not perform them.
 
 ## What the next engineering reference must contain
 
@@ -179,6 +211,27 @@ A phased plan to bring the current repo into doctrine alignment:
 - Phase D — open the `@netscript/*` packages for external
   consumption (JSR publish at full doc score, semver discipline,
   release notes).
+
+## Engineering-reference completion plan — 2026-08-12
+
+The reference is produced from real refactors as a reviewed byproduct, not as a parallel writing
+project. Section 6 is partially represented by `.llm/tools/fitness/`; section 7 is the live
+`.llm/harness/debt/arch-debt.md`. The remaining sections close as follows:
+
+1. Every separate Refactor slice named above contributes the archetype starter, role-folder recipe,
+   pattern skeleton, anti-pattern before/after, and package playbook it actually exercised
+   (sections 1–5). Examples are accepted only after the slice gates pass; speculative templates are
+   not added.
+2. Each such PR appends any reusable review question and newly stabilized vocabulary to the combined
+   checklist and glossary (sections 8–9). Terms already defined remain links rather than duplicated
+   definitions.
+3. This measured verdict table is the migration roadmap source (section 10). The table is refreshed
+   when a unit lands, moves archetype, or closes a Refactor verdict; historical rows stay in Git,
+   not in the live denominator.
+4. Architecture-doctrine maintainers review the accumulated reference at the **2026-09-30** rail
+   checkpoint. Any section still lacking a gated in-repo exemplar receives a named owner and target
+   then; the target for assembling the complete first reference from accepted exemplars is
+   **2026-12-31**.
 
 ## Stop conditions
 
