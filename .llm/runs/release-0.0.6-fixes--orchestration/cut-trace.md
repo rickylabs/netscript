@@ -12,6 +12,7 @@ milestone's rules are earned from evidence rather than memory.
 | 1 | 2026-08-12 08:35:36Z | `69485b8fd` | #1535 | **#1428** (auto-closed COMPLETED 08:35:38Z) | 7/7 — see `worklog.md` stage D |
 | 2 | 2026-08-12 08:36:22Z | `cd24e1679` | #1534 | **#1397, #1399** (both auto-closed COMPLETED) | 7/7 — see `worklog.md` stage D |
 | 3 | 2026-08-12 08:57:53Z | `84dd44ae7` | #1538 | **#1417** (auto-closed COMPLETED) | 7/7 + focused IMPL-EVAL PASS (Fable 5 medium, separate session) |
+| 4 | 2026-08-12 12:54:23Z | `3c9dc1f39` | #1539 | **#1438, #1430** (both auto-closed COMPLETED) | 7/7 + automatic IMPL-EVAL PASS, head-matched at `070eabb61`; runtime tiers recorded as did-not-run with reason |
 | _(none yet)_ | | | | | |
 
 Captured from `git log origin/main --first-parent` after each merge, never from recollection. Both

@@ -1279,3 +1279,68 @@ repo is cutting 0.0.6. The cycle-1 tautology found by IMPL-EVAL exploited precis
 same-version condition (`oldVersion === version` making the writer's rewrite a no-op). The
 parent-anchor now closes it, but the corpus being version-stale is the live precondition that made
 that hole reachable rather than theoretical.
+
+## 2026-08-12 12:54:23Z — Landing 4: PR #1539 → `3c9dc1f39` (closes #1438, #1430)
+
+The lane's hardest slice. Three FAIL/PASS evaluation cycles, one head invalidation, one recovered
+turn, and a banned construct that no automated gate saw.
+
+**Merge basis: the automatic evaluator, head-matched.** DeepSeek V4 Flash 0731, run `31594353825`,
+generation `29337879312`, **PASS at immutable head `070eabb61` against trusted base `5db37e7bb`** —
+matched against the live PR head before consumption, per the internals lane's D-24 hazard. The three
+local Fable 5 cycles are retained as run evidence for the two holes they found but are **superseded
+as merge basis**; the PR body was corrected to say so rather than continuing to cite cycle 3.
+
+**Final gate at `070eabb61`:**
+
+```
+close-gate SUCCESS · check-test SUCCESS · quality SUCCESS · surface-diff SUCCESS
+scaffold-static SUCCESS · deps-report SUCCESS · both lane-visibility SUCCESS
+review-threads PASS (0 threads) · banned-construct scan clean · deno.lock unmodified
+current-main guard: ZERO file overlap between the 3 commits landed since base and the 6 PR files
+label lifecycle: status:augment-review → status:ready-merge (documented advisory stage)
+```
+
+**The two runtime tiers stayed CANCELLED, and the merge says so rather than hiding it.** The single
+owner-authorized rerun did not clear them: superseded in the repo-global `e2e-scaffold-runtime-global`
+queue 51 seconds in, by docs/1377, fix/1459 and internals runs. Five lanes now contend for one slot,
+so this is structural.
+
+**A second rerun was neither authorized nor useful, and the second half matters more.** At head
+`2a4102600` those same jobs took the classifier's escape hatch — `Skipped by policy: success`, step
+10 skipped — because #1539's diff is six files under `.llm/tools/**` with no `packages/**`, no
+`plugins/**` and no scaffold template. `scaffold.runtime` exercises scaffolded app runtime; there is
+nothing of this change for it to exercise. **So the only achievable outcome of a rerun was
+SUCCESS-by-short-circuit — a prettier non-verdict.** CANCELLED-with-a-recorded-reason is visibly a
+non-verdict; short-circuit SUCCESS is not. Merging on the former is the more honest of the two, and
+is the same call recorded for #1535.
+
+**Exact main validated after merge:**
+
+```
+origin/main            3c9dc1f3907c605d2d30d76f5a20ade1e4754736
+                       fix(release): restore release-cut truth (#1539)
+worktree at that SHA   clean, 0 dirty
+release guard suite    23 passed | 0 failed
+  incl. "rejects self-consistent non-version agent-docs injection"      (cycle-1 vector)
+  incl. "rejects writer-preserved non-version provenance injection"     (cycle-2 vector)
+```
+
+## 2026-08-12 — Terminal lifecycle transition (stage G)
+
+Audit found the freeze the `netscript-pr` skill warns about, and it was **lane-wide, not limited to
+#1539**: all four merged PRs were frozen at `status:ready-merge`, three closed issues were still at
+`status:triage`, and three carried no `status:` at all.
+
+Atomic transitions applied — phase label removed and terminal applied in one action per item:
+
+```
+issues #1397 #1399 #1417   status:triage      → status:shipped
+issues #1428 #1438 #1430   (none)             → status:shipped
+PRs #1534 #1535 #1538 #1539  status:ready-merge → status:shipped
+```
+
+Verified afterwards: **exactly one `status:` label on all ten items**, all `status:shipped`. The
+single-status rule is what lets the board reflect reality, and a frozen `status:` before merge is a
+documented merge hazard rather than a cosmetic lapse — three of these issues would have shown as
+`triage` on a board while shipped on `main`.
