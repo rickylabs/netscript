@@ -401,3 +401,46 @@ gate plus `review-threads`, merge, then append the row to `cut-trace.md` capture
 
 On findings, none of that runs; the findings go to the slice thread for a fix cycle and the eval loop
 limit of two failures applies before escalation.
+
+## 2026-08-12 — label re-entry executed; dispatcher structurally cannot fire on this head
+
+Executed the owner's instruction exactly: applied the one-shot `eval:model:qwen`, moved away from
+`status:impl-eval`, then re-added it. Timeline confirms a clean sequence with exactly one `status:`
+label at every point and **no head change**:
+
+| UTC | Event |
+| --- | --- |
+| 09:39:17Z | `eval:model:qwen` labeled; `status:impl` labeled; `status:impl-eval` unlabeled (move away) |
+| 09:39:25Z | `status:impl-eval` labeled; `status:impl` unlabeled (**the trigger**) |
+
+`impl-eval:skip` is not present, so nothing suppressed the eval.
+
+**It did not run, and it cannot run on this head.** Three workflow runs fired around the label
+changes — all of them `openhands-agent.yml` ("OpenHands Agent"), all `completed/skipped`, job `agent`
+skipped with zero steps. The new dispatcher, `openhands-phase-eval.yml` ("OpenHands phase
+evaluation"), produced **no run on this branch at all**, while it has runs on other branches the same
+morning.
+
+Root cause, verified rather than inferred:
+
+```
+git cat-file -e e4319c685:.github/workflows/openhands-phase-eval.yml  ->  ABSENT
+```
+
+For `pull_request` events GitHub resolves workflows from the PR's merge ref, so a workflow absent
+from the PR head does not exist for that PR. The branch's last sync with `main` is `e4319c685` at
+**2026-08-12T08:45:46Z**; #1524 merged at **09:24:15Z** — 38 minutes later. No amount of label cycling
+can trigger a workflow the PR does not contain.
+
+`main` has since moved again: `281ab7688 fix(agentic): use chainable token for eval statuses (#1547)`,
+which addresses the dispatcher's own `PAT_TOKEN` requirement — the "Require chainable trigger token"
+step that hard-fails when the secret is absent. So the current head is missing both the dispatcher
+and its follow-up fix.
+
+**Not actioned unilaterally.** The only path is to sync the branch with current `main`, which
+**changes the head SHA** — directly against the standing instruction to keep #1536 on its current
+head — and invalidates the present green CI, forcing a full re-run including both expensive
+`scaffold-runtime` tiers. That is a material, owner-visible trade, so it is being raised rather than
+taken. The prior green evidence (both OTEL gates passing by name on both tiers) would need to be
+re-established against the new head, which is arguably better evidence anyway since it would match
+what actually merges.
