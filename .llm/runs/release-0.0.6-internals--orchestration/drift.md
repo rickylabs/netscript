@@ -332,3 +332,38 @@ dispatching it on the orchestrator's own authority, against a formal `FAIL_PLAN`
 "do not begin implementation on the current plan", would be the generator overruling its evaluator. That
 is the self-certification the harness forbids, so it goes to the owner as a decision rather than being
 taken as a judgement call.
+
+## D-14 — evaluation automation policy change: label/transition-triggered, never manually dispatched
+
+- **Severity:** significant (changes this lane's evaluator mechanics for every remaining PR)
+- **Recorded:** 2026-08-12, owner directive mid-run
+- **Policy, as stated:**
+  - **Do not manually dispatch OpenHands** for formal PLAN-EVAL or IMPL-EVAL.
+  - **PLAN-EVAL** fires exactly once from the **`openhands` + `status:plan-eval` label pair**. Rerun only
+    by moving away from `status:plan-eval` and re-adding it.
+  - **Initial IMPL-EVAL fires automatically on draft → ready**, unless `impl-eval:skip` is applied. Rerun
+    only by moving away from `status:impl-eval` and re-adding it.
+  - Optional `eval:model:minimax|deepseek|qwen` is **one-shot**.
+  - An already-running local eval may finish; **never duplicate it**.
+- **Compliance position for this lane:**
+  - **No violation to unwind.** This lane never dispatched OpenHands: `drift.md` D-2 recorded on day one
+    that #1524 was an open draft and `lane-policy.md` had the cloud lane paused, so formal evaluation ran
+    on the documented native opposite-family route.
+  - **Cycle-3 PLAN-EVAL is left to finish.** It is a local Codex · Sol · high session (thread
+    `019ff508-…`) launched minutes before this directive. Per the policy it may complete, and it must
+    **not** be duplicated — so this lane will **not** also apply the `openhands` + `status:plan-eval`
+    pair for the same plan. One evaluation of one plan revision.
+- **What changes for PR-E / PR-B / PR-C / PR-D:** the per-PR IMPL-EVAL is **no longer an orchestrator
+  dispatch**. It fires on the draft → ready transition. Consequences the orchestrator must honour:
+  1. **Do not launch a local IMPL-EVAL session per PR.** That would duplicate the automatic one.
+  2. **Do not apply `impl-eval:skip`** on any rail PR — every one of them changes gate semantics, which
+     is exactly the class that needs an independent pass.
+  3. **The draft → ready flip becomes an evaluator trigger, not just a CI trigger.** So it happens when
+     the slice checklist is complete and IMPL-EVAL is expected to pass — not to get CI moving. On PR #1527
+     the flip was used to materialise required contexts; that is no longer a free action.
+  4. **Rerun discipline:** if an IMPL-EVAL verdict must be refreshed after fixes, move away from
+     `status:impl-eval` and re-add it. Do not push an empty commit and do not re-request a review.
+  5. `status:plan-eval` is not applied to any rail PR: the rail's plan was evaluated at the run level,
+     and the PRs carry `status:impl` → `status:impl-eval` → `status:ready-merge`.
+- **Unchanged:** merge authority stays with the orchestrator through the pre-merge gate; a green automated
+  gate is still not a sign-off; the generator still never evaluates its own work.

@@ -155,6 +155,10 @@ comment so the cheap lane is visibly intentional. Never edit a workflow file to 
 5. Slices, per the plan's Design table: **E1** RED fixture (committed red) · **E2** the `isTypeFixture`
    exemption · **E3** leakage controls both directions · **E4** drop the two redundant allowances and
    record the 10 → 8 count.
+6. **Leave the PR in draft.** The draft → ready flip now **automatically triggers the formal IMPL-EVAL**
+   (owner policy, `drift.md` D-14), so it is the orchestrator's action once your slice checklist is
+   complete — not a way to get CI moving. Do **not** flip it yourself, do **not** apply `impl-eval:skip`,
+   and do **not** apply `status:impl-eval` or `status:plan-eval`.
 6. Post one `**[PHASE: IMPL]**` summary when the slices are in, listing every gate with real output.
 
 ## Two mechanical rules that cost this lane time already

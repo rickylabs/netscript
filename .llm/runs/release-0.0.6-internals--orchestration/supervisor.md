@@ -52,9 +52,16 @@ canonical lane is bound to which role in this run.
 | PR | Issues | PLAN-EVAL | IMPL-EVAL |
 | --- | --- | --- | --- |
 | PR-A | #1436, #1415 | **N/A — owner waiver** (mechanical; complete contract, scope, acceptance and gates already in the issue bodies). Substituted by executed negative-case proof. | **N/A — owner waiver** (brief §3). Substituted by orchestrator slice review + RED→GREEN negative-case evidence on both parsers. |
-| PR-B | #1403 | Covered by the single rail PLAN-EVAL. | Required — fresh opposite-family session. |
-| PR-C | #1380 | Covered by the single rail PLAN-EVAL. | Required — fresh opposite-family session. |
-| PR-D | #1378 | Covered by the single rail PLAN-EVAL. | Required — fresh opposite-family session. |
+| PR-E | #1530 | Covered by the rail PLAN-EVAL. | **Automatic on draft → ready** (owner policy, `drift.md` D-14). Not dispatched by the orchestrator; `impl-eval:skip` must not be applied. |
+| PR-B | #1403 | Covered by the rail PLAN-EVAL. | Automatic on draft → ready — as above. |
+| PR-C | #1380 | Covered by the rail PLAN-EVAL. | Automatic on draft → ready — as above. |
+| PR-D | #1378, #1545 | Covered by the rail PLAN-EVAL. | Automatic on draft → ready — as above. |
+
+**Evaluator mechanics changed mid-run (2026-08-12, owner).** Formal evaluation is label/transition
+triggered, never manually dispatched: PLAN-EVAL from the `openhands` + `status:plan-eval` pair, IMPL-EVAL
+from draft → ready. Rerun either only by moving away from its `status:` label and re-adding it. The rail's
+PLAN-EVAL cycles 1–3 ran on the native opposite-family route before this directive and are left to
+complete rather than duplicated. Full terms in `drift.md` D-14.
 
 One rail PLAN-EVAL covers PR-B/C/D because the three issues overlap on root lists, scan semantics,
 doctrine and architecture debt; evaluating their sequencing separately would evaluate the wrong
