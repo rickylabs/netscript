@@ -1,5 +1,5 @@
 import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
-import { OPEN_EVALUATOR_MODEL_IDS } from '../config/models.ts';
+import { OPEN_EVALUATOR_MODEL_IDS, OPENROUTER_MODEL_IDS } from '../config/models.ts';
 
 type Event = {
   action: 'ready_for_review' | 'labeled' | 'synchronize';
@@ -24,9 +24,9 @@ function decision(event: Event): PhaseDecision {
 }
 
 const MODELS = new Map([
-  ['eval:model:minimax', 'openrouter/minimax/minimax-m3'],
-  ['eval:model:deepseek', 'openrouter/deepseek/deepseek-v4-flash-0731'],
-  ['eval:model:qwen', 'openrouter/qwen/qwen3.8-max'],
+  ['eval:model:minimax', `openrouter/${OPENROUTER_MODEL_IDS.minimax}`],
+  ['eval:model:deepseek', `openrouter/${OPENROUTER_MODEL_IDS.deepseekV4Flash0731}`],
+  ['eval:model:qwen', `openrouter/${OPENROUTER_MODEL_IDS.qwen}`],
 ]);
 
 async function selectModel(phase: 'plan' | 'impl', labels: string[]): Promise<string> {
@@ -36,8 +36,8 @@ async function selectModel(phase: 'plan' | 'impl', labels: string[]): Promise<st
   return selected.length
     ? MODELS.get(selected[0])!
     : phase === 'plan'
-    ? 'openrouter/minimax/minimax-m3'
-    : 'openrouter/deepseek/deepseek-v4-flash-0731';
+    ? `openrouter/${OPENROUTER_MODEL_IDS.minimax}`
+    : `openrouter/${OPENROUTER_MODEL_IDS.deepseekV4Flash0731}`;
 }
 
 function nextStatus(
@@ -104,10 +104,10 @@ Deno.test('phase evaluator event matrix dispatches only deliberate transitions',
 });
 
 Deno.test('phase evaluator model labels are exact, optional, and mutually exclusive', async () => {
-  assertEquals(await selectModel('plan', []), 'openrouter/minimax/minimax-m3');
+  assertEquals(await selectModel('plan', []), `openrouter/${OPENROUTER_MODEL_IDS.minimax}`);
   assertEquals(
     await selectModel('impl', []),
-    'openrouter/deepseek/deepseek-v4-flash-0731',
+    `openrouter/${OPENROUTER_MODEL_IDS.deepseekV4Flash0731}`,
   );
   for (const [label, model] of MODELS) assertEquals(await selectModel('impl', [label]), model);
   await assertRejects(() => selectModel('impl', ['eval:model:not-real']));
