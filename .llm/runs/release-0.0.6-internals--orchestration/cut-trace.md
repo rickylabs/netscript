@@ -8,13 +8,13 @@ Root 0.0.6 orchestration owns canary payload computation and the stable cut.
 
 | # | Merged (UTC) | Commit on `origin/main` | PR | Issues closed | Pre-merge gate record |
 | --- | --- | --- | --- | --- | --- |
-| — | — | — | — | — | *no merges yet* |
+| 1 | 2026-08-12 ~08:31Z | `63cd1cd58` | **#1527** | **#1436**, **#1415** (both auto-closed `COMPLETED`) | 7/7 pass — full record in the PR's `[PRE-MERGE GATE]` comment. `pr-checks` **15/15 `current-pass`, 0 current failures** at `dfda54a16`; `close-gate` green; #1415 4/4 boxes mirrored with linked evidence; #1436 has 0 boxes so the PR body is its record; no new ignores/casts, no lock churn; both probes re-run independently by the orchestrator; `review-threads` PASS (0 threads). |
 
 ## Wave clustering as dispatched
 
 | Wave | PR | Issues | Lane | Status |
 | --- | --- | --- | --- | --- |
-| 1 | PR-A `fix/1436-1415-close-gate-trust` → **PR #1527** | #1436, #1415 | Sol · low | **dispatched** — thread `019ff4f4-1fce-7253-a7e0-d718c65b39cc`, worktree `/home/codex/repos/ns006-gatetrust`; S1–S4 landed |
+| 1 | PR-A `fix/1436-1415-close-gate-trust` → **PR #1527** | #1436, #1415 | Sol · low | **MERGED** `63cd1cd58` — thread `019ff4f4-1fce-7253-a7e0-d718c65b39cc`, worktree `/home/codex/repos/ns006-gatetrust`, 7 commits |
 | 2 | PR-E `fix/1530-type-fixture-scan-scope` | #1530 | Sol · low | not yet dispatched (inserted; gates PR-D per rail R-1) |
 | 2 | PR-B `fix/1403-quality-gate-coverage` | #1403 | Sol · low | not yet dispatched |
 | 2 | PR-C `fix/1380-doctrine-verdict-and-repo-gate` | #1380 | Sol · medium | not yet dispatched |
@@ -32,7 +32,9 @@ Root 0.0.6 orchestration owns canary payload computation and the stable cut.
 
 | # | When | Symptom | Root cause | Cost | Recorded where |
 | --- | --- | --- | --- | --- | --- |
-| — | — | — | — | — | — |
+| 1 | 2026-08-12 08:14–08:21Z | `status:ready-merge` applied; nothing happened. `close-gate` stayed red on its pre-label result, #1415's boxes stayed unticked. | `labeled` is absent from `ci.yml:41` and `e2e-cli.yml` `pull_request.types`, yet both `netscript-pr` and `check-close-gate.ts`'s repair hint claim the label triggers a run. | ~7 min, one wasted verification cycle | `drift.md` D-10. Fix is label-then-**push**; the one-line workflow/doc repair is raised to the owner, not taken by this lane. |
+| 2 | 2026-08-12 ~09:56Z | Attached Codex launch received SIGTERM (exit 143) from a shell `timeout 580` wrapper. | The orchestrator wrapped an attached launch/resume in `timeout` to avoid blocking its own turn. The wrapper's SIGTERM kills the attached slice at expiry. | none this time — the thread survived and produced 5 further commits — but the practice is unsafe and was initially mis-recorded as harmless | `drift.md` D-9. Attached launch/resume now run unwrapped; bounded observation uses `agentic:codex-watch --timeout-seconds`. |
+| 3 | 2026-08-12 08:00Z | `codex exec resume` refused with `thread-store conflict: … already has an active writer`. | Steering was attempted mid-turn instead of at a turn boundary. | ~2 min | `drift.md` D-9. That error is the mechanical signal for "not at a turn boundary"; steer on `codex-watch --mode turn` completion. |
 
 ## Falsified / confirmed assumptions
 
@@ -46,4 +48,5 @@ needed.
 | A-2 | Re-baselining an issue body against HEAD is ceremony for mechanical issues | implicit in "mechanical ⇒ no plan needed" | **falsified** | The re-baseline is what caught A-1, on the smallest issue in the lane (p2, 2-line fix). |
 | A-3 | An issue's measured counts stay valid for the few days between filing and implementation | implicit in working from an issue body | **falsified, twice** | `arch:check:repo` FAIL moved 53 → **55** in four days, and `quality:scan:repo` moved from green to **RED exit 1** — the latter making one of #1378's own acceptance boxes unsatisfiable as written. Both found by executing, neither visible in the issue. |
 | A-4 | A doctrine verdict row that names a missing directory was renamed or deleted | #1380 D6 ("plausibly renamed into the `plugin-*-core` tier") | **falsified for 5 of 6 rows** | `git log --all --diff-filter=A` shows `packages/{streams,triggers,workers,sagas}` and `plugins/hello-world` **never existed** in this repo; only `@netscript/shared` ever did (`0ef13de35 chore: genesis eject`). A third state — *authored against a layout that never landed* — is required, and a rename note would have fabricated provenance. |
+| A-6 | A `cancelled` expensive gate on a PR means the gate did not run | pre-merge gate check 4 read naively | **falsified, and it nearly manufactured a false red** | `scaffold-runtime` and `scaffold-runtime-sqlite` first evaluated as `cancelled`. Applying the #1142 rule — only the latest run per check name — resolved both to real `success` (`08:26:44Z`, `08:22:52Z`). Blocking on the cancelled pair would have been the mirror image of check 4's false greens. |
 | A-5 | The escalate-don't-idle brief instruction changes behaviour | `agent-milestone-orchestrator` § Delegation (4 idle-at-red-gate occurrences in 0.0.4) | **confirmed** | PR-A's agent hit a red Gate 1, diagnosed it as a pre-existing permission gap, refused to weaken unrelated tests, recorded it, escalated, and continued unblocked work. `drift.md` D-8. |
