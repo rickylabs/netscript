@@ -164,24 +164,1539 @@ Check packages/cli/src/public/infra/jsr/fetch-jsr-plugin-validator_test.ts
 Check packages/cli/src/public/infra/jsr/verify-jsr-package-integrity_test.ts
 Check packages/cli/src/public/infra/permissions/plugin-scaffold-permissions_test.ts
 Check packages/cli/testing_test.ts
-TS2322 [ERROR]: Type '() => Promise<{ auth: { name: string; workdir: string; rootDir: string; permissions: string[]; cli: { doctorChecks: "auth-backend"[]; }; }; }>' is not assignable to type '(projectRoot: string, config?: NetScriptConfig | undefined) => Promise<Record<string, RegisteredPluginConfig>>'.
-  Type 'Promise<{ auth: { name: string; workdir: string; rootDir: string; permissions: string[]; cli: { doctorChecks: "auth-backend"[]; }; }; }>' is not assignable to type 'Promise<Record<string, RegisteredPluginConfig>>'.
-    Type '{ auth: { name: string; workdir: string; rootDir: string; permissions: string[]; cli: { doctorChecks: "auth-backend"[]; }; }; }' is not assignable to type 'Record<string, RegisteredPluginConfig>'.
-      Property 'auth' is incompatible with index signature.
-        Property 'source' is missing in type '{ name: string; workdir: string; rootDir: string; permissions: string[]; cli: { doctorChecks: "auth-backend"[]; }; }' but required in type 'RegisteredPluginConfig'.
-    loadRegisteredPlugins: () => Promise.resolve({
-    ~~~~~~~~~~~~~~~~~~~~~
-    at file:///home/codex/repos/ns006-w2-1454/packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts:61:5
+running 1 test from ./packages/cli/module_import_side_effect_test.ts
+public module imports do not execute the CLI runner ... ok (300ms)
+running 2 tests from ./packages/cli/scaffolding_test.ts
+plugin scaffolding plans and writes plugin-owned templates ... ok (3ms)
+plugin scaffolding skips existing files unless overwrite is enabled ... ok (829µs)
+running 4 tests from ./packages/cli/src/kernel/adapters/aspire/apphost-doctor-inspector_test.ts
+AppHost doctor inspector uses ps truth before describe ... ok (1ms)
+AppHost doctor inspector reports unavailable when Aspire cannot execute ... ok (615µs)
+AppHost doctor inspector preserves genuine Aspire command failures ... ok (1ms)
+AppHost doctor inspector returns named resource state from the matching AppHost ... ok (383µs)
+running 8 tests from ./packages/cli/src/kernel/adapters/aspire/aspire-cloud-deploy-target_test.ts
+kubernetes adapter declares an Aspire-owned operation subset ... ok (928µs)
+plan/emit validate AppHost markers and delegate without platform --environment ... ok (468µs)
+up uses configured AppHost and outputPath from request config ... ok (323µs)
+AppHost validation rejects a mismatched platform before invoking Aspire ... ok (619µs)
+cloud-run up builds, pushes, and deploys the configured image ... ok (450µs)
+cloud-run down deletes the configured service ... ok (207µs)
+cloud-run requires registry and imageName config ... ok (480µs)
+a non-zero external CLI exit surfaces stderr detail ... ok (464µs)
+running 8 tests from ./packages/cli/src/kernel/adapters/aspire/aspire-compose-deploy-target_test.ts
+compose adapter declares the supported subset and omits rollback/secrets ... ok (1ms)
+plan/emit delegate to `aspire publish --output-path` (authors no YAML) ... ok (300µs)
+plan forwards Aspire environment and non-interactive flags ... ok (98µs)
+compose `up` self-hosts via `docker compose up -d` on the emitted file ... ok (175µs)
+docker `up` delegates the apply to `aspire deploy` ... ok (433µs)
+docker `up` can clear Aspire deployment cache for CI ... ok (116µs)
+down/status/logs shell `docker compose` against the emitted project ... ok (225µs)
+a non-zero exit surfaces as a thrown error with stderr detail ... ok (741µs)
+running 2 tests from ./packages/cli/src/kernel/adapters/config/configured-plugin-manifest-summary_test.ts
+configured manifest payload parser accepts the versioned JSON-safe contract ... ok (1ms)
+configured manifest payload parser rejects invalid envelope fields ... ok (129µs)
+running 4 tests from ./packages/cli/src/kernel/adapters/config/deploy-config-resolvers.test.ts
+resolveDenoDeployTarget: empty config defaults prod to false with no fields ... ok (921µs)
+resolveDenoDeployTarget: reads deploy.targets[deno-deploy] from config ... ok (222µs)
+resolveDenoDeployTarget: CLI flag overrides win over config ... ok (133µs)
+resolveDenoDeployTarget: flags alone work with no config section ... ok (137µs)
+running 7 tests from ./packages/cli/src/kernel/adapters/config/deploy-config-resolvers_test.ts
+resolveLinuxDeploy applies Linux-sensible defaults ... ok (1ms)
+resolveLinuxDeploy honors user overrides from deploy.targets.linux ... ok (214µs)
+resolveWindowsDeploy applies Windows-sensible defaults ... ok (192µs)
+resolveWindowsDeploy honors user overrides from deploy.targets.windows ... ok (86µs)
+resolveDeployBase defaults the activation/secrets/otel convention blocks (U1–U3) ... ok (315µs)
+activation.strategy defaults per-OS (symlink on Linux, dir-swap on Windows) ... ok (157µs)
+resolveDeployBase honors activation/secrets/otel overrides ... ok (150µs)
+running 1 test from ./packages/cli/src/kernel/adapters/config/plugin-permission-precedence_test.ts
+plugin permission precedence preserves every canonical slot ... ok (1ms)
+running 9 tests from ./packages/cli/src/kernel/adapters/config/plugin-registry.test.ts
+loadRegisteredPlugins returns normalized background processor metadata ... ok (52ms)
+loadRegisteredPlugins loads plugin specs from netscript config when omitted ... ok (112ms)
+loadRegisteredPlugins preserves registry output shape from explicit config specs ... ok (10ms)
+loadRegisteredPlugins resolves the generated AI configured module ... ok (24ms)
+loadRegisteredPluginMetadata reads scaffold manifests without importing plugin modules ... ok (9ms)
+loadRegisteredPluginMetadata omits service metadata for a service-less manifest ... ok (9ms)
+loadRegisteredPluginMetadata derives identity from the configured module directory ... ok (1ms)
+loadRegisteredPluginMetadata isolates malformed scaffold metadata per plugin ... ok (2ms)
+loadRegisteredPluginMetadata falls back when userland scaffold manifest is absent ... ok (10ms)
+running 4 tests from ./packages/cli/src/kernel/adapters/config/project-config-loader_test.ts
+loadProjectConfig runs the child loader under the project deno.json ... ok (137ms)
+loadProjectConfig preserves JavaScript config file resolution ... ok (147ms)
+loadProjectConfig reports a missing config from the child process ... ok (120ms)
+loadProjectConfig parses stdout without reading stderr noise ... ok (642µs)
+running 2 tests from ./packages/cli/src/kernel/adapters/contracts/contract-source_test.ts
+contract source promotion renames versioned symbols and prose ... ok (435µs)
+contract route append round-trips through structured inspection ... ok (1ms)
+running 1 test from ./packages/cli/src/kernel/adapters/database/apphost-lifecycle-lock_test.ts
+FileAppHostLifecycleLock reclaims a lock held by a dead process ... ok (12ms)
+running 3 tests from ./packages/cli/src/kernel/adapters/database/operation-runner-helpers_test.ts
+isNoRunningAppHostOutput accepts the documented line with allowed prefixes ... ok (707µs)
+isNoRunningAppHostOutput rejects a failure that only quotes the phrase ... ok (116µs)
+db migrate forwards artifact name and terminal identity to the generated task ... ok (149µs)
+running 1 test from ./packages/cli/src/kernel/adapters/database/operation-runner_test.ts
+DbOperationRunner ...
+  uses the resident explicit-start resource and never starts a second AppHost ...
+------- post-test output -------
+Starting db migrate for postgres...
+migration complete
+db migrate completed successfully.
+----- post-test output end -----
+  uses the resident explicit-start resource and never starts a second AppHost ... ok (3ms)
+  fails closed when the resident AppHost is absent without starting a resource ...
+------- post-test output -------
+Starting db seed for postgres...
+----- post-test output end -----
+  fails closed when the resident AppHost is absent without starting a resource ... ok (1ms)
+  stops the resident operation resource when the database task fails ...
+------- post-test output -------
+Starting db status for postgres...
+failed
+db status failed with exit code 7.
+----- post-test output end -----
+  stops the resident operation resource when the database task fails ... ok (1ms)
+  stops the resource when a signal aborts polling ...
+------- post-test output -------
+Starting db seed for postgres...
+----- post-test output end -----
+  stops the resource when a signal aborts polling ... ok (2ms)
+  keeps studio attached to the resident AppHost ... ok (1ms)
+DbOperationRunner ... ok (15ms)
+running 1 test from ./packages/cli/src/kernel/adapters/database/scaffolder_test.ts
+DatabaseScaffolder ...
+  renders database script wrappers with concrete schema and generated paths ... ok (6ms)
+  derives unique container database names for added engines ... ok (1ms)
+DatabaseScaffolder ... ok (10ms)
+running 1 test from ./packages/cli/src/kernel/adapters/database/workspace-mutator_remove_test.ts
+database removal repairs primary and tool references ... ok (1ms)
+running 1 test from ./packages/cli/src/kernel/adapters/database/workspace-resolver_test.ts
+DbWorkspaceResolver ...
+  discovers configured databases from appsettings.json ... ok (2ms)
+  resolves all enabled databases and skips disabled entries ... ok (0ms)
+  maps config engine labels to CLI engine identifiers ... ok (0ms)
+  rejects unknown database targets ... ok (1ms)
+DbWorkspaceResolver ... ok (7ms)
+running 5 tests from ./packages/cli/src/kernel/adapters/deno-deploy/deno-deploy-cli_test.ts
+buildDeployArgs: preview push maps only provided flags ... ok (675µs)
+buildDeployArgs: production push maps --prod/--org/--app/--env-file/entrypoint in order ... ok (263µs)
+buildLogsArgs/buildDeleteArgs/buildStatusArgs: map subcommand + target flags ... ok (259µs)
+DenoDeployCliAdapter: shells `deno` with deploy argv from the project root ... ok (257µs)
+DenoDeployCliAdapter: propagates a non-zero exit code ... ok (269µs)
+running 1 test from ./packages/cli/src/kernel/adapters/deploy/compile/compile-platform_test.ts
+compile-platform ...
+  defaultCompileTarget returns the host triple ... ok (1ms)
+  binaryExtensionForTarget appends .exe for windows triples ... ok (0ms)
+  binaryExtensionForTarget yields no extension for non-windows triples ... ok (0ms)
+compile-platform ... ok (3ms)
+running 3 tests from ./packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+loadDeployConfig resolves unified background processors from appsettings and registry ... ok (699ms)
+extractCompileTargets emits metadata-driven background processor targets ... ok (1ms)
+loadDeployConfig maps service references to compile target dependencies ... ok (498µs)
+running 1 test from ./packages/cli/src/kernel/adapters/deploy/runtime-detect_test.ts
+deploy runtime-detect ...
+  honors an explicit OS over the host ... ok (0ms)
+  falls back to the host OS when none is given ... ok (0ms)
+  builds OS-appropriate full service names ... ok (0ms)
+  builds OS-appropriate config file names ... ok (0ms)
+  joins config paths per OS ... ok (1ms)
+deploy runtime-detect ... ok (6ms)
+running 5 tests from ./packages/cli/src/kernel/adapters/health/fetch-health-probe_test.ts
+resolveProbeUrl derives http://host:port/path when no url is given ... ok (601µs)
+resolveProbeUrl prefers an explicit url over derived host/port/path ... ok (68µs)
+probe is healthy when the observed status equals expectStatus ... ok (9ms)
+probe is unhealthy when the status differs from expectStatus ... ok (381µs)
+a thrown fetch (timeout/refused) is a non-healthy outcome, not an error ... ok (750µs)
+running 2 tests from ./packages/cli/src/kernel/adapters/linux/systemd/systemd-environment_test.ts
+withObservabilityEnvironment merges the core OTEL env over a base record ... ok (1ms)
+renderSystemdUnit emits the merged OTEL vars as Environment= directives ... ok (333µs)
+running 2 tests from ./packages/cli/src/kernel/adapters/linux/systemd/systemd_test.ts
+renderSystemdUnit ...
+  renders a well-formed .service unit with defaults ... ok (1ms)
+  emits User/Group/RuntimeDirectory only when provided ... ok (0ms)
+  escapes quotes and backslashes in Environment values ... ok (1ms)
+  honors overrides for service type, restart, and wantedBy ... ok (1ms)
+renderSystemdUnit ... ok (6ms)
+systemd command builders ...
+  builds the full unit name with the default prefix ... ok (0ms)
+  builds lifecycle args ... ok (0ms)
+  builds enable args with and without --force ... ok (0ms)
+  builds disable and daemon-reload args ... ok (1ms)
+  builds journalctl args ... ok (0ms)
+systemd command builders ... ok (8ms)
+running 9 tests from ./packages/cli/src/kernel/adapters/plugin/db-integration_test.ts
+copyPluginSchemaToRootDb copies plugin schema into active root DB schema tree ... ok (2ms)
+copyPluginSchemaToRootDb skips non-DB plugins ... ok (222µs)
+copyPluginSchemasToRootDb copies production plugin schema filenames ... ok (317µs)
+copyPluginSchemasToRootDb prefers package fragments over copied placeholders ... ok (525µs)
+copyPluginSchemasToRootDb keeps the bare schema filename rule for package fragments ... ok (503µs)
+copyPluginSchemasToRootDb validates declared schemas without widening no-DB behavior ... ok (1ms)
+copyPluginSchemasToRootDb rejects a dependency fragment that collides with a base declaration ... ok (591µs)
+copyPluginSchemasToRootDb deduplicates an identical base declaration ... ok (606µs)
+copyPluginSchemasToRootDb reinstalls a changed fragment without self-collision ... ok (496µs)
+running 5 tests from ./packages/cli/src/kernel/adapters/plugin/plugin-reference-reconciler_test.ts
+reconcilePluginReferences omits dangling dependencies and adds every producer edge ... ok (9ms)
+reconcilePluginReferences maps canonical dependencies to renamed installed instances ... ok (980µs)
+reconcilePluginReferences uses configured modules and accepts service-less declarations ... ok (3ms)
+reconcilePluginReferences wires a fixture third-party plugin to declared services and apps ... ok (2ms)
+third-party linking converges when consumers arrive later and cleans up after uninstall ... ok (1ms)
+running 2 tests from ./packages/cli/src/kernel/adapters/plugin/scaffolder_test.ts
+PluginScaffolder includes sample jobs and tasks by default ... ok (4ms)
+PluginScaffolder skips sample files and manifest contributions when disabled ... ok (1ms)
+running 19 tests from ./packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts
+PluginWorkspaceMutator ensures plugins root and plugin packages are workspace members ... ok (2ms)
+PluginWorkspaceMutator injects first-party plugin core imports into root deno config ... ok (2ms)
+root-level scaffold runtime imports resolve in both package-source modes ... ok (13ms)
+PluginWorkspaceMutator registers background plugins with companion API service ... ok (936µs)
+PluginWorkspaceMutator omits appsettings entries for service-less plugins ... ok (497µs)
+PluginWorkspaceMutator honors absolute local source service entrypoints ... ok (507µs)
+PluginWorkspaceMutator keeps package id separate from the instance name ... ok (286µs)
+PluginWorkspaceMutator writes saga store backend appsettings for saga plugins ... ok (342µs)
+PluginWorkspaceMutator provisions shared Garnet cache when missing ... ok (313µs)
+PluginWorkspaceMutator reuses existing shared cache entry ... ok (245µs)
+PluginWorkspaceMutator appends project-local plugin config specs ... ok (952µs)
+PluginWorkspaceMutator registers generated plugin glue entrypoints ... ok (512µs)
+PluginWorkspaceMutator rejects a missing configured plugin module ... ok (748µs)
+PluginWorkspaceMutator removes exactly one plugin instance from netscript config ... ok (404µs)
+PluginWorkspaceMutator removes generated root-level plugin glue declarations ... ok (142µs)
+first-party control-plane modules are import-safe and preserve application barrels ... ok (13s)
+first-party generated namespaces have complete imports in JSR and local-source modes ... ok (12ms)
+PluginWorkspaceMutator writes no ai kind-source jsr pins into local-source projects ... ok (791µs)
+PluginWorkspaceMutator rewrite map covers every @netscript/telemetry export subpath ... ok (649µs)
+running 2 tests from ./packages/cli/src/kernel/adapters/runtime/file-system/deno-file-system_test.ts
+copyFilePortable falls back to read/write when native copy is denied ... ok (1ms)
+copyFilePortable rethrows non-permission copy failures ... ok (301µs)
+running 2 tests from ./packages/cli/src/kernel/adapters/runtime/process/deno-process_test.ts
+DenoProcess kills and awaits a child after the configured timeout ... ok (72ms)
+DenoProcess can start a child with an empty inherited environment ... ok (63ms)
+running 1 test from ./packages/cli/src/kernel/adapters/scaffold/tests/dry-run-fs_test.ts
+DryRunFileSystemAdapter ...
+  should record writeFile as write operation ... ok (1ms)
+  should record createDir as mkdir operation ... ok (0ms)
+  should record remove as remove operation ... ok (0ms)
+  should record copy with src in content field ... ok (0ms)
+  should record multiple operations in order ... ok (0ms)
+  should NOT write files to the inner adapter ... ok (0ms)
+  should NOT create directories in the inner adapter ... ok (0ms)
+  exists() returns true for recorded write paths ... ok (1ms)
+  exists() returns true for recorded mkdir paths ... ok (0ms)
+  exists() delegates to inner for unknown paths ... ok (1ms)
+  exists() returns false for truly absent paths ... ok (0ms)
+  stat() returns isFile:true for recorded write paths ... ok (0ms)
+  stat() returns isDirectory:true for recorded mkdir paths ... ok (0ms)
+  stat() delegates to inner for real paths ... ok (1ms)
+  readFile() returns content from recorded writes before inner adapter ... ok (0ms)
+  readFile() delegates to inner adapter ... ok (1ms)
+  readFile() throws if file not in inner ... ok (0ms)
+  getOperations() returns copy not reference ... ok (0ms)
+DryRunFileSystemAdapter ... ok (16ms)
+running 1 test from ./packages/cli/src/kernel/adapters/scaffold/tests/fresh-adapter_test.ts
+normalizeFreshOutput ...
+  should remove known demo files that exist ... ok (3ms)
+  should skip demo files that do not exist ... ok (0ms)
+  should update deno.json with scoped name and exports ... ok (0ms)
+  should handle missing deno.json gracefully ... ok (0ms)
+normalizeFreshOutput ... ok (9ms)
+running 2 tests from ./packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts
+resolveNetScriptImports ...
+  should keep direct scaffold package families aligned across modes ... ok (2ms)
+  should resolve JSR mode imports ... ok (1ms)
+  should resolve local mode imports with default base ... ok (1ms)
+  should resolve local mode with custom base ... ok (0ms)
+resolveNetScriptImports ... ok (11ms)
+resolveNuGetReference ...
+  should resolve JSR mode as package reference ... ok (1ms)
+  should resolve local mode as project reference ... ok (0ms)
+  should use custom path for local mode ... ok (0ms)
+resolveNuGetReference ... ok (3ms)
+running 1 test from ./packages/cli/src/kernel/adapters/scaffold/tests/scaffolder_test.ts
+Scaffolder integration ...
+  should scaffold a single file from template content ... ok (2ms)
+  should write pre-rendered content directly ... ok (0ms)
+  should skip existing files without overwrite ... ok (0ms)
+  should overwrite existing files with overwrite flag ... ok (0ms)
+  should scaffold directory tree from templates ... ok (1ms)
+  should report skipped files in result ... ok (1ms)
+  should create directories and report them ... ok (1ms)
+  should check existence via the scaffolder ... ok (0ms)
+Scaffolder integration ... ok (15ms)
+running 2 tests from ./packages/cli/src/kernel/adapters/scaffold/tests/template-adapter_test.ts
+renderTemplate ...
+  should replace simple variables ... ok (1ms)
+  should replace multiple variables ... ok (0ms)
+  should apply camelCase pipe ... ok (1ms)
+  should apply pascalCase pipe ... ok (0ms)
+  should apply kebabCase pipe ... ok (1ms)
+  should apply snakeCase pipe ... ok (0ms)
+  should apply upperCase pipe ... ok (0ms)
+  should apply lowerCase pipe ... ok (1ms)
+  should handle whitespace in placeholders ... ok (0ms)
+  should handle whitespace around pipe ... ok (1ms)
+  should throw on undefined variable ... ok (1ms)
+  should throw on unknown pipe ... ok (0ms)
+  should leave non-template content unchanged ... ok (0ms)
+renderTemplate ... ok (15ms)
+StringTemplateAdapter ...
+  should have engine name ... ok (0ms)
+  should render template string ... ok (1ms)
+  should render file from filesystem ... ok (1ms)
+StringTemplateAdapter ... ok (3ms)
+running 3 tests from ./packages/cli/src/kernel/adapters/scaffold/tests/workspace-writer_test.ts
+addWorkspaceMember ...
+  adds member and sorts alphabetically ... ok (2ms)
+  throws if member already exists ... ok (1ms)
+  normalizes backslashes in member path ... ok (0ms)
+  normalizes member path without leading ./ ... ok (0ms)
+addWorkspaceMember ... ok (9ms)
+validateUniqueName ...
+  accepts valid kebab-case names ... ok (0ms)
+  validates resource names without workspace uniqueness checks ... ok (1ms)
+  rejects invalid pattern — uppercase ... ok (1ms)
+  rejects invalid pattern — starts with digit ... ok (0ms)
+  rejects invalid pattern — special chars ... ok (0ms)
+  rejects name exceeding max length ... ok (1ms)
+  rejects reserved names ... ok (1ms)
+  rejects names already in workspace ... ok (1ms)
+validateUniqueName ... ok (12ms)
+allocatePort ...
+  returns preferred port when available ... ok (1ms)
+  skips already used ports ... ok (0ms)
+  throws when range is exhausted ... ok (2ms)
+allocatePort ... ok (5ms)
+running 6 tests from ./packages/cli/src/kernel/adapters/secrets/env-file-secrets-store_test.ts
+put on POSIX writes content then chmod 0o600, no process invocation ... ok (2ms)
+put on Windows writes content then applies owner+SYSTEM icacls ACL, no chmod ... ok (443µs)
+Windows put without a ProcessPort rejects ... ok (607µs)
+list parses persisted keys and ignores blanks and comments ... ok (391µs)
+list returns empty when the secret file is absent ... ok (135µs)
+clear removes the secret file ... ok (203µs)
+running 1 test from ./packages/cli/src/kernel/adapters/service/client-scaffolder_test.ts
+service client scaffolder mirrors the typed SDK and query template ... ok (2ms)
+running 1 test from ./packages/cli/src/kernel/adapters/service/router-source_test.ts
+service handler append binds through the generated typed contract router ... ok (1ms)
+running 7 tests from ./packages/cli/src/kernel/adapters/service/scaffolder_test.ts
+ServiceScaffolder creates a contract-bound service workspace ... ok (5ms)
+shared contract scaffolder creates service contracts and aggregates v1 mod exports ... ok (1s)
+PortAllocator assigns next available service port ... ok (959µs)
+PortAllocator rejects out-of-range and duplicate requested ports ... ok (1ms)
+ServiceWorkspaceResolver discovers configured services ... ok (561µs)
+shared generateV1Mod supports multiple service names ... ok (268µs)
+shared generateV1Mod supports one service name ... ok (207µs)
+running 4 tests from ./packages/cli/src/kernel/adapters/templates/template-asset_test.ts
+package asset adapters do not perform direct Deno.read template reads ... ok (1ms)
+template asset adapter reads embedded content without hydration ... ok (355µs)
+template asset adapter renders existing template pipes ... ok (1ms)
+app and service templates emit lint-clean generated contracts ... ok (162µs)
+running 1 test from ./packages/cli/src/kernel/adapters/windows/manifest/manifest-resolver_test.ts
+buildManifestContext resolves executable bindings via manifest resource aliases ... ok (7ms)
+running 2 tests from ./packages/cli/src/kernel/application/plugin/registered-plugin-source_test.ts
+registered plugin source classifies explicit filesystem contracts as local ... ok (3ms)
+registered plugin source classifies package contracts without consulting the filesystem ... ok (320µs)
+running 2 tests from ./packages/cli/src/kernel/application/registries/template-registry_test.ts
+TemplateRegistry manifest matches checked-in template assets ... ok (18ms)
+TemplateRegistry reads registered template content ... ok (339µs)
+running 8 tests from ./packages/cli/src/kernel/application/scaffold/orchestrate-init_test.ts
+root and app scaffold bookkeeping share the project-boundary filename ... ok (638µs)
+initNextSteps includes public database preparation steps for JSR init ... ok (418µs)
+InMemoryScaffolder writes rendered files without a temp directory ... ok (1ms)
+initNextSteps includes local database preparation steps for maintainer init ... ok (162µs)
+initNextSteps tells no-Aspire Postgres users to self-provision ... ok (128µs)
+initNextSteps points at the dashboard when Aspire assigns the service port ... ok (93µs)
+initNextSteps prints a literal URL and an isolation warning for a pinned port ... ok (185µs)
+initNextSteps prints a literal URL for a no-Aspire workspace ... ok (126µs)
+running 7 tests from ./packages/cli/src/kernel/application/scaffold/plan-init_test.ts
+scaffoldRoot emits CI/CD workflow templates for shipped deploy targets ... ok (31ms)
+scaffoldRoot writes and bookkeeps a self-contained root tsconfig ... ok (842µs)
+#966 scaffoldRoot keeps source appsettings tracked by git ... ok (401µs)
+scaffoldRoot emits the Aspire CLI task runner only for Aspire workspaces ... ok (844µs)
+scaffoldRoot always emits quality and npm runners with the Deno pin ... ok (1ms)
+scaffoldRoot emits deploy workflow invocations accepted by the real deploy parser ...
+------- post-test output -------
+✓ compose plan ok
+✓ docker up ok
+deno-deploy up ok
+deno-deploy up ok
+Deployment artifacts generated.
+----- post-test output end -----
+scaffoldRoot emits deploy workflow invocations accepted by the real deploy parser ... ok (12ms)
+scaffoldRoot omits Aspire-backed compose CI when --no-aspire is used ... ok (1ms)
+running 2 tests from ./packages/cli/src/kernel/application/scaffold/support/format-generated-files_test.ts
+generated-file formatting uses scaffold style and the exact file list ... ok (1ms)
+generated-file formatting propagates formatter failures ... ok (810µs)
+running 4 tests from ./packages/cli/src/kernel/application/scaffold/writers/write-app-files_test.ts
+selected cache backend is carried into the generated app runtime ... ok (699µs)
+cache registration import is omitted when cache is disabled ... ok (62µs)
+app tsconfig is self-contained and Vite/Fresh compatible ... ok (360µs)
+initial route references match the canonical generated leaf shape ... ok (138µs)
+running 5 tests from ./packages/cli/src/kernel/application/ui/registry-deno-json_test.ts
+a subpath dependency maps the package root so the subpath import resolves ... ok (2ms)
+two subpaths of one package collapse to a single package-root entry ... ok (330µs)
+dependencies without a subpath keep their specifier verbatim ... ok (221µs)
+existing workspace imports are never overwritten ... ok (303µs)
+importEntryForDependency normalises every specifier shape ... ok (324µs)
+running 5 tests from ./packages/cli/src/kernel/application/ui/registry-lifecycle_test.ts
+registry list mirrors the manifest and flags installed items ... ok (3ms)
+registry update reports local edits without clobbering them ... ok (1ms)
+registry remove deletes files and dependency imports ... ok (2ms)
+installing the desktop items pins the SDK release the workspace ships ... ok (4ms)
+removing one desktop item keeps the SDK import the other still needs ... ok (1ms)
+running 2 tests from ./packages/cli/src/kernel/application/ui/registry-styles.test.ts
+writeStylesAggregator registers a collection install's per-item CSS imports ... ok (1ms)
+writeStylesAggregator appends a collection install onto an existing aggregator ... ok (590µs)
+running 2 tests from ./packages/cli/src/kernel/application/ui/web-scaffold_test.ts
+page scaffold emits a definePage route and colocated island files ... ok (3ms)
+island scaffold emits signals or query hydration templates ... ok (443µs)
+running 2 tests from ./packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog_test.ts
+scaffold runtime npm imports match workspace, Fresh, and SDK catalogs ... ok (2ms)
+standalone workspace Zod catalog matches the repository authority ... ok (366µs)
+running 2 tests from ./packages/cli/src/kernel/constants/version-drift_test.ts
+no hardcoded pinned NetScript JSR specifiers in CLI src ... FAILED (190ms)
+no version-less NetScript JSR specifiers in framework command sources ... ok (44ms)
+running 4 tests from ./packages/cli/src/kernel/domain/deploy/activation-convention_test.ts
+activateWithHealthGate records the candidate and prunes on a passing gate ... ok (1ms)
+activateWithHealthGate activates the candidate BEFORE probing it ... ok (211µs)
+activateWithHealthGate auto-rolls-back to the prior current on a failing gate ... ok (360µs)
+activateWithHealthGate on a failing gate with no prior current does not rollback-activate ... ok (276µs)
+running 9 tests from ./packages/cli/src/kernel/domain/deploy/deno-deploy-target_test.ts
+DenoDeployTarget: declares the supported canonical op subset (no rollback/secrets) ... ok (1ms)
+DenoDeployTarget: plan reports guard violations without shelling ... ok (613µs)
+DenoDeployTarget: plan on a clean project reports Deploy-ready ... ok (138µs)
+DenoDeployTarget: up refuses a production push with unstable-API violations ... ok (1ms)
+DenoDeployTarget: up proceeds on a preview push despite violations (warns) ... ok (366µs)
+DenoDeployTarget: up pushes cleanly and forwards resolved defaults ... ok (322µs)
+DenoDeployTarget: down/status/logs delegate to the CLI port ... ok (443µs)
+DenoDeployTarget: a non-zero CLI exit code throws ... ok (400µs)
+DEFAULT_DEPLOY_TARGETS: registers the deno-deploy target ... ok (455µs)
+running 11 tests from ./packages/cli/src/kernel/domain/deploy/deploy-target-port_test.ts
+deploy target contract exposes the canonical 7-op names ... ok (1ms)
+deploy target contract retains the legacy build/install/uninstall verb aliases ... ok (168µs)
+deploy target port accepts an adapter that implements only the canonical subset ... ok (146µs)
+deploy target registry reserves all first-party target keys at the type level ... ok (507µs)
+unwired bare-metal service targets advertise only the canonical 6-op subset (F-DEPLOY-1) ... ok (397µs)
+wiring the core ports promotes a service target to the 7-op surface and delegates ... ok (597µs)
+a bare-metal service operation resolves a target-scoped descriptor result ... ok (264µs)
+the default deploy target registry resolves every first-party target ... ok (410µs)
+the default deploy target registry exposes only operations with implemented handlers ... ok (378µs)
+compose and docker targets resolve the Aspire adapter operation subsets ... ok (221µs)
+kubernetes, azure, and cloud-run targets resolve the Aspire cloud operation subset ... ok (282µs)
+running 4 tests from ./packages/cli/src/kernel/domain/deploy/health-gate_test.ts
+runHealthGate passes once a probe reports healthy, honoring earlier retries ... ok (1ms)
+runHealthGate fails after exhausting retries ... ok (293µs)
+runHealthGate counts a thrown probe (timeout/transport) as a failed attempt ... ok (451µs)
+runHealthGate makes at least one attempt even when retries < 1 ... ok (103µs)
+running 5 tests from ./packages/cli/src/kernel/domain/deploy/observability-convention_test.ts
+observabilityEnv emits OTEL_DENO=true with the derived service name and default protocol ... ok (1ms)
+observabilityEnv wires the exporter endpoint and protocol when configured ... ok (151µs)
+observabilityEnv applies the service-name prefix ... ok (100µs)
+observabilityEnv emits the service-version resource attribute and optional standalone var ... ok (175µs)
+observabilityEnv returns an empty map when disabled ... ok (257µs)
+running 9 tests from ./packages/cli/src/kernel/domain/deploy/rollback-convention_test.ts
+DEFAULT_RELEASE_RETENTION is 3 ... ok (2ms)
+retainReleases prunes prior releases older than the retention window ... ok (667µs)
+retainReleases never prunes the current release even when keep is 0 ... ok (569µs)
+retainReleases is a no-op when keep >= prior count ... ok (141µs)
+selectRollbackTarget picks the most-recent healthy release before current ... ok (258µs)
+selectRollbackTarget skips unhealthy prior releases ... ok (212µs)
+selectRollbackTarget returns undefined for single/empty history ... ok (132µs)
+rollbackToPrevious activates the previous healthy release ... ok (313µs)
+rollbackToPrevious is a structured no-op when there is nothing to roll back to ... ok (154µs)
+running 6 tests from ./packages/cli/src/kernel/domain/deploy/secrets-convention_test.ts
+RESTRICTED_SECRET_FILE_MODE is owner read/write only (0o600) ... ok (1ms)
+renderSecretsEnvFile emits KEY=VALUE lines with the restricted mode ... ok (407µs)
+renderSecretsEnvFile quotes + escapes values that would break a dotenv parse ... ok (197µs)
+renderSecretsEnvFile renders an empty body for a bundle with no secrets ... ok (67µs)
+reconcileSecrets writes the rendered bundle through the store port ... ok (654µs)
+reconcileSecrets reports keys held by the store but dropped from the bundle as pruned ... ok (240µs)
+running 6 tests from ./packages/cli/src/kernel/domain/deploy/unstable-api-guard_test.ts
+scanUnstableApis: clean project reports ok with no violations ... ok (904µs)
+scanUnstableApis: flags Deno.openKv usage in an entrypoint ... ok (298µs)
+scanUnstableApis: flags features declared in deno.json unstable list ... ok (435µs)
+scanUnstableApis: dedupes the same API across the declared list and sources ... ok (209µs)
+scanUnstableApis: detects Temporal, cron, and BroadcastChannel tokens ... ok (408µs)
+scanUnstableApis: tolerates missing/invalid deno.json and sources ... ok (163µs)
+running 3 tests from ./packages/cli/src/kernel/domain/scaffold/app-name_test.ts
+deriveDefaultAppName adds one project-specific web suffix ... ok (1ms)
+deriveDefaultAppName stays inside the validated app-name contract ... ok (294µs)
+deriveDefaultAppName trims a separator at the length boundary ... ok (154µs)
+running 2 tests from ./packages/cli/src/kernel/domain/scaffold/default-port-allocation_test.ts
+scaffold default ports are stable, high, and resource-specific ... ok (1ms)
+scaffold default port allocation probes occupied ports ... ok (185µs)
+running 2 tests from ./packages/cli/src/kernel/templates/app/generators-config_test.ts
+generateAppDenoJson ...
+  should produce valid JSON with scoped name ... ok (1ms)
+  should have exports pointing to main.ts ... ok (0ms)
+  should include Fresh and Preact imports ... ok (0ms)
+  should include JSX compiler options ... ok (0ms)
+  should NOT include workspace field (only valid on root deno.json) ... ok (0ms)
+  should have Vite-based tasks ... ok (0ms)
+  should include Vite and Fresh plugin imports ... ok (0ms)
+  should end with trailing newline ... ok (0ms)
+  emits the expected app manifest shape for JSR mode ... ok (1ms)
+  should resolve @netscript/fresh/vite in local mode ... ok (1ms)
+  should match the validated copied-workspace app contract in local mode ... ok (0ms)
+  sources external app dependency pins from the scaffold catalog ... ok (1ms)
+generateAppDenoJson ... ok (14ms)
+generateAppViteConfig ...
+  should include the NetScript Vite plugin and workspace watch paths ... ok (1ms)
+  should include all @app aliases mirrored from the playground ... ok (0ms)
+  keeps alias and plugin ordering stable in the vite config ... ok (1ms)
+generateAppViteConfig ... ok (2ms)
+running 1 test from ./packages/cli/src/kernel/templates/app/route-templates_test.ts
+app route template rendering ...
+  router.ts mirrors the playground route entrypoint and adds the scaffold service ref ... ok (2ms)
+  CRUD links resolve to the generated /examples/crud route ... ok (1ms)
+  rejects duplicate direct appRoutes targets ... ok (0ms)
+  utils.ts re-exports a typed definePage helper ... ok (1ms)
+  app shell imports design CSS and avoids favicon console noise ... ok (1ms)
+  index route keeps the builder in index.tsx and the view in a child component ... ok (0ms)
+  dashboard route keeps operations data in a registry-only child view ... ok (0ms)
+  health route keeps the builder in health.tsx and the probe payload in shared helpers ... ok (0ms)
+  health route renders through SSR unless the caller asks for JSON only ... ok (0ms)
+  layout template keeps define.layout and exposes the examples nav ... ok (0ms)
+  design route templates use NetScript page builders and scoped route files ... ok (0ms)
+  examples landing route keeps the builder in index.tsx and the cards in a child view ... ok (0ms)
+  static directory-pattern route uses registry form, table, and detail blocks ... ok (0ms)
+  example service template wires the selected service client and query helpers ... ok (0ms)
+  resource-local route contract owns typed path and search state ... ok (0ms)
+  service example route is folder-owned with the builder in index.tsx and layout in index.layout.tsx ... ok (0ms)
+  service example child components separate page structure from layer UIs ... ok (0ms)
+  managed form renders the schema-invalid branch and keeps partial navigation ... ok (0ms)
+  managed form renders the successful-submission branch ... ok (0ms)
+  route-local shared loader prefetches and dehydrates the showcase query ... ok (0ms)
+  optimistic callbacks capture and restore the exact pre-mutation snapshot ... ok (11ms)
+  DB island exposes cached query states and consumes executable rollback callbacks ... ok (0ms)
+  memory island consumes executable rollback callbacks and preserves query states ... ok (0ms)
+  summary panel and partial route keep defer concerns server-owned ... ok (0ms)
+  service contract exposes typed CRUD schemas for the showcase mutations ... ok (0ms)
+  service router binds Prisma-backed CRUD handlers for the showcase flow ... ok (0ms)
+app route template rendering ... ok (36ms)
+running 1 test from ./packages/cli/src/kernel/templates/aspire/generate-aspire-config_test.ts
+generateTsAspireConfig ...
+  lets Aspire choose per-process dashboard and telemetry ports ... ok (1ms)
+  does not pin the profile to the base Aspire infra ports ... ok (0ms)
+  includes all required DB integration packages for multi-engine projects ... ok (1ms)
+  includes the browser logs integration package by default ... ok (0ms)
+generateTsAspireConfig ... ok (5ms)
+running 3 tests from ./packages/cli/src/kernel/templates/aspire/generators_test.ts
+generateGlobalJson ...
+  should produce valid JSON with SDK version ... ok (1ms)
+  should set rollForward to latestMinor ... ok (0ms)
+  should allow prereleases ... ok (1ms)
+  should accept custom SDK version ... ok (0ms)
+  should end with trailing newline ... ok (0ms)
+  keeps the root and sdk key ordering stable ... ok (0ms)
+generateGlobalJson ... ok (8ms)
+generateAspireConfig ...
+  should produce valid JSON with appHostPath ... ok (1ms)
+  should accept custom appHostPath ... ok (0ms)
+  should end with trailing newline ... ok (0ms)
+  keeps the minimal config shape stable ... ok (0ms)
+generateAspireConfig ... ok (4ms)
+generateAppsettings ...
+  should produce valid JSON with NetScript config root ... ok (1ms)
+  should include OTEL endpoint under NetScript.Otel ... ok (0ms)
+  should accept custom appPort and otelPort ... ok (0ms)
+  should pin no app host port by default ... ok (0ms)
+  should omit Databases/PrimaryDatabase when dbEngine is none ... ok (0ms)
+  defaults shared cache to redis ... ok (0ms)
+  can omit shared cache emission ... ok (0ms)
+  emits garnet cache appsettings when selected ... ok (0ms)
+  emits deno-kv cache appsettings when selected ... ok (1ms)
+  should register Postgres engine when dbEngine is postgres ... ok (1ms)
+  should register Sqlite engine without Mode ... ok (0ms)
+  should register MSSQL engine with matching Aspire password parameter ... ok (0ms)
+  should include example service when provided, pinning no host port ... ok (0ms)
+  should pin the host port a caller explicitly requests ... ok (1ms)
+  should produce an empty Services block when no service provided ... ok (0ms)
+  should omit Prisma Studio when no database is configured ... ok (0ms)
+  should end with trailing newline ... ok (1ms)
+  keeps the default NetScript key ordering stable ... ok (0ms)
+  keeps service + postgres sections structurally stable ... ok (0ms)
+generateAppsettings ... ok (19ms)
+running 1 test from ./packages/cli/src/kernel/templates/aspire/helpers/tests/database-permissions_test.ts
+SQLite permissions add FFI only when it is not already granted ... ok (1ms)
+running 1 test from ./packages/cli/src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts
+generateDbCliMode ...
+  generates targets for all configured database engines ... ok (1ms)
+  registers operation resources without short-circuiting the resident graph ... ok (0ms)
+generateDbCliMode ... ok (5ms)
+running 1 test from ./packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts
+generateRegisterInfrastructure ...
+  uses session lifetime for configured-persistent databases only under isolated starts ... ok (3ms)
+  registers redis cache containers with endpoint wiring ... ok (0ms)
+  registers garnet cache containers with endpoint wiring ... ok (0ms)
+  emits deno-kv Local cache as in-process wiring without an Aspire resource ... ok (0ms)
+  emits deno-kv Container cache as a Deno KV Connect container with an access token ... ok (0ms)
+  emits garnet Executable cache as a self-provisioned dotnet tool (Docker-less) ... ok (1ms)
+  honors an explicit ToolVersion pin for the garnet Executable arm ... ok (1ms)
+  emits garnet Auto as a runtime Docker probe: Garnet container vs Garnet executable ... ok (0ms)
+  emits deno-kv Auto with the DenoKv Connect container as the Docker branch ... ok (0ms)
+  registers sqlite as a resolved file-backed Aspire resource ... ok (0ms)
+  generates one resolved graph resource per scaffolded backing service ... ok (1ms)
+  registers SQL Server containers with explicit image and password policy env ... ok (1ms)
+  persists container database credentials for resident AppHost restarts ... ok (0ms)
+generateRegisterInfrastructure ... ok (17ms)
+running 2 tests from ./packages/cli/src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts
+generateRegisterBackground ...
+  should return a non-empty string ... ok (1ms)
+  should include the standard file header ... ok (0ms)
+  should export registerBackgroundProcessors async function ... ok (1ms)
+  should import buildOtelEnvVars and resolvePermissions ... ok (0ms)
+  should register processors via addExecutable ... ok (0ms)
+  emits SQLite FFI exactly once for background processors ... ok (0ms)
+  keeps non-SQLite background output byte-identical ... ok (0ms)
+  should use --watch flag (not --watch-hmr) for background processors ... ok (0ms)
+  should enable Deno worker options for background processors ... ok (0ms)
+  should include enabled gate for each processor ... ok (0ms)
+  should include OTEL env vars when telemetry is enabled ... ok (0ms)
+  should opt out of telemetry when disabled ... ok (0ms)
+  should include concurrency env var when configured ... ok (0ms)
+  should include database dependency when RequiresDb is true ... ok (0ms)
+  should include KV cache dependency when RequiresKv is true ... ok (0ms)
+  uses the typed service map parameter for background service references ... ok (1ms)
+  should pass saga store backend appsettings to background env ... ok (0ms)
+  should register the saga supervisor health endpoint and probe ... ok (0ms)
+  should point triggers background at the generated trigger registry module ... ok (1ms)
+  should handle empty processors ... ok (0ms)
+generateRegisterBackground ... ok (19ms)
+generateRegisterApps ...
+  should return a non-empty string ... ok (1ms)
+  should include the standard file header ... ok (0ms)
+  should export registerApps async function ... ok (0ms)
+  should import buildViteEnvVarName from _aspire-compat ... ok (0ms)
+  should register app type with valid deno task argv ... ok (0ms)
+  should include enabled gate for each app ... ok (0ms)
+  should include OTEL telemetry for all app types ... ok (0ms)
+  should include HTTP endpoint when port is configured ... ok (0ms)
+  should not emit browser-log capabilities for generic executable apps ... ok (0ms)
+  should use deno task for app registration ... ok (0ms)
+  should include VITE service-discovery injection for service references ... ok (1ms)
+  should register desktop only when explicitly enabled ... ok (0ms)
+  should make desktop launch wait for the Fresh build resource ... ok (0ms)
+  should apply desktop build and predev task defaults ... ok (0ms)
+  should inject server-side discovery without an Aspire HTTP endpoint for desktop ... ok (0ms)
+  should annotate app type in comment ... ok (0ms)
+  should register an HTTP health probe for app resources ... ok (0ms)
+  should probe a custom path when HealthCheckPath is configured ... ok (0ms)
+  should omit the health probe when HealthCheckPath is false ... ok (0ms)
+  should register a health probe for every endpoint-bearing executable ... ok (1ms)
+  should not register a health probe for an endpoint-less task ... ok (0ms)
+  should handle empty apps ... ok (0ms)
+generateRegisterApps ... ok (19ms)
+running 2 tests from ./packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts
+generateConfigSchema ...
+  should return a non-empty string ... ok (1ms)
+  should include the standard file header ... ok (1ms)
+  should import zod and NetScriptConfigSchema from _aspire-compat ... ok (1ms)
+  should export ProjectConfigSchema and ProjectConfig type ... ok (1ms)
+  should include section entries as literal keys ... ok (1ms)
+  should import entry schemas only for populated sections ... ok (0ms)
+  should quote property keys with special characters ... ok (1ms)
+  should handle all empty sections with no z.object blocks ... ok (0ms)
+generateConfigSchema ... ok (12ms)
+generateRegisterInfrastructure ...
+  should return a non-empty string ... ok (2ms)
+  should include the standard file header ... ok (0ms)
+  should export registerInfrastructure async function ... ok (1ms)
+  should export InfrastructureContext interface ... ok (0ms)
+  should import persistent-container helpers only when generated output uses them ... ok (0ms)
+  should use addPostgres for Postgres Container mode ... ok (0ms)
+  should use addConnectionString for External mode ... ok (0ms)
+  should include withLifetime for persistent databases, session-scoped when isolated ... ok (1ms)
+  should include withDataBindMount for databases with DataPath ... ok (0ms)
+  should include addDatabase when DatabaseName is specified ... ok (0ms)
+  should assign server directly when no DatabaseName ... ok (0ms)
+  should use a Redis-compatible Garnet container for Garnet cache engine ... ok (1ms)
+  should resolve primary database from config ... ok (1ms)
+  should resolve primary cache from config ... ok (1ms)
+  should set null primaries when not configured ... ok (0ms)
+  should handle empty databases and caches ... ok (1ms)
+generateRegisterInfrastructure ... ok (25ms)
+running 2 tests from ./packages/cli/src/kernel/templates/aspire/helpers/tests/generators-pipeline_test.ts
+HelpersGeneratorPipeline ...
+  should generate all AppHost project files when enabled ... ok (6ms)
+  should generate 11 files without apphost ... ok (1ms)
+  should produce files with non-empty paths and content ... ok (1ms)
+  threads SQLite FFI to every permission-bearing register output ... ok (1ms)
+  should emit local import specifiers that resolve to generated files ... ok (2ms)
+  should use correct .helpers/ output paths for all helpers files ... ok (1ms)
+  should include apphost.mts at root level (not in .helpers/) ... ok (1ms)
+  must not generate a second DB-operation AppHost over resident data ... ok (1ms)
+  should not include apphost.mts when generateAppHost is false ... ok (1ms)
+  should render apphost.mts with correct template variables ... ok (1ms)
+  should include configure-dashboard.mts from Tier 2 template ... ok (1ms)
+  should mirror dashboard env constants in the Aspire compat helper ... ok (0ms)
+  should include the Aspire compat helper with VITE env-var export ... ok (0ms)
+  should bound best-effort Garnet tool restore ... ok (0ms)
+  should pass populated config through to Tier 1 generator content ... ok (0ms)
+  should handle empty config producing valid no-op output ... ok (1ms)
+HelpersGeneratorPipeline ... ok (36ms)
+generateHelpers ...
+  should return the same file count as pipeline.execute() ... ok (1ms)
+  should support generateAppHost: false ... ok (1ms)
+  should produce valid generated files with non-empty content ... ok (1ms)
+generateHelpers ... ok (5ms)
+running 2 tests from ./packages/cli/src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts
+generateRegisterServices ...
+  should return a non-empty string ... ok (0ms)
+  should include the standard file header ... ok (0ms)
+  should export registerServices async function ... ok (0ms)
+  should import register-services dependencies ... ok (1ms)
+  should generate two-pass registration structure ... ok (0ms)
+  should register services via addExecutable with correct port and entrypoint ... ok (0ms)
+  should include full executable OTEL env vars for each service ... ok (0ms)
+  should register an HTTP health probe after the endpoint for unpinned services ... ok (0ms)
+  should support custom and disabled service health probes ... ok (0ms)
+  should use --watch-hmr flag for services (HMR-capable) ... ok (0ms)
+  should emit FFI permission only for SQLite-backed service commands ... ok (1ms)
+  should preserve explicit service permissions while requiring SQLite FFI once ... ok (0ms)
+  keeps non-SQLite service output byte-identical ... ok (0ms)
+  should wire primary database dependency for all services ... ok (0ms)
+  should wire service references from the services map ... ok (1ms)
+  should wire plugin references from the plugins map ... ok (0ms)
+  should handle empty services ... ok (0ms)
+generateRegisterServices ... ok (13ms)
+generateRegisterPlugins ...
+  should return a non-empty string ... ok (1ms)
+  should include the standard file header ... ok (0ms)
+  should export registerPlugins async function ... ok (1ms)
+  should generate two-pass registration structure ... ok (1ms)
+  should register plugins via addExecutable with correct port ... ok (0ms)
+  emits SQLite FFI exactly once for plugin services ... ok (0ms)
+  keeps non-SQLite plugin output byte-identical ... ok (0ms)
+  should include full executable OTEL env vars for each plugin ... ok (1ms)
+  should register an HTTP health probe after the endpoint for unpinned plugins ... ok (0ms)
+  should support custom and disabled plugin health probes ... ok (0ms)
+  should inject configured plugin environment variables ... ok (1ms)
+  should wire plugin→plugin references in pass 2 ... ok (1ms)
+  should wire service references in pass 1 (services already exist) ... ok (0ms)
+  should handle RequiresDb dependency ... ok (0ms)
+  should handle RequiresKv dependency via the withCacheReference seam ... ok (0ms)
+  should pass saga store backend appsettings to plugin env ... ok (0ms)
+  should point triggers API at the generated trigger registry module ... ok (0ms)
+  should handle empty plugins ... ok (0ms)
+generateRegisterPlugins ... ok (20ms)
+running 3 tests from ./packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts
+generateRegisterTools ...
+  should return a non-empty string ... ok (0ms)
+  should include the standard file header ... ok (0ms)
+  should export registerTools async function ... ok (0ms)
+  should import resolveWorkspacePath from _aspire-compat ... ok (0ms)
+  should register tools via addExecutable with deno task ... ok (0ms)
+  should use resource name as TaskName fallback ... ok (1ms)
+  should convert hyphenated names to safe identifiers ... ok (0ms)
+  should include enabled gate for each tool ... ok (0ms)
+  should use named database dependency when configured ... ok (0ms)
+  should fall back to primary database when no named database ... ok (0ms)
+  should inject database URL for database-backed tools ... ok (1ms)
+  should resolve Prisma Studio to the database workspace ... ok (0ms)
+  should handle empty tools ... ok (0ms)
+generateRegisterTools ... ok (15ms)
+generateDbCliMode ...
+  should generate targets for all configured database engines ... ok (0ms)
+  registers explicit DB resources without short-circuiting the resident graph ... ok (0ms)
+generateDbCliMode ... ok (3ms)
+generateIndex ...
+  should return a non-empty string ... ok (0ms)
+  should include the standard file header ... ok (0ms)
+  should export createNetScriptAppHost async function with correct params ... ok (0ms)
+  should import parseAppSettings from _aspire-compat ... ok (0ms)
+  should import DistributedApplicationBuilder from SDK module ... ok (0ms)
+  should include all registration phase imports ... ok (0ms)
+  should follow correct registration order in function body ... ok (0ms)
+  should parse config via parseAppSettings in function body ... ok (0ms)
+generateIndex ... ok (7ms)
+running 5 tests from ./packages/cli/src/kernel/templates/aspire/helpers/tests/register-http-endpoint_test.ts
+resolveHostPort ...
+  should return undefined when the entry pins nothing ... ok (1ms)
+  should prefer HostPort over the deprecated Port alias ... ok (0ms)
+  should still read the deprecated Port alias so existing configs keep working ... ok (1ms)
+resolveHostPort ... ok (6ms)
+renderHttpEndpointOptions ...
+  should omit port entirely when nothing is pinned ... ok (0ms)
+  should emit the pinned host port when one is configured ... ok (0ms)
+  should always name the PORT env var so the process learns its target port ... ok (0ms)
+renderHttpEndpointOptions ... ok (3ms)
+generateRegisterServices host ports ...
+  should pin no host port for a service that configures none ... ok (1ms)
+  should pin the host port a service opts into via HostPort ... ok (0ms)
+  should keep honouring the deprecated Port alias unchanged ... ok (1ms)
+  should wire cross-references through getEndpoint regardless of pinning ... ok (0ms)
+generateRegisterServices host ports ... ok (4ms)
+generateRegisterPlugins host ports ...
+  should pin no host port for a plugin that configures none ... ok (1ms)
+  should keep honouring a configured plugin port ... ok (0ms)
+generateRegisterPlugins host ports ... ok (2ms)
+generateRegisterApps host ports ...
+  should still register an endpoint for a web app that pins no host port ... ok (1ms)
+  should keep honouring a configured app port ... ok (0ms)
+  should leave a portless task app without an HTTP endpoint, as before ... ok (0ms)
+generateRegisterApps host ports ... ok (3ms)
+running 3 tests from ./packages/cli/src/kernel/templates/aspire/helpers/tests/service-environment-runtime_test.ts
+generated service registration, executed (#1447) ...
+  should put every declared entry on its own resource ... ok (42ms)
+  should still wire the database reference and wait ... ok (15ms)
+  should register the HTTP endpoint that owns PORT ... ok (15ms)
+generated service registration, executed (#1447) ... ok (76ms)
+declared environment precedence, per documented category (#1447) ...
+  should honor the plain (control) rule: declared-wins ... ok (19ms)
+  should honor the plain (second control) rule: declared-wins ... ok (14ms)
+  should honor the OTel rule: generated-wins ... ok (17ms)
+  should honor the database URL rule: generated-wins ... ok (20ms)
+  should honor the database engine URI rule: generated-wins ... ok (16ms)
+  should honor the database provider rule: generated-wins ... ok (19ms)
+  should honor the service discovery rule: generated-wins ... ok (15ms)
+  should honor the PORT / endpoint rule: refused ... ok (18ms)
+  should keep a non-colliding control intact while collisions are overridden ... ok (17ms)
+declared environment precedence, per documented category (#1447) ... ok (163ms)
+the declared environment reaches a real process (#1447) ...
+  should be observed by a process started with the assigned environment ... ok (81ms)
+the declared environment reaches a real process (#1447) ... ok (82ms)
+running 2 tests from ./packages/cli/src/kernel/templates/aspire/helpers/tests/service-environment_test.ts
+declared service environment (#1447) ...
+  should survive config parsing under the deprecated Env alias ... ok (12ms)
+  should apply every declared entry to the correct service resource ... ok (3ms)
+  should apply the declared entries through withEnvironment ... ok (2ms)
+  should let generated telemetry and database values win a declared collision ... ok (1ms)
+  should refuse a declared PORT and say so in the generated helper ... ok (1ms)
+  should prefer Environment over the deprecated Env alias ... ok (2ms)
+  should emit nothing extra for a service that declares no environment ... ok (1ms)
+  should regenerate byte-identical output ... ok (1ms)
+declared service environment (#1447) ... ok (33ms)
+declared plugin environment parity (#1447) ...
+  should apply the declared entries to plugin resources the same way ... ok (3ms)
+  should read the deprecated Env alias on plugin entries too ... ok (1ms)
+  should place declared entries before generated values on plugins as well ... ok (1ms)
+  should refuse a declared PORT on plugin resources too ... ok (1ms)
+declared plugin environment parity (#1447) ... ok (11ms)
+running 1 test from ./packages/cli/src/kernel/templates/aspire/pristine-scaffold-ports_test.ts
+pristine scaffold host ports (#952) ...
+  should write no host port for the example service or the app ... ok (1ms)
+  should generate a service registration that pins nothing ... ok (1ms)
+  resolves the database resource afresh instead of persisting an allocated endpoint (#1202) ... ok (0ms)
+  should generate an app registration that pins nothing but still serves HTTP ... ok (1ms)
+  should still pin when the developer asks for it ... ok (0ms)
+pristine scaffold host ports (#952) ... ok (9ms)
+running 1 test from ./packages/cli/src/kernel/templates/database/generators_test.ts
+database template generators ...
+  generates engine-specific Deno tasks and imports ... ok (2ms)
+  includes patch-client and fix-zod tasks for sqlite ... ok (0ms)
+  generates zod and patch-client tasks for mysql ... ok (0ms)
+  generates zod and patch-client tasks for mssql ... ok (0ms)
+  generates Prisma config with Aspire env key and sqlite fallback URL ... ok (1ms)
+  generates Prisma config with the env import and fallback for postgres ... ok (0ms)
+  normalizes mssql Aspire loopback endpoints to hostname URLs ... ok (0ms)
+  generates engine modules with adapter setup where required ... ok (1ms)
+  constructs the sqlite engine module with the libsql driver adapter ... ok (0ms)
+  includes the libsql adapter import for the sqlite database deno.json ... ok (0ms)
+  generates the root database facade for the selected engine ... ok (0ms)
+database template generators ... ok (13ms)
+running 4 tests from ./packages/cli/src/kernel/templates/plugins/generate-plugin-service_test.ts
+generatePluginService opts KV-backed plugin services into Redis adapter ... ok (2ms)
+generatePluginService does not add Redis adapter import for API-only services ... ok (310µs)
+generatePluginProcessorEntrypoint carries the selected KV adapter ... ok (272µs)
+generatePluginServiceContext emits package-resident safe imports ... ok (183µs)
+running 2 tests from ./packages/cli/src/kernel/templates/service/generators_test.ts
+generateServiceDenoJson ...
+  should produce valid JSON with scoped name and direct imports only ... ok (0ms)
+  should resolve service imports against local packages when using copied workspace members ... ok (1ms)
+  should run the server with --unstable-no-legacy-abort (Deno 2.9, #176) ... ok (1ms)
+  should end with a trailing newline ... ok (0ms)
+generateServiceDenoJson ... ok (5ms)
+service template rendering ...
+  main.ts uses defineService as the only boot primitive ... ok (1ms)
+  router.ts preserves the validated service-local health contract shape ... ok (0ms)
+service template rendering ... ok (2ms)
+running 22 tests from ./packages/cli/src/kernel/templates/workspace/generators_test.ts
+generateTsConfig terminates parent lookup without claiming Deno files ... ok (1ms)
+generateDenoJson emits the expected root workspace shape in JSR mode ... ok (834µs)
+generateDenoJson gives standalone workspaces their own Zod catalog ... ok (251µs)
+generatePackageJson pins the pre-window Deno runtime ... ok (212µs)
+generateDenoJson emits detached Aspire telemetry task routes ... ok (273µs)
+generateAspireCliTaskRunner emits bare-first fallback and actionable failure ... ok (187µs)
+generateDenoJson gives Aspire cold starts a configurable five-minute budget ... ok (100µs)
+generateDenoJson scopes the minimum dependency age exception to NetScript packages ... ok (288µs)
+generateDenoJson emits shared plugin service-context imports in JSR mode ... ok (166µs)
+generateDenoJson maps @database/zod for the selected database engine ... ok (123µs)
+generateDenoJson keeps generated database aliases in local mode ... ok (234µs)
+generateDenoJson keeps the same root-only shape in local mode ... ok (270µs)
+generateDenoJson omits imports in local mode ... ok (195µs)
+generateDenoJson expands copied workspace packages in stable order ... ok (357µs)
+generateNetScriptConfig emits the JSR import and stable section order ... ok (553µs)
+generateNetScriptConfig switches to local imports without the JSR TODO banner ... ok (185µs)
+generateReadme — TS AppHost with service + postgres ... ok (1ms)
+generateReadme — no aspire points at app dev task ... ok (260µs)
+generateReadme — no aspire postgres asks for self-provisioning ... ok (178µs)
+generateReadme — sqlite gets non-persistent note ... ok (135µs)
+generateReadme — mysql gets persistent-container note ... ok (153µs)
+generated tsconfigs terminate upward lookup so a hostile parent cannot reach the project ... ok (220µs)
+running 2 tests from ./packages/cli/src/kernel/templates/workspace/node-modules-verifier_test.ts
+generated verifier fails closed for a cache file missing from node_modules/.deno ... ok (56ms)
+generated verifier passes only after the local materialization is complete ... ok (44ms)
+running 6 tests from ./packages/cli/src/kernel/templates/workspace/quality-runner_test.ts
+generated quality runner rejects an empty owned-source selection in every mode ... ok (178ms)
+generated quality runner selects TS, TSX, and AppHost MTS while excluding non-product trees ... ok (94ms)
+generated quality runner propagates a selected TypeScript failure ... ok (972ms)
+generated quality runner rejects explicit any in selected product source ... ok (64ms)
+generated quality runner is itself lint and format clean in its consumer location ... ok (184ms)
+generated quality runner checks AppHost source through its restored TypeScript project ... ok (253µs)
+running 1 test from ./packages/cli/src/local/composition/local-contributor-command-tree_test.ts
+local contributor CLI composition ...
+  exposes public project commands plus maintainer commands ... ok (13ms)
+local contributor CLI composition ... ok (35ms)
+running 1 test from ./packages/cli/src/local/features/plugins/install/install-local-plugin_test.ts
+local contributor install plugin flow ...
+  writes starter plugin files with local imports for non-canonical plugin names ... ok (8ms)
+  renders canonical plugins without copying source when no local path is supplied ... ok (2ms)
+  writes thin local-import stubs for canonical plugins when source copy is disabled ... ok (2ms)
+  keeps the plugin-owned AI namespace configured in local-source installs ... ok (2s)
+  skips the target generated project when discovering the official plugin source root ... ok (0ms)
+local contributor install plugin flow ... ok (2s)
+running 1 test from ./packages/cli/src/maintainer/adapters/official-plugin-source_test.ts
+findOfficialPluginSourceRoot follows copied workspace source marker ... ok (17ms)
+running 2 tests from ./packages/cli/src/maintainer/adapters/packages-copier_test.ts
+copyLocalPackages keeps mysql adapter engine-specific while resolving database imports ... ok (153ms)
+copyLocalPackages copies mysql adapter only for mysql engine ... ok (130ms)
+running 1 test from ./packages/cli/src/maintainer/features/init/init-command_test.ts
+createMaintainerInitCommand ...
+  accepts an explicit boolean value for --service without consuming the project name ... ok (6ms)
+createMaintainerInitCommand ... ok (9ms)
+running 1 test from ./packages/cli/src/maintainer/features/root/maintainer-services_test.ts
+maintainer application services ...
+  syncPackages delegates to the package copier port ... ok (1ms)
+  syncPlugin discovers the source root and defaults to canonical names ... ok (0ms)
+  syncPlugin carries a service-less official source without service metadata ... ok (29ms)
+  syncTemplates runs all registered steps in order ... ok (1ms)
+  probeMonorepo reports local sync capabilities and localBase ... ok (0ms)
+  runScaffoldTest launches the repo e2e task with scaffold suite ids ... ok (0ms)
+  orchestrateMaintainerInit runs local-mode init and package sync ... ok (0ms)
+  orchestrateMaintainerInit fails when no monorepo root is available ... ok (1ms)
+maintainer application services ... ok (42ms)
+running 4 tests from ./packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-copy_test.ts
+canCopyOfficialPlugin recognizes canonical first-party plugin names ... ok (21ms)
+copyOfficialPlugin copies plugin and background source workspaces ... ok (344ms)
+copyOfficialPlugin rewrites fallback plugin source imports for top-level background workspaces ... ok (137ms)
+official plugin import rewrite converts local package paths to JSR specifiers ... ok (292µs)
+running 2 tests from ./packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-samples_test.ts
+copyOfficialPlugin wires sample config and runtime files for scaffold projects ... ok (379ms)
+copyOfficialPlugin honors includeSamples false ... ok (133ms)
+running 4 tests from ./packages/cli/src/public/adapters/agent/deno-agent-docs-generator_test.ts
+offline docs cover every export subpath at the exact installed version ... ok (114ms)
+lock evidence resolves a non-exact JSR range ... ok (2ms)
+workspace evidence resolves a local package version without a lock ... ok (87ms)
+missing lock evidence, version mismatch, and launch throws fail loudly ... ok (81ms)
+running 1 test from ./packages/cli/src/public/adapters/jsr-import-resolver_test.ts
+JsrImportResolver ...
+  resolves NetScript package specifiers to JSR imports ... ok (1ms)
+  resolves external dependencies to registry imports ... ok (0ms)
+  resolves selected imports as an import-map fragment ... ok (1ms)
+  rejects unknown import keys ... ok (1ms)
+JsrImportResolver ... ok (8ms)
+running 3 tests from ./packages/cli/src/public/adapters/os-service-factory_test.ts
+createOsServicePort routes windows to the servy adapter ... ok (1ms)
+createOsServicePort routes linux to the systemd adapter ... ok (350µs)
+OS routing is coherent from explicit OS → naming → adapter ... ok (1ms)
+running 6 tests from ./packages/cli/src/public/adapters/service-activation-port_test.ts
+SymlinkActivationPort activates via atomic symlink+rename before restart ... ok (1ms)
+DirSwapActivationPort removes the old junction then recreates before restart ... ok (572µs)
+current resolves the active release id from the current link basename ... ok (272µs)
+current is undefined when no current link exists ... ok (71µs)
+record appends to persisted history and history reads it back ... ok (491µs)
+prune removes each pruned release directory recursively ... ok (267µs)
+running 1 test from ./packages/cli/src/public/adapters/systemd-os-service_test.ts
+SystemdOsServiceAdapter ...
+  maps Linux service operations to byte-identical systemctl invocations ... ok (2ms)
+  fails fast when daemon-reload fails and does not enable ... ok (0ms)
+  surfaces a structured result on success ... ok (0ms)
+SystemdOsServiceAdapter ... ok (8ms)
+running 1 test from ./packages/cli/src/public/composition/run-public-cli_test.ts
+normalizes plugin custom add syntax without changing other verbs ... ok (21ms)
+running 1 test from ./packages/cli/src/public/domain/scaffold-plan_test.ts
+createScaffoldPlan ...
+  builds the base workspace member list ... ok (2ms)
+  includes service and database members when selected ... ok (0ms)
+createScaffoldPlan ... ok (5ms)
+running 1 test from ./packages/cli/src/public/features/agent/drift/record-drift-command_test.ts
+agent drift record enforces the same receipt gate and appends locally ... ok (22ms)
+running 2 tests from ./packages/cli/src/public/features/agent/init/init-agent-command_test.ts
+agent init command forwards editor and --with-docs explicitly ...
+------- post-test output -------
+NetScript agent integration is already current.
+----- post-test output end -----
+agent init command forwards editor and --with-docs explicitly ... ok (8ms)
+agent init command rejects unsupported editors with manual guidance ... ok (2ms)
+running 19 tests from ./packages/cli/src/public/features/agent/init/init-agent_test.ts
+agent init writes Claude config, skills, and marked AGENTS section idempotently ... ok (69ms)
+agent init selects VS Code and detect-or-all host table ... ok (74ms)
+agent init applies native editor configuration for none, Zed, and VS Code ... ok (93ms)
+agent init detects one existing editor and rejects an ambiguous project ... ok (35ms)
+S-18 prior-release host stays pinned until agent init and restart exposes the tool triad ... ok (744ms)
+VS Code-only agent init never delegates to the Claude skill tree ... ok (44ms)
+agent init rejects a bundle whose manifest hash does not match ... ok (2ms)
+installed skill routing resolves to installed skills or help ... ok (27ms)
+aspire delegation is skipped when Playwright CLI is already installed ... ok (29ms)
+aspire delegation timeout is swallowed after cancelling the fake ... ok (30ms)
+aspire delegation errors are swallowed with unconditional MCP config ... ok (30ms)
+agent init installs the complete diagnostic surface ... ok (37ms)
+agent init installs the consumer tool surface for every host ... ok (39ms)
+installed consumer tools resolve from the project when process CWD differs ... ok (718ms)
+agent init leaves the offline docs corpus absent unless requested ... ok (19ms)
+agent init --with-docs installs a path-closed local corpus ... ok (26ms)
+generated project search_docs reaches its installed corpus after host restart ... ok (1s)
+agent init --with-docs gives Claude, VS Code, and Zed the same docs root ... ok (69ms)
+offline docs failure occurs before any project write ... ok (3ms)
+running 3 tests from ./packages/cli/src/public/features/agent/mcp/agent-mcp-command_test.ts
+agent mcp explains stdio setup and does not start a server on a TTY ... ok (7ms)
+agent mcp starts silently when stdin is piped ... ok (2ms)
+agent mcp help names stdio transport and client configuration docs ... ok (42ms)
+running 4 tests from ./packages/cli/src/public/features/agent/mcp/cli-mcp-adapters_test.ts
+CLI-hosted MCP defaults to the real CLI package version without a JSR child ... ok (39ms)
+CLI-hosted MCP executes a mismatched-version host entrypoint ... ok (141ms)
+an injected host executor reports identity distinct from standalone MCP ... ok (476µs)
+agent MCP adapters expose real verbs and non-stub plugin doctor results ... ok (74ms)
+running 1 test from ./packages/cli/src/public/features/agent/mcp/command-policy-parity_test.ts
+every default MCP command policy prefix exists in the public CLI tree ... ok (36ms)
+running 3 tests from ./packages/cli/src/public/features/config/override/manage-runtime-overrides_test.ts
+publish writes a version before atomically activating its topic pointer ... ok (2ms)
+rollback preserves other topic pointers ... ok (402µs)
+dashboard-style flag set and clear create immutable versions ... ok (876µs)
+running 5 tests from ./packages/cli/src/public/features/config/project/list-appsettings-paths_test.ts
+listAppsettingsPaths reports canonical case-sensitive paths ... ok (14ms)
+listAppsettingsPaths expands records over the project's own keys ... ok (4ms)
+listAppsettingsPaths templates records the project has not populated ... ok (4ms)
+listAppsettingsPaths surfaces keys the generator does not read ... ok (5ms)
+listAppsettingsPaths filters by prefix ... ok (4ms)
+running 10 tests from ./packages/cli/src/public/features/config/project/project-config-ops_test.ts
+getDottedValue reads resolved telemetry paths ... ok (1ms)
+setProjectConfigValue maps telemetry endpoint into generated AppSettings ... ok (25ms)
+#955 setProjectConfigValue writes a key parseAppSettings reads back ... ok (8ms)
+#955 setProjectConfigValue does not double the NetScript prefix ... ok (5ms)
+#955 setProjectConfigValue preserves user-chosen record keys ... ok (6ms)
+#955 setProjectConfigValue rejects a path the generator does not read ... ok (5ms)
+#955 setProjectConfigValue rejects a value the schema would drop ... ok (6ms)
+#955 setProjectConfigValue --force writes an off-schema key with no silent success ... ok (5ms)
+#975 setProjectConfigValue writes a modelled Aspire parameter without --force ... ok (6ms)
+#955 readAppsettingsValue resolves the same spellings as set ... ok (6ms)
+running 14 tests from ./packages/cli/src/public/features/config/project/resolve-appsettings-path_test.ts
+resolveAppsettingsPath accepts the full appsettings path unchanged ... ok (10ms)
+resolveAppsettingsPath canonicalizes schema field casing ... ok (3ms)
+resolveAppsettingsPath accepts the section-relative shorthand ... ok (2ms)
+resolveAppsettingsPath never re-cases a record key against the schema ... ok (2ms)
+resolveAppsettingsPath keeps an unknown record key verbatim ... ok (2ms)
+resolveAppsettingsPath preserves hyphenated service keys ... ok (1ms)
+resolveAppsettingsPath rejects a misspelled schema field with suggestions ... ok (3ms)
+resolveAppsettingsPath rejects a doubled root prefix ... ok (2ms)
+resolveAppsettingsPath resolves a top-level key without re-homing it ... ok (2ms)
+resolveAppsettingsPath reports an undeclared top-level key at the top level ... ok (2ms)
+resolveAppsettingsPath will not descend into a scalar ... ok (1ms)
+resolveAppsettingsPath resolves the telemetry alias through the schema ... ok (1ms)
+collectSchemaIssues reports issues at the written path ... ok (5ms)
+collectSchemaIssues ignores pre-existing damage elsewhere ... ok (815µs)
+running 1 test from ./packages/cli/src/public/features/contracts/add-route/add-contract-route_test.ts
+contract add-route emits an inspectable typed procedure ... ok (2ms)
+running 1 test from ./packages/cli/src/public/features/contracts/add/add-contract_test.ts
+add contract ...
+  writes a v1 contract and regenerates the aggregate ... ok (6ms)
+  preserves an existing contract unless force is set ... ok (2ms)
+  rejects names outside the workspace naming contract ... ok (1ms)
+add contract ... ok (14ms)
+running 1 test from ./packages/cli/src/public/features/contracts/remove/remove-contract_test.ts
+contract remove deletes every version and regenerates aggregates ... ok (6ms)
+running 1 test from ./packages/cli/src/public/features/contracts/version-add/add-contract-version_test.ts
+contract version add promotes symbols and regenerates aggregates ... ok (5ms)
+running 1 test from ./packages/cli/src/public/features/db/add/add-db_test.ts
+public add database flow ...
+  plans a database add request from project metadata ... ok (1ms)
+  writes the database workspace and root project metadata ... ok (5ms)
+public add database flow ... ok (10ms)
+running 1 test from ./packages/cli/src/public/features/db/operations/db-operation-command_test.ts
+DB operation command no longer requires a transient AppHost workspace mutator ... ok (2ms)
+running 1 test from ./packages/cli/src/public/features/deploy/build/deploy_test.ts
+public deploy application flows ...
+  builds deployment artifacts from a resolved config ... ok (1ms)
+  installs manifest services in manifest order ... ok (1ms)
+  routes install naming through the linux (systemd) lane ... ok (0ms)
+  uninstalls manifest services in reverse manifest order ... ok (1ms)
+  maps Windows service operations to servy-cli invocations ... ok (1ms)
+public deploy application flows ... ok (12ms)
+running 2 tests from ./packages/cli/src/public/features/deploy/build/prepare-deploy-build_test.ts
+deployBuildDirs maps a Windows deploy root to the four standard subdirs ... ok (1ms)
+deployBuildDirs derives every subdir under the given deploy root ... ok (274µs)
+running 1 test from ./packages/cli/src/public/features/deploy/list/list-deploy-targets_test.ts
+deploy list enumerates every registered target with advertised operations ... ok (1ms)
+running 1 test from ./packages/cli/src/public/features/deploy/target/desktop/desktop-group_test.ts
+desktop deploy group exposes the native package command ... ok (26ms)
+running 4 tests from ./packages/cli/src/public/features/deploy/target/desktop/package/package-desktop-command_test.ts
+desktop package parser forwards repeated formats and explicit selectors ... ok (34ms)
+desktop package parser forwards all-targets and xz defaults ... ok (2ms)
+desktop package parser rejects conflicting selectors before application call ... ok (1ms)
+desktop package parser rejects unknown format and compression values ...
+  unsupported-format ... ok (0ms)
+  invalid-input ... ok (0ms)
+desktop package parser rejects unknown format and compression values ... ok (3ms)
+running 7 tests from ./packages/cli/src/public/features/deploy/target/desktop/package/package-desktop_test.ts
+package workflow consumes configured PackageTaskName and app workdir ... ok (20ms)
+package workflow defaults the #452 hook to desktop:package ... ok (515µs)
+multiple enabled desktop apps require explicit selection ... ok (622µs)
+disabled and non-desktop requested apps fail honestly ...
+  app-disabled ... ok (0ms)
+  app-not-desktop ... ok (0ms)
+disabled and non-desktop requested apps fail honestly ... ok (2ms)
+zstd preflight runs before package invocations ... ok (683µs)
+missing zstd executable is reported as a typed tool error ... ok (609µs)
+package process failures identify target and format ... ok (464µs)
+running 7 tests from ./packages/cli/src/public/features/deploy/target/desktop/package/plan-desktop-packages_test.ts
+desktop target catalog exhaustively derives SDK OS and architecture pairs ... ok (21ms)
+all-targets plans every native format with explicit unique argv ... ok (3ms)
+all-targets format filter selects only compatible targets ... ok (524µs)
+omitted selector uses the current SDK target and can omit compression ... ok (293µs)
+target and all-targets are mutually exclusive ... ok (1ms)
+dmg fails before execution on a non-macOS host ... ok (494µs)
+an incompatible explicit target and format is rejected ... ok (439µs)
+running 2 tests from ./packages/cli/src/public/features/deploy/target/desktop/release/prepare-native-release_test.ts
+release preparation composes lowercase digests and exact native patch map ... ok (2ms)
+release preparation rejects duplicate and unsafe prior versions before promotion ... ok (1ms)
+running 1 test from ./packages/cli/src/public/features/deploy/target/desktop/release/prepare-release-command_test.ts
+release prepare parser invokes exact bsdiff argv and promotes signed envelope ... ok (46ms)
+running 4 tests from ./packages/cli/src/public/features/deploy/target/desktop/release/release-store_test.ts
+release store rejects lower and equal sequences using private high-water ... ok (42ms)
+concurrent promotion permits exactly one route winner ... ok (6ms)
+manifest replacement failure safely burns sequence after immutable patch write ... ok (6ms)
+corrupt private high-water fails closed ... ok (4ms)
+running 4 tests from ./packages/cli/src/public/features/deploy/target/desktop/release/server/release-handler_test.ts
+release server route and real handler match public createReleaseClient URL composition ... ok (46ms)
+handler serves exact manifest bytes and immutable patch HEAD metadata ... ok (5ms)
+handler rejects methods, private paths, encoded separators, and traversal ...
+  /stable/linux-x86_64/.release-state ... ok (0ms)
+  /stable/linux-x86_64/%2fsecret.bsdiff ... ok (0ms)
+  /stable/linux-x86_64/%2Fsecret.bsdiff ... ok (0ms)
+  /stable/linux-x86_64/%2e%2e/secret.bsdiff ... ok (1ms)
+  /stable/linux-x86_64/%2E%2E/secret.bsdiff ... ok (1ms)
+  /stable/linux-x86_64/..%2fsecret.bsdiff ... ok (0ms)
+  /stable/linux-x86_64/secret.txt ... ok (0ms)
+  /stable/not-a-target/latest.json ... ok (1ms)
+handler rejects methods, private paths, encoded separators, and traversal ... ok (12ms)
+resolve-under-root and realpath checks reject escape and symlink reads ... ok (3ms)
+running 1 test from ./packages/cli/src/public/features/deploy/target/desktop/release/server/serve-release-command_test.ts
+release server parser forwards lifecycle, listener, root, and handler ... ok (41ms)
+running 2 tests from ./packages/cli/src/public/features/deploy/target/desktop/release/sign-release_test.ts
+Ed25519 envelope signs the exact preserved UTF-8 string ... ok (2ms)
+native composer preserves native shape and PKCS8 PEM import verifies ... ok (1ms)
+running 7 tests from ./packages/cli/src/public/features/deploy/target/target-deploy-command_test.ts
+router derives verb subcommands from the adapter operations (no business logic) ... ok (2ms)
+router routes a verb straight to the registry-resolved adapter ...
+------- post-test output -------
+✓ plan ok
+----- post-test output end -----
+router routes a verb straight to the registry-resolved adapter ... ok (3ms)
+router forwards cache clearing without target-specific branching ...
+------- post-test output -------
+✓ up ok
+----- post-test output end -----
+router forwards cache clearing without target-specific branching ... ok (583µs)
+router merges target config into the deploy request ...
+------- post-test output -------
+✓ plan ok
+----- post-test output end -----
+router merges target config into the deploy request ... ok (833µs)
+router omits verbs the adapter does not advertise ... ok (321µs)
+router exposes secrets set/get/list and forwards the selected operation ...
+------- post-test output -------
+✓ secrets ok
+----- post-test output end -----
+router exposes secrets set/get/list and forwards the selected operation ... ok (963µs)
+deploy target routers resolve their default registry targets ... ok (1ms)
+running 1 test from ./packages/cli/src/public/features/generate/plugins/generate-plugin-registries-command_test.ts
+generate plugin registries command ...
+  runs the authoritative generator for the resolved project root ... ok (7ms)
+generate plugin registries command ... ok (8ms)
+running 1 test from ./packages/cli/src/public/features/generate/plugins/installed-runtime-registry-generator_test.ts
+installed runtime registry generator ...
+  runs a published manifest generator under the project config and canonical target ... ok (5ms)
+  names the installed plugin and rejects a declared empty runtime ... ok (2ms)
+  dry-run reports canonical paths without executing or writing ... ok (1ms)
+  does not substitute an unrelated marked source package for a third-party plugin ... ok (2ms)
+installed runtime registry generator ... ok (15ms)
+running 9 tests from ./packages/cli/src/public/features/generate/plugins/installed-runtime-registry-integration_test.ts
+generated trigger registry loads definitions and excludes control-plane and runtime modules ... ok (155ms)
+generated trigger registry rejects a non-definition module that is not excluded ... ok (118ms)
+workspace import resolves the on-disk trigger manifest without fetching JSR ... ok (12ms)
+generated workers registry loads a custom-only job and excludes job tools ... ok (146ms)
+generated sagas registry loads saga definitions and ignores other TypeScript files ... ok (140ms)
+packaged runtime export starts a saga runtime with a project-owned non-empty registry ... ok (1s)
+generated AI registries load resources and exclude the skill-loader factory ... ok (181ms)
+marked source workspace wins for a published-shaped AI project ... ok (177ms)
+JSR-only imports retain the published manifest and generator fallback ... ok (8ms)
+running 1 test from ./packages/cli/src/public/features/generate/runtime-schemas/generate-runtime-schemas_test.ts
+public generate application flows ...
+  regenerates Aspire helpers through an injected helper generator ... ok (1ms)
+  plans runtime config schema writes with configured paths ... ok (1ms)
+  writes changed schemas and skips unchanged files ... ok (1ms)
+  rejects duplicate runtime config schema topics ... ok (1ms)
+public generate application flows ... ok (13ms)
+running 11 tests from ./packages/cli/src/public/features/init/init-command_test.ts
+init --from reports the empty Wave 6 preset registry ... ok (8ms)
+init defaults cache on with redis backend in non-interactive mode ... ok (2ms)
+init derives an omitted app name from the project name ... ok (458µs)
+init keeps an explicit app name authoritative ... ok (341µs)
+init derives Prisma model name from service name ... ok (704µs)
+init generates a stable high-range standalone service port ... ok (356µs)
+init accepts validated Prisma model name override ... ok (230µs)
+init rejects invalid Prisma model name override ... ok (1ms)
+interactive init prompts for all missing scaffold choices ... ok (747µs)
+#968 non-terminal init uses defaults without invoking a prompt ... ok (374µs)
+#967 init uses a cwd whose basename already matches the project name ... ok (377µs)
+running 2 tests from ./packages/cli/src/public/features/marketplace/marketplace-group_test.ts
+marketplace search prints JSR discovery guidance ... ok (5ms)
+marketplace publish prints temporary publishing guidance ... ok (712µs)
+running 2 tests from ./packages/cli/src/public/features/plugins/ai/ai-plugin-command_test.ts
+plugin ai forwards nested lifecycle verbs and flags ... ok (4ms)
+plugin ai shells out to the lockstep-versioned plugin CLI ... ok (1ms)
+running 10 tests from ./packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts
+auth backend set reconciles .env and show reports the active backend ... ok (25ms)
+auth backend show reads the service-supported appsettings seam ... ok (577µs)
+plugin doctor reports the configured active auth backend ... ok (3ms)
+github provider preset writes boot-ready OAuth environment ... ok (8ms)
+workos and better-auth variants enforce their boot credential contracts ... ok (1ms)
+generated kv-oauth key is accepted by the real backend registry ... ok (936µs)
+session projection parser exposes active sessions ... ok (515µs)
+fetch session adapter lists projections and revokes through signout ... ok (8ms)
+plugin auth parser drives backend and session verbs ... ok (7ms)
+session CLI lists a signed-in backend session and revoke invalidates it ...
+------- post-test output -------
+[Auth Stream] Durable stream emit skipped: streams URL is not configured.
+[Auth Stream] Durable stream emit skipped: streams URL is not configured.
+----- post-test output end -----
+session CLI lists a signed-in backend session and revoke invalidates it ... ok (17ms)
+running 2 tests from ./packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts
+plugin verb dispatch ...
+  routes framework verbs through deno x and the plugin cli subpath ... ok (2ms)
+  maps non-zero plugin cli exits to remote errors ... ok (1ms)
+  returns captured process output through the dispatch port ... ok (1ms)
+  identifies framework verbs and resolves jsr cli specifiers ... ok (1ms)
+  runs an unversioned first-party plugin through the lockstep config and direct JSR target ... ok (1ms)
+  runs an explicitly lockstep first-party plugin through the direct JSR target ... ok (1ms)
+  keeps an explicitly non-lockstep first-party plugin on protected deno x dispatch ... ok (1ms)
+plugin verb dispatch ... ok (12ms)
+plugin scaffold dispatch ...
+  invokes a local fixture scaffolder and runs declared post-scripts ... ok (164ms)
+  passes dry-run context to the fixture without writing project files ... ok (93ms)
+  builds deno run argv with confined flags for third-party JSR scaffolders ... ok (2ms)
+  verifies JSR file integrity and reports sha mismatches ... ok (1ms)
+plugin scaffold dispatch ... ok (264ms)
+running 16 tests from ./packages/cli/src/public/features/plugins/doctor/doctor-plugin-command_test.ts
+plugin doctor writes a successful evidence receipt after an actual run ... ok (18ms)
+plugin doctor reports configured-module workdirs across first-party topology shapes ... ok (20ms)
+plugin doctor exits non-zero when generated registries are absent ... ok (12ms)
+plugin doctor accepts real compile-registry workers output and exits zero ... ok (7ms)
+plugin doctor accepts real generate plugins workers output and exits zero ... ok (8ms)
+plugin doctor accepts the real shared sagas generator output and exits zero ... ok (12ms)
+plugin doctor reports visible validation issues by field ... ok (355µs)
+plugin doctor distinguishes an absent AppHost from unhealthy resources ... ok (561µs)
+plugin doctor warns and exits zero when Aspire inspection is unavailable ... ok (2ms)
+plugin doctor reports normally when diagnostic evidence cannot be written ... ok (452µs)
+plugin doctor reports configured resources missing from the running AppHost by name ... ok (373µs)
+plugin doctor reports a running but unhealthy AppHost resource ... ok (183µs)
+plugin doctor does not certify healthy without readiness evidence ... ok (214µs)
+plugin doctor maps realistic database config names without inventing section resources ... ok (575µs)
+plugin manifest import failures degrade to an error report ... ok (395µs)
+one unloadable plugin doctor does not suppress a healthy plugin report ... ok (11ms)
+running 10 tests from ./packages/cli/src/public/features/plugins/doctor/doctor-plugin-invariants_test.ts
+plugin doctor reports all three host invariants healthy for a valid install ... ok (66ms)
+plugin doctor rejects a dangling configured module ... ok (10ms)
+plugin doctor rejects a configured module with no manifest export ... ok (35ms)
+plugin doctor distinguishes a configured module import failure ... ok (38ms)
+plugin doctor kills and reports a configured module that times out ... ok (58ms)
+plugin doctor distinguishes a configured module non-zero exit ... ok (25ms)
+plugin doctor rejects a service entrypoint absent from a JSR export map ... ok (38ms)
+plugin doctor warns when an explicit permission override differs from manifest truth ... ok (33ms)
+doctor subprocess and runtime loader have manifest-resolution parity ... ok (261ms)
+plugin doctor treats a bare package alias as package-backed despite an incidental directory ... ok (71ms)
+running 1 test from ./packages/cli/src/public/features/plugins/host/plugin-loader_test.ts
+plugin host loader ...
+  resolves config plugins, merges contributions, and triggers the walker ... ok (1ms)
+  resolves project root flags before creating the sync loader ... ok (5ms)
+plugin host loader ... ok (12ms)
+running 1 test from ./packages/cli/src/public/features/plugins/install/confirm-plugin-install_test.ts
+confirmPluginInstall ...
+  prompts for third-party packages and includes JSR metadata ... ok (2ms)
+  skips prompts for first-party packages ... ok (0ms)
+  skips third-party prompts with --skip-confirmation ... ok (1ms)
+  rejects third-party packages in --ci mode without an explicit bypass ... ok (2ms)
+  rejects third-party packages when no prompt is available ... ok (1ms)
+  allows --ci only when --skip-confirmation is explicit ... ok (0ms)
+  rejects when a third-party prompt is declined ... ok (0ms)
+confirmPluginInstall ... ok (13ms)
+running 1 test from ./packages/cli/src/public/features/plugins/install/install-plugin_test.ts
+public install plugin flow ...
+  threads includeSamples false into the workers scaffolder ... ok (234ms)
+  threads includeSamples false into the sagas scaffolder ... ok (167ms)
+  threads includeSamples false into the triggers scaffolder ... ok (220ms)
+  threads includeSamples false into the streams scaffolder ... ok (188ms)
+  plans a starter plugin request from project metadata ... ok (2ms)
+  preserves a jsr:-prefixed exact canary through validation, scaffold dispatch, and generated state ... ok (3ms)
+  preserves a prefixless exact canary through validation, scaffold dispatch, and generated state ... ok (3ms)
+  rejects a configured service-less plugin without appsettings or a conventional plugin directory ... ok (1ms)
+  rejects an unresolvable plugin (no JSR/local descriptor) instead of CLI-side rendering ... ok (0ms)
+  rejects a resolvable plugin when no process runner can dispatch its scaffolder ... ok (1ms)
+  installs a published Prisma fragment from JSR metadata into the root schema tree ... ok (7ms)
+  rejects a DB-required JSR plugin that declares migrations without a published fragment ... ok (2ms)
+  previews a local-path plugin-owned scaffolder without writing files ... ok (71ms)
+  installs and links the fixture third-party plugin without officialSource or CLI branches ... ok (78ms)
+  installs the AI markdown registry closure into its generated namespace ... ok (3s)
+  keeps the configured AI module resolvable across a forced reinstall ... ok (503ms)
+  derives plugin-owned service and background workdirs from existing files after a skipped scaffold ... ok (7ms)
+  adds workers from the real local-path plugin-owned scaffolder ... ok (169ms)
+  previews the real workers local-path scaffolder without writing files ... ok (121ms)
+  reruns the real workers scaffolder idempotently ... ok (242ms)
+  runs the real sagas local-path scaffolder through plugin install ... ok (133ms)
+  previews the real sagas local-path scaffolder without writing files ... ok (144ms)
+  reruns the real sagas scaffolder idempotently ... ok (242ms)
+  runs the real triggers local-path scaffolder through plugin install ... ok (141ms)
+  previews the real triggers local-path scaffolder without writing files ... ok (129ms)
+  reruns the real triggers scaffolder idempotently ... ok (228ms)
+  runs the real streams local-path scaffolder through plugin install ... ok (161ms)
+  previews the real streams local-path scaffolder without writing files ... ok (115ms)
+  reruns the real streams scaffolder idempotently ... ok (235ms)
+  reconciles dependency-derived plugin references independently of install order ... ok (792ms)
+  runs the real auth local-path scaffolder through plugin install ... ok (178ms)
+  previews the real auth local-path scaffolder without writing files ... ok (120ms)
+  reruns the real auth scaffolder idempotently ... ok (237ms)
+public install plugin flow ... ok (8s)
+running 2 tests from ./packages/cli/src/public/features/plugins/install/manifest-service-shape_test.ts
+shipped manifests preserve their declared appsettings projections ... ok (17ms)
+manifest provider normalization converts an absent service entrypoint to null once ... ok (6ms)
+running 1 test from ./packages/cli/src/public/features/plugins/install/plugin-package-resolver_test.ts
+resolvePluginPackageSpec ...
+  resolves bare aliases to verified NetScript plugin packages ... ok (0ms)
+  resolves the AI bare alias to the published NetScript AI plugin package ... ok (0ms)
+  passes scoped package names through unchanged ... ok (1ms)
+  passes explicit JSR package specs through unchanged ... ok (1ms)
+  preserves an exact version from a jsr:-prefixed package spec ... ok (1ms)
+  preserves an exact version from a prefixless package spec ... ok (0ms)
+  rejects malformed package specs ... ok (1ms)
+resolvePluginPackageSpec ... ok (11ms)
+running 1 test from ./packages/cli/src/public/features/plugins/install/plugin-trust-tier_test.ts
+classifyPluginTrust ...
+  classifies @netscript packages as trusted first-party plugins ... ok (1ms)
+  classifies non-NetScript packages as third-party plugins requiring confirmation ... ok (0ms)
+classifyPluginTrust ... ok (3ms)
+running 3 tests from ./packages/cli/src/public/features/plugins/list/list-plugins-command_test.ts
+plugin list succeeds for config-registered plugin without userland scaffold manifest ...
+------- post-test output -------
+Name	DisplayName	Type	Enabled	Workdir	Service	Port	Axis	Contributions
+workers	Workers	-	true	workers	-	-	jobs	0
+----- post-test output end -----
+plugin list succeeds for config-registered plugin without userland scaffold manifest ... ok (23ms)
+plugin list reports configured-module identity across first-party topology shapes ... ok (10ms)
+plugin list renders package-backed source truth deliberately ... ok (34ms)
+running 1 test from ./packages/cli/src/public/features/plugins/new/new-plugin_test.ts
+plugin new use case ...
+  registers a generated plugin by default ... ok (6ms)
+  writes a dual-tier proxy plugin without template files ... ok (1ms)
+  normalizes package names into deterministic tier paths ... ok (0ms)
+  skips existing files unless overwrite is enabled ... ok (1ms)
+plugin new use case ... ok (14ms)
+running 3 tests from ./packages/cli/src/public/features/plugins/remove/remove-plugin_test.ts
+plugin remove resolves a configured bare name before dispatch and preserves state on failure ... ok (7ms)
+plugin remove rolls back every owned path when regeneration fails after mutation ... ok (5ms)
+public plugin install then bare-name remove restores owned state and leaves doctor clean ... ok (208ms)
+running 1 test from ./packages/cli/src/public/features/plugins/scaffold/scaffold-plugin_test.ts
+plugin scaffold use case ...
+  writes registered plugin skeleton templates with semantic substitutions ... ok (3ms)
+  skips existing files unless overwrite is enabled ... ok (1ms)
+  resolves default target and variables from scoped package names ... ok (0ms)
+  rejects templates with missing variables ... ok (1ms)
+plugin scaffold use case ... ok (9ms)
+running 4 tests from ./packages/cli/src/public/features/root/command-registry_test.ts
+public command registry keeps top-level public command order stable ... ok (2ms)
+public command registry passes in-memory context to command factories ... ok (300µs)
+public command registry rejects duplicate top-level command names ... ok (1ms)
+public command registry exposes deploy targets through a string-keyed port registry ... ok (501µs)
+running 3 tests from ./packages/cli/src/public/features/root/public-command-tree_test.ts
+public root command reports the package version ... ok (32ms)
+public init --dry-run leaves the target directory absent ...
+------- post-test output -------
+╔═════════════════════════════════════════════════════════════╗
+║              NetScript — Scaffold New Project               ║
+╚═════════════════════════════════════════════════════════════╝
 
-    'source' is declared here.
-      source: RegisteredPluginSource;
-      ~~~~~~
-        at file:///home/codex/repos/ns006-w2-1454/packages/cli/src/kernel/domain/resolved-config.ts:172:3    The expected type comes from property 'loadRegisteredPlugins' which is declared here on type 'PluginDoctorDependencies'
-      readonly loadRegisteredPlugins?: (
-               ~~~~~~~~~~~~~~~~~~~~~
-        at file:///home/codex/repos/ns006-w2-1454/packages/cli/src/public/features/plugins/doctor/doctor-plugin-use-case.ts:66:12
+📁 Creating project "dry-run-zero"...
+   ✓ Project root (deno.json, netscript.config.ts, .gitignore, README.md)
+   ✓ Frontend app "dry-run-zero-web" (Fresh framework)
+   ✓ Contracts (v1 stub)
+   ✓ Plugins (empty registry)
+  [dry-run] Would create 149 files, 23 directories
 
-error: Type checking failed.
+  No files were written. Remove --dry-run to execute.
+----- post-test output end -----
+public init --dry-run leaves the target directory absent ... ok (46ms)
+public init emits resolvable app conventions with and without the example service ...
+------- post-test output -------
+╔═════════════════════════════════════════════════════════════╗
+║              NetScript — Scaffold New Project               ║
+╚═════════════════════════════════════════════════════════════╝
 
-  [33minfo:[39m The program failed type-checking, but it still might work correctly.
-  [36mhint:[39m Re-run with [4m--no-check[24m to skip type-checking.
+📁 Creating project "with-service"...
+   ✓ Project root (deno.json, netscript.config.ts, .gitignore, README.md)
+   ✓ Frontend app "dashboard" (Fresh framework)
+   ✓ Contracts (v1 with users stub)
+   ✓ Example service "users" (oRPC handler, Aspire assigns its port)
+   ✓ Plugins (empty registry)
+   ✓ Output formatted (deno fmt)
+
+✅ Project scaffolded successfully in 0.3s
+
+  Created: 175 files, 37 directories
+
+Next steps:
+  1. cd with-service
+  2. deno task --cwd apps/dashboard dev  # start Fresh dev server
+  3. # oRPC service "users" at http://localhost:52514/api/rpc
+
+╔═════════════════════════════════════════════════════════════╗
+║              NetScript — Scaffold New Project               ║
+╚═════════════════════════════════════════════════════════════╝
+
+📁 Creating project "with-db-service"...
+   ✓ Project root (deno.json, netscript.config.ts, .gitignore, README.md)
+   ✓ Database workspace (postgres)
+   ✓ Frontend app "dashboard" (Fresh framework)
+   ✓ Contracts (v1 with users stub)
+   ✓ Example service "users" (oRPC handler, Aspire assigns its port)
+   ✓ Plugins (empty registry)
+   ✓ Output formatted (deno fmt)
+
+✅ Project scaffolded successfully in 0.3s
+
+  Created: 189 files, 43 directories
+
+Next steps:
+  1. cd with-db-service
+  2. netscript db generate  # generate database client after configuring DATABASE_URL
+  3. netscript db seed  # seed after the generated client exists
+  4. deno task --cwd apps/dashboard dev  # start Fresh dev server
+  5. # oRPC service "users" at http://localhost:57769/api/rpc
+  6. # Provision Postgres yourself and set POSTGRES_URI or DATABASE_URL
+
+╔═════════════════════════════════════════════════════════════╗
+║              NetScript — Scaffold New Project               ║
+╚═════════════════════════════════════════════════════════════╝
+
+📁 Creating project "without-service"...
+   ✓ Project root (deno.json, netscript.config.ts, .gitignore, README.md)
+   ✓ Frontend app "dashboard" (Fresh framework)
+   ✓ Contracts (v1 stub)
+   ✓ Plugins (empty registry)
+   ✓ Output formatted (deno fmt)
+
+✅ Project scaffolded successfully in 0.2s
+
+  Created: 149 files, 23 directories
+
+Next steps:
+  1. cd without-service
+  2. deno task --cwd apps/dashboard dev  # start Fresh dev server
+
+----- post-test output end -----
+public init emits resolvable app conventions with and without the example service ... ok (897ms)
+running 1 test from ./packages/cli/src/public/features/services/add-handler/add-service-handler_test.ts
+service add-handler verifies the contract then appends a router stub ... ok (5ms)
+running 1 test from ./packages/cli/src/public/features/services/add/add-service_test.ts
+public add service flow ...
+  plans a service add request from project metadata ... ok (2ms)
+  writes service and contract files with JSR imports ... ok (5ms)
+public add service flow ... ok (12ms)
+running 2 tests from ./packages/cli/src/public/features/services/configure/mutate-service-config_test.ts
+service ref add/remove mutates appsettings and regenerates in one operation ... ok (10ms)
+service set updates port/enabled and regenerates helpers ... ok (2ms)
+running 1 test from ./packages/cli/src/public/features/services/remove/remove-service_test.ts
+service remove reverses workspace, appsettings, contract, and helper mutations ... ok (6ms)
+running 1 test from ./packages/cli/src/public/features/ui/add/add-ui-command_test.ts
+ui:add help explains the page island query-loader triad ... ok (16ms)
+running 8 tests from ./packages/cli/src/public/features/ui/registry.test.ts
+resolveRegistryItems installs the official theme by default ... ok (1ms)
+resolveRegistryItems substitutes a theme override for theme dependencies ... ok (304µs)
+resolveRegistryItems applies theme overrides through collections ... ok (195µs)
+resolveRegistryItems rejects a theme override that is not a theme item ... ok (625µs)
+resolveRegistryItems rejects an unknown theme override ... ok (405µs)
+registryManifestModuleUrl resolves manifest outside the copy payload ... ok (1ms)
+DEFAULT_UI_INIT_ITEMS installs the scaffold foundation and floating styles ... ok (157µs)
+installUiRegistryItems uses embedded content by default ... ok (2ms)
+running 7 tests from ./packages/cli/src/public/features/ui/ui-app-root-command_test.ts
+ui commands resolve the sole Fresh app and never write the workspace root ...
+------- post-test output -------
+Generated 1 Fresh page files.
+----- post-test output end -----
+ui commands resolve the sole Fresh app and never write the workspace root ... ok (38ms)
+ui commands accept --app and select the named Fresh app ...
+------- post-test output -------
+Generated 1 Fresh page files.
+----- post-test output end -----
+ui commands accept --app and select the named Fresh app ... ok (11ms)
+ui commands infer the Fresh app from an app descendant cwd ...
+------- post-test output -------
+Generated 1 Fresh page files.
+----- post-test output end -----
+ui commands infer the Fresh app from an app descendant cwd ... ok (12ms)
+ui commands reject an ambiguous workspace and name every candidate app ... ok (7ms)
+every ui command help documents --app ... ok (13ms)
+ambiguous ui command process exits non-zero and prints actual candidate apps ... ok (805ms)
+UiAddCommandInput exposes every accepted option ... ok (183µs)
+running 1 test from ./packages/cli/src/public/infra/jsr/fetch-jsr-plugin-validator_test.ts
+FetchJsrPluginValidator ...
+  returns a validated plugin descriptor for a published NetScript manifest ... ok (8ms)
+  installs the CLI's own release version rather than latest ... ok (0ms)
+  preserves an explicit exact version when stable latest differs ... ok (2ms)
+  resolves the semver-greatest prerelease when JSR latest is null ... ok (1ms)
+  skips yanked versions when falling back from null latest ... ok (1ms)
+  reports invalid metadata when no non-yanked version is installable ... ok (1ms)
+  reports missing JSR packages as not found ... ok (1ms)
+  reports yanked latest versions ... ok (0ms)
+  reports packages that do not publish scaffold.plugin.json ... ok (0ms)
+  reports invalid plugin manifests without executing package code ... ok (1ms)
+FetchJsrPluginValidator ... ok (22ms)
+running 3 tests from ./packages/cli/src/public/infra/jsr/verify-jsr-package-integrity_test.ts
+fetchJsrPackageSchemaFragments returns checksum-verified schema content ... ok (2ms)
+fetchJsrPackageSchemaFragments rejects tampered schema content ... ok (1ms)
+fetchJsrPackageSchemaFragments rejects a schema without a checksum ... ok (781µs)
+running 1 test from ./packages/cli/src/public/infra/permissions/plugin-scaffold-permissions_test.ts
+buildPluginScaffoldPermissionFlags ...
+  uses the trusted deno x permission level for first-party plugins ... ok (1ms)
+  allows the fresh alpha dependency-age exception only for first-party opt-in ... ok (1ms)
+  confines third-party plugins to project reads, scoped writes, and denied net/run ... ok (1ms)
+  does not inject the minimum dependency age bypass for third-party plugins ... ok (0ms)
+buildPluginScaffoldPermissionFlags ... ok (6ms)
+running 3 tests from ./packages/cli/testing_test.ts
+createInMemoryProcess records calls and returns queued results ... ok (1ms)
+createInMemoryPrompt replays scripted answers ... ok (337µs)
+buildMinimalScaffoldPlan applies overrides ... ok (184µs)
+
+ ERRORS 
+
+no hardcoded pinned NetScript JSR specifiers in CLI src => ./packages/cli/src/kernel/constants/version-drift_test.ts:32:6
+error: AssertionError: Values are not equal: Found hardcoded pinned NetScript JSR specifiers. Derive them from NETSCRIPT_RELEASE_VERSION / netscriptJsrSpecifier instead:
+/home/codex/repos/ns006-w2-1454/packages/cli/src/kernel/adapters/config/configured-plugin-manifest-summary_test.ts
+/home/codex/repos/ns006-w2-1454/packages/cli/src/kernel/application/plugin/registered-plugin-source_test.ts
+
+
+    [Diff] Actual / Expected
+
+
+-   [
+-     "/home/codex/repos/ns006-w2-1454/packages/cli/src/kernel/adapters/config/configured-plugin-manifest-summary_test.ts",
+-     "/home/codex/repos/ns006-w2-1454/packages/cli/src/kernel/application/plugin/registered-plugin-source_test.ts",
+-   ]
++   []
+
+  throw new AssertionError(message);
+        ^
+    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:67:9)
+    at file:///home/codex/repos/ns006-w2-1454/packages/cli/src/kernel/constants/version-drift_test.ts:51:3
+
+ FAILURES 
+
+no hardcoded pinned NetScript JSR specifiers in CLI src => ./packages/cli/src/kernel/constants/version-drift_test.ts:32:6
+
+FAILED | 576 passed (531 steps) | 1 failed (1m12s)
+
+error: Test failed

@@ -1,0 +1,324 @@
+Check packages/cli/e2e/fixtures/desktop-native/tests/fixture-contract_test.ts
+Check packages/cli/e2e/src/application/gates/quickstart/database-integrity-walk_test.ts
+Check packages/cli/e2e/src/application/gates/scaffold/run-documented-stream-example_test.ts
+Check packages/cli/e2e/src/application/gates/scaffold/select-flow-b-stream-change_test.ts
+Check packages/cli/e2e/src/application/gates/scaffold/service-env/discover-service-subjects_test.ts
+Check packages/cli/e2e/src/application/gates/scaffold/service-env/process-evidence_test.ts
+Check packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-evidence_test.ts
+Check packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-gates_test.ts
+Check packages/cli/e2e/src/application/gates/scaffold/validate-aspire-task-traces_test.ts
+Check packages/cli/e2e/src/application/gates/scaffold/validate-flow-b-traces_test.ts
+Check packages/cli/e2e/src/application/gates/scaffold/verify-producer-reconnect_test.ts
+Check packages/cli/e2e/tests/adapters/commands/docker-resource-cleaner_test.ts
+Check packages/cli/e2e/tests/adapters/reporting/pretty-reporter_test.ts
+Check packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts
+Check packages/cli/e2e/tests/application/builders/runtime-gates_test.ts
+Check packages/cli/e2e/tests/application/builders/suite-builder_test.ts
+Check packages/cli/e2e/tests/application/builders/workspace-options_test.ts
+Check packages/cli/e2e/tests/application/gates/aspire-dashboard-telemetry_test.ts
+Check packages/cli/e2e/tests/application/gates/command-gate_test.ts
+Check packages/cli/e2e/tests/application/gates/configure-published-workers-block_test.ts
+Check packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts
+Check packages/cli/e2e/tests/application/gates/http-gate_test.ts
+Check packages/cli/e2e/tests/application/gates/local-source-fixture_test.ts
+Check packages/cli/e2e/tests/application/gates/probe-app-reference_test.ts
+Check packages/cli/e2e/tests/application/gates/quickstart-aspire-walk_test.ts
+Check packages/cli/e2e/tests/application/gates/scaffold-gates_test.ts
+Check packages/cli/e2e/tests/application/gates/scaffold/generated-app-identity-source-policy_test.ts
+Check packages/cli/e2e/tests/application/gates/scaffold/plugin-contract-gates_test.ts
+Check packages/cli/e2e/tests/application/gates/scaffold/ui-ai-gates_test.ts
+Check packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts
+Check packages/cli/e2e/tests/application/runner/gate-runner_test.ts
+Check packages/cli/e2e/tests/application/runner/suite-lease_test.ts
+Check packages/cli/e2e/tests/application/runner/suite-runner_test.ts
+Check packages/cli/e2e/tests/application/verify-clean-clone-readme_test.ts
+Check packages/cli/e2e/tests/presentation/cli-options_test.ts
+Check packages/cli/e2e/tests/presentation/cli-program_test.ts
+Check packages/cli/e2e/tests/presentation/init-json_test.ts
+Check packages/cli/e2e/tests/presentation/quickstart-command-drift_test.ts
+Check packages/cli/e2e/tests/presentation/quickstart-walk-suite_test.ts
+Check packages/cli/e2e/tests/presentation/suite-registry_test.ts
+running 4 tests from ./packages/cli/e2e/fixtures/desktop-native/tests/fixture-contract_test.ts
+renderer contract acknowledges a response fetched through services__remote__http__0 ...Listening on http://127.0.0.1:42671/
+ ok (35ms)
+release signing fixture exports PKCS8 PEM and verifiable raw public key ... ok (2ms)
+renderer entrypoint bundles for a browser without ambient binding declarations ... ok (132ms)
+desktop package task forwards target and output flags before the entrypoint ... ok (256µs)
+running 5 tests from ./packages/cli/e2e/src/application/gates/quickstart/database-integrity-walk_test.ts
+pgDataFromEnv reads PGDATA from docker inspect Env ... ok (1ms)
+resolvePgDataPath prefers PGDATA env over host layout ... ok (1ms)
+resolvePgDataPath finds nested Postgres 18 PGDATA on a readable host tree ... ok (1s)
+resolvePgDataPath keeps flat PGDATA at the mount root ... ok (1s)
+resolvePgDataPath fails closed when pg_control is absent ... ok (906ms)
+running 1 test from ./packages/cli/e2e/src/application/gates/scaffold/run-documented-stream-example_test.ts
+unchanged documented native EventSource example consumes named SSE ... ok (272ms)
+running 5 tests from ./packages/cli/e2e/src/application/gates/scaffold/select-flow-b-stream-change_test.ts
+selectFlowBStreamChange skips startup snapshots and selects one execution record ... ok (1ms)
+selectFlowBStreamChange exhaustion names expected and observed correlations ... ok (1ms)
+selectFlowBStreamChange enforces the total wait bound between batches ... ok (358µs)
+TC-14 rejects a matched record without traceparent ... ok (682µs)
+TC-14 rejects a matched record whose trace differs from the producer ... ok (423µs)
+running 8 tests from ./packages/cli/e2e/src/application/gates/scaffold/service-env/discover-service-subjects_test.ts
+discovery: reads names, workdirs, entrypoints and declared entries ... ok (1ms)
+discovery: prefers the canonical Environment over the deprecated alias ... ok (239µs)
+discovery: selects the subject deterministically and skips disabled services ... ok (13ms)
+discovery: refuses a project with no enabled service ... ok (1ms)
+discovery: returns every service that declares an environment ... ok (477µs)
+discovery: refuses to pass by matching nothing when no service declares env ... ok (352µs)
+discovery: refuses a config whose shape it cannot read ... ok (458µs)
+discovery: derives the engine URI key the way the compat helper does ... ok (385µs)
+running 7 tests from ./packages/cli/e2e/src/application/gates/scaffold/service-env/process-evidence_test.ts
+process evidence: parses the NUL-separated environ blob ... ok (1ms)
+process evidence: keeps a value that itself contains = ... ok (285µs)
+process evidence: ignores malformed and empty entries ... ok (258µs)
+process evidence: identifies a process by the injected resource name ... ok (143µs)
+process evidence: refuses an empty scan instead of reporting success ... ok (806µs)
+process evidence: returns what the scan identified ... ok (137µs)
+process evidence: reads a real process environment through /proc ... ok (67ms)
+running 21 tests from ./packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-evidence_test.ts
+contract: covers every documented category, in both directions ... ok (960µs)
+topology evidence: accepts a running resource that honors the contract ... ok (559µs)
+topology evidence: reads a DCP-suffixed instance id ... ok (343µs)
+topology evidence: reads the array-shaped environment ... ok (305µs)
+topology evidence: requires an explicitly running state, not merely a non-terminal one ... ok (301µs)
+topology evidence: accepts Running and Healthy under either spelling shape ... ok (207µs)
+topology evidence: reports every missing declared entry at once ... ok (150µs)
+topology evidence: catches an inverted precedence per category ... ok (350µs)
+topology evidence: catches a refused key that was applied anyway ... ok (86µs)
+topology evidence: refuses to guess when the resource is absent ... ok (708µs)
+topology evidence: refuses output that carries no JSON ... ok (125µs)
+process evidence: accepts a process that honors every category ... ok (443µs)
+process evidence: refuses an empty case list rather than passing vacuously ... ok (328µs)
+process evidence: catches a declared value the process never observed ... ok (247µs)
+process evidence: catches every inverted category in the running process ... ok (541µs)
+process evidence: catches a generated OTel identity that is not the resource ... ok (238µs)
+process evidence: catches an engine URI that drifted from DATABASE_URL ... ok (188µs)
+process evidence: catches a discovery URL that is not an allocated endpoint ... ok (186µs)
+process evidence: catches a refused PORT that reached the process ... ok (155µs)
+process evidence: catches a process with no PORT at all ... ok (134µs)
+process evidence: catches the stale database literals winning in the process ... ok (202µs)
+running 4 tests from ./packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-gates_test.ts
+service env gates: the behavior gate can read /proc with the flags it declares ... ok (107ms)
+service env gates: the fixture gate can spawn the CLI and rewrite appsettings ... ok (67ms)
+service env gates: the probe fails when a declared flag is taken away ... ok (61ms)
+service env gates: every gate command names a script that exists ... ok (1ms)
+running 5 tests from ./packages/cli/e2e/src/application/gates/scaffold/validate-aspire-task-traces_test.ts
+parseNonEmptyTraceArray accepts task banners before trace JSON ... ok (949µs)
+parseNonEmptyTraceArray rejects empty task output ... ok (877µs)
+resourceInstanceName resolves the suffixed DCP resource name ... ok (792µs)
+resourceCandidates orders model, display, and running instance identities ... ok (321µs)
+resourceCandidates deduplicates a suffixed describe identity ... ok (322µs)
+running 2 tests from ./packages/cli/e2e/src/application/gates/scaffold/validate-flow-b-traces_test.ts
+TC-14 zero-link diagnostic names producer and consumer identities ... ok (2ms)
+TC-14 wrong-link diagnostic prints every link identity and count ... ok (437µs)
+running 3 tests from ./packages/cli/e2e/src/application/gates/scaffold/verify-producer-reconnect_test.ts
+parseProducerReconnectResult accepts the probe marker only ... ok (24ms)
+assertProducerReconnectTrace requires one trace across every reconnect event ... ok (2ms)
+assertProducerReconnectMetrics requires retry recovery and delivered receipts ... ok (1ms)
+running 4 tests from ./packages/cli/e2e/tests/adapters/commands/docker-resource-cleaner_test.ts
+docker cleaner treats an absent docker binary as an empty snapshot ... ok (1ms)
+docker cleaner treats a non-zero docker ps as an empty snapshot ... ok (378µs)
+docker cleaner returns no resources when the snapshot has no new containers ... ok (568µs)
+docker cleaner still throws when removing a created container fails ... ok (572µs)
+running 4 tests from ./packages/cli/e2e/tests/adapters/reporting/pretty-reporter_test.ts
+pretty reporter aggregate exposes skipped and deferred gate count ... ok (84ms)
+pretty reporter surfaces a failed command reason and stderr ... ok (501µs)
+pretty reporter distinguishes a retried pass ... ok (218µs)
+pretty reporter prints every attempt duration when retries fail ... ok (211µs)
+running 1 test from ./packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts
+agent mcp real CLI stdio smoke ...
+------- post-test output -------
+╔═════════════════════════════════════════════════════════════╗
+║              NetScript — Scaffold New Project               ║
+╚═════════════════════════════════════════════════════════════╝
+
+📁 Creating project "stdio-scaffold"...
+   ✓ Project root (deno.json, netscript.config.ts, .gitignore, README.md)
+   ✓ Frontend app "dashboard" (Fresh framework)
+   ✓ Contracts (v1 stub)
+   ✓ Plugins (empty registry)
+   ✓ Output formatted (deno fmt)
+
+✅ Project scaffolded successfully in 0.2s
+
+  Created: 149 files, 23 directories
+
+Next steps:
+  1. cd stdio-scaffold
+  2. deno task --cwd apps/dashboard dev  # start Fresh dev server
+
+----- post-test output end -----
+agent mcp real CLI stdio smoke ... ok (3s)
+running 18 tests from ./packages/cli/e2e/tests/application/builders/runtime-gates_test.ts
+runtime Aspire restore has a bounded infrastructure retry budget ... ok (3ms)
+runtime aspire start gate captures detached endpoint metadata ... ok (450µs)
+live DB endpoint gate reads the detached dashboard metadata path ... ok (249µs)
+app home gate hands the probe a project and an AppHost to resolve the port from ... ok (509µs)
+app home gate can reach a localhost endpoint, not only 127.0.0.1 ... ok (255µs)
+app reference gate runs the real browser probe for the project-derived app ... ok (384µs)
+runtime gates wait for postgres resource by default ... ok (256µs)
+runtime app wait derives the resource name from the scaffold project ... ok (372µs)
+runtime gates include durable workers and sagas CLI parity ... ok (648µs)
+runtime gates prove MCP Aspire endpoint discovery against the live AppHost ... ok (234µs)
+project boundary gate requires the project-derived app name ... ok (700µs)
+workers wait gate requires runtime startup evidence before behavior gates ... ok (367µs)
+runtime gates enumerate every KV-backed first-party background runtime ... ok (413µs)
+AI chat route gate captures generated registry import failures ... ok (276µs)
+runtime gates wait for mysql resource when mysql is selected ... ok (230µs)
+runtime gates skip database resource wait for sqlite ... ok (218µs)
+runtime service health gate asserts only the selected sqlite adapter ... ok (405µs)
+runtime gates wait for mssql resource with extended timeout when mssql is selected ... ok (332µs)
+running 3 tests from ./packages/cli/e2e/tests/application/builders/suite-builder_test.ts
+defineCliE2eSuite materializes scaffold.plugins with gates ... ok (4ms)
+defineCliE2eSuite rejects suites without gates ... ok (1ms)
+defineCliE2eSuite rejects an empty suite id ... ok (892µs)
+running 2 tests from ./packages/cli/e2e/tests/application/builders/workspace-options_test.ts
+defaultRunOptions targets the maintainer binary entrypoint ... ok (2ms)
+withRepoRootOption derives the maintainer binary entrypoint from the repo root ... ok (522µs)
+running 1 test from ./packages/cli/e2e/tests/application/gates/aspire-dashboard-telemetry_test.ts
+live Aspire fetch normalizes trace and log OTLP envelopes ... ok (15ms)
+running 9 tests from ./packages/cli/e2e/tests/application/gates/command-gate_test.ts
+command gate never retries an assertion failure ... ok (2ms)
+command gate retries a timeout and records a passing second attempt ... ok (633µs)
+command gate classifies the Deno cancellation marker and retries it ... ok (493µs)
+command gate treats exit 6 without the cancellation marker as an assertion ... ok (427µs)
+command gate distinguishes Deno argument parsing from a product assertion ... ok (448µs)
+command gate keeps an immediate non-parser failure classified as a product assertion ... ok (242µs)
+command gate preserves both timeout durations after retries are exhausted ... ok (421µs)
+command gate without retry configuration executes once ... ok (227µs)
+command gate honors a per-gate timeout and three-attempt infrastructure budget ... ok (458µs)
+running 5 tests from ./packages/cli/e2e/tests/application/gates/configure-published-workers-block_test.ts
+published workers rewrite preserves one existing dependency-age argument ... ok (842µs)
+published workers rewrite adds one missing dependency-age argument ... ok (247µs)
+published workers rewrite accepts a formatted Deno argument array ... ok (169µs)
+published workers rewrite adds dependency age to a formatted argument array ... ok (117µs)
+published workers rewrite rejects a block without the Deno config pair ... ok (1ms)
+running 19 tests from ./packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts
+readPinnedAppPort returns the port the project declares, not a default ... ok (11ms)
+readPinnedAppPort still honours the legacy Port spelling ... ok (1ms)
+the app home URL follows a pinned port rather than a guessed one ... ok (2ms)
+a pristine scaffold pins no port, and that is not an error ... ok (3ms)
+an app absent from appsettings pins nothing ... ok (1ms)
+a non-numeric pinned port is reported, never coerced ... ok (2ms)
+readPinnedAppPort reports an unreadable appsettings rather than guessing ... ok (2ms)
+the app endpoint comes from the resource's declared urls[] ... ok (624µs)
+resolution never returns the dashboard link or a sibling service URL ... ok (397µs)
+a resource resolves by displayName even though name is suffixed ... ok (189µs)
+a relationship stub is never mistaken for the resource ... ok (184µs)
+appUrlsFromDescribeOutput tolerates a banner before the JSON ... ok (284µs)
+appUrlsFromDescribeOutput names what was missing ... ok (480µs)
+app-home probe does not retry terminal endpoint resolution failures ... ok (2ms)
+app-home probe retries while aspire describe has not registered the endpoint ... ok (9ms)
+app-home probe bounds a resource endpoint that never appears ... ok (2ms)
+app-home diagnostics extract the Fresh overlay error and stack ... ok (620µs)
+app-home diagnostics retain a useful bounded fallback for unknown responses ... ok (378µs)
+app-home exhaustion includes the app resource logs ... ok (2ms)
+running 1 test from ./packages/cli/e2e/tests/application/gates/http-gate_test.ts
+HTTP gate retries transient request failures within the gate deadline ... ok (265ms)
+running 3 tests from ./packages/cli/e2e/tests/application/gates/local-source-fixture_test.ts
+resolveLocalSourceImports maps an explicit package set from its source base ... ok (1ms)
+prepareLocalSourceFixture rewrites selected generated workspace targets ... ok (12ms)
+localSourceFixtureScript prepares a generated project through deno eval ... ok (56ms)
+running 3 tests from ./packages/cli/e2e/tests/application/gates/probe-app-reference_test.ts
+reference probe renders every named state at desktop and mobile viewports ... ok (2ms)
+reference probe rejects the old route with no rendered state marker ... ok (936µs)
+reference probe reports a missing semantic marker from the rendered browser DOM ... ok (785µs)
+running 3 tests from ./packages/cli/e2e/tests/application/gates/quickstart-aspire-walk_test.ts
+bounded Aspire walk runs restore, start, then waits for postgres ... ok (1ms)
+bounded Aspire walk classifies restore timeout with #1227 and stops ... ok (710µs)
+bounded Aspire walk classifies start timeout independently ... ok (190µs)
+running 10 tests from ./packages/cli/e2e/tests/application/gates/scaffold-gates_test.ts
+generated explicit-any probe source remains byte-identical ... ok (798µs)
+--source jsr accepts the local public CLI binary ... ok (870µs)
+scaffold init default command remains byte-identical ... ok (369µs)
+scaffold runtime exercises the generated service port default ... ok (208µs)
+scaffold init disables the cache exactly once ... ok (270µs)
+--source jsr rejects the local contributor CLI binary ... ok (966µs)
+generated check runs the fresh scaffold workspace check task ... ok (534µs)
+generated quality probes cover TS, TSX, plugin, background, and AppHost surfaces ... ok (301µs)
+scaffold contract add gate targets the generated workspace ... ok (301µs)
+published AI lifecycle gate reuses the published CLI version ... ok (516µs)
+running 2 tests from ./packages/cli/e2e/tests/application/gates/scaffold/generated-app-identity-source-policy_test.ts
+scaffold gate scripts do not assume the legacy generated app identity ... ok (26ms)
+repo tests that scaffold a default app do not assume the legacy app directory ... ok (468ms)
+running 3 tests from ./packages/cli/e2e/tests/application/gates/scaffold/plugin-contract-gates_test.ts
+plugin contract gates select runtime schemas and the complete AI namespace ... ok (3ms)
+AI appsettings gate rejects only service configuration attributed to AI ... ok (125ms)
+doctor negative gate observes failure and restores the configured module ... ok (110ms)
+running 3 tests from ./packages/cli/e2e/tests/application/gates/scaffold/ui-ai-gates_test.ts
+ui AI gate rejects the old workspace-root layout and accepts the Fresh app layout ... ok (115ms)
+ui AI install gate selects the generated Fresh app from the workspace ... ok (669µs)
+every UI AI assertion runs in the app and local imports stay workspace-relative ... ok (642µs)
+running 7 tests from ./packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts
+database endpoint ports match across URL and keyword dialects ... ok (2ms)
+database endpoint comparison rejects deliberately mismatched ports ... ok (681µs)
+database endpoint comparison names an unparseable side and its value ... ok (370µs)
+database health matcher accepts the captured users response contract ... ok (417µs)
+database health matcher rejects an unhealthy database fixture ... ok (267µs)
+users telemetry correlation reports the compared ids and candidate spans ... ok (535µs)
+users telemetry correlation polls until logs and traces converge ... ok (650µs)
+running 1 test from ./packages/cli/e2e/tests/application/runner/gate-runner_test.ts
+platform-inapplicable gate emits machine-readable NOT_RUN without execution ... ok (2ms)
+running 2 tests from ./packages/cli/e2e/tests/application/runner/suite-lease_test.ts
+second acquire refuses while the recorded holder pid is alive ... ok (2ms)
+dead holder is declared stale, removed, and replaced ... ok (1ms)
+running 9 tests from ./packages/cli/e2e/tests/application/runner/suite-runner_test.ts
+suite runner reports no skipped steps after the #1398 deferrals are removed ... ok (6ms)
+suite runner emits a failed report and prunes only created Docker resources ... ok (3ms)
+suite runner skips cleanup phase when cleanup is disabled ... ok (8ms)
+suite runner completes cleanup with a Docker-less cleaner ... ok (2ms)
+suite runner cleans up after a targeted non-cleanup gate when cleanup is enabled ... ok (906µs)
+suite runner can target cleanup gate without suite cleanup enabled ... ok (1ms)
+suite runner releases the expensive-suite lease when suite execution throws ... ok (1ms)
+expensive runtime suites contend for one lease in both directions ... ok (1ms)
+suite runner does not interact with the lease for a cheap suite ... ok (1ms)
+running 1 test from ./packages/cli/e2e/tests/application/verify-clean-clone-readme_test.ts
+clean-clone README gate reports a missing binary ... ok (154ms)
+running 9 tests from ./packages/cli/e2e/tests/presentation/cli-options_test.ts
+mapRunOptions keeps defaults by omitting undefined values ... ok (925µs)
+mapRunOptions accepts sqlite database axis ... ok (265µs)
+mapRunOptions maps --no-cache ... ok (157µs)
+mapRunOptions maps --cache ... ok (108µs)
+mapRunOptions rejects unsupported database values ... ok (980µs)
+mapRunOptions rejects unsupported plugin values ... ok (357µs)
+mapRunOptions accepts ai plugin axis ... ok (216µs)
+mapRunOptions accepts mssql database axis ... ok (101µs)
+mapRunOptions reports all supported database axes ... ok (217µs)
+running 4 tests from ./packages/cli/e2e/tests/presentation/cli-program_test.ts
+bare CLI command runs the full scaffold runtime suite with cleanup ... ok (8ms)
+full CLI command accepts run options and runs runtime suite ... ok (4ms)
+run command lets sqlite runtime suite defaults win unless flags override them ... ok (2ms)
+run command keeps explicit postgres above sqlite runtime suite default ... ok (2ms)
+running 1 test from ./packages/cli/e2e/tests/presentation/init-json_test.ts
+netscript init --json emits a single structured object ... ok (693ms)
+running 1 test from ./packages/cli/e2e/tests/presentation/quickstart-command-drift_test.ts
+Quickstart executable commands stay aligned with quickstart.walk ... ok (2ms)
+running 5 tests from ./packages/cli/e2e/tests/presentation/quickstart-walk-suite_test.ts
+quickstart walk exposes exactly seven independently named verdicts before cleanup ... ok (3ms)
+quickstart service-add verdict initializes first, adds users, and checks that service ... ok (604µs)
+quickstart project-check verdict runs the documented command exactly ... ok (554µs)
+quickstart service-response verdict accepts service health without a database assertion ... ok (427µs)
+quickstart commands reject a local CLI entrypoint ... ok (969µs)
+running 19 tests from ./packages/cli/e2e/tests/presentation/suite-registry_test.ts
+registry exposes scaffold capability suites from constants ... ok (1ms)
+native desktop suite is registered with an honest fixture preflight ... ok (1ms)
+capability suites select only their scoped gates ... ok (3ms)
+plugin suite includes all official plugin and generated-check gates ... ok (539µs)
+true userland suite runs init, four no-samples plugin installs, assertion, and cleanup ... ok (1ms)
+runtime suite includes full scaffold, database, runtime, and behavior gates ... ok (1ms)
+runtime suites execute the formerly deferred #1398 OTEL gates ... ok (2ms)
+every registered suite pins its exact deferred-gate set and owning issues ... ok (3ms)
+runtime suite waits for the generated app and requests its home page ... ok (957µs)
+runtime DB mutations run only after the resident AppHost starts ... ok (538µs)
+runtime suite omits database resource wait for sqlite ... ok (521µs)
+sqlite runtime suite resolves its reduced-container defaults without mutating cache mode ... ok (589µs)
+runtime suites declare service environment before start and verify it after (#1447) ... ok (655µs)
+runtime database overrides preserve service health and the Postgres gate set ... ok (1ms)
+sqlite runtime suite keeps explicit database overrides above suite defaults ... ok (324µs)
+runtime suite wait matrices match runtime resources for postgres and sqlite ... ok (1ms)
+runtime suite selects mssql database resource wait for mssql ... ok (712µs)
+capability defaults are a baseline and caller overrides select database gates ... ok (650µs)
+existing built-in suites preserve their exact resolved options ... ok (2ms)
+
+ok | 218 passed | 0 failed (16s)
+

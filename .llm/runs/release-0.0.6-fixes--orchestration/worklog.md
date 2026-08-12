@@ -1588,3 +1588,78 @@ Restated to the slice: a CANCELLED or SKIPPED runtime job is a **did-not-run, no
 has watched that gate produce a non-verdict three separate ways — SKIPPED while draft,
 SUCCESS-by-classifier-short-circuit (only step 2 vs step 10 distinguishes it from a real run), and
 CANCELLED by cross-lane contention.
+
+## 2026-08-12 — Shallow-clone ancestry hazard, and re-verification of this lane's claims
+
+The internals lane reported, after being caught by it on #1585, that these worktrees are **shallow
+clones**. Verified here:
+
+```
+$ git rev-parse --is-shallow-repository
+true
+```
+
+**Consequence:** `git rev-list --max-parents=0` reports the *shallow boundary* as a root commit, and
+`git merge-base --is-ancestor` returns **false** for any commit whose connecting history is absent
+locally — silently, with no error or warning. Any ancestry conclusion drawn from a local command in
+one of these worktrees can be quietly false.
+
+**This lane reasons about release ancestry constantly** — canary-pair inheritance,
+`isVersionOnlyReleaseDiff`, version-only parents — so every ancestry claim already made was
+re-checked against the canonical compare API, which is computed on the real graph:
+
+```
+$ gh api /repos/rickylabs/netscript/compare/<sha>...main
+  4637e9f41  ahead_by=6  behind_by=0     → main contains it
+  efb5182f1  ahead_by=5  behind_by=0     → main contains it
+  7aa4aadfd  ahead_by=2  behind_by=0     → main contains it
+
+$ gh api /repos/rickylabs/netscript/commits/89184c1bd200…   (the v0.0.6-canary.2 tag commit)
+  parents: e67c1ba1317e                  → matches the local shallow answer
+```
+
+**All claims hold.** But they hold by luck rather than by method: every commit involved was recent
+enough to sit inside the shallow window, so the local answers happened to be correct. The canary
+tag-parent claim is the one that mattered — it went into a release record asserting the canary's
+content SHA was exactly the authorized `main`.
+
+**Rule adopted: ancestry claims in this lane go through `gh api /compare/A...B`, not local git.**
+
+### The generalisable lesson, which is theirs and is sharper than mine
+
+They ran **three** probes to rebut an evaluator finding, called them independent, and all three were
+wrong because they shared one premise — the shallow graph.
+
+> **Independence of method is not independence of premise.**
+
+That is a sharper statement of what bit this orchestrator repeatedly today: the corpus count (dict
+iterated as list → confident `0`), the member enumeration (glob-as-literal → `0 discovered`, then
+`urllib` rejected → `35 missing`), and the circular-box grep (matched "published release" in prose).
+Each was a check that could only fail in one direction, returning a clean-looking result that read
+as evidence. Running *more* checks of the same shape would not have helped.
+
+## 2026-08-12 — Ownership of remaining 0.0.6 leaves, settled by asking
+
+Confirmed by the owning lanes rather than inferred from the board:
+
+| Issues | Owner | Status |
+| --- | --- | --- |
+| #1589, #1583, #1577, #1576, #1569, #1568, #1562 | **Runtime** | all seven explicitly assigned; #1583 dispatched, #1589 getting a plan + automatic PLAN-EVAL |
+| #1549, #1380 | **Internals** | both in flight — #1380 at PR #1585 in a FAIL_FIX cycle, #1549 dispatching after it |
+| #1554, #1531, #1377 | **Docs** | #1531 last by the snapshot rule |
+| **#1454** | **this lane** | PR #1574, IMPL-EVAL running |
+
+**This lane's queue is therefore empty after #1454.** Nothing was taken on my own read; each lane
+confirmed its own leaves.
+
+**#1403 closed** at `e391f3aec`, 8/8 boxes mirrored. This lane's stale-base contribution landed as
+three enforceable acceptance boxes that internals moved from comments into the issue **body** so
+close-gate would actually enforce them — including the two-dot → three-dot fix at
+`code-quality.yml:39`. **#1564's remaining scope narrows accordingly**: the shared-input question
+across other consumers, not that line.
+
+**Trap recorded from the runtime lane, in case a future leaf surfaces it:** #1589's symptom is
+"route partials failed with Cache provider not initialized", which is superficially close to the
+`isPartial` cache-suppression class that EIS #191 proved forbidden and that closed #1550 as invalid.
+They are unrelated. Anyone reasoning "partials fail on cache access, so guard it on `isPartial`"
+would implement the forbidden pattern while appearing to fix the bug.
