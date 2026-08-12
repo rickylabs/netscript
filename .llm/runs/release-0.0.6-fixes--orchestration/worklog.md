@@ -1223,3 +1223,59 @@ the merge-base or the PR's own file list, never from a recorded base against a m
 Routed to the internals lane as data for #1403 (theirs to own); provenance credited on that issue.
 The correction stands regardless of who fixes it: **on #1539 the only thing that inspected the
 actual diff for banned constructs was the orchestrator's pre-merge grep.**
+
+## 2026-08-12 — My own probe produced a false clean result, and I nearly contradicted a correct peer with it
+
+The docs lane reported that the shipped MCP agent-docs corpus on `main` still carries **60
+`api-clients` references** that `docs/site` no longer contains. I set out to verify it before
+repeating it to the owner. My first probe returned **zero**.
+
+```python
+for f in files:                       # `files` is a DICT keyed by path
+    c = f.get('content','') if isinstance(f, dict) else ''   # f is a str → False → c = ''
+    n = c.count('api-clients')        # always 0
+```
+
+No exception, no warning — a confident `0` that read exactly like a real answer, and would have had
+me tell a peer their verified finding was wrong.
+
+Corrected probe, same file, same commit:
+
+```
+files container: dict, count: 174
+files containing api-clients: 11
+total occurrences: 60
+    30  llms-full.txt
+     5  pages/services-sdk/sdk/index.md
+     5  pages/tutorials/live-dashboard/03-sdk-cache-first-query/index.md
+     …
+```
+
+**Exactly 60. Their number was right to the unit.**
+
+This is the lane's own subject landing on the orchestrator: *a check that reports a clean result
+while not doing its job*. Every defect this lane has fixed is that shape — #1417's dry-run exiting
+0, #1397's green aggregate, #1399's pin covering two suites, #1428's `3 passed`, #1438's tautology,
+`code-quality.yml` scanning nine foreign files. I wrote the brief demanding negative controls for
+all of them, and then ran an unvalidated probe and believed its first answer.
+
+**The rule I had been applying to others and not to myself:** a probe that can only return "clean"
+by silently doing nothing is not evidence. The corrected probe was distinguishable because it prints
+the container type and count before counting — had the first one printed `files container: dict`, I
+would have seen it immediately.
+
+Corroborating provenance, independently checked:
+
+```
+.llm/assets/agent-docs/provenance.json @ main d558f9ab2
+  version: 0.0.5    sourceCommit: eda49bb2e    extracted: 2026-08-09T10:03:43Z    files: 174
+```
+
+A 0.0.5-era snapshot, extracted three days ago, shipping in a 0.0.6 canary — which is exactly the
+staleness #1531 exists to close.
+
+**Incidental but worth flagging for #1438:** that provenance carries `version: 0.0.5` while the
+repo is cutting 0.0.6. The cycle-1 tautology found by IMPL-EVAL exploited precisely the
+same-version condition (`oldVersion === version` making the writer's rewrite a no-op). The
+parent-anchor now closes it, but the corpus being version-stale is the live precondition that made
+that hole reachable rather than theoretical.
