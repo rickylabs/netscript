@@ -99,12 +99,29 @@ terminal states.
 
 ## Slices
 
-**S0 — verify the environment precondition (blocking, do first).**
-Read `packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-background.ts:180-220`
-and confirm `workers-combined` actually receives `DURABLE_STREAMS_URL` or
-`services__streams__http__0` (`stream-url-resolver.ts:154-190`). If it does not, the hook will throw
-at `create-durable-stream.ts:262-272` and the scope is larger than this plan — **stop and report
-before writing code**. This is the research's first unverified item and it gates everything after it.
+**S0 — environment precondition: RESOLVED before dispatch, no longer blocking.**
+
+Answered by the orchestrator on 2026-08-12. **`workers-combined` does receive the streams URL.**
+
+`generate-register-background.ts:200-218` emits
+`await <id>.withEnvironment('services__<ref>__http__0', <ref>Endpoint)` for every entry in the
+background processor's `PluginReferences`, and
+`packages/cli/src/public/features/plugins/install/install-plugin_test.ts:1393-1396` asserts that
+`BackgroundProcessors.workers.PluginReferences` is exactly `['streams', 'workers-api']`. That is the
+env name `stream-url-resolver.ts:154-190` reads. So the wiring exists by design.
+
+**Correction, recorded rather than quietly fixed.** I first read
+`plugins/workers/src/aspire/workers-contribution.ts:55-63` — which calls `addDenoBackground` with no
+reference to `streams` and only `builder.waitFor(combined, api)` — and concluded the env was missing
+and the slice needed an extra Aspire slice. That was **wrong**: `PluginReferences` is not derived
+from the contribution file at all. It is reconciled from the plugin manifest's
+`.withDependencies({ streams: streamsPlugin })` (`plugins/workers/src/public/mod.ts:61`),
+independently of install order, per the test above. Checking the mechanism instead of trusting the
+first plausible file is what kept an unnecessary slice out of this plan.
+
+**Residual, for the implementer to confirm in the live run only:** the generated code guards with
+`if (<ref>Endpoint)`, so the env is silently omitted if the streams resource exposes no `http`
+endpoint at wiring time. That is a runtime observation for S3, not a design unknown.
 
 **S1 — hook installation + trace-context join** (D1, D2, D3) with unit tests.
 

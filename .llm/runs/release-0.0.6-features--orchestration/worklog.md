@@ -128,3 +128,32 @@ D-2). Its prompt (`slices/impl-eval-1405-prompt.md`) directs it at the highest-v
 whether a genuinely failed producer can now be masked as merely closing, which would be a worse
 defect than the one being fixed — and requires it to revert each fix **individually** to prove each
 test fails for its own reason.
+
+## 2026-08-12 — #1398 S0 resolved (and an orchestrator inference corrected)
+
+The plan's blocking precondition — does `workers-combined` actually receive the streams URL — is
+**answered: yes**, so S0 stops being a blocking unknown and becomes a runtime confirmation in S3.
+
+Evidence: `generate-register-background.ts:200-218` emits `services__<ref>__http__0` for every
+background-processor `PluginReferences` entry, and
+`packages/cli/src/public/features/plugins/install/install-plugin_test.ts:1393-1396` asserts
+`BackgroundProcessors.workers.PluginReferences === ['streams', 'workers-api']`.
+
+**Correction.** My first read was `plugins/workers/src/aspire/workers-contribution.ts:55-63`, where
+`addDenoBackground` declares no `streams` reference and only `builder.waitFor(combined, api)` — from
+which I concluded the env was missing and the plan needed an extra Aspire slice. That inference was
+wrong. `PluginReferences` is not derived from the contribution file; it is reconciled from the plugin
+manifest's `.withDependencies({ streams: streamsPlugin })` (`plugins/workers/src/public/mod.ts:61`).
+Verifying the mechanism rather than stopping at the first plausible file is what kept an unnecessary
+slice out of the plan. Recorded here rather than silently amended, because the wrong version was
+briefly the basis for a scope judgement.
+
+Residual for S3 only: the generated wiring guards with `if (<ref>Endpoint)`, so the env is silently
+omitted if the streams resource exposes no `http` endpoint at wiring time. Runtime observation, not
+a design unknown.
+
+**Evaluator sessions in flight** (both real agentic turns, not nominal): PLAN-EVAL #1398 on MiniMax
+M3 high (208 stream events at 07:59Z) and IMPL-EVAL #1405 on DeepSeek V4 Flash 0731 max (1012
+events). Preset validation ran first — `agentic:provider-canary --all` reported all six presets
+`passed`, with `claude-evaluator-minimax-m3` and `claude-evaluator-deepseek-v4-flash-0731` both
+`liveEligible: true`, `agenticTurn: supported`.
