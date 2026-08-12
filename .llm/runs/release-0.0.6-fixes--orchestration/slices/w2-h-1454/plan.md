@@ -12,11 +12,18 @@ orchestrator explicitly says to proceed.**
   the scaffold E2E surface. Folded concern: plugin / Archetype 5, because doctor consumes published
   plugin manifests and a published doctor adapter. Doctrine status is **Restructure** for
   `packages/cli`, **Refactor** for `plugins/workers`, and **Keep** for `plugins/streams`.
-- This closes the still-open `cli-plugin-doctor-published-module` debt left by #1022: local and
-  copied-source doctor resolution is covered, but a published JSR module is not.
+- This is intended to close the still-open `cli-plugin-doctor-published-module` debt left by #1022:
+  local and copied-source doctor resolution is covered, but a published JSR module is not. The
+  exact close-out gate and evidence location are locked in the open-decision sweep below.
 - Direct inspection of the published 0.0.5 packages confirms that both manifests already contain
   their complete top-level permission arrays, and workers already exports `./doctor`. The missing
   truth is lost inside the CLI; it is not absent from the published packages.
+- Gate coverage is measured against the named **Archetype Gate Matrix — ARCHETYPE-5 (Plugin
+  Package)** requirements, including F-5 public surface, F-6 JSR publishability, F-7 doc score, F-9
+  permission declarations, required runtime validation, and required consumer import validation.
+  Published-surface safety is measured against the named **JSR Publishing Audit (`jsr-audit`)
+  rubric — 9 Scoring Factors and Audit Checklist**, including the full export map, module/symbol
+  documentation, slow types, publish contents, description, and runtime compatibility.
 
 ## 1. Current behaviour
 
@@ -110,13 +117,21 @@ version, permissions, service contribution, and doctor contribution), and the do
 will consume that summary instead of replacing a resolved package with name-only fallback data.
 The import stays out of the CLI process, preserving the isolation repair from #1022.
 
-The same plugin-wide permissions must feed effective runtime resolution:
+### Canonical effective-permission precedence (LOCKED)
 
-- explicit appsettings/service permissions remain highest precedence;
-- contribution-specific permissions, if present internally, remain next;
-- existing `PluginManifest.permissions` becomes the package default for service/plugin and
-  background resources;
-- global defaults are the final fallback only.
+This is the single authoritative chain for the plan; every later reference to “permission
+precedence” means exactly:
+
+```text
+explicit appsettings/service cfg.Permissions
+  > pluginService.permissions
+    > plugin.permissions
+      > global defaults
+```
+
+An absent slot is skipped. The existing `PluginManifest.permissions` therefore becomes the package
+default for service/plugin and background resources without displacing either an explicit user
+override or a contribution-specific permission declaration.
 
 Doctor's permission check will report the exact effective set selected by that same precedence,
 not merely the existence of a duplicate config field. Workers' package-backed doctor contribution
@@ -133,6 +148,14 @@ still a user-facing behavioural contract and requires CLI contract tests and E2E
 implementation discovers that a new public manifest field or export is actually necessary, that is
 significant doctrine drift: stop, record it, and return for rescope/PLAN-EVAL rather than adding it
 opportunistically.
+
+Against the **Archetype Gate Matrix — ARCHETYPE-5** and the **JSR Publishing Audit (`jsr-audit`)
+rubric**, this is a no-delta published manifest/export design: it adds no entrypoint, public symbol,
+documentation obligation, inferred export, or slow-type risk. F-5/F-6/F-7/F-9 remain enforced by
+the existing public-surface, JSR, documentation, and permission gates; the composite consumer E2E
+supplies the matrix's required runtime and consumer validation. If Phase 2 touches a plugin public
+file despite this plan, the slice must run the rubric over the full affected export map with
+doc-lint, the JSR audit, and publish dry-run evidence, or stop for rescope if the surface changed.
 
 ## 4. Scaffold E2E design, including demonstrated failure
 
@@ -191,6 +214,27 @@ In Phase 2 I will ask the orchestrator before taking the serialized slot, run th
 iterating, and run the required one-pass
 `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` only when the slot is granted.
 
+## Risk register
+
+| Risk | Mitigation | Owning slice |
+| --- | --- | --- |
+| **Type-breaking `RegisteredPluginConfig` migration.** `workdir` and `rootDir` are required today, while the proposed source union makes them local-only. Direct readers include `deploy-config-background.ts:99-103`, `deploy-config-resolvers.ts:197-201`, `doctor-plugin-use-case.ts:524-536`, and `list-plugins-command.ts:47-60,110-115`; unit fixtures in `plugin-registry.test.ts:21-302` encode the required-field shape. E2E topology assumptions also live in `packages/cli/e2e/suites/scaffold/true-userland-install-suite.ts:122-155` and the local/published split in `packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts:20-145`. | Slice 1 must enumerate every `RegisteredPluginConfig.workdir`/`rootDir` reader, select the guarded representation, and add a test that fails when the package variant is passed through a local-only caller. It must explicitly record whether each E2E assumption remains local-only; Slice 6 updates the new package-backed fixture. Type-check is the migration gate before Slice 4 consumes the source. | Slice 1 (inventory, representation, failing package-variant test); Slice 6 (E2E fixture) |
+| **Runtime permission behaviour changes.** Adding manifest permissions to the effective chain changes the permissions users actually receive, so it is not metadata-only plumbing. | Lock the chain in §3 with precedence tests for every occupied/absent slot. Add a `packages/cli/CHANGELOG.md` 0.0.6 entry. Doctor must emit a warning when the effective manifest/contribution permission set differs from a user-overridden `cfg.Permissions`, while preserving that override as highest precedence. | Slice 4 (doctor warning); Slice 5 (runtime chain, precedence tests, CHANGELOG) |
+| **Package source beats an incidental local directory.** Users relying on implicit workspace substitution could observe a different diagnostic and source choice. | Test both directory-present and directory-absent package cases. Explain the explicit-filesystem opt-in in CLI help/`packages/cli/README.md`, emit a package-backed/no-local-workdir message in doctor output, and include the behaviour in the 0.0.6 CHANGELOG/release notes. | Slice 4 (help/output); Slice 5 (release note) |
+| **Permission-precedence contradiction.** The original plan's prose retained `pluginService.permissions` while sequence step 5 elided it, risking an implementation that skipped a contract slot. | Resolved by the single canonical chain in §3. All doctor/runtime code and tests point to that chain; sequence step 5 explicitly preserves `pluginService.permissions`. Any different ordering is plan drift and stops the slice. | Resolved in this plan amendment; enforced by Slices 4 and 5 |
+
+## Open-decision sweep
+
+| Decision | Status | Required resolution/evidence |
+| --- | --- | --- |
+| **Bounded-probe surface contract:** the exact JSON schema, validation rules, and error/failure envelope for carrying manifest metadata are not yet pinned. | **must-resolve-in-slice-2** | Slice 2 defines one versioned/internal result union covering resolved metadata, missing/ambiguous manifest, import failure, timeout, non-zero exit, and malformed payload; parser/child parity tests must fail on an invalid envelope before Slice 3 consumes it. |
+| **`RegisteredPluginConfig.workdir` migration:** whether local fields move entirely onto the discriminated source or remain optional compatibility projections, and how every caller is guarded. | **must-resolve-in-slice-1 (and before slice 4)** | Use the caller inventory in the risk register, select one representation, and make the package-variant test plus scoped type-check fail if any local-only caller dereferences an unguarded field. |
+| **#1022 debt close-out:** the debt may close only when published module resolution, adapter execution, and consumer truth are demonstrated rather than asserted. | **must-resolve-in-slice-7** | The exact closing gate is `behavior.package-backed-plugin-doctor`, registered in both `scaffold.plugins` and `scaffold.runtime`. Its focused red → green logs and the granted one-pass `scaffold.runtime` result are recorded untruncated in this slice's `evidence.md` and linked in the PR Phase 2 comment; only then may Slice 7 update the `cli-plugin-doctor-published-module` row in `.llm/harness/debt/arch-debt.md`. |
+
+There are no remaining **safe-defer** decisions for #1454. A new public manifest field/export, a
+different permission order, or a probe envelope deferred past its owning slice is rescope, not an
+implementation choice.
+
 ## 6. Implementation sequence and gates
 
 1. Add the internal discriminated source contract and a shared configured-specifier classifier;
@@ -201,8 +245,9 @@ iterating, and run the required one-pass
    resolve a package doctor contribution through its public JSR export.
 4. Make doctor source-aware, and make its permissions check consume the same effective permission
    precedence as runtime resolution.
-5. Feed plugin-wide manifest permissions into service/plugin runtime resolution, retaining explicit
-   configuration precedence and the existing background behaviour.
+5. Implement the canonical §3 chain in service/plugin runtime resolution, explicitly preserving
+   the `pluginService.permissions` slot between explicit `cfg.Permissions` and `plugin.permissions`;
+   retain the existing background behaviour for absent slots.
 6. Add focused unit/contract tests, then the fail-closed composite E2E and its red → green proof.
 7. Update/close the #1022 architecture-debt entry only when the published-package gate proves the
    debt's stated acceptance; record any design drift in the slice artifacts.
