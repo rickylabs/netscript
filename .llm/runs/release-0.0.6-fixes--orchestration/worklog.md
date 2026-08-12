@@ -668,3 +668,90 @@ refused to tick its own IMPL-EVAL box ("Pending by design; evaluator separation 
 implementation session from self-certifying it"), and the gate then refused to pass the PR. The box
 becomes tickable only when a separate-session verdict actually returns PASS — which is the correct
 merge ordering for #1539 and is what this lane is waiting on.
+
+## 2026-08-12 — IMPL-EVAL verdict, PR #1539 (slice A, #1438 + #1430): FAIL
+
+Separate native opposite-family session (Claude · Fable 5 · medium), own detached worktree
+`/home/codex/repos/ns006-f-a-impleval` at `c0b98d93d`, diffed against merge-base. Generator
+worktree untouched. No publication attempted.
+
+**VERDICT: FAIL (FAIL_FIX). One blocking finding. #1539 is not merged.**
+
+### B-1 — the agent-docs reproduction check is a self-consistency tautology
+
+The evaluator was asked one question explicitly: *can any non-version-bump content be admitted for
+canary-pair inheritance?* Answer: **yes, reproduced.**
+
+`verifyGreenCanaryPair` (~L190-197) drops the parent→HEAD byte comparison for every path matching
+`isPreparedReleaseGeneratedOutput`, pushing it to `inexactGeneratedPaths` and relying solely on
+`assertPreparedReleaseGeneratedOutputsFresh(root)` — which runs the writers in `--check` against
+**HEAD only**.
+
+For **source-derived** outputs that is sound, and the evaluator confirmed it by tamper-testing:
+the writer re-derives from committed source, and drifted source is itself a changed path outside
+the writer set, so `isVersionOnlyReleaseDiff` rejects the diff first. The barrel `--check`
+genuinely fails on tamper. **That half of the design is correct.**
+
+`prose.json.gz` is not source-derived in the same sense. `rebaseAgentDocsProse` reads the committed
+blob, version-rewrites it, and recompresses. On a same-version stable tree `oldVersion === version`,
+so the rewrite is a **no-op and `--check` compares the blob to itself**. `provenance.json` is
+recomputed from that blob; `agent-docs.generated.ts` is generated from it. The whole agent-docs
+chain is anchored to an unvalidated blob, and all three files are in
+`PREPARED_RELEASE_GENERATED_OUTPUTS`.
+
+Reproduced attack, real output:
+
+```
+injected MALICIOUS-NON-VERSION-CONTENT-INJECTED-BY-EVALUATOR (no version string) into prose payload
+provenance sha256/bytes updated, version unchanged (0.0.5)
+gen:publish-assets --check        → exit 0    ← tamper NOT detected
+generate-cli-assets-barrel --check → exit 0    ← after syncing the barrel
+decoded published barrel          → "MALICIOUS marker present: True"
+```
+
+All three admit as inexact-generated, pass `isVersionOnlyReleaseDiff`, and inherit the parent's
+canary pair.
+
+**Why this is the worst available outcome in this lane, and why it justified the focused eval.**
+Before this PR the guard failed closed — it blocked good releases, which cost 0.0.5 an extra canary
+cycle but was safe. This PR would have inverted that to *authorizing publication of content that was
+never canary-verified*. Everything else on #1539 was green: seven CI checks, the full 3188-test
+suite, both runtime tiers, and the slice's own 21 focused / 101 release-suite tests. **Only an
+adversary specifically briefed to attack the inheritance path found it.** That is the
+`review_codex_complex` pairing earning its cost, and it is direct evidence for the milestone-run
+rule that a guard enters the profile only with its negative case demonstrated.
+
+### B-2 (non-blocking, recorded not fixed)
+
+`check:mcp-export-corpus` fails on the clean committed tree in the evaluator's environment (deno
+2.9.5 `deno doc` byte drift). Direction is safe — fails closed — but if release CI likewise cannot
+reproduce the committed corpus byte-for-byte, the **entire D-6 inheritance path always rejects and
+#1438's feature is inert**: fixed on paper, dead in practice. CI determinism could not be verified.
+Routed to slice A as a `drift.md` note only.
+
+### Judged sound
+
+- `--check` is real: non-mutating, and fails closed on tampered source-derived barrels
+  (independently confirmed, as the brief required — this was new code with no track record).
+- **#1430 is correct and complete**: `--prev-tag` date resolution, commit-date fallback, and the
+  loud empty-`since` failure all verified.
+- Exact-version-replacement-first ordering and the writer-derived path set are sound.
+
+### Gates the evaluator reproduced rather than relayed
+
+21 focused / 101 release-suite / **3188 repo tests, 0 failed, 17 ignored**; check/lint/fmt clean;
+`git status` empty and `deno.lock` unchanged after every probe, including the injection probes.
+
+### Stated as unverified
+
+Real-CI corpus determinism (B-2); live GitHub API behaviour of the notes path (unit/injected
+transport only, per the no-network constraint).
+
+### Action
+
+Blocking finding routed back to slice A's live thread with the reproduction and the two bounded fix
+options (compare admitted generated outputs parent→HEAD, or make the prose writer a genuine
+rebuild). Slice A instructed: do not weaken any existing check to pass; the fix is not done until
+the evaluator's attack has been reproduced and shown to **reject**, with that red output in
+`evidence.md`; and do not tick the PR's IMPL-EVAL box — that stays unticked until a fresh
+separate-session verdict returns PASS, which is why close-gate is honestly red.
