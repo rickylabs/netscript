@@ -44,9 +44,11 @@ import {
   discoverPreparedReleaseFiles,
   PREPARED_RELEASE_GENERATED_OUTPUTS,
 } from './prepare-release.ts';
+import { rewriteNetScriptVersion } from '../deps/bump-version.ts';
 
 const DEFAULT_REPO = 'rickylabs/netscript';
 export const CANARY_PAIR_STATUS_CONTEXT = 'release/canary-pair';
+const AGENT_DOCS_PROSE_PATH = '.llm/assets/agent-docs/prose.json.gz';
 
 export interface ClosedIssue {
   readonly number: number;
@@ -120,6 +122,11 @@ export interface CanaryPairDependencies {
   readonly changedFiles: (root: string) => Promise<readonly string[]>;
   readonly releaseFiles: (root: string) => Promise<readonly string[]>;
   readonly fileAtRevision: (root: string, revision: string, path: string) => Promise<string>;
+  readonly fileBytesAtRevision?: (
+    root: string,
+    revision: string,
+    path: string,
+  ) => Promise<Uint8Array>;
   readonly generatedOutputsFresh?: (root: string) => Promise<void>;
   readonly request: typeof githubRequest;
 }
@@ -129,6 +136,7 @@ const defaultCanaryPairDependencies: CanaryPairDependencies = {
   changedFiles: runGitChangedFiles,
   releaseFiles: discoverPreparedReleaseFiles,
   fileAtRevision: runGitFileAtRevision,
+  fileBytesAtRevision: runGitFileBytesAtRevision,
   generatedOutputsFresh: assertPreparedReleaseGeneratedOutputsFresh,
   request: githubRequest,
 };
@@ -199,6 +207,34 @@ export async function verifyGreenCanaryPair(
     });
     if (exactReplacement) {
       if (inexactGeneratedPaths.length > 0) {
+        if (
+          inexactGeneratedPaths.some((path) => normalizeGitPath(path) === AGENT_DOCS_PROSE_PATH)
+        ) {
+          const readBytes = dependencies.fileBytesAtRevision;
+          if (!readBytes) {
+            throw new Error(
+              'Stable publication blocked: agent-docs prose requires a binary parent-to-HEAD ' +
+                'comparison before canary evidence can be inherited.',
+            );
+          }
+          const [before, after] = await Promise.all([
+            readBytes(root, parent, AGENT_DOCS_PROSE_PATH),
+            readBytes(root, current, AGENT_DOCS_PROSE_PATH),
+          ]);
+          if (
+            !(await isExactAgentDocsVersionReplacement(
+              before,
+              after,
+              previousVersion,
+              nextVersion,
+            ))
+          ) {
+            throw new Error(
+              'Stable publication blocked: agent-docs prose contains non-version changes, so ' +
+                'the parent canary evidence cannot authorize this content.',
+            );
+          }
+        }
         const assertFresh = dependencies.generatedOutputsFresh ??
           assertPreparedReleaseGeneratedOutputsFresh;
         await assertFresh(root);
@@ -223,6 +259,51 @@ export async function verifyGreenCanaryPair(
   );
 }
 
+/** True only when the current prose payload is the writer's version rewrite of its canary parent. */
+export async function isExactAgentDocsVersionReplacement(
+  beforeCompressed: Uint8Array,
+  afterCompressed: Uint8Array,
+  previousVersion: string,
+  nextVersion: string,
+): Promise<boolean> {
+  if (previousVersion === nextVersion) return false;
+  try {
+    const [before, after] = await Promise.all([
+      decompressGzip(beforeCompressed),
+      decompressGzip(afterCompressed),
+    ]);
+    const payload: unknown = JSON.parse(new TextDecoder().decode(before));
+    if (!isAgentDocsPayload(payload)) return false;
+    const files = Object.fromEntries(
+      Object.entries(payload.files).map(([path, source]) => [
+        path,
+        rewriteNetScriptVersion(source, previousVersion, nextVersion),
+      ]),
+    );
+    const expected = new TextEncoder().encode(JSON.stringify({ schemaVersion: 1, files }));
+    return bytesEqual(expected, after);
+  } catch {
+    return false;
+  }
+}
+
+function isAgentDocsPayload(
+  value: unknown,
+): value is { readonly schemaVersion: 1; readonly files: Readonly<Record<string, string>> } {
+  return isRecord(value) && value.schemaVersion === 1 && isRecord(value.files) &&
+    Object.values(value.files).every((source) => typeof source === 'string');
+}
+
+async function decompressGzip(compressed: Uint8Array): Promise<Uint8Array> {
+  const copy = new Uint8Array(compressed);
+  const stream = new Blob([copy.buffer]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+function bytesEqual(left: Uint8Array, right: Uint8Array): boolean {
+  return left.byteLength === right.byteLength && left.every((byte, index) => byte === right[index]);
+}
+
 function isPreparedReleaseGeneratedOutput(path: string): boolean {
   const normalized = normalizeGitPath(path);
   return PREPARED_RELEASE_GENERATED_OUTPUTS.some(
@@ -232,9 +313,9 @@ function isPreparedReleaseGeneratedOutput(path: string): boolean {
 
 /**
  * Derived gzip/base64/hash outputs cannot satisfy a plain-text replacement.
- * Keep the byte check as the first rule, then reproduce all generator checks
- * against a clean checkout so those explicit exceptions still match the same
- * writers used by release:cut.
+ * Keep the byte check as the first rule. The prose blob is separately anchored
+ * to its canary parent; these clean-checkout reproductions then prove the
+ * current provenance and remaining outputs match the release:cut writers.
  */
 async function assertPreparedReleaseGeneratedOutputsFresh(root: string): Promise<void> {
   const dirty = await runGit(root, ['status', '--porcelain', '--untracked-files=no']);
@@ -312,6 +393,26 @@ async function runGitFileAtRevision(
   path: string,
 ): Promise<string> {
   return await runGit(root, ['show', `${revision}:${normalizeGitPath(path)}`], false);
+}
+
+async function runGitFileBytesAtRevision(
+  root: string,
+  revision: string,
+  path: string,
+): Promise<Uint8Array> {
+  const result = await new Deno.Command('git', {
+    args: ['show', `${revision}:${normalizeGitPath(path)}`],
+    cwd: root,
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  if (!result.success) {
+    const stderr = new TextDecoder().decode(result.stderr).trim();
+    throw new Error(
+      `git show ${revision}:${normalizeGitPath(path)} failed: ${stderr || `exit ${result.code}`}`,
+    );
+  }
+  return result.stdout;
 }
 
 async function runGit(root: string, args: readonly string[], trim = true): Promise<string> {
