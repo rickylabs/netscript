@@ -59,6 +59,8 @@ browser contract tests.
 | 2026-08-12 | 1 | implement | Added public navigation vocabulary, one resolver seam, Form integration, compatibility bridge, docs, and browser fixture. |
 | 2026-08-12 | 1 | browser mutation | Mapping `document` to `true` made the browser test fail after 30s with actual `true`, expected `false`; restored the resolver. |
 | 2026-08-12 | 1 | green | All requested gates passed; real Fresh/Vite/Chromium test passed with inherited body client navigation. |
+| 2026-08-12 | review follow-up | CI discovery | Reviewer found that the explicit browser task had no automatic invoker because its filename intentionally stayed outside Deno discovery. |
+| 2026-08-12 | review follow-up | CI wiring | Chose Option 1: the required `check-test` CI lane now installs the pinned Playwright CLI + matching Chromium and invokes the package `test:browser` task explicitly. |
 
 ## Decisions
 
@@ -101,6 +103,7 @@ browser contract tests.
 | --- | --- | --- | --- |
 | Real-browser form redirect | PASS | `deno task --cwd packages/fresh test:browser --fail-fast` | `browser: document form redirect beats inherited body client nav without runtime errors ... ok (26s)`; zero captured page/runtime errors. |
 | Browser mutation sensitivity | RED as expected | same test with resolver temporarily mapped to `true` | Failed after 30s: actual `true`, expected `false`; implementation restored and green rerun completed. |
+| Browser regression CI wiring | PASS / WIRED | `.github/workflows/ci.yml`, required `check-test` job | Installs `@playwright/cli@0.1.17` in runner temp, exposes its local bin through `GITHUB_PATH`, provisions the package's matching Chromium revision, then runs `deno task --cwd packages/fresh test:browser`. Exact local invocation: `ok | 1 passed | 0 failed (15s)`. The test stays outside ordinary Deno discovery so package tests do not acquire an undeclared machine-global browser prerequisite. |
 
 ### Consumer Gates
 
@@ -141,3 +144,9 @@ error: Test failed
 - Automatic evaluation is required later and is orchestrator-owned; this session will not launch it.
 - PR `#1600` remains draft with `status:impl`; no ready-state, merge, canary, OpenHands, or local
   evaluator action was taken.
+- Review finding resolution: Option 1 selected. The browser assertion is now part of the required
+  CI `check-test` lane when that lane executes; it is no longer manual-only coverage.
+- `deno.lock` remains unchanged; no dependency was added to the Deno workspace.
+- Workflow syntax lint was not available locally (`actionlint: not installed`); the edited YAML is a
+  two-step extension of the existing `check-test` step list. GitHub execution is intentionally not
+  forced while the PR remains draft.

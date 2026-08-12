@@ -12,8 +12,8 @@
 
 ## Current State
 
-Implementation and all owner-requested gates are complete. Draft PR `#1600` is ready for the
-automatic label-driven evaluation lifecycle; it remains intentionally draft at `status:impl`.
+Implementation and the review follow-up are complete. Draft PR `#1600` remains intentionally draft
+at `status:impl`; the real-browser assertion is now wired into the required CI `check-test` lane.
 
 ## Completed
 
@@ -28,6 +28,11 @@ automatic label-driven evaluation lifecycle; it remains intentionally draft at `
 - Proved successful document-strategy POST redirects replace the document without reviver errors.
 - Passed check, lint, format, 231 package tests, browser test, quality gate, explicit Fresh target
   scan, publish dry run, and the repository doc-lint wrapper.
+- Closed the review discovery gap with Option 1: CI installs the pinned Playwright CLI in runner
+  temp, provisions its matching Chromium revision, then explicitly invokes
+  `deno task --cwd packages/fresh test:browser`.
+- Confirmed `deno.lock` remains unchanged because the CI-only runtime install adds no Deno workspace
+  dependency.
 
 ## In Progress
 
@@ -35,9 +40,8 @@ automatic label-driven evaluation lifecycle; it remains intentionally draft at `
 
 ## Next Steps
 
-1. Commit and push the implementation slice.
-2. Update PR `#1600` body and post the single `[PHASE: IMPL]` evidence comment.
-3. Leave the draft PR for automatic evaluation; do not launch an evaluator locally.
+1. Leave the draft PR for the orchestrator-owned automatic evaluation lifecycle.
+2. Do not launch an evaluator locally or transition the PR out of draft from this lane.
 
 ## Key Decisions
 
@@ -55,6 +59,7 @@ automatic label-driven evaluation lifecycle; it remains intentionally draft at `
 | `packages/fresh/tests/form-navigation_browser.ts` | new | Real-browser contract test. |
 | `packages/fresh/tests/fixtures/form-navigation-browser/**` | new | Fresh/Vite fixture with inherited body client navigation. |
 | `packages/fresh/deno.json` | modified | Explicit browser-test task. |
+| `.github/workflows/ci.yml` | modified | Required `check-test` lane provisions Chromium and invokes the explicit browser task. |
 | `.llm/runs/fix-1569-form-redirect-nav-strategy--codex/*` | modified | Harness evidence and handoff. |
 
 ## Gates
@@ -63,7 +68,7 @@ automatic label-driven evaluation lifecycle; it remains intentionally draft at `
 | --- | --- | --- |
 | Static | pass | 192-file check/lint/fmt; package tests 231/231 |
 | Fitness | pass | quality gate exit 0; explicit Fresh scan has no findings |
-| Runtime/browser | pass | real Fresh/Vite/Chromium: 1 passed, 0 failed |
+| Runtime/browser | pass + CI-wired | real Fresh/Vite/Chromium: 1 passed, 0 failed; required `check-test` invocation added |
 | Consumer | pass | named SSR contracts, exported type check, publish dry run |
 
 ## Open Questions
