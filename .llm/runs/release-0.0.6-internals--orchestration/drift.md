@@ -1127,3 +1127,22 @@ completed/failure   59e435c5d   12:03:58Z
   event-history dependency were found by running the thing rather than reading it. With the import removed the
   transition succeeds, the label is applied, the generation exists, and automatic DeepSeek runs exactly once.
   The waiver would save one run and remove the only check that has caught anything here.
+
+## D-34 — Canary.3 cut ownership sits with the runtime lane; this lane does not cut and does not compete
+
+- **Severity:** minor (coordination), supersedes part of **D-26**
+- **Recorded:** 2026-08-12, owner directive
+- **Policy:** the **runtime** lane alone owns the Canary.3 cut, after merged **#1558**. No competing release is
+  to be started. This lane continues its assigned issues.
+- **Effect on D-26.** D-26 recorded that 0.0.6 may cut intermediary canaries and that this lane **reports**
+  merged gate-trust checkpoints to the fixes/release coordinator. The reporting duty stands; what changes is
+  **who cuts**. D-26 pointed reporting at the fixes lane, which had described itself as release-checkpoint
+  coordinator and was assembling a cut recommendation for the owner. Canary.3 authority is the runtime lane's.
+- **This lane's position is unchanged and was never at risk:** `drift.md` D-3 recorded on day one that this
+  lane declares no canary point and runs no publish step. Nothing to stand down.
+- **Action taken to prevent an accidental competing process:** notified the fixes lane that Canary.3 cut
+  authority is the runtime lane's, because they had explicitly told me they would bring a
+  first-coherent-checkpoint recommendation to the owner once #1539 landed — and #1539 **has** landed
+  (`3c9dc1f39`). Without that note, two lanes could arrive at the owner with cut recommendations, which is the
+  exact collision the directive guards against. Payload facts were sent to them; the cut decision is not
+  this lane's to route.
