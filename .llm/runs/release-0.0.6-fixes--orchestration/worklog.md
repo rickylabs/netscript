@@ -1020,3 +1020,60 @@ Owner instruction: keep #1539 immutable, wait for #1552 to merge, then move away
 `status:impl-eval` **exactly once**, then finish the merge gate. The cast fix was landed **before**
 that cycle deliberately, so the single dispatch run evaluates final content rather than being
 invalidated by a later push.
+
+## 2026-08-12 — Evaluator recovery on #1539, and prior eval evidence invalidated
+
+**My earlier diagnosis was incomplete.** I reported that #1552 "does not fix #1539's case" because
+the dispatcher resolved the prompt at `pr.base.sha` = `cd24e1679`, which predates the prompt file.
+That observation was correct but the conclusion was too narrow: the real cause is that **#1539's
+branch still carried the pre-#1552 workflow**, and `pr.base.sha` was stale because the branch had
+never been updated against `main`. Relabeling alone could not fix either.
+
+Owner-directed recovery, executed:
+
+```
+$ git merge origin/main --no-edit          → clean, head f2f8a05c8 → 070eabb61
+  impl-eval-prompt.md on branch            → EXISTS  (was MISSING)
+  openhands-phase-eval.yml on branch       → EXISTS
+  the six lane files                       → intact (1046 insertions preserved)
+$ git push origin HEAD:refs/heads/fix/1438-...   (explicit refspec; no upstream)
+  PR base recomputed  cd24e1679 → 5db37e7bb
+  prompt at new base 5db37e7bb             → EXISTS
+```
+
+Then `status:impl-eval` moved away and re-added **exactly once**. Result:
+
+```
+openhands-phase-eval  31594332535  completed/SUCCESS   (previously: failure)
+→ @openhands-agent model=openrouter/deepseek/deepseek-v4-flash-0731 phase=impl
+  Trusted base SHA: 5db37e7bb    Evaluated head SHA: 070eabb61
+→ OpenHands agent run 31594353825 running
+```
+
+The automatic evaluator resolved and launched. Route is `openrouter/deepseek/deepseek-v4-flash-0731`
+— the `formal_impl_evaluation` escalation model in `lane-policy.md`. **No manual evaluator was
+launched or posted at any point in this lane.**
+
+### Prior evaluation evidence is INVALIDATED
+
+Per owner instruction, the three local Fable 5 cycles no longer constitute the merge basis:
+
+| Cycle | Head evaluated | Verdict | Status now |
+| --- | --- | --- | --- |
+| 1 | `c0b98d93d` | FAIL (prose tautology) | historical |
+| 2 | `5350d01fc` | FAIL (provenance tautology) | historical |
+| 3 | `2a4102600` | PASS | **superseded — head has moved twice since** |
+
+The evaluated head is now `070eabb61` (cast fix `f2f8a05c8` + the `main` merge). **The merge basis
+for #1539 is the automatic dispatch verdict at `070eabb61`, not cycle 3.** The local verdicts are
+retained as run evidence — they are what found and closed the two real holes — but they are no
+longer cited as merge authorization.
+
+This is the correct call regardless of instruction: cycle 3 was pinned to a commit two moves back,
+and this lane's whole subject is refusing evidence that no longer describes the artifact.
+
+### Standing constraint reaffirmed
+
+Waves 3–4 branches are cut from **current `main`** at dispatch time. This incident is the concrete
+reason: a branch cut from a stale base carries a stale workflow *and* a stale `pr.base.sha`, and
+both must be current for automatic evaluation to resolve.
