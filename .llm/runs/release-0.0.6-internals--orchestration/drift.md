@@ -886,8 +886,42 @@ Nothing further has been launched and no fourth run created. The merge is held.
   `quality:gate` still reported SUCCESS; their pre-merge diff scan was the only thing in the pipeline that
   saw it, and three adversarial eval cycles did not flag it either because they were briefed on semantics
   rather than typing hygiene.
+- **CORRECTION after a probe the fixes lane asked for — the mechanism is different and the consequence is
+  worse.** `scan-code-quality.ts:178` makes `DEFAULT_ROOTS` the *last* fallback
+  (`changed.length > 0 ? changed : roots.length > 0 ? roots : DEFAULT_ROOTS`), so "not in the roots" was
+  never provably the defect. The probe of `.github/workflows/code-quality.yml:36-42` found two independent
+  failures in five lines:
+
+  ```bash
+  mapfile -t files < <(git diff --name-only --diff-filter=ACMR "$BASE" "$SHA" -- packages plugins)
+  args=(); for file in "${files[@]}"; do args+=(--changed-file "$file"); done
+  if ((${#args[@]})); then deno task quality:scan --pretty "${args[@]}"; fi
+  ```
+
+  1. The changed-file set is **pathspec-limited to `-- packages plugins`**, so `.llm/tools/**` can never
+     enter it. This fully explains the fixes lane's observation: their PR also touched `packages/**`, so
+     the scan *did* run — over the `packages`/`plugins` changed files only, never the `.llm/tools/` file
+     carrying the new `as unknown as`.
+  2. **`if ((${#args[@]}))` skips the scan entirely when the set is empty.** For a PR touching **only**
+     `.llm/tools/**` — every PR in this rail — the step runs **no command** and reports success.
+
+  And `quality:scan` runs from nowhere else: `ci.yml`'s `quality` job invokes `check:source-format`,
+  `test:source-format`, `deno install`, `lint`, `fmt:check`, `docs:tagline:check`, `docs:accuracy` — not
+  `quality:scan`. So both branches of the only caller are blind to `.llm/tools/**`: the PR branch by
+  pathspec, the repo-wide branch by root list.
+
+  So this lane's `.llm/tools`-only PRs have not been *under*-scanned; that gate has been executing **zero
+  commands** and reporting success.
+- **Why the probe mattered before writing #1403's acceptance.** #1403 is framed as a root-list problem.
+  Adding `.llm/tools` to the roots fixes the repo-wide path and leaves the PR gate blind, because the PR
+  gate never consults the roots — shipping that would produce another gate that looks covered and is not,
+  the exact class #1403 exists to close, re-created by its own fix. Two acceptance properties added to
+  #1403 (comment `5266602856`): a red-first fixture proving a `.llm/tools`-only diff actually executes the
+  scan, and the empty-changed-set case failing closed or being reported as "not scanned" rather than green.
 - **Actions taken:**
-  1. Remaining rail PR bodies state what `quality:gate` does and does not cover instead of citing it flatly.
+  1. Remaining rail PR bodies state what `quality:gate` does and does not cover instead of citing it flatly,
+     and state intended scaffold skips as step counts ("step 2 Skipped by policy: success, step 10 skipped,
+     intended") rather than as a bucket, which is a provable claim where `SUCCESS` is not.
   2. Routed into **#1403**'s triage list as a second, larger uncovered surface on the same gate — #1403
      names the `plugin-*-core` omission, and the fix for one is the fix for the other. Filed as a triage
      entry with the fixes lane's PR as provenance rather than as a duplicate issue; ownership offered back
