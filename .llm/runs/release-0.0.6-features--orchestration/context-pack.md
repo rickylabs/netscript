@@ -1,5 +1,15 @@
 # Context pack — 0.0.6 runtime / public-surface lane
 
+## Reopened slice — #1548 / PR #1559 (2026-08-12)
+
+The lane was reopened for the P1 browser stream-discovery fix on
+`fix/1548-vite-browser-stream-discovery`. PLAN-EVAL passed with binding amendments recorded at the
+bottom of `slices/plan-1548.md`. The implementation replaces the value-passed/computed browser env
+reads with literal Vite-substitutable member expressions, adds a source-internal pure lookup, and
+adds five resolver tests. Gate evidence and the contributor path are in `slices/worklog-1548.md`.
+The PR remains draft at `status:impl`; separate-session IMPL-EVAL and merge authority remain with the
+orchestrator.
+
 Closing summary. The lane is **complete**: both owned issues landed on `main`. Read this first if
 resuming or auditing; everything below is traceable to a named artifact.
 
