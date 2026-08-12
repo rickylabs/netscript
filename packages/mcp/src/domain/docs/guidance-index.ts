@@ -26,6 +26,7 @@ export interface GuidanceRankingPolicy {
   readonly exactPhraseBoost: number;
   readonly conceptBoost: number;
   readonly linkBoost: number;
+  readonly closeScoreGap: number;
   readonly graphDepth: 1;
 }
 
@@ -38,6 +39,7 @@ export const GUIDANCE_RANKING_POLICY: GuidanceRankingPolicy = Object.freeze({
   exactPhraseBoost: 10,
   conceptBoost: 8,
   linkBoost: 2,
+  closeScoreGap: 0.5,
   graphDepth: 1,
 });
 
@@ -78,12 +80,8 @@ export class GuidanceIndex {
       this.#rank(entry, normalizedIntent, queryTerms, concepts)
     ).filter((entry): entry is RankedGuidanceSection => entry !== undefined);
     this.#applyLinkBoosts(ranked);
-    ranked.sort((left, right) => {
-      const leftRoute = routeIndex(left.entry, concepts);
-      const rightRoute = routeIndex(right.entry, concepts);
-      return leftRoute - rightRoute || right.score - left.score ||
-        compareGuidanceSectionIdentity(left.entry, right.entry);
-    });
+    orderGuidanceSections(ranked, concepts);
+    const topScore = ranked[0]?.score ?? 0;
 
     if (ranked.length === 0) {
       return {
@@ -100,7 +98,6 @@ export class GuidanceIndex {
       toGuidanceRecommendation(entry, matchedTerms)
     );
     const related = collectGuidanceRelated(ranked, this.#byId);
-    const topScore = ranked[0]?.score ?? 0;
     const confidence = topScore >= 24 ? 'high' : topScore >= 8 ? 'medium' : 'low';
     return {
       intent: guidanceOneLine(intent),
@@ -178,6 +175,39 @@ export class GuidanceIndex {
         targetRank.score += GUIDANCE_RANKING_POLICY.linkBoost;
       }
     }
+  }
+}
+
+/** Order score-near cross-document candidates without a non-transitive epsilon comparator. */
+export function orderGuidanceSections(
+  ranked: RankedGuidanceSection[],
+  concepts: readonly GuidanceConcept[],
+): void {
+  ranked.sort((left, right) => {
+    const leftRoute = routeIndex(left.entry, concepts);
+    const rightRoute = routeIndex(right.entry, concepts);
+    return leftRoute - rightRoute || right.score - left.score ||
+      compareGuidanceSectionIdentity(left.entry, right.entry);
+  });
+
+  let start = 0;
+  while (start < ranked.length) {
+    const leader = ranked[start]!;
+    const route = routeIndex(leader.entry, concepts);
+    let end = start + 1;
+    while (
+      end < ranked.length &&
+      routeIndex(ranked[end]!.entry, concepts) === route &&
+      leader.score - ranked[end]!.score <= GUIDANCE_RANKING_POLICY.closeScoreGap
+    ) {
+      end++;
+    }
+    const closeScoreGroup = ranked.slice(start, end).sort((left, right) =>
+      left.entry.slug.localeCompare(right.entry.slug) || right.score - left.score ||
+      left.entry.section.localeCompare(right.entry.section)
+    );
+    ranked.splice(start, closeScoreGroup.length, ...closeScoreGroup);
+    start = end;
   }
 }
 

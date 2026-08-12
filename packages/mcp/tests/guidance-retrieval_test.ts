@@ -3,6 +3,11 @@ import { createFindGuidanceFlow, type GuidanceResult } from '../mod.ts';
 import { MCP_EMBEDDED_DOCS } from '../src/publish-assets.generated.ts';
 import { EmbeddedDocsCorpus } from '../src/infrastructure/embedded-docs-corpus.ts';
 import { FilesystemDocsCorpus } from '../src/infrastructure/filesystem-docs-corpus.ts';
+import {
+  orderGuidanceSections,
+  type RankedGuidanceSection,
+} from '../src/domain/docs/guidance-index.ts';
+import type { IndexedGuidanceSection } from '../src/domain/docs/guidance-parser.ts';
 
 const SOURCES = [
   {
@@ -67,6 +72,76 @@ Configure the runtime project with explicit service settings.
 `,
   },
 ] as const;
+
+Deno.test('guidance close-score groups use stable documents without chaining or flattening same-page scores', () => {
+  const ranked = [
+    rankedSection('pages/beta', 'highest', 10.4),
+    rankedSection('pages/alpha', 'stronger', 10.2),
+    rankedSection('pages/alpha', 'weaker', 10.1),
+    rankedSection('pages/gamma', 'outside-leader-band', 9.8),
+  ];
+
+  orderGuidanceSections(ranked, []);
+
+  assertEquals(
+    ranked.map(({ entry }) => `${entry.slug}#${entry.section}`),
+    [
+      'pages/alpha#stronger',
+      'pages/alpha#weaker',
+      'pages/beta#highest',
+      'pages/gamma#outside-leader-band',
+    ],
+  );
+});
+
+Deno.test('guidance confidence follows a route-promoted lower scorer', async () => {
+  const corpus = new EmbeddedDocsCorpus({
+    documents: [
+      {
+        slug: 'guides/route-winner',
+        source: '# Route winner\n\n## Task Router\n\nPlugin.',
+      },
+      {
+        slug: 'guides/global-scorer',
+        source:
+          '# Global scorer\n\n## Plugin Thin Layer Core Scaffold Skeleton Dashboard\n\nPlugin dashboard thin layer core scaffold skeleton.',
+      },
+      // Shared terms keep the route winner below the high-confidence threshold.
+      ...Array.from({ length: 20 }, (_, index) => ({
+        slug: `noise/${index}`,
+        source: '# Noise\n\n## Noise\n\nTask router plugin.',
+      })),
+    ],
+  });
+
+  const scoreOrdered = await corpus.findGuidance('add a capability NetScript does not ship');
+  assertEquals(scoreOrdered.recommendations[0]?.slug, 'guides/global-scorer');
+  assertEquals(scoreOrdered.confidence, 'high');
+
+  const routeOrdered = await corpus.findGuidance(
+    'build a real service-backed ui and add a capability NetScript does not ship',
+  );
+  assertEquals(routeOrdered.recommendations[0]?.slug, 'guides/route-winner');
+  assertEquals(routeOrdered.recommendations[1]?.slug, 'guides/global-scorer');
+  assertEquals(routeOrdered.confidence, 'medium');
+});
+
+function rankedSection(slug: string, section: string, score: number): RankedGuidanceSection {
+  const entry: IndexedGuidanceSection = {
+    id: `${slug}#${section}`,
+    slug,
+    section,
+    level: 2,
+    heading: section,
+    title: slug,
+    content: '',
+    tokens: [],
+    tokenCounts: new Map(),
+    code: [],
+    links: [],
+  };
+  return { entry, score, matchedTerms: [] };
+}
 
 Deno.test('shared guidance index bridges concept mismatch and cites fenced and Vento code', async () => {
   const corpus = new EmbeddedDocsCorpus({ documents: SOURCES });
