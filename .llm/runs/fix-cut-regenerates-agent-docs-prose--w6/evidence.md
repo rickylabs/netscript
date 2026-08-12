@@ -37,16 +37,16 @@ shared release preparation runs the stable gate sequence in order ... FAILED (5m
 
  ERRORS
 
-shared release preparation runs the stable gate sequence in order => ./.llm/tools/release/prepare-release_test.ts:16:6
+shared release preparation runs the stable gate sequence in order => ./.llm/tools/release/prepare-release_test.ts:17:6
 error: AssertionError: Values are not equal.
 
     [Diff] Actual / Expected
 
     [
       "bump:0.0.1-canary.1:canary",
++     "deno task gen:agent-docs-prose",
       "deno task gen:publish-assets",
       "deno task gen:mcp-export-corpus",
-+     "deno task gen:agent-docs-prose",
       "deno task gen:assets-barrel",
       "residue:0.0.1-beta.10",
       "deno task publish:readiness",
@@ -57,11 +57,11 @@ error: AssertionError: Values are not equal.
   throw new AssertionError(message);
         ^
     at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:67:9)
-    at file:///home/codex/repos/ns006-w6/.llm/tools/release/prepare-release_test.ts:44:3
+    at file:///home/codex/repos/ns006-w6/.llm/tools/release/prepare-release_test.ts:45:3
 
  FAILURES
 
-shared release preparation runs the stable gate sequence in order => ./.llm/tools/release/prepare-release_test.ts:16:6
+shared release preparation runs the stable gate sequence in order => ./.llm/tools/release/prepare-release_test.ts:17:6
 
 FAILED | 0 passed | 1 failed | 2 filtered out (10ms)
 
@@ -131,14 +131,166 @@ Baseline nuance: both corpus paths were already present transitively at the head
 prepared-release set as the owner contract requested; the implementation makes that ownership
 explicit without duplicating staged paths.
 
-### 3. Real pre-fix cut path
+### 3. Real pre-fix cut path leaves the bumped corpus stale
 
-Pending disposable 0.0.7 rehearsal from the pre-fix commit.
+Disposable root: `/tmp/netscript-w6-prefix.TQbM4q/repo`
+
+Source commit: `1804c23ff` (production pre-fix; only harness bootstrap differs from the requested
+base).
+
+Command: `deno task release:cut -- 0.0.7 --dry-run`
+
+Raw exit code: `0`
+
+Terminal output (the command emitted 3,150 publish-simulation progress lines; no lines in this
+terminal verdict are elided):
+
+```text
+Success Dry run complete
+release:cut gate: deno ci --prod
+release:cut dry-run complete; branch/commit/push/PR skipped.
+RELEASE_EXIT=0
+```
+
+Immediate command in the same bumped disposable copy: `deno task check:agent-docs-prose`
+
+Raw exit code: `1`
+
+Terminal output (the preceding docs build completed successfully with `629 files generated`,
+`Rendered output: OK (homepage semantics; 224 HTML files; 4 documented-syntax allowances)`):
+
+```text
+{"fresh":false,"stalePaths":["prose.json.gz","provenance.json"],"provenance":{"schemaVersion":1,"version":"0.0.7",...}}
+error: Uncaught (in promise) Error: Agent docs prose is stale: prose.json.gz, provenance.json
+        throw new Error(`Agent docs prose is stale: ${freshness.stalePaths.join(', ')}`);
+              ^
+    at file:///tmp/netscript-w6-prefix.TQbM4q/repo/.llm/tools/docs/build-agent-docs-bundle.ts:358:15
+```
+
+The provenance object contains the full 182-file corpus inventory; the decisive freshness fields
+above are reproduced without alteration. This proves the real pre-fix cut path exits green while
+violating the required post-cut freshness property.
 
 ## Gate output
 
-Pending implementation.
+All commands ran from `/home/codex/repos/ns006-w6`. Raw exit codes were `0`.
+
+```text
+$ deno test -A .llm/tools/release/prepare-release_test.ts
+running 3 tests from ./.llm/tools/release/prepare-release_test.ts
+shared release preparation runs the stable gate sequence in order ... ok
+shared release preparation stages every generator-owned output ... ok
+shared release preparation regenerates assets then stops when residue remains ... ok
+ok | 3 passed | 0 failed
+EXIT_CODE=0
+
+$ rtk proxy deno task check
+{"source":{"mode":"selection","cwd":"/home/codex/repos/ns006-w6"},"command":"deno check --unstable-kv <files>","selection":{"filesSelected":2915,"batches":25,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+EXIT_CODE=0
+
+$ rtk proxy deno task test
+ok | 3386 passed (624 steps) | 0 failed | 17 ignored (4m0s)
+EXIT_CODE=0
+
+$ rtk proxy deno task lint
+Task lint deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)"
+{"source":{"mode":"command","cwd":"/home/codex/repos/ns006-w6","exitCode":0},"selection":{"filesSelected":2034,"batches":11},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+EXIT_CODE=0
+
+$ rtk proxy deno task fmt:check
+Task fmt:check deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)" --ignore-line-endings
+{"command":"deno fmt --check","cwd":"/home/codex/repos/ns006-w6","mode":"check","summary":{"filesSelected":2034,"batches":11,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+EXIT_CODE=0
+```
+
+### Agent-docs freshness, twice consecutively
+
+Both invocations built 629 files, reported rendered output OK, and returned the same semantic
+freshness payload and hash:
+
+```text
+$ deno task check:agent-docs-prose
+Rendered output: OK (homepage semantics; 224 HTML files; 4 documented-syntax allowances)
+{"fresh":true,"stalePaths":[],"provenance":{"schemaVersion":1,"version":"0.0.5",...,"sha256":"6edddd572ce21179cec9939e67232ee931e33358f75a68389791f722f6d8a088"}}
+EXIT_CODE=0
+
+$ deno task check:agent-docs-prose
+Rendered output: OK (homepage semantics; 224 HTML files; 4 documented-syntax allowances)
+{"fresh":true,"stalePaths":[],"provenance":{"schemaVersion":1,"version":"0.0.5",...,"sha256":"6edddd572ce21179cec9939e67232ee931e33358f75a68389791f722f6d8a088"}}
+EXIT_CODE=0
+```
+
+The omitted provenance middle is the identical 178-file inventory emitted on both runs; no verdict
+or differing field is elided.
+
+### Lock hygiene in the implementation worktree
+
+Both commands emitted no diff and exited `0`:
+
+```text
+$ git diff --stat -- deno.lock packages/fresh-ui/deno.lock
+EXIT_CODE=0
+
+$ git diff --stat origin/main...HEAD -- deno.lock packages/fresh-ui/deno.lock
+EXIT_CODE=0
+```
 
 ## Disposable 0.0.7 dry-run proof
 
-Pending implementation.
+Disposable root: `/tmp/netscript-w6-postfix.9vF9Mh/repo`. The clone used branch commit `a42d3e707`
+and overlaid only the reviewed `prepare-release.ts` and `prepare-release_test.ts` changes before the
+cut. No live cut, branch, tag, push, PR, or publication occurred.
+
+```text
+$ deno task release:cut -- 0.0.7 --dry-run
+release:cut bumped 0.0.5 -> 0.0.7
+release:cut gate: gen:agent-docs-prose
+Docs source format: OK
+[diagram] verified 21 diagram asset reference(s).
+Site built into _site
+629 files generated
+Rendered output: OK (homepage semantics; 224 HTML files; 4 documented-syntax allowances)
+release:cut gate: gen:publish-assets
+release:cut gate: gen:mcp-export-corpus
+release:cut gate: gen:assets-barrel
+release:cut gate: publish:readiness
+{"gate":"publish-readiness","ok":true,"version":"0.0.7"}
+release:cut gate: publish:dry-run
+Success Dry run complete
+release:cut gate: deno ci --prod
+release:cut dry-run complete; branch/commit/push/PR skipped.
+RELEASE_EXIT=0
+```
+
+The dry-run's publish simulation emitted 3,150 file-progress lines; the complete terminal sequence
+and every release gate are retained above.
+
+Immediate post-cut freshness check in that same bumped copy:
+
+```text
+$ deno task check:agent-docs-prose
+Docs source format: OK
+[diagram] verified 21 diagram asset reference(s).
+629 files generated
+Rendered output: OK (homepage semantics; 224 HTML files; 4 documented-syntax allowances)
+{"fresh":true,"stalePaths":[],"provenance":{"schemaVersion":1,"version":"0.0.7",...,"sha256":"c9268f6cb59e8b94b3c5f01afd1e2203034f38769f14e91eabe22464df3cf257"}}
+EXIT_CODE=0
+```
+
+Direct corpus identity and residue proof:
+
+```text
+{"version":"0.0.7","sha256":"c9268f6cb59e8b94b3c5f01afd1e2203034f38769f14e91eabe22464df3cf257","files":178}
+{"contains007":true,"contains005":false,"count007":162,"count005":0}
+```
+
+Coordinated version-only classifier over the 62 cut-created paths (excluding only the two known
+implementation overlays):
+
+```text
+{"changed":62,"declared":68,"versionOnly":true}
+```
+
+The changed-path census contains only bumped `deno.json` / `scaffold.plugin.json` manifests, the two
+release lockfiles, and writer-declared generated assets (including both agent-docs corpus files and
+their CLI/MCP consumers). No source path is present.

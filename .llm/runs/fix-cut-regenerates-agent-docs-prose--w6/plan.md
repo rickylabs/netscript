@@ -32,8 +32,8 @@ files so a cut commit is fresh for its bumped version.
 
 | ID | Decision | Rationale |
 | --- | --- | --- |
-| D1 | Run `gen:agent-docs-prose` after the MCP corpus and before `gen:assets-barrel`. | The prose generator first renders the version-bumped docs; the final barrel then embeds the newly generated corpus, avoiding a stale embedded asset. |
-| D2 | Import canonical corpus path constants from the bundle builder. | One source of truth prevents staging/generator path drift. |
+| D1 | Run `gen:agent-docs-prose` immediately after the bump, before all existing generators. | The docs render uses bumped manifests; `gen:publish-assets` and the final barrel both consume the freshly generated corpus, so placing it later would leave derived MCP/CLI assets stale. |
+| D2 | Give the prepared-release module an explicit corpus-output constant and deduplicate those paths from its inherited publish-output set. | Direct ownership prevents staging drift while preserving one occurrence per file. |
 | D3 | Keep the freshness check unchanged and mandatory. | The reported mismatch is genuine content drift. |
 
 ## Open-Decision Sweep

@@ -52,7 +52,20 @@ Future version-coupled assets are added to the generator sequence and
 | --- | --- | --- | --- |
 | 2026-08-13 | 1 | bootstrap | PLAN-EVAL: N/A; owner supplied a complete mechanical contract and gates. |
 | 2026-08-13 | 2 | pre-fix tests | Gate sequence and explicit prepared-output ownership each fail independently; full output in `evidence.md`. |
+| 2026-08-13 | 3 | implementation | Added post-bump agent-docs generation before all corpus consumers and explicit deduplicated staging ownership. |
+| 2026-08-13 | 3 | gates | Focused tests, check/test/lint/fmt, two freshness runs, and disposable 0.0.7 rehearsal all pass. |
+| 2026-08-13 | 3 | reconcile | PR #1628 remains draft/status:impl; no new comments or scope changes require adjustment. |
 
 ## Gate Results
 
-Not run yet. Full untruncated evidence is recorded in `evidence.md`.
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| focused release tests | PASS | 3 passed, 0 failed |
+| check | PASS | 2,915 files; 25 batches; 0 findings |
+| test | PASS | 3,386 passed; 0 failed; 17 ignored |
+| lint | PASS | 2,034 files; 0 findings |
+| fmt:check | PASS | 2,034 files; 0 findings |
+| agent-docs freshness ×2 | PASS | identical semantic hash, `fresh:true` twice |
+| disposable 0.0.7 cut + freshness | PASS | cut exit 0; immediate freshness exit 0; version-only classifier true |
+
+Full command evidence is recorded in `evidence.md`.

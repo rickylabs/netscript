@@ -11,3 +11,13 @@
 - **Severity:** minor
 - **Action:** fix by explicitly classifying the paths in the prepared-release set without duplicates.
 - **Evidence:** `evidence.md` pre-fix assertion 2.
+
+## 2026-08-13 — generator dependency order corrected before source implementation
+
+- **What:** Initial plan placed agent-docs generation before only the final barrel.
+- **Source:** `generate-publish-assets.ts` reads the corpus and emits MCP/CLI publish assets.
+- **Expected:** Agent docs after MCP corpus, before the barrel.
+- **Actual:** Agent docs must run immediately post-bump so every downstream consumer sees fresh prose.
+- **Severity:** minor
+- **Action:** fix the locked order in plan/tests before production changes.
+- **Evidence:** `prepare-release.ts` final order and focused exact-sequence test.

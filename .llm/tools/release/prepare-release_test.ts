@@ -2,17 +2,14 @@ import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
 import { PUBLISH_ASSET_OUTPUTS } from '../generate-publish-assets.ts';
 import { EXPORT_SURFACE_CORPUS_OUTPUT } from '../docs/generate-export-surface-corpus.ts';
 import {
+  AGENT_DOCS_PROSE_OUTPUTS,
   collectPreparedReleaseFiles,
   PREPARED_RELEASE_GENERATED_OUTPUTS,
   prepareRelease,
   type PrepareReleaseDependencies,
 } from './prepare-release.ts';
 
-const AGENT_DOCS_OUTPUTS = [
-  '.llm/assets/agent-docs/prose.json.gz',
-  '.llm/assets/agent-docs/provenance.json',
-] as const;
-const AGENT_DOCS_OUTPUT_SET = new Set<string>(AGENT_DOCS_OUTPUTS);
+const AGENT_DOCS_OUTPUT_SET = new Set<string>(AGENT_DOCS_PROSE_OUTPUTS);
 
 Deno.test('shared release preparation runs the stable gate sequence in order', async () => {
   const calls: string[] = [];
@@ -44,9 +41,9 @@ Deno.test('shared release preparation runs the stable gate sequence in order', a
   );
   assertEquals(calls, [
     'bump:0.0.1-canary.1:canary',
+    'deno task gen:agent-docs-prose',
     'deno task gen:publish-assets',
     'deno task gen:mcp-export-corpus',
-    'deno task gen:agent-docs-prose',
     'deno task gen:assets-barrel',
     'residue:0.0.1-beta.10',
     'deno task publish:readiness',
@@ -59,7 +56,7 @@ Deno.test('shared release preparation stages every generator-owned output', () =
   assertEquals(PREPARED_RELEASE_GENERATED_OUTPUTS, [
     ...PUBLISH_ASSET_OUTPUTS.filter((path) => !AGENT_DOCS_OUTPUT_SET.has(path)),
     EXPORT_SURFACE_CORPUS_OUTPUT,
-    ...AGENT_DOCS_OUTPUTS,
+    ...AGENT_DOCS_PROSE_OUTPUTS,
   ]);
   assertEquals(collectPreparedReleaseFiles('/repo', ['/repo/deno.json']), [
     '/repo/deno.json',
@@ -67,7 +64,7 @@ Deno.test('shared release preparation stages every generator-owned output', () =
       (path) => `/repo/${path}`,
     ),
     `/repo/${EXPORT_SURFACE_CORPUS_OUTPUT}`,
-    ...AGENT_DOCS_OUTPUTS.map((path) => `/repo/${path}`),
+    ...AGENT_DOCS_PROSE_OUTPUTS.map((path) => `/repo/${path}`),
   ]);
 });
 
@@ -92,9 +89,9 @@ Deno.test('shared release preparation regenerates assets then stops when residue
     'Version residue remains',
   );
   assertEquals(calls, [
+    'deno task gen:agent-docs-prose',
     'deno task gen:publish-assets',
     'deno task gen:mcp-export-corpus',
-    'deno task gen:agent-docs-prose',
     'deno task gen:assets-barrel',
   ]);
 });

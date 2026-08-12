@@ -33,10 +33,19 @@ const defaultDependencies: PrepareReleaseDependencies = {
   runCommand,
 };
 
+/** Version-coupled docs corpus outputs owned by the shared release preparation path. */
+export const AGENT_DOCS_PROSE_OUTPUTS = [
+  '.llm/assets/agent-docs/prose.json.gz',
+  '.llm/assets/agent-docs/provenance.json',
+] as const;
+
+const AGENT_DOCS_PROSE_OUTPUT_SET = new Set<string>(AGENT_DOCS_PROSE_OUTPUTS);
+
 /** Generator-owned outputs staged by every stable or canary release preparation. */
 export const PREPARED_RELEASE_GENERATED_OUTPUTS: readonly string[] = [
-  ...PUBLISH_ASSET_OUTPUTS,
+  ...PUBLISH_ASSET_OUTPUTS.filter((path) => !AGENT_DOCS_PROSE_OUTPUT_SET.has(path)),
   EXPORT_SURFACE_CORPUS_OUTPUT,
+  ...AGENT_DOCS_PROSE_OUTPUTS,
 ];
 
 /** Combine the bump writer's discovered files with every generator-owned release output. */
@@ -71,6 +80,14 @@ export async function prepareRelease(
   const bump = await dependencies.bump(root, version, mode);
   console.log(`${label} bumped ${bump.oldVersion} -> ${bump.newVersion}`);
 
+  await runGate(
+    label,
+    'gen:agent-docs-prose',
+    'deno',
+    ['task', 'gen:agent-docs-prose'],
+    root,
+    dependencies,
+  );
   await runGate(
     label,
     'gen:publish-assets',
