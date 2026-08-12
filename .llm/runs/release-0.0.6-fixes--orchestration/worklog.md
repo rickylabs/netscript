@@ -346,3 +346,73 @@ class *without* `scaffold.runtime`.
 
 Both slices correctly declined to run the serialized `scaffold.runtime` gate without an
 orchestrator grant, as their briefs required. Neither self-merged.
+
+## 2026-08-12 — Expensive-gate grant: slice C holds `scaffold.runtime`
+
+Both slices correctly declined to run the serialized runtime smoke without a grant. The
+orchestrator grants it to **PR #1534 only**, by applying the `e2e-cli-gate` label
+(`.github/workflows/e2e-cli.yml:97` — the workflow runs for eligible PRs carrying it).
+
+Rationale: #1534 is the PR that *changes runtime gate selection*, including adding
+`behavior.service-health` to the sqlite tier. `scaffold-runtime-sqlite` is the only job that
+proves `/health` actually answers there. Running it on #1534 is not ceremony — it is the specific
+evidence the pre-merge gate is missing.
+
+PR #1535 is **not** granted the gate. It is a test-only change under `packages/cli/src/**` that
+does not alter any suite's gate selection, and #1428's whole purpose is to catch its defect class
+*without* the expensive gate. Running it there would contradict the issue being closed.
+
+Serialisation holds: exactly one PR carries the label, so only one `scaffold.runtime` executes.
+
+## 2026-08-12 — close-gate FAILURE on #1534, root cause and fix
+
+`close-gate` reported **FAIL** with all 8 boxes across #1397 and #1399 listed as `unchecked`
+against the live issue bodies, while the mirror step logged `acceptance-mirror APPLIED: no changes`.
+
+Root cause, read from the tool rather than guessed
+(`.llm/tools/validation/mirror-acceptance-evidence.ts:40,54-67`):
+
+```ts
+const READY_LABEL = 'status:ready-merge';
+...
+if (!hasLabel(labels, READY_LABEL)) {
+  ... warnings: [`Mirror skipped because live PR labels do not include ${READY_LABEL}; ...`]
+  return;   // ← returns before mirroring anything
+}
+```
+
+The mirror **refuses to run** unless the PR carries `status:ready-merge`. #1534 carried
+`status:impl-eval`, so the mirror short-circuited, no box was ever ticked on the issues, and
+close-gate then correctly failed on 8 unticked boxes. The PR's `acceptance-evidence` blocks were
+well-formed; they were simply never consumed.
+
+**Fix applied:** swapped `status:impl-eval` → `status:ready-merge` (the taxonomy permits exactly
+one `status:` label). That label change is itself the `labeled` event that triggers a fresh run —
+which matters, because the tool's own guidance warns `reruns cannot observe a new label event`.
+
+This is a **process defect, not an implementation defect**: nothing about slice C's code or
+evidence was wrong. Recorded because the same misordering will bite every PR in this lane, and the
+remaining slices' PRs are labelled the same way.
+
+## 2026-08-12 — Falsification: cut-trace rule 3 is DISPROVED
+
+Rule 3 was recorded at run open as `[asserted]`: *"a fix whose issue carries no acceptance
+checkboxes is adequately close-gated by PR-body checklist + decisive-claim re-verification."*
+
+**The run disproved it.** PR #1535 closes #1428, which carries **no acceptance checkboxes**.
+`close-gate` returned **SUCCESS** — while #1534, whose issues carry 8 real boxes, returned
+FAILURE for the label reason above.
+
+#1535's green close-gate therefore asserted **nothing about acceptance**: there were no boxes to
+check, so the gate had no work to do and passed trivially. A PR closing a box-less issue gets an
+identical green from close-gate whether its acceptance was met or entirely ignored.
+
+This is the lane's own failure class — pass indistinguishable from did-not-run — reproduced in the
+gate that is supposed to catch it. It does not make #1535 wrong (its acceptance was verified
+independently by the orchestrator at check 5/6/7), but it does mean **close-gate green is not
+evidence for a box-less issue**, and the PR-body checklist plus independent verification is
+carrying the entire load.
+
+Marked `[observed]`. Consequence for this lane: #1438, #1430 and #1428 all lack boxes, so their
+PRs' close-gate results must be treated as *no verdict* rather than as a pass, and checks 5 and 7
+are the real gate for them.

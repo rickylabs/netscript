@@ -50,3 +50,19 @@ below at landing time.
 | D (#1428) | _pending_ | _pending_ |
 
 Automated gates are unchanged by this waiver: they are evidence, not sign-off.
+
+## D-4 — #1417 mutation source is mixed; preferred isolation remains viable
+
+**Recorded:** 2026-08-12, Slice B implementation.
+
+The live-tree mutation is not solely an upstream Deno defect. NetScript's
+`.llm/tools/release/publish-workspace.ts` deliberately materializes npm `catalog:` entries before
+calling Deno; its existing `finally` restored those files only after normal completion. Separately,
+the package-scoped `deno publish --dry-run` path can expand MCP publish metadata. Thus both repo
+preparation and upstream publish processing can write manifests, and an interruption can bypass the
+normal-completion restore.
+
+**Decision:** issue option 1 is viable and selected. Workspace and MCP member dry-runs execute in a
+throwaway workspace. The source tree is never a command working directory, while the same catalog
+materialization and real Deno dry-run gate continue to execute. A hard kill may abandon temporary
+data, but cannot abandon expanded source manifests.
