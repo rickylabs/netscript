@@ -21,6 +21,9 @@
 | Baseline `quality:scan` | exit 0, findings 0, allowCount 7 |
 | Docs-fence red control | exit 1: fenced `as any` under `docs/site/**` produced no finding before implementation |
 | Scanner focused tests after integration | exit 0: 14 passed, 0 failed |
+| Quality suite after budget predicate | exit 0: 21 passed, 0 failed |
+| Docs snippet gate | exit 0: PASS, scanned 578, checked 21, exempt 14, malformed 0 |
+| Trigger executable twin check | exit 0: `deno check --unstable-kv docs/site/reference/triggers/examples_test.ts` |
 
 ## Reconcile
 
@@ -28,3 +31,5 @@
   exists with `Closes #1549`, the required taxonomy, and milestone 0.0.6.
 - Live issue #1549 contains seven acceptance boxes. Evidence will use `box-index: 1..7`.
 - D-1 records three pre-existing docs-companion findings that the widened scan exposes.
+- Trigger reference and executable twin now use the exported
+  `TriggerEventSubscriptionMessage`; the docs snippet gate and direct twin check both pass.

@@ -8,5 +8,7 @@
 - Open escalation D-1: three pre-existing findings in
   `docs/site/reference/contracts/examples_test.ts` are outside ownership, while final scans are
   required green. Continue unblocked work; do not fix or suppress them without direction.
-- Remaining: diff budget predicate/workflow step, max ceilings and overflow fixture, trigger typing,
-  full gates, commits/push/comments/body evidence.
+- Landed rail commit: `5e081e8b8c9aebc6697827698a056b49055e8d58`.
+- Trigger reference and executable twin are typed with `TriggerEventSubscriptionMessage`; both
+  direct checking and the #1537 docs snippet gate pass.
+- Remaining: final gates, resolution of D-1, final commit/push/comments/body evidence.
