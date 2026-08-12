@@ -548,3 +548,53 @@ head and job ids as required arguments and asserts no pre-sync reference survive
 `COMPLETED`; `status:shipped` on both.
 
 **Both owned issues are now on `main`.** #1405 → `8ff1bcb8f`; #1398 → `d7e2b67b2`.
+
+## 2026-08-12 — reopen: all three dispatched, evaluations running on the automatic policy
+
+| Issue | PR | Phase | Evaluation |
+| --- | --- | --- | --- |
+| #1457 | **#1556** | impl complete, ready | IMPL-EVAL running (run `31590876488`) |
+| #1459 | **#1558** | plan committed, draft | PLAN-EVAL dispatched |
+| #1548 | **#1559** | plan committed, draft | PLAN-EVAL dispatched |
+
+All three fired through the **label-driven automatic policy** — no manual OpenHands dispatch, no
+local evaluator. The PLAN-EVAL pair behaved exactly as documented: applying `openhands` alone
+produced a `skipped` dispatch, and applying `status:plan-eval` completed the pair and produced
+`completed/success`. Each PR carries exactly **one** agent-summary comment.
+
+### #1457 landed and reviewed
+
+Two commits, draft PR #1556 → ready. Diff conforms to all four locked decisions. The one worth
+calling out is **D2**: `resolvedQueryNames` is snapshotted **before** the append loop, so client input
+can never override a key the configured `streamPath` already set, and `append` (not `set`) preserves
+repeats. Getting that direction backwards would have created a request-forgery seam and would still
+have passed a naive "the query is forwarded" test.
+
+Verified independently: `deno task --cwd packages/fresh test` → **223 passed, 0 failed**. Negative
+case: reverting the forwarding → **217 passed, 6 failed**; restored, clean, 223/223. One of the six is
+the **pre-existing** `#219` eis-chat test, so the existing suite now genuinely covers forwarded query
+rather than only the new tests doing so.
+
+### My error: a redundant second trigger on #1556
+
+Flipping #1556 to ready fires the initial IMPL-EVAL by itself. I *then* also swapped
+`status:impl` → `status:impl-eval`, which is the **rerun** trigger — two dispatcher runs
+(`11:13:07Z` ready_for_review, `11:13:16Z` labeled), both `completed/success`.
+
+**Observed outcome: no duplicate spend** — the PR carries exactly one agent-summary comment and one
+run id (`31590876488`). But the double-trigger was avoidable and is exactly what D-5 warns against.
+Not repeated for #1558/#1559, which were left as drafts so only the PLAN-EVAL pair fired.
+
+### #1459 rescoped before dispatch, not at merge
+
+Research found the issue is materially larger than titled: `DeferIsland.tsx` is **not registered as
+an island at all**, and a second defect sets `f-client-nav` false in exactly the `partial-miss` case,
+so hydration alone may still produce a document navigation. Those two are technically inseparable and
+stay together.
+
+Its acceptance also requires a regression test that builds the client bundle and drives a browser —
+capability this repo **does not have** (no browser driver in test infra; no gate builds or inspects a
+client bundle). Per `milestone-run.md`, an issue whose acceptance cannot all be truthfully ticked by
+one PR is split **before** dispatch rather than discovered at merge (the #1024/#1061 precedent). That
+criterion moved to **#1557** with a written reason; #1558's body states which criteria it proves and
+which it does not.
