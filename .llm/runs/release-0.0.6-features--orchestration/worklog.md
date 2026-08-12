@@ -723,3 +723,49 @@ standard applied to the lock. Generated-asset churn is the same incidental class
 **Audit gate:** nothing is pushed or flipped to ready until `git status` after the Codex turn is
 audited against this table, with the lock confirmed at HEAD and both `.generated.ts` files accounted
 for.
+
+## 2026-08-12 — #1459 lock churn recurred: root cause found, not just reverted
+
+The lock reappeared modified at the audit boundary (**+385 / −9**) after having been restored. The
+added specifiers name the cause unambiguously:
+
+```
+npm:vite@^7.1.4  npm:rollup@^4.55.1  npm:@babel/preset-react  npm:@prefresh/vite
+npm:@types/babel__core  jsr:@fresh/plugin-vite  jsr:@fresh/core  jsr:@deno/loader
+```
+
+That is a **Vite/Rollup/Babel client-build toolchain**. The **B3 bundle fixture runs a real
+`vite build`, and that build writes the root lock.**
+
+**So a plain revert cannot hold.** It restores the file and the next test run regenerates it — which
+is exactly what happened between the previous restoration and this audit. Treating the first
+occurrence as a one-off edit was an incomplete diagnosis on my part; the recurrence is what exposed
+the mechanism.
+
+**This is my own brief's second-order consequence.** I mandated B3 ("build the client bundle and
+assert the island is present") without considering that a real `vite build` mutates the workspace
+lock. The requirement and the lock policy are in tension, and that tension is mine to resolve, not
+the implementer's to absorb silently.
+
+**Steered with three ordered resolutions, one of which is "this does not work":**
+
+1. **Preferred — isolate the build from the root lock:** run the fixture's `vite build` with
+   `--no-lock`, or give it its own lock inside
+   `packages/fresh/tests/fixtures/defer-island-client/`. A test fixture's toolchain resolution has no
+   business in the workspace lock.
+2. **Prove a narrow required manifest delta:** declare the dependencies explicitly and show the
+   **exact minimal** delta. `+385` lines of transitive resolution is explicitly rejected as "minimal".
+3. **Stop and report that B3 is not viable under the lock policy** — a legitimate answer. B3 then gets
+   rescoped and the client-bundle assertion joins the browser-level evidence already split to #1557.
+
+Hard conditions: re-run `git status` and `git diff --stat HEAD -- deno.lock` **immediately before**
+the commit rather than earlier (the gap between audit and commit is where this recurred); default to
+reverting the whole churn if the chosen approach is not fully working at commit time; never add the
+lock to a commit to make the tree look clean.
+
+Also flagged for attribution in the same pass: `agent-docs.generated.ts` is modified and is not
+obviously implied by this slice, unlike `embedded.generated.ts` which the template change legitimately
+requires.
+
+**Nothing has been committed or pushed on this branch.** The branch head remains `4f93a0c2e`
+(docs-only), so no churn has landed anywhere.
