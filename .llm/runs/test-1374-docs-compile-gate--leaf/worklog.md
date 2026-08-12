@@ -83,6 +83,7 @@ focused negative controls before the repo suite.
 | 2026-08-12 | PLAN-EVAL cycle 1 | `FAIL_PLAN` | Opposite-family evaluator built and ran D2, confirmed four blocking defects and four non-blocking gaps; no implementation started. |
 | 2026-08-12 | Phase 1 revision | Plan & Design | D2 now uses a copied temporary lock without `--frozen` plus root-catalog fallback; containment/Fresh guards remain; `typescript` is covered; the barrel bug and two island examples move to checked. Revised floor is 35 = 21 checked + 14 exempt. |
 | 2026-08-12 | PLAN-EVAL cycle 2 | `PASS` | Fresh opposite-family session verified every cycle-1 fix by execution. Two mandatory additive D2 mechanics were recorded before implementation: carry the root catalog section and canonicalize equivalent import ranges. |
+| 2026-08-12 | Slice 1 | Extractor contract | Added stable source/fence provenance, backtick/tilde parsing, `ts`/`tsx`/`typescript` recognition, exact reason markers, bidirectional coverage floors, the real-corpus census test, and the empty-reason CLI fixture. |
 
 ## Decisions
 
@@ -112,6 +113,26 @@ focused negative controls before the repo suite.
 | PLAN-EVAL cycle 1 | `FAIL_PLAN` | Four blocking and four non-blocking findings; all addressed in the revised plan artifacts. |
 | PLAN-EVAL cycle 2 | PASS | No blocking findings; implementation authorized after the mandatory pre-slice-2 amendments. |
 | Implementation gates | NOT_RUN | Correctly deferred until separate PLAN-EVAL `PASS`. |
+
+### Slice 1 — extractor, marker, and census
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Scoped type-check | PASS | Wrapper selected 17 docs-tool TS files; 0 diagnostics; exit 0. |
+| Scoped lint | PASS | Wrapper selected 17 docs-tool TS files; 0 findings; exit 0. |
+| Scoped format | PASS | Exact docs-tool wrapper selected 17 files; 0 findings after Deno-formatting the selected TS surface; exit 0. |
+| Focused tests | PASS | `deno task docs:snippets:test`: 4 passed, 0 failed. |
+| Raw empty-reason control | EXPECTED_RED | `deno task docs:snippets:negative empty-exemption-reason`: exit 1; `page.md:1: malformed ts fence: expected no-check:<nonblank reason>`. |
+| Lock hygiene | PASS | No `deno.lock` change. |
+
+Slice review: parser provenance is stable for #1378; recognized aliases share one strict marker
+grammar; missing candidates, checked-count loss, and exemption growth are independent failures. No
+ambient or cast-based legalization exists. The exact format gate also normalized pre-existing Deno
+format drift in `check-exports-drift.ts` and its test without semantic edits.
+
+Reconcile: PR #1537 remains draft with `status:impl`, `Closes #1374`, milestone `0.0.6`, and the
+required type/area/priority labels. New comments contained only the already-recorded #1378 extractor
+consumer boundary; no scope or issue-state readjustment was required.
 
 ## Handoff Notes
 

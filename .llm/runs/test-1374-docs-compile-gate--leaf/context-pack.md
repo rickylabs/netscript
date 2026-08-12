@@ -32,7 +32,7 @@ slice 2; phase 2 may now implement slices 1–4 in order.
 
 ## In Progress
 
-- Slice 1 implementation.
+- Slice 1 complete locally; commit/push/comment boundary next, then slice 2 compiler contract.
 
 ## Next Steps
 
@@ -51,6 +51,15 @@ slice 2; phase 2 may now implement slices 1–4 in order.
 | Pages workflow trigger | `plan.md` D4 | `ci.yml` keeps current accuracy step, no duplicate snippet job. |
 | Accuracy demotion | `plan.md` D5 | One-page dialect containment and Fresh-root guard survive; only named positive needles are removed; drift checker unchanged. |
 | Actual red controls | `plan.md` D6 | Three spawned CLI failures plus two dialect green controls. |
+
+## Implementation Evidence
+
+| Slice | State | Evidence |
+| --- | --- | --- |
+| S1 extractor/marker/census | COMPLETE_LOCAL | Focused tests 4/4; scoped check/lint/fmt exits 0; empty-reason raw exit 1 naming `page.md:1`. |
+| S2 compiler/import resolution | PENDING | — |
+| S3 Tier-1/accuracy/coverage | PENDING | — |
+| S4 Pages/final gates | PENDING | — |
 
 ## Files Changed
 

@@ -48,3 +48,12 @@ Drift is append-only.
   `docs/site/reference/sdk/index.md` are not compiler-covered until reference wave 4. Exact
   one-page `createServiceQueryUtils` containment continues to block the wrong dialect on all
   golden-path pages; only positive presence on the sanctioned page is deferred.
+
+## 2026-08-12 — Slice 1 scoped format baseline
+
+- **Severity:** mechanical, no behavioral drift.
+- **Observed:** the required exact `.llm/tools/docs` format wrapper found Deno-format drift in the
+  new slice files and in pre-existing `check-exports-drift.ts` plus its test.
+- **Disposition:** ran `deno fmt` only on the six selected TypeScript files. The two pre-existing
+  files changed formatting only; their checker behavior, mapping, and tests were not altered. The
+  exact scoped wrapper then exited 0.

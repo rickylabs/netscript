@@ -1,0 +1,122 @@
+import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import { dirname, fromFileUrl, join } from '@std/path';
+import { extractFencedBlocks } from './snippet-extractor.ts';
+import { analyzeSnippetSite } from './snippet-policy.ts';
+
+const repositoryRoot = dirname(dirname(dirname(dirname(fromFileUrl(import.meta.url)))));
+
+Deno.test('extractor preserves provenance and treats typescript as checked ts', () => {
+  const blocks = extractFencedBlocks(
+    '# Example\n\n~~~typescript\nconst answer = 42;\n~~~\n\n```tsx no-check: partial JSX\n<div />\n```\n',
+    'guide.md',
+  );
+  assertEquals(blocks, [
+    {
+      sourcePath: 'guide.md',
+      fenceOrdinal: 1,
+      openingLine: 3,
+      codeStartLine: 4,
+      closingLine: 5,
+      delimiter: '~',
+      delimiterLength: 3,
+      infoString: 'typescript',
+      language: 'typescript',
+      checkedLanguage: 'typescript',
+      compilationExtension: 'ts',
+      body: 'const answer = 42;',
+    },
+    {
+      sourcePath: 'guide.md',
+      fenceOrdinal: 2,
+      openingLine: 7,
+      codeStartLine: 8,
+      closingLine: 9,
+      delimiter: '`',
+      delimiterLength: 3,
+      infoString: 'tsx no-check: partial JSX',
+      language: 'tsx',
+      checkedLanguage: 'tsx',
+      compilationExtension: 'tsx',
+      exemptionReason: 'partial JSX',
+      body: '<div />',
+    },
+  ]);
+});
+
+Deno.test('recognized TS fences reject missing reasons and extra attributes', () => {
+  for (const info of ['ts no-check', 'ts no-check:', 'tsx twoslash']) {
+    let message = '';
+    try {
+      extractFencedBlocks(`\`\`\`${info}\nconst x = 1;\n\`\`\`\n`, 'bad.md');
+    } catch (error) {
+      message = error instanceof Error ? error.message : String(error);
+    }
+    assertStringIncludes(message, 'bad.md:1: malformed');
+  }
+});
+
+Deno.test('real corpus census recognizes aliases and protects the Tier-1 candidate floor', async () => {
+  const analysis = await analyzeSnippetSite(join(repositoryRoot, 'docs/site'));
+  assertEquals(analysis.census, {
+    scanned: 578,
+    ts: 211,
+    tsx: 77,
+    typescript: 7,
+    tsLike: 295,
+    tier1: 35,
+    checked: 35,
+    exempt: 0,
+    outsideFloor: 260,
+    malformed: 0,
+  });
+
+  const temp = await Deno.makeTempDir();
+  try {
+    const site = join(temp, 'docs/site');
+    for (
+      const page of [
+        'quickstart.vto',
+        'index.vto',
+        'services-sdk/sdk.md',
+        'services-sdk/how-to/add-a-service.md',
+        'web-layer/query.md',
+        'web-layer/examples.md',
+        'web-layer/interactive.md',
+        'web-layer/form.md',
+        'web-layer/query-bridge.md',
+      ]
+    ) {
+      const target = join(site, page);
+      await Deno.mkdir(dirname(target), { recursive: true });
+      await Deno.writeTextFile(
+        target,
+        page === 'quickstart.vto' ? '```js\nconst bypass = true;\n```\n' : '',
+      );
+    }
+    await assertRejects(
+      () => analyzeSnippetSite(site),
+      Error,
+      'candidate count 0 is below floor 35',
+    );
+  } finally {
+    await Deno.remove(temp, { recursive: true });
+  }
+});
+
+Deno.test('empty-reason fixture exits the actual CLI non-zero and names its fence', async () => {
+  const output = await new Deno.Command(Deno.execPath(), {
+    cwd: repositoryRoot,
+    args: [
+      'run',
+      '--allow-read',
+      '.llm/tools/docs/check-snippets.ts',
+      '--negative',
+      'empty-exemption-reason',
+      '--extract-only',
+    ],
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  assertEquals(output.code, 1);
+  assertStringIncludes(new TextDecoder().decode(output.stderr), 'page.md:1: malformed ts fence');
+});
