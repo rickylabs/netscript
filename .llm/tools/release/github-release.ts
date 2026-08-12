@@ -413,7 +413,16 @@ function parseAgentDocsProvenance(source: string): AgentDocsProvenance | undefin
     typeof value.sha256 !== 'string' ||
     Object.keys(value).sort().join('\0') !== [...AGENT_DOCS_PROVENANCE_KEYS].sort().join('\0')
   ) return undefined;
-  return value as unknown as AgentDocsProvenance;
+  return {
+    schemaVersion: 1,
+    version: value.version,
+    sourceCommit: value.sourceCommit,
+    extractionTimestamp: value.extractionTimestamp,
+    files: [...value.files],
+    uncompressedBytes: value.uncompressedBytes,
+    compressedBytes: value.compressedBytes,
+    sha256: value.sha256,
+  };
 }
 
 function agentDocsPayloadFiles(payloadBytes: Uint8Array): readonly string[] | undefined {
