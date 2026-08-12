@@ -502,3 +502,35 @@ ticked or quietly reinterpreted.
 Owned issues: **#1436, #1415 closed** (PR #1527, merged `63cd1cd58`). **#1530, #1403, #1380, #1549** remain
 in 0.0.6 across PR-E → PR-B → PR-C → PR-D. **#1378, #1545** carry to 0.0.7. The lane's deliverable count is
 unchanged at four remaining PRs; what changed is that PR-D's scope is now provable.
+
+## D-18 — PLAN-EVAL cycle 4 runs on the automated path; evaluator route changed by automation, not escalation
+
+- **Severity:** minor (route record)
+- **Recorded:** 2026-08-12
+- **Owner directive:** run a separate PLAN-EVAL cycle 4 on the rescoped plan before dispatching PR-E; do
+  not waive it, because the change remains a complex cross-cutting quality-gate change.
+- **Mechanism used, per D-14:** the rescoped plan needed a PR surface for the label pair, so the control
+  branch's run-record PR **#1553** was opened **as a draft** and given `openhands` + `status:plan-eval`.
+  Verified from `openhands-phase-eval.yml:24-34` that the PLAN-EVAL branch does **not** test draft state
+  (only `status:impl-eval` requires non-draft), so a draft record PR is the correct surface.
+- **Dispatch verified, not assumed:** run `29334443743` succeeded on the `labeled` event and posted the
+  trigger; run **31588750658** is the evaluator.
+
+```text
+@openhands-agent model=openrouter/minimax/minimax-m3 output=pr-comment iterations=500 phase=plan
+head=ce011b5f157a3f90bfbbf2c6a9e4f25ff3a060bc
+Trusted base SHA: d7e2b67b2be535c9ca13449f97f8f4585344030a
+```
+
+- **Route shift worth recording.** Cycles 1–3 ran on the native opposite-family route (Codex · Sol · high),
+  which `lane-policy.md` makes the local default, with OpenRouter reserved for a third opinion or a
+  quota-blocked native family. Cycle 4 is **MiniMax M3 over OpenRouter** — the phase-bound PLAN-EVAL model
+  in `lane-policy.md` § Native-first formal evaluation. The change is **chosen by the automation**, not an
+  orchestrator escalation: the phase dispatcher resolves the model. Recorded so the run's route history is
+  not mistaken for an unrecorded escalation. It also means cycle 4 is a genuine **third opinion** on a plan
+  three Codex cycles have already failed, which is the more useful pairing here.
+- **No duplication.** The local Codex evaluator thread finished cycle 3 and was not resumed. One evaluation
+  of one plan revision, per D-14.
+- **#1553 must never leave draft.** Draft → ready fires the initial IMPL-EVAL, which is meaningless for a
+  record PR that ships no code. `netscript-pr` also forbids merging a PR at `status:plan-eval`, which is
+  correct for this surface.
