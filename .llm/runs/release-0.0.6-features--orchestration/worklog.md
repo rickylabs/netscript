@@ -934,3 +934,43 @@ its regenerated lock could not be mistaken for the deliverable.
 under inherited Fresh client navigation) joined this lane. With **#1562**, three items are queued
 **behind terminal-green Canary.3**. #1569 looks adjacent to #1459's `f-client-nav` work — worth
 checking for overlap at triage. Fable prohibited; automatic evaluator lifecycle only.
+
+## 2026-08-12 — #1571 second-run neutrality gap: two import forms, two lock entries
+
+Supervision caught the leaf dirty again after its committed 386/9 closure. `HEAD..worktree` adds
+**exactly one** derived entry at `deno.lock:34`:
+
+```
+"jsr:@fresh/plugin-vite@1.1.2": "1.1.2",      # exact-specifier form
+"jsr:@fresh/plugin-vite@^1.1.2": "1.1.2",     # range form, already in the closure
+```
+
+**Mechanism, confirmed by inspection rather than inferred:** two import forms diverge, so the lock
+legitimately needs both entries.
+
+| Site | Form |
+| --- | --- |
+| `packages/fresh/deno.json:35` | `jsr:@fresh/plugin-vite@^1.1.2` — range, via the import map |
+| `packages/fresh/tests/fixtures/defer-island-client/vite.config.ts:1` | `jsr:@fresh/plugin-vite@1.1.2` — **exact, fully qualified**, bypassing the map |
+
+A gate that walks fixture sources resolves the exact specifier and writes its own entry. The
+committed closure captured only the range form, so the second pass is not byte-identical. **The PR
+body correctly still marks neutrality pending** — the claim was never overstated, which is the right
+failure mode.
+
+**Not flipped to ready.** Steered the existing worker (thread
+`019ff621-00ba-7323-8353-a1e9c5654390`, Sol low, route matched) to: identify the generating gate **by
+running them one at a time from a clean lock** rather than guessing; incorporate the entry through
+the generating Deno command, never a hand-edit; commit the deterministic final closure; run the
+frozen `deno ci --prod` plus `publish:readiness`/`check`/`lint` **twice** and prove an empty
+`git status` and lock diff on the second pass; and **measure** the final numstat rather than
+repeating my ~387/9 estimate.
+
+**One question posed, deliberately not actioned:** the fixture's exact pin against the manifest's
+range is what forces two entries for one dependency. Collapsing the fixture to the bare mapped
+specifier may be the better fix — but that is a **source** change, and this is a p0 release blocker
+scoped to `deno.lock`. The worker reports its opinion; I decide whether it becomes a follow-up. Not
+widening a p0 to take a tidier design.
+
+Note: the worker reverted my brief commit off the slice branch, keeping the PR `deno.lock`-only. That
+is consistent with the brief's own constraint, so it stands.
