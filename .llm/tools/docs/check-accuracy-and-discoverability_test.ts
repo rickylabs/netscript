@@ -4,6 +4,7 @@ import {
   checkFreshRootImports,
   checkGoldenPathDocs,
   checkMutationMapColumns,
+  checkPublicCommandReference,
   checkSagaVocabulary,
 } from './check-accuracy-and-discoverability.ts';
 
@@ -132,4 +133,55 @@ Deno.test('checkMutationMapColumns requires the heading and all five policy colu
       missing,
     );
   }
+});
+
+Deno.test('public command coverage uses structural roots, direct-parent projection, and colon roots', () => {
+  const paths = [
+    'agent',
+    'agent drift',
+    'agent drift record',
+    'agent init',
+    'ui:add',
+  ];
+  const result = checkPublicCommandReference(paths, [
+    [
+      '## `agent` — agent tooling',
+      '`netscript agent init` installs tooling.',
+      '`netscript agent drift record` records drift.',
+      '`netscript ui:add` copies a registry item.',
+    ].join('\n'),
+    '# Curated companion\n',
+  ], 4);
+  assertEquals(result, {
+    auditedCount: 4,
+    documentedCount: 4,
+    recursiveCount: 5,
+    missing: [],
+  });
+});
+
+Deno.test('public command coverage does not credit a descendant or sibling to a missing path', () => {
+  const paths = ['agent', 'agent init', 'agent mcp'];
+  assertThrows(
+    () =>
+      checkPublicCommandReference(paths, [
+        'The command `netscript agent init` installs tooling.\n',
+        'No group heading is present.\n',
+      ], 3),
+    Error,
+    'missing netscript agent, netscript agent mcp',
+  );
+});
+
+Deno.test('public command census drift names the newly appeared undocumented path', () => {
+  assertThrows(
+    () =>
+      checkPublicCommandReference(
+        ['agent', 'agent init', 'agent mcp'],
+        ['## `agent`\n`netscript agent init`\n'],
+        2,
+      ),
+    Error,
+    'expected 2, got 3; unratified command path(s): netscript agent mcp',
+  );
 });

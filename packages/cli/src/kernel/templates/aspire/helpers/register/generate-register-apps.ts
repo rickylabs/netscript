@@ -109,6 +109,13 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       lines.push(``);
       lines.push(`    // HTTP endpoint`);
       lines.push(`    await ${id}.${renderHttpEndpointCall(entry)};`);
+
+      // Browser diagnostics are a frontend-app default. Keep the app-type and
+      // endpoint predicates together so task/desktop executables cannot gain a
+      // browser child without a browseable HTTP/HTTPS parent.
+      if (type === 'app') {
+        lines.push(`    await ${id}.withBrowserLogs();`);
+      }
     }
 
     // --- Endpoint readiness probe ---
@@ -250,7 +257,7 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
  * Aspire only treats a resource as healthy once its registered health checks pass; a resource
  * with no health check at all is considered ready as soon as its process reaches `Running`.
  * That fallback is what let a generated Fresh app report `Healthy` while every request failed
- * during SSR (#954). The probe targets the app's own server-rendered health route, so a broken
+ * during SSR. The probe targets the app's own server-rendered health route, so a broken
  * render pipeline surfaces as `Unhealthy` instead of green-and-500.
  */
 function buildHealthProbeBlock(

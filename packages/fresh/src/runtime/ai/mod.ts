@@ -15,10 +15,10 @@
  * - `@tanstack/ai-preact` — the `useChat` island hook + MCP app bridge.
  * - `@tanstack/ai` — server-side chat activity, tool definitions, MCP sources.
  *
- * ## StreamDB *shapes* vs Durable *Sessions* — the doctrinal root of #219
+ * ## StreamDB *shapes* vs Durable *Sessions*
  *
  * `@netscript/fresh/streams` and `@netscript/fresh/ai` look adjacent but model
- * two different things. Conflating them is the root confusion behind #219: a
+ * two different things. Conflating them creates a category error: a
  * chat is **not** a StreamDB shape, and a StreamDB shape is **not** a session.
  *
  * | Axis            | StreamDB *shapes* (`./streams`)          | Durable *Sessions* (`./ai`)                         |

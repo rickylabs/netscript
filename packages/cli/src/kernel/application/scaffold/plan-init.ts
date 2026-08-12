@@ -9,6 +9,7 @@ import { generateNetScriptConfig } from '../../templates/workspace/netscript-con
 import { generateReadme } from '../../templates/workspace/generate-readme.ts';
 import { generateAspireCliTaskRunner } from '../../templates/workspace/aspire-cli-task.ts';
 import { generateNodeModulesVerifier } from '../../templates/workspace/node-modules-verifier.ts';
+import { generateDependencyClosureVerifier } from '../../templates/workspace/dependency-closure-verifier.ts';
 import { generateQualityRunner } from '../../templates/workspace/quality-runner.ts';
 import { generatePackageJson } from '../../templates/workspace/package-json.ts';
 import { generateEditorConfigFiles } from '../../adapters/scaffold/editor-config.ts';
@@ -238,6 +239,27 @@ export async function scaffoldRoot(
     filesCreated.push(verifierPath);
   } else {
     filesSkipped.push(verifierPath);
+  }
+
+  const appNetscriptDir = join(appDir, SCAFFOLD_DIRS.NETSCRIPT);
+  if (!directoriesCreated.includes(appNetscriptDir)) {
+    await context.scaffolder.createDir(appNetscriptDir);
+    directoriesCreated.push(appNetscriptDir);
+  }
+  const closureVerifierPath = join(
+    appNetscriptDir,
+    SCAFFOLD_FILES.DEPENDENCY_CLOSURE_VERIFIER,
+  );
+  if (
+    await context.scaffolder.writeFile(
+      closureVerifierPath,
+      generateDependencyClosureVerifier(),
+      options.force,
+    )
+  ) {
+    filesCreated.push(closureVerifierPath);
+  } else {
+    filesSkipped.push(closureVerifierPath);
   }
 
   const qualityRunnerPath = join(netscriptDir, SCAFFOLD_FILES.QUALITY_RUNNER);

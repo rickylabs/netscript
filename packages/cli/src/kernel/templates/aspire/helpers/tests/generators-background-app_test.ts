@@ -355,13 +355,17 @@ describe('generateRegisterApps', () => {
     assertStringIncludes(output, ".withHttpEndpoint({ port: 8000, env: 'PORT' })");
   });
 
-  it('should not emit browser-log capabilities for generic executable apps', () => {
+  it('should enable browser logs after endpoint binding for app resources', () => {
     const output = generateRegisterApps({
       ...emptyOptions,
       apps: { frontend: fixtures.MINIMAL_APP },
     });
 
-    assert(!output.includes('withBrowserLogs'));
+    assertStringIncludes(output, 'await frontend.withBrowserLogs();');
+    assert(
+      output.indexOf('frontend.withHttpEndpoint(') < output.indexOf('frontend.withBrowserLogs()'),
+      'browser logs must be registered after the HTTP endpoint they browse',
+    );
   });
 
   it('should use deno task for app registration', () => {
@@ -512,6 +516,7 @@ describe('generateRegisterApps', () => {
       apps: { chores: fixtures.UNPINNED_TASK_APP },
     });
     assert(!output.includes('withHttpHealthCheck'));
+    assert(!output.includes('withBrowserLogs'));
   });
 
   it('should handle empty apps', () => {

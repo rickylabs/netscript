@@ -151,7 +151,7 @@ const deployTargetBaseShape = {
 
 /**
  * Shared base schema for every `deploy.targets.*` member.
- * Downstream targets (#339+) compose these fields into their own member schema.
+ * Downstream targets compose these fields into their own member schema.
  */
 export const DeployTargetBaseSchema: z.ZodType<DeployTargetBase> = z.object(deployTargetBaseShape);
 
@@ -199,7 +199,7 @@ export const DockerComposeDeployTargetSchema: z.ZodType<DockerComposeDeployTarge
 /**
  * Linux systemd deployment target (`deploy.targets.linux`).
  * Extends the shared base with systemd service-manager fields.
- * Consumed by the bare-metal Linux deploy target (#339 + #340).
+ * Consumed by the bare-metal Linux deploy target.
  */
 export const LinuxDeployTargetSchema: z.ZodType<LinuxDeployTarget> = z.object({
   ...deployTargetBaseShape,

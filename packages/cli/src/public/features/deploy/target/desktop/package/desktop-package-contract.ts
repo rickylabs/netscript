@@ -30,7 +30,7 @@ export const DESKTOP_PACKAGE_COMPRESSIONS = ['none', 'xz', 'lzma', 'zstd'] as co
 /** Desktop package compression mode. */
 export type DesktopPackageCompression = (typeof DESKTOP_PACKAGE_COMPRESSIONS)[number];
 
-/** Default task name exposed by the #452 package hook. */
+/** Default task name exposed by the native package hook. */
 export const DEFAULT_DESKTOP_PACKAGE_TASK = 'desktop:package' as const;
 
 /** Default project-relative directory for native package output. */
@@ -105,7 +105,7 @@ export interface DesktopPackagePlanRequest {
   readonly appName: string;
   /** App version embedded in artifact names. */
   readonly version: string;
-  /** Deno task selected from the #452 package hook. */
+  /** Deno task selected from the native package hook. */
   readonly packageTaskName: string;
   /** Absolute app working directory. */
   readonly workdir: string;

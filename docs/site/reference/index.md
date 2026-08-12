@@ -30,8 +30,9 @@ exceptions, the deployable plugins, which drop the `plugin-` prefix:
 
 Their `-core` counterparts use the name-exact form, so `@netscript/plugin-sagas-core` is at
 [`/reference/plugin-sagas-core/`](/reference/plugin-sagas-core/) while `@netscript/plugin-sagas` is at
-`/reference/sagas/`. This is a description of what the site does today, not a rule to follow when the
-two forms disagree.
+`/reference/sagas/`. The release-readiness gate treats the four table entries as declared aliases;
+all other publishable members use the name-exact segment. A maintainer adding or changing an
+exception must update this table and the gate together.
 
 Each publishable workspace member's own page is canonical for its exported API. The four deployable
 plugin pages describe their manifests and integration entrypoints, then link to their separately
@@ -42,3 +43,10 @@ publishable workspace surface and gives each API claim one place to stay current
 
 Navigation is derived from the folder tree, so a new page is discoverable as soon as its directory
 exists — no index or nav file lists the packages.
+
+## CLI command coverage
+
+The public command documentation is the union of exactly two pages: the curated
+[CLI reference](/cli-reference/) and the detailed [`netscript` command
+reference](/reference/cli/commands/). Together they cover every public root command and direct
+subcommand derived from the installed command tree; neither page is treated as exhaustive alone.

@@ -51,9 +51,9 @@ export interface AspireComposeDeployTargetOptions {
  * (R-DEPLOY-2).
  *
  * `rollback` and `secrets` are **omitted** (declared unsupported, not silent
- * no-ops): they are shared core conventions (R-DEPLOY-3) that land with the
- * deployment hardening slice (#341). Adapters advertise their supported subset
- * via {@link operations}.
+ * no-ops): their shared core conventions (R-DEPLOY-3) are reserved for
+ * deployment hardening. Adapters advertise their supported subset via
+ * {@link operations}.
  */
 export class AspireComposeDeployTarget implements DeployTargetPort {
   /** Stable target identifier (`compose` or `docker`). */
