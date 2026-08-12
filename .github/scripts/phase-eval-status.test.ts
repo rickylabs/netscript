@@ -2,6 +2,8 @@ import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import {
   applyImplEvalStatusTransition,
   decideImplEvalStatusTransition,
+  IMPL_EVAL_STATUS,
+  MISSING_LABEL_MESSAGE,
 } from './phase-eval-status.mjs';
 
 interface IssueLabelOperations {
@@ -116,9 +118,8 @@ Deno.test('generation deduplication remains before trigger creation', async () =
   assertEquals(workflow.indexOf(earlyReturn) < workflow.indexOf(create), true);
 });
 
-Deno.test('status bookkeeping failures are reported but cannot suppress dispatch', async () => {
+Deno.test('status bookkeeping failures are attributed and dispatch remains conditionally eligible', async () => {
   const workflow = await Deno.readTextFile('.github/workflows/openhands-phase-eval.yml');
-  const checkout = workflowStep(workflow, 'Check out trusted phase-eval scripts');
   const transition = workflowStep(workflow, 'Enter IMPL-EVAL status on ready transition');
   const diagnostic = workflowStep(
     workflow,
@@ -126,15 +127,12 @@ Deno.test('status bookkeeping failures are reported but cannot suppress dispatch
   );
   const dispatch = workflowStep(workflow, 'Resolve and dispatch exactly one evaluator');
 
-  assertStringIncludes(checkout, 'continue-on-error: true');
-  assertStringIncludes(checkout, 'persist-credentials: false');
-  assertStringIncludes(checkout, 'github.event.pull_request.base.ref');
   assertStringIncludes(transition, 'id: enter_impl_eval_status');
   assertStringIncludes(transition, 'continue-on-error: true');
   assertStringIncludes(transition, 'core.setOutput(');
   assertStringIncludes(transition, "'failure_reason'");
   assertStringIncludes(diagnostic, "steps.enter_impl_eval_status.outcome == 'failure'");
-  assertStringIncludes(diagnostic, 'evaluator dispatch continues');
+  assertStringIncludes(diagnostic, 'evaluator dispatch attempt continues');
   assertStringIncludes(diagnostic, 'REQUEST_ACTOR: ${{ github.actor }}');
   assertStringIncludes(diagnostic, 'FAILURE_REASON:');
   assertStringIncludes(dispatch, '!cancelled()');
@@ -143,5 +141,26 @@ Deno.test('status bookkeeping failures are reported but cannot suppress dispatch
     "steps.require_chainable_trigger_token.outcome == 'success'",
   );
   assertEquals(dispatch.includes('enter_impl_eval_status.outcome'), false);
-  assertEquals(dispatch.includes('checkout_trusted_phase_eval_scripts.outcome'), false);
+});
+
+Deno.test('inline cleanup transcription matches helper contract literals', async () => {
+  const workflow = await Deno.readTextFile('.github/workflows/openhands-phase-eval.yml');
+  const transition = workflowStep(workflow, 'Enter IMPL-EVAL status on ready transition');
+
+  assertEquals(workflow.includes('Check out trusted phase-eval scripts'), false);
+  assertEquals(transition.includes('await import('), false);
+  assertStringIncludes(transition, 'github.rest.issues.listLabelsOnIssue');
+  assertStringIncludes(
+    transition,
+    `const IMPL_EVAL_STATUS = '${IMPL_EVAL_STATUS}';`,
+  );
+  assertStringIncludes(
+    transition,
+    `const MISSING_LABEL_MESSAGE = '${MISSING_LABEL_MESSAGE}';`,
+  );
+  assertStringIncludes(
+    transition,
+    'error?.response?.data?.message === MISSING_LABEL_MESSAGE',
+  );
+  assertStringIncludes(transition, 'labels: [IMPL_EVAL_STATUS]');
 });

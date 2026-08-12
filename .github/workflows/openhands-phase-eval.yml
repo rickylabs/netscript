@@ -67,19 +67,6 @@ jobs:
             exit 1
           fi
 
-      - name: Check out trusted phase-eval scripts
-        id: checkout_trusted_phase_eval_scripts
-        if: >-
-          !cancelled() &&
-          env.SKIP_IMPL != 'true' &&
-          github.event.action == 'ready_for_review' &&
-          steps.require_chainable_trigger_token.outcome == 'success'
-        continue-on-error: true
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
-        with:
-          ref: ${{ github.event.pull_request.base.ref }}
-          persist-credentials: false
-
       - name: Enter IMPL-EVAL status on ready transition
         id: enter_impl_eval_status
         if: >-
@@ -98,25 +85,28 @@ jobs:
               const owner = context.repo.owner;
               const repo = context.repo.repo;
               const issue_number = context.payload.pull_request.number;
-              const { applyImplEvalStatusTransition } = await import(
-                `${process.env.GITHUB_WORKSPACE}/.github/scripts/phase-eval-status.mjs`
+              const STATUS_PREFIX = 'status:';
+              const IMPL_EVAL_STATUS = 'status:impl-eval';
+              const MISSING_LABEL_MESSAGE = 'Label does not exist';
+              const liveLabels = await github.paginate(
+                github.rest.issues.listLabelsOnIssue,
+                { owner, repo, issue_number, per_page: 100 },
               );
-              await applyImplEvalStatusTransition({
-                listLabelsOnIssue: async () => {
-                  const labels = await github.paginate(github.rest.issues.listLabelsOnIssue, {
-                    owner,
-                    repo,
-                    issue_number,
-                    per_page: 100,
-                  });
-                  return labels.map((label) => label.name);
-                },
-                removeLabel: async (name) => {
+              for (const { name } of liveLabels) {
+                if (!name.startsWith(STATUS_PREFIX)) continue;
+                try {
                   await github.rest.issues.removeLabel({ owner, repo, issue_number, name });
-                },
-                addLabels: async (labels) => {
-                  await github.rest.issues.addLabels({ owner, repo, issue_number, labels });
-                },
+                } catch (error) {
+                  const missingLabel = error?.status === 404 &&
+                    error?.response?.data?.message === MISSING_LABEL_MESSAGE;
+                  if (!missingLabel) throw error;
+                }
+              }
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number,
+                labels: [IMPL_EVAL_STATUS],
               });
             } catch (error) {
               const reason = (error instanceof Error ? error.message : String(error))
@@ -140,17 +130,15 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           REQUEST_ACTOR: ${{ github.actor }}
           FAILURE_REASON: ${{ steps.enter_impl_eval_status.outputs.failure_reason }}
-          TRUSTED_CHECKOUT_OUTCOME: ${{ steps.checkout_trusted_phase_eval_scripts.outcome }}
         run: |
           {
             echo '## OpenHands phase evaluation'
             echo
-            echo '**Status:** IMPL-EVAL status transition failed; evaluator dispatch continues'
+            echo '**Status:** IMPL-EVAL status transition failed; evaluator dispatch attempt continues'
             echo
             printf -- '- Who: `@%s`\n' "$REQUEST_ACTOR"
             printf -- '- PR: `#%s`\n' "$PR_NUMBER"
             printf -- '- Head SHA: `%s`\n' "$HEAD_SHA"
-            printf -- '- Trusted checkout outcome: `%s`\n' "$TRUSTED_CHECKOUT_OUTCOME"
             printf -- '- Reason: `%s`\n' "$FAILURE_REASON"
           } >> "$GITHUB_STEP_SUMMARY"
 

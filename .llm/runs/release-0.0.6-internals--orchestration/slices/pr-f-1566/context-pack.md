@@ -24,6 +24,13 @@ missing-label 404 race, while preserving generation deduplication and the single
   check/lint/format, YAML parsing, and post-commit asset generation with an empty working tree.
 - The PR body and S3 phase comment state the box-1 interpretation and bootstrap limitation. PR
   #1567 remains draft with exactly `status:impl` and milestone `0.0.6`.
+- Run `31598386001` showed the hidden event-history dependency: dispatch ran after the non-fatal
+  transition failure, then failed because no `status:impl-eval` labeled-event generation existed.
+  The owner-directed next landing removes checkout/import and transcribes the tested cleanup inline;
+  the helper and unit tests remain.
+- The self-contained implementation is complete and all six local gates are green: 67 script tests,
+  scoped check/lint/format, asset generation without generated drift, and YAML parsing. Commit/push
+  plus the terminal empty-status proof remain.
 
 ## Locked boundaries
 
@@ -33,5 +40,5 @@ merge or mark the PR ready.
 
 ## Next action
 
-Orchestrator substantively reviews the terminal slice and uses the labeled path for separate-session
-IMPL-EVAL. This implementation agent must not mark ready, trigger evaluation, or merge.
+Finish the self-contained inline landing, rerun all six gates, push/comment, and stop. The
+orchestrator owns the ready flip and automatic DeepSeek retry; this agent must not trigger or merge.

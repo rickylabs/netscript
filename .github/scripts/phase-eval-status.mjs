@@ -4,6 +4,9 @@ export const STATUS_PREFIX = 'status:';
 /** Terminal status entered before dispatching IMPL-EVAL. */
 export const IMPL_EVAL_STATUS = 'status:impl-eval';
 
+/** GitHub's exact response message when a label is absent from an issue. */
+export const MISSING_LABEL_MESSAGE = 'Label does not exist';
+
 /**
  * Decide the idempotent status-label transition from a live issue-label set.
  *
@@ -47,7 +50,7 @@ function isMissingLabelError(error) {
   const response = error.response;
   if (!isRecord(response)) return false;
   const data = response.data;
-  return isRecord(data) && data.message === 'Label does not exist';
+  return isRecord(data) && data.message === MISSING_LABEL_MESSAGE;
 }
 
 /** @param {unknown} value */

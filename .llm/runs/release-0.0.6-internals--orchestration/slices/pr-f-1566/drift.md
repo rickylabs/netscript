@@ -13,3 +13,11 @@
   The new independence test statically validates named workflow step contracts and dependencies;
   it cannot simulate GitHub Actions runner status semantics locally, so its evidence is policy
   structure plus YAML parsing rather than an end-to-end Actions execution.
+- 2026-08-12: Run `31598386001` corrected the prior interpretation. Dispatch was conditionally
+  eligible and did run, but its data dependency on a `status:impl-eval` labeled-event generation
+  made successful dispatch impossible after transition failure. The static policy test's recorded
+  limitation was decisive; it is retained but no longer cited as end-to-end independence evidence.
+  Owner directed a self-contained first landing: inline the tested cleanup in the workflow and keep
+  the helper as its independently tested contract. Importing the helper is deferred to a follow-up
+  only after this PR merges and the helper is reachable from trusted `main`; no PR-head fallback is
+  permitted.

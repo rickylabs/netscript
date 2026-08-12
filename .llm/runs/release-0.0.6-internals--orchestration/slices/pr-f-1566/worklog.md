@@ -113,3 +113,41 @@ acceptance criteria, and required gates fully specified in issue #1566 and `impl
   scope changed.
 - Review-fix implementation commit: `7170d574b3`; pushed with explicit refspec. The orchestrator
   retains the labeled IMPL-EVAL transition and merge authority.
+
+## Evaluator-run correction and self-contained landing
+
+- Run `31598386001` disproved the prior end-to-end independence claim. `continue-on-error` worked:
+  the failed transition remained legible, its attributed diagnostic ran, and the dispatch step
+  started. Dispatch then failed because it requires a `status:impl-eval` labeled-event generation,
+  which cannot exist when the transition does not apply the label. The dependency is through
+  GitHub event history, not the step's declared `if:` condition.
+- Owner-directed design: remove the checkout/import bootstrap and perform the cleanup inline in the
+  trusted `github-script` step. The inline code paginates live labels, removes only live `status:`
+  labels, tolerates only status 404 with exact message `Label does not exist`, rethrows everything
+  else, and adds only `status:impl-eval`.
+- `.github/scripts/phase-eval-status.mjs` remains the independently unit-tested behavioral contract.
+  The workflow currently carries a transcription rather than importing it because this first
+  landing must be self-contained before the helper exists on trusted `main`.
+- The existing workflow-policy test is retained with its precise scope: it proves the failed
+  transition is attributed and the dispatch step remains eligible under its declared conditions.
+  It does not prove the event-history generation dependency is satisfied. A separate explicitly
+  string-based parity assertion checks that the inline transcription and helper use the same exact
+  missing-label message and terminal label, including their comparison/addition sites.
+- `continue-on-error` and the attributed failure summary remain. They do not make label generation
+  optional; they make future failures observable and allow the dispatch step to expose its own
+  generation precondition instead of being skipped.
+
+### Self-contained landing gate evidence
+
+| Gate | Result |
+| --- | --- |
+| Script tests | `deno test --allow-read --allow-env --allow-write --allow-run .github/scripts/` — exit 0; 67 passed, 0 failed |
+| Scoped type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .github/scripts --ext ts` — exit 0; 6 files, 0 findings |
+| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .github/scripts --ext ts` — exit 0; 6 files, 0 findings |
+| Scoped format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .github/scripts --ext ts` — exit 0; 6 files, 0 findings |
+| Asset barrel | `deno task gen:assets-barrel` — exit 0; no generated file changed. Empty-status proof follows the committed head. |
+| Workflow YAML | `deno eval --no-lock` with `jsr:@std/yaml@^1.0.10` — exit 0, `YAML_PARSE_OK` |
+
+- Self-contained landing reconcile: PR #1567 is draft with exactly `status:impl`; the failed run
+  facts changed the design but not issue #1566's six-box acceptance mapping. No manual OpenHands
+  trigger, ready transition, waiver label, merge, #1541 action, or out-of-scope change occurred.
