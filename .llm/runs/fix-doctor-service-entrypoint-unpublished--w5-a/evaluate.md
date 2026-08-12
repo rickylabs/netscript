@@ -8,7 +8,14 @@
 - Trusted base: `9a7cadcaa9066970e931ed6abf1e61b65fcef20e`
 - Evaluator: OpenHands / DeepSeek V4 Flash 0731, separate cloud session
 - Actions run: <https://github.com/rickylabs/netscript/actions/runs/31644442984>
-- Verdict comment: <https://github.com/rickylabs/netscript/pull/1625#issuecomment-5273209978>
+- Verdict report: <https://github.com/rickylabs/netscript/pull/1625#issuecomment-5273277382>
+  (body opens `OPENHANDS_VERDICT: PASS`, posted 2026-08-12T22:00:18Z)
+- Machine provenance comment: <https://github.com/rickylabs/netscript/pull/1625#issuecomment-5273209978>
+  (workflow-owned status comment carrying `run_id: 31644442984`, `verdict: PASS`,
+  `verdict_source: summary-file`)
+- Paid evaluations for this head: exactly one — `31644442984` (`agent: success`). Runs
+  `31644251307` (owner-cancelled mid-`agent`, before credentials) and `31644474350` (`total_jobs=0`)
+  spent nothing and are not evaluations.
 - Machine verdict: `OPENHANDS_VERDICT: PASS`
 
 ## Independent checks
