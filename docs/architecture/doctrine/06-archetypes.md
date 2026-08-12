@@ -13,8 +13,8 @@ organized.
 ## Archetype 1 — Small Contract
 
 For packages that publish *types and small invariants* and almost
-no runtime. Examples in this repo: `@netscript/streams`,
-`@netscript/runtime-config`, `@netscript/config` (after refactor).
+no runtime. Examples in this repo: `@netscript/contracts`,
+`@netscript/plugin-ai-core`, and `@netscript/config`.
 
 Minimum shape:
 
@@ -78,9 +78,9 @@ Doctrine for this archetype:
 ## Archetype 3 — Runtime/Behavior
 
 For packages that own long-running behavior with state, lifecycle,
-and supervised execution. Examples: `@netscript/workers`,
-`@netscript/triggers`, future `@netscript/streams` runtime layer.
-*Not* `@netscript/sagas`, which is its own archetype below.
+and supervised execution. Examples: `@netscript/plugin-workers-core`,
+`@netscript/plugin-triggers-core`, `@netscript/plugin-streams-core`,
+and `@netscript/plugin-sagas-core` with its state-machine specialization.
 
 Minimum shape:
 
@@ -215,8 +215,9 @@ Doctrine for this archetype:
 
 ## Archetype 6 — CLI / Tooling Package
 
-For packages that ship a binary the user runs. Examples:
-`@netscript/cli`, future `packages/cli/e2e`.
+For packages that ship a binary or user-run tooling flow. Examples:
+`@netscript/cli` and `@netscript/bench`. The nested `packages/cli/e2e`
+workspace is a harness owned by `@netscript/cli`, not a top-level doctrine unit.
 
 Minimum shape:
 
@@ -367,28 +368,49 @@ archetypes.
 
 ## Archetype assignments for current packages
 
-| Package                      | Archetype                  |
-| ---------------------------- | -------------------------- |
-| `streams`, `runtime-config`, `config` | 1 — Small Contract |
-| `database`, `queue`, `kv`, `aspire`, `cron`, `prisma-adapter-mysql`, `logger`, `telemetry` | 2 — Integration |
-| `workers`, `triggers`, `watchers` | 3 — Runtime/Behavior |
-| `sagas`                      | 3 — Runtime/Behavior with state-machine specialization |
-| `fresh`, `fresh-ui`, `sdk`, `service`, `contracts`, `plugin` | 4 — DSL/Builder |
-| `cli`                        | 6 — CLI/Tooling            |
-| _future_ `deploy-core` (not yet extracted; deploy today folded in `cli` / A6) | 7 — Deployment Target Adapter (composite) |
-| `shared`                     | Special — see below.       |
-| `plugins/*`                  | 5 — Plugin Package         |
+Measured 2026-08-12. This table uses the same 36 top-level paths as the verdict table in
+[`10-codebase-verdict-and-handoff.md`](./10-codebase-verdict-and-handoff.md).
 
-### About `packages/shared`
+| Path | Archetype |
+| --- | --- |
+| `packages/ai` | 4 — DSL/Builder |
+| `packages/aspire` | 2 — Integration |
+| `packages/auth-better-auth` | 2 — Integration |
+| `packages/auth-kv-oauth` | 2 — Integration |
+| `packages/auth-workos` | 2 — Integration |
+| `packages/bench` | 6 — CLI/Tooling |
+| `packages/cli` | 6 — CLI/Tooling |
+| `packages/config` | 1 — Small Contract |
+| `packages/contracts` | 1 — Small Contract |
+| `packages/cron` | 2 — Integration |
+| `packages/database` | 2 — Integration |
+| `packages/fresh` | 4 — DSL/Builder |
+| `packages/fresh-ui` | 4 — DSL/Builder |
+| `packages/kv` | 2 — Integration |
+| `packages/logger` | 2 — Integration |
+| `packages/mcp` | 2 — Integration |
+| `packages/plugin` | 4 — DSL/Builder |
+| `packages/plugin-ai-core` | 1 — Small Contract |
+| `packages/plugin-auth-core` | 2 — Integration |
+| `packages/plugin-sagas-core` | 3 — Runtime/Behavior (state-machine specialization) |
+| `packages/plugin-streams-core` | 3 — Runtime/Behavior |
+| `packages/plugin-triggers-core` | 3 — Runtime/Behavior |
+| `packages/plugin-workers-core` | 3 — Runtime/Behavior |
+| `packages/prisma-adapter-mysql` | 2 — Integration |
+| `packages/queue` | 2 — Integration |
+| `packages/runtime-config` | 3 — Runtime/Behavior |
+| `packages/sdk` | 2 — Integration |
+| `packages/service` | 4 — DSL/Builder |
+| `packages/telemetry` | 2 — Integration |
+| `packages/watchers` | 3 — Runtime/Behavior |
+| `plugins/ai` | 5 — Plugin Package |
+| `plugins/auth` | 5 — Plugin Package |
+| `plugins/sagas` | 5 — Plugin Package |
+| `plugins/streams` | 5 — Plugin Package |
+| `plugins/triggers` | 5 — Plugin Package |
+| `plugins/workers` | 5 — Plugin Package |
 
-A `shared` package is an architectural smell unless every export is
-a domain-neutral primitive that genuinely is shared by three or
-more sibling packages. Today, `shared/utils/datetime.ts` (1,112
-LOC) is the worst offender — it is reinventing `@std/datetime`. The
-remediation is to delete or shrink `shared/` until what remains is
-either (a) re-exports of `@std/*`/`crypto`/`Temporal` shaped to
-NetScript policy, or (b) a single `domain/` with cross-package
-identifiers (`CorrelationId`, `RunId`, `EventId`).
+Archetype 7 remains the future composite deployment-target pattern; it is not a live top-level unit.
 
 ## Archetype checklist for review
 

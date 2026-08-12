@@ -1,10 +1,19 @@
-import { assertEquals } from 'jsr:@std/assert@1';
+import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@1';
 import type { AcceptanceEvidence } from './acceptance-evidence.ts';
 import {
   closingMirrorIssues,
   type MirrorClient,
   mirrorIssue,
+  readyLabelRepairNotice,
 } from './mirror-acceptance-evidence.ts';
+
+Deno.test('ready-label mirror repair reruns CI without moving the evaluated head', () => {
+  const notice = readyLabelRepairNotice();
+  assertStringIncludes(notice, 'gh run rerun <run-id>');
+  assertStringIncludes(notice, 'live reads observe the label');
+  assertEquals(notice.includes('labeled event triggers'), false);
+  assertEquals(notice.includes('then push'), false);
+});
 
 Deno.test('mirror excludes classified pull requests and retains lookup failures', () => {
   assertEquals(

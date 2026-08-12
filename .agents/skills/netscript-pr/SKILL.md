@@ -166,8 +166,10 @@ closing keyword (including epics/umbrellas referenced with `Part of`) are never 
 The mirror and checker fetch the PR, its labels/body/head, comments, and every closing issue live
 through the API at execution time. Workflow event payloads supply only repository and PR
 identifiers: a job re-run retains its original event snapshot, but because every read is live, a
-re-run after labeling now works — and applying `status:ready-merge` itself triggers a fresh run
-(the workflow listens to `labeled`). Every
+re-run after labeling works. `openhands-phase-eval.yml` listens to `labeled`, but `ci.yml` — which
+runs the acceptance mirror and close-gate — does not. After applying `status:ready-merge`, re-run the
+existing CI workflow with `gh run rerun <run-id>` so those jobs read the live labels. Do not push
+solely to refresh them: a push moves the head and invalidates an existing IMPL-EVAL verdict. Every
 pretty/JSON verdict prints `headSha`, `evaluatedAt`, and per-issue `number`, `updatedAt`, and
 `bodySha256`, so reviewers can mechanically detect a verdict evaluated against an older issue body.
 

@@ -389,7 +389,7 @@ export function findUncheckedAcceptance(
       section: 'acceptance/gate',
       text: box.text,
       action:
-        `Tick issue #${issue.number} box "${box.text}" after attaching evidence, or add structured PR evidence and apply status:ready-merge then push; reruns cannot observe a new label event.`,
+        `Tick issue #${issue.number} box "${box.text}" after attaching evidence, or add structured PR evidence, apply status:ready-merge, then rerun the existing CI workflow with "gh run rerun <run-id>" so its live reads observe the label without moving the evaluated head.`,
     });
   }
   return { findings, notices };
