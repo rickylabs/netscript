@@ -10,7 +10,10 @@ missing-label 404 race, while preserving generation deduplication and the single
 - Branch is based on `e67c1ba13` (`origin/main`).
 - The supplied implementation brief is committed at `fe1d3b5e8` and pushed.
 - Live issue #1566 has six acceptance boxes; PR evidence must map them with `box-index: 1..6`.
-- No source or test changes have landed yet.
+- Draft PR #1567 is open with `type:fix`, `area:tooling`, `priority:p2`, `status:impl`, and milestone
+  `0.0.6`; it remains draft.
+- The S1 test file defines the extracted module contract, race regression, narrow 403/unrelated-404
+  failures, terminal single-status state, and a guard for the unchanged generation-dedup ordering.
 
 ## Locked boundaries
 
@@ -20,6 +23,5 @@ merge or mark the PR ready.
 
 ## Next action
 
-Commit and push this artifact bootstrap, open/configure the draft PR, then land tests as a separate
-RED commit before implementing the fix.
-
+Capture the expected pre-fix RED result, commit/push/comment S1, then implement the module and
+workflow adapter.

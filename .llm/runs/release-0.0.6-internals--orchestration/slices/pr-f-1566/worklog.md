@@ -34,9 +34,17 @@ acceptance criteria, and required gates fully specified in issue #1566 and `impl
 
 ## Progress
 
-- Bootstrap: in progress.
-- Tests: pending.
+- Bootstrap: complete; draft PR #1567 opened with required metadata and six indexed acceptance
+  mappings.
+- Tests: RED regression suite added. Before implementation it fails because the extracted
+  `phase-eval-status.ts` production module does not yet exist; the named race and narrow-tolerance
+  assertions define the required caller contract. Generation dedup is guarded structurally in the
+  unchanged workflow script.
 - Implementation: pending.
 - Gates: pending.
 - IMPL-EVAL: owned by the separate orchestrator/evaluator transition; this agent leaves the PR draft.
 
+## RED evidence
+
+- `deno test --allow-read .github/scripts/phase-eval-status.test.ts` — exit 1 before the production
+  module exists (`TS2307 Cannot find module .github/scripts/phase-eval-status.ts`).
