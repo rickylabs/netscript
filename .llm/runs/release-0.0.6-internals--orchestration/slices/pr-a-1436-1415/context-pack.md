@@ -15,5 +15,6 @@ changed yet. PR #1527 is the sole draft PR; the orchestrator retains merge autho
 
 ## Next
 
-S1 RED is committed as `a927790eb`. S2 changes only the keyword boundary to `(?<![\w-])`; next land
-PR classification and mirror consistency, then evidence assertion and the six requested gates.
+S1 RED is `a927790eb`; S2 boundary is `4ca4cc421`. S3 adds pure classification consumption plus
+call-site GitHub lookup for both close-gate and mirror. Next run its focused tests, then implement
+the evidence assertion and the six requested gates.

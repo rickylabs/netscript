@@ -17,6 +17,7 @@ interface Issue {
   updated_at: string;
   labels?: Array<{ name?: string } | string>;
   head?: { sha: string };
+  pull_request?: Record<string, unknown>;
 }
 
 interface Comment {
@@ -42,6 +43,31 @@ interface MirrorIssueResult {
 const READY_LABEL = 'status:ready-merge';
 const MAX_MIRROR_ATTEMPTS = 2;
 
+type ClosingReferenceClassification = 'issue' | 'pull request' | 'lookup failed';
+
+/** Selects mirror targets from resolved classifications without performing network access. */
+export function closingMirrorIssues(
+  numbers: readonly number[],
+  classifications: ReadonlyMap<number, ClosingReferenceClassification>,
+): { issues: number[]; notices: string[] } {
+  const issues: number[] = [];
+  const notices: string[] = [];
+  for (const number of numbers) {
+    const classification = classifications.get(number) ?? 'lookup failed';
+    const excluded = classification === 'pull request';
+    if (!excluded) issues.push(number);
+    const classificationText = classification === 'lookup failed'
+      ? 'classification lookup failed'
+      : `classified as ${classification}`;
+    notices.push(
+      `Closing reference #${number} ${classificationText}; ${
+        excluded ? 'excluded from' : 'retained for'
+      } acceptance mirroring.`,
+    );
+  }
+  return { issues, notices };
+}
+
 async function main(): Promise<void> {
   const options = parseArgs(Deno.args);
   const token = Deno.env.get('GITHUB_TOKEN') ?? Deno.env.get('GH_TOKEN');
@@ -51,7 +77,18 @@ async function main(): Promise<void> {
   const evaluatedAt = new Date().toISOString();
   const headSha = pr.head?.sha ?? 'unavailable';
   const labels = pr.labels ?? [];
-  const issueNumbers = extractClosingIssues(pr.body ?? '');
+  const closingReferences = extractClosingIssues(pr.body ?? '');
+  const classifications = new Map<number, ClosingReferenceClassification>();
+  await Promise.all(closingReferences.map(async (number) => {
+    try {
+      const reference = await client.getIssue(number);
+      classifications.set(number, reference.pull_request ? 'pull request' : 'issue');
+    } catch {
+      classifications.set(number, 'lookup failed');
+    }
+  }));
+  const classified = closingMirrorIssues(closingReferences, classifications);
+  const issueNumbers = classified.issues;
   if (!hasLabel(labels, READY_LABEL)) {
     const snapshots = await Promise.all(
       issueNumbers.map(async (issueNumber) => issueSnapshot(await client.getIssue(issueNumber))),
@@ -64,6 +101,7 @@ async function main(): Promise<void> {
       evaluatedAt,
       issues: snapshots,
       warnings: [
+        ...classified.notices,
         `Mirror skipped because live PR labels do not include ${READY_LABEL}; apply the label and the labeled event triggers a fresh run (labels are read live, so a manual rerun also works).`,
       ],
     }, options.pretty);
@@ -74,7 +112,9 @@ async function main(): Promise<void> {
   const parsed = [pr.body ?? '', ...comments.map((comment) => comment.body ?? '')]
     .map(parseAcceptanceEvidence);
   const evidence = parsed.flatMap((result) => result.entries);
-  const warnings = [...new Set(parsed.flatMap((result) => result.warnings))];
+  const warnings = [
+    ...new Set([...classified.notices, ...parsed.flatMap((result) => result.warnings)]),
+  ];
   // Validate the complete live mapping before the first mutation. A bad later issue must not leave
   // an earlier closing issue partially mirrored.
   for (const issueNumber of issueNumbers) {

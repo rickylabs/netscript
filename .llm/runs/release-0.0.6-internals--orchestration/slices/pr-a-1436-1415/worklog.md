@@ -56,3 +56,15 @@ No scope adjustment is required.
 ### Reconcile
 
 The implementation matches the corrected #1436 contract without preserving the prose workaround.
+
+## S3 — PR-vs-issue classification
+
+- Kept `resolveClosingIssueReferences` synchronous and pure; its optional classification map affects
+  only regex-derived references, never GitHub's authoritative issue set.
+- Close-gate output retains every reference with visible classification and `excluded: yes` for PRs.
+- Mirror uses the same three classifications; lookup failures stay in its issue set and are reported.
+- Gate: focused close-gate + mirror tests — exit 0, 16 passed, 0 failed.
+
+### Reconcile
+
+No network call entered either pure helper. The implementation stays within the assigned files.
