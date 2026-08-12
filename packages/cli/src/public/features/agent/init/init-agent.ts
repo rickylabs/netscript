@@ -253,18 +253,7 @@ async function writeHostConfig(
           ...existing,
           netscript: {
             command: "deno",
-            args: [
-              "run",
-              "--config",
-              join(projectRoot, "deno.json"),
-              "-A",
-              cliSpecifier,
-              "agent",
-              "mcp",
-              "--project-root",
-              projectRoot,
-              ...(docsRoot ? ["--docs-root", docsRoot] : []),
-            ],
+            args: netscriptMcpArgs(projectRoot, cliSpecifier, docsRoot),
           },
           aspire: {
             command: "aspire",
@@ -300,18 +289,7 @@ async function writeZedConfig(
     name === 'netscript'
       ? {
         command: 'deno',
-        args: [
-          'run',
-          '--config',
-          join(projectRoot, 'deno.json'),
-          '-A',
-          cliSpecifier,
-          'agent',
-          'mcp',
-          '--project-root',
-          projectRoot,
-          ...(docsRoot ? ['--docs-root', docsRoot] : []),
-        ],
+        args: netscriptMcpArgs(projectRoot, cliSpecifier, docsRoot),
       }
       : { command: 'aspire', args: ['agent', 'mcp'] };
   const content = `${JSON.stringify({
@@ -324,6 +302,27 @@ async function writeZedConfig(
     },
   }, null, 2)}\n`;
   await writeChanged(fs, path, content, changed);
+}
+
+function netscriptMcpArgs(
+  projectRoot: string,
+  cliSpecifier: string,
+  docsRoot?: string,
+): string[] {
+  return [
+    'run',
+    '--no-lock',
+    '--minimum-dependency-age=0',
+    '--config',
+    join(projectRoot, 'deno.json'),
+    '-A',
+    cliSpecifier,
+    'agent',
+    'mcp',
+    '--project-root',
+    projectRoot,
+    ...(docsRoot ? ['--docs-root', docsRoot] : []),
+  ];
 }
 
 function aspireSkipped(reason: string): string {

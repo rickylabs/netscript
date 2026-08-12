@@ -79,6 +79,7 @@ Deno.test('loadProjectConfig parses stdout without reading stderr noise', async 
 
   assertEquals(config.name, 'stderr-noise-app');
   assertEquals(process.calls[0]?.command, 'deno');
+  assertEquals(process.calls[0]?.args.slice(0, 3), ['run', '--no-lock', '--allow-all']);
   assertEquals(process.calls[0]?.options?.cwd, '/workspace/app');
 });
 
