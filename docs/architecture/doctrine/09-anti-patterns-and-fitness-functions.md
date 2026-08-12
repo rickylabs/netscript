@@ -335,6 +335,10 @@ owned or current-wave package/plugin roots, exclude generated output (`.generate
 client trees, scaffold scratch), and exclude future-wave packages that the current plan does not
 own.
 
+Doctrine-root discovery covers the top-level units under `packages/*` and `plugins/*`. The nested
+`packages/cli/e2e` workspace member is an end-to-end harness for the CLI, not an independently
+published top-level doctrine unit, so it is intentionally excluded from that root set.
+
 Raw root `deno check .`, `deno lint`, or `deno fmt --check` over scratch workspaces, copied
 templates, generated output, Markdown, or legacy line-ending-only drift is not a package-quality
 verdict source unless the plan explicitly owns a repo-wide normalization pass. For ordinary
