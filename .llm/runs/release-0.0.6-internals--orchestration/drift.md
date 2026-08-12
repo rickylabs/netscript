@@ -397,3 +397,69 @@ taken as a judgement call.
   `git diff --name-only 84dd44ae7..origin/main | grep -E 'tools/quality|type-fixtures'` returns nothing.
   PR-E's surface is unaffected and its premise still holds: `quality:scan:repo` is **still exit 1** at
   `281ab7688`, so #1530 is live and its RED-first proof remains real.
+
+## D-16 — cycle 3 FAIL_PLAN: the plan is converging, #1378 is not implementable as scoped
+
+- **Severity:** architectural (milestone-content decision, not a plan defect)
+- **Recorded:** 2026-08-12, eval cycle **3 of 3**
+- **Verdict:** `FAIL_PLAN`. Cycle-2 disposition: **6 addressed, 4 partially addressed, 0 not addressed**.
+  Five new blocking findings. The plan is measurably converging; what is not converging is #1378's
+  premise.
+
+### The finding that changes the milestone, not the plan
+
+`R-3` deferred "measure the intersection, then wire or rescope" into PR-D. The evaluator refused that as
+a plan-time deferral (`plan-gate.md:24-27`) **and measured it**:
+
+```text
+30-package deno doc --json run: 567 warnings reproduced
+1,714 published symbol records contain unresolved type references (3,945 occurrences)
+  plugin-sagas-core: 230/724 symbols affected
+  fresh:             174/487 symbols affected
+```
+
+It also identified why my framing was unusable: **warning text names the dependency module, not the
+published declaration that transitively depends on it**, so "warnings that touch a declaration" was never
+a defined mapping. The intersection is plausibly *most* declarations in dependency-heavy packages.
+
+That is not a plan defect I can rewrite away. #1378 box 1 ("a new `any` in an exported type fails") rests
+on export-reachability that cannot be computed reliably at this baseline without a debt baseline for
+1,714 symbol records — which is a programme, not a slice.
+
+### The second unimplementable premise
+
+`#1378` requires `// quality-allow:` to carry an issue id that is **open and milestoned**. The scanner
+runs with `--allow-read` only (`deno.json:50-51`) — it cannot observe live issue state. My D2 proof
+(unlinked-red / linked-green) would be satisfied by a parser that accepts any `#<n>`, i.e. **a test that
+cannot fail on the property the issue actually requires**. Satisfying it needs a deterministic state
+source (checked-in register, or a networked step outside the scanner) that #1378 never specifies.
+
+### Two factual corrections the evaluator found, both mine
+
+1. **`@netscript/sagas` — my row was false.** I wrote "no checked-in supersession record found".
+   `arch-debt.md:576-584` records the resolved debt in `packages/plugin-sagas-core` and explicitly calls
+   the old directory superseded.
+2. **`@netscript/shared` — my row was incomplete.** I wrote "no removal commit on `main`", which is true
+   but omits load-bearing evidence: the mandated full-history probe finds **`fd8259b76`**, whose diff
+   deletes `packages/shared/deno.json` and the rest of `packages/shared/**`. Non-HEAD history, but it is
+   the removal commit the row must cite alongside the ancestry boundary.
+
+Both are exactly the class I was auditing #1380 for — asserting an absence without running the probe that
+would find the presence. Recorded rather than quietly fixed.
+
+3. **My 374-commit figure is unpinned** and therefore false at any later head (finding 7). A count that
+   moves must be stated with the sha it was measured at.
+
+### Also found: E1's gate is structurally invalid
+
+`worklog.md:352` gives E1 the post-slice gate "`deno test .llm/tools/quality/` **fails**". A landed commit
+slice whose required gate is red cannot satisfy the Plan-Gate's "gate that proves it" rule. RED-first
+evidence belongs in the PR comment and the test's pre-change output — not as a slice's passing condition.
+
+### Action
+
+Three cycles is the escalation point twice over. The plan is not rewritten a fourth time. Escalated to the
+owner as a **milestone-content decision**: #1530, #1403 and #1380 remain deliverable with small,
+identified fixes; #1378's boxes 1 and 2 rest on properties this codebase cannot satisfy in 0.0.6 without a
+separate debt programme, and the honesty rule says such criteria move with their issue rather than being
+ticked or quietly reinterpreted.
