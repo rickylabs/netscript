@@ -1526,3 +1526,46 @@ Fallback authorized by the owner and dispatched: one fresh native Opus 5 medium 
 the immutable head `7264ce6aa`, trigger-immune single comment, no label cycle, no paid retrigger. It is briefed
 to treat the orchestrator's claims as claims, warned that this checkout is shallow, and required to reach its
 own conclusion on the D-43 closure failure.
+
+## D-45 — my D-44 verdict-detection rule was too narrow to catch the real verdict (severity: moderate)
+
+D-44 concluded: "a verdict exists only when a comment matching `[PHASE: IMPL-EVAL]` exists…". That rule is
+**wrong**, and it would have hidden the authoritative verdict it was written to protect against missing.
+
+The cancelled run `31618732014` **did** publish a complete formal `FAIL_FIX`, by **editing the existing
+`<!-- openhands-agent-summary -->` comment in place** rather than posting a new one:
+
+```text
+<!-- openhands-run: {"run_id":31618732014,"attempt":1,"conclusion":"cancelled","state":"not-run",
+                     "verdict":"FAIL_FIX","verdict_source":"summary-file"} -->
+OPENHANDS_VERDICT: FAIL_FIX
+# IMPL-EVAL — PR #1596 …
+```
+
+My query `select(.body|test("PHASE: IMPL-EVAL"))` returned **0** twice, because the machine format is
+`OPENHANDS_VERDICT:` plus a `# IMPL-EVAL` heading — not the `**[PHASE: IMPL-EVAL]**` token from the human phase
+convention. Two structural facts I had not internalised:
+
+1. **A verdict can arrive on a `cancelled` run.** `conclusion=cancelled` with `state=not-run` still carries
+   `verdict_source=summary-file`: the agent wrote its summary file before the job was cancelled, and
+   housekeeping published it. "Run cancelled" is therefore **not** equivalent to "no verdict" — I had treated
+   them as the same thing and dispatched a fallback on that basis.
+2. **A verdict can arrive by comment *edit*.** Any detection keyed to new-comment creation, or to `createdAt`
+   ordering, misses it. The `<!-- openhands-run: … -->` marker is the reliable machine anchor.
+
+**Corrected rule.** A verdict exists when a PR comment carries `OPENHANDS_VERDICT:` or an
+`<!-- openhands-run: … -->` marker whose `run_id` matches the dispatch under consideration, **or** a
+`[PHASE: IMPL-EVAL]` comment authored by a session other than this one. Match the marker's `head`/dispatch
+identity, never the comment's position or `createdAt`. Re-fetch before concluding "no verdict" — the body is
+mutable in place.
+
+**Cost of the error.** I launched an authorized native Opus fallback against a verdict that already existed. The
+owner caught it and I stopped that agent before it posted anything, so exactly one verdict stands and no second
+evaluation was published — but the token burn was real and avoidable, and the trigger was my own too-narrow
+detection rule written one entry earlier. D-44's *substance* holds (gh-watch matched my own review comment as a
+PASS; that remains a false authority); its *rule* is superseded by this entry.
+
+**What the verdict confirms.** F1/F2 match D-43 independently: F1 the closure defect, verified **introduced by
+this PR** (base `agent-tools.generated.ts` had zero `snippet-extractor` occurrences); F2 names the asset-freshness
+gate as answering the wrong question, the same finding I recorded against myself. The prepared correction brief
+already covers both and needed no change beyond mapping its contracts to F1/F2.

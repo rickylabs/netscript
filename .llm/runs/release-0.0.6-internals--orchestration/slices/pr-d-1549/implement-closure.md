@@ -3,9 +3,20 @@ use harness
 # PR-D follow-up — the consumer bundle ships an unresolvable import
 
 You are continuing the **same leaf** (`fix/1549-quality-scan-provable-half`, PR #1596) in the **same worktree**.
-This is a correction to work you already landed, dispatched after the automatic IMPL-EVAL on head `7264ce6aa`
-went terminal. Everything already merged in this PR stands — the defect is one missing capability in the
-consumer-bundle generator, plus the guard that makes the class non-recurring.
+This is a correction to work you already landed. The formal IMPL-EVAL on head `7264ce6aa` returned
+**`FAIL_FIX`** with exactly two findings, and this brief is scoped to closing both. Everything else in this PR
+**stands** — the evaluator independently re-ran the rail and confirmed it green, including `quality:scan:repo`
+exit 0 / findings 0 / `allowCount` **8** (10 → 8), `quality:scan` at 7, `arch:check` and `arch:check:repo`
+exit 0, `docs:snippets` exit 0, 21 quality tests passing, the D-1 typed fixture free of casts/suppressions, and
+the D-2 derivative idempotent. Do not revisit any of that.
+
+| Verdict finding | What it requires | Contract here |
+| --- | --- | --- |
+| **F1** HIGH — embedded consumer bundle incomplete wrt its own imports; `init-agent_test.ts` red; confirmed **introduced by this PR** (base had zero `snippet-extractor` occurrences) | third manifest category for bundled module dependencies + the durable import-closure regression guard with a negative control | **C1 + C2** |
+| **F2** MEDIUM false-done — the asset-freshness gate answered the wrong question: `gen:assets-barrel` + empty `git status` proves currency wrt the manifest, not completeness wrt the bundle's imports, so F1 passed straight through it | the closure test is the durable fix and must land before merge | **C2 + C3** |
+
+The evaluator explicitly rules out inlining a second fence parser (it would violate R-10 and #1549 box 2), which
+matches this brief. Do not revert the extractor consumption.
 
 Do **not** revert the extractor consumption. Consuming `.llm/tools/docs/snippet-extractor.ts` instead of forking
 a second fence parser is rail decision **R-10** and stays.
