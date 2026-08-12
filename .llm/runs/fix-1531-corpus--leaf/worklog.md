@@ -68,6 +68,8 @@ Update `docs/site`, run `deno task gen:agent-docs-prose`, then run
 | 2026-08-12 | 2 | Rebase/regeneration | Rebased cleanly onto `origin/main@6aee2b414`, regenerated the corpus and both dependent generated assets, and preserved a clean `deno.lock`. The triggers reference entry now contains two `TriggerEventSubscriptionMessage` occurrences, matching the source page. |
 | 2026-08-12 | 2 | Targeted validation | Freshness, asset-barrel, publish-asset, snippets, and accuracy checks all exit 0; direct census remains zero for stale terms and the triggers entry is 2/2. Root tests were not rerun because the cycle brief restricts reruns to rebase-invalidated gates; the known ranking failure is tracked by #1615. |
 | 2026-08-12 | 2 | Latest-base reconcile | While PR evidence was being updated, `main` advanced again to `6b29d12ea` through PR #1614. That commit does not touch `docs/site`; rebased again, reran normal generation so provenance is ancestral to the latest base, and rebuilt both dependent assets. |
+| 2026-08-12 | final | Exact merge-base rebase | Rebased cleanly onto live `origin/main@bcfbd0f65`, which includes PR #1617. No intervening commit touches `docs/site`; normal regeneration produced the identical corpus blob/SHA and changed only provenance plus its two dependent generated assets. |
+| 2026-08-12 | final | Merge-base gates | `check:agent-docs-prose`, root tests, assets-barrel, and publish-assets all returned raw exit 0. Root tests are fully green at `3355 passed`, `0 failed`, `17 ignored`; `deno.lock` and `docs/site` remain unchanged. |
 
 ## Decisions
 
@@ -149,6 +151,17 @@ Cycle-2 provenance reports version `0.0.5`, extraction timestamp
 | Lock/source hygiene | 0 | `deno.lock` and `docs/site` have zero diff after every generator/check run. |
 | `deno task test` | not rerun | Cycle brief limited reruns to rebase-invalidated gates; known guidance ranking failure is #1615. |
 
+### Final exact-merge-base gates
+
+| Gate | Raw exit | Evidence |
+| ---- | -------- | -------- |
+| Normal regeneration | 0 | Corpus gzip blob remains `36fbb82824c37167d65624596787f85833cc7de7`; SHA-256 remains `105b8e0a081249ae5b93d58fc87ca3dbdbe79de7aa2ef140d0629b29e8757908`. Only provenance and the two dependent generated assets changed. |
+| `deno task check:agent-docs-prose` | 0 | Emitted the same SHA-256 and left zero corpus/provenance diff. |
+| `deno task test` | 0 | `3355 passed (624 steps)`, `0 failed`, `17 ignored` in 3m22s. |
+| `deno task check:assets-barrel` | 0 | Rebased CLI generated asset is current. |
+| `deno task check:publish-assets` | 0 | Rebased MCP generated asset is current. |
+| Lock/source hygiene | 0 | `deno.lock` and `docs/site` have zero diff; final `git status --porcelain` is recorded after commit/push. |
+
 The root-test failures are:
 
 1. `published JSDoc excludes internal workstream codenames`: unchanged base source contains `#1589`
@@ -158,6 +171,10 @@ The root-test failures are:
    snapshot ranks the plugin-system page where the existing fixture expects the external-database
    page. This is a real consequence of regeneration tracked by #1615; the docs content and fixture
    were left untouched. `git diff --quiet 0551ff592 HEAD -- packages/mcp/tests/` exits 0.
+
+These are historical cycle-1 failures. Current `main` includes PR #1617, which fixed the ranking by
+changing `packages/mcp/src/domain/docs/guidance-index.ts` scoring and one test while leaving
+`packages/mcp/tests/fixtures/**` untouched. The final exact-merge-base root suite is green.
 
 ## Handoff Notes
 

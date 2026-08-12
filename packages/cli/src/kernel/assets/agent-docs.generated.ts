@@ -9,8 +9,8 @@ export const EMBEDDED_AGENT_DOCS_GZIP_BASE64: string =
 export const EMBEDDED_AGENT_DOCS_PROVENANCE = {
   'schemaVersion': 1,
   'version': '0.0.5',
-  'sourceCommit': 'c0b7bdf25',
-  'extractionTimestamp': '2026-08-12T18:55:58.115Z',
+  'sourceCommit': '7563aa6b1',
+  'extractionTimestamp': '2026-08-12T20:06:35.190Z',
   'files': [
     'context/01-how-the-web-became-the-default.mdx',
     'context/02-how-the-web-stack-grew-up.mdx',

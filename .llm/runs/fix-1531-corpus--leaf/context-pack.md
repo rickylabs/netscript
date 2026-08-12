@@ -6,7 +6,7 @@
 | ----- | ----- |
 | Run ID | `fix-1531-corpus--leaf` |
 | Branch | `fix/1531-agent-docs-corpus-gate` |
-| Current phase | `cycle-2 handoff` |
+| Current phase | `final merge-base handoff` |
 | Archetype | N/A — docs/tooling |
 | Scope overlays | `SCOPE-docs.md` |
 
@@ -16,7 +16,8 @@ Draft PR #1608 received an exact-head native Opus 5 `FAIL_FIX`. The corpus mecha
 control, determinism, and shipped-vocabulary accuracy defense were independently confirmed. Cycle 2
 first rebased onto `origin/main@6aee2b414`, then reconciled again after `main` advanced to
 `6b29d12ea` through PR #1614. Cycle 2 refreshes moving-base generated outputs, corrects ownership to
-#1615, and records two non-blocking check/provenance limitations.
+#1615, and records two non-blocking check/provenance limitations. The exact-head cycle-2 evaluation
+passed. Final merge-base work rebases onto `origin/main@bcfbd0f65`, including PR #1617.
 
 ## Completed
 
@@ -29,15 +30,16 @@ first rebased onto `origin/main@6aee2b414`, then reconciled again after `main` a
 - Focused, generated-asset, docs, scoped static, and root-test gates recorded in `worklog.md`.
 - Rebased cleanly onto latest `origin/main@6b29d12ea` and regenerated corpus plus both dependent
   generated assets without touching `deno.lock`; the intervening PR #1614 has no `docs/site` diff.
+- Rebased again onto exact merge base `bcfbd0f65`; corpus regeneration is a content no-op with the
+  same gzip blob and SHA-256. Root tests are now green after PR #1617: 3355 passed, 0 failed.
 
 ## In Progress
 
-- Commit/push the cycle-2 immutable head and update PR evidence.
+- Commit/push the final provenance/generated-asset reconciliation and update PR evidence.
 
 ## Next Steps
 
-1. Orchestrator dispatches a fresh native Opus 5 read-only evaluator against the cycle-2 immutable
-   head.
+1. Orchestrator owns the ready transition, CI watch, and merge.
 2. If another docs change lands before merge, rerun `deno task gen:agent-docs-prose`, rebuild
    publish assets, and require `deno task check:agent-docs-prose` to be clean.
 
@@ -67,7 +69,7 @@ first rebased onto `origin/main@6aee2b414`, then reconciled again after `main` a
 | Fitness/docs | partial | Cycle-2 corpus, snippets, and accuracy pass; links retains two unchanged-base anchor failures and is not workflow-called. |
 | Runtime | N/A | No runtime behavior. |
 | Consumer | pass | MCP generated asset has zero `api-clients`; asset checks pass. |
-| Repo tests | not rerun cycle 2 | Earlier run had 3300 pass plus the now-main-fixed #1612 finding and the remaining #1615 ranking drift. |
+| Repo tests | pass | Final exact-merge-base run: 3355 passed, 0 failed, 17 ignored. |
 
 ## Open Questions
 
@@ -82,8 +84,9 @@ first rebased onto `origin/main@6aee2b414`, then reconciled again after `main` a
 
 ## Commits
 
-- `149894121` — latest-rebased bootstrap/harness activation commit.
-- `e90ce21e8` — latest-rebased corpus freshness implementation commit.
-- `11c54621e` — latest-rebased cycle-1 handoff-evidence commit.
-- `c0b7bdf25` — latest-rebased cycle-2 regeneration/evidence commit and final normal-generation
-  provenance source before the handoff commit.
+- `40ea88d8d` — exact-base-rebased bootstrap/harness activation commit.
+- `0896d929f` — exact-base-rebased corpus freshness implementation commit.
+- `0cebc4494` — exact-base-rebased cycle-1 handoff-evidence commit.
+- `6ed1743d0` — exact-base-rebased cycle-2 regeneration/evidence commit.
+- `7563aa6b1` — exact-base-rebased provenance reconciliation commit and final normal-generation
+  provenance source before the final handoff commit.
