@@ -334,3 +334,46 @@ merge gate is finished.
 no label change, no body edit, no OpenHands trigger, and no local evaluator launch. IMPL-EVAL will
 arrive via the automatic dispatcher after #1524 lands; root re-enters the label to fire it. This
 lane's remaining work is to watch that verdict, then run and record the seven-check pre-merge gate.
+
+## 2026-08-12 — deferred findings filed as their own issues (scope-drift checkpoint)
+
+Two findings were fenced out of this lane's PRs on purpose. Filing them rather than letting them die
+in a run artifact, per the profile's rule that scope drift is an explicit checkpoint and that
+findings raised inside a run get filed from inside the run:
+
+| Issue | Title | Milestone | Origin |
+| --- | --- | --- | --- |
+| **#1542** | `quality:gate` roots omit published packages, so a green gate is not proof they were scanned | 0.0.7 | found **independently three times**: #1405 implementer, #1405 IMPL-EVAL (against `deno.json:156`), #1398 implementer |
+| **#1543** | `plugin-workers-core` and `plugins/triggers` import `plugin-streams-core` without declaring it | 0.0.7 | #1398 research + PLAN-EVAL, recorded as plan risk R3 |
+
+**#1542 is the more serious of the two** and is the reason the #1405 merge record says explicitly
+that this package's quality verdict rests on the explicit target scan and **not** on the repo gate.
+A `quality:gate` that silently skips a package leaves the framework-wave gate law unenforced while
+appearing enforced — the same shape as pre-merge check 4 ("clean" meaning "nothing ran"), one level
+down. Three independent sessions each hit it and each hand-compensated, which is exactly the pattern
+that eventually gets forgotten once.
+
+**#1543 is filed honestly as unverified.** Whether `deno publish` actually rejects the undeclared
+import was never checked; the issue says so and makes `publish:dry-run` evidence the first
+acceptance box rather than asserting a defect. Both the research pass and the PLAN-EVAL recorded it
+as unverified, and it is carried forward that way rather than upgraded by repetition.
+
+Neither issue is a 0.0.6 blocker; both are `0.0.7` with `status:triage`.
+
+## Waiting state — #1524 has not landed
+
+`gh pr view 1524` → `OPEN`, `mergedAt: null`. The automatic phase dispatcher is therefore not live,
+root has not re-entered `status:impl-eval`, and no automatic verdict exists. The merge gate for
+#1536 genuinely cannot proceed, and nothing has been done to it: head `e4319c685`,
+`status:impl-eval`, no label change, no body edit, no evaluator, no OpenHands trigger.
+
+Watcher confirmed **alive** (PID 224681) rather than assumed — a dead watcher and a quiet one look
+identical, and "liveness is not progress" cuts both ways.
+
+The merge-gate finish is staged and **dry-run against a throwaway copy of the PR body**
+(`scratchpad/finish-1536.py`): it ticks the three remaining DoD boxes, replaces the now-false claims
+("blocked before those gates by `runtime.flow-b-fixture` fetch failure", "Not yet live-verified") with
+the CI job evidence, and rewrites the four acceptance-evidence entries to `box-index` form because
+#1398's boxes wrap across lines and the mirror matches on a checkbox's first line. Every edit asserts
+it matched and the script refuses to finish with an unticked DoD box or a surviving stale claim.
+It is **not applied**: DoD box 6 asserts IMPL-EVAL passed, which is not true until the verdict lands.
