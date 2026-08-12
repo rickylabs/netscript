@@ -133,3 +133,50 @@ worktrees and briefs staged but are **not** dispatched. They are independent of 
 not a dependency hold — the reason is that wave 1 is the first use of this lane's brief format, and
 a defect in the brief is cheaper to fix once than four times. Recorded here so the hold is a
 decision, not a drift.
+
+## 2026-08-12 — Stage C: wave 2 dispatch
+
+Wave 2 dispatched on owner instruction, into the worktrees already prepared at wave 1. The hold
+recorded above is therefore **lifted by owner decision, not by the stated condition** (wave 1 had
+not yet produced a PR to validate the brief format). Recorded as a re-planning event in
+`cut-trace.md` rather than silently overwritten.
+
+**Duplicate-work check before dispatch** (owner instruction: do not duplicate active work).
+Executed, not assumed:
+
+```
+$ gh pr list --state open --search <n>   for n in 1397 1399 1428 1438 1430 1417
+  → no open PR references any of the six owned issues
+$ git ls-remote --heads origin | grep -E "1397|1399|1428|1438|1430|1417"
+  → no remote branch for any owned issue (the three greps that matched are
+    coincidental SHA substrings, not branch names)
+$ deno task agentic:codex-status
+  → no session in ns006-f-c-e2e-gates or ns006-f-d-island prior to launch
+```
+
+Sibling 0.0.6 lanes are concurrently active on this host (`ns006-1405` → features lane,
+`ns006-gatetrust` → a PR-A gate-trust slice). Neither touches this lane's six issues or its four
+worktrees. No overlap.
+
+**Launch identity — requested vs observed:**
+
+| Slice | Worktree | Thread id | Requested | Observed | State |
+| --- | --- | --- | --- | --- | --- |
+| C (#1397+#1399) | `/home/codex/repos/ns006-f-c-e2e-gates` | `019ff4f5-2117-7a61-84e0-1afb82ae7c05` | openai / gpt-5.6-sol / low | openai / gpt-5.6-sol / low | working |
+| D (#1428) | `/home/codex/repos/ns006-f-d-island` | `019ff4f5-27a0-77c1-8072-6842061aa589` | openai / gpt-5.6-sol / low | openai / gpt-5.6-sol / low | working |
+
+All four thread ids are recorded by the launcher in each slice's `codex-thread-ids.md`.
+
+**All four slices live, verified by growing rollout artifact rather than by status display:**
+
+```
+A 019ff4ef-8644  rollout 660785 B  mtime 09:51:31
+B 019ff4f0-5c24  rollout 732292 B  mtime 09:51:11
+C 019ff4f5-2117  rollout 239722 B  mtime 09:52:48
+D 019ff4f5-27a0  rollout 157221 B  mtime 09:52:49   (now 09:52:50 +0200)
+```
+
+**Scope discipline.** Each leaf PR stays narrow: A and B are one file each, C is
+`packages/cli/e2e/**`, D is `packages/cli/src/**`. C and D touch disjoint trees and cannot conflict.
+Every brief forbids starting `scaffold.runtime` on the slice's own initiative, so the expensive gate
+stays serialised under orchestrator control even with four slices in flight.
