@@ -328,8 +328,10 @@ Repo-internal tooling; no `packages/**`/`plugins/**` published surface changes, 
 ### Ports
 
 - `discoverDoctrineRoots(): string[]` — the single source of truth for doctrine root selection. Exists so
-  the task string, `arch:check:repo`, and the coverage test read one function. Introduced in PR-B and
-  **expanded** in PR-C; never duplicated into a checked-in list (this replaces the withdrawn R-6).
+  the task string, `arch:check:repo`, and the coverage test read one function. **PR-B performs the single
+  transition** to the final 36-unit selector; PR-C **consumes it unchanged** for `arch:check:repo` and does
+  not expand it. There is no interim root set and no checked-in list — that two-step was the withdrawn R-6,
+  rejected by cycle 1 finding 9 and cycle 2 finding 4.
 - `resolveIdentifierOrigin(file, ident)` — lexical import + top-level/local binding collection. No type
   checker; `check-doctrine.ts` stays a line/lexical scanner.
 - **#1374's extractor** — consumed, not re-implemented. PR-D imports it; if its surface stays private,

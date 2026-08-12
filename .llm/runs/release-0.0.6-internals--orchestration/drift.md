@@ -534,3 +534,41 @@ Trusted base SHA: d7e2b67b2be535c9ca13449f97f8f4585344030a
 - **#1553 must never leave draft.** Draft → ready fires the initial IMPL-EVAL, which is meaningless for a
   record PR that ships no code. `netscript-pr` also forbids merging a PR at `status:plan-eval`, which is
   correct for this surface.
+
+## D-19 — cycle 4 verdict `FAIL_RESCOPE`: the plan passed, its companion prose did not
+
+- **Severity:** minor (documentation consistency; no scope or decision changed)
+- **Recorded:** 2026-08-12, PLAN-EVAL cycle 4, MiniMax M3 over OpenRouter via the automated phase-eval path
+- **Verdict:** `FAIL_RESCOPE` on PR #1553 at `ce011b5f1`, run `31588750658`. **Five findings PASS**, two
+  FAIL — and the two are not about the plan's decisions:
+  - **F-1 PASS** — the rescope is bounded, per-criterion reasoned, and honest; criteria moved with their
+    issues and none was reinterpreted.
+  - **F-2 PASS** — the three defects cycle 3 left standing are repaired (E1's red-gate structure, B1's
+    independent oracle, the two provenance rows).
+  - **F-3 PASS** — **the Plan-Gate checklist is cleared**: research current, decisions locked, 20
+    file-scoped slices each with a green post-slice gate, gate set fireable, deferred scope explicit.
+  - **F-6 / F-7 PASS** — lane discipline and verdict vocabulary.
+  - **F-4 FAIL** — companion artifacts still describe the pre-rescope surface.
+  - **F-5 FAIL** — no implementation slice is committed. The evaluator states explicitly that this is
+    **not a Plan-Gate failure of the plan**; it discharges the moment PR-E is dispatched.
+- **So the blocking defect is F-4 alone**, and it is the same sin as cycle 2 finding 6: I reconciled the
+  rail plan and left the companion documents behind. Six stale statements, all now fixed in one
+  run-artifact-only commit:
+  1. `plan.md` — "the three issues … three sequential PRs" → four, with the order named in its own prose
+     rather than delegated to another file.
+  2. `plan.md` — "PR-D … closes #1378 … export-aware `any` severity" → closes **#1549**, effort dropped
+     high → medium because export-reachability was the complex half and it moved.
+  3. `worklog.md` § Ports — `discoverDoctrineRoots()` "expanded in PR-C" → PR-B performs the **single**
+     transition and PR-C consumes it unchanged.
+  4. `plan-quality-rail.md` routing — the nine #1378 rows and five #1545 rows replaced by seven #1549 rows,
+     with the moved slices marked out-of-milestone rather than deleted.
+  5. `plan-quality-rail.md` routing header — denominator corrected to the in-0.0.6 boxes, stating that the
+     moved boxes are *out of milestone*, not unrouted.
+  6. `plan-quality-rail.md` open decisions — R-3 and R-7 marked **withdrawn by rescope**, not "resolved".
+     Calling a withdrawn decision resolved is precisely the unearned-green wording this lane removes.
+- **One factual note back to the evaluator:** its Remaining-risks section says "#1549 must be filed with
+  provable-half boxes before PR-D dispatch … the lane must reconcile before filing #1549". #1549 was
+  **already filed** with exactly those seven boxes before this evaluation ran — it is referenced in D-17 at
+  the evaluated head. The risk is discharged, not outstanding.
+- **Action:** F-4 fixed; PLAN-EVAL re-triggered by label-cycling `status:plan-eval` per D-14's rerun path
+  (the only sanctioned rerun mechanism — not a push, not a re-request). PR-E dispatches on `PASS`.

@@ -118,9 +118,9 @@ Revision 1 inherited that claim without re-measuring and was failed on it (`drif
 | Decision | Status |
 | --- | --- |
 | `docs/site/**` extractor ownership | **RESOLVED** — `R-10`, with the closing-keyword consequence stated |
-| The 567 `deno doc` warnings | **RESOLVED in shape** — `R-3`; PR-D measures the intersection before wiring, residue is dated debt |
-| The 8 pre-existing allowances | **RESOLVED** — `R-7`, umbrella issue #1545 |
-| Budget-link predicate mechanism | **RESOLVED** — `R-12` |
+| The 567 `deno doc` warnings | **WITHDRAWN BY RESCOPE — not resolved.** Export-reachability moved to 0.0.7 with #1378 (`drift.md` D-17). Nothing in 0.0.6 depends on an answer. Cycle 4 finding 4 flagged this row as still claiming a 0.0.6 resolution. |
+| The 8 pre-existing allowances | **WITHDRAWN BY RESCOPE — not resolved.** The registration rule and #1545 moved to 0.0.7. In 0.0.6, `--max-allow` is wired at the measured count with **no** issue-id requirement, so the population needs no register yet. |
+| Budget-link predicate mechanism | **RESOLVED** — `R-12`, one added step in the existing `code-quality` PR job. Stays in 0.0.6 as #1549 box 5. |
 | `arch:check:repo` residue after R-4/R-5 | defer to PR-C — #1380 box 13 accepts "exit 0 **or** residue enumerated" |
 | Successor records for `sagas`/`streams`/`hello-world` | defer to PR-C — the deliverable is to **state the absence**, not to find one |
 
@@ -151,7 +151,11 @@ Revision 1 inherited that claim without re-measuring and was failed on it (`drif
 `--allow-write --allow-run` is mandatory: nine tests under `.llm/tools` call `Deno.makeTempDir()` and one
 spawns a subprocess (`drift.md` D-8). `deno task e2e:cli` is out of scope for the whole rail.
 
-## Acceptance-box routing — every box has a slice, files, and a proof
+## Acceptance-box routing — every in-milestone box has a slice, files, and a proof
+
+**Denominator after the rescope: 28 in-0.0.6 boxes** — #1530 (7, one `[post-merge]`), #1403 (5),
+#1380 (13), #1549 (7) minus the 4 `gate:`/duplicate overlaps counted once. The 14 boxes of #1378 and
+#1545 are **out of milestone**, not unrouted (cycle 4 finding 4).
 
 Slice ids refer to `worklog.md` § Design.
 
@@ -169,13 +173,10 @@ Slice ids refer to `worklog.md` § Design.
 | #1380 · 9 | PR-C | C5 | `10-…md` carries a **dated** plan for engineering-reference §1–§5/§8–§10; test asserts the section exists and is dated |
 | #1380 · 10 | PR-C | C6 | `rfcs/README.md` records `rfcs/NNNN-*.md` canonical per `R-9`; all five `DECISION_PENDING` ids mapped; test asserts all five present |
 | #1380 · 13 | PR-C | C2 | named gate pair |
-| #1378 · 1 | PR-D | D1 | exported `any` red, local `any` unchanged, re-export attribution fixture |
-| #1378 · 2 | PR-D | D2 | unlinked `as unknown as` red; allowance linked to an open milestoned issue green |
-| #1378 · 3 | PR-D | D5 | `as any` in a `docs/site/**` fence red via #1374's extractor; **moves with the issue** under `R-10`'s fallback, which then drops `Closes #1378` |
-| #1378 · 4 | PR-D | D5 | the 6 `*-soundness_test.ts` files green with `@ts-expect-error` unchanged — regression evidence, explicitly not a negative case |
-| #1378 · 5 | PR-D | D3 | `--max-allow` wired at 8; overflow red |
-| #1378 · 6 | PR-D | D4 | the added `code-quality` step (`R-12`) is red when the budget rises without a same-diff issue link, exercised on PR-D itself |
-| #1378 · 7 | PR-D | D6 | `docs/site/reference/triggers/index.md:310` and `examples_test.ts:65` typed; both compile with no `any` |
-| #1378 · 8 | PR-D | D1–D5 | full matrix |
-| #1378 · 9 | PR-D | D1–D6 | `quality:scan:repo` + `arch:check` green (depends on PR-E, PR-B, PR-C) |
-| #1545 · 1–5 | PR-D | D2, D3 | all 8 allowances reference #1545; budget at 8; registered-vs-unregistered test; the five CLI sites recorded against the plugin-port-identity cause |
+| **#1549 · 1–2** | PR-D | D5 | `as any` in a `docs/site/**` fence red, proven red-first, **consuming** #1374's extractor — a test asserts no second fence parser exists in the tree |
+| **#1549 · 3** | PR-D | D5 | the 6 `*-soundness_test.ts` files green with `@ts-expect-error` unchanged, and a test asserts the exemption rather than relying on filename luck |
+| **#1549 · 4** | PR-D | D3 | `--max-allow` wired into both tasks at the count measured in that PR; overflow fixture red. **No issue-id requirement in 0.0.6.** |
+| **#1549 · 5** | PR-D | D4 | the added `code-quality` step (`R-12`) is red when the budget rises without a same-diff issue link, with a linked-GREEN control; exercised on PR-D itself |
+| **#1549 · 6** | PR-D | D6 | `docs/site/reference/triggers/index.md:310` and `examples_test.ts:65` typed; both compile with no `any` |
+| **#1549 · 7** | PR-D | D3–D6 | `gate:` `quality:scan:repo` + `arch:check` green (depends on PR-E, PR-B, PR-C) |
+| ~~#1378 · 1–9~~ · ~~#1545 · 1–5~~ | **moved to 0.0.7** | ~~D1, D2~~ | Slices **D1** (export-awareness) and **D2** (allowance registration) move with their issues. Written reasons on #1378 and #1545; measurement in `drift.md` D-17. Not routed here and not ticked here. |

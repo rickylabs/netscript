@@ -84,10 +84,14 @@ Required deliverables:
 > `plan-quality-rail.md` § The one PR order. PR-E was inserted after this section was written, and
 > `plan-eval-cycle2.md` finding 6 failed the plan for leaving the two statements in conflict. Where
 > this section and `plan-quality-rail.md` differ, the rail plan governs.
+>
+> **The order, stated here so this section is not a hazard on its own:**
+> **PR-E (#1530) → PR-B (#1403) → PR-C (#1380) → PR-D (#1549)** — four sequential PRs, not three.
 
-Serialized under this lane because the three issues overlap on root lists, scan semantics, doctrine
-and architecture debt. One rail plan, **one** PLAN-EVAL over the whole rail, then three sequential
-PRs each with its own IMPL-EVAL.
+Serialized under this lane because the issues overlap on root lists, scan semantics, doctrine and
+architecture debt. One rail plan, one PLAN-EVAL over the whole rail, then **four** sequential PRs.
+Each PR's IMPL-EVAL now fires automatically on draft → ready rather than being dispatched
+(`drift.md` D-14).
 
 **PR-B — `fix/1403-quality-gate-coverage`** · closes #1403 · lane `light_implementation`
 (Sol · low) · review `review_codex_light`.
@@ -106,11 +110,17 @@ Re-walks the verdict table to the 36 live units, records rename-vs-deletion per 
 root, stops A14 firing on `@std/testing/bdd` imports, and closes-or-dates the accepted-red
 `arch-debt.md` entry.
 
-**PR-D — `fix/1378-quality-scan-rule-power`** · closes #1378 · lane `complex_implementation`
-(Sol · high) · review `review_codex_complex` (Fable 5 · medium).
+**PR-D — `fix/1549-quality-scan-provable-half`** · closes **#1549** · lane `normal_implementation`
+(Sol · medium) · review `review_codex` (Fable 5 · low).
 
-The largest slice: export-aware `any` severity, allowances that require a linked open issue and are
-budgeted via `--max-allow`, and `docs/site/**` fenced-TS extraction.
+**Rescoped (revision 4, owner-authorized).** #1378 and #1545 moved to **0.0.7**: export-reachability
+severity and allowance issue-state verification were measured unimplementable at this baseline (567
+`deno doc` warnings, 1,714 published symbol records with unresolved types, and a scanner that has
+`--allow-read` only). #1549 carries the provable half: `docs/site/**` fenced-TS scanning consuming
+#1374's extractor, the soundness/type-fixture exemption asserted by rule, `--max-allow` at the measured
+count **with no issue-id requirement**, the same-PR budget-link step in the existing `code-quality` job,
+and typing `docs/site/reference/triggers/index.md:310` with its executable twin. Effort drops from high
+to medium because export-reachability was the complex half and it moved. Full reasons: `drift.md` D-17.
 
 ### Locked sequencing decisions
 
