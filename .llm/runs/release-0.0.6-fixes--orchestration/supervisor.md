@@ -43,7 +43,7 @@ Routed from `.llm/harness/workflow/lane-policy.md`; no routing table is invented
 | Review of Sol·low work                     | `review_codex_light`          | Claude · Opus 5 · high                   |
 | Review of Sol·medium work                  | `review_codex`                | Claude · Fable 5 · low                   |
 | IMPL-EVAL (Codex-authored)                 | `formal_impl_evaluation`      | Claude · Fable 5 · medium (native opposite-family) |
-| Deep analysis when delegated               | `deep_analysis`               | Claude · Fable 5 · medium                |
+| Deep analysis when delegated               | `deep_analysis`               | ~~Claude · Fable 5 · medium~~ → **PROHIBITED (drift D-7)**; handled by the Opus orchestrator or `chore_code` Opus 5 · medium |
 
 **Escalation only when justified, recorded per use:** MiniMax M3 high (PLAN-EVAL third opinion),
 DeepSeek V4 Flash 0731 max (small IMPL-EVAL third opinion), Qwen 3.8 Max (broad/complex IMPL-EVAL).

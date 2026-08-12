@@ -220,3 +220,46 @@ than by design. Had the drift gone the other way this would have mismatched the 
 **Follow-up for the next run:** either `codex-resume` should accept and assert an explicit route
 identity, or a resume should be treated as a new launch edge that re-validates it. Filed as an
 observation here rather than a code change, since this lane does not own the agentic suite.
+
+## D-7 — Fable 5 fully prohibited for this lane (owner, 2026-08-12)
+
+**Recorded:** 2026-08-12. Authority: owner. Scope: this 0.0.6 lane, all phases — planning, research,
+implementation, review, evaluation. Duration: until explicitly lifted (95% quota until Saturday).
+
+**Compliance status at the moment the policy issued: no live Fable dispatch.** The lane's three
+local IMPL-EVAL cycles (Fable 5 · medium, slices A and B) had all completed; no Fable agent was
+running and none was queued. No dispatch had to be stopped.
+
+### Routes that would select Fable, and the substitution for each
+
+`lane-policy.md` already declares Opus fallbacks for exactly this condition, and the reason it gives
+matters: *"the Codex-review lanes instead fall back to Claude · Opus 5 (same effort) so an
+OpenAI-authored change is never reviewed by an OpenAI-family model — opposite-family review is never
+traded away for a token-limit fallback."* A 95% quota **is** a token-limit condition, so the
+documented fallback applies as written rather than as an improvisation.
+
+| Lane | Canonical route | Under D-7 |
+| --- | --- | --- |
+| `review_codex` (paired to Sol·medium impl) | Fable 5 · low | **Opus 5 · low** (declared fallback) |
+| `review_codex_complex` (paired to Sol·high impl) | Fable 5 · medium | **Opus 5 · medium** (declared fallback) |
+| `review_codex_light` (paired to Sol·low impl) | Opus 5 · high | unchanged — never selected Fable |
+| `deep_analysis` | Fable 5 · medium | **Not delegated.** Handled by this Opus orchestrator, or as `chore_code` → Opus 5 · medium |
+| `formal_plan_evaluation` (Codex plans) | Fable 5 · medium | Moot — PLAN-EVAL is `N/A` for this lane (D-2) |
+| `formal_impl_evaluation` (Codex work) | Fable 5 · medium | **Superseded by the automatic evaluator.** Owner policy of 2026-08-12 routes IMPL-EVAL through the label-driven `openhands-phase-eval` workflow, whose models are `minimax` / `deepseek` / `qwen` — all OpenRouter open models. The automatic path is Fable-free by construction. |
+| `docs_polish` | Fable 5 · medium | N/A — not a docs lane |
+| Forward rule: Sol·max implementation | Fable 5 · high review | **Avoided** — no wave-3/4 slice is routed at Sol·max |
+
+**Opposite-family review is preserved in every substitution.** Every replacement is Claude-family
+reviewing Codex-authored work, which is the invariant the fallback chain exists to protect. Nothing
+in D-7 forces this lane to let an OpenAI-family model review OpenAI-authored code.
+
+### Effect on waves 3–4
+
+None blocking. Implementation stays on Codex Sol (low default, medium where decisions arise, high
+only for genuinely complex work); ordinary adversarial review substitutes Opus at the paired effort;
+formal evaluation is automatic and Fable-free.
+
+**Standing instruction honoured:** if a configured route would select Fable, the dispatch stops and
+is reported rather than silently substituted. The substitutions above are recorded *in advance* so
+that no wave-3/4 dispatch has to make that call ad hoc — but any route not in this table that
+resolves to Fable halts and comes to the owner.
