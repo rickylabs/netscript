@@ -756,6 +756,55 @@ fatal: no upstream configured for branch 'fix/1438-release-cut-canary-pair-inher
 exit 128 (expected; explicit-refspec push required)
 ```
 
+Commit, push, and final ground truth:
+
+```text
+$ git commit -m "fix(release): construct validated provenance"
+ok 1 file changed, 10 insertions(+), 1 deletion(-)
+ok f2f8a05
+exit 0
+
+$ git push origin HEAD:refs/heads/fix/1438-release-cut-canary-pair-inheritance
+To https://github.com/rickylabs/netscript.git
+   2a4102600..f2f8a05c8  HEAD -> fix/1438-release-cut-canary-pair-inheritance
+ok fix/1438-release-cut-canary-pair-inheritance
+exit 0
+
+$ gh pr comment 1539 --body-file .llm/tmp/pr-a-premerge-cast-repair-comment.md
+https://github.com/rickylabs/netscript/pull/1539#issuecomment-5265685054
+exit 0
+
+$ git status --porcelain
+exit 0; stdout bytes: 0
+
+$ git diff --exit-code 01aa12b67 HEAD -- deno.lock
+exit 0; stdout bytes: 0
+
+$ git rev-parse HEAD
+f2f8a05c8adf53929183ef5917e486712979a4bc
+exit 0
+
+$ git ls-remote origin refs/heads/fix/1438-release-cut-canary-pair-inheritance
+f2f8a05c8adf53929183ef5917e486712979a4bc refs/heads/fix/1438-release-cut-canary-pair-inheritance
+exit 0
+
+$ deno eval '<repeat committed added-line scan>'
+{"base":"01aa12b67","head":"HEAD","scope":"added lines outside .llm/runs/**","violations":[]}
+exit 0
+
+$ gh pr view 1539 --json ...
+{"base":"main","closes":[1430,1438],"head":"fix/1438-release-cut-canary-pair-inheritance","headSha":"f2f8a05c8adf53929183ef5917e486712979a4bc","implEvalChecked":true,"isDraft":false,"labels":["type:fix","status:impl-eval","area:tooling","priority:p1","area:release"],"milestone":"0.0.6","number":1539,"state":"OPEN","statusLabels":["status:impl-eval"],"url":"https://github.com/rickylabs/netscript/pull/1539"}
+exit 0
+
+$ rtk proxy deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1539 --pretty
+review-threads PASS rickylabs/netscript#1539 threads=0 unanswered=0
+exit 0
+```
+
+The PR remained ready for review (`isDraft: false`) and its accepted cycle-3 IMPL-EVAL checkbox
+remained checked. No PR-body edit, label transition, publication, canary, tag operation, or merge was
+performed.
+
 ### Cycle-2 commit, push, and PR audit
 
 ```text
@@ -809,3 +858,91 @@ exit 0
 
 No publication, `release:publish`, `deno publish`, tag creation/push, canary, lock mutation, cache
 reload, scaffold runtime, merge, or evaluator self-certification was performed.
+
+## Post-IMPL-EVAL pre-merge repair — remove banned double assertion
+
+Cycle-3 IMPL-EVAL returned `PASS` at `2a4102600`. The orchestrator's independent added-line scan
+then found the new `as unknown as AgentDocsProvenance` return assertion in
+`parseAgentDocsProvenance`. The only implementation change after the accepted design is a
+field-by-field structural return object after the existing type and exact-key-set guards. No
+parent-anchor logic, closed-schema key, audit classification, test, or #1430 behavior changed.
+
+The named provenance shapes were exercised directly against
+`isExactAgentDocsProvenanceReplacement` after the edit:
+
+```text
+$ deno eval '<synthetic provenance rejection/admission matrix>'
+[{"scenario":"extra-field","admitted":false},{"scenario":"sourceCommit","admitted":false},{"scenario":"extractionTimestamp","admitted":false},{"scenario":"files-array","admitted":false},{"scenario":"same-version","admitted":false},{"scenario":"legitimate","admitted":true}]
+exit 0
+
+$ deno eval '<real git-show provenance/gzip control for 6ec75573d^..6ec75573d>'
+{"cut":"6ec75573d","previousVersion":"0.0.4","nextVersion":"0.0.5","admitted":true}
+exit 0
+```
+
+Focused release suite:
+
+```text
+$ deno test --quiet --allow-all .llm/tools/release/
+running 23 tests from ./.llm/tools/release/github-release_test.ts
+parent canary evidence checks every release path and reproduces derived writer outputs ... ok
+parent canary evidence rejects self-consistent non-version agent-docs injection ... ok
+parent canary evidence rejects writer-preserved non-version provenance injection ... ok
+known previous tag with empty since fails loudly before reporting closed issues ... ok
+explicit previous tag uses release date with commit-date fallback ... ok
+<the other 98 individually named release tests also reported ok>
+ok | 103 passed | 0 failed (1s)
+exit 0
+```
+
+Repository and uncached release-tool gates:
+
+```text
+$ rtk proxy deno task check
+Task check deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude "^(.*(?:^|/)\.generated/|.*(?:^|/)node_modules/)" (cached, inputs unchanged)
+exit 0
+
+$ rtk proxy deno task lint
+Task lint deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\.generated/|.*(?:^|/)node_modules/)" (cached, inputs unchanged)
+exit 0
+
+$ rtk proxy deno task fmt:check
+Task fmt:check deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\.generated/|.*(?:^|/)node_modules/)" --ignore-line-endings (cached, inputs unchanged)
+exit 0
+
+$ deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/release --ext ts
+{"source":{"mode":"selection","cwd":"/home/codex/repos/ns006-f-a-release-tooling"},"command":"deno check --unstable-kv <files>","selection":{"filesSelected":40,"batches":1,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+exit 0
+
+$ deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .llm/tools/release --ext ts
+{"source":{"mode":"command","cwd":"/home/codex/repos/ns006-f-a-release-tooling","exitCode":0},"selection":{"filesSelected":40,"batches":1},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+exit 0
+
+$ deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools/release --ext ts
+{"command":"deno fmt --check","cwd":"/home/codex/repos/ns006-f-a-release-tooling","mode":"check","summary":{"filesSelected":40,"batches":1,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+exit 0
+
+$ rtk proxy deno task test --reporter=dot
+Task test deno test --allow-all '--reporter=dot'
+<3190 pass dots and 17 ignore commas; no failure symbols or diagnostics>
+ok | 3190 passed (617 steps) | 0 failed | 17 ignored (3m13s)
+exit 0
+```
+
+The exact pre-merge incident-class scan is green after the edit:
+
+```text
+$ deno eval '<scan added diff lines outside .llm/runs/** for deno-lint-ignore, as unknown as, @ts-ignore, or quality-allow>'
+{"base":"01aa12b67","scope":"added lines outside .llm/runs/**","violations":[]}
+exit 0
+
+$ git diff --check
+exit 0
+
+$ git diff --exit-code 01aa12b67 HEAD -- deno.lock
+exit 0; stdout bytes: 0
+
+$ git rev-parse --abbrev-ref --symbolic-full-name @{u}
+fatal: no upstream configured for branch 'fix/1438-release-cut-canary-pair-inheritance'
+exit 128 (expected; explicit-refspec push required)
+```

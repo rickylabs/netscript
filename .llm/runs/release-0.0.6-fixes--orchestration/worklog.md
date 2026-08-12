@@ -950,3 +950,73 @@ The PR had been flipped back to **draft** when slice A pushed the provenance fix
 lane's very first gate finding. Marked ready again to trigger a real run; the IMPL-EVAL box was
 ticked **only after** `verdict-3.md` existed and said PASS, and the label moved to
 `status:ready-merge` so the acceptance mirror will run.
+
+## 2026-08-12 — Pre-merge check 3 fired on #1539, and quality:gate did not
+
+The cycle-3 PASS did **not** clear #1539 for merge. The orchestrator's own diff scan caught a
+banned construct the repo's automated quality gate is blind to:
+
+```
+.llm/tools/release/github-release.ts:416
++  return value as unknown as AgentDocsProvenance;
+```
+
+`deno task quality:gate` reported **SUCCESS** on this PR. It did not catch this, because
+`quality:scan` covers `packages/cli/src` and `plugins` — **not `.llm/tools/**`**. The pre-merge diff
+scan is the only thing in the pipeline that sees it. This is the #745 incident class and is not
+waivable by the orchestrator, so #1539 was held despite a passing formal evaluation.
+
+Worth recording plainly: **three adversarial evaluation cycles did not flag this.** They were
+briefed on the inheritance semantics and found two real holes there; a style/typing violation in a
+helper was outside what they were told to attack. Formal evaluation and the mechanical gate cover
+different ground, and this PR needed both.
+
+### The fix, and the standard applied to it
+
+Routed to slice A with an explicit instruction to preserve the closed-field validation and use a
+structural construction or a type predicate — never a `deno-lint-ignore` or `quality-allow`.
+
+Landed as `f2f8a05c8 fix(release): construct validated provenance`. Delta from the evaluated head
+`2a4102600` is **one file, one hunk, +10/−1**, entirely inside `parseAgentDocsProvenance`:
+
+```diff
+-  return value as unknown as AgentDocsProvenance;
++  return {
++    schemaVersion: 1,
++    version: value.version,
++    ... every field taken from the already-narrowed value ...
++    files: [...value.files],
++  };
+```
+
+**The standard for accepting this without a fourth evaluation cycle was stated to the owner before
+the diff was seen**, not invented afterwards: the delta must be confined to that function, the field
+checks and exact key-set check must be untouched, and the guard regressions must still reject.
+Verified by the orchestrator at the final head `f2f8a05c8`:
+
+```
+$ deno test .llm/tools/release/github-release_test.ts
+parent canary evidence rejects self-consistent non-version agent-docs injection ... ok   ← cycle-1 vector
+parent canary evidence rejects writer-preserved non-version provenance injection ... ok  ← cycle-2 vector
+ok | 23 passed | 0 failed
+```
+
+Banned-construct scan at `f2f8a05c8` against the merge-base: **clean**. `deno.lock` unmodified.
+
+### Dispatch root cause — owner-confirmed, and a correction to this run's record
+
+`dispatch: FAILURE` on #1539 is `openhands-phase-eval.yml` failing with
+`HttpError: Not Found — repos/contents` while resolving the trusted evaluator prompt. Root cause
+confirmed by the owner: **#1539's historical base SHA predates the trusted prompt**, and for
+`pull_request` events the workflow runs from `main` while reading the prompt from the PR's branch.
+
+This **corrects** the earlier entry in `drift.md` D-1, which stated the automatic evaluator "never
+fired on this lane because the branches predate the workflow." It did fire, once #1524 landed; it
+failed on a missing file rather than never running. The distinction matters: a red `dispatch` is a
+gate result to resolve, not an absent gate to note.
+
+Fix PR **#1552** (`fix(agentic): resolve evaluator prompt from current trusted base`) is open.
+Owner instruction: keep #1539 immutable, wait for #1552 to merge, then move away from and re-add
+`status:impl-eval` **exactly once**, then finish the merge gate. The cast fix was landed **before**
+that cycle deliberately, so the single dispatch run evaluates final content rather than being
+invalidated by a later push.
