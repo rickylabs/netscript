@@ -39,8 +39,10 @@ OpenHands is **not** the evaluator for local runs. Two hard rules:
 2. **OpenHands is for CLOUD-driven runs only** — small GitHub-Copilot-style tasks the owner wants
    reviewed fully in the cloud with adversarial agents. OpenHands remains the **default automated
    cloud agent**; nothing below changes that. For any run on the **local machine**, do NOT dispatch
-   cloud OpenHands at all — use the local evaluator transport named below. The **supervisor chooses
-   what to trigger** — sub-agents/implementers must NEVER auto-dispatch a cloud evaluator.
+   cloud OpenHands at all — use the local evaluator transport named below. On cloud-driven PRs the
+   repository phase workflow owns dispatch: `openhands` + `status:plan-eval` starts PLAN-EVAL;
+   draft→ready starts IMPL-EVAL unless `impl-eval:skip` is present. Orchestrators select an optional
+   `eval:model:*` label before the transition and must NEVER duplicate it with a manual trigger.
 
 ### Local evaluator transport (owner revision, 2026-08-08)
 
@@ -85,8 +87,14 @@ the supervisor decide — never self-certify.
 
 Use one of these from GitHub mobile, a local agent, or another cloud agent:
 
-- Add `fix-me` or `openhands` to an issue or PR.
-- Add a model label: `agent:sonnet`, `agent:gpt`, or `agent:gemini`.
+- PLAN-EVAL: add `openhands`, optionally add one `eval:model:*` label, then enter
+  `status:plan-eval` (either label may complete the pair).
+- IMPL-EVAL: optionally add one `eval:model:*` label while draft, then make the PR ready. Use
+  `impl-eval:skip` only for an owner-approved waiver.
+- Rerun PLAN by moving away from and back to `status:plan-eval` while `openhands` remains present;
+  rerun IMPL by moving away from and back to `status:impl-eval`. Do not comment-trigger the same
+  head while its automatic run is queued or active.
+- For non-phase issue work, add `fix-me`, `openhands`, or an approved open `agent:*` profile.
 - Comment with `@openhands-agent ...` from an owner, member, or collaborator account.
 - Push a commit whose message contains `[openhands ...]`.
 - Run `OpenHands Agent` manually from Actions.

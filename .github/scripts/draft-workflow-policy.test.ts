@@ -3,7 +3,7 @@ import { assert, assertMatch, assertStringIncludes } from '@std/assert';
 const workflows = [
   'ci.yml',
   'code-quality.yml',
-  'docs-openhands-eval.yml',
+  'openhands-phase-eval.yml',
   'e2e-cli.yml',
   'openhands-agent.yml',
   'surface-diff.yml',

@@ -166,6 +166,10 @@ escalation hits an OpenRouter limit, the final fallback is a fresh
 AGY Gemini 3.6 Flash high session on the Google subscription. OpenHands is reserved for explicitly
 cloud-driven work.
 
+For cloud-driven PRs, the phase workflow dispatches from `openhands` + `status:plan-eval` or from
+draft→ready. An orchestrator may select one `eval:model:*` override before the transition but never
+duplicates the automatic trigger.
+
 **Machine binding.** This table is the rendered view of `CANONICAL_ROUTE_POLICY`.
 `resolveCanonicalFormalEvaluatorRoute()` **throws** unless the requested native family or explicit
 fallback reason matches the phase-bound route. Approved OpenRouter model identities remain
