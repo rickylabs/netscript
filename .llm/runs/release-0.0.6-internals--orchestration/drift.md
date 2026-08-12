@@ -1032,3 +1032,42 @@ completed/failure   59e435c5d   12:03:58Z
 - **Effect on the remaining rail:** none on capability. PR-B is `light_implementation` (Sol · low), whose
   pairing is `review_codex_light` → **Opus 5 · high**, which never involved Fable. PR-C and PR-D now review
   on Opus 5 · low. Implementation stays Codex; formal evaluation stays automated.
+
+## D-32 — PR-F (#1566): the reported 404 was a symptom; the defect was bookkeeping able to fail dispatch
+
+- **Severity:** significant (structural fix beyond the reported symptom)
+- **Recorded:** 2026-08-12
+- **Reported defect:** `openhands-phase-eval.yml`'s status cleanup removed `status:*` labels read from the
+  **event-payload snapshot**, so a concurrent dispatch's `removeLabel` returned `404 Label does not exist`
+  and reddened a run whose evaluation had succeeded. Verified before filing: runs `31596291515` (red) and
+  `31596293364` (green) two seconds apart on PR #1541 head `0503991ab`, and **exactly-once held** — one
+  trigger marker, `generation=29339092792`. Filed as **#1566**.
+- **Two findings from the orchestrator review, the second larger than the issue:**
+  1. **Bootstrap self-block.** The fix imports a new module from a **trusted base checkout**, and that module
+     is absent on `main`, so the introducing PR's own transition step threw `MODULE_NOT_FOUND`, aborted the
+     job, and the dispatch step never ran — no evaluator, so no PASS, so #1567 could not merge by its own
+     change. Explicitly **not** fixed by falling back to the PR-head copy, which would restore the very
+     escalation the trusted checkout prevents (this job holds `issues: write`).
+  2. **The real defect is structural.** The job exists to dispatch exactly one evaluator; the label
+     transition is bookkeeping. A bookkeeping failure aborted the job and prevented the dispatch — the same
+     pathology as #1566 one level up, and a red run implying dispatch had failed when it had not. Fixing only
+     the 404 would have left that intact for the next hiccup.
+- **Resolution:** both bookkeeping steps are `continue-on-error`; the transition still **rethrows** so its
+  outcome is truthfully `failure`; a dedicated step records actor / PR / head / **trusted-checkout outcome** /
+  bounded reason to `GITHUB_STEP_SUMMARY`; dispatch is gated only on `!cancelled()` and the chain-token check.
+  Non-fatal **and** non-silent, with the checkout outcome reported separately so the bootstrap case is
+  distinguishable from a permissions failure.
+- **Consequence worth noting:** the fix retires its own bootstrap problem. #1567's ready flip now fails one
+  step, records the attributed diagnostic, and dispatches anyway — so **the PR demonstrates its own fix on its
+  own CI run**, and the `labeled`-path workaround is unnecessary. It self-heals on merge.
+- **Two unprompted improvements by the implementer, both accepted:** the trusted-base checkout with
+  `persist-credentials: false` (and pinned to `base.ref`, the branch tip, not the recorded `base.sha` — the
+  #1552/#1564 lesson applied without being told), and sanitisation of the failure reason before it reaches a
+  Markdown step summary.
+- **Epistemic honesty, self-reported:** the new workflow-policy test extracts named step blocks and asserts
+  the declared policy — static evidence that the YAML *declares* independence, not that the runner honours it.
+  Recorded as such in the slice `drift.md` rather than counted as behavioural coverage. The runner behaviour is
+  proven by #1567's own run.
+- **Acceptance:** box 1 stands as worded — the concurrent-removal case is handled inside the caller so the
+  transition completes normally; the non-fatal path applies only to other failures. The implementer defended
+  the stronger reading with a reason instead of stretching the box.
