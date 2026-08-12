@@ -3,7 +3,7 @@
  */
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertStringIncludes, assertThrows } from 'jsr:@std/assert@^1';
 import { SCAFFOLD_APP_IMPORTS } from '../../constants/scaffold/scaffold-app-catalog.ts';
 import { generateAppDenoJson } from '../../adapters/templates/app/generate-app-deno-json.ts';
 import { generateAppViteConfig } from '../../adapters/templates/app/generate-vite-config.ts';
@@ -241,6 +241,61 @@ describe('generateAppDenoJson', () => {
     for (const [specifier, target] of Object.entries(SCAFFOLD_APP_IMPORTS)) {
       assertEquals(config.imports[specifier], target);
     }
+  });
+
+  it('rejects an incoherent resolver result before serializing the app manifest', () => {
+    const error = assertThrows(
+      () =>
+        generateAppDenoJson({
+          projectName: 'test',
+          appName: 'dashboard',
+          importMode: 'jsr',
+          jsrResolver: {
+            resolveImport: (specifier) => specifier,
+            resolveImports: (specifiers) =>
+              Object.fromEntries(specifiers.map((specifier) => [
+                specifier,
+                specifier === '@netscript/fresh/defer/island'
+                  ? 'jsr:@netscript/fresh@0.0.6-canary.3/defer/island'
+                  : specifier.startsWith('@netscript/fresh')
+                  ? `jsr:@netscript/fresh@0.0.5${specifier.slice('@netscript/fresh'.length)}`
+                  : specifier.startsWith('@netscript/sdk')
+                  ? `jsr:@netscript/sdk@0.0.5${specifier.slice('@netscript/sdk'.length)}`
+                  : 'jsr:@netscript/fresh-ui@0.0.5',
+              ])),
+          },
+        }),
+      Error,
+    );
+    assertStringIncludes(error.message, 'NetScript dependency closure is incoherent.');
+    assertStringIncludes(error.message, '@netscript/fresh@0.0.5');
+    assertStringIncludes(error.message, '@netscript/fresh@0.0.6-canary.3/defer/island');
+  });
+
+  it('rejects a non-exact closure member at init', () => {
+    const error = assertThrows(
+      () =>
+        generateAppDenoJson({
+          projectName: 'test',
+          appName: 'dashboard',
+          importMode: 'jsr',
+          jsrResolver: {
+            resolveImport: (specifier) => specifier,
+            resolveImports: (specifiers) =>
+              Object.fromEntries(specifiers.map((specifier) => [
+                specifier,
+                specifier.startsWith('@netscript/fresh')
+                  ? `jsr:@netscript/fresh@^0.0.5${specifier.slice('@netscript/fresh'.length)}`
+                  : specifier.startsWith('@netscript/sdk')
+                  ? `jsr:@netscript/sdk@0.0.5${specifier.slice('@netscript/sdk'.length)}`
+                  : 'jsr:@netscript/fresh-ui@0.0.5',
+              ])),
+          },
+        }),
+      Error,
+    );
+    assertStringIncludes(error.message, 'uses non-exact version "^0.0.5"');
+    assertStringIncludes(error.message, 'pin this member exactly');
   });
 });
 

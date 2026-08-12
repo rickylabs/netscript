@@ -12,6 +12,7 @@ import { SCAFFOLD_APP_IMPORTS } from '../../../constants/scaffold/scaffold-app-c
 import { SCAFFOLD_PACKAGES } from '../../../constants/scaffold/scaffold-packages.ts';
 import type { JsrResolverPort } from '../../../ports/jsr-resolver-port.ts';
 import type { PackageSourceMode } from '../../../domain/scaffold/scaffold-options.ts';
+import { assertCoherentNetScriptWebRuntimeImports } from '../../../domain/dependency-closures/netscript-web-runtime-closure.ts';
 
 /** Options for generating the app-level `deno.json`. */
 export interface AppDenoJsonOptions {
@@ -104,6 +105,8 @@ export function generateAppDenoJson(options: AppDenoJsonOptions): string {
       }
       : {}),
   };
+
+  assertCoherentNetScriptWebRuntimeImports(directNetScriptImports);
 
   const config = {
     name: `@${options.projectName}/${options.appName}`,
