@@ -308,6 +308,10 @@ jobs:
         if: env.RUN == 'true'
         run: deno task docs:accuracy
 
+      - name: Agent docs corpus freshness
+        if: env.RUN == 'true'
+        run: deno task check:agent-docs-prose
+
       - name: Generated asset freshness
         if: env.RUN == 'true'
         run: deno task check:assets-barrel

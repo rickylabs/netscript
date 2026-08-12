@@ -1,12 +1,24 @@
 import { assertEquals, assertRejects, assertThrows } from '@std/assert';
 import { join } from '@std/path';
 import {
+  checkForbiddenGoldenPathTerms,
   checkFreshRootImports,
   checkGoldenPathDocs,
   checkMutationMapColumns,
   checkPublicCommandReference,
   checkSagaVocabulary,
 } from './check-accuracy-and-discoverability.ts';
+
+Deno.test('shipped-corpus vocabulary check rejects every golden-path stale term', () => {
+  checkForbiddenGoldenPathTerms('apps/storefront/lib/catalog.ts', 'corpus:clean.md');
+  for (const stale of ['lib/api-clients.ts', '@contracts', '@/lib/orders.ts']) {
+    assertThrows(
+      () => checkForbiddenGoldenPathTerms(stale, 'corpus:stale.md'),
+      Error,
+      stale.includes('@/lib/') ? '@/lib/' : stale,
+    );
+  }
+});
 
 Deno.test('checkFreshRootImports allows valid root imports and fails on invalid root import with file, line, and symbol diagnostics', async () => {
   const tempDir = await Deno.makeTempDir();
