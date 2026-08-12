@@ -76,3 +76,6 @@
   `EMBEDDED_AGENT_TOOL_FILES` into a temporary project and executes `--help` for every manifest
   `tools` entry from a foreign process CWD. It was extended only to assert schema version 2 and the
   installed module path; no parallel smoke was added.
+- Follow-up gate 3 is blocked by D-6: its exact command sweeps all 724 `.llm/tools` tests without
+  granting the loopback net permission required by two pre-existing agentic tests. Result was exit 1
+  after 1m39s (722 passed, 2 permission failures); the generator suite itself passed 3/3.

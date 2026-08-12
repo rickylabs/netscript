@@ -84,3 +84,20 @@ The durable correction adds a non-runnable `modules` manifest category, register
 includes module paths and bytes in the canonical bundle identity, and adds a generic relative-import
 closure test with an omitted-module negative control. The existing installed-bundle smoke remains
 the end-to-end executable proof and now covers the repaired scanner import.
+
+## 2026-08-12 — D-6: prescribed generator-suite command lacks required net permission
+
+Severity: significant (final gate contradiction)
+
+The exact prescribed command
+`deno test --allow-read --allow-env --allow-write --allow-run .llm/tools/` does not isolate the
+generator suite. It discovers 724 tests across all tool subtrees, including two pre-existing tests in
+`.llm/tools/agentic/claude/openrouter-run_test.ts` that start a loopback `Deno.serve` and therefore
+require `--allow-net`.
+
+Observed result: exit 1 after 1m39s, 722 passed and 2 failed. Both failures are `NotCapable: Requires
+net access to "127.0.0.1:0"`; the new generator suite passed 3/3 during the same run. The exact focused
+generator command `deno test --allow-read .llm/tools/generate-cli-assets-barrel_test.ts` is green,
+but it is not silently substituted for the stated broad command. No unrelated agentic code or test
+permission semantics were changed. Orchestrator direction is required to authorize either the
+focused generator command or the broad command with `--allow-net` as gate 3.
