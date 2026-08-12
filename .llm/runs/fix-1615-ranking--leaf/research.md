@@ -40,4 +40,3 @@ movement. This is a near-tie. It does not support a new concept weight or a gold
 ## Open questions
 
 - None before implementation. The measured near-tie selects the deterministic tie-break direction.
-

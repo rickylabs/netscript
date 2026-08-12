@@ -131,4 +131,3 @@ movement while preserving meaningful numeric ordering between sections of the sa
 - Any fresh-corpus order or score that differs from the live issue's abbreviated reproduction.
 - Any other guidance fixture movement under the close-score policy.
 - Any lockfile, generated asset, or docs-site change.
-
