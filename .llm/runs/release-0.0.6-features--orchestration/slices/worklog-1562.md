@@ -282,3 +282,20 @@ CLI source was edited, and `e2e:cli` was not run.
 `73be92b116b9065372505157da4f6729176e975aa118e9944746317887e9a4c4` with no Git delta. No Fresh,
 CLI, cache-provider implementation, or cache-telemetry implementation file changed; `e2e:cli` was
 not run.
+
+## Docs-site telemetry export correction
+
+- Separate-session IMPL-EVAL returned **PASS** at `c50e88a5c`; this mechanical follow-up changes no
+  evaluated implementation or package file and did not launch another evaluator.
+- Added individual reference-table entries for all nine cache telemetry exports omitted by the
+  docs site: `CacheAttributes`, `CacheAttributeOptions`, `CacheOperation`, `CacheOperations`,
+  `CacheOutcome`, `CacheOutcomes`, `CacheTier`, `CacheTiers`, and `createCacheAttributes`.
+- The entries preserve the shipped semantics: promotion is an event, tiers/outcomes are bounded,
+  unknowable successful provider topology omits `outcome`, thrown operations emit `error`, and the
+  builder cannot accept a cache key.
+- `deno task quality:gate` exited 0 with the existing dependency/doctrine warning baseline and no
+  failures. At this head that task does not invoke the CI docs checker, so the authoritative focused
+  `deno task docs:accuracy` was also run and exited 0 with `docs accuracy: PASS`; no symbol-drift
+  omission remains.
+- Product-doc delta: `docs/site/reference/telemetry/index.md`. This worklog is the only other changed
+  file. No `packages/` path or `deno.lock` changed.
