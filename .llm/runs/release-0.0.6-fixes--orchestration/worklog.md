@@ -94,3 +94,42 @@ at dispatch, so wave 1 starts with the expensive gate free. Wave 1 (release tool
 expected to need it; wave 2 (E2E) is, and will take it one slice at a time.
 
 **Verdict: preconditions green. Wave 1 cleared for dispatch.**
+
+## 2026-08-12 — Stage C: wave 1 dispatch
+
+Leaf worktrees created off `origin/main@01aa12b67`, one per PR cluster. All four (waves 1 and 2)
+were created up front; only wave 1 is dispatched.
+
+**Git-safety finding at dispatch.** `git worktree add -b <branch> origin/main` sets the new branch's
+upstream to `origin/main`. The launcher's safety check **blocked the first launch attempt**:
+
+```
+FAIL git-safety: {"branch":"fix/1438-release-cut-canary-pair-inheritance","head":"01aa12b67",
+"upstream":"origin/main","dirty":0,"problems":["worktree has upstream 'origin/main' — a bare push
+could corrupt it (push-safety requires NONE; push via explicit refspec)"]}
+```
+
+This is the guard doing its job: a bare `git push` from a slice worktree would have targeted `main`
+directly. Resolved by `git branch --unset-upstream` on all four leaf branches; re-verified
+`upstream: NONE` before launching. Slices push via explicit refspec.
+
+**Launch identity — requested vs observed** (`lane-policy.md` invariant 3: launch identity is data,
+not prose):
+
+| Slice | Worktree | Thread id | Requested | Observed | State |
+| --- | --- | --- | --- | --- | --- |
+| A (#1438+#1430) | `/home/codex/repos/ns006-f-a-release-tooling` | `019ff4ef-8644-7260-9290-79da5586e774` | openai / gpt-5.6-sol / medium | openai / gpt-5.6-sol / medium | working |
+| B (#1417) | `/home/codex/repos/ns006-f-b-dryrun` | `019ff4f0-5c24-7a01-bb58-1d2e69cb0196` | openai / gpt-5.6-sol / medium | openai / gpt-5.6-sol / medium | working |
+
+Requested and observed identity match for both. Launched **attached** through
+`agentic:launch-codex-slice` (app-server thread), never `codex exec` — an unattached one-shot is
+unreachable for follow-up turns and cost an hour in 0.0.4.
+
+One sender per worktree; no rival second send. Steering, when needed, goes through
+`agentic:codex-resume` on the thread id.
+
+**Wave 2 held, deliberately.** PR C (`ns006-f-c-e2e-gates`) and PR D (`ns006-f-d-island`) have
+worktrees and briefs staged but are **not** dispatched. They are independent of wave 1, so this is
+not a dependency hold — the reason is that wave 1 is the first use of this lane's brief format, and
+a defect in the brief is cheaper to fix once than four times. Recorded here so the hold is a
+decision, not a drift.
