@@ -17,7 +17,8 @@ export interface QualityFinding {
 const PLUGIN_NAMES = ['ai', 'auth', 'sagas', 'streams', 'triggers', 'workers'];
 // Root policy: the default `quality:scan` half of `quality:gate` covers CLI
 // host code plus first-party plugins. Package-wide auditing, including the
-// publishable plugin-*-core packages, is the explicit `quality:scan:repo` task.
+// publishable plugin-*-core packages and fitness/quality tool sources, is the
+// explicit `quality:scan:repo` task.
 // The companion `arch:check` independently evaluates every doctrine root.
 const DEFAULT_ROOTS = ['packages/cli/src', 'plugins'];
 const EMPTY_TAINT: Set<string> = new Set();

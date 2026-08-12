@@ -70,3 +70,39 @@ fixtures, not inferred from the final implementation.
 - `deno task quality:scan:repo` — exit **0**, 0 findings, 8 allowances.
 - `deno task gen:assets-barrel` second run — exit **0** and `git status --porcelain` empty;
   generated assets are fresh and idempotent.
+
+## Orchestrator rescope
+
+- R-5 moved from PR-C into PR-B because 36-root discovery and A14 origin-awareness cannot be split.
+- Actual-cli three-origin fixture: imported exit 0, locally bound exit 0, unresolved exit 1 with
+  `FAIL A14`.
+- `deno task arch:check` after R-5 — exit **0** over all 36 roots.
+- Two authorized comment false positives carry temporary #1549 allowances; the PR-owned repo scan
+  allowance census is **8 → 10**.
+- Wrapper scope corrected to `.llm/tools/quality` + `.llm/tools/fitness`; no change to the unrelated
+  formatter residue.
+
+## Final gate evidence after orchestrator decisions
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Fitness + quality tests | PASS, exit 0 | 15 passed, 0 failed; includes 36-root census and the imported/local/unresolved A14 CLI fixture |
+| `deno task arch:check` | PASS, exit 0 | all 36 roots; CLI/database/MCP A14 false positives eliminated by origin resolution |
+| `deno task quality:gate` | PASS, exit 0 | default quality scan followed by the green 36-root doctrine gate |
+| `deno task quality:scan:repo` | PASS, exit 0 | 0 findings, allowCount **10** (base 8 + 2 reversible #1549 comment allowances) |
+| Owned scoped check | PASS, exit 0 | roots `.llm/tools/quality` + `.llm/tools/fitness`, 10 files, 0 diagnostics |
+| Owned scoped lint | PASS, exit 0 | same 10 files, 0 diagnostics |
+| Owned scoped format | PASS, exit 0 | same 10 files, 0 findings |
+| Workflow-equivalent PR scan | PASS, exit 0 | `.llm/tools` files scanned; 0 findings, 2 reported allowances |
+| Workflow sanity | PASS, exit 0 | draft policy 3/3; `code-quality.yml` parses through `@std/yaml` |
+| Asset barrel generation | PASS, exit 0 | generated tool embedding refreshed; final second-run cleanliness checked after commit |
+
+## Final reconcile
+
+- #1403 remains the sole closing issue and has eight index-based evidence entries on draft PR #1570.
+- #1380 is referenced without a closing keyword: box 5's A14 implementation lands here for PR-C to
+  cite and tick; no #1380 checkbox was changed by this lane.
+- #1549 remains open and owns deletion of the two temporary comment allowances when scanner
+  comment-awareness lands.
+- The actionable `plugin-streams-core` 515-line A8 warning remains unchanged in `triage.md`.
+- Draft PR #1570 stays `status:impl`; the orchestrator retains ready/merge authority.

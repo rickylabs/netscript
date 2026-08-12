@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertStringIncludes } from '@std/assert';
 import { join } from '@std/path';
 import { discoverDoctrineRoots } from './check-doctrine.ts';
 
@@ -29,4 +29,44 @@ Deno.test('doctrine root discovery equals the independently enumerated publishab
   assertEquals(actual, expected);
   assertEquals(actual.includes('packages/plugin-streams-core'), true);
   assertEquals(actual.includes('packages/cli/e2e'), false);
+});
+
+Deno.test('A14 distinguishes imported, locally-bound, and unresolved test identifiers', async () => {
+  const fixtureRoot = await Deno.makeTempDir();
+  const tool = join(Deno.cwd(), '.llm/tools/fitness/check-doctrine.ts');
+  const cases = [
+    {
+      name: 'imported',
+      source:
+        "import { describe, it } from '@std/testing/bdd';\ndescribe('suite', () => it('works', () => {}));\n",
+      code: 0,
+    },
+    {
+      name: 'locally-bound',
+      source: "const describe = (value: string) => value;\ndescribe('local helper');\n",
+      code: 0,
+    },
+    {
+      name: 'unresolved',
+      source: "describe('bare global', () => {});\n",
+      code: 1,
+    },
+  ] as const;
+
+  for (const fixture of cases) {
+    const root = join(fixtureRoot, fixture.name);
+    await Deno.mkdir(join(root, 'tests'), { recursive: true });
+    await Deno.writeTextFile(join(root, 'mod.ts'), '/** @module */\nexport const value = true;\n');
+    await Deno.writeTextFile(join(root, 'tests', 'origin_test.ts'), fixture.source);
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: ['run', '--allow-read', tool, '--root', root],
+    }).output();
+    assertEquals(output.code, fixture.code, fixture.name);
+    const stdout = new TextDecoder().decode(output.stdout);
+    if (fixture.name === 'unresolved') {
+      assertStringIncludes(stdout, "FAIL A14: unresolved Jest/Vitest global 'describe'");
+    } else {
+      assertEquals(stdout.includes('FAIL A14'), false, fixture.name);
+    }
+  }
 });

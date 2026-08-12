@@ -42,6 +42,47 @@ export async function discoverDoctrineRoots(repoRoot: string = Deno.cwd()): Prom
   return roots.sort();
 }
 
+/** Lexical origin of a test-global-shaped identifier. */
+export type IdentifierOrigin = 'imported' | 'locally-bound' | 'unresolved';
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function importedBindings(source: string): Set<string> {
+  const bindings = new Set<string>();
+  for (const match of source.matchAll(/^\s*import\s+([\s\S]*?)\s+from\s+['"][^'"]+['"]\s*;?/gm)) {
+    const clause = match[1].trim().replace(/^type\s+/, '');
+    const named = clause.match(/\{([\s\S]*?)\}/)?.[1];
+    if (named) {
+      for (const item of named.split(',')) {
+        const names = item.trim().replace(/^type\s+/, '').split(/\s+as\s+/);
+        const local = names.at(-1)?.trim();
+        if (local) bindings.add(local);
+      }
+    }
+    const namespace = clause.match(/\*\s+as\s+([A-Za-z_$][\w$]*)/);
+    if (namespace) bindings.add(namespace[1]);
+    const defaultBinding = clause.match(/^([A-Za-z_$][\w$]*)\s*(?:,|$)/);
+    if (defaultBinding) bindings.add(defaultBinding[1]);
+  }
+  return bindings;
+}
+
+/** Resolves an identifier using imports and file-local lexical declarations. */
+export function resolveIdentifierOrigin(source: string, identifier: string): IdentifierOrigin {
+  if (importedBindings(source).has(identifier)) return 'imported';
+
+  const escaped = escapeRegExp(identifier);
+  const declaration = new RegExp(
+    `\\b(?:const|let|var|function|class)\\s+${escaped}\\b`,
+  );
+  const parameter = new RegExp(
+    `(?:function\\s*[A-Za-z_$]*[\\w$]*\\s*)?\\([^)]*\\b${escaped}\\b[^)]*\\)\\s*(?:=>|\\{)`,
+  );
+  return declaration.test(source) || parameter.test(source) ? 'locally-bound' : 'unresolved';
+}
+
 async function main(): Promise<void> {
   const args = parseArgs(Deno.args, {
     string: ['root', 'out'],
@@ -166,7 +207,7 @@ async function main(): Promise<void> {
 
   // ─────────────────────────────────────────────────────────────────────────
   // A4 — Base classes are stub-only contracts
-  // Heuristic: any `export abstract class` MUST declare ≥ 1 abstract member, and
+  // Heuristic: any `export abstract class` MUST declare ≥ 1 abstract member, and // quality-allow: scanner matches the English word in a comment, not a TypeScript any; durable comment-awareness fix #1549
   // concrete implementations MUST live in a sibling `*.default.ts` or `*.impl.ts`
   // rather than the base file. An abstract member is an abstract method, an
   // abstract accessor, OR an `abstract readonly` identity field — doctrine file
@@ -234,7 +275,7 @@ async function main(): Promise<void> {
   // ─────────────────────────────────────────────────────────────────────────
   // A5 — Composition over inheritance.
   // AP-5 / F-4: deep inheritance.
-  // Heuristic: any class chain ≥ 3 deep (extends Foo extends Bar) flagged.
+  // Heuristic: any class chain ≥ 3 deep (extends Foo extends Bar) flagged. // quality-allow: scanner matches the English word in a comment, not a TypeScript any; durable comment-awareness fix #1549
   // ─────────────────────────────────────────────────────────────────────────
   // Approximated: count chains that say `extends X` where X also extends Y in same package.
   const extendsMap = new Map<string, string>();
@@ -426,7 +467,7 @@ async function main(): Promise<void> {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // A14 — Tests preserve doctrine. Detect Jest leftovers / forbidden patterns.
+  // A14 — Tests preserve doctrine. Detect unresolved Jest/Vitest globals.
   // ─────────────────────────────────────────────────────────────────────────
   const testFiles: string[] = [];
   for await (
@@ -440,12 +481,17 @@ async function main(): Promise<void> {
     // Match only *bare* Jest/Vitest globals, never method invocations: a leading
     // `.` or word char means it is a method call (e.g. the `defineAiTool(...)
     // .describe(...)` fluent tool builder), not a forbidden test global.
-    if (/(?<![.\w])(?:describe|it|expect|jest|vitest)\s*\(/.test(text)) {
+    const unresolved = [...text.matchAll(/(?<![.\w])(describe|it|expect|jest|vitest)\s*\(/g)]
+      .find((match) => resolveIdentifierOrigin(text, match[1]) === 'unresolved');
+    if (unresolved) {
       findings.push({
         ref: 'A14',
         level: 'FAIL',
-        message: 'Jest/Vitest globals (describe/it/expect) — only Deno.test allowed',
+        message: `unresolved Jest/Vitest global '${
+          unresolved[1]
+        }' — import a sanctioned binding or use Deno.test`,
         path: relative(ROOT, f),
+        line: text.slice(0, unresolved.index).split(/\r?\n/).length,
       });
     }
     if (

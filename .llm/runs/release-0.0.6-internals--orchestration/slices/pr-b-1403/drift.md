@@ -33,3 +33,25 @@ because the repaired gate scans the changed tool file. C6 forbids fixing surface
 and the boundaries forbid allowance comments, so both are recorded in `triage.md` without a fix.
 This is evidence that C4 is no longer silently green, but it also prevents the workflow job from
 being green at this head.
+
+## D-4 — orchestrator resolution: R-5 moves from PR-C to PR-B
+
+The orchestrator confirmed D-1 was a plan-ordering defect. The 36-root transition and A14
+origin-awareness are a matched pair, so R-5 now lands in PR-B. `resolveIdentifierOrigin()` performs
+lexical import and local-binding collection and returns `imported | locally-bound | unresolved`;
+A14 fires only on `unresolved`. One test exercises all three origins through the actual CLI, with a
+synthetic unresolved fixture that exits 1. `deno task arch:check` now exits 0 across all 36 roots.
+#1380 remains open; its box 5 implementation is provided here for PR-C to cite and tick.
+
+## D-5 — orchestrator resolution: temporary #1549 allowances
+
+D-3's two comment false positives receive exactly two per-line `quality-allow:` comments. Each
+reason says the scanner matched an English comment word rather than TypeScript `any` and routes the
+durable comment-awareness fix to #1549. The PR-owned repo scan allowance count rises **8 → 10**;
+both additions are designed to be deleted by #1549.
+
+## D-6 — orchestrator correction: wrapper scope is the owned tool trees
+
+The brief's `.llm/tools` wrapper root was too broad. Final wrapper evidence uses only
+`.llm/tools/quality` and `.llm/tools/fitness`; the pre-existing unformatted
+`.llm/tools/harness/extract-verdict.ts` remains untouched and outside PR-B.

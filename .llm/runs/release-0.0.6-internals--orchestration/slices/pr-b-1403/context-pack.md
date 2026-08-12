@@ -17,11 +17,19 @@
 - The PR selector includes `packages`, `plugins`, and `.llm/tools`, reports empty explicitly, and
   diffs `BASE...HEAD`.
 - Findings are triaged only; package/plugin source is out of scope.
-- `triage.md` records 3 surfaced findings: 1 actionable `plugin-streams-core` doctrine warning and
-  2 changed-tool scanner false positives in existing comments. The focused package quality scan is
-  green with zero findings and zero allowances.
+- `triage.md` records 1 actionable `plugin-streams-core` doctrine warning plus a 2-entry temporary
+  #1549 allowance register for changed-tool comment false positives. The focused package quality
+  scan is green with zero findings and zero allowances.
+
+## Orchestrator decisions applied
+
+- R-5 moved into PR-B. A14 is lexical-origin-aware and retains a synthetic unresolved RED case.
+- The two tool-comment false positives now have reversible #1549 per-line allowances; current
+  triage is 1 actionable package finding plus a 2-entry temporary allowance register.
+- Final wrapper roots are the owned `.llm/tools/quality` and `.llm/tools/fitness` trees.
 
 ## Next
 
-Implement B1/B2/B3, run slice gates, update these artifacts in the same commits, push, and comment
-on draft PR #1570 after each slice.
+Commit and push the resolved B1–B3 implementation with generated assets, rerun the final-head
+idempotence/status check, and update draft PR #1570. The orchestrator then re-syncs against main and
+owns the ready transition plus separate-session IMPL-EVAL.
