@@ -12,8 +12,8 @@
 
 ## Current State
 
-Slices 1 and 2 are committed, pushed, and commented. Slice 3 is green locally and awaiting its
-commit/push/comment boundary. The PR remains draft at `status:impl`.
+Slices 1–3 are committed, pushed, and commented. Slice 4 and the complete final gate set are green
+locally and awaiting the final commit/push/comment boundary. The PR remains draft at `status:impl`.
 
 ## Completed
 
@@ -33,16 +33,20 @@ commit/push/comment boundary. The PR remains draft at `status:impl`.
 - Exact public-entrypoint synthetic compiler committed as `5c828856b`.
 - Real Tier-1 gate is green at the exact 35/21/14 census; the 14 structural markers and barrel fix
   are applied, and the accuracy checker is demoted only where planned.
+- Pages watches package/plugin/tooling/config changes in both trigger arms and runs the snippet gate
+  before Lume; its structural assertion passes in the focused and root suites.
+- Final repo suite: 3,193 passed (617 steps), 0 failed, 17 ignored. All three raw negative controls
+  exit 1 with source-fence diagnostics. Tracked `deno.lock` is clean.
 
 ## In Progress
 
-- Slice 3 commit/push/comment boundary.
+- Slice 4 commit/push/comment boundary and acceptance/PR evidence update.
 
 ## Next Steps
 
-1. Commit/push/comment Slice 3.
-2. Implement the Pages trigger/step and unconditional workflow test in Slice 4.
-3. Run the final scoped/docs/test gates and all three raw red controls, then stop for IMPL-EVAL.
+1. Commit and explicitly push Slice 4; comment the final implementation evidence.
+2. Mirror only completed #1374 acceptance boxes with evidence and update the draft PR body.
+3. Stop for a fresh opposite-family IMPL-EVAL; do not mark ready or merge.
 
 ## Key Decisions
 
@@ -61,8 +65,8 @@ commit/push/comment boundary. The PR remains draft at `status:impl`.
 | --- | --- | --- |
 | S1 extractor/marker/census | COMMITTED | `b1129dd7b`; focused tests and scoped wrappers green; empty-reason raw exit 1 naming `page.md:1`. |
 | S2 compiler/import resolution | COMMITTED | `5c828856b`; focused tests/scoped wrappers green; raw export and dialect controls exit 1 with mapped source fences. |
-| S3 Tier-1/accuracy/coverage | COMPLETE_LOCAL | Exact census green; docs accuracy/links and scoped wrappers green; focused suite 8/8. |
-| S4 Pages/final gates | PENDING | — |
+| S3 Tier-1/accuracy/coverage | COMMITTED | `983cf3464`; exact census, docs accuracy/links, scoped wrappers, and focused suite green. |
+| S4 Pages/final gates | COMPLETE_LOCAL | Focused 9/9; final green/docs/scoped gates; three raw exit-1 controls; repository suite 3,193/0. |
 
 ## Files Changed
 
@@ -81,7 +85,7 @@ commit/push/comment boundary. The PR remains draft at `status:impl`.
 | --- | --- | --- |
 | Plan-Gate cycle 1 | `FAIL_PLAN` | Four blocking and four non-blocking findings returned; revised without implementation. |
 | Plan-Gate cycle 2 | PASS | Fresh opposite-family session; cycle-1 fixes verified by execution. |
-| Static/fitness/consumer | PASS through S3 | Scoped wrappers, snippets, accuracy, links, and focused tests green. |
+| Static/fitness/consumer | PASS through S4 | All requested gates green; three required negative controls red. |
 | Runtime | N/A | Compilation-only slice. |
 
 ## Open Questions
@@ -99,3 +103,4 @@ None.
 - `ef64ea55c` — mandatory D2 plan amendment.
 - `b1129dd7b` — extractor/marker/census contract.
 - `5c828856b` — public-entrypoint synthetic compiler.
+- `983cf3464` — Tier-1 docs floor, expansion plan, and accuracy demotion.

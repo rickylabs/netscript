@@ -86,6 +86,7 @@ focused negative controls before the repo suite.
 | 2026-08-12 | Slice 1 | Extractor contract | Added stable source/fence provenance, backtick/tilde parsing, `ts`/`tsx`/`typescript` recognition, exact reason markers, bidirectional coverage floors, the real-corpus census test, and the empty-reason CLI fixture. |
 | 2026-08-12 | Slice 2 | Compiler contract | Added exact public-export resolution, canonicalized root/member imports, root-catalog fallback and copied catalog, disposable copied-lock compilation, page-isolated modules, typed query support, and real export/dialect controls. |
 | 2026-08-12 | Slice 3 | Tier-1 and demotion | Applied 14 structural reasons, fixed the barrel binding, compiled 21 fences, wrote the five-wave ratchet, retained vocabulary/Fresh/export guards, and removed only the named positive needles. |
+| 2026-08-12 | Slice 4 | Pages and final gates | Added both package/plugin trigger arms, the root snippet step before Lume, an unconditional structural workflow test, three raw red exits, and a green 3,193-test repository verdict. |
 
 ## Decisions
 
@@ -185,10 +186,37 @@ kind, all golden-path forbidden aliases/CSS-client claims, exact one-page
 `createServiceQueryUtils` containment, the five mutation-map columns, site-wide Fresh-root imports,
 and the unchanged export-drift subprocess. Only the named positive API/presence needles were removed.
 
+### Slice 4 — Pages trigger and final gate set
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Pages workflow contract | PASS | `pages-workflow_test.ts` structurally parses both event path lists and build steps; both arms include docs/package/plugin/tool/config paths, and root `docs:snippets` precedes the `docs/site` Lume build. |
+| Focused snippet/workflow tests | PASS | `deno task docs:snippets:test`: 9 passed, 0 failed. |
+| Scoped type-check | PASS | Wrapper selected 22 docs-tool TS files; 0 diagnostics; exit 0. |
+| Scoped lint | PASS | Wrapper selected 22 docs-tool TS files; 0 findings; exit 0. |
+| Scoped format | PASS | Wrapper selected 22 docs-tool TS files; 0 findings; exit 0. |
+| Docs links | PASS | Exit 0; 102 docs, 0 broken links, 0 broken anchors. |
+| Docs accuracy | PASS | Exit 0; textual policies and export drift green. |
+| Tier-1 snippet gate | PASS | Exit 0; exact census `578/211/77/7/295/35/21/14/260/0`; all 14 exemption reasons printed. |
+| Raw empty-reason control | EXPECTED_RED | Exit 1; `page.md:1: malformed ts fence: expected no-check:<nonblank reason>`. |
+| Raw non-exported-symbol control | EXPECTED_RED | Exit 1; source fence `page.md:1`; TS2305 names `DefinitelyNotExportedByNetScript`. |
+| Raw dialect-A wrong-shape control | EXPECTED_RED | Exit 1; source fence `page.md:1`; TS2353 names the unsupported `input` property. |
+| Repository suite | PASS | `deno task test`: 3,193 passed (617 steps), 0 failed, 17 ignored; exit 0 in 3m13s. |
+| Lock hygiene | PASS | The full gate set left tracked `deno.lock` clean. |
+
+Final review: `.github/workflows/pages.yml` owns the compile step and both package/plugin trigger
+arms; `.github/workflows/ci.yml` is deliberately unchanged and retains its existing accuracy job.
+The structural assertion is part of both `docs:snippets:test` and root test discovery. Generated
+modules remain temporary and compilation-only. No service, network validation, or E2E CLI suite was
+run; those are outside this slice and the brief explicitly excludes `e2e:cli`.
+
+Reconcile: PR #1537 remains draft at `status:impl` with `Closes #1374`, milestone `0.0.6`, and the
+required type/area/priority labels. No reviewer comment altered scope. Phase 2 is complete locally;
+the next authority is a fresh opposite-family IMPL-EVAL session.
+
 ## Handoff Notes
 
-- Slice 3 applies the 14 structural markers, fixes the barrel binding, compiles the real Tier-1
-  floor through the checked support modules, writes the expansion ratchet, and demotes only the
-  named positive `docs:accuracy` assertions. Complete in commit pending at this boundary.
-- Slice 4 adds both Pages trigger arms, the snippet step before Lume, and the unconditional
-  structural workflow test before the final full gate set.
+- Phase 2 is complete after the Slice-4 commit/push/comment boundary.
+- IMPL-EVAL must run in a fresh opposite-family session and should independently rerun the green
+  gate, all three raw red controls, the workflow mutation assertion, and lock-hygiene check.
+- Keep the PR draft; the implementation agent does not mark ready or merge.
