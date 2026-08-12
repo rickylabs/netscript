@@ -28,3 +28,23 @@ Drift is append-only.
 - **Observed:** the mutation-family count was 18, and the workflow assertion was conditional.
 - **Disposition:** correct the count and make the structural `pages.yml` assertion unconditional
   in slice 4.
+
+## 2026-08-12 — PLAN-EVAL cycle 2 mandatory D2 amendments
+
+- **Severity:** non-blocking implementation amendment required before slice 2; PLAN-EVAL verdict is
+  `PASS`.
+- **Observed:** materialized top-level imports do not satisfy `"catalog:"` inside member configs
+  auto-discovered through file-URL workspace source. Without a root `catalog` section in the
+  synthetic config, every input exits 1 with `Package 'zod' not found in catalog` before type-check.
+- **Disposition:** copy the root catalog (38 entries at evaluation) verbatim into the synthetic
+  config. The evaluator's identical green control then exits 0.
+- **Observed:** literal merge comparison reports 40 false conflicts because root major shorthand
+  such as `jsr:@std/assert@1` is Deno-equivalent to member `jsr:@std/assert@^1`.
+- **Disposition:** compare canonicalized package/version requirements. Current canonicalized
+  declared-import conflicts and declared-versus-catalog conflicts are both zero. Both checks remain
+  fail-closed config guards: a future conflict makes the build red; neither is claimed as a current
+  negative-test predicate.
+- **Known ratchet window:** the three removed positive needles on
+  `docs/site/reference/sdk/index.md` are not compiler-covered until reference wave 4. Exact
+  one-page `createServiceQueryUtils` containment continues to block the wrong dialect on all
+  golden-path pages; only positive presence on the sanctioned page is deferred.

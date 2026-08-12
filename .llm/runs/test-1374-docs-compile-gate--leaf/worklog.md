@@ -82,6 +82,7 @@ focused negative controls before the repo suite.
 | 2026-08-12 | Phase 1 | Original Plan & Design | Cycle-1 submission locked 35 Tier-1 = 18 checked + 17 exempt; superseded after evaluator probes. |
 | 2026-08-12 | PLAN-EVAL cycle 1 | `FAIL_PLAN` | Opposite-family evaluator built and ran D2, confirmed four blocking defects and four non-blocking gaps; no implementation started. |
 | 2026-08-12 | Phase 1 revision | Plan & Design | D2 now uses a copied temporary lock without `--frozen` plus root-catalog fallback; containment/Fresh guards remain; `typescript` is covered; the barrel bug and two island examples move to checked. Revised floor is 35 = 21 checked + 14 exempt. |
+| 2026-08-12 | PLAN-EVAL cycle 2 | `PASS` | Fresh opposite-family session verified every cycle-1 fix by execution. Two mandatory additive D2 mechanics were recorded before implementation: carry the root catalog section and canonicalize equivalent import ranges. |
 
 ## Decisions
 
@@ -109,6 +110,7 @@ focused negative controls before the repo suite.
 | Branch/base/raw status | PASS | Branch and both HEAD/base at `01aa12b67`; only run-dir files are new. |
 | Fence census | PASS | 578 total; 288 `ts`/`tsx` plus 7 `typescript`; Tier-1 35. Read-only research command. |
 | PLAN-EVAL cycle 1 | `FAIL_PLAN` | Four blocking and four non-blocking findings; all addressed in the revised plan artifacts. |
+| PLAN-EVAL cycle 2 | PASS | No blocking findings; implementation authorized after the mandatory pre-slice-2 amendments. |
 | Implementation gates | NOT_RUN | Correctly deferred until separate PLAN-EVAL `PASS`. |
 
 ## Handoff Notes

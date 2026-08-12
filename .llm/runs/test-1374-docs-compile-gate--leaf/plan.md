@@ -94,17 +94,26 @@ an explicit marker; it cannot silently legalize a fragment.
 - Resolve targets to absolute file URLs for the declared entrypoint files. Do not add a package
   prefix mapping and do not expose undeclared files.
 - Merge declared external imports from the root/member configs, resolving member `catalog:` values
-  through the root npm catalog and failing on conflicting mappings. Also materialize every root
-  catalog entry that has no declared-import mapping as `<catalog-key>` →
+  through the root npm catalog and comparing canonicalized package/version requirements before
+  failing on conflicts. Deno-equivalent range spellings such as `jsr:@std/assert@1` and
+  `jsr:@std/assert@^1` are the same mapping; literal spelling differences are not conflicts. Also
+  materialize every root catalog entry that has no declared-import mapping as `<catalog-key>` →
   `npm:<catalog-key>@<catalog-range>`. This catalog-fallback pass is mandatory: bare imports such as
   `@opentelemetry/api` can be reachable through `@netscript/sdk` while appearing in no `imports`
   block. A declared import and catalog fallback for the same key must canonicalize to the same npm
-  package/range or configuration fails; no silent precedence is allowed.
+  package/range or configuration fails; no silent precedence is allowed. Against the current root
+  plus 37 members, canonicalized declared-import comparison yields zero conflicts (literal
+  comparison would yield 40), and declared-versus-catalog comparison also yields zero. These are
+  intentionally fail-closed configuration guards: even though neither fires on today's repo, a
+  future real conflict stops config construction loudly instead of letting an unchecked graph pass.
 - Add only the named, typed support aliases (`@database/zod`, `@playground/contracts`,
   `@my-app/contracts`, `@app/utils.ts`, `@app/lib/contacts.ts`) and exact Preact JSX runtime
   mappings required by Tier-1 examples.
 
-The generated config keeps `strict`, `noImplicitAny`, and `noImplicitReturns`; sets
+The generated config copies the root `catalog` section (currently 38 entries) verbatim so Deno's
+auto-discovered member configs can resolve their own `"catalog:"` imports while their workspace
+source is reached through file-URL exports. Top-level import-map entries do not replace this config
+section. The config also keeps `strict`, `noImplicitAny`, and `noImplicitReturns`; sets
 `isolatedDeclarations: false` because examples are consumers rather than publishable declarations;
 and selects Preact `jsx: precompile`. Before every check, copy the repository `deno.lock` to
 `<temp>/deno.lock`. The subprocess is:
@@ -279,6 +288,14 @@ ratchet waves; each wave lowers `outside_floor` and records checked/exempt delta
 Each expansion PR must add pages to the checked-in coverage policy, make every new unmarked block
 green, add reason markers only for deliberate fragments, lower the outside-floor count, and never
 increase the exemption baseline without an explicit reviewer-approved rationale.
+
+The coverage document must name one deliberate window until wave 4: removing the three positive
+reference-page needles (`queryOptions({ input })`, `queryOptions(input)`, `no server KV tier`)
+means their sanctioned-page presence is not compiler-covered while
+`docs/site/reference/sdk/index.md` remains outside the day-one floor. The retained exact one-page
+`createServiceQueryUtils` containment still blocks dialect B on every golden-path page; only positive
+presence on the one sanctioned reference page is deferred, avoiding continuation of the
+false-green needle class this issue removes.
 
 **Reason.** Section-sized ratchets keep fixtures coherent and make coverage movement auditable;
 tutorials and references have distinct owners and failure shapes.

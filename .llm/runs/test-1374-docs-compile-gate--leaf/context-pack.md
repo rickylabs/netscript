@@ -6,15 +6,14 @@
 | --- | --- |
 | Run ID | `test-1374-docs-compile-gate--leaf` |
 | Branch | `test/1374-docs-snippet-compile-gate` |
-| Current phase | `plan-eval` cycle 2 (cycle 1 `FAIL_PLAN` remediated) |
+| Current phase | `implement` (PLAN-EVAL cycle 2 `PASS`) |
 | Archetype | N/A — internal docs tooling |
 | Scope overlays | `SCOPE-docs` |
 
 ## Current State
 
-Phase 1 research and the cycle-1-remediated plan are ready for a second separate native
-Claude/Fable 5 medium PLAN-EVAL. Implementation has not started and is forbidden until this thread
-is resumed with `PASS`.
+PLAN-EVAL cycle 2 returned `PASS`. The two mandatory additive D2 amendments are recorded before
+slice 2; phase 2 may now implement slices 1–4 in order.
 
 ## Completed
 
@@ -26,21 +25,21 @@ is resumed with `PASS`.
   candidates.
 - Current accuracy/export-drift checker and Pages/core-CI wiring research.
 - PLAN-EVAL cycle 1 concrete probes recorded and all eight findings dispositioned in the plan.
+- PLAN-EVAL cycle 2 verified those fixes by execution and returned `PASS`; root-catalog config
+  copying and canonicalized merge comparison are mandatory implementation details.
 - Revised locked plan: 21 Tier-1 checked, 14 reason-marked exemptions, 260 TS-like blocks outside
   the floor.
 
 ## In Progress
 
-- PLAN-EVAL cycle 2, followed by implementation only if it returns `PASS`.
+- Slice 1 implementation.
 
 ## Next Steps
 
-1. Separate-session Claude/Fable 5 medium re-evaluates the revised plan, especially the copied
-   temporary lock/catalog recipe, bidirectional census floor, retained string guards, and 21/14
-   disposition.
-2. Evaluator writes `plan-eval.md` with `PASS` or `FAIL_PLAN` and posts the PLAN-EVAL phase comment.
-3. Only after orchestrator resumes this same thread with `PASS`: switch `status:plan` to
-   `status:impl` and implement slices 1–4 in order.
+1. Commit/push the mandatory D2/drift amendment without implementation code.
+2. Switch PR #1537 to `status:impl` and implement slices 1–4 in order.
+3. After every slice: run its named gate, commit, push explicit refspec, comment the PR, and perform
+   the reconcile sweep.
 
 ## Key Decisions
 
@@ -69,7 +68,7 @@ is resumed with `PASS`.
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Plan-Gate cycle 1 | `FAIL_PLAN` | Four blocking and four non-blocking findings returned; revised without implementation. |
-| Plan-Gate cycle 2 | PENDING | Separate-session evaluation required. |
+| Plan-Gate cycle 2 | PASS | Fresh opposite-family session; cycle-1 fixes verified by execution. |
 | Static/fitness/consumer | NOT_RUN | Implementation has not begun. |
 | Runtime | N/A | Compilation-only slice. |
 
