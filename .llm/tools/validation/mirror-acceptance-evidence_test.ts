@@ -1,6 +1,28 @@
 import { assertEquals } from 'jsr:@std/assert@1';
 import type { AcceptanceEvidence } from './acceptance-evidence.ts';
-import { type MirrorClient, mirrorIssue } from './mirror-acceptance-evidence.ts';
+import {
+  closingMirrorIssues,
+  type MirrorClient,
+  mirrorIssue,
+} from './mirror-acceptance-evidence.ts';
+
+Deno.test('mirror excludes classified pull requests and retains lookup failures', () => {
+  assertEquals(
+    closingMirrorIssues([1415, 1431, 1432], new Map([
+      [1415, 'issue'],
+      [1431, 'pull request'],
+      [1432, 'lookup failed'],
+    ])),
+    {
+      issues: [1415, 1432],
+      notices: [
+        'Closing reference #1415 classified as issue; retained for acceptance mirroring.',
+        'Closing reference #1431 classified as pull request; excluded from acceptance mirroring.',
+        'Closing reference #1432 classification lookup failed; retained for acceptance mirroring.',
+      ],
+    },
+  );
+});
 
 Deno.test('mirror retries once from a live body after a mid-air edit', async () => {
   let body = '## Acceptance\n- [ ] criterion';

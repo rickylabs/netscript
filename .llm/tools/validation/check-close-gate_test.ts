@@ -50,6 +50,26 @@ Deno.test('body-keyword-only closing behavior is unchanged without external refe
   ]);
 });
 
+Deno.test('regex-derived pull requests are excluded with visible classification', () => {
+  assertEquals(
+    resolveClosingIssueReferences([], 'Closes #1415\nFixes #1431', [], new Map([
+      [1415, 'issue'],
+      [1431, 'pull request'],
+    ])),
+    [
+      { issue: 1415, sources: ['body keyword'], classification: 'issue' },
+      { issue: 1431, sources: ['body keyword'], classification: 'pull request', excluded: true },
+    ],
+  );
+});
+
+Deno.test('failed regex-reference lookup is retained and visibly uncertain', () => {
+  assertEquals(
+    resolveClosingIssueReferences([], 'Closes #1415', [], new Map([[1415, 'lookup failed']])),
+    [{ issue: 1415, sources: ['body keyword'], classification: 'lookup failed' }],
+  );
+});
+
 Deno.test('closing-keyword prose inside acceptance-evidence fences is ignored', () => {
   assertEquals(
     resolveClosingIssueReferences(
