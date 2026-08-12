@@ -6,16 +6,16 @@
 | --- | --- |
 | Run ID | `fix-1629-cut-version-derived-tests--w7` |
 | Branch | `fix/1629-cut-version-derived-tests` |
-| Current phase | `implement` |
+| Current phase | `draft handoff` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `none` |
 
 ## Current State
 
-The arbitrary 0.0.7 bumped-copy discriminator is captured. Version-bearing diagnostic assertions
-derive from `NETSCRIPT_RELEASE_VERSION`. Cut-local workspace mapping derives all first-party export
-aliases from manifests, carries root catalog/imports, and fails on missing targets. All 34 targeted
-tests (55 steps) pass.
+Version-bearing diagnostic assertions derive from `NETSCRIPT_RELEASE_VERSION`. Cut-local workspace
+mapping derives all first-party export aliases from manifests, carries root catalog/imports, and
+fails on missing targets. Final gates are green, including a fresh disposable 0.0.7 release-cut
+dry-run and full 3386-test suite with zero failures.
 
 ## Completed
 
@@ -23,17 +23,18 @@ tests (55 steps) pass.
 - Issue #1629 and requested baseline verified.
 - Research, plan, and design recorded; PLAN-EVAL justified N/A.
 - Pre-fix arbitrary-bump failures recorded and version assertions corrected.
+- All cut-local plugin install fixtures use the shared manifest-derived workspace mapper.
+- Requested gates and the final disposable 0.0.7 proof passed.
 
 ## In Progress
 
-- Full requested gates and disposable post-fix 0.0.7 proof.
+- Final evidence commit, PR body, and acceptance mirror validation.
 
 ## Next Steps
 
-1. Open the draft PR with required taxonomy/milestone/evidence mappings.
-2. Add and run discriminating tests against the baseline to capture red evidence.
-3. Implement the two bounded fixes and run targeted/full gates.
-4. Run the disposable 0.0.7 proof, finalize the draft, and stop.
+1. Commit and push final evidence.
+2. Update the draft PR body and validate acceptance mappings.
+3. Stop without changing draft state or labels.
 
 ## Key Decisions
 
@@ -46,16 +47,19 @@ tests (55 steps) pass.
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/fix-1629-cut-version-derived-tests--w7/` | new | Harness bootstrap artifacts. |
+| `.llm/runs/fix-1629-cut-version-derived-tests--w7/` | modified | Harness evidence and handoff artifacts. |
+| `packages/cli/**/_test.ts` | modified | Active-version-derived closure expectations and cut-local install probes. |
+| `packages/cli/tests/support/local-workspace-imports.ts` | new | Test-only manifest-derived local import mapper with fail-closed target validation. |
+| `plugins/ai/tests/adapter/no-samples-install_test.ts` | modified | Applies local imports before install-time project config loading. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | not run | implementation pending |
-| Fitness | planned | `quality:gate` required |
+| Static | PASS | check/lint/fmt and focused CLI check |
+| Fitness | PASS | `quality:gate` exit 0 |
 | Runtime | N/A | no runtime command/service behavior change |
-| Consumer | planned | plugin install probes + disposable release rehearsal |
+| Consumer | PASS | targeted installs + disposable 0.0.7 full test |
 
 ## Open Questions
 

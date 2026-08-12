@@ -62,6 +62,8 @@ cut-local fixture helper only for tests that intentionally exercise pre-publish 
 | 2026-08-13 | 1 | research/design | Re-baselined issue against requested base; PLAN-EVAL N/A because the issue fully enumerates contract, exclusions, discriminators, and gates. |
 | 2026-08-13 | 2 | red/green | Disposable 0.0.7 bump produced six literal-version assertion failures; all now interpolate `NETSCRIPT_RELEASE_VERSION`. |
 | 2026-08-13 | 3 | red/green | Temporary cut projects now import every real first-party manifest export from the checkout and inherit root catalog/imports; 34 targeted tests/55 steps pass. |
+| 2026-08-13 | 3 | decisive correction | First disposable full run exposed the standalone AI `--no-samples` fixture applying local aliases too late; moved the shared mapper before install and its focused test passed. |
+| 2026-08-13 | 4 | gates/proof | Final static, lint, format, quality, and focused CLI checks passed. A fresh disposable 0.0.7 cut dry-run and full suite passed 3386/3386 tests. |
 
 ## Decisions
 
@@ -80,8 +82,17 @@ cut-local fixture helper only for tests that intentionally exercise pre-publish 
 
 ## Gate Results
 
-Pending implementation.
+| Gate | Result |
+| --- | --- |
+| `deno task check` | PASS — 2917 files, 25 batches, 0 diagnostics |
+| `deno task test` | PASS — 3386 tests, 624 steps, 0 failed, 17 ignored |
+| `deno task lint` | PASS — 2034 files, 0 findings |
+| `deno task fmt:check` | PASS — 2034 files, 0 findings |
+| `deno task quality:gate` | PASS — no quality findings; architecture gate exited 0 |
+| focused `packages/cli` check | PASS — 878 files, 8 batches, 0 diagnostics |
+| disposable 0.0.7 cut + full test | PASS — dry-run skipped branch/commit/push/PR; 3386 tests, 0 failed |
 
 ## Handoff Notes
 
 - Inspect strictness preservation and the disposable 0.0.7 full-test evidence first.
+- Keep PR #1630 draft; the owner alone triggers automatic IMPL-EVAL by moving it ready.
