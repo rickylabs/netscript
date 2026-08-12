@@ -1688,3 +1688,59 @@ middle one self-describes as "a workflow failure, not a task verdict".
    rather than a guess.
 
 No code, plan, or evidence defect is implicated in any of the three.
+
+## D-50 — PR-G / #1612 dispatched: `main` red on the published-JSDoc codename guard
+
+New leaf taken after lane closeout, on owner instruction. **PLAN-EVAL: N/A** — a single-line prose fix against a
+deterministic guard; recording the waiver here rather than running ceremony.
+
+**Verified independently before briefing**, on current `main` `6aee2b414`:
+
+```text
+deno test --allow-all .llm/tools/fitness/check-public-jsdoc-codenames_test.ts
+  Error: Published JSDoc contains internal codenames:
+  packages/cli/.../netscript-web-runtime-closure.ts:6 #1589
+  FAILED | 3 passed | 1 failed
+```
+
+**The sweep, done by the orchestrator so the brief is not a discovery exercise.** The guard only scans published
+*entrypoint closures*, so an occurrence in a file outside one is latent — real but not yet caught. I applied the
+guard's own `INTERNAL_CODENAME` class to **every** `.ts`/`.tsx` under `packages` and `plugins` with closure
+membership ignored:
+
+```text
+repo-wide JSDoc findings (guard class, closure-membership ignored): 1
+  packages/cli/.../netscript-web-runtime-closure.ts:6  #1589
+```
+
+**Exactly one occurrence repo-wide**, and no latent ones. Acceptance box 3 is therefore satisfiable by evidence
+rather than by assertion, and the leaf's scope is genuinely one line.
+
+**Two decisions recorded in the brief, both about not defeating the guard.**
+
+1. A backticked `` `#1589` `` *would* pass, because the scanner strips inline code spans before matching. That is
+   forbidden here: it keeps an unresolvable internal pointer in published JSR output while satisfying the letter
+   of the guard. The fix is the mechanism reword with no issue reference in the published comment.
+2. The reword must introduce **no new factual claim**. The comment already states the full reason in the
+   preceding sentence (fresh-ui's SDK imports are limited to desktop/auto-update, which import no cache or query
+   modules, and it imports no Fresh runtime), so `in #1589` is a dangling pointer on a complete explanation.
+   Guard-clean but factually wrong published JSDoc would be a worse outcome than the current red, so the brief
+   instructs escalate-and-stop if the implementer thinks the mechanism differs.
+
+**Launch safety catch worth keeping.** `launch-codex-slice` refused the first attempt:
+
+```text
+FAIL git-safety: worktree has upstream 'origin/main' — a bare push could corrupt it
+                 (push-safety requires NONE; push via explicit refspec)
+```
+
+`git worktree add -b <branch> origin/main` sets the new branch to **track `origin/main`**, so a bare `git push`
+from the slice would have targeted `main` directly. Unset with `git branch --unset-upstream` before launch. This
+is a real hazard the launcher caught for me, not a formality — and it argues for creating leaf branches with the
+upstream explicitly unset as a standing step.
+
+**Impl-eval decision deferred, with its condition stated in advance:** an `impl-eval:skip` is defensible for a
+one-line prose change proven by a deterministic guard plus an exhaustive sweep — but only if the delivered wording
+adds no claim beyond what the surrounding comment and this file's code already support, which the orchestrator can
+verify directly at slice review. If the implementer introduces a new mechanism claim, the automatic evaluation
+runs instead. Deciding after reading the diff, not before.
