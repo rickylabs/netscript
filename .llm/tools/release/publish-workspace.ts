@@ -44,6 +44,7 @@ const JSR_SCOPE = '@netscript/';
 const JSR_LINK_BLOCK_START = '<!-- jsr-links:start -->';
 const JSR_LINK_BLOCK_END = '<!-- jsr-links:end -->';
 const THROWAWAY_PREFIX = 'netscript-publish-dry-run-';
+const PUBLISH_WORKTREE_PREFIX = 'netscript-publish-worktree-';
 const THROWAWAY_EXCLUDED_DIRECTORIES = new Set(['.git', 'node_modules']);
 const THROWAWAY_EXCLUDED_PATHS = new Set(['.llm/tmp']);
 
@@ -59,7 +60,9 @@ export async function publishWorkspace(
     });
   }
 
-  return await publishWorkspaceInPlace(options.mode, sourceRoot, commandRunner);
+  return await withDetachedPublishWorktree(sourceRoot, async (worktreeRoot) => {
+    return await publishWorkspaceInPlace(options.mode, worktreeRoot, commandRunner);
+  });
 }
 
 export async function publishMemberDryRun(
@@ -86,60 +89,53 @@ async function publishWorkspaceInPlace(
 ): Promise<PublishWorkspaceResult> {
   const catalog = await readRootCatalog(root);
   const members = await discoverWorkspaceMembers(root);
-  const snapshots = new Map<string, string>();
 
-  try {
-    for (const member of members) {
-      const configPath = `${root}/${member.path}/deno.json`;
-      const source = await Deno.readTextFile(configPath);
-      snapshots.set(configPath, source);
-      const config = parseJsonObject(source, configPath);
-      config.imports = materializeCatalogImports(config.imports, catalog, member.path);
-      await Deno.writeTextFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
-    }
-
-    // Atomic whole-workspace publish from the repo root. Deno publishes every
-    // workspace member in a single transaction and rewrites inter-member
-    // @netscript/* imports to jsr: specifiers. Publishing members individually
-    // (cd per member) breaks that resolution: a sibling's source files fall
-    // outside the member's own publish tarball, so the module graph fails with
-    // "Module not found". deno publish skips versions already on the registry,
-    // so re-running after a partial publish is safe and idempotent. Every
-    // workspace member must satisfy the normal no-slow-types publish bar.
-    //
-    // Bundled assets are inlined as plain string constants in the *.generated.ts
-    // barrels (see .llm/tools/generate-cli-assets-barrel.ts), NOT imported via
-    // `with { type: 'text' }`. `deno publish`'s module-graph build never enables
-    // `unstable_text_imports`, so text-attribute imports fail at real publish
-    // ("The import attribute type of 'text' is unsupported") even though they
-    // type-check, run, and pass `publish --dry-run`. No `--unstable-*` flag fixes
-    // this: text imports are stable (no flag exists) and `--unstable-raw-imports`
-    // only toggles `bytes` imports, which this workspace does not use. Plain
-    // string constants publish cleanly with no flag.
-    const baseArgs = ['publish', '--allow-dirty'];
-
-    if (mode === 'preflight') {
-      await runPublishPreflight(baseArgs, root, commandRunner);
-      return { members };
-    }
-
-    const args = mode === 'dry-run' ? [...baseArgs, '--dry-run'] : baseArgs;
-    const result = await commandRunner({
-      args,
-      cwd: root,
-      captureOutput: false,
-    });
-    if (result.code !== 0) {
-      const action = mode === 'dry-run' ? 'Publish dry-run' : 'Publish';
-      throw new Error(`${action} failed (deno publish exit ${result.code}).`);
-    }
-
-    return { members };
-  } finally {
-    for (const [path, source] of snapshots) {
-      await Deno.writeTextFile(path, source);
-    }
+  for (const member of members) {
+    const configPath = `${root}/${member.path}/deno.json`;
+    await assertRegularManifest(configPath);
+    const source = await Deno.readTextFile(configPath);
+    const config = parseJsonObject(source, configPath);
+    config.imports = materializeCatalogImports(config.imports, catalog, member.path);
+    await Deno.writeTextFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
   }
+
+  // Atomic whole-workspace publish from the repo root. Deno publishes every
+  // workspace member in a single transaction and rewrites inter-member
+  // @netscript/* imports to jsr: specifiers. Publishing members individually
+  // (cd per member) breaks that resolution: a sibling's source files fall
+  // outside the member's own publish tarball, so the module graph fails with
+  // "Module not found". deno publish skips versions already on the registry,
+  // so re-running after a partial publish is safe and idempotent. Every
+  // workspace member must satisfy the normal no-slow-types publish bar.
+  //
+  // Bundled assets are inlined as plain string constants in the *.generated.ts
+  // barrels (see .llm/tools/generate-cli-assets-barrel.ts), NOT imported via
+  // `with { type: 'text' }`. `deno publish`'s module-graph build never enables
+  // `unstable_text_imports`, so text-attribute imports fail at real publish
+  // ("The import attribute type of 'text' is unsupported") even though they
+  // type-check, run, and pass `publish --dry-run`. No `--unstable-*` flag fixes
+  // this: text imports are stable (no flag exists) and `--unstable-raw-imports`
+  // only toggles `bytes` imports, which this workspace does not use. Plain
+  // string constants publish cleanly with no flag.
+  const baseArgs = ['publish', '--allow-dirty'];
+
+  if (mode === 'preflight') {
+    await runPublishPreflight(baseArgs, root, commandRunner);
+    return { members };
+  }
+
+  const args = mode === 'dry-run' ? [...baseArgs, '--dry-run'] : baseArgs;
+  const result = await commandRunner({
+    args,
+    cwd: root,
+    captureOutput: false,
+  });
+  if (result.code !== 0) {
+    const action = mode === 'dry-run' ? 'Publish dry-run' : 'Publish';
+    throw new Error(`${action} failed (deno publish exit ${result.code}).`);
+  }
+
+  return { members };
 }
 
 /**
@@ -219,6 +215,56 @@ async function withThrowawayWorkspace<T>(
     return await operation(throwawayRoot);
   } finally {
     await Deno.remove(throwawayRoot, { recursive: true });
+  }
+}
+
+async function withDetachedPublishWorktree<T>(
+  sourceRoot: string,
+  operation: (worktreeRoot: string) => Promise<T>,
+): Promise<T> {
+  const worktreeRoot = await Deno.makeTempDir({ prefix: PUBLISH_WORKTREE_PREFIX });
+  await Deno.remove(worktreeRoot);
+  let worktreeAdded = false;
+  try {
+    await runGit(sourceRoot, ['worktree', 'add', '--detach', worktreeRoot, 'HEAD']);
+    worktreeAdded = true;
+    return await operation(worktreeRoot);
+  } finally {
+    if (worktreeAdded) {
+      await runGit(sourceRoot, ['worktree', 'remove', '--force', worktreeRoot]);
+      await runGit(sourceRoot, ['worktree', 'prune']);
+    } else {
+      await removeIfPresent(worktreeRoot);
+    }
+  }
+}
+
+async function assertRegularManifest(path: string): Promise<void> {
+  const info = await Deno.lstat(path);
+  if (!info.isFile || info.isSymlink) {
+    throw new Error(`Publish manifest must be a regular file: ${path}`);
+  }
+}
+
+async function runGit(root: string, args: readonly string[]): Promise<void> {
+  const result = await new Deno.Command('git', {
+    args: ['-C', root, ...args],
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  if (!result.success) {
+    const stderr = new TextDecoder().decode(result.stderr).trim();
+    throw new Error(`git ${args.join(' ')} failed (exit ${result.code}): ${stderr}`);
+  }
+}
+
+async function removeIfPresent(path: string): Promise<void> {
+  try {
+    await Deno.remove(path, { recursive: true });
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound)) {
+      throw error;
+    }
   }
 }
 
