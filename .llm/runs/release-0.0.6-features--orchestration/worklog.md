@@ -244,3 +244,58 @@ auto-closed `COMPLETED` by the body's closing keyword; `status:shipped` on both.
 (`findings=[]`, `allowCount=0`), not on the repo gate. CI `code-quality` passing is not by itself
 proof for this package. Repo gate-coverage gap, not a defect in the change — candidate for a
 follow-up issue at lane close.
+
+## 2026-08-12 — #1398 slice landed on branch; live gate red **twice**, no verdict yet
+
+Codex thread `019ff4ff-a633-7062-ae9c-21930930b5d6` completed. Three commits, draft PR **#1536**
+against `main`. Diff conforms to every locked decision — D1 (hook on worker + combined, correctly not
+scheduler), D2, **D3** (`withContext(extractContext({traceparent, tracestate}), …)` — the PLAN-EVAL
+F1 trap, implemented), D4 (`streams/schema.ts` untouched, 0 changes), D5 (both named tests).
+
+**A third stale deferral pin, found by neither the plan nor PLAN-EVAL.** The plan named
+`suite-registry_test.ts:204-215`; PLAN-EVAL F2 found `:209-234`; the implementer found a **third** in
+`suite-runner_test.ts` still expecting two deferred skipped steps, and fixed it in the same commit —
+by running the full package tests rather than only the tests it was pointed at. Each layer caught
+what the one above missed. It also hit a genuine type trap: an empty
+`as const satisfies readonly DeferredGate[]` infers its element as `never`, breaking fixture code
+that reads `issue`/`reason`; fixed by declaring against the explicit contract without relaxing an
+assertion.
+
+### The live gate has not produced a verdict — two runs, two different pre-gate failures
+
+| Run | Where it died | Result | Reached the restored gates? |
+| --- | --- | --- | --- |
+| 1 (slice) | `runtime.flow-b-fixture` — `netscript generate plugins failed: fetch failed` | `passed=33 failed=1`, exit 1 | **no** |
+| 2 (orchestrator, branch updated to current `main`) | `runtime.wait.triggers-api` — timed out unhealthy after 120 s | `passed=50 failed=1`, exit 1 | **no** |
+
+Run 2 got substantially further: the run-1 fetch failure did **not** reproduce, and fixture
+generation, Aspire start, database init/migrate/generate/seed, AppHost restart, and health waits for
+postgres, garnet, workers-api, **workers**, sagas-api and sagas all passed. It then timed out on
+`triggers-api`.
+
+**Neither run gives `behavior.otel.stream-consumer` or `behavior.otel.traces` a live verdict, so
+#1398's acceptance criterion 3 remains unproven and the PR cannot merge.** The slice said this
+plainly about run 1 and did not retry to manufacture a green; that was correct.
+
+**What I can and cannot say about run 2.** #1398 touches workers and the CLI e2e suite definitions —
+not triggers. `runtime.wait.workers` passed while `runtime.wait.triggers-api` timed out. The Aspire
+AppHost log shows no triggers error, only an unrelated dev-certificate trust warning, and an issue
+search found no known `triggers-api` health defect. That is **consistent with** an environmental
+failure but does **not** prove one — I have not reproduced the suite on a clean `main` checkout, so I
+cannot state as fact that the change is uninvolved.
+
+**Serialisation was verified before run 2**, per the expensive-gate rule: no
+`/tmp/netscript-e2e-scaffold-runtime.lease`, no competing `e2e:cli` process, zero Docker containers.
+`agentic:leak-check` after run 1 reported no survivors.
+
+### Escalating the verdict to CI rather than burning more local runs
+
+Two local failures at two unrelated points, neither reaching the target gates. CI ran
+`scaffold-runtime (aspire + docker + postgres)` **green** on PR #1528 (main + #1405) an hour earlier,
+so the CI environment starts this suite cleanly. #1398 adds both OTEL gates to `RUNTIME_GATES`, so
+CI's own scaffold-runtime job now exercises them — the same gate, in an environment that is currently
+working.
+
+PR #1536 flipped to ready to trigger the blocking tier, held at `status:impl-eval` (**not**
+`ready-merge`) so it cannot be mistaken for merge-ready. IMPL-EVAL is still required — the D-3 owner
+ruling waives evaluation only for the small deterministic class, explicitly not for this issue.
