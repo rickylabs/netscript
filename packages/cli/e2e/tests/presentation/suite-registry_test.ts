@@ -1,5 +1,12 @@
 import { assertEquals } from '@std/assert';
-import { DEPLOY, GATE, type GateId, QUICKSTART, SCAFFOLD } from '../../src/domain/cli-surface.ts';
+import {
+  DEPLOY,
+  GATE,
+  type GateId,
+  QUICKSTART,
+  SCAFFOLD,
+  type SuiteId,
+} from '../../src/domain/cli-surface.ts';
 import {
   DATABASE,
   PACKAGE_SOURCE,
@@ -7,6 +14,7 @@ import {
   REPORT_FORMAT,
 } from '../../src/domain/extension-axes.ts';
 import type { RunOptions } from '../../src/domain/run-context.ts';
+import type { DeferredGate } from '../../src/domain/suite-definition.ts';
 import { runtimeResources } from '../../src/application/gates/scaffold/runtime-gates.ts';
 import { builtInSuites, resolveSuite } from '../../src/presentation/cli/suites/registry.ts';
 import {
@@ -229,6 +237,34 @@ Deno.test('runtime suites pin the exact #1398 OTEL deferral without widening it'
       ),
       false,
       `${suiteId} must not execute a deferred gate`,
+    );
+  }
+});
+
+Deno.test('every registered suite pins its exact deferred-gate set and owning issues', () => {
+  const expected = {
+    [SCAFFOLD.SERVICE]: [],
+    [SCAFFOLD.CONTRACTS]: [],
+    [SCAFFOLD.INFRASTRUCTURE]: [],
+    [SCAFFOLD.PLUGIN]: [],
+    [SCAFFOLD.RUNTIME]: SCAFFOLD_RUNTIME_DEFERRED_GATES,
+    [SCAFFOLD.RUNTIME_SQLITE]: SCAFFOLD_RUNTIME_DEFERRED_GATES,
+    [SCAFFOLD.USERLAND_INSTALL]: [],
+    [DEPLOY.TARGETS]: [],
+    [DEPLOY.DESKTOP_NATIVE]: [],
+    [QUICKSTART.WALK]: [],
+  } satisfies Record<SuiteId, readonly DeferredGate[]>;
+
+  assertEquals(
+    builtInSuites.map((suite) => suite.id).sort(),
+    Object.keys(expected).sort(),
+    'the expectation map must cover every registered suite',
+  );
+  for (const descriptor of builtInSuites) {
+    assertEquals(
+      resolveSuite(descriptor.id).deferredGates ?? [],
+      expected[descriptor.id],
+      `${descriptor.id} deferred gates must match their issue-owned expectation`,
     );
   }
 });
