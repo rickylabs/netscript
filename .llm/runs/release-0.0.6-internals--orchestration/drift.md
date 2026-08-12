@@ -187,3 +187,94 @@ being fixed, filed, or briefed by this lane. Both are the owner's call.
 - **Note on the pre-merge gate:** this is check 1's failure mode from the other side — the close-gate
   *result existed* and was red, but it was red for a reason the operator was told to fix in a way that
   does not work. "Unproven, not clean" applies to a stale result just as much as to a missing one.
+
+## D-11 — rail PLAN-EVAL returned FAIL_PLAN; the orchestrator's own plan carried an unverified claim
+
+- **Severity:** significant
+- **Recorded:** 2026-08-12, stage B (rail), eval loop failure **1 of 2**
+- **Evaluator:** fresh Codex · GPT-5.6 Sol · **high** session, thread
+  `019ff508-d5a3-7100-b6a0-1b6226e97e70`, worktree `/home/codex/repos/ns006-raileval` @ `83de0dc06`.
+  Opposite family to the Claude-authored plan, per `lane-policy.md` `formal_plan_evaluation`.
+- **Verdict:** `FAIL_PLAN`, on three findings. Two are corrections to the plan; one is a routing gap.
+
+### Finding 2 is the one that matters most, and it is the orchestrator's error
+
+`plan-quality-rail.md` R-9 asserts: "`rfcs/` holds only a template and a README; five numbered RFCs
+(0001–0005) were accepted through `.llm/runs/*/design/canonical/` … the de-facto path is the harness
+path." **That is false at the plan's own baseline.** Independently confirmed by the orchestrator:
+
+```text
+$ ls rfcs/
+0000-template.md
+0001-sdk-client-contributions.md
+0002-runtime-versioned-automation.md
+0003-command-composition-kit.md
+0004-deterministic-first-hybrid-mcp-doc-retrieval.md
+0005-devtools-contribution.md
+README.md
+```
+
+The five numbered RFCs are present, and the merges that landed them are in this run's own opening `git
+log` read (`03680f6e8 docs(rfc): accept DevTools contribution architecture (RFC 0005)` and four
+siblings). The plan inherited "Zero numbered RFCs have ever landed" from #1380's 2026-08-08 measurement
+and **did not re-measure it** — inside a plan whose stated value proposition is that it re-measured
+everything rather than trusting the issues. A-3 in `cut-trace.md` records issue counts going stale in
+four days; R-9 is that same failure committed by the plan itself.
+
+Consequence beyond the plan: **#1380's D9/D10 divergence is stale in the same direction.** Its
+acceptance box "The RFC-location divergence is resolved in `rfcs/README.md` with the 5
+`DECISION_PENDING` entries mapped to the chosen location" no longer means "choose a location" — the repo
+already chose, within the last week. The correct deliverable is to record `rfcs/NNNN-*.md` as canonical
+and map the five entries onto it, not to adjudicate a divergence that has closed.
+
+### Finding 1 — the A14 population is misclassified
+
+The plan states all 54 `FAIL A14` results are `@std/testing/bdd` false positives. The evaluator reports
+**53 sanctioned imports plus one locally bound `describe`**. That distinction is load-bearing: R-5's
+required negative case is "the rule must still fire on a real bare global", and there is a **live
+instance** to test it against rather than a synthetic fixture. Treating all 54 as false positives risks
+a fix that suppresses the true positive too — the mirror image of the defect #1380 is about.
+
+### Finding 3 — six live acceptance boxes have no stated proof route
+
+The plan's per-PR contract table does not route every box. An unrouted box is how a milestone reaches
+merge with an unticked gate, which is the failure the whole lane exists to prevent.
+
+### Action
+
+The plan is revised before any rail PR is dispatched — no implementation proceeds on a `FAIL_PLAN`.
+Revision: correct R-9's premise and restate the #1380 RFC deliverable; split the A14 population and
+name the true positive as R-5's negative case; route the six boxes. Then a second PLAN-EVAL pass. The
+eval loop limit is two failures before escalation; this is failure 1.
+
+### Process note worth keeping
+
+The evaluator caught R-9 **because the brief told it to check R-9's premise specifically** rather than
+asking for a general review. The finding cost one eval cycle and would otherwise have reached #1380's
+implementation, where it would have produced a doctrine document arguing about a divergence that no
+longer exists. Also recorded: the evaluator ended its turn with an in-band summary instead of writing
+`plan-eval.md`, so the verdict had to be recovered from its rollout and the thread resumed to produce
+the artifact. Briefs should state that the file is the deliverable and a chat answer is not.
+
+## D-12 — a `stalled` status label is not death; verify the artifact and the writer lock
+
+- **Severity:** minor (supervision practice)
+- **Recorded:** 2026-08-12, stage B (rail)
+- **What happened:** `agentic:codex-status` reported the PLAN-EVAL thread as `stalled` with
+  `activityAgeMs` ≈ 626 s and `failure: null`, and no `plan-eval.md` existed. Its last recorded activity
+  was an **assistant message** ending "I'm writing the formal `FAIL_PLAN` verdict now", which reads like
+  a turn that ended without producing its deliverable.
+- **What was actually true:** the thread was still mid-turn. The attempted `codex exec resume` was
+  refused immediately with `thread-store conflict: … already has an active writer`, and the rollout file
+  had grown to ~1.05 MB with a recent mtime.
+- **Why it matters:** this is `agent-milestone-orchestrator` § Supervision pitfalls in its less obvious
+  direction. The recorded lesson is "liveness is not progress" — a live socket does not mean work is
+  happening. The converse also holds: **a `stalled` label does not mean the agent is dead.** A research
+  agent believed idle for 70 minutes was 25/27 complete and came within one command of being killed.
+- **The reliable signals, in order:** (1) the writer lock — a refused resume with `active writer` is
+  positive proof the thread is working; (2) a growing rollout file; (3) a written artifact or new commit.
+  The `state` field is a hint, not a verdict.
+- **Practice:** wait at the turn boundary with
+  `agentic:codex-watch --mode turn --thread-id <id> --timeout-seconds N`. Never kill on a `stalled`
+  label alone. The failed resume was harmless — it fails fast and creates no rival sender — which is the
+  behaviour that made this recoverable.
