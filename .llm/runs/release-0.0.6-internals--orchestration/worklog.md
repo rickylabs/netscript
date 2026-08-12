@@ -428,6 +428,30 @@ no Fable work to unwind and none in flight.
 model". Under a Claude capacity squeeze the cheap move is to review Codex work with Codex; that is the one
 substitution the policy forbids, and it is named here so a later squeeze does not quietly take it.
 
+### Resume is prohibited too, and this lane has nothing resumable — checked
+
+The fixes lane raised a subtlety worth adopting: the prohibition covers **resume**, not only launch, because a
+`SendMessage` to a completed Fable evaluator agent would restart a Fable session **without looking like a
+launch**. They marked wave 1's three completed Fable evaluator agents dead to their run for exactly that
+reason.
+
+Checked here rather than assumed. Every recorded implementation thread in this run:
+
+```text
+grep "Requested route\|Observed route" .llm/runs/…/slices/*/codex-thread-ids.md | sort -u
+- **Observed route:**  provider=openai · model=gpt-5.6-sol · effort=low
+- **Requested route:** provider=openai · model=gpt-5.6-sol · effort=low
+```
+
+One distinct route across every slice, and no Fable thread id recorded anywhere. Combined with the fact that
+this orchestrator has spawned **no Claude subagents at all** — every delegation went through
+`agentic:launch-codex-slice` — there is no Fable session in this lane's history that a resume could restart.
+Nothing to mark dead.
+
+Worth keeping as a rule regardless: **a completed agent is a resumable agent.** "I am not launching anything"
+is not the same claim as "I am not starting a prohibited model", and the second is the one the policy is
+about.
+
 **No manual OpenHands trigger has been or will be issued.** Every formal evaluation in this run reached the
 evaluator through the `openhands` + `status:plan-eval` label pair or the draft → ready transition. That is
 also why the earlier "duplicate run" scare resolved as no-op skip events rather than duplicate execution.
