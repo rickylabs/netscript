@@ -974,3 +974,45 @@ widening a p0 to take a tidier design.
 
 Note: the worker reverted my brief commit off the slice branch, keeping the PR `deno.lock`-only. That
 is consistent with the brief's own constraint, so it stands.
+
+## 2026-08-12 — #1572: broke a circular close-gate; scaffold rows were CANCELLED, not failures
+
+**Two distinct CI signals, and conflating them would have caused real damage.**
+
+- `scaffold-runtime (aspire + docker + postgres)` and `scaffold-runtime-sqlite` read
+  **`CANCELLED`**, not `FAILURE` — run `31602137850` is `completed/cancelled`. Verified directly
+  rather than taken on report. **No product defect, so no runtime code was touched.** Reading a
+  cancelled row as a red and "repairing" runtime code would have manufactured a change nobody needed,
+  on a p0 release blocker.
+- `close-gate` was the genuine `FAILURE`, and it was **circular**: #1571's fifth acceptance box
+  requires terminal-green `v0.0.6-canary.3`, which can only exist **after** this lock fix reaches
+  `main`. Carrying `Closes #1571` made a post-merge fact a pre-merge merge condition. The gate was
+  correct; the PR's framing was wrong.
+
+### Correction applied to PR #1572
+
+1. `Closes #1571` → **`Refs #1571`**, with the circularity stated in the body so the choice reads as
+   deliberate rather than an omission.
+2. **Structured closing-evidence block removed.** With no closing keyword the mirror never mutates
+   #1571, so the block was inert — and its box-5 entry asserted a pending fact. The per-box evidence
+   still lives in the body and the review comment; it attaches to **#1571 itself** after the re-cut.
+3. **Canary re-cut moved out of the pre-merge Definition of Done** into an explicit
+   *"Post-merge follow-through (not a merge condition)"* section. Encoding a post-merge action as a
+   DoD item is precisely what made the gate circular. DoD now has **0** unticked boxes.
+
+**#1571 remains OPEN with all five boxes unticked**, box 5 included. Its boxes get ticked in one
+honest transaction when the release proof is attached — not incrementally against a merge that cannot
+yet prove them.
+
+### Deliberately not doing
+
+- **No ad-hoc CI rerun.** The cancelled scaffold rows may be superseded by the lifecycle/status
+  transition; normal harness event behaviour applies. A rerun happens only if a documented required
+  gate is still absent after the evaluation completes.
+- **No manual OpenHands trigger**, no Fable.
+
+### Sequence from here
+
+Automatic DeepSeek IMPL-EVAL PASS → required **non-cancelled** gates + current-main overlap guard →
+merge #1572 **without closing #1571** → re-dispatch Canary.3 from the corrected `main` SHA → attach
+the exact release proof to #1571 → tick box 5 and close it.
