@@ -18,11 +18,11 @@ Deno.test('registered plugin source classifies explicit filesystem contracts as 
 Deno.test('registered plugin source classifies package contracts without consulting the filesystem', () => {
   const source = resolveRegisteredPluginSource(
     '/workspace/project',
-    'jsr:@netscript/plugin-workers@0.0.5',
+    'jsr:@example/plugin-workers@1.2.3',
   );
   assertEquals(source, {
     kind: 'package',
-    configuredSpecifier: 'jsr:@netscript/plugin-workers@0.0.5',
-    resolvedSpecifier: 'jsr:@netscript/plugin-workers@0.0.5',
+    configuredSpecifier: 'jsr:@example/plugin-workers@1.2.3',
+    resolvedSpecifier: 'jsr:@example/plugin-workers@1.2.3',
   });
 });

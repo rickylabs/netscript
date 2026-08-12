@@ -9,10 +9,10 @@ Deno.test('configured manifest payload parser accepts the versioned JSON-safe co
     parseResolvedConfiguredPluginManifestPayload({
       schemaVersion: CONFIGURED_PLUGIN_PROBE_SCHEMA_VERSION,
       status: 'resolved',
-      resolvedSpecifier: 'jsr:@netscript/plugin-workers@0.0.5',
+      resolvedSpecifier: 'jsr:@example/plugin-workers@1.2.3',
       manifest: {
-        name: '@netscript/plugin-workers',
-        version: '0.0.5',
+        name: '@example/plugin-workers',
+        version: '1.2.3',
         permissions: ['--allow-read'],
         service: { entrypoint: './services/src/main.ts', port: 8091 },
         doctor: './src/adapter/plugin.ts',
@@ -21,10 +21,10 @@ Deno.test('configured manifest payload parser accepts the versioned JSON-safe co
     {
       schemaVersion: CONFIGURED_PLUGIN_PROBE_SCHEMA_VERSION,
       status: 'resolved',
-      resolvedSpecifier: 'jsr:@netscript/plugin-workers@0.0.5',
+      resolvedSpecifier: 'jsr:@example/plugin-workers@1.2.3',
       manifest: {
-        name: '@netscript/plugin-workers',
-        version: '0.0.5',
+        name: '@example/plugin-workers',
+        version: '1.2.3',
         permissions: ['--allow-read'],
         service: { entrypoint: './services/src/main.ts', port: 8091 },
         doctor: './src/adapter/plugin.ts',
