@@ -100,3 +100,51 @@ owns the canary and the stable cut; this lane does not publish.
 - `git fetch origin main` → `origin/main@01aa12b67` (identical; lane starts at tip)
 - `deno task agentic:runtime doctor` → `no_change (schema 1.0)`, components 18, **sessions 0**
   (no pre-existing Codex sessions to collide with)
+
+---
+
+# Reopen — 2026-08-12, narrow scope
+
+The lane was closed with both original issues merged (#1405 `8ff1bcb8f`, #1398 `d7e2b67b2`, control
+PR #1525 `0f0b6b6a3`). It is **reopened narrowly** for three newly triaged 0.0.6 public-runtime
+blockers. Everything above this line is the closed original run and is not rewritten.
+
+| Field | Value |
+| --- | --- |
+| Control branch | `chore/release-0.0.6-runtime-reopen` |
+| Baseline | `origin/main@0f0b6b6a3` |
+| Scope | **#1457, #1459, #1548 only** — no other issue is adopted |
+| Eval policy | **automatic**, per D-4/D-5: label-driven, never a manual OpenHands dispatch |
+
+## Grouping decision — three separate PRs
+
+Instructed to group only if technically inseparable. Checked by locating each defect's surface rather
+than inferring from titles:
+
+| Issue | Surface | Shape |
+| --- | --- | --- |
+| #1457 chat proxy drops State-Protocol query params | `packages/fresh/src/runtime/ai/stream-proxy.ts` | small, fully specified |
+| #1459 `DeferComponent` never hydrated | `packages/fresh/src/application/defer/{DeferPage,DeferIsland}.tsx`, `policy.ts` | substantive — hydration + client-bundle regression test |
+| #1548 browser resolver cannot see Vite service refs | `packages/plugin-streams-core/src/application/stream-url-resolver.ts` | specified cause, real design choice |
+
+**No file overlap.** #1457 and #1459 both sit in `packages/fresh` but in unrelated subtrees
+(`runtime/ai` vs `application/defer`), so they neither conflict nor share acceptance. #1548 is in a
+different package entirely, and `stream-url-resolver.ts` was **not** touched by #1405 (that was the
+producer supervisor, façade, and contract) — so there is no interaction with what this lane already
+landed.
+
+Nothing is technically inseparable → **three independent PRs**, dispatchable in parallel.
+
+## Eval routing under the automatic policy
+
+- **#1457** — small and fully specified. Initial IMPL-EVAL fires automatically on draft → ready.
+  `impl-eval:skip` is **not** applied: the instruction is to use the automatic policy, and D-3's
+  waiver was the source of one prior misjudgement in this lane. Erring toward the automatic route.
+- **#1459** — decision-heavy (how the island is registered and how a client-bundle regression test is
+  built). PLAN-EVAL warranted, triggered by the `openhands` + `status:plan-eval` label pair.
+- **#1548** — the cause is known, but the fix is a genuine choice (package-side direct
+  `import.meta.env.VITE_*` read vs a Vite plugin transform), and it changes a published resolver.
+  PLAN-EVAL warranted.
+
+Reruns only by moving away from and back to the relevant `status:` label. One-shot
+`eval:model:*` overrides applied per PR only where a specific model is wanted.
