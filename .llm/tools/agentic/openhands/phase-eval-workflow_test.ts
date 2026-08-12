@@ -140,6 +140,12 @@ Deno.test('workflow source encodes trusted, exactly-once phase dispatch', async 
   assertStringIncludes(phase, 'ref: trustedBaseSha');
   assertStringIncludes(phase, 'Trusted base SHA: ${trustedBaseSha}');
   assert(!phase.includes('ref: pr.base.sha'));
+  assertStringIncludes(phase, 'contents: write');
+  assertStringIncludes(phase, 'refs/openhands-phase-eval-claims/');
+  assertStringIncludes(phase, 'await github.rest.git.createRef({');
+  assertStringIncludes(phase, "error?.response?.data?.message === 'Reference already exists'");
+  assertStringIncludes(phase, 'await github.rest.git.getRef({');
+  assert(!phase.includes('github.rest.issues.listComments'));
   assertStringIncludes(phase, 'openhands-phase-eval generation=${generationEvent.id}');
   assertStringIncludes(phase, '@openhands-agent model=${model}');
   assertStringIncludes(phase, 'head=${pr.head.sha}');

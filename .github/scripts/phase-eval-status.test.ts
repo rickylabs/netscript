@@ -101,20 +101,22 @@ Deno.test('terminal decision contains exactly one status label', () => {
   assertEquals(terminal.filter((label) => label.startsWith('status:')), ['status:impl-eval']);
 });
 
-Deno.test('generation deduplication remains before trigger creation', async () => {
+Deno.test('atomic generation claim remains before trigger creation', async () => {
   const workflow = await Deno.readTextFile('.github/workflows/openhands-phase-eval.yml');
+  const claim = 'await github.rest.git.createRef({';
+  const collision = "error?.response?.data?.message === 'Reference already exists'";
+  const earlyReturn = 'core.notice(`This phase transition is already claimed by ${claimRef}.`);';
   const marker =
     'const marker = `<!-- openhands-phase-eval generation=${generationEvent.id} phase=${phase} head=${pr.head.sha} -->`;';
-  const claim = "String(comment.body ?? '').includes(marker)";
-  const earlyReturn = 'if (existing) {';
   const create = 'github.rest.issues.createComment({';
 
-  assertStringIncludes(workflow, marker);
   assertStringIncludes(workflow, claim);
+  assertStringIncludes(workflow, collision);
   assertStringIncludes(workflow, earlyReturn);
+  assertStringIncludes(workflow, marker);
   assertStringIncludes(workflow, create);
-  assertEquals(workflow.indexOf(marker) < workflow.indexOf(claim), true);
-  assertEquals(workflow.indexOf(claim) < workflow.indexOf(earlyReturn), true);
+  assertEquals(workflow.indexOf(claim) < workflow.indexOf(collision), true);
+  assertEquals(workflow.indexOf(collision) < workflow.indexOf(earlyReturn), true);
   assertEquals(workflow.indexOf(earlyReturn) < workflow.indexOf(create), true);
 });
 

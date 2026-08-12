@@ -13,7 +13,7 @@ on:
     types: [labeled, ready_for_review]
 
 permissions:
-  contents: read
+  contents: write
   issues: write
   pull-requests: read
 
@@ -222,19 +222,33 @@ jobs:
             if (!generationEvent) {
               throw new Error(`No labeled-event generation found for ${expectedStatus}.`);
             }
-            const marker = `<!-- openhands-phase-eval generation=${generationEvent.id} phase=${phase} head=${pr.head.sha} -->`;
-            const comments = await github.paginate(github.rest.issues.listComments, {
-              owner,
-              repo,
-              issue_number: pr.number,
-              per_page: 100,
-            });
-            const existing = comments.find((comment) => String(comment.body ?? '').includes(marker));
-            if (existing) {
-              core.notice(`This phase transition is already claimed: ${existing.html_url}`);
+            const claimRef = `refs/openhands-phase-eval-claims/${generationEvent.id}-${phase}-${pr.head.sha}`;
+            try {
+              await github.rest.git.createRef({
+                owner,
+                repo,
+                ref: claimRef,
+                sha: pr.head.sha,
+              });
+            } catch (error) {
+              const alreadyClaimed = error?.status === 422 &&
+                error?.response?.data?.message === 'Reference already exists';
+              if (!alreadyClaimed) throw error;
+              const existing = await github.rest.git.getRef({
+                owner,
+                repo,
+                ref: claimRef.slice('refs/'.length),
+              });
+              if (existing.data.object.sha !== pr.head.sha) {
+                throw new Error(
+                  `Evaluator claim ref ${claimRef} points to unexpected SHA ${existing.data.object.sha}`,
+                );
+              }
+              core.notice(`This phase transition is already claimed by ${claimRef}.`);
               return;
             }
 
+            const marker = `<!-- openhands-phase-eval generation=${generationEvent.id} phase=${phase} head=${pr.head.sha} -->`;
             const iterations = phase === 'plan' ? 500 : 800;
             const trigger = `@openhands-agent model=${model} output=pr-comment iterations=${iterations} phase=${phase} head=${pr.head.sha}`;
             const { data: comment } = await github.rest.issues.createComment({
