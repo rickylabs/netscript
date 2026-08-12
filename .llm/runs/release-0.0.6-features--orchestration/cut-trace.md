@@ -57,3 +57,54 @@ profile's merge-derived rule. Issue states re-read live: both `CLOSED` / `COMPLE
 | 6 | 2026-08-12 | **Automation added a second `status:` label.** `status:augment-review` was applied 1 s after the orchestrator moved off `status:impl-eval`, breaching the exactly-one-status invariant. | None — caught while verifying labels before merge. | Re-verify the `status:` set after any automated phase transition, not only after manual edits. |
 | 7 | 2026-08-12 | **Orchestrator's own slice brief named a broken gate command.** `deno test packages/plugin-streams-core` exits 1 with 19 `NotCapable` errors for want of `--allow-env`. | Minor; the implementer reported the red with its cause rather than hiding or working around it. | Use the package-declared `deno task --cwd <pkg> test`. Corrected in the #1398 brief rather than repeated. |
 | 8 | 2026-08-12 | **One unnecessary evaluator dispatch.** The lane brief's IMPL-EVAL waiver for the #1405 class was read as a blocked-transport fallback rather than the class default. | One DeepSeek IMPL-EVAL run (~643 s) that the owner did not want. | Recorded as D-3. "A waiver is available" and "the waiver is the default" are different instructions; resolve the ambiguity before spending. |
+
+### Merge — #1593 (#1583) duplicate durable SSE subscriptions
+
+| Field | Value |
+| --- | --- |
+| Merged at | `f542f31cbea383f28dd2ea8ebc7ac99697c147a2` |
+| Evaluated head | `308bcea57` (correction cycle 2) |
+| Evaluation | automatic DeepSeek IMPL-EVAL run `31619302966` → `OPENHANDS_VERDICT: PASS` |
+| Prior cycle | fallback IMPL-EVAL at `b96b5a58e` → `FAIL_FIX`, one blocking finding |
+| Issue | #1583 closed, 3/3 acceptance boxes ticked by the mirror |
+
+**What the FAIL_FIX caught, and why it was worth a cycle.** The implementation was accepted on the
+first pass — one physical subscription, correct retirement barrier, byte-equivalent SR2, no surface
+growth. What was missing was coverage that consumers *receive data*: every in-tree hub test used a
+probe that blocks until abort and only yields **after** the hold, so no value was ever emitted while
+two subscribers were attached. `publish` and the `wake` handshake — the reason the hub exists — were
+asserted by nothing, and a refactor dropping all but the first subscriber would have left 230 tests
+green. Cycle 2 added an emitting probe and two assertions; production behaviour did not change.
+
+**Redness was reported honestly and needs preserving as precedent.** The new tests are red without the
+hub **only on the physical-count assertion**, because the emitting probe broadcasts into every
+physical stream, so pre-hub both collectors still received values. The value/terminal assertions guard
+a different regression — the hub's fan-out breaking — which removing the hub cannot demonstrate. The
+implementer stated this rather than claiming full redness.
+
+### Time-costing failure — infrastructure red read as product red
+
+Two of three current CI failures on #1593 were **infrastructure**: `build` died on `socket hang up`
+and `quality` on `Unexpected HTTP response: 503`, both fetching Deno 2.9.5 in `setup-deno`. Both
+passed on rerun with no code change. The third, `close-gate`, was **correctly** red — it named a DoD
+box ("IMPL-EVAL records PASS") that was not yet true and issue boxes the mirror ticks at
+`status:ready-merge`. Establishing currency first (`agentic:pr-checks`) and reading each log before
+reacting kept this to two reruns instead of a diagnosis of the product.
+
+### Trap — the `status:ready-merge` label does not re-run CI
+
+Applying `status:ready-merge` triggered only the OpenHands workflows; the CI workflow carrying
+close-gate did **not** re-run, so close-gate kept reporting its pre-label verdict and looked stuck.
+The fix is **not** an empty commit — that would move the head away from the evaluated one. Because the
+mirror and checker read labels, body, and issues **live** at execution time, re-running the existing
+close-gate job after labeling is sufficient and preserves head immutability. It passed in 18s.
+
+### Filed from inside the run
+
+- **#1598** — SDK cache-provider throw should name its `import.meta.url` (PLAN-EVAL C6 for #1589):
+  the only remedy reaching already-generated consumers, whom a build-time gate structurally cannot.
+- **#1601** — `defer-island-client-bundle_test.ts` resolves `npm:vite@7.2.2` over the network with
+  `--no-lock` at test time, so the package verdict depends on registry reachability. Observed as
+  `232/0` locally and `231/1` in the evaluator session **for the same head**. Both reports were
+  accurate; without the mechanism that reads as one agent misreporting, and the natural response —
+  re-running until they agree — wastes a cycle and teaches the wrong lesson.
