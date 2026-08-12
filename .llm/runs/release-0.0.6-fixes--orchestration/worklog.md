@@ -1160,3 +1160,66 @@ the acceptance mirror accepts — evidence asserting not-yet-done ("Pending…",
 merge") is now rejected for any box it is about to newly tick. #1539's IMPL-EVAL box currently cites
 cycle 3, which is invalidated. It must be rewritten to cite the automatic verdict at `070eabb61`
 before the mirror runs, or it is both stale and potentially mirror-rejected.
+
+
+## 2026-08-12 — Correction: why quality:gate missed the `as unknown as` on #1539
+
+Earlier I recorded that `quality:gate` missed the cast because "`quality:scan` covers
+`packages/cli/src` and `plugins` — not `.llm/tools/**`". **That mechanism was wrong for this case.**
+The internals lane probed it, I verified their probe, and the real cause is a third failure mode
+neither lane had stated.
+
+`.github/workflows/code-quality.yml` computes the PR gate's input as:
+
+```bash
+mapfile -t files < <(git diff --name-only --diff-filter=ACMR \
+  "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" -- packages plugins)
+args=(); for file in "${files[@]}"; do args+=(--changed-file "$file"); done
+if ((${#args[@]})); then deno task quality:scan --pretty "${args[@]}"; fi
+```
+
+Three independent defects live here:
+
+1. **Pathspec `-- packages plugins`** — a `.llm/tools/**` change can never enter the set.
+2. **`if ((${#args[@]}))`** — an empty set skips the scan entirely and the step reports success.
+   The did-not-run-looks-like-pass signature, in one line of bash, inside the gate built to detect
+   that class.
+3. **`pull_request.base.sha` is stale for an old PR** — and this is the one that hit #1539.
+
+#1539 touches **no** `packages/**` file; its whole diff is six files under `.llm/tools/`. Yet the
+set was not empty, because its `base.sha` was `cd24e1679` — the commit this lane's own #1534 merged
+at, hours stale. Running the workflow's exact range:
+
+```
+$ git diff --name-only --diff-filter=ACMR cd24e1679 2a4102600 -- packages plugins   → 9 files
+  packages/cli/e2e/suites/scaffold/capability-suites.ts            ← my #1534, already merged
+  packages/cli/e2e/tests/presentation/suite-registry_test.ts       ← my #1534, already merged
+  packages/cli/src/public/features/root/public-command-tree_test.ts ← my #1535, already merged
+  packages/plugin-streams-core/… (4 files)                          ← features lane #1405, merged
+  packages/sdk/… (2 files)                                          ← #1425 lane, merged
+```
+
+**Every file belongs to a PR that already landed.** The gate scanned nine real files, found
+nothing, and reported success — having inspected zero lines of the PR under review. Not
+under-scanned: scanned the wrong changeset.
+
+Mode 3 is the worst of the three because it is the least visible. Mode 2 reports success having run
+nothing, which a step log exposes. Mode 3 reports success having run something substantial over
+foreign input, and it **degrades with PR age** — the staler the base, the more foreign files it
+pulls in and the more convincingly covered it looks. The gate is therefore anti-correlated with
+risk: a long-lived PR, the kind most likely to accumulate a bad cast, gets the least of its own code
+scanned.
+
+**Same root cause as the evaluator failure.** The stale `pull_request.base.sha` that made
+`impl-eval-prompt.md` unresolvable on #1539 is the same value poisoning this changed-file range.
+One stale input, two independent gates producing confident false greens.
+
+**And it is the third time this run that a two-dot range against a moved `main` produced a false
+result** — the first was my own changed-file audit, where `origin/main..HEAD` rendered other lanes'
+merged work as deletions and nearly had me steer four slices to restore files they never touched.
+The rule earned there applies to CI as well as to orchestrators: **compute a PR's changed set from
+the merge-base or the PR's own file list, never from a recorded base against a moving branch.**
+
+Routed to the internals lane as data for #1403 (theirs to own); provenance credited on that issue.
+The correction stands regardless of who fixes it: **on #1539 the only thing that inspected the
+actual diff for banned constructs was the orchestrator's pre-merge grep.**
