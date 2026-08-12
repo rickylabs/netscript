@@ -101,21 +101,22 @@ Deno.test('terminal decision contains exactly one status label', () => {
   assertEquals(terminal.filter((label) => label.startsWith('status:')), ['status:impl-eval']);
 });
 
-Deno.test('generation deduplication remains before trigger creation', async () => {
+Deno.test('atomic generation claim remains before trigger creation', async () => {
   const workflow = await Deno.readTextFile('.github/workflows/openhands-phase-eval.yml');
-  const marker =
-    'const marker = `<!-- openhands-phase-eval generation=${generationEvent.id} phase=${phase} head=${pr.head.sha} -->`;';
-  const claim = "String(comment.body ?? '').includes(marker)";
-  const earlyReturn = 'if (existing) {';
+  const importPrimitive =
+    'const { dispatchClaimedPhaseEvaluation, phaseEvalMarker } = await import(';
+  const claim = 'const outcome = await dispatchClaimedPhaseEvaluation(';
+  const earlyReturn = 'if (!outcome.claimed) {';
+  const marker = 'const marker = phaseEvalMarker(claimKey);';
   const create = 'github.rest.issues.createComment({';
 
-  assertStringIncludes(workflow, marker);
   assertStringIncludes(workflow, claim);
   assertStringIncludes(workflow, earlyReturn);
+  assertStringIncludes(workflow, marker);
   assertStringIncludes(workflow, create);
-  assertEquals(workflow.indexOf(marker) < workflow.indexOf(claim), true);
-  assertEquals(workflow.indexOf(claim) < workflow.indexOf(earlyReturn), true);
-  assertEquals(workflow.indexOf(earlyReturn) < workflow.indexOf(create), true);
+  assertEquals(workflow.indexOf(importPrimitive) < workflow.indexOf(claim), true);
+  assertEquals(workflow.indexOf(claim) < workflow.indexOf(create), true);
+  assertEquals(workflow.indexOf(create) < workflow.indexOf(earlyReturn), true);
 });
 
 Deno.test('status bookkeeping failures are attributed and dispatch remains conditionally eligible', async () => {
@@ -138,7 +139,7 @@ Deno.test('status bookkeeping failures are attributed and dispatch remains condi
   assertStringIncludes(dispatch, '!cancelled()');
   assertStringIncludes(
     dispatch,
-    "steps.require_chainable_trigger_token.outcome == 'success'",
+    "steps.checkout_trusted_primitive.outcome == 'success'",
   );
   assertEquals(dispatch.includes('enter_impl_eval_status.outcome'), false);
 });

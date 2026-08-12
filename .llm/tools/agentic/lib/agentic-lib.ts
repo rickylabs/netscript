@@ -521,9 +521,9 @@ export interface DispatchOptions {
 }
 
 /**
- * Build the `@openhands-agent` trigger comment body. The workflow's matcher reads
- * `name=value` / `name: value` tokens anywhere in the comment, and the
- * issue_comment trigger requires the literal `@openhands-agent` mention.
+ * Build the manual trigger comment body. The command token begins the first line, that line contains
+ * only `name=value` arguments, and the prompt begins after it. This is the exact grammar enforced by
+ * the issue-comment authorization policy.
  */
 export function buildOpenHandsComment(o: DispatchOptions): string {
   const tokens = ['@openhands-agent'];

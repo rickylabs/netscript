@@ -140,7 +140,26 @@ Deno.test('workflow source encodes trusted, exactly-once phase dispatch', async 
   assertStringIncludes(phase, 'ref: trustedBaseSha');
   assertStringIncludes(phase, 'Trusted base SHA: ${trustedBaseSha}');
   assert(!phase.includes('ref: pr.base.sha'));
-  assertStringIncludes(phase, 'openhands-phase-eval generation=${generationEvent.id}');
+  assertStringIncludes(phase, 'contents: read');
+  assert(!phase.includes('contents: write'));
+  assertStringIncludes(phase, 'Check out trusted phase-eval primitive');
+  assertStringIncludes(phase, 'id: checkout_trusted_primitive');
+  assertStringIncludes(phase, "steps.checkout_trusted_primitive.outcome == 'success'");
+  assertStringIncludes(phase, 'persist-credentials: false');
+  assertStringIncludes(phase, "'.phase-eval-trusted/.github/scripts/phase-eval-claim.mjs'");
+  assertStringIncludes(
+    phase,
+    'const { dispatchClaimedPhaseEvaluation, phaseEvalMarker } = await import(',
+  );
+  assertStringIncludes(phase, 'const outcome = await dispatchClaimedPhaseEvaluation(');
+  assert(!phase.includes('github.rest.git.deleteRef'));
+  assertStringIncludes(phase, 'const findExistingTrigger = async () => {');
+  assertStringIncludes(phase, 'findExistingTrigger,');
+  assertStringIncludes(phase, 'Cycle the phase status to recover with a new');
+  assertEquals(phase.match(/github\.rest\.git\.createRef\(/g)?.length, 1);
+  assertEquals(phase.match(/github\.rest\.git\.getRef\(/g)?.length, 2);
+  assertEquals(phase.match(/github\.rest\.issues\.listComments/g)?.length, 1);
+  assertStringIncludes(phase, 'const marker = phaseEvalMarker(claimKey);');
   assertStringIncludes(phase, '@openhands-agent model=${model}');
   assertStringIncludes(phase, 'head=${pr.head.sha}');
   assertStringIncludes(phase, 'name: selectedLabel');
@@ -166,6 +185,39 @@ Deno.test('generic OpenHands stays fail-closed to current open evaluator models'
   assert(!workflow.includes("['sonnet', 'anthropic/claude-sonnet-4']"));
   assert(!workflow.includes("['gpt', 'openai/gpt-5.1']"));
   assert(!workflow.includes("['gemini', 'gemini/gemini-2.5-pro']"));
+});
+
+Deno.test('generic OpenHands delegates comment authorization to the tested policy module', async () => {
+  const workflow = await Deno.readTextFile('.github/workflows/openhands-agent.yml');
+  assertStringIncludes(workflow, 'id: policy');
+  assertStringIncludes(workflow, "if: github.event_name == 'issue_comment'");
+  assertStringIncludes(workflow, 'id: non_comment');
+  assertStringIncludes(workflow, "if: github.event_name != 'issue_comment'");
+  assertStringIncludes(
+    workflow,
+    'dispatch: ${{ steps.non_comment.outputs.dispatch || steps.policy.outputs.dispatch }}',
+  );
+  assertStringIncludes(
+    workflow,
+    "'.trigger-policy-trusted/.github/scripts/openhands-comment-trigger.mjs'",
+  );
+  assertStringIncludes(workflow, 'const { authorizeOpenHandsCommentTrigger } = await import(');
+  assertStringIncludes(workflow, 'const decision = await authorizeOpenHandsCommentTrigger(');
+  assertStringIncludes(workflow, 'await github.rest.git.createRef({ owner, repo, ref, sha });');
+  assertStringIncludes(workflow, 'No labeled-event generation found for ${expectedStatus}.');
+  assertStringIncludes(workflow, 'priorCommentBodies: comments');
+  assertStringIncludes(workflow, 'github-token: ${{ secrets.PAT_TOKEN }}');
+  assertStringIncludes(
+    workflow,
+    "startsWith(github.event.comment.body, '@openhands-agent')",
+  );
+  assertStringIncludes(workflow, "if: needs.authorize.outputs.dispatch == 'true'");
+  assertStringIncludes(
+    workflow,
+    'MANUAL_TRIGGER_LINE: ${{ needs.authorize.outputs.trigger_line }}',
+  );
+  assert(!workflow.includes('contains(github.event.comment.body'));
+  assert(!workflow.includes("line.includes('@openhands-agent')"));
 });
 
 Deno.test('formal evaluator prompts are trusted read-only harness contracts', async () => {

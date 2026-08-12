@@ -32,10 +32,10 @@ required summary artifacts keep local and cloud agents synchronized.
 OpenHands is **not** the evaluator for local runs. Two hard rules:
 
 1. **OpenHands runs OPEN models only** — MiniMax M3 for PLAN-EVAL, DeepSeek V4 Flash 0731 for
-   small/simple IMPL-EVAL, and Qwen 3.8 Max for broader/complex IMPL-EVAL. NEVER
-   dispatch OpenHands with a closed/paid model (Claude/`sonnet`, GPT/`gpt`, Gemini/`gemini`). Closed
-   models on OpenHands route through paid OpenRouter/LiteLLM credit and can silently burn the
-   owner's balance — this is prohibited.
+   small/simple IMPL-EVAL, and Qwen 3.8 Max for broader/complex IMPL-EVAL. NEVER dispatch OpenHands
+   with a closed/paid model (Claude/`sonnet`, GPT/`gpt`, Gemini/`gemini`). Closed models on
+   OpenHands route through paid OpenRouter/LiteLLM credit and can silently burn the owner's balance
+   — this is prohibited.
 2. **OpenHands is for CLOUD-driven runs only** — small GitHub-Copilot-style tasks the owner wants
    reviewed fully in the cloud with adversarial agents. OpenHands remains the **default automated
    cloud agent**; nothing below changes that. For any run on the **local machine**, do NOT dispatch
@@ -59,13 +59,13 @@ OpenHands: only approved open models may use those paid relay surfaces.
 
 **Capability (verified; drift D-4 amended):** both approved open models return a **real reasoning
 trace** and have a **verified agentic turn** (real tool calls) on this transport. Both bound
-evaluation presets can therefore run gates and their `effort` is genuine — not nominal. The zero-reasoning behaviour is
-**specific to GLM 5.2** over OpenRouter (a design-lane model), **not** a client-wide gap: never cite
-"GLM 5.2 · xhigh reasoning" as gate evidence, and do not restate that caveat as a property of the
-transport or of the evaluator lane.
+evaluation presets can therefore run gates and their `effort` is genuine — not nominal. The
+zero-reasoning behaviour is **specific to GLM 5.2** over OpenRouter (a design-lane model), **not** a
+client-wide gap: never cite "GLM 5.2 · xhigh reasoning" as gate evidence, and do not restate that
+caveat as a property of the transport or of the evaluator lane.
 
-If neither an approved local route nor an authorized cloud run can be launched, record the gap in `drift.md` and let
-the supervisor decide — never self-certify.
+If neither an approved local route nor an authorized cloud run can be launched, record the gap in
+`drift.md` and let the supervisor decide — never self-certify.
 
 ## Key Concepts
 
@@ -73,7 +73,7 @@ the supervisor decide — never self-certify.
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Actions agent    | `.github/workflows/openhands-agent.yml`, used for short cloud runs.                                                                                                          |
 | VPS session      | Long-running OpenHands Web UI/SDK deployment from `ops/openhands/docker-compose.yml`.                                                                                        |
-| Model profile    | OPEN models only: MiniMax M3 (PLAN), DeepSeek V4 Flash 0731 (small IMPL), Qwen 3.8 Max (broader/complex IMPL). Closed models are PROHIBITED on OpenHands.        |
+| Model profile    | OPEN models only: MiniMax M3 (PLAN), DeepSeek V4 Flash 0731 (small IMPL), Qwen 3.8 Max (broader/complex IMPL). Closed models are PROHIBITED on OpenHands.                    |
 | Literal model    | Any LiteLLM-compatible `provider/model` string supplied with `model=...`.                                                                                                    |
 | Provider secret  | `LLM_API_KEY_<PROVIDER>`, inferred from the model prefix, with `LLM_API_KEY` fallback.                                                                                       |
 | Output mode      | `pr-comment`, `respond-comments`, `thread-replies`, or `summary-only`.                                                                                                       |
@@ -87,15 +87,16 @@ the supervisor decide — never self-certify.
 
 Use one of these from GitHub mobile, a local agent, or another cloud agent:
 
-- PLAN-EVAL: add `openhands`, optionally add one `eval:model:*` label, then enter
-  `status:plan-eval` (either label may complete the pair).
+- PLAN-EVAL: add `openhands`, optionally add one `eval:model:*` label, then enter `status:plan-eval`
+  (either label may complete the pair).
 - IMPL-EVAL: optionally add one `eval:model:*` label while draft, then make the PR ready. Use
   `impl-eval:skip` only for an owner-approved waiver.
 - Rerun PLAN by moving away from and back to `status:plan-eval` while `openhands` remains present;
   rerun IMPL by moving away from and back to `status:impl-eval`. Do not comment-trigger the same
   head while its automatic run is queued or active.
 - For non-phase issue work, add `fix-me`, `openhands`, or an approved open `agent:*` profile.
-- Comment with `@openhands-agent ...` from an owner, member, or collaborator account.
+- Comment from an owner, member, or collaborator account with the command token and only
+  `name=value` arguments on the first line; begin the prose prompt on the following line.
 - Push a commit whose message contains `[openhands ...]`.
 - Run `OpenHands Agent` manually from Actions.
 
