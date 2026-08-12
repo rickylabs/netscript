@@ -65,15 +65,15 @@ error: Test failed
 
 ### What discriminates on the pre-fix code
 
-| Test | Pre-fix result | Discriminating assertion |
-| --- | --- | --- |
-| Exact unpublished version | **RED** | `assertEquals(check.status, 'warning')` fails because current code reports `error`. The later message/command-success assertions are consequently not reached. |
-| Published version, missing export | PASS negative control | Proves the loader is called for the exact published version and the genuine missing-export defect still fails. This behavior must remain unchanged. |
-| HTTP 503 | PASS negative control | Proves non-404 registry failures are already hard and must remain unchanged. |
+| Test                              | Pre-fix result        | Discriminating assertion                                                                                                                                       |
+| --------------------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Exact unpublished version         | **RED**               | `assertEquals(check.status, 'warning')` fails because current code reports `error`. The later message/command-success assertions are consequently not reached. |
+| Published version, missing export | PASS negative control | Proves the loader is called for the exact published version and the genuine missing-export defect still fails. This behavior must remain unchanged.            |
+| HTTP 503                          | PASS negative control | Proves non-404 registry failures are already hard and must remain unchanged.                                                                                   |
 
 The focused three-test set is red before the fix. Only the contract being changed is expected to
-fail; the other two cases are preservation controls, so claiming they were individually red would
-be false evidence.
+fail; the other two cases are preservation controls, so claiming they were individually red would be
+false evidence.
 
 ### Post-fix focused run
 
@@ -115,8 +115,94 @@ The adapter test also asserts the exact request URL:
 
 ## Gate output
 
-Untruncated command output and raw exit codes will be appended after implementation.
+The exact owner-specified commands ran from the repository root. The compact wrapper output below is
+reproduced without ellipses; the test command's terminal verdict is retained instead of its 3,382
+per-test progress lines. All raw exit codes were `0`.
+
+```text
+$ deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx
+{"source":{"mode":"selection","cwd":"/home/codex/repos/ns006-w5a"},"command":"deno check --unstable-kv <files>","selection":{"filesSelected":876,"batches":8,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+EXIT_CODE=0
+
+$ rtk proxy deno task test
+ok | 3382 passed (624 steps) | 0 failed | 17 ignored (3m41s)
+EXIT_CODE=0
+
+$ rtk proxy deno task lint
+Task lint deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)"
+{"source":{"mode":"command","cwd":"/home/codex/repos/ns006-w5a","exitCode":0},"selection":{"filesSelected":2034,"batches":11},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+EXIT_CODE=0
+
+$ rtk proxy deno task fmt:check
+Task fmt:check deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)" --ignore-line-endings
+{"command":"deno fmt --check","cwd":"/home/codex/repos/ns006-w5a","mode":"check","summary":{"filesSelected":2034,"batches":11,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+EXIT_CODE=0
+
+$ rtk proxy deno task quality:gate
+quality:scan: {"ok":true,"mode":"repository","scanned":["packages/cli/src","plugins","docs/site"],"findings":[],"allowCount":7}
+arch:check: every doctrine root reported FAIL=0; the command retained the existing WARN/INFO inventory
+EXIT_CODE=0
+```
+
+The full quality command emitted its repository-wide pre-existing warning inventory. It had no
+blocking findings: `quality:scan` returned `ok=true` with `findings=[]`, dependency scans completed,
+and every doctrine root reported `FAIL=0`.
+
+### Release-blocker suite
+
+```text
+$ deno task e2e:cli run scaffold.plugins --format pretty
+Task e2e:cli deno run --allow-all packages/cli/e2e/cli.ts 'run' 'scaffold.plugins' '--format' 'pretty'
+Running scaffold.plugins
+> preflight.deno: Deno CLI is available
+  PASSED 9ms
+> scaffold.init: Scaffold generated project
+  PASSED 1013ms
+> scaffold.plugin.worker: Install official worker plugin
+  PASSED 1060ms
+> scaffold.plugin.saga: Install official saga plugin
+  PASSED 701ms
+> scaffold.plugin.trigger: Install official trigger plugin
+  PASSED 689ms
+> scaffold.plugin.stream: Install official stream plugin
+  PASSED 687ms
+> scaffold.plugin.auth: Install official auth plugin
+  PASSED 738ms
+> scaffold.plugin.ai: Install official ai plugin
+  PASSED 875ms
+> scaffold.plugin.ai.mcp: Install official AI plugin with MCP skill tool
+  PASSED 924ms
+> scaffold.plugin.ai.lifecycle: Add and self-wire an AI tool through the plugin CLI
+  PASSED 78ms
+> scaffold.plugin-list: List configured plugins
+  PASSED 1729ms
+> behavior.plugins-unhealthy: Reject missing workers and sagas registries
+  PASSED 2276ms
+> generated.plugins-check: Generate plugin registries from discovered manifests
+  PASSED 1124ms
+> generated.workers-registry: Compile workers registry through plugin CLI
+  PASSED 139ms
+> generated.sagas-registry: Generate sagas registry through plugin CLI
+  PASSED 79ms
+> behavior.plugins-health: Check installed plugin health
+  PASSED 1147ms
+> behavior.package-backed-plugin-doctor: Validate package-backed plugin doctor truth
+  PASSED 2120ms
+Summary: passed=17 failed=0 skipped=0
+EXIT_CODE=0
+```
+
+The separate `behavior.package-backed-plugin-doctor` gate from #1597 remains green; this slice did
+not change that path.
 
 ## Lock hygiene
 
-Pending final explicit-path diff assertion for `deno.lock` and `packages/fresh-ui/deno.lock`.
+Both required assertions produced empty output and exited `0`:
+
+```text
+$ git diff --stat -- deno.lock packages/fresh-ui/deno.lock
+EXIT_CODE=0
+
+$ git diff --stat origin/main...HEAD -- deno.lock packages/fresh-ui/deno.lock
+EXIT_CODE=0
+```
