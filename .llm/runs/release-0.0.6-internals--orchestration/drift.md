@@ -1480,3 +1480,49 @@ do not investigate.
 **Gate correction for future briefs:** the asset-barrel gate is two gates, and I had been writing only the
 first. (a) regenerate and assert an empty `git status` — currency; (b) install the bundle to a temp dir and
 execute each runnable tool's `--help` — closure. (b) is what a consumer actually does, and only (b) fails here.
+
+## D-44 — `gh-watch` reported my own review comment as the evaluator's PASS (severity: significant)
+
+Third distinct failure of the same tool in one hour, and the only dangerous one.
+
+The automatic DeepSeek IMPL-EVAL run `31618732014` was **cancelled** at 16:58:41Z after 20 minutes with no
+verdict. `agentic:gh-watch`, watching the same PR, reported:
+
+```text
+TERMINAL PR #1596: PASS (PASS) after 724s
+GH_WATCH_REAL_EXIT=0
+```
+
+There is **no IMPL-EVAL verdict on #1596 at all** — verified directly:
+
+```text
+gh pr view 1596 --json comments --jq '[.comments[]|select(.body|test("PHASE: IMPL-EVAL"))]|length'
+=> 0
+```
+
+The only `VERDICT: PASS` text on the PR is **my own** `[PHASE: REVIEW] [VERDICT: PASS — flipping to ready]`
+comment. The watcher matched the orchestrator's review as the evaluator's verdict.
+
+**Why this one is worse than D-42.** Those were false *negatives-as-greens*: a watch that did nothing while
+claiming success, costing time. This is a false *authority*: had I consumed it, I would have run the pre-merge
+gate believing an independent evaluator had passed the head, and merged **on my own certification** — the one
+thing the harness forbids without exception (`generator ≠ evaluator`, no lane self-certifies). The PR would
+have merged with a reproducible consumer-facing defect (D-43) and a fabricated evaluator provenance.
+
+Three failure modes now recorded for this tool: superseded verdict as terminal (D-24), silent no-op / no-token
+with a pipeline-masked exit code (D-42), and **non-evaluator comment matched as a verdict (this entry)**. It has
+been wrong in every way a verdict watcher can be wrong.
+
+**Rule, now unconditional:** a verdict exists only when a comment matching `[PHASE: IMPL-EVAL]` exists, its
+author is not this session, and its evaluated head equals the head under consideration. Assert all three by
+direct query before the pre-merge gate. `gh-watch` may be used to wake a turn and for nothing else.
+
+**What made this catchable:** the owner reported the run as cancelled, which contradicted the watcher. Without
+that contradiction the false PASS was plausible — it arrived at 724s, a believable evaluation duration, with a
+believable verdict. That is the shape of the failures this lane exists to remove, and my own supervision loop
+produced it twice in one afternoon.
+
+Fallback authorized by the owner and dispatched: one fresh native Opus 5 medium **read-only** session against
+the immutable head `7264ce6aa`, trigger-immune single comment, no label cycle, no paid retrigger. It is briefed
+to treat the orchestrator's claims as claims, warned that this checkout is shallow, and required to reach its
+own conclusion on the D-43 closure failure.
