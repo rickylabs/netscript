@@ -112,3 +112,28 @@ Deno.test('scanner exempts negative type fixtures from production-source finding
 
   assertEquals(await scanCodeQuality(['packages'], root), []);
 });
+
+Deno.test('type-fixture exemption requires both its directory and suffix', async () => {
+  const root = await Deno.makeTempDir();
+  const sourceDir = join(root, 'packages/sdk/src');
+  const testsDir = join(root, 'packages/sdk/tests');
+  const fixtureDir = join(testsDir, 'type-fixtures');
+  await Deno.mkdir(sourceDir, { recursive: true });
+  await Deno.mkdir(fixtureDir, { recursive: true });
+  const directive = '// @ts-expect-error negative compile fixture assertion\nconst value: string = 1;\n';
+  await Deno.writeTextFile(join(sourceDir, 'ordinary-source.ts'), directive);
+  await Deno.writeTextFile(join(testsDir, 'outside-directory_type.ts'), directive);
+  await Deno.writeTextFile(join(fixtureDir, 'missing-suffix.ts'), directive);
+
+  const findings = await scanCodeQuality(['packages'], root);
+  assertEquals(findings.map((finding) => finding.file), [
+    'packages/sdk/src/ordinary-source.ts',
+    'packages/sdk/tests/outside-directory_type.ts',
+    'packages/sdk/tests/type-fixtures/missing-suffix.ts',
+  ]);
+  assertEquals(findings.map((finding) => finding.rule), [
+    'ts-error-suppression',
+    'ts-error-suppression',
+    'ts-error-suppression',
+  ]);
+});

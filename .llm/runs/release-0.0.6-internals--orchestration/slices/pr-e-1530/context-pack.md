@@ -17,7 +17,7 @@ Remove only the two redundant allowance comments and prove repo `allowCount` 10 
 ## Current state
 
 E1 added the intentionally failing regression test as a standalone commit. E2 added `isTypeFixture`
-and restored the quality test gate. E3 adds the three leakage controls. E4 removes the two actual
+and restored the quality test gate. E3 added all three leakage controls. E4 removes the two actual
 SDK allowance comments and runs all acceptance gates.
 
 The PR must remain draft; the orchestrator owns draft → ready, formal IMPL-EVAL, labels after

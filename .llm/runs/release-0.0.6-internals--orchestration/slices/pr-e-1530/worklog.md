@@ -36,3 +36,11 @@ PLAN-EVAL: PASS in the orchestrator rail plan; PR #1553 run 31589648809 at `69ef
   comments from source so the repository no longer carries redundant policy prose.
 - Reconcile: the E1 RED is resolved without changing fixture assertions. PR #1560 remains draft;
   E3 must still prove the exemption does not leak.
+
+## E3 — leakage controls
+
+- Added one table-shaped test proving three paths remain scanned: ordinary source, `_type.ts`
+  outside `tests/type-fixtures/`, and a non-`_type.ts` file inside that directory.
+- Quality tool tests: 8 passed, 0 failed, exit 0.
+- Reconcile: live contract coverage now proves both sides of the conjunction. PR #1560 remains
+  draft; E4 owns redundant-comment removal and final gates.
