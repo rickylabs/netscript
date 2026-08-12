@@ -1172,3 +1172,50 @@ was ticked to clear a gate.
 **Sequence:** terminal-green CI → merge the lock-only PR → re-sync/re-run **#1570** on the new `main`
 → attach its green Fresh UI quality proof to **#1580** → tick the final box → close #1580. Only then,
 with **both** lock closures merged and proven, is Canary.3 re-cut.
+
+## 2026-08-12 — #1581 MERGED (`50739a7ae`); both lock repairs proven on main
+
+`close-gate` was again **stale**, not failing: it ran 14:01:10Z, my lifecycle edit landed 14:04:36Z,
+and its two complaints were precisely what that edit resolved. Re-ran → `completed/success`.
+Every other check was already green, including `fresh-ui-quality` and both scaffold-runtime tiers.
+
+**Head moved between my verification and merge** — `889936dc3` → `7b8488211` — so I re-verified rather
+than merging on stale evidence. The extra commit only removes the brief file, keeping the PR
+**lock-only**; net delta at the merged head is exactly `1 0 packages/fresh-ui/deno.lock`. Overlap
+guard clean against a main that had advanced 2 commits.
+
+### Exact-main validation — both derived repairs, frozen-clean
+
+Validated in a disposable worktree at **`50739a7ae`**:
+
+| Check | Result |
+| --- | --- |
+| root `deno.lock` plugin-vite entries | **3** |
+| `packages/fresh-ui/deno.lock` entries | **1** |
+| root `deno ci --prod` (frozen) | **PASS** |
+| `packages/fresh-ui` frozen check | **`failedBatches: 0`** (was 2 of 2) |
+| tree after both | **clean** — frozen-stable |
+
+Both instances of the lock defect I introduced are now closed on `main`.
+
+### #1570: I wrote to it before ownership was clarified
+
+I ran `gh pr update-branch 1570`, moving its head `c740ff6e0` → `807d29003` and starting
+`fresh-ui-quality` there. I checked for a live Codex writer first and found none, and I was acting on
+an explicit instruction to re-sync/re-run #1570 — but ownership has since been clarified as
+internals'. **Stopped: no further writes from me to that PR**, and I notified the fixes lane to relay,
+so a moved head is not a surprise rather than something they discover.
+
+Recorded because the write happened and disclosing it is cheaper than the alternative — the sanctioned
+`update-branch` merges base into head with no force-push and no content of mine, but it is still a
+write to someone else's PR.
+
+**#1580 and #1571 both remain OPEN**, each with its circular box unticked, awaiting the artifact that
+can only exist post-merge.
+
+### Canary.3 re-cut: precondition met, note still owed
+
+Both lock closures are merged and proven. The remaining input is internals' green `fresh-ui-quality`
+on #1570 → attach proof to #1580 → tick → close. The re-cut note must be **measured at the re-cut
+SHA**: main has moved well past the failed attempt's `5705aeb19`, and the payload now includes #1541's
+docs changes and the rewritten `packages/sdk/README.md` JSR landing page.

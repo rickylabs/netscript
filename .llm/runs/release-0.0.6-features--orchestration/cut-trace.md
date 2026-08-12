@@ -28,6 +28,8 @@ owns the canary and the stable cut.
 
 | 6 | 2026-08-12T13:59:13Z | `a553afef4` — `fix(release): regenerate the deno.lock closure for the packages/fresh plugin-vite dependency (#1572)` | #1572 | **none** — carries `Refs #1571`, which stays open pending Canary.3 | `slices/pre-merge-gate-1558.md` pattern; overlap guard clean, 387/9 lock-only |
 
+| 7 | 2026-08-12T14:11:23Z | `50739a7ae` — `fix(fresh-ui): regenerate the stale private lock for the plugin-vite dependency (#1581)` | #1581 | **none** — carries `Refs #1580`, which stays open pending #1570's green proof | one-line derived lock; `impl-eval:skip` attributed, zero evaluator spend |
+
 Rows captured from `git log origin/main --first-parent -1` **after** each merge, per the
 profile's merge-derived rule. Issue states re-read live: both `CLOSED` / `COMPLETED`, with
 `status:shipped` applied to each issue and PR.
