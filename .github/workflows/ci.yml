@@ -233,6 +233,18 @@ jobs:
         if: env.RUN == 'true'
         run: deno task test
 
+      - name: Install managed-form browser test runtime
+        if: env.RUN == 'true'
+        run: |
+          browser_runtime="${RUNNER_TEMP}/netscript-playwright-cli"
+          npm install --prefix "$browser_runtime" @playwright/cli@0.1.17
+          echo "$browser_runtime/node_modules/.bin" >> "$GITHUB_PATH"
+          "$browser_runtime/node_modules/.bin/playwright" install --with-deps chromium
+
+      - name: Managed form browser regression
+        if: env.RUN == 'true'
+        run: deno task --cwd packages/fresh test:browser
+
       - name: Agentic OpenRouter preset canary
         if: env.RUN == 'true'
         run: deno task agentic:provider-canary
