@@ -487,3 +487,31 @@ Instead:
 
 Smoothing the distinction here would reproduce the exact failure this lane keeps catching: a checked
 box whose evidence does not cover the path that actually broke.
+
+### D-13 correction — "unsatisfiable as worded" was too strong
+
+The cycle-3 IMPL-EVAL of #1602 corrected the claim above, and the correction is worth keeping because
+the error was mine and it is the same shape as errors this lane keeps catching in others.
+
+D-13 concluded criterion 5 was unsatisfiable because the **scaffold** seeds no dynamic route. That
+half is confirmed independently. But "generated" admits two readings:
+
+| Reading | Meaning | Status today |
+| --- | --- | --- |
+| A | scaffold-seeded dynamic route | **not satisfiable** — every seeded `$route` is static |
+| B | real route-**manifest generator** output | **satisfiable now, no framework change** |
+
+Reading B is achievable because `packages/fresh/src/application/route/manifest.ts:154-156` already
+maps a `[id]` segment to key `$id` and `:269` emits `createRouteReference(<pattern>, <metadata>)` — so
+a test can run the generator over a fixture routes directory containing `routes/orders/[id].tsx` and
+drive the browser test against genuine generator output.
+
+**Why I got it wrong:** I searched `packages/cli` for the scaffold emitter, found only static
+patterns, and generalized from "the scaffold cannot produce this" to "nothing can". I never looked for
+a generator inside `packages/fresh` itself. Searching one package and concluding about the repo is
+exactly the proxy-for-evidence mistake recorded in D-12.
+
+The disposition does not change — criterion 5 stays unticked and #1602 still must not claim generator
+provenance for a hand-authored fixture. What changes is the follow-up: **#1616 now states it closes
+Reading A**, and records that Reading B is the cheaper fix and should be done first, since it would
+replace `tests/fixtures/route-binding-browser/routes.ts` with real generator output.
