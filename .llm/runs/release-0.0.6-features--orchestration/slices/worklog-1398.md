@@ -103,3 +103,61 @@ Final S2 evidence:
 Negative guard evidence: temporarily removing both OTEL gates from `RUNTIME_GATES` made the main
 runtime presence test and the both-tier execution test fail (exit 1, actual `false`, expected
 `true`).
+
+## Final implementation gates
+
+All required non-live gates passed on the S1+S2 head:
+
+| Gate | Result |
+| --- | --- |
+| workers scoped check | PASS — 101 files, 0 findings |
+| plugin-workers-core scoped check | PASS — 111 files, 0 findings |
+| workers scoped lint | PASS — 101 files, 0 findings |
+| workers scoped format | PASS — 101 files, 0 findings |
+| plugin-workers-core package test | PASS — 27 passed, 0 failed |
+| `quality:gate` | PASS — quality scan clean; doctrine `FAIL=0` on touched roots |
+| explicit plugin-workers-core quality scan | PASS — 0 findings, 0 allowances |
+| explicit CLI E2E quality scan | PASS — 0 findings, 0 allowances |
+
+The configured quality scan covers `packages/cli/src` and `plugins`, but not
+`packages/plugin-workers-core` or `packages/cli/e2e`; the two explicit scans above close that
+coverage gap. No lockfile change, schema change, public export, lint suppression, `any`, unsafe
+double cast, or `@ts-ignore` was added.
+
+## S3 — one-pass live runtime evidence
+
+Serialization was confirmed before launch: `/tmp/netscript-e2e-scaffold-runtime.lease` was absent,
+no competing `e2e:cli`/`scaffold.runtime` process was running, and Docker reported zero containers.
+
+The mandated single invocation was run once and was not retried:
+
+```text
+$ deno task e2e:cli run scaffold.runtime --cleanup --format pretty
+> runtime.flow-b-fixture: Wire real Flow-B callback fixture
+  FAILED 10777ms
+    Command exited 1; expected 0.
+    error: Uncaught (in promise) Error: netscript generate plugins failed: Error: fetch failed
+> cleanup.aspire-stop: Stop generated Aspire AppHost
+  PASSED 81ms
+Summary: passed=33 failed=1 skipped=0
+raw exit code: 1
+```
+
+This failure occurred before Aspire launch and before `behavior.otel.stream-consumer` or
+`behavior.otel.traces`, so neither restored gate received a live verdict. The gate therefore does
+not provide #1398's required end-to-end acceptance evidence.
+
+Diagnostics followed the required order:
+
+- Plugin doctor against the preserved generated fixture reported every configured plugin healthy;
+  its only warning was that no AppHost was running, expected because the failure preceded launch.
+- Aspire OTEL logs/traces were unavailable because the AppHost never started.
+- The failure is not the known `Missing plugin reference "streams"` residual; that message did not
+  occur, and generation failed earlier with Deno's generic network-resolution `fetch failed`.
+- A focused rerun of only the failed `generate plugins` command against the preserved fixture then
+  passed in 0.9 seconds and wrote all three registries. This makes the observed failure consistent
+  with a transient dependency/registry fetch, but the nested Deno error did not expose a URL, so
+  the exact endpoint could not be verified. This diagnostic does not alter the authoritative red
+  E2E verdict and was not a second suite run.
+- `agentic:leak-check` reported Aspire and Docker probes `ok` with no survivors; Docker also showed
+  zero running containers after cleanup.
