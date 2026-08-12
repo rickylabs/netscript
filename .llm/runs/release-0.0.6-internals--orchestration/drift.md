@@ -660,3 +660,28 @@ Trusted base SHA: d7e2b67b2be535c9ca13449f97f8f4585344030a
   fix is either a note in `tooling.md` § Tool layout stating the obligation in the tool-author's direction,
   or making the freshness check runnable as a named task so it can be listed in a gate set. Recorded here;
   not taken by this PR, whose boundary is `.llm/tools/quality/**`.
+
+## D-23 — a required fix superseded a passing IMPL-EVAL; re-evaluated rather than reasoned around
+
+- **Severity:** significant (evaluation integrity)
+- **Recorded:** 2026-08-12, PR #1560
+- **Situation:** IMPL-EVAL returned `PASS` at `49e2b86e9`. The barrel-freshness fix (D-22) then landed
+  `9ab361440`, so the verdict no longer corresponds to what would merge. This is the D-21 hazard arriving
+  from the opposite direction: not a gratuitous push, but a **required** fix that CI itself demanded.
+- **The tempting argument, and why it is refused.** The delta is a *generated* file, mechanically derived
+  from a change that was already evaluated, and the orchestrator independently verified both that the
+  generator is idempotent (a second run left `git status --porcelain` empty) and that the diff touches only
+  `packages/cli/src/kernel/assets/agent-tools.generated.ts`. It would be easy to merge on the `49e2b86e9`
+  verdict and note the delta as inert. That reasoning is exactly what this lane exists to distrust: "the
+  gate does not need to run because I can see the change is safe" is the same shape as "the gate passed" when
+  it did not run. `milestone-run.md` is explicit — a gate that did not execute against what ships is an
+  **unproven, not clean** state.
+- **Action:** re-ran IMPL-EVAL against the true final head by label-cycling `status:ready-merge` →
+  `status:impl-eval`, the sanctioned rerun path (D-14). Cost is one evaluator cycle; the alternative is a
+  merge whose strongest piece of evidence names a commit that is not the one being merged.
+- **Rule this establishes for the rest of the rail.** Any commit that lands **after** an IMPL-EVAL `PASS` —
+  including a generated-artifact refresh, a formatting fix, or a run-artifact update — invalidates that
+  verdict and requires a re-evaluation before merge. The practical consequence for PR-B/C/D: run the barrel
+  gate (validation row 7b) and every scoped wrapper **before** flipping draft → ready, so the ready flip
+  evaluates a head that is already final. That ordering is now in the rail plan's validation table, and it
+  is the cheap way to avoid paying for this twice.
