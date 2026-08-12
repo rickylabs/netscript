@@ -39,8 +39,14 @@ deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>
 netscript init my-app --db postgres --service --yes
 ```
 
-The scaffold reports **183 files, 44 directories** and prints your numbered next steps — follow
-them:
+Substitute `<version>` with the current release — the
+[latest tag](https://github.com/rickylabs/netscript/releases/latest), or the version shown on
+[jsr.io/@netscript/cli](https://jsr.io/@netscript/cli). Bare `jsr:@netscript/*` specifiers do not
+resolve on the pre-release line, so the pin is required rather than cosmetic.
+
+The scaffold prints its own file and directory totals along with your numbered next steps — those
+totals vary with the database, service, editor, and agent-tooling options you chose, so treat the
+printed result as the authority. Follow the steps it prints:
 
 ```bash
 # 3. Boot the whole stack: Postgres, cache, and every service come up together
@@ -61,7 +67,8 @@ netscript db seed
 ```
 
 The payoff: the Aspire dashboard shows every resource, trace, and log in one place, and your typed
-service answers on its health probe (replace `<port>` with the port assigned to your service in the scaffold console output or Aspire dashboard):
+service answers on its health probe (replace `<port>` with the port assigned to your service in the
+scaffold console output or Aspire dashboard):
 
 ```bash
 curl http://localhost:<port>/health
