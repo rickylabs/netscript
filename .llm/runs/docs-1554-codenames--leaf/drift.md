@@ -69,3 +69,37 @@ Drift is append-only.
 - **Actual:** One saga row retained the old tier wording.
 - **Severity:** minor, fixed.
 - **Action:** Copy the authoritative `deno doc` summary into the saga table and re-run docs gates.
+
+## 2026-08-12 — Cycle-2 evaluator found a root-entrypoint scan gap
+
+- **What:** FALLBACK IMPL-EVAL cycle 2 found two issue-number tokens in the JSDoc for
+  `packages/aspire/constants.ts` `AppHealthCheckPath`. The package exports `./constants` directly,
+  but the guard required `/src/` in every scanned path and therefore could not see it.
+- **Source:** Evaluator BF-1 plus direct `packages/aspire/deno.json` export inspection and
+  `deno doc --json packages/aspire/constants.ts`.
+- **Expected:** “Published JSDoc” means declarations reachable from a package/plugin export
+  entrypoint, regardless of whether the file is rooted under `src/`.
+- **Actual:** The path heuristic covered the first 78 tokens but omitted published root files.
+- **Severity:** blocking, fixed.
+- **Action:** Discover every top-level package/plugin export target from its `deno.json`, follow
+  static local import/export and literal dynamic-import edges inside that package, and scan the
+  resulting entrypoint closure. This shape was chosen over an all-file walk because it follows the
+  actual consumer surface and naturally excludes unpublished scripts, tests, fixtures, and E2E
+  source.
+- **Evidence:** The discovery fixture asserts that Aspire constants, the exported KV Redis adapter,
+  and the exported database patch script are all traversed. The widened guard fails on the two
+  Aspire tokens before their source fix and passes afterward.
+
+## 2026-08-12 — Numbered algorithm phases are not planning labels
+
+- **What:** Export-closure traversal reaches legitimate algorithm documentation in
+  `packages/kv/adapters/redis.adapter.ts` (“Phase 1” / “Phase 2”) and the published database scripts
+  surface (“Phase 1” / “Phase 2” / “Phase 3”).
+- **Source:** Evaluator trap plus direct export-closure inspection.
+- **Expected:** The guard rejects internal phase codenames without rejecting numbered steps in an
+  algorithm.
+- **Actual:** The cycle-1 `Phase` arm treated every plain `Phase N` as a planning label.
+- **Severity:** blocking false-positive risk, fixed before final green.
+- **Action:** Keep codenamed forms such as `Phase A` and `Phase 7d` forbidden, but allow plain
+  integer `Phase N` prose. Add an explicit regression fixture and assert that both real files are in
+  the published closure. All prior tag/link/backtick/example exclusions remain unchanged.

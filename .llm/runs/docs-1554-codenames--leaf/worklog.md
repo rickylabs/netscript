@@ -78,6 +78,12 @@ The policy test walks published-source JSDoc and reports exact file/line finding
 | 2026-08-12 | 4 | Source truth | Replaced all 52 findings by mechanism, restored `reserved` on the four saga agent-axis descriptions, and aligned the stale `SagaStorePort` reference row to `deno doc`. |
 | 2026-08-12 | 4 | Guard green proof | Focused guard exited 0 with 2 passed / 0 failed after formatting; code-context fixtures cover `@template T1`, inline generics/links, and fenced examples. |
 | 2026-08-12 | 4 | Full revalidation | Seven scoped check/lint/fmt wrapper trios, seven doc-lint roots, quality, all docs gates, and 3,255 repository tests exited 0. |
+| 2026-08-12 | 5 | FALLBACK IMPL-EVAL cycle 2 | Received `FAIL_FIX` at `0152e9795`: root-level export entrypoints were absent from the `/src/`-only discovery model. |
+| 2026-08-12 | 5 | First red proof | Reproduced the exact cycle-1 52-finding failure on `944dbbe07` with the cycle-1 guard. |
+| 2026-08-12 | 5 | Discovery design | Replaced the `/src/` heuristic with package/plugin export-entrypoint closure traversal; allowed plain numbered algorithm phases while keeping `Phase A` and `Phase 7d` forbidden. |
+| 2026-08-12 | 5 | Second red proof | Before changing Aspire source, the widened guard exited 1 and reported exactly `constants.ts:123 #954` and `#1012`; both algorithm and discovery fixtures passed. |
+| 2026-08-12 | 5 | Source truth | Removed the two issue numbers from `AppHealthCheckPath` while preserving why a registered health check distinguishes readiness from a merely running process. |
+| 2026-08-12 | 5 | Final revalidation | Guard 4/4, Aspire wrapper/doc-lint gates, quality/docs gates, and 3,257 repository tests exited 0. |
 
 ## Decisions
 
@@ -91,9 +97,11 @@ The policy test walks published-source JSDoc and reports exact file/line finding
 | Drift | Severity | Logged in drift.md |
 | ----- | -------- | ------------------ |
 | Census expands dispatch's examples to 26 JSDoc tokens | minor | yes |
-| Two executable-string matches cannot change under comments-only authority | significant | yes |
+| Three executable-string matches cannot change under comments-only authority | significant | yes |
 | Fallback evaluation expands the measured class by 52 JSDoc tokens | blocking, fixed | yes |
 | The source correction exposed one stale saga reference-table row | minor, fixed | yes |
+| Cycle-2 export discovery adds two Aspire issue-number tokens | blocking, fixed | yes |
+| Plain numbered algorithm phases need semantic discrimination | blocking false-positive risk, fixed | yes |
 
 ## Gate Results
 
@@ -109,23 +117,25 @@ The policy test walks published-source JSDoc and reports exact file/line finding
 | Trigger full-export doc-lint | PASS with baseline diagnostics | Exit 0; 0 missing JSDoc; 2 private-type-ref in untouched `triggers.contract.ts` |
 | Saga full-export doc-lint | PASS with baseline diagnostics | Exit 0; 0 missing JSDoc; 9 private-type-ref in untouched telemetry/contract/store files |
 
-### Final issue-defined census
+### Final issue-defined published-surface census
 
 | Measure | Count | Notes |
 | ------- | ----- | ----- |
 | Original narrow-pattern tokens found/fixed | 26 | 9 `Group X`, 17 `Tn`; 14 files; 2 packages |
 | Fallback class-expansion tokens found/fixed | 52 | 48 issue refs, 3 phase names, 1 wave name; 24 files; 7 roots |
-| Total published-JSDoc tokens found/fixed | 78 | Enumerated workstream-name, tier/wave shorthand, and issue-number class |
+| Cycle-2 root-entrypoint tokens found/fixed | 2 | Aspire `AppHealthCheckPath`: `#954`, `#1012` |
+| Total published-JSDoc tokens found/fixed | 80 | Enumerated workstream-name, tier/wave shorthand, and issue-number class |
 | Published-JSDoc tokens remaining | 0 | Proved by the widened focused scanner after formatting and in the repository suite |
 | Raw executable-string exclusions | 3 | Saga Zod description (`T1`); CLI generated CONTRIBUTING template (`Group B`); CLI agent-docs error text (`#1068`) |
 | Real generic-type-parameter matches | 0 | No publish-source generic matched; fixtures prove `@template T1`, inline `Pair<T1, T2>`, links, and fenced examples are excluded. |
 | Non-JSDoc source-comment exclusions | 14 | Raw sweep finds ordinary `//` planning references; they do not render through `deno doc` and are outside the published-JSDoc acceptance surface. |
 
 The widened pattern class is: title-cased `Group`/`Phase`/`Wave`/`Epic` planning labels,
-exact `Tn` and `Wn` shorthand, and `#n`/`netscript#n` issue references. The scanner walks
-non-generated `.ts`/`.tsx` JSDoc in package/plugin `src`, excluding publish-config-equivalent
-test, E2E, and fixture paths. It ignores JSDoc tag lines, `@example` bodies/fences, inline code,
-and inline JSDoc links so generic identifiers are not treated as planning prose.
+exact `Tn` and `Wn` shorthand, and `#n`/`netscript#n` issue references. Plain integer `Phase N`
+algorithm steps are not planning labels; letter and number-plus-letter phase forms remain forbidden.
+The scanner derives package/plugin source from every `deno.json` export entrypoint and follows local
+module edges inside that package. It excludes test, E2E, fixture, and generated paths, and ignores
+JSDoc tag lines, `@example` bodies/fences, inline code, and inline JSDoc links.
 
 ### Fallback guard proof
 
@@ -186,9 +196,28 @@ ok | 2 passed | 0 failed
 | `deno task test` | PASS | 3,255 passed (622 steps), 0 failed, 17 ignored in 5m23s |
 | Diff/lock hygiene | PASS | Package/plugin diff contains comment lines only; `git diff --check` clean; `deno.lock` unchanged |
 
+### Fallback cycle-2 proof and revalidation
+
+| Gate | Result | Output / notes |
+| ---- | ------ | -------------- |
+| Cycle-1 red reproduction | PASS (expected failure) | On `944dbbe07`: exit 1, exact 52 findings, 1 passed / 1 failed |
+| Export-closure red proof | PASS (expected failure) | On unfixed Aspire source: exit 1, exactly `#954` and `#1012`; 3 passed / 1 failed |
+| Cumulative census replay | PASS (expected failure) | On `a8303d738`: exactly 80 findings = prior 78 + two Aspire terms |
+| Final widened guard | PASS | 4 passed / 0 failed; code-context behavior unchanged |
+| Legitimate algorithm phases | PASS | Redis and database script files are in the closure; `Phase 1`/`2`/`3` produce no finding |
+| Aspire check/lint/fmt | PASS | 45 files selected; 0 failed batches/findings |
+| Aspire full-export doc-lint | PASS | 9 entrypoints including `./constants.ts`; combined diagnostics 0 |
+| Aspire `deno doc --json` | PASS | `AppHealthCheckPath` renders the readiness mechanism without issue numbers |
+| `quality:gate` | PASS | Code-quality scan 0 findings; doctrine warnings only |
+| `docs:snippets` | PASS | scanned=578, checked=21, malformed=0; no `_site` regression |
+| `docs:links` | PASS | docs=102, broken links/anchors/orphans=0 |
+| `docs:accuracy` | PASS | 4 saga pages and 196 published-source pages checked |
+| `deno task test` | PASS | 3,257 passed (622 steps), 0 failed, 17 ignored in 6m17s |
+| Diff/lock hygiene | PASS | Aspire edit is JSDoc-only; `git diff --check` clean; `deno.lock` unchanged |
+
 ## Handoff Notes
 
-- Evaluator should inspect the fallback red/green guard proof, expanded 78-token census,
+- Evaluator should inspect both cycle-2 red proofs, final green, expanded 80-token census,
   executable-diff proof, and `deno doc`/reference comparison first.
 - No occurrence was left because its meaning was uncertain; every JSDoc replacement traces to the
   declaration/runtime mechanism. Only the three explicitly out-of-authority executable strings remain.

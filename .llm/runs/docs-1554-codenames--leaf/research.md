@@ -77,3 +77,32 @@ The scanner now excludes publish-config-equivalent test, E2E, fixture, and gener
 JSDoc it excludes tag lines, `@example` bodies/fences, inline code, and inline links; the test fixture
 proves `@template T1`, `Pair<T1, T2>`, and `{@link T1}` are not treated as planning prose. The raw
 repository sweep found no real generic type-parameter occurrence in the publish source.
+
+## Fallback cycle-2 re-baseline at `0152e9795`
+
+The second evaluator found that the guard's `/src/` discovery heuristic was not equivalent to the
+published surface. `packages/aspire/deno.json` declares `./constants.ts` as the `./constants`
+entrypoint, and `deno doc --json` renders two issue references in `AppHealthCheckPath`, but the guard
+did not open that file.
+
+The replacement discovery model starts at every export target in each top-level package/plugin
+`deno.json` and follows local module edges within the package. It therefore covers root entrypoints
+and their implementation declarations without treating every included support/test/script file as
+consumer-facing documentation. A fixture locks three important closure cases:
+
+- `packages/aspire/constants.ts` — direct root export;
+- `packages/kv/adapters/redis.adapter.ts` — dependency of the `./redis` export;
+- `packages/database/scripts/patch-prisma-client.ts` — dependency of the `./scripts` export.
+
+The `Phase` predicate now distinguishes numbered algorithm steps from planning codenames. Plain
+`Phase 1` / `Phase 2` / `Phase 3` prose passes; letter phases and number-plus-letter forms such as
+`Phase A` and `Phase 7d` remain forbidden. Existing JSDoc code-context discrimination is unchanged.
+
+Two raw pre-fix proofs establish the scope:
+
+1. Cycle-1 discovery on `944dbbe07` still reports exactly the reproduced 52 findings.
+2. Export-closure discovery on the cycle-1 fixed tree reports exactly the two Aspire issue tokens.
+
+A cumulative replay at pre-remediation commit `a8303d738` reports 80 terms: the prior 78 plus
+Aspire `#954` and `#1012`. All 80 are fixed and the final published-entrypoint-closure census is
+zero.

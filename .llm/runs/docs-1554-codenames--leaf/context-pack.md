@@ -12,12 +12,12 @@
 
 ## Current State
 
-Fallback implementation fixes and generator-owned gates are complete. The original two-regex sweep
-fixed 26 JSDoc tokens; the evaluator-required class expansion proved 52 additional findings red and
-fixed all of them (78 total, 0 remaining). The focused regression, seven package wrapper/doc-lint
-sets, quality/docs gates, and 3,255 repository tests pass. Trigger and saga reference summaries now
-match `deno doc --json`. The draft remains in `status:impl` for the orchestrator-owned evaluator
-lifecycle.
+Fallback cycle-2 implementation fixes and generator-owned gates are complete. Export-entrypoint
+closure discovery found two additional Aspire issue references outside `src`; the cumulative census
+is now 80 found, 80 fixed, 0 remaining. The focused four-case regression, Aspire wrapper/doc-lint
+set, quality/docs gates, and 3,257 repository tests pass. Trigger and saga reference summaries still
+match `deno doc --json`, and Aspire's source has no separate reference row to update. PR metadata is
+unchanged for the orchestrator-owned evaluator lifecycle.
 
 ## Completed
 
@@ -31,15 +31,20 @@ lifecycle.
 - Trigger reference page remains aligned (6 rows); the stale saga `SagaStorePort` row is corrected;
   CLI reference rows contain no stale summary.
 - Quality gate, all three docs gates, and repository tests pass.
+- Cycle-2 raw proof 1: the unchanged cycle-1 guard reports the exact 52 findings on `944dbbe07`.
+- Cycle-2 raw proof 2: export-closure discovery reports Aspire `#954` and `#1012` before their fix.
+- The guard follows every package/plugin export closure, covers root entrypoints, and explicitly
+  allows legitimate numbered algorithm phases while retaining all prior code-context exclusions.
+- `AppHealthCheckPath` now explains the health/readiness mechanism without issue numbers.
 
 ## In Progress
 
-- Fallback fix commit/push/comment and PR body evidence refresh.
+- Cycle-2 fix commit/push/comment and PR body evidence refresh.
 
 ## Next Steps
 
-1. Commit and push the fallback fix with the explicit refspec.
-2. Update the draft PR evidence and post the raw guard failure/pass.
+1. Commit and push the cycle-2 fallback fix with the explicit refspec.
+2. Update PR evidence and post both raw guard failures plus the final pass.
 3. Stop; do not mark ready or change labels.
 
 ## Key Decisions
@@ -49,6 +54,8 @@ lifecycle.
 | `deno doc` is authoritative | Owner brief / Deno toolchain | Source first, reference page second. |
 | Executable strings excluded | Owner boundary | Three exact strings logged as drift, not silently ignored. |
 | JSDoc code contexts excluded | Owner/evaluator caution | `@template`, examples/fences, inline code, and links are regression-tested. |
+| Export-entrypoint closure defines published source | Cycle-2 evaluator / package export maps | Covers root entrypoints and local dependencies without scanning unpublished scripts/tests. |
+| Plain numbered algorithm phases are allowed | Cycle-2 evaluator trap | `Phase A` and `Phase 7d` remain forbidden; `Phase 1`/`2`/`3` steps pass. |
 
 ## Files Changed
 
@@ -59,13 +66,14 @@ lifecycle.
 | `plugins/streams/services/src/**` | changed | JSDoc prose only. |
 | `.llm/tools/fitness/check-public-jsdoc-codenames_test.ts` | changed | Full-class JSDoc recurrence test. |
 | `docs/site/reference/{plugin-triggers-core,sagas}/index.md` | changed | JSON-aligned symbol summaries. |
+| `packages/aspire/constants.ts` | changed | Published health-check JSDoc drops two issue numbers while preserving mechanism. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | PASS | Focused test and all seven scoped wrapper trios pass. |
-| Fitness | PASS | Expanded JSDoc census 0; quality gate exit 0. |
+| Static | PASS | Focused 4/4 test and Aspire's 45-file scoped wrapper trio pass. |
+| Fitness | PASS | Export-closure JSDoc census 0; cumulative 80/80 fixed; quality gate exit 0. |
 | Runtime | N/A | Comments/test only; no behavior change. |
 | Consumer | PASS | 6/6 trigger summaries and corrected saga store summary match JSON. |
 
@@ -75,7 +83,7 @@ lifecycle.
 
 ## Drift and Debt
 
-- Drift: the first census understated the issue-defined class; three executable strings are excluded.
+- Drift: two prior censuses understated the published surface; three executable strings are excluded.
 - Debt: none created.
 
 ## Commits
