@@ -40,3 +40,19 @@
 
 - None that require implementation rework. The precedence and partial API shape are locked in
   `plan.md`.
+
+## Correction Cycle 2 — evaluated head `f9e924d0b`
+
+The owner-provided fallback IMPL-EVAL returned `FAIL_FIX` with one blocking counterexample and one
+advisory to repair alongside it:
+
+1. `promoteRouteContractConfig()` discarded prior path/search schemas when an inline contract
+   omitted them, while its type transition continued to expose the prior state. The stored bound
+   contract therefore parsed the request successfully as `{}`.
+2. Route-bound partials trusted their statically typed reference and reached `safeParsePath`
+   directly, so a JavaScript/cast consumer could receive an incidental missing-method `TypeError`
+   rather than the page builder's deterministic validation error.
+
+The accepted `withRoute()` mechanism, precedence chain, 404/400 policy, pipeline matrix, and parser
+constraint are unchanged. The correction is mechanical and has no unresolved design question, so
+cycle-2 PLAN-EVAL is N/A. Per the owner override, re-evaluation remains automatic lifecycle work.

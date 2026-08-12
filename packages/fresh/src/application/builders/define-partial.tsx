@@ -15,6 +15,10 @@ import type { PageMethod } from './define-page/page-compat/form-types.ts';
 import type { PageErrorPrimitives } from './define-page/page-compat/route-types.ts';
 import type { RouteReference } from '../route/_internal/contract-runtime.ts';
 import { resolvePathParams, resolveSearchParams } from './define-page/runtime/context.ts';
+import {
+  INCOMPLETE_ROUTE_REFERENCE_MESSAGE,
+  isRouteReference,
+} from './define-page/builder/route-support.ts';
 
 /** Default Fresh route config used by framework partial routes. */
 export const PARTIAL_ROUTE_CONFIG: RouteConfig = {
@@ -245,6 +249,9 @@ export function definePartial<
   > {
   if ('route' in options) {
     const { route } = options;
+    if (!isRouteReference(route)) {
+      throw new TypeError(INCOMPLETE_ROUTE_REFERENCE_MESSAGE);
+    }
     return materializePartial(
       options,
       (ctx: PageRequestContext<TState>) => bindPartialRouteContext(ctx, route),

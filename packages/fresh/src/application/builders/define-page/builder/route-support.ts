@@ -21,7 +21,12 @@ import type {
 } from '../types.ts';
 import type { InferRoutePath, InferRouteSearch, TypedRouteTarget } from '../navigation/mod.ts';
 
-function isRouteReference<
+/** Error shared by builders that receive an incomplete route reference. */
+export const INCOMPLETE_ROUTE_REFERENCE_MESSAGE =
+  'definePage().withRoute(...) requires a complete route reference with navigation and parsers.';
+
+/** Return whether a value carries the complete runtime route-reference capability. */
+export function isRouteReference<
   TRoute extends TypedRouteTarget<object, object> & RouteParserTarget,
 >(
   route: TRoute,
@@ -45,9 +50,7 @@ export function promoteRouteConfig<
   type TRouteTypes = DefinePageWithRoute<TTypes, TRoute>;
 
   if (!isRouteReference(route)) {
-    throw new TypeError(
-      'definePage().withRoute(...) requires a complete route reference with navigation and parsers.',
-    );
+    throw new TypeError(INCOMPLETE_ROUTE_REFERENCE_MESSAGE);
   }
 
   return {
@@ -87,17 +90,16 @@ export function promoteRouteContractConfig<
     );
   }
 
-  const routeContract = defineRouteContract({
-    pathSchema: contract.pathSchema,
-    searchSchema: contract.searchSchema,
-  });
+  const pathSchema = contract.pathSchema ?? config.pathSchema;
+  const searchSchema = contract.searchSchema ?? config.searchSchema;
+  const routeContract = defineRouteContract({ pathSchema, searchSchema });
   const boundRoute = bindRoutePattern(routeContract, contract.$route);
 
   return {
     ...promoteConfigToRoute<TTypes, TRouteTypes, THasConfiguredRoute>(config),
     defaultRoutePattern: boundRoute.routePattern,
-    pathSchema: contract.pathSchema as RuntimePageConfig<TRouteTypes, true>['pathSchema'],
-    searchSchema: contract.searchSchema as RuntimePageConfig<TRouteTypes, true>['searchSchema'],
-    route: boundRoute as unknown as RuntimePageConfig<TRouteTypes, true>['route'], // quality-allow: DefinePageWithRouteContract preserves prior path/search output when either optional schema is omitted, but BoundRouteContract maps an omitted schema to EmptyRecord; TypeScript cannot equate those conditional states without presence-specific legacy builder overloads
+    pathSchema: pathSchema as RuntimePageConfig<TRouteTypes, true>['pathSchema'],
+    searchSchema: searchSchema as RuntimePageConfig<TRouteTypes, true>['searchSchema'],
+    route: boundRoute as RuntimePageConfig<TRouteTypes, true>['route'],
   };
 }

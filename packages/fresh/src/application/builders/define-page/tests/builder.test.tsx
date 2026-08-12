@@ -610,6 +610,30 @@ Deno.test('definePage withRouteContract({ pathSchema }) promotes path type-state
     `Expected layout ctx.path to carry the promoted inline path: ${capturedHref}`,
   );
 });
+Deno.test('definePage withRouteContract preserves prior schemas when its contract omits them', async () => {
+  let resolved = '';
+  const route = definePage<{ requestId: string }>()
+    .withPathParams(z.object({ id: z.string().min(1) }))
+    .withSearchParams(z.object({ view: z.enum(['summary', 'detail']) }))
+    .withRouteContract({ $route: '/orders/[id]' })
+    .withResource('capture', (ctx) => {
+      const typedId: string = ctx.path.id;
+      const typedView: 'summary' | 'detail' = ctx.search.view;
+      resolved = `${typedId}:${typedView}`;
+      return null;
+    })
+    .build();
+
+  await route.page(createRequestContext({
+    params: { id: 'order-42' },
+    url: new URL('http://localhost/orders/order-42?view=detail'),
+  }));
+
+  assert(
+    resolved === 'order-42:detail',
+    `Expected prior path/search schemas to remain bound, received ${resolved}`,
+  );
+});
 Deno.test('definePage withRouteContract({ searchSchema }) promotes search type-state', () => {
   const route = definePage<{ requestId: string }>()
     .withRouteContract({

@@ -83,3 +83,19 @@ parser, then expose that same binding natively through `definePartial()`.
 
 Not launched. The owner explicitly prohibited all local evaluators for this lane and directed that
 evaluation reach the draft PR only through the automatic label-driven lifecycle.
+
+## Correction Cycle 2
+
+- **C1:** Preserve an existing runtime path/search schema when `withRouteContract()` omits the
+  corresponding inline schema. Inline contract schemas still win when present, matching the existing
+  `ResolveSchemaOutput` promise without changing the accepted `withRoute()` chain.
+- **C2:** Remove the `as unknown as` route assertion and its settled quality allowance. A single
+  structural route assertion remains because TypeScript cannot prove the output of generic
+  schema-nullish-coalescing, but the runtime reference is now constructed from exactly those
+  effective schemas.
+- **C4:** Export and reuse the internal `isRouteReference` guard and its error message from routed
+  partial materialization, so incomplete references fail immediately and identically to pages.
+- **Tests:** Capture red-before-fix evidence for the omitted-contract-schema reproduction and the
+  malformed partial reference before running the owner-specified final gate set.
+- **Non-scope:** No redesign of `withRoute`, no route-inference C3 work, no browser/CLI E2E, and no
+  local evaluator or lifecycle transition.

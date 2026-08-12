@@ -241,6 +241,30 @@ Deno.test('definePartial route binding uses shared 404 and 400 invalid-state res
   }
 });
 
+Deno.test('definePartial rejects an incomplete route reference with the page builder error', () => {
+  const malformedRoute = createRouteReference('/orders/[id]');
+  Reflect.deleteProperty(malformedRoute, 'safeParsePath');
+
+  let thrown: unknown;
+  try {
+    definePartial({
+      name: 'malformed-route',
+      route: malformedRoute,
+      loader: async () => await Promise.resolve({ label: 'unused', value: 'unused' }),
+      component: StatsCard,
+    });
+  } catch (error: unknown) {
+    thrown = error;
+  }
+
+  assert(thrown instanceof TypeError, 'Expected an incomplete route reference to throw TypeError');
+  assert(
+    thrown.message ===
+      'definePage().withRoute(...) requires a complete route reference with navigation and parsers.',
+    `Unexpected incomplete route error: ${thrown.message}`,
+  );
+});
+
 function assertPartialRouteMutationInference(): void {
   type IsNever<T> = [T] extends [never] ? true : false;
   type Expect<T extends true> = T;
