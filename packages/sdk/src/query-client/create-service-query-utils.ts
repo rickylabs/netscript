@@ -36,7 +36,8 @@ export interface CreateServiceQueryUtilsOptions {
  *
  * @example
  * ```ts
- * import { ordersClient } from './api-clients.ts';
+ * import { useQuery } from '@netscript/fresh/query';
+ * import { ordersClient } from '@app/lib/orders.ts';
  *
  * const ordersQueryUtils = createServiceQueryUtils(ordersClient, {
  *   path: ['orders'],
@@ -44,7 +45,7 @@ export interface CreateServiceQueryUtilsOptions {
  *
  * // In an island:
  * const { data } = useQuery(
- *   ordersQueryUtils.list.queryOptions({ input: { page: 1, limit: 20 } }),
+ *   ordersQueryUtils.list.queryOptions({ input: { offset: 0, limit: 20 } }),
  * );
  * ```
  *

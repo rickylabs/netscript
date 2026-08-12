@@ -140,8 +140,10 @@ routing here — defer to that file. The items below are the parts of the contra
   Use the phase-bound Minimax/DeepSeek OpenRouter preset only for a genuine third opinion or when
   the native opposite-family route is quota-blocked. If OpenRouter is then limited, use a fresh AGY
   Gemini 3.6 Flash high session on the Google subscription. OpenHands is reserved for explicitly
-  cloud-driven work. The **supervisor chooses when to trigger**; never auto-dispatch an evaluator
-  from a sub-agent. Record every blocked route, escalation, and requested/observed identity.
+  cloud-driven work. For cloud PRs, repository automation owns the phase trigger: `openhands` plus
+  `status:plan-eval` for PLAN-EVAL, and draft→ready for IMPL-EVAL. Supervisors select labels and do
+  not duplicate the automatic dispatch with a manual evaluator. Record every blocked route,
+  escalation, and requested/observed identity.
 - **Self-certifying a slice** — a green automated gate is not a sign-off. The Tier-A supervisor must
   substantively review the slice before the sign-off commit, for every implementation lane
   (`workflow/lane-policy.md` invariant 2). No lane self-certifies.

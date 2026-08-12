@@ -84,6 +84,138 @@ Deno.test(
   },
 );
 
+Deno.test('forwards durable State-Protocol query parameters to the injected fetch', async () => {
+  let upstreamRequest: Request | undefined;
+  const handler = createNetScriptChatStreamProxy({
+    target: { sessionId: 's1', baseUrl: 'http://upstream.test' },
+    auth: () => ({}),
+    fetch: (request) => {
+      upstreamRequest = request as Request;
+      return Promise.resolve(new Response());
+    },
+  });
+
+  await handler(
+    new Request(
+      'http://app.test/api/chat-stream?offset=42&live=sse&handle=h1&cursor=next',
+    ),
+  );
+
+  assert(upstreamRequest);
+  const query = new URL(upstreamRequest.url).searchParams;
+  assertEquals(query.get('offset'), '42');
+  assertEquals(query.get('live'), 'sse');
+  assertEquals(query.get('handle'), 'h1');
+  assertEquals(query.get('cursor'), 'next');
+});
+
+Deno.test('drops application routing id while forwarding durable query parameters', async () => {
+  let upstreamRequest: Request | undefined;
+  const handler = createNetScriptChatStreamProxy({
+    target: { sessionId: 'session-1', baseUrl: 'http://upstream.test' },
+    auth: () => ({}),
+    fetch: (request) => {
+      upstreamRequest = request as Request;
+      return Promise.resolve(new Response());
+    },
+  });
+
+  await handler(
+    new Request(
+      'http://app.test/api/chat-stream?id=session-1&offset=42&live=sse&handle=h1',
+    ),
+  );
+
+  assert(upstreamRequest);
+  const query = new URL(upstreamRequest.url).searchParams;
+  assertEquals(query.get('id'), null);
+  assertEquals(query.get('offset'), '42');
+  assertEquals(query.get('live'), 'sse');
+  assertEquals(query.get('handle'), 'h1');
+});
+
+Deno.test('keeps resolved upstream query values on client collisions', async () => {
+  let upstreamRequest: Request | undefined;
+  const handler = createNetScriptChatStreamProxy({
+    target: { sessionId: 's1', baseUrl: 'http://upstream.test' },
+    streamPath: ({ target }) => `/ai/chat/${target.sessionId}?live=configured`,
+    auth: () => ({}),
+    fetch: (request) => {
+      upstreamRequest = request as Request;
+      return Promise.resolve(new Response());
+    },
+  });
+
+  await handler(new Request('http://app.test/api/chat-stream?live=client&offset=42'));
+
+  assert(upstreamRequest);
+  const query = new URL(upstreamRequest.url).searchParams;
+  assertEquals(query.getAll('live'), ['configured']);
+  assertEquals(query.get('offset'), '42');
+});
+
+Deno.test('preserves repeated incoming query keys', async () => {
+  let upstreamRequest: Request | undefined;
+  const handler = createNetScriptChatStreamProxy({
+    target: { sessionId: 's1', baseUrl: 'http://upstream.test' },
+    auth: () => ({}),
+    fetch: (request) => {
+      upstreamRequest = request as Request;
+      return Promise.resolve(new Response());
+    },
+  });
+
+  await handler(new Request('http://app.test/api/chat-stream?cursor=a&cursor=b'));
+
+  assert(upstreamRequest);
+  assertEquals(new URL(upstreamRequest.url).searchParams.getAll('cursor'), ['a', 'b']);
+});
+
+Deno.test('query hook replaces default forwarding and can suppress or add parameters', async () => {
+  let upstreamRequest: Request | undefined;
+  const handler = createNetScriptChatStreamProxy({
+    target: { sessionId: 's1', baseUrl: 'http://upstream.test' },
+    query: (incoming) =>
+      new URLSearchParams([
+        ['id', incoming.get('id') ?? 'missing'],
+        ['cursor', 'mapped'],
+      ]),
+    auth: () => ({}),
+    fetch: (request) => {
+      upstreamRequest = request as Request;
+      return Promise.resolve(new Response());
+    },
+  });
+
+  await handler(
+    new Request('http://app.test/api/chat-stream?id=session-1&offset=42&live=sse'),
+  );
+
+  assert(upstreamRequest);
+  const query = new URL(upstreamRequest.url).searchParams;
+  assertEquals(query.get('id'), 'session-1');
+  assertEquals(query.get('cursor'), 'mapped');
+  assertEquals(query.get('offset'), null);
+  assertEquals(query.get('live'), null);
+});
+
+Deno.test('leaves a no-query upstream URL unchanged without a stray question mark', async () => {
+  let upstreamRequest: Request | undefined;
+  const handler = createNetScriptChatStreamProxy({
+    target: { sessionId: 's1', baseUrl: 'http://upstream.test' },
+    auth: () => ({}),
+    fetch: (request) => {
+      upstreamRequest = request as Request;
+      return Promise.resolve(new Response());
+    },
+  });
+
+  await handler(new Request('http://app.test/api/chat-stream'));
+
+  assert(upstreamRequest);
+  assertEquals(upstreamRequest.url, 'http://upstream.test/v1/stream/netscript/ai/chat/s1');
+});
+
 Deno.test(
   'supports eis-chat per-session stream paths and survives identity-negotiated gzip mislabel (#219)',
   async () => {
@@ -134,7 +266,7 @@ Deno.test(
 
       assertEquals(
         upstreamUrl,
-        `http://127.0.0.1:${port}/v1/stream/netscript/eischat/sessions/eis-123/messages`,
+        `http://127.0.0.1:${port}/v1/stream/netscript/eischat/sessions/eis-123/messages?session=eis-123`,
       );
       assertEquals(response.headers.get('content-encoding'), null);
       assertEquals(response.headers.get('content-type'), 'application/json');

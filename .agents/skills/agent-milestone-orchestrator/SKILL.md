@@ -106,10 +106,12 @@ skill holds no routing. The orchestrator's delegation judgement, beyond routing:
 - **Intercept between turns, not on git activity.** `codex-watch --mode turn` fires on
   `task_complete`, when the agent is idle between turns — that is the clean point to read, steer,
   or stop; git activity is not that signal **[observed — #1120 learnings]**.
-- **Evaluate only when necessary [observed — #1120 learnings].** Draft→ready already triggers the
-  augment review; a label auto-triggers OpenHands (repo CI behaviour). Spawning a local evaluator
-  per PR is waste. The evaluator invariants and the scoped reviewer-substitution waiver are
-  defined in `milestone-run.md` § Evaluator protocol.
+- **Let phase automation own OpenHands [observed — #1120 learnings].** For PLAN-EVAL, add
+  `openhands` and transition the draft PR to `status:plan-eval`. For IMPL-EVAL, choose at most one
+  `eval:model:*` override while draft, then make the PR ready once; automation enters
+  `status:impl-eval` and dispatches exactly once. Never also post `@openhands-agent` manually for
+  that head. A deliberate rerun moves away from and back to the relevant eval status. Local native
+  evaluator sessions remain available when the run explicitly selects the local transport.
 
 ## Merge authority
 

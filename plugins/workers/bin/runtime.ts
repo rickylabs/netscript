@@ -31,6 +31,7 @@ import {
   type StaticJobDefinitionRegistry,
 } from '../src/runtime/generated-jobs.ts';
 import { createWorkersServiceRuntime } from '../services/src/service-runtime.ts';
+import { createStreamMutationHook } from '../streams/server.ts';
 import { Scheduler, Worker } from '../worker/mod.ts';
 
 /**
@@ -88,6 +89,7 @@ export type StartCombinedProcessOptions = StartWorkerProcessOptions & StartSched
 /** Start the plugin worker process. */
 export async function startWorkerProcess(options: StartWorkerProcessOptions = {}): Promise<Worker> {
   const runtime = await createWorkersServiceRuntime();
+  runtime.executionState.setMutationHook(createStreamMutationHook());
   const generated = await registerProjectJobs(runtime, options.definitions);
   const poolRegistry = options.registry ?? generated?.registry;
   const worker = new Worker({
@@ -126,6 +128,7 @@ export async function startCombinedProcess(
   options: StartCombinedProcessOptions = {},
 ): Promise<Readonly<{ scheduler: Scheduler; worker: Worker }>> {
   const runtime = await createWorkersServiceRuntime();
+  runtime.executionState.setMutationHook(createStreamMutationHook());
   const generated = await registerProjectJobs(runtime, options.definitions);
   const poolRegistry = options.registry ?? generated?.registry;
   const taskExecutor = createDefaultTaskExecutor();
