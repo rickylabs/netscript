@@ -109,6 +109,13 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       lines.push(``);
       lines.push(`    // HTTP endpoint`);
       lines.push(`    await ${id}.${renderHttpEndpointCall(entry)};`);
+
+      // Browser diagnostics are a frontend-app default. Keep the app-type and
+      // endpoint predicates together so task/desktop executables cannot gain a
+      // browser child without a browseable HTTP/HTTPS parent.
+      if (type === 'app') {
+        lines.push(`    await ${id}.withBrowserLogs();`);
+      }
     }
 
     // --- Endpoint readiness probe ---
