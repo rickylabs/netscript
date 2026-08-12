@@ -108,3 +108,84 @@ close-gate job after labeling is sufficient and preserves head immutability. It 
   `232/0` locally and `231/1` in the evaluator session **for the same head**. Both reports were
   accurate; without the mechanism that reads as one agent misreporting, and the natural response —
   re-running until they agree — wastes a cycle and teaches the wrong lesson.
+
+---
+
+# Lane retrospective — 0.0.6 runtime / public-surface
+
+Written at lane close. Release ownership hands to **ns006-fixes**; this lane dispatched no release.
+
+## What landed
+
+| PR | Issues | Merge |
+| --- | --- | --- |
+| #1593 | #1583 | `f542f31cb` |
+| #1595 | #1589 | `4dc4d8262` |
+| #1607 | #1577 | `1f9efb4d` |
+| #1600 | #1569 | `6aee2b414` |
+| #1602 | #1576, #1568 | `1ed78f508` |
+| #1605 | #1562 | at ready-merge on `6a5692d84` |
+
+Earlier in the run: #1457, #1459, #1548, #1571, #1580, #1227, plus Canary.3 and the terminal-green
+Canary.4.
+
+## What the evaluators caught that the lane did not
+
+This is the part worth keeping. In every case the implementation was accepted and the finding was
+about whether the evidence meant what it claimed.
+
+- **#1583** — one physical subscription was enforced, but every hub test used a probe that yields only
+  *after* the hold, so `publish` and the wake handshake were asserted by nothing. A refactor dropping
+  all but the first subscriber would have left 230 tests green.
+- **#1576** — the fix was correct, and the *sibling* `withRouteContract` path had the identical defect
+  one builder method away: typed `ctx.path.id` resolving `{}`. Reproduced by probe, not inferred.
+- **#1569** — the browser regression passed by hand and was wired into nothing, so the acceptance box
+  claiming browser coverage was satisfied by a test that would never run again.
+- **#1562** — the C1 code fix was right and the published README still documented the deleted
+  behaviour, which would have had consumers alerting on `outcome=error` for healthy reads. And the
+  regression test added for C2 **passed with its own fix reverted**.
+
+The pattern: a green gate is not evidence that the gate can fail.
+
+## What this lane got wrong
+
+- **D-11 → D-12.** I inferred from `run.headSha` that draft→ready evaluations were unbound to the PR
+  head. That field is the merge ref by GitHub's design and never described the evaluator's checkout.
+  The inference cost a rollback of #1595 and a cancelled #1602 run, both on valid verdicts. Corrected
+  rule: authority is the verdict's declared head.
+- **D-13 → corrected.** I declared #1576 criterion 5 "unsatisfiable as worded" after searching
+  `packages/cli` and finding only static route patterns. The route-manifest generator inside
+  `packages/fresh` handles dynamic segments, so the criterion is satisfiable under the
+  generator-output reading. Searching one package and concluding about the repo.
+- **D-14.** My briefs used issue numbers as shorthand and asked for the reasoning to be recorded in
+  source. `#1589` reached published JSDoc twice, breaking CI both times.
+- **A fabricated SHA.** I handed an evaluator a 40-character hash padded from a short prefix. It ran
+  `git rev-parse`, got `fatal: bad object`, resolved the real head, and said so. Caught by
+  verification, not by me.
+
+Each of these is the same shape as the findings above: a claim that looked checkable and was not.
+
+## Infrastructure, quantified
+
+- **Ten `setup-deno` `socket hang up` / HTTP 503 failures across six PRs in one day**, every one green
+  on rerun with no code change.
+- **Three cloud evaluators stalled past 20 minutes with no verdict** (#1593, #1595, #1605), each
+  replaced by an authorized native fallback.
+
+The cost is not the reruns. It is that the reflex they train — rerun red without reading it — would
+have buried two real failures that looked identical at a glance: the `#1589` codename conflict between
+#1595 and #1587, and the nine-symbol docs drift on #1605.
+
+## Filed from inside the run
+
+#1542, #1543, #1557, #1561, #1563, #1571, #1580, #1597, #1598, #1601, #1604, #1609, #1610, #1616,
+#1619, #1620, #1621, #1623.
+
+Four of these — #1601, #1604, #1616, #1621 — are gate-integrity defects: tests or tooling that report
+a verdict the codebase does not support. #1621 in particular cost a cycle on four separate PRs before
+being named.
+
+## Handover
+
+Canary.5's blockers are #1599 (merged, `canary:0.0.6-canary.5`) and #1605. After #1605 lands, 0.0.6
+holds only docs-owned #1531. **No release dispatched from this lane.**
