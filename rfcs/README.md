@@ -63,6 +63,26 @@ Draft ──▶ Discussion ──▶ Final Comment Period ──▶ Accepted ─
 RFC numbers are assigned by a maintainer at acceptance (next free integer), not by the author. Use
 `0000` in the filename while the RFC is in draft. This avoids number races between concurrent drafts.
 
+### Canonical location and harness provenance
+
+The canonical accepted design record is `rfcs/NNNN-*.md`. Numbered RFCs 0001 through 0005 establish
+that practice in this tree. Files under `.llm/runs/*/design/canonical/` are durable research,
+provenance, and draft-design artifacts; despite the historical `canonical` folder name, they do not
+become accepted RFCs unless their decision is reviewed, numbered, and merged here.
+
+The following architecture-debt decisions are mapped to this process but are **not filed by this
+documentation change**. Until an RFC draft exists, the debt entry remains the decision's source of
+truth; if the maintainer chooses a public or cross-cutting change, the proposal starts as
+`rfcs/0000-<slug>.md` and receives its number only at acceptance.
+
+| Debt decision ID | RFC-process mapping |
+| --- | --- |
+| `CRON-SUBSYSTEM-DUP` | Decide the canonical scheduling surface through a future RFC before removing or blessing either public path. |
+| `RUN-ARTIFACT-ARCHIVAL-POLICY` | Ratify any cross-repository evidence-retention convention through a future RFC before pruning run provenance. |
+| `PAGEBUILDER-LEGACY-COMPAT-TREE` | Route the public builder compatibility decision through a future RFC before a breaking removal or permanent dual surface. |
+| `FORMPAGEPROPS-PLAYGROUND-MIGRATION` | Bind the transitional public type's disposition to the PageBuilder RFC decision and migration sequence. |
+| `REDIS-LEGACY-VALUE-FALLBACK` | Route any hard data-compatibility break or durable migration convention through a future RFC before removing the fallback. |
+
 ## Relationship to milestones and labels
 
 - An **accepted** RFC's tracking issue is placed on the normal `0.0.x` release milestone it targets
@@ -73,7 +93,6 @@ RFC numbers are assigned by a maintainer at acceptance (next free integer), not 
 
 ## Governance note
 
-The formal, binding "what requires an RFC" policy is part of NetScript's architecture governance and
-is being reconciled with the architecture doctrine (`.agents/skills/netscript-doctrine`,
-`docs/architecture/doctrine/`). This document is the operational process; if it ever conflicts with a
-ratified doctrine governance statement, doctrine wins and this file will be updated to match.
+This file is the canonical operational location for numbered RFCs and their lifecycle. Architecture
+doctrine defines package/plugin constraints; if a future ratified doctrine rule changes what requires
+an RFC, this process is updated in the same change rather than creating a second RFC location.

@@ -17,6 +17,9 @@ import { loadProjectConfig } from './project-config-loader.ts';
 import { DenoProcess } from '../runtime/process/deno-process.ts';
 import { resolveExportedPluginManifest } from '../../application/plugin/exported-plugin-manifest.ts';
 import { resolvePluginImportSpecifier } from '../../application/plugin/configured-plugin-specifier.ts';
+import { resolveRegisteredPluginSource } from '../../application/plugin/registered-plugin-source.ts';
+import { probeConfiguredPluginManifest } from './configured-plugin-manifest-probe.ts';
+import type { ConfiguredPluginManifestSummary } from './configured-plugin-manifest-summary.ts';
 
 const PLUGIN_DEPENDENCY_MISSING_EXIT_CODE = 76;
 const SCAFFOLD_PLUGIN_MANIFEST = 'scaffold.plugin.json';
@@ -40,7 +43,7 @@ type RegisteredPluginSnapshot = Pick<
   | 'runtimeConfig'
   | 'doctor'
   | 'cli'
->;
+> & { readonly configuredSpecifier: string };
 
 type NetScriptConfigWithPlugins = NetScriptConfig & {
   readonly plugins?: readonly string[];
@@ -104,16 +107,14 @@ function normalizePluginManifest(
   definition: RegisteredPluginSnapshot,
   projectRoot: string,
   config?: NetScriptConfig,
-  paths?: Pick<PathsConfig, 'plugins'>,
 ): RegisteredPluginConfig {
-  const workdir = resolvePluginWorkdir(definition.name, paths);
+  const source = resolveRegisteredPluginSource(projectRoot, definition.configuredSpecifier);
 
   return {
     name: definition.name,
     displayName: definition.displayName,
     type: definition.type,
-    workdir,
-    rootDir: resolve(projectRoot, workdir),
+    source,
     permissions: definition.permissions ? [...definition.permissions] : undefined,
     service: definition.service,
     infrastructure: definition.infrastructure,
@@ -146,7 +147,9 @@ async function resolvePluginConfigSnapshot(
     validatePluginDependencies(manifest, installedPluginNames);
   }
 
-  return manifests.map((manifest) => resolveRegisteredPluginSnapshot(manifest, config));
+  return manifests.map((manifest, index) =>
+    resolveRegisteredPluginSnapshot(manifest, specs[index] ?? manifest.name, config)
+  );
 }
 
 async function resolvePluginManifestsInProcess(
@@ -231,7 +234,6 @@ export async function loadRegisteredPlugins(
         definition,
         projectRoot,
         resolvedConfig,
-        resolvedConfig.paths,
       );
       return [resolvePluginLocalName(plugin.name), plugin] as const;
     }),
@@ -253,11 +255,12 @@ export async function loadRegisteredPluginMetadata(
           projectRoot,
           resolvedMetadata.metadata,
           resolvedMetadata.moduleDirectory,
+          spec,
         )
-        : normalizePluginSpecMetadata(projectRoot, spec, config.paths);
+        : await normalizePluginSpecMetadata(projectRoot, spec);
     } catch (error) {
       plugin = {
-        ...normalizePluginSpecMetadata(projectRoot, spec, config.paths),
+        ...normalizeUnresolvedPluginSpecMetadata(projectRoot, spec),
         manifestError: error instanceof Error ? error.message : String(error),
       };
     }
@@ -305,6 +308,7 @@ function normalizeScaffoldPluginMetadata(
   projectRoot: string,
   metadata: ScaffoldPluginMetadata,
   moduleDirectory: string,
+  configuredSpecifier: string,
 ): RegisteredPluginConfig {
   const name = metadata.officialSource?.canonicalName ?? metadata.officialSource?.pluginDir;
   if (!name) {
@@ -328,8 +332,13 @@ function normalizeScaffoldPluginMetadata(
     type: metadata.provider.pluginType === 'background-processor'
       ? 'background-processor'
       : 'utility',
-    workdir,
-    rootDir: moduleDirectory,
+    source: {
+      kind: 'local-workdir',
+      configuredSpecifier,
+      resolvedSpecifier: resolvePluginImportSpecifier(projectRoot, configuredSpecifier),
+      workdir,
+      rootDir: moduleDirectory,
+    },
     permissions: permissions ? [...permissions] : undefined,
     doctor: metadata.officialSource?.doctorEntrypoint,
     service: serviceEntrypoint
@@ -351,19 +360,51 @@ function normalizeScaffoldPluginMetadata(
   };
 }
 
-function normalizePluginSpecMetadata(
+async function normalizePluginSpecMetadata(
   projectRoot: string,
   spec: string,
-  paths?: Pick<PathsConfig, 'plugins'>,
+): Promise<RegisteredPluginConfig> {
+  const source = resolveRegisteredPluginSource(projectRoot, spec);
+  if (source.kind === 'local-workdir') return normalizeUnresolvedPluginSpecMetadata(projectRoot, spec);
+  const probe = await probeConfiguredPluginManifest(projectRoot, spec, new DenoProcess(), {
+    timeoutMs: CONFIGURED_PLUGIN_MANIFEST_LOAD_TIMEOUT_MS,
+  });
+  if (probe.status !== 'resolved') {
+    throw new Error(formatManifestProbeFailure(spec, probe));
+  }
+  return normalizePackagePluginMetadata(
+    { ...source, resolvedSpecifier: probe.resolvedSpecifier },
+    probe.manifest,
+  );
+}
+
+function normalizeUnresolvedPluginSpecMetadata(
+  projectRoot: string,
+  spec: string,
 ): RegisteredPluginConfig {
+  const source = resolveRegisteredPluginSource(projectRoot, spec);
   const name = resolvePluginNameFromSpec(spec);
-  const workdir = resolvePluginWorkdirFromSpec(spec, name, paths);
   return {
     name,
     displayName: toDisplayName(name),
     type: undefined,
-    workdir,
-    rootDir: resolve(projectRoot, workdir),
+    source,
+  };
+}
+
+function normalizePackagePluginMetadata(
+  source: Extract<RegisteredPluginConfig['source'], { kind: 'package' }>,
+  manifest: ConfiguredPluginManifestSummary,
+): RegisteredPluginConfig {
+  return {
+    name: manifest.name,
+    displayName: manifest.displayName,
+    type: manifest.type,
+    source,
+    permissions: manifest.permissions ? [...manifest.permissions] : undefined,
+    service: manifest.service,
+    doctor: manifest.doctor ? resolvePackageDoctorSpecifier(source.configuredSpecifier) : undefined,
+    cli: manifest.cli,
   };
 }
 
@@ -387,34 +428,9 @@ function resolvePluginNameFromSpec(spec: string): string {
   return resolvePluginLocalName(stripPackageVersion(packageSegment));
 }
 
-function resolvePluginWorkdirFromSpec(
-  spec: string,
-  pluginName: string,
-  paths?: Pick<PathsConfig, 'plugins'>,
-): string {
-  const normalized = normalizePath(spec.trim());
-  if (!normalized.startsWith('.') && !normalized.startsWith('/')) {
-    return resolvePluginWorkdir(pluginName, paths);
-  }
-
-  const candidate = normalized.endsWith('.ts') ? dirname(normalized) : normalized;
-  if (candidate.startsWith('/')) {
-    return candidate;
-  }
-  return stripRelativePrefix(candidate);
-}
-
 function stripPackageVersion(packageSegment: string): string {
   const versionSeparator = packageSegment.indexOf('@');
   return versionSeparator === -1 ? packageSegment : packageSegment.slice(0, versionSeparator);
-}
-
-function stripRelativePrefix(path: string): string {
-  let next = path;
-  while (next.startsWith('./')) {
-    next = next.slice(2);
-  }
-  return next;
 }
 
 function toDisplayName(pluginName: string): string {
@@ -493,11 +509,13 @@ function hasHostContribution(manifest: PluginManifest): boolean {
 
 function resolveRegisteredPluginSnapshot(
   definition: PluginManifest,
+  configuredSpecifier: string,
   _config?: NetScriptConfig,
 ): RegisteredPluginSnapshot {
   const service = definition.contributions.services?.[0];
   return {
     name: definition.name,
+    configuredSpecifier,
     displayName: definition.displayName,
     type: definition.type,
     permissions: definition.permissions ? [...definition.permissions] : undefined,
@@ -516,6 +534,31 @@ function resolveRegisteredPluginSnapshot(
     doctor: definition.contributions.doctor,
     cli: definition.contributions.cli,
   };
+}
+
+function resolvePackageDoctorSpecifier(configuredSpecifier: string): string {
+  return `${configuredSpecifier.replace(/\/$/, '')}/doctor`;
+}
+
+function formatManifestProbeFailure(
+  spec: string,
+  result: Awaited<ReturnType<typeof probeConfiguredPluginManifest>>,
+): string {
+  switch (result.status) {
+    case 'timeout':
+      return `Configured plugin module "${spec}" timed out after ${result.timeoutMs}ms.`;
+    case 'non-zero':
+      return `Configured plugin module "${spec}" exited non-zero (${result.code}): ${result.message}`;
+    case 'import-failure':
+    case 'malformed-payload':
+      return `Configured plugin module "${spec}" could not provide manifest metadata: ${result.message}`;
+    case 'ambiguous':
+      return `Configured plugin module "${spec}" exports ${result.count} manifests.`;
+    case 'missing':
+      return `Configured plugin module "${spec}" exports no plugin manifest.`;
+    case 'resolved':
+      return spec;
+  }
 }
 
 export function resolvePluginEnvironmentVariables(

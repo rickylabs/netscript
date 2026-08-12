@@ -110,6 +110,20 @@ $ netscript init my-app --db postgres --service --yes --dry-run
 `netscript <group> --help` prints the live tree for any group; it is generated from the same
 command definitions this package exports, so it never drifts from the binary you installed.
 
+### Plugin source truth
+
+`plugin list` and `plugin doctor` distinguish explicit filesystem installs from package-backed
+installs. Relative, absolute, and `file:` plugin specifiers opt into a local-workdir contract;
+package and import-map specifiers use their published manifest and do not require a copied
+`plugins/<name>` directory. If both a package specifier and an incidental directory exist, the
+configured package wins. Configure an explicit filesystem specifier when local-workdir behaviour
+is intended.
+
+Published manifest permissions feed the generated runtime configuration. An explicit appsettings
+permission list still wins, followed by contribution-specific permissions, plugin-wide manifest
+permissions, and finally global defaults. Doctor warns when an explicit override differs from the
+published default so that the effective runtime choice stays visible.
+
 ## Agent tooling
 
 NetScript's agentic surface is one triple: the **CLI** is the hands, the **skills** are the

@@ -61,8 +61,13 @@ Deno.test('plugin doctor reports the configured active auth backend', async () =
     loadRegisteredPlugins: () => Promise.resolve({
       auth: {
         name: 'auth',
-        workdir: 'auth',
-        rootDir: '/workspace/auth',
+        source: {
+          kind: 'local-workdir',
+          configuredSpecifier: './auth/mod.ts',
+          resolvedSpecifier: 'file:///workspace/auth/mod.ts',
+          workdir: 'auth',
+          rootDir: '/workspace/auth',
+        },
         permissions: ['--allow-env'],
         cli: { doctorChecks: ['auth-backend'] },
       },

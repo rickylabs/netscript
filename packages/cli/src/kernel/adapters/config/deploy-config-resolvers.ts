@@ -69,6 +69,16 @@ export function mergeEnvironment(
 
 export type WorkspaceMap = Awaited<ReturnType<typeof discoverWorkspace>>;
 
+/** Canonical appsettings > contribution > manifest > global permission precedence. */
+export function resolveEffectivePluginPermissions(
+  explicit: readonly string[] | undefined,
+  contribution: readonly string[] | undefined,
+  plugin: readonly string[] | undefined,
+  globalDefaults: readonly string[],
+): string[] {
+  return [...(explicit ?? contribution ?? plugin ?? globalDefaults)];
+}
+
 function normalizePath(path: string): string {
   return path.replace(/\\/g, '/');
 }
@@ -196,15 +206,19 @@ export function resolvePlugins(
       entrypoint: cfg.Entrypoint ?? pluginService?.entrypoint ?? 'services/src/main.ts',
       workdir: resolveWorkdir(
         cfg.Workdir,
-        plugin?.workdir ?? workspaceWorkdir,
+        plugin?.source.kind === 'local-workdir' ? plugin.source.workdir : workspaceWorkdir,
         join(paths.plugins, pluginName),
       ),
       requiresKv: cfg.RequiresKv ?? pluginService?.requiresKv ??
         plugin?.infrastructure?.requires.includes('kv') ?? false,
       requiresDb: cfg.RequiresDb ?? pluginService?.requiresDatabase ??
         plugin?.infrastructure?.requires.includes('db') ?? false,
-      permissions: cfg.Permissions ?? pluginService?.permissions ??
+      permissions: resolveEffectivePluginPermissions(
+        cfg.Permissions,
+        pluginService?.permissions,
+        plugin?.permissions,
         [...defaultPermissions, '--allow-write'],
+      ),
       description: cfg.Description ?? pluginService?.description,
     };
   }

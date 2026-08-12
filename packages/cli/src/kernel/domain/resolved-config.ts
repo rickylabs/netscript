@@ -150,12 +150,26 @@ export interface RegisteredPluginRuntimeConfig {
   }[];
 }
 
+/** How a configured plugin is installed and resolved by the CLI. */
+export type RegisteredPluginSource =
+  | {
+    readonly kind: 'local-workdir';
+    readonly configuredSpecifier: string;
+    readonly resolvedSpecifier: string;
+    readonly workdir: string;
+    readonly rootDir: string;
+  }
+  | {
+    readonly kind: 'package';
+    readonly configuredSpecifier: string;
+    readonly resolvedSpecifier: string;
+  };
+
 export interface RegisteredPluginConfig {
   name: string;
   displayName?: string;
   type?: PluginType;
-  workdir: string;
-  rootDir: string;
+  source: RegisteredPluginSource;
   permissions?: string[];
   service?: RegisteredPluginService;
   infrastructure?: RegisteredPluginInfrastructure;

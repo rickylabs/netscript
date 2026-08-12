@@ -481,8 +481,20 @@ async function main(): Promise<void> {
     // Match only *bare* Jest/Vitest globals, never method invocations: a leading
     // `.` or word char means it is a method call (e.g. the `defineAiTool(...)
     // .describe(...)` fluent tool builder), not a forbidden test global.
-    const unresolved = [...text.matchAll(/(?<![.\w])(describe|it|expect|jest|vitest)\s*\(/g)]
-      .find((match) => resolveIdentifierOrigin(text, match[1]) === 'unresolved');
+    // A line whose first non-whitespace character is a quote/backtick is fixture
+    // source data, not syntax in the scanned module (the quality scanner applies
+    // the same deliberately narrow guard).
+    let unresolved: RegExpMatchArray | undefined;
+    let unresolvedLine: number | undefined;
+    for (const [index, line] of text.split(/\r?\n/).entries()) {
+      if (/^\s*[`'"]/.test(line)) continue;
+      unresolved = [...line.matchAll(/(?<![.\w])(describe|it|expect|jest|vitest)\s*\(/g)]
+        .find((match) => resolveIdentifierOrigin(text, match[1]) === 'unresolved');
+      if (unresolved) {
+        unresolvedLine = index + 1;
+        break;
+      }
+    }
     if (unresolved) {
       findings.push({
         ref: 'A14',
@@ -491,7 +503,7 @@ async function main(): Promise<void> {
           unresolved[1]
         }' — import a sanctioned binding or use Deno.test`,
         path: relative(ROOT, f),
-        line: text.slice(0, unresolved.index).split(/\r?\n/).length,
+        line: unresolvedLine,
       });
     }
     if (
