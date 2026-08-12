@@ -30,6 +30,8 @@ owns the canary and the stable cut.
 
 | 7 | 2026-08-12T14:11:23Z | `50739a7ae` — `fix(fresh-ui): regenerate the stale private lock for the plugin-vite dependency (#1581)` | #1581 | **none** — carries `Refs #1580`, which stays open pending #1570's green proof | one-line derived lock; `impl-eval:skip` attributed, zero evaluator spend |
 
+| 8 | 2026-08-12T15:24:59Z | `fc312f211` — `fix(e2e): retry quickstart aspire restore on timeout and cancellation (#1584)` | #1584 | **#1227** (auto-closed `COMPLETED`) | `slices/pre-merge-gate-1584.md` — 7 checks PASS; **canary.4 cut from this SHA reached terminal green** |
+
 Rows captured from `git log origin/main --first-parent -1` **after** each merge, per the
 profile's merge-derived rule. Issue states re-read live: both `CLOSED` / `COMPLETED`, with
 `status:shipped` applied to each issue and PR.

@@ -1548,3 +1548,53 @@ open**; its box 5 needs a terminal-green canary.
 **The note will be measured at `fc312f211`**, not copied from canary.3: this payload includes #1541's
 docs changes and the rewritten `packages/sdk/README.md` JSR landing page, plus #1573, #1582 and the
 two lock repairs.
+
+## 2026-08-12 — **v0.0.6-canary.4 TERMINAL GREEN**; #1571 closed
+
+Run **`31612170240`** at `main@fc312f211` → **completed/success**.
+
+| Step | Outcome |
+| --- | --- |
+| 13 Publish canary through the production path | **success** |
+| 14 Detect exact-version registry outcome after publish failure | **SKIPPED** — no partial-publish path |
+| **17 Await canary-pinned production E2E** | **SUCCESS** — the exact step canary.3 failed |
+| 19 Record green canary pair | **success** |
+| 20 Record failed canary pair | skipped |
+
+**Verified independently, not read off the summary:**
+
+- `release/canary-pair` on `fc312f211`: **`success` — "Canary 0.0.6-canary.4 publish + pinned
+  production E2E passed"**.
+- Member completeness against `jsr.io/<pkg>/0.0.6-canary.4_meta.json`, enumerated from workspace
+  globs: **35 of 37**, absent being `@netscript/bench` and `@netscript/cli-e2e` — both explicitly
+  excluded as non-publishable. **35/35 effective.**
+- Tag `v0.0.6-canary.4` present; **`v0.0.6-canary.3` preserved**, not yanked.
+- `git status` checked **first** per lane discipline — clean, no stranded `catalog:` expansion.
+
+### Two distinct blockers, fixed separately rather than conflated
+
+The lock closure (#1571/#1580) unblocked the **cut** — canary.3 got past the `deno ci --prod` failure
+that killed the attempt before it at step 6. The remaining failure was a **separate, pre-existing
+gap**: #1227's quickstart restore had no retry coverage. Treating either as "the canary problem"
+would have left the other in place. Canary.3 proved the first fix and exposed the second; canary.4
+proves both.
+
+### #1571 closed with all five boxes ticked against recorded proof
+
+Box 5 names `canary.3`. Canary.3 **published cleanly but its pinned E2E failed**, and canary versions
+are immutable — a failed canary is preserved, not re-cut under the same number. So the terminal-green
+re-dispatch is **canary.4**, and the box is satisfied by it. Stated explicitly on the issue rather
+than quietly ticking a box whose literal text names a different version.
+
+**#1580** closed earlier on internals' green `fresh-ui-quality` proof. Both circular-acceptance issues
+are now closed **after** the artifacts they depended on existed — which is exactly why they carried
+`Refs` rather than `Closes`.
+
+### Lane state
+
+Merged this session: **#1405, #1398, #1457, #1548, #1459, #1572, #1581, #1584**. Canary.4 green.
+Filed from inside the run: **#1542, #1543, #1557, #1561, #1563, #1571, #1580**; **#1227 reopened,
+fixed, closed**.
+
+**Next: #1589** (P0, split SDK cache-provider singleton), then #1583, the Fresh group
+(#1576/#1568/#1569), #1577 after a cross-lane writer check, and #1562.
