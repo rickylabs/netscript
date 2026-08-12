@@ -816,3 +816,28 @@ No new lint-ignore, unsafe cast, or ts-ignore anywhere in the diff.
 **Review on Opus 5 · high per D-6**; the canonical `review_codex_complex` route (Fable 5 · medium) was
 **not** dispatched. Flipped to ready **once**, firing the initial automatic IMPL-EVAL at head
 `2d515de75`.
+
+## 2026-08-12 — HARD POLICY: Fable prohibited for all remaining 0.0.6 work
+
+**Owner, hardened.** Fable is fully prohibited for **all remaining 0.0.6 work** until explicitly
+lifted (quota at 95% through Saturday). Do **not** launch or resume any Fable session or subagent.
+
+Permitted for the remainder of this lane:
+
+- **Claude · Opus 5** — orchestration and sub-agents (research, planning, slice review).
+- **Codex · GPT-5.6 Sol** — implementation.
+- **The automatic evaluator workflow** — label-driven only. **Never manually trigger OpenHands.**
+
+This hardens `drift.md` **D-6** from lane-scoped to all-remaining-0.0.6, and adds the explicit
+never-manually-trigger-OpenHands clause.
+
+**Compliance to date, audited per work item rather than asserted:** zero Fable dispatches in this
+lane. Research on Opus, all five slice reviews on Opus 5 · high, PLAN-EVALs on MiniMax M3, IMPL-EVALs
+on DeepSeek and Qwen through the automatic dispatcher, implementation on Codex Sol. Every evaluation
+this lane has run was triggered by labels; **no manual OpenHands dispatch was ever issued.**
+
+**The one route that would have selected Fable** — `review_codex_complex` (Fable 5 · medium), the
+canonical pairing for the Sol·high #1459 slice — was stopped and performed on Opus 5 · high, which is
+that route's own documented fallback. Opposite-family review of Codex work is preserved.
+
+**Forward:** #1562's plan, PLAN-EVAL, implementation, and IMPL-EVAL all run under this constraint.
