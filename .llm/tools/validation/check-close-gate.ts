@@ -20,6 +20,7 @@ export interface GitHubIssue {
   body: string | null;
   updated_at: string;
   labels: Array<{ name?: string } | string>;
+  pull_request?: Record<string, unknown>;
 }
 
 interface GitHubPullRequest {
@@ -89,7 +90,11 @@ export type ClosingReferenceSource = 'body keyword' | 'manual link' | 'commit me
 export interface ClosingIssueReference {
   issue: number;
   sources: ClosingReferenceSource[];
+  classification?: ClosingReferenceClassification;
+  excluded?: boolean;
 }
+
+export type ClosingReferenceClassification = 'issue' | 'pull request' | 'lookup failed';
 
 interface GitHubClosingContext {
   closingIssues: number[];
@@ -145,6 +150,7 @@ export function resolveClosingIssueReferences(
   authoritativeIssues: readonly number[],
   body: string,
   commitMessages: readonly string[],
+  classifications?: ReadonlyMap<number, ClosingReferenceClassification>,
 ): ClosingIssueReference[] {
   const bodyIssues = new Set(extractClosingIssues(body));
   const commitIssues = new Set(commitMessages.flatMap(extractClosingIssues));
@@ -161,8 +167,43 @@ export function resolveClosingIssueReferences(
     if (bodyIssues.has(issue)) sources.push('body keyword');
     if (commitIssues.has(issue)) sources.push('commit message');
     if (authoritativeIssues.includes(issue) && sources.length === 0) sources.push('manual link');
-    return { issue, sources };
+    const classification = authoritativeIssues.includes(issue)
+      ? undefined
+      : classifications?.get(issue);
+    return {
+      issue,
+      sources,
+      ...(classification === undefined ? {} : { classification }),
+      ...(classification === 'pull request' ? { excluded: true } : {}),
+    };
   });
+}
+
+async function classifyRegexReferences(
+  client: GitHubClient,
+  authoritativeIssues: readonly number[],
+  body: string,
+  commitMessages: readonly string[],
+): Promise<Map<number, ClosingReferenceClassification>> {
+  const authoritative = new Set(authoritativeIssues);
+  const candidates = new Set([
+    ...extractClosingIssues(body),
+    ...commitMessages.flatMap(extractClosingIssues),
+  ]);
+  const classifications = new Map<number, ClosingReferenceClassification>();
+  await Promise.all(
+    [...candidates].filter((number) => !authoritative.has(number)).map(
+      async (number) => {
+        try {
+          const reference = await client.getIssue(number);
+          classifications.set(number, reference.pull_request ? 'pull request' : 'issue');
+        } catch {
+          classifications.set(number, 'lookup failed');
+        }
+      },
+    ),
+  );
+  return classifications;
 }
 
 /** Fails if the close-gate job regresses to frozen pull-request label payloads. */
@@ -193,15 +234,24 @@ async function main(): Promise<void> {
     const closingContext = await client.getClosingContext(options.pr);
     headSha = pr.head.sha;
     prFindings = findUncheckedPrBody(pr);
-    closingIssueReferences = resolveClosingIssueReferences(
+    const classifications = await classifyRegexReferences(
+      client,
       closingContext.closingIssues,
       pr.body ?? '',
       closingContext.commitMessages,
     );
+    closingIssueReferences = resolveClosingIssueReferences(
+      closingContext.closingIssues,
+      pr.body ?? '',
+      closingContext.commitMessages,
+      classifications,
+    );
     issueNumbers = [
       ...new Set([
         ...issueNumbers,
-        ...closingIssueReferences.map((reference) => reference.issue),
+        ...closingIssueReferences.filter((reference) => !reference.excluded).map((reference) =>
+          reference.issue
+        ),
       ]),
     ].sort((a, b) => a - b);
     const prIssue = await client.getIssue(options.pr);
@@ -428,6 +478,8 @@ export function formatPrettyReport(report: Report): string[] {
     lines.push(
       `closing reference: #${reference.issue} source${reference.sources.length === 1 ? '' : 's'}: ${
         reference.sources.join(', ')
+      }${reference.classification ? ` classification: ${reference.classification}` : ''}${
+        reference.excluded ? ' excluded: yes' : ''
       }`,
     );
   }

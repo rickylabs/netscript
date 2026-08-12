@@ -289,8 +289,11 @@ evaluator read):
 
 - Open multi-slice work as a **draft** PR; per-commit CI (Phase C tier 1) runs on drafts but is
   non-blocking.
-- Flip to **ready for review** only when the slice checklist is complete and IMPL-EVAL is expected to
-  pass — that transition is what triggers the blocking e2e tier and `status:impl-eval`.
+- Flip to **ready for review** only when the slice checklist is complete and IMPL-EVAL is expected
+  to pass. That transition triggers one automatic OpenHands IMPL-EVAL and enters `status:impl-eval`
+  unless `impl-eval:skip` is present. Before the transition, select at most one optional
+  `eval:model:minimax`, `eval:model:deepseek`, or `eval:model:qwen` override. Do not also dispatch a
+  manual `@openhands-agent` run for the same head.
 
 ## Label taxonomy (namespaced — Phase D)
 
@@ -304,8 +307,9 @@ a board column reflect reality.
   `kv`, `sdk`, `service`, `config`, `telemetry`, `ai-core`, `plugin-ai`, `docs`
 - `priority:` — `p0` (release blocker), `p1`, `p2`, `p3`
 - `ci:` — `skip-e2e`, `skip-scaffold`, `full` (manual overrides for the path-filtered CI);
-  `docs-eval:skip` — on-demand escape hatch for the automatic OpenHands docs-accuracy gate (the
-  workflow records an attributed skipped summary rather than silently skipping);
+  `impl-eval:skip` — attributed escape hatch for automatic ready-for-review IMPL-EVAL;
+  `eval:model:minimax`, `eval:model:deepseek`, `eval:model:qwen` — mutually exclusive override for
+  the next status-driven OpenHands phase; `docs-eval:skip` is a deprecated compatibility label;
   `gate:` — `e2e`, `jsr`
 - `epic:` — groups every issue/PR belonging to a program epic (e.g. `epic:ai-stack`,
   `epic:deployment`); the epic's own umbrella issue carries `type:umbrella`.

@@ -17,10 +17,11 @@ the evaluator session, and no lane self-certifies. The transport is how that inv
 - **OpenRouter escalation.** Use the bound Minimax M3 high PLAN preset or DeepSeek V4 Flash 0731
   max IMPL preset only for a genuine third opinion or when the native opposite-family route is
   quota-blocked. Approved open models only; never send Claude/GPT/Gemini through OpenRouter.
-- **Cloud run.** OpenHands dispatch is temporarily paused by owner direction while its trigger path
-  is repaired. Do not dispatch it; use the local evaluator transport. When restored it remains:
-  **open models only (Minimax M3 / Qwen 3.8 Max), cloud-driven runs only; dispatching it with a closed
-  model (Claude/GPT/Gemini) is prohibited — it burns paid OpenRouter credit.**
+- **Cloud run.** OpenHands is phase-driven and open-model-only. `openhands` plus `status:plan-eval`
+  dispatches PLAN-EVAL; draft→ready dispatches IMPL-EVAL unless `impl-eval:skip` is present. Select
+  at most one `eval:model:*` override before the transition. Orchestrators never also post a manual
+  trigger for that head. Dispatching a closed model (Claude/GPT/Gemini) through OpenHands is
+  prohibited — it burns paid OpenRouter credit.
 - **Ordinary (non-formal) review** — the slice review gate, code/PR review — remains
   **opposite-family Claude ⇄ Codex**: a Codex session reviews Claude-authored work, a Claude session
   reviews Codex-authored work, mixed authorship per slice or by both.

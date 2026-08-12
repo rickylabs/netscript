@@ -8,8 +8,9 @@ description: >
 This skill is the routing card for OpenHands handoffs: comments and labels start cloud work, and the
 required summary artifacts keep local and cloud agents synchronized.
 
-> **Temporary owner hold (2026-08-06):** do not dispatch OpenHands until its trigger path is fixed.
-> Use the checked-in local evaluator toolchain. This hold does not waive mandatory IMPL-EVAL.
+> **Hold lifted (2026-08-12):** generic OpenHands dispatch is fail-closed to the approved open
+> evaluator set. DeepSeek V4 Flash 0731 completed the bounded branch smoke in Actions run
+> `31574668989`; keep one trigger per PR and use the phase/complexity route below.
 
 ## When to Use
 
@@ -30,15 +31,18 @@ required summary artifacts keep local and cloud agents synchronized.
 
 OpenHands is **not** the evaluator for local runs. Two hard rules:
 
-1. **OpenHands runs OPEN models only** — e.g. `minimax/minimax-m3`, `qwen/qwen3.8-max`. NEVER
+1. **OpenHands runs OPEN models only** — MiniMax M3 for PLAN-EVAL, DeepSeek V4 Flash 0731 for
+   small/simple IMPL-EVAL, and Qwen 3.8 Max for broader/complex IMPL-EVAL. NEVER
    dispatch OpenHands with a closed/paid model (Claude/`sonnet`, GPT/`gpt`, Gemini/`gemini`). Closed
    models on OpenHands route through paid OpenRouter/LiteLLM credit and can silently burn the
    owner's balance — this is prohibited.
 2. **OpenHands is for CLOUD-driven runs only** — small GitHub-Copilot-style tasks the owner wants
    reviewed fully in the cloud with adversarial agents. OpenHands remains the **default automated
    cloud agent**; nothing below changes that. For any run on the **local machine**, do NOT dispatch
-   cloud OpenHands at all — use the local evaluator transport named below. The **supervisor chooses
-   what to trigger** — sub-agents/implementers must NEVER auto-dispatch a cloud evaluator.
+   cloud OpenHands at all — use the local evaluator transport named below. On cloud-driven PRs the
+   repository phase workflow owns dispatch: `openhands` + `status:plan-eval` starts PLAN-EVAL;
+   draft→ready starts IMPL-EVAL unless `impl-eval:skip` is present. Orchestrators select an optional
+   `eval:model:*` label before the transition and must NEVER duplicate it with a manual trigger.
 
 ### Local evaluator transport (owner revision, 2026-08-08)
 
@@ -69,7 +73,7 @@ the supervisor decide — never self-certify.
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Actions agent    | `.github/workflows/openhands-agent.yml`, used for short cloud runs.                                                                                                          |
 | VPS session      | Long-running OpenHands Web UI/SDK deployment from `ops/openhands/docker-compose.yml`.                                                                                        |
-| Model profile    | OPEN models only (e.g. `minimax/minimax-m3`, `qwen/qwen3.8-max`). Closed models (`sonnet`/`gpt`/`gemini`) are PROHIBITED on OpenHands — see the routing policy above.        |
+| Model profile    | OPEN models only: MiniMax M3 (PLAN), DeepSeek V4 Flash 0731 (small IMPL), Qwen 3.8 Max (broader/complex IMPL). Closed models are PROHIBITED on OpenHands.        |
 | Literal model    | Any LiteLLM-compatible `provider/model` string supplied with `model=...`.                                                                                                    |
 | Provider secret  | `LLM_API_KEY_<PROVIDER>`, inferred from the model prefix, with `LLM_API_KEY` fallback.                                                                                       |
 | Output mode      | `pr-comment`, `respond-comments`, `thread-replies`, or `summary-only`.                                                                                                       |
@@ -83,8 +87,14 @@ the supervisor decide — never self-certify.
 
 Use one of these from GitHub mobile, a local agent, or another cloud agent:
 
-- Add `fix-me` or `openhands` to an issue or PR.
-- Add a model label: `agent:sonnet`, `agent:gpt`, or `agent:gemini`.
+- PLAN-EVAL: add `openhands`, optionally add one `eval:model:*` label, then enter
+  `status:plan-eval` (either label may complete the pair).
+- IMPL-EVAL: optionally add one `eval:model:*` label while draft, then make the PR ready. Use
+  `impl-eval:skip` only for an owner-approved waiver.
+- Rerun PLAN by moving away from and back to `status:plan-eval` while `openhands` remains present;
+  rerun IMPL by moving away from and back to `status:impl-eval`. Do not comment-trigger the same
+  head while its automatic run is queued or active.
+- For non-phase issue work, add `fix-me`, `openhands`, or an approved open `agent:*` profile.
 - Comment with `@openhands-agent ...` from an owner, member, or collaborator account.
 - Push a commit whose message contains `[openhands ...]`.
 - Run `OpenHands Agent` manually from Actions.

@@ -125,9 +125,11 @@ Run at stage F, before the stable cut. Each item is something 0.0.4 missed or ne
 
 ## Evaluator protocol for a milestone run
 
-Per-PR evaluation composes what already triggers rather than spawning evaluators **[observed —
-#1120 learnings]**: draft→ready fires the augment review and the label surface fires OpenHands
-(repo CI behaviour); a local evaluator per PR is waste. The invariants that hold regardless
+Per-PR evaluation composes what already triggers rather than spawning duplicate evaluators
+**[observed — #1120 learnings]**: `openhands` + `status:plan-eval` dispatches PLAN-EVAL and
+draft→ready dispatches IMPL-EVAL. The orchestrator selects an optional `eval:model:*` override before
+the transition, then watches the automatic run; it does not also comment-trigger OpenHands. The
+invariants that hold regardless
 (owned by `netscript-harness`/`lane-policy.md`, only their milestone-run application stated
 here):
 

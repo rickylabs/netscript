@@ -129,7 +129,7 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
     context?: StreamWriteContextV1,
   ): StreamWriteReceiptV1 {
     if (this.closed) {
-      return this.#reject(stateRejection(this.state.state));
+      return this.#reject(this.#supervisor.writeRejectionReason() ?? 'producer-failed');
     }
     const definition = this.#schema[entityType];
     if (!definition) {
@@ -157,7 +157,7 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
     context?: StreamWriteContextV1,
   ): StreamWriteReceiptV1 {
     if (this.closed) {
-      return this.#reject(stateRejection(this.state.state));
+      return this.#reject(this.#supervisor.writeRejectionReason() ?? 'producer-failed');
     }
     const definition = this.#schema[entityType];
     if (!definition) {
@@ -246,18 +246,6 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
     this.#instrumentation.recordRejected(this.streamPath, this.#producerId, reason);
     return this.#supervisor.reject(reason);
   }
-}
-
-function stateRejection(
-  state: StreamProducerStateSnapshotV1['state'],
-): StreamWriteRejectionReasonV1 {
-  if (state === 'stopping') {
-    return 'producer-stopping';
-  }
-  if (state === 'stopped') {
-    return 'producer-stopped';
-  }
-  return 'producer-failed';
 }
 
 function resolveRequiredStreamUrl(streamPath: string): string {
