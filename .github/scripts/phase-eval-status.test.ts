@@ -103,11 +103,11 @@ Deno.test('terminal decision contains exactly one status label', () => {
 
 Deno.test('atomic generation claim remains before trigger creation', async () => {
   const workflow = await Deno.readTextFile('.github/workflows/openhands-phase-eval.yml');
-  const importPrimitive = 'const { dispatchClaimedPhaseEvaluation } = await import(';
+  const importPrimitive =
+    'const { dispatchClaimedPhaseEvaluation, phaseEvalMarker } = await import(';
   const claim = 'const outcome = await dispatchClaimedPhaseEvaluation(';
   const earlyReturn = 'if (!outcome.claimed) {';
-  const marker =
-    'const marker = `<!-- openhands-phase-eval generation=${generationEvent.id} phase=${phase} head=${pr.head.sha} -->`;';
+  const marker = 'const marker = phaseEvalMarker(claimKey);';
   const create = 'github.rest.issues.createComment({';
 
   assertStringIncludes(workflow, claim);

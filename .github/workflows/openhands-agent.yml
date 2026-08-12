@@ -147,9 +147,14 @@ jobs:
     permissions:
       contents: read
     outputs:
-      dispatch: ${{ steps.policy.outputs.dispatch }}
+      dispatch: ${{ steps.non_comment.outputs.dispatch || steps.policy.outputs.dispatch }}
       trigger_line: ${{ steps.policy.outputs.trigger_line }}
     steps:
+      - name: Authorize non-comment trigger
+        id: non_comment
+        if: github.event_name != 'issue_comment'
+        run: echo 'dispatch=true' >> "$GITHUB_OUTPUT"
+
       - name: Check out trusted manual-trigger policy
         if: github.event_name == 'issue_comment'
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
@@ -161,27 +166,69 @@ jobs:
 
       - name: Evaluate trusted manual-trigger policy
         id: policy
+        if: github.event_name == 'issue_comment'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
+          github-token: ${{ secrets.PAT_TOKEN }}
           script: |
-            if (context.eventName !== 'issue_comment') {
-              core.setOutput('dispatch', 'true');
-              core.setOutput('trigger_line', '');
-              return;
-            }
             const path = require('path');
             const { pathToFileURL } = require('url');
             const policyPath = path.join(
               process.env.GITHUB_WORKSPACE,
               '.trigger-policy-trusted/.github/scripts/openhands-comment-trigger.mjs',
             );
-            const { evaluateOpenHandsCommentTrigger } = await import(
+            const { authorizeOpenHandsCommentTrigger } = await import(
               pathToFileURL(policyPath).href
             );
-            const decision = evaluateOpenHandsCommentTrigger({
-              body: context.payload.comment?.body,
-              authorAssociation: context.payload.comment?.author_association,
-            });
+            const decision = await authorizeOpenHandsCommentTrigger(
+              {
+                body: context.payload.comment?.body,
+                authorAssociation: context.payload.comment?.author_association,
+              },
+              async ({ phase, head }) => {
+                if (!context.payload.issue?.pull_request) {
+                  throw new Error('Formal evaluator comment commands require a pull request.');
+                }
+                const owner = context.repo.owner;
+                const repo = context.repo.repo;
+                const issue_number = context.payload.issue.number;
+                const expectedStatus = phase === 'plan' ? 'status:plan-eval' : 'status:impl-eval';
+                const events = await github.paginate(github.rest.issues.listEvents, {
+                  owner,
+                  repo,
+                  issue_number,
+                  per_page: 100,
+                });
+                const generationEvent = events
+                  .filter((event) => event.event === 'labeled' && event.label?.name === expectedStatus)
+                  .at(-1);
+                if (!generationEvent) {
+                  throw new Error(`No labeled-event generation found for ${expectedStatus}.`);
+                }
+                const comments = await github.paginate(github.rest.issues.listComments, {
+                  owner,
+                  repo,
+                  issue_number,
+                  per_page: 100,
+                });
+                const currentCommentId = Number(context.payload.comment?.id);
+                return {
+                  generation: generationEvent.id,
+                  operations: {
+                    createRef: async ({ ref, sha }) => {
+                      await github.rest.git.createRef({ owner, repo, ref, sha });
+                    },
+                    getRef: async ({ ref }) => {
+                      const existing = await github.rest.git.getRef({ owner, repo, ref });
+                      return { sha: existing.data.object.sha };
+                    },
+                  },
+                  priorCommentBodies: comments
+                    .filter((comment) => Number(comment.id) !== currentCommentId)
+                    .map((comment) => String(comment.body ?? '')),
+                };
+              },
+            );
             core.setOutput('dispatch', String(decision.dispatch));
             core.setOutput('trigger_line', decision.triggerLine);
             core.notice(`Manual comment policy: ${decision.reason}`);
@@ -232,7 +279,7 @@ jobs:
             if (payload.label?.name) labels.add(payload.label.name);
 
             // Parameter surface. For comment triggers, ONLY the trigger line
-            // (the first line containing @openhands-agent) carries key=value
+            // (the first line beginning with @openhands-agent) carries key=value
             // params — prompt bodies with template text like `output=...` or
             // `[VERDICT: <verdict>]` cannot hijack the run configuration.
             // Label/push triggers have no trigger line and keep the legacy
@@ -250,6 +297,8 @@ jobs:
 
             function matchValue(name) {
               const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              // Colon separators remain legacy syntax for label and push text. Manual comments
+              // reach this parser only after the policy has required exact name=value fields.
               const re = new RegExp(`(?:^|\\s)${escaped}\\s*[:=]\\s*([^\\s\\]]+)`, 'i');
               return paramText.match(re)?.[1];
             }

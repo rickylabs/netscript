@@ -3,6 +3,7 @@ import {
   claimPhaseEvaluation,
   dispatchClaimedPhaseEvaluation,
   phaseEvalClaimRef,
+  phaseEvalMarker,
   REFERENCE_ALREADY_EXISTS_MESSAGE,
 } from './phase-eval-claim.mjs';
 
@@ -45,10 +46,6 @@ function atomicRefOperations(waitAtCreate?: () => Promise<void>) {
         const sha = refs.get(`refs/${ref}`);
         if (!sha) return Promise.reject(new Error(`Missing ref: ${ref}`));
         return Promise.resolve({ sha });
-      },
-      deleteRef({ ref }: { ref: string }) {
-        if (!refs.delete(`refs/${ref}`)) return Promise.reject(new Error(`Missing ref: ${ref}`));
-        return Promise.resolve();
       },
     },
   };
@@ -129,31 +126,86 @@ Deno.test('atomic claim: head, phase, and generation each identify a distinct cl
   console.log('distinct tuples: base + varied head + varied phase + varied generation -> 4 claims');
 });
 
-Deno.test('trigger failure releases the claim and the same tuple can retry', async () => {
+Deno.test('existing marker is reused before trigger creation', async () => {
   const key: ClaimKey = { generation: 1594001, phase: 'impl', head: HEAD_A };
   const { operations, refs } = atomicRefOperations();
+  let createCalls = 0;
+
+  const outcome = await dispatchClaimedPhaseEvaluation(
+    operations,
+    key,
+    () => {
+      createCalls += 1;
+      return Promise.resolve('unexpected-trigger');
+    },
+    () => Promise.resolve('existing-trigger'),
+  );
+
+  assertEquals(outcome.claimed, true);
+  assertEquals(outcome.claimed && outcome.trigger, 'existing-trigger');
+  assertEquals(createCalls, 0);
+  assertEquals(refs.size, 1);
+});
+
+Deno.test('lost trigger response reuses the visible marker and retains the claim', async () => {
+  const key: ClaimKey = { generation: 1594001, phase: 'impl', head: HEAD_A };
+  const { operations, refs } = atomicRefOperations();
+  let visibleTrigger: string | null = null;
+
+  const outcome = await dispatchClaimedPhaseEvaluation(
+    operations,
+    key,
+    () => {
+      visibleTrigger = 'server-created-trigger';
+      return Promise.reject(new Error('response lost after create'));
+    },
+    () => Promise.resolve(visibleTrigger),
+  );
+
+  assertEquals(outcome.claimed, true);
+  assertEquals(outcome.claimed && outcome.trigger, 'server-created-trigger');
+  assertEquals(refs.size, 1);
+});
+
+Deno.test('unverified trigger failure retains the claim and rerun spends nothing', async () => {
+  const key: ClaimKey = { generation: 1594001, phase: 'impl', head: HEAD_A };
+  const { operations, refs } = atomicRefOperations();
+  let createCalls = 0;
 
   await assertRejects(
     () =>
       dispatchClaimedPhaseEvaluation(
         operations,
         key,
-        () => Promise.reject(new Error('transient comment failure')),
+        () => {
+          createCalls += 1;
+          return Promise.reject(new Error('comment result unknown'));
+        },
       ),
     Error,
-    'transient comment failure',
+    'comment result unknown',
   );
-  assertEquals(refs.size, 0);
+  assertEquals(refs.size, 1);
 
   const retry = await dispatchClaimedPhaseEvaluation(
     operations,
     key,
-    () => Promise.resolve('trigger-created'),
+    () => {
+      createCalls += 1;
+      return Promise.resolve('trigger-created');
+    },
   );
-  assertEquals(retry.claimed, true);
-  assertEquals(retry.claimed && retry.trigger, 'trigger-created');
+  assertEquals(retry.claimed, false);
+  assertEquals(createCalls, 1);
   assertEquals(refs.size, 1);
-  console.log('trigger failure: claim released; same tuple retry -> claimed');
+  console.log('unknown trigger result: claim retained; same-tuple rerun paid starts=0');
+});
+
+Deno.test('claim marker is derived from the validated tuple', () => {
+  assertEquals(
+    phaseEvalMarker({ generation: 1594001, phase: 'impl', head: HEAD_A }),
+    `<!-- openhands-phase-eval generation=1594001 phase=impl head=${HEAD_A} -->`,
+  );
 });
 
 Deno.test('claim validation and non-collision failures fail closed', async () => {

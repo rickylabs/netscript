@@ -34,7 +34,18 @@ Manual/non-phase compatibility triggers:
 Manual comment grammar is intentionally strict: the command token must be the first token of the
 first line, every remaining first-line field must be a unique recognized `name=value` argument, and
 the prose prompt must begin on a following line. Malformed, unknown, or duplicate first-line
-arguments are refused without dispatch.
+arguments are refused without dispatch. The legacy `name: value` form remains available to
+label/push text parsing but is intentionally invalid on a manual comment command line.
+
+### 2026-08-12 recursive-dispatch incident
+
+Two paid `issue_comment` runs on `main`, `31615108125` at `2026-08-12T15:57:30Z` and `31615110254`
+at `2026-08-12T15:57:31Z`, launched one second apart and were cancelled by the owner. The primary
+cause was an unanchored substring trigger that treated trusted prose quoting the manual command
+vocabulary as an invocation. A non-atomic marker read followed by comment creation also let
+concurrent phase transitions create duplicate paid triggers. The runner now delegates comments to
+the tested first-line command predicate, and formal phase requests use the tested atomic Git-ref
+claim before the trigger that starts provider work.
 
 For harness work, prefer `.llm/tools/agentic/openhands/dispatch-openhands.ts` with explicit
 provider, model, and effort selected from `workflow/lane-policy.md`. The legacy triggers above are

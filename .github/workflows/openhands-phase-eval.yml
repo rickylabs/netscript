@@ -13,7 +13,7 @@ on:
     types: [labeled, ready_for_review]
 
 permissions:
-  contents: write
+  contents: read
   issues: write
   pull-requests: read
 
@@ -198,7 +198,7 @@ jobs:
               process.env.GITHUB_WORKSPACE,
               '.phase-eval-trusted/.github/scripts/phase-eval-claim.mjs',
             );
-            const { dispatchClaimedPhaseEvaluation } = await import(
+            const { dispatchClaimedPhaseEvaluation, phaseEvalMarker } = await import(
               pathToFileURL(primitivePath).href
             );
             const eventLabel = context.payload.label?.name ?? '';
@@ -264,11 +264,25 @@ jobs:
             if (!generationEvent) {
               throw new Error(`No labeled-event generation found for ${expectedStatus}.`);
             }
-            const marker = `<!-- openhands-phase-eval generation=${generationEvent.id} phase=${phase} head=${pr.head.sha} -->`;
+            const claimKey = { generation: generationEvent.id, phase, head: pr.head.sha };
+            const marker = phaseEvalMarker(claimKey);
             const iterations = phase === 'plan' ? 500 : 800;
             const trigger = `@openhands-agent model=${model} output=pr-comment iterations=${iterations} phase=${phase} head=${pr.head.sha}`;
-            // A caught comment failure releases the ref in the tested primitive. A process crash
-            // cannot run that cleanup; cycle the phase status to create a new generation and claim.
+            const findExistingTrigger = async () => {
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner,
+                repo,
+                issue_number: pr.number,
+                per_page: 100,
+              });
+              return comments.find((comment) =>
+                String(comment.body ?? '').split(/\r?\n/).includes(marker)
+              ) ?? null;
+            };
+            // Once trigger creation is attempted, an API failure may mean the comment succeeded
+            // but its response was lost. The tested lifecycle rechecks the marker and retains the
+            // claim if the result remains unknown. Cycle the phase status to recover with a new
+            // generation; never re-run the failed job against the same claim.
             const outcome = await dispatchClaimedPhaseEvaluation(
               {
                 createRef: async ({ ref, sha }) => {
@@ -278,11 +292,8 @@ jobs:
                   const existing = await github.rest.git.getRef({ owner, repo, ref });
                   return { sha: existing.data.object.sha };
                 },
-                deleteRef: async ({ ref }) => {
-                  await github.rest.git.deleteRef({ owner, repo, ref });
-                },
               },
-              { generation: generationEvent.id, phase, head: pr.head.sha },
+              claimKey,
               async () => {
                 const { data } = await github.rest.issues.createComment({
                   owner,
@@ -292,6 +303,7 @@ jobs:
                 });
                 return data;
               },
+              findExistingTrigger,
             );
             if (!outcome.claimed) {
               core.notice(`This phase transition is already claimed by ${outcome.ref}.`);
