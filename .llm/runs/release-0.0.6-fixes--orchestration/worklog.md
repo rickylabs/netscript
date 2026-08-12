@@ -797,3 +797,78 @@ One consequence worth carrying forward: **`scaffold-runtime: SUCCESS` in a PR ro
 on its own.** Whether it ran is only visible in step 2 versus step 10 of the job. Any pre-merge
 gate that reads the rollup alone will accept a short-circuit as a pass — which is check 4's exact
 failure mode, hiding one level deeper than the rollup.
+
+## 2026-08-12 — IMPL-EVAL cycle 2, PR #1539: FAIL again — same class, different path
+
+Fresh separate Fable 5 session (not a continuation of cycle 1), own worktree
+`ns006-f-a-impleval2` at `5350d01fc`. **VERDICT: FAIL (FAIL_FIX). #1539 not merged.**
+
+### What the repair achieved (verified, not relayed)
+
+- **Cycle 1's prose attack is now REJECTED.** The evaluator rebuilt the full injection in a scratch
+  repo and drove the real inheritance path: fails closed with "agent-docs prose contains
+  non-version changes."
+- Probing the new equality held: gzip determinism (the anchor compares **decompressed** content),
+  absent parent blob (fail-closed), consistent parent+HEAD injection (would require the canary to
+  have published it).
+- **The legitimate path still inherits — the feature is not inert.** The real measured v0.0.5 cut
+  `6ec75573d` (0.0.4→0.0.5) drove end-to-end through the real `verifyGreenCanaryPair` → `ADMITTED`.
+  This was the other way the repair could have failed, and it did not.
+
+### Blocking finding B-1 (cycle 2) — the tautology moved one file over
+
+The parent-anchor guards **only** `prose.json.gz`. A change to `provenance.json` that does not touch
+prose **skips the anchor entirely** and is admitted purely on `assertFresh` — which is tautological
+for provenance because the writer **spreads `...provenance`**, preserving arbitrary injected fields,
+and re-derives only sha/bytes from the unchanged prose.
+
+Proven on the real worktree: an injected non-version field passes `gen:publish-assets --check`
+(exit 0), flows into the published `EMBEDDED_AGENT_DOCS_PROVENANCE` barrel, and the diff is
+`ADMITTED` through the real inheritance path.
+
+### The orchestrator's read: this is structural, and the fix instruction changed accordingly
+
+Two cycles, two different writer-declared paths, one defect class. The generalisation:
+
+> **Any writer that PRESERVES content rather than RE-DERIVING it from validated source makes its
+> HEAD-only `--check` a tautology.**
+
+Cycle 1 verified the *re-derived* outputs (barrels, package metadata, export corpus) are genuinely
+tamper-detecting, because their source is itself a changed path the rejection rule catches first.
+The *preserved* outputs are the hole, and prose was only the first one found.
+
+So slice A was **not** told to parent-anchor provenance and stop. It was told to **audit every path
+in `PREPARED_RELEASE_GENERATED_OUTPUTS` against that rule**, categorise each as re-derived or
+preserved with evidence in a table, fix every path in the preserved category, and add a
+per-path regression written **before** the fix and shown red — the pattern its prose regression
+already demonstrated correctly. A path that cannot be categorised with evidence is to be treated as
+unsafe.
+
+Fixing only the reported instance is what produced cycle 2 from cycle 1.
+
+### B-2 partially resolved by cycle 2
+
+The clean-tree `check:mcp-export-corpus` failure is **source drift** — the corpus was last
+regenerated 16 commits / 91 source files ago — **not** `deno doc` non-determinism. Generation is
+byte-deterministic within deno 2.9.5 linux (CI's pinned version), and `release:cut` regenerates the
+corpus at cut time. **Cross-environment determinism (cut-env vs `publish.yml`) remains
+unestablished.** Also newly noted: `ci.yml` never runs the corpus check — only the D-6 path does.
+Routed to slice A as a `drift.md` D-6 note, not a fix.
+
+### #1430
+
+Correct and complete, spot-checked again: release-date → committer-date → author-date fallback, and
+the loud throw on empty `since` before issue collection.
+
+### Gates the cycle-2 evaluator executed
+
+Release suite 102/0, full repo **3189/0**, scoped check/lint/fmt clean, root aliases exit 0.
+Worktree left clean, `deno.lock` unchanged, HEAD still `5350d01fc`, generator worktree untouched,
+scratch repos built outside both worktrees and removed.
+
+### Stated as unverified
+
+Cross-environment corpus determinism; live GitHub API behaviour (transport-stubbed by constraint);
+and — stated by the evaluator against its own result — the provenance-ADMITTED run stubbed
+`generatedOutputsFresh`, though its provenance-touching components were proven separately against
+the real worktree.
