@@ -10,7 +10,7 @@
  *   deno run -A .llm/tools/release/run-publish-dry-run.ts
  */
 
-import { publishWorkspace } from './publish-workspace.ts';
+import { publishMemberDryRun, publishWorkspace } from './publish-workspace.ts';
 
 if (import.meta.main) {
   if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
@@ -19,12 +19,30 @@ if (import.meta.main) {
         'run-publish-dry-run.ts — run the workspace publish in dry-run mode',
         '',
         'Usage:',
-        '  deno run -A .llm/tools/release/run-publish-dry-run.ts',
+        '  deno run -A .llm/tools/release/run-publish-dry-run.ts [--root <path> --member <path>]',
         '',
-        'Takes no flags (other than --help). Runs publishWorkspace in dry-run mode.',
+        'Without flags, runs the workspace dry-run. With --member, runs that package dry-run.',
       ].join('\n'),
     );
     Deno.exit(0);
   }
-  await publishWorkspace({ mode: 'dry-run' });
+  const root = readFlag(Deno.args, '--root') ?? Deno.cwd();
+  const member = readFlag(Deno.args, '--member');
+  if (member) {
+    await publishMemberDryRun(root, member);
+  } else {
+    await publishWorkspace({ mode: 'dry-run', root });
+  }
+}
+
+function readFlag(args: readonly string[], flag: string): string | undefined {
+  const index = args.indexOf(flag);
+  if (index < 0) {
+    return undefined;
+  }
+  const value = args[index + 1];
+  if (!value || value.startsWith('--')) {
+    throw new Error(`${flag} requires a value.`);
+  }
+  return value;
 }

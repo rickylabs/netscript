@@ -15,10 +15,17 @@ Use this workflow note when a harness run needs:
 
 ## Trigger Contract
 
-Preferred triggers:
+Preferred formal-phase triggers:
 
-- label `fix-me` or `openhands`,
-- label `agent:sonnet`, `agent:gpt`, or `agent:gemini`,
+- PLAN-EVAL: `openhands` + `status:plan-eval`, with at most one optional `eval:model:*` override,
+- IMPL-EVAL: draft→ready, with at most one optional `eval:model:*` override or the attributed
+  `impl-eval:skip` waiver,
+- phase rerun: move away from and back to the phase's eval status (`openhands` remains required
+  only for PLAN-EVAL),
+
+Manual/non-phase compatibility triggers:
+
+- label `fix-me` or an approved open `agent:*` profile; `openhands` directly on issues only,
 - comment `@openhands-agent model=<provider/model> output=<mode> ...`,
 - commit message `[openhands model=<provider/model> output=<mode>] ...`,
 - manual `OpenHands Agent` workflow dispatch.
