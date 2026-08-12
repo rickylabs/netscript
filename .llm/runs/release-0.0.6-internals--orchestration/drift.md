@@ -931,3 +931,46 @@ Nothing further has been launched and no fourth run created. The merge is held.
   short-circuits it via a step named "Skipped by policy". Only the **step count** distinguishes a real run
   from a short-circuit. This lane applies `ci:skip-e2e`/`ci:skip-scaffold` deliberately, so the intended
   skip is stated in the PR body and step counts are checked rather than buckets.
+
+## D-29 — a third `quality:scan` failure mode, reproduced: a stale `base.sha` scans another lane's merged work
+
+- **Severity:** architectural (the most dangerous of the three; single root cause shared with a second gate)
+- **Recorded:** 2026-08-12, from the fixes lane's pushback on **my** misattribution, reproduced here
+- **My error:** D-28 claimed the fixes lane's PR "also touched `packages/**`, so the scan ran over those
+  files". **#1539 touches no `packages/**` files at all** — its whole diff is six `.llm/tools/` files
+  (`git diff --name-only 5db37e7bb origin/pr-1539`). So neither mode explained a scan that ran over nine
+  files. I had reasoned from a plausible mechanism instead of running the range.
+- **Mode 3, reproduced exactly:** `code-quality.yml:39` computes its range from
+  `github.event.pull_request.base.sha`, which for a never-updated branch is stale. #1539's was `cd24e1679`:
+
+```text
+$ git diff --name-only --diff-filter=ACMR cd24e1679 2a4102600 -- packages plugins    → 9 files
+packages/cli/e2e/{suites/scaffold/capability-suites.ts,tests/presentation/suite-registry_test.ts}
+packages/cli/src/public/features/root/public-command-tree_test.ts
+packages/plugin-streams-core/{src/application/create-durable-stream.ts,
+  src/application/durable-stream-producer-supervisor.ts, src/domain/producer-contract-v1.ts,
+  tests/application/durable-stream-producer-contract_behavior_test.ts}
+packages/sdk/src/{desktop/mod.ts,query-client/create-service-query-utils.ts}
+```
+
+  All already-merged foreign work — spot-verified against `main`: `capability-suites.ts` ← `d7e2b67b2`
+  (#1536), `producer-contract-v1.ts` ← `8ff1bcb8f` (#1528), `desktop/mod.ts` ← `d8d0400ef` (#1526) — and
+  **zero** of the nine appear in #1539's own diff. The gate scanned nine real files, found nothing, reported
+  success, and inspected **zero lines of the PR under review**.
+- **Why it is the worst of the three.** Mode 2 reports success having run *nothing* — visibly nothing to
+  anyone reading the step. Mode 3 reports success having run *something substantial over the wrong input*,
+  so the step log shows a genuine nine-file scan and looks **more** covered the more wrong it is. It
+  degrades with PR age, which makes the gate **anti-correlated with risk**: the long-lived PR most likely to
+  have accumulated a bad cast gets the least of its own code scanned.
+- **Single root cause, two gates.** The same stale `pull_request.base.sha` broke evaluator prompt resolution
+  on #1539 (addressed by #1552). One stale value, two independent gates producing confident false greens. A
+  fix that only widens the pathspec still computes from the stale base.
+- **#1403 acceptance updated** (comment `5266629043`) to three properties, replacing the two from D-28: the
+  `.llm/tools`-only execution proof, the empty-set fail-closed, and a stale-base fixture asserting the
+  scanned set equals the PR's own diff — with **merge-base** (or the PR's API file list) preferred over
+  `pull_request.base.sha`.
+- **The methodological lesson, which is mine.** I verified the *source* of modes 1 and 2 and then
+  **reasoned** about which one explained the observed case instead of running the range that would have
+  answered it. The peer ran the range. This lane has now made that mistake twice — asserting an absence
+  without the probe that finds the presence (the sagas supersession row) and asserting a mechanism without
+  the probe that identifies it (here). Both were caught by someone else executing the command I should have.
