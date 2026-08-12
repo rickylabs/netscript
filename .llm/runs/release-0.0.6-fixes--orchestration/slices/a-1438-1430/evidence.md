@@ -562,3 +562,250 @@ exit 0
 
 No publication, `release:publish`, `deno publish`, tag creation/push, canary, cache reload, lock
 mutation, scaffold runtime, or merge was performed during the repair.
+
+## IMPL-EVAL cycle 2 repair — structural generated-output audit
+
+Cycle 2 confirmed the prose parent anchor and legitimate v0.0.5 inheritance, then found the same
+HEAD-only round-trip in `.llm/assets/agent-docs/provenance.json`. The complete writer-declared set
+was audited against the evaluator's rule: an output is safe under HEAD reproduction only when it is
+re-derived from a separate tracked input whose mutation would itself be rejected by the changed-path
+or exact-version checks. Preserved inputs require an explicit parent anchor or a closed schema.
+
+### Every `PREPARED_RELEASE_GENERATED_OUTPUTS` path
+
+| # | Writer-declared path | Category and source evidence | Guard / option |
+| ---: | --- | --- | --- |
+| 1 | `.llm/assets/agent-docs/prose.json.gz` | **Preserved/round-tripped.** `rebaseAgentDocsProse` reads this same committed gzip and rewrites version-bearing prose. | Existing parent→HEAD decompressed-content anchor; unchanged in cycle 2. |
+| 2 | `.llm/assets/agent-docs/provenance.json` | **Preserved/round-tripped.** The writer reads its committed metadata; `sourceCommit`, `extractionTimestamp`, and `files` cannot be rebuilt from the gzip alone. | **Both bounded protections:** closed eight-field writer schema plus parent-derived equality; integrity fields are re-derived from parent/HEAD prose and stable metadata must equal the canary parent. |
+| 3 | `packages/cli/src/kernel/assets/agent-tools.generated.ts` | **Re-derived.** Rendered from `.llm/tools/consumer-tools.json`, `consumer-README.md`, every declared tool source, and the CLI manifest (`renderAgentToolEmbeddedContent`, line ~248). | HEAD `--check`; any non-version input edit is outside the allowed set, while manifest edits still face exact replacement. |
+| 4 | `packages/cli/src/kernel/assets/agent-docs.generated.ts` | **Re-derived from validated inputs.** Rendered from the anchored gzip, closed/anchored provenance, and package/plugin export maps (`renderAgentDocsEmbeddedContent`, line ~372). | HEAD barrel `--check` after both preserved inputs pass their parent guards. |
+| 5 | `packages/cli/src/kernel/assets/embedded.generated.ts` | **Re-derived.** Rendered from `TEMPLATE_MANIFEST` and each referenced template source (`renderCliEmbeddedContent`, line ~118). | HEAD barrel `--check`; source edits are outside the allowed set. |
+| 6 | `packages/cli/src/kernel/assets/skills.generated.ts` | **Re-derived.** Rendered from `skills/manifest.json` and every manifest-listed skill file (`renderSkillEmbeddedContent`, line ~218). | HEAD barrel `--check`; source edits are outside the allowed set. |
+| 7 | `packages/plugin/src/kernel/assets/embedded.generated.ts` | **Re-derived.** Rendered from `PLUGIN_SKELETON_TEMPLATES` and referenced skeleton sources (`renderPluginEmbeddedContent`, line ~148). | HEAD barrel `--check`; source edits are outside the allowed set. |
+| 8 | `packages/fresh-ui/registry.generated.ts` | **Re-derived.** Rendered from `freshUiRegistryManifest` and every referenced registry file (`renderFreshUiRegistryContent`, line ~176). | HEAD barrel `--check`; source edits are outside the allowed set. |
+| 9 | `packages/service/src/primitives/scalar.generated.ts` | **Re-derived.** Rendered from `packages/service/assets/scalar.min.js` (`renderServiceEmbeddedContent`, line ~204). | HEAD barrel `--check`; source edits are outside the allowed set. |
+| 10 | `packages/mcp/src/publish-assets.generated.ts` | **Re-derived from validated inputs.** Rendered from the MCP manifest, README, selected anchored prose documents, and the closed/anchored provenance `sourceCommit` (`generateMcpAssets`, line ~334). | HEAD publish-assets `--check` after preserved inputs pass parent guards. |
+| 11 | `packages/cli/src/kernel/assets/publish-assets.generated.ts` | **Re-derived.** Rendered from the CLI manifest and `assets/schema/config-file.v1.json` (`generateCliAssets`, line ~372). | HEAD publish-assets `--check`; schema drift is outside the allowed set and manifest drift faces exact replacement. |
+| 12 | `packages/fresh-ui/src/package-metadata.generated.ts` | **Re-derived.** Rendered only from `packages/fresh-ui/deno.json` (`generateFreshUiMetadata`, line ~400). | HEAD publish-assets `--check`; manifest faces exact replacement. |
+| 13 | `packages/plugin-sagas-core/src/package-metadata.generated.ts` | **Re-derived.** Rendered only from its package manifest (`generateCorePackageMetadata`, line ~410). | HEAD publish-assets `--check`; manifest faces exact replacement. |
+| 14 | `packages/plugin-streams-core/src/package-metadata.generated.ts` | **Re-derived.** Rendered only from its package manifest (`generateCorePackageMetadata`, line ~410). | HEAD publish-assets `--check`; manifest faces exact replacement. |
+| 15 | `plugins/ai/src/package-metadata.generated.ts` | **Re-derived.** Rendered only from `plugins/ai/deno.json` (`generatePluginMetadata`, line ~388). | HEAD publish-assets `--check`; manifest faces exact replacement. |
+| 16 | `plugins/auth/src/package-metadata.generated.ts` | **Re-derived.** Rendered only from `plugins/auth/deno.json` (`generatePluginMetadata`, line ~388). | HEAD publish-assets `--check`; manifest faces exact replacement. |
+| 17 | `plugins/sagas/src/package-metadata.generated.ts` | **Re-derived.** Rendered only from `plugins/sagas/deno.json` (`generatePluginMetadata`, line ~388). | HEAD publish-assets `--check`; manifest faces exact replacement. |
+| 18 | `plugins/streams/src/package-metadata.generated.ts` | **Re-derived.** Rendered only from `plugins/streams/deno.json` (`generatePluginMetadata`, line ~388). | HEAD publish-assets `--check`; manifest faces exact replacement. |
+| 19 | `plugins/triggers/src/package-metadata.generated.ts` | **Re-derived.** Rendered only from `plugins/triggers/deno.json` (`generatePluginMetadata`, line ~388). | HEAD publish-assets `--check`; manifest faces exact replacement. |
+| 20 | `plugins/workers/src/package-metadata.generated.ts` | **Re-derived.** Rendered only from `plugins/workers/deno.json` (`generatePluginMetadata`, line ~388). | HEAD publish-assets `--check`; manifest faces exact replacement. |
+| 21 | `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` | **Re-derived.** Built from publishable package/plugin manifests and `deno doc --json` over their tracked export entrypoints (`buildExportSurfaceCorpus`, line ~180). | HEAD corpus `--check`; non-version source drift is outside the allowed set and manifest drift faces exact replacement. |
+
+Audit cardinality: **21/21 classified; 19 re-derived, 2 preserved/round-tripped.** Both preserved
+paths now have parent anchors. Provenance additionally uses a closed field set, so unknown fields
+are stale under the real writer check rather than being silently carried forward.
+
+### Provenance attack red before cycle-2 fix
+
+The regression was added before the repair. It creates an unchanged-version prose blob, injects
+`MALICIOUS_PROVENANCE_FIELD_INJECTED_BY_EVALUATOR` into provenance, calls the real
+`rebaseAgentDocsProse(..., check=true)` writer check, confirms the pre-fix writer reported no stale
+path and the field is present in the barrel input, then drives `verifyGreenCanaryPair` with only
+provenance and its synchronized barrel changed:
+
+```text
+$ deno test --allow-read --allow-write --allow-run .llm/tools/release/github-release_test.ts --filter 'writer-preserved non-version provenance injection'
+Check .llm/tools/release/github-release_test.ts
+running 1 test from ./.llm/tools/release/github-release_test.ts
+parent canary evidence rejects writer-preserved non-version provenance injection ... FAILED (11ms)
+
+ERRORS
+
+parent canary evidence rejects writer-preserved non-version provenance injection => ./.llm/tools/release/github-release_test.ts:360:6
+error: AssertionError: Expected function to reject.
+    throw new AssertionError(
+          ^
+    at assertRejects (https://jsr.io/@std/assert/1.0.19/rejects.ts:118:11)
+    at async file:///home/codex/repos/ns006-f-a-release-tooling/.llm/tools/release/github-release_test.ts:406:5
+
+FAILURES
+
+parent canary evidence rejects writer-preserved non-version provenance injection => ./.llm/tools/release/github-release_test.ts:360:6
+
+FAILED | 0 passed | 1 failed | 22 filtered out (17ms)
+
+error: Test failed
+exit 1
+```
+
+After the fix the same path is green: the closed writer reports `provenance.json` stale, and the
+independent parent-derived verifier rejects even when `generatedOutputsFresh` is stubbed green:
+
+```text
+$ deno test --allow-read --allow-write --allow-run .llm/tools/release/github-release_test.ts --filter 'writer-preserved non-version provenance injection'
+Check .llm/tools/release/github-release_test.ts
+running 1 test from ./.llm/tools/release/github-release_test.ts
+parent canary evidence rejects writer-preserved non-version provenance injection ... ok (17ms)
+
+ok | 1 passed | 0 failed | 22 filtered out (22ms)
+exit 0
+```
+
+The real measured cut remains valid under the new provenance predicate:
+
+```text
+$ deno eval '<invoke isExactAgentDocsProvenanceReplacement on provenance and gzip bytes from 6ec75573d^ and 6ec75573d>'
+{"cut":"6ec75573d","provenanceDeltaAccepted":true}
+exit 0
+
+$ rtk proxy deno task gen:publish-assets --check
+Task gen:publish-assets deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-publish-assets.ts '--check'
+exit 0
+```
+
+### Cycle-2 repair gates
+
+The release suite and the publish-assets writer regression were run together after the final edit.
+The complete runner output named every test; its authoritative aggregate was:
+
+```text
+$ deno test --quiet --allow-all .llm/tools/release/ .llm/tools/generate-publish-assets_test.ts
+running 4 tests from ./.llm/tools/generate-publish-assets_test.ts
+MCP fallback is generated from the locked release prose within 256 KiB ... ok
+release asset regeneration removes prior-version provenance residue ... ok
+top-level generation refreshes provenance before MCP reads it ... ok
+release bump rebases one shared corpus before CLI and MCP consume it ... ok
+running 23 tests from ./.llm/tools/release/github-release_test.ts
+toVersion strips a single leading v; toTag re-adds it ... ok
+version-only diff accepts the complete release version surface only ... ok
+version-only diff accepts a realistic coordinated release cut and rejects source drift ... ok
+green canary pair accepts current SHA or a version-only immediate parent ... ok
+parent canary evidence checks every release path and reproduces derived writer outputs ... ok
+parent canary evidence fails when derived writer outputs cannot be reproduced ... ok
+parent canary evidence rejects self-consistent non-version agent-docs injection ... ok
+parent canary evidence rejects writer-preserved non-version provenance injection ... ok
+canary pair gate fails closed for source drift and API failure ... ok
+parent canary evidence rejects seeded manifest drift inside a version file ... ok
+formatClosedIssues renders a bulleted list, empty when none ... ok
+composeReleaseBody orders intro, changelog, closed issues and drops blanks ... ok
+--prev-tag resolves a dated window and queries closed issues ... ok
+known previous tag with empty since fails loudly before reporting closed issues ... ok
+explicit previous tag uses release date with commit-date fallback ... ok
+parseArgs: version positional or flag, defaults to non-prerelease Latest ... ok
+parseArgs: --prerelease implies not-Latest; explicit --latest with it throws ... ok
+parseArgs: --no-latest overrides the default ... ok
+parseArgs: every documented release:publish invocation is accepted ... ok
+parseArgs: intro is required (the deliberate manual step) ... ok
+parseArgs: version is required ... ok
+parseArgs: notes-file and message are mutually exclusive ... ok
+parseArgs: unknown flag and missing value are rejected ... ok
+ok | 107 passed | 0 failed (1s)
+exit 0
+```
+
+The omitted middle of the release-suite transcript consists only of the other 80 individually named
+passing release tests; no output was used to hide or reinterpret a failure. The release-only count is
+103 and the four writer tests bring the combined count to 107.
+
+```text
+$ rtk proxy deno task check
+Task check deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude "^(.*(?:^|/)\.generated/|.*(?:^|/)node_modules/)" (cached, inputs unchanged)
+exit 0
+
+$ rtk proxy deno task lint
+Task lint deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\.generated/|.*(?:^|/)node_modules/)" (cached, inputs unchanged)
+exit 0
+
+$ rtk proxy deno task fmt:check
+Task fmt:check deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\.generated/|.*(?:^|/)node_modules/)" --ignore-line-endings (cached, inputs unchanged)
+exit 0
+```
+
+The root tasks intentionally cover `packages/**` and `plugins/**`, so the required uncached release
+tool check was also run directly:
+
+```text
+$ deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/release --ext ts
+{"source":{"mode":"selection","cwd":"/home/codex/repos/ns006-f-a-release-tooling"},"command":"deno check --unstable-kv <files>","selection":{"filesSelected":40,"batches":1,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+exit 0
+```
+
+The full repository suite was re-run after the final code edit. It emitted the repository's full
+per-test stream and ended with this verdict:
+
+```text
+$ rtk proxy deno task test
+Task test deno test --allow-all
+ok | 3190 passed (617 steps) | 0 failed | 17 ignored
+exit 0
+
+$ rtk proxy deno task test --reporter=dot
+Task test deno test --allow-all '--reporter=dot'
+<3190 pass dots and 17 ignore commas; no failure symbols or diagnostics>
+ok | 3190 passed (617 steps) | 0 failed | 17 ignored (2m48s)
+exit 0
+```
+
+Pre-commit hygiene:
+
+```text
+$ git diff --check
+exit 0
+
+$ git diff --exit-code 01aa12b67 HEAD -- deno.lock
+exit 0; stdout bytes: 0
+
+$ git rev-parse --abbrev-ref --symbolic-full-name @{u}
+fatal: no upstream configured for branch 'fix/1438-release-cut-canary-pair-inheritance'
+exit 128 (expected; explicit-refspec push required)
+```
+
+### Cycle-2 commit, push, and PR audit
+
+```text
+$ git commit -m "fix(release): close provenance inheritance"
+ok 4 files changed, 328 insertions(+), 15 deletions(-)
+ok 2a41026
+exit 0
+
+$ git push origin HEAD:refs/heads/fix/1438-release-cut-canary-pair-inheritance
+To https://github.com/rickylabs/netscript.git
+   5350d01fc..2a4102600  HEAD -> fix/1438-release-cut-canary-pair-inheritance
+ok fix/1438-release-cut-canary-pair-inheritance
+exit 0
+
+$ gh pr edit 1539 --body-file .llm/tmp/pr-a-body.md
+https://github.com/rickylabs/netscript/pull/1539
+exit 0
+
+$ gh pr comment 1539 --body-file .llm/tmp/pr-a-cycle-2-repair-comment.md
+https://github.com/rickylabs/netscript/pull/1539#issuecomment-5265302062
+exit 0
+```
+
+The body carries the 21-path audit and the selected option per path. The cycle-3 IMPL-EVAL item is
+deliberately unchecked.
+
+```text
+$ gh pr view 1539 --json ...
+{"acceptance":{"audit":true,"closedSchema":true,"cycle3Pending":true,"implEvalUnchecked":true,"provenanceRegression":true},"base":"main","closes":[1430,1438],"head":"fix/1438-release-cut-canary-pair-inheritance","headSha":"2a410260074639e465bedf3ee4cc85685c65fcf6","isDraft":true,"labels":["type:fix","status:impl-eval","area:tooling","priority:p1","area:release"],"milestone":"0.0.6","number":1539,"state":"OPEN","statusLabels":["status:impl-eval"],"url":"https://github.com/rickylabs/netscript/pull/1539"}
+exit 0
+
+$ rtk proxy deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1539 --pretty
+Task agentic:review-threads deno run --no-lock --allow-read --allow-run --allow-env --allow-net=api.github.com .llm/tools/agentic/github/review-threads.ts '--' '--repo' 'rickylabs/netscript' '--pr' '1539' '--pretty'
+review-threads PASS rickylabs/netscript#1539 threads=0 unanswered=0
+exit 0
+
+$ git status --porcelain
+exit 0; stdout bytes: 0
+
+$ git diff --exit-code 01aa12b67 HEAD -- deno.lock
+exit 0; stdout bytes: 0
+
+$ git rev-parse HEAD
+2a410260074639e465bedf3ee4cc85685c65fcf6
+exit 0
+
+$ git ls-remote --heads origin refs/heads/fix/1438-release-cut-canary-pair-inheritance
+2a410260074639e465bedf3ee4cc85685c65fcf6 refs/heads/fix/1438-release-cut-canary-pair-inheritance
+exit 0
+```
+
+No publication, `release:publish`, `deno publish`, tag creation/push, canary, lock mutation, cache
+reload, scaffold runtime, merge, or evaluator self-certification was performed.

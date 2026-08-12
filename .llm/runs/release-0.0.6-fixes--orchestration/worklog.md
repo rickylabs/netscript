@@ -872,3 +872,81 @@ Cross-environment corpus determinism; live GitHub API behaviour (transport-stubb
 and — stated by the evaluator against its own result — the provenance-ADMITTED run stubbed
 `generatedOutputsFresh`, though its provenance-touching components were proven separately against
 the real worktree.
+
+## 2026-08-12 — IMPL-EVAL cycle 3, PR #1539: **PASS**
+
+Fresh separate Fable 5 session (neither prior evaluator), own worktree `ns006-f-a-impleval3` at
+`2a4102600`. **VERDICT: PASS. No blocking findings.**
+
+### Headline answer, re-derived
+
+**NO** — no non-version content could be admitted for canary-pair inheritance through **any**
+writer-declared path. Both prior holes are closed and no third instance of the class exists.
+
+### The audit was itself audited
+
+Slice A's response to the structural instruction was a **21-row categorisation** of every path in
+`PREPARED_RELEASE_GENERATED_OUTPUTS`, each with its named writer function. The evaluator **agreed
+with all 21 categories**, having read every writer and traced each output's derivation source
+rather than accepting the table.
+
+The tautology-prone class — *a writer re-reading its own committed output* — applies to exactly two
+paths, `prose.json.gz` and `provenance.json`, both now separately anchored to the canary parent.
+
+The two rows flagged in the brief as borrowing their safety from other paths' guards (row 4
+`agent-docs.generated.ts`, row 10 `mcp publish-assets.generated.ts`) were confirmed genuinely
+**re-derived**: their `--check` reads prose/provenance — *other* files — never their own output, so
+it is a real reproduction. Proven by tampering each committed output in the real worktree and
+getting **exit 1**. The remaining 19 derive from either an exact-version-guarded manifest or a
+source outside `discoverPreparedReleaseFiles`, where tamper produces a non-version-only diff that
+is rejected upstream.
+
+### Attacks, all through the real verifier with real git reads
+
+```
+cycle-1 prose injection ......................... REJECTED
+cycle-2 provenance: extra field ................. REJECTED
+cycle-2 provenance: sourceCommit ................ REJECTED
+cycle-2 provenance: extractionTimestamp ......... REJECTED
+cycle-2 provenance: files array ................. REJECTED
+cycle-2 provenance: same-version ................ REJECTED
+absent-at-parent, both anchored inputs .......... REJECTED (fail-closed)
+legitimate control .............................. ADMITTED
+```
+
+### The feature is effective, not inert
+
+The real measured v0.0.5 cut `6ec75573d` (0.0.4→0.0.5, 62 files) driven end-to-end through the real
+`verifyGreenCanaryPair` returns **ADMITTED**, inheriting parent `89a4e5f4`. This was a blocking
+condition in the opposite direction and it holds: #1438 fixes the dead inheritance path rather than
+replacing one refusal with another.
+
+### Non-blocking
+
+- **N-1** `check:mcp-export-corpus` still exits 1 on clean HEAD — mid-milestone source drift,
+  fail-closed, and `release:cut` regenerates the corpus at cut time. Cross-environment `deno doc`
+  determinism remains unverifiable locally. This is cycle 1's B-2, now diagnosed rather than open.
+- **N-2** Doc-set-changing cuts are conservatively **rejected by design** — such a cut must earn its
+  own canary. Correct behaviour, recorded so it is not mistaken for a defect later.
+
+### Disclosed stub, with justification
+
+`generatedOutputsFresh` was stubbed to resolve in the drivers. The evaluator disclosed this and
+justified it: every rejection above comes from the parent-anchor guards that run **before**
+`assertFresh`, and it separately proved the two non-tautological `assertFresh` components reject
+direct tamper against the real worktree. Live GitHub API paths were exercised via injected
+transports only, per the no-network constraint.
+
+### Gates the cycle-3 evaluator executed
+
+Full suite **3190 passed / 0 failed / 17 ignored**; release suite **103 passed**; root check (2876
+files), lint, and fmt:check clean; scoped check/lint/fmt on the changed tool files clean. Worktree
+clean, `deno.lock` unchanged, HEAD `2a4102600`, generator worktree untouched, tampers restored.
+
+## Merge sequence for #1539
+
+The PR had been flipped back to **draft** when slice A pushed the provenance fix, which is why the
+`ci` run at `2a4102600` reported every job `skipped` — the same draft-suppression that opened this
+lane's very first gate finding. Marked ready again to trigger a real run; the IMPL-EVAL box was
+ticked **only after** `verdict-3.md` existed and said PASS, and the label moved to
+`status:ready-merge` so the acceptance mirror will run.

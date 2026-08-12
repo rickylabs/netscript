@@ -151,6 +151,34 @@ cannot reproduce the committing environment byte-for-byte, however, the D-6 inhe
 always reject and #1438 will be operationally inert. Per slice scope this determinism issue is
 recorded only; no corpus-generator change or bypass is attempted here.
 
+### IMPL-EVAL cycle 2 correction — provenance and corpus cause
+
+**Recorded:** 2026-08-12, after PR #1539 IMPL-EVAL cycle 2 `FAIL_FIX`.
+
+The cycle-1 correction still left `.llm/assets/agent-docs/provenance.json` structurally unsafe.
+Both provenance writers spread the parsed committed object, so an arbitrary field was preserved by
+`gen:publish-assets --check` and then embedded into the published agent-docs barrel. A complete
+audit of all 21 `PREPARED_RELEASE_GENERATED_OUTPUTS` paths found only two preserved/round-tripped
+writer inputs: the already-anchored prose gzip and provenance. The other 19 outputs are re-derived
+from separate tracked sources whose mutation is rejected by the changed-path or exact-manifest
+checks. The full path-by-path table is in slice A's `evidence.md`.
+
+Provenance now takes both bounded protections. Its writer emits a closed eight-field schema rather
+than spreading unknown fields, and inheritance derives the only permitted HEAD provenance from the
+canary parent's stable metadata plus integrity measurements of the parent and HEAD prose blobs.
+This catches unknown fields and mutations to legitimate preserved fields; the existing prose anchor
+and all HEAD reproduction checks remain in force.
+
+Cycle 2 also refined the corpus observation above. The clean-tree stale result is explained by
+**source drift**, not demonstrated `deno doc` byte nondeterminism: the corpus was last regenerated at
+the 0.0.5 cut, while 16 commits / 91 package-and-plugin source files changed afterward.
+`release:cut` regenerates the corpus before inheritance is evaluated. Two consecutive generations
+under Deno 2.9.5 Linux were byte-identical, establishing same-environment determinism. What remains
+unknown is cross-environment determinism between a cut environment and `publish.yml`; additionally,
+`ci.yml` does not independently run `check:mcp-export-corpus`, so D-6 is currently the check that
+observes it. This remains a fail-closed, non-blocking observation only; the slice does not modify the
+corpus or its CI coverage.
+
 ## D-4 — #1417 mutation source is mixed; preferred isolation remains viable
 
 **Recorded:** 2026-08-12, Slice B implementation.
