@@ -15,44 +15,50 @@ cancelled by the owner:
 - `31615110254` at `2026-08-12T15:57:31Z`
 
 The primary root cause was the generic agent workflow's unanchored body-substring trigger. Any
-comment by an owner, member, or collaborator that merely quoted the manual command token anywhere in
-prose could start paid work, including fallback provenance and workflow-owned status comments. The
+comment by an owner, member, or collaborator that quoted the manual command token anywhere in
+prose could start paid work — fallback provenance comments that quote the original request are the concrete case. (Workflow-owned status comments do not contain the token and were never admitted by that predicate; the fixed predicate rejects them by position regardless, which is what the box-3 regression test pins.) The
 second root cause was the phase dispatcher's non-atomic sequence: list comments, observe no tuple
 marker, then create the paid trigger comment. Concurrent attempts could both complete the read
 before either completed the write, so both launched work for the same logical transition.
 
-### Live recursive status-comment reproductions on PR #1603
+### Duplicate workflow triggers observed during evaluation — corrected scope
 
-The same primary defect reproduced twice during PR #1603's evaluation. Both duplicates were
-`issue_comment` events caused by workflow-authored comments rather than human commands:
+Three duplicate `OpenHands Agent` workflow runs were observed while PRs #1603 and #1605 were being
+evaluated. An earlier revision of this file described them as live reproductions of the double-spend
+defect. **That description was wrong and is retracted here.**
 
-| Duplicate run | Created                                                                   | Jobs | Outcome                                                      |
-| ------------- | ------------------------------------------------------------------------- | ---: | ------------------------------------------------------------ |
-| `31624029906` | `2026-08-12T17:43:12Z`, 18 seconds after the trigger comment              |    0 | Cancelled at run level                                       |
-| `31625413947` | `2026-08-12T17:59:52Z`, 17 seconds after generation `29356827659` started |    0 | Cancelled manually by the owner before the agent job started |
+| Duplicate run | Created | Jobs | Outcome |
+| --- | --- | ---: | --- |
+| `31624029906` | `2026-08-12T17:43:12Z` | 0 | Cancelled at run level |
+| `31625413947` | `2026-08-12T17:59:52Z` | 0 | Cancelled by root while zero jobs were assigned |
+| `31630450143` | `2026-08-12T18:59:55Z` | 0 | Cancelled by root while zero jobs were assigned |
 
-The second reproduction directly exercises acceptance box 3. Intentional evaluation run
-`31625391423` posted its workflow-owned Running summary, and that summary comment spawned duplicate
-run `31625413947`. The pre-fix production predicate used an unanchored substring test, so a status
-comment that quoted the invocation vocabulary re-entered the workflow. Both real status bodies begin
-with the summary HTML marker; under the fixed predicate, the first field of the first line is
-therefore not the command token and authorization rejects them. This is the production red-before
-evidence for the isolated acknowledgement/summary regression in
-`.github/scripts/openhands-comment-trigger.test.ts`.
+What was actually observed, stated exactly: **a second workflow was triggered after an
+acknowledgement comment; root cancelled it while zero jobs were assigned; duplicate paid execution
+was therefore prevented, but production crossing of authorization was not observed.**
 
-Neither duplicate billed provider work, but that outcome was due to cancellation timing and owner
-intervention, not a pre-spend refusal by the system. Run-level cancellation happened to land before
-the first duplicate created any job, and the owner manually cancelled the second before its agent
-job started. Either duplicate could have billed if the agent job had started first. A concurrency
-group is consequently not a sufficient fix: cancellation can stop work only after it has been
-admitted, including after provider spend begins. The fixed authorization and tuple claim refuse
-duplicates before the trigger that admits the paid job.
+These runs do **not** demonstrate that a duplicate crossed authorization, and they do not demonstrate
+duplicate spend. The triggering body in each case is a workflow-authored status summary beginning:
 
-For production forensics, `conclusion=cancelled` with `total_jobs=0` means cancellation prevented
-the duplicate from reaching a job in that occurrence. A realized double-spend would have
-`total_jobs>=1` with a started `agent` job. Both cases render as “fail” in `gh pr checks`, so the
-job count and presence of a started agent job—not the conclusion string—are the spend discriminator.
+```
+<!-- openhands-agent-summary -->
+<!-- openhands-run: {"run_id":<id>,"attempt":1,"conclusion":"running"} -->
+```
 
+That body contains no `@`-prefixed invocation token, so the pre-fix `contains(...)` predicate would
+not have matched it and the `agent` job would have been skipped regardless of cancellation. A
+GitHub `issue_comment` event creates a workflow run for any comment; the run existing is not
+evidence that its jobs would have been admitted.
+
+Correspondingly, `conclusion=cancelled` with `total_jobs=0` does not by itself prove a prevented
+spend — it is equally consistent with a run whose jobs would have skipped. The discriminator is
+whether the triggering body satisfies the trigger predicate, which must be tested directly rather
+than inferred from run timing.
+
+The genuine production incident is unchanged and remains the basis for this work: runs
+`31615108125` and `31615110254`, one second apart, **each reaching a job**. Two paid runs for one
+logical phase transition. The deterministic regression proof for every acceptance criterion is the
+executed test suite recorded below; it does not depend on any of the three runs retracted above.
 ## Scope and design
 
 The workflow now creates one deterministic immutable Git ref for each `(generation, phase, head)`
