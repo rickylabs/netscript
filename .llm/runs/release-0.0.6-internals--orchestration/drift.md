@@ -866,3 +866,34 @@ Options, stated rather than chosen:
    (`milestone-run.md` § Evaluator protocol permits it, recorded in `drift.md`, never silently applied).
 
 Nothing further has been launched and no fourth run created. The merge is held.
+
+## D-28 — `quality:gate` does not cover `.llm/tools/**`, so this lane's own gate citations were overstated
+
+- **Severity:** significant (weakens gate evidence this lane has been citing on every PR)
+- **Recorded:** 2026-08-12, reported by the 0.0.6 **fixes** lane, confirmed here against source
+- **Fact:** `scan-code-quality.ts:18` sets `DEFAULT_ROOTS = ['packages/cli/src', 'plugins']`, and
+  `quality:scan:repo` is `--root packages --root plugins`. **`.llm/tools/**` is scanned by neither.**
+- **Why it matters to this lane specifically:** every PR in this rail — #1530, #1403, #1380, #1549 —
+  changes `.llm/tools/**` and nothing else of substance. So `deno task quality:gate` has been reporting
+  SUCCESS on these PRs **without inspecting a line of the changed code**, while the PR bodies cite it as
+  gate evidence. That is a weaker claim than was made.
+- **What actually inspected PR-E's diff:** the orchestrator's own pre-merge `git diff | grep -E` for new
+  `deno-lint-ignore` / `@ts-ignore` / `as any` / `as unknown as` / `quality-allow:`. It found nothing real
+  (one hit, a pre-existing string in the scanner's own test corpus). But **a hand grep is not a gate**, and
+  representing `quality:gate` green as coverage of `.llm/tools` changes was an overstatement. Corrected here
+  rather than left implied.
+- **The fixes lane's evidence for the same hole:** a PR of theirs carried a **new `as unknown as`** and
+  `quality:gate` still reported SUCCESS; their pre-merge diff scan was the only thing in the pipeline that
+  saw it, and three adversarial eval cycles did not flag it either because they were briefed on semantics
+  rather than typing hygiene.
+- **Actions taken:**
+  1. Remaining rail PR bodies state what `quality:gate` does and does not cover instead of citing it flatly.
+  2. Routed into **#1403**'s triage list as a second, larger uncovered surface on the same gate — #1403
+     names the `plugin-*-core` omission, and the fix for one is the fix for the other. Filed as a triage
+     entry with the fixes lane's PR as provenance rather than as a duplicate issue; ownership offered back
+     to them since they found it.
+- **Adjacent read rule adopted from the same report:** a `scaffold-runtime` job reporting SUCCESS in a
+  rollup means nothing on its own — the job always starts so its status reports, and the classifier
+  short-circuits it via a step named "Skipped by policy". Only the **step count** distinguishes a real run
+  from a short-circuit. This lane applies `ci:skip-e2e`/`ci:skip-scaffold` deliberately, so the intended
+  skip is stated in the PR body and step counts are checked rather than buckets.
