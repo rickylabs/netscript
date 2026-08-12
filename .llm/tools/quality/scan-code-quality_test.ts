@@ -100,3 +100,15 @@ Deno.test('scanner catches @ts-error suppressions and `as never` (source-side ty
   assertEquals(rules.filter((r) => r === 'ts-error-suppression').length, 2);
   assertEquals(rules.filter((r) => r === 'unsafe-cast').length, 1);
 });
+
+Deno.test('scanner exempts negative type fixtures from production-source findings', async () => {
+  const root = await Deno.makeTempDir();
+  const fixtureDir = join(root, 'packages/sdk/tests/type-fixtures');
+  await Deno.mkdir(fixtureDir, { recursive: true });
+  await Deno.writeTextFile(
+    join(fixtureDir, 'negative-contract_type.ts'),
+    '// @ts-expect-error negative compile fixture assertion\nconst value: string = 1;\n',
+  );
+
+  assertEquals(await scanCodeQuality(['packages'], root), []);
+});
