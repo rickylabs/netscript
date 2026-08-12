@@ -8,8 +8,9 @@ description: >
 This skill is the routing card for OpenHands handoffs: comments and labels start cloud work, and the
 required summary artifacts keep local and cloud agents synchronized.
 
-> **Temporary owner hold (2026-08-06):** do not dispatch OpenHands until its trigger path is fixed.
-> Use the checked-in local evaluator toolchain. This hold does not waive mandatory IMPL-EVAL.
+> **Hold lifted (2026-08-12):** generic OpenHands dispatch is fail-closed to the approved open
+> evaluator set. DeepSeek V4 Flash 0731 completed the bounded branch smoke in Actions run
+> `31574668989`; keep one trigger per PR and use the phase/complexity route below.
 
 ## When to Use
 
