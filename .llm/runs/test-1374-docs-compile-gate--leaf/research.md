@@ -17,14 +17,17 @@
 | 1 | The root `deno.json` declares `workspace: ["packages/*", "packages/cli/e2e", "plugins/*", "examples/*", "apps/*"]`. Workspace member `name` plus `exports` maps `@netscript/*` and exact subpaths to local declared entrypoints. | `deno info --json @netscript/sdk/query` reports root `packages/sdk/src/query/mod.ts`; `deno info --json @netscript/sdk` reports `packages/sdk/mod.ts`. |
 | 2 | A synthetic file outside the repository resolves `@netscript/sdk/client` and `@netscript/sdk/query` when checked with the root config. TSX additionally needs the Preact JSX import mapping. | Research probe: `deno check --unstable-kv --frozen --config <root>/deno.json <temp>.ts`; TSX passes when the import map supplies exact `preact` and `preact/jsx-runtime` mappings. |
 | 3 | Root `isolatedDeclarations: true` is correct for packages but creates example-only failures for exported snippet declarations without explicit annotations. The synthetic config must turn it off; it must not weaken `strict`, `noImplicitAny`, or `noImplicitReturns`. | Root `deno.json:compilerOptions`; research TSX probe emitted TS9007 until checked from a config with `isolatedDeclarations: false`. |
-| 4 | `docs/site/**` contains 246 `.md`/`.vto` source files, 578 fenced blocks on 123 pages, 211 `ts`, 77 `tsx`, and 7 `typescript` blocks. The target language set (`ts`/`tsx`) therefore contains 288 blocks. | Read-only Deno fence scanner over every `.md`/`.vto`, with matching backtick/tilde fence length and an unclosed-fence assertion. Per-page table below. |
+| 4 | `docs/site/**` contains 246 `.md`/`.vto` source files, 578 fenced blocks on 123 pages, 211 `ts`, 77 `tsx`, and 7 `typescript` blocks. The gate recognizes all three TS-like tags, for 295 blocks. | Read-only Deno fence scanner over every `.md`/`.vto`, with matching backtick/tilde fence length and an unclosed-fence assertion. Per-page table below. |
 | 5 | The nine Tier-1 pages contain 35 `ts`/`tsx` blocks: `quickstart` 1, `index` 0, SDK overview 1, add-service 6, query 7, examples 2, interactive 2, form 6, query-bridge 10. | Focused extraction with source lines; table below. |
-| 6 | Tier-1 includes complete modules, multi-file continuations indicated by leading `// path.ts[x]` comments, deliberate counter-examples, and partial fragments with app-local names. A permissive ambient preamble would make the gate lie. | Direct inspection of the 35 extracted blocks. The planned census is 18 checked and 17 reason-marked exemptions. |
-| 7 | `check-accuracy-and-discoverability.ts` mixes forbidden stale-text rules with positive API needles, source regexes, a manual Fresh-root export allowlist, 17 hardcoded CLI mutation families, and a subprocess call to `check-exports-drift.ts`. | `.llm/tools/docs/check-accuracy-and-discoverability.ts`. Exact demotion is locked in `plan.md`. |
+| 6 | Tier-1 includes complete modules, multi-file continuations indicated by leading `// path.ts[x]` comments, deliberate counter-examples, and partial fragments with app-local names. A permissive ambient preamble would make the gate lie. | Direct inspection of the 35 extracted blocks. After the PLAN-EVAL disposition, the planned census is 21 checked and 14 reason-marked exemptions. |
+| 7 | `check-accuracy-and-discoverability.ts` mixes forbidden stale-text rules with positive API needles, source regexes, a manual Fresh-root export allowlist, 18 hardcoded CLI mutation families, and a subprocess call to `check-exports-drift.ts`. | `.llm/tools/docs/check-accuracy-and-discoverability.ts`. Exact demotion is locked in `plan.md`. |
 | 8 | `check-exports-drift.ts` reads package `deno.json` export maps and docs export tables for 8 mappings. Only `config`, `contracts`, and `telemetry` have `checkSymbols: true`; symbol checking shells out to `deno doc --json`. Expanding its mapping belongs to #1108. | `.llm/tools/docs/check-exports-drift.ts:13-220,222-392`. |
 | 9 | `pages.yml` runs for PRs/pushes only on `docs/site/**` and itself. It builds Lume, links, and caveats, but has no snippet/API check. | `.github/workflows/pages.yml`. |
 | 10 | `ci.yml` suppresses all draft-PR jobs. On non-drafts its `quality` job runs when classifier output is `needs_deno || needs_docs`, and currently invokes `docs:accuracy` but no snippet compile task. `packages/**`/`plugins/**` classify as Deno changes. | `.github/workflows/ci.yml`; `.github/scripts/ci-classify-changes.ts`. |
 | 11 | Deno 2.9.5 `check` accepts multiple entry files, `--config`, `--import-map`, `--lock`, `--frozen`, and `--unstable-kv`; it type-checks without executing the modules. | `deno check --help`; `netscript-deno-toolchain` skill. |
+| 12 | A synthetic config cannot use the real workspace lock with `--frozen`: every evaluator control exits 1 with `The lockfile is out of date`. Copying the root lock into the temp root and omitting `--frozen` allows Deno to reconcile synthetic workspace metadata without mutating the tracked lock. | Opposite-family PLAN-EVAL cycle-1 executed D2 probe (B1). |
+| 13 | Root/member `imports` are insufficient for reachable workspace graphs: `@opentelemetry/api` is imported by telemetry but exists only in the root npm `catalog`. The synthetic map must materialize root catalog fallbacks. | Opposite-family PLAN-EVAL cycle-1 D2 probe; `deno.json:215`; `packages/telemetry/src/context/w3c.ts`. |
+| 14 | Of the original 17 planned exemptions, 14 are structural, two query-island examples are harness-fit and can compile with typed relative support modules, and one add-service barrel is a real missing-local-binding defect. | Opposite-family PLAN-EVAL cycle-1 classification and compiled probes (B4/N1). |
 
 ## Fence census by language
 
@@ -41,9 +44,9 @@
 | `js`, `jsonc`, `md`, `powershell`, `prisma` | 1 each |
 | **Total** | **578** |
 
-The compile-gate target is exactly `ts` and `tsx`: **288 candidate blocks**. The seven
-`typescript` fences remain visible in the census but are not silently treated as `ts`; normalizing
-their language tag belongs to the expansion plan.
+The compile gate recognizes `ts`, `tsx`, and `typescript`: **295 TS-like blocks**. `typescript` is
+normalized to the `.ts` compilation path immediately so a one-word tag rename cannot bypass the
+gate; canonical tag cleanup remains part of the reference expansion wave.
 
 ## Fence census by page
 
@@ -183,17 +186,16 @@ denominator is reproducible.
 | `quickstart.vto` | 1 | 0 | 1 | 0 | Typed generated-schema fixture supplies the scaffold alias. |
 | `index.vto` | 0 | 0 | 0 | 0 | Coverage-floor page is asserted present even with no TS fence. |
 | `services-sdk/sdk.md` | 1 | 0 | 1 | 0 | Typed contract fixture supplies the app contract alias. |
-| `services-sdk/how-to/add-a-service.md` | 6 | 0 | 5 | 1 | One barrel excerpt omits the local binding it uses. |
-| `web-layer/query.md` | 3 | 4 | 4 | 3 | Three fragments depend on page-loader/app modules absent from the page. |
+| `services-sdk/how-to/add-a-service.md` | 6 | 0 | 6 | 0 | The broken barrel excerpt is corrected to import and re-export its local binding. |
+| `web-layer/query.md` | 3 | 4 | 6 | 1 | Typed support modules cover both primary island examples; one cache fragment remains deliberately partial. |
 | `web-layer/examples.md` | 1 | 1 | 1 | 1 | Cache-projection fragment assumes loader values. |
 | `web-layer/interactive.md` | 0 | 2 | 2 | 0 | Typed support module supplies the app query fixture. |
 | `web-layer/form.md` | 0 | 6 | 3 | 3 | Counter-example and two state-only fragments are intentionally partial. |
 | `web-layer/query-bridge.md` | 5 | 5 | 1 | 9 | Counter-examples, pseudocode, and chain fragments are intentionally partial. |
-| **Total** | **17** | **18** | **18** | **17** | **35 Tier-1 candidates** |
+| **Total** | **17** | **18** | **21** | **14** | **35 Tier-1 candidates** |
 
-The gate will also report **253 `ts`/`tsx` blocks outside the Tier-1 floor** and the 7
-`typescript` fences. That separates marked exemptions from not-yet-covered work instead of
-presenting 18 checked blocks as site-wide coverage.
+The gate will also report **260 TS-like blocks outside the Tier-1 floor**. That separates marked
+exemptions from not-yet-covered work instead of presenting 21 checked blocks as site-wide coverage.
 
 ## Current checker responsibilities
 
@@ -201,7 +203,7 @@ presenting 18 checked blocks as site-wide coverage.
 
 - Source/API regexes for `defineSaga` and `spawn`.
 - Positive API/text needles for saga payload/return shape, preferred how-to paths,
-  `--with-client`, quickstart paths, the query-dialect exception, and 17 CLI mutation families.
+  `--with-client`, quickstart paths, the query-dialect exception, and 18 CLI mutation families.
 - Forbidden stale claims: old saga calls/sends, retired client paths/aliases, and treating
   `apps/<app>/client.ts` as a data client.
 - A manual `ALLOWED_FRESH_ROOT_SYMBOLS` set and import regex.
