@@ -572,3 +572,33 @@ Trusted base SHA: d7e2b67b2be535c9ca13449f97f8f4585344030a
   the evaluated head. The risk is discharged, not outstanding.
 - **Action:** F-4 fixed; PLAN-EVAL re-triggered by label-cycling `status:plan-eval` per D-14's rerun path
   (the only sanctioned rerun mechanism — not a push, not a re-request). PR-E dispatches on `PASS`.
+
+## D-20 — PLAN-EVAL PASS at cycle 5; Plan-Gate cleared, implementation authorized
+
+- **Severity:** minor (milestone in the run's own process)
+- **Recorded:** 2026-08-12
+- **Verdict:** **`PASS`** — PR #1553, run `31589648809`, evaluated head `69ef5f15d`, MiniMax M3 over
+  OpenRouter via the automated phase-eval path. Verdict body saved as `plan-eval-cycle5.md`; cycle 4's
+  `FAIL_RESCOPE` saved as `plan-eval-cycle4.md`.
+- **Rerun mechanism used:** label-cycled `status:plan-eval` → `status:plan` → `status:plan-eval`, the only
+  sanctioned rerun path (D-14). Exactly one `status:` label at every point. Not a push, not a
+  re-requested review — and a push would not have worked, since `openhands-phase-eval.yml` triggers only on
+  `labeled` and `ready_for_review`.
+- **Cycle history, for the retrospective:**
+
+| Cycle | Route | Verdict | What it cost, and what it bought |
+| --- | --- | --- | --- |
+| 1 | Codex · Sol · high (local) | `FAIL_PLAN` | Caught R-9's premise — a claim inherited from #1380 and never re-measured, inside a plan whose whole value was re-measurement |
+| 2 | Codex · Sol · high (local) | `FAIL_PLAN` | Caught the allowance rule reddening CI on day one, the unreachable green gate, and the diff-vs-file impossibility of box 6 |
+| 3 | Codex · Sol · high (local) | `FAIL_PLAN` | **Measured** the premise instead of arguing it: 1,714 published symbol records with unresolved types. That number is what forced the rescope |
+| 4 | MiniMax M3 (automated) | `FAIL_RESCOPE` | Passed the plan and the Plan-Gate; failed the companion prose still describing the pre-rescope surface |
+| 5 | MiniMax M3 (automated) | **`PASS`** | Plan-Gate cleared |
+
+- **Judgement worth recording:** five cycles is far more than this repo's two-cycle norm, and it was not
+  ceremony. Cycles 1–3 each found a defect that would have shipped: a no-op premise, a gate red by
+  construction, and a rule whose green state was unreachable. Cycle 3's measurement in particular is the
+  kind of finding no amount of plan re-reading produces — it required executing `deno doc --json` and
+  parsing the result. The cost was borne almost entirely by the *plan*, not by implementation, which is
+  where it is cheapest to pay.
+- **Implementation is now authorized.** PR-E dispatches first. F-5 of cycle 4 (no committed slice)
+  discharges on that dispatch, as the evaluator stated.
