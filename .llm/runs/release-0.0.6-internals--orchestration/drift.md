@@ -161,3 +161,29 @@ being fixed, filed, or briefed by this lane. Both are the owner's call.
   `thread-store conflict: … already has an active writer` while the thread is mid-turn. That is the
   mechanical signal for "you are not at a turn boundary" — steer on `codex-watch --mode turn`
   completion, not on git activity.
+
+## D-10 — `status:ready-merge` alone cannot trigger the acceptance mirror; the documented behaviour is wrong
+
+- **Severity:** significant (gate-trust defect in the close-gate surface this lane is repairing)
+- **Recorded:** 2026-08-12, stage D, observed live on PR #1527
+- **Two sources assert the label is a trigger:**
+  - `.agents/skills/netscript-pr`: "applying `status:ready-merge` itself triggers a fresh run (the
+    workflow listens to `labeled`)".
+  - `check-close-gate.ts`'s own repair hint: "apply the label and the labeled event triggers a fresh
+    run".
+- **Both are false at `01aa12b67`:** `ci.yml:41` and `e2e-cli.yml` both declare
+  `types: [opened, synchronize, reopened, ready_for_review]`. **`labeled` is in neither list.**
+- **Observed cost:** the label was applied at ~08:14Z; no run was created; `close-gate` stayed
+  `current-fail` on its pre-label result and #1415's four acceptance boxes were still `0` ticked at
+  08:19Z. One wasted verification cycle, and a repair hint that tells the operator to do something that
+  cannot work.
+- **The rule that works:** **label first, then push.** The push fires `synchronize`, and because the
+  gate and the mirror read everything live at execution time, that run observes the label.
+- **Not fixed by this lane.** Adding `labeled` to `ci.yml`'s types is a one-line change that would make
+  both documents true, but PR-A's boundary is `.llm/tools/validation/**` and the owner has just narrowed
+  this lane's scope; widening a slice into workflow surgery mid-flight is how scope leaks. Raised to the
+  owner as a separate decision, with the alternative being to correct the two documents instead of the
+  workflow.
+- **Note on the pre-merge gate:** this is check 1's failure mode from the other side — the close-gate
+  *result existed* and was red, but it was red for a reason the operator was told to fix in a way that
+  does not work. "Unproven, not clean" applies to a stale result just as much as to a missing one.
