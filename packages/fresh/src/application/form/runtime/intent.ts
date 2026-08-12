@@ -78,8 +78,8 @@ export function parseFormIntent(rawValues: Record<string, unknown>): FormIntent 
 /**
  * Apply a collection intent to the submitted values.
  *
- * Phase A only mutates existing array fields. Missing or malformed collection
- * targets are treated as a no-op so the higher-level pipeline can continue
+ * This operation only mutates existing array fields. Missing or malformed
+ * collection targets are treated as a no-op so the higher-level pipeline can continue
  * without turning malformed intent payloads into runtime crashes.
  */
 export function applyIntentOperation<TValues extends FormValues>(

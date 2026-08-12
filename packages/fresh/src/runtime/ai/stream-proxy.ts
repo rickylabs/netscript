@@ -9,10 +9,10 @@
  * re-framed — mislabeling the bytes on the wire and breaking every
  * standards-compliant reader (browser `fetch`/`DecompressionStream`, Deno
  * `fetch` auto-decompress, `curl --compressed`) and, worse, truncating a
- * re-streamed chunked body against a stale `content-length`. That defect is
- * netscript#239.
+ * re-streamed chunked body against a stale `content-length`.
  *
- * This handler fences #239 in the Fresh layer by upholding one invariant:
+ * This handler prevents that failure in the Fresh layer by upholding one
+ * invariant:
  * **every response header must describe the bytes actually sent.** Since the
  * re-streamed body is decoded and re-framed by `Deno.serve`, the honest thing is
  * to drop `content-encoding` and `content-length`, plus the RFC 9110 §7.6.1
@@ -48,7 +48,7 @@ import {
  * to the client.
  *
  * - `content-encoding` / `content-length` — no longer describe the decoded,
- *   re-framed body once it crosses the `fetch` hop (netscript#239).
+ *   re-framed body once it crosses the `fetch` hop.
  * - the RFC 9110 §7.6.1 hop-by-hop headers — describe the upstream connection,
  *   not the re-streamed one, so they must not survive a proxy hop.
  */
@@ -141,7 +141,7 @@ function toRequest(input: Request | { readonly req: Request }): Request {
  * The returned handler resolves the chat session target (static or per-request),
  * proxies the incoming request to that session's durable-stream URL, attaches
  * server-side streams auth, passes the upstream body through unbuffered, strips
- * headers that would misdescribe the re-framed bytes (fencing netscript#239),
+ * headers that would misdescribe the re-framed bytes,
  * and propagates the client `AbortSignal` so a disconnect tears the upstream
  * fetch down (F-13).
  *

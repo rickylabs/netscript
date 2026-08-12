@@ -3,9 +3,9 @@
  *
  * Store extension subpath.
  *
- * Group E keeps concrete persistent stores outside the root barrel. The store
- * port is re-exported here so external store implementations can target a
- * stable role-named subpath without importing test-only memory stores.
+ * Concrete persistent stores live outside the root module. The store port is
+ * re-exported here so external store implementations can target a stable
+ * role-named subpath without importing test-only memory stores.
  */
 
 export { SAGA_DURABILITY_TIERS, SAGA_INSTANCE_STATUSES } from '../domain/mod.ts';

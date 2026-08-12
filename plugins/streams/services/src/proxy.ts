@@ -7,10 +7,10 @@
  *  1. **Header hygiene** — the upstream mislabels a decoded JSON body with
  *     `content-encoding: gzip`; {@link sanitizeProxyResponse} strips that (and
  *     the hop-by-hop headers) so the response describes the bytes actually sent
- *     (netscript#219 / #239). The same sanitizer also re-streams the upstream
+ *     after decoding. The same sanitizer also re-streams the upstream
  *     body through an explicit `ReadableStream` so a client disconnect cancels
  *     the upstream reader cleanly instead of tearing the upstream `fetch` down
- *     as an uncaught `AbortError` (netscript#268 / SR1). Every response returned
+ *     as an uncaught `AbortError` (SR1). Every response returned
  *     from this handler passes through that sanitizer.
  *
  *  2. **Fresh-session live-read race** — a brand-new chat session issues its
@@ -18,15 +18,15 @@
  *     first write has created that stream. The upstream answers a live poll of
  *     a not-yet-created stream with `404 Stream not found`, which the client
  *     surfaces as a terminal error and the UI stalls until a manual refresh
- *     (netscript#267). A live subscription of a stream that does not yet exist
- *     is semantically "the stream is empty and up-to-date" — not an error — so
+ *     before its first write. A live subscription of a stream that does not yet
+ *     exist is semantically "the stream is empty and up-to-date" — not an error — so
  *     this handler intercepts that specific 404 and either bridges until the
  *     producer creates the stream (then forwards the real data) or returns an
  *     empty, up-to-date live response so the subscription stays open and
  *     re-polls. Snapshot (non-live) reads of a genuinely missing stream still
  *     404 unchanged.
  *
- * The bug's client-side retry/backoff half (netscript#267 FA1) is a separate
+ * The client-side retry/backoff counterpart (FA1) is a separate
  * change; this module is the runtime/service half only and touches no client
  * code.
  *
@@ -40,7 +40,7 @@ import { sanitizeProxyResponse } from './proxy-headers.ts';
  * The `live` query-parameter value used by the durable-streams long-poll
  * subscription mode (`@durable-streams/client`). `live: true` maps to this on
  * the wire; it is the default subscribe transport and the one exercised by the
- * fresh-session race in netscript#267.
+ * fresh-session race described above.
  */
 const LIVE_LONG_POLL = 'long-poll';
 
@@ -188,7 +188,7 @@ export function createStreamsProxyHandler(
       const first = await forward(c, target);
 
       // Fast path: anything other than a live-poll 404 is proxied verbatim
-      // (header-sanitized). This preserves snapshot 404s, the #239 gzip fix, and
+      // (header-sanitized). This preserves snapshot 404s, the gzip-header fix, and
       // every non-error response byte-for-byte.
       if (first.status !== 404 || !isLiveLongPollRead(c.req.method, url)) {
         return sanitizeProxyResponse(first);

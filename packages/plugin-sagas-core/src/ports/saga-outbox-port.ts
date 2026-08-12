@@ -1,6 +1,6 @@
 import type { CascadedMessage, SagaInstanceId, SagaMessageId } from '../domain/mod.ts';
 
-/** Transactional outbox record reserved for T2 durability. */
+/** Transactional outbox record for cascaded saga messages. */
 export type SagaOutboxRecord = Readonly<{
   id: SagaMessageId;
   instanceId: SagaInstanceId;
@@ -9,7 +9,7 @@ export type SagaOutboxRecord = Readonly<{
   publishedAt?: Date;
 }>;
 
-/** Reserved T2 port for atomic state and cascaded-message commits. */
+/** Reserved port for atomic state and cascaded-message commits. */
 export interface SagaOutboxPort {
   /** Stable adapter identifier used by runtime diagnostics and plugin registration. */
   readonly id: string;

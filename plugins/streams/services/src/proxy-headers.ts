@@ -17,9 +17,7 @@
  * sent.** Since the re-streamed bytes are decoded and re-framed by
  * `Deno.serve`, the honest thing is to drop both.
  *
- * See netscript#219 (root-cause wire proof) and #239 (this runtime-side fix).
- *
- * ## Cancel lifecycle (netscript#268 / SR1)
+ * ## Cancel lifecycle (SR1)
  *
  * The upstream body is not forwarded to `Deno.serve` as the raw `fetch`
  * response stream. Handing the raw stream through means a client disconnect
@@ -29,8 +27,8 @@
  * {@link ReadableStream} whose `cancel()` runs the upstream reader's own
  * `cancel()`. On client disconnect the served stream's `cancel()` fires, the
  * upstream reader is released cleanly, and no `AbortError` propagates. The
- * re-streamed bytes are enqueued verbatim, so the #239 invariant above is
- * preserved unchanged.
+ * re-streamed bytes are enqueued verbatim, so the header-hygiene invariant
+ * above is preserved unchanged.
  *
  * @module
  */
@@ -39,7 +37,7 @@
  * Headers stripped before re-streaming an upstream response through the proxy.
  *
  * - `content-encoding` / `content-length` — no longer describe the decoded,
- *   re-framed body (netscript#219 / #239).
+ *   re-framed body.
  * - the RFC 9110 §7.6.1 hop-by-hop headers — describe the upstream connection,
  *   not the re-streamed one, so they must not be forwarded across a proxy hop.
  */
@@ -77,13 +75,13 @@ export function sanitizeProxyResponseHeaders(source: Headers): Headers {
  *
  * Bytes are enqueued verbatim as they are read (no buffering, transform, or
  * re-framing), so the payload is byte-identical to the upstream body and the
- * #239 "content-encoding describes the bytes sent" invariant is preserved.
+ * "content-encoding describes the bytes sent" invariant is preserved.
  *
  * The returned stream's `cancel()` — fired by `Deno.serve` when the client
  * disconnects mid-stream — cancels the upstream reader, which releases the
  * upstream `fetch` connection cleanly. This replaces the previous behavior of
  * handing the raw `fetch` body to `Deno.serve`, where a client disconnect tore
- * the upstream connection down as an uncaught `AbortError` (netscript#268 SR1).
+ * the upstream connection down as an uncaught `AbortError`.
  *
  * @param upstreamBody The non-null body of the upstream `fetch` response.
  * @returns A fresh readable stream that forwards `upstreamBody`'s chunks and
@@ -128,9 +126,9 @@ export function restreamUpstreamBody(
  * Re-wrap an upstream proxy response so its headers describe the bytes on the
  * wire and its body's cancel lifecycle is owned by the proxy.
  *
- * Headers are rewritten by {@link sanitizeProxyResponseHeaders} (the #239
- * content-encoding/content-length/hop-by-hop strip). The body is re-streamed
- * through {@link restreamUpstreamBody} so a client disconnect cancels the
+ * Headers are rewritten by {@link sanitizeProxyResponseHeaders} to strip stale
+ * content-encoding, content-length, and hop-by-hop metadata. The body is
+ * re-streamed through {@link restreamUpstreamBody} so a client disconnect cancels the
  * upstream reader cleanly rather than aborting the upstream `fetch`. A null
  * upstream body (e.g. a `204`/`304`) is forwarded as `null` unchanged.
  */
