@@ -61,11 +61,26 @@ while `index.md:310` moved to line 173. No further action is required for that l
 
 ## 2026-08-12 — D-4: authorized scope complete
 
-D-1 closed in `bd95998fd9d73565f0e5454559db8c536474db79`: the three Prisma-shaped fixture findings
+D-1 closed in `d876bfa93635ce924539f12ad236fc482f2d5815`: the three Prisma-shaped fixture findings
 now use `unknown` inputs, record/key narrowing, a typed sort comparator, and `Promise<MockItem[]>`.
 The direct scanner reports zero findings, the file type-checks, and its three pagination tests pass.
 No additional finding surfaced.
 
-D-2 closed in derivative-only commit `b82d2086eacb65552552f933c441ff8ca2e7b177`. The first generator
+D-2 closed in derivative-only commit `f73fb369620e154f4c134cccf16423c9ae2f8f4c`. The first generator
 run produced only the expected generated file; the second generator run exited 0 and
 `git status --porcelain` was empty. The generated asset was not hand-edited.
+
+## 2026-08-12 — D-5: IMPL-EVAL found consumer-bundle import closure missing
+
+Severity: high (introduced installed-bundle failure)
+
+Formal IMPL-EVAL on head `7264ce6aac21eecade916ea4b0332f5a1912e0c3` found that the generated
+consumer bundle was current with respect to `consumer-tools.json` but incomplete with respect to
+its own imports. Installed `quality/scan-code-quality.ts --help` could not resolve
+`../docs/snippet-extractor.ts`. This is a correction within the same leaf, not a reversal of R-10:
+the shared extractor remains the sole fence parser.
+
+The durable correction adds a non-runnable `modules` manifest category, registers the extractor,
+includes module paths and bytes in the canonical bundle identity, and adds a generic relative-import
+closure test with an omitted-module negative control. The existing installed-bundle smoke remains
+the end-to-end executable proof and now covers the repaired scanner import.

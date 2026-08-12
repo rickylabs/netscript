@@ -1,7 +1,13 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "installRoot": ".llm/tools",
   "supportFiles": ["consumer-tools.json", "README.md", "release.json"],
+  "modules": [
+    {
+      "source": ".llm/tools/docs/snippet-extractor.ts",
+      "path": "docs/snippet-extractor.ts"
+    }
+  ],
   "tools": [
     {
       "source": ".llm/tools/run-deno-check.ts",
