@@ -57,6 +57,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Require chainable trigger token
+        id: require_chainable_trigger_token
         if: env.SKIP_IMPL != 'true'
         env:
           CHAIN_TOKEN: ${{ secrets.PAT_TOKEN }}
@@ -67,24 +68,85 @@ jobs:
           fi
 
       - name: Enter IMPL-EVAL status on ready transition
-        if: env.SKIP_IMPL != 'true' && github.event.action == 'ready_for_review'
+        id: enter_impl_eval_status
+        if: >-
+          !cancelled() &&
+          env.SKIP_IMPL != 'true' &&
+          github.event.action == 'ready_for_review' &&
+          steps.require_chainable_trigger_token.outcome == 'success'
+        continue-on-error: true
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
           # This transition must use the same chainable token as dispatch. Repository Actions
           # policy may make GITHUB_TOKEN read-only even when workflow permissions request writes.
           github-token: ${{ secrets.PAT_TOKEN }}
           script: |
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const issue_number = context.payload.pull_request.number;
-            const labels = context.payload.pull_request.labels.map((label) => label.name);
-            for (const label of labels.filter((name) => name.startsWith('status:'))) {
-              await github.rest.issues.removeLabel({ owner, repo, issue_number, name: label });
+            try {
+              const owner = context.repo.owner;
+              const repo = context.repo.repo;
+              const issue_number = context.payload.pull_request.number;
+              const STATUS_PREFIX = 'status:';
+              const IMPL_EVAL_STATUS = 'status:impl-eval';
+              const MISSING_LABEL_MESSAGE = 'Label does not exist';
+              const liveLabels = await github.paginate(
+                github.rest.issues.listLabelsOnIssue,
+                { owner, repo, issue_number, per_page: 100 },
+              );
+              for (const { name } of liveLabels) {
+                if (!name.startsWith(STATUS_PREFIX)) continue;
+                try {
+                  await github.rest.issues.removeLabel({ owner, repo, issue_number, name });
+                } catch (error) {
+                  const missingLabel = error?.status === 404 &&
+                    error?.response?.data?.message === MISSING_LABEL_MESSAGE;
+                  if (!missingLabel) throw error;
+                }
+              }
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number,
+                labels: [IMPL_EVAL_STATUS],
+              });
+            } catch (error) {
+              const reason = (error instanceof Error ? error.message : String(error))
+                .replace(/[\r\n\0]+/g, ' ')
+                .slice(0, 500);
+              core.setOutput(
+                'failure_reason',
+                reason,
+              );
+              throw error;
             }
-            await github.rest.issues.addLabels({ owner, repo, issue_number, labels: ['status:impl-eval'] });
+
+      - name: Record attributed IMPL-EVAL status-transition failure
+        if: >-
+          !cancelled() &&
+          env.SKIP_IMPL != 'true' &&
+          github.event.action == 'ready_for_review' &&
+          steps.enter_impl_eval_status.outcome == 'failure'
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REQUEST_ACTOR: ${{ github.actor }}
+          FAILURE_REASON: ${{ steps.enter_impl_eval_status.outputs.failure_reason }}
+        run: |
+          {
+            echo '## OpenHands phase evaluation'
+            echo
+            echo '**Status:** IMPL-EVAL status transition failed; evaluator dispatch attempt continues'
+            echo
+            printf -- '- Who: `@%s`\n' "$REQUEST_ACTOR"
+            printf -- '- PR: `#%s`\n' "$PR_NUMBER"
+            printf -- '- Head SHA: `%s`\n' "$HEAD_SHA"
+            printf -- '- Reason: `%s`\n' "$FAILURE_REASON"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Resolve and dispatch exactly one evaluator
-        if: env.SKIP_IMPL != 'true'
+        if: >-
+          !cancelled() &&
+          env.SKIP_IMPL != 'true' &&
+          steps.require_chainable_trigger_token.outcome == 'success'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
           github-token: ${{ secrets.PAT_TOKEN }}
