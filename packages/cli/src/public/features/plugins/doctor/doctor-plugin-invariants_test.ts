@@ -2,7 +2,10 @@ import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { join } from '@std/path';
 import { defineConfig } from '@netscript/config';
 
-import { loadRegisteredPlugins } from '../../../../kernel/adapters/config/plugin-registry.ts';
+import {
+  loadRegisteredPluginMetadata,
+  loadRegisteredPlugins,
+} from '../../../../kernel/adapters/config/plugin-registry.ts';
 import { probeConfiguredPluginManifest } from '../../../../kernel/adapters/config/configured-plugin-manifest-probe.ts';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
@@ -118,6 +121,29 @@ Deno.test('plugin doctor rejects a service entrypoint absent from a JSR export m
   });
 });
 
+Deno.test('plugin doctor warns when an explicit permission override differs from manifest truth', async () => {
+  await withProject(async (projectRoot) => {
+    await writeModule(projectRoot, `${MANIFEST_SOURCE}\nexport default manifest;\n`);
+    await Deno.writeTextFile(join(projectRoot, 'extension/service.ts'), 'export {};\n');
+    await Deno.writeTextFile(join(projectRoot, 'appsettings.json'), JSON.stringify({
+      NetScript: {
+        Plugins: {
+          fixture: {
+            Entrypoint: 'extension/service.ts',
+            Workdir: '.',
+            Permissions: ['--allow-net'],
+          },
+        },
+      },
+    }));
+    const reports = await runDoctor(projectRoot);
+    const permission = findCheck(reports[0].checks, 'permissions');
+    assertEquals(permission.status, 'warning');
+    assertStringIncludes(permission.message ?? '', '--allow-net');
+    assertStringIncludes(permission.message ?? '', 'published default: --allow-read');
+  });
+});
+
 Deno.test('doctor subprocess and runtime loader have manifest-resolution parity', async () => {
   const cases = [
     {
@@ -162,6 +188,41 @@ Deno.test('doctor subprocess and runtime loader have manifest-resolution parity'
   }
 });
 
+Deno.test('plugin doctor treats a bare package alias as package-backed despite an incidental directory', async () => {
+  await withProject(async (projectRoot) => {
+    await Deno.mkdir(join(projectRoot, 'package'), { recursive: true });
+    await Deno.writeTextFile(
+      join(projectRoot, 'package/plugin.ts'),
+      `${MANIFEST_SOURCE.replace('contributions: {},', "permissions: ['--allow-read'],\n  contributions: {},")}
+export default manifest;
+`,
+    );
+    await Deno.mkdir(join(projectRoot, 'plugins/fixture'), { recursive: true });
+    await Deno.writeTextFile(
+      join(projectRoot, 'deno.json'),
+      JSON.stringify({ imports: { '@example/plugin-fixture': './package/plugin.ts' } }),
+    );
+    const config = defineConfig({
+      name: 'doctor-fixture',
+      databases: { config: [] },
+      plugins: ['@example/plugin-fixture'],
+    });
+    const plugins = await loadRegisteredPluginMetadata(projectRoot, config);
+    const reports = await doctorPlugin({ projectRoot }, {
+      fs: new DenoFileSystem(),
+      process: new DenoProcess(),
+      loadConfig: () => Promise.resolve(config),
+      loadRegisteredPlugins: () => Promise.resolve(plugins),
+    });
+    const fixture = reports.find((report) => report.pluginName === '@example/plugin-fixture');
+    if (!fixture) throw new Error('Missing package-backed plugin report.');
+    assertEquals(findCheck(fixture.checks, 'source').status, 'healthy');
+    assertStringIncludes(findCheck(fixture.checks, 'source').message ?? '', 'Package-backed');
+    assertEquals(fixture.checks.some((check) => check.id === 'workdir'), false);
+    assertEquals(findCheck(fixture.checks, 'permissions').message, '--allow-read');
+  });
+});
+
 async function runDoctor(
   projectRoot: string,
   timeoutMs?: number,
@@ -193,8 +254,13 @@ function registeredPlugin(projectRoot: string): RegisteredPluginConfig {
   return {
     name: '@example/plugin-fixture',
     displayName: 'Fixture',
-    workdir: 'extension',
-    rootDir: join(projectRoot, 'extension'),
+    source: {
+      kind: 'local-workdir',
+      configuredSpecifier: './extension/plugin.ts',
+      resolvedSpecifier: new URL(`file://${join(projectRoot, 'extension/plugin.ts')}`).href,
+      workdir: 'extension',
+      rootDir: join(projectRoot, 'extension'),
+    },
     permissions: ['--allow-read'],
   };
 }

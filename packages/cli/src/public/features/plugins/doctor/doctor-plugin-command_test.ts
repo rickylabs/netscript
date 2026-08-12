@@ -29,7 +29,8 @@ const HEALTHY_MODULE_PROCESS: ProcessPort = {
   exec: () =>
     Promise.resolve({
       code: 0,
-      stdout: 'NETSCRIPT_PLUGIN_MANIFEST_PROBE={"status":"resolved"}\n',
+      stdout:
+        'NETSCRIPT_PLUGIN_MANIFEST_PROBE={"schemaVersion":1,"status":"resolved","resolvedSpecifier":"file:///workspace/plugin.ts","manifest":{"name":"@example/plugin","version":"1.0.0"}}\n',
       stderr: '',
     }),
 };
@@ -122,8 +123,11 @@ Deno.test("plugin doctor exits non-zero when generated registries are absent", a
           Promise.resolve({
             workers: {
               name: "@netscript/plugin-workers",
-              workdir: "plugins/workers",
-              rootDir: workersRoot,
+              source: localPluginSource(
+                "./plugins/workers/mod.ts",
+                "plugins/workers",
+                workersRoot,
+              ),
               doctor: "./src/adapter/plugin.ts",
             },
           }),
@@ -416,15 +420,21 @@ Deno.test("one unloadable plugin doctor does not suppress a healthy plugin repor
       Promise.resolve({
         broken: {
           name: "broken",
-          workdir: "plugins/broken",
-          rootDir: "/workspace/plugins/broken",
+          source: localPluginSource(
+            "./plugins/broken/mod.ts",
+            "plugins/broken",
+            "/workspace/plugins/broken",
+          ),
           permissions: ["--allow-read"],
           doctor: "./missing-doctor.ts",
         },
         healthy: {
           name: "healthy",
-          workdir: "plugins/healthy",
-          rootDir: "/workspace/plugins/healthy",
+          source: localPluginSource(
+            "./plugins/healthy/mod.ts",
+            "plugins/healthy",
+            "/workspace/plugins/healthy",
+          ),
           permissions: ["--allow-read"],
         },
       }),
@@ -469,8 +479,11 @@ async function assertWorkersCommandPasses(
           Promise.resolve({
             workers: {
               name: "@netscript/plugin-workers",
-              workdir: "plugins/workers",
-              rootDir: workersRoot,
+              source: localPluginSource(
+                "./plugins/workers/mod.ts",
+                "plugins/workers",
+                workersRoot,
+              ),
               doctor: "./src/adapter/plugin.ts",
             },
           }),
@@ -523,12 +536,25 @@ async function assertSagaCommandPasses(registrySource: string): Promise<void> {
           Promise.resolve({
             sagas: {
               name: "@netscript/plugin-sagas",
-              workdir: "plugins/sagas",
-              rootDir: sagasRoot,
+              source: localPluginSource(
+                "./plugins/sagas/mod.ts",
+                "plugins/sagas",
+                sagasRoot,
+              ),
               doctor: "./src/adapter/plugin.ts",
             },
           }),
       }),
   });
   await command.parse(["--project-root", projectRoot]);
+}
+
+function localPluginSource(configuredSpecifier: string, workdir: string, rootDir: string) {
+  return {
+    kind: 'local-workdir' as const,
+    configuredSpecifier,
+    resolvedSpecifier: new URL(`file://${rootDir}/mod.ts`).href,
+    workdir,
+    rootDir,
+  };
 }

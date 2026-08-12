@@ -2,6 +2,12 @@ import { GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import { cli, commandGate } from './gate-factory.ts';
 import { resolve } from '@std/path';
+import { NETSCRIPT_RELEASE_VERSION } from '../../../../../src/kernel/constants/jsr-specifiers.ts';
+
+const PACKAGE_BACKED_DOCTOR_FIXTURE = new URL(
+  './package-backed-plugin-doctor-fixture.ts',
+  import.meta.url,
+);
 
 /** Assert doctor fails honestly before required plugin registries are generated. */
 export function createBehaviorPluginUnhealthyGates(): readonly GateDefinition[] {
@@ -64,6 +70,36 @@ export function createBehaviorPluginHealthGates(): readonly GateDefinition[] {
       'Check installed plugin health',
       GATE_PHASE.BEHAVIOR,
       (context) => cli(context, 'plugin', 'doctor', '--project-root', context.project.projectRoot),
+    ),
+  ];
+}
+
+/** Validate published workers/streams manifests without copied plugin workdirs. */
+export function createPackageBackedPluginDoctorGates(): readonly GateDefinition[] {
+  return [
+    commandGate(
+      GATE.BEHAVIOR_PACKAGE_BACKED_PLUGIN_DOCTOR,
+      'Validate package-backed plugin doctor truth',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '-A',
+        PACKAGE_BACKED_DOCTOR_FIXTURE.href,
+        '--project-root',
+        resolve(context.project.smokeRoot, `${context.project.projectName}-package-doctor`),
+        '--repo-root',
+        context.project.repoRoot,
+        '--cli-entrypoint',
+        context.project.cliEntrypoint,
+        '--package-version',
+        NETSCRIPT_RELEASE_VERSION,
+      ],
+      (context) => context.project.repoRoot,
+      'capture',
+      'Package-backed doctor must consume published manifests without local plugin workdirs.',
+      undefined,
+      120_000,
     ),
   ];
 }

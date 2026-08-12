@@ -5,6 +5,7 @@ import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import {
   createBehaviorPluginHealthGates,
   createBehaviorPluginUnhealthyGates,
+  createPackageBackedPluginDoctorGates,
   createPluginRegistryGenerationGates,
 } from './behavior-plugins-health-gate.ts';
 import {
@@ -53,6 +54,7 @@ export function createScaffoldCapabilityGates(
     ...residentDatabaseGates,
     ...runtimeGates.slice(startIndex + 1),
     ...createBehaviorPluginHealthGates(),
+    ...createPackageBackedPluginDoctorGates(),
     ...createOtelGates(),
     // Registration only — the suite gate lists in `capability-suites.ts` decide
     // where the fixture and the verification run relative to AppHost start.

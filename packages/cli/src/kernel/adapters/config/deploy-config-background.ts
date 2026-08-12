@@ -9,6 +9,7 @@ import { resolvePluginEnvironmentVariables } from './plugin-registry.ts';
 import {
   findWorkspaceMemberPath,
   mergeEnvironment,
+  resolveEffectivePluginPermissions,
   resolveWorkdir,
   type WorkspaceMap,
 } from './deploy-config-resolvers.ts';
@@ -98,7 +99,8 @@ function resolveBackgroundProcessor(
   const workspaceWorkdir = findWorkspaceMemberPath(workspace, 'background', name);
   const workdir = resolveWorkdir(
     raw?.Workdir,
-    workspaceWorkdir ?? plugin?.workdir,
+    workspaceWorkdir ??
+      (plugin?.source.kind === 'local-workdir' ? plugin.source.workdir : undefined),
     getBackgroundProcessorPath(paths, name),
   );
 
@@ -108,7 +110,12 @@ function resolveBackgroundProcessor(
     workdir,
     concurrency: raw?.Concurrency ?? plugin?.infrastructure?.defaultConcurrency ?? 2,
     concurrencyEnvVar: raw?.ConcurrencyEnvVar ?? plugin?.infrastructure?.concurrencyEnvVar,
-    permissions: raw?.Permissions ?? plugin?.permissions ?? ['--allow-all', '--unstable-kv'],
+    permissions: resolveEffectivePluginPermissions(
+      raw?.Permissions,
+      undefined,
+      plugin?.permissions,
+      ['--allow-all', '--unstable-kv'],
+    ),
     description: raw?.Description,
     watchDirs: raw?.WatchDirs,
     runtimeTopics: plugin?.infrastructure?.runtimeTopics,
