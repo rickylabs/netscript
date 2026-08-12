@@ -1460,3 +1460,33 @@ applied at the point of observation rather than to the class, which then resurfa
 
 Then **canary.4 from fixed `main`**. **#1571 stays OPEN** — its box 5 needs a terminal-green canary,
 and canary.3 is published but not green.
+
+## 2026-08-12 — #1227 leaf inspected: thread ALIVE, not vanished — no relaunch
+
+The brief reported "9 scoped modified files but agentic status reports no recent agent", raising the
+question of whether the thread finished or vanished. **Neither — it is actively working.** Determined
+by three independent signals rather than one status read:
+
+| Signal | Result |
+| --- | --- |
+| Rollout mtime | **4 s ago** |
+| `codex-status` row | **`working`**, worktree `/home/codex/repos/ns006-1227`, route `gpt-5.6-sol / medium` **matched**, doing *"Investigating CLI scan-code-quality flags"*, artifact = live file-write |
+| Rollout growth over 25 s | **948 429 → 953 770 bytes** — monotonic |
+
+So the "no recent agent" reading was stale or transient. **No resume, no relaunch** — relaunching
+would have duplicated in-progress work on a live worktree and created a second writer, the exact
+hazard this harness warns about. The lane has already seen a status read disagree with reality once
+today (runtime `doctor` reporting `sessions: 0` while sibling lanes were working); a single status
+line is not evidence of absence.
+
+**Why the files are uncommitted:** the 9 modifications are scoped exactly to the brief —
+`command-gate.ts`, `gate-definition.ts`, `quickstart/aspire-walk.ts`, `database-integrity-walk.ts`
+(+ its test), the quickstart suite and its presentation test, and the pretty reporter. The thread is
+at the **gate-running** stage, which sits before its commit step. Nothing is lost.
+
+PR **#1584** is open as a draft at head `f96e0afc1` (the docs bootstrap) — the implementation commit
+has not landed yet, which is consistent.
+
+Armed `codex-watch --mode turn` on the thread. Next: on turn completion, review the slice, drive
+commit/push, automatic IMPL-EVAL, green CI, merge — then **Canary.4 exactly once** from validated
+current main, with pinned production E2E proven.
