@@ -56,6 +56,19 @@ never usefully run, and polluting the tool listing.
 
 `supportFiles` is also wrong — that is bundle metadata (`consumer-tools.json`, `README.md`, `release.json`).
 
+## Two facts measured for you, so C2 is not a trap
+
+I audited the whole bundle before writing this, because a closure test that fails for **pre-existing** reasons
+would make this brief self-contradictory — which has already happened twice on this lane.
+
+1. **There is exactly one gap, and it is yours.** Every relative import of every bundled `.ts` file resolves to
+   a bundled path except `quality/scan-code-quality.ts -> ../docs/snippet-extractor.ts`. So C2 goes green on
+   registering that one module; it will not surface unrelated debt.
+2. **The extractor has zero imports of its own** — no `import` or re-export lines at all. Registering it
+   therefore **terminates** the closure; there is no transitive cascade to chase.
+
+If your own measurement disagrees with either, trust yours and say so.
+
 ## Contract
 
 ### C1 — a third manifest category for bundled module dependencies
