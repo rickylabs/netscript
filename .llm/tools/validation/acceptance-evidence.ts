@@ -37,10 +37,12 @@ const FENCE_PATTERN = /^\s*```acceptance-evidence\s*$/i;
 const EVIDENCE_HEADING = 'acceptance evidence';
 const LEGACY_WARNING =
   'Deprecated legacy "## Acceptance evidence" list detected; replace it with a fenced ```acceptance-evidence YAML block.';
+const NOT_YET_DONE_EVIDENCE =
+  /^(?:pending\b|todo\b|tbd\b|will\s+run\b|after\s+merge\b|not\s+yet\b)/i;
 
 export function extractClosingIssues(body: string): number[] {
   const pattern =
-    /\b(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+(?:(?:https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/issues\/)|#)(\d+)\b/gi;
+    /(?<![\w-])(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+(?:(?:https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/issues\/)|#)(\d+)\b/gi;
   // GitHub does not interpret closing keywords inside fenced code blocks. Structured
   // acceptance evidence commonly contains prose such as "resolves #123", so scan
   // only the Markdown text that GitHub itself treats as closing-keyword syntax.
@@ -145,6 +147,12 @@ export function validateEvidenceMapping(
       );
       continue;
     }
+    if (!box.checked && evidenceAssertsNotYetDone(entry.evidence)) {
+      errors.push(
+        `Issue #${issue}: box "${box.text}" has not-yet-done evidence "${entry.evidence}"; supply real evidence or leave the box unchecked.`,
+      );
+      continue;
+    }
     if (!box.checked) mapping.set(box.index, entry);
   }
   for (const box of unchecked) {
@@ -156,6 +164,10 @@ export function validateEvidenceMapping(
   }
   if (errors.length) throw new Error(errors.join('\n'));
   return mapping;
+}
+
+function evidenceAssertsNotYetDone(evidence: string): boolean {
+  return NOT_YET_DONE_EVIDENCE.test(evidence.replace(/^[\s\-—–*•·]+/, ''));
 }
 
 export function checkAcceptanceBoxes(body: string, indexes: ReadonlySet<number>): string {

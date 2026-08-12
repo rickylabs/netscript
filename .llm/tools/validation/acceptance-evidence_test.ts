@@ -109,3 +109,93 @@ Deno.test('stale verdict snapshot is detected after an issue edit', async () => 
 Deno.test('umbrella reference without closing keyword is untouched', () => {
   assertEquals(extractClosingIssues('Part of #607\nRefs #574'), []);
 });
+
+Deno.test('closing keywords reject word and hyphen prefixes without tightening punctuation', () => {
+  for (
+    const body of [
+      'Exact pre-fix #1431 head',
+      'un-fixed #555',
+      're-resolved #444',
+      'hotfix #999 landed',
+      'prefixes #888 there',
+      'This is a bugfix #777',
+      'Refs #111',
+      'Part of #222',
+      'See #333',
+    ]
+  ) {
+    assertEquals(extractClosingIssues(body), [], body);
+  }
+
+  assertEquals(extractClosingIssues('Closes #1234 and fixes #4321'), [1234, 4321]);
+  assertEquals(extractClosingIssues('FIXES #12\nResolved #13'), [12, 13]);
+  assertEquals(
+    extractClosingIssues('resolves https://github.com/rickylabs/netscript/issues/333'),
+    [333],
+  );
+  for (const prefix of ['', '(', '"', '*', ',', ':', '\n']) {
+    assertEquals(extractClosingIssues(`${prefix}Fixes #1434`), [1434], JSON.stringify(prefix));
+  }
+});
+
+Deno.test('not-yet-done evidence is rejected only for a newly ticked box', () => {
+  const boxText = 'Independent separate-session IMPL-EVAL passes at the final head.';
+  const unchecked = acceptanceCheckboxes(`## Acceptance\n- [ ] ${boxText}`);
+  for (
+    const evidence of [
+      'Pending milestone-orchestrator separate-session IMPL-EVAL after this draft handoff.',
+      '— Pending IMPL-EVAL',
+      'TODO: run the gate',
+      'TBD',
+      'will run after merge',
+      'Not yet executed',
+      'pending',
+    ]
+  ) {
+    assertThrows(
+      () =>
+        validateEvidenceMapping(1415, unchecked, [{
+          issue: 1415,
+          text: boxText,
+          evidence,
+          legacy: false,
+        }]),
+      Error,
+      `Issue #1415: box "${boxText}" has not-yet-done evidence "${evidence}"; supply real evidence or leave the box unchecked.`,
+    );
+  }
+
+  const alreadyChecked = acceptanceCheckboxes(`## Acceptance\n- [x] ${boxText}`);
+  assertEquals(
+    validateEvidenceMapping(1415, alreadyChecked, [{
+      issue: 1415,
+      text: boxText,
+      evidence: '— Pending historical note',
+      legacy: false,
+    }]).size,
+    0,
+  );
+});
+
+Deno.test('factual evidence is not rejected for marker words in non-asserting positions', () => {
+  const box = 'normal evidence still ticks';
+  for (
+    const evidence of [
+      'supersedes the earlier pending note',
+      'IMPL-EVAL PASS at e730b8bfa; supersedes the pending row',
+      'Gate run URL … ; the pending-migration note no longer applies',
+      'pr-checks_test.ts fixture; report.ok gate',
+    ]
+  ) {
+    assertEquals(
+      validateEvidenceMapping(1415, acceptanceCheckboxes(`## Acceptance\n- [ ] ${box}`), [{
+        issue: 1415,
+        text: box,
+        evidence,
+        legacy: false,
+      }]).size,
+      1,
+      evidence,
+    );
+  }
+});
