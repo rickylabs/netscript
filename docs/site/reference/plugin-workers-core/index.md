@@ -6,7 +6,7 @@ title: "@netscript/plugin-workers-core"
 # `@netscript/plugin-workers-core`
 
 Job, task, workflow, runtime, config, and testing primitives for NetScript workers plugins. This page
-is written against the package's published exports and its `deno doc` surface. For the full index of
+is written against the package's public surface reported by `deno doc`. For the full index of
 packages and plugins return to the [reference overview](/reference/).
 
 Background-job definitions fail in two places: at definition time, when a job is missing an

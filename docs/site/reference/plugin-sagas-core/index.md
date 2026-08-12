@@ -6,7 +6,7 @@ title: "@netscript/plugin-sagas-core"
 # `@netscript/plugin-sagas-core`
 
 Saga DSL, runtime ports, adapters, telemetry, config, and testing primitives for NetScript sagas
-plugins. This page is written against the package's published exports and its `deno doc` surface.
+plugins. This page is written against the package's public surface reported by `deno doc`.
 For the full index of packages and plugins return to the [reference overview](/reference/).
 
 Sagas are the honest answer to distributed transactions: a sequence of steps, each with a

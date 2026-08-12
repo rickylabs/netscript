@@ -6,7 +6,7 @@ title: "@netscript/plugin-streams-core"
 # `@netscript/plugin-streams-core`
 
 Schema, producer, config, telemetry, testing, and diagnostics primitives for NetScript streams. This
-page is written against the package's published exports and its `deno doc` surface. For the full
+page is written against the package's public surface reported by `deno doc`. For the full
 index of packages and plugins return to the [reference overview](/reference/).
 
 Publishing change events sounds trivial until it has to be safe: typed payloads, idempotent appends,

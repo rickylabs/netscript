@@ -12,8 +12,7 @@ recipes see the [how-to guides](/how-to/), and for the ideas behind the API read
 
 There is no generator that writes these pages. `deno doc <module>` is the authority a page is written
 against, and an automated drift check verifies a subset of pages against their packages' declared
-entrypoints — so a page can fall behind its package, and reporting one that has is a bug worth
-filing.
+entrypoints — so a page can fall behind its package, and one that has is a bug worth filing.
 
 ## Page paths
 

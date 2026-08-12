@@ -131,7 +131,7 @@ from [`@netscript/aspire`](/reference/aspire/); see that reference page for thei
 
 The following surface belongs to the internal **`@netscript/plugin-streams-core`** package. It is a
 supporting package — not part of the public plugin contract — and is documented here per the
-single-page internals convention (US-8). It provides the schema, producer, configuration,
+single-page internals convention. It provides the schema, producer, configuration,
 telemetry, testing, and diagnostics primitives that `@netscript/plugin-streams` builds on. Its root
 export is `@netscript/plugin-streams-core` with two sub-path exports (`/telemetry`, `/testing`).
 

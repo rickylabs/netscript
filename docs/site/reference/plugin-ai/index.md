@@ -337,7 +337,7 @@ export const summarizeTool = defineAiTool("summarize")
 > implementer factory. `@netscript/plugin-ai` re-exports its contract through
 > `@netscript/plugin-ai/contracts`, and the generated stream route imports `createAiRouter`,
 > `aiContractV1`, and `AiRouterImplementation` from it directly. It is published separately and
-> documented on its own [reference page](/reference/plugin-ai-core/) (US-8). The runtime AI engine
+> documented on its own [reference page](/reference/plugin-ai-core/). The runtime AI engine
 > itself — providers, the tool registry, the agent loop, and embeddings — lives in the separate
 > `@netscript/ai` package, and the durable-chat client/server runtime in `@netscript/fresh/ai`.
 

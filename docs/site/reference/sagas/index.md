@@ -151,7 +151,7 @@ Browser-safe stream exports for the sagas plugin.
 > The following surface belongs to `@netscript/plugin-sagas-core`, the framework-internal package
 > that implements the saga DSL, runtime ports, adapters, telemetry, config, and testing primitives.
 > Application authors normally import these symbols through `@netscript/plugin-sagas`; the core
-> package is documented here for completeness (US-8). It is not a separate top-level reference entry.
+> package is documented here for completeness. It is not a separate top-level reference entry.
 
 ### `@netscript/plugin-sagas-core`
 

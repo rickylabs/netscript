@@ -8,8 +8,8 @@ title: "netscript command reference"
 The complete verb-and-flag surface of the published `netscript` binary
 (`@netscript/cli`). The [CLI reference](/cli-reference/) is the curated
 tour of the everyday path; this page is the exhaustive companion — every command group,
-subcommand, and flag, spelled exactly as the installed CLI prints it. For the generated
-package API surface (the embeddable helpers, not the command tree) see the
+subcommand, and flag, spelled exactly as the installed CLI prints it. For the package API
+surface (the embeddable helpers, not the command tree) see the
 [`@netscript/cli` package page](/reference/cli/).
 
 This page documents the **public `netscript` binary** — the CLI published as

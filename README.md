@@ -39,14 +39,14 @@ deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>
 netscript init my-app --db postgres --service --yes
 ```
 
-Substitute `<version>` with the current release — the
+Replace `<version>` with the current release — the
 [latest tag](https://github.com/rickylabs/netscript/releases/latest), or the version shown on
 [jsr.io/@netscript/cli](https://jsr.io/@netscript/cli). Bare `jsr:@netscript/*` specifiers do not
 resolve on the pre-release line, so the pin is required rather than cosmetic.
 
-The scaffold prints its own file and directory totals along with your numbered next steps — those
-totals vary with the database, service, editor, and agent-tooling options you chose, so treat the
-printed result as the authority. Follow the steps it prints:
+The scaffold reports its own file and directory totals — they vary with the database, service,
+editor, and agent-tooling options you chose, so the printed output is the authority — and ends with
+your numbered next steps. Follow them:
 
 ```bash
 # 3. Boot the whole stack: Postgres, cache, and every service come up together
@@ -128,7 +128,7 @@ gets there through the plugin system. A plugin is, at its core, a manifest: plai
 declaring what it contributes, inspected by hosts without executing plugin code. One manifest can
 contribute across **every layer** — CLI verbs, scaffolded code, runtime services, storage, stream
 topics, telemetry, Aspire resources — and the host materializes whatever it declares. One command,
-with the generated plugin files and Aspire helpers reported in its output:
+and every scaffolded plugin file and regenerated Aspire helper is itemized in its output:
 
 ```bash
 netscript plugin install worker --name workers

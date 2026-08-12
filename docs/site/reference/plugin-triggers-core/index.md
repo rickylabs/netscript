@@ -6,7 +6,7 @@ title: "@netscript/plugin-triggers-core"
 # `@netscript/plugin-triggers-core`
 
 Trigger DSL, runtime ports, adapters, telemetry, config, and testing primitives for NetScript trigger
-plugins. This page is written against the package's published exports and its `deno doc` surface. For
+plugins. This page is written against the package's public surface reported by `deno doc`. For
 the full index of packages and plugins return to the [reference overview](/reference/).
 
 The hard part of triggers is not receiving them — it is surviving them: duplicate webhooks, senders

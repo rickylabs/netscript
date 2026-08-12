@@ -311,7 +311,7 @@ flag — spelled exactly as the installed CLI prints it — go to the
   },
   {
     title: "@netscript/cli package",
-    body: "The generated package reference — the embeddable TypeScript surface, not the command tree.",
+    body: "The package API reference — the embeddable TypeScript surface, not the command tree.",
     href: "/reference/cli/",
     icon: "◇"
   }
