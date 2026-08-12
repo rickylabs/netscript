@@ -182,6 +182,21 @@ Deno.test('close-gate keeps issue pass fail and override semantics with rebuilt 
   assertEquals(closeGatePasses(true, unchecked, []), true);
 });
 
+Deno.test('unchecked acceptance repair reruns CI without moving the evaluated head', () => {
+  const [finding] = findUncheckedAcceptance({
+    number: 1380,
+    title: 'live label repair',
+    body: '## Acceptance\n- [ ] required evidence',
+    updated_at: '2026-08-12T10:00:00Z',
+    labels: [],
+  }).findings;
+
+  assertStringIncludes(finding.action, 'gh run rerun <run-id>');
+  assertStringIncludes(finding.action, 'live reads observe the label');
+  assertEquals(finding.action.includes('then push'), false);
+  assertEquals(finding.action.includes('reruns cannot observe'), false);
+});
+
 Deno.test('close-gate fails unchecked PR DoD but ignores non-authoritative checklists', () => {
   const findings = findUncheckedPrBody({
     number: 1181,

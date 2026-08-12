@@ -157,7 +157,7 @@
     "docs:readme:check": "deno run --no-lock --allow-read .llm/tools/validation/check-readme-standard.ts --pretty",
     "docs:tagline:check": "deno run --no-lock --allow-read .llm/tools/validation/check-jsr-tagline-length.ts --pretty",
     "arch:check": "deno task deps:check && deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots",
-    "arch:check:repo": "deno run --allow-read .llm/tools/fitness/check-doctrine.ts"
+    "arch:check:repo": "deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
