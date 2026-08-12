@@ -68,3 +68,20 @@ The implementation matches the corrected #1436 contract without preserving the p
 ### Reconcile
 
 No network call entered either pure helper. The implementation stays within the assigned files.
+
+## S4 — reject unearned acceptance ticks
+
+- Added a leading-token predicate after stripping whitespace and common dash/bullet punctuation.
+- Applied it only after resolving an unchecked box, preserving already-checked historical evidence.
+- Errors accumulate through the existing `errors[]` path and name issue, exact box, evidence, and
+  the repair: supply real evidence or leave the box unchecked.
+- Proven RED at S2 head: the acceptance-evidence test command exited 1 with
+  `not-yet-done evidence is rejected only for a newly ticked box ... FAILED` and
+  `AssertionError: Expected function to throw.`
+- Proven GREEN after S4: focused acceptance + mirror command exited 0, 13 passed, 0 failed; this
+  includes `— Pending …` rejection, normal ticking, factual non-asserting marker sentences, and all
+  pre-existing mirror cases.
+
+### Reconcile
+
+The predicate remains narrow: factual sentences containing marker words later in the evidence pass.

@@ -16,5 +16,5 @@ changed yet. PR #1527 is the sole draft PR; the orchestrator retains merge autho
 ## Next
 
 S1 RED is `a927790eb`; S2 boundary is `4ca4cc421`. S3 adds pure classification consumption plus
-call-site GitHub lookup for both close-gate and mirror. Next run its focused tests, then implement
-the evidence assertion and the six requested gates.
+call-site GitHub lookup for both close-gate and mirror. S4 adds the narrow newly-ticked evidence
+assertion. Next run focused/full tests, then finish the six requested gates and PR evidence.
