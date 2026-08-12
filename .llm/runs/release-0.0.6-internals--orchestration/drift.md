@@ -278,3 +278,57 @@ the artifact. Briefs should state that the file is the deliverable and a chat an
   `agentic:codex-watch --mode turn --thread-id <id> --timeout-seconds N`. Never kill on a `stalled`
   label alone. The failed resume was harmless — it fails fast and creates no rival sender — which is the
   behaviour that made this recoverable.
+
+## D-13 — rail PLAN-EVAL cycle 2 also returned FAIL_PLAN; two-cycle limit reached, escalating
+
+- **Severity:** architectural (the rail's plan is not implementable as written)
+- **Recorded:** 2026-08-12, stage B (rail), eval loop failure **2 of 2**
+- **Evaluator:** same fresh Codex · Sol · high session, thread `019ff508-…`, at `a9ddbdd46`. Verdict in
+  `plan-eval-cycle2.md`. Cycle-1 disposition: 5 addressed, 4 partially addressed, 1 not addressed.
+- **Verdict:** `FAIL_PLAN`, seven blocking findings. `netscript-harness` § Evaluator Separation sets the
+  loop limit at two failures before escalation, so implementation stops here and the owner arbitrates.
+
+### The three findings that are genuinely new information, not restatements
+
+1. **Registered allowances would immediately invalidate the eight allowances that survive PR-E.** #1378
+   requires every `// quality-allow:` to carry an **open, milestoned** `#<n>`. The existing allowances
+   carry free-text reasons with no issue id. So the moment that rule lands, all eight become findings and
+   PR-D is red by construction. #1378 never states a migration path, and the rail plan did not notice.
+2. **R-3's fail-closed rule makes PR-D's own green gate unreachable.** The measured population is **567**
+   `deno doc --json` unresolved-type warnings on an exit-0 run. Failing closed on them — which cycle 1
+   correctly demanded — means #1378's `gate:` box can never go green without a classification or
+   migration plan for those 567. Adopting the cycle-1 caveat literally created a contradiction.
+3. **#1378 box 6 has no executable hook.** "A budget increase must carry an issue link in the same PR" is
+   a property of a *diff*, not of a file. `quality:scan` reads files; it cannot see a PR. The proof needs
+   a CI-integrated predicate, and slice D4 named a test without naming that mechanism.
+
+### The findings that are the orchestrator's sloppiness
+
+4. **The revised plan contradicts itself on wave membership and order.** Revision 2 inserted PR-E, but the
+   authoritative wave sections above it still read PR-B → PR-C → PR-D. Appending a revision instead of
+   reconciling the document produced exactly the internal inconsistency this lane exists to catch in
+   others.
+5. **The Design table claims 21 slices and contains 20**, and several rows are not file-scoped. A
+   miscount in the artifact written specifically to satisfy a commit-slice gate.
+6. **"Strictly harder" was an overstatement** (finding 8). The amended #1380 box 2 *admits a state the
+   original did not* while *requiring evidence the original did not*. It is stricter on evidence and
+   broader on admissible states — not strictly harder. The claim on issue comment `5264580324` needs
+   correcting, because overstating the direction of an acceptance amendment is precisely the kind of
+   self-serving record this lane is repairing.
+7. **The provenance conclusion ignored checked-in records that claim rename/supersession** (finding 7).
+   `git log --all --diff-filter=A` says four packages never existed; checked-in debt/doctrine records
+   explicitly document rename or supersession for some of them. Both cannot be true as stated. The
+   re-walk must reconcile them, not silently prefer the git probe.
+8. **R-10's fallback is only honest if PR-D stops closing #1378** (finding 9). If slice D5 and box 3 move
+   with the issue, PR-D delivers partial work and must reference `#1378` **without** a closing keyword.
+   The plan kept `Closes #1378` while also allowing the box to move — an internal contradiction that would
+   have auto-closed an issue with an undelivered acceptance box.
+
+### Action
+
+No rail PR is dispatched, including PR-E. PR-E's own slices E1–E4 are untouched by any blocking finding
+and it clears a red gate on `main`, so it is a candidate for a scoped owner authorization — but
+dispatching it on the orchestrator's own authority, against a formal `FAIL_PLAN` that explicitly says
+"do not begin implementation on the current plan", would be the generator overruling its evaluator. That
+is the self-certification the harness forbids, so it goes to the owner as a decision rather than being
+taken as a judgement call.
