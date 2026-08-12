@@ -149,6 +149,7 @@ Deno.test('workflow source encodes trusted, exactly-once phase dispatch', async 
     runner,
     "label.name == 'openhands' && github.event_name == 'issues'",
   );
+  assert(!runner.includes('types: [labeled, ready_for_review]'));
 });
 
 Deno.test('generic OpenHands stays fail-closed to current open evaluator models', async () => {

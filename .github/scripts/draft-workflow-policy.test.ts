@@ -1,16 +1,15 @@
 import { assert, assertMatch, assertStringIncludes } from '@std/assert';
 
-const workflows = [
+const readyWorkflows = [
   'ci.yml',
   'code-quality.yml',
   'openhands-phase-eval.yml',
   'e2e-cli.yml',
-  'openhands-agent.yml',
   'surface-diff.yml',
 ];
 
 Deno.test('every pull-request workflow handles ready_for_review', async () => {
-  for (const name of workflows) {
+  for (const name of readyWorkflows) {
     const source = await Deno.readTextFile(`.github/workflows/${name}`);
     assertStringIncludes(source, 'ready_for_review', name);
   }

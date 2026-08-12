@@ -110,8 +110,10 @@ on:
   issues:
     types: [labeled]
   pull_request:
-    # The ready event is inert unless the explicit agent-label predicate holds.
-    types: [labeled, ready_for_review]
+    # Formal ready-for-review evaluation belongs to openhands-phase-eval.yml. This runner keeps
+    # only explicit non-phase PR labels, so ready transitions no longer publish a misleading
+    # skipped `agent` check.
+    types: [labeled]
   issue_comment:
     types: [created]
   push:
