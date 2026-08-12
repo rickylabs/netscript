@@ -59,7 +59,7 @@
       "intent": "create a new NetScript project from scratch",
       "mode": "rank-one",
       "expected": [
-        "llms#deliberate-negative-control"
+        "llms#getting-started"
       ]
     },
     {
