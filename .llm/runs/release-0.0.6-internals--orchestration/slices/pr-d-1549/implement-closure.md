@@ -21,6 +21,15 @@ matches this brief. Do not revert the extractor consumption.
 Do **not** revert the extractor consumption. Consuming `.llm/tools/docs/snippet-extractor.ts` instead of forking
 a second fence parser is rail decision **R-10** and stays.
 
+## SKILL
+
+- `netscript-harness` — run artifacts, slice discipline, commit trail.
+- `netscript-tools` — scoped validation wrappers; what is a verdict and what is not.
+- `netscript-pr` — PR comment/label mechanics and the fenced `acceptance-evidence` block (the existing
+  `box-index: 1..7` mapping stays valid; do not rewrite it).
+- `netscript-deno-toolchain` — deterministic `deno test`, task semantics, `deno doc` for surface questions.
+- `rtk` — prefix read-heavy `git`/`gh`/`grep`.
+
 ## Identity
 
 | Field | Value |
