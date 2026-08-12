@@ -285,8 +285,13 @@ fully executed baseline table. Notable outputs of the re-baseline, all of which 
 ## Design — quality rail (PR-E → PR-B → PR-C → PR-D)
 
 Written to close `plan-eval.md` finding 5: `plan-gate.md:16-34` requires ordered, file-scoped commit
-slices with a gate per slice, and the first cycle offered four per-PR summary rows instead. Recorded
-before any rail implementation file is created, per `run-loop.md` § 3b.
+slices with a gate per slice, and cycle 1 offered four per-PR summary rows instead. Recorded before any
+rail implementation file is created, per `run-loop.md` § 3b.
+
+**Aligned to `plan-quality-rail.md` revision 3.** The table below holds **20** slices — E1–E4, B1–B2,
+C1–C7, D1–D6, plus B3 — and every row names the files it touches. Cycle 2 finding 5 was correct that a
+previous revision claimed 21; the count is stated here so the claim and the table cannot diverge again.
+B1/B2 now perform the **single** transition to discovery per `R-6`; there is no interim root list.
 
 ### Public Surface
 
@@ -348,8 +353,8 @@ Ordered, file-scoped, one gate each. `deno test` roots take
 | E2 | PR-E | `isTypeFixture` exemption (dir + suffix) | `scan-code-quality.ts` | test green; `quality:scan:repo` exit 0 |
 | E3 | PR-E | leakage controls: ordinary source, and `_type.ts` outside the dir, stay red | `scan-code-quality_test.ts` | both negatives fail-on-removal |
 | E4 | PR-E | drop the two redundant allowances | `desktop-consumer_type.ts`, `sdk-assignability_type.ts` | `quality:scan:repo` `allowCount` 10 → 8 |
-| B1 | PR-B | `discoverDoctrineRoots()` + coverage test asserting every publishable `plugin-*-core` is a root | `check-doctrine.ts`, `check-doctrine_test.ts` | test fails when a package is removed from the source |
-| B2 | PR-B | `arch:check` consumes it; `plugin-streams-core` covered | `deno.json:156`, `check-doctrine.ts` | `arch:check` exit 0 |
+| B1 | PR-B | `discoverDoctrineRoots()` returning the **final 36-unit selector** (expanded top-level `packages/*` + `plugins/*`, `packages/cli/e2e` excluded) + coverage test | `.llm/tools/fitness/check-doctrine.ts`, `.llm/tools/fitness/check-doctrine_test.ts` | coverage test fails when a publishable `plugin-*-core` leaves the selector |
+| B2 | PR-B | `arch:check` repointed at `discoverDoctrineRoots()` in **one** step — no interim list, no data file | `deno.json:156`, `.llm/tools/fitness/check-doctrine.ts` | `deno task arch:check` exit 0 with `plugin-streams-core` covered |
 | B3 | PR-B | run the repaired gate on `plugin-streams-core`; triage output to new issues | triage list in slice dir only | no `packages/**` source edit in the diff |
 | C1 | PR-C | `resolveIdentifierOrigin()`; A14 fires only on `unresolved` | `check-doctrine.ts`, `check-doctrine_test.ts` | 3 fixtures: import (quiet), local binding (quiet), bare global (**red**) |
 | C2 | PR-C | `arch:check:repo` iterates `discoverDoctrineRoots()`; stops walking `.llm/tmp`, `docs/`, `.llm/tools` | `deno.json:157`, `check-doctrine.ts` | `arch:check:repo` exit 0 or residue enumerated |

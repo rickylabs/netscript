@@ -79,6 +79,12 @@ Required deliverables:
 
 ### Wave 2 — quality rail
 
+> **Superseded ordering note (revision 3).** The authoritative order is
+> **PR-E (#1530) → PR-B (#1403) → PR-C (#1380) → PR-D (#1378 + #1545)**, defined once in
+> `plan-quality-rail.md` § The one PR order. PR-E was inserted after this section was written, and
+> `plan-eval-cycle2.md` finding 6 failed the plan for leaving the two statements in conflict. Where
+> this section and `plan-quality-rail.md` differ, the rail plan governs.
+
 Serialized under this lane because the three issues overlap on root lists, scan semantics, doctrine
 and architecture debt. One rail plan, **one** PLAN-EVAL over the whole rail, then three sequential
 PRs each with its own IMPL-EVAL.
