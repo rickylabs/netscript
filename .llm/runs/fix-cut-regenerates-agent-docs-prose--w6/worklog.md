@@ -51,6 +51,7 @@ Future version-coupled assets are added to the generator sequence and
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-13 | 1 | bootstrap | PLAN-EVAL: N/A; owner supplied a complete mechanical contract and gates. |
+| 2026-08-13 | 2 | pre-fix tests | Gate sequence and explicit prepared-output ownership each fail independently; full output in `evidence.md`. |
 
 ## Gate Results
 

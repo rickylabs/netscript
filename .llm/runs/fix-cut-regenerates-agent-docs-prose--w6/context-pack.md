@@ -6,33 +6,36 @@
 | --- | --- |
 | Run ID | `fix-cut-regenerates-agent-docs-prose--w6` |
 | Branch | `fix/cut-regenerates-agent-docs-prose` |
-| Current phase | plan |
+| Current phase | implement |
 | Archetype | N/A — release tooling |
 | Scope overlays | none |
 
 ## Current State
 
-The clean branch is pinned to the requested baseline. Research/design are locked; no implementation
-source has changed. PLAN-EVAL is N/A by the owner's explicit seam/contract.
+The harness bootstrap is on draft PR #1628. Independent tests now fail on the pre-fix generator
+sequence and explicit prepared-output ownership. Production source is still unchanged.
 
 ## Completed
 
 - Read required harness, release, tooling, PR, and RTK authorities.
 - Re-baselined the defect and identified the existing partial failing test.
+- Opened draft PR #1628 with requested labels and milestone 0.0.6.
+- Captured two focused pre-fix reds without touching production source.
 
 ## In Progress
 
-- Bootstrap commit and draft PR.
+- Disposable pre-fix 0.0.7 dry-run proof, then implementation.
 
 ## Next Steps
 
-1. Commit/push run bootstrap and open the draft PR.
-2. Add independent discriminating tests and capture pre-fix red output.
-3. Implement, validate, and run the disposable 0.0.7 dry-run proof.
+1. Commit/push the discriminating test slice and comment on the draft PR.
+2. Capture the real pre-fix 0.0.7 dry-run in a disposable copy.
+3. Implement, validate, and repeat the disposable proof post-fix.
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: corpus paths were already staged transitively via `PUBLISH_ASSET_OUTPUTS`; explicit
+  prepared-release ownership remains missing.
 - Debt: none.
 
 ## Commits
