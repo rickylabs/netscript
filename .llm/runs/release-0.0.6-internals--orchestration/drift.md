@@ -1744,3 +1744,49 @@ one-line prose change proven by a deterministic guard plus an exhaustive sweep �
 adds no claim beyond what the surrounding comment and this file's code already support, which the orchestrator can
 verify directly at slice review. If the implementer introduces a new mechanism claim, the automatic evaluation
 runs instead. Deciding after reading the diff, not before.
+
+## D-51 — PR-G / #1612 merged; the duplicate-evidence trap caught locally this time
+
+Merged `6b29d12ea` at 18:54:05Z. `main` no longer fails the published-JSDoc codename guard: **4 passed / 0
+failed** on merged main, `git grep "#1589" -- packages plugins` empty, repo-wide sweep 0. #1612
+`CLOSED/COMPLETED`, single `status:shipped` (it had retained `status:triage` from filing). Unblocks **#1599**,
+whose CI was 3340/3340 green except this guard.
+
+**The one real defect, and it was caught before CI this time.** close-gate first failed because the fenced
+`acceptance-evidence` block existed **twice** — canonical in the PR body *and* repeated in the `[PHASE: IMPL]`
+comment. The mirror parses the body **plus every comment**, so it saw **6 entries for 3 boxes** and failed on
+duplicates:
+
+```text
+parsed evidence entries: 6
+#1612 acceptance boxes: 3
+VALIDATION FAILED: box "No bare issue reference remains…" has duplicate evidence
+```
+
+This is a **new** failure mode for this lane, distinct from #1560's (which was exact-box-text mismatch, fixed by
+`box-index`). `box-index` does not protect against duplication — the mapping is per-box-per-*document-set*, not
+per-document. **A per-slice comment must not repeat the body's evidence block.**
+
+What made it cheap: running the mirror's own `validateEvidenceMapping` against the live PR **before** labeling,
+the pre-flight established after #1560. It cost one command instead of a CI round trip, and it is now two-for-two
+at catching mapping defects that CI would otherwise have found.
+
+**Impl-eval skip, recorded as a decision with a pre-committed condition.** Owner authorized documenting a skip
+"if warranted". I fixed the condition before reading the diff: for a one-line prose change the only genuine
+evaluation surface is *whether the prose is true*. The delivered reword — `in #1589` → "cannot **instantiate** a
+cache-provider singleton" — introduces no claim, being entailed by the preceding sentence, and I verified it
+against the package rather than the prose (`packages/fresh-ui/deno.json` exposes exactly `auto-update` and
+`desktop`; no `sdk/cache`/`sdk/query` import anywhere in `fresh-ui`). Had it added an unsupported mechanism claim
+the automatic evaluation would have run. Verified the label was honoured: zero trigger comments, zero markers.
+
+**Two smaller items worth keeping.**
+
+- **The PR body asserted something the merge would falsify.** It carried "Do not merge until the mandatory
+  separate-session IMPL-EVAL is complete" and a DoD box to match. Applying a skip without editing that would have
+  shipped a body contradicting what happened — pre-merge check 7 exists for exactly this. Corrected to record the
+  skip and its justification.
+- **Duplicate check names resolved by rule, not by eye.** Every expensive check appeared twice at the head
+  (`skipped` + `success`) because `ci:skip-*` was applied after a run had already executed them. Under the #1142
+  latest-run-per-name rule the head is 0 failures; taken from `pr-checks` rather than inspected manually, because
+  this lane already had a near-miss reading duplicate names naively (`cut-trace` A-6). The skipped duplicates are
+  **not** claimed as green.
