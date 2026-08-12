@@ -1143,3 +1143,32 @@ Verified independently: PR diff vs main is that lock alone, tree clean, and **by
 ready transition — the dispatcher computes its skip from the label at the `ready_for_review` event, so
 the order is load-bearing. Result: dispatcher `completed/success` with **zero agent summaries** — an
 attributed skip, no evaluator spent. `PLAN-EVAL: N/A`.
+
+## 2026-08-12 — #1581: the same circular acceptance, one level down
+
+`close-gate` red on #1581 is a **real circular acceptance condition, not a code failure** — the
+identical shape #1572 hit, in a different pair.
+
+**#1580's final box (line 43):** *"The `Fresh UI package quality` workflow is green on the repair PR
+**and on the dependent quality-gate PR #1570**"*. #1570 cannot go green until this lock fix is on
+`main` and #1570 re-syncs. Carrying `Closes #1580` therefore made a post-merge fact a pre-merge merge
+condition.
+
+**Correction applied to #1581, mirroring #1572:**
+
+1. `Closes #1580` → **`Refs #1580`**, with the circularity stated in the body.
+2. Structured evidence block dropped — inert without a closing keyword, and it would have asserted a
+   pending fact.
+3. The `#1570`-dependent DoD line **moved into an explicit post-merge follow-through section**;
+   remaining DoD claims, which are proven, ticked — including the `impl-eval:skip` attribution
+   (dispatcher `completed/success`, **zero** agent summaries).
+
+**Acceptance not weakened:** #1580 stays **OPEN with all five boxes unticked**. Nothing on the issue
+was ticked to clear a gate.
+
+**Already proven on #1581:** `fresh-ui-quality` **passes** — the repair does what it claims.
+`check-test` and both scaffold-runtime tiers were still pending at correction time.
+
+**Sequence:** terminal-green CI → merge the lock-only PR → re-sync/re-run **#1570** on the new `main`
+→ attach its green Fresh UI quality proof to **#1580** → tick the final box → close #1580. Only then,
+with **both** lock closures merged and proven, is Canary.3 re-cut.
