@@ -128,3 +128,101 @@ Serialisation: any slice needing `scaffold.runtime` waits for exclusive use. No 
 
 Recorded in `worklog.md` before wave 1 dispatch — quota and paid-transport verification are
 procedural gates whose proof is the recorded check output, not a claim.
+
+---
+
+# Scope extension — wave 3 / wave 4 (owner triage, 2026-08-12)
+
+Milestone triage added **#1540, #1456, #1460, #1454** to 0.0.6 and assigned them to this lane, in
+that priority order, to start **after #1539 lands**. This is a definition-of-done move recorded as
+an explicit checkpoint (`milestone-run.md` cut-time item 3), not absorbed silently. The original
+six-issue scope and its wave plan above are **not rewritten**; this section extends them.
+
+Lane scope: **6 → 10 issues.**
+
+## Live re-baseline
+
+| Issue | Priority | Labels | Acceptance boxes | Surface |
+| --- | --- | --- | --- | --- |
+| #1540 | p2 | `type:fix,area:tooling,area:release` | **4** | `.llm/tools/release/publish-workspace.ts` |
+| #1456 | p1 | `type:fix,area:cli` | **0** | CLI plugin-install JSR spec resolver |
+| #1460 | p1 | `type:fix,area:cli,area:agentic` | **5** | `netscript agent init` generated MCP config |
+| #1454 | p1 | `type:fix,area:plugins,area:tooling` | **0** | plugin doctor package-backed detection + scaffold E2E |
+
+Two carry no checkboxes (#1456, #1454), so — per this run's corrected finding — their close-gate
+signal reduces to the PR-body checklist with no issue-side cross-check, and pre-merge checks 5 and 7
+carry the weight. Their briefs must state acceptance explicitly in the PR body.
+
+**#1540 is this lane's own filing.** It came out of the #1417 IMPL-EVAL as a non-blocking,
+out-of-scope finding and was routed to `Backlog / Triage` rather than ticked; triage has now
+promoted it into the milestone. That round trip is the #1090 pattern working as intended.
+
+## PR clusters — four separate connected groups
+
+Clustered per the owner's instruction. Each is a single connected concern; none is bundled for
+convenience.
+
+### PR E — interrupted publish/preflight tree safety (#1540)
+
+Branch `fix/1540-publish-interrupt-tree-safety`. **Directly continues PR B (#1417)**, same file,
+same mechanism: #1417 removed the *routine* path to an expanded-`catalog:` tree; this closes the
+*interrupted* path. The `finally` restores only on normal completion, so a hard kill, CI timeout, or
+runner eviction still strands ~19 manifests opted out of central version control.
+
+Acceptance box 2 demands the interruption be **executed**, not reasoned about — kill the process
+between materialization and restore, then assert a clean tree and an intact `catalog:` sentinel.
+That is the deliverable.
+
+### PR F — exact canary plugin install (#1456)
+
+Branch `fix/1456-plugin-install-exact-jsr-version`. `--jsr-url` rejects both exact JSR spellings
+(`jsr:@scope/pkg@version` and `@scope/pkg@version`), and the accepted unversioned form silently
+resolves the registry's stable `latest` — `0.0.5` where `0.0.6-canary.1` was requested.
+
+This is a **release-verification blocker in disguise**: it prevents a consumer from validating a
+coordinated canary without silently mixing plugin generations, which is exactly what the canary
+process exists to prove.
+
+### PR G — agent-init MCP lock neutrality (#1460)
+
+Branch `fix/1460-agent-init-mcp-lock-neutrality`. Merely starting the generated MCP server mutates
+the consumer's `deno.lock` (+87/−5 observed), so a read-only evaluation session dirties an
+application worktree and can contaminate a migration PR. The consumer proved a workaround
+(`--no-lock --minimum-dependency-age=0`); the fix is to make the generated config do that by
+construction. **The CLI is tooling, not a workspace dependency.**
+
+Same failure family as #1417/#1540 — a read-only-sounding operation mutating a tree — now on the
+consumer side.
+
+### PR H — package-backed plugin doctor truth (#1454)
+
+Branch `fix/1454-plugin-doctor-package-backed`. Doctor conflates in-process package installs with
+local plugin workdirs, so consumers are pushed to create **fake `workers/` / `streams/`
+directories** and duplicate framework permission metadata to satisfy diagnostics. Acceptance
+requires a **scaffold E2E** over published workers + streams packages, generated registries,
+permission metadata, and doctor output/exit code.
+
+Kept separate from PR F despite both being plugin-subsystem: F is the install resolver, H is
+diagnostics plus a new expensive E2E over framework code. Bundling them would put the release's
+plugin-critical path behind one review — the "too big" test.
+
+## Wave sequence
+
+| Wave | PRs | Rationale |
+| --- | --- | --- |
+| **3** | E (#1540), F (#1456) | Owner's top two. Disjoint surfaces — release tooling vs CLI resolver. |
+| **4** | G (#1460), H (#1454) | Disjoint — agent-init template vs plugin doctor. H holds the serialized `scaffold.runtime`-class gate. |
+
+Dispatch begins **only after #1539 lands**, per the owner instruction.
+
+## Two binding changes from waves 1–2
+
+1. **Branch from current `main`, never from the old baseline.** #1539's `dispatch` failure was
+   caused by a base SHA predating the trusted evaluator prompt. Every wave-3/4 branch is cut from
+   `main` at dispatch time so the automatic evaluator can resolve its prompt.
+2. **Automatic evaluation only — no locally spawned evaluators.** Per owner policy (2026-08-12):
+   initial IMPL-EVAL triggers on **draft → ready** (escape hatch `impl-eval:skip`); rerun only by
+   moving away from and re-adding `status:impl-eval`; PLAN-EVAL by the `openhands` +
+   `status:plan-eval` pair; `eval:model:minimax|deepseek|qwen` is one-shot. **Never manually
+   dispatch OpenHands, and never duplicate a running evaluation.** Waves 1–2 used local Fable 5
+   sessions because that transport did not exist yet; that route is now closed.
