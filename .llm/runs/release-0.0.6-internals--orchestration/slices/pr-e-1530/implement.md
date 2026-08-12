@@ -26,6 +26,7 @@ report; you do not merge.
 | Branch | `fix/1530-type-fixture-scan-scope` |
 | Base | **`84dd44ae7`** = `origin/main` at dispatch. Contains PR #1527 (`63cd1cd58`, the gate-trust fix). Verified at this base: `deno task quality:scan:repo` still exits **1**, so the defect is live here. |
 | Slice dir | `.llm/runs/release-0.0.6-internals--orchestration/slices/pr-e-1530/` |
+| Draft PR | **#1560** — already open, already labelled, body already written. Comment on it; do not open another, and do not flip it out of draft. |
 | Closes | #1530 |
 | Route | Codex · gpt-5.6-sol · **low** |
 | Plan | `plan-quality-rail.md` (incl. § Revision 2) · slices **E1–E4** in `worklog.md` § Design |
@@ -155,6 +156,10 @@ comment so the cheap lane is visibly intentional. Never edit a workflow file to 
 5. Slices, per the plan's Design table: **E1** RED fixture (committed red) · **E2** the `isTypeFixture`
    exemption · **E3** leakage controls both directions · **E4** drop the two redundant allowances and
    record the 10 → 8 count.
+6. **Leave the PR in draft.** The draft → ready flip now **automatically triggers the formal IMPL-EVAL**
+   (owner policy, `drift.md` D-14), so it is the orchestrator's action once your slice checklist is
+   complete — not a way to get CI moving. Do **not** flip it yourself, do **not** apply `impl-eval:skip`,
+   and do **not** apply `status:impl-eval` or `status:plan-eval`.
 6. Post one `**[PHASE: IMPL]**` summary when the slices are in, listing every gate with real output.
 
 ## Two mechanical rules that cost this lane time already
