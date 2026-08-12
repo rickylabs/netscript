@@ -226,3 +226,66 @@ Dispatch begins **only after #1539 lands**, per the owner instruction.
    `status:plan-eval` pair; `eval:model:minimax|deepseek|qwen` is one-shot. **Never manually
    dispatch OpenHands, and never duplicate a running evaluation.** Waves 1–2 used local Fable 5
    sessions because that transport did not exist yet; that route is now closed.
+
+---
+
+# Wave 2 — dispatch record (owner correction, 2026-08-12)
+
+**The lane was closed prematurely.** The closing record above documents wave 1 only; the owner's
+board-coverage correction establishes that remaining 0.0.6 fixes ownership is exactly **#1540,
+#1456, #1460, #1454**. The lane is reopened; the closing record is retained as the wave-1 record and
+is **not rewritten**, per the standing rule that the plan records intent and the trace records what
+happened.
+
+Renumbered to the owner's scheme: what this file earlier called waves 3–4 is **wave 2**.
+
+Base for every branch: **`3c9dc1f39`** (current `origin/main`, the #1539 merge). All four worktrees
+cut from it with `upstream=NONE` — verified, so no bare push can reach `main`.
+
+## One issue per PR
+
+Four separate draft PRs. None of these four is genuinely connected to another: #1540 is release
+tooling, #1456 is the plugin-install resolver, #1460 is agent-init config generation, #1454 is
+plugin doctor plus a new E2E. Grouping any of them would fail the "genuinely connected" test.
+
+| Slice | Issue | Branch | Worktree | Lane |
+| --- | --- | --- | --- | --- |
+| W2-E | #1540 p2 | `fix/1540-publish-interrupt-tree-safety` | `ns006-w2-1540` | `complex_implementation` Sol · high |
+| W2-F | #1456 p1 | `fix/1456-plugin-install-exact-jsr-version` | `ns006-w2-1456` | `normal_implementation` Sol · medium |
+| W2-G | #1460 p1 | `fix/1460-agent-init-mcp-lock-neutrality` | `ns006-w2-1460` | `light_implementation` Sol · low |
+| W2-H | #1454 p1 | `fix/1454-plugin-doctor-package-backed` | `ns006-w2-1454` | `complex_implementation` Sol · high |
+
+## PLAN-EVAL decision, per issue
+
+The owner's rule: **skip only where fully deterministic.** Applied per issue rather than blanket —
+wave 1's blanket `N/A` is not carried forward.
+
+| Issue | PLAN-EVAL | Why |
+| --- | --- | --- |
+| #1540 | **REQUIRED** | Not deterministic. #1417 could use a throwaway workspace because a dry-run needs no real registry; a **real** publish cannot. Making an interrupted publish leave a clean tree is a genuine design choice (signal handling, atomic restore, or restructuring so the live tree is never materialized), and the issue names none. |
+| #1456 | **N/A — deterministic** | The issue states expected behaviour exactly: preserve `jsr:@scope/pkg@version` and the prefixless form through validation and scaffold dispatch, and never substitute registry `latest` for an explicit version. No design freedom. |
+| #1460 | **N/A — deterministic** | Consumer-proven fix (`--no-lock --minimum-dependency-age=0`), five acceptance boxes, and a stated principle: the CLI is tooling, not a workspace dependency. |
+| #1454 | **REQUIRED** | Not deterministic. Requires deciding how doctor distinguishes package-backed from local-workdir manifests, what permission metadata published packages must carry, **and** a new scaffold E2E over published workers + streams — a new expensive gate whose shape is a design decision. |
+
+PLAN-EVAL runs through the **automatic** label mechanism (`openhands` + `status:plan-eval`), never a
+manual dispatch and never Fable (drift D-7).
+
+## IMPL-EVAL
+
+**Normal automatic IMPL-EVAL for all four** — draft → ready triggers it; the documented small
+deterministic waiver is **not** pre-applied to any of them. If a slice's evidence later earns that
+waiver it is recorded explicitly at that point, never assumed in advance. Wave 1's conditional
+waiver for C/D is not precedent here: those were guard tests, these are p1/p2 correctness fixes in
+shipped surfaces.
+
+## Binding constraints carried from wave 1
+
+1. **Branch from current `main` and re-sync immediately before draft → ready.** #1539's stale base
+   broke evaluator prompt resolution *and* poisoned the quality scan's changed-file range.
+2. **No Fable** (D-7). Implementation Codex; ordinary review substitutes Opus at the paired effort.
+3. **No manual OpenHands dispatch.** Automatic label-driven phases only.
+4. **Never wrap the launcher in `timeout`** — it kills the turn ~25s later (cut-trace F-2).
+5. **`scaffold.runtime` is serialised and contended by five lanes.** W2-H is the only slice that
+   needs it; it asks before taking it.
+6. **Verify a slice's liveness by a fresh growing rollout**, never by absence from the bounded
+   status list (F-1).
