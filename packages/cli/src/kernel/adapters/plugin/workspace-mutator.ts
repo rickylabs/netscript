@@ -39,6 +39,14 @@ export interface PluginWorkspaceMutationOptions {
   readonly packageVersion?: string;
 }
 
+/** Exact installed package identity used to preserve explicit plugin pins. */
+export interface InstalledPluginPackage {
+  /** Unversioned JSR package identity. */
+  readonly packageSpecifier: string;
+  /** Exact validated package version. */
+  readonly version: string;
+}
+
 /** Summary of appsettings entries removed for a plugin. */
 export interface RemovedPluginAppsettingsEntries {
   /** Removed API/service plugin config keys. */
@@ -395,7 +403,11 @@ export class PluginWorkspaceMutator {
   }
 
   /** Ensure root `deno.json` can resolve packages used by an added first-party plugin kind. */
-  async ensureRootImportsForPluginKind(projectRoot: string, pluginKind: string): Promise<void> {
+  async ensureRootImportsForPluginKind(
+    projectRoot: string,
+    pluginKind: string,
+    installedPackage?: InstalledPluginPackage,
+  ): Promise<void> {
     const denoJsonPath = join(projectRoot, SCAFFOLD_FILES.DENO_JSON);
     if (!await this.fs.exists(denoJsonPath)) {
       throw new ScaffoldValidationError(
@@ -407,9 +419,12 @@ export class PluginWorkspaceMutator {
     // Kind-source jsr pins are prod/JSR-only: local-source projects resolve
     // these packages as copied workspace members (name + export subpaths).
     const isLocalSourceProject = await this.fs.exists(join(projectRoot, LOCAL_SOURCE_MARKER));
-    const kindSourceImports = isLocalSourceProject
+    const kindSourceImports: Readonly<Record<string, string>> = isLocalSourceProject
       ? {}
-      : PLUGIN_KIND_SOURCE_IMPORTS[pluginKind] ?? {};
+      : exactInstalledPluginImport(
+        PLUGIN_KIND_SOURCE_IMPORTS[pluginKind] ?? {},
+        installedPackage,
+      );
     const requiredSpecifiers = [
       ...PLUGIN_SERVICE_BOOTSTRAP_IMPORTS,
       ...(PLUGIN_KIND_ROOT_IMPORTS[pluginKind] ?? []),
@@ -621,6 +636,23 @@ export class PluginWorkspaceMutator {
     await this.fs.writeFile(configPath, JSON.stringify(raw, null, 2) + '\n');
     return !hadCache;
   }
+}
+
+function exactInstalledPluginImport(
+  imports: Readonly<Record<string, string>>,
+  installedPackage: InstalledPluginPackage | undefined,
+): Readonly<Record<string, string>> {
+  if (
+    installedPackage === undefined ||
+    !Object.hasOwn(imports, installedPackage.packageSpecifier)
+  ) {
+    return imports;
+  }
+  return {
+    ...imports,
+    [installedPackage.packageSpecifier]:
+      `jsr:${installedPackage.packageSpecifier}@${installedPackage.version}`,
+  };
 }
 
 function normalizeWorkspaceRelativePath(projectRoot: string, path: string): string {

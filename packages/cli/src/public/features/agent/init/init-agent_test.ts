@@ -61,6 +61,8 @@ Deno.test("agent init writes Claude config, skills, and marked AGENTS section id
     assertEquals(config.mcpServers.netscript.command, "deno");
     assertEquals(config.mcpServers.netscript.args, [
       "run",
+      "--no-lock",
+      "--minimum-dependency-age=0",
       "--config",
       join(root, "deno.json"),
       "-A",
@@ -128,6 +130,8 @@ Deno.test("agent init selects VS Code and detect-or-all host table", async () =>
     assertEquals(vscode.servers.netscript.command, "deno");
     assertEquals(vscode.servers.netscript.args, [
       "run",
+      "--no-lock",
+      "--minimum-dependency-age=0",
       "--config",
       join(root, "deno.json"),
       "-A",
@@ -189,6 +193,11 @@ Deno.test('agent init applies native editor configuration for none, Zed, and VS 
     assertEquals(zed.custom, true);
     assertEquals(zed.context_servers.other.command, 'other');
     assertEquals(zed.context_servers.netscript.command, 'deno');
+    assertEquals(zed.context_servers.netscript.args.slice(0, 3), [
+      'run',
+      '--no-lock',
+      '--minimum-dependency-age=0',
+    ]);
     assertEquals(zed.context_servers.aspire.command, 'aspire');
     assert(zed.lsp.deno.settings.deno.enable);
     assert(await fs.exists(join(zedRoot, '.zed/debug.json')));
@@ -266,7 +275,7 @@ Deno.test("S-18 prior-release host stays pinned until agent init and restart exp
     const after = JSON.parse(await Deno.readTextFile(join(root, ".mcp.json")));
     assertEquals(after.project, "prior-release-fixture");
     assertEquals(after.mcpServers.other.command, "other");
-    assertEquals(after.mcpServers.netscript.args[4], MIGRATION_TARGET_SPECIFIER);
+    assertEquals(after.mcpServers.netscript.args[6], MIGRATION_TARGET_SPECIFIER);
 
     const restartedTools = await listToolsAfterHostRestart(root);
     assertEquals(restartedTools.length, 22);
@@ -848,8 +857,8 @@ async function callToolFromGeneratedHost(
   const args = [...generatedArgs];
   // Run the generated command against local workspace source while preserving its project/docs
   // arguments; a generated project's import map would otherwise resolve the published CLI.
-  args[2] = new URL("../../../../../../../deno.json", import.meta.url).pathname;
-  args[4] = cliPath;
+  args[4] = new URL("../../../../../../../deno.json", import.meta.url).pathname;
+  args[6] = cliPath;
   args.push("--endpoint", "http://127.0.0.1:1");
   const child = new Deno.Command(Deno.execPath(), {
     args,

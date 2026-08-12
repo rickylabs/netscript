@@ -130,7 +130,9 @@ manual MCP configuration. Agent hosts remain selectable with `--host claude|vsco
 installed server entry runs `netscript agent mcp`
 ([`@netscript/mcp`](https://jsr.io/@netscript/mcp)); its data boundary covers telemetry, project
 metadata, generated registries, and public docs — never project source, environment values,
-credentials, or secrets.
+credentials, or secrets. The generated Deno invocation disables consumer lock discovery for both
+the server and its diagnostic child processes, so starting or using MCP leaves the application's
+`deno.lock` byte-identical.
 
 `--with-docs` is deliberately opt-in because it expands to several megabytes. It installs the
 release task router/prose and generates API text for every export subpath of the exact NetScript

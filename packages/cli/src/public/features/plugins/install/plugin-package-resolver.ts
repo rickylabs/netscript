@@ -1,3 +1,5 @@
+import { parse } from '@std/semver';
+
 /** Known bare plugin aliases that resolve only to verified NetScript JSR packages. */
 export const BARE_PLUGIN_PACKAGE_ALIASES: Readonly<Record<string, string>> = Object.freeze({
   ai: '@netscript/plugin-ai',
@@ -27,6 +29,8 @@ export interface ResolvedPluginPackageSpec {
   readonly packageName: string;
   /** Scoped package name without the `jsr:` prefix. */
   readonly packageSpecifier: string;
+  /** Exact version explicitly requested by the caller. */
+  readonly requestedVersion?: string;
   /** Fully-qualified Deno JSR specifier. */
   readonly jsrSpecifier: string;
   /** Matched bare alias, when the verified NetScript alias map was used. */
@@ -62,13 +66,26 @@ function toResolvedPackageSpec(
   source: PluginPackageSpecSource,
   alias?: string,
 ): ResolvedPluginPackageSpec {
-  const match = /^@([^/]+)\/([^/@]+)$/.exec(packageSpecifier);
+  const match = /^@([^/]+)\/([^/@]+)(?:@([^/]+))?$/.exec(packageSpecifier);
   if (match === null) {
-    throw new Error(`Invalid JSR plugin package spec "${requestedSpec}". Expected @scope/package.`);
+    throw new Error(
+      `Invalid JSR plugin package spec "${requestedSpec}". ` +
+        'Expected @scope/package or @scope/package@version.',
+    );
   }
 
   const scope = match[1];
   const packageName = match[2];
+  const requestedVersion = match[3];
+  if (requestedVersion !== undefined) {
+    try {
+      parse(requestedVersion);
+    } catch {
+      throw new Error(
+        `Invalid JSR plugin package spec "${requestedSpec}". Expected an exact semantic version.`,
+      );
+    }
+  }
   const scopedPackage = `@${scope}/${packageName}`;
   return {
     requestedSpec,
@@ -76,7 +93,8 @@ function toResolvedPackageSpec(
     scope,
     packageName,
     packageSpecifier: scopedPackage,
-    jsrSpecifier: `jsr:${scopedPackage}`,
+    requestedVersion,
+    jsrSpecifier: `jsr:${scopedPackage}${requestedVersion ? `@${requestedVersion}` : ''}`,
     alias,
   };
 }

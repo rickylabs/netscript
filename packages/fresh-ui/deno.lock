@@ -3784,6 +3784,7 @@
       "packages/fresh": {
         "dependencies": [
           "jsr:@fresh/core@^2.3.3",
+          "jsr:@fresh/plugin-vite@^1.1.2",
           "jsr:@netscript/ai@0.0.5",
           "jsr:@netscript/plugin-streams-core@0.0.5",
           "jsr:@netscript/sdk@0.0.5",

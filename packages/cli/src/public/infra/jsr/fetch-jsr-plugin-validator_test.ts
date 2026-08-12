@@ -52,6 +52,51 @@ describe('FetchJsrPluginValidator', () => {
     if (result.ok) assertEquals(result.descriptor.version, NETSCRIPT_RELEASE_VERSION);
   });
 
+  it('preserves an explicit exact version when stable latest differs', async () => {
+    const requestedVersion = '0.0.6-canary.2';
+    const fixtures = validFixtures();
+    fixtures.set('https://jsr.io/@netscript/plugin-workers/meta.json', {
+      status: 200,
+      body: {
+        latest: '0.0.5',
+        versions: { '0.0.5': {}, [requestedVersion]: {} },
+      },
+    });
+    fixtures.set(`https://jsr.io/@netscript/plugin-workers/${requestedVersion}_meta.json`, {
+      status: 200,
+      body: {
+        exports: { '.': './mod.ts', './scaffold': './src/scaffold/mod.ts' },
+        manifest: { '/scaffold.plugin.json': { checksum: 'sha256-canary' } },
+      },
+    });
+    fixtures.set(
+      `https://jsr.io/@netscript/plugin-workers/${requestedVersion}/scaffold.plugin.json`,
+      {
+        status: 200,
+        body: { ...validPluginManifest(), version: requestedVersion },
+      },
+    );
+    const validator = new FetchJsrPluginValidator(new FixtureHttpClient(fixtures));
+
+    const result = await validator.validate(
+      resolvePluginPackageSpec(`jsr:@netscript/plugin-workers@${requestedVersion}`),
+    );
+
+    assertEquals(result.ok, true);
+    if (result.ok) {
+      assertEquals(result.descriptor.version, requestedVersion);
+      assertEquals(
+        result.descriptor.package.jsrSpecifier,
+        `jsr:@netscript/plugin-workers@${requestedVersion}`,
+      );
+      assertEquals(result.descriptor.packageMetadata.latest, '0.0.5');
+      assertEquals(
+        result.descriptor.versionMetadata.files['/scaffold.plugin.json'],
+        'sha256-canary',
+      );
+    }
+  });
+
   it('resolves the semver-greatest prerelease when JSR latest is null', async () => {
     const fixtures = validFixtures();
     fixtures.set('https://jsr.io/@netscript/plugin-workers/meta.json', {

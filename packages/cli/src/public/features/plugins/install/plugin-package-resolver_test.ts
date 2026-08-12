@@ -42,6 +42,22 @@ describe('resolvePluginPackageSpec', () => {
     assertEquals(resolved.jsrSpecifier, 'jsr:@acme/plugin-billing');
   });
 
+  for (const prefix of ['jsr:', ''] as const) {
+    const spelling = prefix === 'jsr:' ? 'jsr:-prefixed' : 'prefixless';
+    it(`preserves an exact version from a ${spelling} package spec`, () => {
+      const resolved = resolvePluginPackageSpec(
+        `${prefix}@acme/plugin-billing@0.0.6-canary.2`,
+      );
+
+      assertEquals(
+        'requestedVersion' in resolved ? resolved.requestedVersion : undefined,
+        '0.0.6-canary.2',
+      );
+      assertEquals(resolved.packageSpecifier, '@acme/plugin-billing');
+      assertEquals(resolved.jsrSpecifier, 'jsr:@acme/plugin-billing@0.0.6-canary.2');
+    });
+  }
+
   it('rejects malformed package specs', async () => {
     await assertRejects(
       () => Promise.resolve().then(() => resolvePluginPackageSpec('not a package')),
