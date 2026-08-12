@@ -367,3 +367,33 @@ taken as a judgement call.
      and the PRs carry `status:impl` → `status:impl-eval` → `status:ready-merge`.
 - **Unchanged:** merge authority stays with the orchestrator through the pre-merge gate; a green automated
   gate is still not a sign-off; the generator still never evaluates its own work.
+
+## D-15 — #1524 landed mid-run, which makes the `labeled` documentation defect worse, not better
+
+- **Severity:** significant (sharpens R-11 and supersedes part of D-2)
+- **Recorded:** 2026-08-12, while cycle 3 was running
+- **Fact:** `main` advanced two commits past PR-E's base to `281ab7688`, including
+  **`7837ef470 feat(agentic): automate formal evaluator phases (#1524)`** — the automation the owner's
+  policy directive (D-14) describes. **D-2 is now superseded on its factual claim:** #1524 is no longer an
+  open draft; the label-triggered evaluator route exists.
+- **What it added:** `.github/workflows/openhands-phase-eval.yml`, whose trigger is
+  `on: pull_request: types: [labeled, ready_for_review]`, with the state machine documented in its own
+  header: initial IMPL-EVAL on draft→ready, `impl-eval:skip` as the attributed escape hatch, PLAN-EVAL on
+  the `openhands` + `status:plan-eval` pair, rerun by label-cycling.
+- **What it did *not* change:** `ci.yml:41` is still
+  `types: [opened, synchronize, reopened, ready_for_review]`. **`labeled` is still absent**, and `ci.yml`
+  is the workflow that runs `close-gate` and the acceptance mirror.
+- **Why this makes the documentation defect worse.** `netscript-pr` `SKILL.md:169-170` still reads
+  "applying `status:ready-merge` itself triggers a fresh run (the workflow listens to `labeled`)". Before
+  #1524 that sentence was simply false. Now it is **half true**, which is harder to catch: a label *does*
+  now trigger a workflow — just not the one that re-evaluates the close-gate. An operator who reads it
+  will apply `status:ready-merge`, see a run appear, and conclude the close-gate was re-evaluated. It was
+  not.
+- **Action:** `R-11` refined from a negation into a distinction — the phase-eval workflow listens to
+  `labeled`; `ci.yml` does not; for `status:ready-merge` it is label **then push**. PR-C slice C7 carries
+  it, along with the same fix to `check-close-gate.ts`'s repair hint. No workflow trigger is changed
+  (owner decision, D-14 boundary).
+- **Collision check for PR-E:** the two new commits touch skills, labels, and workflows only —
+  `git diff --name-only 84dd44ae7..origin/main | grep -E 'tools/quality|type-fixtures'` returns nothing.
+  PR-E's surface is unaffected and its premise still holds: `quality:scan:repo` is **still exit 1** at
+  `281ab7688`, so #1530 is live and its RED-first proof remains real.
