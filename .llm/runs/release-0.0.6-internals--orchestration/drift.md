@@ -685,3 +685,34 @@ Trusted base SHA: d7e2b67b2be535c9ca13449f97f8f4585344030a
   gate (validation row 7b) and every scoped wrapper **before** flipping draft → ready, so the ready flip
   evaluates a head that is already final. That ordering is now in the rail plan's validation table, and it
   is the cheap way to avoid paying for this twice.
+
+## D-24 — `gh-watch` reported a terminal PASS in 0s by matching a superseded verdict comment
+
+- **Severity:** significant (a gate-trust defect in the tool used to gate merges)
+- **Recorded:** 2026-08-12, PR #1560, immediately after the D-23 re-evaluation
+- **What happened:** after label-cycling to re-run IMPL-EVAL at the final head `9ab361440`,
+  `deno task agentic:gh-watch --repo rickylabs/netscript --pr 1560` printed
+  `TERMINAL PR #1560: PASS (PASS) after 0s` and exited 0. The re-run had **not** finished — the newest PR
+  comment showed `conclusion: running` on run `31593326538` (DeepSeek V4 Flash 0731, the phase-bound
+  IMPL-EVAL model). The watcher had matched the **previous** run's `PASS` comment, left on the PR by the
+  superseded evaluation at `49e2b86e9`.
+- **Why it matters, precisely.** The whole point of the D-23 re-evaluation was to stop merging on a verdict
+  that names a commit other than the one shipping. Acting on this watcher result would have done exactly
+  that, one step later and with a green tool output as cover. A verdict watcher that cannot distinguish
+  "this PR has a PASS somewhere in its history" from "this PR's current evaluation passed" is the same
+  defect class as #1415 (presence mistaken for assertion) and #1436 (a match that means nothing) — in the
+  tool that gates merges.
+- **Not a defect this lane fixes, and not this lane's issue to file blind.** `gh-watch` sits under
+  `.llm/tools/agentic/github/`, outside every rail PR's boundary, and the sibling lanes use it too. Recorded
+  here with the reproduction so it can be filed or fixed with an owner decision rather than absorbed
+  mid-slice. The nearby `pr-checks.ts` classification already models exactly the missing concept —
+  `superseded` vs `current-*` per check name — so the shape of the fix is known: a verdict comment must be
+  matched against the **current head SHA**, which the trigger comment already carries (`head=<sha>`), before
+  it is treated as terminal.
+- **Workaround used here:** waited on the Actions **run id** (`31593326538`) reaching `completed`, then read
+  the newest `OPENHANDS_VERDICT` comment and checked its head against `9ab361440`. Run identity is
+  unambiguous where comment presence is not.
+- **Related orchestrator lesson:** this is the third time on this lane that a green tool output has meant
+  something other than what it appeared to (cancelled-vs-superseded checks nearly manufacturing a false red
+  on PR #1527; the phase-eval workflow succeeding while dispatching nothing on an incomplete label pair; and
+  now this). Reading the *provenance* rather than the *status* has caught all three.
