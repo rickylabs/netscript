@@ -581,25 +581,27 @@ Deno.test('formal IMPL evaluator rejects the stale Qwen 3.7 model', () => {
   );
 });
 
-Deno.test('formal IMPL evaluator rejects the retired well-formed Qwen 3.8 route', () => {
+Deno.test('formal complex IMPL evaluator selects Qwen 3.8 max', () => {
   const at = new Date('2026-08-06T00:00:00Z');
-  const route = CANONICAL_ROUTE_POLICY.find((entry) =>
-    entry.lane === 'formal_impl_evaluation' &&
-    entry.condition === 'third_opinion_or_native_limit'
-  )!;
-  assertThrows(
-    () =>
-      resolveCanonicalFormalEvaluatorRoute({
-        phase: 'impl',
-        authorFamily: 'openai',
-        generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
-        evaluatorSession: { ...session, agent: 'claude', sessionId: 'open-evaluator' },
-        fallbackReason: 'third_opinion',
-        route: { ...route, model: OPENROUTER_MODEL_IDS.qwen },
-      }, at),
-    Error,
-    'formal impl evaluator requires its canonical OpenRouter escalation route',
-  );
+  const route = resolveCanonicalFormalEvaluatorRoute({
+    phase: 'impl',
+    complexity: 'complex',
+    authorFamily: 'openai',
+    generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
+    evaluatorSession: { ...session, agent: 'claude', sessionId: 'open-evaluator' },
+    fallbackReason: 'third_opinion',
+  }, at);
+  equal([
+    route.presetId,
+    route.model,
+    route.effort,
+    route.condition,
+  ], [
+    'claude-evaluator-qwen-3-8-max',
+    OPENROUTER_MODEL_IDS.qwen,
+    'max',
+    'complex_third_opinion_or_native_limit',
+  ]);
 });
 
 Deno.test('formal evaluator rejects the Gemini documentation-authoring generator lane', () => {

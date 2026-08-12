@@ -178,14 +178,17 @@ attach. `--dry-run` emits a deterministic simulated transcript and writes/sends 
 
 ## The everyday flow: evaluating with OpenHands
 
-Implementation is only half the loop. Evaluation runs on OpenHands via a GitHub Action triggered by
-an `@openhands-agent` comment.
+Implementation is only half the loop. Cloud evaluation normally runs through the phase workflow:
+`openhands` + `status:plan-eval` for PLAN-EVAL, or draft→ready for IMPL-EVAL. Choose at most one
+one-shot `eval:model:*` override before the transition. Do not also post a manual trigger for the
+same phase/head.
 
 ### Dispatch — `openhands/dispatch-openhands.ts`
 
-**When:** a slice is ready for a PLAN-EVAL or IMPL-EVAL pass. The tool validates the dispatch-prompt
-contract (it must begin with `use harness` and carry a `## SKILL` chapter), builds the trigger, and
-POSTs it. Dispatch exactly one trigger per intended run — OpenHands cancels overlapping runs per PR.
+**When:** an authorized manual rerun or non-phase cloud task genuinely needs a direct trigger. The
+tool validates the dispatch-prompt contract (it must begin with `use harness` and carry a `## SKILL`
+chapter), builds the trigger, and POSTs it. Normal PLAN/IMPL phase runs use labels/status transitions
+instead. Dispatch exactly one trigger per intended run.
 
 ```bash
 # Dry-run (no token, no network) — see the exact comment that would post:

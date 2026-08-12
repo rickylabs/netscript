@@ -4,7 +4,8 @@
 #   - `@openhands-agent [model=<litellm-id>] [provider=<name>] [output=<mode>]
 #      [iterations=<n>]` in a PR/issue comment from OWNER/MEMBER/COLLABORATOR.
 #   - workflow_dispatch with explicit inputs.
-#   - `fix-me` / `openhands` / `agent:<profile>` labels on issues/PRs.
+#   - `fix-me` / `agent:<profile>` labels on issues/PRs; `openhands` directly on issues.
+#     On PRs, `openhands` is reserved for the formal phase dispatcher.
 #   - `[openhands ...]` in a pushed commit message.
 #
 # Parameter parsing (hardened vs v1): for comment triggers, `key=value` params
@@ -82,12 +83,12 @@ on:
       model_profile:
         description: Model profile to use when model is empty.
         required: false
-        default: sonnet
+        default: qwen
         type: choice
         options:
-          - sonnet
-          - gpt
-          - gemini
+          - qwen
+          - minimax
+          - deepseek
       target_pr:
         description: Optional PR number to inspect/comment on.
         required: false
@@ -109,8 +110,10 @@ on:
   issues:
     types: [labeled]
   pull_request:
-    # The ready event is inert unless the explicit agent-label predicate holds.
-    types: [labeled, ready_for_review]
+    # Formal ready-for-review evaluation belongs to openhands-phase-eval.yml. This runner keeps
+    # only explicit non-phase PR labels, so ready transitions no longer publish a misleading
+    # skipped `agent` check.
+    types: [labeled]
   issue_comment:
     types: [created]
   push:
@@ -137,7 +140,7 @@ jobs:
         contains(fromJson('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)) ||
       ((github.event_name == 'issues' || github.event_name == 'pull_request') &&
         (github.event.label.name == 'fix-me' ||
-         github.event.label.name == 'openhands' ||
+         (github.event.label.name == 'openhands' && github.event_name == 'issues') ||
          startsWith(github.event.label.name, 'agent:')))
     runs-on: ubuntu-latest
     timeout-minutes: 300
@@ -146,7 +149,7 @@ jobs:
       issues: write # acknowledge + final status comments
       pull-requests: write # draft PR for non-PR triggers, review-thread replies
     env:
-      DEFAULT_OPENHANDS_MODEL: ${{ vars.OPENHANDS_DEFAULT_MODEL || 'anthropic/claude-sonnet-4' }}
+      DEFAULT_OPENHANDS_MODEL: ${{ vars.OPENHANDS_DEFAULT_MODEL || 'openrouter/qwen/qwen3.8-max' }}
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
@@ -170,10 +173,9 @@ jobs:
             const eventName = context.eventName;
 
             const modelProfiles = new Map([
-              ['sonnet', 'anthropic/claude-sonnet-4'],
-              ['gpt', 'openai/gpt-5.1'],
-              ['gemini', 'gemini/gemini-2.5-pro'],
-              ['openrouter', 'openrouter/anthropic/claude-sonnet-4'],
+              ['qwen', 'openrouter/qwen/qwen3.8-max'],
+              ['minimax', 'openrouter/minimax/minimax-m3'],
+              ['deepseek', 'openrouter/deepseek/deepseek-v4-flash-0731'],
             ]);
 
             const labels = new Set();
@@ -223,6 +225,14 @@ jobs:
 
             const outputMode = matchValue('output') || process.env.DISPATCH_OUTPUT_MODE || 'pr-comment';
             const iterations = matchValue('iterations') || process.env.DISPATCH_ITERATIONS || '';
+            const evalPhase = matchValue('phase') || '';
+            const evalHead = matchValue('head') || '';
+            if (evalPhase && !['plan', 'impl'].includes(evalPhase)) {
+              throw new Error(`Unsupported evaluator phase: ${evalPhase}`);
+            }
+            if (evalPhase && !/^[0-9a-f]{40}$/.test(evalHead)) {
+              throw new Error('Formal evaluator triggers require an immutable 40-character head SHA.');
+            }
 
             function inferProvider(model) {
               const explicitProvider = matchValue('provider');
@@ -270,6 +280,7 @@ jobs:
               checkoutRef = pr.head.ref;
               baseBranch = pr.base.ref;
             }
+            if (evalHead) checkoutRef = evalHead;
 
             const promptParts = [];
             if (process.env.DISPATCH_PROMPT) promptParts.push(process.env.DISPATCH_PROMPT);
@@ -282,10 +293,20 @@ jobs:
               || paramText;
 
             const selectedModel = pickModel();
+            const allowedModels = new Set([
+              'openrouter/minimax/minimax-m3',
+              'openrouter/deepseek/deepseek-v4-flash-0731',
+              'openrouter/qwen/qwen3.8-max',
+            ]);
+            if (!allowedModels.has(selectedModel)) {
+              throw new Error(`OpenHands model is not in the approved open-evaluator allowlist: ${selectedModel}`);
+            }
             core.setOutput('model', selectedModel);
             core.setOutput('provider', inferProvider(selectedModel));
             core.setOutput('output_mode', outputMode);
             core.setOutput('iterations', /^\d+$/.test(iterations) ? iterations : '');
+            core.setOutput('eval_phase', evalPhase);
+            core.setOutput('eval_head', evalHead);
             core.setOutput('prompt', prompt);
             core.setOutput('issue_number', String(issueNumber));
             core.setOutput('is_pr', String(isPr));
@@ -308,16 +329,21 @@ jobs:
           error_file="$(mktemp)"
           trap 'rm -f "$error_file"' EXIT
 
-          if [[ "$CHECKOUT_REF" == refs/* ]]; then
-            patterns=("$CHECKOUT_REF")
+          if [[ "$CHECKOUT_REF" =~ ^[0-9a-f]{40}$ ]]; then
+            gh api --silent "repos/${CHECKOUT_REPO}/git/commits/${CHECKOUT_REF}" \
+              >/dev/null 2>"$error_file"
+            status=$?
           else
-            patterns=("refs/heads/$CHECKOUT_REF" "refs/tags/$CHECKOUT_REF")
+            if [[ "$CHECKOUT_REF" == refs/* ]]; then
+              patterns=("$CHECKOUT_REF")
+            else
+              patterns=("refs/heads/$CHECKOUT_REF" "refs/tags/$CHECKOUT_REF")
+            fi
+            git -c "http.extraheader=AUTHORIZATION: basic $auth" \
+              ls-remote --exit-code --refs "https://github.com/${CHECKOUT_REPO}.git" \
+              "${patterns[@]}" >/dev/null 2>"$error_file"
+            status=$?
           fi
-
-          git -c "http.extraheader=AUTHORIZATION: basic $auth" \
-            ls-remote --exit-code --refs "https://github.com/${CHECKOUT_REPO}.git" \
-            "${patterns[@]}" >/dev/null 2>"$error_file"
-          status=$?
 
           if [ "$status" -eq 0 ]; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
@@ -839,11 +865,18 @@ jobs:
         id: commit-artifacts
         # always(): trace/run artifacts from a failed or budget-cut run must
         # still land on the branch for the supervisor's local status tooling.
+        # Formal evaluators are immutable read-only runs: their trace stays in the Actions artifact
+        # and final PR comment so the evaluated head can never be changed by evaluation itself.
         # Allow-list: .llm/tmp/run/openhands/** and .llm/runs/** only — never
         # deno.lock, never node_modules, never agent source changes (the agent
         # pushes its own source commits per the request contract). Disallowed
         # leftovers are counted, sampled, and preserved in the Actions artifact.
-        if: always() && steps.target-ref.outputs.exists == 'true' && steps.request.outputs.is_pr == 'true' && steps.artifacts.outputs.trace_dir != ''
+        if: >-
+          always() &&
+          steps.request.outputs.eval_phase == '' &&
+          steps.target-ref.outputs.exists == 'true' &&
+          steps.request.outputs.is_pr == 'true' &&
+          steps.artifacts.outputs.trace_dir != ''
         continue-on-error: true
         env:
           TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
@@ -1198,6 +1231,66 @@ jobs:
                 body: finalBody,
               });
             }
+
+      - name: Apply formal evaluator status transition
+        if: >-
+          always() &&
+          steps.request.outputs.eval_phase != '' &&
+          steps.run-agent.outcome == 'success' &&
+          steps.finalize.outputs.verdict != 'NONE'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          ISSUE_NUMBER: ${{ steps.request.outputs.issue_number }}
+          EVAL_PHASE: ${{ steps.request.outputs.eval_phase }}
+          EVAL_HEAD: ${{ steps.request.outputs.eval_head }}
+          VERDICT: ${{ steps.finalize.outputs.verdict }}
+        with:
+          # GITHUB_TOKEN label writes deliberately do not emit recursive workflow triggers. A
+          # maintainer retriggers by moving away from and back to the phase status label.
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue_number = Number(process.env.ISSUE_NUMBER);
+            const phase = process.env.EVAL_PHASE;
+            const evaluatedHead = process.env.EVAL_HEAD;
+            const verdict = process.env.VERDICT;
+            const expected = phase === 'plan' ? 'status:plan-eval' : 'status:impl-eval';
+            const { data: issue } = await github.rest.issues.get({ owner, repo, issue_number });
+            const labels = issue.labels.map((label) => typeof label === 'string' ? label : label.name);
+            if (!labels.includes(expected)) {
+              core.notice(`Stale ${phase} evaluator result ignored: ${expected} is no longer current.`);
+              return;
+            }
+            const { data: pr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: issue_number,
+            });
+            if (pr.head.sha !== evaluatedHead) {
+              core.notice(`Stale ${phase} evaluator result ignored: evaluated ${evaluatedHead}, current head is ${pr.head.sha}.`);
+              return;
+            }
+
+            const destination = phase === 'plan'
+              ? verdict === 'PASS' ? 'status:impl' : 'status:plan'
+              : verdict === 'PASS'
+              ? 'status:augment-review'
+              : ['FAIL_RESCOPE', 'FAIL_PLAN'].includes(verdict)
+              ? 'status:plan'
+              : 'status:impl';
+            for (const label of labels.filter((name) => name?.startsWith('status:'))) {
+              await github.rest.issues.removeLabel({ owner, repo, issue_number, name: label });
+            }
+            await github.rest.issues.addLabels({ owner, repo, issue_number, labels: [destination] });
+            await core.summary
+              .addHeading('Harness status transition')
+              .addList([
+                `Phase: ${phase}`,
+                `Verdict: ${verdict}`,
+                `Status: ${expected} → ${destination}`,
+              ])
+              .write();
 
       - name: Upload OpenHands artifacts
         if: always() && steps.target-ref.outputs.exists == 'true' && steps.artifacts.outputs.run_dir != ''
