@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------- |
 | Run ID         | `fix-doctor-service-entrypoint-unpublished--w5-a` |
 | Branch         | `fix/doctor-service-entrypoint-unpublished`       |
-| Current phase  | `impl-eval`                                       |
+| Current phase  | `complete`                                        |
 | Archetype      | `6 — CLI / Tooling`                               |
 | Scope overlays | `none`                                            |
 
@@ -23,15 +23,15 @@ path; #1597's E2E availability predicate is already exact-404-only and remains o
   404 warning assertion failed, while published-defect and 503 preservation controls passed.
 - Exact 404-only exclusion implemented through a typed loader-port HTTP error.
 - All requested implementation gates passed, including `scaffold.plugins` 17/17.
+- Separate-session IMPL-EVAL passed against `41ef373ab`.
 
 ## In Progress
 
-- Automatic separate-session IMPL-EVAL.
+- None.
 
 ## Next Steps
 
-1. Trigger the automatic draft-to-ready IMPL-EVAL.
-2. Apply only evaluator-required fixes, then return the completed PR to draft for owner handoff.
+1. Return the completed PR to draft for owner handoff.
 
 ## Key Decisions
 
@@ -45,7 +45,7 @@ path; #1597's E2E availability predicate is already exact-404-only and remains o
 | Path                                                                               | Status  | Notes                                 |
 | ---------------------------------------------------------------------------------- | ------- | ------------------------------------- |
 | `.llm/runs/fix-doctor-service-entrypoint-unpublished--w5-a/`                       | new     | Harness state                         |
-| `slices/w5-a-doctor/evidence.md`                                                   | new     | Required evidence ledger              |
+| `.llm/runs/fix-doctor-service-entrypoint-unpublished--w5-a/evidence.md`            | new     | Required evidence ledger              |
 | `packages/cli/src/public/features/plugins/doctor/jsr-export-map-loader-port.ts`    | new     | Typed exact-response failure boundary |
 | `packages/cli/src/public/features/plugins/doctor/doctor-plugin-use-case.ts`        | changed | Exact 404 warning exclusion           |
 | `packages/cli/src/public/infra/jsr/fetch-jsr-export-map.ts`                        | changed | Preserves received HTTP status        |
@@ -67,7 +67,7 @@ path; #1597's E2E availability predicate is already exact-404-only and remains o
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: automatic evaluator transport and owner-side evidence relocation recorded in `drift.md`.
 - Debt: none expected.
 
 ## Commits

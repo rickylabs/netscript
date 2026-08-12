@@ -78,23 +78,25 @@ transport behavior.
 | 2026-08-12 | 3     | repository gates | CLI check, 3,382-test suite, lint, format, and package quality gate all exited 0.                                                                                                        |
 | 2026-08-12 | 3     | consumer gate    | `scaffold.plugins` passed 17/17, including doctor health and the unchanged #1597 package-backed gate.                                                                                    |
 | 2026-08-12 | 3     | lock hygiene     | Working-tree and base-range diffs for both lockfiles were empty.                                                                                                                         |
+| 2026-08-12 | 4     | IMPL-EVAL        | Automatic separate cloud evaluator passed against `41ef373ab`; focused tests and scoped CLI check independently green.                                                                   |
+| 2026-08-13 | 4     | closeout         | Applied the evaluator's low path-reference cleanup and recorded the external PASS; no product code changed after the evaluated head.                                                     |
 
 ## Gate Results
 
-| Gate                                | Result                                               | Evidence                         |
-| ----------------------------------- | ---------------------------------------------------- | -------------------------------- |
-| Focused discriminating pre-fix test | EXPECTED RED (exit 1; 2 pass / 1 fail)               | `slices/w5-a-doctor/evidence.md` |
-| Focused doctor + export-map tests   | PASS (exit 0; 14 pass / 0 fail)                      | `slices/w5-a-doctor/evidence.md` |
-| Scoped CLI check                    | PASS (exit 0; 876 files / 8 batches / 0 diagnostics) | `slices/w5-a-doctor/evidence.md` |
-| Repository test                     | PASS (exit 0; 3,382 pass / 0 fail / 17 ignored)      | `slices/w5-a-doctor/evidence.md` |
-| Repository lint                     | PASS (exit 0; 2,034 files / 0 findings)              | `slices/w5-a-doctor/evidence.md` |
-| Repository format check             | PASS (exit 0; 2,034 files / 0 findings)              | `slices/w5-a-doctor/evidence.md` |
-| Package quality gate                | PASS (exit 0; no blocking findings; doctrine FAIL=0) | `slices/w5-a-doctor/evidence.md` |
-| `scaffold.plugins`                  | PASS (exit 0; 17 pass / 0 fail / 0 skip)             | `slices/w5-a-doctor/evidence.md` |
+| Gate                                | Result                                               | Evidence      |
+| ----------------------------------- | ---------------------------------------------------- | ------------- |
+| Focused discriminating pre-fix test | EXPECTED RED (exit 1; 2 pass / 1 fail)               | `evidence.md` |
+| Focused doctor + export-map tests   | PASS (exit 0; 14 pass / 0 fail)                      | `evidence.md` |
+| Scoped CLI check                    | PASS (exit 0; 876 files / 8 batches / 0 diagnostics) | `evidence.md` |
+| Repository test                     | PASS (exit 0; 3,382 pass / 0 fail / 17 ignored)      | `evidence.md` |
+| Repository lint                     | PASS (exit 0; 2,034 files / 0 findings)              | `evidence.md` |
+| Repository format check             | PASS (exit 0; 2,034 files / 0 findings)              | `evidence.md` |
+| Package quality gate                | PASS (exit 0; no blocking findings; doctrine FAIL=0) | `evidence.md` |
+| `scaffold.plugins`                  | PASS (exit 0; 17 pass / 0 fail / 0 skip)             | `evidence.md` |
+| Separate-session IMPL-EVAL          | PASS against `41ef373ab`                             | `evaluate.md` |
 
-All owner-required implementation gates are green. IMPL-EVAL remains pending.
+All owner-required implementation gates and the separate-session IMPL-EVAL are green.
 
 ## Handoff Notes
 
-- Evaluator should inspect exact-status discrimination, the published negative fixture, 503
-  behavior, and confirm #1597 files are unchanged.
+- Owner retains merge and release authority. Do not publish, cut, tag, or merge from this run.
