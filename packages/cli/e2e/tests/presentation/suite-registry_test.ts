@@ -209,35 +209,19 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
     runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_STREAMS_PRODUCER_RECONNECT),
     true,
   );
-  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_STREAM_CONSUMER), false);
-  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), false);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_STREAM_CONSUMER), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TASK_TRACES), true);
 });
 
-Deno.test('runtime suites pin the exact #1398 OTEL deferral without widening it', () => {
-  assertEquals(SCAFFOLD_RUNTIME_DEFERRED_GATES, [
-    {
-      id: GATE.BEHAVIOR_OTEL_STREAM_CONSUMER,
-      issue: '#1398',
-      reason: 'workers-combined does not install the stream mutation hook',
-    },
-    {
-      id: GATE.BEHAVIOR_OTEL_TRACES,
-      issue: '#1398',
-      reason: 'TC-14 requires the deferred Flow-B stream-consumer record',
-    },
-  ]);
+Deno.test('runtime suites execute the formerly deferred #1398 OTEL gates', () => {
+  assertEquals(SCAFFOLD_RUNTIME_DEFERRED_GATES, []);
 
   for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
     const suite = resolveSuite(suiteId);
     assertEquals(suite.deferredGates, SCAFFOLD_RUNTIME_DEFERRED_GATES, suiteId);
-    assertEquals(
-      suite.gates.some((gate) =>
-        SCAFFOLD_RUNTIME_DEFERRED_GATES.some((deferred) => deferred.id === gate.id)
-      ),
-      false,
-      `${suiteId} must not execute a deferred gate`,
-    );
+    assertEquals(suite.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_STREAM_CONSUMER), true);
+    assertEquals(suite.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), true);
   }
 });
 

@@ -29,7 +29,7 @@ import {
   scaffoldCapabilitySuites,
 } from '../../../suites/scaffold/capability-suites.ts';
 
-Deno.test('suite runner reports every #1398 deferral as an explicit skipped step', async () => {
+Deno.test('suite runner reports no skipped steps after the #1398 deferrals are removed', async () => {
   const runtime = createScaffoldRuntimeSuite({
     repoRoot: '.',
     projectName: 'runner-deferral-test',
@@ -47,29 +47,14 @@ Deno.test('suite runner reports every #1398 deferral as an explicit skipped step
     suiteLeaseManager: new RecordingSuiteLeaseManager(),
   }).run(suite, { suiteId: suite.id, options: suite.defaultOptions });
 
-  assertEquals(report.steps.map((step) => step.id), [
-    GATE.BEHAVIOR_OTEL_STREAM_CONSUMER,
-    GATE.BEHAVIOR_OTEL_TRACES,
-  ]);
-  assertEquals(report.steps.every((step) => step.verdict === 'skipped' && !step.critical), true);
-  assertEquals(report.summary, { passed: 0, failed: 0, skipped: 2 });
-  assertEquals(
-    report.steps.map((step) => step.evidence[0]),
-    SCAFFOLD_RUNTIME_DEFERRED_GATES.map((deferred) => ({
-      kind: 'summary' as const,
-      label: 'owned suite deferral',
-      data: {
-        status: 'deferred',
-        issue: deferred.issue,
-        reason: deferred.reason,
-      },
-    })),
-  );
+  assertEquals(SCAFFOLD_RUNTIME_DEFERRED_GATES, []);
+  assertEquals(report.steps, []);
+  assertEquals(report.summary, { passed: 0, failed: 0, skipped: 0 });
   assertEquals(
     reporter.events
       .filter((event) => event.type === 'gate-start')
-      .map((event) => event.title.startsWith('DEFERRED #1398:')),
-    [true, true],
+      .map((event) => event.title),
+    [],
   );
 });
 
