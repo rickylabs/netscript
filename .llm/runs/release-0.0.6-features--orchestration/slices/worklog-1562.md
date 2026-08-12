@@ -155,3 +155,42 @@ caller supplies an override, and assert explicit `billing.dashboard` plus fixed 
 identities without exposing `private-tenant`. The SDK task passes all 55 tests and scoped check has
 no findings. No Fresh-owned path or partial-request behavior changed, and `deno.lock` has no Git
 delta.
+
+## S5 — durable/Aspire proof and closeout
+
+- A real `KvCacheStore` run forced the shared provider to `deno-kv` and executed cold then warm
+  reads for `runtime.cache-proof`. The loader ran once across two navigations.
+- A standalone Aspire Dashboard received the Deno-native OTLP export. Cold trace
+  `f08d30e7b9b5b3244a939a6611ca13e0` contains `defer.cache.read` parent
+  `41606eb1a5298ae1` and one `cache.read` child `8cdc1bf6d2be463a`; the child reports durable miss,
+  `backend_executed=true`, and ordered lookup/write events. Warm trace
+  `6fec150fb1a0b10de09ffa0b80afd386` contains parent `4c8d0167b3bb0775` and one cache child
+  `80d5fdb806a5f0b9`; the child reports durable hit, age/TTL, one lookup event, and
+  `backend_executed=false`.
+- Each ordinary read added exactly one cache span. Applied to the issue's 41-span consumer evidence,
+  the chosen shape is 42 spans regardless of tier count. The original consumer application was not
+  available in this worktree, so its complete 41-span navigation was not replayed.
+- The exact standalone dashboard session was stopped, its temporary SQLite/script artifacts were
+  removed, and `agentic:leak-check` reported both probes `ok` with `survivors: []`.
+
+### S5 final gate evidence
+
+| Gate                            | Result                                                                          |
+| ------------------------------- | ------------------------------------------------------------------------------- |
+| SDK+telemetry scoped check      | exit 0; 184 files, 2 batches, 0 findings                                        |
+| SDK+telemetry scoped lint       | exit 0; 184 files, 0 findings                                                   |
+| SDK+telemetry scoped format     | exit 0; 184 files, 0 findings                                                   |
+| SDK package test task           | exit 0; 56 passed, 0 failed                                                     |
+| telemetry package test task     | exit 0; 54 passed, 0 failed                                                     |
+| `quality:gate`                  | exit 0; quality scan clean, doctrine FAIL=0; repository warning baseline remains |
+| SDK publish dry-run             | exit 0                                                                          |
+| telemetry publish dry-run       | exit 0; existing dynamic-import warning retained                               |
+| SDK full-export doc lint        | 2 existing TanStack `QueryClient` private-type refs; no cache diagnostics       |
+| telemetry full-export doc lint  | exit 0                                                                          |
+
+### S5 reconcile
+
+No Fresh-owned path was touched, and partial-request behavior was not conditioned or suppressed.
+No dependency or module-local mutable singleton was added; `deno.lock` has no Git delta. PR #1605
+remains draft. Separate-session IMPL-EVAL is pending and was not launched by this implementation
+session.

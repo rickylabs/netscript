@@ -12,7 +12,7 @@ import {
   withSpan as withTelemetrySpan,
 } from '@netscript/telemetry/tracer';
 import { withContextAsync } from '@netscript/telemetry/context';
-import { context, trace } from 'npm:@opentelemetry/api@^1.9.0';
+import { context, trace } from 'npm:@opentelemetry/api@^1.9.1';
 import { AsyncLocalStorageContextManager } from 'npm:@opentelemetry/context-async-hooks@^2.9.0';
 import {
   BasicTracerProvider,
@@ -234,6 +234,42 @@ Deno.test('cache telemetry measures backend entry when the loader throws', async
   assertEquals(span.exceptions.length, 1);
 });
 
+Deno.test('cache telemetry rejects incomplete or unbounded provider evidence', async () => {
+  class UnboundedStore extends MemoryCacheStore {
+    override get<T>(_key: CacheKey): Promise<CacheStoreEntry<T>> {
+      return Promise.resolve({
+        value: null,
+        report: {
+          lookups: [
+            { system: 'memory', tier: 'l1', lookupIndex: 0, outcome: 'miss' },
+            { system: 'redis', tier: 'l2', lookupIndex: 1, outcome: 'miss' },
+            { system: 'deno-kv', tier: 'durable', lookupIndex: 2, outcome: 'miss' },
+            { system: 'duplicate', tier: 'l1', lookupIndex: 3, outcome: 'miss' },
+          ],
+          promotions: [],
+          topologyComplete: true,
+        },
+      });
+    }
+  }
+  const { cache, telemetry } = makeCache(new UnboundedStore());
+
+  await assertRejects(
+    () =>
+      cache.query(['orders'], {
+        operationId: 'orders.list',
+        queryFn: () => Promise.resolve('unexpected'),
+      }),
+    TypeError,
+    'missing or invalid topology evidence',
+  );
+
+  const span = telemetry.spans[0];
+  assertEquals(span.attributes[CacheAttributes.OUTCOME], CacheOutcomes.ERROR);
+  assertEquals(span.attributes[CacheAttributes.TOPOLOGY_COMPLETE], false);
+  assertEquals(span.attributes[CacheAttributes.BACKEND_EXECUTED], false);
+});
+
 Deno.test('cache telemetry distinguishes a tier promotion and write-through', async () => {
   class PromotingStore extends MemoryCacheStore {
     override readonly descriptor: CacheProviderDescriptor = { system: 'hybrid', tier: 'l1' };
@@ -280,7 +316,7 @@ Deno.test('cache telemetry distinguishes invalidation from read and write operat
   assertEquals(telemetry.spans.length, 1);
   const span = telemetry.spans[0];
   assertEquals(span.name, CacheOperations.INVALIDATE);
-  assertEquals(span.attributes[CacheAttributes.NAMESPACE], 'cache.invalidate-prefix');
+  assertEquals(span.attributes[CacheAttributes.NAMESPACE], 'cache.invalidate.prefix');
   assertEquals(findEvent(span, CacheEvents.INVALIDATE).attributes[CacheAttributes.TIER], 'l1');
   assertEquals(span.events.filter((event) => event.name === CacheEvents.INVALIDATE).length, 1);
   assertEquals(span.attributes[CacheAttributes.BACKEND_EXECUTED], false);
@@ -330,6 +366,7 @@ Deno.test('cache namespaces are bounded normalized operation identities', () => 
   assertEquals(bounded.length, CACHE_NAMESPACE_MAX_LENGTH);
   assert(/^[a-z0-9.]+$/.test(bounded));
   assertEquals(normalizeCacheNamespace(undefined), 'direct');
+  assertEquals(normalizeCacheNamespace(undefined, ' Composite View '), 'composite.view');
 });
 
 Deno.test('registered custom providers cannot bypass the telemetry boundary', async () => {

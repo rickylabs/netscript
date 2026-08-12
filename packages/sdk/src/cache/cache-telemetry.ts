@@ -24,6 +24,7 @@ import type {
 
 /** Maximum length of a cache operation namespace. */
 export const CACHE_NAMESPACE_MAX_LENGTH = 80 as const;
+const CACHE_SYSTEM_MAX_LENGTH = 64;
 
 /** Span attributes accepted by the SDK cache telemetry seam. */
 export type CacheSpanAttributes = Readonly<
@@ -75,15 +76,16 @@ const MAX_CACHE_TIERS = VALID_TIERS.size;
 
 /** Normalize a caller-supplied operation identity to bounded cache namespace syntax. */
 export function normalizeCacheNamespace(value: string | undefined, fallback = 'direct'): string {
-  const normalized = (value ?? '')
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]+/g, '.')
-    .replace(/[._-]+/g, '.')
-    .replace(/^\.+|\.+$/g, '')
-    .slice(0, CACHE_NAMESPACE_MAX_LENGTH)
-    .replace(/\.+$/g, '');
-  return normalized || fallback;
+  const normalize = (candidate: string): string =>
+    candidate
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9._-]+/g, '.')
+      .replace(/[._-]+/g, '.')
+      .replace(/^\.+|\.+$/g, '')
+      .slice(0, CACHE_NAMESPACE_MAX_LENGTH)
+      .replace(/\.+$/g, '');
+  return normalize(value ?? '') || normalize(fallback) || 'direct';
 }
 
 /** Create the standard OpenTelemetry-backed cache collaborator. */
@@ -145,7 +147,10 @@ export function recordCacheExecutionState(
 }
 
 function validateDescriptor(descriptor: CacheProviderDescriptor): void {
-  if (!SYSTEM_PATTERN.test(descriptor.system) || !VALID_TIERS.has(descriptor.tier)) {
+  if (
+    descriptor.system.length > CACHE_SYSTEM_MAX_LENGTH ||
+    !SYSTEM_PATTERN.test(descriptor.system) || !VALID_TIERS.has(descriptor.tier)
+  ) {
     throw new TypeError('Cache provider reports must use a stable system id and bounded tier');
   }
 }
