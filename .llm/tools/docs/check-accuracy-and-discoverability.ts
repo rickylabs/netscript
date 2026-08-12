@@ -20,6 +20,19 @@ function forbidText(text: string, needle: string, location: string): void {
   }
 }
 
+export const FORBIDDEN_GOLDEN_PATH_TERMS: readonly string[] = [
+  'lib/api-clients.ts',
+  '@contracts',
+  '@/lib/',
+];
+
+/** Apply the golden-path vocabulary policy to one source or shipped-corpus document. */
+export function checkForbiddenGoldenPathTerms(text: string, location: string): void {
+  for (const forbidden of FORBIDDEN_GOLDEN_PATH_TERMS) {
+    forbidText(text, forbidden, location);
+  }
+}
+
 export const ALLOWED_FRESH_ROOT_SYMBOLS: Set<string> = new Set([
   'CachedListEntryLike',
   'CacheEntryLike',
@@ -145,9 +158,7 @@ export async function checkGoldenPathDocs(
   await walk(dirPath);
   const queryUtilsPages: string[] = [];
   for (const page of pages) {
-    for (const forbidden of ['lib/api-clients.ts', '@contracts', '@/lib/']) {
-      forbidText(page.content, forbidden, page.path);
-    }
+    checkForbiddenGoldenPathTerms(page.content, page.path);
     if (/apps\/[^/\s`]+\/client\.ts/.test(page.content)) {
       throw new Error(`${page.path}: apps/<app>/client.ts is the CSS entry, not a data client`);
     }
@@ -269,6 +280,10 @@ export async function runAccuracyCheck(): Promise<void> {
     commandReferenceSources,
   );
   const goldenPathDocs = await checkGoldenPathDocs();
+  const shippedCorpus = await readShippedAgentDocsCorpus();
+  for (const [path, content] of Object.entries(shippedCorpus.files)) {
+    checkForbiddenGoldenPathTerms(content, `.llm/assets/agent-docs/prose.json.gz:${path}`);
+  }
   checkMutationMapColumns(cliReference);
 
   const checkedFreshRootImports = await checkFreshRootImports('docs');
@@ -286,8 +301,25 @@ export async function runAccuracyCheck(): Promise<void> {
   }
 
   console.log(
-    `docs accuracy: PASS (${publicDocs.length} saga pages checked for stale claims, ${goldenPathDocs.pageCount} published source pages, one query dialect exception page, mutation-map columns, ${commandReference.documentedCount}/${commandReference.auditedCount} root/direct public commands from ${commandReference.recursiveCount} recursive paths, ${checkedFreshRootImports} valid @netscript/fresh root imports checked)`,
+    `docs accuracy: PASS (${publicDocs.length} saga pages checked for stale claims, ${goldenPathDocs.pageCount} published source pages, ${
+      Object.keys(shippedCorpus.files).length
+    } shipped corpus files, one query dialect exception page, mutation-map columns, ${commandReference.documentedCount}/${commandReference.auditedCount} root/direct public commands from ${commandReference.recursiveCount} recursive paths, ${checkedFreshRootImports} valid @netscript/fresh root imports checked)`,
   );
+}
+
+async function readShippedAgentDocsCorpus(): Promise<{
+  readonly schemaVersion: 1;
+  readonly files: Readonly<Record<string, string>>;
+}> {
+  const compressed = await Deno.readFile(
+    new URL('.llm/assets/agent-docs/prose.json.gz', root),
+  );
+  const copied = new Uint8Array(compressed.byteLength);
+  copied.set(compressed);
+  const stream = new Blob([copied.buffer]).stream().pipeThrough(
+    new DecompressionStream('gzip'),
+  );
+  return JSON.parse(await new Response(stream).text());
 }
 
 /** Materialize the live public CLI registry through its recursive catalog adapter. */

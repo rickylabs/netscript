@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "version": "0.0.5",
-  "sourceCommit": "eda49bb2e",
-  "extractionTimestamp": "2026-08-09T10:03:43Z",
+  "sourceCommit": "657b3b9d6",
+  "extractionTimestamp": "2026-08-12T20:31:25.357Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -100,6 +100,10 @@
     "pages/reference/plugin-ai/index.md",
     "pages/reference/plugin-auth-core/index.md",
     "pages/reference/plugin-auth/index.md",
+    "pages/reference/plugin-sagas-core/index.md",
+    "pages/reference/plugin-streams-core/index.md",
+    "pages/reference/plugin-triggers-core/index.md",
+    "pages/reference/plugin-workers-core/index.md",
     "pages/reference/plugin/index.md",
     "pages/reference/prisma-adapter-mysql/index.md",
     "pages/reference/queue/index.md",
@@ -179,7 +183,7 @@
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 4685958,
-  "compressedBytes": 1332192,
-  "sha256": "e752fb07a5598a2755f7962c5e4860b1fb27d00120ce5aff32148943e95ab30e"
+  "uncompressedBytes": 4720171,
+  "compressedBytes": 1352791,
+  "sha256": "fc121f9c0bb737e3776d64c03f6d940d7a5e1b14d5e35100c9923a3602a10da3"
 }
