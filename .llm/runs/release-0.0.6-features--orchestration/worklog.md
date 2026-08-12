@@ -1490,3 +1490,61 @@ has not landed yet, which is consistent.
 Armed `codex-watch --mode turn` on the thread. Next: on turn completion, review the slice, drive
 commit/push, automatic IMPL-EVAL, green CI, merge — then **Canary.4 exactly once** from validated
 current main, with pinned production E2E proven.
+
+## 2026-08-12 — #1227 MERGED (`fc312f211`); Canary.4 dispatched, run `31612170240`
+
+IMPL-EVAL **PASS** (`31610825898`). Seven-check pre-merge gate all PASS with `pending 0, cancelled 0,
+failing 0` — the first PR this session to reach merge **without a stale-close-gate detour**. #1227
+carries no post-merge-only box, so `Closes` was correct here, unlike #1571/#1580.
+
+**Validated exact main `fc312f211` before cutting:**
+
+| Check | Result |
+| --- | --- |
+| root lock plugin-vite entries | 3 |
+| fresh-ui private lock entries | 1 |
+| root `deno ci --prod` (frozen) | **PASS** |
+| `packages/fresh-ui` frozen check | **`failedBatches: 0`** |
+| `publish:readiness` | **`ok: true`** |
+| tree | clean |
+
+**Race check:** last two `release-canary.yml` runs are my own `31605906943` and `31600415045`, both
+terminal. Tags confirm `canary.1/2/3` → **canary.4 is the correct N.**
+
+### Canary.4 — dispatched exactly once
+
+| Field | Value |
+| --- | --- |
+| Run | **`31612170240`** |
+| Head | **`fc312f2116f9b463e5a049b5e70d8152e448463c`** |
+| Target | `0.0.6` (workflow derives `-canary.4`) |
+| Created | 2026-08-12T15:24:59Z |
+
+**What changed since canary.3 — the reason to expect a different outcome.** Canary.3 published
+cleanly and failed only on the pinned production E2E, at `quickstart.4-aspire-restore-start`: a
+single unguarded 180 s NuGet restore, externally terminated → exit 6. #1227 now routes that path
+through the centralized `CommandGateRetryPolicy` with `classes: ['timeout','canceled']` and
+`maxRetries: 2`, and the wrapper surfaces classifiable exits so the retry can see them. The secondary
+PGDATA cascade is gone too — an absent-state teardown now reports an explicit `skipped` verdict via
+the new `CommandGateSkipPolicy` instead of failing on a missing path.
+
+So the specific failure mode is addressed rather than re-rolled. **This is not a rerun of canary.3.**
+
+### Supervision — same discipline as canary.3
+
+- **Steps 12 and 13 read separately**; step 12's invalid-token failures are **not** registry outcomes.
+- **Step 14 `SKIPPED`** = no partial-publish path entered.
+- **Member completeness verified myself** via `jsr.io/<pkg>/…_meta.json`, enumerated from workspace
+  globs — expecting **35/37**, i.e. **35/35 effective** (`bench` and `cli-e2e` are excluded
+  non-publishable members). "35/37" must not be read as two missing.
+- **If interrupted mid-publish, `git status` first** — #1573 landed tree-safety for interrupted
+  publish, but #1540's class is worth confirming rather than assuming.
+- **A failed canary is not an incident:** preserve tag and members, fix forward, mint canary.5. **No
+  yank.**
+
+**`v0.0.6-canary.3` remains preserved** — published, 35/35, tag intact, not yanked. **#1571 stays
+open**; its box 5 needs a terminal-green canary.
+
+**The note will be measured at `fc312f211`**, not copied from canary.3: this payload includes #1541's
+docs changes and the rewritten `packages/sdk/README.md` JSR landing page, plus #1573, #1582 and the
+two lock repairs.
