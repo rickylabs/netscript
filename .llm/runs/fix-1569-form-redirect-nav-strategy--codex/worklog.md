@@ -55,6 +55,10 @@ browser contract tests.
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-12 | bootstrap | research/design | Re-baselined mechanism; recorded actual Preact vs Fresh SSR behavior. |
+| 2026-08-12 | 1 | red | Named SSR contract failed because `strategy` leaked to markup instead of resolving to `f-client-nav="false"`. |
+| 2026-08-12 | 1 | implement | Added public navigation vocabulary, one resolver seam, Form integration, compatibility bridge, docs, and browser fixture. |
+| 2026-08-12 | 1 | browser mutation | Mapping `document` to `true` made the browser test fail after 30s with actual `true`, expected `false`; restored the resolver. |
+| 2026-08-12 | 1 | green | All requested gates passed; real Fresh/Vite/Chromium test passed with inherited body client navigation. |
 
 ## Decisions
 
@@ -76,27 +80,64 @@ browser contract tests.
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| Requested gates | pending | NOT_RUN | Implementation not started. |
+| Check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh --ext ts,tsx` | PASS | 192 files; 2 batches; 0 findings. |
+| Lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh --ext ts,tsx` | PASS | 192 files; 0 findings. Initial `no-unsafe-finally` finding in the new browser cleanup was fixed before the final run. |
+| Format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh --ext ts,tsx` | PASS | 192 files; 0 findings. |
+| Package tests | `deno task --cwd packages/fresh test --reporter=dot` | PASS | `ok | 231 passed | 0 failed (31s)` |
+| Quality gate | `deno task quality:gate` | PASS | Exit 0. Existing warnings remain in untouched code, including forbidden sibling-owned Fresh paths. |
+| Publish dry run | `deno task --cwd packages/fresh publish:dry-run` | PASS | `Success Dry run complete` |
+| Documentation lint | `deno task doc:lint --root packages/fresh --pretty` | BASELINE PASS | Wrapper exits 0; form entrypoint has 0 findings. Package baseline is 44 findings in route/query/streams, outside this slice. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Archetype 4 set | NOT_RUN | pending | Explicit target quality scan required because root arch coverage is not the package verdict requested by the owner. |
+| Explicit Fresh target quality scan | PASS | `deno task quality:scan --root packages/fresh/src --pretty` | `ok: true`, `findings: []`; one existing allowance in `application/builders/**`, which this slice did not touch. This is the package verdict; root `arch:check` alone is not. |
+| Public-surface publish simulation | PASS | package `publish:dry-run` | Public form entrypoint and package export graph check successfully. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Real-browser form redirect | NOT_RUN | pending | Must use Fresh runtime under ancestor opt-in. |
+| Real-browser form redirect | PASS | `deno task --cwd packages/fresh test:browser --fail-fast` | `browser: document form redirect beats inherited body client nav without runtime errors ... ok (26s)`; zero captured page/runtime errors. |
+| Browser mutation sensitivity | RED as expected | same test with resolver temporarily mapped to `true` | Failed after 30s: actual `true`, expected `false`; implementation restored and green rerun completed. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| `@netscript/fresh/form` | NOT_RUN | pending | SSR and type contract tests planned. |
+| `@netscript/fresh/form` | PASS | named SSR/resolver/collection tests plus package check/publish dry run | Default emits no local override; document emits literal `false`; public types export cleanly. |
+
+## Named Test Evidence
+
+- `Form document navigation strategy renders the literal Fresh opt-out`
+- `Form default navigation strategy preserves inherited client navigation`
+- `resolveFormNavigationProps maps typed client and document strategies`
+- `applyCollectionStrategy accepts the shared document navigation policy`
+- `browser: document form redirect beats inherited body client nav without runtime errors`
+
+Focused document red (before implementation):
+
+```text
+Form document navigation strategy renders the literal Fresh opt-out ... FAILED (8ms)
+AssertionError: Expected document strategy to render the literal Fresh opt-out in <form ... strategy="[object Object]">...
+FAILED | 0 passed | 1 failed | 56 filtered out (2s)
+error: Test failed
+```
+
+Browser mutation red:
+
+```text
+browser: document form redirect beats inherited body client nav without runtime errors ... FAILED (30s)
+AssertionError: Values are not equal.
+-   true
++   false
+FAILED | 0 passed | 1 failed (30s)
+error: Test failed
+```
 
 ## Handoff Notes
 
 - Automatic evaluation is required later and is orchestrator-owned; this session will not launch it.
-
+- PR `#1600` remains draft with `status:impl`; no ready-state, merge, canary, OpenHands, or local
+  evaluator action was taken.

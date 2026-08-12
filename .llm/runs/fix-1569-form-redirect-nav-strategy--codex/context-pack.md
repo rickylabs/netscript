@@ -6,13 +6,14 @@
 | --- | --- |
 | Run ID | `fix-1569-form-redirect-nav-strategy--codex` |
 | Branch | `fix/1569-form-redirect-nav-strategy` |
-| Current phase | `plan` |
+| Current phase | `impl complete; automatic evaluation pending` |
 | Archetype | `4 - Public DSL / Builder` |
 | Scope overlays | `frontend` |
 
 ## Current State
 
-Clean baseline is verified. Research and design are locked; implementation has not started.
+Implementation and all owner-requested gates are complete. Draft PR `#1600` is ready for the
+automatic label-driven evaluation lifecycle; it remains intentionally draft at `status:impl`.
 
 ## Completed
 
@@ -21,17 +22,22 @@ Clean baseline is verified. Research and design are locked; implementation has n
 - Verified plain Preact omits boolean false while real Fresh SSR emits the literal string false.
 - Located Fresh client lookup at `@fresh/core@2.3.3/src/runtime/client/partials.ts:41-45`.
 - Selected public `{ navigation: 'client' | 'document' }` strategy.
+- Added the public strategy, resolver, managed Form integration, compatibility bridge, and docs.
+- Added SSR/resolver/collection coverage and a real Fresh/Vite/Chromium browser test.
+- Proved validation errors preserve the page-global sentinel under inherited client navigation.
+- Proved successful document-strategy POST redirects replace the document without reviver errors.
+- Passed check, lint, format, 231 package tests, browser test, quality gate, explicit Fresh target
+  scan, publish dry run, and the repository doc-lint wrapper.
 
 ## In Progress
 
-- Bootstrap commit and draft PR creation.
+- Automatic label-driven evaluation, owned by the orchestrator.
 
 ## Next Steps
 
-1. Commit/push bootstrap and open the draft PR.
-2. Add named failing SSR/state/browser tests and capture red output.
-3. Implement the public strategy and documentation.
-4. Run every required gate and update PR/run evidence.
+1. Commit and push the implementation slice.
+2. Update PR `#1600` body and post the single `[PHASE: IMPL]` evidence comment.
+3. Leave the draft PR for automatic evaluation; do not launch an evaluator locally.
 
 ## Key Decisions
 
@@ -45,27 +51,33 @@ Clean baseline is verified. Research and design are locked; implementation has n
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/fix-1569-form-redirect-nav-strategy--codex/*` | new | Harness bootstrap artifacts. |
+| `packages/fresh/src/application/form/**` | modified | Public strategy, resolver, Form integration, docs, tests. |
+| `packages/fresh/tests/form-navigation_browser.ts` | new | Real-browser contract test. |
+| `packages/fresh/tests/fixtures/form-navigation-browser/**` | new | Fresh/Vite fixture with inherited body client navigation. |
+| `packages/fresh/deno.json` | modified | Explicit browser-test task. |
+| `.llm/runs/fix-1569-form-redirect-nav-strategy--codex/*` | modified | Harness evidence and handoff. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | not run | implementation pending |
-| Fitness | not run | implementation pending |
-| Runtime/browser | not run | implementation pending |
-| Consumer | not run | implementation pending |
+| Static | pass | 192-file check/lint/fmt; package tests 231/231 |
+| Fitness | pass | quality gate exit 0; explicit Fresh scan has no findings |
+| Runtime/browser | pass | real Fresh/Vite/Chromium: 1 passed, 0 failed |
+| Consumer | pass | named SSR contracts, exported type check, publish dry run |
 
 ## Open Questions
 
-- None that force implementation rework.
+- Separate-session automatic evaluation has not yet run; owner explicitly reserves it to the
+  orchestrator.
 
 ## Drift and Debt
 
 - Drift: actual Fresh SSR makes boolean false sufficient; issue wording was plain-Preact-specific.
 - Debt: none created.
+- Baseline: doc lint reports 44 existing package findings, but the form entrypoint reports zero.
 
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments.
-
+- `a7d470509` — harness bootstrap.
