@@ -15,6 +15,7 @@ import {
   toVersion,
   verifyGreenCanaryPair,
 } from './github-release.ts';
+import { discoverPreparedReleaseFiles } from './prepare-release.ts';
 
 Deno.test('toVersion strips a single leading v; toTag re-adds it', () => {
   assertEquals(toVersion('v0.0.1-alpha.20'), '0.0.1-alpha.20');
@@ -47,6 +48,50 @@ Deno.test('version-only diff accepts the complete release version surface only',
   );
 });
 
+Deno.test('version-only diff accepts a realistic coordinated release cut and rejects source drift', async () => {
+  const root = await Deno.makeTempDir({ prefix: 'netscript-release-files-' });
+  try {
+    await Deno.mkdir(`${root}/packages/a`, { recursive: true });
+    await Deno.mkdir(`${root}/plugins/workers`, { recursive: true });
+    await Deno.writeTextFile(
+      `${root}/deno.json`,
+      JSON.stringify({ version: '1.0.0', workspace: ['packages/*', 'plugins/*'] }),
+    );
+    await Deno.writeTextFile(`${root}/deno.lock`, '{}');
+    await Deno.writeTextFile(`${root}/packages/a/deno.json`, '{"version":"1.0.0"}');
+    await Deno.writeTextFile(`${root}/plugins/workers/deno.json`, '{"version":"1.0.0"}');
+    await Deno.writeTextFile(
+      `${root}/plugins/workers/scaffold.plugin.json`,
+      '{"version":"1.0.0"}',
+    );
+
+    const releaseFiles = await discoverPreparedReleaseFiles(root);
+    const changedFiles = releaseFiles.map((path) => path.slice(`${root}/`.length));
+
+    for (
+      const expected of [
+        'deno.json',
+        'deno.lock',
+        'packages/a/deno.json',
+        '.llm/assets/agent-docs/prose.json.gz',
+        '.llm/assets/agent-docs/provenance.json',
+        'packages/cli/src/kernel/assets/agent-tools.generated.ts',
+        'packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts',
+        'plugins/workers/scaffold.plugin.json',
+      ]
+    ) {
+      assertEquals(changedFiles.includes(expected), true, `missing writer output ${expected}`);
+    }
+    assertEquals(isVersionOnlyReleaseDiff(root, changedFiles, releaseFiles), true);
+    assertEquals(
+      isVersionOnlyReleaseDiff(root, [...changedFiles, 'packages/a/mod.ts'], releaseFiles),
+      false,
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
 Deno.test('green canary pair accepts current SHA or a version-only immediate parent', async () => {
   const request = (
     _method: string,
@@ -64,7 +109,7 @@ Deno.test('green canary pair accepts current SHA or a version-only immediate par
     });
   const base = {
     changedFiles: () => Promise.resolve(['deno.json']),
-    versionFiles: () => Promise.resolve(['/repo/deno.json']),
+    releaseFiles: () => Promise.resolve(['/repo/deno.json']),
     fileAtRevision: (_root: string, revision: string) =>
       Promise.resolve(revision === 'content-sha' ? '{"version":"1"}\n' : '{"version":"2"}\n'),
     request,
@@ -87,6 +132,87 @@ Deno.test('green canary pair accepts current SHA or a version-only immediate par
   );
 });
 
+Deno.test('parent canary evidence checks every release path and reproduces derived writer outputs', async () => {
+  const changedFiles = [
+    'deno.json',
+    'deno.lock',
+    '.llm/assets/agent-docs/prose.json.gz',
+    'packages/cli/src/kernel/assets/agent-tools.generated.ts',
+    'plugins/workers/scaffold.plugin.json',
+  ];
+  let generatedChecks = 0;
+  const result = await verifyGreenCanaryPair('owner/repo', 'token', '/repo', {
+    revParse: (_root, revision) =>
+      Promise.resolve(revision === 'HEAD' ? 'stable-sha' : 'canary-content-sha'),
+    changedFiles: () => Promise.resolve(changedFiles),
+    releaseFiles: () => Promise.resolve(changedFiles.map((path) => `/repo/${path}`)),
+    fileAtRevision: (_root, revision, path) => {
+      if (path === 'deno.json') {
+        return Promise.resolve(
+          revision === 'canary-content-sha'
+            ? '{"version":"1.0.0-canary.1"}'
+            : '{"version":"1.0.0"}',
+        );
+      }
+      if (path.endsWith('.gz') || path.endsWith('.generated.ts')) {
+        return Promise.resolve(`${revision}:${path}:derived-by-writer`);
+      }
+      return Promise.resolve(
+        revision === 'canary-content-sha'
+          ? 'jsr:@netscript/a@1.0.0-canary.1'
+          : 'jsr:@netscript/a@1.0.0',
+      );
+    },
+    generatedOutputsFresh: () => {
+      generatedChecks += 1;
+      return Promise.resolve();
+    },
+    request: (_method, path) =>
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        body: {
+          statuses: path.includes('canary-content-sha')
+            ? [{ context: CANARY_PAIR_STATUS_CONTEXT, state: 'success' }]
+            : [],
+        },
+      }),
+  });
+
+  assertEquals(result, 'canary-content-sha');
+  assertEquals(generatedChecks, 1);
+});
+
+Deno.test('parent canary evidence fails when derived writer outputs cannot be reproduced', async () => {
+  await assertRejects(
+    () =>
+      verifyGreenCanaryPair('owner/repo', 'token', '/repo', {
+        revParse: (_root, revision) =>
+          Promise.resolve(revision === 'HEAD' ? 'stable-sha' : 'canary-content-sha'),
+        changedFiles: () => Promise.resolve(['deno.json', '.llm/assets/agent-docs/prose.json.gz']),
+        releaseFiles: () =>
+          Promise.resolve([
+            '/repo/deno.json',
+            '/repo/.llm/assets/agent-docs/prose.json.gz',
+          ]),
+        fileAtRevision: (_root, revision, path) => {
+          if (path === 'deno.json') {
+            return Promise.resolve(
+              revision === 'canary-content-sha'
+                ? '{"version":"1.0.0-canary.1"}'
+                : '{"version":"1.0.0"}',
+            );
+          }
+          return Promise.resolve(`${revision}:not-reproducible`);
+        },
+        generatedOutputsFresh: () => Promise.reject(new Error('writer output is stale')),
+        request: () => Promise.resolve({ status: 200, ok: true, body: { statuses: [] } }),
+      }),
+    Error,
+    'writer output is stale',
+  );
+});
+
 Deno.test('canary pair gate fails closed for source drift and API failure', async () => {
   const noStatuses = () => Promise.resolve({ status: 200, ok: true, body: { statuses: [] } });
   await assertRejects(
@@ -94,7 +220,7 @@ Deno.test('canary pair gate fails closed for source drift and API failure', asyn
       verifyGreenCanaryPair('owner/repo', 'token', '/repo', {
         revParse: () => Promise.resolve('source-sha'),
         changedFiles: () => Promise.resolve(['packages/a/mod.ts']),
-        versionFiles: () => Promise.resolve(['/repo/deno.json']),
+        releaseFiles: () => Promise.resolve(['/repo/deno.json']),
         fileAtRevision: () => Promise.resolve('{"version":"1"}\n'),
         request: noStatuses,
       }),
@@ -106,7 +232,7 @@ Deno.test('canary pair gate fails closed for source drift and API failure', asyn
       verifyGreenCanaryPair('owner/repo', 'token', '/repo', {
         revParse: () => Promise.resolve('source-sha'),
         changedFiles: () => Promise.resolve(['deno.json']),
-        versionFiles: () => Promise.resolve(['/repo/deno.json']),
+        releaseFiles: () => Promise.resolve(['/repo/deno.json']),
         fileAtRevision: () => Promise.resolve('{"version":"1"}\n'),
         request: () => Promise.resolve({ status: 403, ok: false, body: { message: 'forbidden' } }),
       }),
@@ -122,7 +248,7 @@ Deno.test('parent canary evidence rejects seeded manifest drift inside a version
         revParse: (_root, revision) =>
           Promise.resolve(revision === 'HEAD' ? 'stable-sha' : 'content-sha'),
         changedFiles: () => Promise.resolve(['deno.json']),
-        versionFiles: () => Promise.resolve(['/repo/deno.json']),
+        releaseFiles: () => Promise.resolve(['/repo/deno.json']),
         fileAtRevision: (_root, revision) =>
           Promise.resolve(
             revision === 'content-sha'

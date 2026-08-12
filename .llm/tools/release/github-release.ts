@@ -40,7 +40,10 @@ import {
   type GitHubResponse,
   resolveGithubToken,
 } from '../agentic/lib/agentic-lib.ts';
-import { discoverVersionFiles } from '../deps/bump-version.ts';
+import {
+  discoverPreparedReleaseFiles,
+  PREPARED_RELEASE_GENERATED_OUTPUTS,
+} from './prepare-release.ts';
 
 const DEFAULT_REPO = 'rickylabs/netscript';
 export const CANARY_PAIR_STATUS_CONTEXT = 'release/canary-pair';
@@ -115,20 +118,22 @@ export function toTag(version: string): string {
 export interface CanaryPairDependencies {
   readonly revParse: (root: string, revision: string) => Promise<string>;
   readonly changedFiles: (root: string) => Promise<readonly string[]>;
-  readonly versionFiles: (root: string) => Promise<readonly string[]>;
+  readonly releaseFiles: (root: string) => Promise<readonly string[]>;
   readonly fileAtRevision: (root: string, revision: string, path: string) => Promise<string>;
+  readonly generatedOutputsFresh?: (root: string) => Promise<void>;
   readonly request: typeof githubRequest;
 }
 
 const defaultCanaryPairDependencies: CanaryPairDependencies = {
   revParse: runGitRevParse,
   changedFiles: runGitChangedFiles,
-  versionFiles: discoverVersionFiles,
+  releaseFiles: discoverPreparedReleaseFiles,
   fileAtRevision: runGitFileAtRevision,
+  generatedOutputsFresh: assertPreparedReleaseGeneratedOutputsFresh,
   request: githubRequest,
 };
 
-/** True only when the current commit changed release-version files and nothing else. */
+/** True only when the current commit changed writer-declared release files and nothing else. */
 export function isVersionOnlyReleaseDiff(
   root: string,
   changedFiles: readonly string[],
@@ -174,19 +179,30 @@ export async function verifyGreenCanaryPair(
   if (await hasGreenCanaryPair(repo, token, current, dependencies.request)) return current;
 
   const changed = await dependencies.changedFiles(root);
-  const versionFiles = await dependencies.versionFiles(root);
-  if (isVersionOnlyReleaseDiff(root, changed, versionFiles)) {
+  const releaseFiles = await dependencies.releaseFiles(root);
+  if (isVersionOnlyReleaseDiff(root, changed, releaseFiles)) {
     const parent = await dependencies.revParse(root, 'HEAD^');
     const parentRoot = await dependencies.fileAtRevision(root, parent, 'deno.json');
     const currentRoot = await dependencies.fileAtRevision(root, current, 'deno.json');
     const previousVersion = readManifestVersion(parentRoot, `${parent}:deno.json`);
     const nextVersion = readManifestVersion(currentRoot, `${current}:deno.json`);
+    const inexactGeneratedPaths: string[] = [];
     const exactReplacement = await everyAsync(changed, async (path) => {
       const before = await dependencies.fileAtRevision(root, parent, path);
       const after = await dependencies.fileAtRevision(root, current, path);
-      return isExactVersionReplacement(before, after, previousVersion, nextVersion);
+      if (isExactVersionReplacement(before, after, previousVersion, nextVersion)) return true;
+      if (isPreparedReleaseGeneratedOutput(path)) {
+        inexactGeneratedPaths.push(path);
+        return true;
+      }
+      return false;
     });
     if (exactReplacement) {
+      if (inexactGeneratedPaths.length > 0) {
+        const assertFresh = dependencies.generatedOutputsFresh ??
+          assertPreparedReleaseGeneratedOutputsFresh;
+        await assertFresh(root);
+      }
       if (await hasGreenCanaryPair(repo, token, parent, dependencies.request)) return parent;
       throw new Error(
         `Stable publication blocked: neither ${current} nor its exact version-only parent ${parent} ` +
@@ -205,6 +221,56 @@ export async function verifyGreenCanaryPair(
       'and the immediate parent cannot be used because the current commit contains non-version ' +
       'changes. Run a new canary pair for this exact content.',
   );
+}
+
+function isPreparedReleaseGeneratedOutput(path: string): boolean {
+  const normalized = normalizeGitPath(path);
+  return PREPARED_RELEASE_GENERATED_OUTPUTS.some(
+    (generatedPath) => normalizeGitPath(generatedPath) === normalized,
+  );
+}
+
+/**
+ * Derived gzip/base64/hash outputs cannot satisfy a plain-text replacement.
+ * Keep the byte check as the first rule, then reproduce all generator checks
+ * against a clean checkout so those explicit exceptions still match the same
+ * writers used by release:cut.
+ */
+async function assertPreparedReleaseGeneratedOutputsFresh(root: string): Promise<void> {
+  const dirty = await runGit(root, ['status', '--porcelain', '--untracked-files=no']);
+  if (dirty) {
+    throw new Error(
+      'Stable publication blocked: generated release outputs require a clean tracked worktree ' +
+        'before their writer-derived content can be verified.',
+    );
+  }
+  await runCheckedCommand(root, ['task', 'gen:publish-assets', '--check']);
+  await runCheckedCommand(root, ['task', 'check:mcp-export-corpus']);
+  await runCheckedCommand(root, [
+    'run',
+    '--no-lock',
+    '--allow-read',
+    '--allow-run=deno',
+    '.llm/tools/generate-cli-assets-barrel.ts',
+    '--check',
+  ]);
+}
+
+async function runCheckedCommand(root: string, args: readonly string[]): Promise<void> {
+  const result = await new Deno.Command('deno', {
+    args: [...args],
+    cwd: root,
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  if (!result.success) {
+    const stdout = new TextDecoder().decode(result.stdout).trim();
+    const stderr = new TextDecoder().decode(result.stderr).trim();
+    throw new Error(
+      `Stable publication blocked: deno ${args.join(' ')} did not reproduce the generated ` +
+        `release outputs.${stdout ? `\n${stdout}` : ''}${stderr ? `\n${stderr}` : ''}`,
+    );
+  }
 }
 
 async function hasGreenCanaryPair(
@@ -525,7 +591,6 @@ async function main(): Promise<void> {
   if (previous?.tag) {
     console.error(`[release:publish] previous release: ${previous.tag}`);
   }
-
   const whatsChanged = await generateWhatsChanged(plan.repo, token, tag, previous?.tag);
   const closed = previous?.since ? await fetchClosedIssues(plan.repo, token, previous.since) : [];
   console.error(`[release:publish] closed issues since previous release: ${closed.length}`);
