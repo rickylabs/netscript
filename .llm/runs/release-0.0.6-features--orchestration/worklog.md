@@ -208,3 +208,39 @@ requires the expensive `scaffold.runtime` gate to be confirmed un-contended befo
 **Note on tooling:** `slices/codex-thread-ids.md` is written per slice-dir and was **overwritten** by
 the second launch, so it now shows only the #1398 thread. The #1405 identity is preserved in this
 worklog above; nothing was lost, but the file is not an accumulating registry.
+
+## 2026-08-12 — #1405 MERGED (`8ff1bcb8f`)
+
+IMPL-EVAL returned **PASS** (DeepSeek V4 Flash 0731 max, fresh session, 642,836 ms, 5,226 events).
+Its per-fix revert isolation is the substantive result: reverting only the `#closing` change fails
+only the close-drain test; reverting only the `#failActive` change fails only the refusal tests.
+My earlier both-at-once revert proved the tests fire but **not** that each guards its own defect —
+that distinction is what acceptance box 4 actually asks for.
+
+**One evaluator suggestion declined, with reasons on the PR.** It proposed dropping the unreachable
+`?? 'producer-failed'` fallback (`create-durable-stream.ts:132,160`). The unreachability is correct,
+but the cleanup does not typecheck: `writeRejectionReason()` returns
+`StreamWriteRejectionReasonV1 | undefined`, so removing the `??` needs a non-null assertion — which
+the slice brief forbids — or a wider refactor. A total, type-safe expression is the better trade.
+Declining with a reason satisfies the review-thread gate; silently ignoring it would not.
+
+**The draft-CI trap fired exactly as the profile predicts.** Every check on #1528 read `skipping`
+while it was a draft. Under check 4 that is *unproven*, not clean — the #778/#775 failure mode where
+"clean" meant "nothing ran". Flipping to ready produced real runs, and the named expensive gates then
+reported genuine `SUCCESS`: `scaffold-runtime (aspire + docker + postgres)`,
+`scaffold-runtime-sqlite`, `scaffold-static`, `code-quality`, `quality`, `check-test`,
+`surface-diff`, `deps-report`, `close-gate`. Terminal after 440 s.
+
+The evidence mirror was **pre-flighted with `--dry-run` before labeling** and reported it would skip
+without `status:ready-merge`; applying the label let it tick all five #1405 acceptance boxes from the
+PR's fenced `acceptance-evidence` block rather than by hand.
+
+**Pre-merge gate:** `slices/pre-merge-gate-1528.md`, all seven checks PASS with named sources, plus
+`agentic:review-threads` → `PASS threads=0 unanswered=0`. Merged squash → `8ff1bcb8f`; #1405
+auto-closed `COMPLETED` by the body's closing keyword; `status:shipped` on both.
+
+**Caveat carried into the merge record rather than dropped:** `quality:gate`'s configured roots omit
+`packages/plugin-streams-core`, so this package's quality verdict rests on the explicit target scan
+(`findings=[]`, `allowCount=0`), not on the repo gate. CI `code-quality` passing is not by itself
+proof for this package. Repo gate-coverage gap, not a defect in the change — candidate for a
+follow-up issue at lane close.

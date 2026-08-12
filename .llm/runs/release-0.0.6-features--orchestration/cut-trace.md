@@ -16,7 +16,11 @@ owns the canary and the stable cut.
 
 | # | UTC | Merge commit on `origin/main` | PR | Issues closed | Pre-merge gate record |
 | --- | --- | --- | --- | --- | --- |
-| _(none yet)_ | | | | | |
+| 1 | 2026-08-12T08:20:29Z | `8ff1bcb8fc741db17a765a1965861828e0ae6171` (`8ff1bcb8f`) — `fix(streams): distinguish producer refusal reasons (#1528)` | #1528 | **#1405** (auto-closed `COMPLETED` by the body's `Closes #1405`) | `slices/pre-merge-gate-1528.md` — all 7 checks PASS |
+
+Row 1 captured from `git log origin/main --first-parent -1` **after** the merge, per the profile's
+merge-derived rule. Issue state re-read live: `CLOSED` / `COMPLETED`, `status:shipped` applied to
+both issue and PR.
 
 ## Re-planning events
 
