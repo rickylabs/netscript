@@ -1164,3 +1164,37 @@ completed/failure   59e435c5d   12:03:58Z
   branch. That is not a quirk of this workflow — it applies to any `getContent`/checkout-from-base pattern,
   and this lane paid one full ready-flip cycle to learn it.
 - **Lane state:** #1436, #1415, #1530, #1566 **closed**. Remaining: **#1403** (PR #1570), **#1380**, **#1549**.
+
+## D-36 — #1570's `fresh-ui-quality` red is a foreign defect (#1580); PR held immutable through the evaluator
+
+- **Severity:** minor for this lane, **p0 for the repo** (owned elsewhere)
+- **Recorded:** 2026-08-12, owner directive
+- **Directive:** #1570's `fresh-ui-quality` failure is proven unrelated to its tooling diff. New **p0 #1580**
+  in 0.0.6 owns the missing generated `packages/fresh-ui/deno.lock` dependency entry, absent since #1558, and
+  the **runtime lane** repairs it. Do **not** absorb it into #1570. Keep #1570 **immutable** during the
+  evaluator run. After #1580 merges, use the normal current-main sync / status lifecycle to obtain a green
+  Fresh UI quality.
+- **Independently verified rather than accepted**, three ways:
+
+```text
+git diff --name-only origin/main...HEAD | grep -c fresh-ui        → 0     (#1570 touches no fresh-ui file)
+git diff --name-only 5705aeb19..origin/main -- packages/fresh-ui/deno.lock → (empty)
+                                                                  (lock untouched since #1558, as reported)
+fresh-ui-quality log: "Fresh UI private lock is stale. … run deno task --cwd packages/fresh-ui lock:update"
+                      step: "Frozen package type-check", deno check --lock=deno.lock --frozen
+```
+
+  #1580 is live: `OPEN`, milestone 0.0.6, `priority:p0`, `area:fresh-ui`+`area:deps`.
+
+- **Why not absorbing it is the right call even though the fix is one line.** The remedy is a generated-lock
+  regeneration in a package this PR does not touch. Folding it in would put a `packages/fresh-ui` change on a
+  `.llm/tools` gate-coverage PR — the #1020/#1079 class this lane's own pre-merge check 6 exists to catch, and
+  it would make #1570's diff no longer match its stated scope. A one-line fix in the wrong PR is still the
+  wrong PR.
+- **Immutability matters here specifically.** #1570 is mid-IMPL-EVAL at head `c740ff6e0`. Any push — including
+  a one-line lock fix or a main re-sync — moves the head and invalidates the verdict, which this lane has
+  already paid for twice (`drift.md` D-21, D-23). So the sequence is: verdict first, then #1580 merges, then
+  sync forward, then re-run the gate. Not the other way round.
+- **Consequence for the merge order.** #1570 cannot merge green until #1580 lands, so this lane's #1403 now
+  has an external dependency it did not have an hour ago. Recorded rather than worked around; nothing in
+  #1570 changes.
