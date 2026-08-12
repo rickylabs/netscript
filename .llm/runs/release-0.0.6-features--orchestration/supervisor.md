@@ -151,6 +151,21 @@ Reruns only by moving away from and back to the relevant `status:` label. One-sh
 
 ---
 
+## Final ownership boundary — owner-confirmed 2026-08-12
+
+Remaining runtime/features ownership for this lane is **exactly two items, in this order**:
+
+1. **#1459** — finish PR #1558 to a terminal merge/eval state.
+2. **#1562** — owner-approved P1 exception; harness plan + draft PR + **automatic PLAN-EVAL**.
+
+Nothing else is adopted. **One writer at a time**: #1562 gets no worktree, no branch, and no Codex
+dispatch until #1558 is terminal. **No Fable** (D-6) at any phase — orchestrator review stays on
+Opus 5 · high, evaluation stays on the automatic label-driven route.
+
+Already landed in this lane and not reopened: #1405, #1398, #1457, #1548.
+
+---
+
 # Scope addition — #1562 (queued behind #1459)
 
 **Owner-approved 2026-08-12.** `#1562 feat(observability): trace data-cache tier topology and
