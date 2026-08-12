@@ -22,6 +22,18 @@ import { cacheQuery } from './cache-query.ts';
 setCacheProvider(cacheQuery);
 
 export { CacheQuery, cacheQuery } from './cache-query.ts';
+export {
+  CACHE_NAMESPACE_MAX_LENGTH,
+  CacheEvents,
+  normalizeCacheNamespace,
+} from './cache-telemetry.ts';
+export type {
+  CacheSpanAttributes,
+  CacheSpanName,
+  CacheTelemetry,
+  CacheTelemetryParent,
+  CacheTelemetrySpan,
+} from './cache-telemetry.ts';
 export { KvCacheStore } from './kv-cache-store.ts';
 export type { CachedEntry, CacheEntry } from '../ports/cache-entry.ts';
 export type {

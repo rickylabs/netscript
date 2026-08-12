@@ -108,3 +108,31 @@ the forced doctrine drift. `deno.lock` is unchanged.
 The contract remains within approved D3/D7 scope: factories still return raw data, while topology
 evidence is internal to the store/`CacheQuery` seam. PR #1605 remains draft and issue #1562 remains
 open. No Fresh path was touched, no dependency was added, and `deno.lock` is unchanged.
+
+## S3 — mandatory logical-operation instrumentation
+
+- `CacheQuery` now owns exactly one INTERNAL span for each logical read, write, or invalidation;
+  ordered tier lookups and bounded writes, promotions, and invalidations are span events.
+- Loader execution is measured at `queryFn` entry. Fresh/cache-only/provider-error/in-flight-join
+  paths remain false; the loader owner, including loader-error and background-revalidation paths,
+  becomes true. The losing join trace is separately marked `inflight_joined=true`.
+- Stale background completion captures the active read context and uses one bounded `cache.write`
+  follow-up span. Prefix invalidation collapses repeated keys to one event per tier.
+- The registration wrapper recognizes the package-owned immutable marker. A registered custom
+  high-level provider cannot silently bypass the span: its fallback span measures loader entry and
+  reports outcome error plus `topology_complete=false` because that interface cannot prove tiers.
+- Provider reports are runtime-validated for stable systems, bounded tier/outcome values, ordered
+  unique lookup tiers, maximum three tiers, and completeness. Invalid evidence becomes a visible
+  incomplete/error path.
+
+### S3 focused evidence
+
+The SDK test task passes 55 tests, including distinct cold miss, warm-fresh hit, warm-stale
+background revalidation, provider error, loader error, promotion/write-through, bounded
+invalidation, in-flight join, cache-only read, custom-provider boundary, privacy, and same-trace
+page/defer-parent topology cases. The real context-propagation test records one cache span beneath
+the active `defer.cache.read` test span and preserves trace/parent ids.
+
+SDK scoped check has no findings. Full-export doc lint has only the two pre-existing TanStack
+`QueryClient` private-type references and no new cache diagnostics. No Fresh-owned path was touched,
+no dependency was added, and `deno.lock` has no Git delta.

@@ -17,6 +17,17 @@ import type { CachedEntry } from '../ports/cache-entry.ts';
 import type { QueryKey } from '../ports/query-key.ts';
 import type { CacheQueryOptions } from '../ports/query-options.ts';
 import type { CacheProviderDescriptor } from '../ports/cache-topology.ts';
+import { CacheOperations } from '@netscript/telemetry/attributes';
+import { ownsCacheTelemetry } from './cache-provider-marker.ts';
+import {
+  CacheEvents,
+  type CacheTelemetry,
+  createCacheSpanAttributes,
+  createDefaultCacheTelemetry,
+  normalizeCacheNamespace,
+  recordCacheExecutionState,
+  recordCacheProviderError,
+} from './cache-telemetry.ts';
 
 /**
  * Minimal interface that the query-factory layer needs from the cache engine.
@@ -30,29 +41,130 @@ export interface CacheProvider {
   /** Prefetch a query through the registered cache engine. */
   prefetch<TData>(queryKey: QueryKey, options: CacheQueryOptions<TData>): Promise<void>;
   /** Read cached data for a query key without fetching. */
-  getCachedData<TData>(queryKey: QueryKey): Promise<TData | null>;
+  getCachedData<TData>(queryKey: QueryKey, operationId?: string): Promise<TData | null>;
   /** Read cached data and timestamp metadata for a query key. */
-  getCachedEntry<TData>(queryKey: QueryKey): Promise<CachedEntry<TData> | null>;
+  getCachedEntry<TData>(
+    queryKey: QueryKey,
+    operationId?: string,
+  ): Promise<CachedEntry<TData> | null>;
   /** Invalidate all cached entries under a query-key prefix. */
-  invalidateQueries(prefix: QueryKey): Promise<void>;
+  invalidateQueries(prefix: QueryKey, operationId?: string): Promise<void>;
 }
 
 let _provider: CacheProvider | null = null;
 
-function createProviderBoundary(provider: CacheProvider): CacheProvider {
+/** Create the mandatory telemetry boundary around a registered provider. */
+export function createProviderBoundary(
+  provider: CacheProvider,
+  telemetry: CacheTelemetry = createDefaultCacheTelemetry(),
+): CacheProvider {
+  if (ownsCacheTelemetry(provider)) {
+    return {
+      get descriptor(): CacheProviderDescriptor {
+        return provider.descriptor;
+      },
+      query: <TData>(queryKey: QueryKey, options: CacheQueryOptions<TData>): Promise<TData> =>
+        provider.query(queryKey, options),
+      prefetch: <TData>(queryKey: QueryKey, options: CacheQueryOptions<TData>): Promise<void> =>
+        provider.prefetch(queryKey, options),
+      getCachedData: <TData>(queryKey: QueryKey, operationId?: string): Promise<TData | null> =>
+        provider.getCachedData(queryKey, operationId),
+      getCachedEntry: <TData>(
+        queryKey: QueryKey,
+        operationId?: string,
+      ): Promise<CachedEntry<TData> | null> => provider.getCachedEntry(queryKey, operationId),
+      invalidateQueries: (prefix: QueryKey, operationId?: string): Promise<void> =>
+        provider.invalidateQueries(prefix, operationId),
+    };
+  }
+
+  const traceUnsupported = async <T>(
+    operation: typeof CacheOperations[keyof typeof CacheOperations],
+    namespace: string,
+    event: string,
+    callback: (markBackendExecuted: () => void) => Promise<T>,
+  ): Promise<T> =>
+    await telemetry.withSpan(
+      operation,
+      createCacheSpanAttributes(operation, namespace, provider.descriptor),
+      async (span) => {
+        const markBackendExecuted = (): void =>
+          recordCacheExecutionState(
+            span,
+            operation,
+            namespace,
+            provider.descriptor,
+            true,
+            false,
+          );
+        try {
+          return await callback(markBackendExecuted);
+        } finally {
+          recordCacheProviderError(span, operation, namespace, provider.descriptor, event);
+        }
+      },
+    );
+
   return {
     get descriptor(): CacheProviderDescriptor {
       return provider.descriptor;
     },
-    query: <TData>(queryKey: QueryKey, options: CacheQueryOptions<TData>): Promise<TData> =>
-      provider.query(queryKey, options),
-    prefetch: <TData>(queryKey: QueryKey, options: CacheQueryOptions<TData>): Promise<void> =>
-      provider.prefetch(queryKey, options),
-    getCachedData: <TData>(queryKey: QueryKey): Promise<TData | null> =>
-      provider.getCachedData(queryKey),
-    getCachedEntry: <TData>(queryKey: QueryKey): Promise<CachedEntry<TData> | null> =>
-      provider.getCachedEntry(queryKey),
-    invalidateQueries: (prefix: QueryKey): Promise<void> => provider.invalidateQueries(prefix),
+    query: <TData>(queryKey: QueryKey, options: CacheQueryOptions<TData>): Promise<TData> => {
+      const namespace = normalizeCacheNamespace(options.operationId);
+      return traceUnsupported(
+        CacheOperations.READ,
+        namespace,
+        CacheEvents.LOOKUP,
+        (markBackend) =>
+          provider.query(queryKey, {
+            ...options,
+            queryFn: () => {
+              markBackend();
+              return options.queryFn();
+            },
+          }),
+      );
+    },
+    prefetch: <TData>(queryKey: QueryKey, options: CacheQueryOptions<TData>): Promise<void> => {
+      const namespace = normalizeCacheNamespace(options.operationId);
+      return traceUnsupported(
+        CacheOperations.READ,
+        namespace,
+        CacheEvents.LOOKUP,
+        (markBackend) =>
+          provider.prefetch(queryKey, {
+            ...options,
+            queryFn: () => {
+              markBackend();
+              return options.queryFn();
+            },
+          }),
+      );
+    },
+    getCachedData: <TData>(queryKey: QueryKey, operationId?: string): Promise<TData | null> =>
+      traceUnsupported(
+        CacheOperations.READ,
+        normalizeCacheNamespace(operationId, 'cache.cached-data'),
+        CacheEvents.LOOKUP,
+        () => provider.getCachedData(queryKey, operationId),
+      ),
+    getCachedEntry: <TData>(
+      queryKey: QueryKey,
+      operationId?: string,
+    ): Promise<CachedEntry<TData> | null> =>
+      traceUnsupported(
+        CacheOperations.READ,
+        normalizeCacheNamespace(operationId, 'cache.cached-entry'),
+        CacheEvents.LOOKUP,
+        () => provider.getCachedEntry(queryKey, operationId),
+      ),
+    invalidateQueries: (prefix: QueryKey, operationId?: string): Promise<void> =>
+      traceUnsupported(
+        CacheOperations.INVALIDATE,
+        normalizeCacheNamespace(operationId, 'cache.invalidate-prefix'),
+        CacheEvents.INVALIDATE,
+        () => provider.invalidateQueries(prefix, operationId),
+      ),
   };
 }
 

@@ -133,6 +133,13 @@ identifiers (`deno-kv`, `redis`, `memory`, or an extension's documented lowercas
 `netscript.cache.backend_executed` means the backing loader was actually entered; a miss or elapsed
 duration is never a proxy for that fact.
 
+One logical operation uses one INTERNAL span. `cache.lookup`, `cache.write`, `cache.promote`, and
+`cache.invalidate` are ordered or bounded per-tier events beneath that span, not per-tier spans.
+`netscript.cache.lookup_index` orders lookups; `entry_age_ms` and `ttl_ms` describe freshness;
+`write_through` distinguishes propagation/promotion; `inflight_joined` identifies a trace that
+awaited work owned elsewhere; and `topology_complete=false` makes missing provider evidence visible.
+Stale background completion may use one captured-context `cache.write` follow-up span.
+
 ## Public surface
 
 | Entry               | What it gives you                                       |
