@@ -19,3 +19,16 @@ E4 will remove the actual SDK allowance so the required scan-owned count can fal
 The required scoped format wrapper initially exited 1 because the existing `escape.ts` fixture setup
 in `scan-code-quality_test.ts` was not in current formatter shape. Since E1/E3 already own that file,
 `deno fmt` was applied to that file only. The wrapper rerun exits 0; no other file was formatted.
+
+## D-4 — bundled tool edits require same-PR asset regeneration
+
+CI found a real coupling omitted from the issue, implementation brief, rail plan, and original gate
+set: `.llm/tools/quality/scan-code-quality.ts` is embedded as source in the generated CLI consumer
+tool asset. Editing a bundled `.llm/tools/` file therefore requires `deno task gen:assets-barrel` in
+the same PR, followed by an idempotence check. Without it, CI's `Generated asset freshness` step
+fails even when the tool's direct tests and quality gates are green.
+
+The canonical generator changed only `agent-tools.generated.ts`: the scanner source plus its bundle
+hash. Contrary to the initial CI steer, `skills.generated.ts` contains command guidance rather than
+an independent full-source copy, so it correctly remained unchanged. No unrelated generated drift
+was absorbed.

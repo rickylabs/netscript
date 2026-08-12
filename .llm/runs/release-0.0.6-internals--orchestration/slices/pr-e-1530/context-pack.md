@@ -21,11 +21,12 @@ and restored the quality test gate. E3 added all three leakage controls. E4 remo
 SDK allowance clauses. All required gates are green; the base/head repo scan moved from exit 1,
 five findings, `allowCount: 10` to exit 0, no findings, `allowCount: 8`.
 
+CI then exposed one missing generated-asset step. E5 refreshes the scanner's consumer-tool copy in
+`packages/cli/src/kernel/assets/agent-tools.generated.ts`; inspection found no unrelated generated
+drift. Quality tests, repo scan, and quality gate remain green. A post-commit generator run must
+leave `git status --porcelain` empty before the E5 PR comment is posted.
+
 ## Handoff
 
-Update PR #1560's body with literal E1–E4 hashes, gate results, checked Definition of Done boxes,
-and exact-text evidence mappings for issue boxes 1–6. Do not map or tick issue box 7. Leave the PR
-draft and at `status:impl`; the orchestrator owns the draft-to-ready IMPL-EVAL trigger and merge.
-
-The PR must remain draft; the orchestrator owns draft → ready, formal IMPL-EVAL, labels after
-implementation, and merge authority.
+Post E5's literal hash and post-commit idempotence/gate evidence on PR #1560. Do not change PR state,
+labels, milestone, acceptance mappings, or issue box 7. The orchestrator retains merge authority.

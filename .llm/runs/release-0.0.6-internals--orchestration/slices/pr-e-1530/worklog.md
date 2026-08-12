@@ -11,6 +11,7 @@ The scanner's public CLI and scan result types do not change.
 | E2 | Add a named directory-and-suffix predicate in `.llm/tools/quality/scan-code-quality.ts`. | Quality tests pass; repo scan no longer reports negative type fixtures. |
 | E3 | Add ordinary-source, suffix-only, and directory-only leakage controls in the scanner test. | All three controls remain findings. |
 | E4 | Remove two redundant SDK fixture allowances and run the full gate set. | Repo `allowCount` falls 10 → 8; all required gates pass. |
+| E5 | Refresh the generated consumer-tool asset after CI exposed the scanner's embedded-source coupling. | Generator diff contains only the embedded scanner plus bundle hash; regeneration is idempotent; quality gates stay green. |
 
 Deferred: export awareness, allowance issue links, `--max-allow` task wiring, docs-fence scanning,
 workflow changes, and scaffold/runtime E2E. No package/plugin public surface changes.
@@ -67,3 +68,25 @@ PLAN-EVAL: PASS in the orchestrator rail plan; PR #1553 run 31589648809 at `69ef
 Reconcile: all six pre-merge acceptance boxes have evidence. Box 7 remains intentionally unmapped
 and unchecked because it is marked `[post-merge]`. PR #1560 remains draft for orchestrator-owned
 IMPL-EVAL and merge handling.
+
+## E5 — generated asset freshness
+
+- CI's `Generated asset freshness` step exposed that
+  `.llm/tools/quality/scan-code-quality.ts` is bundled as consumer tool source in
+  `packages/cli/src/kernel/assets/agent-tools.generated.ts`.
+- Ran `deno task gen:assets-barrel` from the repository root. The complete generated diff changes
+  only the embedded scanner source (`isTypeFixture` plus the `isScannable` conjunction) and the
+  derived bundle hash. No other tool source or generated entry changed.
+- `skills.generated.ts` mentions the installed scanner command but does not embed the scanner's
+  full source, so the canonical generator correctly left it unchanged.
+- A second pre-commit generator run produced the identical one-file diff.
+
+| Gate | Result |
+| --- | --- |
+| `gen:assets-barrel` | exit 0; generated diff remains exactly 2 additions / 2 deletions in `agent-tools.generated.ts` |
+| Quality tool tests | exit 0; 8 passed, 0 failed |
+| `quality:scan:repo` | exit 0; `findings: []`; `allowCount: 8` |
+| `quality:gate` | exit 0; scanner and doctrine chain green (warnings non-blocking) |
+
+Reconcile: E5 repairs the real CI coupling without changing scanner behavior or fixture assertions.
+PR #1560 state, labels, milestone, existing IMPL-EVAL verdict, and merge authority remain untouched.
