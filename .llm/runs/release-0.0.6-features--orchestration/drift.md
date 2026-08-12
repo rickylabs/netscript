@@ -45,3 +45,37 @@ Its PLAN-EVAL has already run (PASS, MiniMax M3) and its IMPL-EVAL is still requ
 verified clean (empty `git status --porcelain`) and removed. The #1398 PLAN-EVAL worktree
 `/home/codex/repos/ns006-1398-planeval` is retained pending that issue's IMPL-EVAL. Pre-existing
 global stashes belonging to other lanes' branches were left untouched.
+
+## D-4 — phase evaluation moves to the automatic status dispatcher (significant)
+
+**Date** 2026-08-12. **Owner ruling.** PR #1524 (automatic phase dispatcher) is about to merge. Once
+it lands, **all future phase evaluations use the automatic status workflow** unless the owner selects
+a documented local route or an explicit skip. Manual IMPL-EVAL launches and manual
+`@openhands-agent` PR comments are not to be used for #1536.
+
+**Standing instruction for #1536:** keep it on its **current head and status** — head `e4319c685`,
+`status:impl-eval`, milestone `0.0.6`. Root will **deliberately re-enter** `status:impl-eval` with
+the Qwen override *after* #1524 lands, which is what triggers the automatic dispatcher. This
+orchestrator must not re-enter the label for the same head, must not trigger OpenHands, and must not
+launch a local evaluator. Its remaining job is to **watch the automatic verdict and then finish the
+merge gate**.
+
+**Timing, recorded factually.** The steer anticipated that a local #1536 evaluator had already been
+launched. It had **not**. For #1398 I wrote the evaluator prompt
+(`slices/impl-eval-1398-prompt.md`, 10:57) and pre-created the detached worktree
+`/home/codex/repos/ns006-1398-impleval` at `e4319c685`, then **stopped and raised the decision**
+rather than dispatching. Verified at the time of this entry: no `openrouter-run`/`claude-openrouter`
+process, and no `impl-eval-1398-raw.md` output file — only the prompt. **No duplicate spend occurred
+and none was in flight.**
+
+The two evaluator sessions this run did spend are unaffected and both completed before this ruling:
+PLAN-EVAL #1398 (MiniMax M3, PASS) and IMPL-EVAL #1405 (DeepSeek V4 Flash 0731, PASS — itself the
+subject of D-3).
+
+**Unused artifacts retained, not removed:** `slices/impl-eval-1398-prompt.md` and the
+`ns006-1398-impleval` worktree are left in place, clean and unused, in case the owner later selects
+the documented local route. They are inert; nothing reads them.
+
+**Interaction with D-3.** D-3 waives formal evaluation for the small deterministic class. D-4 does
+not widen that waiver — #1398 still gets a formal IMPL-EVAL; it now arrives through the automatic
+dispatcher rather than a manual launch.
