@@ -799,3 +799,70 @@ head and invalidate *both* verdicts.
      classified as a pull request and excluded) firing on the PR that fixed it.
   2. **PR #1560** — pending the verdict question in D-25. Restores `main`'s blocking
      `code-quality-repo` job, red for seven consecutive pushes.
+
+## D-27 — the two IMPL-EVAL verdicts disagree, and the later one was right
+
+- **Severity:** architectural (this is the strongest evidence the lane has produced about its own thesis)
+- **Recorded:** 2026-08-12, PR #1560
+
+| Run | Head evaluated | Verdict |
+| --- | --- | --- |
+| `31592060933` (first) | `49e2b86e9` — **pre** barrel fix | **PASS** |
+| `31593326538` (re-run at final head) | `9ab361440` — what would merge | **`FAIL_FIX`** |
+
+**The `FAIL_FIX` was correct, specific, and independently reproduced by the evaluator.** Its single
+blocking finding: the PR's fenced `acceptance-evidence` `box:` values were de-backticked,
+continuation-merged sentences, while `acceptanceCheckboxes` parses an issue checkbox as **raw first line
+only, backticks preserved**. So `validateEvidenceMapping` matched **none** of the six actionable boxes, the
+mirror threw, `close-gate` was red, and the downstream acceptance and review-thread steps were skipped.
+The evaluator reproduced it by calling
+`validateEvidenceMapping(1530, acceptanceCheckboxes(issue), parseAcceptanceEvidence(pr))` directly.
+
+**What this means for the instruction to "use only the first run's final verdict".** Following it literally
+would have merged PR #1560 on a `PASS` whose head fails its own close-gate. The verdict was not wrong about
+the *code* — the scanner change is correct in both evaluations — it was simply issued against a tree that
+did not include the required barrel fix, and therefore never saw the close-gate failure. This is the
+lane's own thesis turned on the lane: **a gate result that does not correspond to what ships is unproven,
+not clean**, and the fact that it says `PASS` makes it more dangerous, not less.
+
+Recorded plainly because the D-23 decision to re-evaluate was, at the time, a judgement call that cost a
+cycle and could have looked like ceremony. It was not ceremony. The re-run is the only reason this defect
+was caught before merge.
+
+### Remediation, and why it invalidated nothing
+
+The fix is **PR-body only** — the evidence block was rebuilt with keys taken from the repo's own parser
+(`acceptanceCheckboxes` over the live issue body), preserving every evidence *value* verbatim from what was
+already posted, per the instruction to reconcile only from posted evidence. Editing a PR body is **not a
+commit**, so the head stayed `9ab361440` and neither verdict was invalidated by the repair itself.
+
+Post-fix `mirror --dry-run` at the unchanged head:
+
+```text
+acceptance-mirror DRY-RUN: #1530
+provenance: head=9ab361440… evaluated=2026-08-12T12:01:51Z
+notice: Closing reference #1530 classified as issue; retained for acceptance mirroring.
+notice: Issue #1530: excluded post-merge box(es) "`gate:` the `code-quality-repo` job is green on `main`
+        after merge. `[post-merge]`"; verify in a follow-up comment and tick after merge.
+```
+
+Both notices are PR #1527's own work running in production: the PR-vs-issue classification from #1436, and
+the explicit post-merge exclusion notice. The gate-trust fix is gating the next gate-trust fix.
+
+### Open decision for the owner — not taken unilaterally
+
+`netscript-pr` requires **IMPL-EVAL PASS evidence** before `status:ready-merge` and merge. The verdict of
+record is `FAIL_FIX`. Its cause is remediated at the same head, and the sanctioned response to `FAIL_FIX`
+is fix-then-re-evaluate (the loop allows two failures). But the owner directed "do not retrigger", in the
+context of preventing duplicate consumption.
+
+Options, stated rather than chosen:
+1. **Label-cycle `status:impl-eval` once** to obtain a verdict on the remediated state at the same head.
+   Costs one evaluator cycle; produces a `PASS` that names the merged tree. This is the harness-sanctioned
+   `FAIL_FIX` loop and the orchestrator's recommendation.
+2. **Merge on the first run's `PASS`.** Fastest, and explicitly what the instruction says — but the merge
+   evidence would name `49e2b86e9`, which is neither the merged head nor a tree whose close-gate passed.
+3. **Owner reviews directly** and records the reviewer-substitution waiver
+   (`milestone-run.md` § Evaluator protocol permits it, recorded in `drift.md`, never silently applied).
+
+Nothing further has been launched and no fourth run created. The merge is held.
