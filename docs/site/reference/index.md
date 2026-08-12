@@ -43,3 +43,10 @@ publishable workspace surface and gives each API claim one place to stay current
 
 Navigation is derived from the folder tree, so a new page is discoverable as soon as its directory
 exists — no index or nav file lists the packages.
+
+## CLI command coverage
+
+The public command documentation is the union of exactly two pages: the curated
+[CLI reference](/cli-reference/) and the detailed [`netscript` command
+reference](/reference/cli/commands/). Together they cover every public root command and direct
+subcommand derived from the installed command tree; neither page is treated as exhaustive alone.

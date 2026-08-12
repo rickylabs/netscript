@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-1377-gate--leaf` |
 | Branch | `fix/1377-docs-reference-gate-scope` |
-| Current phase | `implement` — S1 |
+| Current phase | `implement` — S2 ready to commit |
 | Archetype | 6 — CLI / tooling |
 | Scope overlays | Docs |
 
@@ -30,13 +30,13 @@ and makes the four missing deploy rows bounded S2 scope.
 
 ## In Progress
 
-- S1 is gate-green and ready for its sign-off commit/push/comment.
+- S2 is gate-green and ready for its sign-off commit/push/comment.
 
 ## Next Steps
 
-1. Complete S1 gates, commit, explicit push, and PR comment.
-2. Complete S2 command-coverage gate and bounded docs corrections.
-3. Complete S3 composed gates and stop for native Opus 5 IMPL-EVAL fallback.
+1. Commit S2, explicit push, and PR comment.
+2. Complete S3 composed gates and lock-hygiene inspection.
+3. Finalize run/PR evidence and stop for native Opus 5 IMPL-EVAL fallback.
 
 ## Key Decisions
 
@@ -52,15 +52,17 @@ and makes the four missing deploy rows bounded S2 scope.
 
 - S1: release readiness tool/test, reference index convention, and run artifacts including
   `plan-eval.md`.
+- S2: docs accuracy tool/test, four deploy command rows, exact two-page union wording including the
+  two authorised `cli-reference.md` sentences, reference-index command contract, and run artifacts.
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Plan | PASS | Native Opus 5 fallback, cycle 2, head `706c2bf05` |
-| Static / Fitness | NOT_RUN | Phase 2 |
-| Docs / Release | NOT_RUN | Phase 2 |
-| Negative controls | NOT_RUN | Phase 2; raw exits mandatory |
+| Static / Fitness | PARTIAL PASS | S1 release and S2 docs scoped wrappers green; S3 composition pending |
+| Docs / Release | PARTIAL PASS | Docs accuracy/links green; publish dry-run pending S3 |
+| Negative controls | COMPLETE | Both raw controls exited 1 with required diagnostics |
 
 S1 release unit, scoped check/lint/format, and raw missing-page exit 1 are PASS/expected-fail with
 diagnostics recorded in `worklog.md`.

@@ -1,5 +1,7 @@
 /** Guards genuinely textual documentation policy against surface drift. */
 
+import { resolve } from '@std/path';
+
 const root = new URL('../../../', import.meta.url);
 
 async function read(path: string, base: URL = root): Promise<string> {
@@ -28,9 +30,98 @@ export const ALLOWED_FRESH_ROOT_SYMBOLS: Set<string> = new Set([
 
 const GOLDEN_PATH_QUERY_UTILS_PAGE = 'docs/site/reference/sdk/index.md';
 
+/** The complete Markdown corpus accepted as public command documentation. */
+export const COMMAND_REFERENCE_PATHS: readonly string[] = [
+  'docs/site/reference/cli/commands.md',
+  'docs/site/cli-reference.md',
+];
+
+/** Ratified root plus direct-child command census for the current public tree. */
+export const EXPECTED_PUBLIC_DIRECT_COMMAND_COUNT = 91;
+
 export interface GoldenPathDocsResult {
   readonly pageCount: number;
   readonly queryUtilsPageCount: number;
+}
+
+export interface CommandReferenceResult {
+  readonly auditedCount: number;
+  readonly documentedCount: number;
+  readonly recursiveCount: number;
+  readonly missing: readonly string[];
+}
+
+/** Audit root/direct-child command coverage against the locked Markdown corpus. */
+export function auditPublicCommandReference(
+  recursiveCommandPaths: readonly string[],
+  markdownSources: readonly string[],
+): CommandReferenceResult {
+  const catalogPaths = [
+    ...new Set(recursiveCommandPaths.map((path) => path.trim()).filter(Boolean)),
+  ]
+    .sort();
+  const rootPaths = catalogPaths.filter((path) => commandDepth(path) === 1);
+  const directPaths = catalogPaths.filter((path) => commandDepth(path) === 2);
+  const auditedPaths = [...rootPaths, ...directPaths].sort();
+  const resolvedInvocations = markdownSources.flatMap((source) =>
+    resolveDocumentedInvocations(source, catalogPaths)
+  );
+  const documented = new Set<string>();
+
+  for (const rootPath of rootPaths) {
+    if (
+      markdownSources.some((source) => hasStructuralRootDeclaration(source, rootPath)) ||
+      resolvedInvocations.includes(rootPath)
+    ) {
+      documented.add(rootPath);
+    }
+  }
+  for (const directPath of directPaths) {
+    if (
+      resolvedInvocations.some((resolvedPath) =>
+        resolvedPath === directPath || resolvedPath.startsWith(`${directPath} `)
+      )
+    ) {
+      documented.add(directPath);
+    }
+  }
+
+  const missing = auditedPaths
+    .filter((path) => !documented.has(path))
+    .map(renderCommandPath);
+  return {
+    auditedCount: auditedPaths.length,
+    documentedCount: auditedPaths.length - missing.length,
+    recursiveCount: catalogPaths.length,
+    missing,
+  };
+}
+
+/** Fail when the live command census or locked-corpus coverage drifts. */
+export function checkPublicCommandReference(
+  recursiveCommandPaths: readonly string[],
+  markdownSources: readonly string[],
+  expectedCount: number = EXPECTED_PUBLIC_DIRECT_COMMAND_COUNT,
+): CommandReferenceResult {
+  const result = auditPublicCommandReference(recursiveCommandPaths, markdownSources);
+  if (result.auditedCount !== expectedCount) {
+    const lead = result.missing.length > 0
+      ? `; unratified command path(s): ${result.missing.join(', ')}`
+      : `; audited paths: ${
+        deriveAuditedPaths(recursiveCommandPaths).map(renderCommandPath).join(', ')
+      }`;
+    throw new Error(
+      `public command census expected ${expectedCount}, got ${result.auditedCount}${lead}`,
+    );
+  }
+  if (result.missing.length > 0) {
+    throw new Error(
+      `public command reference covers ${result.documentedCount}/${result.auditedCount}; missing ${
+        result.missing.join(', ')
+      }`,
+    );
+  }
+  return result;
 }
 
 /** Enforce the published golden-path module, alias, and query-dialect vocabulary. */
@@ -170,6 +261,13 @@ export async function runAccuracyCheck(): Promise<void> {
   checkSagaVocabulary(publicDocs, sagaPagePaths);
 
   const cliReference = await read('docs/site/cli-reference.md');
+  const commandReferenceSources = await Promise.all(
+    COMMAND_REFERENCE_PATHS.map((path) => read(path)),
+  );
+  const commandReference = checkPublicCommandReference(
+    await listPublicCommandPaths(),
+    commandReferenceSources,
+  );
   const goldenPathDocs = await checkGoldenPathDocs();
   checkMutationMapColumns(cliReference);
 
@@ -188,8 +286,116 @@ export async function runAccuracyCheck(): Promise<void> {
   }
 
   console.log(
-    `docs accuracy: PASS (${publicDocs.length} saga pages checked for stale claims, ${goldenPathDocs.pageCount} published source pages, one query dialect exception page, mutation-map columns, ${checkedFreshRootImports} valid @netscript/fresh root imports checked)`,
+    `docs accuracy: PASS (${publicDocs.length} saga pages checked for stale claims, ${goldenPathDocs.pageCount} published source pages, one query dialect exception page, mutation-map columns, ${commandReference.documentedCount}/${commandReference.auditedCount} root/direct public commands from ${commandReference.recursiveCount} recursive paths, ${checkedFreshRootImports} valid @netscript/fresh root imports checked)`,
   );
+}
+
+/** Materialize the live public CLI registry through its recursive catalog adapter. */
+export async function listPublicCommandPaths(): Promise<readonly string[]> {
+  interface PublicCliHost {
+    readonly cwd: () => string;
+    readonly resolvePath: (path?: string) => string;
+  }
+  interface EnumerableCommand {
+    readonly getName: () => string;
+    readonly getDescription: () => string;
+    readonly getCommands: () => readonly EnumerableCommand[];
+  }
+  interface PublicTreeModule {
+    readonly createPublicCommandRegistry: () => {
+      readonly program: (input: Record<string, unknown>) => EnumerableCommand;
+    };
+  }
+  interface PublicDependenciesModule {
+    readonly createPublicCommandDependencies: (host: PublicCliHost) => unknown;
+  }
+  interface PublicCatalogModule {
+    readonly PublicCliCommandCatalog: new (root: EnumerableCommand) => {
+      readonly listCommands: () => Promise<readonly { readonly path: string }[]>;
+    };
+  }
+
+  const treeUrl = new URL(
+    '../../../packages/cli/src/public/features/root/public-command-tree.ts',
+    import.meta.url,
+  ).href;
+  const dependenciesUrl = new URL(
+    '../../../packages/cli/src/public/features/root/public-command-dependencies.ts',
+    import.meta.url,
+  ).href;
+  const catalogUrl = new URL(
+    '../../../packages/cli/src/public/features/agent/mcp/cli-mcp-adapters.ts',
+    import.meta.url,
+  ).href;
+  const [treeModule, dependenciesModule, catalogModule] = await Promise.all([
+    import(treeUrl) as Promise<PublicTreeModule>,
+    import(dependenciesUrl) as Promise<PublicDependenciesModule>,
+    import(catalogUrl) as Promise<PublicCatalogModule>,
+  ]);
+  const host: PublicCliHost = {
+    cwd: () => Deno.cwd(),
+    resolvePath: (path) => resolve(Deno.cwd(), path ?? '.'),
+  };
+  const rootCommand = treeModule.createPublicCommandRegistry().program({
+    name: 'netscript',
+    version: 'docs-accuracy',
+    description: 'Public command documentation accuracy check',
+    context: {
+      host,
+      dependencies: dependenciesModule.createPublicCommandDependencies(host),
+    },
+  });
+  return (await new catalogModule.PublicCliCommandCatalog(rootCommand).listCommands()).map(
+    ({ path }) => path,
+  );
+}
+
+function resolveDocumentedInvocations(
+  markdown: string,
+  catalogPaths: readonly string[],
+): readonly string[] {
+  const catalogTokens = catalogPaths
+    .map((path) => ({ path, tokens: path.split(' ') }))
+    .sort((left, right) => right.tokens.length - left.tokens.length);
+  const resolved: string[] = [];
+  for (
+    const match of markdown.matchAll(
+      /\bnetscript[ \t]+([a-z0-9][a-z0-9:-]*(?:[ \t]+[a-z0-9][a-z0-9:-]*)*)/gi,
+    )
+  ) {
+    const tokens = match[1].toLowerCase().split(/[ \t]+/);
+    const command = catalogTokens.find(({ tokens: commandTokens }) =>
+      commandTokens.every((token, index) => tokens[index] === token)
+    );
+    if (command) resolved.push(command.path);
+  }
+  return resolved;
+}
+
+function hasStructuralRootDeclaration(markdown: string, rootPath: string): boolean {
+  const escaped = escapeRegExp(rootPath);
+  return new RegExp(
+    `^#{1,6}[ \\t]+\\\`${escaped}\\\`(?:[ \\t]+—.*)?$`,
+    'im',
+  ).test(markdown);
+}
+
+function deriveAuditedPaths(recursiveCommandPaths: readonly string[]): readonly string[] {
+  return [...new Set(recursiveCommandPaths.map((path) => path.trim()).filter(Boolean))]
+    .filter((path) => commandDepth(path) <= 2)
+    .sort();
+}
+
+function commandDepth(path: string): number {
+  return path.split(' ').length;
+}
+
+function renderCommandPath(path: string): string {
+  return `netscript ${path}`;
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 if (import.meta.main) {

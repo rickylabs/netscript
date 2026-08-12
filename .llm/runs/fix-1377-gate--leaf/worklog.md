@@ -98,6 +98,9 @@ and coverage diagnostic name any missing path. Do not edit a command list in the
 | 2026-08-12 | S1 | Start | Began whole-publish-set reference existence implementation after PASS. |
 | 2026-08-12 | S1 | Implement | Added the independent `docs-reference` row over `publishSet.effective`, four declared aliases, and removed page existence from first-publish policy. |
 | 2026-08-12 | S1 | Reconcile | PR #1586 remains draft with `Closes #1377`; issue #1377 remains open. Read current PR/issue comments; no new blocker or scope change. Labels were observed but not changed. |
+| 2026-08-12 | S2 | Implement | Added the two-file `COMMAND_REFERENCE_PATHS` gate over the live recursive catalog, exact 91 census, strict structural roots, tokenized direct-parent projection, colon handling, and new-path diagnostics. Added four deploy rows and bounded union-contract corrections in the two corpus pages plus the reference index. |
+| 2026-08-12 | S2 | Toolchain seam | Static imports pulled unrelated existing CLI `isolatedDeclarations` failures into the focused docs test. Switched only module loading to dynamic structural types; runtime still materializes `createPublicCommandRegistry()` through `PublicCliCommandCatalog`, with no source parser or literal verb list. |
+| 2026-08-12 | S2 | Reconcile | PR remains draft and issue #1377 remains open with `Closes #1377` in the PR body. No labels changed; the orchestrator retains lifecycle ownership. |
 
 ## Decisions
 
@@ -121,7 +124,7 @@ All implementation gates are `NOT_RUN` by design in phase 1.
 | Reference arrival coverage | PASS | 35 effective, 35 present under locked alias resolver, 0 missing |
 | PLAN-EVAL | FAIL_PLAN → PASS | Native Opus 5 read-only fallback: cycle 1 failed `5ba4bc339`; cycle 2 passed `706c2bf05`. The generator did not self-evaluate. |
 | Type/lint/fmt/docs/publish/tests | NOT_RUN | Phase 2 only after PLAN-EVAL PASS |
-| Raw negative controls | NOT_RUN | Phase 2 only; both raw exit codes and diagnostics required |
+| Raw negative controls | COMPLETE | Missing page exit 1 in S1; missing command exit 1 in S2; diagnostics below |
 
 ### S1 gate evidence
 
@@ -132,6 +135,19 @@ All implementation gates are `NOT_RUN` by design in phase 1.
 | Scoped release check | PASS | 42 files selected; 0 findings |
 | Scoped release lint | PASS | 42 files selected; 0 findings |
 | Scoped release format | PASS | 42 files selected; 0 findings after targeted formatting |
+
+### S2 gate evidence
+
+| Gate | Result | Evidence / notes |
+| --- | --- | --- |
+| Docs checker unit | PASS | `deno test --allow-all --unstable-kv .llm/tools/docs/check-accuracy-and-discoverability_test.ts` — 7 passed, 0 failed |
+| Missing-command raw control | EXPECTED FAIL, exit 1 | Live recursive tree plus the exact locked two-page corpus with `netscript deploy uninstall` removed in memory; diagnostic: `public command reference covers 90/91; missing netscript deploy uninstall` |
+| Corpus measurement | PASS | After the four-row repair: detailed page 69/91, curated page 59/91, union 91/91; live recursive census 149 |
+| Docs accuracy | PASS | 91/91 root/direct commands from 149 recursive paths; baseline peer-dependency warning remained non-verdict |
+| Docs links | PASS | 102 docs; 0 broken links, 0 broken anchors, 0 enforced orphans |
+| Scoped docs check | PASS | 22 files selected; 0 findings |
+| Scoped docs lint | PASS | 22 files selected; 0 findings |
+| Scoped docs format | PASS | 22 files selected; 0 findings |
 
 ## Handoff Notes
 
