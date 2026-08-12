@@ -20,8 +20,10 @@ missing-label 404 race, while preserving generation deduplication and the single
   cannot bootstrap the trusted-base module on its own ready event. The labeled evaluation path is
   orchestrator-owned; the review-fix slice makes checkout/transition failures non-blocking and
   attributed without weakening the trusted-base boundary.
-- Review-fix gates are green: 66 script tests plus scoped check/lint/format, asset generation, and
-  YAML parsing. A final post-commit asset/status proof and PR evidence update remain.
+- Review-fix commit `7170d574b3` is pushed. Gates are green: 66 script tests plus scoped
+  check/lint/format, YAML parsing, and post-commit asset generation with an empty working tree.
+- The PR body and S3 phase comment state the box-1 interpretation and bootstrap limitation. PR
+  #1567 remains draft with exactly `status:impl` and milestone `0.0.6`.
 
 ## Locked boundaries
 
@@ -31,5 +33,5 @@ merge or mark the PR ready.
 
 ## Next action
 
-Commit/push the review fix, rerun asset generation with an empty status proof, update the PR's box-1
-interpretation and gate evidence, and leave it draft with `status:impl` for orchestrator evaluation.
+Orchestrator substantively reviews the terminal slice and uses the labeled path for separate-session
+IMPL-EVAL. This implementation agent must not mark ready, trigger evaluation, or merge.

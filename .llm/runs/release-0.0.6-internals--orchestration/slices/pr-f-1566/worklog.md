@@ -40,8 +40,8 @@ acceptance criteria, and required gates fully specified in issue #1566 and `impl
   `phase-eval-status.ts` production module does not yet exist; the named race and narrow-tolerance
   assertions define the required caller contract. Generation dedup is guarded structurally in the
   unchanged workflow script.
-- Implementation: complete; pending implementation commit/push.
-- Gates: complete except the required post-commit empty-status proof for asset freshness.
+- Implementation: complete and pushed through the orchestrator review fix.
+- Gates: complete, including post-commit asset-barrel generation and empty-status proof.
 - IMPL-EVAL: owned by the separate orchestrator/evaluator transition; this agent leaves the PR draft.
 
 ## RED evidence
@@ -105,9 +105,11 @@ acceptance criteria, and required gates fully specified in issue #1566 and `impl
 | Scoped type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .github/scripts --ext ts` — exit 0; 6 files, 0 findings |
 | Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .github/scripts --ext ts` — exit 0; 6 files, 0 findings |
 | Scoped format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .github/scripts --ext ts` — exit 0; 6 files, 0 findings |
-| Asset barrel | `deno task gen:assets-barrel` — exit 0; no generated file changed. Final empty-status proof runs after this review-fix commit. |
+| Asset barrel | `deno task gen:assets-barrel` — exit 0; after review-fix commit `7170d574b3`, `git status --porcelain` was empty with exit 0 |
 | Workflow YAML | `deno eval --no-lock` with `jsr:@std/yaml@^1.0.10` — exit 0, `YAML_PARSE_OK` |
 
 - Review-fix reconcile: live issue wording supports box 1 without amendment; PR #1567 remains draft
   with exactly `status:impl`. No trigger, condition, model, trusted-base lookup, #1541, or #1564
   scope changed.
+- Review-fix implementation commit: `7170d574b3`; pushed with explicit refspec. The orchestrator
+  retains the labeled IMPL-EVAL transition and merge authority.
