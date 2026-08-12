@@ -20,11 +20,13 @@ owns the canary and the stable cut.
 
 | 2 | 2026-08-12T10:27:26Z | `d7e2b67b2be535c9ca13449f97f8f4585344030a` (`d7e2b67b2`) — `fix(workers): publish job executions to the durable stream on the job.execute trace (#1536)` | #1536 | **#1398** (auto-closed `COMPLETED` by the body's `Closes #1398`) | `slices/pre-merge-gate-1536.md` — all 7 checks PASS at head `f7d503fee` |
 
-Both rows captured from `git log origin/main --first-parent -1` **after** each merge, per the
+| 3 | 2026-08-12T11:40:14Z | `5db37e7bb` — `fix(fresh): forward durable State-Protocol query parameters through the chat stream proxy (#1556)` | #1556 | **#1457** (auto-closed `COMPLETED`) | `slices/pre-merge-gate-1556.md` — all 7 checks PASS |
+
+Rows captured from `git log origin/main --first-parent -1` **after** each merge, per the
 profile's merge-derived rule. Issue states re-read live: both `CLOSED` / `COMPLETED`, with
 `status:shipped` applied to each issue and PR.
 
-**Lane complete: both owned issues landed on `main`.**
+**First pass complete** (#1405, #1398). **Reopened 2026-08-12** for #1457, #1459, #1548 — #1457 landed as row 3.
 
 ## Re-planning events
 
