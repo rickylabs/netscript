@@ -345,3 +345,74 @@ necessary** — I traded away opposite-family review when the documented path di
 generator ≠ evaluator **and** opposite-family both hold. No invariant is traded. The bounds on scope
 still apply: the fallback adjudicates the four hygiene amendments; cycle 1's architectural verdict
 stands; IMPL-EVAL remains DeepSeek.
+
+## D-9 — AGY fallback cannot be launched at the required identity; #1454 plan gate HALTED
+
+**Recorded:** 2026-08-12. Owner-directed route: a fresh **AGY Gemini 3.6 Flash · high** read-only
+evaluator on immutable head `ad7574bb7`. **It could not be executed at that identity.**
+
+### Evidence — two independent probes, not one
+
+**Attempt 1** — full brief, `--model gemini-3.6-flash --effort high`:
+
+```
+I am currently running on Gemini 3.5 Flash.
+```
+
+The model id was invalid (effort is baked into the id, per `agy models`), and **`agy` silently
+substituted a different model rather than erroring.** That is a wrong input producing a plausible
+result — this lane's entire subject class, in the evaluator launcher itself.
+
+**Attempt 2** — canonical id from `.llm/tools/agentic/config/models.ts:32`
+(`antigravityDocs: 'gemini-3.6-flash-high'`), confirmed present in `agy models`:
+
+```
+$ agy --print --model gemini-3.6-flash-high "Reply with exactly one line: the model identifier you are running as."
+I am currently running on **Gemini 3.5 Flash**.
+```
+
+**`--model` is not honoured.** A third observation from the full run: the session reported
+`Gemini 3.5 Flash (Low)` "configured via your settings", so a local configuration is pinning both
+model and effort below the required route. No `~/.agy` or `~/.config/agy` settings file was found to
+correct.
+
+Both attempts also **failed to perform the evaluation at all** — each answered conversationally and
+wrote no verdict file.
+
+### Decision: halt, do not substitute
+
+`lane-policy.md` invariant 3 makes launch identity **data, validated** — requested versus observed
+must match. Observed is Gemini 3.5 Flash (Low); requested is Gemini 3.6 Flash high. That is a
+**two-step downgrade in both model and effort** on a p1 plan gate.
+
+Accepting it would be the same error I made an hour ago in the opposite direction: taking whatever
+evaluator is reachable and writing a justification afterwards. The standing rule in this run is that
+a route which cannot be launched at its required identity **halts and is reported** rather than
+being silently substituted. So:
+
+- **No verdict was accepted.** Nothing from either AGY attempt adjudicates anything.
+- **No substitute was launched.** Not Codex (same-family, already ruled wrong — see the D-8
+  correction), not Fable (prohibited, D-7), not a manual OpenHands retrigger (prohibited).
+- **#1454's plan gate is HALTED** pending an owner decision on the transport.
+
+### What is unaffected
+
+- **#1454's architecture already has an opposite-family verdict.** Cycle 1's MiniMax M3 evaluation
+  verified every load-bearing claim against the tree and judged the root cause, fix surface, and
+  published-surface answer correct. Only the **four hygiene amendments** are unadjudicated.
+- **The amendments were verified present and substantive by this orchestrator** before the re-arm —
+  risk register with mitigations and owning slices, open-decision sweep with must-resolve markers,
+  one canonical precedence chain, ARCHETYPE-5 and `jsr-audit` cited. That is an orchestrator check,
+  **not** a formal PLAN-EVAL, and is recorded as such rather than promoted to one.
+- **The other three wave-2 slices are unaffected.** #1456 and #1460 are merged; #1540 passed
+  automatic IMPL-EVAL at `7ba8d10c4` and is in its merge lifecycle.
+
+### Options for the owner
+
+1. Fix the AGY configuration so `--model gemini-3.6-flash-high` takes effect, then re-run the single
+   fallback.
+2. Wait for the OpenRouter/MiniMax lane to recover and re-arm the automatic PLAN-EVAL.
+3. Explicitly waive the plan gate for #1454's amendments, on the basis that its architecture already
+   holds an opposite-family PASS and the amendments are hygiene — recorded as a waiver, not as a
+   verdict.
+4. Move #1454 to the next milestone with its remaining scope written on the issue.
