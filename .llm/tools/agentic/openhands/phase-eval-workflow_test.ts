@@ -190,6 +190,10 @@ Deno.test('generic OpenHands delegates comment authorization to the tested polic
   );
   assertStringIncludes(workflow, 'const { evaluateOpenHandsCommentTrigger } = await import(');
   assertStringIncludes(workflow, 'const decision = evaluateOpenHandsCommentTrigger({');
+  assertStringIncludes(
+    workflow,
+    "startsWith(github.event.comment.body, '@openhands-agent')",
+  );
   assertStringIncludes(workflow, "if: needs.authorize.outputs.dispatch == 'true'");
   assertStringIncludes(
     workflow,
