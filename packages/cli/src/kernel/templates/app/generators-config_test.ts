@@ -3,11 +3,18 @@
  */
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertStringIncludes, assertThrows } from 'jsr:@std/assert@^1';
 import { SCAFFOLD_APP_IMPORTS } from '../../constants/scaffold/scaffold-app-catalog.ts';
 import { generateAppDenoJson } from '../../adapters/templates/app/generate-app-deno-json.ts';
 import { generateAppViteConfig } from '../../adapters/templates/app/generate-vite-config.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
+import { NETSCRIPT_RELEASE_VERSION } from '../../constants/jsr-specifiers.ts';
+
+const CANARY_VERSION = '0.0.6-canary.3';
+
+function jsr(packageName: string, version: string, subpath = ''): string {
+  return `jsr:@netscript/${packageName}@${version}${subpath}`;
+}
 
 // These generators read templates synchronously, which requires a previously-
 // awaited registry hydration. The tests exercise them directly (outside the CLI
@@ -75,9 +82,16 @@ describe('generateAppDenoJson', () => {
     }));
     assertEquals(
       config.tasks.dev,
-      'deno task --cwd ../.. deps:verify && deno run -A npm:vite --configLoader native',
+      'deno task deps:closure && deno task --cwd ../.. deps:verify && deno run -A npm:vite --configLoader native',
     );
-    assertEquals(config.tasks.build, 'deno run -A npm:vite build');
+    assertEquals(
+      config.tasks['deps:closure'],
+      'deno run --allow-read .netscript/verify-dependency-closure.ts',
+    );
+    assertEquals(
+      config.tasks.build,
+      'deno task deps:closure && deno run -A npm:vite build',
+    );
     assertEquals(config.tasks.serve, 'deno run -A npm:vite preview');
   });
 
@@ -126,6 +140,7 @@ describe('generateAppDenoJson', () => {
     assertEquals(config.exports, './main.ts');
     assertEquals(Object.keys(config.tasks), [
       'check',
+      'deps:closure',
       'dev',
       'build',
       'serve',
@@ -241,6 +256,83 @@ describe('generateAppDenoJson', () => {
     for (const [specifier, target] of Object.entries(SCAFFOLD_APP_IMPORTS)) {
       assertEquals(config.imports[specifier], target);
     }
+  });
+
+  it('rejects an incoherent resolver result before serializing the app manifest', () => {
+    const error = assertThrows(
+      () =>
+        generateAppDenoJson({
+          projectName: 'test',
+          appName: 'dashboard',
+          importMode: 'jsr',
+          jsrResolver: {
+            resolveImport: (specifier) => specifier,
+            resolveImports: (specifiers) =>
+              Object.fromEntries(specifiers.map((specifier) => [
+                specifier,
+                specifier === '@netscript/fresh/defer/island'
+                  ? jsr('fresh', CANARY_VERSION, '/defer/island')
+                  : specifier.startsWith('@netscript/fresh')
+                  ? jsr(
+                    'fresh',
+                    NETSCRIPT_RELEASE_VERSION,
+                    specifier.slice('@netscript/fresh'.length),
+                  )
+                  : specifier.startsWith('@netscript/sdk')
+                  ? jsr(
+                    'sdk',
+                    NETSCRIPT_RELEASE_VERSION,
+                    specifier.slice('@netscript/sdk'.length),
+                  )
+                  : jsr('fresh-ui', NETSCRIPT_RELEASE_VERSION),
+              ])),
+          },
+        }),
+      Error,
+    );
+    assertStringIncludes(
+      error.message,
+      'NetScript dependency closure is incoherent.',
+    );
+    assertStringIncludes(error.message, '@netscript/fresh@0.0.5');
+    assertStringIncludes(
+      error.message,
+      '@netscript/fresh@0.0.6-canary.3/defer/island',
+    );
+  });
+
+  it('rejects a non-exact closure member at init', () => {
+    const error = assertThrows(
+      () =>
+        generateAppDenoJson({
+          projectName: 'test',
+          appName: 'dashboard',
+          importMode: 'jsr',
+          jsrResolver: {
+            resolveImport: (specifier) => specifier,
+            resolveImports: (specifiers) =>
+              Object.fromEntries(specifiers.map((specifier) => [
+                specifier,
+                specifier.startsWith('@netscript/fresh')
+                  ? jsr(
+                    'fresh',
+                    `^${NETSCRIPT_RELEASE_VERSION}`,
+                    specifier.slice('@netscript/fresh'.length),
+                  )
+                  : specifier.startsWith('@netscript/sdk')
+                  ? jsr(
+                    'sdk',
+                    NETSCRIPT_RELEASE_VERSION,
+                    specifier.slice('@netscript/sdk'.length),
+                  )
+                  : jsr('fresh-ui', NETSCRIPT_RELEASE_VERSION),
+              ])),
+          },
+        }),
+      Error,
+    );
+    assertStringIncludes(error.message, 'uses non-exact version "^0.0.5"');
+    assertStringIncludes(error.message, 'pin this member exactly');
   });
 });
 

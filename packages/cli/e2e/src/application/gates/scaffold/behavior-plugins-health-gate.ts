@@ -3,6 +3,10 @@ import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import { cli, commandGate } from './gate-factory.ts';
 import { resolve } from '@std/path';
 import { NETSCRIPT_RELEASE_VERSION } from '../../../../../src/kernel/constants/jsr-specifiers.ts';
+import {
+  PACKAGE_BACKED_DOCTOR_UNPUBLISHED_EXIT_CODE,
+  PACKAGE_BACKED_DOCTOR_UNPUBLISHED_MESSAGE,
+} from './package-backed-plugin-version.ts';
 
 const PACKAGE_BACKED_DOCTOR_FIXTURE = new URL(
   './package-backed-plugin-doctor-fixture.ts',
@@ -77,29 +81,40 @@ export function createBehaviorPluginHealthGates(): readonly GateDefinition[] {
 /** Validate published workers/streams manifests without copied plugin workdirs. */
 export function createPackageBackedPluginDoctorGates(): readonly GateDefinition[] {
   return [
-    commandGate(
-      GATE.BEHAVIOR_PACKAGE_BACKED_PLUGIN_DOCTOR,
-      'Validate package-backed plugin doctor truth',
-      GATE_PHASE.BEHAVIOR,
-      (context) => [
-        'deno',
-        'run',
-        '-A',
-        PACKAGE_BACKED_DOCTOR_FIXTURE.href,
-        '--project-root',
-        resolve(context.project.smokeRoot, `${context.project.projectName}-package-doctor`),
-        '--repo-root',
-        context.project.repoRoot,
-        '--cli-entrypoint',
-        context.project.cliEntrypoint,
-        '--package-version',
-        NETSCRIPT_RELEASE_VERSION,
-      ],
-      (context) => context.project.repoRoot,
-      'capture',
-      'Package-backed doctor must consume published manifests without local plugin workdirs.',
-      undefined,
-      120_000,
-    ),
+    {
+      id: GATE.BEHAVIOR_PACKAGE_BACKED_PLUGIN_DOCTOR,
+      title: 'Validate package-backed plugin doctor truth',
+      phase: GATE_PHASE.BEHAVIOR,
+      kind: 'command',
+      critical: true,
+      command: (context) => {
+        const publishedVersion = /^jsr:@netscript\/cli@([^/]+)(?:\/.*)?$/.exec(
+          context.project.cliEntrypoint,
+        )?.[1];
+        return [
+          'deno',
+          'run',
+          '-A',
+          PACKAGE_BACKED_DOCTOR_FIXTURE.href,
+          '--project-root',
+          resolve(context.project.smokeRoot, `${context.project.projectName}-package-doctor`),
+          '--repo-root',
+          context.project.repoRoot,
+          '--cli-entrypoint',
+          context.project.cliEntrypoint,
+          '--package-version',
+          publishedVersion ?? NETSCRIPT_RELEASE_VERSION,
+        ];
+      },
+      cwd: (context) => context.project.repoRoot,
+      outputMode: 'capture',
+      failureHint:
+        'Package-backed doctor must consume published manifests without local plugin workdirs.',
+      timeoutMs: 120_000,
+      skip: {
+        exitCode: PACKAGE_BACKED_DOCTOR_UNPUBLISHED_EXIT_CODE,
+        message: PACKAGE_BACKED_DOCTOR_UNPUBLISHED_MESSAGE,
+      },
+    },
   ];
 }

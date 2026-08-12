@@ -214,8 +214,8 @@ export interface EnhancedFormProps {
   readonly noValidate: boolean;
   /** CSS class forwarded to the form element. */
   readonly class?: string;
-  /** Fresh client-navigation flag. */
-  readonly 'f-client-nav'?: boolean;
+  /** Fresh client-navigation transport value. */
+  readonly 'f-client-nav'?: boolean | 'false';
   /** Fresh partial route name. */
   readonly 'f-partial'?: string;
   /** Enhanced submit handler. */

@@ -536,6 +536,7 @@ Deno.test("agent init installs the consumer tool surface for every host", async 
         "consumer-tools.json",
         "README.md",
         "release.json",
+        "docs/snippet-extractor.ts",
         "run-deno-check.ts",
         "run-deno-lint.ts",
         "run-deno-doc-lint.ts",
@@ -587,7 +588,8 @@ Deno.test("installed consumer tools resolve from the project when process CWD di
     });
     const manifest = JSON.parse(
       await Deno.readTextFile(join(root, ".llm", "tools", "consumer-tools.json")),
-    ) as { readonly tools: readonly { path: string }[] };
+    ) as { readonly schemaVersion: number; readonly tools: readonly { path: string }[] };
+    assertEquals(manifest.schemaVersion, 2);
     for (const tool of manifest.tools) {
       const output = await new Deno.Command(Deno.execPath(), {
         args: [

@@ -2,6 +2,7 @@ import { assert, assertEquals } from 'jsr:@std/assert@^1';
 import {
   auditFirstPublishPackages,
   auditLockstepAndResidue,
+  auditReferencePages,
   collectPublishReadiness,
   type PublishReadinessDependencies,
   type ReadinessCheckEvidence,
@@ -16,6 +17,7 @@ Deno.test('publish readiness emits ordered structured evidence for every compose
   assertEquals(report.ok, true);
   assertEquals(report.checks.map(({ id, status }) => ({ id, status })), [
     { id: 'publish-set', status: 'PASS' },
+    { id: 'docs-reference', status: 'PASS' },
     { id: 'markdown-pins', status: 'PASS' },
     { id: 'lockstep-residue', status: 'PASS' },
     { id: 'versionless-specifiers', status: 'PASS' },
@@ -25,6 +27,62 @@ Deno.test('publish readiness emits ordered structured evidence for every compose
     { id: 'import-attribute-preflight', status: 'PASS' },
   ]);
   assert(report.checks.every((check) => Number.isInteger(check.durationMs)));
+});
+
+Deno.test('reference-page audit resolves the four deployable aliases and name-exact core peers', async () => {
+  const root = await Deno.makeTempDir({ prefix: 'netscript-readiness-reference-aliases-' });
+  const members = [
+    { path: 'plugins/sagas', name: '@netscript/plugin-sagas' },
+    { path: 'packages/sagas-core', name: '@netscript/plugin-sagas-core' },
+    { path: 'plugins/streams', name: '@netscript/plugin-streams' },
+    { path: 'packages/streams-core', name: '@netscript/plugin-streams-core' },
+    { path: 'plugins/triggers', name: '@netscript/plugin-triggers' },
+    { path: 'packages/triggers-core', name: '@netscript/plugin-triggers-core' },
+    { path: 'plugins/workers', name: '@netscript/plugin-workers' },
+    { path: 'packages/workers-core', name: '@netscript/plugin-workers-core' },
+  ];
+  try {
+    for (
+      const segment of [
+        'sagas',
+        'plugin-sagas-core',
+        'streams',
+        'plugin-streams-core',
+        'triggers',
+        'plugin-triggers-core',
+        'workers',
+        'plugin-workers-core',
+      ]
+    ) {
+      const directory = `${root}/docs/site/reference/${segment}`;
+      await Deno.mkdir(directory, { recursive: true });
+      await Deno.writeTextFile(`${directory}/index.md`, `# ${segment}\n`);
+    }
+    assertEquals(await auditReferencePages(root, members), []);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('publish readiness fails when a published effective member has no reference page', async () => {
+  const root = await Deno.makeTempDir({ prefix: 'netscript-readiness-reference-missing-' });
+  try {
+    const report = await collectPublishReadiness(
+      root,
+      '0.0.2-canary.1',
+      dependencies({
+        auditReferencePages,
+        readRegistryVersions: () => Promise.resolve(['0.0.1']),
+      }),
+    );
+    assertEquals(report.ok, false);
+    assertFailed(report.checks, 'docs-reference', '@netscript/new');
+    assertFailed(report.checks, 'docs-reference', 'docs/site/reference/new/index.md');
+    assertEquals(report.checks.find((check) => check.id === 'new-packages')?.details, []);
+    assertEquals(report.checks.find((check) => check.id === 'first-publish')?.status, 'PASS');
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
 });
 
 Deno.test('publish readiness fails on a seeded workspace member omitted from the publish set', async () => {
@@ -140,19 +198,18 @@ Deno.test('first-publish checklist fails on a seeded missing README', async () =
   }
 });
 
-Deno.test('first-publish checklist fails over-cap tagline, missing license/exports, and docs pointer', async () => {
+Deno.test('first-publish checklist fails over-cap tagline and missing license/exports', async () => {
   const root = await firstPublishFixture({
     tagline: `**${'enterprise '.repeat(30)}**`,
     license: false,
     exports: false,
-    docs: false,
   });
   try {
     const rules = (await auditFirstPublishPackages(root, [MEMBER])).map((finding) => finding.rule);
     assert(rules.includes('tagline-bytes'));
     assert(rules.includes('license'));
     assert(rules.includes('exports'));
-    assert(rules.includes('docs-reference'));
+    assertEquals(rules.includes('docs-reference'), false);
   } finally {
     await Deno.remove(root, { recursive: true });
   }
@@ -279,6 +336,7 @@ function dependencies(
         unknownExports: [],
         ranges: [],
       }),
+    auditReferencePages: () => Promise.resolve([]),
     readRegistryVersions: () => Promise.resolve([]),
     auditFirstPublish: () => Promise.resolve([]),
     runProvisioningDryCheck: () => Promise.resolve(),
@@ -328,7 +386,6 @@ async function firstPublishFixture(
     tagline?: string;
     license?: boolean;
     exports?: boolean;
-    docs?: boolean;
   } = {},
 ): Promise<string> {
   const root = await Deno.makeTempDir({ prefix: 'netscript-readiness-first-' });
@@ -365,10 +422,6 @@ async function firstPublishFixture(
         '',
       ].join('\n'),
     );
-  }
-  if (options.docs !== false) {
-    await Deno.mkdir(`${root}/docs/site/reference/new`, { recursive: true });
-    await Deno.writeTextFile(`${root}/docs/site/reference/new/index.md`, '# New\n');
   }
   return root;
 }

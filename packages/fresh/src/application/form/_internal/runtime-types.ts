@@ -76,13 +76,25 @@ export interface FormEnhancementSnapshot<TValues extends FormValues> {
 /** Progressive enhancement strategy for collection fields. */
 export type FormCollectionStrategyMode = 'server' | 'client' | 'hybrid';
 
+/** Navigation mode used when a managed form submits. */
+export type FormNavigationMode = 'client' | 'document';
+
+/** Caller-facing navigation policy for a managed form submission. */
+export interface FormNavigationStrategy {
+  /** Use Fresh client revival or a browser document navigation. */
+  readonly navigation: FormNavigationMode;
+}
+
 /** Client/server ownership policy for a collection field. */
-export interface FormCollectionStrategy {
+export interface FormCollectionStrategy extends Partial<FormNavigationStrategy> {
   /** Strategy mode. */
   readonly mode: FormCollectionStrategyMode;
   /** Partial route used for collection updates. */
   readonly partial?: string;
-  /** Whether client navigation is enabled for collection updates. */
+  /** Whether client navigation is enabled for collection updates.
+   *
+   * @deprecated Use `navigation` so the policy describes caller intent.
+   */
   readonly clientNav?: boolean;
 }
 
@@ -92,6 +104,8 @@ export interface FormEnhancementOptions<TValues extends FormValues> {
   readonly partial?: string;
   /** Whether Fresh client navigation handles enhanced submissions. */
   readonly clientNav?: boolean;
+  /** Navigation policy for enhanced submissions. */
+  readonly strategy?: FormNavigationStrategy;
   /** Client validation timing. */
   readonly validate?: 'onSubmit' | 'onBlur' | 'onChange';
   /** Optional schema-like validator used before submission. */

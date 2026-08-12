@@ -34,6 +34,8 @@ export type {
   FormFieldPath,
   FormIntent,
   FormIntentResult,
+  FormNavigationMode,
+  FormNavigationStrategy,
   FormPageInvalidateContext,
   FormPageMode,
   FormPageProps,

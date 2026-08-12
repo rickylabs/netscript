@@ -1,8 +1,10 @@
 import { SUBMISSION_ID_FIELD_NAME } from '../runtime/idempotency.ts';
+import { resolveFormNavigationProps } from './enhancement.tsx';
 import type {
   FormElementOverrideProps,
   FormEnhancementSnapshot,
   FormEnhancementState,
+  FormNavigationStrategy,
   FormValues,
   RuntimeFormState,
 } from '../runtime/types.ts';
@@ -32,6 +34,8 @@ export interface FormProps<TValues extends FormValues> extends Partial<Record<st
   readonly children: FormContent;
   /** Optional override for framework-managed form attributes. */
   readonly formProps?: FormElementOverrideProps;
+  /** Navigation policy used when the managed form submits. */
+  readonly strategy?: FormNavigationStrategy;
 }
 
 /** Render a managed form element with submission and CSRF hidden inputs. */
@@ -40,6 +44,7 @@ export function Form<TValues extends FormValues>({
   enhancement,
   children,
   formProps: formPropOverrides,
+  strategy,
   ...props
 }: FormProps<TValues>): object {
   const {
@@ -54,6 +59,7 @@ export function Form<TValues extends FormValues>({
     ...(enhancement?.formProps ?? {}),
     ...formElementOverrides,
     ...props,
+    ...resolveFormNavigationProps(strategy),
   };
 
   return (

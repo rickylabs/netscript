@@ -1,4 +1,8 @@
 import { dirname, join, resolve } from '@std/path';
+import {
+  findUnpublishedFixturePackages,
+  PACKAGE_BACKED_DOCTOR_UNPUBLISHED_EXIT_CODE,
+} from './package-backed-plugin-version.ts';
 
 const WORKERS_PERMISSIONS = [
   '--unstable-kv',
@@ -19,6 +23,13 @@ const STREAMS_PERMISSIONS = [
 const REGISTRY_PATH = '.netscript/generated/plugin-workers/job-registry.ts';
 
 const options = parseArgs(Deno.args);
+const unpublishedPackages = await findUnpublishedFixturePackages(options.packageVersion);
+if (unpublishedPackages.length > 0) {
+  console.log('PACKAGE_BACKED_PLUGIN_DOCTOR_EXCLUDED');
+  console.log(`version=${options.packageVersion}`);
+  console.log(`unpublishedPackages=${unpublishedPackages.join(',')}`);
+  Deno.exit(PACKAGE_BACKED_DOCTOR_UNPUBLISHED_EXIT_CODE);
+}
 await Deno.remove(options.projectRoot, { recursive: true }).catch((error: unknown) => {
   if (!(error instanceof Deno.errors.NotFound)) throw error;
 });

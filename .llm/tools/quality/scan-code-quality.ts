@@ -1,4 +1,5 @@
 import { relative, resolve } from 'jsr:@std/path@^1';
+import { extractFencedBlocks } from '../docs/snippet-extractor.ts';
 
 export type QualityRule =
   | 'explicit-any-ignore'
@@ -12,6 +13,7 @@ export interface QualityFinding {
   readonly file: string;
   readonly line: number;
   readonly text: string;
+  readonly fenceOrdinal?: number;
 }
 
 const PLUGIN_NAMES = ['ai', 'auth', 'sagas', 'streams', 'triggers', 'workers'];
@@ -53,7 +55,8 @@ function ruleFor(line: string, file: string, tainted: Set<string>): QualityRule 
   if (/deno-lint-ignore(?:-file)?\s+no-explicit-any/.test(line)) return 'explicit-any-ignore';
   if (/@ts-(?:ignore|expect-error|nocheck)\b/.test(line)) return 'ts-error-suppression';
   if (/\bas\s+unknown\s+as\b|\bas\s+any\b|\bas\s+never\b/.test(line)) return 'unsafe-cast';
-  if (/(?:<|:\s*)any(?:\s*[,>;)\]}]|\b)/.test(line)) return 'explicit-any';
+  const commentOnly = /^\s*(?:\/\/|\/\*|\*)/.test(line);
+  if (!commentOnly && /(?:<|:\s*)any(?:\s*[,>;)\]}]|\b)/.test(line)) return 'explicit-any';
   // Host-side plugin identity: equality/predicate against a plugin name whether
   // written as a quoted literal OR a same-file identifier bound to one (const
   // indirection). Requiring the closing quote on literals keeps `'auth-backend'`
@@ -93,9 +96,22 @@ function isTypeFixture(file: string): boolean {
   return normalized.includes('/tests/type-fixtures/') && normalized.endsWith('_type.ts');
 }
 
+function isSoundnessFixture(file: string): boolean {
+  return file.replaceAll('\\', '/').endsWith('-soundness_test.ts');
+}
+
+function isDocsSiteFile(file: string): boolean {
+  const normalized = file.replaceAll('\\', '/');
+  return normalized.includes('/docs/site/') || normalized.startsWith('docs/site/');
+}
+
 function isScannable(file: string): boolean {
-  return /\.[cm]?[jt]sx?$/.test(file) && !/(?:_test|\.test|\.spec)\.[cm]?[jt]sx?$/.test(file) &&
-    !file.endsWith('.generated.ts') && !isTypeFixture(file);
+  if (isDocsSiteFile(file) && /\.md$/.test(file)) return true;
+  if (!/\.[cm]?[jt]sx?$/.test(file) || file.endsWith('.generated.ts') || isTypeFixture(file)) {
+    return false;
+  }
+  const testFile = /(?:_test|\.test|\.spec)\.[cm]?[jt]sx?$/.test(file);
+  return !testFile || isDocsSiteFile(file) || isSoundnessFixture(file);
 }
 
 async function collect(path: string): Promise<string[]> {
@@ -119,12 +135,46 @@ export interface QualityAllowance {
   readonly file: string;
   readonly line: number;
   readonly reason: string;
+  readonly fenceOrdinal?: number;
 }
 
 /** Full scan result: real findings plus every honored allowance (for audit). */
 export interface QualityScan {
   readonly findings: QualityFinding[];
   readonly allowances: QualityAllowance[];
+}
+
+interface ScanUnit {
+  readonly sourcePath: string;
+  readonly lines: readonly string[];
+  readonly lineOffset: number;
+  readonly fenceOrdinal?: number;
+  readonly exemptTsErrorSuppression: boolean;
+}
+
+async function scanUnits(file: string, cwd: string): Promise<ScanUnit[]> {
+  const sourcePath = relative(cwd, file).replaceAll('\\', '/');
+  const source = await Deno.readTextFile(file);
+  if (!sourcePath.startsWith('docs/site/') || !sourcePath.endsWith('.md')) {
+    return [{
+      sourcePath,
+      lines: source.split(/\r?\n/),
+      lineOffset: 0,
+      exemptTsErrorSuppression: isSoundnessFixture(sourcePath),
+    }];
+  }
+
+  return extractFencedBlocks(source, sourcePath)
+    .filter((block) =>
+      block.compilationExtension !== undefined && block.exemptionReason === undefined
+    )
+    .map((block) => ({
+      sourcePath: block.sourcePath,
+      lines: block.body.split(/\r?\n/),
+      lineOffset: block.codeStartLine - 1,
+      fenceOrdinal: block.fenceOrdinal,
+      exemptTsErrorSuppression: false,
+    }));
 }
 
 /** Scan selected source paths, returning findings and honored allowances. */
@@ -136,29 +186,37 @@ export async function scanCodeQualityDetailed(
   const findings: QualityFinding[] = [];
   const allowances: QualityAllowance[] = [];
   for (const file of files) {
-    const lines = (await Deno.readTextFile(file)).split(/\r?\n/);
-    const normalized = file.replaceAll('\\', '/');
-    const tainted = normalized.includes('/features/plugins/')
-      ? collectPluginNameIdents(lines)
-      : EMPTY_TAINT;
-    for (let index = 0; index < lines.length; index++) {
-      const line = lines[index];
-      const allowance = line.match(/\/\/\s*quality-allow:\s*(.+)$/);
-      if (allowance?.[1].trim()) {
-        // A quality-allow only suppresses a line that would otherwise fire a
-        // rule — an allowance on a clean line is dead weight, not counted.
-        if (ruleFor(line.replace(/\/\/\s*quality-allow:.*$/, ''), normalized, tainted)) {
-          allowances.push({
-            file: relative(cwd, file),
-            line: index + 1,
-            reason: allowance[1].trim(),
+    for (const unit of await scanUnits(file, cwd)) {
+      const normalized = unit.sourcePath.replaceAll('\\', '/');
+      const tainted = normalized.includes('/features/plugins/')
+        ? collectPluginNameIdents(unit.lines)
+        : EMPTY_TAINT;
+      for (let index = 0; index < unit.lines.length; index++) {
+        const line = unit.lines[index];
+        const allowance = line.match(/\/\/\s*quality-allow:\s*(.+)$/);
+        if (allowance?.[1].trim()) {
+          // A quality-allow only suppresses a line that would otherwise fire a
+          // rule — an allowance on a clean line is dead weight, not counted.
+          if (ruleFor(line.replace(/\/\/\s*quality-allow:.*$/, ''), normalized, tainted)) {
+            allowances.push({
+              file: unit.sourcePath,
+              line: unit.lineOffset + index + 1,
+              reason: allowance[1].trim(),
+              ...(unit.fenceOrdinal === undefined ? {} : { fenceOrdinal: unit.fenceOrdinal }),
+            });
+          }
+          continue;
+        }
+        const rule = ruleFor(line, normalized, tainted);
+        if (rule && !(unit.exemptTsErrorSuppression && rule === 'ts-error-suppression')) {
+          findings.push({
+            rule,
+            file: unit.sourcePath,
+            line: unit.lineOffset + index + 1,
+            text: line.trim(),
+            ...(unit.fenceOrdinal === undefined ? {} : { fenceOrdinal: unit.fenceOrdinal }),
           });
         }
-        continue;
-      }
-      const rule = ruleFor(line, normalized, tainted);
-      if (rule) {
-        findings.push({ rule, file: relative(cwd, file), line: index + 1, text: line.trim() });
       }
     }
   }

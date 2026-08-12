@@ -33,6 +33,12 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.9.5
+      - name: Require an issue link for allowance budget increases
+        run: >-
+          deno run --allow-run .llm/tools/quality/check-allowance-budget-diff.ts
+          "${{ github.event.pull_request.base.sha }}"
+          "${{ github.event.pull_request.head.sha }}"
+          --pretty
       - name: Scan changed source files
         shell: bash
         run: |
