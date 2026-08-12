@@ -2,11 +2,11 @@ import { join } from '@std/path';
 
 export interface PackageMapping {
   name: string;
-  packagePath: string;      // relative to root, e.g. "packages/plugin"
-  docPath: string;          // relative to root, e.g. "docs/site/reference/plugin/index.md"
-  packageName: string;      // e.g. "@netscript/plugin"
+  packagePath: string; // relative to root, e.g. "packages/plugin"
+  docPath: string; // relative to root, e.g. "docs/site/reference/plugin/index.md"
+  packageName: string; // e.g. "@netscript/plugin"
   excludedExports?: string[]; // list of exported keys to ignore, e.g. ["./internal"]
-  checkSymbols?: boolean;   // if true, verifies every exported symbol is listed in the doc
+  checkSymbols?: boolean; // if true, verifies every exported symbol is listed in the doc
   excludedSymbols?: string[]; // list of symbol names to ignore
 }
 
@@ -235,12 +235,14 @@ export const AUTHORITATIVE_MAPPING: PackageMapping[] = [
       'telemetryConfigSchema',
       'TelemetryConfigError',
       'validateTelemetryConfig',
-      'TracedResult'
+      'TracedResult',
     ],
   },
 ];
 
-export function parseDocContent(docContent: string): { docExports: Map<string, string>; docSymbols: Set<string> } {
+export function parseDocContent(
+  docContent: string,
+): { docExports: Map<string, string>; docSymbols: Set<string> } {
   const docExports = new Map<string, string>();
   const docSymbols = new Set<string>();
   const lines = docContent.split('\n');
@@ -265,14 +267,14 @@ export function parseDocContent(docContent: string): { docExports: Map<string, s
     }
 
     if (line.startsWith('|') && !line.includes('---') && !line.includes('Symbol |')) {
-      const parts = line.split('|').map(p => p.trim()).filter(Boolean);
+      const parts = line.split('|').map((p) => p.trim()).filter(Boolean);
       if (parts.length >= 1) {
         const firstCol = parts[0];
         const matches = firstCol.matchAll(/`([^`]+)`/g);
         for (const m of matches) {
           const val = m[1];
           if (val.includes('@netscript/') || val.startsWith('.')) continue;
-          const syms = val.split(/[\/,\|]/).map(s => s.trim()).filter(Boolean);
+          const syms = val.split(/[\/,\|]/).map((s) => s.trim()).filter(Boolean);
           for (const s of syms) {
             docSymbols.add(s);
           }
@@ -283,7 +285,11 @@ export function parseDocContent(docContent: string): { docExports: Map<string, s
   return { docExports, docSymbols };
 }
 
-export function deriveExpectedExports(packageName: string, exportsObj: any, excludedExports: string[] = []): Map<string, string> {
+export function deriveExpectedExports(
+  packageName: string,
+  exportsObj: any,
+  excludedExports: string[] = [],
+): Map<string, string> {
   const expectedExports = new Map<string, string>();
   const excludedSet = new Set(excludedExports);
 
@@ -295,47 +301,73 @@ export function deriveExpectedExports(packageName: string, exportsObj: any, excl
     for (const [key, value] of Object.entries(exportsObj)) {
       if (excludedSet.has(key)) continue;
       const exportName = key === '.' ? packageName : `${packageName}/${key.slice(2)}`;
-      expectedExports.set(exportName, typeof value === 'string' ? value : (value as any).default || '');
+      expectedExports.set(
+        exportName,
+        typeof value === 'string' ? value : (value as any).default || '',
+      );
     }
   }
   return expectedExports;
 }
 
-export function checkExportsDrift(pkgName: string, docPath: string, expectedExports: Map<string, string>, docExports: Map<string, string>): string[] {
+export function checkExportsDrift(
+  pkgName: string,
+  docPath: string,
+  expectedExports: Map<string, string>,
+  docExports: Map<string, string>,
+): string[] {
   const errors: string[] = [];
   for (const [name, path] of expectedExports.entries()) {
     if (!docExports.has(name)) {
-      errors.push(`Drift Error [${pkgName}]: Document at ${docPath} OMITS exported entrypoint '${name}' (${path})`);
+      errors.push(
+        `Drift Error [${pkgName}]: Document at ${docPath} OMITS exported entrypoint '${name}' (${path})`,
+      );
     } else {
       const docPathVal = docExports.get(name);
       if (docPathVal !== path) {
-        errors.push(`Drift Error [${pkgName}]: Document at ${docPath} has mismatching path for '${name}'. Expected: '${path}', Doc: '${docPathVal}'`);
+        errors.push(
+          `Drift Error [${pkgName}]: Document at ${docPath} has mismatching path for '${name}'. Expected: '${path}', Doc: '${docPathVal}'`,
+        );
       }
     }
   }
 
   for (const name of docExports.keys()) {
     if (!expectedExports.has(name)) {
-      errors.push(`Drift Error [${pkgName}]: Document at ${docPath} INVENTS nonexistent/omitted entrypoint '${name}'`);
+      errors.push(
+        `Drift Error [${pkgName}]: Document at ${docPath} INVENTS nonexistent/omitted entrypoint '${name}'`,
+      );
     }
   }
   return errors;
 }
 
-export function checkSymbolsDrift(pkgName: string, docPath: string, expectedSymbols: Set<string>, docSymbols: Set<string>): string[] {
+export function checkSymbolsDrift(
+  pkgName: string,
+  docPath: string,
+  expectedSymbols: Set<string>,
+  docSymbols: Set<string>,
+): string[] {
   const errors: string[] = [];
   for (const sym of expectedSymbols) {
     if (!docSymbols.has(sym)) {
-      errors.push(`Symbol Drift Error [${pkgName}]: Document at ${docPath} OMITS exported symbol '${sym}'`);
+      errors.push(
+        `Symbol Drift Error [${pkgName}]: Document at ${docPath} OMITS exported symbol '${sym}'`,
+      );
     }
   }
 
   for (const sym of docSymbols) {
-    if (sym === 'Symbol' || sym === 'Kind' || sym === 'Signature' || sym === 'Description' || sym === 'Export' || sym === 'Entrypoint' || sym === 'Purpose') continue;
+    if (
+      sym === 'Symbol' || sym === 'Kind' || sym === 'Signature' || sym === 'Description' ||
+      sym === 'Export' || sym === 'Entrypoint' || sym === 'Purpose'
+    ) continue;
     if (sym.includes('/') || sym.startsWith('@')) continue;
-    
+
     if (!expectedSymbols.has(sym)) {
-      errors.push(`Symbol Drift Error [${pkgName}]: Document at ${docPath} INVENTS nonexistent/unexported symbol '${sym}'`);
+      errors.push(
+        `Symbol Drift Error [${pkgName}]: Document at ${docPath} INVENTS nonexistent/unexported symbol '${sym}'`,
+      );
     }
   }
   return errors;
@@ -396,7 +428,9 @@ async function checkDrift() {
           });
           const { stdout, code } = await cmd.output();
           if (code !== 0) {
-            console.error(`Failed to run deno doc --json for ${exportName} at ${fullEntrypointPath}`);
+            console.error(
+              `Failed to run deno doc --json for ${exportName} at ${fullEntrypointPath}`,
+            );
             hasErrors = true;
             continue;
           }

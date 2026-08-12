@@ -1,8 +1,10 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { assertEquals, assertRejects, assertThrows } from '@std/assert';
 import { join } from '@std/path';
 import {
   checkFreshRootImports,
   checkGoldenPathDocs,
+  checkMutationMapColumns,
+  checkSagaVocabulary,
 } from './check-accuracy-and-discoverability.ts';
 
 Deno.test('checkFreshRootImports allows valid root imports and fails on invalid root import with file, line, and symbol diagnostics', async () => {
@@ -53,7 +55,7 @@ Deno.test('checkGoldenPathDocs rejects retired paths, aliases, and query dialect
     await Deno.mkdir(reference, { recursive: true });
     await Deno.writeTextFile(
       join(reference, 'index.md'),
-      'createServiceQueryUtils uses queryOptions({ input }); createQueryFactories uses queryOptions(input) and has no server KV tier.\n',
+      'createServiceQueryUtils is the reference-only query dialect.\n',
     );
     await Deno.writeTextFile(join(site, 'guide.md'), '# clean guide\n');
 
@@ -84,5 +86,50 @@ Deno.test('checkGoldenPathDocs rejects retired paths, aliases, and query dialect
     );
   } finally {
     await Deno.remove(tempDir, { recursive: true });
+  }
+});
+
+Deno.test('checkSagaVocabulary rejects stale builder and orphan worker claims', () => {
+  const paths = ['sagas.md', 'storefront.md', 'architecture.md', 'durability.md'];
+  checkSagaVocabulary(['clean', 'clean', 'clean', 'clean'], paths);
+
+  for (
+    const stale of [
+      'defineSaga({ id: "checkout" })',
+      "send('CheckoutPaymentRequested'",
+      "send('reserve-inventory'",
+      "send('create-shipment'",
+      "send('OrderCancelled'",
+      "{ kind: 'service', id: 'payments' }",
+    ]
+  ) {
+    const pages = ['clean', 'clean', 'clean', 'clean'];
+    pages[stale.startsWith('send(') ? 1 : 0] = stale;
+    assertThrows(() => checkSagaVocabulary(pages, paths), Error);
+  }
+});
+
+Deno.test('checkMutationMapColumns requires the heading and all five policy columns', () => {
+  const columns =
+    '| Command | Source of truth mutated | Generated artifacts | Runtime consumers | Preview |';
+  checkMutationMapColumns(`## Mutation and regeneration map\n\n${columns}\n`);
+
+  for (
+    const missing of [
+      'Command',
+      'Source of truth mutated',
+      'Generated artifacts',
+      'Runtime consumers',
+      'Preview',
+    ]
+  ) {
+    assertThrows(
+      () =>
+        checkMutationMapColumns(
+          `## Mutation and regeneration map\n\n${columns.replace(missing, 'Removed')}\n`,
+        ),
+      Error,
+      missing,
+    );
   }
 });

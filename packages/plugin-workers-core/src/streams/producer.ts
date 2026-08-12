@@ -1,4 +1,5 @@
 import { createDurableStream } from '@netscript/plugin-streams-core';
+import { extractContext, withContext } from '@netscript/telemetry/context';
 import { DEFAULT_TOPIC } from '../domain/mod.ts';
 import { type WorkerExecution, type WorkerJob, workersStreamSchema } from './schema.ts';
 
@@ -37,6 +38,8 @@ export type WorkerExecutionRecord = Readonly<
     readonly result?: Record<string, unknown> | null;
     readonly workerId?: string | null;
     readonly attempt?: number;
+    readonly traceparent?: string;
+    readonly tracestate?: string;
   }
 >;
 
@@ -110,11 +113,19 @@ export function createStreamMutationHook(
   producer: WorkersStreamProducer,
 ): ExecutionMutationHook {
   return ({ type, execution }) => {
-    if (type === 'deleted') {
-      producer.delete('execution', execution.id);
-    } else {
-      producer.upsert('execution', toExecutionStreamEntity(execution));
-    }
+    withContext(
+      extractContext({
+        ...(execution.traceparent ? { traceparent: execution.traceparent } : {}),
+        ...(execution.tracestate ? { tracestate: execution.tracestate } : {}),
+      }),
+      () => {
+        if (type === 'deleted') {
+          producer.delete('execution', execution.id);
+          return;
+        }
+        producer.upsert('execution', toExecutionStreamEntity(execution));
+      },
+    );
   };
 }
 

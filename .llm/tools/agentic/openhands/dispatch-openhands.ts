@@ -53,7 +53,7 @@ import {
   validateHandoffContract,
 } from '../lib/agentic-lib.ts';
 import { requestedLaunchIdentity } from '../runtime/launch-route-identity.ts';
-import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
+import { OPEN_EVALUATOR_MODEL_IDS, OPENROUTER_MODEL_IDS } from '../config/models.ts';
 
 interface Options {
   repo: string;
@@ -189,6 +189,15 @@ async function main(): Promise<void> {
     console.error(error instanceof Error ? error.message : String(error));
     Deno.exit(2);
     return;
+  }
+  const openRouterModel = requested.model.replace(/^openrouter\//, '');
+  if (!OPEN_EVALUATOR_MODEL_IDS.some((model) => model === openRouterModel)) {
+    console.error(
+      `OpenHands evaluator model must be one of: ${
+        OPEN_EVALUATOR_MODEL_IDS.map((model) => `openrouter/${model}`).join(', ')
+      }`,
+    );
+    Deno.exit(2);
   }
   const number = o.pr ?? o.issue;
   if (!number || !Number.isFinite(number)) {

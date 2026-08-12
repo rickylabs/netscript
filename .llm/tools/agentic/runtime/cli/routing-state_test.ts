@@ -29,6 +29,7 @@ Deno.test('routing state human edge renders canonical evaluator lanes', () => {
       `  formal_impl_evaluation: evaluates=openai route=claude/anthropic/${MODEL_IDS.fable} effort=medium`,
       `  formal_impl_evaluation: evaluates=anthropic route=codex/openai/${MODEL_IDS.codexSol} effort=xhigh`,
       `  formal_impl_evaluation: policy=open_only route=claude/openrouter/${OPENROUTER_MODEL_IDS.deepseekV4Flash0731} effort=max`,
+      `  formal_impl_evaluation: policy=open_only route=claude/openrouter/${OPENROUTER_MODEL_IDS.qwen} effort=max`,
       `  formal_impl_evaluation: condition=fallback_on_openrouter_limit route=antigravity/google/${MODEL_IDS.antigravityDocs} effort=high`,
       `  review_claude: evaluates=anthropic route=codex/openai/${MODEL_IDS.codexSol} effort=xhigh`,
       `  review_codex_light: evaluates=openai route=claude/anthropic/${MODEL_IDS.opus} effort=high`,

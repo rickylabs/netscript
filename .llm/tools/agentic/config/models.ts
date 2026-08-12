@@ -69,9 +69,11 @@ export const HYBRID_DELEGATION_DEFAULT_MODEL: HybridDelegationModelId =
 export const OPEN_EVALUATOR_MODEL_IDS: readonly [
   typeof OPENROUTER_MODEL_IDS.minimax,
   typeof OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
+  typeof OPENROUTER_MODEL_IDS.qwen,
 ] = [
   OPENROUTER_MODEL_IDS.minimax,
   OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
+  OPENROUTER_MODEL_IDS.qwen,
 ] as const;
 export type OpenEvaluatorModelId = typeof OPEN_EVALUATOR_MODEL_IDS[number];
 

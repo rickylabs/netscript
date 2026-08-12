@@ -111,6 +111,13 @@ export interface NetScriptChatStreamProxyOptions {
       readonly target: NetScriptChatSessionTarget;
     }) => string);
   /**
+   * Maps the incoming request query to parameters forwarded upstream. When
+   * omitted, every incoming parameter except application-routing metadata
+   * `id` is forwarded. Returned parameters are merged with any query already
+   * present on the resolved stream URL; resolved values take precedence.
+   */
+  readonly query?: (query: URLSearchParams) => URLSearchParams;
+  /**
    * Server-side auth header provider. Defaults to `getStreamsAuth` from
    * `@netscript/plugin-streams-core`. Invoked per request; the result is
    * overlaid onto the upstream request headers and never returned to the client.
@@ -169,7 +176,17 @@ export function createNetScriptChatStreamProxy(
     const streamPath = typeof configuredStreamPath === 'function'
       ? () => configuredStreamPath({ request, target })
       : configuredStreamPath;
-    const upstreamUrl = resolveChatSessionUrl(target, { streamPath });
+    const upstreamUrl = new URL(resolveChatSessionUrl(target, { streamPath }));
+    const incomingQuery = new URL(request.url).searchParams;
+    const forwardedQuery = options.query ? options.query(incomingQuery) : new URLSearchParams(
+      [...incomingQuery].filter(([name]) => name !== 'id'),
+    );
+    const resolvedQueryNames = new Set(upstreamUrl.searchParams.keys());
+    for (const [name, value] of forwardedQuery) {
+      if (!resolvedQueryNames.has(name)) {
+        upstreamUrl.searchParams.append(name, value);
+      }
+    }
 
     // Forward the client request headers, then overlay the target's session
     // headers (if any) and the server-side streams auth. `host` is dropped so

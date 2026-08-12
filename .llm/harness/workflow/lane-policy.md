@@ -44,7 +44,7 @@ carries an in-plan token-limit fallback where declared.
 | Massive external research / extraction (`research_extraction`)                                                                                                                             | Antigravity CLI · Google · Gemini 3.6 Flash · low                                                                                 | —                                    |
 | **Local PLAN-EVAL** (`formal_plan_evaluation`)                                                                                                                                              | Native opposite-family: Fable 5 · medium for Codex plans; Sol · high for Claude plans                                            | Minimax M3 · high for third opinion/native quota limit; AGY Gemini 3.6 Flash · high if OpenRouter is limited |
 | **Local IMPL-EVAL** (`formal_impl_evaluation`)                                                                                                                                              | Native opposite-family: Fable 5 · medium for Codex work; Sol · xhigh for Claude work                                             | DeepSeek V4 Flash 0731 · max for third opinion/native quota limit; AGY Gemini 3.6 Flash · high if OpenRouter is limited |
-| Automated cloud agent (including cloud evaluator runs)                                                                                                                                     | **TEMPORARILY PAUSED by owner (2026-08-06)** — use local toolchain until trigger path is fixed                                    | —                                    |
+| Automated cloud evaluator                                                                                                                                                                  | OpenHands · approved open model only · branch smoke verified in Actions run `31574668989` (2026-08-12)                          | Local agentic evaluator when cloud is unavailable |
 
 The `major_ui_ux_*` GLM 5.2 lanes and the OpenCode vision-evidence lane are **dormant** while the
 Dev Dashboard is paused (epic #400 moved to `0.0.1-beta.13`); they remain the enforced route for any
@@ -160,10 +160,15 @@ evaluates Codex-authored work; Codex GPT-5.6 Sol high (PLAN) or xhigh (IMPL) eva
 Claude-authored work. The generator session never evaluates itself.
 
 The phase-bound OpenRouter presets remain available only for a genuine third opinion or when the
-native opposite-family route is quota-blocked: Minimax M3 high for PLAN-EVAL and DeepSeek V4 Flash
-0731 max for IMPL-EVAL. If that escalation hits an OpenRouter limit, the final fallback is a fresh
+native opposite-family route is quota-blocked: Minimax M3 high for PLAN-EVAL, DeepSeek V4 Flash
+0731 max for small/simple IMPL-EVAL, and Qwen 3.8 Max for broader or complex IMPL-EVAL. If that
+escalation hits an OpenRouter limit, the final fallback is a fresh
 AGY Gemini 3.6 Flash high session on the Google subscription. OpenHands is reserved for explicitly
 cloud-driven work.
+
+For cloud-driven PRs, the phase workflow dispatches from `openhands` + `status:plan-eval` or from
+draft→ready. An orchestrator may select one `eval:model:*` override before the transition but never
+duplicates the automatic trigger.
 
 **Machine binding.** This table is the rendered view of `CANONICAL_ROUTE_POLICY`.
 `resolveCanonicalFormalEvaluatorRoute()` **throws** unless the requested native family or explicit

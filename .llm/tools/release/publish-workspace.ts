@@ -16,21 +16,74 @@ export interface PublishableMember {
 export interface PublishWorkspaceOptions {
   readonly mode: PublishMode;
   readonly root?: string;
+  readonly commandRunner?: PublishCommandRunner;
 }
 
 export interface PublishWorkspaceResult {
   readonly members: readonly PublishableMember[];
 }
 
+export interface PublishCommandRequest {
+  readonly args: readonly string[];
+  readonly cwd: string;
+  readonly captureOutput: boolean;
+}
+
+export interface PublishCommandResult {
+  readonly code: number;
+  readonly stdout: Uint8Array;
+  readonly stderr: Uint8Array;
+}
+
+export type PublishCommandRunner = (
+  request: PublishCommandRequest,
+) => Promise<PublishCommandResult>;
+
 const PUBLISH_PARENT_DIRS = ['packages', 'plugins'];
 const JSR_SCOPE = '@netscript/';
 const JSR_LINK_BLOCK_START = '<!-- jsr-links:start -->';
 const JSR_LINK_BLOCK_END = '<!-- jsr-links:end -->';
+const THROWAWAY_PREFIX = 'netscript-publish-dry-run-';
+const THROWAWAY_EXCLUDED_DIRECTORIES = new Set(['.git', 'node_modules']);
+const THROWAWAY_EXCLUDED_PATHS = new Set(['.llm/tmp']);
 
 export async function publishWorkspace(
   options: PublishWorkspaceOptions,
 ): Promise<PublishWorkspaceResult> {
-  const root = options.root ?? Deno.cwd();
+  const sourceRoot = options.root ?? Deno.cwd();
+  const commandRunner = options.commandRunner ?? runPublishCommand;
+
+  if (options.mode === 'dry-run') {
+    return await withThrowawayWorkspace(sourceRoot, async (throwawayRoot) => {
+      return await publishWorkspaceInPlace(options.mode, throwawayRoot, commandRunner);
+    });
+  }
+
+  return await publishWorkspaceInPlace(options.mode, sourceRoot, commandRunner);
+}
+
+export async function publishMemberDryRun(
+  root: string,
+  memberPath: string,
+  commandRunner: PublishCommandRunner = runPublishCommand,
+): Promise<void> {
+  await withThrowawayWorkspace(root, async (throwawayRoot) => {
+    const result = await commandRunner({
+      args: ['publish', '--allow-dirty', '--dry-run'],
+      cwd: `${throwawayRoot}/${memberPath}`,
+      captureOutput: false,
+    });
+    if (result.code !== 0) {
+      throw new Error(`Publish dry-run failed (deno publish exit ${result.code}).`);
+    }
+  });
+}
+
+async function publishWorkspaceInPlace(
+  mode: PublishMode,
+  root: string,
+  commandRunner: PublishCommandRunner,
+): Promise<PublishWorkspaceResult> {
   const catalog = await readRootCatalog(root);
   const members = await discoverWorkspaceMembers(root);
   const snapshots = new Map<string, string>();
@@ -65,21 +118,19 @@ export async function publishWorkspace(
     // string constants publish cleanly with no flag.
     const baseArgs = ['publish', '--allow-dirty'];
 
-    if (options.mode === 'preflight') {
-      await runPublishPreflight(baseArgs, root);
+    if (mode === 'preflight') {
+      await runPublishPreflight(baseArgs, root, commandRunner);
       return { members };
     }
 
-    const args = options.mode === 'dry-run' ? [...baseArgs, '--dry-run'] : baseArgs;
-    const command = new Deno.Command('deno', {
+    const args = mode === 'dry-run' ? [...baseArgs, '--dry-run'] : baseArgs;
+    const result = await commandRunner({
       args,
       cwd: root,
-      stdout: 'inherit',
-      stderr: 'inherit',
+      captureOutput: false,
     });
-    const result = await command.output();
     if (result.code !== 0) {
-      const action = options.mode === 'dry-run' ? 'Publish dry-run' : 'Publish';
+      const action = mode === 'dry-run' ? 'Publish dry-run' : 'Publish';
       throw new Error(`${action} failed (deno publish exit ${result.code}).`);
     }
 
@@ -111,15 +162,14 @@ export async function publishWorkspace(
 async function runPublishPreflight(
   baseArgs: readonly string[],
   root: string,
+  commandRunner: PublishCommandRunner,
 ): Promise<void> {
   const args = [...baseArgs, '--no-provenance', '--token', PREFLIGHT_INVALID_TOKEN];
-  const command = new Deno.Command('deno', {
+  const result = await commandRunner({
     args,
     cwd: root,
-    stdout: 'piped',
-    stderr: 'piped',
+    captureOutput: true,
   });
-  const result = await command.output();
   // Surface the real publish output in the CI log.
   await Deno.stdout.write(result.stdout);
   await Deno.stderr.write(result.stderr);
@@ -145,6 +195,62 @@ async function runPublishPreflight(
       'the auth boundary, so a real publish would fail and could half-publish. ' +
       `deno publish exit ${result.code}. See the output above for the failing module.`,
   );
+}
+
+async function runPublishCommand(
+  request: PublishCommandRequest,
+): Promise<PublishCommandResult> {
+  const command = new Deno.Command('deno', {
+    args: [...request.args],
+    cwd: request.cwd,
+    stdout: request.captureOutput ? 'piped' : 'inherit',
+    stderr: request.captureOutput ? 'piped' : 'inherit',
+  });
+  return await command.output();
+}
+
+async function withThrowawayWorkspace<T>(
+  sourceRoot: string,
+  operation: (throwawayRoot: string) => Promise<T>,
+): Promise<T> {
+  const throwawayRoot = await Deno.makeTempDir({ prefix: THROWAWAY_PREFIX });
+  try {
+    await copyWorkspace(sourceRoot, throwawayRoot);
+    return await operation(throwawayRoot);
+  } finally {
+    await Deno.remove(throwawayRoot, { recursive: true });
+  }
+}
+
+async function copyWorkspace(
+  sourceRoot: string,
+  destinationRoot: string,
+  relativePath = '',
+): Promise<void> {
+  const sourceDirectory = relativePath.length > 0 ? `${sourceRoot}/${relativePath}` : sourceRoot;
+
+  for await (const entry of Deno.readDir(sourceDirectory)) {
+    const entryPath = relativePath.length > 0 ? `${relativePath}/${entry.name}` : entry.name;
+    if (entry.isDirectory && shouldExcludeFromThrowaway(entryPath, entry.name)) {
+      continue;
+    }
+
+    const sourcePath = `${sourceRoot}/${entryPath}`;
+    const destinationPath = `${destinationRoot}/${entryPath}`;
+    if (entry.isDirectory) {
+      await Deno.mkdir(destinationPath, { recursive: true });
+      await copyWorkspace(sourceRoot, destinationRoot, entryPath);
+    } else if (entry.isSymlink) {
+      await Deno.symlink(await Deno.readLink(sourcePath), destinationPath);
+    } else if (entry.isFile) {
+      await Deno.copyFile(sourcePath, destinationPath);
+    }
+  }
+}
+
+function shouldExcludeFromThrowaway(relativePath: string, name: string): boolean {
+  return THROWAWAY_EXCLUDED_DIRECTORIES.has(name) ||
+    THROWAWAY_EXCLUDED_PATHS.has(relativePath);
 }
 
 function reachedAuthBoundary(output: string): boolean {

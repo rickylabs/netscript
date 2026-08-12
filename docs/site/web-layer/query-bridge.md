@@ -26,7 +26,7 @@ Fresh already carries the loader's value into the island: island props are seria
 owns their transport and escaping. So the handoff itself is not the problem — this is the whole of
 it:
 
-```tsx
+```tsx no-check:counter-example intentionally omits bare Fresh setup
 // routes/orders.tsx — bare Fresh
 export const handler = define.handlers({
   async GET(ctx) {
@@ -39,7 +39,7 @@ export const handler = define.handlers({
 export default define.page<typeof handler>(({ data }) => <OrdersIsland initialOrders={data.orders} />);
 ```
 
-```tsx
+```tsx no-check:counter-example intentionally omits bare TanStack setup
 // islands/OrdersIsland.tsx — bare Fresh
 export default function OrdersIsland({ initialOrders }: { initialOrders: { items: Order[] } }) {
   const query = useQuery({
@@ -105,7 +105,7 @@ invalidate) was called from client-side code — use queryOptions/mutationOption
 
 The server key and the client key for the same call are different shapes, on purpose:
 
-```ts
+```ts no-check:pseudocode compares key shapes rather than defining runnable values
 // server tier — packages/sdk/src/ports/query-key.ts
 createActionQueryKey(resource, action, input); // => [resource, action, JSON.stringify(input)]
 
@@ -121,7 +121,7 @@ works if the leading segments are real array elements rather than one opaque JSO
 `key-bridge.ts` states the rule directly: the two tiers *"live in separate cache tiers and are
 intentionally **not merged**"*. Do not try to make one serve the other. Bridge them instead:
 
-```ts
+```ts no-check:partial invalidation fragment uses surrounding query utilities
 import { bridgeInvalidation, toClientKeyPrefix } from '@netscript/sdk/query-client';
 
 toClientKeyPrefix('orders'); // ['orders']          — every orders query
@@ -136,7 +136,7 @@ that hop: `defineFreshApp()` registers a same-origin, JSON-only POST route at
 `/_netscript/query-cache/invalidate`, and the browser helper sends the canonical server key to it.
 After a committed mutation, invalidate the tiers in this order:
 
-```ts
+```ts no-check:partial invalidation fragment uses surrounding cache values
 import { invalidateServerQueryCache } from '@netscript/fresh/query';
 
 await invalidateServerQueryCache(ordersQueryUtils.list.key(input));
@@ -161,7 +161,7 @@ hand-write either one.
 returns `{ data, cachedAt }` or `null`. There is no fetch, no revalidation, and no waiting on the
 service:
 
-```tsx
+```tsx no-check:partial builder chain uses page-local declarations omitted here
 export const ordersPage = definePage()
   .withRoute(routes.dashboard.orders.$route)
   .withResource('ordersData', async (ctx) =>
@@ -195,7 +195,7 @@ to render a skeleton against; the callable blocks on a cold cache but guarantees
 
 `queryOptions(input)` returns three fields and nothing more:
 
-```ts
+```ts no-check:object-shape pseudocode documents generated query options
 {
   queryKey: [resource, action, { input }],
   queryFn: () => invokeClientProcedure(client, action, input),
@@ -205,7 +205,7 @@ to render a skeleton against; the callable blocks on a cold cache but guarantees
 
 The island spreads that and adds the seed the loader produced:
 
-```tsx
+```tsx no-check:partial component uses page-local types and view components
 function OrdersInner(props: OrdersIslandProps) {
   const query = useQuery({
     ...ordersQueryUtils.list.queryOptions(props.input),
@@ -254,7 +254,7 @@ The mechanical differences behind that advice:
 
 On the server, dehydration means building a per-request client, prefetching into it, and serializing:
 
-```tsx
+```tsx no-check:partial builder chain continues from surrounding page code
 .withResource('dehydratedQuery', async (ctx) => {
   const queryClient = createNetScriptQueryClient();
   await queryClient.prefetchQuery(ordersQueryUtils.list.queryOptions({

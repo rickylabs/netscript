@@ -151,7 +151,9 @@ The CLI maintains this aggregate so callers and the service share one type sourc
 
 ```ts
 // contracts/versions/v1/mod.ts
-export { UsersContractV1, UsersV1 } from './users.contract.ts';
+import { UsersContractV1, UsersV1 } from './users.contract.ts';
+
+export { UsersContractV1, UsersV1 };
 export const v1 = { users: UsersV1 };
 ```
 
