@@ -2,19 +2,20 @@
 
 ## Run Metadata
 
-| Field | Value |
-| ----- | ----- |
-| Run ID | `fix-1615-ranking--leaf` |
-| Branch | `fix/1615-guidance-ranking-determinism` |
-| Current phase | `implement` |
-| Archetype | `2 — Integration` |
-| Scope overlays | none |
+| Field          | Value                                                       |
+| -------------- | ----------------------------------------------------------- |
+| Run ID         | `fix-1615-ranking--leaf`                                    |
+| Branch         | `fix/1615-guidance-ranking-determinism`                     |
+| Current phase  | `implementation complete; awaiting orchestrator evaluation` |
+| Archetype      | `2 — Integration`                                           |
+| Scope overlays | none                                                        |
 
 ## Current State
 
-S1 implementation and focused validation are complete. The fresh direct/plugin absolute score gap
-is `0.3019801981861221`; leader-anchored close-score groups now restore the unchanged exact golden
-on both base and fresh corpora without changing public contracts.
+S2 implementation evidence is complete. The fresh direct/plugin absolute score gap is
+`0.3019801981861221`; leader-anchored close-score groups restore the unchanged exact golden on both
+base and fresh corpora without changing public contracts. Draft PR #1617 remains at `status:impl`
+for the orchestrator's separate native Opus 5 read-only evaluation.
 
 ## Completed
 
@@ -23,45 +24,51 @@ on both base and fresh corpora without changing public contracts.
   ranking implementation, fixture, and relevant debt.
 - Printed and cross-checked base and fresh candidate scores.
 - Recorded PLAN-EVAL N/A; mandatory separate-session IMPL-EVAL remains with the orchestrator.
-- Opened draft PR #1617 with `Closes #1615`, exactly `status:impl`, requested labels, milestone 0.0.6.
+- Opened draft PR #1617 with `Closes #1615`, exactly `status:impl`, requested labels, milestone
+  0.0.6.
 - Implemented and focused-tested close-score grouping; fresh 8-case fixture passed twice across two
   independently constructed corpora.
+- Proved the evaluation can fail via throwaway commit `5d7ca0f46` (raw exit 1) and restored it via
+  revert `c86a4080f` (exit 0).
+- Completed the guidance, scoped static/doc, and quality gates. Full repository tests retain only
+  the documented pre-existing #1589 failure: 3321 passed, 1 failed, 17 ignored.
 
 ## In Progress
 
-- S1 implementation commit and PR comment.
+- Final evidence commit/push and S2 PR update.
 
 ## Next Steps
 
-1. Commit/push S1 and post its PR phase comment.
-2. Run the throwaway-commit negative control and record the raw exit.
-3. Run repository, scoped static/doc-lint, and quality gates; finalize S2 evidence.
+1. Commit/push the final S2 evidence and update the draft PR body/comment.
+2. Stop with the PR still draft and exactly `status:impl`.
+3. Orchestrator dispatches mandatory native Opus 5 IMPL-EVAL against the immutable head.
 
 ## Key Decisions
 
-| Decision | Source | Notes |
-| -------- | ------ | ----- |
-| Direction 1 | score measurement | near-tie, not wide semantic preference |
-| `closeScoreGap = 0.5` | plan D2 | covers observed movement; leader-anchored grouping preserves transitivity |
-| No golden edit | plan D4 | exact ranks remain meaningful after deterministic tie handling |
+| Decision              | Source            | Notes                                                                     |
+| --------------------- | ----------------- | ------------------------------------------------------------------------- |
+| Direction 1           | score measurement | near-tie, not wide semantic preference                                    |
+| `closeScoreGap = 0.5` | plan D2           | covers observed movement; leader-anchored grouping preserves transitivity |
+| No golden edit        | plan D4           | exact ranks remain meaningful after deterministic tie handling            |
 
 ## Files Changed
 
-| Path | Status | Notes |
-| ---- | ------ | ----- |
-| `.llm/runs/fix-1615-ranking--leaf/**` | new | run identity, research, design, decisions, and resumable state |
-| `packages/mcp/src/domain/docs/guidance-index.ts` | changed | measured transitive close-score ordering policy |
-| `packages/mcp/tests/guidance-retrieval_test.ts` | changed | grouping/no-chaining/same-page ordering proof |
+| Path                                             | Status  | Notes                                                          |
+| ------------------------------------------------ | ------- | -------------------------------------------------------------- |
+| `.llm/runs/fix-1615-ranking--leaf/**`            | new     | run identity, research, design, decisions, and resumable state |
+| `packages/mcp/src/domain/docs/guidance-index.ts` | changed | measured transitive close-score ordering policy                |
+| `packages/mcp/tests/guidance-retrieval_test.ts`  | changed | grouping/no-chaining/same-page ordering proof                  |
 
 ## Gates
 
-| Gate family | Current status | Evidence |
-| ----------- | -------------- | -------- |
-| Measurement | pass | base and fresh scores printed; instrumentation cross-check passed |
-| Static | partial pass | focused guidance test: 7 passed; requested guidance filter: 13 passed |
-| Fitness | pending | S2 |
-| Runtime | pass | base adapter parity/rerun plus fresh 8 cases × 2 corpora × 2 reruns |
-| Consumer | pass | unchanged exact fixture and guidance contract tests |
+| Gate family | Current status        | Evidence                                                                    |
+| ----------- | --------------------- | --------------------------------------------------------------------------- |
+| Measurement | pass                  | base and fresh scores printed; instrumentation cross-check passed           |
+| Static      | pass                  | final guidance filter: 14 passed; scoped check/lint/fmt and doc lint exit 0 |
+| Fitness     | pass                  | `quality:gate` exit 0; MCP doctrine FAIL=0                                  |
+| Runtime     | pass                  | base adapter parity/rerun plus fresh 8 cases × 2 corpora × 2 reruns         |
+| Consumer    | pass                  | unchanged exact fixture and guidance contract tests                         |
+| Repository  | expected baseline red | 3321 passed, 1 known #1589 failure, 17 ignored; no guidance failure         |
 
 ## Open Questions
 
@@ -69,9 +76,15 @@ on both base and fresh corpora without changing public contracts.
 
 ## Drift and Debt
 
-- Drift: evaluator override and fresh-head rank detail recorded in `drift.md`.
+- Drift: evaluator override, fresh-head rank detail, expected #1589 base failure, and explicit
+  scoped-wrapper config routing recorded in `drift.md`.
 - Debt: pre-existing `MCP-A6-V2-SHAPE` unchanged; no new debt planned.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments.
+- `0b73d7333` — S0 measurement/design/run activation.
+- `b943392d7` — S1 implementation and focused proof.
+- `5d7ca0f46` — negative-control perturbation (intentionally reverted).
+- `c86a4080f` — negative-control restoration.
+- Final S2 evidence — this handoff commit; use the immutable draft PR head as the authoritative
+  hash.

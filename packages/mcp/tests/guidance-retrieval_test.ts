@@ -4,8 +4,8 @@ import { MCP_EMBEDDED_DOCS } from '../src/publish-assets.generated.ts';
 import { EmbeddedDocsCorpus } from '../src/infrastructure/embedded-docs-corpus.ts';
 import { FilesystemDocsCorpus } from '../src/infrastructure/filesystem-docs-corpus.ts';
 import {
-  type RankedGuidanceSection,
   orderGuidanceSections,
+  type RankedGuidanceSection,
 } from '../src/domain/docs/guidance-index.ts';
 import type { IndexedGuidanceSection } from '../src/domain/docs/guidance-parser.ts';
 
