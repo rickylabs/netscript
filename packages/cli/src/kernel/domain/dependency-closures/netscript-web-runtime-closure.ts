@@ -3,7 +3,7 @@
  *
  * `@netscript/fresh-ui` is intentionally excluded: its SDK imports are limited to desktop and
  * auto-update, whose implementations do not import cache or query modules, and it imports no Fresh
- * runtime. A second fresh-ui instance therefore cannot own the cache-provider singleton in #1589.
+ * runtime. A second fresh-ui instance therefore cannot instantiate a cache-provider singleton.
  */
 export const NETSCRIPT_WEB_RUNTIME_EXPORTS = {
   '@netscript/fresh': [

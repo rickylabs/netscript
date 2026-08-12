@@ -9,6 +9,7 @@ import type {
   FormEnhancementState,
   FormFieldErrors,
   FormIntent,
+  FormNavigationStrategy,
   FormValues,
   IntentButtonProps,
   RuntimeFormState,
@@ -42,7 +43,7 @@ export function applyCollectionStrategy<TProps extends IntentButtonProps>(
   props: TProps,
   strategy: FormCollectionStrategy | undefined,
 ): TProps & {
-  readonly 'f-client-nav'?: boolean;
+  readonly 'f-client-nav'?: boolean | 'false';
   readonly 'f-partial'?: string;
 } {
   if (!strategy || strategy.mode === 'client') {
@@ -51,8 +52,22 @@ export function applyCollectionStrategy<TProps extends IntentButtonProps>(
 
   return {
     ...props,
-    'f-client-nav': strategy.clientNav ?? true,
+    'f-client-nav': resolveFormNavigationProps(strategy)['f-client-nav'] ??
+      strategy.clientNav ?? true,
     'f-partial': strategy.partial,
+  };
+}
+
+/** Resolve caller-facing form navigation policy to Fresh transport props. */
+export function resolveFormNavigationProps(
+  strategy: Partial<FormNavigationStrategy> | undefined,
+): { readonly 'f-client-nav'?: true | 'false' } {
+  if (!strategy?.navigation) {
+    return {};
+  }
+
+  return {
+    'f-client-nav': strategy.navigation === 'document' ? 'false' : true,
   };
 }
 
@@ -98,6 +113,7 @@ export function useFormEnhancement<TValues extends FormValues>(
     ...snapshot.formProps,
     'f-client-nav': options.clientNav ?? (options.partial ? true : undefined),
     'f-partial': options.partial,
+    ...resolveFormNavigationProps(options.strategy),
     ref: (element: HTMLFormElement | null) => {
       formRef.value = element;
     },
