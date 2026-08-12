@@ -681,3 +681,45 @@ owns. The steer requires the implementer to:
 
 Explicitly told not to commit the lock "to keep the tree clean", and told that "the fix needs a
 dependency change" is a legitimate stop-and-report rather than a failure.
+
+## 2026-08-12 — #1459 lock churn reverted; default-restore held
+
+**Outcome: `deno.lock` matches HEAD.** `git diff --quiet HEAD -- deno.lock` → clean, and there is no
+committed lock delta against `origin/main`. The implementer reverted the churn rather than committing
+it, which is the default the steer required.
+
+**What the churn was.** At its peak the delta was **+397 / −9**, adding broad Fresh / Vite / Babel /
+Preact resolver entries plus `jsr:@fresh/plugin-vite@1.1.2` pinned **exact** against the repo's
+`^1.1.2` range convention. The composition is diagnostic: Babel and Preact resolver entries are what a
+**client-bundle build** pulls in transitively. That points at the B3 fixture work (`vite build`)
+writing the lock as a **harness side effect**, not at any manifest dependency the fix requires —
+transitive resolution, not declaration. Treating it as unauthorized incidental churn was correct.
+
+**Standing requirement, unchanged for the rest of this slice:** `deno.lock` is restored to HEAD by
+default before any commit. A lock change lands only if the leaf proves a **specific required manifest
+dependency** and an **exact minimal delta** to match — a stop-and-report, not a silent inclusion.
+
+### Work in flight looks on-plan (uncommitted, 17 modified + 4 new)
+
+Mapping the working tree against the locked decisions:
+
+| Path | Decision it serves |
+| --- | --- |
+| `packages/fresh/src/application/defer/island.ts` *(new)* | B2 — the island entry the specifier names |
+| `packages/fresh/deno.json` | B2 — the sub-export, which did not exist |
+| `packages/cli/src/kernel/assets/app/vite.config.ts.template` | D1 — `fresh({ islandSpecifiers: [...] })` |
+| `packages/fresh/tests/fixtures/defer-island-client/` *(new)* | B3 — the fixture location, committed rather than deferred |
+| `packages/fresh/tests/defer-island-client-bundle_test.ts` *(new)* | B3 — the client-bundle presence assertion |
+| `DeferIsland.tsx`, `DeferPage.tsx` | D2 `f-client-nav`, D3 form moved inside the `<Partial>` |
+| scaffold plumbing (`import-resolver`, `jsr-import-resolver`, `scaffold-packages`, `fresh-adapter`) | B2/B4 — specifier resolution and template wiring |
+
+**Two generated files to interrogate at audit, not to wave through:**
+`packages/cli/src/kernel/assets/embedded.generated.ts` and `agent-docs.generated.ts` are modified.
+`embedded.generated.ts` embeds the app assets, so a `vite.config.ts.template` change **legitimately
+requires** regenerating it — that one is expected. `agent-docs.generated.ts` is **not** obviously
+implied by this slice; it must be attributed to a specific generator run or reverted, the same
+standard applied to the lock. Generated-asset churn is the same incidental class, one step removed.
+
+**Audit gate:** nothing is pushed or flipped to ready until `git status` after the Codex turn is
+audited against this table, with the lock confirmed at HEAD and both `.generated.ts` files accounted
+for.
