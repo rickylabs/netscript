@@ -24,11 +24,13 @@ owns the canary and the stable cut.
 
 | 4 | 2026-08-12T12:03:55Z | `59e435c5d` — `fix(streams): resolve Aspire VITE service references in the browser stream resolver (#1559)` | #1559 | **#1548** (auto-closed `COMPLETED`) | `slices/pre-merge-gate-1559.md` — all 7 checks PASS at head `ccfa5407e` |
 
+| 5 | 2026-08-12T13:11:29Z | `5705aeb19` — `fix(fresh): hydrate the deferred refresh coordinator so partial-miss regions settle (#1558)` | #1558 | **#1459** (closed by hand — PR carried `Refs`, observational criterion routed to #1557) | `slices/pre-merge-gate-1558.md` — 7 checks PASS at head `2d515de75` |
+
 Rows captured from `git log origin/main --first-parent -1` **after** each merge, per the
 profile's merge-derived rule. Issue states re-read live: both `CLOSED` / `COMPLETED`, with
 `status:shipped` applied to each issue and PR.
 
-**First pass complete** (#1405, #1398). **Reopened 2026-08-12** for #1457, #1459, #1548 — #1457 landed as row 3, #1548 as row 4; #1459 remains open.
+**First pass complete** (#1405, #1398). **Reopened 2026-08-12** for #1457, #1459, #1548 — #1457 row 3, #1548 row 4, #1459 row 5. **All three reopen issues landed.** #1562 is queued next.
 
 ## Re-planning events
 

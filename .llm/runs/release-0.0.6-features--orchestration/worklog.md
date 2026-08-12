@@ -841,3 +841,39 @@ canonical pairing for the Sol·high #1459 slice — was stopped and performed on
 that route's own documented fallback. Opposite-family review of Codex work is preserved.
 
 **Forward:** #1562's plan, PLAN-EVAL, implementation, and IMPL-EVAL all run under this constraint.
+
+## 2026-08-12 — #1459 MERGED (`5705aeb19`) — reopen scope complete
+
+IMPL-EVAL **PASS**, run `31598821606`, `completed/success` at head `2d515de75` — **verified live
+against the Actions API**, after an earlier steer reported it as already PASS while the API and the
+PR comment both still read `in_progress`/`"running"`. Advancement was declined until the verdict
+existed. That is the third steer this session that arrived ahead of live state, so
+verify-before-acting is now the standing default rather than an exception.
+
+**Overlap guard:** `main` had advanced **3 commits** past the merge-base; files touched by both
+`main`-since-base and the PR: **none**. `MERGEABLE` / `CLEAN`.
+
+**Exact-main validation after merge:** `packages/fresh/src/application/defer/island.ts` present on
+`main`; lock delta on `main` is exactly `+ "jsr:@fresh/plugin-vite@^1.1.2",` — one line, nothing else.
+
+**#1459 closed by hand, deliberately.** The PR carried `Refs`, not a closing keyword, so the call was
+left to the orchestrator. The runtime defect is fixed and proven; the Expected section's
+**navigation + exactly-one-swap** assertion needs a browser driver this repo lacks and is routed to
+**#1557** under the #1090 pattern. Closed on the runtime fix with the verification depth tracked —
+**not** claiming the navigation assertion exists.
+
+`status:augment-review` was auto-added on the ready-merge transition for the **fourth** time in this
+lane and removed again. Consistent automation behaviour, worth a follow-up rather than repeated manual
+cleanup.
+
+### Reopen scope complete
+
+| Issue | PR | Merge |
+| --- | --- | --- |
+| #1457 | #1556 | `5db37e7bb` |
+| #1548 | #1559 | `59e435c5d` |
+| #1459 | #1558 | `5705aeb19` |
+
+Filed from inside the reopen: **#1542**, **#1543**, **#1557**, **#1561**, **#1563**.
+
+**Next and last: #1562**, now unblocked — no competing writer remains.
