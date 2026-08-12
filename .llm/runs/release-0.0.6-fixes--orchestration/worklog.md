@@ -416,3 +416,82 @@ carrying the entire load.
 Marked `[observed]`. Consequence for this lane: #1438, #1430 and #1428 all lack boxes, so their
 PRs' close-gate results must be treated as *no verdict* rather than as a pass, and checks 5 and 7
 are the real gate for them.
+
+## 2026-08-12 — Correction: a stale diff base manufactured a false scope violation
+
+While auditing slices A and B I read `git diff --stat origin/main..HEAD` and saw **20 changed
+files** in each, including deletions of another lane's run artifacts
+(`.llm/runs/fix-1425-sdk-jsdoc--leaf/*`, `.llm/runs/release-0.0.6-features--orchestration/slices/1405/*`)
+and edits to `packages/plugin-streams-core/**` and `packages/sdk/**` — work belonging to the
+features and SDK lanes. Read at face value this was a serious cross-lane scope violation.
+
+**It was a measurement error, not a slice error.** `origin/main` had advanced by 2 commits
+(`01aa12b67` → `8ff1bcb8f`) after these worktrees were cut, as sibling 0.0.6 lanes merged. The
+two-dot range `origin/main..HEAD` therefore renders every commit merged into `main` since the
+branch point as a *deletion* on my side. Against the merge-base, both slices are tightly scoped:
+
+| Slice | Files vs `origin/main` (wrong) | Files vs merge-base (correct) |
+| --- | --- | --- |
+| A | 20 | **4** — all `.llm/tools/`: `github-release.ts`, `github-release_test.ts`, `prepare-release.ts`, `generate-cli-assets-barrel.ts` |
+| B | 20 | **4** — `publish-workspace.ts`, `publish-workspace_test.ts`, `run-publish-dry-run.ts`, `packages/mcp/deno.json` |
+
+**Rule for the changed-file audit (pre-merge check 6): diff against the merge-base, never against a
+moving `origin/main`.** On a milestone with concurrent lanes, `origin/main` moves during the run by
+construction, so the naive range accuses every slice of reverting whatever landed while it worked.
+Acting on that reading would have meant steering four slices to "restore" files they never touched.
+Checks C and D were re-verified against the merge-base and their earlier verdicts stand unchanged
+(C: 2 files, D: 1 file).
+
+**On-scope confirmation for B's one non-tooling file.** `packages/mcp/deno.json` looked like the
+exact mutation #1417 exists to prevent. It is the opposite — it routes the package-scoped dry-run
+through the same non-mutating wrapper and drops `--allow-dirty`:
+
+```diff
+-    "publish:dry-run": "deno publish --dry-run --allow-dirty"
++    "publish:dry-run": "deno run --allow-read --allow-write --allow-run ../../.llm/tools/release/run-publish-dry-run.ts --root ../.. --member packages/mcp"
+```
+
+That is acceptance box 3 of #1417 ("the package-scoped dry-run likewise leaves MCP `publish` arrays
+unmodified") implemented at its source rather than worked around.
+
+## 2026-08-12 — #1534 close-gate now GREEN
+
+After the `status:ready-merge` swap, the `ci` run was re-run (the mirror reads labels live, which is
+why a rerun works where the label event alone does not — `ci.yml` fires only on
+`[opened, synchronize, reopened, ready_for_review]`).
+
+```
+close-gate: success
+quality:    success
+check-test: success
+```
+
+Live issue bodies now show **#1397: 4/4 ticked, #1399: 4/4 ticked** — the mirror applied the PR's
+`acceptance-evidence` blocks. Pre-merge checks 1 and 2 are now satisfied for #1534 by execution,
+not by assertion.
+
+## 2026-08-12 — The expensive gate contends repo-wide, and contention reads as CANCELLED
+
+`scaffold-runtime-sqlite` reported **CANCELLED** on #1534's dispatched e2e run while
+`scaffold-runtime` (postgres) ran. Cause, read from the workflow:
+
+```yaml
+scaffold-runtime:
+  concurrency:
+    group: e2e-scaffold-runtime-global    # ← global, not per-ref
+    cancel-in-progress: false
+```
+
+The group is **repo-global**, so every lane's runtime job contends for one slot; with
+`cancel-in-progress: false` a queued job is dropped when further runs enter the group. Sibling
+0.0.6 lanes are active, so this is expected contention, not a defect in #1534.
+
+**Per the gate-integrity rules a CANCELLED expensive gate is a did-not-run, not a pass** — and this
+is the specific job that would prove `behavior.service-health` answers on the sqlite tier, which is
+#1534's one unproven consequence. Queued for re-run once the group frees. #1534 does not merge
+until it reports SUCCESS.
+
+This also *confirms* the 0.0.4 lesson from a new direction: 0.0.4 saw three concurrent
+`scaffold.runtime` runs produce two failures that were contention rather than defects. The repo has
+since serialised the gate — so contention no longer manufactures false *failures*, it manufactures
+**cancellations**, which are easier to misread as neutral.
