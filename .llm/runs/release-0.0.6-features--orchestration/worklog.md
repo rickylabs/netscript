@@ -1056,3 +1056,40 @@ redundant). And **#1540 remains open**: real publish/preflight still materialize
 the live tree behind a normal-completion-only `finally`, so **if the re-cut is interrupted mid-publish,
 check `git status` before anything else** — a stranded catalog expansion looks like unrelated churn
 afterwards.
+
+## 2026-08-12 — #1580: the same lock defect, second instance, in a private lock
+
+**P0.** `packages/fresh-ui` keeps its **own** lock (`packages/fresh-ui/deno.lock`) and checks frozen
+against it (`deno.json:42`). #1558 added the direct `@fresh/plugin-vite@^1.1.2` dependency to
+`packages/fresh`; the fresh-ui private lock was never regenerated.
+
+**Reproduced by me at `db1d79c68`** before delegating — the claim was verified, not taken on report:
+
+| Measurement | Result |
+| --- | --- |
+| `deno task check` in `packages/fresh-ui` (frozen) | **`failedBatches: 2`** of 2 — stale |
+| canonical `deno task lock:update` delta | **exactly one line**, `+ "jsr:@fresh/plugin-vite@^1.1.2",`, numstat `1 0` |
+
+**This is the second instance of the same defect I caused.** #1571 was the root lock; #1580 is the
+private one. One incomplete lock decision during #1459 propagated into two lock files, and each
+surfaced separately — the root one at a canary cut, the private one at a sibling lane's CI. Worth
+recording as a property of the mistake: a hand-reduced lock delta does not fail loudly at the point
+of the edit; it fails later, elsewhere, in someone else's red.
+
+**Dispatched:** fresh worktree `/home/codex/repos/ns006-1580` from current main, branch
+`fix/1580-fresh-ui-private-lock`, **Codex · Sol · low**. Brief requires the canonical `lock:update`
+(generated, never hand-edited), the exact one-line delta as a stop-and-report boundary,
+`failedBatches: 0`, **second-run byte-hash stability**, and the workflow gate green.
+
+**Evaluation:** `PLAN-EVAL: N/A`; **IMPL-EVAL skipped via the documented `impl-eval:skip` escape
+hatch** — owner-authorized for a one-line deterministic derived-lock correction. This is the first
+use of that hatch in this lane. The dispatcher records an attributed skip; no manual OpenHands, no
+Fable.
+
+**No competing writers.** #1572's worktree (`ns006-1571`, head `9ccb4db4b`) is untouched and its
+evaluated head does not move; #1580 works in a separate worktree from a different base. Both must
+land before Canary.3.
+
+**Internals notified** on #1570: its `fresh-ui-quality` red is owned by #1580, not by its code, with
+the measurements quoted. Explicitly asked them **not** to regenerate the lock from their branch —
+parallel writers on the same derived file would conflict.
