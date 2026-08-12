@@ -191,16 +191,18 @@ async function classifyRegexReferences(
     ...commitMessages.flatMap(extractClosingIssues),
   ]);
   const classifications = new Map<number, ClosingReferenceClassification>();
-  await Promise.all([...candidates].filter((number) => !authoritative.has(number)).map(
-    async (number) => {
-      try {
-        const reference = await client.getIssue(number);
-        classifications.set(number, reference.pull_request ? 'pull request' : 'issue');
-      } catch {
-        classifications.set(number, 'lookup failed');
-      }
-    },
-  ));
+  await Promise.all(
+    [...candidates].filter((number) => !authoritative.has(number)).map(
+      async (number) => {
+        try {
+          const reference = await client.getIssue(number);
+          classifications.set(number, reference.pull_request ? 'pull request' : 'issue');
+        } catch {
+          classifications.set(number, 'lookup failed');
+        }
+      },
+    ),
+  );
   return classifications;
 }
 

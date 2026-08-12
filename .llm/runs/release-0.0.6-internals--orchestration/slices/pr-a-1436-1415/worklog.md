@@ -85,3 +85,41 @@ No network call entered either pure helper. The implementation stays within the 
 ### Reconcile
 
 The predicate remains narrow: factual sentences containing marker words later in the evidence pass.
+
+## S5 — gate evidence
+
+- Gate 1 exact command: exit 1, 39 passed / 9 failed. Every failure is `NotCapable: Requires write
+  access to <TMP>` from pre-existing tests using `Deno.makeTempDir()`; see `drift.md`.
+- Gate 1 supplementary command with the permissions required by the existing suite
+  (`--allow-write --allow-run`): exit 0, 48 passed / 0 failed.
+- Gate 2 scoped check: exit 0; 18 files, 1 batch, 0 failed batches, 0 findings.
+- Gate 3 scoped lint: exit 0; 18 files, 1 batch, 0 findings.
+- Gate 4 scoped format: exit 0; 18 files, 1 batch, 0 findings.
+- Gate 5 baseline probe: exit 0. Whole output:
+
+  ```text
+  "Exact pre-fix #1431 head" -> []
+  "pre-repair #1431 head" -> []
+  "Fixes #1434" -> [1434]
+  "hotfix #999 landed" -> []
+  "prefixes #888 there" -> []
+  "This is a bugfix #777" -> []
+  "un-fixed #555" -> []
+  "Closes #1234 and fixes #4321" -> [1234,4321]
+  "Refs #111" -> []
+  "Part of #222" -> []
+  "resolves https://github.com/rickylabs/netscript/issues/333" -> [333]
+  ```
+
+- Gate 6 live mirror dry-run against PR #1527: exit 0, no changes. Snapshots for #1436 and #1415
+  were read; illustrative `fix #1431` was classified as a pull request and excluded visibly, while
+  both real closing issues were classified as issues and retained. Mirror skipped mutation because
+  `status:ready-merge` is correctly absent; the implementation agent did not apply it.
+- Diff hygiene scan: no new `quality-allow:`, `deno-lint-ignore`, `@ts-ignore`, `as any`, or
+  `as unknown as`; no `deno.lock` change.
+
+### Final reconcile
+
+PR #1527 remains draft with exactly `status:impl`, milestone `0.0.6`, required taxonomy/CI labels,
+both closing keywords, truthful checked DoD, and four exact-text #1415 evidence mappings. The
+orchestrator retains separate review and merge authority.

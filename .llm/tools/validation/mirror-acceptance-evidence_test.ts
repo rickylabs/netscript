@@ -8,11 +8,14 @@ import {
 
 Deno.test('mirror excludes classified pull requests and retains lookup failures', () => {
   assertEquals(
-    closingMirrorIssues([1415, 1431, 1432], new Map([
-      [1415, 'issue'],
-      [1431, 'pull request'],
-      [1432, 'lookup failed'],
-    ])),
+    closingMirrorIssues(
+      [1415, 1431, 1432],
+      new Map([
+        [1415, 'issue'],
+        [1431, 'pull request'],
+        [1432, 'lookup failed'],
+      ]),
+    ),
     {
       issues: [1415, 1432],
       notices: [

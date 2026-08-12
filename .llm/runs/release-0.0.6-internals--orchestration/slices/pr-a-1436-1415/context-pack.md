@@ -15,6 +15,9 @@ changed yet. PR #1527 is the sole draft PR; the orchestrator retains merge autho
 
 ## Next
 
-S1 RED is `a927790eb`; S2 boundary is `4ca4cc421`. S3 adds pure classification consumption plus
-call-site GitHub lookup for both close-gate and mirror. S4 adds the narrow newly-ticked evidence
-assertion. Next run focused/full tests, then finish the six requested gates and PR evidence.
+Implementation is complete through S4: S1 `a927790eb`, S2 `4ca4cc421`, S3 `0329acaf8`, S4
+`c095303c8`. S5 has green scoped check/lint/fmt, green probe and live mirror dry-run, plus a green
+48-test supplementary suite. The exact prescribed test command remains red only because it omits
+permissions required by unrelated existing tests; this is escalated in `drift.md` and PR comments.
+Next: push S5, rerun the live mirror at final head, post the single `[PHASE: IMPL]` handoff, and wait
+for orchestrator review. Do not merge or apply `status:ready-merge`.

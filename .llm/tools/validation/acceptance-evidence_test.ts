@@ -111,17 +111,19 @@ Deno.test('umbrella reference without closing keyword is untouched', () => {
 });
 
 Deno.test('closing keywords reject word and hyphen prefixes without tightening punctuation', () => {
-  for (const body of [
-    'Exact pre-fix #1431 head',
-    'un-fixed #555',
-    're-resolved #444',
-    'hotfix #999 landed',
-    'prefixes #888 there',
-    'This is a bugfix #777',
-    'Refs #111',
-    'Part of #222',
-    'See #333',
-  ]) {
+  for (
+    const body of [
+      'Exact pre-fix #1431 head',
+      'un-fixed #555',
+      're-resolved #444',
+      'hotfix #999 landed',
+      'prefixes #888 there',
+      'This is a bugfix #777',
+      'Refs #111',
+      'Part of #222',
+      'See #333',
+    ]
+  ) {
     assertEquals(extractClosingIssues(body), [], body);
   }
 
@@ -139,15 +141,17 @@ Deno.test('closing keywords reject word and hyphen prefixes without tightening p
 Deno.test('not-yet-done evidence is rejected only for a newly ticked box', () => {
   const boxText = 'Independent separate-session IMPL-EVAL passes at the final head.';
   const unchecked = acceptanceCheckboxes(`## Acceptance\n- [ ] ${boxText}`);
-  for (const evidence of [
-    'Pending milestone-orchestrator separate-session IMPL-EVAL after this draft handoff.',
-    '— Pending IMPL-EVAL',
-    'TODO: run the gate',
-    'TBD',
-    'will run after merge',
-    'Not yet executed',
-    'pending',
-  ]) {
+  for (
+    const evidence of [
+      'Pending milestone-orchestrator separate-session IMPL-EVAL after this draft handoff.',
+      '— Pending IMPL-EVAL',
+      'TODO: run the gate',
+      'TBD',
+      'will run after merge',
+      'Not yet executed',
+      'pending',
+    ]
+  ) {
     assertThrows(
       () =>
         validateEvidenceMapping(1415, unchecked, [{
@@ -175,12 +179,14 @@ Deno.test('not-yet-done evidence is rejected only for a newly ticked box', () =>
 
 Deno.test('factual evidence is not rejected for marker words in non-asserting positions', () => {
   const box = 'normal evidence still ticks';
-  for (const evidence of [
-    'supersedes the earlier pending note',
-    'IMPL-EVAL PASS at e730b8bfa; supersedes the pending row',
-    'Gate run URL … ; the pending-migration note no longer applies',
-    'pr-checks_test.ts fixture; report.ok gate',
-  ]) {
+  for (
+    const evidence of [
+      'supersedes the earlier pending note',
+      'IMPL-EVAL PASS at e730b8bfa; supersedes the pending row',
+      'Gate run URL … ; the pending-migration note no longer applies',
+      'pr-checks_test.ts fixture; report.ok gate',
+    ]
+  ) {
     assertEquals(
       validateEvidenceMapping(1415, acceptanceCheckboxes(`## Acceptance\n- [ ] ${box}`), [{
         issue: 1415,
