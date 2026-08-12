@@ -2123,10 +2123,17 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Target:** Before claiming published-binary parity for plugin-contributed doctor checks.
 - **Linked plan:** `.llm/runs/fix-1022-plugin-doctor-truth--codex/plan.md`; PR #1045.
 - **Created:** 2026-08-01
-- **Status:** open, DEBT_ACCEPTED — local/copied-source behavior ships while production-package
-  resolution receives a dedicated smoke and URL-aware module locator.
+- **Status:** closed 2026-08-12 by #1454 / PR #1574. The CLI now retains a package-backed source
+  discriminator, transports the published manifest through a versioned bounded-child envelope,
+  resolves the existing public `./doctor` export, and executes the contributed workers registry
+  checks without a copied plugin root.
 - **Gate:** Close when a compiled/public CLI installs a JSR plugin, resolves its doctor adapter,
   executes a contributed check, and reports import failures as structured doctor errors.
+- **Closure evidence:** `behavior.package-backed-plugin-doctor` was demonstrated red before the
+  product fix, red again after deliberately dropping bounded-probe permission metadata, and green
+  in both the focused `scaffold.plugins` run and the serialized `scaffold.runtime` run. The latter
+  executed 89 named gates with 0 failures and 0 skips, including the published workers doctor
+  adapter and cleanup; see the W2-H `evidence.md`.
 
 ## documentation lane authored framework source (`docs-lane-framework-source-1020`)
 

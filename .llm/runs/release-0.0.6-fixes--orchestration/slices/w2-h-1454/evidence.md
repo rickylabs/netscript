@@ -181,14 +181,200 @@ The filtered package test invocation also exercised the CLI/E2E unit set. Its on
 quickstart test was not used as a verdict; the root task above ran that same test from the canonical
 repository cwd and passed. CLI source tests and E2E unit tests separately completed green.
 
-## Serialized runtime verdict
+## Serialized runtime verdict — substantive PASS
 
-`scaffold.runtime` is pending an explicit orchestrator slot grant. It will be run once, in the
-required one-pass form, after that grant and before draft → ready:
+The orchestrator granted the free global slot after independently verifying the focused gates.
+The exact command ran once locally. Raw exit code was 0 and observed wall time was approximately
+5m34s, so this was not a seconds-long classifier short-circuit. All 89 named gates executed; none
+was skipped or cancelled. The untruncated transcript is:
 
 ```text
-deno task e2e:cli run scaffold.runtime --cleanup --format pretty
+$ deno task e2e:cli run scaffold.runtime --cleanup --format pretty
+Task e2e:cli deno run --allow-all packages/cli/e2e/cli.ts 'run' 'scaffold.runtime' '--cleanup' '--format' 'pretty'
+Running scaffold.runtime
+> preflight.deno: Deno CLI is available
+  PASSED 6ms
+> preflight.aspire: Aspire CLI is available
+  PASSED 48ms
+> scaffold.init: Scaffold generated project
+  PASSED 1207ms
+> scaffold.plugin.worker: Install official worker plugin
+  PASSED 987ms
+> scaffold.plugin.saga: Install official saga plugin
+  PASSED 783ms
+> scaffold.plugin.trigger: Install official trigger plugin
+  PASSED 890ms
+> scaffold.plugin.stream: Install official stream plugin
+  PASSED 786ms
+> scaffold.plugin.auth: Install official auth plugin
+  PASSED 728ms
+> scaffold.plugin.ai: Install official ai plugin
+  PASSED 821ms
+> scaffold.plugin.ai.mcp: Install official AI plugin with MCP skill tool
+  PASSED 701ms
+> scaffold.plugin.ai.lifecycle: Add and self-wire an AI tool through the plugin CLI
+  PASSED 66ms
+> scaffold.plugin-list: List configured plugins
+  PASSED 1403ms
+> scaffold.plugin.ai.appsettings: Reject synthesized service configuration for the AI plugin
+  PASSED 283ms
+> scaffold.ui-add-ai: Install the Fresh UI AI collection
+  PASSED 294ms
+> scaffold.ui-local-source: Map the unpublished AI dependency to the local workspace member
+  PASSED 317ms
+> generated.runtime-schemas: Generate runtime schemas from all configured plugin modules
+  PASSED 995ms
+> database.codegen: Generate database clients (standalone, no Aspire)
+  PASSED 3750ms
+> behavior.project-boundary-dev: Start the generated Fresh dev server below a hostile parent tsconfig
+  PASSED 21896ms
+> behavior.plugins-unhealthy: Reject missing workers and sagas registries
+  PASSED 1526ms
+> generated.plugins-check: Generate plugin registries from discovered manifests
+  PASSED 960ms
+> generated.workers-registry: Compile workers registry through plugin CLI
+  PASSED 151ms
+> generated.sagas-registry: Generate sagas registry through plugin CLI
+  PASSED 93ms
+> behavior.plugin-doctor-missing-module: Reject a configured plugin whose module has been removed
+  PASSED 2632ms
+> runtime.aspire-restore: Restore Aspire TypeScript SDK
+  PASSED 7197ms
+> runtime.service-env-fixture: Declare service environment and regenerate on the consumer path
+  PASSED 1681ms
+> generated.quality-negative: Prove every generated quality surface with deliberate failures
+  PASSED 74542ms
+> generated.deno-check: Run the generated workspace type-check task
+  PASSED 2909ms
+> generated.deno-lint: Run the generated workspace lint task
+  PASSED 142ms
+> generated.deno-fmt-check: Run the generated workspace format-check task
+  PASSED 191ms
+> generated.ui-ai-check: Type-check copied Fresh UI AI files
+  PASSED 737ms
+> generated.ai-namespace-check: Type-check the complete generated AI namespace
+  PASSED 3174ms
+> runtime.auth-smoke-env: Wire auth smoke environment
+  PASSED 1663ms
+> runtime.flow-b-fixture: Wire real Flow-B callback fixture
+  PASSED 1782ms
+> runtime.readiness-fixture: Wire dead-port readiness fixture
+  PASSED 43ms
+> runtime.aspire-start: Start generated Aspire AppHost
+  PASSED 13685ms
+> database.init: Initialize generated database
+  PASSED 22380ms
+> database.migration-artifacts: Create and verify headless and TTY migration artifacts
+  PASSED 28207ms
+> database.generate: Generate database clients
+  PASSED 6990ms
+> database.seed: Seed generated database
+  PASSED 4598ms
+> runtime.capture-db-allocation-first: Capture first live database allocation
+  PASSED 438ms
+> runtime.aspire-restart-after-db: Restart resident AppHost after database preparation
+  PASSED 16140ms
+> runtime.capture-db-allocation-second: Capture second live database allocation
+  PASSED 439ms
+> runtime.wait.postgres: Wait for postgres
+  PASSED 352ms
+> runtime.wait.garnet: Wait for garnet
+  PASSED 5311ms
+> runtime.wait.workers-api: Wait for workers-api
+  PASSED 2186ms
+> runtime.wait.workers: Wait for workers
+  PASSED 796ms
+> runtime.wait.sagas-api: Wait for sagas-api
+  PASSED 435ms
+> runtime.wait.sagas: Wait for sagas
+  PASSED 413ms
+> runtime.wait.triggers-api: Wait for triggers-api
+  PASSED 374ms
+> runtime.wait.triggers: Wait for triggers
+  PASSED 261ms
+> runtime.wait.auth: Wait for auth
+  PASSED 284ms
+> runtime.wait.streams: Wait for streams
+  PASSED 478ms
+> runtime.wait.app: Wait for the project-derived Fresh app
+  PASSED 22458ms
+> runtime.aspire-describe: Describe generated topology
+  PASSED 128ms
+> behavior.db-status-preserves-apphost: DB status preserves resident AppHost identity
+  PASSED 5379ms
+> behavior.endpoint-readiness: Endpoint-bearing process requires readiness evidence
+  PASSED 458ms
+> behavior.workers-health: Workers API health
+  PASSED 24ms
+> behavior.workers-jobs: List worker jobs
+  PASSED 40ms
+> behavior.workers-tasks: List worker tasks
+  PASSED 13ms
+> behavior.workers-seed: Seed worker demo data through API
+  PASSED 10ms
+> behavior.workers-trigger-health-job: Trigger workers plugin health job
+  PASSED 145ms
+> behavior.workers-executions: List recent worker executions
+  PASSED 253ms
+> behavior.mcp-endpoint-directory: Follow the documented MCP OpenAPI discovery path
+  PASSED 6309ms
+> behavior.service-health: Users service health
+  PASSED 29701ms
+> behavior.service-env: The AppHost-started service process observes its declared environment
+  PASSED 325ms
+> behavior.live-db-endpoint: Users service uses the second live Postgres allocation with correlated telemetry
+  PASSED 607ms
+> behavior.sagas-health: Sagas API health
+  PASSED 4ms
+> behavior.sagas-list: List saga definitions
+  PASSED 12ms
+> behavior.sagas-instances: List saga instances
+  PASSED 8ms
+> behavior.triggers-health: Triggers API health
+  PASSED 5ms
+> behavior.triggers-webhook: Accept generic trigger webhook
+  PASSED 67ms
+> behavior.triggers-events: List trigger events
+  PASSED 83ms
+> behavior.auth-live: Auth API liveness
+  PASSED 6ms
+> behavior.auth-ready: Auth API readiness
+  PASSED 4ms
+> behavior.auth-session: Read auth session route
+  PASSED 18ms
+> behavior.ai-chat-route: Import generated AI chat route
+  PASSED 642ms
+> behavior.app-home: Generated app serves its home page
+  PASSED 278ms
+> behavior.app-reference: Render canonical app reference states in desktop and mobile browsers
+  PASSED 54394ms
+> behavior.ui-render: Render safe nested and fallback generative UI output
+  PASSED 161ms
+> behavior.mcp-widget-roundtrip: Round-trip an MCP UI resource through the widget renderer
+  PASSED 467ms
+> behavior.plugins-health: Check installed plugin health
+  PASSED 2501ms
+> behavior.package-backed-plugin-doctor: Validate package-backed plugin doctor truth
+  PASSED 3250ms
+> behavior.otel.webhook: Fire webhook for OTEL trace capture
+  PASSED 32ms
+> behavior.otel.stream-consumer: Consume real Flow-B stream with fan-in links
+  PASSED 1247ms
+> behavior.otel.traces: Validate OTEL trace chain via Dashboard API
+  PASSED 153ms
+> behavior.streams.producer-reconnect: Recover buffered stream producer writes with correlated OTEL
+  PASSED 10987ms
+> behavior.otel.task-traces: Validate generated detached Aspire telemetry task
+  PASSED 1862ms
+> cleanup.aspire-stop: Stop generated Aspire AppHost
+  PASSED 969ms
+Summary: passed=89 failed=0 skipped=0
+EXIT_CODE=0
 ```
+
+This was a local invocation, so CI step-2/step-10 classifier provenance is not applicable. The
+named transcript and wall time establish that the full suite executed rather than being skipped or
+short-circuited.
 
 ## Lock and diff hygiene
 
@@ -207,12 +393,12 @@ by explicit path only, and no publication command ran.
 
 The exact close-out gate is `behavior.package-backed-plugin-doctor`, scheduled in both
 `scaffold.plugins` and `scaffold.runtime`. The focused published-package red/green evidence is above.
-The `cli-plugin-doctor-published-module` debt row will close only after the granted one-pass runtime
-suite also passes.
+The serialized runtime suite passed with all 89 gates executed, so the
+`cli-plugin-doctor-published-module` row is closed with this focused red → green plus runtime proof.
 
 ## Acceptance status
 
-All implementation claims are pre-merge provable. The six explicit PR-body acceptance items are
-implemented and covered by the focused gate; the serialized merge-readiness verdict and formal
-separate-session IMPL-EVAL remain pending. This implementation session does not self-certify the
-formal evaluator box.
+All implementation claims are pre-merge proven. The six explicit PR-body acceptance items are
+implemented and covered by the focused gate and the substantive serialized runtime pass. Formal
+separate-session IMPL-EVAL remains pending; this implementation session does not self-certify that
+box.
