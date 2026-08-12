@@ -2288,3 +2288,18 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   export (entry schemas, infrastructure schemas, root config), keeping the public surface and the
   generated `appsettings.schema.json` byte-identical; `deno test packages/aspire`, doc-lint, publish
   dry-run, and `arch:check` must remain green.
+
+## packages/telemetry — cache attributes deepen over-cap attribute folder (`telemetry-attributes-f16-1562`)
+
+- **Reason:** Issue #1562 and its PLAN-EVAL advisory A1 require `src/attributes/cache.ts` beside the
+  package's existing published attribute modules. The addition increases `src/attributes/` from 13
+  to 14 immediate children against the F-16 cap of 12.
+- **Owner:** `@netscript/telemetry` public attribute-surface maintainers.
+- **Target:** Before the next telemetry attribute domain is added.
+- **Linked plan:** `.llm/runs/release-0.0.6-features--orchestration/slices/plan-1562.md`; issue
+  #1562; PR #1605.
+- **Created:** 2026-08-12.
+- **Status:** open, DEBT_ACCEPTED for #1562; recorded in implementation slice S1.
+- **Gate:** Group the established attribute domains behind role-named bounded subdirectories while
+  preserving the `@netscript/telemetry/attributes` export map and symbol names; telemetry package
+  tests, scoped gates, full-export doc lint, publish dry-run, and `quality:gate` must remain green.

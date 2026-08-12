@@ -1,5 +1,10 @@
-import { assert, assertEquals } from '@std/assert';
+import { assert, assertEquals, assertThrows } from '@std/assert';
 import {
+  CacheAttributes,
+  CacheOperations,
+  CacheOutcomes,
+  CacheTiers,
+  createCacheAttributes,
   createExecutionAttributes,
   createGenAiAttributes,
   createJobAttributes,
@@ -148,6 +153,54 @@ Deno.test('telemetry convention publishes TC-1 through TC-14 and netscript root 
   ]);
   assertEquals(NetScriptAttributeDomains.JOB, 'netscript.job');
   assertEquals(NetScriptAttributeDomains.CORRELATION, 'netscript.correlation');
+  assertEquals(NetScriptAttributeDomains.CACHE, 'netscript.cache');
+});
+
+Deno.test('cache builder emits the bounded cache topology contract', () => {
+  const attributes = createCacheAttributes({
+    operation: CacheOperations.READ,
+    system: 'redis',
+    namespace: 'orders.list',
+    tier: CacheTiers.L2,
+    outcome: CacheOutcomes.HIT,
+    lookupIndex: 1,
+    backendExecuted: false,
+    entryAgeMs: 125,
+    ttlMs: 60_000,
+    writeThrough: true,
+    inflightJoined: false,
+    topologyComplete: true,
+  });
+
+  assertEquals(attributes, {
+    'netscript.operation': 'cache.read',
+    'netscript.cache.system': 'redis',
+    'netscript.cache.namespace': 'orders.list',
+    'netscript.cache.tier': 'l2',
+    'netscript.cache.outcome': 'hit',
+    'netscript.cache.lookup_index': 1,
+    'netscript.cache.backend_executed': false,
+    'netscript.cache.entry_age_ms': 125,
+    'netscript.cache.ttl_ms': 60_000,
+    'netscript.cache.write_through': true,
+    'netscript.cache.inflight_joined': false,
+    'netscript.cache.topology_complete': true,
+  });
+});
+
+Deno.test('cache builder rejects negative or fractional cardinality values', () => {
+  for (const lookupIndex of [-1, 0.5]) {
+    assertThrows(
+      () =>
+        createCacheAttributes({
+          operation: CacheOperations.READ,
+          system: 'memory',
+          namespace: 'direct',
+          lookupIndex,
+        }),
+      RangeError,
+    );
+  }
 });
 
 Deno.test('TC-5 messaging keys match current OpenTelemetry messaging semconv verbatim', () => {
@@ -187,6 +240,7 @@ Deno.test('canonical exported attribute keys derive from NetScript domains or se
     SchedulerAttributes,
     SSEAttributes,
     KVAttributes,
+    CacheAttributes,
     GenAiAttributes,
     NetScriptCorrelationAttributes,
   ];
@@ -194,6 +248,10 @@ Deno.test('canonical exported attribute keys derive from NetScript domains or se
   const keys = canonicalAttributeMaps.flatMap((attributes) => Object.values(attributes));
 
   for (const key of keys) {
+    if (key === CacheAttributes.OPERATION) {
+      assertEquals(key, 'netscript.operation');
+      continue;
+    }
     if (key.startsWith('netscript.')) {
       assertNetScriptDomain(key);
       continue;

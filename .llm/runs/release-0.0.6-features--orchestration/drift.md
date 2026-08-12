@@ -137,3 +137,13 @@ probe resolve in the wrong namespace. The implementation therefore emits the ver
 app and has the root task delegate through `deno task --cwd apps/<app>`. Enforcement and operator
 semantics are unchanged; only the generated file location differs from the plan's expected-file
 list. No Fresh/SDK published surface or dependency changed.
+
+## D-7 — #1562 required cache attribute module deepens telemetry folder cardinality (minor)
+
+**Date** 2026-08-12. The issue brief and PLAN-EVAL advisory A1 explicitly require the new published
+module `packages/telemetry/src/attributes/cache.ts`. That takes `src/attributes/` from 13 to 14
+immediate children against F-16's cap of 12. Moving the new contract elsewhere would violate the
+approved public-surface layout; regrouping the established attribute modules is a separate package
+restructure. The implementation therefore records debt `telemetry-attributes-f16-1562` and does not
+claim the doctrine warning as green. Attribute convention tests, full-export doc lint, and publish
+dry-run remain the closing slice's surface gates.

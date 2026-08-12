@@ -1,4 +1,10 @@
 import type { CacheKey, CacheStore, CacheStoreEntry } from '../src/ports/cache-store.ts';
+import { CacheOutcomes, CacheTiers } from '@netscript/telemetry/attributes';
+import type {
+  CacheInvalidationTopologyReport,
+  CacheProviderDescriptor,
+  CacheWriteTopologyReport,
+} from '../src/ports/cache-topology.ts';
 
 function serializeKey(key: CacheKey): string {
   return JSON.stringify(key);
@@ -8,24 +14,48 @@ function serializeKey(key: CacheKey): string {
  * In-memory CacheStore used by SDK unit tests.
  */
 export class MemoryCacheStore implements CacheStore {
+  readonly descriptor: CacheProviderDescriptor = {
+    system: 'memory',
+    tier: CacheTiers.L1,
+  };
   readonly values: Map<string, unknown> = new Map<string, unknown>();
   lastSetOptions?: { expireIn?: number };
 
   get<T>(key: CacheKey): Promise<CacheStoreEntry<T>> {
     return Promise.resolve({
       value: (this.values.get(serializeKey(key)) as T | undefined) ?? null,
+      report: {
+        lookups: [{
+          ...this.descriptor,
+          lookupIndex: 0,
+          outcome: this.values.has(serializeKey(key)) ? CacheOutcomes.HIT : CacheOutcomes.MISS,
+        }],
+        promotions: [],
+        topologyComplete: true,
+      },
     });
   }
 
-  set(key: CacheKey, value: unknown, options?: { expireIn?: number }): Promise<void> {
+  set(
+    key: CacheKey,
+    value: unknown,
+    options?: { expireIn?: number },
+  ): Promise<CacheWriteTopologyReport> {
     this.values.set(serializeKey(key), value);
     this.lastSetOptions = options;
-    return Promise.resolve();
+    return Promise.resolve({
+      writes: [{ ...this.descriptor, writeThrough: false }],
+      promotions: [],
+      topologyComplete: true,
+    });
   }
 
-  delete(key: CacheKey): Promise<void> {
+  delete(key: CacheKey): Promise<CacheInvalidationTopologyReport> {
     this.values.delete(serializeKey(key));
-    return Promise.resolve();
+    return Promise.resolve({
+      invalidations: [this.descriptor],
+      topologyComplete: true,
+    });
   }
 
   async *list(options: { prefix: CacheKey }): AsyncIterable<{ key: CacheKey }> {

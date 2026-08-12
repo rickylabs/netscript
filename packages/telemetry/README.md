@@ -119,6 +119,29 @@ canonical span-name vocabulary. The full convention — span naming, SpanKind, s
 and the required `OTEL_SEMCONV_STABILITY_OPT_IN` value — is on the
 [convention page](https://rickylabs.github.io/netscript/reference/telemetry/convention/).
 
+### Cache topology contract
+
+`createCacheAttributes` builds the published `netscript.cache.*` contract used by SDK cache spans
+and their ordered tier events. A logical operation is `cache.read`, `cache.write`, or
+`cache.invalidate`; tiers are the bounded values `l1`, `l2`, and `durable`; outcomes are `hit`,
+`miss`, `stale`, and `error`.
+
+`netscript.cache.namespace` is a normalized operation or contract identity such as `orders.list`. It
+is never a raw cache key. Cache keys, serialized inputs, values, URLs, and user data must not be
+passed to this builder or copied into other telemetry attributes. Provider systems use stable
+identifiers (`deno-kv`, `redis`, `memory`, or an extension's documented lowercase identifier).
+`netscript.cache.backend_executed` means the backing loader was actually entered; a miss or elapsed
+duration is never a proxy for that fact.
+
+One logical operation uses one INTERNAL span. `cache.lookup`, `cache.write`, `cache.promote`, and
+`cache.invalidate` are ordered or bounded per-tier events beneath that span, not per-tier spans.
+`netscript.cache.lookup_index` orders lookups; `entry_age_ms` and `ttl_ms` describe freshness;
+`write_through` distinguishes propagation/promotion; `inflight_joined` identifies a trace that
+awaited work owned elsewhere; and `topology_complete=false` makes missing provider evidence visible.
+For an unowned provider, a successful operation has `topology_complete=false` with no `outcome`;
+`outcome=error` appears only when the operation throws.
+Stale background completion may use one captured-context `cache.write` follow-up span.
+
 ## Public surface
 
 | Entry               | What it gives you                                       |

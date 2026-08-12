@@ -60,9 +60,18 @@ export * from './src/query/mod.ts';
 export * from './src/query-client/mod.ts';
 export * from './src/telemetry/mod.ts';
 export type {
+  CacheInvalidationReport,
+  CacheInvalidationTopologyReport,
   CacheKey,
+  CacheLookupReport,
+  CacheProviderDescriptor,
+  CacheReadTopologyReport,
   CacheStore,
   CacheStoreEntry,
+  CacheTopologyOutcome,
+  CacheTopologyTier,
+  CacheWriteReport,
+  CacheWriteTopologyReport,
   QueryClientPort,
   ServiceClientContract,
   ServiceClientShape,
