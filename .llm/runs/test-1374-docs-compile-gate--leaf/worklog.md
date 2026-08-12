@@ -87,6 +87,7 @@ focused negative controls before the repo suite.
 | 2026-08-12 | Slice 2 | Compiler contract | Added exact public-export resolution, canonicalized root/member imports, root-catalog fallback and copied catalog, disposable copied-lock compilation, page-isolated modules, typed query support, and real export/dialect controls. |
 | 2026-08-12 | Slice 3 | Tier-1 and demotion | Applied 14 structural reasons, fixed the barrel binding, compiled 21 fences, wrote the five-wave ratchet, retained vocabulary/Fresh/export guards, and removed only the named positive needles. |
 | 2026-08-12 | Slice 4 | Pages and final gates | Added both package/plugin trigger arms, the root snippet step before Lume, an unconditional structural workflow test, three raw red exits, and a green 3,193-test repository verdict. |
+| 2026-08-12 | Phase 2 handoff | STOP | All four slices committed/pushed/commented; PR body and all 11 truthfully completed #1374 acceptance boxes carry evidence; draft remains at `status:impl` for separate IMPL-EVAL. |
 
 ## Decisions
 
@@ -214,9 +215,13 @@ Reconcile: PR #1537 remains draft at `status:impl` with `Closes #1374`, mileston
 required type/area/priority labels. No reviewer comment altered scope. Phase 2 is complete locally;
 the next authority is a fresh opposite-family IMPL-EVAL session.
 
+External evidence mirror: the draft PR body now records commits, census, gates, red controls, drift,
+and the unchecked IMPL-EVAL step. All 11 #1374 acceptance boxes are checked with one evidence line
+each. The issue remains open and the PR remains draft; no readiness or merge transition was made.
+
 ## Handoff Notes
 
-- Phase 2 is complete after the Slice-4 commit/push/comment boundary.
+- Phase 2 is complete; Slice 4 is `5ce34c089` and its push/comment boundary is closed.
 - IMPL-EVAL must run in a fresh opposite-family session and should independently rerun the green
   gate, all three raw red controls, the workflow mutation assertion, and lock-hygiene check.
 - Keep the PR draft; the implementation agent does not mark ready or merge.

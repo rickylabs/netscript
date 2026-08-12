@@ -12,8 +12,9 @@
 
 ## Current State
 
-Slices 1–3 are committed, pushed, and commented. Slice 4 and the complete final gate set are green
-locally and awaiting the final commit/push/comment boundary. The PR remains draft at `status:impl`.
+All four slices are committed, explicitly pushed, and commented. The draft PR body and every
+truthfully completed #1374 acceptance box carry evidence. The PR remains draft at `status:impl` and
+the implementation session is stopped for separate-session IMPL-EVAL.
 
 ## Completed
 
@@ -40,13 +41,13 @@ locally and awaiting the final commit/push/comment boundary. The PR remains draf
 
 ## In Progress
 
-- Slice 4 commit/push/comment boundary and acceptance/PR evidence update.
+- None in the implementation session; awaiting fresh opposite-family IMPL-EVAL.
 
 ## Next Steps
 
-1. Commit and explicitly push Slice 4; comment the final implementation evidence.
-2. Mirror only completed #1374 acceptance boxes with evidence and update the draft PR body.
-3. Stop for a fresh opposite-family IMPL-EVAL; do not mark ready or merge.
+1. Fresh opposite-family session performs IMPL-EVAL and writes `evaluate.md`.
+2. Orchestrator decides any remediation and merge readiness.
+3. Keep the PR draft until that authority acts; do not merge from this session.
 
 ## Key Decisions
 
@@ -66,7 +67,7 @@ locally and awaiting the final commit/push/comment boundary. The PR remains draf
 | S1 extractor/marker/census | COMMITTED | `b1129dd7b`; focused tests and scoped wrappers green; empty-reason raw exit 1 naming `page.md:1`. |
 | S2 compiler/import resolution | COMMITTED | `5c828856b`; focused tests/scoped wrappers green; raw export and dialect controls exit 1 with mapped source fences. |
 | S3 Tier-1/accuracy/coverage | COMMITTED | `983cf3464`; exact census, docs accuracy/links, scoped wrappers, and focused suite green. |
-| S4 Pages/final gates | COMPLETE_LOCAL | Focused 9/9; final green/docs/scoped gates; three raw exit-1 controls; repository suite 3,193/0. |
+| S4 Pages/final gates | COMMITTED | `5ce34c089`; focused 9/9; final green/docs/scoped gates; three raw exit-1 controls; repository suite 3,193/0. |
 
 ## Files Changed
 
@@ -104,3 +105,4 @@ None.
 - `b1129dd7b` — extractor/marker/census contract.
 - `5c828856b` — public-entrypoint synthetic compiler.
 - `983cf3464` — Tier-1 docs floor, expansion plan, and accuracy demotion.
+- `5ce34c089` — Pages package/plugin revalidation and final workflow assertion.
