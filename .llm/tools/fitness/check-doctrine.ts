@@ -207,7 +207,7 @@ async function main(): Promise<void> {
 
   // ─────────────────────────────────────────────────────────────────────────
   // A4 — Base classes are stub-only contracts
-  // Heuristic: any `export abstract class` MUST declare ≥ 1 abstract member, and // quality-allow: scanner matches the English word in a comment, not a TypeScript any; durable comment-awareness fix #1549
+  // Heuristic: any `export abstract class` MUST declare ≥ 1 abstract member, and
   // concrete implementations MUST live in a sibling `*.default.ts` or `*.impl.ts`
   // rather than the base file. An abstract member is an abstract method, an
   // abstract accessor, OR an `abstract readonly` identity field — doctrine file
@@ -275,7 +275,7 @@ async function main(): Promise<void> {
   // ─────────────────────────────────────────────────────────────────────────
   // A5 — Composition over inheritance.
   // AP-5 / F-4: deep inheritance.
-  // Heuristic: any class chain ≥ 3 deep (extends Foo extends Bar) flagged. // quality-allow: scanner matches the English word in a comment, not a TypeScript any; durable comment-awareness fix #1549
+  // Heuristic: any class chain ≥ 3 deep (extends Foo extends Bar) flagged.
   // ─────────────────────────────────────────────────────────────────────────
   // Approximated: count chains that say `extends X` where X also extends Y in same package.
   const extendsMap = new Map<string, string>();
