@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertStringIncludes } from '@std/assert';
 import { join } from '@std/path';
 import { collectChangedSourceFiles } from './changed-source-files.ts';
 
@@ -33,6 +33,22 @@ Deno.test('changed-source selector includes .llm/tools-only diffs and reports an
     '.llm/tools/quality/new-rule.ts',
   ]);
   assertEquals(await collectChangedSourceFiles(root, head, head), []);
+
+  const empty = await new Deno.Command(Deno.execPath(), {
+    cwd: root,
+    args: [
+      'run',
+      '--allow-run',
+      join(Deno.cwd(), '.llm/tools/quality/changed-source-files.ts'),
+      head,
+      head,
+    ],
+  }).output();
+  assertEquals(empty.code, 2);
+  assertEquals(
+    new TextDecoder().decode(empty.stderr).trim(),
+    'not scanned: no changed source files matched packages, plugins, or .llm/tools',
+  );
 });
 
 Deno.test('changed-source selector uses merge-base and excludes foreign merged files', async () => {
@@ -60,4 +76,14 @@ Deno.test('changed-source selector uses merge-base and excludes foreign merged f
   assertEquals(await collectChangedSourceFiles(root, recordedBase, head), [
     '.llm/tools/quality/owned.ts',
   ]);
+});
+
+Deno.test('code-quality workflow executes the selector for every .llm/tools change', async () => {
+  const workflow = await Deno.readTextFile('.github/workflows/code-quality.yml');
+  assertStringIncludes(workflow, "- '.llm/tools/**'");
+  assertStringIncludes(
+    workflow,
+    'changed_files=$(deno run --allow-run .llm/tools/quality/changed-source-files.ts',
+  );
+  assertStringIncludes(workflow, 'deno task quality:scan --pretty "${args[@]}"');
 });

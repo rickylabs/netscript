@@ -5,6 +5,9 @@
 - Draft PR #1570 is open from bootstrap commit `059576fcd`.
 - The formal quality-rail plan revision 4 passed PLAN-EVAL cycle 5.
 - RED-first fixtures cover B1 and B3 and currently fail because both planned contracts are absent.
+- B1/B3 implementations make the focused fixtures green. B2 exposes the passed-plan contradiction
+  recorded as `drift.md` D-1: the final 36 roots contain 54 known A14 failures while this slice is
+  forbidden to change A14 and is required to keep `arch:check` green.
 
 ## Locked implementation
 
@@ -14,6 +17,8 @@
 - The PR selector includes `packages`, `plugins`, and `.llm/tools`, reports empty explicitly, and
   diffs `BASE...HEAD`.
 - Findings are triaged only; package/plugin source is out of scope.
+- `triage.md` records exactly 1 actionable `plugin-streams-core` doctrine finding; the focused
+  quality scan is green with zero findings and zero allowances.
 
 ## Next
 

@@ -9,7 +9,7 @@ on:
     paths:
       - 'packages/**'
       - 'plugins/**'
-      - '.llm/tools/quality/**'
+      - '.llm/tools/**'
       - 'deno.json'
   push:
     branches: [main]
@@ -36,10 +36,11 @@ jobs:
       - name: Scan changed source files
         shell: bash
         run: |
-          mapfile -t files < <(git diff --name-only --diff-filter=ACMR "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" -- packages plugins)
+          changed_files=$(deno run --allow-run .llm/tools/quality/changed-source-files.ts "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}")
+          mapfile -t files <<< "$changed_files"
           args=()
           for file in "${files[@]}"; do args+=(--changed-file "$file"); done
-          if ((${#args[@]})); then deno task quality:scan --pretty "${args[@]}"; fi
+          deno task quality:scan --pretty "${args[@]}"
       - run: deno task arch:check
       - name: Lint changed publish surfaces
         run: |

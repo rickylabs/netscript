@@ -52,4 +52,14 @@ fixtures, not inferred from the final implementation.
 
 ## Gates
 
-Pending final implementation head.
+- `deno task arch:check` after the 36-root transition — exit **1**, 54 known pre-existing A14
+  findings. See `drift.md` D-1; no findings fixed or suppressed.
+- `deno task quality:scan --pretty --root packages/plugin-streams-core` — exit **0**, 0 findings,
+  0 allowances.
+- Focused doctrine result for `plugin-streams-core` — 0 FAIL, 1 WARN, 1 INFO. The single actionable
+  warning is recorded in `triage.md`; no package source was edited.
+- Scoped check wrapper (`--root .llm/tools --ext ts`) — exit **0**, 287 files, 0 diagnostics.
+- Scoped lint wrapper (`--root .llm/tools --ext ts`) — exit **0**, 287 files, 0 diagnostics.
+- Scoped format wrapper (`--root .llm/tools --ext ts`) — exit **1** solely for pre-existing,
+  out-of-scope `.llm/tools/harness/extract-verdict.ts`; every owned TS file passes. See D-2.
+- `code-quality.yml` — `@std/yaml` parse exit **0**; draft workflow policy tests 3/3 pass.
