@@ -10,6 +10,20 @@ interface IssueLabelOperations {
   addLabels(labels: string[]): Promise<void>;
 }
 
+function workflowStep(source: string, name: string): string {
+  const lines = source.split('\n');
+  const start = lines.indexOf(`      - name: ${name}`);
+  if (start < 0) throw new Error(`Missing workflow step: ${name}`);
+  let end = lines.length;
+  for (let index = start + 1; index < lines.length; index += 1) {
+    if (lines[index].startsWith('      - name: ')) {
+      end = index;
+      break;
+    }
+  }
+  return lines.slice(start, end).join('\n');
+}
+
 function operations(
   labels: string[],
   removeError?: (label: string) => unknown,
@@ -100,4 +114,34 @@ Deno.test('generation deduplication remains before trigger creation', async () =
   assertEquals(workflow.indexOf(marker) < workflow.indexOf(claim), true);
   assertEquals(workflow.indexOf(claim) < workflow.indexOf(earlyReturn), true);
   assertEquals(workflow.indexOf(earlyReturn) < workflow.indexOf(create), true);
+});
+
+Deno.test('status bookkeeping failures are reported but cannot suppress dispatch', async () => {
+  const workflow = await Deno.readTextFile('.github/workflows/openhands-phase-eval.yml');
+  const checkout = workflowStep(workflow, 'Check out trusted phase-eval scripts');
+  const transition = workflowStep(workflow, 'Enter IMPL-EVAL status on ready transition');
+  const diagnostic = workflowStep(
+    workflow,
+    'Record attributed IMPL-EVAL status-transition failure',
+  );
+  const dispatch = workflowStep(workflow, 'Resolve and dispatch exactly one evaluator');
+
+  assertStringIncludes(checkout, 'continue-on-error: true');
+  assertStringIncludes(checkout, 'persist-credentials: false');
+  assertStringIncludes(checkout, 'github.event.pull_request.base.ref');
+  assertStringIncludes(transition, 'id: enter_impl_eval_status');
+  assertStringIncludes(transition, 'continue-on-error: true');
+  assertStringIncludes(transition, 'core.setOutput(');
+  assertStringIncludes(transition, "'failure_reason'");
+  assertStringIncludes(diagnostic, "steps.enter_impl_eval_status.outcome == 'failure'");
+  assertStringIncludes(diagnostic, 'evaluator dispatch continues');
+  assertStringIncludes(diagnostic, 'REQUEST_ACTOR: ${{ github.actor }}');
+  assertStringIncludes(diagnostic, 'FAILURE_REASON:');
+  assertStringIncludes(dispatch, '!cancelled()');
+  assertStringIncludes(
+    dispatch,
+    "steps.require_chainable_trigger_token.outcome == 'success'",
+  );
+  assertEquals(dispatch.includes('enter_impl_eval_status.outcome'), false);
+  assertEquals(dispatch.includes('checkout_trusted_phase_eval_scripts.outcome'), false);
 });

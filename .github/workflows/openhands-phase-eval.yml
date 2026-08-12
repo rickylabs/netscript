@@ -57,6 +57,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Require chainable trigger token
+        id: require_chainable_trigger_token
         if: env.SKIP_IMPL != 'true'
         env:
           CHAIN_TOKEN: ${{ secrets.PAT_TOKEN }}
@@ -67,46 +68,97 @@ jobs:
           fi
 
       - name: Check out trusted phase-eval scripts
-        if: env.SKIP_IMPL != 'true' && github.event.action == 'ready_for_review'
+        id: checkout_trusted_phase_eval_scripts
+        if: >-
+          !cancelled() &&
+          env.SKIP_IMPL != 'true' &&
+          github.event.action == 'ready_for_review' &&
+          steps.require_chainable_trigger_token.outcome == 'success'
+        continue-on-error: true
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           ref: ${{ github.event.pull_request.base.ref }}
           persist-credentials: false
 
       - name: Enter IMPL-EVAL status on ready transition
-        if: env.SKIP_IMPL != 'true' && github.event.action == 'ready_for_review'
+        id: enter_impl_eval_status
+        if: >-
+          !cancelled() &&
+          env.SKIP_IMPL != 'true' &&
+          github.event.action == 'ready_for_review' &&
+          steps.require_chainable_trigger_token.outcome == 'success'
+        continue-on-error: true
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
           # This transition must use the same chainable token as dispatch. Repository Actions
           # policy may make GITHUB_TOKEN read-only even when workflow permissions request writes.
           github-token: ${{ secrets.PAT_TOKEN }}
           script: |
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const issue_number = context.payload.pull_request.number;
-            const { applyImplEvalStatusTransition } = await import(
-              `${process.env.GITHUB_WORKSPACE}/.github/scripts/phase-eval-status.mjs`
-            );
-            await applyImplEvalStatusTransition({
-              listLabelsOnIssue: async () => {
-                const labels = await github.paginate(github.rest.issues.listLabelsOnIssue, {
-                  owner,
-                  repo,
-                  issue_number,
-                  per_page: 100,
-                });
-                return labels.map((label) => label.name);
-              },
-              removeLabel: async (name) => {
-                await github.rest.issues.removeLabel({ owner, repo, issue_number, name });
-              },
-              addLabels: async (labels) => {
-                await github.rest.issues.addLabels({ owner, repo, issue_number, labels });
-              },
-            });
+            try {
+              const owner = context.repo.owner;
+              const repo = context.repo.repo;
+              const issue_number = context.payload.pull_request.number;
+              const { applyImplEvalStatusTransition } = await import(
+                `${process.env.GITHUB_WORKSPACE}/.github/scripts/phase-eval-status.mjs`
+              );
+              await applyImplEvalStatusTransition({
+                listLabelsOnIssue: async () => {
+                  const labels = await github.paginate(github.rest.issues.listLabelsOnIssue, {
+                    owner,
+                    repo,
+                    issue_number,
+                    per_page: 100,
+                  });
+                  return labels.map((label) => label.name);
+                },
+                removeLabel: async (name) => {
+                  await github.rest.issues.removeLabel({ owner, repo, issue_number, name });
+                },
+                addLabels: async (labels) => {
+                  await github.rest.issues.addLabels({ owner, repo, issue_number, labels });
+                },
+              });
+            } catch (error) {
+              const reason = (error instanceof Error ? error.message : String(error))
+                .replace(/[\r\n\0]+/g, ' ')
+                .slice(0, 500);
+              core.setOutput(
+                'failure_reason',
+                reason,
+              );
+              throw error;
+            }
+
+      - name: Record attributed IMPL-EVAL status-transition failure
+        if: >-
+          !cancelled() &&
+          env.SKIP_IMPL != 'true' &&
+          github.event.action == 'ready_for_review' &&
+          steps.enter_impl_eval_status.outcome == 'failure'
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REQUEST_ACTOR: ${{ github.actor }}
+          FAILURE_REASON: ${{ steps.enter_impl_eval_status.outputs.failure_reason }}
+          TRUSTED_CHECKOUT_OUTCOME: ${{ steps.checkout_trusted_phase_eval_scripts.outcome }}
+        run: |
+          {
+            echo '## OpenHands phase evaluation'
+            echo
+            echo '**Status:** IMPL-EVAL status transition failed; evaluator dispatch continues'
+            echo
+            printf -- '- Who: `@%s`\n' "$REQUEST_ACTOR"
+            printf -- '- PR: `#%s`\n' "$PR_NUMBER"
+            printf -- '- Head SHA: `%s`\n' "$HEAD_SHA"
+            printf -- '- Trusted checkout outcome: `%s`\n' "$TRUSTED_CHECKOUT_OUTCOME"
+            printf -- '- Reason: `%s`\n' "$FAILURE_REASON"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Resolve and dispatch exactly one evaluator
-        if: env.SKIP_IMPL != 'true'
+        if: >-
+          !cancelled() &&
+          env.SKIP_IMPL != 'true' &&
+          steps.require_chainable_trigger_token.outcome == 'success'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
           github-token: ${{ secrets.PAT_TOKEN }}

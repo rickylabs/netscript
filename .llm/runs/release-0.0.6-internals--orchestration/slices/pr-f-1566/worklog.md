@@ -75,3 +75,39 @@ acceptance criteria, and required gates fully specified in issue #1566 and `impl
   evidence entries, and exactly one lifecycle label (`status:impl`). No new comments changed scope.
 - Slice S2: no issue/PR feedback required readjustment. The PR remains draft for orchestrator-owned
   IMPL-EVAL; no skip, ready-merge, or impl-eval label was applied.
+
+## Orchestrator review fix
+
+- Finding 1 confirmed: because `phase-eval-status.mjs` is not yet on `main`, this PR's own
+  ready-for-review event cannot import the trusted-base module. The orchestrator will use the
+  existing labeled path for this PR's evaluation; this implementation does not trigger it.
+- Finding 2 accepted: evaluator dispatch is the primary work; status mutation and its trusted
+  checkout are bookkeeping. Both bookkeeping steps now use `continue-on-error`, while the dispatch
+  step explicitly depends only on a successful chain-token check and `!cancelled()`—not on checkout
+  or transition outcomes. This preserves a hard failure when the required PAT is absent.
+- The transition catches its error only to publish a `failure_reason` output, then rethrows so the
+  step retains a truthful failure outcome. A following attributed summary step records actor, PR,
+  head, checkout outcome, and reason before dispatch proceeds.
+- Static regression coverage extracts the named workflow step blocks and asserts the non-blocking
+  edges, diagnostic fields, trusted-base/credential boundary, and absence of bookkeeping outcome
+  dependencies from dispatch. This proves the declared workflow policy; it is not a GitHub runner
+  simulation.
+- Acceptance reading: live issue #1566 box 1 remains truthful. Its specific concurrent-removal race
+  is narrowly tolerated inside the caller, so that transition completes normally and applies
+  `status:impl-eval` exactly once. Other errors still fail the transition step truthfully but no
+  longer suppress evaluator dispatch.
+
+### Review-fix gate evidence
+
+| Gate | Result |
+| --- | --- |
+| Script tests | `deno test --allow-read --allow-env --allow-write --allow-run .github/scripts/` — exit 0; 66 passed, 0 failed |
+| Scoped type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .github/scripts --ext ts` — exit 0; 6 files, 0 findings |
+| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .github/scripts --ext ts` — exit 0; 6 files, 0 findings |
+| Scoped format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .github/scripts --ext ts` — exit 0; 6 files, 0 findings |
+| Asset barrel | `deno task gen:assets-barrel` — exit 0; no generated file changed. Final empty-status proof runs after this review-fix commit. |
+| Workflow YAML | `deno eval --no-lock` with `jsr:@std/yaml@^1.0.10` — exit 0, `YAML_PARSE_OK` |
+
+- Review-fix reconcile: live issue wording supports box 1 without amendment; PR #1567 remains draft
+  with exactly `status:impl`. No trigger, condition, model, trusted-base lookup, #1541, or #1564
+  scope changed.
