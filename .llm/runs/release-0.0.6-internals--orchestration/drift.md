@@ -1401,3 +1401,35 @@ Error: thread/resume: thread/resume failed: thread 019ff6bf-… already has an a
   output carried the refusal while the surrounding command still succeeded.
 - **Resent** once the thread was genuinely idle (0 active sessions in that worktree), with the authorization
   unchanged plus a note that the earlier send never arrived, so the agent does not treat it as a repeat.
+
+## D-42 — my own supervision watch reported success twice while doing nothing (severity: moderate)
+
+Watching for PR #1596's IMPL-EVAL verdict, `agentic:gh-watch` produced a **false green twice inside five
+minutes**, and both times the harness task notification read `exit code 0`:
+
+1. **`--` separator rejected.** I invoked `deno task agentic:gh-watch -- --repo … --pr 1596`, copying the
+   `--`-separated form other `agentic:*` tasks use. This task passes argv straight through, so `--` arrived as
+   an argument: `Unknown argument: --`. The watch never started.
+2. **No token.** Re-invoked without `--`, it exited **4** — `No valid GitHub token resolved`. `gh` itself is
+   authenticated in this session, but the task shell does not inherit a token; `GH_TOKEN=$(gh auth token)` is
+   required, exactly as the mirror pre-flight needs.
+
+**Why both looked green:** I wrapped the call as `timeout … | tail -12`, so the reported status was the
+*pipeline's*, and `tail` always succeeds. `${PIPESTATUS[0]}` did print the real code into the log — I had the
+evidence and read the notification instead of the output.
+
+**The uncomfortable part:** this run's entire thesis is that a gate reporting success without executing is
+worse than a red one, and my own supervision loop did precisely that while I was auditing others for it. Had I
+trusted it, I would have proceeded to the pre-merge gate believing a verdict existed. The second occurrence
+also has a superseded-verdict precedent — D-24 — so `gh-watch` output has now misled this run in two distinct
+ways and gets no benefit of the doubt.
+
+**Rule:** never accept a watch's exit status from a pipeline or a task notification. Read the tool's own final
+line, and confirm the verdict independently — the verdict *comment* matched against the evaluated head — before
+acting on it. A watcher is a wake-up mechanism, never evidence.
+
+**Also observed, and this one is good news:** the ready-flip fired **two** phase-eval dispatch runs 8s apart
+(`31618717550` 16:39:58, `31618729177` 16:40:06) — the same double-fire shape as #1566. **Both exited
+`success`**, and exactly **one** trigger comment was posted (`head=7264ce6aa`). Before PR-F this pattern
+produced one red 404 run beside one success. That is #1566's fix confirmed in production on the next
+occurrence, and it is why the dedup evidence is worth citing at the cut.
