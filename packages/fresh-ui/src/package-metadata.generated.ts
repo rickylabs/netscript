@@ -2,4 +2,4 @@
 // Do not edit by hand. Run `deno task gen:publish-assets`.
 
 /** Version of the published Fresh UI package. */
-export const FRESH_UI_PACKAGE_VERSION: string = '0.0.5';
+export const FRESH_UI_PACKAGE_VERSION: string = '0.0.6-canary.6';
