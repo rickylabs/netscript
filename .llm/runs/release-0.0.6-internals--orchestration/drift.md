@@ -1198,3 +1198,49 @@ fresh-ui-quality log: "Fresh UI private lock is stale. … run deno task --cwd p
 - **Consequence for the merge order.** #1570 cannot merge green until #1580 lands, so this lane's #1403 now
   has an external dependency it did not have an hour ago. Recorded rather than worked around; nothing in
   #1570 changes.
+
+## D-37 — two reusable rules from the #1580 exchange, both earned rather than asserted
+
+- **Recorded:** 2026-08-12, from the runtime lane's #1580 closure
+- **Outcome:** #1580 closed `COMPLETED` on this lane's evidence — `fresh-ui-quality` run `31605497993` at
+  head `807d29003` (success), against the prior `31603374728` at `c740ff6e0` (failure, "Fresh UI private lock
+  is stale", `failedBatches` 2/2). #1570's `fresh-ui-quality` is green and the transition spans exactly their
+  fix.
+
+### Rule 1 — a control turns an after-measurement into evidence
+
+The runtime lane had the **after** (green on fixed main). This lane supplied the **before** (the red run at
+the pre-fix head, with the failing step and its message). Their framing, worth keeping verbatim in substance:
+*a one-sided after is an assertion; a control is evidence.* Neither lane could have produced the pair alone —
+they could not see my PR's earlier run in context, and I could not have known their fix was the only variable.
+
+This generalises past locks: for any "X is now green" claim, the cheap upgrade is to name the red run at the
+head immediately before, so the transition brackets exactly one change.
+
+### Rule 2 — a merge-forward on another lane's PR is safe precisely when the owned paths are unchanged
+
+`gh pr update-branch` on #1570 moved its head mid-evaluation. That is normally a verdict-invalidating event on
+this lane (`drift.md` D-21, D-23 — twice paid). It was **not** this time, and the difference is one command:
+
+```text
+git diff --stat c740ff6e0..807d29003 -- .llm/tools/quality .llm/tools/fitness deno.json \
+    .github/workflows/code-quality.yml docs/architecture/doctrine    → EMPTY
+```
+
+Byte-identical owned paths ⇒ the evaluated implementation is the shipped implementation ⇒ the `PASS` at
+`c740ff6e0` (run `31603391461`, trigger `gen=29343539580 head=c740ff6e0`) still names what merges, and no
+re-evaluation is owed. Provenance preserved **on proof**, not on assumption, and no evaluator capacity spent
+re-running an identical tree.
+
+The runtime lane adopted this as a rule and noted the ordering correction themselves: run the diff **before**
+the merge-forward, not after. Recorded here because the asymmetry is the useful part — the same head move is
+either harmless or verdict-destroying depending on a fact that takes one command to establish.
+
+### Reciprocal: `[post-merge]` vs `Refs` for a circular acceptance box
+
+They hit boxes that cannot be true until the enabling fix merges (#1571 wanting terminal-green Canary.3,
+#1580 wanting green `fresh-ui-quality` on #1570) and resolved with `Refs` plus a follow-through section, which
+defers the close by hand. This lane's `[post-merge]` marker (#1530 box 7, working precedent — the mirror
+prints "excluded post-merge box(es) … verify in a follow-up comment and tick after merge") keeps the closing
+keyword and the auto-close instead. The distinction they drew back is the right one: the marker fits a
+**genuinely post-merge-only** fact; `Refs` fits a box blocked on **another PR**.
