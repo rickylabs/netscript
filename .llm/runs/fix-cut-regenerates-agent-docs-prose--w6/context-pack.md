@@ -24,18 +24,21 @@ assumption. The owner explicitly ruled that both causal halves land together her
 - Captured two focused pre-fix reds without touching production source.
 - Implemented dependency-ordered regeneration; explicit staging ownership is retracted because the
   corpus was already covered by `PUBLISH_ASSET_OUTPUTS`.
+- Added corrected real-render differential and strict parent→HEAD acceptance/rejection tests.
+- Implemented semantic freshness in preparation and stable-publish reproduction.
+- Removed literal rebasing from production call sites and accepted render metadata variance only
+  behind canonical identity plus semantic reproduction.
 - Passed all owner gates, two freshness checks, and the disposable cut proof.
 
 ## In Progress
 
-- Correct staging tests, add post-writer semantic freshness, remove literal rebase call sites, and
-  implement strict rebuilt-provenance inheritance with acceptance/rejection proofs.
+- Final full gates, disposable 0.0.7 cut proof, evidence reconciliation, and PR handoff.
 
 ## Next Steps
 
-1. Capture corrected discriminating reds.
-2. Implement and run focused/full gates plus disposable cut and inheritance proofs.
-3. Commit/push each new slice, update PR body/evidence, and stop without flipping ready.
+1. Commit/push the focused-green semantic inheritance slice.
+2. Run full gates plus disposable cut proof and two consecutive freshness checks.
+3. Update PR body/evidence and stop without flipping ready.
 
 ## Drift and Debt
 

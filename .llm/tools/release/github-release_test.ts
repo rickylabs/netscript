@@ -6,7 +6,9 @@ import {
   assertThrows,
 } from 'jsr:@std/assert@^1';
 import {
+  assertPreparedReleaseGeneratedOutputsFresh,
   CANARY_PAIR_STATUS_CONTEXT,
+  type CanaryPairDependencies,
   collectReleaseNotes,
   composeReleaseBody,
   formatClosedIssues,
@@ -31,6 +33,17 @@ import { join, toFileUrl } from '@std/path';
 interface TestAgentDocsPayload {
   readonly schemaVersion: 1;
   readonly files: Readonly<Record<string, string>>;
+}
+
+interface TestAgentDocsProvenance {
+  readonly schemaVersion: 1;
+  readonly version: string;
+  readonly sourceCommit: string;
+  readonly extractionTimestamp: string;
+  readonly files: readonly string[];
+  readonly uncompressedBytes: number;
+  readonly compressedBytes: number;
+  readonly sha256: string;
 }
 
 async function gzipJson(value: unknown): Promise<Uint8Array> {
@@ -61,7 +74,7 @@ async function testAgentDocsProvenance(
   version: string,
   prose: Uint8Array,
   files: readonly string[] = ['llms.txt'],
-): Promise<Record<string, unknown>> {
+): Promise<TestAgentDocsProvenance> {
   const raw = await gunzipBytes(prose);
   return {
     schemaVersion: 1,
@@ -92,7 +105,7 @@ interface RenderedCanaryPairFixture {
   readonly nextVersion: string;
   readonly literalRebaseSha256: string;
   readonly renderedSha256: string;
-  readonly dependencies: Parameters<typeof verifyGreenCanaryPair>[3];
+  readonly dependencies: CanaryPairDependencies;
   readonly dispose: () => Promise<void>;
 }
 
@@ -232,7 +245,7 @@ async function createRenderedCanaryPairFixture(
     await git(['commit', '--quiet', '-m', 'stable cut']);
     const current = await git(['rev-parse', 'HEAD']) as string;
 
-    const dependencies: Parameters<typeof verifyGreenCanaryPair>[3] = {
+    const dependencies: CanaryPairDependencies = {
       revParse: async (_root, revision) => await git(['rev-parse', revision]) as string,
       changedFiles: async () =>
         (await git(['diff', '--name-only', 'HEAD^', 'HEAD']) as string).split(/\r?\n/).filter(
@@ -328,6 +341,40 @@ Deno.test('version-only diff accepts the complete release version surface only',
     ),
     false,
   );
+});
+
+Deno.test('generated release freshness checks semantic prose before downstream assets', async () => {
+  const calls: string[] = [];
+  await assertPreparedReleaseGeneratedOutputsFresh('/repo', {
+    trackedStatus: () => Promise.resolve(''),
+    runDeno: (_root, args) => {
+      calls.push(`deno ${args.join(' ')}`);
+      return Promise.resolve();
+    },
+  });
+  assertEquals(calls, [
+    'deno task check:agent-docs-prose',
+    'deno task gen:publish-assets --check',
+    'deno task check:mcp-export-corpus',
+    'deno run --no-lock --allow-read --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts --check',
+  ]);
+});
+
+Deno.test('generated release freshness stops before downstream checks when semantic prose is stale', async () => {
+  const calls: string[] = [];
+  await assertRejects(
+    () =>
+      assertPreparedReleaseGeneratedOutputsFresh('/repo', {
+        trackedStatus: () => Promise.resolve(''),
+        runDeno: (_root, args) => {
+          calls.push(`deno ${args.join(' ')}`);
+          return Promise.reject(new Error('semantic agent-docs stale'));
+        },
+      }),
+    Error,
+    'semantic agent-docs stale',
+  );
+  assertEquals(calls, ['deno task check:agent-docs-prose']);
 });
 
 Deno.test('version-only diff accepts a realistic coordinated release cut and rejects source drift', async () => {
@@ -488,6 +535,22 @@ Deno.test('parent canary evidence checks every release path and reproduces deriv
 Deno.test('parent canary evidence accepts a genuinely re-rendered version-derived corpus', async () => {
   const fixture = await createRenderedCanaryPairFixture(false);
   try {
+    const beforeProvenance = JSON.parse(
+      await fixture.dependencies.fileAtRevision(
+        fixture.root,
+        fixture.parent,
+        PAIR_PROVENANCE_PATH,
+      ),
+    ) as TestAgentDocsProvenance;
+    const afterProvenance = JSON.parse(
+      await fixture.dependencies.fileAtRevision(
+        fixture.root,
+        fixture.current,
+        PAIR_PROVENANCE_PATH,
+      ),
+    ) as TestAgentDocsProvenance;
+    assertNotEquals(beforeProvenance.sourceCommit, afterProvenance.sourceCommit);
+    assertNotEquals(beforeProvenance.extractionTimestamp, afterProvenance.extractionTimestamp);
     assertNotEquals(
       fixture.literalRebaseSha256,
       fixture.renderedSha256,
@@ -535,16 +598,24 @@ Deno.test('parent canary evidence fails when derived writer outputs cannot be re
     schemaVersion: 1,
     files: { 'llms.txt': 'Install jsr:@netscript/cli@1.0.0' },
   });
+  const parentProvenance = await testAgentDocsProvenance('1.0.0-canary.1', parentProse);
+  const currentProvenance = await testAgentDocsProvenance('1.0.0', currentProse);
   await assertRejects(
     () =>
       verifyGreenCanaryPair('owner/repo', 'token', '/repo', {
         revParse: (_root, revision) =>
           Promise.resolve(revision === 'HEAD' ? 'stable-sha' : 'canary-content-sha'),
-        changedFiles: () => Promise.resolve(['deno.json', '.llm/assets/agent-docs/prose.json.gz']),
+        changedFiles: () =>
+          Promise.resolve([
+            'deno.json',
+            '.llm/assets/agent-docs/prose.json.gz',
+            '.llm/assets/agent-docs/provenance.json',
+          ]),
         releaseFiles: () =>
           Promise.resolve([
             '/repo/deno.json',
             '/repo/.llm/assets/agent-docs/prose.json.gz',
+            '/repo/.llm/assets/agent-docs/provenance.json',
           ]),
         fileAtRevision: (_root, revision, path) => {
           if (path === 'deno.json') {
@@ -553,6 +624,11 @@ Deno.test('parent canary evidence fails when derived writer outputs cannot be re
                 ? '{"version":"1.0.0-canary.1"}'
                 : '{"version":"1.0.0"}',
             );
+          }
+          if (path === '.llm/assets/agent-docs/provenance.json') {
+            return Promise.resolve(JSON.stringify(
+              revision === 'canary-content-sha' ? parentProvenance : currentProvenance,
+            ));
           }
           return Promise.resolve(`${revision}:not-reproducible`);
         },
@@ -589,21 +665,22 @@ Deno.test('parent canary evidence rejects self-consistent non-version agent-docs
   const parentProse = await gzipJson(parentPayload);
   const injectedProse = await gzipJson(injectedPayload);
   const injectedRaw = new TextEncoder().encode(JSON.stringify(injectedPayload));
-  const injectedProvenance = {
-    schemaVersion: 1,
-    version: nextVersion,
-    files: [documentPath],
-    uncompressedBytes: injectedRaw.byteLength,
-    compressedBytes: injectedProse.byteLength,
-    sha256: await sha256(injectedRaw),
-  };
+  const parentProvenance = await testAgentDocsProvenance(
+    previousVersion,
+    parentProse,
+    [documentPath],
+  );
+  const injectedProvenance = await testAgentDocsProvenance(
+    nextVersion,
+    injectedProse,
+    [documentPath],
+  );
   const injectedBarrel = [
     `export const EMBEDDED_AGENT_DOCS_GZIP_BASE64 = ${
       JSON.stringify(bytesToBase64(injectedProse))
     };`,
     `export const EMBEDDED_AGENT_DOCS_PROVENANCE = ${JSON.stringify(injectedProvenance)};`,
   ].join('\n');
-  const parentProvenance = JSON.stringify({ ...injectedProvenance, version: previousVersion });
   const parentBarrel = 'parent canary barrel';
   const changedFiles = ['deno.json', prosePath, provenancePath, barrelPath];
   let reproducedHead = false;
@@ -619,7 +696,7 @@ Deno.test('parent canary evidence rejects self-consistent non-version agent-docs
       }
       if (path === prosePath) return Promise.resolve(parent ? 'parent gzip' : 'injected gzip');
       if (path === provenancePath) {
-        return Promise.resolve(parent ? parentProvenance : JSON.stringify(injectedProvenance));
+        return Promise.resolve(JSON.stringify(parent ? parentProvenance : injectedProvenance));
       }
       return Promise.resolve(parent ? parentBarrel : injectedBarrel);
     },
@@ -634,6 +711,7 @@ Deno.test('parent canary evidence rejects self-consistent non-version agent-docs
       assertStringIncludes(injectedBarrel, bytesToBase64(injectedProse));
       assertStringIncludes(injectedBarrel, injectedProvenance.sha256);
       reproducedHead = true;
+      throw new Error('semantic agent-docs drift');
     },
     request: (_method: string, path: string) =>
       Promise.resolve({
@@ -647,7 +725,11 @@ Deno.test('parent canary evidence rejects self-consistent non-version agent-docs
       }),
   };
 
-  await dependencies.generatedOutputsFresh();
+  await assertRejects(
+    () => dependencies.generatedOutputsFresh(),
+    Error,
+    'semantic agent-docs drift',
+  );
   assertEquals(reproducedHead, true, 'the attack must be self-consistent at HEAD');
   await assertRejects(
     () => verifyGreenCanaryPair('owner/repo', 'token', '/repo', dependencies),

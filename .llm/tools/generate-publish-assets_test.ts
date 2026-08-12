@@ -8,7 +8,6 @@ import {
   generatePublishAssets,
   MCP_EMBEDDED_DOC_PATHS,
   MCP_EMBEDDED_DOCS_MAX_BYTES,
-  rebaseAgentDocsProse,
   refreshAgentDocsProvenance,
 } from './generate-publish-assets.ts';
 
@@ -182,7 +181,7 @@ Deno.test('top-level generation refreshes provenance before MCP reads it', async
   }
 });
 
-Deno.test('release bump rebases one shared corpus before CLI and MCP consume it', async () => {
+Deno.test('publish assets consume the genuinely rendered shared corpus without rebasing it', async () => {
   const root = await Deno.makeTempDir();
   const rootUrl = toFileUrl(`${root}/`);
   const oldVersion = '0.0.4';
@@ -212,11 +211,12 @@ Deno.test('release bump rebases one shared corpus before CLI and MCP consume it'
       ),
     ]);
 
+    const bump = await coordinateVersionBump(root, nextVersion, 'canary');
     const files = Object.fromEntries(
       MCP_EMBEDDED_DOC_PATHS.map((path, index) => [
         path,
         index === 0
-          ? `Shipped in ${oldVersion}. Install \`jsr:@netscript/plugin@${oldVersion}\`. ` +
+          ? `Shipped in ${nextVersion}. Install \`jsr:@netscript/plugin@${nextVersion}\`. ` +
             `Historical: \`jsr:@netscript/cli@0.0.2\`.\n`
           : `# ${path}\nRelease-current guidance.\n`,
       ]),
@@ -232,7 +232,7 @@ Deno.test('release bump rebases one shared corpus before CLI and MCP consume it'
           JSON.stringify(
             {
               schemaVersion: 1,
-              version: oldVersion,
+              version: nextVersion,
               sourceCommit: 'release-fixture',
               extractionTimestamp: '2026-08-09T00:00:00Z',
               files: Object.keys(files),
@@ -247,10 +247,8 @@ Deno.test('release bump rebases one shared corpus before CLI and MCP consume it'
       ),
     ]);
 
-    const bump = await coordinateVersionBump(root, nextVersion, 'canary');
     await generatePublishAssets({
       refreshProvenance: () => refreshAgentDocsProvenance(rootUrl, false),
-      rebaseProse: (oldVersion) => rebaseAgentDocsProse(oldVersion, rootUrl, false, []),
       generateMcp: () => generateMcpAssets(rootUrl, false, []),
       generateCli: NOOP_GENERATOR,
       generateFreshUi: NOOP_GENERATOR,
@@ -268,7 +266,7 @@ Deno.test('release bump rebases one shared corpus before CLI and MCP consume it'
         new TextEncoder().encode(cliPayload.files[document.path]),
       );
     }
-    assert(cliPayload.files['llms.txt'].includes(`Shipped in ${oldVersion}.`));
+    assert(cliPayload.files['llms.txt'].includes(`Shipped in ${nextVersion}.`));
     assert(cliPayload.files['llms.txt'].includes(`jsr:@netscript/plugin@${nextVersion}`));
     assert(!cliPayload.files['llms.txt'].includes(`jsr:@netscript/plugin@${oldVersion}`));
     assert(cliPayload.files['llms.txt'].includes('jsr:@netscript/cli@0.0.2'));

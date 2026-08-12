@@ -382,3 +382,48 @@ ok | 1 passed | 0 failed | 24 filtered out
 
 The pre-fix code refuses both cases at the coarse literal-replacement boundary. The implementation
 must accept the first only after semantic reproduction, while preserving rejection of the second.
+
+## Corrected-RCA focused green
+
+Command:
+`deno test -A .llm/tools/release/prepare-release_test.ts .llm/tools/release/github-release_test.ts .llm/tools/generate-publish-assets_test.ts .llm/tools/docs/build-agent-docs-bundle_test.ts`
+
+Exit code: `0`
+
+```text
+running 4 tests from .llm/tools/release/prepare-release_test.ts
+shared release preparation runs the stable gate sequence in order ... ok
+shared release preparation stages every generator-owned output ... ok
+shared release preparation regenerates assets then stops when residue remains ... ok
+shared release preparation fails locally when semantic agent-docs freshness is red ... ok
+
+running 27 tests from .llm/tools/release/github-release_test.ts
+generated release freshness checks semantic prose before downstream assets ... ok
+generated release freshness stops before downstream checks when semantic prose is stale ... ok
+parent canary evidence accepts a genuinely re-rendered version-derived corpus ... ok
+parent canary evidence rejects semantically drifted rebuilt corpus content ... ok
+parent canary evidence fails when derived writer outputs cannot be reproduced ... ok
+parent canary evidence rejects self-consistent non-version agent-docs injection ... ok
+parent canary evidence rejects writer-preserved non-version provenance injection ... ok
+... remaining GitHub-release contract tests ... ok
+
+running 4 tests from .llm/tools/docs/build-agent-docs-bundle_test.ts
+... 4 passed ...
+running 5 tests from .llm/tools/generate-publish-assets_test.ts
+publish assets consume the genuinely rendered shared corpus without rebasing it ... ok
+... 4 remaining publish-asset tests ... ok
+
+ok | 40 passed | 0 failed
+```
+
+Focused `deno check --unstable-kv` over the six changed source/test files also exited `0`.
+
+The inheritance acceptance fixture explicitly proves `sourceCommit` and
+`extractionTimestamp` change between the real Git parent and HEAD. Both sides must still match their
+own canonical uncompressed SHA-256, exact file list, and uncompressed byte count. The rejection
+fixture changes corpus content and updates its sidecar/downstream embedding self-consistently; it is
+nevertheless refused because it cannot reproduce from the rendered site.
+
+`rebaseAgentDocsProse` has no production call site after this change. It remains exported only for
+the differential test and recovery diagnostics; `generatePublishAssets` consumes the corpus emitted
+by the preceding real render.

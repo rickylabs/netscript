@@ -103,3 +103,33 @@ Deno.test('shared release preparation regenerates assets then stops when residue
     'deno task check:agent-docs-prose',
   ]);
 });
+
+Deno.test('shared release preparation fails locally when semantic agent-docs freshness is red', async () => {
+  const calls: string[] = [];
+  await assertRejects(
+    () =>
+      prepareRelease('/repo', '0.0.2', 'release:cut', 'stable', {
+        bump: (_root, version) =>
+          Promise.resolve({ oldVersion: '0.0.1', newVersion: version, files: ['/repo/deno.json'] }),
+        findResidue: () => Promise.resolve([]),
+        runCommand: (command, args) => {
+          const call = `${command} ${args.join(' ')}`;
+          calls.push(call);
+          return Promise.resolve({
+            code: call === 'deno task check:agent-docs-prose' ? 1 : 0,
+            stdout: '',
+            stderr: call === 'deno task check:agent-docs-prose' ? 'semantic corpus stale' : '',
+          });
+        },
+      }),
+    Error,
+    'check:agent-docs-prose failed with exit 1',
+  );
+  assertEquals(calls, [
+    'deno task gen:agent-docs-prose',
+    'deno task gen:publish-assets',
+    'deno task gen:mcp-export-corpus',
+    'deno task gen:assets-barrel',
+    'deno task check:agent-docs-prose',
+  ]);
+});

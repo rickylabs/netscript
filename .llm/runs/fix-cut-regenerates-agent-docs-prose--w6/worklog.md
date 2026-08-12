@@ -64,6 +64,9 @@ Future version-coupled assets are added to the generator sequence and
 | 2026-08-13 | 3 | reconcile | PR #1628 remains draft/status:impl; no new comments or scope changes require adjustment. |
 | 2026-08-13 | 4 | owner rescope | Retracted explicit output classification; added same-PR semantic freshness and strict canary inheritance scope. Automatic IMPL-EVAL remains orchestrator-owned. |
 | 2026-08-13 | 4 | corrected reds | Preparation sequence/staging assertions fail 3/3; genuine-render inheritance fails; drift companion remains refused. Full evidence in `evidence.md`. |
+| 2026-08-13 | 5 | implementation | Restored single staging ownership; added post-writer semantic check; removed literal rebase from production call sites; changed inheritance to canonical identity + semantic HEAD reproduction. |
+| 2026-08-13 | 5 | focused gates | 40 preparation/docs/publish/inheritance tests pass; six changed TS files type-check; lockfile diff empty. |
+| 2026-08-13 | 5 | reconcile | Scope matches the owner RCA in #1628; PR remains draft/status:impl and no evaluator was dispatched. |
 
 ## Gate Results
 
