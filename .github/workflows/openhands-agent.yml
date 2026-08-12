@@ -863,7 +863,6 @@ jobs:
 
       - name: Commit run artifacts to PR branch (allow-listed paths only)
         id: commit-artifacts
-        if: always() && steps.request.outputs.eval_phase == ''
         # always(): trace/run artifacts from a failed or budget-cut run must
         # still land on the branch for the supervisor's local status tooling.
         # Formal evaluators are immutable read-only runs: their trace stays in the Actions artifact
@@ -872,7 +871,12 @@ jobs:
         # deno.lock, never node_modules, never agent source changes (the agent
         # pushes its own source commits per the request contract). Disallowed
         # leftovers are counted, sampled, and preserved in the Actions artifact.
-        if: always() && steps.target-ref.outputs.exists == 'true' && steps.request.outputs.is_pr == 'true' && steps.artifacts.outputs.trace_dir != ''
+        if: >-
+          always() &&
+          steps.request.outputs.eval_phase == '' &&
+          steps.target-ref.outputs.exists == 'true' &&
+          steps.request.outputs.is_pr == 'true' &&
+          steps.artifacts.outputs.trace_dir != ''
         continue-on-error: true
         env:
           TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
