@@ -5,10 +5,10 @@
 **PASS after in-place documentation corrections.**
 
 This was the opposite-family `docs_audit` pass over `cd24e1679..f3893df5b` as one changeset,
-followed by a complete rerun with the audit fixes applied and a focused rerun after the
-orchestrator's xref-registry finding. The generator's worklog and PR claims were treated as input
-only. Evidence below came from this Codex session's commands against the checked-out public package,
-CLI, and documentation wiring surfaces.
+followed by a complete rerun with the audit fixes applied and focused reruns after the
+orchestrator's xref-registry and plugin/core canonical-location findings. The generator's worklog
+and PR claims were treated as input only. Evidence below came from this Codex session's commands
+against the checked-out public package, CLI, and documentation wiring surfaces.
 
 ## Gate log
 
@@ -22,7 +22,7 @@ CLI, and documentation wiring surfaces.
 | 6. Template/generated drift | `rtk proxy deno task check:assets-barrel`; immediate `git diff` of generated barrels and `rtk git status --short` | Repo-owned generated asset barrels affected by documentation/README assets | **PASS** — exit 0 and no generated-barrel diff | The gate did not alter any generated assets. A later targeted CLI invocation added one incidental `deno.lock` integrity row. | Yes — removed the incidental lock entry and retained no cache/lock change. |
 | 7. Nav/front matter | Front-matter inspection for the four new pages; publishable-page inventory; `_config.ts`/`_data.ts` nav-source inspection; `deno eval` comparison of `docs/site/reference/` directories with exported `ref:` keys; Gates 1–2 rerun after the registry fix | New core pages, folder-derived navigation, xref registry, front matter, and path convention | **PASS after follow-up fix** — all four pages have `layout: layouts/base.vto` and exact package titles; Lume rendered all four; 35 publishable workspace members have pages; all 36 reference directories have exactly 36 registered `ref:` keys, with zero missing or extra entries | The initial audit verified folder-derived nav but missed the separate hand-maintained `REFERENCE_UNITS` registry. The four new `plugin-*-core` pages lacked xref keys. `_data.ts` no longer contains a mirrored executable list; it explicitly delegates `ref:` keys to `_data/xref.ts`. Two comments in `xref.ts` also carried stale counts (`32` and `28`) and one retained false “generated” provenance. | Yes — registered all four missing units, corrected both counts to 36, and documented that nav is independently folder-derived while the xref registry must stay aligned with `docs/site/reference/`. |
 | 8. Prose quality | `deno run --no-lock --allow-read docs/site/_plugins/check-source-format.ts .`; heading-level Deno scan; `deno fmt --check README.md packages/sdk/README.md`; `git diff --check cd24e1679`; changed-line filler/callout/command scans; live command checks from Gate 5 | All changed public prose, headings, tables, callouts, and shown commands | **PASS after fixes** — source formatting OK; 45 changed Markdown files, zero heading jumps; both READMEs formatted; diff check clean | The shown `netscript plugin ai --help` command failed because the host pass-through does not own `--help`. Root README still contained separate hardcoded plugin-file/helper totals. Desktop wording omitted explicit-target behavior. | Yes — removed the invalid shown command, removed all hardcoded root-README file/directory/helper totals, qualified host targeting as the default, and added exact release setup flags. |
-| 9. Cross-page contradiction | Whole-tree `rg` for generated-reference claims, deploy verb claims, SDK query shapes, scaffold totals, and internal identifiers; focused repo search for a reference writer; comparison to live surfaces from Gate 5 | Every changed claim against the rest of the public documentation tree | **PASS after fixes** — no unresolved contradiction found in the public tree | The rewritten index said reference pages are hand-written, while many existing public pages and the Reference lane subtitle still called them generated. The repository contains checks/readers but no writer, so the old wording contradicted the changed whole-site claim. Also fixed deploy capability and workers-runtime contradictions found during API comparison. Historical `_plan/` files retain their original planning language and are not public documentation. | Yes — harmonized public references to “written/documented against `deno doc`” / “API reference,” updated the lane subtitle and source comments, and left historical plan artifacts untouched. |
+| 9. Cross-page contradiction | Whole-tree `rg` for generated-reference claims, deploy verb claims, SDK query shapes, scaffold totals, internal identifiers, and obsolete plugin/core convention statements; focused repo search for a reference writer; comparison to live surfaces from Gate 5; `rtk proxy deno task docs:accuracy` | Every changed claim against the rest of the public documentation tree | **PASS after follow-up fixes** — no obsolete “not a separate top-level reference entry,” “single-page internals convention,” or “not part of the public plugin contract” claim remains; docs accuracy exits 0 | The rewritten index said reference pages are hand-written, while many existing public pages still called them generated. A later polish pass found a second contradiction the initial audit missed: the four deployable-plugin pages duplicated their core packages' exhaustive surfaces, and the sagas/streams pages denied those separate core references should exist. Historical `_plan/` files retain their original planning language and are not public documentation. | Yes — selected one publishable package/one canonical reference page, retained focused cross-package examples, replaced four duplicated core tables with links to the canonical `plugin-*-core` pages, recorded the rule and rationale in the index, and retained the saga `spawn(...): never` contract required by the accuracy gate. The `Group F`/`T1` descriptions remain unchanged because they match authoritative published JSDoc and are tracked in #1554. |
 
 ## Fix disposition
 
@@ -36,9 +36,13 @@ Fixed in place:
 - reconciled public “generated reference” wording with the verified hand-maintained Markdown model;
 - changed the public Reference-lane subtitle to “Every published symbol”; and
 - registered the four new core-reference pages in the hand-maintained `ref:` xref surface, verified
-  exact 36-directory/36-key parity, and corrected its stale count/provenance comments; and
+  exact 36-directory/36-key parity, and corrected its stale count/provenance comments;
+- made each separately published `plugin-*-core` page canonical for its own exports, replacing the
+  four deployable-plugin pages' duplicated exhaustive tables with links and recording the convention
+  in the reference index; and
 - removed incidental `deno.lock` churn.
 
 Flagged but not fixed: none. The unrouted adapter `emit` operation remains the separately owned
 source defect and was not changed. Historical files under `docs/site/_plan/` are retained as records,
-not treated as current public claims.
+not treated as current public claims. The published-JSDoc terms `Group F` and `T1` remain in the
+triggers-core page pending the separately filed source correction #1554.

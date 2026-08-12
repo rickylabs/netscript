@@ -12,8 +12,8 @@ index of packages and plugins return to the [reference overview](/reference/).
 The published plugin exposes the host-facing plugin manifest, the executable saga runtime and
 supervisor, the HTTP publisher, the versioned API contract, and the browser-safe stream surface.
 The userland saga DSL (`defineSaga`, the cascaded-message constructors) is authored against
-[`@netscript/plugin-sagas-core`](#internals) and re-exported through the runtime entrypoint; the
-core package is documented as an [Internals](#internals) subsection below.
+[`@netscript/plugin-sagas-core`](/reference/plugin-sagas-core/) and re-exported through the runtime
+entrypoint. That separately published package has its own canonical reference page.
 
 ## Entrypoints
 
@@ -53,7 +53,7 @@ is provided by `inspectPlugin` from `@netscript/plugin`.
 
 The runtime entrypoint provides the executable saga runtime and the building blocks a composition
 root wires together. It also re-exports the userland DSL types and cascaded-message vocabulary from
-[`@netscript/plugin-sagas-core`](#internals).
+[`@netscript/plugin-sagas-core`](/reference/plugin-sagas-core/).
 
 ### Runtime entry functions and classes
 
@@ -146,82 +146,17 @@ Browser-safe stream exports for the sagas plugin.
 
 ---
 
-## Internals
+## Core package
 
-> The following surface belongs to `@netscript/plugin-sagas-core`, the framework-internal package
-> that implements the saga DSL, runtime ports, adapters, telemetry, config, and testing primitives.
-> Application authors normally import these symbols through `@netscript/plugin-sagas`; the core
-> package is documented here for completeness. It is not a separate top-level reference entry.
+The separately published
+[`@netscript/plugin-sagas-core`](/reference/plugin-sagas-core/) page is canonical for the saga DSL,
+runtime ports, adapters, telemetry, configuration, and testing exports. This page stays focused on
+the deployable plugin's manifest and integration entrypoints. The testing example below uses the core
+package intentionally; exhaustive core entrypoint and symbol tables live only on its reference page.
 
-### `@netscript/plugin-sagas-core`
-
-Saga DSL, runtime ports, adapters, telemetry, config, and testing primitives for NetScript sagas
-plugins. Its root entrypoint (`./mod.ts`) is the authoring surface for saga definitions.
-
-#### DSL constructors (root export)
-
-| Symbol | Kind | Signature | Description |
-| --- | --- | --- | --- |
-| `defineSaga` | function | `defineSaga(id: TId): SagaBuilder` | Start a userland saga definition chain. |
-| `defineQuery` | function | `defineQuery(name: TName): QueryDefinition` | Define a synchronous read-only query for a running saga instance. |
-| `defineSignal` | function | `defineSignal(name: TName): SignalDefinition` | Define a signal that can be sent to a running saga instance. |
-| `send` | function | `send(target, payload: unknown, options?: SendOptions): CascadedMessage` | Republish an internal message onto the saga bus; does not trigger workers. |
-| `spawn` | function | `spawn(child, input: unknown, options?: SpawnOptions): never` | Unsupported; calling it immediately throws `SAGA_NOT_IMPLEMENTED`. Deserialized spawn effects are also rejected defensively. |
-| `schedule` | function | `schedule(message, delay: SagaScheduleDelay): CascadedMessage` | Create a cascaded scheduled message. |
-| `sagaComplete` | function | `sagaComplete(result: unknown): CascadedMessage` | Create a terminal saga completion message. |
-| `sagaFail` | function | `sagaFail(reason): CascadedMessage` | Create a terminal saga failure message. |
-| `sagaCompensate` | function | `sagaCompensate(message, reason: string): CascadedMessage` | Create a cascaded compensation message. |
-
-#### DSL types (root export)
-
-| Symbol | Kind | Description |
-| --- | --- | --- |
-| `SagaBuilder` | interface | Userland fluent saga builder. |
-| `SagaBuilderPhase` | type alias | Typestate phase for the userland saga builder. |
-| `SagaEvent` | type alias | Event shape inferred by `defineSaga().on(type, handler)`. |
-| `SagaHandler` | type alias | Synchronous saga handler that returns cascaded messages. |
-| `SagaState` | type alias | Base state shape accepted by saga definitions. |
-| `SagaConcurrencyOptions` / `SagaConcurrencyPolicy` | type alias | Concurrency options/policy for a saga definition. |
-| `CascadedMessage` / `CascadedMessageKind` / `CascadedMessageTarget` | type alias | Cascaded-message side-effect ledger vocabulary. |
-| `QueryDefinition` / `SignalDefinition` | type alias | Query/signal definitions reserved by the public DSL. |
-| `SendOptions` / `SpawnOptions` / `SagaScheduleDelay` | type alias | Constructor options; `SpawnOptions` is retained for the unsupported, always-throwing `spawn()` call. |
-
-#### Core sub-path entrypoints
-
-| Export | Entrypoint | Purpose |
-| --- | --- | --- |
-| `@netscript/plugin-sagas-core` | `./mod.ts` | DSL constructors and types (documented above). |
-| `@netscript/plugin-sagas-core/builders` | `./src/builders/mod.ts` | Fluent `defineSaga` builder and DSL constructors. |
-| `@netscript/plugin-sagas-core/domain` | `./src/domain/mod.ts` | Domain primitives, `SagasError`, defaults, and branded ids. |
-| `@netscript/plugin-sagas-core/ports` | `./src/ports/mod.ts` | Runtime port interfaces (`SagaBusPort`, `SagaStorePort`, idempotency). |
-| `@netscript/plugin-sagas-core/runtime` | `./src/runtime/mod.ts` | Native runtime engine wiring consumed by the plugin runtime. |
-| `@netscript/plugin-sagas-core/adapters` | `./src/adapters/mod.ts` | Bus/store adapters. |
-| `@netscript/plugin-sagas-core/transports` | `./src/transports/mod.ts` | Transport implementations. |
-| `@netscript/plugin-sagas-core/stores` | `./src/stores/mod.ts` | State store implementations. |
-| `@netscript/plugin-sagas-core/middleware` | `./src/middleware/mod.ts` | Saga middleware primitives. |
-| `@netscript/plugin-sagas-core/telemetry` | `./src/telemetry/mod.ts` | Saga telemetry instrumentation. |
-| `@netscript/plugin-sagas-core/config` | `./src/config/mod.ts` | Saga runtime configuration. |
-| `@netscript/plugin-sagas-core/contracts/v1` | `./src/contracts/v1/mod.ts` | Core contract primitives. |
-| `@netscript/plugin-sagas-core/streams` | `./src/streams/mod.ts` | Core stream schema primitives. |
-| `@netscript/plugin-sagas-core/presets` | `./src/presets/mod.ts` | Runtime presets. |
-| `@netscript/plugin-sagas-core/abstracts` | `./src/abstracts/mod.ts` | Abstract base primitives. |
-| `@netscript/plugin-sagas-core/testing` | `./src/testing/mod.ts` | Deterministic saga test helpers. |
-| `@netscript/plugin-sagas-core/agent` | `./src/agent/mod.ts` | Agent-integration primitives. |
-| `@netscript/plugin-sagas-core/integration/workers` | `./src/integration/workers/mod.ts` | Workers integration seam. |
-| `@netscript/plugin-sagas-core/integration/publisher` | `./src/integration/publisher/mod.ts` | Publisher integration seam. |
-
-#### Domain primitives (`@netscript/plugin-sagas-core/domain`)
-
-| Symbol | Kind | Description |
-| --- | --- | --- |
-| `SagasError` | class | Structured error thrown by sagas core APIs. |
-| `SAGAS_ERROR_CODES` / `SagasErrorCode` | variable / type | Error codes produced by `SagasError`. |
-| `DEFAULT_RETRY_POLICY` | variable | Default retry policy used when a saga does not override retry behavior. |
-| `DEFAULT_SAGA_DURABILITY_TIER` | variable | Default durability tier for saga definitions. |
-| `DEFAULT_RETRY_MAX_ATTEMPTS` | variable | Default maximum retry attempts for cascaded messages. |
-| `DEFAULT_IDEMPOTENCY_WINDOW_MS` | variable | Default idempotency deduplication window in milliseconds. |
-| `SAGA_ADAPTER_KINDS` / `SagaAdapterKind` | variable / type | Runtime adapter kinds supported by `createSagaRuntime`. |
-| `SagaMessageType` | type alias | Extracts the message type discriminator from a saga message. |
+The unsupported `spawn(child, input, options?: SpawnOptions): never` contract is worth calling out:
+it throws immediately rather than starting a child saga. Its full description and every other core
+symbol live on the canonical core page.
 
 ## Deterministic Testing
 

@@ -33,5 +33,12 @@ Their `-core` counterparts use the name-exact form, so `@netscript/plugin-sagas-
 `/reference/sagas/`. This is a description of what the site does today, not a rule to follow when the
 two forms disagree.
 
+Each publishable workspace member's own page is canonical for its exported API. The four deployable
+plugin pages describe their manifests and integration entrypoints, then link to their separately
+published `-core` packages instead of duplicating the core symbol tables inline. Focused examples may
+use both packages, but exhaustive entrypoint and symbol documentation lives on the package that
+exports it. This one-package/one-canonical-page rule keeps the reference consistent with the
+publishable workspace surface and gives each API claim one place to stay current.
+
 Navigation is derived from the folder tree, so a new page is discoverable as soon as its directory
 exists — no index or nav file lists the packages.

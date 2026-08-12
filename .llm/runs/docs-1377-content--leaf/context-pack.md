@@ -30,7 +30,8 @@ Push with an explicit refspec: `git push origin HEAD:refs/heads/docs/1377-refere
 | S2 `packages/sdk/README.md` query dialect | `68cf6f2e5` | landed, gated, commented |
 | S3 root `README.md` scaffold count + specifier | `617b74884` | landed, gated, commented |
 | S4 CLI reference — six verbs + two wrong claims | `f3893df5b` | landed, gated, commented |
-| Audit corrections | `077a75716`, `13b6d118a` | landed, gated, commented; follow-up xref fix pending commit |
+| Audit corrections | `077a75716`, `13b6d118a`, `ef2b05670` | landed, gated, commented |
+| Plugin/core canonical-location follow-up | this commit | four deployable-plugin pages point to canonical `plugin-*-core` pages; gated |
 
 ## Measurements that must not be re-derived
 
@@ -43,6 +44,10 @@ Push with an explicit refspec: `git push origin HEAD:refs/heads/docs/1377-refere
 - **Reference xref registry:** navigation is folder-derived, but `_data/xref.ts` separately registers
   all 36 reference directories. The audit follow-up restored exact 36-directory/36-key parity and
   added the four new `plugin-*-core` keys.
+- **Canonical reference location:** each separately published `plugin-*-core` page owns its
+  exhaustive exported-API documentation. The corresponding deployable-plugin page owns manifest and
+  integration coverage, links to the core page, and may retain focused cross-package examples. This
+  removes the prior duplicated tables and obsolete single-page-internals claims.
 - **Deploy target operations, measured from source:**
 
   | Target(s) | Class | Operations |

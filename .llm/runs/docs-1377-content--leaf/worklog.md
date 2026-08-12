@@ -275,3 +275,32 @@ unchanged, adds the four missing registry entries, and documents the real two-su
 | Xref parity | `deno eval` import of `xref` plus directory/key set comparison | 0 | 36 directories, 36 registered `ref:` units, zero missing/extra; all four new URLs exact |
 | Internal doc links | `deno task docs:links` | 0 | `docs=102 broken-links=0 broken-anchors=0 orphans=0` |
 | Site build | `cd docs/site && deno task build` | 0 | source format OK; 630 files generated; rendered output OK for 224 HTML files |
+
+## Opposite-family audit follow-up — canonical plugin/core references
+
+The polish lane found a Gate 9 contradiction the first audit did not catch. The four new
+`plugin-*-core` pages were intended to satisfy the one-page-per-publishable-package acceptance row,
+but the deployable sagas and streams pages still denied that such top-level references should exist.
+All four deployable-plugin pages also repeated their core package's exhaustive API documentation.
+
+Decision: **the separately published core package's page is canonical for its exported surface**.
+This is the arrangement most consistent with #1377: one publishable workspace member has one
+canonical reference page, so an API claim has one place to remain accurate. The four deployable
+plugin pages retain their manifest/integration coverage and focused examples, but their exhaustive
+core sections are now short pointers to `plugin-{sagas,streams,triggers,workers}-core`. The reference
+index records this one-package/one-canonical-page rule and its rationale.
+
+`docs:accuracy` initially exposed one legacy checker dependency on the sagas page's exact
+`options?: SpawnOptions): never` marker. The page therefore retains a focused explanation of the
+unsupported `spawn(...)` contract while leaving the exhaustive core table canonical on
+`plugin-sagas-core`. No gate code was changed.
+
+The `Group F` and `T1` descriptions in `plugin-triggers-core` were deliberately left unchanged:
+they match `deno doc` and the published source JSDoc. Their source-level cleanup is tracked in #1554.
+
+| Gate | Command | Exit | Result |
+| --- | --- | --- | --- |
+| Internal doc links | `rtk proxy deno task docs:links` | 0 | `docs=102 broken-links=0 broken-anchors=0 orphans=0` |
+| Docs accuracy | `rtk proxy deno task docs:accuracy` | 0 | PASS; 196 published source pages, spawn contract, preferred paths, and CLI mutation families checked |
+| Obsolete convention scan | `rtk grep -n -E 'not a separate top-level reference entry\|single-page internals convention\|not part of the public plugin contract' docs/site/reference/*/index.md` | 1 | Expected no-match result; all three contradictory statements are absent |
+| Core-page preservation | `rtk git diff -- docs/site/reference/plugin-{sagas,streams,triggers,workers}-core/index.md` | 0 | No diff; exhaustive canonical pages and `Group F`/`T1` descriptions untouched |
