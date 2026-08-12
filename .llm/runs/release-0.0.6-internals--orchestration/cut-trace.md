@@ -8,6 +8,7 @@ Root 0.0.6 orchestration owns canary payload computation and the stable cut.
 
 | # | Merged (UTC) | Commit on `origin/main` | PR | Issues closed | Pre-merge gate record |
 | --- | --- | --- | --- | --- | --- |
+| 2 | 2026-08-12 ~12:24Z | `e67c1ba13` | **#1560** | **#1530** (auto-closed `COMPLETED`) | 7/7 pass — `pr-checks` **23 checks, 0 current failures** at `28fc1b423`; `close-gate` green after label + workflow **re-run** (not a push); boxes 1–6 mirrored, box 7 `[post-merge]` verified after merge and ticked with evidence; `review-threads` PASS. **Two IMPL-EVAL verdicts:** `PASS` at `49e2b86e9` (pre barrel fix) then **`FAIL_FIX`** at `9ab361440` on a real close-gate defect, then `PASS` at `28fc1b423`. Consuming the first would have merged a red gate. |
 | 1 | 2026-08-12 ~08:31Z | `63cd1cd58` | **#1527** | **#1436**, **#1415** (both auto-closed `COMPLETED`) | 7/7 pass — full record in the PR's `[PRE-MERGE GATE]` comment. `pr-checks` **15/15 `current-pass`, 0 current failures** at `dfda54a16`; `close-gate` green; #1415 4/4 boxes mirrored with linked evidence; #1436 has 0 boxes so the PR body is its record; no new ignores/casts, no lock churn; both probes re-run independently by the orchestrator; `review-threads` PASS (0 threads). |
 
 ## Wave clustering as dispatched
@@ -15,7 +16,7 @@ Root 0.0.6 orchestration owns canary payload computation and the stable cut.
 | Wave | PR | Issues | Lane | Status |
 | --- | --- | --- | --- | --- |
 | 1 | PR-A `fix/1436-1415-close-gate-trust` → **PR #1527** | #1436, #1415 | Sol · low | **MERGED** `63cd1cd58` — thread `019ff4f4-1fce-7253-a7e0-d718c65b39cc`, worktree `/home/codex/repos/ns006-gatetrust`, 7 commits |
-| 2 | PR-E `fix/1530-type-fixture-scan-scope` | #1530 | Sol · low | not yet dispatched (inserted; gates PR-D per rail R-1) |
+| 2 | PR-E `fix/1530-type-fixture-scan-scope` → **PR #1560** | #1530 | Sol · low | **MERGED** `e67c1ba13` — thread `019ff5b2-7d02-…`, worktree `/home/codex/repos/ns006-typefixtures`, 6 commits. Restored `main`'s blocking `code-quality-repo` job: first green in **nine** consecutive push-to-main runs. |
 | 2 | PR-B `fix/1403-quality-gate-coverage` | #1403 | Sol · low | not yet dispatched |
 | 2 | PR-C `fix/1380-doctrine-verdict-and-repo-gate` | #1380 | Sol · medium | not yet dispatched |
 | 2 | PR-D `fix/1378-quality-scan-rule-power` | #1378 | Sol · high | not yet dispatched |

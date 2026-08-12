@@ -1,0 +1,204 @@
+name: OpenHands phase evaluation
+
+# Phase dispatcher. The generic OpenHands workflow remains the runner; this workflow owns the
+# harness state machine and posts exactly one trusted trigger for each deliberate phase transition.
+#
+# Initial IMPL-EVAL: make a draft PR ready for review. `impl-eval:skip` is the attributed escape
+# hatch. Rerun: move away from `status:impl-eval`, then add it again.
+# PLAN-EVAL: add `openhands`, then add `status:plan-eval` (either label may complete the pair).
+# Rerun by moving away from and back to `status:plan-eval`.
+
+on:
+  pull_request:
+    types: [labeled, ready_for_review]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+concurrency:
+  group: openhands-phase-eval-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    if: >-
+      github.event.action == 'ready_for_review' ||
+      (github.event.action == 'labeled' &&
+       ((github.event.label.name == 'status:plan-eval' &&
+         contains(github.event.pull_request.labels.*.name, 'openhands')) ||
+        (github.event.label.name == 'openhands' &&
+         contains(github.event.pull_request.labels.*.name, 'status:plan-eval')) ||
+        (github.event.pull_request.draft == false &&
+         github.event.label.name == 'status:impl-eval')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      SKIP_IMPL: ${{ github.event.action == 'ready_for_review' && contains(github.event.pull_request.labels.*.name, 'impl-eval:skip') }}
+    steps:
+      - name: Record attributed IMPL-EVAL skip
+        if: env.SKIP_IMPL == 'true'
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REQUEST_ACTOR: ${{ github.actor }}
+        run: |
+          {
+            echo '## OpenHands phase evaluation'
+            echo
+            echo '**Status:** IMPL-EVAL skipped on demand'
+            echo
+            printf -- '- Who: `@%s`\n' "$REQUEST_ACTOR"
+            echo '- Why: PR carries `impl-eval:skip`'
+            printf -- '- PR: `#%s`\n' "$PR_NUMBER"
+            printf -- '- Head SHA: `%s`\n' "$HEAD_SHA"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Require chainable trigger token
+        if: env.SKIP_IMPL != 'true'
+        env:
+          CHAIN_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          if [ -z "$CHAIN_TOKEN" ]; then
+            echo 'PAT_TOKEN is required because GITHUB_TOKEN comments cannot trigger OpenHands.' >&2
+            exit 1
+          fi
+
+      - name: Enter IMPL-EVAL status on ready transition
+        if: env.SKIP_IMPL != 'true' && github.event.action == 'ready_for_review'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          # This transition must use the same chainable token as dispatch. Repository Actions
+          # policy may make GITHUB_TOKEN read-only even when workflow permissions request writes.
+          github-token: ${{ secrets.PAT_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue_number = context.payload.pull_request.number;
+            const labels = context.payload.pull_request.labels.map((label) => label.name);
+            for (const label of labels.filter((name) => name.startsWith('status:'))) {
+              await github.rest.issues.removeLabel({ owner, repo, issue_number, name: label });
+            }
+            await github.rest.issues.addLabels({ owner, repo, issue_number, labels: ['status:impl-eval'] });
+
+      - name: Resolve and dispatch exactly one evaluator
+        if: env.SKIP_IMPL != 'true'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          github-token: ${{ secrets.PAT_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pr = context.payload.pull_request;
+            const eventLabel = context.payload.label?.name ?? '';
+            const labels = new Set(pr.labels.map((label) => label.name));
+            const phase = context.payload.action === 'ready_for_review' ||
+                eventLabel === 'status:impl-eval' ||
+                (eventLabel === 'openhands' && labels.has('status:impl-eval'))
+              ? 'impl'
+              : 'plan';
+
+            const modelLabels = new Map([
+              ['eval:model:minimax', 'openrouter/minimax/minimax-m3'],
+              ['eval:model:deepseek', 'openrouter/deepseek/deepseek-v4-flash-0731'],
+              ['eval:model:qwen', 'openrouter/qwen/qwen3.8-max'],
+            ]);
+            const selectedLabels = [...labels].filter((label) => label.startsWith('eval:model:'));
+            const unknown = selectedLabels.filter((label) => !modelLabels.has(label));
+            if (unknown.length) throw new Error(`Unknown evaluator model label(s): ${unknown.join(', ')}`);
+            if (selectedLabels.length > 1) {
+              throw new Error(`Evaluator model labels are mutually exclusive: ${selectedLabels.join(', ')}`);
+            }
+            const selectedLabel = selectedLabels[0] ?? '';
+            const model = selectedLabel
+              ? modelLabels.get(selectedLabel)
+              : phase === 'plan'
+              ? 'openrouter/minimax/minimax-m3'
+              : 'openrouter/deepseek/deepseek-v4-flash-0731';
+            const promptPath = `.llm/tools/agentic/openhands/${phase}-eval-prompt.md`;
+            const baseOwner = pr.base.repo.owner.login;
+            const baseRepo = pr.base.repo.name;
+            const baseRef = await github.rest.git.getRef({
+              owner: baseOwner,
+              repo: baseRepo,
+              ref: `heads/${pr.base.ref}`,
+            });
+            const trustedBaseSha = baseRef.data.object.sha;
+            if (!/^[0-9a-f]{40}$/.test(trustedBaseSha)) {
+              throw new Error(`Protected base ref resolved to an invalid SHA: ${trustedBaseSha}`);
+            }
+            const promptResponse = await github.rest.repos.getContent({
+              owner: baseOwner,
+              repo: baseRepo,
+              path: promptPath,
+              ref: trustedBaseSha,
+            });
+            if (Array.isArray(promptResponse.data) || promptResponse.data.type !== 'file') {
+              throw new Error(`Expected trusted evaluator prompt at ${promptPath}`);
+            }
+            const prompt = Buffer.from(promptResponse.data.content, 'base64').toString('utf8').trim();
+            if (!prompt.startsWith('use harness\n')) {
+              throw new Error(`${promptPath} must begin with "use harness"`);
+            }
+
+            const expectedStatus = phase === 'plan' ? 'status:plan-eval' : 'status:impl-eval';
+            let generationEvent;
+            for (let attempt = 0; attempt < 5 && !generationEvent; attempt += 1) {
+              const events = await github.paginate(github.rest.issues.listEvents, {
+                owner,
+                repo,
+                issue_number: pr.number,
+                per_page: 100,
+              });
+              generationEvent = events
+                .filter((event) => event.event === 'labeled' && event.label?.name === expectedStatus)
+                .at(-1);
+              if (!generationEvent) await new Promise((resolve) => setTimeout(resolve, 1000));
+            }
+            if (!generationEvent) {
+              throw new Error(`No labeled-event generation found for ${expectedStatus}.`);
+            }
+            const marker = `<!-- openhands-phase-eval generation=${generationEvent.id} phase=${phase} head=${pr.head.sha} -->`;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number: pr.number,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) => String(comment.body ?? '').includes(marker));
+            if (existing) {
+              core.notice(`This phase transition is already claimed: ${existing.html_url}`);
+              return;
+            }
+
+            const iterations = phase === 'plan' ? 500 : 800;
+            const trigger = `@openhands-agent model=${model} output=pr-comment iterations=${iterations} phase=${phase} head=${pr.head.sha}`;
+            const { data: comment } = await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: pr.number,
+              body: `${trigger}\n${marker}\n\nTrusted base SHA: ${trustedBaseSha}\nEvaluated head SHA: ${pr.head.sha}\n\n${prompt}`,
+            });
+            if (selectedLabel) {
+              await github.rest.issues.removeLabel({
+                owner,
+                repo,
+                issue_number: pr.number,
+                name: selectedLabel,
+              });
+            }
+            await core.summary
+              .addHeading('OpenHands phase evaluation')
+              .addRaw('Claimed one deliberate evaluator transition.\n')
+              .addList([
+                `Phase: ${phase}`,
+                `Model: ${model}`,
+                `PR: #${pr.number}`,
+                `Head SHA: ${pr.head.sha}`,
+                `Generation: ${generationEvent.id}`,
+                `Consumed override: ${selectedLabel || 'none'}`,
+                `Trigger: ${comment.html_url}`,
+              ])
+              .write();

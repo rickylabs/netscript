@@ -974,3 +974,26 @@ packages/sdk/src/{desktop/mod.ts,query-client/create-service-query-utils.ts}
   answered it. The peer ran the range. This lane has now made that mistake twice — asserting an absence
   without the probe that finds the presence (the sagas supersession row) and asserting a mechanism without
   the probe that identifies it (here). Both were caught by someone else executing the command I should have.
+
+## D-30 — PR-E merged; `main`'s blocking quality gate green for the first time in nine pushes
+
+- **Recorded:** 2026-08-12
+- **Merge:** PR #1560 → `e67c1ba13`. #1530 auto-closed `COMPLETED`, `status:shipped`. All **seven** boxes
+  truthfully ticked — 1–6 mirrored from structured evidence, box 7 verified **after** merge from the run it
+  describes and ticked then, which is what `[post-merge]` exists for.
+- **The headline result:** `code-quality-repo` on `main` at `e67c1ba13` is **success**, the first green in
+  **nine** consecutive push-to-main runs (streak from `b3dc006e8`). Independently reproduced at merged main:
+  `deno task quality:scan:repo` → exit 0.
+
+```text
+completed/success   e67c1ba13   12:23:53Z   <- this merge
+completed/failure   d558f9ab2   12:21:08Z
+completed/failure   59e435c5d   12:03:58Z
+```
+
+- **#1537 landed** at `d558f9ab2` — the docs lane's fenced-TS extractor. So **rail `R-10`'s primary path is
+  available**: PR-D consumes that extractor rather than taking the fallback, and #1549's docs-fence box stays
+  in 0.0.6 rather than moving. The stated fallback was never needed, which is the outcome that having stated
+  it in advance bought.
+- **Lane status:** #1436, #1415, #1530 closed. Remaining in 0.0.6: **#1403** (PR-B, next), **#1380** (PR-C),
+  **#1549** (PR-D). #1378 and #1545 in 0.0.7.
