@@ -9,6 +9,10 @@ import { DEFAULT_QUERY_CACHE_TIME, DEFAULT_QUERY_STALE_TIME } from './defaults.t
 import type { CachedEntry, CacheEntry } from '../ports/cache-entry.ts';
 import { toCachedEntry } from '../ports/cache-entry.ts';
 import type { CacheStore } from '../ports/cache-store.ts';
+import type {
+  CacheInvalidationTopologyReport,
+  CacheProviderDescriptor,
+} from '../ports/cache-topology.ts';
 import type { QueryKey } from '../ports/query-key.ts';
 import type { CacheQueryOptions } from '../ports/query-options.ts';
 
@@ -29,6 +33,11 @@ function toCacheStoreKey(queryKey: QueryKey): Deno.KvKey {
 export class CacheQuery {
   private readonly store: CacheStore;
   private readonly inflightRequests: Map<string, Promise<unknown>>;
+
+  /** Stable provider identity and fallback tier for the registered boundary. */
+  get descriptor(): CacheProviderDescriptor {
+    return this.store.descriptor;
+  }
 
   /**
    * Create a cache-query engine.
@@ -188,7 +197,7 @@ export class CacheQuery {
    */
   async invalidateQueries(queryKeyPrefix: QueryKey): Promise<void> {
     const prefix = toCacheStoreKey(queryKeyPrefix);
-    const deletions: Promise<void>[] = [];
+    const deletions: Promise<CacheInvalidationTopologyReport>[] = [];
 
     for await (const entry of this.store.list({ prefix })) {
       deletions.push(this.store.delete(entry.key));

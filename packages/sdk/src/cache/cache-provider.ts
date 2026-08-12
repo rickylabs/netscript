@@ -16,12 +16,15 @@
 import type { CachedEntry } from '../ports/cache-entry.ts';
 import type { QueryKey } from '../ports/query-key.ts';
 import type { CacheQueryOptions } from '../ports/query-options.ts';
+import type { CacheProviderDescriptor } from '../ports/cache-topology.ts';
 
 /**
  * Minimal interface that the query-factory layer needs from the cache engine.
  * Matches the public surface of {@link CacheQuery} without importing it.
  */
 export interface CacheProvider {
+  /** Stable provider identity and fallback tier for telemetry. */
+  readonly descriptor: CacheProviderDescriptor;
   /** Execute a query through the registered cache engine. */
   query<TData>(queryKey: QueryKey, options: CacheQueryOptions<TData>): Promise<TData>;
   /** Prefetch a query through the registered cache engine. */
@@ -36,6 +39,23 @@ export interface CacheProvider {
 
 let _provider: CacheProvider | null = null;
 
+function createProviderBoundary(provider: CacheProvider): CacheProvider {
+  return {
+    get descriptor(): CacheProviderDescriptor {
+      return provider.descriptor;
+    },
+    query: <TData>(queryKey: QueryKey, options: CacheQueryOptions<TData>): Promise<TData> =>
+      provider.query(queryKey, options),
+    prefetch: <TData>(queryKey: QueryKey, options: CacheQueryOptions<TData>): Promise<void> =>
+      provider.prefetch(queryKey, options),
+    getCachedData: <TData>(queryKey: QueryKey): Promise<TData | null> =>
+      provider.getCachedData(queryKey),
+    getCachedEntry: <TData>(queryKey: QueryKey): Promise<CachedEntry<TData> | null> =>
+      provider.getCachedEntry(queryKey),
+    invalidateQueries: (prefix: QueryKey): Promise<void> => provider.invalidateQueries(prefix),
+  };
+}
+
 /**
  * Register the cache engine. Call once during server bootstrap.
  *
@@ -48,7 +68,7 @@ let _provider: CacheProvider | null = null;
  * ```
  */
 export function setCacheProvider(provider: CacheProvider): void {
-  _provider = provider;
+  _provider = createProviderBoundary(provider);
 }
 
 /**

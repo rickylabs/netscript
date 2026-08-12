@@ -73,3 +73,38 @@ PR #1605 remains draft and issue #1562 remains open. The approved public vocabul
 are unchanged. Creating the explicitly required `src/attributes/cache.ts` increased that already
 over-cap folder from 13 to 14 direct children; D-7 and debt `telemetry-attributes-f16-1562` record
 the forced doctrine drift. `deno.lock` is unchanged.
+
+## S2 — evidence-bearing cache provider and store contracts
+
+- Published provider descriptors plus lookup, write, promotion, and invalidation topology report
+  types from the SDK root, `./cache`, and `./ports` surfaces.
+- `CacheStore.get`, `set`, and `delete` now require non-empty ordered reports and explicit
+  `topologyComplete`; `KvCacheStore` reports the selected `@netscript/kv` provider at the durable
+  tier, and the test store reports its memory L1 behavior.
+- `CacheProvider` now requires a descriptor. `setCacheProvider()` stores a package-owned forwarding
+  boundary in the existing registry slot, so `getCacheProvider()` never returns the raw custom
+  provider object. No additional module-local mutable registry or singleton was introduced.
+- SDK-local topology unions mirror the telemetry literals without re-exporting upstream types. The
+  first doc-lint run exposed four new private-type references from direct telemetry type imports;
+  replacing those public annotations with explicit SDK literals restored the exact three-diagnostic
+  baseline before the slice was committed.
+- Documented the pre-1.0 migration and the prohibition on raw keys, inputs, values, URLs, or user
+  data in provider descriptors and reports.
+
+### S2 gate evidence
+
+| Gate                     | Result                                                                   |
+| ------------------------ | ------------------------------------------------------------------------ |
+| SDK scoped check         | `filesSelected=80`, `failedBatches=0`, no findings                       |
+| SDK scoped lint          | `filesSelected=80`, exit 0, no findings                                  |
+| SDK scoped format        | `filesSelected=80`, `failedBatches=0`, no findings                       |
+| SDK package test task    | `41 passed`, `0 failed`; includes report and registration-boundary tests |
+| SDK full-export doc lint | exact baseline retained: 3 combined private-type refs, 0 missing JSDoc   |
+| SDK publish dry-run      | exit 0, no warning                                                       |
+| `quality:gate`           | exit 0; code scan has no findings and doctrine has no failures           |
+
+### S2 reconcile
+
+The contract remains within approved D3/D7 scope: factories still return raw data, while topology
+evidence is internal to the store/`CacheQuery` seam. PR #1605 remains draft and issue #1562 remains
+open. No Fresh path was touched, no dependency was added, and `deno.lock` is unchanged.

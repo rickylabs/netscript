@@ -111,6 +111,21 @@ want, and do not mix the two call shapes within one data layer: they address dif
 which is why `./query-client` ships `toClientKeyPrefix` and `bridgeInvalidation` to cross between
 them deliberately.
 
+### Cache provider topology reports
+
+`CacheStore` implementations return bounded topology evidence with every lookup, write, and
+invalidation. A provider descriptor names a stable lowercase system (`deno-kv`, `redis`, `memory`,
+or an extension's documented identifier) and a default tier (`l1`, `l2`, or `durable`). Read reports
+contain a non-empty lookup chain ordered by `lookupIndex`; write and invalidation reports contain
+bounded per-tier effects and a `topologyComplete` marker.
+
+This is a pre-1.0 provider contract migration: custom `CacheStore` implementations must return the
+new report objects, and custom `CacheProvider` implementations must expose a descriptor. Registering
+a provider with `setCacheProvider()` stores a package-owned forwarding boundary instead of the raw
+object, so the telemetry wrapper added at that boundary cannot be skipped by direct retrieval. The
+reports contain operation facts only. Raw cache keys, serialized inputs, values, URLs, and user data
+must never be copied into a descriptor or report.
+
 ### Desktop RPC bindings
 
 Inside a Deno Desktop webview, reuse the same contract as the runtime router without declaring a

@@ -18,6 +18,17 @@ export type { CachedEntry, CacheEntry } from './cache-entry.ts';
 export { isCacheEntryStale, toCachedEntry } from './cache-entry.ts';
 export type { CacheKey, CacheStore, CacheStoreEntry } from './cache-store.ts';
 export type {
+  CacheInvalidationReport,
+  CacheInvalidationTopologyReport,
+  CacheLookupReport,
+  CacheProviderDescriptor,
+  CacheReadTopologyReport,
+  CacheTopologyOutcome,
+  CacheTopologyTier,
+  CacheWriteReport,
+  CacheWriteTopologyReport,
+} from './cache-topology.ts';
+export type {
   ActionMethod,
   CompositeQuery,
   FactoryConfig,

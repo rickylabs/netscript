@@ -14,6 +14,13 @@
  * @module
  */
 
+import type {
+  CacheInvalidationTopologyReport,
+  CacheProviderDescriptor,
+  CacheReadTopologyReport,
+  CacheWriteTopologyReport,
+} from './cache-topology.ts';
+
 /**
  * Cache key used by the SDK cache layer.
  *
@@ -30,7 +37,9 @@ export type CacheKey = Deno.KvKey;
  */
 export interface CacheStoreEntry<T> {
   /** The stored value, or `null` if the key does not exist. */
-  value: T | null;
+  readonly value: T | null;
+  /** Ordered provider evidence for this lookup. */
+  readonly report: CacheReadTopologyReport;
 }
 
 /**
@@ -44,6 +53,9 @@ export interface CacheStoreEntry<T> {
  * construction without local casts or sibling-package aliases.
  */
 export interface CacheStore {
+  /** Stable provider identity and fallback tier for error reporting. */
+  readonly descriptor: CacheProviderDescriptor;
+
   /**
    * Retrieve a value by key.
    *
@@ -59,14 +71,18 @@ export interface CacheStore {
    * @param value   - Payload to cache (must be structured-clone-safe)
    * @param options - Optional `expireIn` in milliseconds
    */
-  set(key: CacheKey, value: unknown, options?: { expireIn?: number }): Promise<void>;
+  set(
+    key: CacheKey,
+    value: unknown,
+    options?: { expireIn?: number },
+  ): Promise<CacheWriteTopologyReport>;
 
   /**
    * Remove a single key from the store.
    *
    * @param key - Composite key segments
    */
-  delete(key: CacheKey): Promise<void>;
+  delete(key: CacheKey): Promise<CacheInvalidationTopologyReport>;
 
   /**
    * Iterate over all keys that share a common prefix.

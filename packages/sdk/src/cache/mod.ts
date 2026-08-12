@@ -24,6 +24,17 @@ setCacheProvider(cacheQuery);
 export { CacheQuery, cacheQuery } from './cache-query.ts';
 export { KvCacheStore } from './kv-cache-store.ts';
 export type { CachedEntry, CacheEntry } from '../ports/cache-entry.ts';
+export type {
+  CacheInvalidationReport,
+  CacheInvalidationTopologyReport,
+  CacheLookupReport,
+  CacheProviderDescriptor,
+  CacheReadTopologyReport,
+  CacheTopologyOutcome,
+  CacheTopologyTier,
+  CacheWriteReport,
+  CacheWriteTopologyReport,
+} from '../ports/cache-topology.ts';
 export { isCacheEntryStale, toCachedEntry } from '../ports/cache-entry.ts';
 export type { CacheQueryOptions, QueryParams } from '../ports/query-options.ts';
 export type { QueryKey, QueryKeyPart } from '../ports/query-key.ts';

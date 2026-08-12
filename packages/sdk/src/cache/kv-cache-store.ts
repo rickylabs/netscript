@@ -22,7 +22,13 @@
  */
 
 import type { WatchableKv } from '@netscript/kv';
+import { CacheOutcomes, CacheTiers } from '@netscript/telemetry/attributes';
 import type { CacheKey, CacheStore, CacheStoreEntry } from '../ports/cache-store.ts';
+import type {
+  CacheInvalidationTopologyReport,
+  CacheProviderDescriptor,
+  CacheWriteTopologyReport,
+} from '../ports/cache-topology.ts';
 
 /**
  * SDK cache store backed by the shared `@netscript/kv` singleton.
@@ -40,6 +46,13 @@ import type { CacheKey, CacheStore, CacheStoreEntry } from '../ports/cache-store
  * ```
  */
 export class KvCacheStore implements CacheStore {
+  private system = 'kv';
+
+  /** Stable provider identity and durable cache tier. */
+  get descriptor(): CacheProviderDescriptor {
+    return { system: this.system, tier: CacheTiers.DURABLE };
+  }
+
   /** Resolved singleton — cached after first successful `getKv()`. */
   private kv: WatchableKv | null = null;
 
@@ -59,7 +72,11 @@ export class KvCacheStore implements CacheStore {
       // Dynamic import keeps @netscript/kv (and its transitive ioredis
       // dependency) out of the static module graph. Vite's client environment
       // would otherwise try to bundle the Redis adapter's Node-only imports.
-      this.initPromise = import('@netscript/kv').then((mod) => mod.getKv());
+      this.initPromise = import('@netscript/kv').then(async (mod) => {
+        const store = await mod.getKv();
+        this.system = mod.getActiveProvider() ?? 'kv';
+        return store;
+      });
     }
 
     this.kv = await this.initPromise;
@@ -80,7 +97,19 @@ export class KvCacheStore implements CacheStore {
   async get<T>(key: CacheKey): Promise<CacheStoreEntry<T>> {
     const store = await this.resolve();
     const entry = await store.get<T>(key);
-    return { value: entry?.value ?? null };
+    const value = entry?.value ?? null;
+    return {
+      value,
+      report: {
+        lookups: [{
+          ...this.descriptor,
+          lookupIndex: 0,
+          outcome: value === null ? CacheOutcomes.MISS : CacheOutcomes.HIT,
+        }],
+        promotions: [],
+        topologyComplete: true,
+      },
+    };
   }
 
   /**
@@ -90,9 +119,18 @@ export class KvCacheStore implements CacheStore {
    * @param value - Structured-clone-safe payload to store.
    * @param options - Optional expiration window in milliseconds.
    */
-  async set(key: CacheKey, value: unknown, options?: { expireIn?: number }): Promise<void> {
+  async set(
+    key: CacheKey,
+    value: unknown,
+    options?: { expireIn?: number },
+  ): Promise<CacheWriteTopologyReport> {
     const store = await this.resolve();
     await store.set(key, value, options);
+    return {
+      writes: [{ ...this.descriptor, writeThrough: false }],
+      promotions: [],
+      topologyComplete: true,
+    };
   }
 
   /**
@@ -100,9 +138,13 @@ export class KvCacheStore implements CacheStore {
    *
    * @param key - Composite cache key segments.
    */
-  async delete(key: CacheKey): Promise<void> {
+  async delete(key: CacheKey): Promise<CacheInvalidationTopologyReport> {
     const store = await this.resolve();
     await store.delete(key);
+    return {
+      invalidations: [this.descriptor],
+      topologyComplete: true,
+    };
   }
 
   /**
