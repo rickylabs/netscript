@@ -356,3 +356,50 @@ because "we decided not to file" is itself a decision the next reader needs.
 C6 from the #1595 PLAN-EVAL was the opposite call and **was** filed, as **#1598** — the
 cache-provider throw naming its own `import.meta.url` is the only remedy that reaches
 already-generated consumers, whom #1589's build-time gate structurally cannot reach.
+
+---
+
+## D-11 — a draft→ready evaluation does not bind to the PR head; only a label-triggered one does
+
+**Severity: significant. Recorded 2026-08-12. Caught by the owner, not by this lane.**
+
+The automatic phase dispatcher can be triggered two ways, and they do **not** produce equivalent
+evidence:
+
+| Trigger | Run `headSha` | Binds to the PR head? |
+| --- | --- | --- |
+| draft → ready (`pull_request`) | the base / merge ref | **No** |
+| `status:` label applied (`labeled`) | the branch head | **Yes** |
+
+Measured on four PRs in one window:
+
+| PR | Head | Eval run `headSha` | Trigger |
+| --- | --- | --- | --- |
+| #1600 | `717cef36d` | `717cef36d` | label |
+| #1607 | `966bed5dd` | `966bed5dd` | label |
+| #1595 | `cbf6d5c27` | **`f542f31cb`** (old `main`) | draft→ready |
+| #1602 | `f9e924d0b` | **`66196034e`** (`main`) | draft→ready |
+
+**Why this is not cosmetic.** #1595's IMPL-EVAL returned **PASS** and that verdict was used to apply
+`status:ready-merge`. The verdict's own prose claimed the "immutable head", but the run metadata could
+not corroborate which commit it read. A PASS that cannot be proven to describe the commit being merged
+is not evidence — it is a plausible-looking artefact, which is exactly the class this lane spends its
+verdicts trying to eliminate. #1602 was worse: its evaluator was running against `main`, so a verdict
+would have described a tree that does not contain the change under review.
+
+**Correction applied.** #1595 was rolled back from `status:ready-merge`, #1602's mis-headed run was
+cancelled, and both were re-triggered through the **label** path. Both re-dispatches then reported
+`headSha` equal to the exact PR head (`cbf6d5c27`, `f9e924d0b`) and were re-verified before use.
+
+**Standing rule for this lane, from now on:**
+
+1. **Never flip draft→ready and treat the resulting evaluation as the head-bound verdict.** Flip to
+   ready, then apply the `status:` label as a separate action, and let *that* dispatch be the verdict.
+2. **Before consuming any verdict, assert `run.headSha == pr.headRefOid`.** One `gh run view --json
+   headSha` call. If they differ, the verdict is not evidence for that merge, regardless of what it
+   says.
+3. **After any post-ready change** — a resync merge, a body correction, a new commit — the previous
+   verdict is void. Re-trigger once at the new immutable head.
+
+The invariant in one line: **the evaluator's head must equal the merge head.** This lane had been
+checking that the verdict *said* PASS, not that it described the commit about to land.
