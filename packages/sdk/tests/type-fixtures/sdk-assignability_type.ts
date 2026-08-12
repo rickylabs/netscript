@@ -59,7 +59,7 @@ const typedClient: ServiceClient<typeof ordersContract> = serviceClient;
 const listFromClient: Promise<ListOrdersOutput> = typedClient.list({ page: 1 });
 const orderFromClient: Promise<Order> = typedClient.get({ id: 'ord_1' });
 
-// @ts-expect-error page must remain a number in the inferred service client. // quality-allow: negative compile fixture requires TypeScript's expect-error directive to prove string input remains rejected
+// @ts-expect-error page must remain a number in the inferred service client.
 typedClient.list({ page: '1' });
 
 const queryFactory = createQueryFactory('orders', ordersContract, serviceClient);
