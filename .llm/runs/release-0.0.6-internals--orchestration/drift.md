@@ -62,3 +62,82 @@ Append-only. Newest entries at the bottom.
   mandatory cases and the orchestrator re-runs the probe against the patched parser before merge.
   #1436's acceptance is unaffected (it has no checkboxes); the issue's *analysis* section is corrected
   by a comment on the issue, so the record is not silently better than the issue.
+
+## D-5 — `quality:scan:repo` is RED on `main`, and #1378's gate box is unsatisfiable until it is fixed
+
+- **Severity:** significant
+- **Recorded:** 2026-08-12, stage B, executed at `01aa12b67`
+- **Fact:** #1378 § Current surface records "The scan is green today at 0 findings / 7 default / 10
+  repo-wide allowances" (measured 2026-08-08 at `fac9e339042c`). Executed now:
+  `deno task quality:scan:repo` exits **1** with **5** `ts-error-suppression` findings.
+- **Cause:** `scan-code-quality.ts:86-89` exempts `_test`/`.test`/`.spec` files but not `*_type.ts`, so
+  negative type fixtures are scanned as production source and their `@ts-expect-error` assertions —
+  the whole point of the fixture — are reported as violations. `b3dc006e8` ("accept typed SDK client
+  contributions (RFC 0001)") added `packages/sdk/tests/type-fixtures/sdk-client-contributions-rfc_type.ts`
+  and turned the gate red.
+- **Blast radius:** the **blocking** `code-quality-repo` job has failed on **7 consecutive pushes to
+  `main`** (first `b3dc006e8` 2026-08-11T20:15Z; last green `0fbe3dadd` 2026-08-11T11:48Z). #1378's
+  `gate:` acceptance box requires `quality:scan:repo` green after its change, so that box cannot be
+  truthfully ticked until this is cleared.
+- **Also observed:** the PR-side `code-quality` job scans only changed files and skips drafts
+  (`code-quality.yml:28,36-42`), so the repo-wide job is the only path that ever scanned the file — and
+  it runs post-merge. The violation was structurally invisible until it was already on `main`.
+- **Action:** filed as **#1530** (p1, milestone 0.0.6) with the executed evidence and a narrow fix
+  keyed on `tests/type-fixtures/**/*_type.ts`. Sequenced as PR-E before PR-D (`plan-quality-rail.md`
+  R-1). Two now-redundant `// quality-allow:` lines are removed by it, lowering the repo-wide count
+  10 → 8, which matters because #1378 wires `--max-allow` as a budget that can only fall.
+
+## D-6 — #1529 added to the lane by the owner, then withdrawn by the owner
+
+- **Severity:** significant (scope, owner-directed both ways)
+- **Recorded:** 2026-08-12, stage C
+- **Sequence:** the owner added #1529 (`fix(ci): ready_for_review can report every required lane as
+  skipped`, p0 release blocker) to this lane as a separate leaf PR, requiring proof of both `ci` and
+  `e2e` visibility semantics. The orchestrator created worktree `/home/codex/repos/ns006-cigate`,
+  branch `fix/1529-required-lane-visibility`, and a brief. The owner then closed #1529 as **not
+  planned**, stating the observed core-CI skip is intended, and withdrew it from the lane.
+- **Independent finding, which agrees with the owner's call:** before the withdrawal the orchestrator
+  reconstructed the event sequence from the Actions API and found the issue's repro **misattributed**.
+  Run `31575007718` (all six jobs skipped) was created at `07:41:03Z`, while the `ready_for_review`
+  timeline event is at `07:41:14Z` — 11 seconds later. That run was a **draft `synchronize`**, and
+  draft pushes scheduling no jobs is documented intended behaviour (`ci.yml:59-60`). The real
+  `ready_for_review` run is `31575023887`, which was **`cancelled`** 82s in by the next push under
+  `concurrency.cancel-in-progress` (`ci.yml:48-50`). So the cited evidence did not demonstrate the
+  claimed mechanism.
+- **Action:** worktree removed, branch deleted, brief deleted. No workflow or visibility behaviour was
+  changed. Two incidental observations made during that analysis are recorded in D-7 as **observations
+  only** — not acted on, not filed, per the owner's instruction to drop the item completely.
+
+## D-7 — observations recorded but deliberately not acted on
+
+Kept because `agent-milestone-orchestrator` § Honesty rules requires recording what a run learns
+rather than discarding it, and because an unrecorded observation gets rediscovered at cost. Neither is
+being fixed, filed, or briefed by this lane. Both are the owner's call.
+
+1. **Both `lane-visibility` jobs are reporters, not gates.** `ci.yml:347-395`
+   (`core CI lane visibility`) and `e2e-cli.yml:509-564` (`scaffold CI lane visibility`) each consist of
+   one step that writes a Markdown table to `$GITHUB_STEP_SUMMARY`. Neither contains `exit 1`
+   (`grep -n "exit 1" .github/workflows/ci.yml` returns only Aspire-version checks in other jobs). They
+   cannot fail.
+2. **`pr-checks.ts` classifies a `skipped` check-run at head as a pass.**
+   `.llm/tools/agentic/github/pr-checks.ts:141-157` chains superseded → stale-post-merge → pending →
+   cancelled → failure → **else `current-pass`**, so `conclusion: 'skipped'` and `'neutral'` fall
+   through to `current-pass`, and `buildPrCheckReport` then reports `ok: true`. This is the tool
+   `netscript-pr`'s close-gate playbook directs operators to for "establish currency first".
+
+## D-8 — orchestrator brief error, corrected mid-slice (Gate 1 permissions)
+
+- **Severity:** minor
+- **Recorded:** 2026-08-12, stage C
+- **Fact:** PR-A's brief prescribed `deno test --allow-read --allow-env .llm/tools/validation/` as
+  Gate 1. The implementation agent ran it, got exit 1 with 39 passed / 9 failed, correctly diagnosed
+  all 9 as pre-existing `NotCapable: Requires write access` at `Deno.makeTempDir()` calls in
+  `check-aspire-host-ports_test.ts`, `check-netscript-jsr-specifiers_test.ts` and
+  `fresh-ui-quality_test.ts`, **refused to weaken unrelated tests**, recorded it, and continued with
+  the unblocked gates.
+- **Verdict:** the brief was wrong, the agent was right. Gate 1 is amended to include
+  `--allow-write`, and that permission requirement is carried into the rail plan's validation table so
+  the next three briefs do not repeat the error.
+- **Worth noting:** this is the escalate-don't-idle instruction working as intended. The recorded
+  failure mode it was written against — supervisors going idle at a red gate, four occurrences in
+  0.0.4 — did not recur.

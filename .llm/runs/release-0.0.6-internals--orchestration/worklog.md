@@ -185,3 +185,95 @@ No steering or stop is warranted.
 ## Stage C/D — per-PR dispatch and landing
 
 *(appended per PR as it dispatches, lands, and passes the pre-merge gate)*
+
+### PR-A (#1436 + #1415) — dispatch and slice review
+
+**Dispatch, 2026-08-12T09:51Z.** Launched through `deno task agentic:launch-codex-slice` (never ad-hoc
+`wsl.exe`). Mobile-visibility proof, from
+`slices/pr-a-1436-1415/codex-thread-ids.md` written by the launcher:
+
+| Field | Value |
+| --- | --- |
+| Thread id | `019ff4f4-1fce-7253-a7e0-d718c65b39cc` |
+| Rollout | `/home/codex/.codex/sessions/2026/08/12/rollout-2026-08-12T09-51-07-019ff4f4-…jsonl` |
+| Worktree | `/home/codex/repos/ns006-gatetrust` (no upstream, by design) |
+| Branch @ base | `fix/1436-1415-close-gate-trust` @ `c2d8a8e4b` |
+| Requested route | openai · gpt-5.6-sol · low |
+| Observed route | openai · gpt-5.6-sol · low — **matched** |
+| Runtime | approval=never · sandbox=dangerFullAccess |
+| Steering | `codex exec resume 019ff4f4-1fce-7253-a7e0-d718c65b39cc -- "<follow-up>"` |
+
+Draft PR **#1527** was opened by the orchestrator before dispatch (labels `type:fix`, `area:tooling`,
+`priority:p1`, `ci:skip-e2e`, `ci:skip-scaffold`, `status:impl`; milestone `0.0.6`), so the agent had a
+live reviewable surface from its first commit.
+
+**Tooling observation, not a failure:** the foreground launcher stream was killed by the orchestrator's
+own 580s command timeout (exit 143 / SIGTERM). The thread itself was already created and unaffected —
+confirmed by `agentic:codex-status` showing it `working` at that `cwd`, and by four subsequent commits.
+A launcher whose log stream outlives the caller's timeout should be backgrounded from the start.
+
+**Slices landed** (`git log --oneline origin/main..HEAD` in the worktree):
+
+```text
+c095303c8 fix(validation): reject not-yet-done acceptance evidence
+0329acaf8 fix(validation): exclude pull requests from closing issues
+4ca4cc421 fix(validation): reject hyphen-prefixed closing keywords
+a927790eb test(validation): prove gate-trust contracts red
+c2d8a8e4b chore(harness): bootstrap the PR-A gate-trust slice with its executed baseline
+```
+
+The RED-first commit (`a927790eb`) is committed as RED, so the record shows the tests failing before
+the fixes rather than asserting that they would have.
+
+**Orchestrator slice review — independent re-verification, not a claim relay.** The Tier-A review rule
+says a green automated gate is not a sign-off, and #1436 has zero acceptance boxes, so this is the only
+verification of its central claim. Re-ran the baseline probe **myself** against the patched parser at
+`c095303c8`:
+
+```text
+"Exact pre-fix #1431 head" -> []          # was [1431] at 01aa12b67
+"un-fixed #555"            -> []          # was [555]
+"hotfix #999 landed"       -> []          # unchanged
+"prefixes #888 there"      -> []          # unchanged
+"This is a bugfix #777"    -> []          # unchanged
+"Fixes #1434"              -> [1434]      # real form preserved
+"Closes #1234 and fixes #4321" -> [1234,4321]
+"resolves https://github.com/rickylabs/netscript/issues/333" -> [333]
+"Refs #111" / "Part of #222" -> []
+```
+
+Predicate at `acceptance-evidence.ts:45` is `(?<![\w-])(?:close|closes|…|resolved)\s+…` — the locked
+shape, not the no-op `\b` the issue prescribed. **#1436's substantive fix is accepted.**
+
+**Findings raised back to the thread** (steered once, on the same thread, no rival send):
+
+1. *Accepted the agent's escalation and amended my own brief* — Gate 1 needed `--allow-write`
+   (`drift.md` D-8).
+2. *Evidence-integrity defect:* the S2 and S4 PR comments contain the literal text
+   `(git rev-parse --short=10 HEAD)` — an unexpanded command substitution — so the commit trail does not
+   name the commits carrying the two central fixes. Required a single
+   `[EVIDENCE CORRECTION: S2/S4 commit hashes]` comment with the real hashes, no history rewrite. This
+   matters more than usual here: with #1436 carrying no acceptance boxes, the PR record *is* the record.
+3. Proceed to S5 (acceptance-evidence block for #1415's four boxes, truthful DoD ticks, amended gates),
+   with the note that the PR's own evidence must not contain a leading not-yet-done marker — it is the
+   first thing the new predicate will judge.
+
+The first steer attempt failed with `thread-store conflict: … already has an active writer`, i.e. the
+thread was mid-turn. Correct interception point is the turn boundary, so
+`agentic:codex-watch --mode turn --thread-id 019ff4f4-…` is armed in the background and the steer is
+delivered on wake. Recorded because "wait for the turn boundary" is cheaper to read than to rediscover.
+
+### Wave 2 — rail plan committed
+
+`plan-quality-rail.md` written with nine locked rail decisions (R-1…R-9), three open decisions, and a
+fully executed baseline table. Notable outputs of the re-baseline, all of which change the work:
+
+- `quality:scan:repo` is **RED on `main`** (7 consecutive pushes) → **#1530** filed, inserted as PR-E
+  before PR-D (`drift.md` D-5).
+- `arch:check:repo` FAIL is **55**, not #1380's 53 — the A14 false-positive population grows with every
+  new `@std/testing/bdd` test, which is the argument for fixing the predicate over enumerating residue.
+- Five of #1380's six stale verdict rows name directories that **never existed** in this repo, so
+  "renamed vs deleted" is a false dichotomy and a rename note would fabricate provenance.
+- A cross-lane collision: **#1374** (docs lane, live at `/home/codex/repos/ns006-1374-compilegate`)
+  needs the same `docs/site/**` fenced-TS extraction that #1378 needs. Two extractors with different
+  fence rules would disagree invisibly. Flagged as a must-resolve-before-PR-D open decision.
