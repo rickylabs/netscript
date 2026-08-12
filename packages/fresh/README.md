@@ -114,6 +114,27 @@ export const ordersPage = definePage()
 The built page exposes the Fresh route pieces (`page`, `handler`, `route`, `nav`, `hooks`), and the
 bound route carries typed `href`, `safeParseSearch`, and a contract-aware `Link` component.
 
+A named partial binds to the same generated reference in one call. Its loader and method handlers
+receive contract-parsed `path` and `search` state; missing path state throws 404, while search state
+that cannot parse or fall back to contract defaults throws 400.
+
+```tsx
+import { definePartial } from '@netscript/fresh/builders';
+import { routes } from '@app/router.ts';
+
+export const orderSummaryPartial = definePartial({
+  name: 'order-summary',
+  route: routes.partials.orders.$id.$route,
+  loader: async (ctx) => ({
+    order: await loadOrder(ctx.path.id),
+  }),
+  component: ({ order }) => <aside>{order.total}</aside>,
+});
+
+export const { handler } = orderSummaryPartial;
+export default orderSummaryPartial.default;
+```
+
 ### Desktop RPC composition
 
 Deno Desktop composition roots can bind an existing oRPC router to one native window. Browser and

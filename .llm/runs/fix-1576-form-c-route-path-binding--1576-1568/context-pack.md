@@ -12,9 +12,10 @@
 
 ## Current State
 
-Harness bootstrap and design are complete against clean baseline `e85d8d28c`. Slice #1576 is
-implemented and focused tests plus the scoped package check pass. `deno.lock` is unchanged. The
-first commit and draft PR are next, followed by #1568.
+Both slices are implemented against baseline `e85d8d28c`. Slice #1576 is committed as
+`44a78ba60fce133d8a0862c0da9dc187d5ac712c`; slice #1568 is ready for its commit. The draft PR is
+`#1602`. All owner-specified gates and the explicit Fresh source quality scan pass. `deno.lock` is
+unchanged.
 
 ## Key Decisions
 
@@ -25,20 +26,23 @@ first commit and draft PR are next, followed by #1568.
 
 ## Next Steps
 
-1. Commit/push #1576 and open the draft PR.
-2. Add and implement partial binding.
-3. Run final gates, commit/push/comment.
+1. Commit and push slice #1568.
+2. Update PR acceptance evidence and post `[PHASE: IMPL]`.
+3. Leave the PR draft for automatic label-driven evaluation.
 
 ## Files Changed
 
-- Page runtime resolver/handler wiring, route constraint types, and builder tests/surface tests.
+- Shared page resolver/handler wiring and parser-bearing route constraint.
+- Route-bound partial overload, public types, docs, runtime/type matrices, and surface snapshots.
 - Harness run artifacts.
 
 ## Gates
 
-- Focused #1576 runtime tests: PASS.
-- Scoped Fresh check: PASS (`Checked 14 files`).
-- Final lint/fmt/package/quality gates: pending slice #1568.
+- Focused #1576 and #1568 runtime/type tests: PASS.
+- Scoped Fresh check/lint/fmt: PASS (188 selected files; zero findings).
+- Fresh package suite: PASS (234 passed, 0 failed).
+- Explicit Fresh source quality scan: PASS (zero findings, one existing allowance).
+- Repository quality gate: PASS (exit 0 with existing warning-only inventory).
 
 ## Drift and Debt
 

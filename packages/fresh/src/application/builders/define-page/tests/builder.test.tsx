@@ -512,6 +512,11 @@ Deno.test('definePage withRoute generated references resolve dynamic and catch-a
     },
     {
       route: createRouteReference('/docs/[[...slug]]'),
+      params: { slug: 'guides/start' },
+      expected: JSON.stringify({ slug: ['guides', 'start'] }),
+    },
+    {
+      route: createRouteReference('/docs/[[...slug]]'),
       params: {},
       expected: JSON.stringify({}),
     },
@@ -549,21 +554,30 @@ Deno.test('definePage withRoute generated reference rejects missing dynamic para
   assert(thrown instanceof Response, 'Expected missing generated path state to throw a Response');
   assert(thrown.status === 404, `Unexpected missing generated path status: ${thrown.status}`);
 });
-Deno.test('definePage explicit path schema configured after withRoute takes parser precedence', async () => {
+Deno.test('definePage explicit path schema wins while the route supplies absent search parsing', async () => {
   let resolved = '';
+  const generatedRoute = bindRoutePattern(
+    defineRouteContract({
+      searchSchema: z.object({ view: z.enum(['summary', 'detail']) }),
+    }),
+    '/orders/[id]',
+  );
   const route = definePage<{ requestId: string }>()
-    .withRoute(createRouteReference('/orders/[id]'))
+    .withRoute(generatedRoute)
     .withPathParams(z.object({ id: z.string().transform((value) => `schema:${value}`) }))
     .withResource('capture', (ctx) => {
-      resolved = ctx.path.id;
+      resolved = `${ctx.path.id}:${ctx.search.view}`;
       return null;
     })
     .build();
 
-  await route.page(createRequestContext({ params: { id: 'order-9' } }));
+  await route.page(createRequestContext({
+    params: { id: 'order-9' },
+    url: new URL('http://localhost/orders/order-9?view=detail'),
+  }));
   assert(
-    resolved === 'schema:order-9',
-    `Expected explicit schema precedence, received ${resolved}`,
+    resolved === 'schema:order-9:detail',
+    `Expected explicit path precedence with reference search fallback, received ${resolved}`,
   );
 });
 Deno.test('definePage withRouteContract({ pathSchema }) promotes path type-state and binds the route', async () => {
