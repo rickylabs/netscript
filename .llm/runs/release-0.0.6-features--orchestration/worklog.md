@@ -1016,3 +1016,43 @@ yet prove them.
 Automatic DeepSeek IMPL-EVAL PASS → required **non-cancelled** gates + current-main overlap guard →
 merge #1572 **without closing #1571** → re-dispatch Canary.3 from the corrected `main` SHA → attach
 the exact release proof to #1571 → tick box 5 and close it.
+
+## 2026-08-12 — canary.3 re-cut payload DIFFERS from the failed attempt
+
+The fixes lane flagged that docs PR **#1541** merged after my canary source. Measured rather than
+assumed:
+
+| | |
+| --- | --- |
+| Failed canary.3 source | `5705aeb19` |
+| `main` now | **`db1d79c68`** — 2 commits ahead |
+| In that range | **#1541** (46 `docs/site` files + a rewritten `packages/sdk/README.md`) and #1567 (phase-eval status cleanup) |
+
+**Two separate consequences, and only the first was the peer's point.**
+
+1. **For the failed attempt:** their corpus caveat stands exactly as originally given — 0.0.5-era
+   snapshot, `sourceCommit eda49bb2e`, 60 `api-clients` references across 11 files. Their observation
+   that "the gap just widened by 46 files" is true of **`main`**, not of the payload I attempted. I
+   had **not** picked up the wider figure, so nothing needed correcting — but restating their number
+   would have made my note wrong for the artifact actually published. Good catch.
+
+2. **For the re-cut, which they did not raise and which matters more to me:** the canary.3 re-cut
+   happens from the **corrected** `main` SHA — i.e. `db1d79c68` **plus** #1572's lock fix. So its
+   payload **does** include #1541: the 46 `docs/site` files and the rewritten
+   `packages/sdk/README.md`, which is the public JSR landing page for `@netscript/sdk` and renders
+   the moment that package publishes.
+
+**Therefore the canary note must be re-measured against the actual re-cut SHA, not copied forward
+from the failed attempt.** Specifically: re-derive the `@netscript/mcp` corpus-vs-`docs/site`
+divergence at the re-cut SHA (the widened gap likely *does* apply there), and state that the new SDK
+landing page ships in this canary. Copying the earlier caveat verbatim would understate the payload.
+
+Recorded now because the failed attempt makes it tempting to treat the re-cut as "the same cut,
+retried". It is not — it is a different payload, and its note is a different note.
+
+Also noted from the peer, non-actionable but useful: repo-wide `quality:scan:repo` is stable at
+`allowCount 8` (independently corroborated by two lanes after internals' #1560 made five markers
+redundant). And **#1540 remains open**: real publish/preflight still materialize `catalog:` entries in
+the live tree behind a normal-completion-only `finally`, so **if the re-cut is interrupted mid-publish,
+check `git status` before anything else** — a stranded catalog expansion looks like unrelated churn
+afterwards.
