@@ -1373,3 +1373,31 @@ silently alter documentation semantics.
 
 The trigger defect moved from `index.md:310` to line 173; symbol and executable twin still match. My brief
 pinned a stale line number. The identity of a defect is the symbol, not the line.
+
+## D-41 — the authorization steer silently did not arrive; I reported it as in progress
+
+- **Severity:** minor (supervision), but the reporting error matters more than the mechanics
+- **Recorded:** 2026-08-12, PR #1596
+- **What happened:** the D-1/D-2 scope authorization was sent while the implementation thread was still
+  mid-turn writing its escalation record. `codex exec resume` refused it:
+
+```text
+Error: thread/resume: thread/resume failed: thread 019ff6bf-… already has an active writer (code -32600)
+```
+
+  The message was never delivered. I then armed a turn-boundary watcher, which returned
+  `{"turnComplete":true,"alreadyIdle":true}` — the turn it observed completing was the **escalation record**,
+  not the authorized work.
+- **The reporting error.** On that basis I told the owner "the authorized work is in progress". It was not: no
+  authorization had reached the agent and the head had not moved. Corrected in the next report. A failed send
+  plus an idle-thread signal is indistinguishable from a completed instruction **unless you check the head**,
+  and I checked the head only afterwards.
+- **Why this recurs on this lane.** `drift.md` D-9 already records that resume must happen **at the turn
+  boundary** and that `active writer` is the mechanical signal for "not there yet". The failure is not
+  ignorance of the rule — it is that I sent immediately on receiving the owner's decision, treating urgency as
+  a reason to skip the check.
+- **Rule tightened:** after any `codex exec resume`, confirm delivery before reporting on it — either a fresh
+  agent message or a moved head. Exit code 0 from the wrapper is not delivery; in this case the wrapper's own
+  output carried the refusal while the surrounding command still succeeded.
+- **Resent** once the thread was genuinely idle (0 active sessions in that worktree), with the authorization
+  unchanged plus a note that the earlier send never arrived, so the agent does not treat it as a repeat.
