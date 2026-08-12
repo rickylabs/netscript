@@ -32,7 +32,7 @@ before implementation.
 
 ## Next Steps
 
-1. Orchestrator launches fresh native Claude/Fable PLAN-EVAL and writes `plan-eval.md`.
+1. Orchestrator triggers the automatic status-driven PLAN-EVAL via the status-label mechanism and records the verdict.
 2. Resolve any `FAIL_PLAN`; do not implement meanwhile.
 3. Before S2, orchestrator resolves the four PR-C prose findings (`deploy start/stop/status/uninstall`)
    or explicitly rescopes; never weaken the strict predicate.

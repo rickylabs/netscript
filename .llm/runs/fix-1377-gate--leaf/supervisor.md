@@ -18,7 +18,7 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 | Task lane | Provider / model / effort | Role in this run |
 | --- | --- | --- |
 | `normal_implementation` | Codex · OpenAI · GPT-5.6 Sol · medium | Plan author and, only after PLAN-EVAL PASS, implementation agent |
-| `review_codex` | Claude · Anthropic · Fable 5 · low | Opposite-family slice review / IMPL-EVAL route selected by the orchestrator |
-| formal PLAN-EVAL | Fresh native Claude · Anthropic · Fable 5 · medium | Separate-session plan evaluator selected and launched by the orchestrator |
+| `review_codex` | Claude · Anthropic · Opus 5 · low | Fable prohibited this milestone; this is the declared in-plan fallback in `routing-policy.ts:441` |
+| formal PLAN-EVAL | Automatic status-driven evaluator (MiniMax M3) | Triggered by the orchestrator through the `openhands` + `status:plan-eval` label pair. The orchestrator does not select, launch, or resume an evaluator model. |
 
 Reference `.llm/harness/workflow/lane-policy.md`; no lane overrides are in force.

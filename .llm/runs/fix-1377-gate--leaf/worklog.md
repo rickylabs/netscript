@@ -112,7 +112,7 @@ All implementation gates are `NOT_RUN` by design in phase 1.
 | Baseline identity | PASS | branch `fix/1377-docs-reference-gate-scope`; head `fa5d0d411…` |
 | PR-C landed | PASS | `db1d79c68…` is an ancestor of HEAD |
 | Reference arrival coverage | PASS | 35 effective, 35 present under locked alias resolver, 0 missing |
-| PLAN-EVAL | PENDING | Must be a fresh native Claude/Fable session; this generator cannot self-evaluate |
+| PLAN-EVAL | PENDING | Must be the automatic status-driven plan evaluator; this generator cannot self-evaluate |
 | Type/lint/fmt/docs/publish/tests | NOT_RUN | Phase 2 only after PLAN-EVAL PASS |
 | Raw negative controls | NOT_RUN | Phase 2 only; both raw exit codes and diagnostics required |
 
