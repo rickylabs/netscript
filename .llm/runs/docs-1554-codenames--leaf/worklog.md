@@ -79,7 +79,7 @@ The policy test walks published-source JSDoc and reports exact file/line finding
 | 2026-08-12 | 4 | Guard green proof | Focused guard exited 0 with 2 passed / 0 failed after formatting; code-context fixtures cover `@template T1`, inline generics/links, and fenced examples. |
 | 2026-08-12 | 4 | Full revalidation | Seven scoped check/lint/fmt wrapper trios, seven doc-lint roots, quality, all docs gates, and 3,255 repository tests exited 0. |
 | 2026-08-12 | 5 | FALLBACK IMPL-EVAL cycle 2 | Received `FAIL_FIX` at `0152e9795`: root-level export entrypoints were absent from the `/src/`-only discovery model. |
-| 2026-08-12 | 5 | First red proof | Reproduced the exact cycle-1 52-finding failure on `944dbbe07` with the cycle-1 guard. |
+| 2026-08-12 | 5 | First red proof | Ran the export-closure guard on `944dbbe07`; it exited 1 with 54 findings: the reproduced cycle-1 52 plus Aspire `#954` and `#1012`. |
 | 2026-08-12 | 5 | Discovery design | Replaced the `/src/` heuristic with package/plugin export-entrypoint closure traversal; allowed plain numbered algorithm phases while keeping `Phase A` and `Phase 7d` forbidden. |
 | 2026-08-12 | 5 | Second red proof | Before changing Aspire source, the widened guard exited 1 and reported exactly `constants.ts:123 #954` and `#1012`; both algorithm and discovery fixtures passed. |
 | 2026-08-12 | 5 | Source truth | Removed the two issue numbers from `AppHealthCheckPath` while preserving why a registered health check distinguishes readiness from a merely running process. |
@@ -200,7 +200,7 @@ ok | 2 passed | 0 failed
 
 | Gate | Result | Output / notes |
 | ---- | ------ | -------------- |
-| Cycle-1 red reproduction | PASS (expected failure) | On `944dbbe07`: exit 1, exact 52 findings, 1 passed / 1 failed |
+| Cycle-1 widened red proof | PASS (expected failure) | On `944dbbe07`: exit 1, exact 54 findings (prior 52 + Aspire 2), 3 passed / 1 failed |
 | Export-closure red proof | PASS (expected failure) | On unfixed Aspire source: exit 1, exactly `#954` and `#1012`; 3 passed / 1 failed |
 | Cumulative census replay | PASS (expected failure) | On `a8303d738`: exactly 80 findings = prior 78 + two Aspire terms |
 | Final widened guard | PASS | 4 passed / 0 failed; code-context behavior unchanged |

@@ -31,7 +31,8 @@ unchanged for the orchestrator-owned evaluator lifecycle.
 - Trigger reference page remains aligned (6 rows); the stale saga `SagaStorePort` row is corrected;
   CLI reference rows contain no stale summary.
 - Quality gate, all three docs gates, and repository tests pass.
-- Cycle-2 raw proof 1: the unchanged cycle-1 guard reports the exact 52 findings on `944dbbe07`.
+- Cycle-2 raw proof 1: the export-closure guard reports exactly 54 findings on `944dbbe07`—the
+  reproduced cycle-1 52 plus Aspire `#954` and `#1012`.
 - Cycle-2 raw proof 2: export-closure discovery reports Aspire `#954` and `#1012` before their fix.
 - The guard follows every package/plugin export closure, covers root entrypoints, and explicitly
   allows legitimate numbered algorithm phases while retaining all prior code-context exclusions.

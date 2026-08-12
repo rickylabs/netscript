@@ -100,7 +100,8 @@ The `Phase` predicate now distinguishes numbered algorithm steps from planning c
 
 Two raw pre-fix proofs establish the scope:
 
-1. Cycle-1 discovery on `944dbbe07` still reports exactly the reproduced 52 findings.
+1. Export-closure discovery on `944dbbe07` reports exactly 54 findings: the reproduced cycle-1 52
+   plus the two Aspire issue tokens.
 2. Export-closure discovery on the cycle-1 fixed tree reports exactly the two Aspire issue tokens.
 
 A cumulative replay at pre-remediation commit `a8303d738` reports 80 terms: the prior 78 plus
