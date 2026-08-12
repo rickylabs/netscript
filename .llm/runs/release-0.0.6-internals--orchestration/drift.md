@@ -1569,3 +1569,37 @@ PASS; that remains a false authority); its *rule* is superseded by this entry.
 this PR** (base `agent-tools.generated.ts` had zero `snippet-extractor` occurrences); F2 names the asset-freshness
 gate as answering the wrong question, the same finding I recorded against myself. The prepared correction brief
 already covers both and needed no change beyond mapping its contracts to F1/F2.
+
+## D-46 — re-syncing a leaf orphans every commit hash its evidence cites (severity: moderate)
+
+The correction slice rebased `fix/1549-quality-scan-provable-half` onto current `main`
+(`f542f31cb`), which is correct — the merge-base is now exactly `origin/main`. Side effect: the evaluated head
+`7264ce6aa` and all three S3 commits are **orphaned**, and PR #1596's body still cites them in three places:
+
+```text
+line 18  - [x] S3 … `bd95998fd9…`, `b82d2086ea…`, `7264ce6aac…`
+line 22  Final head: `7264ce6aac21eecade916ea4b0332f5a1912e0c3`
+line 68  box-index: 7 → "At final head 7264ce6aac21…: quality:scan:repo, quality:scan, arch:check … exit 0"
+```
+
+`git merge-base --is-ancestor 7264ce6aa HEAD` → **false**.
+
+**Why it matters rather than being cosmetic.** Box 7 is a `gate:` box. Its evidence mirrors into **#1549**, where
+it outlives the PR. After merge, a reader checking that evidence would look up a commit that is not in the
+branch's history and cannot verify the claim — the gate result becomes **unverifiable**, which is the same
+false-provenance class as the shallow-clone rebuttal earlier in this run. The claim was true when made; the
+pointer is what rots.
+
+**Generalisation:** evidence pinned to a commit hash has a lifetime bounded by the next history rewrite. Any
+re-sync, rebase, or squash of a leaf invalidates every hash its PR body and acceptance evidence cite. This lane
+already had one case of a head moving under a verdict (PR-B, where another lane's `update-branch` moved it and
+the owned-path diff had to be shown empty); this is the same hazard reached from the leaf's own side.
+
+**Action, owned by the orchestrator, not the implementer:** after the correction lands and the final head is
+fixed, update the PR body's `## Slices` hashes, `Final head:`, and the `box-index: 7` evidence to the corrected
+head **before** the single authorized evaluation generation and before the mirror runs. Doing it after the mirror
+would leave #1549 permanently citing an orphan. Verify with `git merge-base --is-ancestor <cited> HEAD` for every
+hash the body cites — not by eye.
+
+**Sequencing note:** this repair changes only the PR **body**, never the head, so it does not disturb the
+evaluated tree or consume an evaluation generation.
