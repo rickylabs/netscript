@@ -1077,3 +1077,86 @@ and this lane's whole subject is refusing evidence that no longer describes the 
 Waves 3–4 branches are cut from **current `main`** at dispatch time. This incident is the concrete
 reason: a branch cut from a stale base carries a stale workflow *and* a stale `pr.base.sha`, and
 both must be current for automatic evaluation to resolve.
+
+## 2026-08-12 — e2e CANCELLED on #1539: diagnosed as global runtime contention, NOT label-event concurrency
+
+Owner asked whether label-event concurrency caused the cancellation. **It did not**, and the
+evidence is decisive:
+
+**1. `e2e-cli.yml` does not trigger on `labeled` at all.**
+
+```yaml
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+```
+
+So the `status:impl-eval` remove/re-add could not have created a competing `e2e-cli` run. Run
+`31594287382` was created at 11:58:48Z by the **`synchronize` event from my merge push**, not by a
+label event.
+
+**2. The workflow-level concurrency did not fire either.** `e2e-cli` uses
+`group: e2e-cli-<workflow>-<ref>` with `cancel-in-progress: true`. Had that fired, the **whole run**
+would have been cancelled. It was not — four of six jobs completed successfully:
+
+```
+classify changes ............................ success  11:58:51 → 11:59:07
+scaffold-static (deno-only) ................. success  11:59:10 → 11:59:14
+desktop-native-linux ........................ success  11:59:09 → 11:59:13
+scaffold CI lane visibility ................. success  11:59:46 → 11:59:49
+scaffold-runtime (postgres) ................. CANCELLED 11:59:07 → 11:59:44
+scaffold-runtime-sqlite ..................... CANCELLED 11:59:07 → 11:59:43
+```
+
+**Only the two jobs in the repo-global group were cancelled**, which localises the cause to the
+job-level `concurrency: group: e2e-scaffold-runtime-global, cancel-in-progress: false`. Under that
+setting a **queued** job is superseded when a newer run enters the group. Concurrent entrants around
+the cancellation window:
+
+```
+31594326130  11:59:17  test/1374-docs-snippet-compile-gate       success
+31594377509  12:00:00  chore/release-0.0.6-internals-orchestration  skipped
+31594287382  11:58:48  fix/1438-... (ours)                       CANCELLED
+```
+
+**Verdict: cross-lane contention for the single global runtime slot.** This is the third distinct
+way this lane has seen the expensive gate produce a non-verdict — CANCELLED by contention (#1535,
+here), SUCCESS-by-short-circuit (#1539 at `2a4102600`), and SKIPPED while draft (all four PRs).
+
+**Is a rerun required?** Not for correctness. At the previous head the same jobs took the
+classifier's escape hatch — `2. Skipped by policy: success`, `10. SQLite scaffold runtime E2E:
+skipped` — because #1539's diff is release tooling under `.llm/tools/**` with no `packages/**`,
+`plugins/**`, or scaffold template. They would short-circuit again. A rerun's only value is turning
+CANCELLED into SUCCESS so the merge gate reads zero non-green.
+
+Per owner instruction this is deferred: **rerun once, only after the evaluator verdict and head
+stability**, and only if still required at that point.
+
+## Cross-lane hazard received from the 0.0.6 internals lane — applies directly here
+
+The internals orchestrator reported (their `drift.md` D-24) that **`gh-watch` reported a terminal
+PASS in 0 seconds by matching a SUPERSEDED run's verdict comment** while a new evaluation was still
+in flight. It cannot distinguish "this PR has a PASS in its history" from "this PR's current
+evaluation passed."
+
+**This lane is squarely exposed.** #1539 now has four evaluation verdicts across four heads:
+
+```
+c0b98d93d  local cycle 1  FAIL
+5350d01fc  local cycle 2  FAIL
+2a4102600  local cycle 3  PASS   ← a PASS sitting in this PR's history
+070eabb61  automatic      pending  ← the only one that can authorize a merge
+```
+
+A head-blind verdict read would match cycle 3's PASS and authorise a merge on evidence two commits
+stale. **Binding rule adopted for this lane: before consuming any verdict, compare the verdict
+comment's `head=` against the live PR head, and reject any verdict whose head does not match.**
+Their concrete precedent: PR #1560 had two automatic runs disagreeing across heads — PASS at
+`49e2b86e9`, FAIL_FIX at `9ab361440`, the latter being the head that would actually merge.
+
+**Second item from that report with a direct effect here:** #1527 landed on `main` and changed what
+the acceptance mirror accepts — evidence asserting not-yet-done ("Pending…", "TODO", "will run after
+merge") is now rejected for any box it is about to newly tick. #1539's IMPL-EVAL box currently cites
+cycle 3, which is invalidated. It must be rewritten to cite the automatic verdict at `070eabb61`
+before the mirror runs, or it is both stale and potentially mirror-rejected.
