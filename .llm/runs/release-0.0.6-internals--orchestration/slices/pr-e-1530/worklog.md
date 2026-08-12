@@ -26,3 +26,13 @@ PLAN-EVAL: PASS in the orchestrator rail plan; PR #1553 run 31589648809 at `69ef
   groups E1 and E2 into one landed-green slice.
 - Reconcile: live issue #1530 and draft PR #1560 were read; the PR remains draft and retains
   `Closes #1530`. E2 is the immediate next slice that restores green.
+
+## E2 — directory-and-suffix exemption
+
+- Added `isTypeFixture`, which normalizes path separators and requires both
+  `/tests/type-fixtures/` and `_type.ts`.
+- Quality tool tests: 7 passed, 0 failed, exit 0.
+- Repo-wide scan: exit 0 with `allowCount: 8`; E4 still removes the now-unreachable allowance
+  comments from source so the repository no longer carries redundant policy prose.
+- Reconcile: the E1 RED is resolved without changing fixture assertions. PR #1560 remains draft;
+  E3 must still prove the exemption does not leak.

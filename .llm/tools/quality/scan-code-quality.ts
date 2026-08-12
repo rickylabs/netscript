@@ -83,9 +83,14 @@ function ruleFor(line: string, file: string, tainted: Set<string>): QualityRule 
   return undefined;
 }
 
+function isTypeFixture(file: string): boolean {
+  const normalized = file.replaceAll('\\', '/');
+  return normalized.includes('/tests/type-fixtures/') && normalized.endsWith('_type.ts');
+}
+
 function isScannable(file: string): boolean {
   return /\.[cm]?[jt]sx?$/.test(file) && !/(?:_test|\.test|\.spec)\.[cm]?[jt]sx?$/.test(file) &&
-    !file.endsWith('.generated.ts');
+    !file.endsWith('.generated.ts') && !isTypeFixture(file);
 }
 
 async function collect(path: string): Promise<string[]> {
