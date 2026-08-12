@@ -14,7 +14,9 @@
 ### Public Surface
 
 - `prepareRelease` — shared stable/canary version bump and preparation path.
-- `PREPARED_RELEASE_GENERATED_OUTPUTS` — authoritative generated files staged by a cut.
+- `verifyGreenCanaryPair` — stable-publish authorization boundary for parent canary evidence.
+- `assertPreparedReleaseGeneratedOutputsFresh` — semantic reproduction boundary for generated cut
+  outputs.
 
 ### Domain Vocabulary
 
@@ -24,10 +26,12 @@
 ### Ports
 
 - Existing `PrepareReleaseDependencies.runCommand` is the test seam; no new port is needed.
+- Existing `CanaryPairDependencies` remains the Git/GitHub and freshness test seam.
 
 ### Constants
 
-- Reuse canonical agent-docs output constants from `build-agent-docs-bundle.ts`.
+- Keep corpus paths owned once by `PUBLISH_ASSET_OUTPUTS`; tests name the two paths as contract
+  assertions without adding them to the staged set.
 
 ### Commit Slices
 
@@ -36,6 +40,9 @@
 | 1 | Bootstrap the harness contract and draft PR | artifact review | run directory |
 | 2 | Make tests independently fail for gate order and both staged outputs | focused pre-fix reds | `prepare-release_test.ts`, run evidence |
 | 3 | Regenerate then stage the complete corpus | focused test + required gates + disposable dry-run | `prepare-release.ts`, run evidence |
+| 4 | Correct the staged-output assumption and expose the real-render / inheritance reds | focused preparation + release tests | preparation, publish-asset, GitHub-release tests; run artifacts |
+| 5 | Enforce semantic freshness and strict rebuild inheritance | focused tests | `prepare-release.ts`, `generate-publish-assets.ts`, `github-release.ts`, tests, run artifacts |
+| 6 | Re-prove cut and stable-publish contracts | full owner gates + disposable cut/pair proof | run evidence |
 
 ### Deferred Scope
 
@@ -55,6 +62,8 @@ Future version-coupled assets are added to the generator sequence and
 | 2026-08-13 | 3 | implementation | Added post-bump agent-docs generation before all corpus consumers and explicit deduplicated staging ownership. |
 | 2026-08-13 | 3 | gates | Focused tests, check/test/lint/fmt, two freshness runs, and disposable 0.0.7 rehearsal all pass. |
 | 2026-08-13 | 3 | reconcile | PR #1628 remains draft/status:impl; no new comments or scope changes require adjustment. |
+| 2026-08-13 | 4 | owner rescope | Retracted explicit output classification; added same-PR semantic freshness and strict canary inheritance scope. Automatic IMPL-EVAL remains orchestrator-owned. |
+| 2026-08-13 | 4 | corrected reds | Preparation sequence/staging assertions fail 3/3; genuine-render inheritance fails; drift companion remains refused. Full evidence in `evidence.md`. |
 
 ## Gate Results
 

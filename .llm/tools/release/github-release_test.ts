@@ -1,5 +1,6 @@
 import {
   assertEquals,
+  assertNotEquals,
   assertRejects,
   assertStringIncludes,
   assertThrows,
@@ -19,6 +20,13 @@ import {
 } from './github-release.ts';
 import { discoverPreparedReleaseFiles } from './prepare-release.ts';
 import { rebaseAgentDocsProse } from '../generate-publish-assets.ts';
+import {
+  type AgentDocsProseProvenance,
+  buildAgentDocsProse,
+  buildAgentDocsProseFromSite,
+  checkAgentDocsProseFromSite,
+} from '../docs/build-agent-docs-bundle.ts';
+import { join, toFileUrl } from '@std/path';
 
 interface TestAgentDocsPayload {
   readonly schemaVersion: 1;
@@ -71,6 +79,224 @@ async function gunzipBytes(bytes: Uint8Array): Promise<Uint8Array> {
   const copy = new Uint8Array(bytes);
   const stream = new Blob([copy.buffer]).stream().pipeThrough(new DecompressionStream('gzip'));
   return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+const PAIR_PROSE_PATH = '.llm/assets/agent-docs/prose.json.gz';
+const PAIR_PROVENANCE_PATH = '.llm/assets/agent-docs/provenance.json';
+
+interface RenderedCanaryPairFixture {
+  readonly root: string;
+  readonly parent: string;
+  readonly current: string;
+  readonly previousVersion: string;
+  readonly nextVersion: string;
+  readonly literalRebaseSha256: string;
+  readonly renderedSha256: string;
+  readonly dependencies: Parameters<typeof verifyGreenCanaryPair>[3];
+  readonly dispose: () => Promise<void>;
+}
+
+async function createRenderedCanaryPairFixture(
+  injectContentDrift: boolean,
+): Promise<RenderedCanaryPairFixture> {
+  const root = await Deno.makeTempDir({ prefix: 'netscript-rendered-canary-pair-' });
+  const source = await Deno.makeTempDir({ prefix: 'netscript-rendered-canary-source-' });
+  const literal = await Deno.makeTempDir({ prefix: 'netscript-literal-agent-docs-rebase-' });
+  const previousVersion = '0.0.5';
+  const nextVersion = '0.0.6';
+  const output = join(root, '.llm', 'assets', 'agent-docs');
+  const site = join(source, 'site');
+  const bundle = join(source, 'bundle');
+  const prosePath = join(output, 'prose.json.gz');
+  const provenancePath = join(output, 'provenance.json');
+  const git = async (args: readonly string[], binary = false): Promise<string | Uint8Array> => {
+    const result = await new Deno.Command('git', {
+      args: [...args],
+      cwd: root,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    if (!result.success) {
+      throw new Error(`git ${args.join(' ')} failed: ${new TextDecoder().decode(result.stderr)}`);
+    }
+    return binary ? result.stdout : new TextDecoder().decode(result.stdout).trim();
+  };
+  const writeRenderedSite = async (version: string): Promise<void> => {
+    await Deno.mkdir(site, { recursive: true });
+    await Deno.writeTextFile(
+      join(site, 'llms.txt'),
+      `# NetScript\n\n## Task router\n\nInstall jsr:@netscript/cli@${version}.\n`,
+    );
+    await Deno.writeTextFile(
+      join(site, 'llms-full.txt'),
+      `# Full corpus\n\nInstall jsr:@netscript/cli@${version}. APIs use exact @${version} pins.\n`,
+    );
+    await Deno.writeTextFile(
+      join(site, 'index.md'),
+      `# Home\n\nThe package family uses exact @${version} pins.\n`,
+    );
+  };
+  try {
+    await Promise.all([
+      Deno.mkdir(bundle, { recursive: true }),
+      Deno.mkdir(output, { recursive: true }),
+      Deno.mkdir(join(literal, 'packages', 'cli'), { recursive: true }),
+      Deno.mkdir(join(literal, '.llm', 'assets', 'agent-docs'), { recursive: true }),
+    ]);
+    await Promise.all([
+      Deno.writeTextFile(
+        join(bundle, 'llms.txt'),
+        '# NetScript\n\n## Task router\n\nParent corpus.\n',
+      ),
+      Deno.writeTextFile(join(bundle, 'llms-full.txt'), '# Parent full corpus.\n'),
+      Deno.writeTextFile(
+        join(bundle, 'MANIFEST.md'),
+        `| Framework version | \`${previousVersion}\` |\n` +
+          '| Extracted from commit | `parent-render` |\n' +
+          '| Extraction timestamp | 2026-08-12T00:00:00Z |\n',
+      ),
+      Deno.writeTextFile(join(root, 'deno.json'), JSON.stringify({ version: previousVersion })),
+    ]);
+    await buildAgentDocsProse(bundle, output);
+    await writeRenderedSite(previousVersion);
+    await buildAgentDocsProseFromSite(site, {
+      version: previousVersion,
+      sourceCommit: 'parent-render',
+      extractionTimestamp: '2026-08-12T00:00:00Z',
+      preservedCorpusPath: prosePath,
+    }, output);
+
+    await Deno.copyFile(prosePath, join(literal, PAIR_PROSE_PATH));
+    await Deno.copyFile(provenancePath, join(literal, PAIR_PROVENANCE_PATH));
+    await Deno.writeTextFile(
+      join(literal, 'packages', 'cli', 'deno.json'),
+      JSON.stringify({ version: nextVersion }),
+    );
+    await rebaseAgentDocsProse(
+      previousVersion,
+      toFileUrl(`${literal}/`),
+      false,
+      [],
+    );
+    const literalRebaseSha256 = await sha256(
+      await gunzipBytes(await Deno.readFile(join(literal, PAIR_PROSE_PATH))),
+    );
+
+    await git(['init', '--quiet']);
+    await git(['config', 'user.email', 'release-test@netscript.dev']);
+    await git(['config', 'user.name', 'NetScript release test']);
+    await git(['add', 'deno.json', PAIR_PROSE_PATH, PAIR_PROVENANCE_PATH]);
+    await git(['commit', '--quiet', '-m', 'parent canary content']);
+    const parent = await git(['rev-parse', 'HEAD']) as string;
+
+    await Deno.writeTextFile(join(root, 'deno.json'), JSON.stringify({ version: nextVersion }));
+    await writeRenderedSite(nextVersion);
+    await buildAgentDocsProseFromSite(site, {
+      version: nextVersion,
+      sourceCommit: 'head-render',
+      extractionTimestamp: '2026-08-13T00:00:00Z',
+      preservedCorpusPath: prosePath,
+    }, output);
+    const renderedSha256 = await sha256(await gunzipBytes(await Deno.readFile(prosePath)));
+
+    if (injectContentDrift) {
+      const raw = await gunzipBytes(await Deno.readFile(prosePath));
+      const payload = JSON.parse(new TextDecoder().decode(raw)) as TestAgentDocsPayload;
+      const files = { ...payload.files, 'llms.txt': `${payload.files['llms.txt']}\nDRIFT\n` };
+      const canonical = new TextEncoder().encode(JSON.stringify({ schemaVersion: 1, files }));
+      const compressed = await gzipJson({ schemaVersion: 1, files });
+      const provenance = JSON.parse(
+        await Deno.readTextFile(provenancePath),
+      ) as AgentDocsProseProvenance;
+      await Promise.all([
+        Deno.writeFile(prosePath, compressed),
+        Deno.writeTextFile(
+          provenancePath,
+          `${
+            JSON.stringify(
+              {
+                ...provenance,
+                uncompressedBytes: canonical.byteLength,
+                compressedBytes: compressed.byteLength,
+                sha256: await sha256(canonical),
+              },
+              null,
+              2,
+            )
+          }\n`,
+        ),
+      ]);
+    }
+
+    await git(['add', 'deno.json', PAIR_PROSE_PATH, PAIR_PROVENANCE_PATH]);
+    await git(['commit', '--quiet', '-m', 'stable cut']);
+    const current = await git(['rev-parse', 'HEAD']) as string;
+
+    const dependencies: Parameters<typeof verifyGreenCanaryPair>[3] = {
+      revParse: async (_root, revision) => await git(['rev-parse', revision]) as string,
+      changedFiles: async () =>
+        (await git(['diff', '--name-only', 'HEAD^', 'HEAD']) as string).split(/\r?\n/).filter(
+          Boolean,
+        ),
+      releaseFiles: () =>
+        Promise.resolve([
+          join(root, 'deno.json'),
+          join(root, PAIR_PROSE_PATH),
+          join(root, PAIR_PROVENANCE_PATH),
+        ]),
+      fileAtRevision: async (_root, revision, path) =>
+        new TextDecoder().decode(
+          await git(['show', `${revision}:${path}`], true) as Uint8Array,
+        ),
+      fileBytesAtRevision: async (_root, revision, path) =>
+        await git(['show', `${revision}:${path}`], true) as Uint8Array,
+      generatedOutputsFresh: async () => {
+        const provenance = JSON.parse(
+          await Deno.readTextFile(provenancePath),
+        ) as AgentDocsProseProvenance;
+        const freshness = await checkAgentDocsProseFromSite(site, {
+          version: provenance.version,
+          sourceCommit: provenance.sourceCommit,
+          extractionTimestamp: provenance.extractionTimestamp,
+          preservedCorpusPath: prosePath,
+        }, output);
+        if (!freshness.fresh) {
+          throw new Error(`semantic agent-docs drift: ${freshness.stalePaths.join(', ')}`);
+        }
+      },
+      request: (_method, path) =>
+        Promise.resolve({
+          status: 200,
+          ok: true,
+          body: {
+            statuses: path.includes(parent)
+              ? [{ context: CANARY_PAIR_STATUS_CONTEXT, state: 'success' }]
+              : [],
+          },
+        }),
+    };
+    return {
+      root,
+      parent,
+      current,
+      previousVersion,
+      nextVersion,
+      literalRebaseSha256,
+      renderedSha256,
+      dependencies,
+      dispose: () =>
+        Promise.all([root, source, literal].map((path) =>
+          Deno.remove(path, {
+            recursive: true,
+          })
+        )).then(() => undefined),
+    };
+  } catch (error) {
+    await Promise.all(
+      [root, source, literal].map((path) => Deno.remove(path, { recursive: true })),
+    );
+    throw error;
+  }
 }
 
 Deno.test('toVersion strips a single leading v; toTag re-adds it', () => {
@@ -257,6 +483,47 @@ Deno.test('parent canary evidence checks every release path and reproduces deriv
 
   assertEquals(result, 'canary-content-sha');
   assertEquals(generatedChecks, 1);
+});
+
+Deno.test('parent canary evidence accepts a genuinely re-rendered version-derived corpus', async () => {
+  const fixture = await createRenderedCanaryPairFixture(false);
+  try {
+    assertNotEquals(
+      fixture.literalRebaseSha256,
+      fixture.renderedSha256,
+      'the real bumped render must differ canonically from literal agent-docs rebasing',
+    );
+    assertEquals(
+      await verifyGreenCanaryPair(
+        'owner/repo',
+        'token',
+        fixture.root,
+        fixture.dependencies,
+      ),
+      fixture.parent,
+    );
+  } finally {
+    await fixture.dispose();
+  }
+});
+
+Deno.test('parent canary evidence rejects semantically drifted rebuilt corpus content', async () => {
+  const fixture = await createRenderedCanaryPairFixture(true);
+  try {
+    await assertRejects(
+      () =>
+        verifyGreenCanaryPair(
+          'owner/repo',
+          'token',
+          fixture.root,
+          fixture.dependencies,
+        ),
+      Error,
+      'Stable publication blocked: agent-docs prose contains non-version changes',
+    );
+  } finally {
+    await fixture.dispose();
+  }
 });
 
 Deno.test('parent canary evidence fails when derived writer outputs cannot be reproduced', async () => {

@@ -131,6 +131,11 @@ Baseline nuance: both corpus paths were already present transitively at the head
 prepared-release set as the owner contract requested; the implementation makes that ownership
 explicit without duplicating staged paths.
 
+Correction after independent RCA: the assertion above encoded the owner's original, retracted
+instruction. Independent classification was not a missing property; `PUBLISH_ASSET_OUTPUTS` was
+already the correct single owner. The superseding test below proves both paths are staged exactly
+once without reclassifying them.
+
 ### 3. Real pre-fix cut path leaves the bumped corpus stale
 
 Disposable root: `/tmp/netscript-w6-prefix.TQbM4q/repo`
@@ -294,3 +299,86 @@ implementation overlays):
 The changed-path census contains only bumped `deno.json` / `scaffold.plugin.json` manifests, the two
 release lockfiles, and writer-declared generated assets (including both agent-docs corpus files and
 their CLI/MCP consumers). No source path is present.
+
+## Corrected-RCA pre-fix evidence
+
+These tests ran against production commit `3aed636a9`, before the semantic-freshness and inheritance
+implementation. The run artifacts and tests were the only working-tree changes.
+
+### Prepared sequence and existing staging ownership
+
+Command: `deno test -A .llm/tools/release/prepare-release_test.ts`
+
+Exit code: `1`
+
+```text
+running 3 tests from ./.llm/tools/release/prepare-release_test.ts
+shared release preparation runs the stable gate sequence in order ... FAILED
+shared release preparation stages every generator-owned output ... FAILED
+shared release preparation regenerates assets then stops when residue remains ... FAILED
+
+[Diff] Actual / Expected
+  "deno task gen:assets-barrel",
++ "deno task check:agent-docs-prose",
+
+[Diff] Actual / Expected
++ ".llm/assets/agent-docs/prose.json.gz",
++ ".llm/assets/agent-docs/provenance.json",
+  "packages/cli/src/kernel/assets/agent-tools.generated.ts",
+  ...
+  "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+- ".llm/assets/agent-docs/prose.json.gz",
+- ".llm/assets/agent-docs/provenance.json",
+
+FAILED | 0 passed | 3 failed
+error: Test failed
+```
+
+The first and third failures prove the local semantic check was absent. The second proves the
+temporary explicit-classification implementation moved paths that were already present through the
+`PUBLISH_ASSET_OUTPUTS` spread; final behavior must restore that spread unchanged and assert each
+path occurs once in `collectPreparedReleaseFiles`.
+
+### Genuine-render inheritance
+
+Command:
+`deno test -A .llm/tools/release/github-release_test.ts --filter "genuinely re-rendered"`
+
+Exit code: `1`
+
+```text
+running 1 test from ./.llm/tools/release/github-release_test.ts
+parent canary evidence accepts a genuinely re-rendered version-derived corpus ... FAILED
+
+error: Error: Stable publication blocked: agent-docs prose contains non-version changes, so the
+parent canary evidence cannot authorize this content.
+    at verifyGreenCanaryPair (.llm/tools/release/github-release.ts:233:19)
+
+FAILED | 0 passed | 1 failed | 24 filtered out
+error: Test failed
+```
+
+The fixture creates a real Git parent→HEAD pair and uses the production site-corpus builder. Before
+calling inheritance it asserts the canonical uncompressed SHA-256 of `rebaseAgentDocsProse` output
+differs from the genuine bumped render. The repository-scale 0.0.7 proof measured the same
+differential across 20 files:
+
+```text
+literal rebase sha256: 18138d9daba98946ca33ce0b5a4eb7e96bad4406641a64167ac45b1fea268267
+real render sha256:    c9268f6cb59e8b94b3c5f01afd1e2203034f38769f14e91eabe22464df3cf257
+equal: false
+changed files: 20
+```
+
+Companion command:
+`deno test -A .llm/tools/release/github-release_test.ts --filter "semantically drifted"`
+
+Exit code: `0`
+
+```text
+parent canary evidence rejects semantically drifted rebuilt corpus content ... ok
+ok | 1 passed | 0 failed | 24 filtered out
+```
+
+The pre-fix code refuses both cases at the coarse literal-replacement boundary. The implementation
+must accept the first only after semantic reproduction, while preserving rejection of the second.
