@@ -9,7 +9,14 @@ milestone's rules are earned from evidence rather than memory.
 
 | # | Time (UTC) | Commit on `main` | PR | Issues closed | Pre-merge gate record |
 | --- | --- | --- | --- | --- | --- |
+| 1 | 2026-08-12 08:35:36Z | `69485b8fd` | #1535 | **#1428** (auto-closed COMPLETED 08:35:38Z) | 7/7 — see `worklog.md` stage D |
+| 2 | 2026-08-12 08:36:22Z | `cd24e1679` | #1534 | **#1397, #1399** (both auto-closed COMPLETED) | 7/7 — see `worklog.md` stage D |
 | _(none yet)_ | | | | | |
+
+Captured from `git log origin/main --first-parent` after each merge, never from recollection. Both
+rows carry a closing keyword that auto-closed their issues, which is the `AGENTS.md` obligation that
+stranded 40+ merged PRs when omitted — verified here by the issues' own `CLOSED/COMPLETED` state
+rather than by the PR body's text.
 
 Baseline at run open: `origin/main@01aa12b67e36b643e1ca4f94421ecba07e030db5`
 (`docs(harness): record FILING-LOG -- board migration executed once (#1523)`).

@@ -495,3 +495,65 @@ This also *confirms* the 0.0.4 lesson from a new direction: 0.0.4 saw three conc
 `scaffold.runtime` runs produce two failures that were contention rather than defects. The repo has
 since serialised the gate — so contention no longer manufactures false *failures*, it manufactures
 **cancellations**, which are easier to misread as neutral.
+
+## 2026-08-12 08:35–08:36Z — Two landings
+
+### PR #1535 → `69485b8fd` (closes #1428)
+
+Full seven-check gate passed. Notable: `close-gate` SUCCESS is **not** counted as acceptance
+evidence here (#1428 carries no boxes — see the falsified rule 3 above); checks 5, 6 and 7 carried
+it, with template restoration verified against the changed-file list rather than the slice's claim.
+
+`scaffold-runtime` reported **CANCELLED** and this was **not** treated as a pass. It is not a
+required gate for this PR, for a stated reason: the change is a single unit test under
+`packages/cli/src/**`, executed by `check-test` (SUCCESS); `scaffold.runtime` never loads
+`public-command-tree_test.ts`. The cancellation was caused by this orchestrator dispatching #1534's
+runtime run into the repo-global concurrency group. Recorded as a did-not-run with a reason, not
+argued into a green.
+
+`review-threads` PASS (0 threads). IMPL-EVAL owner waiver applied, earned (drift D-3).
+
+### PR #1534 → `cd24e1679` (closes #1397, #1399)
+
+Full seven-check gate passed, including the expensive gate — **on real execution**.
+
+The PR's own rollup shows `scaffold-runtime` and `scaffold-runtime-sqlite` as CANCELLED, because
+those are the superseded `pull_request`-event runs. The green comes from the dispatched run
+**31577752491**, and the identity was verified rather than assumed:
+
+```
+PR 1534 head sha : 86d265f74d548765fad4d738ee004d0b1aef34f2
+dispatch run sha : 86d265f74d548765fad4d738ee004d0b1aef34f2
+branch tip       : 86d265f74d548765fad4d738ee004d0b1aef34f2
+```
+
+Same content, all three. And the sqlite job **did real work** rather than short-circuiting through
+the classifier — the workflow's own escape hatch is a step named `Skipped by policy`, and that step
+was itself skipped while the real one ran for ~5 minutes:
+
+```
+2. Skipped by policy: skipped                                    ← escape hatch NOT taken
+10. SQLite scaffold runtime E2E (one pass, with cleanup): success ← 08:28:51 → 08:33:48
+    scaffold-runtime (aspire + docker + postgres): success
+```
+
+**This closes the one open risk on #1534**: adding `behavior.service-health` to the sqlite tier was
+the unproven consequence of the fix, and the sqlite tier now executes it and passes. The scope note
+raised at check 7 is resolved by execution.
+
+Distinguishing "SUCCESS because it ran and passed" from "SUCCESS because a policy step short-
+circuited it" is the same did-not-run discipline this lane exists to enforce — applied here to the
+gate proving the lane's own fix.
+
+## Lane status after wave landings
+
+| Issue | PR | State |
+| --- | --- | --- |
+| #1397 | #1534 | **CLOSED/COMPLETED** |
+| #1399 | #1534 | **CLOSED/COMPLETED** |
+| #1428 | #1535 | **CLOSED/COMPLETED** |
+| #1438 | — | slice A working, 2 commits, no PR yet |
+| #1430 | — | slice A (same PR) |
+| #1417 | — | slice B working, 1 commit, branch pushed, no PR yet |
+
+3 of 6 owned issues landed on `main`. No canary declared by this lane; root owns cadence and cut.

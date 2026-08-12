@@ -46,8 +46,18 @@ below at landing time.
 
 | PR | Negative-test evidence | Waiver applied? |
 | --- | --- | --- |
-| C (#1397 + #1399) | _pending_ | _pending_ |
-| D (#1428) | _pending_ | _pending_ |
+| C (#1397 + #1399) | **Strong.** Three executed red→green controls quoted with real output in `slices/c-1397-1399/evidence.md`: restoring the postgres-only service-health drop fails the new database-matrix test (`17 passed \| 1 failed`, with the diff naming `behavior.service-health` as the missing member); a throwaway deferral on `scaffold.service` fails the all-suite pin; removing an expectation entry fails **type-checking** (TS1360 + TS7053), which is a compile-time guard rather than a runtime one. Restored tree green at 19/19. | **Yes** |
+| D (#1428) | **Strong, and includes the decisive control.** `slices/d-1428/evidence.md` records the DB-only break staying **green before the fix** (`3 passed, 415ms`) — the executed proof that the gap #1428 describes was real — then **red after** (`2 passed \| 1 failed`). Plus: memory-island break still red (unchanged coverage), broken non-relative specifier red, legitimate `npm:`/`jsr:` specifiers green (no false positive), restored final run green at 825ms. | **Yes** |
+
+**Both waivers earned by execution, not by assertion.** The condition set at run open was a guard
+demonstrated red before the fix and green after, on real output. Both slices met it, and D met the
+stronger form — showing the *pre-fix* state green, which is the only control that actually proves a
+coverage gap existed rather than merely that a new test can fail.
+
+The orchestrator additionally re-verified each slice's decisive claim independently (pre-merge
+check 5), so neither lane self-certified: C's engine-agnostic claim was checked against
+`PROBE_SERVICE_HEALTH_SCRIPT`, and D's template-restoration claim was checked against the
+changed-file list rather than its own report.
 
 Automated gates are unchanged by this waiver: they are evidence, not sign-off.
 
