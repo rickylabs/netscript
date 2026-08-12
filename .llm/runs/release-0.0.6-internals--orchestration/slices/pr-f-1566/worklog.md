@@ -40,11 +40,38 @@ acceptance criteria, and required gates fully specified in issue #1566 and `impl
   `phase-eval-status.ts` production module does not yet exist; the named race and narrow-tolerance
   assertions define the required caller contract. Generation dedup is guarded structurally in the
   unchanged workflow script.
-- Implementation: pending.
-- Gates: pending.
+- Implementation: complete; pending implementation commit/push.
+- Gates: complete except the required post-commit empty-status proof for asset freshness.
 - IMPL-EVAL: owned by the separate orchestrator/evaluator transition; this agent leaves the PR draft.
 
 ## RED evidence
 
 - `deno test --allow-read .github/scripts/phase-eval-status.test.ts` — exit 1 before the production
   module exists (`TS2307 Cannot find module .github/scripts/phase-eval-status.ts`).
+
+## Implementation
+
+- Added `phase-eval-status.mjs`: pure transition decision plus an injected operation caller.
+- The caller reads live labels, removes only live `status:` labels, tolerates only an Octokit-style
+  `404` with response message `Label does not exist`, and adds `status:impl-eval` once.
+- The workflow checks out the live protected base ref with credentials disabled, imports that
+  trusted module, and adapts the existing GitHub client operations. Dispatch/dedup code is unchanged.
+- Targeted regression suite after implementation: 5 passed, 0 failed.
+
+## Gate evidence
+
+| Gate | Result |
+| --- | --- |
+| Script tests | `deno test --allow-read --allow-env --allow-write --allow-run .github/scripts/` — exit 0; 65 passed, 0 failed |
+| Scoped type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .github/scripts --ext ts` — exit 0; 6 files, 0 findings |
+| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .github/scripts --ext ts` — exit 0; 6 files, 0 findings |
+| Scoped format | Initial exit 1 on the new test import layout; formatted only the owned test/module, rerun exit 0; 6 files, 0 findings |
+| Asset barrel | `deno task gen:assets-barrel` — exit 0; no generated file appeared in status. Final clean-status proof runs after the implementation commit. |
+| Workflow YAML | `deno eval --no-lock` with `jsr:@std/yaml@^1.0.10` parsed `openhands-phase-eval.yml` — exit 0, `YAML_PARSE_OK` |
+
+## Reconcile
+
+- Slice S1: issue #1566 remained open; PR #1567 carries the sole closing keyword, six indexed
+  evidence entries, and exactly one lifecycle label (`status:impl`). No new comments changed scope.
+- Slice S2: no issue/PR feedback required readjustment. The PR remains draft for orchestrator-owned
+  IMPL-EVAL; no skip, ready-merge, or impl-eval label was applied.

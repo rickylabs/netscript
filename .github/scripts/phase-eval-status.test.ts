@@ -1,13 +1,14 @@
-import {
-  assertEquals,
-  assertRejects,
-  assertStringIncludes,
-} from '@std/assert';
+import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import {
   applyImplEvalStatusTransition,
   decideImplEvalStatusTransition,
-  type IssueLabelOperations,
-} from './phase-eval-status.ts';
+} from './phase-eval-status.mjs';
+
+interface IssueLabelOperations {
+  listLabelsOnIssue(): Promise<string[]>;
+  removeLabel(label: string): Promise<void>;
+  addLabels(labels: string[]): Promise<void>;
+}
 
 function operations(
   labels: string[],
@@ -46,7 +47,10 @@ Deno.test('race regression: a concurrently removed status label does not fail cl
 Deno.test('narrow tolerance: permission failures still fail cleanup', async () => {
   const { client } = operations(
     ['status:impl'],
-    () => ({ status: 403, response: { data: { message: 'Resource not accessible by integration' } } }),
+    () => ({
+      status: 403,
+      response: { data: { message: 'Resource not accessible by integration' } },
+    }),
   );
 
   await assertRejects(() => applyImplEvalStatusTransition(client));
@@ -83,8 +87,9 @@ Deno.test('terminal decision contains exactly one status label', () => {
 
 Deno.test('generation deduplication remains before trigger creation', async () => {
   const workflow = await Deno.readTextFile('.github/workflows/openhands-phase-eval.yml');
-  const marker = 'const marker = `<!-- openhands-phase-eval generation=${generationEvent.id} phase=${phase} head=${pr.head.sha} -->`;';
-  const claim = 'String(comment.body ?? \'\').includes(marker)';
+  const marker =
+    'const marker = `<!-- openhands-phase-eval generation=${generationEvent.id} phase=${phase} head=${pr.head.sha} -->`;';
+  const claim = "String(comment.body ?? '').includes(marker)";
   const earlyReturn = 'if (existing) {';
   const create = 'github.rest.issues.createComment({';
 

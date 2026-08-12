@@ -14,6 +14,8 @@ missing-label 404 race, while preserving generation deduplication and the single
   `0.0.6`; it remains draft.
 - The S1 test file defines the extracted module contract, race regression, narrow 403/unrelated-404
   failures, terminal single-status state, and a guard for the unchanged generation-dedup ordering.
+- S2 implementation and all functional/static gates are green. The asset generator produced no
+  generated-file drift; a final post-commit clean status remains to capture before handoff.
 
 ## Locked boundaries
 
@@ -23,5 +25,5 @@ merge or mark the PR ready.
 
 ## Next action
 
-Capture the expected pre-fix RED result, commit/push/comment S1, then implement the module and
-workflow adapter.
+Commit and push S2, rerun asset generation and prove `git status --porcelain` is empty, update the
+PR body/evidence, and post the literal-hash implementation comment for orchestrator review.
