@@ -12,12 +12,11 @@
 
 ## Current State
 
-Draft PR #1608 received an exact-head native Opus 5 `FAIL_FIX`. The corpus mechanism, negative
-control, determinism, and shipped-vocabulary accuracy defense were independently confirmed. Cycle 2
-first rebased onto `origin/main@6aee2b414`, then reconciled again after `main` advanced to
-`6b29d12ea` through PR #1614. Cycle 2 refreshes moving-base generated outputs, corrects ownership to
-#1615, and records two non-blocking check/provenance limitations. The exact-head cycle-2 evaluation
-passed. Final merge-base work rebases onto `origin/main@bcfbd0f65`, including PR #1617.
+Draft PR #1608 passed exact-head native Opus 5 evaluation, then followed moving `main` through the
+PR #1617 merge. `origin/main` subsequently advanced to `bfcf4ed11` through PR #1605, which changes
+the telemetry reference page and therefore a real corpus input. The branch is rebased onto that
+head; normal regeneration moved the corpus SHA-256 from `105b8e0a…` to `fc121f9c…` and rebuilt both
+dependent generated assets.
 
 ## Completed
 
@@ -32,10 +31,15 @@ passed. Final merge-base work rebases onto `origin/main@bcfbd0f65`, including PR
   generated assets without touching `deno.lock`; the intervening PR #1614 has no `docs/site` diff.
 - Rebased again onto exact merge base `bcfbd0f65`; corpus regeneration is a content no-op with the
   same gzip blob and SHA-256. Root tests are now green after PR #1617: 3355 passed, 0 failed.
+- Rebased cleanly onto `bfcf4ed11`; parsed old/new corpus maps show changes only in
+  `pages/reference/telemetry/index.md` and `llms-full.txt`. `llms.txt` remains byte-identical, the
+  file count remains 178, and both forbidden terms remain absent from corpus and MCP output.
+- Exact-tree freshness, root tests, asset checks, and corpus-aware accuracy all pass; root tests now
+  report 3378 passed and 0 failed. `deno.lock` remains unchanged.
 
 ## In Progress
 
-- Commit/push the final provenance/generated-asset reconciliation and update PR evidence.
+- Commit/push the telemetry-input regeneration and update PR evidence with both corpus hashes.
 
 ## Next Steps
 
@@ -69,7 +73,7 @@ passed. Final merge-base work rebases onto `origin/main@bcfbd0f65`, including PR
 | Fitness/docs | partial | Cycle-2 corpus, snippets, and accuracy pass; links retains two unchanged-base anchor failures and is not workflow-called. |
 | Runtime | N/A | No runtime behavior. |
 | Consumer | pass | MCP generated asset has zero `api-clients`; asset checks pass. |
-| Repo tests | pass | Final exact-merge-base run: 3355 passed, 0 failed, 17 ignored. |
+| Repo tests | pass | Telemetry-rebased run: 3378 passed, 0 failed, 17 ignored. |
 
 ## Open Questions
 

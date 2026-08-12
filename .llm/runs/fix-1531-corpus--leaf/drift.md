@@ -109,3 +109,20 @@ documentation.
 - **Severity:** non-blocking/tooling
 - **Action:** record the semantic limitation; do not redesign determinism in this PR.
 - **Evidence:** Check-mode metadata selection in `build-agent-docs-bundle.ts`.
+
+## 2026-08-12 — PR #1605 moves a real corpus input after exact-head evaluation
+
+- **What:** `origin/main` advanced from `bcfbd0f65` to `bfcf4ed11` through PR #1605 and changed
+  `docs/site/reference/telemetry/index.md` after the preceding exact-head corpus verification.
+- **Source:** Owner-directed final rebase and live remote fetch.
+- **Expected:** A freshness snapshot must be regenerated whenever its source tree changes before
+  merge.
+- **Actual:** Normal regeneration moved the corpus SHA-256 from
+  `105b8e0a081249ae5b93d58fc87ca3dbdbe79de7aa2ef140d0629b29e8757908` to
+  `fc121f9c0bb737e3776d64c03f6d940d7a5e1b14d5e35100c9923a3602a10da3`. Parsed JSON comparison
+  confines the delta to `pages/reference/telemetry/index.md` and `llms-full.txt`; `llms.txt` is
+  byte-identical, no entries were added or removed, and the file count remains 178.
+- **Severity:** expected/moving-base
+- **Action:** regenerate and rebuild both dependent assets; preserve both hashes in PR evidence.
+- **Evidence:** Gzip diff 1,351,792 → 1,352,791 bytes; all requested gates exit 0; forbidden-term
+  counts remain zero in both the corpus and MCP generated asset.
