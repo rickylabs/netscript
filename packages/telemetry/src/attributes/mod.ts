@@ -12,6 +12,7 @@ export * from './saga.ts';
 export * from './genai.ts';
 export * from './sse.ts';
 export * from './kv.ts';
+export * from './cache.ts';
 export * from './spans.ts';
 export * from './helpers.ts';
 export * from '../domain/mod.ts';

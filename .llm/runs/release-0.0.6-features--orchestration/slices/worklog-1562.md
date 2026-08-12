@@ -38,5 +38,38 @@
 
 ## Phase state
 
-PLAN-EVAL: **required, pending, orchestrator-owned**. No implementation, evaluator dispatch,
-sub-agent, OpenHands trigger, ready transition, merge, or release action was performed.
+PLAN-EVAL: **PASS** at evaluated plan head `af1cb92cc` via the automatic label-driven lifecycle. The
+implementation branch was resynced by the orchestrator to `fc28b397c` before source work began. This
+implementation session did not launch an evaluator, sub-agent, Fable, or OpenHands and did not
+perform a ready transition, merge, release, or canary action.
+
+## S1 — published cache telemetry vocabulary
+
+- Added `NetScriptAttributeDomains.CACHE` before registering `CacheAttributes` in the convention
+  test, satisfying PLAN-EVAL advisory A1 at the first implementation seam.
+- Published `CacheAttributes`, `CacheOperations`, `CacheTiers`, `CacheOutcomes`, their finite union
+  types, `CacheAttributeOptions`, and `createCacheAttributes` from
+  `@netscript/telemetry/attributes`.
+- The builder accepts normalized operation identity but has no cache-key/value/input parameter and
+  rejects negative or fractional lookup/age/TTL values.
+- Documented provider ids, bounded tier/outcome vocabulary, namespace privacy, and the measured
+  meaning of `backend_executed` in the telemetry README.
+
+### S1 gate evidence
+
+| Gate                           | Result                                                                                |
+| ------------------------------ | ------------------------------------------------------------------------------------- |
+| telemetry scoped check         | `filesSelected=101`, `failedBatches=0`, no findings                                   |
+| telemetry scoped lint          | `filesSelected=101`, exit 0, no findings                                              |
+| telemetry scoped format        | `filesSelected=101`, `failedBatches=0`, no findings                                   |
+| telemetry package test task    | `54 passed`, `0 failed`                                                               |
+| telemetry full-export doc lint | baseline retained: 6 combined private-type refs + 1 missing JSDoc; no new diagnostics |
+| telemetry publish dry-run      | exit 0; existing `otel-sdk.ts:201` dynamic-import warning retained                    |
+| `quality:gate`                 | exit 0; code scan has no findings and doctrine has no failures                        |
+
+### S1 reconcile
+
+PR #1605 remains draft and issue #1562 remains open. The approved public vocabulary and A1 amendment
+are unchanged. Creating the explicitly required `src/attributes/cache.ts` increased that already
+over-cap folder from 13 to 14 direct children; D-7 and debt `telemetry-attributes-f16-1562` record
+the forced doctrine drift. `deno.lock` is unchanged.

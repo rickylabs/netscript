@@ -43,6 +43,7 @@ export const NetScriptAttributeDomains = {
   OUTCOME: 'netscript.outcome',
   SSE: 'netscript.sse',
   KV: 'netscript.kv',
+  CACHE: 'netscript.cache',
 } as const;
 
 /**

@@ -119,6 +119,20 @@ canonical span-name vocabulary. The full convention — span naming, SpanKind, s
 and the required `OTEL_SEMCONV_STABILITY_OPT_IN` value — is on the
 [convention page](https://rickylabs.github.io/netscript/reference/telemetry/convention/).
 
+### Cache topology contract
+
+`createCacheAttributes` builds the published `netscript.cache.*` contract used by SDK cache spans
+and their ordered tier events. A logical operation is `cache.read`, `cache.write`, or
+`cache.invalidate`; tiers are the bounded values `l1`, `l2`, and `durable`; outcomes are `hit`,
+`miss`, `stale`, and `error`.
+
+`netscript.cache.namespace` is a normalized operation or contract identity such as `orders.list`. It
+is never a raw cache key. Cache keys, serialized inputs, values, URLs, and user data must not be
+passed to this builder or copied into other telemetry attributes. Provider systems use stable
+identifiers (`deno-kv`, `redis`, `memory`, or an extension's documented lowercase identifier).
+`netscript.cache.backend_executed` means the backing loader was actually entered; a miss or elapsed
+duration is never a proxy for that fact.
+
 ## Public surface
 
 | Entry               | What it gives you                                       |
