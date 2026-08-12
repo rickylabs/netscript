@@ -127,7 +127,7 @@ package boundary to work around.
 {{ comp.featureGrid({ items: [
   {
     title: "Look up — @netscript/fresh-ui",
-    body: "The generated reference for the fresh-ui package, including the copy-registry manifest surface.",
+    body: "The API reference for the fresh-ui package, including the copy-registry manifest surface.",
     href: "/reference/fresh-ui/",
     icon: "≡"
   },

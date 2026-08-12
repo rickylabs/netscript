@@ -6,7 +6,7 @@ title: '@netscript/fresh'
 # `@netscript/fresh`
 
 Fresh runtime extensions, builders, forms, defer primitives, and route contracts for NetScript. This
-page is generated from the public surface of the package with `deno doc` (US-2). For the full index
+page is written against the public surface reported by `deno doc`. For the full index
 of packages and plugins return to the [reference overview](/reference/).
 
 The root entrypoint (`@netscript/fresh`) exposes only the cross-cutting page-loader cache helpers.

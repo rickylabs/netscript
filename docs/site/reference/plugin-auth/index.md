@@ -6,8 +6,8 @@ templateEngine: [vento, md]
 
 # `@netscript/plugin-auth`
 
-Public plugin manifest for NetScript auth. This page is generated from the package's
-public surface with `deno doc`. For the auth package map, return to the
+Public plugin manifest for NetScript auth. This page is written against the package's
+public surface reported by `deno doc`. For the auth package map, return to the
 [auth reference hub](/reference/auth/).
 
 The root entrypoint exposes the plugin manifest and auth metadata constants. Shared manifest

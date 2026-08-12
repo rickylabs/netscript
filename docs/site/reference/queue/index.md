@@ -8,8 +8,8 @@ title: "@netscript/queue"
 Provider-agnostic message queue abstraction for NetScript applications. It wraps
 [Fedify](https://fedify.dev/) battle-tested queue adapters behind a single, unified
 `MessageQueue` interface with optional Zod validation and Aspire-based backend
-auto-discovery. This page is generated from the package public surface with `deno doc`
-(US-2). For the full index of packages and plugins return to the
+auto-discovery. This page is written against the package public surface reported by `deno doc`.
+For the full index of packages and plugins return to the
 [reference overview](/reference/).
 
 The root entrypoint (`@netscript/queue`) re-exports the factory functions, the port

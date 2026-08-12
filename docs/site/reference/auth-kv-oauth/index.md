@@ -5,8 +5,8 @@ title: "@netscript/auth-kv-oauth"
 
 # `@netscript/auth-kv-oauth`
 
-KV-backed OAuth2/OIDC relying-party backend for NetScript auth. This page is
-generated from the package's public surface with `deno doc`.
+KV-backed OAuth2/OIDC relying-party backend for NetScript auth. This page is written against the
+package's public surface reported by `deno doc`.
 
 ## Backend and flow factories
 

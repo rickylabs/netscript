@@ -94,7 +94,7 @@ export const navLanes: NavLane[] = [
   },
   {
     label: "Reference",
-    subtitle: "Every symbol, generated",
+    subtitle: "Every published symbol",
     kind: "menu",
     roots: ["/reference/"],
     expandRoot: true,

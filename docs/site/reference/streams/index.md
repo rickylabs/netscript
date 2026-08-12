@@ -8,7 +8,7 @@ templateEngine: [vento, md]
 
 Durable Streams development plugin for NetScript: a plugin manifest plus CLI, scaffolding,
 end-to-end gate, and Aspire integration surfaces for a durable, change-data stream service. This
-page is generated from the plugin public surface with `deno doc` (US-2). For the full index of
+page is written against the plugin public surface reported by `deno doc`. For the full index of
 packages and plugins return to the [reference overview](/reference/).
 
 The plugin ships five published entrypoints. The root export (`@netscript/plugin-streams`) carries
@@ -20,9 +20,10 @@ the framework integrations:
 - [`@netscript/plugin-streams/e2e`](#sub-path-e2e) — E2E gate definitions.
 - [`@netscript/plugin-streams/aspire`](#sub-path-aspire) — Aspire AppHost contribution.
 
-The schema, producer, telemetry, testing, and diagnostics primitives that the plugin builds on
-live in the internal `@netscript/plugin-streams-core` package, documented in
-[Internals](#internals) below.
+The schema, producer, telemetry, testing, and diagnostics primitives that the plugin builds on live
+in the separately published
+[`@netscript/plugin-streams-core`](/reference/plugin-streams-core/) package, which has its own
+canonical reference page.
 
 ## Plugin manifest
 
@@ -47,7 +48,7 @@ live in the internal `@netscript/plugin-streams-core` package, documented in
 > A producer's `publish()` returns a rejected promise and a consumer's `subscribe()` throws
 > synchronously, both with `StreamUnsupportedOperationError`. For real producer work use
 > `createDurableStream` (or the Service-facing `createServiceStreamProducer`) and `defineStreamSchema`
-> from [`@netscript/plugin-streams-core`](#internals). See the
+> from [`@netscript/plugin-streams-core`](/reference/plugin-streams-core/). See the
 > [durable streams capability page](/capabilities/streams/) for the full producer/consumer model.
 
 > **Browser consumers read over HTTP/SSE.** There is no in-process `subscribe()`; a browser
@@ -127,71 +128,13 @@ The remaining symbols on this entrypoint (`AspireBuilder`, `AspireResource`, `As
 `DenoServiceSpec`, `DenoBackgroundSpec`, `HealthCheckSpec`, `EnvSource`) are re-exported unchanged
 from [`@netscript/aspire`](/reference/aspire/); see that reference page for their definitions.
 
-## Internals
+## Core package
 
-The following surface belongs to the internal **`@netscript/plugin-streams-core`** package. It is a
-supporting package — not part of the public plugin contract — and is documented here per the
-single-page internals convention (US-8). It provides the schema, producer, configuration,
-telemetry, testing, and diagnostics primitives that `@netscript/plugin-streams` builds on. Its root
-export is `@netscript/plugin-streams-core` with two sub-path exports (`/telemetry`, `/testing`).
-
-### Schema and producers (`@netscript/plugin-streams-core`)
-
-| Symbol | Kind | Signature | Description |
-| --- | --- | --- | --- |
-| `defineStreamSchema` | function | `function defineStreamSchema(collections): StateSchema` | Define a type-safe durable stream schema. |
-| `createDurableStream` | function | `function createDurableStream(options): DurableStreamProducer` | Create or reuse a durable stream producer for a stream path. |
-| `createServiceStreamProducer` | function | `function createServiceStreamProducer(options): DurableStreamProducer` | Blessed Service-facing producer factory. Wraps `createDurableStream` reusing `getStreamsUrl`/`getStreamsAuth`; a missing `streams` reference **throws at construction** instead of blocking or silently dropping writes. Install streams and run `netscript service generate` to reconcile a missing reference. |
-| `DurableStreamProducer` | class | `class DurableStreamProducer` | Server-side writer for a named durable stream. |
-| `DurableStreamProducerOptions` | interface | `interface DurableStreamProducerOptions` | Options accepted by `createDurableStream` / `DurableStreamProducer`. |
-| `ServiceStreamProducerOptions` | interface | `interface ServiceStreamProducerOptions extends DurableStreamProducerOptions` | Options for `createServiceStreamProducer`; it has the same fields as `DurableStreamProducerOptions`. |
-| `StreamProducerPort` | interface | `interface StreamProducerPort` | Port implemented by stream producers that publish State Protocol changes. |
-| `inspectStreamTopic` | function | `function inspectStreamTopic(input): StreamTopicInspectionReport` | Inspect a stream schema and optional producer metadata. |
-| `StreamTopicInspectionInput` | interface | `interface StreamTopicInspectionInput` | Input accepted by `inspectStreamTopic`. |
-| `StreamTopicInspectionReport` | interface | `interface StreamTopicInspectionReport` | Diagnostic report returned by `inspectStreamTopic`. |
-
-#### Configuration helpers
-
-| Symbol | Kind | Signature | Description |
-| --- | --- | --- | --- |
-| `getStreamsUrl` | function | `function getStreamsUrl(): string` | Resolve the base URL of the durable streams server. |
-| `getStreamsAuth` | function | `function getStreamsAuth(): Record` | Resolve authentication headers for the durable streams server. |
-| `buildStreamUrl` | function | `function buildStreamUrl(path, baseUrl): string` | Build the full stream URL for a NetScript stream path. |
-
-#### Schema and event types
-
-| Symbol | Kind | Description |
-| --- | --- | --- |
-| `StateSchema` | type alias | Schema map returned by `defineStreamSchema`. |
-| `StreamStateDefinition` | type alias | Input map accepted by `defineStreamSchema`. |
-| `CollectionDefinition` | interface | A single collection definition inside a durable stream schema. |
-| `CollectionWithHelpers` | type alias | Collection definition after durable-streams helper methods are attached. |
-| `CollectionEventHelpers` | interface | Helper methods attached to collections by `@durable-streams/state`. |
-| `StateEvent` | type alias | Durable stream event union. |
-| `ChangeEvent` | interface | Entity change event emitted by durable stream producers. |
-| `ControlEvent` | interface | Control event emitted by durable streams for non-entity lifecycle changes. |
-| `Operation` | type alias | State Protocol operation names supported by durable streams. |
-
-### Telemetry (`@netscript/plugin-streams-core/telemetry`)
-
-| Symbol | Kind | Signature | Description |
-| --- | --- | --- | --- |
-| `streamsInstrumentation` | variable | `const streamsInstrumentation: StreamsInstrumentationRegistration` | Telemetry registration for stream publish, consume, and subscribe spans. |
-| `StreamsInstrumentationRegistration` | interface | `interface StreamsInstrumentationRegistration` | Minimal instrumentation contract understood by NetScript telemetry hosts. |
-| `STREAMS_SPAN_NAMES` | variable | `const STREAMS_SPAN_NAMES` | Span names emitted by stream producers and consumers. |
-| `STREAMS_TELEMETRY_ATTRIBUTES` | variable | `const STREAMS_TELEMETRY_ATTRIBUTES` | Attribute keys used by stream telemetry. |
-| `StreamsSpanName` | type alias | Span name emitted by stream instrumentation. |
-| `StreamsTelemetryAttributeKey` | type alias | Attribute key used by stream telemetry. |
-| `StreamsTelemetryAttributes` | type alias | Attribute bag accepted by stream instrumentation hooks. |
-
-### Testing (`@netscript/plugin-streams-core/testing`)
-
-| Symbol | Kind | Signature | Description |
-| --- | --- | --- | --- |
-| `MemoryStreamProducer` | class | `class MemoryStreamProducer` | In-memory stream producer for tests that should not open network sockets. |
-| `MemoryStreamEvent` | interface | `interface MemoryStreamEvent` | Event recorded by `MemoryStreamProducer`. |
-| `createStreamTopicFixture` | function | `function createStreamTopicFixture(): StreamTopicFixtureSchema` | Create a small stream schema fixture with one `execution` collection. |
-| `StreamTopicFixtureSchema` | type alias | Schema shape returned by `createStreamTopicFixture`. |
+The separately published
+[`@netscript/plugin-streams-core`](/reference/plugin-streams-core/) page is canonical for stream
+schemas, producers, configuration, telemetry, testing, and diagnostics. This page stays focused on
+the deployable plugin's manifest and integration entrypoints. The testing example below uses core
+APIs intentionally; exhaustive core entrypoint and symbol tables live only on its reference page.
 
 ## Socket-Free Testing and Telemetry
 

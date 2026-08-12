@@ -6,8 +6,8 @@ title: "@netscript/plugin-auth-core"
 # `@netscript/plugin-auth-core`
 
 Auth plugin contracts, backend ports, stream schemas, config schemas, telemetry
-primitives, and testing primitives for NetScript auth plugins. This page is generated
-from the package's public surface with `deno doc`.
+primitives, and testing primitives for NetScript auth plugins. This page is written against the
+package's public surface reported by `deno doc`.
 
 ## Backend ports and errors
 

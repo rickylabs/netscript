@@ -5,8 +5,8 @@ title: "@netscript/sdk"
 
 # `@netscript/sdk`
 
-Service discovery, oRPC clients, and cache-backed query factories for NetScript. This page
-is generated from the package's public surface with `deno doc` (US-2). For the full index of
+Service discovery, oRPC clients, and cache-backed query factories for NetScript. This page is
+written against the package's public surface reported by `deno doc`. For the full index of
 packages and plugins return to the [reference overview](/reference/).
 
 The root entrypoint (`@netscript/sdk`) is the high-level composition preset for service-aware

@@ -5,8 +5,8 @@ title: "@netscript/plugin"
 
 # `@netscript/plugin`
 
-Plugin manifest, validation, discovery, and host-context contracts for NetScript. This page
-is generated from the package's public surface with `deno doc` (US-2). For the full index of
+Plugin manifest, validation, discovery, and host-context contracts for NetScript. This page is
+written against the package's public surface reported by `deno doc`. For the full index of
 packages and plugins return to the [reference overview](/reference/).
 
 The root entrypoint (`@netscript/plugin`) is the plugin authoring contract: the
