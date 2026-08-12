@@ -1433,3 +1433,50 @@ acting on it. A watcher is a wake-up mechanism, never evidence.
 `success`**, and exactly **one** trigger comment was posted (`head=7264ce6aa`). Before PR-F this pattern
 produced one red 404 run beside one success. That is #1566's fix confirmed in production on the next
 occurrence, and it is why the dedup evidence is worth citing at the cut.
+
+## D-43 — the asset-barrel gate proves currency, not closure (severity: significant)
+
+PR #1596's `check-test` failed at
+`packages/cli/src/public/features/agent/init/init-agent_test.ts:580` — the installed consumer bundle's
+`quality/scan-code-quality.ts --help` exits 1. Reported by the owner, **reproduced locally**, real, and mine.
+
+**Mechanism.** `renderAgentToolEmbeddedContent()` bundles exactly what `.llm/tools/consumer-tools.json`
+enumerates, with **no transitive import resolution**. When C1/R-10 made the scanner *consume*
+`../docs/snippet-extractor.ts` rather than fork a second fence parser, the embedded scanner gained an import the
+bundle cannot satisfy:
+
+```text
+error: Module not found "file:///tmp/…/docs/snippet-extractor.ts".
+    at file:///tmp/…/quality/scan-code-quality.ts:2:37
+bundled paths: [… "quality/scan-code-quality.ts" …]   ← docs/snippet-extractor.ts absent
+```
+
+The manifest's two categories both exclude this case: `supportFiles` is metadata, `tools` are runnable
+diagnostics carrying `symptom` + `permissions` and surfaced as consumer commands. A library module is neither.
+
+**Why my gate missed it — the reusable part.** Gate 7 (`gen:assets-barrel`, then `git status --porcelain`
+empty) **passed, twice**, including as an idempotence proof. The result was true and answered the wrong
+question: it proves the barrel is **current with respect to the manifest**, not that the bundle is **complete
+with respect to its own imports**. The generator faithfully embedded a file whose second line cannot resolve.
+
+This is the lane's own thesis turned on me: a gate reporting success on a property *adjacent* to the one that
+matters. It happened on my leaf, one PR after I recorded the asset-barrel coupling as D-22 and then failed to
+apply it. Two distinct failures now trace to the same generated-asset boundary, and neither was caught by the
+gate I added for it.
+
+**Fix shape (not the one-liner).** Listing the extractor under `tools` would misfile a non-runnable module as a
+runnable diagnostic with an invented `symptom`/`permissions` and expose it as a consumer command. Correct: a
+**third manifest category for bundled module dependencies** — in the file set and the ordered-path hash, out of
+the runnable surface — plus **a test asserting every relative import of every bundled file resolves to a bundled
+path**, with a negative control. The test is the durable deliverable; without it the next tool that grows an
+import breaks consumers silently and `gen:assets-barrel` stays green throughout. Inlining a second copy of the
+extractor is excluded: two fence parsers that can drift is what R-10 forbids.
+
+**Sequencing (owner instruction).** Evaluated head `7264ce6aa` frozen until the active DeepSeek IMPL-EVAL is
+terminal; correction lands afterward on a new immutable head, then exactly one re-triggered IMPL-EVAL.
+`scaffold-static` at this head is unrelated and genuinely infrastructural (`Error: socket hang up`) — re-run,
+do not investigate.
+
+**Gate correction for future briefs:** the asset-barrel gate is two gates, and I had been writing only the
+first. (a) regenerate and assert an empty `git status` — currency; (b) install the bundle to a temp dir and
+execute each runnable tool's `--help` — closure. (b) is what a consumer actually does, and only (b) fails here.
