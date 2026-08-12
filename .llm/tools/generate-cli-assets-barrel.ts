@@ -387,12 +387,15 @@ export async function readAgentDocsEmbeddedBundle(
     );
   }
   const compressed = await Deno.readFile(new URL('.llm/assets/agent-docs/prose.json.gz', root));
-  const digest = await crypto.subtle.digest('SHA-256', new Uint8Array(compressed).buffer);
+  const copy = new Uint8Array(compressed);
+  const stream = new Blob([copy.buffer]).stream().pipeThrough(new DecompressionStream('gzip'));
+  const uncompressed = new Uint8Array(await new Response(stream).arrayBuffer());
+  const digest = await crypto.subtle.digest('SHA-256', uncompressed.buffer);
   const hash = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join(
     '',
   );
-  if (hash !== provenance.sha256 || compressed.byteLength !== provenance.compressedBytes) {
-    throw new Error('Agent docs compressed prose does not match provenance.json');
+  if (hash !== provenance.sha256 || uncompressed.byteLength !== provenance.uncompressedBytes) {
+    throw new Error('Agent docs canonical prose does not match provenance.json');
   }
   return { compressed, provenance };
 }

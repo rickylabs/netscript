@@ -168,16 +168,20 @@ async function sha256(bytes: Uint8Array): Promise<string> {
 
 async function inflateProse(): Promise<Readonly<Record<string, string>>> {
   const compressed = decodeBase64(EMBEDDED_AGENT_DOCS_GZIP_BASE64);
-  if (await sha256(compressed) !== EMBEDDED_AGENT_DOCS_PROVENANCE.sha256) {
-    throw new Error(
-      'Embedded offline documentation prose failed its SHA-256 check',
-    );
-  }
   const stream = new Blob([new Uint8Array(compressed).buffer]).stream()
     .pipeThrough(
       new DecompressionStream('gzip'),
     );
-  const decoded = JSON.parse(await new Response(stream).text()) as {
+  const uncompressed = new Uint8Array(await new Response(stream).arrayBuffer());
+  if (
+    await sha256(uncompressed) !== EMBEDDED_AGENT_DOCS_PROVENANCE.sha256 ||
+    uncompressed.byteLength !== EMBEDDED_AGENT_DOCS_PROVENANCE.uncompressedBytes
+  ) {
+    throw new Error(
+      'Embedded offline documentation prose failed its canonical SHA-256 check',
+    );
+  }
+  const decoded = JSON.parse(new TextDecoder().decode(uncompressed)) as {
     readonly schemaVersion: number;
     readonly files: Readonly<Record<string, string>>;
   };
