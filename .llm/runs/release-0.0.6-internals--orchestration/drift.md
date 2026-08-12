@@ -1603,3 +1603,61 @@ hash the body cites — not by eye.
 
 **Sequencing note:** this repair changes only the PR **body**, never the head, so it does not disturb the
 evaluated tree or consume an evaluation generation.
+
+## D-47 — the authorized evaluation generation was consumed by a network flake (severity: significant)
+
+The single authorized evaluation generation for corrected head `a1010e314` fired correctly (one trigger comment,
+dispatch `31622678606` success) and then **produced no verdict**:
+
+```text
+<!-- openhands-run: {"run_id":31622691685,"attempt":1,"conclusion":"failure","state":"not-run",
+                     "verdict":"NONE","verdict_source":"none"} -->
+## OpenHands Agent — Did not run
+Toolchain bootstrap failed, so the agent never ran.
+This is a workflow failure, not a task verdict.
+```
+
+Root cause, from the run log — **the same flake that killed `scaffold-static` 45 minutes earlier**:
+
+```text
+Downloading Deno from https://github.com/denoland/deno/releases/download/v2.9.5/…
+socket hang up  → wait 13s → socket hang up → wait 10s → ##[error]Error: socket hang up
+```
+
+Two independent job failures in one hour from `socket hang up` against GitHub-hosted downloads. Neither is a
+task outcome; both are transport.
+
+**Decision and its justification.** Re-entered the documented label lifecycle **once** to obtain the evaluation.
+A bootstrap failure that never started the agent is not a duplicate evaluation — there was no evaluation to
+duplicate — and the label cycle is the documented rerun mechanism, not a manual dispatch. The alternatives were
+both worse: merging with no independent verdict on the corrected head would be **self-certification** (the
+harness's one unconditional prohibition), and the only verdict on record, `FAIL_FIX`, was against the superseded
+head `7264ce6aa`.
+
+**Distinction worth preserving:** "the evaluation generation was spent" and "an evaluation was delivered" are
+different facts, and only the second one licenses a merge decision. A `state:not-run` / `verdict:NONE` marker is
+the machine-readable form of "spent, not delivered". Any policy that counts triggers rather than verdicts will
+eventually merge on a flake.
+
+## D-48 — my own verdict poller reproduced the exact bug I had just documented (severity: moderate)
+
+Having recorded in D-45 that verdict detection must anchor on the `<!-- openhands-run -->` marker, I wrote a
+poller that concatenated **all** matching comment bodies and then grepped the marker and the verdict
+**independently**, each with `tail -1`. It paired a marker from one comment with a verdict from another and
+reported:
+
+```text
+TERMINAL_FOR_NEW_GENERATION: OPENHANDS_VERDICT: FAIL_PLAN
+```
+
+`FAIL_PLAN` came from an unrelated older comment; the marker it was paired with said `"conclusion":"running"`.
+The exit condition also matched any `3162…` run id, so it fired on a run that was still in progress.
+
+That is the same defect class as D-42/D-44 — a detector conflating independent fields and reporting a confident
+verdict that does not exist — committed by me **immediately after** writing the rule against it. Four instances
+now in one afternoon: `gh-watch` three times, my own poller once.
+
+**Rule:** parse per-comment and keep fields from a single comment together; require the marker's `run_id` to
+equal the generation under consideration **and** its `conclusion` to be terminal **and** the verdict to be in
+**that same** comment body. Never grep two facts out of a concatenated blob and treat them as related — that is
+not a detection heuristic, it is a coincidence generator.
