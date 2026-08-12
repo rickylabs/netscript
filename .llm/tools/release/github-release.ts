@@ -445,7 +445,7 @@ async function deriveAgentDocsProvenance(
     files,
     uncompressedBytes: uncompressed.byteLength,
     compressedBytes: compressed.byteLength,
-    sha256: await sha256Hex(compressed),
+    sha256: await sha256Hex(uncompressed),
   };
 }
 

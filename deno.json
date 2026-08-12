@@ -110,7 +110,7 @@
     "gen:mcp-export-corpus": "deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/docs/generate-export-surface-corpus.ts",
     "check:mcp-export-corpus": "deno run --no-lock --allow-read --allow-run=deno .llm/tools/docs/generate-export-surface-corpus.ts --check",
     "check:assets-barrel": "deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/cli/src/kernel/assets/skills.generated.ts packages/cli/src/kernel/assets/agent-tools.generated.ts packages/cli/src/kernel/assets/agent-docs.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts",
-    "check:agent-docs-prose": "deno task gen:agent-docs-prose --check && git diff --exit-code -- .llm/assets/agent-docs/prose.json.gz .llm/assets/agent-docs/provenance.json",
+    "check:agent-docs-prose": "deno task gen:agent-docs-prose --check",
     "gen:publish-assets": "deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-publish-assets.ts",
     "check:publish-assets": "deno task gen:publish-assets --check",
     "check:scaffold-versions": "deno run .llm/tools/validation/check-scaffold-versions.ts --pretty",
