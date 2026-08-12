@@ -23,7 +23,7 @@ separate session writes `plan-eval.md` with `PASS`.
 - `auditFirstPublishPackages()` — preserves README/tagline/license/export first-publish policy and
   no longer owns reference existence.
 - `checkPublicCommandReference()` (planned name) — exported docs-policy audit accepting a command
-  tree/catalog and reference Markdown, invoked by `runAccuracyCheck()`.
+  tree/catalog and the exact two-file Markdown corpus, invoked by `runAccuracyCheck()`.
 - No new end-user CLI command, option, package export, or page URL.
 
 ### Domain Vocabulary
@@ -41,8 +41,8 @@ separate session writes `plan-eval.md` with `PASS`.
 - `auditPublishSet` dependency — authoritative publish membership.
 - Existing `exists` filesystem seam — reference-page presence.
 - Existing `PublicCliCommandCatalog` / enumerable Cliffy command seam — live public command tree.
-- Markdown text input — injected in tests; production reads the exhaustive public command reference
-  (and any explicitly declared companion source needed by the ratified predicate).
+- Markdown corpus — injected in tests; production reads exactly
+  `docs/site/reference/cli/commands.md` plus `docs/site/cli-reference.md`.
 - No new network, registry, filesystem abstraction, or source parser.
 
 ### Constants
@@ -50,6 +50,7 @@ separate session writes `plan-eval.md` with `PASS`.
 - `REFERENCE_PAGE_ALIASES` — four entries: sagas, streams, triggers, workers.
 - `EXPECTED_PUBLIC_DIRECT_COMMAND_COUNT` — `91`, asserted against the exact root/direct-child set.
 - `NETSCRIPT_COMMAND_PREFIX` — `netscript` for rendered diagnostics.
+- `COMMAND_REFERENCE_PATHS` — the exact two-file corpus, not a broad docs glob.
 - Existing gate ids plus new `docs-reference`; no duplicate string list of commands.
 
 ### Command Surface / Composition Contract
@@ -68,7 +69,7 @@ separate session writes `plan-eval.md` with `PASS`.
 | --- | --- | --- | --- |
 | P | Decision-locked plan and Design checkpoint | Separate-session PLAN-EVAL | Run artifacts |
 | S1 | Whole-publish-set path coverage and alias convention | Release unit + raw negative + scoped release wrappers | Release tool/test, index, run artifacts |
-| S2 | Tree-derived direct-subcommand coverage | Docs unit + raw negative + docs accuracy + scoped docs wrappers | Docs checker/test, run artifacts |
+| S2 | Tree-derived direct-subcommand coverage plus bounded four-row unblock | Docs unit + raw negative + docs accuracy/links + scoped docs wrappers | Docs checker/test, reference index, commands page, run artifacts |
 | S3 | Composed merge-readiness evidence and lock hygiene | Docs links/accuracy, publish dry-run, repo tests, scoped wrappers | Run artifacts only unless reviewed fix required |
 
 ### Deferred Scope
@@ -92,6 +93,7 @@ and coverage diagnostic name any missing path. Do not edit a command list in the
 | 2026-08-12 | P | Bootstrap | Wrote `supervisor.md` first; loaded named skills and harness policy. |
 | 2026-08-12 | P | Arrival checks | Baseline exact; PR-C ancestor; alias convention yields 35/35 reference coverage. |
 | 2026-08-12 | P | Design | Locked alias, check placement, release unblock, command-tree scope, census, and negative controls. |
+| 2026-08-12 | P | FAIL_PLAN revision | Locked the two-page corpus, exact 91 equality, structural root plus tokenized path matching, four-row S2 unblock, and retracted the false sagas-path premise. |
 
 ## Decisions
 
@@ -101,7 +103,8 @@ and coverage diagnostic name any missing path. Do not edit a command list in the
 | Separate whole-set readiness check | Prevent registry/new-package skip | `plan.md` D-2 |
 | Page/stub with follow-up is unblock; no bypass | Release gate needs a bounded repair path | `plan.md` D-3; release skill |
 | Live tree, root/direct children, colon-safe | Predicate must be executable and nonliteral | `plan.md` D-4–D-6 |
-| Four deploy prose gaps return to orchestrator | PR-C owns prose; strict gate must not be weakened | `plan.md` D-7 |
+| Exact two-page corpus and structural matching | Prevent implicit corpus drift and root-prefix false greens | `plan.md` D-7/D-8 |
+| Four deploy rows owned by S2 | Make the strict gate executable without an ownerless predecessor | `plan.md` D-9 |
 
 ## Gate Results
 
@@ -112,13 +115,12 @@ All implementation gates are `NOT_RUN` by design in phase 1.
 | Baseline identity | PASS | branch `fix/1377-docs-reference-gate-scope`; head `fa5d0d411…` |
 | PR-C landed | PASS | `db1d79c68…` is an ancestor of HEAD |
 | Reference arrival coverage | PASS | 35 effective, 35 present under locked alias resolver, 0 missing |
-| PLAN-EVAL | PENDING | Must be the automatic status-driven plan evaluator; this generator cannot self-evaluate |
+| PLAN-EVAL | FAIL_PLAN → REVISION_READY | Fallback evaluation failed head `5ba4bc339`; revised head requires a new automatic status-driven evaluation; this generator cannot self-evaluate |
 | Type/lint/fmt/docs/publish/tests | NOT_RUN | Phase 2 only after PLAN-EVAL PASS |
 | Raw negative controls | NOT_RUN | Phase 2 only; both raw exit codes and diagnostics required |
 
 ## Handoff Notes
 
-- Evaluator should challenge D-4/D-6 first: whether 91 is the correct direct-subcommand surface and
-  whether compact deeper command families are safely deferred.
-- Evaluator should verify D-7 is treated as a real dependency, not an excuse to reduce coverage.
+- Evaluator should verify the exact two-file corpus, structural root plus tokenized path matching,
+  exact 91 equality, and bounded four-row ownership satisfy B1–B3 without expanding into #1108.
 - No implementation file has been edited.

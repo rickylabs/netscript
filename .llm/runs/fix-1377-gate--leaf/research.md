@@ -23,9 +23,9 @@
 | 6 | The existing `firstPublishFixture()` can seed a missing reference page. Tests can reuse it after reference existence is separated from first-publish policy. | `.llm/tools/release/publish-readiness_test.ts:369-415` |
 | 7 | The live public command tree already has a recursive, tree-derived catalog: `PublicCliCommandCatalog` walks `getCommands()` and emits paths. No source parser or literal command list is needed. | `packages/cli/src/public/features/agent/mcp/cli-mcp-adapters.ts:7-51` |
 | 8 | The live catalog currently has 15 root entries, 91 root-or-immediate-child entries, and 149 recursive entries. The five `ui:*` commands are colon-form root entries, not nested `ui` children. | focused `deno eval --unstable-kv` against `createPublicCommandRegistry()` and `PublicCliCommandCatalog` |
-| 9 | A literal full-path search across the exhaustive and curated CLI pages finds 87/91 root-or-immediate-child paths. Four real immediate children (`deploy start`, `deploy stop`, `deploy status`, `deploy uninstall`) have no exact public-doc occurrence. This is a PR-C content finding, not permission for PR-D to write prose. | focused catalog evaluation plus `rg -F` over `docs/site`; see plan dependency D-7 |
+| 9 | Corpus choice is load-bearing: `docs/site/reference/cli/commands.md` alone misses 25/91, `docs/site/cli-reference.md` alone misses 25/91, and their exact union misses 4/91 (`deploy start`, `deploy stop`, `deploy status`, `deploy uninstall`). | focused tree-derived census against each file and their union; evaluator-confirmed FAIL_PLAN B1/B2 |
 | 10 | The command-reference checker is naturally part of `docs:accuracy`, whose implementation and tests already own textual command-policy checks. | `deno.json:82`; `.llm/tools/docs/check-accuracy-and-discoverability.ts` and `_test.ts` |
-| 11 | PR-C's short sagas path remains consumed by `docs:accuracy`. Choosing aliases preserves it; moving the IA would widen scope and change published URLs. | `.llm/tools/docs/check-accuracy-and-discoverability.ts`; PR-C drift DR-3 |
+| 11 | **Retraction:** carried research C-3 and this run's first plan incorrectly claimed `check-accuracy-and-discoverability.ts` hardcodes `docs/site/reference/sagas/index.md`. It does not; its only hardcoded reference path is the SDK page. The real second hardcoded-path consumer is `check-exports-drift.ts`, whose eight paths include none of the four aliases and whose expansion remains #1108's scope. | `rg "reference/sagas" .llm/tools/` → no matches; focused reads of both checkers |
 | 12 | `publish:dry-run` is a required final gate but may rewrite catalog-backed manifests under #1417. Status must be inspected immediately and incidental manifest/lock churn restored without committing it. | dispatch boundary; `.agents/skills/netscript-tools/SKILL.md` lock hygiene |
 
 ## jsr-audit surface scan
@@ -45,5 +45,7 @@
   public tree, with a census assertion over that exact set. Recursive grandchildren are deferred
   because the reference intentionally documents generated deploy families compactly rather than as
   every cross-product path.
-- Four missing deploy lifecycle strings: orchestrator/PR-C follow-up dependency, not prose authored
-  by this implementation agent.
+- Command corpus: exact union of `docs/site/reference/cli/commands.md` and
+  `docs/site/cli-reference.md`, ratified in the reference index.
+- Four missing deploy lifecycle strings: bounded gate-enabling rows owned by S2, so no external
+  predecessor remains.

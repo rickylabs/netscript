@@ -36,35 +36,39 @@ must exit non-zero with package/command diagnostics.
 - Split reference-page existence out of `auditFirstPublishPackages` and run it directly over
   `publishSet.effective`.
 - Declare four exact package-to-page aliases matching `docs/site/reference/index.md`.
-- Add tree-derived root/immediate-subcommand coverage to `docs:accuracy` with an asserted census.
+- Add tree-derived root/immediate-subcommand coverage to `docs:accuracy` over the locked two-page
+  command corpus with an exact asserted census.
 - Add focused positive and negative tests and preserve raw non-zero negative-control evidence.
-- Clarify the reference-index convention once so it describes the gate contract, not only observed
-  layout.
+- Clarify the reference index once for both page paths and the two-page command corpus.
+- Add the four missing deploy lifecycle rows and correct the command-reference completeness claim
+  so the strict gate is green on arrival.
 
 ## Non-Scope
 
 - Reference page content/export-map verification (#1108) or `check-exports-drift` expansion.
 - README standard/staleness (#767), fenced-block extraction (#1374), installed-artifact proof
   (#1343), package renames, URL moves, or command behavior changes.
-- Authoring missing package pages or filling PR-C command prose. Missing content is reported to the
-  orchestrator.
+- Authoring package/API reference content beyond the bounded four command rows needed to activate
+  the gate.
 - The unreachable deploy `emit` operation (#1544).
 
 ## Locked Decisions
 
 | ID | Decision | Criterion and rationale |
 | --- | --- | --- |
-| D-1 | Use a declared four-entry alias map; do not move the IA. | Criterion: minimize irreversible public-URL and cross-gate change while making the release predicate agree with the already published site. Aliases change one resolver, preserve inbound links and `docs:accuracy`, and match PR-C's enumerated convention. Moving four URLs would create avoidable user-facing breakage and broader proof obligations. The inconsistency is bounded and explicit rather than inferred. |
+| D-1 | Use a declared four-entry alias map; do not move the IA. | Criterion: preserve published URLs while making the release predicate agree with the measured site. Name-exact resolution misses exactly the four deployable plugins; the four aliases produce 35/35 coverage and match PR-C's enumerated convention. Moving four URLs would create avoidable user-facing breakage. The retracted claim that `check-accuracy-and-discoverability.ts` consumes the short sagas path is not part of this decision: it does not. The real hardcoded-path consumer, `check-exports-drift.ts`, covers eight other paths and remains #1108's untouched scope. |
 | D-2 | Add a separate `docs-reference` readiness check immediately after `publish-set`. | `publishSet.effective` is the authoritative coordinated publish set. Placing the check here makes it independent of JSR registry discovery and prevents it being skipped with first-publish checks. `auditFirstPublishPackages` retains only README/tagline/license/export policy. If publish-set evidence is unavailable, `docs-reference` is explicitly `SKIP`; publish-set itself is already `FAIL`, so readiness cannot falsely pass. |
 | D-3 | A missing page is release-blocking, with a bounded content escape hatch rather than a bypass flag. | A publishable member without a page turns `docs-reference` red. A maintainer unblocks by adding the canonical page resolved by the convention; when full prose cannot land before a cut, the release skill permits an explicit stub that names and links the tracked content follow-up. No ignore list, environment override, or silent exemption is added. #1108 remains responsible for content/export fidelity. |
-| D-4 | Derive command obligations from the materialized public tree through `PublicCliCommandCatalog`; never parse `.command()` source and never hardcode verbs. | This executes the same tree users/MCP see and already walks every child. The checker selects all root entries plus each root entry's immediate children. That is the acceptance level that catches a new group subcommand while respecting compact documentation of deeper generated command families. |
+| D-4 | Derive command obligations from the materialized public tree through `PublicCliCommandCatalog`; never parse `.command()` source and never hardcode verbs. | This executes the same tree users/MCP see and already walks every child. The checker selects all root entries plus each root entry's immediate children. This deliberately diverges from #1377's acceptance wording, which says command **group**: all 15 groups already have prose, so a group-only predicate is inert. The negative test therefore removes a direct **subcommand** from the documentation and audits the correction explicitly when acceptance evidence is posted. Deeper generated command families remain compactly documented and out of this slice's predicate. |
 | D-5 | Treat colon-form `ui:*` names as complete root command paths. | A tree path `ui:add` renders as `netscript ui:add`; it must not be rewritten to `netscript ui add`. The normal nested form remains `netscript <group> <subcommand>`. |
-| D-6 | Assert the exact audited census, not a neighboring or merely printed count. | Production evidence reports and asserts 91 root-or-immediate-child command paths on this baseline (15 roots plus 76 direct children). The test also asserts the derived path set; any public-tree growth changes the count and requires corresponding documentation. The count is computed from the tree and compared to the ratified floor, not used as a literal verb list. |
-| D-7 | PR-D will not author four newly discovered deploy lifecycle prose entries. | The focused arrival check found `deploy start`, `deploy stop`, `deploy status`, and `deploy uninstall` absent as exact public command paths. PR-C owns prose. The orchestrator must land/authorize its content follow-up before the implementation slice can claim `docs:accuracy` green. The gate remains strict; it will not be weakened to hide these four paths. |
-| D-8 | Raw negative controls invoke the exported gate functions one case at a time. | A unit test that expects a rejection exits zero and is insufficient evidence. Each control command seeds exactly one missing page/command, invokes the real exported audit, prints its diagnostic, and leaves the process at raw exit 1. Tests separately lock the diagnostic contract. |
+| D-6 | Assert exact equality with the audited census, not a floor or a merely printed count. | Production code and tests require exactly 91 root-or-immediate-child paths on this baseline: 15 roots plus 76 direct children. A tree addition makes the census assertion red even if prose happens to match, forcing maintainers to inspect and ratify the new obligation and update the expected count. The constant is a count, never a literal verb list. Recursive census 149 is reported for context but is not the asserted coverage set. |
+| D-7 | Lock the command coverage corpus to the union of exactly two files: `docs/site/reference/cli/commands.md` and `docs/site/cli-reference.md`. | Measured separately, each file misses 25 of 91 obligations; their union misses 4. The gate reads both and no other docs. The reference index records that the public command contract is the two-page union, while `commands.md` is amended so it no longer falsely promises completeness by itself. This makes the corpus stable and auditable instead of dependent on an implementer's interpretation of “the command reference.” |
+| D-8 | Match documented commands structurally, never with raw substring `includes`. | Tokenize `netscript` invocations across the full locked Markdown corpus and resolve each against the recursive tree catalog. A root obligation is credited only by an explicit root declaration (a matching command heading/top-level entry or an exact root invocation), never by a descendant invocation: `netscript agent init` cannot satisfy `netscript agent`. A direct-child obligation is credited by that exact invocation or a resolved descendant whose immediate prefix is that child, so compact deeper-family examples still establish their direct parent. Tests lock root non-prefix behavior, sibling isolation, direct-parent projection, and colon-form ids as single exact tokens. Coverage remains the root/direct 91; recursive 149 is matching context, not a neighboring asserted census. |
+| D-9 | S2 owns four bounded gate-enabling command rows. | `deploy start`, `deploy stop`, `deploy status`, and `deploy uninstall` are real registered direct children with dedicated handlers. S2 adds their rows to `commands.md`, changes its self-description to agree with the two-page-union convention, and records that convention in the reference index. This is the smallest executable unblock; it does not reopen PR-C's broader prose scope or touch the unrelated unrouted `emit` defect (#1544). |
+| D-10 | Raw negative controls invoke the exported gate functions one case at a time. | A unit test that expects a rejection exits zero and is insufficient evidence. Each control command seeds exactly one missing page/command, invokes the real exported audit, prints its diagnostic, and leaves the process at raw exit 1. Tests separately lock the diagnostic contract. |
 
-The reference-index change records D-1 once: normal scoped-name stripping plus exactly four declared
-aliases. It does not rename or add pages.
+The reference-index change records D-1 once for page paths and D-7 once for command coverage. It
+does not rename or add package pages.
 
 ## Open-Decision Sweep
 
@@ -75,12 +79,13 @@ aliases. It does not rename or add pages.
 | Missing-page release escape | resolved now | D-3 |
 | Command-tree depth and `ui:*` normalization | resolved now | D-4/D-5 |
 | Census assertion | resolved now | D-6 |
-| Four prose gaps | resolved now, external dependency | D-7; do not start implementation if the strict baseline cannot be made green without violating scope |
+| Command corpus and matching semantics | resolved now | D-7/D-8 |
+| Four prose gaps | resolved now, owned by this slice | D-9; bounded S2 rows make the strict baseline green |
 | Deeper recursive command families | safe to defer | They are represented by compact family tables; a later structural Markdown grammar may expand from 91 to the full 149 without changing this slice's direct-subcommand acceptance. |
 | Content correctness | safe to defer | Owned by #1108; this slice enforces existence only. |
 
-No unresolved decision remains that would force implementation rework. D-7 is a sequencing
-dependency, not permission to modify the predicate.
+No unresolved decision or external predecessor remains that would prevent S1 or S2 from starting
+after PLAN-EVAL PASS.
 
 ## Exact Files
 
@@ -88,13 +93,15 @@ dependency, not permission to modify the predicate.
 | --- | --- |
 | `.llm/tools/release/publish-readiness.ts` | Alias resolver, separate whole-publish-set audit/dependency/evidence row, remove docs check from first-publish audit. |
 | `.llm/tools/release/publish-readiness_test.ts` | Ordered evidence update; 35/35-style whole-set positive; published-member missing-page negative; first-publish regression remains registry-scoped. |
-| `.llm/tools/docs/check-accuracy-and-discoverability.ts` | Tree-derived command-reference coverage, colon-aware rendering, asserted census, `runAccuracyCheck()` integration. |
-| `.llm/tools/docs/check-accuracy-and-discoverability_test.ts` | Synthetic public-tree positive and missing-direct-subcommand negative; colon-form control; census behavior. |
-| `docs/site/reference/index.md` | One bounded convention sentence declaring that the four listed paths are gate aliases. No page content or URL move. |
+| `.llm/tools/docs/check-accuracy-and-discoverability.ts` | Tree-derived command-reference coverage over the exact two-file corpus, structural root matching, tokenized recursive-path resolution, colon-aware rendering, exact census assertion, and `runAccuracyCheck()` integration. |
+| `.llm/tools/docs/check-accuracy-and-discoverability_test.ts` | Synthetic public-tree positive and missing-direct-subcommand negative; root-prefix false-positive control; colon-form control; exact census behavior. |
+| `docs/site/reference/index.md` | Declare the four page aliases and state once that CLI command coverage is the union of the curated and detailed command pages. No package page or URL move. |
+| `docs/site/reference/cli/commands.md` | Add the four missing deploy lifecycle rows and replace the false claim that this page alone contains every command with the ratified two-page-union contract. |
 | `.llm/runs/fix-1377-gate--leaf/{supervisor,research,plan,worklog,context-pack,drift}.md` | Harness decisions, evidence, per-slice results, resume state, and drift. |
 
-If implementation requires any other product or prose file, stop and rescope through the
-orchestrator rather than silently widening the slice.
+`docs/site/cli-reference.md` is an input to the gate but is not edited. If implementation requires
+any other product or prose file, stop and rescope through the orchestrator rather than silently
+widening the slice.
 
 ## The Two Negative Tests
 
@@ -102,10 +109,11 @@ orchestrator rather than silently widening the slice.
    it is already published, and its resolved canonical page is absent. The report must contain
    `docs-reference: FAIL`, package name, resolved path, rule `docs-reference`, and `ok=false`. The raw
    one-case command must exit 1.
-2. **Missing command-tree subcommand:** a synthetic materialized tree adds a direct child under an
-   otherwise documented group without adding reference prose. Coverage must identify the rendered
-   `netscript <group> <subcommand>` path, report the audited/covered counts, and fail. A separate
-   colon control proves `ui:add` stays colon-form. The raw one-case command must exit 1.
+2. **Missing command-tree subcommand:** the synthetic two-page corpus documents the group but omits
+   one direct child from a materialized tree. Coverage must identify the rendered
+   `netscript <group> <subcommand>` path, report the audited/covered counts, and fail. Separate
+   controls prove `netscript <group> <other-subcommand>` cannot satisfy the root or missing child,
+   and that `ui:add` stays colon-form. The raw one-case command must exit 1.
 
 ## Commit Slices
 
@@ -113,7 +121,7 @@ orchestrator rather than silently widening the slice.
 | --- | --- | --- | --- |
 | P | The decision-locked plan is reviewable and implementation has not begun. | Run artifacts only. | Plan-Gate checklist review; separate-session PLAN-EVAL must return PASS before S1. |
 | S1 | Every effective publish member is audited at the PR-C path convention, independently of registry/new-package state, and a missing page fails. | Release tool/test, reference index, run artifacts. | Focused `deno test --allow-all .llm/tools/release/publish-readiness_test.ts`; raw missing-page control exit 1; scoped release check/lint/fmt wrappers. |
-| S2 | Every public root/direct-child command is derived from the live tree, colon-safe, census-asserted, and an undocumented child fails. | Docs checker/test, run artifacts. | Focused `deno test --allow-all --unstable-kv .llm/tools/docs/check-accuracy-and-discoverability_test.ts`; raw missing-subcommand control exit 1; `rtk proxy deno task docs:accuracy`; scoped check/lint/fmt wrappers over owned tool roots. |
+| S2 | The ratified two-page corpus covers every live public root/direct child, exact matching is prefix-safe and colon-safe, the exact 91 census is asserted, and an undocumented child fails. | Docs checker/test, `docs/site/reference/index.md`, `docs/site/reference/cli/commands.md`, run artifacts. | Focused `deno test --allow-all --unstable-kv .llm/tools/docs/check-accuracy-and-discoverability_test.ts`; raw missing-subcommand control exit 1; `rtk proxy deno task docs:accuracy`; `rtk proxy deno task docs:links`; scoped check/lint/fmt wrappers over owned tool roots. |
 | S3 | The composed release/docs gate set stays green and leaves no incidental manifest/lock churn. | Run artifacts only unless reviewed fixes are required. | `docs:links`, `docs:accuracy`, `publish:dry-run`, repo tests, scoped release check/lint/fmt; immediate raw git status after dry-run. |
 
 Each implementation slice updates `worklog.md` and `context-pack.md`, receives a separate
@@ -147,10 +155,11 @@ release cut.
 | False red blocks a canary/stable cut. | Audit `publishSet.effective`, preserve alias resolver in one constant, retain independent evidence, test published and new members. |
 | Registry outage suppresses reference coverage. | Place check before and outside registry discovery. |
 | Alias drift creates another hidden convention. | Exact four-entry constant plus index table and tests for alias and name-exact `-core` paths. |
-| Command gate is inert or literal-list based. | Consume materialized tree; raw synthetic child negative; assert 91 obligations, not only print it. |
+| Command gate is inert, prefix-vacuous, or literal-list based. | Consume the materialized tree; require structural root matches and tokenized command-path resolution; run the raw synthetic-child negative; assert exact equality with 91 obligations, not only print it. |
 | `ui:*` false negative. | Dedicated colon-form test and path renderer rule. |
+| Corpus selection silently changes the result. | Read exactly the two locked files; index states their union; tests pass inputs separately and together. |
 | Compact nested command families create false reds. | Lock this slice to root/immediate-child acceptance and defer recursive family grammar explicitly. |
-| Existing four prose gaps make strict gate red. | D-7 orchestrator dependency; do not weaken or author prose in this slice. |
+| Existing four prose gaps make strict gate red. | S2 owns exactly four rows and the completeness-contract correction; no external predecessor remains. |
 | `publish:dry-run` rewrites manifests/lock. | Immediate raw status/diff and restore only identified incidental churn; never commit it. |
 
 ## Arch-Debt Implications
@@ -163,11 +172,9 @@ the implementation.
 ## Dependencies and Drift Watch
 
 - Hard dependency: separate-session PLAN-EVAL PASS.
-- Sequencing dependency: the orchestrator resolves D-7 before strict `docs:accuracy` can be claimed
-  green without PR-D writing prose.
 - Log drift if effective publish count differs from 35, command census differs from 91, aliases
-  differ from PR-C's four, another file hardcodes the path convention, or implementation needs a
-  third production file.
+  differ from PR-C's four, either locked command-corpus path changes, or implementation needs an
+  additional production/prose file.
 
 ## Deferred Scope
 
