@@ -54,13 +54,14 @@ export function createQueryFactory<TContract extends ContractLike>(
   const factory: Record<string, unknown> = {
     resource,
     invalidate: async (): Promise<void> => {
-      await getCacheProvider().invalidateQueries([resource]);
+      await getCacheProvider().invalidateQueries([resource], `${resource}.all`);
     },
   };
 
   const actionNames = Object.keys(contract) as Array<ContractProcedureNames<TContract>>;
 
   for (const action of actionNames) {
+    const operationId = `${resource}.${String(action)}`;
     const actionMethod = async (
       props: ProcedureInput<TContract, typeof action>,
       options: QueryParams = {},
@@ -79,13 +80,14 @@ export function createQueryFactory<TContract extends ContractLike>(
           cacheTime,
           revalidateOnStale,
           preferFreshOnStale,
+          operationId,
           queryFn: () => invokeClientProcedure(client, action, props),
         },
       );
     };
 
     actionMethod.invalidate = async (): Promise<void> => {
-      await getCacheProvider().invalidateQueries([resource, action]);
+      await getCacheProvider().invalidateQueries([resource, action], operationId);
     };
 
     actionMethod.key = (
@@ -116,6 +118,7 @@ export function createQueryFactory<TContract extends ContractLike>(
           cacheTime,
           revalidateOnStale,
           preferFreshOnStale,
+          operationId,
           queryFn: () => invokeClientProcedure(client, action, props),
         },
       );
@@ -126,12 +129,14 @@ export function createQueryFactory<TContract extends ContractLike>(
     ): Promise<ProcedureOutput<TContract, typeof action> | null> => {
       return await getCacheProvider().getCachedData(
         createActionQueryKey(resource, action, props),
+        operationId,
       );
     };
 
     actionMethod.getCachedEntry = async (props: ProcedureInput<TContract, typeof action>) => {
       return await getCacheProvider().getCachedEntry(
         createActionQueryKey(resource, action, props),
+        operationId,
       );
     };
 

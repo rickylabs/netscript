@@ -136,3 +136,22 @@ the active `defer.cache.read` test span and preserves trace/parent ids.
 SDK scoped check has no findings. Full-export doc lint has only the two pre-existing TanStack
 `QueryClient` private-type references and no new cache diagnostics. No Fresh-owned path was touched,
 no dependency was added, and `deno.lock` has no Git delta.
+
+## S4 — normalized operation identity propagation
+
+- Generated contract queries always pass the static `${resource}.${action}` identity through read,
+  prefetch, cache-only, and action-invalidation paths; a per-call `operationId` cannot override it.
+- Composite queries normalize an explicit static default operation id and otherwise use the fixed
+  `composite` namespace. Direct `CacheQuery` methods retain fixed fallbacks.
+- Namespace normalization lowercases, collapses separators, rejects unbounded syntax by reduction,
+  caps output at 80 characters, and never reads the serialized query key or props.
+- Public SDK docs now describe the one-span event model, custom-provider incomplete evidence,
+  namespace privacy, and the exact measured-loader semantics.
+
+### S4 focused evidence
+
+Query-factory tests assert `orders.list` across query/cache-only/invalidation methods even when a
+caller supplies an override, and assert explicit `billing.dashboard` plus fixed `composite`
+identities without exposing `private-tenant`. The SDK task passes all 55 tests and scoped check has
+no findings. No Fresh-owned path or partial-request behavior changed, and `deno.lock` has no Git
+delta.

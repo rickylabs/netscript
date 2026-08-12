@@ -8,6 +8,8 @@
  * Cache policy overrides for a query execution.
  */
 export interface QueryParams {
+  /** Normalized operation identity used for cache telemetry, never a cache key. */
+  operationId?: string;
   /** How long data is considered fresh in milliseconds. */
   staleTime?: number;
   /** How long to keep data in cache in milliseconds. */

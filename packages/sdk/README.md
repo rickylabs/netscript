@@ -126,6 +126,30 @@ object, so the telemetry wrapper added at that boundary cannot be skipped by dir
 reports contain operation facts only. Raw cache keys, serialized inputs, values, URLs, and user data
 must never be copied into a descriptor or report.
 
+`CacheQuery` turns those reports into one INTERNAL span per logical `cache.read`, `cache.write`, or
+`cache.invalidate` operation. Consulted tiers are ordered `cache.lookup` events; write-through and
+promotion are `cache.write` and `cache.promote` events; prefix invalidation aggregates repeated keys
+to at most one event per tier. A one-, two-, or three-tier ordinary read therefore adds exactly one
+span to a request trace (the 41-span evidence trace for this contract becomes 42, not 44). A stale
+background refresh may add one explicitly parented `cache.write` completion span.
+
+Generated contract queries use the normalized `resource.action` namespace. Composite queries use a
+static `operationId` from `defaultOptions`, or the fixed `composite` fallback; direct `CacheQuery`
+calls accept a static `operationId`, or use a fixed direct-method fallback. Operation ids are
+lowercase, separator-normalized, and capped at 80 characters. They are contract metadata: never
+construct one from query props, tenant/user ids, cache keys, values, or URLs.
+
+`backend_executed` is measured only when the `queryFn` closure is entered. It is `false` for a fresh
+hit, cache-only read, provider failure before the loader, and the losing trace in an in-flight join
+(`inflight_joined=true`); it becomes `true` for cold, blocking-stale, background-revalidation, and
+loader-error paths. Misses, durations, and revalidation flags are never proxies for loader entry.
+
+Custom high-level `CacheProvider` objects registered without the package-owned `CacheQuery` marker
+still receive a logical span from the registration boundary. Because that interface cannot prove an
+internal tier chain, the boundary honestly reports `topology_complete=false` and outcome `error`
+while measuring loader entry. Migrate such providers to a `CacheStore` with mandatory reports and
+register a `CacheQuery` to produce complete topology.
+
 ### Desktop RPC bindings
 
 Inside a Deno Desktop webview, reuse the same contract as the runtime router without declaring a

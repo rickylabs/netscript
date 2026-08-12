@@ -9,6 +9,7 @@ import { DEFAULT_QUERY_CACHE_TIME, DEFAULT_QUERY_STALE_TIME } from '../cache/def
 import { serializeQueryKeyInput } from '../ports/query-key.ts';
 import type { CompositeQuery } from '../ports/query-factory.ts';
 import type { QueryParams } from '../ports/query-options.ts';
+import { normalizeCacheNamespace } from '../cache/cache-telemetry.ts';
 
 /**
  * Create a composite query that combines multiple endpoints under one cache key.
@@ -38,6 +39,7 @@ export function createCompositeQuery<
     revalidateOnStale: defaultRevalidateOnStale = true,
     preferFreshOnStale: defaultPreferFreshOnStale = false,
   } = defaultOptions;
+  const defaultOperationId = normalizeCacheNamespace(defaultOptions.operationId, 'composite');
 
   const compositeQuery = async (
     props: TProps,
@@ -48,6 +50,7 @@ export function createCompositeQuery<
       cacheTime = defaultCacheTime,
       revalidateOnStale = defaultRevalidateOnStale,
       preferFreshOnStale = defaultPreferFreshOnStale,
+      operationId = defaultOperationId,
     } = options;
 
     return await getCacheProvider().query(
@@ -57,22 +60,27 @@ export function createCompositeQuery<
         cacheTime,
         revalidateOnStale,
         preferFreshOnStale,
+        operationId,
         queryFn: () => queryFn(props),
       },
     );
   };
 
   compositeQuery.invalidate = async (): Promise<void> => {
-    await getCacheProvider().invalidateQueries([...key]);
+    await getCacheProvider().invalidateQueries([...key], defaultOperationId);
   };
 
   compositeQuery.getCachedData = async (props: TProps): Promise<TOutput | null> => {
-    return await getCacheProvider().getCachedData([...key, serializeQueryKeyInput(props)] as const);
+    return await getCacheProvider().getCachedData(
+      [...key, serializeQueryKeyInput(props)] as const,
+      defaultOperationId,
+    );
   };
 
   compositeQuery.getCachedEntry = async (props: TProps) => {
     return await getCacheProvider().getCachedEntry(
       [...key, serializeQueryKeyInput(props)] as const,
+      defaultOperationId,
     );
   };
 
@@ -86,6 +94,7 @@ export function createCompositeQuery<
       cacheTime = defaultCacheTime,
       revalidateOnStale = defaultRevalidateOnStale,
       preferFreshOnStale = defaultPreferFreshOnStale,
+      operationId = defaultOperationId,
     } = options;
 
     void getCacheProvider().prefetch(
@@ -95,6 +104,7 @@ export function createCompositeQuery<
         cacheTime,
         revalidateOnStale,
         preferFreshOnStale,
+        operationId,
         queryFn: () => queryFn(props),
       },
     );
