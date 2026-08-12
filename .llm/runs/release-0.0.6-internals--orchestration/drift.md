@@ -630,3 +630,33 @@ Trusted base SHA: d7e2b67b2be535c9ca13449f97f8f4585344030a
   way to make the close-gate and mirror observe a new label is to **re-run** the existing run, not to push —
   explicitly so an existing IMPL-EVAL verdict is not invalidated. That is strictly more useful than the flat
   "label, then push" this lane started with, and it is the version C7 ships.
+
+## D-22 — editing a bundled `.llm/tools/` file requires same-PR asset-barrel regeneration
+
+- **Severity:** significant (a real coupling; third gate my brief got wrong)
+- **Recorded:** 2026-08-12, PR #1560 CI
+- **Finding:** `ci.yml`'s `quality` job step **"Generated asset freshness"** (`ci.yml:299`) failed at PR-E's
+  head. The full source text of `.llm/tools/quality/scan-code-quality.ts` is **embedded as a string** inside
+  generated CLI asset barrels — both `packages/cli/src/kernel/assets/skills.generated.ts` and
+  `packages/cli/src/kernel/assets/agent-tools.generated.ts` contain it. So the `isTypeFixture` change made
+  those generated files stale, and the freshness check diffs regenerated output against what is committed.
+- **Remedy:** `deno task gen:assets-barrel` (`deno.json:105`), committed in the same PR.
+- **Why it was missed, and why that matters.** `tooling.md` documents that
+  `generate-cli-assets-barrel.ts` must stay at the tools root *because its path is embedded in four
+  generated files* — the coupling is written down, from the generator's side. What is **not** written down
+  anywhere is the consequence for the other direction: that editing a *bundled tool* obligates regenerating
+  the barrel. Neither #1530, nor this lane's brief, nor the rail plan's validation table carried it, so the
+  implementer had no way to catch it locally. It is only discoverable from CI or from reading the barrel
+  generator's inputs.
+- **This is the third gate this lane's briefs got wrong**, all of the same shape — a required command the
+  brief did not name:
+  1. D-8: Gate 1 missing `--allow-write` (9 tests call `Deno.makeTempDir()`).
+  2. D-8: still missing `--allow-run` (one test spawns a subprocess).
+  3. D-22: no barrel regeneration for a bundled tool edit.
+  Each was found by execution, not review, and each cost one CI or gate cycle. The rail plan's validation
+  table now carries the barrel step for PR-B/C/D, which all touch `.llm/tools/`.
+- **Worth promoting beyond this run.** A contributor editing `.llm/tools/quality/**` or
+  `.llm/tools/fitness/**` has no local signal that a generated barrel depends on their file. The durable
+  fix is either a note in `tooling.md` § Tool layout stating the obligation in the tool-author's direction,
+  or making the freshness check runnable as a named task so it can be listed in a gate set. Recorded here;
+  not taken by this PR, whose boundary is `.llm/tools/quality/**`.

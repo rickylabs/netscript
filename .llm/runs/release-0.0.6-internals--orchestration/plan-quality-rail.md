@@ -145,6 +145,7 @@ Revision 1 inherited that claim without re-measuring and was failed on it (`drif
 | 5 | doctrine (curated) | `deno task arch:check` | exit 0 throughout |
 | 6 | doctrine (repo) | `deno task arch:check:repo` | exit 1 / FAIL=55 before PR-C; after PR-C exit 0 or enumerated residue |
 | 7 | scoped wrappers | `run-deno-{check,lint,fmt}.ts --root .llm/tools --ext ts` | pass |
+| 7b | **generated asset freshness** | `deno task gen:assets-barrel`, then `git status --porcelain` must be **empty** | **Mandatory for every rail PR.** The source of `.llm/tools/quality/**` and `.llm/tools/fitness/**` files is embedded as strings in `packages/cli/src/kernel/assets/{skills,agent-tools}.generated.ts`, so editing a bundled tool makes them stale and reds `ci.yml`'s `quality` job. Found the hard way on PR-E (`drift.md` D-22). The empty-status re-run also proves the generator is idempotent. |
 | 8 | doctrine-document tests | PR-C's existence + coverage tests | fail on a fabricated row and on an ungated live unit |
 | 9 | budget-link step | the added `code-quality` step, exercised on PR-D itself | red when the budget rises without a same-diff issue link |
 
