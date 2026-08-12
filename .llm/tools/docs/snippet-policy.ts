@@ -80,7 +80,9 @@ export async function analyzeSnippetSite(
 
   const tier1Pages = new Set<string>(TIER_1_PAGES);
   const tsLikeBlocks = blocks.filter((block) => block.checkedLanguage !== undefined);
-  const tier1Blocks = tsLikeBlocks.filter((block) => tier1Pages.has(block.sourcePath));
+  const tier1Blocks = options.enforceCoverage === false
+    ? tsLikeBlocks
+    : tsLikeBlocks.filter((block) => tier1Pages.has(block.sourcePath));
   const exemptions = tier1Blocks.filter((block) => block.exemptionReason !== undefined);
   const checked = tier1Blocks.length - exemptions.length;
 

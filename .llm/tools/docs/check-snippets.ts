@@ -1,4 +1,5 @@
 import { dirname, fromFileUrl, join } from '@std/path';
+import { compileSnippetAnalysis } from './snippet-compiler.ts';
 import { analyzeSnippetSite, formatSnippetCensus } from './snippet-policy.ts';
 
 const repositoryRoot = dirname(dirname(dirname(dirname(fromFileUrl(import.meta.url)))));
@@ -18,7 +19,12 @@ async function main(args: string[]): Promise<void> {
   });
 
   if (!args.includes('--extract-only')) {
-    throw new Error('snippet compiler is introduced by implementation slice 2');
+    const result = await compileSnippetAnalysis(analysis, repositoryRoot);
+    if (result.code !== 0) {
+      console.error(formatSnippetCensus(analysis.census, 'FAIL'));
+      console.error(result.diagnostics.trimEnd());
+      Deno.exit(result.code);
+    }
   }
 
   console.log(formatSnippetCensus(analysis.census));

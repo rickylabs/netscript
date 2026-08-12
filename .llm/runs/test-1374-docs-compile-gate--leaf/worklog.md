@@ -84,6 +84,7 @@ focused negative controls before the repo suite.
 | 2026-08-12 | Phase 1 revision | Plan & Design | D2 now uses a copied temporary lock without `--frozen` plus root-catalog fallback; containment/Fresh guards remain; `typescript` is covered; the barrel bug and two island examples move to checked. Revised floor is 35 = 21 checked + 14 exempt. |
 | 2026-08-12 | PLAN-EVAL cycle 2 | `PASS` | Fresh opposite-family session verified every cycle-1 fix by execution. Two mandatory additive D2 mechanics were recorded before implementation: carry the root catalog section and canonicalize equivalent import ranges. |
 | 2026-08-12 | Slice 1 | Extractor contract | Added stable source/fence provenance, backtick/tilde parsing, `ts`/`tsx`/`typescript` recognition, exact reason markers, bidirectional coverage floors, the real-corpus census test, and the empty-reason CLI fixture. |
+| 2026-08-12 | Slice 2 | Compiler contract | Added exact public-export resolution, canonicalized root/member imports, root-catalog fallback and copied catalog, disposable copied-lock compilation, page-isolated modules, typed query support, and real export/dialect controls. |
 
 ## Decisions
 
@@ -134,10 +135,34 @@ Reconcile: PR #1537 remains draft with `status:impl`, `Closes #1374`, milestone 
 required type/area/priority labels. New comments contained only the already-recorded #1378 extractor
 consumer boundary; no scope or issue-state readjustment was required.
 
+### Slice 2 — synthetic compiler and public entrypoints
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Scoped type-check | PASS | Wrapper selected 21 docs-tool TS files; 0 diagnostics; exit 0. |
+| Scoped lint | PASS | Wrapper selected 21 docs-tool TS files; 0 findings; exit 0. |
+| Scoped format | PASS | Wrapper selected 21 docs-tool TS files; 0 findings; exit 0. |
+| Focused tests | PASS | `deno task docs:snippets:test`: 8 passed, 0 failed. |
+| Copied-lock green control | PASS | Dialect-A positional fixture exits 0 with 37 discovered members and 38 copied catalog entries; temporary lock is rewritten while tracked root lock bytes remain unchanged. |
+| Raw non-exported-symbol control | EXPECTED_RED | `deno task docs:snippets:negative non-exported-symbol`: exit 1; source fence `page.md:1`; TS2305 names `DefinitelyNotExportedByNetScript`. |
+| Raw dialect-A wrong-shape control | EXPECTED_RED | `deno task docs:snippets:negative dialect-a-object-input`: exit 1; source fence `page.md:1`; TS2353 says `input` does not exist in `{ id: string }`. |
+| Dialect positive controls | PASS | Direct dialect-A positional and dialect-B `{ input }` fixture invocations both exit 0 through the same typed public-factory support. |
+| Lock hygiene | PASS | `deno.lock` is clean after all compiler/test/control runs. |
+
+Slice review: the generated configuration exposes only exact workspace-declared `@netscript/*`
+exports, materializes catalog-only transitive imports, copies the 38-entry root catalog, and compares
+canonicalized package requirements. Page-local imports resolve within isolated temporary roots;
+diagnostics map generated paths back to source fence lines. Typed support contains no `any` or casts,
+and the wrong dialect remains a real excess-property error.
+
+Reconcile: PR #1537 remains draft at `status:impl`; the only cross-lane instruction still applies:
+#1378 consumes the stable extractor provenance surface and does not fork the parser. No new reviewer
+comment changed the locked slice plan.
+
 ## Handoff Notes
 
-- PLAN-EVAL cycle 2 should verify the copied-lock/catalog recipe, 21/14 bidirectional floor,
-  preserved containment/Fresh rules, the barrel-fix disposition, both materialized island modules,
-  and the unconditional Pages workflow assertion. Dialect discrimination remains unchanged after
-  its cycle-1 compiled controls passed.
-- No implementation file, docs marker, task, or workflow has been changed in Phase 1.
+- Slice 3 applies the 14 structural markers, fixes the barrel binding, compiles the real Tier-1
+  floor through the checked support modules, writes the expansion ratchet, and demotes only the
+  named positive `docs:accuracy` assertions.
+- Keep `createServiceQueryUtils` page containment, the site-wide Fresh-root guard, and
+  `check-exports-drift` unchanged.
