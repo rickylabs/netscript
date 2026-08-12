@@ -278,3 +278,81 @@ The wrapper's useful work — launching the slice — had already completed, and
 runs in GitHub Actions, so a local kill could not reach it. **The sanctioned path was never at risk;
 only the prohibited one was stopped.** Worth stating because "I killed processes and something exited
 143" is exactly the kind of event that should be checked rather than assumed benign.
+
+---
+
+## D-9 — both automatic evaluators stalled; one native fallback each, by owner authorization
+
+**Severity: significant. Recorded 2026-08-12.**
+
+The automatic label-driven lifecycle — which D-4/D-5 established as the *only* evaluation path for
+this lane — **stalled on both open PRs at once**:
+
+| Run | PR | Phase | Model | Created | Outcome |
+| --- | --- | --- | --- | --- | --- |
+| `31616560752` | #1593 (#1583) | IMPL-EVAL | DeepSeek | ~16:14Z | cancelled after >20 min, no update |
+| `31616569894` | #1595 (#1589) | PLAN-EVAL | MiniMax | ~16:14Z | cancelled after >20 min, no update |
+
+The owner authorized **exactly one** native Opus 5 fallback per PR, with explicit constraints: no
+label cycling, no second paid evaluator, immutable clean detached worktree at the evaluated head,
+read-only, and a **trigger-immune final comment only** — no running commentary.
+
+Executed as authorized:
+
+| PR | Fallback worktree | Evaluated head | Clean | Verdict |
+| --- | --- | --- | --- | --- |
+| #1593 | `/home/codex/repos/ns006-1583-fbeval` | `b96b5a58e` | 0 | **FAIL_FIX** |
+| #1595 | `/home/codex/repos/ns006-1589-fbeval` | `ec596b353` | 0 | **PASS** |
+
+Both fallback briefs enforced: read-only, **no sub-agent spawning** (Fable and `deep_analysis` named
+explicitly per D-8), **no posting to GitHub** — the evaluator returns its verdict and the orchestrator
+posts it — and **no OpenHands invocation syntax anywhere in the returned text**, so the final comment
+is trigger-immune *by construction* rather than by review. Both posted comments were verified to
+contain zero invocation tokens before publication.
+
+**Why the no-posting rule matters.** An evaluator that posts its own verdict is one string away from
+re-triggering the dispatcher it is standing in for. Removing the capability is cheaper than auditing
+the output.
+
+**Public provenance.** The lifecycle labels showed only a cancelled run with verdict `NONE`. A
+fallback verdict that lives only in an embedded agent transcript is not evidence anyone else can
+audit, so each verdict was posted as a single final PR comment naming the exact evaluated head.
+
+### Sub-drift: the resume path does not carry the requested effort
+
+Both leaves already had registered senders, so the correction/implementation cycles were dispatched
+via `agentic:codex-resume` rather than a fresh launch — correct per the one-sender-per-worktree guard.
+`codex exec resume` takes no `--model`/`--effort`; the thread keeps its original binding, so both
+resumed at **gpt-5.6-sol / high** where the brief specified low and medium respectively. Same model
+family, higher effort — harmless here, but the launcher's route flags are **not** a control surface on
+the resume path, and a brief that states an effort tier cannot enforce it.
+
+## D-10 — C2 (#1583 late-join) closed by inspection rather than by follow-up issue
+
+The fallback IMPL-EVAL raised, as advisory C2, that a late-joining subscriber now receives only a
+**suffix** — pre-fix, every subscriber opened its own physical stream replaying from `initialOffset`.
+It could not determine whether this causes real transcript loss, because the transport
+(`@durable-streams/tanstack-ai-transport`) is external and no in-repo caller iterates
+`connection.subscribe`. The owner's instruction was to file a bounded-replay follow-up **only if
+needed after external transport behaviour is checked**.
+
+Checked, and **not needed**. `createChatSubscriptionHub` is invoked at
+`packages/fresh/src/runtime/ai/create-chat-connection.ts:395`, **inside**
+`createNetScriptChatConnection` — the hub is scoped to one connection instance, not module-global.
+Therefore:
+
+- Two distinct islands each construct their own connection, hence their own hub and their own physical
+  stream, each replaying from `initialOffset`. Cross-island sharing does not occur.
+- A reconnect after all subscribers stop passes through retirement and opens a fresh physical stream —
+  a **full replay**, not a suffix.
+- The only way two subscribers coexist on one hub is two `subscribe()` calls on the **same connection
+  object**.
+
+That last case is exactly the duplicate-subscription scenario #1583 exists to eliminate: **the
+late-join window is the duplicate-subscriber window.** Documenting the rule is sufficient; a replay
+buffer would add a buffer to serve a case the same PR removes. Recorded here rather than filed,
+because "we decided not to file" is itself a decision the next reader needs.
+
+C6 from the #1595 PLAN-EVAL was the opposite call and **was** filed, as **#1598** — the
+cache-provider throw naming its own `import.meta.url` is the only remedy that reaches
+already-generated consumers, whom #1589's build-time gate structurally cannot reach.

@@ -13,6 +13,12 @@ changes are in files this slice already touches.
 | Branch | `fix/1583-duplicate-sse-subscriptions` |
 | Head | `b96b5a58e` — the evaluated head, clean |
 
+## SKILL
+
+- `deno-fresh` — Preact/Fresh runtime semantics for the test probes.
+- `netscript-doctrine` — `packages/fresh` is framework code; `runtime/ai` is published surface.
+- `netscript-tools`, `netscript-pr`, `netscript-harness`.
+
 Read the `[PHASE: FALLBACK IMPL-EVAL]` comment on PR #1593 first. It verified your work in detail:
 the three new tests are genuinely red without the fix, the retirement race at
 `chat-subscription-hub.ts:70` is a correct mutual-exclusion barrier, SR2 is byte-equivalent, and no

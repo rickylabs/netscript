@@ -12,6 +12,14 @@ findings, and the plan has been **amended**. Implement the amended plan.
 | Branch | `fix/1589-sdk-provider-closure` |
 | Head | `ff2c18149` — plan amendments already committed, clean |
 
+## SKILL
+
+- `netscript-deno-toolchain` — **read first.** Version resolution, workspace/import-map semantics,
+  `catalog:` resolution, and why two module instances can coexist.
+- `netscript-cli` — the generated-workspace task surface this gate is emitted into.
+- `netscript-doctrine` — `packages/sdk` is published surface.
+- `netscript-tools`, `netscript-pr`, `netscript-harness`.
+
 **Read `.llm/runs/release-0.0.6-features--orchestration/slices/plan-1589.md` in full, including the
 `# Amendments after fallback PLAN-EVAL` section at the end.** The amendments are binding. Also read
 the `[PHASE: FALLBACK PLAN-EVAL]` comment on PR #1595 — it verified your mechanism analysis and
