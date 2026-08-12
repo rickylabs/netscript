@@ -35,7 +35,8 @@ required CI lane detect any future site/corpus drift.
 ## Non-Scope
 
 - No `docs/site` content edits.
-- No corpus selection changes (#1260) and no MCP export-surface changes (#1201).
+- No corpus selection/ranking changes and no MCP export-surface changes. Historical issues #1260
+  and #1201 are closed; the ranking regression discovered by regeneration is tracked by #1615.
 - No package source edits beyond regenerated `.generated.ts` output.
 - No CLI/scaffold E2E.
 
@@ -58,8 +59,8 @@ required CI lane detect any future site/corpus drift.
 
 | Decision | Status | Notes |
 | -------- | ------ | ----- |
-| Corpus membership | safe to defer | Owned by #1260; preserve current non-site entries. |
-| MCP serving/export shape | safe to defer | Owned by #1201; this leaf only refreshes existing generated input. |
+| Corpus membership/ranking | safe to defer | Preserve current non-site entries; #1260 is closed for corpus presence, while the ranking regression is tracked by #1615. |
+| MCP serving/export shape | safe to defer | No change in this leaf; historical issue #1201 is closed. |
 
 ## Risk Register
 

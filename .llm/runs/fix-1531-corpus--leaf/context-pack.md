@@ -6,15 +6,16 @@
 | ----- | ----- |
 | Run ID | `fix-1531-corpus--leaf` |
 | Branch | `fix/1531-agent-docs-corpus-gate` |
-| Current phase | `handoff` |
+| Current phase | `cycle-2 handoff` |
 | Archetype | N/A — docs/tooling |
 | Scope overlays | `SCOPE-docs.md` |
 
 ## Current State
 
-Draft PR #1608 exists from bootstrap commit `73ed851d3`. Implementation, regeneration, direct
-census, positive/negative freshness proofs, and requested validation are complete. PLAN-EVAL is
-recorded N/A; the orchestrator owns the separate native Opus 5 read-only IMPL-EVAL fallback.
+Draft PR #1608 received an exact-head native Opus 5 `FAIL_FIX`. The corpus mechanism, negative
+control, determinism, and shipped-vocabulary accuracy defense were independently confirmed. Cycle 2
+rebases onto `origin/main@6aee2b414`, refreshes moving-base generated outputs, corrects ownership to
+#1615, and records two non-blocking check/provenance limitations.
 
 ## Completed
 
@@ -25,14 +26,17 @@ recorded N/A; the orchestrator owns the separate native Opus 5 read-only IMPL-EV
   MCP; `@contracts` fell 8→0.
 - Negative source-drift control returned raw exit 1, then restoration reran green.
 - Focused, generated-asset, docs, scoped static, and root-test gates recorded in `worklog.md`.
+- Rebased cleanly onto `origin/main@6aee2b414` and regenerated corpus plus both dependent generated
+  assets without touching `deno.lock`.
 
 ## In Progress
 
-- None in this implementation session; the draft PR is handed back to the orchestrator.
+- Commit/push the cycle-2 immutable head and update PR evidence.
 
 ## Next Steps
 
-1. Orchestrator dispatches the native Opus 5 read-only evaluator against the immutable head.
+1. Orchestrator dispatches a fresh native Opus 5 read-only evaluator against the cycle-2 immutable
+   head.
 2. If another docs change lands before merge, rerun `deno task gen:agent-docs-prose`, rebuild
    publish assets, and require `deno task check:agent-docs-prose` to be clean.
 
@@ -40,7 +44,7 @@ recorded N/A; the orchestrator owns the separate native Opus 5 read-only IMPL-EV
 
 | Decision | Source | Notes |
 | -------- | ------ | ----- |
-| Preserve non-site entries | plan D1/D2 | Avoids taking #1260 content-selection scope. |
+| Preserve non-site entries | plan D1/D2 | #1260 is closed for corpus presence; ranking regression is tracked by #1615. |
 | Workflow-call the check | plan D3 | A task alone is not a gate. |
 | Audit shipped vocabulary | plan D4 | Independent defense for stale terminology. |
 
@@ -59,10 +63,10 @@ recorded N/A; the orchestrator owns the separate native Opus 5 read-only IMPL-EV
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
 | Static | pass | Focused tests plus scoped check/lint/fmt are green. |
-| Fitness/docs | partial | Corpus, snippets, accuracy pass; links has two unchanged-base anchor failures. |
+| Fitness/docs | partial | Cycle-2 corpus, snippets, and accuracy pass; links retains two unchanged-base anchor failures and is not workflow-called. |
 | Runtime | N/A | No runtime behavior. |
 | Consumer | pass | MCP generated asset has zero `api-clients`; asset checks pass. |
-| Repo tests | partial | 3300 pass; one unchanged-base fitness failure and one #1260 corpus-ranking drift. |
+| Repo tests | partial | 3300 pass; one unchanged-base fitness failure and one #1615 corpus-ranking drift. |
 
 ## Open Questions
 
@@ -70,11 +74,13 @@ recorded N/A; the orchestrator owns the separate native Opus 5 read-only IMPL-EV
 
 ## Drift and Debt
 
-- Drift: evaluator override, two pre-existing link failures, one pre-existing JSDoc failure, and one
-  refreshed-corpus ranking mismatch deferred to #1260.
+- Drift: evaluator override, two pre-existing link failures, one pre-existing JSDoc failure owned
+  by #1612 / PR #1614, the #1615 ranking mismatch, moving-base regeneration, mutating check mode,
+  and provenance semantics.
 - Debt: none.
 
 ## Commits
 
-- `73ed851d3` — activate the harness run and draft PR.
-- `26b759023` — implement, regenerate, and validate the corpus freshness gate.
+- `429dbfdfb` — rebased bootstrap/harness activation commit.
+- `53bd62062` — rebased corpus freshness implementation commit.
+- `d07384b38` — rebased cycle-1 handoff-evidence commit and cycle-2 normal-generation provenance source.

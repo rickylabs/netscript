@@ -40,9 +40,11 @@ documentation.
 - **Actual:** Corpus freshness changes the score-only top three, so the test fails deterministically
   for both adapters after they agree with each other.
 - **Severity:** surfaced/out-of-scope
-- **Action:** defer to #1260, which owns corpus content selection; do not modify docs content,
-  ranking behavior, or the fixture in this stale-snapshot leaf.
+- **Action:** defer to #1615, which now tracks corpus-wide term-statistics coupling and the locked
+  ranking regression. #1260 is closed after addressing corpus presence; do not modify docs
+  content, ranking behavior, or the fixture in this stale-snapshot leaf.
 - **Evidence:** Root test exit 1; named failure in `packages/mcp/tests/guidance-evaluation_test.ts`.
+  `git diff --quiet 0551ff592 HEAD -- packages/mcp/tests/` exits 0.
 
 ## 2026-08-12 — pre-existing published JSDoc codename
 
@@ -52,5 +54,44 @@ documentation.
 - **Expected:** Published JSDoc contains no internal workstream codenames.
 - **Actual:** The finding exists at base and the file is unchanged on this branch.
 - **Severity:** pre-existing
-- **Action:** defer; unrelated package source is outside this leaf.
+- **Action:** defer to #1612 / PR #1614; unrelated package source is outside this leaf.
 - **Evidence:** `git diff --quiet 0551ff592 -- <source file>` exits 0.
+
+## 2026-08-12 — cycle-2 moving-base regeneration
+
+- **What:** `origin/main` moved from `0551ff592` to `6aee2b414` and changed the triggers reference
+  page after the first corpus snapshot.
+- **Source:** Exact-head native Opus 5 IMPL-EVAL cycle 1.
+- **Expected:** The committed snapshot matches the tree it will merge with.
+- **Actual:** Before cycle 2, the source page had two `TriggerEventSubscriptionMessage` occurrences
+  while its committed corpus entry had one; rebasing and regenerating restored two in both.
+- **Severity:** expected/moving-base
+- **Action:** regenerate again whenever `docs/site` changes before merge; this is not a one-time
+  migration.
+- **Evidence:** Rebase base `6aee2b414`; regenerated corpus SHA-256
+  `105b8e0a081249ae5b93d58fc87ca3dbdbe79de7aa2ef140d0629b29e8757908`.
+
+## 2026-08-12 — failed `--check` mutates the worktree
+
+- **What:** `buildAgentDocsProseFromSite` writes regenerated corpus/provenance bytes before the
+  task runs `git diff --exit-code`.
+- **Source:** Exact-head native Opus 5 IMPL-EVAL cycle 1.
+- **Expected:** A command named `check` is commonly read as non-mutating.
+- **Actual:** A failing freshness check leaves fresh content in the worktree with the preserved,
+  stale check-mode provenance stamps; those bytes are committable.
+- **Severity:** non-blocking/tooling
+- **Action:** record only for this PR; do not redesign the confirmed gate mechanism in #1531.
+- **Evidence:** Generator control flow and negative-control worktree behavior.
+
+## 2026-08-12 — provenance fields are not independently freshness-gated
+
+- **What:** Check mode pins `version`, `sourceCommit`, and `extractionTimestamp` from committed
+  provenance to make byte comparison deterministic.
+- **Source:** Exact-head native Opus 5 IMPL-EVAL cycle 1.
+- **Expected:** Readers may infer that provenance fields continuously prove freshness.
+- **Actual:** A `deno.json` version-only bump or an advancing HEAD can leave old provenance values
+  while the content gate stays green. `sourceCommit` describes the last normal regeneration; it is
+  not an ongoing freshness guarantee.
+- **Severity:** non-blocking/tooling
+- **Action:** record the semantic limitation; do not redesign determinism in this PR.
+- **Evidence:** Check-mode metadata selection in `build-agent-docs-bundle.ts`.

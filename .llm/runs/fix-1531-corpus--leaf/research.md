@@ -27,5 +27,6 @@
 ## Open questions
 
 - Closed in design: preserve the two externally sourced `context/*` entries from the committed
-  corpus while deterministically replacing the site-derived `llms*` and `pages/*` entries. Content
-  selection remains owned by #1260.
+  corpus while deterministically replacing the site-derived `llms*` and `pages/*` entries. #1260
+  is closed after addressing corpus presence; the ranking regression surfaced here is tracked by
+  #1615.
