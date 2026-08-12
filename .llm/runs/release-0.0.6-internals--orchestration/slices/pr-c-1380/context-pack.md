@@ -4,8 +4,8 @@
 
 Draft PR #1585 contains green S1 and S2 changes. The repo gate uses the discovered-root path; the
 doctrine verdict/archetype tables measure the same 36 roots; the provenance, debt, gated-set,
-engineering-reference, and RFC-location records have executable content tests. S3 close-gate
-operator guidance is next.
+engineering-reference, and RFC-location records have executable content tests. S3 now also corrects
+the close-gate rerun guidance and its Claude mirror. The complete final gate matrix is next.
 
 ## Completed
 
@@ -14,16 +14,17 @@ operator guidance is next.
 - Implemented and verified S1.
 - Implemented and verified S2: 36-unit tables, reconciled provenance, accepted-red debt closure,
   documented gate coverage, dated engineering-reference plan, canonical RFC mapping, and six doc tests.
+- Implemented and verified S3: label/rerun guidance, repair hint contract, and regenerated Claude skill.
 
 ## In Progress
 
-- S3: close-gate label/rerun guidance and regenerated Claude mirror.
+- S4: complete final gate matrix, literal evidence, acceptance mapping, and PR handoff.
 
 ## Next Steps
 
-1. Correct `netscript-pr` and the close-gate repair hint to say label then rerun the existing CI run.
-2. Add/adjust validation coverage for that operator instruction.
-3. Sync and check the Claude skill mirror, then commit and comment S3.
+1. Commit and comment S3.
+2. Run every requested final gate on the final source head.
+3. Commit only final run evidence, push, then rerun any source-sensitive gates if the evidence commit changes their inputs.
 
 ## Key Decisions
 

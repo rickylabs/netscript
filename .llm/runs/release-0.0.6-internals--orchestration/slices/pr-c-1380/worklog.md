@@ -59,6 +59,7 @@ Update top-level units, then run the doctrine contract tests; the measured table
 | 2026-08-12 | S0 | Bootstrap | Commit `8ddc17abbe24108b9fc30c35aaae03114336ce20`; draft PR #1585 opened. |
 | 2026-08-12 | S1 | Implement + focused gate | `arch:check:repo` now selects all roots; leading quote/backtick fixture data ignored; real unresolved global remains red. |
 | 2026-08-12 | S2 | Measurement + doc contracts | Doctrine 06/10 now enumerate 36 roots; removed-row provenance, debt closure, gated-set exclusion, dated reference plan, and RFC mapping are executable documentation contracts. |
+| 2026-08-12 | S3 | Operator guidance + mirror | Source/mirrored skill and close-gate hint now require rerunning existing CI after labeling, without a verdict-invalidating push. |
 
 ## Decisions
 
@@ -81,6 +82,9 @@ None as of S1.
 | Doctrine doc contracts | PASS, exit 0 | 6 passed, 0 failed; includes path soundness/coverage, assignment sync, dated plan, RFC mapping, and provenance |
 | `deno task arch:check` | PASS, exit 0 | dependency checks + all 36 doctrine roots, zero FAIL |
 | S2 scoped fitness wrappers | PASS, exit 0 | 7 files selected; check/lint/fmt zero findings |
+| Close-gate focused tests | PASS, exit 0 | 15 passed, 0 failed; repair-hint contract included |
+| S3 scoped validation wrappers | PASS, exit 0 | 18 files selected; check/lint/fmt zero findings |
+| Claude skill mirror | PASS, exit 0 | sync updated one stale skill; `agentic:check-claude` all checks OK |
 
 ## Handoff Notes
 
