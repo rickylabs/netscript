@@ -2136,8 +2136,9 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Closure evidence:** `behavior.package-backed-plugin-doctor` was demonstrated red before the
   product fix, red again after deliberately dropping bounded-probe permission metadata, and green
   in both the focused `scaffold.plugins` run and the serialized `scaffold.runtime` run. The latter
-  executed 89 named gates with 0 failures and 0 skips, including the published workers doctor
-  adapter and cleanup; see the W2-H `evidence.md`.
+  executed 88 printed named gates with 0 failures and 0 skips, including the published workers
+  doctor adapter. Its summary counts an unprinted 89th passed step because `suite-runner.ts` adds
+  the Docker prune step without emitting a reporter event; see the W2-H `evidence.md`.
 
 ## documentation lane authored framework source (`docs-lane-framework-source-1020`)
 

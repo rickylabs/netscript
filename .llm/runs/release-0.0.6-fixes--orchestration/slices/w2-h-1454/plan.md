@@ -5,9 +5,11 @@ orchestrator explicitly says to proceed.**
 
 ## Research baseline
 
-- Branch `fix/1454-plugin-doctor-package-backed` is clean at the requested pinned base
-  `3c9dc1f39`. `origin/main` has advanced, but the intervening changes are unrelated Fresh work; the
-  relevant CLI/plugin files have not moved. Phase 2 will re-sync with `main` before draft → ready.
+- Branch `fix/1454-plugin-doctor-package-backed` began at the requested pinned base `3c9dc1f39`.
+  Before implementation, `main` gained exact-version JSR spec parsing in
+  `plugins/install/plugin-package-resolver.ts` and `plugins/install/install-plugin.ts` through
+  #1456. That additive change lets the E2E pin the published fixture version; the planned doctor
+  fix surface itself was otherwise unchanged. Phase 2 will re-sync with `main` before draft → ready.
 - Primary archetype: CLI / Archetype 6, because this changes a public diagnostic, its exit code, and
   the scaffold E2E surface. Folded concern: plugin / Archetype 5, because doctor consumes published
   plugin manifests and a published doctor adapter. Doctrine status is **Restructure** for

@@ -156,7 +156,7 @@ $ rtk proxy deno task check
 filesSelected=2891 batches=25 failedBatches=0 occurrences=0
 EXIT_CODE=0
 
-$ rtk proxy deno task test
+$ rtk proxy deno task test  # pre-rebase implementation run
 ok | 3260 passed (622 steps) | 0 failed | 17 ignored (3m34s)
 EXIT_CODE=0
 
@@ -185,9 +185,12 @@ repository cwd and passed. CLI source tests and E2E unit tests separately comple
 ## Serialized runtime verdict — substantive PASS
 
 The orchestrator granted the free global slot after independently verifying the focused gates.
-The exact command ran once locally. Raw exit code was 0 and observed wall time was approximately
-5m34s, so this was not a seconds-long classifier short-circuit. All 89 named gates executed; none
-was skipped or cancelled. The untruncated transcript is:
+The exact command ran once locally. Raw exit code was 0. The 88 printed per-gate `PASSED`
+durations sum to 382,151 ms (approximately 6m22s), and the runner executes them serially; total
+wall time is therefore at least that sum plus setup and the unprinted prune step. This was not a
+seconds-long classifier short-circuit. All 88 named gates executed; none was skipped or cancelled.
+The summary's 89th passed step is `cleanup.docker-created-containers`, which `suite-runner.ts`
+adds without emitting a reporter event. The untruncated transcript is:
 
 ```text
 $ deno task e2e:cli run scaffold.runtime --cleanup --format pretty
@@ -394,15 +397,16 @@ by explicit path only, and no publication command ran.
 
 The exact close-out gate is `behavior.package-backed-plugin-doctor`, scheduled in both
 `scaffold.plugins` and `scaffold.runtime`. The focused published-package red/green evidence is above.
-The serialized runtime suite passed with all 89 gates executed, so the
+The serialized runtime suite passed with all 88 named gates executed. Its summary reports 89
+passed because the Docker prune step is counted without a printed reporter event. The
 `cli-plugin-doctor-published-module` row is closed with this focused red → green plus runtime proof.
 
 ## Acceptance status
 
 All implementation claims are pre-merge proven. The six explicit PR-body acceptance items are
 implemented and covered by the focused gate and the substantive serialized runtime pass. Formal
-separate-session IMPL-EVAL remains pending; this implementation session does not self-certify that
-box.
+separate-session IMPL-EVAL recorded **PASS WITH FINDINGS** at `7bbccf514`; this implementation
+session still leaves the formal PR checkbox unticked for the orchestrator to clear.
 
 ## Final synchronization
 
@@ -429,3 +433,30 @@ EXIT_CODE=0
 
 The last two commands had empty output. The post-rebase owned-file forbidden-pattern scan also had
 no matches.
+
+The separate-session IMPL-EVAL then supplied full-suite evidence at evaluated branch head
+`7bbccf514`:
+
+```text
+$ rtk proxy deno task test
+ok | 3268 passed (622 steps) | 0 failed | 17 ignored (5m56s)
+EXIT_CODE=0
+```
+
+The eight additional passes came from `main`; the earlier 3,260-pass result above is retained and
+labelled as the pre-rebase implementation run rather than presented as head-of-branch evidence.
+
+After that verdict, current `origin/main@eb373db29` was merged without rewriting history in merge
+commit `580c30b668`. The semantic overlap in `.llm/harness/debt/arch-debt.md` was reconciled so
+#1585's separate repo-doctrine closeout and #1454's published-doctor closeout both survive. The
+required post-merge gate produced:
+
+```text
+$ rtk proxy deno task quality:gate
+quality:scan ok=true findings=[]
+arch:check completed with FAIL=0; existing doctrine warnings remain visible
+EXIT_CODE=0
+```
+
+The untruncated output is retained as `logs/post-impl-eval-quality-gate.log` in the orchestration
+slice. The post-evaluation working diff changed no file under `packages/**` or `plugins/**`.
