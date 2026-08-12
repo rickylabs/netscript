@@ -1344,3 +1344,43 @@ Verified afterwards: **exactly one `status:` label on all ten items**, all `stat
 single-status rule is what lets the board reflect reality, and a frozen `status:` before merge is a
 documented merge hazard rather than a cosmetic lapse — three of these issues would have shown as
 `triage` on a board while shipped on `main`.
+
+## 2026-08-12 — HARD POLICY: Fable prohibited for all remaining 0.0.6 work
+
+**Owner, restated as hard policy.** No Fable for any remaining 0.0.6 work — no launch, **no
+resume** — until explicitly lifted. Quota at 95% until Saturday. Continue on native Opus 5
+orchestration/sub-agents, Codex GPT-5.6 Sol implementation, and the **automatic** evaluator workflow
+only; never manually trigger OpenHands.
+
+This restates and hardens drift **D-7**, which recorded the same prohibition with the per-route
+substitutions. That table remains the operative mapping and is not repeated here.
+
+### Compliance verified, not asserted
+
+- **No Fable session is live.** Wave 2's four slices are all Codex GPT-5.6 Sol
+  (`019ff614-ab17…` #1460 low, `019ff614-b1e9…` #1456 medium, plus #1540 and #1454 at high).
+  Orchestration is Opus 5. The automatic evaluator routes to
+  `openrouter/deepseek/deepseek-v4-flash-0731` — Fable-free by construction.
+- **No manual OpenHands dispatch has ever been made in this lane**, in any wave.
+
+### The specific hazard this run carries, recorded so it is not tripped
+
+Wave 1 used three **local Fable 5 · medium** IMPL-EVAL sub-agents (slice A cycles 1–3, slice B).
+Those agents are **completed but resumable** — a `SendMessage` to any of their agent ids would
+restart a Fable session and violate this policy silently, because resuming does not look like
+launching.
+
+**Standing rule for the remainder of this lane: those three agent ids are dead to this run.** Their
+verdicts are already captured as files (`verdict.md`, `verdict-2.md`, `verdict-3.md`) and need no
+further interaction. If any question arises about their findings, it is answered from those files or
+re-derived by an allowed route — never by resuming the agent that produced them.
+
+### Effect on wave 2
+
+None blocking. Both PLAN-EVALs (#1540, #1454) run through the **automatic** `openhands` +
+`status:plan-eval` label pair, and all four IMPL-EVALs through the automatic draft → ready trigger.
+Neither path touches Fable. Ordinary adversarial review, if any slice needs it, substitutes Opus at
+the paired effort per D-7 — which preserves opposite-family review rather than trading it away.
+
+If any route not covered by D-7's table resolves to Fable, that dispatch **halts and is reported**
+rather than silently substituted.
