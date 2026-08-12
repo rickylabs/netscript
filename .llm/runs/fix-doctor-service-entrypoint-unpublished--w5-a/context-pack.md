@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-doctor-service-entrypoint-unpublished--w5-a` |
 | Branch | `fix/doctor-service-entrypoint-unpublished` |
-| Current phase | `plan` |
+| Current phase | `implement` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `none` |
 
@@ -19,10 +19,12 @@ path; #1597's E2E availability predicate is already exact-404-only and remains o
 
 - Skills, harness activation, archetype, doctrine verdict, debt, and release context reviewed.
 - Research, locked plan, design checkpoint, and `PLAN-EVAL: N/A` recorded.
+- Three discriminating tests added and run on pre-fix code: expected exit 1; only the unpublished
+  404 warning assertion failed, while published-defect and 503 preservation controls passed.
 
 ## In Progress
 
-- Harness bootstrap commit and draft PR opening.
+- Exact-404-only implementation.
 
 ## Next Steps
 
@@ -65,4 +67,3 @@ path; #1597's E2E availability predicate is already exact-404-only and remains o
 ## Commits
 
 - See the draft PR commit list + per-slice PR comments.
-

@@ -69,13 +69,17 @@ transport behavior.
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-12 | 0 | bootstrap | Clean requested branch confirmed at exact baseline; research and design recorded. |
+| 2026-08-12 | 1 | pre-fix test | Focused set exited 1: unpublished 404 expected warning but received error; published-defect and 503 controls passed. |
 
 ## Gate Results
 
-Not run yet. Full untruncated output will be recorded in `slices/w5-a-doctor/evidence.md`.
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Focused discriminating pre-fix test | EXPECTED RED (exit 1; 2 pass / 1 fail) | `slices/w5-a-doctor/evidence.md` |
+
+Remaining gates are not run yet.
 
 ## Handoff Notes
 
 - Evaluator should inspect exact-status discrimination, the published negative fixture, 503 behavior,
   and confirm #1597 files are unchanged.
-
