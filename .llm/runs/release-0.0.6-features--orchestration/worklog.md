@@ -1412,3 +1412,51 @@ remains blocked — which is the gate working.
 
 **#1571 stays OPEN**: its box 5 requires terminal-green Canary.3, and this canary is published but not
 green.
+
+## 2026-08-12 — Canary.3 E2E failure is an uncovered #1227 recurrence, not a flake
+
+**Correction to my own reading.** I recorded the step-17 failure as *"consistent with an
+Aspire-prepare flake, unverified"*. The precise diagnosis is better and different: it is a **real
+uncovered recurrence of closed #1227**.
+
+The distinction matters because it changes the action. A flake justifies a rerun; a coverage gap
+makes a rerun **actively misleading** — a transient pass would only re-roll the same unguarded 180 s
+window and would be recorded as proof of something that was never fixed.
+
+### The evidence that settles it
+
+- **Full scaffold runtime E2E passed**; `quickstart.1/2/3` passed. **Only quickstart step 4 failed.**
+- The restore hung **exactly 180 s** inside the bundled NuGet restore of the **same five exact
+  packages**, then external termination → exit 6.
+- Aspire log `cli_20260812T143425_97132e38`: **no product-code error** — NuGet restore start, then
+  termination.
+- `quickstart.pgdata-integrity-after-teardown` is **secondary** — it reads a fixture path the aborted
+  start never created. One root cause, one cascade, two red gates.
+
+### Verified at code level myself
+
+`packages/cli/e2e/src/application/gates/quickstart/aspire-walk.ts` carries timeout markers **naming
+this very issue** — `quickstart.aspire.restore.timeout:#1227` and siblings — while executing
+`aspire restore` as a **single attempt bounded by `timeoutMs`** (`:32-34`), with **no retry and no
+NuGet cache coverage**. The path knew about #1227 and was still left uncovered: the mitigation landed
+where the failure was first *observed*, not everywhere the same call is made.
+
+That is the generalisable lesson, and it is the same shape as this lane's own lock defect — a fix
+applied at the point of observation rather than to the class, which then resurfaces elsewhere.
+
+### Actions taken
+
+- **#1227 reopened**, proof attached (canary run `31605906943`, E2E run `31606532698`, Aspire log id),
+  moved to milestone **0.0.6**, **`priority:p0`**, **`status:plan`**.
+- **`v0.0.6-canary.3` preserved** — tag and all 35 published members. **Not yanked, not republished.**
+- **No bare rerun.**
+
+### Fix-forward scope
+
+1. Bring the quickstart walk's `aspire restore` to parity with the runtime path — retry and/or NuGet
+   cache coverage instead of one bounded attempt.
+2. Fix the **secondary cleanup semantics** so the teardown-integrity gate reports "state was never
+   created" rather than failing on a missing path — one root failure should produce one signal.
+
+Then **canary.4 from fixed `main`**. **#1571 stays OPEN** — its box 5 needs a terminal-green canary,
+and canary.3 is published but not green.
