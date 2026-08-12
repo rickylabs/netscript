@@ -39,7 +39,7 @@
 | - | - | - | - |
 | 1 | Lock research, mechanism, design, and draft PR surface | plan checklist/manual citations | run artifacts |
 | 2 | Add RED lifecycle/concurrency regression tests | `deno task --cwd packages/fresh test` (expected focused failures) | `create-chat-connection_test.ts`, run artifacts |
-| 3 | Implement single-upstream ownership and prove all gates | prescribed static/package/docs/quality gates | `create-chat-connection.ts`, run artifacts |
+| 3 | Implement single-upstream ownership and prove all gates | prescribed static/package/docs/quality gates | `src/internal/chat-subscription-hub.ts`, `create-chat-connection.ts`, run artifacts |
 | 4 | Separate-session IMPL-EVAL and final evidence update | evaluator protocol | `evaluate.md`, run artifacts, PR comment |
 
 ### Deferred Scope
@@ -57,6 +57,9 @@ Read `createNetScriptChatConnection` for handle lifecycle, then the adjacent sub
 | --- | --- | --- | --- |
 | 2026-08-12 | 1 | research/design | Pinned Preact effect and ChatClient dedupe verified; NetScript handle has no active-owner guard. |
 | 2026-08-12 | 2 | RED tests | Required package task exited 1: 227 passed, exactly the three new physical-subscription tests failed. |
+| 2026-08-12 | 3 | implementation | Added one per-handle multicast hub; caller abort detaches one logical consumer, last detach retires the pump, and connection teardown aborts the physical request. |
+| 2026-08-12 | 3 | slice review | Reviewed acquisition/retirement races, terminal error delivery, lifetime abort, export reachability, forbidden paths, public-surface delta, and lock hygiene. No new surface, casts, lint suppressions, dependency changes, or sibling-tree edits. |
+| 2026-08-12 | 3 | reconcile | #1583 remains open with the three acceptance boxes and required labels/milestone; draft PR #1593 remains `status:impl`. No new review comments required scope adjustment. |
 
 ## Decisions
 
@@ -70,6 +73,7 @@ Read `createNetScriptChatConnection` for handle lifecycle, then the adjacent sub
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | Issue body has no acceptance checkboxes although brief requires `box-index` mapping | minor | yes |
+| Full Fresh doc-lint has 44 diagnostics outside `./ai` despite the expected zero-diagnostic package bar | significant | yes |
 
 ## Gate Results
 
@@ -98,7 +102,33 @@ Each failure is causal to the missing ownership guard: two concurrent logical co
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | Package tests (RED) | `deno task --cwd packages/fresh test` | EXPECTED_FAIL | 227 existing tests passed; all three new tests failed. |
+| Check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh --ext ts,tsx` | PASS (0) | 189 files, 2 batches, 0 failed batches, 0 occurrences. |
+| Lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh --ext ts,tsx` | PASS (0) | Final retry: 189 files, 1 batch, 0 occurrences. The first implementation run found three `require-yield` diagnostics in test-only held generators; fixed without suppression. |
+| Format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh --ext ts,tsx` | PASS (0) | 189 files, 1 batch, 0 findings. |
+| Package tests (GREEN) | `deno task --cwd packages/fresh test` | PASS (0) | `ok | 230 passed | 0 failed (10s)`; existing integration test green. |
+| Doc lint | `deno task doc:lint --root packages/fresh --pretty` | COMMAND_PASS_WITH_RESIDUE (0) | `./ai` entrypoints: 0. Full package: 44 pre-existing diagnostics (query 8, route 25, streams 11), all outside changed files. |
+| Fresh target quality | `deno run --allow-read .llm/tools/quality/scan-code-quality.ts --root packages/fresh/src` | PASS (0) | `"ok":true`, zero findings, one existing route-support allowance. This is the explicit package verdict because root `quality:scan` does not scan Fresh. |
+| Repository quality gate | `deno task quality:gate` | PASS (0) | Root quality scan clean; doctrine scan has `FAIL=0` for Fresh. Existing warnings remain: changed file 605 lines (improved from 684), route manifest 604, runtime/ai 13 children. |
+
+### Final regression evidence
+
+```text
+one mounted chat connection shares one live request across repeated subscribe attempts ... ok
+stop aborts the one physically in-flight shared live request ... ok
+re-subscribing after every prior subscriber explicitly stops opens a fresh request ... ok
+durable chat lifecycle provides seed, optimism, live tokens, reload resume,
+multi-tab convergence, and multibyte fidelity ... ok
+
+ok | 230 passed | 0 failed (10s)
+```
+
+### Lock and scope checks
+
+- `git diff -- deno.lock`: empty; no dependency was added.
+- No changed path is under `packages/fresh/src/application/defer/**` or `define-page/**`.
+- `packages/fresh/src/runtime/ai/mod.ts` is unchanged; the hub is reachable only through the existing published factory.
+- `create-chat-connection.ts` is 605 doctrine-counted lines versus 684 on the parent, so the slice improves rather than deepens its existing F-1 warning.
 
 ## Handoff Notes
 
-- Evaluator should inspect subscription acquisition/retirement races and confirm all three new tests fail on the parent baseline.
+- Evaluator should inspect subscription acquisition/retirement races, confirm all three new tests fail on the parent baseline, and treat the unrelated 44-item Fresh doc-lint residue explicitly rather than as changed-surface evidence.

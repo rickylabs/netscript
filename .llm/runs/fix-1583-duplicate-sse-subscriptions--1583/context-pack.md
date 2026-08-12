@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `fix-1583-duplicate-sse-subscriptions--1583` |
 | Branch | `fix/1583-duplicate-sse-subscriptions` |
-| Current phase | `implement` |
+| Current phase | `evaluate` |
 | Archetype | `4 - Public DSL / Builder`, with runtime gates |
 | Scope overlays | `frontend` |
 
 ## Current State
 
-Research and RED testing are complete. Ordinary renders of the pinned Preact hook do not recreate its `ChatClient` or bypass its idempotent subscribe guard. The NetScript handle itself has no ownership guard and directly opens one upstream iterator per consumed `subscribe()` call. All three new tests fail before production change with physical call counts 2/2/3 instead of 1/1/2.
+Implementation and generator gates are complete. Ordinary renders of the pinned Preact hook do not recreate its `ChatClient` or bypass its idempotent subscribe guard. The original NetScript handle had no ownership guard and directly opened one upstream iterator per consumed `subscribe()` call. The new per-handle internal hub shares one physical retry pump, aborts it on teardown/last detach, and permits a fresh pump after retirement.
 
 ## Completed
 
@@ -21,16 +21,20 @@ Research and RED testing are complete. Ordinary renders of the pinned Preact hoo
 - Preact hook, TanStack client, durable transport, and NetScript lifecycle trace.
 - JSR/public-surface scan and PLAN-EVAL N/A decision.
 - RED package run: 227 passed, three new tests failed exactly as designed.
+- GREEN package run: 230 passed, 0 failed.
+- Check/lint/fmt wrappers, explicit Fresh source quality scan, and repository quality gate exit 0.
+- Required doc-lint command exits 0 and keeps `./ai` at zero, while exposing 44 unrelated package diagnostics in query/route/streams.
+- Local substantive slice review complete; no public-surface, dependency, lockfile, or forbidden-subtree changes.
 
 ## In Progress
 
-- Slice 2 RED test commit and PR evidence.
+- Separate-session native Fable 5 medium IMPL-EVAL.
 
 ## Next Steps
 
-1. Commit/push RED tests and update the draft PR.
-2. Implement the single-upstream pump, run required gates, and update evidence.
-3. Run separate-session native Fable IMPL-EVAL.
+1. Commit/push implementation and gate evidence; post the final `[PHASE: IMPL]` comment.
+2. Run separate-session native Fable IMPL-EVAL and address at most two `FAIL_FIX` cycles.
+3. Record the evaluator verdict without changing the PR out of draft.
 
 ## Key Decisions
 
@@ -45,15 +49,18 @@ Research and RED testing are complete. Ordinary renders of the pinned Preact hoo
 | --- | --- | --- |
 | `.llm/runs/fix-1583-duplicate-sse-subscriptions--1583/*` | new | Harness evidence only. |
 | `packages/fresh/src/runtime/ai/create-chat-connection_test.ts` | changed | Three RED-first physical-subscription lifecycle tests. |
+| `packages/fresh/src/runtime/ai/create-chat-connection.ts` | changed | Routes logical subscription calls through one internal hub. |
+| `packages/fresh/src/internal/chat-subscription-hub.ts` | new | Connection-scoped ownership, multicast, cancellation, retirement, and unchanged SR2 retry. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | NOT_RUN | implementation not started |
-| Fitness | planned | `plan.md` |
-| Runtime | RED proven | `deno task --cwd packages/fresh test`: 227 pass / 3 expected fail |
-| Consumer | planned | package integration suite; external EIS unavailable |
+| Static | PASS | scoped check/lint/fmt wrappers: zero findings |
+| Fitness | PASS_WITH_BASELINE_WARNINGS | explicit Fresh scan zero findings; `quality:gate` exit 0; no deepened Fresh warning |
+| Runtime | PASS | `deno task --cwd packages/fresh test`: 230 pass / 0 fail after RED 227/3 evidence |
+| Docs/JSR | PARTIAL_BASELINE_RESIDUE | `./ai` zero; full package tool reports 44 unrelated diagnostics while exiting 0 |
+| Consumer | PACKAGE_PASS / EXTERNAL_UNAVAILABLE | existing integration green; external EIS checkout unavailable |
 
 ## Open Questions
 

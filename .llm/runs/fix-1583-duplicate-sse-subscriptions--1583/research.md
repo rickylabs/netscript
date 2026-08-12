@@ -16,6 +16,7 @@
 | 4 | TanStack's client-level `subscribe()` is already idempotent: it returns when `isSubscribed` and only restarts when explicitly requested. Its unsubscribe aborts the subscription controller. Therefore ordinary rerenders of one pinned hook do not explain two upstream calls. | `npm:@tanstack/ai-client@0.19.1/src/chat-client.ts:638-672,1093-1120` |
 | 5 | Existing NetScript lifecycle teardown aborts a connection-wide controller, and the signal is combined with a caller signal before reaching the upstream path. The existing test only observes the signal after a finite generator has completed; it does not prove cancellation of a physically in-flight live GET. | `packages/fresh/src/runtime/ai/create-chat-connection.ts:385-402,395-396`; `packages/fresh/src/runtime/ai/create-chat-connection_test.ts:229-263` |
 | 6 | The upstream durable client deliberately performs a non-live catch-up GET before its SSE GET, but that sequencing alone does not authorize two concurrently active NetScript subscription loops. | `npm:@durable-streams/client@0.2.6/src/stream-api.ts:132-175,218-225,252-286` |
+| 7 | The repaired factory creates exactly one internal hub per connection handle and delegates every logical `subscribe()` to it. The hub owns one active retry pump, multicasts future chunks, aborts on the connection lifetime signal, and retires before reopening. | `packages/fresh/src/runtime/ai/create-chat-connection.ts:379-429`; `packages/fresh/src/internal/chat-subscription-hub.ts:30-122,124-193,195-213` |
 
 ## Mechanism verdict
 
@@ -31,4 +32,3 @@ The reproducible package defect is the absence of structural ownership at the Ne
 
 - Closed for implementation: dedupe belongs to the connection handle because that is the narrowest layer that can structurally guarantee one physical upstream subscription while preserving callers and upstream packages unchanged.
 - Deferred/non-blocking: the external EIS `ChatPane` construction site is unavailable in this repository, so browser replay of that application is not possible from this worktree.
-

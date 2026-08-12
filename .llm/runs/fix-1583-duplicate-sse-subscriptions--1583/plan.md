@@ -58,7 +58,7 @@ One `NetScriptChatConnection` owns at most one physical live upstream subscripti
 | --- | --- | --- |
 | D1 | The connection handle owns dedupe via one internal multicast pump. | Structural guarantee at the package boundary; independent of consumer effect dependencies. |
 | D2 | Do not grow `NetScriptChatConnection`. | Existing `subscribe`/`stop`/`dispose` verbs are sufficient. |
-| D3 | Preserve `subscribeWithRetry` unchanged as the sole upstream seed/live subscription path. | Protects SR2 retry and replay semantics. |
+| D3 | Preserve the `subscribeWithRetry` algorithm as the sole upstream seed/live subscription path, colocated with the internal ownership hub. | Protects SR2 retry and replay semantics while reducing the already-oversized published module. |
 | D4 | A caller signal detaches that subscriber; the last detach aborts the shared pump. | Prevents leaks while allowing multiple logical consumers. |
 
 ## Open-Decision Sweep
@@ -109,10 +109,9 @@ One `NetScriptChatConnection` owns at most one physical live upstream subscripti
 | 1 | RED | `deno task --cwd packages/fresh test` with tests only | New tests fail against baseline behavior; existing tests remain green. |
 | 2 | Focused GREEN | `deno task --cwd packages/fresh test` | All lifecycle/integration tests pass. |
 | 3 | Static | user-specified scoped check/lint/fmt wrappers | PASS |
-| 4 | Docs/JSR | `deno task doc:lint --root packages/fresh --pretty` | zero diagnostics across exports |
+| 4 | Docs/JSR | `deno task doc:lint --root packages/fresh --pretty` | changed `./ai` entrypoint stays at zero; report any unrelated package residue verbatim |
 | 5 | Package quality | explicit Fresh source scan, then `deno task quality:gate` | PASS; note `arch:check` package-coverage limitation |
 
 ## PLAN-EVAL
 
 `PLAN-EVAL: N/A` — this is one focused internal lifecycle fix with a complete issue contract, fixed public surface, locked ownership layer, explicit RED tests, and prescribed gates. No unresolved decision would force implementation rework.
-

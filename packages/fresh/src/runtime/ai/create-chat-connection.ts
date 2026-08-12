@@ -28,6 +28,7 @@ import {
   toDurableChatSessionResponse,
 } from '@durable-streams/tanstack-ai-transport';
 import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
+import { createChatSubscriptionHub } from '../../internal/chat-subscription-hub.ts';
 
 // ---------------------------------------------------------------------------
 // Session addressing (internal — not part of the public `./ai` surface).
@@ -381,7 +382,6 @@ export function createNetScriptChatConnection(
   const { target } = options;
   const sessionUrl = resolveChatSessionUrl(target, { streamPath: options.streamPath });
   const headers = resolveChatHeaders(target);
-  const retry = resolveRetryConfig(options.subscribeRetry);
   const controller = new AbortController();
   let disposed = false;
 
@@ -391,6 +391,12 @@ export function createNetScriptChatConnection(
     headers,
     initialOffset: options.initialOffset,
   });
+
+  const subscribe = createChatSubscriptionHub(
+    (signal) => upstream.subscribe(signal),
+    controller.signal,
+    options.subscribeRetry,
+  );
 
   const linkSignal = (caller?: AbortSignal): AbortSignal =>
     caller ? AbortSignal.any([controller.signal, caller]) : controller.signal;
@@ -404,8 +410,7 @@ export function createNetScriptChatConnection(
   return {
     sessionId: target.sessionId,
     authorize: options.authorize,
-    subscribe: (signal?: AbortSignal): AsyncIterable<unknown> =>
-      subscribeWithRetry(upstream, retry, linkSignal(signal)),
+    subscribe,
     send: (
       messages: readonly NetScriptChatMessage[],
       data?: unknown,
@@ -497,12 +502,6 @@ interface UpstreamChatConnection {
   ) => Promise<void>;
 }
 
-interface ResolvedRetryConfig {
-  readonly maxAttempts: number;
-  readonly initialDelayMs: number;
-  readonly maxDelayMs: number;
-}
-
 function defaultCreateConnection(input: {
   readonly sendUrl: string;
   readonly readUrl: string;
@@ -550,16 +549,6 @@ function defaultToResponse(input: {
   });
 }
 
-function resolveRetryConfig(
-  overrides: NetScriptChatConnectionOptions['subscribeRetry'],
-): ResolvedRetryConfig {
-  return {
-    maxAttempts: overrides?.maxAttempts ?? 5,
-    initialDelayMs: overrides?.initialDelayMs ?? 250,
-    maxDelayMs: overrides?.maxDelayMs ?? 5000,
-  };
-}
-
 function resolveChatStreamSubpath(
   target: NetScriptChatSessionTarget,
   streamPath: NetScriptChatStreamPath | undefined,
@@ -584,75 +573,6 @@ function withIdentityEncoding(headers: Record<string, string>): Record<string, s
   }
   normalized['accept-encoding'] = 'identity';
   return normalized;
-}
-
-/**
- * SR2-tolerant subscribe. Complements the service-side SR2 fix (204/bridge): a
- * first-subscribe that races a not-yet-created session stream sees a transient
- * empty result or a transient error. Rather than surfacing that as terminal, we
- * re-poll with exponential backoff up to `maxAttempts`. Once real chunks flow,
- * the retry budget is spent and normal completion ends the stream.
- */
-async function* subscribeWithRetry(
-  connection: UpstreamChatConnection,
-  retry: ResolvedRetryConfig,
-  signal: AbortSignal,
-): AsyncGenerator<unknown, void, unknown> {
-  let attempt = 0;
-
-  while (!signal.aborted) {
-    let yielded = false;
-    try {
-      for await (const chunk of connection.subscribe(signal)) {
-        yielded = true;
-        yield chunk;
-      }
-    } catch (error) {
-      if (signal.aborted) return;
-      // A transient pre-data error (not-yet-created / premature close) is
-      // re-polled; anything after data, or a hard error (401/403), propagates.
-      if (yielded || !isTransientSubscribeError(error)) throw error;
-    }
-
-    if (signal.aborted || yielded) return;
-
-    attempt += 1;
-    if (attempt > retry.maxAttempts) return;
-    await sleep(backoffDelay(attempt, retry), signal);
-  }
-}
-
-function isTransientSubscribeError(error: unknown): boolean {
-  const message = (error instanceof Error ? error.message : String(error)).toLowerCase();
-  if (
-    message.includes('401') || message.includes('403') ||
-    message.includes('unauthorized') || message.includes('forbidden')
-  ) {
-    return false;
-  }
-  return (
-    error instanceof TypeError || // fetch network error
-    message.includes('404') || message.includes('not found') ||
-    message.includes('204') || message.includes('no content') ||
-    message.includes('up to date') || message.includes('up-to-date') ||
-    message.includes('premature close') || message.includes('err_stream_premature_close') ||
-    message.includes('econnrefused') || message.includes('connection refused')
-  );
-}
-
-function backoffDelay(attempt: number, retry: ResolvedRetryConfig): number {
-  return Math.min(retry.initialDelayMs * 2 ** (attempt - 1), retry.maxDelayMs);
-}
-
-function sleep(ms: number, signal: AbortSignal): Promise<void> {
-  if (ms <= 0 || signal.aborted) return Promise.resolve();
-  return new Promise<void>((resolve) => {
-    const timer = setTimeout(resolve, ms);
-    signal.addEventListener('abort', () => {
-      clearTimeout(timer);
-      resolve();
-    }, { once: true });
-  });
 }
 
 function toDurableMessage(message: NetScriptChatMessage): {

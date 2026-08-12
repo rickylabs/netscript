@@ -65,6 +65,7 @@ function createHeldSubscriptionProbe(): {
           } finally {
             stats.openRequests -= 1;
           }
+          if (!signal?.aborted) yield undefined;
         })();
       },
       send: () => Promise.resolve(),
@@ -346,26 +347,52 @@ Deno.test('one mounted chat connection shares one live request across repeated s
 });
 
 Deno.test('stop aborts the one physically in-flight shared live request', async () => {
-  const probe = createHeldSubscriptionProbe();
-  const connection = createNetScriptChatConnection({
-    target: baseTarget,
-    createConnection: () => probe.connection,
-  });
-  const first = connection.subscribe()[Symbol.asyncIterator]();
-  const second = connection.subscribe()[Symbol.asyncIterator]();
-  const pendingFirst = first.next();
-  const pendingSecond = second.next();
-
-  await waitFor(
-    () => probe.stats.openRequests > 0,
-    'the physical live request did not open',
+  const serverController = new AbortController();
+  let openedRequests = 0;
+  let abortedRequests = 0;
+  const server = Deno.serve(
+    { port: 0, signal: serverController.signal, onListen() {} },
+    (_request, info) => {
+      openedRequests += 1;
+      void info.completed.then(() => (abortedRequests += 1));
+      return new Response(new ReadableStream({ start() {} }));
+    },
   );
-  connection.stop();
-  await Promise.all([pendingFirst, pendingSecond]);
 
-  assertEquals(probe.stats.subscribeCalls, 1);
-  assertEquals(probe.stats.abortedRequests, 1);
-  assertEquals(probe.stats.openRequests, 0);
+  try {
+    const { port } = server.addr as Deno.NetAddr;
+    const connection = createNetScriptChatConnection({
+      target: { sessionId: 'physical-abort', baseUrl: `http://127.0.0.1:${port}` },
+      createConnection(input) {
+        return {
+          subscribe(signal) {
+            return (async function* () {
+              const response = await fetch(input.readUrl, { signal });
+              await response.body?.getReader().read();
+              if (!signal?.aborted) yield undefined;
+            })();
+          },
+          send: () => Promise.resolve(),
+        };
+      },
+    });
+    const first = connection.subscribe()[Symbol.asyncIterator]();
+    const second = connection.subscribe()[Symbol.asyncIterator]();
+    const pendingFirst = first.next();
+    const pendingSecond = second.next();
+
+    await waitFor(() => openedRequests > 0, 'the physical live GET did not open');
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    connection.stop();
+    await Promise.all([pendingFirst, pendingSecond]);
+    await waitFor(() => abortedRequests > 0, 'the server did not observe the live GET abort');
+
+    assertEquals(openedRequests, 1);
+    assertEquals(abortedRequests, 1);
+  } finally {
+    serverController.abort();
+    await server.finished.catch(() => undefined);
+  }
 });
 
 Deno.test('re-subscribing after every prior subscriber explicitly stops opens a fresh request', async () => {
