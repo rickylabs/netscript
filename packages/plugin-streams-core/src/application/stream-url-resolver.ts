@@ -1,3 +1,5 @@
+/// <reference path="./stream-browser-environment.d.ts" />
+
 import { STREAMS_RESOURCE_NAME, STREAMS_URL_PREFIX } from '../domain/constants.ts';
 
 interface EnvReadState {
@@ -42,49 +44,36 @@ function getServerServiceEndpoint(
 /**
  * Read a service URL from the browser environment.
  *
- * Mirrors the lookup performed by `@netscript/sdk/discovery` so that browser
- * consumers (Fresh islands, the Vite-built playground) can resolve the streams
- * URL without taking a framework-level dependency on the SDK.
+ * Browser consumers (Fresh islands, the Vite-built playground) can resolve the
+ * streams URL without taking a framework-level dependency on the SDK.
  *
  * Aspire's `WithConfiguredViteHttpReferences` injects two env vars per
  * service reference, both surfaced by Vite as `import.meta.env.VITE_*`:
  *   1. `VITE_services__{name}__{protocol}__{index}` — isomorphic full format.
  *   2. `VITE_{NORMALISED}_URL` — convenience shorthand.
  */
-function getBrowserServiceEndpoint(
-  serviceName: string,
-  protocol: 'http' | 'https' = 'http',
-  index = 0,
-): string | undefined {
+function getBrowserServiceEndpoint(): string | undefined {
   try {
-    const env = readImportMetaEnvironment(import.meta);
-    if (!env) return undefined;
-
-    const fullKey = `VITE_services__${serviceName}__${protocol}__${index}`;
-    const fullUrl = env[fullKey];
-    if (fullUrl) return fullUrl;
-
-    const shortKey = `VITE_${serviceName.toUpperCase().replace(/-/g, '_')}_URL`;
-    return env[shortKey];
+    return getBrowserStreamsUrlFromEnv({
+      VITE_services__streams__http__0: import.meta.env.VITE_services__streams__http__0,
+      VITE_STREAMS_URL: import.meta.env.VITE_STREAMS_URL,
+    });
   } catch {
     return undefined;
   }
 }
 
-function readImportMetaEnvironment(
-  meta: ImportMeta,
-): Readonly<Record<string, string | undefined>> | undefined {
-  if (!('env' in meta) || !isEnvironmentRecord(meta.env)) return undefined;
-  return meta.env;
-}
-
-function isEnvironmentRecord(
-  value: unknown,
-): value is Readonly<Record<string, string | undefined>> {
-  return typeof value === 'object' && value !== null &&
-    Object.values(value).every((entry: unknown) =>
-      entry === undefined || typeof entry === 'string'
-    );
+/** Resolve the browser streams URL from an injected environment bag. */
+export function getBrowserStreamsUrlFromEnv(
+  env:
+    | Readonly<{
+      readonly VITE_services__streams__http__0?: string;
+      readonly VITE_STREAMS_URL?: string;
+    }>
+    | undefined,
+): string | undefined {
+  if (!env) return undefined;
+  return env.VITE_services__streams__http__0 || env.VITE_STREAMS_URL;
 }
 
 /**
@@ -111,7 +100,7 @@ export function getStreamsUrl(): string {
     return serverDiscovered;
   }
 
-  const browserDiscovered = getBrowserServiceEndpoint(STREAMS_RESOURCE_NAME, 'http');
+  const browserDiscovered = getBrowserServiceEndpoint();
   if (browserDiscovered) {
     return browserDiscovered;
   }
