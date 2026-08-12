@@ -136,7 +136,10 @@ Deno.test('workflow source encodes trusted, exactly-once phase dispatch', async 
     phase,
     "contains(github.event.pull_request.labels.*.name, 'impl-eval:skip')",
   );
-  assertStringIncludes(phase, 'ref: pr.base.sha');
+  assertStringIncludes(phase, 'ref: `heads/${pr.base.ref}`');
+  assertStringIncludes(phase, 'ref: trustedBaseSha');
+  assertStringIncludes(phase, 'Trusted base SHA: ${trustedBaseSha}');
+  assert(!phase.includes('ref: pr.base.sha'));
   assertStringIncludes(phase, 'openhands-phase-eval generation=${generationEvent.id}');
   assertStringIncludes(phase, '@openhands-agent model=${model}');
   assertStringIncludes(phase, 'head=${pr.head.sha}');
