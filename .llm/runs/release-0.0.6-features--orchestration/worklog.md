@@ -1249,3 +1249,48 @@ Recorded as additional preflight evidence for Canary.3.
 3. Confirm **no newer unvalidated `main` commit** has landed between this validation and the cut — the
    proof above binds to `50739a7ae` specifically, and `main` moves quickly in this repo (it advanced
    twice during the last two merges alone).
+
+## 2026-08-12 — #1580 CLOSED; internals corroborated the diagnosis and taught a better mechanism
+
+All five #1580 boxes ticked against **verified** proof and the issue closed COMPLETED. Box 5's
+evidence checked via the API before citing: job `94143265702`, `conclusion: success`, `head_sha`
+`807d29003…` matching #1570's live head.
+
+**Internals independently corroborated the diagnosis three ways** — and, importantly, produced the
+control I could not: the **prior** run `31603374728` was `completed/failure` at `c740ff6e0` with
+*"Fresh UI private lock is stale"*, `failedBatches 2/2`, at the *"Frozen package type-check"* step.
+So the transition is **red → green across exactly my fix landing and nothing else**. They also showed
+#1570 touches **zero** fresh-ui files and that `packages/fresh-ui/deno.lock` was untouched since
+#1558. My diagnosis stood on its own evidence, but a before/after control is strictly better than a
+one-sided after.
+
+**On my write to their PR:** they confirmed no disruption and proved it rather than assuring me —
+`git diff --stat c740ff6e0..807d29003 -- <owned paths>` is **empty**, so their IMPL-EVAL PASS at
+`c740ff6e0` still names the shipped implementation and no evaluator capacity was re-spent. They noted
+this lane has twice had a verdict invalidated by a head move, so "head moved" is normally a
+re-evaluation trigger there — it was not this time, and they can show why. **The reusable rule:** a
+merge-forward on another lane's PR is safe exactly when the *owned paths* are unchanged, and that is
+checkable in one command. If I ever do it again, that diff is the thing to run **and quote**, ideally
+before rather than after.
+
+### A third mechanism I did not know about: `[post-merge]`
+
+`netscript-pr` supports marking an acceptance box `[post-merge]`: it is **visibly excluded** from the
+merge gate with a notice, then verified and ticked by comment afterwards. Internals used it on #1530
+box 7 and it worked end to end.
+
+That is a materially better fit than `Refs` for a box that is **genuinely post-merge-only**, because
+it **keeps the closing keyword and the auto-close** — where `Refs` defers the close and leaves the
+issue open by hand. Applied to this lane:
+
+- **#1580's** box 5 was blocked on *another PR* (#1570), so `Refs` was reasonable.
+- **#1571's** box 5 — "Canary.3 is re-dispatched and reaches terminal green" — is **genuinely
+  post-merge-only**, so `[post-merge]` would have been the better instrument and would have let #1572
+  auto-close it. Recording as a candidate rule for the retrospective rather than retrofitting a
+  closed situation.
+
+### Canary.3 eligibility
+
+Re-measured immediately: `main` is still **`50739a7ae`** — unchanged since validation, so the
+frozen-clean proof and both corroborated lock hashes still bind. No newer unvalidated commit
+intervenes. #1580 closed; **#1571 remains open**, its box 5 awaiting the canary itself.
