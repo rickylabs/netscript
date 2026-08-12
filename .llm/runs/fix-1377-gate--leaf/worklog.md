@@ -1,0 +1,183 @@
+# Worklog: #1377 gate half
+
+## Run Metadata
+
+| Field | Value |
+| --- | --- |
+| Run ID | `fix-1377-gate--leaf` |
+| Branch | `fix/1377-docs-reference-gate-scope` |
+| Archetype | 6 — CLI / tooling |
+| Scope overlays | Docs |
+
+## Design
+
+Recorded before implementation. Separate-session PLAN-EVAL cycle 2 passed head `706c2bf05`; Phase 2
+began only after that verdict.
+
+### Public Surface
+
+- `collectPublishReadiness()` — gains an ordered `docs-reference` evidence row over the effective
+  publish set.
+- `auditReferencePages()` (planned name) — exported pure filesystem audit used by readiness, tests,
+  and raw negative evidence.
+- `auditFirstPublishPackages()` — preserves README/tagline/license/export first-publish policy and
+  no longer owns reference existence.
+- `checkPublicCommandReference()` (planned name) — exported docs-policy audit accepting a command
+  tree/catalog and the exact two-file Markdown corpus, invoked by `runAccuracyCheck()`.
+- No new end-user CLI command, option, package export, or page URL.
+
+### Domain Vocabulary
+
+- `REFERENCE_PAGE_ALIASES` — exact package-name → path-segment exceptions.
+- `ReferencePageViolation` — package, resolved path, rule, message (may reuse/rename the existing
+  violation shape without widening semantics).
+- `CommandReferenceResult` — audited count, documented count, missing rendered command paths.
+- `CommandPath` — token lineage from the materialized Cliffy tree; colon-form root ids remain one
+  token.
+- `DIRECT_COMMAND_DEPTH` — root plus one child, the coverage boundary for this slice.
+
+### Ports
+
+- `auditPublishSet` dependency — authoritative publish membership.
+- Existing `exists` filesystem seam — reference-page presence.
+- Existing `PublicCliCommandCatalog` / enumerable Cliffy command seam — live public command tree.
+- Markdown corpus — injected in tests; production reads exactly
+  `docs/site/reference/cli/commands.md` plus `docs/site/cli-reference.md`.
+- No new network, registry, filesystem abstraction, or source parser.
+
+### Constants
+
+- `REFERENCE_PAGE_ALIASES` — four entries: sagas, streams, triggers, workers.
+- `EXPECTED_PUBLIC_DIRECT_COMMAND_COUNT` — `91`, asserted against the exact root/direct-child set.
+- `NETSCRIPT_COMMAND_PREFIX` — `netscript` for rendered diagnostics.
+- `COMMAND_REFERENCE_PATHS` — the exact two-file corpus, not a broad docs glob.
+- Existing gate ids plus new `docs-reference`; no duplicate string list of commands.
+
+### Command Surface / Composition Contract
+
+- Composition authority stays
+  `packages/cli/src/public/features/root/public-command-tree.ts`.
+- Enumeration reuses `PublicCliCommandCatalog`; the docs checker does not import group factories or
+  scrape `.command()` source.
+- Current vertical-feature catalog, spine abstracts, registries, adapters, and ports are unchanged;
+  this is a consumer of the existing tree, not an Archetype-6 restructuring slice.
+- No layer-2 abstract or generated output is introduced.
+
+### Commit Slices
+
+| # | Slice | Gate | Files |
+| --- | --- | --- | --- |
+| P | Decision-locked plan and Design checkpoint | Separate-session PLAN-EVAL | Run artifacts |
+| S1 | Whole-publish-set path coverage and alias convention | Release unit + raw negative + scoped release wrappers | Release tool/test, index, run artifacts |
+| S2 | Tree-derived direct-subcommand coverage plus bounded four-row unblock | Docs unit + raw negative + docs accuracy/links + scoped docs wrappers | Docs checker/test, reference index, commands page, run artifacts |
+| S3 | Composed merge-readiness evidence and lock hygiene | Docs links/accuracy, publish dry-run, repo tests, scoped wrappers | Run artifacts only unless reviewed fix required |
+
+### Deferred Scope
+
+- Full recursive command-family expansion — direct-subcommand acceptance catches the documented
+  defect without inventing a Markdown DSL for generated grandchildren.
+- Reference content fidelity, README checker, snippet extractor, installed-artifact proof, deploy
+  operation reachability, and post-merge JSR observation — owned by their cited issues.
+
+### Contributor Path
+
+To add a publishable package, add its canonical reference page at the scoped-name segment unless it
+is one of the four declared aliases; run publish readiness. To add a public root/direct child
+command, register it in the public tree and document the rendered `netscript …` path; the tree census
+and coverage diagnostic name any missing path. Do not edit a command list in the gate.
+
+## Progress Log
+
+| Time | Slice | Step | Notes |
+| --- | --- | --- | --- |
+| 2026-08-12 | P | Bootstrap | Wrote `supervisor.md` first; loaded named skills and harness policy. |
+| 2026-08-12 | P | Arrival checks | Baseline exact; PR-C ancestor; alias convention yields 35/35 reference coverage. |
+| 2026-08-12 | P | Design | Locked alias, check placement, release unblock, command-tree scope, census, and negative controls. |
+| 2026-08-12 | P | FAIL_PLAN revision | Locked the two-page corpus, exact 91 equality, structural root plus tokenized path matching, four-row S2 unblock, and retracted the false sagas-path premise. |
+| 2026-08-12 | P | PLAN-EVAL cycle 2 | Native Opus 5 read-only fallback returned PASS on immutable head `706c2bf05`; cloud evaluators had stalled and were cancelled. |
+| 2026-08-12 | S1 | Start | Began whole-publish-set reference existence implementation after PASS. |
+| 2026-08-12 | S1 | Implement | Added the independent `docs-reference` row over `publishSet.effective`, four declared aliases, and removed page existence from first-publish policy. |
+| 2026-08-12 | S1 | Reconcile | PR #1586 remains draft with `Closes #1377`; issue #1377 remains open. Read current PR/issue comments; no new blocker or scope change. Labels were observed but not changed. |
+| 2026-08-12 | S2 | Implement | Added the two-file `COMMAND_REFERENCE_PATHS` gate over the live recursive catalog, exact 91 census, strict structural roots, tokenized direct-parent projection, colon handling, and new-path diagnostics. Added four deploy rows and bounded union-contract corrections in the two corpus pages plus the reference index. |
+| 2026-08-12 | S2 | Toolchain seam | Static imports pulled unrelated existing CLI `isolatedDeclarations` failures into the focused docs test. Switched only module loading to dynamic structural types; runtime still materializes `createPublicCommandRegistry()` through `PublicCliCommandCatalog`, with no source parser or literal verb list. |
+| 2026-08-12 | S2 | Reconcile | PR remains draft and issue #1377 remains open with `Closes #1377` in the PR body. No labels changed; the orchestrator retains lifecycle ownership. |
+| 2026-08-12 | S3 | Publish composition | `publish:dry-run` passed. The immediate raw status check was clean: #1417 produced no manifest or lock churn, so nothing was restored. |
+| 2026-08-12 | S3 | Repository composition | Repeated both scoped wrapper families plus docs links/accuracy; all passed. The full repository suite passed 3,258 tests (622 steps), with 0 failures and 17 ignored. The snippet extractor's real-corpus test explicitly confirmed Lume `_site` output remains excluded. |
+| 2026-08-12 | S3 | Reconcile | Final implementation evidence is complete. PR #1586 remains draft; no `status:` label, ready-state, or merge mutation was performed. Native Opus 5 IMPL-EVAL remains an orchestrator-owned next step on the final immutable head. |
+
+## Decisions
+
+| Decision | Reason | Source |
+| --- | --- | --- |
+| Four aliases, no IA move | Preserve public URLs and agree with PR-C | `plan.md` D-1 |
+| Separate whole-set readiness check | Prevent registry/new-package skip | `plan.md` D-2 |
+| Page/stub with follow-up is unblock; no bypass | Release gate needs a bounded repair path | `plan.md` D-3; release skill |
+| Live tree, root/direct children, colon-safe | Predicate must be executable and nonliteral | `plan.md` D-4–D-6 |
+| Exact two-page corpus and structural matching | Prevent implicit corpus drift and root-prefix false greens | `plan.md` D-7/D-8 |
+| Four deploy rows owned by S2 | Make the strict gate executable without an ownerless predecessor | `plan.md` D-9 |
+
+## Gate Results
+
+All planned implementation and composition gates completed after the cycle-2 PLAN-EVAL PASS.
+
+| Gate | Result | Evidence / notes |
+| --- | --- | --- |
+| Baseline identity | PASS | branch `fix/1377-docs-reference-gate-scope`; head `fa5d0d411…` |
+| PR-C landed | PASS | `db1d79c68…` is an ancestor of HEAD |
+| Reference arrival coverage | PASS | 35 effective, 35 present under locked alias resolver, 0 missing |
+| PLAN-EVAL | FAIL_PLAN → PASS | Native Opus 5 read-only fallback: cycle 1 failed `5ba4bc339`; cycle 2 passed `706c2bf05`. The generator did not self-evaluate. |
+| Type/lint/fmt/docs/publish/tests | PASS | S1/S2 focused gates and S3 composed gates are recorded below |
+| Raw negative controls | COMPLETE | Missing page exit 1 in S1; missing command exit 1 in S2; diagnostics below |
+
+### S1 gate evidence
+
+| Gate | Result | Evidence / notes |
+| --- | --- | --- |
+| Release unit | PASS | `deno test --allow-all .llm/tools/release/publish-readiness_test.ts` — 15 passed, 0 failed |
+| Missing-page raw control | EXPECTED FAIL, exit 1 | Exported `auditReferencePages()` over published `@netscript/published`; diagnostic: `@netscript/published docs/site/reference/published/index.md [docs-reference] docs-site reference page is required` |
+| Scoped release check | PASS | 42 files selected; 0 findings |
+| Scoped release lint | PASS | 42 files selected; 0 findings |
+| Scoped release format | PASS | 42 files selected; 0 findings after targeted formatting |
+
+### S2 gate evidence
+
+| Gate | Result | Evidence / notes |
+| --- | --- | --- |
+| Docs checker unit | PASS | `deno test --allow-all --unstable-kv .llm/tools/docs/check-accuracy-and-discoverability_test.ts` — 7 passed, 0 failed |
+| Missing-command raw control | EXPECTED FAIL, exit 1 | Live recursive tree plus the exact locked two-page corpus with `netscript deploy uninstall` removed in memory; diagnostic: `public command reference covers 90/91; missing netscript deploy uninstall` |
+| Corpus measurement | PASS | After the four-row repair: detailed page 69/91, curated page 59/91, union 91/91; live recursive census 149 |
+| Docs accuracy | PASS | 91/91 root/direct commands from 149 recursive paths; baseline peer-dependency warning remained non-verdict |
+| Docs links | PASS | 102 docs; 0 broken links, 0 broken anchors, 0 enforced orphans |
+| Scoped docs check | PASS | 22 files selected; 0 findings |
+| Scoped docs lint | PASS | 22 files selected; 0 findings |
+| Scoped docs format | PASS | 22 files selected; 0 findings |
+
+### S3 composed gate evidence
+
+| Gate | Result | Evidence / notes |
+| --- | --- | --- |
+| Docs accuracy | PASS | 91/91 root/direct commands from 149 recursive paths; baseline peer-dependency warning remained non-verdict |
+| Docs links | PASS | 102 docs; 0 broken links, 0 broken anchors, 0 enforced orphans |
+| Scoped release check/lint/format | PASS | 42 files selected per wrapper; 0 findings in each |
+| Scoped docs check/lint/format | PASS | 22 files selected per wrapper; 0 findings in each |
+| Publish dry-run | PASS, exit 0 | `rtk proxy deno task publish:dry-run`; dry run completed successfully |
+| Immediate post-dry-run status | PASS | Raw `git status --short` was empty; no catalog-backed manifest churn and no `deno.lock` churn occurred |
+| Repository tests | PASS, exit 0 | `rtk proxy deno task test` — 3,258 passed (622 steps), 0 failed, 17 ignored in 8m46s |
+| Snippet `_site` exclusion | PASS | Repository suite ran `site analysis excludes Lume build output without shrinking source coverage`; it passed |
+
+### Raw negative-control evidence
+
+The controls invoked the exported production audits directly, one seeded failure at a time. They
+were not tests that converted an expected failure into exit 0.
+
+| Control | Raw result | Diagnostic |
+| --- | --- | --- |
+| Published package without reference page | exit 1 | `@netscript/published docs/site/reference/published/index.md [docs-reference] docs-site reference page is required` |
+| Live-tree subcommand absent from locked two-file corpus | exit 1 | `public command reference covers 90/91; missing netscript deploy uninstall` |
+
+## Handoff Notes
+
+- Native Opus 5 IMPL-EVAL should verify the exact two-file corpus, structural root plus tokenized
+  path matching, exact 91 equality, bounded four-row ownership, and both raw exit-1 controls.
+- The PR remains draft. The orchestrator owns the IMPL-EVAL dispatch, any `status:` transition, and
+  the ready/merge decision.

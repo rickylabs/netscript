@@ -285,15 +285,15 @@ See [Agent tooling](/ai/agent-tooling/) for the mental model.
 
 ## The full surface
 
-This page is the curated common path. For every command, every subcommand, and every
-flag — spelled exactly as the installed CLI prints it — go to the
-[command reference](/reference/cli/commands/); for the embeddable package API, the
+This page is the curated common path; together with the detailed
+[command reference](/reference/cli/commands/), the two-page set covers every public command group
+and direct subcommand. For the embeddable package API, use the
 [`@netscript/cli` package page]({{ "ref:cli" |> xref }}).
 
 {{ comp.featureGrid({ items: [
   {
     title: "Command reference",
-    body: "The exhaustive command surface — every command, subcommand, and flag verbatim.",
+    body: "The detailed companion for extended command groups and flags; use it with this curated page for the complete public root/direct-command surface.",
     href: "/reference/cli/commands/",
     icon: "≡"
   },
