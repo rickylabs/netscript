@@ -62,6 +62,7 @@ export class DurableStreamProducerSupervisor {
     bufferedBytes: 0,
   };
   #accepted = true;
+  #closing = false;
   #epoch = 0;
   #nextSequence = 0;
 
@@ -108,6 +109,11 @@ export class DurableStreamProducerSupervisor {
   /** Whether new writes are rejected because shutdown or terminal failure began. */
   get closed(): boolean {
     return !this.#accepted;
+  }
+
+  /** Explain why a new write cannot be accepted. */
+  writeRejectionReason(): StreamWriteRejectionReasonV1 | undefined {
+    return this.#writeRejectionReason();
   }
 
   /** Accept an already serialized event into the bounded FIFO. */
@@ -213,6 +219,7 @@ export class DurableStreamProducerSupervisor {
       return Promise.resolve();
     }
     this.#accepted = false;
+    this.#closing = true;
     this.#closePromise = this.#closeGracefully();
     return this.#closePromise;
   }
@@ -298,7 +305,11 @@ export class DurableStreamProducerSupervisor {
           if (this.#abort.signal.aborted) {
             return false;
           }
-          if (!isRetryable(connected.failure) || attempt === this.#reconnectPolicy.maxAttempts) {
+          if (!isRetryable(connected.failure)) {
+            this.#failActive(entry, connected.failure, attempt);
+            return false;
+          }
+          if (attempt === this.#reconnectPolicy.maxAttempts) {
             this.#failActive(entry, connected.failure, attempt);
             return false;
           }
@@ -416,7 +427,11 @@ export class DurableStreamProducerSupervisor {
   ): void {
     this.#queue.settle(active, {
       status: 'delivery-unknown',
-      reason: failure.kind === 'aborted' ? 'transport-aborted' : 'retry-exhausted',
+      reason: failure.kind === 'aborted'
+        ? 'transport-aborted'
+        : !isRetryable(failure)
+        ? 'transport-refused'
+        : 'retry-exhausted',
       error: failure.message,
     });
     this.#fail(`${failure.message} (attempt ${attempt})`);
@@ -473,8 +488,10 @@ export class DurableStreamProducerSupervisor {
         return 'producer-stopping';
       case 'stopped':
         return 'producer-stopped';
-      default:
+      case 'failed':
         return 'producer-failed';
+      default:
+        return this.#closing ? 'producer-stopping' : 'producer-failed';
     }
   }
 

@@ -1,5 +1,12 @@
 import { assertEquals } from '@std/assert';
-import { DEPLOY, GATE, type GateId, QUICKSTART, SCAFFOLD } from '../../src/domain/cli-surface.ts';
+import {
+  DEPLOY,
+  GATE,
+  type GateId,
+  QUICKSTART,
+  SCAFFOLD,
+  type SuiteId,
+} from '../../src/domain/cli-surface.ts';
 import {
   DATABASE,
   PACKAGE_SOURCE,
@@ -7,6 +14,7 @@ import {
   REPORT_FORMAT,
 } from '../../src/domain/extension-axes.ts';
 import type { RunOptions } from '../../src/domain/run-context.ts';
+import type { DeferredGate } from '../../src/domain/suite-definition.ts';
 import { runtimeResources } from '../../src/application/gates/scaffold/runtime-gates.ts';
 import { builtInSuites, resolveSuite } from '../../src/presentation/cli/suites/registry.ts';
 import {
@@ -217,6 +225,34 @@ Deno.test('runtime suites execute the formerly deferred #1398 OTEL gates', () =>
   }
 });
 
+Deno.test('every registered suite pins its exact deferred-gate set and owning issues', () => {
+  const expected = {
+    [SCAFFOLD.SERVICE]: [],
+    [SCAFFOLD.CONTRACTS]: [],
+    [SCAFFOLD.INFRASTRUCTURE]: [],
+    [SCAFFOLD.PLUGIN]: [],
+    [SCAFFOLD.RUNTIME]: SCAFFOLD_RUNTIME_DEFERRED_GATES,
+    [SCAFFOLD.RUNTIME_SQLITE]: SCAFFOLD_RUNTIME_DEFERRED_GATES,
+    [SCAFFOLD.USERLAND_INSTALL]: [],
+    [DEPLOY.TARGETS]: [],
+    [DEPLOY.DESKTOP_NATIVE]: [],
+    [QUICKSTART.WALK]: [],
+  } satisfies Record<SuiteId, readonly DeferredGate[]>;
+
+  assertEquals(
+    builtInSuites.map((suite) => suite.id).sort(),
+    Object.keys(expected).sort(),
+    'the expectation map must cover every registered suite',
+  );
+  for (const descriptor of builtInSuites) {
+    assertEquals(
+      resolveSuite(descriptor.id).deferredGates ?? [],
+      expected[descriptor.id],
+      `${descriptor.id} deferred gates must match their issue-owned expectation`,
+    );
+  }
+});
+
 // #954: the suite used to start the whole AppHost without ever waiting on the generated app
 // or requesting one of its routes, so "Aspire says Healthy while every request returns 500"
 // passed. These two gates are that missing assertion — keep them paired.
@@ -308,9 +344,11 @@ Deno.test('runtime suites declare service environment before start and verify it
   }
 });
 
-Deno.test('sqlite runtime suite excludes Postgres-only database evidence gates', () => {
+Deno.test('runtime database overrides preserve service health and the Postgres gate set', () => {
   const sqlite = resolveSuite(SCAFFOLD.RUNTIME_SQLITE);
   const postgres = resolveSuite(SCAFFOLD.RUNTIME);
+  const mysql = resolveSuite(SCAFFOLD.RUNTIME, { database: DATABASE.MYSQL });
+  const mssql = resolveSuite(SCAFFOLD.RUNTIME, { database: DATABASE.MSSQL });
   const runtimeCapability = scaffoldCapabilitySuites.find((suite) => suite.id === SCAFFOLD.RUNTIME);
   const sqliteCapability = scaffoldCapabilitySuites.find((suite) =>
     suite.id === SCAFFOLD.RUNTIME_SQLITE
@@ -319,8 +357,37 @@ Deno.test('sqlite runtime suite excludes Postgres-only database evidence gates',
     throw new Error('Runtime capability suites are not registered.');
   }
 
-  assertEquals(sqlite.gates.some((gate) => gate.id === GATE.BEHAVIOR_SERVICE_HEALTH), false);
-  assertEquals(postgres.gates.some((gate) => gate.id === GATE.BEHAVIOR_SERVICE_HEALTH), true);
+  const postgresOnly = new Set<GateId>([
+    GATE.DATABASE_MIGRATION_ARTIFACTS,
+    GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST,
+    GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,
+    GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
+  ]);
+  const databaseWaits = new Set<GateId>([
+    GATE.RUNTIME_WAIT_POSTGRES,
+    GATE.RUNTIME_WAIT_MYSQL,
+    GATE.RUNTIME_WAIT_MSSQL,
+  ]);
+  const expectedFor = (databaseWait: GateId, omitPostgresOnly: boolean) =>
+    runtimeCapability.gates.filter((gate) =>
+      (!databaseWaits.has(gate) || gate === databaseWait) &&
+      (!omitPostgresOnly || !postgresOnly.has(gate))
+    );
+
+  assertEquals(
+    postgres.gates.map((gate) => gate.id),
+    expectedFor(GATE.RUNTIME_WAIT_POSTGRES, false),
+  );
+  assertEquals(mysql.gates.map((gate) => gate.id), expectedFor(GATE.RUNTIME_WAIT_MYSQL, true));
+  assertEquals(mssql.gates.map((gate) => gate.id), expectedFor(GATE.RUNTIME_WAIT_MSSQL, true));
+  for (const suite of [postgres, mysql, mssql]) {
+    assertEquals(
+      suite.gates.some((gate) => gate.id === GATE.BEHAVIOR_SERVICE_HEALTH),
+      true,
+      `${suite.defaultOptions.database} must execute service health`,
+    );
+  }
+  assertEquals(sqlite.gates.some((gate) => gate.id === GATE.BEHAVIOR_SERVICE_HEALTH), true);
   assertEquals(
     sqliteCapability.gates,
     runtimeCapability.gates.filter((gate) =>
@@ -328,7 +395,6 @@ Deno.test('sqlite runtime suite excludes Postgres-only database evidence gates',
         GATE.DATABASE_MIGRATION_ARTIFACTS,
         GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST,
         GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,
-        GATE.BEHAVIOR_SERVICE_HEALTH,
         GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
       ])).has(gate)
     ),
