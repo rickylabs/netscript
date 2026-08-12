@@ -387,3 +387,47 @@ To add a doctrine-gated unit: create `packages/<name>/` with a `deno.json`; `dis
 picks it up and `arch:check` gates it with no task edit. To add a quality allowance: append
 `// quality-allow: <reason> (#<open issue>)` on the offending line and raise `--max-allow` in the same PR
 as the issue link — the budget can only fall otherwise.
+
+---
+
+## Constraint: Fable fully prohibited for all remaining 0.0.6 work (owner, 2026-08-12)
+
+Recorded here in the worklog at the owner's explicit instruction; the route rebinding and its rationale are
+in `drift.md` **D-31**, and `supervisor.md` § Routes in force carries the live bindings.
+
+**The policy.** Fable is prohibited for all remaining 0.0.6 work until explicitly lifted (quota at 95% until
+Saturday). No Fable session or subagent may be launched **or resumed**. Continue on native Opus 5
+orchestration and subagents, Codex GPT-5.6 Sol implementation, and the **automatic** evaluator workflow only.
+Never manually trigger OpenHands.
+
+**Compliance, verified rather than asserted.** Checked at the time of the directive:
+
+```text
+deno task agentic:codex-status → models seen: ['gpt-5.6-luna', 'gpt-5.6-sol']
+                                 FABLE sessions: 0
+```
+
+No Fable session exists to stop or avoid resuming. This orchestrator has spawned **no Claude subagents at
+all** for the entire run — every delegation went to Codex Sol through `agentic:launch-codex-slice`, and the
+`deep_analysis` (Fable 5 · medium) lane was carried as optional in `supervisor.md` and never used. So there is
+no Fable work to unwind and none in flight.
+
+**Bindings in force for the remaining rail** (PR-B/C/D and #1566):
+
+| Role | Route |
+| --- | --- |
+| Orchestration | Claude · Opus 5 · high — this session |
+| Implementation | Codex · GPT-5.6 Sol · low/medium |
+| Adversarial review of Sol·low work | Claude · Opus 5 · high (`review_codex_light`) |
+| Adversarial review of Sol·medium work | Claude · Opus 5 · low — was Fable 5 · low, rebound to `lane-policy.md`'s documented fallback |
+| Formal PLAN/IMPL-EVAL | **automatic** phase-eval workflow; model resolved by it (verified at source: only `minimax-m3`, `deepseek-v4-flash-0731`, `qwen3.8-max` — no Fable path exists) |
+| Deep analysis, if needed | Claude · Opus 5 — deliberately **not** the published Codex Sol fallback, because it would be analysing Codex-authored artifacts |
+
+**The substitution that must not be made.** `lane-policy.md` requires the Codex-review lanes to fall back to
+**Claude · Opus**, not to a Codex model, "so an OpenAI-authored change is never reviewed by an OpenAI-family
+model". Under a Claude capacity squeeze the cheap move is to review Codex work with Codex; that is the one
+substitution the policy forbids, and it is named here so a later squeeze does not quietly take it.
+
+**No manual OpenHands trigger has been or will be issued.** Every formal evaluation in this run reached the
+evaluator through the `openhands` + `status:plan-eval` label pair or the draft → ready transition. That is
+also why the earlier "duplicate run" scare resolved as no-op skip events rather than duplicate execution.
