@@ -455,3 +455,70 @@ about.
 **No manual OpenHands trigger has been or will be issued.** Every formal evaluation in this run reached the
 evaluator through the `openhands` + `status:plan-eval` label pair or the draft → ready transition. That is
 also why the earlier "duplicate run" scare resolved as no-op skip events rather than duplicate execution.
+
+---
+
+## Diagnostic trap: this checkout is SHALLOW, and every history-shaped git answer here is unreliable
+
+Recorded at the owner's explicit instruction. This is the most consequential methodological error of the run
+and it invalidated a public rebuttal I posted against a correct formal verdict.
+
+### The trap
+
+```text
+git rev-parse --is-shallow-repository            → true
+gh api /repos/rickylabs/netscript/commits/317e4b509 → parents: 6a4ca79de
+```
+
+`317e4b509` is **not** a root commit. It is the **shallow boundary**, and it has a canonical parent. Git
+reports it as a root because the parent object is simply absent locally — **with no error and no warning.**
+
+### What it made false
+
+| Probe I ran | What I concluded | Why it was wrong |
+| --- | --- | --- |
+| `git rev-list --max-parents=0 HEAD` → `317e4b509` | "history begins 2026-07-06" | reports the shallow boundary as a root |
+| `git merge-base --is-ancestor 0ef13de35 HEAD` → false | "non-ancestor history" | returns false for a commit whose connecting history is absent |
+| `git log HEAD -- packages/shared/deno.json` → 0 | "never in reachable history" | cannot traverse past the boundary |
+| `git for-each-ref --contains 0ef13de35` → 3 branches | "lives only on other refs" | true, and irrelevant to canonical ancestry |
+
+### The canonical answer, via the API rather than the clone
+
+```text
+gh api compare/0ef13de359...4a5a28b8 → status=ahead  merge_base=0ef13de359b  ahead_by=2050
+gh api compare/fd8259b76...4a5a28b8  → status=ahead  merge_base=fd8259b76d8
+```
+
+Both are canonical ancestors. `@netscript/shared` **did** exist in reachable history — added `0ef13de35`
+(2026-06-05), deleted `fd8259b76`.
+
+### The lesson, which is not "run more probes"
+
+I ran **three** probes and called them independent. They were three expressions of **one premise** — that the
+local object graph is complete. **Independence of method is not independence of premise.** Adding a fourth
+probe of the same kind would have produced a fourth wrong answer with more confidence.
+
+This is the fourth instance of one pattern on this lane, and the sharpest:
+
+1. asserted an absence (`packages/sagas` supersession record) without the probe that finds the presence;
+2. asserted a mechanism (the `code-quality` changed-file range) without running the range;
+3. asserted an outcome (dispatch would proceed) without tracing the data flow;
+4. asserted ancestry from a clone that structurally cannot answer it.
+
+Each time the missing step was one command. The difference here is that the wrong answer was *stable across
+repetition*, which is what made it persuasive.
+
+### Standing rules taken
+
+- **Before any history-shaped claim** — ancestry, "first commit", "never existed", "not reachable" — run
+  `git rev-parse --is-shallow-repository`. If true, the clone cannot answer it.
+- For anything load-bearing, use the **compare API** (`gh api /repos/:o/:r/compare/A...B` → `status`,
+  `merge_base`, `ahead_by`), which is computed on the canonical graph.
+- Treat `--all` / `for-each-ref --contains` results as statements about **local refs**, never about ancestry.
+- When several probes agree, ask what premise they share **before** treating agreement as corroboration.
+
+### Blast radius, being corrected
+
+The false framing reached `plan-quality-rail.md` (4 occurrences), the doctrine document and doc-contract test
+in PR #1585, box 2's acceptance evidence, and **#1380 comment `5264832009`**. All are corrected — the run
+record must not carry the claim that a formal evaluator correctly rejected.

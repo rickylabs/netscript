@@ -50,7 +50,7 @@ Measured at `01aa12b67`, re-confirmed at `84dd44ae7` (contains PR #1527).
 | Verdict table | 28 rows; **6** name non-live units; **14** live units have no row |
 | `*-soundness_test.ts` / `*_type.ts` | **6** / **12** (all under `tests/type-fixtures/`, **3** with `@ts-expect-error`) |
 | `deno doc --json` over all 30 export maps | **3.733 s**, exit 0, **567** `Failed resolving types` warnings |
-| Repository history | root `317e4b509` (2026-07-06, "cut 0.0.1-beta.5"); **374** commits **measured at `84dd44ae7`** — the count moves with `main`, so it is only meaningful pinned to a sha (cycle 3 finding 7) |
+| Repository history | ~~root `317e4b509`; 374 commits~~ **WITHDRAWN — measured in a SHALLOW clone and false.** `git rev-parse --is-shallow-repository` → **true**; `317e4b509` is the shallow **boundary**, not a root, and has canonical parent `6a4ca79de`. Canonical ancestry via the compare API: `0ef13de359...4a5a28b8` → `merge_base=0ef13de359b`, `ahead_by=2050`. See `worklog.md` § Diagnostic trap. |
 
 ### A14 has three identifier origins, not two
 
@@ -82,7 +82,7 @@ beta.5 release cut) with 374 commits, and `git ls-tree 317e4b509:packages/` alre
 | `@netscript/workers` | same, per `arch-debt.md:561` → `packages/plugin-workers-core` |
 | `@netscript/sagas` | not present in this history; **a checked-in supersession record exists** — `arch-debt.md:583-584` reads "the top-level `packages/sagas` directory named in this heading no longer exists — the code and this resolved debt live entirely in `packages/plugin-sagas-core`". Cycle 3 finding 3: revision 3 asserted no record existed, which was **false**. Verified by the orchestrator. |
 | `@netscript/streams` | not present in this history; successor `packages/plugin-streams-core` exists; no supersession record found — PR-C states that absence **after** running the same `arch-debt.md` probe that found the sagas one |
-| `@netscript/shared` | not present in HEAD's history; **added at `0ef13de35`, deleted at `fd8259b76`** (`feat(contracts): consolidate shared foundation package`, 2026-06-05, which deletes `packages/shared/deno.json` and 25 further `packages/shared/**` paths) — both on **non-ancestor** history. Cycle 3 finding 3: revision 3 said only "no removal commit on `main`", true but omitting the load-bearing commit. PR-C cites the commit **and** the ancestry qualifier. |
+| `@netscript/shared` | **CORRECTED — it DID exist in reachable history.** Added `0ef13de35` (2026-06-05), deleted `fd8259b76`; **both are canonical ancestors** (compare API `merge_base` confirms each). The earlier "non-ancestor" qualifier was a shallow-clone artefact. Original text: added at `0ef13de35`, deleted at `fd8259b76` (`feat(contracts): consolidate shared foundation package`, 2026-06-05, which deletes `packages/shared/deno.json` and 25 further `packages/shared/**` paths) — both on **non-ancestor** history. Cycle 3 finding 3: revision 3 said only "no removal commit on `main`", true but omitting the load-bearing commit. PR-C cites the commit **and** the ancestry qualifier. |
 | `plugins/hello-world` | not present in this history; no successor and no supersession record |
 
 #1380 box 2 was **amended with owner authorization** to require per-row evidence and admit "never present
