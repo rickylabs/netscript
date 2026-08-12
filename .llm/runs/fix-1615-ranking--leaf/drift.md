@@ -54,3 +54,43 @@ Drift is append-only.
 - **Action:** accept for this leaf; use the package config as supported wrapper input rather than
   changing repository tooling outside #1615.
 - **Evidence:** final wrapper results in `worklog.md`.
+
+## 2026-08-12 — confidence semantics corrected after review
+
+- **What:** S1 computed confidence from the global maximum before route and close-score ordering,
+  while prior behavior used the score of the post-order winner.
+- **Source:** Review of head `543a7b1e9` against `routeIndex()` semantics.
+- **Expected:** Route hints promote a candidate and that agent-facing winner determines confidence.
+- **Actual:** The pre-review implementation could report a higher confidence from an unreturned
+  global scorer.
+- **Severity:** significant
+- **Action:** fixed by moving `ranked[0]?.score` after ordering and adding a public-behavior test
+  with a high global scorer and medium route-promoted winner.
+- **Evidence:** S3 gate rows in `worklog.md`.
+
+## 2026-08-12 — deterministic tie-break is not insertion-stable
+
+- **What:** Slug ordering is a deterministic but arbitrary total order for statistically tied
+  cross-document candidates.
+- **Source:** Review question about adding a third close-scoring document.
+- **Expected:** Existing candidate order does not flip under unrelated corpus-statistic drift.
+- **Actual:** A newly added candidate inside the leader-anchored `0.5` group can sort before both
+  existing candidates and legitimately change the locked rank.
+- **Severity:** minor
+- **Action:** accept and disclose. This fixture protects repeatability for a fixed candidate set;
+  corpus growth that adds a genuinely close candidate requires semantic review, not automatic golden
+  regeneration.
+- **Evidence:** grouping design and focused boundary test.
+
+## 2026-08-12 — superseding the earlier scoped-format claim
+
+- **What:** The earlier drift entry treated explicit package config as enough for a scoped format
+  verdict.
+- **Source:** Follow-up review and issue #1618.
+- **Expected:** A package-wide format command can inspect every selected source safely.
+- **Actual:** The deliberately malformed `packages/mcp/tests/fixtures/doctor/broken/deno.json`
+  prevents a trustworthy package-scoped formatter verdict; this is pre-existing on `origin/main`.
+- **Severity:** minor
+- **Action:** supersede the earlier format PASS claim, leave #1618 untouched, and use exact
+  touched-file `deno fmt --check` evidence for #1615.
+- **Evidence:** S3 exact-file format row in `worklog.md`.

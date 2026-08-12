@@ -12,10 +12,11 @@
 
 ## Current State
 
-S2 implementation evidence is complete. The fresh direct/plugin absolute score gap is
+S3 review correction is implemented and gated. The fresh direct/plugin absolute score gap is
 `0.3019801981861221`; leader-anchored close-score groups restore the unchanged exact golden on both
-base and fresh corpora without changing public contracts. Draft PR #1617 remains at `status:impl`
-for the orchestrator's separate native Opus 5 read-only evaluation.
+base and fresh corpora. Confidence again follows the post-order route-priority winner, with any
+close-score-induced score movement bounded by `0.5`. Draft PR #1617 remains at `status:impl` for the
+orchestrator's separate native Opus 5 read-only evaluation.
 
 ## Completed
 
@@ -32,24 +33,28 @@ for the orchestrator's separate native Opus 5 read-only evaluation.
   revert `c86a4080f` (exit 0).
 - Completed the guidance, scoped static/doc, and quality gates. Full repository tests retain only
   the documented pre-existing #1589 failure: 3321 passed, 1 failed, 17 ignored.
+- Corrected the review-blocking confidence change and added a route-promoted lower-scorer regression
+  test. MCP package tests pass: 136 passed, 0 failed.
+- Re-proved the negative control at the follow-up head with raw exit 1 and restored the fixture.
 
 ## In Progress
 
-- Final evidence commit/push and S2 PR update.
+- S3 evidence commit/push and PR body correction.
 
 ## Next Steps
 
-1. Commit/push the final S2 evidence and update the draft PR body/comment.
+1. Commit/push the S3 review correction and update the draft PR body/comment.
 2. Stop with the PR still draft and exactly `status:impl`.
 3. Orchestrator dispatches mandatory native Opus 5 IMPL-EVAL against the immutable head.
 
 ## Key Decisions
 
-| Decision              | Source            | Notes                                                                     |
-| --------------------- | ----------------- | ------------------------------------------------------------------------- |
-| Direction 1           | score measurement | near-tie, not wide semantic preference                                    |
-| `closeScoreGap = 0.5` | plan D2           | covers observed movement; leader-anchored grouping preserves transitivity |
-| No golden edit        | plan D4           | exact ranks remain meaningful after deterministic tie handling            |
+| Decision                | Source            | Notes                                                                        |
+| ----------------------- | ----------------- | ---------------------------------------------------------------------------- |
+| Direction 1             | score measurement | near-tie, not wide semantic preference                                       |
+| `closeScoreGap = 0.5`   | plan D2           | covers observed movement; leader-anchored grouping preserves transitivity    |
+| No golden edit          | plan D4           | exact ranks remain meaningful after deterministic tie handling               |
+| Route-winner confidence | review correction | post-order winner preserves route-promotion behavior; close-band delta ≤ 0.5 |
 
 ## Files Changed
 
@@ -61,14 +66,14 @@ for the orchestrator's separate native Opus 5 read-only evaluation.
 
 ## Gates
 
-| Gate family | Current status        | Evidence                                                                    |
-| ----------- | --------------------- | --------------------------------------------------------------------------- |
-| Measurement | pass                  | base and fresh scores printed; instrumentation cross-check passed           |
-| Static      | pass                  | final guidance filter: 14 passed; scoped check/lint/fmt and doc lint exit 0 |
-| Fitness     | pass                  | `quality:gate` exit 0; MCP doctrine FAIL=0                                  |
-| Runtime     | pass                  | base adapter parity/rerun plus fresh 8 cases × 2 corpora × 2 reruns         |
-| Consumer    | pass                  | unchanged exact fixture and guidance contract tests                         |
-| Repository  | expected baseline red | 3321 passed, 1 known #1589 failure, 17 ignored; no guidance failure         |
+| Gate family | Current status        | Evidence                                                                                               |
+| ----------- | --------------------- | ------------------------------------------------------------------------------------------------------ |
+| Measurement | pass                  | base and fresh scores printed; instrumentation cross-check passed                                      |
+| Static      | pass                  | S3 check/lint pass; exact touched-file format check passes; package-wide format is a #1618 non-verdict |
+| Fitness     | pass                  | `quality:gate` exit 0; MCP doctrine FAIL=0                                                             |
+| Runtime     | pass                  | base adapter parity/rerun plus fresh 8 cases × 2 corpora × 2 reruns                                    |
+| Consumer    | pass                  | unchanged exact fixture and guidance contract tests                                                    |
+| Repository  | expected baseline red | 3321 passed, 1 known #1589 failure, 17 ignored; no guidance failure                                    |
 
 ## Open Questions
 
@@ -76,8 +81,8 @@ for the orchestrator's separate native Opus 5 read-only evaluation.
 
 ## Drift and Debt
 
-- Drift: evaluator override, fresh-head rank detail, expected #1589 base failure, and explicit
-  scoped-wrapper config routing recorded in `drift.md`.
+- Drift: evaluator override, fresh-head rank detail, expected #1589 base failure, confidence review
+  correction, corpus-growth limit, and #1618 formatting non-verdict recorded in `drift.md`.
 - Debt: pre-existing `MCP-A6-V2-SHAPE` unchanged; no new debt planned.
 
 ## Commits

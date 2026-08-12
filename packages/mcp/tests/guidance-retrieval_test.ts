@@ -94,6 +94,38 @@ Deno.test('guidance close-score groups use stable documents without chaining or 
   );
 });
 
+Deno.test('guidance confidence follows a route-promoted lower scorer', async () => {
+  const corpus = new EmbeddedDocsCorpus({
+    documents: [
+      {
+        slug: 'guides/route-winner',
+        source: '# Route winner\n\n## Task Router\n\nPlugin.',
+      },
+      {
+        slug: 'guides/global-scorer',
+        source:
+          '# Global scorer\n\n## Plugin Thin Layer Core Scaffold Skeleton Dashboard\n\nPlugin dashboard thin layer core scaffold skeleton.',
+      },
+      // Shared terms keep the route winner below the high-confidence threshold.
+      ...Array.from({ length: 20 }, (_, index) => ({
+        slug: `noise/${index}`,
+        source: '# Noise\n\n## Noise\n\nTask router plugin.',
+      })),
+    ],
+  });
+
+  const scoreOrdered = await corpus.findGuidance('add a capability NetScript does not ship');
+  assertEquals(scoreOrdered.recommendations[0]?.slug, 'guides/global-scorer');
+  assertEquals(scoreOrdered.confidence, 'high');
+
+  const routeOrdered = await corpus.findGuidance(
+    'build a real service-backed ui and add a capability NetScript does not ship',
+  );
+  assertEquals(routeOrdered.recommendations[0]?.slug, 'guides/route-winner');
+  assertEquals(routeOrdered.recommendations[1]?.slug, 'guides/global-scorer');
+  assertEquals(routeOrdered.confidence, 'medium');
+});
+
 function rankedSection(slug: string, section: string, score: number): RankedGuidanceSection {
   const entry: IndexedGuidanceSection = {
     id: `${slug}#${section}`,

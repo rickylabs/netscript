@@ -80,8 +80,8 @@ export class GuidanceIndex {
       this.#rank(entry, normalizedIntent, queryTerms, concepts)
     ).filter((entry): entry is RankedGuidanceSection => entry !== undefined);
     this.#applyLinkBoosts(ranked);
-    const topScore = ranked.reduce((highest, entry) => Math.max(highest, entry.score), 0);
     orderGuidanceSections(ranked, concepts);
+    const topScore = ranked[0]?.score ?? 0;
 
     if (ranked.length === 0) {
       return {
