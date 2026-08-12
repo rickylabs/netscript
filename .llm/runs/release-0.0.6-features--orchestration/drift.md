@@ -431,3 +431,59 @@ The general lesson is the one this lane keeps relearning from the other directio
 drawn from a proxy field is not evidence.** D-11 was written while arguing that a PASS which cannot
 be shown to describe the merge commit is a plausible-looking artefact — and then treated a proxy
 field as if it were the thing itself. Verify against the artefact, not the metadata about it.
+
+---
+
+## D-13 — #1576 criterion 5 is not satisfiable as worded; the generator emits no dynamic Form-C route
+
+**Severity: significant. Recorded 2026-08-12. Raised by the owner during slice review.**
+
+#1576's acceptance criterion 5 reads:
+
+> A generated dynamic Form-C scaffold browser test loads through `fresh-partial=true` without 500.
+
+The cycle-3 fixture (`packages/fresh/tests/fixtures/route-binding-browser/app.tsx:8-9`) hand-constructs
+its reference and comments *"This is the runtime reference shape emitted for a generated Form-C page."*
+That comment is the tell: the test proves the **runtime reference shape**, not **generator
+provenance**. If the generator emitted a different construction, the fixture would still pass.
+
+### What the generator actually emits
+
+| Site | Emission |
+| --- | --- |
+| `packages/cli/src/kernel/application/ui/web-scaffold.ts:29` | `createRouteReference('/<segment>', { id, kind: 'page' })` then `definePage().withRoute(route)` |
+| `packages/cli/src/kernel/application/scaffold/writers/app-route-seeds.ts:49-54` | `createRouteReference(routePatterns.<x>.$route, { id, kind: 'page' })` |
+| `packages/cli/src/kernel/assets/embedded.generated.ts:29` | same shape, all static paths |
+
+**The construction shape the fixture assumes is correct.** But
+`grep -rnE "createRouteReference\('/[^']*\[" packages/cli/src` returns **nothing**: the default
+scaffold emits **only static patterns**. It has no dynamic `[param]` page route at all.
+
+### Why the criterion cannot be met literally
+
+The consumer failure came from the generated **routes tree** — `.generated/routes.ts`, built by
+scanning the consumer's own route files, which included `/project/[project]/channel/[channel]` — not
+from the seed scaffold. So "a generated dynamic Form-C scaffold" is two claims that do not co-occur
+today:
+
+1. the generator emits the `createRouteReference(...) → withRoute(...)` wiring — **true, and
+   mechanically checkable**;
+2. a **dynamic** pattern flows through it in a generated scaffold — **not produced by the default
+   scaffold**, only by a consumer whose own route files contain dynamic segments.
+
+### Decision
+
+**Do not tick criterion 5 on the current fixture, and do not reword the criterion to fit the test.**
+Instead:
+
+- **Strengthen** the evidence with a mechanical provenance anchor: assert the generator's emitted
+  construction shape equals the shape the fixture exercises, so generator drift breaks the test rather
+  than silently invalidating it.
+- **State the residual limitation explicitly** on the issue: the dynamic-pattern half has no generated
+  source in the default scaffold, so the browser test necessarily supplies the dynamic pattern itself.
+- **File the gap** rather than absorbing it — a scaffold that never emits a dynamic route also means no
+  gate exercises dynamic route binding end to end, which is how #1576 reached a consumer in the first
+  place.
+
+Smoothing the distinction here would reproduce the exact failure this lane keeps catching: a checked
+box whose evidence does not cover the path that actually broke.
