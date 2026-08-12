@@ -60,6 +60,7 @@ Update top-level units, then run the doctrine contract tests; the measured table
 | 2026-08-12 | S1 | Implement + focused gate | `arch:check:repo` now selects all roots; leading quote/backtick fixture data ignored; real unresolved global remains red. |
 | 2026-08-12 | S2 | Measurement + doc contracts | Doctrine 06/10 now enumerate 36 roots; removed-row provenance, debt closure, gated-set exclusion, dated reference plan, and RFC mapping are executable documentation contracts. |
 | 2026-08-12 | S3 | Operator guidance + mirror | Source/mirrored skill and close-gate hint now require rerunning existing CI after labeling, without a verdict-invalidating push. |
+| 2026-08-12 | S4 | Final gate matrix | All requested gates passed on source head `bef1d9b4806b04da51d0120de6d9df08f0699bde`; this evidence-only update is the final planned commit. |
 
 ## Decisions
 
@@ -86,6 +87,23 @@ None as of S1.
 | S3 scoped validation wrappers | PASS, exit 0 | 18 files selected; check/lint/fmt zero findings |
 | Claude skill mirror | PASS, exit 0 | sync updated one stale skill; `agentic:check-claude` all checks OK |
 
+### Final requested gate matrix
+
+| # | Command | Exit | Literal summary |
+| --- | --- | --- | --- |
+| 1 | `deno test --allow-read --allow-env --allow-write --allow-run .llm/tools/fitness/` | 0 | `ok | 10 passed | 0 failed` |
+| 2 | `deno task arch:check` | 0 | dependency checks passed; 36 root reports, every `FAIL=0` |
+| 3 | `deno task arch:check:repo` | 0 | 36 root reports, every `FAIL=0`; advisory WARN residue is non-fatal |
+| 4 | `deno task quality:gate` | 0 | quality scan `{ "ok": true, "findings": [] }`; chained doctrine gate passed |
+| 5a | check wrapper, roots `fitness` + `validation`, `--ext ts` | 0 | 25 files, 1 batch, 0 failed batches / occurrences |
+| 5b | lint wrapper, same roots | 0 | 25 files, 1 batch, 0 findings |
+| 5c | fmt wrapper, same roots | 0 | 25 files, 1 batch, 0 findings |
+| 6 | `deno task gen:assets-barrel`; `git status --porcelain` | 0 / 0 | generator emitted no drift; status output empty |
+| 7 | `deno task agentic:sync-claude`; `deno task agentic:check-claude` | 0 / 0 | 18 skills / 22 files synced; every Claude surface check `OK` |
+| 8 | `deno test ... check-doctrine-docs_test.ts` | 0 | `ok | 6 passed | 0 failed` |
+
 ## Handoff Notes
 
 - The parent orchestrator performs substantive slice review and owns draft → ready / IMPL-EVAL.
+- Final acceptance evidence is mapped in PR #1585 by `box-index: 1..13`; box 5 cites PR-B commit
+  `e391f3aec` rather than claiming implementation in this PR.

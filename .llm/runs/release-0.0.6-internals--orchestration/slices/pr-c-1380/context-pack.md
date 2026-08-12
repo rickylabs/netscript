@@ -4,8 +4,9 @@
 
 Draft PR #1585 contains green S1 and S2 changes. The repo gate uses the discovered-root path; the
 doctrine verdict/archetype tables measure the same 36 roots; the provenance, debt, gated-set,
-engineering-reference, and RFC-location records have executable content tests. S3 now also corrects
-the close-gate rerun guidance and its Claude mirror. The complete final gate matrix is next.
+engineering-reference, and RFC-location records have executable content tests. S3 corrects the
+close-gate rerun guidance and its Claude mirror. The complete requested gate matrix is green; the
+branch is ready for parent-orchestrator review while remaining draft.
 
 ## Completed
 
@@ -15,16 +16,17 @@ the close-gate rerun guidance and its Claude mirror. The complete final gate mat
 - Implemented and verified S2: 36-unit tables, reconciled provenance, accepted-red debt closure,
   documented gate coverage, dated engineering-reference plan, canonical RFC mapping, and six doc tests.
 - Implemented and verified S3: label/rerun guidance, repair hint contract, and regenerated Claude skill.
+- Completed S4 gate matrix: all eight requested gate families passed with literal exit evidence.
 
 ## In Progress
 
-- S4: complete final gate matrix, literal evidence, acceptance mapping, and PR handoff.
+- Parent-orchestrator substantive review and separate-session IMPL-EVAL (not owned by this agent).
 
 ## Next Steps
 
-1. Commit and comment S3.
-2. Run every requested final gate on the final source head.
-3. Commit only final run evidence, push, then rerun any source-sensitive gates if the evidence commit changes their inputs.
+1. Commit/push this evidence-only update.
+2. Re-run the complete matrix on that final commit without changing files.
+3. Update the draft PR body/comment with acceptance evidence and hand off; do not flip ready.
 
 ## Key Decisions
 
@@ -35,7 +37,7 @@ the close-gate rerun guidance and its Claude mirror. The complete final gate mat
 ## Drift and Debt
 
 - Drift: none.
-- Debt: the 2026-06-21 accepted-red repo-doctrine entry is scheduled for closure in S2.
+- Debt: the 2026-06-21 accepted-red repo-doctrine entry is resolved by this PR; no new debt.
 
 ## Commits
 
