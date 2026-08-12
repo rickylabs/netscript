@@ -22,11 +22,13 @@ owns the canary and the stable cut.
 
 | 3 | 2026-08-12T11:40:14Z | `5db37e7bb` — `fix(fresh): forward durable State-Protocol query parameters through the chat stream proxy (#1556)` | #1556 | **#1457** (auto-closed `COMPLETED`) | `slices/pre-merge-gate-1556.md` — all 7 checks PASS |
 
+| 4 | 2026-08-12T12:03:55Z | `59e435c5d` — `fix(streams): resolve Aspire VITE service references in the browser stream resolver (#1559)` | #1559 | **#1548** (auto-closed `COMPLETED`) | `slices/pre-merge-gate-1559.md` — all 7 checks PASS at head `ccfa5407e` |
+
 Rows captured from `git log origin/main --first-parent -1` **after** each merge, per the
 profile's merge-derived rule. Issue states re-read live: both `CLOSED` / `COMPLETED`, with
 `status:shipped` applied to each issue and PR.
 
-**First pass complete** (#1405, #1398). **Reopened 2026-08-12** for #1457, #1459, #1548 — #1457 landed as row 3.
+**First pass complete** (#1405, #1398). **Reopened 2026-08-12** for #1457, #1459, #1548 — #1457 landed as row 3, #1548 as row 4; #1459 remains open.
 
 ## Re-planning events
 

@@ -598,3 +598,37 @@ client bundle). Per `milestone-run.md`, an issue whose acceptance cannot all be 
 one PR is split **before** dispatch rather than discovered at merge (the #1024/#1061 precedent). That
 criterion moved to **#1557** with a written reason; #1558's body states which criteria it proves and
 which it does not.
+
+## 2026-08-12 — #1548 MERGED (`59e435c5d`)
+
+IMPL-EVAL **PASS**, run `31593936968` — confirmed by root as the **sole authoritative** evaluator for
+head `ccfa5407`; the extra phase/generic entries were no-op/skip events and the pending run root
+cancelled (`31593958280`) was skip-only with no model spend. **Exactly-once held**, and no evaluator
+was retriggered from this lane. My earlier concern about two summary comments was **wrong and
+self-corrected before root's confirmation**: they were two *phases* (PLAN-EVAL `31591064684`,
+IMPL-EVAL `31593936968`), each of which posts its own summary.
+
+**Evaluated head == merge head** (`ccfa5407e`), verified before merging, so the verdict describes what
+landed. That check exists because #1536's head moved mid-flight earlier in this lane and its pre-sync
+evidence had to be discarded.
+
+### The final guard caught a real hazard
+
+An intermediate reading of `gh pr checks` showed **0 failing** while
+`scaffold-runtime (aspire + docker + postgres)` was still **pending**. Counting failures alone would
+have cleared a merge with an expensive gate unfinished — the same family as the draft-`skipping`
+trap, one step subtler. The merge waited until `pending = 0`, then all named gates read `pass`.
+
+The `status:augment-review` label was auto-added again on the ready-merge transition, giving two
+`status:` labels; removed. That is the **third** occurrence in this lane, so it is automation
+behaviour rather than a one-off.
+
+### Substance
+
+I regressed the reader to a **computed index** — behaviourally identical, every precedence test still
+green — and the shape guard fired (`36 passed, 2 failed`); restored → `38 passed, 0 failed`. That is
+the silent-regression class the plan predicted, demonstrated rather than asserted.
+
+**Still true and unfixed:** `packages/sdk/src/discovery/browser-env.ts:65` carries the same
+substitutability defect. The SDK was a structural precedent only. To be filed once this shape is
+proven in a real Vite build, not fixed blind.
