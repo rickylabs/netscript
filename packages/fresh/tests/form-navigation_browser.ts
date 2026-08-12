@@ -2,8 +2,12 @@ import { assertEquals } from '@std/assert';
 import { fromFileUrl } from '@std/path';
 
 const PLAYWRIGHT_SESSION = 'netscript-fresh-form-navigation';
+const ROUTE_BINDING_SESSION = 'netscript-fresh-route-binding';
 const FIXTURE_ROOT = fromFileUrl(
   new URL('./fixtures/form-navigation-browser/', import.meta.url),
+);
+const ROUTE_BINDING_FIXTURE_ROOT = fromFileUrl(
+  new URL('./fixtures/route-binding-browser/', import.meta.url),
 );
 
 Deno.test({
@@ -99,6 +103,107 @@ Deno.test({
   },
 });
 
+Deno.test({
+  name: 'browser: generated Form-C dynamic route resolves path during fresh partial navigation',
+  sanitizeOps: false,
+  sanitizeResources: false,
+  async fn() {
+    const port = reservePort();
+    const url = `http://127.0.0.1:${port}/`;
+    const playwrightOutput = await Deno.makeTempDir({ prefix: 'netscript-route-browser-' });
+    const vite = new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        '--no-lock',
+        '-A',
+        'npm:vite@7.2.2',
+        '--config',
+        'vite.config.ts',
+        '--host',
+        '127.0.0.1',
+        '--port',
+        String(port),
+        '--strictPort',
+      ],
+      cwd: ROUTE_BINDING_FIXTURE_ROOT,
+      stdout: 'null',
+      stderr: 'null',
+    }).spawn();
+
+    try {
+      await waitForServer(url, vite);
+      await runPlaywright(['-s', ROUTE_BINDING_SESSION, 'open', url], playwrightOutput);
+      const result = await runPlaywright([
+        '--raw',
+        '-s',
+        ROUTE_BINDING_SESSION,
+        'run-code',
+        `async page => {
+          const runtimeErrors = [];
+          page.on('pageerror', error => runtimeErrors.push(String(error)));
+          page.on('console', message => {
+            if (message.type() === 'error') runtimeErrors.push(message.text());
+          });
+          await page.goto(${JSON.stringify(url)});
+          await page.waitForFunction(() => history.state?.fClientNav === true);
+
+          const partialResponsePromise = page.waitForResponse(response => {
+            const responseUrl = response.url();
+            return responseUrl.includes('/orders/order-42?') &&
+              responseUrl.includes('fresh-partial=true');
+          });
+          await page.getByRole('link', { name: 'Load order 42' }).click();
+          const partialResponse = await partialResponsePromise;
+          const partialStatus = partialResponse.status();
+          let orderId = null;
+          let selfHref = null;
+          if (partialStatus === 200) {
+            await page.locator('#order-id').waitFor();
+            orderId = await page.locator('#order-id').textContent();
+            selfHref = await page.locator('#order-self-link').getAttribute('href');
+          }
+
+          return {
+            partialStatus,
+            partialUrl: partialResponse.url(),
+            orderId,
+            selfHref,
+            runtimeErrors,
+            finalUrl: page.url(),
+          };
+        }`,
+      ], playwrightOutput);
+      const evidence = JSON.parse(result.trim()) as {
+        readonly partialStatus: number;
+        readonly partialUrl: string;
+        readonly orderId: string | null;
+        readonly selfHref: string | null;
+        readonly runtimeErrors: readonly string[];
+        readonly finalUrl: string;
+      };
+
+      assertEquals(evidence.partialStatus, 200);
+      assertEquals(
+        new URL(evidence.partialUrl).searchParams.get('fresh-partial'),
+        'true',
+      );
+      assertEquals(evidence.orderId, 'order-42');
+      assertEquals(evidence.selfHref, '/orders/order-42');
+      assertEquals(evidence.runtimeErrors, []);
+      assertEquals(evidence.finalUrl, `http://127.0.0.1:${port}/orders/order-42`);
+    } finally {
+      await runPlaywright(['-s', ROUTE_BINDING_SESSION, 'close'], playwrightOutput, false);
+      try {
+        vite.kill('SIGTERM');
+      } catch {
+        // The fixture process already stopped; cleanup can continue.
+      }
+      await vite.status;
+      await Deno.remove(playwrightOutput, { recursive: true });
+    }
+  },
+});
+
 async function runPlaywright(
   args: readonly string[],
   cwd: string,
@@ -113,7 +218,7 @@ async function runPlaywright(
   const stdout = new TextDecoder().decode(output.stdout);
   const stderr = new TextDecoder().decode(output.stderr);
 
-  if (check && !output.success) {
+  if (check && (!output.success || stdout.startsWith('### Error'))) {
     throw new Error(
       `playwright-cli ${args.join(' ')} failed (${output.code})\n${stdout}\n${stderr}`,
     );

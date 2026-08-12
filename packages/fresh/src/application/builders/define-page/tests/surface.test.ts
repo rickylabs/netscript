@@ -1,8 +1,10 @@
 import { assertEquals } from '@std/assert';
+import { definePage } from '../mod.ts';
 import type {
   ComponentLike,
   DefinedPartialRoute,
   DefinePartialOptions,
+  DefineRoutedPartialOptions,
   DefineStatsPartialOptions,
   EmptyRecord,
   InferDefinePageLayerLoaderProps,
@@ -56,6 +58,9 @@ import type {
   PageSlot,
   PageSlots,
   PageTelemetryConfig,
+  PartialRouteContext,
+  PartialRouteHandler,
+  PartialRouteHandlers,
   RoutedPageDefinition,
   RuntimeFormState,
   SchemaInput,
@@ -171,6 +176,8 @@ type AnyTarget = {
     readonly path: object;
     readonly search: object;
   };
+  safeParsePath(input: PathParamInput): SchemaParseResult<object>;
+  safeParseSearch(input: URLSearchParams | SearchParamInput): SchemaParseResult<object>;
 };
 type AnyDefinition = DefinePageDefinitionFor<AnyTypes>;
 type AnyLayerMap = DefinePageLayerMap;
@@ -179,10 +186,22 @@ type AnyFormState = RuntimeFormState<Record<string, string>>;
 type BuildersModule = typeof import('../../mod.ts');
 type DefinePageModule = typeof import('../mod.ts');
 
+function assertRouteParserCapabilityIsRequired(): void {
+  const compileTimeOnlyTarget = {
+    routePattern: '/orders/[id]',
+  } as PageRouteTarget<{ id: string }>;
+
+  // @ts-expect-error A route carrying inferred path state must also carry runtime parsers.
+  definePage().withRoute(compileTimeOnlyTarget);
+}
+
+void assertRouteParserCapabilityIsRequired;
+
 type BuildersSurfaceSnapshot = [
   ComponentLike<{ readonly children?: AnyRenderable }>,
   DefinedPartialRoute<object>,
   DefinePartialOptions<object, object>,
+  DefineRoutedPartialOptions<object, EmptyRecord, EmptyRecord, EmptyRecord>,
   DefineStatsPartialOptions<object, object>,
   EmptyRecord,
   InferDefinePageLayerLoaderProps<AnyLoader>,
@@ -213,6 +232,9 @@ type BuildersSurfaceSnapshot = [
   PagePairedRouteHrefInput<EmptyRecord, EmptyRecord, EmptyRecord, EmptyRecord>,
   PagePairedRouteTarget,
   PagePartialLinkProps,
+  PartialRouteContext<EmptyRecord, EmptyRecord, EmptyRecord>,
+  PartialRouteHandler<object>,
+  PartialRouteHandlers<object>,
   PagePathParamInput,
   PagePathSchema,
   PageRenderContext,

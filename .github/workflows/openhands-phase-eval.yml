@@ -142,7 +142,8 @@ jobs:
             printf -- '- Reason: `%s`\n' "$FAILURE_REASON"
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Resolve and dispatch exactly one evaluator
+      - name: Resolve protected base SHA for trusted evaluator code
+        id: resolve_trusted_base
         if: >-
           !cancelled() &&
           env.SKIP_IMPL != 'true' &&
@@ -151,9 +152,55 @@ jobs:
         with:
           github-token: ${{ secrets.PAT_TOKEN }}
           script: |
+            const pr = context.payload.pull_request;
+            const baseRef = await github.rest.git.getRef({
+              owner: pr.base.repo.owner.login,
+              repo: pr.base.repo.name,
+              ref: `heads/${pr.base.ref}`,
+            });
+            const sha = baseRef.data.object.sha;
+            if (!/^[0-9a-f]{40}$/.test(sha)) {
+              throw new Error(`Protected base ref resolved to an invalid SHA: ${sha}`);
+            }
+            core.setOutput('sha', sha);
+
+      - name: Check out trusted phase-eval primitive
+        id: checkout_trusted_primitive
+        if: >-
+          !cancelled() &&
+          env.SKIP_IMPL != 'true' &&
+          steps.resolve_trusted_base.outcome == 'success'
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          repository: ${{ github.event.pull_request.base.repo.full_name }}
+          ref: ${{ steps.resolve_trusted_base.outputs.sha }}
+          path: .phase-eval-trusted
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Resolve and dispatch exactly one evaluator
+        if: >-
+          !cancelled() &&
+          env.SKIP_IMPL != 'true' &&
+          steps.checkout_trusted_primitive.outcome == 'success'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          TRUSTED_BASE_SHA: ${{ steps.resolve_trusted_base.outputs.sha }}
+        with:
+          github-token: ${{ secrets.PAT_TOKEN }}
+          script: |
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const pr = context.payload.pull_request;
+            const path = require('path');
+            const { pathToFileURL } = require('url');
+            const primitivePath = path.join(
+              process.env.GITHUB_WORKSPACE,
+              '.phase-eval-trusted/.github/scripts/phase-eval-claim.mjs',
+            );
+            const { dispatchClaimedPhaseEvaluation, phaseEvalMarker } = await import(
+              pathToFileURL(primitivePath).href
+            );
             const eventLabel = context.payload.label?.name ?? '';
             const labels = new Set(pr.labels.map((label) => label.name));
             const phase = context.payload.action === 'ready_for_review' ||
@@ -182,12 +229,7 @@ jobs:
             const promptPath = `.llm/tools/agentic/openhands/${phase}-eval-prompt.md`;
             const baseOwner = pr.base.repo.owner.login;
             const baseRepo = pr.base.repo.name;
-            const baseRef = await github.rest.git.getRef({
-              owner: baseOwner,
-              repo: baseRepo,
-              ref: `heads/${pr.base.ref}`,
-            });
-            const trustedBaseSha = baseRef.data.object.sha;
+            const trustedBaseSha = process.env.TRUSTED_BASE_SHA ?? '';
             if (!/^[0-9a-f]{40}$/.test(trustedBaseSha)) {
               throw new Error(`Protected base ref resolved to an invalid SHA: ${trustedBaseSha}`);
             }
@@ -222,27 +264,52 @@ jobs:
             if (!generationEvent) {
               throw new Error(`No labeled-event generation found for ${expectedStatus}.`);
             }
-            const marker = `<!-- openhands-phase-eval generation=${generationEvent.id} phase=${phase} head=${pr.head.sha} -->`;
-            const comments = await github.paginate(github.rest.issues.listComments, {
-              owner,
-              repo,
-              issue_number: pr.number,
-              per_page: 100,
-            });
-            const existing = comments.find((comment) => String(comment.body ?? '').includes(marker));
-            if (existing) {
-              core.notice(`This phase transition is already claimed: ${existing.html_url}`);
-              return;
-            }
-
+            const claimKey = { generation: generationEvent.id, phase, head: pr.head.sha };
+            const marker = phaseEvalMarker(claimKey);
             const iterations = phase === 'plan' ? 500 : 800;
             const trigger = `@openhands-agent model=${model} output=pr-comment iterations=${iterations} phase=${phase} head=${pr.head.sha}`;
-            const { data: comment } = await github.rest.issues.createComment({
-              owner,
-              repo,
-              issue_number: pr.number,
-              body: `${trigger}\n${marker}\n\nTrusted base SHA: ${trustedBaseSha}\nEvaluated head SHA: ${pr.head.sha}\n\n${prompt}`,
-            });
+            const findExistingTrigger = async () => {
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner,
+                repo,
+                issue_number: pr.number,
+                per_page: 100,
+              });
+              return comments.find((comment) =>
+                String(comment.body ?? '').split(/\r?\n/).includes(marker)
+              ) ?? null;
+            };
+            // Once trigger creation is attempted, an API failure may mean the comment succeeded
+            // but its response was lost. The tested lifecycle rechecks the marker and retains the
+            // claim if the result remains unknown. Cycle the phase status to recover with a new
+            // generation; never re-run the failed job against the same claim.
+            const outcome = await dispatchClaimedPhaseEvaluation(
+              {
+                createRef: async ({ ref, sha }) => {
+                  await github.rest.git.createRef({ owner, repo, ref, sha });
+                },
+                getRef: async ({ ref }) => {
+                  const existing = await github.rest.git.getRef({ owner, repo, ref });
+                  return { sha: existing.data.object.sha };
+                },
+              },
+              claimKey,
+              async () => {
+                const { data } = await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: pr.number,
+                  body: `${trigger}\n${marker}\n\nTrusted base SHA: ${trustedBaseSha}\nEvaluated head SHA: ${pr.head.sha}\n\n${prompt}`,
+                });
+                return data;
+              },
+              findExistingTrigger,
+            );
+            if (!outcome.claimed) {
+              core.notice(`This phase transition is already claimed by ${outcome.ref}.`);
+              return;
+            }
+            const comment = outcome.trigger;
             if (selectedLabel) {
               await github.rest.issues.removeLabel({
                 owner,

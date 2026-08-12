@@ -28,6 +28,12 @@ export type PathParamInput = Record<string, string | undefined>;
 /** @internal */
 export type SearchParamInput = Record<string, SearchParamValue>;
 
+/** @internal Runtime parsing capability required by a route-bound builder. */
+export interface RouteParserTarget {
+  safeParsePath(input: PathParamInput): SchemaParseResult<object>;
+  safeParseSearch(input: URLSearchParams | SearchParamInput): SchemaParseResult<object>;
+}
+
 /** @internal */
 export interface PaginationSearchSchemaOptions {
   defaultLimit?: number;
@@ -327,7 +333,7 @@ export type DefinePageWithParams<
 /** @internal */
 export type DefinePageWithRoute<
   TTypes extends AnyDefinePageTypeState,
-  TRoute extends TypedRouteTarget<object, object>,
+  TRoute extends TypedRouteTarget<object, object> & RouteParserTarget,
 > = DefinePageTypeState<
   DefinePageStateOf<TTypes>,
   DefinePageResourcesOf<TTypes>,

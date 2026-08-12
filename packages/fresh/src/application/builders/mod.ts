@@ -10,7 +10,6 @@ import { definePage as definePageImpl } from './define-page/mod.ts';
 import {
   type DefinedPartialRoute,
   definePartial as definePartialImpl,
-  type DefinePartialOptions,
   defineStatsPartial as defineStatsPartialImpl,
   type DefineStatsPartialOptions,
 } from './define-partial.tsx';
@@ -25,11 +24,7 @@ export function definePage<TState = EmptyRecord>(): PageRootBuilder<TState> {
 }
 
 /** Define a framework-owned partial route backed by an async loader. */
-export function definePartial<TProps extends object, TContext, THandler = undefined>(
-  options: DefinePartialOptions<TProps, TContext, THandler>,
-): DefinedPartialRoute<TContext, THandler> {
-  return definePartialImpl(options);
-}
+export const definePartial: typeof definePartialImpl = definePartialImpl;
 
 /** Define a stats-only partial route backed by a context-free query function. */
 export function defineStatsPartial<TProps extends object, TContext, THandler = undefined>(
