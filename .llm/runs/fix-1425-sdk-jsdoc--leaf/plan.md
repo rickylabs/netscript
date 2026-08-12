@@ -36,6 +36,9 @@ module path while preserving the documented `queryOptions({ input })` call shape
 ## Scope
 
 - Change the one stale import inside the `createServiceQueryUtils` JSDoc example.
+- Make that example self-contained by importing `useQuery` from the package-owned Fresh query surface.
+- Orchestrator-approved extension: repair the sibling desktop JSDoc contract import with the
+  scaffolded `@my-app/contracts` alias.
 - Record the initial and final census.
 - Run every gate named in the implementation brief.
 
@@ -57,6 +60,8 @@ module path while preserving the documented `queryOptions({ input })` call shape
 | D1 | Import `ordersClient` from `@app/lib/orders.ts`. | The shipped app alias resolves to `apps/<app>/lib/<service>.ts` and replaces the removed catch-all module. |
 | D2 | Preserve `ordersQueryUtils.list.queryOptions({ input: ... })`. | The named consistency page explicitly distinguishes this helper's options-object call shape. |
 | D3 | Touch only the JSDoc comment body in package source. | The issue forbids runtime behavior changes. |
+| D4 | Import `useQuery` from `@netscript/fresh/query`. | Checked-in SDK/docs examples establish the package-owned island hook surface. |
+| D5 | Import the desktop example contract from `@my-app/contracts`. | `generate-app-deno-json.ts` emits `@<projectName>/contracts`; docs use `@my-app/contracts` for generic examples. |
 
 ## Open-Decision Sweep
 
@@ -104,6 +109,8 @@ module path while preserving the documented `queryOptions({ input })` call shape
 | 4 | Format | scoped fmt wrapper | exit 0 |
 | 5 | Code quality | `rtk proxy deno task quality:gate` | exit 0 |
 | 6 | Census | `rtk grep -rn "api-clients" packages/sdk/` | zero matches / grep exit 1 |
+| 7 | Repo-wide variant census | case-insensitive `api[-_]?clients` over `packages/` and `plugins/` | zero JSDoc matches; generated corpus hit classified |
+| 8 | SDK JSDoc import audit | enumerate example import specifiers | no relative app-level paths |
 
 ## PLAN-EVAL
 

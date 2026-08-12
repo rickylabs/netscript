@@ -12,22 +12,24 @@
 
 ## Current State
 
-The sole stale JSDoc import is replaced with `@app/lib/orders.ts`; the helper-specific
-`queryOptions({ input })` shape is preserved. All requested gates pass and the final census is zero.
+The query JSDoc example is self-contained, uses `@app/lib/orders.ts`, and preserves the helper-specific
+`queryOptions({ input })` shape. The approved sibling desktop example now uses `@my-app/contracts`.
+All requested gates and widened audits pass.
 
 ## Completed
 
-- Harness bootstrap, research, plan, Design checkpoint, 1→0 census, implementation, and all requested gates.
+- S1–S2 plus independent adversarial review PASS.
+- S3 evidence corrections, self-contained query example, desktop scope extension, and gates.
 
 ## In Progress
 
-- Final implementation commit, push, PR evidence comment, and issue acceptance update.
+- S3 commit, explicit push, PR comment/body update, and corrected issue evidence.
 
 ## Next Steps
 
-1. Commit and explicitly push S2.
-2. Update draft PR body/comment and issue acceptance evidence.
-3. Stop for independent orchestrator evaluation; do not mark ready or merge.
+1. Commit and explicitly push S3.
+2. Correct PR/issue acceptance evidence without claiming a nonexistent JSDoc compile gate.
+3. Stop without changing PR ready state or merging.
 
 ## Key Decisions
 
@@ -41,16 +43,17 @@ The sole stale JSDoc import is replaced with `@app/lib/orders.ts`; the helper-sp
 | Path | Status | Notes |
 | ---- | ------ | ----- |
 | `.llm/runs/fix-1425-sdk-jsdoc--leaf/*` | new | Run evidence only. |
-| `packages/sdk/src/query-client/create-service-query-utils.ts` | changed | One JSDoc import line only. |
+| `packages/sdk/src/query-client/create-service-query-utils.ts` | changed | JSDoc-only self-containment, path, and canonical input edits. |
+| `packages/sdk/src/desktop/mod.ts` | changed | Approved sibling JSDoc import correction. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
 | Static | PASS | doc-lint + scoped check/lint/fmt; exit 0 |
-| Fitness | PASS | `quality:gate` exit 0; census 1→0 |
+| Fitness | PASS | `quality:gate` exit 0; repo-wide variant JSDoc census 1→0 |
 | Runtime | N/A | no behavior change |
-| Consumer | PASS | `@app/lib/orders.ts` plus `queryOptions({ input })` |
+| Consumer | PASS by construction/inspection | self-contained query block; canonical app and contract aliases; no JSDoc compile gate exists |
 
 ## Open Questions
 
@@ -58,7 +61,7 @@ The sole stale JSDoc import is replaced with `@app/lib/orders.ts`; the helper-sp
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: orchestrator-approved desktop JSDoc sibling fix, recorded in `drift.md`.
 - Debt: none.
 
 ## Commits
