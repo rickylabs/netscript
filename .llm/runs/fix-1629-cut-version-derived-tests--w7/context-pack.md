@@ -13,8 +13,9 @@
 ## Current State
 
 The arbitrary 0.0.7 bumped-copy discriminator is captured. Version-bearing diagnostic assertions
-now derive from `NETSCRIPT_RELEASE_VERSION`; cut-local workspace mapping is implemented and targeted
-plugin resolution tests are green but not yet committed.
+derive from `NETSCRIPT_RELEASE_VERSION`. Cut-local workspace mapping derives all first-party export
+aliases from manifests, carries root catalog/imports, and fails on missing targets. All 34 targeted
+tests (55 steps) pass.
 
 ## Completed
 
@@ -25,7 +26,7 @@ plugin resolution tests are green but not yet committed.
 
 ## In Progress
 
-- Cut-local import resolution slice.
+- Full requested gates and disposable post-fix 0.0.7 proof.
 
 ## Next Steps
 

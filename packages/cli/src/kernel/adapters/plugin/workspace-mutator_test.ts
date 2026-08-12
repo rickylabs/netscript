@@ -5,7 +5,7 @@
  */
 
 import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@^1';
-import { dirname, join, relative, resolve, toFileUrl } from '@std/path';
+import { dirname, fromFileUrl, join, relative, resolve, toFileUrl } from '@std/path';
 import { artifactText, collectInstallArtifacts } from '@netscript/plugin/adapter';
 import type { NetScriptPlugin } from '@netscript/plugin/adapter';
 import { aiAdapterPlugin } from '@netscript/plugin-ai/adapter';
@@ -21,6 +21,7 @@ import {
   netscriptJsrSpecifier,
   NETSCRIPT_RELEASE_VERSION,
 } from '../../constants/jsr-specifiers.ts';
+import { useLocalWorkspaceImports } from '../../../../tests/support/local-workspace-imports.ts';
 import {
   SCAFFOLD_CONNECTOR_PACKAGES,
   SCAFFOLD_WORKSPACE_PACKAGES,
@@ -31,6 +32,8 @@ import { ScaffoldValidationError } from '../../domain/errors.ts';
 import { loadRegisteredPlugins } from '../config/plugin-registry.ts';
 import { DenoFileSystem } from '../runtime/file-system/deno-file-system.ts';
 import { installUiRegistryItems } from '../../application/ui/registry.ts';
+
+const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../../../../../');
 
 interface FirstPartyPluginCase {
   readonly adapter: NetScriptPlugin;
@@ -862,6 +865,7 @@ Deno.test('first-party control-plane modules are import-safe and preserve applic
   for (const plugin of FIRST_PARTY_PLUGIN_CASES) {
     await workspaceMutator.ensureRootImportsForPluginKind(projectRoot, plugin.kind);
   }
+  await useLocalWorkspaceImports(projectRoot, REPO_ROOT);
 
   for (const plugin of FIRST_PARTY_PLUGIN_CASES) {
     const artifacts = collectInstallArtifacts(plugin.adapter);

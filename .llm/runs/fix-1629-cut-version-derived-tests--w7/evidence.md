@@ -74,3 +74,33 @@ generated closure verifier rejects split JSR identities with version-bearing out
 generated closure verifier fails closed on a range pin ... ok
 generateAppDenoJson ... ok
 ```
+
+## Targeted green — cut-local resolution and fail-closed guard
+
+```text
+$ deno test --allow-all packages/cli/tests/support/local-workspace-imports_test.ts \
+  packages/cli/src/kernel/domain/dependency-closures/netscript-web-runtime-closure_test.ts \
+  packages/cli/src/kernel/templates/app/generators-config_test.ts \
+  packages/cli/src/kernel/templates/workspace/dependency-closure-verifier_test.ts \
+  packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts \
+  packages/cli/src/public/features/plugins/install/install-plugin_test.ts \
+  packages/cli/src/local/features/plugins/install/install-local-plugin_test.ts
+first-party control-plane modules are import-safe and preserve application barrels ... ok
+installs the AI markdown registry closure into its generated namespace ... ok
+keeps the configured AI module resolvable across a forced reinstall ... ok
+keeps the plugin-owned AI namespace configured in local-source installs ... ok
+cut-local imports fail closed when a first-party export target is missing ... ok
+ok | 34 passed (55 steps) | 0 failed (18s)
+exit: 0
+```
+
+The helper derives aliases from every actual `packages/*` and `plugins/*` manifest export, carries
+the root workspace import/catalog contract into the temporary project, and calls `Deno.stat` on
+each export target. It therefore cannot convert a real missing first-party package/export into a
+green result.
+
+```text
+$ deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx
+{"command":"deno fmt --check","cwd":"/home/codex/repos/ns006-w7","mode":"check","summary":{"filesSelected":878,"batches":5,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+exit: 0
+```

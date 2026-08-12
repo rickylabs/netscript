@@ -61,6 +61,7 @@ cut-local fixture helper only for tests that intentionally exercise pre-publish 
 | --- | --- | --- | --- |
 | 2026-08-13 | 1 | research/design | Re-baselined issue against requested base; PLAN-EVAL N/A because the issue fully enumerates contract, exclusions, discriminators, and gates. |
 | 2026-08-13 | 2 | red/green | Disposable 0.0.7 bump produced six literal-version assertion failures; all now interpolate `NETSCRIPT_RELEASE_VERSION`. |
+| 2026-08-13 | 3 | red/green | Temporary cut projects now import every real first-party manifest export from the checkout and inherit root catalog/imports; 34 targeted tests/55 steps pass. |
 
 ## Decisions
 
@@ -69,6 +70,7 @@ cut-local fixture helper only for tests that intentionally exercise pre-publish 
 | PLAN-EVAL N/A | Small bounded correctness fix with owner-enumerated properties and no open architectural decision. | issue #1629 / run-loop §4 |
 | Automatic IMPL-EVAL only | Owner controls draft→ready and explicitly prohibited this session from flipping. | user directive |
 | Version fixtures interpolate the generated CLI version | Inputs and expectations share the exercised manifest authority. | targeted bumped-copy failures |
+| Local helper validates every export target | A missing package/export remains an immediate `NotFound`, while existing range/split guards stay unchanged. | `local-workspace-imports_test.ts` |
 
 ## Drift
 
