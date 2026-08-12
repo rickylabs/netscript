@@ -38,6 +38,7 @@ export async function loadProjectConfig(
 ): Promise<NetScriptConfig> {
   const args = [
     'run',
+    '--no-lock',
     '--allow-all',
     '--minimum-dependency-age=0',
   ];
