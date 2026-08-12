@@ -8,7 +8,7 @@ templateEngine: [vento, md]
 
 Durable Streams development plugin for NetScript: a plugin manifest plus CLI, scaffolding,
 end-to-end gate, and Aspire integration surfaces for a durable, change-data stream service. This
-page is generated from the plugin public surface with `deno doc` (US-2). For the full index of
+page is written against the plugin public surface reported by `deno doc`. For the full index of
 packages and plugins return to the [reference overview](/reference/).
 
 The plugin ships five published entrypoints. The root export (`@netscript/plugin-streams`) carries

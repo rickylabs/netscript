@@ -6,7 +6,7 @@ title: "@netscript/plugin-sagas"
 # `@netscript/plugin-sagas`
 
 NetScript plugin for durable saga orchestration, workflow APIs, and saga runtime metadata.
-This page is generated from the package's public surface with `deno doc` (US-2). For the full
+This page is written against the package's public surface reported by `deno doc`. For the full
 index of packages and plugins return to the [reference overview](/reference/).
 
 The published plugin exposes the host-facing plugin manifest, the executable saga runtime and
@@ -17,7 +17,8 @@ core package is documented as an [Internals](#internals) subsection below.
 
 ## Entrypoints
 
-The plugin publishes the following entrypoints. Each is generated from its own `deno doc` surface.
+The plugin publishes the following entrypoints. Each is documented against its own `deno doc`
+surface.
 
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |

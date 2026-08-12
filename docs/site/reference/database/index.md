@@ -6,8 +6,8 @@ title: "@netscript/database"
 # `@netscript/database`
 
 Database adapter contracts, Prisma driver helpers, tracing, and schema tooling for
-NetScript packages. This page is generated from the package's public surface with
-`deno doc` (US-2). For the full index of packages and plugins return to the
+NetScript packages. This page is written against the package's public surface reported by
+`deno doc`. For the full index of packages and plugins return to the
 [reference overview](/reference/).
 
 The root entrypoint (`@netscript/database`) re-exports the port contracts, the PostgreSQL

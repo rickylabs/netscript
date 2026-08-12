@@ -228,7 +228,7 @@ real today. Do not build on <code>createNetScriptMcpSandbox</code> yet.
 
 ## Reference
 
-This page orients; the generated reference enumerates every exported symbol.
+This page orients; the API reference enumerates every exported symbol.
 
 {{ comp.featureGrid({ items: [
   {

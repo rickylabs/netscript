@@ -6,7 +6,7 @@ title: "@netscript/plugin-triggers"
 # `@netscript/plugin-triggers`
 
 NetScript plugin for trigger ingress, scheduling, file watching, and the trigger runtime APIs.
-This page is generated from the package's public surface with `deno doc` (US-2). For the full
+This page is written against the package's public surface reported by `deno doc`. For the full
 index of packages and plugins return to the [reference overview](/reference/).
 
 The plugin's root entrypoint (`@netscript/plugin-triggers`) exposes the public **plugin manifest**
@@ -17,7 +17,7 @@ core package and are documented in [Internals](#internals) below.
 
 Additional integration entrypoints are published as [sub-path exports](#sub-path-exports):
 `./public`, `./plugin`, `./runtime`, `./scaffolding`, `./aspire`, `./cli`, `./services`,
-`./streams`, and `./streams/server`. Their reference detail is generated from their own
+`./streams`, and `./streams/server`. Their reference detail is documented against their own
 `deno doc` surface.
 
 ## Plugin manifest
@@ -97,8 +97,8 @@ The following entrypoints are published alongside the root export.
 > package that backs the triggers plugin. It is the implementation surface: the handler-first
 > trigger DSL, the trigger runtime (ingress + processor), the runtime ports, configuration
 > schemas, and deterministic testing primitives. Application code that authors trigger
-> definitions imports the DSL from here; everything below is generated from
-> `@netscript/plugin-triggers-core`'s own `deno doc` surface (US-8).
+> definitions imports the DSL from here; everything below is documented against
+> `@netscript/plugin-triggers-core`'s own `deno doc` surface.
 
 ### Authoring DSL
 
@@ -221,7 +221,7 @@ The following entrypoints are published alongside the root export.
 
 ### Internals sub-path exports
 
-The core package publishes the following sub-path entrypoints. Each is generated from its own
+The core package publishes the following sub-path entrypoints. Each is documented against its own
 `deno doc` surface.
 
 | Export | Entrypoint | Purpose |

@@ -7,8 +7,8 @@ title: "@netscript/plugin-workers"
 
 The NetScript background-workers plugin: background jobs, task execution, workflow
 orchestration, a Workers API service, CLI commands, scaffolding, durable streams, and Aspire
-process wiring. This page is generated from the package public surface with `deno doc`
-(US-2). For the full index of packages and plugins return to the
+process wiring. This page is written against the package public surface reported by `deno doc`.
+For the full index of packages and plugins return to the
 [reference overview](/reference/).
 
 The deployable plugin (`@netscript/plugin-workers`) binds the host plugin system to the
@@ -274,8 +274,8 @@ The long-running runtime processes: the `Worker` job/task consumer and the cron 
 > **Internals.** The `@netscript/plugin-workers-core` package holds the reusable worker
 > definition builders, runtime composition, registries, executors, and testing primitives that
 > `@netscript/plugin-workers` binds to the host. It is published separately and may be imported
-> directly, but most applications consume it through the plugin above (US-8). The surface below
-> is generated from its own `deno doc` exports.
+> directly, but most applications consume it through the plugin above. The surface below is
+> documented against its own `deno doc` exports.
 
 ### `@netscript/plugin-workers-core`
 

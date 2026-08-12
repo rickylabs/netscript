@@ -5,8 +5,8 @@ title: "@netscript/logger"
 
 # `@netscript/logger`
 
-Structured logging for NetScript packages, services, workers, and jobs. This page is
-generated from the package's public surface with `deno doc` (US-2). For the full index of
+Structured logging for NetScript packages, services, workers, and jobs. This page is written
+against the package's public surface reported by `deno doc`. For the full index of
 packages and plugins return to the [reference overview](/reference/).
 
 The root entrypoint (`@netscript/logger`) exposes the lightweight core surface only:

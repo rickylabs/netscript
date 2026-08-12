@@ -9,13 +9,13 @@ Job, task, workflow, runtime, config, and testing primitives for NetScript worke
 is written against the package's published exports and its `deno doc` surface. For the full index of
 packages and plugins return to the [reference overview](/reference/).
 
-Background-job definitions fail in two places: at definition time, when a job is missing a handler
-and nobody notices until production; and at runtime, when the executor and its storage are welded
-together and untestable. This package attacks both. `defineJob`, `defineTask`, and `defineWorkflow`
-are **typestate-gated** builders — `build()` only exists once an entrypoint or handler is set, so an
-incomplete definition is a compile error rather than a runtime surprise. The runtime composes from
-injected registry, worker, and storage ports with memory-backed defaults, so the same definitions run
-in production and in permission-free tests.
+Background-job definitions fail in two places: at definition time, when a job is missing an
+execution target and nobody notices until production; and at runtime, when the executor and its
+storage are welded together and untestable. This package attacks both. `defineJob`, `defineTask`,
+and `defineWorkflow` are **typestate-gated** builders — `build()` only exists once an entrypoint or
+handler is set, so an incomplete definition is a compile error rather than a runtime surprise. The
+runtime composes from injected registry, worker, and storage ports with memory-backed defaults, so
+the same definitions run in production and in permission-free tests.
 
 This is the core that the deployable [`@netscript/plugin-workers`](/reference/workers/) plugin binds
 to a NetScript host. Use it directly for custom hosts, libraries, and tests.
@@ -71,8 +71,8 @@ Each builder is typestate-gated: `build()` becomes available only after the defi
 | `WorkflowBuilder` | interface | Root-surface workflow builder typestate API. |
 | `WorkflowDefinition` | type alias | Root-surface workflow definition derived from the thin public schema. |
 
-A **job** runs a handler in-process; a **task** runs an external entrypoint through the multi-runtime
-executor; a **workflow** sequences them. The three builders share the same typestate discipline.
+Jobs and tasks both accept either an in-process handler or a runtime-specific entrypoint; workflows
+sequence their definitions. The three builders share the same typestate discipline.
 
 ### Handler results and tools
 
@@ -101,11 +101,12 @@ exposes are bound to the active worker instrumentation context.
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `startWorkers` | function | Create and start a workers runtime using default composition. |
-| `createWorkersRuntime` | function | Create a fresh workers runtime from explicit dependencies. |
+| `createWorkersRuntime` | function | Create an unstarted workers runtime with the root surface's minimal options. |
 
-Two entry styles for one runtime: `startWorkers()` is the one-line preset with memory-backed
-defaults; `createWorkersRuntime()` composes explicitly when startup order, storage backends, or
-shutdown need to be controlled.
+Two entry styles for one runtime: root `startWorkers()` creates and starts the memory-backed preset,
+while root `createWorkersRuntime()` creates the same runtime without starting it. Import
+`createWorkersRuntime` from `/runtime` when registries, executors, storage, or other runtime ports
+must be injected explicitly.
 
 ### Inspection
 

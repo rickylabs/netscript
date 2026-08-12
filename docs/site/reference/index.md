@@ -6,7 +6,7 @@ title: Reference
 Reference is **information-oriented**: precise, exhaustive API documentation for every public
 NetScript package and plugin. These pages are hand-written and derived from each package's published
 export surface with `deno doc`, so they describe the published surface rather than the source tree
-(US-2). For a guided introduction start with the [tutorials](/tutorials/), for problem-solving
+surface. For a guided introduction start with the [tutorials](/tutorials/), for problem-solving
 recipes see the [how-to guides](/how-to/), and for the ideas behind the API read the
 [explanation](/explanation/).
 
@@ -32,7 +32,7 @@ exceptions, the deployable plugins, which drop the `plugin-` prefix:
 Their `-core` counterparts use the name-exact form, so `@netscript/plugin-sagas-core` is at
 [`/reference/plugin-sagas-core/`](/reference/plugin-sagas-core/) while `@netscript/plugin-sagas` is at
 `/reference/sagas/`. This is a description of what the site does today, not a rule to follow when the
-two forms disagree; reconciling them is tracked separately.
+two forms disagree.
 
 Navigation is derived from the folder tree, so a new page is discoverable as soon as its directory
 exists — no index or nav file lists the packages.

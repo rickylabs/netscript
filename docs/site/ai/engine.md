@@ -16,7 +16,7 @@ core that owns the domain vocabulary, the capability seams, the model registries
 the tool system, the agent loop, MCP transports, and opt-in provider adapters. It
 wraps `@tanstack/ai*` and `@standard-schema/spec` and adds no schema DSL of its own.
 We keep this page at the "which piece, and why" altitude; the exact symbol tables
-live in the generated reference, linked at the end.
+live in the API reference, linked at the end.
 
 {{ comp callout { type: "note", title: "Published in " + releaseVersion } }}
 <code>@netscript/ai</code> is <strong>published on JSR</strong> and installs today:
@@ -179,7 +179,7 @@ Choosing between them is mostly a question of where your models live:
   chat: `.embed()` and `.analyze()`.
 
 Per-provider config fields and defaults are enumerated in the
-[generated reference]({{ "ref:ai" |> xref |> url }}).
+[API reference]({{ "ref:ai" |> xref |> url }}).
 
 ## Testing — deterministic fakes
 
@@ -187,7 +187,7 @@ Per-provider config fields and defaults are enumerated in the
 without a network: fake chat model providers and agent loops that replay scripted
 turns and chunks, fake memory, embedding, and vision ports, an in-memory tool
 registry, and `createFakeTelemetryPort()` (whose `.records` capture emitted
-telemetry). The full factory list lives in the generated reference.
+telemetry). The full factory list lives in the API reference.
 
 ## Wiring tool and agent registries
 

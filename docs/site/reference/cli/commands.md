@@ -149,9 +149,8 @@ the [CLI reference](/cli-reference/#plugins). The full group also carries:
 `--project-root`, then runs the installed `@netscript/plugin-ai` package's CLI in a child
 `deno run` process and forwards every remaining argument verbatim, printing its output and
 propagating its exit code. The verb vocabulary therefore belongs to that plugin's release,
-not to this reference — run `netscript plugin ai --help` against your installed version, and
-see the [`@netscript/plugin-ai` reference](/reference/plugin-ai/). Invoking it with no verb
-is an error.
+not to this reference; see the
+[`@netscript/plugin-ai` reference](/reference/plugin-ai/). Invoking it with no verb is an error.
 
 ### `plugin auth` subcommands
 
@@ -237,8 +236,10 @@ packaging verbs, and artifact-copy and log verbs.
 | --- | --- |
 | `netscript deploy list` | List registered deploy targets and operations. Prints `key`, advertised operations, and label per line. Flag: `--json` (emit machine-readable target descriptors). |
 
-`deploy list` reads the live registry, so it is the authoritative answer to "which targets
-exist and what can each one do" for the CLI you actually have installed. Ten targets are
+`deploy list` reads the live registry, so it is the authoritative answer to which targets are
+registered and which operations their adapters advertise. The advertised set can be wider than
+the router's callable command set; use each target's help output or the routed-verb table below to
+see which verbs the CLI exposes. Ten targets are
 registered by default: `azure-aca`, `azure-aks`, `azure-app-service`, `cloud-run`,
 `compose`, `deno-deploy`, `docker`, `kubernetes`, `linux-service`, `windows-service`.
 
@@ -284,8 +285,10 @@ Every routed verb on every target shares the same flags: `--project-root <dir>`,
 | Command | Description |
 | --- | --- |
 | `netscript deploy desktop <sub>` | Package and publish native Deno Desktop applications. The group prints help; `package` and `release` do the work. |
-| `netscript deploy desktop package` | Package an enabled desktop app into Deno Desktop native formats. The target OS and architecture are the host's, resolved at run time; an unsupported host fails rather than producing a wrong artifact. |
-| `netscript deploy desktop release <sub>` | Prepare, sign, and serve a native release. |
+| `netscript deploy desktop package` | Package an enabled desktop app into Deno Desktop native formats. Flags: `--project-root <path>`, `--app <id>`, `--target <triple>`, `--all-targets`, repeatable `--format <format>`, `--compression <algorithm>` (default `xz`), `-o, --output-dir <dir>` (default `.deploy/desktop/packages`). Without a target flag it uses the host OS and architecture; an unsupported target fails rather than producing a wrong artifact. |
+| `netscript deploy desktop release <sub>` | Prepare or serve a native release. The group prints help for its two subcommands. |
+| `netscript deploy desktop release prepare` | Prepare and sign release metadata. Required flags: `--target <target>`, `--version <version>`, `--sequence <n>`, `--current-runtime <path>`, repeatable `--from <version>=<runtime-path>`, `--private-key-file <path>`. Optional: `--project-root <path>`, `--channel <name>` (default `stable`), `--release-dir <dir>` (default `.deploy/desktop/releases`). |
+| `netscript deploy desktop release serve` | Serve a prepared release directory. Flags: `--project-root <path>`, `--release-dir <dir>` (default `.deploy/desktop/releases`), `--hostname <host>` (default `127.0.0.1`), `--port <port>` (default `8787`), `--base-path <path>` (default `/`). |
 | `netscript deploy package-cli` | Compile the NetScript CLI itself into a self-shippable Windows `.exe`. Flags: `-o, --output-dir <dir>` (default `./.deploy/windows`; a `scripts/` subdirectory is used), `--target <triple>` (default `x86_64-pc-windows-msvc`), `--no-bundle` (compile directly from source — larger output), `-v, --verbose`. |
 
 `package-cli` bundles before compiling by default and falls back to compiling from source if

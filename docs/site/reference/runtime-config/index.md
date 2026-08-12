@@ -5,8 +5,8 @@ title: "@netscript/runtime-config"
 
 # `@netscript/runtime-config`
 
-Hot-reloadable NetScript runtime override types, loaders, watchers, and diagnostics. This page
-is generated from the package's public surface with `deno doc` (US-2). For the full index of
+Hot-reloadable NetScript runtime override types, loaders, watchers, and diagnostics. This page is
+written against the package's public surface reported by `deno doc`. For the full index of
 packages and plugins return to the [reference overview](/reference/).
 
 Runtime config files live under the configured runtime directory and are loaded through a

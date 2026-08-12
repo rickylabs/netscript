@@ -128,13 +128,11 @@ gets there through the plugin system. A plugin is, at its core, a manifest: plai
 declaring what it contributes, inspected by hosts without executing plugin code. One manifest can
 contribute across **every layer** — CLI verbs, scaffolded code, runtime services, storage, stream
 topics, telemetry, Aspire resources — and the host materializes whatever it declares. One command,
-four plugin files scaffolded and twelve Aspire helpers regenerated:
+with the generated plugin files and Aspire helpers reported in its output:
 
 ```bash
 netscript plugin install worker --name workers
 # Installed worker plugin "workers" on port 49152. (Note: your scaffold's port will differ)
-# Created 4 plugin files.
-# Regenerated 12 Aspire helper files.
 ```
 
 The same mechanism that ships the six first-party plugins below is how a team extends the framework

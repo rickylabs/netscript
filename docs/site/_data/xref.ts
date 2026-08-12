@@ -11,7 +11,7 @@
  *   tut:        tutorial chapter/track  (tut:first-workspace)
  *   explain:    explanation essay       (explain:architecture)
  *   concept:    concept / mental-model page
- *   ref:        generated reference unit (ref:sagas -> /reference/sagas/)
+ *   ref:        reference unit (ref:sagas -> /reference/sagas/)
  *               and sub-paths           (ref:sagas/presets -> /reference/sagas/presets/)
  *   cli:        CLI reference           (cli:reference)
  *   glossary:   glossary                (glossary: or glossary:<anchor>)
@@ -32,7 +32,7 @@ export interface XrefTarget {
   label: string;
 }
 
-/** The 32 generated reference units (mirrors `referenceUnits` in `_data.ts`). */
+/** The 32 reference units. */
 const REFERENCE_UNITS = [
   "ai",
   "auth",

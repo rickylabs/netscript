@@ -5,7 +5,10 @@ title: "@netscript/config"
 
 # `@netscript/config`
 
-Typed NetScript project configuration: schemas, loaders, environment helpers, workspace discovery, diagnostics, and scaffold constants. This page is generated from the package public surface with `deno doc` (US-2). For the full index of packages and plugins return to the [reference overview](/reference/).
+Typed NetScript project configuration: schemas, loaders, environment helpers, workspace discovery,
+diagnostics, and scaffold constants. This page is written against the package public surface
+reported by `deno doc`. For the full index of packages and plugins return to the
+[reference overview](/reference/).
 
 The root entrypoint (`@netscript/config`) exposes the authoring, loading, environment, workspace, and diagnostic contract. The usual path is to define a project config once with `defineConfig` in `netscript.config.ts`, load it at process startup with `initConfig`, and read the validated `NetScriptConfig` synchronously with `getConfig`. Schema-only APIs live on sub-paths so the public root surface does not leak Zod internals:
 
