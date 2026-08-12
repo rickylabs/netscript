@@ -141,3 +141,23 @@ being fixed, filed, or briefed by this lane. Both are the owner's call.
 - **Worth noting:** this is the escalate-don't-idle instruction working as intended. The recorded
   failure mode it was written against — supervisors going idle at a red gate, four occurrences in
   0.0.4 — did not recur.
+
+## D-9 — never wrap an attached Codex launch or resume in a shell `timeout`
+
+- **Severity:** significant (tooling practice; owner-corrected)
+- **Recorded:** 2026-08-12, stage C
+- **What the orchestrator did wrong:** wrapped `agentic:launch-codex-slice` in `timeout 580` and
+  `codex exec resume` in `timeout 900`, to keep the foreground stream from blocking the supervisor turn.
+- **Why it is wrong:** the wrapper's SIGTERM at expiry **kills the attached slice**, not merely the log
+  stream. The launch wrapper did fire (exit 143 / SIGTERM); this thread survived it, and the worklog
+  initially recorded that as "an observation, not a failure". That conclusion was wrong — surviving once
+  is not evidence the practice is safe, and treating a SIGTERM on an attached agent as harmless is
+  exactly the "verify the artefact, never the exit code" mistake in reverse.
+- **Correct practice, owner-stated:** attached launch and resume run **unwrapped**. For bounded
+  observation use `deno task agentic:codex-watch --mode turn --thread-id <id> --timeout-seconds N`,
+  which is designed to expire without touching the slice. Preserve the same thread and worktree
+  throughout; never launch a rival.
+- **Also learned (and independently useful):** `codex exec resume` fails fast with
+  `thread-store conflict: … already has an active writer` while the thread is mid-turn. That is the
+  mechanical signal for "you are not at a turn boundary" — steer on `codex-watch --mode turn`
+  completion, not on git activity.

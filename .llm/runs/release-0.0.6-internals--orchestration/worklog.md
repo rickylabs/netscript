@@ -207,10 +207,12 @@ Draft PR **#1527** was opened by the orchestrator before dispatch (labels `type:
 `priority:p1`, `ci:skip-e2e`, `ci:skip-scaffold`, `status:impl`; milestone `0.0.6`), so the agent had a
 live reviewable surface from its first commit.
 
-**Tooling observation, not a failure:** the foreground launcher stream was killed by the orchestrator's
-own 580s command timeout (exit 143 / SIGTERM). The thread itself was already created and unaffected —
-confirmed by `agentic:codex-status` showing it `working` at that `cwd`, and by four subsequent commits.
-A launcher whose log stream outlives the caller's timeout should be backgrounded from the start.
+**Tooling hazard — see `drift.md` D-9.** The launch was wrapped in a shell `timeout 580`, which fired
+and sent SIGTERM (exit 143). This slice's thread happened to survive (confirmed by
+`agentic:codex-status` showing it `working` at that `cwd`, and by five subsequent commits), but the
+practice is **prohibited**: wrapping an attached launch or resume in a shell `timeout` kills the
+attached slice when the timeout expires. Attached launch/resume run unwrapped; bounded observation uses
+`agentic:codex-watch --timeout-seconds` instead.
 
 **Slices landed** (`git log --oneline origin/main..HEAD` in the worktree):
 
