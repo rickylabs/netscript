@@ -60,7 +60,7 @@ function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
   return !!value && typeof value === 'object';
 }
 
-async function writeResult(result: Readonly<Record<string, unknown>>): Promise<void> {
+async function writeResult(result: unknown): Promise<void> {
   const line = `${PROBE_RESULT_PREFIX}${JSON.stringify(result)}\n`;
   await Deno.stdout.write(new TextEncoder().encode(line));
 }
