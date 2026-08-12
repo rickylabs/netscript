@@ -63,10 +63,9 @@ not separate units. Paths, rather than remembered package names, are the executa
 
 ## Provenance for removed rows
 
-This repository's reachable history begins at
-`317e4b509704877f30ef901a4e5db3bedc8db43e` (2026-07-06, beta.5). The `plugin-*-core` tier is
-already present in that root tree, so “not present in this repository's history” does not mean the
-named capability never existed before the truncated history.
+Ancestry claims in this repository must not be derived from a shallow clone. Check the checkout
+with `git rev-parse --is-shallow-repository`; when it reports `true`, use the GitHub compare API
+(`gh api repos/rickylabs/netscript/compare/<base>...<head>`) as the canonical ancestry source.
 
 - `@netscript/triggers` (`packages/triggers`) is absent from every reachable commit. It was
   superseded before this history by `packages/plugin-triggers-core`, recorded in the
@@ -81,11 +80,10 @@ named capability never existed before the truncated history.
   `packages/plugin-streams-core` is present in the root tree, but the same `arch-debt.md` probe that
   finds the sagas record finds no top-level streams supersession record; no stronger provenance is
   asserted.
-- `@netscript/shared` (`packages/shared`) exists only on non-ancestor history: added at
-  `0ef13de359b1eb1cdd653ab4400ae57fd19644f6` and deleted at
+- `@netscript/shared` (`packages/shared`) existed in this repository's reachable history. It was
+  added at `0ef13de359b1eb1cdd653ab4400ae57fd19644f6` (2026-06-05) and removed at
   `fd8259b76d8e71ee76eadd56ce94160de004fc32` (`feat(contracts): consolidate shared foundation
-  package`, including `packages/shared/deno.json` and its tree). Neither commit is an ancestor of
-  this branch.
+  package`). Both commits are canonical ancestors of `main`.
 - `plugins/hello-world` is absent from every reachable commit, with no successor and no
   supersession record in `arch-debt.md`.
 

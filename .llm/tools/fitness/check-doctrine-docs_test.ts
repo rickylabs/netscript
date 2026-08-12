@@ -102,7 +102,6 @@ Deno.test('removed verdict rows carry the reconciled per-row provenance', async 
   const verdict = await Deno.readTextFile(VERDICT_PATH);
   const provenance = section(verdict, 'Provenance for removed rows');
   const expected = [
-    '317e4b509704877f30ef901a4e5db3bedc8db43e',
     '@netscript/triggers',
     '@netscript/workers',
     '@netscript/sagas',
@@ -111,7 +110,10 @@ Deno.test('removed verdict rows carry the reconciled per-row provenance', async 
     'plugins/hello-world',
     '0ef13de359b1eb1cdd653ab4400ae57fd19644f6',
     'fd8259b76d8e71ee76eadd56ce94160de004fc32',
-    'Neither commit is an ancestor',
+    '2026-06-05',
+    'Both commits are canonical ancestors of `main`',
+    'git rev-parse --is-shallow-repository',
+    'GitHub compare API',
     'no top-level streams supersession record',
   ];
 
