@@ -11,4 +11,8 @@
 - Landed rail commit: `5e081e8b8c9aebc6697827698a056b49055e8d58`.
 - Trigger reference and executable twin are typed with `TriggerEventSubscriptionMessage`; both
   direct checking and the #1537 docs snippet gate pass.
-- Remaining: final gates, resolution of D-1, final commit/push/comments/body evidence.
+- Final-head green gates: quality+docs tests (46/46), both doctrine gates, scoped check/lint/fmt,
+  docs snippets, and trigger twin check.
+- Open escalations: D-1 blocks both scan gates on three pre-existing docs-companion findings; D-2
+  blocks asset freshness because regeneration changes an explicitly out-of-bound package file.
+- Remaining: orchestrator resolution of D-1/D-2, final artifact commit/push/comment/body evidence.

@@ -24,6 +24,12 @@
 | Quality suite after budget predicate | exit 0: 21 passed, 0 failed |
 | Docs snippet gate | exit 0: PASS, scanned 578, checked 21, exempt 14, malformed 0 |
 | Trigger executable twin check | exit 0: `deno check --unstable-kv docs/site/reference/triggers/examples_test.ts` |
+| Final quality + docs tests | exit 0: 46 passed, 0 failed, 27 s |
+| Final repo scan | exit 1: 3 triaged D-1 findings, allowCount 8 (baseline 10) |
+| Final default scan | exit 1: 3 triaged D-1 findings, allowCount 7 |
+| `arch:check` / `arch:check:repo` | exit 0 / exit 0 |
+| Scoped check / lint / fmt | exit 0 / exit 0 / exit 0 |
+| Asset barrel generation | generator exit 0; freshness FAIL because D-2 generated a package delta |
 
 ## Reconcile
 
@@ -33,3 +39,5 @@
 - D-1 records three pre-existing docs-companion findings that the widened scan exposes.
 - Trigger reference and executable twin now use the exported
   `TriggerEventSubscriptionMessage`; the docs snippet gate and direct twin check both pass.
+- D-2 records the asset-barrel freshness/boundary contradiction; the generated delta remains
+  uncommitted pending orchestrator direction.
