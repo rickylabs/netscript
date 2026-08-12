@@ -279,3 +279,104 @@ fully executed baseline table. Notable outputs of the re-baseline, all of which 
 - A cross-lane collision: **#1374** (docs lane, live at `/home/codex/repos/ns006-1374-compilegate`)
   needs the same `docs/site/**` fenced-TS extraction that #1378 needs. Two extractors with different
   fence rules would disagree invisibly. Flagged as a must-resolve-before-PR-D open decision.
+
+---
+
+## Design — quality rail (PR-E → PR-B → PR-C → PR-D)
+
+Written to close `plan-eval.md` finding 5: `plan-gate.md:16-34` requires ordered, file-scoped commit
+slices with a gate per slice, and the first cycle offered four per-PR summary rows instead. Recorded
+before any rail implementation file is created, per `run-loop.md` § 3b.
+
+### Public Surface
+
+Repo-internal tooling; no `packages/**`/`plugins/**` published surface changes, so no archetype and no
+`jsr-audit`.
+
+- `.llm/tools/quality/scan-code-quality.ts` — adds `isTypeFixture(file)`, export-awareness, allowance
+  registration, docs-fence intake. Existing exported `QualityRule` union gains members; `QualityFinding`
+  gains an origin field.
+- `.llm/tools/fitness/check-doctrine.ts` — adds `discoverDoctrineRoots()` and
+  `resolveIdentifierOrigin()`; A14 becomes origin-aware.
+- `deno.json` tasks — `arch:check` consumes `discoverDoctrineRoots()`; `quality:scan`/`quality:scan:repo`
+  gain `--max-allow`.
+- `docs/architecture/doctrine/{10-codebase-verdict-and-handoff,06-archetypes}.md`,
+  `.llm/harness/debt/arch-debt.md`, `rfcs/README.md` — documents, not code.
+
+### Domain Vocabulary
+
+- **doctrine root** — a top-level `packages/*` or `plugins/*` workspace member that `check-doctrine.ts`
+  evaluates as one package. *Not* every `deno.json` workspace member: root `deno.json:3-9` also lists
+  `packages/cli/e2e`, `examples/*`, `apps/*`. **Locked:** the selector is expanded top-level
+  `packages/*` + `plugins/*` only, and `packages/cli/e2e` is **excluded** with that exclusion stated in
+  the doctrine (it is a nested e2e harness, not one of the 36 units #1380 enumerates).
+- **identifier origin** — `imported` | `locally-bound` | `unresolved`. A14 fires **only** on
+  `unresolved`. Three origins exist live; see `research.md`.
+- **type fixture** — a `*_type.ts` file under a `tests/type-fixtures/` directory, whose
+  `@ts-expect-error` lines are its assertions.
+- **published reachability** — a declaration reachable from a package's `deno.json` `exports` map, as
+  answered by `deno doc --json`.
+- **registered allowance** — a `// quality-allow:` whose reason contains an open, milestoned `#<n>`.
+- **snippet record** — one fenced TS block from `docs/site/**`, owned by #1374's extractor, carrying
+  (source file, fence ordinal, start line).
+
+### Ports
+
+- `discoverDoctrineRoots(): string[]` — the single source of truth for doctrine root selection. Exists so
+  the task string, `arch:check:repo`, and the coverage test read one function. Introduced in PR-B and
+  **expanded** in PR-C; never duplicated into a checked-in list (this replaces the withdrawn R-6).
+- `resolveIdentifierOrigin(file, ident)` — lexical import + top-level/local binding collection. No type
+  checker; `check-doctrine.ts` stays a line/lexical scanner.
+- **#1374's extractor** — consumed, not re-implemented. PR-D imports it; if its surface stays private,
+  #1378's docs-fence box is blocked on a follow-up rather than forked (owner-confirmed).
+
+### Constants
+
+- `TYPE_FIXTURE_DIR = 'tests/type-fixtures'`, suffix `_type.ts`.
+- `SANCTIONED_BDD_SPECIFIER` — `@std/testing/bdd` (matched by specifier, not by identifier).
+- `MAX_ALLOW` — wired at the count **measured in the wiring PR**, not at a literal from an issue body.
+  Measured today: 7 default / 10 repo-wide; PR-E lowers repo-wide to 8.
+
+### Commit Slices
+
+Ordered, file-scoped, one gate each. `deno test` roots take
+`--allow-read --allow-env --allow-write --allow-run` (established by PR-A's escalation, `drift.md` D-8).
+
+| # | PR | Slice | Files | Gate |
+| --- | --- | --- | --- | --- |
+| E1 | PR-E | RED fixture: `@ts-expect-error` in a type fixture is reported | `.llm/tools/quality/scan-code-quality_test.ts` | `deno test .llm/tools/quality/` fails |
+| E2 | PR-E | `isTypeFixture` exemption (dir + suffix) | `scan-code-quality.ts` | test green; `quality:scan:repo` exit 0 |
+| E3 | PR-E | leakage controls: ordinary source, and `_type.ts` outside the dir, stay red | `scan-code-quality_test.ts` | both negatives fail-on-removal |
+| E4 | PR-E | drop the two redundant allowances | `desktop-consumer_type.ts`, `sdk-assignability_type.ts` | `quality:scan:repo` `allowCount` 10 → 8 |
+| B1 | PR-B | `discoverDoctrineRoots()` + coverage test asserting every publishable `plugin-*-core` is a root | `check-doctrine.ts`, `check-doctrine_test.ts` | test fails when a package is removed from the source |
+| B2 | PR-B | `arch:check` consumes it; `plugin-streams-core` covered | `deno.json:156`, `check-doctrine.ts` | `arch:check` exit 0 |
+| B3 | PR-B | run the repaired gate on `plugin-streams-core`; triage output to new issues | triage list in slice dir only | no `packages/**` source edit in the diff |
+| C1 | PR-C | `resolveIdentifierOrigin()`; A14 fires only on `unresolved` | `check-doctrine.ts`, `check-doctrine_test.ts` | 3 fixtures: import (quiet), local binding (quiet), bare global (**red**) |
+| C2 | PR-C | `arch:check:repo` iterates `discoverDoctrineRoots()`; stops walking `.llm/tmp`, `docs/`, `.llm/tools` | `deno.json:157`, `check-doctrine.ts` | `arch:check:repo` exit 0 or residue enumerated |
+| C3 | PR-C | verdict table re-walked to 36 units; per-row git evidence incl. never-present rows | `10-…md` | existence + coverage tests fail on a fabricated row / an ungated unit |
+| C4 | PR-C | `06-archetypes.md` synced; doctrine states which units are gated and why `packages/cli/e2e` is not | `06-archetypes.md`, `10-…md` | sync test |
+| C5 | PR-C | `arch-debt.md` accepted-red entry closed or dated; dated engineering-reference plan | `arch-debt.md`, `10-…md` | content assertions |
+| C6 | PR-C | `rfcs/README.md` records `rfcs/NNNN-*.md` as canonical; 5 `DECISION_PENDING` mapped | `rfcs/README.md`, `arch-debt.md` | mapping present for all five |
+| C7 | PR-C | docs correction: `netscript-pr` + close-gate repair hint say "label, then push" | `.agents/skills/netscript-pr/SKILL.md`, `check-close-gate.ts`, mirrored `.claude/skills/` | `agentic:check-claude`; no workflow file touched |
+| D1 | PR-D | export-awareness via `deno doc --json`, **fail-closed** on unresolved-type warnings | `scan-code-quality.ts` + test | exported `any` red, local `any` unchanged; re-export attribution fixture |
+| D2 | PR-D | registered allowances (open milestoned `#n`) | `scan-code-quality.ts` + test | unlinked allowance red |
+| D3 | PR-D | `--max-allow` wired at the measured count | `deno.json:50-51` | overflow red |
+| D4 | PR-D | same-PR budget-link control | new check + test | raising the budget without a same-PR issue link is red |
+| D5 | PR-D | docs fences via #1374's extractor | `scan-code-quality.ts` | `as any` in a `docs/site/**` fence red; 6 soundness files unchanged |
+| D6 | PR-D | type the triggers reference and its executable twin | `docs/site/reference/triggers/index.md:310`, `examples_test.ts:65` | both compile without `any` |
+
+### Deferred Scope
+
+- #1530 box 7 (`code-quality-repo` green on `main`) — **observational**, already carries the
+  `[post-merge]` marker in the issue, so it is excluded from the merge gate by the sanctioned mechanism
+  and verified by comment after merge. This is a correction to `plan-eval.md` finding 4, which proposed
+  routing it to a verification issue; the marker already discharges it.
+- PR-D's D5 depends on #1537 landing. If it does not, D5 and #1378 box 3 move with the issue rather than
+  being forked or ticked.
+
+### Contributor Path
+
+To add a doctrine-gated unit: create `packages/<name>/` with a `deno.json`; `discoverDoctrineRoots()`
+picks it up and `arch:check` gates it with no task edit. To add a quality allowance: append
+`// quality-allow: <reason> (#<open issue>)` on the offending line and raise `--max-allow` in the same PR
+as the issue link — the budget can only fall otherwise.

@@ -67,12 +67,12 @@ against that walk, and `.agents/skills/netscript-doctrine` routes every agent th
 | `R-1` | **PR-E (#1530) lands before PR-D (#1378).** | #1378's `gate:` box requires `quality:scan:repo` green. It is red on `main` today for a reason that is not a defect (negative type fixtures scanned as production source). PR-D cannot truthfully tick that box until PR-E clears it. |
 | `R-2` | The `*_type.ts` exemption is keyed on **directory + suffix** (`tests/type-fixtures/**/*_type.ts`), never a filename allowlist and never a widened test regex. | A widened `_test`-style regex would exempt production code; an allowlist rots on the next fixture. The exemption must be an explicit rule asserted by test, which is the shape #1378 § Target contract already mandates for the 6 soundness tests. |
 | `R-3` | Export-awareness is driven by **`deno doc --json` over each package's `exports` map**, not a fourth line-regex. | #1378 offers both. `deno doc --json` already answers "is this symbol published"; `check-doctrine.ts:467-484`'s line-start matching provably misses `export const`, class members, generic defaults and re-exports. Adding a regex that misses the same things would ship a rule that looks export-aware and is not. |
-| `R-4` | `arch:check:repo` iterates **live workspace members read from the root `deno.json` workspace list**, not a hand-listed set and not the repository root. | #1380 acceptance requires it. Reading the workspace list means a new package is gated the moment it joins the workspace — the property #1403's coverage test is reaching for, generalised. |
-| `R-5` | The A14 predicate must resolve **where the identifier came from**, not merely that `describe(`/`it(` appears. | 54 of 55 `arch:check:repo` failures are `@std/testing/bdd` imports — the sanctioned API. A predicate that cannot tell an import from a global is not a Jest/Vitest detector. |
-| `R-6` | `arch:check`'s 16-root task string is moved into **data** (a checked-in list the task and the tests both read) in **PR-B**, before PR-C generalises it. | The list is a ~2 kB inline shell string; a coverage test would have to parse shell to read it. Moving it to data first makes PR-B's coverage assertion honest and PR-C's live-member switch a small delta rather than a rewrite. |
+| `R-4` | **[revised, cycle 2]** `arch:check:repo` iterates **expanded top-level `packages/*` + `plugins/*` workspace members**, not a hand-listed set, not the repository root, and **not every workspace member**. `packages/cli/e2e` is explicitly excluded and the exclusion is stated in the doctrine. | #1380 acceptance requires it. Reading the workspace list means a new package is gated the moment it joins the workspace — the property #1403's coverage test is reaching for, generalised. |
+| `R-5` | **[revised, cycle 2]** The A14 predicate must resolve `imported` \| `locally-bound` \| `unresolved` and fire **only** on `unresolved`, collecting both import specifiers and top-level/local bindings lexically (no type checker). | The population is **53** sanctioned `@std/testing/bdd` imports **plus one locally bound helper** — `packages/mcp/tests/service-endpoint-sources_test.ts:248` declares `const describe = (workDir: string) => …` and imports nothing named `describe` (verified). A predicate that collects only imports would still flag it. Origin 3 (a genuine bare global) has **zero** live instances, so it needs a synthetic fixture and must stay red. |
+| ~~`R-6`~~ | **WITHDRAWN, cycle 2 — the evaluator was right.** A checked-in 16-root data list would be replaced by R-4's discovery in the very next PR, creating two sources of truth and touching task ownership twice. **Replacement:** PR-B introduces `discoverDoctrineRoots()` and asserts coverage against **that function**; PR-C expands the same function to the final policy. S-4 is honoured by preserving and evolving the coverage predicate, which never required a list file. |
 | `R-7` | `--max-allow` is wired at the count **measured in the wiring PR**, and the PR body states that adding an allowance will now fail CI. | Wiring a budget is a behavioural change to every future PR, not a flag addition. Unstated, it reads as a break. |
 | `R-8` | Findings surfaced by newly-covered scans are **triaged into issues, never fixed in the surfacing PR** (`plan.md` S-5). PR-E is not an exception: it fixes the **scanner's scope**, not the findings. | #1403 box 5 and #1378 § Boundaries both require it. The distinction matters for honest box-ticking, so PR-E's body states it explicitly. |
-| `R-9` | The RFC-location divergence (#1380 D9/D10) is resolved **by recording the decision the repo already made**, not by adopting a new process. | `rfcs/` holds only a template and a README; five numbered RFCs (0001–0005) were accepted through `.llm/runs/*/design/canonical/` and merged in the last week. The de-facto path is the harness path. PR-C states which location is canonical and maps the 5 `DECISION_PENDING` entries onto it — it does not invent a promotion pipeline. |
+| ~~`R-9`~~ | **WITHDRAWN, cycle 2 — premise was false at this plan's own baseline.** The claim that `rfcs/` holds only a template and a README was inherited from #1380's 2026-08-08 measurement and never re-measured. At `01aa12b67`, `rfcs/0001-*.md` through `0005-*.md` are present, all `status: Accepted`, and `rfcs/0005-devtools-contribution.md:10-18` names `rfcs/README.md` as canonical. **Replacement (`R-9b`):** accepted RFCs are promoted to numbered `rfcs/NNNN-*.md`; `.llm/runs/*/design/canonical/` bundles are provenance/draft artifacts. PR-C records that in `rfcs/README.md` and maps the five `DECISION_PENDING` entries onto it **without filing them**. See `drift.md` D-11. |
 
 ## Open decisions
 
@@ -116,3 +116,92 @@ pre-existing tests call `Deno.makeTempDir()`).
 | PR-B | #1403 | Sol · low | The coverage test **fails** when a publishable `plugin-*-core` package is removed from the root list; the repaired gate reports `packages/plugin-streams-core`'s real state and its findings are triaged, not fixed |
 | PR-C | #1380 | Sol · medium | Existence test fails on a verdict row naming a non-existent directory; coverage test fails on a live unit with no row; A14 does **not** fire on `@std/testing/bdd` **and still fires** on a real bare global |
 | PR-D | #1378 | Sol · high | Exported `any` fails while a local `any` keeps its current severity; an unlinked `as unknown as` fails; `as any` in a `docs/site/**` fence fails; the 6 soundness tests stay green unchanged; budget overflow fails |
+
+---
+
+# Revision 2 — response to `plan-eval.md` (`FAIL_PLAN`, 6 blocking / 3 should-fix / 1 advisory)
+
+Cycle 1 verdict: `FAIL_PLAN` from a fresh Codex · Sol · high session (thread `019ff508-…`), opposite
+family to this Claude-authored plan. Every finding is accepted except one, which is rebutted with
+evidence below. The withdrawn decisions are struck above rather than edited away, so the record shows
+what was wrong and why.
+
+## Baseline correction — the A14 decomposition (finding 1, blocking)
+
+The table above says `FAIL=55` = 54 × A14 + 1 × A1. The **count** is confirmed; the **cause** was wrong.
+Corrected, and verified independently by this session:
+
+| Identifier origin | Count | Sanctioned? | Evidence |
+| --- | --- | --- | --- |
+| imported from `@std/testing/bdd` | **53** | yes | e.g. `packages/database/tests/migrate-retry_test.ts:10` |
+| **locally bound** in the test file | **1** | yes | `packages/mcp/tests/service-endpoint-sources_test.ts:248` — `const describe = (workDir: string) => …`; the file's imports (`:1-6`) are `@std/assert` plus four local modules, nothing named `describe` |
+| genuinely unresolved global | **0** | **no — the real signal** | none live; needs a synthetic fixture that must stay red |
+
+`check-doctrine.ts:403-413` matches a bare identifier anywhere in a `*_test.ts` file and so cannot
+distinguish any of the three. Treating all 54 as import false-positives would have produced a fix that
+went quiet on the true positive too — the same defect, re-shipped inside its own repair.
+
+## Decisions revised, withdrawn, and added
+
+| ID | Change |
+| --- | --- |
+| `R-3` | **Caveat adopted (finding 7).** `deno doc --json` is fast enough — 3.733 s across all 30 package export maps, exit 0 — but that run emitted **567** `Warning Failed resolving types`. Exit 0 is therefore **not** a completeness proof. The export audit is **fail-closed**: an unresolved published declaration is a finding, unless it falls in a named, tested allowlist class. PR-D additionally carries a fixture proving a **re-exported** `any` is attributed to the published entrypoint. |
+| `R-4` | Revised in place above — selector narrowed from "workspace members" to expanded top-level `packages/*` + `plugins/*`, with `packages/cli/e2e` explicitly excluded and the exclusion stated in the doctrine (finding 8). |
+| `R-5` | Revised in place above — three origins, lexical import **and** binding collection, all three tested (finding 1). |
+| ~~`R-6`~~ | **Withdrawn** (finding 9). Replaced by a single `discoverDoctrineRoots()` introduced in PR-B and expanded in PR-C. No transient list, one source of truth, S-4 honoured through the coverage predicate. |
+| `R-7` | **Caveat adopted.** Ratcheting at the measured count does not prove #1378 box 6. A separate **fireable** control is added (slice D4): raising `--max-allow` **without** a same-PR issue link is red. |
+| ~~`R-9`~~ | **Withdrawn** (finding 2). Replaced by `R-9b`. |
+| `R-9b` | Accepted RFCs are promoted to numbered `rfcs/NNNN-*.md`; `.llm/runs/*/design/canonical/` bundles are provenance/draft artifacts. `rfcs/0001-*.md`–`0005-*.md` exist at `01aa12b67`, all `status: Accepted`, and `rfcs/0005-devtools-contribution.md:10-18` names `rfcs/README.md` canonical. PR-C records this and maps the five `DECISION_PENDING` entries onto it **without filing them**. |
+| `R-10` **(new)** | **The `docs/site/**` fenced-TS extractor is owned by #1374 and consumed by PR-D** (finding 6, resolved with owner authority). PR-D imports the extractor from draft PR **#1537** and sequences after it lands; it does **not** write a second parser. Coordination and the API request (stable per-snippet provenance) are posted at PR #1537 comment `5264583905`. **Fallback, stated now rather than discovered later:** if #1537's surface stays private to `docs:accuracy`, slice D5 and #1378 box 3 **move with the issue** — they are not forked and not ticked. |
+| `R-11` **(new)** | The `labeled`-trigger defect (`drift.md` D-10) is fixed **in the documents, not the workflow** (owner decision). PR-C slice C7 corrects `.agents/skills/netscript-pr` and `check-close-gate.ts`'s repair hint to say "label, then push", regenerates the `.claude/skills/` mirror, and touches **no** workflow file. |
+
+## Open decisions — now none that force rework
+
+| Decision | Status | Resolution |
+| --- | --- | --- |
+| `docs/site/**` extractor ownership | **RESOLVED** | `R-10`. This was the finding-6 blocker; `plan-gate.md:20-22` is satisfied. |
+| `arch:check:repo` residue after R-4/R-5 | safe to defer to PR-C | #1380 box 13 accepts "exit 0 **or** residue enumerated in `arch-debt.md`". PR-C measures and reports the real number. |
+| `@netscript/shared`'s removing commit | safe to defer to PR-C | It existed (`0ef13de35`) so a removal is findable. If it cannot be found, the row records "removed, commit not identified" rather than a guess — the amended box 2 requires evidence, not a label. |
+
+## Acceptance-box routing — all 34 live boxes, none unrouted
+
+Denominator corrected to **34** (the brief said 33; #1380 carries a thirteenth `gate:` box). The six the
+evaluator found unrouted are routed here to a named slice, file, and proof. Slice ids refer to the
+`## Design` § Commit Slices table in `worklog.md`.
+
+| Issue / box | Route | Slice | Proof |
+| --- | --- | --- | --- |
+| #1403 · 1–5 | PR-B | B1–B3 | root added + `discoverDoctrineRoots()` coverage test; repaired gate run on `plugin-streams-core`; triage list with **no** `packages/**` source edit in the diff |
+| #1380 · 1, 3, 11, 12 | PR-C | C3, C4 | existence test fails on a fabricated row; coverage test fails on an ungated live unit; `06-archetypes.md` sync test |
+| #1380 · 2 | PR-C | C3 | **amended box** (owner-authorized, issue comment `5264580324`): per-row git evidence, with `never present under that name` admitted. Five rows carry the never-present verdict; `@netscript/shared` carries its removing commit. |
+| #1380 · 4, 6 | PR-C | C2 | `arch:check:repo` iterates `discoverDoctrineRoots()`; output no longer contains `.llm/tmp/`, `docs/`, `.llm/tools/` paths |
+| #1380 · 5 | PR-C | C1 | three-origin fixture: import quiet, local binding quiet, bare global **red** |
+| #1380 · 7 | PR-C | C5 | `arch-debt.md` entry closed, or carries a dated closure plan naming both mechanical causes |
+| **#1380 · 8** *(was unrouted)* | PR-C | C4 | `10-…md` gains a section naming which of the 36 units `arch:check` gates and why `packages/cli/e2e` is excluded; asserted by a test that fails if the gated set and `discoverDoctrineRoots()` disagree |
+| **#1380 · 9** *(was unrouted)* | PR-C | C5 | `10-…md` gains a **dated** plan for engineering-reference §1–§5/§8–§10, authored as a byproduct of the refactors; test asserts the section exists and carries a date |
+| **#1380 · 10** *(was unrouted)* | PR-C | C6 | `rfcs/README.md` records `rfcs/NNNN-*.md` as canonical per `R-9b`; all five `DECISION_PENDING` ids (`CRON-SUBSYSTEM-DUP`, `RUN-ARTIFACT-ARCHIVAL-POLICY`, `PAGEBUILDER-LEGACY-COMPAT-TREE`, `FORMPAGEPROPS-PLAYGROUND-MIGRATION`, `REDIS-LEGACY-VALUE-FALLBACK`) mapped onto it; test asserts all five are present |
+| #1380 · 13 | PR-C | C2 | named gate pair: `arch:check` exit 0, `arch:check:repo` exit 0 or enumerated residue |
+| #1378 · 1 | PR-D | D1 | exported `any` red, local `any` unchanged, plus re-export attribution fixture |
+| #1378 · 2 | PR-D | D2 | unlinked `as unknown as` red; linked allowance green |
+| #1378 · 3 | PR-D | D5 | `as any` in a `docs/site/**` fence red, via #1374's extractor. **Moves with the issue** if #1537's surface stays private (`R-10`). |
+| #1378 · 4 | PR-D | D5 | the 6 `*-soundness_test.ts` files green with `@ts-expect-error` lines **unchanged** — regression evidence, explicitly not a negative case |
+| #1378 · 5 | PR-D | D3 | `--max-allow` wired at the count measured in that PR; overflow red |
+| **#1378 · 6** *(was unrouted)* | PR-D | D4 | a **fireable** same-PR control: raising the budget without an accompanying issue link in the same PR is red. Overflow alone does not prove this, which is why it is its own slice. |
+| **#1378 · 7** *(was unrouted)* | PR-D | D6 | `docs/site/reference/triggers/index.md:310` and `docs/site/reference/triggers/examples_test.ts:65` both typed; both compile with no `any` |
+| #1378 · 8 | PR-D | D1–D5 | full matrix: exported/local, linked/unlinked, fence, soundness, overflow |
+| #1378 · 9 | PR-D | D1–D6 | `quality:scan:repo` + `arch:check` green (depends on PR-E and PR-C) |
+| #1530 · 1–6 | PR-E | E1–E4 | RED-first fixture; dir+suffix rule; leakage controls both directions; `allowCount` 10 → 8; named gate pair |
+| **#1530 · 7** | PR-E, **`[post-merge]`** | — | **Rebuttal to finding 4.** The live box already reads `` `gate:` the `code-quality-repo` job is green on `main` after merge. `[post-merge]` `` (issue #1530 line 92). `netscript-pr` makes `[post-merge]` the sanctioned mechanism: such a box is *visibly excluded from the merge gate with a notice* and verified by comment afterwards. It therefore needs no verification issue and does not keep #1530 open — the honesty rule is satisfied by the marker, which is what the marker is for. |
+
+## Protocol artifacts added (finding 5, blocking)
+
+`research.md` now exists, and `worklog.md` carries a `## Design` section with public surface, domain
+vocabulary, ports, constants, **21 ordered file-scoped commit slices with a gate each**, deferred scope,
+and the contributor path. Cycle 1 had neither; `plan-gate.md:16-34` requires both.
+
+## Finding 10 (advisory) — accepted
+
+The evaluator brief described its worktree as detached at `9c3cdfead`; ground truth was branch
+`eval/quality-rail-plan-eval` at `83de0dc06`, the brief-only commit on top. The evaluator caught the
+mismatch itself and reported it. Cycle 2's brief states the actual branch and sha, and the launcher's
+`--expect-base` is set to the same value it verifies.
