@@ -463,3 +463,42 @@ owner as a **milestone-content decision**: #1530, #1403 and #1380 remain deliver
 identified fixes; #1378's boxes 1 and 2 rest on properties this codebase cannot satisfy in 0.0.6 without a
 separate debt programme, and the honesty rule says such criteria move with their issue rather than being
 ticked or quietly reinterpreted.
+
+## D-17 — rescope executed: which acceptance criteria moved, and why
+
+- **Severity:** architectural (milestone content changed)
+- **Recorded:** 2026-08-12, owner-authorized after cycle 3 `FAIL_PLAN`
+- **Authorization:** owner directive — "If PLAN-EVAL cycle 3 fails, rescope the issues and report exactly
+  which acceptance criteria move and why."
+
+### Moved to 0.0.7
+
+| Issue | Criteria moved | Why it cannot be truthfully ticked in 0.0.6 |
+| --- | --- | --- |
+| **#1378** (whole issue) | box 1 (exported `any` fails), box 2 (unlinked `as unknown as` fails), and the exported/local + linked/unlinked halves of box 8 | **Measured, not judged.** `deno doc --json` over 30 export maps: 3.733 s, exit 0, **567** warnings, **1,714** published symbol records with unresolved type references (3,945 occurrences; 230/724 in `plugin-sagas-core`, 174/487 in `fresh`). Warning text names the *dependency module*, not the dependent declaration, so export-reachability has **no deterministic attribution** at this baseline. Separately, box 2 requires the allowance's issue to be **open and milestoned**, and `scan-code-quality.ts` runs `--allow-read` only (`deno.json:50-51`) — it cannot observe live issue state, so the obvious proof cannot fail on the property the box requires. |
+| **#1545** | all five boxes | Its acceptance depends on the registration rule that moved with #1378. Boxes 1 and 3 require the mechanism to exist. |
+
+### Stayed in 0.0.6
+
+| Issue | Status |
+| --- | --- |
+| **#1530** | unchanged — PR-E. Only defect was E1's gate framing, fixed in the Design table. |
+| **#1403** | unchanged — PR-B. Only defect was the coverage test deriving its expectation from the function under test; now independently derived. |
+| **#1380** | unchanged — PR-C. Only defects were two provenance rows, corrected against verified evidence. |
+| **#1549** *(new)* | the provable half of #1378: docs-fence scanning via #1374's extractor, soundness/type-fixture exemption asserted by rule, `--max-allow` at the measured count, the same-PR budget-link predicate in the existing `code-quality` job, and typing `docs/site/reference/triggers/index.md:310` + its twin. |
+
+### What was deliberately **not** done
+
+- **No id-presence check dressed up as registration.** Accepting any `#<n>` without verifying open/milestoned
+  would satisfy the written test while violating the contract — the unearned-green pattern this lane exists
+  to remove. #1549 explicitly declines it.
+- **No fourth plan rewrite.** Three cycles closed 6 of 10 findings with none unaddressed; the residue was in
+  the issues' premises, not the plan's structure.
+- **No criterion reinterpreted to fit.** Each moved box moved with a written reason on its issue
+  (#1378 and #1545 comments), per the honesty rule.
+
+### Net effect on the lane
+
+Owned issues: **#1436, #1415 closed** (PR #1527, merged `63cd1cd58`). **#1530, #1403, #1380, #1549** remain
+in 0.0.6 across PR-E → PR-B → PR-C → PR-D. **#1378, #1545** carry to 0.0.7. The lane's deliverable count is
+unchanged at four remaining PRs; what changed is that PR-D's scope is now provable.
