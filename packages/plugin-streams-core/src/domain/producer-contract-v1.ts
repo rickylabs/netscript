@@ -83,6 +83,8 @@ export type StreamWriteCancellationReasonV1 = 'producer-stopped' | 'producer-fai
 /** Reasons an attempted write cannot be reported as delivered or rejected. */
 export type StreamWriteUnknownReasonV1 =
   | 'retry-exhausted'
+  /** The transport positively refused the write with a non-retryable failure. */
+  | 'transport-refused'
   | 'transport-aborted'
   | 'producer-stopped';
 
