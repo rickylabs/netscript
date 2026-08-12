@@ -769,3 +769,50 @@ requires.
 
 **Nothing has been committed or pushed on this branch.** The branch head remains `4f93a0c2e`
 (docs-only), so no churn has landed anywhere.
+
+## 2026-08-12 — #1459 lock corrected; root-approved one-line delta; advancing
+
+**Corrective slice performed by the orchestrator**, not delegated. The Codex thread finished its turn
+and went **idle** without acting on the corrective steer (it had already committed by the time the
+steer landed). `codex-status` confirmed no live writer on the worktree before I touched it — the
+delegation attempt came first precisely to avoid being a second writer, and only after the thread
+released the worktree did I act directly.
+
+**History preserved — no amend, no rebase, no force-push:**
+
+| Commit | Purpose |
+| --- | --- |
+| `1a5c1d688` | the offending commit, **left in the record** |
+| `0fc2c0158` | restores `deno.lock` byte-for-byte from pre-slice parent `4f93a0c2e` |
+| `2d515de75` | re-adds exactly one proven line — the corrected head |
+
+**Root's proofs, both satisfied:**
+
+- `git diff 2d515de75 -- deno.lock` → **empty**
+- total PR lock diff vs `main` → **1 insertion, 0 removals**:
+  `+ "jsr:@fresh/plugin-vite@^1.1.2",` under the `packages/fresh` workspace member, nothing else
+
+**The delta is required, and I proved it by trying to remove it.** My hypothesis was that the
+fixture's fully-qualified `jsr:@fresh/plugin-vite@1.1.2` import made the `packages/fresh/deno.json`
+declaration unnecessary — and that removing it would also drop the lock line and keep the published
+dependency surface clean. I removed it, re-ran the client-bundle test, and it **failed**. Restored;
+test passes. **The hypothesis was wrong, and testing it rather than asserting it is what settled it.**
+
+**A finding the churn concealed:** the +384-line version is a **cold-cache first-resolution artifact**.
+Warm-cache runs of both the full suite and the isolated bundle test leave the lock clean — verified
+repeatedly. An earlier bisect appeared to prove "the bundle test is the writer", but 227 tests passed
+in both arms, which meant the `--ignore` had not excluded anything and the clean result was cache
+warmth, not exclusion. Re-tested properly rather than reporting the convenient conclusion.
+
+**Gates:** check/lint/fmt 0 findings across 188 files; `227 passed, 0 failed`; explicit target quality
+scan `ok:true, findings:[]` with its single allowance **pre-existing** at `route-support.ts:96`
+(untouched by this slice); `quality:gate` WARNs only. **`deno.lock` clean after the full gate run.**
+No new lint-ignore, unsafe cast, or ts-ignore anywhere in the diff.
+
+**Generated files attributed, not waved through:** `agent-docs.generated.ts`'s entire diff is
+`+ './defer/island',` — exactly the B2 sub-export — from `deno task gen:assets-barrel`.
+`embedded.generated.ts` follows from the edited template.
+
+**Review on Opus 5 · high per D-6**; the canonical `review_codex_complex` route (Fable 5 · medium) was
+**not** dispatched. Flipped to ready **once**, firing the initial automatic IMPL-EVAL at head
+`2d515de75`.
