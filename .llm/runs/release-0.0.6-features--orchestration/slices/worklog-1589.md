@@ -15,9 +15,9 @@
   code/name, and generated verifier/task filename are finite constants. Tests compare subpath
   constants to the packages' real export maps.
 - **Commit slices:** S1 establishes closure semantics + init rejection + generated verifier and is
-  proved by focused negative/positive tests. S2 wires generated tasks and is proved by consumer
-  execution plus the scaffold runtime smoke. Both update this worklog/context evidence when they
-  eventually run.
+  proved by focused negative/positive tests. S2 wires generated tasks and is proved by real
+  generated-consumer execution plus the owner-mandated CLI gates. The owner explicitly prohibited
+  `e2e:cli` for this slice.
 - **Deferred scope:** peer metadata, `globalThis`, cache/partial behavior, arbitrary scoped import
   maps/direct literals, and automated repair.
 - **Contributor path:** update the finite closure policy when Fresh/SDK exports change; add identity
@@ -66,6 +66,64 @@ emitted verifier is therefore app-local, while the root task delegates with
 - Focused result: `ok | 12 passed (17 steps) | 0 failed (534ms)`.
 - `deno.lock`: unchanged.
 
+## S2 implementation evidence
+
+- Generated apps now own an app-local `.netscript/verify-dependency-closure.ts` and a
+  `deps:closure` task. Their `dev` and `build` tasks run the verifier before Vite. The generated
+  workspace root delegates `deps:closure` to the app with `deno task --cwd apps/<app>` and runs it
+  before its direct development entrypoint.
+- A real public-JSR generated workspace accepted the full stable closure:
+
+  ```text
+  Task deps:closure deno task --cwd apps/dashboard deps:closure
+  Task deps:closure deno run --allow-read .netscript/verify-dependency-closure.ts
+  NetScript dependency closure verified: exact release 0.0.5 (jsr).
+  ```
+
+- Changing only `@netscript/fresh/defer/island` to `0.0.6-canary.3` made the same root task exit 1
+  before Vite. The diagnostic enumerated every resolved closure member, named both versions, and
+  ended with:
+
+  ```text
+    reason: closure members resolve to different exact versions: 0.0.5, 0.0.6-canary.3.
+    reason: @netscript/fresh resolves from multiple package roots.
+  Pin @netscript/fresh, all @netscript/fresh/* and @netscript/sdk/* imports, and any direct @netscript/telemetry import to one exact release, then rerun.
+  ```
+
+- The final focused command covered init rejection, exact/range/local identity policy, export-list
+  parity, the explicit `fresh-ui` exclusion, emitted task/file shape, and real root-to-app task
+  execution. Result: `ok | 43 passed (17 steps) | 0 failed (2s)`.
+- `deno task quality:gate`: exit 0. The repository quality scan returned `"ok":true` with no
+  findings; doctrine returned no failures. Existing dependency/doctrine warnings remain.
+- Scoped check/lint/fmt wrappers all exited 0:
+
+  ```text
+  {"source":{"mode":"selection","cwd":"/home/codex/repos/ns006-1589"},"command":"deno check --unstable-kv <files>","selection":{"filesSelected":865,"batches":8,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+  {"source":{"mode":"command","cwd":"/home/codex/repos/ns006-1589","exitCode":0},"selection":{"filesSelected":865,"batches":5},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+  {"command":"deno fmt --check","cwd":"/home/codex/repos/ns006-1589","mode":"check","summary":{"filesSelected":865,"batches":5,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+  ```
+
+- The mandated `deno task --cwd packages/cli test` reached
+  `FAILED | 801 passed (533 steps) | 3 failed (2m14s)`. All three failures are cwd-sensitive
+  `NotFound` errors in pre-existing checks for files outside `packages/cli`; none is in an owned or
+  modified path:
+
+  ```text
+  unchanged documented native EventSource example consumes named SSE
+  NotFound: docs/site/durable-workflows/streams.md
+
+  service env gates: every gate command names a script that exists
+  NotFound: packages/cli/e2e/src/application/gates/scaffold/service-env/configure-service-env.ts
+
+  Quickstart executable commands stay aligned with quickstart.walk
+  NotFound: docs/site/quickstart.vto
+
+  FAILED | 801 passed (533 steps) | 3 failed (2m14s)
+  error: Test failed
+  ```
+
+- No dependency was added and `deno.lock` is unchanged.
+
 ## Plan-phase evidence
 
 - PLAN-EVAL: **PASS** via the authorized fallback comment on PR #1595. Binding findings A1-A4 are
@@ -76,9 +134,12 @@ emitted verifier is therefore app-local, while the root task delegates with
 - `deno.lock`: unchanged.
 - Required implementation boundaries from the brief remain untouched.
 
-## PLAN-EVAL attention
+## IMPL-EVAL attention
 
-The evaluator should decide whether the explicit generated-workspace boundary is sufficient for
-#1589. The first cut does not claim complete coverage of hand-authored direct literal JSR imports or
-per-referrer scoped import maps. Expanding to those graphs would materially widen the design and
-must happen before implementation, not during it.
+The separate evaluator should verify the generated-workspace boundary and the three baseline
+package-task failures above. The first cut does not claim complete coverage of hand-authored direct
+literal JSR imports or per-referrer scoped import maps. Legitimate separate app workspaces may each
+use a different internally coherent release because the verifier runs per app, not across the whole
+workspace. A deliberately mixed Fresh/SDK graph inside one generated app is rejected; no legitimate
+same-app split-cache-provider case was verified. Version equality remains only a lockstep-publishing
+proxy for the Fresh-to-SDK graph edge (A2).

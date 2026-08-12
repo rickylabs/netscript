@@ -118,8 +118,10 @@ export function generateAppDenoJson(options: AppDenoJsonOptions): string {
     // in Deno 2.x.
     tasks: {
       check: 'deno fmt --check . && deno lint . && deno check',
-      dev: 'deno task --cwd ../.. deps:verify && deno run -A npm:vite --configLoader native',
-      build: 'deno run -A npm:vite build',
+      'deps:closure': 'deno run --allow-read .netscript/verify-dependency-closure.ts',
+      dev:
+        'deno task deps:closure && deno task --cwd ../.. deps:verify && deno run -A npm:vite --configLoader native',
+      build: 'deno task deps:closure && deno run -A npm:vite build',
       serve: 'deno run -A npm:vite preview',
       start: 'deno serve -A _fresh/server.js',
       update: 'deno run -A -r jsr:@fresh/update .',

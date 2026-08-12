@@ -137,7 +137,7 @@ if (reasons.length > 0) {
   console.error(
     'Pin @netscript/fresh, all @netscript/fresh/* and @netscript/sdk/* imports, and any direct @netscript/telemetry import to one exact release, then rerun.',
   );
-  Deno.exit(1);
+  throw new Error('NetScript dependency closure is incoherent.');
 }
 
 const release = supported[0]?.version ?? '<unknown>';

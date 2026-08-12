@@ -4,11 +4,14 @@
 
 PLAN-EVAL passed and its A1-A4 amendments are binding in `slices/plan-1589.md`. A4 passed in a real
 generated workspace: both normal app-local discovery and explicit member config resolved root
-`catalog:` entry `zod` to `zod@4.4.3`. S1 now owns a finite Fresh/SDK closure contract, init-time
-import-map rejection, export parity, and an app-context generated verifier. The verifier remains
-app-local because Deno scopes a root `.netscript` script to the root referrer namespace; root tasks
-delegate via `deno task --cwd apps/<app>`. See `slices/worklog-1589.md` and drift D-6. S2
-task/scaffold wiring, full gates, PR body/evidence, and automatic IMPL-EVAL handoff remain pending.
+`catalog:` entry `zod` to `zod@4.4.3`. S1 owns a finite Fresh/SDK closure contract, init-time
+import-map rejection, export parity, and an app-context generated verifier. S2 emits that verifier
+per app and gates generated `dev`/`build` tasks before Vite; the workspace-root task delegates with
+`deno task --cwd apps/<app>` because Deno scopes resolution by the script referrer. Focused tests are
+green (`43 passed`), scoped check/lint/fmt and `quality:gate` exit 0, and `deno.lock` is unchanged.
+The mandated package test has three pre-existing cwd-sensitive `NotFound` failures (`801 passed`,
+`3 failed`), recorded verbatim in `slices/worklog-1589.md`. Implementation evidence is recorded on
+PR #1595; separate label-driven IMPL-EVAL remains with the orchestrator. See drift D-6.
 
 ## Reopened slice — #1548 / PR #1559 (2026-08-12)
 

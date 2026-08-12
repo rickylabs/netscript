@@ -241,7 +241,7 @@ Deno.test('scaffoldRoot emits the Aspire CLI task runner only for Aspire workspa
   assertEquals(noAspireScaffolder.files.has(taskPath), false);
 });
 
-Deno.test('scaffoldRoot always emits quality and npm runners with the Deno pin', async () => {
+Deno.test('scaffoldRoot always emits dependency and quality preflights with the Deno pin', async () => {
   for (const noAspire of [false, true]) {
     const scaffolder = new InMemoryScaffolder();
     const result = await scaffoldRoot(
@@ -249,6 +249,8 @@ Deno.test('scaffoldRoot always emits quality and npm runners with the Deno pin',
       options({ noAspire }),
     );
     const verifierPath = '/workspace/deploy-app/.netscript/verify-node-modules.ts';
+    const closureVerifierPath =
+      '/workspace/deploy-app/apps/dashboard/.netscript/verify-dependency-closure.ts';
     const qualityRunnerPath = '/workspace/deploy-app/.netscript/quality-runner.ts';
     const packageJsonPath = '/workspace/deploy-app/package.json';
 
@@ -256,6 +258,11 @@ Deno.test('scaffoldRoot always emits quality and npm runners with the Deno pin',
     assertStringIncludes(
       scaffolder.files.get(verifierPath) ?? '',
       'Deno npm materialization is incomplete.',
+    );
+    assert(result.filesCreated.includes(closureVerifierPath));
+    assertStringIncludes(
+      scaffolder.files.get(closureVerifierPath) ?? '',
+      'NetScript dependency closure is incoherent.',
     );
     assert(result.filesCreated.includes(qualityRunnerPath));
     assertStringIncludes(
