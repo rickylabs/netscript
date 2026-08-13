@@ -7,14 +7,14 @@
       "id": "issue:1093",
       "kind": "issue",
       "issueNumber": 1093,
-      "lane": "features",
+      "lane": "fixes",
       "title": "[sdk-client S8] fix(plugin-core): let third-party plugin factories participate in discovery"
     },
     {
       "id": "issue:1112",
       "kind": "issue",
       "issueNumber": 1112,
-      "lane": "docs",
+      "lane": "fixes",
       "title": "docs(database): make the MySQL Prisma adapter example honest and executable"
     },
     {
@@ -23,6 +23,13 @@
       "issueNumber": 1243,
       "lane": "fixes",
       "title": "auth: session list --stream-url default pins localhost:4437 which no longer exists post-#1211"
+    },
+    {
+      "id": "issue:1249",
+      "kind": "issue",
+      "issueNumber": 1249,
+      "lane": "fixes",
+      "title": "fix(fresh/form): controlProps() is not element-assignable, and Zod 4 constraint derivation misses numbers and regex"
     },
     {
       "id": "issue:1262",
@@ -42,21 +49,21 @@
       "id": "issue:1293",
       "kind": "issue",
       "issueNumber": 1293,
-      "lane": "fixes",
-      "title": "prisma-adapter-mysql: adapter class is unexported and has no connection-error hook — the honest example needs both"
+      "lane": "features",
+      "title": "prisma-adapter-mysql: adapter class is unexported and has no connection-error hook"
     },
     {
       "id": "issue:1296",
       "kind": "issue",
       "issueNumber": 1296,
-      "lane": "docs",
+      "lane": "internals",
       "title": "fix(docs/exports): repair contracts and Fresh UI reference drift, then wire the regeneration gate"
     },
     {
       "id": "issue:1306",
       "kind": "issue",
       "issueNumber": 1306,
-      "lane": "internals",
+      "lane": "features",
       "title": "fix(aspire): 'the dashboard is the authority' is unusable for an agent — aspire start detaches in a non-TTY and prints no login token"
     },
     {
@@ -77,14 +84,14 @@
       "id": "issue:1350",
       "kind": "issue",
       "issueNumber": 1350,
-      "lane": "features",
+      "lane": "fixes",
       "title": "[sdk-client S1] fix(sdk): preserve contract errors through safe() and isDefinedError"
     },
     {
       "id": "issue:1351",
       "kind": "issue",
       "issueNumber": 1351,
-      "lane": "features",
+      "lane": "fixes",
       "title": "[sdk-client S4] refactor(sdk): centralize HTTP method and GET-cache policy"
     },
     {
@@ -98,7 +105,7 @@
       "id": "issue:1353",
       "kind": "issue",
       "issueNumber": 1353,
-      "lane": "features",
+      "lane": "fixes",
       "title": "[sdk-client S6] feat(sdk): express trace propagation as a general contribution"
     },
     {
@@ -172,17 +179,10 @@
       "title": "feat(plugin): publish reusable PluginServiceContext host factory"
     },
     {
-      "id": "issue:1453",
-      "kind": "issue",
-      "issueNumber": 1453,
-      "lane": "internals",
-      "title": "fix(agentic): migration LOC worktree snapshot crashes on unstaged deletions"
-    },
-    {
       "id": "issue:1455",
       "kind": "issue",
       "issueNumber": 1455,
-      "lane": "fixes",
+      "lane": "features",
       "title": "workers: preserve job payload type through definition, registry, and enqueue"
     },
     {
@@ -196,7 +196,7 @@
       "id": "issue:1461",
       "kind": "issue",
       "issueNumber": 1461,
-      "lane": "docs",
+      "lane": "fixes",
       "title": "docs/sdk: getCachedEntry cache-first loader example never revalidates stale entries"
     },
     {
@@ -238,8 +238,8 @@
       "id": "issue:1533",
       "kind": "issue",
       "issueNumber": 1533,
-      "lane": "docs",
-      "title": "test(docs): nothing compiles JSDoc `@example` blocks, so a published JSR reference can import a module that does not exist"
+      "lane": "internals",
+      "title": "test(docs): nothing compiles JSDoc `@example` blocks"
     },
     {
       "id": "issue:1542",
@@ -252,7 +252,7 @@
       "id": "issue:1543",
       "kind": "issue",
       "issueNumber": 1543,
-      "lane": "internals",
+      "lane": "fixes",
       "title": "chore(deps): plugin-workers-core and plugins/triggers import plugin-streams-core without declaring it"
     },
     {
@@ -260,7 +260,7 @@
       "kind": "issue",
       "issueNumber": 1544,
       "lane": "fixes",
-      "title": "fix(cli): `emit` is advertised and implemented by three deploy adapters but never routed, so `deploy list` reports a command that does not exist"
+      "title": "fix(cli): `emit` is advertised by three deploy adapters but never routed"
     },
     {
       "id": "issue:1545",
@@ -274,13 +274,13 @@
       "kind": "issue",
       "issueNumber": 1551,
       "lane": "docs",
-      "title": "docs(positioning): establish “NetScript vs …” and “Migrate from …” comparison framework, starting with Next.js"
+      "title": "docs(positioning): establish \"NetScript vs …\" and \"Migrate from …\" comparison framework"
     },
     {
       "id": "issue:1557",
       "kind": "issue",
       "issueNumber": 1557,
-      "lane": "fixes",
+      "lane": "internals",
       "title": "test(fresh): no capability to assert the deferred coordinator reaches the client bundle"
     },
     {
@@ -351,7 +351,7 @@
       "kind": "issue",
       "issueNumber": 1604,
       "lane": "internals",
-      "title": "test(cli): the prescribed deno task --cwd packages/cli test is always red — 3 tests resolve repo-root-relative paths"
+      "title": "test(cli): the prescribed `deno task --cwd packages/cli test` is always red"
     },
     {
       "id": "issue:1606",
@@ -434,39 +434,80 @@
       "id": "issue:1623",
       "kind": "issue",
       "issueNumber": 1623,
-      "lane": "docs",
+      "lane": "fixes",
       "title": "docs(sdk): CacheStore.get JSDoc documents a return shape that no longer type-checks"
+    },
+    {
+      "id": "issue:1637",
+      "kind": "issue",
+      "issueNumber": 1637,
+      "lane": "fixes",
+      "title": "fix(sdk): cache write limits must not fail successful query results"
     }
   ],
   "edges": [
     {
-      "from": "issue:1545",
-      "to": "issue:1378",
-      "kind": "requires",
+      "from": "issue:1348",
+      "to": "issue:1350",
+      "kind": "rfc-prerequisite",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1545",
-        "https://github.com/rickylabs/netscript/issues/1378",
-        "Quality allowance population must be registered before linked-issue enforcement can turn on."
+        "RFC 0001 Stage 0 (#1348) must accept the RFC and align #1349-#1353 bodies before Stage 1a implements; rfcs/0001-sdk-client-contributions.md:1273-1274."
       ]
     },
     {
-      "from": "issue:1542",
-      "to": "issue:1378",
-      "kind": "requires",
+      "from": "issue:1348",
+      "to": "issue:1466",
+      "kind": "rfc-prerequisite",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1542",
-        "https://github.com/rickylabs/netscript/issues/1378",
-        "Published-package roots must be complete before the strengthened quality scan is authoritative."
+        "Stage 1b owner is \"selected in Stage 0; do not file in this run\"; rfcs/0001-sdk-client-contributions.md:1275."
       ]
     },
     {
-      "from": "issue:1293",
-      "to": "issue:1112",
-      "kind": "requires",
+      "from": "issue:1348",
+      "to": "issue:1349",
+      "kind": "rfc-prerequisite",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1293",
-        "https://github.com/rickylabs/netscript/issues/1112",
-        "The executable MySQL documentation requires the adapter export and connection-error surface."
+        "Stage 2 scope at rfcs/0001-sdk-client-contributions.md:1276 differs from the filed #1349 acceptance in four places; Stage 0 owns the realignment."
+      ]
+    },
+    {
+      "from": "issue:1348",
+      "to": "issue:1351",
+      "kind": "rfc-prerequisite",
+      "evidence": [
+        "Stage 3 at rfcs/0001-sdk-client-contributions.md:1277 reassigns the deprecate-no-op-options scope and makes the oRPC family move a separate decision."
+      ]
+    },
+    {
+      "from": "issue:1348",
+      "to": "issue:1352",
+      "kind": "rfc-prerequisite",
+      "evidence": [
+        "Stage 4 at rfcs/0001-sdk-client-contributions.md:1278 adds scaffold choice and bans the cookie carve-out the issue still records."
+      ]
+    },
+    {
+      "from": "issue:1348",
+      "to": "issue:1353",
+      "kind": "rfc-prerequisite",
+      "evidence": [
+        "Stage 5 at rfcs/0001-sdk-client-contributions.md:1279 reverses the filed acceptance from \"ship a trace contribution\" to \"prove the transport owns trace injection\"."
+      ]
+    },
+    {
+      "from": "issue:1348",
+      "to": "issue:1467",
+      "kind": "rfc-prerequisite",
+      "evidence": [
+        "Stage 6 is \"new child after RFC acceptance\"; rfcs/0001-sdk-client-contributions.md:1280."
+      ]
+    },
+    {
+      "from": "issue:1348",
+      "to": "issue:1093",
+      "kind": "rfc-prerequisite",
+      "evidence": [
+        "Stage 7 at rfcs/0001-sdk-client-contributions.md:1281 defines the generic-discovery exit condition the issue body predates."
       ]
     },
     {
@@ -474,9 +515,7 @@
       "to": "issue:1466",
       "kind": "requires",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1350",
-        "https://github.com/rickylabs/netscript/issues/1466",
-        "Procedure metadata must preserve the contract error channel repaired by S1."
+        "Stage 1b must initialize NetScriptProcedureMeta \"without re-erasing Stage 1a types\"; rfcs/0001-sdk-client-contributions.md:1275."
       ]
     },
     {
@@ -484,19 +523,23 @@
       "to": "issue:1349",
       "kind": "requires",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1466",
-        "https://github.com/rickylabs/netscript/issues/1349",
-        "The typed client contribution seam consumes the NetScript procedure metadata vocabulary."
+        "The normative SdkClientProcedureDescriptor consumed by every contribution embeds Readonly<NetScriptProcedureMeta>; rfcs/0001-sdk-client-contributions.md:410-413."
+      ]
+    },
+    {
+      "from": "issue:1466",
+      "to": "issue:1352",
+      "kind": "requires",
+      "evidence": [
+        "#1352 acceptance reads procedure policy metadata, which #1466 defines."
       ]
     },
     {
       "from": "issue:1349",
       "to": "issue:1351",
-      "kind": "requires",
+      "kind": "cross-epic-order",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1349",
-        "https://github.com/rickylabs/netscript/issues/1351",
-        "HTTP/cache policy becomes a general extension only after the public composition seam exists."
+        "#1351 Boundaries: \"If #1349 lands first, this issue must additionally prove no contribution can reach the method decision.\""
       ]
     },
     {
@@ -504,9 +547,7 @@
       "to": "issue:1352",
       "kind": "requires",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1349",
-        "https://github.com/rickylabs/netscript/issues/1352",
-        "The credential contribution is the first end-to-end consumer of the typed client seam."
+        "#1352 is the first dogfood consumer of the contribution chain #1349 creates; #1352 Summary."
       ]
     },
     {
@@ -514,9 +555,23 @@
       "to": "issue:1353",
       "kind": "requires",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1349",
-        "https://github.com/rickylabs/netscript/issues/1353",
-        "Trace propagation becomes a contribution only after the typed client seam exists."
+        "Stage 5 proves a property of the seam Stage 2 builds; rfcs/0001-sdk-client-contributions.md:1276,1279."
+      ]
+    },
+    {
+      "from": "issue:1349",
+      "to": "issue:1467",
+      "kind": "requires",
+      "evidence": [
+        "#1467 ships a contribution through the chain #1349 exposes."
+      ]
+    },
+    {
+      "from": "issue:1349",
+      "to": "issue:1093",
+      "kind": "cross-epic-order",
+      "evidence": [
+        "The RFC-added sdkClients-collection half of Stage 7 cannot land until the contribution seam exists; rfcs/0001-sdk-client-contributions.md:1156-1160."
       ]
     },
     {
@@ -524,49 +579,31 @@
       "to": "issue:1467",
       "kind": "cross-epic-order",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1352",
-        "https://github.com/rickylabs/netscript/issues/1467",
-        "Locale is the non-auth proof after the credential consumer establishes the contribution contract."
+        "#1467 is the non-auth counterpart proof and reuses the auth dogfood composition order; both edit the same SDK docs page."
       ]
     },
     {
-      "from": "issue:1353",
-      "to": "issue:1467",
+      "from": "issue:1243",
+      "to": "issue:1352",
       "kind": "cross-epic-order",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1353",
-        "https://github.com/rickylabs/netscript/issues/1467",
-        "Locale follows the second independent contribution consumer proof."
+        "#1352 swaps the first-party CLI off raw fetch at the same call sites whose default URL #1243 repairs (auth-plugin-command.ts:87)."
       ]
     },
     {
-      "from": "issue:1467",
-      "to": "issue:1093",
-      "kind": "cross-epic-order",
-      "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1467",
-        "https://github.com/rickylabs/netscript/issues/1093",
-        "Third-party discovery is the final SDK-client contribution stage after first-party consumers prove the seam."
-      ]
-    },
-    {
-      "from": "issue:1093",
-      "to": "issue:1348",
-      "kind": "cross-epic-order",
-      "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1093",
-        "https://github.com/rickylabs/netscript/issues/1348",
-        "The SDK contribution epic closes only after its S8 discovery child is terminal."
-      ]
-    },
-    {
-      "from": "issue:1349",
-      "to": "issue:1355",
+      "from": "issue:1293",
+      "to": "issue:1112",
       "kind": "requires",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1349",
-        "https://github.com/rickylabs/netscript/issues/1355",
-        "Generated client/query wiring consumes the public typed client-contribution seam when present."
+        "#1112 own text: \"Until this lands, #1112 example must document only what ships today\"; #1293 opening paragraph."
+      ]
+    },
+    {
+      "from": "issue:1355",
+      "to": "issue:1357",
+      "kind": "requires",
+      "evidence": [
+        "#1357 emission target is the app-side client/query wiring #1355 regenerates."
       ]
     },
     {
@@ -574,49 +611,31 @@
       "to": "issue:1354",
       "kind": "requires",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1355",
-        "https://github.com/rickylabs/netscript/issues/1354",
-        "The resource-route generator consumes the reusable client/query/invalidation factories."
+        "#1354 resource slice consumes the client/query wiring #1355 owns."
       ]
     },
     {
-      "from": "issue:1093",
+      "from": "issue:1357",
       "to": "issue:1354",
-      "kind": "requires",
+      "kind": "cross-epic-order",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1093",
-        "https://github.com/rickylabs/netscript/issues/1354",
-        "Plugin-contributed route surfaces require open third-party discovery."
+        "The new verb should generate against a repaired ui:add emission, not codify the broken one."
       ]
     },
     {
-      "from": "issue:1354",
-      "to": "issue:1616",
-      "kind": "requires",
+      "from": "issue:1378",
+      "to": "issue:1542",
+      "kind": "cross-epic-order",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1354",
-        "https://github.com/rickylabs/netscript/issues/1616",
-        "The dynamic-route E2E proof needs a generated route slice to exercise."
+        "Widening quality:gate roots to published packages is only safe once the scanner is export-aware and allowances are registered."
       ]
     },
     {
-      "from": "issue:1557",
-      "to": "issue:1590",
-      "kind": "requires",
+      "from": "issue:1451",
+      "to": "issue:1455",
+      "kind": "cross-epic-order",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1557",
-        "https://github.com/rickylabs/netscript/issues/1590",
-        "The partial-navigation regression needs a client-bundle capability that can observe the deferred coordinator."
-      ]
-    },
-    {
-      "from": "issue:1502",
-      "to": "issue:1544",
-      "kind": "rfc-prerequisite",
-      "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1502",
-        "https://github.com/rickylabs/netscript/issues/1544",
-        "Deploy emit routing must not create a second plugin CLI mount mechanism before the general CLI contribution RFC is locked."
+        "#1455 registry payload map consumes the generated-registry metadata plumbing #1451 introduces."
       ]
     }
   ],
@@ -624,103 +643,114 @@
     {
       "index": 0,
       "nodeIds": [
-        "issue:1243",
-        "issue:1262",
-        "issue:1263",
-        "issue:1293",
-        "issue:1296",
-        "issue:1306",
-        "issue:1350",
-        "issue:1357",
-        "issue:1358",
-        "issue:1360",
-        "issue:1429",
-        "issue:1448",
-        "issue:1451",
-        "issue:1452",
-        "issue:1453",
-        "issue:1455",
-        "issue:1458",
-        "issue:1461",
-        "issue:1462",
-        "issue:1481",
-        "issue:1502",
-        "issue:1533",
-        "issue:1542",
-        "issue:1543",
-        "issue:1545",
-        "issue:1551",
-        "issue:1557",
-        "issue:1561",
-        "issue:1563",
-        "issue:1564",
-        "issue:1588",
-        "issue:1591",
-        "issue:1592",
-        "issue:1598",
-        "issue:1601",
-        "issue:1604",
-        "issue:1606",
-        "issue:1609",
-        "issue:1610",
-        "issue:1611",
-        "issue:1613",
-        "issue:1618",
-        "issue:1619",
-        "issue:1620",
-        "issue:1621",
-        "issue:1622",
-        "issue:1623"
+        "issue:1564"
       ]
     },
     {
       "index": 1,
       "nodeIds": [
-        "issue:1112",
+        "issue:1243",
+        "issue:1262",
+        "issue:1263",
+        "issue:1348",
         "issue:1378",
-        "issue:1466",
-        "issue:1544",
-        "issue:1590"
+        "issue:1502",
+        "issue:1545",
+        "issue:1551",
+        "issue:1561",
+        "issue:1563",
+        "issue:1588",
+        "issue:1606",
+        "issue:1621"
       ]
     },
     {
       "index": 2,
       "nodeIds": [
-        "issue:1349"
+        "issue:1293",
+        "issue:1350",
+        "issue:1355",
+        "issue:1358",
+        "issue:1360",
+        "issue:1542",
+        "issue:1611",
+        "issue:1613"
       ]
     },
     {
       "index": 3,
       "nodeIds": [
-        "issue:1351",
-        "issue:1352",
-        "issue:1353",
-        "issue:1355"
+        "issue:1112",
+        "issue:1296",
+        "issue:1357",
+        "issue:1451",
+        "issue:1466",
+        "issue:1604",
+        "issue:1618",
+        "issue:1622"
       ]
     },
     {
       "index": 4,
       "nodeIds": [
-        "issue:1467"
+        "issue:1349",
+        "issue:1354",
+        "issue:1429",
+        "issue:1448",
+        "issue:1533",
+        "issue:1598",
+        "issue:1619",
+        "issue:1620",
+        "issue:1623",
+        "issue:1637"
       ]
     },
     {
       "index": 5,
       "nodeIds": [
-        "issue:1093"
+        "issue:1351",
+        "issue:1352",
+        "issue:1353",
+        "issue:1455",
+        "issue:1557",
+        "issue:1601"
       ]
     },
     {
       "index": 6,
       "nodeIds": [
-        "issue:1348",
-        "issue:1354"
+        "issue:1093",
+        "issue:1306",
+        "issue:1461",
+        "issue:1467"
       ]
     },
     {
       "index": 7,
       "nodeIds": [
+        "issue:1452",
+        "issue:1462",
+        "issue:1481",
+        "issue:1592",
         "issue:1616"
+      ]
+    },
+    {
+      "index": 8,
+      "nodeIds": [
+        "issue:1249",
+        "issue:1543",
+        "issue:1590",
+        "issue:1591",
+        "issue:1609",
+        "issue:1610"
+      ]
+    },
+    {
+      "index": 9,
+      "nodeIds": [
+        "issue:1458",
+        "issue:1544"
       ]
     }
   ]

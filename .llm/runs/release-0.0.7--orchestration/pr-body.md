@@ -11,7 +11,7 @@ and cut stable only from exact-main green evidence.
 
 ## Slices
 
-- [ ] Step 0 owner-ratified inventory and dependency DAG validated
+- [x] Step 0 owner-ratified inventory and dependency DAG validated
 - [ ] Composed milestone plan independently approved
 - [ ] All leaf PRs independently evaluated and merged to `main`
 - [ ] Coherent canary checkpoint(s) published and production-E2E proven
@@ -19,17 +19,19 @@ and cut stable only from exact-main green evidence.
 
 ## Validation
 
-- `deno task harness:milestone:render -- .llm/runs/release-0.0.7--orchestration` — pending Step 0 freeze
-- `deno task harness:milestone:validate -- .llm/runs/release-0.0.7--orchestration` — pending Step 0 freeze
+- `deno task harness:milestone:render -- .llm/runs/release-0.0.7--orchestration` — PASS
+- `deno task harness:milestone:validate -- .llm/runs/release-0.0.7--orchestration` — PASS (`ok: true`)
+- `deno task harness:milestone:test` — PASS (15 tests)
 
 ## Harness
 
 - Run dir: `.llm/runs/release-0.0.7--orchestration/`
-- Phase: research / intake
+- Phase: plan evaluation
 
 ## Drift / Debt
 
-- none accepted
+- #1453 moved to Backlog / Triage because its cited surface has never existed in this repository.
+- #1384/#1385 remain in 0.0.8; no partial credential-only workaround is accepted for #1384.
 
 ## Definition of Done
 

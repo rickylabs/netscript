@@ -2,27 +2,35 @@
   "schemaVersion": 1,
   "repo": "rickylabs/netscript",
   "milestone": "0.0.7",
-  "capturedAt": "2026-08-13T18:38:26.000Z",
+  "capturedAt": "2026-08-13T21:12:00.000Z",
   "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
-  "ownerRatifiedAt": "2026-08-13T18:35:10.000Z",
-  "targetIssueCount": 62,
+  "ownerRatifiedAt": "2026-08-13T21:12:00.000Z",
+  "targetIssueCount": 64,
   "issues": [
     {
       "number": 1093,
       "title": "[sdk-client S8] fix(plugin-core): let third-party plugin factories participate in discovery",
       "disposition": "active",
-      "lane": "features",
+      "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1093"
+        "packages/plugin/src/sdk/discovery/ast-extractor.ts:4-8 — CONTRIBUTION_BUILDERS still hardcodes { defineJob: jobs }, { defineSaga: sagas }, { defineWebhook: triggers } in the core",
+        "packages/plugin/src/config/domain/plugin-contributions.ts:12-41 — no seam through which a plugin declares its own factory axis; :14-16 doctorChecks is a closed 'auth-backend' literal union",
+        "rfcs/0001-sdk-client-contributions.md:1156-1160 — '#1093 must collect these references without official-plugin switches, reject duplicate ids or mismatched imported descriptors, and expose them to generators' (new obligation added by the merged RFC)",
+        "rfcs/0001-sdk-client-contributions.md:1281 Stage 7 assigns generic discovery to #1093",
+        "Timeline: no merged PR references #1093; the nearest merged neighbour PR #1316 (fix(plugins): declare linking through shared core seam) closed a different issue (#1189) and left ast-extractor.ts:4-8 intact"
       ]
     },
     {
       "number": 1112,
       "title": "docs(database): make the MySQL Prisma adapter example honest and executable",
       "disposition": "active",
-      "lane": "docs",
+      "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1112"
+        "packages/prisma-adapter-mysql/README.md:7,13,20 still claims 'Deno's native MySQL client' / 'Deno-native driver' — this file is the JSR landing page (jsr-package-settings.json defaults readmeSource: 'readme')",
+        "packages/prisma-adapter-mysql/src/mod.ts:6-8 module JSDoc repeats the same false 'Deno's native mysql driver' claim above the @example",
+        "packages/prisma-adapter-mysql/src/adapter.ts:26 imports type { Pool, PoolConnection, PoolOptions } from 'mysql2/promise' — the real dependency",
+        "packages/prisma-adapter-mysql/src/types.ts:39 declares onConnectionError; grep across the package finds it referenced only in examples/basic-usage.ts:39 and never in src/adapter.ts — a live accepted-but-unused option (acceptance row 4)",
+        "docs/site/reference/prisma-adapter-mysql/index.md:8,14,16-17 IS already honest about mysql2, pooling ownership and timeout — that half was repaired by PR #1292, so only the package-local prose plus source rows remain"
       ]
     },
     {
@@ -31,7 +39,23 @@
       "disposition": "active",
       "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1243"
+        "packages/cli/src/public/features/plugins/auth/auth-plugin-command.ts:87 still sets `default: 'http://localhost:4437/auth/sessions'` on --stream-url",
+        "plugins/streams/scaffold.plugin.json:54-55 still carries servicePort 4437 / backgroundPort 4437 — the dead manifest values the issue asks to sweep",
+        "packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-test-support.ts:108-109 also hardcodes 4437 for both ports",
+        "#1211 (randomize default listener ports) is MERGED in 0.0.5, so the premise that 4437 is no longer bound by new scaffolds holds",
+        "The 4437 squatting failure class is documented in the repo's own aspire skill text (packages/cli/src/kernel/assets/skills.generated.ts), which describes a foreign process answering on 4437 healthily"
+      ]
+    },
+    {
+      "number": 1249,
+      "title": "fix(fresh/form): controlProps() is not element-assignable, and Zod 4 constraint derivation misses numbers and regex",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1249",
+        "https://github.com/rickylabs/netscript/issues/1249#issuecomment-5285236885",
+        "packages/fresh/src/application/form/_internal/prop-types.ts:166",
+        "packages/fresh/src/application/form/schema-adapter/zod-constraints.ts:163-198"
       ]
     },
     {
@@ -40,7 +64,10 @@
       "disposition": "active",
       "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1262"
+        "packages/cli/src/kernel/assets/database/seed.ts.template:13-14 is verbatim `await client.$queryRaw\\`SELECT 1\\`;` followed by `console.log('✅ Database seed completed.')` — unchanged on baseline",
+        "It is the only seed asset in the tree (`find packages/cli/src/kernel/assets -iname '*seed*'` returns exactly this one file), so every engine gets the placebo",
+        "No test references the seed script's row-writing behaviour (no seed assertions found under packages/cli/e2e)",
+        "Timeline shows only #1250/#1256 (the Zod-4 coercion fix) cross-referencing it — nothing that touched the seed"
       ]
     },
     {
@@ -49,34 +76,49 @@
       "disposition": "active",
       "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1263"
+        "packages/cli/src/kernel/assets/service/routers/v1.ts.template:59 still throws a bare `new Error(\\`{{modelName}} ${input.id} not found\\`)` in the getById handler — not a defined oRPC error",
+        "Same defect in the memory variant: packages/cli/src/kernel/assets/service/routers/v1.memory.ts.template:56",
+        "Repo-wide grep for `.errors(`, `NOT_FOUND`, or `ORPCError` across packages/cli/src/kernel/assets (excluding generated) returns ZERO hits — no scaffolded contract defines a 404, so the OpenAPI projection cannot document one",
+        "update/delete handlers rely on Prisma's own throw (v1.ts.template update/delete use where:{id} with no not-found branch), so they share the class",
+        "Timeline shows only #1250/#1256 and later related issues; no merged PR addressed the defined-error gap"
       ]
     },
     {
       "number": 1293,
-      "title": "prisma-adapter-mysql: adapter class is unexported and has no connection-error hook — the honest example needs both",
+      "title": "prisma-adapter-mysql: adapter class is unexported and has no connection-error hook",
       "disposition": "active",
-      "lane": "fixes",
+      "lane": "features",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1293"
+        "packages/prisma-adapter-mysql/src/adapter.ts:319 declares `class PrismaMySqlAdapter extends MySqlQueryable<MysqlPoolClient>` with no `export` keyword; src/mod.ts exports only PrismaMySqlAdapterFactory/PrismaMySql (adapter.ts:742 aliases them) — the class is still unexported",
+        "packages/prisma-adapter-mysql/src/types.ts:39 `onConnectionError?: (err: Error) => void` exists in the options type but no src/ file reads it — the hook is declared, not implemented or tested",
+        "packages/prisma-adapter-mysql/src/adapter.ts:544,546 already carry explicit annotations (`readonly provider: 'mysql' = 'mysql'`, `readonly adapterName: string`), so the slow-types row is largely satisfied on baseline",
+        "packages/prisma-adapter-mysql/deno.json exports only '.' -> './mod.ts', so any new export must go through src/mod.ts"
       ]
     },
     {
       "number": 1296,
       "title": "fix(docs/exports): repair contracts and Fresh UI reference drift, then wire the regeneration gate",
       "disposition": "active",
-      "lane": "docs",
+      "lane": "internals",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1296"
+        "The cited file is a false lead: packages/contracts/src/application/contract-primitives.ts:72,112,144 import baseContract/BaseContractRoute/BaseContractOutputRoute from '@netscript/contracts', and all three ARE root exports (packages/contracts/src/public/mod.ts:2-6) — those examples are correct",
+        "Real instances of the same defect: packages/contracts/src/application/paginated-query.ts:6 imports paginatedQuery, schemas/pagination.ts:6 imports PaginationInputSchema/createPaginatedOutput, schemas/filters.ts:6 imports FilterConditionSchema/buildPrismaWhere, and src/application/transform-helpers.ts:6 imports createTransformer — all from the root, while none of those symbols appear in src/public/mod.ts (they live on ./query and ./transform)",
+        ".llm/tools/docs/check-exports-drift.ts:13-21 lists fresh-ui with `checkSymbols: false` and `excludedSymbols: []` — symbol-level drift for docs/site/reference/fresh-ui/index.md is not checked and there is no machine-readable intentional-omission mechanism in use",
+        "Wiring is partly done: .llm/tools/docs/check-accuracy-and-discoverability.ts:293 spawns check-exports-drift.ts, and deno.json:85,90 expose it via docs:accuracy/docs:maintenance — but no .github/workflows job runs those tasks (only pages.yml:145 runs docs:snippets)",
+        "#1108 (the parent of the fresh-ui rows) was closed NOT_PLANNED on 2026-08-11, so those rows genuinely have no other owner"
       ]
     },
     {
       "number": 1306,
       "title": "fix(aspire): 'the dashboard is the authority' is unusable for an agent — aspire start detaches in a non-TTY and prints no login token",
       "disposition": "active",
-      "lane": "internals",
+      "lane": "features",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1306"
+        "No inventory verb exists: packages/cli/src/public/features/ contains agent, config, contracts, db, deploy, generate, init, marketplace, plugins, root, services, ui — no aspire/status/resources group",
+        "The issue's 'check get_app_status first' question resolves NEGATIVE: packages/mcp/src/domain/tool-contracts.ts:175-179 declares its output as { status, counts, domains } — a health rollup, with no resolved endpoints, ports, or URLs",
+        "packages/mcp/src/application/tool-registry.ts:36 describes get_app_status only as 'Summarize NetScript app health', confirming it is not a resource inventory",
+        "No TTY/token handling anywhere near an aspire path: grep for isTerminal in packages/cli/src hits only init-command.ts:116, agent-mcp-command.ts:44, agent-group.ts:33, db-operation-command.ts:84",
+        "Timeline: only #1290 and the merged docs PR #1309 cross-reference it — the docs pass did not close the capability gap"
       ]
     },
     {
@@ -85,7 +127,11 @@
       "disposition": "active",
       "lane": "features",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1348"
+        "rfcs/0001-sdk-client-contributions.md:1 exists on baseline — RFC text published, so acceptance box 1 is satisfied",
+        "PR #1390 'RFC: Typed SDK client contributions' MERGED 2026-08-11T20:15:51Z; its body states 'RFC tracking issue: #1348 (reference only; this draft does not close it)'",
+        "rfcs/0001-sdk-client-contributions.md:1555-1599 — 11 unresolved questions still open (incl. Q6 metadata ownership), so ratification acceptance is incomplete",
+        "rfcs/0001-sdk-client-contributions.md:1273 Stage 0 row assigns #1348 'align #1349–#1353 bodies before implementation' — not yet done (bodies still contradict the RFC)",
+        "gh issue list --label epic:sdk-client-contrib: all 8 children (#1349-#1353,#1466,#1467,#1093) still OPEN"
       ]
     },
     {
@@ -94,25 +140,37 @@
       "disposition": "active",
       "lane": "features",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1349"
+        "packages/sdk/src/ports/service-client.ts:203-222 — CreateServiceClientOptions is still the closed nine-field record; no headers/fetch/interceptors/plugins/link/context parameter",
+        "packages/sdk/src/ports/service-client.ts:129-155 — ServiceClientContext is still a concrete interface; ServiceClientMethod<TInput, TOutput> at :167 carries no context or error generic",
+        "packages/sdk/src/client/http-client-link.ts:82,83-101,102-126 — method, headers and plugins are still inline literals inside the link",
+        "packages/sdk/src/ports/mod.ts:7 still advertises 'the transport seam' while ClientLinkPort/ClientLinkCallOptions (packages/sdk/src/ports/client-link-factory.ts:8-26, doc'd 'Internal … seam') are absent from its export list",
+        "packages/service/src/builder/service-rpc.ts:57 still calls createRPCHandler(router, { serviceName, debug }) while packages/service/src/primitives/handlers.ts:44 declares `plugins`; packages/service/src/types.ts:221 still `init?(options: unknown, router: unknown)`"
       ]
     },
     {
       "number": 1350,
       "title": "[sdk-client S1] fix(sdk): preserve contract errors through safe() and isDefinedError",
       "disposition": "active",
-      "lane": "features",
+      "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1350"
+        "packages/sdk/src/client/errors.ts:75-77 — `isDefinedError<T>(error: T): error is Extract<T, DefinedError>` still lacks the upstream error generic",
+        "packages/sdk/src/client/errors.ts:86-92 — `safe<TOutput>(promise: PromiseLike<TOutput>)`, no TError; SafeResult<TOutput, TError = unknown> at :49",
+        "packages/contracts/src/application/contract-primitives.ts:81 — `export const baseContract: ReturnType<typeof oc.errors> = oc.errors(commonErrorMap);` still erases the six literal codes",
+        "packages/sdk/tests/readme-doctest_test.ts:36-37 — still `declare function safe<T>(...)` / `declare function isDefinedError(...)` instead of importing the real exports",
+        "docs/site/services-sdk/sdk.md:198 and docs/site/services-sdk/how-to/discover-services.md:147,224 still ship the `isDefinedError(error) -> error.code` pattern"
       ]
     },
     {
       "number": 1351,
       "title": "[sdk-client S4] refactor(sdk): centralize HTTP method and GET-cache policy",
       "disposition": "active",
-      "lane": "features",
+      "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1351"
+        "packages/sdk/src/client/http-client-link.ts:82 — `method: inferRPCMethodFromContractRouter(contract)` still applied inline; no owned policy function exists (grep inferRPCMethodFromContractRouter/StrictGetMethodPlugin/fallbackMethod returns only this file)",
+        "packages/sdk/src/client/http-client-link.ts:109 — `filter: ({ request }) => request.method === 'GET'` still re-derives the method decision from the wire",
+        "packages/sdk/src/client/http-client-link.ts:110-125 — the 'force-cache' group condition is still an independent literal keyed off context?.cache",
+        "packages/sdk/src/client/http-client-link.ts:103-108 — ClientRetryPlugin default still frozen at retry: 0",
+        "rfcs/0001-sdk-client-contributions.md:1277 Stage 3 assigns this issue the v1-family version decision, one fetch/retry/dedupe/trace path, header-safe dedupe, and deprecating the no-op options"
       ]
     },
     {
@@ -121,16 +179,24 @@
       "disposition": "active",
       "lane": "features",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1352"
+        "packages/service/src/auth/static-credential-authenticator.ts reads Authorization/x-api-key while grep 'Authorization' packages/sdk/src returns no match — the client still cannot send a credential",
+        "packages/sdk/src/client/http-client-link.ts:83-101 — client header authorship is still only Content-Type + optional traceparent/tracestate",
+        "grep -rn 'authClient' packages plugins → no such symbol on baseline (only oauthClient in packages/auth-kv-oauth/src/flow.ts:169)",
+        "packages/plugin/src/config/domain/plugin-contributions.ts:12-41 — still no client/sdkClients contribution group; :14-16 `doctorChecks?: readonly 'auth-backend'[]` is the closed-literal precedent the issue warns against",
+        "rfcs/0001-sdk-client-contributions.md:1278 Stage 4 keeps this issue as the auth dogfood (auth-core bearer factory, access metadata, redaction, cache partition/direct-only, manifest reference, docs, scaffold choice)"
       ]
     },
     {
       "number": 1353,
       "title": "[sdk-client S6] feat(sdk): express trace propagation as a general contribution",
       "disposition": "active",
-      "lane": "features",
+      "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1353"
+        "packages/sdk/src/client/http-client-link.ts:87-98 — trace-header authorship is still hard-coded in the link behind the propagateTraceContext boolean",
+        "packages/sdk/src/ports/service-client.ts:149-155 — ServiceClientContext.traceHeaders is still the per-call override; grep traceContextContribution → no such symbol on baseline",
+        "rfcs/0001-sdk-client-contributions.md:1476-1481 §'Rejected: trace propagation as the non-auth contribution' — the merged RFC REJECTS this issue's headline deliverable",
+        "rfcs/0001-sdk-client-contributions.md:1279 Stage 5 — 'Re-scope from “trace contribution” to prove the transport retains the only final trace injection and rejects contributor ownership of trace headers'",
+        "rfcs/0001-sdk-client-contributions.md:870-871,886-887 — traceparent/tracestate are reserved SDK-owned headers unavailable to contributions"
       ]
     },
     {
@@ -139,7 +205,11 @@
       "disposition": "active",
       "lane": "features",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1354"
+        "packages/cli/src/kernel/application/ui/web-scaffold.ts:15-45 is still the entire page generator: three files, no withResource, no loader, no contract sidecar",
+        "packages/cli/src/public/features/generate/generate-group.ts:19-27 registers only `aspire`, `runtime-schemas`, `plugins` — no slice/route generator exists",
+        "packages/cli/src/kernel/application/ui/web-scaffold.ts:60-62 writeGeneratedFiles hard-refuses on any existing file; no --force/--dry-run reaches it from add-ui-command.ts:61-67",
+        "Reference slice still exists only as init assets: packages/cli/src/kernel/assets/app/routes/examples/service/(_lib)/service-query.ts.template and (_islands)/ServiceShowcaseLab.tsx.template",
+        "Timeline shows no merged PR touching this issue; only open peers #1355/#1357/#1360 cross-reference it"
       ]
     },
     {
@@ -148,7 +218,11 @@
       "disposition": "active",
       "lane": "features",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1355"
+        "packages/cli/src/kernel/assets/app/routes/examples/service/(_lib)/service-query.ts.template:22-27 still literally does `createQueryFactories({ service: { … } }).service` — resource key is the literal 'service' for every service",
+        "Same template :11-14 builds bridgeInvalidation({{serviceName|camelCase}}RouterName, 'list') → keys ['users','list'], while packages/sdk/src/query/query-factory.ts:218 passes the OBJECT KEY ('service') as resource → the invalidation is a no-op",
+        "packages/sdk/src/query-client/key-bridge.ts:32-37 confirms bridgeInvalidation returns { queryKey: [resource, action] } with no factory linkage",
+        "Dead call sites confirmed: assets/app/routes/examples/(_islands)/ServiceShowcaseLab.memory.tsx.template:93 (onSettled) and :135 ('Invalidate list cache' button)",
+        "packages/cli/src/kernel/adapters/service/client-scaffolder.ts:38-49 is still a single renderTemplateAssetSync — one template, one shot, no per-service naming"
       ]
     },
     {
@@ -157,7 +231,11 @@
       "disposition": "active",
       "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1357"
+        "packages/cli/src/kernel/application/ui/web-scaffold.ts:37 still emits `export const queryLoaders = {} as const;` and :35 emits signalIslandTemplate (useSignal counter, :66-68)",
+        "web-scaffold.ts:51-54 — `ui:add island --query` still emits `<QueryIsland><div>Name</div></QueryIsland>`: no useQuery, no key, no factory",
+        "web-scaffold.ts:20+:30 — route id is still a hand-derived dotted string with an inline createRouteReference, not router.ts/appRoutes",
+        "Contradicted description still live at packages/cli/src/public/features/ui/add/add-ui-command.ts:26-28 ('Scaffold the Fresh page + island + query-loader triad for a data screen')",
+        "add-ui-command.ts:61-67 never forwards `--force` to scaffoldUiPage/scaffoldUiIsland, and there is no --dry-run flag at all"
       ]
     },
     {
@@ -166,7 +244,11 @@
       "disposition": "active",
       "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1358"
+        "packages/cli/src/kernel/assets/app/routes/(design)/design/(_shared)/registry.ts.template:28 still declares `total: 50` and :1-4 self-describes as a hand-copied snapshot",
+        "Live manifest item count is 66: `grep -c '^      kind: ' packages/fresh-ui/registry.manifest.ts` → 66",
+        "AI/chart items absent from the snapshot but present in the manifest: grep for model-selector|prompt-input|donut|dropzone|citation-chip|mcp-ui-widget returns 0 hits in the template, and hits at packages/fresh-ui/registry.manifest.ts:451,495,561,583",
+        "The only drift test remains packages/fresh-ui/tests/registry-doc-drift.test.ts:4-19, which compares registry.ts JSDoc COLLECTION NAMES only and never reads the CLI snapshot",
+        "packages/cli/src/kernel/application/ui/registry.ts imports freshUiRegistryManifest — the CLI resolves against the live manifest, so ui:add can install items the gallery denies"
       ]
     },
     {
@@ -175,7 +257,11 @@
       "disposition": "active",
       "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1360"
+        "Repo-wide grep for `initialDataUpdatedAt` under packages/cli/src returns ZERO hits; all hits are in packages/fresh (query-types.ts:136, hooks.ts:128,138-140, and two tests)",
+        "packages/cli/src/kernel/assets/app/routes/examples/(_islands)/ServiceShowcaseLab.tsx.template:54-57 passes queryKey + initialData: props.initialList with no initialDataUpdatedAt; :148 uses props.cachedAt only as a display stat",
+        "Memory variant identical: ServiceShowcaseLab.memory.tsx.template:60 initialData, :119 cachedAt as a label only",
+        "The seam is live and tested in the framework — packages/fresh/src/application/query/hooks.ts:138-140 maps the option to `{ updatedAt }` and initial-data.test.tsx:15 exercises it — so only the scaffold is unwired",
+        "Timeline shows no merged PR; only open peers #1354/#1357 cross-reference it"
       ]
     },
     {
@@ -184,7 +270,11 @@
       "disposition": "active",
       "lane": "internals",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1378"
+        "Still regex-only, export-blind: `.llm/tools/quality/scan-code-quality.ts:69` `if (!commentOnly && /(?:<|:\\s*)any.../.test(line)) return 'explicit-any'` — no notion of `export`.",
+        "Allowances still unlinked: `scan-code-quality.ts:207` matches `/\\/\\/\\s*quality-allow:\\s*(.+)$/` and accepts any non-empty free text; no `#<n>` requirement anywhere in the file.",
+        "Already landed (boxes 3,4,5,7): `scan-code-quality.ts:119` scans `docs/site/**` `.md` fences; `:124` keeps `-soundness_test.ts` in scope; `deno.json:50-51` wires `--root docs/site --max-allow 7` and `--max-allow 8`.",
+        "PR #1596 (merged 2026-08-12) body: \"Export reachability and live issue-state verification remain explicitly deferred to #1378 for 0.0.7\"; it referenced #1378 without closing it.",
+        "`docs/site/reference/triggers/index.md` (205 lines) contains no `any[]` at baseline — acceptance box 7 is discharged."
       ]
     },
     {
@@ -193,7 +283,10 @@
       "disposition": "active",
       "lane": "internals",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1429"
+        "`.llm/tools/agentic/teardown/leak-check.ts` has zero matches for `ppid|PPID|pgrep|/proc|process` — it has no process-descendant observation at all.",
+        "Its resource model is containers + AppHosts only: `leak-check.ts:42`, `:68`, `:74`, `:106` all branch on `resource.kind === 'apphost'` or `registry.containers`.",
+        "Timeline cross-references for #1429 are only issues #1227 and #1169 (both closed), no merged PR touching leak-check.",
+        "`.llm/tools/agentic/teardown/` contains ownership.ts, ports.ts, probes.ts, run-resources.ts — no process enumerator module."
       ]
     },
     {
@@ -202,7 +295,11 @@
       "disposition": "active",
       "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1448"
+        "packages/ai/src/mcp/application/pool.ts:154-173 — #collectTools iterates transports in a `for...of` with `await list(transport)`, so one never-settling or rejecting server blocks/aborts the whole pool; connect/reconnect/listTools (:107, :115, :122) all route through it",
+        "packages/ai/src/mcp/adapters/tanstack-connector.ts:80 and :89 — listTools/callTool only call options.signal?.throwIfAborted() before awaiting client.tools()/client.callTool(name, args); no signal is passed into the pending TanStack work",
+        "packages/ai/src/mcp/application/register-tools.ts:14-17 — registerMcpTools(registry, transport) accepts no caller signal, and :36 hardcodes `{ signal: undefined }` on every tool call",
+        "packages/ai/src/mcp/application/pool.ts:88 — the pool exposes only an aggregate `state`; there is no per-server status/degraded-lifecycle read",
+        "gh api issues/1448/timeline — the only cross-reference is rickylabs/eis-chat#159 (consumer adapter), not a netscript fix"
       ]
     },
     {
@@ -211,7 +308,11 @@
       "disposition": "active",
       "lane": "features",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1451"
+        "plugins/workers/src/cli/runtime-registry-generator.ts:325-340 — createJobDefinition still hardcodes topic 'default', timeout 300000, maxRetries 3, retryDelay 1000, maxConcurrency 1, priority 50, persist true and a fixed tags expression",
+        "plugins/workers/src/cli/registry-compiler.ts:78 — the compiler path emits the same `timeout: 300000` literal",
+        "plugins/workers/tests/cli/registry-compiler-golden_test.ts:68 and plugins/workers/services/src/generated-jobs_test.ts:22 — golden tests pin the generic 300000ms timeout, so no project-metadata seam is exercised",
+        "packages/plugin-workers-core/src/executor/multi-runtime-task-executor.ts:66 — the executor default is likewise `options.defaults?.timeout ?? 300000`",
+        "gh api issues/1451/timeline — the only cross-reference is issue #1455 (open), no fix PR"
       ]
     },
     {
@@ -220,25 +321,39 @@
       "disposition": "active",
       "lane": "features",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1452"
+        "packages/cli/src/kernel/assets/embedded.generated.ts:177 — the scaffold still embeds a full ~100-line LazyPluginKv class plus db/contracts/logger/env composition in the generated createPluginServiceContext",
+        "packages/cli/src/kernel/templates/plugins/generate-plugin-service_test.ts:82 — the test asserts the generator emits `export function createPluginServiceContext(` into consumer code, pinning the duplicate-per-consumer shape",
+        "plugins/workers/services/src/main.ts:88-89, plugins/sagas/services/src/main.ts:139-140 and plugins/auth/services/src/main.ts:124-127 all load the host factory via NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE, so no published factory exists to import",
+        "packages/plugin/src/sdk/ contains only discovery/walker/registry-emitter modules — no host-context factory",
+        "gh api issues/1452/timeline — no cross-references at all"
       ]
     },
     {
       "number": 1453,
       "title": "fix(agentic): migration LOC worktree snapshot crashes on unstaged deletions",
-      "disposition": "active",
-      "lane": "internals",
+      "disposition": "move",
+      "lane": null,
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1453"
-      ]
+        "`tools/migration-loc/` does not exist at baseline: `find . -iname '*migration-loc*'` returns nothing outside `.llm/tmp` hook logs and the 0.0.7 inventory JSONs.",
+        "`git log --all -- tools/migration-loc` is empty — the path has never existed in this repository's history.",
+        "`grep -rn readTrackedFile --include=*.ts .` returns no match; the cited `tools/migration-loc/git.ts:78` frame has no counterpart here.",
+        "The only `-S'migration-loc'` history hits (05e5fbac2, 9f1d0244a) are false positives on the string `migration-lock` in `rfcs/0000-database-architecture.md`.",
+        "No scaffold template emits it: `packages/cli/src/kernel/assets/**` has no migration-loc generator.",
+        "https://github.com/rickylabs/netscript/issues/1453#issuecomment-5285235764"
+      ],
+      "reason": "The entire cited surface is absent from the repo and its full history, so the acceptance is unsatisfiable in a 0.0.7 slice against this codebase; needs re-scoping or relocation to the owning repo first."
     },
     {
       "number": 1455,
       "title": "workers: preserve job payload type through definition, registry, and enqueue",
       "disposition": "active",
-      "lane": "fixes",
+      "lane": "features",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1455"
+        "packages/plugin-triggers-core/src/builders/define-webhook.ts:79-81 — `enqueueJob<TJobId extends string, TPayload = unknown>(job: JobDefinition<TJobId>, ...)` still infers the payload independently of the job definition",
+        "packages/plugin-workers-core/src/contracts/v1/workers.contract-types.ts:32-36 — JobTriggerInput still exposes `payload?: Record<string, unknown>`",
+        "packages/cli/src/kernel/assets/registry-generator-fixture.ts:37 — generated registries still emit `new Map<string, JobHandler<any>>([`",
+        "Partially superseded upstream: packages/plugin-workers-core/src/domain/job-definition.ts:153-163 and builders/job-builder.ts:241 already return JobDefinition<TId, TPayload, TResult>, so the builder-side erasure the issue describes is already gone",
+        "gh api issues/1455/timeline — only cross-reference is rickylabs/eis-chat#168 (consumer repo), no netscript fix PR"
       ]
     },
     {
@@ -247,16 +362,23 @@
       "disposition": "active",
       "lane": "features",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1458"
+        "packages/fresh/src/runtime/ai/create-chat-connection.ts:234-264 — NetScriptChatResponseOptions exposes target/streamPath/source/newMessages/request/authorize/toResponse and no mode or waitUntil",
+        "packages/fresh/src/runtime/ai/create-chat-connection.ts:255-263 — `toResponse` is documented as a test/adapter seam defaulting to toDurableChatSessionResponse, which is exactly the escape hatch consumers are forced to use",
+        "packages/fresh/src/runtime/ai/create-chat-connection.ts:461 — `const toResponse = options.toResponse ?? defaultToResponse;` with no completion-mode forwarding",
+        "gh timeline for #1458: only a 0.0.7 milestone event; no PR has referenced it"
       ]
     },
     {
       "number": 1461,
       "title": "docs/sdk: getCachedEntry cache-first loader example never revalidates stale entries",
       "disposition": "active",
-      "lane": "docs",
+      "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1461"
+        "packages/sdk/src/cache/cache-query.ts:385-410 — getCachedEntry() reads this.store.get(), records telemetry and returns toCachedEntry(); it never reads staleTime, calls queryFn, or schedules a refresh",
+        "docs/site/services-sdk/sdk.md:188 — the published example still carries `if (entry) return entry; // serve cached; SDK reloads stale in the background`",
+        "docs/site/services-sdk/sdk.md:138 — getCachedEntry is still described as 'the SWR primitive a layer loader uses to decide stale-reload'",
+        "packages/sdk/src/cache/cache-query.ts:256-300 — revalidateInBackground never touches this.inflightRequests, confirming the issue's concurrent-duplicate-refresh note (dedupe exists only in fetchAndCacheOnce at :210-217)",
+        "docs/site/_site/capabilities/sdk/index.md:143 — the same false comment is in the built site output"
       ]
     },
     {
@@ -265,7 +387,11 @@
       "disposition": "active",
       "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1462"
+        "packages/sdk/mod.ts:46 — `export * from './src/cache/mod.ts'` still re-exports the cache module from the SDK root alongside defineServices (mod.ts:55)",
+        "packages/sdk/src/cache/mod.ts:22 — top-level `setCacheProvider(cacheQuery)` executes on any import of that module; the module JSDoc (:11-12) only warns browsers to avoid it",
+        "packages/sdk/deno.json:6-19 exports map has no ./presets or other browser-safe defineServices subpath — exactly the published-surface gap the issue reports",
+        "packages/sdk/mod.ts:24-25 documents the auto-registration as intended behaviour, so the fix must also update the root module contract",
+        "gh timeline for #1462: only a 0.0.7 milestone event — no PR has touched it"
       ]
     },
     {
@@ -274,7 +400,11 @@
       "disposition": "active",
       "lane": "features",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1466"
+        "grep -rnE '\\$meta<|\\.meta\\(|NetScriptProcedureMeta' packages plugins --include=*.ts → only Zod `.meta({` in packages/aspire/config.ts; no oRPC procedure metadata and no NetScriptProcedureMeta symbol exists on baseline",
+        "rfcs/0001-sdk-client-contributions.md:1275 Stage 1b — 'Initialize/export NetScriptProcedureMeta without re-erasing Stage 1a types … an explicit dependent child owns this before auth dogfood'",
+        "rfcs/0001-sdk-client-contributions.md:410-413 — `SdkClientProcedureDescriptor.meta: Readonly<NetScriptProcedureMeta>` is a field of the normative public contribution contract",
+        "Issue body 'Part of #1348. Implements RFC 0001 stage 1b.' — filed after PR #1390 merged, so it IS the Stage-0-selected 1b owner",
+        "rfcs/0001-sdk-client-contributions.md:1347 §'Procedure metadata' defines the shape this issue must export"
       ]
     },
     {
@@ -283,7 +413,11 @@
       "disposition": "active",
       "lane": "features",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1467"
+        "grep -rn 'SdkClientContribution' packages plugins → no match on baseline; no locale contribution exists",
+        "rfcs/0001-sdk-client-contributions.md:1280 Stage 6 'Non-auth proof — new child after RFC acceptance. Ship/test locale contribution, partitioned keys, header conflicts, and generated use.' — #1467 is that child (body: 'Implements RFC 0001 stage 6')",
+        "rfcs/0001-sdk-client-contributions.md:1480-1481 — 'Locale proves generality without duplicating credential semantics or violating trace ownership' (locale, not trace, is the ratified non-auth proof)",
+        "rfcs/0001-sdk-client-contributions.md:879 — `accept-language` is explicitly permitted for contributions",
+        "rfcs/0001-sdk-client-contributions.md:441-452 — SdkClientResponseCache partition/direct-only law this issue must exercise"
       ]
     },
     {
@@ -292,7 +426,10 @@
       "disposition": "active",
       "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1481"
+        "packages/cli/src/kernel/assets/app/routes/(design)/design/ ships _layout, index, tokens, components, composition templates plus (_components)/(_islands)/(_shared) — grep for MODE|development|import.meta.env across that directory returns zero matches, so no mode gate exists",
+        "packages/cli/src/kernel/application/scaffold/writers/write-app-files.ts:95-99 and :139-143 create the (design) group unconditionally; :257-263 write the route templates with no opt-in flag",
+        "gh timeline for #1481: milestoned to Backlog/Triage then 0.0.7; cross-referenced from merged PRs #1450/#1523 and open #1522 (DevTools RFC artifacts) — none touched the gate",
+        "RFC authority rfcs/0005-devtools-contribution.md is merged on main, so the dual-exclusion posture the acceptance must match is already ratified"
       ]
     },
     {
@@ -301,16 +438,24 @@
       "disposition": "active",
       "lane": "features",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1502"
+        "No such RFC exists: rfcs/ contains only 0000-template, 0001-sdk-client-contributions, 0002-runtime-versioned-automation, 0003-command-composition-kit, 0004-deterministic-first-hybrid-mcp-doc-retrieval, 0005-devtools-contribution",
+        "rfcs/0003-command-composition-kit.md:1-20 is 'Production command composition kit' (transactional business commands, single store) — confirms it does not cover CLI extension, as the issue states",
+        "rfcs/0005-devtools-contribution.md:1-8 is Accepted with tracking issue #1465, so the DevTools consumer named in the sequencing section exists and would consume this seam",
+        "The consumer children are filed and parked downstream: #904, #905, #906, #907, #908 are all OPEN in milestone 0.0.11 ('Host: CLI mount-children contribution contract', async bootstrap, doctor-checks-as-data, manifest triad, plugin CLI children)",
+        "Labelled priority:p0 + status:research + epic:cli-contrib and self-declared '0.0.7 foundation' — nothing in-repo supersedes it"
       ]
     },
     {
       "number": 1533,
-      "title": "test(docs): nothing compiles JSDoc `@example` blocks, so a published JSR reference can import a module that does not exist",
+      "title": "test(docs): nothing compiles JSDoc `@example` blocks",
       "disposition": "active",
-      "lane": "docs",
+      "lane": "internals",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1533"
+        "No JSDoc example gate exists: .llm/tools/docs/check-snippets.ts:42-43 resolves its root to docs/site (or a fixture's docs/site) only — packages/** and plugins/** JSDoc are outside its scope",
+        "The tool inventory under .llm/tools/docs/ (snippet-extractor.ts, snippet-compiler.ts, snippet-policy.ts, check-snippets.ts) contains no @example/JSDoc extractor",
+        "Negative-test fixture #1 is currently clean: grep for 'api-clients' across packages/sdk/**/*.ts returns nothing (file is packages/sdk/src/query-client/create-service-query-utils.ts), so the gate must reintroduce it deliberately",
+        "Negative-test fixture #2 is also clean: packages/sdk/src/desktop/mod.ts:11-12 now imports '@my-app/contracts', not a relative app path",
+        "Prerequisite #1374 is CLOSED (milestone 0.0.6) and its snippet machinery is checked in, so the sequencing constraint is already satisfied"
       ]
     },
     {
@@ -319,25 +464,36 @@
       "disposition": "active",
       "lane": "internals",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1542"
+        "`deno.json:52` `quality:gate` = `quality:scan && arch:check`, and `deno.json:50` `quality:scan` roots are still `packages/cli/src`, `plugins`, `docs/site` — `packages/plugin-streams-core`, `packages/plugin-workers-core`, and `packages/cli/e2e` are outside them.",
+        "The `arch:check` half is now fixed: `deno.json:163` uses `--all-roots`, and `.llm/tools/fitness/check-doctrine.ts:27-43` `discoverDoctrineRoots()` enumerates every `packages/*` and `plugins/*` carrying a named `deno.json`.",
+        "That arch half landed in `e391f3aec` \"fix(quality): make quality gate coverage informative (#1570)\", merged 2026-08-12T14:31 — after #1542 was filed (2026-08-12T09:11) but closing #1403, not #1542.",
+        "Acceptance box 3 is arguably already met: the scanner emits `scanned` in its JSON result (`scan-code-quality.ts` main block, `result.scanned`).",
+        "No test pins root coverage: no reference to `discoverDoctrineRoots` from any file under `.llm/tools/quality`."
       ]
     },
     {
       "number": 1543,
       "title": "chore(deps): plugin-workers-core and plugins/triggers import plugin-streams-core without declaring it",
       "disposition": "active",
-      "lane": "internals",
+      "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1543"
+        "grep for '@netscript/plugin-streams-core' across the three manifests returns only plugins/workers/deno.json:26 — packages/plugin-workers-core/deno.json and plugins/triggers/deno.json still do not declare it",
+        "packages/plugin-workers-core/src/streams/producer.ts:1 imports { createDurableStream } from '@netscript/plugin-streams-core'",
+        "plugins/triggers/streams/producer.ts:7 imports { createDurableStream } from '@netscript/plugin-streams-core'",
+        "plugins/workers/deno.json:26 pins it as jsr:@netscript/plugin-streams-core@0.0.6, establishing the declaration pattern the other two diverge from"
       ]
     },
     {
       "number": 1544,
-      "title": "fix(cli): `emit` is advertised and implemented by three deploy adapters but never routed, so `deploy list` reports a command that does not exist",
+      "title": "fix(cli): `emit` is advertised by three deploy adapters but never routed",
       "disposition": "active",
       "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1544"
+        "packages/cli/src/public/features/deploy/target/target-deploy-command.ts:15-23 ROUTED_OPERATIONS = ['plan','up','down','status','logs','rollback','secrets'] — 'emit' absent",
+        "Same file:26-35 OPERATION_DESCRIPTIONS still carries `emit: 'Emit deployment artifacts'`, and :58-59 generates subcommands only from ROUTED_OPERATIONS ∩ adapter.operations, so emit can never become a command",
+        "packages/cli/src/kernel/adapters/aspire/aspire-compose-deploy-target.ts:66 advertises 'emit' and :97 implements it (`return this.#publish('emit', request)`)",
+        "packages/cli/src/kernel/adapters/aspire/aspire-cloud-deploy-target.ts:125 advertises ['plan','emit','up','down']; packages/cli/src/kernel/domain/deploy/service-deploy-target.ts:24,107 advertise and implement it too",
+        "Existing tests lock the advertised sets (deploy-target-port_test.ts:198-199,210) but none asserts routability — the invariant the issue asks for is genuinely missing"
       ]
     },
     {
@@ -346,25 +502,35 @@
       "disposition": "active",
       "lane": "internals",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1545"
+        "No allowance carries an issue id at baseline: all 7 live sites read `// quality-allow: <free text>` — `packages/cli/src/public/public-api.ts:135,136,158,275,276`, `packages/cli/src/public/features/root/public-command-dependencies.ts:363`, `plugins/workers/streams/producer.ts:52`.",
+        "The population is 7, not the 8 the issue tabulates: `grep -rn 'quality-allow' packages/fresh/src` returns nothing, so table row 7 (`route-support.ts:96`) no longer exists at baseline.",
+        "`--max-allow` is already wired: `deno.json:50` `--max-allow 7`, `deno.json:51` `--max-allow 8` — so acceptance box 2 as written (8 for both) is stale relative to the tree.",
+        "The scanner still has no registration concept: `scan-code-quality.ts:207` accepts any non-empty reason, so box 1's 'reports them as registered rather than as findings' has no mechanism.",
+        "PR #1596 referenced #1545 without closing it and deferred live issue-state verification to 0.0.7."
       ]
     },
     {
       "number": 1551,
-      "title": "docs(positioning): establish “NetScript vs …” and “Migrate from …” comparison framework, starting with Next.js",
+      "title": "docs(positioning): establish \"NetScript vs …\" and \"Migrate from …\" comparison framework",
       "disposition": "active",
       "lane": "docs",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1551"
+        "No comparison surface exists yet: docs/site has no comparisons/ directory and docs/site/reference/ contains only per-package pages",
+        "The named case-study artifact is not in this repository — there is no apps/ directory, so `apps/dashboard/routes/project/[project]/channel/[channel]/session/[session]/index.tsx` cannot be read or reproduced from this worktree",
+        "#1550 (framework-owned request-aware cache-seed primitive, referenced by the case study) is CLOSED, so the 'label the current helper as application-owned' caveat may already be stale",
+        "Issue body itself scopes 17 deliverable checkboxes including LSP cold/warm p50/p95 benchmarks, paired human/agent navigation studies, and runtime measurement — none of which is a documentation authoring task"
       ]
     },
     {
       "number": 1557,
       "title": "test(fresh): no capability to assert the deferred coordinator reaches the client bundle",
       "disposition": "active",
-      "lane": "fixes",
+      "lane": "internals",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1557"
+        "packages/fresh/tests/form-navigation_browser.ts:212 drives `playwright-cli` and .github/workflows/ci.yml:252-265 installs @playwright/cli and runs the fresh-browser gate — the issue's premise 'no browser driver in repo test infrastructure' is STALE as of 1ed78f508 (#1602)",
+        "packages/fresh/tests/defer-island-client-bundle_test.ts:38-60 already builds a client bundle and asserts the defer island entry plus the 'partial-miss' policy string — criterion 1 is largely met for a FIXTURE, not for a scaffolded app",
+        "Criteria 2 and 3 remain unmet: nothing asserts a request to a configured /partials/** endpoint from a client navigation, and nothing asserts a named boundary swaps exactly once (grep of packages/fresh/tests shows only form-navigation_browser.ts and the bundle test)",
+        "gh timeline for #1557: cross-referenced from closed #1459 and merged PRs #1555/#1558 (the runtime fix), never from a test-capability PR"
       ]
     },
     {
@@ -373,7 +539,9 @@
       "disposition": "active",
       "lane": "internals",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1561"
+        "Defect present verbatim: `.llm/tools/validation/acceptance-evidence.ts:255` `if (!field) throw new Error(\\`Invalid acceptance-evidence YAML line: ${line}\\`);`.",
+        "The skip guard only tolerates the bare key: `acceptance-evidence.ts:251` `if (!line || line === 'entries:') continue;` — the literal `entries: []` is neither empty nor equal to `'entries:'`.",
+        "The field regex `^-?\\s*(issue|box|box-index|evidence):\\s*(.*)$` (`:254`) cannot match `entries: []`, so the throw is guaranteed, not conditional."
       ]
     },
     {
@@ -382,7 +550,11 @@
       "disposition": "active",
       "lane": "internals",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1563"
+        "Shell tier 2 cannot match a heading: `.github/workflows/openhands-agent.yml:874` `grep -E '^[[:space:]]*(Verdict:?[[:space:]]*)?OPENHANDS_VERDICT:...'` after `sed -E 's/[*`]+//g'` — the strip removes `*` and backtick only, never `#`.",
+        "Shell tier 1 is strictly anchored: `openhands-agent.yml:870` `grep -E '^OPENHANDS_VERDICT:...'`.",
+        "The JS twin has the same hole: `openhands-agent.yml:~1176-1182` `verdictOf()` matches `/^OPENHANDS_VERDICT:.../` then `line.replace(/[*`]+/g,'').match(/^[ \\t]*(?:Verdict:?[ \\t]*)?OPENHANDS_VERDICT:.../)`.",
+        "The library extractor is equally blind: `.llm/tools/agentic/lib/agentic-lib.ts:892` prefix class is `[\\s>*`_]*` — `#` is not a member.",
+        "No test covers the heading form: `agentic-lib_test.ts:655,739` cover the bare line and the `**Verdict: OPENHANDS_VERDICT: PASS**` bold form only."
       ]
     },
     {
@@ -391,7 +563,10 @@
       "disposition": "active",
       "lane": "internals",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1564"
+        "Reproduced on PR #1539: base.sha cd24e1679 was hours stale; `git diff --name-only --diff-filter=ACMR cd24e1679 2a4102600 -- packages plugins` returned 9 files, ZERO of them in #1539 own diff (all from already-merged #1526/#1528/#1534/#1535/#1536).",
+        "The gate reported success having inspected zero lines of the PR under review, while a new `as unknown as` sat in .llm/tools/release/github-release.ts throughout.",
+        "Consumers audited on main: code-quality.yml:39 (affected, owned by #1403); ci.yml:135,153, e2e-cli.yml:128,158, surface-diff.yml:47 (unaudited, same input); openhands-phase-eval.yml:126 already fixed by #1552 by resolving heads/${pr.base.ref} instead.",
+        "gh issue view 1564: state=OPEN, milestone=0.0.7, labels type:fix,area:tooling,status:triage,priority:p1, updated 2026-08-13T18:38:26Z."
       ]
     },
     {
@@ -400,7 +575,11 @@
       "disposition": "active",
       "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1588"
+        "packages/cli/src/kernel/assets/generated/database/generate-prisma-config-1.ts.template:35-51 emits normalizeDatabaseUrl with postgres/mysql/mssql branches while :27 types the provider as the literal '{{__slot4__}}' (= 'sqlite') and :36-38 short-circuits sqlite first — the branches are statically unreachable",
+        "Same template :53-134 carries normalizePostgresUrl, normalizeMysqlUrl, normalizeMssqlUrl, parseSqlServerEndpoint and parseConnectionParts for every engine",
+        "packages/cli/src/kernel/templates/database/generate-engine-mod.ts:34 + :140-142 inline the full connection-helpers asset unconditionally (buildConnectionHelpers() takes no provider argument), so database/<engine>/mod.ts gets all three normalizers too",
+        "packages/cli/src/kernel/assets/database/connection-helpers.ts.template:12-21 is the shared switch that duplicates the prisma-config one",
+        "The only cross-reference is rickylabs/eis-chat#194 (closed, downstream consumer cleanup) — no netscript PR has touched this"
       ]
     },
     {
@@ -409,7 +588,10 @@
       "disposition": "active",
       "lane": "features",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1590"
+        "packages/fresh/src/application/builders/define-page/navigation/ contains only context.ts/hooks.ts/link.tsx/mod.ts — href/link typing, no generation counter, no supersede/abort logic (grep for generation|supersede|inflight|abort in hooks.ts returns nothing)",
+        "packages/fresh/deno.json:7-22 export map has no client-navigation subpath; nearest client runtime is ./defer/island (packages/fresh/src/application/defer/island.ts)",
+        "grep -rln 'clientNav|replaceState' packages/fresh/src only hits form transport attributes (packages/fresh/src/application/form/components/enhancement.tsx:55) and route types, never a navigation coordinator",
+        "gh timeline for #1590: only a 0.0.7 milestone event, no cross-referenced PR — nothing has attempted this"
       ]
     },
     {
@@ -418,7 +600,10 @@
       "disposition": "active",
       "lane": "features",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1591"
+        "packages/ai/src/adapters/openai-compatible.adapter.ts:39-51 — openAiCompatibleGenerationModelOptions only emits Chat Completions keys (flat `reasoning_effort`, `max_tokens`); no Responses variant exists",
+        "packages/ai/src/adapters/openai-compatible.adapter.ts:56 — OpenAiCompatibleApi already accepts 'responses', and packages/ai/openai-compatible.ts:49 passes it through, so the config surface admits a wire shape the mapper cannot produce",
+        "grep for max_output_tokens across packages/ai returns no hits — the Responses output-token key is absent from the repo",
+        "gh api issues/1591/timeline — no cross-references"
       ]
     },
     {
@@ -427,7 +612,11 @@
       "disposition": "active",
       "lane": "features",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1592"
+        "packages/plugin-workers-core/src/domain/job-definition.ts:201-245 — ExecutionRecordShape has no progress or progressMessage field (id, concept, jobId, topic, status, triggeredBy, timestamps, exitCode, duration, error, result, workerId, attempt, maxAttempts, payload, correlationId, traceparent, tracestate only)",
+        "packages/plugin-workers-core/src/domain/job-context.ts:11 — reportProgress?: (percent, message?) => void | Promise<void> exists on the context",
+        "plugins/workers/worker/job-runner-pool.ts:61 — the runtime wires reportProgress and does not persist it into an execution record",
+        "packages/plugin-workers-core/src/telemetry/job-tools.ts:46 — the only consumer just forwards to ctx.reportProgress?.()",
+        "gh api issues/1592/timeline — no cross-references"
       ]
     },
     {
@@ -436,7 +625,10 @@
       "disposition": "active",
       "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1598"
+        "packages/sdk/src/cache/cache-provider.ts:203-212 — getCacheProvider() throw text still has no import.meta.url and no two-instances hint",
+        "packages/sdk/src/cache/cache-provider.ts:55 — `let _provider: CacheProvider | null = null` is still module-local, as the issue requires it stay",
+        "gh issue 1589 is CLOSED on milestone 0.0.6 — the build-time gate landed, leaving this runtime throw as the only signal for already-generated consumers",
+        "No cross-referenced PR on issue 1598 timeline (gh api issues/1598/timeline returned no cross-references)"
       ]
     },
     {
@@ -445,16 +637,23 @@
       "disposition": "active",
       "lane": "internals",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1601"
+        "packages/fresh/tests/defer-island-client-bundle_test.ts:19-28 — still `args: ['run','--no-lock','-A','npm:vite@7.2.2','build',...]`, verbatim the cited defect",
+        "packages/fresh/tests/fixtures/defer-island-client/ contains only client.ts, main.ts, otel-api.ts, vite.config.ts — no locked vite resolution for the fixture",
+        "git log on that test shows only 5705aeb19 (#1558); no determinism follow-up landed",
+        "gh timeline for #1601: cross-referenced only from open issue #1604 (packages/cli test suite always red) — same 'prescribed package test task is not a trustworthy verdict' family"
       ]
     },
     {
       "number": 1604,
-      "title": "test(cli): the prescribed deno task --cwd packages/cli test is always red — 3 tests resolve repo-root-relative paths",
+      "title": "test(cli): the prescribed `deno task --cwd packages/cli test` is always red",
       "disposition": "active",
       "lane": "internals",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1604"
+        "packages/cli/e2e/tests/presentation/quickstart-command-drift_test.ts:5 calls `Deno.readTextFile('docs/site/quickstart.vto')` — a bare repo-root-relative path, resolved against process cwd",
+        "packages/cli/e2e/src/application/gates/scaffold/run-documented-stream-example.ts:3,7 define DOC_PATH = 'docs/site/durable-workflows/streams.md' and read it with Deno.readTextFile — same cwd dependence",
+        "packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-gates_test.ts:96-100 stats the script argument produced by service-env-gates.ts:59 (`${GATE_DIR}/configure-service-env.ts`), which is repo-root-relative",
+        "All three are reachable from the packages/cli test task, so the failure is in the base, not any branch — matching the issue's cbf6d5c27 observation",
+        "Same class as #1601 (OPEN, 0.0.7: environment-dependent package verdict), different mechanism"
       ]
     },
     {
@@ -463,7 +662,11 @@
       "disposition": "active",
       "lane": "docs",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1606"
+        "Source work is confirmed merged: packages/sdk/README.md:30 leads with 'createQueryFactories is the golden path'; grep finds no 'api-clients' reference in the file",
+        "packages/sdk/README.md:103,216-217 demote createServiceQueryUtils to the narrower ./query-client helper, matching the intended dialect",
+        "jsr-package-settings.json (repo root) sets defaults.readmeSource: 'readme', so packages/sdk/README.md is indeed the JSR landing page source",
+        "The README fix (db1d79c68, PR #1541) is an ancestor of the 0.0.6 cut c63dcc669 (`git merge-base --is-ancestor` = true), so if @netscript/sdk@0.0.6 published, the observation may already be makeable without waiting for a 0.0.7 publish",
+        "packages/sdk/deno.json:3 version is 0.0.6"
       ]
     },
     {
@@ -472,7 +675,11 @@
       "disposition": "active",
       "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1609"
+        "packages/fresh/src/application/form/components/enhancement.tsx:49 — `if (!strategy || strategy.mode === 'client') { return props; }` still early-returns before resolveFormNavigationProps is consulted (function is now applyCollectionStrategy at :42, issue cited the older name resolveFormEnhancementProps)",
+        "packages/fresh/src/application/form/_internal/runtime-types.ts:89 — `FormCollectionStrategy extends Partial<FormNavigationStrategy>` still makes `{ mode: 'client', navigation: 'document' }` expressible",
+        "packages/fresh/src/application/form/components/form.tsx:62 — `...resolveFormNavigationProps(strategy)` is still spread after `...props`, the C3 precedence",
+        "packages/fresh/src/application/form/README.md:77-94 documents client/document strategies but states no precedence over caller-supplied raw f-client-nav props",
+        "git log -- packages/fresh/src/application/form/ shows 6aee2b414 (#1600) as the last change; no follow-up commit touched enhancement.tsx"
       ]
     },
     {
@@ -481,7 +688,11 @@
       "disposition": "active",
       "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1610"
+        "packages/fresh/src/application/route/types.ts:14 — `export type EmptyRecord = Record<string, never>` still exists and is the empty-pattern branch at types.ts:131-132 (`TPattern extends '' ? EmptyRecord`)",
+        "packages/fresh/src/application/route/_internal/contract-types.ts:80 — the internal copy has the same `'' ? EmptyRecord` branch; contract-types.ts:170 also defaults `RouteReference<TPath extends object = EmptyRecord>`, so an unbound reference's unknown key is `never`",
+        "packages/fresh/src/application/builders/define-partial.test.tsx:272-274 — `OriginalPath['channel']` is asserted `IsNever` for pattern '/projects/[project]', i.e. the carrier admits an undeclared key rather than erroring",
+        "packages/fresh/src/application/route/mod.ts:54 — createRouteReference returns RouteReference<InferRoutePatternPath<TRoutePattern>>, so parsePath (contract-types.ts:185) inherits that shape",
+        "gh timeline for #1610: only cross-referenced from PR #1602 (the eval that raised it); no fix PR, and git log on route/types.ts shows no commit after the beta.5 baseline"
       ]
     },
     {
@@ -490,7 +701,10 @@
       "disposition": "active",
       "lane": "internals",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1611"
+        "Producer confirmed silent on phase/head: `.llm/tools/agentic/lib/agentic-lib.ts:528-539` `buildOpenHandsComment` pushes only `model`, `provider`, `effort`, `output`, `iterations`.",
+        "Authorizer short-circuit confirmed: `.github/scripts/openhands-comment-trigger.mjs:61-63` reads `params.get('phase')`/`params.get('head')` then `if (!phase && !head) return decision;` — returns authorized without consulting the claim.",
+        "The claim path that is bypassed exists immediately below: `openhands-comment-trigger.mjs:64-67` `denied('incomplete-phase-claim')` / `denied('phase-claim-context-required')`.",
+        "No `phase=`/`head=` token appears anywhere in `agentic-lib.ts`'s DispatchOptions surface (`:515-521`)."
       ]
     },
     {
@@ -499,7 +713,9 @@
       "disposition": "active",
       "lane": "internals",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1613"
+        "N2 confirmed: `.github/workflows/openhands-agent.yml:249` `core.notice(\\`Manual comment policy: ${decision.reason}\\`)` and `:252` for the stale-evaluator case — no `createComment` on the denial path.",
+        "N3 confirmed: `.github/workflows/openhands-agent.yml:208` `throw new Error(\\`No labeled-event generation found for ${expectedStatus}.\\`)` with no surrounding retry.",
+        "The asymmetry is real: `.github/workflows/openhands-phase-eval.yml:302-315` wraps the identical lookup in `for (let attempt = 0; attempt < 5 && !generationEvent; attempt += 1)` with a 1s sleep at `:313`."
       ]
     },
     {
@@ -508,7 +724,11 @@
       "disposition": "active",
       "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1616"
+        "grep -rnE \"createRouteReference\\('/[^']*\\[\" packages/cli/src returns nothing on baseline — no dynamic reference is emitted anywhere",
+        "packages/cli/src/kernel/application/ui/web-scaffold.ts:29 emits `createRouteReference('/${segment}', ...)`; packages/cli/src/kernel/application/scaffold/writers/app-route-seeds.ts:45-60 seeds only $route/dashboard/health static references",
+        "packages/fresh/src/application/route/manifest.ts:154-156 maps a `[id]` segment to `$id` and :269 emits `createRouteReference(<pattern>, <metadata>)` — Reading B is achievable with no framework change, as the issue claims",
+        "packages/fresh/tests/fixtures/route-binding-browser/routes.ts exists as a hand-authored fixture (added by 1ed78f508, #1602), confirming the provenance gap the issue describes",
+        "gh timeline for #1616: cross-referenced only from merged PR #1602; no fix attempt"
       ]
     },
     {
@@ -517,7 +737,11 @@
       "disposition": "active",
       "lane": "internals",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1618"
+        "Hazard present: `packages/mcp/tests/fixtures/doctor/broken/deno.json` is exactly `{ \"workspace\": \"packages/*\" }` — a string where a WorkspaceConfig is required.",
+        "The root `fmt` config does not exclude it: `deno.json:206-210` excludes only `packages/cli/`, `**/.generated/`, `**/node_modules/`.",
+        "Only the whole-repo task compensates: `deno.json:140` `fmt:check` passes `--exclude \"^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|...)\"`, so a scoped `--root packages/mcp` run (the issue's repro) carries no such exclusion.",
+        "That compensating exclusion is pre-existing, not a fix for this issue: it entered in `10162bfda` (#715), long before the issue was filed.",
+        "`.llm/tools/run-deno-fmt.ts` has no fixture-marker skip of its own — the exclusion is caller-supplied only."
       ]
     },
     {
@@ -526,7 +750,10 @@
       "disposition": "active",
       "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1619"
+        "packages/sdk/src/cache/cache-telemetry.ts:164-180 — recordIncompleteTopology is still typed `never` and ends in `throw new TypeError('Cache provider returned missing or invalid topology evidence')`",
+        "packages/sdk/src/cache/cache-telemetry.ts:149 validateDescriptor + :120 createCacheSpanAttributes — validation still runs inside the attribute builder",
+        "packages/sdk/src/cache/cache-query.ts:88 — createCacheSpanAttributes(...) is still evaluated as an argument to withSpan, so a bad descriptor throws before any span opens (same at :267, :308, :364, :392, :421)",
+        "packages/sdk/src/cache/cache-telemetry.ts:72 SYSTEM_PATTERN /^[a-z0-9][a-z0-9._-]*$/ still bounds the id, confirming the issue's 'no shipped path triggers it' framing"
       ]
     },
     {
@@ -535,7 +762,9 @@
       "disposition": "active",
       "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1620"
+        "packages/sdk/src/cache/cache-telemetry.ts:78-89 — normalizeCacheNamespace still only trims/lowercases/collapses/slices to CACHE_NAMESPACE_MAX_LENGTH; no distinct-value bound, no overflow collapse, no warning",
+        "packages/sdk/src/cache/cache-query.ts:86 and :389 — namespace derives directly from the caller-supplied options.operationId on every read path",
+        "Shares its edit surface with #1619 (both mutate packages/sdk/src/cache/cache-telemetry.ts and both need a README contract paragraph) — grouped into one leaf"
       ]
     },
     {
@@ -544,7 +773,9 @@
       "disposition": "active",
       "lane": "internals",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1621"
+        "Error text present unchanged: `.llm/tools/validation/acceptance-evidence.ts:132` `Issue #${issue}: no acceptance box matched ${compared}; add an entry for box ... using exact trimmed text or its current box-index.`",
+        "No zero-box special case: `validateEvidenceMapping` (`acceptance-evidence.ts:116-140`) computes `actionable = checkboxes.filter(...)` and iterates evidence entries, emitting one per-index error each; it never tests `actionable.length === 0`.",
+        "Only the exact-text variant is pinned by a test: `acceptance-evidence_test.ts:55` asserts the `exact box text \"changed\"` message; there is no zero-box test."
       ]
     },
     {
@@ -553,16 +784,31 @@
       "disposition": "active",
       "lane": "internals",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1622"
+        "Constant present and unpinned: `packages/mcp/src/domain/docs/guidance-index.ts:42` `closeScoreGap: 0.5`, declared at `:29`, consumed at `:201` `leader.score - ranked[end]!.score <= GUIDANCE_RANKING_POLICY.closeScoreGap`.",
+        "The misleading fixture is unchanged: `packages/mcp/tests/guidance-retrieval_test.ts:76` is the close-score test, `:81` seeds `rankedSection('pages/gamma','outside-leader-band',9.8)` and `:92` asserts `'pages/gamma#outside-leader-band'` last — gamma sorts last by slug either way.",
+        "No slug-early/score-outside case exists in that test file (no `zulu`/`alpha` boundary pair), so band membership never changes the observable order."
       ]
     },
     {
       "number": 1623,
       "title": "docs(sdk): CacheStore.get JSDoc documents a return shape that no longer type-checks",
       "disposition": "active",
-      "lane": "docs",
+      "lane": "fixes",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1623"
+        "packages/sdk/src/ports/cache-store.ts:63 — `@returns Entry with the value or `{ value: null }` on cache miss` is still present",
+        "packages/sdk/src/ports/cache-store.ts:38-43 — CacheStoreEntry<T> still declares a required `report: CacheReadTopologyReport`, so `{ value: null }` cannot satisfy it",
+        "packages/sdk/src/ports/cache-store.ts:66-79 — set() JSDoc documents only key/value/options and never mentions the CacheWriteTopologyReport it returns"
+      ]
+    },
+    {
+      "number": 1637,
+      "title": "fix(sdk): cache write limits must not fail successful query results",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1637",
+        "https://github.com/rickylabs/netscript/issues/1637#issuecomment-5285236378",
+        "packages/sdk/src/cache/cache-query.ts:234-248"
       ]
     }
   ]

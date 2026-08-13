@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "repo": "rickylabs/netscript",
   "milestone": "0.0.7",
-  "capturedAt": "2026-08-13T18:35:10.000Z",
+  "capturedAt": "2026-08-13T21:12:00.000Z",
   "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
-  "ownerRatifiedAt": "2026-08-13T18:35:10.000Z",
+  "ownerRatifiedAt": "2026-08-13T21:12:00.000Z",
   "sources": {
     "targetMilestone": true,
     "unmilestoned": true,
@@ -74,6 +74,20 @@
         "https://github.com/rickylabs/netscript/issues/1243"
       ],
       "ownerRatified": true
+    },
+    {
+      "number": 1249,
+      "source": "backlog",
+      "decision": "include",
+      "reason": "High-value coherent public Fresh form correctness work on the same managed-form surface as #1609; both halves require red-first reproduction.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1249",
+        "https://github.com/rickylabs/netscript/issues/1249#issuecomment-5285236885"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-13T21:12:00.000Z"
     },
     {
       "number": 1262,
@@ -257,6 +271,27 @@
       "ownerRatified": true
     },
     {
+      "number": 1384,
+      "source": "laterMilestone",
+      "decision": "defer",
+      "reason": "The complete security fix depends on #1383 and the issue explicitly forbids owning that seam; a credential-only carve-out would not satisfy its principal/ownership acceptance and would be a partial workaround. Keep the full fix in 0.0.8.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1384",
+        "https://github.com/rickylabs/netscript/issues/1383"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1385,
+      "source": "laterMilestone",
+      "decision": "defer",
+      "reason": "A real P0 auth defect, but it is a contract-breaking auth transport slice outside the milestone's explicit typed-extension scope; preserve its already-scheduled 0.0.8 ownership rather than mixing auth topology into this foundation cut.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1385"
+      ],
+      "ownerRatified": true
+    },
+    {
       "number": 1429,
       "source": "targetMilestone",
       "decision": "include",
@@ -300,9 +335,10 @@
       "number": 1453,
       "source": "targetMilestone",
       "decision": "include",
-      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "reason": "Included in the frozen target sweep, then dispositioned out after independent verification showed the cited surface has never existed in this repository.",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1453"
+        "https://github.com/rickylabs/netscript/issues/1453",
+        "https://github.com/rickylabs/netscript/issues/1453#issuecomment-5285235764"
       ],
       "ownerRatified": true
     },
@@ -679,6 +715,20 @@
         "https://github.com/rickylabs/netscript/issues/1623"
       ],
       "ownerRatified": true
+    },
+    {
+      "number": 1637,
+      "source": "unmilestoned",
+      "decision": "include",
+      "reason": "High-value coherent consumer-visible false outage on the exact SDK cache leaf already containing #1598/#1619/#1620/#1623.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1637",
+        "https://github.com/rickylabs/netscript/issues/1637#issuecomment-5285236378"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "high-value-coherent",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-13T21:12:00.000Z"
     }
   ]
 }

@@ -1,0 +1,530 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-13T21:12:00.000Z",
+  "leafGroups": [
+    {
+      "key": "ci-diff-range-base-sha-barrier",
+      "lane": "internals",
+      "issues": [
+        1564
+      ],
+      "wave": 0,
+      "rationale": "MERGE BARRIER. Every pre-merge gate that computes a diff range from pull_request.base.sha can report success having scanned zero lines of the PR under review, and degrades with PR age. With 45 leaves merging direct-to-main across ten waves, pre-merge gate checks 3 (no new ignore/cast in the diff) and 6 (changed-file audit on docs-lane PRs) are unreliable until this lands. It must merge before any other leaf in the milestone.",
+      "splitCandidates": [
+        1564
+      ]
+    },
+    {
+      "key": "rfc-a-stage0-ratification-board",
+      "lane": "features",
+      "issues": [
+        1348
+      ],
+      "wave": 1,
+      "rationale": "RFC 0001 Stage 0: owner ratification, FCP questions, and realignment of #1349-#1353 bodies to the merged RFC. Tracking issue - no implementation PR may carry a closing keyword on it.",
+      "splitCandidates": [
+        1348
+      ]
+    },
+    {
+      "key": "rfc-plugin-cli-contribution",
+      "lane": "features",
+      "issues": [
+        1502
+      ],
+      "wave": 1,
+      "rationale": "RFC document + PLAN-EVAL for the plugin CLI command contribution seam; proposes its own implementation epic.",
+      "splitCandidates": []
+    },
+    {
+      "key": "sdk-typed-error-channel",
+      "lane": "fixes",
+      "issues": [
+        1350
+      ],
+      "wave": 2,
+      "rationale": "packages/sdk/src/client/errors.ts + packages/contracts contract-primitives.ts:81; RFC Stage 1a.",
+      "splitCandidates": []
+    },
+    {
+      "key": "sdk-procedure-metadata",
+      "lane": "features",
+      "issues": [
+        1466
+      ],
+      "wave": 3,
+      "rationale": "NetScriptProcedureMeta vocabulary; RFC Stage 1b. Must not re-erase Stage 1a types.",
+      "splitCandidates": []
+    },
+    {
+      "key": "sdk-client-contribution-seam",
+      "lane": "features",
+      "issues": [
+        1349
+      ],
+      "wave": 4,
+      "rationale": "RFC Stage 2. Largest slice in the release; body contradicts the merged RFC in four places and must be realigned by Stage 0 first.",
+      "splitCandidates": [
+        1349
+      ]
+    },
+    {
+      "key": "sdk-transport-policy-consolidation",
+      "lane": "fixes",
+      "issues": [
+        1351
+      ],
+      "wave": 5,
+      "rationale": "RFC Stage 3. One owned transport-policy function; the oRPC family version move is a separate owner decision.",
+      "splitCandidates": [
+        1351
+      ]
+    },
+    {
+      "key": "sdk-auth-contribution-dogfood",
+      "lane": "features",
+      "issues": [
+        1352
+      ],
+      "wave": 5,
+      "rationale": "RFC Stage 4. Auth-core bearer factory + CLI transport swap; cookie transport explicitly out.",
+      "splitCandidates": [
+        1352
+      ]
+    },
+    {
+      "key": "sdk-trace-ownership-proof",
+      "lane": "fixes",
+      "issues": [
+        1353
+      ],
+      "wave": 5,
+      "rationale": "RFC Stage 5, re-scoped: prove the transport keeps the only final trace injection and rejects contributor ownership.",
+      "splitCandidates": []
+    },
+    {
+      "key": "sdk-locale-contribution-proof",
+      "lane": "features",
+      "issues": [
+        1467
+      ],
+      "wave": 6,
+      "rationale": "RFC Stage 6 non-auth proof.",
+      "splitCandidates": []
+    },
+    {
+      "key": "plugin-discovery-contribution-references",
+      "lane": "fixes",
+      "issues": [
+        1093
+      ],
+      "wave": 6,
+      "rationale": "RFC Stage 7. Filed half (move callee-to-axis to plugins) is one PR; the RFC-added sdkClients-collection half needs #1349 and is not in the issue body.",
+      "splitCandidates": [
+        1093
+      ]
+    },
+    {
+      "key": "prisma-mysql-adapter-surface",
+      "lane": "features",
+      "issues": [
+        1293
+      ],
+      "wave": 2,
+      "rationale": "Export PrismaMySqlAdapter + design the connection-error hook as API; surface-diff gate applies.",
+      "splitCandidates": []
+    },
+    {
+      "key": "prisma-mysql-honest-example",
+      "lane": "fixes",
+      "issues": [
+        1112
+      ],
+      "wave": 3,
+      "rationale": "Rewrite the MySQL example against the surface #1293 ships. Blocked until then by the issue own text.",
+      "splitCandidates": []
+    },
+    {
+      "key": "legacy-port-pin-sweep",
+      "lane": "fixes",
+      "issues": [
+        1243
+      ],
+      "wave": 1,
+      "rationale": "Dead 4437 pins in the auth CLI, the streams manifest, and copy-official-plugin-test-support.",
+      "splitCandidates": []
+    },
+    {
+      "key": "scaffold-generated-output-correctness",
+      "lane": "fixes",
+      "issues": [
+        1262,
+        1263,
+        1588
+      ],
+      "wave": 1,
+      "rationale": "Generated project output defects sharing one scaffold.runtime verdict: placebo seed, 500-instead-of-404 by-id handler, unreachable SQLite provider parsers.",
+      "splitCandidates": []
+    },
+    {
+      "key": "app-service-client-wiring",
+      "lane": "features",
+      "issues": [
+        1355,
+        1360
+      ],
+      "wave": 2,
+      "rationale": "Grouped because both edit the same ServiceShowcaseLab template - separate PRs would collide.",
+      "splitCandidates": [
+        1355
+      ]
+    },
+    {
+      "key": "ui-add-page-island-repair",
+      "lane": "fixes",
+      "issues": [
+        1357
+      ],
+      "wave": 3,
+      "rationale": "Repair ui:add page --island emission. Split from #1354 deliberately: repair and new verb need separate review.",
+      "splitCandidates": [
+        1357
+      ]
+    },
+    {
+      "key": "ui-resource-slice-generator",
+      "lane": "features",
+      "issues": [
+        1354
+      ],
+      "wave": 4,
+      "rationale": "New resource-slice generator verb. Large; the three optional flags are independently testable and are split candidates.",
+      "splitCandidates": [
+        1354
+      ]
+    },
+    {
+      "key": "design-registry-catalog-drift-gate",
+      "lane": "fixes",
+      "issues": [
+        1358
+      ],
+      "wave": 2,
+      "rationale": "Gallery lists 50 of 66 registry items; add the comparison gate.",
+      "splitCandidates": []
+    },
+    {
+      "key": "aspire-agent-resource-inventory",
+      "lane": "features",
+      "issues": [
+        1306
+      ],
+      "wave": 6,
+      "rationale": "Four acceptance rows are ALTERNATIVE remedies; scope must be chosen before assignment.",
+      "splitCandidates": [
+        1306
+      ]
+    },
+    {
+      "key": "workers-job-policy-metadata",
+      "lane": "features",
+      "issues": [
+        1451
+      ],
+      "wave": 3,
+      "rationale": "Project job-policy seam consumed by the generated registry. The seam is unnamed in the issue and has no baseline candidate.",
+      "splitCandidates": [
+        1451
+      ]
+    },
+    {
+      "key": "workers-job-payload-typing",
+      "lane": "features",
+      "issues": [
+        1455
+      ],
+      "wave": 5,
+      "rationale": "Registry map + JobTriggerInput + enqueueJob binding. Issue stated baseline is stale: JobDefinition already carries TPayload.",
+      "splitCandidates": [
+        1455
+      ]
+    },
+    {
+      "key": "plugin-service-context-factory",
+      "lane": "features",
+      "issues": [
+        1452
+      ],
+      "wave": 7,
+      "rationale": "Publish the PluginServiceContext host factory and consume it from scaffold output.",
+      "splitCandidates": [
+        1452
+      ]
+    },
+    {
+      "key": "workers-execution-progress",
+      "lane": "features",
+      "issues": [
+        1592
+      ],
+      "wave": 7,
+      "rationale": "Typed progress on the published ExecutionRecord + durable stream; replay/coalescing needs its own design decision.",
+      "splitCandidates": [
+        1592
+      ]
+    },
+    {
+      "key": "ai-mcp-pool-isolation",
+      "lane": "fixes",
+      "issues": [
+        1448
+      ],
+      "wave": 4,
+      "rationale": "Failure-isolated MCP pool startup + cancellation. Snapshot API and cancellation plumbing are independently shippable.",
+      "splitCandidates": [
+        1448
+      ]
+    },
+    {
+      "key": "ai-openai-responses-mapper",
+      "lane": "features",
+      "issues": [
+        1591
+      ],
+      "wave": 8,
+      "rationale": "Typed OpenAI Responses mapper on @netscript/ai.",
+      "splitCandidates": []
+    },
+    {
+      "key": "fresh-ai-chat-response-options",
+      "lane": "features",
+      "issues": [
+        1458
+      ],
+      "wave": 9,
+      "rationale": "Awaited durable chat completion options on @netscript/fresh/ai.",
+      "splitCandidates": []
+    },
+    {
+      "key": "fresh-client-navigation-coordinator",
+      "lane": "features",
+      "issues": [
+        1590
+      ],
+      "wave": 8,
+      "rationale": "Four bundled behaviours; only honest as one coordinator module, otherwise split.",
+      "splitCandidates": [
+        1590
+      ]
+    },
+    {
+      "key": "fresh-typed-route-and-form-repair",
+      "lane": "fixes",
+      "issues": [
+        1249,
+        1609,
+        1610
+      ],
+      "wave": 8,
+      "rationale": "Both are packages/fresh typed-route/managed-form defects on one surface.",
+      "splitCandidates": []
+    },
+    {
+      "key": "sdk-cache-surface-and-telemetry",
+      "lane": "fixes",
+      "issues": [
+        1598,
+        1619,
+        1620,
+        1623,
+        1637
+      ],
+      "wave": 4,
+      "rationale": "Four small packages/sdk cache-surface repairs sharing one review; grouped to avoid four micro-PRs. #1637 joins here if admitted.",
+      "splitCandidates": []
+    },
+    {
+      "key": "sdk-cached-entry-swr",
+      "lane": "fixes",
+      "issues": [
+        1461
+      ],
+      "wave": 6,
+      "rationale": "Remedy undecided (doc correction vs new queryEntry API); the choice moves the lane.",
+      "splitCandidates": [
+        1461
+      ]
+    },
+    {
+      "key": "sdk-browser-safe-entrypoints",
+      "lane": "fixes",
+      "issues": [
+        1462
+      ],
+      "wave": 7,
+      "rationale": "Export/side-effect restructure; the bundle-content assertion needs a gate that does not exist yet.",
+      "splitCandidates": [
+        1462
+      ]
+    },
+    {
+      "key": "scaffold-route-emission-and-gating",
+      "lane": "fixes",
+      "issues": [
+        1481,
+        1616
+      ],
+      "wave": 7,
+      "rationale": "Both change what routes the scaffold emits and how the build gates them.",
+      "splitCandidates": [
+        1616
+      ]
+    },
+    {
+      "key": "cross-package-dependency-declarations",
+      "lane": "fixes",
+      "issues": [
+        1543
+      ],
+      "wave": 8,
+      "rationale": "Undeclared @netscript/plugin-streams-core imports in two published manifests. Small; may ride an adjacent workers PR.",
+      "splitCandidates": []
+    },
+    {
+      "key": "cli-deploy-verb-surface",
+      "lane": "fixes",
+      "issues": [
+        1544
+      ],
+      "wave": 9,
+      "rationale": "Route or unadvertise `emit`. Product call, not a code call.",
+      "splitCandidates": []
+    },
+    {
+      "key": "reference-export-drift-gate",
+      "lane": "internals",
+      "issues": [
+        1296
+      ],
+      "wave": 3,
+      "rationale": "Machine-readable omissions + fresh-ui reference repair + maintainer runbook + gate wiring. Row 1 (contracts JSDoc subpath) is already satisfied on baseline.",
+      "splitCandidates": [
+        1296
+      ]
+    },
+    {
+      "key": "quality-scan-allowance-rail",
+      "lane": "internals",
+      "issues": [
+        1378,
+        1545
+      ],
+      "wave": 1,
+      "rationale": "MUST be one PR: #1545 registration must precede #1378 rule or the gate is red day one, while #1545 own test box needs that rule to exist.",
+      "splitCandidates": [
+        1378,
+        1545
+      ]
+    },
+    {
+      "key": "quality-scan-root-coverage",
+      "lane": "internals",
+      "issues": [
+        1542
+      ],
+      "wave": 2,
+      "rationale": "Widen quality:gate roots to published packages. Sequenced after the allowance rail.",
+      "splitCandidates": []
+    },
+    {
+      "key": "leak-check-process-descendants",
+      "lane": "internals",
+      "issues": [
+        1429
+      ],
+      "wave": 4,
+      "rationale": "leak-check cannot see orphaned Aspire descendants, so it reports clean through a real leak.",
+      "splitCandidates": []
+    },
+    {
+      "key": "jsdoc-example-compile-gate",
+      "lane": "internals",
+      "issues": [
+        1533
+      ],
+      "wave": 4,
+      "rationale": "Compile JSDoc @example blocks so a published JSR reference cannot import a missing module.",
+      "splitCandidates": []
+    },
+    {
+      "key": "fresh-defer-test-capability",
+      "lane": "internals",
+      "issues": [
+        1557,
+        1601
+      ],
+      "wave": 5,
+      "rationale": "Both are the deferred-coordinator client-bundle gate; #1601 determinism must be fixed before #1557 asserts on it.",
+      "splitCandidates": [
+        1557
+      ]
+    },
+    {
+      "key": "harness-evidence-and-verdict-tooling",
+      "lane": "internals",
+      "issues": [
+        1561,
+        1563,
+        1621
+      ],
+      "wave": 1,
+      "rationale": "Three acceptance-evidence / verdict-extraction defects in the same tool family.",
+      "splitCandidates": []
+    },
+    {
+      "key": "openhands-dispatch-claim-and-refusal",
+      "lane": "internals",
+      "issues": [
+        1611,
+        1613
+      ],
+      "wave": 2,
+      "rationale": "Formal evaluator dispatch claim + refused-command reporting in one workflow surface.",
+      "splitCandidates": []
+    },
+    {
+      "key": "package-gate-honesty",
+      "lane": "internals",
+      "issues": [
+        1604,
+        1618,
+        1622
+      ],
+      "wave": 3,
+      "rationale": "Three packages whose prescribed quality gate is dishonest (always-red cli tests, fmt aborted by a fixture, an unpinnable mcp constant).",
+      "splitCandidates": []
+    },
+    {
+      "key": "comparison-docs-programme",
+      "lane": "docs",
+      "issues": [
+        1551
+      ],
+      "wave": 1,
+      "rationale": "17 deliverables. Only methodology page + one case study + migration placeholder is a 0.0.7-sized leaf; the rest needs its own issues.",
+      "splitCandidates": [
+        1551
+      ]
+    },
+    {
+      "key": "sdk-jsr-landing-verification",
+      "lane": "docs",
+      "issues": [
+        1606
+      ],
+      "wave": 1,
+      "rationale": "Observational: closes by a recorded observation of the published JSR page, never by a PR.",
+      "splitCandidates": []
+    }
+  ]
+}
