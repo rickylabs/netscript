@@ -380,15 +380,19 @@
     {
       "id": "harness-evidence-and-verdict-tooling",
       "lane": "internals",
-      "phase": "implementing",
+      "phase": "blocked",
       "baseBranch": "main",
-      "headSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+      "headSha": "4d9fb196765cbf1a6bc7eaa7c18ec82b237ab89f",
       "issueNumbers": [1561, 1563, 1621],
       "implementerAgentId": "019ffcc9-97ba-7770-a890-a1ebd80ec793",
       "evaluatorAgentId": null,
       "branch": "fix/harness-evidence-and-verdict-tooling",
       "worktree": "/home/codex/repos/netscript-007-harness-evidence",
-      "receiptRefs": []
+      "receiptRefs": [
+        ".llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling/receipts/final/check.receipt.json",
+        ".llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling/receipts/final/test.receipt.json",
+        ".llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling/receipts/final/quality-job.receipt.json"
+      ]
     },
     {
       "id": "legacy-port-pin-sweep",

@@ -89,3 +89,9 @@ that process before verdict, removed its temporary transport artifact, amended t
 to require a fresh native Claude/Fable gate after reset, and stopped the fixes topic control to
 prevent automatic relaunch. #1643's substantive Codex implementation and Tier-A review remain
 valid at pushed head `e6ba15ec6`; #1654 remains plan-only at `14d8b38b4`.
+
+The internals tooling leaf #1644 completed its exact nine-surface implementation at `634b257ea`,
+including the coordinator-authorized #1621 operator guidance. Substantive Tier-A review passed and
+fresh structured check/test/quality receipts all passed at that implementation head. Evidence-only
+child `4d9fb1967` packages the receipts and formal handoff without a self-referential gate rerun.
+The draft remains `status:impl` and blocked only on native opposite-family IMPL-EVAL after reset.
