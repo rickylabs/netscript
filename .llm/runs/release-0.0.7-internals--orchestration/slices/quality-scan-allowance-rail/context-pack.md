@@ -3,7 +3,9 @@
 ## Current state
 
 - Wave 0 leaf at baseline `01e0960494c95ce56eb35892c211a095eb13e6ed`.
-- Branch `chore/quality-scan-allowance-rail`, no upstream; draft PR bootstrap pending.
+- Branch `chore/quality-scan-allowance-rail`, no upstream; draft PR #1653 directly targets `main`.
+- Bootstrap commit: `12f0929f3db0507b37216dcfefa21301f5255399`.
+- PR lifecycle: RESEARCH and PLAN comments posted; milestone 0.0.7; `status:plan-eval`.
 - Generator: OpenAI Codex `gpt-5.6-sol`, high.
 - No product implementation has started. #1378 and #1545 are inseparable.
 - Read `implement.md`, `research.md`, `plan.md`, `worklog.md`, and `drift.md` in full.

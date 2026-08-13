@@ -7,7 +7,7 @@
 - Base: `01e0960494c95ce56eb35892c211a095eb13e6ed`
 - Issues: #1378 + #1545
 - Route requested/observed: OpenAI Codex GPT-5.6 Sol, high
-- Draft PR: pending bootstrap push
+- Draft PR: #1653 — `https://github.com/rickylabs/netscript/pull/1653`
 
 ## Design
 
@@ -95,3 +95,6 @@ gates require the coordinator's singleton lease.
   published surfaces; re-measured current-head counts.
 - 2026-08-13 — wrote research/design/plan artifacts and a separate evaluator request. No product
   implementation started.
+- 2026-08-13 — committed bootstrap as `12f0929f3db0507b37216dcfefa21301f5255399`, pushed by explicit
+  refspec, opened draft PR #1653 directly against `main`, applied milestone 0.0.7/taxonomy, posted
+  RESEARCH and PLAN comments, and handed off at `status:plan-eval`.

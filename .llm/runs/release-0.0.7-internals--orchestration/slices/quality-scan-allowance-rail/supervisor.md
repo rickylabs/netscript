@@ -11,7 +11,7 @@
 | Plan evaluator           | separate native opposite-family session requested in `context-pack.md`            |
 | Plan status              | research/plan complete; implementation hard stop; verdict pending                 |
 | Implementation evaluator | separate opposite-family session, pending after implementation/Tier-A review      |
-| Draft PR                 | pending bootstrap push                                                            |
+| Draft PR                 | #1653, draft against `main`, `status:plan-eval`                                   |
 | Authority                | draft leaf PR only; no merge, release, publish, scope, or central-state authority |
 
 The topic orchestrator performs substantive Tier-A slice review and resolves/escalates the contract
