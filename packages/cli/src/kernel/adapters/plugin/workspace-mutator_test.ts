@@ -866,7 +866,6 @@ Deno.test('first-party control-plane modules are import-safe and preserve applic
   for (const plugin of FIRST_PARTY_PLUGIN_CASES) {
     await workspaceMutator.ensureRootImportsForPluginKind(projectRoot, plugin.kind);
   }
-  await useLocalWorkspaceImports(projectRoot, REPO_ROOT);
 
   for (const plugin of FIRST_PARTY_PLUGIN_CASES) {
     const artifacts = collectInstallArtifacts(plugin.adapter);

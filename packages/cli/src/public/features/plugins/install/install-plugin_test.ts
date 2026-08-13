@@ -788,8 +788,6 @@ describe('public install plugin flow', () => {
       );
       assertEquals(registryGeneration.code, 0, registryGeneration.stderr);
 
-      await useLocalWorkspaceImports(projectRoot, REPO_ROOT);
-
       const aiSources = await collectTypeScriptFiles(join(projectRoot, 'ai'));
       await assertGeneratedImportsResolve(
         projectRoot,
@@ -852,7 +850,6 @@ describe('public install plugin flow', () => {
       await installAi(false, false);
       const firstConfig = await Deno.readTextFile(join(projectRoot, 'netscript.config.ts'));
       const secondInstall = await installAi(true, true);
-      await useLocalWorkspaceImports(projectRoot, REPO_ROOT);
       const secondConfig = await Deno.readTextFile(join(projectRoot, 'netscript.config.ts'));
 
       assertEquals(

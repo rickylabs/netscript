@@ -8,12 +8,18 @@ interface DenoConfig {
   imports?: Record<string, string>;
 }
 
+const installedProjectRoots = new Set<string>();
+
 /** Replace first-party JSR fixture imports with exports from the checkout under test. */
 export async function useLocalWorkspaceImports(
   projectRoot: string,
   repositoryRoot: string,
 ): Promise<void> {
-  const configPath = join(projectRoot, 'deno.json');
+  const normalizedProjectRoot = resolve(projectRoot);
+  if (installedProjectRoots.has(normalizedProjectRoot)) {
+    throw new Error(`Local workspace imports are already installed for ${normalizedProjectRoot}`);
+  }
+  const configPath = join(normalizedProjectRoot, 'deno.json');
   const config = JSON.parse(await Deno.readTextFile(configPath)) as DenoConfig;
   const repositoryConfig = JSON.parse(
     await Deno.readTextFile(join(repositoryRoot, 'deno.json')),
@@ -26,6 +32,7 @@ export async function useLocalWorkspaceImports(
   };
   Object.assign(config, { catalog: repositoryConfig.catalog });
   await Deno.writeTextFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
+  installedProjectRoots.add(normalizedProjectRoot);
 }
 
 function catalogImports(

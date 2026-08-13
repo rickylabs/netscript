@@ -240,7 +240,6 @@ describe('local contributor install plugin flow', () => {
 
       await installAi(false);
       await installAi(true);
-      await useLocalWorkspaceImports(projectRoot, REPO_ROOT);
 
       const rootConfig: { readonly workspace: readonly string[] } = JSON.parse(
         await Deno.readTextFile(join(projectRoot, 'deno.json')),
