@@ -7,7 +7,7 @@
 - Base: `01e0960494c95ce56eb35892c211a095eb13e6ed`
 - Issues: #1561 + #1563 + #1621
 - Route requested: OpenAI Codex GPT-5.6 Sol, medium
-- Draft PR: pending
+- Draft PR: #1644 — https://github.com/rickylabs/netscript/pull/1644
 
 ## Design
 
@@ -90,3 +90,6 @@ commands and RTK-filtered output are not verdict sources.
 - S0 research reconcile: live issue bodies/comments match the locked coordinator remedy. Added the
   undeclared mirror CLI to the clarification request because #1561 requires a structured report at
   the CLI boundary, not merely a more specific thrown parser message.
+- S0 draft reconcile: bootstrap commit `0be658912d167da5bc46b718a862a43e33e5f4c4` pushed by the
+  explicit refspec; draft PR #1644 targets `main`, milestone 0.0.7, with exactly `type:fix`,
+  `area:tooling`, and `status:plan`. Plan/clarification comment id: `5286024710`.

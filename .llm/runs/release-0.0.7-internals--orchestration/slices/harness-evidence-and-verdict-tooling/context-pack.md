@@ -6,7 +6,8 @@
   `fix/harness-evidence-and-verdict-tooling`, with no upstream.
 - Live #1561, #1563, and #1621 research is complete. The remedies are locked/mechanical and
   `PLAN-EVAL: N/A` is recorded before implementation.
-- S0 run-artifact bootstrap is ready to commit, push by explicit refspec, and expose in a draft PR.
+- S0 bootstrap is committed at `0be658912d167da5bc46b718a862a43e33e5f4c4`, pushed by explicit
+  refspec, and exposed in draft PR #1644 against `main`.
 - Implementation is blocked only on exact contract clarification for the paths in `drift.md`.
 
 ## Locked behavior
@@ -19,11 +20,10 @@
 
 ## Required next actions
 
-1. Commit S0, explicit-refspec push, open draft PR against `main`, apply milestone 0.0.7 and exactly
-   `type:fix`, `area:tooling`, `status:plan`.
-2. Post the recorded path mismatch to the PR and notify `topic-internals-0.0.7`.
-3. Do not edit an undeclared path until the coordinator clarifies the contract.
-4. Implement S1–S3 RED-first with structured receipts and Tier-A review between slices.
-5. Run final immutable-head gates and request separate opposite-family IMPL-EVAL; keep draft.
+1. Await `topic-internals-0.0.7` / coordinator clarification requested on PR #1644 comment
+   `5286024710` for the exact paths in `drift.md`.
+2. Do not edit an undeclared path until the coordinator clarifies the contract.
+3. Implement S1–S3 RED-first with structured receipts and Tier-A review between slices.
+4. Run final immutable-head gates and request separate opposite-family IMPL-EVAL; keep draft.
 
 No merge, ready transition, publication, release, milestone-scope, or central-cluster-state authority.
