@@ -44,6 +44,7 @@ import {
   discoverPreparedReleaseFiles,
   PREPARED_RELEASE_GENERATED_OUTPUTS,
 } from './prepare-release.ts';
+import { rewriteNetScriptVersion } from '../deps/bump-version.ts';
 
 const DEFAULT_REPO = 'rickylabs/netscript';
 export const CANARY_PAIR_STATUS_CONTEXT = 'release/canary-pair';
@@ -169,7 +170,7 @@ export function isExactVersionReplacement(
 ): boolean {
   // Keep this byte-for-byte rule aligned with deps/bump-version.ts::replaceVersionFiles.
   return previousVersion !== nextVersion &&
-    before.replaceAll(previousVersion, nextVersion) === after;
+    rewriteNetScriptVersion(before, previousVersion, nextVersion) === after;
 }
 
 /**

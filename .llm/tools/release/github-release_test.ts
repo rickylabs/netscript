@@ -334,6 +334,16 @@ Deno.test('version-only diff accepts the complete release version surface only',
   assertEquals(isExactVersionReplacement('{"version":"1"}', '{"version":"2"}', '1', '2'), true);
   assertEquals(
     isExactVersionReplacement(
+      '{"version":"0.0.5","npm":{"@ag-ui/core@0.0.52":{}}}',
+      '{"version":"0.0.7","npm":{"@ag-ui/core@0.0.52":{}}}',
+      '0.0.5',
+      '0.0.7',
+    ),
+    true,
+    'unrelated versions containing the old version as a prefix are not release drift',
+  );
+  assertEquals(
+    isExactVersionReplacement(
       '{"version":"1","exports":"./a.ts"}',
       '{"version":"2","exports":"./b.ts"}',
       '1',
