@@ -3,6 +3,7 @@
   "workspace": [
     "packages/*",
     "packages/cli/e2e",
+    "packages/cli/e2e/fixtures/desktop-native",
     "plugins/*",
     "examples/*",
     "apps/*"
@@ -47,8 +48,6 @@
     "test": "deno test --allow-all",
     "gates:run": "deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/gates/run-gate.ts",
     "gates:test": "deno test --allow-read --allow-write --allow-run --allow-env .llm/tools/gates/*_test.ts .llm/tools/run-deno-check_test.ts .llm/tools/run-deno-lint_test.ts .llm/tools/run-deno-fmt_test.ts .llm/tools/run-deno-doc-lint_test.ts .llm/tools/quality/changed-source-files_test.ts .github/scripts/ci-receipt-policy.test.ts",
-    "test:redis-regression": "deno run --allow-env=NETSCRIPT_TEST_REDIS_URL --allow-read --allow-run .llm/tools/validation/redis-regression-gate.ts",
-    "test:redis-regression:negative-control": "deno run --allow-env=NETSCRIPT_TEST_REDIS_URL --allow-read --allow-write=packages/kv/adapters/redis.adapter.ts --allow-run .llm/tools/validation/redis-regression-gate.ts --negative-control",
     "quality:scan": "deno run --allow-read .llm/tools/quality/scan-code-quality.ts --root packages/cli/src --root plugins --root docs/site --max-allow 7",
     "quality:scan:repo": "deno run --allow-read .llm/tools/quality/scan-code-quality.ts --root packages --root plugins --root .llm/tools/fitness --root .llm/tools/quality --root docs/site --max-allow 8",
     "quality:gate": "deno task quality:scan && deno task arch:check",

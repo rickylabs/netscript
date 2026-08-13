@@ -463,40 +463,24 @@ jobs:
         if: env.RUN == 'true'
         run: deno install
 
-      - name: Native desktop package, install, update, and rollback (one pass)
+      - name: Native desktop package, install, update, and rollback (one pass; #859 exception bounded below)
         id: native_suite
         if: env.RUN == 'true'
-        # TEMPORARY NON-BLOCKING POLICY: remove step tolerance when the packaged
-        # runtime ships the #841 verification op. See the G7 drift entry
-        # "Packaged runtime lacks the #841 verification op" for fail-closed evidence.
+        # Active non-blocking policy: #859 tracks the remaining Deno Desktop
+        # callback/apply gap. The next step accepts only that exact evidence;
+        # fixture, packaging, or unrelated native failures still fail the job.
         continue-on-error: true
         run: deno task e2e:cli run deploy.desktop-native --cleanup --format pretty
 
-      - name: Summarize native desktop upstream gap (LOUD, never masks suite evidence)
+      - name: Enforce active desktop exception boundary (#859)
         if: always() && env.RUN == 'true'
         env:
           EVIDENCE: .llm/tmp/desktop-native-e2e/evidence.json
           NATIVE_SUITE_OUTCOME: ${{ steps.native_suite.outcome }}
-          DRIFT_URL: >-
-            ${{ github.server_url }}/${{ github.repository }}/blob/${{ github.sha }}/.llm/runs/beta11-cli--orchestrator/slices/g7-457-e2e/drift.md#2026-07-18--packaged-runtime-lacks-the-841-verification-op
-        run: |
-          echo '::warning title=DESKTOP NATIVE E2E IS NON-BLOCKING PENDING UPSTREAM OP::The suite remains fail-closed; inspect the structured evidence and linked drift investigation.'
-          {
-            printf '# ⚠️ DESKTOP NATIVE LINUX: NON-BLOCKING UPSTREAM GAP — step outcome: `%s` (failure tolerated)\n' "$NATIVE_SUITE_OUTCOME"
-            echo
-            echo 'The native suite ran unchanged. Its failure is retained as evidence; CI policy alone is temporarily non-blocking pending the owner rescope decision.'
-            echo
-            printf '[Upstream-gap investigation and flip-back condition](%s)\n' "$DRIFT_URL"
-            echo
-            echo '## Structured suite evidence'
-            echo '```json'
-            if [ -f "$EVIDENCE" ]; then
-              sed -n '1,240p' "$EVIDENCE"
-            else
-              echo '{"status":"FAIL","reason":"structured evidence file was not produced"}'
-            fi
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+        run: >-
+          deno run --allow-env --allow-read --allow-write
+          .github/scripts/desktop-native-exception.ts
+          --outcome "$NATIVE_SUITE_OUTCOME" --evidence "$EVIDENCE"
 
       - name: Upload native desktop evidence
         if: always() && env.RUN == 'true'

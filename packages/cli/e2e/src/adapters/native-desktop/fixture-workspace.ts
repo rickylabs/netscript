@@ -23,6 +23,7 @@ export async function prepareDesktopFixture(
   const denoPath = join(destination, 'deno.json');
   const config = JSON.parse(await Deno.readTextFile(denoPath)) as Record<string, unknown>;
   config.version = version;
+  config.catalog = { zod: '^4.4.3' };
   config.imports = {
     '@netscript/fresh/desktop': localModule(repoRoot, 'packages/fresh/src/runtime/desktop/mod.ts'),
     '@netscript/sdk/auto-update': localModule(repoRoot, 'packages/sdk/src/auto-update/mod.ts'),
@@ -33,6 +34,7 @@ export async function prepareDesktopFixture(
     '@orpc/server': 'npm:@orpc/server@^1.14.6',
     '@std/assert': 'jsr:@std/assert@^1',
     '@std/path': 'jsr:@std/path@^1',
+    zod: 'catalog:',
   };
   await Deno.writeTextFile(denoPath, `${JSON.stringify(config, null, 2)}\n`);
 

@@ -5,6 +5,15 @@ import { KvSagaStore } from '../../src/stores/kv-saga-store.ts';
 
 const now = new Date('2026-08-03T06:00:00.000Z');
 const instanceId = 'redis-store:workflow-1' as SagaInstanceId;
+const redisUrl = Deno.env.get('NETSCRIPT_TEST_REDIS_URL');
+
+Deno.test({
+  name: 'CI requires the real Redis saga-store service',
+  ignore: !Deno.env.get('CI'),
+  fn() {
+    assert(redisUrl, 'NETSCRIPT_TEST_REDIS_URL is required in CI');
+  },
+});
 
 Deno.test('KvSagaStore over Redis fails a dead endpoint loudly instead of hanging', async () => {
   const kv = new RedisKvAdapter({
@@ -26,11 +35,10 @@ Deno.test('KvSagaStore over Redis fails a dead endpoint loudly instead of hangin
 
 Deno.test({
   name: 'KvSagaStore over real Redis lists entries and admits one expected-version save',
-  ignore: !Deno.env.get('NETSCRIPT_TEST_REDIS_URL'),
+  ignore: !redisUrl,
   async fn() {
-    const url = Deno.env.get('NETSCRIPT_TEST_REDIS_URL');
-    assert(url);
-    const kv = new RedisKvAdapter({ url, namespace: `saga-test-${crypto.randomUUID()}` });
+    assert(redisUrl);
+    const kv = new RedisKvAdapter({ url: redisUrl, namespace: `saga-test-${crypto.randomUUID()}` });
     const store = new KvSagaStore({ kv, prefix: ['sagas'] });
 
     try {

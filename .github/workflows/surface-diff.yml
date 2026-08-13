@@ -97,8 +97,8 @@ jobs:
         with:
           deno-version: "2.9.5"
 
-      # Beta rollout is observational. Issue #309 owns the stable-line flip to blocking.
-      - name: Classify public API changes
+      # Issue #309 remains open and explicitly owns the flip to enforcement.
+      - name: Observe public API drift (non-blocking pending #309)
         if: env.RUN == 'true'
         run: deno task surface:diff
         continue-on-error: true

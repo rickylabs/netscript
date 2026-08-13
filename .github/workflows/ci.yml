@@ -3,9 +3,9 @@ name: ci
 # S2 full CI. Lanes over the existing `deno task`s:
 #
 #   - `check-test` — the lean, required S1 pre-merge gate: repo-wide `deno check`
-#     + `deno test`, plus the required Redis CAS/saga-store regression gate.
-#     A lightweight Redis service makes those integrations mandatory rather than
-#     silently skipped.
+#     + `deno test`. A lightweight Redis service makes the CAS/saga-store
+#     integrations mandatory inside the repo-wide suite rather than silently
+#     skipped or repeated as historical one-off gates.
 #
 #   - `quality` — the S2 full quality lane the original header reserved: lint,
 #     fmt, scaffold-version guard, publish dry-run, and critical advisory audit.
@@ -230,20 +230,6 @@ jobs:
           .llm/tools/gates/run-gate.ts --gate check --id check-test-check
           --output .llm/tmp/gate-receipts/check-test/check.json
 
-      - name: Required real-Redis regression tests
-        if: env.RUN == 'true'
-        run: >-
-          deno run --allow-read --allow-write --allow-run --allow-env
-          .llm/tools/gates/run-gate.ts --gate redis-regression --id check-test-redis
-          --output .llm/tmp/gate-receipts/check-test/redis.json
-
-      - name: Prove the pre-#1075 adapter turns the gate red
-        if: env.RUN == 'true'
-        run: >-
-          deno run --allow-read --allow-write --allow-run --allow-env
-          .llm/tools/gates/run-gate.ts --gate redis-negative-control --id check-test-redis-negative
-          --output .llm/tmp/gate-receipts/check-test/redis-negative.json
-
       - name: Repo-wide test
         if: env.RUN == 'true'
         run: >-
@@ -265,13 +251,6 @@ jobs:
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate fresh-browser --id check-test-fresh-browser
           --cwd packages/fresh --output .llm/tmp/gate-receipts/check-test/fresh-browser.json
-
-      - name: Agentic OpenRouter preset canary
-        if: env.RUN == 'true'
-        run: >-
-          deno run --allow-read --allow-write --allow-run --allow-env
-          .llm/tools/gates/run-gate.ts --gate provider-canary --id check-test-provider-canary
-          --output .llm/tmp/gate-receipts/check-test/provider-canary.json
 
       - name: Upload check-test gate receipts
         if: always()

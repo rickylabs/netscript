@@ -2,6 +2,16 @@ import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/
 import { KvConnectionError } from '../application/errors.ts';
 import { RedisKvAdapter } from '../redis.ts';
 
+const redisUrl = Deno.env.get('NETSCRIPT_TEST_REDIS_URL');
+
+Deno.test({
+  name: 'CI requires the real Redis regression service',
+  ignore: !Deno.env.get('CI'),
+  fn() {
+    assert(redisUrl, 'NETSCRIPT_TEST_REDIS_URL is required in CI');
+  },
+});
+
 Deno.test('RedisKvAdapter fails a dead endpoint loudly within a bounded interval', async () => {
   const kv = new RedisKvAdapter({
     url: 'redis://127.0.0.1:1',
@@ -24,11 +34,10 @@ Deno.test('RedisKvAdapter fails a dead endpoint loudly within a bounded interval
 
 Deno.test({
   name: 'RedisKvAdapter lists real Redis entries and admits one atomic CAS winner',
-  ignore: !Deno.env.get('NETSCRIPT_TEST_REDIS_URL'),
+  ignore: !redisUrl,
   async fn() {
-    const url = Deno.env.get('NETSCRIPT_TEST_REDIS_URL');
-    assert(url);
-    const kv = new RedisKvAdapter({ url, namespace: `test-${crypto.randomUUID()}` });
+    assert(redisUrl);
+    const kv = new RedisKvAdapter({ url: redisUrl, namespace: `test-${crypto.randomUUID()}` });
 
     try {
       await kv.set(['registry', 'orders'], { id: 'orders' });
