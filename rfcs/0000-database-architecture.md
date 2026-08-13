@@ -23,12 +23,11 @@ recipe** for the golden path, the **L2 factories** it calls, and **L3 native Pri
 primitives**. None of them describes a model, field, relation, or query: NetScript adds no schema or
 query vocabulary and re-exports no builder. A compiler with no live dependencies resolves those
 definitions into canonical contract artifacts and one deterministic, content-addressed
-`DatabaseManifest`. That manifest is the durable join point for everything downstream: an app-local
-binding typed from the authored contracts by erased inference, with an automatically emitted
-declaration supplying the same evidence for any space the consumer did not author; typed
-process/request sessions; bounded `StandardSchemaV1` validators; programmatic
-emit/inspect/plan/apply/verify operations; provider markers and ledgers; immutable receipts; and
-generated CLI, Aspire, and agent projections.
+`DatabaseManifest`. That manifest is the durable join point for everything downstream: an emitted
+app-local binding descriptor coupling erased inference for authored contracts with an automatically
+emitted declaration for any space the consumer did not author; typed process/request sessions;
+bounded `StandardSchemaV1` validators; programmatic emit/inspect/plan/apply/verify operations;
+provider markers and ledgers; immutable receipts; and generated CLI, Aspire, and agent projections.
 
 The end-to-end flow is one pipeline of separately named values, and no stage may impersonate
 another:
@@ -155,12 +154,12 @@ across the churn.
 
 This section describes the system as if it had shipped.
 
-> **Example status.** A snippet with a file-path comment and imports is a complete module for the
-> packages in [§ The package graph](#the-package-graph); a snippet marked _excerpt_ names the values
-> it assumes from an earlier one. `@netscript/*` shapes are proposed API. `@prisma/*` shapes are
-> observed in the pinned RC1 checkout and linked to it; the exact module specifier is an
-> adapter-pinned, implementation-time decision (W3), because Prisma's public CLI package name
-> changed six days after the RC tag.
+> **Example status.** A snippet explicitly marked _complete module_ is complete for the packages in
+> [§ The package graph](#the-package-graph); every other snippet is an excerpt whose surrounding
+> application values are named where they matter. `@netscript/*` shapes are proposed API.
+> `@prisma/*` shapes are observed in the pinned RC1 checkout and linked to it; the exact module
+> specifier is an adapter-pinned, implementation-time decision (W3), because Prisma's public CLI
+> package name changed six days after the RC tag.
 
 ### Step 1 — author the contract natively
 
@@ -170,25 +169,30 @@ composed helper surface and returns native `types`, `models`, and `enums`
 ([`define-contract.ts`][rc1-define-contract]; the callback overload preserves its returned literal
 types).
 
-One thing precedes the contract: the extension bundle. A logical extension such as pgvector has
-authoring, control, runtime, and validation facets, and the authoring facet has to exist _before_
-the builder runs, so the application configures the bundle once and passes its **public authoring
-projection** into `defineContract`:
+One thing precedes the contract: the configured provider value. A logical extension such as pgvector
+has authoring, control, runtime, and validation facets, and the authoring facet has to exist
+_before_ the builder runs. The application therefore creates the extension once, registers it once
+on the provider, and uses that provider's **public authoring scaffold** with `defineContract`:
 
 ```ts
-// database/extensions.ts — one configured, identity- and version-checked bundle
-import { pgvector } from '@netscript/database-prisma-postgres';
+// database/provider.ts — complete module; the sole live provider/extension composition root
+import { pgvector, prismaPostgres } from '@netscript/database-prisma-postgres';
 
-export const vector = pgvector({ dimensions: 1536 });
+const vector = pgvector({ dimensions: 1536 });
+
+export const postgres = prismaPostgres({
+  minVersion: 15,
+  extensions: [vector],
+});
 ```
 
 ```ts
 // database/app.contract.ts — provider-native authoring; specifier pinned in W3
 import { defineContract, rel } from '@prisma/orm-postgres/contract-builder';
-import { vector } from './extensions.ts';
+import { postgres } from './provider.ts';
 
 export const appContract = defineContract(
-  { extensions: { pgvector: vector.authoring } }, // the bundle's authoring facet, not a second import
+  postgres.authoring.scaffold,
   ({ field, model, type }) => {
     const types = { Embedding: type.pgvector.Vector(1536) } as const;
 
@@ -232,6 +236,12 @@ owns only the orchestration around the contract, and that surface has three leve
 The same app and the same `appContract` appear at every level. L1 calls L2; L2 produces the value
 L3's primitives consume. Nothing below defines a model, field, relation, or query.
 
+`postgres.authoring.scaffold` contains Prisma's native PostgreSQL scaffold composed with the
+registered extension authoring facets. It does not expose control or runtime implementations. The
+same `postgres` module can therefore be imported by build tooling and by the application runtime
+without making the runtime import the contract module; the dependency points from the contract to
+the provider, never back from the provider to authoring code.
+
 **L1 — the golden path.** One call with inspectable, replaceable defaults: target id `primary`, app
 space `app`, managed ownership, and retain-on-removal. The provider is **not** one of the defaults —
 the application constructs exactly one configured provider value and hands it in, so a
@@ -241,20 +251,15 @@ provider-neutral package never chooses, imports, or looks up a provider.
 // database/database.ts
 import { fromAspire } from '@netscript/aspire';
 import { defineSingleTargetDatabase } from '@netscript/database';
-import { prismaPostgres } from '@netscript/database-prisma-postgres';
 import { authSpace } from '@netscript/plugin-auth-core/database';
 import { appContract } from './app.contract.ts';
-import { vector } from './extensions.ts';
-
-/** The one configured provider value. Targets, runtime, and control all receive this object. */
-export const postgres = prismaPostgres({ minVersion: 15 });
+import { postgres } from './provider.ts';
 
 export default defineSingleTargetDatabase({
   provider: postgres,
   contract: appContract,
   connection: fromAspire('netscript-db'),
   spaces: [authSpace()], // plugin-owned schema, independently versioned
-  extensions: [vector], // the same bundle the contract was authored with
 });
 ```
 
@@ -279,13 +284,10 @@ import {
   defineDatabaseTarget,
   fromEnv,
 } from '@netscript/database';
-import { prismaPostgres } from '@netscript/database-prisma-postgres';
 import { authSpace } from '@netscript/plugin-auth-core/database';
 import { appContract } from './app.contract.ts';
-import { vector } from './extensions.ts';
+import { postgres } from './provider.ts';
 import { warehouseContract } from './warehouse.contract.ts';
-
-export const postgres = prismaPostgres({ minVersion: 15 }); // configured once, reused everywhere
 
 const primary = defineDatabaseTarget({
   id: 'primary',
@@ -313,7 +315,7 @@ export default defineDatabase({
       contract: appContract, // `typeof appContract` is preserved exactly
       policy: { removal: 'retain' },
     }),
-    auth: authSpace({ target: 'primary' }),
+    [authSpace.id]: authSpace({ target: 'primary' }),
     warehouse: defineDatabaseSpace({
       id: 'warehouse',
       owner: 'app',
@@ -322,7 +324,6 @@ export default defineDatabase({
       contract: warehouseContract,
     }),
   },
-  extensions: [vector], // the same configured bundle, still registered exactly once
 });
 ```
 
@@ -332,92 +333,92 @@ is refused with `db.compose.cross-target-relation`, and no multi-target operatio
 as atomic.
 
 `defineDatabaseSpace` stores `appContract` and preserves `typeof appContract` unchanged; everything
-NetScript adds is plain data that survives a provider replacement. The target key is checked where
-both halves are visible: `defineDatabase` requires every space's target to be a key of `targets`, so
-`target: 'primry'` is a type error at that call, and a bypassed check is refused with
-`db.compose.target.unknown` — there is no fallback chain anywhere.
+NetScript adds is plain data that survives a provider replacement. Both coordinates are checked
+where their halves are visible: `defineDatabase` requires every space's target to be a key of
+`targets` and every map key to equal that contribution's canonical `SpaceId`. Thus
+`target: 'primry'` or `{ auth: authSpace(...) }` is a type error at that call; a bypassed check is
+refused with `db.compose.target.unknown` or `db.compose.space-id.mismatch` — there is no fallback or
+alias chain anywhere.
 
-**L3 — the native foundation.** The same native contract and the same definition value, but the
-application drives the pipeline itself instead of letting the launcher do it: compiler → manifest →
-adapter binding → runtime → control, with no NetScript magic in between.
+**L3 — the native foundation.** The same native contract and definition, but the application owns
+the two module-graph phases that the launcher normally sequences. Emission must finish before the
+application imports emitted bindings; pretending both happen through static imports in one module
+would make first boot impossible and could pair a new manifest with a stale binding.
 
 ```ts
-// tools/pipeline.ts — excerpt. `database` and `postgres` come from database/database.ts above,
-// `primaryBinding` from database/binding.ts below, `connections` from Step 3's composition root,
-// and `io` is the artifact source/publisher pair the launcher normally supplies.
+// tools/emit-database.ts — excerpt; a build process runs this before application type-check/load.
+// `io` is the explicit artifact source + atomic publisher the launcher normally supplies.
 import { compileDatabase } from '@netscript/database';
-import { createDatabaseControl } from '@netscript/database-control';
-import { createDatabaseRuntime } from '@netscript/database-runtime';
+import database from '../database/database.ts';
 
-const compiled = await compileDatabase(database, io); // offline effects only; no connection in scope
+const compiled = await compileDatabase(database, io); // offline effects; no connection in scope
 if (!compiled.ok) throw new DatabaseCompositionError(compiled.diagnostics);
-
-const { manifest } = compiled; // durable, content-addressed; the only value passed on from here
-
-await using runtime = await createDatabaseRuntime({
-  manifest,
-  providers: [postgres],
-  bindings: [primaryBinding],
-  scope: 'process',
-  connections,
-});
-
-const control = createDatabaseControl({ manifest, providers: [postgres] });
 ```
 
-Nothing downstream of `compileDatabase` receives the `DatabaseDefinition`: runtime and control take
-the manifest, the configured provider, connections, and bindings. The binding itself is the one
-place where app-local type evidence and emitted artifacts meet:
+The successful atomic publish contains the manifest and one target binding descriptor. The following
+is simplified **emitted output**, not code a developer maintains:
 
 ```ts
-// database/binding.ts — hand-written once
-import type { ContractOf } from '@netscript/database';
-import type { ProcessSessionOf } from '@netscript/database-runtime';
+// .netscript/database/primary.binding.ts — emitted atomically with manifest.ts
+import type database from '../../database/database.ts';
 import {
+  artifactSpaceEvidence,
   createPrismaPostgresBinding,
+  definePrismaPostgresBindingDescriptor,
   type QueriesOf,
+  sourceSpaceEvidence,
 } from '@netscript/database-prisma-postgres/binding';
-// Source-native evidence: type-only, erased at run time.
-import type database from './database.ts';
-// Generated declaration: the auth space is artifact-only here, so its exact type cannot be
-// reconstructed from JSON. The launcher emits this declaration atomically during the same compile.
-import type { AuthContract } from '../.netscript/database/primary/auth.contract.d.ts';
-import { manifest } from '../.netscript/database/manifest.ts'; // emitted value
+import type { ProcessSessionOf } from '@netscript/database-runtime';
+import type { AuthContract } from './primary/plugin-auth.contract.d.ts';
+import { manifest } from './manifest.ts';
 
-export const primaryBinding = createPrismaPostgresBinding<{
-  app: ContractOf<typeof database, 'app'>;
-  auth: AuthContract;
-}>({
+const descriptor = definePrismaPostgresBindingDescriptor({
   target: 'primary',
-  manifest, // carries the ManifestDigest, provider pin, and per-space ContractSnapshotIds
+  manifestDigest: 'nsdb1:9f3c…',
+  spaces: {
+    app: sourceSpaceEvidence<typeof database, 'app'>({ snapshot: 'nsdbc1:2c71…' }),
+    'plugin:@netscript/plugin-auth': artifactSpaceEvidence<AuthContract>({
+      snapshot: 'nsdbc1:71ba…',
+    }),
+  },
 });
 
-export type PrimaryQueries = QueriesOf<typeof primaryBinding>; // { app: …; auth: … }
+export const primaryBinding = createPrismaPostgresBinding({ descriptor, manifest });
+export type PrimaryQueries = QueriesOf<typeof primaryBinding>;
 export type PrimarySession = ProcessSessionOf<typeof primaryBinding>;
 ```
 
-The type argument is a **literal, space-keyed map** and each entry carries its own evidence: `app`
-from erased source inference, `auth` from a generated declaration. Prisma contract spaces are
-separate contracts with separate artifacts and heads ([space aggregate][rc1-space-aggregate]), so
-the binding never merges them into one contract or one query type, and each entry keeps its own
-`ContractSnapshotId`. An application that does not query a pinned space simply omits it from the
-map: the space is still planned, applied, and verified — it just has no typed query surface.
-Claiming `auth` in `PrimaryQueries` without importing its declaration would be the unsound version
-of this, and the emitter refuses to produce a binding whose map names a space it has no evidence
-for. `primaryBinding` is a real value constructed by the adapter factory from the manifest's
-identities — never an ambient `declare const`.
+The compiler, not application code, writes that literal map. Each key is the canonical `SpaceId`
+used by definitions, manifests, receipts, `.space(...)`, and diagnostics; local aliases do not
+exist. Each value couples type-only evidence to a value-level `ContractSnapshotId`, while the
+descriptor itself carries its target and `ManifestDigest`. The adapter rejects a missing, duplicate,
+extra, wrong-target, or wrong-snapshot entry before returning a binding, and bind time rechecks the
+descriptor against the manifest. Editing or hand-writing the generated module is detected by
+`db emit --verify`.
+
+`app` still gets its exact contract type from erased `typeof database`; no app model type is
+generated. The plugin space needs the automatically emitted `AuthContract` declaration because its
+publisher supplied data artifacts rather than the consumer's TypeScript source. Prisma spaces stay
+separate contracts with separate heads ([space aggregate][rc1-space-aggregate]); this descriptor
+associates them but never merges their models or query types. An application that does not query a
+pinned space asks the emitter to omit its binding evidence: the space is still planned, applied, and
+verified, but has no typed query surface.
+
+Only after that build phase does the application module graph import `primary.binding.ts` and create
+runtime or control values. Nothing downstream receives `DatabaseDefinition`: runtime and control
+take the manifest, the same configured provider value, connections, and emitted bindings.
 
 #### Who owns what
 
-| Surface                                                                | Owner                                                                                  | Source of truth                                               | Produces / lowers to                                                                  | Must not cross                                                                              |
-| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `defineContract`, ORM and SQL query surfaces                           | `@prisma/orm-postgres`, imported directly by app and plugin authoring modules          | Prisma                                                        | native contract value, `contract.json`, `contract.d.ts`                               | never mirrored, wrapped, or re-exported by NetScript                                        |
-| L1 `defineSingleTargetDatabase` and the L2 `defineDatabase*` factories | `@netscript/database`                                                                  | this RFC                                                      | L1 calls L2 → one `DatabaseDefinition` → `resolveDatabase`/`compileDatabase`          | no schema or query vocabulary, no provider import, no live IO                               |
-| `prismaPostgres(...)` and `pgvector(...)` bundles                      | `@netscript/database-prisma-postgres` (or an extension publisher inside that boundary) | the adapter                                                   | one opaque configured value carrying identity, version, capabilities, and four facets | control/runtime facets never leave the provider boundary; the app touches only `.authoring` |
-| `fromAspire` and its `ConnectionSource` adapter                        | `@netscript/aspire`                                                                    | Aspire                                                        | plain connection-reference data, resolved at runtime                                  | reference construction performs no IO; the kernel never imports Aspire                      |
-| `createPrismaPostgresBinding`, `QueriesOf`                             | `@netscript/database-prisma-postgres/binding`                                          | app-local `typeof` evidence + emitted declarations + manifest | per-space query/transaction types and a digest-verifying runtime value                | provider-specific by design; never a provider-neutral query API                             |
-| Sessions, validators, ports                                            | `@netscript/database-runtime`, `@netscript/database-control`                           | manifest, binding, pinned artifacts                           | typed sessions, Standard Schema values, plans, receipts                               | provider-neutral packages never name a Prisma type                                          |
-| CLI, Aspire resources, agent surfaces                                  | `@netscript/cli`, `@netscript/aspire`                                                  | `DatabaseManifest` + operation catalog                        | commands, resources, agent schemas                                                    | never evaluates authoring TypeScript                                                        |
+| Surface                                                                | Owner                                                                         | Source of truth                                               | Produces / lowers to                                                             | Must not cross                                                                         |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `defineContract`, ORM and SQL query surfaces                           | `@prisma/orm-postgres`, imported directly by app and plugin authoring modules | Prisma                                                        | native contract value, `contract.json`, `contract.d.ts`                          | never mirrored, wrapped, or re-exported by NetScript                                   |
+| L1 `defineSingleTargetDatabase` and the L2 `defineDatabase*` factories | `@netscript/database`                                                         | this RFC                                                      | L1 calls L2 → one `DatabaseDefinition` → `resolveDatabase`/`compileDatabase`     | no schema or query vocabulary, no provider import, no live IO                          |
+| `prismaPostgres(...)` and `pgvector(...)` bundles                      | `@netscript/database-prisma-postgres` plus compatible extension publishers    | provider composition                                          | one configured provider carrying registered extension identities and live facets | manifest stores only pins; runtime code never reconstructs executable facets from data |
+| `fromAspire` and its `ConnectionSource` adapter                        | `@netscript/aspire`                                                           | Aspire                                                        | plain connection-reference data, resolved at runtime                             | reference construction performs no IO; the kernel never imports Aspire                 |
+| emitted target descriptor; `createPrismaPostgresBinding`, `QueriesOf`  | compiler; `@netscript/database-prisma-postgres/binding`                       | app-local `typeof` evidence + emitted declarations + manifest | canonical per-space query/transaction types and a digest-verifying runtime value | no hand-written evidence map, provider-neutral query API, or local space alias         |
+| Sessions, validators, ports                                            | `@netscript/database-runtime`, `@netscript/database-control`                  | manifest, binding, pinned artifacts                           | typed sessions, Standard Schema values, plans, receipts                          | provider-neutral packages never name a Prisma type                                     |
+| CLI, Aspire resources, agent surfaces                                  | `@netscript/cli`, `@netscript/aspire`                                         | `DatabaseManifest` + operation catalog                        | commands, resources, agent schemas                                               | never evaluates authoring TypeScript                                                   |
 
 #### The normal loop has no manual type generation
 
@@ -435,7 +436,7 @@ never opens a connection, plans, or applies. Plan and apply authority stays expl
 ### Step 3 — sessions and queries
 
 ```ts
-// composition-root.ts — hand-written; the only place a target is bound by name
+// composition-root.ts — complete module; the only place a target is bound by name
 import { aspireConnections } from '@netscript/aspire';
 import {
   createDatabaseRuntime,
@@ -443,8 +444,10 @@ import {
   resolveConnections,
 } from '@netscript/database-runtime';
 import { manifest } from './.netscript/database/manifest.ts';
-import { postgres } from './database/database.ts';
-import { primaryBinding, type PrimarySession } from './database/binding.ts';
+import { primaryBinding, type PrimarySession } from './.netscript/database/primary.binding.ts';
+import { PrismaAccountStore } from './database/accounts.store.ts';
+import { postgres } from './database/provider.ts';
+import type { AccountStore } from './ports/account.store.ts';
 
 const connections = await resolveConnections(manifest, [aspireConnections, envConnections]);
 
@@ -461,12 +464,18 @@ const accounts: AccountStore = new PrismaAccountStore(primary); // application-o
 ```
 
 ```ts
-// accounts.store.ts — application-owned adapter; `space` selects one contract space,
-// and the surface inside it is Prisma's own (shapes follow the pinned RC1 ORM examples).
+// database/accounts.store.ts — complete application-owned adapter. `space` selects one contract
+// space; the surface inside it is Prisma's own (shapes follow the pinned RC1 ORM examples).
+import type { FieldValueOf } from '@netscript/database-prisma-postgres/binding';
+import { primaryBinding, type PrimarySession } from '../.netscript/database/primary.binding.ts';
+import type { AccountStore } from '../ports/account.store.ts';
+
+type UserId = FieldValueOf<typeof primaryBinding, 'app', 'User', 'id'>;
+
 export class PrismaAccountStore implements AccountStore {
   constructor(private readonly primary: PrimarySession) {}
 
-  recentPosts(userId: string, limit: number) {
+  recentPosts(userId: UserId, limit: number) {
     return this.primary.space('app').orm.Post
       .where({ userId })
       .orderBy((post) => post.createdAt.desc())
@@ -474,7 +483,7 @@ export class PrismaAccountStore implements AccountStore {
       .all();
   }
 
-  register(id: string, email: string) {
+  register(id: UserId, email: string) {
     return this.primary.transaction(
       'app',
       (tx) => tx.orm.User.select('id', 'email').create({ id, email }),
@@ -483,15 +492,17 @@ export class PrismaAccountStore implements AccountStore {
 }
 ```
 
-Those are the RC1 collection shapes verbatim — Pascal-case models, fluent
-`where(...).orderBy(...).take(...).all()` reads and `select(...).create(...)` writes
-([reads][rc1-orm-read], [writes][rc1-orm-write]). `space('app')` hands back the provider's own
-facade, so `.orm` is the ORM collection client and `.sql` is the same SQL DSL escape hatch the
-provider already ships; NetScript wraps neither and adds no query language of its own. `postgres` is
-the identical configured provider value the target declared, imported from the application's own
-database module, so no composition root builds a second one. Connections are resolved from the
-manifest's connection references through `ConnectionSource` adapters, which is the only place Aspire
-enters the picture.
+Those are the RC1 collection shapes — Pascal-case models, fluent `where(...)` filtering,
+`orderBy(...).take(...).all()` reads and `select(...).create(...)` writes ([filter][rc1-orm-filter],
+[reads][rc1-orm-read], [writes][rc1-orm-write]). The ID type is derived from the binding because
+RC1's UUID string codec is a branded `Char<36>`, not an ordinary `string`; external text reaches
+this port only after a boundary schema validates and decodes it to `UserId`. `space('app')` hands
+back the provider's own facade, so `.orm` is the ORM collection client and `.sql` is the same SQL
+DSL escape hatch the provider already ships; NetScript wraps neither and adds no query language of
+its own. `postgres` is the identical configured provider value the target declared, imported from
+the application's own database module, so no composition root builds a second one. Connections are
+resolved from the manifest's connection references through `ConnectionSource` adapters, which is the
+only place Aspire enters the picture.
 
 Feature code receives `AccountStore` — an application-owned port — not the runtime. `runtime.bind`
 is reachable only from declared composition-root files, enforced by `arch:check`, because a database
@@ -519,7 +530,7 @@ space whose provider or extensions contribute no pack for an operation fails at 
 instead of guessing.
 
 ```ts
-import { primaryBinding } from './database/binding.ts';
+import { primaryBinding } from './.netscript/database/primary.binding.ts';
 
 const users = primaryBinding.ref({ space: 'app' }).model('User');
 
@@ -529,19 +540,23 @@ const wholeUser = users.output('model', { representation: 'json' });
 ```
 
 Two methods, two representations. `input` produces an **operation input** schema — the pack-backed
-half — while `output` produces a **selected result** schema for the shape actually requested, or the
-whole-model shape under the explicit `'model'` form. The only public representations are `runtime`
-and `json`. Both implement `StandardSchemaV1`, so they drop into independent consumers unchanged,
-and each boundary uses the schema that actually describes it:
+half — while `output` produces a selected-result schema or the whole-model shape under the explicit
+`'model'` form. The literal `select` above is a validation projection, not a second query API and
+not automatically the identity of a later query: the route handler's inferred result is checked
+against the schema output type. The overload also accepts a provider-produced plan or selection
+value when the adapter can prove every projected leaf; W3 must prove that public coupling for the
+pinned ORM, and otherwise the explicit projection is the honest fallback. The only public
+representations are `runtime` and `json`. Both implement `StandardSchemaV1`, so they drop into
+independent consumers unchanged, and each boundary uses the schema that actually describes it:
 
 ```ts
-// an oRPC route contract: create-input in, selected output out
+// excerpt: `baseContract` is the application oRPC builder.
 const createAccount = baseContract
   .route({ method: 'POST', path: '/accounts' })
   .input(createUser)
   .output(publicUser);
 
-// a Fresh action consuming the same input schema for the same payload shape
+// excerpt: `formPayload` is already a JSON-shaped object, not a raw FormData value.
 const parsed = await createUser['~standard'].validate(formPayload);
 if (parsed.issues) return renderFieldErrors(parsed.issues);
 ```
@@ -564,9 +579,12 @@ application.
 // plugins/auth/core/src/database.ts — the plugin owns a space, not a fragment
 import { CAP, pinnedSpace } from '@netscript/database-contract';
 import { definePluginSpace } from '@netscript/plugin';
+import { authSpaceAggregate } from './artifacts/auth.space.ts';
+
+export const AUTH_SPACE_ID = 'plugin:@netscript/plugin-auth' as const;
 
 export const authSpace = definePluginSpace({
-  id: 'plugin:@netscript/plugin-auth',
+  id: AUTH_SPACE_ID,
   owner: '@netscript/plugin-auth',
   version: '0.0.7',
   contractFormat: '>=1 <2',
@@ -577,21 +595,29 @@ export const authSpace = definePluginSpace({
     denies: ['drop-column', 'change-type', 'add-required-column'],
   },
   policy: { removal: 'retain' },
-  // One pinned space aggregate, not a lone contract.json: descriptor snapshot, canonical contract
-  // data *and* declaration, migration packages and graph, head ref, hashes, and provenance.
-  space: pinnedSpace('./artifacts/auth.space'),
+  // A generated module statically materializes the whole aggregate in Deno's module graph.
+  space: pinnedSpace(authSpaceAggregate),
 });
 ```
 
-`definePluginSpace` returns a **callable descriptor**: `authSpace()` takes the single target an L1
-application has, `authSpace({ target: 'primary' })` names one explicitly at L2, and both produce the
-same `SpaceContribution`. Installation copies nothing into the application's schema; it writes that
-pinned aggregate under the application's generated root, mirroring the shape Prisma's own migration
-tooling already loads per space ([space aggregate][rc1-space-aggregate]). Production apply and
-verify read the aggregate, so a deployment never needs the plugin's package graph resolvable, and an
-aggregate that disagrees with the installed package is `db.space.skew`. Typed queries against the
-space use the consumer declaration emitted from that same aggregate — the `AuthContract` import in
-the binding above — and the spaces are never merged.
+`definePluginSpace` returns a **callable descriptor** carrying its literal `.id`: `authSpace()`
+takes the single target an L1 application has, `authSpace({ target: 'primary' })` names one
+explicitly at L2, and both produce the same `SpaceContribution`. L2 keys the contribution with
+`[authSpace.id]`; there is no shorter local alias whose meaning disappears at run time.
+`auth.space.ts` is a checked-in deterministic generated module that statically contains or imports
+every descriptor, canonical contract value and declaration, migration package/graph, head, hash, and
+provenance record. It is in the publisher's explicit JSR asset/export allowlist, so Deno
+materializes the complete graph before executing the consumer; `compileDatabase` receives an
+already-loaded value and performs no fetch. The release gate proves a cold remote consumer can
+materialize the package once and then run emit/verify with network access disabled.
+
+Installation copies nothing into the application's schema; it publishes that pinned aggregate under
+the application's generated root, mirroring the shape Prisma's own migration tooling already loads
+per space ([space aggregate][rc1-space-aggregate]). Production apply and verify read the local
+mirror, so a deployment never needs the plugin package graph resolvable, and an aggregate that
+disagrees with the installed package is `db.space.skew`. Typed queries against the space use the
+consumer declaration emitted from that same aggregate — the `AuthContract` import in the binding
+above — and the spaces are never merged.
 
 Ownership is checked over `(target, namespace, object kind, name)`, not over declaration text, so
 two spaces wanting a table named `user` are a conflict naming both. Because the first adapter
@@ -602,38 +628,39 @@ Uninstalling is a planned operation, not a directory delete: **detach-and-retain
 runtime binding while data, provider marker, lineage, and ownership history stay behind a
 verify-only tombstone.
 
-### Step 6 — one extension, registered once
+### Step 6 — one extension value, registered once
 
 Upstream, one logical extension is several modules: `@prisma/orm-extension-pgvector/pack` for
 authoring and `@prisma/orm-extension-pgvector/runtime` for the runtime facet, plus control wiring.
 Registering some of them and forgetting the rest is silent until something fails. Those runtime and
-control modules are exactly what an application must not import, so the **adapter or the extension's
-publisher** assembles the bundle inside the provider boundary:
+control modules are exactly what an application must not import, so the **adapter or a compatible
+extension publisher** assembles one bundle for the provider boundary:
 
 ```ts
 // @netscript/database-prisma-postgres — assembled inside the provider boundary, not by the app
-export declare function pgvector(options: PgVectorOptions): DatabaseExtension<'pgvector'>;
+export declare function pgvector(options: PgVectorOptions): PostgresExtension<'pgvector'>;
 // → { id, version, requires: [CAP.pgvector], authoring, control, runtime, validation }
-//   `authoring` is the only facet an application can reach.
 ```
 
-The application creates that value **once, before the contract** (Step 1), and passes the same
-object to the definition (Step 2). Composition then runs two phases. Phase 1 collects every declared
-bundle, checks identity and version against what each space's contract was authored with, refuses a
-duplicate identity or a facet mismatch with `db.compose.extension.facet-mismatch`, and orders
-contributions. Phase 2 invokes the native model-first builder with `bundle.authoring`,
-canonicalizes, publishes artifacts, and then fans the _same_ bundle into control, runtime, and
-validation. A later value cannot supply the authoring facet retroactively, which is why the order is
-fixed.
+The application creates the extension **once**, before the contract, and passes it once to
+`prismaPostgres({ extensions: [...] })` (Step 1). That provider composes
+`postgres.authoring.scaffold` for the app's one native `defineContract` call and retains the same
+bundle's executable control, runtime, and validation facets. The completed contract records the
+extension identity and version. Later, `compileDatabase` does **not** invoke the builder again: it
+compares those recorded pins with the extensions registered on the target's provider, refuses a
+duplicate, missing identity, version skew, or facet mismatch with
+`db.compose.extension.facet-mismatch`, and writes only serializable pins and capabilities to the
+manifest. At run time the application supplies the same configured `postgres` value; runtime and
+control obtain executable facets from it, never from manifest data and never from a global registry.
 
-The provider-neutral kernel sees only identity, version, provider and capability requirements, and
-opaque facet handles. The L3 escape hatch stays open with one condition: an author may call
-`defineContract` against Prisma's public `/pack` import directly, but if the space declares that
-extension in its NetScript definition, the contract must be built from the registered bundle's
-`.authoring` projection — composition compares the extension identity and version recorded in the
-emitted contract against the registered bundle and refuses on mismatch. A raw pack import is
-equivalent only when no bundle is registered for it, and then that extension has no control,
-runtime, or validation facet at all.
+This is a two-stage flow, not retroactive authoring: **authoring** evaluates the app-owned native
+builder with the already-composed scaffold; **offline compilation** verifies, canonicalizes, and
+publishes. A third-party publisher participates by returning a compatible `PostgresExtension` value
+to the application's explicit provider configuration. The L3 escape hatch remains native: an author
+may assemble Prisma's public pack directly, but a NetScript target using that contract is accepted
+only when its configured provider carries the same extension identity/version and all facets
+required by the claimed capabilities. Otherwise native authoring still works outside the NetScript
+seam, while NetScript runtime/control/validation correctly refuse it.
 
 ### Step 7 — the operational journey
 
@@ -652,7 +679,6 @@ const policy = { destructive: 'allow-with-approval' } as const;
 // Pure control: artifacts and policy only. It has no connection resolver to reach.
 const control = createDatabaseControl({ manifest, providers: [postgres] });
 
-const emitted = await control.emit({ targets: ['primary'], runId });
 const advisory = await control.preview({ targets: ['primary'], runId });
 
 // Live control: constructed from the pure catalog by supplying explicit live dependencies.
@@ -666,9 +692,12 @@ const applied = await live.apply({ plan: signed, runId });
 const verified = await live.verify({ targets: ['primary'], runId });
 ```
 
-`emit` is offline because there is no connection in scope, not because an injected resolver happens
-to go unused. This is the structural closure of the `DB-GENERATE-ASPIRE-COUPLING` debt entry: Aspire
-is a property of a target's connection source, and a pure operation never receives one.
+There is deliberately no `control.emit`. `emit` is the operation-catalog/CLI projection of
+`compileDatabase(definition, sourceAndPublisher)` from L3; the explicit `ArtifactPublisher` is its
+effect port, and the control package never receives a definition. It is offline because there is no
+connection in scope, not because an injected resolver happens to go unused. This is the structural
+closure of the `DB-GENERATE-ASPIRE-COUPLING` debt entry: Aspire is a property of a target's
+connection source, and a pure operation never receives one.
 
 ```console
 $ netscript db plan --target primary --json
@@ -799,11 +828,16 @@ The dependency edges are exact, and each clause is mechanically checkable:
 - `@netscript/database-testkit` may depend on every public surface; nothing depends on it at
   runtime.
 
-**No framework package depends on a provider** — providers are composition-root values, so there is
-no global registry and no lookup by string — and **no framework package re-exports Prisma**: only
-the adapter and extension publishers import Prisma runtime or control modules, while application and
-plugin authoring modules import Prisma's public authoring builder during the controlled build phase.
-The adapter owns exactly two public subpaths, its root and `/binding`.
+**No provider-neutral framework package depends on a provider** — providers are composition-root
+values, so there is no global registry and no lookup by string — and **no framework package
+re-exports Prisma**: only the adapter and extension publishers import Prisma runtime or control
+modules, while application and plugin authoring modules import Prisma's public authoring builder
+during the controlled build phase. The adapter owns exactly two public subpaths, its root and
+`/binding`; provider-specific `defineContractFragment` lives at the adapter root rather than leaking
+a Prisma helper type into `@netscript/database`. W1/W3 cannot publish any of these surfaces until
+documentation/type lint, `isolatedDeclarations`, JSR dry-run, packed and cold remote consumers,
+explicit aggregate-module asset inclusion, network-disabled emit/verify after dependency
+materialization, provenance, and release E2E all pass.
 
 Doctrine currently codifies the model this RFC removes — Archetype 5 makes plugin database
 contributions plain `*.prisma` files ([archetypes](../docs/architecture/doctrine/06-archetypes.md))
@@ -820,14 +854,25 @@ type `TContract`. The target key is checked one level up, where both halves are 
 ```ts
 // @netscript/database
 
-/** Composes targets and spaces into a frozen definition; the target keys are checked here. */
+/** Composes targets and canonically keyed spaces into a frozen definition. */
 export declare function defineDatabase<
   const TTargets extends Readonly<Record<string, DatabaseTargetDefinition<string>>>,
   const TSpaces extends Readonly<
     Record<string, DatabaseSpaceDefinition<string, Extract<keyof TTargets, string>, unknown>>
   >,
 >(
-  input: { targets: TTargets; spaces: TSpaces; extensions?: readonly DatabaseExtension[] },
+  input: {
+    targets: TTargets;
+    spaces:
+      & TSpaces
+      & {
+        readonly [K in keyof TSpaces]: DatabaseSpaceDefinition<
+          Extract<K, string>,
+          Extract<keyof TTargets, string>,
+          unknown
+        >;
+      };
+  },
 ): DatabaseDefinition<TTargets, TSpaces>;
 
 /**
@@ -887,18 +932,21 @@ query surface can be typed from `typeof` while the runtime value comes from the 
 And root `deno.json` enables `isolatedDeclarations`, under which an exported inferred
 `defineContract(...)` constant needs an explicit annotation; app-owned authoring modules are **build
 inputs, not JSR exports**, so that narrow app-local project sets `isolatedDeclarations: false` while
-every published `@netscript/*` package keeps it `true`. For app-authored spaces nothing is emitted,
-no neutral declaration names a Prisma type, and no slow-types waiver is requested: evidence flows
-`typeof definition → ContractOf → adapter binding`.
+every published `@netscript/*` package keeps it `true`. For app-authored spaces no contract
+declaration or generated model/query type is emitted, no neutral declaration names a Prisma type,
+and no slow-types waiver is requested: evidence flows
+`typeof definition → ContractOf → emitted adapter binding descriptor`.
 
 A consumer cannot do that for a space it did not author. A pinned plugin space arrives as artifacts,
 and TypeScript cannot reconstruct an exact contract type from JSON. For those spaces — and for an
 application that deliberately exports an inferred definition from a publishable package — the
 provider **declaration** is generated **automatically and atomically in the same compile** that
-publishes the artifacts, and imported as type-only evidence into the hand-written binding. It is
-never hand-run, never a framework slow type, and never control authority: runtime and control still
-consume the manifest and pinned artifact values, and a declaration only tells the type checker what
-the artifact already says.
+publishes the artifacts. The compiler also emits the target binding descriptor shown above: it
+references app-authored spaces through `typeof definition`, artifact-only spaces through their
+generated declarations, and couples both to value-level snapshot identities. This is generated
+wiring, not generated app model types. It is never hand-run, never a framework slow type, and never
+control authority: runtime and control still consume the manifest, descriptor, and pinned artifact
+values, and a declaration only tells the type checker what the artifact already says.
 
 The fallback is bounded to exactly those two boundaries, both proved in W3. If direct app inference
 turns out to require a private import, a copied overload, a cast, a provider type in a neutral
@@ -906,13 +954,12 @@ package, or runtime evaluation of authoring code, that is recorded as a **W3 kil
 criterion** — the layered surface is reconsidered rather than silently promoted to universal
 generation.
 
-**The one deliberate soundness seam.** `runtime.bind` returns a session whose query types come from
-app-local inference, and the kernel cannot prove that the runtime value the provider constructs
-matches them, because those type parameters are erased. Three gates make the seam safe: the binding
-is constructed by the adapter factory from the same manifest that produced the artifacts; it carries
-the manifest digest, provider pin, and per-space snapshot ids that the provider verifies at bind
-time; and a conformance case asserts that a mismatched binding fails at bind rather than at first
-query.
+**The one deliberate soundness seam.** `runtime.bind` returns a session whose source-authored query
+types are erased at run time. Application code cannot supply an arbitrary type map: the compiler
+emits the descriptor from the same resolution that emits the manifest, with canonical `SpaceId`s,
+provider pin, manifest digest, and per-space snapshot ids. The adapter verifies those values before
+constructing the binding, and conformance swaps every target, space, declaration, and snapshot in
+turn to prove a mismatch fails at construction or bind rather than at first query.
 
 ### Contribution modes
 
@@ -929,18 +976,19 @@ published declaration. Fragments are therefore application-local and a published
 failure — which is why persistent plugin tables default to full spaces published as plain data plus
 pinned artifacts.
 
-Composition is two-phase because extension packs determine the composed helper object's shape
-_before_ Prisma invokes the callback. Phase 1 collects contributions, bundles, dependency edges, and
-capability requirements, resolving extension identity and version, detecting facet mismatch,
-ordering fragments, and refusing cycles; phase 2 builds one scaffold into the exact composed helper
-surface, invokes fragments in dependency order, canonicalizes, and atomically publishes the
-artifacts. Both phases are pure, the root is explicit calls and spreads in deterministic order —
-never a registry, never `Array.reduce`, never `Record<string, ModelLike>` — and fragment order must
-not change the canonical digest. Plugin spaces never appear in that root.
+Extension composition and contract compilation are ordered but do not invoke the builder twice. The
+app first configures the provider extensions, then its explicit contract root invokes Prisma's
+native builder once and invokes app-local fragments in dependency order against that composed helper
+surface. The later offline compiler verifies extension pins, dependency edges, capability
+requirements, ownership, and cycles; canonicalizes the completed contract; and atomically publishes
+artifacts. Only the in-memory resolution step is mathematically pure — publishing is an explicit
+offline effect. The authoring root uses explicit calls and const-preserving spreads in deterministic
+order, never a registry, `Array.reduce`, or `Record<string, ModelLike>`, and fragment order must not
+change the canonical digest. Plugin spaces never appear in that root.
 
 ```ts
-// database/contract-root.ts — app-owned fragments composed in one explicit, const-preserving root
-export const primaryContract = defineContract(scaffold, (h) => {
+// database/contract-root.ts — excerpt; app-owned fragments in one const-preserving native root
+export const primaryContract = defineContract(postgres.authoring.scaffold, (h) => {
   const billing = billingFragment.build(h, {});
   const app = appFragment.build(h, { billing });
 
@@ -980,9 +1028,10 @@ and its pins.
 
 Operations are classified before they run, and the class determines what an operation may resolve.
 In this catalog `pure` means **no live database, network, connection, or orchestrator** — not
-side-effect-free: `emit` reads authoring artifacts and publishes an artifact set atomically.
-`compose` is the catalog's projection of the A4 compiler, and the control package does not own the
-compiler; live control never receives a `DatabaseDefinition`.
+side-effect-free: `emit` is the CLI/catalog projection of `compileDatabase`, reads authoring
+artifacts, and publishes through its explicit atomic publisher. `compose` projects
+`resolveDatabase`; neither operation is a method on `DatabaseControl`. The control package does not
+own the compiler, and live control never receives a `DatabaseDefinition`.
 
 | Class       | Examples                                                    | May resolve                                                                                                                    | Lock     |
 | ----------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | -------- |
@@ -1075,13 +1124,13 @@ diagnostics, receipts, or logs; and **bind refuses mismatch**.
 Ports stay at three or four cohesive methods, because AP-3 names "a port with every operation the
 backend can perform" as the integration-package failure mode and today's `DatabaseAdapter<TClient>`
 is that anti-pattern in shipped code. The consumed set is `ContractArtifactSource`,
-`ArtifactPublisher` (stage/commit/abort, never patch in place), `ProviderRuntimeFactory`,
-`ProviderControl` (emit/inspect/plan/apply), `ConnectionSource` (the Aspire, environment, and
-secret-reference adapters), `MigrationLock`, and the append-plus-lookup receipt store, plus `Clock`,
-`IdSource`, and `SignaturePolicy` where deterministic testing or production approval requires them.
-**Verify is not a provider method**: it is composed from `ProviderControl.inspect` plus a manifest
-comparison plus ownership classification, which is what keeps drift semantics identical across
-providers.
+`ArtifactPublisher` (stage/commit/abort, never patch in place), `ProviderContractCompiler`
+(validate/canonicalize), `ProviderRuntimeFactory`, `ProviderControl` (inspect/plan/apply),
+`ConnectionSource` (the Aspire, environment, and secret-reference adapters), `MigrationLock`, and
+the append-plus-lookup receipt store, plus `Clock`, `IdSource`, and `SignaturePolicy` where
+deterministic testing or production approval requires them. **Verify is not a provider method**: it
+is composed from `ProviderControl.inspect` plus a manifest comparison plus ownership classification,
+which is what keeps drift semantics identical across providers.
 
 ### The runtime validation subsystem
 
@@ -1188,9 +1237,12 @@ The space lifecycle is `declared → installed → upgraded`, with refusals for 
 cyclic dependencies, contract-format skew, capability regression, ownership widening, and mirror
 skew; then `detached → retained`, with `archived` and `dropped` specified but unclaimed.
 Detach-and-retain is the **only guaranteed removal**, and retained is a lifecycle state rather than
-an ownership policy: the space keeps its data, marker, lineage, and ownership history as a
-**verify-only tombstone** that drift reporting still sees but no plan or apply may touch until a new
-explicit space re-adopts it. Detaching a space a still-installed space depends on is refused.
+an ownership policy. Under the provider lock/fence, one receipt-backed ledger transition records the
+previous head/snapshot, reason, `retained` state, and transition `ReceiptId`; the runtime binding is
+removed and the provider marker is preserved. The space keeps its data, lineage, and ownership
+history as a **verify-only tombstone** that inventory and drift reporting still see but no plan or
+apply may touch until a new explicit space re-adopts it. Detaching a space a still-installed space
+depends on is refused.
 
 Prisma's runtime lowering honours per-model namespaces, but its authoring type maps do not: the
 authoring path lumps every model under the default storage namespace and leaves additional namespace
@@ -1262,19 +1314,19 @@ instance of it rather than a new idiom.
 
 ### Alternatives considered and rejected
 
-| Alternative                                                          | Why rejected                                                                                                                                                                                                                                                                                                                           |
-| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Keep Prisma 7 and add Prisma 8 as an opt-in pilot (issue #313)       | It preserves every seam in Motivation; the current architecture is what a compatibility-first constraint produced.                                                                                                                                                                                                                     |
-| A one-to-one migration of the current design onto Prisma 8           | Engine-as-identity, the repair pipeline, copied fragments, exit-code results, and Aspire-coupled generation are version-independent.                                                                                                                                                                                                   |
-| A proprietary NetScript schema DSL lowering to the contract          | A third schema language tracking every native type, index kind, constraint, and default; permanently lagging.                                                                                                                                                                                                                          |
-| A live `DatabaseGraph` as the public artifact                        | A runtime graph accretes traversal APIs and becomes a lookup surface; the manifest gives every property it was wanted for.                                                                                                                                                                                                             |
-| Re-export Prisma from a NetScript package                            | AP-14, the publish constraint, and 138 upstream export keys — it converts Early-Access internals into NetScript public API.                                                                                                                                                                                                            |
-| A generated app-local binding as the universal default               | Prisma's phantom contract type parameter and an app-local `isolatedDeclarations` scope make direct inference sound for app-authored spaces, so universal generation would add a ritual with no type benefit. Generation is kept exactly where evidence is missing: pinned spaces the consumer did not author, and publishable exports. |
-| Generated mirror validators (one schema file per model/input/output) | Combinatorially wrong for selection-aware output, and it recreates the repair pipeline that already failed here.                                                                                                                                                                                                                       |
-| Claim full operation/result validation from contract data            | The operation and result type maps are phantom and erased at runtime; the claim would be false.                                                                                                                                                                                                                                        |
-| Copy plugin schema fragments (status quo)                            | No version, ownership, capability guard, dependency order, provenance, or safe removal — two recorded production failures.                                                                                                                                                                                                             |
-| Build a hosted control plane (registry, RBAC, approvals, drift)      | Persistent products with operators, not local primitives; a local kernel exposes stable artifacts and integration events instead.                                                                                                                                                                                                      |
-| Extend the `--allow-slow-types` carve-out to database packages       | It converts an application-local inference problem into permanent framework-wide publish debt.                                                                                                                                                                                                                                         |
+| Alternative                                                          | Why rejected                                                                                                                                                                                                                                                                                                |
+| -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Keep Prisma 7 and add Prisma 8 as an opt-in pilot (issue #313)       | It preserves every seam in Motivation; the current architecture is what a compatibility-first constraint produced.                                                                                                                                                                                          |
+| A one-to-one migration of the current design onto Prisma 8           | Engine-as-identity, the repair pipeline, copied fragments, exit-code results, and Aspire-coupled generation are version-independent.                                                                                                                                                                        |
+| A proprietary NetScript schema DSL lowering to the contract          | A third schema language tracking every native type, index kind, constraint, and default; permanently lagging.                                                                                                                                                                                               |
+| A live `DatabaseGraph` as the public artifact                        | A runtime graph accretes traversal APIs and becomes a lookup surface; the manifest gives every property it was wanted for.                                                                                                                                                                                  |
+| Re-export Prisma from a NetScript package                            | AP-14, the publish constraint, and 138 upstream export keys — it converts Early-Access internals into NetScript public API.                                                                                                                                                                                 |
+| Generated model/query declarations as the universal type source      | Prisma's phantom contract type parameter and an app-local `isolatedDeclarations` scope preserve direct inference for app-authored spaces. The target descriptor is emitted wiring, but generated contract declarations remain bounded to pinned spaces the consumer did not author and publishable exports. |
+| Generated mirror validators (one schema file per model/input/output) | Combinatorially wrong for selection-aware output, and it recreates the repair pipeline that already failed here.                                                                                                                                                                                            |
+| Claim full operation/result validation from contract data            | The operation and result type maps are phantom and erased at runtime; the claim would be false.                                                                                                                                                                                                             |
+| Copy plugin schema fragments (status quo)                            | No version, ownership, capability guard, dependency order, provenance, or safe removal — two recorded production failures.                                                                                                                                                                                  |
+| Build a hosted control plane (registry, RBAC, approvals, drift)      | Persistent products with operators, not local primitives; a local kernel exposes stable artifacts and integration events instead.                                                                                                                                                                           |
+| Extend the `--allow-slow-types` carve-out to database packages       | It converts an application-local inference problem into permanent framework-wide publish debt.                                                                                                                                                                                                              |
 
 ### Market lessons
 
@@ -1358,12 +1410,12 @@ preconditions; and an agreed migration window, legacy release-line end date, and
 
 ### Rollback boundaries
 
-| Point                                                  | Rollback                                                                                                                                                                                                                                                                        | Cost                                                           |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| Before the marker write                                | Delete generated artifacts                                                                                                                                                                                                                                                      | None; nothing was written to any database                      |
-| After markers, before the cutover commit               | Remove the adopted spaces' marker rows **where certified provider marker semantics prove removal is safe and idempotent**; otherwise preserve the marker and move the space to the retained verify-only tombstone state — no binding, plan, or apply until explicit re-adoption | Trivial; markers carry no user data                            |
-| After the cutover commit, before the first new `apply` | Revert the commit                                                                                                                                                                                                                                                               | Repository-only; the database is untouched                     |
-| After the first new `apply`                            | **Forward only** — lineage, provider ledger, receipts                                                                                                                                                                                                                           | Ordinary migration recovery; the receipt names which steps ran |
+| Point                                                  | Rollback                                                                                                                                                                                                                                                                                      | Cost                                                                                        |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Before the marker write                                | Delete generated artifacts                                                                                                                                                                                                                                                                    | None; nothing was written to any database                                                   |
+| After markers, before the cutover commit               | Under the provider lock/fence, append a receipt-backed lifecycle transition carrying previous head/snapshot, reason, and `retained`; preserve the marker as a verify-only tombstone. Remove metadata only where certified provider semantics prove the inverse transition safe and idempotent | Application schema/data are untouched; provider metadata remains auditable                  |
+| After the cutover commit, before the first new `apply` | Revert the repository commit; retain and verify any adoption metadata already written                                                                                                                                                                                                         | Repository rollback only for application code/schema; provider metadata may remain retained |
+| After the first new `apply`                            | **Forward only** — lineage, provider ledger, receipts                                                                                                                                                                                                                                         | Ordinary migration recovery; the receipt names which steps ran                              |
 
 There is deliberately no "run both stacks" rollback: it would require the compatibility layer this
 design refuses and would double the failure surface exactly when the system is least understood.
@@ -1461,6 +1513,7 @@ Natural extensions this architecture enables and this RFC deliberately excludes:
 [rc1-contract-example]: https://github.com/prisma/prisma/blob/v8.0.0-rc.1/examples/prisma-8-demo/prisma/contract.ts
 [rc1-postgres-runtime]: https://github.com/prisma/prisma/blob/v8.0.0-rc.1/packages/3-extensions/postgres/src/runtime/postgres.ts#L96-L110
 [rc1-no-emit]: https://github.com/prisma/prisma/blob/v8.0.0-rc.1/examples/prisma-8-demo/src/prisma-no-emit/context.ts#L11
+[rc1-orm-filter]: https://github.com/prisma/prisma/blob/v8.0.0-rc.1/examples/prisma-8-demo/src/orm-client/get-posts-by-tag-filter.ts
 [rc1-orm-read]: https://github.com/prisma/prisma/blob/v8.0.0-rc.1/examples/prisma-8-demo/src/orm-client/get-user-posts.ts
 [rc1-orm-write]: https://github.com/prisma/prisma/blob/v8.0.0-rc.1/examples/prisma-8-demo/src/orm-client/create-user.ts
 [rc1-space-aggregate]: https://github.com/prisma/prisma/blob/v8.0.0-rc.1/packages/1-framework/3-tooling/migration/src/aggregate/types.ts#L71-L124
