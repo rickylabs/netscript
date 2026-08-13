@@ -6,33 +6,28 @@
 | -------------- | ------------------------------------------------------- |
 | Run ID         | `docs-database-architecture-rfc--prisma-8-rfc`          |
 | Branch         | `docs/database-architecture-rfc`                        |
-| Current phase  | `rfc-authoring`                                         |
+| Current phase  | `final-verification`                                    |
 | Archetype      | Docs-only RFC describing future A1/A4/A3/A2/A2/A6 graph |
 | Scope overlays | `SCOPE-docs.md`                                         |
 
 ## Current State
 
-A clean-break database architecture RFC run is active. Issue #313 is historical evidence; its
-compatibility-first solution is superseded. Native Fable 5 medium PLAN-EVAL cycle 2 session
-`f3286656-7d0f-4da2-a22d-32897a5e6482` passed commit `383170bbc`. Native Claude Code Opus 5 high
-authored an evidence-complete 28,194-word raw draft, pushed as `05e5fbac2`. Opus 5 high
-consolidation session `de518f07-68e0-4f77-9cb5-e59dc3e81ebc` resolved root findings R1–R10 and
-reduced it to 11,205 words. Root read the entire compact RFC, added three narrow correctness fixes,
-and pushed it as `5dfc4e8eb`. Qwen 3.8 Max reviewed that frozen commit without edits and returned
-`PASS_WITH_CHANGES`. Grok 4.6 high then reviewed the same byte-identical RFC without edits and
-returned `PASS_WITH_REFINEMENTS` with zero blockers. QF-01–QF-05 and GR-01–GR-08 remain open. It is
-not finally accepted. After PLAN-EVAL and these reviews, the owner issued `OWNER-DX-01`: D-07/D-08/
-D-36 now require L1 preset/recipe → L2 public factories → L3 native Prisma plus NetScript
-primitives, with source-native app inference preferred over generated type bindings. This is an
-owner override, not a new PLAN-EVAL cycle. Current-main commit `01e096049` remains nonblocking
-CI/gate-tooling drift.
+A clean-break database architecture RFC is at final verification. Issue #313 remains historical
+evidence; its compatibility-first solution is superseded. PLAN-EVAL cycle 2 passed, Opus authored
+and consolidated the draft, Qwen and Grok reviewed it, and the author/editor disposition checkpoint
+was pushed at `ad8effff9`. The owner then removed the length target and stopped every further
+Claude/Fable route. Root resolved the remaining value-flow, binding-evidence, module-order,
+operation-authority, JSR-asset, branded-type, validation, and rollback findings. Existing non-Claude
+TypeScript/API, prospective JSR, and architecture lanes each returned `PASS`; the resulting RFC is
+pushed at `d28d8e779`. Only mechanical verification, run-state bookkeeping, and PR handoff remain.
 
 ## Completed
 
 - Loaded current repository, RFC process, harness, PR, doctrine-navigation, and docs-profile rules.
 - Created an isolated worktree/branch from `origin/main` @ `cd7205293`.
 - Read GitHub issue #313 and its comments through the connected GitHub surface.
-- Selected mandatory PLAN-EVAL and the owner-directed Fable 5 high final refinement override.
+- Selected and completed mandatory PLAN-EVAL; the later planned Fable refinement was superseded by
+  the owner's Claude freeze before it ran.
 - Completed the research corpus, D-01–D-47 lock, prospective JSR audit, and architecture synthesis.
 - Preserved cycle 1 `FAIL_PLAN`, corrected the task finding to 42 keys per generated engine
   workspace, and obtained cycle 2 `PASS`.
@@ -60,22 +55,25 @@ CI/gate-tooling drift.
   `contractJson` from its phantom compile-time contract generic. The audit recommends erased
   `typeof definition` for app-owned contracts and automatic atomic launcher-integrated declarations
   only for W3-proven publish/artifact-only boundaries.
+- Completed author/editor dispositions and pushed `ad8effff9`.
+- Root replaced the impossible extension and binding flows with one configured provider value and a
+  compiler-emitted, canonical-space/snapshot-bound target descriptor; split emission from runtime
+  module loading; unified `emit` authority; corrected branded IDs, examples, validation selection,
+  plugin aggregate transport, and durable retained rollback semantics.
+- TypeScript/API, prospective JSR, and architecture closure lanes all returned `PASS`; root ran
+  targeted formatting, internal-link, whitespace, and fence checks and pushed `d28d8e779`. The
+  consolidated receipt is `reviews/root-semantic-closure.md`.
 
 ## In Progress
 
-- Opus 5 high author/editor dispositions and consolidation, including `OWNER-DX-01` exact API
-  selection and type-boundary proof. The RFC remains frozen at 11,205 words and the run remains in
-  `rfc-authoring`; no QF/GR finding has been dispositioned yet.
+- Final mechanical verification, authoritative run-state update, and PR handoff. No substantive
+  model route remains active.
 
 ## Next Steps
 
-1. Use Opus 5 high for author/editor disposition of every QF/GR finding, integrate `OWNER-DX-01`,
-   choose the exact layered API, and state how W3 proves direct inference versus fallback while
-   consolidating to at most 10,000 words. Preserve Qwen's must-not-cut contracts; Grok projects a
-   net approximately 1,040–1,200-word cut plus another safe approximately 80 words if needed.
-2. Root checks the consolidated result.
-3. Run one final Fable 5 high substantive refinement.
-4. Run mechanical checks only, then commit/push and update the PR trail.
+1. Run the final mechanical format/link/diff and repository-status checks.
+2. Commit and push the run-state/handoff gate.
+3. Update draft PR #1640 with the semantic and verification checkpoints; request owner review.
 
 ## Key Decisions
 
@@ -86,37 +84,39 @@ CI/gate-tooling drift.
 | Exact future package graph     | Plan lock       | A1 contract → A4 definition → A3 runtime → A2 control → A2 Prisma PostgreSQL adapter → A6 testkit. |
 | Layered database adoption      | Owner override  | L1 preset/recipe uses L2 factories; L3 is native Prisma plus NetScript primitives/ports.           |
 | App type flow                  | Owner override  | Erased `typeof definition` first; automatic atomic declaration only at a W3-proven boundary.       |
-| Fable 5 high is last           | Owner directive | Final gate includes refinement, not only critique.                                                 |
+| No further Claude/Fable usage  | Owner directive | Supersedes the planned final Fable gate; existing evidence remains historical.                     |
+| Content, not a word target     | Owner directive | Consolidation serves clarity; length is not an acceptance metric.                                  |
 
 ## Files Changed
 
 | Path                                                      | Status | Notes                                   |
 | --------------------------------------------------------- | ------ | --------------------------------------- |
 | `.llm/runs/docs-database-architecture-rfc--prisma-8-rfc/` | new    | Harness provenance and resumable state. |
+| `rfcs/0000-database-architecture.md`                      | new    | Canonical RFC; semantic closure pushed. |
 
 ## Gates
 
-| Gate family | Current status | Evidence                                              |
-| ----------- | -------------- | ----------------------------------------------------- |
-| Static      | PASS           | Compact RFC fmt, `docs:links`, diff.                  |
-| Fitness     | owner override | Cycle 2 PASS; D-01–D-47 plus post-eval `OWNER-DX-01`. |
-| Runtime     | N/A            | Docs-only RFC run.                                    |
-| Consumer    | changes open   | Qwen/Grok reviews complete; Opus dispositions next.   |
+| Gate family | Current status | Evidence                                                                |
+| ----------- | -------------- | ----------------------------------------------------------------------- |
+| Static      | PASS           | RFC format, `docs:links`, diff, balanced fences at semantic checkpoint. |
+| Fitness     | PASS           | D-01–D-47, OWNER-DX-01, and three final closure audits.                 |
+| Runtime     | N/A            | Docs-only RFC; future matrices are explicit implementation gates.       |
+| Consumer    | PASS           | TypeScript/API, JSR, and architecture closure all passed `d28d8e779`.   |
 
 ## Open Questions
 
 - No must-resolve-now architecture decision remains; pre-implementation decisions stay assigned to
   their W1/W3/W4/W5/W7/W10 gates. W3 now includes direct-erasure and automatic-fallback proof.
-- QF-01–QF-05 are review findings, not reopened architecture decisions; they await author/editor
-  disposition together with GR-01–GR-08.
-- Exact L1/L2 API spelling is an Opus author/editor task under the owner override; it may not add a
-  mirrored Prisma schema/query DSL or change the six-package graph.
+- No review blocker/high remains. RFC implementation-time questions stay assigned to their
+  W1/W3/W4/W5/W7/W10 gates and do not reopen the architecture.
 
 ## Drift and Debt
 
-- Drift: #313 compatibility-first architecture is superseded; final-gate effort is owner-overridden.
+- Drift: #313 compatibility-first architecture is superseded; the planned final Fable gate and
+  length target are superseded by the latest owner directives.
 - Debt: pending targeted ledger scan.
 
 ## Commits
 
+- Semantic review closure: `d28d8e779` (pushed).
 - See the draft PR's commit list + per-slice PR comments (V3 retired `commits.md`).

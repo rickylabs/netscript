@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------------------- |
 | Run ID         | `docs-database-architecture-rfc--prisma-8-rfc`                |
 | Branch         | `docs/database-architecture-rfc`                              |
-| Phase          | `rfc-authoring`                                               |
+| Phase          | `final-verification`                                          |
 | Archetype      | Docs-only RFC describing future A1/A2/A3/A4/A5/A6 surfaces    |
 | Scope overlays | `SCOPE-docs.md`; future packages use their archetype matrices |
 
@@ -16,10 +16,12 @@ The Design checkpoint is **locked and evaluator-approved**. Cycle 1 returned `FA
 because the copied generated-workspace task count was factually wrong; evaluator execution found 42
 `db:*` keys per workspace for all four providers. After correction, native Fable 5 medium cycle 2
 session `f3286656-7d0f-4da2-a22d-32897a5e6482` evaluated commit `383170bbc` and returned `PASS`.
-Canonical RFC authorship is unblocked. The consolidated draft is accepted for focused review but is
-not finally accepted; no further PLAN-EVAL cycle is planned. After cycle 2, the owner issued
-`OWNER-DX-01`, overriding D-07/D-08/D-36 to require layered adoption and source-native app inference
-by default. This is not a new PLAN-EVAL cycle and leaves the exact six-package graph intact.
+Canonical RFC authorship is complete and no further PLAN-EVAL cycle is planned. After cycle 2, the
+owner issued `OWNER-DX-01`, overriding D-07/D-08/D-36 to require layered adoption and source-native
+app inference by default. The author/editor checkpoint landed at `ad8effff9`; root then closed the
+remaining semantic findings, and three non-Claude lanes passed the result at `d28d8e779`. The owner
+removed the length target and stopped all further Claude/Fable usage. Only mechanical verification
+and handoff remain; the exact six-package graph is unchanged.
 
 ### Public Surface and Package Graph
 
@@ -27,11 +29,11 @@ by default. This is not a new PLAN-EVAL cycle and leaves the exact six-package g
 - `@netscript/database-contract` (A1): plain identities, manifest/plan/receipt/diagnostic schemas,
   capabilities, ownership, and shared small SPIs; zero provider dependencies.
 - `@netscript/database` (A4): L1 preset/recipe, the L2 `defineDatabase`/target/space/policy
-  factories it uses, and the pure deterministic manifest compiler.
+  factories it uses, deterministic resolution, and compile/emit through an explicit publisher.
 - `@netscript/database-runtime` (A3): process/request lifecycle, connection ownership,
   health/readiness, cancellation, and validation coordination.
-- `@netscript/database-control` (A2): programmatic operation catalog, emit/preview/plan/apply/
-  verify/inspect, provider ports, locks, receipts, recovery, and cross-target saga.
+- `@netscript/database-control` (A2): preview/inspect/plan/apply/verify, policy, provider ports,
+  locks, receipts, recovery, and cross-target saga; it does not own compile/emit.
 - `@netscript/database-prisma-postgres` (A2): experimental/certified provider and sole framework
   Prisma runtime/control boundary; no Prisma re-export.
 - `@netscript/database-testkit` (A6): runnable provider/space conformance only if a binary is
@@ -106,7 +108,7 @@ outcome is inspected before resume; cross-target atomicity is never claimed.
 | 4 | Cutover/waves/conformance/risks/market completion.                        | Migration safety, claim trace, docs gates.               | RFC plus run context/worklog.                                     |
 | 5 | Root, Qwen focused, and Grok whole-RFC reviews complete.                  | Review receipts; no undispositioned critical/high.       | RFC plus review/run artifacts.                                    |
 | 6 | Author/editor dispositions complete.                                      | Finding ledger closed; decision/contradiction trace.     | RFC plus review/run artifacts.                                    |
-| 7 | Absolute final Fable 5 high refinement and publish handoff.               | Fable substantive gate, then mechanical checks only.     | RFC/final run/handoff artifacts.                                  |
+| 7 | Root semantic closure, three non-Claude passes, and publish handoff.      | Closure verdicts, then mechanical checks only.           | RFC/final run/handoff artifacts.                                  |
 
 ### Prospective JSR Verdict
 
@@ -166,6 +168,9 @@ and release exits recorded in `plan.md`.
 | 2026-08-13 | 5     | qwen-review | Qwen 3.8 Max session `3d1277dd-be6a-44af-9e98-4560d8aaf1b7` reviewed frozen commit `5dfc4e8eb` at effort `max`, returned 2,181 words and `PASS_WITH_CHANGES`, made no edits, and opened QF-01 high, QF-02 medium, and QF-03–QF-05 low. Four substantive axes passed; TypeScript/API and package/dependency examples need disposition.          |
 | 2026-08-13 | 5     | grok-review | OpenCode/OpenRouter requested and observed `x-ai/grok-4.6` variant `high`, session `ses_003644aeaffeSm3UCAW9xUqRIK`, against RFC commit `5dfc4e8eb` and byte-identical blob `f46040d8...` while HEAD was `be83301c6`. It used no subagents, made no edits, and returned `PASS_WITH_REFINEMENTS`, zero blockers, and GR-01–GR-08.               |
 | 2026-08-13 | 6     | owner-dx    | `OWNER-DX-01` audited shipped service/Hono preset→factory→native primitives, SDK/Fresh analogues, and Prisma's runtime `contractJson` plus phantom compile-time contract split. Owner overrode D-07/D-08/D-36 after PLAN-EVAL: source-native app inference is default; automatic declarations are a bounded W3 fallback. No new PLAN-EVAL.     |
+| 2026-08-13 | 6     | disposition | The author/editor pass resolved QF/GR and OWNER-DX-01 findings; root's correction pass was committed and pushed as `ad8effff9`.                                                                                                                                                                                                                |
+| 2026-08-13 | 7     | owner-gate  | Owner removed word-count acceptance criteria and froze all further Claude/Fable usage. Existing completed sessions remain provenance only; no planned final Fable session ran.                                                                                                                                                                 |
+| 2026-08-13 | 7     | closure     | Root corrected executable extension transport, canonical space/snapshot binding evidence, emit/load ordering, compile/emit authority, branded IDs, validation projection honesty, package aggregate transport, and retained rollback. TypeScript/API, prospective JSR, and architecture lanes all returned `PASS`; `d28d8e779` was pushed.     |
 
 ### RFC Consolidation and Root Acceptance
 
@@ -187,19 +192,16 @@ OpenRouter requested and observed `qwen/qwen3.8-max` at effort `max`, model sess
 Schema boundary, control/recovery, migration/plugin safety, and market/upstream claims passed. The
 narrow failures were TypeScript/API examples and one package/dependency example.
 
-Open findings, pending author/editor disposition:
+Dispositioned findings:
 
-- **QF-01 high:** generated-binding example uses ambient declarations as runtime values.
-- **QF-02 medium:** extension-bundle authoring can violate the adapter-only runtime/control import
-  law.
-- **QF-03 low:** unbound values and elisions undermine the executable-as-written claim.
-- **QF-04 low:** Prisma source-path attribution needs correction or qualification.
-- **QF-05 low:** codec parameter validation is conflated with three conversion representations.
+- **QF-01:** closed by the compiler-emitted target descriptor carrying real manifest/snapshot
+  values.
+- **QF-02:** closed by registering one extension value on the configured provider before authoring.
+- **QF-03:** closed by explicit complete-module/excerpt status and bound example imports.
+- **QF-04/QF-05:** closed by pinned API attribution and the runtime/JSON validation boundary.
 
-Qwen also supplied an approximately 1,240-word deletion ledger projecting an approximately
-9,965-word RFC while naming must-not-cut contracts. It is editorial input, not authorization to
-remove load-bearing semantics. The canonical RFC remains frozen at 11,205 words; no disposition,
-edit, or final acceptance occurred.
+Qwen also supplied a deletion ledger. It remains historical editorial input, not authorization to
+remove load-bearing semantics; the owner later removed length as an acceptance criterion.
 
 ### Grok Whole-RFC Adversarial Review
 
@@ -210,23 +212,18 @@ edits, and returned `PASS_WITH_REFINEMENTS` with zero blockers. Axes 2, 3, 4, an
 abstraction, axis 5 public API/DX/types, and axis 7 economy failed narrowly while the architecture
 stood.
 
-Open refinements for Opus author/editor disposition:
+Dispositioned refinements:
 
-- **GR-01:** use real generated binding values, overlapping QF-01.
-- **GR-02:** put opaque control/runtime extension facets under extension-pack/adapter ownership,
-  overlapping QF-02.
-- **GR-03:** bind queries, validators, and hashes per target/per space; never merge a Prisma
-  `AppContract`.
-- **GR-04:** make pure compose/compile authority consistent with control wording.
-- **GR-05:** distinguish adopted manage-forward objects from detach-retained verify-only tombstones.
-- **GR-06:** specify space → target → run outcome rollup explicitly.
-- **GR-07:** show a configured provider factory and remove executable-example elisions.
-- **GR-08:** perform net consolidation and resolve QF-04/QF-05.
+- **GR-01–GR-03:** closed by the emitted canonical-space/snapshot descriptor and configured provider
+  value; Prisma contract spaces remain disjoint.
+- **GR-04:** closed by making catalog/CLI `emit` the sole projection of `compileDatabase` with an
+  explicit publisher; `DatabaseControl` has no competing method.
+- **GR-05–GR-06:** closed by durable receipt-backed retained transitions and total outcome rollup.
+- **GR-07–GR-08:** closed by the provider module, honest excerpt markers, source corrections, and
+  consolidation that preserved content over a numeric length target.
 
-Grok's deletion ledger estimates approximately 1,180 words removed and 140 added, net approximately
-1,040–1,200 words removed, landing around 10,000–10,160 words; it identifies another safe
-approximately 80-word cut to cross 10,000. The RFC remains frozen at 11,205 words until Opus applies
-all QF/GR dispositions. This gate is not final acceptance.
+Grok's deletion ledger remains historical editorial input. QF/GR dispositions are complete; the
+owner's later direction makes content and clarity, not a numeric length, the acceptance criterion.
 
 ### PLAN-EVAL Cycle 1
 
@@ -261,24 +258,27 @@ CI/gate-tooling drift that changes structured check invocation rather than datab
 | Provider-neutral kernel, PostgreSQL-only first adapter        | Matches Prisma maturity without compatibility fallback or false portability.                                                  | Prisma scorecard/source + D-10/D-11/D-34 |
 | NetScript operational semantics, provider migration mechanics | NetScript owns policy/locks/recovery/receipts/saga while provider owns diff/lineage/marker.                                   | Market/source reconciliation + D-27–D-30 |
 | PLAN-EVAL before RFC                                          | Architecture has no open must-resolve item but still requires independent acceptance.                                         | Harness Plan-Gate + D-01–D-47            |
-| Fable 5 high remains last substantive gate                    | Explicit owner exception; no substantive model review follows it.                                                             | Owner directive                          |
+| No further Claude/Fable route                                 | Latest owner directive supersedes the planned final Fable gate; completed evidence remains historical.                        | Owner directive                          |
+| No numeric RFC length gate                                    | Content and clarity govern acceptance; consolidation is not a word-count exercise.                                            | Owner directive                          |
 
 ## Drift
 
 | Drift                                                        | Severity      | Logged in drift.md |
 | ------------------------------------------------------------ | ------------- | ------------------ |
 | #313 compatibility-first plan is no longer authoritative     | architectural | yes                |
-| Fable 5 high is the owner-directed final refinement gate     | significant   | yes                |
+| Planned final Fable refinement was cancelled by owner        | significant   | run-state override |
+| Word-count target was removed by owner                       | significant   | run-state override |
 | `origin/main` advanced by CI/gate-tooling commit `01e096049` | nonblocking   | plan-eval evidence |
 
 ## Gate Results
 
 ### Static Gates
 
-| Gate           | Command or check                                | Result | Notes                                                 |
-| -------------- | ----------------------------------------------- | ------ | ----------------------------------------------------- |
-| Bootstrap diff | `git diff --check`; targeted `deno fmt --check` | PASS   | Six required run artifacts are present and formatted. |
-| Compact RFC    | Targeted fmt; `docs:links`; `git diff --check`  | PASS   | Commit `5dfc4e8eb`; 11,205 words and R1–R10 resolved. |
+| Gate           | Command or check                                       | Result | Notes                                                   |
+| -------------- | ------------------------------------------------------ | ------ | ------------------------------------------------------- |
+| Bootstrap diff | `git diff --check`; targeted `deno fmt --check`        | PASS   | Six required run artifacts are present and formatted.   |
+| Compact RFC    | Targeted fmt; `docs:links`; `git diff --check`         | PASS   | Commit `5dfc4e8eb`; 11,205 words and R1–R10 resolved.   |
+| Semantic RFC   | Targeted fmt; `docs:links`; `git diff --check`; fences | PASS   | Commit `d28d8e779`; final blocker/high findings closed. |
 
 ### Fitness Gates
 
@@ -288,8 +288,11 @@ CI/gate-tooling drift that changes structured check invocation rather than datab
 | Open-decision sweep          | PASS_OWNER_OVERRIDE   | D-01–D-47 plus `OWNER-DX-01`                                       | No must-resolve-now item; D-07/D-08/D-36 updated without changing package boundaries. |
 | Prospective JSR audit        | PASS_AS_PLANNED       | `research/planned-jsr-audit.md`                                    | New-package dry-run/docs/packed/canary gates are N/A until implementation, not PASS.  |
 | PLAN-EVAL                    | PASS_CYCLE_2          | `plan-eval.md`; session `f3286656-7d0f-4da2-a22d-32897a5e6482`     | Commit `383170bbc`; no further Plan-Eval cycle.                                       |
-| Qwen focused RFC review      | PASS_WITH_CHANGES     | Session `3d1277dd-be6a-44af-9e98-4560d8aaf1b7`; commit `5dfc4e8eb` | Five findings remain open; review made no edits.                                      |
-| Grok whole-RFC review        | PASS_WITH_REFINEMENTS | Session `ses_003644aeaffeSm3UCAW9xUqRIK`; blob `f46040d8...`       | Zero blockers; GR-01–GR-08 await disposition.                                         |
+| Qwen focused RFC review      | PASS_WITH_CHANGES     | Session `3d1277dd-be6a-44af-9e98-4560d8aaf1b7`; commit `5dfc4e8eb` | Five findings were later dispositioned; review made no edits.                         |
+| Grok whole-RFC review        | PASS_WITH_REFINEMENTS | Session `ses_003644aeaffeSm3UCAW9xUqRIK`; blob `f46040d8...`       | Zero blockers; GR-01–GR-08 were later dispositioned.                                  |
+| TypeScript/API closure       | PASS                  | `reviews/root-semantic-closure.md`; `d28d8e779`                    | Extension, binding, loading, branded ID, validation and examples closed.              |
+| Prospective JSR closure      | PASS                  | `reviews/root-semantic-closure.md`; `d28d8e779`                    | Static aggregate module plus cold-remote/network-disabled gate closed the last high.  |
+| Architecture closure         | PASS                  | `reviews/root-semantic-closure.md`; `d28d8e779`                    | D-01–D-47, OWNER-DX-01, package graph and four prior findings closed.                 |
 
 ### Runtime Gates
 
@@ -299,10 +302,10 @@ CI/gate-tooling drift that changes structured check invocation rather than datab
 
 ### Consumer Gates
 
-| Consumer               | Result                        | Evidence                                                      | Notes                                               |
-| ---------------------- | ----------------------------- | ------------------------------------------------------------- | --------------------------------------------------- |
-| PLAN-EVAL reader       | PASS                          | `plan-eval.md`, corrected research/plan, synthesis and audits | Cycle 2 accepted the locked plan.                   |
-| RFC reader/implementer | REVIEWS_COMPLETE_CHANGES_OPEN | Frozen RFC `5dfc4e8eb`; Qwen/Grok receipts                    | QF-01–QF-05 and GR-01–GR-08 await Opus disposition. |
+| Consumer               | Result | Evidence                                                      | Notes                                                                |
+| ---------------------- | ------ | ------------------------------------------------------------- | -------------------------------------------------------------------- |
+| PLAN-EVAL reader       | PASS   | `plan-eval.md`, corrected research/plan, synthesis and audits | Cycle 2 accepted the locked plan.                                    |
+| RFC reader/implementer | PASS   | RFC `d28d8e779`; Qwen/Grok plus three closure verdicts        | No blocker/high finding remains; implementation gates stay explicit. |
 
 ## Handoff Notes
 
@@ -311,10 +314,8 @@ CI/gate-tooling drift that changes structured check invocation rather than datab
   explicit later owner override, not an evaluator rerun.
 - Prospective package publishability is `PASS-AS-PLANNED`; actual JSR commands remain N/A until
   packages exist and must produce implementation/release receipts later.
-- The consolidated RFC remains frozen at `5dfc4e8eb` and 11,205 words. Qwen returned
-  `PASS_WITH_CHANGES`; Grok returned `PASS_WITH_REFINEMENTS` and zero blockers. All QF/GR findings
-  and both deletion ledgers await disposition.
-- Continue the owner-locked order: Opus 5 high author/editor dispositions plus consolidation to at
-  most 10,000 words, including exact layered API selection and proof of the source-native/fallback
-  boundary; root checks, one final Fable 5 high substantive refinement, and mechanical checks only.
-  The current checkpoint is not final acceptance.
+- Qwen returned `PASS_WITH_CHANGES`; Grok returned `PASS_WITH_REFINEMENTS`. Author/editor and root
+  dispositions are complete, and three final non-Claude closure audits passed `d28d8e779`.
+- The owner removed the word-count gate and stopped all Claude/Fable usage. Do not launch or resume
+  any such route. Only mechanical run-state verification, commit/push, PR update, and owner review
+  remain.

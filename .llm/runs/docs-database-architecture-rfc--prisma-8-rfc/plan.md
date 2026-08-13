@@ -7,8 +7,8 @@
 | Run ID              | `docs-database-architecture-rfc--prisma-8-rfc`                                                                       |
 | Branch              | `docs/database-architecture-rfc`                                                                                     |
 | Baseline            | `origin/main@cd720529333328bcba5e1a308ce7632f4350efdf`                                                               |
-| Phase               | `rfc-authoring`                                                                                                      |
-| Target              | `rfcs/0000-database-architecture.md` plus harness provenance; authorship is unblocked but not yet complete           |
+| Phase               | `final-verification`                                                                                                 |
+| Target              | `rfcs/0000-database-architecture.md` plus harness provenance; semantic closure is pushed at `d28d8e779`              |
 | Current changeset   | Documentation/RFC under `SCOPE-docs.md`                                                                              |
 | Future architecture | A1 contract, A2 control/provider integrations, A3 runtime, A4 definition/plugin DSL, A5 thin plugins, A6 testkit/CLI |
 
@@ -39,8 +39,10 @@ RFC premise invalidated, and the existing fresh-pin drift watch remains sufficie
 After that pass, the owner issued `OWNER-DX-01`: the accepted architecture must expose NetScript's
 existing layered adoption pattern and must not assume generated app type bindings are inevitable.
 This is an explicit owner override to D-07/D-08/D-36, not a new PLAN-EVAL cycle; no further
-PLAN-EVAL will run. The Opus author/editor pass owns exact API selection and the source-native
-versus fallback type-boundary proof while keeping the RFC at or below 10,000 words.
+PLAN-EVAL will run. The completed author/editor pass selected the layered API and source-native
+versus fallback type boundary. The owner subsequently removed every word-count acceptance target and
+stopped all further Claude/Fable usage. Root applied the remaining semantic corrections, and three
+non-Claude closure lanes passed the resulting RFC at `d28d8e779`.
 
 ## Scope
 
@@ -370,11 +372,12 @@ marker cleanup where supported. After apply, recovery is forward via lineage and
 | 4 | RFC completes adoption/cutover, implementation waves, exhaustive conformance/release matrix, market implications, risks, and kill/switch criteria. | Requirement/decision trace, migration safety, claim/source audit, docs gates.                     | Same RFC plus run context/worklog.                                                      |
 | 5 | Root personal review, Qwen 3.8 Max focused review, and Grok 4.6 high whole-RFC adversarial review complete.                                        | Review receipts, source audit, and no undispositioned critical/high finding.                      | RFC plus review/run artifacts.                                                          |
 | 6 | Author/editor dispositions resolve every actionable post-draft finding and preserve D-01–D-47.                                                     | Finding ledger closed or reasoned decline; contradiction and decision trace rerun.                | RFC plus review/run artifacts.                                                          |
-| 7 | Owner-directed Fable 5 high performs the absolute final substantive refinement; publish the final review state.                                    | Fable refinement, docs static checks only afterward, commit/push/PR trail.                        | RFC and final run/handoff artifacts.                                                    |
+| 7 | Root closes the final semantic findings, obtains non-Claude TypeScript/JSR/architecture closure, and publishes the final review state.             | Three closure verdicts `PASS`; docs static checks, commit/push/PR trail.                          | RFC and final run/handoff artifacts.                                                    |
 
-There are eight ordered slices, below the Plan-Gate limit. The canonical RFC does not exist before
-Slice 2 passes. Fable 5 high is the last substantive model gate; only mechanical static verification
-may follow.
+There are eight ordered slices, below the Plan-Gate limit. The canonical RFC did not exist before
+Slice 2 passed. The owner superseded the planned Fable gate after Slice 6 and froze every Claude
+route; Slice 7 therefore ends with root-authored corrections and independent non-Claude closure.
+Only mechanical static verification and run-state bookkeeping follow.
 
 ## Gate Set
 
@@ -443,8 +446,10 @@ packed install cannot substitute for the remote-graph verdict.
 3. Qwen 3.8 Max focused post-draft review.
 4. Grok 4.6 high whole-RFC adversarial review.
 5. Author/editor dispositions for every actionable finding.
-6. One Fable 5 high final in-place refinement as the absolute last substantive gate.
-7. Mechanical format/link/diff checks, commit/push, and PR handoff only.
+6. Owner supersession: remove the length target and stop every further Claude/Fable route.
+7. Root semantic closure, then independent TypeScript/API, prospective JSR, and architecture passes
+   through the existing non-Claude lanes.
+8. Mechanical format/link/diff checks, commit/push, and PR handoff only.
 
 ## Risk Register
 

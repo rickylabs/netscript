@@ -13,17 +13,17 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 | Baseline | `origin/main` @ `cd720529333328bcba5e1a308ce7632f4350efdf` (2026-08-13)              |
 | Run ID   | `docs-database-architecture-rfc--prisma-8-rfc`                                       |
 
-## Routes in force
+## Routes used and final disposition
 
-| Task lane                             | Provider / model / effort               | Role in this run                                                             |
-| ------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------- |
-| `planning_decisions`                  | OpenAI · Codex · GPT-5 family · high    | Root research coordinator and RFC generator in the active user session       |
-| owner-directed architecture deep dive | Anthropic · Claude Code · Opus 5 · high | Fresh independent architecture/API review with optional native workflows     |
-| `deep_analysis`                       | Anthropic · Fable 5 · medium            | Architecture decision analysis when the native agentic route is available    |
-| `formal_plan_evaluation`              | Anthropic · Fable 5 · medium            | Fresh opposite-family PLAN-EVAL before the RFC file is authored              |
-| focused post-draft RFC review         | OpenRouter · Qwen 3.8 Max · max         | Focused review after the root's complete-draft personal review               |
-| owner-directed adversarial RFC review | OpenCode · OpenRouter · Grok 4.6 · high | Post-draft attack on portability, migration safety, trust, and abstraction   |
-| owner-directed final refinement       | Anthropic · Fable 5 · high              | Absolute final review-and-refinement gate after every other substantive gate |
+| Task lane                             | Provider / model / effort               | Role in this run                                                           |
+| ------------------------------------- | --------------------------------------- | -------------------------------------------------------------------------- |
+| `planning_decisions`                  | OpenAI · Codex · GPT-5 family · high    | Root research coordinator and RFC generator in the active user session     |
+| owner-directed architecture deep dive | Anthropic · Claude Code · Opus 5 · high | Fresh independent architecture/API review with optional native workflows   |
+| `deep_analysis`                       | Anthropic · Fable 5 · medium            | Architecture decision analysis when the native agentic route is available  |
+| `formal_plan_evaluation`              | Anthropic · Fable 5 · medium            | Fresh opposite-family PLAN-EVAL before the RFC file is authored            |
+| focused post-draft RFC review         | OpenRouter · Qwen 3.8 Max · max         | Focused review after the root's complete-draft personal review             |
+| owner-directed adversarial RFC review | OpenCode · OpenRouter · Grok 4.6 · high | Post-draft attack on portability, migration safety, trust, and abstraction |
+| owner-directed final refinement       | Anthropic · Fable 5 · high              | **Cancelled before launch** by the latest owner Claude freeze              |
 
 ## Delegated research and synthesis lanes
 
@@ -35,8 +35,8 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 | `/root/architecture_plan_synthesis` | OpenAI · GPT-5.6 Sol · high | Plan-Gate synthesis plus repository-grounded `OWNER-DX-01` audit | Complete |
 | `/root/planned_jsr_audit`           | OpenAI · GPT-5.6 Sol · high | Prospective publishability/slow-type review of the planned graph | Complete |
 
-These lanes are independent research/synthesis inputs. None is the formal PLAN-EVAL or the
-owner-directed final Fable refinement.
+These lanes are independent research/synthesis inputs. The three existing non-Claude lanes also
+performed the final read-only closure checks; no new lane and no Claude/Fable route was launched.
 
 ## Formal plan evaluation
 
@@ -50,10 +50,10 @@ research/synthesis lanes. Its only required fix was the copied claim of 30 gener
 evaluator execution of `generateDatabaseDenoJson` established 42 keys per generated engine workspace
 for PostgreSQL, SQLite, MySQL, and MSSQL. `research.md`, the architecture synthesis, and `plan.md`
 now carry the executed result and disposition Qwen F3 as an incorrect correction; independent model
-reports and briefs remain immutable evidence. Cycle 2 passed at `383170bbc`; the phase is now
-`rfc-authoring`, canonical RFC authorship is unblocked but incomplete, and no further PLAN-EVAL
-cycle is requested. Cycle 2 also classified current-main `01e096049` as nonblocking CI/gate-tooling
-drift and independently confirmed 42 generated `db:*` keys per engine workspace.
+reports and briefs remain immutable evidence. Cycle 2 passed at `383170bbc` and unblocked RFC
+authorship; no further PLAN-EVAL cycle is requested. The current phase is `final-verification` after
+semantic closure at `d28d8e779`. Cycle 2 also classified current-main `01e096049` as nonblocking
+CI/gate-tooling drift and independently confirmed 42 generated `db:*` keys per engine workspace.
 
 After cycle 2, `OWNER-DX-01` explicitly overrode D-07/D-08/D-36. It requires the shipped NetScript
 L1 preset/recipe → L2 public factories → L3 native-framework/primitives progression and prefers an
@@ -63,42 +63,35 @@ decisions remain locked, and no further PLAN-EVAL will run.
 
 ## RFC authoring and consolidation
 
-| Stage                 | Route / model / effort                       | Session                                | Result                                                                                           |
-| --------------------- | -------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Raw draft             | Native Claude Code · Opus 5 · high           | `105f7bbd-895d-4dcd-8641-6768c6e076c8` | 28,194-word evidence-complete draft pushed as `05e5fbac2`; root requested consolidation.         |
-| Consolidation         | Native Claude Code · Opus 5 · high           | `de518f07-68e0-4f77-9cb5-e59dc3e81ebc` | R1–R10 resolved; 11,205-word compact RFC committed and pushed as `5dfc4e8eb`.                    |
-| Root review           | Codex supervisor · personal full read        | `019ffbc7-133b-7852-905d-53a163fe9819` | `PASS_TO_FOCUSED_REVIEW`; Qwen 3.8 Max is next, but final acceptance has not been granted.       |
-| Qwen focused review   | OpenRouter · `qwen/qwen3.8-max` · max        | `3d1277dd-be6a-44af-9e98-4560d8aaf1b7` | Commit `5dfc4e8eb`; 2,181 words, no edits, `PASS_WITH_CHANGES`; QF-01–QF-05 open.                |
-| Grok whole-RFC review | OpenCode/OpenRouter · `x-ai/grok-4.6` · high | `ses_003644aeaffeSm3UCAW9xUqRIK`       | Commit `5dfc4e8eb`, blob `f46040d8...`; no subagents/edits; `PASS_WITH_REFINEMENTS`, 0 blockers. |
+| Stage                    | Route / model / effort                       | Session                                | Result                                                                                           |
+| ------------------------ | -------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Raw draft                | Native Claude Code · Opus 5 · high           | `105f7bbd-895d-4dcd-8641-6768c6e076c8` | 28,194-word evidence-complete draft pushed as `05e5fbac2`; root requested consolidation.         |
+| Consolidation            | Native Claude Code · Opus 5 · high           | `de518f07-68e0-4f77-9cb5-e59dc3e81ebc` | R1–R10 resolved; 11,205-word compact RFC committed and pushed as `5dfc4e8eb`.                    |
+| Root review              | Codex supervisor · personal full read        | `019ffbc7-133b-7852-905d-53a163fe9819` | `PASS_TO_FOCUSED_REVIEW`; Qwen 3.8 Max is next, but final acceptance has not been granted.       |
+| Qwen focused review      | OpenRouter · `qwen/qwen3.8-max` · max        | `3d1277dd-be6a-44af-9e98-4560d8aaf1b7` | Commit `5dfc4e8eb`; 2,181 words, no edits, `PASS_WITH_CHANGES`; QF-01–QF-05 open.                |
+| Grok whole-RFC review    | OpenCode/OpenRouter · `x-ai/grok-4.6` · high | `ses_003644aeaffeSm3UCAW9xUqRIK`       | Commit `5dfc4e8eb`, blob `f46040d8...`; no subagents/edits; `PASS_WITH_REFINEMENTS`, 0 blockers. |
+| Author/editor checkpoint | Native Claude Code · Opus 5 · high           | completed session recorded in worklog  | Root corrections applied and pushed as `ad8effff9`; no later Claude use.                         |
+| Root semantic closure    | Codex supervisor + existing non-Claude lanes | current root session                   | TypeScript/API, JSR, and architecture verdicts `PASS`; pushed as `d28d8e779`.                    |
 
 Before commit `5dfc4e8eb`, root added three narrow corrections: runtime consumes the compiled
 `DatabaseManifest`, not `DatabaseDefinition`; the authority table distinguishes each artifact and
-value's role; and `partial-success` requires mixed successful and unsuccessful target outcomes.
-Targeted formatting, `docs:links`, and diff checks passed. The phase remains `rfc-authoring`. The
-preferred final target remains at most 10,000 words where further cuts preserve decision and API
-clarity.
+value's role; and `partial-success` requires mixed successful and unsuccessful target outcomes. The
+later author/editor and root closure passes resolved all blocker/high findings without changing the
+package graph. The phase is `final-verification`; length is not an acceptance gate.
 
 The Qwen focused review passed architecture/type model, Standard Schema boundary, control/recovery,
-migration/plugin safety, and market/upstream claims. Its narrow failures affect TypeScript/API
-examples and one package/dependency example. QF-01 is high, QF-02 medium, and QF-03–QF-05 low. Its
-approximately 1,240-word deletion ledger projects approximately 9,965 words while naming
-must-not-cut contracts. The RFC remains frozen at 11,205 words until Grok review and Opus
-author/editor disposition; this is not final acceptance.
+migration/plugin safety, and market/upstream claims. Its QF-01–QF-05 findings are dispositioned in
+the author/editor/root passes; its deletion ledger remains historical editorial input.
 
 The Grok review ran against current HEAD `be83301c6` while proving the RFC blob byte-identical to
-commit `5dfc4e8eb`. Axes 2, 3, 4, and 6 passed. Abstraction, public API/DX/types, and economy failed
-narrowly through GR-01–GR-08; the architecture stands. The deletion ledger estimates approximately
-1,180 words deleted and 140 added, net approximately 1,040–1,200 removed, landing around
-10,000–10,160 with another safe approximately 80-word cut. The RFC remains frozen at 11,205 words
-pending Opus dispositions; this is not final acceptance.
+commit `5dfc4e8eb`. Axes 2, 3, 4, and 6 passed. GR-01–GR-08 are dispositioned; its deletion ledger
+is historical editorial input, not a gate.
 
 The subsequent `OWNER-DX-01` audit is recorded in `research/layered-dx-api-audit.md`. It inspected
 the defining service/Hono preset, builder, and native primitives; SDK/Fresh analogues; and pinned
-Prisma's runtime `contractJson` plus phantom compile-time contract split. Opus remains the
-author/editor responsible for selecting the exact layered API and expressing the W3 proof/fallback
-boundary while reducing the RFC to at most 10,000 words. The default is source-native app inference
-with runtime manifest/artifact consumption; automatic atomic launcher-integrated declarations are
-reserved for proved publish/artifact-only boundaries.
+Prisma's runtime `contractJson` plus phantom compile-time contract split. The final RFC selects that
+layered API, source-native app inference, and bounded artifact-only declarations; its emitted target
+descriptor couples both evidence tracks to canonical runtime snapshot identities.
 
 ## Recorded lane/eval overrides
 
@@ -113,9 +106,9 @@ reserved for proved publish/artifact-only boundaries.
   `3f8a9a69-5589-4b91-9a32-91f7770fe7c2`, PID `1944525`, worktree matched, native UI reported “Opus
   5 with high effort · Claude Max.” The session immediately exposed four internal agents; their
   roles/identities must be recorded in its report.
-- The owner explicitly requires Fable 5 **high**, not merely an adversarial review, as the final
-  refinement gate. That owner directive overrides the ordinary `docs_polish` Fable-medium effort for
-  this run. No substantive model gate may follow it.
+- Historical directive: the owner initially selected Fable 5 **high** as the final refinement gate.
+  The latest owner directive supersedes it and freezes all further Claude/Fable usage; the session
+  was not launched.
 - Qwen 3.8 Max is selected for the owner-clarified focused post-draft review, after the root's
   personal complete-draft review and before Grok's whole-RFC adversarial pass. The completed route
   requested and observed `qwen/qwen3.8-max` at `max`, session
@@ -125,8 +118,8 @@ reserved for proved publish/artifact-only boundaries.
   still names Grok 4.5, so this is an explicit owner-directed route override rather than a claim
   that the catalog is current. Use the existing bounded OpenCode/OpenRouter runner with model
   `openrouter/x-ai/grok-4.6` and variant `high`, record requested/observed identity and raw receipt,
-  and run it after the focused Qwen review. No substantive gate may follow the final Fable 5 high
-  refinement.
+  and run it after the focused Qwen review. That Grok route completed; the later planned Fable route
+  was cancelled by owner supersession.
 - The completed Grok route requested and observed `x-ai/grok-4.6`, variant `high`, session
   `ses_003644aeaffeSm3UCAW9xUqRIK`, with no subagents and no edits. It evaluated RFC commit
   `5dfc4e8eb` / blob `f46040d8...` at HEAD `be83301c6` and returned `PASS_WITH_REFINEMENTS` with
@@ -146,12 +139,14 @@ reserved for proved publish/artifact-only boundaries.
   architecture axis beside contract-derived validation. A separate read-only source audit must
   establish the exact upstream state and derive candidate end-to-end NetScript type flows before
   plan lock; the Opus synthesis brief now requires this subsystem explicitly.
-- The owner locked the post-draft sequence: root personal review → Qwen 3.8 Max focused review →
-  Grok 4.6 high whole-RFC adversarial review → Opus author/editor dispositions and consolidation →
-  one final Fable 5 high substantive refinement → mechanical checks only.
+- Historical sequence: root personal review → Qwen 3.8 Max focused review → Grok 4.6 high whole-RFC
+  adversarial review → Opus author/editor dispositions. The owner then superseded the planned Fable
+  step; root plus the three existing non-Claude lanes closed semantics before mechanical checks.
 - After PLAN-EVAL cycle 2 and the frozen Qwen/Grok review inputs, the owner issued `OWNER-DX-01`.
   The override changes D-07/D-08/D-36 only: progressive NetScript adoption layers are required, only
   a mirrored Prisma model/field/relation/query DSL is forbidden, and erased source-native app
-  inference replaces universal generated bindings. It triggers no further PLAN-EVAL. Opus decides
-  exact API spelling and proves the fallback boundary during the already-planned ≤10k disposition
-  pass.
+  inference replaces universal generated declarations. It triggered no further PLAN-EVAL. The
+  completed author/editor/root passes selected the API and proved the fallback boundary.
+- Latest owner supersession: RFC length is not an acceptance gate, and all further Claude usage is
+  stopped. Completed Claude outputs remain provenance only. No Claude or Fable session may be
+  launched or resumed; final closure uses root judgment and the already-running non-Claude lanes.
