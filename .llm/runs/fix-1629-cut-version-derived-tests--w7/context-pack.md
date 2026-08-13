@@ -36,13 +36,13 @@ release-coherence negative control and the restored synthetic coherent-local-gra
 
 ## In Progress
 
-- Final evidence commit and draft PR narrative update.
+- None. The draft handoff is complete; the owner controls the later ready transition.
 
 ## Next Steps
 
-1. Commit/push the exact-head proof artifacts and update the draft PR narrative.
-2. Verify acceptance mirroring, lock hygiene, and draft metadata.
-3. Stop without changing draft state or labels.
+1. Owner reviews the evidence and performs the single draft → ready transition when desired.
+2. The automatic workflow performs the separate-session IMPL-EVAL exactly once.
+3. This implementation session takes no further PR-state or taxonomy action.
 
 ## Key Decisions
 

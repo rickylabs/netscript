@@ -68,6 +68,7 @@ cut-local fixture helper only for tests that intentionally exercise pre-publish 
 | 2026-08-13 | refinement | focused/static gates | 35 affected tests/55 steps pass; check, lint, fmt, quality, and focused CLI check all exit 0. |
 | 2026-08-13 | refinement | seam ordering | Installed the shared local mapper at fixture-project creation before every affected install/config/plugin flow; callers refresh it only after those flows intentionally rewrite imports. |
 | 2026-08-13 | refinement | exact-head proof | Fresh no-hardlink clone of `175725981` passed the 0.0.7 release-cut dry-run and full suite: 3386 passed, 0 failed, 17 ignored. Static and fitness gates were rerun at the same implementation head and passed. |
+| 2026-08-13 | refinement | draft handoff | Updated PR #1630's refinement narrative; acceptance evidence validates 5/5 with no warnings. Verified clean worktree, matching local/remote head, untouched coherence control, empty lock diff, draft state, milestone `0.0.6`, and exactly one `status:impl`. |
 
 ## Decisions
 
