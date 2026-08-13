@@ -4,9 +4,8 @@ import { assert } from '@std/assert';
 
 Deno.test('checked-in report is traceable to every machine-readable canary', async () => {
   const root = new URL('../../../../', import.meta.url);
-  const run = new URL('.llm/runs/feat-epic-574-rollout-canaries--pr-6/', root);
   const outcome = JSON.parse(
-    await Deno.readTextFile(new URL('rollout-canary-matrix.json', run)),
+    await Deno.readTextFile(new URL('./fixtures/rollout-canary-matrix.json', import.meta.url)),
   ) as RolloutOutcome;
   const rendered = renderRolloutReport(outcome);
   const checkedIn = await Deno.readTextFile(new URL('ROLLOUT.md', root));
