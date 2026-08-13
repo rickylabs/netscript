@@ -13,6 +13,6 @@ Read, in order:
 Baseline identity is `01e0960494c95ce56eb35892c211a095eb13e6ed`. Treat GitHub live state as
 mutable after the snapshot; any issue or `main` drift must be recorded before dispatch or merge.
 
-Step 0 is repaired at 64 inspected targets / 60 active issues, 43 leaves, and nine dispatch waves.
-#1564 is closed-fixed; there is no implementation wave-zero barrier. The canonical artifacts must
-validate green, and the remaining dispatch gate is approval from the bounded PLAN-EVAL re-review.
+Step 0 is approved at 64 inspected targets / 60 active issues, 43 leaves, and nine dispatch waves.
+#1564 is closed-fixed; there is no implementation wave-zero barrier. PLAN-EVAL cycle 2 approved
+dispatch at plan head `331f7c664`; `leaf-contracts.json` is binding input for every leaf.

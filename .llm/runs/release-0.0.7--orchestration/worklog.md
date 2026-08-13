@@ -18,11 +18,12 @@
 | 2026-08-13T22:35:00.000Z | Rewrote #1348–#1353 Acceptance contracts in place, locked #1249/#1451 decisions, synchronized #1377, and created residual Aspire docs issue #1642. | Live GitHub issue bodies and comments |
 | 2026-08-13T22:42:00.000Z | Re-audited every #1564 construct; closed it completed because all live changed-file consumers are safe and #1403 already fixed the affected construct. Removed the false wave-zero barrier and moved #1360 to features. | #1564 correction comment; 60 active / 43 leaves / nine waves; lane counts 1/16/26/17 |
 | 2026-08-13T22:48:00.000Z | Added per-leaf surfaces, archetypes, overlays, proving gates, JSR applicability, risk register, collision ownership, release evidence ids, two read-only watchers, and exact OIDC/artifact-pinned stable conditions. | `leaf-contracts.json`; repaired plan/state/DAG/inventory |
+| 2026-08-13T23:03:00.000Z | PLAN-EVAL cycle 2 approved the repaired plan. Fable completed evidence collection, hit monthly spend before verdict text, and the same conversation emitted the final synthesis through the recorded Opus fallback. | `plan-eval-cycle-2.md`; evaluator session `2439b19d-5df7-4920-9fce-fa5831ec4fdf`; evaluated head `331f7c664` |
 
 ## Current design checkpoint
 
 - Objective: complete and publish milestone `0.0.7` through the milestone-cluster profile.
 - Frozen invariants: four topic orchestrators, leaf PRs target `main`, coordinator-only merge,
   one expensive gate globally, inactive release captain until exact-main readiness.
-- Step 0 repair is complete. The sole remaining dispatch gate is the bounded same-conversation
-  PLAN-EVAL re-review; no leaf dispatch before its approval.
+- Step 0 repair and PLAN-EVAL are approved. Dispatch may begin after the final clean-environment
+  sweep and status transition to implementation.

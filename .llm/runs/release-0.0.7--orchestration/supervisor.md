@@ -11,7 +11,7 @@
 | Started | `2026-08-13T18:35:10.000Z` |
 | Coordinator runtime | Codex via ChatGPT subscription; current app session on WSL |
 | PLAN-EVAL session | Claude `2439b19d-5df7-4920-9fce-fa5831ec4fdf`; opposite family |
-| PLAN-EVAL cycle | 1 of 2: `CHANGES_REQUESTED`; bounded same-conversation re-review pending |
+| PLAN-EVAL cycle | 2 of 2: `APPROVED` at plan head `331f7c664` |
 
 The coordinator is the sole merge authority. Exactly four topic orchestrators will own the
 `docs`, `internals`, `fixes`, and `features` lanes after Step 0 validates. The release captain and
@@ -27,7 +27,8 @@ writer lease remain inactive until every committed issue is terminal and exact-`
 Read-only watchers are `milestone-main-watcher-0.0.7` and `milestone-ci-watcher-0.0.7`; both carry
 `mutationAuthority:false`. The first evaluation was mistakenly routed to Claude Opus/high instead
 of the canonical Fable/medium plan-evaluator route. The family separation was valid, but the route
-deviation is recorded and the same conversation will be resumed for the bounded re-review.
+deviation is recorded. Fable completed the cycle-2 evidence pass but hit its monthly spend limit;
+the same conversation used the recorded Opus fallback for final synthesis and approved dispatch.
 
 Quota at the checkpoint: Codex primary window had 77% remaining (weekly reset 2026-08-20 05:31
 Europe/Zurich); Claude Max showed 6% all-model weekly remaining and 2% Fable weekly remaining

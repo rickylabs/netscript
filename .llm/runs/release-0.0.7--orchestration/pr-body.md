@@ -14,7 +14,7 @@ and cut stable only from exact-main green evidence.
 ## Slices
 
 - [x] Step 0 owner-ratified inventory and dependency DAG repaired after PLAN-EVAL cycle 1
-- [ ] Composed milestone plan independently approved
+- [x] Composed milestone plan independently approved at plan head `331f7c664`
 - [ ] All leaf PRs independently evaluated and merged to `main`
 - [ ] Coherent canary checkpoint(s) published and production-E2E proven
 - [ ] Stable 0.0.7 publication and exact artifact-pinned production E2E proven
@@ -28,7 +28,7 @@ and cut stable only from exact-main green evidence.
 ## Harness
 
 - Run dir: `.llm/runs/release-0.0.7--orchestration/`
-- Phase: plan evaluation
+- Phase: implementation dispatch
 
 ## Drift / Debt
 
