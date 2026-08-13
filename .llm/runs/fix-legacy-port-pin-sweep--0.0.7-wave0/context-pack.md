@@ -13,21 +13,20 @@
 - Reproduced live pins in the auth default, streams manifest, and copy fixture. The generated skill
   occurrence is historical diagnostic prose, not a pin.
 - #1206's real endpoint-discovery seam lives in `@netscript/mcp`; wiring it crosses the frozen leaf
-  surface. Locked remedy: explicit required `--stream-url` with Aspire discovery guidance, plus
-  removal of dead manifest/fixture port fields.
+  surface. Locked remedy: explicit required `--stream-url` with Aspire discovery guidance.
 - Draft PR #1643 opened from bootstrap commit `e49948bbf`, labeled `status:plan` with milestone
   `0.0.7`.
 - First focused structured test falsified the issue's manifest-removal assumption: the shared schema
   requires `backgroundPort` and atomically couples `servicePort` to the service shape; copy mode
   still consumes them. Invalid manifest/fixture edits were restored.
-- Proposed explicit-URL auth diff remains uncommitted because two current tests need changes outside
-  the frozen surface. No durable receipts or expensive gates ran.
-- Coordinator instruction on 2026-08-13: do not expand or reinterpret the frozen leaf contract; the
-  topic orchestrator cannot approve either rescope. PR #1643 stays draft at `status:plan`.
-- The exact proposed auth-command diff is preserved in `worklog.md`; the product-source edit was
-  removed with `apply_patch` and was never committed.
-- Required decision: only the release coordinator may issue a replacement leaf contract naming any
-  additional test/schema/copy surfaces and remedy, or disposition #1243 outside this leaf. Resume no
-  source work until that explicit coordinator decision arrives.
-- No further gates, expensive-gate lease request, issue/milestone mutation, ready transition, merge,
-  or publication is authorized. This paused run owns no runtime resources and needs no cleanup.
+- The release coordinator's authorization was verified from live issue #1243 and PR #1643 at
+  `2026-08-13T20:35:47.522Z` (issue comment `5286074974`; PR comment `5286075209`). The sole added
+  product surface is
+  `packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts`.
+- The manifest and official-copy `4437` values are required compatibility metadata and remain
+  unchanged. No schema/copy redesign is authorized.
+- Resume scope is the explicit-URL/fail-loud command behavior, focused tests, and structured
+  non-expensive gate receipts. PR #1643 remains draft and moves from `status:plan` to `status:impl`
+  only after real implementation evidence is committed and pushed.
+- `scaffold.runtime`, Aspire, Docker, merge, publication, and issue/milestone mutation remain
+  forbidden. This run owns no runtime resources and needs no cleanup.

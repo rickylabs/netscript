@@ -151,13 +151,15 @@ Deno.test('session projection parser exposes active sessions', () => {
 
 Deno.test('fetch session adapter lists projections and revokes through signout', async () => {
   const requests: Request[] = [];
-  const client = new FetchAuthSessionHttp(async (input, init) => {
+  const client = new FetchAuthSessionHttp((input, init) => {
     const request = new Request(input, init);
     requests.push(request);
     if (request.method === 'POST') {
-      return Response.json({ signedOut: true, sessionId: 'session-1' });
+      return Promise.resolve(Response.json({ signedOut: true, sessionId: 'session-1' }));
     }
-    return Response.json([{ id: 'session-1', state: 'active', userId: 'user-1' }]);
+    return Promise.resolve(
+      Response.json([{ id: 'session-1', state: 'active', userId: 'user-1' }]),
+    );
   });
   assertEquals((await client.list('http://streams/auth/sessions'))[0].id, 'session-1');
   assertEquals(await client.revoke('http://auth/api/v1/auth', 'session-1'), 'session-1');
@@ -169,11 +171,15 @@ Deno.test('plugin auth parser drives backend and session verbs', async () => {
   const fs = new MemoryFileSystemAdapter();
   const output: string[] = [];
   const regenerated: string[] = [];
+  const listedUrls: string[] = [];
   const sessions: AuthSessionHttpPort = {
-    list: () => Promise.resolve([
-      { id: 'active-1', state: 'active', userId: 'user-1' },
-      { id: 'old-1', state: 'revoked', userId: 'user-1' },
-    ]),
+    list: (url) => {
+      listedUrls.push(url);
+      return Promise.resolve([
+        { id: 'active-1', state: 'active', userId: 'user-1' },
+        { id: 'old-1', state: 'revoked', userId: 'user-1' },
+      ]);
+    },
     revoke: (_url, id) => Promise.resolve(id),
   };
   const command = createAuthPluginCommand({
@@ -188,7 +194,12 @@ Deno.test('plugin auth parser drives backend and session verbs', async () => {
   });
 
   await command.parse(['backend', 'set', 'kv-oauth', '--project-root', '/workspace']);
-  await command.parse(['session', 'list']);
+  await command.parse([
+    'session',
+    'list',
+    '--stream-url',
+    'http://streams.test/auth/sessions',
+  ]);
   await command.parse(['session', 'revoke', 'active-1']);
   assertEquals(output, [
     'kv-oauth',
@@ -197,6 +208,30 @@ Deno.test('plugin auth parser drives backend and session verbs', async () => {
     'Revoked active-1.',
   ]);
   assertEquals(regenerated, ['/workspace']);
+  assertEquals(listedUrls, ['http://streams.test/auth/sessions']);
+});
+
+Deno.test('session list fails loudly when the stream URL is omitted', async () => {
+  let listCalls = 0;
+  const command = createAuthPluginCommand({
+    fs: new MemoryFileSystemAdapter(),
+    sessions: {
+      list: () => {
+        listCalls++;
+        return Promise.resolve([]);
+      },
+      revoke: (_url, id) => Promise.resolve(id),
+    },
+    resolveProjectRoot: () => Promise.resolve('/workspace'),
+  });
+
+  await assertRejects(
+    () => command.parse(['session', 'list']),
+    Error,
+    'Run `aspire describe streams --format Json`, append `/auth/sessions` to the streams ' +
+      'HTTP endpoint, and pass it with `--stream-url`.',
+  );
+  assertEquals(listCalls, 0);
 });
 
 Deno.test('session CLI lists a signed-in backend session and revoke invalidates it', async () => {
@@ -238,7 +273,12 @@ Deno.test('session CLI lists a signed-in backend session and revoke invalidates 
     resolveProjectRoot: () => Promise.resolve('/workspace'),
     print: (line) => output.push(line),
   });
-  await command.parse(['session', 'list']);
+  await command.parse([
+    'session',
+    'list',
+    '--stream-url',
+    'http://streams.test/auth/sessions',
+  ]);
   await command.parse(['session', 'revoke', id]);
 
   assertMatch(output[1], new RegExp(id));

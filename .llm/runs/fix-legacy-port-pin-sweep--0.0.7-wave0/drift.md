@@ -32,3 +32,13 @@ contract test falsified the filed assumption that manifest cleanup was mechanica
 schema/copy remedy now contains a material compatibility decision and requires a revised plan plus
 separate PLAN-EVAL. If the orchestrator instead narrows the leaf to the explicit-URL behavior and
 authorizes only the focused test surface, PLAN-EVAL can remain N/A because that remedy is mechanical.
+
+## 2026-08-13 — resolved — coordinator narrows compatibility remedy
+
+- Live coordinator comments on issue #1243 (`5286074974`) and PR #1643 (`5286075209`) authorize only
+  `packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts` beyond the original
+  contract.
+- The manifest and official-copy `4437` fields are required compatibility metadata and must remain
+  unchanged; no schema/copy redesign is in scope.
+- The explicit `--stream-url` behavior plus focused tests is again locked and mechanical. The prior
+  `PLAN-EVAL: N/A` remains valid, and implementation resumes within this corrected boundary.

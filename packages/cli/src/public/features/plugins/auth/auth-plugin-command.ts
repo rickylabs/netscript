@@ -83,10 +83,19 @@ export function createAuthPluginCommand(
 
   const session = new Command().name('session').description('Inspect or revoke auth sessions')
     .command('list', new Command()
-      .option('--stream-url <url:string>', 'Auth durable stream URL', {
-        default: 'http://localhost:4437/auth/sessions',
-      })
-      .action(async (options: { streamUrl: string }) => {
+      .option(
+        '--stream-url <url:string>',
+        'Auth durable stream URL (find the streams HTTP endpoint with ' +
+          '`aspire describe streams --format Json`, then append `/auth/sessions`)',
+      )
+      .action(async (options: { streamUrl?: string }) => {
+        if (!options.streamUrl) {
+          throw new Error(
+            'The legacy localhost:4437 stream URL is no longer inferred. ' +
+              'Run `aspire describe streams --format Json`, append `/auth/sessions` to the ' +
+              'streams HTTP endpoint, and pass it with `--stream-url`.',
+          );
+        }
         const active = (await dependencies.sessions.list(options.streamUrl))
           .filter((item) => item.state === 'active');
         print('Session\tUser\tProvider\tState\tExpires');

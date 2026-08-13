@@ -71,8 +71,7 @@
 The actual-discovery option is architecturally known but unavailable inside the immutable leaf
 surface. The issue explicitly permits the remaining truthful contract: remove the legacy default,
 require `--stream-url`, and make the option help/error state that no endpoint is inferred and that
-the caller should obtain the streams URL from `aspire describe streams --format Json`. Removing the
-manifest/fixture fields is mechanical because allocation already comes from `portRangeKey`.
+the caller should obtain the streams URL from `aspire describe streams --format Json`.
 
 ## Contract-test correction
 
@@ -81,3 +80,17 @@ plugin-owned installer allocates from `portRangeKey`, but the shared manifest pr
 requires `backgroundPort`, atomically couples the service triple, and the maintainer official-copy
 compatibility adapter consumes those values. Removing them is not valid within the declared files.
 The deletion was restored and the compatibility redesign is escalated in `drift.md`.
+
+## Live coordinator authorization snapshot
+
+- API fetch time: `2026-08-13T20:35:47.522Z`; issue #1243 and PR #1643 were both open, and the PR
+  remained draft at `status:plan` with head `f3cf4090993ec60b5a23a3669efa2825b01064a4`.
+- Issue comment `5286074974` records the compatibility correction: preserve the manifest/copy
+  `4437` values and narrow the remedy to explicit URL/fail-loud behavior.
+- PR comment `5286075209` authorizes only
+  `packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts` beyond the original
+  contract. It forbids schema/copy redesign and directs non-expensive validation followed by Tier-A
+  review and a separate opposite-family IMPL-EVAL.
+- This live authorization resolves the test-surface blocker. It does not authorize
+  `scaffold.runtime`, a lease request, ready transition, merge, publication, or central issue/
+  milestone mutation.

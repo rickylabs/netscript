@@ -10,10 +10,11 @@
 - Ports: continue consuming `AuthSessionHttpPort`. The established endpoint discovery port is
   `ServiceEndpointDirectoryPort` in `@netscript/mcp`, but it cannot be wired without crossing the
   approved package/composition boundary; no parallel port will be invented.
-- Constants: no new finite-domain constant. `4437` is deleted from live defaults/manifest fixtures;
-  the generated skill's historical incident value remains prose evidence.
-- Commit slices: (1) artifact/bootstrap + draft PR, (2) explicit URL contract + manifest/fixture pin
-  removal, (3) publishability/gate evidence and handoff.
+- Constants: no new finite-domain constant. `4437` is deleted only from the auth command's inferred
+  runtime default; the manifest/copy values remain required compatibility metadata, and the
+  generated skill occurrence remains historical prose evidence.
+- Commit slices: (1) artifact/bootstrap + draft PR, (2) explicit URL contract + focused tests,
+  (3) structured non-expensive gate evidence and review/evaluator handoff.
 - Deferred scope: endpoint-directory injection, undeclared 4437 sites, all central coordination,
   publication, and expensive runtime execution without a lease.
 - Contributor path: callers run `aspire describe streams --format Json`, select the advertised HTTP
@@ -30,37 +31,37 @@ explicit-URL/fail-loud fallback, so the implementation is locked and mechanical.
 | Gate | Result | Evidence |
 | --- | --- | --- |
 | Focused structured test reporter (exploratory, pre-commit) | FAIL | exit 1; 10 passed, 8 failed, 5 unique failure groups. Two auth tests expose the required test rescope; manifest-shape failure proves current schema requires the filed pins; additional copy tests failed because the invalid streams manifest could no longer satisfy dependency discovery. |
+| Focused structured check reporter (authorized implementation, pre-commit) | PASS | 2 files selected; 1 batch; 0 diagnostics; `deno check --unstable-kv`. |
+| Focused structured test reporter (authorized implementation, pre-commit) | PASS | 11 passed, 0 failed; explicit URL forwarding and omitted-URL no-adapter-call rejection covered. |
+| Focused structured lint reporter (authorized implementation, pre-commit) | PASS | 2 files selected; 1 batch; 0 findings. A standalone workspace config is used because the root intentionally excludes `packages/cli`; it carries the root lint rules without that directory exclusion. |
 
-No durable receipt was minted because the proposed source is not committed and the gate runner must
-attest an immutable Git head. `scaffold.runtime`, Aspire, and Docker remain forbidden until the
-coordinator-owned global expensive-gate lease is explicitly granted.
+No durable receipt has been minted yet because the gate runner must attest an immutable Git head.
+`scaffold.runtime`, its lease request, Aspire, and Docker are explicitly forbidden for this turn.
 
 ## Research evidence
 
 - Live issue API snapshot captured at `2026-08-13T20:23:46.556Z` in `research.md`.
+- Live coordinator authorization captured at `2026-08-13T20:35:47.522Z` in `research.md`.
 - Baseline: branch = `origin/main` = `01e0960494c95ce56eb35892c211a095eb13e6ed`.
 - Reproduction and existing-seam findings are recorded in `research.md`.
 
-## Blocker
+## Blocker resolution
 
-The issue's manifest-removal assumption is stale against current main, and the explicit-URL behavior
-requires an undeclared test file. The invalid manifest change was restored; the proposed auth diff
-was intentionally left uncommitted for review.
+The live release-coordinator comments on issue #1243 (`5286074974`) and PR #1643 (`5286075209`) were
+fetched at `2026-08-13T20:35:47.522Z`. They authorize only
+`packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts` beyond the original
+contract, classify both manifest/copy `4437` values as required compatibility metadata, and reject a
+schema/copy redesign. This resolves the test-surface blocker without reopening a material design
+choice, so `PLAN-EVAL: N/A` remains truthful.
 
-On 2026-08-13 the supervising coordinator instruction clarified that the frozen leaf contract must
-not be expanded or reinterpreted and that the topic orchestrator has no authority to approve either
-previously proposed rescope. PR #1643 remains paused as a draft at `status:plan`. Only the release
-coordinator can now decide whether to issue a replacement leaf contract that names the additional
-test/schema/copy surfaces and remedy, or to disposition #1243 outside this leaf. Until that explicit
-coordinator decision exists, this implementation session must not resume source work.
-
-No further gates may run, no expensive-gate lease may be requested, and issue/milestone/PR phase
-state must remain unchanged.
+Implementation may resume only for the explicit `--stream-url` fail-loud path and focused tests,
+followed by structured non-expensive receipts. `scaffold.runtime`, ready transition, merge,
+publication, and central issue/milestone mutation remain forbidden.
 
 ## Preserved proposed auth-command patch
 
-The following exact uncommitted proposal is preserved for coordinator review. It was not committed
-to the product surface and was removed from the working tree after capture:
+The following exact proposal was preserved through the pause and is now the coordinator-authorized
+implementation shape. Its final committed form must remain semantically identical:
 
 ```diff
 diff --git a/packages/cli/src/public/features/plugins/auth/auth-plugin-command.ts b/packages/cli/src/public/features/plugins/auth/auth-plugin-command.ts
