@@ -100,7 +100,7 @@ index 0938c8c47..2705c464b 100644
 --- a/packages/cli/src/public/features/plugins/auth/auth-plugin-command.ts
 +++ b/packages/cli/src/public/features/plugins/auth/auth-plugin-command.ts
 @@ -83,10 +83,17 @@ export function createAuthPluginCommand(
- 
+
    const session = new Command().name('session').description('Inspect or revoke auth sessions')
      .command('list', new Command()
 -      .option('--stream-url <url:string>', 'Auth durable stream URL', {
