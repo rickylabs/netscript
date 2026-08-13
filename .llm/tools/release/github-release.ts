@@ -128,7 +128,7 @@ export interface CanaryPairDependencies {
     revision: string,
     path: string,
   ) => Promise<Uint8Array>;
-  readonly generatedOutputsFresh?: (root: string) => Promise<void>;
+  readonly generatedOutputsFresh?: (root: string) => Promise<unknown>;
   readonly request: typeof githubRequest;
 }
 
@@ -170,7 +170,7 @@ export function isExactVersionReplacement(
 ): boolean {
   // Keep this byte-for-byte rule aligned with deps/bump-version.ts::replaceVersionFiles.
   return previousVersion !== nextVersion &&
-    before.replaceAll(previousVersion, nextVersion) === after;
+    rewriteNetScriptVersion(before, previousVersion, nextVersion) === after;
 }
 
 /**
@@ -208,39 +208,11 @@ export async function verifyGreenCanaryPair(
     });
     if (exactReplacement) {
       if (inexactGeneratedPaths.length > 0) {
-        if (
-          inexactGeneratedPaths.some((path) => normalizeGitPath(path) === AGENT_DOCS_PROSE_PATH)
-        ) {
-          const readBytes = dependencies.fileBytesAtRevision;
-          if (!readBytes) {
-            throw new Error(
-              'Stable publication blocked: agent-docs prose requires a binary parent-to-HEAD ' +
-                'comparison before canary evidence can be inherited.',
-            );
-          }
-          const [before, after] = await Promise.all([
-            readBytes(root, parent, AGENT_DOCS_PROSE_PATH),
-            readBytes(root, current, AGENT_DOCS_PROSE_PATH),
-          ]);
-          if (
-            !(await isExactAgentDocsVersionReplacement(
-              before,
-              after,
-              previousVersion,
-              nextVersion,
-            ))
-          ) {
-            throw new Error(
-              'Stable publication blocked: agent-docs prose contains non-version changes, so ' +
-                'the parent canary evidence cannot authorize this content.',
-            );
-          }
-        }
-        if (
-          inexactGeneratedPaths.some((path) =>
-            normalizeGitPath(path) === AGENT_DOCS_PROVENANCE_PATH
-          )
-        ) {
+        const agentDocsChanged = inexactGeneratedPaths.some((path) => {
+          const normalized = normalizeGitPath(path);
+          return normalized === AGENT_DOCS_PROSE_PATH || normalized === AGENT_DOCS_PROVENANCE_PATH;
+        });
+        if (agentDocsChanged) {
           const readBytes = dependencies.fileBytesAtRevision;
           if (!readBytes) {
             throw new Error(
@@ -270,9 +242,24 @@ export async function verifyGreenCanaryPair(
             );
           }
         }
-        const assertFresh = dependencies.generatedOutputsFresh ??
-          assertPreparedReleaseGeneratedOutputsFresh;
-        await assertFresh(root);
+        const assertFresh = dependencies.generatedOutputsFresh;
+        try {
+          const proof = assertFresh ? await assertFresh(root) : undefined;
+          if (proof !== PREPARED_RELEASE_FRESHNESS_PROOF) {
+            throw new Error(
+              'Stable publication blocked: semantic generated-output freshness was not proven.',
+            );
+          }
+        } catch (error) {
+          if (agentDocsChanged) {
+            throw new Error(
+              'Stable publication blocked: agent-docs prose contains non-version changes, so ' +
+                'the parent canary evidence cannot authorize this content.' +
+                `\n${error instanceof Error ? error.message : String(error)}`,
+            );
+          }
+          throw error;
+        }
       }
       if (await hasGreenCanaryPair(repo, token, parent, dependencies.request)) return parent;
       throw new Error(
@@ -294,34 +281,6 @@ export async function verifyGreenCanaryPair(
   );
 }
 
-/** True only when the current prose payload is the writer's version rewrite of its canary parent. */
-export async function isExactAgentDocsVersionReplacement(
-  beforeCompressed: Uint8Array,
-  afterCompressed: Uint8Array,
-  previousVersion: string,
-  nextVersion: string,
-): Promise<boolean> {
-  if (previousVersion === nextVersion) return false;
-  try {
-    const [before, after] = await Promise.all([
-      decompressGzip(beforeCompressed),
-      decompressGzip(afterCompressed),
-    ]);
-    const payload: unknown = JSON.parse(new TextDecoder().decode(before));
-    if (!isAgentDocsPayload(payload)) return false;
-    const files = Object.fromEntries(
-      Object.entries(payload.files).map(([path, source]) => [
-        path,
-        rewriteNetScriptVersion(source, previousVersion, nextVersion),
-      ]),
-    );
-    const expected = new TextEncoder().encode(JSON.stringify({ schemaVersion: 1, files }));
-    return bytesEqual(expected, after);
-  } catch {
-    return false;
-  }
-}
-
 function isAgentDocsPayload(
   value: unknown,
 ): value is { readonly schemaVersion: 1; readonly files: Readonly<Record<string, string>> } {
@@ -333,10 +292,6 @@ async function decompressGzip(compressed: Uint8Array): Promise<Uint8Array> {
   const copy = new Uint8Array(compressed);
   const stream = new Blob([copy.buffer]).stream().pipeThrough(new DecompressionStream('gzip'));
   return new Uint8Array(await new Response(stream).arrayBuffer());
-}
-
-function bytesEqual(left: Uint8Array, right: Uint8Array): boolean {
-  return left.byteLength === right.byteLength && left.every((byte, index) => byte === right[index]);
 }
 
 interface AgentDocsProvenance {
@@ -361,7 +316,7 @@ const AGENT_DOCS_PROVENANCE_KEYS = [
   'sha256',
 ] as const;
 
-/** True only when HEAD provenance is the closed, integrity-derived successor of its parent. */
+/** True only when both revisions close over canonical corpus identity with the expected versions. */
 export async function isExactAgentDocsProvenanceReplacement(
   beforeSource: string,
   afterSource: string,
@@ -382,21 +337,19 @@ export async function isExactAgentDocsProvenanceReplacement(
     const beforeFiles = agentDocsPayloadFiles(beforePayload);
     const afterFiles = agentDocsPayloadFiles(afterPayload);
     if (!beforeFiles || !afterFiles) return false;
-    const beforeExpected = await deriveAgentDocsProvenance(
+    return await provenanceMatchesCanonicalCorpus(
       before,
       previousVersion,
       beforeFiles,
       beforePayload,
-      beforeProse,
-    );
-    const afterExpected = await deriveAgentDocsProvenance(
-      before,
+      beforeProse.byteLength,
+    ) && await provenanceMatchesCanonicalCorpus(
+      after,
       nextVersion,
       afterFiles,
       afterPayload,
-      afterProse,
-    );
-    return provenanceEquals(before, beforeExpected) && provenanceEquals(after, afterExpected) &&
+      afterProse.byteLength,
+    ) &&
       JSON.stringify(before.files) === JSON.stringify(after.files);
   } catch {
     return false;
@@ -430,27 +383,37 @@ function agentDocsPayloadFiles(payloadBytes: Uint8Array): readonly string[] | un
   return isAgentDocsPayload(value) ? Object.keys(value.files) : undefined;
 }
 
-async function deriveAgentDocsProvenance(
-  parent: AgentDocsProvenance,
+async function provenanceMatchesCanonicalCorpus(
+  provenance: AgentDocsProvenance,
   version: string,
   files: readonly string[],
   uncompressed: Uint8Array,
-  compressed: Uint8Array,
-): Promise<AgentDocsProvenance> {
-  return {
-    schemaVersion: 1,
-    version,
-    sourceCommit: parent.sourceCommit,
-    extractionTimestamp: parent.extractionTimestamp,
-    files,
-    uncompressedBytes: uncompressed.byteLength,
-    compressedBytes: compressed.byteLength,
-    sha256: await sha256Hex(uncompressed),
-  };
+  compressedBytes: number,
+): Promise<boolean> {
+  // sourceCommit and extractionTimestamp describe the render; they do not authorize canary
+  // inheritance and may legitimately change between revisions. They must still be values the
+  // writer can emit: a nine-character lowercase Git object abbreviation and canonical UTC ISO
+  // timestamp. compressedBytes is likewise checked only against its own revision's blob, so this
+  // closes forged sidecars without comparing gzip encoders across revisions (#1626).
+  return provenance.version === version &&
+    /^[0-9a-f]{9}$/.test(provenance.sourceCommit) &&
+    isCanonicalIsoTimestamp(provenance.extractionTimestamp) &&
+    JSON.stringify(provenance.files) === JSON.stringify(files) &&
+    provenance.uncompressedBytes === uncompressed.byteLength &&
+    provenance.compressedBytes === compressedBytes &&
+    provenance.sha256 === await sha256Hex(uncompressed);
 }
 
-function provenanceEquals(left: AgentDocsProvenance, right: AgentDocsProvenance): boolean {
-  return JSON.stringify(left) === JSON.stringify(right);
+function isCanonicalIsoTimestamp(value: string): boolean {
+  // Honest writers emit UTC RFC3339 with `Z` and either omit fractional seconds or use the three
+  // millisecond digits produced by Date.toISOString(). Offsets and every other byte shape are not
+  // provenance this writer can produce. The round trip also rejects impossible calendar values.
+  const match = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{3}))?Z$/.exec(value);
+  if (!match) return false;
+  const timestamp = new Date(value);
+  if (Number.isNaN(timestamp.valueOf())) return false;
+  const canonical = `${match[1]}.${match[2] ?? '000'}Z`;
+  return timestamp.toISOString() === canonical;
 }
 
 async function sha256Hex(bytes: Uint8Array): Promise<string> {
@@ -467,23 +430,36 @@ function isPreparedReleaseGeneratedOutput(path: string): boolean {
   );
 }
 
-/**
- * Derived gzip/base64/hash outputs cannot satisfy a plain-text replacement.
- * Keep the byte check as the first rule. The prose blob is separately anchored
- * to its canary parent; these clean-checkout reproductions then prove the
- * current provenance and remaining outputs match the release:cut writers.
- */
-async function assertPreparedReleaseGeneratedOutputsFresh(root: string): Promise<void> {
-  const dirty = await runGit(root, ['status', '--porcelain', '--untracked-files=no']);
+export interface PreparedReleaseFreshnessDependencies {
+  readonly trackedStatus: (root: string) => Promise<string>;
+  readonly runDeno: (root: string, args: readonly string[]) => Promise<void>;
+}
+
+const defaultPreparedReleaseFreshnessDependencies: PreparedReleaseFreshnessDependencies = {
+  trackedStatus: (root) => runGit(root, ['status', '--porcelain', '--untracked-files=no']),
+  runDeno: (root, args) => runCheckedCommand(root, args),
+};
+
+// Identity, not structure, proves the production freshness pipeline reached its terminal verdict.
+// Dependency stubs cannot manufacture this module-private capability from self-consistent sidecars.
+const PREPARED_RELEASE_FRESHNESS_PROOF = Object.freeze({});
+
+/** Reproduce semantic corpus content and every downstream generated release asset from HEAD. */
+export async function assertPreparedReleaseGeneratedOutputsFresh(
+  root: string,
+  dependencies: PreparedReleaseFreshnessDependencies = defaultPreparedReleaseFreshnessDependencies,
+): Promise<unknown> {
+  const dirty = await dependencies.trackedStatus(root);
   if (dirty) {
     throw new Error(
       'Stable publication blocked: generated release outputs require a clean tracked worktree ' +
         'before their writer-derived content can be verified.',
     );
   }
-  await runCheckedCommand(root, ['task', 'gen:publish-assets', '--check']);
-  await runCheckedCommand(root, ['task', 'check:mcp-export-corpus']);
-  await runCheckedCommand(root, [
+  await dependencies.runDeno(root, ['task', 'check:agent-docs-prose']);
+  await dependencies.runDeno(root, ['task', 'gen:publish-assets', '--check']);
+  await dependencies.runDeno(root, ['task', 'check:mcp-export-corpus']);
+  await dependencies.runDeno(root, [
     'run',
     '--no-lock',
     '--allow-read',
@@ -491,6 +467,7 @@ async function assertPreparedReleaseGeneratedOutputsFresh(root: string): Promise
     '.llm/tools/generate-cli-assets-barrel.ts',
     '--check',
   ]);
+  return PREPARED_RELEASE_FRESHNESS_PROOF;
 }
 
 async function runCheckedCommand(root: string, args: readonly string[]): Promise<void> {

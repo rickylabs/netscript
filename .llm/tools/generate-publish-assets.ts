@@ -217,7 +217,11 @@ export async function refreshAgentDocsProvenance(
   return provenance.version;
 }
 
-/** Rebase the shared CLI/MCP prose pins and refresh provenance before either consumer reads it. */
+/**
+ * Apply the legacy literal corpus rewrite for differential tests and recovery diagnostics.
+ * Release writers must render the docs site instead: literal rewriting misses rendered version
+ * prose and is intentionally absent from `generatePublishAssets`.
+ */
 export async function rebaseAgentDocsProse(
   oldVersion: string,
   root: URL = ROOT,
@@ -422,7 +426,6 @@ export const CORE_PACKAGE_VERSION: string = ${JSON.stringify(version)};
 /** Generation steps composed by the top-level publish-asset entrypoint. */
 export interface PublishAssetGenerationSteps {
   readonly refreshProvenance: () => Promise<string | void>;
-  readonly rebaseProse?: (oldVersion: string) => Promise<void>;
   readonly generateMcp: () => Promise<void>;
   readonly generateCli: () => Promise<void>;
   readonly generateFreshUi: () => Promise<void>;
@@ -434,7 +437,6 @@ export interface PublishAssetGenerationSteps {
 export async function generatePublishAssets(
   steps: PublishAssetGenerationSteps = {
     refreshProvenance: () => refreshAgentDocsProvenance(),
-    rebaseProse: (oldVersion) => rebaseAgentDocsProse(oldVersion),
     generateMcp: () => generateMcpAssets(),
     generateCli: () => generateCliAssets(),
     generateFreshUi: () => generateFreshUiMetadata(),
@@ -442,11 +444,7 @@ export async function generatePublishAssets(
     generatePlugins: () => generatePluginMetadata(),
   },
 ): Promise<void> {
-  const oldVersion = await steps.refreshProvenance();
-  if (steps.rebaseProse) {
-    if (!oldVersion) throw new Error('provenance refresh must return the prior corpus version');
-    await steps.rebaseProse(oldVersion);
-  }
+  await steps.refreshProvenance();
   await Promise.all([
     steps.generateMcp(),
     steps.generateCli(),

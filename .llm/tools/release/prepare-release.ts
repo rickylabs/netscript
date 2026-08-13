@@ -73,6 +73,14 @@ export async function prepareRelease(
 
   await runGate(
     label,
+    'gen:agent-docs-prose',
+    'deno',
+    ['task', 'gen:agent-docs-prose'],
+    root,
+    dependencies,
+  );
+  await runGate(
+    label,
     'gen:publish-assets',
     'deno',
     ['task', 'gen:publish-assets'],
@@ -92,6 +100,14 @@ export async function prepareRelease(
     'gen:assets-barrel',
     'deno',
     ['task', 'gen:assets-barrel'],
+    root,
+    dependencies,
+  );
+  await runGate(
+    label,
+    'check:agent-docs-prose',
+    'deno',
+    ['task', 'check:agent-docs-prose'],
     root,
     dependencies,
   );
