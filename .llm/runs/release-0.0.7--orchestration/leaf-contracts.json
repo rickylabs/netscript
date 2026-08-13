@@ -1171,13 +1171,17 @@
         "docs"
       ],
       "fileSurfaces": [
+        ".llm/harness/debt/arch-debt.md",
+        ".llm/tools/consumer-tools.json",
         ".llm/tools/quality/scan-code-quality.ts",
+        ".llm/tools/quality/scan-code-quality_test.ts",
         "deno.json",
         "docs/site",
         "docs/site/**",
         "docs/site/reference/triggers/index.md",
         "packages/cli/src/public/features/root/public-command-dependencies.ts",
         "packages/cli/src/public/public-api.ts",
+        "packages/cli/src/kernel/assets/agent-tools.generated.ts",
         "packages/fresh/src",
         "plugins/workers/streams/producer.ts"
       ],

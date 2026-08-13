@@ -68,3 +68,12 @@ PR #1651 PLAN-EVAL separately uses a bounded native Claude Remote Control sessio
 5/medium fallback, and bridge id `session_018f6pxZjiFPaYJF6AFLyLxn`. It was interrupted before
 verdict and cleanly exited on the same owner directive; no verdict or repository mutation survived.
 Formal Claude-family gates may resume after the Saturday 2026-08-15 00:00 Europe/Zurich reset.
+
+After that owner directive, the internals topic briefly launched a Claude-compatible OpenRouter
+PLAN-EVAL for #1653. It had already committed a `FAIL_PLAN` artifact before the coordinator's stop
+signal reached it; the process then exited and no replacement was launched. Its three substantive
+findings are retained as advisory planning evidence and resolved by coordinator decisions, but it
+does not waive the fresh formal opposite-family PLAN-EVAL required after reset. Until that reset,
+topic and leaf lanes must not launch native Claude, Claude-compatible OpenRouter, or substitute
+formal evaluators; existing Codex sessions may continue research, implementation already backed by
+a valid plan gate, and artifact-only housekeeping.

@@ -367,9 +367,9 @@
     {
       "id": "quality-scan-allowance-rail",
       "lane": "internals",
-      "phase": "implementing",
+      "phase": "blocked",
       "baseBranch": "main",
-      "headSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+      "headSha": "8a4709afe4271833dad2eff9752115634552b7ba",
       "issueNumbers": [1378, 1545],
       "implementerAgentId": "019ffcc9-97d6-7602-bb7d-582ecc92b069",
       "evaluatorAgentId": null,
