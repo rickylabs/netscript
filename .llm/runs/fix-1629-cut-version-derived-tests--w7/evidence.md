@@ -140,16 +140,104 @@ ordering was audited after the orchestrator refinement:
 
 | Affected path | Seam placement before execution that resolves first-party imports |
 | --- | --- |
-| control-plane module probe | immediately after fixture import-map creation, before the mutator/config/plugin flow; refreshed after mutator-owned imports are written |
-| public AI registry closure | immediately after project creation, before install; refreshed before generated-source import resolution and `deno check` |
-| public forced reinstall | immediately after project creation, before install; refreshed before `loadConfig` and `loadRegisteredPlugins` |
-| local contributor install | immediately after project/config creation, before install; refreshed before generated route `deno check` |
+| control-plane module probe | once, immediately after fixture import-map creation and before the mutator/config/plugin flow; durable through module loading |
+| public AI registry closure | once, immediately after project creation and before install; durable through generated-source import resolution and `deno check` |
+| public forced reinstall | once, immediately after project creation and before install; durable through both installs, `loadConfig`, and `loadRegisteredPlugins` |
+| local contributor install | once, immediately after project/config creation and before install; durable through both installs and generated route `deno check` |
 | AI `--no-samples` CLI integration | before the install command, hence before install-time config/plugin loading |
 
 The seam lives only under `packages/cli/tests/support/` and is imported only by test modules; no
 consumer or product code path calls it. No exit-78 or named-exclusion behavior was introduced.
 
-After moving initial seam installation to project creation, the affected install/config/plugin
+The contract is exactly one early seam installation per temporary project, before config and plugin
+loading, durable through to use. A second call on the same normalized project root throws. The
+focused persistence guard installs once, rewrites unrelated project configuration, and then imports
+both a config package and a plugin package through the preserved local aliases. Dropping the seam or
+overwriting its imports therefore fails instead of reaching the registry or being repaired by a
+later call.
+
+## Replacement focused gate — retired session 15574
+
+The first focused gate's unified-exec buffer was retired before its terminal verdict could be
+collected. The orchestrator authorized exactly one replacement run. This is the complete,
+untruncated output of that replacement command:
+
+```text
+$ NO_COLOR=1 deno test --allow-all packages/cli/tests/support/local-workspace-imports_test.ts packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts packages/cli/src/local/features/plugins/install/install-local-plugin_test.ts packages/cli/src/public/features/plugins/install/install-plugin_test.ts
+running 1 test from ./packages/cli/src/public/features/plugins/install/install-plugin_test.ts
+public install plugin flow ...
+  threads includeSamples false into the workers scaffolder ... ok (71ms)
+  threads includeSamples false into the sagas scaffolder ... ok (65ms)
+  threads includeSamples false into the triggers scaffolder ... ok (61ms)
+  threads includeSamples false into the streams scaffolder ... ok (67ms)
+  plans a starter plugin request from project metadata ... ok (0ms)
+  preserves a jsr:-prefixed exact canary through validation, scaffold dispatch, and generated state ... ok (7ms)
+  preserves a prefixless exact canary through validation, scaffold dispatch, and generated state ... ok (1ms)
+  rejects a configured service-less plugin without appsettings or a conventional plugin directory ... ok (0ms)
+  rejects an unresolvable plugin (no JSR/local descriptor) instead of CLI-side rendering ... ok (1ms)
+  rejects a resolvable plugin when no process runner can dispatch its scaffolder ... ok (1ms)
+  installs a published Prisma fragment from JSR metadata into the root schema tree ... ok (3ms)
+  rejects a DB-required JSR plugin that declares migrations without a published fragment ... ok (1ms)
+  previews a local-path plugin-owned scaffolder without writing files ... ok (35ms)
+  installs and links the fixture third-party plugin without officialSource or CLI branches ... ok (30ms)
+  installs the AI markdown registry closure into its generated namespace ... ok (2s)
+  keeps the configured AI module resolvable across a forced reinstall ... ok (233ms)
+  derives plugin-owned service and background workdirs from existing files after a skipped scaffold ... ok (2ms)
+  adds workers from the real local-path plugin-owned scaffolder ... ok (64ms)
+  previews the real workers local-path scaffolder without writing files ... ok (52ms)
+  reruns the real workers scaffolder idempotently ... ok (110ms)
+  runs the real sagas local-path scaffolder through plugin install ... ok (62ms)
+  previews the real sagas local-path scaffolder without writing files ... ok (57ms)
+  reruns the real sagas scaffolder idempotently ... ok (110ms)
+  runs the real triggers local-path scaffolder through plugin install ... ok (60ms)
+  previews the real triggers local-path scaffolder without writing files ... ok (63ms)
+  reruns the real triggers scaffolder idempotently ... ok (111ms)
+  runs the real streams local-path scaffolder through plugin install ... ok (63ms)
+  previews the real streams local-path scaffolder without writing files ... ok (49ms)
+  reruns the real streams scaffolder idempotently ... ok (124ms)
+  reconciles dependency-derived plugin references independently of install order ... ok (420ms)
+  runs the real auth local-path scaffolder through plugin install ... ok (65ms)
+  previews the real auth local-path scaffolder without writing files ... ok (51ms)
+  reruns the real auth scaffolder idempotently ... ok (103ms)
+public install plugin flow ... ok (5s)
+running 1 test from ./packages/cli/src/local/features/plugins/install/install-local-plugin_test.ts
+local contributor install plugin flow ...
+  writes starter plugin files with local imports for non-canonical plugin names ... ok (4ms)
+  renders canonical plugins without copying source when no local path is supplied ... ok (1ms)
+  writes thin local-import stubs for canonical plugins when source copy is disabled ... ok (1ms)
+  keeps the plugin-owned AI namespace configured in local-source installs ... ok (1s)
+  skips the target generated project when discovering the official plugin source root ... ok (0ms)
+local contributor install plugin flow ... ok (1s)
+running 19 tests from ./packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts
+PluginWorkspaceMutator ensures plugins root and plugin packages are workspace members ... ok (1ms)
+PluginWorkspaceMutator injects first-party plugin core imports into root deno config ... ok (797µs)
+root-level scaffold runtime imports resolve in both package-source modes ... ok (2ms)
+PluginWorkspaceMutator registers background plugins with companion API service ... ok (356µs)
+PluginWorkspaceMutator omits appsettings entries for service-less plugins ... ok (127µs)
+PluginWorkspaceMutator honors absolute local source service entrypoints ... ok (284µs)
+PluginWorkspaceMutator keeps package id separate from the instance name ... ok (284µs)
+PluginWorkspaceMutator writes saga store backend appsettings for saga plugins ... ok (164µs)
+PluginWorkspaceMutator provisions shared Garnet cache when missing ... ok (179µs)
+PluginWorkspaceMutator reuses existing shared cache entry ... ok (82µs)
+PluginWorkspaceMutator appends project-local plugin config specs ... ok (374µs)
+PluginWorkspaceMutator registers generated plugin glue entrypoints ... ok (134µs)
+PluginWorkspaceMutator rejects a missing configured plugin module ... ok (509µs)
+PluginWorkspaceMutator removes exactly one plugin instance from netscript config ... ok (272µs)
+PluginWorkspaceMutator removes generated root-level plugin glue declarations ... ok (83µs)
+first-party control-plane modules are import-safe and preserve application barrels ... ok (12s)
+first-party generated namespaces have complete imports in JSR and local-source modes ... ok (4ms)
+PluginWorkspaceMutator writes no ai kind-source jsr pins into local-source projects ... ok (224µs)
+PluginWorkspaceMutator rewrite map covers every @netscript/telemetry export subpath ... ok (332µs)
+running 2 tests from ./packages/cli/tests/support/local-workspace-imports_test.ts
+cut-local imports fail closed when a first-party export target is missing ... ok (5ms)
+cut-local imports install once and survive until config and plugin loading ... ok (19ms)
+
+ok | 23 passed (38 steps) | 0 failed (18s)
+
+exit: 0
+```
+
+After moving the single seam installation to project creation, the affected install/config/plugin
 families remain green:
 
 ```text

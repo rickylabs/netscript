@@ -31,8 +31,8 @@ release-coherence negative control and the restored synthetic coherent-local-gra
 - Requested gates and the final disposable 0.0.7 proof passed.
 - Owner refinement audited: coherence provenance corrected; shared test-only seam and call ordering
   verified; no exit-78/product fallback exists.
-- The shared seam is installed at temporary-project creation before affected install/config/plugin
-  flows and refreshed after flows that intentionally rewrite the import map.
+- The shared seam is installed exactly once at temporary-project creation before affected
+  install/config/plugin flows and remains effective through config and plugin loading.
 
 ## In Progress
 
