@@ -2,6 +2,7 @@ import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { renderMilestoneStatus } from './render-milestone-status.ts';
 import {
   type MilestoneClusterArtifacts,
+  parseValidateCliArgs,
   validateMilestoneCluster,
 } from './validate-milestone-cluster.ts';
 
@@ -16,6 +17,12 @@ type MutableArtifacts = {
 function clone<T>(value: T): T {
   return structuredClone(value);
 }
+
+Deno.test('validate CLI accepts the deno task separator and rejects malformed usage', () => {
+  assertEquals(parseValidateCliArgs(['--', '/tmp/run']), { runDir: '/tmp/run' });
+  assertStringIncludes(parseValidateCliArgs(['--']).error ?? '', 'missing run directory');
+  assertStringIncludes(parseValidateCliArgs(['a', 'b']).error ?? '', 'exactly one');
+});
 
 async function validArtifacts(): Promise<MutableArtifacts> {
   const baselineMainSha = 'a'.repeat(40);
@@ -209,6 +216,30 @@ Deno.test('RED: WIP overflow and mutating watchers fail', async () => {
   await expectRed((artifacts) => {
     (artifacts.state.watchers as Record<string, unknown>[])[0].mutationAuthority = true;
   }, 'mutationAuthority:false');
+  await expectRed((artifacts) => {
+    (artifacts.state.watchers as Record<string, unknown>[])[0].agentId = 'fixes-orch';
+  }, 'cannot also be a lane orchestrator');
+});
+
+Deno.test('RED: inventory lane must agree with state lane ownership', async () => {
+  await expectRed((artifacts) => {
+    const issue = (artifacts.inventory.issues as Record<string, unknown>[])[0];
+    issue.lane = 'features';
+  }, 'disagrees with cluster state');
+});
+
+Deno.test('RED: DAG issue nodes require active inventory backing', async () => {
+  await expectRed((artifacts) => {
+    (artifacts.dag.nodes as Record<string, unknown>[]).push({
+      id: 'issue:999',
+      kind: 'issue',
+      issueNumber: 999,
+    });
+    (artifacts.dag.waves as Record<string, unknown>[]).push({
+      index: 1,
+      nodeIds: ['issue:999'],
+    });
+  }, 'has no active inventory backing');
 });
 
 Deno.test('RED: release captain cannot claim early or admit two writers', async () => {

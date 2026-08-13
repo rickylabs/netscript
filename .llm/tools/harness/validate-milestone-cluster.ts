@@ -241,6 +241,20 @@ function validateDag(
   }
   const nodeSet = new Set(nodeIds);
   const activeNumbers = activeIssues.map((issue) => issue.number).filter(issueNumber);
+  const activeNumberSet = new Set(activeNumbers);
+
+  for (const node of nodes) {
+    if (node.kind === 'issue') {
+      if (!issueNumber(node.issueNumber) || !activeNumberSet.has(node.issueNumber)) {
+        errors.push(`DAG issue node ${String(node.id)} has no active inventory backing`);
+      }
+      if (node.id !== `issue:${String(node.issueNumber)}`) {
+        errors.push(`DAG issue node ${String(node.id)} has an inconsistent issueNumber`);
+      }
+    } else if (!oneOf(node.kind, ['rfc', 'external'] as const)) {
+      errors.push(`DAG node ${String(node.id)} has an invalid kind`);
+    }
+  }
 
   for (const number of activeNumbers) {
     const matches = nodes.filter((node) =>
@@ -330,11 +344,15 @@ function validateState(
     errors.push('state must contain exactly docs, internals, fixes, and features lanes');
   }
   const laneIssues: number[] = [];
+  const stateLaneByIssue = new Map<number, string>();
   for (const lane of lanes) {
     if (!nonEmpty(lane.orchestratorAgentId)) {
       errors.push(`lane ${String(lane.id)} needs one orchestrator identity`);
     }
-    laneIssues.push(...integers(lane.issueNumbers));
+    for (const number of integers(lane.issueNumbers)) {
+      laneIssues.push(number);
+      if (typeof lane.id === 'string') stateLaneByIssue.set(number, lane.id);
+    }
   }
   for (const duplicate of duplicateValues(laneIssues)) {
     errors.push(`active issue #${duplicate} is owned by more than one lane`);
@@ -346,6 +364,15 @@ function validateState(
   if (JSON.stringify(activeNumbers) !== JSON.stringify(assignedNumbers)) {
     errors.push('lane issue ownership must equal the active frozen inventory');
   }
+  for (const issue of activeIssues) {
+    if (issueNumber(issue.number) && stateLaneByIssue.get(issue.number) !== issue.lane) {
+      errors.push(
+        `active inventory issue #${issue.number} lane ${
+          String(issue.lane)
+        } disagrees with cluster state`,
+      );
+    }
+  }
 
   for (const watcher of records(state.watchers)) {
     if (!nonEmpty(watcher.agentId) || watcher.mutationAuthority !== false) {
@@ -355,6 +382,14 @@ function validateState(
   const watcherIds = records(state.watchers).map((watcher) => watcher.agentId).filter(nonEmpty);
   for (const duplicate of duplicateValues(watcherIds)) {
     errors.push(`watcher ${duplicate} is duplicated`);
+  }
+  const laneOrchestratorIds = new Set(
+    lanes.map((lane) => lane.orchestratorAgentId).filter(nonEmpty),
+  );
+  for (const watcherId of watcherIds) {
+    if (laneOrchestratorIds.has(watcherId)) {
+      errors.push(`watcher ${watcherId} cannot also be a lane orchestrator`);
+    }
   }
 
   const leaves = records(state.leaves);
@@ -512,19 +547,52 @@ async function readJson(path: string): Promise<unknown> {
   return JSON.parse(await Deno.readTextFile(path));
 }
 
+export interface ValidateCliArgs {
+  readonly runDir?: string;
+  readonly error?: string;
+}
+
+/** Parse both direct invocation and `deno task ... -- <run-dir>` arguments. */
+export function parseValidateCliArgs(args: readonly string[]): ValidateCliArgs {
+  const positional = args.filter((arg) => arg !== '--');
+  if (positional.some((arg) => arg.startsWith('-'))) {
+    return { error: `unknown option: ${positional.find((arg) => arg.startsWith('-'))}` };
+  }
+  if (positional.length !== 1) {
+    return {
+      error: positional.length === 0
+        ? 'missing run directory'
+        : 'expected exactly one run directory',
+    };
+  }
+  return { runDir: positional[0] };
+}
+
 async function main(): Promise<void> {
-  const runDir = Deno.args[0];
-  if (!runDir) {
+  const parsed = parseValidateCliArgs(Deno.args);
+  if (!parsed.runDir || parsed.error) {
+    if (parsed.error) console.error(`error: ${parsed.error}`);
     console.error('usage: validate-milestone-cluster.ts <run-dir>');
     Deno.exit(2);
   }
-  const result = await validateMilestoneCluster({
-    intake: await readJson(join(runDir, 'milestone-intake.json')),
-    inventory: await readJson(join(runDir, 'milestone-inventory.json')),
-    dag: await readJson(join(runDir, 'milestone-dependency-dag.json')),
-    state: await readJson(join(runDir, 'milestone-cluster-state.json')),
-    status: await Deno.readTextFile(join(runDir, 'milestone-status.md')),
-  });
+  let result: ValidationResult;
+  try {
+    const runDir = parsed.runDir;
+    result = await validateMilestoneCluster({
+      intake: await readJson(join(runDir, 'milestone-intake.json')),
+      inventory: await readJson(join(runDir, 'milestone-inventory.json')),
+      dag: await readJson(join(runDir, 'milestone-dependency-dag.json')),
+      state: await readJson(join(runDir, 'milestone-cluster-state.json')),
+      status: await Deno.readTextFile(join(runDir, 'milestone-status.md')),
+    });
+  } catch (error) {
+    console.error(
+      `error: unable to validate milestone cluster: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+    Deno.exit(1);
+  }
   console.log(JSON.stringify(result, null, 2));
   if (!result.ok) Deno.exit(1);
 }

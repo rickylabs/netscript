@@ -104,20 +104,55 @@ export async function renderMilestoneStatus(state: MilestoneClusterStateView): P
   return `${lines.join('\n')}\n`;
 }
 
+export interface RenderCliArgs {
+  readonly runDir?: string;
+  readonly check: boolean;
+  readonly error?: string;
+}
+
+/** Parse both direct invocation and `deno task ... -- <run-dir>` arguments. */
+export function parseRenderCliArgs(args: readonly string[]): RenderCliArgs {
+  let runDir: string | undefined;
+  let check = false;
+  for (const arg of args) {
+    if (arg === '--') continue;
+    if (arg === '--check') {
+      check = true;
+      continue;
+    }
+    if (arg.startsWith('-')) return { check, error: `unknown option: ${arg}` };
+    if (runDir) return { check, error: 'expected exactly one run directory' };
+    runDir = arg;
+  }
+  if (!runDir) return { check, error: 'missing run directory' };
+  return { runDir, check };
+}
+
 async function main(): Promise<void> {
-  const args = Deno.args.filter((arg) => arg !== '--check');
-  const runDir = args[0];
-  if (!runDir) {
+  const parsed = parseRenderCliArgs(Deno.args);
+  if (!parsed.runDir || parsed.error) {
+    if (parsed.error) console.error(`error: ${parsed.error}`);
     console.error('usage: render-milestone-status.ts <run-dir> [--check]');
     Deno.exit(2);
   }
 
+  const runDir = parsed.runDir;
   const statePath = join(runDir, 'milestone-cluster-state.json');
   const statusPath = join(runDir, 'milestone-status.md');
-  const state = JSON.parse(await Deno.readTextFile(statePath)) as MilestoneClusterStateView;
-  const rendered = await renderMilestoneStatus(state);
+  let rendered: string;
+  try {
+    const state = JSON.parse(await Deno.readTextFile(statePath)) as MilestoneClusterStateView;
+    rendered = await renderMilestoneStatus(state);
+  } catch (error) {
+    console.error(
+      `error: unable to render milestone status: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+    Deno.exit(1);
+  }
 
-  if (Deno.args.includes('--check')) {
+  if (parsed.check) {
     let current = '';
     try {
       current = await Deno.readTextFile(statusPath);

@@ -1,5 +1,22 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
-import { renderMilestoneStatus, stateDigest } from './render-milestone-status.ts';
+import {
+  parseRenderCliArgs,
+  renderMilestoneStatus,
+  stateDigest,
+} from './render-milestone-status.ts';
+
+Deno.test('render CLI accepts the deno task separator and rejects malformed usage', () => {
+  assertEquals(parseRenderCliArgs(['--', '/tmp/run']), {
+    runDir: '/tmp/run',
+    check: false,
+  });
+  assertEquals(parseRenderCliArgs(['--check', '--', '/tmp/run']), {
+    runDir: '/tmp/run',
+    check: true,
+  });
+  assertStringIncludes(parseRenderCliArgs(['--']).error ?? '', 'missing run directory');
+  assertStringIncludes(parseRenderCliArgs(['a', 'b']).error ?? '', 'exactly one');
+});
 
 Deno.test('milestone status is deterministic and carries a state digest', async () => {
   const state = {
