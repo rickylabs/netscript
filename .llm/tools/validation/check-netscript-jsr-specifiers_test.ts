@@ -1,5 +1,9 @@
 import { assertEquals } from 'jsr:@std/assert@^1';
 import { failureCount, scanNetscriptJsrSpecifiers } from './check-netscript-jsr-specifiers.ts';
+import {
+  createNetscriptJsrSpecifierRegExp,
+  parseNetscriptJsrSpecifier,
+} from '../netscript-jsr-specifier.ts';
 
 Deno.test('embedded MCP documentation is allowed without weakening MCP source checks', async () => {
   const root = await Deno.makeTempDir({ prefix: 'netscript-jsr-specifier-guard-' });
@@ -85,6 +89,73 @@ Deno.test('a current pin naming a real export passes', async () => {
   }
 });
 
+Deno.test('sentence punctuation terminates an exact prerelease specifier', async () => {
+  for (
+    const prose of [
+      'install jsr:@netscript/sdk@0.0.1-beta.11.',
+      'install jsr:@netscript/sdk@0.0.1-beta.11, continue',
+      '(jsr:@netscript/sdk@0.0.1-beta.11)',
+      'install jsr:@netscript/sdk@0.0.1-beta.11\nnext',
+    ]
+  ) {
+    const matched = createNetscriptJsrSpecifierRegExp().exec(prose)?.[0];
+    assertEquals(matched, 'jsr:@netscript/sdk@0.0.1-beta.11');
+    assertEquals(parseNetscriptJsrSpecifier(matched!), {
+      name: '@netscript/sdk',
+      version: '0.0.1-beta.11',
+      rangeOperator: '',
+      subpath: '',
+    });
+  }
+
+  const root = await workspaceWithSdk(
+    `export const period = 'install jsr:@netscript/sdk@0.0.1-beta.11.';\n` +
+      `export const comma = 'install jsr:@netscript/sdk@0.0.1-beta.11,';\n` +
+      `export const parenthesis = '(jsr:@netscript/sdk@0.0.1-beta.11)';\n` +
+      'export const newline = `install jsr:@netscript/sdk@0.0.1-beta.11\nnext`;\n',
+  );
+  try {
+    const result = await scanNetscriptJsrSpecifiers(['packages'], root);
+
+    assertEquals(result.staleVersions, []);
+    assertEquals(result.ranges, []);
+    assertEquals(failureCount(result), 0);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('a genuinely versionless specifier remains release-blocking', async () => {
+  const root = await workspaceWithSdk(
+    `export const deps = ['jsr:@netscript/sdk'];\n`,
+  );
+  try {
+    const result = await scanNetscriptJsrSpecifiers(['packages'], root);
+
+    assertEquals(result.findings.length, 1);
+    assertEquals(result.findings[0].specifier, 'jsr:@netscript/sdk');
+    assertEquals(failureCount(result), 1);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('stale exact and range pins remain release-blocking', async () => {
+  for (const pin of ['0.0.1-beta.10', '^0.0.1-beta.11', '~0.0.1-beta.11', '>=0.0.1-beta.11']) {
+    const root = await workspaceWithSdk(
+      `export const deps = ['jsr:@netscript/sdk@${pin}'];\n`,
+    );
+    try {
+      const result = await scanNetscriptJsrSpecifiers(['packages'], root);
+      assertEquals(failureCount(result), 1, pin);
+      if (pin === '0.0.1-beta.10') assertEquals(result.staleVersions.length, 1, pin);
+      else assertEquals(result.ranges.length, 1, pin);
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
+  }
+});
+
 Deno.test('a subpath the package does not export fails even when the version is current', async () => {
   const root = await workspaceWithSdk(
     `export const deps = ['jsr:@netscript/sdk@0.0.1-beta.11/auto-update'];\n`,
@@ -105,7 +176,9 @@ Deno.test('a subpath the package does not export fails even when the version is 
 Deno.test('range pins fail while template placeholders remain version-neutral', async () => {
   const root = await workspaceWithSdk(
     `export const range = ['jsr:@netscript/sdk@^0.0.1-beta.5'];\n` +
-      `export const doc = 'deno add jsr:@netscript/sdk@<version>/desktop';\n`,
+      `export const doc = 'deno add jsr:@netscript/sdk@<version>/desktop';\n` +
+      `export const template = 'jsr:@netscript/sdk@{{netscriptReleaseVersion}}';\n` +
+      `export const prefix = 'jsr:@netscript/sdk@';\n`,
   );
   try {
     const result = await scanNetscriptJsrSpecifiers(['packages'], root);

@@ -188,6 +188,27 @@ Deno.test('publish readiness fails on a seeded versionless framework specifier',
   }
 });
 
+Deno.test('publish readiness fails on every first-party range pin', async () => {
+  for (const operator of ['^', '~', '>=']) {
+    const root = await versionFixture();
+    try {
+      await Deno.mkdir(`${root}/plugins`, { recursive: true });
+      await Deno.writeTextFile(
+        `${root}/packages/new/registry.manifest.ts`,
+        `export const deps = ['jsr:@netscript/new@${operator}0.0.2-canary.1'];\n`,
+      );
+      const report = await collectPublishReadiness(
+        root,
+        '0.0.2-canary.1',
+        dependencies({ scanSpecifiers: scanNetscriptJsrSpecifiers }),
+      );
+      assertFailed(report.checks, 'versionless-specifiers', 'range pin');
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
+  }
+});
+
 Deno.test('first-publish checklist fails on a seeded missing README', async () => {
   const root = await firstPublishFixture({ readme: false });
   try {
