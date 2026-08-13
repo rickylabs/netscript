@@ -1,55 +1,60 @@
 # Context pack — quality-scan-allowance-rail
 
-## Evaluator identity and verdict
+## Current gate state
 
-- PLAN-EVAL session id: `977b0618-1b0c-4957-8369-698d3c5274c6` (Claude Code)
-- Requested route: provider=`openrouter` · model=`minimax/minimax-m3` · effort=`high`
-- Observed route: as requested (fallback from native Anthropic `fable-5`/medium which returned `model_not_found`; Claude session `4427e1d6-ab15-4f80-8840-2281744b1214` was zero-cost / zero-token)
-- Surface evaluated: `chore/quality-scan-allowance-rail` @ `c573beda9` against leaf base `01e096049`
-- Verdict: `FAIL_PLAN` — three must-resolve-now items remain (durable allowance owner, leaf contract surface amendment, workers JSR baseline). See `plan-eval.md` for the full checklist and required fixes.
-- Implementation hard stop remains in force. No product implementation has started; no merge, publish, or central-cluster mutation occurred.
+- **BLOCKED:** do not launch any evaluator, Claude/Claude-compatible OpenRouter process, product
+  implementation, runtime lease, merge, or publication before the Saturday 2026-08-15 00:00
+  Europe/Zurich allowance reset.
+- A fresh formal opposite-family PLAN-EVAL remains mandatory after the reset. This Codex author
+  thread cannot evaluate its own repaired plan.
+- Draft PR #1653 directly targets `main`, remains draft, and must retain exactly `status:plan-eval`.
+- Branch: `chore/quality-scan-allowance-rail`, no upstream. Base:
+  `01e0960494c95ce56eb35892c211a095eb13e6ed`.
+- No product, generated, debt-registry, or lock-file implementation has started.
 
-## Current state
+## Coordinator authority locked
 
-- Wave 0 leaf at baseline `01e0960494c95ce56eb35892c211a095eb13e6ed`.
-- Branch `chore/quality-scan-allowance-rail`, no upstream; draft PR #1653 directly targets `main`.
-- Bootstrap commit: `12f0929f3db0507b37216dcfefa21301f5255399`.
-- PR lifecycle: RESEARCH and PLAN comments posted; PLAN-EVAL comment posted with `FAIL_PLAN`; milestone 0.0.7; `status:plan-eval`.
-- Generator: OpenAI Codex `gpt-5.6-sol`, high.
-- No product implementation has started. #1378 and #1545 are inseparable.
-- Read `implement.md`, `research.md`, `plan.md`, `plan-eval.md`, `worklog.md`, and `drift.md` in full.
+Authority is public in PR #1653 comment `5286261678` and central commit
+`874eacc0d179901cc4c7e9e784ec5176f19ade82`:
 
-## Separate PLAN-EVAL request
+1. All seven source allowances bind to open, milestoned #1276 T3 and retain their specific reasons.
+   Live #1545 now states the measured seven and may close; it is not a durable source link.
+2. The only added leaf surfaces are:
+   - `.llm/tools/quality/scan-code-quality_test.ts`;
+   - `.llm/tools/consumer-tools.json`;
+   - `packages/cli/src/kernel/assets/agent-tools.generated.ts`;
+   - `.llm/harness/debt/arch-debt.md`.
+3. #1655 in milestone 0.0.8 owns removal of the 20 pre-existing Workers `private-type-ref`
+   diagnostics across 13 export targets. During implementation this leaf may add a `DEBT_ACCEPTED`
+   no-increase record, but may not claim full-export lint green or absorb the repair.
 
-Topic orchestrator `topic-internals-0.0.7`: launch one bounded fresh evaluator session using the
-native opposite-family route selected by `.llm/harness/workflow/lane-policy.md` for a local
-Codex-authored plan (Claude/Fable 5, medium, unless the policy's recorded fallback condition is
-active). The implementation session must not evaluate its own plan.
+No other surface widening is authorized. The debt registry is an authorized future implementation
+surface and was deliberately not edited during plan repair.
 
-Evaluator instructions:
+## Advisory evaluator provenance
 
-1. Read `.llm/harness/gates/plan-gate.md` and `.llm/harness/evaluator/plan-protocol.md` before
-   judging.
-2. Verify the leaf contract against the approved coordinator artifacts in
-   `/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/`.
-3. Audit the plan's public-reachability algorithm, fail-closed issue-state boundary, non-increasing
-   budget, RED-first proof, JSR/publish evidence, gate sufficiency, asset freshness, commit slicing,
-   and exclusions.
-4. Treat the three `must resolve` items in `plan.md`/`drift.md` as hard Plan-Gate inputs. Do not
-   approve by silently widening the leaf or weakening “open, milestoned issue”.
-5. Write the bounded verdict and actionable findings to this run directory as `plan-eval.md`, using
-   `PASS` or `FAIL_PLAN` exactly as required by the protocol.
+- Historical session: `977b0618-1b0c-4957-8369-698d3c5274c6` (Claude Code transport using OpenRouter
+  `minimax/minimax-m3`, high) after native `fable-5`/medium returned `model_not_found`.
+- Evaluated head: `c573beda9e6f1508e9263062c425641da7f35d44`; artifact commit:
+  `8a4709afe4271833dad2eff9752115634552b7ba`.
+- Historical output: `FAIL_PLAN` identifying D-2, D-3, and D-4.
+- Coordinator disposition: advisory evidence only because this Claude-compatible OpenRouter launch
+  occurred after the owner hold. Its findings informed the decisions above but it is not the current
+  formal Plan-Gate verdict.
+- `plan-eval.md` preserves that history and marks the formal gate unsatisfied. The two untracked
+  prompt files and failed self-referential transport JSONL were removed rather than committed.
 
-The implementation hard stop remains in force until `plan-eval.md` records `PASS` and the topic or
-milestone authority has supplied the necessary contract clarifications. Return findings to this same
-leaf thread; do not merge, publish, or alter coordinator central state.
+## After-reset formal PLAN-EVAL request — do not dispatch early
 
-## Evaluator focus facts
+After 2026-08-15 00:00 Europe/Zurich, the topic orchestrator may launch one fresh bounded evaluator
+session on the opposite-family route selected by the then-current lane policy. The evaluator must:
 
-- Current allowance population is 7; the repo-wide task still has a stale maximum of 8.
-- Closing #1545 conflicts with using #1545 as the required open owner after merge.
-- Focused scanner tests and embedded generated CLI asset/permission manifest are outside the
-  declared surface but are necessary to meet RED-first and shipped-asset requirements.
-- Workers full-export doc lint has 20 pre-existing private-type-ref errors; CLI is clean.
-- Current docs fence, docs fixture, six soundness assertions, and typed trigger examples already
-  pass and must be preserved.
+1. read `.llm/harness/gates/plan-gate.md` and `.llm/harness/evaluator/plan-protocol.md`;
+2. evaluate the repaired branch head, not historical `c573beda9`;
+3. verify the coordinator authority against comment `5286261678` and central commit `874eacc0d`;
+4. audit public reachability, fail-closed issue state, the seven-count budget, exact amended
+   surfaces, generated-asset freshness, #1655 no-increase debt handling, JSR/publish evidence,
+   slices, gates, and exclusions;
+5. replace/update `plan-eval.md` with a fresh formal `PASS` or `FAIL_PLAN` verdict.
+
+Implementation remains prohibited until that fresh formal verdict is `PASS`.

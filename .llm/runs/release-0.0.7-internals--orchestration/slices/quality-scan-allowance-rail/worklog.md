@@ -27,24 +27,26 @@ reads.
 - `AllowancePolicyFailure` covers malformed/unverified registration and budget overflow.
 
 The scanner remains the sole tool/application boundary. No new package layer, CLI spine, feature
-axis, plugin extension, or backend protocol is introduced. A narrow GitHub adapter is the proposed
-external port; contract approval is pending because its manifest/generated peers are not currently
-declared.
+axis, plugin extension, or backend protocol is introduced. A narrow GitHub adapter is the external
+port. Coordinator commit `874eacc0d` authorizes its exact focused-test, consumer-manifest,
+generated-asset, and debt-registry peers; no other widening is permitted.
 
 ### Constants and configuration
 
 The measured live population is 7. Both task maxima converge to 7 and may only decrease with removed
-allowances. Syntax and state enums are named in the scanner; issue owner IDs remain in the source
-registration comments, not duplicated in a second budget table.
+allowances. All seven registration comments use open, milestoned #1276 T3 and retain their specific
+reason. #1545 is the closing one-time registration issue, never the durable source owner. Syntax and
+state enums are named in the scanner; issue owner IDs remain in source comments, not a second table.
 
 ### Ordered commit slices
 
-1. Registration rail: RED-first allowance/state tests, seven linked records, fail-closed resolver,
-   budgets at 7; push only once green.
+1. Registration rail: RED-first allowance/state tests, seven #1276-linked records with specific
+   reasons, fail-closed resolver, budgets at 7; push only once green.
 2. Exported-any rail: RED-first public-vs-local/re-export tests, then deterministic export graph and
    token-aware enforcement.
-3. Consumer/JSR synchronization: generated asset through checked-in generator, clean second run,
-   full-export doc/publish evidence.
+3. Consumer/JSR synchronization: generated asset through checked-in generator, clean second run, CLI
+   full-export evidence, Workers strict 20-diagnostic no-increase evidence, and one #1655-linked
+   `DEBT_ACCEPTED` entry.
 4. Final evidence/sign-off artifacts after Tier-A reviews and global-gate lease; request IMPL-EVAL.
 
 Each implementation slice will name its literal commit SHA and receipts in a structured PR comment.
@@ -53,9 +55,10 @@ permitted.
 
 ### Deferred and excluded work
 
-The casts' root-cause removal, broad JSR private-type repairs, #1278 Inventory B, #1276 T1–T5,
-#1245, #1249, #1379, and #1380 are excluded. No type weakening, broad suppression, `as unknown as`,
-`as any`, `@ts-ignore`, or unregistered allowance will be introduced to green a gate.
+The #1276 T3 root-cause removal and #1655 Workers private-type repair remain excluded, as do #1278
+Inventory B, #1276 T1–T2/T4–T5, #1245, #1249, #1379, and #1380. No type weakening, broad
+suppression, `as unknown as`, `as any`, `@ts-ignore`, or unregistered allowance will be introduced
+to green a gate.
 
 ### Contributor path
 
@@ -83,9 +86,10 @@ gates require the coordinator's singleton lease.
 - Live #1378 and #1545 are open in milestone 0.0.7; `origin/main` equals the approved baseline.
 - #1549 already delivered docs fences, soundness preservation, original budget wiring, and typed
   triggers examples; preserve rather than duplicate it.
-- Current allowance population is 7, not the issue's stale 8.
-- Required test/generated peers, durable issue ownership/state lookup, and workers JSR baseline are
-  escalated in `drift.md`.
+- Current allowance population is 7; live #1545 has been reconciled from stale 8 to 7.
+- Coordinator comment `5286261678` and central commit `874eacc0d` resolve the former authority
+  blockers: #1276 T3 owns all seven records, the four exact coupled surfaces are authorized, and
+  #1655 owns Workers lint repair with strict no-increase evidence here.
 
 ## Activity
 
@@ -98,25 +102,26 @@ gates require the coordinator's singleton lease.
 - 2026-08-13 — committed bootstrap as `12f0929f3db0507b37216dcfefa21301f5255399`, pushed by explicit
   refspec, opened draft PR #1653 directly against `main`, applied milestone 0.0.7/taxonomy, posted
   RESEARCH and PLAN comments, and handed off at `status:plan-eval`.
-- 2026-08-13 — bounded opposite-family PLAN-EVAL (Claude session
+- 2026-08-13 — late Claude-compatible OpenRouter evaluator run (Claude session
   `977b0618-1b0c-4957-8369-698d3c5274c6`, OpenRouter `minimax/minimax-m3` / high; native
   `fable-5`/medium fallback per the lane policy) evaluated the plan at `c573beda9` against leaf base
-  `01e096049` and returned `FAIL_PLAN`. Three must-resolve-now items (`drift.md` D-2, D-3, D-4)
-  remain open and are listed in `plan-eval.md`; D-1 (#1545 stale prose) is editorial and safe to
-  defer to implementation alongside D-2. Implementation hard stop remains in force. No product,
-  package, plugin, generated, or workflow source was inspected or edited.
+  `01e096049` and returned `FAIL_PLAN`. At that historical head, three must-resolve-now items
+  (`drift.md` D-2, D-3, D-4) were open and listed in `plan-eval.md`; D-1 (#1545 stale prose) was
+  editorial. Implementation hard stop remained in force. No product, package, plugin, generated, or
+  workflow source was inspected or edited.
+- 2026-08-13 — the owner/coordinator classified the late Claude-compatible OpenRouter `FAIL_PLAN` as
+  advisory only and stopped all milestone Claude/OpenRouter evaluator work until the 2026-08-15
+  00:00 Europe/Zurich reset. Coordinator comment `5286261678` and central commit `874eacc0d`
+  resolved D-1 through D-4 without implementation.
+- 2026-08-13 — repaired plan/design/evaluator metadata only, removed the two untracked evaluator
+  prompts and failed self-referential JSONL, left `.llm/harness/debt/arch-debt.md` untouched, and
+  stopped at `status:plan-eval` awaiting a fresh formal post-reset verdict.
 
-## PLAN-EVAL verdict
+## Plan-Gate state
 
-- Verdict: `FAIL_PLAN` (see `plan-eval.md`).
-- Required fixes before a fresh PLAN-EVAL may return `PASS`:
-  1. Durable open, milestoned debt owner for the seven allowances (D-2). #1545 closes in this PR and
-     cannot be the post-merge owner.
-  2. Leaf contract surface amendment for `.llm/tools/quality/scan-code-quality_test.ts`,
-     `packages/cli/src/kernel/assets/agent-tools.generated.ts`, and
-     `.llm/tools/consumer-tools.json`, or a truthful approved alternative that still proves
-     RED-first behaviour and ships a fresh consumer asset (D-3).
-  3. Workers JSR baseline decision — explicit no-increase debt baseline with separately owned debt
-     or scheduled prerequisite repair (D-4).
-  4. Editorial reconciliation of live #1545 acceptance count from stale 8 to measured 7 before the
-     PR carries `Closes #1545`.
+- Historical OpenRouter artifact: advisory `FAIL_PLAN` at `8a4709afe`; its D-2/D-3/D-4 findings are
+  resolved by coordinator authority and its D-1 editorial finding is resolved in live #1545.
+- Current formal verdict: none for the repaired head.
+- Scheduling blocker: owner hold forbids any formal evaluator before 2026-08-15 00:00 Europe/Zurich.
+- Required next gate: one fresh separate opposite-family PLAN-EVAL after reset. Product
+  implementation remains prohibited until it records `PASS`.

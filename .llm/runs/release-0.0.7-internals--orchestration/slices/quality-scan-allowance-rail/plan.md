@@ -2,9 +2,11 @@
 
 ## Status and hard stop
 
-This plan is ready for a bounded, separate-session PLAN-EVAL. No implementation may begin before
-`plan-eval.md` records `PASS`. Three contract/authority clarifications in `drift.md` are also
-must-resolve inputs; the leaf will not silently widen surfaces or weaken an acceptance claim.
+Coordinator comment `5286261678` and central commit `874eacc0d` resolve the three authority
+questions raised by the advisory OpenRouter `FAIL_PLAN`. The repaired plan is ready for a fresh,
+bounded, formal opposite-family PLAN-EVAL, but the owner has forbidden that launch before the
+Saturday 2026-08-15 00:00 Europe/Zurich allowance reset. No implementation may begin until a fresh
+separate session evaluates this repaired head and `plan-eval.md` records `PASS`.
 
 ## Outcome
 
@@ -48,17 +50,19 @@ Reject missing/multiple IDs, missing reasons, duplicate/malformed records, close
 without a milestone, and unavailable/malformed issue-state responses. Deduplicate lookups by issue
 number. Keep issue resolution behind an injected port so focused tests use fixtures.
 
-The proposed production adapter is a narrow GitHub REST lookup for `rickylabs/netscript`, using only
+The production adapter is a narrow GitHub REST lookup for `rickylabs/netscript`, using only
 `api.github.com` and an optional existing token for rate limits. It must fail closed when no
-authoritative answer is available. This adapter cannot be finalized until the topic/coordinator
-approves the required permission-manifest/generated-asset contract amendment and names a durable
-open debt issue. #1545 itself cannot be the durable owner because this PR closes it.
+authoritative answer is available. All seven source registrations bind to open, milestoned #1276 T3
+and retain their existing specific reason. #1545 tracks the one-time registration and may close; it
+is never written into source as the durable owner.
 
 ### Budget
 
 Set both `quality:scan` and `quality:scan:repo` to `--max-allow 7`, matching the measured
-population. The budget checker must validate the linked issue state for any attempted increase;
-normal cleanup only lowers the count/budget. No planned slice increases the population.
+population. Keep the existing allowance-budget diff checker as the same-change numeric guard; the
+scanner independently validates every source registration, so a new allowance/budget increase cannot
+pass without its own open, milestoned issue link in the diff. Normal cleanup only lowers the
+count/budget. No planned slice increases the population.
 
 ### Existing behavior
 
@@ -100,14 +104,15 @@ and overflow cases. Then land the parser/resolver contract, seven issue-linked s
 budgets at 7, and deterministic resolver fixtures in one green reviewable commit. Registration
 precedes public-`any` enforcement. No pushed head may be day-one red.
 
-Planned files after contract clarification:
+Planned files under the coordinator-amended contract:
 
 - `.llm/tools/quality/scan-code-quality.ts`;
-- `.llm/tools/quality/scan-code-quality_test.ts` (contract amendment required);
+- `.llm/tools/quality/scan-code-quality_test.ts`;
 - `deno.json`;
-- the six approved CLI/public source sites and workers producer;
-- `.llm/tools/consumer-tools.json` and generated CLI asset if live lookup changes permissions
-  (contract amendment required).
+- `packages/cli/src/public/features/root/public-command-dependencies.ts`,
+  `packages/cli/src/public/public-api.ts`, and `plugins/workers/streams/producer.ts`;
+- `.llm/tools/consumer-tools.json` and `packages/cli/src/kernel/assets/agent-tools.generated.ts` for
+  the exact consumer permissions and generated copy.
 
 Proof: focused structured tests, `quality-scan`, `quality-scan-repo`, `allowance-budget`, scoped
 check/lint/format, and generated-asset freshness where applicable.
@@ -119,7 +124,7 @@ member, and local-only control. Land the export graph and token-aware public-dec
 keeping local-only `any` outside this specific rule. Preserve the docs and soundness behaviors in
 the same focused suite.
 
-Planned files: scanner and focused scanner test only, subject to the Slice 1 contract amendment.
+Planned files: scanner and focused scanner test only.
 
 Proof: focused structured tests, scoped check/lint/format, `quality-scan`, and `quality-scan-repo`.
 
@@ -127,14 +132,20 @@ Proof: focused structured tests, scoped check/lint/format, `quality-scan`, and `
 
 Regenerate the embedded CLI tool only through `gen:assets-barrel`, then run the checked-in freshness
 check a second time with no diff. Review exact CLI/workers export maps, dependency pins, publish
-file lists, isolated-declaration diagnostics, and runtime asset availability. Preserve the
-already-typed triggers docs and avoid unrelated Fresh/docs edits unless a RED-first regression
-demonstrates a necessary approved-surface correction.
+file lists, isolated-declaration diagnostics, and runtime asset availability. Add one
+`DEBT_ACCEPTED` no-increase entry to `.llm/harness/debt/arch-debt.md` that binds the Workers
+20-diagnostic/13-export-target baseline to #1655. Preserve the already-typed triggers docs and avoid
+unrelated Fresh/docs edits unless a RED-first regression demonstrates a necessary approved-surface
+correction.
 
-Planned files: generated CLI asset only if the contract is amended; no hand editing.
+Planned files: generated CLI asset through its checked-in generator and the debt registry entry. Do
+not hand-edit generated output. The debt registry is authorized for implementation but remains
+untouched during this plan-repair slice.
 
-Proof: `assets-barrel`, full-export `doc:lint` for each touched publishable member, scoped publish
-dry-run, and recorded no-regression handling for any coordinator-accepted baseline JSR debt.
+Proof: `assets-barrel`; CLI full-export `doc:lint`; Workers full-export `doc:lint` showing exactly
+20 `private-type-ref` diagnostics and no new diagnostic class/count across all 13 targets; scoped
+publish dry-run; and the #1655-linked `DEBT_ACCEPTED` record. This leaf must not report Workers
+full-export lint as green.
 
 ### Slice 4 — final gates, review reconciliation, and sign-off artifacts
 
@@ -160,7 +171,7 @@ No status-ready label, ready-for-review flip, merge, publish, or release action 
 | Docs source format      | durable `docs-source-format` plus its test from `docs/site`  | final head                             |
 | Docs accuracy           | durable `docs-accuracy` receipt                              | final head                             |
 | Generated asset         | `assets-barrel`, followed by a clean second generation       | Slice 3/final head                     |
-| JSR docs                | full export-map `deno doc`, then full-export `doc:lint`      | Slice 3/final head                     |
+| JSR docs                | CLI green; Workers exact 20-diagnostic no-increase baseline  | Slice 3/final head                     |
 | Publish package set     | scoped `publish:dry-run`; inspect pins and file lists        | Slice 3/final; global lease            |
 | Git/lock truth          | raw `git status`, `git diff`, `git diff <base> -- deno.lock` | every slice/final                      |
 
@@ -172,33 +183,39 @@ the separate IMPL-EVAL remain mandatory.
 - **CLI:** inspect all three export targets with `deno doc`, run full-export `doc:lint`, scoped
   publish dry-run, review exact pins/publish files, and verify the embedded scanner runtime asset.
 - **Workers:** inspect all thirteen export targets, run full-export `doc:lint`, scoped publish
-  dry-run, review exact pins/publish files, and explicitly compare private-type-ref diagnostics to
-  the accepted baseline if the coordinator authorizes no-regression handling.
+  dry-run, review exact pins/publish files, and prove that `private-type-ref` remains exactly 20
+  with no new diagnostic category. Record `DEBT_ACCEPTED` against #1655 (milestone 0.0.8). Do not
+  claim full-export lint green or absorb #1655's repair.
 - **Fresh/docs:** run their overlay gates; do not claim them as touched publishable members unless
   the final source diff actually touches them.
 - Never publish, reload caches, delete lock files, or retain unrelated `deno.lock` churn.
 
 ## Open-decision sweep
 
-### Must resolve before implementation / PLAN-EVAL PASS
+### Coordinator-resolved decisions
 
-1. Amend the leaf contract for the focused scanner test and generated CLI asset/permission manifest,
-   or provide an approved alternative that still proves RED-first behavior and ships a fresh
-   consumer asset.
-2. Name/authorize a durable open, milestoned debt owner for the seven allowances and approve the
-   live issue-state adapter. #1545 cannot own records after a PR that closes #1545 merges.
-3. Decide whether the workers package's 20 pre-existing full-export `private-type-ref` diagnostics
-   are accepted as an explicit no-increase debt baseline or whether a separately scoped repair must
-   land first. This leaf will not absorb unrelated export repairs.
+1. **Allowance owner:** all seven records use open, milestoned #1276 T3 and their specific reasons;
+   live #1545 is reconciled to seven and may close.
+2. **Exact surface extension:** `.llm/tools/quality/scan-code-quality_test.ts`,
+   `.llm/tools/consumer-tools.json`, `packages/cli/src/kernel/assets/agent-tools.generated.ts`, and
+   `.llm/harness/debt/arch-debt.md` are authorized. No other widening is permitted.
+3. **Workers baseline:** #1655 in milestone 0.0.8 owns removal. This leaf may add one no-increase
+   `DEBT_ACCEPTED` entry and prove the exact 20-diagnostic baseline, but may not claim green lint or
+   repair the public surface.
+
+No design or authority decision remains open. The only blocker is the required fresh formal
+opposite-family PLAN-EVAL, which must not launch before 2026-08-15 00:00 Europe/Zurich.
 
 ### Safe deferrals
 
-- Removing the six CLI casts and one workers cast remains separately owned architecture debt.
-- #1278 Inventory B, #1276 T1–T5, #1245, #1249, #1379, and #1380 remain excluded.
+- Removing the six CLI casts and one workers cast remains #1276 T3 work; this leaf registers and
+  enforces the rail but does not perform that removal.
+- The 20 Workers `private-type-ref` repairs remain exclusively owned by #1655.
+- #1278 Inventory B, #1276 T1–T2/T4–T5, #1245, #1249, #1379, and #1380 remain excluded.
 - Broader public API resolution beyond checked-in local export/re-export graphs remains out of
   scope; unresolvable local edges fail closed rather than being ignored.
 
-No listed deferral blocks this leaf once the three authority decisions above are resolved.
+No listed scope deferral blocks this leaf. The Plan-Gate scheduling hold remains binding.
 
 ## Completion and rollback
 

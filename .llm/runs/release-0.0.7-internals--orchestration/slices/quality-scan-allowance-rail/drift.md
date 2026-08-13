@@ -12,3 +12,18 @@ claim to conceal these divergences.
 | D-5 | Prior landed scope   | Live #1378 comment says #1549 already delivered docs fences, docs fixtures/soundness preservation, max-budget wiring, and trigger typing in 0.0.6. Current-head inspection confirms those behaviors.                                                          | Preserve and regression-test; do not duplicate or revert the landed solution.                                                                                                       | Incorporated into plan                   |
 
 The draft PR PLAN comment is the topic-orchestrator notification channel for D-1 through D-4.
+
+## Coordinator disposition — 2026-08-13
+
+The historical states above are preserved because this log is append-only. Coordinator comment
+`5286261678` on PR #1653 and central commit `874eacc0d` supply the following superseding decisions:
+
+| ID  | Resolves            | Authority decision                                                                                                                                                                                                                         | Current state                             |
+| --- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- |
+| D-6 | D-1, D-2            | Bind all seven source allowances to open, milestoned #1276 T3 with their existing specific reasons. Live #1545 is reconciled to seven and may close; it is not a source owner.                                                             | Resolved before fresh PLAN-EVAL           |
+| D-7 | D-3                 | Extend the leaf only to `.llm/tools/quality/scan-code-quality_test.ts`, `.llm/tools/consumer-tools.json`, `packages/cli/src/kernel/assets/agent-tools.generated.ts`, and `.llm/harness/debt/arch-debt.md`.                                 | Resolved; no other widening               |
+| D-8 | D-4                 | #1655 (milestone 0.0.8) owns the 20 Workers `private-type-ref` repairs. This leaf may record `DEBT_ACCEPTED` and prove strict no-increase across 13 export targets, but may not claim green lint or absorb repair.                         | Resolved before fresh PLAN-EVAL           |
+| D-9 | Evaluator transport | The OpenRouter `FAIL_PLAN` at commit `8a4709afe` is advisory only. All Claude and Claude-compatible OpenRouter work is stopped until 2026-08-15 00:00 Europe/Zurich; a fresh formal opposite-family PLAN-EVAL remains mandatory afterward. | BLOCKED awaiting reset and formal verdict |
+
+No product implementation, runtime lease, merge, publication, or central-state mutation is
+authorized while D-9 is active.
