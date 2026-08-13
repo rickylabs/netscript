@@ -7,6 +7,8 @@
 - Approved coordinator artifacts:
   `/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/`.
 - No upstream; explicit push refspec only; draft PR against `main`; no merge or publication.
+- Draft PR: #1654 at initial artifact head `88b735a3641704810c86066310507c97db7f5a37`, labeled
+  `status:plan` with milestone `0.0.7`.
 - One grouped `scaffold.runtime` execution/receipt; never split the three issues.
 - Archetype 6 CLI/tooling. Required gates: structured check/test/lint/fmt, asset freshness,
   `quality:gate`, `arch:check`, applicable JSR audit/doc lint/publish dry run, and one leased shared

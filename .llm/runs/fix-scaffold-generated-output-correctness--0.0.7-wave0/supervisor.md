@@ -8,6 +8,7 @@
 | Worktree                   | `/home/codex/repos/netscript-007-leaf-scaffold-generated-output-correctness`        |
 | Branch                     | `fix/scaffold-generated-output-correctness` (no upstream)                           |
 | Base                       | `01e0960494c95ce56eb35892c211a095eb13e6ed`                                          |
+| Draft PR                   | #1654, direct to `main`                                                             |
 | Topic orchestrator         | `topic-fixes-0.0.7`                                                                 |
 | Merge/release authority    | `codex-root-0.0.7` only                                                             |
 | Implementation route       | requested OpenAI/Codex `gpt-5.6-sol` high                                           |
