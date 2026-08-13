@@ -62,7 +62,9 @@ jobs:
         run: |
           deno run --allow-read --allow-write --allow-run --allow-env \
             .llm/tools/gates/run-gate.ts --gate doc-lint --id code-quality-cli-docs \
-            --output .llm/tmp/gate-receipts/code-quality/cli-docs.json -- --root packages/cli --pretty
+            --output .llm/tmp/gate-receipts/code-quality/cli-docs.receipt.json \
+            --child-report .llm/tmp/gate-receipts/code-quality/cli-docs.report.json -- \
+            --root packages/cli --output .llm/tmp/gate-receipts/code-quality/cli-docs.report.json --pretty
           deno run --allow-read --allow-write --allow-run --allow-env \
             .llm/tools/gates/run-gate.ts --gate public-doc-lint --id code-quality-plugin-docs \
             --output .llm/tmp/gate-receipts/code-quality/plugin-docs.json -- \

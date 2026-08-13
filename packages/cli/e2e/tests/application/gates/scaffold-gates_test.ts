@@ -1,6 +1,7 @@
 import { assertEquals, assertThrows } from '@std/assert';
 
 import { createSmokeProject } from '../../../src/application/builders/workspace/smoke-project-factory.ts';
+import { createGeneratedCheckGates } from '../../../src/application/gates/scaffold/database-gates.ts';
 import { createGeneratedQualityGates } from '../../../src/application/gates/scaffold/generated-quality-gate.ts';
 import {
   ANY_PROBE_SOURCE,
@@ -139,6 +140,20 @@ Deno.test('generated check runs the fresh scaffold workspace check task', () => 
   assertEquals(
     gate.command(createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.LOCAL)),
     ['deno', 'task', 'check'],
+  );
+});
+
+Deno.test('every generated workspace check uses the scoped quality task', () => {
+  const context = createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.LOCAL);
+  assertEquals(
+    createGeneratedCheckGates().map((gate) =>
+      gate.kind === 'command' ? gate.command(context) : undefined
+    ),
+    [
+      ['deno', 'task', 'check', '--skip-apphost'],
+      ['deno', 'task', 'check', '--skip-apphost'],
+      ['deno', 'task', 'check', '--skip-apphost'],
+    ],
   );
 });
 

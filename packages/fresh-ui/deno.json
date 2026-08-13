@@ -39,9 +39,9 @@
     ]
   },
   "tasks": {
-    "check": "deno run --allow-read --allow-run ../../.llm/tools/run-deno-check.ts --cwd . --root . --ext ts,tsx --deno-arg --lock=deno.lock --deno-arg --frozen",
-    "lock:update": "deno run --allow-read --allow-run ../../.llm/tools/run-deno-check.ts --cwd . --root . --ext ts,tsx --deno-arg --lock=deno.lock --deno-arg --frozen=false",
-    "lint": "deno run --allow-read --allow-run ../../.llm/tools/run-deno-lint.ts --cwd . --root . --ext ts,tsx --config deno.json",
+    "check": "deno run --allow-read --allow-write --allow-run ../../.llm/tools/run-deno-check.ts --cwd . --root . --ext ts,tsx --deno-arg --lock=deno.lock --deno-arg --frozen",
+    "lock:update": "deno run --allow-read --allow-write --allow-run ../../.llm/tools/run-deno-check.ts --cwd . --root . --ext ts,tsx --deno-arg --lock=deno.lock --deno-arg --frozen=false",
+    "lint": "deno run --allow-read --allow-write --allow-run ../../.llm/tools/run-deno-lint.ts --cwd . --root . --ext ts,tsx --config deno.json",
     "test": "deno test --allow-read --allow-write --allow-run --lock=deno.lock --frozen --unstable-kv \"tests/**/*.ts\" \"tests/**/*.tsx\"",
     "tokens:build": "deno run --lock=deno.lock --frozen --allow-read=. --allow-write=registry/theme --allow-env --allow-net=registry.npmjs.org scripts/build-tokens.ts",
     "tokens:check": "deno task tokens:build && git diff --exit-code registry/theme/tokens.css registry/theme/theme-bridge.css registry/theme/tokens.json"

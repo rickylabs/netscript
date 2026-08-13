@@ -133,7 +133,8 @@ forking its skill content.
 - Evidence sets reject duplicate/contradictory gate or receipt IDs and recompute sufficiency; a
   stored `sufficiency` string has no authority.
 - E2E: preserve the E2E report and reference it using `--child-report`; do not replace or nest its
-  domain schema.
+  domain schema. Declared child reports must be fresh, parseable JSON; missing, malformed, or stale
+  reports fail closed.
 
 ### `run-deno-check.ts`
 
@@ -143,6 +144,14 @@ forking its skill content.
   - `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/logger --ext ts,tsx --pretty`
   - `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --input .llm/tmp/check.log --pretty`
   - `deno run --allow-run --allow-read .llm/tools/run-deno-check.ts --pretty --cwd . -- deno task check`
+
+### `run-deno-test.ts`
+
+- Purpose: run `deno test` through the native TAP reporter, preserve its exit code, group repeated
+  failure shapes, and retain every affected test location in structured JSON.
+- Example commands:
+  - `deno task test`
+  - `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts --output .llm/tmp/test-report.json -- --allow-all packages/kv/tests`
 
 ### `run-deno-fmt.ts`
 

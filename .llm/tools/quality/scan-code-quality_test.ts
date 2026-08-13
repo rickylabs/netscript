@@ -182,6 +182,21 @@ Deno.test('scanner respects extractor exemptions and scans docs test companions'
   }]);
 });
 
+Deno.test('scanner ignores generated docs output and caches', async () => {
+  const root = await Deno.makeTempDir();
+  const sourceDir = join(root, 'docs/site/reference/example');
+  const outputDir = join(root, 'docs/site/_site/example');
+  const cacheDir = join(root, 'docs/site/_cache/example');
+  await Deno.mkdir(sourceDir, { recursive: true });
+  await Deno.mkdir(outputDir, { recursive: true });
+  await Deno.mkdir(cacheDir, { recursive: true });
+  await Deno.writeTextFile(join(sourceDir, 'index.md'), '# Clean source\n');
+  await Deno.writeTextFile(join(outputDir, 'index.md'), '```ts\nconst generated: any = value;\n');
+  await Deno.writeTextFile(join(cacheDir, 'cached.md'), '```ts\nconst cached: any = value;\n');
+
+  assertEquals(await scanCodeQuality(['docs/site'], root), []);
+});
+
 Deno.test('soundness fixtures exempt negative-type directives but no other quality rule', async () => {
   const root = await Deno.makeTempDir();
   const fixtureDir = join(root, 'packages/contracts/tests/contracts');

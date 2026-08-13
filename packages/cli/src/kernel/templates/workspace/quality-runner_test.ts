@@ -18,6 +18,7 @@ async function runQuality(
   projectRoot: string,
   mode: string,
   runnerRoot = projectRoot,
+  args: readonly string[] = [],
 ): Promise<{ readonly code: number; readonly report: QualityReport }> {
   const runnerPath = join(runnerRoot, 'quality-runner.ts');
   await Deno.writeTextFile(runnerPath, generateQualityRunner());
@@ -28,6 +29,7 @@ async function runQuality(
       `--allow-run=${Deno.execPath()}`,
       runnerPath,
       mode,
+      ...args,
     ],
     cwd: projectRoot,
     stdout: 'piped',
@@ -124,6 +126,25 @@ Deno.test('generated quality runner propagates a selected TypeScript failure', a
     assertEquals(result.report.ok, false);
     assertEquals(result.report.selection.files, ['plugins/example/runtime.ts']);
     assertEquals(result.report.batches.map((batch) => batch.exitCode), [1]);
+  });
+});
+
+Deno.test('generated quality runner can omit unrestored AppHost sources for Deno-only gates', async () => {
+  await withTempRoots(async (projectRoot, runnerRoot) => {
+    const sources = new Map([
+      ['services/users/main.ts', 'export const service = true;\n'],
+      ['aspire/apphost.mts', 'const broken: string = 1;\n'],
+    ]);
+    for (const [path, source] of sources) {
+      const absolute = join(projectRoot, path);
+      await Deno.mkdir(join(absolute, '..'), { recursive: true });
+      await Deno.writeTextFile(absolute, source);
+    }
+
+    const result = await runQuality(projectRoot, 'check', runnerRoot, ['--skip-apphost']);
+    assertEquals(result.code, 0);
+    assertEquals(result.report.ok, true);
+    assertEquals(result.report.selection.files, ['services/users/main.ts']);
   });
 });
 

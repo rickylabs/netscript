@@ -25,7 +25,7 @@ that govern _when_ to reach for these tools. For those, see:
 
 | Subtree                  | Purpose                                                                                                                                                                                                                                                             | Detail                                                                                                   |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `.llm/tools/` (root)     | Stable-path scoped check/lint/fmt/doc-lint wrappers and the generated-assets barrel maintainer.                                                                                                                                                                     | This README + [`entry.md`](./entry.md).                                                                  |
+| `.llm/tools/` (root)     | Stable-path structured check/test/lint/fmt/doc-lint wrappers and the generated-assets barrel maintainer.                                                                                                                                                            | This README + [`entry.md`](./entry.md).                                                                  |
 | `.llm/tools/deps/`       | Structured wrappers over the Deno 2.9 dependency commands (`latest`/`outdated`/`why`/`audit`/`prod-install`) plus the centralization/catalog/file-link scan gates.                                                                                                  | [Dependency toolbelt](#dependency-toolbelt-llmtoolsdeps) below and the `netscript-deno-toolchain` skill. |
 | `.llm/tools/agentic/`    | The agent-orchestration suite: a desired-state runtime controller plus concern-grouped lanes (`codex/`, `openhands/`, `github/`, `wsl/`, `claude/`, `runtime/` + `runtime/cli/`, `lib/`). Everything volatile (models, versions, endpoints) lives in its `config/`. | [Agentic tooling](#agentic-tooling-llmtoolsagentic) below + the suite [`README`](./agentic/README.md).   |
 | `.llm/tools/docs/`       | Docs-site source checks for internal links and caveat ownership.                                                                                                                                                                                                    | Invoked from `docs/site/deno.json`.                                                                      |
@@ -49,6 +49,8 @@ for replicating the `agentic/` cleanup standard on other folders.
 - Use `.llm/tools/e2e/scaffold-e2e-test.ts` only as the retained independent behavioral diagnostic;
   it does not replace the product-grade merge gate.
 - Use `.llm/tools/run-deno-check.ts` to run scoped type-checks or summarize noisy deno-check logs.
+- Use `.llm/tools/run-deno-test.ts` to preserve test exit semantics while grouping repeated TAP
+  failure shapes into compact JSON.
 - Use `.llm/tools/run-deno-lint.ts` to run scoped lint checks and summarize findings as JSON.
 - Use `.llm/tools/run-deno-fmt.ts` to run scoped, non-mutating fmt checks by root and extension. Add
   `--ignore-line-endings` for known baseline line-ending drift; add `--show-ignored` only when the
@@ -63,7 +65,8 @@ for replicating the `agentic/` cleanup standard on other folders.
   CI/worker gates whose outcome must remain available after logs or agent context disappear. Its
   receipt proves one command at the locally resolved `HEAD` only; evaluate the complete evidence set
   separately. Declared-head overrides are recorded as diagnostic and cannot satisfy an evidence set.
-  Do not wrap E2E domain reports a second time.
+  Declared child reports must be fresh JSON; missing, malformed, or stale reports fail closed. Do
+  not wrap E2E domain reports a second time.
 - Use the `.llm/tools/agentic/` suite for agent orchestration (Codex/OpenHands/GitHub lanes, the WSL
   foundation, and the Claude surface). Start from its [`README`](./agentic/README.md); change a
   model/version/endpoint only in `.llm/tools/agentic/config/`.
@@ -91,20 +94,21 @@ deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/log
 deno task agentic:check-claude
 ```
 
-## Scoped check/lint/fmt wrappers
+## Structured check/test/lint/fmt wrappers
 
-These wrap the root `deno check`/`deno lint`/`deno fmt` tasks for cases where the root task is too
-broad or too noisy. They select explicit files by `--root`, `--ext`, and include/exclude regex,
-batch the run, and emit structured (JSON, or `--pretty`) output. `AGENTS.md` -> Validation governs
-when to prefer them over the root tasks (notably: package-quality fmt gates must target source
-TypeScript only and exclude generated output).
+These wrap the root `deno check`/`deno test`/`deno lint`/`deno fmt` tasks. The source wrappers
+select explicit files by `--root`, `--ext`, and include/exclude regex; the test wrapper converts
+Deno's TAP diagnostics into grouped JSON. `AGENTS.md` -> Validation governs when to prefer them over
+the root tasks (notably: package-quality fmt gates must target source TypeScript only and exclude
+generated output).
 
-| Tool                   | Use                                                                                                                             | Key flags                                                                |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `run-deno-check.ts`    | Scoped `deno check` runner and parser; also parses a saved log (`--input`), stdin, or a wrapped command (`-- deno task check`). | `--root`, `--ext ts,tsx`, `--input`, `--cwd`, `--pretty`                 |
-| `run-deno-lint.ts`     | Scoped `deno lint` runner with findings grouped by rule into JSON.                                                              | `--root`, `--ext`, `--include`/`--exclude`, `--input`, `--pretty`        |
-| `run-deno-fmt.ts`      | Scoped, non-mutating `deno fmt --check` (or mutating `deno fmt`) over explicit roots/extensions without shell glob expansion.   | `--root`, `--ext`, `--ignore-line-endings`, `--show-ignored`, `--pretty` |
-| `run-deno-doc-lint.ts` | Structured `deno doc --lint` runner with per-entrypoint and per-file attribution -- the publish-quality documentation bar.      | (see file header)                                                        |
+| Tool                   | Use                                                                                                                             | Key flags                                                            |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `run-deno-check.ts`    | Scoped `deno check` runner and parser; also parses a saved log (`--input`), stdin, or a wrapped command (`-- deno task check`). | `--root`, `--ext ts,tsx`, `--input`, `--output`, `--cwd`, `--pretty` |
+| `run-deno-test.ts`     | TAP-backed `deno test` runner; preserves exit code and deduplicates repeated failure shapes while retaining test locations.     | `--cwd`, `--output`, `--pretty`, then test args after `--`           |
+| `run-deno-lint.ts`     | Scoped `deno lint` runner with findings grouped by rule into JSON.                                                              | `--root`, `--ext`, `--include`/`--exclude`, `--input`, `--output`    |
+| `run-deno-fmt.ts`      | Scoped, non-mutating `deno fmt --check` (or mutating `deno fmt`) over explicit roots/extensions without shell glob expansion.   | `--root`, `--ext`, `--output`, `--ignore-line-endings`, `--pretty`   |
+| `run-deno-doc-lint.ts` | Structured `deno doc --lint` runner with per-entrypoint and per-file attribution -- the publish-quality documentation bar.      | (see file header)                                                    |
 
 ## Dependency toolbelt (`.llm/tools/deps/`)
 

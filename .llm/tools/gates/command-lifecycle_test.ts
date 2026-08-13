@@ -64,3 +64,48 @@ Deno.test('command lifecycle emits SKIPPED without spawning', async () => {
     await Deno.remove(root, { recursive: true });
   }
 });
+
+Deno.test('command lifecycle validates and hashes a fresh JSON child report', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const report = join(root, 'child.json');
+    const script = `await Deno.writeTextFile(${JSON.stringify(report)}, '{"ok":true}\\n')`;
+    const result = await executeGate(
+      request([Deno.execPath(), 'eval', script]),
+      {
+        store: new AtomicFileReceiptStore(join(root, 'receipt.json')),
+        childReport: report,
+      },
+    );
+    assertEquals(result.outcome, 'PASS');
+    assertEquals(result.childReportEvidence?.path, report);
+    assertEquals(result.childReportEvidence?.sha256.length, 64);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('command lifecycle fails closed on missing, malformed, or stale child reports', async () => {
+  for (const mode of ['missing', 'malformed', 'stale'] as const) {
+    const root = await Deno.makeTempDir();
+    try {
+      const report = join(root, 'child.json');
+      if (mode === 'stale') await Deno.writeTextFile(report, '{"old":true}\n');
+      const script = mode === 'malformed'
+        ? `await Deno.writeTextFile(${JSON.stringify(report)}, 'not json')`
+        : 'console.log("done")';
+      const result = await executeGate(
+        request([Deno.execPath(), 'eval', script]),
+        {
+          store: new AtomicFileReceiptStore(join(root, 'receipt.json')),
+          childReport: report,
+        },
+      );
+      assertEquals(result.outcome, 'FAIL', mode);
+      assertEquals(result.exitCode, 1, mode);
+      assertEquals(result.reason?.includes('Child report'), true, mode);
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
+  }
+});

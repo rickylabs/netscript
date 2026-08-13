@@ -49,8 +49,10 @@ interface BatchResult {
 }
 
 const mode = parseMode(Deno.args[0]);
+const skipAppHost = Deno.args.includes('--skip-apphost');
 const projectRoot = resolve(Deno.cwd());
-const files = await selectFiles(projectRoot);
+const selectedFiles = await selectFiles(projectRoot);
+const files = skipAppHost ? selectedFiles.filter((file) => !isAppHostSource(file)) : selectedFiles;
 
 if (files.length === 0) {
   console.log(
@@ -92,7 +94,7 @@ if (!ok) Deno.exit(1);
 function parseMode(value: string | undefined): QualityMode {
   const mode = MODES.find((candidate) => candidate === value);
   if (mode !== undefined) return mode;
-  console.error('Usage: quality-runner.ts <check|lint|fmt-check|fmt-write>');
+  console.error('Usage: quality-runner.ts <check|lint|fmt-check|fmt-write> [--skip-apphost]');
   Deno.exit(2);
 }
 

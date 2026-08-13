@@ -15,6 +15,7 @@ interface Options {
   input?: string;
   stdin: boolean;
   command?: string[];
+  output?: string;
   roots: string[];
   files: string[];
   extensions: Set<string>;
@@ -106,6 +107,7 @@ function printHelp(): void {
     'Options:',
     '  --input <path>      Parse a saved deno check log instead of running deno check.',
     '  --stdin             Parse stdin instead of running deno check.',
+    '  --output <path>     Atomically write the full JSON report to this path.',
     '  --root <path>       Directory or file to scan. Repeatable. Defaults to current directory.',
     '  --file <path>       Explicit file to include. Repeatable.',
     '  --ext <list>        Comma-separated extensions without dots. Repeatable.',
@@ -146,6 +148,7 @@ function parseArgs(args: string[]): Options | null {
   const files: string[] = [];
   let input: string | undefined;
   let stdin = false;
+  let output: string | undefined;
   let extensions = new Set(DEFAULT_EXTENSIONS);
   let include: RegExp | undefined;
   let exclude: RegExp | undefined;
@@ -165,6 +168,10 @@ function parseArgs(args: string[]): Options | null {
         break;
       case '--stdin':
         stdin = true;
+        break;
+      case '--output':
+        output = requireValue(optionArgs, index, arg);
+        index++;
         break;
       case '--root':
         roots.push(requireValue(optionArgs, index, arg));
@@ -225,6 +232,7 @@ function parseArgs(args: string[]): Options | null {
     input,
     stdin,
     command: command && command.length > 0 ? command : undefined,
+    output,
     roots: roots.length > 0 ? roots : files.length > 0 ? [] : ['.'],
     files,
     extensions,
@@ -401,6 +409,20 @@ function stripAnsi(text: string): string {
   return text.replaceAll(ANSI_PATTERN, '');
 }
 
+async function writeAtomic(path: string, text: string): Promise<void> {
+  const normalized = normalizePath(path);
+  const separator = normalized.lastIndexOf('/');
+  const directory = separator < 0 ? '.' : normalized.slice(0, separator) || '/';
+  await Deno.mkdir(directory, { recursive: true });
+  const temp = `${normalized}.${crypto.randomUUID()}.tmp`;
+  try {
+    await Deno.writeTextFile(temp, text, { createNew: true });
+    await Deno.rename(temp, normalized);
+  } finally {
+    await Deno.remove(temp).catch(() => undefined);
+  }
+}
+
 function parseOccurrences(results: BatchResult[]): CheckOccurrence[] {
   const occurrences: CheckOccurrence[] = [];
 
@@ -572,7 +594,13 @@ async function main(): Promise<void> {
     failures: failures.length > 0 ? failures : undefined,
   };
 
-  console.log(JSON.stringify(report, null, options.pretty ? 2 : undefined));
+  const json = `${JSON.stringify(report, null, options.pretty ? 2 : undefined)}\n`;
+  if (options.output) {
+    await writeAtomic(options.output, json);
+    console.log(JSON.stringify({ report: options.output, summary: report.summary }));
+  } else {
+    await Deno.stdout.write(new TextEncoder().encode(json));
+  }
 
   if (sourceMode === 'command' && sourceExitCode && sourceExitCode !== 0) Deno.exit(sourceExitCode);
   if (sourceMode === 'selection' && files?.length === 0) Deno.exit(2);

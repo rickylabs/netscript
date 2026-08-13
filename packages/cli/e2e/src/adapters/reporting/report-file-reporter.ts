@@ -9,6 +9,14 @@ export class ReportFileReporter implements Reporter {
   async emit(event: ReportEvent): Promise<void> {
     if (event.type !== 'suite-end') return;
     await ensureDir(dirname(this.path));
-    await Deno.writeTextFile(this.path, `${JSON.stringify(event.report, null, 2)}\n`);
+    const temp = `${this.path}.${crypto.randomUUID()}.tmp`;
+    try {
+      await Deno.writeTextFile(temp, `${JSON.stringify(event.report, null, 2)}\n`, {
+        createNew: true,
+      });
+      await Deno.rename(temp, this.path);
+    } finally {
+      await Deno.remove(temp).catch(() => undefined);
+    }
   }
 }
