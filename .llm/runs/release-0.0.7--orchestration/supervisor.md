@@ -83,3 +83,9 @@ formal hold. The coordinator interrupted each leaf turn, stopped the dedicated d
 group and watcher, removed the uncommitted/untracked S1 patch with `apply_patch`, and verified the
 leaf worktree exactly clean at pushed plan head `d35cbca30`. The docs lane remains intentionally
 offline until the Saturday gate; the other three Codex topic controls are unaffected.
+
+The fixes topic later attempted a DeepSeek/OpenRouter IMPL-EVAL for #1643. The coordinator stopped
+that process before verdict, removed its temporary transport artifact, amended the evaluator brief
+to require a fresh native Claude/Fable gate after reset, and stopped the fixes topic control to
+prevent automatic relaunch. #1643's substantive Codex implementation and Tier-A review remain
+valid at pushed head `e6ba15ec6`; #1654 remains plan-only at `14d8b38b4`.
