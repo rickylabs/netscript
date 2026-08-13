@@ -31,3 +31,30 @@ The live contract already projects 404 for GET/PATCH/DELETE via `baseContract`; 
 green. The plan preserves this acceptance with a scaffold-level regression assertion and does not
 touch undeclared contract-package code. Runtime missing-row behavior remains independently red and
 in scope.
+
+## 2026-08-13T20:46:05Z — coordinator authorized the narrow generator amendment
+
+**Status: resolved by coordinator comment `5286194892`; no product edit started.**
+
+The coordinator authorized these exact additional CLI seams:
+
+- `packages/cli/src/kernel/templates/database/generate-prisma-config.ts`;
+- `packages/cli/src/kernel/templates/database/database-generators.ts`;
+- new `packages/cli/src/kernel/templates/database/generate-database-seed.ts` and its focused
+  `generate-database-seed_test.ts`;
+- `packages/cli/src/kernel/templates/database/generators_test.ts`;
+- `packages/cli/src/kernel/adapters/database/scaffolder.ts`;
+- `packages/cli/src/kernel/adapters/database/scaffolder_test.ts`.
+
+This amendment resolves the boundary gap recorded above; it does not authorize any contract-package
+change. The already-green #1263 OpenAPI 404 projection remains a regression-coverage obligation
+only.
+
+## 2026-08-13T20:50:16Z — PLAN-EVAL paused for Claude allowance reset
+
+**Status: active process blocker.**
+
+The amended design still requires a fresh native opposite-family PLAN-EVAL. The coordinator directed
+the leaf to wait for the Claude allowance reset. This housekeeping turn does not launch an
+evaluator, implement product code, run gates, request an expensive-gate lease, or alter PR
+readiness.

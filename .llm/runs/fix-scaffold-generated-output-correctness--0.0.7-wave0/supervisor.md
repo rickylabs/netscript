@@ -13,7 +13,7 @@
 | Merge/release authority    | `codex-root-0.0.7` only                                                             |
 | Implementation route       | requested OpenAI/Codex `gpt-5.6-sol` high                                           |
 | Thread id / observed route | `019ffcca-8be0-74c2-bb0e-c82cf5ce3c85`; OpenAI `gpt-5.6-sol` high (matched)         |
-| PLAN-EVAL                  | required; blocked pending contract-boundary decision, then fresh separate evaluator |
+| PLAN-EVAL                  | required; boundary authorized, paused for Claude allowance reset, then fresh opposite-family evaluator |
 | IMPL-EVAL                  | mandatory fresh opposite-family session                                             |
 
 The three issues remain one PR and consume one shared `scaffold.runtime` verdict. The implementation
@@ -24,6 +24,8 @@ session updates this file with observed route identity and may not self-certify.
 - `codex-root-0.0.7` alone may change milestone scope, merge, or publish.
 - `topic-fixes-0.0.7` owns substantive Tier-A review and the singleton expensive-gate lease request
   path.
-- Source implementation is stopped before PLAN-EVAL because research found two required generator
-  sources outside the frozen `leaf-contracts.json` boundary. No file-boundary inference is allowed.
+- Coordinator comment `5286194892` authorizes only the exact generator/scaffolder seams recorded in
+  `plan.md` and `drift.md`; contract-package work remains forbidden.
+- Source implementation remains stopped until a fresh opposite-family PLAN-EVAL records PASS after
+  the Claude allowance reset. This implementation session may not self-evaluate.
 - `scaffold.runtime`, Aspire, and Docker remain forbidden until an explicit global lease grant.

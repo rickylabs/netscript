@@ -2,9 +2,10 @@
 
 ## Status
 
-**DESIGN LOCKED; IMPLEMENTATION BLOCKED.** Research is complete and proves a substantive separate
-PLAN-EVAL is required. The evaluator may run only after the orchestrator/coordinator resolves the
-two frozen-boundary gaps below. No product source edit is authorized in the meantime.
+**DESIGN LOCKED; NARROW BOUNDARY AMENDMENT AUTHORIZED; IMPLEMENTATION BLOCKED.** Research is
+complete and proves a substantive separate PLAN-EVAL is required. Coordinator comment `5286194892`
+authorizes the exact generator/scaffolder seams below. Product implementation remains prohibited
+until a fresh opposite-family PLAN-EVAL records PASS after the Claude allowance reset.
 
 ## Frozen boundary
 
@@ -55,20 +56,22 @@ milestone `leaf-contracts.json`. Report drift before crossing that boundary. Pre
   `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` for the grouped leaf. Preserve
   its JSON/domain report and follow it with the scoped read-only leak checker.
 
-## Required boundary decision
+## Authorized boundary amendment
 
-The approved file list cannot express the locked design without crossing its boundary:
+Research established that the original file list could not express the locked design. Coordinator
+comment `5286194892` now authorizes these exact additional seams:
 
-1. `packages/cli/src/kernel/templates/database/generate-prisma-config.ts` must select and pass the
-   provider-specific helper fragment; the declared template has no conditional syntax.
-2. Model-aware versus empty-schema seed output requires a generator-level conditional. The narrow
-   requested surface is: `packages/cli/src/kernel/adapters/database/scaffolder.ts` plus a new
-   `packages/cli/src/kernel/templates/database/generate-database-seed.ts` (and its focused test
-   under the same templates directory).
+1. `packages/cli/src/kernel/templates/database/generate-prisma-config.ts`;
+2. `packages/cli/src/kernel/templates/database/database-generators.ts`;
+3. new `packages/cli/src/kernel/templates/database/generate-database-seed.ts` plus its focused
+   `generate-database-seed_test.ts`;
+4. `packages/cli/src/kernel/templates/database/generators_test.ts`;
+5. `packages/cli/src/kernel/adapters/database/scaffolder.ts`;
+6. `packages/cli/src/kernel/adapters/database/scaffolder_test.ts`.
 
-The coordinator must issue a replacement/amended leaf contract naming these surfaces, or choose a
-different acceptance-preserving design within the existing boundary. This implementation session
-will not infer authority.
+The original asset/template and `packages/cli/e2e` surfaces remain in force. The amendment does not
+authorize contract-package changes: the already-green #1263 OpenAPI projection is preserved through
+regression coverage only. No implementation begins until PLAN-EVAL PASS.
 
 ## Ordered reviewable slices
 
@@ -130,6 +133,7 @@ After explicit lease:
 ## Plan gate
 
 Decision: **PLAN-EVAL required**. The design is non-mechanical and crosses multiple generated
-runtime/template seams. A fresh separate evaluator must review this plan after the boundary decision
-and write `plan-eval.md`. Implementation may resume only on an unqualified PASS committed to this
-branch; NEEDS_WORK returns to this same implementation thread for plan revision.
+runtime/template seams. After the Claude allowance reset, a fresh native opposite-family evaluator
+must review this amended plan and write `plan-eval.md`. Implementation may resume only on an
+unqualified PASS committed to this branch; NEEDS_WORK returns to this same implementation thread for
+plan revision. No evaluator is launched during this housekeeping slice.
