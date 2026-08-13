@@ -37,6 +37,7 @@ import { resolveRegistryItems } from '../../../../kernel/application/ui/registry
 import { importEntryForDependency } from '../../../../kernel/application/ui/registry-deno-json.ts';
 import { loadRegisteredPlugins } from '../../../../kernel/adapters/config/plugin-registry.ts';
 import { loadConfig } from '@netscript/config';
+import { useLocalWorkspaceImports } from '../../../../../tests/support/local-workspace-imports.ts';
 
 // This flow renders plugin/workspace files via sync template generators, which
 // require a previously-awaited registry hydration. The test drives the flow
@@ -655,6 +656,7 @@ describe('public install plugin flow', () => {
     const aiRoot = repoPath('plugins/ai');
     try {
       await writeRealProjectFiles(projectRoot);
+      await useLocalWorkspaceImports(projectRoot, REPO_ROOT);
       const fs = new DenoFileSystem();
       const templateAdapter = new StringTemplateAdapter(fs);
       const scaffolder = new Scaffolder(templateAdapter, fs);
@@ -809,6 +811,7 @@ describe('public install plugin flow', () => {
     const aiRoot = repoPath('plugins/ai');
     try {
       await writeRealProjectFiles(projectRoot);
+      await useLocalWorkspaceImports(projectRoot, REPO_ROOT);
       await Deno.writeTextFile(
         join(projectRoot, 'netscript.config.ts'),
         `export default {

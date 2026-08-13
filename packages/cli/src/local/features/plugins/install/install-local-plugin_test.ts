@@ -15,6 +15,7 @@ import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/works
 import type { PluginKindProvider } from '../../../../kernel/domain/plugin-kind.ts';
 import { installLocalPlugin, resolveOfficialPluginSourceRoot } from './install-local-plugin.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
+import { useLocalWorkspaceImports } from '../../../../../tests/support/local-workspace-imports.ts';
 
 // This flow renders plugin/workspace files via sync template generators, which
 // require a previously-awaited registry hydration. The test drives the flow
@@ -46,6 +47,8 @@ const workerProvider: PluginKindProvider = {
   infrastructureRequires: ['kv'],
   infrastructureOptionalDeps: ['db'],
 };
+
+const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../../../../../..');
 
 describe('local contributor install plugin flow', () => {
   it('writes starter plugin files with local imports for non-canonical plugin names', async () => {
@@ -206,6 +209,7 @@ describe('local contributor install plugin flow', () => {
 };
 `,
       );
+      await useLocalWorkspaceImports(projectRoot, REPO_ROOT);
       const fs = new DenoFileSystem();
       const templateAdapter = new StringTemplateAdapter(fs);
       const scaffolder = new Scaffolder(templateAdapter, fs);

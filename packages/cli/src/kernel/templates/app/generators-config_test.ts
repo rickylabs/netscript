@@ -294,7 +294,7 @@ describe('generateAppDenoJson', () => {
       error.message,
       'NetScript dependency closure is incoherent.',
     );
-    assertStringIncludes(error.message, '@netscript/fresh@0.0.5');
+    assertStringIncludes(error.message, `@netscript/fresh@${NETSCRIPT_RELEASE_VERSION}`);
     assertStringIncludes(
       error.message,
       '@netscript/fresh@0.0.6-canary.3/defer/island',
@@ -331,7 +331,10 @@ describe('generateAppDenoJson', () => {
         }),
       Error,
     );
-    assertStringIncludes(error.message, 'uses non-exact version "^0.0.5"');
+    assertStringIncludes(
+      error.message,
+      `uses non-exact version "^${NETSCRIPT_RELEASE_VERSION}"`,
+    );
     assertStringIncludes(error.message, 'pin this member exactly');
   });
 });

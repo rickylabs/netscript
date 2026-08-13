@@ -1,5 +1,6 @@
 import { assertEquals } from '@std/assert';
 import { join, resolve } from '@std/path';
+import { useLocalWorkspaceImports } from '../../../../packages/cli/tests/support/local-workspace-imports.ts';
 
 Deno.test({
   name: 'plugin install ai --no-samples omits samples and type-checks the generated workspace',
@@ -28,6 +29,7 @@ Deno.test({
         '--no-git',
         '--force',
       ]);
+      await useLocalWorkspaceImports(projectRoot, repoRoot);
       await run(repoRoot, [
         'run',
         '-A',
