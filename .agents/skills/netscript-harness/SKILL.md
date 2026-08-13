@@ -34,24 +34,30 @@ self-certifies). Everything else is a per-run lane assignment recorded in the ru
 
 ## Key Concepts
 
-| Concept           | Meaning                                                                                 |
-| ----------------- | --------------------------------------------------------------------------------------- |
-| **9-phase model** | Bootstrap → Research → Plan & Design → Plan-Gate → Implement → Gate → Evaluate → Release → Close. |
-| **PLAN-EVAL**     | Conditional pre-implementation pass for complex/decision-heavy work; hard stop when selected. |
-| **IMPL-EVAL**     | Mandatory final pass after implementation unless the owner explicitly waives it.       |
-| **Tiered lanes**  | Agent lanes A–E with named model bindings; single source `workflow/lane-policy.md`.     |
-| **Slice review gate** | Tier-A supervisor substantively reviews each landed slice before the sign-off commit; no lane self-certifies (A1). |
-| **Supervisor identity** | Every run dir carries `supervisor.md` (model, session, host, paths, branch, baseline, lanes). |
-| **Plan-Gate**     | Checklist (`gates/plan-gate.md`) that PLAN-EVAL enforces.                               |
-| **Archetype**     | Package/plugin shape profile from `archetypes/ARCHETYPE-*.md`.                          |
-| **Scope overlay** | `SCOPE-frontend.md`, `SCOPE-service.md`, `SCOPE-docs.md`.                               |
-| **Seed run**      | Planning-only run shape (`workflow/seed-run.md`): discovery → roadmap → owner-ratified one-shot GitHub filing. Use when the deliverable is a board (epics + issues), not code. |
-| **Run artifact**  | File in `.llm/runs/<run-id>/` that preserves state across sessions.                     |
-| **Debt**          | Recorded in `.llm/harness/debt/arch-debt.md`.                                           |
+| Concept                 | Meaning                                                                                                                                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **9-phase model**       | Bootstrap → Research → Plan & Design → Plan-Gate → Implement → Gate → Evaluate → Release → Close.                                                                              |
+| **PLAN-EVAL**           | Conditional pre-implementation pass for complex/decision-heavy work; hard stop when selected.                                                                                  |
+| **IMPL-EVAL**           | Mandatory final pass after implementation unless the owner explicitly waives it.                                                                                               |
+| **Tiered lanes**        | Agent lanes A–E with named model bindings; single source `workflow/lane-policy.md`.                                                                                            |
+| **Slice review gate**   | Tier-A supervisor substantively reviews each landed slice before the sign-off commit; no lane self-certifies (A1).                                                             |
+| **Supervisor identity** | Every run dir carries `supervisor.md` (model, session, host, paths, branch, baseline, lanes).                                                                                  |
+| **Plan-Gate**           | Checklist (`gates/plan-gate.md`) that PLAN-EVAL enforces.                                                                                                                      |
+| **Archetype**           | Package/plugin shape profile from `archetypes/ARCHETYPE-*.md`.                                                                                                                 |
+| **Scope overlay**       | `SCOPE-frontend.md`, `SCOPE-service.md`, `SCOPE-docs.md`.                                                                                                                      |
+| **Seed run**            | Planning-only run shape (`workflow/seed-run.md`): discovery → roadmap → owner-ratified one-shot GitHub filing. Use when the deliverable is a board (epics + issues), not code. |
+| **Milestone cluster**   | Release run shape (`workflow/milestone-run.md`): Step 0 intake/cleanup/DAG → four topic orchestrators → direct-to-main leaves → canaries/stable cut.                           |
+| **Run artifact**        | File in `.llm/runs/<run-id>/` that preserves state across sessions.                                                                                                            |
+| **Debt**                | Recorded in `.llm/harness/debt/arch-debt.md`.                                                                                                                                  |
 
 For a **supervisor run** (two or more capability-scoped phase groups), also read
 `.llm/harness/workflow/supervisor.md` and `.llm/harness/workflow/escalation.md`, and track the
 groups in `phase-registry.md`.
+
+For a **release milestone**, use the milestone-cluster route instead: read
+`workflow/milestone-run.md` and `agent-milestone-orchestrator`. Do not apply the generic supervisor
+integration branch. Create the intake, inventory, DAG, cluster-state, and generated status
+artifacts; Step 0 must validate before any implementation or evaluation lane starts.
 
 For OpenHands or local-agent handoffs during a run, also read
 `.llm/harness/workflow/agent-handoff.md` and `.agents/skills/openhands-handoff/SKILL.md`.
@@ -98,9 +104,9 @@ Tier B), and the named model bindings are defined once in
 routing here — defer to that file. The items below are the parts of the contract that hold as
 **invariants** regardless of which lane implements:
 
-- **Generator ≠ evaluator (hard invariant).** The session that generates a plan or an
-  implementation is never the session that evaluates it. Which model implements is configurable per
-  run and recorded in `supervisor.md`/`drift.md`; the session separation is not.
+- **Generator ≠ evaluator (hard invariant).** The session that generates a plan or an implementation
+  is never the session that evaluates it. Which model implements is configurable per run and
+  recorded in `supervisor.md`/`drift.md`; the session separation is not.
 - **Slice review gate (A1, hard invariant).** After any implementation lane lands a slice and its
   automated gates pass, the Tier-A supervisor substantively reviews the slice content before the
   sign-off commit — and the sign-off commit is the supervisor's, not the implementer's. This holds
@@ -151,8 +157,8 @@ routing here — defer to that file. The items below are the parts of the contra
   fixed-lane assertion is retired. Lanes are configuration; consult `workflow/lane-policy.md` and
   honor the run's recorded lane assignments/overrides in `supervisor.md`/`drift.md`.
 - **False attached-agent claims** — for Tier-D slices, a Claude `codex:*` skill/helper is not a WSL
-  Codex daemon thread. Require daemon status plus thread id before claiming the user can see or steer
-  the subagent from phone/Desktop.
+  Codex daemon thread. Require daemon status plus thread id before claiming the user can see or
+  steer the subagent from phone/Desktop.
 - **Carried-in plans as ground truth** — Re-baseline against current `main` before locking the plan.
 - **Monolithic commits** — Commit by slice, not by monolith. Each slice has its own gate.
 - **Raw root CLI noise as a verdict** — Package-quality check/lint/fmt evidence must come from the
@@ -175,23 +181,28 @@ Run artifacts live under `.llm/runs/<run-id>/` and use templates from `.llm/harn
 
 `<run-id>` is the current branch name with `/` replaced by `-`, followed by `--<suffix>`.
 
-| File                | Purpose                                                     |
-| ------------------- | ----------------------------------------------------------- |
+| File                | Purpose                                                                                           |
+| ------------------- | ------------------------------------------------------------------------------------------------- |
 | `supervisor.md`     | supervisor identity (model, session, host, paths, branch, baseline, lanes) — written at run start |
-| `research.md`       | deep findings, re-baseline of carried-in plans              |
-| `plan.md`           | approved scope, archetype, gates, debt implications         |
-| `implement.md`      | generator prompt when needed                                |
-| `worklog.md`        | implementation evidence and gate results                    |
-| `plan-eval.md`      | PLAN-EVAL verdict (separate session, before implementation) |
-| `evaluate.md`       | IMPL-EVAL verdict (separate session, after implementation)  |
-| `context-pack.md`   | resumable summary                                           |
-| `drift.md`          | append-only drift log                                       |
-| `phase-registry.md` | supervisor runs only: phase-group map + live status         |
+| `research.md`       | deep findings, re-baseline of carried-in plans                                                    |
+| `plan.md`           | approved scope, archetype, gates, debt implications                                               |
+| `implement.md`      | generator prompt when needed                                                                      |
+| `worklog.md`        | implementation evidence and gate results                                                          |
+| `plan-eval.md`      | PLAN-EVAL verdict (separate session, before implementation)                                       |
+| `evaluate.md`       | IMPL-EVAL verdict (separate session, after implementation)                                        |
+| `context-pack.md`   | resumable summary                                                                                 |
+| `drift.md`          | append-only drift log                                                                             |
+| `phase-registry.md` | supervisor runs only: phase-group map + live status                                               |
 
 There is no `commits.md` — the draft-PR commit list + per-slice PR comments are the commit trail.
 Keep `worklog.md` + `context-pack.md` current as part of every slice. Supervisor runs additionally
-keep `phase-registry.md`, `final-pr-handoff.md`, and an `escalations/` folder; brief each group agent
-with `templates/agent-briefing.md`.
+keep `phase-registry.md`, `final-pr-handoff.md`, and an `escalations/` folder; brief each group
+agent with `templates/agent-briefing.md`.
+
+Milestone clusters additionally keep `milestone-intake.json`, `milestone-inventory.json`,
+`milestone-dependency-dag.json`, `milestone-cluster-state.json`, generated `milestone-status.md`,
+`cut-trace.md`, and `receipts/`. Run `harness:milestone:render` after every state transition and
+`harness:milestone:validate` before dispatch or release-captain activation.
 
 ## `.llm/runs` Path Caveat
 
@@ -282,6 +293,8 @@ User says "use harness"
   -> resuming? read context-pack.md
   -> deliverable is a board (epics/issues/milestones from a major feature, refactor, replan,
      or triage)? read workflow/seed-run.md — drafts only until owner ratification
+  -> deliverable is a release milestone landed through multiple PRs? read workflow/milestone-run.md
+     — Step 0 sweep/cleanup/DAG, four topic orchestrators, direct-to-main leaves
   -> deliverable is code for a single scoped change? stay on run-loop.md (a seed run here is
      ceremony)
   -> package/plugin? select ARCHETYPE-* and load netscript-doctrine
@@ -300,22 +313,23 @@ User says "use harness"
 
 ## Reference Files
 
-| File                                            | Load when                   |
-| ----------------------------------------------- | --------------------------- |
-| `.llm/harness/workflow/activation.md`           | Every harness run           |
-| `.llm/harness/workflow/run-loop.md`             | Every harness run           |
-| `.llm/harness/workflow/lane-policy.md`          | Lane assignment + model bindings |
+| File                                            | Load when                                                                                     |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `.llm/harness/workflow/activation.md`           | Every harness run                                                                             |
+| `.llm/harness/workflow/run-loop.md`             | Every harness run                                                                             |
+| `.llm/harness/workflow/lane-policy.md`          | Lane assignment + model bindings                                                              |
 | `.llm/harness/workflow/doc-audit.md`            | Docs-changeset runs — opposite-family Sol audit + Fable prose polish of Claude-generated docs |
-| `.llm/harness/workflow/supervisor.md`           | Multi-group supervisor runs |
-| `.llm/harness/workflow/seed-run.md`             | Planning-only board-seeding runs (discovery → roadmap → owner-ratified filing) |
-| `.llm/harness/gates/plan-gate.md`               | Plan-Gate checklist         |
-| `.llm/harness/evaluator/plan-protocol.md`       | PLAN-EVAL instructions      |
-| `.llm/harness/evaluator/protocol.md`            | IMPL-EVAL instructions      |
-| `.llm/harness/evaluator/verdict-definitions.md` | Verdict meanings            |
-| `.llm/harness/gates/archetype-gate-matrix.md`   | Gate selection              |
-| `.llm/harness/archetypes/README.md`             | Archetype selection         |
-| `.llm/harness/templates/`                       | Run artifact scaffolding    |
-| `.llm/harness/debt/arch-debt.md`                | Debt registry               |
+| `.llm/harness/workflow/supervisor.md`           | Multi-group supervisor runs                                                                   |
+| `.llm/harness/workflow/seed-run.md`             | Planning-only board-seeding runs (discovery → roadmap → owner-ratified filing)                |
+| `.llm/harness/workflow/milestone-run.md`        | Release milestone clusters from Step 0 through stable cut                                     |
+| `.llm/harness/gates/plan-gate.md`               | Plan-Gate checklist                                                                           |
+| `.llm/harness/evaluator/plan-protocol.md`       | PLAN-EVAL instructions                                                                        |
+| `.llm/harness/evaluator/protocol.md`            | IMPL-EVAL instructions                                                                        |
+| `.llm/harness/evaluator/verdict-definitions.md` | Verdict meanings                                                                              |
+| `.llm/harness/gates/archetype-gate-matrix.md`   | Gate selection                                                                                |
+| `.llm/harness/archetypes/README.md`             | Archetype selection                                                                           |
+| `.llm/harness/templates/`                       | Run artifact scaffolding                                                                      |
+| `.llm/harness/debt/arch-debt.md`                | Debt registry                                                                                 |
 
 ## Checklist
 
@@ -325,7 +339,8 @@ User says "use harness"
 - [ ] Lane assignments follow `workflow/lane-policy.md`, or the override is recorded in
       `supervisor.md`/`drift.md`.
 - [ ] Plan-Gate checklist (`gates/plan-gate.md`) was reviewed.
-- [ ] PLAN-EVAL returned `PASS` before implementation when selected, or a justified `PLAN-EVAL: N/A` was recorded first.
+- [ ] PLAN-EVAL returned `PASS` before implementation when selected, or a justified `PLAN-EVAL: N/A`
+      was recorded first.
 - [ ] Any PLAN-EVAL used the recorded route, or the owner-authorized fallback was recorded.
 - [ ] Tier-D (WSL Codex) slices recorded daemon-managed proof, thread id, worktree, and steering
       command.

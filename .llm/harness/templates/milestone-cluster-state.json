@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "milestone": "0.0.x",
+  "baselineMainSha": "0000000000000000000000000000000000000000",
+  "currentMainSha": "0000000000000000000000000000000000000000",
+  "coordinator": {
+    "agentId": "replace-me"
+  },
+  "limits": {
+    "activeImplementationSlicesPerLane": 2,
+    "activeEvaluatorsPerLane": 1,
+    "globalExpensiveGates": 1,
+    "releaseWriters": 1
+  },
+  "lanes": [
+    { "id": "docs", "orchestratorAgentId": "replace-me", "issueNumbers": [] },
+    { "id": "internals", "orchestratorAgentId": "replace-me", "issueNumbers": [] },
+    { "id": "fixes", "orchestratorAgentId": "replace-me", "issueNumbers": [] },
+    { "id": "features", "orchestratorAgentId": "replace-me", "issueNumbers": [] }
+  ],
+  "watchers": [],
+  "committedIssues": [],
+  "leaves": [],
+  "expensiveGates": [],
+  "canaryCheckpoints": [],
+  "exactMainEvidence": {
+    "gitHead": "0000000000000000000000000000000000000000",
+    "sufficiency": "INSUFFICIENT",
+    "receiptRefs": []
+  },
+  "existingReleaseLease": false,
+  "releaseWriters": [],
+  "releaseCaptain": {
+    "state": "inactive",
+    "agentId": null,
+    "leaseId": null,
+    "contentSha": null,
+    "evidence": []
+  },
+  "updatedAt": "1970-01-01T00:00:00.000Z"
+}
