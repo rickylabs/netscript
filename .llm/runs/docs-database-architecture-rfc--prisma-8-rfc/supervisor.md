@@ -27,12 +27,13 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 
 ## Delegated research and synthesis lanes
 
-| Agent path                          | Model / effort              | Scope                                                           | Status    |
-| ----------------------------------- | --------------------------- | --------------------------------------------------------------- | --------- |
-| `/root/market_gap_audit`            | OpenAI · GPT-5.6 Sol · high | Missing delivery/control/validation comparators and market QA   | Complete  |
-| `/root/validation_source_audit`     | OpenAI · GPT-5.6 Sol · high | RC contract/result-plan proof for runtime Standard Schema       | Complete  |
-| `/root/typescript_schema_audit`     | OpenAI · GPT-5.6 Sol · high | Native TypeScript builder evolution and NetScript oRPC transfer | Complete  |
-| `/root/architecture_plan_synthesis` | OpenAI · GPT-5.6 Sol · high | Reconcile all evidence into a decision-grade Plan-Gate proposal | In flight |
+| Agent path                          | Model / effort              | Scope                                                            | Status   |
+| ----------------------------------- | --------------------------- | ---------------------------------------------------------------- | -------- |
+| `/root/market_gap_audit`            | OpenAI · GPT-5.6 Sol · high | Missing delivery/control/validation comparators and market QA    | Complete |
+| `/root/validation_source_audit`     | OpenAI · GPT-5.6 Sol · high | RC contract/result-plan proof for runtime Standard Schema        | Complete |
+| `/root/typescript_schema_audit`     | OpenAI · GPT-5.6 Sol · high | Native TypeScript builder evolution and NetScript oRPC transfer  | Complete |
+| `/root/architecture_plan_synthesis` | OpenAI · GPT-5.6 Sol · high | Reconcile all evidence into a decision-grade Plan-Gate proposal  | Complete |
+| `/root/planned_jsr_audit`           | OpenAI · GPT-5.6 Sol · high | Prospective publishability/slow-type review of the planned graph | Complete |
 
 These lanes are independent research/synthesis inputs. None is the formal PLAN-EVAL, IMPL-EVAL, or
 owner-directed final Fable refinement.
