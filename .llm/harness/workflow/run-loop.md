@@ -4,8 +4,8 @@ Harness runs in nine phases: Bootstrap, Research, Plan & Design, Plan-Gate, Impl
 Evaluate, Release, Close.
 
 The loop has one mandatory evaluator pass and one conditional pass: **PLAN-EVAL** is used before
-implementation when the work is genuinely complex, decision-heavy, or benefits from adversarial
-plan advice; **IMPL-EVAL** runs after implementation unless the owner explicitly waives it. Every
+implementation when the work is genuinely complex, decision-heavy, or benefits from adversarial plan
+advice; **IMPL-EVAL** runs after implementation unless the owner explicitly waives it. Every
 evaluator pass that runs uses a separate session.
 
 ## 1. Bootstrap
@@ -172,19 +172,19 @@ wrapper is never a substitute for these two gates on a framework-source wave. A
 `// deno-lint-ignore` added to make a wrapper pass is itself a finding — never silence a gate to
 green it.
 
-Gate **evidence is wrapper-sourced and mandatory**: type-check / lint / format from the scoped
-wrappers (`.llm/tools/run-deno-check|lint|fmt.ts`), doc-lint from `deno task doc:lint`, and
-dependency / publishability from the `deno task deps:*` wrappers — raw root `deno check .` /
-`deno fmt --check` and hand-rolled registry curls are non-verdicts. The full tool surface is indexed
-in `workflow/tooling.md`; the command map and gotchas live in the **netscript-tools** and
-**netscript-deno-toolchain** skills (do not restate them here).
+Gate **evidence is wrapper-sourced and mandatory**: type-check / test / lint / format from the
+structured wrappers (`.llm/tools/run-deno-check|test|lint|fmt.ts`), doc-lint from
+`deno task doc:lint`, and dependency / publishability from the `deno task deps:*` wrappers — raw
+root `deno check .` / `deno fmt --check` and hand-rolled registry curls are non-verdicts. The full
+tool surface is indexed in `workflow/tooling.md`; the command map and gotchas live in the
+**netscript-tools** and **netscript-deno-toolchain** skills (do not restate them here).
 
 Record results as tables in `worklog.md`.
 
 ## 7. Evaluate (IMPL-EVAL)
 
-The final evaluation is mandatory unless the owner explicitly waives it, and always uses a
-separate session. Operating instructions live in `evaluator/protocol.md`.
+The final evaluation is mandatory unless the owner explicitly waives it, and always uses a separate
+session. Operating instructions live in `evaluator/protocol.md`.
 
 1. Read `evaluator/protocol.md` and `evaluator/verdict-definitions.md`.
 2. Read the archetype profile, overlays, research, plan, plan-eval, worklog, context pack, drift,

@@ -53,3 +53,33 @@ Deno.test('runner fails when its own selection is empty', async () => {
     await Deno.remove(root, { recursive: true });
   }
 });
+
+Deno.test('runner atomically persists its structured report and emits a compact pointer', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await Deno.writeTextFile(join(root, 'valid.ts'), 'export const value: number = 1;\n');
+    const reportPath = join(root, 'report.json');
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        '--allow-read',
+        '--allow-write',
+        '--allow-run',
+        new URL('./run-deno-check.ts', import.meta.url).pathname,
+        '--cwd',
+        root,
+        '--root',
+        '.',
+        '--output',
+        reportPath,
+      ],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(output.code, 0);
+    assertEquals(JSON.parse(new TextDecoder().decode(output.stdout)).report, reportPath);
+    assertEquals(JSON.parse(await Deno.readTextFile(reportPath)).selection.filesSelected, 1);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});

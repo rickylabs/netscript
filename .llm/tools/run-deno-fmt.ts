@@ -11,6 +11,7 @@
  */
 
 interface Options {
+  output?: string;
   roots: string[];
   files: string[];
   extensions: Set<string>;
@@ -69,6 +70,7 @@ function printHelp(): void {
     '  deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts [options]',
     '',
     'Options:',
+    '  --output <path>     Atomically write the full JSON report to this path.',
     '  --root <path>       Directory or file to scan. Repeatable. Defaults to current directory.',
     '  --file <path>       Explicit file to include. Repeatable.',
     '  --ext <list>        Comma-separated extensions without dots. Repeatable.',
@@ -101,6 +103,7 @@ function parseExtensions(value: string): string[] {
 function parseArgs(args: string[]): Options | null {
   const roots: string[] = [];
   const files: string[] = [];
+  let output: string | undefined;
   let extensions = new Set(DEFAULT_EXTENSIONS);
   let include: RegExp | undefined;
   let exclude: RegExp | undefined;
@@ -116,6 +119,10 @@ function parseArgs(args: string[]): Options | null {
   for (let index = 0; index < args.length; index++) {
     const arg = args[index];
     switch (arg) {
+      case '--output':
+        output = requireValue(args, index, arg);
+        index++;
+        break;
       case '--root':
         roots.push(requireValue(args, index, arg));
         index++;
@@ -178,6 +185,7 @@ function parseArgs(args: string[]): Options | null {
   }
 
   return {
+    output,
     roots: roots.length > 0 ? roots : files.length > 0 ? [] : ['.'],
     files,
     extensions,
@@ -199,6 +207,20 @@ function isLineEndingFinding(finding: FormatFinding): boolean {
 
 function normalizePath(path: string): string {
   return path.replace(/\\/g, '/');
+}
+
+async function writeAtomic(path: string, text: string): Promise<void> {
+  const normalized = normalizePath(path);
+  const separator = normalized.lastIndexOf('/');
+  const directory = separator < 0 ? '.' : normalized.slice(0, separator) || '/';
+  await Deno.mkdir(directory, { recursive: true });
+  const temp = `${normalized}.${crypto.randomUUID()}.tmp`;
+  try {
+    await Deno.writeTextFile(temp, text, { createNew: true });
+    await Deno.rename(temp, normalized);
+  } finally {
+    await Deno.remove(temp).catch(() => undefined);
+  }
 }
 
 function hasWindowsDrivePrefix(path: string): boolean {
@@ -440,7 +462,13 @@ async function main(): Promise<void> {
     report.ignoredFindings = ignoredFindings;
   }
 
-  console.log(JSON.stringify(report, null, options.pretty ? 2 : undefined));
+  const json = `${JSON.stringify(report, null, options.pretty ? 2 : undefined)}\n`;
+  if (options.output) {
+    await writeAtomic(options.output, json);
+    console.log(JSON.stringify({ report: options.output, summary: report.summary }));
+  } else {
+    await Deno.stdout.write(new TextEncoder().encode(json));
+  }
 
   if (files.length === 0) {
     console.error('deno fmt selection matched zero files; refusing a false-green gate.');

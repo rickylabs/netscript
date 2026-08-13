@@ -214,11 +214,11 @@ jobs:
 
       - name: scaffold.service (init + generated discovery + typecheck)
         if: env.RUN == 'true'
-        run: deno task e2e:cli run scaffold.service --format pretty
+        run: deno task e2e:cli run scaffold.service --format pretty --report .llm/tmp/e2e-report-scaffold-service.json
 
       - name: scaffold.contracts (init + contract discovery + typecheck)
         if: env.RUN == 'true'
-        run: deno task e2e:cli run scaffold.contracts --format pretty
+        run: deno task e2e:cli run scaffold.contracts --format pretty --report .llm/tmp/e2e-report-scaffold-contracts.json
 
       - name: generated README from a clean clone
         if: env.RUN == 'true'
@@ -226,7 +226,25 @@ jobs:
 
       - name: scaffold.plugins (official plugins + registry gen + plugin doctor)
         if: env.RUN == 'true'
-        run: deno task e2e:cli run scaffold.plugins --format pretty
+        run: deno task e2e:cli run scaffold.plugins --format pretty --report .llm/tmp/e2e-report-scaffold-plugins.json
+
+      - name: Print failed static E2E gate evidence
+        if: failure() && env.RUN == 'true'
+        shell: bash
+        run: |
+          for report in .llm/tmp/e2e-report-scaffold-{service,contracts,plugins}.json; do
+            if [[ -f "$report" ]]; then
+              deno run --allow-read .llm/tools/e2e/print-failed-report-steps.ts "$report"
+            fi
+          done
+
+      - name: Upload static E2E reports
+        if: always() && env.RUN == 'true'
+        uses: actions/upload-artifact@v5
+        with:
+          name: e2e-cli-scaffold-static-reports
+          path: .llm/tmp/e2e-report-scaffold-*.json
+          if-no-files-found: error
 
   scaffold-runtime:
     name: scaffold-runtime (aspire + docker + postgres)

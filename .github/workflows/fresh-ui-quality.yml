@@ -131,7 +131,10 @@ jobs:
         run: |
           if ! deno run --allow-read --allow-write --allow-run --allow-env \
             .llm/tools/gates/run-gate.ts --gate check --id fresh-ui-check \
-            --cwd packages/fresh-ui --output .llm/tmp/gate-receipts/fresh-ui/check.json; then
+            --cwd packages/fresh-ui \
+            --output .llm/tmp/gate-receipts/fresh-ui/check.receipt.json \
+            --child-report ../../.llm/tmp/gate-receipts/fresh-ui/check.report.json -- \
+            --output ../../.llm/tmp/gate-receipts/fresh-ui/check.report.json; then
             printf '::error::Fresh UI private lock is stale. Review the dependency diff, then run deno task --cwd packages/fresh-ui lock:update and commit packages/fresh-ui/deno.lock.\n'
             exit 1
           fi
@@ -141,7 +144,10 @@ jobs:
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate lint --id fresh-ui-lint
-          --cwd packages/fresh-ui --output .llm/tmp/gate-receipts/fresh-ui/lint.json
+          --cwd packages/fresh-ui
+          --output .llm/tmp/gate-receipts/fresh-ui/lint.receipt.json
+          --child-report ../../.llm/tmp/gate-receipts/fresh-ui/lint.report.json --
+          --output ../../.llm/tmp/gate-receipts/fresh-ui/lint.report.json
 
       - name: Frozen-lock failure regression
         if: env.RUN == 'true'

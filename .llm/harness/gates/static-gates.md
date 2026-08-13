@@ -5,28 +5,29 @@ package scope is involved.
 
 ## Gate Definitions
 
-| Gate             | Default command                                   | Required when                                                | Evidence                      |
-| ---------------- | ------------------------------------------------- | ------------------------------------------------------------ | ----------------------------- |
-| Narrow typecheck | `deno check --unstable-kv <file-or-entry>`        | Small focused changes where workspace config is not required | command output or parser JSON |
-| Slice typecheck  | `.llm/tools/run-deno-check.ts -- <check command>` | Significant work or workspace-config-sensitive code          | wrapper JSON summary          |
-| Format check     | `deno task fmt --check` or targeted equivalent    | Any committed docs/code where formatting matters             | command output                |
-| Lint             | `deno task lint` or narrow lint target            | Code changes; docs-only runs may skip with rationale         | command output                |
-| Doc lint         | `deno doc --lint <module>`                        | Public package exports, README/API docs, JSR work            | command output                |
-| Publish dry-run  | `deno publish --dry-run` from package             | Published package/plugin changes                             | command output                |
-| Link/path check  | focused filesystem check                          | Docs that reference local paths                              | list of checked paths         |
+| Gate             | Default command                                       | Required when                                                | Evidence                      |
+| ---------------- | ----------------------------------------------------- | ------------------------------------------------------------ | ----------------------------- |
+| Narrow typecheck | `deno check --unstable-kv <file-or-entry>`            | Small focused changes where workspace config is not required | command output or parser JSON |
+| Slice typecheck  | `deno task check` or `.llm/tools/run-deno-check.ts`   | Significant work or workspace-config-sensitive code          | deduplicated wrapper JSON     |
+| Tests            | `deno task test` or `.llm/tools/run-deno-test.ts`     | Runtime or regression behavior                               | deduplicated wrapper JSON     |
+| Format check     | `deno task fmt:check` or `.llm/tools/run-deno-fmt.ts` | Any committed docs/code where formatting matters             | wrapper JSON summary          |
+| Lint             | `deno task lint` or `.llm/tools/run-deno-lint.ts`     | Code changes; docs-only runs may skip with rationale         | deduplicated wrapper JSON     |
+| Doc lint         | `deno task doc:lint --root <package>`                 | Public package exports, README/API docs, JSR work            | wrapper JSON summary          |
+| Publish dry-run  | `deno publish --dry-run` from package                 | Published package/plugin changes                             | command output                |
+| Link/path check  | focused filesystem check                              | Docs that reference local paths                              | list of checked paths         |
 
 ## Required Evidence Source (mandatory)
 
-Static-gate evidence for **type-check, lint, and format** MUST come from the scoped wrappers —
-`.llm/tools/run-deno-check.ts`, `run-deno-lint.ts`, `run-deno-fmt.ts` (with `--root … --ext ts,tsx`),
-or the `deno task check|lint|fmt:check` aliases that wrap them. Raw root `deno check .` /
-`deno fmt --check` / `deno lint` over the repo is **not a verdict**: it walks Markdown, generated
-output, and future-wave packages. **Doc-lint** evidence uses `deno task doc:lint --root <pkg>`
-(`.llm/tools/run-deno-doc-lint.ts`), which lints the full `deno.json` export map. **Dependency /
-publishability** evidence (latest, outdated, why, audit, prod-install) uses the `deno task deps:*`
-wrappers — never hand-rolled registry curls, never `deno outdated --latest` for "latest". The wrapper
-invocations, flags, and gotcha rationale live in the **netscript-tools** and
-**netscript-deno-toolchain** skills; do not restate them here.
+Static-gate evidence for **type-check, test, lint, and format** MUST come from the structured
+wrappers — `.llm/tools/run-deno-check.ts`, `run-deno-test.ts`, `run-deno-lint.ts`, `run-deno-fmt.ts`
+(with `--root … --ext ts,tsx` where applicable), or the `deno task check|test|lint|fmt:check`
+aliases that wrap them. Raw root `deno check .` / `deno fmt --check` / `deno lint` over the repo is
+**not a verdict**: it walks Markdown, generated output, and future-wave packages. **Doc-lint**
+evidence uses `deno task doc:lint --root <pkg>` (`.llm/tools/run-deno-doc-lint.ts`), which lints the
+full `deno.json` export map. **Dependency / publishability** evidence (latest, outdated, why, audit,
+prod-install) uses the `deno task deps:*` wrappers — never hand-rolled registry curls, never
+`deno outdated --latest` for "latest". The wrapper invocations, flags, and gotcha rationale live in
+the **netscript-tools** and **netscript-deno-toolchain** skills; do not restate them here.
 
 `.llm/tools/run-deno-check.ts` can run a scoped file selection directly, parse a saved log with
 `--input`, parse stdin with `--stdin`, or wrap a command after `--`. Fall back to raw output only if

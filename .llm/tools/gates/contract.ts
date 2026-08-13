@@ -46,6 +46,13 @@ export interface OutputEvidence {
   truncated: boolean;
 }
 
+export interface ChildReportEvidence {
+  path: string;
+  bytes: number;
+  sha256: string;
+  modifiedAt?: string;
+}
+
 export interface GateReceipt extends GateRequest {
   schemaVersion: typeof RECEIPT_SCHEMA_VERSION;
   requestHash: string;
@@ -60,6 +67,7 @@ export interface GateReceipt extends GateRequest {
   stdout?: OutputEvidence;
   stderr?: OutputEvidence;
   childReport?: string;
+  childReportEvidence?: ChildReportEvidence;
   reason?: string;
 }
 

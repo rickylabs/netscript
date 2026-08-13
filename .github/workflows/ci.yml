@@ -236,14 +236,18 @@ jobs:
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate check --id check-test-check
-          --output .llm/tmp/gate-receipts/check-test/check.json
+          --output .llm/tmp/gate-receipts/check-test/check.receipt.json
+          --child-report .llm/tmp/gate-receipts/check-test/check.report.json --
+          --output .llm/tmp/gate-receipts/check-test/check.report.json
 
       - name: Repo-wide test
         if: env.RUN == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate test --id check-test-test
-          --output .llm/tmp/gate-receipts/check-test/test.json
+          --output .llm/tmp/gate-receipts/check-test/test.receipt.json
+          --child-report .llm/tmp/gate-receipts/check-test/test.report.json --
+          --report-output .llm/tmp/gate-receipts/check-test/test.report.json
 
       - name: Install managed-form browser test runtime
         if: env.RUN == 'true' && env.RUN_FRESH_BROWSER == 'true'
@@ -335,14 +339,18 @@ jobs:
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate lint --id quality-lint
-          --output .llm/tmp/gate-receipts/quality/lint.json
+          --output .llm/tmp/gate-receipts/quality/lint.receipt.json
+          --child-report .llm/tmp/gate-receipts/quality/lint.report.json --
+          --output .llm/tmp/gate-receipts/quality/lint.report.json
 
       - name: Format check
         if: env.RUN_DENO == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate fmt-check --id quality-fmt
-          --output .llm/tmp/gate-receipts/quality/fmt.json
+          --output .llm/tmp/gate-receipts/quality/fmt.receipt.json
+          --child-report .llm/tmp/gate-receipts/quality/fmt.report.json --
+          --output .llm/tmp/gate-receipts/quality/fmt.report.json
 
       - name: JSR tagline length
         if: env.RUN_DOCS == 'true'

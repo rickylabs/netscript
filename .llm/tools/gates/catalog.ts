@@ -20,6 +20,7 @@ export const GATE_CATALOG = {
     '.llm/tools/gates/evidence-set_test.ts',
     '.llm/tools/gates/process-runner_test.ts',
     '.llm/tools/gates/receipt-store_test.ts',
+    '.llm/tools/run-deno-test.ts',
     '.llm/tools/harness/render-milestone-status.ts',
     '.llm/tools/harness/validate-milestone-cluster.ts',
     '.llm/tools/agentic/github/gh-pr.ts',

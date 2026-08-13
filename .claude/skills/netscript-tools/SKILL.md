@@ -52,31 +52,36 @@ or hand-edit a `sufficiency` string. Duplicate gate IDs, duplicate receipt IDs, 
 receipts, `SKIPPED`, `NOT_RUN`, missing/nonterminal receipts, or an immutable-head mismatch are
 insufficient. Package/plugin evidence also needs `quality-gate`, dependency evidence, and the
 applicable JSR audit. E2E tools keep their domain JSON reports; reference them with `--child-report`
-instead of double-wrapping or replacing them.
+instead of double-wrapping or replacing them. A declared child report is part of the verdict: it
+must be freshly written, parse as JSON, and is hashed into the receipt. Missing, malformed, or stale
+child reports fail closed.
 
-**MANDATE (harness runs).** TS type-check / lint / format gate **evidence MUST come from the scoped
-wrappers** — `.llm/tools/run-deno-check.ts`, `.llm/tools/run-deno-lint.ts`, and
-`.llm/tools/run-deno-fmt.ts` (invoked directly with `--root … --ext ts,tsx`, or through the
-`deno task check|lint|fmt:check` aliases that already wrap them). Raw root `deno check .` /
+**MANDATE (harness runs).** TS type-check / test / lint / format gate **evidence MUST come from the
+structured wrappers** — `.llm/tools/run-deno-check.ts`, `.llm/tools/run-deno-test.ts`,
+`.llm/tools/run-deno-lint.ts`, and `.llm/tools/run-deno-fmt.ts` (invoked directly, or through the
+`deno task check|test|lint|fmt:check` aliases that already wrap them). Raw root `deno check .` /
 `deno fmt --check` / `deno lint` over the repo is **not a verdict source**: it walks Markdown,
 generated output, scratch workspaces, and future-wave packages, producing false reds/greens. Use
 these wrappers for package/plugin quality checks:
 
 ```powershell
 deno task check
+deno task test
 deno task lint
 deno task fmt:check
 deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root <path> --ext ts,tsx
+deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all <test-path>
 deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root <path> --ext ts,tsx
 deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root <path> --ext ts,tsx
 ```
 
-The wrappers accept roots, extensions, include/exclude filters, and batching, and emit structured
-compact output. Package-quality formatting gates target source TypeScript only (`--ext ts,tsx`) and
-exclude generated output, scratch workspaces, and future-wave packages. All scoped wrappers fail
-closed when their own selection is empty. Check/lint/fmt child crashes must appear structurally in
-JSON, and doc-lint preserves its child exit code; an empty findings array is not a PASS when a child
-failed.
+The source wrappers accept roots, extensions, include/exclude filters, and batching; the test
+wrapper accepts native test arguments after `--`. All emit structured compact output.
+Package-quality formatting gates target source TypeScript only (`--ext ts,tsx`) and exclude
+generated output, scratch workspaces, and future-wave packages. All scoped wrappers fail closed when
+their own selection is empty. Check/test/lint/fmt child crashes must appear structurally in JSON,
+test failures are grouped without losing affected test locations, and doc-lint preserves its child
+exit code; an empty findings array is not a PASS when a child failed.
 
 **Code-quality gate (required for `packages/**`/`plugins/**` waves).** The scoped check/lint/fmt
 wrappers above are necessary but NOT sufficient: they pass code containing `any`, honor an inline

@@ -124,3 +124,33 @@ Deno.test('CLI fails when Deno config excludes every selected lint target', asyn
     await Deno.remove(root, { recursive: true });
   }
 });
+
+Deno.test('CLI atomically persists its structured lint report', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await Deno.writeTextFile(`${root}/valid.ts`, 'export const value = 1;\n');
+    const reportPath = `${root}/report.json`;
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        '--allow-read',
+        '--allow-write',
+        '--allow-run',
+        new URL('./run-deno-lint.ts', import.meta.url).pathname,
+        '--cwd',
+        root,
+        '--root',
+        '.',
+        '--output',
+        reportPath,
+      ],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(output.code, 0);
+    assertEquals(JSON.parse(new TextDecoder().decode(output.stdout)).report, reportPath);
+    assertEquals(JSON.parse(await Deno.readTextFile(reportPath)).selection.filesSelected, 1);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});

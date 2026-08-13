@@ -97,8 +97,8 @@ After a group's evaluator returns `PASS`:
    On conflict: **stop, do not force-resolve.** Take the group version for generated artifacts and
    re-generate; merge both entries for `deno.json` workspace members; analyze source conflicts
    manually. Log conflict + resolution in `drift.md` as `significant`.
-3. **Post-merge verification** — `deno check` (with project unstable flags) on affected surfaces;
-   forbidden-import check; affected tests.
+3. **Post-merge verification** — the structured `deno task check` and `deno task test` aliases on
+   affected surfaces; forbidden-import check.
 4. **Update supervisor state** — `phase-registry.md` group → `merged` (record merge commit);
    `context-pack.md` group → Completed; `worklog.md` progress; the merge commit is captured in the
    integration PR / sub-PR commit trail.
@@ -118,7 +118,7 @@ dependency graph, or needs a user decision.
 | Base branch gets a significant commit to a touched surface | immediate sync                     |
 | Never during an active group                               | wait for group close               |
 
-After sync: verify `deno check` passes, log the sync in `worklog.md`, log any conflicts in
+After sync: verify `deno task check` passes, log the sync in `worklog.md`, log any conflicts in
 `drift.md`.
 
 ## 6. Final integration merge / PR
@@ -128,9 +128,10 @@ After the last group passes evaluation:
 - [ ] All groups `merged` in `phase-registry.md`.
 - [ ] No unresolved `architectural` drift.
 - [ ] No open `FAIL_*` verdicts in any group's `evaluate.md`.
-- [ ] Workspace `deno check` + affected tests pass on the integration branch.
+- [ ] Structured workspace `deno task check` + affected `deno task test` pass on the integration
+      branch.
 - [ ] End-to-end / parity gate for the program passes.
-- [ ] `deno fmt --check` + `deno lint` pass on changed files.
+- [ ] `deno task fmt:check` + `deno task lint` pass on changed files.
 
 Then open the supervisor PR to the base branch (the PR #96 shape): summary, merged group/sub-PR
 list, validation snapshot, and links to `final-pr-handoff.md` + `context-pack.md` +

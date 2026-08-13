@@ -174,15 +174,15 @@ and uploads it with `if: always()`; workers keep same-ID/same-hash promises in t
 store. RTK output is exploratory only and is never the durable verdict source. A command receipt
 proves that command, not the sufficiency of a merge gate set.
 
-For root check, lint, and formatting validation, prefer the scoped wrappers:
-`.llm/tools/run-deno-check.ts`, `.llm/tools/run-deno-lint.ts`, and `.llm/tools/run-deno-fmt.ts`.
-They accept roots, extensions, include/exclude filters, batching, and structured compact output,
-avoiding raw CLI noise and shell glob expansion. Package-quality formatting gates must target source
-TypeScript only (`--ext ts,tsx`) and exclude generated output, scratch workspaces, and future-wave
-packages. Do not treat raw root `deno fmt --check` across Markdown, generated files, or
-line-ending-only legacy drift as a package-quality verdict, and do not run the mutating root
-`deno task fmt` unless the user explicitly asks for repo-wide formatting changes. The wrapper
-invocations, gate-evidence rules, and lock hygiene are detailed once in
+For root check, test, lint, and formatting validation, prefer the structured wrappers:
+`.llm/tools/run-deno-check.ts`, `.llm/tools/run-deno-test.ts`, `.llm/tools/run-deno-lint.ts`, and
+`.llm/tools/run-deno-fmt.ts`. They accept roots, extensions, include/exclude filters, batching, and
+structured compact output, avoiding raw CLI noise and shell glob expansion. Package-quality
+formatting gates must target source TypeScript only (`--ext ts,tsx`) and exclude generated output,
+scratch workspaces, and future-wave packages. Do not treat raw root `deno fmt --check` across
+Markdown, generated files, or line-ending-only legacy drift as a package-quality verdict, and do not
+run the mutating root `deno task fmt` unless the user explicitly asks for repo-wide formatting
+changes. The wrapper invocations, gate-evidence rules, and lock hygiene are detailed once in
 `.agents/skills/netscript-tools`.
 
 Common commands:
@@ -193,6 +193,7 @@ deno task test
 deno task lint
 deno task fmt:check
 deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root <path> --ext ts,tsx
+deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all <test-path>
 deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root <path> --ext ts,tsx
 deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root <path> --ext ts,tsx
 deno task publish:dry-run

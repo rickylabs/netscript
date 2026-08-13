@@ -18,14 +18,14 @@ Use this profile for packages whose value is a clear public contract: types, sch
 identifiers, parse/validation helpers, and small invariants. If the work introduces adapters,
 runtime lifecycle, state, or a fluent API as the main product, select a larger archetype.
 
-Current examples are listed in `docs/architecture/doctrine/06-archetypes.md` under "Archetype assignments for current
-packages."
+Current examples are listed in `docs/architecture/doctrine/06-archetypes.md` under "Archetype
+assignments for current packages."
 
 ## Minimum Folder Shape
 
-Use the canonical shape in `docs/architecture/doctrine/06-archetypes.md#archetype-1--small-contract`. The review
-question is not whether every folder exists; it is whether the package stayed small and avoided
-invented layers.
+Use the canonical shape in
+`docs/architecture/doctrine/06-archetypes.md#archetype-1--small-contract`. The review question is
+not whether every folder exists; it is whether the package stayed small and avoided invented layers.
 
 ## Skills to Activate
 
@@ -43,8 +43,9 @@ invented layers.
 
 ## Required Gates in Order
 
-1. Static gates: narrow `deno check`, package slice check, `deno fmt --check`, `deno lint`,
-   `deno doc --lint`, `deno publish --dry-run` when package scope.
+1. Static gates: narrow `deno check` when justified, structured package check/test,
+   `deno task fmt:check`, `deno task lint`, `deno task doc:lint`, and `deno publish --dry-run` when
+   package scope.
 2. Fitness gates: F-1, F-5, F-6, F-7, F-8, F-10, F-11, F-12, F-14, F-15, F-16, F-17, F-18, F-19.
 3. Runtime gates: none by default.
 4. Consumer gates: optional unless exports, names, or validation semantics changed.

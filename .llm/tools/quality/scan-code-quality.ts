@@ -24,6 +24,16 @@ const PLUGIN_NAMES = ['ai', 'auth', 'sagas', 'streams', 'triggers', 'workers'];
 // The companion `arch:check` independently evaluates every doctrine root.
 const DEFAULT_ROOTS = ['packages/cli/src', 'plugins'];
 const EMPTY_TAINT: Set<string> = new Set();
+const GENERATED_OR_VENDOR_DIRS = new Set([
+  '.deno',
+  '.deploy',
+  '.git',
+  '.output',
+  '_cache',
+  '_site',
+  'node_modules',
+  'vendor',
+]);
 
 /**
  * Same-file identifiers bound to a plugin name — `const target = 'auth'` or an
@@ -123,6 +133,7 @@ async function collect(path: string): Promise<string[]> {
   }
   const files: string[] = [];
   for await (const entry of Deno.readDir(path)) {
+    if (entry.isDirectory && GENERATED_OR_VENDOR_DIRS.has(entry.name)) continue;
     const child = resolve(path, entry.name);
     if (entry.isDirectory) files.push(...await collect(child));
     else if (entry.isFile && isScannable(child)) files.push(child);
