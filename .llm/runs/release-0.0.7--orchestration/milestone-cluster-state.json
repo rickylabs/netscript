@@ -350,7 +350,86 @@
       "state": "open"
     }
   ],
-  "leaves": [],
+  "leaves": [
+    {
+      "id": "comparison-docs-programme",
+      "lane": "docs",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "headSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+      "issueNumbers": [1551],
+      "implementerAgentId": "019ffcc9-16c2-7573-b7f6-d627172408e8",
+      "evaluatorAgentId": null,
+      "branch": "docs/comparison-docs-programme",
+      "worktree": "/home/codex/repos/netscript-007-docs-comparison",
+      "receiptRefs": []
+    },
+    {
+      "id": "quality-scan-allowance-rail",
+      "lane": "internals",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "headSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+      "issueNumbers": [1378, 1545],
+      "implementerAgentId": "019ffcc9-97d6-7602-bb7d-582ecc92b069",
+      "evaluatorAgentId": null,
+      "branch": "chore/quality-scan-allowance-rail",
+      "worktree": "/home/codex/repos/netscript-007-quality-rail",
+      "receiptRefs": []
+    },
+    {
+      "id": "harness-evidence-and-verdict-tooling",
+      "lane": "internals",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "headSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+      "issueNumbers": [1561, 1563, 1621],
+      "implementerAgentId": "019ffcc9-97ba-7770-a890-a1ebd80ec793",
+      "evaluatorAgentId": null,
+      "branch": "fix/harness-evidence-and-verdict-tooling",
+      "worktree": "/home/codex/repos/netscript-007-harness-evidence",
+      "receiptRefs": []
+    },
+    {
+      "id": "legacy-port-pin-sweep",
+      "lane": "fixes",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "headSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+      "issueNumbers": [1243],
+      "implementerAgentId": "019ffcca-8bdc-7fb3-98c5-df90e2ae3b1f",
+      "evaluatorAgentId": null,
+      "branch": "fix/legacy-port-pin-sweep",
+      "worktree": "/home/codex/repos/netscript-007-leaf-legacy-port-pin-sweep",
+      "receiptRefs": []
+    },
+    {
+      "id": "scaffold-generated-output-correctness",
+      "lane": "fixes",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "headSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+      "issueNumbers": [1262, 1263, 1588],
+      "implementerAgentId": "019ffcca-8be0-74c2-bb0e-c82cf5ce3c85",
+      "evaluatorAgentId": null,
+      "branch": "fix/scaffold-generated-output-correctness",
+      "worktree": "/home/codex/repos/netscript-007-leaf-scaffold-generated-output-correctness",
+      "receiptRefs": []
+    },
+    {
+      "id": "rfc-plugin-cli-contribution",
+      "lane": "features",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "headSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+      "issueNumbers": [1502],
+      "implementerAgentId": "019ffcc5-d3e1-7c13-9815-e9956ec43683",
+      "evaluatorAgentId": null,
+      "branch": "docs/rfc-plugin-cli-contribution",
+      "worktree": "/home/codex/repos/netscript-007-features-1502",
+      "receiptRefs": []
+    }
+  ],
   "expensiveGates": [],
   "canaryCheckpoints": [
     {
@@ -391,5 +470,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-13T21:27:00.000Z"
+  "updatedAt": "2026-08-13T23:25:00.000Z"
 }
