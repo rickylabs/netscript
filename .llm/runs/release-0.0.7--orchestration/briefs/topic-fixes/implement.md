@@ -29,4 +29,6 @@ Act as a topic orchestrator, not either leaf implementer. Create fresh leaf work
 
 Every leaf must inspect live issues, reproduce the defect or record the approved fallback, use the structured NetScript Deno check/test/quality reporters and preserve JSON receipts, commit in reviewable slices, push by explicit refspec, and open a draft PR against `main` with acceptance evidence. Use PLAN-EVAL N/A only for locked/mechanical work; otherwise run the bounded plan gate. Require substantive Tier-A review and a separate opposite-family IMPL-EVAL before requesting merge. Serialize scaffold/runtime/Aspire/Docker work under the one global expensive-gate lease and run `quality:gate`/JSR audit where the contract requires them. Clean any AppHost or container created by a leaf.
 
+Any Claude supervisor/orchestrator session you introduce must be native Claude Remote Control (`/remote-control`, launched through the supported native/hybrid surface), with matching PID/cwd and non-empty `bridgeSessionId` recorded. A custom-endpoint/OpenRouter Claude session is not Remote Control and must never be described as mobile-visible.
+
 Start now: reconcile live `main` and issue state, launch both ready wave-zero leaves within WIP, and keep supervising them. Report progress in topic run artifacts and return a compact identity/status table to the coordinator; never claim merge authority.

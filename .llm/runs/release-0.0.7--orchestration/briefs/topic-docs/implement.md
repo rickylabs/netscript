@@ -28,4 +28,6 @@ Act as a topic orchestrator, not the leaf implementer. Create a fresh leaf workt
 
 The leaf must inspect the live issue, use structured NetScript checks/reports, commit in reviewable slices, push by explicit refspec, and open a draft PR against `main` with acceptance evidence. Use PLAN-EVAL N/A only if the implementation is fully locked/mechanical; otherwise run the bounded plan gate. Require substantive Tier-A review and a separate opposite-family IMPL-EVAL before requesting merge. Do not run irrelevant expensive gates.
 
+Any Claude supervisor/orchestrator session you introduce must be native Claude Remote Control (`/remote-control`, launched through the supported native/hybrid surface), with matching PID/cwd and non-empty `bridgeSessionId` recorded. A custom-endpoint/OpenRouter Claude session is not Remote Control and must never be described as mobile-visible.
+
 Start now: reconcile live `main` and issue state, launch the ready wave-zero leaf, and keep supervising it. Report progress in your topic run artifacts and return a compact identity/status table to the coordinator; never claim merge authority.

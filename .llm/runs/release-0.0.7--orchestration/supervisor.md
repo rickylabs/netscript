@@ -49,3 +49,9 @@ control worktrees are `/home/codex/repos/netscript-007-{docs,internals,fixes,fea
 
 All four sessions were launched attached through `agentic:launch-codex-slice`; live status reports
 one working Sol/high agent at each exact worktree and no route or worktree ownership collision.
+
+Owner visibility invariant: every 0.0.7 session assigned a Claude supervisor/orchestrator role must
+run with native Claude `/remote-control`. Attachment is proven only by the native session registry
+matching PID and cwd and exposing a non-empty `bridgeSessionId`; custom-endpoint/OpenRouter Claude
+sessions do not satisfy this invariant. The four active topic controls above are Codex daemon lanes,
+so they use the corresponding daemon/thread visibility proof instead.

@@ -29,4 +29,6 @@ Act as a topic orchestrator, not the leaf implementer. Create a fresh #1502 leaf
 
 The leaf must inspect live issue/RFC doctrine, use structured NetScript checks and preserve JSON receipts, commit in reviewable slices, push by explicit refspec, and open a draft PR against `main` with acceptance evidence. #1502 requires its bounded PLAN-EVAL; do not mark it N/A. Require substantive Tier-A review and a separate opposite-family IMPL-EVAL before requesting merge. Run `quality:gate` and JSR audit only where applicable. Do not overlap the global expensive gate.
 
+Any Claude supervisor/orchestrator session you introduce must be native Claude Remote Control (`/remote-control`, launched through the supported native/hybrid surface), with matching PID/cwd and non-empty `bridgeSessionId` recorded. A custom-endpoint/OpenRouter Claude session is not Remote Control and must never be described as mobile-visible.
+
 Start now: reconcile live `main`, verify the #1348 coordinator checkpoint without closing it, launch the ready #1502 leaf, and keep supervising it. Report progress in topic run artifacts and return a compact identity/status table to the coordinator; never claim merge authority.

@@ -22,6 +22,7 @@
 | 2026-08-13T23:08:44.000Z | Final dispatch recheck passed on unchanged `main`: milestone schema valid; Docker empty; Aspire has no AppHost/resources; coordinator PR merge state clean. | `origin/main` `01e096049`; validator `ok:true`; `docker ps/volume/network`; `aspire stop` + `aspire ps` |
 | 2026-08-13T23:10:00.000Z | Materialized four clean topic-control worktrees and locked wave-zero dispatch briefs. | `netscript-007-{docs,internals,fixes,features}`; `briefs/topic-*/implement.md` |
 | 2026-08-13T23:12:07.000Z | Activated exactly four attached topic orchestrators on the recorded Codex Sol/high fallback; all four route/worktree identities matched and began working. | `topic-{docs,internals,fixes,features}/codex-thread-ids.md`; `agentic:codex-status` |
+| 2026-08-13T23:18:00.000Z | Locked the owner-requested visibility rule: every Claude orchestrator lane must use native `/remote-control` with registry attachment proof. | `agentic:smoke-claude-remote`: version/help/remote-control/agents surfaces all OK; topic briefs + supervisor invariant |
 
 ## Current design checkpoint
 
