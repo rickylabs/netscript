@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "milestone": "0.0.7",
+  "launchAfter": "2026-08-15T00:00:00+02:00",
+  "timezone": "Europe/Zurich",
+  "concurrency": 1,
+  "route": {
+    "provider": "native-claude",
+    "model": "Fable 5",
+    "effort": "medium",
+    "remoteControlRequired": true,
+    "substitutesAllowed": false
+  },
+  "entries": [
+    {
+      "order": 1,
+      "leafId": "harness-evidence-and-verdict-tooling",
+      "phase": "impl-eval",
+      "pr": 1644,
+      "branch": "fix/harness-evidence-and-verdict-tooling",
+      "worktree": "/home/codex/repos/netscript-007-harness-evidence",
+      "sourceHead": "4d9fb196765cbf1a6bc7eaa7c18ec82b237ab89f",
+      "implementationParent": "634b257ea1afcedb2d7f1da486d8c9e9432a2a86",
+      "runDir": ".llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling",
+      "brief": "harness-evidence-and-verdict-tooling.md",
+      "output": "evaluate.md"
+    },
+    {
+      "order": 2,
+      "leafId": "legacy-port-pin-sweep",
+      "phase": "impl-eval",
+      "pr": 1643,
+      "branch": "fix/legacy-port-pin-sweep",
+      "worktree": "/home/codex/repos/netscript-007-leaf-legacy-port-pin-sweep",
+      "sourceHead": "e6ba15ec6414c0a42b1f9870791131162ea71c36",
+      "runDir": ".llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0",
+      "brief": "legacy-port-pin-sweep.md",
+      "output": "evaluate.md"
+    },
+    {
+      "order": 3,
+      "leafId": "rfc-plugin-cli-contribution",
+      "phase": "plan-eval",
+      "cycle": 2,
+      "pr": 1651,
+      "branch": "docs/rfc-plugin-cli-contribution",
+      "worktree": "/home/codex/repos/netscript-007-features-1502",
+      "sourceHead": "12276e6d86403ed1340ef79a963e87d401d643e9",
+      "runDir": ".llm/runs/docs-rfc-plugin-cli-contribution--1502",
+      "brief": "rfc-plugin-cli-contribution.md",
+      "output": "plan-eval.md"
+    },
+    {
+      "order": 4,
+      "leafId": "quality-scan-allowance-rail",
+      "phase": "plan-eval",
+      "cycle": 2,
+      "pr": 1653,
+      "branch": "chore/quality-scan-allowance-rail",
+      "worktree": "/home/codex/repos/netscript-007-quality-rail",
+      "sourceHead": "09dfb092dccf7f843b9270295047d674a8187362",
+      "runDir": ".llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail",
+      "brief": "quality-scan-allowance-rail.md",
+      "output": "plan-eval.md"
+    },
+    {
+      "order": 5,
+      "leafId": "scaffold-generated-output-correctness",
+      "phase": "plan-eval",
+      "cycle": 1,
+      "pr": 1654,
+      "branch": "fix/scaffold-generated-output-correctness",
+      "worktree": "/home/codex/repos/netscript-007-leaf-scaffold-generated-output-correctness",
+      "sourceHead": "14d8b38b4db7ba0635cbbcac2f8cd8903bee0ec9",
+      "runDir": ".llm/runs/fix-scaffold-generated-output-correctness--0.0.7-wave0",
+      "brief": "scaffold-generated-output-correctness.md",
+      "output": "plan-eval.md"
+    },
+    {
+      "order": 6,
+      "leafId": "comparison-docs-programme",
+      "phase": "plan-eval",
+      "cycle": 1,
+      "pr": 1652,
+      "branch": "docs/comparison-docs-programme",
+      "worktree": "/home/codex/repos/netscript-007-docs-comparison",
+      "sourceHead": "d35cbca30872d1f55118d63437638e93270c2ac3",
+      "runDir": ".llm/runs/docs-comparison-docs-programme--1551",
+      "brief": "comparison-docs-programme.md",
+      "output": "plan-eval.md"
+    }
+  ]
+}

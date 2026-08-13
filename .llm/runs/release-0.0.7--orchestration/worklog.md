@@ -37,6 +37,7 @@
 | 2026-08-13T21:14:00.000Z | Completed #1651's bounded same-thread Codex plan repair without RFC/product implementation and parked it for formal PLAN-EVAL cycle 2. | Clean pushed head `12276e6d8`; structured check/test/publish/architecture/docs/JSR receipts; PR #1651 PLAN-UPDATE |
 | 2026-08-13T21:17:00.000Z | Reconciled #1644's final closure contract before packaging: #1621 explicitly requires one operator-guidance sentence, so the previously read-only `netscript-pr` skill became the ninth and final authorized surface. | Live #1621 acceptance; exact `.agents/skills/netscript-pr/SKILL.md` amendment; no other scope growth |
 | 2026-08-13T21:35:00.000Z | Completed #1644's acceptance guidance, substantive S3 Tier-A review, and immutable structured evidence package; parked the draft leaf at its formal native IMPL-EVAL handoff. | Implementation `634b257ea`; evidence head `4d9fb1967`; check 2,919 files/0 diagnostics; test 4,109 pass/19 ignored/0 fail; quality-job PASS; handoff comment `5286647015` |
+| 2026-08-13T21:47:00.000Z | Replaced stale/scattered evaluator handoffs with one coordinator-owned, serial, SHA-locked Saturday dispatch set. No evaluator was launched. | `briefs/reset-gates/dispatch.json`; six activation-correct briefs; local/remote/PR/cluster-state validation PASS; native Claude/Fable 5 medium + `/remote-control`, no substitutes |
 
 ## Current design checkpoint
 
