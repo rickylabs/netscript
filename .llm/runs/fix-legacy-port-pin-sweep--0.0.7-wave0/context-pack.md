@@ -22,5 +22,12 @@
   still consumes them. Invalid manifest/fixture edits were restored.
 - Proposed explicit-URL auth diff remains uncommitted because two current tests need changes outside
   the frozen surface. No durable receipts or expensive gates ran.
-- Resume only after the topic orchestrator chooses the narrow test-file rescope (retain compatibility
-  pins) or a broader schema/copy redesign with revised plan + separate PLAN-EVAL.
+- Coordinator instruction on 2026-08-13: do not expand or reinterpret the frozen leaf contract; the
+  topic orchestrator cannot approve either rescope. PR #1643 stays draft at `status:plan`.
+- The exact proposed auth-command diff is preserved in `worklog.md`; the product-source edit was
+  removed with `apply_patch` and was never committed.
+- Required decision: only the release coordinator may issue a replacement leaf contract naming any
+  additional test/schema/copy surfaces and remedy, or disposition #1243 outside this leaf. Resume no
+  source work until that explicit coordinator decision arrives.
+- No further gates, expensive-gate lease request, issue/milestone mutation, ready transition, merge,
+  or publication is authorized. This paused run owns no runtime resources and needs no cleanup.
