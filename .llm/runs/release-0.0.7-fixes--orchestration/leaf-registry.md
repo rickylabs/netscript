@@ -2,7 +2,7 @@
 
 | Leaf | Issues | Worktree | Branch | Base | Route | Thread | Draft PR | State |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `legacy-port-pin-sweep` | #1243 | `/home/codex/repos/netscript-007-leaf-legacy-port-pin-sweep` | `fix/legacy-port-pin-sweep` | `01e096049` | requested/observed Codex · OpenAI · `gpt-5.6-sol` · low (matched) | `019ffcca-8bdc-7fb3-98c5-df90e2ae3b1f` | pending | researching |
+| `legacy-port-pin-sweep` | #1243 | `/home/codex/repos/netscript-007-leaf-legacy-port-pin-sweep` | `fix/legacy-port-pin-sweep` | `f3cf40909` | requested/observed Codex · OpenAI · `gpt-5.6-sol` · low (matched) | `019ffcca-8bdc-7fb3-98c5-df90e2ae3b1f` | [#1643](https://github.com/rickylabs/netscript/pull/1643) draft → `main` | paused: replacement contract/coordinator disposition required |
 | `scaffold-generated-output-correctness` | #1262, #1263, #1588 | `/home/codex/repos/netscript-007-leaf-scaffold-generated-output-correctness` | `fix/scaffold-generated-output-correctness` | `01e096049` | requested/observed Codex · OpenAI · `gpt-5.6-sol` · high (matched) | `019ffcca-8be0-74c2-bb0e-c82cf5ce3c85` | pending | researching |
 
 Every branch has no upstream by design. Pushes must use an explicit refspec. Exact observed route,
