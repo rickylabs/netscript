@@ -24,6 +24,29 @@ Deno.test('validate CLI accepts the deno task separator and rejects malformed us
   assertStringIncludes(parseValidateCliArgs(['a', 'b']).error ?? '', 'exactly one');
 });
 
+function gateReceipt(gateId: string, head: string): Record<string, unknown> {
+  return {
+    schemaVersion: 1,
+    gateId,
+    invocationId: `${gateId}-1`,
+    argv: ['deno', 'task', gateId],
+    cwd: '/repo',
+    gitHead: head,
+    actualGitHead: head,
+    timeoutMs: 1_000,
+    runnerIdentity: 'ci',
+    attempt: 1,
+    requestHash: `${gateId}-hash`,
+    lifecycleId: `ci:${gateId}:1`,
+    outcome: 'PASS',
+    claimedAt: '2026-08-13T08:00:00.000Z',
+    startedAt: '2026-08-13T08:00:00.000Z',
+    finishedAt: '2026-08-13T08:00:01.000Z',
+    durationMs: 1_000,
+    exitCode: 0,
+  };
+}
+
 async function validArtifacts(): Promise<MutableArtifacts> {
   const baselineMainSha = 'a'.repeat(40);
   const headSha = 'b'.repeat(40);
@@ -121,7 +144,12 @@ async function validArtifacts(): Promise<MutableArtifacts> {
     }],
     expensiveGates: [],
     canaryCheckpoints: [],
-    exactMainEvidence: { gitHead: headSha, sufficiency: 'INSUFFICIENT', receiptRefs: [] },
+    exactMainEvidence: {
+      gitHead: headSha,
+      surface: 'repository',
+      expectedGateIds: [],
+      receipts: [],
+    },
     existingReleaseLease: false,
     releaseWriters: [],
     releaseCaptain: {
@@ -256,6 +284,64 @@ Deno.test('RED: release captain cannot claim early or admit two writers', async 
   await expectRed((artifacts) => {
     artifacts.state.releaseWriters = ['captain-a', 'captain-b'];
   }, 'at most one release writer');
+});
+
+Deno.test('release captain requires recomputed exact-main receipt sufficiency', async () => {
+  const artifacts = await validArtifacts();
+  const head = artifacts.state.currentMainSha as string;
+  (artifacts.state.committedIssues as Record<string, unknown>[])[0].state = 'closed';
+  (artifacts.state.leaves as Record<string, unknown>[])[0].phase = 'merged';
+  artifacts.state.exactMainEvidence = {
+    gitHead: head,
+    surface: 'repository',
+    expectedGateIds: ['check'],
+    receipts: [gateReceipt('check', head)],
+  };
+  artifacts.state.releaseWriters = ['captain'];
+  artifacts.state.releaseCaptain = {
+    state: 'claimed',
+    agentId: 'captain',
+    leaseId: 'lease-1',
+    contentSha: head,
+    evidence: [],
+  };
+  artifacts.status = await renderMilestoneStatus(artifacts.state);
+  const result = await validateMilestoneCluster(artifacts);
+  assert(result.ok, result.errors.join('\n'));
+
+  const forged = clone(artifacts);
+  forged.state.exactMainEvidence = {
+    gitHead: head,
+    sufficiency: 'SUFFICIENT',
+    receiptRefs: ['hand-written'],
+  };
+  forged.status = await renderMilestoneStatus(forged.state);
+  const forgedResult = await validateMilestoneCluster(forged);
+  assertEquals(forgedResult.ok, false);
+  assertStringIncludes(forgedResult.errors.join('\n'), 'expectedGateIds must not be empty');
+});
+
+Deno.test('RED: duplicate exact-main receipts cannot claim the release captain', async () => {
+  await expectRed(async (artifacts) => {
+    const head = artifacts.state.currentMainSha as string;
+    (artifacts.state.committedIssues as Record<string, unknown>[])[0].state = 'closed';
+    (artifacts.state.leaves as Record<string, unknown>[])[0].phase = 'merged';
+    artifacts.state.exactMainEvidence = {
+      gitHead: head,
+      surface: 'repository',
+      expectedGateIds: ['check'],
+      receipts: [gateReceipt('check', head), gateReceipt('check', head)],
+    };
+    artifacts.state.releaseWriters = ['captain'];
+    artifacts.state.releaseCaptain = {
+      state: 'claimed',
+      agentId: 'captain',
+      leaseId: 'lease-1',
+      contentSha: head,
+      evidence: [],
+    };
+    artifacts.status = await renderMilestoneStatus(artifacts.state);
+  }, 'duplicate or contradictory receipts');
 });
 
 Deno.test('RED: generated status and receipt heads are immutable', async () => {

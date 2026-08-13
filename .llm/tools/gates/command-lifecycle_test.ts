@@ -12,6 +12,7 @@ function request(argv: string[]): GateRequest {
     argv,
     cwd: Deno.cwd(),
     gitHead: 'abc',
+    actualGitHead: 'abc',
     timeoutMs: 5_000,
     runnerIdentity: 'test',
     attempt: 1,

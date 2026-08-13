@@ -127,6 +127,11 @@ forking its skill content.
   `deno task gates:run --gate check --id check-1 --output .llm/tmp/gate-receipts/check.json`
 - Worker semantics: reuse one `LifecycleMemoryStore` across the lifecycle so same-ID/same-hash
   requests replay instead of spawning again. This is not a cross-process lock.
+- Attestation boundary: the runner resolves actual `HEAD`; a mismatched declared head requires a
+  written diagnostic override and can never count toward sufficiency. The receipt does not prove
+  remote currency, a clean worktree, semantic sufficiency, or publication.
+- Evidence sets reject duplicate/contradictory gate or receipt IDs and recompute sufficiency; a
+  stored `sufficiency` string has no authority.
 - E2E: preserve the E2E report and reference it using `--child-report`; do not replace or nest its
   domain schema.
 

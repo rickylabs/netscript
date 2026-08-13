@@ -1,4 +1,7 @@
 import { join } from '@std/path';
+import type { GateReceipt } from '../gates/contract.ts';
+import { RECEIPT_OUTCOMES } from '../gates/contract.ts';
+import { evaluateEvidenceSet } from '../gates/evidence-set.ts';
 import { renderMilestoneStatus } from './render-milestone-status.ts';
 
 export const TOPIC_LANES = ['docs', 'internals', 'fixes', 'features'] as const;
@@ -84,6 +87,34 @@ function duplicateValues<T>(values: readonly T[]): T[] {
     seen.add(value);
   }
   return [...duplicates];
+}
+
+function parseGateReceipts(errors: string[], value: unknown): GateReceipt[] {
+  const input = records(value);
+  if (!Array.isArray(value) || input.length !== value.length) {
+    errors.push('exactMainEvidence.receipts must contain receipt objects only');
+    return [];
+  }
+  const receipts: GateReceipt[] = [];
+  for (const receipt of input) {
+    const valid = receipt.schemaVersion === 1 && nonEmpty(receipt.gateId) &&
+      nonEmpty(receipt.invocationId) && Array.isArray(receipt.argv) &&
+      receipt.argv.every((entry) => typeof entry === 'string') && nonEmpty(receipt.cwd) &&
+      nonEmpty(receipt.gitHead) && nonEmpty(receipt.actualGitHead) &&
+      Number.isInteger(receipt.timeoutMs) && (receipt.timeoutMs as number) > 0 &&
+      nonEmpty(receipt.runnerIdentity) && Number.isInteger(receipt.attempt) &&
+      (receipt.attempt as number) > 0 &&
+      nonEmpty(receipt.requestHash) && nonEmpty(receipt.lifecycleId) &&
+      oneOf(receipt.outcome, RECEIPT_OUTCOMES) && nonEmpty(receipt.claimedAt);
+    if (!valid) {
+      errors.push(
+        `exactMainEvidence receipt ${String(receipt.invocationId ?? '?')} is malformed`,
+      );
+      continue;
+    }
+    receipts.push(receipt as unknown as GateReceipt);
+  }
+  return receipts;
 }
 
 function requireSharedIdentity(
@@ -485,9 +516,24 @@ function validateState(
   );
   const terminalLeaves = leaves.every((leaf) => TERMINAL_LEAF_PHASES.has(String(leaf.phase)));
   const exactEvidence = isRecord(state.exactMainEvidence) ? state.exactMainEvidence : {};
-  const exactMainGreen = exactEvidence.sufficiency === 'SUFFICIENT' &&
-    nonEmpty(state.currentMainSha) && exactEvidence.gitHead === state.currentMainSha &&
-    strings(exactEvidence.receiptRefs).length > 0;
+  const expectedGateIds = strings(exactEvidence.expectedGateIds);
+  const evidenceReceipts = parseGateReceipts(errors, exactEvidence.receipts);
+  const evaluatedEvidence = nonEmpty(state.currentMainSha) && nonEmpty(exactEvidence.surface)
+    ? evaluateEvidenceSet({
+      immutableHead: state.currentMainSha,
+      surface: exactEvidence.surface,
+      expectedGateIds,
+      receipts: evidenceReceipts,
+    })
+    : undefined;
+  if (expectedGateIds.length === 0) {
+    errors.push('exactMainEvidence.expectedGateIds must not be empty');
+  }
+  for (const reason of evaluatedEvidence?.reasons ?? []) {
+    errors.push(`exactMainEvidence: ${reason}`);
+  }
+  const exactMainGreen = exactEvidence.gitHead === state.currentMainSha &&
+    expectedGateIds.length > 0 && evaluatedEvidence?.sufficiency === 'SUFFICIENT';
   if (
     !terminalIssues || !terminalLeaves || !exactMainGreen || state.existingReleaseLease !== false
   ) {

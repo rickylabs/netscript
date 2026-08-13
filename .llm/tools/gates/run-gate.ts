@@ -14,6 +14,7 @@ interface CliOptions {
   attempt: number;
   runner: string;
   gitHead?: string;
+  gitHeadOverrideReason?: string;
   childReport?: string;
   skipReason?: string;
   args: string[];
@@ -23,6 +24,11 @@ function value(args: string[], index: number): string {
   const result = args[index + 1];
   if (!result) throw new Error(`Missing value for ${args[index]}`);
   return result;
+}
+
+function valueAllowEmpty(args: string[], index: number): string {
+  if (index + 1 >= args.length) throw new Error(`Missing value for ${args[index]}`);
+  return args[index + 1];
 }
 
 function parseArgs(args: string[]): CliOptions {
@@ -37,6 +43,7 @@ function parseArgs(args: string[]): CliOptions {
   let attempt = Number(Deno.env.get('GITHUB_RUN_ATTEMPT') ?? '1');
   let runner = Deno.env.get('GITHUB_JOB') ?? `worker:${Deno.pid}`;
   let gitHead: string | undefined;
+  let gitHeadOverrideReason: string | undefined;
   let childReport: string | undefined;
   let skipReason: string | undefined;
   for (let index = 0; index < own.length; index++) {
@@ -65,11 +72,14 @@ function parseArgs(args: string[]): CliOptions {
       case '--git-head':
         gitHead = value(own, index++);
         break;
+      case '--allow-git-head-mismatch':
+        gitHeadOverrideReason = value(own, index++);
+        break;
       case '--child-report':
         childReport = value(own, index++);
         break;
       case '--skip-reason':
-        skipReason = value(own, index++);
+        skipReason = valueAllowEmpty(own, index++).trim() || 'Policy skip (no reason supplied)';
         break;
       default:
         throw new Error(`Unknown argument ${own[index]}`);
@@ -89,13 +99,14 @@ function parseArgs(args: string[]): CliOptions {
     attempt,
     runner,
     gitHead,
+    gitHeadOverrideReason,
     childReport,
     skipReason,
     args: forwarded,
   };
 }
 
-async function resolveHead(cwd: string): Promise<string> {
+export async function resolveHead(cwd: string): Promise<string> {
   const result = await new Deno.Command('git', {
     args: ['rev-parse', 'HEAD'],
     cwd,
@@ -108,15 +119,39 @@ async function resolveHead(cwd: string): Promise<string> {
   return new TextDecoder().decode(result.stdout).trim();
 }
 
+export function attestGitHead(
+  actualGitHead: string,
+  requestedGitHead?: string,
+  overrideReason?: string,
+): { gitHead: string; actualGitHead: string; gitHeadOverrideReason?: string } {
+  const gitHead = requestedGitHead ?? actualGitHead;
+  if (gitHead !== actualGitHead && !overrideReason?.trim()) {
+    throw new Error(
+      `--git-head ${gitHead} does not match actual HEAD ${actualGitHead}; ` +
+        'use --allow-git-head-mismatch <reason> only for diagnostic evidence',
+    );
+  }
+  return {
+    gitHead,
+    actualGitHead,
+    gitHeadOverrideReason: gitHead === actualGitHead ? undefined : overrideReason?.trim(),
+  };
+}
+
 export async function main(args: string[] = Deno.args): Promise<number> {
   const options = parseArgs(args);
   const cwd = await Deno.realPath(options.cwd).catch(() => resolve(options.cwd));
+  const attestation = attestGitHead(
+    await resolveHead(cwd),
+    options.gitHead,
+    options.gitHeadOverrideReason,
+  );
   const request: GateRequest = {
     gateId: options.gate,
     invocationId: options.invocationId,
     argv: gateArgv(options.gate, options.args),
     cwd,
-    gitHead: options.gitHead ?? await resolveHead(cwd),
+    ...attestation,
     timeoutMs: options.timeoutMs,
     runnerIdentity: options.runner,
     attempt: options.attempt,

@@ -217,7 +217,7 @@ jobs:
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate check-test-job --id check-test-policy
           --output .llm/tmp/gate-receipts/check-test/policy.json
-          --git-head "${{ github.sha }}" --skip-reason "$SKIP_REASON"
+          --skip-reason "${SKIP_REASON:-Classifier selected no affected check-test surface.}"
 
       - name: Install workspace dependencies
         if: env.RUN == 'true'
@@ -314,7 +314,7 @@ jobs:
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate quality-job --id quality-policy
           --output .llm/tmp/gate-receipts/quality/policy.json
-          --git-head "${{ github.sha }}" --skip-reason "$SKIP_REASON"
+          --skip-reason "${SKIP_REASON:-Classifier selected no affected quality surface.}"
 
       - name: Check docs site source format
         if: env.RUN == 'true'

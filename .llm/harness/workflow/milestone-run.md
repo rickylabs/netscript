@@ -107,9 +107,11 @@ re-run the gate. Silent additions are forbidden.
   the release captain. `milestone-cluster-state.json` is the only mutable source; regenerate
   `milestone-status.md` after every transition.
 - The release captain remains inactive until every committed issue is closed or moved with reason,
-  every leaf is terminal, exact-current-`main` evidence is sufficient and green, and no existing
-  release lease is present. One agent then owns one writer lease for that content SHA. Topic agents
-  and watchers never publish.
+  every leaf is terminal, exact-current-`main` evidence recomputes as sufficient from its full
+  receipts and expected gate IDs, and no existing release lease is present. The validator ignores
+  hand-written sufficiency claims and rejects duplicate/contradictory or head-mismatched receipts.
+  One agent then owns one writer lease for that content SHA. Topic agents and watchers never
+  publish.
 
 ## Stage contracts
 

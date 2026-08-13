@@ -58,3 +58,16 @@ Deno.test('E2E keeps its domain report instead of being double-wrapped', async (
     assertEquals(text.includes('.llm/tools/gates/run-gate.ts'), false, name);
   }
 });
+
+Deno.test('policy skips always supply a non-empty fallback reason', async () => {
+  const ci = await workflow('ci.yml');
+  assertStringIncludes(
+    ci,
+    '${SKIP_REASON:-Classifier selected no affected check-test surface.}',
+  );
+  assertStringIncludes(
+    ci,
+    '${SKIP_REASON:-Classifier selected no affected quality surface.}',
+  );
+  assertEquals(ci.includes('--git-head "${{ github.sha }}"'), false);
+});

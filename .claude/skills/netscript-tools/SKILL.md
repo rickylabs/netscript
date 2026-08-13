@@ -41,8 +41,15 @@ invocation-ID/same-hash calls share one lifecycle-local promise; ID reuse with a
 capacity exhaustion fail closed. This is at-most-once only within the live broker lifecycle, not a
 distributed or crash-safe execution lock.
 
-`PASS` certifies only the named command. Use an `evidence-set.json` sufficiency decision for a merge
-gate set; `SKIPPED`, `NOT_RUN`, missing/nonterminal receipts, or an immutable-head mismatch are
+The runner resolves the repository's actual `HEAD` itself. A caller-supplied `--git-head` must
+match; `--allow-git-head-mismatch <reason>` exists only for explicit diagnostic fixtures and records
+both values. Such a receipt cannot satisfy an evidence set. Receipts attest that one process ran in
+one working tree at the recorded commit; they do not attest remote branch currency, source-tree
+cleanliness, semantic gate sufficiency, or publication. Those remain separate gates.
+
+`PASS` certifies only the named command. Sufficiency is recomputed from exact receipts; never trust
+or hand-edit a `sufficiency` string. Duplicate gate IDs, duplicate receipt IDs, contradictory
+receipts, `SKIPPED`, `NOT_RUN`, missing/nonterminal receipts, or an immutable-head mismatch are
 insufficient. Package/plugin evidence also needs `quality-gate`, dependency evidence, and the
 applicable JSR audit. E2E tools keep their domain JSON reports; reference them with `--child-report`
 instead of double-wrapping or replacing them.

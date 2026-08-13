@@ -25,8 +25,9 @@
   "canaryCheckpoints": [],
   "exactMainEvidence": {
     "gitHead": "0000000000000000000000000000000000000000",
-    "sufficiency": "INSUFFICIENT",
-    "receiptRefs": []
+    "surface": "repository",
+    "expectedGateIds": [],
+    "receipts": []
   },
   "existingReleaseLease": false,
   "releaseWriters": [],

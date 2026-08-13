@@ -32,6 +32,8 @@ export interface GateRequest {
   argv: string[];
   cwd: string;
   gitHead: string;
+  actualGitHead: string;
+  gitHeadOverrideReason?: string;
   timeoutMs: number;
   runnerIdentity: string;
   attempt: number;
@@ -94,6 +96,8 @@ export function canonicalRequest(request: GateRequest): string {
     cwd: request.cwd,
     gateId: request.gateId,
     gitHead: request.gitHead,
+    actualGitHead: request.actualGitHead,
+    gitHeadOverrideReason: request.gitHeadOverrideReason,
     invocationId: request.invocationId,
     runnerIdentity: request.runnerIdentity,
     timeoutMs: request.timeoutMs,
