@@ -53,6 +53,7 @@ import {
   parseRepoSlug,
   requireValue,
   resolveGithubToken,
+  selectLatestCurrentHeadImplEval,
   selectLatestOpenHandsComment,
 } from '../lib/agentic-lib.ts';
 import { readOwnedPublicationBody, stagePublicationBody } from './publication-body.ts';
@@ -207,11 +208,48 @@ async function requireToken(o: Options): Promise<string> {
   throw new Error('unreachable');
 }
 
+type GitHubRequester = typeof githubRequest;
+
+/** Fetch every PR issue comment page, retaining GitHub's chronological order. */
+export async function fetchAllPullRequestComments(
+  owner: string,
+  repo: string,
+  pr: number,
+  token: string,
+  request: GitHubRequester = githubRequest,
+): Promise<CommentLike[]> {
+  const comments: CommentLike[] = [];
+  for (let page = 1;; page += 1) {
+    const res = await request(
+      'GET',
+      `/repos/${owner}/${repo}/issues/${pr}/comments?per_page=100&page=${page}`,
+      token,
+    );
+    if (!res.ok) {
+      throw new Error(
+        `GitHub comments page ${page} failed (${res.status}): ${
+          String(githubField(res.body, 'message') ?? res.body)
+        }`,
+      );
+    }
+    const items = Array.isArray(res.body) ? res.body : [];
+    comments.push(...items.flatMap((value) => {
+      const body = githubField(value, 'body');
+      const createdAt = githubField(value, 'created_at');
+      return typeof body === 'string'
+        ? [{ body, ...(typeof createdAt === 'string' ? { created_at: createdAt } : {}) }]
+        : [];
+    }));
+    if (items.length < 100) return comments;
+  }
+}
+
 async function fetchLatestVerdict(
   owner: string,
   repo: string,
   pr: number,
   token: string,
+  currentHead?: string,
 ): Promise<
   {
     comment: CommentLike | null;
@@ -219,33 +257,14 @@ async function fetchLatestVerdict(
     jobFinal: boolean;
     runUrl: string | null;
     status: ReturnType<typeof parseOpenHandsStatusComment>;
+    selectionIssue: 'none' | 'malformed-marker' | 'ambiguous-marker' | null;
   }
 > {
-  const res = await githubRequest(
-    'GET',
-    `/repos/${owner}/${repo}/issues/${pr}/comments?per_page=100`,
-    token,
-  );
-  if (!res.ok) {
-    console.log(
-      JSON.stringify({
-        ok: false,
-        status: res.status,
-        error: githubField(res.body, 'message') ?? res.body,
-      }),
-    );
-    Deno.exit(1);
-  }
-  const comments: CommentLike[] = Array.isArray(res.body)
-    ? res.body.flatMap((value) => {
-      const body = githubField(value, 'body');
-      const createdAt = githubField(value, 'created_at');
-      return typeof body === 'string'
-        ? [{ body, ...(typeof createdAt === 'string' ? { created_at: createdAt } : {}) }]
-        : [];
-    })
-    : [];
-  const comment = selectLatestOpenHandsComment(comments);
+  const comments = await fetchAllPullRequestComments(owner, repo, pr, token);
+  const selection = currentHead ? selectLatestCurrentHeadImplEval(comments, currentHead) : null;
+  const comment = selection
+    ? selection.ok ? selection.comment : null
+    : selectLatestOpenHandsComment(comments);
   const body = comment?.body ?? '';
   const status = parseOpenHandsStatusComment(body);
   return {
@@ -254,6 +273,7 @@ async function fetchLatestVerdict(
     jobFinal: status.isFinal,
     runUrl: status.runUrl,
     status,
+    selectionIssue: selection && !selection.ok ? selection.reason : null,
   };
 }
 
@@ -420,12 +440,26 @@ async function main(): Promise<void> {
   }
 
   if (o.evalGate) {
-    const { comment, verdict, jobFinal, status } = await fetchLatestVerdict(
+    const { comment, verdict, jobFinal, status, selectionIssue } = await fetchLatestVerdict(
       owner,
       repo,
       o.pr!,
       token,
+      headSha,
     );
+    if (selectionIssue !== null && selectionIssue !== 'none') {
+      emit(o.pretty, [
+        `BLOCKED PR #${o.pr}: evaluator provenance is ${selectionIssue}.`,
+        '  use --no-eval-gate to bypass deliberately.',
+      ], {
+        ok: false,
+        blocked: 'eval-invalid-marker',
+        reason: selectionIssue,
+        pr: o.pr,
+        currentHead: headSha,
+      });
+      Deno.exit(11);
+    }
     const gate = evaluateCurrentHeadImplEvalGate(comment !== null, status, headSha);
     if (!gate.ok) {
       emit(o.pretty, [

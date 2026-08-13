@@ -32,6 +32,7 @@ import {
   parseRepoSlug,
   parseThreadInfo,
   parseTurnComplete,
+  selectLatestCurrentHeadImplEval,
   selectLatestOpenHandsComment,
   sq,
   validateHandoffContract,
@@ -448,6 +449,71 @@ Deno.test('merge eval gate rejects running, plan, stale-head, and non-PASS termi
     ok: false,
     blocked: 'eval-not-pass',
   });
+});
+
+function statusComment(
+  phase: 'plan' | 'impl' | null,
+  head: string | null,
+  verdict: string,
+  createdAt: string,
+) {
+  const marker = JSON.stringify({
+    state: 'completed',
+    verdict,
+    phase,
+    evaluated_head: head,
+  });
+  return {
+    body:
+      `<!-- openhands-agent-summary -->\n<!-- openhands-run: ${marker} -->\n## OpenHands Agent — Completed`,
+    created_at: createdAt,
+  };
+}
+
+Deno.test('current-head selector ignores later non-eval and plan summaries', () => {
+  const head = 'a'.repeat(40);
+  const pass = statusComment('impl', head, 'PASS', '2026-08-13T10:00:00Z');
+  const selection = selectLatestCurrentHeadImplEval([
+    pass,
+    statusComment(null, null, 'NONE', '2026-08-13T11:00:00Z'),
+    statusComment('plan', head, 'PASS', '2026-08-13T12:00:00Z'),
+  ], head);
+  assertEquals(selection.ok, true);
+  if (selection.ok) assertEquals(selection.comment, pass);
+});
+
+Deno.test('current-head selector chooses latest terminal IMPL marker for that head', () => {
+  const head = 'a'.repeat(40);
+  const selection = selectLatestCurrentHeadImplEval([
+    statusComment('impl', head, 'PASS', '2026-08-13T10:00:00Z'),
+    statusComment('impl', 'b'.repeat(40), 'PASS', '2026-08-13T12:00:00Z'),
+    statusComment('impl', head, 'FAIL_FIX', '2026-08-13T11:00:00Z'),
+  ], head);
+  assertEquals(selection.ok, true);
+  if (selection.ok) assertEquals(selection.status.formalVerdict, 'FAIL_FIX');
+});
+
+Deno.test('current-head selector fails closed for malformed or ambiguous markers', () => {
+  const head = 'a'.repeat(40);
+  const malformed = {
+    body:
+      '<!-- openhands-agent-summary -->\n<!-- openhands-run: {bad} -->\n## OpenHands Agent — Completed',
+    created_at: '2026-08-13T11:00:00Z',
+  };
+  assertEquals(selectLatestCurrentHeadImplEval([malformed], head), {
+    ok: false,
+    reason: 'malformed-marker',
+  });
+  const valid = statusComment('impl', head, 'PASS', '2026-08-13T10:00:00Z');
+  assertEquals(
+    selectLatestCurrentHeadImplEval([{
+      ...valid,
+      body: `${valid.body}\n<!-- openhands-run: ${
+        JSON.stringify({ phase: 'impl', evaluated_head: head })
+      } -->`,
+    }], head),
+    { ok: false, reason: 'ambiguous-marker' },
+  );
 });
 
 // --- buildPullRequestBody / buildMergeBody --------------------------------
