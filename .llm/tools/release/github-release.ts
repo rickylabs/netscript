@@ -251,6 +251,12 @@ export async function verifyGreenCanaryPair(
             );
           }
         } catch (error) {
+          if (error instanceof Deno.errors.PermissionDenied) {
+            throw new Error(
+              'Stable publication infrastructure failure: cannot execute generated-output ' +
+                `freshness checks.\n${error.message}`,
+            );
+          }
           if (agentDocsChanged) {
             throw new Error(
               'Stable publication blocked: agent-docs prose contains non-version changes, so ' +

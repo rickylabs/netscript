@@ -711,6 +711,35 @@ Deno.test('parent canary evidence rejects semantically drifted rebuilt corpus co
   }
 });
 
+Deno.test('parent canary evidence distinguishes permission failure from content drift', async () => {
+  const driftFixture = await createRenderedCanaryPairFixture(true);
+  try {
+    await assertRejects(
+      () =>
+        verifyGreenCanaryPair('owner/repo', 'token', driftFixture.root, driftFixture.dependencies),
+      Error,
+      'Stable publication blocked: agent-docs prose contains non-version changes',
+    );
+
+    await assertRejects(
+      () =>
+        verifyGreenCanaryPair('owner/repo', 'token', driftFixture.root, {
+          ...driftFixture.dependencies,
+          generatedOutputsFresh: () =>
+            Promise.reject(
+              new Deno.errors.PermissionDenied(
+                'Requires run access to "deno", run again with the --allow-run flag',
+              ),
+            ),
+        }),
+      Error,
+      'Stable publication infrastructure failure: cannot execute generated-output freshness checks',
+    );
+  } finally {
+    await driftFixture.dispose();
+  }
+});
+
 Deno.test('parent canary evidence fails when derived writer outputs cannot be reproduced', async () => {
   const parentProse = await gzipJson({
     schemaVersion: 1,

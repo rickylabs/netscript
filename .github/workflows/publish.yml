@@ -72,7 +72,9 @@ jobs:
       - name: Require green canary pair for this content
         env:
           GH_TOKEN: ${{ github.token }}
-        run: deno task release:verify-canary-pair -- --repo "$GITHUB_REPOSITORY"
+        # This trusted workflow may recover an immutable release tag whose
+        # checked-out deno.json predates the verifier's Deno subprocesses.
+        run: deno run --allow-net=api.github.com --allow-env=GH_TOKEN --allow-run=git,deno --allow-read .llm/tools/release/verify-canary-pair.ts --repo "$GITHUB_REPOSITORY"
 
       - name: Publish readiness
         run: deno task publish:readiness
