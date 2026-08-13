@@ -67,17 +67,22 @@ Future version-coupled assets are added to the generator sequence and
 | 2026-08-13 | 5 | implementation | Restored single staging ownership; added post-writer semantic check; removed literal rebase from production call sites; changed inheritance to canonical identity + semantic HEAD reproduction. |
 | 2026-08-13 | 5 | focused gates | 40 preparation/docs/publish/inheritance tests pass; six changed TS files type-check; lockfile diff empty. |
 | 2026-08-13 | 5 | reconcile | Scope matches the owner RCA in #1628; PR remains draft/status:impl and no evaluator was dispatched. |
+| 2026-08-13 | 6 | real-pair RCA | Disposable cut exposed raw-substring classifier mismatch on unrelated `0.0.52`; aligned inheritance with the canonical ownership-aware bump writer. |
+| 2026-08-13 | 6 | decisive proof | Final 0.0.7 dry-run and immediate freshness pass; 62/62 changed paths are writer-declared; actual cut commit inherits parent canary evidence. |
+| 2026-08-13 | 6 | final gates | Root check/test/lint/fmt, targeted check/lint/fmt, two freshness checks, strict rejection companion, diff checks, and lock hygiene pass. |
 
 ## Gate Results
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
-| focused release tests | PASS | 3 passed, 0 failed |
-| check | PASS | 2,915 files; 25 batches; 0 findings |
-| test | PASS | 3,386 passed; 0 failed; 17 ignored |
-| lint | PASS | 2,034 files; 0 findings |
-| fmt:check | PASS | 2,034 files; 0 findings |
+| focused release tests | PASS | 40 passed, 0 failed; publisher suite rerun 27/27 |
+| check | PASS | root cached verdict plus targeted 6-file check, 0 findings |
+| test | PASS | 3,391 passed; 0 failed; 17 ignored |
+| lint | PASS | root cached verdict plus targeted 6-file lint, 0 findings |
+| fmt:check | PASS | root cached verdict plus targeted 6-file fmt, 0 findings |
 | agent-docs freshness ×2 | PASS | identical semantic hash, `fresh:true` twice |
-| disposable 0.0.7 cut + freshness | PASS | cut exit 0; immediate freshness exit 0; version-only classifier true |
+| disposable 0.0.7 cut + freshness | PASS | cut exit 0; immediate freshness exit 0; 62 paths, no extras |
+| disposable canary inheritance | PASS | actual cut HEAD authorized exact immediate parent |
+| strict content-drift rejection | PASS | semantic drift companion refused with blocked-publication error |
 
 Full command evidence is recorded in `evidence.md`.

@@ -1,7 +1,9 @@
 # Evidence — fix-cut-regenerates-agent-docs-prose--w6
 
-This file records untruncated command output and exact exit codes for the discriminating pre-fix
-tests, required gates, consecutive freshness checks, and disposable 0.0.7 cut rehearsal.
+This file records exact exit codes and unelided terminal verdicts for the discriminating pre-fix
+tests, required gates, consecutive freshness checks, and disposable 0.0.7 cut rehearsal. Long docs
+file inventories and publish-simulation progress are summarized explicitly; their verdict lines and
+semantic identity fields are preserved below.
 
 ## Baseline
 
@@ -127,9 +129,8 @@ error: Test failed
 ```
 
 Baseline nuance: both corpus paths were already present transitively at the head of
-`PUBLISH_ASSET_OUTPUTS`. The failing assertion proves they were not independently classified by the
-prepared-release set as the owner contract requested; the implementation makes that ownership
-explicit without duplicating staged paths.
+`PUBLISH_ASSET_OUTPUTS`. The failing assertion encoded the initial owner contract, which was
+subsequently retracted.
 
 Correction after independent RCA: the assertion above encoded the owner's original, retracted
 instruction. Independent classification was not a missing property; `PUBLISH_ASSET_OUTPUTS` was
@@ -181,30 +182,20 @@ violating the required post-cut freshness property.
 All commands ran from `/home/codex/repos/ns006-w6`. Raw exit codes were `0`.
 
 ```text
-$ deno test -A .llm/tools/release/prepare-release_test.ts
-running 3 tests from ./.llm/tools/release/prepare-release_test.ts
-shared release preparation runs the stable gate sequence in order ... ok
-shared release preparation stages every generator-owned output ... ok
-shared release preparation regenerates assets then stops when residue remains ... ok
-ok | 3 passed | 0 failed
-EXIT_CODE=0
-
 $ rtk proxy deno task check
-{"source":{"mode":"selection","cwd":"/home/codex/repos/ns006-w6"},"command":"deno check --unstable-kv <files>","selection":{"filesSelected":2915,"batches":25,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+Task check deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude "^(.*(?:^|/)\.generated/|.*(?:^|/)node_modules/)" (cached, inputs unchanged)
 EXIT_CODE=0
 
 $ rtk proxy deno task test
-ok | 3386 passed (624 steps) | 0 failed | 17 ignored (4m0s)
+ok | 3391 passed (624 steps) | 0 failed | 17 ignored (4m23s)
 EXIT_CODE=0
 
 $ rtk proxy deno task lint
-Task lint deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)"
-{"source":{"mode":"command","cwd":"/home/codex/repos/ns006-w6","exitCode":0},"selection":{"filesSelected":2034,"batches":11},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+Task lint deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)" (cached, inputs unchanged)
 EXIT_CODE=0
 
 $ rtk proxy deno task fmt:check
-Task fmt:check deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)" --ignore-line-endings
-{"command":"deno fmt --check","cwd":"/home/codex/repos/ns006-w6","mode":"check","summary":{"filesSelected":2034,"batches":11,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+Task fmt:check deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)" --ignore-line-endings (cached, inputs unchanged)
 EXIT_CODE=0
 ```
 
@@ -427,3 +418,93 @@ nevertheless refused because it cannot reproduce from the rendered site.
 `rebaseAgentDocsProse` has no production call site after this change. It remains exported only for
 the differential test and recovery diagnostics; `generatePublishAssets` consumes the corpus emitted
 by the preceding real render.
+
+## Final disposable cut and stable-publisher proof
+
+Disposable root: `/tmp/netscript-w6-final3.kKD0yq/repo`. It was a shared local clone of final
+implementation commit `d5f9f8f1d`; nothing was minted, pushed, tagged, published, or written back to
+the implementation worktree.
+
+The real cut command completed successfully:
+
+```text
+$ deno task release:cut -- 0.0.7 --dry-run
+release:cut bumped 0.0.5 -> 0.0.7
+release:cut gate: gen:agent-docs-prose
+{"version":"0.0.7","uncompressedBytes":4720171,"sha256":"c9268f6cb59e8b94b3c5f01afd1e2203034f38769f14e91eabe22464df3cf257"}
+release:cut gate: gen:publish-assets
+release:cut gate: gen:mcp-export-corpus
+release:cut gate: gen:assets-barrel
+release:cut gate: check:agent-docs-prose
+{"fresh":true,"stalePaths":[],"provenance":{"version":"0.0.7","uncompressedBytes":4720171,"sha256":"c9268f6cb59e8b94b3c5f01afd1e2203034f38769f14e91eabe22464df3cf257"}}
+release:cut gate: publish:readiness
+{"gate":"publish-readiness","ok":true,"version":"0.0.7"}
+release:cut gate: publish:dry-run
+Success Dry run complete
+release:cut gate: deno ci --prod
+release:cut dry-run complete; branch/commit/push/PR skipped.
+EXIT_CODE=0
+```
+
+An independent freshness command in that same bumped copy also exited `0` with the identical
+canonical hash:
+
+```text
+$ deno task check:agent-docs-prose
+{"fresh":true,"stalePaths":[],"provenance":{"version":"0.0.7","uncompressedBytes":4720171,"sha256":"c9268f6cb59e8b94b3c5f01afd1e2203034f38769f14e91eabe22464df3cf257"}}
+EXIT_CODE=0
+```
+
+The prepared-file census was computed through the production
+`discoverPreparedReleaseFiles` function before explicitly staging those paths:
+
+```text
+{"changed":62,"allowed":68,"extras":[],"corpus":[".llm/assets/agent-docs/prose.json.gz",".llm/assets/agent-docs/provenance.json"]}
+$ git commit -m "test: disposable 0.0.7 cut"
+[fix/cut-regenerates-agent-docs-prose 2b8c733e1] test: disposable 0.0.7 cut
+ 62 files changed, 297 insertions(+), 297 deletions(-)
+EXIT_CODE=0
+```
+
+This proves both corpus paths are staged through the existing transitive ownership and the cut has
+no path outside manifests, the two release lockfiles, and writer-declared generated assets.
+
+Finally, `verifyGreenCanaryPair` ran against that exact Git parent→HEAD pair with real Git readers,
+the default generated-output freshness checker, a missing HEAD status, and a green parent status:
+
+```text
+{"authorized":true,"result":"d5f9f8f1d7767dc0adf39af896c4bc9c19245df8","parent":"d5f9f8f1d7767dc0adf39af896c4bc9c19245df8","current":"2b8c733e17ba0a72577a4c01aa5d7673c28a411a"}
+EXIT_CODE=0
+```
+
+During this proof, the exact-diff classifier initially exposed a false refusal in its own legacy
+implementation: raw `replaceAll("0.0.5", "0.0.7")` expected unrelated lock entry `0.0.52` to become
+`0.0.72`, unlike the canonical bump writer. `isExactVersionReplacement` now calls the same
+ownership-aware `rewriteNetScriptVersion` function as the writer, and its regression test preserves
+the unrelated dependency version. This aligns authorization with the actual coordinated cut without
+relaxing any source/generated-content boundary.
+
+The strict negative companion remains green:
+
+```text
+$ deno test -A .llm/tools/release/github-release_test.ts --filter "semantically drifted"
+parent canary evidence rejects semantically drifted rebuilt corpus content ... ok
+ok | 1 passed | 0 failed | 26 filtered out
+EXIT_CODE=0
+```
+
+## Final targeted tool gates
+
+```text
+$ deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root <six changed TS files> --ext ts
+{"selection":{"filesSelected":6,"batches":1,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+EXIT_CODE=0
+
+$ deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root <six changed TS files> --ext ts
+{"source":{"mode":"command","exitCode":0},"selection":{"filesSelected":6,"batches":1},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+EXIT_CODE=0
+
+$ deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root <six changed TS files> --ext ts
+{"command":"deno fmt --check","mode":"check","summary":{"filesSelected":6,"batches":1,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+EXIT_CODE=0
+```

@@ -36,3 +36,18 @@
   PR. Do not run a late PLAN-EVAL: the owner supplied the exact RCA, security property, scope, and
   automatic-evaluator constraint.
 - **Evidence:** focused inheritance tests and `evidence.md`.
+
+## 2026-08-13 — exact replacement verifier diverged from the bump writer
+
+- **What:** The actual disposable 0.0.7 commit was rejected before corpus authorization because the
+  verifier applied raw `0.0.5` substring replacement to unrelated lock entry `0.0.52`, expecting
+  `0.0.72`.
+- **Source:** real `verifyGreenCanaryPair` invocation over disposable cut commit `2b8c733e1` and its
+  parent.
+- **Expected:** The verifier accepts exactly what the coordinated version writer emits.
+- **Actual:** Its legacy replacement algorithm was broader than
+  `bump-version.ts::rewriteNetScriptVersion`.
+- **Severity:** significant
+- **Action:** reuse the canonical ownership-aware writer transformation in
+  `isExactVersionReplacement`; add a regression case preserving the unrelated dependency version.
+- **Evidence:** final disposable cut and stable-publisher section in `evidence.md`.

@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-cut-regenerates-agent-docs-prose--w6` |
 | Branch | `fix/cut-regenerates-agent-docs-prose` |
-| Current phase | implementation rescope |
+| Current phase | implementation complete; draft awaiting automatic evaluator |
 | Archetype | N/A — release tooling |
 | Scope overlays | none |
 
@@ -28,17 +28,20 @@ assumption. The owner explicitly ruled that both causal halves land together her
 - Implemented semantic freshness in preparation and stable-publish reproduction.
 - Removed literal rebasing from production call sites and accepted render metadata variance only
   behind canonical identity plus semantic reproduction.
-- Passed all owner gates, two freshness checks, and the disposable cut proof.
+- Passed all owner gates, two freshness checks, the final disposable cut proof, and real
+  stable-publisher inheritance over the disposable cut commit.
+- Aligned the exact version replacement verifier with the canonical bump writer after the real-pair
+  proof exposed a false substring match on unrelated lock version `0.0.52`.
 
 ## In Progress
 
-- Final full gates, disposable 0.0.7 cut proof, evidence reconciliation, and PR handoff.
+- PR evidence handoff only; automatic IMPL-EVAL and draft→ready remain orchestrator-owned.
 
 ## Next Steps
 
-1. Commit/push the focused-green semantic inheritance slice.
-2. Run full gates plus disposable cut proof and two consecutive freshness checks.
-3. Update PR body/evidence and stop without flipping ready.
+1. Commit/push final evidence.
+2. Update PR body and structured S6 comment.
+3. Stop without flipping ready or dispatching an evaluator.
 
 ## Drift and Debt
 
