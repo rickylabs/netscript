@@ -6,17 +6,17 @@
 | -------------- | ---------------------------------------------- |
 | Run ID         | `docs-rfc-plugin-cli-contribution--1502`       |
 | Branch         | `docs/rfc-plugin-cli-contribution`             |
-| Current phase  | `plan-eval` after S0 commit/PR handoff         |
+| Current phase  | `plan-eval` cycle 2 handoff after plan repair  |
 | Archetype      | 4 — public DSL/builder (future implementation) |
 | Scope overlays | `SCOPE-docs`                                   |
 
 ## Current State
 
-The leaf is reconciled to the exact required live `origin/main` baseline. Research and the Design
-checkpoint are complete; the RFC file does not exist and must not be authored until a fresh native
-Claude/Fable 5 medium session records PLAN-EVAL `PASS`. S0 docs gates are green and the current diff
-is limited to the required run directory. The exact plan head is the S0 commit containing this file
-and is recorded in the draft PR's PLAN handoff comment.
+Cycle-1 PLAN-EVAL evaluated `a02f9690154b7384ca8e6503ea91d644b397368a`, returned `FAIL_PLAN`, and is
+preserved in evaluator-only commit `d71b78c3116db4ec3aaaa0447dd527fcd4867f6f`. The same Codex author
+thread has repaired only the plan/research/evidence surface. The RFC file still does not exist and
+cannot be authored until a separate-session cycle-2 PLAN-EVAL records `PASS`. The exact repaired
+head is recorded in the PR's single PLAN-UPDATE comment and final supervisor report.
 
 ## Completed
 
@@ -33,20 +33,31 @@ and is recorded in the draft PR's PLAN handoff comment.
   absent UX, generator transaction, capabilities, doctor, manifest pointers, compatibility,
   migration, duplicate audit, and future epic shape.
 - Created required PLAN-EVAL and IMPL-EVAL placeholders without an author verdict.
+- Read all 145 lines of the committed cycle-1 verdict before repair and mapped FP-1–FP-3/N-1–N-4.
+- Reconciled the coordinator record at
+  `/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/leaf-contracts.json`,
+  key `rfc-plugin-cli-contribution`, with the authoritative RFC-only dispatch; recorded significant
+  drift and the coordinator-amendment/new-plan rule for any code expansion.
+- Corrected requested and observed author effort to `high` from the topic launcher record.
+- Ran the contracted CLI/plugin JSR audit, exact-pin/asset/import-meta checks, structured check and
+  tests, per-member publish dry-runs, and root architecture check with JSON receipts.
+- Locked the final six-gate rerun, live-glossary terminology review, complete 18-gate Archetype-4
+  roadmap, and #1502-versus-later-epic closing boundary.
 
 ## In Progress
 
-- S0 commit, explicit-refspec push, draft PR, taxonomy, milestone, phase comments, and separate
+- S0R plan-fix commit, explicit-refspec push, one PLAN-UPDATE comment, and separate cycle-2
   evaluator handoff.
 
 ## Next Steps
 
-1. Fresh native Claude/Fable 5 medium evaluator reads the S0 plan head and records `PASS` or
-   `FAIL_PLAN` in `plan-eval.md`.
-2. If `FAIL_PLAN`, this same author thread fixes only the plan/research artifacts and re-requests
-   separate evaluation.
-3. If `PASS`, resume this author thread for S1–S4 RFC authoring; keep the PR draft.
-4. After RFC/gates, a fresh opposite-family session performs IMPL-EVAL; Tier-A topic review remains
+1. A fresh opposite-family evaluator session reads the repaired plan head and records cycle-2 `PASS`
+   or `FAIL_PLAN` in `plan-eval.md`; the author does not self-evaluate or dispatch it.
+2. If `PASS`, resume this author thread for S1–S4 RFC authoring; keep the PR draft and preserve the
+   RFC-only boundary.
+3. After RFC content, rerun all six contracted gates at final head and complete the JSR/docs
+   evidence set.
+4. A fresh opposite-family session then performs IMPL-EVAL; Tier-A topic review remains
    orchestrator-owned.
 
 ## Key Decisions
@@ -59,43 +70,49 @@ and is recorded in the draft PR's PLAN handoff comment.
 | Host-neutral generation plan and host-owned transaction.                                    | current gap + RFC 0005 + D11–D13      | Preview is zero-write/effect.     |
 | Matching installer/runtime pointers after manifest forward-compat prerequisite.             | live `.strict()` + RFC 0005 + D14–D15 | Duplicate-audit #1474.            |
 | Deploy and DevTools are independent consumers of the same seam.                             | #1502 + D17                           | No cross-imports.                 |
+| Contract file surfaces are audit-only; all six gates and JSR audit remain binding.          | cycle-1 dispatch + D22                | Code expansion needs amendment.   |
+| `Closes #1502` completes this RFC leaf; the implementation epic is separate and unfiled.    | cycle-1 dispatch + D23                | No future epic is auto-closed.    |
 
 ## Files Changed
 
-| Path                                                               | Status | Notes                                          |
-| ------------------------------------------------------------------ | ------ | ---------------------------------------------- |
-| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/supervisor.md`   | new    | Identity and requested/observed routes.        |
-| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/research.md`     | new    | Live inventory, duplicate map, JSR audit.      |
-| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/plan.md`         | new    | Locked plan, gates, risks, slices, epic shape. |
-| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/worklog.md`      | new    | Design checkpoint and evidence log.            |
-| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/context-pack.md` | new    | Resumable handoff.                             |
-| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/drift.md`        | new    | Route/current-state/JSR drift.                 |
-| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/plan-eval.md`    | new    | Separate evaluator placeholder.                |
-| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/evaluate.md`     | new    | Later separate IMPL-EVAL placeholder.          |
-| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/receipts/`       | new    | Structured/durable S0 evidence.                |
+| Path                                                               | Status    | Notes                                            |
+| ------------------------------------------------------------------ | --------- | ------------------------------------------------ |
+| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/supervisor.md`   | updated   | Correct high-effort requested/observed identity. |
+| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/research.md`     | updated   | Contract resolution and measured JSR baseline.   |
+| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/plan.md`         | updated   | Repaired scope, gates, risks, slices, roadmap.   |
+| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/worklog.md`      | updated   | Design checkpoint and cycle-1 evidence log.      |
+| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/context-pack.md` | updated   | Resumable cycle-2 handoff.                       |
+| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/drift.md`        | updated   | Significant contract tension and resolution.     |
+| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/plan-eval.md`    | preserved | Cycle-1 evaluator verdict; author did not edit.  |
+| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/evaluate.md`     | unchanged | Later separate IMPL-EVAL placeholder.            |
+| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/receipts/`       | updated   | Structured/durable S0R and JSR evidence.         |
 
 ## Gates
 
-| Gate family | Current status                      | Evidence                               |
-| ----------- | ----------------------------------- | -------------------------------------- |
-| Static      | PASS for S0 docs scope              | `worklog.md`; `receipts/`              |
-| Fitness     | design/research/docs gate complete  | `plan.md`; `research.md`; `worklog.md` |
-| Runtime     | N/A / global expensive gate not run | docs-only scope                        |
-| Consumer    | research inventory complete         | live issues/RFCs and `research.md`     |
+| Gate family | Current status                                                       | Evidence                               |
+| ----------- | -------------------------------------------------------------------- | -------------------------------------- |
+| Static      | contracted check/test/publish/arch evidence green; docs rerun in S0R | `worklog.md`; `receipts/`              |
+| Fitness     | full A4 roadmap plus measured JSR baseline                           | `plan.md`; `research.md`; `worklog.md` |
+| Runtime     | N/A / global expensive gate not run                                  | docs-only scope                        |
+| Consumer    | research inventory complete                                          | live issues/RFCs and `research.md`     |
 
 ## Open Questions
 
-- PLAN-EVAL verdict only. Remaining exact spellings, copy, numeric limits, and rollout duration are
-  safe FCP/implementation-policy choices listed in `plan.md`; no package/lifecycle decision is open.
+- Cycle-2 PLAN-EVAL verdict only. FP-3 scope and N-2 closing semantics are resolved. Remaining exact
+  spellings, copy, numeric limits, and rollout duration are safe FCP/implementation-policy choices
+  listed in `plan.md`; no package/lifecycle decision is open.
 
 ## Drift and Debt
 
-- Drift: attached author route, accepted-but-unshipped consumer seams, shallow existing `./cli`, and
-  current plugin doc-lint baseline are recorded in `drift.md`.
+- Drift: attached author route, accepted-but-unshipped consumer seams, shallow existing `./cli`,
+  current plugin doc-lint baseline, coordinator-contract tension, and glossary path are recorded in
+  `drift.md`.
 - Debt: no new or deepened architecture debt; source implementation is forbidden in this leaf.
 
 ## Commits
 
-- S0 plan head: the commit containing this artifact; exact SHA is recorded in the draft PR's PLAN
-  handoff comment and final supervisor report.
+- S0 plan head: `a02f9690154b7384ca8e6503ea91d644b397368a`.
+- Cycle-1 verdict-only head: `d71b78c3116db4ec3aaaa0447dd527fcd4867f6f`.
+- S0R repaired plan head: the commit containing this artifact; exact SHA is recorded in the draft
+  PR's PLAN-UPDATE comment and final supervisor report.
 - See the draft PR commit list and per-slice comments after push; V3 uses no `commits.md`.

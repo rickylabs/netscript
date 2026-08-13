@@ -13,11 +13,26 @@
   `drift.md`: accepted consumer RFCs are design authority but their contribution machinery is not
   shipped.
 
+## Coordinator contract reconciliation
+
+The cycle-1 evaluator identified the binding coordinator record at
+`/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/leaf-contracts.json`,
+contract key `rfc-plugin-cli-contribution`. Its `fileSurfaces` name `packages/cli/`,
+`packages/plugin/`, `rfcs/`, RFC 0003, and RFC 0005; its `provingGates` are `check`, `test`,
+`publish-dry-run`, `arch-check`, `docs-source-format`, and `docs-accuracy`; and
+`jsrAudit.applicable` is `true`.
+
+The authoritative cycle-1 dispatch resolves the contract tension: package/plugin and existing-RFC
+paths are inspection/audit inputs, not mutation authority. This leaf remains the RFC document that
+completes #1502 and proposes a separate, unfiled implementation epic, while retaining every
+contracted proving gate and JSR risk. A code-scope expansion would require a coordinator amendment,
+a new plan, and another PLAN-EVAL. The significant drift is recorded in `drift.md`.
+
 ## Required-source inventory
 
 | Source                                                             | Status | Binding input for the plan                                                                                                                                                  |
 | ------------------------------------------------------------------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AGENTS.md`                                                        | read   | Doctrine first; contract first; native Deno tooling; no lock/cache churn; docs-only scoped gates.                                                                           |
+| `AGENTS.md`                                                        | read   | Doctrine first; contract first; native Deno tooling; no lock/cache churn; structured/durable evidence.                                                                      |
 | Harness activation/run-loop/lane policy/plan gate/plan protocol    | read   | Tracked run artifacts, separate PLAN-EVAL, explicit routes, design checkpoint, reviewable slices.                                                                           |
 | Archetype decision tree + Archetype 4 + `SCOPE-docs` + gate matrix | read   | Public DSL/builder is the approved described implementation; this leaf changes only docs/run artifacts.                                                                     |
 | Doctrine chapters 01, 02, 04–11                                    | read   | Registration over inheritance; deterministic explicit discovery; immutable public definitions; errors at the edge; thin plugins; no hidden globals or load-time I/O.        |
@@ -81,11 +96,32 @@ and changes no existing issue.
 | Workspace mutation transaction                                                                          | host CLI                                    | Plugin returns a typed plan; host validates containment/capabilities, stages, checks, commits or rolls back.     |
 | Doctor aggregation and stale-pointer diagnostics                                                        | host CLI over plugin-owned descriptor data  | One doctor command; plugin failures are isolated and attributed.                                                 |
 
-## JSR audit surface scan (planned package/plugin waves)
+## JSR audit of contracted publish surfaces
 
-This docs leaf does not change publishable code and does not run publication or publish dry-runs.
-The audit below applies the rubric to every planned public surface so the later epic cannot hide
-packaging work.
+`jsrAudit.applicable` is true even though this leaf does not mutate publishable code. Cycle 1
+therefore measured `packages/cli/` and `packages/plugin/` with repo-native audit, doc-lint,
+specifier, publish-asset, import-meta, type-check, test, and per-member publish-dry-run tooling. The
+receipts bind the measurements to evaluator commit `d71b78c3116db4ec3aaaa0447dd527fcd4867f6f`; final
+contracted gates rerun after the RFC is authored.
+
+### Cycle-1 measured baseline
+
+| Surface / risk                        | Measurement                                                                                                                                                                                            | Verdict and interpretation                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Export maps                           | JSON JSR audits enumerate 3 CLI exports and 13 plugin exports; structured full-map doc lint covers each package.                                                                                       | CLI doc lint: PASS, 0 diagnostics. Plugin doc lint: BASELINE_FAIL, 15 existing `private-type-ref` diagnostics, including the known `./cli` finding. No package source changed, so none is introduced by this leaf.                                                                                                                                                                                                                  |
+| JSR metadata/module docs              | `audit-jsr-package.ts` wrote package JSON reports and ran local dry-runs.                                                                                                                              | CLI audit exits 0. Plugin audit exits 1 on four existing missing `@module` tags (`./abstracts`, `./config`, `./cli`, `./testing`); its dry-run itself succeeds. These are measured baseline failures, not waived or introduced failures.                                                                                                                                                                                            |
+| Exact internal pins                   | CLI declares six and plugin declares two internal `@netscript/*` imports, all exact `jsr:@netscript/*@0.0.6`; durable `netscript-jsr-specifiers` scans 2,360 occurrences with 0 ranges and 0 failures. | PASS. Later implementation children must retain exact internal pins for every touched publishable member.                                                                                                                                                                                                                                                                                                                           |
+| Isolated declarations / slow types    | Workspace root enables `isolatedDeclarations`; plugin does not opt out, while CLI explicitly sets `isolatedDeclarations: false`. Canonical per-member publish dry-runs pass for both.                  | PASS_BASELINE_WITH_RISK. CLI's opt-out means its green dry-run is not proof that a new recursive public DSL is isolated-declaration clean. The later public-contract child must use explicit boundary annotations and an isolated-declaration probe; plugin's sanctioned slow-type carve-out is not permission to add new CLI slow types. The audit helper's “Checking for slow types” banner is not itself a slow-type diagnostic. |
+| Publish files/assets                  | Durable `publish-assets` freshness check passes; dry-run file lists include the declared CLI assets/templates and plugin embedded/template sources.                                                    | PASS. Future generated descriptors must be checked into the declared include set or embedded as TypeScript constants.                                                                                                                                                                                                                                                                                                               |
+| Runtime asset and `import.meta` reads | `deno task release:preflight` reports 0 text-import, import-attribute, file-URL/`import.meta`, and self-import findings across the publish surface.                                                    | PASS_BASELINE. The RFC must explicitly reject unguarded `fromFileUrl(import.meta.url)` and runtime asset reads in published modules; final implementation reruns the preflight and real consumer checks.                                                                                                                                                                                                                            |
+| Canonical publish simulation          | Durable per-member `publish-dry-run` receipts for `packages/cli` and `packages/plugin`.                                                                                                                | PASS for both. This is static evidence only and not publication; no local publish was run.                                                                                                                                                                                                                                                                                                                                          |
+
+Evidence: `receipts/jsr-audit-cli-cycle1.json`, `receipts/jsr-audit-plugin-cycle1.json`,
+`receipts/doc-lint-cli-cycle1.json`, `receipts/doc-lint-plugin-cycle1.json`,
+`receipts/netscript-jsr-specifiers-cycle1.json`, `receipts/publish-assets-cycle1.json`,
+`receipts/jsr-runtime-asset-preflight-cycle1.json`, and the two per-member publish-dry-run receipts.
+
+### Future publishable surfaces
 
 | Planned publishable surface                                                  | Current audit                                                                                                                                                            | Required implementation bar / risk                                                                                                                                                                                                                                              |
 | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -100,7 +136,8 @@ JSR/package risks that must be named in the RFC implementation roadmap:
    public returns and callback boundaries need explicit annotations.
 2. The current `./cli` private-type reference is a measured baseline, not permission to add more.
 3. Generated descriptor/registry assets must be embedded TypeScript or intentionally included;
-   runtime file reads/import attributes are not publish-equivalent.
+   runtime file reads, import attributes, and unguarded `fromFileUrl(import.meta.url)` /
+   `import.meta`-relative filesystem access are not publish-equivalent and must be rejected.
 4. Internal self-imports such as `@netscript/plugin/cli` from inside the same package can bind to
    the latest published package during publish; implementation must use relative internal imports.
 5. A CLI-internal Cliffy type in a public descriptor would leak upstream types and make completion,

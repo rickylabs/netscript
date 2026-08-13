@@ -1,0 +1,369 @@
+{
+  "pkg": {
+    "name": "@netscript/plugin",
+    "version": "0.0.6",
+    "description": "Plugin manifest, validation, discovery, and host-context contracts for NetScript.",
+    "root": "packages/plugin"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./abstracts": "./src/abstracts/mod.ts",
+    "./adapter": "./src/adapter/mod.ts",
+    "./config": "./src/config/mod.ts",
+    "./cli": "./src/cli/mod.ts",
+    "./loader": "./loader.ts",
+    "./protocol": "./src/protocol/mod.ts",
+    "./scaffold": "./src/scaffold/mod.ts",
+    "./sdk": "./src/sdk/mod.ts",
+    "./testing": "./src/testing/mod.ts",
+    "./templates": "./src/templates/mod.ts",
+    "./contract-base": "./src/contract-base/mod.ts",
+    "./service": "./src/service/mod.ts"
+  },
+  "files": {
+    "total": 153,
+    "loc": 8149,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 3119
+      },
+      {
+        "path": "src/abstracts/mod.ts",
+        "bytes": 1046
+      },
+      {
+        "path": "src/adapter/mod.ts",
+        "bytes": 3091
+      },
+      {
+        "path": "src/config/mod.ts",
+        "bytes": 2054
+      },
+      {
+        "path": "src/cli/mod.ts",
+        "bytes": 1667
+      },
+      {
+        "path": "loader.ts",
+        "bytes": 2298
+      },
+      {
+        "path": "src/protocol/mod.ts",
+        "bytes": 853
+      },
+      {
+        "path": "src/scaffold/mod.ts",
+        "bytes": 4257
+      },
+      {
+        "path": "src/sdk/mod.ts",
+        "bytes": 2722
+      },
+      {
+        "path": "src/testing/mod.ts",
+        "bytes": 1190
+      },
+      {
+        "path": "src/templates/mod.ts",
+        "bytes": 329
+      },
+      {
+        "path": "src/contract-base/mod.ts",
+        "bytes": 1237
+      },
+      {
+        "path": "src/service/mod.ts",
+        "bytes": 1677
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": true,
+    "readmeLines": 113,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true,
+      "./abstracts": false,
+      "./adapter": true,
+      "./config": false,
+      "./cli": false,
+      "./loader": true,
+      "./protocol": true,
+      "./scaffold": true,
+      "./sdk": true,
+      "./testing": false,
+      "./templates": true,
+      "./contract-base": true,
+      "./service": true
+    },
+    "descriptionLen": 81
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "DuplicatePluginError",
+        "PLUGIN_MANIFEST_SCHEMA_VERSION",
+        "PLUGIN_TYPES",
+        "PluginContribution",
+        "PluginError",
+        "PluginInstallerManifestSchema",
+        "PluginValidationError",
+        "assertSuccessfulProbe",
+        "definePlugin",
+        "inspectPlugin",
+        "joinProbeUrl",
+        "normalizeProbePath",
+        "parsePluginManifest",
+        "resolveProbeUrl",
+        "runPluginVerificationCli",
+        "summarizeResponse",
+        "verifyPlugin"
+      ],
+      "rawCount": 17
+    },
+    "./abstracts": {
+      "exported": [
+        "PluginAspireContribution",
+        "PluginBackgroundProcessorContribution",
+        "PluginContractVersionContribution",
+        "PluginContribution",
+        "PluginDbSchemaContribution",
+        "PluginE2eContribution",
+        "PluginMigrationContribution",
+        "PluginRuntimeConfigTopicContribution",
+        "PluginServiceContribution",
+        "PluginStreamTopicContribution",
+        "PluginTelemetryContribution"
+      ],
+      "rawCount": 11
+    },
+    "./adapter": {
+      "exported": [
+        "DEFAULT_PLUGIN_HEALTH_ENDPOINT",
+        "DEFAULT_PLUGIN_WORKSPACE_ROOT",
+        "artifactText",
+        "collectInstallArtifacts",
+        "createDenoFileSystem",
+        "createInstallScaffoldEntrypoint",
+        "createPluginAdapter",
+        "defineStub",
+        "resolveWorkspacePath",
+        "runDoctorCommand",
+        "runInfoCommand",
+        "runInstallCommand",
+        "runPluginCliCommand",
+        "runPluginScaffoldCli",
+        "runRemoveCommand",
+        "runUpdateCommand",
+        "substituteTokens",
+        "textArtifact"
+      ],
+      "rawCount": 18
+    },
+    "./config": {
+      "exported": [
+        "CONTRIBUTION_AXES",
+        "PLUGIN_TYPES",
+        "PluginBuilder",
+        "PluginManifestSchema",
+        "definePlugin",
+        "isContributionAxis",
+        "isReservedPluginName",
+        "mergeContributions"
+      ],
+      "rawCount": 8
+    },
+    "./cli": {
+      "exported": [
+        "LocalProjectFiles",
+        "PluginCli",
+        "PluginRuntimeConfigCli",
+        "applyScaffoldPlan",
+        "createBaseMetaCommands",
+        "findGeneratedProjectRoot",
+        "formatPluginHelp",
+        "isDoctorReportPassing",
+        "loadGeneratedProjectRegistry",
+        "mountPluginCli",
+        "normalizePluginArgv",
+        "parsePluginCliArgs",
+        "renderRegistryModule",
+        "resolveProjectRoot",
+        "routeVerb",
+        "runMountedCommand",
+        "toRegistryImportSpecifier"
+      ],
+      "rawCount": 17
+    },
+    "./loader": {
+      "exported": [
+        "PluginLogger",
+        "createPluginLogger"
+      ],
+      "rawCount": 2
+    },
+    "./protocol": {
+      "exported": [
+        "PLUGIN_MANIFEST_SCHEMA_VERSION",
+        "PluginInstallerManifestSchema",
+        "parsePluginManifest"
+      ],
+      "rawCount": 3
+    },
+    "./scaffold": {
+      "exported": [
+        "RegistryImport",
+        "RegistryModule",
+        "RuntimeRegistryModule",
+        "artifactText",
+        "defineRegistryModule",
+        "defineRuntimeRegistryModule",
+        "defineStub",
+        "renderRegistrySource",
+        "renderRuntimeRegistrySource",
+        "substituteTokens",
+        "textArtifact"
+      ],
+      "rawCount": 11
+    },
+    "./sdk": {
+      "exported": [
+        "AstExtractor",
+        "FilesystemWalker",
+        "MemoryManifestResolver",
+        "ModuleManifestResolver",
+        "RegistryEmitter",
+        "createInstrumentationBridge",
+        "createPluginContext",
+        "createPluginHostBootstrap",
+        "createSourceGraph",
+        "createWatcherHandle",
+        "runDoctorReport",
+        "runWalkerPipeline",
+        "startWalker",
+        "startWatcher"
+      ],
+      "rawCount": 14
+    },
+    "./testing": {
+      "exported": [
+        "MemoryEmitter",
+        "MemoryFileSystemAdapter",
+        "MemoryManifestResolver",
+        "MemoryWalker",
+        "PluginCli",
+        "createPluginManifestFixture",
+        "createWalkedFileFixture",
+        "runPluginCliContract"
+      ],
+      "rawCount": 8
+    },
+    "./templates": {
+      "exported": [
+        "PLUGIN_SKELETON_TEMPLATES",
+        "PLUGIN_SKELETON_TEMPLATE_CONTENT"
+      ],
+      "rawCount": 2
+    },
+    "./contract-base": {
+      "exported": [
+        "BASE_PLUGIN_CONTRACT_ROUTES",
+        "BASE_PLUGIN_ERRORS",
+        "PluginCapabilitiesSchema"
+      ],
+      "rawCount": 3
+    },
+    "./service": {
+      "exported": [
+        "assemblePluginContractRouter",
+        "bindPluginContract",
+        "createPluginService"
+      ],
+      "rawCount": 3
+    }
+  },
+  "tests": {
+    "fileCount": 28,
+    "files": [
+      "src/sdk/discovery/manifest-resolver_test.ts",
+      "src/adapter/factory_test.ts",
+      "src/adapter/runner/plugin-cli-runner_test.ts",
+      "src/adapter/item/item-scaffolder_test.ts",
+      "src/adapter/item/substitute_test.ts",
+      "src/adapter/scaffold-cli-runner_test.ts",
+      "src/adapter/commands/install_test.ts",
+      "src/service/presentation/create-plugin-service-rawroute_test.ts",
+      "tests/adapters/memory-file-system_test.ts",
+      "tests/cli/base-meta-commands_test.ts",
+      "tests/cli/plugin-cli_test.ts",
+      "tests/cli/argv_test.ts",
+      "tests/cli/generated-project-registry_test.ts",
+      "tests/sdk/watcher-cleanup_test.ts",
+      "tests/sdk/walker-ports_test.ts",
+      "tests/domain/errors_test.ts",
+      "tests/domain/core-types_test.ts",
+      "tests/_fixtures/readme-examples_test.ts",
+      "tests/protocol/plugin-manifest_test.ts",
+      "tests/service/plugin-contract-binder_test.ts",
+      "tests/service/create-plugin-service_test.ts",
+      "tests/contract-base/base-contract_test.ts",
+      "tests/scaffold/scaffold-generators_test.ts",
+      "tests/diagnostics/probes_test.ts",
+      "tests/diagnostics/e2e-gate_test.ts",
+      "tests/diagnostics/verify-plugin_test.ts",
+      "tests/application/plugin-registry_test.ts",
+      "tests/application/plugin-loader_test.ts"
+    ]
+  },
+  "gates": [
+    {
+      "gate": "F-JSR-2 module-tag",
+      "level": "FAIL",
+      "message": "export ./abstracts (./src/abstracts/mod.ts) lacks @module JSDoc tag",
+      "path": "./src/abstracts/mod.ts"
+    },
+    {
+      "gate": "F-JSR-2 module-tag",
+      "level": "FAIL",
+      "message": "export ./config (./src/config/mod.ts) lacks @module JSDoc tag",
+      "path": "./src/config/mod.ts"
+    },
+    {
+      "gate": "F-JSR-2 module-tag",
+      "level": "FAIL",
+      "message": "export ./cli (./src/cli/mod.ts) lacks @module JSDoc tag",
+      "path": "./src/cli/mod.ts"
+    },
+    {
+      "gate": "F-JSR-2 module-tag",
+      "level": "FAIL",
+      "message": "export ./testing (./src/testing/mod.ts) lacks @module JSDoc tag",
+      "path": "./src/testing/mod.ts"
+    },
+    {
+      "gate": "F-DOCT-5 cardinality",
+      "level": "WARN",
+      "message": "directory has 17 immediate children; doctrine cap is 12",
+      "path": "src"
+    },
+    {
+      "gate": "F-DOCT-5 cardinality",
+      "level": "WARN",
+      "message": "directory has 15 immediate children; doctrine cap is 12",
+      "path": "src/config/domain"
+    },
+    {
+      "gate": "F-JSR-7 slow-types",
+      "level": "INFO",
+      "message": "Checking for slow types in the public API... — sanctioned --allow-slow-types (oRPC-bound; see docs/architecture/doctrine/02-public-surface.md)"
+    }
+  ],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [
+      "Checking for slow types in the public API..."
+    ],
+    "rawTail": "   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/sdk/runtime/instrumentation-bridge.ts (515B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/sdk/runtime/plugin-context.ts (436B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/sdk/runtime/plugin-host-bootstrap.ts (434B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/sdk/runtime/plugin-service-context.ts (781B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/service/mod.ts (1.65KB)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/service/presentation/create-plugin-service.ts (7.06KB)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/service/presentation/plugin-contract-binder.ts (6.08KB)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/templates/mod.ts (329B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/templates/skeleton/README.md.template (4.44KB)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/templates/skeleton/deno.json.template (1.34KB)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/templates/skeleton/docs/architecture.md.template (701B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/templates/skeleton/mod.ts.template (1.31KB)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/templates/skeleton/src/aspire/%7B%7Bplugin-name%7D%7D-contribution.ts.template (284B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/templates/skeleton/src/aspire/mod.ts.template (184B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/templates/skeleton/src/cli/%7B%7Bplugin-name%7D%7D-cli.ts.template (463B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/templates/skeleton/src/cli/composition/main.ts.template (399B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/templates/skeleton/src/e2e/mod.ts.template (433B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/templates/skeleton/src/public/mod.ts.template (223B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/templates/skeleton/src/scaffolding/mod.ts.template (244B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/templates/skeleton/src/testing/mod.ts.template (269B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/templates/skeleton/tests/_fixtures/readme-examples_test.ts.template (199B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/testing/manifest-fixtures.ts (359B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/testing/memory-emitter.ts (66B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/testing/memory-manifest-resolver.ts (56B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/testing/memory-walker.ts (66B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/testing/mod.ts (1.16KB)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/testing/plugin-cli-contract.ts (241B)\n   file:///home/codex/repos/netscript-007-features-1502/packages/plugin/src/testing/walker-fixtures.ts (209B)\nSuccess Dry run complete\n"
+  }
+}

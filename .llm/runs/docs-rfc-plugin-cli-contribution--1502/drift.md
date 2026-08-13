@@ -61,3 +61,40 @@ Drift is append-only. Package and plugin source remain read-only in this leaf.
 - **Action:** make the existing `./cli` private-type repair an explicit implementation prerequisite
   or same-child fix; never claim this docs leaf passed a package publish bar.
 - **Evidence:** `research.md` JSR audit table and command transcript summarized in `worklog.md`.
+
+## 2026-08-13 — Coordinator contract shape conflicts with the RFC-only dispatch
+
+- **What:** The coordinator contract has implementation-shaped file surfaces and proving gates,
+  while both the original leaf dispatch and the cycle-1 repair dispatch authorize an RFC document
+  that proposes a separate later implementation epic.
+- **Source:**
+  `/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/leaf-contracts.json`,
+  contract key `rfc-plugin-cli-contribution`, specifically `executionKind`, `fileSurfaces`,
+  `provingGates`, and `jsrAudit`; user dispatch “#1502 plan-fix cycle 1”, scope resolution items
+  1–3.
+- **Expected:** The contract's `executionKind: implementation` and `fileSurfaces` could be read as
+  authorizing changes under `packages/cli/` and `packages/plugin/`.
+- **Actual:** The authoritative dispatch resolves #1502 as an RFC/docs leaf. `packages/cli/`,
+  `packages/plugin/`, RFC 0003, and RFC 0005 are inspection/audit surfaces only. The immutable
+  `provingGates` and `jsrAudit.applicable: true` still bind this leaf and are run against those
+  surfaces; they do not grant mutation authority.
+- **Severity:** significant.
+- **Action:** preserve the RFC-only slices, run and retain all six contracted proving gates plus the
+  contracted CLI/plugin JSR audit, and propose—but do not file—the later implementation epic. Any
+  expansion into framework code requires a coordinator amendment to contract key
+  `rfc-plugin-cli-contribution`, followed by a new plan and separate PLAN-EVAL; it is not inferred
+  from the current contract shape.
+- **Evidence:** cycle-1 dispatch; `plan-eval.md` FP-1–FP-3; repaired `plan.md` Contract Resolution;
+  cycle-1 receipts under `receipts/`.
+
+## 2026-08-13 — Docs overlay points to a retired glossary path
+
+- **What:** `SCOPE-docs` names `.claude/09-glossary.md` for its Terminology gate, but that path does
+  not exist in the live tree.
+- **Source:** `.llm/harness/archetypes/SCOPE-docs.md` Additional Gates; evaluator note N-3.
+- **Expected:** The terminology check resolves to a live authoritative glossary.
+- **Actual:** The live glossary is `docs/site/glossary.md`.
+- **Severity:** minor.
+- **Action:** name and run the RFC terminology review against `docs/site/glossary.md`; do not edit
+  the shared overlay from this leaf.
+- **Evidence:** repaired `plan.md` Validation Plan and final RFC review checklist.

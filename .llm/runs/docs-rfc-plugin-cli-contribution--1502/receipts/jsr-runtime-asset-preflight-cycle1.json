@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "kind": "research-audit-receipt",
+  "note": "Author-recorded output from the repo-native preflight; this is not a run-gate lifecycle receipt.",
+  "gitHead": "d71b78c3116db4ec3aaaa0447dd527fcd4867f6f",
+  "cwd": "/home/codex/repos/netscript-007-features-1502",
+  "command": [
+    "deno",
+    "task",
+    "release:preflight"
+  ],
+  "implementation": ".llm/tools/release/preflight-text-imports.ts",
+  "exitCode": 0,
+  "outcome": "PASS",
+  "checks": {
+    "textImports": 0,
+    "importAttributes": 0,
+    "fileUrlImportMeta": 0,
+    "selfImports": 0
+  },
+  "scope": "All configured workspace publish surfaces, including packages/cli and packages/plugin",
+  "interpretation": "Measured baseline only. Future CLI/plugin implementation must rerun this check and reject introduced runtime asset or unguarded import.meta file reads."
+}
