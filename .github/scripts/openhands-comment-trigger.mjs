@@ -50,6 +50,8 @@ export function evaluateOpenHandsCommentTrigger(comment) {
  *     getRef: (input: { ref: string }) => Promise<{ sha: string }>,
  *   },
  *   priorCommentBodies: string[],
+ *   currentHead: string,
+ *   liveLabels: string[],
  * }>} [resolvePhaseClaim]
  */
 export async function authorizeOpenHandsCommentTrigger(comment, resolvePhaseClaim) {
@@ -65,6 +67,9 @@ export async function authorizeOpenHandsCommentTrigger(comment, resolvePhaseClai
   if (!resolvePhaseClaim) return denied('phase-claim-context-required');
 
   const context = await resolvePhaseClaim({ phase, head });
+  const expectedStatus = phase === 'plan' ? 'status:plan-eval' : 'status:impl-eval';
+  if (context.currentHead !== head) return denied('stale-phase-head');
+  if (!context.liveLabels.includes(expectedStatus)) return denied('phase-not-current');
   const key = { generation: context.generation, phase, head };
   const marker = phaseEvalMarker(key);
   const currentHasMarker = commentLines(comment.body).includes(marker);

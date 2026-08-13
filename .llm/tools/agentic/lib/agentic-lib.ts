@@ -604,6 +604,12 @@ export interface OpenHandsStatus {
   jobStatus: string | null;
   runUrl: string | null;
   isFinal: boolean;
+  /** Formal evaluator phase from the terminal machine marker. */
+  phase: 'plan' | 'impl' | null;
+  /** Immutable head evaluated by the formal phase run. */
+  evaluatedHead: string | null;
+  /** Formal verdict from the terminal machine marker. */
+  formalVerdict: string | null;
 }
 
 /**
@@ -626,6 +632,19 @@ export function parseOpenHandsStatusComment(body: string): OpenHandsStatus {
     'Did not run': 'not-run',
   };
   const verdict = heading ? (headingToVerdict[heading] ?? heading.toLowerCase()) : null;
+  let marker: Record<string, unknown> | null = null;
+  const markerText = body.match(/<!--\s*openhands-run:\s*(\{[^\r\n]*\})\s*-->/)?.[1];
+  if (markerText) {
+    try {
+      const parsed = JSON.parse(markerText);
+      if (typeof parsed === 'object' && parsed !== null) marker = parsed;
+    } catch {
+      // Malformed provenance is represented as absent and therefore fails merge gates closed.
+    }
+  }
+  const rawPhase = marker?.phase;
+  const rawHead = marker?.evaluated_head;
+  const rawFormalVerdict = marker?.verdict;
   return {
     heading,
     verdict,
@@ -634,7 +653,94 @@ export function parseOpenHandsStatusComment(body: string): OpenHandsStatus {
     jobStatus,
     runUrl,
     isFinal: heading !== null && heading !== 'Running',
+    phase: rawPhase === 'plan' || rawPhase === 'impl' ? rawPhase : null,
+    evaluatedHead: typeof rawHead === 'string' && /^[0-9a-f]{40}$/.test(rawHead) ? rawHead : null,
+    formalVerdict: typeof rawFormalVerdict === 'string' ? rawFormalVerdict : null,
   };
+}
+
+export type ImplEvalMergeBlock =
+  | 'no-eval-comment'
+  | 'eval-not-final'
+  | 'eval-not-impl'
+  | 'eval-stale-head'
+  | 'eval-not-pass'
+  | 'eval-invalid-marker';
+
+export type CurrentHeadImplEvalSelection<T extends CommentLike> =
+  | { ok: true; comment: T; status: OpenHandsStatus }
+  | { ok: false; reason: 'none' | 'malformed-marker' | 'ambiguous-marker' };
+
+/**
+ * Select the latest terminal formal IMPL evaluation for an immutable PR head.
+ *
+ * Valid non-evaluator OpenHands summaries (`phase` and `evaluated_head` both null) are ignored, so
+ * later generic agent runs cannot hide a prior evaluator verdict. A malformed or multiply-marked
+ * workflow summary fails closed instead of allowing an older PASS to mask corrupt provenance.
+ */
+export function selectLatestCurrentHeadImplEval<T extends CommentLike>(
+  comments: T[],
+  currentHead: string,
+): CurrentHeadImplEvalSelection<T> {
+  const candidates: Array<{ comment: T; status: OpenHandsStatus; index: number }> = [];
+  for (const [index, comment] of comments.entries()) {
+    const body = comment.body ?? '';
+    if (!body.includes(OPENHANDS_MARKER)) continue;
+    const markers = [...body.matchAll(/<!--\s*openhands-run:\s*(\{[^\r\n]*\})\s*-->/g)];
+    const markerTokens = body.match(/<!--\s*openhands-run:/g)?.length ?? 0;
+    if (markerTokens > 1) return { ok: false, reason: 'ambiguous-marker' };
+    if (markerTokens === 1 && markers.length !== 1) {
+      return { ok: false, reason: 'malformed-marker' };
+    }
+    if (markers.length === 0) continue; // legacy summary without the v2 marker
+
+    let marker: Record<string, unknown>;
+    try {
+      const parsed = JSON.parse(markers[0][1]);
+      if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+        return { ok: false, reason: 'malformed-marker' };
+      }
+      marker = parsed;
+    } catch {
+      return { ok: false, reason: 'malformed-marker' };
+    }
+    const phase = marker.phase;
+    const evaluatedHead = marker.evaluated_head;
+    const nonEval = (phase === null || phase === undefined) &&
+      (evaluatedHead === null || evaluatedHead === undefined);
+    const formal = (phase === 'plan' || phase === 'impl') &&
+      typeof evaluatedHead === 'string' && /^[0-9a-f]{40}$/.test(evaluatedHead);
+    if (!nonEval && !formal) return { ok: false, reason: 'malformed-marker' };
+    if (nonEval) continue;
+
+    const status = parseOpenHandsStatusComment(body);
+    if (status.phase === 'impl' && status.evaluatedHead === currentHead && status.isFinal) {
+      candidates.push({ comment, status, index });
+    }
+  }
+  const selected = candidates.sort((a, b) => {
+    const time = String(a.comment.created_at ?? '').localeCompare(
+      String(b.comment.created_at ?? ''),
+    );
+    return time || a.index - b.index;
+  }).at(-1);
+  return selected
+    ? { ok: true, comment: selected.comment, status: selected.status }
+    : { ok: false, reason: 'none' };
+}
+
+/** Require one terminal IMPL PASS whose marker names the PR's current immutable head. */
+export function evaluateCurrentHeadImplEvalGate(
+  commentExists: boolean,
+  status: OpenHandsStatus,
+  currentHead: string,
+): { ok: true } | { ok: false; blocked: ImplEvalMergeBlock } {
+  if (!commentExists) return { ok: false, blocked: 'no-eval-comment' };
+  if (!status.isFinal) return { ok: false, blocked: 'eval-not-final' };
+  if (status.phase !== 'impl') return { ok: false, blocked: 'eval-not-impl' };
+  if (status.evaluatedHead !== currentHead) return { ok: false, blocked: 'eval-stale-head' };
+  if (status.formalVerdict !== 'PASS') return { ok: false, blocked: 'eval-not-pass' };
+  return { ok: true };
 }
 
 // ---------------------------------------------------------------------------

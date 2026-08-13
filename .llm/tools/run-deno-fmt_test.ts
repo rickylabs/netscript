@@ -90,3 +90,54 @@ Deno.test('formatFailedBatches strips ANSI and reports every crashed batch', () 
   assertStringIncludes(rendered, 'boom b');
   assertEquals(rendered.includes(esc), false);
 });
+
+Deno.test('CLI refuses an empty format selection', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        '--allow-read',
+        '--allow-run',
+        new URL('./run-deno-fmt.ts', import.meta.url).pathname,
+        '--cwd',
+        root,
+        '--ext',
+        'ts',
+      ],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(output.code, 2);
+    assertEquals(JSON.parse(new TextDecoder().decode(output.stdout)).summary.filesSelected, 0);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('CLI fails when Deno config excludes every selected format target', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await Deno.writeTextFile(`${root}/deno.json`, '{"fmt":{"exclude":["generated/"]}}\n');
+    await Deno.mkdir(`${root}/generated`);
+    await Deno.writeTextFile(`${root}/generated/file.ts`, 'export const value=1;\n');
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        '--allow-read',
+        '--allow-run',
+        new URL('./run-deno-fmt.ts', import.meta.url).pathname,
+        '--cwd',
+        root,
+        '--file',
+        'generated/file.ts',
+      ],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(output.code, 2);
+    assertEquals(JSON.parse(new TextDecoder().decode(output.stdout)).summary.failedBatches, 1);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});

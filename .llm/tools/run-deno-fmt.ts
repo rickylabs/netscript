@@ -416,6 +416,7 @@ async function main(): Promise<void> {
     : allFindings;
   const failedBatches =
     results.filter((result) => result.exitCode !== 0 && !isNoTargetFilesResult(result)).length;
+  const noTargetBatches = results.filter(isNoTargetFilesResult).length;
   // Crashes are judged PER BATCH. A batch that failed with no parseable finding of its own is a
   // crash even if some other batch produced findings, and even if the only findings in the run are
   // line-ending ones we ignore. Judging this globally is a false-green (see crashedBatches).
@@ -428,7 +429,7 @@ async function main(): Promise<void> {
     summary: {
       filesSelected: files.length,
       batches: batches.length,
-      failedBatches: effectiveFailedBatches,
+      failedBatches: effectiveFailedBatches + noTargetBatches,
       findings: findings.length,
       ignoredFindings: ignoredFindings.length,
     },
@@ -440,6 +441,17 @@ async function main(): Promise<void> {
   }
 
   console.log(JSON.stringify(report, null, options.pretty ? 2 : undefined));
+
+  if (files.length === 0) {
+    console.error('deno fmt selection matched zero files; refusing a false-green gate.');
+    Deno.exit(2);
+  }
+  if (noTargetBatches > 0) {
+    console.error(
+      `${noTargetBatches} deno fmt batch(es) matched the wrapper selection but were excluded by Deno; refusing a false-green gate.`,
+    );
+    Deno.exit(2);
+  }
 
   // A batch that failed without any parseable finding of its own is a crash. Never let it exit
   // silently, and never let it pass just because another batch had findings.

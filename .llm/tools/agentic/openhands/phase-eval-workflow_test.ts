@@ -142,11 +142,12 @@ Deno.test('workflow source encodes trusted, exactly-once phase dispatch', async 
   assert(!phase.includes('ref: pr.base.sha'));
   assertStringIncludes(phase, 'contents: read');
   assert(!phase.includes('contents: write'));
-  assertStringIncludes(phase, 'Check out trusted phase-eval primitive');
+  assertStringIncludes(phase, 'Check out trusted phase-eval scripts');
   assertStringIncludes(phase, 'id: checkout_trusted_primitive');
   assertStringIncludes(phase, "steps.checkout_trusted_primitive.outcome == 'success'");
   assertStringIncludes(phase, 'persist-credentials: false');
   assertStringIncludes(phase, "'.phase-eval-trusted/.github/scripts/phase-eval-claim.mjs'");
+  assertStringIncludes(phase, "'.phase-eval-trusted/.github/scripts/phase-eval-status.mjs'");
   assertStringIncludes(
     phase,
     'const { dispatchClaimedPhaseEvaluation, phaseEvalMarker } = await import(',
@@ -161,13 +162,24 @@ Deno.test('workflow source encodes trusted, exactly-once phase dispatch', async 
   assertEquals(phase.match(/github\.rest\.issues\.listComments/g)?.length, 1);
   assertStringIncludes(phase, 'const marker = phaseEvalMarker(claimKey);');
   assertStringIncludes(phase, '@openhands-agent model=${model}');
-  assertStringIncludes(phase, 'head=${pr.head.sha}');
+  assertStringIncludes(phase, 'head=${livePr.head.sha}');
+  assertStringIncludes(phase, 'decidePhaseEvaluationCurrency');
+  assertStringIncludes(phase, 'No evaluator was claimed or dispatched.');
+  assertStringIncludes(phase, 'Zero-spend stale evaluator event');
   assertStringIncludes(phase, 'name: selectedLabel');
   assertStringIncludes(phase, 'github-token: ${{ secrets.PAT_TOKEN }}');
   assertStringIncludes(runner, "steps.request.outputs.eval_phase != ''");
   assertStringIncludes(runner, "steps.request.outputs.eval_phase == ''");
   assertStringIncludes(runner, "'status:augment-review'");
   assertStringIncludes(runner, 'pr.head.sha !== evaluatedHead');
+  assertStringIncludes(runner, 'currentHead: livePr.head.sha');
+  assertStringIncludes(runner, 'liveLabels: liveLabelData.map(({ name }) => name)');
+  assertStringIncludes(runner, 'phase: env.EVAL_PHASE || null');
+  assertStringIncludes(runner, 'evaluated_head: env.EVAL_HEAD || null');
+  assertStringIncludes(runner, 'Check out trusted status transition helper');
+  assertStringIncludes(runner, 'applyStatusTransition');
+  assertStringIncludes(phase, 'run-name: Phase eval PR #');
+  assertStringIncludes(runner, 'run-name: OpenHands runner ·');
   assertStringIncludes(runner, 'github-token: ${{ secrets.PAT_TOKEN }}');
   assertStringIncludes(
     runner,

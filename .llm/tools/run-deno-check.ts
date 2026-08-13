@@ -54,6 +54,13 @@ interface BatchResult {
   output: string;
 }
 
+interface BatchFailure {
+  batchIndex: number;
+  exitCode: number;
+  files: string[];
+  output: string;
+}
+
 interface OutputReport {
   source: {
     mode: 'file' | 'stdin' | 'command' | 'selection';
@@ -75,6 +82,7 @@ interface OutputReport {
     uniquePaths: number;
   };
   groups: CheckGroup[];
+  failures?: BatchFailure[];
 }
 
 const DEFAULT_EXTENSIONS = new Set(['ts', 'tsx', 'js', 'jsx', 'mjs', 'mts']);
@@ -519,6 +527,17 @@ async function main(): Promise<void> {
   const uniqueOccurrences = dedupeOccurrences(occurrences);
   const groups = groupOccurrences(uniqueOccurrences);
   const failedBatches = results.filter((result) => result.exitCode !== 0).length;
+  const failures = results.flatMap((result, batchIndex) => {
+    if (result.exitCode === 0 || parseOccurrences([result]).length > 0) return [];
+    return [
+      {
+        batchIndex,
+        exitCode: result.exitCode,
+        files: result.files,
+        output: stripAnsi(result.output).trimEnd(),
+      } satisfies BatchFailure,
+    ];
+  });
   const uniquePaths = new Set(
     uniqueOccurrences.flatMap((occurrence) =>
       occurrence.location?.path ? [occurrence.location.path] : []
@@ -550,13 +569,26 @@ async function main(): Promise<void> {
       uniquePaths: uniquePaths.size,
     },
     groups,
+    failures: failures.length > 0 ? failures : undefined,
   };
 
   console.log(JSON.stringify(report, null, options.pretty ? 2 : undefined));
 
   if (sourceMode === 'command' && sourceExitCode && sourceExitCode !== 0) Deno.exit(sourceExitCode);
   if (sourceMode === 'selection' && files?.length === 0) Deno.exit(2);
-  if (sourceMode === 'selection' && failedBatches > 0) Deno.exit(1);
+  if (failures.length > 0) {
+    console.error(
+      `${failures.length} deno check batch(es) failed without parseable type diagnostics.\n` +
+        failures.map((failure) =>
+          `batch ${failure.batchIndex}, exit ${failure.exitCode}, files: ${
+            failure.files.join(', ')
+          }\n${failure.output}`
+        ).join('\n'),
+    );
+  }
+  if (sourceMode === 'selection' && failedBatches > 0) {
+    Deno.exit(results.find((result) => result.exitCode !== 0)?.exitCode ?? 1);
+  }
 }
 
 await main();

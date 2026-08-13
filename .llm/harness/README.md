@@ -26,21 +26,26 @@ how an agent uses it during a run.
 6. Read `gates/archetype-gate-matrix.md`.
 7. Use the matching artifact template from `templates/`.
 
-For planning-only work whose deliverable is a GitHub board (epics + milestones + issues) rather
-than code — a major feature, cross-cutting refactor, replan, or big triage — use the **seed run**
-shape: `workflow/seed-run.md`.
+For planning-only work whose deliverable is a GitHub board (epics + milestones + issues) rather than
+code — a major feature, cross-cutting refactor, replan, or big triage — use the **seed run** shape:
+`workflow/seed-run.md`.
+
+For a release milestone whose issues land through several independent PRs and end in canary/stable
+publication, use the **milestone-cluster** shape: `workflow/milestone-run.md`. It begins with a hard
+Step 0 sweep/cleanup/dependency gate, then coordinates exactly four topic lanes. Its leaf PRs target
+`main`; it is not the integration-branch `supervisor.md` shape.
 
 ## Folder Contract
 
-| Folder        | Concern                                                               |
-| ------------- | --------------------------------------------------------------------- |
+| Folder        | Concern                                                                                  |
+| ------------- | ---------------------------------------------------------------------------------------- |
 | `workflow/`   | Run mechanics: activation, loop, retrieval, lane policy, tooling index, circuit breakers |
-| `archetypes/` | Doctrine archetype profiles plus scope overlays                       |
-| `gates/`      | Static, fitness, runtime, and consumer gate definitions               |
-| `evaluator/`  | Separate evaluator-session protocol and verdict definitions           |
-| `templates/`  | Canonical run artifact templates                                      |
-| `lessons/`    | Stable cross-run lessons promoted after repetition                    |
-| `debt/`       | Persistent architecture debt registry and rules                       |
+| `archetypes/` | Doctrine archetype profiles plus scope overlays                                          |
+| `gates/`      | Static, fitness, runtime, and consumer gate definitions                                  |
+| `evaluator/`  | Separate evaluator-session protocol and verdict definitions                              |
+| `templates/`  | Canonical run artifact templates                                                         |
+| `lessons/`    | Stable cross-run lessons promoted after repetition                                       |
+| `debt/`       | Persistent architecture debt registry and rules                                          |
 
 ## Core Contract
 
@@ -73,5 +78,9 @@ Run artifacts live under `.llm/runs/<run-id>/` and use the templates in `templat
 - `context-pack.md`
 - `drift.md`
 
-The draft-PR commit list + per-slice PR comments are the commit trail; there is no `commits.md`. Keep
-`worklog.md` + `context-pack.md` current as part of every slice.
+Milestone clusters also require `milestone-intake.json`, `milestone-inventory.json`,
+`milestone-dependency-dag.json`, `milestone-cluster-state.json`, generated `milestone-status.md`,
+`cut-trace.md`, and `receipts/`.
+
+The draft-PR commit list + per-slice PR comments are the commit trail; there is no `commits.md`.
+Keep `worklog.md` + `context-pack.md` current as part of every slice.

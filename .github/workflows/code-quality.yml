@@ -35,10 +35,10 @@ jobs:
           deno-version: v2.9.5
       - name: Require an issue link for allowance budget increases
         run: >-
-          deno run --allow-run .llm/tools/quality/check-allowance-budget-diff.ts
-          "${{ github.event.pull_request.base.sha }}"
-          "${{ github.event.pull_request.head.sha }}"
-          --pretty
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate allowance-budget --id code-quality-allowance
+          --output .llm/tmp/gate-receipts/code-quality/allowance.json --
+          "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" --pretty
       - name: Scan changed source files
         shell: bash
         run: |
@@ -46,12 +46,30 @@ jobs:
           mapfile -t files <<< "$changed_files"
           args=()
           for file in "${files[@]}"; do args+=(--changed-file "$file"); done
-          deno task quality:scan --pretty "${args[@]}"
-      - run: deno task arch:check
+          deno run --allow-read --allow-write --allow-run --allow-env \
+            .llm/tools/gates/run-gate.ts --gate quality-scan --id code-quality-scan \
+            --output .llm/tmp/gate-receipts/code-quality/scan.json -- --pretty "${args[@]}"
+      - name: Architecture check
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate arch-check --id code-quality-arch
+          --output .llm/tmp/gate-receipts/code-quality/arch.json
       - name: Lint changed publish surfaces
         run: |
-          deno task doc:lint --root packages/cli --pretty
-          deno doc --lint packages/plugin/src/config/mod.ts packages/plugin/src/protocol/mod.ts
+          deno run --allow-read --allow-write --allow-run --allow-env \
+            .llm/tools/gates/run-gate.ts --gate doc-lint --id code-quality-cli-docs \
+            --output .llm/tmp/gate-receipts/code-quality/cli-docs.json -- --root packages/cli --pretty
+          deno run --allow-read --allow-write --allow-run --allow-env \
+            .llm/tools/gates/run-gate.ts --gate public-doc-lint --id code-quality-plugin-docs \
+            --output .llm/tmp/gate-receipts/code-quality/plugin-docs.json -- \
+            packages/plugin/src/config/mod.ts packages/plugin/src/protocol/mod.ts
+      - name: Upload code-quality gate receipts
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: ${{ github.workflow }}-${{ github.job }}-gate-receipts-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .llm/tmp/gate-receipts/code-quality/*.json
+          if-no-files-found: error
 
   # Blocking repo-wide drift scan on push-to-main + schedule.
   code-quality-repo:
@@ -63,4 +81,14 @@ jobs:
         with:
           deno-version: v2.9.5
       - name: Repo-wide quality scan
-        run: deno task quality:scan:repo --pretty
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate quality-scan-repo --id code-quality-repo-scan
+          --output .llm/tmp/gate-receipts/code-quality-repo/scan.json -- --pretty
+      - name: Upload repo-wide quality receipt
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: ${{ github.workflow }}-${{ github.job }}-gate-receipts-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .llm/tmp/gate-receipts/code-quality-repo/*.json
+          if-no-files-found: error

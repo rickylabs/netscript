@@ -4,6 +4,11 @@ Operating protocol for **supervisor runs** — harness runs that aggregate sever
 **phase groups**, where each group is its own branch + worktree + nested harness sub-run + sub-PR +
 evaluator pass, merged into one integration branch that PRs to the base branch.
 
+> **Milestone exclusion.** Do not use this integration-branch topology for a release milestone. A
+> milestone is a `milestone-cluster` run: exactly four topic orchestrators delegate independent leaf
+> PRs directly against `main`, while one coordinator holds merge authority and one release captain
+> owns publication. See [`milestone-run.md`](./milestone-run.md).
+
 > **Provenance.** Promoted from the plugin-platform supervisor run (`feat/plugin-platform-impl`, PR
 > #96), which proved this model across 8 groups (sub-PRs #86–#95) and satisfied its own § 8
 > promotion criteria. The original lives at `.llm/tmp/run/feat-plugin-platform-impl--supervisor/`
@@ -12,9 +17,10 @@ evaluator pass, merged into one integration branch that PRs to the base branch.
 ## When to use a supervisor run
 
 Use a supervisor run when one deliverable is too large for a single harness run and splits into
-**two or more phase groups** with dependency ordering (a multi-wave package program, a platform
-rewrite, a release program). A **phase group** is sized to _one reviewable PR with its own evaluator
-pass_ — never a single command or file. Single-surface changes use the normal `run-loop.md`.
+**two or more phase groups** with dependency ordering (a multi-wave package program or a platform
+rewrite). Release milestones use `milestone-run.md` even when they span many capability groups. A
+**phase group** is sized to _one reviewable PR with its own evaluator pass_ — never a single command
+or file. Single-surface changes use the normal `run-loop.md`.
 
 ## Run layout
 

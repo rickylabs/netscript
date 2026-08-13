@@ -23,7 +23,8 @@
 #   <!-- openhands-agent-summary -->                      (legacy marker, kept
 #       for .llm/tools/agentic/openhands/openhands-status.ts compatibility)
 #   <!-- openhands-run: {"run_id":..,"attempt":..,"conclusion":..,
-#        "state":..,"verdict":..,"verdict_source":..} -->  (machine marker, v2)
+#        "state":..,"verdict":..,"verdict_source":..,"phase":..,
+#        "evaluated_head":..} -->                              (machine marker, v2)
 #   ## OpenHands Agent — <Completed|Completed — no agent summary|Agent failed|
 #        Bootstrap failed|Did not run>                     (heading vocabulary
 #       is frozen; agentic-lib.ts parseOpenHandsStatusComment maps it)
@@ -69,6 +70,7 @@
 # environment; tokens are never echoed or written to disk.
 
 name: OpenHands Agent
+run-name: OpenHands runner · ${{ github.event_name }} · ${{ github.event.issue.number || github.event.pull_request.number || github.ref_name }}
 
 on:
   workflow_dispatch:
@@ -212,6 +214,17 @@ jobs:
                   per_page: 100,
                 });
                 const currentCommentId = Number(context.payload.comment?.id);
+                // Re-read the live PR and phase immediately before returning claim operations.
+                // A queued stale command is denied by the trusted policy before any provider job.
+                const { data: livePr } = await github.rest.pulls.get({
+                  owner,
+                  repo,
+                  pull_number: issue_number,
+                });
+                const liveLabelData = await github.paginate(
+                  github.rest.issues.listLabelsOnIssue,
+                  { owner, repo, issue_number, per_page: 100 },
+                );
                 return {
                   generation: generationEvent.id,
                   operations: {
@@ -226,12 +239,23 @@ jobs:
                   priorCommentBodies: comments
                     .filter((comment) => Number(comment.id) !== currentCommentId)
                     .map((comment) => String(comment.body ?? '')),
+                  currentHead: livePr.head.sha,
+                  liveLabels: liveLabelData.map(({ name }) => name),
                 };
               },
             );
             core.setOutput('dispatch', String(decision.dispatch));
             core.setOutput('trigger_line', decision.triggerLine);
             core.notice(`Manual comment policy: ${decision.reason}`);
+            if (['stale-phase-head', 'phase-not-current'].includes(decision.reason)) {
+              const recovery = 'Cycle away from and back to the phase status label to create a new deliberate generation.';
+              core.notice(`Zero-spend stale evaluator command: ${decision.reason}. ${recovery}`);
+              await core.summary
+                .addHeading('OpenHands phase authorization')
+                .addRaw('No provider job was authorized.\n')
+                .addList([`Reason: ${decision.reason}`, `Recovery: ${recovery}`])
+                .write();
+            }
 
   agent:
     needs: authorize
@@ -1105,6 +1129,8 @@ jobs:
           OUTPUT_MODE: ${{ steps.request.outputs.output_mode }}
           MODEL: ${{ steps.request.outputs.model }}
           PROVIDER: ${{ steps.request.outputs.provider }}
+          EVAL_PHASE: ${{ steps.request.outputs.eval_phase }}
+          EVAL_HEAD: ${{ steps.request.outputs.eval_head }}
           STARTED_AT: ${{ steps.request.outputs.started_at }}
           TRIGGER_COMMENT_ID: ${{ steps.request.outputs.trigger_comment_id }}
           ACK_COMMENT_ID: ${{ steps.ack.outputs.comment_id }}
@@ -1239,6 +1265,8 @@ jobs:
               state,
               verdict,
               verdict_source: verdictSource,
+              phase: env.EVAL_PHASE || null,
+              evaluated_head: env.EVAL_HEAD || null,
             });
 
             const MAX_SUMMARY = 55000;
@@ -1330,12 +1358,28 @@ jobs:
               });
             }
 
-      - name: Apply formal evaluator status transition
+      - name: Check out trusted status transition helper
+        id: checkout_status_helper
         if: >-
           always() &&
           steps.request.outputs.eval_phase != '' &&
           steps.run-agent.outcome == 'success' &&
           steps.finalize.outputs.verdict != 'NONE'
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.event.repository.default_branch }}
+          path: .phase-status-trusted
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Apply formal evaluator status transition
+        if: >-
+          always() &&
+          steps.request.outputs.eval_phase != '' &&
+          steps.run-agent.outcome == 'success' &&
+          steps.finalize.outputs.verdict != 'NONE' &&
+          steps.checkout_status_helper.outcome == 'success'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         env:
           ISSUE_NUMBER: ${{ steps.request.outputs.issue_number }}
@@ -1356,6 +1400,13 @@ jobs:
             const evaluatedHead = process.env.EVAL_HEAD;
             const verdict = process.env.VERDICT;
             const expected = phase === 'plan' ? 'status:plan-eval' : 'status:impl-eval';
+            const path = require('path');
+            const { pathToFileURL } = require('url');
+            const helperPath = path.join(
+              process.env.GITHUB_WORKSPACE,
+              '.phase-status-trusted/.github/scripts/phase-eval-status.mjs',
+            );
+            const { applyStatusTransition } = await import(pathToFileURL(helperPath).href);
             const { data: issue } = await github.rest.issues.get({ owner, repo, issue_number });
             const labels = issue.labels.map((label) => typeof label === 'string' ? label : label.name);
             if (!labels.includes(expected)) {
@@ -1379,10 +1430,20 @@ jobs:
               : ['FAIL_RESCOPE', 'FAIL_PLAN'].includes(verdict)
               ? 'status:plan'
               : 'status:impl';
-            for (const label of labels.filter((name) => name?.startsWith('status:'))) {
-              await github.rest.issues.removeLabel({ owner, repo, issue_number, name: label });
-            }
-            await github.rest.issues.addLabels({ owner, repo, issue_number, labels: [destination] });
+            await applyStatusTransition({
+              listLabelsOnIssue: () => Promise.resolve(labels),
+              removeLabel: async (name) => {
+                await github.rest.issues.removeLabel({ owner, repo, issue_number, name });
+              },
+              addLabels: async (nextLabels) => {
+                await github.rest.issues.addLabels({
+                  owner,
+                  repo,
+                  issue_number,
+                  labels: nextLabels,
+                });
+              },
+            }, destination);
             await core.summary
               .addHeading('Harness status transition')
               .addList([

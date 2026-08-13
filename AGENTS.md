@@ -168,6 +168,12 @@ Wrap `deno task` validation runs in `rtk proxy` to keep logs tracked and compres
 `rtk proxy deno task check`), and prefix git inspection between slices with `rtk` (`rtk git status`,
 `rtk git diff`). See `.agents/skills/rtk`.
 
+For a gate that must survive CI log loss or a long worker lifecycle, run the allowlisted command
+through `.llm/tools/gates/run-gate.ts`. CI writes atomic JSON under `.llm/tmp/gate-receipts/<job>/`
+and uploads it with `if: always()`; workers keep same-ID/same-hash promises in the lifecycle-memory
+store. RTK output is exploratory only and is never the durable verdict source. A command receipt
+proves that command, not the sufficiency of a merge gate set.
+
 For root check, lint, and formatting validation, prefer the scoped wrappers:
 `.llm/tools/run-deno-check.ts`, `.llm/tools/run-deno-lint.ts`, and `.llm/tools/run-deno-fmt.ts`.
 They accept roots, extensions, include/exclude filters, batching, and structured compact output,

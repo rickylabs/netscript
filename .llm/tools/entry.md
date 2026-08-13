@@ -12,6 +12,8 @@ across sessions; temporary investigation scripts belong under `.llm/tmp/`.
   `.llm/tools/fitness/`.
 - The maintained full CLI E2E gate is `deno task e2e:cli`; the independent scaffold behavioral tool
   is diagnostic only.
+- Durable CI/worker process evidence lives under `gates/`. Use only its allowlisted catalog; the
+  receipt binds one command to one Git head and never substitutes for evidence-set sufficiency.
 - For any "is this the latest version" decision use `deps:latest` (registry **stable** channel),
   **never** `deno outdated --latest` — the native `--latest` view ignores semver and reports
   pre-release tags as latest (it once reported `@fedify/fedify 2.3.0-dev.*` while stable was
@@ -116,6 +118,22 @@ forking its skill content.
   `deno task e2e:cli`.
 
 ## Diagnostics
+
+### `gates/run-gate.ts`
+
+- Purpose: execute an allowlisted existing gate with bounded output capture and atomically persist
+  an immutable-head-bound JSON receipt.
+- Example:
+  `deno task gates:run --gate check --id check-1 --output .llm/tmp/gate-receipts/check.json`
+- Worker semantics: reuse one `LifecycleMemoryStore` across the lifecycle so same-ID/same-hash
+  requests replay instead of spawning again. This is not a cross-process lock.
+- Attestation boundary: the runner resolves actual `HEAD`; a mismatched declared head requires a
+  written diagnostic override and can never count toward sufficiency. The receipt does not prove
+  remote currency, a clean worktree, semantic sufficiency, or publication.
+- Evidence sets reject duplicate/contradictory gate or receipt IDs and recompute sufficiency; a
+  stored `sufficiency` string has no authority.
+- E2E: preserve the E2E report and reference it using `--child-report`; do not replace or nest its
+  domain schema.
 
 ### `run-deno-check.ts`
 

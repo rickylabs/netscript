@@ -8,8 +8,8 @@
  * as a suite tool — a thin CLI over the pure primitives in `agentic-lib.ts`.
  *
  * Encoded guardrails (the doctrine, in code):
- *   - `merge` gates on an IMPL/PLAN-EVAL `PASS` by default (the generator never
- *     self-certifies; merge only follows a passing separate-session eval). Bypass
+ *   - `merge` gates on a terminal IMPL-EVAL `PASS` for the current PR head by default
+ *     (the generator never self-certifies). Bypass
  *     deliberately with `--no-eval-gate` for non-eval merges (e.g. umbrella→base).
  *   - `merge`/`create` refuse a `main` base unless `--allow-base-main`: leaves land
  *     on the umbrella, not on the default branch.
@@ -43,6 +43,7 @@ import {
   buildMergeBody,
   buildPullRequestBody,
   type CommentLike,
+  evaluateCurrentHeadImplEvalGate,
   type EvalVerdict,
   githubField,
   githubRequest,
@@ -52,6 +53,7 @@ import {
   parseRepoSlug,
   requireValue,
   resolveGithubToken,
+  selectLatestCurrentHeadImplEval,
   selectLatestOpenHandsComment,
 } from '../lib/agentic-lib.ts';
 import { readOwnedPublicationBody, stagePublicationBody } from './publication-body.ts';
@@ -92,7 +94,7 @@ function printHelp(): void {
     '  --pretty              Human-readable output instead of JSON.',
     '  --help                Show this help.',
     '',
-    'merge gates on an IMPL/PLAN-EVAL PASS by default; use --no-eval-gate to bypass.',
+    'merge gates on a terminal current-head IMPL-EVAL PASS by default; use --no-eval-gate to bypass.',
   ].join('\n'));
 }
 
@@ -206,39 +208,63 @@ async function requireToken(o: Options): Promise<string> {
   throw new Error('unreachable');
 }
 
-async function fetchLatestVerdict(
+type GitHubRequester = typeof githubRequest;
+
+/** Fetch every PR issue comment page, retaining GitHub's chronological order. */
+export async function fetchAllPullRequestComments(
   owner: string,
   repo: string,
   pr: number,
   token: string,
-): Promise<
-  { comment: CommentLike | null; verdict: EvalVerdict; jobFinal: boolean; runUrl: string | null }
-> {
-  const res = await githubRequest(
-    'GET',
-    `/repos/${owner}/${repo}/issues/${pr}/comments?per_page=100`,
-    token,
-  );
-  if (!res.ok) {
-    console.log(
-      JSON.stringify({
-        ok: false,
-        status: res.status,
-        error: githubField(res.body, 'message') ?? res.body,
-      }),
+  request: GitHubRequester = githubRequest,
+): Promise<CommentLike[]> {
+  const comments: CommentLike[] = [];
+  for (let page = 1;; page += 1) {
+    const res = await request(
+      'GET',
+      `/repos/${owner}/${repo}/issues/${pr}/comments?per_page=100&page=${page}`,
+      token,
     );
-    Deno.exit(1);
-  }
-  const comments: CommentLike[] = Array.isArray(res.body)
-    ? res.body.flatMap((value) => {
+    if (!res.ok) {
+      throw new Error(
+        `GitHub comments page ${page} failed (${res.status}): ${
+          String(githubField(res.body, 'message') ?? res.body)
+        }`,
+      );
+    }
+    const items = Array.isArray(res.body) ? res.body : [];
+    comments.push(...items.flatMap((value) => {
       const body = githubField(value, 'body');
       const createdAt = githubField(value, 'created_at');
       return typeof body === 'string'
         ? [{ body, ...(typeof createdAt === 'string' ? { created_at: createdAt } : {}) }]
         : [];
-    })
-    : [];
-  const comment = selectLatestOpenHandsComment(comments);
+    }));
+    if (items.length < 100) return comments;
+  }
+}
+
+async function fetchLatestVerdict(
+  owner: string,
+  repo: string,
+  pr: number,
+  token: string,
+  currentHead?: string,
+): Promise<
+  {
+    comment: CommentLike | null;
+    verdict: EvalVerdict;
+    jobFinal: boolean;
+    runUrl: string | null;
+    status: ReturnType<typeof parseOpenHandsStatusComment>;
+    selectionIssue: 'none' | 'malformed-marker' | 'ambiguous-marker' | null;
+  }
+> {
+  const comments = await fetchAllPullRequestComments(owner, repo, pr, token);
+  const selection = currentHead ? selectLatestCurrentHeadImplEval(comments, currentHead) : null;
+  const comment = selection
+    ? selection.ok ? selection.comment : null
+    : selectLatestOpenHandsComment(comments);
   const body = comment?.body ?? '';
   const status = parseOpenHandsStatusComment(body);
   return {
@@ -246,6 +272,8 @@ async function fetchLatestVerdict(
     verdict: parseEvalVerdict(body),
     jobFinal: status.isFinal,
     runUrl: status.runUrl,
+    status,
+    selectionIssue: selection && !selection.ok ? selection.reason : null,
   };
 }
 
@@ -349,7 +377,7 @@ async function main(): Promise<void> {
   // ---- verdict ------------------------------------------------------------
   if (o.sub === 'verdict') {
     const token = await requireToken(o);
-    const { comment, verdict, jobFinal, runUrl } = await fetchLatestVerdict(
+    const { comment, verdict, jobFinal, runUrl, status } = await fetchLatestVerdict(
       owner,
       repo,
       o.pr!,
@@ -365,6 +393,9 @@ async function main(): Promise<void> {
       isFail: verdict.isFail,
       jobFinal,
       runUrl,
+      phase: status.phase,
+      evaluatedHead: status.evaluatedHead,
+      terminalVerdict: status.formalVerdict,
     };
     const lines = [
       `PR #${o.pr}: ${
@@ -409,25 +440,43 @@ async function main(): Promise<void> {
   }
 
   if (o.evalGate) {
-    const { comment, verdict, jobFinal } = await fetchLatestVerdict(owner, repo, o.pr!, token);
-    if (!comment) {
+    const { comment, verdict, jobFinal, status, selectionIssue } = await fetchLatestVerdict(
+      owner,
+      repo,
+      o.pr!,
+      token,
+      headSha,
+    );
+    if (selectionIssue !== null && selectionIssue !== 'none') {
       emit(o.pretty, [
-        `BLOCKED PR #${o.pr}: no OpenHands eval comment yet (use --no-eval-gate to bypass).`,
+        `BLOCKED PR #${o.pr}: evaluator provenance is ${selectionIssue}.`,
+        '  use --no-eval-gate to bypass deliberately.',
       ], {
         ok: false,
-        blocked: 'no-eval-comment',
+        blocked: 'eval-invalid-marker',
+        reason: selectionIssue,
         pr: o.pr,
+        currentHead: headSha,
       });
-      Deno.exit(12);
+      Deno.exit(11);
     }
-    if (!verdict.isPass) {
+    const gate = evaluateCurrentHeadImplEvalGate(comment !== null, status, headSha);
+    if (!gate.ok) {
       emit(o.pretty, [
-        `BLOCKED PR #${o.pr}: eval verdict is ${verdict.verdict ?? '(none/non-final)'}${
-          jobFinal ? '' : ' (run not final)'
-        } — not PASS.`,
+        `BLOCKED PR #${o.pr}: ${gate.blocked}; merge requires a terminal IMPL PASS for current head ${headSha}.`,
         '  use --no-eval-gate to bypass deliberately.',
-      ], { ok: false, blocked: 'eval-not-pass', pr: o.pr, verdict: verdict.verdict, jobFinal });
-      Deno.exit(verdict.isFail ? 10 : 11);
+      ], {
+        ok: false,
+        blocked: gate.blocked,
+        pr: o.pr,
+        currentHead: headSha,
+        evaluatedHead: status.evaluatedHead,
+        phase: status.phase,
+        verdict: status.formalVerdict ?? verdict.verdict,
+        jobFinal,
+      });
+      if (gate.blocked === 'no-eval-comment') Deno.exit(12);
+      Deno.exit(verdict.isFail || status.formalVerdict?.startsWith('FAIL') ? 10 : 11);
     }
   }
 

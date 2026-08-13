@@ -24,6 +24,11 @@ Harness mode activates when the user says `use harness` or explicitly asks for a
 10. For a **seed run** (planning-only: the deliverable is a GitHub board — epics, milestones,
     issues, design packs — not code), read `workflow/seed-run.md` and follow its stage contracts
     A–I. Seed runs are drafts-only until owner ratification.
+11. For a **milestone-cluster run** (the deliverable is a release milestone landed through several
+    direct-to-`main` PRs and a cut), read `workflow/milestone-run.md` and
+    `agent-milestone-orchestrator`. Instantiate its five milestone artifacts and pass Step 0 before
+    dispatch. This route replaces the generic supervisor integration-branch mechanics for release
+    milestones.
 
 ## Run ID
 
@@ -37,8 +42,8 @@ doc/harness-doctrine-refactor -> doc-harness-doctrine-refactor--harness-v2-plan
 
 ## Profile Field
 
-Old harness prompts used `profile: package`, `profile: frontend`, and similar task categories.
-Treat that field as an intent hint. The effective run profile is:
+Old harness prompts used `profile: package`, `profile: frontend`, and similar task categories. Treat
+that field as an intent hint. The effective run profile is:
 
 - the selected `ARCHETYPE-*` file for package/plugin subjects, plus
 - zero or more `SCOPE-*` overlays.
@@ -50,8 +55,7 @@ For docs-only harness work, use `SCOPE-docs.md` and any archetype profiles the d
 Every run directory contains:
 
 - `supervisor.md` (supervisor identity + lane table, from `templates/supervisor.md`) — written at
-  run start; a run dir without it is not activated (`workflow/lane-policy.md` § Supervisor
-  identity)
+  run start; a run dir without it is not activated (`workflow/lane-policy.md` § Supervisor identity)
 - `research.md`
 - `plan.md`
 - `worklog.md` (must include a `## Design` section before implementation)
@@ -65,3 +69,8 @@ There is no `commits.md` — the draft-PR commit list + per-slice PR comments ar
 Supervisor (multi-group) runs additionally contain `phase-registry.md` (from
 `templates/phase-registry.md`), `final-pr-handoff.md`, and an `escalations/` folder; brief each
 group agent with `templates/agent-briefing.md`. See `workflow/supervisor.md`.
+
+Milestone clusters instead contain `milestone-intake.json`, `milestone-inventory.json`,
+`milestone-dependency-dag.json`, `milestone-cluster-state.json`, generated `milestone-status.md`,
+`cut-trace.md`, and `receipts/`. Their leaf PRs target `main`; do not create a generic supervisor
+integration branch.

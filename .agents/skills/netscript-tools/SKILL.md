@@ -31,6 +31,29 @@ output as the sole PASS/FAIL source for gates.
 
 ## Validation Wrappers
 
+### Durable gate receipts
+
+For CI or long-lived harness workers, invoke allowlisted gates through
+`.llm/tools/gates/run-gate.ts`; do not redirect an ad-hoc command and call the log a receipt. The
+runner records the exact argv/cwd, immutable Git head, request hash, attempt, timing, real
+exit/signal, and bounded hashed output, then atomically replaces one JSON receipt. Same
+invocation-ID/same-hash calls share one lifecycle-local promise; ID reuse with another hash and
+capacity exhaustion fail closed. This is at-most-once only within the live broker lifecycle, not a
+distributed or crash-safe execution lock.
+
+The runner resolves the repository's actual `HEAD` itself. A caller-supplied `--git-head` must
+match; `--allow-git-head-mismatch <reason>` exists only for explicit diagnostic fixtures and records
+both values. Such a receipt cannot satisfy an evidence set. Receipts attest that one process ran in
+one working tree at the recorded commit; they do not attest remote branch currency, source-tree
+cleanliness, semantic gate sufficiency, or publication. Those remain separate gates.
+
+`PASS` certifies only the named command. Sufficiency is recomputed from exact receipts; never trust
+or hand-edit a `sufficiency` string. Duplicate gate IDs, duplicate receipt IDs, contradictory
+receipts, `SKIPPED`, `NOT_RUN`, missing/nonterminal receipts, or an immutable-head mismatch are
+insufficient. Package/plugin evidence also needs `quality-gate`, dependency evidence, and the
+applicable JSR audit. E2E tools keep their domain JSON reports; reference them with `--child-report`
+instead of double-wrapping or replacing them.
+
 **MANDATE (harness runs).** TS type-check / lint / format gate **evidence MUST come from the scoped
 wrappers** — `.llm/tools/run-deno-check.ts`, `.llm/tools/run-deno-lint.ts`, and
 `.llm/tools/run-deno-fmt.ts` (invoked directly with `--root … --ext ts,tsx`, or through the
@@ -50,7 +73,10 @@ deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root <path> --ext
 
 The wrappers accept roots, extensions, include/exclude filters, and batching, and emit structured
 compact output. Package-quality formatting gates target source TypeScript only (`--ext ts,tsx`) and
-exclude generated output, scratch workspaces, and future-wave packages.
+exclude generated output, scratch workspaces, and future-wave packages. All scoped wrappers fail
+closed when their own selection is empty. Check/lint/fmt child crashes must appear structurally in
+JSON, and doc-lint preserves its child exit code; an empty findings array is not a PASS when a child
+failed.
 
 **Code-quality gate (required for `packages/**`/`plugins/**` waves).** The scoped check/lint/fmt
 wrappers above are necessary but NOT sufficient: they pass code containing `any`, honor an inline
