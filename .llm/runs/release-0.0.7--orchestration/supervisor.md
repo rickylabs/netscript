@@ -55,3 +55,13 @@ run with native Claude `/remote-control`. Attachment is proven only by the nativ
 matching PID and cwd and exposing a non-empty `bridgeSessionId`; custom-endpoint/OpenRouter Claude
 sessions do not satisfy this invariant. The four active topic controls above are Codex daemon lanes,
 so they use the corresponding daemon/thread visibility proof instead.
+
+The user-visible native Claude milestone control surface is attached with `/remote-control` at
+`https://claude.ai/code/session_016HFNiTigGUb7ieFxqFDvJb`: PID `2163112`, cwd
+`/home/codex/repos/netscript-547-lffix`, Claude session `6e65c618-c957-443a-b713-d0399a891463`, and
+non-empty bridge id `session_016HFNiTigGUb7ieFxqFDvJb`. It is a supervisory surface over the four
+approved topic lanes, not a fifth topic orchestrator or rival implementation sender.
+
+PR #1651 PLAN-EVAL separately uses a bounded native Claude Remote Control session at
+`https://claude.ai/code/session_018f6pxZjiFPaYJF6AFLyLxn`: PID `2159276`, exact leaf cwd, Opus
+5/medium fallback, and bridge id `session_018f6pxZjiFPaYJF6AFLyLxn`.

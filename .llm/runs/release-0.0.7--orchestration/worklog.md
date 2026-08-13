@@ -26,6 +26,7 @@
 | 2026-08-13T23:25:00.000Z | Wave-zero dispatch reached its exact WIP shape: six attached implementation leaves (docs 1, internals 2, fixes 2, features 1), all based on exact `main` with no upstream and recorded daemon/thread identity. | `milestone-cluster-state.json`; per-leaf `codex-thread-ids.md`; `agentic:codex-status` |
 | 2026-08-13T23:32:00.000Z | At the first completed-turn interception, authorized the narrow #1561 mirror-CLI/test extension and resumed the same #1644 implementation thread. #1643 separately proved two manifest values remain schema compatibility fields and narrowed to the silent CLI default plus focused tests. | PRs #1644/#1643; leaf research/drift; same-thread resume `019ffcc9-97ba-7770-a890-a1ebd80ec793` |
 | 2026-08-13T23:34:00.000Z | Authorized #1643's narrow focused-test extension and classified the manifest/copy `4437` values as required compatibility metadata rather than mechanically removable dead pins. | Structured plugin validation; #1243/PR #1643 coordinator comments; `leaf-contracts.json` |
+| 2026-08-13T23:41:00.000Z | Activated and registry-proved the user-visible native Claude `/remote-control` milestone surface, while preserving exactly four topic lanes; also launched #1651's bounded remote PLAN-EVAL fallback. | Bridge ids `session_016HFNiTigGUb7ieFxqFDvJb` and `session_018f6pxZjiFPaYJF6AFLyLxn`; matching PID/cwd registry records |
 
 ## Current design checkpoint
 
