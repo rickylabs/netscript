@@ -8,8 +8,8 @@
  * as a suite tool — a thin CLI over the pure primitives in `agentic-lib.ts`.
  *
  * Encoded guardrails (the doctrine, in code):
- *   - `merge` gates on an IMPL/PLAN-EVAL `PASS` by default (the generator never
- *     self-certifies; merge only follows a passing separate-session eval). Bypass
+ *   - `merge` gates on a terminal IMPL-EVAL `PASS` for the current PR head by default
+ *     (the generator never self-certifies). Bypass
  *     deliberately with `--no-eval-gate` for non-eval merges (e.g. umbrella→base).
  *   - `merge`/`create` refuse a `main` base unless `--allow-base-main`: leaves land
  *     on the umbrella, not on the default branch.
@@ -43,6 +43,7 @@ import {
   buildMergeBody,
   buildPullRequestBody,
   type CommentLike,
+  evaluateCurrentHeadImplEvalGate,
   type EvalVerdict,
   githubField,
   githubRequest,
@@ -92,7 +93,7 @@ function printHelp(): void {
     '  --pretty              Human-readable output instead of JSON.',
     '  --help                Show this help.',
     '',
-    'merge gates on an IMPL/PLAN-EVAL PASS by default; use --no-eval-gate to bypass.',
+    'merge gates on a terminal current-head IMPL-EVAL PASS by default; use --no-eval-gate to bypass.',
   ].join('\n'));
 }
 
@@ -212,7 +213,13 @@ async function fetchLatestVerdict(
   pr: number,
   token: string,
 ): Promise<
-  { comment: CommentLike | null; verdict: EvalVerdict; jobFinal: boolean; runUrl: string | null }
+  {
+    comment: CommentLike | null;
+    verdict: EvalVerdict;
+    jobFinal: boolean;
+    runUrl: string | null;
+    status: ReturnType<typeof parseOpenHandsStatusComment>;
+  }
 > {
   const res = await githubRequest(
     'GET',
@@ -246,6 +253,7 @@ async function fetchLatestVerdict(
     verdict: parseEvalVerdict(body),
     jobFinal: status.isFinal,
     runUrl: status.runUrl,
+    status,
   };
 }
 
@@ -349,7 +357,7 @@ async function main(): Promise<void> {
   // ---- verdict ------------------------------------------------------------
   if (o.sub === 'verdict') {
     const token = await requireToken(o);
-    const { comment, verdict, jobFinal, runUrl } = await fetchLatestVerdict(
+    const { comment, verdict, jobFinal, runUrl, status } = await fetchLatestVerdict(
       owner,
       repo,
       o.pr!,
@@ -365,6 +373,9 @@ async function main(): Promise<void> {
       isFail: verdict.isFail,
       jobFinal,
       runUrl,
+      phase: status.phase,
+      evaluatedHead: status.evaluatedHead,
+      terminalVerdict: status.formalVerdict,
     };
     const lines = [
       `PR #${o.pr}: ${
@@ -409,25 +420,29 @@ async function main(): Promise<void> {
   }
 
   if (o.evalGate) {
-    const { comment, verdict, jobFinal } = await fetchLatestVerdict(owner, repo, o.pr!, token);
-    if (!comment) {
+    const { comment, verdict, jobFinal, status } = await fetchLatestVerdict(
+      owner,
+      repo,
+      o.pr!,
+      token,
+    );
+    const gate = evaluateCurrentHeadImplEvalGate(comment !== null, status, headSha);
+    if (!gate.ok) {
       emit(o.pretty, [
-        `BLOCKED PR #${o.pr}: no OpenHands eval comment yet (use --no-eval-gate to bypass).`,
+        `BLOCKED PR #${o.pr}: ${gate.blocked}; merge requires a terminal IMPL PASS for current head ${headSha}.`,
+        '  use --no-eval-gate to bypass deliberately.',
       ], {
         ok: false,
-        blocked: 'no-eval-comment',
+        blocked: gate.blocked,
         pr: o.pr,
+        currentHead: headSha,
+        evaluatedHead: status.evaluatedHead,
+        phase: status.phase,
+        verdict: status.formalVerdict ?? verdict.verdict,
+        jobFinal,
       });
-      Deno.exit(12);
-    }
-    if (!verdict.isPass) {
-      emit(o.pretty, [
-        `BLOCKED PR #${o.pr}: eval verdict is ${verdict.verdict ?? '(none/non-final)'}${
-          jobFinal ? '' : ' (run not final)'
-        } — not PASS.`,
-        '  use --no-eval-gate to bypass deliberately.',
-      ], { ok: false, blocked: 'eval-not-pass', pr: o.pr, verdict: verdict.verdict, jobFinal });
-      Deno.exit(verdict.isFail ? 10 : 11);
+      if (gate.blocked === 'no-eval-comment') Deno.exit(12);
+      Deno.exit(verdict.isFail || status.formalVerdict?.startsWith('FAIL') ? 10 : 11);
     }
   }
 

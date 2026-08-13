@@ -132,7 +132,14 @@ Deno.test('manual phase commands atomically claim once before dispatch', async (
     },
   };
   const command = `${OPENHANDS_COMMENT_COMMAND} phase=impl head=${head}`;
-  const context = () => Promise.resolve({ generation, operations, priorCommentBodies: [] });
+  const context = () =>
+    Promise.resolve({
+      generation,
+      operations,
+      priorCommentBodies: [],
+      currentHead: head,
+      liveLabels: ['status:impl-eval'],
+    });
 
   const outcomes: Array<{ dispatch: boolean }> = await Promise.all([
     authorizeOpenHandsCommentTrigger({ body: command, authorAssociation: 'OWNER' }, context),
@@ -172,14 +179,28 @@ Deno.test('phase dispatcher marker authorizes only the first claimed trigger com
     (await authorizeOpenHandsCommentTrigger({
       body,
       authorAssociation: 'OWNER',
-    }, () => Promise.resolve({ generation, operations, priorCommentBodies: [] }))).dispatch,
+    }, () =>
+      Promise.resolve({
+        generation,
+        operations,
+        priorCommentBodies: [],
+        currentHead: head,
+        liveLabels: ['status:impl-eval'],
+      }))).dispatch,
     true,
   );
   assertEquals(
     (await authorizeOpenHandsCommentTrigger({
       body,
       authorAssociation: 'OWNER',
-    }, () => Promise.resolve({ generation, operations, priorCommentBodies: [body] }))).dispatch,
+    }, () =>
+      Promise.resolve({
+        generation,
+        operations,
+        priorCommentBodies: [body],
+        currentHead: head,
+        liveLabels: ['status:impl-eval'],
+      }))).dispatch,
     false,
   );
 });
@@ -203,8 +224,50 @@ Deno.test('existing generation marker blocks manual dispatch even when its claim
         getRef: () => Promise.resolve({ sha: head }),
       },
       priorCommentBodies: [marker],
+      currentHead: head,
+      liveLabels: ['status:impl-eval'],
     }));
 
   assertEquals(decision.dispatch, false);
+  assertEquals(createCalls, 0);
+});
+
+Deno.test('formal phase command is zero-spend when live head or phase is stale', async () => {
+  const head = 'a'.repeat(40);
+  let createCalls = 0;
+  const operations = {
+    createRef: () => {
+      createCalls += 1;
+      return Promise.resolve();
+    },
+    getRef: () => Promise.resolve({ sha: head }),
+  };
+  const command = `${OPENHANDS_COMMENT_COMMAND} phase=impl head=${head}`;
+
+  const staleHead = await authorizeOpenHandsCommentTrigger(
+    { body: command, authorAssociation: 'OWNER' },
+    () =>
+      Promise.resolve({
+        generation: 1,
+        operations,
+        priorCommentBodies: [],
+        currentHead: 'b'.repeat(40),
+        liveLabels: ['status:impl-eval'],
+      }),
+  );
+  assertEquals(staleHead, { dispatch: false, triggerLine: '', reason: 'stale-phase-head' });
+
+  const stalePhase = await authorizeOpenHandsCommentTrigger(
+    { body: command, authorAssociation: 'OWNER' },
+    () =>
+      Promise.resolve({
+        generation: 1,
+        operations,
+        priorCommentBodies: [],
+        currentHead: head,
+        liveLabels: ['status:impl'],
+      }),
+  );
+  assertEquals(stalePhase, { dispatch: false, triggerLine: '', reason: 'phase-not-current' });
   assertEquals(createCalls, 0);
 });

@@ -19,6 +19,7 @@ import {
   buildOpenHandsComment,
   buildPullRequestBody,
   buildWslCommand,
+  evaluateCurrentHeadImplEvalGate,
   evaluateGitSafety,
   extractVerdict,
   formatGithubTokenAttempt,
@@ -365,6 +366,8 @@ Deno.test('parseOpenHandsStatusComment parses a completed status', async () => {
   assertEquals(s.jobStatus, 'success');
   assert(s.isFinal, 'completed is final');
   assert(s.runUrl?.includes('actions/runs/27412819714') ?? false, 'captures run url');
+  assertEquals(s.phase, null);
+  assertEquals(s.evaluatedHead, null);
 });
 Deno.test('parseOpenHandsStatusComment treats Running as non-final', () => {
   const s = parseOpenHandsStatusComment(
@@ -383,6 +386,68 @@ Deno.test('parseOpenHandsStatusComment maps failure headings', () => {
     parseOpenHandsStatusComment('## OpenHands Agent — Bootstrap failed\n').verdict,
     'bootstrap-failed',
   );
+});
+
+Deno.test('terminal marker carries formal evaluator phase, head, and verdict', () => {
+  const head = 'a'.repeat(40);
+  const marker = JSON.stringify({
+    run_id: 1,
+    state: 'completed',
+    verdict: 'PASS',
+    phase: 'impl',
+    evaluated_head: head,
+  });
+  const status = parseOpenHandsStatusComment(
+    `<!-- openhands-agent-summary -->\n<!-- openhands-run: ${marker} -->\n## OpenHands Agent — Completed`,
+  );
+  assertEquals(status.phase, 'impl');
+  assertEquals(status.evaluatedHead, head);
+  assertEquals(status.formalVerdict, 'PASS');
+  assertEquals(evaluateCurrentHeadImplEvalGate(true, status, head), { ok: true });
+});
+
+Deno.test('merge eval gate rejects running, plan, stale-head, and non-PASS terminal results', () => {
+  const head = 'a'.repeat(40);
+  const status = (
+    phase: 'plan' | 'impl',
+    evaluatedHead: string,
+    verdict: string,
+    final = true,
+  ) => ({
+    heading: final ? 'Completed' : 'Running',
+    verdict: final ? 'completed' : 'running',
+    model: null,
+    provider: null,
+    jobStatus: final ? 'success' : null,
+    runUrl: null,
+    isFinal: final,
+    phase,
+    evaluatedHead,
+    formalVerdict: verdict,
+  });
+  assertEquals(evaluateCurrentHeadImplEvalGate(false, status('impl', head, 'PASS'), head), {
+    ok: false,
+    blocked: 'no-eval-comment',
+  });
+  assertEquals(evaluateCurrentHeadImplEvalGate(true, status('impl', head, 'PASS', false), head), {
+    ok: false,
+    blocked: 'eval-not-final',
+  });
+  assertEquals(evaluateCurrentHeadImplEvalGate(true, status('plan', head, 'PASS'), head), {
+    ok: false,
+    blocked: 'eval-not-impl',
+  });
+  assertEquals(
+    evaluateCurrentHeadImplEvalGate(true, status('impl', 'b'.repeat(40), 'PASS'), head),
+    {
+      ok: false,
+      blocked: 'eval-stale-head',
+    },
+  );
+  assertEquals(evaluateCurrentHeadImplEvalGate(true, status('impl', head, 'FAIL_FIX'), head), {
+    ok: false,
+    blocked: 'eval-not-pass',
+  });
 });
 
 // --- buildPullRequestBody / buildMergeBody --------------------------------

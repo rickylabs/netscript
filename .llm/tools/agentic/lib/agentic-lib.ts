@@ -604,6 +604,12 @@ export interface OpenHandsStatus {
   jobStatus: string | null;
   runUrl: string | null;
   isFinal: boolean;
+  /** Formal evaluator phase from the terminal machine marker. */
+  phase: 'plan' | 'impl' | null;
+  /** Immutable head evaluated by the formal phase run. */
+  evaluatedHead: string | null;
+  /** Formal verdict from the terminal machine marker. */
+  formalVerdict: string | null;
 }
 
 /**
@@ -626,6 +632,19 @@ export function parseOpenHandsStatusComment(body: string): OpenHandsStatus {
     'Did not run': 'not-run',
   };
   const verdict = heading ? (headingToVerdict[heading] ?? heading.toLowerCase()) : null;
+  let marker: Record<string, unknown> | null = null;
+  const markerText = body.match(/<!--\s*openhands-run:\s*(\{[^\r\n]*\})\s*-->/)?.[1];
+  if (markerText) {
+    try {
+      const parsed = JSON.parse(markerText);
+      if (typeof parsed === 'object' && parsed !== null) marker = parsed;
+    } catch {
+      // Malformed provenance is represented as absent and therefore fails merge gates closed.
+    }
+  }
+  const rawPhase = marker?.phase;
+  const rawHead = marker?.evaluated_head;
+  const rawFormalVerdict = marker?.verdict;
   return {
     heading,
     verdict,
@@ -634,7 +653,31 @@ export function parseOpenHandsStatusComment(body: string): OpenHandsStatus {
     jobStatus,
     runUrl,
     isFinal: heading !== null && heading !== 'Running',
+    phase: rawPhase === 'plan' || rawPhase === 'impl' ? rawPhase : null,
+    evaluatedHead: typeof rawHead === 'string' && /^[0-9a-f]{40}$/.test(rawHead) ? rawHead : null,
+    formalVerdict: typeof rawFormalVerdict === 'string' ? rawFormalVerdict : null,
   };
+}
+
+export type ImplEvalMergeBlock =
+  | 'no-eval-comment'
+  | 'eval-not-final'
+  | 'eval-not-impl'
+  | 'eval-stale-head'
+  | 'eval-not-pass';
+
+/** Require one terminal IMPL PASS whose marker names the PR's current immutable head. */
+export function evaluateCurrentHeadImplEvalGate(
+  commentExists: boolean,
+  status: OpenHandsStatus,
+  currentHead: string,
+): { ok: true } | { ok: false; blocked: ImplEvalMergeBlock } {
+  if (!commentExists) return { ok: false, blocked: 'no-eval-comment' };
+  if (!status.isFinal) return { ok: false, blocked: 'eval-not-final' };
+  if (status.phase !== 'impl') return { ok: false, blocked: 'eval-not-impl' };
+  if (status.evaluatedHead !== currentHead) return { ok: false, blocked: 'eval-stale-head' };
+  if (status.formalVerdict !== 'PASS') return { ok: false, blocked: 'eval-not-pass' };
+  return { ok: true };
 }
 
 // ---------------------------------------------------------------------------

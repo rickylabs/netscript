@@ -1,9 +1,12 @@
 import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import {
   applyImplEvalStatusTransition,
+  applyStatusTransition,
   decideImplEvalStatusTransition,
+  decidePhaseEvaluationCurrency,
+  decideStatusTransition,
   IMPL_EVAL_STATUS,
-  MISSING_LABEL_MESSAGE,
+  PHASE_EVAL_RECOVERY,
 } from './phase-eval-status.mjs';
 
 interface IssueLabelOperations {
@@ -101,6 +104,51 @@ Deno.test('terminal decision contains exactly one status label', () => {
   assertEquals(terminal.filter((label) => label.startsWith('status:')), ['status:impl-eval']);
 });
 
+Deno.test('delta-only transition is a no-op when the destination is already the only status', async () => {
+  const { client, removed, added } = operations(['type:fix', IMPL_EVAL_STATUS]);
+  const decision = await applyStatusTransition(client, IMPL_EVAL_STATUS);
+  assertEquals(decision, { remove: [], add: [] });
+  assertEquals(removed, []);
+  assertEquals(added, []);
+});
+
+Deno.test('delta-only transition removes only competing statuses and does not re-add destination', () => {
+  assertEquals(
+    decideStatusTransition(['status:impl', IMPL_EVAL_STATUS, 'area:tooling'], IMPL_EVAL_STATUS),
+    { remove: ['status:impl'], add: [] },
+  );
+});
+
+Deno.test('phase currency fails closed without spend for stale head or phase', () => {
+  const current = decidePhaseEvaluationCurrency({
+    eventHead: 'a'.repeat(40),
+    liveHead: 'a'.repeat(40),
+    expectedStatus: IMPL_EVAL_STATUS,
+    liveLabels: [IMPL_EVAL_STATUS],
+  });
+  assertEquals(current, { dispatch: true, reason: 'current', recovery: '' });
+
+  for (
+    const stale of [
+      decidePhaseEvaluationCurrency({
+        eventHead: 'a'.repeat(40),
+        liveHead: 'b'.repeat(40),
+        expectedStatus: IMPL_EVAL_STATUS,
+        liveLabels: [IMPL_EVAL_STATUS],
+      }),
+      decidePhaseEvaluationCurrency({
+        eventHead: 'a'.repeat(40),
+        liveHead: 'a'.repeat(40),
+        expectedStatus: IMPL_EVAL_STATUS,
+        liveLabels: ['status:impl'],
+      }),
+    ]
+  ) {
+    assertEquals(stale.dispatch, false);
+    assertStringIncludes(stale.recovery, PHASE_EVAL_RECOVERY);
+  }
+});
+
 Deno.test('atomic generation claim remains before trigger creation', async () => {
   const workflow = await Deno.readTextFile('.github/workflows/openhands-phase-eval.yml');
   const importPrimitive =
@@ -108,7 +156,7 @@ Deno.test('atomic generation claim remains before trigger creation', async () =>
   const claim = 'const outcome = await dispatchClaimedPhaseEvaluation(';
   const earlyReturn = 'if (!outcome.claimed) {';
   const marker = 'const marker = phaseEvalMarker(claimKey);';
-  const create = 'github.rest.issues.createComment({';
+  const create = 'body: `${trigger}\\n${marker}';
 
   assertStringIncludes(workflow, claim);
   assertStringIncludes(workflow, earlyReturn);
@@ -119,7 +167,7 @@ Deno.test('atomic generation claim remains before trigger creation', async () =>
   assertEquals(workflow.indexOf(create) < workflow.indexOf(earlyReturn), true);
 });
 
-Deno.test('status bookkeeping failures are attributed and dispatch remains conditionally eligible', async () => {
+Deno.test('status mutation failure is attributed, blocks dispatch, and fails the workflow', async () => {
   const workflow = await Deno.readTextFile('.github/workflows/openhands-phase-eval.yml');
   const transition = workflowStep(workflow, 'Enter IMPL-EVAL status on ready transition');
   const diagnostic = workflowStep(
@@ -127,41 +175,43 @@ Deno.test('status bookkeeping failures are attributed and dispatch remains condi
     'Record attributed IMPL-EVAL status-transition failure',
   );
   const dispatch = workflowStep(workflow, 'Resolve and dispatch exactly one evaluator');
+  const failClosed = workflowStep(
+    workflow,
+    'Fail closed on IMPL-EVAL status-transition failure',
+  );
 
   assertStringIncludes(transition, 'id: enter_impl_eval_status');
   assertStringIncludes(transition, 'continue-on-error: true');
   assertStringIncludes(transition, 'core.setOutput(');
   assertStringIncludes(transition, "'failure_reason'");
   assertStringIncludes(diagnostic, "steps.enter_impl_eval_status.outcome == 'failure'");
-  assertStringIncludes(diagnostic, 'evaluator dispatch attempt continues');
+  assertStringIncludes(diagnostic, 'evaluator dispatch blocked');
   assertStringIncludes(diagnostic, 'REQUEST_ACTOR: ${{ github.actor }}');
   assertStringIncludes(diagnostic, 'FAILURE_REASON:');
+  assertStringIncludes(diagnostic, 'github.rest.issues.createComment');
   assertStringIncludes(dispatch, '!cancelled()');
   assertStringIncludes(
     dispatch,
     "steps.checkout_trusted_primitive.outcome == 'success'",
   );
-  assertEquals(dispatch.includes('enter_impl_eval_status.outcome'), false);
+  assertStringIncludes(dispatch, "steps.enter_impl_eval_status.outcome == 'success'");
+  assertStringIncludes(failClosed, "steps.enter_impl_eval_status.outcome == 'failure'");
+  assertStringIncludes(failClosed, 'exit 1');
 });
 
-Deno.test('inline cleanup transcription matches helper contract literals', async () => {
+Deno.test('ready transition imports the trusted delta-only status helper', async () => {
   const workflow = await Deno.readTextFile('.github/workflows/openhands-phase-eval.yml');
   const transition = workflowStep(workflow, 'Enter IMPL-EVAL status on ready transition');
 
-  assertEquals(workflow.includes('Check out trusted phase-eval scripts'), false);
-  assertEquals(transition.includes('await import('), false);
+  assertStringIncludes(workflow, 'Check out trusted phase-eval scripts');
+  assertStringIncludes(transition, 'await import(');
+  assertStringIncludes(transition, "'.phase-eval-trusted/.github/scripts/phase-eval-status.mjs'");
+  assertStringIncludes(transition, 'applyImplEvalStatusTransition');
   assertStringIncludes(transition, 'github.rest.issues.listLabelsOnIssue');
-  assertStringIncludes(
-    transition,
-    `const IMPL_EVAL_STATUS = '${IMPL_EVAL_STATUS}';`,
+  assertEquals(transition.includes("const STATUS_PREFIX = 'status:'"), false);
+  assertEquals(
+    workflow.indexOf('Check out trusted phase-eval scripts') <
+      workflow.indexOf('Enter IMPL-EVAL status on ready transition'),
+    true,
   );
-  assertStringIncludes(
-    transition,
-    `const MISSING_LABEL_MESSAGE = '${MISSING_LABEL_MESSAGE}';`,
-  );
-  assertStringIncludes(
-    transition,
-    'error?.response?.data?.message === MISSING_LABEL_MESSAGE',
-  );
-  assertStringIncludes(transition, 'labels: [IMPL_EVAL_STATUS]');
 });
