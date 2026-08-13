@@ -11,11 +11,10 @@
 - Coordinator clarification is recorded on PR #1644 comment `5286066438`: the five exact source/test
   peers in `drift.md` are authorized; `netscript-pr` is read/use only and no further product path is
   admitted.
-- S1 candidate `a4a3010427afa43a36ac1c477b854e067162464a` received Tier-A
-  `CHANGES_REQUESTED`; the one required mirror-boundary fixture is now green with replacement
-  receipts and awaits a follow-up candidate commit/re-review.
-- S2 is implemented separately in the working tree; 81 focused agentic/workflow tests pass and its
-  check/format reports are clean. It is ready for an isolated candidate commit and Tier-A request.
+- S1 passed Tier-A re-review through `01db2bd360ea15d8bd9b53fee5fc392678321f43`; its supervisor
+  sign-off is recorded in the run-artifact-only commit containing this context update.
+- S2 candidate `8b4f4b509e4cb9ad6f7e9414b9b948ce9a2b7a33` is pushed with 81 passing focused
+  tests and clean check/format reports; substantive Tier-A review is pending.
 
 ## Locked behavior
 
@@ -29,12 +28,12 @@
 
 ## Required next actions
 
-1. Commit/push the isolated S1 Tier-A fix and request re-review of its literal SHA.
-2. Commit/push the isolated S2 candidate and request substantive Tier-A review of its literal SHA.
-3. Obtain coordinator acceptance reconciliation for the denied `netscript-pr` edit versus the
+1. Obtain and answer substantive Tier-A review of the literal S2 candidate SHA, then record its
+   supervisor sign-off in a run-artifact-only commit.
+2. Obtain coordinator acceptance reconciliation for the denied `netscript-pr` edit versus the
    binding `Closes #1561` / `Closes #1621` claims; do not resolve it by widening scope.
-4. Keep `netscript-pr` and every other undeclared product path read-only.
-5. Preserve structured focused-test and final gate receipts in `receipts/`.
-6. Stop after requesting Tier-A substantive review and separate opposite-family IMPL-EVAL.
+3. Keep `netscript-pr` and every other undeclared product path read-only.
+4. Preserve structured focused-test and final gate receipts in `receipts/`.
+5. Stop after requesting Tier-A substantive review and separate opposite-family IMPL-EVAL.
 
 No merge, ready transition, publication, release, milestone-scope, or central-cluster-state authority.

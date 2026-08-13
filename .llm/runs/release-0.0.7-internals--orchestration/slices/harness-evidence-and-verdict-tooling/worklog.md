@@ -91,9 +91,9 @@ output are not verdict sources.
 | S2 focused format | `receipts/s2-fmt.json` | PASS, 3 TypeScript files / 0 findings |
 | S2 focused lint attempt | `receipts/s2-lint.json` | NOT FIRED, exit 2: Deno excluded all 3 explicit hidden-path batches; not claimed as a pass |
 
-S1 is not self-certified: first Tier-A review requested one mirror-boundary fixture. That fixture and
-replacement green receipts are prepared as a follow-up candidate for Tier-A re-review before the
-supervisor sign-off commit.
+S1 first review requested one mirror-boundary fixture. The replacement candidate passed substantive
+Tier-A re-review through `01db2bd360ea15d8bd9b53fee5fc392678321f43`; the supervisor sign-off
+disposition is recorded in the run-artifact-only commit containing this note.
 
 S2 is not self-certified: its source/workflow diff and receipts are prepared as a distinct candidate
 for substantive Tier-A topic-orchestrator review before the supervisor sign-off commit.
@@ -128,6 +128,12 @@ for substantive Tier-A topic-orchestrator review before the supervisor sign-off 
   to `ok:false`, preserves the index-specific repair diagnostic, and performs zero updates. Focused
   test/check/format replacement receipts pass at 19/19, zero diagnostics, and zero findings. Tier-A
   re-review remains required; the skill/closure conflict is recorded in `drift.md`, not widened.
+- S1 Tier-A re-review (`2026-08-13T21:00:39Z`): `PASS` through literal candidate
+  `01db2bd360ea15d8bd9b53fee5fc392678321f43` (PR comment `5286336338`). The reviewer confirmed the
+  unmatched-index boundary resolves to structured `ok:false`, retains actionable diagnostics, and
+  performs zero mutations; replacement receipts are 19/19 tests, zero check diagnostics, and zero
+  format findings. Supervisor sign-off: accepted for S1 behavior and authorized scope only. This
+  does not sign off S2, final gates, IMPL-EVAL, closure reconciliation, or merge readiness.
 - S2 pre-review reconcile (`2026-08-13T21:00:26Z`): the shared extractor now exposes a fence-aware
   `parsed | absent | unparseable` inspection while retaining `extractVerdict()` compatibility. Bare,
   heading, emphasis, and blockquote-plus-heading exact lines parse; placeholder/fenced lines stay
