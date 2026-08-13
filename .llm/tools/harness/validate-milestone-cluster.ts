@@ -89,6 +89,10 @@ function duplicateValues<T>(values: readonly T[]): T[] {
   return [...duplicates];
 }
 
+function stringArray(value: unknown): string[] | null {
+  return Array.isArray(value) && value.every((entry) => typeof entry === 'string') ? value : null;
+}
+
 function parseGateReceipts(errors: string[], value: unknown): GateReceipt[] {
   const input = records(value);
   if (!Array.isArray(value) || input.length !== value.length) {
@@ -97,22 +101,39 @@ function parseGateReceipts(errors: string[], value: unknown): GateReceipt[] {
   }
   const receipts: GateReceipt[] = [];
   for (const receipt of input) {
-    const valid = receipt.schemaVersion === 1 && nonEmpty(receipt.gateId) &&
-      nonEmpty(receipt.invocationId) && Array.isArray(receipt.argv) &&
-      receipt.argv.every((entry) => typeof entry === 'string') && nonEmpty(receipt.cwd) &&
-      nonEmpty(receipt.gitHead) && nonEmpty(receipt.actualGitHead) &&
-      Number.isInteger(receipt.timeoutMs) && (receipt.timeoutMs as number) > 0 &&
-      nonEmpty(receipt.runnerIdentity) && Number.isInteger(receipt.attempt) &&
-      (receipt.attempt as number) > 0 &&
-      nonEmpty(receipt.requestHash) && nonEmpty(receipt.lifecycleId) &&
-      oneOf(receipt.outcome, RECEIPT_OUTCOMES) && nonEmpty(receipt.claimedAt);
-    if (!valid) {
+    const argv = stringArray(receipt.argv);
+    if (
+      receipt.schemaVersion !== 1 || !nonEmpty(receipt.gateId) ||
+      !nonEmpty(receipt.invocationId) || argv === null || !nonEmpty(receipt.cwd) ||
+      !nonEmpty(receipt.gitHead) || !nonEmpty(receipt.actualGitHead) ||
+      typeof receipt.timeoutMs !== 'number' || !Number.isInteger(receipt.timeoutMs) ||
+      receipt.timeoutMs <= 0 || !nonEmpty(receipt.runnerIdentity) ||
+      typeof receipt.attempt !== 'number' || !Number.isInteger(receipt.attempt) ||
+      receipt.attempt <= 0 || !nonEmpty(receipt.requestHash) ||
+      !nonEmpty(receipt.lifecycleId) || !oneOf(receipt.outcome, RECEIPT_OUTCOMES) ||
+      !nonEmpty(receipt.claimedAt)
+    ) {
       errors.push(
         `exactMainEvidence receipt ${String(receipt.invocationId ?? '?')} is malformed`,
       );
       continue;
     }
-    receipts.push(receipt as unknown as GateReceipt);
+    receipts.push({
+      schemaVersion: 1,
+      gateId: receipt.gateId,
+      invocationId: receipt.invocationId,
+      argv,
+      cwd: receipt.cwd,
+      gitHead: receipt.gitHead,
+      actualGitHead: receipt.actualGitHead,
+      timeoutMs: receipt.timeoutMs,
+      runnerIdentity: receipt.runnerIdentity,
+      attempt: receipt.attempt,
+      requestHash: receipt.requestHash,
+      lifecycleId: receipt.lifecycleId,
+      outcome: receipt.outcome,
+      claimedAt: receipt.claimedAt,
+    });
   }
   return receipts;
 }
