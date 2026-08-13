@@ -19,4 +19,4 @@
 | audit-profile | Codex sub-agent | read-only harness/profile audit |
 | audit-receipts | Codex sub-agent | read-only gate receipt/toolchain audit |
 | audit-actions | Codex sub-agent | read-only Actions/evaluator audit |
-
+| formal-plan-eval | Claude / Opus 5 / high | separate opposite-family evaluator; owner-prohibited Fable substitution |

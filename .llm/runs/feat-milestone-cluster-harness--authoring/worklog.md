@@ -24,15 +24,35 @@
 - `cluster` — coordinator plus exclusive topic orchestrators and read-only watchers.
 - `gate receipt` — immutable-head command verdict with timestamps, exit status, and artifact paths.
 - `release lease` — one recorded release captain, main SHA, and phase; no heavyweight lock manager.
+- `evidence set` — immutable-head manifest that decides whether command receipts are sufficient.
+
+### Ports
+
+- `GateReceiptStore` — atomic durable CI adapter and lifecycle-memory worker adapter.
+- `GateProcessRunner` — direct argv execution; raw exit is authoritative.
+- `MilestoneStateValidator` — pure intake/inventory/DAG/cluster invariant validator.
+
+### Constants
+
+- Topic lanes: `docs`, `internals`, `fixes`, `features`.
+- Receipt states: `CLAIMED`, `RUNNING`, `PASS`, `FAIL`, `TIMED_OUT`, `SPAWN_FAILED`,
+  `INTERRUPTED`, `SKIPPED`, `NOT_RUN`.
+- WIP: two implementations/lane, one evaluator/lane, one global expensive gate, one release writer.
+
+### Contributor path
+
+- Milestone coordinator instantiates the five cluster templates and validates Step 0 before launch.
+- Workers call allowlisted gate IDs through the receipt broker; CI calls the same runner and uploads
+  atomic JSON. New gate IDs require a catalog entry and negative test.
 
 ### Commit Slices
 
 | # | Slice | Gate | Files |
 | --- | --- | --- | --- |
 | 1 | bootstrap + audits | document review | run dir |
-| 2 | cluster profile and templates | profile contract tests | harness + skills |
-| 3 | gate receipts and CI adoption | focused Deno tests | tools + workflows |
-| 4 | evaluator/label hardening | workflow contract tests | Actions + agentic tests |
+| 2 | cluster profile and templates | profile contract tests | exact list in `plan.md` slice 1 |
+| 3 | gate receipts and CI adoption | focused Deno tests | exact list in `plan.md` slices 2–3 |
+| 4 | evaluator/label hardening | workflow contract tests | exact list in `plan.md` slice 4 |
 
 ### Deferred Scope
 
@@ -48,6 +68,7 @@
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
-| PLAN-EVAL | PENDING | separate session after design integration |
+| PLAN-EVAL cycle 1 | FAIL_PLAN | Opus 5 high session `d23e5024-b47b-4e1c-b4a1-b853717d5708`; plan amended before source work |
+| PLAN-EVAL cycle 2 | PENDING | same separate evaluator session against amended immutable commit |
 | focused tests | NOT_RUN | implementation not started |
 | root gates | NOT_RUN | implementation not started |

@@ -3,57 +3,162 @@
 ## Goal
 
 Encode the proven four-topic milestone cluster and make repo-native, durable gate receipts the
-default for workers and CI.
+default evidence path for workers and CI without overstating what one green command proves.
 
-## Scope
-
-- Add the `milestone-cluster` profile, with mandatory Step 0 intake, inventory cleanup, and
-  dependency DAG.
-- Refine concise cluster run artifacts and role/state contracts.
-- Add a deterministic gate receipt runner/schema using existing toolchain primitives.
-- Route CI and worker guidance through it; upload CI JSON receipts.
-- Harden evaluator/label workflow only for idempotent status entry, fail-closed dispatch, and
-  immutable-head terminal verdict consumption.
-
-## Non-Scope
-
-- No product/package public API change.
-- No release, milestone, issue, or evaluator dispatch.
-- No new distributed lock service; use the existing exact-head claims and one recorded release owner.
-
-## Locked Decisions
+## Scope and locked decisions
 
 | ID | Decision | Rationale |
 | --- | --- | --- |
-| D1 | `milestone-cluster` composes `milestone-run`; it does not fork release mechanics. | one source per concern |
-| D2 | Step 0 is a hard gate before dispatch. | prevents stale scope and dependency collisions |
-| D3 | CI receipts are durable JSON artifacts; workers retain the same schema in run state. | no lost verdicts or repeated long gates |
-| D4 | Exact-once phase automation remains the only cloud-eval dispatcher. | prevents duplicate spend |
-| D5 | Prefer small deterministic tools and schemas over prose. | owner directive |
-| D6 | Existing scoped wrappers and E2E reports run inside one generic receipt envelope. | preserves domain evidence while standardizing lifecycle proof |
-| D7 | Milestone clusters are explicitly exempt from generic integration-branch supervisor mechanics. | direct-to-main leaf PRs were the proven shape |
-| D8 | Step 0 scans unmilestoned, Backlog, and later-milestone issues before freezing scope. | critical blockers and coherent high-value features must not be silently missed |
+| D1 | Evolve `milestone-run.md` as profile `milestone-cluster`; do not fork release mechanics. | one source per concern |
+| D2 | Step 0 intake, cleanup, owner ratification, and DAG validation are a hard stop before dispatch. | prevents stale scope and dependency collisions |
+| D3 | One generic receipt envelope runs existing allowlisted tools; E2E domain reports remain separate and referenced. | no duplicate parsers |
+| D4 | A command receipt proves only that command; an evidence-set manifest alone may assert a sufficient gate set. | prevents durable false-green claims |
+| D5 | CI stores atomic JSON receipts; a live worker uses an at-most-once in-memory lifecycle store. | no lost verdicts; no false crash-safe exactly-once claim |
+| D6 | Milestone leaf PRs target `main`; generic integration-branch supervisor mechanics do not apply. | proven 0.0.6 shape |
+| D7 | Existing phase automation remains the only cloud-eval dispatcher. | prevents duplicate spend |
+| D8 | Prefer deterministic schemas and validators over prose or a new distributed lock service. | owner directive |
 
-## Implementation slices
+## Step 0 — intake and scope freeze
 
-1. **Cluster contract:** evolve `milestone-run`, role/routing docs, Step 0 intake templates,
-   validator, and tests.
-2. **Receipt contract:** add one JSON receipt envelope/runner, worker memory index, CI artifact upload,
-   and focused negative tests for failure, interruption, SHA mismatch, and `NOT_RUN`.
-3. **Evaluator lifecycle:** make status entry idempotent and fail-closed; require final verdict phase
-   and evaluated head at PR acceptance; retain the existing atomic claim and model overrides.
-4. **Integration:** update skills/tool indexes, sync Claude skills, validate workflows and root gates.
+The coordinator snapshots four sources at one `baselineMainSha`: target milestone, unmilestoned
+issues, Backlog, and later milestones. `milestone-intake.json` records every candidate considered.
 
-## Validation Plan
+An external candidate may be included only when owner-ratified and one predicate is evidenced:
 
-| Order | Gate | Expected result |
+- `release-critical`: P0/security/regression/release blocker that prevents the target release;
+- `dependency-required`: prerequisite in the accepted RFC/cross-epic DAG for an active target item;
+- `high-value-coherent`: P1 or feature that directly serves the milestone purpose, has complete
+  acceptance, fits a coherent leaf PR, and does not displace a critical prerequisite.
+
+Every candidate gets exactly one decision: `include`, `exclude`, or `defer`, plus reason and links
+to issue/PR/code evidence. Included candidates are moved into the milestone before inventory
+freeze; excluded/deferred candidates remain recorded. There is no label-only admission.
+
+`milestone-inventory.json` then records every target-milestone issue with exactly one disposition:
+`active`, `move`, `close-fixed`, `close-duplicate`, or `close-superseded`. Non-active dispositions
+require written GitHub evidence. Every active issue has exactly one topic lane. The owner-ratified
+inventory and acyclic `milestone-dependency-dag.json` must validate before any worker/evaluator
+dispatch. The DAG covers `requires`, `rfc-prerequisite`, and `cross-epic-order` edges and proves
+topological waves; connected nodes cannot run in the same wave.
+
+## Cluster control plane
+
+`milestone-cluster-state.json` is the single mutable truth; `milestone-status.md` is generated by
+`render-milestone-status.ts` and freshness-checked.
+
+Required state:
+
+- exactly four lanes: `docs`, `internals`, `fixes`, `features`;
+- one orchestrator identity and exclusive issue set per lane;
+- leaf PR identity, immutable head, lifecycle phase, implementer/evaluator, receipt refs, blocker,
+  last progress time;
+- limits: two active implementations per lane, one evaluator per lane, one global expensive gate,
+  one release writer;
+- read-only watcher identities with `mutationAuthority: false`;
+- canary checkpoints with rationale, content SHA, state, and receipt refs;
+- release captain `inactive|claimed|publishing|complete`, lease ID, content SHA, and evidence.
+
+The release captain cannot be claimed until every committed issue is closed/moved with reason,
+every leaf is terminal, exact-current-main evidence is sufficient and green, and no release lease
+exists. Topic owners and watchers cannot publish. Stable completion remains package publication plus
+artifact-pinned production E2E.
+
+## Receipt and evidence contract
+
+`.llm/tools/gates/` owns:
+
+- `contract.ts`: schema v1, canonical request hash, gate/outcome constants;
+- `process-runner.ts`: direct `Deno.Command`, bounded output, timeout, signal and real exit;
+- `receipt-store.ts`: atomic file store and bounded lifecycle-memory store;
+- `command-lifecycle.ts`: claim-before-spawn, replay, hash mismatch rejection, terminal settlement;
+- `catalog.ts`: allowlisted `check`, `lint`, `fmt-check`, `doc-lint`, `quality-gate`, `test` gates;
+- `run-gate.ts`: CLI adapter preserving the child exit code;
+- tests for success, failure, empty selection, spawn failure, timeout, interruption, replay,
+  concurrent same-ID execution, hash mismatch, capacity exhaustion, and atomic output.
+
+Receipt state is one of `CLAIMED`, `RUNNING`, `PASS`, `FAIL`, `TIMED_OUT`, `SPAWN_FAILED`,
+`INTERRUPTED`, `SKIPPED`, `NOT_RUN`. It records invocation/lifecycle/gate IDs, request hash,
+attempt, runner identity, git head, exact argv/cwd, timestamps/duration, raw exit/signal, bounded
+stdout/stderr hashes/tails, and optional child report. Environment values and secrets are never
+serialized.
+
+`evidence-set.json` lists expected gate IDs, receipt IDs, immutable head, surface, and
+`sufficiency: SUFFICIENT|INSUFFICIENT`. For `packages/**` or `plugins/**`, `quality-gate` is required
+alongside scoped check/lint/fmt before `SUFFICIENT`; a lone command `PASS` is never a sufficient
+merge verdict. `SKIPPED`/`NOT_RUN`, missing receipt, nonterminal receipt, or SHA mismatch makes the
+set insufficient.
+
+Before receipts become authoritative, existing wrappers are fixed so lint/fmt empty selections
+exit 2, check/lint/fmt preserve crashes structurally, and doc-lint propagates child failures with
+atomic newline-terminated output.
+
+CI uses `run-gate.ts` directly, writes `.llm/tmp/gate-receipts/<job>/`, uploads under `if: always()`
+with run ID/attempt/job in the artifact name, and never uses RTK as verdict authority. Worker
+brokers retain same-ID/same-hash promises and terminal receipts until lifecycle completion; same ID
+with a different hash or capacity exhaustion fails closed.
+
+## Evaluator lifecycle contract
+
+- Generalize the trusted status helper to delta-only transitions. Workflows import/use the trusted
+  helper; already-correct state performs no label operation.
+- Ready-transition status failure posts an attributed diagnostic, blocks dispatch, and fails the
+  workflow. Label-driven reruns remain independent of the skipped ready step.
+- Immediately before claim/provider dispatch, fetch the live PR and labels; require current head
+  and expected phase status. Stale queued work exits zero-spend with an attributed reason.
+- Final markers carry phase and evaluated head. `gh-pr merge` accepts only terminal IMPL `PASS` for
+  the current PR head; `--no-eval-gate` remains the explicit bypass.
+- Preserve atomic generation claims, uncertain-claim retention, one optional `eval:model:*`
+  override, and automatic trigger semantics. Add distinct Action `run-name` values.
+- Retain the post-mutation generation check as defence in depth; it may fail but never create a
+  second dispatch.
+
+## Ordered implementation slices
+
+| # | Slice and proof | Files |
 | --- | --- | --- |
-| 1 | focused receipt/profile/workflow contract tests | PASS |
-| 2 | skill sync/validation | PASS |
-| 3 | root check, lint, fmt:check | PASS |
-| 4 | relevant CI workflow contract tests | PASS |
+| 1 | Cluster contracts/templates; RED fixtures prove missing intake, unratified inclusion, stale disposition, DAG cycle/same-wave edge, WIP overflow, mutating watcher, early/two release writers, stale generated status, receipt/head mismatch. | `.llm/harness/workflow/{milestone-run,activation,supervisor,canary-cadence}.md`; `.llm/harness/README.md`; `.agents/skills/{agent-milestone-orchestrator,netscript-harness}/SKILL.md`; `.llm/harness/templates/milestone-{intake,inventory,dependency-dag,cluster-state,status}.*`; `.llm/tools/harness/{validate-milestone-cluster,render-milestone-status}{,_test}.ts`; `deno.json` |
+| 2 | Receipt envelope + wrapper honesty; tests prove no-selection/crash/timeout/nonzero/at-most-once/NOT_RUN/SHA/sufficiency negatives before CI adoption. | `.llm/tools/gates/*.ts`; `.llm/tools/run-deno-{check,lint,fmt,doc-lint}{,_test}.ts`; `.llm/tools/{README,entry}.md`; `.agents/skills/{netscript-tools,rtk}/SKILL.md`; `AGENTS.md`; `deno.json` |
+| 3 | CI persistence; contract tests prove every authoritative job uses raw gate runner and always uploads receipts, while existing E2E JSON is referenced rather than wrapped. | `.github/workflows/{ci,code-quality,fresh-ui-quality}.yml`; `.github/scripts/ci-receipt-policy.test.ts`; bounded E2E reporter files only if checkpointing is required by the test |
+| 4 | Evaluator lifecycle; RED tests prove idempotency, status-failure no-spend, stale queued head/phase no-spend, running/plan/stale-head PASS rejection, exact-head terminal IMPL acceptance, and distinct run names. | `.github/scripts/phase-eval-status.{mjs,test.ts}`; `.github/workflows/{openhands-phase-eval,openhands-agent}.yml`; `.github/scripts/openhands-comment-trigger.test.ts`; `.llm/tools/agentic/{lib/agentic-lib{,_test}.ts,github/gh-pr{,_test}.ts,openhands/phase-eval-workflow_test.ts}` |
+| 5 | Integration/docs/skill sync; all focused tests, doctrine/quality, root check/lint/fmt and skill synchronization pass; run artifacts and PR evidence become current. | touched docs/skills; `.llm/runs/feat-milestone-cluster-harness--authoring/*` |
+
+## Risk register
+
+| Risk | Mitigation |
+| --- | --- |
+| Receipts certify an insufficient gate set | command vs evidence-set separation; quality-gate requirement |
+| Step 0 becomes uncontrolled scope expansion | evidence predicate + complete candidate log + owner ratification |
+| Duplicate provider spend | live currency check + existing immutable claim; never manual-trigger same phase |
+| Receipt broker is mistaken for crash-safe exactly once | explicitly lifecycle-local at-most-once; durable CI is evidence, not distributed execution |
+| Four orchestrators collide or overload host | exclusive ownership, WIP 2/lane, one evaluator/lane, one global expensive gate |
+| YAML and helper logic drift | trusted helper import where supported plus contract tests for both workflows |
+| Workflow change breaks CI visibility | focused workflow tests and immutable-head PR CI before readiness |
+
+## Open-decision sweep
+
+- **Must resolve now:** exact schemas, admission predicate, receipt sufficiency law, live eval currency
+  check, trusted status landing path — resolved above.
+- **Safe to defer:** durable cross-process worker claims, claim-ref retention policy, generic
+  OpenHands concurrency redesign, automatic milestone issue mutation. They are not required for the
+  first cluster and would widen risk.
+
+## Gates
+
+- Surface: internal CLI/tooling (Archetype 6) plus docs/workflow overlays.
+- Focused Deno tests for every new tool and workflow contract, including demonstrated RED cases.
+- `deno task arch:check`, `deno task quality:gate`, root `check`, `test`, `lint`, `fmt:check`.
+- `agentic:sync-claude:check`, skill validation, docs links/accuracy where touched.
+- Release-gate class: N/A; no release/scaffold/package-publication behavior changes.
+- jsr-audit: N/A; this wave changes internal harness/tooling and GitHub automation, not a published
+  package/plugin surface.
+
+## Deferred scope
+
+- Product release mechanics and product-facing command receipts remain owned by existing RFCs.
+- No automatic GitHub issue mutation in the validator: Step 0 records and validates decisions; the
+  coordinator performs ratified moves/closes through normal GitHub workflow.
 
 ## PLAN-EVAL
 
-Required after the three independent audits are integrated because this changes the repository's
-orchestration and CI evidence contract.
+Cycle 1: `FAIL_PLAN` at commit `9369f83d5`; amendments above close all blocking contracts. Cycle 2
+must pass in the same separate native Opus 5 high evaluator session before implementation starts.
