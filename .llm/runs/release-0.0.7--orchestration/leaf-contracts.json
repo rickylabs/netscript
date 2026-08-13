@@ -410,6 +410,7 @@
         "packages/cli/src/kernel/assets/skills.generated.ts",
         "packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-test-support.ts",
         "packages/cli/src/public/features/plugins/auth/auth-plugin-command.ts",
+        "packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts",
         "plugins/streams/scaffold.plugin.json"
       ],
       "provingGates": [

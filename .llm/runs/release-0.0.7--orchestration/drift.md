@@ -12,6 +12,7 @@
 | 2026-08-13T23:03:00Z | Fable reached the monthly spend limit after completing cycle-2 evidence collection but before verdict emission. | Same conversation, same cycle, and same evidence used the recorded Opus fallback for final synthesis; verdict `APPROVED`. |
 | 2026-08-13T23:10:00Z | Canonical topic-orchestrator route is Claude Opus/high, but native Claude quota is nearly exhausted and Fable already hit the spend limit. | Use the documented same-role Codex Sol/high fallback for the four control sessions; implementations remain Codex-routed and opposite-family evaluation evidence is still mandatory per leaf. |
 | 2026-08-13T23:32:00Z | #1561's structured non-zero validation report requires the mirror CLI and directly coupled tests omitted from the pre-dispatch file surface. | Coordinator authorized only the mirror CLI plus five named test peers; `netscript-pr` remains read-only skill guidance, and no unrelated product surface was admitted. |
+| 2026-08-13T23:34:00Z | #1243 assumed the streams manifest/copy fields were ignored dead pins, but structured validation proved they remain required compatibility fields. | Preserve/classify those values; authorize only `auth-plugin-command_test.ts` beyond the original contract and finish the core stale silent-default fix with explicit URL/fail-loud guidance. |
 
 No implementation drift is accepted. The plan repair changes orchestration evidence and public issue
 contracts only; leaf implementation remains blocked until PLAN-EVAL approval.
