@@ -20,6 +20,10 @@ import {
 } from './preflight-release.ts';
 import type { PublishableMember } from './publish-workspace.ts';
 import { type ReleaseCommandRunner, runCommand } from './prepare-release.ts';
+import {
+  createNetscriptJsrSpecifierRegExp,
+  parseNetscriptJsrSpecifier,
+} from '../netscript-jsr-specifier.ts';
 
 export type ReadinessStatus = 'PASS' | 'FAIL' | 'SKIP';
 
@@ -86,9 +90,6 @@ const defaultDependencies: PublishReadinessDependencies = {
   runProvisioningDryCheck,
   runCanonicalPreflight,
 };
-
-const INTERNAL_SPECIFIER =
-  /jsr:@netscript\/[a-z0-9][a-z0-9-]*@\^?((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?)/g;
 
 const IMPORT_ATTRIBUTE_SUNSET =
   'Import-attribute publication remains prohibited until denoland/deno#35546 is fixed, merged, released, and an authenticated canary text-import probe is green.';
@@ -182,6 +183,9 @@ export async function collectPublishReadiness(
       ...result.unknownExports.map((finding) =>
         `${finding.path}:${finding.line} ${finding.specifier} names unexported './${finding.subpath}'`
       ),
+      ...result.ranges.map((finding) =>
+        `${finding.path}:${finding.line} ${finding.specifier} uses a range pin instead of the exact workspace release version`
+      ),
     ];
     if (failures.length > 0) throw new Error(failures.join('; '));
     return {
@@ -189,7 +193,6 @@ export async function collectPublishReadiness(
         `${result.scannedFiles} framework source files carry only versioned, current NetScript JSR specifiers`,
       details: [
         ...result.allowances.map((entry) => `${entry.path}:${entry.line} ALLOW ${entry.reason}`),
-        ...result.ranges.map((entry) => `${entry.path}:${entry.line} RANGE ${entry.specifier}`),
       ],
     };
   });
@@ -282,10 +285,10 @@ export async function auditLockstepAndResidue(
         findings.push({ path, message: `manifest version ${manifest.version} is not ${version}` });
       }
     }
-    INTERNAL_SPECIFIER.lastIndex = 0;
-    for (const match of source.matchAll(INTERNAL_SPECIFIER)) {
-      if (match[1] !== version) {
-        findings.push({ path, message: `${match[0]} retains ${match[1]} instead of ${version}` });
+    for (const match of source.matchAll(createNetscriptJsrSpecifierRegExp())) {
+      const pinned = parseNetscriptJsrSpecifier(match[0])?.version;
+      if (pinned !== undefined && /^\d/.test(pinned) && pinned !== version) {
+        findings.push({ path, message: `${match[0]} retains ${pinned} instead of ${version}` });
       }
     }
   }

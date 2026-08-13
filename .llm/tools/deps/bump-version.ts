@@ -3,6 +3,7 @@
 
 import { walk } from 'jsr:@std/fs@^1.0.0/walk';
 import { basename, dirname, join, normalize } from 'jsr:@std/path@^1.0.0';
+import { createNetscriptVersionRewriteRegExp } from '../netscript-jsr-specifier.ts';
 
 export interface BumpResult {
   readonly oldVersion: string;
@@ -94,10 +95,7 @@ export function rewriteNetScriptVersion(
   return text
     .replace(new RegExp(`("version"\\s*:\\s*")${escaped}(?=")`, 'g'), `$1${newVersion}`)
     .replace(
-      new RegExp(
-        `((?:jsr|npm):@netscript/[A-Za-z0-9._-]+@(?:\\^|~|>=|<=|>|<|=)?)${escaped}(?=[^0-9A-Za-z.+-]|$)`,
-        'g',
-      ),
+      createNetscriptVersionRewriteRegExp(oldVersion),
       `$1${newVersion}`,
     )
     .replace(

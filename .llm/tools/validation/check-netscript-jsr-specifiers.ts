@@ -21,6 +21,11 @@
  */
 import { walk } from 'jsr:@std/fs@^1/walk';
 import { relative } from 'jsr:@std/path@^1';
+import {
+  createNetscriptJsrSpecifierRegExp,
+  NETSCRIPT_SEMVER_PATTERN,
+  parseNetscriptJsrSpecifier,
+} from '../netscript-jsr-specifier.ts';
 
 const DEFAULT_ROOTS = ['packages', 'plugins'] as const;
 const SOURCE_EXTENSIONS = new Set([
@@ -36,7 +41,6 @@ const SOURCE_EXTENSIONS = new Set([
   '.yml',
   '.yaml',
 ]);
-const NETSCRIPT_JSR_PREFIX = /jsr:@netscript\/([a-z0-9][a-z0-9-]*)/g;
 const ALLOW_MARKER = 'jsr-versionless-ok:';
 const MCP_PUBLISH_ASSETS = 'packages/mcp/src/publish-assets.generated.ts';
 
@@ -93,7 +97,7 @@ export interface WorkspacePackage {
   readonly exports: readonly string[];
 }
 
-const EXACT_VERSION = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
+const EXACT_VERSION = new RegExp(`^${NETSCRIPT_SEMVER_PATTERN}$`);
 // A range starts with an operator followed by a version; `<version>` and `${…}` are placeholders.
 const RANGE_VERSION = /^(?:[\^~]|[<>]=?|=)\d/;
 const LITERAL_SUBPATH = /^[a-z0-9][a-z0-9./-]*$/;
@@ -211,25 +215,15 @@ function sourceLine(source: string, line: number): string {
   return source.split(/\r?\n/)[line - 1] ?? '';
 }
 
-function displayedSpecifier(source: string, offset: number): string {
-  const tail = source.slice(offset);
-  return tail.match(/^jsr:@netscript\/[^\s'"`),\]}]+/)?.[0] ?? 'jsr:@netscript/*';
-}
-
 /** Split a NetScript JSR specifier into the parts the currency and export rules compare. */
 export function parseNetscriptSpecifier(
   specifier: string,
 ): { readonly name: string; readonly version: string; readonly subpath: string } | undefined {
-  const body = specifier.slice('jsr:'.length);
-  const segments = body.split('/');
-  if (segments.length < 2 || !segments[1]) return undefined;
-  const at = segments[1].indexOf('@');
-  return {
-    name: at === -1
-      ? `${segments[0]}/${segments[1]}`
-      : `${segments[0]}/${segments[1].slice(0, at)}`,
-    version: at === -1 ? '' : segments[1].slice(at + 1),
-    subpath: segments.slice(2).join('/'),
+  const parsed = parseNetscriptJsrSpecifier(specifier);
+  return parsed && {
+    name: parsed.name,
+    version: `${parsed.rangeOperator}${parsed.version}`,
+    subpath: parsed.subpath,
   };
 }
 
@@ -321,10 +315,8 @@ export async function scanNetscriptJsrSpecifiers(
         }
       }
 
-      NETSCRIPT_JSR_PREFIX.lastIndex = 0;
-      for (const match of masked.matchAll(NETSCRIPT_JSR_PREFIX)) {
+      for (const match of masked.matchAll(createNetscriptJsrSpecifierRegExp())) {
         const offset = match.index!;
-        const afterPackage = masked[offset + match[0].length];
         const line = lineNumber(masked, offset);
         const text = sourceLine(source, line);
         const markerIndex = text.indexOf(ALLOW_MARKER);
@@ -332,10 +324,10 @@ export async function scanNetscriptJsrSpecifiers(
           ? text.slice(markerIndex + ALLOW_MARKER.length).trim()
           : undefined;
 
-        if (afterPackage === '@') {
+        if (match[3] !== undefined) {
           if (reason) continue;
           inspectVersionedSpecifier(
-            { path, line, specifier: displayedSpecifier(source, offset) },
+            { path, line, specifier: match[0] },
             workspace,
             { staleVersions, unknownExports, ranges },
           );
@@ -348,7 +340,7 @@ export async function scanNetscriptJsrSpecifiers(
         findings.push({
           path,
           line,
-          specifier: displayedSpecifier(source, offset),
+          specifier: match[0],
           message:
             'framework-emitted or executed jsr:@netscript/* specifier must include a version',
         });
