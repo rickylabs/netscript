@@ -66,9 +66,9 @@
 | ---------- | ----- | -------- | ------------------------------------------------------------------------------------- |
 | 2026-08-13 | 1     | complete | Three independent read-only audits integrated.                                        |
 | 2026-08-13 | 2     | complete | Cluster contract amended after independent review; 13 focused tests green.            |
-| 2026-08-13 | 3–4   | complete | Receipt/CI slice committed; 33 focused tests green.                                   |
-| 2026-08-13 | 5     | complete | Evaluator lifecycle committed; 97 integrated focused tests green.                     |
-| 2026-08-13 | 6     | active   | Integrated check/lint/fmt receipts green on pre-final head; final-head rerun pending. |
+| 2026-08-13 | 3–4   | complete | Receipt/CI correction cycle complete; 43 focused tests green.                          |
+| 2026-08-13 | 5     | complete | Evaluator lifecycle correction cycle complete; 102 focused tests green.               |
+| 2026-08-13 | 6     | active   | Cycle-1 IMPL-EVAL findings fixed; final immutable-head receipts and cycle 2 pending.   |
 
 ## Gate Results
 
@@ -76,9 +76,10 @@
 | --------------------------- | -------------- | --------------------------------------------------------------------------------------------------- |
 | PLAN-EVAL cycle 1           | FAIL_PLAN      | Opus 5 high session `d23e5024-b47b-4e1c-b4a1-b853717d5708`; plan amended before source work         |
 | PLAN-EVAL cycle 2           | PASS_PLAN      | same separate evaluator session against `2435b4edd`; no blockers                                    |
-| milestone cluster           | PASS           | 13 tests: task-separator CLI, watcher/lane identity, inventory/state lane, DAG backing RED controls |
-| receipts/wrappers/CI policy | PASS           | 33 tests                                                                                            |
-| evaluator lifecycle         | PASS           | 97 integrated tests                                                                                 |
-| root check/lint/fmt         | PASS_PRE_FINAL | durable receipts under `.llm/tmp/gate-receipts/integration/`; rerun required after evidence commit  |
-| root test/quality           | NOT_RUN        | final-head only                                                                                     |
-| IMPL-EVAL                   | NOT_RUN        | fresh opposite-family session after final gates                                                     |
+| milestone cluster           | PASS           | 15 tests: CLI separator, identity, inventory/DAG, and recomputed evidence RED controls               |
+| receipts/wrappers/CI policy | PASS           | 43 tests                                                                                            |
+| evaluator lifecycle         | PASS           | 102 integrated tests, including paginated current-head verdict selection                            |
+| prior immutable head        | PASS           | `a7bbf51d8`: check/lint/fmt/quality and 3,441 tests / 0 failed / 17 ignored                          |
+| IMPL-EVAL cycle 1           | FAIL_FIX       | Opus 5 high session `d08c5182-26af-486b-a2c3-d5c465eb9c03`; two blockers and hardening gaps accepted |
+| final immutable head        | PENDING        | rerun authoritative receipts after correction/evidence commit                                       |
+| IMPL-EVAL cycle 2           | PENDING        | same evaluator session against the new immutable head                                                |
