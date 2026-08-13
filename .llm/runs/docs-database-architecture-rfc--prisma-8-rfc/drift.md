@@ -163,3 +163,20 @@ documentation.
 - **Action:** accept as a research input; reconcile its broader validation assumptions against the
   later pinned-source validation audit before plan lock.
 - **Evidence:** report section index and native turn receipts for parts 1–3.
+
+## 2026-08-13 — Raw RFC requires owner-directed consolidation
+
+- **What:** The evidence-complete authoring pass produced a 28,194-word RFC, while the owner
+  requires a short, specific decision document focused on API, DX, type safety, contract-first
+  composition, and plugin contribution.
+- **Source:** Raw RFC commit `05e5fbac2`; owner direction in the active session; root review
+  `reviews/root-rfc-review.md`.
+- **Expected:** The author brief required complete coverage but did not impose a reader-facing word
+  ceiling.
+- **Actual:** The draft correctly preserves research and decisions but duplicates run evidence,
+  gates, process, and source traces that belong behind links.
+- **Severity:** editorial/significant.
+- **Action:** accept the raw document only as an evidence draft; resume Opus 5 high with a strict
+  8,000–10,000-word target and 12,000-word hard ceiling, apply root findings R1–R10, then continue
+  Qwen → Grok → dispositions → final Fable review order.
+- **Evidence:** `briefs/claude-opus-rfc-consolidate.md`; no architecture decision is reopened.
