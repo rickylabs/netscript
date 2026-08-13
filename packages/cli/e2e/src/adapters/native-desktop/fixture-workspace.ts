@@ -46,6 +46,16 @@ export async function prepareDesktopFixture(
   };
   await Deno.writeTextFile(denoPath, `${JSON.stringify(config, null, 2)}\n`);
 
+  const contractPath = join(destination, 'tests', 'fixture-contract.ts');
+  const contract = await Deno.readTextFile(contractPath);
+  await Deno.writeTextFile(
+    contractPath,
+    contract.replace(
+      '../../../../src/public/features/deploy/target/desktop/release/sign-release.ts',
+      '@netscript/cli/desktop-release-signing',
+    ),
+  );
+
   const appSettingsPath = join(destination, 'dotnet', 'AppHost', 'appsettings.json');
   const appSettings = JSON.parse(await Deno.readTextFile(appSettingsPath)) as Record<
     string,

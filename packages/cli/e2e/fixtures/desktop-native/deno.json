@@ -14,7 +14,6 @@
     "@netscript/sdk/auto-update": "../../../../sdk/src/auto-update/mod.ts",
     "@netscript/sdk/desktop": "../../../../sdk/src/desktop/mod.ts",
     "@netscript/telemetry": "../../../../telemetry/mod.ts",
-    "@netscript/cli/desktop-release-signing": "../../../src/public/features/deploy/target/desktop/release/sign-release.ts",
     "@opentelemetry/api": "npm:@opentelemetry/api@^1.9.1",
     "@orpc/client": "npm:@orpc/client@^1.14.6",
     "@orpc/server": "npm:@orpc/server@^1.14.6",

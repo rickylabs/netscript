@@ -13,7 +13,7 @@ import {
   decodePkcs8Pem,
   importReleasePrivateKey,
   signReleaseString,
-} from '@netscript/cli/desktop-release-signing';
+} from '../../../../src/public/features/deploy/target/desktop/release/sign-release.ts';
 
 const DESKTOP_RUNTIME = { BrowserWindow: class BrowserWindow {} };
 
