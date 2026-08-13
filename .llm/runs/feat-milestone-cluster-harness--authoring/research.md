@@ -20,9 +20,13 @@
 | 7 | Ready-transition status failure is currently diagnostic-only, so paid evaluation may run without a lifecycle state that can consume its verdict. | `openhands-phase-eval.yml`, status workflow tests |
 | 8 | The PR merge helper's OpenHands acceptance needs an immutable-head, terminal-verdict proof rather than the latest PASS-shaped comment alone. | `.llm/tools/agentic/github/gh-pr.ts` |
 | 9 | Milestone cleanup alone can miss urgent or high-leverage work filed outside the board; Step 0 must sweep unmilestoned, Backlog, and later milestones before scope freezes. | owner correction, 2026-08-13 |
+| 10 | Lint/fmt wrappers can select zero files and exit green; doc-lint discards child exit codes; check can hide unparseable child failures in its JSON body. | `.llm/tools/run-deno-{check,lint,fmt,doc-lint}.ts` |
+| 11 | One command receipt is not a sufficient gate verdict: package/plugin work also requires quality, dependency, and applicable JSR evidence. | `workflow/run-loop.md`, `gates/archetype-gate-matrix.md` |
 
 ## Resolved design question
 
 - A small generic gate-receipt runner owns process timing, exact command, immutable SHA, terminal
   status, log digest, and durable output. Existing scoped Deno wrappers and E2E tools remain the
   commands inside that envelope; their domain reports are referenced rather than duplicated.
+- The process-evidence envelope belongs under `.llm/tools/gates/`; `.llm/tools/fitness/` continues
+  to own architectural predicates rather than command lifecycle/provenance.

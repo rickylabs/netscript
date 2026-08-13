@@ -84,9 +84,9 @@ serialized.
 
 `evidence-set.json` lists expected gate IDs, receipt IDs, immutable head, surface, and
 `sufficiency: SUFFICIENT|INSUFFICIENT`. For `packages/**` or `plugins/**`, `quality-gate` is required
-alongside scoped check/lint/fmt before `SUFFICIENT`; a lone command `PASS` is never a sufficient
-merge verdict. `SKIPPED`/`NOT_RUN`, missing receipt, nonterminal receipt, or SHA mismatch makes the
-set insufficient.
+alongside scoped check/lint/fmt, dependency evidence, and the applicable JSR audit before
+`SUFFICIENT`; a lone command `PASS` is never a sufficient merge verdict. `SKIPPED`/`NOT_RUN`,
+missing receipt, nonterminal receipt, or SHA mismatch makes the set insufficient.
 
 Before receipts become authoritative, existing wrappers are fixed so lint/fmt empty selections
 exit 2, check/lint/fmt preserve crashes structurally, and doc-lint propagates child failures with
@@ -99,12 +99,14 @@ with a different hash or capacity exhaustion fails closed.
 
 ## Evaluator lifecycle contract
 
-- Generalize the trusted status helper to delta-only transitions. Workflows import/use the trusted
-  helper; already-correct state performs no label operation.
+- Generalize the trusted status helper to delta-only transitions. Move trusted-script checkout
+  before status entry, then import the helper in the workflow; already-correct state performs no
+  label operation. Inline duplicate transition logic is not an accepted outcome.
 - Ready-transition status failure posts an attributed diagnostic, blocks dispatch, and fails the
   workflow. Label-driven reruns remain independent of the skipped ready step.
 - Immediately before claim/provider dispatch, fetch the live PR and labels; require current head
-  and expected phase status. Stale queued work exits zero-spend with an attributed reason.
+  and expected phase status. Stale queued work exits zero-spend with an attributed reason that
+  instructs cycling away from and back to the phase status to create a new deliberate generation.
 - Final markers carry phase and evaluated head. `gh-pr merge` accepts only terminal IMPL `PASS` for
   the current PR head; `--no-eval-gate` remains the explicit bypass.
 - Preserve atomic generation claims, uncertain-claim retention, one optional `eval:model:*`
@@ -117,7 +119,7 @@ with a different hash or capacity exhaustion fails closed.
 | # | Slice and proof | Files |
 | --- | --- | --- |
 | 1 | Cluster contracts/templates; RED fixtures prove missing intake, unratified inclusion, stale disposition, DAG cycle/same-wave edge, WIP overflow, mutating watcher, early/two release writers, stale generated status, receipt/head mismatch. | `.llm/harness/workflow/{milestone-run,activation,supervisor,canary-cadence}.md`; `.llm/harness/README.md`; `.agents/skills/{agent-milestone-orchestrator,netscript-harness}/SKILL.md`; `.llm/harness/templates/milestone-{intake,inventory,dependency-dag,cluster-state,status}.*`; `.llm/tools/harness/{validate-milestone-cluster,render-milestone-status}{,_test}.ts`; `deno.json` |
-| 2 | Receipt envelope + wrapper honesty; tests prove no-selection/crash/timeout/nonzero/at-most-once/NOT_RUN/SHA/sufficiency negatives before CI adoption. | `.llm/tools/gates/*.ts`; `.llm/tools/run-deno-{check,lint,fmt,doc-lint}{,_test}.ts`; `.llm/tools/{README,entry}.md`; `.agents/skills/{netscript-tools,rtk}/SKILL.md`; `AGENTS.md`; `deno.json` |
+| 2 | Receipt envelope + wrapper honesty; tests prove no-selection/crash/timeout/nonzero/at-most-once/NOT_RUN/SHA/sufficiency negatives before CI adoption. The process-evidence envelope lives in `.llm/tools/gates/`; architectural fitness predicates remain in `.llm/tools/fitness/`. | `.llm/tools/gates/*.ts`; `.llm/tools/run-deno-{check,lint,fmt,doc-lint}{,_test}.ts`; `.llm/tools/{README,entry}.md`; `.agents/skills/{netscript-tools,rtk}/SKILL.md`; `AGENTS.md`; `deno.json` |
 | 3 | CI persistence; contract tests prove every authoritative job uses raw gate runner and always uploads receipts, while existing E2E JSON is referenced rather than wrapped. | `.github/workflows/{ci,code-quality,fresh-ui-quality}.yml`; `.github/scripts/ci-receipt-policy.test.ts`; bounded E2E reporter files only if checkpointing is required by the test |
 | 4 | Evaluator lifecycle; RED tests prove idempotency, status-failure no-spend, stale queued head/phase no-spend, running/plan/stale-head PASS rejection, exact-head terminal IMPL acceptance, and distinct run names. | `.github/scripts/phase-eval-status.{mjs,test.ts}`; `.github/workflows/{openhands-phase-eval,openhands-agent}.yml`; `.github/scripts/openhands-comment-trigger.test.ts`; `.llm/tools/agentic/{lib/agentic-lib{,_test}.ts,github/gh-pr{,_test}.ts,openhands/phase-eval-workflow_test.ts}` |
 | 5 | Integration/docs/skill sync; all focused tests, doctrine/quality, root check/lint/fmt and skill synchronization pass; run artifacts and PR evidence become current. | touched docs/skills; `.llm/runs/feat-milestone-cluster-harness--authoring/*` |

@@ -51,8 +51,10 @@
 | --- | --- | --- | --- |
 | 1 | bootstrap + audits | document review | run dir |
 | 2 | cluster profile and templates | profile contract tests | exact list in `plan.md` slice 1 |
-| 3 | gate receipts and CI adoption | focused Deno tests | exact list in `plan.md` slices 2–3 |
-| 4 | evaluator/label hardening | workflow contract tests | exact list in `plan.md` slice 4 |
+| 3 | receipt envelope and wrapper honesty | focused Deno tests | exact list in `plan.md` slice 2 |
+| 4 | CI receipt adoption | workflow contract tests | exact list in `plan.md` slice 3 |
+| 5 | evaluator lifecycle hardening | workflow contract tests | exact list in `plan.md` slice 4 |
+| 6 | integration and skill sync | root and doctrine gates | exact list in `plan.md` slice 5 |
 
 ### Deferred Scope
 
@@ -69,6 +71,6 @@
 | Gate | Result | Evidence |
 | --- | --- | --- |
 | PLAN-EVAL cycle 1 | FAIL_PLAN | Opus 5 high session `d23e5024-b47b-4e1c-b4a1-b853717d5708`; plan amended before source work |
-| PLAN-EVAL cycle 2 | PENDING | same separate evaluator session against amended immutable commit |
+| PLAN-EVAL cycle 2 | PASS_PLAN | same separate evaluator session against `2435b4edd`; no blockers |
 | focused tests | NOT_RUN | implementation not started |
 | root gates | NOT_RUN | implementation not started |
