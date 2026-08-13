@@ -1,6 +1,7 @@
 import {
   acceptanceCheckboxes,
   type AcceptanceEvidence,
+  AcceptanceEvidenceValidationError,
   bodySha256,
   checkAcceptanceBoxes,
   extractClosingIssues,
@@ -40,6 +41,15 @@ interface MirrorIssueResult {
   notice?: string;
 }
 
+export interface MirrorOptions {
+  pr: number;
+  dryRun: boolean;
+}
+
+export interface MirrorRunContext {
+  evaluatedAt?: string;
+}
+
 const READY_LABEL = 'status:ready-merge';
 const MAX_MIRROR_ATTEMPTS = 2;
 
@@ -74,12 +84,42 @@ export function closingMirrorIssues(
 }
 
 async function main(): Promise<void> {
-  const options = parseArgs(Deno.args);
-  const token = Deno.env.get('GITHUB_TOKEN') ?? Deno.env.get('GH_TOKEN');
-  if (!token) throw new Error('GITHUB_TOKEN or GH_TOKEN is required');
-  const client = new GitHubClient(options.repo, token);
+  const pretty = Deno.args.includes('--pretty');
+  const dryRun = Deno.args.includes('--dry-run');
+  try {
+    const options = parseArgs(Deno.args);
+    const token = Deno.env.get('GITHUB_TOKEN') ?? Deno.env.get('GH_TOKEN');
+    if (!token) throw new Error('GITHUB_TOKEN or GH_TOKEN is required');
+    const report = await runAcceptanceEvidenceMirror(
+      new GitHubClient(options.repo, token),
+      options,
+    );
+    printReport(report, options.pretty);
+    if (!report.ok) Deno.exitCode = 1;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    printReport({
+      ok: false,
+      dryRun,
+      changed: [],
+      headSha: 'unavailable',
+      evaluatedAt: new Date().toISOString(),
+      issues: [],
+      warnings: [],
+      errors: [message],
+    }, pretty);
+    Deno.exitCode = 1;
+  }
+}
+
+/** Runs the live mirror and converts expected evidence authoring failures into a JSON verdict. */
+export async function runAcceptanceEvidenceMirror(
+  client: MirrorClient,
+  options: MirrorOptions,
+  context: MirrorRunContext = {},
+): Promise<MirrorReport> {
   const pr = await client.getPullRequest(options.pr);
-  const evaluatedAt = new Date().toISOString();
+  const evaluatedAt = context.evaluatedAt ?? new Date().toISOString();
   const headSha = pr.head?.sha ?? 'unavailable';
   const labels = pr.labels ?? [];
   const closingReferences = extractClosingIssues(pr.body ?? '');
@@ -98,7 +138,7 @@ async function main(): Promise<void> {
     const snapshots = await Promise.all(
       issueNumbers.map(async (issueNumber) => issueSnapshot(await client.getIssue(issueNumber))),
     );
-    printReport({
+    return {
       ok: true,
       dryRun: options.dryRun,
       changed: [],
@@ -109,46 +149,62 @@ async function main(): Promise<void> {
         ...classified.notices,
         readyLabelRepairNotice(),
       ],
-    }, options.pretty);
-    return;
+      errors: [],
+    };
   }
 
-  const comments = await client.getComments(options.pr);
-  const parsed = [pr.body ?? '', ...comments.map((comment) => comment.body ?? '')]
-    .map(parseAcceptanceEvidence);
-  const evidence = parsed.flatMap((result) => result.entries);
-  const warnings = [
-    ...new Set([...classified.notices, ...parsed.flatMap((result) => result.warnings)]),
-  ];
-  // Validate the complete live mapping before the first mutation. A bad later issue must not leave
-  // an earlier closing issue partially mirrored.
-  for (const issueNumber of issueNumbers) {
-    const issue = await client.getIssue(issueNumber);
-    validateEvidenceMapping(
-      issueNumber,
-      acceptanceCheckboxes(issue.body ?? ''),
-      evidence,
-    );
-  }
-  const results: Array<MirrorIssueResult & { issue: number }> = [];
-  for (const issueNumber of issueNumbers) {
-    const result = await mirrorIssue(client, issueNumber, evidence, options.dryRun);
-    results.push({ issue: issueNumber, ...result });
-    if (result.changed && !options.dryRun) {
-      await postProvenanceCommentOnce(client, options.pr, issueNumber, result);
+  const warnings = [...classified.notices];
+  const snapshots: IssueSnapshot[] = [];
+  try {
+    const comments = await client.getComments(options.pr);
+    const parsed = [pr.body ?? '', ...comments.map((comment) => comment.body ?? '')]
+      .map(parseAcceptanceEvidence);
+    const evidence = parsed.flatMap((result) => result.entries);
+    warnings.push(...parsed.flatMap((result) => result.warnings));
+    // Validate the complete live mapping before the first mutation. A bad later issue must not
+    // leave an earlier closing issue partially mirrored.
+    for (const issueNumber of issueNumbers) {
+      const issue = await client.getIssue(issueNumber);
+      snapshots.push(await issueSnapshot(issue));
+      validateEvidenceMapping(
+        issueNumber,
+        acceptanceCheckboxes(issue.body ?? ''),
+        evidence,
+      );
     }
-    if (result.notice) warnings.push(result.notice);
-  }
+    const results: Array<MirrorIssueResult & { issue: number }> = [];
+    for (const issueNumber of issueNumbers) {
+      const result = await mirrorIssue(client, issueNumber, evidence, options.dryRun);
+      results.push({ issue: issueNumber, ...result });
+      if (result.changed && !options.dryRun) {
+        await postProvenanceCommentOnce(client, options.pr, issueNumber, result);
+      }
+      if (result.notice) warnings.push(result.notice);
+    }
 
-  printReport({
-    ok: true,
-    dryRun: options.dryRun,
-    changed: results.filter((item) => item.changed).map((item) => item.issue),
-    headSha,
-    evaluatedAt,
-    issues: results.map((item) => item.snapshot),
-    warnings,
-  }, options.pretty);
+    return {
+      ok: true,
+      dryRun: options.dryRun,
+      changed: results.filter((item) => item.changed).map((item) => item.issue),
+      headSha,
+      evaluatedAt,
+      issues: results.map((item) => item.snapshot),
+      warnings: [...new Set(warnings)],
+      errors: [],
+    };
+  } catch (error) {
+    if (!(error instanceof AcceptanceEvidenceValidationError)) throw error;
+    return {
+      ok: false,
+      dryRun: options.dryRun,
+      changed: [],
+      headSha,
+      evaluatedAt,
+      issues: snapshots,
+      warnings: [...new Set(warnings)],
+      errors: error.errors,
+    };
+  }
 }
 
 /** Mirrors one issue from a freshly fetched body and retries once if the post-PATCH body diverges. */
@@ -235,7 +291,7 @@ function postMergeNotice(issue: number, texts: string[]): string | undefined {
     : undefined;
 }
 
-interface MirrorReport {
+export interface MirrorReport {
   ok: boolean;
   dryRun: boolean;
   changed: number[];
@@ -243,6 +299,7 @@ interface MirrorReport {
   evaluatedAt: string;
   issues: IssueSnapshot[];
   warnings: string[];
+  errors: string[];
 }
 
 function printReport(report: MirrorReport, pretty: boolean): void {
@@ -250,18 +307,24 @@ function printReport(report: MirrorReport, pretty: boolean): void {
     console.log(JSON.stringify(report));
     return;
   }
-  console.log(
-    `acceptance-mirror ${report.dryRun ? 'DRY-RUN' : 'APPLIED'}: ${
-      report.changed.map((issue) => `#${issue}`).join(', ') || 'no changes'
-    }`,
-  );
-  console.log(`provenance: head=${report.headSha} evaluated=${report.evaluatedAt}`);
-  for (const issue of report.issues) {
-    console.log(
-      `snapshot: #${issue.number} updated=${issue.updatedAt} bodySha256=${issue.bodySha256}`,
-    );
-  }
-  for (const warning of report.warnings) console.log(`notice: ${warning}`);
+  console.log(formatMirrorReport(report));
+}
+
+/** Formats the human-readable mirror summary while retaining the same explicit pass/fail verdict. */
+export function formatMirrorReport(report: MirrorReport): string {
+  const mode = report.dryRun ? 'DRY-RUN' : 'APPLIED';
+  const outcome = report.ok
+    ? report.changed.map((issue) => `#${issue}`).join(', ') || 'no changes'
+    : 'FAILED';
+  return [
+    `acceptance-mirror ${mode}: ${outcome}`,
+    `provenance: head=${report.headSha} evaluated=${report.evaluatedAt}`,
+    ...report.issues.map((issue) =>
+      `snapshot: #${issue.number} updated=${issue.updatedAt} bodySha256=${issue.bodySha256}`
+    ),
+    ...report.warnings.map((warning) => `notice: ${warning}`),
+    ...report.errors.map((error) => `error: ${error}`),
+  ].join('\n');
 }
 
 function parseArgs(args: string[]): { repo: string; pr: number; dryRun: boolean; pretty: boolean } {

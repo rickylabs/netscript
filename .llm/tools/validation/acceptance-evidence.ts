@@ -31,6 +31,16 @@ export interface EvidenceParseResult {
   warnings: string[];
 }
 
+/** An expected authoring failure that callers should render as validation evidence, not a crash. */
+export class AcceptanceEvidenceValidationError extends Error {
+  readonly code = 'acceptance-evidence-invalid';
+
+  constructor(readonly errors: string[]) {
+    super(errors.join('\n'));
+    this.name = 'AcceptanceEvidenceValidationError';
+  }
+}
+
 const CHECKBOX_PATTERN = /^(\s*[-*]\s+\[)( |x|X)(\]\s+)(.*)$/;
 const HEADING_PATTERN = /^(#{1,6})\s+(.+?)\s*#*\s*$/;
 const FENCE_PATTERN = /^\s*```acceptance-evidence\s*$/i;
@@ -80,13 +90,23 @@ export function parseAcceptanceEvidence(markdown: string): EvidenceParseResult {
   const entries: AcceptanceEvidence[] = [];
   const warnings: string[] = [];
   const lines = markdown.split(/\r?\n/);
+  let blockNumber = 0;
   for (let index = 0; index < lines.length; index++) {
     if (!FENCE_PATTERN.test(lines[index])) continue;
+    blockNumber++;
     const block: string[] = [];
     for (index++; index < lines.length && !/^\s*```\s*$/.test(lines[index]); index++) {
       block.push(lines[index]);
     }
-    entries.push(...parseStructuredBlock(block));
+    try {
+      entries.push(...parseStructuredBlock(block, blockNumber));
+    } catch (error) {
+      if (error instanceof AcceptanceEvidenceValidationError) throw error;
+      const detail = error instanceof Error ? error.message : String(error);
+      throw new AcceptanceEvidenceValidationError([
+        `Acceptance-evidence block ${blockNumber}: ${detail}`,
+      ]);
+    }
   }
 
   let sectionLevel: number | undefined;
@@ -120,9 +140,17 @@ export function validateEvidenceMapping(
 ): Map<number, AcceptanceEvidence> {
   const actionable = checkboxes.filter((box) => !box.postMerge);
   const unchecked = actionable.filter((box) => !box.checked);
+  const scopedEvidence = evidence.filter((item) =>
+    item.issue === undefined || item.issue === issue
+  );
+  if (actionable.length === 0 && scopedEvidence.length > 0) {
+    throw new AcceptanceEvidenceValidationError([
+      `Issue #${issue} has zero close-gated markdown checkboxes; remove its acceptance-evidence block or convert the issue acceptance list to markdown checkboxes.`,
+    ]);
+  }
   const mapping = new Map<number, AcceptanceEvidence>();
   const errors: string[] = [];
-  for (const entry of evidence.filter((item) => item.issue === undefined || item.issue === issue)) {
+  for (const entry of scopedEvidence) {
     const box = resolveEvidenceBox(entry, actionable);
     if (!box) {
       const compared = entry.text !== undefined
@@ -162,7 +190,7 @@ export function validateEvidenceMapping(
       );
     }
   }
-  if (errors.length) throw new Error(errors.join('\n'));
+  if (errors.length) throw new AcceptanceEvidenceValidationError(errors);
   return mapping;
 }
 
@@ -229,7 +257,7 @@ function resolveEvidenceBox(
 // This intentionally accepts the documented, unambiguous YAML subset without introducing a
 // runtime package dependency into CI validation: scalar `issue`, then `entries`, each with exactly
 // one `box` or `box-index` and an `evidence` scalar. Quoted YAML scalars are recommended.
-function parseStructuredBlock(lines: string[]): AcceptanceEvidence[] {
+function parseStructuredBlock(lines: string[], blockNumber: number): AcceptanceEvidence[] {
   let issue = 0;
   const entries: AcceptanceEvidence[] = [];
   let current: Partial<AcceptanceEvidence> | undefined;
@@ -250,7 +278,9 @@ function parseStructuredBlock(lines: string[]): AcceptanceEvidence[] {
   };
   for (const rawLine of lines) {
     const line = rawLine.trim();
-    if (!line || line === 'entries:') continue;
+    if (!line || line === 'entries:' || /^entries:\s*\[\s*\](?:\s+#.*)?$/.test(line)) {
+      continue;
+    }
     const field = line.match(/^-?\s*(issue|box|box-index|evidence):\s*(.*)$/);
     if (!field) throw new Error(`Invalid acceptance-evidence YAML line: ${line}`);
     const [, key, rawValue] = field;
@@ -269,6 +299,12 @@ function parseStructuredBlock(lines: string[]): AcceptanceEvidence[] {
     else current.evidence = value;
   }
   flush();
+  if (entries.length === 0) {
+    const target = issue > 0 ? ` for issue #${issue}` : '';
+    throw new AcceptanceEvidenceValidationError([
+      `Acceptance-evidence block ${blockNumber}${target} has no entries; remove the block when the closing issue has no close-gated markdown checkboxes, or add one evidence entry per unchecked checkbox.`,
+    ]);
+  }
   return entries;
 }
 

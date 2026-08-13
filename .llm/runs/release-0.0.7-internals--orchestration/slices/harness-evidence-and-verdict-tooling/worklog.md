@@ -76,8 +76,18 @@ undeclared paths, not on a design decision.
 
 ## Gates
 
-Pending implementation. Structured JSON outputs will be preserved under `receipts/`; raw root Deno
-commands and RTK-filtered output are not verdict sources.
+Structured JSON outputs are preserved under `receipts/`; raw root Deno commands and RTK-filtered
+output are not verdict sources.
+
+| Slice | Receipt | Result |
+| --- | --- | --- |
+| S1 RED | `receipts/s1-red.json` | expected type-check failure: the structured validation/report APIs did not exist |
+| S1 focused test | `receipts/s1-green.json` | PASS, 18 passed / 0 failed |
+| S1 focused check | `receipts/s1-check.json` | PASS, 0 diagnostics across the four S1 files |
+| S1 focused format | `receipts/s1-fmt.json` | PASS, 4 files / 0 findings |
+
+S1 is not self-certified: the working-tree diff and receipts are awaiting substantive Tier-A topic
+orchestrator review before the supervisor sign-off commit.
 
 ## Reconcile notes
 
@@ -95,3 +105,8 @@ commands and RTK-filtered output are not verdict sources.
   implementation/test peers listed above, keeps `netscript-pr` read-only, admits no other product
   path, and requires the leaf to stop at Tier-A plus separate IMPL-EVAL handoff. Implementation may
   now begin; the PR remains `status:plan` until real implementation lands.
+- S1 pre-review reconcile (`2026-08-13T20:44:05Z`): `entries: []` and block-style empty `entries:`
+  now produce a typed, block-attributed validation failure; the mirror converts expected authoring
+  failures into an explicit `ok:false` report; zero checkbox targets are rejected once before any
+  per-index matching with remove-or-convert guidance. No mutation occurs in dry-run fixtures. The
+  focused test/check/format receipts are green; Tier-A review is the remaining slice gate.

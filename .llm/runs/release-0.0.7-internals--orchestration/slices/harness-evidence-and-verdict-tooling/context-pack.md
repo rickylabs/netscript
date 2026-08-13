@@ -11,6 +11,8 @@
 - Coordinator clarification is recorded on PR #1644 comment `5286066438`: the five exact source/test
   peers in `drift.md` are authorized; `netscript-pr` is read/use only and no further product path is
   admitted.
+- S1 is implemented in the working tree and its focused test/check/format receipts are green. It
+  remains uncommitted pending the required substantive Tier-A topic-orchestrator review.
 
 ## Locked behavior
 
@@ -24,10 +26,12 @@
 
 ## Required next actions
 
-1. Implement S1/S2 RED-first inside the exact eight-file implementation/test boundary.
-2. Keep `netscript-pr` and every other undeclared product path read-only.
-3. Preserve structured focused-test and final gate receipts in `receipts/`.
-4. Move draft PR #1644 to `status:impl` only after real implementation lands.
-5. Stop after requesting Tier-A substantive review and separate opposite-family IMPL-EVAL.
+1. Obtain Tier-A substantive review of the S1 working-tree diff, address findings, then make the S1
+   sign-off commit and explicit-refspec push.
+2. Implement S2 RED-first inside the exact eight-file implementation/test boundary.
+3. Keep `netscript-pr` and every other undeclared product path read-only.
+4. Preserve structured focused-test and final gate receipts in `receipts/`.
+5. Move draft PR #1644 to `status:impl` only after real implementation lands.
+6. Stop after requesting Tier-A substantive review and separate opposite-family IMPL-EVAL.
 
 No merge, ready transition, publication, release, milestone-scope, or central-cluster-state authority.
