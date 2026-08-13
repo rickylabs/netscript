@@ -7,8 +7,8 @@
 | Run ID              | `docs-database-architecture-rfc--prisma-8-rfc`                                                                       |
 | Branch              | `docs/database-architecture-rfc`                                                                                     |
 | Baseline            | `origin/main@cd720529333328bcba5e1a308ce7632f4350efdf`                                                               |
-| Phase               | `plan-eval-ready`                                                                                                    |
-| Target              | `rfcs/0000-database-architecture.md` plus harness provenance; no canonical RFC before PLAN-EVAL PASS                 |
+| Phase               | `rfc-authoring`                                                                                                      |
+| Target              | `rfcs/0000-database-architecture.md` plus harness provenance; authorship is unblocked but not yet complete           |
 | Current changeset   | Documentation/RFC under `SCOPE-docs.md`                                                                              |
 | Future architecture | A1 contract, A2 control/provider integrations, A3 runtime, A4 definition/plugin DSL, A5 thin plugins, A6 testkit/CLI |
 
@@ -20,6 +20,19 @@ runtime-lifecycle, validation, and operations system. The experience must elimin
 manually synchronized types, hand-wired clients/adapters, textual generated-source repair, implicit
 target selection, Aspire-coupled pure work, terminal-log contracts, and hand-maintained agent
 instructions.
+
+## Plan-Eval Disposition
+
+Cycle 1 (`dd3cfbee-1a53-4dfd-84a3-e78e38ef5b22`, commit `3cbcfcec8`) returned `FAIL_PLAN` solely for
+the copied claim of 30 generated `db:*` tasks. Executing the generator established the corrected
+finding: **42 `db:*` keys per generated engine workspace** for each of PostgreSQL, SQLite, MySQL,
+and MSSQL. Independent reports remain immutable; mutable planning records carry the correction.
+
+Fresh cycle 2 used native Fable 5 medium session `f3286656-7d0f-4da2-a22d-32897a5e6482` against
+commit `383170bbc` and returned **`PASS`**. Canonical RFC authorship is therefore unblocked. No
+additional PLAN-EVAL cycle is requested. `origin/main` has since advanced by one nonblocking
+CI/gate-tooling commit (`01e096049`); the evaluator found no architecture, database, doctrine, or
+RFC premise invalidated, and the existing fresh-pin drift watch remains sufficient.
 
 ## Scope
 
@@ -340,8 +353,8 @@ marker cleanup where supported. After apply, recovery is forward via lineage and
 | 2 | Independent PLAN-EVAL accepts the locked plan before RFC authorship.                                                                               | Fresh separate-session evaluator `PASS`.                                                          | `plan-eval.md`, planning artifacts only.                                                |
 | 3 | Canonical RFC defines vocabulary, APIs, package graph, TypeScript/E2E types, validation, control, contributions, providers, and refusal boundary.  | Source alignment, local-link/terminology/docs format, decision coverage.                          | `rfcs/0000-database-architecture.md`, run context/worklog.                              |
 | 4 | RFC completes adoption/cutover, implementation waves, exhaustive conformance/release matrix, market implications, risks, and kill/switch criteria. | Requirement/decision trace, migration safety, claim/source audit, docs gates.                     | Same RFC plus run context/worklog.                                                      |
-| 5 | Independent Qwen/Grok/adversarial findings are resolved with no open critical/high issue.                                                          | Qwen review disposition; Grok 4.6 high observable route receipt; source audit.                    | RFC plus review/run artifacts.                                                          |
-| 6 | Separate-session IMPL-EVAL accepts the complete RFC.                                                                                               | Evaluator `PASS`; no self-certification.                                                          | `evaluate.md`, RFC/run artifacts.                                                       |
+| 5 | Root personal review, Qwen 3.8 Max focused review, and Grok 4.6 high whole-RFC adversarial review complete.                                        | Review receipts, source audit, and no undispositioned critical/high finding.                      | RFC plus review/run artifacts.                                                          |
+| 6 | Author/editor dispositions resolve every actionable post-draft finding and preserve D-01–D-47.                                                     | Finding ledger closed or reasoned decline; contradiction and decision trace rerun.                | RFC plus review/run artifacts.                                                          |
 | 7 | Owner-directed Fable 5 high performs the absolute final substantive refinement; publish the final review state.                                    | Fable refinement, docs static checks only afterward, commit/push/PR trail.                        | RFC and final run/handoff artifacts.                                                    |
 
 There are eight ordered slices, below the Plan-Gate limit. The canonical RFC does not exist before
@@ -409,12 +422,13 @@ packed install cannot substitute for the remote-graph verdict.
 
 ### Review/evaluator order
 
-1. PLAN-EVAL: fresh Fable 5 medium separate session, `PASS` before RFC.
-2. Root/source/doctrine audit during drafting; no generator self-certification.
-3. Independent Qwen findings disposition and Grok 4.6 high adversarial complete-RFC review.
-4. IMPL-EVAL: fresh separate evaluator session.
-5. Fable 5 high final in-place refinement as the absolute last substantive gate.
-6. Mechanical format/link/diff checks, commit/push, and PR handoff only.
+1. PLAN-EVAL: completed with fresh Fable 5 medium cycle 2 `PASS`; no further Plan-Eval cycle.
+2. Root personal source/doctrine/architecture review of the complete draft.
+3. Qwen 3.8 Max focused post-draft review.
+4. Grok 4.6 high whole-RFC adversarial review.
+5. Author/editor dispositions for every actionable finding.
+6. One Fable 5 high final in-place refinement as the absolute last substantive gate.
+7. Mechanical format/link/diff checks, commit/push, and PR handoff only.
 
 ## Risk Register
 
@@ -507,5 +521,5 @@ their gates have run.
 - Risk, deferred scope, doctrine/debt, future package/JSR/source/consumer gates, and waves are
   explicit.
 - Prospective JSR audit is applied honestly as planning evidence, with actual dry runs N/A.
-- The next action is a fresh separate-session PLAN-EVAL. Canonical RFC authorship remains blocked
-  until `PASS`.
+- PLAN-EVAL cycle 2 passed at commit `383170bbc`; canonical RFC authorship is unblocked but has not
+  yet completed. The next action is Slice 3 RFC drafting.

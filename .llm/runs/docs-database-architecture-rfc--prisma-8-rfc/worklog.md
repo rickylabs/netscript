@@ -6,22 +6,21 @@
 | -------------- | ------------------------------------------------------------- |
 | Run ID         | `docs-database-architecture-rfc--prisma-8-rfc`                |
 | Branch         | `docs/database-architecture-rfc`                              |
-| Phase          | `plan-eval-ready`                                             |
+| Phase          | `rfc-authoring`                                               |
 | Archetype      | Docs-only RFC describing future A1/A2/A3/A4/A5/A6 surfaces    |
 | Scope overlays | `SCOPE-docs.md`; future packages use their archetype matrices |
 
 ## Design
 
-The Design checkpoint is **locked and ready for PLAN-EVAL cycle 2**. Cycle 1 returned `FAIL_PLAN`
-solely because the copied generated-workspace task count was factually wrong; the evaluator executed
-the generator for all four providers and found 42 `db:*` keys per workspace. The mutable
-research/synthesis/plan records are corrected and ready for resubmission. The architecture remains
-evaluator-unapproved, and no canonical RFC file may be created until a fresh separate evaluator
-returns `PASS`.
+The Design checkpoint is **locked and evaluator-approved**. Cycle 1 returned `FAIL_PLAN` solely
+because the copied generated-workspace task count was factually wrong; evaluator execution found 42
+`db:*` keys per workspace for all four providers. After correction, native Fable 5 medium cycle 2
+session `f3286656-7d0f-4da2-a22d-32897a5e6482` evaluated commit `383170bbc` and returned `PASS`.
+Canonical RFC authorship is unblocked but not yet complete; no further PLAN-EVAL cycle is planned.
 
 ### Public Surface and Package Graph
 
-- Planned RFC record: `rfcs/0000-database-architecture.md`; it does not exist before PLAN-EVAL.
+- Planned RFC record: `rfcs/0000-database-architecture.md`; its authorship is now unblocked.
 - `@netscript/database-contract` (A1): plain identities, manifest/plan/receipt/diagnostic schemas,
   capabilities, ownership, and shared small SPIs; zero provider dependencies.
 - `@netscript/database` (A4): thin `defineDatabase`/target/space/policy definitions and pure
@@ -99,8 +98,8 @@ outcome is inspected before resume; cross-target atomicity is never claimed.
 | 2 | Independent Plan-Gate verdict.                                            | Fresh separate-session `PASS`.                           | `plan-eval.md`, planning artifacts only.                          |
 | 3 | Canonical architecture/API RFC body.                                      | Source alignment, docs, decision coverage.               | RFC plus run context/worklog.                                     |
 | 4 | Cutover/waves/conformance/risks/market completion.                        | Migration safety, claim trace, docs gates.               | RFC plus run context/worklog.                                     |
-| 5 | Qwen/Grok adversarial findings resolved.                                  | No open critical/high; Grok 4.6 route receipt.           | RFC plus review/run artifacts.                                    |
-| 6 | Separate-session IMPL-EVAL.                                               | Evaluator `PASS`.                                        | `evaluate.md`, RFC/run artifacts.                                 |
+| 5 | Root, Qwen focused, and Grok whole-RFC reviews complete.                  | Review receipts; no undispositioned critical/high.       | RFC plus review/run artifacts.                                    |
+| 6 | Author/editor dispositions complete.                                      | Finding ledger closed; decision/contradiction trace.     | RFC plus review/run artifacts.                                    |
 | 7 | Absolute final Fable 5 high refinement and publish handoff.               | Fable substantive gate, then mechanical checks only.     | RFC/final run/handoff artifacts.                                  |
 
 ### Prospective JSR Verdict
@@ -152,6 +151,7 @@ the archetype, source, JSR, consumer, conformance, and release exits recorded in
 | 2026-08-13 | 1     | research  | Claude Code Opus 5 high completed its three-part independent architecture synthesis. It recommends a compiled manifest, app-local inferred contract binding, an A3 runtime package, an operational protocol replacing `Promise<number>`, native TypeScript authoring at the composition seam, and a clean Postgres-first cutover.              |
 | 2026-08-13 | 1     | synthesis | Delegated a separate Plan-Gate synthesis to reconcile Opus, Qwen, source audits, market evidence, doctrine, and the pending TypeScript/oRPC audit before formal PLAN-EVAL.                                                                                                                                                                     |
 | 2026-08-13 | 1     | plan-lock | Completed the source-audited TypeScript/oRPC and prospective JSR audits, current-main `research.md` index, decision-grade architecture synthesis, and formal D-01–D-47 Plan-Gate. No must-resolve-now decision remains; phase advanced to `plan-eval-ready`.                                                                                   |
+| 2026-08-13 | 2     | plan-eval | Native Fable 5 medium cycle 2 session `f3286656-7d0f-4da2-a22d-32897a5e6482` evaluated commit `383170bbc` and returned `PASS`. It independently confirmed 42 generated `db:*` keys per engine workspace and classified current-main commit `01e096049` as nonblocking CI/gate-tooling drift. RFC authorship is unblocked.                      |
 
 ### PLAN-EVAL Cycle 1
 
@@ -162,8 +162,15 @@ decisions, slices, risks, gates, and deferrals otherwise passed.
 
 The three mutable records now use the executed 42-per-workspace result and disposition Qwen F3 as an
 incorrect correction while preserving independent reports and evaluator evidence. Targeted format
-and full diff checks passed. Cycle 2 resubmission is ready; phase remains `plan-eval-ready` and RFC
-authorship remains blocked.
+and full diff checks passed.
+
+### PLAN-EVAL Cycle 2
+
+Fresh native Fable 5 medium session `f3286656-7d0f-4da2-a22d-32897a5e6482` evaluated commit
+`383170bbc` and returned `PASS`. It re-executed the generator and confirmed 42 task keys **per
+workspace**, verified D-01–D-47 and all eight slices, and found no open rework-forcing decision. It
+also inspected the one-commit current-main delta (`01e096049`) and classified it as nonblocking
+CI/gate-tooling drift that changes structured check invocation rather than database or RFC premises.
 
 ## Decisions
 
@@ -183,10 +190,11 @@ authorship remains blocked.
 
 ## Drift
 
-| Drift                                                    | Severity      | Logged in drift.md |
-| -------------------------------------------------------- | ------------- | ------------------ |
-| #313 compatibility-first plan is no longer authoritative | architectural | yes                |
-| Fable 5 high is the owner-directed final refinement gate | significant   | yes                |
+| Drift                                                        | Severity      | Logged in drift.md |
+| ------------------------------------------------------------ | ------------- | ------------------ |
+| #313 compatibility-first plan is no longer authoritative     | architectural | yes                |
+| Fable 5 high is the owner-directed final refinement gate     | significant   | yes                |
+| `origin/main` advanced by CI/gate-tooling commit `01e096049` | nonblocking   | plan-eval evidence |
 
 ## Gate Results
 
@@ -198,12 +206,12 @@ authorship remains blocked.
 
 ### Fitness Gates
 
-| Gate                         | Result            | Evidence                        | Notes                                                                                |
-| ---------------------------- | ----------------- | ------------------------------- | ------------------------------------------------------------------------------------ |
-| Archetype/package assignment | PASS_PLANNED      | `plan.md` package graph         | A1/A2/A3/A4/A5/A6 responsibilities and gates are explicit.                           |
-| Open-decision sweep          | PASS_PLANNED      | D-01–D-47                       | No must-resolve-now item; pre-wave/deferred items cannot rewrite package boundaries. |
-| Prospective JSR audit        | PASS_AS_PLANNED   | `research/planned-jsr-audit.md` | New-package dry-run/docs/packed/canary gates are N/A until implementation, not PASS. |
-| PLAN-EVAL                    | FAIL_PLAN_CYCLE_1 | `plan-eval.md`; correction diff | Sole factual-integrity finding corrected; cycle 2 required before canonical RFC.     |
+| Gate                         | Result          | Evidence                                                       | Notes                                                                                |
+| ---------------------------- | --------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Archetype/package assignment | PASS_PLANNED    | `plan.md` package graph                                        | A1/A2/A3/A4/A5/A6 responsibilities and gates are explicit.                           |
+| Open-decision sweep          | PASS_PLANNED    | D-01–D-47                                                      | No must-resolve-now item; pre-wave/deferred items cannot rewrite package boundaries. |
+| Prospective JSR audit        | PASS_AS_PLANNED | `research/planned-jsr-audit.md`                                | New-package dry-run/docs/packed/canary gates are N/A until implementation, not PASS. |
+| PLAN-EVAL                    | PASS_CYCLE_2    | `plan-eval.md`; session `f3286656-7d0f-4da2-a22d-32897a5e6482` | Commit `383170bbc`; no further Plan-Eval cycle.                                      |
 
 ### Runtime Gates
 
@@ -213,17 +221,17 @@ authorship remains blocked.
 
 ### Consumer Gates
 
-| Consumer               | Result         | Evidence                                                      | Notes                                                                  |
-| ---------------------- | -------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| PLAN-EVAL reader       | RESUBMIT_READY | `plan-eval.md`, corrected research/plan, synthesis and audits | Cycle 1's sole factual finding is corrected; cycle 2 remains required. |
-| RFC reader/implementer | NOT_RUN        | RFC blocked                                                   | Canonical RFC authorship begins only after PLAN-EVAL PASS.             |
+| Consumer               | Result      | Evidence                                                      | Notes                              |
+| ---------------------- | ----------- | ------------------------------------------------------------- | ---------------------------------- |
+| PLAN-EVAL reader       | PASS        | `plan-eval.md`, corrected research/plan, synthesis and audits | Cycle 2 accepted the locked plan.  |
+| RFC reader/implementer | IN_PROGRESS | RFC authorship unblocked                                      | Canonical RFC is not yet complete. |
 
 ## Handoff Notes
 
-- Planning is complete, not evaluator-approved. PLAN-EVAL cycle 1 returned `FAIL_PLAN` only for the
-  corrected generated-task count; the next action is fresh separate-session cycle 2. No
-  implementation or canonical RFC authorship verdict is claimed.
+- Planning is complete and evaluator-approved at commit `383170bbc`. Cycle 1's failure remains
+  preserved; cycle 2 passed and no further PLAN-EVAL cycle is requested.
 - Prospective package publishability is `PASS-AS-PLANNED`; actual JSR commands remain N/A until
   packages exist and must produce implementation/release receipts later.
-- After PLAN-EVAL PASS, follow the eight RFC slices and preserve Fable 5 high as the final
-  substantive gate.
+- Continue RFC authorship, then follow the owner-locked post-draft order: root personal review, Qwen
+  3.8 Max focused review, Grok 4.6 high whole-RFC adversarial review, author/editor dispositions,
+  one final Fable 5 high substantive refinement, and mechanical checks only.

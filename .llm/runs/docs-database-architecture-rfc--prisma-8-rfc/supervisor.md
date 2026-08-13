@@ -21,7 +21,7 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 | owner-directed architecture deep dive | Anthropic · Claude Code · Opus 5 · high | Fresh independent architecture/API review with optional native workflows     |
 | `deep_analysis`                       | Anthropic · Fable 5 · medium            | Architecture decision analysis when the native agentic route is available    |
 | `formal_plan_evaluation`              | Anthropic · Fable 5 · medium            | Fresh opposite-family PLAN-EVAL before the RFC file is authored              |
-| third-opinion architecture review     | OpenRouter · Qwen 3.8 Max · max         | Diversity pass over the full architecture and implementation roadmap         |
+| focused post-draft RFC review         | OpenRouter · Qwen 3.8 Max · max         | Focused review after the root's complete-draft personal review               |
 | owner-directed adversarial RFC review | OpenCode · OpenRouter · Grok 4.6 · high | Post-draft attack on portability, migration safety, trust, and abstraction   |
 | owner-directed final refinement       | Anthropic · Fable 5 · high              | Absolute final review-and-refinement gate after every other substantive gate |
 
@@ -35,7 +35,7 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 | `/root/architecture_plan_synthesis` | OpenAI · GPT-5.6 Sol · high | Reconcile all evidence into a decision-grade Plan-Gate proposal  | Complete |
 | `/root/planned_jsr_audit`           | OpenAI · GPT-5.6 Sol · high | Prospective publishability/slow-type review of the planned graph | Complete |
 
-These lanes are independent research/synthesis inputs. None is the formal PLAN-EVAL, IMPL-EVAL, or
+These lanes are independent research/synthesis inputs. None is the formal PLAN-EVAL or the
 owner-directed final Fable refinement.
 
 ## Formal plan evaluation
@@ -43,14 +43,17 @@ owner-directed final Fable refinement.
 | Cycle | Route / model / effort                         | Session                                | Evaluated commit | Verdict     | Disposition                                                                                                                                  |
 | ----- | ---------------------------------------------- | -------------------------------------- | ---------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1     | Native Claude Code · `claude-fable-5` · medium | `dd3cfbee-1a53-4dfd-84a3-e78e38ef5b22` | `3cbcfcec8`      | `FAIL_PLAN` | Sole medium factual-integrity finding corrected in mutable records; cycle 2 resubmission ready, with canonical RFC authorship still blocked. |
+| 2     | Native Claude Code · `claude-fable-5` · medium | `f3286656-7d0f-4da2-a22d-32897a5e6482` | `383170bbc`      | `PASS`      | Corrected 42-per-workspace finding confirmed; D-01–D-47 and slice/gate set accepted; RFC authorship unblocked.                               |
 
 Cycle 1 used the required fresh `formal_plan_evaluation` route, separate from the supervisor and all
 research/synthesis lanes. Its only required fix was the copied claim of 30 generated `db:*` tasks:
 evaluator execution of `generateDatabaseDenoJson` established 42 keys per generated engine workspace
 for PostgreSQL, SQLite, MySQL, and MSSQL. `research.md`, the architecture synthesis, and `plan.md`
 now carry the executed result and disposition Qwen F3 as an incorrect correction; independent model
-reports, briefs, and `plan-eval.md` remain immutable evidence. The phase remains `plan-eval-ready`;
-a fresh cycle 2 `PASS` is required before the canonical RFC is authored.
+reports and briefs remain immutable evidence. Cycle 2 passed at `383170bbc`; the phase is now
+`rfc-authoring`, canonical RFC authorship is unblocked but incomplete, and no further PLAN-EVAL
+cycle is requested. Cycle 2 also classified current-main `01e096049` as nonblocking CI/gate-tooling
+drift and independently confirmed 42 generated `db:*` keys per engine workspace.
 
 ## Recorded lane/eval overrides
 
@@ -68,15 +71,15 @@ a fresh cycle 2 `PASS` is required before the canonical RFC is authored.
 - The owner explicitly requires Fable 5 **high**, not merely an adversarial review, as the final
   refinement gate. That owner directive overrides the ordinary `docs_polish` Fable-medium effort for
   this run. No substantive model gate may follow it.
-- Qwen 3.8 Max is selected as an in-policy independent architecture review for intelligence-family
-  diversity.
+- Qwen 3.8 Max is selected for the owner-clarified focused post-draft review, after the root's
+  personal complete-draft review and before Grok's whole-RFC adversarial pass.
 - The owner subsequently requires Grok 4.6 high. On 2026-08-13 the live OpenRouter models API
   returned `x-ai/grok-4.6` with `reasoning_effort` support. The repository's static model catalog
   still names Grok 4.5, so this is an explicit owner-directed route override rather than a claim
   that the catalog is current. Use the existing bounded OpenCode/OpenRouter runner with model
   `openrouter/x-ai/grok-4.6` and variant `high`, record requested/observed identity and raw receipt,
-  and run it after the complete RFC draft but before IMPL-EVAL. Grok is not the formal evaluator and
-  no substantive gate may follow the final Fable 5 high refinement.
+  and run it after the focused Qwen review. No substantive gate may follow the final Fable 5 high
+  refinement.
 - Qwen integration-risk launch evidence: OpenRouter evaluator guard requested `qwen/qwen3.8-max` at
   `max`; session `f5c1afd0-f89f-48e2-9dfc-3e8f5ade646b` initialized with observed model
   `qwen/qwen3.8-max` and provider `Alibaba`. This is a complementary falsification pass, not
@@ -92,3 +95,6 @@ a fresh cycle 2 `PASS` is required before the canonical RFC is authored.
   architecture axis beside contract-derived validation. A separate read-only source audit must
   establish the exact upstream state and derive candidate end-to-end NetScript type flows before
   plan lock; the Opus synthesis brief now requires this subsystem explicitly.
+- The owner locked the post-draft sequence: root personal review → Qwen 3.8 Max focused review →
+  Grok 4.6 high whole-RFC adversarial review → author/editor dispositions → one final Fable 5 high
+  substantive refinement → mechanical checks only.
