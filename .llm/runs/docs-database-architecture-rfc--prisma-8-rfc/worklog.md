@@ -12,9 +12,12 @@
 
 ## Design
 
-The Design checkpoint is **locked and ready for PLAN-EVAL**. It is not evaluator-approved yet. No
-canonical RFC file may be created until a fresh separate evaluator writes `plan-eval.md` with
-`PASS`.
+The Design checkpoint is **locked and ready for PLAN-EVAL cycle 2**. Cycle 1 returned `FAIL_PLAN`
+solely because the copied generated-workspace task count was factually wrong; the evaluator executed
+the generator for all four providers and found 42 `db:*` keys per workspace. The mutable
+research/synthesis/plan records are corrected and ready for resubmission. The architecture remains
+evaluator-unapproved, and no canonical RFC file may be created until a fresh separate evaluator
+returns `PASS`.
 
 ### Public Surface and Package Graph
 
@@ -150,6 +153,18 @@ the archetype, source, JSR, consumer, conformance, and release exits recorded in
 | 2026-08-13 | 1     | synthesis | Delegated a separate Plan-Gate synthesis to reconcile Opus, Qwen, source audits, market evidence, doctrine, and the pending TypeScript/oRPC audit before formal PLAN-EVAL.                                                                                                                                                                     |
 | 2026-08-13 | 1     | plan-lock | Completed the source-audited TypeScript/oRPC and prospective JSR audits, current-main `research.md` index, decision-grade architecture synthesis, and formal D-01–D-47 Plan-Gate. No must-resolve-now decision remains; phase advanced to `plan-eval-ready`.                                                                                   |
 
+### PLAN-EVAL Cycle 1
+
+Fresh Fable 5 medium cycle 1 returned `FAIL_PLAN` on one medium factual-integrity defect only: an
+independently reported count of 30 generated `db:*` tasks was copied into mutable Plan-Gate records,
+while executing the generator produced 42 per engine workspace for every provider. All architecture
+decisions, slices, risks, gates, and deferrals otherwise passed.
+
+The three mutable records now use the executed 42-per-workspace result and disposition Qwen F3 as an
+incorrect correction while preserving independent reports and evaluator evidence. Targeted format
+and full diff checks passed. Cycle 2 resubmission is ready; phase remains `plan-eval-ready` and RFC
+authorship remains blocked.
+
 ## Decisions
 
 | Decision                                                      | Reason                                                                                                                     | Source                                   |
@@ -183,12 +198,12 @@ the archetype, source, JSR, consumer, conformance, and release exits recorded in
 
 ### Fitness Gates
 
-| Gate                         | Result          | Evidence                        | Notes                                                                                |
-| ---------------------------- | --------------- | ------------------------------- | ------------------------------------------------------------------------------------ |
-| Archetype/package assignment | PASS_PLANNED    | `plan.md` package graph         | A1/A2/A3/A4/A5/A6 responsibilities and gates are explicit.                           |
-| Open-decision sweep          | PASS_PLANNED    | D-01–D-47                       | No must-resolve-now item; pre-wave/deferred items cannot rewrite package boundaries. |
-| Prospective JSR audit        | PASS_AS_PLANNED | `research/planned-jsr-audit.md` | New-package dry-run/docs/packed/canary gates are N/A until implementation, not PASS. |
-| PLAN-EVAL                    | NOT_RUN         | Fresh evaluator required        | Hard stop before canonical RFC.                                                      |
+| Gate                         | Result            | Evidence                        | Notes                                                                                |
+| ---------------------------- | ----------------- | ------------------------------- | ------------------------------------------------------------------------------------ |
+| Archetype/package assignment | PASS_PLANNED      | `plan.md` package graph         | A1/A2/A3/A4/A5/A6 responsibilities and gates are explicit.                           |
+| Open-decision sweep          | PASS_PLANNED      | D-01–D-47                       | No must-resolve-now item; pre-wave/deferred items cannot rewrite package boundaries. |
+| Prospective JSR audit        | PASS_AS_PLANNED   | `research/planned-jsr-audit.md` | New-package dry-run/docs/packed/canary gates are N/A until implementation, not PASS. |
+| PLAN-EVAL                    | FAIL_PLAN_CYCLE_1 | `plan-eval.md`; correction diff | Sole factual-integrity finding corrected; cycle 2 required before canonical RFC.     |
 
 ### Runtime Gates
 
@@ -198,15 +213,16 @@ the archetype, source, JSR, consumer, conformance, and release exits recorded in
 
 ### Consumer Gates
 
-| Consumer               | Result  | Evidence                                                     | Notes                                                                        |
-| ---------------------- | ------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------- |
-| PLAN-EVAL reader       | READY   | `research.md`, `plan.md`, `worklog.md`, synthesis and audits | Complete current rebaseline, locked design, risks, slices, waves, and gates. |
-| RFC reader/implementer | NOT_RUN | RFC blocked                                                  | Canonical RFC authorship begins only after PLAN-EVAL PASS.                   |
+| Consumer               | Result         | Evidence                                                      | Notes                                                                  |
+| ---------------------- | -------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| PLAN-EVAL reader       | RESUBMIT_READY | `plan-eval.md`, corrected research/plan, synthesis and audits | Cycle 1's sole factual finding is corrected; cycle 2 remains required. |
+| RFC reader/implementer | NOT_RUN        | RFC blocked                                                   | Canonical RFC authorship begins only after PLAN-EVAL PASS.             |
 
 ## Handoff Notes
 
-- Planning is complete, not evaluator-approved. The next action is a fresh separate-session
-  PLAN-EVAL. No implementation or canonical RFC authorship verdict is claimed.
+- Planning is complete, not evaluator-approved. PLAN-EVAL cycle 1 returned `FAIL_PLAN` only for the
+  corrected generated-task count; the next action is fresh separate-session cycle 2. No
+  implementation or canonical RFC authorship verdict is claimed.
 - Prospective package publishability is `PASS-AS-PLANNED`; actual JSR commands remain N/A until
   packages exist and must produce implementation/release receipts later.
 - After PLAN-EVAL PASS, follow the eight RFC slices and preserve Fable 5 high as the final

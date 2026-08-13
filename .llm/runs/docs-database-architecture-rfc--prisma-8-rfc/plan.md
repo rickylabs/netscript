@@ -306,9 +306,9 @@ identity/version, and execution identity when defaults matter.
 `netscript db adopt` is a temporary codemod/tool, not compatibility. It reads legacy config/layout,
 generates explicit target definitions from config keys, introspects reachable databases, proposes
 object ownership, hard-stops on unattributed objects, compiles/emits canonical artifacts, writes
-baseline marker metadata only, verifies zero drift, and then deletes the old engine workspaces, 30
-tasks, copied fragments, repair scripts, adapters, and dependencies. Baseline establishment performs
-zero table/data DDL/DML.
+baseline marker metadata only, verifies zero drift, and then deletes the old engine workspaces, the
+42 per-workspace generated `db:*` task keys, copied fragments, repair scripts, adapters, and
+dependencies. Baseline establishment performs zero table/data DDL/DML.
 
 Old/new stacks may coexist on separate branches/release lines while features are developed, but one
 application never composes both. Before first new apply, rollback is repository-only plus idempotent

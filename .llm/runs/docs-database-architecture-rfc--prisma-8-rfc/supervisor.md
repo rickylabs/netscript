@@ -38,6 +38,20 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 These lanes are independent research/synthesis inputs. None is the formal PLAN-EVAL, IMPL-EVAL, or
 owner-directed final Fable refinement.
 
+## Formal plan evaluation
+
+| Cycle | Route / model / effort                         | Session                                | Evaluated commit | Verdict     | Disposition                                                                                                                                  |
+| ----- | ---------------------------------------------- | -------------------------------------- | ---------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1     | Native Claude Code · `claude-fable-5` · medium | `dd3cfbee-1a53-4dfd-84a3-e78e38ef5b22` | `3cbcfcec8`      | `FAIL_PLAN` | Sole medium factual-integrity finding corrected in mutable records; cycle 2 resubmission ready, with canonical RFC authorship still blocked. |
+
+Cycle 1 used the required fresh `formal_plan_evaluation` route, separate from the supervisor and all
+research/synthesis lanes. Its only required fix was the copied claim of 30 generated `db:*` tasks:
+evaluator execution of `generateDatabaseDenoJson` established 42 keys per generated engine workspace
+for PostgreSQL, SQLite, MySQL, and MSSQL. `research.md`, the architecture synthesis, and `plan.md`
+now carry the executed result and disposition Qwen F3 as an incorrect correction; independent model
+reports, briefs, and `plan-eval.md` remain immutable evidence. The phase remains `plan-eval-ready`;
+a fresh cycle 2 `PASS` is required before the canonical RFC is authored.
+
 ## Recorded lane/eval overrides
 
 - The root session is Codex rather than the default Opus 5 orchestrator. This is the active

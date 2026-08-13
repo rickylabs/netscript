@@ -66,10 +66,11 @@ The redesign has five refusal boundaries:
 - **[FACT]** NetScript currently has five overlapping systems—configuration/Aspire resources, CLI
   registry/runner, generated engine workspaces, runtime wrappers, and plugin fragment copying—with
   no canonical join point. Target resolution ignores `PrimaryDatabase`; two same-provider targets
-  share `database/<engine>`; generation is Aspire-coupled; the generated workspace carries exactly
-  30 `db:*` tasks; plugin contribution is source-layout discovery plus regex collision checking
-  ([netscript-current-state.md](./netscript-current-state.md); corrected facts in
-  [qwen-prisma-risk-review.md](./qwen-prisma-risk-review.md), §3).
+  share `database/<engine>`; generation is Aspire-coupled; executing `generateDatabaseDenoJson` for
+  all four providers produces 42 `db:*` task keys in every generated engine workspace; plugin
+  contribution is source-layout discovery plus regex collision checking
+  ([netscript-current-state.md](./netscript-current-state.md); executed-generator correction in the
+  [run-root rebaseline](../research.md), “Corrections and conflict resolutions”).
 - **[FACT]** Prisma 8 RC1 is Early Access, Node 24-primary, TypeScript 5.9 optional-peer, and
   intends PostgreSQL as the only 8.0 GA database. MongoDB is EA, SQLite is proof-of-concept, MySQL
   is later, and SQL Server is absent. Prisma's current direction is canonical contract data, a
@@ -678,8 +679,9 @@ facades, dual migration histories, or copied schema bridges.
 6. Compile the manifest and emit atomic provider/app-binding artifacts.
 7. Establish one baseline/root per space and write provider marker metadata **only**—zero DDL/DML.
 8. Verify the live target against the manifest and baseline.
-9. Commit the new composition and delete old engine workspaces, 30 tasks, repair scripts, copied
-   plugin fragments, old adapters, and dependencies only after verification.
+9. Commit the new composition and delete old engine workspaces, the 42 per-workspace generated
+   `db:*` task keys, repair scripts, copied plugin fragments, old adapters, and dependencies only
+   after verification.
 
 After baseline and before the first new apply, rollback is repository-only plus idempotent removal
 of new marker metadata where provider semantics permit. After first apply, recovery is forward

@@ -31,7 +31,8 @@ the harness-required current research entrypoint; it does not duplicate the repo
    wrappers, and install-time plugin schema copying.
 2. Target identity collapses into provider/engine paths. Two same-provider databases share
    `database/<engine>`; operation target resolution ignores `PrimaryDatabase`; pure generation is
-   Aspire-coupled; the generated workspace has exactly 30 `db:*` tasks.
+   Aspire-coupled. Executing `generateDatabaseDenoJson` for PostgreSQL, SQLite, MySQL, and MSSQL at
+   the baseline produces 42 `db:*` task keys in every generated engine workspace.
 3. Plugin schema is inferred from files and regex collisions rather than versioned ownership,
    capability, migration history, provenance, or retention policy.
 4. Prisma 8 is an architectural change: canonical contract data and declaration artifacts,
@@ -57,6 +58,13 @@ the harness-required current research entrypoint; it does not duplicate the repo
 ## Corrections and conflict resolutions
 
 - Root Prisma catalog entries are caret ranges `^7.8.0`; generated templates still use `^7.4.2`.
+- Qwen finding F3 incorrectly “corrected” the current-state report's accurate “more than twenty”
+  wording to exactly 30 tasks by omitting twelve computed provider-specific task keys. The PLAN-EVAL
+  evaluator executed `generateDatabaseDenoJson` for all four providers and verified 42 `db:*` keys
+  for each. Qwen's report remains immutable independent audit evidence; its count is explicitly
+  superseded here. The same copied 30-task premise propagated into the immutable Opus review and
+  model briefs and is likewise non-authoritative. Mutable synthesis and plan records use the
+  executed-generator result.
 - `@prisma/orm-postgres` has 138 audited top-level export keys, not the approximate 275 in the Qwen
   independent report.
 - The AP-17 `interfaces/` rename debt for `packages/database` is stale because `ports/` exists; its
