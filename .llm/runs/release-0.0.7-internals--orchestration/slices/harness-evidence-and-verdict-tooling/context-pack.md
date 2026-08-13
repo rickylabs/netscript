@@ -15,6 +15,15 @@
   sign-off is recorded in the run-artifact-only commit containing this context update.
 - S2 passed Tier-A review at `8b4f4b509e4cb9ad6f7e9414b9b948ce9a2b7a33`; its supervisor
   sign-off is recorded in the run-artifact-only commit containing this context update.
+- The contract's durable `check`, `test`, and `quality-job` gates passed at signed-off
+  implementation head `b21424c44bf43077b4caf5702ef58b3e1d0c00b1`; tracked JSON receipts are
+  preserved under `receipts/pre-guidance/` as historical pre-guidance evidence. The quality job
+  emitted existing non-blocking dependency-catalog warnings and did not mutate `deno.lock` or source
+  files.
+- Coordinator control head `33626b1f4752b3a0e53ea21407ff1ddb6af0fcfb` and PR comment
+  `5286507468` supersede the read/use-only restriction for exactly
+  `.agents/skills/netscript-pr/SKILL.md`. The acceptance-complete leaf surface is now nine files;
+  no tenth source, workflow, tool, test, or skill path is authorized.
 
 ## Locked behavior
 
@@ -22,17 +31,20 @@
 - Detect zero checkbox targets before index matching and instruct removal-or-checkbox conversion.
 - Accept exact bare/heading/emphasis verdict token lines; keep templates/prose excluded.
 - Distinguish absent marker from emitted-but-unparseable marker.
-- Emit direct removal-or-checkbox-conversion guidance for plain-bullet Acceptance targets. The
-  `netscript-pr` skill remains read-only by coordinator decision, so its documentation criterion is
-  not claimed as leaf-delivered.
+- Emit direct removal-or-checkbox-conversion guidance for plain-bullet Acceptance targets, and state
+  in the canonical `netscript-pr` machine convention that only markdown checkboxes are close-gated
+  and mirrorable, so a plain-bullet `Acceptance` section takes no `acceptance-evidence` block.
 
-## Required next actions
+## Handoff state
 
-1. Obtain coordinator acceptance reconciliation for the denied `netscript-pr` edit versus the
-   binding `Closes #1561` / `Closes #1621` claims; do not resolve it by widening scope.
-2. Run the contracted durable `check`, `test`, and `quality-job` gates and preserve structured final
-   receipts without claiming package/plugin `quality:gate` or JSR audit.
-3. Keep `netscript-pr` and every other undeclared product path read-only.
-4. Stop after requesting the separate opposite-family IMPL-EVAL; keep the PR draft.
+1. Commit and push the acceptance-complete guidance plus this run-artifact reconciliation.
+2. Run exactly one final structured `check`, `test`, and `quality-job` cycle at that literal
+   implementation head. Package/plugin `quality:gate` and JSR audit remain N/A.
+3. Package the new receipts plus the implementation-parent/evidence-child relationship in one
+   evidence-only commit; do not rerun merely because that receipt-only commit changes HEAD.
+4. Keep draft PR #1644 at `status:impl`, with S3/its DoD row checked only after the guidance commit
+   exists and the IMPL-EVAL row unchecked.
+5. Stop at the native opposite-family IMPL-EVAL handoff. The evaluator is held until Saturday
+   2026-08-15 00:00 Europe/Zurich; no substitute route is authorized.
 
 No merge, ready transition, publication, release, milestone-scope, or central-cluster-state authority.

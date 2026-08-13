@@ -39,8 +39,11 @@
    changes. Prove with the focused validation test wrapper.
 2. S2: add heading, emphasis, absence, and malformed RED fixtures, then update shared and workflow
    extractors. Prove with focused agentic/workflow tests.
-3. S3: run durable `check`, `test`, and `quality-job` at one immutable final head and prepare the
-   separate opposite-family IMPL-EVAL handoff.
+3. S3: add the coordinator-authorized checkbox-only/plain-bullet operator guidance to the existing
+   `netscript-pr` machine convention.
+4. S4: run durable `check`, `test`, and `quality-job` once at the acceptance-complete implementation
+   head, package their receipts in one evidence-only child commit, and prepare the held
+   opposite-family IMPL-EVAL handoff without rerunning for that receipt-only head.
 
 ### Exact files
 
@@ -51,7 +54,9 @@
   `.llm/tools/validation/mirror-acceptance-evidence_test.ts`,
   `.llm/tools/agentic/lib/agentic-lib_test.ts`,
   `.llm/tools/agentic/openhands/phase-eval-workflow_test.ts`.
-- Read/use only: `.agents/skills/netscript-pr/SKILL.md`; it must not be edited.
+- Final coordinator amendment: control head `33626b1f4752b3a0e53ea21407ff1ddb6af0fcfb`
+  authorizes exactly `.agents/skills/netscript-pr/SKILL.md` as the ninth and final edit surface,
+  superseding the earlier read/use-only decision.
 
 ### Deferred scope
 
@@ -90,6 +95,9 @@ output are not verdict sources.
 | S2 focused check | `receipts/s2-check.json` | PASS, 0 diagnostics across the three TypeScript S2 files |
 | S2 focused format | `receipts/s2-fmt.json` | PASS, 3 TypeScript files / 0 findings |
 | S2 focused lint attempt | `receipts/s2-lint.json` | NOT FIRED, exit 2: Deno excluded all 3 explicit hidden-path batches; not claimed as a pass |
+| Pre-guidance check | `receipts/pre-guidance/check.json` | PASS at `b21424c44bf43077b4caf5702ef58b3e1d0c00b1`; historical evidence only, not the final acceptance-complete gate |
+| Pre-guidance test | `receipts/pre-guidance/test.json` | PASS at `b21424c44bf43077b4caf5702ef58b3e1d0c00b1`; historical evidence only, not the final acceptance-complete gate |
+| Pre-guidance quality-job | `receipts/pre-guidance/quality-job.json` | PASS at `b21424c44bf43077b4caf5702ef58b3e1d0c00b1`; historical evidence only, not the final acceptance-complete gate |
 
 S1 first review requested one mirror-boundary fixture. The replacement candidate passed substantive
 Tier-A re-review through `01db2bd360ea15d8bd9b53fee5fc392678321f43`; the supervisor sign-off
@@ -148,3 +156,26 @@ sign-off disposition is recorded in the run-artifact-only commit containing this
   and executable workflow fixtures. The excluded-path lint attempt remains honestly NOT FIRED and
   is not a binding gate. Supervisor sign-off: accepted for S2 behavior and authorized scope only.
   Final structured gates, coordinator closure reconciliation, and IMPL-EVAL remain pending.
+- Pre-guidance contracted gates (`2026-08-13T21:12:52Z`): durable allowlisted `check`, `test`, and
+  `quality-job` all returned `PASS` with exit 0 at the signed-off implementation head
+  `b21424c44bf43077b4caf5702ef58b3e1d0c00b1`. The quality job retained pre-existing non-blocking
+  `DEPS-NPM-CATALOG` warnings; it is not described as warning-free. Gate inspection found no
+  `deno.lock` or source churn. The coordinator interrupted packaging before any commit, so these
+  receipts are preserved only as pre-guidance history; the same three gates must run once at the
+  later acceptance-complete implementation head.
+- S3 closure reconcile (`2026-08-13T21:16:19Z`): no coordinator response yet resolves the
+  `netscript-pr` read-only decision against the live #1561/#1621 documentation criteria and the
+  binding `Closes` claims. The implementation can be handed to IMPL-EVAL with this conflict
+  explicit, but this leaf does not claim those documentation criteria or merge readiness.
+- S3 coordinator amendment (`2026-08-13T21:22:56Z`): control head
+  `33626b1f4752b3a0e53ea21407ff1ddb6af0fcfb` and PR comment `5286507468` supersede the earlier
+  read-only decision and authorize `.agents/skills/netscript-pr/SKILL.md` as the ninth and final
+  edit surface. The exact #1621 guidance is now present in the existing machine convention; no
+  other skill, source, workflow, tool, or test surface was added.
+- S3 evidence disposition (`2026-08-13T21:22:56Z`): the three receipts generated at
+  `b21424c44bf43077b4caf5702ef58b3e1d0c00b1` remain byte-for-byte preserved under
+  `receipts/pre-guidance/` and are explicitly historical. One new final structured
+  `check`/`test`/`quality-job` cycle will run only after the acceptance-complete guidance commit.
+- Evaluator hold (`2026-08-13T21:22:56Z`): formal native opposite-family IMPL-EVAL must not launch
+  before Saturday 2026-08-15 00:00 Europe/Zurich. No Claude, Fable, OpenRouter, DeepSeek, Minimax,
+  or substitute evaluator is authorized during this leaf turn; stop at the recorded handoff.
