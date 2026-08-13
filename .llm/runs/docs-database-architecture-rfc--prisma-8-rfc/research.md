@@ -32,11 +32,16 @@
 
 ## Findings
 
-| # | Finding                                                                                                                                          | How to verify                              |
-| - | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
-| 1 | #313's compatibility-first premise conflicts with the current owner directive.                                                                   | GitHub issue #313 body; current run prompt |
-| 2 | This is decision-heavy, cross-package, multi-wave architecture work; PLAN-EVAL is mandatory.                                                     | `.llm/harness/workflow/run-loop.md` §4     |
-| 3 | The canonical deliverable is a draft RFC under `rfcs/0000-*.md`; run artifacts preserve provenance but do not become the accepted design record. | `rfcs/README.md`                           |
+| # | Finding                                                                                                                                                                                                        | How to verify                                                                  |
+| - | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| 1 | #313's compatibility-first premise conflicts with the current owner directive.                                                                                                                                 | GitHub issue #313 body; current run prompt                                     |
+| 2 | This is decision-heavy, cross-package, multi-wave architecture work; PLAN-EVAL is mandatory.                                                                                                                   | `.llm/harness/workflow/run-loop.md` §4                                         |
+| 3 | The canonical deliverable is a draft RFC under `rfcs/0000-*.md`; run artifacts preserve provenance but do not become the accepted design record.                                                               | `rfcs/README.md`                                                               |
+| 4 | NetScript currently has five overlapping database systems rather than one source of truth; same-engine targets collide at `database/<engine>`.                                                                 | [current-state audit](./research/netscript-current-state.md)                   |
+| 5 | Prisma 8 replaces generated executable clients with a canonical contract plus runtime/control planes, but RC1 is Early Access and PostgreSQL is its only intended 8.0 GA target.                               | [Prisma deep dive](./research/prisma-8-deep-dive.md)                           |
+| 6 | Prisma's programmatic control seam is strengthening while its CLI/config packaging changed materially within six days after RC1.                                                                               | [Prisma deep dive](./research/prisma-8-deep-dive.md#six-days-of-post-rc-churn) |
+| 7 | Market leaders solve individual parts—contract ownership, named connections, adapter factories, migration graphs, or policy—but no comparator composes all of them into a typed meta-framework database layer. | [market analysis](./research/market-analysis.md)                               |
+| 8 | The owner requires orchestration-first execution; a native Claude Code Opus 5 high lane now independently challenges the research and designs the architecture before plan lock.                               | [architecture briefing](./briefs/claude-opus-architecture.md)                  |
 
 ## jsr-audit surface scan (package/plugin waves)
 
@@ -45,6 +50,12 @@
 - This RFC is docs-only, but it specifies future published package/plugin surfaces, so the planned
   public API must receive the same slow-type, private-type-reference, upstream-re-export, and
   subpath-boundary scrutiny before Plan-Gate.
+
+## Completed research artifacts
+
+- [NetScript current-state and incident audit](./research/netscript-current-state.md)
+- [Prisma 8 RC1/current-main source, scorecard, issue/PR, and agent-surface audit](./research/prisma-8-deep-dive.md)
+- [Eleven-product market/prior-art comparison](./research/market-analysis.md)
 
 ## Open questions
 
@@ -60,3 +71,4 @@
   migrations, seeding, registry wiring, and CI matrix maintenance?
 - What implementation-wave boundaries preserve reviewability while explicitly avoiding a
   compatibility layer?
+- Which independent Opus findings require correction before the plan is eligible for PLAN-EVAL?

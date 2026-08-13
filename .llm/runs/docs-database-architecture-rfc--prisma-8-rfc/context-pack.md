@@ -25,15 +25,17 @@ canonical RFC has not been authored; research and PLAN-EVAL come first.
 
 ## In Progress
 
-- Bootstrap commit/draft PR, then current-state and upstream research.
+- Claude Code Opus 5 high independent architecture deep dive, followed by plan synthesis and the
+  separate formal PLAN-EVAL.
 
 ## Next Steps
 
 1. Publish the bootstrap review surface.
 2. Audit current NetScript DB code, generated assets, public APIs, CI, issues, and debt.
 3. Audit Prisma 8/Next primary sources and market prior art.
-4. Lock architecture and Design checkpoint, then obtain PLAN-EVAL PASS.
-5. Author and evaluate the RFC.
+4. Incorporate the owner-directed Claude Opus 5 high independent report.
+5. Lock architecture and Design checkpoint, then obtain PLAN-EVAL PASS.
+6. Author and evaluate the RFC.
 
 ## Key Decisions
 

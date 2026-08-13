@@ -27,3 +27,17 @@ documentation.
 - **Severity:** significant
 - **Action:** accept
 - **Evidence:** `supervisor.md` routes and override record.
+
+## 2026-08-13 — Orchestration posture correction
+
+- **What:** The root session performed too much of the research directly instead of using the
+  harness as the orchestration layer.
+- **Source:** Owner correction in the active session.
+- **Expected:** Root research coordination followed by ordinary deep-analysis routing.
+- **Actual:** The owner explicitly requires the root to orchestrate substantive independent work and
+  requests Claude Code Opus 5 high with its workflow capabilities.
+- **Severity:** significant
+- **Action:** correct
+- **Evidence:** native background session `3f8a9a69-5589-4b91-9a32-91f7770fe7c2`, observed as Opus 5
+  high in `/home/codex/repos/netscript-db-rfc`; exclusive briefing at
+  `briefs/claude-opus-architecture.md`.

@@ -15,19 +15,28 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 
 ## Routes in force
 
-| Task lane                         | Provider / model / effort            | Role in this run                                                             |
-| --------------------------------- | ------------------------------------ | ---------------------------------------------------------------------------- |
-| `planning_decisions`              | OpenAI · Codex · GPT-5 family · high | Root research coordinator and RFC generator in the active user session       |
-| `deep_analysis`                   | Anthropic · Fable 5 · medium         | Architecture decision analysis when the native agentic route is available    |
-| `formal_plan_evaluation`          | Anthropic · Fable 5 · medium         | Fresh opposite-family PLAN-EVAL before the RFC file is authored              |
-| third-opinion architecture review | OpenRouter · Qwen 3.8 Max · max      | Diversity pass over the full architecture and implementation roadmap         |
-| owner-directed final refinement   | Anthropic · Fable 5 · high           | Absolute final review-and-refinement gate after every other substantive gate |
+| Task lane                             | Provider / model / effort               | Role in this run                                                             |
+| ------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------- |
+| `planning_decisions`                  | OpenAI · Codex · GPT-5 family · high    | Root research coordinator and RFC generator in the active user session       |
+| owner-directed architecture deep dive | Anthropic · Claude Code · Opus 5 · high | Fresh independent architecture/API review with optional native workflows     |
+| `deep_analysis`                       | Anthropic · Fable 5 · medium            | Architecture decision analysis when the native agentic route is available    |
+| `formal_plan_evaluation`              | Anthropic · Fable 5 · medium            | Fresh opposite-family PLAN-EVAL before the RFC file is authored              |
+| third-opinion architecture review     | OpenRouter · Qwen 3.8 Max · max         | Diversity pass over the full architecture and implementation roadmap         |
+| owner-directed final refinement       | Anthropic · Fable 5 · high              | Absolute final review-and-refinement gate after every other substantive gate |
 
 ## Recorded lane/eval overrides
 
 - The root session is Codex rather than the default Opus 5 orchestrator. This is the active
   user-facing session surface; exact backend SKU is not exported, so the observed identity is
   recorded without claiming GPT-5.6 Sol.
+- The owner corrected the execution posture on 2026-08-13: the root must orchestrate rather than
+  absorb the substantive work. A fresh native Claude Code Opus 5 high lane is therefore added for
+  the independent architecture deep dive before plan lock. It is an input to, not a substitute for,
+  the separate PLAN-EVAL.
+- Claude launch evidence: background handle `3f8a9a69`, full session
+  `3f8a9a69-5589-4b91-9a32-91f7770fe7c2`, PID `1944525`, worktree matched, native UI reported “Opus
+  5 with high effort · Claude Max.” The session immediately exposed four internal agents; their
+  roles/identities must be recorded in its report.
 - The owner explicitly requires Fable 5 **high**, not merely an adversarial review, as the final
   refinement gate. That owner directive overrides the ordinary `docs_polish` Fable-medium effort for
   this run. No substantive model gate may follow it.

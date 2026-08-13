@@ -74,6 +74,7 @@ databases, engines, providers, deployment runtimes, and third-party contribution
 | L1 | Prisma is an implementation target behind NetScript-owned concepts, not the NetScript DB public API itself. | Preserves flexibility without pretending all database semantics are portable.       |
 | L2 | PLAN-EVAL is mandatory before authoring the canonical RFC.                                                  | The run is architecture-heavy, high-risk, and multi-wave.                           |
 | L3 | Fable 5 high is the last substantive gate and may refine the document in place.                             | Explicit owner exception.                                                           |
+| L4 | Claude Code Opus 5 high performs a fresh independent architecture deep dive before plan lock.               | Owner explicitly requires orchestration and this model's workflow capabilities.     |
 
 ## Open-Decision Sweep
 
@@ -104,15 +105,16 @@ Pending targeted scan of `.llm/harness/debt/arch-debt.md`.
 
 ## Validation Plan
 
-| Order | Gate                            | Command or check                                                           | Expected result                                         |
-| ----- | ------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------- |
-| 1     | Research provenance             | Source/link inventory and claim ledger                                     | Every load-bearing claim is traceable and current.      |
-| 2     | PLAN-EVAL                       | Fresh Fable 5 medium opposite-family session                               | `PASS` before RFC authoring.                            |
-| 3     | RFC source alignment            | Local paths, `deno doc`, focused code inspection, upstream primary sources | No unsupported present-state or proposed-surface claim. |
-| 4     | Docs gates                      | Formatting, local links/paths, terminology, contradiction scan             | PASS.                                                   |
-| 5     | Independent architecture review | Qwen 3.8 Max                                                               | No unresolved critical/high finding.                    |
-| 6     | IMPL-EVAL                       | Fresh opposite-family evaluator                                            | `PASS`.                                                 |
-| 7     | Final refinement                | Fable 5 high                                                               | Final in-place refinement; no substantive gate follows. |
+| Order | Gate                               | Command or check                                                           | Expected result                                         |
+| ----- | ---------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------- |
+| 1     | Research provenance                | Source/link inventory and claim ledger                                     | Every load-bearing claim is traceable and current.      |
+| 2     | Independent architecture deep dive | Fresh native Claude Code Opus 5 high                                       | Decision-grade report incorporated before plan lock.    |
+| 3     | PLAN-EVAL                          | Fresh Fable 5 medium opposite-family session                               | `PASS` before RFC authoring.                            |
+| 4     | RFC source alignment               | Local paths, `deno doc`, focused code inspection, upstream primary sources | No unsupported present-state or proposed-surface claim. |
+| 5     | Docs gates                         | Formatting, local links/paths, terminology, contradiction scan             | PASS.                                                   |
+| 6     | Independent architecture review    | Qwen 3.8 Max                                                               | No unresolved critical/high finding.                    |
+| 7     | IMPL-EVAL                          | Fresh opposite-family evaluator                                            | `PASS`.                                                 |
+| 8     | Final refinement                   | Fable 5 high                                                               | Final in-place refinement; no substantive gate follows. |
 
 ## Dependencies
 

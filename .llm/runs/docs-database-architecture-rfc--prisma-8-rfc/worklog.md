@@ -52,16 +52,18 @@ research inventory and proposed package-boundary matrix.
 
 ## Progress Log
 
-| Time       | Slice | Step      | Notes                                                                                    |
-| ---------- | ----- | --------- | ---------------------------------------------------------------------------------------- |
-| 2026-08-13 | 0     | bootstrap | Fresh worktree and branch created from current `origin/main`; run artifacts initialized. |
+| Time       | Slice | Step      | Notes                                                                                                                                              |
+| ---------- | ----- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-13 | 0     | bootstrap | Fresh worktree and branch created from current `origin/main`; run artifacts initialized.                                                           |
+| 2026-08-13 | 1     | research  | Owner directed the root to orchestrate. Added a fresh Claude Code Opus 5 high independent architecture lane; its exclusive report feeds plan lock. |
 
 ## Decisions
 
-| Decision                              | Reason                                                                            | Source                    |
-| ------------------------------------- | --------------------------------------------------------------------------------- | ------------------------- |
-| Treat #313 as superseded design input | Its additive compatibility premise conflicts with the owner-directed clean break. | Issue #313 + owner prompt |
-| Require PLAN-EVAL                     | Material architecture, sequencing, and multi-wave risk are unavoidable.           | Harness run loop §4       |
+| Decision                              | Reason                                                                                 | Source                    |
+| ------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------- |
+| Treat #313 as superseded design input | Its additive compatibility premise conflicts with the owner-directed clean break.      | Issue #313 + owner prompt |
+| Require PLAN-EVAL                     | Material architecture, sequencing, and multi-wave risk are unavoidable.                | Harness run loop §4       |
+| Delegate architecture deep dive       | Owner explicitly requested Claude Code Opus 5 high and an orchestration-first posture. | Owner correction          |
 
 ## Drift
 
