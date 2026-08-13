@@ -1356,6 +1356,7 @@
       "archetype": "6-cli-tooling",
       "overlays": [],
       "fileSurfaces": [
+        ".agents/skills/netscript-pr/SKILL.md",
         ".github/workflows/openhands-agent.yml",
         ".llm/tools/agentic/lib/agentic-lib.ts",
         ".llm/tools/agentic/lib/agentic-lib_test.ts",
