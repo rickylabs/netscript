@@ -19,6 +19,9 @@
 | 2026-08-13T22:42:00.000Z | Re-audited every #1564 construct; closed it completed because all live changed-file consumers are safe and #1403 already fixed the affected construct. Removed the false wave-zero barrier and moved #1360 to features. | #1564 correction comment; 60 active / 43 leaves / nine waves; lane counts 1/16/26/17 |
 | 2026-08-13T22:48:00.000Z | Added per-leaf surfaces, archetypes, overlays, proving gates, JSR applicability, risk register, collision ownership, release evidence ids, two read-only watchers, and exact OIDC/artifact-pinned stable conditions. | `leaf-contracts.json`; repaired plan/state/DAG/inventory |
 | 2026-08-13T23:03:00.000Z | PLAN-EVAL cycle 2 approved the repaired plan. Fable completed evidence collection, hit monthly spend before verdict text, and the same conversation emitted the final synthesis through the recorded Opus fallback. | `plan-eval-cycle-2.md`; evaluator session `2439b19d-5df7-4920-9fce-fa5831ec4fdf`; evaluated head `331f7c664` |
+| 2026-08-13T23:08:44.000Z | Final dispatch recheck passed on unchanged `main`: milestone schema valid; Docker empty; Aspire has no AppHost/resources; coordinator PR merge state clean. | `origin/main` `01e096049`; validator `ok:true`; `docker ps/volume/network`; `aspire stop` + `aspire ps` |
+| 2026-08-13T23:10:00.000Z | Materialized four clean topic-control worktrees and locked wave-zero dispatch briefs. | `netscript-007-{docs,internals,fixes,features}`; `briefs/topic-*/implement.md` |
+| 2026-08-13T23:12:07.000Z | Activated exactly four attached topic orchestrators on the recorded Codex Sol/high fallback; all four route/worktree identities matched and began working. | `topic-{docs,internals,fixes,features}/codex-thread-ids.md`; `agentic:codex-status` |
 
 ## Current design checkpoint
 

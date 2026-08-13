@@ -34,3 +34,18 @@ Quota at the checkpoint: Codex primary window had 77% remaining (weekly reset 20
 Europe/Zurich); Claude Max showed 6% all-model weekly remaining and 2% Fable weekly remaining
 (reset 2026-08-15 00:00), with its current-session window resetting 2026-08-13 23:10. Implementation
 therefore routes through WSL Codex; Claude is reserved for the bounded opposite-family re-review.
+
+At dispatch, all four topic-control sessions use the documented Codex Sol/high route fallback
+because native Claude capacity is insufficient for four persistent orchestrators. Their clean
+control worktrees are `/home/codex/repos/netscript-007-{docs,internals,fixes,features}` at exact
+`main` `01e096049`; thread identities and steering commands are recorded after launch.
+
+| Lane | Topic thread | Worktree | Same-thread steering |
+| --- | --- | --- | --- |
+| docs | `019ffcc0-e19b-71d1-95ce-8c72559eb026` | `/home/codex/repos/netscript-007-docs` | `codex exec resume 019ffcc0-e19b-71d1-95ce-8c72559eb026 -- "<follow-up>"` |
+| internals | `019ffcc0-e1b5-74f0-96eb-cdeb298d6b17` | `/home/codex/repos/netscript-007-internals` | `codex exec resume 019ffcc0-e1b5-74f0-96eb-cdeb298d6b17 -- "<follow-up>"` |
+| fixes | `019ffcc0-e1ae-7b70-b3b8-8804ebd6f773` | `/home/codex/repos/netscript-007-fixes` | `codex exec resume 019ffcc0-e1ae-7b70-b3b8-8804ebd6f773 -- "<follow-up>"` |
+| features | `019ffcc0-e1d2-7850-a308-354b670c6f3d` | `/home/codex/repos/netscript-007-features` | `codex exec resume 019ffcc0-e1d2-7850-a308-354b670c6f3d -- "<follow-up>"` |
+
+All four sessions were launched attached through `agentic:launch-codex-slice`; live status reports
+one working Sol/high agent at each exact worktree and no route or worktree ownership collision.

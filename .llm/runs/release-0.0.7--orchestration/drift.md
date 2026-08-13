@@ -10,6 +10,7 @@
 | 2026-08-13T22:42:00Z | First PLAN-EVAL used Claude Opus/high instead of Fable/medium. | Valid opposite-family verdict retained; route deviation recorded; same conversation gets the sole bounded re-review. |
 | 2026-08-13T22:42:00Z | Evaluator write hook created a temporary worktree despite read-only intent. | Artifact captured; session stopped; worktree and temporary branch removed; no product mutation retained. |
 | 2026-08-13T23:03:00Z | Fable reached the monthly spend limit after completing cycle-2 evidence collection but before verdict emission. | Same conversation, same cycle, and same evidence used the recorded Opus fallback for final synthesis; verdict `APPROVED`. |
+| 2026-08-13T23:10:00Z | Canonical topic-orchestrator route is Claude Opus/high, but native Claude quota is nearly exhausted and Fable already hit the spend limit. | Use the documented same-role Codex Sol/high fallback for the four control sessions; implementations remain Codex-routed and opposite-family evaluation evidence is still mandatory per leaf. |
 
 No implementation drift is accepted. The plan repair changes orchestration evidence and public issue
 contracts only; leaf implementation remains blocked until PLAN-EVAL approval.
