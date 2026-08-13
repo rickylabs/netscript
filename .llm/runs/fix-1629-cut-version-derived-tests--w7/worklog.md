@@ -67,6 +67,7 @@ cut-local fixture helper only for tests that intentionally exercise pre-publish 
 | 2026-08-13 | refinement | provenance/scope audit | Retracted the coherence negative-control failure claim, confirmed that test is untouched, restored the verifier's intentional fixed `0.0.5` coherent-local fixture, and audited all shared local-resolution seam placements. |
 | 2026-08-13 | refinement | focused/static gates | 35 affected tests/55 steps pass; check, lint, fmt, quality, and focused CLI check all exit 0. |
 | 2026-08-13 | refinement | seam ordering | Installed the shared local mapper at fixture-project creation before every affected install/config/plugin flow; callers refresh it only after those flows intentionally rewrite imports. |
+| 2026-08-13 | refinement | exact-head proof | Fresh no-hardlink clone of `175725981` passed the 0.0.7 release-cut dry-run and full suite: 3386 passed, 0 failed, 17 ignored. Static and fitness gates were rerun at the same implementation head and passed. |
 
 ## Decisions
 
@@ -93,7 +94,7 @@ cut-local fixture helper only for tests that intentionally exercise pre-publish 
 | `deno task fmt:check` | PASS — 2034 files, 0 findings |
 | `deno task quality:gate` | PASS — no quality findings; architecture gate exited 0 |
 | focused `packages/cli` check | PASS — 878 files, 8 batches, 0 diagnostics |
-| disposable 0.0.7 cut + full test | PASS — dry-run skipped branch/commit/push/PR; 3386 tests, 0 failed |
+| disposable 0.0.7 cut + full test | PASS — exact implementation head `175725981`; dry-run skipped branch/commit/push/PR; 3386 tests, 0 failed |
 | refinement audit | PASS — 35 affected tests/55 steps; static/fitness gates refreshed after restoring fixed fixture |
 
 ## Handoff Notes

@@ -36,12 +36,12 @@ release-coherence negative control and the restored synthetic coherent-local-gra
 
 ## In Progress
 
-- Refinement gate rerun, evidence commit, and draft PR narrative update.
+- Final evidence commit and draft PR narrative update.
 
 ## Next Steps
 
-1. Commit/push the final seam-ordering refinement.
-2. Run the final disposable bumped-tree proof and update the draft PR narrative.
+1. Commit/push the exact-head proof artifacts and update the draft PR narrative.
+2. Verify acceptance mirroring, lock hygiene, and draft metadata.
 3. Stop without changing draft state or labels.
 
 ## Key Decisions
@@ -75,7 +75,8 @@ release-coherence negative control and the restored synthetic coherent-local-gra
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: owner refinement restored one intentional fixed-version fixture and corrected one evidence
+  provenance claim; recorded in `drift.md`.
 - Debt: none introduced or deepened.
 
 ## Commits

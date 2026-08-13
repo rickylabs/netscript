@@ -193,7 +193,8 @@ exit: 0
 
 ## Final requested gates
 
-All commands ran from `/home/codex/repos/ns006-w7` at final implementation commit `cce0f01e6`.
+The static and fitness commands below were rerun from `/home/codex/repos/ns006-w7` at refined
+implementation commit `175725981` after the shared seam was moved to temporary-project creation.
 
 ```text
 $ rtk proxy deno task check
@@ -239,8 +240,9 @@ exit: 0
 
 ## Decisive disposable 0.0.7 proof
 
-Fresh no-hardlink clone: `/tmp/netscript-1629-final.EefZ2l/repo`, cloned from final implementation
-commit `cce0f01e6`. No command in this section targeted the working tree or the live `0.0.6` cut.
+Fresh no-hardlink clone: `/tmp/netscript-1629-final-refine.ku78HE/repo`, cloned from refined
+implementation commit `175725981`. No command in this section targeted the working tree or the live
+`0.0.6` cut.
 
 ```text
 $ rtk proxy deno task release:cut -- 0.0.7 --dry-run
@@ -278,13 +280,18 @@ rejects a split root and subpath with every involved version ... ok
 fails closed on a non-exact closure member ... ok
 generated closure verifier rejects split JSR identities with version-bearing output ... ok
 generated closure verifier fails closed on a range pin ... ok
-ok | 3386 passed (624 steps) | 0 failed | 17 ignored (4m33s)
+ok | 3386 passed (624 steps) | 0 failed | 17 ignored (3m49s)
 exit: 0
 ```
 
 This proves an arbitrary coordinated bump survives both failure classes. Published-consumer
 strictness is unchanged: the range and split-identity cases above still assert rejection, and the
 local import mapper's missing-target test still requires `Deno.errors.NotFound`.
+
+The same exact-head full run also executed the untouched release-coherence negative control. Its
+deliberate `Release version coherence: FAIL ...` post-test output was followed by `... ok`; both
+coherence tests passed. That confirms the provenance correction without changing the negative
+fixture's meaning.
 
 ## Lock hygiene
 
