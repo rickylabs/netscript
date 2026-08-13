@@ -6,7 +6,8 @@ import { parseTap } from './run-deno-test.ts';
 Deno.test('TAP parser groups duplicate failure shapes while retaining test locations', () => {
   const message = (line: number) =>
     JSON.stringify({
-      message: `Error: same failure\n    at file:///repo/example_test.ts:${line}:3`,
+      message:
+        `Error: same failure\n\u001b[31mDeno.test('case ${line}', () => fail());\u001b[0m\n\u001b[31m  ^\u001b[0m\n    at file:///repo/example_test.ts:${line}:3`,
       severity: 'fail',
       at: { file: './example_test.ts', line, column: 6 },
     });

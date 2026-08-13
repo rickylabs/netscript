@@ -163,6 +163,7 @@ function asLocation(value: TapDiagnostic['at']): TestLocation {
 function normalizeFailure(message: string, cwd: string): string {
   const normalizedCwd = cwd.replaceAll('\\', '/').replace(/\/$/, '');
   const normalized = message
+    .replace(/\u001b\[[0-9;]*m/g, '')
     .replaceAll('\\', '/')
     .replaceAll(`file://${normalizedCwd}/`, 'file://<cwd>/')
     .replaceAll(`${normalizedCwd}/`, '<cwd>/')
