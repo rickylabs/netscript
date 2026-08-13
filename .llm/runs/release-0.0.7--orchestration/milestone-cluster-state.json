@@ -419,9 +419,9 @@
     {
       "id": "rfc-plugin-cli-contribution",
       "lane": "features",
-      "phase": "implementing",
+      "phase": "blocked",
       "baseBranch": "main",
-      "headSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+      "headSha": "12276e6d86403ed1340ef79a963e87d401d643e9",
       "issueNumbers": [1502],
       "implementerAgentId": "019ffcc5-d3e1-7c13-9815-e9956ec43683",
       "evaluatorAgentId": null,
