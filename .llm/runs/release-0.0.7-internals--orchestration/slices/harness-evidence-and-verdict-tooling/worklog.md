@@ -82,12 +82,13 @@ output are not verdict sources.
 | Slice | Receipt | Result |
 | --- | --- | --- |
 | S1 RED | `receipts/s1-red.json` | expected type-check failure: the structured validation/report APIs did not exist |
-| S1 focused test | `receipts/s1-green.json` | PASS, 18 passed / 0 failed |
+| S1 focused test | `receipts/s1-green.json` | PASS after Tier-A fix, 19 passed / 0 failed |
 | S1 focused check | `receipts/s1-check.json` | PASS, 0 diagnostics across the four S1 files |
 | S1 focused format | `receipts/s1-fmt.json` | PASS, 4 files / 0 findings |
 
-S1 is not self-certified: the working-tree diff and receipts are awaiting substantive Tier-A topic
-orchestrator review before the supervisor sign-off commit.
+S1 is not self-certified: first Tier-A review requested one mirror-boundary fixture. That fixture and
+replacement green receipts are prepared as a follow-up candidate for Tier-A re-review before the
+supervisor sign-off commit.
 
 ## Reconcile notes
 
@@ -110,3 +111,12 @@ orchestrator review before the supervisor sign-off commit.
   failures into an explicit `ok:false` report; zero checkbox targets are rejected once before any
   per-index matching with remove-or-convert guidance. No mutation occurs in dry-run fixtures. The
   focused test/check/format receipts are green; Tier-A review is the remaining slice gate.
+- S1 Tier-A review (`2026-08-13T20:50:46Z`): `CHANGES_REQUESTED` on candidate
+  `a4a3010427afa43a36ac1c477b854e067162464a`. The typed error/report split, pre-mutation
+  validation, explicit failure verdict, and zero-checkbox ordering were accepted. The reviewer
+  required one mirror-boundary regression for a non-existent index on an otherwise checkbox-bearing
+  issue and separately flagged the coordinator-owned #1561 documentation/closing-keyword conflict.
+- S1 review response (`2026-08-13T20:58:34Z`): added the exact boundary fixture; the mirror resolves
+  to `ok:false`, preserves the index-specific repair diagnostic, and performs zero updates. Focused
+  test/check/format replacement receipts pass at 19/19, zero diagnostics, and zero findings. Tier-A
+  re-review remains required; the skill/closure conflict is recorded in `drift.md`, not widened.

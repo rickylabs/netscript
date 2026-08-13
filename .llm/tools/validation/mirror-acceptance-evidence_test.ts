@@ -159,3 +159,29 @@ entries:
   assertEquals(rendered.includes('box-index 2'), false);
   assertEquals(client.updates, 0);
 });
+
+Deno.test('mirror reports an unmatched index without rejecting or mutating', async () => {
+  const client = dryRunClient(
+    `Closes #1561
+
+\`\`\`acceptance-evidence
+issue: 1561
+entries:
+  - box-index: 1
+    evidence: "focused test receipt"
+  - box-index: 2
+    evidence: "index does not exist"
+\`\`\``,
+    '## Acceptance\n- [ ] parser reports authoring failures',
+  );
+
+  const report = await runAcceptanceEvidenceMirror(client, { pr: 1644, dryRun: true }, {
+    evaluatedAt: '2026-08-13T20:02:00Z',
+  });
+
+  assertEquals(report.ok, false);
+  assertEquals(report.errors, [
+    'Issue #1561: no acceptance box matched box-index 2; add an entry for box "#2" using exact trimmed text or its current box-index.',
+  ]);
+  assertEquals(client.updates, 0);
+});
