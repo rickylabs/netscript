@@ -65,7 +65,7 @@ jobs:
             packages/plugin/src/config/mod.ts packages/plugin/src/protocol/mod.ts
       - name: Upload code-quality gate receipts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ github.workflow }}-${{ github.job }}-gate-receipts-${{ github.run_id }}-${{ github.run_attempt }}
           path: .llm/tmp/gate-receipts/code-quality/*.json
@@ -87,7 +87,7 @@ jobs:
           --output .llm/tmp/gate-receipts/code-quality-repo/scan.json -- --pretty
       - name: Upload repo-wide quality receipt
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ github.workflow }}-${{ github.job }}-gate-receipts-${{ github.run_id }}-${{ github.run_attempt }}
           path: .llm/tmp/gate-receipts/code-quality-repo/*.json

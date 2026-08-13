@@ -1,4 +1,17 @@
 export const GATE_CATALOG = {
+  'gates-test': ['deno', 'task', 'gates:test'],
+  'milestone-cluster-test': ['deno', 'task', 'harness:milestone:test'],
+  'agentic-lifecycle-test': [
+    'deno',
+    'test',
+    '--allow-read',
+    '--allow-env',
+    '.github/scripts/phase-eval-status.test.ts',
+    '.github/scripts/openhands-comment-trigger.test.ts',
+    '.llm/tools/agentic/openhands/phase-eval-workflow_test.ts',
+    '.llm/tools/agentic/github/gh-pr_test.ts',
+    '.llm/tools/agentic/lib/agentic-lib_test.ts',
+  ],
   'check-test-job': ['deno', 'task', 'check'],
   'quality-job': ['deno', 'task', 'ci:quality'],
   check: ['deno', 'task', 'check'],

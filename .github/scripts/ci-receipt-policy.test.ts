@@ -18,7 +18,7 @@ Deno.test('authoritative CI jobs run repository gates through durable receipts',
   for (const text of [ci, quality, fresh]) {
     assertStringIncludes(text, '.llm/tools/gates/run-gate.ts');
     assertStringIncludes(text, 'if: always()');
-    assertStringIncludes(text, 'actions/upload-artifact@v4');
+    assertStringIncludes(text, 'actions/upload-artifact@v5');
     assertStringIncludes(text, 'github.run_id');
     assertStringIncludes(text, 'github.run_attempt');
     assertStringIncludes(text, 'if-no-files-found: error');

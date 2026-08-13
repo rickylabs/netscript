@@ -275,7 +275,7 @@ jobs:
 
       - name: Upload check-test gate receipts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ github.workflow }}-${{ github.job }}-gate-receipts-${{ github.run_id }}-${{ github.run_attempt }}
           path: .llm/tmp/gate-receipts/check-test/*.json
@@ -420,7 +420,7 @@ jobs:
 
       - name: Upload quality gate receipts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ github.workflow }}-${{ github.job }}-gate-receipts-${{ github.run_id }}-${{ github.run_attempt }}
           path: .llm/tmp/gate-receipts/quality/*.json

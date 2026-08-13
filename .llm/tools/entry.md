@@ -124,7 +124,7 @@ forking its skill content.
 - Purpose: execute an allowlisted existing gate with bounded output capture and atomically persist
   an immutable-head-bound JSON receipt.
 - Example:
-  `deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/gates/run-gate.ts --gate check --id check-1 --output .llm/tmp/gate-receipts/check.json`
+  `deno task gates:run --gate check --id check-1 --output .llm/tmp/gate-receipts/check.json`
 - Worker semantics: reuse one `LifecycleMemoryStore` across the lifecycle so same-ID/same-hash
   requests replay instead of spawning again. This is not a cross-process lock.
 - E2E: preserve the E2E report and reference it using `--child-report`; do not replace or nest its

@@ -68,7 +68,7 @@ jobs:
 
       - name: Upload Fresh UI gate receipts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ github.workflow }}-${{ github.job }}-gate-receipts-${{ github.run_id }}-${{ github.run_attempt }}
           path: .llm/tmp/gate-receipts/fresh-ui/*.json

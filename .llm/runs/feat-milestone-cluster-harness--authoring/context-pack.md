@@ -2,26 +2,28 @@
 
 ## Current State
 
-The 0.0.6 retrospective is owner-approved. A fresh branch from `main@624e1d736` is active. Three
-read-only audits are mapping the existing milestone profile, gate toolchain, and evaluator Actions.
+The approved implementation is integrated on draft PR #1636 from `main@624e1d736`. Step 0 cluster
+contracts, durable receipts/CI adoption, and evaluator lifecycle hardening are implemented.
 
 ## Completed
 
 - Stable 0.0.6 release and retrospective.
-- Scope and five locked design decisions recorded.
+- Three independent read-only audits.
+- PLAN-EVAL cycle 1 `FAIL_PLAN`, amendments, cycle 2 `PASS_PLAN`.
+- Three isolated implementation slices integrated.
+- Focused cluster, receipt, wrapper, CI-policy, and evaluator lifecycle suites green.
 
 ## In Progress
 
-- Existing-surface audits and profile design.
+- Final immutable-head receipt gates, independent IMPL-EVAL, and PR readiness.
 
 ## Next Steps
 
-1. Integrate audit findings into the profile and tool schema.
-2. Run separate PLAN-EVAL.
-3. Implement, validate, and open/update the draft PR.
+1. Commit integration refinements and run final receipt-backed gates.
+2. Run a fresh opposite-family IMPL-EVAL.
+3. Address findings, update PR evidence, and move to ready only on PASS.
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: D-1 records owner-directed Opus substitution for prohibited Fable usage.
 - Debt: none accepted.
-

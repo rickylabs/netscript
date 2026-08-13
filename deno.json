@@ -45,6 +45,7 @@
     "check:emitted-samples": "deno run --allow-read --allow-write --allow-run .llm/tools/validation/check-emitted-samples.ts",
     "check:streams-types": "deno task --cwd packages/fresh check:streams-types",
     "test": "deno test --allow-all",
+    "gates:run": "deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/gates/run-gate.ts",
     "gates:test": "deno test --allow-read --allow-write --allow-run --allow-env .llm/tools/gates/*_test.ts .llm/tools/run-deno-check_test.ts .llm/tools/run-deno-lint_test.ts .llm/tools/run-deno-fmt_test.ts .llm/tools/run-deno-doc-lint_test.ts .github/scripts/ci-receipt-policy.test.ts",
     "test:redis-regression": "deno run --allow-env=NETSCRIPT_TEST_REDIS_URL --allow-read --allow-run .llm/tools/validation/redis-regression-gate.ts",
     "test:redis-regression:negative-control": "deno run --allow-env=NETSCRIPT_TEST_REDIS_URL --allow-read --allow-write=packages/kv/adapters/redis.adapter.ts --allow-run .llm/tools/validation/redis-regression-gate.ts --negative-control",

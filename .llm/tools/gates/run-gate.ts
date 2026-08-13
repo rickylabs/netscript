@@ -123,7 +123,8 @@ export async function main(args: string[] = Deno.args): Promise<number> {
   };
   const abort = new AbortController();
   const interrupt = () => abort.abort();
-  Deno.addSignalListener('SIGINT', interrupt);
+  const signals: Deno.Signal[] = ['SIGINT', 'SIGTERM'];
+  for (const signal of signals) Deno.addSignalListener(signal, interrupt);
   try {
     const receipt = await executeGate(request, {
       store: new AtomicFileReceiptStore(resolve(options.output)),
@@ -138,7 +139,7 @@ export async function main(args: string[] = Deno.args): Promise<number> {
       ? receipt.exitCode
       : 1;
   } finally {
-    Deno.removeSignalListener('SIGINT', interrupt);
+    for (const signal of signals) Deno.removeSignalListener(signal, interrupt);
   }
 }
 

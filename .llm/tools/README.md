@@ -59,9 +59,10 @@ for replicating the `agentic/` cleanup standard on other folders.
   [Dependency toolbelt](#dependency-toolbelt-llmtoolsdeps).
 - Use `.llm/tools/fitness/*.ts` for doctrine and package-readiness gates; do not duplicate those
   scripts under `.llm/tools`.
-- Use `.llm/tools/gates/run-gate.ts` for allowlisted CI/worker gates whose outcome must remain
-  available after logs or agent context disappear. Its receipt proves one command only; evaluate the
-  complete evidence set separately. Do not wrap E2E domain reports a second time.
+- Use `deno task gates:run --gate <id> --id <invocation> --output <receipt.json>` for allowlisted
+  CI/worker gates whose outcome must remain available after logs or agent context disappear. Its
+  receipt proves one command only; evaluate the complete evidence set separately. Do not wrap E2E
+  domain reports a second time.
 - Use the `.llm/tools/agentic/` suite for agent orchestration (Codex/OpenHands/GitHub lanes, the WSL
   foundation, and the Claude surface). Start from its [`README`](./agentic/README.md); change a
   model/version/endpoint only in `.llm/tools/agentic/config/`.
