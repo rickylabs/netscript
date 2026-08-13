@@ -128,7 +128,7 @@ export interface CanaryPairDependencies {
     revision: string,
     path: string,
   ) => Promise<Uint8Array>;
-  readonly generatedOutputsFresh?: (root: string) => Promise<void>;
+  readonly generatedOutputsFresh?: (root: string) => Promise<unknown>;
   readonly request: typeof githubRequest;
 }
 
@@ -242,10 +242,14 @@ export async function verifyGreenCanaryPair(
             );
           }
         }
-        const assertFresh = dependencies.generatedOutputsFresh ??
-          assertPreparedReleaseGeneratedOutputsFresh;
+        const assertFresh = dependencies.generatedOutputsFresh;
         try {
-          await assertFresh(root);
+          const proof = assertFresh ? await assertFresh(root) : undefined;
+          if (proof !== PREPARED_RELEASE_FRESHNESS_PROOF) {
+            throw new Error(
+              'Stable publication blocked: semantic generated-output freshness was not proven.',
+            );
+          }
         } catch (error) {
           if (agentDocsChanged) {
             throw new Error(
@@ -338,11 +342,13 @@ export async function isExactAgentDocsProvenanceReplacement(
       previousVersion,
       beforeFiles,
       beforePayload,
+      beforeProse.byteLength,
     ) && await provenanceMatchesCanonicalCorpus(
       after,
       nextVersion,
       afterFiles,
       afterPayload,
+      afterProse.byteLength,
     ) &&
       JSON.stringify(before.files) === JSON.stringify(after.files);
   } catch {
@@ -382,14 +388,32 @@ async function provenanceMatchesCanonicalCorpus(
   version: string,
   files: readonly string[],
   uncompressed: Uint8Array,
+  compressedBytes: number,
 ): Promise<boolean> {
-  // sourceCommit and extractionTimestamp are render metadata, while compressedBytes describes a
-  // transport the semantic corpus gate deliberately allows to vary. Canonical identity is the
-  // ordered file set plus the uncompressed length and digest.
+  // sourceCommit and extractionTimestamp describe the render; they do not authorize canary
+  // inheritance and may legitimately change between revisions. They must still be values the
+  // writer can emit: a nine-character lowercase Git object abbreviation and canonical UTC ISO
+  // timestamp. compressedBytes is likewise checked only against its own revision's blob, so this
+  // closes forged sidecars without comparing gzip encoders across revisions (#1626).
   return provenance.version === version &&
+    /^[0-9a-f]{9}$/.test(provenance.sourceCommit) &&
+    isCanonicalIsoTimestamp(provenance.extractionTimestamp) &&
     JSON.stringify(provenance.files) === JSON.stringify(files) &&
     provenance.uncompressedBytes === uncompressed.byteLength &&
+    provenance.compressedBytes === compressedBytes &&
     provenance.sha256 === await sha256Hex(uncompressed);
+}
+
+function isCanonicalIsoTimestamp(value: string): boolean {
+  // Honest writers emit UTC RFC3339 with `Z` and either omit fractional seconds or use the three
+  // millisecond digits produced by Date.toISOString(). Offsets and every other byte shape are not
+  // provenance this writer can produce. The round trip also rejects impossible calendar values.
+  const match = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{3}))?Z$/.exec(value);
+  if (!match) return false;
+  const timestamp = new Date(value);
+  if (Number.isNaN(timestamp.valueOf())) return false;
+  const canonical = `${match[1]}.${match[2] ?? '000'}Z`;
+  return timestamp.toISOString() === canonical;
 }
 
 async function sha256Hex(bytes: Uint8Array): Promise<string> {
@@ -416,11 +440,15 @@ const defaultPreparedReleaseFreshnessDependencies: PreparedReleaseFreshnessDepen
   runDeno: (root, args) => runCheckedCommand(root, args),
 };
 
+// Identity, not structure, proves the production freshness pipeline reached its terminal verdict.
+// Dependency stubs cannot manufacture this module-private capability from self-consistent sidecars.
+const PREPARED_RELEASE_FRESHNESS_PROOF = Object.freeze({});
+
 /** Reproduce semantic corpus content and every downstream generated release asset from HEAD. */
 export async function assertPreparedReleaseGeneratedOutputsFresh(
   root: string,
   dependencies: PreparedReleaseFreshnessDependencies = defaultPreparedReleaseFreshnessDependencies,
-): Promise<void> {
+): Promise<unknown> {
   const dirty = await dependencies.trackedStatus(root);
   if (dirty) {
     throw new Error(
@@ -439,6 +467,7 @@ export async function assertPreparedReleaseGeneratedOutputsFresh(
     '.llm/tools/generate-cli-assets-barrel.ts',
     '--check',
   ]);
+  return PREPARED_RELEASE_FRESHNESS_PROOF;
 }
 
 async function runCheckedCommand(root: string, args: readonly string[]): Promise<void> {
