@@ -508,3 +508,77 @@ $ deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root <six chang
 {"command":"deno fmt --check","mode":"check","summary":{"filesSelected":6,"batches":1,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
 EXIT_CODE=0
 ```
+
+## Forged-sidecar correction
+
+Independent orchestrator execution against the earlier branch revision demonstrated that
+`isExactAgentDocsProvenanceReplacement` accepted a forged sidecar on both revisions when the
+canonical payload/hash/file count were honest but `compressedBytes` was `999999` and
+`sourceCommit` / `extractionTimestamp` were empty. That acceptance was a real security-boundary gap,
+not a theoretical concern.
+
+Commit `95a74182b` closes it without restoring cross-encoder gzip comparisons:
+
+- each provenance `compressedBytes` must equal its own revision's actual compressed blob length;
+- the closed exact-key schema and pinned `schemaVersion: 1` remain enforced;
+- `sourceCommit` must be the writer's nine-character lowercase hexadecimal Git abbreviation;
+- `extractionTimestamp` must be canonical UTC RFC3339 ending in `Z`, with either no fractional
+  seconds or exactly three millisecond digits. Empty, impossible, offset, non-UTC, and other shapes
+  are rejected;
+- canonical uncompressed SHA-256, file list, and uncompressed byte-count checks remain unchanged;
+- a custom freshness callback cannot authorize inheritance merely by resolving: it must return the
+  module-private proof produced only after `assertPreparedReleaseGeneratedOutputsFresh` reaches its
+  terminal verdict.
+
+The timestamp grammar was widened after an initial over-strict implementation required the exact
+`Date.toISOString()` byte shape and rejected legitimate writer/fixture values without fractional
+seconds. In that first 24/6 run, the freshness-stub and failing-freshness tests were short-circuited
+by provenance rejection and therefore did not test their intended guarantee. The corrected 31/0
+run below reaches their intended errors: the resolving stub is refused because semantic freshness
+was not proven, while the deliberately failing semantic check surfaces its writer-staleness error.
+
+The complete focused publisher-suite output is reproduced untruncated:
+
+```text
+$ deno test --allow-read --allow-write --allow-run --allow-env .llm/tools/release/github-release_test.ts
+Check .llm/tools/release/github-release_test.ts
+running 31 tests from ./.llm/tools/release/github-release_test.ts
+toVersion strips a single leading v; toTag re-adds it ... ok (365µs)
+version-only diff accepts the complete release version surface only ... ok (518µs)
+agent-docs provenance rejects forged sidecars for their own compressed blobs ... ok (9ms)
+agent-docs provenance rejects impossible render metadata with honest blob lengths ... ok (2ms)
+agent-docs provenance accepts writer-valid UTC timestamps with optional milliseconds ... ok (2ms)
+generated release freshness checks semantic prose before downstream assets ... ok (182µs)
+generated release freshness stops before downstream checks when semantic prose is stale ... ok (475µs)
+version-only diff accepts a realistic coordinated release cut and rejects source drift ... ok (5ms)
+green canary pair accepts current SHA or a version-only immediate parent ... ok (372µs)
+parent canary evidence checks every release path and reproduces derived writer outputs ... ok (1ms)
+parent canary evidence accepts a genuinely re-rendered version-derived corpus ... ok (54ms)
+parent canary evidence refuses a freshness stub without semantic proof ... ok (46ms)
+parent canary evidence rejects semantically drifted rebuilt corpus content ... ok (45ms)
+parent canary evidence fails when derived writer outputs cannot be reproduced ... ok (1ms)
+parent canary evidence rejects self-consistent non-version agent-docs injection ... ok (1ms)
+parent canary evidence rejects writer-preserved non-version provenance injection ... ok (2ms)
+canary pair gate fails closed for source drift and API failure ... ok (380µs)
+parent canary evidence rejects seeded manifest drift inside a version file ... ok (199µs)
+formatClosedIssues renders a bulleted list, empty when none ... ok (70µs)
+composeReleaseBody orders intro, changelog, closed issues and drops blanks ... ok (127µs)
+--prev-tag resolves a dated window and queries closed issues ... ok (226µs)
+known previous tag with empty since fails loudly before reporting closed issues ... ok (112µs)
+explicit previous tag uses release date with commit-date fallback ... ok (165µs)
+parseArgs: version positional or flag, defaults to non-prerelease Latest ... ok (70µs)
+parseArgs: --prerelease implies not-Latest; explicit --latest with it throws ... ok (402µs)
+parseArgs: --no-latest overrides the default ... ok (81µs)
+parseArgs: every documented release:publish invocation is accepted ... ok (467µs)
+parseArgs: intro is required (the deliberate manual step) ... ok (75µs)
+parseArgs: version is required ... ok (94µs)
+parseArgs: notes-file and message are mutually exclusive ... ok (58µs)
+parseArgs: unknown flag and missing value are rejected ... ok (204µs)
+
+ok | 31 passed | 0 failed (185ms)
+EXIT_CODE=0
+```
+
+The scoped manifest comparator remains the implementation from `d5f9f8f1d`: it delegates to
+`rewriteNetScriptVersion`, changes NetScript pins and owned `version` fields, and leaves incidental
+third-party version `0.0.52` unchanged. Neither release lockfile was edited.
