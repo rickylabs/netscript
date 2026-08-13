@@ -10,7 +10,8 @@
 - Live issue fetched `2026-08-13T20:23:46.556Z`; current issue is open and has no acceptance
   checkboxes. Its milestone comment conflicts with the cluster's 0.0.7 assignment; leaf will not
   mutate central issue state.
-- Reproduced live pins in the auth default, streams manifest, and copy fixture. The generated skill
+- Reproduced the auth default defect and the filed streams manifest/copy occurrences. Validation
+  subsequently classified the latter as required compatibility metadata; the generated skill
   occurrence is historical diagnostic prose, not a pin.
 - #1206's real endpoint-discovery seam lives in `@netscript/mcp`; wiring it crosses the frozen leaf
   surface. Locked remedy: explicit required `--stream-url` with Aspire discovery guidance.
@@ -28,5 +29,14 @@
 - Resume scope is the explicit-URL/fail-loud command behavior, focused tests, and structured
   non-expensive gate receipts. PR #1643 remains draft and moves from `status:plan` to `status:impl`
   only after real implementation evidence is committed and pushed.
+- Implementation commit `3d32e9ee2ee37dc9cebfe645f93e3a4ea479c215` is followed by an isolated
+  formatting commit `a212245867b77ab8d40e7330b2b7cb7409781a90`; the semantic slice therefore
+  remains directly reviewable. The committed CLI reporter config is
+  `6242edabc3679173c841e2e167f7f5786819e720`.
+- All allowed gates attest `6242edabc3679173c841e2e167f7f5786819e720`: focused check/test, root
+  lint/fmt plus changed-file CLI reports, `quality:gate`, `arch:check`, CLI doc lint, package-only
+  publish dry-run, and the CLI JSR audit are green. Receipts live under `receipts/`.
+- The only remaining work is topic-orchestrator Tier-A review and a fresh opposite-family
+  IMPL-EVAL. This implementation session must not self-certify or mark the draft ready.
 - `scaffold.runtime`, Aspire, Docker, merge, publication, and issue/milestone mutation remain
   forbidden. This run owns no runtime resources and needs no cleanup.

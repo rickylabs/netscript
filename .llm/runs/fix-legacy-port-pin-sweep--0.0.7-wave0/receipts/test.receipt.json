@@ -1,0 +1,46 @@
+{
+  "gateId": "test",
+  "invocationId": "legacy-port-pin-sweep-test-6242edabc",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    "packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts",
+    "--report-output",
+    ".llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0/receipts/test.report.json"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-leaf-legacy-port-pin-sweep",
+  "gitHead": "6242edabc3679173c841e2e167f7f5786819e720",
+  "actualGitHead": "6242edabc3679173c841e2e167f7f5786819e720",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:2199550",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "da9f12e12982a79ba3e548eb478c6fc917571637fcc2aecc468714813fe11490",
+  "lifecycleId": "worker:2199550:legacy-port-pin-sweep-test-6242edabc:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-13T20:52:17.498Z",
+  "childReport": ".llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0/receipts/test.report.json",
+  "startedAt": "2026-08-13T20:52:17.504Z",
+  "finishedAt": "2026-08-13T20:52:18.892Z",
+  "durationMs": 1389,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 172,
+    "sha256": "0449afcccf14c6cf2d77fe176c02ba5fbb18a36fc2d566b29efa2f90804c9c65",
+    "tail": "{\"report\":\".llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0/receipts/test.report.json\",\"summary\":{\"passed\":11,\"failed\":0,\"ignored\":0,\"totalResults\":11,\"uniqueFailures\":0}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 272,
+    "sha256": "26153ac0e8f1957ee800c422133f027116003571b0b3f8532dc82510ab92859b",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all 'packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts' '--report-output' '.llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0/receipts/test.report.json'\n",
+    "truncated": false
+  },
+  "childReportEvidence": {
+    "path": ".llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0/receipts/test.report.json",
+    "bytes": 349,
+    "sha256": "fd0e622c47c5cecf2e96176274761cefe2fcfacac69ad1de5e9e75c2444ef45e",
+    "modifiedAt": "2026-08-13T20:52:18.873Z"
+  }
+}

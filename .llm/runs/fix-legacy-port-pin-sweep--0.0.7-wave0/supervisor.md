@@ -19,7 +19,7 @@
 
 | Phase | Route | State |
 | --- | --- | --- |
-| Implementation | `light_implementation`: Codex / GPT-5.6 Sol / low | active in the recorded thread |
+| Implementation | `light_implementation`: Codex / GPT-5.6 Sol / low | complete; receipt head `6242edabc3679173c841e2e167f7f5786819e720` |
 | Slice review | `review_codex_light`: Claude / Opus 5 / high | topic-orchestrator owned; pending |
 | IMPL-EVAL | `formal_impl_evaluation`: fresh native opposite-family Fable 5 / medium | mandatory; pending |
 

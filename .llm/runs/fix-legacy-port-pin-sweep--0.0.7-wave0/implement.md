@@ -22,3 +22,12 @@ review plus separate opposite-family IMPL-EVAL. Never merge or publish.
 - Finish the explicit `--stream-url` fail-loud guidance and focused tests, produce structured
   non-expensive receipts, and stop for Tier-A review plus separate IMPL-EVAL.
 - Do not request or run `scaffold.runtime`, mark ready, merge, or publish.
+
+## Implementation result
+
+- Semantic implementation: `3d32e9ee2ee37dc9cebfe645f93e3a4ea479c215`.
+- Mechanical formatting slice: `a212245867b77ab8d40e7330b2b7cb7409781a90`.
+- Durable gate receipt head: `6242edabc3679173c841e2e167f7f5786819e720`.
+- All authorized non-expensive gates passed; receipts and structured reports are in `receipts/`.
+- Stop state: draft PR at `status:impl`, awaiting topic-orchestrator Tier-A review and a fresh
+  opposite-family IMPL-EVAL. No ready transition, merge, publication, or runtime lease.

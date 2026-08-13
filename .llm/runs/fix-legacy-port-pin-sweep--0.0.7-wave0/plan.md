@@ -2,8 +2,8 @@
 
 ## Status
 
-Plan locked. `PLAN-EVAL: N/A` is justified below. The release coordinator has authorized the sole
-additional focused-test surface, so narrow implementation may resume.
+Plan implemented. `PLAN-EVAL: N/A` remains justified below. The narrow source and authorized focused
+test are complete; the run is awaiting Tier-A review and separate opposite-family IMPL-EVAL.
 
 ## Frozen boundary
 
@@ -44,8 +44,8 @@ crossing that boundary.
    `worklog.md`/`context-pack.md`; gates: focused auth command test plus structured check/lint/fmt/test
    receipts, `quality:gate`, and `arch:check`.
 3. **Publishability and handoff evidence** — files: run artifacts/receipts only; gates: applicable
-   JSR audit and canonical publish dry-run. `scaffold.runtime` runs only if the orchestrator grants
-   the singleton lease.
+   JSR audit and canonical publish dry-run. Completed without requesting or running
+   `scaffold.runtime`, as directed by the coordinator.
 
 ## Risk register
 

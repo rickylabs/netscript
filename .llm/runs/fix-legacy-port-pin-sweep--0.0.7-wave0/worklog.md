@@ -34,9 +34,30 @@ explicit-URL/fail-loud fallback, so the implementation is locked and mechanical.
 | Focused structured check reporter (authorized implementation, pre-commit) | PASS | 2 files selected; 1 batch; 0 diagnostics; `deno check --unstable-kv`. |
 | Focused structured test reporter (authorized implementation, pre-commit) | PASS | 11 passed, 0 failed; explicit URL forwarding and omitted-URL no-adapter-call rejection covered. |
 | Focused structured lint reporter (authorized implementation, pre-commit) | PASS | 2 files selected; 1 batch; 0 findings. A standalone workspace config is used because the root intentionally excludes `packages/cli`; it carries the root lint rules without that directory exclusion. |
+| Focused check receipt | PASS | `receipts/check.receipt.json` + child report; 2 files, 0 diagnostics; head `6242edabc3679173c841e2e167f7f5786819e720`. |
+| Focused test receipt | PASS | `receipts/test.receipt.json` + child report; 11 passed, 0 failed; same head. |
+| Root lint receipt + changed-file CLI report | PASS | `receipts/lint.receipt.json` and `receipts/cli-lint.report.json`; root gate 0 findings, changed files 0 findings. |
+| Root fmt receipt + changed-file CLI report | PASS | `receipts/fmt-check.receipt.json` and `receipts/cli-fmt.report.json`; root gate 2,034 files/0 findings, changed files 2/0 findings. |
+| `quality:gate` | PASS | `receipts/quality-gate.receipt.json`; exit 0; same head. Existing doctrine warnings remain non-blocking baseline findings. |
+| `arch:check` | PASS | `receipts/arch-check.receipt.json`; exit 0; same head. |
+| CLI doc lint | PASS | `receipts/doc-lint.receipt.json` + child report; 1 package, 3 entrypoints, 0 errors/private-type-ref/missing-JSDoc findings. |
+| CLI JSR audit | PASS | `receipts/jsr-audit.report.json`; dry run OK, 0 FAIL and 19 existing WARN findings. |
+| CLI publish dry-run | PASS | `receipts/publish-dry-run.receipt.json`; package-only canonical task, exit 0; no publish performed. |
 
-No durable receipt has been minted yet because the gate runner must attest an immutable Git head.
-`scaffold.runtime`, its lease request, Aspire, and Docker are explicitly forbidden for this turn.
+All durable command receipts attest immutable implementation/config head
+`6242edabc3679173c841e2e167f7f5786819e720`. The first receipt attempt supplied a mistyped full SHA
+and failed closed before command execution or receipt creation; it was immediately retried with the
+raw `git rev-parse HEAD` value. `scaffold.runtime`, its lease request, Aspire, and Docker were not run.
+
+## Implementation slices
+
+- `3d32e9ee2ee37dc9cebfe645f93e3a4ea479c215` — removes the inferred auth streams URL, adds
+  actionable Aspire discovery guidance, proves explicit URL forwarding, and proves omission rejects
+  before the session adapter is called.
+- `a212245867b77ab8d40e7330b2b7cb7409781a90` — mechanical formatting of only the two touched auth
+  files, isolated so the semantic patch remains reviewable.
+- `6242edabc3679173c841e2e167f7f5786819e720` — commits the isolated CLI lint/fmt reporter config used
+  because the official root tasks intentionally exclude `packages/cli`.
 
 ## Research evidence
 
@@ -54,9 +75,19 @@ contract, classify both manifest/copy `4437` values as required compatibility me
 schema/copy redesign. This resolves the test-surface blocker without reopening a material design
 choice, so `PLAN-EVAL: N/A` remains truthful.
 
-Implementation may resume only for the explicit `--stream-url` fail-loud path and focused tests,
+Implementation resumed only for the explicit `--stream-url` fail-loud path and focused tests,
 followed by structured non-expensive receipts. `scaffold.runtime`, ready transition, merge,
 publication, and central issue/milestone mutation remain forbidden.
+
+## Review and evaluator handoff
+
+Implementation and all authorized non-expensive evidence are complete. PR #1643 stays draft at
+`status:impl`. The topic orchestrator must now perform substantive Tier-A review, then launch a fresh
+opposite-family IMPL-EVAL. This implementation session does not certify either gate and must not mark
+the PR ready, merge, or publish.
+
+Resource state: no `scaffold.runtime`, Aspire, Docker, or other runtime resource was started. The
+package publish-dry-run helper removed its temporary clone; no matching temporary directory remains.
 
 ## Preserved proposed auth-command patch
 
