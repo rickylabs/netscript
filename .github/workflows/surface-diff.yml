@@ -1,17 +1,14 @@
 name: public-surface-diff
 
-# #1152: the old workflow-level `paths: packages/**` filter meant this job did
-# not report at all on non-matching PRs, so it could never be promoted to a
-# required check. The classifier's `needs_surface` output mirrors that filter
-# exactly (any `packages/**` change, plus the conservative unrecognised-path
-# escalation); the job now always starts and reports, short-circuiting to a
-# skipped-by-policy step. FAIL-CLOSED: a failed classify forces a full run.
-# Draft PR pushes schedule no surface analysis; ready and later non-draft
-# events retain the existing fail-closed vector behavior.
+# Public surface observation remains non-blocking pending #309. It runs for
+# release tags, or on a PR explicitly labeled `surface-diff-gate`/`ci:full`.
+# Ordinary PRs schedule no runner for this informational lane.
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
+  push:
+    tags: ['v*']
 
 permissions:
   contents: read
@@ -21,7 +18,11 @@ jobs:
     name: classify changes
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    if: github.event.pull_request.draft == false
+    if: >-
+      github.event_name != 'pull_request' ||
+      (github.event.pull_request.draft == false &&
+       (contains(github.event.pull_request.labels.*.name, 'surface-diff-gate') ||
+        contains(github.event.pull_request.labels.*.name, 'ci:full')))
     outputs:
       needs_surface: ${{ steps.decide.outputs.needs_surface }}
       reason: ${{ steps.decide.outputs.reason }}
@@ -43,6 +44,7 @@ jobs:
 
       - name: Compute changed files (merge-base diff, rename-aware)
         id: diff
+        if: github.event_name == 'pull_request'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
@@ -71,9 +73,9 @@ jobs:
 
   surface-diff:
     needs: classify
-    # Job always starts (so its status reports); FAIL-CLOSED on classify
-    # failure, same pattern as the other classifier consumers.
-    if: ${{ !cancelled() && github.event.pull_request.draft == false }}
+    # Only release or explicitly opted-in PR runs reach this lane. Within an
+    # applicable run, classifier failure is fail-closed.
+    if: ${{ !cancelled() && needs.classify.result != 'skipped' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:

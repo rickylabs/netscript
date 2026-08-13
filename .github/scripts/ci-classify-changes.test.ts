@@ -197,6 +197,7 @@ Deno.test('SAFETY: an unrecognised path forces EVERY output true', () => {
       surface: true,
       pages: true,
       freshUi: true,
+      freshBrowser: true,
     }, `expected full escalation for: ${p}`);
     const d = decide({ eventName: 'pull_request', files: [p], labels: [] });
     assertEquals(d.runStatic, true, p);
@@ -489,6 +490,34 @@ Deno.test('Fresh UI and Pages selectors distinguish tasks-only root config', () 
   assertEquals(toolchain.needsFreshUi, true);
 });
 
+Deno.test('managed-form browser selector is limited to Fresh and its owners', () => {
+  for (
+    const path of [
+      'packages/fresh/src/application/form/form.ts',
+      'packages/fresh/tests/form-navigation_browser.ts',
+      'packages/fresh/deno.json',
+      '.github/workflows/ci.yml',
+      '.llm/tools/gates/catalog.ts',
+    ]
+  ) {
+    assertEquals(classifyPath(path).freshBrowser, true, path);
+  }
+  for (
+    const path of [
+      'packages/cli/mod.ts',
+      'packages/kv/tests/redis.adapter_test.ts',
+      'docs/site/index.md',
+      'deno.json',
+    ]
+  ) {
+    assertEquals(
+      classifyPath(path, path === 'deno.json' ? 'tasks-only' : 'toolchain').freshBrowser,
+      false,
+      path,
+    );
+  }
+});
+
 Deno.test('stale run evidence and design references do not fan out into CI', () => {
   const d = decide({
     eventName: 'pull_request',
@@ -506,6 +535,31 @@ Deno.test('stale run evidence and design references do not fan out into CI', () 
   assertEquals(d.needsDeno, true);
   assertEquals(d.needsPages, false);
   assertEquals(d.needsFreshUi, false);
+});
+
+Deno.test('cleanup replay selects only Deno and docs, never runtime/native/browser', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: [
+      '.llm/runs/old-harness/launch.js',
+      'resources/design/dashboard/reference/record.md',
+      'tools/design-sync/src/types.ts',
+      'docs/architecture/doctrine/index.md',
+      'deno.json',
+    ],
+    labels: [],
+    rootDenoConfig: { base: DENO_BASE, head: DENO_TASKS_ONLY },
+  });
+  assertEquals(d.runStatic, false);
+  assertEquals(d.runRuntimeSqlite, false);
+  assertEquals(d.runRuntime, false);
+  assertEquals(d.needsDeno, true);
+  assertEquals(d.needsDocs, true);
+  assertEquals(d.needsDocker, false);
+  assertEquals(d.needsDesktop, false);
+  assertEquals(d.needsFreshBrowser, false);
+  assertEquals(d.needsFreshUi, false);
+  assertEquals(d.needsPages, false);
 });
 
 Deno.test('Pages and Fresh UI consume their selectors and fail closed', async () => {
@@ -530,6 +584,33 @@ Deno.test('Pages and Fresh UI consume their selectors and fail closed', async ()
     freshUi.includes(
       "RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_fresh_ui != 'false' }}",
     ),
+    true,
+  );
+});
+
+Deno.test('core CI bounds browser and docs-only quality sub-lanes', async () => {
+  const core = await Deno.readTextFile('.github/workflows/ci.yml');
+  assertEquals(
+    core.includes(
+      'needs_fresh_browser: ${{ steps.decide.outputs.needs_fresh_browser }}',
+    ),
+    true,
+  );
+  assertEquals(
+    core.includes("if: env.RUN == 'true' && env.RUN_FRESH_BROWSER == 'true'"),
+    true,
+  );
+  assertEquals(
+    core.includes("if: env.RUN_DENO == 'true'"),
+    true,
+  );
+  assertEquals(
+    core.includes("if: env.RUN_DOCS == 'true'"),
+    true,
+  );
+  assertEquals(core.includes('services:\n      redis:'), false);
+  assertEquals(
+    core.includes("if: always() && env.RUN == 'true'"),
     true,
   );
 });
@@ -749,10 +830,11 @@ Deno.test('workflow: sqlite runtime uses sibling diff guard and fails closed', a
   );
   assertEquals(
     sqliteJob!.includes(
-      "RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.run_runtime_sqlite == 'true' }}",
+      "contains(github.event.pull_request.labels.*.name, 'e2e-cli-gate')",
     ),
     true,
   );
+  assertEquals(sqliteJob!.includes("needs.classify.outputs.run_runtime_sqlite == 'true'"), true);
 
   const classifyJob = workflowJob(workflow, 'classify');
   assertEquals(typeof classifyJob, 'string');

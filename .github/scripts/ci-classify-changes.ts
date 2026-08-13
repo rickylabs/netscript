@@ -25,6 +25,8 @@
  *                        implementation/public metadata excluding tests,
  *                        docs tooling, root toolchain)
  *   - `needs_fresh_ui` -> Fresh UI sources and its dedicated quality tooling
+ *   - `needs_fresh_browser` -> managed-form Playwright coverage under
+ *                              `packages/fresh/**`
  *
  * Precision rules (#1122): only the tier-defining workflows (`e2e-cli.yml`,
  * `ci.yml`) escalate the scaffold tiers — `release-canary.yml`, `pages.yml`
@@ -100,6 +102,7 @@ export interface Capabilities {
   surface: boolean;
   pages: boolean;
   freshUi: boolean;
+  freshBrowser: boolean;
 }
 
 const NONE: Capabilities = {
@@ -111,6 +114,7 @@ const NONE: Capabilities = {
   surface: false,
   pages: false,
   freshUi: false,
+  freshBrowser: false,
 };
 
 const ALL: Capabilities = {
@@ -122,6 +126,7 @@ const ALL: Capabilities = {
   surface: true,
   pages: true,
   freshUi: true,
+  freshBrowser: true,
 };
 
 /** Normalise a git path: strip a leading `./`, collapse backslashes. */
@@ -200,6 +205,7 @@ export function classifyPath(
       deno: true,
       pages: true,
       freshUi: true,
+      freshBrowser: true,
     };
   }
   if (isDenoConfigBase(path)) {
@@ -215,10 +221,18 @@ export function classifyPath(
       pages: (path === 'deno.lock' || /^(packages|plugins)\/[^/]+\/deno\.jsonc?$/.test(path)) &&
         !isPackageTestOnly(path),
       freshUi: path.startsWith('packages/fresh-ui/'),
+      freshBrowser: path === 'deno.lock' || path.startsWith('packages/fresh/'),
     };
   }
   if (TIER_DEFINING_WORKFLOWS.has(path)) {
-    return { ...NONE, scaffold: true, docker: true, desktop: true, deno: true };
+    return {
+      ...NONE,
+      scaffold: true,
+      docker: true,
+      desktop: true,
+      deno: true,
+      freshBrowser: path === '.github/workflows/ci.yml',
+    };
   }
   if (path.startsWith('.github/workflows/')) {
     // Non-tier workflows cannot affect scaffold behaviour by construction
@@ -268,6 +282,7 @@ export function classifyPath(
       pages: (path.startsWith('packages/') || path.startsWith('plugins/')) &&
         !isPackageTestOnly(path),
       freshUi: path.startsWith('packages/fresh-ui/'),
+      freshBrowser: path.startsWith('packages/fresh/'),
     };
   }
   if (DOCS_PREFIXES.some((prefix) => path.startsWith(prefix))) {
@@ -282,6 +297,7 @@ export function classifyPath(
         '.llm/tools/run-deno-lint.ts',
         '.llm/tools/validation/fresh-ui-quality_test.ts',
       ].includes(path),
+      freshBrowser: path === '.llm/tools/gates/catalog.ts',
     };
   }
   // Unrecognised path: force EVERY gate. NEVER skip on a failed classification.
@@ -328,6 +344,7 @@ export interface Decision {
   needsSurface: boolean;
   needsPages: boolean;
   needsFreshUi: boolean;
+  needsFreshBrowser: boolean;
   reason: string;
 }
 
@@ -344,6 +361,7 @@ function fullDecision(docsOnly: boolean, reason: string, sqliteReason: string): 
     needsSurface: true,
     needsPages: true,
     needsFreshUi: true,
+    needsFreshBrowser: true,
     reason: `${reason}. ${sqliteReason}`,
   };
 }
@@ -413,6 +431,7 @@ export function decide(input: DecisionInput): Decision {
     caps.surface ||= contribution.surface;
     caps.pages ||= contribution.pages;
     caps.freshUi ||= contribution.freshUi;
+    caps.freshBrowser ||= contribution.freshBrowser;
   }
 
   const impacting = changed.filter((p) => !isDocsOnlyPath(p, rootDenoConfig));
@@ -483,6 +502,7 @@ export function decide(input: DecisionInput): Decision {
     needsSurface: caps.surface,
     needsPages: caps.pages,
     needsFreshUi: caps.freshUi,
+    needsFreshBrowser: caps.freshBrowser,
     reason: `${impactingNote}. ${staticReason}; ${sqliteReason}; ${runtimeReason}. ${vectorNote}`,
   };
 }
@@ -595,6 +615,7 @@ async function main(): Promise<void> {
     `needs_surface=${decision.needsSurface}`,
     `needs_pages=${decision.needsPages}`,
     `needs_fresh_ui=${decision.needsFreshUi}`,
+    `needs_fresh_browser=${decision.needsFreshBrowser}`,
     `reason=${reason}`,
   ];
 
@@ -614,6 +635,7 @@ async function main(): Promise<void> {
   console.log(`  needs_surface: ${decision.needsSurface}`);
   console.log(`  needs_pages:   ${decision.needsPages}`);
   console.log(`  needs_fresh_ui: ${decision.needsFreshUi}`);
+  console.log(`  needs_fresh_browser: ${decision.needsFreshBrowser}`);
   console.log(`  reason:        ${reason}`);
 
   const outPath = Deno.env.get('GITHUB_OUTPUT');

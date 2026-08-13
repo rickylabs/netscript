@@ -24,7 +24,8 @@ name: ci
 # skip requires `classify` to SUCCEED with an explicit `needs_*=false`; a
 # failed classify forces a full run. Push events (no diff) always run in
 # full. `ci:full` forces everything; the skip labels do NOT extend here.
-# `close-gate` and `deps-report` are never gated.
+# `close-gate` always runs on non-draft PRs. The informational `deps-report`
+# runs only for release tags or an explicit `ci:full` PR.
 # Draft PR pushes schedule no jobs. The full required-context set materializes
 # on `ready_for_review` and every later non-draft PR event.
 #
@@ -36,6 +37,7 @@ name: ci
 on:
   push:
     branches: [main, 'feat/package-quality']
+    tags: ['v*']
   pull_request:
     branches: [main, 'feat/**', 'epic/**', 'canary/**']
     types: [opened, synchronize, reopened, ready_for_review]
@@ -110,6 +112,7 @@ jobs:
     outputs:
       needs_deno: ${{ steps.decide.outputs.needs_deno }}
       needs_docs: ${{ steps.decide.outputs.needs_docs }}
+      needs_fresh_browser: ${{ steps.decide.outputs.needs_fresh_browser }}
       docs_only: ${{ steps.decide.outputs.docs_only }}
       reason: ${{ steps.decide.outputs.reason }}
     steps:
@@ -183,18 +186,10 @@ jobs:
     timeout-minutes: 30
     env:
       RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_deno == 'true' }}
+      RUN_FRESH_BROWSER: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_fresh_browser == 'true' }}
       SKIP_REASON: ${{ needs.classify.outputs.reason }}
       NETSCRIPT_TEST_REDIS_URL: redis://127.0.0.1:6379
-    services:
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 10
+      REDIS_CONTAINER: netscript-ci-redis-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - name: Skipped by policy
         if: env.RUN != 'true'
@@ -223,6 +218,19 @@ jobs:
         if: env.RUN == 'true'
         run: deno install
 
+      - name: Start required Redis integration service
+        if: env.RUN == 'true'
+        run: |
+          docker run --detach --rm --name "$REDIS_CONTAINER" --publish 6379:6379 redis:7-alpine
+          for attempt in $(seq 1 10); do
+            if docker exec "$REDIS_CONTAINER" redis-cli ping | grep -qx PONG; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs "$REDIS_CONTAINER"
+          exit 1
+
       - name: Repo-wide check
         if: env.RUN == 'true'
         run: >-
@@ -238,7 +246,7 @@ jobs:
           --output .llm/tmp/gate-receipts/check-test/test.json
 
       - name: Install managed-form browser test runtime
-        if: env.RUN == 'true'
+        if: env.RUN == 'true' && env.RUN_FRESH_BROWSER == 'true'
         run: |
           browser_runtime="${RUNNER_TEMP}/netscript-playwright-cli"
           npm install --prefix "$browser_runtime" @playwright/cli@0.1.17
@@ -246,11 +254,18 @@ jobs:
           "$browser_runtime/node_modules/.bin/playwright" install --with-deps chromium
 
       - name: Managed form browser regression
-        if: env.RUN == 'true'
+        if: env.RUN == 'true' && env.RUN_FRESH_BROWSER == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate fresh-browser --id check-test-fresh-browser
           --cwd packages/fresh --output .llm/tmp/gate-receipts/check-test/fresh-browser.json
+
+      - name: Stop required Redis integration service
+        if: always() && env.RUN == 'true'
+        run: |
+          if docker inspect "$REDIS_CONTAINER" >/dev/null 2>&1; then
+            docker stop "$REDIS_CONTAINER"
+          fi
 
       - name: Upload check-test gate receipts
         if: always()
@@ -270,6 +285,8 @@ jobs:
     timeout-minutes: 30
     env:
       RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_deno == 'true' || needs.classify.outputs.needs_docs == 'true' }}
+      RUN_DENO: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_deno == 'true' }}
+      RUN_DOCS: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_docs == 'true' }}
       SKIP_REASON: ${{ needs.classify.outputs.reason }}
     steps:
       - name: Skipped by policy
@@ -296,39 +313,39 @@ jobs:
           --skip-reason "${SKIP_REASON:-Classifier selected no affected quality surface.}"
 
       - name: Check docs site source format
-        if: env.RUN == 'true'
+        if: env.RUN_DOCS == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate docs-source-format --id quality-docs-format
           --cwd docs/site --output .llm/tmp/gate-receipts/quality/docs-format.json
 
       - name: Test docs site source-format checker
-        if: env.RUN == 'true'
+        if: env.RUN_DOCS == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate docs-source-format-test --id quality-docs-format-test
           --cwd docs/site --output .llm/tmp/gate-receipts/quality/docs-format-test.json
 
       - name: Install workspace dependencies
-        if: env.RUN == 'true'
+        if: env.RUN_DENO == 'true'
         run: deno install
 
       - name: Lint
-        if: env.RUN == 'true'
+        if: env.RUN_DENO == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate lint --id quality-lint
           --output .llm/tmp/gate-receipts/quality/lint.json
 
       - name: Format check
-        if: env.RUN == 'true'
+        if: env.RUN_DENO == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate fmt-check --id quality-fmt
           --output .llm/tmp/gate-receipts/quality/fmt.json
 
       - name: JSR tagline length
-        if: env.RUN == 'true'
+        if: env.RUN_DOCS == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate docs-tagline --id quality-docs-tagline
@@ -349,49 +366,49 @@ jobs:
           --output .llm/tmp/gate-receipts/quality/agent-docs-prose.json
 
       - name: Generated asset freshness
-        if: env.RUN == 'true'
+        if: env.RUN_DENO == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate assets-barrel --id quality-assets-barrel
           --output .llm/tmp/gate-receipts/quality/assets-barrel.json
 
       - name: Publish asset freshness
-        if: env.RUN == 'true'
+        if: env.RUN_DENO == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate publish-assets --id quality-publish-assets
           --output .llm/tmp/gate-receipts/quality/publish-assets.json
 
       - name: Emitted sample type-check
-        if: env.RUN == 'true'
+        if: env.RUN_DENO == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate emitted-samples --id quality-emitted-samples
           --output .llm/tmp/gate-receipts/quality/emitted-samples.json
 
       - name: NetScript JSR emitted-specifier guard
-        if: env.RUN == 'true'
+        if: env.RUN_DENO == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate netscript-jsr-specifiers --id quality-jsr-specifiers
           --output .llm/tmp/gate-receipts/quality/jsr-specifiers.json
 
       - name: Scaffold version guard (no preview pins)
-        if: env.RUN == 'true'
+        if: env.RUN_DENO == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate scaffold-versions --id quality-scaffold-versions
           --output .llm/tmp/gate-receipts/quality/scaffold-versions.json
 
       - name: Publish dry-run (0 slow-types across all units)
-        if: env.RUN == 'true'
+        if: env.RUN_DENO == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate publish-dry-run --id quality-publish-dry-run
           --output .llm/tmp/gate-receipts/quality/publish-dry-run.json
 
       - name: Critical advisory audit
-        if: env.RUN == 'true'
+        if: env.RUN_DENO == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate audit-critical --id quality-audit-critical
@@ -406,7 +423,11 @@ jobs:
           if-no-files-found: error
 
   deps-report:
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    if: >-
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.draft == false &&
+       contains(github.event.pull_request.labels.*.name, 'ci:full')) ||
+      startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -473,5 +494,9 @@ jobs:
             printf '| `classify` | ran (%s) |\n' "$CLASSIFY_RESULT"
             printf '| `check-test` | %s |\n' "$check_test_outcome"
             printf '| `quality` | %s |\n' "$quality_outcome"
-            printf '| `deps-report` | ran (%s) |\n' "$DEPS_REPORT_RESULT"
+            if [ "$DEPS_REPORT_RESULT" = "skipped" ]; then
+              echo '| `deps-report` | not scheduled (release / `ci:full` only) |'
+            else
+              printf '| `deps-report` | ran (%s) |\n' "$DEPS_REPORT_RESULT"
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
