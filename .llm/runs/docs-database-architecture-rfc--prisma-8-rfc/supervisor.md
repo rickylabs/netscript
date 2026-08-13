@@ -22,6 +22,7 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 | `deep_analysis`                       | Anthropic · Fable 5 · medium            | Architecture decision analysis when the native agentic route is available    |
 | `formal_plan_evaluation`              | Anthropic · Fable 5 · medium            | Fresh opposite-family PLAN-EVAL before the RFC file is authored              |
 | third-opinion architecture review     | OpenRouter · Qwen 3.8 Max · max         | Diversity pass over the full architecture and implementation roadmap         |
+| owner-directed adversarial RFC review | OpenCode · OpenRouter · Grok 4.6 · high | Post-draft attack on portability, migration safety, trust, and abstraction   |
 | owner-directed final refinement       | Anthropic · Fable 5 · high              | Absolute final review-and-refinement gate after every other substantive gate |
 
 ## Recorded lane/eval overrides
@@ -41,5 +42,26 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
   refinement gate. That owner directive overrides the ordinary `docs_polish` Fable-medium effort for
   this run. No substantive model gate may follow it.
 - Qwen 3.8 Max is selected as an in-policy independent architecture review for intelligence-family
-  diversity. Grok 4.6 will be used only if an existing policy-compliant, observable route is
-  present; no unrecorded paid escalation is authorized.
+  diversity.
+- The owner subsequently requires Grok 4.6 high. On 2026-08-13 the live OpenRouter models API
+  returned `x-ai/grok-4.6` with `reasoning_effort` support. The repository's static model catalog
+  still names Grok 4.5, so this is an explicit owner-directed route override rather than a claim
+  that the catalog is current. Use the existing bounded OpenCode/OpenRouter runner with model
+  `openrouter/x-ai/grok-4.6` and variant `high`, record requested/observed identity and raw receipt,
+  and run it after the complete RFC draft but before IMPL-EVAL. Grok is not the formal evaluator and
+  no substantive gate may follow the final Fable 5 high refinement.
+- Qwen integration-risk launch evidence: OpenRouter evaluator guard requested `qwen/qwen3.8-max` at
+  `max`; session `f5c1afd0-f89f-48e2-9dfc-3e8f5ade646b` initialized with observed model
+  `qwen/qwen3.8-max` and provider `Alibaba`. This is a complementary falsification pass, not
+  PLAN-EVAL.
+- Qwen's initial parent was interrupted before synthesis when a child request attempted
+  `claude-opus-5`; the HTTP-boundary evaluator guard recorded the denial and exited 78. The same
+  Qwen session is resumed in single-parent mode with all child-agent facilities forbidden. This
+  failed attempt is route evidence only and cannot be counted as a completed review.
+- The native Opus parent paused after its specialist fan-out and placeholder creation. The same Opus
+  5 high session is resumed for synthesis, preserving its completed workflow evidence rather than
+  launching a replacement author.
+- The owner elevated Prisma Next's proposed pure-TypeScript schema authoring as a second primary
+  architecture axis beside contract-derived validation. A separate read-only source audit must
+  establish the exact upstream state and derive candidate end-to-end NetScript type flows before
+  plan lock; the Opus synthesis brief now requires this subsystem explicitly.

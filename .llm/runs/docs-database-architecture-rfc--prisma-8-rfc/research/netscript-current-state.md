@@ -5,8 +5,8 @@
 - Repository: `rickylabs/netscript`
 - Baseline: `origin/main` at `cd720529333328bcba5e1a308ce7632f4350efdf`
 - Audit date: 2026-08-13
-- Package dependency baseline: Prisma `7.8.0` in the root catalog/lock; generated workspaces still
-  encode `^7.4.2` specifiers.
+- Package dependency baseline: the root catalog declares Prisma caret ranges `^7.8.0` (the lock
+  resolves the installed versions); generated workspaces still encode `^7.4.2` specifiers.
 - Sources: current source and docs, architecture-debt ledger, Git history, GitHub issue/PR evidence,
   and focused `deno doc`/dependency-tool inspection.
 
@@ -257,8 +257,8 @@ design must structurally retire.
 
 ## Architecture-debt alignment
 
-- `packages/database — AP-17` remains open: ports were renamed, but the composition root has never
-  been resolved.
+- `packages/database — AP-17` remains open. Source has already renamed `interfaces/` to `ports/`, so
+  that part of the debt entry is stale; the unresolved composition-root finding remains current.
 - `DB-GENERATE-ASPIRE-COUPLING` remains open and documents the pure-codegen/Aspire mismatch.
 - Current doctrine classifies `packages/database` as an A2 integration package needing refactor and
   `packages/prisma-adapter-mysql` as an A2 integration package. The new owner directive supersedes

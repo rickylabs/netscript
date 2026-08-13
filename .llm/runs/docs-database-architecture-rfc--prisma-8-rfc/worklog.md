@@ -52,18 +52,23 @@ research inventory and proposed package-boundary matrix.
 
 ## Progress Log
 
-| Time       | Slice | Step      | Notes                                                                                                                                              |
-| ---------- | ----- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-13 | 0     | bootstrap | Fresh worktree and branch created from current `origin/main`; run artifacts initialized.                                                           |
-| 2026-08-13 | 1     | research  | Owner directed the root to orchestrate. Added a fresh Claude Code Opus 5 high independent architecture lane; its exclusive report feeds plan lock. |
+| Time       | Slice | Step      | Notes                                                                                                                                                                                                                                                                                                              |
+| ---------- | ----- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-08-13 | 0     | bootstrap | Fresh worktree and branch created from current `origin/main`; run artifacts initialized.                                                                                                                                                                                                                           |
+| 2026-08-13 | 1     | research  | Owner directed the root to orchestrate. Added a fresh Claude Code Opus 5 high independent architecture lane; its exclusive report feeds plan lock.                                                                                                                                                                 |
+| 2026-08-13 | 1     | research  | Owner supplied a March 2026 Prisma-maintainer exchange supporting contract-derived runtime validation. Elevated Standard Schema input/output validation to a first-class subsystem and recorded runtime/AOT equivalence gates.                                                                                     |
+| 2026-08-13 | 1     | research  | Owner elevated Prisma Next's proposed pure-TypeScript schema authoring. Added a dedicated source/architecture audit and required schema-to-contract-to-operation-to-validation-to-transport type propagation in the Opus synthesis and Plan-Gate.                                                                  |
+| 2026-08-13 | 1     | research  | Owner clarified the target is Prisma's native `defineContract` builder and named NetScript's oRPC extension model as the precedent. Expanded the audit to compare native-surface preservation, factory augmentation, plugin typing, and app-local composition against database-specific lifecycle/ownership needs. |
+| 2026-08-13 | 1     | research  | Pinned-source validation audit found a qualified runtime-interpretation path, not full contract-only parity. Locked fail-closed bounded semantics, `runtime                                                                                                                                                        |
 
 ## Decisions
 
-| Decision                              | Reason                                                                                 | Source                    |
-| ------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------- |
-| Treat #313 as superseded design input | Its additive compatibility premise conflicts with the owner-directed clean break.      | Issue #313 + owner prompt |
-| Require PLAN-EVAL                     | Material architecture, sequencing, and multi-wave risk are unavoidable.                | Harness run loop §4       |
-| Delegate architecture deep dive       | Owner explicitly requested Claude Code Opus 5 high and an orchestration-first posture. | Owner correction          |
+| Decision                              | Reason                                                                                        | Source                                        |
+| ------------------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| Treat #313 as superseded design input | Its additive compatibility premise conflicts with the owner-directed clean break.             | Issue #313 + owner prompt                     |
+| Require PLAN-EVAL                     | Material architecture, sequencing, and multi-wave risk are unavoidable.                       | Harness run loop §4                           |
+| Delegate architecture deep dive       | Owner explicitly requested Claude Code Opus 5 high and an orchestration-first posture.        | Owner correction                              |
+| Elevate TypeScript schema authoring   | It can remove the schema/type/codegen split and anchor one end-to-end application type graph. | Owner directive + pending pinned-source audit |
 
 ## Drift
 
