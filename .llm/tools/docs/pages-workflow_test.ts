@@ -103,10 +103,19 @@ Deno.test('Pages structurally revalidates docs for package and plugin changes be
   const requiredPaths = [
     'docs/site/**',
     'packages/**',
+    "'!packages/**/tests/**'",
+    "'!packages/cli/e2e/**'",
+    "'!packages/**/*_test.ts'",
+    "'!packages/**/*.test.ts'",
     'plugins/**',
+    "'!plugins/**/tests/**'",
+    "'!plugins/**/*_test.ts'",
+    "'!plugins/**/*.test.ts'",
     '.llm/tools/docs/**',
     'deno.json',
     'deno.lock',
+    '.github/scripts/ci-classify-changes.ts',
+    '.github/scripts/ci-classify-changes.test.ts',
     '.github/workflows/pages.yml',
   ];
   assertEquals(workflow.eventPaths.pull_request, requiredPaths);

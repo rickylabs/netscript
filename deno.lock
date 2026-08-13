@@ -4179,16 +4179,6 @@
           "npm:@orpc/server@^1.14.6"
         ]
       },
-      "packages/cli/e2e/fixtures/desktop-native": {
-        "dependencies": [
-          "jsr:@std/assert@1",
-          "jsr:@std/path@1",
-          "npm:@opentelemetry/api@^1.9.0",
-          "npm:@orpc/client@^1.14.6",
-          "npm:@orpc/server@^1.14.6",
-          "npm:zod@^4.4.3"
-        ]
-      },
       "packages/config": {
         "dependencies": [
           "jsr:@std/fs@1",

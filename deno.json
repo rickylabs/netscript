@@ -3,7 +3,6 @@
   "workspace": [
     "packages/*",
     "packages/cli/e2e",
-    "packages/cli/e2e/fixtures/desktop-native",
     "plugins/*",
     "examples/*",
     "apps/*"

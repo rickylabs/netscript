@@ -1,3 +1,6 @@
+// Executed explicitly by this fixture's isolated `test` task. The filename
+// intentionally avoids `_test.ts` so the repository-root test discovery does
+// not evaluate it under the parent workspace import map.
 import { assertEquals } from '@std/assert';
 import { fromFileUrl } from '@std/path';
 import { bindDesktopRpcWindow } from '@netscript/fresh/desktop';
@@ -10,7 +13,7 @@ import {
   decodePkcs8Pem,
   importReleasePrivateKey,
   signReleaseString,
-} from '../../../../src/public/features/deploy/target/desktop/release/sign-release.ts';
+} from '@netscript/cli/desktop-release-signing';
 
 const DESKTOP_RUNTIME = { BrowserWindow: class BrowserWindow {} };
 

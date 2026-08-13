@@ -2,23 +2,25 @@
   "name": "@netscript/desktop-native-e2e-fixture",
   "version": "1.0.0",
   "private": true,
+  "lock": false,
   "exports": "./src/main.ts",
   "tasks": {
     "desktop:renderer": "deno bundle --platform browser --output dist/renderer.js src/renderer.ts",
     "desktop:package": "deno run --allow-all src/package.ts",
-    "test": "deno test --allow-all tests/"
+    "test": "deno test --allow-all tests/fixture-contract.ts"
   },
   "imports": {
     "@netscript/fresh/desktop": "../../../../fresh/src/runtime/desktop/mod.ts",
     "@netscript/sdk/auto-update": "../../../../sdk/src/auto-update/mod.ts",
     "@netscript/sdk/desktop": "../../../../sdk/src/desktop/mod.ts",
     "@netscript/telemetry": "../../../../telemetry/mod.ts",
-    "@opentelemetry/api": "npm:@opentelemetry/api@^1.9.0",
+    "@netscript/cli/desktop-release-signing": "../../../src/public/features/deploy/target/desktop/release/sign-release.ts",
+    "@opentelemetry/api": "npm:@opentelemetry/api@^1.9.1",
     "@orpc/client": "npm:@orpc/client@^1.14.6",
     "@orpc/server": "npm:@orpc/server@^1.14.6",
     "@std/assert": "jsr:@std/assert@^1",
     "@std/path": "jsr:@std/path@^1",
-    "zod": "catalog:"
+    "zod": "npm:zod@^4.4.3"
   },
   "desktop": {
     "app": {
@@ -31,7 +33,6 @@
     "strict": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
-    "isolatedDeclarations": false,
     "lib": ["deno.ns", "dom"]
   },
   "fmt": {

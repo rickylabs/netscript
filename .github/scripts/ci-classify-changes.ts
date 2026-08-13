@@ -21,6 +21,10 @@
  *                        the agent-context prefixes (`.llm/`, `.agents/`,
  *                        `.claude/`)
  *   - `needs_surface` -> surface-diff (mirrors its old `paths: packages/**`)
+ *   - `needs_pages`   -> generated docs inputs (site sources, package/plugin
+ *                        implementation/public metadata excluding tests,
+ *                        docs tooling, root toolchain)
+ *   - `needs_fresh_ui` -> Fresh UI sources and its dedicated quality tooling
  *
  * Precision rules (#1122): only the tier-defining workflows (`e2e-cli.yml`,
  * `ci.yml`) escalate the scaffold tiers — `release-canary.yml`, `pages.yml`
@@ -94,6 +98,8 @@ export interface Capabilities {
   deno: boolean;
   docs: boolean;
   surface: boolean;
+  pages: boolean;
+  freshUi: boolean;
 }
 
 const NONE: Capabilities = {
@@ -103,6 +109,8 @@ const NONE: Capabilities = {
   deno: false,
   docs: false,
   surface: false,
+  pages: false,
+  freshUi: false,
 };
 
 const ALL: Capabilities = {
@@ -112,6 +120,8 @@ const ALL: Capabilities = {
   deno: true,
   docs: true,
   surface: true,
+  pages: true,
+  freshUi: true,
 };
 
 /** Normalise a git path: strip a leading `./`, collapse backslashes. */
@@ -126,6 +136,11 @@ function hasExtension(path: string, extensions: readonly string[]): boolean {
 function isDenoConfigBase(path: string): boolean {
   const base = path.slice(path.lastIndexOf('/') + 1);
   return base === 'deno.json' || base === 'deno.jsonc' || base === 'deno.lock';
+}
+
+function isPackageTestOnly(path: string): boolean {
+  return path.includes('/tests/') || path.startsWith('packages/cli/e2e/') ||
+    /(?:^|\/)[^/]+(?:_test|\.test)\.(?:ts|tsx|js|jsx)$/.test(path);
 }
 
 export type DenoConfigChange = 'tasks-only' | 'toolchain';
@@ -177,9 +192,15 @@ export function classifyPath(
 ): Capabilities {
   const path = normalise(rawPath);
   if (path === 'deno.json' || path === 'deno.jsonc') {
-    return rootDenoConfig === 'tasks-only'
-      ? { ...NONE, deno: true }
-      : { ...NONE, scaffold: true, docker: true, desktop: true, deno: true };
+    return rootDenoConfig === 'tasks-only' ? { ...NONE, deno: true } : {
+      ...NONE,
+      scaffold: true,
+      docker: true,
+      desktop: true,
+      deno: true,
+      pages: true,
+      freshUi: true,
+    };
   }
   if (isDenoConfigBase(path)) {
     // Any other deno.json*/deno.lock (root lock, nested workspace roots):
@@ -191,6 +212,9 @@ export function classifyPath(
       desktop: true,
       deno: true,
       surface: path.startsWith('packages/'),
+      pages: (path === 'deno.lock' || /^(packages|plugins)\/[^/]+\/deno\.jsonc?$/.test(path)) &&
+        !isPackageTestOnly(path),
+      freshUi: path.startsWith('packages/fresh-ui/'),
     };
   }
   if (TIER_DEFINING_WORKFLOWS.has(path)) {
@@ -200,13 +224,37 @@ export function classifyPath(
     // Non-tier workflows cannot affect scaffold behaviour by construction
     // (#1122), but workflow content is exercised by repo tests
     // (e.g. `.llm/tools/release/release-canary-workflow_test.ts`).
-    return { ...NONE, deno: true };
+    return {
+      ...NONE,
+      deno: true,
+      pages: path === '.github/workflows/pages.yml',
+      freshUi: path === '.github/workflows/fresh-ui-quality.yml',
+    };
+  }
+  if (path.startsWith('.llm/runs/') || path.startsWith('resources/design/')) {
+    // Historical receipts and design-reference records are evidence, not
+    // executable inputs. Their contents must not fan out into runtime lanes.
+    return { ...NONE };
+  }
+  if (path.startsWith('tools/design-sync/')) {
+    return { ...NONE, deno: hasExtension(path, CODE_EXTENSIONS) };
+  }
+  if (path.startsWith('.github/scripts/')) {
+    if (path.startsWith('.github/scripts/ci-classify-changes.')) return { ...ALL };
+    return {
+      ...NONE,
+      deno: hasExtension(path, CODE_EXTENSIONS),
+      desktop: path.startsWith('.github/scripts/desktop-native-exception.'),
+    };
   }
   if (hasExtension(path, DOCS_EXTENSIONS)) {
     return {
       ...NONE,
       docs: !AGENT_CONTEXT_PREFIXES.some((prefix) => path.startsWith(prefix)),
       surface: path.startsWith('packages/'),
+      pages: path.startsWith('docs/site/') ||
+        ((path.startsWith('packages/') || path.startsWith('plugins/')) &&
+          !isPackageTestOnly(path)),
     };
   }
   if (CODE_PREFIXES.some((prefix) => path.startsWith(prefix))) {
@@ -217,6 +265,9 @@ export function classifyPath(
       deno: true,
       desktop: path.startsWith('packages/cli/'),
       surface: path.startsWith('packages/'),
+      pages: (path.startsWith('packages/') || path.startsWith('plugins/')) &&
+        !isPackageTestOnly(path),
+      freshUi: path.startsWith('packages/fresh-ui/'),
     };
   }
   if (DOCS_PREFIXES.some((prefix) => path.startsWith(prefix))) {
@@ -225,6 +276,12 @@ export function classifyPath(
       docs: path.startsWith('docs/'),
       // Root `deno test`/task gates execute code under `.llm/tools` etc.
       deno: hasExtension(path, CODE_EXTENSIONS),
+      pages: path.startsWith('docs/site/') || path.startsWith('.llm/tools/docs/'),
+      freshUi: [
+        '.llm/tools/run-deno-check.ts',
+        '.llm/tools/run-deno-lint.ts',
+        '.llm/tools/validation/fresh-ui-quality_test.ts',
+      ].includes(path),
     };
   }
   // Unrecognised path: force EVERY gate. NEVER skip on a failed classification.
@@ -269,6 +326,8 @@ export interface Decision {
   needsDesktop: boolean;
   needsDocs: boolean;
   needsSurface: boolean;
+  needsPages: boolean;
+  needsFreshUi: boolean;
   reason: string;
 }
 
@@ -283,6 +342,8 @@ function fullDecision(docsOnly: boolean, reason: string, sqliteReason: string): 
     needsDesktop: true,
     needsDocs: true,
     needsSurface: true,
+    needsPages: true,
+    needsFreshUi: true,
     reason: `${reason}. ${sqliteReason}`,
   };
 }
@@ -350,6 +411,8 @@ export function decide(input: DecisionInput): Decision {
     caps.deno ||= contribution.deno;
     caps.docs ||= contribution.docs;
     caps.surface ||= contribution.surface;
+    caps.pages ||= contribution.pages;
+    caps.freshUi ||= contribution.freshUi;
   }
 
   const impacting = changed.filter((p) => !isDocsOnlyPath(p, rootDenoConfig));
@@ -418,6 +481,8 @@ export function decide(input: DecisionInput): Decision {
     needsDesktop: caps.desktop,
     needsDocs: caps.docs,
     needsSurface: caps.surface,
+    needsPages: caps.pages,
+    needsFreshUi: caps.freshUi,
     reason: `${impactingNote}. ${staticReason}; ${sqliteReason}; ${runtimeReason}. ${vectorNote}`,
   };
 }
@@ -528,6 +593,8 @@ async function main(): Promise<void> {
     `needs_desktop=${decision.needsDesktop}`,
     `needs_docs=${decision.needsDocs}`,
     `needs_surface=${decision.needsSurface}`,
+    `needs_pages=${decision.needsPages}`,
+    `needs_fresh_ui=${decision.needsFreshUi}`,
     `reason=${reason}`,
   ];
 
@@ -545,6 +612,8 @@ async function main(): Promise<void> {
   console.log(`  needs_desktop: ${decision.needsDesktop}`);
   console.log(`  needs_docs:    ${decision.needsDocs}`);
   console.log(`  needs_surface: ${decision.needsSurface}`);
+  console.log(`  needs_pages:   ${decision.needsPages}`);
+  console.log(`  needs_fresh_ui: ${decision.needsFreshUi}`);
   console.log(`  reason:        ${reason}`);
 
   const outPath = Deno.env.get('GITHUB_OUTPUT');

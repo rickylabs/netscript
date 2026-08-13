@@ -195,6 +195,8 @@ Deno.test('SAFETY: an unrecognised path forces EVERY output true', () => {
       deno: true,
       docs: true,
       surface: true,
+      pages: true,
+      freshUi: true,
     }, `expected full escalation for: ${p}`);
     const d = decide({ eventName: 'pull_request', files: [p], labels: [] });
     assertEquals(d.runStatic, true, p);
@@ -450,6 +452,86 @@ Deno.test('docs/ code files set docs AND deno', () => {
     labels: [],
   });
   assertEquals(vector(d), { ...ALL_FALSE, deno: true, docs: true });
+});
+
+Deno.test('generated docs ignore package tests and CLI E2E fixtures', () => {
+  for (
+    const path of [
+      'packages/kv/tests/redis.adapter_test.ts',
+      'packages/sdk/src/cache/cache-provider_test.ts',
+      'packages/cli/e2e/fixtures/desktop-native/deno.json',
+      'packages/cli/e2e/src/adapters/native-desktop/fixture-workspace.ts',
+    ]
+  ) {
+    assertEquals(classifyPath(path).pages, false, path);
+  }
+  assertEquals(classifyPath('packages/sdk/src/client/mod.ts').pages, true);
+  assertEquals(classifyPath('packages/sdk/README.md').pages, true);
+});
+
+Deno.test('Fresh UI and Pages selectors distinguish tasks-only root config', () => {
+  const tasksOnly = decide({
+    eventName: 'pull_request',
+    files: ['deno.json'],
+    labels: [],
+    rootDenoConfig: { base: DENO_BASE, head: DENO_TASKS_ONLY },
+  });
+  assertEquals(tasksOnly.needsPages, false);
+  assertEquals(tasksOnly.needsFreshUi, false);
+
+  const toolchain = decide({
+    eventName: 'pull_request',
+    files: ['deno.json'],
+    labels: [],
+    rootDenoConfig: { base: DENO_BASE, head: DENO_TOOLCHAIN },
+  });
+  assertEquals(toolchain.needsPages, true);
+  assertEquals(toolchain.needsFreshUi, true);
+});
+
+Deno.test('stale run evidence and design references do not fan out into CI', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: [
+      '.llm/runs/old-harness/launch.js',
+      'resources/design/dashboard/reference/record.md',
+      'tools/design-sync/src/types.ts',
+    ],
+    labels: [],
+  });
+  assertEquals(d.runStatic, false);
+  assertEquals(d.runRuntime, false);
+  assertEquals(d.needsDesktop, false);
+  assertEquals(d.needsDocker, false);
+  assertEquals(d.needsDeno, true);
+  assertEquals(d.needsPages, false);
+  assertEquals(d.needsFreshUi, false);
+});
+
+Deno.test('Pages and Fresh UI consume their selectors and fail closed', async () => {
+  const pages = await Deno.readTextFile('.github/workflows/pages.yml');
+  assertEquals(
+    pages.includes('needs_pages: ${{ steps.decide.outputs.needs_pages }}'),
+    true,
+  );
+  assertEquals(
+    pages.includes(
+      "RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_pages != 'false' }}",
+    ),
+    true,
+  );
+
+  const freshUi = await Deno.readTextFile('.github/workflows/fresh-ui-quality.yml');
+  assertEquals(
+    freshUi.includes('needs_fresh_ui: ${{ steps.decide.outputs.needs_fresh_ui }}'),
+    true,
+  );
+  assertEquals(
+    freshUi.includes(
+      "RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_fresh_ui != 'false' }}",
+    ),
+    true,
+  );
 });
 
 // ── decide: aggregate + labels ───────────────────────────────────────────────

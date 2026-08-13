@@ -95,20 +95,27 @@ function createLinuxNativeGate(repoRoot: string) {
 }
 
 function createFixtureContractGate(repoRoot: string) {
-  const fixtureRoot = join(
-    repoRoot,
-    'packages',
-    'cli',
-    'e2e',
-    'fixtures',
-    'desktop-native',
-  );
   return commandGate(
     GATE.DEPLOY_DESKTOP_FIXTURE,
     'Prove signed fixture and renderer remote-service contract',
     GATE_PHASE.BEHAVIOR,
-    () => ['deno', 'task', 'test'],
-    () => fixtureRoot,
+    () => [
+      'deno',
+      'run',
+      '--allow-all',
+      join(
+        repoRoot,
+        'packages',
+        'cli',
+        'e2e',
+        'src',
+        'adapters',
+        'native-desktop',
+        'fixture-contract-driver.ts',
+      ),
+      '--repo-root',
+      repoRoot,
+    ],
   );
 }
 
