@@ -69,10 +69,10 @@ with `git rev-parse --is-shallow-repository`; when it reports `true`, use the Gi
 
 - `@netscript/triggers` (`packages/triggers`) is absent from every reachable commit. It was
   superseded before this history by `packages/plugin-triggers-core`, recorded in the
-  [resolved triggers debt](../../../.llm/harness/debt/arch-debt.md#packagestriggers--doctrine-verdict-restructure).
+  [resolved triggers debt](../../../.llm/harness/debt/arch-debt.md#packagestriggers-doctrine-verdict-restructure).
 - `@netscript/workers` (`packages/workers`) is absent from every reachable commit. It was
   superseded before this history by `packages/plugin-workers-core`, recorded in the
-  [resolved workers debt](../../../.llm/harness/debt/arch-debt.md#packagesworkers--ap-1--doctrine-verdict-restructure-task-executorts-1287-loc).
+  [resolved workers debt](../../../.llm/harness/debt/arch-debt.md#packagesworkers-ap-1-doctrine-verdict-restructure-task-executorts-1287-loc).
 - `@netscript/sagas` (`packages/sagas`) is absent from every reachable commit. Its checked-in
   supersession record says the former top-level directory and resolved debt now live entirely in
   `packages/plugin-sagas-core`.

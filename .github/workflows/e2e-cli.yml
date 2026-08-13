@@ -27,17 +27,17 @@ name: e2e-cli
 #     avoiding Postgres and Redis containers. The postgres tier above remains
 #     the merge-readiness bar.
 #
-# Triggers: PR code/lifecycle events for main or an integration branch (`feat/**`, `epic/**`),
-# PLUS any other eligible PR carrying the `e2e-cli-gate` label, PLUS manual dispatch.
-# Label metadata does not trigger this workflow: adding/removing a label must not cancel an
-# executing expensive run. The complete live label set is honored on the next normal trigger.
+# Cost policy: these additive runtime/native lanes do not run on ordinary PRs.
+# `e2e-cli-gate` opts a PR into the scaffold lanes; `desktop-native-gate` opts
+# it into native packaging; `ci:full` opts into both. Applying an opt-in label
+# triggers the workflow immediately. Version tags and manual dispatch run the
+# complete release-grade suite.
 #
-# Skip policy (see `.github/scripts/ci-classify-changes.ts`): the `classify` job
-# emits the #1152 capability vector (`run_static`, `run_runtime_sqlite`,
-# `run_runtime`, `needs_*`)
-# from the PR diff and labels. All four expensive jobs still START and report
-# SUCCESS, but short-circuit to a "skipped-by-policy" step when their work is
-# not needed:
+# Selection policy (see `.github/scripts/ci-classify-changes.ts`): an opted-in
+# PR first runs `classify`, which emits the #1152 capability vector
+# (`run_static`, `run_runtime_sqlite`, `run_runtime`, `needs_*`) from the diff
+# and labels. Ordinary PRs schedule no runner in this workflow. On an opted-in
+# PR, lanes outside the selected capability short-circuit to SUCCESS:
 #
 #   - `run_static`: any scaffold-impacting change (`packages/`/`plugins/`/
 #     `apps/`, tier-defining workflows, toolchain `deno.json*`/`deno.lock`,
@@ -54,16 +54,14 @@ name: e2e-cli
 #     tier; `ci:skip-e2e` -> skip both runtime tiers; `ci:full` -> force
 #     everything regardless.
 #
-# The jobs run + report SUCCESS rather than using `paths-ignore`/job-level `if`,
-# so they never strand a required status check if promoted to one later. ci.yml
-# gates its required jobs (check-test / quality) through its own classify job
-# under the same policy (#1152). Release gates (publish, e2e-cli-prod*) have no
-# skip.
+# These lanes are deliberately not required branch-protection checks. Required
+# checks live in ci.yml and always materialize, then use the classifier to report
+# a native policy skip without doing unrelated work. Release gates (publish,
+# e2e-cli-prod*) have no skip.
 #
-# FAIL-CLOSED RULE: a skip requires `classify` to SUCCEED with an explicit
-# `run_*=false`. If classify fails for any reason, the expensive jobs run in
-# full (`needs.classify.result != 'success'` forces RUN=true); only a `skipped`
-# classify (the pre-existing applicability gate) skips them, as before.
+# Within an applicable release/manual/opt-in run, the policy is fail-closed: a
+# skip requires `classify` to SUCCEED with an explicit `run_*=false`; a failed
+# classifier forces the selected family to run.
 # Rename-aware diff: `--name-status -M` feeds BOTH sides of renames/copies so a
 # source->docs rename can never classify docs-only.
 # Draft PR pushes schedule no classifier, scaffold, runtime, desktop, or
@@ -72,7 +70,9 @@ name: e2e-cli
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
+  push:
+    tags: ['v*']
   workflow_dispatch:
 
 permissions:
@@ -85,16 +85,14 @@ concurrency:
 jobs:
   classify:
     name: classify changes
-    # Applicability gate: PRs to main or integration branch families,
-    # `e2e-cli-gate`-labeled PRs, or manual dispatch exercise this workflow.
+    # Applicability gate: release/manual events, or explicitly opted-in PRs.
     if: >-
       (github.event_name != 'pull_request' || github.event.pull_request.merged != true) &&
       (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
-      (github.event_name == 'workflow_dispatch' ||
-       github.event.pull_request.base.ref == 'main' ||
-       startsWith(github.event.pull_request.base.ref, 'feat/') ||
-       startsWith(github.event.pull_request.base.ref, 'epic/') ||
-       contains(github.event.pull_request.labels.*.name, 'e2e-cli-gate'))
+      (github.event_name != 'pull_request' ||
+       contains(github.event.pull_request.labels.*.name, 'e2e-cli-gate') ||
+       contains(github.event.pull_request.labels.*.name, 'desktop-native-gate') ||
+       contains(github.event.pull_request.labels.*.name, 'ci:full'))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
@@ -183,17 +181,14 @@ jobs:
   scaffold-static:
     name: scaffold-static (deno-only)
     needs: classify
-    # Job always starts (so its status reports); real work is guarded by the
-    # classifier so docs-only / `ci:skip-scaffold` short-circuit to SUCCESS.
-    # FAIL-CLOSED: if `classify` FAILED (setup/diff/output error), this job still
-    # runs and RUN defaults to true — a skip requires classify to have SUCCEEDED
-    # with an explicit `run_static=false`. `skipped` classify (applicability gate:
-    # not a PR to main / no `e2e-cli-gate` label) keeps the old skip behavior.
+    # Applicable only after release/manual/PR opt-in. Within that run, docs-only
+    # or `ci:skip-scaffold` short-circuits to SUCCESS; classifier failure is
+    # fail-closed and runs the lane.
     if: ${{ !cancelled() && needs.classify.result != 'skipped' && needs.classify.outputs.diff_unavailable != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.run_static == 'true' }}
+      RUN: ${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'ci:full') || (contains(github.event.pull_request.labels.*.name, 'e2e-cli-gate') && (needs.classify.result != 'success' || needs.classify.outputs.run_static == 'true')) }}
       SKIP_REASON: ${{ needs.classify.outputs.reason }}
     steps:
       - name: Skipped by policy
@@ -239,20 +234,14 @@ jobs:
     concurrency:
       group: e2e-scaffold-runtime-global
       cancel-in-progress: false
-    # Job always starts (so its status reports); real work is guarded by the
-    # classifier so docs-only / `ci:skip-e2e` short-circuit to SUCCESS. Heavy;
-    # additive until observed green. This is the docker tier (#1152): reached
-    # on the classifier's docker signal — deliberately wide in v1, tightened
-    # only against observed green history.
-    # FAIL-CLOSED: if `classify` FAILED, this job still runs and RUN defaults to
-    # true — a skip requires classify to have SUCCEEDED with an explicit
-    # `run_runtime=false`. `skipped` classify (applicability gate) keeps the old
-    # skip behavior.
+    # Applicable only after release/manual/PR opt-in. `ci:skip-e2e` can
+    # short-circuit the lane; classifier failure is fail-closed and runs it.
+    # This remains additive until it has enough observed-green history.
     if: ${{ !cancelled() && needs.classify.result != 'skipped' && needs.classify.outputs.diff_unavailable != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
-      RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.run_runtime == 'true' }}
+      RUN: ${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'ci:full') || (contains(github.event.pull_request.labels.*.name, 'e2e-cli-gate') && (needs.classify.result != 'success' || needs.classify.outputs.run_runtime == 'true')) }}
       SKIP_REASON: ${{ needs.classify.outputs.reason }}
     steps:
       - name: Skipped by policy
@@ -332,18 +321,14 @@ jobs:
     concurrency:
       group: e2e-scaffold-runtime-sqlite-global
       cancel-in-progress: false
-    # Job always starts so a policy skip still reports SUCCESS. The sqlite
-    # runtime follows the scaffold-impact signal, while ci:skip-e2e remains
-    # authoritative over both runtime tiers.
-    # FAIL-CLOSED: if `classify` FAILED, this job still runs and RUN defaults to
-    # true — a skip requires classify to have SUCCEEDED with an explicit
-    # `run_runtime_sqlite=false`. `skipped` classify (applicability gate) keeps
-    # the old skip behavior.
+    # Applicable only after release/manual/PR opt-in. The sqlite runtime follows
+    # the scaffold-impact signal; ci:skip-e2e remains authoritative over both
+    # runtime tiers. Classifier failure is fail-closed and runs it.
     if: ${{ !cancelled() && needs.classify.result != 'skipped' && needs.classify.outputs.diff_unavailable != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
-      RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.run_runtime_sqlite == 'true' }}
+      RUN: ${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'ci:full') || (contains(github.event.pull_request.labels.*.name, 'e2e-cli-gate') && (needs.classify.result != 'success' || needs.classify.outputs.run_runtime_sqlite == 'true')) }}
       SKIP_REASON: ${{ needs.classify.outputs.reason }}
     steps:
       - name: Skipped by policy
@@ -420,21 +405,15 @@ jobs:
   desktop-native-linux:
     name: desktop-native-linux (deb + signed updater)
     needs: classify
-    # Job always starts (so its status reports); real work is guarded by the
-    # classifier exactly like its two siblings (#1151). The `.deb`/updater
-    # surface lives entirely under `packages/cli/`, so the dedicated
-    # `needs_desktop` output (#1152) gates it: `packages/cli/`, tier-defining
-    # workflows, and toolchain config changes run it; everything else skips.
-    # FAIL-CLOSED: if `classify` FAILED, this job still runs and RUN defaults to
-    # true — a skip requires classify to have SUCCEEDED with an explicit
-    # `needs_desktop=false`. `skipped` classify (applicability gate) keeps the
-    # old skip behavior.
+    # Release/manual only unless a PR explicitly requests `desktop-native-gate`
+    # or `ci:full`. Unlike scaffold lanes, changed paths alone never select this
+    # roughly three-minute native package/install/update/rollback gate.
     if: ${{ !cancelled() && needs.classify.result != 'skipped' && needs.classify.outputs.diff_unavailable != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_desktop == 'true' }}
-      SKIP_REASON: ${{ needs.classify.outputs.reason }}
+      RUN: ${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'ci:full') || contains(github.event.pull_request.labels.*.name, 'desktop-native-gate') }}
+      SKIP_REASON: desktop-native runs only for release/manual events or PRs labeled desktop-native-gate/ci:full.
     steps:
       - name: Skipped by policy
         if: env.RUN != 'true'
@@ -457,46 +436,32 @@ jobs:
         if: env.RUN == 'true'
         run: >-
           sudo apt-get update && sudo apt-get install --yes
-          bsdiff libgtk-3-0 libwebkit2gtk-4.1-0
+          bsdiff libgtk-3-0 libwebkit2gtk-4.1-0 xvfb
 
       - name: Install workspace dependencies
         if: env.RUN == 'true'
         run: deno install
 
-      - name: Native desktop package, install, update, and rollback (one pass)
+      - name: Native desktop package, install, update, and rollback (one pass; #859 exception bounded below)
         id: native_suite
         if: env.RUN == 'true'
-        # TEMPORARY NON-BLOCKING POLICY: remove step tolerance when the packaged
-        # runtime ships the #841 verification op. See the G7 drift entry
-        # "Packaged runtime lacks the #841 verification op" for fail-closed evidence.
+        # Active non-blocking policy: #859 tracks the remaining Deno Desktop
+        # callback/apply gap. The next step accepts only that exact evidence;
+        # fixture, packaging, or unrelated native failures still fail the job.
         continue-on-error: true
-        run: deno task e2e:cli run deploy.desktop-native --cleanup --format pretty
+        run: >-
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24"
+          deno task e2e:cli run deploy.desktop-native --cleanup --format pretty
 
-      - name: Summarize native desktop upstream gap (LOUD, never masks suite evidence)
+      - name: Enforce active desktop exception boundary (#859)
         if: always() && env.RUN == 'true'
         env:
           EVIDENCE: .llm/tmp/desktop-native-e2e/evidence.json
           NATIVE_SUITE_OUTCOME: ${{ steps.native_suite.outcome }}
-          DRIFT_URL: >-
-            ${{ github.server_url }}/${{ github.repository }}/blob/${{ github.sha }}/.llm/runs/beta11-cli--orchestrator/slices/g7-457-e2e/drift.md#2026-07-18--packaged-runtime-lacks-the-841-verification-op
-        run: |
-          echo '::warning title=DESKTOP NATIVE E2E IS NON-BLOCKING PENDING UPSTREAM OP::The suite remains fail-closed; inspect the structured evidence and linked drift investigation.'
-          {
-            printf '# ⚠️ DESKTOP NATIVE LINUX: NON-BLOCKING UPSTREAM GAP — step outcome: `%s` (failure tolerated)\n' "$NATIVE_SUITE_OUTCOME"
-            echo
-            echo 'The native suite ran unchanged. Its failure is retained as evidence; CI policy alone is temporarily non-blocking pending the owner rescope decision.'
-            echo
-            printf '[Upstream-gap investigation and flip-back condition](%s)\n' "$DRIFT_URL"
-            echo
-            echo '## Structured suite evidence'
-            echo '```json'
-            if [ -f "$EVIDENCE" ]; then
-              sed -n '1,240p' "$EVIDENCE"
-            else
-              echo '{"status":"FAIL","reason":"structured evidence file was not produced"}'
-            fi
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+        run: >-
+          deno run --allow-env --allow-read --allow-write
+          .github/scripts/desktop-native-exception.ts
+          --outcome "$NATIVE_SUITE_OUTCOME" --evidence "$EVIDENCE"
 
       - name: Upload native desktop evidence
         if: always() && env.RUN == 'true'
@@ -509,7 +474,7 @@ jobs:
   lane-visibility:
     name: scaffold CI lane visibility
     needs: [classify, scaffold-static, scaffold-runtime, scaffold-runtime-sqlite, desktop-native-linux]
-    if: ${{ always() && github.event_name == 'pull_request' && github.event.pull_request.draft == false }}
+    if: ${{ always() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.classify.result != 'skipped' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

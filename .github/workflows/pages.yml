@@ -6,20 +6,38 @@ on:
     paths:
       - docs/site/**
       - packages/**
+      - '!packages/**/tests/**'
+      - '!packages/cli/e2e/**'
+      - '!packages/**/*_test.ts'
+      - '!packages/**/*.test.ts'
       - plugins/**
+      - '!plugins/**/tests/**'
+      - '!plugins/**/*_test.ts'
+      - '!plugins/**/*.test.ts'
       - .llm/tools/docs/**
       - deno.json
       - deno.lock
+      - .github/scripts/ci-classify-changes.ts
+      - .github/scripts/ci-classify-changes.test.ts
       - .github/workflows/pages.yml
   push:
     branches: [main]
     paths:
       - docs/site/**
       - packages/**
+      - '!packages/**/tests/**'
+      - '!packages/cli/e2e/**'
+      - '!packages/**/*_test.ts'
+      - '!packages/**/*.test.ts'
       - plugins/**
+      - '!plugins/**/tests/**'
+      - '!plugins/**/*_test.ts'
+      - '!plugins/**/*.test.ts'
       - .llm/tools/docs/**
       - deno.json
       - deno.lock
+      - .github/scripts/ci-classify-changes.ts
+      - .github/scripts/ci-classify-changes.test.ts
       - .github/workflows/pages.yml
   release:
     types: [published]
@@ -33,33 +51,115 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    permissions:
-      contents: read
+  classify:
+    name: classify docs-site changes
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      diff_unavailable: ${{ steps.diff.outputs.diff_unavailable }}
+      needs_pages: ${{ steps.decide.outputs.needs_pages }}
+      reason: ${{ steps.decide.outputs.reason }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
           deno-version: '2.9.5'
+      - name: Self-check the classifier
+        run: >-
+          deno test --allow-read --allow-write --allow-env
+          .github/scripts/ci-classify-changes.test.ts
+      - name: Compute changed files
+        id: diff
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          diff_file="$(mktemp)"
+          error_file="$(mktemp)"
+          trap 'rm -f "$diff_file" "$error_file"' EXIT
+          if ! git diff --name-status -M "$BASE_SHA...$HEAD_SHA" > "$diff_file" 2> "$error_file"; then
+            cat "$error_file" >&2
+            echo "diff_unavailable=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          {
+            echo "diff_unavailable=false"
+            echo "changed<<__EOF__"
+            cat "$diff_file"
+            echo "__EOF__"
+          } >> "$GITHUB_OUTPUT"
+      - name: Extract root deno.json
+        id: rootcfg
+        if: github.event_name == 'pull_request' && steps.diff.outputs.diff_unavailable != 'true'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          {
+            echo "base<<__CFG_EOF__"
+            git show "$BASE_SHA:deno.json" 2>/dev/null || true
+            echo "__CFG_EOF__"
+            echo "head<<__CFG_EOF__"
+            git show "$HEAD_SHA:deno.json" 2>/dev/null || true
+            echo "__CFG_EOF__"
+          } >> "$GITHUB_OUTPUT"
+      - name: Decide run or skip
+        id: decide
+        if: github.event_name != 'pull_request' || steps.diff.outputs.diff_unavailable != 'true'
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          CHANGED_NAME_STATUS: ${{ steps.diff.outputs.changed }}
+          PR_LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+          ROOT_DENO_JSON_BASE: ${{ steps.rootcfg.outputs.base }}
+          ROOT_DENO_JSON_HEAD: ${{ steps.rootcfg.outputs.head }}
+        run: deno run --allow-read --allow-write --allow-env .github/scripts/ci-classify-changes.ts
+
+  build:
+    needs: classify
+    if: ${{ !cancelled() }}
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    env:
+      RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_pages != 'false' }}
+      SKIP_REASON: ${{ needs.classify.outputs.reason }}
+    steps:
+      - name: Skipped by policy
+        if: env.RUN != 'true'
+        run: printf '::notice::Pages build skipped by policy. %s\n' "$SKIP_REASON"
+      - name: Checkout
+        if: env.RUN == 'true'
+        uses: actions/checkout@v5
+      - name: Setup Deno
+        if: env.RUN == 'true'
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: '2.9.5'
       - name: Check documentation snippets
+        if: env.RUN == 'true'
         run: deno task docs:snippets
       - name: Build Lume site
+        if: env.RUN == 'true'
         working-directory: docs/site
         run: deno task build
       - name: Check internal links
+        if: env.RUN == 'true'
         working-directory: docs/site
         run: deno task check:links
       - name: Check caveat references
+        if: env.RUN == 'true'
         working-directory: docs/site
         run: deno task check:caveats
       - name: Configure Pages
-        if: github.event_name != 'pull_request'
+        if: env.RUN == 'true' && github.event_name != 'pull_request'
         uses: actions/configure-pages@v6
       - name: Upload artifact
-        if: github.event_name != 'pull_request'
+        if: env.RUN == 'true' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v5
         with:
           path: docs/site/_site

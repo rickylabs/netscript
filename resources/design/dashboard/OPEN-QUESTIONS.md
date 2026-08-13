@@ -10,13 +10,13 @@
 
 ### OQ-1 — Which IA is the canvas building? (owner: orchestrator)
 
-My task brief named the `plan-roadmap-expansion--seed` proposal as "the ratified IA" and the
+My task brief named the `resources/design/dashboard/reference/plan-roadmap-expansion--seed` proposal as "the ratified IA" and the
 design-prototype plan's **LD-1** as the breadth lock ("shell + **7 panels** + 4 capability sections").
 Three of those seven panels were **killed by a later owner ratification**:
 
 | LD-1 panel | Fate | Evidence |
 | ---------- | ---- | -------- |
-| Flow / **Trace Waterfall** | scope killed; #418 rewritten to "S13 Live Flow — causal seam chain" | `dashboard-rescope--seed/ratification-summary.md` (owner: "yes to all, proceed", 32 mutations landed); epic #400 acceptance line 3 |
+| Flow / **Trace Waterfall** | scope killed; #418 rewritten to "S13 Live Flow — causal seam chain" | `resources/design/dashboard/reference/dashboard-rescope--seed/ratification-summary.md` (owner: "yes to all, proceed", 32 mutations landed); epic #400 acceptance line 3 |
 | **Logs** panel | #421 **closed, not planned** — logs deep-link to Aspire | same |
 | **Resource Control** panel | #422 **closed, not planned** — delivered as `withCommand` *inside* Aspire | same |
 

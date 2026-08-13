@@ -22,19 +22,39 @@ export async function prepareDesktopFixture(
 
   const denoPath = join(destination, 'deno.json');
   const config = JSON.parse(await Deno.readTextFile(denoPath)) as Record<string, unknown>;
+  const rootConfig = JSON.parse(
+    await Deno.readTextFile(join(repoRoot, 'deno.json')),
+  ) as Record<string, unknown>;
   config.version = version;
+  config.workspace = [];
+  config.catalog = rootConfig.catalog;
   config.imports = {
     '@netscript/fresh/desktop': localModule(repoRoot, 'packages/fresh/src/runtime/desktop/mod.ts'),
     '@netscript/sdk/auto-update': localModule(repoRoot, 'packages/sdk/src/auto-update/mod.ts'),
     '@netscript/sdk/desktop': localModule(repoRoot, 'packages/sdk/src/desktop/mod.ts'),
     '@netscript/telemetry': localModule(repoRoot, 'packages/telemetry/mod.ts'),
-    '@opentelemetry/api': 'npm:@opentelemetry/api@^1.9.0',
+    '@netscript/cli/desktop-release-signing': localModule(
+      repoRoot,
+      'packages/cli/src/public/features/deploy/target/desktop/release/sign-release.ts',
+    ),
+    '@opentelemetry/api': 'npm:@opentelemetry/api@^1.9.1',
     '@orpc/client': 'npm:@orpc/client@^1.14.6',
     '@orpc/server': 'npm:@orpc/server@^1.14.6',
     '@std/assert': 'jsr:@std/assert@^1',
     '@std/path': 'jsr:@std/path@^1',
+    zod: 'npm:zod@^4.4.3',
   };
   await Deno.writeTextFile(denoPath, `${JSON.stringify(config, null, 2)}\n`);
+
+  const contractPath = join(destination, 'tests', 'fixture-contract.ts');
+  const contract = await Deno.readTextFile(contractPath);
+  await Deno.writeTextFile(
+    contractPath,
+    contract.replace(
+      '../../../../src/public/features/deploy/target/desktop/release/sign-release.ts',
+      '@netscript/cli/desktop-release-signing',
+    ),
+  );
 
   const appSettingsPath = join(destination, 'dotnet', 'AppHost', 'appsettings.json');
   const appSettings = JSON.parse(await Deno.readTextFile(appSettingsPath)) as Record<

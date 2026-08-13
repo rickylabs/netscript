@@ -2,7 +2,7 @@
  * Shared contracts for the design-sync system.
  *
  * Vocabulary is locked by the run plan
- * (`.llm/runs/feat-dashboard-design-prototype--design/worklog.md` § Design):
+ * (`resources/design/dashboard/reference/feat-dashboard-design-prototype--design/plan.md` § Design):
  * `SyncConfig`, `RegistryUnit`, `ConversionResult`, `ParityReport`, `TrapCheck`,
  * plus the `RegistrySource` / `ClosureBuilder` ports.
  */

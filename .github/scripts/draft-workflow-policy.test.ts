@@ -33,7 +33,7 @@ Deno.test('draft PRs schedule no core, e2e, quality, or surface jobs', async () 
 
   const surface = await Deno.readTextFile('.github/workflows/surface-diff.yml');
   assertMatch(surface, /classify:[\s\S]*?github\.event\.pull_request\.draft == false/);
-  assertMatch(surface, /surface-diff:[\s\S]*?github\.event\.pull_request\.draft == false/);
+  assertMatch(surface, /surface-diff:[\s\S]*?needs\.classify\.result != 'skipped'/);
 });
 
 Deno.test('capability-vector and label overrides remain composed beneath draft gating', async () => {
