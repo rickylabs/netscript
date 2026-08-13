@@ -1,14 +1,23 @@
 # Context pack — quality-scan-allowance-rail
 
+## Evaluator identity and verdict
+
+- PLAN-EVAL session id: `977b0618-1b0c-4957-8369-698d3c5274c6` (Claude Code)
+- Requested route: provider=`openrouter` · model=`minimax/minimax-m3` · effort=`high`
+- Observed route: as requested (fallback from native Anthropic `fable-5`/medium which returned `model_not_found`; Claude session `4427e1d6-ab15-4f80-8840-2281744b1214` was zero-cost / zero-token)
+- Surface evaluated: `chore/quality-scan-allowance-rail` @ `c573beda9` against leaf base `01e096049`
+- Verdict: `FAIL_PLAN` — three must-resolve-now items remain (durable allowance owner, leaf contract surface amendment, workers JSR baseline). See `plan-eval.md` for the full checklist and required fixes.
+- Implementation hard stop remains in force. No product implementation has started; no merge, publish, or central-cluster mutation occurred.
+
 ## Current state
 
 - Wave 0 leaf at baseline `01e0960494c95ce56eb35892c211a095eb13e6ed`.
 - Branch `chore/quality-scan-allowance-rail`, no upstream; draft PR #1653 directly targets `main`.
 - Bootstrap commit: `12f0929f3db0507b37216dcfefa21301f5255399`.
-- PR lifecycle: RESEARCH and PLAN comments posted; milestone 0.0.7; `status:plan-eval`.
+- PR lifecycle: RESEARCH and PLAN comments posted; PLAN-EVAL comment posted with `FAIL_PLAN`; milestone 0.0.7; `status:plan-eval`.
 - Generator: OpenAI Codex `gpt-5.6-sol`, high.
 - No product implementation has started. #1378 and #1545 are inseparable.
-- Read `implement.md`, `research.md`, `plan.md`, `worklog.md`, and `drift.md` in full.
+- Read `implement.md`, `research.md`, `plan.md`, `plan-eval.md`, `worklog.md`, and `drift.md` in full.
 
 ## Separate PLAN-EVAL request
 

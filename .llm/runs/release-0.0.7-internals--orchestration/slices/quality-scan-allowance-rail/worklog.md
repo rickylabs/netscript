@@ -98,3 +98,25 @@ gates require the coordinator's singleton lease.
 - 2026-08-13 — committed bootstrap as `12f0929f3db0507b37216dcfefa21301f5255399`, pushed by explicit
   refspec, opened draft PR #1653 directly against `main`, applied milestone 0.0.7/taxonomy, posted
   RESEARCH and PLAN comments, and handed off at `status:plan-eval`.
+- 2026-08-13 — bounded opposite-family PLAN-EVAL (Claude session
+  `977b0618-1b0c-4957-8369-698d3c5274c6`, OpenRouter `minimax/minimax-m3` / high; native
+  `fable-5`/medium fallback per the lane policy) evaluated the plan at `c573beda9` against leaf base
+  `01e096049` and returned `FAIL_PLAN`. Three must-resolve-now items (`drift.md` D-2, D-3, D-4)
+  remain open and are listed in `plan-eval.md`; D-1 (#1545 stale prose) is editorial and safe to
+  defer to implementation alongside D-2. Implementation hard stop remains in force. No product,
+  package, plugin, generated, or workflow source was inspected or edited.
+
+## PLAN-EVAL verdict
+
+- Verdict: `FAIL_PLAN` (see `plan-eval.md`).
+- Required fixes before a fresh PLAN-EVAL may return `PASS`:
+  1. Durable open, milestoned debt owner for the seven allowances (D-2). #1545 closes in this PR and
+     cannot be the post-merge owner.
+  2. Leaf contract surface amendment for `.llm/tools/quality/scan-code-quality_test.ts`,
+     `packages/cli/src/kernel/assets/agent-tools.generated.ts`, and
+     `.llm/tools/consumer-tools.json`, or a truthful approved alternative that still proves
+     RED-first behaviour and ships a fresh consumer asset (D-3).
+  3. Workers JSR baseline decision — explicit no-increase debt baseline with separately owned debt
+     or scheduled prerequisite repair (D-4).
+  4. Editorial reconciliation of live #1545 acceptance count from stale 8 to measured 7 before the
+     PR carries `Closes #1545`.
