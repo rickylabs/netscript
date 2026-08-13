@@ -19,7 +19,9 @@ provider is Prisma 8 PostgreSQL, while NetScript owns a provider-neutral composi
 runtime-lifecycle, validation, and operations system. The experience must eliminate copied schemas,
 manually synchronized types, hand-wired clients/adapters, textual generated-source repair, implicit
 target selection, Aspire-coupled pure work, terminal-log contracts, and hand-maintained agent
-instructions.
+instructions. Adoption must follow NetScript's established progression: an L1 preset/recipe for the
+golden path, the L2 public factories it uses, and L3 native Prisma plus NetScript primitives/ports;
+source-native app inference is preferred over generated TypeScript bindings.
 
 ## Plan-Eval Disposition
 
@@ -34,6 +36,12 @@ additional PLAN-EVAL cycle is requested. `origin/main` has since advanced by one
 CI/gate-tooling commit (`01e096049`); the evaluator found no architecture, database, doctrine, or
 RFC premise invalidated, and the existing fresh-pin drift watch remains sufficient.
 
+After that pass, the owner issued `OWNER-DX-01`: the accepted architecture must expose NetScript's
+existing layered adoption pattern and must not assume generated app type bindings are inevitable.
+This is an explicit owner override to D-07/D-08/D-36, not a new PLAN-EVAL cycle; no further
+PLAN-EVAL will run. The Opus author/editor pass owns exact API selection and the source-native
+versus fallback type-boundary proof while keeping the RFC at or below 10,000 words.
+
 ## Scope
 
 - Current-state, failure-history, doctrine/debt, Prisma RC/current-source, market, and agent-surface
@@ -41,7 +49,8 @@ RFC premise invalidated, and the existing fresh-pin drift watch remains sufficie
 - Exact durable vocabulary, artifact taxonomy, package/archetype/dependency graph, public versus
   adapter-local ownership, and refusal boundaries.
 - Current model-first native Prisma TypeScript authoring, const-preserving app/plugin composition,
-  contract spaces, extension bundles, app-local inferred bindings, and an E2E type flow.
+  contract spaces, extension bundles, layered adoption, source-native app-local inference with a
+  bounded automatic declaration fallback, and an E2E type flow.
 - Bounded contract-derived Standard Schema validation for runtime and JSON representations,
   selection-aware results, codec contributions, fail-closed semantics, caching, and optional AOT
   equivalence.
@@ -59,10 +68,11 @@ RFC premise invalidated, and the existing fresh-pin drift watch remains sufficie
 - Production package, CLI, plugin, or provider implementation in this RFC PR.
 - Any backward-compatible facade, Prisma 7 client, legacy generated module, alias barrel, dual
   migration history, `setClient`, copied fragment, or runtime shim.
-- A NetScript query DSL, generic repository, ORM, model language, or lowest-common-denominator
-  portability API.
-- Recreating Prisma's obsolete target/table/column fluent builder or re-exporting Prisma as though
-  NetScript owns it.
+- A mirrored Prisma model/field/relation/query DSL, generic repository, ORM, or
+  lowest-common-denominator portability API. NetScript presets/factories may orchestrate identity,
+  policy, lifecycle, artifacts, extensions, and validation around the native contract.
+- Recreating Prisma's obsolete target/table/column fluent builder, copying private types/overloads,
+  or re-exporting Prisma as though NetScript owns it.
 - Runtime capability negotiation; capabilities are declared static data.
 - Cross-database foreign keys, transparent joins, atomic transactions, or automatic rollback.
 - Hosted control-plane products: RBAC, approval workflow, registries/promotion, fleet schedulers,
@@ -92,7 +102,7 @@ packages land. This RFC records the target; it does not mutate doctrine before a
 | A7    | Wrap Prisma and Standard Schema; do not rebuild an ORM or validator ecosystem.                                                                     |
 | A8    | Definition, runtime, control, provider, and tooling responsibilities live in separate role-named packages/folders.                                 |
 | A9    | Each future package has exactly one archetype; runtime is explicitly A3.                                                                           |
-| A10   | Generated application composition roots bind providers/targets; no global registry/service locator.                                                |
+| A10   | Application composition roots bind providers/targets; no global registry/service locator.                                                          |
 | A11   | Extension axes are named as target, role, namespace, space, provider, capability, connection source, runtime scope, and validation representation. |
 | A12   | Plan/apply/recovery, contribution lifecycle, and multi-target execution are explicit state machines.                                               |
 | A13   | Runtime/control crash boundaries, cancellation, unknown outcomes, and supervision are explicit.                                                    |
@@ -113,7 +123,7 @@ assertions, implicit fallback selection, and arbitrary schema TypeScript during 
 | `SpaceContribution`                 | Declarative owner/version/dependency/capability/provenance/retention record for one contract space.                              |
 | `ContractArtifact`                  | Canonical provider contract data/declaration, lineage, and provenance pinned per space.                                          |
 | `DatabaseManifest`                  | Deterministic, versioned, content-addressed resolved snapshot; the durable join point. A graph is private compiler IR only.      |
-| `AppBinding`                        | Generated application-local inferred bridge from native contract declarations to sessions, validators, and consumers.            |
+| `AppBinding`                        | Application-local inferred bridge to sessions/validators: source-native by default; an atomic declaration is a bounded fallback. |
 | `TargetRef` / `TargetSession`       | Explicit target reference and process/request lifecycle shell; concrete provider query type is app-local.                        |
 | `SpeculativePreview`                | Advisory output that cannot be approved or applied.                                                                              |
 | `ExecutablePlan`                    | Expiring plan bound to manifest, target/space closure, live baseline, provider pins, policy, environment, and secret references. |
@@ -132,7 +142,7 @@ or dependency edges.
 | Unit                                  | Archetype   | Owns                                                                                                                                   | Must not own                                                                    |
 | ------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
 | `@netscript/database-contract`        | A1          | Plain identities, manifests/plans/receipts/diagnostics, capabilities, ownership, shared small SPIs.                                    | IO, query types, provider imports.                                              |
-| `@netscript/database`                 | A4          | `defineDatabase`, target/space/policy definitions, pure compiler/resolver, frozen definitions.                                         | Connections, provider/Aspire imports, execution.                                |
+| `@netscript/database`                 | A4          | L1 database preset/recipe, L2 `defineDatabase`/target/space/policy factories, pure compiler/resolver, frozen definitions.              | Connections, provider/Aspire imports, execution.                                |
 | `@netscript/database-runtime`         | A3          | Process/request lifecycle, binding, connection ownership, health/readiness, cancellation, validation coordination.                     | Migration orchestration, CLI, provider query vocabulary.                        |
 | `@netscript/database-control`         | A2          | Programmatic classify/compose/emit/preview/plan/apply/verify/inspect, provider ports, locks, receipts, recovery, cross-target saga.    | Provider SQL/AST/types, terminal text, CLI rendering.                           |
 | `@netscript/database-prisma-postgres` | A2          | Sole framework runtime/control Prisma boundary, capability descriptor, artifact/control/runtime/validation adapters, import allowlist. | Prisma re-export, private-type public surface, hand-written low-level driver.   |
@@ -167,11 +177,15 @@ their plain canonical artifacts.
 - Candidate A is the baseline: native current model-first Prisma `defineContract`, then thin
   `defineDatabase({ contract, ... })` or `defineDatabaseSpace({ contract, ... })` preserving
   `typeof contract` unchanged.
-- An optional policy factory exists only if it forwards exact native helpers without private
-  imports, copied overloads, or inference widening; otherwise it is killed.
+- The adoption surface is L1 preset/recipe → L2 public factories → L3 native Prisma plus NetScript
+  primitives/ports. L1 literally composes L2 and returns the same definition; neither layer mirrors
+  Prisma schema/query vocabulary. Exact API spelling is settled by the Opus author/editor pass.
+- Any optional policy factory dies if it forwards/copies native helpers, needs private imports or
+  copied overloads, or widens inference.
 - `ownership: app` fragments return const-preserved native builder values and are composed by an
-  explicit generated root. `ownership: space` contributions own a full contract artifact and
-  migration head; this is the default for plugin-owned tables.
+  explicit source root; generation is reserved for a proved artifact boundary. `ownership: space`
+  contributions own a full contract artifact and migration head; this is the default for
+  plugin-owned tables.
 - One identity/version-checked `DatabaseExtension` bundle fans authoring, control, runtime, and
   validation facets through two-phase collection.
 - `TargetRef`/session handles expose lifecycle and a narrow query generic. Application-owned stores
@@ -214,59 +228,60 @@ Prisma control/runtime/contract/codec/AST shapes stay adapter-local.
 
 ## Locked Decision Ledger
 
-| ID   | Decision                                                                                                                               | Status                                 |
-| ---- | -------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| D-01 | Clean break; no backward-compatibility API/runtime surface.                                                                            | Locked                                 |
-| D-02 | Data continuity and mechanical migration are mandatory.                                                                                | Locked                                 |
-| D-03 | Durable join point is `DatabaseManifest`; live graph is private compiler IR.                                                           | Locked                                 |
-| D-04 | Definition, manifest, executable plan, provider ledger, and receipt remain separate values.                                            | Locked                                 |
-| D-05 | NetScript defines no query DSL, repository, or portable client facade.                                                                 | Locked                                 |
-| D-06 | Current native model-first Prisma TypeScript authoring is primary; obsolete fluent chaining is not recreated.                          | Locked; import spelling adapter-pinned |
-| D-07 | Candidate A native contract plus thin definition is baseline; optional factory dies on private imports/overload copying/type widening. | Locked                                 |
-| D-08 | App-specific inferred binding is generated app-local, never a kernel package export.                                                   | Locked                                 |
-| D-09 | Package/archetype graph above is exact; runtime is A3.                                                                                 | Locked                                 |
-| D-10 | Kernel is provider-neutral; first certified adapter is Prisma 8 PostgreSQL only.                                                       | Locked                                 |
-| D-11 | Unsupported providers fail explicitly; no Prisma 7 fallback.                                                                           | Locked                                 |
-| D-12 | Capabilities are static tags/requirements, never runtime negotiation.                                                                  | Locked                                 |
-| D-13 | Provider registry is composition-root data, never global/public mutable state.                                                         | Locked                                 |
-| D-14 | Stable target ID owns connection, output, runtime, migrations, locks, and receipts.                                                    | Locked                                 |
-| D-15 | Target selection is explicit, dependency-closed, and records every omission/reason.                                                    | Locked                                 |
-| D-16 | Replicas are roles of a target, never migration targets.                                                                               | Locked                                 |
-| D-17 | Provider-native contract spaces plus NetScript policy replace copied fragments.                                                        | Locked                                 |
-| D-18 | One managed owner per `ObjectKey`; augmentation requires owner grant.                                                                  | Locked                                 |
-| D-19 | Pinned mirrors make apply/verify independent of installed plugin code.                                                                 | Locked                                 |
-| D-20 | Detach-and-retain is guaranteed removal; archive/drop are conditional.                                                                 | Locked                                 |
-| D-21 | Standard Schema is public; bounded runtime interpretation is default.                                                                  | Locked                                 |
-| D-22 | Public validation representations are `runtime` and `json`; driver wire is internal.                                                   | Locked                                 |
-| D-23 | Complete Prisma operation validation is not contract-derived; exact operation contributors are required.                               | Locked                                 |
-| D-24 | Unknown validation metadata fails while constructing the schema.                                                                       | Locked                                 |
-| D-25 | Optional AOT validation is corpus-equivalent only and never required.                                                                  | Locked                                 |
-| D-26 | Pure operations cannot resolve connections, Aspire, Docker, or network.                                                                | Locked                                 |
-| D-27 | Programmatic operation catalog is primary; CLI/docs/agents are generated projections.                                                  | Locked                                 |
-| D-28 | Preview is not executable plan; apply accepts only bound/revalidated plans.                                                            | Locked                                 |
-| D-29 | NetScript owns policy/lock/recovery/receipts/cross-target saga; provider owns diff/lineage/marker mechanics.                           | Locked                                 |
-| D-30 | Cross-target apply is never atomic; partial and unknown outcomes are first-class.                                                      | Locked                                 |
-| D-31 | Local kernel does not rebuild hosted registry/RBAC/fleet/drift products.                                                               | Locked                                 |
-| D-32 | Generated artifacts are minimal, content-addressed, atomic, and never text-patched.                                                    | Locked                                 |
-| D-33 | Agent instructions/catalogs are generated and every example executes.                                                                  | Locked                                 |
-| D-34 | Existing MySQL/MSSQL/SQLite support is not carried through compatibility code.                                                         | Locked                                 |
-| D-35 | Production plans require signatures; mechanism/key custody is selected before production cutover.                                      | Pre-implementation W5/W10              |
-| D-36 | Model-first callback, Candidate A, two-phase collection, const-preserving root, and no-re-export rule define builder strategy.         | Locked; exact RC/GA path W3            |
-| D-37 | Multi-namespace adapter capability is withheld while Prisma type maps flatten runtime namespaces; no cast workaround.                  | Conditional upstream block             |
-| D-38 | App-owned fragments and plugin-owned spaces are distinct; plugin tables default to full space ownership.                               | Locked                                 |
-| D-39 | One extension bundle supplies identity-matched authoring/control/runtime/validation facets.                                            | Locked                                 |
-| D-40 | CI/production migration and runtime consume canonical verified artifacts, not arbitrary schema TypeScript.                             | Locked                                 |
-| D-41 | Exact Prisma control/runtime import allowlist and compatibility window are selected in W3.                                             | Pre-implementation W3                  |
-| D-42 | Native advisory versus fenced-row lock is certified per provider.                                                                      | Pre-implementation provider detail     |
-| D-43 | Whether AOT validation ships is safe to defer.                                                                                         | Deferred                               |
-| D-44 | A real second provider is safe to defer.                                                                                               | Deferred                               |
-| D-45 | Public raw/prepared/aggregate conveniences are safe to defer/keep adapter-local.                                                       | Deferred                               |
-| D-46 | Archive/drop plugin retirement in v1 is safe to defer.                                                                                 | Deferred                               |
-| D-47 | Remote approval/registry/continuous-drift integrations are safe to defer.                                                              | Deferred                               |
+| ID   | Decision                                                                                                                                                                                  | Status                                 |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| D-01 | Clean break; no backward-compatibility API/runtime surface.                                                                                                                               | Locked                                 |
+| D-02 | Data continuity and mechanical migration are mandatory.                                                                                                                                   | Locked                                 |
+| D-03 | Durable join point is `DatabaseManifest`; live graph is private compiler IR.                                                                                                              | Locked                                 |
+| D-04 | Definition, manifest, executable plan, provider ledger, and receipt remain separate values.                                                                                               | Locked                                 |
+| D-05 | NetScript defines no query DSL, repository, or portable client facade.                                                                                                                    | Locked                                 |
+| D-06 | Current native model-first Prisma TypeScript authoring is primary; obsolete fluent chaining is not recreated.                                                                             | Locked; import spelling adapter-pinned |
+| D-07 | Candidate A uses L1 preset/recipe → L2 public factories → L3 native Prisma + NetScript primitives; no mirrored Prisma schema/query DSL.                                                   | Owner override; locked                 |
+| D-08 | App-owned contracts prefer erased `typeof definition` inference while runtime consumes artifacts; atomic launcher-integrated declarations are a W3-proven publish/artifact-only fallback. | Owner override; locked                 |
+| D-09 | Package/archetype graph above is exact; runtime is A3.                                                                                                                                    | Locked                                 |
+| D-10 | Kernel is provider-neutral; first certified adapter is Prisma 8 PostgreSQL only.                                                                                                          | Locked                                 |
+| D-11 | Unsupported providers fail explicitly; no Prisma 7 fallback.                                                                                                                              | Locked                                 |
+| D-12 | Capabilities are static tags/requirements, never runtime negotiation.                                                                                                                     | Locked                                 |
+| D-13 | Provider registry is composition-root data, never global/public mutable state.                                                                                                            | Locked                                 |
+| D-14 | Stable target ID owns connection, output, runtime, migrations, locks, and receipts.                                                                                                       | Locked                                 |
+| D-15 | Target selection is explicit, dependency-closed, and records every omission/reason.                                                                                                       | Locked                                 |
+| D-16 | Replicas are roles of a target, never migration targets.                                                                                                                                  | Locked                                 |
+| D-17 | Provider-native contract spaces plus NetScript policy replace copied fragments.                                                                                                           | Locked                                 |
+| D-18 | One managed owner per `ObjectKey`; augmentation requires owner grant.                                                                                                                     | Locked                                 |
+| D-19 | Pinned mirrors make apply/verify independent of installed plugin code.                                                                                                                    | Locked                                 |
+| D-20 | Detach-and-retain is guaranteed removal; archive/drop are conditional.                                                                                                                    | Locked                                 |
+| D-21 | Standard Schema is public; bounded runtime interpretation is default.                                                                                                                     | Locked                                 |
+| D-22 | Public validation representations are `runtime` and `json`; driver wire is internal.                                                                                                      | Locked                                 |
+| D-23 | Complete Prisma operation validation is not contract-derived; exact operation contributors are required.                                                                                  | Locked                                 |
+| D-24 | Unknown validation metadata fails while constructing the schema.                                                                                                                          | Locked                                 |
+| D-25 | Optional AOT validation is corpus-equivalent only and never required.                                                                                                                     | Locked                                 |
+| D-26 | Pure operations cannot resolve connections, Aspire, Docker, or network.                                                                                                                   | Locked                                 |
+| D-27 | Programmatic operation catalog is primary; CLI/docs/agents are generated projections.                                                                                                     | Locked                                 |
+| D-28 | Preview is not executable plan; apply accepts only bound/revalidated plans.                                                                                                               | Locked                                 |
+| D-29 | NetScript owns policy/lock/recovery/receipts/cross-target saga; provider owns diff/lineage/marker mechanics.                                                                              | Locked                                 |
+| D-30 | Cross-target apply is never atomic; partial and unknown outcomes are first-class.                                                                                                         | Locked                                 |
+| D-31 | Local kernel does not rebuild hosted registry/RBAC/fleet/drift products.                                                                                                                  | Locked                                 |
+| D-32 | Generated artifacts are minimal, content-addressed, atomic, and never text-patched.                                                                                                       | Locked                                 |
+| D-33 | Agent instructions/catalogs are generated and every example executes.                                                                                                                     | Locked                                 |
+| D-34 | Existing MySQL/MSSQL/SQLite support is not carried through compatibility code.                                                                                                            | Locked                                 |
+| D-35 | Production plans require signatures; mechanism/key custody is selected before production cutover.                                                                                         | Pre-implementation W5/W10              |
+| D-36 | Prisma's model-first builder remains authority; progressive NetScript layers orchestrate seams without re-export, copied overloads, private types, or widening.                           | Owner override; exact RC/GA path W3    |
+| D-37 | Multi-namespace adapter capability is withheld while Prisma type maps flatten runtime namespaces; no cast workaround.                                                                     | Conditional upstream block             |
+| D-38 | App-owned fragments and plugin-owned spaces are distinct; plugin tables default to full space ownership.                                                                                  | Locked                                 |
+| D-39 | One extension bundle supplies identity-matched authoring/control/runtime/validation facets.                                                                                               | Locked                                 |
+| D-40 | CI/production migration and runtime consume canonical verified artifacts, not arbitrary schema TypeScript.                                                                                | Locked                                 |
+| D-41 | Exact Prisma control/runtime import allowlist and compatibility window are selected in W3.                                                                                                | Pre-implementation W3                  |
+| D-42 | Native advisory versus fenced-row lock is certified per provider.                                                                                                                         | Pre-implementation provider detail     |
+| D-43 | Whether AOT validation ships is safe to defer.                                                                                                                                            | Deferred                               |
+| D-44 | A real second provider is safe to defer.                                                                                                                                                  | Deferred                               |
+| D-45 | Public raw/prepared/aggregate conveniences are safe to defer/keep adapter-local.                                                                                                          | Deferred                               |
+| D-46 | Archive/drop plugin retirement in v1 is safe to defer.                                                                                                                                    | Deferred                               |
+| D-47 | Remote approval/registry/continuous-drift integrations are safe to defer.                                                                                                                 | Deferred                               |
 
 No must-resolve-now decision remains. Pre-implementation items have stable public semantics and
 cannot force a package-boundary rewrite. D-37 withholds a capability claim rather than blocking the
-provider-neutral architecture.
+provider-neutral architecture. `OWNER-DX-01` explicitly overrides D-07/D-08/D-36 after PLAN-EVAL; it
+does not start another evaluator cycle or alter the other decisions or six-package graph.
 
 ## Control and Contribution State Machines
 
@@ -329,20 +344,20 @@ marker cleanup where supported. After apply, recovery is forward via lineage and
 
 ## Implementation Waves
 
-| Wave | Scope                                                                                                                                            | Dependency | Exit evidence                                                                        |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------ |
-| W0   | Accepted RFC, doctrine/verdict amendments planned, package/gate registration.                                                                    | —          | RFC gates and architecture acceptance.                                               |
-| W1   | A1 contract kernel.                                                                                                                              | W0         | Zero-provider-dependency publish/doc/consumer gates.                                 |
-| W2   | A4 definition/compiler and manifest invariants.                                                                                                  | W1         | Pure deterministic property/negative tests; no IO.                                   |
-| W3   | Experimental Prisma PostgreSQL spike: native builder, artifacts, control/runtime, spaces, extensions, validation decoder, Deno, namespace check. | W1–W2      | Real PostgreSQL, packed Deno, import allowlist, kill/switch review.                  |
-| W4   | A3 runtime and Aspire connection adapter.                                                                                                        | W1–W3      | Lifecycle/leak/cancellation/scope/validation gates.                                  |
-| W5   | A2 control, plans, locks, receipts, recovery, cross-target saga.                                                                                 | W1–W4      | Failure injection, atomic emit, pure path without Aspire.                            |
-| W6   | A6 provider/space conformance testkit.                                                                                                           | W1–W5      | Intentionally broken fixtures fail; real-service machine report.                     |
-| W7   | `@netscript/plugin` contribution seam and first plugin-core fixture.                                                                             | W1–W6      | Breaking surface and thinness/seam/package-free gates.                               |
-| W8   | CLI/agent/adoption projection.                                                                                                                   | W2, W5–W7  | Generated examples/catalog freshness, populated adoption preflight.                  |
-| W9   | First-party auth/workers/sagas/triggers spaces.                                                                                                  | W7–W8      | Each space certified; package-free apply/verify and runtime parity.                  |
-| W10  | Clean cutover and legacy deletion.                                                                                                               | W1–W9      | Full release class, Windows/Linux, production-shaped adoption, remote published E2E. |
-| W11  | Second real provider only when demanded/mature.                                                                                                  | W10        | Same provider conformance; no kernel/manifest public rewrite.                        |
+| Wave | Scope                                                                                                                                                                    | Dependency | Exit evidence                                                                                             |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | --------------------------------------------------------------------------------------------------------- |
+| W0   | Accepted RFC, doctrine/verdict amendments planned, package/gate registration.                                                                                            | —          | RFC gates and architecture acceptance.                                                                    |
+| W1   | A1 contract kernel.                                                                                                                                                      | W0         | Zero-provider-dependency publish/doc/consumer gates.                                                      |
+| W2   | A4 definition/compiler and manifest invariants.                                                                                                                          | W1         | Pure deterministic property/negative tests; no IO.                                                        |
+| W3   | Experimental Prisma PostgreSQL spike: native builder, layered API, source-native inference/fallback boundary, artifacts, spaces/extensions, validation, Deno/namespaces. | W1–W2      | Direct-erasure and fallback fixtures, real PostgreSQL, packed Deno, import allowlist, kill/switch review. |
+| W4   | A3 runtime, manifest-only consumption, typed adapter binding, and Aspire connection adapter.                                                                             | W1–W3      | Lifecycle/leak/cancellation/scope/validation and no-authoring-runtime-import gates.                       |
+| W5   | A2 control, plans, locks, receipts, recovery, cross-target saga.                                                                                                         | W1–W4      | Failure injection, atomic emit, pure path without Aspire.                                                 |
+| W6   | A6 provider/space conformance testkit.                                                                                                                                   | W1–W5      | Intentionally broken fixtures fail; real-service machine report.                                          |
+| W7   | `@netscript/plugin` contribution seam and first plugin-core fixture.                                                                                                     | W1–W6      | Breaking surface and thinness/seam/package-free gates.                                                    |
+| W8   | CLI/agent/adoption projection plus launcher-integrated atomic emit/watch/bind.                                                                                           | W2, W5–W7  | Golden-path examples, catalog freshness, stale auto-remediation, populated adoption preflight.            |
+| W9   | First-party auth/workers/sagas/triggers spaces.                                                                                                                          | W7–W8      | Each space certified; package-free apply/verify and runtime parity.                                       |
+| W10  | Clean cutover and legacy deletion.                                                                                                                                       | W1–W9      | Full release class, Windows/Linux, production-shaped adoption, remote published E2E.                      |
+| W11  | Second real provider only when demanded/mature.                                                                                                                          | W10        | Same provider/layer conformance; no kernel, manifest, or L1/L2 public rewrite.                            |
 
 ## RFC Commit Slices
 
@@ -395,7 +410,8 @@ may follow.
   namespace/space isolation, locks, crash/unknown/resume, ownership/removal, and negative diagnostic
   matrices.
 - App fragment literal-type preservation, extension-bundle facet identity, namespace type/runtime
-  parity, 500-model editor/type-check budget, and no private/cast workaround.
+  parity, source-native `typeof definition` erasure, artifact-only/JSR fallback declarations,
+  500-model editor/type-check budget, and no private/cast/copied-overload workaround.
 - Standard Schema runtime/JSON corpus, two independent consumers, selection-aware outputs,
   fail-closed unsupported cases, contract-space aggregation, and optional AOT equivalence.
 - Generated project journeys, agent/help catalog freshness, executable examples, and full
@@ -432,27 +448,27 @@ packed install cannot substitute for the remote-graph verdict.
 
 ## Risk Register
 
-| Risk                                                   | Mitigation / kill response                                                                                             |
-| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| Designing to RC marketing or stale builder screenshots | Pin source; current model-first API; keep exact paths adapter-local; W3 spike.                                         |
-| Upstream changes during RFC/implementation             | RC/current split, exact provider pin/allowlist, independent provider release, compatibility-window gate.               |
-| Replacing glue with a second ORM/control plane         | No query/model DSL, no runtime negotiation, no hosted services, small SPIs and refusal boundary.                       |
-| Published slow types or Prisma leakage                 | App-local inference; no re-export/private imports; isolated declarations; no slow-types waiver; prospective JSR gates. |
-| Native fragment composition widens inference           | Two-phase explicit const-preserving generated root; compile-failure soundness fixtures and editor budget.              |
-| False multi-schema claim                               | Withhold capability until Prisma type/runtime parity passes without casts.                                             |
-| Contract-derived validation overclaims full operations | Bounded algebra, explicit contributors, runtime/JSON split, fail at schema construction.                               |
-| Custom codec accepts invalid values                    | Mandatory representation-specific value schemas; encode/decode is not validation.                                      |
-| Stale or half-published artifacts                      | Full canonical digest, atomic publish, facet identity, runtime/apply mismatch refusal.                                 |
-| Plugin removal destroys data                           | Retain default; archive/drop conditional destructive plan; no directory-delete semantics.                              |
-| Provider spaces mistaken for complete portability      | PostgreSQL-only certification; explicit unsupported targets; native capability surface.                                |
-| Apply success/exit code masks partial work             | Typed per-target/space outcomes, immutable checkpoints, `outcome-unknown`, inspect-before-resume.                      |
-| Cross-target atomicity/rollback implied                | Saga language only; no global transaction; complete partial-success receipt.                                           |
-| Mutable receipts become shadow state                   | Provider ledger remains authority; receipts are append-only evidence.                                                  |
-| No-compat cutover causes data loss                     | Ownership preflight, marker-only adoption, zero-DDL rehearsal, forward recovery, parallel release line only.           |
-| JSR plan mistaken for actual readiness                 | Explicit N/A now; per-package dry-run/docs/packed/canary/remote E2E receipts required later.                           |
-| RFC breadth becomes unimplementable                    | Exact packages, W0–W11 dependencies, per-wave exits, kill/switch criteria.                                             |
-| Agent/docs drift                                       | Generate from operation catalog/manifest and execute every example.                                                    |
-| CI remains long/flaky                                  | Pure/offline paths, digest caching, real-service gates only at bounded stages, atomic structured receipts.             |
+| Risk                                                   | Mitigation / kill response                                                                                                               |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Designing to RC marketing or stale builder screenshots | Pin source; current model-first API; keep exact paths adapter-local; W3 spike.                                                           |
+| Upstream changes during RFC/implementation             | RC/current split, exact provider pin/allowlist, independent provider release, compatibility-window gate.                                 |
+| Replacing glue with a second ORM/control plane         | No query/model DSL, no runtime negotiation, no hosted services, small SPIs and refusal boundary.                                         |
+| Published slow types or Prisma leakage                 | Source-native app inference; atomic fallback only across publish/artifact boundaries; no re-export/private imports or slow-types waiver. |
+| Native fragment composition widens inference           | Two-phase explicit const-preserving root; generate only at proved boundaries; compile-failure fixtures and editor budget.                |
+| False multi-schema claim                               | Withhold capability until Prisma type/runtime parity passes without casts.                                                               |
+| Contract-derived validation overclaims full operations | Bounded algebra, explicit contributors, runtime/JSON split, fail at schema construction.                                                 |
+| Custom codec accepts invalid values                    | Mandatory representation-specific value schemas; encode/decode is not validation.                                                        |
+| Stale or half-published artifacts                      | Full canonical digest, atomic publish, facet identity, runtime/apply mismatch refusal.                                                   |
+| Plugin removal destroys data                           | Retain default; archive/drop conditional destructive plan; no directory-delete semantics.                                                |
+| Provider spaces mistaken for complete portability      | PostgreSQL-only certification; explicit unsupported targets; native capability surface.                                                  |
+| Apply success/exit code masks partial work             | Typed per-target/space outcomes, immutable checkpoints, `outcome-unknown`, inspect-before-resume.                                        |
+| Cross-target atomicity/rollback implied                | Saga language only; no global transaction; complete partial-success receipt.                                                             |
+| Mutable receipts become shadow state                   | Provider ledger remains authority; receipts are append-only evidence.                                                                    |
+| No-compat cutover causes data loss                     | Ownership preflight, marker-only adoption, zero-DDL rehearsal, forward recovery, parallel release line only.                             |
+| JSR plan mistaken for actual readiness                 | Explicit N/A now; per-package dry-run/docs/packed/canary/remote E2E receipts required later.                                             |
+| RFC breadth becomes unimplementable                    | Exact packages, W0–W11 dependencies, per-wave exits, kill/switch criteria.                                                               |
+| Agent/docs drift                                       | Generate from operation catalog/manifest and execute every example.                                                                      |
+| CI remains long/flaky                                  | Pure/offline paths, digest caching, real-service gates only at bounded stages, atomic structured receipts.                               |
 
 ## Kill and Switch Criteria
 
@@ -478,8 +494,9 @@ None.
 ### Must resolve before implementation wave
 
 - W1: canonical manifest/digest encoding and public format-version evolution.
-- W3: exact Prisma pin/import allowlist/public builder subpath, runtime/Deno matrix, extension facet
-  mappings, namespace capability result, and experimental publication status.
+- W3: exact Prisma pin/import allowlist/public builder subpath, L1/L2 API spelling, direct-erasure
+  versus automatic declaration boundary, runtime/Deno matrix, extension facet mappings, namespace
+  capability result, and experimental publication status.
 - W4: concrete request/process scope and transaction capability shapes.
 - W5/W10: signature format/key custody, provider lock implementation, receipt storage/retention, and
   crash-fault harness.
@@ -508,7 +525,8 @@ their gates have run.
 - Current NetScript baseline, issue/PR history, doctrine, debt, RFC process, and harness protocols.
 - Prisma RC1/pinned current source, official release/ADRs/scorecard/issues/PRs, plus a fresh pin
   check during RFC drafting and W3.
-- Standard Schema and current NetScript oRPC/Fresh/plugin composition precedents.
+- Standard Schema and current NetScript service/Hono, SDK, Fresh, oRPC, and plugin composition
+  precedents, including the preset → factory → native-primitives progression.
 - Drift watch: Prisma RC/API/contract changes; namespace typing; moving control/runtime paths;
   NetScript DB changes merged to main; model route identity; any compatibility or hosted-control-
   plane creep; any package surface requiring slow types.

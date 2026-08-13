@@ -32,7 +32,7 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 | `/root/market_gap_audit`            | OpenAI · GPT-5.6 Sol · high | Missing delivery/control/validation comparators and market QA    | Complete |
 | `/root/validation_source_audit`     | OpenAI · GPT-5.6 Sol · high | RC contract/result-plan proof for runtime Standard Schema        | Complete |
 | `/root/typescript_schema_audit`     | OpenAI · GPT-5.6 Sol · high | Native TypeScript builder evolution and NetScript oRPC transfer  | Complete |
-| `/root/architecture_plan_synthesis` | OpenAI · GPT-5.6 Sol · high | Reconcile all evidence into a decision-grade Plan-Gate proposal  | Complete |
+| `/root/architecture_plan_synthesis` | OpenAI · GPT-5.6 Sol · high | Plan-Gate synthesis plus repository-grounded `OWNER-DX-01` audit | Complete |
 | `/root/planned_jsr_audit`           | OpenAI · GPT-5.6 Sol · high | Prospective publishability/slow-type review of the planned graph | Complete |
 
 These lanes are independent research/synthesis inputs. None is the formal PLAN-EVAL or the
@@ -54,6 +54,12 @@ reports and briefs remain immutable evidence. Cycle 2 passed at `383170bbc`; the
 `rfc-authoring`, canonical RFC authorship is unblocked but incomplete, and no further PLAN-EVAL
 cycle is requested. Cycle 2 also classified current-main `01e096049` as nonblocking CI/gate-tooling
 drift and independently confirmed 42 generated `db:*` keys per engine workspace.
+
+After cycle 2, `OWNER-DX-01` explicitly overrode D-07/D-08/D-36. It requires the shipped NetScript
+L1 preset/recipe → L2 public factories → L3 native-framework/primitives progression and prefers an
+erased source-native `typeof definition` binding over universal generated TypeScript. This is owner
+authority applied after evaluation, not a third PLAN-EVAL cycle; the six-package graph and all other
+decisions remain locked, and no further PLAN-EVAL will run.
 
 ## RFC authoring and consolidation
 
@@ -85,6 +91,14 @@ narrowly through GR-01–GR-08; the architecture stands. The deletion ledger est
 1,180 words deleted and 140 added, net approximately 1,040–1,200 removed, landing around
 10,000–10,160 with another safe approximately 80-word cut. The RFC remains frozen at 11,205 words
 pending Opus dispositions; this is not final acceptance.
+
+The subsequent `OWNER-DX-01` audit is recorded in `research/layered-dx-api-audit.md`. It inspected
+the defining service/Hono preset, builder, and native primitives; SDK/Fresh analogues; and pinned
+Prisma's runtime `contractJson` plus phantom compile-time contract split. Opus remains the
+author/editor responsible for selecting the exact layered API and expressing the W3 proof/fallback
+boundary while reducing the RFC to at most 10,000 words. The default is source-native app inference
+with runtime manifest/artifact consumption; automatic atomic launcher-integrated declarations are
+reserved for proved publish/artifact-only boundaries.
 
 ## Recorded lane/eval overrides
 
@@ -135,3 +149,9 @@ pending Opus dispositions; this is not final acceptance.
 - The owner locked the post-draft sequence: root personal review → Qwen 3.8 Max focused review →
   Grok 4.6 high whole-RFC adversarial review → Opus author/editor dispositions and consolidation →
   one final Fable 5 high substantive refinement → mechanical checks only.
+- After PLAN-EVAL cycle 2 and the frozen Qwen/Grok review inputs, the owner issued `OWNER-DX-01`.
+  The override changes D-07/D-08/D-36 only: progressive NetScript adoption layers are required, only
+  a mirrored Prisma model/field/relation/query DSL is forbidden, and erased source-native app
+  inference replaces universal generated bindings. It triggers no further PLAN-EVAL. Opus decides
+  exact API spelling and proves the fallback boundary during the already-planned ≤10k disposition
+  pass.

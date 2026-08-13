@@ -21,7 +21,11 @@ reduced it to 11,205 words. Root read the entire compact RFC, added three narrow
 and pushed it as `5dfc4e8eb`. Qwen 3.8 Max reviewed that frozen commit without edits and returned
 `PASS_WITH_CHANGES`. Grok 4.6 high then reviewed the same byte-identical RFC without edits and
 returned `PASS_WITH_REFINEMENTS` with zero blockers. QF-01–QF-05 and GR-01–GR-08 remain open. It is
-not finally accepted. Current-main commit `01e096049` remains nonblocking CI/gate-tooling drift.
+not finally accepted. After PLAN-EVAL and these reviews, the owner issued `OWNER-DX-01`: D-07/D-08/
+D-36 now require L1 preset/recipe → L2 public factories → L3 native Prisma plus NetScript
+primitives, with source-native app inference preferred over generated type bindings. This is an
+owner override, not a new PLAN-EVAL cycle. Current-main commit `01e096049` remains nonblocking
+CI/gate-tooling drift.
 
 ## Completed
 
@@ -51,17 +55,24 @@ not finally accepted. Current-main commit `01e096049` remains nonblocking CI/gat
   `PASS_WITH_REFINEMENTS`, zero blockers, and GR-01–GR-08.
 - Grok passed axes 2, 3, 4, and 6. Abstraction, public API/DX/types, and economy failed narrowly;
   the architecture stands.
+- Completed `research/layered-dx-api-audit.md`: shipped service/Hono uses preset → factory → native
+  primitives; SDK and Fresh preserve inferred lower-layer values; pinned Prisma separates runtime
+  `contractJson` from its phantom compile-time contract generic. The audit recommends erased
+  `typeof definition` for app-owned contracts and automatic atomic launcher-integrated declarations
+  only for W3-proven publish/artifact-only boundaries.
 
 ## In Progress
 
-- Opus 5 high author/editor dispositions and consolidation. The RFC remains frozen at 11,205 words
-  and the run remains in `rfc-authoring`; no QF/GR finding has been dispositioned yet.
+- Opus 5 high author/editor dispositions and consolidation, including `OWNER-DX-01` exact API
+  selection and type-boundary proof. The RFC remains frozen at 11,205 words and the run remains in
+  `rfc-authoring`; no QF/GR finding has been dispositioned yet.
 
 ## Next Steps
 
-1. Use Opus 5 high for author/editor disposition of every QF/GR finding and consolidation to at most
-   10,000 words. Preserve Qwen's must-not-cut contracts; Grok projects a net approximately
-   1,040–1,200-word cut plus another safe approximately 80 words if needed.
+1. Use Opus 5 high for author/editor disposition of every QF/GR finding, integrate `OWNER-DX-01`,
+   choose the exact layered API, and state how W3 proves direct inference versus fallback while
+   consolidating to at most 10,000 words. Preserve Qwen's must-not-cut contracts; Grok projects a
+   net approximately 1,040–1,200-word cut plus another safe approximately 80 words if needed.
 2. Root checks the consolidated result.
 3. Run one final Fable 5 high substantive refinement.
 4. Run mechanical checks only, then commit/push and update the PR trail.
@@ -73,6 +84,8 @@ not finally accepted. Current-main commit `01e096049` remains nonblocking CI/gat
 | No backward compatibility      | Owner directive | Migration safety is required; runtime compatibility shims are not.                                 |
 | NetScript owns its DB concepts | Initial plan    | Prisma remains an adapter/engine target, not the framework-facing vocabulary.                      |
 | Exact future package graph     | Plan lock       | A1 contract → A4 definition → A3 runtime → A2 control → A2 Prisma PostgreSQL adapter → A6 testkit. |
+| Layered database adoption      | Owner override  | L1 preset/recipe uses L2 factories; L3 is native Prisma plus NetScript primitives/ports.           |
+| App type flow                  | Owner override  | Erased `typeof definition` first; automatic atomic declaration only at a W3-proven boundary.       |
 | Fable 5 high is last           | Owner directive | Final gate includes refinement, not only critique.                                                 |
 
 ## Files Changed
@@ -83,19 +96,21 @@ not finally accepted. Current-main commit `01e096049` remains nonblocking CI/gat
 
 ## Gates
 
-| Gate family | Current status | Evidence                                            |
-| ----------- | -------------- | --------------------------------------------------- |
-| Static      | PASS           | Compact RFC fmt, `docs:links`, diff.                |
-| Fitness     | plan PASS      | Cycle 2 `plan-eval.md`; D-01–D-47.                  |
-| Runtime     | N/A            | Docs-only RFC run.                                  |
-| Consumer    | changes open   | Qwen/Grok reviews complete; Opus dispositions next. |
+| Gate family | Current status | Evidence                                              |
+| ----------- | -------------- | ----------------------------------------------------- |
+| Static      | PASS           | Compact RFC fmt, `docs:links`, diff.                  |
+| Fitness     | owner override | Cycle 2 PASS; D-01–D-47 plus post-eval `OWNER-DX-01`. |
+| Runtime     | N/A            | Docs-only RFC run.                                    |
+| Consumer    | changes open   | Qwen/Grok reviews complete; Opus dispositions next.   |
 
 ## Open Questions
 
 - No must-resolve-now architecture decision remains; pre-implementation decisions stay assigned to
-  their W1/W3/W4/W5/W7/W10 gates.
+  their W1/W3/W4/W5/W7/W10 gates. W3 now includes direct-erasure and automatic-fallback proof.
 - QF-01–QF-05 are review findings, not reopened architecture decisions; they await author/editor
   disposition together with GR-01–GR-08.
+- Exact L1/L2 API spelling is an Opus author/editor task under the owner override; it may not add a
+  mirrored Prisma schema/query DSL or change the six-package graph.
 
 ## Drift and Debt
 

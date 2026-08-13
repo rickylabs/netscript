@@ -48,12 +48,17 @@ the harness-required current research entrypoint; it does not duplicate the repo
 8. Prisma runtime lowering supports namespaces, but RC1 and the inspected post-RC source flatten
    namespaces in type maps. Sound multi-namespace E2E typing is an upstream-blocked capability, not
    a current product claim.
-9. NetScript's `isolatedDeclarations` and doctrine slow-type boundary require application-specific
-   inferred Prisma bindings to remain generated app-local values rather than published framework
-   exports.
+9. NetScript's service/Hono surface already implements preset → public factory → native framework
+   plus NetScript primitives; SDK and Fresh preserve the same inferred lower-layer values through
+   progressively lower adoption surfaces.
 10. Market evidence separates source definition, resolved manifest, executable plan, provider
     ledger, and immutable receipt. It supports partial/unknown outcome recovery and rejects a local
     reinvention of hosted RBAC, fleet, registry, and continuous-drift products.
+11. Pinned Prisma separates compile-time `TContract` from runtime `contractJson` (including a
+    phantom contract type on the emitted path). App-owned contracts can therefore prefer an erased
+    source-native `typeof definition` binding while runtime consumes only manifest/artifact values.
+    Root `isolatedDeclarations` still requires an automatic atomic declaration fallback when exact
+    types cross a publish or artifact-only boundary.
 
 ## Corrections and conflict resolutions
 
@@ -80,6 +85,15 @@ the harness-required current research entrypoint; it does not duplicate the repo
 - Opus's provider re-export sketch is rejected. Applications and controlled plugin authoring may
   import Prisma's public builder directly; NetScript wraps the resulting native value and never
   pretends to own or vendor the builder.
+- `OWNER-DX-01` supersedes the earlier universal-generated-binding assumption after PLAN-EVAL. The
+  current model-first Prisma builder remains schema authority, while NetScript adopts its
+  established L1 preset/recipe → L2 public factories → L3 native Prisma plus primitives/ports
+  progression. This permits orchestration layers but still forbids a mirrored Prisma
+  model/field/relation/query DSL, re-export, copied overloads, private types, or inference widening.
+- The prospective JSR audit's generated-app-binding statement was planning evidence, not an executed
+  impossibility proof. Source-native app inference is now the default; a same-compile,
+  launcher-integrated declaration is the bounded fallback for publish/artifact-only boundaries and
+  must be proved in W3.
 - Plugin removal is not solved by contract spaces alone. Detach-and-retain is the initial guaranteed
   lifecycle; archive/drop remain conditional.
 - The kernel is provider-neutral while the first adapter is Prisma 8 PostgreSQL-only. Unsupported
@@ -96,6 +110,7 @@ the harness-required current research entrypoint; it does not duplicate the repo
 | [runtime-validation-maintainer-exchange.md](./research/runtime-validation-maintainer-exchange.md) | Owner-supplied exploratory primary evidence for runtime-derived validation direction.                                                                       |
 | [runtime-validation-source-audit.md](./research/runtime-validation-source-audit.md)               | Pinned-source proof of bounded validation algebra, missing operation metadata, codec representations, cache identity, and fail-closed cases.                |
 | [typescript-schema-orpc-audit.md](./research/typescript-schema-orpc-audit.md)                     | Historical/current Prisma builder evolution, native fragment/space composition, oRPC transfer, extension bundles, namespace blocker, and artifact boundary. |
+| [layered-dx-api-audit.md](./research/layered-dx-api-audit.md)                                     | `OWNER-DX-01` repository-grounded service/Hono, SDK, Fresh, pinned-Prisma type-flow audit and proposed three-layer adoption API.                            |
 | [qwen-prisma-risk-review.md](./research/qwen-prisma-risk-review.md)                               | Independent adversarial minimum-kernel, provider-contingency, risk, conformance, and kill review; factual conflicts corrected above.                        |
 | [claude-opus-architecture-review.md](./research/claude-opus-architecture-review.md)               | Independent package/archetype, identity, runtime, control, contribution, cutover, waves, and conformance architecture review.                               |
 | [planned-jsr-audit.md](./research/planned-jsr-audit.md)                                           | Prospective JSR verdict `PASS-AS-PLANNED`; explicitly not actual publish readiness because packages do not exist.                                           |
@@ -103,10 +118,10 @@ the harness-required current research entrypoint; it does not duplicate the repo
 
 ## Research verdict
 
-Research supports proceeding to PLAN-EVAL with no must-resolve-now architecture decision. The exact
-Prisma RC/GA import spelling, provider lock mechanism, signature/key custody, and other
-implementation details are classified by wave and cannot force a package-boundary rewrite. The
-Prisma namespace type/runtime mismatch is a capability block: it withholds a claim rather than
-blocking the provider-neutral architecture.
-
-No canonical RFC may be authored until the separate evaluator returns `PASS`.
+PLAN-EVAL cycle 2 passed with no must-resolve-now architecture decision. `OWNER-DX-01` is a later,
+explicit owner override, not a new evaluator cycle. The exact Prisma RC/GA import spelling, provider
+lock mechanism, signature/key custody, and other implementation details remain classified by wave;
+the Opus author/editor pass will choose the exact layered API and state the W3 type-boundary proof
+while consolidating the RFC to at most 10,000 words. The namespace mismatch continues to withhold a
+capability claim rather than blocking the provider-neutral architecture. No further PLAN-EVAL will
+run.

@@ -17,15 +17,17 @@ because the copied generated-workspace task count was factually wrong; evaluator
 `db:*` keys per workspace for all four providers. After correction, native Fable 5 medium cycle 2
 session `f3286656-7d0f-4da2-a22d-32897a5e6482` evaluated commit `383170bbc` and returned `PASS`.
 Canonical RFC authorship is unblocked. The consolidated draft is accepted for focused review but is
-not finally accepted; no further PLAN-EVAL cycle is planned.
+not finally accepted; no further PLAN-EVAL cycle is planned. After cycle 2, the owner issued
+`OWNER-DX-01`, overriding D-07/D-08/D-36 to require layered adoption and source-native app inference
+by default. This is not a new PLAN-EVAL cycle and leaves the exact six-package graph intact.
 
 ### Public Surface and Package Graph
 
 - Planned RFC record: `rfcs/0000-database-architecture.md`; its authorship is now unblocked.
 - `@netscript/database-contract` (A1): plain identities, manifest/plan/receipt/diagnostic schemas,
   capabilities, ownership, and shared small SPIs; zero provider dependencies.
-- `@netscript/database` (A4): thin `defineDatabase`/target/space/policy definitions and pure
-  deterministic manifest compiler.
+- `@netscript/database` (A4): L1 preset/recipe, the L2 `defineDatabase`/target/space/policy
+  factories it uses, and the pure deterministic manifest compiler.
 - `@netscript/database-runtime` (A3): process/request lifecycle, connection ownership,
   health/readiness, cancellation, and validation coordination.
 - `@netscript/database-control` (A2): programmatic operation catalog, emit/preview/plan/apply/
@@ -37,11 +39,13 @@ not finally accepted; no further PLAN-EVAL cycle is planned.
 - Existing `@netscript/plugin` (A4), first-party plugins (A5), Aspire (A2), and CLI (A6) receive
   thin database contribution, connection-source, and operation-projection changes.
 
-Candidate A is the authoring baseline: applications and controlled plugin build inputs call current
-model-first Prisma `defineContract`, then pass the exact native value into thin
-`defineDatabase`/`defineDatabaseSpace` functions that preserve inference. NetScript neither
-recreates the deleted screenshot fluent DSL nor vendors/re-exports Prisma. App-specific inferred
-bindings and const-preserving fragment composition are generated application-locally.
+Candidate A remains the authoring baseline: current model-first Prisma `defineContract` is schema
+authority. NetScript exposes its established L1 preset/recipe → L2 public factories → L3 native
+Prisma plus NetScript primitives/ports progression. It bans a mirrored Prisma
+model/field/relation/query DSL, vendoring/re-export, copied overloads, private types, and
+widening—not progressive orchestration. App-owned contracts prefer erased `typeof definition`
+inference while runtime consumes manifest/artifact values; automatic atomic launcher-integrated
+declarations are a W3-proven fallback only for publish/artifact-only boundaries.
 
 ### Domain Vocabulary
 
@@ -51,7 +55,8 @@ bindings and const-preserving fragment composition are generated application-loc
 - `ContractArtifact`: canonical provider data/declaration/lineage/provenance, pinned per space.
 - `DatabaseManifest`: deterministic versioned resolved value and durable join point; a graph is
   private compiler IR only.
-- `AppBinding`: generated app-local inferred target/session/validation bridge.
+- `AppBinding`: app-local inferred target/session/validation bridge, source-native by default and
+  declaration-backed only at a proved boundary.
 - `TargetRef`/`TargetSession`: explicit identity and lifecycle shell with app-local query generic.
 - `SpeculativePreview` versus baseline-bound `ExecutablePlan`.
 - Provider-owned `ProviderMarker`/`ProviderLedger` versus immutable NetScript `OperationReceipt`.
@@ -130,14 +135,17 @@ reconciliation, and `e2e-cli-prod` against exact JSR versions.
 ### Contributor Path and Implementation Waves
 
 Contributors author native provider contracts, then declare app-owned fragments or plugin-owned full
-spaces. A two-phase generated root collects extension bundles/dependencies first, then invokes
-native fragments with exact helpers. Plugin tables default to their own space, artifacts, lineage,
-and head; production apply/verify consumes the pinned mirror without plugin code.
+spaces. A two-phase root collects extension bundles/dependencies first, then invokes native
+fragments with exact helpers. One extension registration fans all facets. Plugin tables default to
+their own space, artifacts, lineage, and head; production apply/verify consumes the pinned mirror
+without plugin code. Generated type declarations are not universal and, where W3 proves them
+necessary, are created automatically in the same atomic launcher-integrated compile.
 
-W0 RFC/doctrine plan → W1 contract → W2 definition/compiler → W3 experimental Prisma PostgreSQL
-spike → W4 runtime → W5 control → W6 testkit → W7 plugin seam → W8 CLI/agent/adoption → W9
-first-party spaces → W10 clean cutover → W11 second provider only when real/mature. Every wave has
-the archetype, source, JSR, consumer, conformance, and release exits recorded in `plan.md`.
+W0 RFC/doctrine plan → W1 contract → W2 definition/compiler → W3 experimental Prisma PostgreSQL and
+type-boundary spike → W4 manifest-only runtime → W5 control → W6 testkit → W7 plugin seam → W8
+layered CLI/agent/emit-watch adoption → W9 first-party spaces → W10 clean cutover → W11 second
+provider only when real/mature. Every wave has the archetype, source, JSR, consumer, conformance,
+and release exits recorded in `plan.md`.
 
 ## Progress Log
 
@@ -157,6 +165,7 @@ the archetype, source, JSR, consumer, conformance, and release exits recorded in
 | 2026-08-13 | 3     | root-review | Root substantively reviewed the 28,194-word raw draft and returned `REVISE_CONSOLIDATE`. The review locks a reader-first 8,000–10,000-word target (12,000 hard ceiling), removes duplicated evidence/process appendices, and records ten blocking API/correctness repairs before Qwen and Grok review.                                         |
 | 2026-08-13 | 5     | qwen-review | Qwen 3.8 Max session `3d1277dd-be6a-44af-9e98-4560d8aaf1b7` reviewed frozen commit `5dfc4e8eb` at effort `max`, returned 2,181 words and `PASS_WITH_CHANGES`, made no edits, and opened QF-01 high, QF-02 medium, and QF-03–QF-05 low. Four substantive axes passed; TypeScript/API and package/dependency examples need disposition.          |
 | 2026-08-13 | 5     | grok-review | OpenCode/OpenRouter requested and observed `x-ai/grok-4.6` variant `high`, session `ses_003644aeaffeSm3UCAW9xUqRIK`, against RFC commit `5dfc4e8eb` and byte-identical blob `f46040d8...` while HEAD was `be83301c6`. It used no subagents, made no edits, and returned `PASS_WITH_REFINEMENTS`, zero blockers, and GR-01–GR-08.               |
+| 2026-08-13 | 6     | owner-dx    | `OWNER-DX-01` audited shipped service/Hono preset→factory→native primitives, SDK/Fresh analogues, and Prisma's runtime `contractJson` plus phantom compile-time contract split. Owner overrode D-07/D-08/D-36 after PLAN-EVAL: source-native app inference is default; automatic declarations are a bounded W3 fallback. No new PLAN-EVAL.     |
 
 ### RFC Consolidation and Root Acceptance
 
@@ -240,19 +249,19 @@ CI/gate-tooling drift that changes structured check invocation rather than datab
 
 ## Decisions
 
-| Decision                                                      | Reason                                                                                                                     | Source                                   |
-| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| #313 is superseded design evidence                            | Its additive/compatibility premise conflicts with the owner-directed clean break.                                          | Owner directive + current rebaseline     |
-| Compiled manifest, not live graph                             | A plain deterministic value is the durable join point and avoids service location.                                         | Synthesis D-03/D-04                      |
-| Exact A1/A4/A3/A2/A2/A6 package split                         | One archetype per responsibility; runtime lifecycle requires A3 gates.                                                     | Doctrine + synthesis §4                  |
-| Native model-first Prisma authoring                           | Preserve the real current builder/inference; never recreate the deleted fluent screenshot API or another DSL.              | TypeScript/oRPC audit + D-06/D-07        |
-| App-local inferred binding                                    | Satisfies isolated declarations without expanding the oRPC-only slow-type exception.                                       | Doctrine/JSR audit + D-08                |
-| Contract spaces and extension bundles                         | Plugin ownership/history and one authoring/control/runtime/validation registration replace copied fragments/manual facets. | Prisma source + D-17–D-20/D-38–D-40      |
-| Bounded Standard Schema interpreter                           | Contract runtime data is useful but omits full operation/result types; runtime/JSON schemas fail closed.                   | Validation source audit + D-21–D-25      |
-| Provider-neutral kernel, PostgreSQL-only first adapter        | Matches Prisma maturity without compatibility fallback or false portability.                                               | Prisma scorecard/source + D-10/D-11/D-34 |
-| NetScript operational semantics, provider migration mechanics | NetScript owns policy/locks/recovery/receipts/saga while provider owns diff/lineage/marker.                                | Market/source reconciliation + D-27–D-30 |
-| PLAN-EVAL before RFC                                          | Architecture has no open must-resolve item but still requires independent acceptance.                                      | Harness Plan-Gate + D-01–D-47            |
-| Fable 5 high remains last substantive gate                    | Explicit owner exception; no substantive model review follows it.                                                          | Owner directive                          |
+| Decision                                                      | Reason                                                                                                                        | Source                                   |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| #313 is superseded design evidence                            | Its additive/compatibility premise conflicts with the owner-directed clean break.                                             | Owner directive + current rebaseline     |
+| Compiled manifest, not live graph                             | A plain deterministic value is the durable join point and avoids service location.                                            | Synthesis D-03/D-04                      |
+| Exact A1/A4/A3/A2/A2/A6 package split                         | One archetype per responsibility; runtime lifecycle requires A3 gates.                                                        | Doctrine + synthesis §4                  |
+| Native model-first Prisma authoring and layered adoption      | Prisma owns schema vocabulary; L1 preset uses L2 factories and L3 exposes native Prisma plus NetScript primitives/ports.      | OWNER-DX-01 + D-06/D-07/D-36             |
+| App-local inferred binding                                    | Prefer erased `typeof definition`; use atomic launcher-integrated declarations only at W3-proven publish/artifact boundaries. | OWNER-DX-01 + D-08                       |
+| Contract spaces and extension bundles                         | Plugin ownership/history and one authoring/control/runtime/validation registration replace copied fragments/manual facets.    | Prisma source + D-17–D-20/D-38–D-40      |
+| Bounded Standard Schema interpreter                           | Contract runtime data is useful but omits full operation/result types; runtime/JSON schemas fail closed.                      | Validation source audit + D-21–D-25      |
+| Provider-neutral kernel, PostgreSQL-only first adapter        | Matches Prisma maturity without compatibility fallback or false portability.                                                  | Prisma scorecard/source + D-10/D-11/D-34 |
+| NetScript operational semantics, provider migration mechanics | NetScript owns policy/locks/recovery/receipts/saga while provider owns diff/lineage/marker.                                   | Market/source reconciliation + D-27–D-30 |
+| PLAN-EVAL before RFC                                          | Architecture has no open must-resolve item but still requires independent acceptance.                                         | Harness Plan-Gate + D-01–D-47            |
+| Fable 5 high remains last substantive gate                    | Explicit owner exception; no substantive model review follows it.                                                             | Owner directive                          |
 
 ## Drift
 
@@ -273,14 +282,14 @@ CI/gate-tooling drift that changes structured check invocation rather than datab
 
 ### Fitness Gates
 
-| Gate                         | Result                | Evidence                                                           | Notes                                                                                |
-| ---------------------------- | --------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| Archetype/package assignment | PASS_PLANNED          | `plan.md` package graph                                            | A1/A2/A3/A4/A5/A6 responsibilities and gates are explicit.                           |
-| Open-decision sweep          | PASS_PLANNED          | D-01–D-47                                                          | No must-resolve-now item; pre-wave/deferred items cannot rewrite package boundaries. |
-| Prospective JSR audit        | PASS_AS_PLANNED       | `research/planned-jsr-audit.md`                                    | New-package dry-run/docs/packed/canary gates are N/A until implementation, not PASS. |
-| PLAN-EVAL                    | PASS_CYCLE_2          | `plan-eval.md`; session `f3286656-7d0f-4da2-a22d-32897a5e6482`     | Commit `383170bbc`; no further Plan-Eval cycle.                                      |
-| Qwen focused RFC review      | PASS_WITH_CHANGES     | Session `3d1277dd-be6a-44af-9e98-4560d8aaf1b7`; commit `5dfc4e8eb` | Five findings remain open; review made no edits.                                     |
-| Grok whole-RFC review        | PASS_WITH_REFINEMENTS | Session `ses_003644aeaffeSm3UCAW9xUqRIK`; blob `f46040d8...`       | Zero blockers; GR-01–GR-08 await disposition.                                        |
+| Gate                         | Result                | Evidence                                                           | Notes                                                                                 |
+| ---------------------------- | --------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| Archetype/package assignment | PASS_PLANNED          | `plan.md` package graph                                            | A1/A2/A3/A4/A5/A6 responsibilities and gates are explicit.                            |
+| Open-decision sweep          | PASS_OWNER_OVERRIDE   | D-01–D-47 plus `OWNER-DX-01`                                       | No must-resolve-now item; D-07/D-08/D-36 updated without changing package boundaries. |
+| Prospective JSR audit        | PASS_AS_PLANNED       | `research/planned-jsr-audit.md`                                    | New-package dry-run/docs/packed/canary gates are N/A until implementation, not PASS.  |
+| PLAN-EVAL                    | PASS_CYCLE_2          | `plan-eval.md`; session `f3286656-7d0f-4da2-a22d-32897a5e6482`     | Commit `383170bbc`; no further Plan-Eval cycle.                                       |
+| Qwen focused RFC review      | PASS_WITH_CHANGES     | Session `3d1277dd-be6a-44af-9e98-4560d8aaf1b7`; commit `5dfc4e8eb` | Five findings remain open; review made no edits.                                      |
+| Grok whole-RFC review        | PASS_WITH_REFINEMENTS | Session `ses_003644aeaffeSm3UCAW9xUqRIK`; blob `f46040d8...`       | Zero blockers; GR-01–GR-08 await disposition.                                         |
 
 ### Runtime Gates
 
@@ -298,12 +307,14 @@ CI/gate-tooling drift that changes structured check invocation rather than datab
 ## Handoff Notes
 
 - Planning is complete and evaluator-approved at commit `383170bbc`. Cycle 1's failure remains
-  preserved; cycle 2 passed and no further PLAN-EVAL cycle is requested.
+  preserved; cycle 2 passed and no further PLAN-EVAL cycle is requested. `OWNER-DX-01` is an
+  explicit later owner override, not an evaluator rerun.
 - Prospective package publishability is `PASS-AS-PLANNED`; actual JSR commands remain N/A until
   packages exist and must produce implementation/release receipts later.
 - The consolidated RFC remains frozen at `5dfc4e8eb` and 11,205 words. Qwen returned
   `PASS_WITH_CHANGES`; Grok returned `PASS_WITH_REFINEMENTS` and zero blockers. All QF/GR findings
   and both deletion ledgers await disposition.
 - Continue the owner-locked order: Opus 5 high author/editor dispositions plus consolidation to at
-  most 10,000 words, root checks, one final Fable 5 high substantive refinement, and mechanical
-  checks only. The current checkpoint is not final acceptance.
+  most 10,000 words, including exact layered API selection and proof of the source-native/fallback
+  boundary; root checks, one final Fable 5 high substantive refinement, and mechanical checks only.
+  The current checkpoint is not final acceptance.
