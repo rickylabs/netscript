@@ -47,6 +47,7 @@ The draft PR is partial and must say `Part of #1551`. Follow-ups #1645–#1650 o
 | 2026-08-13 | Next.js features pinned to official primary sources. | exact stable `16.3.0`; Cache Components, cache clocks, revalidation, Suspense, parallel routes, errors, and metadata re-baselined |
 | 2026-08-13 | Residual programme split into linked owners. | #1645–#1650, Backlog / Triage, docs labels, exactly one `status:triage`, explicit priority |
 | 2026-08-13 | P0 research/design/plan completed. | exact file slices, risks, decisions, closure semantics, structured gate plan; PLAN-EVAL pending |
+| 2026-08-13 | P0 committed, explicitly pushed, and handed off in draft PR #1652. | commit `75a231053`; canonical body, 0.0.7 milestone, docs CI skips, exactly one `status:plan`, RESEARCH and PLAN comments |
 
 ## Gate log
 
@@ -60,7 +61,7 @@ The draft PR is partial and must say `Part of #1551`. Follow-ups #1645–#1650 o
 | Framework freshness | official Next.js docs/release | Next.js mechanisms used by the case | PASS | exact stable pin is `16.3.0`; cache/failure semantics are non-isomorphic | yes |
 | Residual ownership | inspect created issues/labels/milestones | #1645–#1650 | PASS | every residual has a Backlog / Triage owner | yes |
 | Plan diff | `git diff --check`; changed-path and lock inspection | P0 artifacts | PASS | eight run-bootstrap/research/plan files only; no lock or product/docs implementation diff | yes |
-| Draft PR metadata | GitHub PR/label/milestone/comment inspection | draft PR | PENDING | create only after P0 commit and explicit push | no |
+| Draft PR metadata | GitHub PR/label/milestone/comment inspection | draft PR #1652 | PASS | draft to `main`; milestone 0.0.7; `type:docs`, `area:docs`, `priority:p2`, both docs CI skips, exactly one `status:plan`; two phase comments | yes |
 | PLAN-EVAL | fresh opposite-family evaluator | research/plan and PR | PENDING | implementation remains blocked | no |
 
 ### Planned S3 docs-audit rows

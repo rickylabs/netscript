@@ -46,7 +46,7 @@ Every slice is under 30 files, has a named gate, commits its worklog/context upd
 - Parent #1551 remains open and unchanged in 0.0.7.
 - Closure phrase: `Part of #1551`; no closing keyword.
 - Residual issues: #1645 runnable fixture, #1646 type/LSP, #1647 runtime/freshness, #1648 discovery studies, #1649 post-Session backlog, #1650 full migration map.
-- Draft PR: created after the P0 commit/push; it must remain draft with milestone 0.0.7, `type:docs`, `area:docs`, `priority:p2`, `ci:skip-e2e`, `ci:skip-scaffold`, and exactly one lifecycle label.
+- Draft PR: #1652, created after explicit push of planning commit `75a231053`; it is draft against `main` with milestone 0.0.7, `type:docs`, `area:docs`, `priority:p2`, `ci:skip-e2e`, `ci:skip-scaffold`, exactly one `status:plan`, and RESEARCH/PLAN comments.
 
 ## Next authorized action
 
