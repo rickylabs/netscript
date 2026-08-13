@@ -354,9 +354,9 @@
     {
       "id": "comparison-docs-programme",
       "lane": "docs",
-      "phase": "implementing",
+      "phase": "blocked",
       "baseBranch": "main",
-      "headSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+      "headSha": "d35cbca30872d1f55118d63437638e93270c2ac3",
       "issueNumbers": [1551],
       "implementerAgentId": "019ffcc9-16c2-7573-b7f6-d627172408e8",
       "evaluatorAgentId": null,
