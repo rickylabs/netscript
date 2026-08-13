@@ -41,25 +41,35 @@ jobs:
       - name: Frozen package type-check
         shell: bash
         run: |
-          if ! deno task --cwd packages/fresh-ui check; then
+          if ! deno run --allow-read --allow-write --allow-run --allow-env \
+            .llm/tools/gates/run-gate.ts --gate check --id fresh-ui-check \
+            --cwd packages/fresh-ui --output .llm/tmp/gate-receipts/fresh-ui/check.json; then
             printf '::error::Fresh UI private lock is stale. Review the dependency diff, then run deno task --cwd packages/fresh-ui lock:update and commit packages/fresh-ui/deno.lock.\n'
             exit 1
           fi
 
       - name: Package lint
-        run: deno task --cwd packages/fresh-ui lint
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate lint --id fresh-ui-lint
+          --cwd packages/fresh-ui --output .llm/tmp/gate-receipts/fresh-ui/lint.json
 
       - name: Frozen-lock failure regression
         run: >-
-          deno test --no-lock --allow-read --allow-write --allow-run
-          .llm/tools/validation/fresh-ui-quality_test.ts
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate fresh-ui-lock-regression --id fresh-ui-lock-regression
+          --output .llm/tmp/gate-receipts/fresh-ui/lock-regression.json
 
       - name: Clean worktree invariant
-        shell: bash
-        run: |
-          status="$(git status --porcelain)"
-          if [[ -n "$status" ]]; then
-            printf 'Fresh UI quality gate dirtied the worktree:\n%s\n' "$status" >&2
-            exit 1
-          fi
-          printf 'Fresh UI quality gate left git status --porcelain empty.\n'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate clean-worktree --id fresh-ui-clean-worktree
+          --output .llm/tmp/gate-receipts/fresh-ui/clean-worktree.json
+
+      - name: Upload Fresh UI gate receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.workflow }}-${{ github.job }}-gate-receipts-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .llm/tmp/gate-receipts/fresh-ui/*.json
+          if-no-files-found: error

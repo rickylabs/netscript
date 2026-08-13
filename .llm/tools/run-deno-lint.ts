@@ -71,6 +71,7 @@ interface OutputReport {
   selection?: {
     filesSelected: number;
     batches: number;
+    excludedBatches?: number;
   };
   summary: {
     totalOccurrences: number;
@@ -337,6 +338,7 @@ export interface LintRunResult {
   text: string;
   exitCode: number;
   failures: BatchFailure[];
+  noTargetBatches: number;
 }
 
 /**
@@ -355,6 +357,7 @@ export async function runLint(
   let text = '';
   let exitCode = 0;
   const failures: BatchFailure[] = [];
+  let noTargetBatches = 0;
   const batches = chunk(files, options.batchSize);
 
   for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
@@ -364,7 +367,11 @@ export async function runLint(
     text += output;
 
     if (result.code === 0) continue;
-    if (output.includes(NO_TARGET_FILES_MESSAGE)) continue;
+    if (output.includes(NO_TARGET_FILES_MESSAGE)) {
+      noTargetBatches++;
+      exitCode = 2;
+      continue;
+    }
 
     exitCode = result.code;
 
@@ -381,7 +388,7 @@ export async function runLint(
     }
   }
 
-  return { text, exitCode, failures };
+  return { text, exitCode, failures, noTargetBatches };
 }
 
 function stripAnsi(text: string): string {
@@ -507,6 +514,7 @@ async function main(): Promise<void> {
   let files: string[] | undefined;
   let batches: number | undefined;
   let failures: BatchFailure[] = [];
+  let noTargetBatches = 0;
 
   if (options.input) {
     text = await Deno.readTextFile(options.input);
@@ -517,6 +525,7 @@ async function main(): Promise<void> {
     text = result.text;
     exitCode = result.exitCode;
     failures = result.failures;
+    noTargetBatches = result.noTargetBatches;
   }
 
   const occurrences = parseOccurrences(text);
@@ -539,6 +548,7 @@ async function main(): Promise<void> {
       ? {
         filesSelected: files.length,
         batches: batches ?? 0,
+        excludedBatches: noTargetBatches || undefined,
       }
       : undefined,
     summary: {
@@ -554,6 +564,11 @@ async function main(): Promise<void> {
   console.log(JSON.stringify(report, null, options.pretty ? 2 : undefined));
 
   if (failures.length > 0) console.error(formatFailures(failures));
+  if (noTargetBatches > 0) {
+    console.error(
+      `${noTargetBatches} deno lint batch(es) matched the wrapper selection but were excluded by Deno; refusing a false-green gate.`,
+    );
+  }
 
   // Invariant: a non-zero exit must never be silent. If a batch failed but we captured neither an
   // occurrence nor a failure record, say so loudly rather than exiting 1 with an empty report.
@@ -562,6 +577,11 @@ async function main(): Promise<void> {
       `deno lint exited ${exitCode} but produced no lint occurrences and no captured batch error. ` +
         'Re-run with --batch-size 1 to isolate the offending file.',
     );
+  }
+
+  if (!options.input && files?.length === 0) {
+    console.error('deno lint selection matched zero files; refusing a false-green gate.');
+    Deno.exit(2);
   }
 
   if (exitCode && exitCode !== 0) Deno.exit(exitCode);

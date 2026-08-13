@@ -21,7 +21,7 @@ Deno.test('runner fails when deno check excludes every explicit target despite e
       stdout: 'piped',
       stderr: 'piped',
     }).output();
-    assertEquals(output.code, 1);
+    assertEquals(output.code, 2);
     const report = JSON.parse(new TextDecoder().decode(output.stdout));
     assertEquals(report.selection, { filesSelected: 1, batches: 1, failedBatches: 1 });
   } finally {

@@ -54,13 +54,14 @@ Deno.test('runLint does not treat ordinary lint findings as batch failures', asy
   assertStringIncludes(result.text, 'no-explicit-any');
 });
 
-Deno.test('runLint tolerates the empty-batch "No target files found." exit', async () => {
+Deno.test('runLint fails closed when Deno excludes an otherwise selected batch', async () => {
   const runner: BatchRunner = () =>
     Promise.resolve({ code: 1, stdout: '', stderr: 'No target files found.' });
 
   const result = await runLint(['a.ts'], options, runner);
 
-  assertEquals(result.exitCode, 0);
+  assertEquals(result.exitCode, 2);
+  assertEquals(result.noTargetBatches, 1);
   assertEquals(result.failures, []);
 });
 
@@ -73,4 +74,53 @@ Deno.test('runLint reports every failing batch, not just the first', async () =>
   assertEquals(result.exitCode, 2);
   assertEquals(result.failures.map((failure) => failure.batchIndex), [0, 1]);
   assert(result.failures.every((failure) => failure.stderr.startsWith('boom on ')));
+});
+
+Deno.test('CLI refuses an empty lint selection', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        '--allow-read',
+        '--allow-run',
+        new URL('./run-deno-lint.ts', import.meta.url).pathname,
+        '--cwd',
+        root,
+      ],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(output.code, 2);
+    assertEquals(JSON.parse(new TextDecoder().decode(output.stdout)).selection.filesSelected, 0);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('CLI fails when Deno config excludes every selected lint target', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await Deno.writeTextFile(`${root}/deno.json`, '{"exclude":["generated/"]}\n');
+    await Deno.mkdir(`${root}/generated`);
+    await Deno.writeTextFile(`${root}/generated/file.ts`, 'export const value = 1;\n');
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        '--allow-read',
+        '--allow-run',
+        new URL('./run-deno-lint.ts', import.meta.url).pathname,
+        '--cwd',
+        root,
+        '--file',
+        'generated/file.ts',
+      ],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(output.code, 2);
+    assertEquals(JSON.parse(new TextDecoder().decode(output.stdout)).selection.excludedBatches, 1);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
 });

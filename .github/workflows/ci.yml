@@ -37,7 +37,7 @@ on:
   push:
     branches: [main, 'feat/package-quality']
   pull_request:
-    branches: [main, "feat/**", "epic/**", "canary/**"]
+    branches: [main, 'feat/**', 'epic/**', 'canary/**']
     types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
@@ -204,14 +204,20 @@ jobs:
           printf '::notice::check-test skipped by policy. %s\n' "$SKIP_REASON"
 
       - name: Checkout
-        if: env.RUN == 'true'
         uses: actions/checkout@v5
 
       - name: Setup Deno
-        if: env.RUN == 'true'
         uses: denoland/setup-deno@v2
         with:
           deno-version: '2.9.5'
+
+      - name: Record skipped check receipt
+        if: env.RUN != 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate check-test-job --id check-test-policy
+          --output .llm/tmp/gate-receipts/check-test/policy.json
+          --git-head "${{ github.sha }}" --skip-reason "$SKIP_REASON"
 
       - name: Install workspace dependencies
         if: env.RUN == 'true'
@@ -219,19 +225,31 @@ jobs:
 
       - name: Repo-wide check
         if: env.RUN == 'true'
-        run: deno task check
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate check --id check-test-check
+          --output .llm/tmp/gate-receipts/check-test/check.json
 
       - name: Required real-Redis regression tests
         if: env.RUN == 'true'
-        run: deno task test:redis-regression
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate redis-regression --id check-test-redis
+          --output .llm/tmp/gate-receipts/check-test/redis.json
 
       - name: Prove the pre-#1075 adapter turns the gate red
         if: env.RUN == 'true'
-        run: deno task test:redis-regression:negative-control
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate redis-negative-control --id check-test-redis-negative
+          --output .llm/tmp/gate-receipts/check-test/redis-negative.json
 
       - name: Repo-wide test
         if: env.RUN == 'true'
-        run: deno task test
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate test --id check-test-test
+          --output .llm/tmp/gate-receipts/check-test/test.json
 
       - name: Install managed-form browser test runtime
         if: env.RUN == 'true'
@@ -243,11 +261,25 @@ jobs:
 
       - name: Managed form browser regression
         if: env.RUN == 'true'
-        run: deno task --cwd packages/fresh test:browser
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate fresh-browser --id check-test-fresh-browser
+          --cwd packages/fresh --output .llm/tmp/gate-receipts/check-test/fresh-browser.json
 
       - name: Agentic OpenRouter preset canary
         if: env.RUN == 'true'
-        run: deno task agentic:provider-canary
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate provider-canary --id check-test-provider-canary
+          --output .llm/tmp/gate-receipts/check-test/provider-canary.json
+
+      - name: Upload check-test gate receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.workflow }}-${{ github.job }}-gate-receipts-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .llm/tmp/gate-receipts/check-test/*.json
+          if-no-files-found: error
 
   quality:
     needs: classify
@@ -269,24 +301,34 @@ jobs:
           printf '::notice::quality skipped by policy. %s\n' "$SKIP_REASON"
 
       - name: Checkout
-        if: env.RUN == 'true'
         uses: actions/checkout@v5
 
       - name: Setup Deno
-        if: env.RUN == 'true'
         uses: denoland/setup-deno@v2
         with:
           deno-version: '2.9.5'
 
+      - name: Record skipped quality receipt
+        if: env.RUN != 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate quality-job --id quality-policy
+          --output .llm/tmp/gate-receipts/quality/policy.json
+          --git-head "${{ github.sha }}" --skip-reason "$SKIP_REASON"
+
       - name: Check docs site source format
         if: env.RUN == 'true'
-        working-directory: docs/site
-        run: deno task check:source-format
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate docs-source-format --id quality-docs-format
+          --cwd docs/site --output .llm/tmp/gate-receipts/quality/docs-format.json
 
       - name: Test docs site source-format checker
         if: env.RUN == 'true'
-        working-directory: docs/site
-        run: deno task test:source-format
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate docs-source-format-test --id quality-docs-format-test
+          --cwd docs/site --output .llm/tmp/gate-receipts/quality/docs-format-test.json
 
       - name: Install workspace dependencies
         if: env.RUN == 'true'
@@ -294,51 +336,95 @@ jobs:
 
       - name: Lint
         if: env.RUN == 'true'
-        run: deno task lint
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate lint --id quality-lint
+          --output .llm/tmp/gate-receipts/quality/lint.json
 
       - name: Format check
         if: env.RUN == 'true'
-        run: deno task fmt:check
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate fmt-check --id quality-fmt
+          --output .llm/tmp/gate-receipts/quality/fmt.json
 
       - name: JSR tagline length
         if: env.RUN == 'true'
-        run: deno task docs:tagline:check
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate docs-tagline --id quality-docs-tagline
+          --output .llm/tmp/gate-receipts/quality/docs-tagline.json
 
       - name: Docs accuracy check
         if: env.RUN == 'true'
-        run: deno task docs:accuracy
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate docs-accuracy --id quality-docs-accuracy
+          --output .llm/tmp/gate-receipts/quality/docs-accuracy.json
 
       - name: Agent docs corpus freshness
         if: env.RUN == 'true'
-        run: deno task check:agent-docs-prose
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate agent-docs-prose --id quality-agent-docs-prose
+          --output .llm/tmp/gate-receipts/quality/agent-docs-prose.json
 
       - name: Generated asset freshness
         if: env.RUN == 'true'
-        run: deno task check:assets-barrel
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate assets-barrel --id quality-assets-barrel
+          --output .llm/tmp/gate-receipts/quality/assets-barrel.json
 
       - name: Publish asset freshness
         if: env.RUN == 'true'
-        run: deno task check:publish-assets
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate publish-assets --id quality-publish-assets
+          --output .llm/tmp/gate-receipts/quality/publish-assets.json
 
       - name: Emitted sample type-check
         if: env.RUN == 'true'
-        run: deno task check:emitted-samples
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate emitted-samples --id quality-emitted-samples
+          --output .llm/tmp/gate-receipts/quality/emitted-samples.json
 
       - name: NetScript JSR emitted-specifier guard
         if: env.RUN == 'true'
-        run: deno task check:netscript-jsr-specifiers
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate netscript-jsr-specifiers --id quality-jsr-specifiers
+          --output .llm/tmp/gate-receipts/quality/jsr-specifiers.json
 
       - name: Scaffold version guard (no preview pins)
         if: env.RUN == 'true'
-        run: deno task check:scaffold-versions
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate scaffold-versions --id quality-scaffold-versions
+          --output .llm/tmp/gate-receipts/quality/scaffold-versions.json
 
       - name: Publish dry-run (0 slow-types across all units)
         if: env.RUN == 'true'
-        run: deno task publish:dry-run
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate publish-dry-run --id quality-publish-dry-run
+          --output .llm/tmp/gate-receipts/quality/publish-dry-run.json
 
       - name: Critical advisory audit
         if: env.RUN == 'true'
-        run: deno task audit:critical
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate audit-critical --id quality-audit-critical
+          --output .llm/tmp/gate-receipts/quality/audit-critical.json
+
+      - name: Upload quality gate receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.workflow }}-${{ github.job }}-gate-receipts-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .llm/tmp/gate-receipts/quality/*.json
+          if-no-files-found: error
 
   deps-report:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false

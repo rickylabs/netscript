@@ -51,6 +51,8 @@ interface PackageResult {
   combinedPrivateTypeRef: number;
   combinedMissingJSDoc: number;
   combinedOther: number;
+  combinedExitCode: number;
+  entrypointExitCodes: Record<string, number>;
 }
 
 interface OutputReport {
@@ -58,6 +60,7 @@ interface OutputReport {
     mode: 'auto' | 'explicit';
     root: string;
     entrypoints: string[];
+    exitCode: number;
   };
   summary: {
     totalPackages: number;
@@ -279,8 +282,10 @@ async function measurePackage(
 
   // Per-entrypoint runs
   const epResults: EntrypointResult[] = [];
+  const entrypointExitCodes: Record<string, number> = {};
   for (const ep of entrypoints) {
     const res = await runDocLint(root, [ep]);
+    entrypointExitCodes[ep] = res.code;
     const epErrors = parseErrors(res.text);
     const counts = countSummary(res.text, epErrors);
     epResults.push({
@@ -323,7 +328,22 @@ async function measurePackage(
     combinedPrivateTypeRef: combinedCounts.ptr,
     combinedMissingJSDoc: combinedCounts.jsdoc,
     combinedOther: combinedCounts.other,
+    combinedExitCode: combined.code,
+    entrypointExitCodes,
   };
+}
+
+async function writeAtomic(path: string, text: string): Promise<void> {
+  const slash = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'));
+  const dir = slash < 0 ? '.' : path.slice(0, slash);
+  await Deno.mkdir(dir, { recursive: true });
+  const temp = `${path}.${crypto.randomUUID()}.tmp`;
+  try {
+    await Deno.writeTextFile(temp, text, { createNew: true });
+    await Deno.rename(temp, path);
+  } finally {
+    await Deno.remove(temp).catch(() => undefined);
+  }
 }
 
 async function main(): Promise<void> {
@@ -343,6 +363,7 @@ async function main(): Promise<void> {
       mode: options.entrypoints ? 'explicit' : 'auto',
       root: options.root,
       entrypoints,
+      exitCode: pkg.combinedExitCode,
     },
     summary: {
       totalPackages: 1,
@@ -354,14 +375,18 @@ async function main(): Promise<void> {
     packages: [pkg],
   };
 
-  const json = JSON.stringify(report, null, options.pretty ? 2 : undefined);
+  const json = `${JSON.stringify(report, null, options.pretty ? 2 : undefined)}\n`;
 
   if (options.output) {
-    await Deno.writeTextFile(options.output, json);
+    await writeAtomic(options.output, json);
     console.log(`Wrote ${options.output}`);
   } else {
-    console.log(json);
+    await Deno.stdout.write(new TextEncoder().encode(json));
   }
+
+  const firstFailure = [pkg.combinedExitCode, ...Object.values(pkg.entrypointExitCodes)]
+    .find((code) => code !== 0);
+  if (firstFailure !== undefined) Deno.exit(firstFailure);
 }
 
-await main();
+if (import.meta.main) await main();
