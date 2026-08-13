@@ -448,7 +448,14 @@
         "packages/cli/src/kernel/assets/generated/database/generate-prisma-config-1.ts.template",
         "packages/cli/src/kernel/assets/service/routers/v1.memory.ts.template",
         "packages/cli/src/kernel/assets/service/routers/v1.ts.template",
-        "packages/cli/src/kernel/templates/database/generate-engine-mod.ts"
+        "packages/cli/src/kernel/adapters/database/scaffolder.ts",
+        "packages/cli/src/kernel/adapters/database/scaffolder_test.ts",
+        "packages/cli/src/kernel/templates/database/database-generators.ts",
+        "packages/cli/src/kernel/templates/database/generate-database-seed.ts",
+        "packages/cli/src/kernel/templates/database/generate-database-seed_test.ts",
+        "packages/cli/src/kernel/templates/database/generate-engine-mod.ts",
+        "packages/cli/src/kernel/templates/database/generate-prisma-config.ts",
+        "packages/cli/src/kernel/templates/database/generators_test.ts"
       ],
       "provingGates": [
         "check",

@@ -28,6 +28,7 @@
 | 2026-08-13T23:34:00.000Z | Authorized #1643's narrow focused-test extension and classified the manifest/copy `4437` values as required compatibility metadata rather than mechanically removable dead pins. | Structured plugin validation; #1243/PR #1643 coordinator comments; `leaf-contracts.json` |
 | 2026-08-13T23:41:00.000Z | Activated and registry-proved the user-visible native Claude `/remote-control` milestone surface, while preserving exactly four topic lanes; also launched #1651's bounded remote PLAN-EVAL fallback. | Bridge ids `session_016HFNiTigGUb7ieFxqFDvJb` and `session_018f6pxZjiFPaYJF6AFLyLxn`; matching PID/cwd registry records |
 | 2026-08-13T23:44:00.000Z | Owner directed both newly created Claude sessions stopped and continuation on the existing Codex train. Both exited cleanly, registry records disappeared, and #1651 retained no evaluator mutation. | Claude resume ids `6e65c618-c957-443a-b713-d0399a891463` / `669d043a-a1e3-4e75-9366-a1ee94f965ba`; process/registry audit clean |
+| 2026-08-13T23:47:00.000Z | Amended #1654's leaf contract with the exact generator/scaffolder/test seams required by reproduced #1262/#1588 behavior; classified #1263 OpenAPI projection as already fixed and preservation-only. | PR #1654 research/drift; focused reproduction receipts; `leaf-contracts.json` |
 
 ## Current design checkpoint
 
