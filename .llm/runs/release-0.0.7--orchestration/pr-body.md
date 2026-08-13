@@ -8,12 +8,12 @@ and cut stable only from exact-main green evidence.
 
 - Archetype / area: release orchestration and harness evidence
 - Evidence-only coordinator PR; closes no product issue.
-- Frozen intake: 64 inspected targets, 61 active, one moved, two closed-fixed, 44 leaves,
-  four topic lanes, and 10 dependency waves.
+- Frozen intake: 64 inspected targets, 60 active, one moved, three closed-fixed, 43 leaves,
+  four topic lanes, and nine dependency waves.
 
 ## Slices
 
-- [x] Step 0 owner-ratified inventory and dependency DAG validated
+- [x] Step 0 owner-ratified inventory and dependency DAG repaired after PLAN-EVAL cycle 1
 - [ ] Composed milestone plan independently approved
 - [ ] All leaf PRs independently evaluated and merged to `main`
 - [ ] Coherent canary checkpoint(s) published and production-E2E proven
@@ -36,6 +36,7 @@ and cut stable only from exact-main green evidence.
 - #1306 closed-fixed after Aspire 13.4.6 and the generated NetScript agent skill proved the
   requested native JSON resource inventory path.
 - #1606 closed after live JSR package metadata and landing-page verification.
+- #1564 closed after a seven-construct audit proved #1403 already owned the only affected range.
 - #1384/#1385 remain in 0.0.8; no partial credential-only workaround is accepted for #1384.
 
 ## Definition of Done

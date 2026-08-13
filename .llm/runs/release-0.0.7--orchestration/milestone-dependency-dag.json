@@ -291,13 +291,6 @@
       "title": "fix(agentic): verdict extractor records NONE when the token is a markdown heading"
     },
     {
-      "id": "issue:1564",
-      "kind": "issue",
-      "issueNumber": 1564,
-      "lane": "internals",
-      "title": "fix(ci): pull_request.base.sha is stale on long-lived PRs, so every gate that computes a range from it silently inspects the wrong changeset"
-    },
-    {
       "id": "issue:1588",
       "kind": "issue",
       "issueNumber": 1588,
@@ -629,12 +622,6 @@
     {
       "index": 0,
       "nodeIds": [
-        "issue:1564"
-      ]
-    },
-    {
-      "index": 1,
-      "nodeIds": [
         "issue:1243",
         "issue:1262",
         "issue:1263",
@@ -650,7 +637,7 @@
       ]
     },
     {
-      "index": 2,
+      "index": 1,
       "nodeIds": [
         "issue:1293",
         "issue:1350",
@@ -663,7 +650,7 @@
       ]
     },
     {
-      "index": 3,
+      "index": 2,
       "nodeIds": [
         "issue:1112",
         "issue:1296",
@@ -676,7 +663,7 @@
       ]
     },
     {
-      "index": 4,
+      "index": 3,
       "nodeIds": [
         "issue:1349",
         "issue:1354",
@@ -691,7 +678,7 @@
       ]
     },
     {
-      "index": 5,
+      "index": 4,
       "nodeIds": [
         "issue:1351",
         "issue:1352",
@@ -702,7 +689,7 @@
       ]
     },
     {
-      "index": 6,
+      "index": 5,
       "nodeIds": [
         "issue:1093",
         "issue:1461",
@@ -710,7 +697,7 @@
       ]
     },
     {
-      "index": 7,
+      "index": 6,
       "nodeIds": [
         "issue:1452",
         "issue:1462",
@@ -720,7 +707,7 @@
       ]
     },
     {
-      "index": 8,
+      "index": 7,
       "nodeIds": [
         "issue:1249",
         "issue:1543",
@@ -731,7 +718,7 @@
       ]
     },
     {
-      "index": 9,
+      "index": 8,
       "nodeIds": [
         "issue:1458",
         "issue:1544"

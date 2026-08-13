@@ -256,7 +256,7 @@
       "number": 1360,
       "title": "fix(scaffold): the canonical island never passes initialDataUpdatedAt, so the loader's cachedAt is computed, displayed and discarded",
       "disposition": "active",
-      "lane": "fixes",
+      "lane": "features",
       "evidence": [
         "Repo-wide grep for `initialDataUpdatedAt` under packages/cli/src returns ZERO hits; all hits are in packages/fresh (query-types.ts:136, hooks.ts:128,138-140, and two tests)",
         "packages/cli/src/kernel/assets/app/routes/examples/(_islands)/ServiceShowcaseLab.tsx.template:54-57 passes queryKey + initialData: props.initialList with no initialDataUpdatedAt; :148 uses props.cachedAt only as a display stat",
@@ -561,14 +561,16 @@
     {
       "number": 1564,
       "title": "fix(ci): pull_request.base.sha is stale on long-lived PRs, so every gate that computes a range from it silently inspects the wrong changeset",
-      "disposition": "active",
-      "lane": "internals",
+      "disposition": "close-fixed",
+      "lane": null,
       "evidence": [
-        "Reproduced on PR #1539: base.sha cd24e1679 was hours stale; `git diff --name-only --diff-filter=ACMR cd24e1679 2a4102600 -- packages plugins` returned 9 files, ZERO of them in #1539 own diff (all from already-merged #1526/#1528/#1534/#1535/#1536).",
-        "The gate reported success having inspected zero lines of the PR under review, while a new `as unknown as` sat in .llm/tools/release/github-release.ts throughout.",
-        "Consumers audited on main: code-quality.yml:39 (affected, owned by #1403); ci.yml:135,153, e2e-cli.yml:128,158, surface-diff.yml:47 (unaudited, same input); openhands-phase-eval.yml:126 already fixed by #1552 by resolving heads/${pr.base.ref} instead.",
-        "gh issue view 1564: state=OPEN, milestone=0.0.7, labels type:fix,area:tooling,status:triage,priority:p1, updated 2026-08-13T18:38:26Z."
-      ]
+        "https://github.com/rickylabs/netscript/issues/1564",
+        "Fresh seven-construct workflow audit at 01e0960: every changed-file consumer uses three-dot merge-base semantics.",
+        "The remaining git show BASE_SHA:deno.json calls are conservative tasks-only applicability comparisons, not changed-file ranges.",
+        "The only affected two-dot code-quality construct and its red-first stale/foreign fixture were completed by #1403.",
+        "Closed COMPLETED during PLAN-EVAL remediation on 2026-08-13."
+      ],
+      "reason": "The only unsafe two-dot changed-file consumer was already fixed by #1403; all remaining changed-file ranges use merge-base semantics and base-manifest reads deliberately fail toward running."
     },
     {
       "number": 1588,

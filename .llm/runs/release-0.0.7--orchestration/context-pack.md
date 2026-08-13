@@ -8,11 +8,11 @@ Read, in order:
 4. `.llm/harness/workflow/lane-policy.md`
 5. `.agents/skills/agent-milestone-orchestrator/SKILL.md`
 6. This run's `research.md`, `plan.md`, `worklog.md`, `step0-synthesis.md`, the four milestone
-   control JSON artifacts, and `milestone-leaf-plan.json`.
+   control JSON artifacts, `milestone-leaf-plan.json`, and `leaf-contracts.json`.
 
 Baseline identity is `01e0960494c95ce56eb35892c211a095eb13e6ed`. Treat GitHub live state as
 mutable after the snapshot; any issue or `main` drift must be recorded before dispatch or merge.
 
-Step 0 is frozen at 64 targets / 61 active issues, 44 leaves, and 10 dispatch waves. #1564 is the
-sole wave-0 merge barrier. The canonical artifacts validate green; the remaining dispatch gate is
-the one composed PLAN-EVAL.
+Step 0 is repaired at 64 inspected targets / 60 active issues, 43 leaves, and nine dispatch waves.
+#1564 is closed-fixed; there is no implementation wave-zero barrier. The canonical artifacts must
+validate green, and the remaining dispatch gate is approval from the bounded PLAN-EVAL re-review.

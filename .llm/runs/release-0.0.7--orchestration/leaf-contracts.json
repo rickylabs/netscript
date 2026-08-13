@@ -1,0 +1,1464 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-13T22:42:00.000Z",
+  "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+  "contracts": [
+    {
+      "key": "rfc-a-stage0-ratification-board",
+      "issues": [
+        1348
+      ],
+      "lane": "features",
+      "wave": 0,
+      "executionKind": "coordinator-checkpoint",
+      "archetype": "4-dsl-builder",
+      "overlays": [
+        "docs"
+      ],
+      "fileSurfaces": [
+        "GitHub issues #1348-#1353",
+        "rfcs/0001-sdk-client-contributions.md"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "arch-check",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": false,
+        "reason": "No publishable packages/** or plugins/** surface is in this leaf contract."
+      }
+    },
+    {
+      "key": "rfc-plugin-cli-contribution",
+      "issues": [
+        1502
+      ],
+      "lane": "features",
+      "wave": 0,
+      "executionKind": "implementation",
+      "archetype": "4-dsl-builder",
+      "overlays": [
+        "docs"
+      ],
+      "fileSurfaces": [
+        "packages/cli/",
+        "packages/plugin/",
+        "rfcs/",
+        "rfcs/0003-command-composition-kit.md",
+        "rfcs/0005-devtools-contribution.md"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "arch-check",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "sdk-typed-error-channel",
+      "issues": [
+        1350
+      ],
+      "lane": "fixes",
+      "wave": 1,
+      "executionKind": "implementation",
+      "archetype": "1-small-contract",
+      "overlays": [
+        "docs"
+      ],
+      "fileSurfaces": [
+        "docs/site/services-sdk/how-to/discover-services.md",
+        "docs/site/services-sdk/sdk.md",
+        "packages/contracts/src/application/contract-primitives.ts",
+        "packages/sdk/src/client/errors.ts",
+        "packages/sdk/tests/readme-doctest_test.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "sdk-procedure-metadata",
+      "issues": [
+        1466
+      ],
+      "lane": "features",
+      "wave": 2,
+      "executionKind": "implementation",
+      "archetype": "4-dsl-builder",
+      "overlays": [
+        "service",
+        "docs"
+      ],
+      "fileSurfaces": [
+        "packages/aspire/config.ts",
+        "rfcs/0001-sdk-client-contributions.md"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "arch-check",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "sdk-client-contribution-seam",
+      "issues": [
+        1349
+      ],
+      "lane": "features",
+      "wave": 3,
+      "executionKind": "implementation",
+      "archetype": "4-dsl-builder",
+      "overlays": [
+        "service"
+      ],
+      "fileSurfaces": [
+        "packages/sdk/src/client/http-client-link.ts",
+        "packages/sdk/src/ports/client-link-factory.ts",
+        "packages/sdk/src/ports/mod.ts",
+        "packages/sdk/src/ports/service-client.ts",
+        "packages/service/src/builder/service-rpc.ts",
+        "packages/service/src/primitives/handlers.ts",
+        "packages/service/src/types.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "arch-check"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "sdk-transport-policy-consolidation",
+      "issues": [
+        1351
+      ],
+      "lane": "fixes",
+      "wave": 4,
+      "executionKind": "implementation",
+      "archetype": "4-dsl-builder",
+      "overlays": [
+        "docs"
+      ],
+      "fileSurfaces": [
+        "packages/sdk/src/client/http-client-link.ts",
+        "rfcs/0001-sdk-client-contributions.md"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "arch-check",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "sdk-auth-contribution-dogfood",
+      "issues": [
+        1352
+      ],
+      "lane": "features",
+      "wave": 4,
+      "executionKind": "implementation",
+      "archetype": "4-dsl-builder",
+      "overlays": [
+        "service",
+        "docs"
+      ],
+      "fileSurfaces": [
+        "packages/auth-kv-oauth/src/flow.ts",
+        "packages/plugin/src/config/domain/plugin-contributions.ts",
+        "packages/sdk/src",
+        "packages/sdk/src/client/http-client-link.ts",
+        "packages/service/src/auth/static-credential-authenticator.ts",
+        "rfcs/0001-sdk-client-contributions.md"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "arch-check",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "sdk-trace-ownership-proof",
+      "issues": [
+        1353
+      ],
+      "lane": "fixes",
+      "wave": 4,
+      "executionKind": "implementation",
+      "archetype": "4-dsl-builder",
+      "overlays": [
+        "docs"
+      ],
+      "fileSurfaces": [
+        "packages/sdk/src/client/http-client-link.ts",
+        "packages/sdk/src/ports/service-client.ts",
+        "rfcs/0001-sdk-client-contributions.md"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "arch-check",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "sdk-locale-contribution-proof",
+      "issues": [
+        1467
+      ],
+      "lane": "features",
+      "wave": 5,
+      "executionKind": "implementation",
+      "archetype": "4-dsl-builder",
+      "overlays": [
+        "docs"
+      ],
+      "fileSurfaces": [
+        "rfcs/0001-sdk-client-contributions.md"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "arch-check",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": false,
+        "reason": "No publishable packages/** or plugins/** surface is in this leaf contract."
+      }
+    },
+    {
+      "key": "plugin-discovery-contribution-references",
+      "issues": [
+        1093
+      ],
+      "lane": "fixes",
+      "wave": 5,
+      "executionKind": "implementation",
+      "archetype": "4-dsl-builder",
+      "overlays": [
+        "docs"
+      ],
+      "fileSurfaces": [
+        "packages/plugin/src/config/domain/plugin-contributions.ts",
+        "packages/plugin/src/sdk/discovery/ast-extractor.ts",
+        "rfcs/0001-sdk-client-contributions.md"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "arch-check",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "prisma-mysql-adapter-surface",
+      "issues": [
+        1293
+      ],
+      "lane": "features",
+      "wave": 1,
+      "executionKind": "implementation",
+      "archetype": "2-integration",
+      "overlays": [],
+      "fileSurfaces": [
+        "packages/prisma-adapter-mysql/deno.json",
+        "packages/prisma-adapter-mysql/src/adapter.ts",
+        "packages/prisma-adapter-mysql/src/types.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "arch-check"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "prisma-mysql-honest-example",
+      "issues": [
+        1112
+      ],
+      "lane": "fixes",
+      "wave": 2,
+      "executionKind": "implementation",
+      "archetype": "2-integration",
+      "overlays": [
+        "docs"
+      ],
+      "fileSurfaces": [
+        "docs/site/reference/prisma-adapter-mysql/index.md",
+        "packages/prisma-adapter-mysql/README.md",
+        "packages/prisma-adapter-mysql/src/adapter.ts",
+        "packages/prisma-adapter-mysql/src/mod.ts",
+        "packages/prisma-adapter-mysql/src/types.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "arch-check",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "legacy-port-pin-sweep",
+      "issues": [
+        1243
+      ],
+      "lane": "fixes",
+      "wave": 0,
+      "executionKind": "implementation",
+      "archetype": "5-plugin",
+      "overlays": [
+        "service"
+      ],
+      "fileSurfaces": [
+        "packages/cli/src/kernel/assets/skills.generated.ts",
+        "packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-test-support.ts",
+        "packages/cli/src/public/features/plugins/auth/auth-plugin-command.ts",
+        "plugins/streams/scaffold.plugin.json"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "scaffold.runtime",
+        "arch-check"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "scaffold-generated-output-correctness",
+      "issues": [
+        1262,
+        1263,
+        1588
+      ],
+      "lane": "fixes",
+      "wave": 0,
+      "executionKind": "implementation",
+      "archetype": "6-cli-tooling",
+      "overlays": [],
+      "fileSurfaces": [
+        "packages/cli/e2e",
+        "packages/cli/src/kernel/assets",
+        "packages/cli/src/kernel/assets/database/connection-helpers.ts.template",
+        "packages/cli/src/kernel/assets/database/seed.ts.template",
+        "packages/cli/src/kernel/assets/generated/database/generate-prisma-config-1.ts.template",
+        "packages/cli/src/kernel/assets/service/routers/v1.memory.ts.template",
+        "packages/cli/src/kernel/assets/service/routers/v1.ts.template",
+        "packages/cli/src/kernel/templates/database/generate-engine-mod.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "scaffold.runtime"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "app-service-client-wiring",
+      "issues": [
+        1355,
+        1360
+      ],
+      "lane": "features",
+      "wave": 1,
+      "executionKind": "implementation",
+      "archetype": "2-integration",
+      "overlays": [
+        "frontend"
+      ],
+      "fileSurfaces": [
+        "packages/cli/src",
+        "packages/cli/src/kernel/adapters/service/client-scaffolder.ts",
+        "packages/cli/src/kernel/assets/app/routes/examples/(_islands)/ServiceShowcaseLab.tsx.template",
+        "packages/cli/src/kernel/assets/app/routes/examples/service/(_lib)/service-query.ts.template",
+        "packages/fresh",
+        "packages/fresh/src/application/query/hooks.ts",
+        "packages/sdk/src/query-client/key-bridge.ts",
+        "packages/sdk/src/query/query-factory.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "scaffold.runtime",
+        "arch-check",
+        "fresh-browser"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "ui-add-page-island-repair",
+      "issues": [
+        1357
+      ],
+      "lane": "fixes",
+      "wave": 2,
+      "executionKind": "implementation",
+      "archetype": "6-cli-tooling",
+      "overlays": [
+        "frontend"
+      ],
+      "fileSurfaces": [
+        "packages/cli/src/kernel/application/ui/web-scaffold.ts",
+        "packages/cli/src/public/features/ui/add/add-ui-command.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "scaffold.runtime",
+        "arch-check",
+        "fresh-browser"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "ui-resource-slice-generator",
+      "issues": [
+        1354
+      ],
+      "lane": "features",
+      "wave": 3,
+      "executionKind": "implementation",
+      "archetype": "6-cli-tooling",
+      "overlays": [
+        "frontend"
+      ],
+      "fileSurfaces": [
+        "packages/cli/src/kernel/application/ui/web-scaffold.ts",
+        "packages/cli/src/kernel/assets/app/routes/examples/service/(_lib)/service-query.ts.template",
+        "packages/cli/src/public/features/generate/generate-group.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "scaffold.runtime",
+        "arch-check",
+        "fresh-browser"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "design-registry-catalog-drift-gate",
+      "issues": [
+        1358
+      ],
+      "lane": "fixes",
+      "wave": 1,
+      "executionKind": "implementation",
+      "archetype": "6-cli-tooling",
+      "overlays": [
+        "frontend"
+      ],
+      "fileSurfaces": [
+        "packages/cli/src/kernel/application/ui/registry.ts",
+        "packages/cli/src/kernel/assets/app/routes/(design)/design/(_shared)/registry.ts.template",
+        "packages/fresh-ui/registry.manifest.ts",
+        "packages/fresh-ui/tests/registry-doc-drift.test.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "fresh-browser"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "workers-job-policy-metadata",
+      "issues": [
+        1451
+      ],
+      "lane": "features",
+      "wave": 2,
+      "executionKind": "implementation",
+      "archetype": "4-dsl-builder",
+      "overlays": [
+        "service"
+      ],
+      "fileSurfaces": [
+        "packages/cli/src/kernel/adapters/windows/runtime/runtime-config-overrides.ts",
+        "packages/config/src/",
+        "packages/plugin-workers-core/src/executor/multi-runtime-task-executor.ts",
+        "plugins/workers/services/src/generated-jobs_test.ts",
+        "plugins/workers/src/cli/registry-compiler.ts",
+        "plugins/workers/src/cli/runtime-registry-generator.ts",
+        "plugins/workers/src/runtime/generated-jobs.ts",
+        "plugins/workers/tests/cli/registry-compiler-golden_test.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "scaffold.runtime",
+        "arch-check"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "workers-job-payload-typing",
+      "issues": [
+        1455
+      ],
+      "lane": "features",
+      "wave": 4,
+      "executionKind": "implementation",
+      "archetype": "4-dsl-builder",
+      "overlays": [
+        "service"
+      ],
+      "fileSurfaces": [
+        "packages/cli/src/kernel/assets/registry-generator-fixture.ts",
+        "packages/plugin-triggers-core/src/builders/define-webhook.ts",
+        "packages/plugin-workers-core/src/contracts/v1/workers.contract-types.ts",
+        "packages/plugin-workers-core/src/domain/job-definition.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "scaffold.runtime"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "plugin-service-context-factory",
+      "issues": [
+        1452
+      ],
+      "lane": "features",
+      "wave": 6,
+      "executionKind": "implementation",
+      "archetype": "5-plugin",
+      "overlays": [
+        "service"
+      ],
+      "fileSurfaces": [
+        "packages/cli/src/kernel/assets/embedded.generated.ts",
+        "packages/cli/src/kernel/templates/plugins/generate-plugin-service_test.ts",
+        "packages/plugin/src/sdk/",
+        "plugins/auth/services/src/main.ts",
+        "plugins/sagas/services/src/main.ts",
+        "plugins/workers/services/src/main.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "scaffold.runtime"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "workers-execution-progress",
+      "issues": [
+        1592
+      ],
+      "lane": "features",
+      "wave": 6,
+      "executionKind": "implementation",
+      "archetype": "3-runtime-behavior",
+      "overlays": [
+        "service"
+      ],
+      "fileSurfaces": [
+        "packages/plugin-workers-core/src/domain/job-context.ts",
+        "packages/plugin-workers-core/src/domain/job-definition.ts",
+        "packages/plugin-workers-core/src/telemetry/job-tools.ts",
+        "plugins/workers/worker/job-runner-pool.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "ai-mcp-pool-isolation",
+      "issues": [
+        1448
+      ],
+      "lane": "fixes",
+      "wave": 3,
+      "executionKind": "implementation",
+      "archetype": "2-integration",
+      "overlays": [],
+      "fileSurfaces": [
+        "packages/ai/src/mcp/adapters/tanstack-connector.ts",
+        "packages/ai/src/mcp/application/pool.ts",
+        "packages/ai/src/mcp/application/register-tools.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "arch-check"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "ai-openai-responses-mapper",
+      "issues": [
+        1591
+      ],
+      "lane": "features",
+      "wave": 7,
+      "executionKind": "implementation",
+      "archetype": "2-integration",
+      "overlays": [],
+      "fileSurfaces": [
+        "packages/ai",
+        "packages/ai/openai-compatible.ts",
+        "packages/ai/src/adapters/openai-compatible.adapter.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "arch-check"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "fresh-ai-chat-response-options",
+      "issues": [
+        1458
+      ],
+      "lane": "features",
+      "wave": 8,
+      "executionKind": "implementation",
+      "archetype": "3-runtime-behavior",
+      "overlays": [
+        "frontend"
+      ],
+      "fileSurfaces": [
+        "packages/fresh/src/runtime/ai/create-chat-connection.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "fresh-browser"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "fresh-client-navigation-coordinator",
+      "issues": [
+        1590
+      ],
+      "lane": "features",
+      "wave": 7,
+      "executionKind": "implementation",
+      "archetype": "4-dsl-builder",
+      "overlays": [
+        "frontend"
+      ],
+      "fileSurfaces": [
+        "external:EIS-Chat@5191de83f3da97559f21d8891c6c8afdf1cf473a",
+        "packages/fresh/deno.json",
+        "packages/fresh/src",
+        "packages/fresh/src/",
+        "packages/fresh/src/application/builders/define-page/navigation/",
+        "packages/fresh/src/application/defer/island.ts",
+        "packages/fresh/src/application/form/components/enhancement.tsx",
+        "packages/fresh/tests/"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "fresh-browser"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "fresh-typed-route-and-form-repair",
+      "issues": [
+        1249,
+        1609,
+        1610
+      ],
+      "lane": "fixes",
+      "wave": 7,
+      "executionKind": "implementation",
+      "archetype": "4-dsl-builder",
+      "overlays": [
+        "frontend",
+        "docs"
+      ],
+      "fileSurfaces": [
+        "packages/fresh/src/application/builders/define-partial.test.tsx",
+        "packages/fresh/src/application/form/",
+        "packages/fresh/src/application/form/README.md",
+        "packages/fresh/src/application/form/_internal/prop-types.ts",
+        "packages/fresh/src/application/form/_internal/runtime-types.ts",
+        "packages/fresh/src/application/form/components/enhancement.tsx",
+        "packages/fresh/src/application/form/components/form.tsx",
+        "packages/fresh/src/application/form/schema-adapter/zod-constraints.ts",
+        "packages/fresh/src/application/route/_internal/contract-types.ts",
+        "packages/fresh/src/application/route/mod.ts",
+        "packages/fresh/src/application/route/types.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "arch-check",
+        "fresh-browser",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "sdk-cache-surface-and-telemetry",
+      "issues": [
+        1598,
+        1619,
+        1620,
+        1623,
+        1637
+      ],
+      "lane": "fixes",
+      "wave": 3,
+      "executionKind": "implementation",
+      "archetype": "3-runtime-behavior",
+      "overlays": [],
+      "fileSurfaces": [
+        "packages/sdk/src/cache/cache-provider.ts",
+        "packages/sdk/src/cache/cache-query.ts",
+        "packages/sdk/src/cache/cache-telemetry.ts",
+        "packages/sdk/src/ports/cache-store.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "arch-check"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "sdk-cached-entry-swr",
+      "issues": [
+        1461
+      ],
+      "lane": "fixes",
+      "wave": 5,
+      "executionKind": "implementation",
+      "archetype": "3-runtime-behavior",
+      "overlays": [
+        "docs"
+      ],
+      "fileSurfaces": [
+        "docs/sdk",
+        "docs/site/_site/capabilities/sdk/index.md",
+        "docs/site/services-sdk/sdk.md",
+        "packages/sdk/src/cache/cache-query.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "sdk-browser-safe-entrypoints",
+      "issues": [
+        1462
+      ],
+      "lane": "fixes",
+      "wave": 6,
+      "executionKind": "implementation",
+      "archetype": "3-runtime-behavior",
+      "overlays": [],
+      "fileSurfaces": [
+        "packages/sdk/deno.json",
+        "packages/sdk/mod.ts",
+        "packages/sdk/src/cache/mod.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "arch-check"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "scaffold-route-emission-and-gating",
+      "issues": [
+        1481,
+        1616
+      ],
+      "lane": "fixes",
+      "wave": 6,
+      "executionKind": "implementation",
+      "archetype": "4-dsl-builder",
+      "overlays": [
+        "frontend",
+        "docs"
+      ],
+      "fileSurfaces": [
+        "packages/cli/src",
+        "packages/cli/src/kernel/application/scaffold/writers/app-route-seeds.ts",
+        "packages/cli/src/kernel/application/scaffold/writers/write-app-files.ts",
+        "packages/cli/src/kernel/application/ui/web-scaffold.ts",
+        "packages/cli/src/kernel/assets/app/routes/(design)/design/",
+        "packages/fresh/src/application/route/manifest.ts",
+        "packages/fresh/tests/fixtures/route-binding-browser/routes.ts",
+        "rfcs/0005-devtools-contribution.md"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "scaffold.runtime",
+        "arch-check",
+        "fresh-browser",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "cross-package-dependency-declarations",
+      "issues": [
+        1543
+      ],
+      "lane": "fixes",
+      "wave": 7,
+      "executionKind": "implementation",
+      "archetype": "2-integration",
+      "overlays": [
+        "service"
+      ],
+      "fileSurfaces": [
+        "packages/plugin-workers-core/deno.json",
+        "packages/plugin-workers-core/src/streams/producer.ts",
+        "plugins/triggers",
+        "plugins/triggers/deno.json",
+        "plugins/triggers/streams/producer.ts",
+        "plugins/workers/deno.json"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "arch-check"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "cli-deploy-verb-surface",
+      "issues": [
+        1544
+      ],
+      "lane": "fixes",
+      "wave": 8,
+      "executionKind": "implementation",
+      "archetype": "2-integration",
+      "overlays": [
+        "service"
+      ],
+      "fileSurfaces": [
+        "packages/cli/src/kernel/adapters/aspire/aspire-cloud-deploy-target.ts",
+        "packages/cli/src/kernel/adapters/aspire/aspire-compose-deploy-target.ts",
+        "packages/cli/src/kernel/domain/deploy/service-deploy-target.ts",
+        "packages/cli/src/public/features/deploy/target/target-deploy-command.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "arch-check"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "reference-export-drift-gate",
+      "issues": [
+        1296
+      ],
+      "lane": "internals",
+      "wave": 2,
+      "executionKind": "implementation",
+      "archetype": "6-cli-tooling",
+      "overlays": [
+        "frontend",
+        "docs"
+      ],
+      "fileSurfaces": [
+        ".github/workflows",
+        ".llm/tools/docs/check-accuracy-and-discoverability.ts",
+        ".llm/tools/docs/check-exports-drift.ts",
+        "deno.json",
+        "docs/exports",
+        "docs/site/reference/fresh-ui/index.md",
+        "packages/contracts/src/application/contract-primitives.ts",
+        "packages/contracts/src/application/paginated-query.ts",
+        "packages/contracts/src/public/mod.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "quality-job",
+        "arch-check",
+        "fresh-browser",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "quality-scan-allowance-rail",
+      "issues": [
+        1378,
+        1545
+      ],
+      "lane": "internals",
+      "wave": 0,
+      "executionKind": "implementation",
+      "archetype": "6-cli-tooling",
+      "overlays": [
+        "frontend",
+        "service",
+        "docs"
+      ],
+      "fileSurfaces": [
+        ".llm/tools/quality/scan-code-quality.ts",
+        "deno.json",
+        "docs/site",
+        "docs/site/**",
+        "docs/site/reference/triggers/index.md",
+        "packages/cli/src/public/features/root/public-command-dependencies.ts",
+        "packages/cli/src/public/public-api.ts",
+        "packages/fresh/src",
+        "plugins/workers/streams/producer.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "quality-job",
+        "arch-check",
+        "fresh-browser",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "quality-scan-root-coverage",
+      "issues": [
+        1542
+      ],
+      "lane": "internals",
+      "wave": 1,
+      "executionKind": "implementation",
+      "archetype": "6-cli-tooling",
+      "overlays": [
+        "service",
+        "docs"
+      ],
+      "fileSurfaces": [
+        ".llm/tools/fitness/check-doctrine.ts",
+        ".llm/tools/quality",
+        "deno.json",
+        "docs/site",
+        "packages/*",
+        "packages/cli/e2e",
+        "packages/cli/src",
+        "packages/plugin-streams-core",
+        "packages/plugin-workers-core",
+        "plugins/*"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "quality-job",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "leak-check-process-descendants",
+      "issues": [
+        1429
+      ],
+      "lane": "internals",
+      "wave": 3,
+      "executionKind": "implementation",
+      "archetype": "3-runtime-behavior",
+      "overlays": [],
+      "fileSurfaces": [
+        ".llm/tools/agentic/teardown/",
+        ".llm/tools/agentic/teardown/leak-check.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "quality-job"
+      ],
+      "jsrAudit": {
+        "applicable": false,
+        "reason": "No publishable packages/** or plugins/** surface is in this leaf contract."
+      }
+    },
+    {
+      "key": "jsdoc-example-compile-gate",
+      "issues": [
+        1533
+      ],
+      "lane": "internals",
+      "wave": 3,
+      "executionKind": "implementation",
+      "archetype": "6-cli-tooling",
+      "overlays": [
+        "service",
+        "docs"
+      ],
+      "fileSurfaces": [
+        ".llm/tools/docs/",
+        ".llm/tools/docs/check-snippets.ts",
+        "docs/site",
+        "packages/**",
+        "packages/sdk/**/*.ts",
+        "packages/sdk/src/desktop/mod.ts",
+        "packages/sdk/src/query-client/create-service-query-utils.ts",
+        "plugins/**"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "quality-job",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "fresh-defer-test-capability",
+      "issues": [
+        1557,
+        1601
+      ],
+      "lane": "internals",
+      "wave": 4,
+      "executionKind": "implementation",
+      "archetype": "3-runtime-behavior",
+      "overlays": [
+        "frontend"
+      ],
+      "fileSurfaces": [
+        ".github/workflows/ci.yml",
+        "packages/cli",
+        "packages/fresh/tests",
+        "packages/fresh/tests/defer-island-client-bundle_test.ts",
+        "packages/fresh/tests/fixtures/defer-island-client/",
+        "packages/fresh/tests/form-navigation_browser.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "quality-job",
+        "fresh-browser"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "harness-evidence-and-verdict-tooling",
+      "issues": [
+        1561,
+        1563,
+        1621
+      ],
+      "lane": "internals",
+      "wave": 0,
+      "executionKind": "implementation",
+      "archetype": "6-cli-tooling",
+      "overlays": [],
+      "fileSurfaces": [
+        ".github/workflows/openhands-agent.yml",
+        ".llm/tools/agentic/lib/agentic-lib.ts",
+        ".llm/tools/validation/acceptance-evidence.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "quality-job"
+      ],
+      "jsrAudit": {
+        "applicable": false,
+        "reason": "No publishable packages/** or plugins/** surface is in this leaf contract."
+      }
+    },
+    {
+      "key": "openhands-dispatch-claim-and-refusal",
+      "issues": [
+        1611,
+        1613
+      ],
+      "lane": "internals",
+      "wave": 1,
+      "executionKind": "implementation",
+      "archetype": "6-cli-tooling",
+      "overlays": [],
+      "fileSurfaces": [
+        ".github/scripts/openhands-comment-trigger.mjs",
+        ".github/workflows/openhands-agent.yml",
+        ".github/workflows/openhands-phase-eval.yml",
+        ".llm/tools/agentic/lib/agentic-lib.ts"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "quality-job"
+      ],
+      "jsrAudit": {
+        "applicable": false,
+        "reason": "No publishable packages/** or plugins/** surface is in this leaf contract."
+      }
+    },
+    {
+      "key": "package-gate-honesty",
+      "issues": [
+        1604,
+        1618,
+        1622
+      ],
+      "lane": "internals",
+      "wave": 2,
+      "executionKind": "implementation",
+      "archetype": "6-cli-tooling",
+      "overlays": [
+        "docs"
+      ],
+      "fileSurfaces": [
+        "deno.json",
+        "docs/site/durable-workflows/streams.md",
+        "docs/site/quickstart.vto",
+        "packages/cli/",
+        "packages/*",
+        "packages/cli",
+        "packages/cli/",
+        "packages/cli/e2e/src/application/gates/scaffold/run-documented-stream-example.ts",
+        "packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-gates_test.ts",
+        "packages/cli/e2e/tests/presentation/quickstart-command-drift_test.ts",
+        "packages/mcp",
+        "packages/mcp/tests/fixtures/doctor/broken/deno.json"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "publish-dry-run",
+        "quality-job",
+        "scaffold.runtime",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": true,
+        "risks": [
+          "audit public exports and exact @netscript dependency pins for every touched publishable member",
+          "run isolated-declaration publish dry-run and reject runtime asset/import-meta reads"
+        ]
+      }
+    },
+    {
+      "key": "comparison-docs-programme",
+      "issues": [
+        1551
+      ],
+      "lane": "docs",
+      "wave": 0,
+      "executionKind": "implementation",
+      "archetype": "1-small-contract",
+      "overlays": [
+        "docs"
+      ],
+      "fileSurfaces": [
+        ".llm/tools/",
+        "docs/site",
+        "docs/site/",
+        "docs/site/reference/",
+        "external:EIS-Chat@5191de83f3da97559f21d8891c6c8afdf1cf473a"
+      ],
+      "provingGates": [
+        "check",
+        "test",
+        "docs-source-format",
+        "docs-accuracy"
+      ],
+      "jsrAudit": {
+        "applicable": false,
+        "reason": "No publishable packages/** or plugins/** surface is in this leaf contract."
+      }
+    }
+  ]
+}

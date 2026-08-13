@@ -13,11 +13,16 @@
 | 2026-08-13T21:16:00.000Z | Canonical 64-target/63-active inventory, 46 leaves, and 10-wave DAG rendered and validated. | `harness:milestone:test`: 15 pass; `harness:milestone:validate`: `ok: true` |
 | 2026-08-13T21:27:00.000Z | Discharged two live false positives before PLAN-EVAL: #1306 is fixed by Aspire 13.4.6 plus NetScript's generated agent skill; #1606's JSR observation is satisfied. | `aspire ps/describe --help`; `.agents/skills/aspire/SKILL.md`; `skills.generated.ts`; JSR package metadata and landing page; public close comments |
 | 2026-08-13T21:28:00.000Z | Re-froze the plan at 64 targets / 61 active / 44 leaves and locked the six material remedy choices called out by synthesis. | `plan.md`; `milestone-leaf-plan.json`; four milestone control artifacts |
+| 2026-08-13T22:05:00.000Z | Composed PLAN-EVAL cycle 1 returned `CHANGES_REQUESTED`; no implementation dispatched. | `plan-eval.md`; PR #1641 plan-eval comment; Claude session `2439b19d-5df7-4920-9fce-fa5831ec4fdf` |
+| 2026-08-13T22:12:00.000Z | Captured paid-transport and quota evidence. | Codex ChatGPT: 77% primary remaining, weekly reset 2026-08-20 05:31 Europe/Zurich; Claude first-party Max: 6% all-model / 2% Fable weekly remaining, reset 2026-08-15 00:00 |
+| 2026-08-13T22:35:00.000Z | Rewrote #1348–#1353 Acceptance contracts in place, locked #1249/#1451 decisions, synchronized #1377, and created residual Aspire docs issue #1642. | Live GitHub issue bodies and comments |
+| 2026-08-13T22:42:00.000Z | Re-audited every #1564 construct; closed it completed because all live changed-file consumers are safe and #1403 already fixed the affected construct. Removed the false wave-zero barrier and moved #1360 to features. | #1564 correction comment; 60 active / 43 leaves / nine waves; lane counts 1/16/26/17 |
+| 2026-08-13T22:48:00.000Z | Added per-leaf surfaces, archetypes, overlays, proving gates, JSR applicability, risk register, collision ownership, release evidence ids, two read-only watchers, and exact OIDC/artifact-pinned stable conditions. | `leaf-contracts.json`; repaired plan/state/DAG/inventory |
 
 ## Current design checkpoint
 
 - Objective: complete and publish milestone `0.0.7` through the milestone-cluster profile.
 - Frozen invariants: four topic orchestrators, leaf PRs target `main`, coordinator-only merge,
   one expensive gate globally, inactive release captain until exact-main readiness.
-- Step 0 scope and dependency artifacts are frozen and structurally green. The sole remaining
-  dispatch gate is the one required composed PLAN-EVAL; no leaf dispatch before its approval.
+- Step 0 repair is complete. The sole remaining dispatch gate is the bounded same-conversation
+  PLAN-EVAL re-review; no leaf dispatch before its approval.
