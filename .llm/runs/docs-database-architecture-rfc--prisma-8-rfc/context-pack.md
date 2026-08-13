@@ -19,8 +19,9 @@ authored an evidence-complete 28,194-word raw draft, pushed as `05e5fbac2`. Opus
 consolidation session `de518f07-68e0-4f77-9cb5-e59dc3e81ebc` resolved root findings R1–R10 and
 reduced it to 11,205 words. Root read the entire compact RFC, added three narrow correctness fixes,
 and pushed it as `5dfc4e8eb`. Qwen 3.8 Max reviewed that frozen commit without edits and returned
-`PASS_WITH_CHANGES`; QF-01–QF-05 remain open. It is not finally accepted. Current-main commit
-`01e096049` remains nonblocking CI/gate-tooling drift.
+`PASS_WITH_CHANGES`. Grok 4.6 high then reviewed the same byte-identical RFC without edits and
+returned `PASS_WITH_REFINEMENTS` with zero blockers. QF-01–QF-05 and GR-01–GR-08 remain open. It is
+not finally accepted. Current-main commit `01e096049` remains nonblocking CI/gate-tooling drift.
 
 ## Completed
 
@@ -44,18 +45,24 @@ and pushed it as `5dfc4e8eb`. Qwen 3.8 Max reviewed that frozen commit without e
 - Qwen passed architecture/type model, Standard Schema boundary, control/recovery, migration/plugin
   safety, and market/upstream claims. Its narrow failures affect TypeScript/API examples and one
   package/dependency example only.
+- Completed the Grok whole-RFC review through requested/observed `x-ai/grok-4.6`, variant `high`,
+  session `ses_003644aeaffeSm3UCAW9xUqRIK`. It evaluated byte-identical blob `f46040d8...` from RFC
+  commit `5dfc4e8eb` at HEAD `be83301c6`, used no subagents, made no edits, and returned
+  `PASS_WITH_REFINEMENTS`, zero blockers, and GR-01–GR-08.
+- Grok passed axes 2, 3, 4, and 6. Abstraction, public API/DX/types, and economy failed narrowly;
+  the architecture stands.
 
 ## In Progress
 
-- Grok 4.6 high whole-RFC adversarial review. The RFC remains frozen at 11,205 words and the run
-  remains in `rfc-authoring`; Qwen findings have not yet been dispositioned.
+- Opus 5 high author/editor dispositions and consolidation. The RFC remains frozen at 11,205 words
+  and the run remains in `rfc-authoring`; no QF/GR finding has been dispositioned yet.
 
 ## Next Steps
 
-1. Run Grok 4.6 high as the whole-RFC adversarial review.
-2. Use Opus for author/editor dispositions and consolidation of Qwen/Grok findings. Qwen's
-   approximately 1,240-word deletion ledger projects approximately 9,965 words but its named
-   must-not-cut contracts remain mandatory.
+1. Use Opus 5 high for author/editor disposition of every QF/GR finding and consolidation to at most
+   10,000 words. Preserve Qwen's must-not-cut contracts; Grok projects a net approximately
+   1,040–1,200-word cut plus another safe approximately 80 words if needed.
+2. Root checks the consolidated result.
 3. Run one final Fable 5 high substantive refinement.
 4. Run mechanical checks only, then commit/push and update the PR trail.
 
@@ -76,19 +83,19 @@ and pushed it as `5dfc4e8eb`. Qwen 3.8 Max reviewed that frozen commit without e
 
 ## Gates
 
-| Gate family | Current status | Evidence                             |
-| ----------- | -------------- | ------------------------------------ |
-| Static      | PASS           | Compact RFC fmt, `docs:links`, diff. |
-| Fitness     | plan PASS      | Cycle 2 `plan-eval.md`; D-01–D-47.   |
-| Runtime     | N/A            | Docs-only RFC run.                   |
-| Consumer    | changes open   | Qwen `PASS_WITH_CHANGES`; Grok next. |
+| Gate family | Current status | Evidence                                            |
+| ----------- | -------------- | --------------------------------------------------- |
+| Static      | PASS           | Compact RFC fmt, `docs:links`, diff.                |
+| Fitness     | plan PASS      | Cycle 2 `plan-eval.md`; D-01–D-47.                  |
+| Runtime     | N/A            | Docs-only RFC run.                                  |
+| Consumer    | changes open   | Qwen/Grok reviews complete; Opus dispositions next. |
 
 ## Open Questions
 
 - No must-resolve-now architecture decision remains; pre-implementation decisions stay assigned to
   their W1/W3/W4/W5/W7/W10 gates.
 - QF-01–QF-05 are review findings, not reopened architecture decisions; they await author/editor
-  disposition after Grok.
+  disposition together with GR-01–GR-08.
 
 ## Drift and Debt
 

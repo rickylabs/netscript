@@ -156,6 +156,7 @@ the archetype, source, JSR, consumer, conformance, and release exits recorded in
 | 2026-08-13 | 3     | raw-draft   | Native Claude Code Opus 5 high session `105f7bbd-895d-4dcd-8641-6768c6e076c8` authored the evidence-complete canonical draft. Root committed and pushed it as `05e5fbac2`; the draft was intentionally treated as an input to review, not final prose.                                                                                         |
 | 2026-08-13 | 3     | root-review | Root substantively reviewed the 28,194-word raw draft and returned `REVISE_CONSOLIDATE`. The review locks a reader-first 8,000–10,000-word target (12,000 hard ceiling), removes duplicated evidence/process appendices, and records ten blocking API/correctness repairs before Qwen and Grok review.                                         |
 | 2026-08-13 | 5     | qwen-review | Qwen 3.8 Max session `3d1277dd-be6a-44af-9e98-4560d8aaf1b7` reviewed frozen commit `5dfc4e8eb` at effort `max`, returned 2,181 words and `PASS_WITH_CHANGES`, made no edits, and opened QF-01 high, QF-02 medium, and QF-03–QF-05 low. Four substantive axes passed; TypeScript/API and package/dependency examples need disposition.          |
+| 2026-08-13 | 5     | grok-review | OpenCode/OpenRouter requested and observed `x-ai/grok-4.6` variant `high`, session `ses_003644aeaffeSm3UCAW9xUqRIK`, against RFC commit `5dfc4e8eb` and byte-identical blob `f46040d8...` while HEAD was `be83301c6`. It used no subagents, made no edits, and returned `PASS_WITH_REFINEMENTS`, zero blockers, and GR-01–GR-08.               |
 
 ### RFC Consolidation and Root Acceptance
 
@@ -190,6 +191,33 @@ Qwen also supplied an approximately 1,240-word deletion ledger projecting an app
 9,965-word RFC while naming must-not-cut contracts. It is editorial input, not authorization to
 remove load-bearing semantics. The canonical RFC remains frozen at 11,205 words; no disposition,
 edit, or final acceptance occurred.
+
+### Grok Whole-RFC Adversarial Review
+
+OpenCode/OpenRouter requested and observed `x-ai/grok-4.6`, variant `high`, session
+`ses_003644aeaffeSm3UCAW9xUqRIK`. It evaluated RFC commit `5dfc4e8eb`; the RFC blob was
+byte-identical to `f46040d8...` at current HEAD `be83301c6`. The lane used no subagents, made no
+edits, and returned `PASS_WITH_REFINEMENTS` with zero blockers. Axes 2, 3, 4, and 6 passed; axis 1
+abstraction, axis 5 public API/DX/types, and axis 7 economy failed narrowly while the architecture
+stood.
+
+Open refinements for Opus author/editor disposition:
+
+- **GR-01:** use real generated binding values, overlapping QF-01.
+- **GR-02:** put opaque control/runtime extension facets under extension-pack/adapter ownership,
+  overlapping QF-02.
+- **GR-03:** bind queries, validators, and hashes per target/per space; never merge a Prisma
+  `AppContract`.
+- **GR-04:** make pure compose/compile authority consistent with control wording.
+- **GR-05:** distinguish adopted manage-forward objects from detach-retained verify-only tombstones.
+- **GR-06:** specify space → target → run outcome rollup explicitly.
+- **GR-07:** show a configured provider factory and remove executable-example elisions.
+- **GR-08:** perform net consolidation and resolve QF-04/QF-05.
+
+Grok's deletion ledger estimates approximately 1,180 words removed and 140 added, net approximately
+1,040–1,200 words removed, landing around 10,000–10,160 words; it identifies another safe
+approximately 80-word cut to cross 10,000. The RFC remains frozen at 11,205 words until Opus applies
+all QF/GR dispositions. This gate is not final acceptance.
 
 ### PLAN-EVAL Cycle 1
 
@@ -245,13 +273,14 @@ CI/gate-tooling drift that changes structured check invocation rather than datab
 
 ### Fitness Gates
 
-| Gate                         | Result            | Evidence                                                           | Notes                                                                                |
-| ---------------------------- | ----------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| Archetype/package assignment | PASS_PLANNED      | `plan.md` package graph                                            | A1/A2/A3/A4/A5/A6 responsibilities and gates are explicit.                           |
-| Open-decision sweep          | PASS_PLANNED      | D-01–D-47                                                          | No must-resolve-now item; pre-wave/deferred items cannot rewrite package boundaries. |
-| Prospective JSR audit        | PASS_AS_PLANNED   | `research/planned-jsr-audit.md`                                    | New-package dry-run/docs/packed/canary gates are N/A until implementation, not PASS. |
-| PLAN-EVAL                    | PASS_CYCLE_2      | `plan-eval.md`; session `f3286656-7d0f-4da2-a22d-32897a5e6482`     | Commit `383170bbc`; no further Plan-Eval cycle.                                      |
-| Qwen focused RFC review      | PASS_WITH_CHANGES | Session `3d1277dd-be6a-44af-9e98-4560d8aaf1b7`; commit `5dfc4e8eb` | Five findings remain open; review made no edits.                                     |
+| Gate                         | Result                | Evidence                                                           | Notes                                                                                |
+| ---------------------------- | --------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| Archetype/package assignment | PASS_PLANNED          | `plan.md` package graph                                            | A1/A2/A3/A4/A5/A6 responsibilities and gates are explicit.                           |
+| Open-decision sweep          | PASS_PLANNED          | D-01–D-47                                                          | No must-resolve-now item; pre-wave/deferred items cannot rewrite package boundaries. |
+| Prospective JSR audit        | PASS_AS_PLANNED       | `research/planned-jsr-audit.md`                                    | New-package dry-run/docs/packed/canary gates are N/A until implementation, not PASS. |
+| PLAN-EVAL                    | PASS_CYCLE_2          | `plan-eval.md`; session `f3286656-7d0f-4da2-a22d-32897a5e6482`     | Commit `383170bbc`; no further Plan-Eval cycle.                                      |
+| Qwen focused RFC review      | PASS_WITH_CHANGES     | Session `3d1277dd-be6a-44af-9e98-4560d8aaf1b7`; commit `5dfc4e8eb` | Five findings remain open; review made no edits.                                     |
+| Grok whole-RFC review        | PASS_WITH_REFINEMENTS | Session `ses_003644aeaffeSm3UCAW9xUqRIK`; blob `f46040d8...`       | Zero blockers; GR-01–GR-08 await disposition.                                        |
 
 ### Runtime Gates
 
@@ -261,10 +290,10 @@ CI/gate-tooling drift that changes structured check invocation rather than datab
 
 ### Consumer Gates
 
-| Consumer               | Result                 | Evidence                                                                     | Notes                                        |
-| ---------------------- | ---------------------- | ---------------------------------------------------------------------------- | -------------------------------------------- |
-| PLAN-EVAL reader       | PASS                   | `plan-eval.md`, corrected research/plan, synthesis and audits                | Cycle 2 accepted the locked plan.            |
-| RFC reader/implementer | QWEN_PASS_WITH_CHANGES | Compact RFC `5dfc4e8eb`; Qwen session `3d1277dd-be6a-44af-9e98-4560d8aaf1b7` | QF-01–QF-05 await disposition; Grok is next. |
+| Consumer               | Result                        | Evidence                                                      | Notes                                               |
+| ---------------------- | ----------------------------- | ------------------------------------------------------------- | --------------------------------------------------- |
+| PLAN-EVAL reader       | PASS                          | `plan-eval.md`, corrected research/plan, synthesis and audits | Cycle 2 accepted the locked plan.                   |
+| RFC reader/implementer | REVIEWS_COMPLETE_CHANGES_OPEN | Frozen RFC `5dfc4e8eb`; Qwen/Grok receipts                    | QF-01–QF-05 and GR-01–GR-08 await Opus disposition. |
 
 ## Handoff Notes
 
@@ -273,8 +302,8 @@ CI/gate-tooling drift that changes structured check invocation rather than datab
 - Prospective package publishability is `PASS-AS-PLANNED`; actual JSR commands remain N/A until
   packages exist and must produce implementation/release receipts later.
 - The consolidated RFC remains frozen at `5dfc4e8eb` and 11,205 words. Qwen returned
-  `PASS_WITH_CHANGES`; QF-01–QF-05 and its deletion ledger await disposition. Any cut toward the
-  projected approximately 9,965 words must preserve its named must-not-cut contracts.
-- Continue the owner-locked order: Grok 4.6 high whole-RFC adversarial review, Opus author/editor
-  dispositions and consolidation, one final Fable 5 high substantive refinement, and mechanical
+  `PASS_WITH_CHANGES`; Grok returned `PASS_WITH_REFINEMENTS` and zero blockers. All QF/GR findings
+  and both deletion ledgers await disposition.
+- Continue the owner-locked order: Opus 5 high author/editor dispositions plus consolidation to at
+  most 10,000 words, root checks, one final Fable 5 high substantive refinement, and mechanical
   checks only. The current checkpoint is not final acceptance.

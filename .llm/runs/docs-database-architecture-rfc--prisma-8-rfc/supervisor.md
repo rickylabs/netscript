@@ -57,12 +57,13 @@ drift and independently confirmed 42 generated `db:*` keys per engine workspace.
 
 ## RFC authoring and consolidation
 
-| Stage               | Route / model / effort                | Session                                | Result                                                                                     |
-| ------------------- | ------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Raw draft           | Native Claude Code · Opus 5 · high    | `105f7bbd-895d-4dcd-8641-6768c6e076c8` | 28,194-word evidence-complete draft pushed as `05e5fbac2`; root requested consolidation.   |
-| Consolidation       | Native Claude Code · Opus 5 · high    | `de518f07-68e0-4f77-9cb5-e59dc3e81ebc` | R1–R10 resolved; 11,205-word compact RFC committed and pushed as `5dfc4e8eb`.              |
-| Root review         | Codex supervisor · personal full read | `019ffbc7-133b-7852-905d-53a163fe9819` | `PASS_TO_FOCUSED_REVIEW`; Qwen 3.8 Max is next, but final acceptance has not been granted. |
-| Qwen focused review | OpenRouter · `qwen/qwen3.8-max` · max | `3d1277dd-be6a-44af-9e98-4560d8aaf1b7` | Commit `5dfc4e8eb`; 2,181 words, no edits, `PASS_WITH_CHANGES`; QF-01–QF-05 open.          |
+| Stage                 | Route / model / effort                       | Session                                | Result                                                                                           |
+| --------------------- | -------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Raw draft             | Native Claude Code · Opus 5 · high           | `105f7bbd-895d-4dcd-8641-6768c6e076c8` | 28,194-word evidence-complete draft pushed as `05e5fbac2`; root requested consolidation.         |
+| Consolidation         | Native Claude Code · Opus 5 · high           | `de518f07-68e0-4f77-9cb5-e59dc3e81ebc` | R1–R10 resolved; 11,205-word compact RFC committed and pushed as `5dfc4e8eb`.                    |
+| Root review           | Codex supervisor · personal full read        | `019ffbc7-133b-7852-905d-53a163fe9819` | `PASS_TO_FOCUSED_REVIEW`; Qwen 3.8 Max is next, but final acceptance has not been granted.       |
+| Qwen focused review   | OpenRouter · `qwen/qwen3.8-max` · max        | `3d1277dd-be6a-44af-9e98-4560d8aaf1b7` | Commit `5dfc4e8eb`; 2,181 words, no edits, `PASS_WITH_CHANGES`; QF-01–QF-05 open.                |
+| Grok whole-RFC review | OpenCode/OpenRouter · `x-ai/grok-4.6` · high | `ses_003644aeaffeSm3UCAW9xUqRIK`       | Commit `5dfc4e8eb`, blob `f46040d8...`; no subagents/edits; `PASS_WITH_REFINEMENTS`, 0 blockers. |
 
 Before commit `5dfc4e8eb`, root added three narrow corrections: runtime consumes the compiled
 `DatabaseManifest`, not `DatabaseDefinition`; the authority table distinguishes each artifact and
@@ -77,6 +78,13 @@ examples and one package/dependency example. QF-01 is high, QF-02 medium, and QF
 approximately 1,240-word deletion ledger projects approximately 9,965 words while naming
 must-not-cut contracts. The RFC remains frozen at 11,205 words until Grok review and Opus
 author/editor disposition; this is not final acceptance.
+
+The Grok review ran against current HEAD `be83301c6` while proving the RFC blob byte-identical to
+commit `5dfc4e8eb`. Axes 2, 3, 4, and 6 passed. Abstraction, public API/DX/types, and economy failed
+narrowly through GR-01–GR-08; the architecture stands. The deletion ledger estimates approximately
+1,180 words deleted and 140 added, net approximately 1,040–1,200 removed, landing around
+10,000–10,160 with another safe approximately 80-word cut. The RFC remains frozen at 11,205 words
+pending Opus dispositions; this is not final acceptance.
 
 ## Recorded lane/eval overrides
 
@@ -105,6 +113,10 @@ author/editor disposition; this is not final acceptance.
   `openrouter/x-ai/grok-4.6` and variant `high`, record requested/observed identity and raw receipt,
   and run it after the focused Qwen review. No substantive gate may follow the final Fable 5 high
   refinement.
+- The completed Grok route requested and observed `x-ai/grok-4.6`, variant `high`, session
+  `ses_003644aeaffeSm3UCAW9xUqRIK`, with no subagents and no edits. It evaluated RFC commit
+  `5dfc4e8eb` / blob `f46040d8...` at HEAD `be83301c6` and returned `PASS_WITH_REFINEMENTS` with
+  zero blockers.
 - Qwen integration-risk launch evidence: OpenRouter evaluator guard requested `qwen/qwen3.8-max` at
   `max`; session `f5c1afd0-f89f-48e2-9dfc-3e8f5ade646b` initialized with observed model
   `qwen/qwen3.8-max` and provider `Alibaba`. This is a complementary falsification pass, not
