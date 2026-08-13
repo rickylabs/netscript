@@ -1346,7 +1346,12 @@
       "fileSurfaces": [
         ".github/workflows/openhands-agent.yml",
         ".llm/tools/agentic/lib/agentic-lib.ts",
-        ".llm/tools/validation/acceptance-evidence.ts"
+        ".llm/tools/agentic/lib/agentic-lib_test.ts",
+        ".llm/tools/agentic/openhands/phase-eval-workflow_test.ts",
+        ".llm/tools/validation/acceptance-evidence.ts",
+        ".llm/tools/validation/acceptance-evidence_test.ts",
+        ".llm/tools/validation/mirror-acceptance-evidence.ts",
+        ".llm/tools/validation/mirror-acceptance-evidence_test.ts"
       ],
       "provingGates": [
         "check",

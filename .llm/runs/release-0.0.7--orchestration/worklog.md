@@ -24,6 +24,7 @@
 | 2026-08-13T23:12:07.000Z | Activated exactly four attached topic orchestrators on the recorded Codex Sol/high fallback; all four route/worktree identities matched and began working. | `topic-{docs,internals,fixes,features}/codex-thread-ids.md`; `agentic:codex-status` |
 | 2026-08-13T23:18:00.000Z | Locked the owner-requested visibility rule: every Claude orchestrator lane must use native `/remote-control` with registry attachment proof. | `agentic:smoke-claude-remote`: version/help/remote-control/agents surfaces all OK; topic briefs + supervisor invariant |
 | 2026-08-13T23:25:00.000Z | Wave-zero dispatch reached its exact WIP shape: six attached implementation leaves (docs 1, internals 2, fixes 2, features 1), all based on exact `main` with no upstream and recorded daemon/thread identity. | `milestone-cluster-state.json`; per-leaf `codex-thread-ids.md`; `agentic:codex-status` |
+| 2026-08-13T23:32:00.000Z | At the first completed-turn interception, authorized the narrow #1561 mirror-CLI/test extension and resumed the same #1644 implementation thread. #1643 separately proved two manifest values remain schema compatibility fields and narrowed to the silent CLI default plus focused tests. | PRs #1644/#1643; leaf research/drift; same-thread resume `019ffcc9-97ba-7770-a890-a1ebd80ec793` |
 
 ## Current design checkpoint
 

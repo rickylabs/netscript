@@ -11,6 +11,7 @@
 | 2026-08-13T22:42:00Z | Evaluator write hook created a temporary worktree despite read-only intent. | Artifact captured; session stopped; worktree and temporary branch removed; no product mutation retained. |
 | 2026-08-13T23:03:00Z | Fable reached the monthly spend limit after completing cycle-2 evidence collection but before verdict emission. | Same conversation, same cycle, and same evidence used the recorded Opus fallback for final synthesis; verdict `APPROVED`. |
 | 2026-08-13T23:10:00Z | Canonical topic-orchestrator route is Claude Opus/high, but native Claude quota is nearly exhausted and Fable already hit the spend limit. | Use the documented same-role Codex Sol/high fallback for the four control sessions; implementations remain Codex-routed and opposite-family evaluation evidence is still mandatory per leaf. |
+| 2026-08-13T23:32:00Z | #1561's structured non-zero validation report requires the mirror CLI and directly coupled tests omitted from the pre-dispatch file surface. | Coordinator authorized only the mirror CLI plus five named test peers; `netscript-pr` remains read-only skill guidance, and no unrelated product surface was admitted. |
 
 No implementation drift is accepted. The plan repair changes orchestration evidence and public issue
 contracts only; leaf implementation remains blocked until PLAN-EVAL approval.
