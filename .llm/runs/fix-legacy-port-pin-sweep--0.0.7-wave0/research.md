@@ -73,3 +73,11 @@ surface. The issue explicitly permits the remaining truthful contract: remove th
 require `--stream-url`, and make the option help/error state that no endpoint is inferred and that
 the caller should obtain the streams URL from `aspire describe streams --format Json`. Removing the
 manifest/fixture fields is mechanical because allocation already comes from `portRangeKey`.
+
+## Contract-test correction
+
+The first focused structured test disproved the final sentence above for current main. The
+plugin-owned installer allocates from `portRangeKey`, but the shared manifest protocol still
+requires `backgroundPort`, atomically couples the service triple, and the maintainer official-copy
+compatibility adapter consumes those values. Removing them is not valid within the declared files.
+The deletion was restored and the compatibility redesign is escalated in `drift.md`.

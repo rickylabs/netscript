@@ -15,5 +15,12 @@
 - #1206's real endpoint-discovery seam lives in `@netscript/mcp`; wiring it crosses the frozen leaf
   surface. Locked remedy: explicit required `--stream-url` with Aspire discovery guidance, plus
   removal of dead manifest/fixture port fields.
-- `PLAN-EVAL: N/A` recorded before source edits. Next: commit/push artifact slice and open the draft
-  PR, then implement slice 2.
+- Draft PR #1643 opened from bootstrap commit `e49948bbf`, labeled `status:plan` with milestone
+  `0.0.7`.
+- First focused structured test falsified the issue's manifest-removal assumption: the shared schema
+  requires `backgroundPort` and atomically couples `servicePort` to the service shape; copy mode
+  still consumes them. Invalid manifest/fixture edits were restored.
+- Proposed explicit-URL auth diff remains uncommitted because two current tests need changes outside
+  the frozen surface. No durable receipts or expensive gates ran.
+- Resume only after the topic orchestrator chooses the narrow test-file rescope (retain compatibility
+  pins) or a broader schema/copy redesign with revised plan + separate PLAN-EVAL.

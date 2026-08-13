@@ -75,3 +75,11 @@ drift before crossing the boundary.
 research rules out a truthful config-only shortcut, and the immutable surface prevents the only
 material alternative (cross-package endpoint-directory injection). The remaining edits are locked
 and mechanical; a ceremonial plan evaluator would not decide anything.
+
+## Post-plan correction
+
+The first focused contract test invalidated locked decision 4: current shared schema and official
+copy compatibility still require/consume the manifest port fields. See `drift.md`. Implementation is
+paused. A narrow authorization to add only the auth command test can retain `PLAN-EVAL: N/A`; any
+schema/copy redesign requires a revised locked plan and separate PLAN-EVAL before further source
+work.

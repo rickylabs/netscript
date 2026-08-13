@@ -27,11 +27,28 @@ explicit-URL/fail-loud fallback, so the implementation is locked and mechanical.
 
 ## Gate evidence
 
-No gate has run. `scaffold.runtime`, Aspire, and Docker are forbidden until the coordinator-owned
-global expensive-gate lease is explicitly granted.
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Focused structured test reporter (exploratory, pre-commit) | FAIL | exit 1; 10 passed, 8 failed, 5 unique failure groups. Two auth tests expose the required test rescope; manifest-shape failure proves current schema requires the filed pins; additional copy tests failed because the invalid streams manifest could no longer satisfy dependency discovery. |
+
+No durable receipt was minted because the proposed source is not committed and the gate runner must
+attest an immutable Git head. `scaffold.runtime`, Aspire, and Docker remain forbidden until the
+coordinator-owned global expensive-gate lease is explicitly granted.
 
 ## Research evidence
 
 - Live issue API snapshot captured at `2026-08-13T20:23:46.556Z` in `research.md`.
 - Baseline: branch = `origin/main` = `01e0960494c95ce56eb35892c211a095eb13e6ed`.
 - Reproduction and existing-seam findings are recorded in `research.md`.
+
+## Blocker
+
+The issue's manifest-removal assumption is stale against current main, and the explicit-URL behavior
+requires an undeclared test file. The invalid manifest change was restored; the proposed auth diff
+is intentionally uncommitted. Topic-orchestrator direction is required before implementation can
+continue:
+
+1. authorize a narrow rescope adding
+   `packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts` and explicitly retain
+   the compatibility manifest pins as a recorded already-not-mechanical occurrence; or
+2. authorize a broader schema/copy compatibility redesign, revised plan, and separate PLAN-EVAL.
