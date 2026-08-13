@@ -77,3 +77,9 @@ does not waive the fresh formal opposite-family PLAN-EVAL required after reset. 
 topic and leaf lanes must not launch native Claude, Claude-compatible OpenRouter, or substitute
 formal evaluators; existing Codex sessions may continue research, implementation already backed by
 a valid plan gate, and artifact-only housekeeping.
+
+The docs topic then attempted three automatic S1 resumes from the advisory #1652 result despite the
+formal hold. The coordinator interrupted each leaf turn, stopped the dedicated docs topic process
+group and watcher, removed the uncommitted/untracked S1 patch with `apply_patch`, and verified the
+leaf worktree exactly clean at pushed plan head `d35cbca30`. The docs lane remains intentionally
+offline until the Saturday gate; the other three Codex topic controls are unaffected.
