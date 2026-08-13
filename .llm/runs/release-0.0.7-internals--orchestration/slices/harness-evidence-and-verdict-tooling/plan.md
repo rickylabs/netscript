@@ -23,12 +23,15 @@
    templates/placeholders, unsupported vocabulary, and incidental prose remain non-verdicts.
 5. A marker that is absent and a marker that was emitted but cannot be parsed have distinct source
    states; neither becomes PASS.
-6. `netscript-pr` will state that only markdown checkboxes are close-gated and plain-bullet
-   Acceptance sections take no evidence block.
+6. The validation error itself will state that only markdown checkbox targets can be mirrored and
+   will instruct authors to remove the evidence block or convert the issue list to checkboxes.
+   Coordinator decision `5286066438` keeps `netscript-pr` read/use only, so this leaf does not edit
+   or claim the skill-documentation acceptance row.
 
 ## Open-decision sweep
 
-- Must resolve now: coordinator authority for undeclared paths listed in `drift.md`.
+- Resolved: coordinator authorization is recorded in `drift.md`; the resulting implementation/test
+  surface is exactly eight files and `netscript-pr` remains read-only.
 - Safe to defer: issue-template checkbox defaults, broader OpenHands routing/model policy, general
   YAML support, and any acceptance convention redesign. None is required by the locked outcome.
 
@@ -37,10 +40,9 @@
 | Slice | What it proves | Files | Named gate |
 | --- | --- | --- | --- |
 | S0 | Current-main research, RED fixtures, PLAN-EVAL disposition, and drift are reviewable from a draft PR | leaf run artifacts only | bootstrap review + Git truth |
-| S1 | Empty-list and zero-checkbox evidence failures are fail-closed, structured, actionable, and covered at parser + dry-run boundaries | `acceptance-evidence.ts`; pending authorization for `mirror-acceptance-evidence.ts`, `acceptance-evidence_test.ts`, `mirror-acceptance-evidence_test.ts` | focused structured test, then contract `test` |
-| S2 | Bare/heading/emphasis verdict tokens parse consistently and absence differs from malformed emission | `openhands-agent.yml`, `agentic-lib.ts`; pending authorization for `agentic-lib_test.ts`, `phase-eval-workflow_test.ts` | focused agentic/workflow tests, then contract `check` |
-| S3 | Operator documentation matches the fail-closed checkbox/evidence convention | pending authorization for `.agents/skills/netscript-pr/SKILL.md` | targeted prose/source assertion plus contract `quality-job` |
-| S4 | Final immutable head has sufficient structured evidence and no incidental lock/source churn | leaf run artifacts and `receipts/` | contract `check`, `test`, `quality-job`; IMPL-EVAL handoff |
+| S1 | Empty-list and zero-checkbox evidence failures are fail-closed, structured, actionable, and covered at parser + dry-run boundaries | `acceptance-evidence.ts`, `mirror-acceptance-evidence.ts`, `acceptance-evidence_test.ts`, `mirror-acceptance-evidence_test.ts` | focused structured test, then contract `test` |
+| S2 | Bare/heading/emphasis verdict tokens parse consistently and absence differs from malformed emission | `openhands-agent.yml`, `agentic-lib.ts`, `agentic-lib_test.ts`, `phase-eval-workflow_test.ts` | focused agentic/workflow tests, then contract `check` |
+| S3 | Final immutable head has sufficient structured evidence and no incidental lock/source churn | leaf run artifacts and `receipts/` | contract `check`, `test`, `quality-job`; Tier-A + IMPL-EVAL handoff |
 
 Each implementation slice updates `worklog.md` and `context-pack.md`, receives substantive Tier-A
 topic-orchestrator review before its supervisor sign-off commit, pushes with the explicit refspec,
@@ -65,7 +67,7 @@ and posts literal-SHA evidence to the draft PR.
 | Zero-box logic hides real mismatches when boxes exist | Cardinality check applies only when actionable target count is zero; preserve existing per-entry diagnostics otherwise. |
 | Markdown matching admits prose/template false positives | Match whole non-fenced lines, exact token vocabulary, and reject placeholder/menu forms. |
 | Three extractor copies drift | Apply equivalent fixtures to shared library and workflow source/behavior contract; keep sync comments current. |
-| Undeclared edits widen scope silently | Pause those edits until exact path authorization is recorded. |
+| A denied documentation edit is silently claimed | Keep `netscript-pr` read-only and record the coordinator-owned acceptance disposition explicitly. |
 | Validation churns `deno.lock` | Compare against the true base after every gate and exclude any incidental churn. |
 
 ## Deferred scope

@@ -39,21 +39,19 @@
    changes. Prove with the focused validation test wrapper.
 2. S2: add heading, emphasis, absence, and malformed RED fixtures, then update shared and workflow
    extractors. Prove with focused agentic/workflow tests.
-3. S3: authorize and edit `netscript-pr`, with a targeted assertion that plain-bullet Acceptance
-   takes no evidence block.
-4. S4: run durable `check`, `test`, and `quality-job` at one immutable final head and prepare the
+3. S3: run durable `check`, `test`, and `quality-job` at one immutable final head and prepare the
    separate opposite-family IMPL-EVAL handoff.
 
 ### Exact files
 
 - Declared: `.llm/tools/validation/acceptance-evidence.ts`,
   `.llm/tools/agentic/lib/agentic-lib.ts`, `.github/workflows/openhands-agent.yml`.
-- Authorization required: `.llm/tools/validation/mirror-acceptance-evidence.ts`,
+- Coordinator-authorized extension: `.llm/tools/validation/mirror-acceptance-evidence.ts`,
   `.llm/tools/validation/acceptance-evidence_test.ts`,
   `.llm/tools/validation/mirror-acceptance-evidence_test.ts`,
   `.llm/tools/agentic/lib/agentic-lib_test.ts`,
-  `.llm/tools/agentic/openhands/phase-eval-workflow_test.ts`, and
-  `.agents/skills/netscript-pr/SKILL.md`.
+  `.llm/tools/agentic/openhands/phase-eval-workflow_test.ts`.
+- Read/use only: `.agents/skills/netscript-pr/SKILL.md`; it must not be edited.
 
 ### Deferred scope
 
@@ -93,3 +91,7 @@ commands and RTK-filtered output are not verdict sources.
 - S0 draft reconcile: bootstrap commit `0be658912d167da5bc46b718a862a43e33e5f4c4` pushed by the
   explicit refspec; draft PR #1644 targets `main`, milestone 0.0.7, with exactly `type:fix`,
   `area:tooling`, and `status:plan`. Plan/clarification comment id: `5286024710`.
+- Coordinator clarification reconcile: PR #1644 comment `5286066438` authorizes the five exact
+  implementation/test peers listed above, keeps `netscript-pr` read-only, admits no other product
+  path, and requires the leaf to stop at Tier-A plus separate IMPL-EVAL handoff. Implementation may
+  now begin; the PR remains `status:plan` until real implementation lands.
