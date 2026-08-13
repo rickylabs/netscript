@@ -2,7 +2,7 @@ import { join } from '@std/path';
 import { GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import type { RunContext } from '../../../domain/run-context.ts';
-import { cli, commandGate, denoCommand } from './gate-factory.ts';
+import { cli, commandGate } from './gate-factory.ts';
 import { generatedAppName } from './generated-app-name.ts';
 
 const STANDALONE_DATABASE_CODEGEN_SCRIPT = `
@@ -176,30 +176,21 @@ export function createGeneratedCheckGates(): readonly GateDefinition[] {
       GATE.GENERATED_SERVICE_CHECK,
       'Type-check generated service workspace',
       GATE_PHASE.DATABASE,
-      (context) => denoCommand(context, 'check', '--unstable-kv', './packages', './services'),
+      () => ['deno', 'task', 'check', '--skip-apphost'],
       (context) => context.project.projectRoot,
     ),
     commandGate(
       GATE.GENERATED_CONTRACTS_CHECK,
       'Type-check generated contracts',
       GATE_PHASE.DATABASE,
-      (context) => denoCommand(context, 'check', '--unstable-kv', './contracts'),
+      () => ['deno', 'task', 'check', '--skip-apphost'],
       (context) => context.project.projectRoot,
     ),
     commandGate(
       GATE.GENERATED_INFRASTRUCTURE_CHECK,
       'Type-check generated infrastructure workspace',
       GATE_PHASE.DATABASE,
-      (context) =>
-        denoCommand(
-          context,
-          'check',
-          '--unstable-kv',
-          './packages',
-          './services',
-          './contracts',
-          './database',
-        ),
+      () => ['deno', 'task', 'check', '--skip-apphost'],
       (context) => context.project.projectRoot,
     ),
   ];
