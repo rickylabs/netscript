@@ -31,6 +31,8 @@ release-coherence negative control and the restored synthetic coherent-local-gra
 - Requested gates and the final disposable 0.0.7 proof passed.
 - Owner refinement audited: coherence provenance corrected; shared test-only seam and call ordering
   verified; no exit-78/product fallback exists.
+- The shared seam is installed at temporary-project creation before affected install/config/plugin
+  flows and refreshed after flows that intentionally rewrite the import map.
 
 ## In Progress
 
@@ -38,8 +40,8 @@ release-coherence negative control and the restored synthetic coherent-local-gra
 
 ## Next Steps
 
-1. Run the focused verifier and final disposable bumped-tree proof after restoring fixed fixture data.
-2. Commit/push the refinement evidence and update the draft PR narrative.
+1. Commit/push the final seam-ordering refinement.
+2. Run the final disposable bumped-tree proof and update the draft PR narrative.
 3. Stop without changing draft state or labels.
 
 ## Key Decisions

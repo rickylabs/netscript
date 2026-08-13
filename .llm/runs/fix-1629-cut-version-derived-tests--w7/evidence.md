@@ -140,14 +140,29 @@ ordering was audited after the orchestrator refinement:
 
 | Affected path | Seam placement before execution that resolves first-party imports |
 | --- | --- |
-| control-plane module probe | after fixture import-map creation, before generated module inspection/import |
-| public AI registry closure | before generated-source import resolution and `deno check` |
-| public forced reinstall | before `loadConfig` and `loadRegisteredPlugins` |
-| local contributor install | before generated route `deno check` |
+| control-plane module probe | immediately after fixture import-map creation, before the mutator/config/plugin flow; refreshed after mutator-owned imports are written |
+| public AI registry closure | immediately after project creation, before install; refreshed before generated-source import resolution and `deno check` |
+| public forced reinstall | immediately after project creation, before install; refreshed before `loadConfig` and `loadRegisteredPlugins` |
+| local contributor install | immediately after project/config creation, before install; refreshed before generated route `deno check` |
 | AI `--no-samples` CLI integration | before the install command, hence before install-time config/plugin loading |
 
 The seam lives only under `packages/cli/tests/support/` and is imported only by test modules; no
 consumer or product code path calls it. No exit-78 or named-exclusion behavior was introduced.
+
+After moving initial seam installation to project creation, the affected install/config/plugin
+families remain green:
+
+```text
+$ deno test --allow-all <five local-resolution test modules>
+installs the AI markdown registry closure into its generated namespace ... ok
+keeps the configured AI module resolvable across a forced reinstall ... ok
+keeps the plugin-owned AI namespace configured in local-source installs ... ok
+first-party control-plane modules are import-safe and preserve application barrels ... ok
+cut-local imports fail closed when a first-party export target is missing ... ok
+plugin install ai --no-samples omits samples and type-checks the generated workspace ... ok
+ok | 23 passed (38 steps) | 0 failed (25s)
+exit: 0
+```
 
 Refinement audit gate after restoring the intentional fixed local-graph fixture:
 

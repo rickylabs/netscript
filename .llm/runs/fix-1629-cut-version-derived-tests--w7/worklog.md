@@ -66,6 +66,7 @@ cut-local fixture helper only for tests that intentionally exercise pre-publish 
 | 2026-08-13 | 4 | gates/proof | Final static, lint, format, quality, and focused CLI checks passed. A fresh disposable 0.0.7 cut dry-run and full suite passed 3386/3386 tests. |
 | 2026-08-13 | refinement | provenance/scope audit | Retracted the coherence negative-control failure claim, confirmed that test is untouched, restored the verifier's intentional fixed `0.0.5` coherent-local fixture, and audited all shared local-resolution seam placements. |
 | 2026-08-13 | refinement | focused/static gates | 35 affected tests/55 steps pass; check, lint, fmt, quality, and focused CLI check all exit 0. |
+| 2026-08-13 | refinement | seam ordering | Installed the shared local mapper at fixture-project creation before every affected install/config/plugin flow; callers refresh it only after those flows intentionally rewrite imports. |
 
 ## Decisions
 

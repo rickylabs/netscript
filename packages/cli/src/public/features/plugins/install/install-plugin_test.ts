@@ -656,6 +656,7 @@ describe('public install plugin flow', () => {
     const aiRoot = repoPath('plugins/ai');
     try {
       await writeRealProjectFiles(projectRoot);
+      await useLocalWorkspaceImports(projectRoot, REPO_ROOT);
       const fs = new DenoFileSystem();
       const templateAdapter = new StringTemplateAdapter(fs);
       const scaffolder = new Scaffolder(templateAdapter, fs);
@@ -812,6 +813,7 @@ describe('public install plugin flow', () => {
     const aiRoot = repoPath('plugins/ai');
     try {
       await writeRealProjectFiles(projectRoot);
+      await useLocalWorkspaceImports(projectRoot, REPO_ROOT);
       await Deno.writeTextFile(
         join(projectRoot, 'netscript.config.ts'),
         `export default {

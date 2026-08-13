@@ -209,6 +209,7 @@ describe('local contributor install plugin flow', () => {
 };
 `,
       );
+      await useLocalWorkspaceImports(projectRoot, REPO_ROOT);
       const fs = new DenoFileSystem();
       const templateAdapter = new StringTemplateAdapter(fs);
       const scaffolder = new Scaffolder(templateAdapter, fs);
