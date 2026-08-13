@@ -25,11 +25,12 @@ import { doctorPlugin } from '../doctor/doctor-plugin-use-case.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 
 const HEALTHY_MODULE_PROCESS: ProcessPort = {
-  exec: () => Promise.resolve({
-    code: 0,
-    stdout: 'NETSCRIPT_PLUGIN_MANIFEST_PROBE={"status":"resolved"}\n',
-    stderr: '',
-  }),
+  exec: () =>
+    Promise.resolve({
+      code: 0,
+      stdout: 'NETSCRIPT_PLUGIN_MANIFEST_PROBE={"status":"resolved"}\n',
+      stderr: '',
+    }),
 };
 
 Deno.test('auth backend set reconciles .env and show reports the active backend', async () => {
@@ -46,7 +47,10 @@ Deno.test('auth backend set reconciles .env and show reports the active backend'
 
 Deno.test('auth backend show reads the service-supported appsettings seam', async () => {
   const fs = new MemoryFileSystemAdapter();
-  await fs.writeFile('/workspace/appsettings.json', JSON.stringify({ Auth: { Backend: 'workos' } }));
+  await fs.writeFile(
+    '/workspace/appsettings.json',
+    JSON.stringify({ Auth: { Backend: 'workos' } }),
+  );
   assertEquals(await showAuthBackend('/workspace', fs), 'workos');
 });
 
@@ -58,22 +62,26 @@ Deno.test('plugin doctor reports the configured active auth backend', async () =
     fs,
     process: HEALTHY_MODULE_PROCESS,
     loadConfig: () => Promise.resolve({ plugins: ['auth'] } as never),
-    loadRegisteredPlugins: () => Promise.resolve({
-      auth: {
-        name: 'auth',
-        source: {
-          kind: 'local-workdir',
-          configuredSpecifier: './auth/mod.ts',
-          resolvedSpecifier: 'file:///workspace/auth/mod.ts',
-          workdir: 'auth',
-          rootDir: '/workspace/auth',
+    loadRegisteredPlugins: () =>
+      Promise.resolve({
+        auth: {
+          name: 'auth',
+          source: {
+            kind: 'local-workdir',
+            configuredSpecifier: './auth/mod.ts',
+            resolvedSpecifier: 'file:///workspace/auth/mod.ts',
+            workdir: 'auth',
+            rootDir: '/workspace/auth',
+          },
+          permissions: ['--allow-env'],
+          cli: { doctorChecks: ['auth-backend'] },
         },
-        permissions: ['--allow-env'],
-        cli: { doctorChecks: ['auth-backend'] },
-      },
-    }),
+      }),
   });
-  assertEquals(reports[0].checks.find((check) => check.id === 'auth-backend')?.message, 'better-auth');
+  assertEquals(
+    reports[0].checks.find((check) => check.id === 'auth-backend')?.message,
+    'better-auth',
+  );
 });
 
 Deno.test('github provider preset writes boot-ready OAuth environment', async () => {
@@ -91,7 +99,10 @@ Deno.test('github provider preset writes boot-ready OAuth environment', async ()
   const env = await fs.readFile('/workspace/.env');
   assertMatch(env, /NETSCRIPT_AUTH_BACKEND=kv-oauth/);
   assertMatch(env, /NETSCRIPT_AUTH_PROVIDER_ID=github/);
-  assertMatch(env, /NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT=https:\/\/github.com\/login\/oauth\/authorize/);
+  assertMatch(
+    env,
+    /NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT=https:\/\/github.com\/login\/oauth\/authorize/,
+  );
   assertMatch(env, /NETSCRIPT_AUTH_CLIENT_SECRET=client-secret/);
   assertMatch(env, new RegExp(`NETSCRIPT_AUTH_KV_OAUTH_KEY=${kvOAuthKey}`));
   const appsettings = JSON.parse(await fs.readFile('/workspace/appsettings.json'));
@@ -119,7 +130,11 @@ Deno.test('workos and better-auth variants enforce their boot credential contrac
   }, fs);
   assertMatch(await fs.readFile('/workspace/.env'), /WORKOS_COOKIE_PASSWORD=cookie-secret/);
 
-  await setAuthProvider({ projectRoot: '/workspace', preset: 'better-auth', secret: 'better-secret' }, fs);
+  await setAuthProvider({
+    projectRoot: '/workspace',
+    preset: 'better-auth',
+    secret: 'better-secret',
+  }, fs);
   assertMatch(await fs.readFile('/workspace/.env'), /BETTER_AUTH_SECRET=better-secret/);
   await assertRejects(
     () => setAuthProvider({ projectRoot: '/workspace', preset: 'workos' }, fs),
