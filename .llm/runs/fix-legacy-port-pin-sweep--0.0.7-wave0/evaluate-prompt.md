@@ -16,10 +16,12 @@ Read and follow `AGENTS.md` plus these skills completely before evaluating:
 
 # Formal IMPL-EVAL — legacy-port-pin-sweep / PR #1643
 
-Act as the fresh separate formal IMPL-EVAL session for Codex-authored PR #1643. The native
-Claude-family route is currently allowance-blocked, so lane policy selected the configured open
-fallback: Claude/OpenRouter `deepseek/deepseek-v4-flash-0731`, max effort. You are the sole fixes
-topic evaluator. Do not delegate or launch another evaluator.
+Act as the fresh separate formal IMPL-EVAL session for Codex-authored PR #1643. Do not run this
+brief before the owner-approved Claude allowance reset at 2026-08-15 00:00 Europe/Zurich. After
+that reset, use the canonical fresh native opposite-family Claude/Fable 5 medium route. The owner
+explicitly rejected Claude/OpenRouter, DeepSeek, Minimax, AGY, and other substitute formal
+evaluators during the hold. You are the sole fixes topic evaluator. Do not delegate or launch
+another evaluator.
 
 Subject facts:
 
