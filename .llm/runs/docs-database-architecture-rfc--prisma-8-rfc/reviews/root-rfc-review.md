@@ -1,4 +1,4 @@
-# Root review: raw database architecture RFC
+# Root review: database architecture RFC
 
 ## Review receipt
 
@@ -20,6 +20,39 @@ not recopied.
 Target **8,000–10,000 words**. Hard ceiling **12,000 words**. The final document should be useful to
 an implementer who reads it once and to an owner who wants to decide whether the proposed database
 story is the right one.
+
+## Consolidated draft receipt
+
+| Field            | Value                                                               |
+| ---------------- | ------------------------------------------------------------------- |
+| Reviewer         | Root Codex supervisor                                               |
+| Date             | 2026-08-13                                                          |
+| Evaluated commit | `5dfc4e8eb`                                                         |
+| Authoring lane   | Native Claude Code `claude-opus-5`, high, session `de518f07-68e0-…` |
+| Evaluated file   | `rfcs/0000-database-architecture.md`                                |
+| Size             | 11,205 words; 1,296 lines                                           |
+| Verdict          | `PASS_TO_FOCUSED_REVIEW`                                            |
+
+Root read the complete consolidated RFC, not only the diff. The rewrite removes 60% of the raw
+draft, deletes the appendices and inline evidence taxonomy, retains one lifecycle diagram, links the
+research corpus, and moves the center of gravity to the native contract, NetScript definition,
+app-local binding, Standard Schema, plugin-space/extension, runtime, and plan/apply DX. Findings
+R1–R10 below are resolved in the committed text.
+
+Root made three narrow correctness corrections before accepting the checkpoint:
+
+- downstream runtime now consumes the compiled manifest and generated binding, not the authored
+  `DatabaseDefinition`; this preserves the manifest join point and package-free plugin deployment;
+- the authority section now distinguishes the five control-flow values from each space's
+  provider-owned `ContractArtifact`, instead of silently changing the locked taxonomy; and
+- `partial-success` now requires mixed successful and unsuccessful target outcomes; a run in which
+  no target succeeds cannot be called partial success.
+
+The draft is ready for the owner-locked Qwen 3.8 Max focused review. It is below the mandatory
+12,000-word ceiling but remains 1,205 words above the preferred band. Subsequent reviewers must
+identify deletions or consolidations alongside findings; they must not grow the RFC into another
+research report. The final target is at most 10,000 words when that can be achieved without removing
+an API contract, a safety invariant, or an explicit refusal.
 
 ## What the RFC must make obvious
 

@@ -55,6 +55,29 @@ reports and briefs remain immutable evidence. Cycle 2 passed at `383170bbc`; the
 cycle is requested. Cycle 2 also classified current-main `01e096049` as nonblocking CI/gate-tooling
 drift and independently confirmed 42 generated `db:*` keys per engine workspace.
 
+## RFC authoring and consolidation
+
+| Stage               | Route / model / effort                | Session                                | Result                                                                                     |
+| ------------------- | ------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Raw draft           | Native Claude Code · Opus 5 · high    | `105f7bbd-895d-4dcd-8641-6768c6e076c8` | 28,194-word evidence-complete draft pushed as `05e5fbac2`; root requested consolidation.   |
+| Consolidation       | Native Claude Code · Opus 5 · high    | `de518f07-68e0-4f77-9cb5-e59dc3e81ebc` | R1–R10 resolved; 11,205-word compact RFC committed and pushed as `5dfc4e8eb`.              |
+| Root review         | Codex supervisor · personal full read | `019ffbc7-133b-7852-905d-53a163fe9819` | `PASS_TO_FOCUSED_REVIEW`; Qwen 3.8 Max is next, but final acceptance has not been granted. |
+| Qwen focused review | OpenRouter · `qwen/qwen3.8-max` · max | `3d1277dd-be6a-44af-9e98-4560d8aaf1b7` | Commit `5dfc4e8eb`; 2,181 words, no edits, `PASS_WITH_CHANGES`; QF-01–QF-05 open.          |
+
+Before commit `5dfc4e8eb`, root added three narrow corrections: runtime consumes the compiled
+`DatabaseManifest`, not `DatabaseDefinition`; the authority table distinguishes each artifact and
+value's role; and `partial-success` requires mixed successful and unsuccessful target outcomes.
+Targeted formatting, `docs:links`, and diff checks passed. The phase remains `rfc-authoring`. The
+preferred final target remains at most 10,000 words where further cuts preserve decision and API
+clarity.
+
+The Qwen focused review passed architecture/type model, Standard Schema boundary, control/recovery,
+migration/plugin safety, and market/upstream claims. Its narrow failures affect TypeScript/API
+examples and one package/dependency example. QF-01 is high, QF-02 medium, and QF-03–QF-05 low. Its
+approximately 1,240-word deletion ledger projects approximately 9,965 words while naming
+must-not-cut contracts. The RFC remains frozen at 11,205 words until Grok review and Opus
+author/editor disposition; this is not final acceptance.
+
 ## Recorded lane/eval overrides
 
 - The root session is Codex rather than the default Opus 5 orchestrator. This is the active
@@ -72,7 +95,9 @@ drift and independently confirmed 42 generated `db:*` keys per engine workspace.
   refinement gate. That owner directive overrides the ordinary `docs_polish` Fable-medium effort for
   this run. No substantive model gate may follow it.
 - Qwen 3.8 Max is selected for the owner-clarified focused post-draft review, after the root's
-  personal complete-draft review and before Grok's whole-RFC adversarial pass.
+  personal complete-draft review and before Grok's whole-RFC adversarial pass. The completed route
+  requested and observed `qwen/qwen3.8-max` at `max`, session
+  `3d1277dd-be6a-44af-9e98-4560d8aaf1b7`, against commit `5dfc4e8eb`.
 - The owner subsequently requires Grok 4.6 high. On 2026-08-13 the live OpenRouter models API
   returned `x-ai/grok-4.6` with `reasoning_effort` support. The repository's static model catalog
   still names Grok 4.5, so this is an explicit owner-directed route override rather than a claim
@@ -96,5 +121,5 @@ drift and independently confirmed 42 generated `db:*` keys per engine workspace.
   establish the exact upstream state and derive candidate end-to-end NetScript type flows before
   plan lock; the Opus synthesis brief now requires this subsystem explicitly.
 - The owner locked the post-draft sequence: root personal review → Qwen 3.8 Max focused review →
-  Grok 4.6 high whole-RFC adversarial review → author/editor dispositions → one final Fable 5 high
-  substantive refinement → mechanical checks only.
+  Grok 4.6 high whole-RFC adversarial review → Opus author/editor dispositions and consolidation →
+  one final Fable 5 high substantive refinement → mechanical checks only.

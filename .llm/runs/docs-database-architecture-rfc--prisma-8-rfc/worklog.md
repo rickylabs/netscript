@@ -16,7 +16,8 @@ The Design checkpoint is **locked and evaluator-approved**. Cycle 1 returned `FA
 because the copied generated-workspace task count was factually wrong; evaluator execution found 42
 `db:*` keys per workspace for all four providers. After correction, native Fable 5 medium cycle 2
 session `f3286656-7d0f-4da2-a22d-32897a5e6482` evaluated commit `383170bbc` and returned `PASS`.
-Canonical RFC authorship is unblocked but not yet complete; no further PLAN-EVAL cycle is planned.
+Canonical RFC authorship is unblocked. The consolidated draft is accepted for focused review but is
+not finally accepted; no further PLAN-EVAL cycle is planned.
 
 ### Public Surface and Package Graph
 
@@ -154,6 +155,41 @@ the archetype, source, JSR, consumer, conformance, and release exits recorded in
 | 2026-08-13 | 2     | plan-eval   | Native Fable 5 medium cycle 2 session `f3286656-7d0f-4da2-a22d-32897a5e6482` evaluated commit `383170bbc` and returned `PASS`. It independently confirmed 42 generated `db:*` keys per engine workspace and classified current-main commit `01e096049` as nonblocking CI/gate-tooling drift. RFC authorship is unblocked.                      |
 | 2026-08-13 | 3     | raw-draft   | Native Claude Code Opus 5 high session `105f7bbd-895d-4dcd-8641-6768c6e076c8` authored the evidence-complete canonical draft. Root committed and pushed it as `05e5fbac2`; the draft was intentionally treated as an input to review, not final prose.                                                                                         |
 | 2026-08-13 | 3     | root-review | Root substantively reviewed the 28,194-word raw draft and returned `REVISE_CONSOLIDATE`. The review locks a reader-first 8,000–10,000-word target (12,000 hard ceiling), removes duplicated evidence/process appendices, and records ten blocking API/correctness repairs before Qwen and Grok review.                                         |
+| 2026-08-13 | 5     | qwen-review | Qwen 3.8 Max session `3d1277dd-be6a-44af-9e98-4560d8aaf1b7` reviewed frozen commit `5dfc4e8eb` at effort `max`, returned 2,181 words and `PASS_WITH_CHANGES`, made no edits, and opened QF-01 high, QF-02 medium, and QF-03–QF-05 low. Four substantive axes passed; TypeScript/API and package/dependency examples need disposition.          |
+
+### RFC Consolidation and Root Acceptance
+
+Native Claude Code Opus 5 high session `de518f07-68e0-4f77-9cb5-e59dc3e81ebc` completed the
+single-author consolidation. The canonical RFC fell from 28,194 to 11,205 words while resolving
+R1–R10 and preserving the locked architecture; root committed and pushed it as `5dfc4e8eb`.
+
+Root personally read the entire compact RFC and added three narrow corrections before commit:
+runtime consumes the manifest rather than `DatabaseDefinition`; artifact/value authority remains
+explicit; and `partial-success` requires mixed successful and unsuccessful target outcomes. Targeted
+fmt, `docs:links`, and diff checks passed. The checkpoint is accepted for Qwen review, not finally
+accepted.
+
+### Qwen Focused Post-Draft Review
+
+OpenRouter requested and observed `qwen/qwen3.8-max` at effort `max`, model session
+`3d1277dd-be6a-44af-9e98-4560d8aaf1b7`, against RFC commit `5dfc4e8eb`. The exact review output was
+2,181 words, made no edits, and returned `PASS_WITH_CHANGES`. Architecture/type model, Standard
+Schema boundary, control/recovery, migration/plugin safety, and market/upstream claims passed. The
+narrow failures were TypeScript/API examples and one package/dependency example.
+
+Open findings, pending author/editor disposition:
+
+- **QF-01 high:** generated-binding example uses ambient declarations as runtime values.
+- **QF-02 medium:** extension-bundle authoring can violate the adapter-only runtime/control import
+  law.
+- **QF-03 low:** unbound values and elisions undermine the executable-as-written claim.
+- **QF-04 low:** Prisma source-path attribution needs correction or qualification.
+- **QF-05 low:** codec parameter validation is conflated with three conversion representations.
+
+Qwen also supplied an approximately 1,240-word deletion ledger projecting an approximately
+9,965-word RFC while naming must-not-cut contracts. It is editorial input, not authorization to
+remove load-bearing semantics. The canonical RFC remains frozen at 11,205 words; no disposition,
+edit, or final acceptance occurred.
 
 ### PLAN-EVAL Cycle 1
 
@@ -205,15 +241,17 @@ CI/gate-tooling drift that changes structured check invocation rather than datab
 | Gate           | Command or check                                | Result | Notes                                                 |
 | -------------- | ----------------------------------------------- | ------ | ----------------------------------------------------- |
 | Bootstrap diff | `git diff --check`; targeted `deno fmt --check` | PASS   | Six required run artifacts are present and formatted. |
+| Compact RFC    | Targeted fmt; `docs:links`; `git diff --check`  | PASS   | Commit `5dfc4e8eb`; 11,205 words and R1–R10 resolved. |
 
 ### Fitness Gates
 
-| Gate                         | Result          | Evidence                                                       | Notes                                                                                |
-| ---------------------------- | --------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Archetype/package assignment | PASS_PLANNED    | `plan.md` package graph                                        | A1/A2/A3/A4/A5/A6 responsibilities and gates are explicit.                           |
-| Open-decision sweep          | PASS_PLANNED    | D-01–D-47                                                      | No must-resolve-now item; pre-wave/deferred items cannot rewrite package boundaries. |
-| Prospective JSR audit        | PASS_AS_PLANNED | `research/planned-jsr-audit.md`                                | New-package dry-run/docs/packed/canary gates are N/A until implementation, not PASS. |
-| PLAN-EVAL                    | PASS_CYCLE_2    | `plan-eval.md`; session `f3286656-7d0f-4da2-a22d-32897a5e6482` | Commit `383170bbc`; no further Plan-Eval cycle.                                      |
+| Gate                         | Result            | Evidence                                                           | Notes                                                                                |
+| ---------------------------- | ----------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| Archetype/package assignment | PASS_PLANNED      | `plan.md` package graph                                            | A1/A2/A3/A4/A5/A6 responsibilities and gates are explicit.                           |
+| Open-decision sweep          | PASS_PLANNED      | D-01–D-47                                                          | No must-resolve-now item; pre-wave/deferred items cannot rewrite package boundaries. |
+| Prospective JSR audit        | PASS_AS_PLANNED   | `research/planned-jsr-audit.md`                                    | New-package dry-run/docs/packed/canary gates are N/A until implementation, not PASS. |
+| PLAN-EVAL                    | PASS_CYCLE_2      | `plan-eval.md`; session `f3286656-7d0f-4da2-a22d-32897a5e6482`     | Commit `383170bbc`; no further Plan-Eval cycle.                                      |
+| Qwen focused RFC review      | PASS_WITH_CHANGES | Session `3d1277dd-be6a-44af-9e98-4560d8aaf1b7`; commit `5dfc4e8eb` | Five findings remain open; review made no edits.                                     |
 
 ### Runtime Gates
 
@@ -223,10 +261,10 @@ CI/gate-tooling drift that changes structured check invocation rather than datab
 
 ### Consumer Gates
 
-| Consumer               | Result | Evidence                                                      | Notes                                                                                           |
-| ---------------------- | ------ | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| PLAN-EVAL reader       | PASS   | `plan-eval.md`, corrected research/plan, synthesis and audits | Cycle 2 accepted the locked plan.                                                               |
-| RFC reader/implementer | REVISE | `reviews/root-rfc-review.md`; raw draft commit `05e5fbac2`    | Evidence is complete; the reader-facing RFC must now be consolidated and technically corrected. |
+| Consumer               | Result                 | Evidence                                                                     | Notes                                        |
+| ---------------------- | ---------------------- | ---------------------------------------------------------------------------- | -------------------------------------------- |
+| PLAN-EVAL reader       | PASS                   | `plan-eval.md`, corrected research/plan, synthesis and audits                | Cycle 2 accepted the locked plan.            |
+| RFC reader/implementer | QWEN_PASS_WITH_CHANGES | Compact RFC `5dfc4e8eb`; Qwen session `3d1277dd-be6a-44af-9e98-4560d8aaf1b7` | QF-01–QF-05 await disposition; Grok is next. |
 
 ## Handoff Notes
 
@@ -234,8 +272,9 @@ CI/gate-tooling drift that changes structured check invocation rather than datab
   preserved; cycle 2 passed and no further PLAN-EVAL cycle is requested.
 - Prospective package publishability is `PASS-AS-PLANNED`; actual JSR commands remain N/A until
   packages exist and must produce implementation/release receipts later.
-- Resume the Opus 5 high authoring family with `briefs/claude-opus-rfc-consolidate.md` and reduce
-  the canonical RFC to 8,000–10,000 words (12,000 hard ceiling), applying root findings R1–R10.
-- After root accepts the consolidated draft, continue the owner-locked order: Qwen 3.8 Max focused
-  review, Grok 4.6 high whole-RFC adversarial review, author/editor dispositions, one final Fable 5
-  high substantive refinement, and mechanical checks only.
+- The consolidated RFC remains frozen at `5dfc4e8eb` and 11,205 words. Qwen returned
+  `PASS_WITH_CHANGES`; QF-01–QF-05 and its deletion ledger await disposition. Any cut toward the
+  projected approximately 9,965 words must preserve its named must-not-cut contracts.
+- Continue the owner-locked order: Grok 4.6 high whole-RFC adversarial review, Opus author/editor
+  dispositions and consolidation, one final Fable 5 high substantive refinement, and mechanical
+  checks only. The current checkpoint is not final acceptance.
