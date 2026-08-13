@@ -95,8 +95,8 @@ S1 first review requested one mirror-boundary fixture. The replacement candidate
 Tier-A re-review through `01db2bd360ea15d8bd9b53fee5fc392678321f43`; the supervisor sign-off
 disposition is recorded in the run-artifact-only commit containing this note.
 
-S2 is not self-certified: its source/workflow diff and receipts are prepared as a distinct candidate
-for substantive Tier-A topic-orchestrator review before the supervisor sign-off commit.
+S2 passed substantive Tier-A review at `8b4f4b509e4cb9ad6f7e9414b9b948ce9a2b7a33`; the supervisor
+sign-off disposition is recorded in the run-artifact-only commit containing this note.
 
 ## Reconcile notes
 
@@ -141,3 +141,10 @@ for substantive Tier-A topic-orchestrator review before the supervisor sign-off 
   `agent_verdict_state`, and the final marker/human summary distinguishes no marker from an invalid
   emitted marker. The workflow test executes the embedded JavaScript matcher and validates the
   checked-in shell regex. Focused test/check/format receipts are green; Tier-A review remains.
+- S2 Tier-A review (`2026-08-13T21:04:11Z`): `PASS` at literal candidate
+  `8b4f4b509e4cb9ad6f7e9414b9b948ce9a2b7a33` (PR comment `5286371075`). The reviewer confirmed
+  parity across bare/heading/emphasis/blockquote/optional-prefix parsing, exact token and exclusion
+  rules, trace plus summary/comment state propagation, valid comment fallback, compatibility API,
+  and executable workflow fixtures. The excluded-path lint attempt remains honestly NOT FIRED and
+  is not a binding gate. Supervisor sign-off: accepted for S2 behavior and authorized scope only.
+  Final structured gates, coordinator closure reconciliation, and IMPL-EVAL remain pending.
