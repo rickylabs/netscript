@@ -17,8 +17,7 @@
       "id": "docs",
       "orchestratorAgentId": "topic-docs-0.0.7",
       "issueNumbers": [
-        1551,
-        1606
+        1551
       ]
     },
     {
@@ -82,7 +81,6 @@
       "orchestratorAgentId": "topic-features-0.0.7",
       "issueNumbers": [
         1293,
-        1306,
         1348,
         1349,
         1352,
@@ -133,10 +131,6 @@
     },
     {
       "number": 1296,
-      "state": "open"
-    },
-    {
-      "number": 1306,
       "state": "open"
     },
     {
@@ -304,10 +298,6 @@
       "state": "open"
     },
     {
-      "number": 1606,
-      "state": "open"
-    },
-    {
       "number": 1609,
       "state": "open"
     },
@@ -385,5 +375,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-13T21:12:00.000Z"
+  "updatedAt": "2026-08-13T21:27:00.000Z"
 }

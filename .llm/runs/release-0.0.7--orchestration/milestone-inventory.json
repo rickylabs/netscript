@@ -111,15 +111,16 @@
     {
       "number": 1306,
       "title": "fix(aspire): 'the dashboard is the authority' is unusable for an agent — aspire start detaches in a non-TTY and prints no login token",
-      "disposition": "active",
-      "lane": "features",
+      "disposition": "close-fixed",
+      "lane": null,
       "evidence": [
-        "No inventory verb exists: packages/cli/src/public/features/ contains agent, config, contracts, db, deploy, generate, init, marketplace, plugins, root, services, ui — no aspire/status/resources group",
-        "The issue's 'check get_app_status first' question resolves NEGATIVE: packages/mcp/src/domain/tool-contracts.ts:175-179 declares its output as { status, counts, domains } — a health rollup, with no resolved endpoints, ports, or URLs",
-        "packages/mcp/src/application/tool-registry.ts:36 describes get_app_status only as 'Summarize NetScript app health', confirming it is not a resource inventory",
-        "No TTY/token handling anywhere near an aspire path: grep for isTerminal in packages/cli/src hits only init-command.ts:116, agent-mcp-command.ts:44, agent-group.ts:33, db-operation-command.ts:84",
-        "Timeline: only #1290 and the merged docs PR #1309 cross-reference it — the docs pass did not close the capability gap"
-      ]
+        "https://github.com/rickylabs/netscript/issues/1306",
+        "aspire ps --help: --format Json and --non-interactive",
+        "aspire describe --help: resource state via --format Json",
+        ".agents/skills/aspire/SKILL.md:30-41",
+        "packages/cli/src/kernel/assets/skills.generated.ts"
+      ],
+      "reason": "Aspire CLI 13.4.6 now exposes machine-readable AppHost/resource inventory and NetScript already teaches the exact agent path in both repository and generated skills."
     },
     {
       "number": 1348,
@@ -659,15 +660,14 @@
     {
       "number": 1606,
       "title": "verify(sdk): confirm the published @netscript/sdk JSR landing page shows the canonical query dialect",
-      "disposition": "active",
-      "lane": "docs",
+      "disposition": "close-fixed",
+      "lane": null,
       "evidence": [
-        "Source work is confirmed merged: packages/sdk/README.md:30 leads with 'createQueryFactories is the golden path'; grep finds no 'api-clients' reference in the file",
-        "packages/sdk/README.md:103,216-217 demote createServiceQueryUtils to the narrower ./query-client helper, matching the intended dialect",
-        "jsr-package-settings.json (repo root) sets defaults.readmeSource: 'readme', so packages/sdk/README.md is indeed the JSR landing page source",
-        "The README fix (db1d79c68, PR #1541) is an ancestor of the 0.0.6 cut c63dcc669 (`git merge-base --is-ancestor` = true), so if @netscript/sdk@0.0.6 published, the observation may already be makeable without waiting for a 0.0.7 publish",
-        "packages/sdk/deno.json:3 version is 0.0.6"
-      ]
+        "https://github.com/rickylabs/netscript/issues/1606",
+        "https://jsr.io/@netscript/sdk",
+        "https://jsr.io/@netscript/sdk/meta.json"
+      ],
+      "reason": "The observational acceptance is satisfied: JSR reports 0.0.6 latest and the live SDK landing page renders the canonical query-dialect content."
     },
     {
       "number": 1609,

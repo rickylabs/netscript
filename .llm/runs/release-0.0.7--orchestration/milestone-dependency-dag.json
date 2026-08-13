@@ -60,13 +60,6 @@
       "title": "fix(docs/exports): repair contracts and Fresh UI reference drift, then wire the regeneration gate"
     },
     {
-      "id": "issue:1306",
-      "kind": "issue",
-      "issueNumber": 1306,
-      "lane": "features",
-      "title": "fix(aspire): 'the dashboard is the authority' is unusable for an agent — aspire start detaches in a non-TTY and prints no login token"
-    },
-    {
       "id": "issue:1348",
       "kind": "issue",
       "issueNumber": 1348,
@@ -352,13 +345,6 @@
       "issueNumber": 1604,
       "lane": "internals",
       "title": "test(cli): the prescribed `deno task --cwd packages/cli test` is always red"
-    },
-    {
-      "id": "issue:1606",
-      "kind": "issue",
-      "issueNumber": 1606,
-      "lane": "docs",
-      "title": "verify(sdk): confirm the published @netscript/sdk JSR landing page shows the canonical query dialect"
     },
     {
       "id": "issue:1609",
@@ -660,7 +646,6 @@
         "issue:1561",
         "issue:1563",
         "issue:1588",
-        "issue:1606",
         "issue:1621"
       ]
     },
@@ -720,7 +705,6 @@
       "index": 6,
       "nodeIds": [
         "issue:1093",
-        "issue:1306",
         "issue:1461",
         "issue:1467"
       ]

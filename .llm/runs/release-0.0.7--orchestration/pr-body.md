@@ -8,6 +8,8 @@ and cut stable only from exact-main green evidence.
 
 - Archetype / area: release orchestration and harness evidence
 - Evidence-only coordinator PR; closes no product issue.
+- Frozen intake: 64 inspected targets, 61 active, one moved, two closed-fixed, 44 leaves,
+  four topic lanes, and 10 dependency waves.
 
 ## Slices
 
@@ -31,6 +33,9 @@ and cut stable only from exact-main green evidence.
 ## Drift / Debt
 
 - #1453 moved to Backlog / Triage because its cited surface has never existed in this repository.
+- #1306 closed-fixed after Aspire 13.4.6 and the generated NetScript agent skill proved the
+  requested native JSON resource inventory path.
+- #1606 closed after live JSR package metadata and landing-page verification.
 - #1384/#1385 remain in 0.0.8; no partial credential-only workaround is accepted for #1384.
 
 ## Definition of Done

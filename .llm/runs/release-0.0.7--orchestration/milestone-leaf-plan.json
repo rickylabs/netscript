@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "capturedAt": "2026-08-13T21:12:00.000Z",
+  "capturedAt": "2026-08-13T21:27:00.000Z",
   "leafGroups": [
     {
       "key": "ci-diff-range-base-sha-barrier",
@@ -212,18 +212,6 @@
       "wave": 2,
       "rationale": "Gallery lists 50 of 66 registry items; add the comparison gate.",
       "splitCandidates": []
-    },
-    {
-      "key": "aspire-agent-resource-inventory",
-      "lane": "features",
-      "issues": [
-        1306
-      ],
-      "wave": 6,
-      "rationale": "Four acceptance rows are ALTERNATIVE remedies; scope must be chosen before assignment.",
-      "splitCandidates": [
-        1306
-      ]
     },
     {
       "key": "workers-job-policy-metadata",
@@ -515,16 +503,6 @@
       "splitCandidates": [
         1551
       ]
-    },
-    {
-      "key": "sdk-jsr-landing-verification",
-      "lane": "docs",
-      "issues": [
-        1606
-      ],
-      "wave": 1,
-      "rationale": "Observational: closes by a recorded observation of the published JSR page, never by a PR.",
-      "splitCandidates": []
     }
   ]
 }

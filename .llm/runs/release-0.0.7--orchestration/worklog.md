@@ -11,6 +11,8 @@
 | 2026-08-13T21:12:00.000Z | Scope freeze completed: #1453 moved on repository-boundary evidence; #1249 and #1637 admitted under `high-value-coherent`; #1384/#1385 retained in 0.0.8 to avoid partial auth workarounds. | Public issue disposition/admission comments; `milestone-intake.json` |
 | 2026-08-13T21:15:00.000Z | RFC 0001 board reconciled and #1564/#1403 ownership boundary settled. | Top-of-body normative amendments on #1348/#1349/#1351/#1352/#1353; [ratification record](https://github.com/rickylabs/netscript/issues/1348#issuecomment-5285273104); [CI boundary](https://github.com/rickylabs/netscript/issues/1564#issuecomment-5285276645) |
 | 2026-08-13T21:16:00.000Z | Canonical 64-target/63-active inventory, 46 leaves, and 10-wave DAG rendered and validated. | `harness:milestone:test`: 15 pass; `harness:milestone:validate`: `ok: true` |
+| 2026-08-13T21:27:00.000Z | Discharged two live false positives before PLAN-EVAL: #1306 is fixed by Aspire 13.4.6 plus NetScript's generated agent skill; #1606's JSR observation is satisfied. | `aspire ps/describe --help`; `.agents/skills/aspire/SKILL.md`; `skills.generated.ts`; JSR package metadata and landing page; public close comments |
+| 2026-08-13T21:28:00.000Z | Re-froze the plan at 64 targets / 61 active / 44 leaves and locked the six material remedy choices called out by synthesis. | `plan.md`; `milestone-leaf-plan.json`; four milestone control artifacts |
 
 ## Current design checkpoint
 
