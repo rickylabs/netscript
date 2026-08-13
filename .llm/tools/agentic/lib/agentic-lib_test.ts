@@ -22,9 +22,11 @@ import {
   evaluateCurrentHeadImplEvalGate,
   evaluateGitSafety,
   extractVerdict,
+  extractVerdictResult,
   formatGithubTokenAttempt,
   GITHUB_NET_PERMISSION_FLAG,
   type GitInfo,
+  inspectMachineVerdict,
   isMissingGithubNetPermission,
   parseEvalVerdict,
   parseGithubHostsOauthToken,
@@ -660,6 +662,57 @@ Deno.test('extractVerdict reads the machine-readable OPENHANDS_VERDICT line (exa
   assertEquals(v?.verdict, 'PASS');
   assertEquals(v?.confidence, 'exact');
   assertEquals(v?.url, 'https://x/m');
+});
+Deno.test('machine verdict inspection accepts heading and emphasis wrappers', () => {
+  for (
+    const [body, verdict] of [
+      ['OPENHANDS_VERDICT: PASS', 'PASS'],
+      ['## OPENHANDS_VERDICT: PASS', 'PASS'],
+      ['### **OPENHANDS_VERDICT: FAIL_FIX**', 'FAIL_FIX'],
+      ['_OPENHANDS_VERDICT: FAIL_DEBT_', 'FAIL_DEBT'],
+      ['> ## **Verdict: OPENHANDS_VERDICT: FAIL_PLAN**', 'FAIL_PLAN'],
+    ] as const
+  ) {
+    assertEquals(inspectMachineVerdict(body), { state: 'parsed', verdict }, body);
+  }
+});
+Deno.test('machine verdict inspection distinguishes absence from unparseable emission', () => {
+  assertEquals(inspectMachineVerdict('Agent completed without a marker.'), {
+    state: 'absent',
+    verdict: null,
+  });
+  assertEquals(inspectMachineVerdict('## OPENHANDS_VERDICT: APPROVED'), {
+    state: 'unparseable',
+    verdict: null,
+  });
+  assertEquals(inspectMachineVerdict('```text\nOPENHANDS_VERDICT: PASS\n```'), {
+    state: 'absent',
+    verdict: null,
+  });
+  assertEquals(inspectMachineVerdict('OPENHANDS_VERDICT: <verdict>'), {
+    state: 'absent',
+    verdict: null,
+  });
+});
+Deno.test('layered extraction reports genuine absence separately from malformed marker output', () => {
+  assertEquals(extractVerdictResult([]), { state: 'absent', extracted: null });
+  assertEquals(
+    extractVerdictResult([
+      c('Evaluation complete.\n\n## OPENHANDS_VERDICT: APPROVED', '2026-07-05T01:00:00Z'),
+    ]),
+    { state: 'unparseable', extracted: null },
+  );
+  const parsed = extractVerdictResult([
+    c('Evaluation complete.\n\n## **OPENHANDS_VERDICT: PASS**', '2026-07-05T01:00:00Z'),
+  ]);
+  assertEquals(parsed.state, 'parsed');
+  assertEquals(parsed.extracted?.verdict, 'PASS');
+  assertEquals(
+    extractVerdict([
+      c('## **OPENHANDS_VERDICT: PASS**', '2026-07-05T01:00:00Z'),
+    ])?.verdict,
+    'PASS',
+  );
 });
 Deno.test('extractVerdict reads the formal PHASE/VERDICT header (exact)', () => {
   const v = extractVerdict([

@@ -14,8 +14,8 @@
 - S1 candidate `a4a3010427afa43a36ac1c477b854e067162464a` received Tier-A
   `CHANGES_REQUESTED`; the one required mirror-boundary fixture is now green with replacement
   receipts and awaits a follow-up candidate commit/re-review.
-- S2 is implemented separately in the working tree; 81 focused agentic/workflow tests pass, but it
-  has not been committed, pushed, or submitted for Tier-A review yet.
+- S2 is implemented separately in the working tree; 81 focused agentic/workflow tests pass and its
+  check/format reports are clean. It is ready for an isolated candidate commit and Tier-A request.
 
 ## Locked behavior
 
@@ -30,7 +30,7 @@
 ## Required next actions
 
 1. Commit/push the isolated S1 Tier-A fix and request re-review of its literal SHA.
-2. Commit/push the isolated S2 candidate and request substantive Tier-A review.
+2. Commit/push the isolated S2 candidate and request substantive Tier-A review of its literal SHA.
 3. Obtain coordinator acceptance reconciliation for the denied `netscript-pr` edit versus the
    binding `Closes #1561` / `Closes #1621` claims; do not resolve it by widening scope.
 4. Keep `netscript-pr` and every other undeclared product path read-only.

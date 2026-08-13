@@ -85,10 +85,18 @@ output are not verdict sources.
 | S1 focused test | `receipts/s1-green.json` | PASS after Tier-A fix, 19 passed / 0 failed |
 | S1 focused check | `receipts/s1-check.json` | PASS, 0 diagnostics across the four S1 files |
 | S1 focused format | `receipts/s1-fmt.json` | PASS, 4 files / 0 findings |
+| S2 RED | `receipts/s2-red.json` | expected type-check failure: the discriminated verdict-inspection APIs did not exist |
+| S2 focused test | `receipts/s2-green.json` | PASS, 81 passed / 0 failed |
+| S2 focused check | `receipts/s2-check.json` | PASS, 0 diagnostics across the three TypeScript S2 files |
+| S2 focused format | `receipts/s2-fmt.json` | PASS, 3 TypeScript files / 0 findings |
+| S2 focused lint attempt | `receipts/s2-lint.json` | NOT FIRED, exit 2: Deno excluded all 3 explicit hidden-path batches; not claimed as a pass |
 
 S1 is not self-certified: first Tier-A review requested one mirror-boundary fixture. That fixture and
 replacement green receipts are prepared as a follow-up candidate for Tier-A re-review before the
 supervisor sign-off commit.
+
+S2 is not self-certified: its source/workflow diff and receipts are prepared as a distinct candidate
+for substantive Tier-A topic-orchestrator review before the supervisor sign-off commit.
 
 ## Reconcile notes
 
@@ -120,3 +128,10 @@ supervisor sign-off commit.
   to `ok:false`, preserves the index-specific repair diagnostic, and performs zero updates. Focused
   test/check/format replacement receipts pass at 19/19, zero diagnostics, and zero findings. Tier-A
   re-review remains required; the skill/closure conflict is recorded in `drift.md`, not widened.
+- S2 pre-review reconcile (`2026-08-13T21:00:26Z`): the shared extractor now exposes a fence-aware
+  `parsed | absent | unparseable` inspection while retaining `extractVerdict()` compatibility. Bare,
+  heading, emphasis, and blockquote-plus-heading exact lines parse; placeholder/fenced lines stay
+  excluded. Both embedded workflow matchers accept the same wrapper surface, the trace records
+  `agent_verdict_state`, and the final marker/human summary distinguishes no marker from an invalid
+  emitted marker. The workflow test executes the embedded JavaScript matcher and validates the
+  checked-in shell regex. Focused test/check/format receipts are green; Tier-A review remains.
