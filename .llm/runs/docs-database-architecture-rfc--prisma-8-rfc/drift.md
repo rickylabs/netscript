@@ -141,7 +141,25 @@ documentation.
 - **Actual:** No tracked file was affected. Auditors can still read the intact recoverable trash
   copy, so moving it again during their reads would create avoidable disruption.
 - **Severity:** operational
-- **Action:** recover after active source audits finish, then verify RC HEAD and post-RC main object
-  again. Treat the trash copy as read-only evidence until then.
-- **Evidence:** filesystem path and `.trashinfo` above; `git -C` against the trash copy returned
-  `a76a6c5ad627ceaf1d78e874757cb2ca43e93ff5`.
+- **Action:** recovered after both source audits finished. GIO no longer enumerated the intact trash
+  item despite its file and metadata being present, so it was moved directly back to the exact
+  recorded run-local path.
+- **Evidence:** post-recovery `git -C .llm/tmp/prisma-v8-rc1 rev-parse HEAD` returned
+  `a76a6c5ad627ceaf1d78e874757cb2ca43e93ff5`; `git cat-file` verified post-RC object
+  `71e2e0d9ee1f306b5a11435cd1973023cb33866a`.
+
+## 2026-08-13 — Opus bounded synthesis completed
+
+- **What:** The resumed native Opus report was successfully written in three bounded, marker-joined
+  sections after the monolithic write failure.
+- **Source:** Native Claude Code session `f79af5bb-e953-4aae-9585-a1c83e73a00d`, observed model
+  `claude-opus-5`, effort `high`.
+- **Expected:** One independent architecture report that preserves route/workflow provenance and
+  feeds plan lock without acting as PLAN-EVAL.
+- **Actual:** `research/claude-opus-architecture-review.md` is complete at sixteen top-level
+  sections with no continuation marker. It records incomplete specialist lanes honestly and marks
+  carried Prisma claims that need the separate source-audit ledger.
+- **Severity:** operational recovery
+- **Action:** accept as a research input; reconcile its broader validation assumptions against the
+  later pinned-source validation audit before plan lock.
+- **Evidence:** report section index and native turn receipts for parts 1–3.

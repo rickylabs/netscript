@@ -11,10 +11,10 @@ This audit deliberately separates three upstream states that must not be conflat
 | Upstream main     | [`71e2e0d`](https://github.com/prisma/prisma/tree/71e2e0d9ee1f306b5a11435cd1973023cb33866a), observed 2026-08-13 | Six days of post-RC changes that reveal which integration seams are still moving. |
 
 Prisma calls this release Early Access and explicitly does not recommend it for production
-workloads. The RC source requires Node.js 24+, declares TypeScript 5.9 as the package peer floor,
-and describes PostgreSQL as the sole database intended for 8.0 GA. MongoDB remains Early Access,
-SQLite is a proof of concept, MySQL follows later, and SQL Server is not present in the Prisma 8
-target set.
+workloads. The RC source requires Node.js 24+, declares TypeScript 5.9 as an optional package peer
+floor, and describes PostgreSQL as the sole database intended for 8.0 GA. MongoDB remains Early
+Access, SQLite is a proof of concept, MySQL follows later, and SQL Server is not present in the
+Prisma 8 target set.
 
 The analysis below uses this confidence vocabulary:
 
@@ -95,9 +95,9 @@ a sufficient plugin policy.
 
 The RC publishes facade, framework, family, target, toolchain, and extension packages under
 `@prisma/orm-*`. `@prisma/orm-postgres` is described as the one package an application installs, but
-its export map contains more than one hundred subpaths spanning adapters, control internals,
-contract internals, migration tooling, query ASTs, runtime, target planning, and utilities. It also
-depends on `pg`.
+its export map contains 138 top-level subpath keys spanning adapters, control internals, contract
+internals, migration tooling, query ASTs, runtime, target planning, and utilities. It also depends
+on `pg`.
 
 This is useful for extension authors and dangerous for a meta-framework:
 
@@ -415,21 +415,72 @@ type-check time, not at a late database call.
 
 ## Validation and generated types
 
-Prisma 8 uses Standard Schema-compatible validation for extension/codec parameters and ships an
-ArkType JSON extension. It does not replace NetScript's current generated Zod model/input/output
-surface with a complete general validator generator. Zod and Valibot appear as future directions,
-not RC guarantees.
+The pinned RC source supports a qualified runtime-interpreter design. The emitted contract contains
+a bounded runtime value algebra: scalar codec references, value objects, unions, nullability,
+`many`, `dict`, and value-set references
+(`packages/1-framework/0-foundation/contract/src/domain-types.ts:5-39`). SQL storage adds native
+type, codec parameters/references, defaults, nullability, and value sets
+(`packages/2-sql/1-core/contract/src/ir/storage-column.ts:15-25`), while model relations and
+cross-space coordinates remain explicit (`domain-types.ts:41-75` and
+`packages/1-framework/0-foundation/contract/src/cross-reference.ts:5-14`). NetScript can interpret
+that bounded algebra directly into `StandardSchemaV1` values without generating validator source.
+This is feasibility against `v8.0.0-rc.1`, not evidence of a stable upstream validation API.
 
-NetScript should separate three concerns:
+Standard Schema is the right NetScript public boundary, but Prisma's existing Standard Schema slot
+does not validate model values. `CodecDescriptor.paramsSchema` validates JSON-sourced codec
+_parameters_ and exposes TypeScript renderers
+(`packages/1-framework/1-core/framework-components/src/shared/codec-descriptor.ts:27-54`). Codec
+instances instead define three conversion representations—application runtime, database-driver wire,
+and contract/database JSON
+(`packages/1-framework/1-core/framework-components/src/shared/codec.ts:16-30,44-51`)—without a value
+predicate. NetScript should therefore expose `representation: 'runtime' | 'json'`, reserve driver
+wire for adapter internals, and require every built-in or custom codec contributor to provide an
+explicit value schema for each supported representation. A codec with conversion functions but no
+matching value schema is unsupported; conversion success must not be treated as validation.
 
-1. **database contract types**, emitted by Prisma;
-2. **boundary validation**, owned by application/API/domain schemas through Standard Schema; and
-3. **database codec validation**, contributed by database extensions.
+The interpreter must remain narrower than Prisma's generated type universe. SQL plans retain the
+operation AST, parameters, projection aliases, expressions, and optional codec references
+(`packages/2-sql/4-lanes/relational-core/src/plan.ts:19-22` and
+`src/ast/types.ts:1480-1505,1510-1538,1892-1910,1984-2002`), but codec metadata is explicitly absent
+for computed, subquery, and raw projections (`ast/types.ts:1484-1488`). Mongo plans retain the
+command and an optional nested result shape
+(`packages/2-mongo-family/4-query/query-ast/src/query-plan.ts:15-20` and
+`src/result-shape.ts:1-13`), yet that shape permits `unknown`. Generated SQL field, operation,
+codec, and aggregate type maps are phantom/type-only
+(`packages/2-sql/1-core/contract/src/types.ts:90-139,207-215`) and are emitted into `contract.d.ts`
+(`packages/1-framework/3-tooling/emitter/src/generate-contract-dts.ts:179-221`), not retained as
+runtime validation metadata. Direct model fields and fully known selections can be validated;
+filters, nested writes, polymorphic narrowing, computed/aggregate/include/raw results, and any
+unknown shape require an explicit operation/result contributor or must fail closed.
 
-It should not generate, patch, and re-export a second model universe merely because Prisma types
-exist. Where CRUD boundary schemas are desired, a validator provider should deterministically derive
-them from a supported IR and emit them once into an atomic target-specific artifact root. Provider
-output must pass semantic tests; textual repair is forbidden.
+Contract spaces also remain separate identities. The aggregate exposes app and extension contracts
+per space rather than merging them
+(`packages/1-framework/3-tooling/migration/src/aggregate/types.ts:32-79,81-123`), and cross-space
+domain checks are deferred to aggregate deployment
+(`packages/1-framework/0-foundation/contract/src/validate-domain.ts:140-147`). Validator lookup and
+cache identity must include `spaceId`, resolve references through an integrity-checked aggregate,
+and never flatten equal namespace/model names from different spaces.
+
+No existing section hash is a complete validator cache key. RC hashing separately covers storage,
+execution, and capability profile
+(`packages/1-framework/0-foundation/contract/src/hashing.ts:74-106`), while domain, roots, and
+extensions can change independently. NetScript should digest the canonical full-contract
+representation (`contract/src/canonicalization.ts:250-277`) together with schema version, space,
+target/family, operation or selection, representation, interpreter ABI, and codec/pack contributor
+identities; include execution identity when defaults matter. Unsupported metadata must raise a
+deterministic schema-construction error, never silently become `unknown` or pass-through.
+
+Ahead-of-time output remains an optional startup/performance optimization only if conformance tests
+prove it is semantically identical to the runtime interpreter for success values, issue paths,
+representation handling, unsupported-case failures, and cache invalidation. It must not become a
+second hand-maintained model universe or require textual repair.
+
+Post-RC evidence is narrower and must not be read back into the RC: object `71e2e0d` adds
+`packages/2-sql/2-authoring/contract-ts/src/data-contract-json-schema.ts:10-15,31-38,68-110`, which
+labels generated contract JSON Schema lossy/advisory, keeps ArkType authoritative, and accepts
+unknown pack maps generically because a static editor schema cannot know contributed kinds. That
+improves validation of `contract.json`; it does not add model-data schemas, codec value predicates,
+or universal result-shape metadata.
 
 ## Runtime/platform support and Deno
 
@@ -486,11 +537,11 @@ Prisma 8 treats agent instructions as product surface. `init` installs a version
 skill and a lock file, and the skill routes by workflow. The direction is excellent: an agent gets
 local version-specific commands, structured errors, known gaps, and explicit references.
 
-The RC content is not trustworthy enough to consume directly:
+The RC content is not trustworthy enough to consume directly. Repo-local scans find dozens of legacy
+`@internal/...` paths and `PN-*` error-code references, but exact totals vary materially with the
+token/root-counting pattern and are not load-bearing evidence. More importantly:
 
-- 83 distinct legacy `@internal/...` import roots appear in the `prisma-8` skill;
-- those roots occur 116 times;
-- 47 legacy `PN-*` error-code references remain after the public move to dotted codes;
+- legacy internal imports and error-code vocabulary remain after the public move to dotted codes;
 - one reference says raw SQL is unavailable while runtime source exposes `raw`;
 - one reference says prepared statements are not a user surface while runtime source exposes
   `prepare`;

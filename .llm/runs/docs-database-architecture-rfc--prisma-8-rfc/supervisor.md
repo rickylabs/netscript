@@ -25,6 +25,18 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 | owner-directed adversarial RFC review | OpenCode · OpenRouter · Grok 4.6 · high | Post-draft attack on portability, migration safety, trust, and abstraction   |
 | owner-directed final refinement       | Anthropic · Fable 5 · high              | Absolute final review-and-refinement gate after every other substantive gate |
 
+## Delegated research and synthesis lanes
+
+| Agent path                          | Model / effort              | Scope                                                           | Status    |
+| ----------------------------------- | --------------------------- | --------------------------------------------------------------- | --------- |
+| `/root/market_gap_audit`            | OpenAI · GPT-5.6 Sol · high | Missing delivery/control/validation comparators and market QA   | Complete  |
+| `/root/validation_source_audit`     | OpenAI · GPT-5.6 Sol · high | RC contract/result-plan proof for runtime Standard Schema       | Complete  |
+| `/root/typescript_schema_audit`     | OpenAI · GPT-5.6 Sol · high | Native TypeScript builder evolution and NetScript oRPC transfer | Complete  |
+| `/root/architecture_plan_synthesis` | OpenAI · GPT-5.6 Sol · high | Reconcile all evidence into a decision-grade Plan-Gate proposal | In flight |
+
+These lanes are independent research/synthesis inputs. None is the formal PLAN-EVAL, IMPL-EVAL, or
+owner-directed final Fable refinement.
+
 ## Recorded lane/eval overrides
 
 - The root session is Codex rather than the default Opus 5 orchestrator. This is the active
