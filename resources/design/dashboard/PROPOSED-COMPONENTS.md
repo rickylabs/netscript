@@ -201,7 +201,7 @@ styling choice** — the CLI block is a *required slot*.
 - **The five-beat pattern it encodes:** plan → diff → **exact CLI equivalent** → confirm → result
   (+ undo/next-step where meaningful).
 - **The verb must ship.** CLI verbs come from
-  `.llm/runs/dashboard-design--orchestrator/reference/cli-correlation-report.md`. Inventing a verb is a
+  `resources/design/dashboard/reference/dashboard-design--orchestrator/reference/cli-correlation-report.md`. Inventing a verb is a
   defect.
 
 ### 3.8 Shell furniture — 4 small new components

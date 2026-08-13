@@ -4,7 +4,7 @@
 > This is the **what to draw**: the locked route tree, the shell, the canonical fixture, and a
 > per-screen spec.
 >
-> Source of the route tree and sidebar: `.llm/runs/dashboard-design--orchestrator/analysis/routing-resort.md`
+> Source of the route tree and sidebar: `resources/design/dashboard/reference/dashboard-design--orchestrator/analysis/routing-resort.md`
 > (**LOCKED** — adopt verbatim). Source of the per-screen content: `design-prompts/01–06` in the same
 > run dir, corrected here for the NS One runtime contract and the retired-surface list. **Where they
 > conflict, this spec and the brief win.**

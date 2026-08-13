@@ -23,10 +23,10 @@ owner-ratified artifacts win.** The order, newest first:
 
 | # | Artifact | Status |
 | - | -------- | ------ |
-| A1 | `.llm/runs/dashboard-design--orchestrator/` — improvement-brief (six owner axes, "binding for all passes"), `analysis/routing-resort.md` (LOCKED route tree), `design-prompts/00–06` (v3 prompts), `screen-catalog.md` | **live** (2026-07-12) |
-| A2 | `.llm/runs/dashboard-rescope--seed/` — owner-ratified 2026-07-06 ("yes to all, proceed"; 32 board mutations landed), `epic-rewrite.md` = the rewritten epic #400 body | **live** |
-| A3 | `.llm/runs/plan-roadmap-expansion--seed/design/A-dashboard/proposal.md` | **live except §3** — §9.1 (manage loop) and §9.2 (`DashboardPanelContribution` seam) stand and are embedded verbatim below; **§3's 7-panel table is superseded** by A2's authoritative screen set |
-| A4 | `.llm/runs/feat-dashboard-design-prototype--design/plan.md` — LD-1…LD-7 | **live except LD-1's breadth clause** — LD-1 named "shell + 7 panels + 4 capability sections"; three of those seven panels (Trace Waterfall, Logs, Resource Control) were **killed by A2** and are now acceptance-line violations. LD-2…LD-7 stand. |
+| A1 | `resources/design/dashboard/reference/dashboard-design--orchestrator/` — improvement-brief (six owner axes, "binding for all passes"), `analysis/routing-resort.md` (LOCKED route tree), `design-prompts/00–06` (v3 prompts), `screen-catalog.md` | **live** (2026-07-12) |
+| A2 | `resources/design/dashboard/reference/dashboard-rescope--seed/` — owner-ratified 2026-07-06 ("yes to all, proceed"; 32 board mutations landed), `epic-rewrite.md` = the rewritten epic #400 body | **live** |
+| A3 | `resources/design/dashboard/reference/plan-roadmap-expansion--seed/design/A-dashboard/proposal.md` | **live except §3** — §9.1 (manage loop) and §9.2 (`DashboardPanelContribution` seam) stand and are embedded verbatim below; **§3's 7-panel table is superseded** by A2's authoritative screen set |
+| A4 | `resources/design/dashboard/reference/feat-dashboard-design-prototype--design/plan.md` — LD-1…LD-7 | **live except LD-1's breadth clause** — LD-1 named "shell + 7 panels + 4 capability sections"; three of those seven panels (Trace Waterfall, Logs, Resource Control) were **killed by A2** and are now acceptance-line violations. LD-2…LD-7 stand. |
 
 **What A2 killed, and why it matters to you.** The owner closed #421 (Logs panel) and #422 (Resource
 Control panel) as *not planned*, and rewrote #418 from "trace waterfall" to "S13 Live Flow — causal
@@ -34,7 +34,7 @@ seam chain". If you draw an OTLP trace waterfall, a span gantt, a log tail, a me
 resource start/stop panel, the screen is **rejected on sight** — not restyled, rejected. See §5.
 
 The divergence between A4's LD-1 and A2/A1 is recorded as drift **D-4** in
-`.llm/runs/beta10--orchestrator/drift.md`.
+`resources/design/dashboard/reference/beta10--orchestrator/drift.md`.
 
 ---
 
@@ -169,7 +169,7 @@ beat them on wiring-truth density and the correlation spine — which none of th
 Plus, from A1: **`/ai`** (AI console + distributed assists, Axis 5) and **`/extensions`** (the
 extension-platform surface, Axis 6). The full route tree — every route, every param — is
 `SCREEN-SPEC.md` §1, taken verbatim from the LOCKED hierarchy in
-`.llm/runs/dashboard-design--orchestrator/analysis/routing-resort.md`.
+`resources/design/dashboard/reference/dashboard-design--orchestrator/analysis/routing-resort.md`.
 
 ### 4.2 The three acceptance lines (epic #400, verbatim — they gate every screen)
 
@@ -237,7 +237,7 @@ taxonomy on the canvas.
 
 ## 5. The six owner axes (binding for every pass)
 
-Condensed from `.llm/runs/dashboard-design--orchestrator/improvement-brief.md`. Each is an acceptance
+Condensed from `resources/design/dashboard/reference/dashboard-design--orchestrator/improvement-brief.md`. Each is an acceptance
 bar, not an aspiration.
 
 | Axis | Bar |
@@ -245,7 +245,7 @@ bar, not an aspiration.
 | **1 — Zero future-beta prose** | The design shows the **final product**. No "coming soon", no "lands in beta.N", no "preview — routes pending", no beta version string in the footer. Every planned capability renders fully implemented and operable. Honesty about build status lives in the tracker, never in the design. *(Legitimate exception: a **not-installed plugin** genuinely has no data — its empty state teaching `netscript plugin add crons` is a real product state, not future-beta prose.)* |
 | **2 — Complete routing hierarchy** | Capability group → list → entity detail → sub-entity detail. Path params = identity; query params = filters/tabs/view state. **Nothing selectable is in-memory-only.** Breadcrumbs derived from the pathname; sidebar mirrors the tree; one correlation id resolves to a journey URL. Show realistic URLs in the mocks — addressability must be *visible*. |
 | **3 — All features implemented, including writes** | The dashboard mirrors CLI capability, not read-only panes: plugin add, resource scaffold, db migrate, config override set/unset, trigger enable/disable, DLQ reprocess, saga replay, plugin update. Writes are **first-class flows** (create → configure → monitor), not buried buttons. Every mutation: **plan → diff → exact CLI equivalent → confirm → result**. |
-| **4 — Beta.10 cross-coverage** | Every screen maps to a beta.10/DDX issue and vice-versa (`.llm/runs/dashboard-design--orchestrator/coverage-matrix.md`). Gaps get flagged, not invented around. |
+| **4 — Beta.10 cross-coverage** | Every screen maps to a beta.10/DDX issue and vice-versa (`resources/design/dashboard/reference/dashboard-design--orchestrator/coverage-matrix.md`). Gaps get flagged, not invented around. |
 | **5 — AI as a distributed capability, not a chat pane** | AI shows up as: contextual actions (explain-this-failure, fix-this), embedded assists (inline diagnosis on failed runs, override suggestions, migration explanations), context augmentation (any panel can feed its state to the assistant), durable agent runs **joined to the correlation spine**, and tool-call transparency (contract procedures rendered as tools). One generic chat pane is the failure mode. |
 | **6 — Dynamic plugin/extension system** | The contribution story is **visible**: third-party contributed panels, an extension-management surface, and the contribution-axis map as **live navigation**. A plugin contributes panels, seams, actions — and the dashboard shows it. |
 
@@ -253,7 +253,7 @@ bar, not an aspiration.
 a **defect**, not a styling choice. The `netscript …` CodeBlock is a **required slot** on every
 mutation dialog. Every verb printed must be one that **actually ships** — the CLI-features epic (#701)
 landed in beta.9; the verified verb strings are in
-`.llm/runs/dashboard-design--orchestrator/reference/cli-correlation-report.md`. **Do not invent CLI
+`resources/design/dashboard/reference/dashboard-design--orchestrator/reference/cli-correlation-report.md`. **Do not invent CLI
 verbs.**
 
 ---
@@ -275,7 +275,7 @@ worthless as a decision-locking artifact.
    **action chain** (`enqueueJob` / `publishSaga` / `executeTask` / `executeBatch`, each deep-linking
    to the entity it produced); the saga history stream with `compensating` as a real status; derived
    stats (counts + successRate) computed from list totals. Ground truth:
-   `.llm/runs/dashboard-design--orchestrator/design-project/feedback/POC-ground-truth.md`. Use it.
+   `resources/design/dashboard/reference/dashboard-design--orchestrator/design-project/feedback/POC-ground-truth.md`. Use it.
 5. **If a panel needs data you cannot ground, say so.** Add it to `OPEN-QUESTIONS.md` and leave the
    panel out of the pass. Do **not** invent a data source, an endpoint, a CLI verb, or a stat.
 6. **Never name internal reference applications or internal process artifacts** in screen copy. AI
@@ -364,10 +364,10 @@ Per-pass discipline:
 | The runtime + rules | NS One's own `README.md` **in the canvas project** (it is correct; the platform context around it is not) |
 | The IA, per screen, with the fixture | `SCREEN-SPEC.md` (this directory) |
 | The component contract | `PROPOSED-COMPONENTS.md` (this directory) |
-| The full locked route tree, guards, breadcrumb rules | `.llm/runs/dashboard-design--orchestrator/analysis/routing-resort.md` |
-| Long-form per-area prompts (source for `SCREEN-SPEC.md`; **this brief wins where they conflict** — they target the retired project and predate the runtime contract) | `.llm/runs/dashboard-design--orchestrator/design-prompts/00–06` |
-| The real data model (enums, joins, derived stats) | `.llm/runs/dashboard-design--orchestrator/design-project/feedback/POC-ground-truth.md` |
-| Shipped CLI verbs | `.llm/runs/dashboard-design--orchestrator/reference/cli-correlation-report.md` |
-| What the current prototype already does (and its known defects) | `.llm/runs/dashboard-design--orchestrator/screen-catalog.md` |
-| Issue ↔ screen coverage | `.llm/runs/dashboard-design--orchestrator/coverage-matrix.md` |
+| The full locked route tree, guards, breadcrumb rules | `resources/design/dashboard/reference/dashboard-design--orchestrator/analysis/routing-resort.md` |
+| Long-form per-area prompts (source for `SCREEN-SPEC.md`; **this brief wins where they conflict** — they target the retired project and predate the runtime contract) | `resources/design/dashboard/reference/dashboard-design--orchestrator/design-prompts/00–06` |
+| The real data model (enums, joins, derived stats) | `resources/design/dashboard/reference/dashboard-design--orchestrator/design-project/feedback/POC-ground-truth.md` |
+| Shipped CLI verbs | `resources/design/dashboard/reference/dashboard-design--orchestrator/reference/cli-correlation-report.md` |
+| What the current prototype already does (and its known defects) | `resources/design/dashboard/reference/dashboard-design--orchestrator/screen-catalog.md` |
+| Issue ↔ screen coverage | `resources/design/dashboard/reference/dashboard-design--orchestrator/coverage-matrix.md` |
 | Pass-1 component verdicts (historical; its `ns-waterfall` / `ns-log-stream` verdicts are **superseded**) | `DECISIONS.md` (this directory) |
