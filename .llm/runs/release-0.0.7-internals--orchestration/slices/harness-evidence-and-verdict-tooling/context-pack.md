@@ -24,6 +24,12 @@
   `5286507468` supersede the read/use-only restriction for exactly
   `.agents/skills/netscript-pr/SKILL.md`. The acceptance-complete leaf surface is now nine files;
   no tenth source, workflow, tool, test, or skill path is authorized.
+- S3 guidance is committed at acceptance-complete implementation head
+  `634b257ea1afcedb2d7f1da486d8c9e9432a2a86` and has substantive topic-orchestrator Tier-A PASS in
+  PR comments `5286578469` and `5286595841`.
+- Exactly one final durable `check`, `test`, and `quality-job` cycle passed at that implementation
+  head. Fresh final receipts and child reports are under `receipts/final/`; no lock or source churn
+  occurred.
 
 ## Locked behavior
 
@@ -37,14 +43,14 @@
 
 ## Handoff state
 
-1. Commit and push the acceptance-complete guidance plus this run-artifact reconciliation.
-2. Run exactly one final structured `check`, `test`, and `quality-job` cycle at that literal
-   implementation head. Package/plugin `quality:gate` and JSR audit remain N/A.
-3. Package the new receipts plus the implementation-parent/evidence-child relationship in one
-   evidence-only commit; do not rerun merely because that receipt-only commit changes HEAD.
-4. Keep draft PR #1644 at `status:impl`, with S3/its DoD row checked only after the guidance commit
-   exists and the IMPL-EVAL row unchecked.
-5. Stop at the native opposite-family IMPL-EVAL handoff. The evaluator is held until Saturday
+1. The evidence-only commit containing this context pack is the direct child of implementation head
+   `634b257ea1afcedb2d7f1da486d8c9e9432a2a86`; its literal SHA is named in the final PR handoff
+   comment. Final receipt `actualGitHead` values intentionally identify the implementation parent.
+2. Do not rerun gates for the receipt-only child. Package/plugin `quality:gate`, JSR audit, publish
+   dry-run, and global runtime/E2E remain N/A.
+3. Keep draft PR #1644 at `status:impl`. All implementation, guidance, Tier-A, and local gate rows
+   may be checked; the separate IMPL-EVAL row remains unchecked.
+4. Stop at the native opposite-family IMPL-EVAL handoff. The evaluator is held until Saturday
    2026-08-15 00:00 Europe/Zurich; no substitute route is authorized.
 
 No merge, ready transition, publication, release, milestone-scope, or central-cluster-state authority.

@@ -98,6 +98,9 @@ output are not verdict sources.
 | Pre-guidance check | `receipts/pre-guidance/check.json` | PASS at `b21424c44bf43077b4caf5702ef58b3e1d0c00b1`; historical evidence only, not the final acceptance-complete gate |
 | Pre-guidance test | `receipts/pre-guidance/test.json` | PASS at `b21424c44bf43077b4caf5702ef58b3e1d0c00b1`; historical evidence only, not the final acceptance-complete gate |
 | Pre-guidance quality-job | `receipts/pre-guidance/quality-job.json` | PASS at `b21424c44bf43077b4caf5702ef58b3e1d0c00b1`; historical evidence only, not the final acceptance-complete gate |
+| S4 final check | `receipts/final/check.receipt.json` + `check.report.json` | PASS at implementation head `634b257ea1afcedb2d7f1da486d8c9e9432a2a86`; 5,055 ms; 2,919 files / 25 batches / 0 failed batches / 0 diagnostics |
+| S4 final test | `receipts/final/test.receipt.json` + `test.report.json` | PASS at implementation head `634b257ea1afcedb2d7f1da486d8c9e9432a2a86`; 223,951 ms; 4,109 passed / 19 ignored / 0 failed |
+| S4 final quality-job | `receipts/final/quality-job.receipt.json` | PASS at implementation head `634b257ea1afcedb2d7f1da486d8c9e9432a2a86`; 7,006 ms; `deno task ci:quality`, exit 0 |
 
 S1 first review requested one mirror-boundary fixture. The replacement candidate passed substantive
 Tier-A re-review through `01db2bd360ea15d8bd9b53fee5fc392678321f43`; the supervisor sign-off
@@ -179,3 +182,20 @@ sign-off disposition is recorded in the run-artifact-only commit containing this
 - Evaluator hold (`2026-08-13T21:22:56Z`): formal native opposite-family IMPL-EVAL must not launch
   before Saturday 2026-08-15 00:00 Europe/Zurich. No Claude, Fable, OpenRouter, DeepSeek, Minimax,
   or substitute evaluator is authorized during this leaf turn; stop at the recorded handoff.
+- S3 Tier-A review (`2026-08-13T21:28:29Z`): `PASS` at literal candidate
+  `634b257ea1afcedb2d7f1da486d8c9e9432a2a86`. Topic-orchestrator comments `5286578469` and
+  `5286595841` confirm the exact #1621 rule, its existing machine-convention placement, the amended
+  nine-file contract, remote-head identity, pre-guidance receipt classification, and absence of a
+  tenth implementation surface. The evidence-only commit containing this note is the S3 supervisor
+  sign-off; it does not provide or substitute for IMPL-EVAL.
+- S4 final gate cycle (`2026-08-13T21:30:32Z`): exactly one durable invocation each of `check`,
+  `test`, and `quality-job` returned `PASS` at acceptance-complete implementation head
+  `634b257ea1afcedb2d7f1da486d8c9e9432a2a86`. Check and test wrote fresh structured child reports;
+  the quality job retained known non-blocking `DEPS-NPM-CATALOG` warnings and is not described as
+  warning-free. Git inspection after the cycle found only the five expected final JSON artifacts;
+  `deno.lock` and source files were unchanged.
+- S4 receipt relationship (`2026-08-13T21:31:14Z`): every final receipt records
+  `actualGitHead = 634b257ea1afcedb2d7f1da486d8c9e9432a2a86`. The evidence-only commit containing
+  these receipts and this note is its direct child; its literal SHA is recorded in the final PR
+  handoff comment. Gates are intentionally not rerun for that receipt-only child, avoiding an
+  infinite evidence self-reference loop.
