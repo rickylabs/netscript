@@ -10,6 +10,9 @@
 | 2026-08-13T20:26:59Z | Legacy leaf opened draft PR #1643 after a plan/bootstrap commit with a justified mechanical `PLAN-EVAL: N/A`. | PR #1643; `e49948bbf` |
 | 2026-08-13T20:30:35Z | Legacy leaf stopped on significant frozen-contract drift before committing product code: current shared schema/copy compatibility requires the filed manifest fields, while the viable fail-loud CLI fix requires an undeclared test file. | PR #1643 PLAN comment; focused structured test exit 1 (10 pass, 8 fail); `69aaeba2a` |
 | 2026-08-13T20:33:45Z | Topic orchestrator declined to expand the contract, preserved the exact proposed patch as evidence, restored a clean leaf worktree, and kept PR #1643 draft at `status:plan`. | `f3cf40909`; clean raw Git status; same-thread steering record |
+| 2026-08-13T20:38:25Z | Scaffold leaf completed independent red-first probes. #1262 seed output lacks model-aware rows, #1263 generated runtime lacks GET/PATCH/DELETE not-found handling, and #1588 SQLite output retains other-provider parsers. The #1263 OpenAPI 404 sub-symptom is already fixed on current main and is retained as an approved regression-test fallback. | leaf `receipts/red-first.md`; leaf research/worklog |
+| 2026-08-13T20:41:24Z | Scaffold leaf locked its non-mechanical plan but stopped before product edits because provider selection and model-aware seed generation require two generator surfaces omitted from the frozen contract. | draft PR #1654 RESEARCH/PLAN comments; `88b735a36` |
+| 2026-08-13T20:44:08Z | Scaffold leaf committed and explicitly pushed its clean artifact-only paused state. It now requires a coordinator-amended contract followed by a separate PLAN-EVAL before the implementation thread may resume. | `42572af32`; draft PR #1654; clean raw Git status |
 
 ## Design
 
@@ -37,3 +40,15 @@ The bounded fail-loud CLI remedy is viable, but its focused regression test file
 frozen leaf contract. The leaf is clean and paused at `f3cf40909`; the coordinator must either
 issue a replacement contract naming the authorized surfaces/remedy or disposition #1243 outside
 this leaf. This topic run will not infer that scope change.
+
+## Coordinator decision required — scaffold-generated-output-correctness
+
+The approved behavior remains bounded, but the frozen surface omits the generator seam required to
+select provider-specific Prisma configuration and the generator/scaffolder seam required to emit a
+model-aware or explicit empty-schema seed. The coordinator must amend the contract to include
+`packages/cli/src/kernel/templates/database/generate-prisma-config.ts`,
+`packages/cli/src/kernel/adapters/database/scaffolder.ts`, and a new
+`packages/cli/src/kernel/templates/database/generate-database-seed.ts` plus its focused test. After
+that amendment, launch one separate PLAN-EVAL against `42572af32`; only an unqualified PASS permits
+the attached implementation thread to resume. The shared `scaffold.runtime` verdict remains
+lease-gated and has not run.

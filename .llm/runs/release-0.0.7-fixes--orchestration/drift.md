@@ -19,3 +19,14 @@ compatibility consumes the values. The viable fail-loud CLI change also requires
 `auth-plugin-command_test.ts`, which is outside the contract. No product change was committed;
 draft PR #1643 is clean/paused at `f3cf40909`. Coordinator replacement-contract or disposition
 authority is required before the same thread resumes.
+
+## Significant — scaffold generator seams omitted from frozen contract
+
+The grouped scaffold leaf reproduced the three approved behavior gaps, except that current main
+already projects OpenAPI 404 responses for the #1263 operations. That stale sub-symptom is handled
+by the approved regression-test fallback; runtime not-found behavior remains red. The bounded
+implementation needs `generate-prisma-config.ts` to select provider-specific helper fragments and
+needs `scaffolder.ts` plus a new `generate-database-seed.ts` seam to emit model-aware or explicit
+empty-schema seed output. Those generator surfaces are absent from the frozen contract. No product
+change was committed; draft PR #1654 is clean/paused at `42572af32`. A coordinator amendment and a
+separate PLAN-EVAL are required before implementation resumes.
