@@ -32,3 +32,14 @@ Deno.test('desktop native policy bounds the active #859 exception to staged call
     );
   }
 });
+
+Deno.test('desktop native workflow provides the headless display required by WebKitGTK', async () => {
+  const workflow = await Deno.readTextFile('.github/workflows/e2e-cli.yml');
+  assertEquals(workflow.includes('libwebkit2gtk-4.1-0 xvfb'), true);
+  assertEquals(
+    workflow.includes(
+      'xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24"',
+    ),
+    true,
+  );
+});

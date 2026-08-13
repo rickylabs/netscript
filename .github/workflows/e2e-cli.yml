@@ -457,7 +457,7 @@ jobs:
         if: env.RUN == 'true'
         run: >-
           sudo apt-get update && sudo apt-get install --yes
-          bsdiff libgtk-3-0 libwebkit2gtk-4.1-0
+          bsdiff libgtk-3-0 libwebkit2gtk-4.1-0 xvfb
 
       - name: Install workspace dependencies
         if: env.RUN == 'true'
@@ -470,7 +470,9 @@ jobs:
         # callback/apply gap. The next step accepts only that exact evidence;
         # fixture, packaging, or unrelated native failures still fail the job.
         continue-on-error: true
-        run: deno task e2e:cli run deploy.desktop-native --cleanup --format pretty
+        run: >-
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24"
+          deno task e2e:cli run deploy.desktop-native --cleanup --format pretty
 
       - name: Enforce active desktop exception boundary (#859)
         if: always() && env.RUN == 'true'
