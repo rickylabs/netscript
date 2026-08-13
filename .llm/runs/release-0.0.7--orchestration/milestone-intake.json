@@ -1,0 +1,684 @@
+{
+  "schemaVersion": 1,
+  "repo": "rickylabs/netscript",
+  "milestone": "0.0.7",
+  "capturedAt": "2026-08-13T18:35:10.000Z",
+  "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+  "ownerRatifiedAt": "2026-08-13T18:35:10.000Z",
+  "sources": {
+    "targetMilestone": true,
+    "unmilestoned": true,
+    "backlog": true,
+    "laterMilestones": true
+  },
+  "candidates": [
+    {
+      "number": 928,
+      "source": "laterMilestone",
+      "decision": "defer",
+      "reason": "Referenced by #1348 as a future dialect that 0.0.7 should precede, not as an implementation prerequisite.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/928",
+        "https://github.com/rickylabs/netscript/issues/1348"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 934,
+      "source": "laterMilestone",
+      "decision": "defer",
+      "reason": "Referenced by #1348 as a future consumer whose policy shape must not be pre-empted, not as an implementation prerequisite.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/934",
+        "https://github.com/rickylabs/netscript/issues/1348"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1093,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1093"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1112,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1112"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1175,
+      "source": "backlog",
+      "decision": "defer",
+      "reason": "Replacing the fixed JSR propagation sleep can shorten releases but does not invalidate current publication evidence; keep outside the implementation critical path.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1175",
+        ".llm/tools/release/"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1243,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1243"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1262,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1262"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1263,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1263"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1273,
+      "source": "backlog",
+      "decision": "defer",
+      "reason": "PostgreSQL-tier narrowing is useful compute optimization, but normal PR E2E is already release/manual/explicit-opt-in and this is not a correctness prerequisite for 0.0.7.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1273",
+        ".github/workflows/e2e-cli.yml:88-104"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1293,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1293"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1296,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1296"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1306,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1306"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1348,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1348"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1349,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1349"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1350,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1350"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1351,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1351"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1352,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1352"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1353,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1353"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1354,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1354"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1355,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1355"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1357,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1357"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1358,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1358"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1360,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1360"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1378,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1378"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1429,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1429"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1448,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1448"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1451,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1451"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1452,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1452"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1453,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1453"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1455,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1455"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1458,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1458"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1461,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1461"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1462,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1462"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1466,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1466"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1467,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1467"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1481,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1481"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1502,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1502"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1533,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1533"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1542,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1542"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1543,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1543"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1544,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1544"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1545,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1545"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1551,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1551"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1557,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1557"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1561,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1561"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1563,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1563"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1564,
+      "source": "backlog",
+      "decision": "include",
+      "reason": "Release-critical CI correctness prerequisite explicitly admitted during the owner's pre-0.0.7 false-positive audit.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1564",
+        "https://github.com/rickylabs/netscript/issues/1564#issuecomment-5284900986"
+      ],
+      "ownerRatified": true,
+      "admissionPredicate": "release-critical",
+      "targetMilestone": "0.0.7",
+      "movedAt": "2026-08-13T18:38:26.000Z"
+    },
+    {
+      "number": 1588,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1588"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1590,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1590"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1591,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1591"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1592,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1592"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1598,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1598"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1601,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1601"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1604,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1604"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1606,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1606"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1609,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1609"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1610,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1610"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1611,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1611"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1613,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1613"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1616,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1616"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1618,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1618"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1619,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1619"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1620,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1620"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1621,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1621"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1622,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1622"
+      ],
+      "ownerRatified": true
+    },
+    {
+      "number": 1623,
+      "source": "targetMilestone",
+      "decision": "include",
+      "reason": "Present in the owner-scheduled 0.0.7 milestone at the frozen baseline sweep.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1623"
+      ],
+      "ownerRatified": true
+    }
+  ]
+}

@@ -1,0 +1,384 @@
+{
+  "schemaVersion": 1,
+  "milestone": "0.0.7",
+  "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+  "currentMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+  "coordinator": {
+    "agentId": "codex-root-0.0.7"
+  },
+  "limits": {
+    "activeImplementationSlicesPerLane": 2,
+    "activeEvaluatorsPerLane": 1,
+    "globalExpensiveGates": 1,
+    "releaseWriters": 1
+  },
+  "lanes": [
+    {
+      "id": "docs",
+      "orchestratorAgentId": "topic-docs-0.0.7",
+      "issueNumbers": [
+        1112,
+        1296,
+        1461,
+        1533,
+        1551,
+        1606,
+        1623
+      ]
+    },
+    {
+      "id": "internals",
+      "orchestratorAgentId": "topic-internals-0.0.7",
+      "issueNumbers": [
+        1306,
+        1378,
+        1429,
+        1453,
+        1542,
+        1543,
+        1545,
+        1561,
+        1563,
+        1564,
+        1601,
+        1604,
+        1611,
+        1613,
+        1618,
+        1621,
+        1622
+      ]
+    },
+    {
+      "id": "fixes",
+      "orchestratorAgentId": "topic-fixes-0.0.7",
+      "issueNumbers": [
+        1243,
+        1262,
+        1263,
+        1293,
+        1357,
+        1358,
+        1360,
+        1448,
+        1455,
+        1462,
+        1481,
+        1544,
+        1557,
+        1588,
+        1598,
+        1609,
+        1610,
+        1616,
+        1619,
+        1620
+      ]
+    },
+    {
+      "id": "features",
+      "orchestratorAgentId": "topic-features-0.0.7",
+      "issueNumbers": [
+        1093,
+        1348,
+        1349,
+        1350,
+        1351,
+        1352,
+        1353,
+        1354,
+        1355,
+        1451,
+        1452,
+        1458,
+        1466,
+        1467,
+        1502,
+        1590,
+        1591,
+        1592
+      ]
+    }
+  ],
+  "watchers": [],
+  "committedIssues": [
+    {
+      "number": 1093,
+      "state": "open"
+    },
+    {
+      "number": 1112,
+      "state": "open"
+    },
+    {
+      "number": 1243,
+      "state": "open"
+    },
+    {
+      "number": 1262,
+      "state": "open"
+    },
+    {
+      "number": 1263,
+      "state": "open"
+    },
+    {
+      "number": 1293,
+      "state": "open"
+    },
+    {
+      "number": 1296,
+      "state": "open"
+    },
+    {
+      "number": 1306,
+      "state": "open"
+    },
+    {
+      "number": 1348,
+      "state": "open"
+    },
+    {
+      "number": 1349,
+      "state": "open"
+    },
+    {
+      "number": 1350,
+      "state": "open"
+    },
+    {
+      "number": 1351,
+      "state": "open"
+    },
+    {
+      "number": 1352,
+      "state": "open"
+    },
+    {
+      "number": 1353,
+      "state": "open"
+    },
+    {
+      "number": 1354,
+      "state": "open"
+    },
+    {
+      "number": 1355,
+      "state": "open"
+    },
+    {
+      "number": 1357,
+      "state": "open"
+    },
+    {
+      "number": 1358,
+      "state": "open"
+    },
+    {
+      "number": 1360,
+      "state": "open"
+    },
+    {
+      "number": 1378,
+      "state": "open"
+    },
+    {
+      "number": 1429,
+      "state": "open"
+    },
+    {
+      "number": 1448,
+      "state": "open"
+    },
+    {
+      "number": 1451,
+      "state": "open"
+    },
+    {
+      "number": 1452,
+      "state": "open"
+    },
+    {
+      "number": 1453,
+      "state": "open"
+    },
+    {
+      "number": 1455,
+      "state": "open"
+    },
+    {
+      "number": 1458,
+      "state": "open"
+    },
+    {
+      "number": 1461,
+      "state": "open"
+    },
+    {
+      "number": 1462,
+      "state": "open"
+    },
+    {
+      "number": 1466,
+      "state": "open"
+    },
+    {
+      "number": 1467,
+      "state": "open"
+    },
+    {
+      "number": 1481,
+      "state": "open"
+    },
+    {
+      "number": 1502,
+      "state": "open"
+    },
+    {
+      "number": 1533,
+      "state": "open"
+    },
+    {
+      "number": 1542,
+      "state": "open"
+    },
+    {
+      "number": 1543,
+      "state": "open"
+    },
+    {
+      "number": 1544,
+      "state": "open"
+    },
+    {
+      "number": 1545,
+      "state": "open"
+    },
+    {
+      "number": 1551,
+      "state": "open"
+    },
+    {
+      "number": 1557,
+      "state": "open"
+    },
+    {
+      "number": 1561,
+      "state": "open"
+    },
+    {
+      "number": 1563,
+      "state": "open"
+    },
+    {
+      "number": 1564,
+      "state": "open"
+    },
+    {
+      "number": 1588,
+      "state": "open"
+    },
+    {
+      "number": 1590,
+      "state": "open"
+    },
+    {
+      "number": 1591,
+      "state": "open"
+    },
+    {
+      "number": 1592,
+      "state": "open"
+    },
+    {
+      "number": 1598,
+      "state": "open"
+    },
+    {
+      "number": 1601,
+      "state": "open"
+    },
+    {
+      "number": 1604,
+      "state": "open"
+    },
+    {
+      "number": 1606,
+      "state": "open"
+    },
+    {
+      "number": 1609,
+      "state": "open"
+    },
+    {
+      "number": 1610,
+      "state": "open"
+    },
+    {
+      "number": 1611,
+      "state": "open"
+    },
+    {
+      "number": 1613,
+      "state": "open"
+    },
+    {
+      "number": 1616,
+      "state": "open"
+    },
+    {
+      "number": 1618,
+      "state": "open"
+    },
+    {
+      "number": 1619,
+      "state": "open"
+    },
+    {
+      "number": 1620,
+      "state": "open"
+    },
+    {
+      "number": 1621,
+      "state": "open"
+    },
+    {
+      "number": 1622,
+      "state": "open"
+    },
+    {
+      "number": 1623,
+      "state": "open"
+    }
+  ],
+  "leaves": [],
+  "expensiveGates": [],
+  "canaryCheckpoints": [
+    {
+      "id": "checkpoint-foundations",
+      "rationale": "Publish only after CI correctness and shared SDK/tooling foundations form a coherent, independently green main checkpoint.",
+      "state": "planned"
+    },
+    {
+      "id": "checkpoint-feature-complete",
+      "rationale": "Publish the exact feature-complete main candidate before stable release qualification.",
+      "state": "planned"
+    }
+  ],
+  "exactMainEvidence": {
+    "gitHead": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+    "surface": "repository",
+    "expectedGateIds": [],
+    "receipts": []
+  },
+  "existingReleaseLease": false,
+  "releaseWriters": [],
+  "releaseCaptain": {
+    "state": "inactive",
+    "agentId": null,
+    "leaseId": null,
+    "contentSha": null,
+    "evidence": []
+  },
+  "updatedAt": "2026-08-13T18:38:26.000Z"
+}
