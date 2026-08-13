@@ -87,7 +87,7 @@ Deno.test('root test task uses the structured deduplicating runner', async () =>
   assertStringIncludes(config.tasks.test, '.llm/tools/run-deno-test.ts');
   assertEquals(config.tasks.test.includes('deno test --allow-all'), false);
   assertStringIncludes(config.tasks['gates:test'], '.llm/tools/run-deno-test_test.ts');
-  for (const task of ['check', 'test', 'lint', 'fmt:check']) {
+  for (const task of ['check', 'test', 'lint', 'fmt:check', 'doc:lint']) {
     const definition = config.tasks[task];
     const command = typeof definition === 'string' ? definition : definition.command;
     assertStringIncludes(command, '--allow-write', task);
