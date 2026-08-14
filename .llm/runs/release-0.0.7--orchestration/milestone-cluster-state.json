@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
-  "currentMainSha": "dd472102d05ea13ab7ac7654aeedb177fbae2eb8",
+  "currentMainSha": "0b3ed5d5a6aea451318f120988c25dfa3993a2ab",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -213,7 +213,7 @@
     },
     {
       "number": 1243,
-      "state": "open"
+      "state": "closed"
     },
     {
       "number": 1249,
@@ -502,12 +502,14 @@
     {
       "id": "legacy-port-pin-sweep",
       "lane": "fixes",
-      "phase": "gating",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "e6ba15ec6414c0a42b1f9870791131162ea71c36",
       "currentPrHeadSha": "a949a6cd1777b0d05b1a3b45143de15951aa6dc2",
       "evaluatorCommitSha": "a949a6cd1777b0d05b1a3b45143de15951aa6dc2",
       "evaluationVerdict": "PASS",
+      "mergeCommitSha": "0b3ed5d5a6aea451318f120988c25dfa3993a2ab",
+      "mergedAt": "2026-08-14T23:39:37.000Z",
       "issueNumbers": [1243],
       "implementerAgentId": "019ffcca-8bdc-7fb3-98c5-df90e2ae3b1f",
       "evaluatorAgentId": "8c47751a-6a30-4dab-b25c-dbafe9873455",
@@ -518,9 +520,12 @@
     {
       "id": "scaffold-generated-output-correctness",
       "lane": "fixes",
-      "phase": "evaluating",
+      "phase": "blocked",
       "baseBranch": "main",
       "headSha": "14d8b38b4db7ba0635cbbcac2f8cd8903bee0ec9",
+      "currentPrHeadSha": "13008abf83734884f7fcfc71e6d6d9facb24bcbf",
+      "evaluatorCommitSha": "13008abf83734884f7fcfc71e6d6d9facb24bcbf",
+      "evaluationVerdict": "FAIL_PLAN",
       "issueNumbers": [1262, 1263, 1588],
       "implementerAgentId": "019ffcca-8be0-74c2-bb0e-c82cf5ce3c85",
       "evaluatorAgentId": "bd703a7d-4757-4689-a603-5ca98f7d7323",
@@ -650,7 +655,7 @@
     },
     {
       "id": "reset-gate-05-scaffold-generated-output-correctness-plan-eval-cycle-1",
-      "state": "running",
+      "state": "blocked",
       "lane": "fixes",
       "leafId": "scaffold-generated-output-correctness",
       "phase": "plan-eval",
@@ -668,7 +673,10 @@
         "remoteControlRequired": true
       },
       "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-14T23:26:20.976Z"
+      "grantedAt": "2026-08-14T23:26:20.976Z",
+      "completedAt": "2026-08-14T23:34:26.942Z",
+      "verdict": "FAIL_PLAN",
+      "evaluatorCommitSha": "13008abf83734884f7fcfc71e6d6d9facb24bcbf"
     },
     {
       "id": "reset-gate-06-comparison-docs-programme-plan-eval-cycle-1",
@@ -710,7 +718,7 @@
     }
   ],
   "exactMainEvidence": {
-    "gitHead": "dd472102d05ea13ab7ac7654aeedb177fbae2eb8",
+    "gitHead": "0b3ed5d5a6aea451318f120988c25dfa3993a2ab",
     "surface": "repository",
     "expectedGateIds": [
       "arch-check",
@@ -736,5 +744,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-14T23:29:49.147Z"
+  "updatedAt": "2026-08-14T23:39:38.000Z"
 }

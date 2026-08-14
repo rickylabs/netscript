@@ -50,11 +50,12 @@ and bypass permissions. Their exact session/PID/bridge/URL/topic-head receipts l
 `milestone-cluster-state.json` and their topic journals. The hybrid wrapper is not needed unless a
 later task explicitly authorizes its alternate-worker delegation surface.
 
-Live checkpoint at `2026-08-14T23:29:49Z`: `main` is now
-`dd472102d05ea13ab7ac7654aeedb177fbae2eb8` after coordinator merge of #1644. Reset orders 1, 2,
+Live checkpoint advanced at `2026-08-14T23:39:38Z`: `main` is now
+`0b3ed5d5a6aea451318f120988c25dfa3993a2ab` after coordinator merges of #1644 and #1643. Reset orders 1, 2,
 3, 4, and 6 are terminal `PASS`; orders 3/4/6 have been returned to their preserved Codex
 implementation threads through the existing Claude topic supervisors. Fixes order 5 is the sole
-remaining reset evaluator and runs independently in the fixes lane. PR #1643 is at its ready/CI
-gate. Continue to serialize only inside each topic orchestrator; never introduce a cluster-wide
+remaining reset hold and returned `FAIL_PLAN` cycle 1 for three plan-text-only repairs; it is back
+with the original Codex plan-author thread and has no implementation or cycle-2 authority yet. PR
+orders 1 and 2 are merged. Continue to serialize only inside each topic orchestrator; never introduce a cluster-wide
 evaluator wait, and keep the separate shared-resource `expensiveGates` mutex empty until a genuine
 E2E/Aspire gate needs it.

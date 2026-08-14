@@ -196,10 +196,10 @@ laws remain binding. The exact current assignments and rationales live in
 | Order | Lane | PR | Gate | Result / current action |
 | ----- | ---- | -- | ---- | ----------------------- |
 | 1 | internals | #1644 | IMPL-EVAL | `PASS`; merged by coordinator as `dd472102d`; #1561/#1563/#1621 closed completed |
-| 2 | fixes | #1643 | IMPL-EVAL | `PASS` at evaluator commit `a949a6cd1`; ready transition and current CI in progress |
+| 2 | fixes | #1643 | IMPL-EVAL | `PASS`; merged by coordinator as `0b3ed5d5a`; #1243 closed completed |
 | 3 | features | #1651 | PLAN-EVAL cycle 2 | `PASS` at `3e0c8858b`; preserved Codex thread `019ffcc5-…` authorized to implement |
 | 4 | internals | #1653 | PLAN-EVAL cycle 2 | `PASS` at `c694cfb31`; preserved Codex thread `019ffcc9-97d6-…` authorized to implement |
-| 5 | fixes | #1654 | PLAN-EVAL cycle 1 | running in native Opus 5/medium session `bd703a7d-…`; no implementation authority yet |
+| 5 | fixes | #1654 | PLAN-EVAL cycle 1 | `FAIL_PLAN` at `13008abf8`; original Codex author thread repairing plan text only; cycle 2 not yet granted |
 | 6 | docs | #1652 | PLAN-EVAL cycle 1 | `PASS` at corrected evaluator commit `a790e91e2`; preserved Codex thread `019ffcc9-16c2-…` authorized to implement |
 
 The three PLAN-EVAL passes do not authorize replacement implementation sessions: each topic
