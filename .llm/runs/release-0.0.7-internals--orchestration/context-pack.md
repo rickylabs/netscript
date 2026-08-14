@@ -1,40 +1,63 @@
 # Context pack — 0.0.7 internals topic
 
-Wave 0 contains exactly two active leaves, both branched from live `origin/main`
-`01e0960494c95ce56eb35892c211a095eb13e6ed` with no upstream:
+Resumable state as of the 2026-08-15 reset, first turn of the Opus 5/high topic controller.
 
-1. `quality-scan-allowance-rail` — #1378 + #1545, inseparable; worktree
-   `/home/codex/repos/netscript-007-quality-rail`; branch
-   `chore/quality-scan-allowance-rail`; Sol/high; thread
-   `019ffcc9-97d6-7602-bb7d-582ecc92b069`.
-2. `harness-evidence-and-verdict-tooling` — #1561 + #1563 + #1621; worktree
+## Authority and identity
+
+- Role `topic-internals-0.0.7`, one of exactly four topic orchestrators under Codex coordinator
+  `codex-root-0.0.7` (session `019ffaa3-32ae-7b02-92a5-d7ae146d8cbd`, worktree
+  `/home/codex/repos/netscript-547-lffix`).
+- Active controller: native Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34`, bridge
+  `cse_01HqFtKQtyJcHBEn1MghQdFX`, `claude-opus-5` / high, Remote Control attached. Full identity
+  evidence is in `supervisor.md`.
+- Legacy Codex topic thread `019ffcc0-e1b5-74f0-96eb-cdeb298d6b17` is parked, idle, and preserved.
+  Never resume it as a topic controller.
+- Central authority lives in
+  `/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/`. Read
+  `briefs/reset-gates/dispatch.json` after the central state; it supersedes every pre-reset route
+  table. **Do not mutate central cluster state.**
+- This lane may not merge, publish, mark ready, relabel, close issues, change milestone scope, or
+  acquire the release-writer lease.
+
+## Immutable baseline
+
+`origin/main` = `01e0960494c95ce56eb35892c211a095eb13e6ed`, verified live and equal to both the
+dispatch base and `milestone-cluster-state.json` `currentMainSha`.
+
+## Wave 0 leaves (both draft, both parked on a formal gate)
+
+1. **#1644 `harness-evidence-and-verdict-tooling`** — issues #1561 + #1563 + #1621; worktree
    `/home/codex/repos/netscript-007-harness-evidence`; branch
-   `fix/harness-evidence-and-verdict-tooling`; Sol/medium; thread
-   `019ffcc9-97ba-7770-a890-a1ebd80ec793`.
+   `fix/harness-evidence-and-verdict-tooling`; head `4d9fb196765cbf1a6bc7eaa7c18ec82b237ab89f`;
+   implementation parent `634b257ea1afcedb2d7f1da486d8c9e9432a2a86`; Codex thread
+   `019ffcc9-97ba-7770-a890-a1ebd80ec793` (Sol/medium, parked). `status:impl`. S1/S2/S3 Tier-A PASS;
+   final `check`/`test`/`quality-job` receipts all PASS at the implementation parent. Awaiting
+   **IMPL-EVAL, dispatch order 1**.
+2. **#1653 `quality-scan-allowance-rail`** — issues #1378 + #1545, inseparable; worktree
+   `/home/codex/repos/netscript-007-quality-rail`; branch `chore/quality-scan-allowance-rail`; head
+   `09dfb092dccf7f843b9270295047d674a8187362`; Codex thread `019ffcc9-97d6-7602-bb7d-582ecc92b069`
+   (Sol/high, parked). `status:plan-eval`. All four prior `FAIL_PLAN` blockers were
+   coordinator-resolved on 2026-08-13T23:53Z; that verdict is advisory only. Awaiting **PLAN-EVAL
+   cycle 2, dispatch order 4**.
 
-Coordinator authority remains external in
-`/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/`.
-Do not mutate its cluster state. Supervise leaves event-first, serialize the single evaluator slot,
-and never overlap the global expensive gate.
+Same-thread steering commands are in `worklog.md` and each leaf's `codex-thread-ids.md`. Never fire
+a second `send-message-v2` at a leaf worktree; resume the recorded thread.
 
-Both requested/observed routes match. Same-thread steering commands are recorded in `worklog.md`
-and each leaf's `codex-thread-ids.md`. The launcher reported Remote Control disabled, so do not
-claim mobile-visible Remote Control.
+## Evidence rules that bit this lane
 
-The evidence/verdict leaf is draft PR #1644. The coordinator authorized the exact five
-implementation/test peers and retained `netscript-pr/SKILL.md` as read-only; its existing Codex
-thread resumed and committed the authorization at `41328ea3e6620dbe730157a313ff1d6c6b3f52f5`.
-S1 passed Tier-A re-review through `01db2bd360ea15d8bd9b53fee5fc392678321f43` after the requested
-mirror-boundary regression. S2 passed Tier-A through
-`8b4f4b509e4cb9ad6f7e9414b9b948ce9a2b7a33`; final structured gates and separate IMPL-EVAL remain.
-The #1561/#1621 documentation versus
-read-only-skill closure conflict is still coordinator-owned and blocks a truthful final closing
-claim.
+- **CI is not an evidence source at either head.** Every check on both draft PRs is `SKIPPED`
+  because `ci.yml` guards on `draft == false`. Use the structured receipts under each leaf's
+  `receipts/`, not the check rollup.
+- **Receipts attest the implementation parent, by design.** `4d9fb1967` is an evidence-only child;
+  its receipts record `gitHead` `634b257ea…`. Do not demand a self-referencing receipt.
+- The launcher never proved Codex Remote Control for the leaf threads; the recorded app-server
+  threads are the steering surface. Do not claim mobile-visible Codex Remote Control for them.
 
-The quality leaf is draft PR #1653. Its Codex plan head is `c573beda9`; the separate evaluator
-artifact head is `8a4709afe`. Native Fable 5 medium was unavailable (`model_not_found`, session
-`4427e1d6-ab15-4f80-8840-2281744b1214`), so the one evaluator slot used the approved
-Claude/OpenRouter Minimax M3 high fallback, session
-`977b0618-1b0c-4957-8369-698d3c5274c6`. Verdict: `FAIL_PLAN`. Implementation is hard-stopped on
-the durable allowance owner, exact test/generated file-surface amendment, and workers JSR debt
-baseline; live #1545 also needs its stale count reconciled from 8 to 7 before closure.
+## Next action
+
+The order-1 IMPL-EVAL handoff for #1644 is prepared and **not launched**. Launch authority is
+`briefs/reset-gates/harness-evidence-and-verdict-tooling.md` (native Claude `claude-opus-5`, effort
+`medium`, `/remote-control` on) — **not** the leaf's `impl-eval-request.md`, which still names the
+pre-reset Fable 5 route. Launch only after the coordinator grants the global singleton evaluator
+lease. That lease is currently free: all six leaves carry `evaluatorAgentId: null`, `expensiveGates`
+is empty, and the release captain is inactive.
