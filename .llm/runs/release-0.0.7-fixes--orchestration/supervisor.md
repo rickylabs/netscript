@@ -110,6 +110,44 @@ authorize ready transition, merge, issue closure, relabeling, publication, or an
 all of which remain coordinator-only. PR #1643 is unchanged: `OPEN`, draft, `MERGEABLE`, single
 `status:impl` label, milestone `0.0.7`, base `main`.
 
+### Post-verdict reconciliation of PR #1643 (coordinator grant, 2026-08-14T23:2x)
+
+Done, within this lane's authority:
+
+- **Definition of Done completed.** The two remaining boxes — `Topic-orchestrator Tier-A review is
+  complete` and `Separate opposite-family IMPL-EVAL passes` — are checked with linked evidence
+  (Tier-A comment `5286347517` + `review-tier-a.md`; IMPL-EVAL `PASS` at `e6ba15ec6`, verdict commit
+  `a949a6cd1`, `evaluate.md`, phase comment `2026-08-14T23:20:27Z`, session `8c47751a…`). Both
+  string replacements were asserted to match exactly once before the edit was applied, and the
+  applied body was re-read to confirm zero remaining `- [ ]` boxes.
+- **One structured PR comment posted** recording the accepted verdict, the independent Tier-A
+  re-derivation, and the withheld transition: `#issuecomment-5299139091`.
+
+**Declined: the draft → ready-for-merge transition.** The coordinator conditioned it on "only if
+your protocol authorizes it". It does not. The reset common contract bars this lane from marking
+ready, relabeling, merging, publishing, and closing issues. Three substantive reasons beyond the
+rule:
+
+1. `draft → ready` auto-dispatches one OpenHands IMPL-EVAL and moves the PR to `status:impl-eval`
+   unless `impl-eval:skip` is applied first (`netscript-pr`). That would put a rival evaluator on a
+   head that already carries a fresh native opposite-family `PASS`, breaking the one-evaluator law;
+   and applying `impl-eval:skip` is itself a relabel this lane cannot make.
+2. The verdict head is `e6ba15ec6`; the PR head is now `a949a6cd1`. The only delta is the verdict
+   artifact itself — the expected pattern — but a `status:ready-merge` close-gate/mirror run
+   evaluates at `a949a6cd1`, so the distinction is recorded rather than left to inference.
+3. #1643's body deliberately carries **no closing keyword** for #1243, so a merge would not close it.
+   Whether the compatibility-metadata reclassification satisfies #1243 is the coordinator's call;
+   the evaluator explicitly declined to decide it and so does this lane.
+
+`status:ready-merge` additionally requires evidence review this lane may not self-grant. PR #1643
+therefore remains `OPEN`, draft, `MERGEABLE`, single `status:impl`, milestone `0.0.7`, base `main`,
+head `a949a6cd1` — ready for coordinator disposition.
+
+**Unfiled follow-up for the coordinator:** evaluator finding N1, confirmed at
+`auth-plugin-command.ts:138` — `session revoke --auth-url` still defaults to
+`http://localhost:8094/api/v1/auth`, the same pin class as #1243 and outside its narrowing. It needs
+its own issue; this lane does not file issues.
+
 ## Wave 0 lane assignments
 
 | Leaf | Branch | Implementation route | Formal evaluator (per `dispatch.json`) |
