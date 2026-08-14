@@ -103,7 +103,7 @@ export const navLanes: NavLane[] = [
     label: "Concepts",
     subtitle: "How and why it works",
     kind: "menu",
-    roots: ["/explanation/"],
+    roots: ["/explanation/", "/comparisons/", "/migration/"],
     expandRoot: true,
   },
 ];

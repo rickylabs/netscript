@@ -48,6 +48,8 @@ The draft PR is partial and must say `Part of #1551`. Follow-ups #1645–#1650 o
 | 2026-08-13 | Residual programme split into linked owners. | #1645–#1650, Backlog / Triage, docs labels, exactly one `status:triage`, explicit priority |
 | 2026-08-13 | P0 research/design/plan completed. | exact file slices, risks, decisions, closure semantics, structured gate plan; PLAN-EVAL pending |
 | 2026-08-13 | P0 committed, explicitly pushed, and handed off in draft PR #1652. | commit `75a231053`; canonical body, 0.0.7 milestone, docs CI skips, exactly one `status:plan`, RESEARCH and PLAN comments |
+| 2026-08-15 | Formal PLAN-EVAL cycle 1 reconciled. | fresh native Claude Opus 5/low opposite-family session; `PASS` on `d35cbca30872d1f55118d63437638e93270c2ac3`; evaluator-only commits `9ae97c934` and `a790e91e2`; verdict is external authority, not generator self-certification |
+| 2026-08-15 | S1 authored within the exact six-file content boundary and gated. | build, links, terminology, front matter, prose, and comparison navigation pass; topic-orchestrator correction defers the S3-owned `/migration/` rendered-root assertion without rescope |
 
 ## Gate log
 
@@ -62,7 +64,25 @@ The draft PR is partial and must say `Part of #1551`. Follow-ups #1645–#1650 o
 | Residual ownership | inspect created issues/labels/milestones | #1645–#1650 | PASS | every residual has a Backlog / Triage owner | yes |
 | Plan diff | `git diff --check`; changed-path and lock inspection | P0 artifacts | PASS | eight run-bootstrap/research/plan files only; no lock or product/docs implementation diff | yes |
 | Draft PR metadata | GitHub PR/label/milestone/comment inspection | draft PR #1652 | PASS | draft to `main`; milestone 0.0.7; `type:docs`, `area:docs`, `priority:p2`, both docs CI skips, exactly one `status:plan`; two phase comments | yes |
-| PLAN-EVAL | fresh opposite-family evaluator | research/plan and PR | PENDING | implementation remains blocked | no |
+| PLAN-EVAL | fresh opposite-family evaluator | research/plan and PR | PASS | external evaluator artifact at `plan-eval.md`; evaluated `d35cbca30872d1f55118d63437638e93270c2ac3` | yes, S1 only |
+
+### S1-method-nav
+
+| Gate | Commands / procedure | Scope | Result | Findings | Proceeded |
+| --- | --- | --- | --- | --- | --- |
+| Site build | `rtk proxy deno task --cwd docs/site build` (raw exit `0`) | full rendered docs site | PASS | source format and rendered-output checks pass; 635 files generated, 226 HTML files checked, four documented syntax allowances | yes |
+| Links | `rtk proxy deno task docs:links` (raw exit `0`) | 103 published docs sources | PASS | zero broken links, anchors, or enforced orphans | yes |
+| Terminology | `rtk proxy deno task docs:accuracy` (raw exit `0`) plus prose comparison with `docs/site/glossary.md` | comparison index/methodology and published docs corpus | PASS | evidence, contract, request-scoped resource, presentation, domain, route, mechanism, and framework vocabulary are consistent with the glossary; existing peer-dependency/build-script warnings are non-failing and unrelated | yes |
+| Navigation | inspect the Concepts lane in `docs/site/_site/comparisons/index.html` after the clean build | S1-owned `/comparisons/` and `/comparisons/methodology/` routes | PASS | Comparisons and Comparison methodology render under Concepts; the topic orchestrator corrected the unsatisfiable S1 assertion by deferring `/migration/` to S3, which owns both migration pages and must then assert both roots | yes |
+| Front matter | inspect both new sources and their rendered `<title>`/`<h1>` | comparison index and methodology | PASS | both sources have title and description; rendered pages use `Comparisons` and `Comparison methodology` consistently | yes |
+| Prose and contradictions | compare both new pages with `docs/site/explanation/compared.md`, the approved evidence vocabulary, and the roadmap | changed public prose | PASS | no case-result claim or measured number exists; the broad orientation remains linked and non-contradictory; all six residual issues are linked with descriptive roadmap text | yes |
+| Diff hygiene | `git diff --check` (raw exit `0`) | complete dirty S1 diff | PASS | no whitespace errors | yes |
+| Scope and locks | raw changed-path enumeration; `git diff --exit-code a790e91e26a4fb84636b4f3c57bd6444196b4ca9 -- deno.lock docs/site/deno.lock` (raw exit `0`) | exact S1 baseline through dirty worktree | PASS | the approved six S1 paths plus the specifically authorized `drift.md`; both lockfiles unchanged; no `packages/**`, `plugins/**`, S2, or S3 path | yes |
+
+The topic-orchestrator ruling corrects the plan-acceptance inconsistency without changing scope:
+S1 proves its comparison routes, while S3 inherits the migration-root assertion when it lands the
+S3-owned migration pages. The correction and the PLAN-EVAL miss are recorded append-only in
+`drift.md` with severity `significant`, no rescope, and no scope growth.
 
 ### Planned S3 docs-audit rows
 
@@ -73,8 +93,9 @@ The draft PR is partial and must say `Part of #1551`. Follow-ups #1645–#1650 o
 | Changed-line internal wording | exact diff/`awk`/`rg` command from `plan.md` | added public lines only | NOT RUN | implementation not started | no |
 | Specifier scan | exact versionless `jsr:@netscript` scan from `plan.md` | comparisons and migration trees | NOT RUN | implementation not started | no |
 | Command/API sampling | three `deno doc` commands from `plan.md` | cited builder/defer mechanisms | NOT RUN | implementation not started | no |
-| Navigation/front matter | rendered nav plus front-matter/title/description inspection | five planned public pages | NOT RUN | implementation not started | no |
+| Navigation/front matter | rendered nav plus front-matter/title/description inspection | five planned public pages and both Concepts roots | NOT RUN | S3 inherits the `/migration/` rendered-root assertion and must assert both `/comparisons/` and `/migration/` after its migration pages land | no |
 | Prose | neutral-language/evidence/private-detail review | all changed public prose | NOT RUN | implementation not started | no |
 | Cross-page contradictions | compare broad explanation, methodology, case, migration, builder/defer docs, and matrix rows | related public surfaces | NOT RUN | implementation not started | no |
 
-No S1–S3 implementation gate, release gate, scaffold suite, or E2E suite has been run in this planning turn.
+No S2/S3 implementation gate, release gate, scaffold suite, E2E suite, or expensive-gate lease has
+been run. S1 stops at the completed gate above for topic-orchestrator Tier-A slice review.
