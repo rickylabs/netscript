@@ -1,0 +1,19 @@
+{
+  "source": {
+    "mode": "command",
+    "cwd": "/home/codex/repos/netscript-007-harness-evidence",
+    "exitCode": 2
+  },
+  "selection": {
+    "filesSelected": 3,
+    "batches": 3,
+    "excludedBatches": 3
+  },
+  "summary": {
+    "totalOccurrences": 0,
+    "uniqueOccurrences": 0,
+    "uniqueRules": 0,
+    "uniquePaths": 0
+  },
+  "groups": []
+}

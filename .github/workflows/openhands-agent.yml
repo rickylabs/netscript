@@ -855,36 +855,39 @@ jobs:
             verdict="summary-missing"
           fi
 
-          # Layered agent-verdict extraction. KEEP IN SYNC with verdictOf() in the
-          # "Publish final status comment" step. Tier 1 (strict): literal
-          # OPENHANDS_VERDICT: line, one exact token, alone on its own line, outside
-          # code fences. Template text (e.g. "OPENHANDS_VERDICT: <PASS|FAIL_FIX|...>")
-          # cannot match. Tier 2 (decorated): the same marker line after stripping
-          # markdown decoration and an optional "Verdict:" prefix — models bold the
-          # marker in practice (observed: "**Verdict: OPENHANDS_VERDICT: PASS**",
-          # PR #475); lines containing '<' (placeholders) never match.
+          # Agent-verdict extraction. KEEP IN SYNC with verdictOf() in the
+          # "Publish final status comment" step. Accept one exact token on its own
+          # line outside code fences, optionally wrapped by a blockquote, markdown
+          # heading/emphasis, or "Verdict:" prefix. Template text containing '<'
+          # cannot match. Preserve whether an eligible marker was absent or emitted
+          # with an unparseable token/shape.
           agent_verdict="NONE"
+          agent_verdict_state="absent"
           if [ -s "$OPENHANDS_SUMMARY_PATH" ]; then
             unfenced="$(awk '/^[[:space:]]*(```|~~~)/{fence=!fence; next} !fence' "$OPENHANDS_SUMMARY_PATH")"
-            line="$(printf '%s\n' "$unfenced" \
-              | grep -E '^OPENHANDS_VERDICT:[[:space:]]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN)[[:space:]]*$' \
-              | head -n 1 || true)"
-            if [ -z "$line" ]; then
-              line="$(printf '%s\n' "$unfenced" | grep -v '<' | sed -E 's/[*`]+//g' \
-                | grep -E '^[[:space:]]*(Verdict:?[[:space:]]*)?OPENHANDS_VERDICT:[[:space:]]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN)[[:space:]]*$' \
-                | head -n 1 || true)"
+            eligible="$(printf '%s\n' "$unfenced" | grep -v '<' || true)"
+            if printf '%s\n' "$eligible" | grep -Eq 'OPENHANDS_VERDICT[[:space:]]*:'; then
+              agent_verdict_state="unparseable"
             fi
+            line="$(printf '%s\n' "$eligible" \
+              | grep -E '^[[:space:]]*(>[[:space:]]*)*(#{1,6}[[:space:]]+)?[*_`]*(Verdict[*_`]*[[:space:]]*:?[[:space:]]*[*_`]*)?OPENHANDS_VERDICT[[:space:]]*:[[:space:]]*[*_`]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE)[*_`]*[[:space:]]*$' \
+              | head -n 1 || true)"
             if [ -n "$line" ]; then
-              agent_verdict="$(printf '%s' "$line" | sed -E 's/^.*OPENHANDS_VERDICT:[[:space:]]*//; s/[[:space:]]*$//')"
+              agent_verdict="$(printf '%s' "$line" \
+                | grep -oE 'PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE' \
+                | tail -n 1)"
+              agent_verdict_state="parsed"
             fi
           fi
 
           {
             echo "verdict=$verdict"
             echo "agent_verdict=$agent_verdict"
+            echo "agent_verdict_state=$agent_verdict_state"
             echo "summary_source=$summary_source"
           } >> "$GITHUB_OUTPUT"
-          export RUN_VERDICT="$verdict" AGENT_VERDICT="$agent_verdict" SUMMARY_SOURCE="$summary_source"
+          export RUN_VERDICT="$verdict" AGENT_VERDICT="$agent_verdict" \
+            AGENT_VERDICT_STATE="$agent_verdict_state" SUMMARY_SOURCE="$summary_source"
 
           if [ ! -s "$OPENHANDS_SUMMARY_PATH" ]; then
             {
@@ -939,6 +942,7 @@ jobs:
               "agent_outcome": os.environ["AGENT_OUTCOME"],
               "verdict": os.environ.get("RUN_VERDICT", "unknown"),
               "agent_verdict": os.environ.get("AGENT_VERDICT", "NONE"),
+              "agent_verdict_state": os.environ.get("AGENT_VERDICT_STATE", "absent"),
               "summary_source": os.environ.get("SUMMARY_SOURCE", "none"),
               "model": os.environ["MODEL"],
               "provider": os.environ["PROVIDER"],
@@ -1157,33 +1161,25 @@ jobs:
             const env = process.env;
             const outcome = (v) => v || 'skipped';
 
-            // Layered agent-verdict matcher. KEEP IN SYNC with the awk/grep in
-            // the "Materialize OpenHands trace" step. Tier 1 (strict): literal
-            // line, one exact token, own line, outside code fences. Placeholder/
-            // template text ("OPENHANDS_VERDICT: <PASS|...>", "[VERDICT:
-            // <verdict>]") cannot match, which is the point (observed failure
-            // mode 5). Tier 2 (decorated): same marker line after stripping
-            // markdown decoration and an optional "Verdict:" prefix — models
-            // bold the marker in practice ("**Verdict: OPENHANDS_VERDICT:
-            // PASS**", PR #475); lines containing '<' never match.
+            // Agent-verdict matcher. KEEP IN SYNC with the awk/grep in the
+            // "Materialize OpenHands trace" step. One exact token must occupy its
+            // own line outside code fences; blockquotes, heading/emphasis wrappers,
+            // and an optional "Verdict:" prefix are accepted. Placeholder/template
+            // text containing '<' remains ineligible. The result distinguishes a
+            // genuinely absent marker from an emitted-but-unparseable marker.
             function verdictOf(text) {
               let inFence = false;
-              let decorated = null;
+              let markerSeen = false;
               for (const line of String(text ?? '').split(/\r?\n/)) {
                 if (/^\s*(```|~~~)/.test(line)) { inFence = !inFence; continue; }
-                if (inFence) continue;
-                const m = line.match(
-                  /^OPENHANDS_VERDICT:[ \t]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN)[ \t]*$/,
+                if (inFence || line.includes('<')) continue;
+                if (/OPENHANDS_VERDICT[ \t]*:/.test(line)) markerSeen = true;
+                const match = line.match(
+                  /^[ \t]*(?:>[ \t]*)*(?:#{1,6}[ \t]+)?[*_`]*(?:Verdict[*_`]*[ \t]*:?[ \t]*[*_`]*)?OPENHANDS_VERDICT[ \t]*:[ \t]*[*_`]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE)[*_`]*[ \t]*$/,
                 );
-                if (m) return m[1];
-                if (!decorated && !line.includes('<')) {
-                  const d = line.replace(/[*`]+/g, '').match(
-                    /^[ \t]*(?:Verdict:?[ \t]*)?OPENHANDS_VERDICT:[ \t]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN)[ \t]*$/,
-                  );
-                  if (d) decorated = d[1];
-                }
+                if (match) return { verdict: match[1], state: 'parsed' };
               }
-              return decorated;
+              return { verdict: null, state: markerSeen ? 'unparseable' : 'absent' };
             }
 
             // 1) Summary file (terminal artifact — authoritative when present).
@@ -1199,13 +1195,15 @@ jobs:
                 'See the workflow logs for the failing setup step.',
               ].join('\n');
             }
-            const summaryVerdict = verdictOf(summary);
+            const summaryInspection = verdictOf(summary);
+            const summaryVerdict = summaryInspection.verdict;
 
             // 2) Agent-posted comments created after run start (the dispatch
             // contract asks evaluators to post their verdict comment early, so
             // a budget-cut run can still deliver a verdict this way).
             let commentVerdict = null;
             let commentVerdictUrl = null;
+            let commentVerdictState = 'absent';
             const issueNumber = Number(env.ISSUE_NUMBER || '');
             if (issueNumber) {
               try {
@@ -1220,8 +1218,14 @@ jobs:
                   const body = c.body ?? '';
                   if (String(c.id) === env.TRIGGER_COMMENT_ID) continue; // the trigger itself
                   if (body.includes('<!-- openhands-')) continue; // workflow-owned comments
-                  const v = verdictOf(body);
-                  if (v) { commentVerdict = v; commentVerdictUrl = c.html_url; }
+                  const inspection = verdictOf(body);
+                  if (inspection.verdict) {
+                    commentVerdict = inspection.verdict;
+                    commentVerdictUrl = c.html_url;
+                    commentVerdictState = 'parsed';
+                  } else if (inspection.state === 'unparseable' && !commentVerdict) {
+                    commentVerdictState = 'unparseable';
+                  }
                 }
               } catch (error) {
                 core.warning(`Verdict comment scan failed: ${error.message}`);
@@ -1229,8 +1233,21 @@ jobs:
             }
 
             const verdict = summaryVerdict ?? commentVerdict ?? 'NONE';
-            const verdictSource = summaryVerdict ? 'summary-file' : (commentVerdict ? 'pr-comment' : 'none');
+            const verdictSource = summaryVerdict
+              ? 'summary-file'
+              : commentVerdict
+              ? 'pr-comment'
+              : summaryInspection.state === 'unparseable'
+              ? 'summary-unparseable'
+              : commentVerdictState === 'unparseable'
+              ? 'pr-comment-unparseable'
+              : 'none';
             const verdictMismatch = Boolean(summaryVerdict && commentVerdict && summaryVerdict !== commentVerdict);
+            const verdictDiagnostic = verdictSource === 'none'
+              ? 'Agent emitted no OPENHANDS_VERDICT token.'
+              : verdictSource.endsWith('-unparseable')
+              ? 'Agent emitted an OPENHANDS_VERDICT marker, but its verdict token or line could not be parsed.'
+              : null;
 
             // Heading vocabulary is FROZEN — agentic-lib.ts
             // parseOpenHandsStatusComment maps these exact strings.
@@ -1298,6 +1315,7 @@ jobs:
                 + (verdictMismatch
                   ? ` (MISMATCH: summary=${summaryVerdict}, comment=${commentVerdict}; summary file wins)`
                   : ''),
+              ...(verdictDiagnostic ? [`Verdict diagnostic: ${verdictDiagnostic}`] : []),
             ];
             if (commentVerdictUrl) lines.push(`Verdict comment: ${commentVerdictUrl}`);
             lines.push(`Summary source: ${env.SUMMARY_SOURCE || 'none'}`);

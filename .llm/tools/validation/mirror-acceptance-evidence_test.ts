@@ -2,9 +2,11 @@ import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@1';
 import type { AcceptanceEvidence } from './acceptance-evidence.ts';
 import {
   closingMirrorIssues,
+  formatMirrorReport,
   type MirrorClient,
   mirrorIssue,
   readyLabelRepairNotice,
+  runAcceptanceEvidenceMirror,
 } from './mirror-acceptance-evidence.ts';
 
 Deno.test('ready-label mirror repair reruns CI without moving the evaluated head', () => {
@@ -71,4 +73,115 @@ Deno.test('mirror retries once from a live body after a mid-air edit', async () 
   assertEquals(result.changed, true);
   assertEquals(body, '## Acceptance\n- [x] criterion\n\nconcurrent editor note');
   assertEquals(result.snapshot.updatedAt, '2026-08-03T10:00:02Z');
+});
+
+function dryRunClient(prBody: string, issueBody: string): MirrorClient & { updates: number } {
+  const client: MirrorClient & { updates: number } = {
+    updates: 0,
+    getIssue: (number) =>
+      Promise.resolve({
+        number,
+        title: 'acceptance target',
+        body: issueBody,
+        updated_at: '2026-08-13T20:00:00Z',
+        labels: [],
+      }),
+    getPullRequest: (number) =>
+      Promise.resolve({
+        number,
+        title: 'draft',
+        body: prBody,
+        updated_at: '2026-08-13T20:01:00Z',
+        labels: [{ name: 'status:ready-merge' }],
+        head: { sha: 'abc123' },
+        pull_request: {},
+      }),
+    getComments: () => Promise.resolve([]),
+    updateIssue: () => {
+      client.updates++;
+      return Promise.resolve();
+    },
+    postComment: () => Promise.resolve(),
+  };
+  return client;
+}
+
+Deno.test('empty evidence is a structured block failure rather than a rejected mirror promise', async () => {
+  const client = dryRunClient(
+    `Closes #1561
+
+\`\`\`acceptance-evidence
+issue: 1561
+entries: []
+\`\`\``,
+    '## Acceptance\n- [ ] parser reports empty evidence',
+  );
+
+  const report = await runAcceptanceEvidenceMirror(client, { pr: 1644, dryRun: true }, {
+    evaluatedAt: '2026-08-13T20:02:00Z',
+  });
+
+  assertEquals(report.ok, false);
+  assertEquals(report.changed, []);
+  assertEquals(report.errors.length, 1);
+  assertStringIncludes(report.errors[0], 'Acceptance-evidence block 1 for issue #1561');
+  assertStringIncludes(report.errors[0], 'remove the block');
+  assertEquals(client.updates, 0);
+});
+
+Deno.test('dry-run reports one zero-checkbox verdict before unmatched indices', async () => {
+  const client = dryRunClient(
+    `Closes #1621
+
+\`\`\`acceptance-evidence
+issue: 1621
+entries:
+  - box-index: 1
+    evidence: "focused test receipt"
+  - box-index: 2
+    evidence: "quality-job receipt"
+\`\`\``,
+    '## Acceptance\n- plain bullet one\n- plain bullet two',
+  );
+
+  const report = await runAcceptanceEvidenceMirror(client, { pr: 1644, dryRun: true }, {
+    evaluatedAt: '2026-08-13T20:02:00Z',
+  });
+  const rendered = formatMirrorReport(report);
+
+  assertEquals(report.ok, false);
+  assertEquals(report.errors, [
+    'Issue #1621 has zero close-gated markdown checkboxes; remove its acceptance-evidence block or convert the issue acceptance list to markdown checkboxes.',
+  ]);
+  assertStringIncludes(rendered, 'acceptance-mirror DRY-RUN: FAILED');
+  assertStringIncludes(rendered, 'zero close-gated markdown checkboxes');
+  assertEquals(rendered.includes('box-index 1'), false);
+  assertEquals(rendered.includes('box-index 2'), false);
+  assertEquals(client.updates, 0);
+});
+
+Deno.test('mirror reports an unmatched index without rejecting or mutating', async () => {
+  const client = dryRunClient(
+    `Closes #1561
+
+\`\`\`acceptance-evidence
+issue: 1561
+entries:
+  - box-index: 1
+    evidence: "focused test receipt"
+  - box-index: 2
+    evidence: "index does not exist"
+\`\`\``,
+    '## Acceptance\n- [ ] parser reports authoring failures',
+  );
+
+  const report = await runAcceptanceEvidenceMirror(client, { pr: 1644, dryRun: true }, {
+    evaluatedAt: '2026-08-13T20:02:00Z',
+  });
+
+  assertEquals(report.ok, false);
+  assertEquals(report.errors, [
+    'Issue #1561: no acceptance box matched box-index 2; add an entry for box "#2" using exact trimmed text or its current box-index.',
+  ]);
+  assertEquals(client.updates, 0);
 });

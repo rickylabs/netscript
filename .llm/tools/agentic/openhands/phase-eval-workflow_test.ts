@@ -232,6 +232,55 @@ Deno.test('generic OpenHands delegates comment authorization to the tested polic
   assert(!workflow.includes("line.includes('@openhands-agent')"));
 });
 
+Deno.test('generic OpenHands reports wrapped, absent, and unparseable verdict markers distinctly', async () => {
+  const workflow = await Deno.readTextFile('.github/workflows/openhands-agent.yml');
+  const functionStart = workflow.indexOf('            function verdictOf(text) {');
+  const functionEnd = workflow.indexOf('\n\n            // 1) Summary file', functionStart);
+  assert(functionStart >= 0 && functionEnd > functionStart, 'embedded verdictOf source is present');
+  const functionSource = workflow.slice(functionStart, functionEnd).replace(/^ {12}/gm, '');
+  const verdictOf = new Function(`"use strict"; ${functionSource}; return verdictOf;`)() as (
+    text: string,
+  ) => { verdict: string | null; state: 'parsed' | 'absent' | 'unparseable' };
+
+  assertEquals(verdictOf('OPENHANDS_VERDICT: PASS'), { verdict: 'PASS', state: 'parsed' });
+  assertEquals(verdictOf('## **OPENHANDS_VERDICT: FAIL_FIX**'), {
+    verdict: 'FAIL_FIX',
+    state: 'parsed',
+  });
+  assertEquals(verdictOf('No marker was emitted.'), { verdict: null, state: 'absent' });
+  assertEquals(verdictOf('## OPENHANDS_VERDICT: APPROVED'), {
+    verdict: null,
+    state: 'unparseable',
+  });
+
+  const shellMatcherLine = workflow.split('\n').find((line) =>
+    line.includes("| grep -E '") && line.includes('OPENHANDS_VERDICT')
+  );
+  assert(shellMatcherLine, 'trace step shell verdict matcher is present');
+  const shellPattern = shellMatcherLine.slice(
+    shellMatcherLine.indexOf("grep -E '") + "grep -E '".length,
+    shellMatcherLine.lastIndexOf("'"),
+  );
+  const shellEquivalent = new RegExp(shellPattern.replaceAll('[[:space:]]', '\\s'));
+  assert(shellEquivalent.test('OPENHANDS_VERDICT: PASS'));
+  assert(shellEquivalent.test('## **OPENHANDS_VERDICT: FAIL_FIX**'));
+  assert(!shellEquivalent.test('## OPENHANDS_VERDICT: APPROVED'));
+
+  assertStringIncludes(workflow, 'agent_verdict_state="absent"');
+  assertStringIncludes(workflow, 'agent_verdict_state="unparseable"');
+  assertStringIncludes(workflow, 'agent_verdict_state="parsed"');
+  assertStringIncludes(workflow, 'agent_verdict_state=$agent_verdict_state');
+  assertStringIncludes(workflow, '"agent_verdict_state": os.environ.get(');
+  assertStringIncludes(workflow, "'summary-unparseable'");
+  assertStringIncludes(workflow, "'pr-comment-unparseable'");
+  assertStringIncludes(workflow, 'Agent emitted no OPENHANDS_VERDICT token.');
+  assertStringIncludes(
+    workflow,
+    'Agent emitted an OPENHANDS_VERDICT marker, but its verdict token or line could not be parsed.',
+  );
+  assertStringIncludes(workflow, '(?:#{1,6}[ \\t]+)?');
+});
+
 Deno.test('formal evaluator prompts are trusted read-only harness contracts', async () => {
   for (
     const path of [
