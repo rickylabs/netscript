@@ -28,3 +28,9 @@ six-Fable route: every still-required formal gate remains fresh, separate, oppos
 serial, but starts on the least-cost assigned Sonnet route. Fable is escalation-only after concrete
 failure evidence and a new recorded coordinator amendment. No paused leaf resumes merely because
 the clock reset; its exact head, hold, lease, CI, and formal gate must be re-established first.
+
+All four historical Codex topic controllers are now durably parked: docs had no live session;
+internals/fixes/features returned `TOPIC_CONTROLLER_PARKED`, are idle, and left clean worktrees.
+Launch replacements through native Claude 2.1.231 with explicit `--model claude-sonnet-5 --effort
+low --remote-control`, the exact initial brief, and bypass permissions. The hybrid wrapper is not
+needed unless a later task explicitly authorizes its alternate-worker delegation surface.

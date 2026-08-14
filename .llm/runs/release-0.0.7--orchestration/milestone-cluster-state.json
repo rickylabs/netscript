@@ -16,6 +16,17 @@
     {
       "id": "docs",
       "orchestratorAgentId": "topic-docs-0.0.7",
+      "controller": {
+        "runtime": "claude",
+        "state": "pending_attachment",
+        "worktree": "/home/codex/repos/netscript-007-docs",
+        "branch": "orchestrator/release-0.0.7-docs",
+        "requestedModel": "claude-sonnet-5",
+        "requestedEffort": "low",
+        "remoteControlRequired": true,
+        "legacyCodexThreadId": "019ffcc0-e19b-71d1-95ce-8c72559eb026",
+        "legacyState": "parked_offline"
+      },
       "issueNumbers": [
         1551
       ]
@@ -23,6 +34,17 @@
     {
       "id": "internals",
       "orchestratorAgentId": "topic-internals-0.0.7",
+      "controller": {
+        "runtime": "claude",
+        "state": "pending_attachment",
+        "worktree": "/home/codex/repos/netscript-007-internals",
+        "branch": "orchestrator/release-0.0.7-internals",
+        "requestedModel": "claude-sonnet-5",
+        "requestedEffort": "low",
+        "remoteControlRequired": true,
+        "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
+        "legacyState": "parked_idle"
+      },
       "issueNumbers": [
         1296,
         1378,
@@ -45,6 +67,17 @@
     {
       "id": "fixes",
       "orchestratorAgentId": "topic-fixes-0.0.7",
+      "controller": {
+        "runtime": "claude",
+        "state": "pending_attachment",
+        "worktree": "/home/codex/repos/netscript-007-fixes",
+        "branch": "orchestrator/release-0.0.7-fixes",
+        "requestedModel": "claude-sonnet-5",
+        "requestedEffort": "low",
+        "remoteControlRequired": true,
+        "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
+        "legacyState": "parked_idle"
+      },
       "issueNumbers": [
         1093,
         1112,
@@ -77,6 +110,17 @@
     {
       "id": "features",
       "orchestratorAgentId": "topic-features-0.0.7",
+      "controller": {
+        "runtime": "claude",
+        "state": "pending_attachment",
+        "worktree": "/home/codex/repos/netscript-007-features",
+        "branch": "orchestrator/release-0.0.7-features",
+        "requestedModel": "claude-sonnet-5",
+        "requestedEffort": "low",
+        "remoteControlRequired": true,
+        "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
+        "legacyState": "parked_idle"
+      },
       "issueNumbers": [
         1293,
         1348,
@@ -474,5 +518,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-13T23:25:00.000Z"
+  "updatedAt": "2026-08-14T22:20:00.000Z"
 }

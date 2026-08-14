@@ -120,16 +120,22 @@ native Remote Control, and launcher evidence; implementation remains delegated t
 
 | Lane | Preserved Codex topic thread | Pre-transition state | Claude requested route | Worktree / branch | Replacement identity |
 | --- | --- | --- | --- | --- | --- |
-| docs | `019ffcc0-e19b-71d1-95ce-8c72559eb026` | absent/offline; park recorded | native Claude · Sonnet 5 · low | `/home/codex/repos/netscript-007-docs` / `orchestrator/release-0.0.7-docs` | pending attachment proof |
-| internals | `019ffcc0-e1b5-74f0-96eb-cdeb298d6b17` | stalled over 24h; park required | native Claude · Sonnet 5 · low | `/home/codex/repos/netscript-007-internals` / `orchestrator/release-0.0.7-internals` | pending attachment proof |
-| fixes | `019ffcc0-e1ae-7b70-b3b8-8804ebd6f773` | stalled over 25h; park required | native Claude · Sonnet 5 · low | `/home/codex/repos/netscript-007-fixes` / `orchestrator/release-0.0.7-fixes` | pending attachment proof |
-| features | `019ffcc0-e1d2-7850-a308-354b670c6f3d` | stalled over 24h; park required | native Claude · Sonnet 5 · low | `/home/codex/repos/netscript-007-features` / `orchestrator/release-0.0.7-features` | pending attachment proof |
+| docs | `019ffcc0-e19b-71d1-95ce-8c72559eb026` | parked: prior controller absent/offline; clean worktree | native Claude · Sonnet 5 · low | `/home/codex/repos/netscript-007-docs` / `orchestrator/release-0.0.7-docs` | pending attachment proof |
+| internals | `019ffcc0-e1b5-74f0-96eb-cdeb298d6b17` | parked: `TOPIC_CONTROLLER_PARKED`, idle, clean | native Claude · Sonnet 5 · low | `/home/codex/repos/netscript-007-internals` / `orchestrator/release-0.0.7-internals` | pending attachment proof |
+| fixes | `019ffcc0-e1ae-7b70-b3b8-8804ebd6f773` | parked: `TOPIC_CONTROLLER_PARKED`, idle, clean | native Claude · Sonnet 5 · low | `/home/codex/repos/netscript-007-fixes` / `orchestrator/release-0.0.7-fixes` | pending attachment proof |
+| features | `019ffcc0-e1d2-7850-a308-354b670c6f3d` | parked: `TOPIC_CONTROLLER_PARKED`, idle, clean | native Claude · Sonnet 5 · low | `/home/codex/repos/netscript-007-features` / `orchestrator/release-0.0.7-features` | pending attachment proof |
 
 No replacement is considered active until the previous controller is durably parked and the new
 process has a Claude session ID, non-empty `bridgeSessionId`, PID, exact cwd, process-argv
 model/effort evidence, and owner-visible Remote Control URL/state. Blank or inherited model settings
-are forbidden; the installed user default is Opus/high, so the agentic launcher must pass the
-selected model and effort explicitly.
+are forbidden; the installed user default is Opus/high, so the documented native Claude CLI route
+must pass the selected model, effort, Remote Control, and initial brief explicitly.
+
+Parking proof was completed at `2026-08-14T22:18:41Z`. The three extant Codex threads received the
+same no-edit same-thread parking instruction through `agentic:codex-resume`, returned exactly
+`TOPIC_CONTROLLER_PARKED`, reached `idle`, and left their worktrees clean at the preserved heads.
+The docs topic had no live session or process and was already clean/offline. No topic controller,
+leaf, evaluator, watcher, or resource process now owns any of the four topic worktrees.
 
 ### Corrected evaluator matrix
 
