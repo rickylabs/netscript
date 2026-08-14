@@ -67,9 +67,48 @@ reserved for shared resource-heavy E2E/Aspire gates.
 | `bridgeSessionId` | `session_01LmSFUzxkHGuH98fiDhgHxH` (non-empty) |
 | Remote Control URL | `https://claude.ai/code/session_01LmSFUzxkHGuH98fiDhgHxH` |
 | Generator separation | fresh session; the generator is Codex thread `019ffcca-8bdc-7fb3-98c5-df90e2ae3b1f` (idle, not resumed). Opposite-family and fresh-session invariants hold. |
-| Evaluator result | _pending_ |
+| Evaluator result | **PASS** — `a949a6cd1777b0d05b1a3b45143de15951aa6dc2 docs(harness): record legacy port pin sweep IMPL-EVAL PASS`, evaluated head `e6ba15ec6414c0a42b1f9870791131162ea71c36` (= the verdict commit's parent), artifact `.llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0/evaluate.md`, pushed to `origin/fix/legacy-port-pin-sweep`, one structured PR comment posted `2026-08-14T23:20:27Z`. Session terminal (`state: done`, 17 753 tokens). |
 
-Launched `2026-08-14T23:16:24Z`. No other gate or implementation turn was started with this grant.
+Launched `2026-08-14T23:16:24Z`; terminal `2026-08-14T23:20:50Z`. No other gate or implementation
+turn was started with this grant.
+
+### Topic Tier-A verification of the verdict (not a re-evaluation)
+
+The verdict was not accepted on its headline. Six checkable claims were re-derived independently in
+the leaf worktree; all six hold:
+
+| Claim | Independent check | Result |
+| --- | --- | --- |
+| Evaluated head is the immutable dispatch head | `git rev-parse a949a6cd1^` | `e6ba15ec6414c0a42b1f9870791131162ea71c36` — matches |
+| Verdict commit carries only `evaluate.md` | `git show --stat a949a6cd1` | 1 file, +161, no other path |
+| Product delta is exactly the two authorized files | `git diff --name-status 01e096049..e6ba15ec6 -- . ':(exclude).llm/**'` | only `auth-plugin-command.ts` + `auth-plugin-command_test.ts` |
+| `deno.lock` untouched | `git diff --name-only 01e096049..e6ba15ec6 -- deno.lock` | empty |
+| Receipts still describe the evaluated tree | `git diff --name-only 6242edabc..e6ba15ec6 -- . ':(exclude).llm/**'` | empty — no product file changed after the receipt head |
+| No silent `4437` default; guard precedes the adapter | read `auth-plugin-command.ts` | `--stream-url <url:string>` at L110 declares no `default:`; guard at L115 precedes `dependencies.sessions.list` at L122; the only `4437` is the error string at L117 |
+
+Finding **N1** was also confirmed against source rather than taken on report: L138 still carries
+`default: 'http://localhost:8094/api/v1/auth'` on `session revoke --auth-url`. It is genuinely
+outside the #1243 narrowing and was correctly not swept, but it is the same pin class in the same
+file and needs a follow-up issue so it is tracked. Filing that issue is the coordinator's call; this
+lane did not file it.
+
+Two identity fields in the evaluator's self-report differ from the durable registry and are
+corrected here — non-blocking, and the attachment invariant is satisfied either way:
+
+- It reported PID `2464105` (its inner worker process, since exited). The durable registry PID that
+  satisfies the invariant is `2450732`, matching cwd and `jobId` in `~/.claude/sessions/2450732.json`.
+- It reported bridge id `cse_01LmSFUzxkHGuH98fiDhgHxH`; the registry records
+  `bridgeSessionId: session_01LmSFUzxkHGuH98fiDhgHxH` (same suffix, in-session vs registry prefix).
+  The registry value is authoritative and non-empty.
+
+Session id, cwd, and requested/observed route match exactly. The evaluator independently flagged the
+same lane-route deviation this topic recorded in `drift.md` (leaf-local `supervisor.md` still names
+Fable 5 / medium for `formal_impl_evaluation`) and did not silently substitute.
+
+**Verdict authority boundary.** `PASS` clears the IMPL-EVAL gate at this head only. It does not
+authorize ready transition, merge, issue closure, relabeling, publication, or an expensive gate —
+all of which remain coordinator-only. PR #1643 is unchanged: `OPEN`, draft, `MERGEABLE`, single
+`status:impl` label, milestone `0.0.7`, base `main`.
 
 ## Wave 0 lane assignments
 

@@ -22,14 +22,22 @@ Both leaves are **held**, clean, and at exactly their dispatch heads. Both attac
 are idle at `task_complete`. Nothing may resume until the coordinator grants the specific serial
 dispatch order.
 
-- `legacy-port-pin-sweep` (#1243, PR #1643, `status:impl`): implemented and Tier-A reviewed at
-  `e6ba15ec6414c0a42b1f9870791131162ea71c36`. Product diff is `plugins/auth/auth-plugin-command.ts`
-  plus its test; manifest/copy port fields were deliberately retained as compatibility metadata.
-  Blocked only on **dispatch order 2** — fresh native Claude · Opus 5 · low IMPL-EVAL.
+- `legacy-port-pin-sweep` (#1243, PR #1643, `status:impl`): **order 2 IMPL-EVAL returned `PASS`** at
+  evaluated head `e6ba15ec6414c0a42b1f9870791131162ea71c36`; verdict commit `a949a6cd1` is pushed and
+  the branch head is now `a949a6cd1`. Product diff is `auth-plugin-command.ts` plus its test;
+  manifest/copy port fields were deliberately retained as coordinator-classified compatibility
+  metadata. The `PASS` clears the gate at that head only — ready transition, merge, issue closure,
+  relabeling, and publication stay coordinator-only, and this lane took none of them. Open follow-up
+  for the coordinator: evaluator finding **N1**, the residual
+  `session revoke --auth-url` → `http://localhost:8094/api/v1/auth` default, same pin class as #1243
+  but outside its narrowing; it needs its own issue.
 - `scaffold-generated-output-correctness` (#1262, #1263, #1588, PR #1654, `status:plan-eval`):
   artifact-only at `14d8b38b4db7ba0635cbbcac2f8cd8903bee0ec9`, no product code, contract seams
-  amended by the coordinator. Blocked only on **dispatch order 5** — fresh native Claude · Opus 5 ·
-  medium PLAN-EVAL cycle 1. Only an unqualified `PASS` lets the implementation thread resume.
+  amended by the coordinator. Blocked on **dispatch order 5** — fresh native Claude · Opus 5 ·
+  medium PLAN-EVAL cycle 1. Order 2 is now terminal, so the per-orchestrator serialization no longer
+  blocks it, but it is **not launched**: the reset contract requires an explicit coordinator grant
+  per gate, and the order-2 grant explicitly barred any other gate. Only an unqualified `PASS` lets
+  the implementation thread resume.
 
 Both 2026-08-13 "coordinator decision required" blockers are resolved; see `worklog.md`.
 
