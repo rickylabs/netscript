@@ -25,11 +25,12 @@ import { doctorPlugin } from '../doctor/doctor-plugin-use-case.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 
 const HEALTHY_MODULE_PROCESS: ProcessPort = {
-  exec: () => Promise.resolve({
-    code: 0,
-    stdout: 'NETSCRIPT_PLUGIN_MANIFEST_PROBE={"status":"resolved"}\n',
-    stderr: '',
-  }),
+  exec: () =>
+    Promise.resolve({
+      code: 0,
+      stdout: 'NETSCRIPT_PLUGIN_MANIFEST_PROBE={"status":"resolved"}\n',
+      stderr: '',
+    }),
 };
 
 Deno.test('auth backend set reconciles .env and show reports the active backend', async () => {
@@ -46,7 +47,10 @@ Deno.test('auth backend set reconciles .env and show reports the active backend'
 
 Deno.test('auth backend show reads the service-supported appsettings seam', async () => {
   const fs = new MemoryFileSystemAdapter();
-  await fs.writeFile('/workspace/appsettings.json', JSON.stringify({ Auth: { Backend: 'workos' } }));
+  await fs.writeFile(
+    '/workspace/appsettings.json',
+    JSON.stringify({ Auth: { Backend: 'workos' } }),
+  );
   assertEquals(await showAuthBackend('/workspace', fs), 'workos');
 });
 
@@ -58,22 +62,26 @@ Deno.test('plugin doctor reports the configured active auth backend', async () =
     fs,
     process: HEALTHY_MODULE_PROCESS,
     loadConfig: () => Promise.resolve({ plugins: ['auth'] } as never),
-    loadRegisteredPlugins: () => Promise.resolve({
-      auth: {
-        name: 'auth',
-        source: {
-          kind: 'local-workdir',
-          configuredSpecifier: './auth/mod.ts',
-          resolvedSpecifier: 'file:///workspace/auth/mod.ts',
-          workdir: 'auth',
-          rootDir: '/workspace/auth',
+    loadRegisteredPlugins: () =>
+      Promise.resolve({
+        auth: {
+          name: 'auth',
+          source: {
+            kind: 'local-workdir',
+            configuredSpecifier: './auth/mod.ts',
+            resolvedSpecifier: 'file:///workspace/auth/mod.ts',
+            workdir: 'auth',
+            rootDir: '/workspace/auth',
+          },
+          permissions: ['--allow-env'],
+          cli: { doctorChecks: ['auth-backend'] },
         },
-        permissions: ['--allow-env'],
-        cli: { doctorChecks: ['auth-backend'] },
-      },
-    }),
+      }),
   });
-  assertEquals(reports[0].checks.find((check) => check.id === 'auth-backend')?.message, 'better-auth');
+  assertEquals(
+    reports[0].checks.find((check) => check.id === 'auth-backend')?.message,
+    'better-auth',
+  );
 });
 
 Deno.test('github provider preset writes boot-ready OAuth environment', async () => {
@@ -91,7 +99,10 @@ Deno.test('github provider preset writes boot-ready OAuth environment', async ()
   const env = await fs.readFile('/workspace/.env');
   assertMatch(env, /NETSCRIPT_AUTH_BACKEND=kv-oauth/);
   assertMatch(env, /NETSCRIPT_AUTH_PROVIDER_ID=github/);
-  assertMatch(env, /NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT=https:\/\/github.com\/login\/oauth\/authorize/);
+  assertMatch(
+    env,
+    /NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT=https:\/\/github.com\/login\/oauth\/authorize/,
+  );
   assertMatch(env, /NETSCRIPT_AUTH_CLIENT_SECRET=client-secret/);
   assertMatch(env, new RegExp(`NETSCRIPT_AUTH_KV_OAUTH_KEY=${kvOAuthKey}`));
   const appsettings = JSON.parse(await fs.readFile('/workspace/appsettings.json'));
@@ -119,7 +130,11 @@ Deno.test('workos and better-auth variants enforce their boot credential contrac
   }, fs);
   assertMatch(await fs.readFile('/workspace/.env'), /WORKOS_COOKIE_PASSWORD=cookie-secret/);
 
-  await setAuthProvider({ projectRoot: '/workspace', preset: 'better-auth', secret: 'better-secret' }, fs);
+  await setAuthProvider({
+    projectRoot: '/workspace',
+    preset: 'better-auth',
+    secret: 'better-secret',
+  }, fs);
   assertMatch(await fs.readFile('/workspace/.env'), /BETTER_AUTH_SECRET=better-secret/);
   await assertRejects(
     () => setAuthProvider({ projectRoot: '/workspace', preset: 'workos' }, fs),
@@ -151,13 +166,15 @@ Deno.test('session projection parser exposes active sessions', () => {
 
 Deno.test('fetch session adapter lists projections and revokes through signout', async () => {
   const requests: Request[] = [];
-  const client = new FetchAuthSessionHttp(async (input, init) => {
+  const client = new FetchAuthSessionHttp((input, init) => {
     const request = new Request(input, init);
     requests.push(request);
     if (request.method === 'POST') {
-      return Response.json({ signedOut: true, sessionId: 'session-1' });
+      return Promise.resolve(Response.json({ signedOut: true, sessionId: 'session-1' }));
     }
-    return Response.json([{ id: 'session-1', state: 'active', userId: 'user-1' }]);
+    return Promise.resolve(
+      Response.json([{ id: 'session-1', state: 'active', userId: 'user-1' }]),
+    );
   });
   assertEquals((await client.list('http://streams/auth/sessions'))[0].id, 'session-1');
   assertEquals(await client.revoke('http://auth/api/v1/auth', 'session-1'), 'session-1');
@@ -169,11 +186,15 @@ Deno.test('plugin auth parser drives backend and session verbs', async () => {
   const fs = new MemoryFileSystemAdapter();
   const output: string[] = [];
   const regenerated: string[] = [];
+  const listedUrls: string[] = [];
   const sessions: AuthSessionHttpPort = {
-    list: () => Promise.resolve([
-      { id: 'active-1', state: 'active', userId: 'user-1' },
-      { id: 'old-1', state: 'revoked', userId: 'user-1' },
-    ]),
+    list: (url) => {
+      listedUrls.push(url);
+      return Promise.resolve([
+        { id: 'active-1', state: 'active', userId: 'user-1' },
+        { id: 'old-1', state: 'revoked', userId: 'user-1' },
+      ]);
+    },
     revoke: (_url, id) => Promise.resolve(id),
   };
   const command = createAuthPluginCommand({
@@ -188,7 +209,12 @@ Deno.test('plugin auth parser drives backend and session verbs', async () => {
   });
 
   await command.parse(['backend', 'set', 'kv-oauth', '--project-root', '/workspace']);
-  await command.parse(['session', 'list']);
+  await command.parse([
+    'session',
+    'list',
+    '--stream-url',
+    'http://streams.test/auth/sessions',
+  ]);
   await command.parse(['session', 'revoke', 'active-1']);
   assertEquals(output, [
     'kv-oauth',
@@ -197,6 +223,30 @@ Deno.test('plugin auth parser drives backend and session verbs', async () => {
     'Revoked active-1.',
   ]);
   assertEquals(regenerated, ['/workspace']);
+  assertEquals(listedUrls, ['http://streams.test/auth/sessions']);
+});
+
+Deno.test('session list fails loudly when the stream URL is omitted', async () => {
+  let listCalls = 0;
+  const command = createAuthPluginCommand({
+    fs: new MemoryFileSystemAdapter(),
+    sessions: {
+      list: () => {
+        listCalls++;
+        return Promise.resolve([]);
+      },
+      revoke: (_url, id) => Promise.resolve(id),
+    },
+    resolveProjectRoot: () => Promise.resolve('/workspace'),
+  });
+
+  await assertRejects(
+    () => command.parse(['session', 'list']),
+    Error,
+    'Run `aspire describe streams --format Json`, append `/auth/sessions` to the streams ' +
+      'HTTP endpoint, and pass it with `--stream-url`.',
+  );
+  assertEquals(listCalls, 0);
 });
 
 Deno.test('session CLI lists a signed-in backend session and revoke invalidates it', async () => {
@@ -238,7 +288,12 @@ Deno.test('session CLI lists a signed-in backend session and revoke invalidates 
     resolveProjectRoot: () => Promise.resolve('/workspace'),
     print: (line) => output.push(line),
   });
-  await command.parse(['session', 'list']);
+  await command.parse([
+    'session',
+    'list',
+    '--stream-url',
+    'http://streams.test/auth/sessions',
+  ]);
   await command.parse(['session', 'revoke', id]);
 
   assertMatch(output[1], new RegExp(id));
