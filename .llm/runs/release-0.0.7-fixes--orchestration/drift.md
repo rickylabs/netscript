@@ -2,6 +2,16 @@
 
 No implementation or scope drift is accepted.
 
+## 2026-08-15 reset reconciliation — no drift found
+
+The Claude replacement topic orchestrator verified both leaf worktrees, both draft PR heads
+(`gh pr view 1643/1654 --json headRefOid,state,isDraft,mergeable`), and local `git log`/`git
+status` against coordinator `briefs/reset-gates/dispatch.json` and this session's exact brief.
+Legacy leaf head `e6ba15ec6414c0a42b1f9870791131162ea71c36` (dispatch order 2) and scaffold leaf
+head `14d8b38b4db7ba0635cbbcac2f8cd8903bee0ec9` (dispatch order 5) match exactly; both worktrees
+are clean; both PRs are open/mergeable at those heads. No fact differs from the central dispatch
+set, so nothing is reported to the coordinator as drift.
+
 ## Observed metadata inconsistency (non-blocking for this lane)
 
 The frozen dependency DAG node for #1360 still says `lane: fixes`, while the approved plan, topic
