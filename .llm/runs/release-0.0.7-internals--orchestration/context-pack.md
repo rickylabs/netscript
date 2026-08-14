@@ -28,17 +28,24 @@ dispatch base and `milestone-cluster-state.json` `currentMainSha`.
 
 1. **#1644 `harness-evidence-and-verdict-tooling`** — issues #1561 + #1563 + #1621; worktree
    `/home/codex/repos/netscript-007-harness-evidence`; branch
-   `fix/harness-evidence-and-verdict-tooling`; head `4d9fb196765cbf1a6bc7eaa7c18ec82b237ab89f`;
-   implementation parent `634b257ea1afcedb2d7f1da486d8c9e9432a2a86`; Codex thread
-   `019ffcc9-97ba-7770-a890-a1ebd80ec793` (Sol/medium, parked). `status:impl`. S1/S2/S3 Tier-A PASS;
-   final `check`/`test`/`quality-job` receipts all PASS at the implementation parent. Awaiting
-   **IMPL-EVAL, dispatch order 1**.
+   `fix/harness-evidence-and-verdict-tooling`; Codex thread `019ffcc9-97ba-7770-a890-a1ebd80ec793`
+   (Sol/medium, parked). **Dispatch order 1 is TERMINAL: IMPL-EVAL `PASS`** against evaluated head
+   `4d9fb196765cbf1a6bc7eaa7c18ec82b237ab89f` (implementation parent
+   `634b257ea1afcedb2d7f1da486d8c9e9432a2a86`), evaluator commit
+   `d6e6a6788cd38127f822d192f37557106dad4ebc`, session `1afc9054-cc28-48a8-9fc4-86ae2e3bb28d`. PR
+   left draft at `status:impl`. **Head moved**: the branch/PR head is now `d6e6a6788`, whose only
+   delta over the evaluated head is the evaluator's `evaluate.md`. Any merge-readiness step must
+   reconcile that delta explicitly, since the verdict names `4d9fb1967`, not the current head.
+   Remaining steps (draft→ready, green CI, DoD/acceptance mirror, `status:ready-merge`) are
+   coordinator-owned.
 2. **#1653 `quality-scan-allowance-rail`** — issues #1378 + #1545, inseparable; worktree
    `/home/codex/repos/netscript-007-quality-rail`; branch `chore/quality-scan-allowance-rail`; head
    `09dfb092dccf7f843b9270295047d674a8187362`; Codex thread `019ffcc9-97d6-7602-bb7d-582ecc92b069`
    (Sol/high, parked). `status:plan-eval`. All four prior `FAIL_PLAN` blockers were
-   coordinator-resolved on 2026-08-13T23:53Z; that verdict is advisory only. Awaiting **PLAN-EVAL
-   cycle 2, dispatch order 4**.
+   coordinator-resolved on 2026-08-13T23:53Z; that verdict is advisory only. **PLAN-EVAL cycle 2
+   (dispatch order 4) is LIVE** — session `b6c48f02-cb56-4dae-abfd-e46bdec05bd5`, Opus 5/medium,
+   Remote Control `https://claude.ai/code/session_01Et9Y4vPf8i9ZMTwiqykvXr`. Do not resume
+   implementation or open another gate until it is terminal.
 
 Same-thread steering commands are in `worklog.md` and each leaf's `codex-thread-ids.md`. Never fire
 a second `send-message-v2` at a leaf worktree; resume the recorded thread.
@@ -53,11 +60,16 @@ a second `send-message-v2` at a leaf worktree; resume the recorded thread.
 - The launcher never proved Codex Remote Control for the leaf threads; the recorded app-server
   threads are the steering surface. Do not claim mobile-visible Codex Remote Control for them.
 
+## Evaluator queue rule (owner correction, coordinator head `168715e27`)
+
+Evaluator queues are serial **per topic**, not globally. Internals runs at most one gate at a time;
+other topics may evaluate concurrently. Order 1 is closed, so order 4 is this lane's single active
+gate.
+
 ## Next action
 
-The order-1 IMPL-EVAL handoff for #1644 is prepared and **not launched**. Launch authority is
-`briefs/reset-gates/harness-evidence-and-verdict-tooling.md` (native Claude `claude-opus-5`, effort
-`medium`, `/remote-control` on) — **not** the leaf's `impl-eval-request.md`, which still names the
-pre-reset Fable 5 route. Launch only after the coordinator grants the global singleton evaluator
-lease. That lease is currently free: all six leaves carry `evaluatorAgentId: null`, `expensiveGates`
-is empty, and the release captain is inactive.
+Dispatch order 4 (#1653 PLAN-EVAL cycle 2) is live and not yet terminal. Do not resume leaf
+implementation and do not open another gate until it returns `PASS` or `FAIL_PLAN`. On terminal:
+journal the verdict, evaluated head, evaluator commit, and PR comment id here and in `worklog.md`,
+then report to the coordinator. A `FAIL_PLAN` is cycle 2 of the two-failure limit — a third cycle
+requires escalation, not another mechanical relaunch.
