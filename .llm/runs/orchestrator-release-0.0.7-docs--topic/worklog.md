@@ -60,3 +60,78 @@ Actions deliberately **not** taken: no leaf launch or resume, no evaluator launc
 edit, no PR/issue/label mutation, no ready transition, no merge, no cluster-state mutation, no
 release-writer lease. Dispatch order 6 has not been granted, and the cluster's global evaluator
 concurrency is 1.
+
+## 2026-08-15 — dispatch order 6 granted; PLAN-EVAL cycle 1 launched
+
+Grant verified at coordinator head `168715e2710f846fb20562627bbf84ecb1c780fc`
+(`chore(harness): scope evaluator queues per topic`). The amendment changes `dispatch.json` from
+`concurrency: 1` to `concurrency: 4` with `concurrencyScope: per-topic-orchestrator` and
+`perOrchestratorConcurrency: 1`; the coordinator drift entry `2026-08-14T23:13:20Z` records that
+cluster-wide serialization was a mis-encoding and that formal evaluator leases no longer consume
+`expensiveGates`. Docs order 6 may therefore run alongside the other topics. This lane still runs
+exactly one evaluator at a time.
+
+Immutable head re-verified before launch, independently of the parked record:
+
+| Check                                   | Value                                      |
+| --------------------------------------- | ------------------------------------------ |
+| local `HEAD`                            | `d35cbca30872d1f55118d63437638e93270c2ac3` |
+| `origin/docs/comparison-docs-programme` | `d35cbca30872d1f55118d63437638e93270c2ac3` |
+| PR #1652 head                           | `d35cbca30872d1f55118d63437638e93270c2ac3` |
+| `git status --porcelain`                | empty (clean)                              |
+| merge-base with `main`                  | `01e0960494c95ce56eb35892c211a095eb13e6ed` |
+
+All four agree with dispatch order 6. No mismatch; the gate was allowed to proceed.
+
+### Evaluator identity (attachment proved, not inferred)
+
+| Field                | Value                                                                                                               |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Role                 | formal PLAN-EVAL cycle 1, `comparison-docs-programme` / PR #1652                                                    |
+| Requested route      | native Claude · Opus 5 · effort **low** · Remote Control · bypassPermissions                                        |
+| Observed route       | `respawnFlags`: `--model claude-opus-5 --effort low --remote-control --permission-mode bypassPermissions`           |
+| Observed runtime     | session banner reports `Opus 5 with low effort · Claude Max`                                                        |
+| Route verdict        | **matched**                                                                                                         |
+| Claude session id    | `40a06314-b69a-4ca0-a4a0-1224c5e377ca`                                                                              |
+| Job id               | `40a06314`                                                                                                          |
+| PID                  | `2465471`                                                                                                           |
+| Exact cwd            | `/home/codex/repos/netscript-007-docs-comparison`                                                                   |
+| `bridgeSessionId`    | `session_0126JRYrbXqvoJwskcF31RwW` (non-empty)                                                                      |
+| Remote Control URL   | `https://claude.ai/code/session_0126JRYrbXqvoJwskcF31RwW`                                                           |
+| Remote Control state | active (`bridge_status` at `2026-08-14T23:18:03Z`)                                                                  |
+| Branch at cwd        | `docs/comparison-docs-programme` @ `d35cbca30`                                                                      |
+| Family separation    | opposite family to Codex generator `019ffcc9-16c2-7573-b7f6-d627172408e8`; fresh session, never used for generation |
+
+Observed launch route is read from `~/.claude/jobs/40a06314/state.json` `respawnFlags`, because a
+`--bg` session receives `--model`/`--effort` over the daemon claim socket and they do not appear in
+`/proc/<pid>/cmdline`. Attachment is the `~/.claude/sessions/2465471.json` PID/cwd/`bridgeSessionId`
+triple.
+
+### Initial-prompt provenance — recorded honestly
+
+The `claude --bg` launch placed the topic orchestrator's 6143-character wrapper brief **after** the
+variadic `--add-dir` flag, so the CLI parsed it as a second directory argument rather than the
+initial message. `respawnFlags[9]` holds the brief text as an `--add-dir` value and the job's
+`intent` is empty. The launcher reported `idle — send a prompt to start`, and the transcript
+confirms the session took **no** initial message from this orchestrator.
+
+The turn that actually started the evaluator is the single user record at `2026-08-14T23:18:40Z`
+(`origin.kind: human`, `promptSource: typed`) sent over Remote Control — a 514-character directive
+that binds the evaluator to the coordinator's authoritative brief
+(`briefs/reset-gates/comparison-docs-programme.md`), requires re-verification of source head
+`d35cbca30872d1f55118d63437638e93270c2ac3` with refusal on mismatch, and constrains it to commit
+only `plan-eval.md`, push explicitly, post the structured PR comment, then stop without implementing
+or mutating coordinator state.
+
+Disposition: the governing contract is intact — the coordinator's brief file is the binding
+authority and it already mandates the route/identity recording, Plan-Gate row coverage, single
+verdict token, commit/push/comment shape, and the boundary set. The orchestrator's wrapper brief was
+supplementary and is not required for a valid gate, so the running evaluation was **not**
+interrupted to re-deliver it. Do not describe the wrapper brief as delivered.
+
+### Watch and boundaries
+
+No second gate will be opened and no docs implementation will resume until this verdict is terminal.
+The lane is watching for `plan-eval.md` plus the evaluator's push to
+`docs/comparison-docs-programme`; the Codex leaf thread `019ffcc9-16c2-7573-b7f6-d627172408e8`
+remains idle and unresumed.

@@ -38,3 +38,29 @@ label is correct and the lifecycle invariant of exactly one `status:` holds.
 Disposition: left unmodified. The leaf run dir belongs to the leaf generator, and `d35cbca30` is the
 immutable head the pending PLAN-EVAL evaluates; a supervisor edit there would move the evaluation
 surface. Fold the correction into the leaf's next authorized commit after the gate.
+
+## 2026-08-15 — evaluator serialization scope corrected by the coordinator (accepted)
+
+The reset dispatch this lane reconciled against encoded `concurrency: 1` as a cluster-wide evaluator
+mutex, and the topic record repeated it. Coordinator head `168715e27` corrects it: `concurrency: 4`
+with `concurrencyScope: per-topic-orchestrator` and `perOrchestratorConcurrency: 1`, so docs order 6
+runs alongside the other topics and formal evaluator leases no longer consume `expensiveGates`.
+
+Disposition: accepted from the coordinator. This lane still runs exactly one evaluator at a time.
+
+## 2026-08-15 — the orchestrator's wrapper brief never reached the evaluator
+
+`claude --bg` was invoked with the positional brief placed after the variadic `--add-dir` flag, so
+the CLI consumed the 6143-character brief as a second `--add-dir` value
+(`~/.claude/jobs/40a06314/state.json` → `respawnFlags[9]`; job `intent` empty). The session started
+idle with zero user messages. The evaluator was started instead by a single human-typed Remote
+Control message at `2026-08-14T23:18:40Z` (`origin.kind: human`, `promptSource: typed`) that binds
+it to the coordinator's authoritative brief, the exact source head, and the same output/boundary
+constraints.
+
+Disposition: the gate remains valid — `briefs/reset-gates/comparison-docs-programme.md` is the
+binding contract and already mandates the identity recording, Plan-Gate coverage, verdict token,
+commit/push/comment shape, and boundaries. The running evaluation was not interrupted to re-deliver
+a supplementary wrapper. Recorded so no artifact claims the orchestrator's brief was delivered.
+Launcher rule for this lane: pass the prompt before any variadic flag, then verify `respawnFlags`
+and the transcript's first user record before reporting a launch.
