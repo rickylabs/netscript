@@ -2,15 +2,18 @@
 
 ## Current gate state
 
-- **BLOCKED:** do not launch any evaluator, Claude/Claude-compatible OpenRouter process, product
-  implementation, runtime lease, merge, or publication before the Saturday 2026-08-15 00:00
-  Europe/Zurich allowance reset.
-- A fresh formal opposite-family PLAN-EVAL remains mandatory after the reset. This Codex author
-  thread cannot evaluate its own repaired plan.
-- Draft PR #1653 directly targets `main`, remains draft, and must retain exactly `status:plan-eval`.
+- Formal opposite-family PLAN-EVAL cycle 2 returned `PASS` and is committed at
+  `c694cfb311d378f4796280649042c8c275c828ed`; implementation is authorized.
+- Slice 1 registers and verifies the seven allowances, sets both budgets to 7, updates the scanner
+  permissions, and regenerates the consumer bundle. It is stopped for substantive Tier-A review;
+  do not start Slice 2 or create a supervisor sign-off commit before that review.
+- Draft PR #1653 directly targets `main`, remains draft, and retains exactly `status:impl`.
 - Branch: `chore/quality-scan-allowance-rail`, no upstream. Base:
   `01e0960494c95ce56eb35892c211a095eb13e6ed`.
-- No product, generated, debt-registry, or lock-file implementation has started.
+- Fetched `origin/main` advanced to `dd472102d` only through merged #1644. No authorized leaf
+  surface overlaps that commit; this branch was not rebased and does not absorb #1644.
+- No debt-registry or lock-file change has started. No runtime lease, merge, publication, ready
+  transition, or central-state mutation occurred.
 
 ## Coordinator authority locked
 
@@ -44,17 +47,13 @@ surface and was deliberately not edited during plan repair.
 - `plan-eval.md` preserves that history and marks the formal gate unsatisfied. The two untracked
   prompt files and failed self-referential transport JSONL were removed rather than committed.
 
-## After-reset formal PLAN-EVAL request — do not dispatch early
+## Formal PLAN-EVAL result and next action
 
-After 2026-08-15 00:00 Europe/Zurich, the topic orchestrator may launch one fresh bounded evaluator
-session on the opposite-family route selected by the then-current lane policy. The evaluator must:
+Native Claude Opus 5 cycle 2 evaluated repaired head `09dfb092d` in separate session
+`b6c48f02-cb56-4dae-abfd-e46bdec05bd5` and returned `PASS`. The canonical verdict is
+`plan-eval.md`; the evaluator artifact commit is `c694cfb311d378f4796280649042c8c275c828ed` and
+the verdict comment is `5299133651`.
 
-1. read `.llm/harness/gates/plan-gate.md` and `.llm/harness/evaluator/plan-protocol.md`;
-2. evaluate the repaired branch head, not historical `c573beda9`;
-3. verify the coordinator authority against comment `5286261678` and central commit `874eacc0d`;
-4. audit public reachability, fail-closed issue state, the seven-count budget, exact amended
-   surfaces, generated-asset freshness, #1655 no-increase debt handling, JSR/publish evidence,
-   slices, gates, and exclusions;
-5. replace/update `plan-eval.md` with a fresh formal `PASS` or `FAIL_PLAN` verdict.
-
-Implementation remains prohibited until that fresh formal verdict is `PASS`.
+Next action: the topic orchestrator performs substantive Tier-A review of Slice 1. This author
+thread remains stopped before Slice 2. The final IMPL-EVAL remains a separate opposite-family
+session after all four slices and supervisor reviews.

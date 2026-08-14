@@ -81,6 +81,38 @@ Receipts: `receipts/baseline/quality-tests.json`, `quality-scan.json`, and `qual
 Final proving gates and per-slice structured commands are specified in `plan.md`. Global/expensive
 gates require the coordinator's singleton lease.
 
+### Slice 1 — registration rail
+
+The scanner now accepts only `quality-allow: #<issue> — <specific reason>`, counts every
+syntactically valid record against the fixed budget, deduplicates issue lookups, and fails closed
+for unavailable, malformed, closed, or unmilestoned owner state. All seven source records retain
+their existing reasons and bind to #1276 T3. Both task maxima are 7.
+
+The production resolver is fixed to `rickylabs/netscript` on `api.github.com`. It uses
+`GITHUB_TOKEN` or `GH_TOKEN` when available and otherwise deliberately uses the anonymous public
+API, including in fork PRs and installed consumer copies. Offline, missing-net-permission, malformed,
+and rate-limited responses remain failures; they never silently skip ownership validation. Root
+tasks declare scoped net/env permissions, the consumer manifest declares `read`/`env`/`net`, and
+the generated CLI asset was regenerated only through `gen:assets-barrel`.
+
+| Evidence | Outcome | Exit | Receipt |
+| --- | --- | ---: | --- |
+| RED focused allowance contract | expected FAIL | 1 | `receipts/slice-1/red-test.json` |
+| Focused scanner suite (21 tests) | PASS | 0 | `receipts/slice-1/focused-green-1.json` |
+| Scoped structured check (5 files) | PASS | 0 | `receipts/slice-1/scoped-check.json` |
+| Scoped structured lint (5 files) | PASS | 0 | `receipts/slice-1/scoped-lint.json` |
+| Scoped structured format (5 files) | PASS | 0 | `receipts/slice-1/scoped-fmt.json` |
+| `quality:scan` (7 verified records) | PASS | 0 | `receipts/slice-1/quality-scan.json` |
+| `quality:scan:repo` (7 verified records) | PASS | 0 | `receipts/slice-1/quality-scan-repo.json` |
+| `quality:gate` (`quality:scan` + `arch:check`) | PASS | 0 | `receipts/slice-1/quality-gate.json` |
+| Allowance budget (8 → 7, no increase) | PASS | 0 | `receipts/slice-1/allowance-budget.json` |
+| Generated asset clean second generation | PASS | 0 | `receipts/slice-1/assets-clean.json` |
+
+The allowance-budget receipt compares the immutable base with probe tree
+`3136358e484f8df30b778d2ae838dd9103077d10`, created from the staged Slice 1 diff, because the
+checker requires two committed tree-ish inputs. All other receipts record the pre-commit evaluator
+head and their exact argv; none is presented as a clean-worktree or supervisor sign-off receipt.
+
 ## Reconcile notes
 
 - Live #1378 and #1545 are open in milestone 0.0.7; `origin/main` equals the approved baseline.
@@ -90,6 +122,11 @@ gates require the coordinator's singleton lease.
 - Coordinator comment `5286261678` and central commit `874eacc0d` resolve the former authority
   blockers: #1276 T3 owns all seven records, the four exact coupled surfaces are authorized, and
   #1655 owns Workers lint repair with strict no-increase evidence here.
+- Slice 1 live reconcile: PR #1653 remains open, draft, milestone 0.0.7, and exactly `status:impl`;
+  both closing keywords remain in its body. Fetched `origin/main` advanced from the immutable base
+  to `dd472102d` through merged #1644 only. Its diff does not overlap this leaf's authorized
+  scanner/package/plugin/generated surfaces, so the locked base was retained and no rebase or
+  #1644 worktree/PR mutation occurred.
 
 ## Activity
 
@@ -116,12 +153,14 @@ gates require the coordinator's singleton lease.
 - 2026-08-13 — repaired plan/design/evaluator metadata only, removed the two untracked evaluator
   prompts and failed self-referential JSONL, left `.llm/harness/debt/arch-debt.md` untouched, and
   stopped at `status:plan-eval` awaiting a fresh formal post-reset verdict.
+- 2026-08-15 — resumed at formal PLAN-EVAL cycle 2 `PASS`; captured the Slice 1 RED receipt, landed
+  the fail-closed registration/resolver rail and R-1/R-2 regressions, regenerated the authorized
+  consumer asset, ran the named structured gates, and stopped before Slice 2 for Tier-A review.
 
 ## Plan-Gate state
 
 - Historical OpenRouter artifact: advisory `FAIL_PLAN` at `8a4709afe`; its D-2/D-3/D-4 findings are
   resolved by coordinator authority and its D-1 editorial finding is resolved in live #1545.
-- Current formal verdict: none for the repaired head.
-- Scheduling blocker: owner hold forbids any formal evaluator before 2026-08-15 00:00 Europe/Zurich.
-- Required next gate: one fresh separate opposite-family PLAN-EVAL after reset. Product
-  implementation remains prohibited until it records `PASS`.
+- Current formal verdict: cycle 2 `PASS` in `plan-eval.md`, evaluator artifact commit `c694cfb311`.
+- Slice state: Slice 1 implementation and structured evidence complete; BLOCKED awaiting
+  substantive Tier-A topic review before supervisor sign-off or Slice 2.

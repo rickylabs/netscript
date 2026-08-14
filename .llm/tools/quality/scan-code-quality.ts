@@ -23,6 +23,9 @@ const PLUGIN_NAMES = ['ai', 'auth', 'sagas', 'streams', 'triggers', 'workers'];
 // explicit `quality:scan:repo` task.
 // The companion `arch:check` independently evaluates every doctrine root.
 const DEFAULT_ROOTS = ['packages/cli/src', 'plugins'];
+const ALLOWANCE_OWNER_REPOSITORY = 'rickylabs/netscript';
+const ALLOWANCE_RECORD = /^#([1-9]\d*)\s+—\s+(\S(?:.*\S)?)$/u;
+const ISSUE_REFERENCE = /#\d+/g;
 const EMPTY_TAINT: Set<string> = new Set();
 const GENERATED_OR_VENDOR_DIRS = new Set([
   '.deno',
@@ -141,10 +144,56 @@ async function collect(path: string): Promise<string[]> {
   return files;
 }
 
-/** A reasoned `// quality-allow:` suppression the scanner honored. */
+/** State required from the durable issue that owns an allowance. */
+export interface AllowanceIssueState {
+  readonly issue: number;
+  readonly state: 'open' | 'closed';
+  readonly milestone: string | null;
+}
+
+/** External state boundary used to verify allowance owners. */
+export interface AllowanceIssueResolver {
+  resolve(issue: number): Promise<AllowanceIssueState>;
+}
+
+/** Fetch subset used by the GitHub allowance-owner adapter. */
+export type AllowanceIssueFetch = (
+  input: string | URL,
+  init?: RequestInit,
+) => Promise<Response>;
+
+/** Configuration for the fixed-repository GitHub allowance-owner adapter. */
+export interface GitHubAllowanceIssueResolverOptions {
+  readonly fetch?: AllowanceIssueFetch;
+  readonly token?: string | null;
+}
+
+export type AllowancePolicyFailureKind =
+  | 'malformed-registration'
+  | 'owner-unavailable'
+  | 'owner-closed'
+  | 'owner-unmilestoned';
+
+/** A fail-closed reason that prevents an allowance registration from passing. */
+export interface AllowancePolicyFailure {
+  readonly kind: AllowancePolicyFailureKind;
+  readonly file: string;
+  readonly line: number;
+  readonly issue?: number;
+  readonly message: string;
+  readonly fenceOrdinal?: number;
+}
+
+/** Options for deterministic scanner tests and alternate issue-state adapters. */
+export interface QualityScanOptions {
+  readonly allowanceIssueResolver?: AllowanceIssueResolver;
+}
+
+/** A syntactically valid allowance record counted by the non-increasing budget. */
 export interface QualityAllowance {
   readonly file: string;
   readonly line: number;
+  readonly issue: number;
   readonly reason: string;
   readonly fenceOrdinal?: number;
 }
@@ -153,6 +202,94 @@ export interface QualityAllowance {
 export interface QualityScan {
   readonly findings: QualityFinding[];
   readonly allowances: QualityAllowance[];
+  readonly allowanceFailures: AllowancePolicyFailure[];
+}
+
+function optionalGitHubToken(): string | undefined {
+  try {
+    return Deno.env.get('GITHUB_TOKEN') ?? Deno.env.get('GH_TOKEN') ?? undefined;
+  } catch {
+    // A token is optional. A caller without env permission deliberately uses
+    // the public unauthenticated API and remains subject to its rate limit.
+    return undefined;
+  }
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function githubIssuePayload(value: unknown, issue: number): AllowanceIssueState {
+  if (!value || typeof value !== 'object') {
+    throw new Error(`GitHub issue #${issue} returned a non-object response`);
+  }
+  const payload = value as Record<string, unknown>;
+  if (payload.number !== issue || (payload.state !== 'open' && payload.state !== 'closed')) {
+    throw new Error(`GitHub issue #${issue} returned malformed identity or state`);
+  }
+  let milestone: string | null;
+  if (payload.milestone === null) {
+    milestone = null;
+  } else if (
+    payload.milestone && typeof payload.milestone === 'object' &&
+    typeof (payload.milestone as Record<string, unknown>).title === 'string' &&
+    ((payload.milestone as Record<string, unknown>).title as string).trim().length > 0
+  ) {
+    milestone = ((payload.milestone as Record<string, unknown>).title as string).trim();
+  } else {
+    throw new Error(`GitHub issue #${issue} returned a malformed milestone`);
+  }
+  return { issue, state: payload.state, milestone };
+}
+
+/**
+ * Resolve allowance owners from the fixed public NetScript issue tracker.
+ *
+ * Tokenless developer and fork runs intentionally use GitHub's anonymous API.
+ * Offline, permission-denied, malformed, and rate-limited responses throw so
+ * the scanner can fail closed. A token only raises the rate limit; it never
+ * changes the repository whose issue state is trusted.
+ */
+export function createGitHubAllowanceIssueResolver(
+  options: GitHubAllowanceIssueResolverOptions = {},
+): AllowanceIssueResolver {
+  const request = options.fetch ?? fetch;
+  const token = options.token === undefined ? optionalGitHubToken() : options.token ?? undefined;
+  return {
+    async resolve(issue: number): Promise<AllowanceIssueState> {
+      const url = `https://api.github.com/repos/${ALLOWANCE_OWNER_REPOSITORY}/issues/${issue}`;
+      const headers = new Headers({
+        accept: 'application/vnd.github+json',
+        'x-github-api-version': '2022-11-28',
+        'user-agent': 'netscript-quality-scan',
+      });
+      if (token) headers.set('authorization', `Bearer ${token}`);
+      let response: Response;
+      try {
+        response = await request(url, { headers });
+      } catch (error: unknown) {
+        throw new Error(
+          `GitHub issue #${issue} is unavailable: ${errorMessage(error)}. ` +
+            'Grant --allow-net=api.github.com; a token is optional.',
+        );
+      }
+      if (!response.ok) {
+        const remaining = response.headers.get('x-ratelimit-remaining');
+        throw new Error(
+          `GitHub issue #${issue} is unavailable: HTTP ${response.status}` +
+            `${remaining === null ? '' : ` (rate-limit remaining ${remaining})`}. ` +
+            'Anonymous runs fail closed at the public rate limit; provide GITHUB_TOKEN or GH_TOKEN.',
+        );
+      }
+      let payload: unknown;
+      try {
+        payload = await response.json();
+      } catch (error: unknown) {
+        throw new Error(`GitHub issue #${issue} returned invalid JSON: ${errorMessage(error)}`);
+      }
+      return githubIssuePayload(payload, issue);
+    },
+  };
 }
 
 interface ScanUnit {
@@ -192,10 +329,12 @@ async function scanUnits(file: string, cwd: string): Promise<ScanUnit[]> {
 export async function scanCodeQualityDetailed(
   paths: readonly string[],
   cwd: string = Deno.cwd(),
+  options: QualityScanOptions = {},
 ): Promise<QualityScan> {
   const files = (await Promise.all(paths.map((path) => collect(resolve(cwd, path))))).flat();
   const findings: QualityFinding[] = [];
   const allowances: QualityAllowance[] = [];
+  const allowanceFailures: AllowancePolicyFailure[] = [];
   for (const file of files) {
     for (const unit of await scanUnits(file, cwd)) {
       const normalized = unit.sourcePath.replaceAll('\\', '/');
@@ -204,16 +343,32 @@ export async function scanCodeQualityDetailed(
         : EMPTY_TAINT;
       for (let index = 0; index < unit.lines.length; index++) {
         const line = unit.lines[index];
-        const allowance = line.match(/\/\/\s*quality-allow:\s*(.+)$/);
-        if (allowance?.[1].trim()) {
+        const allowanceMarkers = [...line.matchAll(/\/\/\s*quality-allow:/g)];
+        if (allowanceMarkers.length > 0) {
           // A quality-allow only suppresses a line that would otherwise fire a
           // rule — an allowance on a clean line is dead weight, not counted.
-          if (ruleFor(line.replace(/\/\/\s*quality-allow:.*$/, ''), normalized, tainted)) {
+          if (!ruleFor(line.replace(/\/\/\s*quality-allow:.*$/, ''), normalized, tainted)) {
+            continue;
+          }
+          const location = {
+            file: unit.sourcePath,
+            line: unit.lineOffset + index + 1,
+            ...(unit.fenceOrdinal === undefined ? {} : { fenceOrdinal: unit.fenceOrdinal }),
+          };
+          const recordText = line.match(/\/\/\s*quality-allow:\s*(.*)$/)?.[1].trim() ?? '';
+          const record = allowanceMarkers.length === 1 ? ALLOWANCE_RECORD.exec(recordText) : null;
+          const references = recordText.match(ISSUE_REFERENCE) ?? [];
+          if (!record || references.length !== 1) {
+            allowanceFailures.push({
+              kind: 'malformed-registration',
+              ...location,
+              message: 'Expected exactly `quality-allow: #<issue> — <specific nonblank reason>`.',
+            });
+          } else {
             allowances.push({
-              file: unit.sourcePath,
-              line: unit.lineOffset + index + 1,
-              reason: allowance[1].trim(),
-              ...(unit.fenceOrdinal === undefined ? {} : { fenceOrdinal: unit.fenceOrdinal }),
+              ...location,
+              issue: Number(record[1]),
+              reason: record[2],
             });
           }
           continue;
@@ -232,15 +387,63 @@ export async function scanCodeQualityDetailed(
     }
   }
   findings.sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line);
-  return { findings, allowances };
+  allowances.sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line);
+
+  const resolver = options.allowanceIssueResolver ?? createGitHubAllowanceIssueResolver();
+  const issueStates = new Map<number, AllowanceIssueState | Error>();
+  await Promise.all(
+    [...new Set(allowances.map((allowance) => allowance.issue))].map(async (issue) => {
+      try {
+        issueStates.set(issue, await resolver.resolve(issue));
+      } catch (error: unknown) {
+        issueStates.set(issue, error instanceof Error ? error : new Error(String(error)));
+      }
+    }),
+  );
+  for (const allowance of allowances) {
+    const resolved = issueStates.get(allowance.issue);
+    if (resolved instanceof Error || !resolved || resolved.issue !== allowance.issue) {
+      allowanceFailures.push({
+        kind: 'owner-unavailable',
+        file: allowance.file,
+        line: allowance.line,
+        issue: allowance.issue,
+        message: resolved instanceof Error
+          ? resolved.message
+          : `Issue resolver returned no authoritative state for #${allowance.issue}.`,
+        ...(allowance.fenceOrdinal === undefined ? {} : { fenceOrdinal: allowance.fenceOrdinal }),
+      });
+    } else if (resolved.state !== 'open') {
+      allowanceFailures.push({
+        kind: 'owner-closed',
+        file: allowance.file,
+        line: allowance.line,
+        issue: allowance.issue,
+        message: `Allowance owner #${allowance.issue} is closed.`,
+        ...(allowance.fenceOrdinal === undefined ? {} : { fenceOrdinal: allowance.fenceOrdinal }),
+      });
+    } else if (resolved.milestone === null) {
+      allowanceFailures.push({
+        kind: 'owner-unmilestoned',
+        file: allowance.file,
+        line: allowance.line,
+        issue: allowance.issue,
+        message: `Allowance owner #${allowance.issue} has no milestone.`,
+        ...(allowance.fenceOrdinal === undefined ? {} : { fenceOrdinal: allowance.fenceOrdinal }),
+      });
+    }
+  }
+  allowanceFailures.sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line);
+  return { findings, allowances, allowanceFailures };
 }
 
 /** Scan selected source paths for code-quality violations. */
 export async function scanCodeQuality(
   paths: readonly string[],
   cwd: string = Deno.cwd(),
+  options: QualityScanOptions = {},
 ): Promise<QualityFinding[]> {
-  return (await scanCodeQualityDetailed(paths, cwd)).findings;
+  return (await scanCodeQualityDetailed(paths, cwd, options)).findings;
 }
 
 if (import.meta.main) {
@@ -255,16 +458,17 @@ if (import.meta.main) {
   const maxAllow = maxAllowArg === undefined ? undefined : Number(maxAllowArg);
   const mode = changed.length > 0 ? 'changed-files' : 'repository';
   const scanned = changed.length > 0 ? changed : roots.length > 0 ? roots : DEFAULT_ROOTS;
-  const { findings, allowances } = await scanCodeQualityDetailed(scanned);
+  const { findings, allowances, allowanceFailures } = await scanCodeQualityDetailed(scanned);
   const allowExceeded = maxAllow !== undefined && Number.isFinite(maxAllow) &&
     allowances.length > maxAllow;
   const result = {
-    ok: findings.length === 0 && !allowExceeded,
+    ok: findings.length === 0 && allowanceFailures.length === 0 && !allowExceeded,
     mode,
     scanned,
     findings,
     allowCount: allowances.length,
     allowances,
+    allowanceFailures,
     ...(allowExceeded ? { allowLimitExceeded: { limit: maxAllow, count: allowances.length } } : {}),
   };
   console.log(JSON.stringify(result, null, pretty ? 2 : undefined));

@@ -25,5 +25,11 @@ The historical states above are preserved because this log is append-only. Coord
 | D-8 | D-4                 | #1655 (milestone 0.0.8) owns the 20 Workers `private-type-ref` repairs. This leaf may record `DEBT_ACCEPTED` and prove strict no-increase across 13 export targets, but may not claim green lint or absorb repair.                         | Resolved before fresh PLAN-EVAL           |
 | D-9 | Evaluator transport | The OpenRouter `FAIL_PLAN` at commit `8a4709afe` is advisory only. All Claude and Claude-compatible OpenRouter work is stopped until 2026-08-15 00:00 Europe/Zurich; a fresh formal opposite-family PLAN-EVAL remains mandatory afterward. | BLOCKED awaiting reset and formal verdict |
 
+## Implementation drift — 2026-08-15
+
+| ID | Kind | Exact evidence | Disposition | State |
+| --- | --- | --- | --- | --- |
+| D-10 | Live base movement | Pre-flight fetch resolved `origin/main` to `dd472102d`, one merged #1644 commit beyond immutable leaf base `01e096049`. `git diff 01e096049..dd472102d` shows no overlap with this leaf's authorized scanner, package/plugin registration, consumer manifest, generated asset, or run-artifact surfaces. | Retain the evaluator-approved base and head; do not rebase, absorb, mutate, or claim #1644. Stop if a later gate exposes a real interaction. | Recorded; independent Slice 1 work continued |
+
 No product implementation, runtime lease, merge, publication, or central-state mutation is
 authorized while D-9 is active.

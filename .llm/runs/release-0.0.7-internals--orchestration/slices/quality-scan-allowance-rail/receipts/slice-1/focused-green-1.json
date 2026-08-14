@@ -1,0 +1,37 @@
+{
+  "gateId": "test",
+  "invocationId": "quality-rail-s1-focused-green-1",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    ".llm/tools/quality/scan-code-quality_test.ts"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-rail",
+  "gitHead": "c694cfb311d378f4796280649042c8c275c828ed",
+  "actualGitHead": "c694cfb311d378f4796280649042c8c275c828ed",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "c731104cd690487dbfa6b5efd6feae9f9c25dd611e476cb036fde98a3a1da73c",
+  "lifecycleId": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069:quality-rail-s1-focused-green-1:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-14T23:39:47.585Z",
+  "startedAt": "2026-08-14T23:39:47.587Z",
+  "finishedAt": "2026-08-14T23:39:49.608Z",
+  "durationMs": 1149,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 306,
+    "sha256": "fb6e4493382af69f1114029eb5b178a883494c040ae59e859ce757f12785e463",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\".llm/tools/quality/scan-code-quality_test.ts\"],\"cwd\":\"/home/codex/repos/netscript-007-quality-rail\",\"exitCode\":0,\"durationMs\":1071,\"summary\":{\"passed\":21,\"failed\":0,\"ignored\":0,\"totalResults\":21,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 174,
+    "sha256": "3ec86fd6d24c0008a491bfa3577d6f7562beabf0510c4d0648ff2985162f9253",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mtest\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all '.llm/tools/quality/scan-code-quality_test.ts'\n",
+    "truncated": false
+  }
+}
