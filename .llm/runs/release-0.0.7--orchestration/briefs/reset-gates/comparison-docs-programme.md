@@ -7,9 +7,10 @@ Read `AGENTS.md`, the full `netscript-harness`, `netscript-tools`, `netscript-pr
 PLAN-EVAL protocol, plan gate, verdict definitions, central leaf contract, complete run, live issue
 #1551, PR #1652, and coordinator scope comments.
 
-Act only as fresh formal PLAN-EVAL cycle 1. Do not launch before 2026-08-15 00:00 Europe/Zurich.
-Use native Claude/Fable 5 medium and immediately enable `/remote-control`; record session ID, bridge
-ID, PID, cwd, requested route, and observed route. No substitute provider/model.
+Act only as fresh formal PLAN-EVAL cycle 1. The reset boundary has passed. Use the owner-authorized
+native Claude Sonnet 5 **low** route and immediately enable `/remote-control`; record session ID,
+bridge ID, PID, cwd, requested route, and observed route. No silent substitute; Fable requires a new
+coordinator amendment backed by concrete Sonnet capability-failure evidence.
 
 Worktree `/home/codex/repos/netscript-007-docs-comparison`; branch
 `docs/comparison-docs-programme`; immutable base `01e0960494c95ce56eb35892c211a095eb13e6ed`;

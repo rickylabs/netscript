@@ -4,12 +4,21 @@
   "launchAfter": "2026-08-15T00:00:00+02:00",
   "timezone": "Europe/Zurich",
   "concurrency": 1,
-  "route": {
+  "ownerOverride": {
+    "recordedAt": "2026-08-14T22:13:00.000Z",
+    "coordinator": "codex-root-0.0.7",
+    "topicOrchestrators": "native-claude-only",
+    "implementationLeaves": "daemon-attached-wsl-codex",
+    "costPolicy": "right-size effort, deduplicate shared review inputs, preserve independent gate evidence"
+  },
+  "routePolicy": {
     "provider": "native-claude",
-    "model": "Fable 5",
-    "effort": "medium",
     "remoteControlRequired": true,
-    "substitutesAllowed": false
+    "freshSessionPerGate": true,
+    "oppositeFamilyRequired": true,
+    "substitutesAllowed": false,
+    "fablePolicy": "not pre-dispatched; coordinator amendment only after concrete Sonnet capability failure",
+    "forbiddenProviders": ["openrouter", "opencode", "antigravity"]
   },
   "entries": [
     {
@@ -23,7 +32,14 @@
       "implementationParent": "634b257ea1afcedb2d7f1da486d8c9e9432a2a86",
       "runDir": ".llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling",
       "brief": "harness-evidence-and-verdict-tooling.md",
-      "output": "evaluate.md"
+      "output": "evaluate.md",
+      "route": {
+        "provider": "native-claude",
+        "model": "Claude Sonnet 5",
+        "cliModel": "claude-sonnet-5",
+        "effort": "medium",
+        "rationale": "substantive cross-tooling implementation review; Sonnet medium is the least-cost reliable opposite-family route"
+      }
     },
     {
       "order": 2,
@@ -35,7 +51,14 @@
       "sourceHead": "e6ba15ec6414c0a42b1f9870791131162ea71c36",
       "runDir": ".llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0",
       "brief": "legacy-port-pin-sweep.md",
-      "output": "evaluate.md"
+      "output": "evaluate.md",
+      "route": {
+        "provider": "native-claude",
+        "model": "Claude Sonnet 5",
+        "cliModel": "claude-sonnet-5",
+        "effort": "low",
+        "rationale": "mechanical bounded implementation review with complete Tier-A and gate evidence"
+      }
     },
     {
       "order": 3,
@@ -48,7 +71,14 @@
       "sourceHead": "12276e6d86403ed1340ef79a963e87d401d643e9",
       "runDir": ".llm/runs/docs-rfc-plugin-cli-contribution--1502",
       "brief": "rfc-plugin-cli-contribution.md",
-      "output": "plan-eval.md"
+      "output": "plan-eval.md",
+      "route": {
+        "provider": "native-claude",
+        "model": "Claude Sonnet 5",
+        "cliModel": "claude-sonnet-5",
+        "effort": "medium",
+        "rationale": "architectural PLAN-EVAL requires substantive reasoning, while Sonnet medium remains the efficient compliant first route"
+      }
     },
     {
       "order": 4,
@@ -61,7 +91,14 @@
       "sourceHead": "09dfb092dccf7f843b9270295047d674a8187362",
       "runDir": ".llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail",
       "brief": "quality-scan-allowance-rail.md",
-      "output": "plan-eval.md"
+      "output": "plan-eval.md",
+      "route": {
+        "provider": "native-claude",
+        "model": "Claude Sonnet 5",
+        "cliModel": "claude-sonnet-5",
+        "effort": "medium",
+        "rationale": "substantive coupled ownership and fail-closed quality-policy PLAN-EVAL"
+      }
     },
     {
       "order": 5,
@@ -74,7 +111,14 @@
       "sourceHead": "14d8b38b4db7ba0635cbbcac2f8cd8903bee0ec9",
       "runDir": ".llm/runs/fix-scaffold-generated-output-correctness--0.0.7-wave0",
       "brief": "scaffold-generated-output-correctness.md",
-      "output": "plan-eval.md"
+      "output": "plan-eval.md",
+      "route": {
+        "provider": "native-claude",
+        "model": "Claude Sonnet 5",
+        "cliModel": "claude-sonnet-5",
+        "effort": "medium",
+        "rationale": "substantive grouped generator/runtime boundary PLAN-EVAL without running the expensive gate"
+      }
     },
     {
       "order": 6,
@@ -87,7 +131,14 @@
       "sourceHead": "d35cbca30872d1f55118d63437638e93270c2ac3",
       "runDir": ".llm/runs/docs-comparison-docs-programme--1551",
       "brief": "comparison-docs-programme.md",
-      "output": "plan-eval.md"
+      "output": "plan-eval.md",
+      "route": {
+        "provider": "native-claude",
+        "model": "Claude Sonnet 5",
+        "cliModel": "claude-sonnet-5",
+        "effort": "low",
+        "rationale": "bounded docs-only PLAN-EVAL with immutable evidence and no product implementation"
+      }
     }
   ]
 }

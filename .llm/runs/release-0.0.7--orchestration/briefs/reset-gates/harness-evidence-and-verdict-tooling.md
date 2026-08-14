@@ -9,9 +9,10 @@ Read `AGENTS.md`, `.agents/skills/netscript-harness/SKILL.md`,
 protocol, verdict definitions, lane policy, agent-handoff rules, `6-cli-tooling` profile, the whole
 leaf run directory, live issues #1561/#1563/#1621, PR #1644, and its structured comments.
 
-Act only as the fresh separate formal IMPL-EVAL. Do not launch before 2026-08-15 00:00
-Europe/Zurich. Use native Claude/Fable 5 medium and immediately enable `/remote-control`; record
-session ID, bridge ID, PID, cwd, requested route, and observed route. No substitute provider/model.
+Act only as the fresh separate formal IMPL-EVAL. The reset boundary has passed. Use the
+owner-authorized native Claude Sonnet 5 **medium** route and immediately enable `/remote-control`;
+record session ID, bridge ID, PID, cwd, requested route, and observed route. No silent substitute;
+Fable requires a new coordinator amendment backed by concrete Sonnet capability-failure evidence.
 
 Repository `rickylabs/netscript`; worktree `/home/codex/repos/netscript-007-harness-evidence`;
 branch `fix/harness-evidence-and-verdict-tooling`; immutable base

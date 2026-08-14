@@ -38,6 +38,9 @@
 | 2026-08-13T21:17:00.000Z | Reconciled #1644's final closure contract before packaging: #1621 explicitly requires one operator-guidance sentence, so the previously read-only `netscript-pr` skill became the ninth and final authorized surface. | Live #1621 acceptance; exact `.agents/skills/netscript-pr/SKILL.md` amendment; no other scope growth |
 | 2026-08-13T21:35:00.000Z | Completed #1644's acceptance guidance, substantive S3 Tier-A review, and immutable structured evidence package; parked the draft leaf at its formal native IMPL-EVAL handoff. | Implementation `634b257ea`; evidence head `4d9fb1967`; check 2,919 files/0 diagnostics; test 4,109 pass/19 ignored/0 fail; quality-job PASS; handoff comment `5286647015` |
 | 2026-08-13T21:47:00.000Z | Replaced stale/scattered evaluator handoffs with one coordinator-owned, serial, SHA-locked Saturday dispatch set. No evaluator was launched. | `briefs/reset-gates/dispatch.json`; six activation-correct briefs; local/remote/PR/cluster-state validation PASS; native Claude/Fable 5 medium + `/remote-control`, no substitutes |
+| 2026-08-14T22:12:38.000Z | Reset-boundary reconciliation completed before mutation. `main`, 60-issue milestone scope, seven draft PR heads, branches, and all clean worktrees match the recorded cluster; live PR checks have zero current failures/pending jobs; Docker and milestone resource leases are empty. | `git ls-remote`; GitHub milestone/PR reads; `agentic:pr-checks` for #1641/#1643/#1644/#1651–#1654; `agentic:codex-status`; process/container/port audit |
+| 2026-08-14T22:13:00.000Z | Owner routing correction accepted: Codex remains coordinator; all four legacy Codex topic controllers are preserved but must be parked, then replaced one-for-one by native Claude Remote Control supervisors. | Owner instruction; `supervisor.md` corrected control-plane table; legacy topic threads/worktrees/branches retained |
+| 2026-08-14T22:13:00.000Z | Rebuilt the formal-gate route matrix for cost and evidence quality. Six independent gates remain, but the obsolete six-Fable mandate is removed: Sonnet 5 low handles two mechanical gates, Sonnet 5 medium handles four substantive gates, all serial and fresh; Fable is escalation-only after concrete failure evidence and a recorded amendment. | `briefs/reset-gates/dispatch.json`; six corrected briefs; owner-authorized route override |
 
 ## Current design checkpoint
 
@@ -46,3 +49,6 @@
   one expensive gate globally, inactive release captain until exact-main readiness.
 - Step 0 repair and PLAN-EVAL are approved. Dispatch may begin after the final clean-environment
   sweep and status transition to implementation.
+- The reset sweep is complete. Before leaf/evaluator dispatch resumes, park the four historical
+  Codex topic controllers and attachment-prove exactly one Sonnet 5/low native Claude supervisor in
+  each preserved topic worktree. Implementation stays on WSL Codex Sol with per-slice effort.

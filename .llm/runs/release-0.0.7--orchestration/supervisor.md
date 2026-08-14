@@ -5,7 +5,9 @@
 | Profile | `milestone-cluster` |
 | Run id | `release-0.0.7--orchestration` |
 | Coordinator | `codex-root-0.0.7` |
+| Coordinator worktree | `/home/codex/repos/netscript-547-lffix` |
 | Control branch | `chore/release-0.0.7-orchestration` |
+| Harness | `.llm/runs/release-0.0.7--orchestration` (`milestone-cluster`) |
 | Baseline `main` | `01e0960494c95ce56eb35892c211a095eb13e6ed` |
 | Target milestone | GitHub milestone `0.0.7` (`#27`) |
 | Started | `2026-08-13T18:35:10.000Z` |
@@ -95,3 +97,47 @@ including the coordinator-authorized #1621 operator guidance. Substantive Tier-A
 fresh structured check/test/quality receipts all passed at that implementation head. Evidence-only
 child `4d9fb1967` packages the receipts and formal handoff without a self-referential gate rerun.
 The draft remains `status:impl` and blocked only on native opposite-family IMPL-EVAL after reset.
+
+## 2026-08-15 reset transition
+
+The reset boundary arrived at `2026-08-15T00:00:00+02:00`. The owner revoked the temporary Codex
+topic-orchestrator fallback while retaining Codex as milestone coordinator. The historical Codex
+topic threads, branches, worktrees, leaf threads, PRs, and harness records remain evidence; they are
+parked and must never be resumed as topic controllers while their Claude replacements own the lane.
+
+The pre-mutation recheck at `2026-08-14T22:12:38Z` found unchanged `main` `01e096049`, exactly 60
+open milestone issues, all seven milestone draft PRs at their recorded heads, zero current CI
+failures or pending checks, clean coordinator/topic/leaf worktrees, no Docker containers, no
+milestone resource lease, and no active milestone evaluator. The unrelated database-RFC Fable
+session in `/home/codex/repos/netscript-db-rfc` is outside this cluster and is not touched.
+
+### Corrected topic control plane
+
+The owner-authorized cost override selects the lowest-cost reliable native Claude supervision
+route: Claude Sonnet 5 at low effort. This is an explicit override of the older Opus/high planning
+default, not a silent fallback. Every replacement uses the same preserved topic branch/worktree,
+native Remote Control, and launcher evidence; implementation remains delegated to WSL Codex.
+
+| Lane | Preserved Codex topic thread | Pre-transition state | Claude requested route | Worktree / branch | Replacement identity |
+| --- | --- | --- | --- | --- | --- |
+| docs | `019ffcc0-e19b-71d1-95ce-8c72559eb026` | absent/offline; park recorded | native Claude · Sonnet 5 · low | `/home/codex/repos/netscript-007-docs` / `orchestrator/release-0.0.7-docs` | pending attachment proof |
+| internals | `019ffcc0-e1b5-74f0-96eb-cdeb298d6b17` | stalled over 24h; park required | native Claude · Sonnet 5 · low | `/home/codex/repos/netscript-007-internals` / `orchestrator/release-0.0.7-internals` | pending attachment proof |
+| fixes | `019ffcc0-e1ae-7b70-b3b8-8804ebd6f773` | stalled over 25h; park required | native Claude · Sonnet 5 · low | `/home/codex/repos/netscript-007-fixes` / `orchestrator/release-0.0.7-fixes` | pending attachment proof |
+| features | `019ffcc0-e1d2-7850-a308-354b670c6f3d` | stalled over 24h; park required | native Claude · Sonnet 5 · low | `/home/codex/repos/netscript-007-features` / `orchestrator/release-0.0.7-features` | pending attachment proof |
+
+No replacement is considered active until the previous controller is durably parked and the new
+process has a Claude session ID, non-empty `bridgeSessionId`, PID, exact cwd, process-argv
+model/effort evidence, and owner-visible Remote Control URL/state. Blank or inherited model settings
+are forbidden; the installed user default is Opus/high, so the agentic launcher must pass the
+selected model and effort explicitly.
+
+### Corrected evaluator matrix
+
+The six formal gates remain independently required: the recheck found no prior formal verdict that
+can satisfy them. What is deduplicated is broad shared review and model cost, not independent
+phase evidence. Each gate still uses a fresh session separate from its Codex generator and is
+serialized under the one-evaluator cluster limit. Native Claude Sonnet 5 is the owner-authorized
+opposite-family route: low for the two mechanical gates, medium for the four substantive gates.
+Fable is not pre-dispatched; it may be considered only after a concrete Sonnet capability failure,
+with a new coordinator amendment proving why the same evidence contract cannot be met efficiently.
+The exact assignments and rationales live in `briefs/reset-gates/dispatch.json`.
