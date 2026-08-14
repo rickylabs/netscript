@@ -41,11 +41,23 @@ dispatch base and `milestone-cluster-state.json` `currentMainSha`.
 2. **#1653 `quality-scan-allowance-rail`** — issues #1378 + #1545, inseparable; worktree
    `/home/codex/repos/netscript-007-quality-rail`; branch `chore/quality-scan-allowance-rail`; head
    `09dfb092dccf7f843b9270295047d674a8187362`; Codex thread `019ffcc9-97d6-7602-bb7d-582ecc92b069`
-   (Sol/high, parked). `status:plan-eval`. All four prior `FAIL_PLAN` blockers were
-   coordinator-resolved on 2026-08-13T23:53Z; that verdict is advisory only. **PLAN-EVAL cycle 2
-   (dispatch order 4) is LIVE** — session `b6c48f02-cb56-4dae-abfd-e46bdec05bd5`, Opus 5/medium,
-   Remote Control `https://claude.ai/code/session_01Et9Y4vPf8i9ZMTwiqykvXr`. Do not resume
-   implementation or open another gate until it is terminal.
+   (Sol/high). **Dispatch order 4 is TERMINAL: PLAN-EVAL cycle 2 `PASS`** against evaluated head
+   `09dfb092dccf7f843b9270295047d674a8187362`, evaluator commit
+   `c694cfb311d378f4796280649042c8c275c828ed`, session `b6c48f02-cb56-4dae-abfd-e46bdec05bd5`, PR
+   comment `5299133651`. Cycle-1 advisory preserved bit-identical as
+   `plan-eval-cycle-1-advisory.md`. Branch head is now `c694cfb31` (two run artifacts only).
+   Implementation is unblocked and the leaf moves to `status:impl`.
+
+   Two residual PLAN-EVAL findings are **open for IMPL-EVAL**, not discharged by the `PASS`:
+   - **R-1** — `quality:scan` runs `--allow-read`; a live `api.github.com` owner lookup needs
+     `--allow-net` (+ `--allow-env` for a token). The permission change and the fail-closed
+     resolver's offline / 60-req-hr / fork-PR behaviour are unstated, including for the consumer
+     copy in `agent-tools.generated.ts`. CI reaches the scanner via `deno task quality:scan`
+     (`.llm/tools/gates/catalog.ts:36`), so `deno.json` governs the permission set — no workflow
+     edit needed.
+   - **R-2** — durable owner #1276 T3 is milestoned `Backlog / Triage`, not a numbered release. If
+     the milestone check demands a numbered milestone, all seven records fail on day one. IMPL-EVAL
+     must require a test pinning a `Backlog / Triage`-milestoned owner as passing.
 
 Same-thread steering commands are in `worklog.md` and each leaf's `codex-thread-ids.md`. Never fire
 a second `send-message-v2` at a leaf worktree; resume the recorded thread.
@@ -68,8 +80,12 @@ gate.
 
 ## Next action
 
-Dispatch order 4 (#1653 PLAN-EVAL cycle 2) is live and not yet terminal. Do not resume leaf
-implementation and do not open another gate until it returns `PASS` or `FAIL_PLAN`. On terminal:
-journal the verdict, evaluated head, evaluator commit, and PR comment id here and in `worklog.md`,
-then report to the coordinator. A `FAIL_PLAN` is cycle 2 of the two-failure limit — a third cycle
-requires escalation, not another mechanical relaunch.
+Both dispatched gates are terminal `PASS`. Under the coordinator's post-gate grant, #1653
+implementation resumes on the **existing** Codex thread `019ffcc9-97d6-7602-bb7d-582ecc92b069`
+(`codex exec resume`, never a replacement `send-message-v2`), against the evaluator-approved plan,
+with the PR moved `status:plan-eval` → `status:impl`. Slices are bounded, each with structured
+`run-gate.ts` receipts and a Tier-A stop before the supervisor sign-off commit; no lane
+self-certifies.
+
+Explicitly withheld from this lane: re-opening order 1, merging, publishing, and acquiring the
+expensive-gate mutex. #1644 stays parked at `status:impl` awaiting coordinator merge-readiness.
