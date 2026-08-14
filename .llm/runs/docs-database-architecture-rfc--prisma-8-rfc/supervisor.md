@@ -64,22 +64,30 @@ decisions remain locked, and no further PLAN-EVAL will run.
 
 ## RFC authoring and consolidation
 
-| Stage                    | Route / model / effort                       | Session                                | Result                                                                                           |
-| ------------------------ | -------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Raw draft                | Native Claude Code · Opus 5 · high           | `105f7bbd-895d-4dcd-8641-6768c6e076c8` | 28,194-word evidence-complete draft pushed as `05e5fbac2`; root requested consolidation.         |
-| Consolidation            | Native Claude Code · Opus 5 · high           | `de518f07-68e0-4f77-9cb5-e59dc3e81ebc` | R1–R10 resolved; 11,205-word compact RFC committed and pushed as `5dfc4e8eb`.                    |
-| Root review              | Codex supervisor · personal full read        | `019ffbc7-133b-7852-905d-53a163fe9819` | `PASS_TO_FOCUSED_REVIEW`; Qwen 3.8 Max is next, but final acceptance has not been granted.       |
-| Qwen focused review      | OpenRouter · `qwen/qwen3.8-max` · max        | `3d1277dd-be6a-44af-9e98-4560d8aaf1b7` | Commit `5dfc4e8eb`; 2,181 words, no edits, `PASS_WITH_CHANGES`; QF-01–QF-05 open.                |
-| Grok whole-RFC review    | OpenCode/OpenRouter · `x-ai/grok-4.6` · high | `ses_003644aeaffeSm3UCAW9xUqRIK`       | Commit `5dfc4e8eb`, blob `f46040d8...`; no subagents/edits; `PASS_WITH_REFINEMENTS`, 0 blockers. |
-| Author/editor checkpoint | Native Claude Code · Opus 5 · high           | completed session recorded in worklog  | Root corrections applied and pushed as `ad8effff9`; no later Opus use.                           |
-| Root semantic closure    | Codex supervisor + existing non-Claude lanes | current root session                   | TypeScript/API, JSR, and architecture verdicts `PASS`; pushed as `d28d8e779`.                    |
-| Final evaluator/refiner  | Native Claude Code · Fable 5 · high          | fresh one-shot session, 2026-08-15     | Starting commit `a7a6887c2`; verdict **`PASS`**; one example refinement; gate committed/pushed.  |
+| Stage                    | Route / model / effort                       | Session                                | Result                                                                                            |
+| ------------------------ | -------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Raw draft                | Native Claude Code · Opus 5 · high           | `105f7bbd-895d-4dcd-8641-6768c6e076c8` | 28,194-word evidence-complete draft pushed as `05e5fbac2`; root requested consolidation.          |
+| Consolidation            | Native Claude Code · Opus 5 · high           | `de518f07-68e0-4f77-9cb5-e59dc3e81ebc` | R1–R10 resolved; 11,205-word compact RFC committed and pushed as `5dfc4e8eb`.                     |
+| Root review              | Codex supervisor · personal full read        | `019ffbc7-133b-7852-905d-53a163fe9819` | `PASS_TO_FOCUSED_REVIEW`; Qwen 3.8 Max is next, but final acceptance has not been granted.        |
+| Qwen focused review      | OpenRouter · `qwen/qwen3.8-max` · max        | `3d1277dd-be6a-44af-9e98-4560d8aaf1b7` | Commit `5dfc4e8eb`; 2,181 words, no edits, `PASS_WITH_CHANGES`; QF-01–QF-05 open.                 |
+| Grok whole-RFC review    | OpenCode/OpenRouter · `x-ai/grok-4.6` · high | `ses_003644aeaffeSm3UCAW9xUqRIK`       | Commit `5dfc4e8eb`, blob `f46040d8...`; no subagents/edits; `PASS_WITH_REFINEMENTS`, 0 blockers.  |
+| Author/editor checkpoint | Native Claude Code · Opus 5 · high           | completed session recorded in worklog  | Root corrections applied and pushed as `ad8effff9`; no later Opus use.                            |
+| Root semantic closure    | Codex supervisor + existing non-Claude lanes | current root session                   | TypeScript/API, JSR, and architecture verdicts `PASS`; pushed as `d28d8e779`.                     |
+| Final evaluator/refiner  | Native Claude Code · Fable 5 · high          | `3517a6d2-b0b5-47ec-a207-b3533657a90c` | Starting commit `a7a6887c2`; verdict **`PASS`**; one example refinement; gate `cc90ead70` pushed. |
 
 Before commit `5dfc4e8eb`, root added three narrow corrections: runtime consumes the compiled
 `DatabaseManifest`, not `DatabaseDefinition`; the authority table distinguishes each artifact and
 value's role; and `partial-success` requires mixed successful and unsuccessful target outcomes. The
 later author/editor and root closure passes resolved all blocker/high findings without changing the
-package graph. The phase is `final-verification`; length is not an acceptance gate.
+package graph. The phase is `closed — final gate passed`; length is not an acceptance gate.
+
+Root independently verified the final route from the native stream receipt: systemd unit
+`netscript-db-rfc-final-fable-20260815` exited with `Result=success` and status 0; the stream
+reports model `claude-fable-5`, session `3517a6d2-b0b5-47ec-a207-b3533657a90c`, terminal reason
+`completed`, and no permission denials. Receipt SHA-256 is
+`9939f19d8c66981eadb2589ffdce0f2a3025f24e92ebfb5982a6f24d115cdff3`. At gate close, local, remote,
+and live draft PR #1640 all resolved gate head `cc90ead7047a6f071c239c305619ac1ed77f2dae`; later
+root-only terminal bookkeeping does not alter the RFC.
 
 The Qwen focused review passed architecture/type model, Standard Schema boundary, control/recovery,
 migration/plugin safety, and market/upstream claims. Its QF-01–QF-05 findings are dispositioned in
@@ -122,7 +130,7 @@ descriptor couples both evidence tracks to canonical runtime snapshot identities
   that the catalog is current. Use the existing bounded OpenCode/OpenRouter runner with model
   `openrouter/x-ai/grok-4.6` and variant `high`, record requested/observed identity and raw receipt,
   and run it after the focused Qwen review. That Grok route completed; the later planned Fable route
-  was cancelled by owner supersession.
+  was temporarily cancelled, then explicitly reinstated once and completed at `cc90ead70`.
 - The completed Grok route requested and observed `x-ai/grok-4.6`, variant `high`, session
   `ses_003644aeaffeSm3UCAW9xUqRIK`, with no subagents and no edits. It evaluated RFC commit
   `5dfc4e8eb` / blob `f46040d8...` at HEAD `be83301c6` and returned `PASS_WITH_REFINEMENTS` with
@@ -143,13 +151,14 @@ descriptor couples both evidence tracks to canonical runtime snapshot identities
   establish the exact upstream state and derive candidate end-to-end NetScript type flows before
   plan lock; the Opus synthesis brief now requires this subsystem explicitly.
 - Historical sequence: root personal review → Qwen 3.8 Max focused review → Grok 4.6 high whole-RFC
-  adversarial review → Opus author/editor dispositions. The owner then superseded the planned Fable
-  step; root plus the three existing non-Claude lanes closed semantics before mechanical checks.
+  adversarial review → Opus author/editor dispositions. The owner temporarily cancelled the planned
+  Fable step; root plus the three existing non-Claude lanes closed semantics before the owner later
+  reinstated and completed exactly one final Fable gate.
 - After PLAN-EVAL cycle 2 and the frozen Qwen/Grok review inputs, the owner issued `OWNER-DX-01`.
   The override changes D-07/D-08/D-36 only: progressive NetScript adoption layers are required, only
   a mirrored Prisma model/field/relation/query DSL is forbidden, and erased source-native app
   inference replaces universal generated declarations. It triggered no further PLAN-EVAL. The
   completed author/editor/root passes selected the API and proved the fallback boundary.
-- Latest owner supersession: RFC length is not an acceptance gate, and all further Claude usage is
-  stopped. Completed Claude outputs remain provenance only. No Claude or Fable session may be
-  launched or resumed; final closure uses root judgment and the already-running non-Claude lanes.
+- Terminal owner supersession: RFC length is not an acceptance gate. Exactly one fresh final Fable 5
+  high session was reinstated over the earlier freeze and has completed; no additional Claude or
+  Fable session may be launched or resumed. Only owner review of draft PR #1640 remains.

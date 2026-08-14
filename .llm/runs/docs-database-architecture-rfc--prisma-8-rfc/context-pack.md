@@ -17,18 +17,20 @@ remains historical evidence; its compatibility-first solution is superseded. PLA
 passed, Opus authored and consolidated the draft, Qwen and Grok reviewed it, root closed the
 remaining semantic findings at `d28d8e779`, and the owner-reinstated one-shot fresh native Fable 5
 high evaluator/refiner ran on 2026-08-15 from starting commit `a7a6887c2`. It returned **`PASS`** in
-`evaluate.md` after re-verifying the pinned RC1 claims and applying one narrow example refinement
-(Step 1 `pgvector()` — upstream-false extension-level `dimensions` removed). The earlier
-cancellation is preserved as provenance; it was superseded for exactly this gate and all other
-Claude use stays frozen. Draft PR #1640 awaits owner review and stays draft.
+`evaluate.md` as fresh session `3517a6d2-b0b5-47ec-a207-b3533657a90c` after re-verifying the pinned
+RC1 claims and applying one narrow example refinement (Step 1 `pgvector()` — upstream-false
+extension-level `dimensions` removed). Gate `cc90ead70` is pushed. The earlier cancellation is
+preserved as provenance; it was superseded for exactly this gate and all other Claude use stays
+frozen. Draft PR #1640 awaits owner review and stays draft.
 
 ## Completed
 
 - Loaded current repository, RFC process, harness, PR, doctrine-navigation, and docs-profile rules.
 - Created an isolated worktree/branch from `origin/main` @ `cd7205293`.
 - Read GitHub issue #313 and its comments through the connected GitHub surface.
-- Selected and completed mandatory PLAN-EVAL; the later planned Fable refinement was superseded by
-  the owner's Claude freeze before it ran.
+- Selected and completed mandatory PLAN-EVAL. The owner's later Claude freeze temporarily cancelled
+  final refinement, then a subsequent directive reinstated exactly one fresh Fable gate; it ran and
+  passed.
 - Completed the research corpus, D-01–D-47 lock, prospective JSR audit, and architecture synthesis.
 - Preserved cycle 1 `FAIL_PLAN`, corrected the task finding to 42 keys per generated engine
   workspace, and obtained cycle 2 `PASS`.
@@ -65,9 +67,9 @@ Claude use stays frozen. Draft PR #1640 awaits owner review and stays draft.
   targeted formatting, internal-link, whitespace, and fence checks and pushed `d28d8e779`. The
   consolidated receipt is `reviews/root-semantic-closure.md`.
 
-- The final Fable 5 high gate ran 2026-08-15: starting commit `a7a6887c2`, verdict **`PASS`**, one
-  narrow refinement, docs gates green post-edit; recorded in `evaluate.md` and committed/pushed with
-  a PR #1640 comment.
+- The final Fable 5 high gate ran 2026-08-15 as session `3517a6d2-b0b5-47ec-a207-b3533657a90c`:
+  starting commit `a7a6887c2`, verdict **`PASS`**, one narrow refinement, docs gates green
+  post-edit; recorded in `evaluate.md`, pushed as `cc90ead70`, and posted to PR #1640.
 
 ## In Progress
 
@@ -92,20 +94,20 @@ Claude use stays frozen. Draft PR #1640 awaits owner review and stays draft.
 
 ## Files Changed
 
-| Path                                                      | Status | Notes                                   |
-| --------------------------------------------------------- | ------ | --------------------------------------- |
-| `.llm/runs/docs-database-architecture-rfc--prisma-8-rfc/` | new    | Harness provenance and resumable state. |
-| `rfcs/0000-database-architecture.md`                      | new    | Canonical RFC; semantic closure pushed. |
+| Path                                                      | Status | Notes                                         |
+| --------------------------------------------------------- | ------ | --------------------------------------------- |
+| `.llm/runs/docs-database-architecture-rfc--prisma-8-rfc/` | new    | Harness provenance and terminal receipts.     |
+| `rfcs/0000-database-architecture.md`                      | new    | Canonical RFC; final Fable refinement pushed. |
 
 ## Gates
 
-| Gate family | Current status | Evidence                                                                |
-| ----------- | -------------- | ----------------------------------------------------------------------- |
-| Static      | PASS           | RFC format, `docs:links`, diff, balanced fences at semantic checkpoint. |
-| Fitness     | PASS           | D-01–D-47, OWNER-DX-01, and three final closure audits.                 |
-| Runtime     | N/A            | Docs-only RFC; future matrices are explicit implementation gates.       |
-| Consumer    | PASS           | TypeScript/API, JSR, and architecture closure all passed `d28d8e779`.   |
-| Evaluator   | PASS           | `evaluate.md` — final Fable 5 high gate, 2026-08-15, one refinement.    |
+| Gate family | Current status | Evidence                                                              |
+| ----------- | -------------- | --------------------------------------------------------------------- |
+| Static      | PASS           | Final-gate RFC format, `docs:links`, diff, and 40 balanced fences.    |
+| Fitness     | PASS           | D-01–D-47, OWNER-DX-01, and three final closure audits.               |
+| Runtime     | N/A            | Docs-only RFC; future matrices are explicit implementation gates.     |
+| Consumer    | PASS           | TypeScript/API, JSR, and architecture closure all passed `d28d8e779`. |
+| Evaluator   | PASS           | `evaluate.md`; session `3517a6d2-b0b5-47ec-a207-b3533657a90c`.        |
 
 ## Open Questions
 
@@ -119,10 +121,11 @@ Claude use stays frozen. Draft PR #1640 awaits owner review and stays draft.
 - Drift: #313 compatibility-first architecture is superseded; the numeric length target remains
   removed; the earlier final-Fable cancellation is historical and is superseded only for this one
   scheduled gate.
-- Debt: pending targeted ledger scan.
+- Debt: final evaluator reports zero new, resolved, deepened, or unrecorded doctrine violations;
+  designed future debt closure is not claimed as implemented.
 
 ## Commits
 
 - Semantic review closure: `d28d8e779` (pushed).
-- Final Fable gate + refinement: committed and pushed 2026-08-15 from starting commit `a7a6887c2`.
+- Final Fable gate + refinement: `cc90ead70` (pushed), from starting commit `a7a6887c2`.
 - See the draft PR's commit list + per-slice PR comments (V3 retired `commits.md`).

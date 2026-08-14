@@ -200,7 +200,7 @@ documentation.
   absolute-final substantive gate, superseding the earlier Claude/Fable cancellation for exactly
   this gate. The cancellation remains historical provenance; all other Claude use stays frozen.
 - **Source:** Owner directive 2026-08-14; unit `netscript-db-rfc-final-fable-20260815`;
-  `briefs/fable-final-evaluator.md`.
+  `briefs/fable-final-evaluator.md`; native session `3517a6d2-b0b5-47ec-a207-b3533657a90c`.
 - **Expected:** Evaluate the checked-out RFC at the exact remote tip; refine only within D-01–D-47
   and `OWNER-DX-01`; no subagents, workflows, resumes, or fallback models.
 - **Actual:** Starting commit `a7a6887c2` (verified equal to the fetched remote tip). The full RFC,
@@ -210,7 +210,10 @@ documentation.
   `pgvector({ dimensions: 1536 })` invented an extension-level dimension option that pgvector and
   the pinned demo do not have; the call is now `pgvector()` and the Step 6 declaration takes
   `options?`. No decision was reopened. Verdict: **`PASS`** in `evaluate.md`; targeted fmt,
-  `docs:links` (103 docs, 0 broken), `git diff --check`, and fence balance all green post-edit.
+  `docs:links` (103 docs, 0 broken), `git diff --check`, and fence balance all green post-edit. The
+  unit exited `Result=success`/status 0 with terminal reason `completed` and no permission denials;
+  stream receipt SHA-256 is `9939f19d8c66981eadb2589ffdce0f2a3025f24e92ebfb5982a6f24d115cdff3`; gate
+  `cc90ead70` was the pushed remote and live PR head at gate close.
 - **Severity:** none — gate completed as authorized.
 - **Action:** close the run; draft PR #1640 stays draft for owner review.
 - **Evidence:** `evaluate.md`; this gate's commit on `docs/database-architecture-rfc`.
