@@ -32,19 +32,22 @@ dispatch order.
   `session revoke --auth-url` → `http://localhost:8094/api/v1/auth` default, same pin class as #1243
   but outside its narrowing; it needs its own issue.
 - `scaffold-generated-output-correctness` (#1262, #1263, #1588, PR #1654, `status:plan-eval`):
-  **PLAN-EVAL cycle 2 is running** — the final permitted plan cycle — at immutable source head
-  `5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5`, session `06451c1e-a9b8-47d2-8934-be2247ef5347`
-  (bg `06451c1e`, PID `2487919`, native Claude Opus 5 / medium). Cycle 1 returned `FAIL_PLAN` at
-  `14d8b38b4` (verdict commit `13008abf8`, preserved by the cycle-2 brief as
-  `plan-eval-cycle-1.md`). The existing Codex plan author `019ffcca-8be0-74c2-bb0e-c82cf5ce3c85`
-  repaired the plan same-thread at `5b3c6fcf2`: OD-1 resolved as option (b) — the memory showcase
-  router is excluded and moved to Deferred scope, so no `P2025` translation is prescribed for a
-  router with no Prisma; OD-2 resolved as a generator-level direct-call contract; slices 2-6
-  restated as `proves -> gate -> files` with `generate-engine-mod.ts` added to the surface list; and
-  #1262 acceptance item 3 recorded verified-by-inspection. This lane re-derived the boundary itself:
-  the head is plan-only (no `packages/`/`plugins/` delta from base) and `deno.lock` is untouched.
-  The leaf is still plan-only with no product code; **implementation resumes only on a terminal
-  `PASS`**. A second `FAIL_PLAN` exhausts the two-cycle limit and escalates.
+  **PLAN-EVAL cycle 2 closed `PASS`** at evaluated head
+  `5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5`; verdict commit `b8fc5eb53` is pushed and the branch
+  head is now `b8fc5eb53`. The cycle-1 `FAIL_PLAN` is preserved byte-identical as
+  `plan-eval-cycle-1.md` (verified by sha256). The plan gate is closed; the two-cycle limit was used
+  fully and ended in `PASS`, not escalation.
+
+  **The leaf is still plan-only and implementation has NOT resumed.** Three stops remain, none
+  lifted by this verdict: implementation needs its own explicit coordinator grant; the
+  `scaffold.runtime`/Aspire/Docker singleton lease is still ungranted and slice 6 is the only slice
+  that may touch it; and Tier-A slice review plus a fresh opposite-family IMPL-EVAL remain mandatory
+  with no lane self-certifying. Any slice touching `packages/**` must also clear
+  `deno task quality:scan` and `deno task arch:check` at Tier-A.
+
+  Carried note: the **leaf-local** `plan.md` §Status, `supervisor.md`, and `context-pack.md` still
+  read as "cycle 2 pending a brief and a grant". Both conditions were met and the cycle has closed;
+  the plan author should refresh that wording or the leaf reads as blocked when it is not.
 
 Both 2026-08-13 "coordinator decision required" blockers are resolved; see `worklog.md`.
 

@@ -272,7 +272,7 @@ cycle 2 were verified as actually met, not assumed:**
 | Registry `bridgeSessionId` | `session_01AFoKjRXMVCaXUzJ9HqDvGt` (non-empty) |
 | Remote Control URL | `https://claude.ai/code/session_01AFoKjRXMVCaXUzJ9HqDvGt` |
 | Generator separation | fresh session; the plan author is Codex thread `019ffcca-8be0…`, confirmed idle at `task_complete` ("Plan repair is complete and stopped at the PLAN-EVAL cycle-2…") and not resumed |
-| Verdict | _pending_ |
+| Verdict | **`PASS`** — `b8fc5eb53a530d337602f7dc377239651a57d428 chore(harness): record scaffold plan-eval cycle 2 verdict`, evaluated head `5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5` (= the commit's parent), pushed; structured PR comment `2026-08-14T23:54:02Z`. Cycle 2 of 2 closed with `PASS`. Session retired (`claude stop 06451c1e`, PID gone). |
 
 Launched `2026-08-14T23:48:26Z`. Before launch, a process (`2544277`) briefly appeared to own the
 leaf worktree; it was traced and found to be this lane's own transient verification subprocess,
@@ -285,6 +285,38 @@ resolves as a Remote Control URL.
 
 Constraints honored: no implementation before a terminal verdict, no replacement plan author, no
 other lane touched, no merge, no publish, no expensive-gate lease (`docker ps -a` empty).
+
+#### Topic Tier-A verification of the cycle-2 `PASS`
+
+| Claim | Independent check | Result |
+| --- | --- | --- |
+| Evaluated head is the pinned source head | `git rev-parse b8fc5eb53^` | `5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5` — matches `dispatch.json` order 5 |
+| **Cycle-1 verdict preserved verbatim** | `diff` + `sha256sum` of `plan-eval-cycle-1.md` against `git show 13008abf8:…/plan-eval.md` | **byte-identical**, both `9f3b3c8ef08014b36b575e8d774209da183f38f569cc682ab2e5e5f3f875c387`. The cycle-1 `FAIL_PLAN` record was not silently rewritten by its successor. |
+| Commit carries only evaluator artifacts | `git show --stat b8fc5eb53` | 2 files: `plan-eval-cycle-1.md` (+188, new) and `plan-eval.md` (rewritten). No plan text, no product file. |
+| Head is still plan-only | `git diff --name-only 01e096049..HEAD -- . ':(exclude).llm/**'` | empty |
+| Lock hygiene | same diff scoped to `deno.lock` | empty |
+| No lifecycle mutation | `gh pr view 1654` | `OPEN`, draft, `MERGEABLE`, exactly one `status:plan-eval`, head `b8fc5eb53` |
+| No resource leak | `docker ps -a` | empty |
+
+**What this `PASS` does and does not release.** It closes the plan gate: the harness now permits
+implementation to begin. It does **not** grant it here. Three stops the verdict itself names and
+this lane holds:
+
+1. **Implementation is not resumed.** The reset contract requires an explicit coordinator grant per
+   leaf; none exists for implementation. The Codex plan author `019ffcca-8be0…` stays idle.
+2. **The `scaffold.runtime` / Aspire / Docker singleton lease is still not granted.** Slice 6 is the
+   only slice that may touch it and it cannot run without a coordinator lease grant. A plan `PASS`
+   is not a lease.
+3. **Tier-A slice review and a fresh opposite-family IMPL-EVAL remain mandatory**, with no lane
+   self-certifying. Per `netscript-harness`, any slice touching `packages/**` must additionally
+   clear `deno task quality:scan` and `deno task arch:check` at Tier-A, and a new
+   `// deno-lint-ignore` or `as unknown as` added to green a wrapper is review-blocking.
+
+The evaluator's own non-blocking note stands: the **leaf-local** `plan.md` §"Status",
+`supervisor.md`, and `context-pack.md` still describe cycle 2 as pending a brief and a grant. Both
+conditions were satisfied and the cycle has now closed `PASS`, so that wording should be refreshed
+on the plan author's next artifact touch or a reader will misread the leaf as still blocked. This
+topic run's own artifacts are refreshed here.
 
 ## Wave 0 lane assignments
 
