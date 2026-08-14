@@ -220,3 +220,45 @@ closed against directly-read evidence. Four **non-blocking** notes carry into sl
 
 Cycle 2 was the second and final PLAN-EVAL cycle; `PASS` closes the plan gate and unblocks slice S1
 (RFC authoring). No third cycle is available or needed.
+
+## 2026-08-15 — #1502 phase transition and S1 dispatch
+
+### Lifecycle transition (explicit coordinator grant)
+
+The reset common contract withholds relabel authority from topic orchestrators. The coordinator
+granted this specific transition ("transition the draft from `status:plan-eval` to `status:impl` as
+protocol requires"), so it is an authorized exception, not an assumed permission, and it is scoped to
+PR #1651 only. Issue #1502's own stale `status:research` (drift D-4) is **not** covered by this grant
+and remains reported rather than fixed.
+
+| Action | Evidence | Result |
+| --- | --- | --- |
+| Label set replaced atomically | live PR #1651 after update | exactly one `status:` label, now `status:impl`; the other eight labels unchanged |
+| Draft preserved | live PR #1651 | `draft: true` |
+| Phase comment | `https://github.com/rickylabs/netscript/pull/1651#issuecomment-5299155549` | `[PHASE: IMPL]`, verdict reconciliation, four carried notes, and the next-step boundaries |
+
+Label move and phase comment were performed in the same action, per the stage-label lifecycle rule.
+
+### S1 dispatch — existing thread resumed, never replaced
+
+| Field | Value |
+| --- | --- |
+| Thread | `019ffcc5-d3e1-7c13-9815-e9956ec43683` — the original author thread |
+| Mechanism | `.llm/tools/agentic/codex/codex-resume.ts`, dry-run first (`ok: true`, 7,103 message bytes, single `codex exec resume`) |
+| Rival check before send | `agentic:codex-status --worktree …-1502` → `0 recent` agents, clean at `3e0c8858b` |
+| Attachment after send | `agentic:codex-status` → **1** agent `working`, thread `019ffcc5-…`, `gpt-5.6-sol / high`, correct worktree |
+| Brief | `slices/impl-1502-s1.md`, committed at `f89cc238916d08a247878f2833f971869c70629e` |
+| Boundaries restated | RFC-only; packages/plugins are inspection surfaces; no merge, publish, ready-flip, relabel, issue filing, `#1348` mutation, central-state change, `deno.lock` churn, or `scaffold.runtime` |
+
+No second `send-message-v2` was fired at that worktree — the one-active-send rule holds, and the
+resume continues the same thread rather than forking a rival. The resume runs detached rather than
+under a foreground timeout, because a timeout kills the slice while the launcher appears to succeed.
+
+### Scope of this turn's instruction
+
+S1 only: the RFC's public contract, ownership, and descriptors/routers/help/completion/errors, plus
+closing verdict notes N-1..N-4, ticking DoD box 1 with the verdict commit as evidence, and moving the
+PR body's `## Harness` phase line to `impl`. Each slice must commit, push by explicit refspec,
+comment on #1651, update the leaf run dir in the same commit, and then **stop** at
+`TIER-A STOP: slice S<n> ready for topic review`. S2 is not released until this orchestrator reviews
+S1 substantively — a green automated gate is not a sign-off, and no lane self-certifies.
