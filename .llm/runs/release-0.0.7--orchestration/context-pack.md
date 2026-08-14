@@ -49,3 +49,12 @@ with explicit `--model claude-opus-5`, `--effort high`, `--remote-control`, the 
 and bypass permissions. Their exact session/PID/bridge/URL/topic-head receipts live in
 `milestone-cluster-state.json` and their topic journals. The hybrid wrapper is not needed unless a
 later task explicitly authorizes its alternate-worker delegation surface.
+
+Live checkpoint at `2026-08-14T23:29:49Z`: `main` is now
+`dd472102d05ea13ab7ac7654aeedb177fbae2eb8` after coordinator merge of #1644. Reset orders 1, 2,
+3, 4, and 6 are terminal `PASS`; orders 3/4/6 have been returned to their preserved Codex
+implementation threads through the existing Claude topic supervisors. Fixes order 5 is the sole
+remaining reset evaluator and runs independently in the fixes lane. PR #1643 is at its ready/CI
+gate. Continue to serialize only inside each topic orchestrator; never introduce a cluster-wide
+evaluator wait, and keep the separate shared-resource `expensiveGates` mutex empty until a genuine
+E2E/Aspire gate needs it.

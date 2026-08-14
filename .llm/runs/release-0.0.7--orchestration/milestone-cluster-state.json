@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
-  "currentMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+  "currentMainSha": "dd472102d05ea13ab7ac7654aeedb177fbae2eb8",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -361,11 +361,11 @@
     },
     {
       "number": 1561,
-      "state": "open"
+      "state": "closed"
     },
     {
       "number": 1563,
-      "state": "open"
+      "state": "closed"
     },
     {
       "number": 1588,
@@ -429,7 +429,7 @@
     },
     {
       "number": 1621,
-      "state": "open"
+      "state": "closed"
     },
     {
       "number": 1622,
@@ -448,12 +448,15 @@
     {
       "id": "comparison-docs-programme",
       "lane": "docs",
-      "phase": "blocked",
+      "phase": "implementing",
       "baseBranch": "main",
       "headSha": "d35cbca30872d1f55118d63437638e93270c2ac3",
+      "currentPrHeadSha": "a790e91e26a4fb84636b4f3c57bd6444196b4ca9",
+      "evaluatorCommitSha": "a790e91e26a4fb84636b4f3c57bd6444196b4ca9",
+      "evaluationVerdict": "PASS",
       "issueNumbers": [1551],
       "implementerAgentId": "019ffcc9-16c2-7573-b7f6-d627172408e8",
-      "evaluatorAgentId": null,
+      "evaluatorAgentId": "40a06314-b69a-4ca0-a4a0-1224c5e377ca",
       "branch": "docs/comparison-docs-programme",
       "worktree": "/home/codex/repos/netscript-007-docs-comparison",
       "receiptRefs": []
@@ -461,12 +464,15 @@
     {
       "id": "quality-scan-allowance-rail",
       "lane": "internals",
-      "phase": "blocked",
+      "phase": "implementing",
       "baseBranch": "main",
       "headSha": "09dfb092dccf7f843b9270295047d674a8187362",
+      "currentPrHeadSha": "c694cfb311d378f4796280649042c8c275c828ed",
+      "evaluatorCommitSha": "c694cfb311d378f4796280649042c8c275c828ed",
+      "evaluationVerdict": "PASS",
       "issueNumbers": [1378, 1545],
       "implementerAgentId": "019ffcc9-97d6-7602-bb7d-582ecc92b069",
-      "evaluatorAgentId": null,
+      "evaluatorAgentId": "b6c48f02-cb56-4dae-abfd-e46bdec05bd5",
       "branch": "chore/quality-scan-allowance-rail",
       "worktree": "/home/codex/repos/netscript-007-quality-rail",
       "receiptRefs": []
@@ -474,9 +480,14 @@
     {
       "id": "harness-evidence-and-verdict-tooling",
       "lane": "internals",
-      "phase": "evaluating",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "4d9fb196765cbf1a6bc7eaa7c18ec82b237ab89f",
+      "currentPrHeadSha": "d6e6a6788cd38127f822d192f37557106dad4ebc",
+      "evaluatorCommitSha": "d6e6a6788cd38127f822d192f37557106dad4ebc",
+      "evaluationVerdict": "PASS",
+      "mergeCommitSha": "dd472102d05ea13ab7ac7654aeedb177fbae2eb8",
+      "mergedAt": "2026-08-14T23:27:02.000Z",
       "issueNumbers": [1561, 1563, 1621],
       "implementerAgentId": "019ffcc9-97ba-7770-a890-a1ebd80ec793",
       "evaluatorAgentId": "1afc9054-cc28-48a8-9fc4-86ae2e3bb28d",
@@ -491,12 +502,15 @@
     {
       "id": "legacy-port-pin-sweep",
       "lane": "fixes",
-      "phase": "blocked",
+      "phase": "gating",
       "baseBranch": "main",
       "headSha": "e6ba15ec6414c0a42b1f9870791131162ea71c36",
+      "currentPrHeadSha": "a949a6cd1777b0d05b1a3b45143de15951aa6dc2",
+      "evaluatorCommitSha": "a949a6cd1777b0d05b1a3b45143de15951aa6dc2",
+      "evaluationVerdict": "PASS",
       "issueNumbers": [1243],
       "implementerAgentId": "019ffcca-8bdc-7fb3-98c5-df90e2ae3b1f",
-      "evaluatorAgentId": null,
+      "evaluatorAgentId": "8c47751a-6a30-4dab-b25c-dbafe9873455",
       "branch": "fix/legacy-port-pin-sweep",
       "worktree": "/home/codex/repos/netscript-007-leaf-legacy-port-pin-sweep",
       "receiptRefs": []
@@ -504,12 +518,12 @@
     {
       "id": "scaffold-generated-output-correctness",
       "lane": "fixes",
-      "phase": "blocked",
+      "phase": "evaluating",
       "baseBranch": "main",
       "headSha": "14d8b38b4db7ba0635cbbcac2f8cd8903bee0ec9",
       "issueNumbers": [1262, 1263, 1588],
       "implementerAgentId": "019ffcca-8be0-74c2-bb0e-c82cf5ce3c85",
-      "evaluatorAgentId": null,
+      "evaluatorAgentId": "bd703a7d-4757-4689-a603-5ca98f7d7323",
       "branch": "fix/scaffold-generated-output-correctness",
       "worktree": "/home/codex/repos/netscript-007-leaf-scaffold-generated-output-correctness",
       "receiptRefs": []
@@ -517,12 +531,15 @@
     {
       "id": "rfc-plugin-cli-contribution",
       "lane": "features",
-      "phase": "blocked",
+      "phase": "implementing",
       "baseBranch": "main",
       "headSha": "12276e6d86403ed1340ef79a963e87d401d643e9",
+      "currentPrHeadSha": "3e0c8858b4a2552926d2965b62cbcc97a15c2935",
+      "evaluatorCommitSha": "3e0c8858b4a2552926d2965b62cbcc97a15c2935",
+      "evaluationVerdict": "PASS",
       "issueNumbers": [1502],
       "implementerAgentId": "019ffcc5-d3e1-7c13-9815-e9956ec43683",
-      "evaluatorAgentId": null,
+      "evaluatorAgentId": "28cc8106-967b-4fb7-90f3-dd95054ae953",
       "branch": "docs/rfc-plugin-cli-contribution",
       "worktree": "/home/codex/repos/netscript-007-features-1502",
       "receiptRefs": []
@@ -531,7 +548,7 @@
   "evaluatorLeases": [
     {
       "id": "reset-gate-01-harness-evidence-and-verdict-tooling-impl-eval",
-      "state": "running",
+      "state": "complete",
       "lane": "internals",
       "leafId": "harness-evidence-and-verdict-tooling",
       "phase": "impl-eval",
@@ -551,7 +568,132 @@
       },
       "leaseOwner": "codex-root-0.0.7",
       "grantedAt": "2026-08-14T23:04:51.000Z",
-      "attachedAt": "2026-08-14T23:06:32.000Z"
+      "attachedAt": "2026-08-14T23:06:32.000Z",
+      "completedAt": "2026-08-14T23:14:56.438Z",
+      "verdict": "PASS",
+      "evaluatorCommitSha": "d6e6a6788cd38127f822d192f37557106dad4ebc"
+    },
+    {
+      "id": "reset-gate-02-legacy-port-pin-sweep-impl-eval",
+      "state": "complete",
+      "lane": "fixes",
+      "leafId": "legacy-port-pin-sweep",
+      "phase": "impl-eval",
+      "dispatchOrder": 2,
+      "sourceHead": "e6ba15ec6414c0a42b1f9870791131162ea71c36",
+      "evaluatorAgentId": "8c47751a-6a30-4dab-b25c-dbafe9873455",
+      "backgroundAgentId": "8c47751a",
+      "pid": 2450732,
+      "bridgeSessionId": "session_01LmSFUzxkHGuH98fiDhgHxH",
+      "remoteControlUrl": "https://claude.ai/code/session_01LmSFUzxkHGuH98fiDhgHxH",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-opus-5",
+        "effort": "low",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-14T23:16:24.161Z",
+      "completedAt": "2026-08-14T23:20:50.477Z",
+      "verdict": "PASS",
+      "evaluatorCommitSha": "a949a6cd1777b0d05b1a3b45143de15951aa6dc2"
+    },
+    {
+      "id": "reset-gate-03-rfc-plugin-cli-contribution-plan-eval-cycle-2",
+      "state": "complete",
+      "lane": "features",
+      "leafId": "rfc-plugin-cli-contribution",
+      "phase": "plan-eval",
+      "dispatchOrder": 3,
+      "sourceHead": "12276e6d86403ed1340ef79a963e87d401d643e9",
+      "evaluatorAgentId": "28cc8106-967b-4fb7-90f3-dd95054ae953",
+      "backgroundAgentId": "28cc8106",
+      "pid": 2463708,
+      "bridgeSessionId": "session_01D7t8efMh88nwR2PazUPkC1",
+      "remoteControlUrl": "https://claude.ai/code/session_01D7t8efMh88nwR2PazUPkC1",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-opus-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-14T23:17:07.633Z",
+      "completedAt": "2026-08-14T23:24:37.813Z",
+      "verdict": "PASS",
+      "evaluatorCommitSha": "3e0c8858b4a2552926d2965b62cbcc97a15c2935"
+    },
+    {
+      "id": "reset-gate-04-quality-scan-allowance-rail-plan-eval-cycle-2",
+      "state": "complete",
+      "lane": "internals",
+      "leafId": "quality-scan-allowance-rail",
+      "phase": "plan-eval",
+      "dispatchOrder": 4,
+      "sourceHead": "09dfb092dccf7f843b9270295047d674a8187362",
+      "evaluatorAgentId": "b6c48f02-cb56-4dae-abfd-e46bdec05bd5",
+      "backgroundAgentId": "b6c48f02",
+      "pid": 2467808,
+      "bridgeSessionId": "session_01Et9Y4vPf8i9ZMTwiqykvXr",
+      "remoteControlUrl": "https://claude.ai/code/session_01Et9Y4vPf8i9ZMTwiqykvXr",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-opus-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-14T23:18:58.036Z",
+      "completedAt": "2026-08-14T23:24:44.178Z",
+      "verdict": "PASS",
+      "evaluatorCommitSha": "c694cfb311d378f4796280649042c8c275c828ed"
+    },
+    {
+      "id": "reset-gate-05-scaffold-generated-output-correctness-plan-eval-cycle-1",
+      "state": "running",
+      "lane": "fixes",
+      "leafId": "scaffold-generated-output-correctness",
+      "phase": "plan-eval",
+      "dispatchOrder": 5,
+      "sourceHead": "14d8b38b4db7ba0635cbbcac2f8cd8903bee0ec9",
+      "evaluatorAgentId": "bd703a7d-4757-4689-a603-5ca98f7d7323",
+      "backgroundAgentId": "bd703a7d",
+      "pid": 2470890,
+      "bridgeSessionId": "session_015wwEYoUsxCwzT3PQeSqi2A",
+      "remoteControlUrl": "https://claude.ai/code/session_015wwEYoUsxCwzT3PQeSqi2A",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-opus-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-14T23:26:20.976Z"
+    },
+    {
+      "id": "reset-gate-06-comparison-docs-programme-plan-eval-cycle-1",
+      "state": "complete",
+      "lane": "docs",
+      "leafId": "comparison-docs-programme",
+      "phase": "plan-eval",
+      "dispatchOrder": 6,
+      "sourceHead": "d35cbca30872d1f55118d63437638e93270c2ac3",
+      "evaluatorAgentId": "40a06314-b69a-4ca0-a4a0-1224c5e377ca",
+      "backgroundAgentId": "40a06314",
+      "pid": 2465471,
+      "bridgeSessionId": "session_0126JRYrbXqvoJwskcF31RwW",
+      "remoteControlUrl": "https://claude.ai/code/session_0126JRYrbXqvoJwskcF31RwW",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-opus-5",
+        "effort": "low",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-14T23:18:01.067Z",
+      "completedAt": "2026-08-14T23:29:49.147Z",
+      "verdict": "PASS",
+      "evaluatorCommitSha": "a790e91e26a4fb84636b4f3c57bd6444196b4ca9"
     }
   ],
   "expensiveGates": [],
@@ -568,7 +710,7 @@
     }
   ],
   "exactMainEvidence": {
-    "gitHead": "01e0960494c95ce56eb35892c211a095eb13e6ed",
+    "gitHead": "dd472102d05ea13ab7ac7654aeedb177fbae2eb8",
     "surface": "repository",
     "expectedGateIds": [
       "arch-check",
@@ -594,5 +736,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-14T23:13:20.000Z"
+  "updatedAt": "2026-08-14T23:29:49.147Z"
 }
