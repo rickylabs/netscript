@@ -129,12 +129,12 @@ replacement uses the same preserved topic branch/worktree, native Remote Control
 evidence; implementation remains delegated to WSL Codex with effort matched to documented task
 complexity.
 
-| Lane      | Preserved Codex topic thread           | Pre-transition state                                    | Claude requested route        | Worktree / branch                                                                    | Replacement identity     |
-| --------- | -------------------------------------- | ------------------------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------ | ------------------------ |
-| docs      | `019ffcc0-e19b-71d1-95ce-8c72559eb026` | parked: prior controller absent/offline; clean worktree | native Claude · Opus 5 · high | `/home/codex/repos/netscript-007-docs` / `orchestrator/release-0.0.7-docs`           | pending attachment proof |
-| internals | `019ffcc0-e1b5-74f0-96eb-cdeb298d6b17` | parked: `TOPIC_CONTROLLER_PARKED`, idle, clean          | native Claude · Opus 5 · high | `/home/codex/repos/netscript-007-internals` / `orchestrator/release-0.0.7-internals` | pending attachment proof |
-| fixes     | `019ffcc0-e1ae-7b70-b3b8-8804ebd6f773` | parked: `TOPIC_CONTROLLER_PARKED`, idle, clean          | native Claude · Opus 5 · high | `/home/codex/repos/netscript-007-fixes` / `orchestrator/release-0.0.7-fixes`         | pending attachment proof |
-| features  | `019ffcc0-e1d2-7850-a308-354b670c6f3d` | parked: `TOPIC_CONTROLLER_PARKED`, idle, clean          | native Claude · Opus 5 · high | `/home/codex/repos/netscript-007-features` / `orchestrator/release-0.0.7-features`   | pending attachment proof |
+| Lane      | Preserved Codex topic thread           | Pre-transition state                                    | Claude requested route        | Worktree / branch                                                                    | Replacement identity                                                                                      |
+| --------- | -------------------------------------- | ------------------------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| docs      | `019ffcc0-e19b-71d1-95ce-8c72559eb026` | parked: prior controller absent/offline; clean worktree | native Claude · Opus 5 · high | `/home/codex/repos/netscript-007-docs` / `orchestrator/release-0.0.7-docs`           | `fcf04b0f-…` · PID `2429469` · bridge `session_01PL…` · topic head `3e554349b`                            |
+| internals | `019ffcc0-e1b5-74f0-96eb-cdeb298d6b17` | parked: `TOPIC_CONTROLLER_PARKED`, idle, clean          | native Claude · Opus 5 · high | `/home/codex/repos/netscript-007-internals` / `orchestrator/release-0.0.7-internals` | `f7691917-…` · PID `2429478` · bridge `session_01Hq…` (`cse_01Hq…` daemon alias) · topic head `98661da4f` |
+| fixes     | `019ffcc0-e1ae-7b70-b3b8-8804ebd6f773` | parked: `TOPIC_CONTROLLER_PARKED`, idle, clean          | native Claude · Opus 5 · high | `/home/codex/repos/netscript-007-fixes` / `orchestrator/release-0.0.7-fixes`         | `c7597d28-…` · PID `2430399` · bridge `session_014p…` · topic head `1a5c3d5a9`                            |
+| features  | `019ffcc0-e1d2-7850-a308-354b670c6f3d` | parked: `TOPIC_CONTROLLER_PARKED`, idle, clean          | native Claude · Opus 5 · high | `/home/codex/repos/netscript-007-features` / `orchestrator/release-0.0.7-features`   | `19621a0b-…` · PID `2430404` · bridge `session_01LQ…` · topic head `fed3f8119`                            |
 
 No replacement is considered active until the previous controller is durably parked and the new
 process has a Claude session ID, non-empty `bridgeSessionId`, PID, exact cwd, process-argv
@@ -151,8 +151,13 @@ leaf, evaluator, watcher, or resource process now owns any of the four topic wor
 Four Sonnet 5/low replacement canaries were subsequently started only long enough to reconcile and
 journal their lanes. After the owner's model-floor correction, each returned
 `TOPIC_CONTROLLER_PARKED_MODEL_FLOOR` and exited without launching an implementation leaf or formal
-evaluator. They are historical evidence, not active controllers; their Opus 5/high replacements
-remain pending attachment proof.
+evaluator. They are historical evidence, not active controllers.
+
+At `2026-08-14T23:00:08Z`, all four native Opus 5/high replacements satisfied the attachment gate:
+each has an exact Claude session ID, non-empty bridge ID, PID/cwd match, explicit process-argv model
+and effort, owner-visible Remote Control URL, a clean pushed topic checkpoint, and no premature leaf
+or evaluator dispatch. The central controller state is now `active`; the serialized formal-gate
+queue may begin at order 1.
 
 ### Corrected evaluator matrix
 

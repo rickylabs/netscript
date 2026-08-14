@@ -46,6 +46,7 @@
 | 2026-08-14T22:25:56.000Z | Owner rejected Sonnet 5/low as below the topic-supervision floor. All four reconciliation-only canaries returned `TOPIC_CONTROLLER_PARKED_MODEL_FLOOR`, exited, and launched no leaf or evaluator; Opus 5/high replacements remain pending.                                                                                                          | Topic journals and native process/registry audit; owner correction                                                                                                                                                                                              |
 | 2026-08-14T22:41:15.000Z | Recovered and transcript-verified the actual milestone coordinator rather than a topic/leaf child, then persisted its exact same-session recovery reference.                                                                                                                                                                                         | Codex session `019ffaa3-32ae-7b02-92a5-d7ae146d8cbd`; canonical rollout JSONL; `session_meta`, persistent goal, run-creation, and commit/push events                                                                                                            |
 | 2026-08-14T22:41:15.000Z | Rebuilt the current route policy: topic orchestrators use native Opus 5/high; implementations remain WSL Codex Sol with documented per-slice effort; most adversarial/phase evaluation uses fresh Opus 5 low–high; PLAN-EVAL is conditional; Fable 5 is reserved for recorded genuine architecture or exceptional implementation-review complexity.  | Owner amendment; central topic/reset briefs; `briefs/reset-gates/dispatch.json`; cluster state                                                                                                                                                                  |
+| 2026-08-14T23:00:08.000Z | Attachment-proved exactly four native Opus 5/high Remote Control topic supervisors and reconciled every frozen leaf/PR head without mutation. All four pushed topic-only checkpoints; no leaf or evaluator launched early.                                                                                                                           | Claude sessions `fcf04b0f-…` / `f7691917-…` / `c7597d28-…` / `19621a0b-…`; four non-empty bridge IDs; topic heads `3e554349b` / `98661da4f` / `1a5c3d5a9` / `fed3f8119`; clean worktrees and exact remote refs                                                  |
 
 ## Current design checkpoint
 
@@ -54,7 +55,7 @@
   expensive gate globally, inactive release captain until exact-main readiness.
 - Step 0 repair and PLAN-EVAL are approved. Dispatch may begin after the final clean-environment
   sweep and status transition to implementation.
-- The reset sweep and controller parking are complete. Before leaf/evaluator dispatch resumes,
-  attachment-prove exactly one Opus 5/high native Claude supervisor in each preserved topic
-  worktree. Implementation stays on WSL Codex Sol with per-slice effort; evaluator selection follows
-  the owner-amended Opus-default/Fable-exception policy.
+- The reset sweep, controller parking, and four Opus 5/high Remote Control attachment proofs are
+  complete. The formal evaluator queue is ready to resume serially at order 1. Implementation stays
+  on WSL Codex Sol with per-slice effort; evaluator selection follows the owner-amended
+  Opus-default/Fable-exception policy.

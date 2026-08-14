@@ -36,7 +36,8 @@ the clock reset; its exact head, hold, lease, CI, and formal gate must be re-est
 All four historical Codex topic controllers are now durably parked: docs had no live session;
 internals/fixes/features returned `TOPIC_CONTROLLER_PARKED`, are idle, and left clean worktrees. The
 rejected Sonnet-low replacement canaries also exited with `TOPIC_CONTROLLER_PARKED_MODEL_FLOOR` and
-dispatched no leaf or evaluator. Launch the real replacements through native Claude 2.1.231 with
-explicit `--model claude-opus-5`, `--effort high`, and `--remote-control`, the exact initial brief,
-and bypass permissions. The hybrid wrapper is not needed unless a later task explicitly authorizes
-its alternate-worker delegation surface.
+dispatched no leaf or evaluator. The real replacements are now active through native Claude 2.1.233
+with explicit `--model claude-opus-5`, `--effort high`, `--remote-control`, the exact initial brief,
+and bypass permissions. Their exact session/PID/bridge/URL/topic-head receipts live in
+`milestone-cluster-state.json` and their topic journals. The hybrid wrapper is not needed unless a
+later task explicitly authorizes its alternate-worker delegation surface.
