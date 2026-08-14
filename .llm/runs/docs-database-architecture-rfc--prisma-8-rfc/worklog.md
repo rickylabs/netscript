@@ -171,6 +171,7 @@ and release exits recorded in `plan.md`.
 | 2026-08-13 | 6     | disposition | The author/editor pass resolved QF/GR and OWNER-DX-01 findings; root's correction pass was committed and pushed as `ad8effff9`.                                                                                                                                                                                                                |
 | 2026-08-13 | 7     | owner-gate  | Owner removed word-count acceptance criteria and froze all further Claude/Fable usage. Existing completed sessions remain provenance only; no planned final Fable session ran.                                                                                                                                                                 |
 | 2026-08-13 | 7     | closure     | Root corrected executable extension transport, canonical space/snapshot binding evidence, emit/load ordering, compile/emit authority, branded IDs, validation projection honesty, package aggregate transport, and retained rollback. TypeScript/API, prospective JSR, and architecture lanes all returned `PASS`; `d28d8e779` was pushed.     |
+| 2026-08-14 | 8     | owner-gate  | Owner reinstated exactly one fresh native Fable 5 high final evaluator/refinement gate at 2026-08-15 00:00 Europe/Zurich. Unit `netscript-db-rfc-final-fable-20260815` uses the persisted fail-closed launcher and brief; no fallback, subagent, workflow, or other Claude route is authorized.                                                |
 
 ### RFC Consolidation and Root Acceptance
 
@@ -258,17 +259,17 @@ CI/gate-tooling drift that changes structured check invocation rather than datab
 | Provider-neutral kernel, PostgreSQL-only first adapter        | Matches Prisma maturity without compatibility fallback or false portability.                                                  | Prisma scorecard/source + D-10/D-11/D-34 |
 | NetScript operational semantics, provider migration mechanics | NetScript owns policy/locks/recovery/receipts/saga while provider owns diff/lineage/marker.                                   | Market/source reconciliation + D-27–D-30 |
 | PLAN-EVAL before RFC                                          | Architecture has no open must-resolve item but still requires independent acceptance.                                         | Harness Plan-Gate + D-01–D-47            |
-| No further Claude/Fable route                                 | Latest owner directive supersedes the planned final Fable gate; completed evidence remains historical.                        | Owner directive                          |
+| One final Fable 5 high route                                  | Latest owner directive supersedes the prior cancellation for this gate only; all other Claude usage remains frozen.           | Owner directive                          |
 | No numeric RFC length gate                                    | Content and clarity govern acceptance; consolidation is not a word-count exercise.                                            | Owner directive                          |
 
 ## Drift
 
-| Drift                                                        | Severity      | Logged in drift.md |
-| ------------------------------------------------------------ | ------------- | ------------------ |
-| #313 compatibility-first plan is no longer authoritative     | architectural | yes                |
-| Planned final Fable refinement was cancelled by owner        | significant   | run-state override |
-| Word-count target was removed by owner                       | significant   | run-state override |
-| `origin/main` advanced by CI/gate-tooling commit `01e096049` | nonblocking   | plan-eval evidence |
+| Drift                                                        | Severity      | Logged in drift.md               |
+| ------------------------------------------------------------ | ------------- | -------------------------------- |
+| #313 compatibility-first plan is no longer authoritative     | architectural | yes                              |
+| Final Fable cancellation was later superseded for one gate   | significant   | owner-directed one-shot schedule |
+| Word-count target was removed by owner                       | significant   | run-state override               |
+| `origin/main` advanced by CI/gate-tooling commit `01e096049` | nonblocking   | plan-eval evidence               |
 
 ## Gate Results
 
@@ -279,6 +280,7 @@ CI/gate-tooling drift that changes structured check invocation rather than datab
 | Bootstrap diff | `git diff --check`; targeted `deno fmt --check`        | PASS   | Six required run artifacts are present and formatted.   |
 | Compact RFC    | Targeted fmt; `docs:links`; `git diff --check`         | PASS   | Commit `5dfc4e8eb`; 11,205 words and R1–R10 resolved.   |
 | Semantic RFC   | Targeted fmt; `docs:links`; `git diff --check`; fences | PASS   | Commit `d28d8e779`; final blocker/high findings closed. |
+| Final schedule | Targeted fmt; `docs:links`; `bash -n`; diff; calendar  | PASS   | One-shot launcher resolves to 2026-08-15 00:00 CEST.    |
 
 ### Fitness Gates
 
@@ -293,6 +295,7 @@ CI/gate-tooling drift that changes structured check invocation rather than datab
 | TypeScript/API closure       | PASS                  | `reviews/root-semantic-closure.md`; `d28d8e779`                    | Extension, binding, loading, branded ID, validation and examples closed.              |
 | Prospective JSR closure      | PASS                  | `reviews/root-semantic-closure.md`; `d28d8e779`                    | Static aggregate module plus cold-remote/network-disabled gate closed the last high.  |
 | Architecture closure         | PASS                  | `reviews/root-semantic-closure.md`; `d28d8e779`                    | D-01–D-47, OWNER-DX-01, package graph and four prior findings closed.                 |
+| Final Fable evaluator        | PENDING_SCHEDULED     | Unit `netscript-db-rfc-final-fable-20260815`                       | Fresh native Fable 5 high at 2026-08-15 00:00 Europe/Zurich.                          |
 
 ### Runtime Gates
 
@@ -316,6 +319,6 @@ CI/gate-tooling drift that changes structured check invocation rather than datab
   packages exist and must produce implementation/release receipts later.
 - Qwen returned `PASS_WITH_CHANGES`; Grok returned `PASS_WITH_REFINEMENTS`. Author/editor and root
   dispositions are complete, and three final non-Claude closure audits passed `d28d8e779`.
-- The owner removed the word-count gate and stopped all Claude/Fable usage. Do not launch or resume
-  any such route. Only mechanical run-state verification, commit/push, PR update, and owner review
-  remain.
+- The owner removed the word-count gate. The earlier Claude/Fable freeze remains in force except for
+  the explicitly scheduled single fresh Fable 5 high evaluator/refiner. After it commits and pushes
+  its gate, only PR handoff and owner review remain.

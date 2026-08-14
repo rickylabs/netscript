@@ -23,7 +23,7 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 | `formal_plan_evaluation`              | Anthropic · Fable 5 · medium            | Fresh opposite-family PLAN-EVAL before the RFC file is authored            |
 | focused post-draft RFC review         | OpenRouter · Qwen 3.8 Max · max         | Focused review after the root's complete-draft personal review             |
 | owner-directed adversarial RFC review | OpenCode · OpenRouter · Grok 4.6 · high | Post-draft attack on portability, migration safety, trust, and abstraction |
-| owner-directed final refinement       | Anthropic · Fable 5 · high              | **Cancelled before launch** by the latest owner Claude freeze              |
+| owner-directed final refinement       | Anthropic · Fable 5 · high              | One fresh gate scheduled for 2026-08-15 00:00 Europe/Zurich                |
 
 ## Delegated research and synthesis lanes
 
@@ -36,7 +36,8 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 | `/root/planned_jsr_audit`           | OpenAI · GPT-5.6 Sol · high | Prospective publishability/slow-type review of the planned graph | Complete |
 
 These lanes are independent research/synthesis inputs. The three existing non-Claude lanes also
-performed the final read-only closure checks; no new lane and no Claude/Fable route was launched.
+performed the final read-only closure checks. The owner later reinstated one fresh Fable 5 high
+evaluator/refiner; no other Claude/Fable lane is reopened.
 
 ## Formal plan evaluation
 
@@ -70,8 +71,9 @@ decisions remain locked, and no further PLAN-EVAL will run.
 | Root review              | Codex supervisor · personal full read        | `019ffbc7-133b-7852-905d-53a163fe9819` | `PASS_TO_FOCUSED_REVIEW`; Qwen 3.8 Max is next, but final acceptance has not been granted.       |
 | Qwen focused review      | OpenRouter · `qwen/qwen3.8-max` · max        | `3d1277dd-be6a-44af-9e98-4560d8aaf1b7` | Commit `5dfc4e8eb`; 2,181 words, no edits, `PASS_WITH_CHANGES`; QF-01–QF-05 open.                |
 | Grok whole-RFC review    | OpenCode/OpenRouter · `x-ai/grok-4.6` · high | `ses_003644aeaffeSm3UCAW9xUqRIK`       | Commit `5dfc4e8eb`, blob `f46040d8...`; no subagents/edits; `PASS_WITH_REFINEMENTS`, 0 blockers. |
-| Author/editor checkpoint | Native Claude Code · Opus 5 · high           | completed session recorded in worklog  | Root corrections applied and pushed as `ad8effff9`; no later Claude use.                         |
+| Author/editor checkpoint | Native Claude Code · Opus 5 · high           | completed session recorded in worklog  | Root corrections applied and pushed as `ad8effff9`; no later Opus use.                           |
 | Root semantic closure    | Codex supervisor + existing non-Claude lanes | current root session                   | TypeScript/API, JSR, and architecture verdicts `PASS`; pushed as `d28d8e779`.                    |
+| Final evaluator/refiner  | Native Claude Code · Fable 5 · high          | scheduled fresh session                | One-shot 2026-08-15 00:00 Europe/Zurich; verdict and commit pending.                             |
 
 Before commit `5dfc4e8eb`, root added three narrow corrections: runtime consumes the compiled
 `DatabaseManifest`, not `DatabaseDefinition`; the authority table distinguishes each artifact and
@@ -106,9 +108,10 @@ descriptor couples both evidence tracks to canonical runtime snapshot identities
   `3f8a9a69-5589-4b91-9a32-91f7770fe7c2`, PID `1944525`, worktree matched, native UI reported “Opus
   5 with high effort · Claude Max.” The session immediately exposed four internal agents; their
   roles/identities must be recorded in its report.
-- Historical directive: the owner initially selected Fable 5 **high** as the final refinement gate.
-  The latest owner directive supersedes it and freezes all further Claude/Fable usage; the session
-  was not launched.
+- Historical directive: the owner initially selected Fable 5 **high** as the final refinement gate,
+  then froze all further Claude/Fable usage before it launched. On 2026-08-14 the owner explicitly
+  superseded that cancellation for exactly one fresh final Fable 5 high gate at the next midnight.
+  All other Claude usage remains frozen.
 - Qwen 3.8 Max is selected for the owner-clarified focused post-draft review, after the root's
   personal complete-draft review and before Grok's whole-RFC adversarial pass. The completed route
   requested and observed `qwen/qwen3.8-max` at `max`, session

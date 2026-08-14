@@ -14,12 +14,11 @@
 
 A clean-break database architecture RFC is at final verification. Issue #313 remains historical
 evidence; its compatibility-first solution is superseded. PLAN-EVAL cycle 2 passed, Opus authored
-and consolidated the draft, Qwen and Grok reviewed it, and the author/editor disposition checkpoint
-was pushed at `ad8effff9`. The owner then removed the length target and stopped every further
-Claude/Fable route. Root resolved the remaining value-flow, binding-evidence, module-order,
-operation-authority, JSR-asset, branded-type, validation, and rollback findings. Existing non-Claude
-TypeScript/API, prospective JSR, and architecture lanes each returned `PASS`; the resulting RFC is
-pushed at `d28d8e779`. Only mechanical verification, run-state bookkeeping, and PR handoff remain.
+and consolidated the draft, Qwen and Grok reviewed it, and root closed the remaining semantic
+findings at `d28d8e779`. The owner removed the length target and temporarily stopped further
+Claude/Fable use, then explicitly reinstated exactly one final Fable 5 high evaluation/refinement
+gate. It is scheduled for 2026-08-15 00:00 Europe/Zurich as the one-shot systemd user unit
+`netscript-db-rfc-final-fable-20260815`; no other Claude route is reopened.
 
 ## Completed
 
@@ -66,14 +65,15 @@ pushed at `d28d8e779`. Only mechanical verification, run-state bookkeeping, and 
 
 ## In Progress
 
-- Final mechanical verification, authoritative run-state update, and PR handoff. No substantive
-  model route remains active.
+- One fresh native Fable 5 high final evaluator/refiner is scheduled from the clean pushed branch.
+  Its fail-closed launcher, brief, and output contract are persisted in this run.
 
 ## Next Steps
 
-1. Run the final mechanical format/link/diff and repository-status checks.
-2. Commit and push the run-state/handoff gate.
-3. Update draft PR #1640 with the semantic and verification checkpoints; request owner review.
+1. At 2026-08-15 00:00 Europe/Zurich, launch the single final Fable 5 high gate.
+2. Record its exact starting commit, session, verdict, refinements, and mechanical evidence.
+3. Commit and push the evaluator gate, comment on draft PR #1640, and leave the PR draft for owner
+   review.
 
 ## Key Decisions
 
@@ -84,7 +84,7 @@ pushed at `d28d8e779`. Only mechanical verification, run-state bookkeeping, and 
 | Exact future package graph     | Plan lock       | A1 contract → A4 definition → A3 runtime → A2 control → A2 Prisma PostgreSQL adapter → A6 testkit. |
 | Layered database adoption      | Owner override  | L1 preset/recipe uses L2 factories; L3 is native Prisma plus NetScript primitives/ports.           |
 | App type flow                  | Owner override  | Erased `typeof definition` first; automatic atomic declaration only at a W3-proven boundary.       |
-| No further Claude/Fable usage  | Owner directive | Supersedes the planned final Fable gate; existing evidence remains historical.                     |
+| Single final Fable gate        | Owner directive | Reinstates one fresh Fable 5 high evaluator/refiner; all other Claude usage remains frozen.        |
 | Content, not a word target     | Owner directive | Consolidation serves clarity; length is not an acceptance metric.                                  |
 
 ## Files Changed
@@ -102,6 +102,7 @@ pushed at `d28d8e779`. Only mechanical verification, run-state bookkeeping, and 
 | Fitness     | PASS           | D-01–D-47, OWNER-DX-01, and three final closure audits.                 |
 | Runtime     | N/A            | Docs-only RFC; future matrices are explicit implementation gates.       |
 | Consumer    | PASS           | TypeScript/API, JSR, and architecture closure all passed `d28d8e779`.   |
+| Evaluator   | PENDING        | Final Fable 5 high gate is scheduled for 2026-08-15 00:00 CEST.         |
 
 ## Open Questions
 
@@ -112,8 +113,9 @@ pushed at `d28d8e779`. Only mechanical verification, run-state bookkeeping, and 
 
 ## Drift and Debt
 
-- Drift: #313 compatibility-first architecture is superseded; the planned final Fable gate and
-  length target are superseded by the latest owner directives.
+- Drift: #313 compatibility-first architecture is superseded; the numeric length target remains
+  removed; the earlier final-Fable cancellation is historical and is superseded only for this one
+  scheduled gate.
 - Debt: pending targeted ledger scan.
 
 ## Commits

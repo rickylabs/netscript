@@ -180,3 +180,16 @@ documentation.
   8,000–10,000-word target and 12,000-word hard ceiling, apply root findings R1–R10, then continue
   Qwen → Grok → dispositions → final Fable review order.
 - **Evidence:** `briefs/claude-opus-rfc-consolidate.md`; no architecture decision is reopened.
+
+## 2026-08-14 — Owner reinstated one final Fable refinement gate
+
+- **What:** The owner superseded the prior no-Claude/Fable directive for exactly one fresh final
+  Fable 5 high evaluation/refinement gate at the next midnight.
+- **Expected:** The previous run-state override cancelled the originally planned Fable gate.
+- **Actual:** A one-shot native Fable 5 high launch is scheduled for 2026-08-15 00:00 Europe/Zurich
+  through systemd user unit `netscript-db-rfc-final-fable-20260815`.
+- **Severity:** significant owner override.
+- **Action:** run only the persisted final-evaluator brief; prohibit subagents, workflows, resumes,
+  and fallback models; require a clean committed/pushed close gate. All other Claude use stays
+  frozen.
+- **Evidence:** `briefs/fable-final-evaluator.md` and `workflows/launch-final-fable.sh`.
