@@ -24,6 +24,6 @@ Exact lane identity:
   `14d8b38b4db7ba0635cbbcac2f8cd8903bee0ec9`, fresh PLAN-EVAL cycle 1, dispatch order 5
 - no scaffold/Aspire/Docker lease is active
 
-Requested supervisor route is native Claude Sonnet 5 at low effort. Reconcile and journal only on
-the first turn. Do not launch either evaluator or resume either leaf until the coordinator grants
-its serial dispatch order.
+Requested supervisor route is native Claude Opus 5 at high effort. Reconcile and journal only on the
+first turn. Do not launch either evaluator or resume either leaf until the coordinator grants its
+serial dispatch order.

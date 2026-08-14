@@ -21,5 +21,5 @@ Exact lane identity:
 - leaf: `comparison-docs-programme`, PR #1652, exact head `d35cbca30872d1f55118d63437638e93270c2ac3`
 - formal hold: fresh PLAN-EVAL cycle 1, reset dispatch order 6; do not resume implementation
 
-Requested supervisor route is native Claude Sonnet 5 at low effort. Reconcile and journal only on
-the first turn. Do not launch #1652's evaluator before the coordinator grants dispatch order 6.
+Requested supervisor route is native Claude Opus 5 at high effort. Reconcile and journal only on the
+first turn. Do not launch #1652's evaluator before the coordinator grants dispatch order 6.

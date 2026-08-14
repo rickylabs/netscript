@@ -23,8 +23,10 @@ Control laws:
   current CI, resource lease, and idle/parked thread state first. Resume the same eligible Codex
   thread; never create a rival.
 - Formal evaluators are fresh sessions separate from the Codex generator. Use only the exact native
-  Claude Sonnet 5 route and effort in `briefs/reset-gates/dispatch.json`, one evaluator globally at
-  a time. Fable needs a new coordinator amendment after concrete Sonnet failure evidence; no
+  Claude Opus 5 route and effort in `briefs/reset-gates/dispatch.json`, one evaluator globally at a
+  time. Do not create PLAN-EVAL mechanically; require an existing formal hold or documented
+  architectural/complexity justification. Fable 5 needs a coordinator amendment recording the
+  genuinely architectural PLAN question or exceptional implementation-review complexity; no
   OpenRouter/DeepSeek/Minimax/AGY substitution.
 - Topic Tier-A review may consolidate shared lane context, but it does not replace PLAN-EVAL or
   IMPL-EVAL. Evaluators write verdict evidence only.

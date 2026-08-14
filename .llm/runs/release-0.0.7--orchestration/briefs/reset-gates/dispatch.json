@@ -5,11 +5,15 @@
   "timezone": "Europe/Zurich",
   "concurrency": 1,
   "ownerOverride": {
-    "recordedAt": "2026-08-14T22:13:00.000Z",
+    "recordedAt": "2026-08-14T22:41:15.000Z",
     "coordinator": "codex-root-0.0.7",
-    "topicOrchestrators": "native-claude-only",
-    "implementationLeaves": "daemon-attached-wsl-codex",
-    "costPolicy": "right-size effort, deduplicate shared review inputs, preserve independent gate evidence"
+    "topicOrchestrators": "native Claude Opus 5 / high with Remote Control",
+    "implementationLeaves": "daemon-attached WSL Codex GPT-5.6-SOL with effort matched to documented complexity",
+    "evaluationDefault": "native Claude Opus 5 / low through high; low only for genuinely easy bounded review",
+    "planEvalPolicy": "open only for an existing formal hold, unresolved architectural decision, or demonstrated complexity",
+    "fablePolicy": "reserve Fable 5 for recorded genuinely architectural PLAN questions or exceptional complex implementation review",
+    "costPolicy": "right-size effort, deduplicate shared review inputs, preserve every required independent evidence contract",
+    "supersedes": "the 2026-08-14T22:13:00.000Z Sonnet route matrix and the pre-reset blanket Fable matrix"
   },
   "routePolicy": {
     "provider": "native-claude",
@@ -17,7 +21,7 @@
     "freshSessionPerGate": true,
     "oppositeFamilyRequired": true,
     "substitutesAllowed": false,
-    "fablePolicy": "not pre-dispatched; coordinator amendment only after concrete Sonnet capability failure",
+    "fablePolicy": "not pre-dispatched; coordinator amendment must record genuine architectural or exceptional implementation-review necessity",
     "forbiddenProviders": ["openrouter", "opencode", "antigravity"]
   },
   "entries": [
@@ -35,10 +39,10 @@
       "output": "evaluate.md",
       "route": {
         "provider": "native-claude",
-        "model": "Claude Sonnet 5",
-        "cliModel": "claude-sonnet-5",
+        "model": "Claude Opus 5",
+        "cliModel": "claude-opus-5",
         "effort": "medium",
-        "rationale": "substantive cross-tooling implementation review; Sonnet medium is the least-cost reliable opposite-family route"
+        "rationale": "substantive cross-tooling implementation review; Opus medium matches its documented complexity"
       }
     },
     {
@@ -54,10 +58,10 @@
       "output": "evaluate.md",
       "route": {
         "provider": "native-claude",
-        "model": "Claude Sonnet 5",
-        "cliModel": "claude-sonnet-5",
+        "model": "Claude Opus 5",
+        "cliModel": "claude-opus-5",
         "effort": "low",
-        "rationale": "mechanical bounded implementation review with complete Tier-A and gate evidence"
+        "rationale": "genuinely easy bounded implementation review with complete Tier-A and gate evidence; Opus low is sufficient"
       }
     },
     {
@@ -74,10 +78,10 @@
       "output": "plan-eval.md",
       "route": {
         "provider": "native-claude",
-        "model": "Claude Sonnet 5",
-        "cliModel": "claude-sonnet-5",
+        "model": "Claude Opus 5",
+        "cliModel": "claude-opus-5",
         "effort": "medium",
-        "rationale": "architectural PLAN-EVAL requires substantive reasoning, while Sonnet medium remains the efficient compliant first route"
+        "rationale": "existing formal architectural hold requires substantive independent reasoning; Opus medium is sufficient for this evidence contract"
       }
     },
     {
@@ -94,8 +98,8 @@
       "output": "plan-eval.md",
       "route": {
         "provider": "native-claude",
-        "model": "Claude Sonnet 5",
-        "cliModel": "claude-sonnet-5",
+        "model": "Claude Opus 5",
+        "cliModel": "claude-opus-5",
         "effort": "medium",
         "rationale": "substantive coupled ownership and fail-closed quality-policy PLAN-EVAL"
       }
@@ -114,8 +118,8 @@
       "output": "plan-eval.md",
       "route": {
         "provider": "native-claude",
-        "model": "Claude Sonnet 5",
-        "cliModel": "claude-sonnet-5",
+        "model": "Claude Opus 5",
+        "cliModel": "claude-opus-5",
         "effort": "medium",
         "rationale": "substantive grouped generator/runtime boundary PLAN-EVAL without running the expensive gate"
       }
@@ -134,10 +138,10 @@
       "output": "plan-eval.md",
       "route": {
         "provider": "native-claude",
-        "model": "Claude Sonnet 5",
-        "cliModel": "claude-sonnet-5",
+        "model": "Claude Opus 5",
+        "cliModel": "claude-opus-5",
         "effort": "low",
-        "rationale": "bounded docs-only PLAN-EVAL with immutable evidence and no product implementation"
+        "rationale": "genuinely easy bounded docs-only PLAN-EVAL with immutable evidence and no product implementation; Opus low is sufficient"
       }
     }
   ]

@@ -8,15 +8,16 @@ project skills. Then read the IMPL-EVAL protocol/verdict definitions, complete l
 #1243, PR #1643, coordinator scope comments, full diff, Tier-A review, and receipts.
 
 Act only as the fresh separate formal IMPL-EVAL. The reset boundary has passed. Use the
-owner-authorized native Claude Sonnet 5 **low** route and immediately enable `/remote-control`;
-record session ID, bridge ID, PID, cwd, requested route, and observed route. No silent substitute;
-Fable requires a new coordinator amendment backed by concrete Sonnet capability-failure evidence.
+owner-authorized native Claude Opus 5 **low** route and immediately enable `/remote-control`; record
+session ID, bridge ID, PID, cwd, requested route, and observed route. No silent substitute; Fable 5
+remains unassigned and requires a coordinator amendment recording genuine architectural or
+exceptional implementation-review necessity.
 
 Worktree `/home/codex/repos/netscript-007-leaf-legacy-port-pin-sweep`; branch
-`fix/legacy-port-pin-sweep`; immutable base `01e0960494c95ce56eb35892c211a095eb13e6ed`;
-exact remote PR/source head `e6ba15ec6414c0a42b1f9870791131162ea71c36`. Fetch and resolve both
-PR and branch independently; refuse any mismatch. This exact head supersedes the stale `af3dca0f5`
-value in the older leaf-local `evaluate-prompt.md`.
+`fix/legacy-port-pin-sweep`; immutable base `01e0960494c95ce56eb35892c211a095eb13e6ed`; exact remote
+PR/source head `e6ba15ec6414c0a42b1f9870791131162ea71c36`. Fetch and resolve both PR and branch
+independently; refuse any mismatch. This exact head supersedes the stale `af3dca0f5` value in the
+older leaf-local `evaluate-prompt.md`.
 
 Independently verify the auth command has no silent localhost:4437 default, requires explicit
 `--stream-url`, fails before the session adapter when omitted, and gives actionable Aspire endpoint

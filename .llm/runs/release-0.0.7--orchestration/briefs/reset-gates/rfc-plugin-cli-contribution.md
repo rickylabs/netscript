@@ -8,16 +8,16 @@ Then read the PLAN-EVAL protocol, plan gate, verdict definitions, central leaf c
 run, live issue #1502, PR #1651, and coordinator repair comments.
 
 Act only as fresh PLAN-EVAL cycle 2. The reset boundary has passed. Use the owner-authorized native
-Claude Sonnet 5 **medium** route and immediately enable `/remote-control`; record session ID, bridge
-ID, PID, cwd, requested route, and observed route. No silent substitute; Fable requires a new
-coordinator amendment backed by concrete Sonnet capability-failure evidence.
+Claude Opus 5 **medium** route and immediately enable `/remote-control`; record session ID, bridge
+ID, PID, cwd, requested route, and observed route. No silent substitute; Fable 5 remains unassigned
+and requires a coordinator amendment recording genuine architectural or exceptional
+implementation-review necessity.
 
-Worktree `/home/codex/repos/netscript-007-features-1502`; branch
-`docs/rfc-plugin-cli-contribution`; immutable base `01e0960494c95ce56eb35892c211a095eb13e6ed`;
-exact remote PR/source head `12276e6d86403ed1340ef79a963e87d401d643e9`. Fetch and independently
-resolve PR and branch; refuse any mismatch. Evaluate the repaired current plan, not cycle-1 head
-`a02f969...`. Preserve the prior `plan-eval.md` as `plan-eval-cycle-1.md`, then write the new
-canonical `plan-eval.md`.
+Worktree `/home/codex/repos/netscript-007-features-1502`; branch `docs/rfc-plugin-cli-contribution`;
+immutable base `01e0960494c95ce56eb35892c211a095eb13e6ed`; exact remote PR/source head
+`12276e6d86403ed1340ef79a963e87d401d643e9`. Fetch and independently resolve PR and branch; refuse
+any mismatch. Evaluate the repaired current plan, not cycle-1 head `a02f969...`. Preserve the prior
+`plan-eval.md` as `plan-eval-cycle-1.md`, then write the new canonical `plan-eval.md`.
 
 Independently judge research currency, locked decisions, open-decision sweep, slice sizes, risks,
 deferred scope, exact gate set, contract resolution, docs terminology, all Archetype-4 fitness

@@ -8,14 +8,15 @@ PLAN-EVAL protocol, plan gate, verdict definitions, central leaf contract, compl
 #1551, PR #1652, and coordinator scope comments.
 
 Act only as fresh formal PLAN-EVAL cycle 1. The reset boundary has passed. Use the owner-authorized
-native Claude Sonnet 5 **low** route and immediately enable `/remote-control`; record session ID,
-bridge ID, PID, cwd, requested route, and observed route. No silent substitute; Fable requires a new
-coordinator amendment backed by concrete Sonnet capability-failure evidence.
+native Claude Opus 5 **low** route and immediately enable `/remote-control`; record session ID,
+bridge ID, PID, cwd, requested route, and observed route. No silent substitute; Fable 5 remains
+unassigned and requires a coordinator amendment recording genuine architectural or exceptional
+implementation-review necessity.
 
-Worktree `/home/codex/repos/netscript-007-docs-comparison`; branch
-`docs/comparison-docs-programme`; immutable base `01e0960494c95ce56eb35892c211a095eb13e6ed`;
-exact remote PR/source head `d35cbca30872d1f55118d63437638e93270c2ac3`. Fetch and independently
-resolve PR and branch; refuse any mismatch.
+Worktree `/home/codex/repos/netscript-007-docs-comparison`; branch `docs/comparison-docs-programme`;
+immutable base `01e0960494c95ce56eb35892c211a095eb13e6ed`; exact remote PR/source head
+`d35cbca30872d1f55118d63437638e93270c2ac3`. Fetch and independently resolve PR and branch; refuse
+any mismatch.
 
 Independently judge all Plan-Gate rows, the 0.0.7-sized slice of the 17-deliverable programme,
 methodology/navigation scope, immutable evidence manifest and measurement procedure, deferred case

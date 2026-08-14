@@ -10,27 +10,33 @@ Read, in order:
 6. This run's `research.md`, `plan.md`, `worklog.md`, `step0-synthesis.md`, the four milestone
    control JSON artifacts, `milestone-leaf-plan.json`, and `leaf-contracts.json`.
 
-Baseline identity is `01e0960494c95ce56eb35892c211a095eb13e6ed`. Treat GitHub live state as
-mutable after the snapshot; any issue or `main` drift must be recorded before dispatch or merge.
+Baseline identity is `01e0960494c95ce56eb35892c211a095eb13e6ed`. Treat GitHub live state as mutable
+after the snapshot; any issue or `main` drift must be recorded before dispatch or merge.
 
 Step 0 is approved at 64 inspected targets / 60 active issues, 43 leaves, and nine dispatch waves.
 #1564 is closed-fixed; there is no implementation wave-zero barrier. PLAN-EVAL cycle 2 approved
 dispatch at plan head `331f7c664`; `leaf-contracts.json` is binding input for every leaf.
 
 Reset authority at `2026-08-15T00:00:00+02:00`: `codex-root-0.0.7` remains sole milestone
-coordinator, but topic supervision is native Claude only. Preserve and park the four historical
-Codex topic threads before attaching one Claude Sonnet 5/low Remote Control supervisor to each
-existing topic worktree. Claude supervisors do not implement; WSL Codex Sol leaves use low effort
-for mechanical work, medium by default, and high only for demonstrated complexity.
+coordinator in Codex session `019ffaa3-32ae-7b02-92a5-d7ae146d8cbd`; its canonical transcript is
+`/home/codex/.codex/sessions/2026/08/13/rollout-2026-08-13T12-20-27-019ffaa3-32ae-7b02-92a5-d7ae146d8cbd.jsonl`.
+Resume that exact session rather than creating a rival coordinator. Topic supervision is native
+Claude Opus 5/high only. Preserve and park the four historical Codex topic threads before attaching
+one Remote Control supervisor to each existing topic worktree. Claude supervisors do not implement;
+WSL Codex Sol leaves use effort matched to the harness's per-slice complexity record.
 
-Read `briefs/reset-gates/dispatch.json` after the central state. It supersedes the pre-reset
-six-Fable route: every still-required formal gate remains fresh, separate, opposite-family, and
-serial, but starts on the least-cost assigned Sonnet route. Fable is escalation-only after concrete
-failure evidence and a new recorded coordinator amendment. No paused leaf resumes merely because
+Read `briefs/reset-gates/dispatch.json` after the central state. It supersedes both the pre-reset
+six-Fable route and the rejected Sonnet-low matrix. The six retained holds have specific existing
+issue/complexity justification; future PLAN-EVAL is conditional rather than mechanical. Formal gates
+stay fresh, separate, opposite-family, and serial. Opus 5 low through high is the normal
+adversarial/evaluation route. Fable 5 is reserved for a recorded genuinely architectural PLAN
+question or an exceptionally complex implementation/review. No paused leaf resumes merely because
 the clock reset; its exact head, hold, lease, CI, and formal gate must be re-established first.
 
 All four historical Codex topic controllers are now durably parked: docs had no live session;
-internals/fixes/features returned `TOPIC_CONTROLLER_PARKED`, are idle, and left clean worktrees.
-Launch replacements through native Claude 2.1.231 with explicit `--model claude-sonnet-5 --effort
-low --remote-control`, the exact initial brief, and bypass permissions. The hybrid wrapper is not
-needed unless a later task explicitly authorizes its alternate-worker delegation surface.
+internals/fixes/features returned `TOPIC_CONTROLLER_PARKED`, are idle, and left clean worktrees. The
+rejected Sonnet-low replacement canaries also exited with `TOPIC_CONTROLLER_PARKED_MODEL_FLOOR` and
+dispatched no leaf or evaluator. Launch the real replacements through native Claude 2.1.231 with
+explicit `--model claude-opus-5`, `--effort high`, and `--remote-control`, the exact initial brief,
+and bypass permissions. The hybrid wrapper is not needed unless a later task explicitly authorizes
+its alternate-worker delegation surface.

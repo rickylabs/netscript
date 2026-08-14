@@ -8,16 +8,17 @@ Then read the PLAN-EVAL protocol, plan gate, verdict definitions, central leaf c
 run, issues #1378/#1545, PR #1653, issue #1655, and coordinator resolution comments.
 
 Act only as fresh formal PLAN-EVAL cycle 2. The reset boundary has passed. Use the owner-authorized
-native Claude Sonnet 5 **medium** route and immediately enable `/remote-control`; record session ID,
-bridge ID, PID, cwd, requested route, and observed route. No silent substitute; Fable requires a new
-coordinator amendment backed by concrete Sonnet capability-failure evidence.
+native Claude Opus 5 **medium** route and immediately enable `/remote-control`; record session ID,
+bridge ID, PID, cwd, requested route, and observed route. No silent substitute; Fable 5 remains
+unassigned and requires a coordinator amendment recording genuine architectural or exceptional
+implementation-review necessity.
 
-Worktree `/home/codex/repos/netscript-007-quality-rail`; branch
-`chore/quality-scan-allowance-rail`; immutable base `01e0960494c95ce56eb35892c211a095eb13e6ed`;
-exact remote PR/source head `09dfb092dccf7f843b9270295047d674a8187362`. Fetch and independently
-resolve PR and branch; refuse any mismatch. Evaluate the repaired head, not advisory head
-`c573beda...`. Preserve the existing advisory `plan-eval.md` as
-`plan-eval-cycle-1-advisory.md`, then write the new canonical `plan-eval.md`.
+Worktree `/home/codex/repos/netscript-007-quality-rail`; branch `chore/quality-scan-allowance-rail`;
+immutable base `01e0960494c95ce56eb35892c211a095eb13e6ed`; exact remote PR/source head
+`09dfb092dccf7f843b9270295047d674a8187362`. Fetch and independently resolve PR and branch; refuse
+any mismatch. Evaluate the repaired head, not advisory head `c573beda...`. Preserve the existing
+advisory `plan-eval.md` as `plan-eval-cycle-1-advisory.md`, then write the new canonical
+`plan-eval.md`.
 
 Independently judge all Plan-Gate rows and specifically verify the seven-record ownership decision,
 exact authorized scanner-test/consumer/generated-asset/debt surfaces, strict Workers no-increase

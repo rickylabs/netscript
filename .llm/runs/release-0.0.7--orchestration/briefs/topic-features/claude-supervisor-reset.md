@@ -22,6 +22,6 @@ Exact lane identity:
   `12276e6d86403ed1340ef79a963e87d401d643e9`
 - formal hold: fresh PLAN-EVAL cycle 2, reset dispatch order 3; no RFC authoring yet
 
-Requested supervisor route is native Claude Sonnet 5 at low effort. Reconcile and journal only on
-the first turn. Do not launch #1651's evaluator or resume RFC authoring before the coordinator
-grants dispatch order 3.
+Requested supervisor route is native Claude Opus 5 at high effort. Reconcile and journal only on the
+first turn. Do not launch #1651's evaluator or resume RFC authoring before the coordinator grants
+dispatch order 3.

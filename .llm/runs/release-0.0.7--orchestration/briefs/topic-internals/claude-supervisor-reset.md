@@ -23,6 +23,6 @@ Exact lane identity:
 - leaf #1653: `quality-scan-allowance-rail`, exact head `09dfb092dccf7f843b9270295047d674a8187362`,
   fresh PLAN-EVAL cycle 2, dispatch order 4
 
-Requested supervisor route is native Claude Sonnet 5 at low effort. Reconcile and journal only on
-the first turn. Prepare the order-1 handoff, but do not launch its Sonnet 5/medium evaluator until
-the coordinator grants the singleton evaluator lease after your attachment receipt.
+Requested supervisor route is native Claude Opus 5 at high effort. Reconcile and journal only on the
+first turn. Prepare the order-1 handoff, but do not launch its Opus 5/medium evaluator until the
+coordinator grants the singleton evaluator lease after your attachment receipt.

@@ -4,15 +4,16 @@ use harness
 
 Read `AGENTS.md`, `.agents/skills/netscript-harness/SKILL.md`,
 `.agents/skills/netscript-tools/SKILL.md`, `.agents/skills/netscript-pr/SKILL.md`,
-`.agents/skills/openhands-handoff/SKILL.md`, and
-`.agents/skills/netscript-deno-toolchain/SKILL.md` completely. Then read the harness evaluator
-protocol, verdict definitions, lane policy, agent-handoff rules, `6-cli-tooling` profile, the whole
-leaf run directory, live issues #1561/#1563/#1621, PR #1644, and its structured comments.
+`.agents/skills/openhands-handoff/SKILL.md`, and `.agents/skills/netscript-deno-toolchain/SKILL.md`
+completely. Then read the harness evaluator protocol, verdict definitions, lane policy,
+agent-handoff rules, `6-cli-tooling` profile, the whole leaf run directory, live issues
+#1561/#1563/#1621, PR #1644, and its structured comments.
 
 Act only as the fresh separate formal IMPL-EVAL. The reset boundary has passed. Use the
-owner-authorized native Claude Sonnet 5 **medium** route and immediately enable `/remote-control`;
+owner-authorized native Claude Opus 5 **medium** route and immediately enable `/remote-control`;
 record session ID, bridge ID, PID, cwd, requested route, and observed route. No silent substitute;
-Fable requires a new coordinator amendment backed by concrete Sonnet capability-failure evidence.
+Fable 5 remains unassigned and requires a coordinator amendment recording genuine architectural or
+exceptional implementation-review necessity.
 
 Repository `rickylabs/netscript`; worktree `/home/codex/repos/netscript-007-harness-evidence`;
 branch `fix/harness-evidence-and-verdict-tooling`; immutable base
