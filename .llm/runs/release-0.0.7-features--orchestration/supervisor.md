@@ -5,8 +5,8 @@
 | Run id | `release-0.0.7-features--orchestration` |
 | Profile | `.llm/harness/workflow/milestone-run.md` (topic lane) |
 | Topic orchestrator | `topic-features-0.0.7` |
-| Orchestrator route | Codex · OpenAI · GPT-5.6 Sol · high (approved `planning_decisions` fallback) |
-| Orchestrator thread | `019ffcc0-e1d2-7850-a308-354b670c6f3d` |
+| Active controller (from 2026-08-15 reset) | native Claude Opus 5 · high · Remote Control |
+| Superseded controller (parked, preserved) | Codex · OpenAI · GPT-5.6 Sol · high, thread `019ffcc0-e1d2-7850-a308-354b670c6f3d` |
 | Checkout | `/home/codex/repos/netscript-007-features` |
 | Control branch | `orchestrator/release-0.0.7-features` (no upstream) |
 | Immutable dispatch base | `01e0960494c95ce56eb35892c211a095eb13e6ed` |
@@ -40,3 +40,31 @@ evidence only; content lands through fresh leaf PRs targeting `main`.
 
 Generator and evaluators must be different sessions. The topic orchestrator does not merge,
 publish, change milestone scope, or mutate the central cluster state.
+
+## Controller reset — 2026-08-15 Europe/Zurich
+
+The owner reset at `2026-08-15T00:00:00+02:00` replaces the Codex topic controller with a native
+Claude Opus 5 Remote Control supervisor. The historical Codex thread is preserved and parked; it is
+never resumed as a topic controller. Contract:
+`/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/briefs/topic-claude-reset-common.md`.
+
+| Field | Value |
+| --- | --- |
+| Claude session id | `19621a0b-c6a0-47c6-b826-93c1634a6875` |
+| Bridge session id | `session_01LQBHX8KpA5aYtDraq46J8a` (non-empty) |
+| Remote Control URL | `https://claude.ai/code/session_01LQBHX8KpA5aYtDraq46J8a` |
+| Remote Control label / state | `netscript-007-features`; attached (registry PID + cwd + bridge id) |
+| PID | `2430404` |
+| Exact cwd | `/home/codex/repos/netscript-007-features` |
+| Claude CLI | `2.1.233` at `/home/codex/.local/share/claude/versions/2.1.233` |
+| Requested route | native Claude Opus 5 · high · Remote Control |
+| Observed route | process argv `--model claude-opus-5 --effort high --permission-mode bypassPermissions --remote-control netscript-007-features` |
+| Route verdict | matched |
+| Parked Codex thread | `019ffcc0-e1d2-7850-a308-354b670c6f3d`; last record `task_complete` / `TOPIC_CONTROLLER_PARKED` at `2026-08-14T22:18:38Z` |
+
+Reset-era authority is unchanged and narrower than the pre-reset lane table above: supervise only,
+no implementation in this worktree, no merge, publish, ready-flip, relabel, issue close, milestone
+change, central cluster-state mutation, or release-writer lease. Formal evaluators are fresh
+separate sessions on the exact route in `briefs/reset-gates/dispatch.json`; one evaluator globally
+at a time; Fable 5 requires a coordinator amendment. The pre-reset lane table's Fable bindings for
+#1502 PLAN-EVAL / IMPL-EVAL are superseded by that dispatch file.
