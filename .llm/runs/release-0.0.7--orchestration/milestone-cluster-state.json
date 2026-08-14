@@ -11,7 +11,14 @@
     "resumeCommand": "codex exec resume 019ffaa3-32ae-7b02-92a5-d7ae146d8cbd -- \"<follow-up>\"",
     "worktree": "/home/codex/repos/netscript-547-lffix",
     "branch": "chore/release-0.0.7-orchestration",
-    "verifiedAt": "2026-08-14T22:41:15.000Z"
+    "model": "gpt-5.6-sol",
+    "effort": "high",
+    "maxEffortAuthorized": false,
+    "transport": "codex-app-server-remote-control",
+    "remoteSocket": "unix:///home/codex/.codex/app-server-control/app-server-control.sock",
+    "appServerPid": 5027,
+    "attachedProcessPid": 2452378,
+    "verifiedAt": "2026-08-14T23:08:28.000Z"
   },
   "limits": {
     "activeImplementationSlicesPerLane": 2,
@@ -472,7 +479,7 @@
       "headSha": "4d9fb196765cbf1a6bc7eaa7c18ec82b237ab89f",
       "issueNumbers": [1561, 1563, 1621],
       "implementerAgentId": "019ffcc9-97ba-7770-a890-a1ebd80ec793",
-      "evaluatorAgentId": "aa132a0b-fc17-4998-a5cb-30fc460532c4",
+      "evaluatorAgentId": "1afc9054-cc28-48a8-9fc4-86ae2e3bb28d",
       "branch": "fix/harness-evidence-and-verdict-tooling",
       "worktree": "/home/codex/repos/netscript-007-harness-evidence",
       "receiptRefs": [
@@ -531,7 +538,11 @@
       "dispatchOrder": 1,
       "sourceHead": "4d9fb196765cbf1a6bc7eaa7c18ec82b237ab89f",
       "implementationParent": "634b257ea1afcedb2d7f1da486d8c9e9432a2a86",
-      "evaluatorAgentId": "aa132a0b-fc17-4998-a5cb-30fc460532c4",
+      "evaluatorAgentId": "1afc9054-cc28-48a8-9fc4-86ae2e3bb28d",
+      "backgroundAgentId": "1afc9054",
+      "pid": 2430432,
+      "bridgeSessionId": "session_011426qed3eW6SpmKxrMnzHN",
+      "remoteControlUrl": "https://claude.ai/code/session_011426qed3eW6SpmKxrMnzHN",
       "route": {
         "provider": "native-claude",
         "model": "claude-opus-5",
@@ -539,7 +550,8 @@
         "remoteControlRequired": true
       },
       "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-14T23:04:51.000Z"
+      "grantedAt": "2026-08-14T23:04:51.000Z",
+      "attachedAt": "2026-08-14T23:06:32.000Z"
     }
   ],
   "canaryCheckpoints": [
@@ -581,5 +593,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-14T23:04:51.000Z"
+  "updatedAt": "2026-08-14T23:08:28.000Z"
 }

@@ -30,5 +30,17 @@
 | 2026-08-14T22:41:15Z | The Sonnet correction draft expressed an overly rigid model-floor/capability-failure policy and risked mechanical PLAN-EVAL.                                                                           | Use Opus 5 low–high for most independent adversarial and phase evaluation; open PLAN-EVAL only for an existing formal hold or demonstrated architectural complexity; reserve Fable 5 for recorded genuine architecture or exceptional complex implementation review. Preserve every harness evidence and separation invariant. |
 | 2026-08-14T23:00:08Z | The reset briefs named native Claude 2.1.231 and central state still showed all four Opus replacements as `pending_attachment` after the installed CLI advanced to 2.1.233.                            | Prove the compatible 2.1.233 launch surface with a bounded Opus/high canary plus all four live argv/registry receipts; promote only after each topic pushed a clean reconcile-only checkpoint. Record exact volatile CLI evidence here rather than treating the patch-version literal as a routing contract.                   |
 
+## 2026-08-14T23:08:28Z — evaluator and coordinator transport reconciliation
+
+- Native Claude `--bg` ignored the coordinator's preallocated `--session-id` because background
+  dispatch owns fresh session allocation. The single launched evaluator remains authoritative as
+  background id `1afc9054`, session `1afc9054-cc28-48a8-9fc4-86ae2e3bb28d`; its route is proved by
+  job `respawnFlags` plus registry PID/cwd/bridge. No duplicate evaluator was launched.
+- The interrupted standalone coordinator turn ran GPT-5.6-SOL at `max`, above the owner's authorized
+  effort, and left only order-1 attachment metadata dirty after pushing `aa02c21d3`. The canonical
+  session is now resumed through the Remote Control app-server at explicit GPT-5.6-SOL/high; `max`
+  is unauthorized. The exact dirty diff was reconciled to the live evaluator and all four Claude
+  topic supervisors were preserved unchanged.
+
 No implementation drift is accepted. The plan repair changes orchestration evidence and public issue
 contracts only; leaf implementation remains blocked until PLAN-EVAL approval.

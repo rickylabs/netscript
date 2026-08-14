@@ -15,7 +15,9 @@
 | Baseline `main`           | `01e0960494c95ce56eb35892c211a095eb13e6ed`                                                                      |
 | Target milestone          | GitHub milestone `0.0.7` (`#27`)                                                                                |
 | Started                   | `2026-08-13T18:35:10.000Z`                                                                                      |
-| Coordinator runtime       | Codex via ChatGPT subscription; current app session on WSL                                                      |
+| Coordinator runtime       | Codex via ChatGPT subscription; GPT-5.6-SOL at high effort (`max` is not authorized)                            |
+| Coordinator transport     | Remote Control app-server socket `unix:///home/codex/.codex/app-server-control/app-server-control.sock`         |
+| Coordinator attachment    | resume PID `2452378`; app-server PID `5027` running with `--remote-control`; verified `2026-08-14T23:08:28Z`    |
 | PLAN-EVAL session         | Claude `2439b19d-5df7-4920-9fce-fa5831ec4fdf`; opposite family                                                  |
 | PLAN-EVAL cycle           | 2 of 2: `APPROVED` at plan head `331f7c664`                                                                     |
 
@@ -24,6 +26,15 @@ inferred from a child thread. Its `session_meta` identifies Codex Desktop/OpenAI
 goal names the 0.0.7 milestone coordinator mandate, it created this canonical harness run, and it
 committed/pushed the coordinator checkpoints. Topic and implementation sessions remain excluded.
 Resume this exact session; never create a replacement coordinator while it is recoverable.
+
+The owner-corrected coordinator route is **GPT-5.6-SOL / high, never max**. Two interrupted
+standalone turn contexts at `2026-08-14T22:47:31Z` and `22:53:43Z` recorded `max`; they are
+historical transport drift and confer no continuing authority. The active same-thread process is PID
+`2452378`, launched through `codex resume --remote` with model `gpt-5.6-sol` and reasoning effort
+`high`, against app-server PID `5027`, whose argv includes `app-server --remote-control`. The
+app-server owns both the canonical rollout file and thread-writer lock for
+`019ffaa3-32ae-7b02-92a5-d7ae146d8cbd`. This transport repair does not alter, relaunch, or reassign
+any Claude topic supervisor.
 
 The coordinator is the sole merge authority. Exactly four topic orchestrators will own the `docs`,
 `internals`, `fixes`, and `features` lanes after Step 0 validates. The release captain and writer
