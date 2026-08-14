@@ -64,3 +64,48 @@ commit/push/comment shape, and boundaries. The running evaluation was not interr
 a supplementary wrapper. Recorded so no artifact claims the orchestrator's brief was delivered.
 Launcher rule for this lane: pass the prompt before any variadic flag, then verify `respawnFlags`
 and the transcript's first user record before reporting a launch.
+
+## 2026-08-15 — approved S1 acceptance was unsatisfiable from its own file list (corrected)
+
+The Codex leaf stopped mid-S1 with
+`BLOCKED: /migration/ cannot render under Concepts without a page
+excluded by the exact six-file S1 boundary`.
+The report is correct and the stop was the right call.
+
+`plan.md` S3 owns `docs/site/migration/index.md` and `docs/site/migration/nextjs.md`, so S1 cannot
+create a migration page; yet S1's manual assertion requires **both** roots to appear in rendered
+navigation. The approved plan therefore contradicts itself, and formal PLAN-EVAL cycle 1 (`PASS` at
+`d35cbca30`) did not catch it — its `Commit slices` row enumerated file lists and gates without
+cross-checking that each slice's acceptance is satisfiable from that slice's own files. The topic
+orchestrator's S1 brief then propagated the defective assertion verbatim.
+
+Disposition (topic-orchestrator ruling, severity `significant`, **no rescope, no scope growth**): S1
+asserts only `/comparisons/` and `/comparisons/methodology/`; the `/migration/` rendered-root
+assertion moves to S3, which owns both migration files, and S3's gate must assert both roots. One
+artifact file (`drift.md`) was authorized into the S1 commit so the correction and the PLAN-EVAL
+miss are visible to the later IMPL-EVAL instead of buried.
+
+## 2026-08-15 — Tier-A: S1 ships links to a section that does not exist, and its gate cannot detect that
+
+Tier-A content review of the uncommitted S1 patch (distinct from the file-scope check, which passed)
+found `/migration/` wired in four places while `docs/site/migration/` does not exist:
+
+- `docs/site/_data/xref.ts:202` registers `"migration:index" → /migration/`;
+- `docs/site/comparisons/index.md:41` renders that xref as body text;
+- `docs/site/comparisons/methodology.md` ends with `comp.nextPrev(… next: "/migration/")`;
+- `docs/site/_data.ts:103` adds `/migration/` to the Concepts `roots`.
+
+All four are S3's wiring. Shipping them in S1 publishes links into a non-existent section.
+
+The compounding defect is the gate. S1's gate runs `deno task --cwd docs/site build`, which is
+`check:source-format && lume && check:rendered-output` — the rendered link checker `check:links`
+lives only in `verify`, which the plan does not schedule until S3's `S3-docs-audit`. So S1's gate
+set is structurally incapable of proving S1's own content contract ("stable xrefs", "links
+resolve"), and this defect would have survived two slices undetected. PLAN-EVAL's
+`Gate set selected — PASS` row mapped `docs-source-format` → `build` and noted `verify` only at S3
+without flagging the gap.
+
+Disposition: both returned to the leaf as blocking Tier-A findings for one bounded fix slice — strip
+the `/migration/` wiring from S1, and add `check:links` to the S1 gate with its raw exit code
+recorded. Both strictly reduce what S1 ships; neither changes scope. Recorded here because two
+independent defects in one approved plan is a signal about the gate, not just about this leaf.
