@@ -467,12 +467,12 @@
     {
       "id": "harness-evidence-and-verdict-tooling",
       "lane": "internals",
-      "phase": "blocked",
+      "phase": "evaluating",
       "baseBranch": "main",
       "headSha": "4d9fb196765cbf1a6bc7eaa7c18ec82b237ab89f",
       "issueNumbers": [1561, 1563, 1621],
       "implementerAgentId": "019ffcc9-97ba-7770-a890-a1ebd80ec793",
-      "evaluatorAgentId": null,
+      "evaluatorAgentId": "aa132a0b-fc17-4998-a5cb-30fc460532c4",
       "branch": "fix/harness-evidence-and-verdict-tooling",
       "worktree": "/home/codex/repos/netscript-007-harness-evidence",
       "receiptRefs": [
@@ -521,7 +521,27 @@
       "receiptRefs": []
     }
   ],
-  "expensiveGates": [],
+  "expensiveGates": [
+    {
+      "id": "reset-gate-01-harness-evidence-and-verdict-tooling-impl-eval",
+      "state": "running",
+      "lane": "internals",
+      "leafId": "harness-evidence-and-verdict-tooling",
+      "phase": "impl-eval",
+      "dispatchOrder": 1,
+      "sourceHead": "4d9fb196765cbf1a6bc7eaa7c18ec82b237ab89f",
+      "implementationParent": "634b257ea1afcedb2d7f1da486d8c9e9432a2a86",
+      "evaluatorAgentId": "aa132a0b-fc17-4998-a5cb-30fc460532c4",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-opus-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-14T23:04:51.000Z"
+    }
+  ],
   "canaryCheckpoints": [
     {
       "id": "checkpoint-foundations",
@@ -561,5 +581,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-14T23:00:08.000Z"
+  "updatedAt": "2026-08-14T23:04:51.000Z"
 }
