@@ -22,11 +22,17 @@ contract key `rfc-plugin-cli-contribution`. Its `fileSurfaces` name `packages/cl
 `publish-dry-run`, `arch-check`, `docs-source-format`, and `docs-accuracy`; and
 `jsrAudit.applicable` is `true`.
 
-The authoritative cycle-1 dispatch resolves the contract tension: package/plugin and existing-RFC
-paths are inspection/audit inputs, not mutation authority. This leaf remains the RFC document that
-completes #1502 and proposes a separate, unfiled implementation epic, while retaining every
-contracted proving gate and JSR risk. A code-scope expansion would require a coordinator amendment,
-a new plan, and another PLAN-EVAL. The significant drift is recorded in `drift.md`.
+The durable coordinator brief at
+`/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/briefs/topic-features/implement.md:24`
+(commit `8775be7b3`) resolves the contract tension: package/plugin and existing-RFC paths are
+inspection/audit inputs, not mutation authority. This leaf remains the RFC document that completes
+#1502 and proposes a separate, unfiled implementation epic, while retaining every contracted proving
+gate and JSR risk. A code-scope expansion would require a coordinator amendment, a new plan, and
+another PLAN-EVAL. The significant drift is recorded in `drift.md`.
+
+`leaf-contracts.json` key `rfc-plugin-cli-contribution` was not edited and still carries its
+original implementation-shaped fields. The narrowing is a checked-in dispatch-level decision, not an
+unrecorded contract mutation.
 
 ## Required-source inventory
 
@@ -66,6 +72,7 @@ a new plan, and another PLAN-EVAL. The significant drift is recorded in `drift.m
 | R15 | RFC 0001 requires explicit selection, static module/export refs, family-major handshakes, duplicate rejection, and order-independent composition. CLI contribution success must obey the same laws without importing SDK client types.                                  | `rfcs/0001-sdk-client-contributions.md`.                                                                                                              |
 | R16 | RFC 0002's automation management surface and RFC 0003's business command definitions are consumers behind handlers. Neither may become the plugin CLI descriptor or transaction owner.                                                                                  | RFC 0002 §§5, 8–9; RFC 0003 command/CLI/generation sections.                                                                                          |
 | R17 | Live issue searches find no second general RFC beyond #1502. Known adjacent work is concrete consumer or generator scope: deploy #904–#908, DevTools #1477 (successor to closed #424), frontend generator #946, and resource-slice generator #1354.                     | GitHub searches for `CLI command contribution`, `plugin CLI`, `mount-children`, `scaffolder contribution`, and `generation seam`.                     |
+| R18 | `PluginCliResult` is already a public JSR-published name with `{ code, message?, data? }`; using it for a new discriminated result would be a breaking redefinition.                                                                                                    | `deno doc --filter PluginCliResult packages/plugin/src/cli/mod.ts`; `packages/plugin/src/cli/types.ts:12`.                                            |
 
 ## Live consumer-proposal inventory
 

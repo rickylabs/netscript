@@ -6,7 +6,7 @@
 | -------------- | -------------------------------------------------------------------- |
 | Run ID         | `docs-rfc-plugin-cli-contribution--1502`                             |
 | Branch         | `docs/rfc-plugin-cli-contribution`                                   |
-| Phase          | `plan-eval` cycle 2 requested after cycle-1 repair                   |
+| Phase          | `impl` — S1 public-contract authoring                                |
 | Target         | `rfcs/0000-plugin-cli-contribution.md` plus tracked harness evidence |
 | Archetype      | 4 — public DSL/builder (described future surface)                    |
 | Scope overlays | `SCOPE-docs`                                                         |
@@ -28,11 +28,17 @@ contract key `rfc-plugin-cli-contribution`. It records `executionKind: implement
 `check`, `test`, `publish-dry-run`, `arch-check`, `docs-source-format`, and `docs-accuracy`, and
 sets `jsrAudit.applicable: true`.
 
-The user's original dispatch and authoritative cycle-1 scope resolution decide how those fields
-apply: #1502 delivers the RFC document and proposes a separate later implementation epic;
-package/plugin and accepted-RFC paths are inspection/audit surfaces, not mutation authority. The six
-proving gates and JSR audit remain immutable and apply to the inspected CLI/plugin baseline and the
-actual docs diff. This significant tension and resolution are recorded in `drift.md`.
+The durable coordinator brief at
+`/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/briefs/topic-features/implement.md:24`
+(commit `8775be7b3`) decides how those fields apply: #1502 delivers the RFC document and proposes a
+separate later implementation epic; package/plugin and accepted-RFC paths are inspection/audit
+surfaces, not mutation authority. The six proving gates and JSR audit remain immutable and apply to
+the inspected CLI/plugin baseline and the actual docs diff. This significant tension and resolution
+are recorded in `drift.md`.
+
+The coordinator did not edit `leaf-contracts.json`; key `rfc-plugin-cli-contribution` retains its
+implementation-shaped fields. The checked-in brief is an explicit dispatch-level narrowing, not a
+silent contract-file rewrite.
 
 No source-scope expansion is inferred from `executionKind` or `fileSurfaces`. If accurate RFC
 authoring requires a package/plugin edit, the leaf stops until the coordinator amends contract key
@@ -145,7 +151,9 @@ editorial correction without changing ownership or semantics:
 - `PluginCliGeneratorDefinition` / `PluginCliGenerationPlan` — static planner pointer and
   host-neutral planned file operations.
 - `PluginCliCapability` / `PluginCliCapabilityGrant` — declared versus host-granted operations.
-- `PluginCliInvocation` / `PluginCliResult` / `PluginCliFailure` — serializable boundary values.
+- `PluginCliInvocation` / `PluginCliInvocationResult` / `PluginCliFailure` — serializable boundary
+  values. The already-published incompatible `PluginCliResult` name is preserved for legacy
+  compatibility and is never reassigned within major 1.
 - `PluginCliDiagnosticCode` — finite collision/load/capability/absent/plan/commit failure
   vocabulary.
 - `PluginCliManifestPointer` — parse-only pointer cross-checked with runtime registration.
@@ -168,15 +176,15 @@ leaf.
 
 ## Open-Decision Sweep
 
-| Decision                                                                                      | Status                                              | Notes                                                                                     |
-| --------------------------------------------------------------------------------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Exact public type/function spelling                                                           | safe to refine during RFC authoring                 | Vocabulary above fixes concepts and owner; no package-boundary rework.                    |
-| Whether absent host stubs appear in default help or only on explicit invocation               | safe FCP/product-copy choice                        | D9 fixes behavior and install hint; visibility policy is host metadata.                   |
-| Exact finite exit-code mapping                                                                | safe FCP                                            | D10 fixes error ownership and serialization; host may map categories to documented codes. |
-| Maximum descriptor/tree size and bootstrap deadline defaults                                  | safe FCP/operations policy                          | Bounds must exist and be configurable; values do not alter architecture.                  |
-| Whether existing `PluginCli` helpers are deprecated for one release or replaced at next minor | safe rollout decision                               | D2 requires an explicit compatibility child and migration guide either way.               |
-| Exact issue number/title/milestone for the separate later implementation epic                 | safe board-maintainer decision                      | D23 fixes that it is not #1502; this leaf proposes shape only and files nothing.          |
-| Manifest schema prerequisite ownership versus #1474                                           | must be audited before child filing, not before RFC | D15 fixes semantic outcome; duplicate audit chooses board owner.                          |
+| Decision                                                                                      | Status                                                                                          | Notes                                                                                                                            |
+| --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Exact public type/function spelling                                                           | resolved for the published collision; other names may receive non-breaking editorial refinement | S1 introduces `PluginCliInvocationResult`; live `PluginCliResult` retains its old shape until an explicit major-version removal. |
+| Whether absent host stubs appear in default help or only on explicit invocation               | safe FCP/product-copy choice                                                                    | D9 fixes behavior and install hint; visibility policy is host metadata.                                                          |
+| Exact finite exit-code mapping                                                                | safe FCP                                                                                        | D10 fixes error ownership and serialization; host may map categories to documented codes.                                        |
+| Maximum descriptor/tree size and bootstrap deadline defaults                                  | safe FCP/operations policy                                                                      | Bounds must exist and be configurable; values do not alter architecture.                                                         |
+| Whether existing `PluginCli` helpers are deprecated for one release or replaced at next minor | safe rollout decision                                                                           | D2 requires an explicit compatibility child and migration guide either way.                                                      |
+| Exact issue number/title/milestone for the separate later implementation epic                 | safe board-maintainer decision                                                                  | D23 fixes that it is not #1502; this leaf proposes shape only and files nothing.                                                 |
+| Manifest schema prerequisite ownership versus #1474                                           | must be audited before child filing, not before RFC                                             | D15 fixes semantic outcome; duplicate audit chooses board owner.                                                                 |
 
 No open item may change the public owner, mount model, discovery/bootstrap, mutation transaction, or
 compatibility boundary. A PLAN-EVAL finding that does is a plan failure, not an FCP item.
@@ -359,7 +367,9 @@ contracted proving gates above.
 
 ## Dependencies
 
-- Separate PLAN-EVAL `PASS` from a fresh native Claude/Fable 5 medium session before S1.
+- Separate PLAN-EVAL cycle-2 `PASS` from native Claude Opus 5 medium session
+  `28cc8106-967b-4fb7-90f3-dd95054ae953` before S1; satisfied by verdict commit
+  `3e0c8858b4a2552926d2965b62cbcc97a15c2935`.
 - Coordinator contract
   `/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/leaf-contracts.json`,
   key `rfc-plugin-cli-contribution`, as resolved by the authoritative cycle-1 RFC-only dispatch.

@@ -70,22 +70,37 @@ Drift is append-only. Package and plugin source remain read-only in this leaf.
 - **Source:**
   `/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/leaf-contracts.json`,
   contract key `rfc-plugin-cli-contribution`, specifically `executionKind`, `fileSurfaces`,
-  `provingGates`, and `jsrAudit`; user dispatch “#1502 plan-fix cycle 1”, scope resolution items
-  1–3.
+  `provingGates`, and `jsrAudit`; durable coordinator brief
+  `/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/briefs/topic-features/implement.md:24`
+  at commit `8775be7b3`.
 - **Expected:** The contract's `executionKind: implementation` and `fileSurfaces` could be read as
   authorizing changes under `packages/cli/` and `packages/plugin/`.
 - **Actual:** The authoritative dispatch resolves #1502 as an RFC/docs leaf. `packages/cli/`,
   `packages/plugin/`, RFC 0003, and RFC 0005 are inspection/audit surfaces only. The immutable
   `provingGates` and `jsrAudit.applicable: true` still bind this leaf and are run against those
-  surfaces; they do not grant mutation authority.
+  surfaces; they do not grant mutation authority. `leaf-contracts.json` itself was not edited; the
+  durable brief is an explicit dispatch-level narrowing.
 - **Severity:** significant.
 - **Action:** preserve the RFC-only slices, run and retain all six contracted proving gates plus the
   contracted CLI/plugin JSR audit, and propose—but do not file—the later implementation epic. Any
   expansion into framework code requires a coordinator amendment to contract key
   `rfc-plugin-cli-contribution`, followed by a new plan and separate PLAN-EVAL; it is not inferred
   from the current contract shape.
-- **Evidence:** cycle-1 dispatch; `plan-eval.md` FP-1–FP-3; repaired `plan.md` Contract Resolution;
-  cycle-1 receipts under `receipts/`.
+- **Evidence:** coordinator brief commit `8775be7b3`; `plan-eval-cycle-1.md` FP-1–FP-3;
+  `plan-eval.md` cycle-2 PASS; repaired `plan.md` Contract Resolution; receipts under `receipts/`.
+
+## 2026-08-15 — Main advanced after the approved immutable base
+
+- **What:** `origin/main` advanced by one commit while the leaf was awaiting cycle-2 PLAN-EVAL.
+- **Source:** raw `git rev-parse origin/main`, `git merge-base`, and diff from the approved base.
+- **Expected:** Leaf merge-base remains `01e0960494c95ce56eb35892c211a095eb13e6ed`.
+- **Actual:** `origin/main` is `dd472102d05ea13ab7ac7654aeedb177fbae2eb8`; the only intervening
+  commit changes evidence/verdict tooling and the PR skill, with no `rfcs/`, `packages/cli/`, or
+  `packages/plugin/` overlap.
+- **Severity:** minor.
+- **Action:** retain the approved immutable base and do not silently rebase; rerun final evidence in
+  S4 and escalate only if a later mainline change overlaps the inspected contract surfaces.
+- **Evidence:** raw reconciliation at S1 activation; `worklog.md` progress log.
 
 ## 2026-08-13 — Docs overlay points to a retired glossary path
 

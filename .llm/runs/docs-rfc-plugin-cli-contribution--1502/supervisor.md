@@ -17,14 +17,14 @@ identity through the PLAN-EVAL handoff.
 
 ## Routes in force
 
-| Task lane                               | Provider / model / effort                | Role in this run                                                               |
-| --------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------ |
-| `documentation_authoring` requested     | Antigravity CLI · Gemini 3.6 Flash · low | Canonical route from `lane-policy.md`; not the observed attached thread        |
-| Leaf supervisor/author requested        | OpenAI Codex · GPT-5.6 Sol · high        | Owner-requested attached session; research and plan author                     |
-| Leaf supervisor/author observed         | OpenAI Codex · GPT-5.6 Sol · high        | Topic launcher route verdict matched for the attached thread                   |
-| PLAN-EVAL cycle 1 observed              | Native Claude · Opus 5 · medium          | Approved opposite-family fallback; `FAIL_PLAN` recorded in `plan-eval.md`      |
-| `formal_plan_evaluation` required next  | Native Claude · Fable 5 · medium         | Fresh opposite-family evaluator for this Codex plan; not launched by this leaf |
-| `formal_impl_evaluation` required later | Native Claude · Fable 5 · medium         | Fresh opposite-family evaluator after RFC content and gates                    |
+| Task lane                               | Provider / model / effort                | Role in this run                                                           |
+| --------------------------------------- | ---------------------------------------- | -------------------------------------------------------------------------- |
+| `documentation_authoring` requested     | Antigravity CLI · Gemini 3.6 Flash · low | Canonical route from `lane-policy.md`; not the observed attached thread    |
+| Leaf supervisor/author requested        | OpenAI Codex · GPT-5.6 Sol · high        | Owner-requested attached session; research and plan author                 |
+| Leaf supervisor/author observed         | OpenAI Codex · GPT-5.6 Sol · high        | Topic launcher route verdict matched for the attached thread               |
+| PLAN-EVAL cycle 1 observed              | Native Claude · Opus 5 · medium          | Opposite-family evaluator; `FAIL_PLAN` preserved in `plan-eval-cycle-1.md` |
+| PLAN-EVAL cycle 2 requested/observed    | Native Claude · Opus 5 · medium          | `PASS`; session `28cc8106-967b-4fb7-90f3-dd95054ae953`, PID `2463708`      |
+| `formal_impl_evaluation` required later | Native Claude · Opus 5 · medium          | Fresh opposite-family evaluator after S4; Fable remains unassigned         |
 
 Reference `.llm/harness/workflow/lane-policy.md`; this file records only the routes relevant to the
 leaf.
@@ -36,9 +36,10 @@ leaf.
   recorded by
   `/home/codex/repos/netscript-007-features/.llm/runs/release-0.0.7-features--orchestration/slices/codex-thread-ids.md`;
   the observed session is preserved rather than replaced.
-- The user reserved PLAN-EVAL and IMPL-EVAL for fresh opposite-family sessions and expressly
-  prohibited this leaf from dispatching a rival evaluator. Cycle 1 used the approved native Claude
-  Opus 5 fallback because the Fable allowance was exhausted. This repair turn stops after the
-  repaired plan is pushed and the cycle-2 handoff is posted with `status:plan-eval` unchanged.
+- The reset dispatch de-assigns Fable and routes formal gates to native Claude Opus 5 medium.
+  Cycle-2 requested and observed routes matched: session `28cc8106-967b-4fb7-90f3-dd95054ae953`,
+  bridge `session_01D7t8efMh88nwR2PazUPkC1`, PID `2463708`, Remote Control active. Verdict commit
+  `3e0c8858b4a2552926d2965b62cbcc97a15c2935` records `PASS`. IMPL-EVAL still requires another fresh
+  opposite-family session after S4; this author does not self-evaluate.
 - Every push uses the explicit refspec
   `git push origin HEAD:refs/heads/docs/rfc-plugin-cli-contribution`; no upstream is configured.
