@@ -33,10 +33,13 @@ harness's per-slice complexity record.
 Read `briefs/reset-gates/dispatch.json` after the central state. It supersedes both the pre-reset
 six-Fable route and the rejected Sonnet-low matrix. The six retained holds have specific existing
 issue/complexity justification; future PLAN-EVAL is conditional rather than mechanical. Formal gates
-stay fresh, separate, opposite-family, and serial. Opus 5 low through high is the normal
-adversarial/evaluation route. Fable 5 is reserved for a recorded genuinely architectural PLAN
-question or an exceptionally complex implementation/review. No paused leaf resumes merely because
-the clock reset; its exact head, hold, lease, CI, and formal gate must be re-established first.
+stay fresh, separate, and opposite-family. Their queues are serial **within each topic
+orchestrator**, while one evaluator in each of docs, internals, fixes, and features may run
+concurrently. The cluster-wide expensive-gate limit remains reserved for shared resource-heavy
+E2E/Aspire work. Opus 5 low through high is the normal adversarial/evaluation route. Fable 5 is
+reserved for a recorded genuinely architectural PLAN question or an exceptionally complex
+implementation/review. No paused leaf resumes merely because the clock reset; its exact head, hold,
+lane-local evaluator lease, CI, and formal gate must be re-established first.
 
 All four historical Codex topic controllers are now durably parked: docs had no live session;
 internals/fixes/features returned `TOPIC_CONTROLLER_PARKED`, are idle, and left clean worktrees. The

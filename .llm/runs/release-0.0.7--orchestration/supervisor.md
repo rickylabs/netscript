@@ -167,8 +167,8 @@ evaluator. They are historical evidence, not active controllers.
 At `2026-08-14T23:00:08Z`, all four native Opus 5/high replacements satisfied the attachment gate:
 each has an exact Claude session ID, non-empty bridge ID, PID/cwd match, explicit process-argv model
 and effort, owner-visible Remote Control URL, a clean pushed topic checkpoint, and no premature leaf
-or evaluator dispatch. The central controller state is now `active`; the serialized formal-gate
-queue may begin at order 1.
+or evaluator dispatch. The central controller state is now `active`; each topic's serialized
+formal-gate queue may begin at its first eligible entry.
 
 ### Corrected evaluator matrix
 
@@ -178,11 +178,15 @@ six-gate template: no additional PLAN-EVAL is opened unless an existing issue, u
 architectural decision, or demonstrated complexity makes it necessary. Shared adversarial review is
 deduplicated without replacing required independent phase evidence.
 
-Each retained gate uses a fresh session separate from its Codex generator and is serialized under
-the one-evaluator cluster limit. Native Claude Opus 5 is the normal opposite-family evaluator;
-effort ranges from low through high according to the evidence contract. Fable 5 is not
-pre-dispatched. It is reserved for genuinely architectural PLAN questions or the few exceptionally
-complex implementations/reviews that materially need its additional intelligence, with model and
-effort plus the concrete necessity recorded before launch. All generator/evaluator separation,
-opposite-family, immutable-head, and coordinator-only authority laws remain binding. The exact
-current assignments and rationales live in `briefs/reset-gates/dispatch.json`.
+Each retained gate uses a fresh session separate from its Codex generator. Serialization is **per
+topic orchestrator**: internals must finish order 1 before order 4, and fixes must finish order 2
+before order 5; docs order 6 and features order 3 may run alongside those lane-local queues. One
+evaluator per topic remains binding. The cluster-wide expensive-gate limit applies only to shared
+resource-heavy gates such as full E2E/Aspire work, not formal evaluator sessions. Native Claude Opus
+5 is the normal opposite-family evaluator; effort ranges from low through high according to the
+evidence contract. Fable 5 is not pre-dispatched. It is reserved for genuinely architectural PLAN
+questions or the few exceptionally complex implementations/reviews that materially need its
+additional intelligence, with model and effort plus the concrete necessity recorded before launch.
+All generator/evaluator separation, opposite-family, immutable-head, and coordinator-only authority
+laws remain binding. The exact current assignments and rationales live in
+`briefs/reset-gates/dispatch.json`.

@@ -3,7 +3,9 @@
   "milestone": "0.0.7",
   "launchAfter": "2026-08-15T00:00:00+02:00",
   "timezone": "Europe/Zurich",
-  "concurrency": 1,
+  "concurrency": 4,
+  "concurrencyScope": "per-topic-orchestrator",
+  "perOrchestratorConcurrency": 1,
   "ownerOverride": {
     "recordedAt": "2026-08-14T22:41:15.000Z",
     "coordinator": "codex-root-0.0.7",
@@ -13,6 +15,7 @@
     "planEvalPolicy": "open only for an existing formal hold, unresolved architectural decision, or demonstrated complexity",
     "fablePolicy": "reserve Fable 5 for recorded genuinely architectural PLAN questions or exceptional complex implementation review",
     "costPolicy": "right-size effort, deduplicate shared review inputs, preserve every required independent evidence contract",
+    "queuePolicy": "serialize within each topic orchestrator; docs, internals, fixes, and features may each run one evaluator concurrently",
     "supersedes": "the 2026-08-14T22:13:00.000Z Sonnet route matrix and the pre-reset blanket Fable matrix"
   },
   "routePolicy": {

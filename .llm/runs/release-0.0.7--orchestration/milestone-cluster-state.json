@@ -528,7 +528,7 @@
       "receiptRefs": []
     }
   ],
-  "expensiveGates": [
+  "evaluatorLeases": [
     {
       "id": "reset-gate-01-harness-evidence-and-verdict-tooling-impl-eval",
       "state": "running",
@@ -554,6 +554,7 @@
       "attachedAt": "2026-08-14T23:06:32.000Z"
     }
   ],
+  "expensiveGates": [],
   "canaryCheckpoints": [
     {
       "id": "checkpoint-foundations",
@@ -593,5 +594,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-14T23:08:28.000Z"
+  "updatedAt": "2026-08-14T23:13:20.000Z"
 }

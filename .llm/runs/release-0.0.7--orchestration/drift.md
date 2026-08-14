@@ -42,5 +42,14 @@
   is unauthorized. The exact dirty diff was reconciled to the live evaluator and all four Claude
   topic supervisors were preserved unchanged.
 
+## 2026-08-14T23:13:20Z — evaluator serialization scope correction
+
+The reset dispatch incorrectly encoded `concurrency: 1` as a cluster-wide evaluator mutex. The owner
+clarified that serialization is per topic orchestrator. The dispatch now allows four concurrent
+evaluators total with a per-orchestrator cap of one; internals orders 1→4 and fixes orders 2→5
+remain ordered, while docs order 6 and features order 3 may run alongside them. Formal evaluator
+leases no longer consume `expensiveGates`; that cluster-wide mutex remains reserved for shared
+resource-heavy E2E/Aspire gates.
+
 No implementation drift is accepted. The plan repair changes orchestration evidence and public issue
 contracts only; leaf implementation remains blocked until PLAN-EVAL approval.
