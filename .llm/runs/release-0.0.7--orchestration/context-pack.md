@@ -54,8 +54,9 @@ Live checkpoint advanced at `2026-08-14T23:39:38Z`: `main` is now
 `0b3ed5d5a6aea451318f120988c25dfa3993a2ab` after coordinator merges of #1644 and #1643. Reset orders 1, 2,
 3, 4, and 6 are terminal `PASS`; orders 3/4/6 have been returned to their preserved Codex
 implementation threads through the existing Claude topic supervisors. Fixes order 5 is the sole
-remaining reset hold and returned `FAIL_PLAN` cycle 1 for three plan-text-only repairs; it is back
-with the original Codex plan-author thread and has no implementation or cycle-2 authority yet. PR
-orders 1 and 2 are merged. Continue to serialize only inside each topic orchestrator; never introduce a cluster-wide
+remaining reset hold returned `FAIL_PLAN` cycle 1, was repaired at `5b3c6fcf2` by the original
+Codex plan-author thread, and is now in fresh PLAN-EVAL cycle 2 (`06451c1e-…`). It still has no
+implementation authority before terminal `PASS`. Reset orders 1 and 2 are merged. Continue to
+serialize only inside each topic orchestrator; never introduce a cluster-wide
 evaluator wait, and keep the separate shared-resource `expensiveGates` mutex empty until a genuine
 E2E/Aspire gate needs it.
