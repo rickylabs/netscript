@@ -208,3 +208,52 @@ leaf worktree remains clean at `a790e91e2`. No tracked file was deleted and no `
 2. S2 numbers reproduce only from the private pinned EIS-Chat revision; the rendered case page must
    state who can reproduce them. Falsifiable by a published `measured` number with no
    reproducibility statement.
+
+## 2026-08-15 — S1 dispatched to the existing Codex thread
+
+Lifecycle transition posted and applied together, per `netscript-pr`: PR #1652 comment
+`[PHASE: IMPL] [STATUS: S1 DISPATCHED]` (`issuecomment-5299181113`) and the label move
+`status:plan-eval` → `status:impl`. Verified after the write: exactly one `status:` label, PR still
+`draft: true`, milestone `0.0.7`, and `area:docs` / `type:docs` / `priority:p2` / `ci:skip-e2e` /
+`ci:skip-scaffold` all preserved.
+
+Pre-dispatch environment check: Codex daemon `running`, managed at `0.147.0` with the control socket
+intact and 4 app-server processes; leaf worktree `docs/comparison-docs-programme@a790e91e2`,
+`dirty=0`, `upstream=NONE` by design, `agents: 0 recent`.
+
+Steering used the existing thread, never a replacement sender:
+
+| Field    | Value                                                                                                 |
+| -------- | ----------------------------------------------------------------------------------------------------- |
+| Thread   | `019ffcc9-16c2-7573-b7f6-d627172408e8` (the registered sender for this worktree)                      |
+| Tool     | `deno task agentic:codex-resume` → exactly one `codex exec resume`                                    |
+| Verified | `--dry-run` first: correct thread, correct worktree, 4565-byte message, quoting intact                |
+| Launch   | detached via `nohup … &`, **not** wrapped in `timeout` — a timeout bounds the agent, not the launcher |
+| Live PID | `2510461`                                                                                             |
+
+### S1 brief boundaries
+
+Six files only (`docs/site/_data.ts`, `docs/site/_data/xref.ts`, `comparisons/index.md`,
+`comparisons/methodology.md`, plus the run's `worklog.md` and `context-pack.md`); gate
+`S1-method-nav` (`deno task --cwd docs/site build`, `deno task docs:links`, `git diff --check`) with
+raw exit codes plus the four manual assertions; one commit, explicit-refspec push, one structured PR
+comment. No case-result claim and no measured number ship in S1.
+
+Both surviving evaluator notes were folded into the brief as S1 work rather than left to retrofit:
+glossary consistency for the `SCOPE-docs` Terminology gate, and stating the S2 reproducibility
+precondition on the methodology page so the case page is not its first mention.
+
+The brief also warns the thread explicitly that its memory of writing S1 files is from the reverted
+turn — no such content was ever committed, and the two empty directories it may remember creating
+have been removed.
+
+Hard stops restated to the generator: stop after S1; no S2/S3; no self-certification, because the
+Tier-A slice review and sign-off commit are the orchestrator's; no `packages/**`/`plugins/**`,
+lockfile, private-source, `#1551`, ready, merge, publish, scaffold/E2E, or lease action.
+
+### Correction to an earlier characterization in this log
+
+My first Tier-A report called the `cse_…` bridge id a transcription slip. It was not: both identity
+files genuinely carry different values, and the evaluator had read the jobs file. The prior entry
+already records the accurate root cause; noted here so no reader takes the earlier framing as the
+finding.
