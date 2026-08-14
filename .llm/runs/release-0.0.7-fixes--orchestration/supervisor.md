@@ -148,6 +148,34 @@ head `a949a6cd1` — ready for coordinator disposition.
 `http://localhost:8094/api/v1/auth`, the same pin class as #1243 and outside its narrowing. It needs
 its own issue; this lane does not file issues.
 
+## Order-5 formal PLAN-EVAL cycle 1 — #1654 `scaffold-generated-output-correctness`
+
+Coordinator granted after order 2 reached terminal `PASS`. Before launch, the order-2 session was
+retired (`claude stop 8c47751a`; PID `2450732` gone, registry entry removed) so this lane holds
+exactly one evaluator under `perOrchestratorConcurrency: 1` — its verdict commit `a949a6cd1` and a
+clean leaf tree were re-confirmed intact after the stop.
+
+| Field | Value |
+| --- | --- |
+| Gate | PLAN-EVAL cycle 1, dispatch order 5, PR #1654, issues #1262 / #1263 / #1588 |
+| Immutable source head (re-verified 4 ways) | `14d8b38b4db7ba0635cbbcac2f8cd8903bee0ec9` — local `HEAD`, `FETCH_HEAD` after `git fetch origin fix/scaffold-generated-output-correctness`, `git ls-remote origin`, and PR #1654 `headRefOid` all agree; worktree clean; PR `OPEN`/draft/`MERGEABLE`, `status:plan-eval` |
+| Brief | `/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/briefs/reset-gates/scaffold-generated-output-correctness.md`, passed verbatim, sha256 `d726741d75bcd67fc14ed3c8fd00458e48db1312dd2528fcffcdfd81913a13d1` (1942 bytes); job `intent` opens with the brief's own first line |
+| Requested route | native Claude · Opus 5 · medium · Remote Control (`dispatch.json` order 5: `provider: native-claude`, `cliModel: claude-opus-5`, `effort: medium`) |
+| Observed launch route | `respawnFlags: ["--effort","medium","--permission-mode","bypassPermissions","--remote-control","--name","NetScript 0.0.7 #1654 PLAN-EVAL","--model","claude-opus-5"]` |
+| Background id | `bd703a7d` |
+| Claude session id | `bd703a7d-4757-4689-a603-5ca98f7d7323` |
+| PID | `2470890` |
+| cwd | `/home/codex/repos/netscript-007-leaf-scaffold-generated-output-correctness` (exact; no process owned it at launch) |
+| Registry `bridgeSessionId` | `session_015wwEYoUsxCwzT3PQeSqi2A` (non-empty) |
+| Remote Control URL | `https://claude.ai/code/session_015wwEYoUsxCwzT3PQeSqi2A` |
+| Generator separation | fresh session; the generator is Codex thread `019ffcca-8be0-74c2-bb0e-c82cf5ce3c85` (idle, not resumed) |
+| Verdict | _pending_ |
+
+Launched `2026-08-14T23:26:21Z`. Constraints honored: no other lane touched, no merge, no publish,
+no global expensive-gate mutex acquired (`docker ps -a` empty at launch), and **implementation does
+not resume before a terminal verdict** — the brief bars implementation and only an unqualified
+`PASS` releases the attached Codex thread.
+
 ## Wave 0 lane assignments
 
 | Leaf | Branch | Implementation route | Formal evaluator (per `dispatch.json`) |
