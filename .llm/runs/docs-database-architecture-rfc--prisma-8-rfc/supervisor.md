@@ -23,7 +23,7 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 | `formal_plan_evaluation`              | Anthropic · Fable 5 · medium            | Fresh opposite-family PLAN-EVAL before the RFC file is authored            |
 | focused post-draft RFC review         | OpenRouter · Qwen 3.8 Max · max         | Focused review after the root's complete-draft personal review             |
 | owner-directed adversarial RFC review | OpenCode · OpenRouter · Grok 4.6 · high | Post-draft attack on portability, migration safety, trust, and abstraction |
-| owner-directed final refinement       | Anthropic · Fable 5 · high              | One fresh gate scheduled for 2026-08-15 00:00 Europe/Zurich                |
+| owner-directed final refinement       | Anthropic · Fable 5 · high              | Ran 2026-08-15 as one fresh session; verdict `PASS` with one refinement    |
 
 ## Delegated research and synthesis lanes
 
@@ -73,7 +73,7 @@ decisions remain locked, and no further PLAN-EVAL will run.
 | Grok whole-RFC review    | OpenCode/OpenRouter · `x-ai/grok-4.6` · high | `ses_003644aeaffeSm3UCAW9xUqRIK`       | Commit `5dfc4e8eb`, blob `f46040d8...`; no subagents/edits; `PASS_WITH_REFINEMENTS`, 0 blockers. |
 | Author/editor checkpoint | Native Claude Code · Opus 5 · high           | completed session recorded in worklog  | Root corrections applied and pushed as `ad8effff9`; no later Opus use.                           |
 | Root semantic closure    | Codex supervisor + existing non-Claude lanes | current root session                   | TypeScript/API, JSR, and architecture verdicts `PASS`; pushed as `d28d8e779`.                    |
-| Final evaluator/refiner  | Native Claude Code · Fable 5 · high          | scheduled fresh session                | One-shot 2026-08-15 00:00 Europe/Zurich; verdict and commit pending.                             |
+| Final evaluator/refiner  | Native Claude Code · Fable 5 · high          | fresh one-shot session, 2026-08-15     | Starting commit `a7a6887c2`; verdict **`PASS`**; one example refinement; gate committed/pushed.  |
 
 Before commit `5dfc4e8eb`, root added three narrow corrections: runtime consumes the compiled
 `DatabaseManifest`, not `DatabaseDefinition`; the authority table distinguishes each artifact and

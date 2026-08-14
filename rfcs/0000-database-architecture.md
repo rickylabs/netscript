@@ -178,7 +178,7 @@ on the provider, and uses that provider's **public authoring scaffold** with `de
 // database/provider.ts — complete module; the sole live provider/extension composition root
 import { pgvector, prismaPostgres } from '@netscript/database-prisma-postgres';
 
-const vector = pgvector({ dimensions: 1536 });
+const vector = pgvector();
 
 export const postgres = prismaPostgres({
   minVersion: 15,
@@ -638,7 +638,7 @@ extension publisher** assembles one bundle for the provider boundary:
 
 ```ts
 // @netscript/database-prisma-postgres — assembled inside the provider boundary, not by the app
-export declare function pgvector(options: PgVectorOptions): PostgresExtension<'pgvector'>;
+export declare function pgvector(options?: PgVectorOptions): PostgresExtension<'pgvector'>;
 // → { id, version, requires: [CAP.pgvector], authoring, control, runtime, validation }
 ```
 

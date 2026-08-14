@@ -6,19 +6,21 @@
 | -------------- | ------------------------------------------------------- |
 | Run ID         | `docs-database-architecture-rfc--prisma-8-rfc`          |
 | Branch         | `docs/database-architecture-rfc`                        |
-| Current phase  | `final-verification`                                    |
+| Current phase  | `closed — final gate passed`                            |
 | Archetype      | Docs-only RFC describing future A1/A4/A3/A2/A2/A6 graph |
 | Scope overlays | `SCOPE-docs.md`                                         |
 
 ## Current State
 
-A clean-break database architecture RFC is at final verification. Issue #313 remains historical
-evidence; its compatibility-first solution is superseded. PLAN-EVAL cycle 2 passed, Opus authored
-and consolidated the draft, Qwen and Grok reviewed it, and root closed the remaining semantic
-findings at `d28d8e779`. The owner removed the length target and temporarily stopped further
-Claude/Fable use, then explicitly reinstated exactly one final Fable 5 high evaluation/refinement
-gate. It is scheduled for 2026-08-15 00:00 Europe/Zurich as the one-shot systemd user unit
-`netscript-db-rfc-final-fable-20260815`; no other Claude route is reopened.
+The clean-break database architecture RFC has passed its absolute-final substantive gate. Issue #313
+remains historical evidence; its compatibility-first solution is superseded. PLAN-EVAL cycle 2
+passed, Opus authored and consolidated the draft, Qwen and Grok reviewed it, root closed the
+remaining semantic findings at `d28d8e779`, and the owner-reinstated one-shot fresh native Fable 5
+high evaluator/refiner ran on 2026-08-15 from starting commit `a7a6887c2`. It returned **`PASS`** in
+`evaluate.md` after re-verifying the pinned RC1 claims and applying one narrow example refinement
+(Step 1 `pgvector()` — upstream-false extension-level `dimensions` removed). The earlier
+cancellation is preserved as provenance; it was superseded for exactly this gate and all other
+Claude use stays frozen. Draft PR #1640 awaits owner review and stays draft.
 
 ## Completed
 
@@ -63,17 +65,18 @@ gate. It is scheduled for 2026-08-15 00:00 Europe/Zurich as the one-shot systemd
   targeted formatting, internal-link, whitespace, and fence checks and pushed `d28d8e779`. The
   consolidated receipt is `reviews/root-semantic-closure.md`.
 
+- The final Fable 5 high gate ran 2026-08-15: starting commit `a7a6887c2`, verdict **`PASS`**, one
+  narrow refinement, docs gates green post-edit; recorded in `evaluate.md` and committed/pushed with
+  a PR #1640 comment.
+
 ## In Progress
 
-- One fresh native Fable 5 high final evaluator/refiner is scheduled from the clean pushed branch.
-  Its fail-closed launcher, brief, and output contract are persisted in this run.
+- Nothing. The run is closed pending owner review of draft PR #1640.
 
 ## Next Steps
 
-1. At 2026-08-15 00:00 Europe/Zurich, launch the single final Fable 5 high gate.
-2. Record its exact starting commit, session, verdict, refinements, and mechanical evidence.
-3. Commit and push the evaluator gate, comment on draft PR #1640, and leave the PR draft for owner
-   review.
+1. Owner reviews draft PR #1640 and decides on RFC acceptance (W0). The PR stays draft; no merge or
+   ready transition is authorized from this run.
 
 ## Key Decisions
 
@@ -102,7 +105,7 @@ gate. It is scheduled for 2026-08-15 00:00 Europe/Zurich as the one-shot systemd
 | Fitness     | PASS           | D-01–D-47, OWNER-DX-01, and three final closure audits.                 |
 | Runtime     | N/A            | Docs-only RFC; future matrices are explicit implementation gates.       |
 | Consumer    | PASS           | TypeScript/API, JSR, and architecture closure all passed `d28d8e779`.   |
-| Evaluator   | PENDING        | Final Fable 5 high gate is scheduled for 2026-08-15 00:00 CEST.         |
+| Evaluator   | PASS           | `evaluate.md` — final Fable 5 high gate, 2026-08-15, one refinement.    |
 
 ## Open Questions
 
@@ -121,4 +124,5 @@ gate. It is scheduled for 2026-08-15 00:00 Europe/Zurich as the one-shot systemd
 ## Commits
 
 - Semantic review closure: `d28d8e779` (pushed).
+- Final Fable gate + refinement: committed and pushed 2026-08-15 from starting commit `a7a6887c2`.
 - See the draft PR's commit list + per-slice PR comments (V3 retired `commits.md`).

@@ -193,3 +193,24 @@ documentation.
   and fallback models; require a clean committed/pushed close gate. All other Claude use stays
   frozen.
 - **Evidence:** `briefs/fable-final-evaluator.md` and `workflows/launch-final-fable.sh`.
+
+## 2026-08-15 — Final Fable gate executed; verdict PASS with one refinement
+
+- **What:** The owner-reinstated one-shot fresh native Fable 5 high evaluator/refiner ran as the
+  absolute-final substantive gate, superseding the earlier Claude/Fable cancellation for exactly
+  this gate. The cancellation remains historical provenance; all other Claude use stays frozen.
+- **Source:** Owner directive 2026-08-14; unit `netscript-db-rfc-final-fable-20260815`;
+  `briefs/fable-final-evaluator.md`.
+- **Expected:** Evaluate the checked-out RFC at the exact remote tip; refine only within D-01–D-47
+  and `OWNER-DX-01`; no subagents, workflows, resumes, or fallback models.
+- **Actual:** Starting commit `a7a6887c2` (verified equal to the fetched remote tip). The full RFC,
+  run artifacts, three reviews, and three audits were read; the load-bearing pinned RC1 claims were
+  independently re-verified (138 export keys, phantom type maps at `types.ts:207`, namespace
+  flattening, demo helper spellings). One example-level defect was found and repaired: Step 1's
+  `pgvector({ dimensions: 1536 })` invented an extension-level dimension option that pgvector and
+  the pinned demo do not have; the call is now `pgvector()` and the Step 6 declaration takes
+  `options?`. No decision was reopened. Verdict: **`PASS`** in `evaluate.md`; targeted fmt,
+  `docs:links` (103 docs, 0 broken), `git diff --check`, and fence balance all green post-edit.
+- **Severity:** none — gate completed as authorized.
+- **Action:** close the run; draft PR #1640 stays draft for owner review.
+- **Evidence:** `evaluate.md`; this gate's commit on `docs/database-architecture-rfc`.
