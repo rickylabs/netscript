@@ -113,3 +113,19 @@ Drift is append-only. Package and plugin source remain read-only in this leaf.
 - **Action:** name and run the RFC terminology review against `docs/site/glossary.md`; do not edit
   the shared overlay from this leaf.
 - **Evidence:** repaired `plan.md` Validation Plan and final RFC review checklist.
+
+## 2026-08-15 — Tier-A found three bounded S1 contract inconsistencies
+
+- **What:** The first S1 draft used an undeclared diagnostic type, promised deep immutability with a
+  shallow return type, and allowed the handler-reference type to look sufficient for path safety.
+- **Source:** Tier-A review artifact
+  `/home/codex/repos/netscript-007-features/.llm/runs/release-0.0.7-features--orchestration/slices/tier-a-review-1502-s1.md`
+  at topic commit `b774998f0`, findings F1–F3.
+- **Expected:** The public-types-first RFC declares every normative type and distinguishes static
+  type guarantees from runtime validation.
+- **Actual:** All three defects were documentation-contract inconsistencies; no ownership,
+  lifecycle, package boundary, or implementation scope changed.
+- **Severity:** minor.
+- **Action:** declare the finite tuple/union, express recursive readonly plus runtime copy/freeze,
+  and require normalized in-package handler paths before import. Stop again before S2.
+- **Evidence:** S1 fix-up diff, docs-scoped receipts, and PR fix-up comment.

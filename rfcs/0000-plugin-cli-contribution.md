@@ -226,6 +226,10 @@ export interface PluginCliHandlerRef {
   readonly export: string;
 }
 
+export type PluginCliDeepReadonly<T> = T extends (...args: never[]) => unknown ? T
+  : T extends object ? { readonly [K in keyof T]: PluginCliDeepReadonly<T[K]> }
+  : T;
+
 export interface PluginCliArgumentDefinition {
   readonly id: string;
   readonly metavar: string;
@@ -275,8 +279,19 @@ export interface PluginCliContributionDefinition {
 
 export function definePluginCliContribution<
   const TDefinition extends PluginCliContributionDefinition,
->(definition: TDefinition): Readonly<TDefinition>;
+>(definition: TDefinition): PluginCliDeepReadonly<TDefinition>;
 ```
+
+`PluginCliDeepReadonly` makes every returned property and nested array/object recursively readonly
+to TypeScript consumers; it is not a claim that the input object was immutable before the call. The
+builder must validate the input, copy it into host-owned data, and recursively freeze the returned
+definition so the same guarantee holds at runtime. Token grammar, serializability, path safety, and
+cross-definition collisions are validation obligations because TypeScript cannot prove them.
+
+The `` `./${string}` `` handler-module type is only a package-relative shape hint. It accepts values
+such as `./../escape.ts`; normative validation must normalize the reference, reject every parent
+traversal, and prove that the resolved target remains inside the contributing package before any
+import occurs.
 
 The concrete `PluginCliCapability` union and generation fields are completed with the S2 security
 and transaction model. Their placement is fixed here; their values are not improvised in S1.
@@ -341,6 +356,25 @@ executes a plugin. Dynamic workspace-aware completion is outside v1.
 ### Result, failure, and diagnostic contract
 
 ```ts
+export const PLUGIN_CLI_DIAGNOSTIC_CODES = [
+  'descriptor-invalid',
+  'mount-closed',
+  'reserved-route',
+  'duplicate-route',
+  'duplicate-alias',
+  'duplicate-option',
+  'duplicate-command-id',
+  'handler-unavailable',
+  'plugin-absent',
+  'capability-denied',
+  'bootstrap-timeout',
+  'plugin-failure',
+  'plan-invalid',
+  'commit-failed',
+] as const;
+
+export type PluginCliDiagnosticCode = typeof PLUGIN_CLI_DIAGNOSTIC_CODES[number];
+
 export interface PluginCliMessage {
   readonly level: 'info' | 'warning';
   readonly text: string;
@@ -366,12 +400,9 @@ export type PluginCliInvocationResult =
   };
 ```
 
-Framework diagnostic codes form a finite exported tuple with a derived union. S1 reserves at least
-these stable meanings: `descriptor-invalid`, `mount-closed`, `reserved-route`, `duplicate-route`,
-`duplicate-alias`, `duplicate-option`, `duplicate-command-id`, `handler-unavailable`,
-`plugin-absent`, `capability-denied`, `bootstrap-timeout`, `plugin-failure`, `plan-invalid`, and
-`commit-failed`. Later slices specify the lifecycle phase and remediation data for each code without
-changing these ownership rules.
+The exported tuple is the complete framework diagnostic-code set for contract major 1. Later slices
+specify the lifecycle phase and remediation data for each code without changing these ownership
+rules. Adding a code is additive; changing an existing meaning is a major-version event.
 
 Plugin domain codes use the `plugin.` namespace and are documented by their plugin. They cannot use
 or imitate framework codes. The host owns redaction, JSON/text rendering, ordering of buffered
@@ -386,11 +417,11 @@ name for the v1 contract. The new discriminated boundary is `PluginCliInvocation
 
 The existing `PluginCliResult`, `PluginCliCommand`, and `PluginCli` helpers remain source-compatible
 during the major-1 migration window and may be marked deprecated only when a host compatibility
-adapter exists. The adapter maps `code === 0` to a successful invocation and a nonzero code to a
-stable `legacy-command-failed` failure while retaining the legacy code only as diagnostic details.
-Changing the meaning of `PluginCliResult` or removing the compatibility export requires the next
-public package/contract major; the name is never silently reassigned. The later implementation epic
-must carry a dedicated migration child and consumer fixtures for this boundary.
+adapter exists. The adapter maps `code === 0` to a successful invocation and a nonzero code to
+`plugin-failure`, retaining `{ kind: 'legacy-command-failed', legacyCode: code }` only as diagnostic
+details. Changing the meaning of `PluginCliResult` or removing the compatibility export requires the
+next public package/contract major; the name is never silently reassigned. The later implementation
+epic must carry a dedicated migration child and consumer fixtures for this boundary.
 
 ### S2 and S3 normative sections still to be completed
 

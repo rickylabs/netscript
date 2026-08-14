@@ -15,8 +15,9 @@
 Cycle-1 PLAN-EVAL evaluated `a02f9690154b7384ca8e6503ea91d644b397368a`, returned `FAIL_PLAN`, and is
 preserved at `plan-eval-cycle-1.md`. Cycle 2 evaluated repaired head
 `12276e6d86403ed1340ef79a963e87d401d643e9` and returned `PASS` in evaluator-only commit
-`3e0c8858b4a2552926d2965b62cbcc97a15c2935`. S1 authors only the RFC public contract and closes the
-four non-blocking verdict notes; S2–S4 remain blocked on Tier-A slice release.
+`3e0c8858b4a2552926d2965b62cbcc97a15c2935`. Tier-A reviewed S1 head
+`86d0110a545e449dfa094fc961a37a327604d23a` and requested three bounded contract corrections. This
+turn fixes only F1–F3 and evidence labelling; S2–S4 remain blocked on the next Tier-A release.
 
 ## Completed
 
@@ -49,11 +50,20 @@ four non-blocking verdict notes; S2–S4 remain blocked on Tier-A slice release.
   recorded that `leaf-contracts.json` was not edited.
 - Authored the S1 RFC ownership, descriptor/builder/router/help/completion/error contract and gave
   the live `PluginCliResult` collision an explicit major-version migration disposition.
+- Read the complete Tier-A S1 review at topic commit `b774998f0` and preserved its clean slice-
+  hygiene verdict.
+- Declared `PluginCliDiagnosticCode`, reconciled deep readonly type/runtime guarantees, and made
+  handler path normalization/traversal rejection an explicit validator obligation.
+- Relabelled the three S1 run-gate receipts as parent-head evidence and both source-format JSON
+  files as structured wrapper reports rather than durable receipts.
+- Reran the S1 fix-up docs gates: durable source-format and accuracy passed against parent
+  `86d0110a5`, the structured formatter covered 10 owned Markdown files with zero findings, and the
+  link check covered 103 docs with zero broken links, anchors, or orphans.
 
 ## In Progress
 
-- S1 validation, one reviewable commit, explicit-refspec push, PR body/comment update, and Tier-A
-  topic-review stop.
+- S1 fix-up docs validation, one reviewable commit, explicit-refspec push, PR body/comment update,
+  and renewed Tier-A topic-review stop.
 
 ## Next Steps
 
@@ -94,12 +104,12 @@ four non-blocking verdict notes; S2–S4 remain blocked on Tier-A slice release.
 
 ## Gates
 
-| Gate family | Current status                                                       | Evidence                               |
-| ----------- | -------------------------------------------------------------------- | -------------------------------------- |
-| Static      | contracted check/test/publish/arch evidence green; docs rerun in S0R | `worklog.md`; `receipts/`              |
-| Fitness     | full A4 roadmap plus measured JSR baseline                           | `plan.md`; `research.md`; `worklog.md` |
-| Runtime     | N/A / global expensive gate not run                                  | docs-only scope                        |
-| Consumer    | research inventory complete                                          | live issues/RFCs and `research.md`     |
+| Gate family | Current status                                              | Evidence                               |
+| ----------- | ----------------------------------------------------------- | -------------------------------------- |
+| Static      | S1 fix-up docs gates green with explicit parent-head limits | `worklog.md`; `receipts/`              |
+| Fitness     | full A4 roadmap plus measured JSR baseline                  | `plan.md`; `research.md`; `worklog.md` |
+| Runtime     | N/A / global expensive gate not run                         | docs-only scope                        |
+| Consumer    | research inventory complete                                 | live issues/RFCs and `research.md`     |
 
 ## Open Questions
 
@@ -121,5 +131,6 @@ four non-blocking verdict notes; S2–S4 remain blocked on Tier-A slice release.
 - S0R repaired plan head: the commit containing this artifact; exact SHA is recorded in the draft
   PR's PLAN-UPDATE comment and final supervisor report.
 - Cycle-2 PASS verdict head: `3e0c8858b4a2552926d2965b62cbcc97a15c2935`.
-- S1 exact head: recorded in the PR slice comment after explicit-refspec push.
+- S1 reviewed head: `86d0110a545e449dfa094fc961a37a327604d23a`.
+- S1 fix-up exact head: recorded in the PR fix-up comment after explicit-refspec push.
 - See the draft PR commit list and per-slice comments after push; V3 uses no `commits.md`.

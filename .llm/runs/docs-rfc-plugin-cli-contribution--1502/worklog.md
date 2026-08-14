@@ -99,25 +99,28 @@ No author imports `@netscript/cli` internals, Cliffy, deploy, DevTools, or anoth
 
 ## Progress Log
 
-| Time                  | Slice | Step      | Notes                                                                                                                                 |
-| --------------------- | ----- | --------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-13 21:45 CEST | S0    | activate  | Read all nine selected skills completely; activated harness/docs A4 workflow.                                                         |
-| 2026-08-13 21:55 CEST | S0    | reconcile | Fetched live `origin/main`; clean exact base, no upstream; #1502 open/zero comments; no existing PR.                                  |
-| 2026-08-13 22:05 CEST | S0    | research  | Read required harness/archetype/doctrine/RFC sources and live CLI/plugin public surfaces with `deno doc` before focused source.       |
-| 2026-08-13 22:20 CEST | S0    | consumers | Fetched #904–#908/comments and adjacent #424/#946/#1477; searched for duplicate general proposals.                                    |
-| 2026-08-13 22:25 CEST | S0    | JSR audit | Measured plugin/CLI export-map doc lint and recorded public-surface, slow-type, export, and asset risks.                              |
-| 2026-08-13 22:30 CEST | S0    | design    | Locked ownership, lifecycle, security, compatibility, epic shape, and no-global-expensive-gate contract.                              |
-| 2026-08-13 22:34 CEST | S0    | gates     | Scoped structured Markdown format, durable docs accuracy, and internal-link checks passed; no code/global expensive gate run.         |
-| 2026-08-13 22:48 CEST | S0R   | eval-read | Preserved evaluator-only commit `d71b78c3`; read all 145 lines of cycle-1 `FAIL_PLAN` before repair.                                  |
-| 2026-08-13 22:55 CEST | S0R   | contract  | Read coordinator key `rfc-plugin-cli-contribution`; recorded authoritative RFC-only mutation resolution as significant drift.         |
-| 2026-08-13 22:59 CEST | S0R   | JSR audit | Measured CLI/plugin exports, docs, exact internal pins, isolated-declaration posture, publish assets, and `import.meta` preflight.    |
-| 2026-08-13 23:00 CEST | S0R   | gates     | Structured check and focused tests, per-member publish dry-runs, and root architecture gate passed at evaluator head.                 |
-| 2026-08-13 23:08 CEST | S0R   | docs      | Structured run Markdown, docs-source-format, docs-accuracy, links, and live-glossary terminology review passed.                       |
-| 2026-08-15 01:20 CEST | S1    | eval-read | Read all 246 lines of cycle-2 `PASS`; evaluator-only head `3e0c8858b4a2552926d2965b62cbcc97a15c2935`.                                 |
-| 2026-08-15 01:25 CEST | S1    | reconcile | Clean local/remote evaluator head, no upstream; main advanced one non-overlapping tooling commit, recorded as minor drift.            |
-| 2026-08-15 01:32 CEST | S1    | contract  | Authored ownership, immutable descriptors/builder, nested router/collisions/order, static help/completion, and result/error contract. |
-| 2026-08-15 01:35 CEST | S1    | notes     | Closed N-1 durable citation, N-2 Opus route, N-3 published symbol collision; retained N-4 for mandatory S4 final-head rerun.          |
-| 2026-08-15 01:37 CEST | S1    | gates     | Structured check, docs format/accuracy, owned Markdown, links, terminology, and live API/help sampling passed.                        |
+| Time                  | Slice  | Step      | Notes                                                                                                                                 |
+| --------------------- | ------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-13 21:45 CEST | S0     | activate  | Read all nine selected skills completely; activated harness/docs A4 workflow.                                                         |
+| 2026-08-13 21:55 CEST | S0     | reconcile | Fetched live `origin/main`; clean exact base, no upstream; #1502 open/zero comments; no existing PR.                                  |
+| 2026-08-13 22:05 CEST | S0     | research  | Read required harness/archetype/doctrine/RFC sources and live CLI/plugin public surfaces with `deno doc` before focused source.       |
+| 2026-08-13 22:20 CEST | S0     | consumers | Fetched #904–#908/comments and adjacent #424/#946/#1477; searched for duplicate general proposals.                                    |
+| 2026-08-13 22:25 CEST | S0     | JSR audit | Measured plugin/CLI export-map doc lint and recorded public-surface, slow-type, export, and asset risks.                              |
+| 2026-08-13 22:30 CEST | S0     | design    | Locked ownership, lifecycle, security, compatibility, epic shape, and no-global-expensive-gate contract.                              |
+| 2026-08-13 22:34 CEST | S0     | gates     | Scoped structured Markdown format, durable docs accuracy, and internal-link checks passed; no code/global expensive gate run.         |
+| 2026-08-13 22:48 CEST | S0R    | eval-read | Preserved evaluator-only commit `d71b78c3`; read all 145 lines of cycle-1 `FAIL_PLAN` before repair.                                  |
+| 2026-08-13 22:55 CEST | S0R    | contract  | Read coordinator key `rfc-plugin-cli-contribution`; recorded authoritative RFC-only mutation resolution as significant drift.         |
+| 2026-08-13 22:59 CEST | S0R    | JSR audit | Measured CLI/plugin exports, docs, exact internal pins, isolated-declaration posture, publish assets, and `import.meta` preflight.    |
+| 2026-08-13 23:00 CEST | S0R    | gates     | Structured check and focused tests, per-member publish dry-runs, and root architecture gate passed at evaluator head.                 |
+| 2026-08-13 23:08 CEST | S0R    | docs      | Structured run Markdown, docs-source-format, docs-accuracy, links, and live-glossary terminology review passed.                       |
+| 2026-08-15 01:20 CEST | S1     | eval-read | Read all 246 lines of cycle-2 `PASS`; evaluator-only head `3e0c8858b4a2552926d2965b62cbcc97a15c2935`.                                 |
+| 2026-08-15 01:25 CEST | S1     | reconcile | Clean local/remote evaluator head, no upstream; main advanced one non-overlapping tooling commit, recorded as minor drift.            |
+| 2026-08-15 01:32 CEST | S1     | contract  | Authored ownership, immutable descriptors/builder, nested router/collisions/order, static help/completion, and result/error contract. |
+| 2026-08-15 01:35 CEST | S1     | notes     | Closed N-1 durable citation, N-2 Opus route, N-3 published symbol collision; retained N-4 for mandatory S4 final-head rerun.          |
+| 2026-08-15 01:37 CEST | S1     | gates     | Structured check, docs format/accuracy, owned Markdown, links, terminology, and live API/help sampling passed.                        |
+| 2026-08-15 01:48 CEST | S1-fix | review    | Read full Tier-A `CHANGES_REQUESTED` at topic commit `b774998f0`; F1–F3 are bounded S1 contract defects.                              |
+| 2026-08-15 01:49 CEST | S1-fix | contract  | Declared diagnostic tuple/union, made deep readonly type/runtime guarantees explicit, and made handler path validation normative.     |
+| 2026-08-15 01:51 CEST | S1-fix | gates     | Docs source format/accuracy, structured owned Markdown format, and internal links passed; no code or expensive gate ran.              |
 
 ## Decisions
 
@@ -148,36 +151,52 @@ No author imports `@netscript/cli` internals, Cliffy, deploy, DevTools, or anoth
 
 ### Static Gates
 
-| Gate                                             | Command or check                                                                             | Result             | Notes                                                                                             |
-| ------------------------------------------------ | -------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------- |
-| Live public-surface inspection                   | `deno doc packages/cli/mod.ts`; `deno doc packages/plugin/mod.ts`; focused `deno doc`/source | PASS               | Research only; exact exports and commands inventoried.                                            |
-| JSR doc-lint baseline (`@netscript/plugin`)      | structured full export-map runner                                                            | BASELINE_FAIL      | 15 private-type refs package-wide; one on `./cli`; `receipts/doc-lint-plugin-cycle1.json`.        |
-| JSR doc-lint baseline (`@netscript/cli`)         | structured full export-map runner                                                            | PASS               | 0 diagnostics across three entrypoints; `receipts/doc-lint-cli-cycle1.json`.                      |
-| Initial S0 scoped Markdown format                | `run-deno-fmt.ts --root <run-dir> --ext md --output ...`                                     | PASS               | 8 files, 1 batch, 0 findings; `receipts/source-format.json`.                                      |
-| Initial S0 durable docs accuracy                 | `run-gate.ts --gate docs-accuracy --id ...-s0-accuracy`                                      | PASS               | Exit 0; `receipts/docs-accuracy.json`; pre-existing peer warning only.                            |
-| Cycle-1 scoped Markdown format                   | structured `run-deno-fmt.ts` report                                                          | PASS               | 8 files, 1 batch, 0 findings; `receipts/source-format-cycle1.json`.                               |
-| Contracted docs source format                    | durable `docs-source-format` gate from `docs/site`                                           | PASS               | `Docs source format: OK`; `receipts/docs-source-format-cycle1.json`.                              |
-| Contracted docs accuracy                         | durable root `docs-accuracy` gate                                                            | PASS               | Current command/export corpus green; `receipts/docs-accuracy-cycle1.json`; existing peer warning. |
-| Internal docs links                              | `deno task docs:links`                                                                       | PASS               | 103 docs, 0 broken links/anchors, 0 orphans.                                                      |
-| Docs terminology (live glossary)                 | focused comparison with `docs/site/glossary.md`                                              | PASS_PLAN          | Existing capability/contribution/manifest/plugin/registry meanings preserved; final RFC reruns.   |
-| Contracted structured check                      | durable `check` gate with CLI/plugin include                                                 | PASS               | 1,033 files, 9 batches, 0 failed; `receipts/check-cli-plugin-cycle1.json`.                        |
-| Contracted structured test                       | durable focused `test` gate over 16 CLI/plugin files                                         | PASS               | 88 passed, 0 failed; `receipts/test-cli-plugin-cycle1.json`.                                      |
-| Contracted publish dry-run (`@netscript/cli`)    | canonical per-member wrapper through durable gate                                            | PASS               | Static dry-run only; `receipts/publish-dry-run-cli-cycle1.json`.                                  |
-| Contracted publish dry-run (`@netscript/plugin`) | canonical per-member wrapper through durable gate                                            | PASS               | Static dry-run only; `receipts/publish-dry-run-plugin-cycle1.json`.                               |
-| Contracted architecture check                    | durable root `arch-check` gate                                                               | PASS               | 0 failures; existing warnings retained in receipt; `receipts/arch-check-cycle1.json`.             |
-| Exact internal `@netscript/*` pins               | durable `netscript-jsr-specifiers` gate                                                      | PASS               | 2,360 scanned, 1 documented allowance, 0 ranges/failures.                                         |
-| Publish-asset freshness                          | durable `publish-assets` gate                                                                | PASS               | Generated publish assets current; `receipts/publish-assets-cycle1.json`.                          |
-| Runtime asset / `import.meta` preflight          | `deno task release:preflight`                                                                | PASS               | 0 text-import, import-attribute, file-URL, and self-import findings; JSON audit receipt retained. |
-| JSR package audit (`@netscript/cli`)             | `audit-jsr-package.ts --root packages/cli --out ...`                                         | PASS_WITH_WARNINGS | Dry-run succeeds; existing helper/cardinality warnings and parser banner recorded.                |
-| JSR package audit (`@netscript/plugin`)          | `audit-jsr-package.ts --root packages/plugin --out ...`                                      | BASELINE_FAIL      | Dry-run succeeds; four existing missing `@module` tags make audit exit 1.                         |
-| S1 structured check                              | durable `check` gate with CLI/plugin include                                                 | PASS               | Cached inputs unchanged; exact command/head in `receipts/check-cli-plugin-s1.json`.               |
-| S1 docs source format                            | durable `docs-source-format` gate                                                            | PASS               | `Docs source format: OK`; `receipts/docs-source-format-s1.json`.                                  |
-| S1 docs accuracy                                 | durable `docs-accuracy` gate                                                                 | PASS               | 91/91 root/direct commands; `receipts/docs-accuracy-s1.json`; existing peer warning only.         |
-| S1 owned Markdown format                         | structured `run-deno-fmt.ts` over run docs + RFC                                             | PASS               | 10 files, 1 batch, 0 findings; `receipts/source-format-s1.json`.                                  |
-| S1 docs links                                    | `deno task docs:links`                                                                       | PASS               | 103 docs, 0 broken links/anchors/orphans.                                                         |
-| S1 terminology                                   | comparison with `docs/site/glossary.md`                                                      | PASS               | Capability, contribution, manifest, plugin, and registry retain glossary meanings.                |
-| S1 live surface/help sampling                    | `deno doc --filter` plus `netscript-dev --help`                                              | PASS               | Confirms legacy result/command shapes and current top-level tree.                                 |
-| `quality:gate`                                   | docs-only policy                                                                             | N/A                | Actual diff does not touch `packages/**` or `plugins/**`.                                         |
+| Gate                                             | Command or check                                                                             | Result             | Notes                                                                                               |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------------- | ------------------ | --------------------------------------------------------------------------------------------------- |
+| Live public-surface inspection                   | `deno doc packages/cli/mod.ts`; `deno doc packages/plugin/mod.ts`; focused `deno doc`/source | PASS               | Research only; exact exports and commands inventoried.                                              |
+| JSR doc-lint baseline (`@netscript/plugin`)      | structured full export-map runner                                                            | BASELINE_FAIL      | 15 private-type refs package-wide; one on `./cli`; `receipts/doc-lint-plugin-cycle1.json`.          |
+| JSR doc-lint baseline (`@netscript/cli`)         | structured full export-map runner                                                            | PASS               | 0 diagnostics across three entrypoints; `receipts/doc-lint-cli-cycle1.json`.                        |
+| Initial S0 scoped Markdown format                | `run-deno-fmt.ts --root <run-dir> --ext md --output ...`                                     | PASS               | 8 files, 1 batch, 0 findings; `receipts/source-format.json`.                                        |
+| Initial S0 durable docs accuracy                 | `run-gate.ts --gate docs-accuracy --id ...-s0-accuracy`                                      | PASS               | Exit 0; `receipts/docs-accuracy.json`; pre-existing peer warning only.                              |
+| Cycle-1 scoped Markdown format                   | structured `run-deno-fmt.ts` report                                                          | PASS               | 8 files, 1 batch, 0 findings; `receipts/source-format-cycle1.json`.                                 |
+| Contracted docs source format                    | durable `docs-source-format` gate from `docs/site`                                           | PASS               | `Docs source format: OK`; `receipts/docs-source-format-cycle1.json`.                                |
+| Contracted docs accuracy                         | durable root `docs-accuracy` gate                                                            | PASS               | Current command/export corpus green; `receipts/docs-accuracy-cycle1.json`; existing peer warning.   |
+| Internal docs links                              | `deno task docs:links`                                                                       | PASS               | 103 docs, 0 broken links/anchors, 0 orphans.                                                        |
+| Docs terminology (live glossary)                 | focused comparison with `docs/site/glossary.md`                                              | PASS_PLAN          | Existing capability/contribution/manifest/plugin/registry meanings preserved; final RFC reruns.     |
+| Contracted structured check                      | durable `check` gate with CLI/plugin include                                                 | PASS               | 1,033 files, 9 batches, 0 failed; `receipts/check-cli-plugin-cycle1.json`.                          |
+| Contracted structured test                       | durable focused `test` gate over 16 CLI/plugin files                                         | PASS               | 88 passed, 0 failed; `receipts/test-cli-plugin-cycle1.json`.                                        |
+| Contracted publish dry-run (`@netscript/cli`)    | canonical per-member wrapper through durable gate                                            | PASS               | Static dry-run only; `receipts/publish-dry-run-cli-cycle1.json`.                                    |
+| Contracted publish dry-run (`@netscript/plugin`) | canonical per-member wrapper through durable gate                                            | PASS               | Static dry-run only; `receipts/publish-dry-run-plugin-cycle1.json`.                                 |
+| Contracted architecture check                    | durable root `arch-check` gate                                                               | PASS               | 0 failures; existing warnings retained in receipt; `receipts/arch-check-cycle1.json`.               |
+| Exact internal `@netscript/*` pins               | durable `netscript-jsr-specifiers` gate                                                      | PASS               | 2,360 scanned, 1 documented allowance, 0 ranges/failures.                                           |
+| Publish-asset freshness                          | durable `publish-assets` gate                                                                | PASS               | Generated publish assets current; `receipts/publish-assets-cycle1.json`.                            |
+| Runtime asset / `import.meta` preflight          | `deno task release:preflight`                                                                | PASS               | 0 text-import, import-attribute, file-URL, and self-import findings; JSON audit receipt retained.   |
+| JSR package audit (`@netscript/cli`)             | `audit-jsr-package.ts --root packages/cli --out ...`                                         | PASS_WITH_WARNINGS | Dry-run succeeds; existing helper/cardinality warnings and parser banner recorded.                  |
+| JSR package audit (`@netscript/plugin`)          | `audit-jsr-package.ts --root packages/plugin --out ...`                                      | BASELINE_FAIL      | Dry-run succeeds; four existing missing `@module` tags make audit exit 1.                           |
+| S1 structured check                              | durable `check` gate with CLI/plugin include                                                 | PASS_PARENT_HEAD   | Receipt attests parent `3e0c8858b`, not S1 head `86d0110a5`; S4 final-head rerun binds.             |
+| S1 docs source format                            | durable `docs-source-format` gate                                                            | PASS_PARENT_HEAD   | Receipt attests parent `3e0c8858b`, not S1 head `86d0110a5`; `receipts/docs-source-format-s1.json`. |
+| S1 docs accuracy                                 | durable `docs-accuracy` gate                                                                 | PASS_PARENT_HEAD   | Receipt attests parent `3e0c8858b`, not S1 head `86d0110a5`; `receipts/docs-accuracy-s1.json`.      |
+| S1 owned Markdown format                         | structured `run-deno-fmt.ts` wrapper report                                                  | PASS               | 10 files, 0 findings; not a durable receipt and carries no outcome, exit code, or Git head.         |
+| S1 owned Markdown format write                   | structured `run-deno-fmt.ts --write` wrapper report                                          | PASS               | `source-format-s1-write.json`; not a durable receipt and is excluded from the S4 receipt set.       |
+| S1 docs links                                    | `deno task docs:links`                                                                       | PASS               | 103 docs, 0 broken links/anchors/orphans.                                                           |
+| S1 terminology                                   | comparison with `docs/site/glossary.md`                                                      | PASS               | Capability, contribution, manifest, plugin, and registry retain glossary meanings.                  |
+| S1 live surface/help sampling                    | `deno doc --filter` plus `netscript-dev --help`                                              | PASS               | Confirms legacy result/command shapes and current top-level tree.                                   |
+| S1 fix-up docs source format                     | durable `docs-source-format` gate                                                            | PASS_PARENT_HEAD   | Attests `86d0110a5`, not the fix-up commit; `receipts/docs-source-format-s1-fixup.json`.            |
+| S1 fix-up docs accuracy                          | durable `docs-accuracy` gate                                                                 | PASS_PARENT_HEAD   | Attests `86d0110a5`, not the fix-up commit; `receipts/docs-accuracy-s1-fixup.json`.                 |
+| S1 fix-up owned Markdown format                  | structured `run-deno-fmt.ts` wrapper report                                                  | PASS               | 10 files, 0 findings; not a durable receipt and has no outcome, exit code, or Git head.             |
+| S1 fix-up owned Markdown format write            | structured `run-deno-fmt.ts --write` wrapper report                                          | PASS               | Kept as wrapper output; excluded from the durable receipt set.                                      |
+| S1 fix-up docs links                             | `deno task docs:links`                                                                       | PASS               | 103 docs, 0 broken links/anchors/orphans.                                                           |
+| `quality:gate`                                   | docs-only policy                                                                             | N/A                | Actual diff does not touch `packages/**` or `plugins/**`.                                           |
+
+The three durable receipts from the original S1 turn—`check-cli-plugin-s1.json`,
+`docs-source-format-s1.json`, and `docs-accuracy-s1.json`—attest parent commit `3e0c8858b`, not S1
+commit `86d0110a5`; the gates ran on the working tree before that tree was committed. Likewise, the
+two durable S1 fix-up receipts attest parent `86d0110a5`, not the fix-up commit. This intermediate
+evidence is intentionally non-binding: S4 reruns the contracted set at the final author head.
+
+`source-format-s1.json`, `source-format-s1-write.json`, and their `-fixup` counterparts are
+structured wrapper reports. They carry no `outcome`, `exitCode`, or `gitHead` and are not counted as
+`run-gate.ts` durable receipts.
 
 ### Fitness Gates
 
@@ -226,5 +245,6 @@ Archetype-4 gates (F-1–F-12, F-14–F-19); this summary does not replace that 
   the existing CLI helper migration is explicit.
 - Verify every issue #1502 decision and all five acceptance boxes have a planned evidence path.
 - Record the formal verdict only in `plan-eval.md`; do not author the RFC in the evaluator session.
-- The author has not written `rfcs/0000-plugin-cli-contribution.md`, self-evaluated, dispatched a
-  rival evaluator, changed lifecycle state, or expanded into package/plugin source.
+- The author has written only S1 of `rfcs/0000-plugin-cli-contribution.md`; has not started S2,
+  self-evaluated, dispatched a rival evaluator, changed lifecycle state during this fix-up, or
+  expanded into package/plugin source.
