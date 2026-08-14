@@ -175,3 +175,48 @@ authored by Codex thread `019ffcc5-…`, which stays idle and was not resumed. N
 contend with the parked Codex author thread. No expensive gate lease taken. Result pending — the
 verdict is terminal only when `plan-eval.md` contains exactly `PASS` or `FAIL_PLAN`, the evaluator
 commit is pushed to `docs/rfc-plugin-cli-contribution`, and the structured PR comment is posted.
+
+## 2026-08-15 — #1502 PLAN-EVAL cycle 2 verdict: `PASS`
+
+Session `28cc8106-967b-4fb7-90f3-dd95054ae953` reached `firstTerminalAt`
+`2026-08-14T23:24:37.813Z` (started `23:17:07.633Z`; ~7m30s; 32,075 tokens). The verdict was
+confirmed from committed artifacts, not from the session's own summary or its exit status.
+
+| Terminal-verdict check | Evidence | Result |
+| --- | --- | --- |
+| Verdict token | `plan-eval.md:205` — exactly one standalone verdict line in the file | **`PASS`** (cycle 2 of 2) |
+| Evaluated head | `plan-eval.md:27` "Evaluated head" | `12276e6d86403ed1340ef79a963e87d401d643e9` — equals the dispatch `sourceHead` and the head that was under evaluation |
+| Superseded head named | `plan-eval.md:28` | `a02f9690…` recorded as the cycle-1 failure, so the verdict cannot be misread as re-evaluating it |
+| History preserved | `git show --stat 3e0c8858b` | `plan-eval-cycle-1.md` added (145 lines); prior verdict not overwritten |
+| Verdict-only scope | same | exactly 2 files, +380/−134, both under the leaf run dir; no RFC content, no package/plugin source, no `deno.lock` |
+| Pushed | `git ls-remote origin refs/heads/docs/rfc-plugin-cli-contribution` | `3e0c8858b4a2552926d2965b62cbcc97a15c2935`; local == remote; worktree clean |
+| PR state after verdict | live PR #1651 | `draft: true`; exactly one `status:plan-eval`; `updated_at 2026-08-14T23:24:12Z` (evaluator comment); comments 5 |
+| Evaluator self-restraint | `plan-eval.md` § Scope of this session, corroborated by the diff and live labels | no RFC authored, no source touched, no label changed, no central state mutated, no merge/publish, no expensive gate |
+
+### Gate-relevant content of the verdict
+
+All six contract `provingGates` are named, run, and receipted (`check`, `test`,
+`publish-dry-run`, `arch-check`, `docs-source-format`, `docs-accuracy`); `jsr-audit` is judged
+applicable and satisfied; the cycle-1 failures FP-1..FP-3 and all four cycle-1 notes are recorded as
+closed against directly-read evidence. Four **non-blocking** notes carry into slice S1:
+
+- **N-1 — citation durability.** The docs-only narrowing was attributed to a chat dispatch that is
+  not in the repository. The durable citation is
+  `.llm/runs/release-0.0.7--orchestration/briefs/topic-features/implement.md` (commit `8775be7b3`).
+  **Independently verified by this orchestrator:** that file states the leaf "is an RFC document plus
+  its own PLAN-EVAL and proposes a later implementation epic; it does not implement the CLI seam
+  now." S1 must cite it and state plainly that `leaf-contracts.json` was not edited, so a future
+  reader diffing the contract does not conclude the narrowing was silent.
+- **N-2 — stale evaluator route.** The leaf's `plan.md` § Dependencies and `supervisor.md` § Routes
+  in force still name Fable 5 for both formal gates. The reset de-assigns Fable. S1 corrects both
+  files and records the observed cycle-2 identity. (This topic's own `supervisor.md` was already
+  corrected at the reset — the stale rows are leaf-local.)
+- **N-3 — published symbol collision.** `PluginCliResult` in the plan's proposed vocabulary is
+  already a published export of `@netscript/plugin/cli` with a different shape. Redefining a live
+  JSR-published symbol is a compatibility decision, not spelling; the RFC must name the collision and
+  its major-version/migration disposition.
+- **N-4 — receipt head.** The six contracted receipts attest `d71b78c3…`, one commit before the
+  evaluated head — correctly disclosed. The S4 final-head rerun is what binds for IMPL-EVAL.
+
+Cycle 2 was the second and final PLAN-EVAL cycle; `PASS` closes the plan gate and unblocks slice S1
+(RFC authoring). No third cycle is available or needed.

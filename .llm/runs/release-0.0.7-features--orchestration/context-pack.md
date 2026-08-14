@@ -1,7 +1,7 @@
 # Context pack — NetScript 0.0.7 features lane
 
-Status as of 2026-08-15: reconciled; the hold is **released for the gate only**. PLAN-EVAL cycle 2
-for PR #1651 is **running**; no leaf authoring turn is running in this lane.
+Status as of 2026-08-15: PLAN-EVAL cycle 2 for PR #1651 returned **`PASS`**; the plan gate is
+closed and the leaf is in **implementation (S1, RFC authoring)** on the resumed Codex author thread.
 
 ## Control
 
@@ -29,36 +29,42 @@ state remain with `codex-root-0.0.7`.
   `codex-watch --mode turn` (D-5).
 - `rfc-a-stage0-ratification-board` (#1348) stays a coordinator-only checkpoint with no leaf PR.
 
-## The running gate
+## Closed gate — PLAN-EVAL cycle 2 `PASS`
 
-**PLAN-EVAL cycle 2** for #1651 was granted at coordinator head `168715e27` (per-topic evaluator
-queues: `concurrency: 4`, `perOrchestratorConcurrency: 1`) and dispatched. Head re-verified across
-four independent sources before launch; all equal `12276e6d8…`.
+Granted at coordinator head `168715e27` (per-topic evaluator queues), dispatched after four-source
+head re-verification, verdict `PASS` at `plan-eval.md:205`, evaluated head `12276e6d8…`, verdict-only
+commit `3e0c8858b` (adds `plan-eval-cycle-1.md`, rewrites `plan-eval.md`, nothing else). Evaluator:
+session `28cc8106-967b-4fb7-90f3-dd95054ae953`, bridge `session_01D7t8efMh88nwR2PazUPkC1`, PID
+`2463708`, native Claude Opus 5 · medium, requested = observed. Cycle 2 was the second and final
+cycle; the plan gate is closed and no third cycle exists.
 
-| Field | Value |
-| --- | --- |
-| Session / job | `28cc8106-967b-4fb7-90f3-dd95054ae953` / `28cc8106` |
-| Bridge / URL | `session_01D7t8efMh88nwR2PazUPkC1` / `https://claude.ai/code/session_01D7t8efMh88nwR2PazUPkC1` |
-| PID / cwd | `2463708` / `/home/codex/repos/netscript-007-features-1502` |
-| Route | requested = observed = native Claude Opus 5 · medium · Remote Control (`respawnFlags`) |
+Four non-blocking notes are S1 obligations, not gate blockers: **N-1** cite the durable narrowing
+authority (`briefs/topic-features/implement.md`, commit `8775be7b3`) and state that
+`leaf-contracts.json` was not edited; **N-2** correct the leaf's stale Fable 5 evaluator route in
+`plan.md` and the leaf `supervisor.md`; **N-3** name the `PluginCliResult` collision with the live
+`@netscript/plugin/cli` export and its migration disposition; **N-4** the contracted receipts attest
+`d71b78c3…`, so the S4 final-head rerun is what binds for IMPL-EVAL.
 
-Expected output: `plan-eval.md` in `.llm/runs/docs-rfc-plugin-cli-contribution--1502` containing
-exactly `PASS` or `FAIL_PLAN`, the cycle-1 verdict preserved as `plan-eval-cycle-1.md`, one
-verdict-only commit pushed to `docs/rfc-plugin-cli-contribution`, and one structured PR comment.
-The PR stays draft at `status:plan-eval`.
+## Implementation phase
 
-Inspect with `claude logs 28cc8106`; job state at `/home/codex/.claude/jobs/28cc8106/state.json`.
+Leaf head is now `3e0c8858b4a2552926d2965b62cbcc97a15c2935` (verdict commit). PR #1651 moved
+`status:plan-eval` → `status:impl` under explicit coordinator grant; it stays **draft**.
 
-Until the verdict is terminal: launch no second gate, resume no RFC authoring, and steer the
-evaluator only if it stalls. On `PASS`, RFC authoring resumes on Codex thread `019ffcc5-…` (resume,
-never a rival send); the leaf then stays draft through Tier-A topic review and a separate
-opposite-family IMPL-EVAL. Cycle 2 is the **second and final** PLAN-EVAL cycle — a second
-`FAIL_PLAN` escalates to the coordinator rather than opening cycle 3. Fable 5 remains unassigned and
-needs a coordinator amendment; no OpenRouter/DeepSeek/Minimax/AGY substitution.
+Authoring runs on the **existing** Codex thread `019ffcc5-d3e1-7c13-9815-e9956ec43683` — resumed,
+never replaced. Steering is `.llm/tools/agentic/codex/codex-resume.ts --thread-id
+019ffcc5-d3e1-7c13-9815-e9956ec43683 --message …`; never fire a second `send-message-v2` at that
+worktree. Slices S1–S4 are bounded, each with structured receipts and a Tier-A stop before the next.
+
+Standing prohibitions: no merge, no publish, no ready-flip, no expensive-gate lease
+(`scaffold.runtime` is forbidden for this leaf), no package/plugin source mutation, no issue filing,
+no `#1348` mutation, no central cluster-state change. IMPL-EVAL is a separate fresh opposite-family
+session after S4 and Tier-A review.
 
 ## Open drift
 
 D-1 (Codex leaf mobile visibility unproven — deliberately not repaired, sibling blast radius),
 D-2 (contract/scope resolution, superseded route note), D-3 (Claude CLI 2.1.233 vs 2.1.231),
-D-4 (#1502 still `status:research` — reported, this lane cannot relabel), D-5 (missing
-`task_complete` marker), D-6 (`pr-checks PASS` is an all-`skipped` set, not gate evidence).
+D-4 (#1502 still `status:research` — reported; this lane's relabel grant covers PR #1651 only),
+D-5 (missing `task_complete` marker on the author thread — read idle from `codex-status`),
+D-6 (`pr-checks PASS` is an all-`skipped` set, not gate evidence),
+D-7 (a watcher exit is a wake signal only; verdicts come from committed artifacts).

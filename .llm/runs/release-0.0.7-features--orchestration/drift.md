@@ -84,3 +84,18 @@ a true statement. It is not gate evidence. Per `milestone-run.md` gate-integrity
 here means "nothing ran". Recorded so no later reader promotes this `pr-checks PASS` into a merge or
 IMPL-EVAL green; the leaf's real proving gates are the six contracted structured gates rerun at final
 head, not this rollup.
+
+## D-7 — supervisor's own verdict watcher produced a false terminal signal (minor)
+
+**Date:** 2026-08-15. The first background watcher armed on the cycle-2 evaluator parsed
+`firstTerminalAt` and `state` into one whitespace-delimited string; a null `firstTerminalAt`
+collapsed, so `awk '{print $1}'` returned the *state* value and the watcher exited `0` — "terminal" —
+while the evaluator was still working. No wrong conclusion was published: the exit code was treated
+as a prompt to inspect, the job state was read, the session was found `working`, and the watcher was
+rewritten to emit an unambiguous `TERMINAL`/`RUNNING` token and self-tested before re-arming.
+
+This is the `agent-milestone-orchestrator` rule "verify the artefact, never the exit code" firing
+against the supervisor's own tooling. Standing consequence for this lane: a watcher exit is a wake
+signal only. A terminal PLAN-EVAL/IMPL-EVAL verdict is established from the committed artifact —
+verdict token, evaluated head, pushed commit, and live PR state — never from a watcher exit, a
+session's self-summary, or a job `state` field.
