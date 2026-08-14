@@ -90,32 +90,31 @@ their existing reasons and bind to #1276 T3. Both task maxima are 7.
 
 The production resolver is fixed to `rickylabs/netscript` on `api.github.com`. It uses
 `GITHUB_TOKEN` or `GH_TOKEN` when available and otherwise deliberately uses the anonymous public
-API, including in fork PRs and installed consumer copies. Offline, missing-net-permission, malformed,
-and rate-limited responses remain failures; they never silently skip ownership validation. Root
-tasks declare scoped net/env permissions, the consumer manifest declares `read`/`env`/`net`, and
-the generated CLI asset was regenerated only through `gen:assets-barrel`.
+API, including in fork PRs and installed consumer copies. Offline, missing-net-permission,
+malformed, and rate-limited responses remain failures; they never silently skip ownership
+validation. Root tasks declare scoped net/env permissions, the consumer manifest declares
+`read`/`env`/`net`, and the generated CLI asset was regenerated only through `gen:assets-barrel`.
 
-| Evidence | Outcome | Exit | Receipt |
-| --- | --- | ---: | --- |
-| RED focused allowance contract | expected FAIL | 1 | `receipts/slice-1/red-test.json` |
-| Focused scanner suite (21 tests) | PASS | 0 | `receipts/slice-1/focused-green-1.json` |
-| Scoped structured check (5 files) | PASS | 0 | `receipts/slice-1/scoped-check.json` |
-| Scoped structured lint (5 files) | PASS | 0 | `receipts/slice-1/scoped-lint.json` |
-| Scoped structured format (5 files) | PASS | 0 | `receipts/slice-1/scoped-fmt.json` |
-| `quality:scan` (7 verified records) | PASS | 0 | `receipts/slice-1/quality-scan.json` |
-| `quality:scan:repo` (7 verified records) | PASS | 0 | `receipts/slice-1/quality-scan-repo.json` |
-| `quality:gate` (`quality:scan` + `arch:check`) | PASS | 0 | `receipts/slice-1/quality-gate.json` |
-| Allowance budget stash-probe attestation (superseded) | PASS | 0 | `receipts/slice-1/allowance-budget.json` |
-| Allowance budget landed-head attestation (8 → 7, no increase) | PASS | 0 | `receipts/slice-1/allowance-budget-landed-head.json` |
-| Generated asset clean second generation | PASS | 0 | `receipts/slice-1/assets-clean.json` |
+| Evidence                                                      | Outcome       | Exit | Receipt                                              |
+| ------------------------------------------------------------- | ------------- | ---: | ---------------------------------------------------- |
+| RED focused allowance contract                                | expected FAIL |    1 | `receipts/slice-1/red-test.json`                     |
+| Focused scanner suite (21 tests)                              | PASS          |    0 | `receipts/slice-1/focused-green-1.json`              |
+| Scoped structured check (5 files)                             | PASS          |    0 | `receipts/slice-1/scoped-check.json`                 |
+| Scoped structured lint (5 files)                              | PASS          |    0 | `receipts/slice-1/scoped-lint.json`                  |
+| Scoped structured format (5 files)                            | PASS          |    0 | `receipts/slice-1/scoped-fmt.json`                   |
+| `quality:scan` (7 verified records)                           | PASS          |    0 | `receipts/slice-1/quality-scan.json`                 |
+| `quality:scan:repo` (7 verified records)                      | PASS          |    0 | `receipts/slice-1/quality-scan-repo.json`            |
+| `quality:gate` (`quality:scan` + `arch:check`)                | PASS          |    0 | `receipts/slice-1/quality-gate.json`                 |
+| Allowance budget stash-probe attestation (superseded)         | PASS          |    0 | `receipts/slice-1/allowance-budget.json`             |
+| Allowance budget landed-head attestation (8 → 7, no increase) | PASS          |    0 | `receipts/slice-1/allowance-budget-landed-head.json` |
+| Generated asset clean second generation                       | PASS          |    0 | `receipts/slice-1/assets-clean.json`                 |
 
 The original allowance-budget receipt is preserved but superseded because its second argv input,
 `3136358e484f8df30b778d2ae838dd9103077d10`, is a stash object outside branch history and therefore
-is not a durable, independently rerunnable attestation. The binding replacement receipt compares
-the immutable base directly with landed Slice 1 commit
-`586b5513500caa1fd5ce07878f4ba96606064555` and records exit 0. All other receipts record the
-pre-commit evaluator head and their exact argv; none is presented as a clean-worktree or supervisor
-sign-off receipt.
+is not a durable, independently rerunnable attestation. The binding replacement receipt compares the
+immutable base directly with landed Slice 1 commit `586b5513500caa1fd5ce07878f4ba96606064555` and
+records exit 0. All other receipts record the pre-commit evaluator head and their exact argv; none
+is presented as a clean-worktree or supervisor sign-off receipt.
 
 ## Reconcile notes
 
@@ -129,8 +128,8 @@ sign-off receipt.
 - Slice 1 live reconcile: PR #1653 remains open, draft, milestone 0.0.7, and exactly `status:impl`;
   both closing keywords remain in its body. Fetched `origin/main` advanced from the immutable base
   to `dd472102d` through merged #1644 only. Its diff does not overlap this leaf's authorized
-  scanner/package/plugin/generated surfaces, so the locked base was retained and no rebase or
-  #1644 worktree/PR mutation occurred.
+  scanner/package/plugin/generated surfaces, so the locked base was retained and no rebase or #1644
+  worktree/PR mutation occurred.
 
 ## Activity
 
@@ -170,6 +169,48 @@ sign-off receipt.
 - Historical OpenRouter artifact: advisory `FAIL_PLAN` at `8a4709afe`; its D-2/D-3/D-4 findings are
   resolved by coordinator authority and its D-1 editorial finding is resolved in live #1545.
 - Current formal verdict: cycle 2 `PASS` in `plan-eval.md`, evaluator artifact commit `c694cfb311`.
-- Slice state: Slice 1 content passed substantive Tier-A review in PR comment `5299267431`; the E1
-  landed-head replacement receipt passes. BLOCKED awaiting the supervisor sign-off commit before
-  Slice 2.
+- Slice state: **Slice 1 is signed off.** Content passed substantive Tier-A review (PR comment
+  `5299267431`) and the E1 landed-head replacement receipt was independently re-run by the
+  supervisor. Slice 2 is authorized.
+
+## Tier-A sign-off — Slice 1
+
+Signed off by `topic-internals-0.0.7` (Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34`, Opus 5
+/ high). This commit is the supervisor's, not the implementer's; no lane self-certified.
+
+Reviewed at the landed content, not from receipts:
+
+- Authorized surface holds — all eight non-run-artifact paths are in the leaf contract
+  `fileSurfaces`; no tenth surface.
+- Registration is comment-only. Per-file `as unknown as` / `any` counts are unchanged:
+  `packages/cli/src/public/public-api.ts` 5 → 5,
+  `packages/cli/src/public/features/root/public-command-dependencies.ts` 1 → 1,
+  `plugins/workers/streams/producer.ts` 1 → 1. Every source edit appends `#1276 —` to a pre-existing
+  `quality-allow` reason. The `as unknown as` occurrences elsewhere in the diff are fixture string
+  literals inside `scan-code-quality_test.ts`, where sample violating code is the scanner's test
+  input by construction.
+- Allowance population independently counted at the landed head: **7**, every record bound to #1276.
+  `deno task quality:scan` → `ok:true`, `allowCount: 7`, zero findings, zero `allowanceFailures`.
+- R-1 verified behaviourally in both directions rather than accepted as a claim. Permissions are
+  narrowly scoped (`--allow-net=api.github.com --allow-env=GITHUB_TOKEN,GH_TOKEN`), not blanket.
+  Network denied → exit **1**, `ok:false`, seven `owner-unavailable` failures each naming the exact
+  remedy. Network allowed → exit **0**, `ok:true`, resolver verified #1276 live. The rail fails
+  closed and does not silently no-op when unconfigured.
+- R-2 verified: `scan-code-quality_test.ts:360` pins `Backlog / Triage` owners as accepted, which is
+  the milestone shape that would otherwise fail all seven records on day one. Closed, unmilestoned,
+  malformed, offline, rate-limited (403 + `x-ratelimit-remaining: 0`), and fork-without-token states
+  are also covered.
+- RED-first order holds — `red-test.json` exit 1, then `focused-green-1.json` exit 0 across 21
+  tests.
+- Budgets converge downward to the measured population: `quality:scan:repo` `--max-allow` 8 → 7.
+- Lock hygiene holds — no `deno.lock` and no incidental source churn in either commit.
+- E1 closed: the binding budget attestation is now
+  `receipts/slice-1/allowance-budget-landed-head.json` (`gitHead` = `actualGitHead` =
+  `586b5513500caa1fd5ce07878f4ba96606064555`), independently re-run by the supervisor with exit 0.
+  The superseded stash-probe receipt is retained on disk and its defect is recorded as D-11 rather
+  than hidden.
+
+Noted for IMPL-EVAL, not a slice defect: the slice-1 gate receipts record `actualGitHead` as the
+parent `c694cfb311…`. That is the normal pre-commit gate pattern and matches the convention
+IMPL-EVAL already accepted on #1644 — receipts attest a process in a working tree at a commit, not
+tree cleanliness.
