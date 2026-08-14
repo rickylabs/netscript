@@ -310,3 +310,45 @@ because S4 binds), and label `source-format-s1*.json` as structured **wrapper re
 S2 is **withheld**. One bounded S1 fix-up commit, docs-scoped gate rerun, push, PR comment, then
 another Tier-A stop. The S1 contract is the foundation S2 builds discovery and bootstrap on, so it is
 corrected at the slice that owns it rather than patched downstream.
+
+## 2026-08-15 — S1 fix-up reviewed and signed off; S2 released
+
+Fix-up commit `bd8b29bf3a524280d28a39b21bc7adda277d2e27` (local == remote == PR head), tree clean,
+turn ended `2026-08-14T23:53:39Z` reporting the literal `TIER-A STOP: slice S1 fix-up ready for topic
+review`, thread idle, S2 not started. Scope is 8 files — the RFC, the run dir, and four fix-up
+receipts — with **no `packages/**`, `plugins/**`, or `deno.lock`**. `pr-checks` at `bd8b29bf3`
+reports 0 current failures.
+
+### Findings closed — verified in the file, not accepted on report
+
+| Finding | Fix | Evidence |
+| --- | --- | --- |
+| **F1** | `PLUGIN_CLI_DIAGNOSTIC_CODES` declared as a `const` tuple carrying all 14 reserved meanings, with `PluginCliDiagnosticCode = typeof PLUGIN_CLI_DIAGNOSTIC_CODES[number]` | RFC line 376; use site at 384 now resolves |
+| **F2** | `PluginCliDeepReadonly<T>` defined (line 229) and returned by `definePluginCliContribution` (line 282), plus an explicit statement of what is type-enforced versus validation-enforced (line 285) | prose at line 117 and the signature now agree |
+| **F3** | Explicit sentence naming `./../escape.ts` as a value the type accepts, and requiring normalization, parent-traversal rejection, and proof the resolved target stays inside the contributing package **before any import** | RFC line 291 |
+
+The F3 wording is stronger than the finding asked for — it adds package-containment proof, not just
+traversal rejection, which is the correct bar for an import-safety seam.
+
+### Evidence labelling — resolved better than requested
+
+The author introduced a distinct `PASS_PARENT_HEAD` outcome in the evidence table rather than a prose
+caveat, so every receipt row now states which commit it attests: the three S1 receipts attest parent
+`3e0c8858b` and the two fix-up receipts attest `86d0110a5`, in each case the tree state before the
+commit under review. `source-format-s1*.json` and `source-format-s1-fixup*.json` are labelled
+structured **wrapper reports** and explicitly excluded from the S4 durable receipt set. This makes the
+distinction machine-visible at S4 instead of relying on a reader noticing a footnote.
+
+### Tier-A sign-off
+
+**S1 (with fix-up) is accepted.** The public-contract slice is internally consistent, its normative
+signatures resolve, its immutability and path-safety claims match what the contract actually
+guarantees, and its evidence is labelled honestly about what each receipt proves. Signed off by
+`topic-features-0.0.7` — a session separate from the Codex generator — in this commit, which is the
+supervisor's sign-off commit rather than the implementer's.
+
+**S2 is released**: discovery and generated-registry lifecycle, selected-handler async bootstrap,
+cancellation, isolation, plugin-absent UX, capability grants, and the host-owned generation
+transaction with preview/no-write, rollback, doctor, and manifest-pointer contract. Same bounded
+discipline — one commit, structured receipts, explicit-refspec push, PR comment, run dir in the same
+commit, then a Tier-A stop. S3 is not released by this sign-off.
