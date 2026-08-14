@@ -318,6 +318,50 @@ conditions were satisfied and the cycle has now closed `PASS`, so that wording s
 on the plan author's next artifact touch or a reader will misread the leaf as still blocked. This
 topic run's own artifacts are refreshed here.
 
+### Post-PASS reconciliation and implementation resume — #1654
+
+Coordinator reconciled cycle 2 and granted the lifecycle advance plus implementation resume.
+Verified before acting: PR comment `5299298009` exists and is the cycle-2 `PASS` comment
+(`2026-08-14T23:54:02Z`), and PR head `b8fc5eb53a530d337602f7dc377239651a57d428` equals the
+evaluator commit.
+
+**Queue serialization scope reaffirmed:** it applies only within this fixes orchestrator, never
+across docs/internals/features — matching `dispatch.json` `concurrencyScope:
+per-topic-orchestrator`, `perOrchestratorConcurrency: 1`.
+
+**Label transition applied:** `status:plan-eval` → `status:impl`, draft preserved. Verified after:
+`draft=true`, `OPEN`, head unchanged at `b8fc5eb53`, **exactly one** `status:` label (`status:impl`).
+
+This lane's standing bar on relabeling is superseded here by an explicit, specific coordinator
+instruction, and unlike the #1643 ready-transition this one is safe to execute: it is a normal
+`netscript-pr` lifecycle advance (`plan-eval → impl`), and #1654 carries no `openhands`,
+`eval:model:*`, or `impl-eval:skip` label, so no phase automation dispatches on it. Staying draft
+means no automatic IMPL-EVAL fires either. The distinction from #1643 is the trigger, not the
+permission: flipping draft→ready would have dispatched a rival evaluator; this does nothing.
+
+**Implementation resumed on the original thread — no replacement.** `agentic:codex-resume`
+(dry-run verified first) to `019ffcca-8be0-74c2-bb0e-c82cf5ce3c85`, the same thread that authored
+the plan and its repair. Pre-flight: thread idle at `task_complete` ("Plan repair is complete and
+stopped at the PLAN-EVAL cycle-2 handoff."), no process owned the leaf worktree, head `b8fc5eb53`
+clean. Post-launch `codex-status`: **exactly one** agent at that worktree
+(`gpt-5.6-sol` / high) — same thread, no rival, no second `send-message-v2`.
+
+The brief authorizes **slices 2 → 5 only and stops before slice 6**, because slice 6 is the
+`e2e:cli run scaffold.runtime` gate and the singleton expensive-gate lease is **not granted**. It
+binds each slice to the plan's own `Proves → Decisive gate → Files`, requires the structured
+wrappers as the only verdict source, and — since every one of these slices touches `packages/**` —
+additionally requires `deno task quality:scan` and `deno task arch:check`, with a new
+`// deno-lint-ignore` / `as any` / `as unknown as` introduced to green a wrapper called out as a
+review-blocking defect rather than a pass. Per-slice commit + explicit-refspec push + one structured
+PR comment + run-dir update. No Aspire/Docker/publish, no lock churn, no merge/ready/relabel/close,
+no self-certification: Tier-A review and a fresh opposite-family IMPL-EVAL remain mandatory after
+slice 5.
+
+The stale "cycle 2 pending" wording in the **leaf-local** `plan.md` §Status, `supervisor.md`, and
+`context-pack.md` was delegated to that same thread rather than edited here — leaf plan text is
+leaf-owned, and a supervisor editing it would blur the generator/reviewer boundary. This topic run's
+own artifacts are refreshed in this commit.
+
 ## Wave 0 lane assignments
 
 | Leaf | Branch | Implementation route | Formal evaluator (per `dispatch.json`) |

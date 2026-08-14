@@ -31,23 +31,23 @@ dispatch order.
   for the coordinator: evaluator finding **N1**, the residual
   `session revoke --auth-url` → `http://localhost:8094/api/v1/auth` default, same pin class as #1243
   but outside its narrowing; it needs its own issue.
-- `scaffold-generated-output-correctness` (#1262, #1263, #1588, PR #1654, `status:plan-eval`):
-  **PLAN-EVAL cycle 2 closed `PASS`** at evaluated head
-  `5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5`; verdict commit `b8fc5eb53` is pushed and the branch
-  head is now `b8fc5eb53`. The cycle-1 `FAIL_PLAN` is preserved byte-identical as
-  `plan-eval-cycle-1.md` (verified by sha256). The plan gate is closed; the two-cycle limit was used
-  fully and ended in `PASS`, not escalation.
+- `scaffold-generated-output-correctness` (#1262, #1263, #1588, PR #1654, **`status:impl`**, draft):
+  Plan gate is **closed** — PLAN-EVAL cycle 2 `PASS` at `5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5`,
+  verdict commit `b8fc5eb53`, cycle-1 `FAIL_PLAN` preserved byte-identical as
+  `plan-eval-cycle-1.md`. **Implementation is running on the original Codex thread
+  `019ffcca-8be0-74c2-bb0e-c82cf5ce3c85`** (resumed, never replaced; exactly one sender at that
+  worktree) from head `b8fc5eb53`.
 
-  **The leaf is still plan-only and implementation has NOT resumed.** Three stops remain, none
-  lifted by this verdict: implementation needs its own explicit coordinator grant; the
-  `scaffold.runtime`/Aspire/Docker singleton lease is still ungranted and slice 6 is the only slice
-  that may touch it; and Tier-A slice review plus a fresh opposite-family IMPL-EVAL remain mandatory
-  with no lane self-certifying. Any slice touching `packages/**` must also clear
-  `deno task quality:scan` and `deno task arch:check` at Tier-A.
+  Authorized this turn: **slices 2 -> 5 only, stopping before slice 6.** Slice 6 is the one-pass
+  `deno task e2e:cli run scaffold.runtime` and needs the **singleton expensive-gate lease, which
+  remains ungranted**. Each slice follows the plan's `Proves -> Decisive gate -> Files`, uses the
+  structured wrappers as sole verdict source, and — because every one touches `packages/**` — must
+  also clear `deno task quality:scan` and `deno task arch:check`; a new `// deno-lint-ignore`,
+  `as any`, or `as unknown as` added to green a wrapper is review-blocking, not a pass.
 
-  Carried note: the **leaf-local** `plan.md` §Status, `supervisor.md`, and `context-pack.md` still
-  read as "cycle 2 pending a brief and a grant". Both conditions were met and the cycle has closed;
-  the plan author should refresh that wording or the leaf reads as blocked when it is not.
+  Still ahead after slice 5, none of it lifted by the plan PASS: topic Tier-A substantive review and
+  the supervisor sign-off commit, the coordinator lease decision for slice 6, and a mandatory fresh
+  opposite-family IMPL-EVAL. No lane self-certifies.
 
 Both 2026-08-13 "coordinator decision required" blockers are resolved; see `worklog.md`.
 
