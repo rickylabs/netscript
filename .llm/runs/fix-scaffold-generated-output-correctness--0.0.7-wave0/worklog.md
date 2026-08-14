@@ -30,6 +30,7 @@
 | 2026-08-13T20:43:00Z | Posted structured RESEARCH and PLAN phase summaries; requested contract disposition before separate PLAN-EVAL.                  | PR #1654 comments `5286159434`, `5286161295` |
 | 2026-08-13T20:46:05Z | Coordinator authorized the exact generator/scaffolder amendment, retained regression-only treatment of the already-green #1263 OpenAPI projection, and denied an expensive-gate lease. | PR #1654 comment `5286194892`; `drift.md` |
 | 2026-08-13T20:50:16Z | Reconciled the late thread-identity edit, replaced direct Codex steering with the exact Deno-suite same-thread command, and recorded the PLAN-EVAL allowance-reset pause. | `codex-thread-ids.md`; `context-pack.md`; `plan.md` |
+| 2026-08-14T23:42:17Z | PLAN-EVAL cycle 1 recorded `FAIL_PLAN`; same-thread repair chose memory exclusion (OD-1b), fixed the empty-schema generator contract (OD-2), added exact proves/gate/files slice accounting including `generate-engine-mod.ts`, and verified the existing tutorial baseline-row claim by inspection. No product file or gate was touched. | `plan-eval.md`; `plan.md`; `context-pack.md` |
 
 ## Gate evidence
 
@@ -40,6 +41,7 @@ three issues.
 Red-first probes are defect evidence, not green gate receipts. Durable gate receipt generation
 begins only after an approved plan and implementation.
 
-Housekeeping note: no evaluator, product gate, Aspire/AppHost, Docker, or `scaffold.runtime` process
-was launched; no expensive-gate lease was requested or granted; PR #1654 remains draft at
-`status:plan`.
+Plan-repair note: no evaluator, product gate, Aspire/AppHost, Docker, or `scaffold.runtime` process
+was launched; no expensive-gate lease was requested or granted; PR #1654 remains draft at exactly
+one phase label, `status:plan-eval`. Cycle 2 is stopped pending an updated immutable source brief and
+a separate explicit coordinator grant.

@@ -7,8 +7,7 @@
 - Approved coordinator artifacts:
   `/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/`.
 - No upstream; explicit push refspec only; draft PR against `main`; no merge or publication.
-- Draft PR: #1654 at initial artifact head `88b735a3641704810c86066310507c97db7f5a37`, labeled
-  `status:plan` with milestone `0.0.7`.
+- Draft PR: #1654, labeled with exactly one phase label, `status:plan-eval`, and milestone `0.0.7`.
 - Housekeeping intake head: `42572af323e396d061d8b2e99e0f6a4c62076c31`; local and remote
   branch heads matched and the branch still had no upstream.
 - One grouped `scaffold.runtime` execution/receipt; never split the three issues.
@@ -24,8 +23,12 @@
   CLI database generator/scaffolder paths.
 - Contract-package work remains excluded. The already-green #1263 OpenAPI 404 projection receives
   regression coverage only.
-- Current hard stop: wait for the Claude allowance reset, then obtain a fresh native
-  opposite-family PLAN-EVAL PASS. No evaluator was launched during housekeeping.
+- PLAN-EVAL cycle 1 recorded `FAIL_PLAN`. Its repair locks OD-1 to memory-router exclusion, defines
+  OD-2 as the direct generator no-`modelName` contract, adds `generate-engine-mod.ts` and exact
+  proves/gate/files accounting to slices 2–6, and records the existing tutorial baseline-row claim
+  as verified-by-inspection in scope.
+- Current hard stop: cycle 2 requires an updated immutable source brief and a separate explicit
+  coordinator grant. This plan-author thread does not launch or request it.
 - Opposite-family IMPL-EVAL remains mandatory after implementation and Tier-A review.
 - Same-thread steering must use the exact Deno-suite command in `codex-thread-ids.md`; direct
   `codex exec resume` is prohibited.
