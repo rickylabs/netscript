@@ -2,9 +2,9 @@
 
 ## Current state
 
-Phase: formal PLAN-EVAL cycle 1 passed; S1 implementation and its corrected `S1-method-nav` gate
-are complete. S2/S3 have not started. This pack is being committed in the S1 slice before the
-required explicit push and structured PR handoff.
+Phase: formal PLAN-EVAL cycle 1 passed; the bounded Tier-A S1 fix is complete and awaiting its
+single commit, explicit push, structured PR comment, and topic-orchestrator re-review. S2/S3 have
+not started.
 
 Branch/worktree: `docs/comparison-docs-programme` in
 `/home/codex/repos/netscript-007-docs-comparison`, no upstream. The re-baselined branch/remote head
@@ -33,6 +33,12 @@ No packages/plugins, locks/dependencies, consumer code copy, publication/release
   `d35cbca30872d1f55118d63437638e93270c2ac3`, recorded by evaluator-only commits `9ae97c934` and
   `a790e91e2`. The evaluator was a fresh native Claude Opus 5/low opposite-family session and did
   not consult the generator; this is authority to implement, not generator certification.
+- S1 must reference only pages that exist in S1. All `/migration/` navigation, xrefs, and body or
+  next/previous links land in S3 with `docs/site/migration/index.md` and
+  `docs/site/migration/nextjs.md`.
+- `S1-method-nav` now runs `rtk proxy deno task --cwd docs/site check:links` immediately after the
+  site build. The build and repository-level `docs:links` task do not replace this rendered-site
+  link proof.
 
 - The EIS-Chat authority is only commit `5191de83f3da97559f21d8891c6c8afdf1cf473a`; its Session route uses `ctx.path`, generated route binding, stable generated-route aliases, an `entries` resource, cached entry reads, and three authoritative partial routes.
 - Context/MCP topology I/O lives in the context partial, not a page-level resource.
@@ -45,8 +51,9 @@ No packages/plugins, locks/dependencies, consumer code copy, publication/release
 
 ## Planned slices
 
-- S1: `_data.ts`, xrefs, comparison index/methodology, worklog/context, plus the specifically
-  authorized significant/no-rescope `drift.md` correction. Complete at handoff.
+- S1: `_data.ts`, xrefs, comparison index/methodology, worklog/context, plus the authorized
+  significant/no-rescope `drift.md` corrections. The Tier-A fix removes premature migration
+  references and adds the rendered-link gate; complete at handoff for re-review.
 - S2: measurement tool/test, immutable source manifest, aggregate JSON, worklog/context.
 - S3: Session case, migration index/roadmap, xrefs/index, worklog/context, full docs audit. S3
   inherits the `/migration/` rendered-root assertion and must assert both `/comparisons/` and
@@ -65,6 +72,6 @@ Every slice is under 30 files, has a named gate, commits its worklog/context upd
 
 ## Next authorized action
 
-After the S1 commit, explicit push, and structured PR comment, stop for topic-orchestrator Tier-A
-slice review. Do not begin S2 or S3 without a new authorization. Do not treat the external
-PLAN-EVAL PASS or the generator's gate report as self-certification.
+After the Tier-A fix commit, explicit push, and structured PR comment, stop for topic-orchestrator
+re-review. Do not begin S2 or S3 without a new authorization. Do not treat the external PLAN-EVAL
+PASS or the generator's gate report as self-certification.

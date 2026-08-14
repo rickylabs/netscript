@@ -38,8 +38,7 @@ has explicit owners:
 - [Further comparison cases and topic prioritization](https://github.com/rickylabs/netscript/issues/1649)
 - [Full Next.js concept map and migration parity checklist](https://github.com/rickylabs/netscript/issues/1650)
 
-Migration guidance will live under the {{ comp.xref({ key: "migration:index", text: "migration section" }) }}
-as case-backed mappings become available. A roadmap link is not evidence: each future page must
-still satisfy the methodology below.
+Migration guidance is deferred to issue #1650 until case-backed mappings become available. A
+roadmap owner is not evidence: each future page must still satisfy the methodology below.
 
 {{ comp.nextPrev({ prev: { label: "How NetScript's path compares", href: "/explanation/compared/" }, next: { label: "Comparison methodology", href: "/comparisons/methodology/" } }) }}

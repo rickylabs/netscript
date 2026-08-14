@@ -148,4 +148,4 @@ Before publication, a reviewer checks that the equivalence contract is complete,
 used consistently, presentation is normalized, every claim is labeled, every number reproduces,
 every matrix column is populated, links resolve, and conclusions remain bounded to the evidence.
 
-{{ comp.nextPrev({ prev: { label: "Comparisons", href: "/comparisons/" }, next: { label: "Migration guides", href: "/migration/" } }) }}
+{{ comp.nextPrev({ prev: { label: "Comparisons", href: "/comparisons/" } }) }}

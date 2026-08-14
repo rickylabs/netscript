@@ -50,6 +50,7 @@ The draft PR is partial and must say `Part of #1551`. Follow-ups #1645–#1650 o
 | 2026-08-13 | P0 committed, explicitly pushed, and handed off in draft PR #1652. | commit `75a231053`; canonical body, 0.0.7 milestone, docs CI skips, exactly one `status:plan`, RESEARCH and PLAN comments |
 | 2026-08-15 | Formal PLAN-EVAL cycle 1 reconciled. | fresh native Claude Opus 5/low opposite-family session; `PASS` on `d35cbca30872d1f55118d63437638e93270c2ac3`; evaluator-only commits `9ae97c934` and `a790e91e2`; verdict is external authority, not generator self-certification |
 | 2026-08-15 | S1 authored within the exact six-file content boundary and gated. | build, links, terminology, front matter, prose, and comparison navigation pass; topic-orchestrator correction defers the S3-owned `/migration/` rendered-root assertion without rescope |
+| 2026-08-15 | Tier-A S1 review found premature migration references and an insufficient link gate. | four `/migration/` references removed; rendered `check:links` added to S1; significant/no-rescope correction recorded for later IMPL-EVAL |
 
 ## Gate log
 
@@ -71,6 +72,7 @@ The draft PR is partial and must say `Part of #1551`. Follow-ups #1645–#1650 o
 | Gate | Commands / procedure | Scope | Result | Findings | Proceeded |
 | --- | --- | --- | --- | --- | --- |
 | Site build | `rtk proxy deno task --cwd docs/site build` (raw exit `0`) | full rendered docs site | PASS | source format and rendered-output checks pass; 635 files generated, 226 HTML files checked, four documented syntax allowances | yes |
+| Rendered links | `rtk proxy deno task --cwd docs/site check:links` (raw exit `0`) | generated `_site` after the S1 build | PASS | 34,980 internal links across 226 rendered pages all resolve; this row is now mandatory in S1 after Tier-A exposed that build plus source-link checks could not prove the rendered link contract | yes |
 | Links | `rtk proxy deno task docs:links` (raw exit `0`) | 103 published docs sources | PASS | zero broken links, anchors, or enforced orphans | yes |
 | Terminology | `rtk proxy deno task docs:accuracy` (raw exit `0`) plus prose comparison with `docs/site/glossary.md` | comparison index/methodology and published docs corpus | PASS | evidence, contract, request-scoped resource, presentation, domain, route, mechanism, and framework vocabulary are consistent with the glossary; existing peer-dependency/build-script warnings are non-failing and unrelated | yes |
 | Navigation | inspect the Concepts lane in `docs/site/_site/comparisons/index.html` after the clean build | S1-owned `/comparisons/` and `/comparisons/methodology/` routes | PASS | Comparisons and Comparison methodology render under Concepts; the topic orchestrator corrected the unsatisfiable S1 assertion by deferring `/migration/` to S3, which owns both migration pages and must then assert both roots | yes |
@@ -83,6 +85,22 @@ The topic-orchestrator ruling corrects the plan-acceptance inconsistency without
 S1 proves its comparison routes, while S3 inherits the migration-root assertion when it lands the
 S3-owned migration pages. The correction and the PLAN-EVAL miss are recorded append-only in
 `drift.md` with severity `significant`, no rescope, and no scope growth.
+
+### S1 Tier-A fix — existing-page navigation only
+
+| Gate | Commands / procedure | Scope | Result | Findings | Proceeded |
+| --- | --- | --- | --- | --- | --- |
+| Site build | `rtk proxy deno task --cwd docs/site build` (raw exit `0`) | full rendered docs site after Tier-A fixes | PASS | source format and rendered output pass; 635 files generated, 226 HTML files checked, four documented syntax allowances | yes |
+| Rendered links | `rtk proxy deno task --cwd docs/site check:links` (raw exit `0`) | generated `_site` after build | PASS | all 34,980 internal links across 226 rendered pages resolve; no additional unresolved target was found | yes |
+| Source links | `rtk proxy deno task docs:links` (raw exit `0`) | 103 published docs sources | PASS | zero broken links, anchors, or enforced orphans | yes |
+| Terminology | `rtk proxy deno task docs:accuracy` (raw exit `0`) plus retained glossary prose review | comparison pages and published docs corpus | PASS | accuracy/discoverability passes; the existing peer-dependency warning is non-failing and unrelated | yes |
+| Diff hygiene | `git diff --check` (raw exit `0`) | complete Tier-A fix diff | PASS | no whitespace errors after final run-artifact updates | yes |
+| Manual assertions | rendered nav/source inspection after build | S1 comparison navigation, xrefs, front matter, and prose | PASS | `/comparisons/` and `/comparisons/methodology/` render under Concepts; no `/migration/` href, xref, nav root, or next/previous target remains; both new pages retain title/description; no case result or measured number exists; `explanation/compared` remains linked and non-contradictory; issue #1650 remains the plain-text migration owner | yes |
+| Scope and locks | raw changed-path enumeration; `git diff --exit-code 3a8c738411a69b3cea18edbd7f3909b1998c3ed2 -- deno.lock docs/site/deno.lock` | Tier-A fix baseline through dirty worktree | PASS | exactly seven authorized existing S1 paths; both lockfiles unchanged; no package/plugin, migration-page, S2, or S3 path | yes |
+
+The fix strictly reduces S1's published surface. S3 still owns all migration pages, xrefs,
+navigation, and the assertion that both comparison and migration roots render. Stop again for
+topic-orchestrator Tier-A re-review; no S2 or S3 work has begun.
 
 ### Planned S3 docs-audit rows
 
