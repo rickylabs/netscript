@@ -107,3 +107,71 @@ No evaluator dispatched; no leaf resumed; no RFC authoring; no relabel, ready-fl
 issue close, milestone change, central cluster-state mutation, expensive gate, or release lease. The
 one `codex remote-control start --json` that would settle D-1 is a mutation with sibling-lane blast
 radius and was deliberately not run.
+
+## 2026-08-15 — #1502 PLAN-EVAL cycle 2 dispatch (coordinator grant, order 3)
+
+### Grant and authority
+
+The coordinator granted dispatch order 3 at coordinator head
+`168715e2710f846fb20562627bbf84ecb1c780fc` ("chore(harness): scope evaluator queues per topic",
+branch `chore/release-0.0.7-orchestration`). Verified by reading the commit: `dispatch.json` moves
+from `"concurrency": 1` to `"concurrency": 4` with `"concurrencyScope":
+"per-topic-orchestrator"`,
+`"perOrchestratorConcurrency": 1`, and `queuePolicy` "serialize within each topic orchestrator;
+docs, internals, fixes, and features may each run one evaluator concurrently". The commit touched
+only the dispatch header — the order-3 entry's route, head, worktree, run dir, and output artifact
+are unchanged. This lane therefore runs exactly one evaluator, concurrent with sibling topics
+rather than serial behind them.
+
+### Pre-launch head re-verification (refusal gate)
+
+| Source | Value | Result |
+| --- | --- | --- |
+| `dispatch.json` order 3 `sourceHead` | `12276e6d86403ed1340ef79a963e87d401d643e9` | reference |
+| Live PR #1651 `head.sha` | `12276e6d86403ed1340ef79a963e87d401d643e9` | match |
+| `git ls-remote origin refs/heads/docs/rfc-plugin-cli-contribution` | `12276e6d86403ed1340ef79a963e87d401d643e9` | match |
+| Leaf worktree `git rev-parse HEAD` | `12276e6d86403ed1340ef79a963e87d401d643e9` | match, clean, no upstream |
+| Live PR #1651 `base.sha` | `01e0960494c95ce56eb35892c211a095eb13e6ed` | equals immutable base |
+| Live `origin/main` | `01e0960494c95ce56eb35892c211a095eb13e6ed` | unchanged |
+| PR #1651 lifecycle labels | exactly one `status:plan-eval`; still draft | unchanged |
+
+All four independent resolutions agree. No mismatch, so the hard-refusal condition did not fire.
+
+### Brief provenance
+
+`briefs/reset-gates/rfc-plugin-cli-contribution.md`, passed verbatim as the initial prompt,
+sha256 `0d2a288c550469c2fa5b18dfc5eaaf352b6ba3b3fc95519b8839848592006b21`, 0 CR bytes, committed and
+clean at the coordinator head (last touched by `bda541fbd`).
+
+### Evaluator identity
+
+| Field | Value |
+| --- | --- |
+| Role | fresh PLAN-EVAL cycle 2, separate session from the Codex generator |
+| Claude session id | `28cc8106-967b-4fb7-90f3-dd95054ae953` |
+| Job id | `28cc8106` |
+| Bridge session id | `session_01D7t8efMh88nwR2PazUPkC1` (non-empty; job state records the `cse_01D7t8efMh88nwR2PazUPkC1` form) |
+| Remote Control URL | `https://claude.ai/code/session_01D7t8efMh88nwR2PazUPkC1` |
+| Remote Control label | `netscript-007-features-1502` |
+| PID | `2463708` |
+| Exact cwd | `/home/codex/repos/netscript-007-features-1502` |
+| Claude CLI | `2.1.233`; backend `daemon`; kind `bg` |
+| Requested route | native Claude Opus 5 · **medium** · Remote Control |
+| Observed route | job `state.json` `respawnFlags`: `--effort medium --permission-mode bypassPermissions --remote-control --name … --model claude-opus-5` |
+| Route verdict | **matched**; no substitution, no Fable, no OpenRouter/DeepSeek/Minimax/AGY |
+| Provider boundary | `providerEnv: {}` — native Anthropic auth, so Remote Control attachment is legitimate |
+| Session transcript | `/home/codex/.claude/projects/-home-codex-repos-netscript-007-features-1502/28cc8106-967b-4fb7-90f3-dd95054ae953.jsonl` |
+| Launch state at record time | `working` / `busy`, `firstTerminalAt: null` |
+
+Observed route is read from `respawnFlags` rather than process argv: a bg session that claims a
+spare process does not carry `--model`/`--effort` on its own command line, so argv alone would
+under-report the route.
+
+### Concurrency and separation invariants held
+
+One evaluator in this topic (`perOrchestratorConcurrency: 1`). Generator ≠ evaluator: the plan was
+authored by Codex thread `019ffcc5-…`, which stays idle and was not resumed. No second
+`send-message-v2` was fired at the leaf worktree; the evaluator is a Claude session, so it does not
+contend with the parked Codex author thread. No expensive gate lease taken. Result pending — the
+verdict is terminal only when `plan-eval.md` contains exactly `PASS` or `FAIL_PLAN`, the evaluator
+commit is pushed to `docs/rfc-plugin-cli-contribution`, and the structured PR comment is posted.

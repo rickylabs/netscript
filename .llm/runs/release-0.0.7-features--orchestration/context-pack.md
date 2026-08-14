@@ -1,7 +1,7 @@
 # Context pack — NetScript 0.0.7 features lane
 
-Status as of 2026-08-15 (Claude topic-supervisor reset, first turn): reconciled and **held**. No
-evaluator, leaf, or authoring turn is running in this lane.
+Status as of 2026-08-15: reconciled; the hold is **released for the gate only**. PLAN-EVAL cycle 2
+for PR #1651 is **running**; no leaf authoring turn is running in this lane.
 
 ## Control
 
@@ -29,20 +29,32 @@ state remain with `codex-root-0.0.7`.
   `codex-watch --mode turn` (D-5).
 - `rfc-a-stage0-ratification-board` (#1348) stays a coordinator-only checkpoint with no leaf PR.
 
-## The hold
+## The running gate
 
-The formal gate is **PLAN-EVAL cycle 2** for #1651, `briefs/reset-gates/dispatch.json` order 3:
-fresh separate session, native Claude Opus 5 · **medium**, Remote Control enabled and recorded,
-output `plan-eval.md` in `.llm/runs/docs-rfc-plugin-cli-contribution--1502`, preserving the cycle-1
-verdict as `plan-eval-cycle-1.md`. Fable 5 is unassigned and needs a coordinator amendment; no
-OpenRouter/DeepSeek/Minimax/AGY substitution. One evaluator globally at a time, serial across the
-six reset entries — this lane's entry is third.
+**PLAN-EVAL cycle 2** for #1651 was granted at coordinator head `168715e27` (per-topic evaluator
+queues: `concurrency: 4`, `perOrchestratorConcurrency: 1`) and dispatched. Head re-verified across
+four independent sources before launch; all equal `12276e6d8…`.
 
-Do not dispatch it, and do not resume RFC authoring, until `codex-root-0.0.7` grants dispatch order
-3. On grant: re-verify PR/branch head equals `12276e6d8…` and refuse on any mismatch. After a cycle-2
-`PASS`, RFC authoring resumes on the same Codex thread; the leaf stays draft through Tier-A topic
-review and a separate opposite-family IMPL-EVAL. Cycle 2 is the second and final PLAN-EVAL cycle
-before escalation.
+| Field | Value |
+| --- | --- |
+| Session / job | `28cc8106-967b-4fb7-90f3-dd95054ae953` / `28cc8106` |
+| Bridge / URL | `session_01D7t8efMh88nwR2PazUPkC1` / `https://claude.ai/code/session_01D7t8efMh88nwR2PazUPkC1` |
+| PID / cwd | `2463708` / `/home/codex/repos/netscript-007-features-1502` |
+| Route | requested = observed = native Claude Opus 5 · medium · Remote Control (`respawnFlags`) |
+
+Expected output: `plan-eval.md` in `.llm/runs/docs-rfc-plugin-cli-contribution--1502` containing
+exactly `PASS` or `FAIL_PLAN`, the cycle-1 verdict preserved as `plan-eval-cycle-1.md`, one
+verdict-only commit pushed to `docs/rfc-plugin-cli-contribution`, and one structured PR comment.
+The PR stays draft at `status:plan-eval`.
+
+Inspect with `claude logs 28cc8106`; job state at `/home/codex/.claude/jobs/28cc8106/state.json`.
+
+Until the verdict is terminal: launch no second gate, resume no RFC authoring, and steer the
+evaluator only if it stalls. On `PASS`, RFC authoring resumes on Codex thread `019ffcc5-…` (resume,
+never a rival send); the leaf then stays draft through Tier-A topic review and a separate
+opposite-family IMPL-EVAL. Cycle 2 is the **second and final** PLAN-EVAL cycle — a second
+`FAIL_PLAN` escalates to the coordinator rather than opening cycle 3. Fable 5 remains unassigned and
+needs a coordinator amendment; no OpenRouter/DeepSeek/Minimax/AGY substitution.
 
 ## Open drift
 
