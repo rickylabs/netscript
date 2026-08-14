@@ -135,3 +135,76 @@ No second gate will be opened and no docs implementation will resume until this 
 The lane is watching for `plan-eval.md` plus the evaluator's push to
 `docs/comparison-docs-programme`; the Codex leaf thread `019ffcc9-16c2-7573-b7f6-d627172408e8`
 remains idle and unresumed.
+
+## 2026-08-15 — PLAN-EVAL cycle 1 terminal: PASS (corrected evidence)
+
+Formal gate closed. Coordinator reconciliation grant received after the corrected terminal gate.
+
+| Field                  | Value                                                                   |
+| ---------------------- | ----------------------------------------------------------------------- |
+| Verdict                | `PASS` (single token, `plan-eval.md:81`)                                |
+| Evaluated source head  | `d35cbca30872d1f55118d63437638e93270c2ac3`                              |
+| Evaluator session      | `40a06314-b69a-4ca0-a4a0-1224c5e377ca`                                  |
+| Registry bridge        | `session_0126JRYrbXqvoJwskcF31RwW`                                      |
+| Remote Control URL     | `https://claude.ai/code/session_0126JRYrbXqvoJwskcF31RwW`               |
+| Verdict commit         | `9ae97c9348865e08f8b301ce34709241e964c831` (`plan-eval.md` only)        |
+| Final evaluator commit | `a790e91e26a4fb84636b4f3c57bd6444196b4ca9` (`plan-eval.md` only)        |
+| Remote leaf branch     | `a790e91e26a4fb84636b4f3c57bd6444196b4ca9`                              |
+| PR #1652 after gate    | still draft, still `status:plan-eval`, milestone `0.0.7`, labels intact |
+
+### Tier-A review of the verdict (performed, not delegated)
+
+Boundary compliance verified: each evaluator commit touched exactly one file (`plan-eval.md`), the
+push landed, exactly one new `[PHASE: PLAN-EVAL] [VERDICT: PASS]` comment was posted
+(`2026-08-14T23:22:00Z`, later edited in place rather than duplicated), and no label, ready
+transition, merge, issue, milestone, or coordinator artifact was touched.
+
+Cited evidence independently re-checked against the tree and GitHub — all held:
+
+- `deno.json:84-85` defines `docs:links` and `docs:accuracy`;
+- `docs/site/deno.json:4` chains `check:source-format && lume && check:rendered-output`;
+- `rg defineRegion packages/` → 0 hits, confirming the consumer-local attribution correction;
+- `plan.md:26-35` (8 locked decisions), `:188-198` (9 risk rows with stop conditions), `:200-209`
+  (deferred acceptance map → #1645–#1650);
+- #1650 open in `Backlog / Triage` with `type:docs` + `area:docs` + `priority:p2` + exactly one
+  `status:triage`.
+
+The evaluator also disclaimed the prior contamination on its own initiative: the 2026-08-13
+`APPROVED` comment and the Minimax/OpenRouter advisory run "carry no weight and were not consulted".
+That closes the one gap left by the wrapper brief that never reached it.
+
+### Attachment-evidence defect and its resolution
+
+Tier-A found the published `bridgeSessionId` and Remote Control URL wrong (`cse_…`, non-resolving).
+Root cause is **not** a transcription slip: `~/.claude/jobs/40a06314/state.json` genuinely carries
+`cse_0126JRYrbXqvoJwskcF31RwW` while `~/.claude/sessions/2465471.json` carries
+`session_0126JRYrbXqvoJwskcF31RwW`, and only the `session_…` form resolves. The evaluator had read
+the jobs file, which is the correct source for the observed **route** (`respawnFlags`) but not for
+the identity triple.
+
+The topic orchestrator did **not** edit the verdict artifact — a supervisor rewriting an evaluator's
+evidence would break the separation the gate exists to enforce. The same evaluator session was
+steered to correct both fields, record the file disagreement, amend its existing PR comment in place
+instead of posting a second phase comment, and commit only `plan-eval.md`. Delivered at `a790e91e2`.
+Verdict, evaluated head, and every Plan-Gate row are unchanged.
+
+Route proof was never in doubt: session id, PID `2465471`, cwd, and `respawnFlags`
+(`--model claude-opus-5 --effort low --remote-control --permission-mode bypassPermissions`) were all
+correct and independently confirmed.
+
+### Stale residue removed (coordinator-directed)
+
+The evaluator's non-blocking note 3 flagged `docs/site/comparisons/` and `docs/site/migration/` as
+untracked residue of the interrupted S1 turn. Verified before touching anything: both existed as
+directories, `git ls-files` returned **0** tracked files under each, and `find -mindepth 1`
+(including hidden entries) returned **0** entries — genuinely empty and untracked. Removed with
+`rmdir` (which refuses a non-empty directory, so the guard is structural, not a promise). Both gone;
+leaf worktree remains clean at `a790e91e2`. No tracked file was deleted and no `rm -rf` was used.
+
+### Remaining non-blocking notes carried into implementation
+
+1. S3 must assert the new pages against `docs/site/glossary.md` explicitly for the `SCOPE-docs`
+   Terminology gate; falsifiable by an S3 gate table with no glossary assertion.
+2. S2 numbers reproduce only from the private pinned EIS-Chat revision; the rendered case page must
+   state who can reproduce them. Falsifiable by a published `measured` number with no
+   reproducibility statement.
