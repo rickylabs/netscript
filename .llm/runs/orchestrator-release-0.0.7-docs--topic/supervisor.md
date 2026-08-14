@@ -1,40 +1,78 @@
 # Supervisor identity — topic-docs-0.0.7
 
-| Field | Value |
-| --- | --- |
-| Role | Claude topic orchestrator, `docs` lane |
-| Coordinator | `codex-root-0.0.7` (`/home/codex/repos/netscript-547-lffix`, run `release-0.0.7--orchestration`) |
-| Route | native Claude Sonnet 5, low effort |
-| Worktree | `/home/codex/repos/netscript-007-docs` |
-| Branch | `orchestrator/release-0.0.7-docs` (no upstream by design; push by explicit refspec only) |
-| Preserved parked Codex topic thread | `019ffcc0-e19b-71d1-95ce-8c72559eb026` (parked, never resumed as topic controller) |
-| Leaf | `comparison-docs-programme`, PR #1652, exact head `d35cbca30872d1f55118d63437638e93270c2ac3` |
-| Leaf worktree | `/home/codex/repos/netscript-007-docs-comparison` |
-| Formal hold | fresh PLAN-EVAL cycle 1 required; reset dispatch order 6 (`briefs/reset-gates/dispatch.json`, coordinator run) |
+| Field                               | Value                                                                                                              |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Role                                | Claude topic orchestrator, `docs` lane (supervise-only)                                                            |
+| Coordinator                         | `codex-root-0.0.7` (`/home/codex/repos/netscript-547-lffix`, run `release-0.0.7--orchestration`)                   |
+| Coordinator Codex session           | `019ffaa3-32ae-7b02-92a5-d7ae146d8cbd` (sole merge/release authority)                                              |
+| Requested route                     | native Claude · Opus 5 · high effort · Remote Control required                                                     |
+| Observed route (process argv)       | `--model claude-opus-5 --effort high --permission-mode bypassPermissions --remote-control netscript-007-docs`      |
+| Route verdict                       | matched                                                                                                            |
+| Claude session id                   | `fcf04b0f-3c2f-4844-9508-84c52ce8298c`                                                                             |
+| `bridgeSessionId`                   | `session_01PLRauSHN1PnvrNF2ucefF6` (non-empty)                                                                     |
+| Remote Control URL                  | `https://claude.ai/code/session_01PLRauSHN1PnvrNF2ucefF6`                                                          |
+| Remote Control state                | attached; native Anthropic client, CLI `2.1.233`, `kind: bg`                                                       |
+| PID                                 | `2429469`                                                                                                          |
+| Exact cwd                           | `/home/codex/repos/netscript-007-docs`                                                                             |
+| Worktree                            | `/home/codex/repos/netscript-007-docs`                                                                             |
+| Branch                              | `orchestrator/release-0.0.7-docs` (no upstream by design; push by explicit refspec only)                           |
+| Topic run                           | `.llm/runs/orchestrator-release-0.0.7-docs--topic`                                                                 |
+| Preserved parked Codex topic thread | `019ffcc0-e19b-71d1-95ce-8c72559eb026` (parked/offline; never resumed as topic controller)                         |
+| Leaf                                | `comparison-docs-programme`, PR #1652, exact head `d35cbca30872d1f55118d63437638e93270c2ac3`                       |
+| Leaf worktree / branch              | `/home/codex/repos/netscript-007-docs-comparison` / `docs/comparison-docs-programme`                               |
+| Leaf implementer Codex thread       | `019ffcc9-16c2-7573-b7f6-d627172408e8` (gpt-5.6-sol · high · idle; steer by `codex exec resume`, never a new send) |
+| Lane issue scope                    | #1551 only (one committed milestone issue)                                                                         |
+| Formal hold                         | fresh PLAN-EVAL cycle 1, reset dispatch order 6; implementation must not resume                                    |
 
-## First-turn reconciliation (2026-08-15)
+Attachment is proved by the native session registry entry `~/.claude/sessions/2429469.json`, whose
+`pid`, `cwd`, and non-empty `bridgeSessionId` match the live process, plus the process argv above.
+No `ANTHROPIC_BASE_URL` override is in play; this is a native Remote Control surface, not an
+inference-only gateway session.
 
-- Topic worktree/branch clean at exact `main` `01e096049` — matches the coordinator's parked-state
-  record for this lane.
-- Leaf worktree `/home/codex/repos/netscript-007-docs-comparison` clean at exact recorded head
-  `d35cbca30`.
-- PR #1652 ("docs(positioning): seed the Next.js comparison programme"): `OPEN`, draft, mergeable,
-  head `d35cbca30872d1f55118d63437638e93270c2ac3` — matches dispatch entry order 6 exactly. All
-  status checks are `SKIPPED` (draft-gated), no failures, no drift from the coordinator's dispatch
-  record.
-- No local supervisor/worklog/context/drift artifacts existed yet in this topic run directory
-  (fresh reset); initialized them this turn.
-- No leaf or evaluator launched this turn. Order-6 dispatch (PLAN-EVAL cycle 1 for
-  `comparison-docs-programme`) has not been granted by the coordinator; concurrency cap in
-  `dispatch.json` is 1 globally across all six entries and this lane's turn has not been called.
+## Attachment claim against the coordinator's cluster state
 
-## Standing control laws (from topic-claude-reset-common.md)
+`milestone-cluster-state.json` still records the docs controller as `state: pending_attachment` with
+`requestedModel: claude-opus-5` and `requestedEffort: high`. This session satisfies that request.
+The coordinator owns that field — this lane reports the proof and does **not** mutate the central
+control plane.
 
-- Supervise only; no product/docs/tooling edits in this worktree.
-- Never resume the parked Codex thread `019ffcc0-e19b-71d1-95ce-8c72559eb026` as a controller.
-- One evaluator globally at a time, native Claude Sonnet 5 only, fresh session per gate, opposite
-  family from the WSL Codex generator.
-- No merge, publish, ready-for-review, relabel, issue-close, milestone-scope, or release-writer-lease
-  actions from this lane.
-- Await explicit coordinator grant of dispatch order 6 before launching the PLAN-EVAL evaluator for
-  PR #1652.
+## Dispatch order 6 (this lane's only assigned gate)
+
+| Field      | Value                                                                             |
+| ---------- | --------------------------------------------------------------------------------- |
+| leafId     | `comparison-docs-programme`                                                       |
+| phase      | `plan-eval`, cycle 1                                                              |
+| PR         | #1652, branch `docs/comparison-docs-programme`                                    |
+| worktree   | `/home/codex/repos/netscript-007-docs-comparison`                                 |
+| sourceHead | `d35cbca30872d1f55118d63437638e93270c2ac3` (immutable evaluation head)            |
+| runDir     | `.llm/runs/docs-comparison-docs-programme--1551`                                  |
+| brief      | `comparison-docs-programme.md`                                                    |
+| output     | `plan-eval.md`                                                                    |
+| route      | native-claude · Claude Opus 5 (`claude-opus-5`) · effort **low**                  |
+| rationale  | bounded docs-only PLAN-EVAL with immutable evidence and no product implementation |
+
+Not yet granted. Cluster concurrency is 1 evaluator globally across all six dispatch entries; this
+lane's turn has not been called.
+
+## Leaf contract (binding, from `leaf-contracts.json`)
+
+- archetype `1-small-contract`, overlay `docs`, wave 0, executionKind `implementation`.
+- file surfaces: `.llm/tools/`, `docs/site` (incl. `docs/site/reference/`), and the immutable
+  external source `EIS-Chat@5191de83f3da97559f21d8891c6c8afdf1cf473a`.
+- proving gates: `check`, `test`, `docs-source-format`, `docs-accuracy`.
+- JSR audit not applicable (no `packages/**` or `plugins/**` surface).
+
+## Standing control laws (from `topic-claude-reset-common.md`)
+
+- Supervise only. No product/docs/tooling edits in this worktree; implementation stays in
+  daemon-attached WSL Codex leaves launched/steered through the agentic suite.
+- Never resume parked Codex thread `019ffcc0-e19b-71d1-95ce-8c72559eb026` as a topic controller, and
+  never fire a second `send-message-v2` at a leaf worktree — steer the existing thread.
+- One evaluator globally at a time; fresh session per gate; opposite family from the Codex
+  generator; exact route from `briefs/reset-gates/dispatch.json`. No OpenRouter/OpenCode/AGY
+  substitution. Fable 5 requires a coordinator amendment recording genuine architectural necessity.
+- Tier-A topic review may consolidate shared lane context but never replaces PLAN-EVAL or IMPL-EVAL.
+- No merge, publish, ready-for-review, relabel, issue-close, milestone-scope change, cluster-state
+  mutation, or release-writer lease from this lane.
+- Do not blindly resume a leaf: re-establish exact local/remote/PR head, hold, formal gate, CI,
+  resource lease, and thread state first.
