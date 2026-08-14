@@ -191,7 +191,7 @@ All generator/evaluator separation, opposite-family, immutable-head, and coordin
 laws remain binding. The exact current assignments and rationales live in
 `briefs/reset-gates/dispatch.json`.
 
-### Live reset-gate checkpoint — 2026-08-14T23:29:49Z
+### Live reset-gate checkpoint — 2026-08-14T23:54:29Z
 
 | Order | Lane | PR | Gate | Result / current action |
 | ----- | ---- | -- | ---- | ----------------------- |
@@ -199,8 +199,8 @@ laws remain binding. The exact current assignments and rationales live in
 | 2 | fixes | #1643 | IMPL-EVAL | `PASS`; merged by coordinator as `0b3ed5d5a`; #1243 closed completed |
 | 3 | features | #1651 | PLAN-EVAL cycle 2 | `PASS` at `3e0c8858b`; preserved Codex thread `019ffcc5-…` authorized to implement |
 | 4 | internals | #1653 | PLAN-EVAL cycle 2 | `PASS` at `c694cfb31`; preserved Codex thread `019ffcc9-97d6-…` authorized to implement |
-| 5 | fixes | #1654 | PLAN-EVAL cycle 2 | running at repaired head `5b3c6fcf2` in fresh Opus 5/medium session `06451c1e-…` |
+| 5 | fixes | #1654 | PLAN-EVAL cycle 2 | `PASS` at `b8fc5eb53`; preserved Codex thread `019ffcca-8be0-…` authorized to implement |
 | 6 | docs | #1652 | PLAN-EVAL cycle 1 | `PASS` at corrected evaluator commit `a790e91e2`; preserved Codex thread `019ffcc9-16c2-…` authorized to implement |
 
-The three PLAN-EVAL passes do not authorize replacement implementation sessions: each topic
+The four PLAN-EVAL passes do not authorize replacement implementation sessions: each topic
 supervisor must resume the recorded existing Codex leaf thread. `expensiveGates` is still empty.

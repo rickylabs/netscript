@@ -520,12 +520,13 @@
     {
       "id": "scaffold-generated-output-correctness",
       "lane": "fixes",
-      "phase": "evaluating",
+      "phase": "implementing",
       "baseBranch": "main",
       "headSha": "5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5",
-      "currentPrHeadSha": "5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5",
+      "currentPrHeadSha": "b8fc5eb53a530d337602f7dc377239651a57d428",
+      "evaluatorCommitSha": "b8fc5eb53a530d337602f7dc377239651a57d428",
       "evaluationCycle": 2,
-      "evaluationVerdict": null,
+      "evaluationVerdict": "PASS",
       "priorEvaluation": {
         "cycle": 1,
         "sourceHeadSha": "14d8b38b4db7ba0635cbbcac2f8cd8903bee0ec9",
@@ -712,7 +713,7 @@
     },
     {
       "id": "reset-gate-05-scaffold-generated-output-correctness-plan-eval-cycle-2",
-      "state": "running",
+      "state": "complete",
       "lane": "fixes",
       "leafId": "scaffold-generated-output-correctness",
       "phase": "plan-eval",
@@ -731,7 +732,10 @@
         "remoteControlRequired": true
       },
       "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-14T23:48:25.792Z"
+      "grantedAt": "2026-08-14T23:48:25.792Z",
+      "completedAt": "2026-08-14T23:54:29.079Z",
+      "verdict": "PASS",
+      "evaluatorCommitSha": "b8fc5eb53a530d337602f7dc377239651a57d428"
     }
   ],
   "expensiveGates": [],
