@@ -169,12 +169,47 @@ clean leaf tree were re-confirmed intact after the stop.
 | Registry `bridgeSessionId` | `session_015wwEYoUsxCwzT3PQeSqi2A` (non-empty) |
 | Remote Control URL | `https://claude.ai/code/session_015wwEYoUsxCwzT3PQeSqi2A` |
 | Generator separation | fresh session; the generator is Codex thread `019ffcca-8be0-74c2-bb0e-c82cf5ce3c85` (idle, not resumed) |
-| Verdict | _pending_ |
+| Verdict | **`FAIL_PLAN`** (cycle 1 of the permitted two) — `13008abf83734884f7fcfc71e6d6d9facb24bcbf chore(harness): record scaffold plan-eval cycle 1 verdict`, evaluated head `14d8b38b4db7ba0635cbbcac2f8cd8903bee0ec9` (= the verdict commit's parent), artifact `plan-eval.md` (+188, sole file), pushed to `origin/fix/scaffold-generated-output-correctness`. |
 
-Launched `2026-08-14T23:26:21Z`. Constraints honored: no other lane touched, no merge, no publish,
-no global expensive-gate mutex acquired (`docker ps -a` empty at launch), and **implementation does
-not resume before a terminal verdict** — the brief bars implementation and only an unqualified
-`PASS` releases the attached Codex thread.
+Launched `2026-08-14T23:26:21Z`; verdict committed `2026-08-14T23:32:53Z`. Constraints honored: no
+other lane touched, no merge, no publish, no global expensive-gate mutex acquired (`docker ps -a`
+empty), and implementation did not resume. The evaluator ran no gate, no Aspire/Docker/
+`scaffold.runtime`, requested no lease, and mutated no label, milestone, PR readiness, or central
+state.
+
+The evaluator session was retired after the verdict (`claude stop bd703a7d`; PID `2470890` gone). It
+had settled in job state `blocked` ("plan-eval found 3 issues; awaiting fix or approval") with its
+process still alive — terminal for gate purposes, since the verdict was written, committed, and
+pushed, but it must not perform the repair it authored. Retiring it enforces generator ≠ evaluator
+and frees the lane's single evaluator slot. Verdict commit and clean tree re-confirmed after the
+stop; no Claude session remains in any leaf worktree.
+
+### Topic Tier-A verification of the FAIL_PLAN (not a re-evaluation)
+
+The three required fixes were re-derived independently before being bound into the repair brief. All
+three are genuine; none is a style objection:
+
+| Required fix | Independent check | Result |
+| --- | --- | --- |
+| 1 — OD-1 memory router cannot produce a defined 404 | `grep -c 'errors' assets/service/contract.memory.ts.template` | **0** occurrences; routes are built from bare `oc.route(...)` (L76, L81, L85) with no `.errors(...)` and no `baseContract`. `notFound()` (`packages/contracts/src/domain/errors.ts:39`) calls `constructors.NOT_FOUND({...})` where `constructors = options.errors`, so an absent map yields `undefined(...)` → `TypeError` → undefined 500. Confirmed. |
+| 2 — `generate-engine-mod.ts` missing from the plan's surface list | `grep -c 'generate-engine-mod' plan.md` | **0**, while the central `leaf-contracts.json` does carry it. `plan.md` §"Authorized boundary amendment" lists six seams and describes the rest as "asset/template and `packages/cli/e2e` surfaces". Real omission, same false-boundary class that already cost this run one cycle. |
+| 3 — #1262 acceptance item 3 neither scoped nor deferred | read `docs/site/data-persistence/database.md` | The `3 · seed` step documents `netscript db seed` as populating "baseline rows" — a claim the fix makes true rather than false. The plan neither scopes nor defers verifying it. Confirmed. |
+
+The non-blocking note also holds: `worklog.md:45` still says PR #1654 "remains draft at
+`status:plan`", while the live label is `status:plan-eval`.
+
+Verdict head equals the dispatch source head, and the verdict commit carries only `plan-eval.md`, so
+no plan text was altered by the evaluator. Cycle position is 1 of the permitted 2.
+
+**Repeat observation — evaluator bridge ids are being published in a non-resolving form.** Both
+fixes-lane evaluators recorded `bridgeSessionId` from `jobs/<jobId>/state.json` (`cse_…`) rather than
+from `sessions/<pid>.json` (`session_…`). Order 2 published `cse_01LmSFUzxkHGuH98fiDhgHxH`; order 5
+published `cse_015wwEYoUsxCwzT3PQeSqi2A`. The suffixes are identical and the registry form is the
+one that resolves as `https://claude.ai/code/session_…`; a URL built from the `cse_…` form is a dead
+link. Attachment is genuinely proven in both cases — this is an evidence-formatting defect, not an
+attachment failure. Worth one line in the reset-gate evaluator brief template: read
+`bridgeSessionId` from the sessions registry, not the jobs file. Amending that template is the
+coordinator's, not this lane's.
 
 ## Wave 0 lane assignments
 
