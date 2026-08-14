@@ -105,13 +105,17 @@ the generated CLI asset was regenerated only through `gen:assets-barrel`.
 | `quality:scan` (7 verified records) | PASS | 0 | `receipts/slice-1/quality-scan.json` |
 | `quality:scan:repo` (7 verified records) | PASS | 0 | `receipts/slice-1/quality-scan-repo.json` |
 | `quality:gate` (`quality:scan` + `arch:check`) | PASS | 0 | `receipts/slice-1/quality-gate.json` |
-| Allowance budget (8 → 7, no increase) | PASS | 0 | `receipts/slice-1/allowance-budget.json` |
+| Allowance budget stash-probe attestation (superseded) | PASS | 0 | `receipts/slice-1/allowance-budget.json` |
+| Allowance budget landed-head attestation (8 → 7, no increase) | PASS | 0 | `receipts/slice-1/allowance-budget-landed-head.json` |
 | Generated asset clean second generation | PASS | 0 | `receipts/slice-1/assets-clean.json` |
 
-The allowance-budget receipt compares the immutable base with probe tree
-`3136358e484f8df30b778d2ae838dd9103077d10`, created from the staged Slice 1 diff, because the
-checker requires two committed tree-ish inputs. All other receipts record the pre-commit evaluator
-head and their exact argv; none is presented as a clean-worktree or supervisor sign-off receipt.
+The original allowance-budget receipt is preserved but superseded because its second argv input,
+`3136358e484f8df30b778d2ae838dd9103077d10`, is a stash object outside branch history and therefore
+is not a durable, independently rerunnable attestation. The binding replacement receipt compares
+the immutable base directly with landed Slice 1 commit
+`586b5513500caa1fd5ce07878f4ba96606064555` and records exit 0. All other receipts record the
+pre-commit evaluator head and their exact argv; none is presented as a clean-worktree or supervisor
+sign-off receipt.
 
 ## Reconcile notes
 
@@ -156,11 +160,16 @@ head and their exact argv; none is presented as a clean-worktree or supervisor s
 - 2026-08-15 — resumed at formal PLAN-EVAL cycle 2 `PASS`; captured the Slice 1 RED receipt, landed
   the fail-closed registration/resolver rail and R-1/R-2 regressions, regenerated the authorized
   consumer asset, ran the named structured gates, and stopped before Slice 2 for Tier-A review.
+- 2026-08-15 — substantive Tier-A content review passed in PR comment `5299267431`; reran the sole
+  E1 allowance-budget attestation against landed commit `586b5513500caa1fd5ce07878f4ba96606064555`,
+  preserved the superseded stash-probe receipt, and stopped before Slice 2 pending supervisor
+  sign-off.
 
 ## Plan-Gate state
 
 - Historical OpenRouter artifact: advisory `FAIL_PLAN` at `8a4709afe`; its D-2/D-3/D-4 findings are
   resolved by coordinator authority and its D-1 editorial finding is resolved in live #1545.
 - Current formal verdict: cycle 2 `PASS` in `plan-eval.md`, evaluator artifact commit `c694cfb311`.
-- Slice state: Slice 1 implementation and structured evidence complete; BLOCKED awaiting
-  substantive Tier-A topic review before supervisor sign-off or Slice 2.
+- Slice state: Slice 1 content passed substantive Tier-A review in PR comment `5299267431`; the E1
+  landed-head replacement receipt passes. BLOCKED awaiting the supervisor sign-off commit before
+  Slice 2.

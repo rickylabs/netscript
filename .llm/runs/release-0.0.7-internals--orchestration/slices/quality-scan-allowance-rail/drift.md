@@ -33,3 +33,9 @@ The historical states above are preserved because this log is append-only. Coord
 
 No product implementation, runtime lease, merge, publication, or central-state mutation is
 authorized while D-9 is active.
+
+## Tier-A evidence correction — 2026-08-15
+
+| ID | Kind | Exact evidence | Disposition | State |
+| --- | --- | --- | --- | --- |
+| D-11 | Attestation durability | `receipts/slice-1/allowance-budget.json` passed against stash object `3136358e484f8df30b778d2ae838dd9103077d10`, which is not an ancestor of landed head `586b5513500caa1fd5ce07878f4ba96606064555` and is garbage-collectable. Tier-A review found no content diff between that probe and the landed slice. | Preserve the original receipt as superseded evidence. Use `receipts/slice-1/allowance-budget-landed-head.json`, which reruns the exact immutable-base-to-landed-commit comparison and exits 0, as the binding budget attestation. | Resolved; supervisor sign-off pending |
