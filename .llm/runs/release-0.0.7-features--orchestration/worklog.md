@@ -262,3 +262,51 @@ PR body's `## Harness` phase line to `impl`. Each slice must commit, push by exp
 comment on #1651, update the leaf run dir in the same commit, and then **stop** at
 `TIER-A STOP: slice S<n> ready for topic review`. S2 is not released until this orchestrator reviews
 S1 substantively — a green automated gate is not a sign-off, and no lane self-certifies.
+
+## 2026-08-15 — S1 landed; Tier-A review returns `CHANGES_REQUESTED`
+
+The S1 turn completed with a proper `task_complete` at `2026-08-14T23:40:48Z` (D-5's missing-marker
+symptom did not recur), pushed `86d0110a545e449dfa094fc961a37a327604d23a`, and stopped without
+starting S2 (`agentic:codex-status` → 0 agents).
+
+### Slice hygiene — clean
+
+Commit scope is 12 files: `rfcs/0000-plugin-cli-contribution.md` (483 lines) plus the leaf run dir
+and five receipts. **No `packages/**`, `plugins/**`, or `deno.lock`** — the RFC-only boundary held.
+Local == remote == PR head; tree clean; no upstream. Three durable receipts
+(`check-cli-plugin-s1`, `docs-source-format-s1`, `docs-accuracy-s1`) are `PASS` with
+`gitHead == actualGitHead` and no mismatch allowance. PR #1651 remains open **draft** with exactly
+one `status:` label (`status:impl`), 0 review threads, 0 current CI failures. The RFC matches
+`rfcs/0000-template.md` exactly: all ten sections in template order, frontmatter complete at
+`rfc: 0000` / `status: Draft` / tracking issue #1502 / milestone 0.0.7.
+
+Verdict notes N-1, N-2, and N-3 are closed with content verified in the files, not just claimed; N-4
+is correctly retained for the S4 final-head rerun.
+
+### Findings — three defects inside S1's own normative contract
+
+Full review: `slices/tier-a-review-1502-s1.md`; PR comment linked below.
+
+- **F1** — `PluginCliDiagnosticCode` is used at RFC line 350 to type the failure boundary and is
+  **never declared**; it appears exactly once in the document. `PluginCliCapability` gets an explicit
+  S2 deferral note at line 281, so the omission reads as an oversight rather than a declared gap. The
+  14 stable codes are already enumerated in prose at line 369, so declaring the tuple and derived
+  union in S1 is the cheap, correct fix.
+- **F2** — line 117 promises "a deeply readonly definition" while the normative signature at line 278
+  returns shallow `Readonly<TDefinition>`, leaving `commands`, `children`, `arguments`, and `options`
+  mutable. Immutability is load-bearing for the whole design ("a contribution is immutable static
+  data"), so the RFC must not assert a guarantee its own signature does not provide.
+- **F3** — `` module: `./${string}` `` admits `'./../escape.ts'`, which the invariant at line 288
+  forbids. The contract is right; the type merely looks sufficient. In an import-safety seam that
+  gap invites an implementer to skip the traversal check.
+
+Two evidence-labelling corrections ride along: state plainly that the S1 durable receipts attest the
+**parent** commit `3e0c8858b` (same disclosure class as N-4, acceptable for an intermediate slice
+because S4 binds), and label `source-format-s1*.json` as structured **wrapper reports** rather than
+`run-gate` receipts so the receipt set is not overcounted at S4.
+
+### Disposition
+
+S2 is **withheld**. One bounded S1 fix-up commit, docs-scoped gate rerun, push, PR comment, then
+another Tier-A stop. The S1 contract is the foundation S2 builds discovery and bootstrap on, so it is
+corrected at the slice that owns it rather than patched downstream.
