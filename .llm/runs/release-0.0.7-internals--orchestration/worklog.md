@@ -3,6 +3,7 @@
 | Time (UTC) | Event | Evidence |
 | --- | --- | --- |
 | 2026-08-13T20:16:58Z | Topic harness activated and all required skills plus approved coordinator artifacts read completely. | Local skill/workflow reads; coordinator run path `/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/` |
+| 2026-08-15T00:22:00Z | Replaced parked legacy Codex topic controller with attached native Claude Sonnet 5/low supervisor per the reset common contract; first-turn reconciliation found zero drift on `main`, leaf #1644 (`4d9fb1967`), or leaf #1653 (`09dfb092d`), and no rival controller/evaluator in either leaf worktree. Order-1 IMPL-EVAL handoff prepared but not launched pending coordinator singleton evaluator lease grant. | Session `1d02b9ca-196b-4363-b5ec-d6bd5fdf613c`; PID `2402901`; bridge `session_011m4xHFkn36RbYsSXRpZe1Q`; `gh pr view 1644/1653`; `git status`/`rev-parse` in both leaf worktrees |
 | 2026-08-13T20:16:58Z | Reconciled live `main`; it remains the immutable dispatch base. | `git fetch origin main`; `origin/main` = `01e0960494c95ce56eb35892c211a095eb13e6ed` |
 | 2026-08-13T20:16:58Z | Reconciled Wave 0 issue state. #1378, #1545, #1561, #1563, and #1621 are open in milestone 0.0.7. | Live GitHub issue fetches |
 | 2026-08-13T20:16:58Z | GitHub credential and desired-state runtime preflight passed. | `agentic:gh-token check`: rickylabs; `agentic:runtime doctor`: `no_change`, 18 components ready |
