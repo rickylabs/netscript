@@ -12,6 +12,38 @@ head `14d8b38b4db7ba0635cbbcac2f8cd8903bee0ec9` (dispatch order 5) match exactly
 are clean; both PRs are open/mergeable at those heads. No fact differs from the central dispatch
 set, so nothing is reported to the coordinator as drift.
 
+Re-verified at `2026-08-14T22:56:20Z` by the Opus 5 / high controller, extended with: both leaf
+Codex threads idle at `task_complete`; no process owns either leaf worktree; PR label state is a
+single `status:` each (#1643 `status:impl`, #1654 `status:plan-eval`); `mergeStateStatus` is `CLEAN`
+on both; `origin/main` still `01e096049`; topic branch already pushed at `0aa64fe44`; zero Docker
+containers; Codex daemon `0.147.0` running and managed with an intact control socket.
+
+## Corrected — this lane's own record named the rejected Sonnet 5 route
+
+Not upstream drift: a stale local record. The 2026-08-15 reset section of `supervisor.md`, the
+reset row in `worklog.md`, and both `leaf-registry.md` state cells recorded this lane's replacement
+controller as `native Claude · Sonnet 5 · low` and its two evaluator gates as Sonnet 5 low/medium.
+That is the owner-rejected model-floor canary, which exited `TOPIC_CONTROLLER_PARKED_MODEL_FLOOR`
+without dispatching anything. The authoritative values are the coordinator's:
+`milestone-cluster-state.json` lane `fixes` (`requestedModel: claude-opus-5`,
+`requestedEffort: high`, `remoteControlRequired: true`) and `dispatch.json` orders 2 and 5
+(`Claude Opus 5` low and medium). All four topic-local artifacts were corrected to those values in
+this turn. No leaf, PR, or coordinator artifact was touched.
+
+## Observed — dispatch effort is below the rendered lane-policy pairing, and is authorized
+
+`lane-policy.md` renders `review_codex_light` (paired to a `light_implementation` Sol · low slice)
+as **Opus 5 · high**, and `formal_impl_evaluation` as Fable 5 · medium for Codex-authored work.
+`dispatch.json` order 2 instead assigns **Opus 5 · low** for #1643, and order 5 assigns
+**Opus 5 · medium** for #1654 in place of the Fable PLAN-EVAL route. Both are covered by the
+`ownerOverride` recorded in `dispatch.json` at `2026-08-14T22:41:15Z`
+(`evaluationDefault: native Claude Opus 5 / low through high; low only for genuinely easy bounded
+review`; `fablePolicy: reserve Fable 5 for recorded genuinely architectural PLAN questions or
+exceptional complex implementation review`), which explicitly supersedes the prior matrices. This
+lane follows `dispatch.json` exactly and records the deviation so it is not later misread as an
+unauthorized substitution. The opposite-family and fresh-session invariants are unaffected: both
+gates evaluate Codex-authored work from a fresh Claude session that is not the generator.
+
 ## Observed metadata inconsistency (non-blocking for this lane)
 
 The frozen dependency DAG node for #1360 still says `lane: fixes`, while the approved plan, topic
@@ -19,6 +51,11 @@ issue allocation, leaf contract, and grouped `app-service-client-wiring` leaf as
 `features`. The fixes authority list excludes #1360, so this topic leaves it untouched and does not
 mutate central state. The coordinator should reconcile the generated DAG metadata when it next owns
 a central state transition.
+
+Re-verified `2026-08-14T22:56:20Z`: `milestone-dependency-dag.json` node `issue:1360` still carries
+`"lane": "fixes"`, `milestone-leaf-plan.json` still groups #1360 with #1355 under `"lane":
+"features"` (wave 1), and `milestone-cluster-state.json` lane `fixes` still lists 26 issues that
+exclude #1360. Still non-blocking for this lane; still the coordinator's to reconcile.
 
 ## Significant — #1243 contract is stale on current main
 

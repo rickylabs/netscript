@@ -16,6 +16,8 @@
 | 2026-08-15T00:00:00+02:00 (reset boundary) | Owner revoked the temporary Codex topic-orchestrator fallback for this lane; coordinator `codex-root-0.0.7` parked the prior Codex topic thread `019ffcc0-e1ae-7b70-b3b8-8804ebd6f773` at `TOPIC_CONTROLLER_PARKED`/idle/clean and it must never be resumed as topic controller. Native Claude Sonnet 5 low replaces it on the same preserved worktree/branch. A prior fixes-topic DeepSeek/OpenRouter IMPL-EVAL attempt for #1643 was stopped pre-verdict by the coordinator; its transport artifact was removed and the evaluator brief amended to require a fresh native Claude/Fable gate after reset. | coordinator `supervisor.md` reset-transition section; `briefs/reset-gates/dispatch.json` |
 | 2026-08-15T22:22:23Z (host clock, pre-reset UTC stamp) | First-turn Claude reconciliation. Read the common reset contract and coordinator dispatch set. Verified both leaf worktrees clean and both draft PRs (#1643, #1654) open/mergeable at exactly the heads named in `dispatch.json`: legacy leaf at `e6ba15ec6414c0a42b1f9870791131162ea71c36` (dispatch order 2, fresh IMPL-EVAL, Sonnet 5 low) and scaffold leaf at `14d8b38b4db7ba0635cbbcac2f8cd8903bee0ec9` (dispatch order 5, fresh PLAN-EVAL cycle 1, Sonnet 5 medium). No drift found — the topic-local coordinator-decision-required blockers recorded 2026-08-13 for both leaves were resolved upstream (contracts amended, implementation advanced past the paused heads) between this topic's last local update and the reset. `leaf-registry.md` state/base columns updated to match. No Docker containers running, no expensive-gate lease held. Per the reset contract and this session's exact brief, no leaf or evaluator is launched this turn; both remain held pending the coordinator's explicit serial dispatch grant. | `leaf-registry.md`; `gh pr view 1643/1654 --json headRefOid,state,isDraft,mergeable`; `git log`/`git status` in both leaf worktrees; `docker ps` |
 
+| 2026-08-14T22:56:20Z (`2026-08-15T00:56:20+02:00` Europe/Zurich — past the reset boundary) | **Opus 5 / high replacement first turn — reconcile and journal only.** Read the common reset contract, the coordinator supervisor/context-pack/drift/cluster-state/leaf-plan/DAG and `briefs/reset-gates/dispatch.json` + both fixes evaluator briefs, and the complete topic-local run, then re-established live ground truth. Proved this session's identity: Claude session `c7597d28-6774-44c9-aa00-b8b40b776165`, PID `2430399`, cwd `/home/codex/repos/netscript-007-fixes` (sole Claude process at that cwd), non-empty `bridgeSessionId` `session_014pCd2QWkCscgZpVdjcUPST`, Remote Control `https://claude.ai/code/session_014pCd2QWkCscgZpVdjcUPST` attached, observed launch flags `--model claude-opus-5 --effort high --permission-mode bypassPermissions --remote-control`. Predecessor Codex thread `019ffcc0-e1ae-7b70-b3b8-8804ebd6f773` verified parked: rollout tail `task_complete` / `TOPIC_CONTROLLER_PARKED` at `2026-08-14T22:18:41Z`, not resumed. Both leaf worktrees clean at exactly the dispatch heads, both leaf Codex threads idle at `task_complete`, both draft PRs `OPEN`/`MERGEABLE`/`CLEAN` at those heads with the expected single `status:` label (#1643 `status:impl`, #1654 `status:plan-eval`). Topic branch already pushed at `0aa64fe44` = local `HEAD`; `origin/main` unchanged at `01e096049`. Zero Docker containers, no expensive-gate lease, no evaluator running, Codex daemon `0.147.0` managed with an intact control socket. **Corrected the stale local record**: this lane's replacement route and both evaluator routes were journaled as Sonnet 5, which is the owner-rejected model-floor canary — restored to Opus 5 / high (controller), Opus 5 / low (order 2 IMPL-EVAL), Opus 5 / medium (order 5 PLAN-EVAL) per `dispatch.json` and cluster state. No leaf resumed and no evaluator launched; both gates held pending the coordinator's explicit serial grant. | `~/.claude/sessions/2430399.json`; `~/.claude/jobs/c7597d28/state.json`; `~/.codex/sessions/**/rollout-*-019ffcc0-e1ae-*.jsonl` tail; `git worktree list`; `git status`/`git log` in both leaf worktrees; `git ls-remote origin`; `gh pr view 1643/1654 --json state,isDraft,mergeable,mergeStateStatus,headRefOid,labels`; `deno task agentic:codex-status --pretty`; `docker ps -a` (empty); `milestone-cluster-state.json` lane `fixes` |
+
 ## Design
 
 - Public surface: none in the topic-control branch; product surfaces are exclusively leaf-owned.
@@ -34,23 +36,25 @@ No lease is held locally. Both briefs require a coordinator grant before `scaffo
 Aspire, or Docker work begins. The grouped scaffold leaf has first topic priority when the global
 lease becomes available because its three-issue acceptance shares that one verdict.
 
-## Coordinator decision required — legacy-port-pin-sweep
+## Resolved 2026-08-14 — legacy-port-pin-sweep contract blocker
 
-The live issue assumption that the manifest ports are mechanically removable is false on current
-`main`: the shared manifest schema and official-copy compatibility protocol still consume them.
-The bounded fail-loud CLI remedy is viable, but its focused regression test file is absent from the
-frozen leaf contract. The leaf is clean and paused at `f3cf40909`; the coordinator must either
-issue a replacement contract naming the authorized surfaces/remedy or disposition #1243 outside
-this leaf. This topic run will not infer that scope change.
+The 2026-08-13 blocker (manifest ports are not mechanically removable, and the fail-loud CLI remedy
+needed an out-of-contract regression test file) was dispositioned upstream before the reset. The
+leaf then implemented the bounded remedy — `3d32e9ee2 fix(cli): require explicit auth stream URL`
+plus the authorized `auth-plugin-command_test.ts` coverage — recorded its Tier-A review
+(`af3dca0f5 docs(harness): record legacy Tier-A review`), and committed a receipt set covering
+check, test, lint, fmt, doc-lint, quality-gate, arch-check, jsr-audit, and publish-dry-run. The
+manifest and official-copy port fields stay coordinator-classified compatibility metadata; they were
+not removed. Product diff is confined to `plugins/auth/auth-plugin-command.ts` and its test. The
+leaf is clean at `e6ba15ec6414c0a42b1f9870791131162ea71c36` and blocked only on the order-2
+IMPL-EVAL. Those receipts are the implementer's own evidence; they are inputs to the IMPL-EVAL, not
+a substitute for its verdict, and this topic run has not independently re-executed them.
 
-## Coordinator decision required — scaffold-generated-output-correctness
+## Resolved 2026-08-14 — scaffold-generated-output-correctness contract blocker
 
-The approved behavior remains bounded, but the frozen surface omits the generator seam required to
-select provider-specific Prisma configuration and the generator/scaffolder seam required to emit a
-model-aware or explicit empty-schema seed. The coordinator must amend the contract to include
-`packages/cli/src/kernel/templates/database/generate-prisma-config.ts`,
-`packages/cli/src/kernel/adapters/database/scaffolder.ts`, and a new
-`packages/cli/src/kernel/templates/database/generate-database-seed.ts` plus its focused test. After
-that amendment, launch one separate PLAN-EVAL against `42572af32`; only an unqualified PASS permits
-the attached implementation thread to resume. The shared `scaffold.runtime` verdict remains
-lease-gated and has not run.
+The 2026-08-13 blocker (the frozen surface omitted the provider-selection and seed-generation
+generator seams) was resolved by the coordinator amendment recorded in the leaf at
+`14d8b38b4 chore(harness): record authorized scaffold seams`. The leaf is correctly artifact-only —
+plan, research, drift, and the red-first receipt, with **no product code** — pending the order-5
+PLAN-EVAL cycle 1. Only an unqualified `PASS` permits the attached implementation thread to resume.
+The shared `scaffold.runtime` verdict remains lease-gated and has not run.
