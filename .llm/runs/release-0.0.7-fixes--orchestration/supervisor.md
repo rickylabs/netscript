@@ -211,6 +211,81 @@ attachment failure. Worth one line in the reset-gate evaluator brief template: r
 `bridgeSessionId` from the sessions registry, not the jobs file. Amending that template is the
 coordinator's, not this lane's.
 
+### Plan repair — same-thread, terminal at the cycle-2 handoff
+
+Dispatched via `agentic:codex-resume` (dry-run verified first) to the **existing** plan-author thread
+`019ffcca-8be0-74c2-bb0e-c82cf5ce3c85`; `codex-status` showed exactly one agent
+(`gpt-5.6-sol` / high) at that worktree — same thread, no rival, no second `send-message-v2`.
+
+Result head `5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5`, single commit
+`5b3c6fcf2 chore(harness): repair scaffold plan-eval findings`, clean tree, pushed by explicit
+refspec (remote == local). Structured plan-update comment posted `2026-08-14T23:45:50Z`.
+
+**Boundary proof, re-derived by this lane rather than accepted from the report:**
+
+- `git diff --name-only 01e096049..HEAD -- . ':(exclude).llm/**'` → **empty**. The head is plan-only;
+  no `packages/` or `plugins/` file was touched.
+- `git diff --name-only 01e096049..HEAD -- deno.lock` → **empty**. Lock hygiene holds.
+- No gate, `scaffold.runtime`, Aspire, Docker, publish, or lease. `docker ps -a` empty.
+- No Claude session remains in any leaf worktree — **cycle 2 was not launched**.
+- PR #1654 unchanged in lifecycle: `OPEN`, draft, `MERGEABLE`, exactly one phase label
+  `status:plan-eval`, head now `5b3c6fcf2`.
+
+**Each required fix verified in source:**
+
+| Fix | Verified |
+| --- | --- |
+| 1 — OD-1 + open-decision sweep | `plan.md` now has an `## Open decisions` table: OD-1 **resolved as option (b), out of scope**, OD-2 resolved, OD-3 marked safe to defer. Locked design §2 now reads "the generated persistent router **only**" — "and memory routers" is gone. The memory showcase is recorded under Deferred scope with the reason (no error map, no CRUD by-id surface). Every surviving `P2025` prescription (L42, L141) is scoped to the persistent Prisma router, which is correct; none targets the memory router. OD-2's answer is explicit: the empty-schema branch is a generator-level direct-call contract driven by omitting `modelName`, since `DatabaseScaffolder` always resolves `options.modelName ?? 'ExampleRecord'`. |
+| 2 — `proves → gate → files` per slice | `grep -c generate-engine-mod plan.md` is now **2** (surface list L84, slice-2 file list L120). Slices 2–6 are restated as **Proves → Decisive gate → Files**, each naming one structured wrapper invocation as its decisive gate. Slice 6 truthfully names only evidence-artifact writes. |
+| 3 — #1262 acceptance item 3 + stale status | `plan.md` L33–34 records acceptance item 3 as **verified-by-inspection in scope**: the tutorial already describes `netscript db seed` as populating "baseline rows", so no docs edit is required. `worklog.md` L46 now states exactly one live phase label, `status:plan-eval`. |
+
+Note for future readers: `worklog.md:29` still contains the string `status:plan`, and that is
+**correct history** — it is a dated 2026-08-13 event row recording the label applied at that time.
+The evaluator's finding was about the present-tense housekeeping note, which is the line that was
+corrected. Do not "fix" the history row.
+
+### Order-5 PLAN-EVAL cycle 2 — launched
+
+Coordinator granted at pushed control head `5769171cef9a3c06dc8cfa9c71d75a22c7716a5a`
+(`chore(harness): pin scaffold plan-eval cycle 2`). **Both preconditions this lane required for
+cycle 2 were verified as actually met, not assumed:**
+
+- The binding brief was genuinely updated — sha256 moved `d726741d…13a13d1` → `7e95fd94540162304f1607cbe92b49600b7969bb4bc8549fb4e9513d199f5132`
+  (mtime `2026-08-14T23:46:33Z`). It now names cycle 2 as the final permitted plan cycle, pins the
+  new immutable source head `5b3c6fcf2`, instructs the evaluator to **re-test the three cycle-1
+  findings rather than trust the repair summary**, and resolves the overwrite risk explicitly:
+  preserve the cycle-1 verdict as `plan-eval-cycle-1.md`, then write cycle 2 to `plan-eval.md`.
+- `dispatch.json` order 5 was re-pinned to `cycle: 2`, `sourceHead: 5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5`,
+  route unchanged at native Claude Opus 5 / medium.
+
+| Field | Value |
+| --- | --- |
+| Gate | PLAN-EVAL **cycle 2** (final permitted plan cycle), PR #1654 |
+| Immutable source head (verified 4 ways) | `5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5` — local `HEAD`, `FETCH_HEAD`, `git ls-remote origin`, PR `headRefOid` all equal; tree clean; head still plan-only |
+| Brief | passed verbatim, sha256 `7e95fd94…199f5132` (2798 bytes); job `intent` matches |
+| Requested route | native Claude · Opus 5 · medium · Remote Control |
+| Observed launch route | `respawnFlags: ["--effort","medium","--permission-mode","bypassPermissions","--remote-control","--name","NetScript 0.0.7 #1654 PLAN-EVAL cycle 2","--model","claude-opus-5"]` |
+| Background id | `06451c1e` |
+| Claude session id | `06451c1e-a9b8-47d2-8934-be2247ef5347` |
+| PID | `2487919` |
+| cwd | `/home/codex/repos/netscript-007-leaf-scaffold-generated-output-correctness` |
+| Registry `bridgeSessionId` | `session_01AFoKjRXMVCaXUzJ9HqDvGt` (non-empty) |
+| Remote Control URL | `https://claude.ai/code/session_01AFoKjRXMVCaXUzJ9HqDvGt` |
+| Generator separation | fresh session; the plan author is Codex thread `019ffcca-8be0…`, confirmed idle at `task_complete` ("Plan repair is complete and stopped at the PLAN-EVAL cycle-2…") and not resumed |
+| Verdict | _pending_ |
+
+Launched `2026-08-14T23:48:26Z`. Before launch, a process (`2544277`) briefly appeared to own the
+leaf worktree; it was traced and found to be this lane's own transient verification subprocess,
+already exited. Re-checked: no live owner, and no Claude session in any leaf worktree.
+
+The `cse_…` vs `session_…` prefix split is confirmed again on this launch — the jobs file records
+`cse_01AFoKjRXMVCaXUzJ9HqDvGt` while the sessions registry records
+`session_01AFoKjRXMVCaXUzJ9HqDvGt`. This lane reports the registry form, which is the one that
+resolves as a Remote Control URL.
+
+Constraints honored: no implementation before a terminal verdict, no replacement plan author, no
+other lane touched, no merge, no publish, no expensive-gate lease (`docker ps -a` empty).
+
 ## Wave 0 lane assignments
 
 | Leaf | Branch | Implementation route | Formal evaluator (per `dispatch.json`) |
