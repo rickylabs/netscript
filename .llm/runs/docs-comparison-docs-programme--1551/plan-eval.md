@@ -27,11 +27,19 @@ All three agree. No mismatch; the gate proceeds. Working tree was clean at evalu
 | Claude session id | `40a06314-b69a-4ca0-a4a0-1224c5e377ca`                            |
 | PID               | `2465471` (`/home/codex/.claude/sessions/2465471.json`)           |
 | cwd               | `/home/codex/repos/netscript-007-docs-comparison`                 |
-| `bridgeSessionId` | `cse_0126JRYrbXqvoJwskcF31RwW`                                    |
-| Remote Control    | <https://claude.ai/code/cse_0126JRYrbXqvoJwskcF31RwW>             |
+| `bridgeSessionId` | `session_0126JRYrbXqvoJwskcF31RwW`                                |
+| Remote Control    | <https://claude.ai/code/session_0126JRYrbXqvoJwskcF31RwW>         |
 | Requested route   | native Claude Opus 5, effort `low`, Remote Control, `bypassPermissions` |
 | Observed route    | `respawnFlags` in `~/.claude/jobs/40a06314/state.json`: `--model claude-opus-5`, `--effort low`, `--remote-control`, `--permission-mode bypassPermissions` |
 | Verdict           | **matched** (no substitute provider; Fable 5 not used)            |
+
+Correction (Tier-A, `topic-docs-0.0.7`): commit `9ae97c934` recorded `bridgeSessionId` as
+`cse_0126JRYrbXqvoJwskcF31RwW` and a non-resolving Remote Control URL. The two identity files
+disagree — `~/.claude/jobs/40a06314/state.json` carries `cse_0126JRYrbXqvoJwskcF31RwW` while
+`~/.claude/sessions/2465471.json` carries `session_0126JRYrbXqvoJwskcF31RwW`. The brief designates
+the sessions file as the source for the PID/cwd/`bridgeSessionId` triple, and the session's own
+`Claude-Session` URL agrees, so `session_…` is authoritative and is recorded above. Attachment-proof
+fields only; the verdict, evaluated head, and every Plan-Gate row are unchanged.
 
 `--model`/`--effort` are absent from `/proc/2465471/cmdline` because this is a `--bg` session claimed
 over the daemon socket; `respawnFlags` is the observed-route source of record.
