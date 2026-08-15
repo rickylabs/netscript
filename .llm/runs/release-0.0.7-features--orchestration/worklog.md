@@ -2485,3 +2485,43 @@ stops before any repair, attributed by measurement at a named commit; and this s
 finding with attribution rather than an inherited baseline.
 
 No lease. `scaffold.runtime`, `fresh-browser`, Aspire, Docker, S5, and evaluators untouched.
+
+## 2026-08-15 — session interruption; S4 lane recovered on the same author
+
+The supervising Claude process exited mid-turn. Recovery findings, established from artifacts rather
+than from any completion signal:
+
+| Check | State |
+| --- | --- |
+| Leaf head | still `ee479ea851927818404c6311dac78e07a4eef1b5`, local == remote — **nothing new committed** |
+| Tree | **dirty** — untracked `reports/doc-lint-cli.json`, `reports/doc-lint-fresh.json`; modified `context-pack.md`, `worklog.md`, `s4-format-failure.md` |
+| Receipts | **none** — the four contracted files were never reached |
+| Author thread `01a004f9-…` | **`stalled`**, `activityAgeMs ≈ 4.12e6` (~69 min) — held by the daemon, not idle-complete |
+
+**The absent process is not evidence of completion**, and this is the third form of that lesson on
+this lane: D-7 was a watcher firing early on a mis-parsed field, D-14 a session that finished while
+its state stayed `working`, and this is a session that *stopped* while its state said nothing at all.
+Each time the artefact settled it — here a dirty tree with no receipts, which cannot be a completed
+S4 under any reading.
+
+**Partial work is real and was preserved, not redone.** `doc-lint-cli.json` records `exitCode 0`
+across three entrypoints with **0 errors**; `doc-lint-fresh.json` records **0 findings**
+multi-entrypoint. Per-member doc-lint for CLI and Fresh therefore passed; the SDK 12-entrypoint sweep
+was never reached. The resume instructs the author to commit that evidence *first* so it is durable
+before anything else runs.
+
+**Coordinator reconciliation.** Read the newer checkpoint `353bd087a` ("release features convergence
+gates"). It matches this lane exactly: #1664 S3 Tier-A `PASS` at leaf `1df8a5274` / topic `c91c2084a`,
+full CLI 598/0 independently rechecked, the same Sol/high author on artifact-only S4, the recorded
+stop being "fresh Tier-A and explicit S5 lease review", and `scaffold.runtime`, `fresh-browser`,
+Aspire, Docker and evaluators all explicitly unauthorized with the singleton runtime lease free. No
+divergence to report. The cluster row still shows #1664 as `planned` at the dispatch base, which is
+stale against S1-S4 progress but is central state and not this lane's to mutate.
+
+**Lane recovered** by resuming the same preserved author thread — no replacement session — from where
+it stopped, with the verified formatting invocation restated (absolute config path plus
+`--batch-size 1000`; D-16) and the ordered contract otherwise unchanged. The SDK sweep instruction is
+explicit that this slice owns the **export-map** sweep and that anything beyond the two carried
+`QueryClient` diagnostics is a finding with attribution rather than an inherited baseline.
+
+No lease. No runtime gate. No evaluator. Continuing the queue.
