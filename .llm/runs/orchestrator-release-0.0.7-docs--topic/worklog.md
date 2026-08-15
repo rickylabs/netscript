@@ -705,3 +705,54 @@ comment, and may not implement, ready, merge, publish, relabel, touch #1551, cha
 re-edit the rewritten comments.
 
 The lane stops after this single formal gate and awaits the coordinator.
+
+## 2026-08-15 — formal IMPL-EVAL verdict: FAIL_FIX
+
+Terminal at evaluated head `15429cf8487cfe3504ae0443fd435d2a72d4528b`. Artifact commit
+`e95f4838038a27a0f209d2ce37c9f53bd4ed4299` (`evaluate.md` only, 327 lines); verdict comment
+`issuecomment-5300794391`. Local, remote, and PR head all `e95f48380`; tree clean.
+
+All five proportional gates green in the evaluator's own run: `verify` `0`, `docs:links` `0`,
+`docs:accuracy` `0`, `git diff --check` `0`, lockfile guard `0`. No Aspire, Docker, E2E, or lease.
+
+### Two blocking findings — both independently re-verified by this orchestrator
+
+**F1 — `181 / 178` labelled `Measured` with no published input that reproduces it.** Comment
+`5265971722` states "**Measured.** … yields 181 physical / 178 nonblank" while
+`docs/site/comparisons/evidence/` contains only `session-source-manifest.json` and
+`session-measurements.json` — Session inputs only, no Channel record. The comment also weakened the
+label's own definition in its legend, dropping the _published script_ and _raw aggregate output_
+requirements that `methodology.md:44`, comment `5265826161:17`, and `nextjs-session.md:41` all
+retain. PR #1652's Definition of Done asserts "Every number is reproduced by published inputs and
+procedure." The count is honest — the generator reproduced it against the authorized checkout — but
+no reader can reproduce it from anything published, which is exactly what the label claims.
+Verified: the evidence directory listing is Session-only.
+
+**F2 — evidence cited through mutable branch refs.** Comment `5265826161` links the manifest and
+aggregate as `…/blob/docs/comparison-docs-programme/…`. Verified both blob URLs resolve to the
+branch, not a commit; the case page does it correctly at `nextjs-session.md:26-27` with the
+immutable permalink `…/blob/4e6d52b3d2cb0bf24aca9a47a67da46a213fef64/…`. Both return 200 today and
+will 404 the moment #1652 merges and the branch is deleted. `methodology.md:58` requires an
+"immutable commit or release identifier" for evidence sources.
+
+F3 (manifest omits three `methodology.md` §3 fields), F4 (PR body materially false at the evaluated
+head), and F5 (matrix column heading diverges from the methodology) are minor.
+
+### This orchestrator's Tier-A pass missed both blocking findings
+
+The S3 Tier-A review verified that the Session count `94 / 92` matched between the case page and
+comment `5265826161`, and treated the comment set as consistent. It did **not** check that the
+Channel figure `181 / 178` had a reproducible published input, and did **not** check the mutability
+of the evidence URLs inside the comments. Both defects sit precisely on the evidence-integrity
+contract this changeset exists to establish, and both were reachable with the same cheap checks the
+review already ran on adjacent facts. The Tier-A PASS at `15429cf84` stands as recorded, but it was
+not sufficient, and the gate that caught this is the reason generator-and-supervisor separation from
+the formal evaluator is a hard invariant rather than a formality.
+
+### Position
+
+No fix was attempted. The coordinator's grant ends at this single formal gate, and `FAIL_FIX` means
+the plan remains valid while the docs need more work — a bounded fix slice on the same Codex author
+thread, then fresh Tier-A and a re-run of the formal gate on the new head. The lane holds for
+coordinator direction. PR #1652 remains draft at `status:impl`, `Part of #1551`, no closing keyword,
+labels unchanged.
