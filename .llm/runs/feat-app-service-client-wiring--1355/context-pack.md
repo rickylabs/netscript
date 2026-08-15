@@ -97,6 +97,17 @@ ignoring early status. A corrected measurement found two runnable Playwright-man
 151 binaries. F7-C1 therefore classifies an allowlist/selection defect plus a startup-diagnostic
 defect and binds a strict explicit override; it is not an environmental capability gap.
 
+S5 attempt 6 executed exactly once at leased evidence `ed3f78e0d` with the strict managed-Chromium
+override. The selector records source `NETSCRIPT_E2E_BROWSER_EXECUTABLE`, the exact managed path,
+and `Google Chrome for Testing 151.0.7922.34`. The runtime suite reports 69 passed / 1 failed / 0
+skipped: `behavior.service-client-refetch` alone exits 143 at the suite-owned 900-second command
+boundary with no stdout/stderr evidence. Generated service-client, formatting, and suite cleanup
+gates remain green. This is an honest red with deeper cause pending review, not a refetch-behavior
+verdict. `fresh-browser` is NOT_RUN and has no receipt. Three run-owned NuGet children were stopped
+with TERM+CONT, and the one unreadable Postgres residue was moved intact to
+`/tmp/netscript-s5-a6-quarantine-20260815-4M9v8k/`. Final Aspire/Docker/process/port and D-18 audits
+are empty. Full evidence is in `reports/s5-attempt6-runtime-failure.md`.
+
 ## Completed
 
 - Verified branch/worktree/base/clean-tree identity and no designed upstream.
@@ -155,15 +166,17 @@ defect and binds a strict explicit override; it is not an environmental capabili
   S5 attempt-5 residue. After recoverable coordinator quarantine, one clean-checkout attempt passes
   4,237/0/19 over the same 4,256 results; conditional publish and architecture gates also pass at
   content `e45144db6`. The exact set uses test-attempt2, excludes the original red, and is SUFFICIENT.
+- Attempt 6 proves the strict override selects the runnable managed Chromium, but the live refetch
+  child returns no evidence before the 900-second command boundary. The runtime gate is red and
+  `fresh-browser` remains blocked. Cleanup and recoverable residue quarantine are complete; the
+  host is empty and the leaf has relinquished lease use pending coordinator state update.
 
 ## Next Steps
 
-1. Commit/push the three recovery receipts and append-only recovery report without staging the
-   coordinator-owned `leak-report.md` modification.
-2. Post `[PHASE: IMPL] [SLICE: F7] [BINDING-RECOVERY]` naming the exact sufficient four-file set and
-   the excluded superseded red.
-3. Stop for fresh features Tier-A. Do not request a lease, run attempt 6 or expensive gates, mutate
-   quarantine, or start evaluation.
+1. Commit and push attempt-6 raw/NDJSON/selector evidence plus cleanup records.
+2. Post `[PHASE: IMPL] [SLICE: S5-A6]` with the runtime red, browser NOT_RUN state, and final audit.
+3. Stop for fresh coordinator/Tier-A disposition. Do not retry, run `fresh-browser`, mutate the
+   quarantine, request another lease, or start evaluation.
 
 ## Key Decisions
 
@@ -206,10 +219,10 @@ defect and binds a strict explicit override; it is not an environmental capabili
 
 | Gate family | Current status                                                                                                                    | Evidence                     |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Static      | F6 check, test-attempt2 (4,229/0/19), publish dry-run, and arch-check PASS at `7fa29ad3e`; exact four-file set SUFFICIENT. Original `f6-test` FAIL is preserved as superseded environmental evidence outside the set. | four named passing receipts; quarantine and recovery reports |
+| Static      | F7 check, test-attempt2 (4,237/0/19), publish dry-run, and arch-check PASS at `e45144db6`; exact four-file set SUFFICIENT. Original `f7-test` FAIL is preserved as superseded environmental evidence outside the set. | four named passing receipts; quarantine and recovery reports |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
-| Runtime     | Attempt 5 `scaffold.runtime` FAIL: 69 passed / 1 failed / 0 skipped over 70 steps. Service-client and generated-format proofs PASS; the allowlist ignores runnable managed Linux Chromium, selects an unrunnable Windows PE, and masks status/stderr behind a CDP timeout. Cleanup and independent host audit empty; lease released. | `reports/s5-attempt5-runtime-failure.md`; pretty + NDJSON logs; F7-C1 amendment |
-| Consumer    | `fresh-browser` NOT_RUN because attempt-5 scaffold prerequisite failed; no catalog receipt exists and browser cleanup audit was not reached. | S5 conditional contract |
+| Runtime     | Attempt 6 `scaffold.runtime` FAIL: 69 passed / 1 failed / 0 skipped. Strict managed-Chromium selection succeeds; `behavior.service-client-refetch` exits 143 after 900,030 ms without returning evidence. Cleanup, recoverable D-18 quarantine, and final host audit complete. | `reports/s5-attempt6-runtime-failure.md`; hashed pretty + NDJSON + selector evidence |
+| Consumer    | `fresh-browser` NOT_RUN because attempt-6 scaffold prerequisite failed; no catalog receipt exists. | S5 conditional contract |
 
 ## Open Questions
 

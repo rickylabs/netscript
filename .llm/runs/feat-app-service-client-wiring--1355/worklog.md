@@ -888,3 +888,31 @@ new receipt has `gitHead == actualGitHead == e45144db643f6bde85552a615812c8371e4
 
 No source/test, runtime attempt, lease, expensive gate, browser, Aspire, Docker, evaluator,
 readiness, metadata, lockfile, documentation, quarantine, or coordinator-owned leak report changed.
+
+### S5 attempt 6 — strict browser selection reaches a 900-second runtime red
+
+The singleton lease recorded at features topic `ac1ec35cf` bound evidence
+`ed3f78e0d87784b1869166bd2574737c62fac0af`. Because the leaf checkout carried only a
+coordinator-generated `leak-report.md` timestamp refresh, the one authorized command ran from a new
+clean detached checkout at that exact evidence commit. No commit occurred between grant and
+execution.
+
+The strict selector used source `NETSCRIPT_E2E_BROWSER_EXECUTABLE`, exact path
+`/home/codex/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome`, and version
+`Google Chrome for Testing 151.0.7922.34`. The suite reports **69 passed / 1 failed / 0 skipped**.
+The sole red is `behavior.service-client-refetch`: its child exited 143 after the suite-owned
+900,030 ms command boundary with empty stdout/stderr tails. `generated.service-client-contract`,
+`generated.deno-fmt-check`, and suite cleanup remain green. No retry occurred, and `fresh-browser`
+is NOT_RUN with no receipt.
+
+Pretty output, complete suite NDJSON, and the selector result are hashed in
+`reports/s5-attempt6-runtime-failure.md`. Mandatory cleanup found and terminated three run-owned
+Aspire NuGet search children using TERM+CONT. The D-18 scan then found one unreadable Postgres data
+directory; the complete generated project and its suite log were moved recoverably to
+`/tmp/netscript-s5-a6-quarantine-20260815-4M9v8k/`. The final audit is empty: leak-check Aspire and
+Docker probes are `ok`, survivors are `[]`, Aspire and Docker inventories are empty, run-owned
+processes/listeners are empty, and both leaf and detached `.llm/tmp` unreadable scans exit 0 with no
+findings. The leaf relinquishes lease use only after that proof; central release is coordinator-owned.
+
+No source/test, second runtime, browser gate, evaluator, readiness, metadata, lockfile,
+documentation, or deletion occurred. Attempt 6 and every prior red remain append-only.
