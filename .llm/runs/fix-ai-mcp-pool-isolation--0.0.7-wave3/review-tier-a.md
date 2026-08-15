@@ -258,3 +258,83 @@ Cycle-1's `FAIL_FIX` stands as the record of what was wrong; this re-review cert
 repair. A fresh formal **IMPL-EVAL cycle 2** is mandatory and is requested next — this reviewer has
 now missed a blocking defect on this leaf once, so its `PASS` is an input to that gate, not a
 substitute for it.
+
+---
+
+# Tier-A — the O-3 / `check-test` repair delta
+
+Reviewed head `45aca4adcd35dd6a9b825db449284e400171a533`. Repair base `4766b258f`.
+
+## Verdict
+
+**PASS_TO_IMPL_EVAL** — bounded to this repair delta. This is a **post-IMPL-EVAL product mutation**,
+so a proportionate fresh formal evaluation of the delta follows and is requested next.
+
+## What went wrong, and why my earlier gates could not catch it
+
+CI's `check-test` was a **current failure** (`currentFailures=1`): 4151 passed / **1 failed**, the
+sole failure being `root-level scaffold runtime imports resolve in both package-source modes`
+(`workspace-mutator_test.ts:261`) — *expected @netscript/ai to compute the @tanstack/ai-mcp runtime
+specifier*.
+
+That assertion (`:306-320`) scans the **connector's source text** for `[…].join('')` and requires
+**both** `@tanstack/ai-mcp` and `@tanstack/ai-mcp/stdio` to be computed, keeping optional MCP out of
+the static JSR import graph so generated projects own runtime resolution.
+
+Two failures on my side, recorded because the pattern matters more than the instance:
+
+1. I accepted cycle 1's **O-3** as bookkeeping, even though the evaluator noted the change was "not
+   named in either ruling". That should have prompted *then why is it asserted elsewhere?*
+2. My Tier-A gate set covered the packages the delta **touched**. The assertion lives in
+   **`packages/cli`**, which the delta does not touch but which asserts on `packages/ai`'s source
+   text. Package-scoped gates were structurally incapable of catching it.
+
+## The repair
+
+One product file, faithful to base `284dda90a`:
+
+```diff
++const TANSTACK_MCP_SPECIFIER = ['@tanstack', '/ai-mcp'].join('');
++const TANSTACK_MCP_STDIO_SPECIFIER = ['@tanstack', '/ai-mcp/stdio'].join('');
+-    const mcp = await import('@tanstack/ai-mcp');
++    const mcp = await import(TANSTACK_MCP_SPECIFIER);
+-    const stdio = await import('@tanstack/ai-mcp/stdio');
++    const stdio = await import(TANSTACK_MCP_STDIO_SPECIFIER);
+```
+
+Both constants restored and used at all three dynamic-import sites. **The CLI test was not
+weakened** — `packages/cli` source, `packages/fresh`, `deno.lock` and `packages/ai/deno.json`
+`exports` are all untouched. The O-3 drift entry is corrected to record this as a real cross-package
+regression rather than a publish-graph note.
+
+## Gates — widened to close the gap that let this through
+
+| Gate | Result |
+| --- | --- |
+| **Repo-wide `deno task test`** | exit 0 — **4152 passed / 0 failed / 19 ignored** (CI's failing run: 4151 / **1**) |
+| The previously failing CLI test | exit 0 — **19 passed / 0 failed** |
+| **`packages/cli` check** (the asserting package, previously omitted) | 883 files, **0 failed batches** |
+| `packages/ai` check | 98 files, 0 failed |
+| `packages/fresh` check | 197 files, 0 failed |
+| `deno task quality:scan` | `ok`, **0 findings** |
+| `deno task arch:check` | exit 0 |
+| `doc:lint --root packages/ai` | 0 errors / 0 private-type refs / 0 missing JSDoc |
+| **`deno publish --dry-run`** — the invariant the computed form exists to protect | **Success** |
+| `docker ps -a` | empty — no expensive gate ran |
+
+The repo-wide suite is the one that matters here: it is the gate CI failed on, and it is the gate my
+earlier package-scoped selection omitted. **Rule now standing for this lane:** when a change alters a
+package's *source text* in a way another package may assert on — specifier construction, export
+shape, generated-artifact content — run the repo-wide suite or gate the asserting package explicitly.
+
+## Unchanged by this delta
+
+Everything the cycle-2 `PASS` certified stands: the ten-file contract, Rulings 2/5/6, the F-1
+registration/call lifetime separation, and the nine live acceptance criteria. This delta restores a
+packaging invariant and changes no runtime behaviour of the MCP pool.
+
+## Standing stops
+
+1. A **proportionate fresh formal evaluation of this delta** is required and is requested next.
+2. Merge, readiness, relabel and issue closure remain coordinator-only. The PR is non-draft; I have
+   changed no label, box, or draft state.
