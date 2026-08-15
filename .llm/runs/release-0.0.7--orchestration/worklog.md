@@ -103,3 +103,19 @@
   that exact container, empty Aspire network, and anonymous volume. `aspire ps` and `docker ps -a`
   are empty. A single clean retry is authorized on the original Codex thread under the same global
   lease; partial attempt-1 output is not acceptance evidence.
+
+## 2026-08-15T05:06:31Z — #1653 shipped, #1654 runtime terminal, next internals leaf active
+
+- #1653 IMPL-EVAL cycle 2 recorded `PASS` at evaluator commit `70177e808`; direct evidence mapping
+  was exact 9/9 and 5/5 with zero errors/warnings. The coordinator reconciled the PR body, applied
+  attributed `impl-eval:skip`, moved to `status:ready-merge`, and the live mirror checked all issue
+  acceptance boxes. Current-head check-test, quality, close-gate, code-quality, visibility, and
+  zero-thread review gates passed before squash merge `473e8d75b`. #1378 and #1545 closed
+  `COMPLETED`; PR and issues now carry `status:shipped`.
+- Internals serial work continued immediately with frozen Wave-1 leaf
+  `quality-scan-root-coverage` (#1542), whose #1378 dependency is now satisfied. Its Opus 5/high
+  topic supervisor is bootstrapping research/plan through one Codex leaf thread; the sibling
+  OpenHands leaf remains queued rather than concurrent inside the topic.
+- #1654 retry 2 reached terminal `suite-end`: raw exit 0, 89 passed, 0 failed, 0 skipped, 602,896 ms.
+  Committed receipts at head `0b2cf5e7c` prove empty Aspire/Docker/network/volume state and zero leak
+  survivors. The fixes supervisor is independently executing Tier-A; no IMPL-EVAL has been granted.

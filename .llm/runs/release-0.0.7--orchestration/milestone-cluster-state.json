@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
-  "currentMainSha": "0b3ed5d5a6aea451318f120988c25dfa3993a2ab",
+  "currentMainSha": "473e8d75b5281c93dc4729d99f3358a34f2bd687",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -475,21 +475,28 @@
     {
       "id": "quality-scan-allowance-rail",
       "lane": "internals",
-      "phase": "evaluating",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "09dfb092dccf7f843b9270295047d674a8187362",
-      "currentPrHeadSha": "84bbcf9a185a1bc29072f1feecc1b7d08f3f18b2",
+      "currentPrHeadSha": "70177e80821a916c83ffa72041c6bb24bbb6ccc8",
       "evaluatorCommitSha": "c694cfb311d378f4796280649042c8c275c828ed",
       "evaluationVerdict": "PASS",
-      "implementationEvaluationVerdict": "FAIL_FIX_ADDRESSED",
+      "implementationEvaluationVerdict": "PASS",
       "implementationEvaluationCycle": 2,
       "implementationEvaluatorAgentId": "31c4cfa9-6610-4813-a4d2-482080fc562e",
+      "implementationEvaluatorCommitSha": "70177e80821a916c83ffa72041c6bb24bbb6ccc8",
+      "mergeCommitSha": "473e8d75b5281c93dc4729d99f3358a34f2bd687",
+      "mergedAt": "2026-08-15T05:04:49.000Z",
       "issueNumbers": [1378, 1545],
       "implementerAgentId": "019ffcc9-97d6-7602-bb7d-582ecc92b069",
       "evaluatorAgentId": "b6c48f02-cb56-4dae-abfd-e46bdec05bd5",
       "branch": "chore/quality-scan-allowance-rail",
       "worktree": "/home/codex/repos/netscript-007-quality-rail",
-      "receiptRefs": []
+      "receiptRefs": [
+        ".llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/receipts/slice-4/check-binding.json",
+        ".llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/receipts/slice-4/test-binding.json",
+        ".llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/receipts/slice-4/quality-job.json"
+      ]
     },
     {
       "id": "harness-evidence-and-verdict-tooling",
@@ -537,7 +544,7 @@
       "phase": "gating",
       "baseBranch": "main",
       "headSha": "5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5",
-      "currentPrHeadSha": "ebad68c80bc9079ba835901eb2245a1a31ab7b62",
+      "currentPrHeadSha": "0b2cf5e7c85a8194c77f1a08364b8a5879d7b393",
       "evaluatorCommitSha": "b8fc5eb53a530d337602f7dc377239651a57d428",
       "evaluationCycle": 2,
       "evaluationVerdict": "PASS",
@@ -553,10 +560,24 @@
       "evaluatorAgentId": "06451c1e-a9b8-47d2-8934-be2247ef5347",
       "branch": "fix/scaffold-generated-output-correctness",
       "worktree": "/home/codex/repos/netscript-007-leaf-scaffold-generated-output-correctness",
-      "receiptRefs": [],
+      "receiptRefs": [
+        ".llm/runs/fix-scaffold-generated-output-correctness--0.0.7-wave0/receipts/scaffold-runtime.json",
+        ".llm/runs/fix-scaffold-generated-output-correctness--0.0.7-wave0/receipts/leak-check.json"
+      ],
       "runtimeGate": {
         "attempt": 2,
-        "state": "retry_authorized",
+        "state": "pass_cleanup_verified",
+        "outcome": "PASS",
+        "rawExitCode": 0,
+        "passed": 89,
+        "failed": 0,
+        "skipped": 0,
+        "durationMs": 602896,
+        "suiteEndedAt": "2026-08-15T04:53:51.303Z",
+        "cleanupVerifiedAt": "2026-08-15T04:55:26.483Z",
+        "aspirePostcondition": "empty",
+        "dockerPostcondition": "empty",
+        "leakSurvivors": 0,
         "attempt1": {
           "state": "interrupted_no_verdict",
           "lastCompletedGate": "database.migration-artifacts",
@@ -827,7 +848,7 @@
     },
     {
       "id": "quality-scan-allowance-rail-impl-eval-cycle-2",
-      "state": "running",
+      "state": "complete",
       "lane": "internals",
       "leafId": "quality-scan-allowance-rail",
       "phase": "impl-eval",
@@ -845,13 +866,16 @@
         "remoteControlRequired": true
       },
       "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-15T04:38:08.778Z"
+      "grantedAt": "2026-08-15T04:38:08.778Z",
+      "completedAt": "2026-08-15T04:54:02.899Z",
+      "verdict": "PASS",
+      "evaluatorCommitSha": "70177e80821a916c83ffa72041c6bb24bbb6ccc8"
     }
   ],
   "expensiveGates": [
     {
       "id": "scaffold-generated-output-correctness-runtime",
-      "state": "running",
+      "state": "complete",
       "lane": "fixes",
       "leafId": "scaffold-generated-output-correctness",
       "gateId": "scaffold.runtime",
@@ -861,6 +885,12 @@
       "scope": "one isolated scaffold.runtime verdict covering issues 1262, 1263, and 1588; Aspire/Docker cleanup mandatory",
       "attempt": 2,
       "retryGrantedAt": "2026-08-15T04:38:12.147Z",
+      "completedAt": "2026-08-15T04:55:26.483Z",
+      "verdict": "PASS",
+      "receiptRefs": [
+        ".llm/runs/fix-scaffold-generated-output-correctness--0.0.7-wave0/receipts/scaffold-runtime.json",
+        ".llm/runs/fix-scaffold-generated-output-correctness--0.0.7-wave0/receipts/leak-check.json"
+      ],
       "attempt1": {
         "state": "interrupted_no_verdict",
         "lastCompletedGate": "database.migration-artifacts",
@@ -908,5 +938,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T04:48:32.669Z"
+  "updatedAt": "2026-08-15T05:06:31.873Z"
 }

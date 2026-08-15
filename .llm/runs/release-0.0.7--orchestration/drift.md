@@ -95,3 +95,19 @@ implementation thread.
   are already ancestors of `5191de83`, so the stale surface is the public comment bodies rather than
   the S2 pin. Recompute and replace both comments against `5191de83`; do not invent a later product
   ref or open another PLAN-EVAL for this evidence/publication correction.
+
+## 2026-08-15T05:06:31Z — terminal runtime evidence and receipt-route gap
+
+- **Operational / terminal:** #1654 retry 2 reached one suite-owned terminal `suite-end` from the
+  unchanged approved command: raw exit 0, 89 passed, 0 failed, 0 skipped. Exact postflight cleanup
+  proves no AppHost, container (including stopped), custom network, volume, or leak survivor. The
+  shared expensive-gate lease is complete rather than merely released on process exit.
+- **Tooling gap / fail-closed:** `scaffold.runtime` has no allowlisted `run-gate.ts` catalog route
+  and `e2e:cli` has no standalone report flag. The author correctly refused to edit the catalog,
+  alter the fixed command, or fabricate a child receipt. This run preserves the suite-owned NDJSON
+  terminal record plus raw exit/head/timing in a committed receipt, exactly as its approved plan
+  allowed; the general durable-receipt gap still requires explicit tooling ownership before a later
+  milestone treats post-hoc transcription as the default.
+- **Lifecycle / next queue:** #1653 merged only after cycle-2 `PASS`, direct acceptance validation,
+  current-head CI, close-gate, and zero review threads. Its issues and PR carry `status:shipped`.
+  Internals immediately advanced #1542; serialization remains per topic, not across the cluster.

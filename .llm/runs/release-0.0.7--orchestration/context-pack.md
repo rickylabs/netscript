@@ -72,11 +72,13 @@ fixes #1654 repaired Tier-A finding T-1 at `ebad68c80`, and now holds the single
 terminal results and subsequent merge-readiness decisions. A supervisor's parked checkpoint is
 never itself a reason to yield.
 
-Resume from the authoritative `2026-08-15T04:48:32Z` checkpoint, not the stale paragraph above.
-#1653's cycle-1 editorial finding is addressed and cycle 2 is live in evaluator `31c4cfa9-…` at
-`84bbcf9a1`. #1654 attempt 1 was interrupted at `database.generate` with no verdict; its exact
-Aspire/Docker residue, network, and Garnet volume were removed and the one retry is authorized under
-the still-exclusive lease. #1652 must first rewrite issue comments `5265826161` and `5265971722` in
+Resume from the authoritative `2026-08-15T05:06:31Z` checkpoint, not the stale paragraph above.
+#1653 cycle 2 passed at `70177e808`; current-head CI and close-gate passed, it merged as
+`473e8d75b`, and #1378/#1545 closed `COMPLETED` with terminal labels. Internals has advanced its next
+serial leaf, `quality-scan-root-coverage` (#1542), to harness bootstrap/research/plan. #1654's clean
+retry reached one terminal `suite-end`, 89/0/0, and cleanup receipt proves empty Aspire, Docker,
+custom-network, volume, and leak-survivor state; head `0b2cf5e7c` is in Tier-A review and the shared
+lease is complete. #1652 must first rewrite issue comments `5265826161` and `5265971722` in
 place from authoritative EIS-Chat `5191de83`, with recalculated feature/effort estimates. The
 comments predate the material route improvements already contained in that pin; no newer product
 head exists, and `834a2b36` differs only by harness evidence. #1651 is
