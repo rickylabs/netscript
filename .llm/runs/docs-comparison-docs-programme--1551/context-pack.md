@@ -122,3 +122,21 @@ Commit and explicitly push the merge-readiness record cleanup, replace the bad d
 cleanup comment. Then stop for topic-orchestrator Tier-A verification. Keep the PR draft at
 `status:impl`, preserve `Part of #1551`, and make no readiness disposition, further evaluation, or
 other checkbox change. Keep `/home/codex/repos/eis-chat-007-input` strictly read-only.
+
+## CI readiness repair — agent docs corpus freshness
+
+PR #1652 head `c8e3f26d85c201827812e8292adb668d88b9c19d` failed only CI run `31869720549`,
+job `94976401345`, step **Agent docs corpus freshness**. The stale checked-in corpus predated this
+leaf's five rendered comparison/migration pages. `deno task gen:agent-docs-prose` regenerated only
+`.llm/assets/agent-docs/prose.json.gz` and `.llm/assets/agent-docs/provenance.json`; its docs-site
+build left no tracked source change.
+
+The new provenance source is `c8e3f26d8`, with SHA-256
+`6f25560210cae276a3a5149e7315b1e9682406acdfe342cadbe1c7f35c629efb`. The durable
+`agent-docs-prose` gate passed at raw exit `0`; receipt:
+`.llm/tmp/gate-receipts/docs-comparison-docs-programme--1551/agent-docs-prose.json`. Site verify,
+docs links, docs accuracy, diff hygiene, and lock hygiene also returned raw exit `0`.
+
+Next authorized action is the single generated-asset commit, explicit-refspec push, and one
+structured PR comment, then stop for topic-orchestrator Tier-A verification. Preserve the externally
+set `draft: false` / `status:impl-eval` state and make no PR, issue, evidence, pin, or content change.

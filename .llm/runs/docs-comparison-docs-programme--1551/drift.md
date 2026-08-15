@@ -223,3 +223,18 @@ cmp .llm/tmp/session-measurements-repro.json docs/site/comparisons/evidence/sess
 `cmp` returned raw exit `0`, proving byte-identical fixed-timestamp regeneration. Current records
 and the PR body use that checkable receipt instead of either normalized digest. No manifest,
 measurement, tool, test, product/docs content, consumer pin, or private input changed.
+
+## 2026-08-15 — agent docs prose bundle was stale after the docs slices
+
+**Severity:** minor; resolved pending Tier-A verification; no rescope and no scope growth.
+
+CI run `31869720549`, job `94976401345`, exposed that the checked-in agent-docs prose bundle still
+recorded source commit `6f9620c0c` and therefore omitted the five rendered comparison/migration
+pages landed by this leaf. Local `deno task check:agent-docs-prose` reproduced the failure at raw
+exit `1`, naming only `prose.json.gz` and `provenance.json` as stale.
+
+The canonical generator returned raw exit `0` and changed only those two authorized generated
+assets. The file-list delta is exactly the five expected pages, with no removals or unexpected
+additions. The durable `agent-docs-prose` gate then returned raw exit `0`; receipt
+`.llm/tmp/gate-receipts/docs-comparison-docs-programme--1551/agent-docs-prose.json`. This is a stale
+generated-asset repair, not a content, evidence, plan, pin, or acceptance change.

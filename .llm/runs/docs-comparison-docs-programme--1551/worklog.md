@@ -245,3 +245,41 @@ after the draft-PR handoff for topic-orchestrator Tier-A review; do not launch I
 No canonical #1551 comment, evidence file, product/docs content, pin, label, milestone, issue state,
 draft state, or readiness disposition changed. Stop after the single cleanup commit, explicit push,
 PR-body correction, and structured PR comment for topic-orchestrator Tier-A verification.
+
+### CI readiness repair — agent docs corpus freshness
+
+CI run `31869720549`, job `94976401345`, failed only the `quality` step **Agent docs corpus
+freshness**. Local reproduction with `deno task check:agent-docs-prose` returned raw exit `1` and
+`{"fresh":false,"stalePaths":["prose.json.gz","provenance.json"]}`. The canonical
+`deno task gen:agent-docs-prose` generator returned raw exit `0`.
+
+The regenerated corpus adds exactly the five expected rendered pages and removes none:
+
+- `pages/comparisons/index.md`
+- `pages/comparisons/methodology/index.md`
+- `pages/comparisons/nextjs-session/index.md`
+- `pages/migration/index.md`
+- `pages/migration/nextjs/index.md`
+
+| Asset | Before | After |
+| --- | ---: | ---: |
+| `.llm/assets/agent-docs/prose.json.gz` | 1,352,808 bytes | 1,372,269 bytes |
+| `.llm/assets/agent-docs/provenance.json` | 8,857 bytes | 9,057 bytes |
+
+New provenance records source commit `c8e3f26d8`, extraction timestamp
+`2026-08-15T06:37:52.605Z`, 183 files, 4,783,855 uncompressed bytes, 1,372,269 compressed bytes,
+and SHA-256 `6f25560210cae276a3a5149e7315b1e9682406acdfe342cadbe1c7f35c629efb`.
+
+| Gate | Command / evidence | Result | Finding |
+| --- | --- | --- | --- |
+| Durable corpus freshness | `deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/gates/run-gate.ts --gate agent-docs-prose --id docs-comparison-1551-agent-docs-prose --output .llm/tmp/gate-receipts/docs-comparison-docs-programme--1551/agent-docs-prose.json` | PASS / raw exit `0` | receipt `.llm/tmp/gate-receipts/docs-comparison-docs-programme--1551/agent-docs-prose.json` attests immutable head `c8e3f26d85c201827812e8292adb668d88b9c19d` and `fresh:true` |
+| Site verification | `rtk proxy deno task --cwd docs/site verify` | PASS / raw exit `0` | 644 generated files, 229 rendered pages, 36,084 internal links, and 18 caveat markers verified |
+| Docs links | `rtk proxy deno task docs:links` | PASS / raw exit `0` | 103 docs; no broken links, anchors, or orphans |
+| Docs accuracy | `rtk proxy deno task docs:accuracy` | PASS / raw exit `0` | 201 published source pages and 183 shipped corpus files; existing peer warning remains non-blocking |
+| Diff hygiene | `git diff --check` | PASS / raw exit `0` | no whitespace errors before run-artifact updates |
+| Lock hygiene | `git diff --exit-code origin/main -- deno.lock docs/site/deno.lock` | PASS / raw exit `0` | both lockfiles unchanged |
+| Source preservation | tracked changed-path enumeration after generation | PASS | only the two authorized generated assets changed before these append-only run-artifact updates; `_site` regeneration changed no tracked source |
+
+Final slice scope is the two generated assets plus append-only updates to `worklog.md`,
+`context-pack.md`, and `drift.md`. No evaluated docs page, evidence input, product path, lockfile,
+consumer pin, canonical comment, or PR/issue metadata changed.
