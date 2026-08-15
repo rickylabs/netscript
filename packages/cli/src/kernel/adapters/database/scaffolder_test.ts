@@ -48,6 +48,7 @@ describe('DatabaseScaffolder', () => {
       '/project/database/mysql/schema/zod-generator.config.json',
     );
     const schema = await fs.readFile('/project/database/mysql/schema/schema.prisma');
+    const seed = await fs.readFile('/project/database/mysql/scripts/seed.ts');
 
     assertStringIncludes(
       generateZod,
@@ -98,6 +99,8 @@ describe('DatabaseScaffolder', () => {
     assertStringIncludes(schemaZodConfig, '"emit": {');
     assertStringIncludes(schema, 'model Product {');
     assertStringIncludes(schema, 'id        Int      @id @default(autoincrement())');
+    assertStringIncludes(seed, 'const existing = await client.product.findFirst(');
+    assertStringIncludes(seed, 'await client.product.create({');
   });
 
   it('derives unique container database names for added engines', async () => {
@@ -117,6 +120,7 @@ describe('DatabaseScaffolder', () => {
       configKey: 'mysql',
       importMode: 'jsr',
     });
+    const defaultSeed = await fs.readFile('/project/database/mysql/scripts/seed.ts');
     const mssql = await databaseScaffolder.scaffold({
       projectName: 'alpha-app',
       targetPath: '/project',
@@ -128,5 +132,6 @@ describe('DatabaseScaffolder', () => {
 
     assertStringIncludes(mysql.databaseName, 'alpha-app-mysql-db');
     assertStringIncludes(mssql.databaseName, 'alpha-app-mssql-db');
+    assertStringIncludes(defaultSeed, 'client.exampleRecord.findFirst(');
   });
 });

@@ -1,9 +1,10 @@
-import { assertEquals, assertStringIncludes } from '@std/assert';
+import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import {
   compareDatabaseEndpointPorts,
   correlateUsersTelemetry,
   matchesDatabaseHealthContract,
   pollUsersTelemetryCorrelation,
+  verifyGeneratedCrudAcceptance,
 } from '../../../src/application/gates/scaffold/verify-live-db-endpoint.ts';
 
 const realHealthResponse = await Deno.readTextFile(
@@ -97,3 +98,80 @@ Deno.test('users telemetry correlation polls until logs and traces converge', as
 
   assertEquals(receipt, { traceId: 'shared-trace', attempts: 3 });
 });
+
+Deno.test('generated CRUD acceptance checks seed, defined missing rows, and OpenAPI 404s', async () => {
+  const requests: Array<{ readonly method: string; readonly url: string }> = [];
+  const receipt = await verifyGeneratedCrudAcceptance(
+    'http://127.0.0.1:43100',
+    (input, init) => {
+      const request = new Request(input, init);
+      requests.push({ method: request.method, url: request.url });
+      const url = new URL(request.url);
+
+      if (url.pathname === '/api/users') {
+        return Promise.resolve(jsonResponse({
+          data: [{ id: 1, name: 'Seed User' }],
+          pagination: { page: 1, limit: 100, total: 1 },
+        }));
+      }
+      if (url.pathname === '/api/openapi.json') {
+        return Promise.resolve(jsonResponse(openApiDocument()));
+      }
+      return Promise.resolve(jsonResponse({ code: 'NOT_FOUND' }, 404));
+    },
+  );
+
+  assertEquals(receipt, {
+    representativeId: 1,
+    missingId: 2_147_483_647,
+    projected404Methods: ['get', 'patch', 'delete'],
+  });
+  assertEquals(requests, [
+    { method: 'GET', url: 'http://127.0.0.1:43100/api/users?page=1&limit=100' },
+    { method: 'GET', url: 'http://127.0.0.1:43100/api/openapi.json' },
+    { method: 'GET', url: 'http://127.0.0.1:43100/api/users/2147483647' },
+    { method: 'PATCH', url: 'http://127.0.0.1:43100/api/users/2147483647' },
+    { method: 'DELETE', url: 'http://127.0.0.1:43100/api/users/2147483647' },
+  ]);
+});
+
+Deno.test('generated CRUD acceptance rejects a missing OpenAPI 404 projection', async () => {
+  const document = openApiDocument(false);
+  await assertRejects(
+    () =>
+      verifyGeneratedCrudAcceptance('http://127.0.0.1:43100', (input, init) => {
+        const request = new Request(input, init);
+        const url = new URL(request.url);
+        if (url.pathname === '/api/users') {
+          return Promise.resolve(jsonResponse({ data: [{ id: 1, name: 'Seed User' }] }));
+        }
+        if (url.pathname === '/api/openapi.json') {
+          return Promise.resolve(jsonResponse(document));
+        }
+        return Promise.resolve(jsonResponse({ code: 'NOT_FOUND' }, 404));
+      }),
+    Error,
+    'PATCH /users/{id} omitted 404',
+  );
+});
+
+function openApiDocument(includePatch404 = true) {
+  return {
+    paths: {
+      '/users/{id}': {
+        get: { responses: { '200': {}, '404': {} } },
+        patch: {
+          responses: includePatch404 ? { '200': {}, '404': {} } : { '200': {} },
+        },
+        delete: { responses: { '200': {}, '404': {} } },
+      },
+    },
+  };
+}
+
+function jsonResponse(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'content-type': 'application/json' },
+  });
+}
