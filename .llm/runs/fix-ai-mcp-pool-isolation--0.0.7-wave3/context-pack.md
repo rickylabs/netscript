@@ -170,3 +170,14 @@ amendment.
   mechanical after the exact ten-file surface and behavioral contracts were specified.
 - Implementation-agent work is complete. Stop for topic-orchestrator Tier-A review/sign-off; the
   opposite-family IMPL-EVAL remains evaluator-owned and has not been launched here.
+
+## 2026-08-15 — IMPL-EVAL cycle 1 (separate session, append-only)
+
+- Evaluator: native Claude `claude-fable-5` · medium · Remote Control
+  `https://claude.ai/code/session_01Kwmr8XjoznnQsHUnkmfcnV` (session
+  `cb917802-ee26-4b89-86b9-0eee33c7de1b`, PID 520689). Canonical `formal_impl_evaluation` lane.
+- Evaluated head `e3c74d7aaf3b7734b5a44a5be248c01f004c21e5` (local = origin = PR head).
+- Verdict: **`FAIL_FIX`** — see `evaluate.md`. One blocking finding (F-1): registration signal is
+  bound to every later registered tool call; README pattern fails after its own startup deadline.
+  Contract, rulings 2/5/6, cross-package Fresh check, and all cheap gates re-verified green.
+- Next: F-1 RED→GREEN slice inside the authorized surface, then IMPL-EVAL cycle 2. PR stays draft.
