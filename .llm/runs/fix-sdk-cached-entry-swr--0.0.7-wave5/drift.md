@@ -72,3 +72,28 @@ Drift is append-only.
   required before implementation.
 - **Evidence:** `research.md` findings 11-15; `plan.md` S2 and validation row 8; `worklog.md`
   plan-amendment evidence.
+
+## 2026-08-15 — Tier-A requires a page-level tutorial contract
+
+- **What:** the amended scope committed only to replacing tutorial line 100, while S2 required the
+  page as a whole to distinguish SWR policy execution from the pure KV read.
+- **Source:** Tier-A T-1 on plan head `eadd672d0`.
+- **Expected:** the implementation boundary should state exactly how the authorized tutorial stops
+  implying that its demonstrated `getCachedEntry()` loader revalidates.
+- **Actual:** lines 13, 15, 75, 76, and 80 accurately describe factory-level SWR, but their pairing
+  with the pure-read-only loader at line 107 creates the false page-level implication even if line
+  100 is corrected in isolation.
+- **Severity:** significant
+- **Action:** resolved in the plan — retain lines 13, 15, 75, and 76 with explicit nearby text that
+  assigns SWR to the callable procedure action; correct lines 32, 80, 94, 100, and 107; make the
+  loader demonstrate action-then-metadata composition; retain the accurate services-SDK line 138
+  and correct its line-188 loader.
+- **Verification:** the exact-two-page sweep accounts for every same-class result in the plan's
+  published-claim table. The site-wide sweep also checked
+  `docs/site/tutorials/live-dashboard/04-definePage-QueryIsland.md:231`: its
+  `.withPolicy('balanced')` statement describes a distinct policy mechanism, is plausibly true,
+  and remains out of scope and unedited. No third docs source was added.
+- **Resolution:** plan ambiguity repaired; fresh Tier-A and separate PLAN-EVAL remain required
+  before implementation.
+- **Evidence:** `plan.md` published-claim dispositions and S2 page-level acceptance;
+  `research.md` finding 14 and executed docs claim sweep; `worklog.md` plan-repair entry.

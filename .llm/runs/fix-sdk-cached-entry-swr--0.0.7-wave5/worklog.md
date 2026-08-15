@@ -60,7 +60,7 @@
 | # | Slice                                                                                                                               | Gate                                                                             | Files                                                                                                                                                                                             |
 | - | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1 | Policy-aware, persistence-complete single-flight plus overlapping SWR regression                                                    | Focused structured cache tests; targeted wrappers; `quality:gate`                | `packages/sdk/src/cache/cache-query.ts`, `packages/sdk/tests/cache/cache-query_test.ts`, run artifacts                                                                                            |
-| 2 | Truthful blocking loader example, pure-read tutorial correction, executable factory regression, and ordered four-file asset cascade | Focused factory test; docs format/accuracy; three cascade checks; JSR/root gates | `packages/sdk/tests/query/query-factory_test.ts`, `docs/site/services-sdk/sdk.md`, `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md`, four declared generated files, run artifacts |
+| 2 | Truthful blocking loader example, page-level tutorial action/read distinction, executable factory regression, and ordered four-file asset cascade | Focused factory test; docs format/accuracy; three cascade checks; JSR/root gates | `packages/sdk/tests/query/query-factory_test.ts`, `docs/site/services-sdk/sdk.md`, `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md`, four declared generated files, run artifacts |
 
 ### Deferred Scope
 
@@ -82,6 +82,7 @@ action in `src/query/query-factory.ts` into `src/cache/cache-query.ts`, and add 
 | ---------- | -------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-08-15 | Plan           | Research and design      | Re-baselined at `3e8e146a4`; no product code changed. Hard stop pending topic-orchestrator PLAN-EVAL PASS.                                                                         |
 | 2026-08-15 | Plan amendment | Coordinator scope ruling | Added exactly the live-dashboard chapter-3 source; swept surrounding docs; executed the ordered generation chain with no undeclared tracked path; no product/docs content changed. |
+| 2026-08-15 | Plan repair    | Tier-A T-1               | Reconciled tutorial scope with S2 using explicit dispositions for every same-class line; re-ran the exact-two-page and site-wide sweeps; no product/docs content changed.          |
 
 ## Decisions
 
@@ -98,6 +99,7 @@ action in `src/query/query-factory.ts` into `src/cache/cache-query.ts`, and add 
 | Two frozen contract paths do not exist; `_site` target is generated                                      | significant | yes                |
 | Brief's six-diagnostic wording was the sum of two expected-red three-diagnostic invocations              | significant | yes                |
 | Adjacent false tutorial prose was outside frozen surface; coordinator authorized exactly that one source | significant | yes                |
+| Tier-A found line-100-only scope inconsistent with the page-level S2 acceptance commitment               | significant | yes                |
 
 ## Gate Results
 
@@ -110,7 +112,7 @@ action in `src/query/query-factory.ts` into `src/cache/cache-query.ts`, and add 
 | JSR audit                 | `audit-jsr-package.ts --root packages/sdk --text`                                               | PASS with 2 warnings (exit 0) | Known F-DOCT-5 13-child warning; F-JSR-7 banner parser warning, raw dry-run authoritative.                                                         |
 | Combined SDK doc lint     | explicit 12-entrypoint `deno doc --lint`                                                        | EXPECTED RED (exit 1)         | Exactly three named diagnostics; zero new allowed; never reported green.                                                                           |
 | Cache-entrypoint doc lint | `deno doc --lint ./src/cache/mod.ts` from `packages/sdk`                                        | EXPECTED RED (exit 1)         | Exactly three named `KvCacheStore` diagnostics; zero new allowed; never reported green.                                                            |
-| Docs claim sweep          | two authorized pages + `docs/site/tutorials/live-dashboard` and site-wide source `rg`           | PASS (inspection)             | False direct assignments occur only at `services-sdk/sdk.md:188` and chapter 3 line 100; no third page found.                                      |
+| Docs claim sweep          | exact two authorized pages, surrounding tutorial story, and site-wide source `rg`                  | PASS (inspection)             | All same-class authorized-page results have per-line dispositions; chapter 4 line 231 is checked-and-cleared `withPolicy` prose, out of scope.     |
 | Generated mirror coverage | `gen:agent-docs-prose` → `gen:assets-barrel` → `gen:publish-assets`; provenance `rg`; Git delta | PASS (exit 0 each)            | Both authorized pages are provenance inputs; clean synchronized content produced zero tracked deltas and no path beyond the four declared mirrors. |
 
 ### Static / Fitness / Runtime / Consumer Gates
@@ -121,7 +123,8 @@ PLAN-EVAL returns `PASS`. Aspire, Docker, and `e2e:cli` are explicitly prohibite
 ## Handoff Notes
 
 - PLAN-EVAL should inspect the option-1 rationale, policy-aware single-flight design, overlapping
-  test synchronization, exactly-two-page docs scope, derived cascade evidence, and split 3+3
-  expected-red doc-lint baselines first.
+  test synchronization, exactly-two-page docs scope, the tutorial's per-line dispositions and
+  page-level acceptance sentence, derived cascade evidence, and split 3+3 expected-red doc-lint
+  baselines first.
 - Do not infer approval from this plan or draft PR. Wait for explicit topic-orchestrator
   confirmation of PLAN-EVAL PASS.

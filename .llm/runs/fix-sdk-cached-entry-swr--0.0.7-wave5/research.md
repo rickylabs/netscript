@@ -24,24 +24,32 @@
 | 8  | Background revalidation bypasses `inflightRequests`: `revalidateInBackground()` calls `queryFn()` and `store.set()` directly. Two stale readers that both pass the initial map check can therefore schedule duplicate refreshes.                                                                                                                                                                                                                      | `packages/sdk/src/cache/cache-query.ts:261-313`.                                                                                                                   |
 | 9  | Simply registering the background refresh in the current map is insufficient: the unconditional pre-store map join at lines 140-143 would make a later SWR reader block for fresh data rather than return stale data, and the current foreground map stores only the loader promise rather than the full loader-plus-persistence lifecycle. Policy-aware joining and persistence-complete promises are required.                                      | `packages/sdk/src/cache/cache-query.ts:140-143, 227-258`.                                                                                                          |
 | 10 | `docs/site/web-layer/query-bridge.md` is already accurate: it calls `getCachedEntry()` a read, not a fetch, and identifies the callable action as the SWR/blocking path. This is the source-alignment anchor for the corrected example.                                                                                                                                                                                                               | `docs/site/web-layer/query-bridge.md:157-191`.                                                                                                                     |
-| 11 | `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md:100` contains a second false clause: “the stale entry refreshes in the background” directly follows the `getCachedEntry` warm-read claim. The coordinator authorized this one page and no third docs source. Its correction must say that `getCachedEntry` only returns `{ data, cachedAt }` from warm KV or `null` from cold KV; it does not evaluate staleness or initiate refresh. | Executed docs claim sweep below; page lines 99-108.                                                                                                                |
+| 11 | `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md:100` contains a false direct clause, but correcting that clause alone would leave the page-level implication intact: accurate factory-level SWR claims at lines 13, 15, 75, 76, and 80 are paired with the pure-read-only loader at line 107. The coordinator authorized this one page and no third docs source. The repair must preserve the true callable-action SWR story while making the action/metadata boundary and loader composition explicit. | Executed docs claim sweep below; page lines 13-15, 28-32, 72-107; Tier-A T-1.                                                                                       |
 | 12 | Editing either authorized site source has the same generated cascade: agent-docs prose/provenance, CLI agent-docs barrel, then MCP publish assets. The ordered plan-phase generation run exited 0 for all three tasks and produced no tracked delta or undeclared path because the current content head was already synchronized.                                                                                                                     | `deno task gen:agent-docs-prose`; `deno task gen:assets-barrel`; `deno task gen:publish-assets`; then `git status --short` and `git diff --name-only`, both empty. |
 | 13 | `services-sdk/sdk.md` is a Tier-1 snippet-policy page. The published example also needs a runtime regression because its `comp.tabbedCode` string is not by itself sufficient proof of concurrent behavior.                                                                                                                                                                                                                                           | `.llm/tools/docs/snippet-policy.ts:4-17`; `packages/sdk/tests/query/query-factory_test.ts`.                                                                        |
-| 14 | The two-page plus surrounding-tutorial sweep found no third page that falsely assigns revalidation to `getCachedEntry()`. Broad SWR statements in chapter 3 describe the callable query factory; chapter 4's background-refresh statements are attached to `definePage` layer/client policy, while its `getCachedEntry()` use remains a pure resource read. Those mechanisms are distinct and need no third source edit.                              | Executed docs claim sweep below; adjudicated matches at chapter 3 lines 13-15, 74-80, 94-100, 107-110 and chapter 4 lines 14, 124, 176-195, 231-242.               |
+| 14 | The repaired two-page sweep accounts for every same-class claim: the plan retains tutorial lines 13, 15, 75, and 76 with explicit nearby callable-action scoping; corrects tutorial lines 32, 80, 94, 100, and 107; retains the accurate services-SDK timestamp-decision description at line 138; and corrects its false loader at line 188. Chapter 4 line 231 is a checked-and-cleared third-page claim about `withPolicy('balanced')`, plausibly true of that policy rather than a claim that `getCachedEntry()` refreshes; it remains out of scope and unedited. | Executed docs claim sweep below; `plan.md` published-claim disposition table; chapter 4 lines 231-242. |
 | 15 | Both authorized pages are inputs to the existing agent-docs bundle, so the second source does not authorize a fifth generated mirror.                                                                                                                                                                                                                                                                                                                 | `.llm/assets/agent-docs/provenance.json:127,145` lists `pages/services-sdk/sdk/index.md` and `pages/tutorials/live-dashboard/03-sdk-cache-first-query/index.md`.   |
 
 ## Executed docs claim sweep
 
 ```text
-rtk rg -n -C 4 -i "getCachedEntry|stale.{0,100}(refresh|revalidat)|(?:refresh|revalidat).{0,100}stale|background" docs/site/services-sdk/sdk.md docs/site/tutorials/live-dashboard --glob '*.md'
+rtk rg -n -C 4 -i "getCachedEntry|stale.{0,100}(refresh|revalidat)|(?:refresh|revalidat).{0,100}stale|background" docs/site/services-sdk/sdk.md docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md
+rtk rg -n -C 2 -i "getCachedEntry|stale.{0,100}(refresh|revalidat)|(?:refresh|revalidat).{0,100}stale|background" docs/site/tutorials/live-dashboard --glob '*.md'
 rtk rg -n -i "getCachedEntry|stale.{0,100}(refresh|revalidat)|(?:refresh|revalidat).{0,100}stale" docs/site --glob '*.md' --glob '!_site/**'
 ```
 
-The first command swept both authorized pages plus the surrounding live-dashboard tutorial story;
-the second checked all site source for a third page. The only false direct assignments of refresh to
-`getCachedEntry()` are the authorized service example at line 188 and live-dashboard chapter 3 at
-line 100. Chapter 3's other SWR prose describes the callable factory, and chapter 4's refresh prose
-describes `definePage` layer/client policy. No third docs source qualifies for edit.
+The first command swept exactly the two authorized pages after the disposition table was drafted;
+the second checked the surrounding live-dashboard tutorial story; the third checked all site source
+for another same-class claim. On the authorized pages, the relevant results are fully accounted for
+by `plan.md`: tutorial lines 13, 15, 75, and 76 remain accurate only with the specified nearby
+callable-action scoping; tutorial lines 32, 80, 94, 100, and 107 are corrected; services-SDK line
+138 is accurately scoped to a loader decision; and services-SDK line 188 is corrected. Matches at
+services-SDK lines 35 and 140 are an API inventory and an explicit `prefetch()` mechanism,
+respectively, not same-class claims. No same-class claim on either authorized page remains without
+a disposition. The surrounding-story sweep also surfaced chapter 4 line 231; its
+`withPolicy('balanced')` mechanism is plausibly true and does not assign refresh to
+`getCachedEntry()`, so it is checked-and-cleared, out of scope, and unedited. No third docs source is
+added.
 
 ## Executed generated-mirror verification
 
@@ -80,15 +88,17 @@ This choice is driven by the acceptance contract, not size:
 The choice **does not add published surface**. No `queryEntry()` export, provider method, action
 method, or composite-query method is planned, so no published-surface scope ruling is required.
 
-For the coordinator-authorized tutorial page, the planned replacement is deliberately narrower than
-the surrounding SWR story:
+For the coordinator-authorized tutorial page, the repair preserves the truthful factory-level SWR
+story while removing its misleading association with the demonstrated pure-read loader. The exact
+per-line dispositions are locked in `plan.md`; the direct line-100 replacement is:
 
 > `getCachedEntry` is a pure KV read: on a warm cache it returns `{ data, cachedAt }`; on a cold
 > cache it returns `null`. It does not evaluate staleness or start revalidation; the callable action
 > or page/client policy must do that explicitly.
 
-This preserves the truthful factory-level and page/client refresh mechanisms without inventing one
-inside the fast path.
+Nearby text will identify the callable procedure action as the SWR policy path, and the demonstrated
+loader will call that action before reading metadata. This preserves the truthful factory-level and
+page/client refresh mechanisms without inventing one inside the fast path.
 
 ## Concurrency proof design
 

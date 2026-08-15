@@ -25,13 +25,18 @@ until the topic orchestrator confirms a separate PLAN-EVAL `PASS`.
 - Applied the coordinator's exact one-source expansion for the identical false clause at
   `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md:100`; no third docs source is
   authorized.
+- Repaired Tier-A T-1 with per-line dispositions for the tutorial's accurate factory-level SWR
+  claims, pure-read helper descriptions, false line-100 clause, and line-107 loader. The page-level
+  acceptance now requires an explicit callable-action/metadata-read distinction and demonstrates
+  action-then-metadata composition.
 - Verified `docs/sdk` and `docs/site/_site/capabilities/sdk/index.md` are missing; `_site` is
   generated.
 - Inspected `CacheQuery` with `deno doc` before source reads and traced action/provider behavior.
 - Designed deterministic overlapping SWR and blocking-loader tests.
 - Declared the four-file generated cascade and generation/check order.
-- Executed the two-page and surrounding-tutorial claim sweep: no third page falsely assigns
-  revalidation to `getCachedEntry()`.
+- Re-executed the exact-two-page and site-wide claim sweeps after drafting dispositions: every
+  same-class claim on the authorized pages is accounted for; chapter 4 line 231 is checked and
+  cleared as a distinct `withPolicy('balanced')` claim, with no third source added.
 - Executed `gen:agent-docs-prose` → `gen:assets-barrel` → `gen:publish-assets`; all exited 0, both
   pages are in provenance, and the synchronized content head produced no tracked delta or undeclared
   path.
@@ -40,7 +45,7 @@ until the topic orchestrator confirms a separate PLAN-EVAL `PASS`.
 
 ## In Progress
 
-- Plan-only scope amendment is ready for a fresh Tier-A pass and separate PLAN-EVAL. Product, tests,
+- Plan-only Tier-A repair is ready for a fresh Tier-A pass and separate PLAN-EVAL. Product, tests,
   and docs content remain untouched.
 
 ## Next Steps
@@ -71,7 +76,7 @@ until the topic orchestrator confirms a separate PLAN-EVAL `PASS`.
 | Static        | NOT_RUN for implementation | Prohibited before PLAN-EVAL; research inspection only.                                                                                        |
 | Fitness / JSR | Baseline captured          | Publish dry-run exit 0; audit exit 0 with known warnings; two doc-lint commands remain expected red at exactly 3+3 named diagnostics.         |
 | Runtime       | NOT_RUN                    | Planned deterministic overlapping-reader tests.                                                                                               |
-| Consumer/docs | Plan evidence only         | Claim sweep found no third false page; ordered generation exited 0, both pages are provenance inputs, and no undeclared tracked path changed. |
+| Consumer/docs | Plan evidence only         | Claim sweep accounts for every authorized-page same-class line and adds no third source; ordered generation exited 0, both pages are provenance inputs, and no undeclared tracked path changed. |
 
 ## Open Questions
 
@@ -80,8 +85,8 @@ until the topic orchestrator confirms a separate PLAN-EVAL `PASS`.
 
 ## Drift and Debt
 
-- Drift: missing frozen paths, the now-authorized one-page scope expansion, and the resolved
-  doc-lint brief ambiguity are recorded in `drift.md`.
+- Drift: missing frozen paths, the now-authorized one-page scope expansion, the Tier-A page-level
+  tutorial repair, and the resolved doc-lint brief ambiguity are recorded in `drift.md`.
 - Debt: no new debt planned; known SDK F-DOCT-5 remains out of scope.
 
 ## Commits
