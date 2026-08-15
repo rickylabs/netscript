@@ -522,3 +522,58 @@ All four gates in this leaf's chain are now terminal PASS: PLAN-EVAL (`cd5193b66
 (`9a26c107a`), corpus delta (`7549d9fc0`), asset-chain delta (`9a2c74c41`). Readiness actions —
 terminal CI at this exact head, issue-side acceptance boxes, and the `status:impl-eval` → ready-merge
 progression — remain coordinator-only, as does merge.
+
+## 2026-08-15 — #1665 TERMINAL MERGED; fixes queue advanced
+
+**Merge verified independently, not taken on report.** PR #1665 squash-merged
+`2026-08-15T16:29:46Z` as `3e8e146a4aedf8ee0afec15c83ddaefc171c71f9`; that commit is `origin/main`
+and `git merge-base --is-ancestor` confirms it. Merged from exact head `ac274a464` — the head every
+gate evaluated. Issues #1598/#1619/#1620/#1623/#1637 all `CLOSED`/`COMPLETED`.
+
+Four terminal PASS gates and three post-eval CI repairs: PLAN-EVAL `cd5193b66`; product IMPL-EVAL
+`9a26c107a`; corpus delta `7549d9fc0`; asset-chain delta `9a2c74c41`; repairs closing links 2–4 of the
+generated-asset cascade at `7549d9fc0`, `27a64ea4c`, `9a2c74c41`.
+
+**⚠ Lifecycle-label gap, coordinator-only to close.** The PR carries sole `status:ready-merge` and all
+five issues still carry `status:triage`; none is `status:shipped`. This is the same transitional gap
+seen on #1643/#1243 and #1661/#1448, both of which settled to `status:shipped` shortly after merge —
+so this is flagged for re-verification rather than raced.
+
+## Follow-ups from this leaf
+
+- `packages/queue` `typed-queue_test.ts` DLQ timing flake — **already tracked as #1667**
+  (`type:test`, `priority:p2`, `area:queue`). No action.
+- **MCP export-surface corpus staleness on `main`** — targeted search of open issues found nothing
+  tracking it (`#1655` is workers private-type-ref; `#1666` is reference-drift gating; both
+  different). Verified pre-existing: `check:mcp-export-corpus` is stale at merge base `baf1cdf67` as
+  well as on the branch. Filed as a tracked chore so the finding is not lost.
+
+## Next leaf selected — `sdk-cached-entry-swr` (#1461), wave 5
+
+Dependency readiness was computed across **all** remaining fixes leaves rather than taking the lowest
+wave. Waves 1–5 are almost entirely blocked, and the blockers are genuinely unresolved — a DAG edge to
+a closed issue would be satisfied, so each was checked:
+
+| Leaf | Wave | Blocker | Blocker state |
+| --- | --- | --- | --- |
+| `sdk-typed-error-channel` (#1350) | 1 | `issue:1348` rfc-prerequisite | **OPEN** |
+| `prisma-mysql-honest-example` (#1112) | 2 | `issue:1293` requires | **OPEN** |
+| `ui-add-page-island-repair` (#1357) | 2 | `issue:1355` requires | **OPEN** (features PR #1664 open, unmerged) |
+| `sdk-trace-ownership-proof` (#1353) | 4 | `issue:1348`, `issue:1349` | **OPEN** |
+| `sdk-transport-policy-consolidation` (#1351) | 4 | `issue:1348`, `issue:1349` | **OPEN** |
+| `plugin-discovery-contribution-references` (#1093) | 5 | `issue:1348`, `issue:1349` | **OPEN** |
+| **`sdk-cached-entry-swr` (#1461)** | **5** | **none** | **ELIGIBLE** |
+
+`#1461` is `OPEN`, milestone `0.0.7`, no branch or worktree collision, and carries no
+`epic:sdk-client-contrib` gating. It is the lowest-wave dependency-ready fixes leaf.
+
+**Carry-forward applied up front, not rediscovered.** Its contract touches `docs/site/**`, so the
+four-link `derivedAssetCascadePaths` cascade proven on #1665 is in scope from the first slice:
+`check:agent-docs-prose` and `check:assets-barrel` (and `check:publish-assets` when the barrel moves)
+belong in the proving set from the start. This is the standing correction recorded after the #1665
+process miss, applied proactively.
+
+Two contract details flagged for the plan phase rather than left to trip the author: `fileSurfaces`
+lists `docs/site/_site/capabilities/sdk/index.md`, which is under the Lume **build output** directory
+`_site` and is therefore generated rather than source, and `docs/sdk`, which may not exist as a path.
+The plan must resolve both before touching either.
