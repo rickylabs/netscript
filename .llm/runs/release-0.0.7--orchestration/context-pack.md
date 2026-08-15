@@ -808,3 +808,11 @@ Aspire/Docker/process/port/residue audit is empty after exact cleanup of three s
 helpers and recoverable quarantine of the unreadable generated project at
 `/tmp/netscript-s5-a6-quarantine-20260815-4M9v8k`. Runtime lease is released. Fresh features Tier-A
 must attribute the hang before any repair/retry/evaluator; #1666 repair and #1671 S4 remain active.
+
+Newer transition `2026-08-15T21:36:48Z`: #1666 repair `e357938df` / comment `5304327917` removes
+both quality findings without allowances or scanner weakening and passes fresh internals Tier-A at
+`138ad7436`. The reviewer rejected its own repository-mode false green, then proved the exact
+changed-files mode selected both repaired paths with zero findings. Fresh cycle-5 Fable 5/medium
+Remote Control evaluator `dc433b8d` is active at bridge `cse_016v2se871QD9Q9Rd6YADAKC` / URL
+`https://claude.ai/code/session_016v2se871QD9Q9Rd6YADAKC`; transport flags and bidirectional bridge
+are proven. Readiness remains held. #1664 F8 attribution and #1671 S4 continue independently.

@@ -1462,3 +1462,18 @@
   moved recoverably—not deleted—to `/tmp/netscript-s5-a6-quarantine-20260815-4M9v8k`. Final Aspire,
   Docker, process, port, and unreadable-residue audits are empty. The singleton runtime lease is
   released; no evaluator or later runtime attempt is authorized.
+
+## 2026-08-15T21:36:48Z — #1666 quality repair passes Tier-A and enters cycle 5
+
+- The same original author pushed focused repair `e357938df`, comment `5304327917`. The untrusted
+  exports boundary is now `unknown`, all enumeration is narrowed, the unsafe cast is gone, and
+  discriminating tests cover string/default/missing/falsy/null/malformed shapes. No allowance,
+  suppression, scanner change, generated-output delta, or lock change occurred.
+- Fresh internals Tier-A passed at `138ad7436`. It first rejected its own false green after noticing
+  the scanner was in repository mode and had not selected `.llm/tools`; the corrected exact
+  `changed-files` invocation selected both edited paths, found zero issues, and exited 0. Focused
+  tests, full drift/check/test, cascade/lock identity, and append-only evaluator history all hold.
+- One fresh separate native Fable 5/medium Remote Control delta evaluator is active as job
+  `dc433b8d`, bridge `cse_016v2se871QD9Q9Rd6YADAKC`, URL
+  `https://claude.ai/code/session_016v2se871QD9Q9Rd6YADAKC`. State proves
+  `bridgeOutboundOnly:false` and exact remote-control/model/effort flags. Readiness remains held.

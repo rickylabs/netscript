@@ -777,3 +777,7 @@ implementation thread.
   already green when #1664's separate scan found three stopped run-owned helpers plus unreadable
   database residue. Exact cleanup and recoverable quarantine were required before releasing the
   runtime lease.
+- **A scanner's green verdict is invalid when its mode omits the repaired path:** #1666 Tier-A first
+  saw `ok:true` in repository mode while the payload listed only package/plugin roots. Reading mode
+  and selected paths exposed the false green; only the corrected non-empty `changed-files` selection
+  over both `.llm/tools` files counts as repair evidence.
