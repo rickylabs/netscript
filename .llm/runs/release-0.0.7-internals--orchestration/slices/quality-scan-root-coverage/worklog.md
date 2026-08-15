@@ -18,16 +18,17 @@
   `quality:gate`.
 - New internal CLI: `.llm/tools/quality/check-root-coverage.ts`, emitting deterministic structured
   JSON and exit 1 on an incomplete/malformed denominator.
-- Existing scanner output remains the compliance report and already includes `scanned` roots.
+- Existing scanner output remains the compliance report and includes actual `mode` and `scanned`
+  paths. The checker explicitly says configured roots are configuration coverage, not traversal.
 
 ### Domain vocabulary
 
-- `PublishedWorkspaceMember` — existing `WorkspaceMember` with `publishable:true` and a
+- Published denominator — an existing `WorkspaceMember` with `publishable:true` and a
   `packages/**` or `plugins/**` root.
 - `ConfiguredRootSet` — normalized roots extracted for one quality task.
 - `RootCoverage` — task name, configured roots, and uncovered published members.
-- `RootCoverageReport` — published members, named `publish:false` exclusions, quality-task coverage,
-  doctrine roots, doctrine gaps, and aggregate `ok`.
+- `RootCoverageReport` — census, named boundary and `publish:false` exclusions, quality-task
+  configuration coverage, doctrine roots/gaps, traversal disclosure, and aggregate `ok`.
 - “covers” — configured root equals or is an ancestor of the member root; descendants do not cover
   the whole member.
 
@@ -42,10 +43,10 @@
 
 ### Constants
 
-- `QUALITY_SCAN_TASKS` — `quality:scan`, `quality:scan:repo`.
-- `PUBLISHED_ROOT_PREFIXES` — `packages/`, `plugins/`.
-- Stable report field names: `ok`, `publishedMembers`, `excludedMembers`, `configuredRoots`,
-  `uncoveredMembers`, `doctrineRoots`.
+- `COVERAGE_TASKS` — `quality:scan`, `quality:scan:repo`.
+- `INCLUDED_PARENTS` — named `packages/**`, `plugins/**` denominator boundary.
+- Stable report fields include `ok`, `census`, `boundary`, `publishableMembers`,
+  `excludedNonPublishableMembers`, `qualityTasks`, `doctrine`, `scannerTraversal`, and `errors`.
 
 ### Commit slices
 
@@ -75,6 +76,10 @@ checker and its semantic fixtures, not package lists in multiple tasks.
 | 2026-08-15T07:11:26+02:00 | Bootstrap | Draft PR | PR #1656 opened from bootstrap commit; required labels and milestone applied. |
 | 2026-08-15 | Plan | Research complete | Live issue, task roots, 35-member publish census, 36-root doctrine census, tests, CI, JSR risk, and #1653 findings re-baselined. |
 | 2026-08-15 | Plan | Design checkpoint | Exact three-path implementation surface and three ordered slices locked. |
+| 2026-08-15 | Plan eval | PASS | Cycle 1 passed at `3b95a004f`; immutable plan `da76d9d84` remained byte-identical. |
+| 2026-08-15 | S1 | RED | Contract test committed at `2c9aa89c0`; durable receipt failed before the checker existed. |
+| 2026-08-15 | S1 | Implementation | Checker and nine tests implemented; `deno.json` remains unchanged. |
+| 2026-08-15 | S1 | Design checkpoint | Configured roots and observed traversal are separate; out-of-boundary workspace members are named and counted. |
 
 ## Decisions
 
@@ -83,6 +88,9 @@ checker and its semantic fixtures, not package lists in multiple tasks.
 | PLAN-EVAL required | Cross-repository denominator and ancestry semantics are decision-heavy despite small code volume. | harness run-loop + plan-gate |
 | Do not edit doctrine checker | Dynamic 36-root discovery is already current and independently tested; new coverage tool verifies its published subset. | research F5 |
 | Do not edit scanner | Existing `scanned` output satisfies reporting; task configuration and fail-closed coverage are the defect. | research F4 |
+| Prove forwarding by execution | A temp workspace runs the real checker first in an `&&` task and records `--changed-file` only at the final command. | PLAN-EVAL advisory A |
+| Never equate configured roots with traversal | `observedByChecker:false`, `traversedPaths:null`, and a note prevent a traversal claim. | PLAN-EVAL advisory A |
+| Name the denominator boundary | Exact parent patterns plus excluded count/paths/reason are emitted even when the count is zero. | PLAN-EVAL advisory B |
 
 ## Drift
 
@@ -91,14 +99,23 @@ checker and its semantic fixtures, not package lists in multiple tasks.
 | Launcher pre-seeded the run directory | minor | yes |
 | Historical `arch:check` omission is already fixed on the immutable base | minor | yes |
 
-## Gate results
+## Gate results — slice 1
 
-All implementation and proving gates are **NOT FIRED**. This turn has no implementation authority.
-No receipt has been created.
+| Gate | Exit | Commit attested | Receipt |
+| --- | ---: | --- | --- |
+| focused test (RED) | 1 | `2c9aa89c0` | `receipts/slice-1/red-test.json` |
+| focused test (GREEN; 8/8 before final CLI-failure case) | 0 | `22e35f4be` | `receipts/slice-1/test.json` |
+| check (package roots + explicit S1 roots) | 0 | `22e35f4be` | `receipts/slice-1/check.json` |
+| lint (package roots + explicit S1 roots) | 0 | `22e35f4be` | `receipts/slice-1/lint.json` |
+| format check (package roots + explicit S1 roots) | 0 | `22e35f4be` | `receipts/slice-1/fmt-check.json` |
+
+JSR audit touched-publishable-member denominator is empty: S1 changes internal `.llm` tooling and
+tests only. No public exports, dependency pins, runtime assets, `import.meta` reads, package config,
+or lockfile changed. The repository publish dry run remains a frozen final-gate responsibility.
 
 ## Handoff notes
 
-- PLAN-EVAL should challenge D2-D5: denominator, ancestor direction, doctrine comparison, and task
-  binding are load-bearing.
-- Confirm the three-path surface is sufficient and that no scanner/check-doctrine edit is required.
-- Implementation must not begin until coordinator-disposed PLAN-EVAL `PASS` exists.
+- Tier-A should inspect S1 only. The live checker stays red with 29 `quality:scan` omissions until
+  the approved S2 task binding.
+- S2 must not start until the topic supervisor reviews this slice.
+- No formal IMPL-EVAL has been launched.

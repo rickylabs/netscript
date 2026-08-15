@@ -158,6 +158,27 @@ Deno.test('live repository census remains explicit before the task-binding slice
   assertEquals(report.ok, false);
 });
 
+Deno.test('CLI emits structured JSON and exits non-zero for incomplete configured coverage', async () => {
+  const checker = fromFileUrl(new URL('./check-root-coverage.ts', import.meta.url));
+  const output = await new Deno.Command(Deno.execPath(), {
+    args: ['run', '--allow-read', checker],
+    cwd: Deno.cwd(),
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  const report = JSON.parse(new TextDecoder().decode(output.stdout)) as {
+    ok: boolean;
+    qualityTasks: Array<{ task: string; uncoveredPublishedMembers: string[] }>;
+    errors: string[];
+  };
+
+  assertEquals(output.code, 1);
+  assertEquals(report.ok, false);
+  assertEquals(report.qualityTasks[0].task, 'quality:scan');
+  assertEquals(report.qualityTasks[0].uncoveredPublishedMembers.length, 29);
+  assert(report.errors.some((error) => error.includes('quality:scan does not cover')));
+});
+
 Deno.test('deno task runs the checker and forwards changed-file args only to the last command', async () => {
   const root = await Deno.makeTempDir();
   const checker = fromFileUrl(new URL('./check-root-coverage.ts', import.meta.url));
