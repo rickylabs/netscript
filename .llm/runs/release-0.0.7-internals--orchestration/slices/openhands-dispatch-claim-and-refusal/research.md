@@ -90,7 +90,7 @@ Consequence: the acceptance requirements for executed claim-collision, producer 
 non-recursive refusal, and retry regression tests cannot be met without editing tests excluded by
 the contract. Existing assertions would also reject necessary workflow changes.
 
-## Frozen-contract verdict
+## Frozen-contract verdict and resolution
 
 The four frozen surfaces are not a valid implementation envelope:
 
@@ -101,21 +101,40 @@ The four frozen surfaces are not a valid implementation envelope:
 3. `.github/workflows/openhands-phase-eval.yml` already implements the desired retry and is not
    currently justified as an edit target.
 
-Per the coordinator instruction, this thread does not widen or replace the contract. Research stops
-at the rescope boundary.
+This was recorded as significant drift and the thread stopped without widening scope. The
+coordinator then amended the authoritative contract at
+`feaf2da311ccc4b15c210d25fda5ff1699b60576` on
+`chore/release-0.0.7-orchestration`. The leaf entry now authorizes exactly:
+
+1. `.github/scripts/openhands-comment-trigger.mjs`
+2. `.github/scripts/openhands-comment-trigger.test.ts`
+3. `.github/workflows/openhands-agent.yml`
+4. `.llm/tools/agentic/lib/agentic-lib.ts`
+5. `.llm/tools/agentic/lib/agentic-lib_test.ts`
+6. `.llm/tools/agentic/openhands/dispatch-openhands.ts`
+7. `.llm/tools/agentic/openhands/dispatch-openhands_test.ts` (new)
+8. `.llm/tools/agentic/openhands/phase-eval-workflow_test.ts`
+
+The proving gates remain `check`, `test`, and `quality-job`; JSR remains N/A. The phase workflow is
+explicitly read-only precedent. This amendment resolves the contract defect without changing the
+verified current-state findings F1-F5.
 
 ## jsr-audit surface scan
 
 - N/A: no publishable `packages/**` or `plugins/**` surface is in the contract or discovered fix.
 
-## Open questions requiring coordinator disposition
+## Prior open questions — resolved by the amendment
 
-1. May the production surface expand to
-   `.llm/tools/agentic/openhands/dispatch-openhands.ts` so the real CLI can select a formal phase
-   and bind the live immutable PR head?
-2. May the regression surface expand to the three existing affected test files named in F5?
-3. Should `.github/workflows/openhands-phase-eval.yml` be removed from the edit contract and kept as
-   read-only reference behavior?
-4. What exact CLI semantics distinguish a formal evaluation from a non-formal task (for example an
-   explicit `--phase plan|impl` flag versus another coordinator-owned signal)? This changes the
-   caller contract and must be locked before implementation.
+1. **Production caller:** authorized. `dispatch-openhands.ts` owns an optional `--phase plan|impl`,
+   resolves the live PR head itself, and never accepts caller-supplied head input.
+2. **Regression surface:** authorized. The three discovered suites and a new
+   `dispatch-openhands_test.ts` are inside the outer bound.
+3. **Phase workflow:** read-only precedent. Its existing five-attempt loop must not be edited.
+4. **Formal selection:** explicit optional `--phase`. With it, dispatch is PR-only and requires the
+   verdict contract; without it, PR and issue dispatch remain tuple-free.
+
+## Current open questions
+
+None. The locked semantics are compatible with the verified code: they require extending the
+existing CLI option/parser and request flow, not replacing the claim primitive or adding another
+production module.
