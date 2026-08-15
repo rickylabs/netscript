@@ -102,3 +102,13 @@ amendment.
   `packages/ai/src/mcp/adapters/streamable-http-transport.ts` in addition to the current eight.
 - No slice-3 source edit or gate run occurred. The branch remains at the completed slice-2
   implementation plus this artifact-only stop record.
+
+## 2026-08-15 — Amendment 2 update (append-only)
+
+- The topic orchestrator authorized delegation-only edits to both published concrete transports,
+  bringing the exact writable package surface to ten files.
+- `readResource` is optional only on `McpTransportPort`, required on the base and published
+  transports, and must be proven cancellable through a published path.
+- `stop(options?)` is widened on the port and must forward its signal in both published wrappers.
+- `packages/fresh` remains read-only/out of scope; its structured cross-package check is mandatory.
+- `PLAN-EVAL: N/A` remains locked. Next: committed RED cancellation tests.

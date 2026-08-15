@@ -57,3 +57,15 @@ Drift is append-only.
 - **Action:** rescope — stop slice 3 before edits and request explicit authorization for exactly
   the two concrete adapter files.
 - **Evidence:** focused source inspection after slice 2; no slice-3 source changes were made.
+
+## 2026-08-15 — Attribution correction and cross-package implementor finding
+
+- **Correction:** The first amendment was ruled by topic orchestrator `topic-fixes-0.0.7` under
+  delegated coordinator authority, not directly by the coordinator. The earlier entry is retained
+  unchanged because this log is append-only.
+- **Finding:** The earlier implementor inventory missed the out-of-scope Fresh test double. A
+  required `McpTransportPort.readResource` would break its conformance.
+- **Action:** accept Amendment 2's optional port member plus mandatory base/published behavior, and
+  add a read-only structured Fresh type-check to the gate evidence.
+- **Evidence:** Amendment 2 in `scope-ruling.md` at head
+  `6db182503b219d76c7db23f89c71ec9e467c2f40`.

@@ -137,3 +137,20 @@ cancellation convention, settlement behavior, public entrypoint, documentation, 
 decision-heavy question remains; Tier-A review and opposite-family IMPL-EVAL remain external.
 
 Any required edit beyond the amended eight package files is new drift and an immediate stop.
+
+## 2026-08-15 — Amendment 2 plan re-lock (append-only)
+
+The topic orchestrator's second ruling expands the writable surface to exactly ten package files by
+adding delegation-only edits in `stdio-transport.ts` and `streamable-http-transport.ts`.
+
+- `McpTransportPort.stop(options?)` is widened; existing zero-argument implementors remain valid.
+- `McpTransportPort.readResource?` is optional to preserve the out-of-scope Fresh test double.
+- `BaseMcpTransport` and both published concrete transports require and implement cancellable
+  `readResource(options?)` and `stop(options?)` behavior.
+- Tests must prove abort settlement through a published transport, not merely type availability.
+- A structured cross-package `packages/fresh` check is mandatory before completion.
+- `packages/fresh` is read-only evidence and remains outside writable scope.
+
+`PLAN-EVAL: N/A` remains appropriate. Amendment 2 specifies the exact type shape, implementation
+locations, behavioral proof, compatibility gate, and forbidden workaround. No open design decision
+remains. Tier-A review and opposite-family IMPL-EVAL remain external.

@@ -163,3 +163,14 @@ and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
 - Slice 3 stopped before source edits. No gate was approximated; prior slice-2 green evidence
   remains valid.
 - `deno.lock` unchanged. No Aspire, Docker, browser, scaffold runtime, or CLI E2E command ran.
+
+## 2026-08-15 — Amendment 2 re-lock
+
+- Read the topic-orchestrator ruling at head `6db182503b219d76c7db23f89c71ec9e467c2f40`.
+- Writable package surface is now exactly ten files; the two additions are pass-through-only
+  concrete transport delegates.
+- Recorded the optional port / mandatory published implementation split and the read-only Fresh
+  compatibility gate.
+- `PLAN-EVAL: N/A` remains justified because the ruling resolves all behavioral and type decisions.
+- Next action: commit published-transport `readResource` and `stop` abort tests RED before slice-3
+  implementation.
