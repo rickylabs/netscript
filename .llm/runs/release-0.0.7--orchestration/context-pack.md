@@ -114,3 +114,14 @@ clarifications in `drift.md` and obtain slice-1 sign-off before S2. Fixes #1657 
 `fresh-browser` lease at `4a3c40321`; only Playwright/Chromium is in scope and cleanup plus empty
 Aspire/Docker are mandatory before the lease completes. #1651 remains unchanged and draft pending
 the owner's explicit 1/2/3 disposition. Do not serialize these topic-local actions across lanes.
+
+Resume from the authoritative `2026-08-15T06:19:11Z` checkpoint. Docs #1652 cycle-2 IMPL-EVAL is
+still working in the fresh native Opus 5/medium Remote Control session `4ed649d5-…` against clean
+source `c7ce58a19`; do not repair, ready, merge, or start the next docs leaf before its terminal
+verdict. Internals #1656 S1 is signed off at `a258bcc8c`; S2 is running on its preserved Codex
+thread and has local commits through `a7e9ee0d5`, but the PR is not yet pushed beyond the S1 head,
+so await the author's explicit stop and supervisor Tier-A. Fixes #1657's singleton browser lease is
+terminal PASS with evidence head `c792327c9`; Aspire, Docker containers, volumes, and browser
+survivors are empty, and fixes Tier-A is running. #1651 remains an unchanged draft awaiting owner
+choice 1 keep-and-narrow, 2 remove/defer C6, or 3 close as duplicate. Only the shared runtime mutex
+is cluster-wide; all evaluator and implementation serialization remains per topic.

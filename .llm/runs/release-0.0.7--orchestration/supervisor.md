@@ -261,3 +261,16 @@ Aspire/Docker/E2E uses the cluster-wide mutex.
 
 All checked PR heads equal their remote refs and current workflows have no failures. The singleton
 runtime mutex is held only by #1657 until its browser receipt and cleanup are terminal.
+
+### Active completion checkpoint — 2026-08-15T06:19:11Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | #1652 fresh IMPL-EVAL cycle 2 working against `c7ce58a19` in session `4ed649d5-…` | Wait for one terminal verdict; a further failure escalates and does not begin another loop |
+| internals | #1656 S2 author is finishing receipts after local evidence head `a7e9ee0d5` | No central completion claim, push assumption, or IMPL-EVAL before the author stops and Tier-A signs off |
+| fixes | #1657 browser gate is terminal PASS at evidence head `c792327c9`; substantive Tier-A is running | No IMPL-EVAL, ready flip, merge, issue mutation, or next fixes leaf before the Tier-A verdict |
+| features | #1651 remains draft and owner-blocked on explicit option 1/2/3 | Do not amend, reply, resolve, ready, or merge before the verdict |
+
+The singleton expensive-gate mutex is free: Aspire is empty, Docker has no containers or volumes,
+and the browser gate left no Chromium/Playwright survivors. Topic serialization remains local to
+each orchestrator; these three active gates run concurrently without cross-topic waiting.

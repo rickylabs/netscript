@@ -177,3 +177,21 @@
   terminal, the coordinator granted one catalogued `fresh-browser` pass. The lease is confined to
   Playwright/Chromium and requires a durable receipt, stray-process cleanup, and empty-host
   postcondition before Tier-A or any evaluator.
+
+## 2026-08-15T06:19:11Z — browser lease closed; three topic-local gates remain active
+
+- #1657's exactly-once `fresh-browser` gate passed at product head `4a3c40321`; evidence commit
+  `c792327c9` records 2 passed / 0 failed, exit 0, exact head ancestry, no lock change, and zero
+  browser survivors. Aspire, Docker containers, and Docker volumes are independently empty. The
+  shared lease is complete and fixes Tier-A is now substantively re-deriving the 66/66 catalog,
+  collection metadata, negative fixtures, template, publication, scope, and acceptance evidence.
+- #1656 S1's drift-only finding is closed and signed off at `a258bcc8c`. S2 correctly stopped once
+  when the supervisor's paraphrased file boundary contradicted the approved plan; the supervisor
+  corrected its own brief without widening the plan and resumed the preserved Codex author thread.
+  Local commits `98360da7b`, `15d894740`, and `a7e9ee0d5` now exist, but the author is still running
+  final receipt checks and has not pushed or claimed Tier-A completion, so central state remains
+  `running_slice_2` at the live PR head.
+- #1652's fresh cycle-2 evaluator remains working against immutable head `c7ce58a19` in native
+  Opus 5/medium Remote Control session `4ed649d5-9d62-4e24-a50a-081477607cee`. No competing docs
+  author or evaluator exists. #1651 remains draft and unchanged pending the owner's explicit
+  option 1/2/3 verdict; the hold does not block the other topic queues.

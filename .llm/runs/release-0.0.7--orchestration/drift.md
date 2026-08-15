@@ -160,3 +160,18 @@ implementation thread.
   consumes the singleton lease even though it does not start Aspire or Docker. Empty host state was
   re-proved before grant; the lease remains running until browser/runtime process cleanup and empty
   Aspire/Docker postconditions are recorded.
+
+## 2026-08-15T06:19:11Z — corrected slice authority and closed browser ownership
+
+- **Internals / supervisor correction:** the S2 dispatch said only `deno.json` could change, while
+  the approved plan explicitly allowed `check-root-coverage_test.ts` when its live assertion needed
+  rebinding. The Codex author stopped without a commit and requested clarification. The preserved
+  supervisor corrected the brief from the approved plan, recorded the mistake, and resumed the
+  same thread; this is not a scope expansion or another evaluation cycle.
+- **Fixes / lease closure:** #1657's browser receipt is terminal PASS and cleanup is independently
+  empty across actual Chromium/Playwright processes, Aspire, Docker containers, and volumes. The
+  expensive-gate record is complete before Tier-A begins, so no runtime ownership is carried into
+  review and the singleton mutex is free.
+- **Features / unchanged owner contract:** surfacing the #1651 option 1/2/3 decision did not grant
+  authority. The PR, RFC, comments, labels, readiness, and merge state remain untouched until the
+  owner's explicit verdict.
