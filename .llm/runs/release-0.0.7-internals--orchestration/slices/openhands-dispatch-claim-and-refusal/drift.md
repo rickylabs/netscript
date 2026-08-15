@@ -53,3 +53,24 @@ log is self-contained, per the harness rule that drift is explicit.
 Standing rule carried from the topic drift: when a canonical binding has already failed
 pre-inference, probe it cheaply before re-granting — a probe costs one zero-token launch, whereas
 re-granting blind costs a full gate cycle and blocks the lane.
+
+## 2026-08-15 — F1 accepted as intentional contract (coordinator disposition)
+
+IMPL-EVAL finding **F1 (medium)** observed that broadening `openhands-agent.yml:143` from
+`startsWith(...)` + trusted-author to `contains(github.event.comment.body, '@openhands-agent')`
+means a comment merely **quoting** the command token now reaches trusted policy, yields
+`command-not-first-token`, and — because that reason is reportable — draws an automated bot reply.
+The repo's own two supervisor-provenance regressions
+(`'fallback-running comment can quote command vocabulary without dispatch'` and
+`'final fallback provenance can quote the original command without dispatch'`) encode a real,
+intentional quoting pattern and now fall in that class.
+
+| ID  | Kind                        | Evidence                                                                                                                                                                                                                                                                                                                           | Disposition                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | State                   |
+| --- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------- |
+| D-4 | Accepted behaviour tradeoff | Broad `contains(...)` detection is what makes `command-not-first-token` observable at all: a non-leading or quoted candidate cannot be _reported_ unless it is first _seen_. #1613 N2 enumerates `command-not-first-token` among the five reportable reasons, so narrowing detection would make one contracted reason unreachable. | **ACCEPTED as the intentional contract; no product repair.** The consequence is deliberately bounded on every axis the design controls: **one** reply per source comment (deduplicated), **sanitized** and **token-free**, **marker-bearing**, **non-recursive** (the reply is provably a non-candidate through `isOpenHandsCommentCandidate` and `decide`), posted **pre-spend**, and carrying **zero provider spend** — and **no command dispatch occurs**. A trusted author quoting the token receives one bounded refusal, never a dispatch. | Resolved without repair |
+
+The tradeoff stated plainly, so a future reader does not mistake it for an oversight: the leaf chose
+**observability of a contracted refusal reason** over **silence on quoted prose**. The alternative —
+narrowing reportability so quotation is distinguishable from an attempted command — would leave
+`command-not-first-token` unreachable and reintroduce the silent-refusal class #1613 exists to
+close.
