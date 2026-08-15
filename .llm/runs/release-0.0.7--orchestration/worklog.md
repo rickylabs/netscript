@@ -600,3 +600,26 @@
   `sdk-cache-surface-and-telemetry` (#1637/#1619/#1620/#1598/#1623) from main `baf1cdf67` on matched
   Sol/medium Codex thread `01a00516-2033-7ed3-936a-a616cee47447`. It is research/plan-only and must
   open one draft PR before stopping for PLAN-EVAL.
+
+## 2026-08-15T11:25:08Z — final plan gate passes, honest cycle 2, and SDK feasibility review
+
+- #1664 cycle-2 PLAN-EVAL passed at pushed evaluator commit `c53726c69`, comment `5301997528`,
+  under fresh native Fable 5/medium Remote Control session `8c756943-…`, bridge
+  `cse_01UrhsQgBYpLZWHKAhCvESi6`. Direct typed emission and both gate classes remain locked. Three
+  implementation constraints are carried into the first bounded author slice; neither expensive
+  gate is leased or running.
+- #1663's final plan repair is clean/pushed at `df1d7a96d`: five run artifacts only. Tier-A passed
+  after independently confirming the real fixture remains unformatted/unmutated, the marker is
+  absent, the scratch proof selects 114 and is green, all four healthy files are observed selected,
+  doctor is 4/4, and semantic/hash/negative-control restoration proofs hold. Fresh cycle-2 evaluator
+  `517ac0e7`, bridge `cse_01McQHBVtbuX4WYDsaVXEYAn`, is active on that immutable head.
+- #1665 opened draft at final handoff head `20e7aed41`, run artifacts only. Tier-A returned bounded
+  `FAIL_FIX` at fixes topic `3fdf4b2c7`: define a span-time overflow deferral seam including the
+  no-span composite site; stage invalidation entries so a rejected report cannot leak partial
+  evidence; and replace aggregate doc-lint counts with raw combined/cache-entrypoint evidence naming
+  six exact existing diagnostics. The same author is repairing plan artifacts; no evaluator ran.
+  Coordinator grants the four acceptance/proof paths plus the one exact published query-bridge page
+  that quotes the changing diagnostic, while refusing unrelated doc-lint remediation. Live GitHub
+  classification skipped every unrelated/costly lane.
+- Corrected #1663 recovery wording: local-only `71e803807` was amended before its first remote push;
+  no remote history rewrite occurred and the original author thread was preserved.

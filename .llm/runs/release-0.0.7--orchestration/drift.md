@@ -471,3 +471,11 @@ implementation thread.
   regeneration to `service generate` changes what a familiar Aspire-oriented command overwrites.
   The plan must state owned paths and whether dry-run/force cover both halves before implementation;
   naming deterministic output without that compatibility answer is incomplete.
+- **Plan-only PRs now prove the skip classifier live:** #1663, #1664, and #1665 run-artifact-only
+  heads skipped check-test, quality, desktop, scaffold runtime/static, dependency, surface, and
+  close-gate work. This is the intended native skip case and is distinct from an evaluator-only
+  final commit on a PR whose complete diff still contains product code.
+- **A promised span event needs a span-time seam:** #1665's first cardinality design normalizes and
+  mutates its budget before span creation while preserving a string-only helper signature, yet
+  promises a one-time event carrying the first overflow id. Tier-A must require an explicit
+  metadata/event handoff or an equivalent implementable design; prose cannot bridge ordering.

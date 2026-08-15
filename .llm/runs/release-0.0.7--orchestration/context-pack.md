@@ -346,3 +346,14 @@ mutation remains forbidden before Tier-A and cycle-2 PASS. Fixes has independent
 `sdk-cache-surface-and-telemetry` on Sol/medium thread
 `01a00516-2033-7ed3-936a-a616cee47447`, base main `baf1cdf67`, research/plan and draft-PR only.
 Preserve all three authors and native topic supervisors; serialize only inside each topic.
+
+Resume from the authoritative `2026-08-15T11:25:08Z` transition. Main remains `baf1cdf67`. #1664
+cycle 2 is terminal `PASS` at `c53726c69`; its original Codex author may execute only the next
+bounded implementation slice with C1-C3 carried, and both `scaffold.runtime` and `fresh-browser`
+remain unleased. #1663 is immutable at `df1d7a96d`; Tier-A passed and the sole fresh Fable 5/medium
+Remote Control cycle-2 evaluator is `517ac0e7`, bridge `cse_01McQHBVtbuX4WYDsaVXEYAn`; no product
+mutation before PASS. #1665 is draft at `20e7aed41`; Tier-A is `FAIL_FIX` and the same author is
+repairing the overflow-event ordering, rejected-report staging, and raw six-diagnostic doc-lint
+baseline. Exactly four README/test proof paths plus `docs/site/web-layer/query-bridge.md` are
+authorized; no unrelated SDK doc-lint remediation. Preserve all native topic supervisors and
+original Codex authors; serialization is per topic only.
