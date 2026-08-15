@@ -5030,3 +5030,62 @@ PLAN-EVAL**, the canonical native-quota fallback, since this is a plan-only chan
 review family is unavailable. Generator ≠ evaluator, and the supervisor is neither.
 
 No runtime, lease, product or test mutation, readiness, or merge.
+
+## 2026-08-16 — F8 PLAN-EVAL terminal `PASS`, verdict self-signed by the evaluator
+
+| Field | Value |
+| --- | --- |
+| Verdict head | `20337441788b4e2341b0474d6297bec1ddd33b80` — local == remote == PR #1664 (draft) |
+| Verdict commit | `harness(features): F8 PLAN-EVAL verdict by minimax/minimax-m3 (PASS)` — **one file, 174 insertions** |
+| Verdict | **`PASS`** at `f8-plan-eval.md:157` |
+| Evaluator | OpenRouter **`minimax/minimax-m3` · high**, session `aed7b4ad-54d3-4cfb-b496-43c717a9b39d` |
+| Evaluated head | `4255a57b921e5efae0fb499a35803d150108e10a` |
+| Route rationale | canonical native-quota fallback — the Codex reviewer family is account-blocked until 2026-08-20 |
+
+### The provenance requirement was met, and my brief was the reason it nearly was not
+
+The evaluator wrote its verdict but left it **untracked**. That was my omission: the brief said
+"write `f8-plan-eval.md`" and "you may write only that verdict file", and never said commit and push.
+A verdict living only in a working tree is not terminal evidence — the exact standard I have enforced
+on every author in this leaf.
+
+The fix was to **resume that same session** to commit and push its own artifact, not to sign it
+myself. A supervisor committing an evaluator's judgement would put my authorship over another agent's
+verdict — the same provenance violation that had just cost this lane a full correction cycle with the
+`leak-report` contamination. Having spent that cycle refusing to self-author a two-line fix,
+self-signing a verdict here would have been worse, not more expedient.
+
+The resulting commit touches exactly one path and is signed by the evaluator.
+
+### Substance of the verdict
+
+`PASS`, with criterion 1 answered the way I most wanted pressed: identification of the unbounded
+waits is "from code measurement; scope is bounded to two real defects; the evidentiary limit of the
+attempt-6 ledger is honestly recorded." So the amendment did not fix `connect` and `send` merely
+because both were plausible — it bounded what the evidence supports and recorded what the ledger
+could not distinguish.
+
+### Chain of custody for this correction
+
+Four distinct owners, none reviewing their own work:
+
+1. **Original Codex author** — wrote the F8 plan (`d8d5ee619`), then hit an account-wide quota wall.
+2. **Supervisor (me)** — caused the `leak-report.md` contamination via a host audit, and declined to
+   repair it myself twice.
+3. **Fresh chore_code agent** (Claude Opus 5 · medium, session `41950acc`) — restored the blob
+   byte-identically and rewrote the PR comment in place, append-only.
+4. **Fresh evaluator** (Minimax M3 · high, session `aed7b4ad`) — judged the plan and signed its own
+   verdict.
+
+Generator ≠ evaluator held throughout, and the supervisor neither authored nor certified.
+
+### State
+
+Leaf `20337441788b4e2341b0474d6297bec1ddd33b80`, clean, draft. F8's plan is now reviewed and
+terminal. No product or test has been mutated since `2385cdb72`. No lease held, no runtime gate run,
+no readiness or merge. All four quarantines and the dedicated detached worktree remain intact, and
+every prior red — four S5 attempt logs, `f6-test.json`, `f7-test.json` — is preserved append-only.
+
+**Next:** F8 implementation is not released by this verdict. It needs a dispatch to an implementation
+owner, and the Codex family remains blocked until 2026-08-20, so the route decision is the
+coordinator's.
