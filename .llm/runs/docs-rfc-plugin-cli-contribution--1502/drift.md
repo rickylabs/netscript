@@ -198,3 +198,18 @@ Drift is append-only. Package and plugin source remain read-only in this leaf.
   the committed content head. The future implementation child re-baselines command behavior from
   live main before writing its migration fixtures.
 - **Evidence:** S4 raw Git reconciliation in `worklog.md`; live commit `0b3ed5d5a`.
+
+## 2026-08-15 — S4 sufficiency scope was implicit
+
+- **What:** The first S4 handoff asserted a `SUFFICIENT` evidence-set verdict without preserving the
+  exact six receipt filenames or the evaluator invocation that produced it.
+- **Source:** Tier-A S4 review finding S4-F1 at
+  `/home/codex/repos/netscript-007-features/.llm/runs/release-0.0.7-features--orchestration/slices/tier-a-review-1502-s4.md`.
+- **Expected:** The next evaluator can reproduce sufficiency from the same explicitly bounded set.
+- **Actual:** A naive `receipts/*final*.json` glob includes three receipts with gate ID
+  `publish-dry-run`, which `evidence-set.ts` correctly rejects as duplicate or contradictory.
+- **Severity:** minor.
+- **Action:** Choose remedy (b): preserve all immutable receipts, name the six contracted filenames,
+  label the CLI/plugin member publish receipts supplemental and excluded, and record the exact
+  evaluator command plus `SUFFICIENT` / empty-reasons result in `worklog.md`.
+- **Evidence:** S4-F1 journal diff and reproducible evaluator output; no receipt metadata changed.

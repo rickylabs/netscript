@@ -22,8 +22,10 @@ preserved at `plan-eval-cycle-1.md`. Cycle 2 evaluated repaired head
 honest scanner-gap treatment are closed. S4 content was committed at
 `120859d5c762706702cd45a3f2be19664e335e22`; all six contracted durable receipts attest that exact
 clean head with no mismatch override. The remaining follow-up is receipt/journal-only and cannot
-change the RFC contract. The PR remains draft at `status:impl`; this author does not dispatch or
-write IMPL-EVAL.
+change the RFC contract. Tier-A S4 review found one evidence-scope reproducibility defect. The
+bounded fix chooses remedy (b): six explicit contracted filenames, a recorded copyable evaluator
+command, and the per-member publish receipts labelled supplemental/excluded. The PR remains draft at
+`status:impl`; this author does not dispatch or write IMPL-EVAL.
 
 ## Completed
 
@@ -87,19 +89,21 @@ write IMPL-EVAL.
   preflight, full export-map doc lint, repository quality scan, owned Markdown format, and docs
   links. Existing plugin JSR/doc-lint baselines remain measured failures; no source change was
   introduced.
+- Read the complete Tier-A S4 `CHANGES_REQUESTED` review and resolved its sole finding without
+  changing any receipt. The exact six contracted filenames and evaluator command now reproduce
+  `SUFFICIENT` with `reasons: []`; supplemental per-member publish receipts remain outside that set.
 
 ## In Progress
 
-- Commit the S4 receipts and run journals as an evidence-only final head, then reconcile PR #1651
-  and stop for Tier-A review and coordinator-owned IMPL-EVAL dispatch.
+- Commit and push the S4-F1 journal-only reproducibility fix, post one PR comment, and stop for
+  renewed Tier-A review and coordinator-owned IMPL-EVAL dispatch.
 
 ## Next Steps
 
-1. Commit the receipt/journal-only S4 follow-up and prove its diff contains no RFC, product source,
-   contract, or lock-file content.
-2. Push by explicit refspec, reconcile the draft PR's DoD/acceptance evidence, and post one S4 phase
-   comment.
-3. Stop for Tier-A topic review.
+1. Commit the worklog/context/drift-only S4-F1 repair and prove no receipt, RFC, product source,
+   contract, or lock file changed.
+2. Push by explicit refspec and post one S4 fix-up comment.
+3. Stop for renewed Tier-A topic review.
 4. A fresh native Claude Opus 5 medium session performs IMPL-EVAL only after coordinator dispatch;
    this author does not self-certify.
 
@@ -137,7 +141,7 @@ write IMPL-EVAL.
 
 | Gate family | Current status                                | Evidence                              |
 | ----------- | --------------------------------------------- | ------------------------------------- |
-| Static      | six binding content-head receipts PASS        | `worklog.md`; `receipts/*-final.json` |
+| Static      | six binding content-head receipts PASS        | explicit six-file set in `worklog.md` |
 | Fitness     | full A4 roadmap plus measured JSR obligations | RFC; `research.md`; `worklog.md`      |
 | Runtime     | N/A / global expensive gate not run           | docs-only scope                       |
 | Consumer    | research inventory complete                   | live issues/RFCs and `research.md`    |
@@ -168,6 +172,7 @@ write IMPL-EVAL.
 - S2 exact head: `7a5eb580a8515b8dc1007308a9d917b5e7309f41`.
 - S3 exact head: `171e4e62ebb2e47eb3af08df165394bb4d1bae55`.
 - S4 content head: `120859d5c762706702cd45a3f2be19664e335e22`.
-- S4 final head: the receipt/journal-only commit containing this handoff; record its exact SHA in
-  the PR body/comment after commit.
+- S4 receipt head: `c987f009e502df0bbeb33c3d23f508bc6f320238`.
+- S4-F1 head: the journal-only reproducibility fix containing this handoff; record its exact SHA in
+  the PR comment after commit.
 - See the draft PR commit list and per-slice comments after push; V3 uses no `commits.md`.

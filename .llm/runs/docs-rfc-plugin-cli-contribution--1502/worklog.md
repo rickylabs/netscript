@@ -134,6 +134,7 @@ No author imports `@netscript/cli` internals, Cliffy, deploy, DevTools, or anoth
 | 2026-08-15 03:03 CEST | S4     | content   | Committed all remaining journal/handoff content at `120859d5c`; the tree was clean before any final proving gate ran.                    |
 | 2026-08-15 03:12 CEST | S4     | gates     | All six contracted gates passed durably with both recorded heads equal to content head `120859d5c` and no mismatch override.             |
 | 2026-08-15 03:18 CEST | S4     | audit     | Final JSR, export-map doc-lint, exact-pin, asset, import-meta, scanner, formatting, link, scope, and lock checks reconciled.             |
+| 2026-08-15 03:08 CEST | S4-F1  | evidence  | Chose remedy (b); recorded the exact six-file evaluator command and reproduced `SUFFICIENT` without changing any receipt.                |
 
 ## Decisions
 
@@ -235,11 +236,11 @@ No author imports `@netscript/cli` internals, Cliffy, deploy, DevTools, or anoth
 
 ### S4 binding evidence
 
-The following is the singular six-receipt evidence set for IMPL-EVAL. Every receipt was created by
-`run-gate.ts` from a clean tree and records
+S4-F1 uses remedy **(b)**: the contracted evidence set is exactly the six filenames in the table
+below, not a glob over `receipts/*final*.json`. Every binding receipt was created by `run-gate.ts`
+from a clean tree and records
 `gitHead == actualGitHead == 120859d5c762706702cd45a3f2be19664e335e22`; none enables
-`allowGitHeadMismatch`. The repository evidence-set evaluator reports `SUFFICIENT` with no reasons
-for exactly these six inputs. These rows are therefore `PASS`, not `PASS_PARENT_HEAD`.
+`allowGitHeadMismatch`. These rows are therefore `PASS`, not `PASS_PARENT_HEAD`.
 
 | Contracted gate    | Result | Durable receipt                          | Content attested |
 | ------------------ | ------ | ---------------------------------------- | ---------------- |
@@ -250,12 +251,54 @@ for exactly these six inputs. These rows are therefore `PASS`, not `PASS_PARENT_
 | docs source format | PASS   | `receipts/docs-source-format-final.json` | `120859d5c`      |
 | docs accuracy      | PASS   | `receipts/docs-accuracy-final.json`      | `120859d5c`      |
 
+The following is the exact evaluator invocation used for this six-file set and is the reproduction
+command for IMPL-EVAL:
+
+```bash
+deno eval '
+import { evaluateEvidenceSet } from "./.llm/tools/gates/evidence-set.ts";
+const directory = ".llm/runs/docs-rfc-plugin-cli-contribution--1502/receipts";
+const filenames = [
+  "check-final.json",
+  "test-final.json",
+  "publish-dry-run-final.json",
+  "arch-check-final.json",
+  "docs-source-format-final.json",
+  "docs-accuracy-final.json",
+];
+const receipts = await Promise.all(
+  filenames.map(async (filename) => JSON.parse(await Deno.readTextFile(`${directory}/${filename}`))),
+);
+console.log(JSON.stringify(evaluateEvidenceSet({
+  immutableHead: "120859d5c762706702cd45a3f2be19664e335e22",
+  surface: "docs-rfc-plugin-cli-contribution--1502",
+  expectedGateIds: [
+    "check",
+    "test",
+    "publish-dry-run",
+    "arch-check",
+    "docs-source-format",
+    "docs-accuracy",
+  ],
+  receipts,
+}), null, 2));
+'
+```
+
+The rerun returned `sufficiency: "SUFFICIENT"` and `reasons: []`. Its six receipt IDs were
+`ns1502-s4-final-check`, `ns1502-s4-final-test`, `ns1502-s4-final-publish-workspace`,
+`ns1502-s4-final-arch-check`, `ns1502-s4-final-docs-source-format`, and
+`ns1502-s4-final-docs-accuracy`.
+
 The canonical workspace publish simulation is the one `publish-dry-run` member of the binding set.
 `publish-dry-run-cli-final.json` and `publish-dry-run-plugin-final.json` are supplemental durable
 surface receipts at the same content head; keeping duplicate gate IDs outside the singular evidence
-set preserves the receipt-set law. `netscript-jsr-specifiers-final.json`,
-`publish-assets-final.json`, and `quality-scan-repo-final.json` are also supplemental durable PASS
-receipts at that head. The quality scan retains its documented direct-registration blind spot.
+set preserves the receipt-set law. A naive `receipts/*final*.json` glob is intentionally not the
+contracted set because it includes all three `publish-dry-run` receipts and therefore reports a
+duplicate gate ID. No receipt metadata was changed for this remedy.
+`netscript-jsr-specifiers-final.json`, `publish-assets-final.json`, and
+`quality-scan-repo-final.json` are also supplemental durable PASS receipts at that head. The quality
+scan retains its documented direct-registration blind spot.
 
 Final structured JSR reports preserve the measured baseline rather than relabeling it as introduced:
 `jsr-audit-cli-final.json` has three export-map entries and passes with existing warnings;
@@ -355,7 +398,9 @@ Archetype-4 gates (F-1–F-12, F-14–F-19); this summary does not replace that 
 - Content head `120859d5c762706702cd45a3f2be19664e335e22` is the immutable gate target. The
   follow-up contains only receipts and run journals; independently verify the final-head diff has no
   change to `rfcs/0000-plugin-cli-contribution.md`, `packages/**`, `plugins/**`, or `deno.lock`.
-- The evaluator must independently re-check the six-receipt metadata and sufficiency, RFC ownership
+- The evaluator must independently rerun the exact six-filename command under **S4 binding
+  evidence**; do not glob `receipts/*final*.json`, because the two per-member publish receipts are
+  supplemental and intentionally excluded from contracted sufficiency. Then re-check RFC ownership
   and declared vocabulary, all five #1502 mappings, measured JSR baselines, open drift, draft/label
   state, and the absence of issue filing or source mutation.
 - Final IMPL-EVAL remains a fresh opposite-family session; this author does not dispatch it, write
