@@ -975,3 +975,54 @@ them ticked as part of the readiness disposition rather than carried as a false 
 
 The lane stops here for that disposition. No ready flip, merge, publish, PLAN-EVAL, IMPL-EVAL cycle
 3, or next leaf.
+
+## 2026-08-15 — derived-asset amendment complete; CI green; Tier-A PASS
+
+Leaf head `d24c3fa03197cfcf0adcc91eca08847d6a26bd8c`, pushed, tree clean. Review artifact:
+`tier-a-assets-barrel-review.md`.
+
+`pr-checks PASS` at that head — 20 checks, **0 current failures**. Both freshness steps now pass and
+the `quality` job is green, closing the cascade that began with the stale agent-docs corpus.
+
+Determinism proved by re-running `gen:assets-barrel` at the committed head: exit `0` with a
+completely clean tree, so the committed bytes are exactly the deterministic output. Delta matched
+the pre-dispatch prediction of 11 insertions / 6 deletions in one file, and no other barrel target
+moved.
+
+The author's first `assets-barrel` receipt went exit `1` unstaged → `0` after staging. Tier-A
+rejected that as a weak proof — `check:assets-barrel` ends in `git diff --exit-code`, which compares
+the working tree to the index, so staging passes while the file still differs from `HEAD`, a state
+CI never sees. Required a post-commit re-run instead: `run-gate.ts --gate assets-barrel` exit `0` at
+`gitHead d24c3fa031`.
+
+Reviewer-run gates: determinism `0`, post-commit receipt `0`, `quality:gate` `0` with no
+`quality:scan` finding in the generated file, scoped structured check `0`, `git diff --check` `0`,
+lockfile guard `0`. Scoped `fmt`/`lint` on `packages/cli/**` recorded **N/A — not applicable** on
+root-config evidence.
+
+### Two prescribing errors by this orchestrator in one slice
+
+The leaf blocked twice, correctly, on defects in briefs this lane wrote:
+
+1. The first brief required amending `plan.md` and then omitted `plan.md` from its "allowed changes,
+   and nothing else" list. The leaf ran nothing and asked.
+2. The second prescribed a scoped `fmt` gate on `packages/cli/**`, a path root `deno.json` excludes
+   from `fmt` — a config this orchestrator had already read earlier in the same run when ruling the
+   S2 lint row N/A.
+
+Neither cost any wrong action, because the leaf refused to guess both times. Three of this run's
+stops now trace to prescribed gates the repository's own configuration excludes; two of the three
+were this lane's. The generalizable rule: before prescribing a scoped wrapper, check the target path
+against the relevant `exclude` list in `deno.json` rather than inferring the gate from artifact
+type.
+
+### Preservation
+
+Against the cycle-2 evaluated source `c7ce58a19`, `docs/site`, `.llm/tools/docs`, and both lockfiles
+are byte-unchanged. The full change set since that source is eight files — two agent-docs assets,
+five run artifacts, and one generated CLI asset. `plan.md`'s delta is a pure addition scoped to the
+amendment and its `PLAN-EVAL: N/A` record, with zero deletions. No canonical #1551 comment, pin,
+label, milestone, or issue state changed.
+
+Cycle-2 `PASS` remains the content verdict; no IMPL-EVAL cycle 3 was launched. Lane stops for
+coordinator readiness disposition.
