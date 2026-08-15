@@ -272,3 +272,64 @@ generation.
 - No `fresh-browser`, Aspire, Docker, CLI E2E, or other expensive gate ran.
 - Automated repair gates are not Tier-A sign-off; stop after commit, explicit-refspec push, and one
   structured PR comment for a fresh T-3/N1/N2 review.
+
+## IMPL-EVAL — formal, separate session (2026-08-15)
+
+Fresh separate formal IMPL-EVAL, first and only cycle. Artifact: `evaluate.md`.
+
+| Field | Value |
+| --- | --- |
+| Evaluated head | `939e7311317365db7681de5e3c7c56a73412424e` (local == `origin` == PR `headRefOid`) |
+| Verdict | **`FAIL_FIX`** |
+| Transport | Native first-party Claude Code, background session, `/remote-control` enabled |
+| Requested route | `claude-opus-5` · effort `medium` (owner-route amendment over lane-policy `Fable 5 · medium`) |
+| Observed route | `claude-opus-5` · effort `medium` · `--remote-control` — **matched** |
+| Session ID | `04897102-bcd6-4918-8b72-dc0151035883` |
+| Bridge / Remote Control | `session_01GbqPgckdxHEZzXzNu7DKNp` |
+| PID / job / cwd | `202494` / `04897102` / `/home/codex/repos/netscript-007-leaf-design-registry-drift` |
+
+### Blocking findings
+
+- **E-1** — `packages/cli/src/kernel/assets/embedded.generated.ts` was not regenerated. It is the
+  only template source `TemplateRegistry`/`netscript init` reads, and it still carries the 50-item
+  catalog with `total: 50` and no `registryCollections`. A scaffolded `/design/components` gallery
+  therefore still lists 50 of 66 and still hides the AI collection, so #1358 acceptance boxes 1–3
+  are false in generated output. `deno task check:assets-barrel` is **red at the evaluated head**
+  (raw exit **1**; exactly one file, one line; regenerated barrel carries `total: 66`), executed in
+  a detached scratch worktree so this tree was never mutated. `embedded.generated.ts` is outside the
+  contract surface, so the repair needs a coordinator amendment.
+- **E-2** — the `assets-barrel` gate appears in no plan validation row, no slice comment, and no run
+  artifact; the freshness gate for the changed artifact class was never run by any lane.
+
+### Non-blocking, recorded for the coordinator
+
+- **N-3** — `registryCollections` is exported by the template but consumed by no generated route.
+- **R-1** — concurred non-blocking; corrected Tier-A's disposition: this PR also touches four other
+  paths already in the same `paths:` filter, so its trigger cannot prove the `(design)` glob.
+- **C-1** — all seven #1358 acceptance boxes remain unchecked; boxes 1–3 must not be checked until
+  E-1 is repaired.
+
+### Gates re-executed by the evaluator
+
+| Gate | Raw exit | Result |
+| --- | ---: | --- |
+| `packages/fresh-ui` drift test (frozen lock) | 0 | 5 passed, 0 failed |
+| `.github/scripts/ci-classify-changes.test.ts` | 0 | 62 passed, 0 failed |
+| `deno task quality:scan` | 0 | `ok: true`, 0 findings, 7 pre-existing allowances |
+| `deno task arch:check` | 0 | No failures; existing warnings only |
+| `deno task check:publish-assets` | 0 | Fresh |
+| `deno task check:assets-barrel` | **1** | **RED** — see E-1 |
+
+Independent catalog recomputation (own probe, not the run's comparator): manifest 66 / catalog 66 /
+`registryMeta.total` 66; 0 missing, 0 extra, 0 duplicates; ordered name equality true; 0
+`kind`/`layer`/`description` mismatches; 8/8 collections ordered-equal by membership. T-3 classifier
+ownership re-derived by executing `classifyPath`, including near-miss prefixes: correctly scoped.
+
+### Evaluator boundaries
+
+- Read-only over source; nothing implemented, nothing fixed. Only `evaluate.md` plus this
+  bookkeeping committed.
+- No `fresh-browser`, lease, Aspire, Docker, or `e2e:cli`. Post-evaluation `docker ps -a` empty,
+  `aspire ps` reports no AppHost.
+- PR left `OPEN`, draft, exactly one `status:impl`; `Closes #1358` untouched; no issue mutated; no
+  next leaf begun. Single bounded cycle — no evaluator loop, no PLAN-EVAL.

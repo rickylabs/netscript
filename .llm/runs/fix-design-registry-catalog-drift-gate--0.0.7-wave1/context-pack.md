@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-design-registry-catalog-drift-gate--0.0.7-wave1` |
 | Branch | `fix/design-registry-catalog-drift-gate` |
-| Current phase | `bounded T-3 repair — Tier-A re-review required` |
+| Current phase | `IMPL-EVAL complete — FAIL_FIX; coordinator disposition required` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `frontend` |
 
@@ -46,14 +46,20 @@ focused positive/negative tests.
 
 ## In Progress
 
-- Commit/push the T-3 repair and appended bookkeeping, update N2 in the PR body, and post one
-  structured repair comment.
+- None. The formal IMPL-EVAL returned `FAIL_FIX` at head `939e7311317365db7681de5e3c7c56a73412424e`
+  and the run is stopped for coordinator disposition.
 
 ## Next Steps
 
-1. Hand off to the topic orchestrator for fresh Tier-A re-review of T-3, N1, and N2.
-2. Await a separate coordinator grant for the opposite-family IMPL-EVAL.
-3. Do not mark ready, relabel, merge, or begin another leaf from this implementation thread.
+1. Coordinator: dispose of **E-1** — `packages/cli/src/kernel/assets/embedded.generated.ts` is stale
+   (still `total: 50`), so the shipped scaffold still lists 50 of 66 and
+   `deno task check:assets-barrel` is red (raw exit 1). The file is outside the contract surface, so
+   a further one-file amendment is required before `deno task gen:assets-barrel` may be run and the
+   single regenerated file committed.
+2. Coordinator: dispose of **E-2** — add `check:assets-barrel` to the validation plan for any run
+   touching `packages/cli/src/kernel/assets/**` and record its raw exit code.
+3. Coordinator: record the non-blocking residuals N-3, R-1 and C-1.
+4. Do not mark ready, relabel, merge, close #1358, or begin another leaf until E-1 is repaired.
 
 ## Key Decisions
 
