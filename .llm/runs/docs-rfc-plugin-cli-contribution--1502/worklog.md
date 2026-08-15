@@ -405,3 +405,30 @@ Archetype-4 gates (F-1–F-12, F-14–F-19); this summary does not replace that 
   state, and the absence of issue filing or source mutation.
 - Final IMPL-EVAL remains a fresh opposite-family session; this author does not dispatch it, write
   `evaluate.md`, flip the draft PR ready, or self-certify.
+
+## 2026-08-15 — Owner KEEP AND NARROW amendment
+
+- **Checkpoint:** The owner released the PR #1651 hold and selected option 1, KEEP AND NARROW, in
+  the bounded brief
+  `/home/codex/repos/netscript-007-features/.llm/runs/release-0.0.7-features--orchestration/slices/impl-1502-amendment.md`.
+  Start-state reconciliation proved local HEAD, the explicit remote branch, and live PR head all
+  equal `0e302ad3a5915b7a820adcac0a9d5bdc2d7d0019`, with a clean tree and no upstream.
+- **Resolution:** The descriptor/router/registry/capability/bootstrap/isolation core is unchanged.
+  C6 is narrowed to generic CLI text-plan validation, preview/apply execution,
+  stage/check/commit/rollback, and generic registry/plan/journal doctor states. RFC 0003 and #1490
+  under #1363 exclusively retain command-store provider, Prisma, migration, generated bridge,
+  database-validation, and business-command semantics.
+- **Preview closure:** Planner output is now normatively preview-invariant. The planner returns the
+  same canonical plan for preview and apply; `invocation.preview` cannot alter construction, and
+  only the host execution mode controls mutation.
+- **Compatibility correction:** RFC 0003 execution is described as `@netscript/service/commands`
+  with consumer-owned composition. Non-assignability applies to domain-bearing
+  envelopes/definitions/results, while structurally identical JSON value aliases remain
+  intentionally assignable without branding.
+- **Scope discipline:** This is a refinement of locked D11–D18, not a new D-series decision or code
+  scope. No PLAN-EVAL is authorized. RFC 0003, package/plugin source, issues, evaluator artifacts,
+  and `deno.lock` remain untouched. The four expressly forbidden cross-domain mappings were not
+  added.
+- **Evidence sequence:** Commit the RFC and these content journals first. From that clean content
+  head, rerun the six contracted gates with fresh `ns1502-amend-*` invocation IDs; then record the
+  exact six-file evidence-set invocation and result in a receipt/journal-only follow-up.

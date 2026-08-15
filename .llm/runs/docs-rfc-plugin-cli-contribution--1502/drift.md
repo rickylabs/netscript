@@ -213,3 +213,26 @@ Drift is append-only. Package and plugin source remain read-only in this leaf.
   label the CLI/plugin member publish receipts supplemental and excluded, and record the exact
   evaluator command plus `SUFFICIENT` / empty-reasons result in `worklog.md`.
 - **Evidence:** S4-F1 journal diff and reproducible evaluator output; no receipt metadata changed.
+
+## 2026-08-15 — Owner narrowed C6 after overlap checkpoint
+
+- **What:** The owner found one real overlap between C6 and RFC 0003's live implementation #1490
+  under #1363, then selected KEEP AND NARROW rather than splitting or discarding the RFC.
+- **Source:** Bounded owner brief
+  `/home/codex/repos/netscript-007-features/.llm/runs/release-0.0.7-features--orchestration/slices/impl-1502-amendment.md`.
+- **Expected:** The plugin CLI seam owns generic contribution discovery and workspace-plan execution
+  without claiming command-store persistence or business-command semantics.
+- **Actual:** The core descriptor/router/registry/capability/bootstrap/isolation contract was
+  distinct and remains unchanged. C6 wording was broad enough to imply ownership of RFC-0003
+  generation details, and its compatibility row incorrectly called RFC-0003 execution host-owned.
+- **Severity:** significant.
+- **Resolution:** Narrow C6 to canonical text-plan validation, preview/apply,
+  stage/check/commit/rollback, and generic registry/plan/journal doctor health. Reserve provider,
+  Prisma, migrations, generated bridges, database validation, and receipt/audit/outbox/transaction
+  semantics to RFC 0003/#1490. Add the preview-invariant planner law and qualify payload
+  assignability without a brand or cross-domain semantic mapping.
+- **Decision impact:** This refines locked D11–D18 and does not change an approved D-series
+  decision. The owner expressly authorized no new PLAN-EVAL. Any package/plugin implementation or
+  wider ownership change would still require a coordinator amendment and new plan gate.
+- **Evidence:** RFC compatibility/ownership/doctor/roadmap/prior-art amendment, content-head commit,
+  and fresh six-gate evidence recorded in the following journal commit.

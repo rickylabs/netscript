@@ -176,3 +176,20 @@ command, and the per-member publish receipts labelled supplemental/excluded. The
 - S4-F1 head: the journal-only reproducibility fix containing this handoff; record its exact SHA in
   the PR comment after commit.
 - See the draft PR commit list and per-slice comments after push; V3 uses no `commits.md`.
+
+## Owner amendment checkpoint — 2026-08-15
+
+- Phase remains `impl`; PR #1651 remains draft with exactly `status:impl`.
+- The preserved author resumed at reconciled local/remote/PR head
+  `0e302ad3a5915b7a820adcac0a9d5bdc2d7d0019` and a clean, no-upstream worktree.
+- Owner verdict is KEEP AND NARROW. The RFC's plugin CLI discovery/routing/help/bootstrap/isolation
+  core stays intact; only C6's ownership claim is narrowed.
+- C6 owns generic canonical text-plan validation, preview/apply safety, the shared
+  stage/check/commit/rollback executor, and generic registry/plan/journal doctor health.
+- RFC 0003/#1490 under #1363 exclusively owns command-store provider/Prisma/migration/bridge,
+  database-specific validation, and business receipt/audit/outbox/transaction semantics. Its adapter
+  may submit `PluginCliGenerationPlan`; neither domain creates a second generic CLI mount or
+  workspace transaction engine.
+- No locked D-series decision changed, so the bounded owner brief authorizes amendment without a new
+  PLAN-EVAL. The next external actions after author evidence are renewed Tier-A review and a fresh
+  coordinator-dispatched IMPL-EVAL; this author launches neither.
