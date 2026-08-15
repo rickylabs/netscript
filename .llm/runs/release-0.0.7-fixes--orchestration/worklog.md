@@ -127,3 +127,69 @@ generator seams) was resolved by the coordinator amendment recorded in the leaf 
 plan, research, drift, and the red-first receipt, with **no product code** — pending the order-5
 PLAN-EVAL cycle 1. Only an unqualified `PASS` permits the attached implementation thread to resume.
 The shared `scaffold.runtime` verdict remains lease-gated and has not run.
+
+## 2026-08-15 — #1661 terminal merge reconciled; `sdk-cache-surface-and-telemetry` released
+
+**Merge tuple (independently verified, not taken on report).** PR #1661 squash-merged
+`2026-08-15T10:54:05Z` as `baf1cdf67a4e931af17b4772ddf6101f36152184`, subject
+`fix(ai/mcp): make pool startup failure-isolated and propagate cancellation (#1661)`. That commit is
+`origin/main` and `git merge-base --is-ancestor` confirms it on `main`. Merged from exact head
+`f74695bc4` — the same head the repair-delta IMPL-EVAL evaluated, so no verdict is bound to a
+superseded head. #1448 auto-closed at `10:54:06Z` `CLOSED`/`COMPLETED`. PR and issue each carry a
+sole `status:shipped`. Terminal CI at the merged head: `pr-checks PASS`, `checks=31`,
+`currentFailures=0`; `review-threads PASS` 0/0.
+
+**Correction to my own prior report.** My in-flight CI watcher snapshot showed
+`status=status:ready-merge` on the PR and `status:impl` on the issue, and I was about to report those
+as a lifecycle-label gap. Direct re-query shows both are `status:shipped`. The watcher sampled the
+merge transaction mid-flight; the stale values were never the settled state. Separately, the
+lifecycle-label gap I *did* correctly report on 2026-08-14 for #1643/#1243 is now closed — both are
+`status:shipped` on re-verification. No outstanding label debt remains in this topic.
+
+**Runtime hygiene at release time.** `origin/main` == `baf1cdf67`; zero Docker containers running;
+no orphaned leaf resources attributable to this topic.
+
+**Next serial leaf released — `sdk-cache-surface-and-telemetry` (#1637, #1619, #1620, #1598, #1623).**
+Eligibility re-verified rather than assumed: zero incoming DAG edges into all five issues, all five
+`OPEN` in milestone `0.0.7`. No prior run-dir, thread, branch, or worktree existed for this leaf, so
+"preserve all existing authors" had nothing to preserve — this is a first launch, not a resume, and
+no rival was created.
+
+| Field | Value |
+| --- | --- |
+| Thread | `01a00516-2033-7ed3-936a-a616cee47447` (launched 2026-08-15T13:02:11Z) |
+| Rollout | `/home/codex/.codex/sessions/2026/08/15/rollout-2026-08-15T13-02-11-01a00516-2033-7ed3-936a-a616cee47447.jsonl` |
+| Worktree | `/home/codex/repos/netscript-007-leaf-sdk-cache` |
+| Branch | `fix/sdk-cache-surface-and-telemetry` (no upstream by design) |
+| Base | `main@baf1cdf67` — the #1661 merge commit |
+| Route requested / observed | openai · `gpt-5.6-sol` · medium — **matched** |
+| Pre-launch git safety | `head=baf1cdf67 upstream=NONE dirty=0` |
+| Brief | 11687 bytes, contract-valid (`use harness`, `## SKILL`), staged `/home/codex/sdk-cache-brief.md` |
+
+**Phase discipline.** Research/plan-only through its first gate. PLAN-EVAL is warranted rather than
+`PLAN-EVAL: N/A` under the 2026-08-08 owner decision: #1619 proposes overturning a fail-loud contract
+that a passing test currently pins (`cache-telemetry_test.ts:237`), #1620 chooses between a
+type-level bound that breaks published `QueryParams` and a runtime bound that does not, and #1637 may
+require a public per-action cache opt-out. Those are contract decisions on published surface, not
+mechanical fixes.
+
+**Two prior-failure rules were written into the brief as explicit obligations**, because both classes
+have already cost this topic a cycle:
+
+- #1637 is a *failure-isolation* contract — the same class as #1661's F-1. The brief requires a
+  behavioral RED test that fails at the current head for the reason the issue names (a real
+  oversized-value `KvCacheStore.set()` rejection), and states explicitly that a stubbed throw proves
+  the catch exists but not that the real limit path is isolated.
+- The cross-package rule from O-3: a change to `packages/sdk` source text or public surface can break
+  a package that *asserts on* it rather than one that imports it. The brief requires the asserting
+  packages to be enumerated by executed search, and the gate set to be repo-root or to name every
+  asserting package — scoping gates to the touched packages is explicitly declared insufficient.
+
+**Scope pre-emption.** `packages/sdk/src/ports/query-options.ts` is outside the four declared file
+surfaces, and both #1637's opt-out and #1620's type-level option would need it. The brief instructs a
+scope-boundary report and a stop for a ruling rather than either self-widening the surface or
+silently picking the weaker option to stay inside the box — the pattern that worked on #1661's S0.
+
+**Holds still in force.** No expensive Aspire/Docker/`e2e:cli` gate without a fresh coordinator
+lease; no evaluator launched by the leaf; PR stays draft; issues stay coordinator-relabelled.
+WIP after this release: 1 implementation leaf, 0 evaluators.
