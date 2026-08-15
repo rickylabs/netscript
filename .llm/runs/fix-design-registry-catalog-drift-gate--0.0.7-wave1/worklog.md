@@ -90,6 +90,9 @@ mandatory and separate after implementation.
 | 2026-08-15T07:46:21+02:00 | S0 | research | Reproduced 66 manifest items versus 50 catalog items; named all 16 missing and confirmed 0 extra. |
 | 2026-08-15T07:46:21+02:00 | S0 | root cause | Confirmed renderer covers all kinds; independent incomplete static snapshot is the defect. |
 | 2026-08-15T07:46:21+02:00 | S0 | plan | Locked static projection + semantic symmetric test; recorded `PLAN-EVAL: N/A`. |
+| 2026-08-15T07:52:00+02:00 | S1 | implement | Added the 16 omitted items at their authoritative manifest positions, changed the declared total to 66, and added all eight ordered collection memberships. |
+| 2026-08-15T07:52:00+02:00 | S1 | gate | Semantic data-URL import probe returned exact item/meta/collection projections, 0 missing, 0 extra, raw exit 0. |
+| 2026-08-15T07:52:00+02:00 | S1 | reconcile | Issue #1358 remains open; draft PR #1657 carries `Closes #1358`, milestone 0.0.7, required type/area/priority/gate labels, and exactly one `status:plan` pending the S1 phase transition. No new reviewer comments existed before this slice. |
 
 ## Decisions
 
@@ -112,7 +115,9 @@ mandatory and separate after implementation.
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | Red inventory | `deno eval` command recorded in `research.md` | PASS (exit 0) | Reproduced 66/50/16 before edits. |
-| check/test/lint/fmt | structured wrappers | NOT_RUN | Implementation not started. |
+| S1 semantic catalog inventory | data-URL import of the generated TypeScript template compared to `freshUiRegistryManifest` | PASS (exit 0) | 66/66 items, 0 missing, 0 extra, exact ordered item/meta and eight-collection membership projections. |
+| Template format-wrapper probe | `run-deno-fmt.ts --file <registry.ts.template> --ext template --pretty` | NOT_RUN (wrapper exit 2) | Wrapper correctly refused false green because Deno excludes `.template`; it is not claimed as formatting evidence. Scoped TypeScript formatting remains an S2 gate. |
+| check/test/lint/fmt | structured wrappers | NOT_RUN | Full authorized gate phase follows S2. |
 
 ### Fitness Gates
 
@@ -134,6 +139,17 @@ mandatory and separate after implementation.
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Generated `/design/components` route | NOT_RUN | pending static catalog repair | Browser proof is lease-gated. |
+
+### S1 Gate Detail
+
+| Assertion | Observed |
+| --- | --- |
+| Manifest/catalog items | 66 / 66 |
+| Missing / extra | 0 / 0 |
+| Ordered name/kind/layer/description projection | exact |
+| Manifest/catalog collections | 8 / 8 |
+| Ordered collection membership projection | exact |
+| Meta name/version/package/total | exact |
 
 ## Handoff Notes
 

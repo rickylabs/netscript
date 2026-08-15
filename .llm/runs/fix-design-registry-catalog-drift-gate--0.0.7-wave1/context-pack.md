@@ -6,17 +6,16 @@
 | --- | --- |
 | Run ID | `fix-design-registry-catalog-drift-gate--0.0.7-wave1` |
 | Branch | `fix/design-registry-catalog-drift-gate` |
-| Current phase | `plan` |
+| Current phase | `implement` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `frontend` |
 
 ## Current State
 
-The immutable base and branch identity are verified. Research reproduced the defect before edits:
-66 live manifest items, 50 generated gallery entries/declared total, 16 manifest-only names, and 0
-catalog-only names. The gallery kind filter covers every kind, so the independent incomplete static
-snapshot is the root cause. Plan and design are locked; `PLAN-EVAL: N/A` is justified as a complete
-mechanical contract.
+The immutable base and branch identity are verified. Red research measured 66 live manifest items,
+50 generated gallery entries/declared total, 16 manifest-only names, and 0 catalog-only names. S1
+now projects all 66 authoritative items in order, declares total 66, and includes all eight ordered
+collection memberships. A semantic probe reports exact items/meta/collections with raw exit 0.
 
 ## Completed
 
@@ -25,18 +24,20 @@ mechanical contract.
 - Fetched live issue #1358 and preserved its full acceptance contract.
 - Recorded red-first counts, exact missing names, Git history, root cause, JSR risks, plan, and
   design checkpoint.
+- Opened draft PR #1657 on bootstrap commit `c3f978f5a`, targeting `main`, with `Closes #1358`,
+  milestone 0.0.7, correct taxonomy, one `status:plan`, and the S0 structured comment.
+- Completed the S1 template projection: 66 items, eight collections, exact metadata.
 
 ## In Progress
 
-- S0 bootstrap commit, explicit-refspec push, draft PR creation, taxonomy, milestone, and opening
-  structured comment.
+- S1 bookkeeping, commit, explicit-refspec push, structured PR comment, and phase-label transition.
 
 ## Next Steps
 
-1. Commit and push S0; open the draft PR against `main` with `Closes #1358` and required anchors.
-2. S1: mechanically project the missing items and all collections into the CLI template.
-3. S2: add the semantic real/negative drift tests and run authorized gates.
-4. Stop at the `fresh-browser` lease boundary and hand off for Tier-A review.
+1. Commit and push S1; post its exact raw-exit evidence and move the sole phase label to
+   `status:impl`.
+2. S2: add the semantic real/negative drift tests and run authorized gates.
+3. Stop at the `fresh-browser` lease boundary and hand off for Tier-A review.
 
 ## Key Decisions
 
@@ -51,12 +52,13 @@ mechanical contract.
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/fix-design-registry-catalog-drift-gate--0.0.7-wave1/*` | new | Coordinator thread identity preserved; mandatory harness artifacts added. |
+| `packages/cli/src/kernel/assets/app/routes/(design)/design/(_shared)/registry.ts.template` | changed | Complete ordered item/meta/collection projection. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | red reproduced; implementation gates pending | `research.md` 66/50/16 probe |
+| Static | S1 semantic projection green; structured gates pending S2 | 66/66, 0 missing/extra, exact eight collections, exit 0 |
 | Fitness | pending | `quality:scan`, `arch:check`, JSR audits planned |
 | Runtime | lease-blocked | Aspire/Docker/E2E/browser not run |
 | Consumer | pending | static generated catalog then lease-gated browser proof |
