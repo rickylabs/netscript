@@ -313,3 +313,25 @@ any weakening of the CLI test, and widening the gate set to include the `package
 this is a **post-IMPL-EVAL product mutation**, a fresh Tier-A and a proportionate fresh formal
 evaluation of the delta are required before readiness is revisited. Merge remains the coordinator's
 decision; the next fixes leaf stays queued.
+
+## 2026-08-15 — codex-resume exit 0 masked an undelivered steering message
+
+- **What:** the #1669 scope-widening amendment was dispatched to author thread
+  `01a00646-82a9-7ec2-88e7-16dea98a58fa` and the wrapper **exited 0**, but the message was never
+  delivered. The tail of the run output carried
+  `thread-store conflict: thread 01a00646-… already has an active writer (code -32600)`.
+- **Detection:** the author's next pushed commit `ebf8977c1` was "pin SDK doc-lint baselines" and
+  touched only `drift.md`/`plan.md`; `plan.md:189`, `research.md:27`, and PR #1669 body line 50 all
+  still read "reported, not silently widened into scope". Grepping the rollout for the brief's own
+  heading returned **0**.
+- **Why it happened:** the author was still mid-turn. The idle precondition (`ls` of the rollout
+  mtime) was run **in the same shell command as the dispatch**, so it raced the very state it was
+  meant to gate.
+- **Rules adopted:**
+  1. `agentic:codex-resume` exit status is **not** delivery proof. Delivery is proven by grepping the
+     target rollout for a distinctive phrase from the brief, or by an explicit non-conflict result.
+  2. An idle precondition must be evaluated in a **separate command** from the dispatch it gates.
+  3. Steering an active thread must retry on `already has an active writer` rather than being
+     issued once and assumed landed.
+- **Consequence:** none beyond delay — no wrong work was performed, because the undelivered message
+  could not cause a scope change. Re-dispatched under a retry loop with rollout-grep delivery proof.
