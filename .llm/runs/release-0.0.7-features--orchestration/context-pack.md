@@ -1,8 +1,9 @@
 # Context pack — NetScript 0.0.7 features lane
 
-Status as of 2026-08-15: the #1502 leaf is **complete and IMPL-EVAL-ready**. PLAN-EVAL cycle 2
-returned `PASS`; slices S1–S4 are implemented, Tier-A reviewed, and signed off. Nothing is running in
-this lane. The next actions — IMPL-EVAL dispatch and the ready-flip — belong to the coordinator.
+Status as of 2026-08-15: the #1502 leaf has a terminal **IMPL-EVAL `PASS`**, conditional on one
+body-only correction that is **not yet applied**. PLAN-EVAL cycle 2 passed, slices S1-S4 are
+implemented and Tier-A signed off. Nothing is running in this lane. Merge and the ready-flip belong
+to the coordinator.
 
 ## Control
 

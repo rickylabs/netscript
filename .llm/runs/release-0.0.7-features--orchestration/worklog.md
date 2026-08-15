@@ -633,3 +633,62 @@ The brief binds independent recomputation rather than acceptance on nine axes, i
 the SUFFICIENT set itself from the six named `invocationId`s — with the duplicate-`gateId` trap
 stated up front so the evaluator does not mistake a deliberate scoping for broken evidence — and
 re-deriving the defect classes Tier-A already closed rather than trusting they stay closed.
+
+## 2026-08-15 — #1651 IMPL-EVAL verdict: `PASS`, conditional on one body correction
+
+Session `2a8cf0a6-7529-4ca6-97ce-69edcca3f84d` reached `firstTerminalAt` `2026-08-15T04:05:30Z`
+(started `03:50:58Z`; ~14m30s; 63,533 tokens). Verdict established from the committed artifact, not
+the session summary.
+
+| Terminal-verdict check | Evidence | Result |
+| --- | --- | --- |
+| Verdict | `evaluate.md:380` — the single verdict declaration, in the Verdict table | **`PASS`** |
+| No contradictory verdict | full-file scan | the only `FAIL_FIX` occurrence is at line 402, in the reasoning explaining why no `FAIL_FIX` condition is met |
+| Verdict-only scope | `git show --stat 0e302ad3a` | exactly one file, `evaluate.md`, +408/−12 — narrow authority respected |
+| Pushed | `git ls-remote` | `0e302ad3a5915b7a820adcac0a9d5bdc2d7d0019`; local == remote; tree clean |
+| Evaluated heads | `evaluate.md` | final `04d431028…`, content `120859d5c…` — both as granted |
+| Evaluator identity recorded | `evaluate.md` identity table | bridge `cse_01Y48WxcCgzUAWfJmGmhBykc`, PID `2718910`, exact cwd, requested == observed Opus 5 · high · Remote Control |
+| PR state after verdict | live search | still open **draft**, exactly one `status:impl`, 9 labels — **no relabel, no ready-flip** |
+
+The evaluator did the independent work the brief demanded: it re-derived all four previously-closed
+defects rather than trusting them, recomputed sufficiency from the six contracted `invocationId`s
+(`SUFFICIENT`, `reasons: []`), confirmed no receipt was modified after being written, judged the
+subset scoping honest after checking it conceals no failing evidence, matched board reconciliation on
+16/16 issues against live GitHub, and **tested the advanced-`main` drift assertion and found it
+holds**.
+
+### The one finding — verified independently, and slightly worse than reported
+
+The evaluator reports the PR body's `check` row mis-sources "1,033 files, 9 batches, 0 failed" to
+`check-final.json`. I checked the receipts directly:
+
+- `check-final.json` has `stdout.bytes: 0` with an empty tail — it captured **no structured report at
+  all**. It proves the command ran and exited 0 at the content head, and nothing more. It cannot
+  support any file/batch figure.
+- `check-cli-plugin-cycle1.json` carries the tail
+  `"selection":{"filesSelected":1033,"batches":9,"failedBatches":0}` — the true source, and a
+  **cycle-1** receipt from a different head.
+
+So the PR body does not merely cite the wrong file: it presents **cycle-1 figures as final-head
+figures**. The gate itself genuinely passed at the content head, so this is not a false green about
+pass/fail, but the quantitative claim is unsupported by the final receipt. Confirmed still present in
+the live body.
+
+The correction must therefore either drop the figures from that row or label them explicitly as
+cycle-1 evidence — "attribute it to a different receipt" is not sufficient, because no final receipt
+carries those numbers. Root cause worth carrying forward: the final `check` gate captured empty
+stdout, so a future final-evidence run should ensure the structured report is captured, or the row
+should cite only what the receipt proves (command, exit code, attested head).
+
+### Concurrence with the verdict
+
+`PASS` is the right call. Per `verdict-definitions.md`, `FAIL_FIX` requires a failing gate, missing
+evidence, a wrong path/link, or a false-done state; none applies. The defect is prose in the PR body,
+the underlying gate passed at the content head, and the run's own `worklog.md` attributes the figure
+correctly. Returning the run to implementation over it would misstate the state of the work.
+
+### Outstanding before merge
+
+One bounded, body-only correction, which changes no head, no receipt, and no RFC content. It is
+**not yet applied** — verified live. Merge and the ready-flip remain coordinator decisions, and the
+verdict is explicitly conditional on this correction landing first.
