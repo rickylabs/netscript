@@ -1279,3 +1279,20 @@
 - Attempt 5 owns the singleton lease. Run suite-owned `scaffold.runtime` exactly once, clean and audit,
   then run `fresh-browser` only if scaffold passed and the audit is empty. Any red stops without a
   retry or second expensive gate; evaluator/readiness remain prohibited.
+
+## 2026-08-15T19:40:10Z — #1669 ships and releases the next fixes leaf
+
+- CI run `31904125478` completed success at exact head `313cc08d5`: acceptance mirror, close-gate,
+  quality, repo-wide check/test, and core-lane visibility all passed. The mirror checked all six live
+  #1461 boxes; a final GraphQL query found zero unresolved review threads and GitHub reported CLEAN /
+  MERGEABLE.
+- The coordinator squash-merged PR #1669 as main commit
+  `0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb` at 19:39:50Z. #1461 closed at 19:39:51Z. PR and issue
+  status labels were normalized from ready/triage to exactly `status:shipped`.
+- The non-blocking evaluator advisories are ruled as follow-up debt, not hidden: three other docs
+  loaders make no false revalidation claim and remain compatible with layer-owned background policy;
+  the warm-stale persistence-failure return shape deserves an explicit future contract. Fixes may
+  file one Backlog/Triage issue from reviewed topic draft `70307f47c`.
+- #1350 is released serially on fresh main. #1348 must remain open until every implementation child
+  named in its final coordinator checkbox is merged; its normative RFC Stage-0 prerequisite is already
+  satisfied and therefore does not block its explicitly first implementation child #1350.

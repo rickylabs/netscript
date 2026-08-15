@@ -698,3 +698,12 @@ implementation thread.
   `aspire ps []`, then caught the query's transient `aspire-managed nuget search` child in the same
   instant. Lease decisions require a separate post-query process audit; that audit was empty. Do not
   kill a healthy transient helper or mistake the command's own child for pre-existing runtime debt.
+- **An open umbrella can contain a satisfied prerequisite:** #1348 explicitly remains open until its
+  implementation children ship, while its body simultaneously ratifies RFC 0001 Stage 0 and names
+  #1350 as the first child. Treating every open prerequisite node as blocked would deadlock the very
+  implementation sequence it defines; inspect the acceptance semantics, preserve the umbrella, and
+  release #1350 without falsely closing #1348.
+- **Non-blocking does not mean forgotten:** #1669's evaluator found cross-page loader-shape
+  inconsistency and a warm-stale persistence-failure caveat without finding a false revalidation
+  claim or acceptance failure. Preserve PASS, avoid post-evaluation scope creep, and file one
+  explicitly non-blocking follow-up with both exact contracts rather than silently losing the debt.

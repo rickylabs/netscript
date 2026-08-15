@@ -719,3 +719,9 @@ Newer lease `2026-08-15T19:39:00Z`: #1664 final F6 Tier-A passed at `a4224dbb1`;
 the environmental red preserved. Host preflight is empty after an explicit post-`aspire ps` audit.
 Attempt 5 owns the singleton runtime lease: one `scaffold.runtime`, cleanup/audit, `fresh-browser`
 only after PASS, then final cleanup/audit. Stop on any red; no retry or evaluator yet.
+
+Newer ship `2026-08-15T19:40:10Z`: #1669 merged as main `0ef48c2ec` after exact-head close-gate,
+mirror, quality, check-test, and core visibility passed; #1461 is closed with six boxes checked and
+both objects exactly `status:shipped`. Fixes may file the reviewed non-blocking docs follow-up and
+release #1350 serially on fresh main. Keep #1348 open until all implementation children finish; its
+ratified Stage-0 prerequisite is satisfied and does not block #1350.

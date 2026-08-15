@@ -860,3 +860,13 @@ receipts are PASS/SUFFICIENT. Coordinator preflight found local/remote/PR equali
 query's transient `aspire-managed` helper exited before the post-query audit. Attempt 5 now owns the
 singleton runtime lease: `scaffold.runtime` once, cleanup/audit, then `fresh-browser` only on PASS,
 followed by final cleanup/audit. Any red stops; no evaluator or retry is authorized.
+
+At 19:40Z, #1669 exact-head CI is fully green: the live mirror checked all six #1461 boxes, and
+close-gate, quality, check-test, and core visibility succeeded. With zero review threads and
+mergeability CLEAN, the coordinator squash-merged evaluated head `313cc08d5` as main
+`0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb`. #1461 closed automatically one second later; both PR
+and issue are normalized to exactly `status:shipped`. The evaluator's cross-page and warm-stale
+advisories do not invalidate #1461: the named external pages attach no false revalidation claim and
+their layer policy can own background behavior. One precise Backlog/Triage follow-up is authorized
+from fixes topic draft `70307f47c`. #1350 is released serially on new main. #1348 stays open until all
+its implementation children finish, while its already-ratified Stage-0 prerequisite is satisfied.
