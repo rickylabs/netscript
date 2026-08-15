@@ -652,3 +652,53 @@ Aspire/Docker/`e2e:cli`. PR stays draft at sole `status:plan`.
 
 Fresh Tier-A runs over the amended head next, then exactly one separate native Fable 5 · medium ·
 Remote Control PLAN-EVAL over that immutable head. No implementation before its PASS.
+
+## 2026-08-15 — #1669 T-1 repair delivered, Tier-A PASS, PLAN-EVAL launched
+
+**Dispatch correction.** The previous turn reported the T-1 repair as dispatched when it had not been
+sent. It was dispatched this turn under the delivery-proof discipline: rollout occurrences for a
+distinctive brief phrase went `0 → 3`, and the author produced
+`23db20f30 docs(plan): pin tutorial SWR dispositions`.
+
+A second process note: that dispatch printed `*** NOT DELIVERED ***`. That was a **bug in this
+session's verification script** — `BEFORE` captured two lines so the integer comparison errored — not
+a delivery failure. The discipline stays; the comparison was fixed.
+
+**Tier-A re-review PASS at `23db20f301d06ed1e4a9a65cbbf64349f89cb8c0`.** T-1 resolved beyond the
+finding: the plan gained a nine-line published-claim disposition table (13, 15, 32, 75, 76, 80, 94,
+100, 107 plus Services SDK 188) where the finding named five. An independent re-sweep of the
+authorized page returned the **identical** line set. Retained lines carry mandatory nearby scoping
+text — "part of the required edit, not optional explanatory prose" — and line 107 rewrites the
+demonstrated loader into a policy-aware composition, removing the false implication at its source
+rather than at the prose. A one-sentence page-level acceptance now exists and validation gate 7
+(`docs-accuracy`) binds it. Doc-lint pin, #1665 preservation, persistence-complete in-flight, and the
+deterministic two-reader proof are all unchanged.
+
+**PLAN-EVAL launched — exactly one, fresh, opposite-family.**
+
+| Field | Value |
+| --- | --- |
+| Job id | `01f0eda8` |
+| Session id | `01f0eda8-24fe-41b0-919e-7426579ab868` |
+| OS PID | `391331` |
+| Bridge session id | `session_01SWnk7LwvoLaamvEwR5WLfX` (resolvable form; jobs record carries the non-resolvable `cse_…` form) |
+| Remote Control URL | `https://claude.ai/code/session_01SWnk7LwvoLaamvEwR5WLfX` |
+| `cwd` | `/home/codex/repos/netscript-007-leaf-cached-entry` |
+| Immutable source head | `23db20f301d06ed1e4a9a65cbbf64349f89cb8c0`, worktree clean |
+| Requested route | native Claude · `claude-fable-5` · medium · Remote Control (`formal_plan_evaluation`) |
+| Observed route | `respawnFlags`: `--permission-mode bypassPermissions --remote-control --name "NetScript 0.0.7 #1669 PLAN-EVAL" --effort medium --model claude-fable-5` |
+| Route verdict | **matched** |
+
+Pre-launch sweep confirmed **no rival evaluator** was already running for this leaf. Attachment
+proven: the first `type: user` transcript record is 8289 chars beginning `use harness`.
+
+The brief requires independent re-derivation and explicitly invites disagreement with the supervisor;
+it directs the evaluator to judge disposition completeness, whether Retained lines are defensible,
+whether any Corrected wording **overcorrects** into denying the factory has SWR at all, whether the
+line-107 composition works against the real API, the persistence-complete joiner semantics under a
+#1665 write failure, whether the two-reader proof smuggles a timing assumption, and the
+occurrences-vs-unique-symbols doc-lint reconciliation. `#1667`/`#1668`/`surface:diff`/`F-DOCT-5` are
+declared out of scope and pre-existing red.
+
+No implementation before its PASS. No readiness or label change; PR stays draft at sole
+`status:plan`; no runtime lease.
