@@ -842,3 +842,12 @@ preserved its first F6 root-test receipt red at evidence `4c7792f20`: 4228/1/19 
 scanner entering an ignored root-owned Postgres temp tree. The exact tree is recoverably quarantined
 at `/tmp/netscript-f6-quarantine.7kXcDX`; attempt 2 must be distinct at unchanged product
 `7fa29ad3e`. No runtime lease is active. #1663 and #1651 option 1 remain untouched.
+
+At 19:31Z, #1669 cycle-1 IMPL-EVAL is terminal `PASS` at artifact-only `313cc08d5`, comment
+`5303850473`, with local/remote/PR equality and zero review threads. The coordinator made all eleven
+PR DoD rows current, posted the sole six-box #1461 mapping in comment `5303873817`, applied
+`impl-eval:skip` and `status:ready-merge` while draft, and verified the live mirror dry-run against
+issue-body SHA-256 `20b6370fdf3ed8491c30a052c75b6a6c33b529b4a278c8a39a6243847f47387e`.
+Only then was the PR marked ready. Exact-head CI run `31904125478` is active; merge and #1350 dispatch
+remain blocked until the real mirror, close-gate, required core checks, and generated closure are
+terminal green. This readiness action uses no runtime lease.

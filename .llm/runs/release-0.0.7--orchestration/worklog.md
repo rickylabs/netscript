@@ -1250,3 +1250,18 @@
   no process owning the path, the exact tree was moved recoverably to
   `/tmp/netscript-f6-quarantine.7kXcDX/plugin-smoke-20260815-203755`. Features must create a distinct
   `f6-test-attempt2` at unchanged content; no receipt is overwritten and no product repair is implied.
+
+## 2026-08-15T19:31:02Z — #1669 enters current-head readiness
+
+- Native Fable 5/medium Remote Control IMPL-EVAL completed `PASS` at artifact-only commit
+  `313cc08d5`, PR comment `5303850473`. The only path after implementation evidence `9aa54ae2d` is
+  `impl-eval.md`; local, explicit remote, and PR heads all equal the evaluator commit, and the
+  thread-level review query found zero review threads.
+- The coordinator rewrote stale readiness prose in the PR body and checked all eleven current DoD
+  rows. Comment `5303873817` is the sole structured mapping of the six live #1461 acceptance boxes.
+  With the PR still draft, `status:plan` was replaced by `status:ready-merge`, `impl-eval:skip` was
+  applied to attribute the already-complete external evaluation, and a live dry-run accepted all six
+  entries against issue-body SHA-256
+  `20b6370fdf3ed8491c30a052c75b6a6c33b529b4a278c8a39a6243847f47387e`.
+- Ready-for-review then created exact-head CI run `31904125478`. No issue box has yet been mutated and
+  merge remains prohibited until the mirror, close-gate, required checks, and visibility are green.

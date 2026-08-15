@@ -706,3 +706,10 @@ product `7fa29ad3e`: the first root-test receipt remains red because an ignored 
 temp tree was traversed. That exact tree is recoverably quarantined under
 `/tmp/netscript-f6-quarantine.7kXcDX`; a distinct unchanged-head attempt 2 is active. Runtime leases
 remain free; #1663 and #1651 option 1 are unchanged.
+
+Newer transition `2026-08-15T19:31:02Z`: #1669 IMPL-EVAL is `PASS` at artifact-only `313cc08d5`,
+comment `5303850473`, with no review threads and exact local/remote/PR equality. All eleven PR DoD
+rows are current. Sole acceptance mapping comment `5303873817` covers all six live #1461 boxes; the
+live mirror dry-run passed. `impl-eval:skip` and `status:ready-merge` were verified while draft before
+the ready flip, avoiding #1666's label race. Exact-head CI run `31904125478` is active. Do not merge
+or release the serial #1350 leaf until mirror/close-gate/required checks are terminal green.

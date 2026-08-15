@@ -689,3 +689,8 @@ implementation thread.
   root-owned Postgres data directory under an ignored e2e temp tree and raised `PermissionDenied`.
   Preserve the red receipt, recoverably quarantine only the proven unowned tree after Docker/process
   audits, and use a distinct unchanged-head receipt for the environmental retry.
+- **Apply readiness labels before the ready event and prove live visibility:** #1669 applied both
+  `status:ready-merge` and the attributed `impl-eval:skip` while still draft, fetched them back from
+  GitHub, and passed a live acceptance-mirror dry-run before `ready_for_review`. This ordering avoids
+  the label race observed on #1666 and keeps automatic phase evaluation from duplicating a completed
+  native evaluator.
