@@ -202,3 +202,65 @@ slice whose acceptance, gate, or inputs cannot be satisfied from that slice's ow
 repository's actual configuration. The four previous instances were S1's unsatisfiable rendered-nav
 assertion, S1's four links into a later slice's section, S1's gate being unable to prove its own
 link contract, and S2's local-roots contract with no slice creating the root.
+
+## 2026-08-15 — owner-priority rewrite blocked: no accessible EIS-Chat revision is newer than the pin
+
+The coordinator relayed an owner correction stating both canonical #1551 example comments
+(`5265826161`, `5265971722`) "have been significantly improved in EIS-Chat" and must be rewritten in
+place from a newly fetched immutable head. The premise does not hold against the repository this
+machine can reach. Nothing was edited.
+
+Evidence, after `git fetch --all --tags --prune` against the authorized remote:
+
+1. `origin/HEAD` and `origin/master` are **`5191de83f3da97559f21d8891c6c8afdf1cf473a`** — identical
+   to the existing pin. There is no newer master.
+2. The only ref with a newer commit date is `origin/agent/netscript-0.0.6-stable` @
+   `834a2b36a5c9ef4acf82f8f1f400522d8dab234b` (+30 seconds). It is **not** a descendant
+   (`merge-base --is-ancestor` false, `rev-list --count` 0) and `git diff` against the pin is
+   **empty for the whole tree** — identical content, different commit object.
+3. Across **all** remote refs, the newest commit touching either example path is `aeee408`
+   (`fix(fresh): preserve cache seeds on partial navigation`, 2026-08-12 16:51:16), and its blobs
+   are **byte-identical to the pinned blobs**: `cc2cf0f9d8491f8dc974c478d4a7b08673bab125` for the
+   Session route and `d2e1e781250f6c12bc4ab28e337d5f8ea425f3d1` for the Channel route.
+4. All three local clones report **zero** unpushed commits (`log @{u}..HEAD`) and **zero** dirty
+   files. Their differing working-tree blobs belong to older divergent checkouts (`aeaf2df`,
+   `5fdff77`, `a08ebe5`), not to improvements.
+
+The pinned revision therefore already carries the newest accessible version of both example files.
+The described improvements are unpushed, in another location, or not yet committed.
+
+Disposition: **stop, do not edit.** The instruction is to replace two canonical bodies (28,481 and
+25,976 characters of owner-authored baseline) entirely in place, with no follow-up comment and no
+addendum. Executing that without a genuinely improved implementation would either re-publish the
+same analysis as though it were recomputed, or fabricate improvements — both destroy canonical
+evidence irreversibly and produce exactly the false-done the harness exists to prevent.
+Authorization to edit is not in question; there is simply nothing truthful to edit the comments to.
+No fetch beyond read-only ref updates was performed, no worktree was created, and
+`/home/codex/repos/eis-chat-007-input` remains untouched at the pin.
+
+## 2026-08-15 — PLAN-EVAL validity determination (asked explicitly by the coordinator)
+
+**No fresh PLAN-EVAL is required now, because no evidence-baseline change has actually occurred.**
+The pin is unchanged and remains the newest accessible content, so every locked decision — the
+equivalence contract, evidence vocabulary, matrix columns, presentation-held-constant rule,
+script-only numbers, exact version pins, and `Part of #1551` closure — stands untouched. S1 and S2
+sign-offs remain valid at `4e6d52b3d`.
+
+The conditional ruling, for when an improved revision does become available:
+
+- **Evidence refresh within the locked contract** — if the change alters only counts, hashes, and
+  aggregates, the approved methodology already provides for it: the S1 methodology page carries an
+  explicit freshness policy ("a refresh updates the inspection date, manifest hashes, evidence
+  labels, and affected matrix rows"). Journal the drift, regenerate S2's manifest and measurements
+  at the new pin, and require fresh Tier-A plus IMPL-EVAL on the eventual committed head. No new
+  PLAN-EVAL.
+- **Fresh PLAN-EVAL required** — if the change alters the equivalence contract itself, adds
+  framework surfaces that change the mechanism matrix's shape, or breaks the
+  presentation/domain-held-constant premise. Those are locked architecture, not evidence.
+- **Out of scope either way** — case study 2 (Channel dashboard + create-session form) is already
+  deferred to **#1649** by the approved plan's deferred-acceptance map and is not 0.0.7 docs scope.
+  Rewriting its issue comment is issue-level evidence work that needs no PLAN-EVAL, but it is
+  equally unrecomputable without the improved source.
+
+S3 is held rather than resumed. Its case-study content consumes the same evidence baseline, so
+starting it before the baseline question is settled risks discarding the work.
