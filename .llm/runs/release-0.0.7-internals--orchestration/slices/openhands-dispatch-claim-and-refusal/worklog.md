@@ -294,3 +294,45 @@ Verified by execution:
   `quality-job` as `NOT_RUN` naming the non-covering `check` dependency.
 
 Slice 4 is authorized.
+
+## Slice 4 — Pre-spend workflow reporting and aligned retry
+
+### Progress
+
+| Time       | Step           | Notes                                                                                                                                                                                                                                    |
+| ---------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-15 | Authorization  | Fast-forwarded to Tier-A S3 sign-off `d3d31b3d0`; began S4 only.                                                                                                                                                                         |
+| 2026-08-15 | RED            | Replaced old workflow-filter assertions and added executable retry/refusal/dedup tests first; targeted wrapper exited 1 with 7 passed / 3 failed because literal routing and the embedded helpers did not exist.                           |
+| 2026-08-15 | Implementation | Routed every literal candidate to trusted policy, added 5×1s lookup with controlled exhaustion, emitted source-keyed refusal outputs, and posted them once in an authorize-job step before the paid job. Policy + workflow suites pass 26/26. |
+
+### Decisions
+
+- The PAT remains confined to the trusted policy step because formal authorization must create/read
+  the existing claim ref. Refusal publication is a separate step using `GITHUB_TOKEN`; therefore
+  the authorize job's `issues: write` grant is the actual comment-write ceiling.
+- The authorize job grants only `contents: read` for trusted policy checkout and `issues: write`
+  for refusal publication. It has no `pull-requests: write` or provider permission.
+- Ordinary five-reason denials use the S1 controlled builder. Generation exhaustion uses the same
+  source-comment marker vocabulary but names the missing phase-status generation and five exhausted
+  attempts without reflecting command text.
+- The embedded reporter lists comments, posts only when the source marker is absent, and returns a
+  boolean. Its executed repeat-delivery test pins the exact sequence `list, post, list`, one post,
+  and one stored body.
+- The paid `agent` job still requires `needs.authorize.outputs.dispatch == 'true'`; every refusal
+  path sets dispatch false and the refusal step precedes the agent job in workflow order.
+
+### Gate status
+
+| Gate           | Outcome          | Exit | Receipt / evidence                                                     | Coverage meaning                                                                 |
+| -------------- | ---------------- | ---: | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Targeted RED   | expected failure |    1 | structured test wrapper before implementation; 7 passed / 3 failed     | Missing workflow routing/helpers proved tests preceded implementation.           |
+| Targeted GREEN | PASS             |    0 | structured test wrapper; policy + workflow suites 26/26                | Focused executable S4 policy, retry, dedup, ordering, and permission feedback.   |
+| `check`        | PENDING          |    — | `receipts/slice-4/check.json` after implementation commit               | Frozen-contract receipt only; package/plugin roots do not cover S4.              |
+| `test`         | PENDING          |    — | `receipts/slice-4/test.json` after implementation commit                | Will be the load-bearing S4 proof through root discovery.                        |
+| `quality-job`  | PENDING          |    — | `receipts/slice-4/quality-job.json` after implementation commit         | Required contract receipt; shares non-covering package/plugin quality inputs.    |
+
+### Handoff boundary
+
+- S4 stops after all three durable receipts, push, and its PR comment for Tier-A review.
+- S5 is not authorized and no read-only phase workflow path was changed.
+- No OpenHands/evaluator dispatch, live workflow trigger, or status-label transition occurred.

@@ -1,8 +1,9 @@
 # OpenHands Agent (v2) — cloud agent runner for NetScript.
 #
 # Public manual-comment trigger contract:
-#   - The command token is the first token of the first line, followed only by recognized
-#     `name=value` arguments, in a PR/issue comment from OWNER/MEMBER/COLLABORATOR.
+#   - Any comment containing the literal command token reaches the trusted default-branch policy.
+#     Only a first-line command with recognized `name=value` arguments from an
+#     OWNER/MEMBER/COLLABORATOR may dispatch; every reportable denial gets one controlled reply.
 #   - Any prompt starts on the following line. Quoted commands and prose mentions do not dispatch.
 #   - workflow_dispatch with explicit inputs.
 #   - `fix-me` / `agent:<profile>` labels on issues/PRs; `openhands` directly on issues.
@@ -139,8 +140,7 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'push' && contains(github.event.head_commit.message, '[openhands')) ||
       (github.event_name == 'issue_comment' &&
-        startsWith(github.event.comment.body, '@openhands-agent') &&
-        contains(fromJson('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)) ||
+        contains(github.event.comment.body, '@openhands-agent')) ||
       ((github.event_name == 'issues' || github.event_name == 'pull_request') &&
         (github.event.label.name == 'fix-me' ||
          (github.event.label.name == 'openhands' && github.event_name == 'issues') ||
@@ -148,6 +148,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      issues: write # one source-comment-keyed refusal via GITHUB_TOKEN
     outputs:
       dispatch: ${{ steps.non_comment.outputs.dispatch || steps.policy.outputs.dispatch }}
       trigger_line: ${{ steps.policy.outputs.trigger_line }}
@@ -179,73 +180,135 @@ jobs:
               process.env.GITHUB_WORKSPACE,
               '.trigger-policy-trusted/.github/scripts/openhands-comment-trigger.mjs',
             );
-            const { authorizeOpenHandsCommentTrigger } = await import(
+            const {
+              authorizeOpenHandsCommentTrigger,
+              buildOpenHandsRefusalReply,
+              isReportableOpenHandsDenial,
+            } = await import(
               pathToFileURL(policyPath).href
             );
-            const decision = await authorizeOpenHandsCommentTrigger(
-              {
-                body: context.payload.comment?.body,
-                authorAssociation: context.payload.comment?.author_association,
-              },
-              async ({ phase, head }) => {
-                if (!context.payload.issue?.pull_request) {
-                  throw new Error('Formal evaluator comment commands require a pull request.');
-                }
-                const owner = context.repo.owner;
-                const repo = context.repo.repo;
-                const issue_number = context.payload.issue.number;
-                const expectedStatus = phase === 'plan' ? 'status:plan-eval' : 'status:impl-eval';
-                const events = await github.paginate(github.rest.issues.listEvents, {
-                  owner,
-                  repo,
-                  issue_number,
-                  per_page: 100,
-                });
-                const generationEvent = events
+
+            async function findPhaseGeneration(loadEvents, expectedStatus, sleep) {
+              let generationEvent;
+              for (let attempt = 0; attempt < 5 && !generationEvent; attempt += 1) {
+                const events = await loadEvents();
+                generationEvent = events
                   .filter((event) => event.event === 'labeled' && event.label?.name === expectedStatus)
                   .at(-1);
-                if (!generationEvent) {
-                  throw new Error(`No labeled-event generation found for ${expectedStatus}.`);
-                }
-                const comments = await github.paginate(github.rest.issues.listComments, {
-                  owner,
-                  repo,
-                  issue_number,
-                  per_page: 100,
-                });
-                const currentCommentId = Number(context.payload.comment?.id);
-                // Re-read the live PR and phase immediately before returning claim operations.
-                // A queued stale command is denied by the trusted policy before any provider job.
-                const { data: livePr } = await github.rest.pulls.get({
-                  owner,
-                  repo,
-                  pull_number: issue_number,
-                });
-                const liveLabelData = await github.paginate(
-                  github.rest.issues.listLabelsOnIssue,
-                  { owner, repo, issue_number, per_page: 100 },
-                );
-                return {
-                  generation: generationEvent.id,
-                  operations: {
-                    createRef: async ({ ref, sha }) => {
-                      await github.rest.git.createRef({ owner, repo, ref, sha });
+                if (!generationEvent) await sleep(1000);
+              }
+              return generationEvent;
+            }
+
+            function buildGenerationLookupRefusal({ sourceCommentId, expectedStatus }) {
+              const id = String(sourceCommentId ?? '');
+              if (!/^[1-9][0-9]*$/.test(id)) {
+                throw new Error('sourceCommentId must be a positive integer');
+              }
+              const marker = `<!-- openhands-command-refusal:${id} -->`;
+              const body = [
+                marker,
+                `OpenHands did not start for source comment ${id}.`,
+                `Reason: the labeled-event generation for \`${expectedStatus}\` was not observable after five attempts.`,
+                'Recovery: cycle away from and back to that phase status, then submit a new formal command.',
+              ].join('\n');
+              return { marker, body };
+            }
+
+            let decision;
+            let refusal;
+            try {
+              decision = await authorizeOpenHandsCommentTrigger(
+                {
+                  body: context.payload.comment?.body,
+                  authorAssociation: context.payload.comment?.author_association,
+                },
+                async ({ phase, head }) => {
+                  if (!context.payload.issue?.pull_request) {
+                    throw new Error('Formal evaluator comment commands require a pull request.');
+                  }
+                  const owner = context.repo.owner;
+                  const repo = context.repo.repo;
+                  const issue_number = context.payload.issue.number;
+                  const expectedStatus = phase === 'plan' ? 'status:plan-eval' : 'status:impl-eval';
+                  const generationEvent = await findPhaseGeneration(
+                    () => github.paginate(github.rest.issues.listEvents, {
+                      owner,
+                      repo,
+                      issue_number,
+                      per_page: 100,
+                    }),
+                    expectedStatus,
+                    (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)),
+                  );
+                  if (!generationEvent) {
+                    const error = new Error(
+                      `Labeled-event generation lookup exhausted for ${expectedStatus}.`,
+                    );
+                    error.code = 'phase-generation-lookup-exhausted';
+                    error.expectedStatus = expectedStatus;
+                    throw error;
+                  }
+                  const comments = await github.paginate(github.rest.issues.listComments, {
+                    owner,
+                    repo,
+                    issue_number,
+                    per_page: 100,
+                  });
+                  const currentCommentId = Number(context.payload.comment?.id);
+                  // Re-read the live PR and phase immediately before returning claim operations.
+                  // A queued stale command is denied by the trusted policy before any provider job.
+                  const { data: livePr } = await github.rest.pulls.get({
+                    owner,
+                    repo,
+                    pull_number: issue_number,
+                  });
+                  const liveLabelData = await github.paginate(
+                    github.rest.issues.listLabelsOnIssue,
+                    { owner, repo, issue_number, per_page: 100 },
+                  );
+                  return {
+                    generation: generationEvent.id,
+                    operations: {
+                      createRef: async ({ ref, sha }) => {
+                        await github.rest.git.createRef({ owner, repo, ref, sha });
+                      },
+                      getRef: async ({ ref }) => {
+                        const existing = await github.rest.git.getRef({ owner, repo, ref });
+                        return { sha: existing.data.object.sha };
+                      },
                     },
-                    getRef: async ({ ref }) => {
-                      const existing = await github.rest.git.getRef({ owner, repo, ref });
-                      return { sha: existing.data.object.sha };
-                    },
-                  },
-                  priorCommentBodies: comments
-                    .filter((comment) => Number(comment.id) !== currentCommentId)
-                    .map((comment) => String(comment.body ?? '')),
-                  currentHead: livePr.head.sha,
-                  liveLabels: liveLabelData.map(({ name }) => name),
-                };
-              },
-            );
+                    priorCommentBodies: comments
+                      .filter((comment) => Number(comment.id) !== currentCommentId)
+                      .map((comment) => String(comment.body ?? '')),
+                    currentHead: livePr.head.sha,
+                    liveLabels: liveLabelData.map(({ name }) => name),
+                  };
+                },
+              );
+            } catch (error) {
+              if (error?.code !== 'phase-generation-lookup-exhausted') throw error;
+              decision = {
+                dispatch: false,
+                triggerLine: '',
+                reason: error.code,
+              };
+              refusal = buildGenerationLookupRefusal({
+                sourceCommentId: context.payload.comment?.id,
+                expectedStatus: error.expectedStatus,
+              });
+            }
+            if (!refusal && isReportableOpenHandsDenial(decision.reason)) {
+              refusal = buildOpenHandsRefusalReply({
+                sourceCommentId: context.payload.comment?.id,
+                authorLogin: context.payload.comment?.user?.login,
+                reason: decision.reason,
+              });
+            }
             core.setOutput('dispatch', String(decision.dispatch));
             core.setOutput('trigger_line', decision.triggerLine);
+            core.setOutput('refusal_marker', refusal?.marker ?? '');
+            core.setOutput('refusal_body', refusal?.body ?? '');
             core.notice(`Manual comment policy: ${decision.reason}`);
             if (['stale-phase-head', 'phase-not-current'].includes(decision.reason)) {
               const recovery = 'Cycle away from and back to the phase status label to create a new deliberate generation.';
@@ -256,6 +319,41 @@ jobs:
                 .addList([`Reason: ${decision.reason}`, `Recovery: ${recovery}`])
                 .write();
             }
+
+      - name: Report denied manual command
+        if: github.event_name == 'issue_comment' && steps.policy.outputs.refusal_marker != ''
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          REFUSAL_MARKER: ${{ steps.policy.outputs.refusal_marker }}
+          REFUSAL_BODY: ${{ steps.policy.outputs.refusal_body }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            async function reportRefusalOnce({ listComments, createComment, marker, body }) {
+              const comments = await listComments();
+              if (comments.some((comment) => String(comment.body ?? '').includes(marker))) {
+                return false;
+              }
+              await createComment(body);
+              return true;
+            }
+
+            await reportRefusalOnce({
+              listComments: () => github.paginate(github.rest.issues.listComments, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                per_page: 100,
+              }),
+              createComment: (body) => github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                body,
+              }),
+              marker: process.env.REFUSAL_MARKER,
+              body: process.env.REFUSAL_BODY,
+            });
 
   agent:
     needs: authorize
