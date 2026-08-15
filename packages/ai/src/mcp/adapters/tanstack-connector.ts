@@ -3,6 +3,7 @@ import type {
   McpClientConnector,
   McpConnectOptions,
   McpConnectorConfig,
+  McpReadResourceResult,
   McpToolDescriptor,
   McpToolResult,
 } from '../../ports/mcp-transport.ts';
@@ -25,46 +26,7 @@ interface TanstackStdioConnectorConfig extends McpConnectorConfig {
   readonly cwd?: string;
 }
 
-/** Create a connector for TanStack Streamable-HTTP MCP clients. */
-export function createTanstackHttpConnector(): McpClientConnector {
-  return async (config) => {
-    const mcp = await import(TANSTACK_MCP_SPECIFIER);
-    const client = await mcp.createMCPClient({
-      transport: {
-        type: 'http',
-        url: config.url,
-        headers: config.headers,
-        fetch: config.fetch,
-      },
-      prefix: config.serverId,
-      name: 'netscript-ai',
-      version: '0.0.1',
-    });
-    return toConnection(config.serverId, client);
-  };
-}
-
-/** Create a connector for TanStack stdio MCP clients. */
-export function createTanstackStdioConnector(): McpClientConnector {
-  return async (config) => {
-    const mcp = await import(TANSTACK_MCP_SPECIFIER);
-    const stdio = await import(TANSTACK_MCP_STDIO_SPECIFIER);
-    const client = await mcp.createMCPClient({
-      transport: stdio.stdioTransport({
-        command: config.command,
-        args: config.args,
-        env: config.env,
-        cwd: config.cwd,
-      }),
-      prefix: config.serverId,
-      name: 'netscript-ai',
-      version: '0.0.1',
-    });
-    return toConnection(config.serverId, client);
-  };
-}
-
-function toConnection(serverId: string, client: {
+interface TanstackClient {
   tools: () => Promise<readonly unknown[]>;
   callTool: (
     name: string,
@@ -73,12 +35,66 @@ function toConnection(serverId: string, client: {
     readonly content?: unknown;
     readonly isError?: boolean;
   }>;
+  readResource: (uri: string) => Promise<McpReadResourceResult>;
   close: () => Promise<void>;
-}): McpClientConnection {
+}
+
+/** Create a connector for TanStack Streamable-HTTP MCP clients. */
+export function createTanstackHttpConnector(): McpClientConnector {
+  return async (config, options) => {
+    options.signal.throwIfAborted();
+    const mcp = await import(TANSTACK_MCP_SPECIFIER);
+    options.signal.throwIfAborted();
+    const client = await settleWithSignal<TanstackClient>(
+      mcp.createMCPClient({
+        transport: {
+          type: 'http',
+          url: config.url,
+          headers: config.headers,
+          fetch: fetchWithSignal(config.fetch, options.signal),
+        },
+        prefix: config.serverId,
+        name: 'netscript-ai',
+        version: '0.0.1',
+      }),
+      options.signal,
+      closeClient,
+    );
+    return toConnection(config.serverId, client);
+  };
+}
+
+/** Create a connector for TanStack stdio MCP clients. */
+export function createTanstackStdioConnector(): McpClientConnector {
+  return async (config, options) => {
+    options.signal.throwIfAborted();
+    const mcp = await import(TANSTACK_MCP_SPECIFIER);
+    const stdio = await import(TANSTACK_MCP_STDIO_SPECIFIER);
+    options.signal.throwIfAborted();
+    const client = await settleWithSignal<TanstackClient>(
+      mcp.createMCPClient({
+        transport: stdio.stdioTransport({
+          command: config.command,
+          args: config.args,
+          env: config.env,
+          cwd: config.cwd,
+        }),
+        prefix: config.serverId,
+        name: 'netscript-ai',
+        version: '0.0.1',
+      }),
+      options.signal,
+      closeClient,
+    );
+    return toConnection(config.serverId, client);
+  };
+}
+
+function toConnection(serverId: string, client: TanstackClient): McpClientConnection {
   return {
     async listTools(options: McpConnectOptions = {}): Promise<readonly McpToolDescriptor[]> {
       options.signal?.throwIfAborted();
-      const tools = await client.tools();
+      const tools = await settleWithSignal(client.tools(), options.signal);
       return tools.map((tool) => toMcpToolDescriptor(serverId, tool));
     },
     async callTool(
@@ -87,7 +103,7 @@ function toConnection(serverId: string, client: {
       options: McpConnectOptions = {},
     ): Promise<McpToolResult> {
       options.signal?.throwIfAborted();
-      const result = await client.callTool(name, args);
+      const result = await settleWithSignal(client.callTool(name, args), options.signal);
       if (result.isError) {
         return {
           toolCallId: name,
@@ -102,10 +118,75 @@ function toConnection(serverId: string, client: {
         state: 'complete',
       };
     },
-    close(): Promise<void> {
-      return client.close();
+    readResource(
+      uri: string,
+      options: McpConnectOptions = {},
+    ): Promise<McpReadResourceResult> {
+      return settleWithSignal(client.readResource(uri), options.signal);
+    },
+    close(options: McpConnectOptions = {}): Promise<void> {
+      return settleWithSignal(client.close(), options.signal);
     },
   };
+}
+
+function fetchWithSignal(fetcher: typeof fetch | undefined, signal: AbortSignal): typeof fetch {
+  const execute = fetcher ?? fetch;
+  return (input: string | URL | Request, init?: RequestInit): Promise<Response> => {
+    const requestSignal = init?.signal ?? (input instanceof Request ? input.signal : undefined);
+    return execute(input, {
+      ...init,
+      signal: requestSignal === undefined || requestSignal === null
+        ? signal
+        : AbortSignal.any([signal, requestSignal]),
+    });
+  };
+}
+
+function settleWithSignal<T>(
+  operation: Promise<T>,
+  signal?: AbortSignal,
+  onLateSuccess?: (value: T) => Promise<void>,
+): Promise<T> {
+  if (signal === undefined) {
+    return operation;
+  }
+  if (signal.aborted) {
+    if (onLateSuccess !== undefined) {
+      operation.then((value) => onLateSuccess(value).catch(() => undefined), () => {});
+    }
+    return Promise.reject(signal.reason);
+  }
+  return new Promise<T>((resolve, reject) => {
+    let settled = false;
+    const onAbort = (): void => {
+      settled = true;
+      reject(signal.reason);
+    };
+    signal.addEventListener('abort', onAbort, { once: true });
+    operation.then(
+      (value) => {
+        signal.removeEventListener('abort', onAbort);
+        if (settled) {
+          onLateSuccess?.(value).catch(() => undefined);
+          return;
+        }
+        settled = true;
+        resolve(value);
+      },
+      (error: unknown) => {
+        signal.removeEventListener('abort', onAbort);
+        if (!settled) {
+          settled = true;
+          reject(error);
+        }
+      },
+    );
+  });
+}
+
+function closeClient(client: { close: () => Promise<void> }): Promise<void> {
+  return client.close();
 }
 
 function toMcpToolDescriptor(serverId: string, value: unknown): McpToolDescriptor {

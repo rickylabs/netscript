@@ -192,3 +192,25 @@ and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
   `fulfilled` after caller abort, proving a hanging close still blocks aggregate teardown.
 - Healthy peer teardown did run; the missing behavior is caller-signal propagation and independent
   aggregate settlement.
+
+## 2026-08-15 — Slice 3 cancellation implementation
+
+- Added SDK-independent resource result types; `readResource` is required on the low-level
+  connection and optional only on `McpTransportPort` for Fresh compatibility.
+- Base transport now races connect/call/resource/close against caller or transport cancellation,
+  invokes late connection cleanup, and transitions closed even when caller-aborted close rejects.
+- Default HTTP fetch receives the combined caller signal; TanStack list/call/resource/close and
+  both HTTP/stdio connector startups settle on abort with late client cleanup.
+- Both published concrete transports forward only `readResource(options)` and `stop(options)`.
+- Pool stop uses per-server settlement and caller-signal races.
+- Published-path/default-fetch/late-success regressions and the full MCP file: structured test raw
+  exit `0`, 18 passed.
+- Targeted eight-file structured check (`--unstable-kv`): raw exit `0`.
+- Cross-package structured `packages/fresh` check (`--unstable-kv`, 197 files, 2 batches): raw exit
+  `0`; no out-of-scope source changed.
+- Targeted eight-file structured lint: raw exit `0`.
+- Targeted eight-file structured fmt check: raw exit `0` after scoped formatter normalization;
+  the pre-normalization check exited `1` with one finding.
+- `deno task quality:scan`: raw exit `0`, no findings.
+- `deno task arch:check`: raw exit `0`; existing warning census only, no failures.
+- `deno.lock` unchanged. No expensive runtime gate ran.

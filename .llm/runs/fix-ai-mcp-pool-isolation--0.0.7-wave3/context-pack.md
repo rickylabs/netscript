@@ -125,3 +125,15 @@ amendment.
 
 - Focused structured pool-stop test raw exit `1`: a hanging server kept `pool.stop()` pending after
   caller abort even though its healthy peer closed.
+
+## 2026-08-15 — Slice 3 green update (append-only)
+
+- Published HTTP/stdio transports now expose and forward cancellable resource-read and stop.
+- Base and TanStack layers settle connect/list/call/resource/close on abort; default HTTP fetch sees
+  the caller signal, and late connector/close completion is cleaned up without leaking.
+- Pool stop settles each server independently.
+- Full MCP tests: raw exit `0`, 18 passed. Targeted check/lint/fmt, quality scan, and architecture
+  check all exit `0`.
+- Mandatory read-only Fresh cross-package check exits `0` across 197 files; its test double remains
+  unchanged because the port resource member is optional.
+- Next slice: registration cancellation propagation.

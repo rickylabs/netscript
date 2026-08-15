@@ -111,6 +111,26 @@ export interface McpToolResult {
   readonly error?: string;
 }
 
+/** One resource payload returned by an MCP server. */
+export interface McpResourceContent {
+  /** Stable resource URI. */
+  readonly uri: string;
+  /** MIME type advertised for the payload, when present. */
+  readonly mimeType?: string;
+  /** Inline text payload, when present. */
+  readonly text?: string;
+  /** Inline base64 payload, when present. */
+  readonly blob?: string;
+  /** Additional protocol fields retained without leaking an SDK type. */
+  readonly [key: string]: unknown;
+}
+
+/** Result of reading one MCP resource URI. */
+export interface McpReadResourceResult {
+  /** Resource payloads returned for the requested URI. */
+  readonly contents: readonly McpResourceContent[];
+}
+
 /** Handler invoked whenever an MCP transport changes state. */
 export type McpStateChangeHandler = (
   state: McpConnectionState,
@@ -145,14 +165,18 @@ export interface McpClientConnection {
     args: Readonly<Record<string, unknown>>,
     options?: McpConnectOptions,
   ): Promise<McpToolResult>;
+  /** Read a resource exposed by the connected server. */
+  readResource(uri: string, options?: McpConnectOptions): Promise<McpReadResourceResult>;
   /** Close the client connection and release resources. */
-  close(): Promise<void>;
+  close(options?: McpConnectOptions): Promise<void>;
 }
 
 /** Serializable config handed to a low-level MCP connector. */
 export interface McpConnectorConfig {
   /** Stable id assigned to the MCP server connection. */
   readonly serverId: string;
+  /** Injected fetch implementation for HTTP transports. */
+  readonly fetch?: typeof fetch;
   /** Additional connector-specific values. */
   readonly [key: string]: unknown;
 }
@@ -201,12 +225,17 @@ export interface McpTransportPort {
     args: Readonly<Record<string, unknown>>,
     options?: McpConnectOptions,
   ): Promise<McpToolResult>;
+  /** Read a resource when the concrete transport exposes that capability. */
+  readResource?(
+    uri: string,
+    options?: McpConnectOptions,
+  ): Promise<McpReadResourceResult>;
   /** Subscribe to state changes; returns an unsubscribe function. */
   onStateChange(
     handler: (state: McpConnectionState, previous: McpConnectionState) => void,
   ): () => void;
   /** Close the transport and abort in-flight connect/reconnect work. */
-  stop(): Promise<void>;
+  stop(options?: McpConnectOptions): Promise<void>;
 }
 
 /**

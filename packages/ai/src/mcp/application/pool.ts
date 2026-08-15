@@ -166,8 +166,14 @@ export class McpTransportPool implements McpTransportPort {
   }
 
   /** Stop every pooled transport and clear discovered tool routes. */
-  async stop(): Promise<void> {
-    await Promise.all([...this.#transports.values()].map((transport) => transport.stop()));
+  async stop(options: McpConnectOptions = {}): Promise<void> {
+    await Promise.allSettled([...this.#transports.values()].map((transport) =>
+      settleWithSignal(
+        transport.stop(options),
+        options.signal,
+        () => Promise.resolve(),
+      )
+    ));
     this.#routes.clear();
     this.#transition('closed');
   }

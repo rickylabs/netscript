@@ -39,7 +39,10 @@ function connection(tools: readonly McpToolDescriptor[] = [searchTool]): McpClie
       assert(!closed, 'closed connection should not call tools');
       return Promise.resolve({ toolCallId: name, content: `called:${name}`, state: 'complete' });
     },
-    close(): Promise<void> {
+    readResource(): Promise<{ readonly contents: readonly [] }> {
+      return Promise.resolve({ contents: [] });
+    },
+    close(_options: McpConnectOptions = {}): Promise<void> {
       closed = true;
       return Promise.resolve();
     },
@@ -508,4 +511,92 @@ Deno.test('published transport stop settles when its caller aborts', async () =>
 
   assertEquals(await settlementWithin(pending), 'rejected');
   assertEquals(closeSignal?.aborted, true);
+});
+
+Deno.test('default published HTTP connector aborts its in-flight fetch', async () => {
+  let fetchSignal: AbortSignal | undefined;
+  let markFetchStarted: (signal: AbortSignal) => void = () => {};
+  const fetchStarted = new Promise<AbortSignal>((resolve) => {
+    markFetchStarted = resolve;
+  });
+  const stalledFetch: typeof fetch = (_input, init) => {
+    const signal = init?.signal;
+    assert(signal !== undefined && signal !== null);
+    fetchSignal = signal;
+    markFetchStarted(signal);
+    return new Promise((_resolve, reject) => {
+      signal.addEventListener('abort', () => reject(signal.reason), { once: true });
+    });
+  };
+  const transport = new StreamableHttpMcpTransport({
+    serverId: 'demo',
+    url: 'https://mcp.example.test',
+    fetch: stalledFetch,
+  });
+  const controller = new AbortController();
+  const pending = transport.connect({ signal: controller.signal });
+  await fetchStarted;
+
+  controller.abort(new DOMException('connect deadline', 'AbortError'));
+
+  assertEquals(await settlementWithin(pending), 'rejected');
+  assertEquals(fetchSignal?.aborted, true);
+});
+
+Deno.test('published transport closes a connector that succeeds after abort', async () => {
+  let resolveConnection: (value: McpClientConnection) => void = () => {};
+  let closes = 0;
+  const lateConnection = new Promise<McpClientConnection>((resolve) => {
+    resolveConnection = resolve;
+  });
+  const transport = new StreamableHttpMcpTransport({
+    serverId: 'demo',
+    url: 'https://mcp.example.test',
+    connector: () => lateConnection,
+  });
+  const controller = new AbortController();
+  const pending = transport.connect({ signal: controller.signal });
+  controller.abort(new DOMException('connect deadline', 'AbortError'));
+  assertEquals(await settlementWithin(pending), 'rejected');
+
+  resolveConnection({
+    ...connection([]),
+    close(): Promise<void> {
+      closes += 1;
+      return Promise.resolve();
+    },
+  });
+  await new Promise<void>((resolve) => queueMicrotask(resolve));
+  await new Promise<void>((resolve) => queueMicrotask(resolve));
+
+  assertEquals(closes, 1);
+});
+
+Deno.test('published transport permits late close completion after abort', async () => {
+  let resolveClose: () => void = () => {};
+  let closes = 0;
+  const transport = new StreamableHttpMcpTransport({
+    serverId: 'demo',
+    url: 'https://mcp.example.test',
+    connector: () =>
+      Promise.resolve({
+        ...connection([]),
+        close(): Promise<void> {
+          closes += 1;
+          return new Promise((resolve) => {
+            resolveClose = resolve;
+          });
+        },
+      }),
+  });
+  await transport.connect();
+  const controller = new AbortController();
+  const pending = transport.stop({ signal: controller.signal });
+  controller.abort(new DOMException('close deadline', 'AbortError'));
+
+  assertEquals(await settlementWithin(pending), 'rejected');
+  assertEquals(closes, 1);
+  assertEquals(transport.state, 'closed');
+  resolveClose();
+  await new Promise<void>((resolve) => queueMicrotask(resolve));
 });

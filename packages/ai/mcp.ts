@@ -58,6 +58,8 @@ export {
   type McpConnectionState,
   type McpConnectOptions,
   type McpConnectorConfig,
+  type McpReadResourceResult,
+  type McpResourceContent,
   type McpServerStatus,
   type McpStateChangeHandler,
   type McpToolDescriptor,
