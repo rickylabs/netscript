@@ -222,3 +222,30 @@ unexported) **is** accurate: `src/adapter.ts:319` declares `class PrismaMySqlAda
 The docs page carries a forward reference to #1293 and will become false the moment this leaf ships.
 It is `docs/`-owned, not `packages/`-owned, so this leaf should report it rather than silently edit
 it — see the cross-lane boundary on #1112.
+
+## D-14 — a background session's `state.json` can never mark terminal (significant)
+
+**Date:** 2026-08-15. The #1293 PLAN-EVAL job `75d9028e` completed its work, wrote its verdict, and
+pushed commit `7780ba49e` — but its `state.json` never set `firstTerminalAt` and never left
+`working`. My wake condition was polling exactly those fields, so it would have waited indefinitely
+on a gate that had already finished. The coordinator attached the session directly, observed the
+completed final response, and told this lane not to wait on `firstTerminalAt`.
+
+This is the inverse of D-7 and completes the pair. D-7 recorded a watcher that fired **early** on a
+mis-parsed field; this records a watcher that would never fire **at all** because the transport
+failed to write the field it was watching. Both have the same root cause: treating a session-state
+field as the verdict signal. `agent-milestone-orchestrator`'s rule is "verify the artefact, never
+the exit code", and job state is a species of exit code.
+
+Standing consequence for this lane, generalising D-7's rule: **a gate is terminal when its artefact
+is terminal** — a verdict token in a committed file, a pushed commit, and local == remote. Session
+state, watcher exits, and `firstTerminalAt` are hints about when to *look*, never evidence of what
+was found. When a wake condition is built on job state, pair it with an artefact check that can
+succeed independently, and treat a long-running `working` state as a reason to inspect the branch
+rather than as proof that work continues. D-12 already recorded that the absence of a job dir proves
+nothing; this extends that to the presence of a job dir with stale contents.
+
+Verification actually used here, none of it depending on job state: verdict commit `7780ba49e`
+resolves and touches `plan-eval.md` alone; `git ls-remote` and local `HEAD` both return it; the tree
+is clean; and the artefact carries the verdict token, the evaluated head, and a route match read
+from `respawnFlags`.

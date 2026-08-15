@@ -1258,3 +1258,86 @@ as a gap the evaluator should fill.
 #1502's cycle 1, forcing the Opus 5 fallback. Fable 5 · medium was **accepted** for this dispatch
 with `providerEnv {}`, so the exhaustion was transient and the policy-preferred evaluator route is
 live again. No fallback is claimed here.
+
+## 2026-08-15 — #1293 PLAN-EVAL terminal `PASS` with three binding rulings
+
+Verdict-only commit `7780ba49e119377f2be39cac5ed110fc12758bfc` adding `plan-eval.md` alone (275
+lines). Local == remote == `7780ba49e`; tree clean. Evaluated plan head `23c4d671b`, base
+`284dda90a`. Evaluator: session `75d9028e-0277-4b1c-bc2f-cefd0ce68dd7`, bridge
+`cse_01T55opXUMc1mMKDZaA8bRf3`, PID `417888`, requested = observed = **Fable 5 · medium**, route
+**match** read from `respawnFlags`. No PR exists at this head, so it correctly posted no PR comment
+and reported to the orchestrator instead.
+
+It honoured all three coordinator rulings without reopening any, and confined its view of the
+split-close contract to a single observational sentence ("coherent with the leaf's evidence; no
+objection") exactly as the brief instructed.
+
+### It re-measured everything, including things nobody asked it to
+
+It reproduced all six baselines independently — the six `private-type-ref` errors with their exact
+identities and line numbers, the eight-file green dry-run, the upstream single call site, the
+unexported class, the swallowing probe, and the two-paths-from-one-acquisition-failure structure.
+
+Then it went further than the brief: it opened **mysql2's own source**
+(`client_handshake.js:311,323,371,385`, `base/connection.js:208,217,456,906`) and established that
+handshake errors, socket errors, `PROTOCOL_CONNECTION_LOST`, and connect-timeout are all marked
+`err.fatal = true`. That is what turns "connection error" from a hand-wave into an implementable
+predicate, and it is the difference between a gate that ratifies and a gate that resolves. It also
+spot-checked every doctrine citation the plan made (A1/A2/A5/A10/A11/A13/A14, AP-3/4/5/10/11/14/19/25,
+the Archetype-2 gate set) and confirmed `arch-debt.md` carries no entry for this package.
+
+### The three rulings
+
+**R1 — callback timing and error semantics.** The predicate is a **package-owned classifier applied
+uniformly at every driver-rejection boundary**, not a boundary-name list: add
+`isConnectionError(error: unknown): boolean` to `src/errors.ts`, true iff a driver error and
+(`fatal === true`) or (`errno ∈ {1040, 1203}`) or (`code` in a closed exported transport/pool set).
+`MySqlError` gains `fatal?: boolean`; the classifier stays module-internal unless `surface:diff`
+records it intentionally. Auth/access/missing-database (1045/1044/1049) fire **iff the driver marked
+them fatal** — i.e. at handshake — and are ordinary mapped errors mid-session; 1040/1203 always fire.
+Precedent vs intent is **ruled for intent**: upstream's event predicate is unreachable through our
+`MysqlPoolClient` seam, so our wider signature is kept and the predicate is carried by JSDoc and
+tests, with no event listener added. Containment is **swallow + `debug`, never rethrow, never
+aggregate**, with tests asserting the primary rejection is the *same object* (`===`) with and without
+a throwing callback. The choke point is a **design constraint**, not a test: one private notifier is
+the only call site, and for `startTransaction` only the outer `connectionLifecycle.catch` notifies —
+which the evaluator justified by observing that `pool.getConnection()` failure never enters the inner
+catch at all. `executeScript` is **in scope for notification, out of scope for normalisation**.
+
+**R2 — public adapter export: Choice B.** The concrete class stays out of the root export map.
+The reasoning is the one that matters: the issue's *need* is that an example cannot name what it
+constructs, but the example constructs the public `PrismaMySqlAdapterFactory` and receives the public
+`PrismaMySqlConnectedAdapter` — both nameable today. Choice A would drag `MysqlPoolClient` and
+`MySqlQueryable` into the surface or force a construction redesign, which is AP-3/AP-4 territory.
+**R2.2 says plainly that box 1 as worded is not satisfied** and that rewording it is an owner/issue
+edit the orchestrator must request — see the escalation below. R2.4 resolves the test-reachability
+gap I raised at Tier-A with the minimum seam: a **module-scoped** `export` on the class so tests can
+construct it with a fake client, with **no** root re-export, and `surface:diff` must show no root
+delta from it.
+
+**R3 — capability probe: notify-and-preserve-fallback.** `connect()` still resolves on a dead host,
+and the evaluator stated that cost plainly rather than burying it: the first real operation then
+fails with its mapped error and fires the hook again — per-operation exactly-once, not a duplicate.
+Rejecting instead would change shipped `0.0.6` behaviour without breaking-change authority.
+
+### Required before the first S1 code commit
+
+Record the rulings as locked decisions in `plan.md` — **D9** = R1.1–R1.3 and R1.5–R1.8, **D10** =
+R2.1–R2.4, **D11** = R1.4/R3 — and add `executeScript` to S2's boundary list. This is a run-artifact
+edit, not implementation. I verify it at the S1 Tier-A stop. Implementation that diverges from a
+ruling is drift and goes in `drift.md`.
+
+Also carried: the evaluator conditioned its D7 acceptance on the **raw** `deno doc --lint` exit code
+and the **raw** `deno publish --dry-run` tail being pasted into the evidence at the content head,
+because acceptance box 3 ("`deno doc --lint` clean") is otherwise proven only by an un-receipted
+check. That condition is now part of the leaf's final-evidence obligation.
+
+### Escalation to the coordinator — issue wording, not mine to change
+
+Under R2.1/R2.2, #1293 acceptance **box 1** ("`PrismaMySqlAdapter` exported from the package's
+public surface") will not be satisfied as written, by design and on evaluator ruling. The leaf will
+mark it **not discharged as worded** in `acceptance-evidence` and state that the intentionally
+exported connected-adapter contract satisfies the stated need. Rewording box 1 is an owner/issue
+edit. This does **not** block the product PR — split-close already keeps #1293 open — but the board
+will carry a box that is deliberately unticked for a reason that is not "unfinished work", and that
+should be recorded by whoever owns the issue text.
