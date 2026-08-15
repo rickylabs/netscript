@@ -139,7 +139,7 @@ Deno.test('sorts every reported path deterministically', () => {
   assertEquals(report.qualityTasks[0].configuredRoots, ['packages', 'plugins']);
 });
 
-Deno.test('live repository census remains explicit before the task-binding slice', async () => {
+Deno.test('live repository census and configured task coverage stay explicit', async () => {
   const report = await checkRootCoverage();
 
   assertEquals(report.census, {
@@ -152,17 +152,47 @@ Deno.test('live repository census remains explicit before the task-binding slice
     { path: 'packages/cli/e2e', reason: 'publish:false' },
   ]);
   assertEquals(report.boundary.excludedWorkspaceMembers.count, 0);
-  assertEquals(report.qualityTasks[0].uncoveredPublishedMembers.length, 29);
+  assertEquals(report.qualityTasks[0].configuredRoots, ['docs/site', 'packages', 'plugins']);
+  assertEquals(report.qualityTasks[0].uncoveredPublishedMembers, []);
+  assertEquals(report.qualityTasks[1].configuredRoots, [
+    '.llm/tools/fitness',
+    '.llm/tools/quality',
+    'docs/site',
+    'packages',
+    'plugins',
+  ]);
   assertEquals(report.qualityTasks[1].uncoveredPublishedMembers, []);
   assertEquals(report.doctrine.uncoveredPublishedMembers, []);
-  assertEquals(report.ok, false);
+  assertEquals(report.ok, true);
 });
 
 Deno.test('CLI emits structured JSON and exits non-zero for incomplete configured coverage', async () => {
+  const root = await Deno.makeTempDir();
   const checker = fromFileUrl(new URL('./check-root-coverage.ts', import.meta.url));
+  await Deno.mkdir(join(root, 'packages/covered'), { recursive: true });
+  await Deno.mkdir(join(root, 'packages/uncovered'), { recursive: true });
+  await Deno.mkdir(join(root, 'plugins'), { recursive: true });
+  await Deno.writeTextFile(
+    join(root, 'packages/covered/deno.json'),
+    JSON.stringify({ name: '@fixture/covered', exports: './mod.ts' }),
+  );
+  await Deno.writeTextFile(
+    join(root, 'packages/uncovered/deno.json'),
+    JSON.stringify({ name: '@fixture/uncovered', exports: './mod.ts' }),
+  );
+  await Deno.writeTextFile(
+    join(root, 'deno.json'),
+    JSON.stringify({
+      workspace: ['packages/*', 'plugins/*'],
+      tasks: {
+        'quality:scan': 'scanner --root packages/covered --root plugins',
+        'quality:scan:repo': 'scanner --root packages --root plugins',
+      },
+    }),
+  );
   const output = await new Deno.Command(Deno.execPath(), {
     args: ['run', '--allow-read', checker],
-    cwd: Deno.cwd(),
+    cwd: root,
     stdout: 'piped',
     stderr: 'piped',
   }).output();
@@ -175,7 +205,7 @@ Deno.test('CLI emits structured JSON and exits non-zero for incomplete configure
   assertEquals(output.code, 1);
   assertEquals(report.ok, false);
   assertEquals(report.qualityTasks[0].task, 'quality:scan');
-  assertEquals(report.qualityTasks[0].uncoveredPublishedMembers.length, 29);
+  assertEquals(report.qualityTasks[0].uncoveredPublishedMembers, ['packages/uncovered']);
   assert(report.errors.some((error) => error.includes('quality:scan does not cover')));
 });
 
