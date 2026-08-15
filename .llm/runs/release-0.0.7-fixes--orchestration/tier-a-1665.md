@@ -153,3 +153,77 @@ must not be discovered after merge.
    follow-up, or request a grant widening. Do not leave it undeclared.
 
 Plan-only repair. No product code, no evaluator, PR stays draft.
+
+---
+
+# Tier-A re-review — repaired head `ee1b44c6d401a9edb9c8690870ea2d9151f8f504`
+
+| Field | Value |
+| --- | --- |
+| Reviewed head | `ee1b44c6d401a9edb9c8690870ea2d9151f8f504` — local == remote == PR, clean, draft, sole `status:plan` |
+| Repair commits | `92bf26e11 chore(sdk): repair cache contract plan` (T-1..T-3), `ee1b44c6d chore(sdk): own query bridge diagnostic plan` (T-4 five-path ruling) |
+| Plan-only proof | `git diff baf1cdf67..ee1b44c6d --name-only` filtered for non-`.llm/runs/` paths is **empty** — no product, test, or docs file edited; correct for plan phase |
+| Verdict | **PASS** — all four findings resolved; one non-blocking advisory |
+
+## Finding-by-finding
+
+**T-1 — RESOLVED.** Admission now returns a request-local decision (`namespace` + optional
+first-overflow id) rather than a global pending flag; each span callback flushes the pending
+`cache.namespace.overflow` signal as its first operation and *then* validates the descriptor. The
+plan states the ordering explicitly, noting it will not claim two separate actions are each "first" —
+the ordering conflict between D2 and D3 that the original plan would have hit. The deferral seam is
+applied to every executable caller from the 12-site census, and `composite-query.ts:42` is handled
+honestly: no admission and no event at factory/module level, deferred to its first real operation.
+Risk register gained a matching row ("Overflow is detected before a span exists").
+
+**T-2 — RESOLVED.** Invalidation stages each report into a fresh per-report map and merges into the
+aggregate only on full success, so entries banked before a mid-report throw cannot escape. The
+required test must fail **partway** — the plan states outright that a first-entry failure is
+insufficient proof of rollback, which was the exact hole in the original wording.
+
+**T-3 — RESOLVED.** Step 9 is now two raw `deno doc --lint` invocations — 9a across all 12
+entrypoints, 9b across `./src/cache/mod.ts` — with all six diagnostics pinned by name and location,
+"exactly these and no others", and an explicit instruction that neither red invocation may be
+reported as PASS. The plan records that no count-only wrapper result can satisfy the gate, and that
+the `plugin-streams-core` diagnostic in the combined run is outside the SDK and not this leaf's
+regression.
+
+**T-4 — RESOLVED under the coordinator's five-path ruling.** `scope-boundary.md` now declares
+exactly five additional paths and no sixth. The superseded debt entry was genuinely **removed**, not
+left alongside the fix: the final commit deletes the whole
+`FOLLOWUP-DOC-QUERY-BRIDGE-DIAGNOSTIC` block from `drift.md` (13 lines), and no residual
+debt/deferral language for the page survives anywhere in the run directory.
+
+The dynamic-URL problem I raised is solved mechanically rather than by prose. The message becomes a
+single-line template carrying one `<resolved import.meta.url>` token; `cache-provider_test.ts`
+captures the real error, normalizes **only** the resolved URL segment back to that token, reads the
+authorized docs code block, and byte-compares. It separately asserts the captured URL equals
+`new URL('./cache-provider.ts', import.meta.url).href`. That makes the prefix, wording, punctuation,
+hypothesis, and browser hint an automated acceptance item. The docs read is test-only; no runtime
+asset or filesystem read is introduced.
+
+Also verified: D4's new message **preserves** the existing browser/client-side clause already
+shipped at `cache-provider.ts:209-211`, so D4 adds only the module identity and the two-instances
+hypothesis — it does not smuggle new wording scope into an API-adjacent string.
+
+## Advisory (non-blocking)
+
+The docs quotation is currently a 4-line hard-wrapped `text` fence; the plan deliberately rewrites it
+to a single ~450-character line so byte equality holds against the newline-free runtime string. That
+is coherent and `deno fmt` does not rewrap fenced content, but the published page will render that
+block with horizontal scroll. If the implementer prefers to keep the page wrapped, the test must
+unwrap the block before comparison — it must not be "fixed" by loosening byte equality to a substring
+check. Recorded for PLAN-EVAL and implementation; not a blocker.
+
+## Regression check on the repair
+
+`plan.md` hunks in `ee1b44c6d` fall only in the D4/T-4 regions and the scope/validation tables.
+T-1..T-3 anchors are intact at the final head: the request-local pending-signal language, the
+"merges that map into the aggregate" staging sentence, and all six `private-type-ref` baseline
+entries.
+
+## Outcome
+
+Tier-A **PASS** at `ee1b44c6d`. Requesting the coordinator's fresh PLAN-EVAL grant. No evaluator
+launched by this session; PR remains draft at sole `status:plan`; no product code exists on the
+branch.
