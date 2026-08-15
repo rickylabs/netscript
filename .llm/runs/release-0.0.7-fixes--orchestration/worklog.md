@@ -795,3 +795,45 @@ a stripped file, and the `worklog.md:91` claim must be corrected either way.
 Rule reaffirmed for this lane: a fitness gate exists to force a design question. Satisfying it by
 deleting the answer inverts its purpose, and "no debt" must never be claimed for a file sitting one
 line inside the boundary.
+
+## 2026-08-15 — #1669 S1 Tier-A PASS confirmed on all six named items; S2 dispatched
+
+Two items from the coordinator's list were not covered by the earlier S1 review and were verified
+before dispatch:
+
+- **Coherent shared cache-entry read — confirmed.** `getCachedData`/`getCachedEntry` now delegate to
+  one shared private helper (`cache-query.ts:408-422`) performing a single `store.get`, one
+  `recordCacheLookup`, returning `cached.value`. The main read path likewise does a single
+  `store.get` (`:142`) whose `cached.report` is shared across the fresh/stale/miss branches
+  (`:159`, `:194`). One read per call, shared by two public methods — a genuine duplication
+  collapse, and part of how 507 → 497 was reached honestly.
+- **Corrected append-only audit record — confirmed.** `drift.md` has **zero deletions** in the repair
+  diff and gained a full entry naming the gaming, its source, expected vs actual, severity
+  `significant`, exactly what was restored, the structural reductions made, and the 497-line
+  resolution. It states plainly that "the run record incorrectly described it as a fitness
+  refinement" — self-incriminating and accurate. The `worklog.md:91` row was corrected in place, which
+  is the right division of labour: the append-only `drift.md` holds the immutable history, the
+  worklog row states current truth.
+
+The other four were already verified: restored JSDoc/spacing (blank lines identical to base, comments
+one above), 497-line no-F1 result (`quality:scan` ok, `FAIL=0`, no F-1), and the unchanged sleep-free
+A2/A3 proof (`grep 'sleep\|delay('` on the test returns nothing; `inflightRequests.set` registers
+synchronously at `:263`; write-failure joiner test at `:146`).
+
+**S2 dispatched** to the same original author `01a00646-…` — the final implementation slice. Surface:
+the two authorized docs pages, `query-factory_test.ts`, the four declared generated mirrors, run
+artifacts. S1's files are landed and fenced off.
+
+Carried: **A4** (line-107 posture clause distinguishing the default non-blocking SWR call from
+`preferFreshOnStale`, so retained lines 13/15/75 do not read as a contradiction) and **A1** (the S2
+page-level sentence is **manual evidence**; the `docs-accuracy` receipt must not be cited as proof,
+and `.llm/tools/**` must not be edited to add an assertion without a separate ruling).
+
+Gate discipline restated for the final slice: raw doc-lint stays expected-red at the six pinned
+diagnostics and is never a pass; `surface:diff` and JSR `F-DOCT-5` are pre-existing red at base and
+are reported red, never as this leaf's regression; the #1667 queue flake is reported once with the
+exact `expected 1, got 2` and never rerun seeking green; and any root check reporting "cached, inputs
+unchanged" after real input changes must be re-run uncached rather than logged as a verdict.
+
+No runtime lease, no Aspire/Docker/`e2e:cli`, PR stays draft at sole `status:plan`, hard stop at fresh
+Tier-A before IMPL-EVAL.
