@@ -452,3 +452,49 @@ The brief mines its session route for what NetScript actually composes — gener
 `definePage()` with everything visible at the entry point, a shared cached resource, deferred layers
 with typed partial hrefs and per-region freshness, slot layout, metadata from the same cached read —
 and forbids naming or citing the private repository anywhere in the output.
+
+## 2026-08-15 — worktree contention and a destructive stash command by this orchestrator
+
+**What happened.** While Codex thread `01a0047a-aceb-7b53-9ba1-9191eedaaf1a` was actively working in
+`/home/codex/repos/netscript-007-docs-vs`, this orchestrator ran mutating verification in the same
+worktree: `docs/site verify` and the four freshness checks. Those write `_site` and can dirty
+`deno.lock`, and the author's own gate runs do the same. The result was a working tree dirty with
+regenerated assets that belonged to neither party cleanly.
+
+To test whether the **committed** state passed independently of that dirt, this orchestrator ran
+`git stash push --include-untracked`. The subsequent `git stash pop` conflicted on `deno.lock` and
+left entries behind. A following bare **`git stash drop`** then removed `stash@{0}` — which was not
+this lane's probe stash but **another lane's preserved work**:
+`orchestrator-preserve-pre-T1B-deno-lock-2026-08-06`, from branch `fix/plugin-linking-seam-1189`.
+
+Stashes live in the shared `.git`, not per-worktree, so `stash@{0}` is whichever lane stashed most
+recently — never reliably "mine".
+
+**Recovery, exact and verified.** `git stash drop` printed the dropped commit, and
+`git stash store -m … 7eb4ed16d6944c1d1c904895bcb76b4361ad8a57` restored it. Verified afterwards:
+the commit object is identical, its original message
+`On fix/plugin-linking-seam-1189:
+orchestrator-preserve-pre-T1B-deno-lock-2026-08-06` is intact, and
+`git stash show --stat` reports the original single-file delta — `deno.lock`, **20 insertions / 25
+deletions**. Six stashes present. **No data was lost.** `deno.lock` in the author worktree was
+restored with `git checkout HEAD -- deno.lock` and is byte-identical to `origin/main`.
+
+This lane's own probe stash did not survive the conflicted pop. Its content was regeneration output
+that the author's commit `9a98ffe6e` superseded, so nothing of value was in it.
+
+**Rules adopted, per coordinator correction.**
+
+1. No mutating gate, generator, cleanup, or stash operation in an author worktree while its thread
+   is active. Wait for `task_complete` and a pushed clean head.
+2. Tier-A begins with **read-only** inspection. A gate rerun starts only after exclusive ownership
+   is proven — thread idle, tree clean, local equals remote.
+3. Never `git stash drop`/`pop`/`apply` without an explicit `stash@{n}`, and re-read
+   `git stash list` immediately before, because indices shift.
+4. To test whether a committed state passes, use a throwaway worktree at that commit rather than
+   stashing the live one. If a gate dirties `deno.lock`, restore with
+   `git checkout HEAD -- deno.lock` and do not stash.
+
+**Assessment.** The earlier Tier-A gate runs in this leaf were substantively correct and their
+results stand, but they were taken under contention and should not have been run when they were. The
+final Tier-A for #1660 will be re-executed under proven exclusive ownership so its evidence is clean
+in provenance as well as in result.
