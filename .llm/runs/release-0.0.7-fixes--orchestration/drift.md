@@ -175,3 +175,39 @@ landed on the lane: a supervisor whose probes are weaker than its conclusions ma
 the agents it supervises. Corrective rule adopted for this lane: **execute the check; never infer a
 negative from a pattern match** — and when a finding would expand a contract, re-derive its premise
 by execution before escalating it.
+
+
+## Significant — #1448 leaf contract amended by delegated orchestrator authority
+
+Coordinator delegated the ruling to `topic-fixes-0.0.7`. Leaf-local ruling committed at
+`e2faaab15`; S0 blocker head `1d4533462a088ad902ac7dd71be88764463fcd5d`.
+
+The leaf's S0 stop was correct — it proved the blocker red-first, committed artifact-only, and
+refused to widen its own contract. Verified against the live issue and the code rather than the
+report: criteria 1 (RED test), 3 (degraded state **and error**), 8 (**public** I/O-free snapshot)
+and 9 (docs) have no authorized surface, and criterion 4 is only partly reachable because
+resource-read and close plumb through the shared base transport rather than the TanStack connector
+alone.
+
+**Amendment — exactly five files:** `packages/ai/tests/mcp_test.ts`,
+`packages/ai/src/ports/mcp-transport.ts`, `packages/ai/src/mcp/adapters/base-transport.ts`,
+`packages/ai/mcp.ts`, `packages/ai/README.md`. Explicitly denied: anything outside `packages/ai/**`,
+a **new** `deno.json` `exports` entry (reuse `./mcp`), consumer-side EIS-Chat work, and other
+packages' surfaces.
+
+**Public contract ruled:** the per-server status snapshot is **synchronous and I/O-free** (the
+load-bearing property of criterion 8 — an `async` signature invites the very defect the issue is
+about), keyed by `serverId`, carrying state plus the **last error**, reusing `McpConnectionState`
+rather than a parallel vocabulary, exposing ready clients alongside, and **additive only** on a
+published JSR surface under `isolatedDeclarations`. Cancellable close takes a `signal`-bearing
+options bag mirroring `McpConnectOptions`, and **`pool.stop()` must settle per server** — today
+`pool.ts:149` is `Promise.all(... t.stop())`, the same all-or-nothing defect as startup, which
+leaves criterion 4 unmet while it stands.
+
+**Archetype reconciliation:** the coordinator's Archetype-2 override stands for gate selection, but
+because the amendment now touches the public `mcp.ts` entrypoint and the port, the Archetype-4/JSR
+obligations on `packages/ai` are **not** waived — `deno doc --lint`, `isolatedDeclarations`, and the
+publish dry-run apply to the exported surface. Accepting the archetype override is not accepting a
+lighter public-surface bar.
+
+No expensive-gate lease granted.
