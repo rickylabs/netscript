@@ -84,3 +84,15 @@ publish deltas and require fresh JSR/member dry-run evidence.
 Implementation author commits/pushes the SA-4 attempt-2 attribution and evidence index, comments,
 and stops for the second fresh Tier-A. Fresh delta IMPL-EVAL, readiness, issue boxes, close-gate,
 labels, draft state, and merge remain coordinator-owned.
+
+## CI changed-source quality repair
+
+After post-integration IMPL-EVAL cycle 4 PASS, ready-triggered Code quality run `31908898023` found
+two leaf-owned checker findings: one explicit `any` parameter and one unsafe `as any` access. The
+focused repair replaces both with the typed Deno exports union and narrowing helpers. Target-level
+`null` deliberately resolves to `''`; malformed top-level exports throw fail-closed.
+
+The exact nine-file changed-source scan is green with zero findings/allowances. Root test is
+4,217/0/19, focused checker tests are 12/0, and direct drift retains its eight package reports and
+PASS. No generator output or lock moved. The author stops after commit/push/comment for fresh
+internals Tier-A; no evaluator is launched by the author.

@@ -26,6 +26,14 @@ export interface PackageMapping {
   symbolCoverage: SymbolCoverage;
 }
 
+export interface DenoConditionalExportTarget {
+  readonly default?: string;
+}
+
+export type DenoExportTarget = string | DenoConditionalExportTarget;
+
+export type DenoExports = string | Readonly<Record<string, DenoExportTarget>>;
+
 export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
   {
     name: 'fresh-ui',
@@ -353,7 +361,7 @@ export function parseDocContent(
 
 export function deriveExpectedExports(
   packageName: string,
-  exportsObj: any,
+  exportsObj: unknown,
   excludedExports: readonly string[] = [],
 ): Map<string, string> {
   const expectedExports = new Map<string, string>();
@@ -363,17 +371,34 @@ export function deriveExpectedExports(
     if (!excludedSet.has('.')) {
       expectedExports.set(packageName, exportsObj);
     }
-  } else {
-    for (const [key, value] of Object.entries(exportsObj)) {
-      if (excludedSet.has(key)) continue;
-      const exportName = key === '.' ? packageName : `${packageName}/${key.slice(2)}`;
-      expectedExports.set(
-        exportName,
-        typeof value === 'string' ? value : (value as any).default || '',
-      );
-    }
+    return expectedExports;
+  }
+
+  if (!isExportsRecord(exportsObj)) {
+    throw new TypeError('Deno exports must be a string or a record');
+  }
+
+  for (const [key, value] of Object.entries(exportsObj)) {
+    if (excludedSet.has(key)) continue;
+    const exportName = key === '.' ? packageName : `${packageName}/${key.slice(2)}`;
+    expectedExports.set(exportName, resolveDenoExportPath(value));
   }
   return expectedExports;
+}
+
+function isExportsRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isDenoExportTarget(value: unknown): value is DenoExportTarget {
+  if (typeof value === 'string') return true;
+  if (!isExportsRecord(value)) return false;
+  return value.default === undefined || typeof value.default === 'string';
+}
+
+function resolveDenoExportPath(value: unknown): string {
+  if (!isDenoExportTarget(value)) return '';
+  return typeof value === 'string' ? value : value.default || '';
 }
 
 export function checkExportsDrift(

@@ -1,4 +1,4 @@
-import { assertEquals, assertStringIncludes } from '@std/assert';
+import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
 import { join, relative } from '@std/path';
 import {
   checkDrift,
@@ -64,6 +64,59 @@ Deno.test('drift checker negative fixture validation', () => {
     docExportsDocumented,
   );
   assertEquals(errorsDocumented.length, 0);
+});
+
+Deno.test('derives a root export from the string exports form', () => {
+  assertEquals(
+    deriveExpectedExports('@netscript/fixture', './mod.ts'),
+    new Map([['@netscript/fixture', './mod.ts']]),
+  );
+});
+
+Deno.test('derives record exports from string and default targets', () => {
+  assertEquals(
+    deriveExpectedExports('@netscript/fixture', {
+      '.': './mod.ts',
+      './conditional': { default: './conditional.ts' },
+    }),
+    new Map([
+      ['@netscript/fixture', './mod.ts'],
+      ['@netscript/fixture/conditional', './conditional.ts'],
+    ]),
+  );
+});
+
+Deno.test('uses an empty path when a conditional export has no default', () => {
+  assertEquals(
+    deriveExpectedExports('@netscript/fixture', { './conditional': {} }),
+    new Map([['@netscript/fixture/conditional', '']]),
+  );
+});
+
+Deno.test('preserves the empty fallback for a falsy default', () => {
+  assertEquals(
+    deriveExpectedExports('@netscript/fixture', { './conditional': { default: '' } }),
+    new Map([['@netscript/fixture/conditional', '']]),
+  );
+  assertEquals(
+    deriveExpectedExports('@netscript/fixture', { './malformed': { default: false } }),
+    new Map([['@netscript/fixture/malformed', '']]),
+  );
+});
+
+Deno.test('uses an empty path for a null export target instead of throwing', () => {
+  assertEquals(
+    deriveExpectedExports('@netscript/fixture', { './malformed': null }),
+    new Map([['@netscript/fixture/malformed', '']]),
+  );
+});
+
+Deno.test('refuses a malformed top-level exports value', () => {
+  assertThrows(
+    () => deriveExpectedExports('@netscript/fixture', 42),
+    TypeError,
+    'Deno exports must be a string or a record',
+  );
 });
 
 Deno.test('symbol parsing is table-aware and normalizes display generics', () => {

@@ -88,3 +88,15 @@
   attempt 2 and recomputes `SUFFICIENT` while indexing both receipts.
 - **Boundary drift:** none. No product/source/generated/lock change resulted from attribution or
   quarantine; runtime, close-gate, PR-state, label, issue-box, and merge actions remain untouched.
+
+## CI quality finding — typed Deno exports boundary
+
+- **Observed:** ready-triggered Code quality run `31908898023` found `explicit-any` and
+  `unsafe-cast` in the leaf-owned checker after the post-integration evaluator PASS.
+- **Plan impact:** no rescope. Both findings are in the authorized checker path; the existing test
+  path remains assertions-only.
+- **Resolution:** model the real string-or-record exports shape and narrow untrusted JSON without
+  casts. Preserve the empty fallback, deliberately make target-level `null` safe, and make malformed
+  top-level values fail closed.
+- **Proof:** exact CI selection raw 0 after repair; focused tests 12/0; root test 4,217/0/19; direct
+  drift raw 0 with unchanged coverage reporting.

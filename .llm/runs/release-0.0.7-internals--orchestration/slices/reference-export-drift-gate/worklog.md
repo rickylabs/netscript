@@ -292,3 +292,20 @@ combined-diff proof, history/append-only audit, and lock proof are raw-exit-0. A
 checker invocation omitted write permission and returned raw exit 1; the corrected command returned
 raw exit 0 with 6/0, while the authoritative full-suite receipt was already green. Full details are
 in `base-refresh-evidence.md` and `audit/base-refresh/`.
+
+## CI changed-source quality repair
+
+Code quality run `31908898023` found this leaf's `exportsObj: any` and conditional-export `as any`
+access. The exact nine-file CI scan was reproduced locally at raw exit 1 with those two findings and
+no others. The checker now models Deno export targets with a string/object union and uses `unknown`
+plus narrowing helpers; no allowance or suppression was introduced.
+
+Missing/falsy defaults retain the exact `''` fallback. Target-level `null` deliberately changes from
+throwing to `''` so one malformed entry does not abort the audit. A malformed top-level `exports`
+primitive now throws a typed error rather than silently deriving an empty inventory. Seven focused
+derivation cases make those branches independently observable.
+
+Final evidence: exact changed-source quality raw 0 with nine paths / zero findings / zero
+allowances; focused checker 12/0; root test 4,217/0/19; check raw 0; direct drift raw 0 with
+unchanged eight-row coverage output. Generated cascade outputs and `deno.lock` are unchanged. See
+`ci-quality-repair-evidence.md`.
