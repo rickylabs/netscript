@@ -6,17 +6,18 @@
 | --- | --- |
 | Run ID | `release-0.0.7-internals--orchestration/slices/openhands-dispatch-claim-and-refusal` |
 | Branch | `fix/openhands-dispatch-claim-and-refusal` |
-| Current phase | implementation S1; awaiting durable gates and Tier-A slice review |
+| Current phase | S1 complete; stopped for Tier-A slice review |
 | Archetype | `6-cli-tooling` |
 | Scope overlays | none |
 
 ## Current State
 
 PLAN-EVAL passed in separate evaluator commit `e15d78588` against plan head `cea999d18`. S1 is the
-only authorized implementation slice. Its RED/GREEN loop now proves literal candidates reach the
+only authorized implementation slice. Its RED/GREEN loop proves literal candidates reach the
 trusted policy, the five reportable reasons are explicit, status/refusal markers stop recursion,
 and controlled refusal replies are source-attributable, sanitized, command-token-free, and immune
-to the watcher fallback verdict vocabulary. Durable gates and the S1 evidence handoff remain.
+to the watcher fallback verdict vocabulary. Durable `check` and `test` receipts pass at committed
+head `4aa04de34`; `test` is the only receipt that behaviorally covers the leaf.
 
 ## Completed
 
@@ -27,16 +28,16 @@ to the watcher fallback verdict vocabulary. Durable gates and the S1 evidence ha
 - Repaired plan, Design checkpoint, research resolution, and resolved drift entry.
 - Separate PLAN-EVAL PASS at `e15d78588`.
 - S1 targeted RED (exit 1 before exports existed) and GREEN (exit 0, 16/16 tests).
+- S1 durable `check` PASS/0 and `test` PASS/0 receipts at `4aa04de34`.
 
 ## In Progress
 
-- Commit S1, produce durable receipts at the committed head, then push/comment and stop for Tier-A.
+- Nothing. S1 is being pushed/commented and this thread stops for Tier-A.
 
 ## Next Steps
 
-1. Record S1 durable `check` and `test` receipts and the truthful coverage distinction.
-2. Push S1 and post its scoped PR evidence comment.
-3. Stop for Tier-A substantive slice review; do not begin S2.
+1. Tier-A substantively reviews S1 and either requests a bounded repair or authorizes S2.
+2. If authorized, begin S2 only; otherwise repair S1 without widening the envelope.
 
 ## Key Decisions
 
@@ -65,9 +66,9 @@ to the watcher fallback verdict vocabulary. Durable gates and the S1 evidence ha
 
 | Gate | Current status | Evidence |
 | --- | --- | --- |
-| `check` | NOT_RUN | durable S1 receipt pending committed head; does not select this leaf |
-| `test` | targeted GREEN | structured wrapper exit 0, 16/16; durable S1 receipt pending |
-| `quality-job` | NOT_RUN | planning-only turn |
+| `check` | PASS | `receipts/slice-1/check.json`, exit 0 at `4aa04de34`; package/plugin selection does not cover S1 |
+| `test` | PASS | `receipts/slice-1/test.json`, exit 0 at `4aa04de34`; 4,138 passed, 19 ignored, 0 failed; load-bearing |
+| `quality-job` | NOT_RUN | not an S1 gate; scheduled for S4/S5 and not independent behavioral proof |
 | JSR | N/A | no publishable surface |
 
 ## Open Questions

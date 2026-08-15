@@ -79,6 +79,8 @@ surfaces mirror those boundaries in the same order.
 | 2026-08-15 | Plan gate | PASS | Separate evaluator commit `e15d78588` records PASS against plan head `cea999d18`; implementation authorized at S1. |
 | 2026-08-15 | S1 | RED | Added candidate/refusal/recursion regressions first; targeted structured test wrapper exited 1 because the new policy exports did not exist. |
 | 2026-08-15 | S1 | Implementation | Added literal candidate classification, explicit five-reason reportable set, marker exclusions, and controlled source-comment refusal replies; targeted suite passed 16/16 after implementation. |
+| 2026-08-15 | S1 | Durable gates | At committed head `4aa04de34`, `check` passed with 2,922 package/plugin files selected and `test` passed with 4,138 passed / 19 ignored / 0 failed. Only `test` covers this leaf. |
+| 2026-08-15 | S1 | Reconcile | #1611 and #1613 remain open at milestone `0.0.7`; PR comments through PLAN-EVAL were read and introduced no new implementation adjustment. No issue mutation or out-of-scope label change was made. |
 
 ## Decisions
 
@@ -91,15 +93,21 @@ surfaces mirror those boundaries in the same order.
 
 ## Gate Results
 
-Durable slice receipts are pending the committed S1 head. The targeted RED/GREEN loop used the
-structured test wrapper directly: RED exit 1 before implementation, then GREEN exit 0 with 16/16
-tests after implementation. Of the frozen proving gates, only `test` exercises this leaf;
-`check` and `quality-job` select package/plugin roots and will be recorded as contract receipts,
-not as independent behavioral proof.
+| Gate | Outcome | Exit | Receipt / evidence | Coverage meaning |
+| --- | --- | ---: | --- | --- |
+| Targeted RED | expected failure | 1 | structured test wrapper, before implementation; no durable PASS receipt | New policy exports did not exist. |
+| Targeted GREEN | PASS | 0 | structured test wrapper; 16/16 | Focused S1 regression feedback. |
+| `check` | PASS | 0 | `receipts/slice-1/check.json` at `4aa04de34` | Frozen-contract receipt only: selected 2,922 files under package/plugin roots and does not cover S1. |
+| `test` | PASS | 0 | `receipts/slice-1/test.json` at `4aa04de34`; 4,138 passed, 19 ignored, 0 failed | Load-bearing S1 behavioral proof; root discovery executed the policy suite. |
+| `quality-job` | NOT_RUN | — | S1 does not name this gate; scheduled for S4/S5 | Would share the non-covering package/plugin `check` dependency and is not independent proof. |
 
 ## Handoff Notes
 
 - PLAN-EVAL passed in separate evaluator commit `e15d78588` before implementation.
 - S1 stops after its durable receipts, push, and PR comment for Tier-A substantive review.
 - S2 is not authorized until that review.
+- Evaluator N3/N4 are discharged in S1: controlled refusal output is tested against the exact
+  watcher fallback token regex, and each of the five reportable reasons has its own assertion.
+- Evaluator N5 remains deliberately deferred to S4, the authorized workflow slice: refusal posting
+  must use `GITHUB_TOKEN` beneath `issues: write`, never `PAT_TOKEN`.
 - This thread did not dispatch OpenHands/evaluator work or apply workflow-triggering labels.
