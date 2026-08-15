@@ -248,3 +248,9 @@ settled-refetch observation; a unit test exercises its pure assertions without C
 Docker, or either expensive suite. The exact files, gate order, assertions, and replacement receipt
 set are locked in `plan.md` before product edits. Existing S4-FIX1 receipts remain valid at
 `32ea23f50` but become superseded once the content head moves.
+
+The initial compile-pass design placed the pure/static contract and Chrome DevTools transport in one
+572-line module, crossing doctrine F-1's 500-line review threshold. Before adding a second source
+file, the bounded list is amended to name `service-client-browser-probe.ts` as the internal transport
+dependency. The runtime probe retains all assertions and orchestration; the adapter owns only Chrome
+discovery and CDP mechanics. No public surface, gate, scenario, or expensive-gate authority changes.
