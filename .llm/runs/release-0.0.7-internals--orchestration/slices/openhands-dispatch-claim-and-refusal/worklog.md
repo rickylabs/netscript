@@ -167,6 +167,8 @@ Slice 2 is authorized.
 | 2026-08-15 | Authorization | Fast-forwarded to Tier-A S1 sign-off `6f725ad3b`; began S2 only. |
 | 2026-08-15 | RED | Added symmetric formal-pair and non-formal-omission tests first; targeted structured wrapper exited 1 because `DispatchOptions` had no `phase`/`head` surface. |
 | 2026-08-15 | Implementation | Kept `buildOpenHandsComment` pure; added optional typed phase/head inputs, runtime pair/phase/SHA validation, paired emission, and explicit tuple-free assertions. Targeted suite passed 75/75. |
+| 2026-08-15 | Durable gates | At `28a8a9184`, cached package/plugin `check` passed and root `test` passed with 4,140 passed / 19 ignored / 0 failed. Only `test` covers S2. |
+| 2026-08-15 | Reconcile | Read S1 supervisor sign-off comment `5301346790`; #1611/#1613 remain open and unchanged at milestone `0.0.7`. No plan adjustment or issue mutation was needed. |
 
 ### Decisions
 
@@ -178,11 +180,13 @@ Slice 2 is authorized.
 
 ### Gate status
 
-Durable S2 `check` and `test` receipts are pending the committed implementation head. The targeted
-RED/GREEN loop used the structured test wrapper: RED exit 1 before the producer surface existed,
-then GREEN exit 0 with 75/75 tests. As in S1, only root `test` discovers this `.llm/` test surface;
-`check` selects package/plugin roots and will be recorded as a contract receipt, not independent
-behavioral proof. `quality-job` is `NOT_RUN` because S2 does not name it.
+| Gate | Outcome | Exit | Receipt / evidence | Coverage meaning |
+| --- | --- | ---: | --- | --- |
+| Targeted RED | expected failure | 1 | structured test wrapper before implementation; no durable PASS receipt | Type-check rejected absent `phase`/`head` producer fields. |
+| Targeted GREEN | PASS | 0 | structured test wrapper; 75/75 | Focused pair-validation and tuple-omission feedback. |
+| `check` | PASS | 0 | `receipts/slice-2/check.json` at `28a8a9184`; unchanged-input cache hit | Frozen-contract receipt only; package/plugin roots do not cover S2. |
+| `test` | PASS | 0 | `receipts/slice-2/test.json` at `28a8a9184`; 4,140 passed, 19 ignored, 0 failed | Load-bearing S2 behavioral proof; root discovery executed the producer suite. |
+| `quality-job` | NOT_RUN | — | S2 does not name this gate; scheduled for S4/S5 | Shares the non-covering package/plugin check dependency and is not independent proof. |
 
 ### Handoff boundary
 

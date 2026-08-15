@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `release-0.0.7-internals--orchestration/slices/openhands-dispatch-claim-and-refusal` |
 | Branch | `fix/openhands-dispatch-claim-and-refusal` |
-| Current phase | S2 implementation complete; durable gates pending |
+| Current phase | S2 complete; stopped for Tier-A slice review |
 | Archetype | `6-cli-tooling` |
 | Scope overlays | none |
 
@@ -15,8 +15,8 @@
 Tier-A signed off S1 at `6f725ad3b` with no changes and authorized S2. S2 is the only active slice:
 the pure producer now validates phase/head as a complete formal pair, rejects invalid phases and
 malformed immutable heads, emits both tokens together, and explicitly emits neither token in
-non-formal mode. The focused suite is GREEN at 75/75; durable receipts remain to be created at a
-committed S2 head.
+non-formal mode. Durable `check` and `test` receipts pass at implementation head `28a8a9184`; only
+`test` covers this `.llm/` producer surface.
 
 ## Completed
 
@@ -30,15 +30,16 @@ committed S2 head.
 - S1 durable `check` PASS/0 and `test` PASS/0 receipts at `4aa04de34`.
 - Tier-A S1 sign-off commit `6f725ad3b`.
 - S2 targeted RED (exit 1 before the tuple surface existed) and GREEN (exit 0, 75/75 tests).
+- S2 durable `check` PASS/0 and `test` PASS/0 receipts at `28a8a9184`.
 
 ## In Progress
 
-- Commit S2, create durable `check`/`test` receipts, push/comment, then stop for Tier-A.
+- Nothing. S2 is being pushed/commented and this thread stops for Tier-A.
 
 ## Next Steps
 
-1. Record S2 durable `check` and `test` receipts with the N2 coverage distinction.
-2. Push/comment S2 and stop for Tier-A; do not begin S3.
+1. Tier-A substantively reviews S2 and either requests a bounded repair or authorizes S3.
+2. Do not begin S3 without that authorization.
 
 ## Key Decisions
 
@@ -65,15 +66,15 @@ committed S2 head.
 
 ## Gates
 
-| Gate | Current status | Evidence |
-| --- | --- | --- |
-| `check` | PASS | `receipts/slice-1/check.json`, exit 0 at `4aa04de34`; package/plugin selection does not cover S1 |
-| `test` | PASS | `receipts/slice-1/test.json`, exit 0 at `4aa04de34`; 4,138 passed, 19 ignored, 0 failed; load-bearing |
-| `quality-job` | NOT_RUN | not an S1 gate; scheduled for S4/S5 and not independent behavioral proof |
-| JSR | N/A | no publishable surface |
-
-S2 durable gates are pending its committed implementation head. Its targeted producer suite passed
-75/75; `quality-job` remains `NOT_RUN` because S2 names only `check` and `test`.
+| Slice | Gate | Current status | Evidence |
+| --- | --- | --- | --- |
+| S1 | `check` | PASS | `receipts/slice-1/check.json`, exit 0 at `4aa04de34`; package/plugin selection does not cover S1 |
+| S1 | `test` | PASS | `receipts/slice-1/test.json`, exit 0 at `4aa04de34`; 4,138 passed, 19 ignored, 0 failed; load-bearing |
+| S1 | `quality-job` | NOT_RUN | not an S1 gate; scheduled for S4/S5 and not independent behavioral proof |
+| S2 | `check` | PASS | `receipts/slice-2/check.json`, cached exit 0 at `28a8a9184`; package/plugin selection does not cover S2 |
+| S2 | `test` | PASS | `receipts/slice-2/test.json`, exit 0 at `28a8a9184`; 4,140 passed, 19 ignored, 0 failed; load-bearing |
+| S2 | `quality-job` | NOT_RUN | not an S2 gate; scheduled for S4/S5 and not independent behavioral proof |
+| all | JSR | N/A | no publishable surface |
 
 ## Open Questions
 
