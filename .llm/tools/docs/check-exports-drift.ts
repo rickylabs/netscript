@@ -1,24 +1,55 @@
 import { join } from '@std/path';
 
+export interface SymbolOmissionGroup {
+  reason: string;
+  symbols: readonly string[];
+}
+
+export type SymbolCoverage =
+  | {
+    mode: 'complete';
+    reason: string;
+    omittedSymbols?: readonly SymbolOmissionGroup[];
+    documentedNonExports?: readonly SymbolOmissionGroup[];
+  }
+  | {
+    mode: 'entrypoints-only';
+    reason: string;
+  };
+
 export interface PackageMapping {
   name: string;
   packagePath: string; // relative to root, e.g. "packages/plugin"
   docPath: string; // relative to root, e.g. "docs/site/reference/plugin/index.md"
   packageName: string; // e.g. "@netscript/plugin"
-  excludedExports?: string[]; // list of exported keys to ignore, e.g. ["./internal"]
-  checkSymbols?: boolean; // if true, verifies every exported symbol is listed in the doc
-  excludedSymbols?: string[]; // list of symbol names to ignore
+  excludedExports?: readonly string[]; // exported keys intentionally outside the public reference
+  symbolCoverage: SymbolCoverage;
 }
 
-export const AUTHORITATIVE_MAPPING: PackageMapping[] = [
+export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
   {
     name: 'fresh-ui',
     packagePath: 'packages/fresh-ui',
     docPath: 'docs/site/reference/fresh-ui/index.md',
     packageName: '@netscript/fresh-ui',
     excludedExports: [],
-    checkSymbols: false,
-    excludedSymbols: [],
+    symbolCoverage: {
+      mode: 'complete',
+      reason: 'All six published entrypoints are maintained as one complete reference surface.',
+      documentedNonExports: [{
+        reason:
+          'Dropzone is an explicitly labeled copy-source registry component, not a package export.',
+        symbols: [
+          'DROPZONE_INGEST_SOURCES',
+          'DROPZONE_REJECTED_REASONS',
+          'DropzoneIngestDetails',
+          'DropzoneIngestSource',
+          'DropzoneProps',
+          'DropzoneRejectedFile',
+          'DropzoneRejectedReason',
+        ],
+      }],
+    },
   },
   {
     name: 'plugin',
@@ -26,8 +57,11 @@ export const AUTHORITATIVE_MAPPING: PackageMapping[] = [
     docPath: 'docs/site/reference/plugin/index.md',
     packageName: '@netscript/plugin',
     excludedExports: [],
-    checkSymbols: false,
-    excludedSymbols: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.',
+    },
   },
   {
     name: 'config',
@@ -35,8 +69,10 @@ export const AUTHORITATIVE_MAPPING: PackageMapping[] = [
     docPath: 'docs/site/reference/config/index.md',
     packageName: '@netscript/config',
     excludedExports: [],
-    checkSymbols: true,
-    excludedSymbols: [],
+    symbolCoverage: {
+      mode: 'complete',
+      reason: 'The config reference is maintained as a complete published-symbol inventory.',
+    },
   },
   {
     name: 'contracts',
@@ -44,8 +80,10 @@ export const AUTHORITATIVE_MAPPING: PackageMapping[] = [
     docPath: 'docs/site/reference/contracts/index.md',
     packageName: '@netscript/contracts',
     excludedExports: [],
-    checkSymbols: true,
-    excludedSymbols: [],
+    symbolCoverage: {
+      mode: 'complete',
+      reason: 'The contracts reference is maintained as a complete published-symbol inventory.',
+    },
   },
   {
     name: 'queue',
@@ -53,8 +91,11 @@ export const AUTHORITATIVE_MAPPING: PackageMapping[] = [
     docPath: 'docs/site/reference/queue/index.md',
     packageName: '@netscript/queue',
     excludedExports: [],
-    checkSymbols: false,
-    excludedSymbols: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.',
+    },
   },
   {
     name: 'sdk',
@@ -62,8 +103,11 @@ export const AUTHORITATIVE_MAPPING: PackageMapping[] = [
     docPath: 'docs/site/reference/sdk/index.md',
     packageName: '@netscript/sdk',
     excludedExports: [],
-    checkSymbols: false,
-    excludedSymbols: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.',
+    },
   },
   {
     name: 'service',
@@ -71,8 +115,11 @@ export const AUTHORITATIVE_MAPPING: PackageMapping[] = [
     docPath: 'docs/site/reference/service/index.md',
     packageName: '@netscript/service',
     excludedExports: [],
-    checkSymbols: false,
-    excludedSymbols: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'This page currently guarantees package entrypoint coverage; complete symbol prose is tracked separately.',
+    },
   },
   {
     name: 'telemetry',
@@ -80,163 +127,171 @@ export const AUTHORITATIVE_MAPPING: PackageMapping[] = [
     docPath: 'docs/site/reference/telemetry/index.md',
     packageName: '@netscript/telemetry',
     excludedExports: [],
-    checkSymbols: true,
-    excludedSymbols: [
-      'OtelAiTracer',
-      'TelemetryQueryPort',
-      'TelemetryQueryOptions',
-      'otelDenoDescriptor',
-      'OtelDenoTracerProvider',
-      'OtelDenoPropagator',
-      'OtelDenoMeter',
-      'OtelDenoSpanLink',
-      'createOtelDenoProvider',
-      'createOtelDenoPropagator',
-      'createOtelDenoMeter',
-      'createOtelDenoSpanLink',
-      'SdkTracerProviderHandle',
-      'SdkMeterProviderHandle',
-      'SdkBinding',
-      'SdkLoader',
-      'defaultSdkLoader',
-      'otelSdkDescriptor',
-      'OtelSdkTracerProvider',
-      'OtelSdkSpanLink',
-      'createOtelSdkProvider',
-      'createOtelSdkSpanLink',
-      'TelemetryProviderSelection',
-      'CreateTelemetryProviderInput',
-      'createTelemetryProvider',
-      'metricQueryFilterSchema',
-      'resourceQueryFilterSchema',
-      'TelemetryQueryValidationError',
-      'traceQueryFilterSchema',
-      'validateMetricQueryFilter',
-      'validateResourceQueryFilter',
-      'validateTraceQueryFilter',
-      'MetricQueryFilter',
-      'ResourceQueryFilter',
-      'TelemetryAttributeValue',
-      'TelemetryLog',
-      'TelemetryMetric',
-      'TelemetryMetricPoint',
-      'TelemetryMetricType',
-      'TelemetryOtlpJson',
-      'TelemetryResource',
-      'TelemetrySpan',
-      'TelemetrySpanEvent',
-      'TelemetrySpanKind',
-      'TelemetrySpanLink',
-      'TelemetryTrace',
-      'TraceQueryFilter',
-      'AspireTelemetryQuery',
-      'createAspireTelemetryQuery',
-      'AspireTelemetryQueryOptions',
-      'createTelemetryQuery',
-      'RecordedSpanEvent',
-      'RecordedSpanSnapshot',
-      'InMemorySpanRecorder',
-      'createInMemorySpanRecorder',
-      'getTriggerTracer',
-      'getTraceContext',
-      'parseTraceState',
-      'DeprecatedMessagingAttributeAliases',
-      'DeprecatedJobAttributeAliases',
-      'DeprecatedExecutionAttributeAliases',
-      'DeprecatedSagaAttributeAliases',
-      'SagaAttributeName',
-      'GenAiAttributeName',
-      'TelemetryAttributeBuilderValue',
-      'TelemetryAttributeBuilderMap',
-      'OTEL_SEMCONV_STABILITY_OPT_IN',
-      'NETSCRIPT_SEMCONV_STABILITY_OPT_IN',
-      'NETSCRIPT_ATTRIBUTE_ROOT',
-      'NETSCRIPT_ATTRIBUTE_ALIAS_WINDOW',
-      'NETSCRIPT_ATTRIBUTE_ALIAS_MODE',
-      'TelemetryConventionId',
-      'NetScriptAttributeDomain',
-      'MessageContext',
-      'EnqueueOptions',
-      'ListenOptions',
-      'MessageQueue',
-      'TracedQueueOptions',
-      'TracedMessageContext',
-      'TracedQueue',
-      'traceQueue',
-      'ScheduledJobDefinition',
-      'SchedulerTickContext',
-      'JobDispatchContext',
-      'TracedDispatchOptions',
-      'traceSchedulerTick',
-      'TracedJobDefinition',
-      'TracedJobExecution',
-      'JobExecutionOptions',
-      'TracedJobResult',
-      'TracedWorkerConfig',
-      'WorkerMetricValues',
-      'WorkerMetricInstruments',
-      'createWorkerMetricInstruments',
-      'getWorkerMetricInstruments',
-      'recordSharedWorkerMetrics',
-      'withChildSpan',
-      'createProviderRegistration',
-      'TELEMETRY_PROVIDER_REGISTRATION_NAME',
-      'registerORPCInstrumentation',
-      'ErrorClassification',
-      'ErrorClassifier',
-      'LogLevel',
-      'RootInterceptorOptions',
-      'RootInterceptor',
-      'ClientInterceptorOptions',
-      'AnyInterceptor',
-      'GenericHandlerOptions',
-      'createHonoTracingMiddleware',
-      'HonoTracingMiddleware',
-      'HonoTracingMiddlewareOptions',
-      'AiTelemetryAttributes',
-      'AiTelemetryAttributeValue',
-      'createOtelAiTelemetryPort',
-      'CreateOtelAiTelemetryPortOptions',
-      'OtelAiTelemetryPort',
-      'OtelAiTelemetrySpan',
-      'AttributeValue',
-      'Exception',
-      'SpanContext',
-      'SpanOptions',
-      'SpanStatus',
-      'TimeInput',
-      'TraceState',
-      'Counter',
-      'Histogram',
-      'Meter',
-      'MeterPort',
-      'MetricInstrumentOptions',
-      'ObservableCallback',
-      'ObservableGauge',
-      'ObservableResult',
-      'PropagationExtractCarrier',
-      'PropagationInjectCarrier',
-      'PropagatorPort',
-      'SpanLinkPort',
-      'TelemetryProviderDescriptor',
-      'TelemetryProviderOptions',
-      'TracerProviderPort',
-      'createFanInLinks',
-      'FanInLinkMessage',
-      'getParentContextFromHeaders',
-      'PropagationHeaders',
-      'NETSCRIPT_TELEMETRY_ENV_VARS',
-      'TelemetryProviderId',
-      'DEFAULT_TELEMETRY_PROVIDER_ID',
-      'OTEL_SEMCONV_STABILITY_OPT_IN_VALUE',
-      'markProviderRegistered',
-      'clearProviderRegistration',
-      'isProviderRegistered',
-      'telemetryConfigSchema',
-      'TelemetryConfigError',
-      'validateTelemetryConfig',
-      'TracedResult',
-    ],
+    symbolCoverage: {
+      mode: 'complete',
+      reason:
+        'The telemetry reference curates stable entrypoints and primary APIs while classifying lower-level contracts explicitly.',
+      omittedSymbols: [{
+        reason:
+          'Low-level provider, query, instrumentation, compatibility, and framework integration contracts remain API-reference-only.',
+        symbols: [
+          'AiTelemetryAttributes',
+          'AiTelemetryAttributeValue',
+          'AnyInterceptor',
+          'AspireTelemetryQuery',
+          'AspireTelemetryQueryOptions',
+          'AttributeValue',
+          'clearProviderRegistration',
+          'ClientInterceptorOptions',
+          'Counter',
+          'createAspireTelemetryQuery',
+          'createFanInLinks',
+          'createHonoTracingMiddleware',
+          'createInMemorySpanRecorder',
+          'createOtelAiTelemetryPort',
+          'CreateOtelAiTelemetryPortOptions',
+          'createOtelDenoMeter',
+          'createOtelDenoPropagator',
+          'createOtelDenoProvider',
+          'createOtelDenoSpanLink',
+          'createOtelSdkProvider',
+          'createOtelSdkSpanLink',
+          'createProviderRegistration',
+          'createTelemetryProvider',
+          'CreateTelemetryProviderInput',
+          'createTelemetryQuery',
+          'createWorkerMetricInstruments',
+          'DEFAULT_TELEMETRY_PROVIDER_ID',
+          'defaultSdkLoader',
+          'DeprecatedExecutionAttributeAliases',
+          'DeprecatedJobAttributeAliases',
+          'DeprecatedMessagingAttributeAliases',
+          'DeprecatedSagaAttributeAliases',
+          'EnqueueOptions',
+          'ErrorClassification',
+          'ErrorClassifier',
+          'Exception',
+          'FanInLinkMessage',
+          'GenAiAttributeName',
+          'GenericHandlerOptions',
+          'getParentContextFromHeaders',
+          'getTraceContext',
+          'getTriggerTracer',
+          'getWorkerMetricInstruments',
+          'Histogram',
+          'HonoTracingMiddleware',
+          'HonoTracingMiddlewareOptions',
+          'InMemorySpanRecorder',
+          'isProviderRegistered',
+          'JobDispatchContext',
+          'JobExecutionOptions',
+          'ListenOptions',
+          'LogLevel',
+          'markProviderRegistered',
+          'MessageContext',
+          'MessageQueue',
+          'Meter',
+          'MeterPort',
+          'MetricInstrumentOptions',
+          'MetricQueryFilter',
+          'metricQueryFilterSchema',
+          'NETSCRIPT_ATTRIBUTE_ALIAS_MODE',
+          'NETSCRIPT_ATTRIBUTE_ALIAS_WINDOW',
+          'NETSCRIPT_ATTRIBUTE_ROOT',
+          'NETSCRIPT_SEMCONV_STABILITY_OPT_IN',
+          'NETSCRIPT_TELEMETRY_ENV_VARS',
+          'NetScriptAttributeDomain',
+          'ObservableCallback',
+          'ObservableGauge',
+          'ObservableResult',
+          'OTEL_SEMCONV_STABILITY_OPT_IN',
+          'OTEL_SEMCONV_STABILITY_OPT_IN_VALUE',
+          'OtelAiTelemetryPort',
+          'OtelAiTelemetrySpan',
+          'OtelAiTracer',
+          'otelDenoDescriptor',
+          'OtelDenoMeter',
+          'OtelDenoPropagator',
+          'OtelDenoSpanLink',
+          'OtelDenoTracerProvider',
+          'otelSdkDescriptor',
+          'OtelSdkSpanLink',
+          'OtelSdkTracerProvider',
+          'parseTraceState',
+          'PropagationExtractCarrier',
+          'PropagationHeaders',
+          'PropagationInjectCarrier',
+          'PropagatorPort',
+          'RecordedSpanEvent',
+          'RecordedSpanSnapshot',
+          'recordSharedWorkerMetrics',
+          'registerORPCInstrumentation',
+          'ResourceQueryFilter',
+          'resourceQueryFilterSchema',
+          'RootInterceptor',
+          'RootInterceptorOptions',
+          'SagaAttributeName',
+          'ScheduledJobDefinition',
+          'SchedulerTickContext',
+          'SdkBinding',
+          'SdkLoader',
+          'SdkMeterProviderHandle',
+          'SdkTracerProviderHandle',
+          'SpanContext',
+          'SpanLinkPort',
+          'SpanOptions',
+          'SpanStatus',
+          'TELEMETRY_PROVIDER_REGISTRATION_NAME',
+          'TelemetryAttributeBuilderMap',
+          'TelemetryAttributeBuilderValue',
+          'TelemetryAttributeValue',
+          'TelemetryConfigError',
+          'telemetryConfigSchema',
+          'TelemetryConventionId',
+          'TelemetryLog',
+          'TelemetryMetric',
+          'TelemetryMetricPoint',
+          'TelemetryMetricType',
+          'TelemetryOtlpJson',
+          'TelemetryProviderDescriptor',
+          'TelemetryProviderId',
+          'TelemetryProviderOptions',
+          'TelemetryProviderSelection',
+          'TelemetryQueryOptions',
+          'TelemetryQueryPort',
+          'TelemetryQueryValidationError',
+          'TelemetryResource',
+          'TelemetrySpan',
+          'TelemetrySpanEvent',
+          'TelemetrySpanKind',
+          'TelemetrySpanLink',
+          'TelemetryTrace',
+          'TimeInput',
+          'TracedDispatchOptions',
+          'TracedJobDefinition',
+          'TracedJobExecution',
+          'TracedJobResult',
+          'TracedMessageContext',
+          'TracedQueue',
+          'TracedQueueOptions',
+          'TracedResult',
+          'TracedWorkerConfig',
+          'TraceQueryFilter',
+          'traceQueryFilterSchema',
+          'traceQueue',
+          'TracerProviderPort',
+          'traceSchedulerTick',
+          'TraceState',
+          'validateMetricQueryFilter',
+          'validateResourceQueryFilter',
+          'validateTelemetryConfig',
+          'validateTraceQueryFilter',
+          'withChildSpan',
+          'WorkerMetricInstruments',
+          'WorkerMetricValues',
+        ],
+      }],
+    },
   },
 ];
 
@@ -247,6 +302,7 @@ export function parseDocContent(
   const docSymbols = new Set<string>();
   const lines = docContent.split('\n');
   let insideExportsTable = false;
+  let insideSymbolsTable = false;
 
   for (const line of lines) {
     const trimmed = line.trim();
@@ -266,18 +322,28 @@ export function parseDocContent(
       }
     }
 
-    if (line.startsWith('|') && !line.includes('---') && !line.includes('Symbol |')) {
-      const parts = line.split('|').map((p) => p.trim()).filter(Boolean);
-      if (parts.length >= 1) {
-        const firstCol = parts[0];
-        const matches = firstCol.matchAll(/`([^`]+)`/g);
-        for (const m of matches) {
-          const val = m[1];
-          if (val.includes('@netscript/') || val.startsWith('.')) continue;
-          const syms = val.split(/[\/,\|]/).map((s) => s.trim()).filter(Boolean);
-          for (const s of syms) {
-            docSymbols.add(s);
-          }
+    if (!trimmed.startsWith('|')) {
+      insideSymbolsTable = false;
+      continue;
+    }
+
+    const tableCells = trimmed.slice(1, -1).split('|').map((cell) => cell.trim());
+    if (tableCells[0] === 'Symbol') {
+      insideSymbolsTable = true;
+      continue;
+    }
+    if (!insideSymbolsTable || tableCells.every((cell) => /^:?-{3,}:?$/.test(cell))) {
+      continue;
+    }
+
+    for (const match of tableCells[0].matchAll(/`([^`]+)`/g)) {
+      const groupedSymbols = match[1].split(/[\/,|]/).map((symbol) => symbol.trim()).filter(
+        Boolean,
+      );
+      for (const displaySymbol of groupedSymbols) {
+        const normalizedSymbol = displaySymbol.replace(/<[^<>]*>$/, '').trim();
+        if (normalizedSymbol && !normalizedSymbol.includes('@netscript/')) {
+          docSymbols.add(normalizedSymbol);
         }
       }
     }
@@ -288,7 +354,7 @@ export function parseDocContent(
 export function deriveExpectedExports(
   packageName: string,
   exportsObj: any,
-  excludedExports: string[] = [],
+  excludedExports: readonly string[] = [],
 ): Map<string, string> {
   const expectedExports = new Map<string, string>();
   const excludedSet = new Set(excludedExports);
@@ -347,10 +413,12 @@ export function checkSymbolsDrift(
   docPath: string,
   expectedSymbols: Set<string>,
   docSymbols: Set<string>,
+  omittedSymbols: ReadonlySet<string> = new Set(),
+  documentedNonExports: ReadonlySet<string> = new Set(),
 ): string[] {
   const errors: string[] = [];
   for (const sym of expectedSymbols) {
-    if (!docSymbols.has(sym)) {
+    if (!omittedSymbols.has(sym) && !docSymbols.has(sym)) {
       errors.push(
         `Symbol Drift Error [${pkgName}]: Document at ${docPath} OMITS exported symbol '${sym}'`,
       );
@@ -364,7 +432,7 @@ export function checkSymbolsDrift(
     ) continue;
     if (sym.includes('/') || sym.startsWith('@')) continue;
 
-    if (!expectedSymbols.has(sym)) {
+    if (!expectedSymbols.has(sym) && !documentedNonExports.has(sym)) {
       errors.push(
         `Symbol Drift Error [${pkgName}]: Document at ${docPath} INVENTS nonexistent/unexported symbol '${sym}'`,
       );
@@ -373,11 +441,215 @@ export function checkSymbolsDrift(
   return errors;
 }
 
-async function checkDrift() {
+interface ValidatedMapping {
+  mappings: PackageMapping[];
+  errors: string[];
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isNonemptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+function parseOmissionGroups(
+  value: unknown,
+  field: string,
+  errors: string[],
+): SymbolOmissionGroup[] {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) {
+    errors.push(`${field} must be an array when present`);
+    return [];
+  }
+
+  const groups: SymbolOmissionGroup[] = [];
+  for (const [index, candidate] of value.entries()) {
+    const path = `${field}[${index}]`;
+    if (!isRecord(candidate)) {
+      errors.push(`${path} must be an object`);
+      continue;
+    }
+    if (!isNonemptyString(candidate.reason)) {
+      errors.push(`${path}.reason must be a nonempty string`);
+    }
+    if (!Array.isArray(candidate.symbols) || candidate.symbols.length === 0) {
+      errors.push(`${path}.symbols must be a nonempty array`);
+      continue;
+    }
+    const symbols: string[] = [];
+    for (const [symbolIndex, symbol] of candidate.symbols.entries()) {
+      if (!isNonemptyString(symbol)) {
+        errors.push(`${path}.symbols[${symbolIndex}] must be a nonempty string`);
+      } else {
+        symbols.push(symbol);
+      }
+    }
+    if (isNonemptyString(candidate.reason) && symbols.length === candidate.symbols.length) {
+      groups.push({ reason: candidate.reason.trim(), symbols });
+    }
+  }
+  return groups;
+}
+
+export function validateAuthoritativeMapping(mapping: unknown): ValidatedMapping {
+  const errors: string[] = [];
+  const mappings: PackageMapping[] = [];
+  if (!Array.isArray(mapping) || mapping.length === 0) {
+    return { mappings, errors: ['Authoritative mapping must be a nonempty array'] };
+  }
+
+  const names = new Set<string>();
+  for (const [index, candidate] of mapping.entries()) {
+    const path = `mapping[${index}]`;
+    if (!isRecord(candidate)) {
+      errors.push(`${path} must be an object`);
+      continue;
+    }
+
+    const requiredFields = ['name', 'packagePath', 'docPath', 'packageName'] as const;
+    let fieldsValid = true;
+    for (const field of requiredFields) {
+      if (!isNonemptyString(candidate[field])) {
+        errors.push(`${path}.${field} must be a nonempty string`);
+        fieldsValid = false;
+      }
+    }
+
+    if (isNonemptyString(candidate.name)) {
+      if (names.has(candidate.name)) errors.push(`${path}.name duplicates '${candidate.name}'`);
+      names.add(candidate.name);
+    }
+
+    let excludedExports: string[] | undefined;
+    if (candidate.excludedExports !== undefined) {
+      if (
+        !Array.isArray(candidate.excludedExports) ||
+        !candidate.excludedExports.every(isNonemptyString)
+      ) {
+        errors.push(`${path}.excludedExports must contain only nonempty strings`);
+      } else {
+        excludedExports = [...candidate.excludedExports];
+      }
+    }
+
+    if (!isRecord(candidate.symbolCoverage)) {
+      errors.push(`${path}.symbolCoverage must be an object`);
+      continue;
+    }
+    const coverage = candidate.symbolCoverage;
+    if (!isNonemptyString(coverage.reason)) {
+      errors.push(`${path}.symbolCoverage.reason must be a nonempty string`);
+    }
+
+    let symbolCoverage: SymbolCoverage | undefined;
+    if (coverage.mode === 'complete') {
+      const omittedSymbols = parseOmissionGroups(
+        coverage.omittedSymbols,
+        `${path}.symbolCoverage.omittedSymbols`,
+        errors,
+      );
+      const documentedNonExports = parseOmissionGroups(
+        coverage.documentedNonExports,
+        `${path}.symbolCoverage.documentedNonExports`,
+        errors,
+      );
+      if (isNonemptyString(coverage.reason)) {
+        symbolCoverage = {
+          mode: 'complete',
+          reason: coverage.reason.trim(),
+          omittedSymbols,
+          documentedNonExports,
+        };
+      }
+    } else if (coverage.mode === 'entrypoints-only') {
+      if (coverage.omittedSymbols !== undefined || coverage.documentedNonExports !== undefined) {
+        errors.push(`${path}.symbolCoverage entrypoints-only mode cannot define symbol groups`);
+      }
+      if (isNonemptyString(coverage.reason)) {
+        symbolCoverage = { mode: 'entrypoints-only', reason: coverage.reason.trim() };
+      }
+    } else {
+      errors.push(`${path}.symbolCoverage.mode is unknown: '${String(coverage.mode)}'`);
+    }
+
+    if (fieldsValid && symbolCoverage) {
+      mappings.push({
+        name: String(candidate.name),
+        packagePath: String(candidate.packagePath),
+        docPath: String(candidate.docPath),
+        packageName: String(candidate.packageName),
+        excludedExports,
+        symbolCoverage,
+      });
+    }
+  }
+
+  return { mappings, errors };
+}
+
+function printCoverageReport(mapping: unknown): void {
+  if (!Array.isArray(mapping) || mapping.length === 0) {
+    console.log('Coverage [mapping]: mode=<invalid>; reason=<invalid>; omission-groups=0');
+    return;
+  }
+  for (const [index, candidate] of mapping.entries()) {
+    const record = isRecord(candidate) ? candidate : {};
+    const coverage = isRecord(record.symbolCoverage) ? record.symbolCoverage : {};
+    const name = isNonemptyString(record.name) ? record.name : `#${index}`;
+    const mode = typeof coverage.mode === 'string' ? coverage.mode : '<invalid>';
+    const reason = isNonemptyString(coverage.reason) ? coverage.reason.trim() : '<invalid>';
+    const omittedCount = Array.isArray(coverage.omittedSymbols)
+      ? coverage.omittedSymbols.length
+      : 0;
+    const nonExportCount = Array.isArray(coverage.documentedNonExports)
+      ? coverage.documentedNonExports.length
+      : 0;
+    console.log(
+      `Coverage [${name}]: mode=${mode}; reason=${JSON.stringify(reason)}; ` +
+        `omitted-symbol-groups=${omittedCount}; documented-non-export-groups=${nonExportCount}`,
+    );
+  }
+}
+
+function flattenGroups(
+  pkgName: string,
+  kind: string,
+  groups: readonly SymbolOmissionGroup[],
+): { symbols: Set<string>; errors: string[] } {
+  const symbols = new Set<string>();
+  const errors: string[] = [];
+  for (const group of groups) {
+    const sorted = [...group.symbols].sort((a, b) => a.localeCompare(b));
+    if (group.symbols.some((symbol, index) => symbol !== sorted[index])) {
+      errors.push(`Coverage Policy Error [${pkgName}]: ${kind} symbols must be sorted`);
+    }
+    for (const symbol of group.symbols) {
+      if (symbols.has(symbol)) {
+        errors.push(
+          `Coverage Policy Error [${pkgName}]: ${kind} repeats symbol '${symbol}'`,
+        );
+      }
+      symbols.add(symbol);
+    }
+  }
+  return { symbols, errors };
+}
+
+export async function checkDrift(mapping: unknown): Promise<number> {
+  printCoverageReport(mapping);
+  const validated = validateAuthoritativeMapping(mapping);
+  if (validated.errors.length > 0) {
+    for (const error of validated.errors) console.error(`Coverage Policy Error: ${error}`);
+    return 1;
+  }
+
   let hasErrors = false;
   const root = Deno.cwd();
 
-  for (const pkg of AUTHORITATIVE_MAPPING) {
+  for (const pkg of validated.mappings) {
     const denoJsonPath = join(root, pkg.packagePath, 'deno.json');
     const docPath = join(root, pkg.docPath);
 
@@ -416,32 +688,58 @@ async function checkDrift() {
     }
 
     // Run deno doc to collect all actually exported symbols from this package's entrypoints
-    if (pkg.checkSymbols) {
+    if (pkg.symbolCoverage.mode === 'complete') {
       const expectedSymbols = new Set<string>();
-      const excludedSymbolsSet = new Set(pkg.excludedSymbols ?? []);
+      const omitted = flattenGroups(
+        pkg.name,
+        'omitted-symbol group',
+        pkg.symbolCoverage.omittedSymbols ?? [],
+      );
+      const documentedNonExports = flattenGroups(
+        pkg.name,
+        'documented-non-export group',
+        pkg.symbolCoverage.documentedNonExports ?? [],
+      );
+      for (const error of [...omitted.errors, ...documentedNonExports.errors]) {
+        console.error(error);
+        hasErrors = true;
+      }
+      for (const symbol of omitted.symbols) {
+        if (documentedNonExports.symbols.has(symbol)) {
+          console.error(
+            `Coverage Policy Error [${pkg.name}]: symbol '${symbol}' is both omitted and documented as a non-export`,
+          );
+          hasErrors = true;
+        }
+      }
 
       for (const [exportName, relativePath] of expectedExports.entries()) {
-        const fullEntrypointPath = join(pkg.packagePath, relativePath);
+        const fullEntrypointPath = join(root, pkg.packagePath, relativePath);
         try {
           const cmd = new Deno.Command('deno', {
-            args: ['doc', '--json', fullEntrypointPath],
+            args: ['doc', '--no-lock', '--json', fullEntrypointPath],
           });
-          const { stdout, code } = await cmd.output();
+          const { stdout, stderr, code } = await cmd.output();
           if (code !== 0) {
             console.error(
               `Failed to run deno doc --json for ${exportName} at ${fullEntrypointPath}`,
             );
+            console.error(new TextDecoder().decode(stderr));
             hasErrors = true;
             continue;
           }
           const docJson = JSON.parse(new TextDecoder().decode(stdout));
           const fileUrl = Object.keys(docJson.nodes)[0];
-          if (fileUrl && docJson.nodes[fileUrl]?.symbols) {
-            for (const sym of docJson.nodes[fileUrl].symbols) {
-              if (sym.name && !excludedSymbolsSet.has(sym.name)) {
-                expectedSymbols.add(sym.name);
-              }
-            }
+          const symbols = fileUrl ? docJson.nodes[fileUrl]?.symbols : undefined;
+          if (!Array.isArray(symbols) || symbols.length === 0) {
+            console.error(
+              `Empty symbol selection from deno doc --json for ${exportName} at ${fullEntrypointPath}`,
+            );
+            hasErrors = true;
+            continue;
+          }
+          for (const sym of symbols) {
+            if (sym.name) expectedSymbols.add(sym.name);
           }
         } catch (err) {
           console.error(`Error processing deno doc for ${exportName}:`, err);
@@ -449,7 +747,41 @@ async function checkDrift() {
         }
       }
 
-      const symbolsErrors = checkSymbolsDrift(pkg.name, pkg.docPath, expectedSymbols, docSymbols);
+      for (const symbol of omitted.symbols) {
+        if (!expectedSymbols.has(symbol)) {
+          console.error(
+            `Coverage Policy Error [${pkg.name}]: omitted symbol '${symbol}' is not exported`,
+          );
+          hasErrors = true;
+        } else if (docSymbols.has(symbol)) {
+          console.error(
+            `Coverage Policy Error [${pkg.name}]: omitted symbol '${symbol}' is documented and no longer omitted`,
+          );
+          hasErrors = true;
+        }
+      }
+      for (const symbol of documentedNonExports.symbols) {
+        if (expectedSymbols.has(symbol)) {
+          console.error(
+            `Coverage Policy Error [${pkg.name}]: documented non-export '${symbol}' is now exported`,
+          );
+          hasErrors = true;
+        } else if (!docSymbols.has(symbol)) {
+          console.error(
+            `Coverage Policy Error [${pkg.name}]: documented non-export '${symbol}' is absent from the reference`,
+          );
+          hasErrors = true;
+        }
+      }
+
+      const symbolsErrors = checkSymbolsDrift(
+        pkg.name,
+        pkg.docPath,
+        expectedSymbols,
+        docSymbols,
+        omitted.symbols,
+        documentedNonExports.symbols,
+      );
       for (const err of symbolsErrors) {
         console.error(err);
         hasErrors = true;
@@ -458,12 +790,12 @@ async function checkDrift() {
   }
 
   if (hasErrors) {
-    Deno.exit(1);
-  } else {
-    console.log('Exports & Symbols drift check: PASS');
+    return 1;
   }
+  console.log('Exports & Symbols drift check: PASS');
+  return 0;
 }
 
 if (import.meta.main) {
-  await checkDrift();
+  Deno.exit(await checkDrift(AUTHORITATIVE_MAPPING));
 }
