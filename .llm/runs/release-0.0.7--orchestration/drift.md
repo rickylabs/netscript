@@ -735,3 +735,16 @@ implementation thread.
   copied a checked metadata sentence from #1348 but missed that the accepted amendment, target owner
   comment, and live #1466 assign metadata vocabulary elsewhere. Formal planning must reconcile all live
   authority surfaces before converting a checkbox into leaf ownership.
+
+- **A passed delta evaluator cannot resolve a later generated merge conflict by choosing a side:**
+  #1666 and main both legitimately advanced the same four publication outputs from different source
+  contributions. Preserve the PASS, integrate main, rerun the canonical cascade to include both
+  contributions, prove convergence, and re-evaluate only the integration delta.
+- **Process/container cleanliness is not filesystem cleanliness:** #1664 attempt 5 left a foreign-
+  owned unreadable Postgres directory after its process and container audit passed. Every database-
+  starting run now needs an unreadable/foreign-owned residue sweep; quarantine run-owned residue
+  recoverably and preserve the scanner red rather than weakening traversal.
+- **Compile suppression is transitional evidence, not a green acceptance proof:** #1671 S1 used two
+  `@ts-expect-error` markers to pin the S2 defect after recording the base RED. S2 must remove them
+  and replace them with positive exact-union and code-specific-data assertions before claiming the
+  error channel is preserved.

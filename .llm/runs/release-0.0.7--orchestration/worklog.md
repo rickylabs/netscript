@@ -1372,3 +1372,26 @@
   IMPL-EVAL is therefore active as `f281b8cf`, PID 793975, Remote Control
   `session_01UDGunAVYYPRC6KBNxEwZWA`, over content `46528ae4c` and evidence `b67414f4f` with
   idempotence explicitly required. Readiness remains revoked and runtime remains untouched.
+
+
+## 2026-08-15T20:38:42Z — delta evaluation passes; three bounded recoveries advance
+
+- #1666 delta IMPL-EVAL is terminal `PASS` at artifact-only `0d4c82d6e`, comment `5304103041`.
+  The evaluator independently proved the exact four-output cascade, two-run idempotence, root
+  4202/1/19 red plus 4203/0/19 replacement, honest recoverable quarantine, 14-of-17 scope, unchanged
+  lock, bounded MCP selection, known reds, and all five #1296 rows. A live merge-tree against main
+  `0ef48c2ec` exposes conflicts only in those four generated assets because #1665 advanced the same
+  cascade. Internals checkpoint `268544516` dispatches the original author to integrate main and
+  regenerate deterministically before fresh Tier-A and another delta evaluation; readiness stays
+  revoked.
+- #1671 S1 is clean, pushed, and commented at `dc034d680` / `5304110615`. Its sole baseline check
+  captured TS18046 plus TS2339 once; final exact six-code/empty-meta assertions and focused gates are
+  green. Fresh fixes Tier-A passed at `7281cebac` after independently running a 105-file check,
+  doctest 2/0, and Contracts plus SDK 77/0. S2 alone is released to the same author over `errors.ts`,
+  `service-client.ts`, and the doctest; S3/docs and metadata remain held.
+- #1664 F7 product is `e45144db6`; focused behavior is 22/0 and binding check is green. The root test
+  stopped honestly at 4236/1/19 because the unchanged repository scanner could not read the retained
+  attempt-5 Postgres tree. Red evidence `885f352e7` is preserved. Features moved only that run-owned
+  tree recoverably to `/tmp/netscript-f7-quarantine.iXF6fb`, verified leak-check clean, and recorded
+  `d81b99143`. The original author may run one exact-content `test-attempt2`, then publish and
+  architecture gates only on PASS, before another Tier-A. Runtime remains unleased.

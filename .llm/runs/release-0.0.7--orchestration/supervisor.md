@@ -914,3 +914,18 @@ second Tier-A passed at topic `8933f58f2`; because idempotence was the one expli
 the fresh delta evaluator must re-derive it. Exactly one Fable 5/medium Remote Control evaluator is
 active as job `f281b8cf`, PID 793975, session `session_01UDGunAVYYPRC6KBNxEwZWA`, over content
 `46528ae4c` and evidence `b67414f4f`. No readiness or runtime action is authorized.
+
+
+At 20:38Z, all three topic-local queues advanced again. #1666 fresh delta IMPL-EVAL returned `PASS`
+at `0d4c82d6e`, comment `5304103041`, after independently paying the full two-run Lume/generator
+cost and re-deriving all five #1296 rows. GitHub nevertheless reports the branch conflicting with
+current main `0ef48c2ec`; read-only merge-tree confines the overlap to the same four generated
+publication outputs advanced by #1665. Internals checkpoint `268544516` released the original
+Sol/medium author for a deterministic current-main cascade refresh, followed by fresh Tier-A and a
+fresh delta evaluator before readiness. #1671 S1 is pushed at `dc034d680`, comment `5304110615`, and
+fresh fixes Tier-A passed at `7281cebac`; S2 alone is active on the same Sol/medium author across
+`errors.ts`, `service-client.ts`, and the doctest. #1664 product `e45144db6` passed 22 focused tests
+and the exact-head check, then preserved a 4236/1/19 root-test red caused by unreadable attempt-5
+residue. Features recoverably quarantined it at `/tmp/netscript-f7-quarantine.iXF6fb`, recorded
+checkpoint `d81b99143`, and released one exact-content test retry plus the remaining two cheap gates
+on PASS. No runtime lease, attempt 6, readiness action, issue tick, or #1663/#1651 mutation exists.

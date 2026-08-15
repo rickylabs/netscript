@@ -758,3 +758,15 @@ contracts-exported schemas, retained type default, empty metadata slot, and no s
 second Tier-A passed at `8933f58f2`; fresh Fable 5/medium Remote Control delta IMPL-EVAL job
 `f281b8cf` is active at `session_01UDGunAVYYPRC6KBNxEwZWA` over `46528ae4c`/`b67414f4f`, with
 independent idempotence re-derivation load-bearing. No readiness or runtime lease.
+
+
+Newer transition `2026-08-15T20:38:42Z`: #1666 delta IMPL-EVAL passed at `0d4c82d6e` / comment
+`5304103041`, but current main creates a deterministic four-generated-output conflict via #1665.
+The original Sol/medium author is integrating `0ef48c2ec` and rerunning the canonical cascade under
+internals checkpoint `268544516`; fresh Tier-A and a fresh delta evaluator precede readiness. #1671
+S1 `dc034d680` passed fresh fixes Tier-A at `7281cebac`; S2 only is active in `errors.ts`,
+`service-client.ts`, and the doctest, with positive exact-union assertions and no metadata/docs scope.
+#1664 F7 content `e45144db6` has focused 22/0 and exact-head check PASS; its 4236/1/19 root red is
+environmental unreadable attempt-5 residue, preserved at evidence `885f352e7`. The run-owned tree is
+recoverably quarantined at `/tmp/netscript-f7-quarantine.iXF6fb`; one exact-content test retry and
+the remaining two cheap gates are active before fresh Tier-A. No runtime lease or readiness action.

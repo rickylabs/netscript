@@ -991,14 +991,14 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
-      "currentPrHeadSha": "b67414f4f26d53f00fc50adf3a5787d3bffae077",
+      "currentPrHeadSha": "0d4c82d6e4bd327abd88eb8b80e7a7acd20ea4aa",
       "issueNumbers": [1296],
       "implementerAgentId": "01a005d2-7c9d-7dd1-b6fc-531b72dc14e4",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/reference-export-drift-gate",
       "worktree": "/home/codex/repos/netscript-007-reference-export",
       "prNumber": 1666,
-      "implementationState": "sa4_recovery_pushed_second_tier_a_active",
+      "implementationState": "sa4_delta_eval_pass_current_main_generated_cascade_refresh_active",
       "planHeadSha": "9d0b4bf128ba52fcd52091ba50590661d09470c1",
       "scopeAmendmentHeadSha": "a3f6b87b599e778db950daf6ccaecd847c088d19",
       "tierAPlanState": "PASS_SA2",
@@ -1135,7 +1135,7 @@
       "sa4SecondTierAState": "PASS",
       "sa4SecondTierATopicCheckpointSha": "8933f58f2b435652e317fc46ea77827a523a4710",
       "sa4SecondTierAFinding": "generated cascade, receipt coherence, quarantine attribution, path ceiling, lock identity, publication selection, known reds, and NOT_RUN boundaries pass; idempotence carried from author evidence and explicitly assigned to delta evaluation for independent re-derivation",
-      "sa4DeltaEvaluationState": "active",
+      "sa4DeltaEvaluationState": "complete_pass",
       "sa4DeltaEvaluatorAgentId": "f281b8cf-f4bb-4125-a0ba-d79b6a8e11ad",
       "sa4DeltaEvaluatorBackgroundAgentId": "f281b8cf",
       "sa4DeltaEvaluatorPid": 793975,
@@ -1143,7 +1143,16 @@
       "sa4DeltaEvaluatorRemoteControlUrl": "https://claude.ai/code/session_01UDGunAVYYPRC6KBNxEwZWA",
       "sa4DeltaEvaluatorRoute": "native claude-fable-5 / medium / Remote Control",
       "sa4DeltaEvaluationGrantedAt": "2026-08-15T20:22:51.101Z",
-      "sa4NextGate": "delta IMPL-EVAL terminal verdict before any readiness restoration",
+      "sa4DeltaEvaluationCompletedAt": "2026-08-15T20:32:17.000Z",
+      "sa4DeltaEvaluationVerdict": "PASS",
+      "sa4DeltaEvaluatorCommitSha": "0d4c82d6e4bd327abd88eb8b80e7a7acd20ea4aa",
+      "sa4DeltaEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1666#issuecomment-5304103041",
+      "sa4DeltaEvaluationFinding": "all five #1296 acceptance rows independently pass; the four-output cascade is two-run idempotent with no fifth output; root red/pass receipts, quarantine attribution, 14-of-17 scope, lock identity, MCP bounded selection, baseline reds, and NOT_RUN boundaries are honest",
+      "postDeltaMainConflictState": "current main 0ef48c2ec advances the same four generated publication outputs through #1665, so GitHub reports CONFLICTING; read-only merge-tree found no hand-authored overlap outside those generator-owned outputs",
+      "postDeltaMainRefreshTopicCheckpointSha": "268544516",
+      "postDeltaMainRefreshState": "same_original_sol_medium_author_active",
+      "postDeltaMainRefreshContract": "merge current main preserving history, resolve the four generated conflicts only through the canonical full generator cascade, prove both main and #1666 contributions plus two-run idempotence/no fifth output, recut exact-head receipts, then stop for fresh internals Tier-A and a fresh delta evaluator before readiness",
+      "sa4NextGate": "current-main cascade refresh, fresh internals Tier-A, and fresh delta IMPL-EVAL before any readiness restoration",
       "expensiveGateContract": "no runtime lease; scaffold.runtime and fresh-browser are matrix n/a for this checker/docs/JSDoc/task/workflow-only leaf",
       "receiptRefs": []
     },
@@ -1555,14 +1564,14 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb",
-      "currentPrHeadSha": "f76a3c45bce42cab81c2b481d4abf03be1104bb0",
+      "currentPrHeadSha": "dc034d680b53c2845e9b82f73c6c709f2c51e2b3",
       "issueNumbers": [1350],
       "implementerAgentId": "01a006f3-ae2d-7941-bd17-2ac71dd3d0f0",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/sdk-typed-error-channel",
       "worktree": "/home/codex/repos/netscript-007-leaf-typed-error",
       "prNumber": 1671,
-      "implementationState": "plan_eval_pass_same_original_author_slice_1_active",
+      "implementationState": "slice_1_tier_a_pass_same_original_author_slice_2_active",
       "initialPlanHeadSha": "c7a6f3d32009cfe9344ab8ed613f1c54c205b07f",
       "initialPlanCommentUrl": "https://github.com/rickylabs/netscript/pull/1671#issuecomment-5303978621",
       "scopeOwnershipRuling": "approve packages/sdk/src/ports/service-client.ts as sixth path; deny packages/contracts/src/public/mod.ts and every NetScriptProcedureMeta definition/export; preserve the fourth generic as Record<never, never>; seventh path requires rescope",
@@ -1588,15 +1597,28 @@
       "planEvaluationAdvisories": "record TS18046 plus TS2339 REDs; use exported contracts schemas without SDK zod mapping; retain SafeFailure default; track deferred bench debt without a seventh path; do not tick metadata boxes",
       "implementationSlices": {
         "s1": {
-          "state": "active_same_original_author",
+          "state": "complete_tier_a_pass",
+          "headSha": "dc034d680b53c2845e9b82f73c6c709f2c51e2b3",
+          "topicCheckpointSha": "7281cebac293cf3648d4ac7d7c27c9f21cc84cf8",
+          "commentUrl": "https://github.com/rickylabs/netscript/pull/1671#issuecomment-5304110615",
           "authorizedPaths": [
             "packages/contracts/src/application/contract-primitives.ts",
             "packages/sdk/tests/readme-doctest_test.ts"
           ],
-          "constraints": "RED first with both TS18046 and TS2339; retain Record<never, never>; no metadata vocabulary; no SDK zod mapping; no seventh path; commit/push/comment then stop for fresh Tier-A"
+          "constraints": "RED first with both TS18046 and TS2339; retain Record<never, never>; no metadata vocabulary; no SDK zod mapping; no seventh path; commit/push/comment then stop for fresh Tier-A",
+          "validation": "one structured base RED captured TS18046 unknown and TS2339 never without rerun; exact six literal keys plus Record<never, never> compile assertions; fresh Tier-A reran 105-file check with zero diagnostics, focused doctest 2/0, and Contracts plus SDK 77/0"
+        },
+        "s2": {
+          "state": "active_same_original_author",
+          "authorizedPaths": [
+            "packages/sdk/src/client/errors.ts",
+            "packages/sdk/src/ports/service-client.ts",
+            "packages/sdk/tests/readme-doctest_test.ts"
+          ],
+          "constraints": "preserve SafeFailure<TError = ThrowableError>; convert both S1 @ts-expect-error markers to positive exact-union/data assertions; use public oRPC types; no SDK zod map, ambient redeclaration, seventh path, NetScriptProcedureMeta, docs, or runtime"
         }
       },
-      "nextGate": "fresh fixes Tier-A after S1; no slice 2 before PASS",
+      "nextGate": "fresh fixes Tier-A after S2; no slice 3 before PASS",
       "expensiveGateContract": "no runtime lease; no Aspire, Docker, e2e:cli, browser, or runtime gate during plan evaluation",
       "receiptRefs": []
     },
@@ -1664,17 +1686,17 @@
     {
       "id": "app-service-client-wiring",
       "lane": "features",
-      "phase": "planned",
+      "phase": "implementing",
       "baseBranch": "main",
       "headSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
-      "currentPrHeadSha": "a2e9515f5a430d53cff1e47d55d7916f3dc0db15",
+      "currentPrHeadSha": "885f352e77439e1f846be1f99971c398f6865e75",
       "issueNumbers": [1355, 1360],
       "implementerAgentId": "01a004f9-f033-7592-a0bc-63927753fb43",
       "implementerRoute": "openai / gpt-5.6-sol / high / approval never / dangerFullAccess",
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "f7_c1_plan_tier_a_pass_same_author_two_path_repair_active",
+      "implementationState": "f7_product_pushed_environmental_test_red_recovery_active",
       "dispatchTopicHeadSha": "0d0ba1b7a404c847acba2daed40c69d282906f69",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
@@ -1878,7 +1900,21 @@
           "f7PlanTierAState": "PASS",
           "f7PlanTierATopicCheckpointSha": "8ec20d6065d1a3013cf5009e2883fb0992f11839",
           "f7RepairCeiling": "exactly service-client-browser-probe.ts and service-client-runtime-probe_test.ts; strict NETSCRIPT_E2E_BROWSER_EXECUTABLE override with no fallback, runnable-version validation for override and built-ins, no versioned cache literals, bounded startup stderr/status diagnostics, and deterministic no-fallback proofs",
-          "f7ImplementationState": "same_original_sol_high_author_active_no_runtime_lease",
+          "f7ImplementationState": "product_pushed_environmental_test_red_recovery_active_no_runtime_lease",
+          "f7ProductHeadSha": "e45144db643f6bde85552a615812c8371e4ce792",
+          "f7FirstEvidenceHeadSha": "885f352e77439e1f846be1f99971c398f6865e75",
+          "f7FocusedProof": "22 passed / 0 failed including strict override/no fallback, managed Chromium version validation, early headless exit diagnostics, 32 KiB bounded drain, live-timeout cause preservation, and all F6 teardown cases",
+          "f7BindingCheck": "PASS at exact content head: 2944 files, 25 batches, zero diagnostics",
+          "f7BindingTestRed": "FAIL preserved at exact content head: 4236 passed / 1 failed / 19 ignored; unchanged forbidden-commands walker hit PermissionDenied under the retained attempt-5 Postgres data directory",
+          "f7EnvironmentalQuarantine": {
+            "source": ".llm/tmp/cli-e2e/plugin-smoke-20260815-213942",
+            "destination": "/tmp/netscript-f7-quarantine.iXF6fb/plugin-smoke-20260815-213942",
+            "recoverable": true,
+            "scannerChanged": false
+          },
+          "f7RecoveryTopicCheckpointSha": "d81b99143",
+          "f7RecoveryState": "same_original_sol_high_author_running_exact_content_test_attempt2_then_remaining_two_gates_on_pass",
+          "f7RecoveryContract": "preserve f7-test.json red; run f7-test-attempt2 from a clean exact-content checkout with gitHead == actualGitHead and no mismatch waiver; only on PASS run publish-dry-run then arch-check at the same content; attach evidence and stop for fresh Tier-A before runtime lease",
           "attempt4Next": "superseded by attempt-5 terminal red and attribution recovery"
         }
       },
@@ -3063,5 +3099,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T20:23:15.000Z"
+  "updatedAt": "2026-08-15T20:38:42.000Z"
 }
