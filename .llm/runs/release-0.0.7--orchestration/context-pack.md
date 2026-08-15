@@ -725,3 +725,9 @@ mirror, quality, check-test, and core visibility passed; #1461 is closed with si
 both objects exactly `status:shipped`. Fixes may file the reviewed non-blocking docs follow-up and
 release #1350 serially on fresh main. Keep #1348 open until all implementation children finish; its
 ratified Stage-0 prerequisite is satisfied and does not block #1350.
+
+Newer dispatch `2026-08-15T19:44:30Z`: #1666 SA-3 plan `f98cfabac` passed fresh internals Tier-A;
+the same author is generating exactly four approved corpus/publish outputs before a second Tier-A
+and fresh delta IMPL-EVAL. Non-blocking docs debt is filed as #1670. #1350 is active plan-only in
+`/home/codex/repos/netscript-007-leaf-typed-error` on exact main `0ef48c2ec`, Codex Sol/medium thread
+`01a006f3-ae2d-7941-bd17-2ac71dd3d0f0`; keep #1348 open.

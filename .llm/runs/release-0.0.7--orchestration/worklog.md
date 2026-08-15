@@ -1296,3 +1296,19 @@
 - #1350 is released serially on fresh main. #1348 must remain open until every implementation child
   named in its final coordinator checkbox is merged; its normative RFC Stage-0 prerequisite is already
   satisfied and therefore does not block its explicitly first implementation child #1350.
+
+## 2026-08-15T19:44:30Z — #1666 generation released and #1350 attaches
+
+- #1666 same-author SA-3 amendment `f98cfabac` is explicitly pushed with comment `5303922392`.
+  Fresh internals Tier-A passed after independently verifying the exact four-output chain, 17-path
+  ceiling, real CLI/MCP publication delta, second-pass idempotence contract, and full coherent recut.
+  `gen:mcp-export-corpus` remains excluded: isolated base and leaf runs produce byte-identical output
+  while its check is already red at base. Canonical generation is active on the preserved author;
+  second Tier-A and a fresh delta evaluator still gate readiness.
+- The reviewed advisory draft became Backlog/Triage issue #1670 with its non-blocking framing intact.
+  This preserves the cross-page consistency and warm-stale persistence-failure contracts without
+  retroactively widening or invalidating #1669.
+- Fixes created `/home/codex/repos/netscript-007-leaf-typed-error` on exact main `0ef48c2ec`, branch
+  `fix/sdk-typed-error-channel`, and attached Codex Sol/medium thread
+  `01a006f3-ae2d-7941-bd17-2ac71dd3d0f0`. #1350 is plan-only and must open a draft PR then stop for
+  PLAN-EVAL; #1348 remains open and untouched.

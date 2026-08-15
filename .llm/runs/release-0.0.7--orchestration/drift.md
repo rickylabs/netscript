@@ -707,3 +707,11 @@ implementation thread.
   inconsistency and a warm-stale persistence-failure caveat without finding a false revalidation
   claim or acceptance failure. Preserve PASS, avoid post-evaluation scope creep, and file one
   explicitly non-blocking follow-up with both exact contracts rather than silently losing the debt.
+- **A generated output can change only in provenance and still be a publish delta:** #1666's MCP
+  bounded prose selection excludes Fresh UI, so its prose bytes stay fixed, but the canonical publish
+  asset advances the corpus `sourceCommit`. The path is still an owned generated/published change and
+  belongs in scope, idempotence proof, JSR reasoning, and delta evaluation.
+- **A red generator is not automatically part of the current cascade:** isolated #1666 controls
+  proved `gen:mcp-export-corpus` produces the same rewritten bytes at base and leaf while its check is
+  already red at base. Preserve and report that red; do not regenerate it merely because another MCP
+  generated asset legitimately changes.

@@ -870,3 +870,12 @@ advisories do not invalidate #1461: the named external pages attach no false rev
 their layer policy can own background behavior. One precise Backlog/Triage follow-up is authorized
 from fixes topic draft `70307f47c`. #1350 is released serially on new main. #1348 stays open until all
 its implementation children finish, while its already-ratified Stage-0 prerequisite is satisfied.
+
+At 19:44Z, #1666 SA-3 is plan-only, clean, and pushed at `f98cfabac`, comment `5303922392`.
+Fresh internals Tier-A is `PASS`: isolated base/head generation proves exactly four affected outputs,
+the MCP export corpus is a byte-identical pre-existing red at both heads and is excluded, the live
+ceiling is 17 paths, and CLI/MCP publish deltas plus the full idempotence/receipt recut are explicit.
+The same original Sol/medium author is now running only the three canonical generators over the four
+approved outputs; a second fresh Tier-A and delta IMPL-EVAL remain mandatory. Fixes filed the accepted
+non-blocking docs follow-up as #1670, then launched #1350 plan-only on fresh main `0ef48c2ec` with
+Codex thread `01a006f3-ae2d-7941-bd17-2ac71dd3d0f0`, Sol/medium. #1348 remains open and untouched.
