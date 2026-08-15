@@ -545,3 +545,15 @@ Tier-A, then use one fresh Fable 5/medium Remote Control cycle-2 evaluator. #166
 #1664 F4 is active on the original Sol/high author after exact consecutive-run/hash proof confirmed
 the gate premise was false. #1461 is plan-only at `ebf8977c1`; its second docs-source amendment is
 being delivered on the preserved author before Tier-A/evaluation.
+
+Newer checkpoint `2026-08-15T17:11:14Z`: #1664 is clean and immutable at evidence head
+`6f813b0db`, content `7876aa109`; four exact-content-head receipts are PASS/SUFFICIENT and fresh
+features Tier-A passed at topic `35f3a6975`. The singleton attempt-3 lease is active only for
+suite-owned `scaffold.runtime`, followed by mandatory cleanup/audit; `fresh-browser` may run serially
+only if scaffold passes, followed by final cleanup/audit. No evaluator yet. Unlike attempt 2, every
+preflight artifact was committed before lease grant, so the leased head must not move. #1461 scope
+amendment `eadd672d0` is plan-only but fixes Tier-A is `FAIL_FIX` at `9e9d02ebb`: repair the same
+authorized page's five additional SWR narrative lines explicitly, re-review, then PLAN-EVAL only on
+PASS. #1666 SA-2 plan repair continues on the preserved author under topic `071b2a812`; #1663 stays
+at its owner-only boundary. Coordinator route remains GPT-5.6-SOL/high, never max; preserve native
+Claude supervisors and #1651 option 1.

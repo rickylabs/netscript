@@ -944,3 +944,21 @@
 - #1461 plan head `ebf8977c1` reconciled its SDK doc-lint baseline. Fixes topic `20856dce0` is
   delivering the already-authorized second tutorial page amendment to the same author; no product
   mutation, evaluator, or runtime lease exists yet.
+
+## 2026-08-15T17:11:14Z — #1664 F4 passes Tier-A and immutable attempt 3 is leased
+
+- #1664's preserved Sol/high author pushed the amendment at `b40616a81` before product repair
+  `7876aa109`, then committed four binding receipts at evidence head `6f813b0db`. Check selected
+  2,937 files with zero diagnostics; root test passed 4,213 with zero failures; publish dry-run and
+  architecture checks passed. Features Tier-A independently reproduced the 11/0 focused sequence
+  proof, including second-write and byte-drift rejection, recomputed the receipts sufficient, and
+  pushed topic checkpoint `35f3a6975`.
+- Clean-host preflight proved local == remote == PR and found no Docker container, Aspire
+  application process, watched listener, or competing lease. Central attempt 3 is bound to final
+  evidence head `6f813b0db` before execution. Run suite-owned `scaffold.runtime` first; cleanup and
+  empty-host audit are mandatory; `fresh-browser` is eligible only if scaffold passes.
+- #1461's exact second-source amendment is pushed at `eadd672d0`, but fresh fixes Tier-A correctly
+  returned `FAIL_FIX` at `9e9d02ebb`: the same authorized tutorial repeats the SWR narrative at
+  lines 13, 15, 75, 76, and 80 while demonstrating pure-read `getCachedEntry`. The preserved author
+  must give each line an explicit retain/correct disposition before PLAN-EVAL. #1666 SA-2 remains
+  plan-only on its preserved author; no evaluator or product mutation exists there yet.

@@ -45,7 +45,7 @@
         "pid": 23964,
         "bridgeSessionId": "session_01PLRauSHN1PnvrNF2ucefF6",
         "remoteControlUrl": "https://claude.ai/code/session_01PLRauSHN1PnvrNF2ucefF6",
-        "topicHeadSha": "0ca4c489f43b21c76ab60d677ed89886161bc434",
+        "topicHeadSha": "5c4ccd8fec2b415b373c875c3b02a6f896fcdc3e",
         "queueState": "exhausted_parked",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e19b-71d1-95ce-8c72559eb026",
@@ -73,7 +73,7 @@
         "pid": 23955,
         "bridgeSessionId": "session_01HqFtKQtyJcHBEn1MghQdFX",
         "remoteControlUrl": "https://claude.ai/code/session_01HqFtKQtyJcHBEn1MghQdFX",
-        "topicHeadSha": "818575d18651856793ea054375a48c1b8f6b1769",
+        "topicHeadSha": "071b2a812cb92b7f449ff79abce87d9480df33ed",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle"
@@ -115,7 +115,7 @@
         "pid": 26724,
         "bridgeSessionId": "session_014pCd2QWkCscgZpVdjcUPST",
         "remoteControlUrl": "https://claude.ai/code/session_014pCd2QWkCscgZpVdjcUPST",
-        "topicHeadSha": "20856dce0f44dfb2ff40eb2baa880c69bf8e2c05",
+        "topicHeadSha": "9e9d02ebb5374f327ed3efc1d305ecf51cac4d7b",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle"
@@ -166,7 +166,7 @@
         "sessionId": "19621a0b-c6a0-47c6-b826-93c1634a6875",
         "bridgeSessionId": "session_01LQBHX8KpA5aYtDraq46J8a",
         "remoteControlUrl": "https://claude.ai/code/session_01LQBHX8KpA5aYtDraq46J8a",
-      "topicHeadSha": "a37eefef0ca31f455889647c8d469a066915a083",
+        "topicHeadSha": "35f3a6975b1aaae20a384e5d655cc3483e0b2a56",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
         "legacyState": "parked_idle"
@@ -1341,18 +1341,23 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "3e8e146a4aedf8ee0afec15c83ddaefc171c71f9",
-      "currentPrHeadSha": "ebf8977c155a5887d16324978aa62483ba5a2a32",
+      "currentPrHeadSha": "eadd672d06bd701c4014156dfbbb31e09c9d3e19",
       "issueNumbers": [1461],
       "implementerAgentId": "01a00646-82a9-7ec2-88e7-16dea98a58fa",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/sdk-cached-entry-swr",
       "worktree": "/home/codex/repos/netscript-007-leaf-cached-entry",
       "prNumber": 1669,
-      "implementationState": "doc_lint_baseline_plan_repair_pushed_duplicate_tutorial_scope_amendment_delivery_active_no_product_mutation",
-      "planHeadSha": "ebf8977c155a5887d16324978aa62483ba5a2a32",
+      "implementationState": "scope_amendment_pushed_fresh_tier_a_fail_fix_t1_same_page_narrative_repair_required_no_product_mutation",
+      "planHeadSha": "eadd672d06bd701c4014156dfbbb31e09c9d3e19",
       "dispatchTopicHeadSha": "f9bb928cedeaf91174db4e70f877143028481232",
       "planGate": "research and contract decisions only; resolve the stale docs paths, choose the supported API boundary, open one draft PR, and stop before implementation; PLAN-EVAL is required",
       "scopeRuling": "authorize docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md as the exact second docs source because it repeats the same false getCachedEntry background-refresh claim; no third docs source; verify the existing four-mirror generated closure before implementation",
+      "tierAPlanState": "FAIL_FIX",
+      "tierAPlanHeadSha": "eadd672d06bd701c4014156dfbbb31e09c9d3e19",
+      "tierAPlanTopicCheckpointSha": "9e9d02ebb5374f327ed3efc1d305ecf51cac4d7b",
+      "tierAPlanFinding": "T-1: the authorized tutorial repeats the SWR narrative at lines 13, 15, 75, 76, and 80 while its demonstrated loader uses pure-read getCachedEntry; the plan must give each line an explicit retain/correct disposition and explain how the page stops implying that the loader revalidates",
+      "planEvaluationState": "blocked_pending_bounded_t1_plan_repair_and_fresh_tier_a_pass",
       "acceptanceFocus": "prove stale-while-revalidate with exactly one refresh for concurrent stale readers while carrying the four-link generated-doc asset cascade and known #1667/#1668 reds",
       "expensiveGateContract": "no runtime lease during research or planning",
       "receiptRefs": []
@@ -1424,15 +1429,15 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
-      "currentPrHeadSha": "e1dcb726b983dd10981f4fc8df5ea8c638686e77",
+      "currentPrHeadSha": "6f813b0db35df38dcd9dc7f1ea333e997399fac0",
       "issueNumbers": [1355, 1360],
       "implementerAgentId": "01a004f9-f033-7592-a0bc-63927753fb43",
       "implementerRoute": "openai / gpt-5.6-sol / high / approval never / dangerFullAccess",
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "s5_runtime_failed_leaf_gate_idempotency_contract_fresh_browser_not_run_lease_released_clean_host_awaiting_f4_amendment",
-      "dispatchTopicHeadSha": "d2e83f690",
+      "implementationState": "f4_probe_repair_and_four_receipts_tier_a_pass_attempt_3_runtime_lease_active",
+      "dispatchTopicHeadSha": "35f3a6975b1aaae20a384e5d655cc3483e0b2a56",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
       "tierAPlanRepairHeadSha": "f7225be98c01b38f86712c1df0782aec06e34445",
@@ -1558,9 +1563,16 @@
           "s5RuntimeResult": "FAIL passed=20 failed=1 skipped=0 at generated.service-client-contract; post-plugin service generate wrote zero client modules, skipped two current clients, and wrote three Aspire helper files while the probe required zero helper writes",
           "s5FailureClass": "leaf-caused proof-contract failure: the asserted zero-write run followed plugin installation that legitimately changes Aspire-helper inputs, so it is not yet a same-input idempotency rerun",
           "s5Cleanup": "cleanup.aspire-stop PASS; run-owned teardown empty; independent final leak check Aspire ok, Docker ok, survivors empty; fresh-browser NOT_RUN",
-      "f4RequiredScope": "amend and push before mutation; distinguish reconciliation after plugin-input changes from a true consecutive same-input idempotency rerun, then prove the second identical invocation writes zero clients and zero Aspire helpers; preserve the FAIL and rerun cheap proofs/four receipts/fresh Tier-A before any new lease",
+          "f4RequiredScope": "amend and push before mutation; distinguish reconciliation after plugin-input changes from a true consecutive same-input idempotency rerun, then prove the second identical invocation writes zero clients and zero Aspire helpers; preserve the FAIL and rerun cheap proofs/four receipts/fresh Tier-A before any new lease",
           "f4DiagnosticProof": "after the failed invocation reconciled three helpers, two further consecutive identical service generate commands both exited 0 with zero clients written, two skipped, zero helpers written, and byte-identical complete helper SHA-256 manifests",
-          "runtimeGates": "scaffold.runtime attempt 2 terminal FAIL with clean host and lease released; fresh-browser NOT_RUN; no retry or evaluator before F4 repair and fresh Tier-A"
+          "f4PlanAmendmentHeadSha": "b40616a81e282dc7671cdeeb25eb49bf6946820e",
+          "f4ProductHeadSha": "7876aa10911c2eeea4aafb217d651b28a90bac2c",
+          "f4EvidenceHeadSha": "6f813b0db35df38dcd9dc7f1ea333e997399fac0",
+          "f4ReceiptState": "four distinct exact-content-head receipts PASS and independently SUFFICIENT: check 2937 files/25 batches/0 diagnostics; test 4213/0/19; publish dry-run PASS; arch-check zero failures",
+          "f4TierAState": "PASS",
+          "f4TierATopicCheckpointSha": "35f3a6975b1aaae20a384e5d655cc3483e0b2a56",
+          "f4TierAProof": "amendment preceded product repair; first post-plugin generate may converge, then an immediately identical generate must write zero clients/helpers and preserve SHA-256 path/byte identity; focused sequence and two negative cases passed 11/0; prior FAIL trail intact",
+          "runtimeGates": "attempt 3 lease active at immutable final evidence head 6f813b0db after clean-host preflight; run scaffold.runtime first, clean/audit, then fresh-browser only on PASS, clean/audit again; no evaluator yet"
         }
       },
       "planDecisionBoundary": "cycle 1 ruled direct emitted { queryKey: <svc>Queries.list.clientKey() } with no SDK overload; repair must lock generator-owned output paths, existing service generate overwrite/dry-run/force compatibility, package README homes, post-mutation request-count proof, per-slice paths, and qualified citations",
@@ -2444,6 +2456,27 @@
         "survivors": 0,
         "freshBrowser": "NOT_RUN"
       }
+    },
+    {
+      "id": "app-service-client-wiring-f4-runtime",
+      "state": "active",
+      "lane": "features",
+      "leafId": "app-service-client-wiring",
+      "gateId": "scaffold.runtime_then_fresh-browser",
+      "preGateHead": "6f813b0db35df38dcd9dc7f1ea333e997399fac0",
+      "contentHead": "7876aa10911c2eeea4aafb217d651b28a90bac2c",
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-15T17:11:14.000Z",
+      "attempt": 3,
+      "scope": "run suite-owned scaffold.runtime first at the immutable final evidence head; preserve the exact raw result; mandatory Aspire/Docker cleanup and clean inter-gate audit; only on PASS run catalog-backed fresh-browser serially, then browser/runtime cleanup and a final empty-host audit; no evaluator until both gates and topic reconciliation are terminal",
+      "preflight": {
+        "leafState": "clean_local_remote_pr_equal",
+        "dockerContainers": 0,
+        "aspireApplicationProcesses": 0,
+        "relevantListeningPorts": 0,
+        "otherLeaseOwners": 0,
+        "idleAspireMcpHelpers": "foreign_tooling_preserved"
+      }
     }
   ],
   "canaryCheckpoints": [
@@ -2485,5 +2518,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T16:57:59.947Z"
+  "updatedAt": "2026-08-15T17:11:14.000Z"
 }

@@ -610,3 +610,12 @@ implementation thread.
   #1666 plan to mark acceptance row 1 otherwise satisfied, but an exhaustive shipped-source sweep
   found three more identical defects. When acceptance is phrased for a package family, planning must
   enumerate the whole publish set, not stop at the issue's cited exemplar.
+- **A corrected line must repair the surrounding teaching contract:** #1461's second authorized page
+  has one explicitly false `getCachedEntry` clause at line 100, but five earlier SWR statements make
+  the same demonstrated loader story misleading without being individually false. A docs plan must
+  give every nearby mechanism claim an explicit retain/correct disposition and explain the composed
+  narrative; fixing the quoted sentence alone is not sufficient acceptance.
+- **Lease readiness is an immutable evidence state, not an intent:** #1664 attempt 3 was granted only
+  after all F4 receipts, the author report, and independent Tier-A were committed and pushed at
+  `6f813b0db`. No preflight artifact may be appended between this grant and execution. This makes the
+  exact authorized tree reproducible and prevents the attempt-2 grant/run head mismatch.

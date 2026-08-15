@@ -663,3 +663,18 @@ plan Tier-A. #1664 is in same-author F4 plan/proof repair after consecutive zero
 proved the S5 idempotency assertion was positioned before convergence. #1461 remains plan-only while
 its exact second tutorial source is added to scope. All three lanes remain independent and serial
 within themselves; #1663 and docs stay parked.
+
+### Live transition — 2026-08-15T17:11:14Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Queue exhausted and parked at `5c4ccd8fe` | Do not invent work |
+| internals | #1666 preserved author is repairing SA-2 plan-only at topic `071b2a812` | Fresh Tier-A, then exactly one cycle-2 Fable 5/medium Remote Control PLAN-EVAL; #1663 untouched |
+| fixes | #1461 amendment `eadd672d0` received Tier-A `FAIL_FIX` at topic `9e9d02ebb`; bounded T-1 plan repair is required | No PLAN-EVAL or product mutation before the same-page narrative has an explicit per-line disposition and fresh Tier-A passes |
+| features | #1664 F4 evidence `6f813b0db` and topic Tier-A `35f3a6975` are PASS; immutable attempt-3 singleton runtime lease is active | Run `scaffold.runtime`, clean/audit, then `fresh-browser` only on PASS; clean/audit again; no evaluator yet |
+
+#1664 local, remote, and PR heads are equal and the preflight found zero Docker containers, Aspire
+application processes, relevant listening ports, or competing lease owners. All preflight artifacts
+were already committed before the lease, so the authorized evidence head cannot move as it did on
+attempt 2. Coordinator remains GPT-5.6-SOL/high through Remote Control, never max. Native Claude
+topic supervisors and #1651 option-1 keep-and-narrow architecture remain preserved.
