@@ -67,3 +67,58 @@ Cheap classifier/workflow-structure tests plus the existing drift/check/quality/
 `fresh-browser`, Aspire, Docker, and any expensive lease are **explicitly out of scope** — the
 singleton lease is consumed and its `PASS` receipt at product head `4a3c40321` remains valid because
 the repair changes no product file.
+
+## Significant — second coordinator contract amendment for IMPL-EVAL finding E-1
+
+Severity: **significant**. Recorded by topic orchestrator `topic-fixes-0.0.7` on coordinator
+disposition, at leaf head `ca8773f662e3ae8ba48a601e73563570825892ff`.
+
+### Why the amended surface still could not express the fix
+
+IMPL-EVAL cycle 1 (`a46b83831`, evaluated head `939e73113`) returned **`FAIL_FIX`** on **E-1**: the
+leaf repaired the source template but never regenerated the embedded barrel the CLI actually ships.
+
+Independently confirmed: `packages/cli/src/kernel/assets/embedded.generated.ts` is absent from the
+entire product diff, still carries `total: 50`, contains **zero** occurrences of `citation-chip`,
+and `deno task check:assets-barrel` exits **1**. `TemplateRegistry`'s only content source is
+`EMBEDDED_TEMPLATE_CONTENT` from that file, its `hydrate()` is a no-op, and there is no disk
+fallback — so `netscript init` still scaffolds a gallery rendering "All 50 items" with the AI
+collection hidden. #1358's user-visible defect was unfixed on the consumer path.
+
+Secondary finding **E-2**: `assets-barrel` is absent from this leaf's `provingGates` and was never
+run by any lane, which is why the staleness survived every green gate.
+
+### Amended surface — exactly one generated product path
+
+Added to the contract:
+
+1. `packages/cli/src/kernel/assets/embedded.generated.ts` — **generated**; only ever written by
+   `deno task gen:assets-barrel`, never hand-edited.
+
+Plus append-only run artifacts needed to record this amendment and its proof. **No other product
+file enters the contract.** The four original product surfaces and the three T-3 CI files remain in
+force and unchanged.
+
+`deno task check:assets-barrel` is added to the leaf's validation plan as a bound gate; its raw exit
+code and structured receipt are required evidence.
+
+### Determinism condition on the repair
+
+The regenerated delta is retained **only if** it is exactly the output of `deno task
+gen:assets-barrel` and **no other generated target moves**. Otherwise the author stops and reports.
+The expected shape, observed independently in a clean tree at this head, is **one file, one line**.
+
+### Why no expensive gate is rerun
+
+The previously leased `fresh-browser` product surface is **byte-identical**: this repair
+synchronizes only the embedded *representation* of an already-gated template. The consumed lease's
+`PASS` receipt at product head `4a3c40321` therefore remains valid, and no Aspire, Docker, browser,
+scaffold-runtime, or E2E rerun is authorized or needed.
+
+### Supervisor boundary note
+
+While verifying E-1 the topic orchestrator ran `deno task check:assets-barrel`, whose first half
+(`gen:assets-barrel`) mutates the tree. That left `embedded.generated.ts` modified in the working
+tree. It was **reverted with `git checkout --` before dispatch**, restoring the committed stale
+state, so the repair delta is produced by the Codex author and not by the supervisor. Verified clean
+at `ca8773f66` with the barrel back to `total: 50` before the author was resumed.
