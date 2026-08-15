@@ -153,6 +153,47 @@ task result. Formatting targeted only the two TypeScript sources and never the r
 All binding receipts record `actualGitHead` = signed Slice 1 head
 `3c398528996a715da8daebe04969e6aba90263e9`; none names a stash or any non-history commit-ish.
 
+### Slice 3 — consumer synchronization and JSR evidence
+
+The checked-in generator synchronized the embedded consumer scanner after Slice 2. The RED asset
+receipt proves the signed Slice 2 head was stale; `gen:assets-barrel` then changed only
+`packages/cli/src/kernel/assets/agent-tools.generated.ts`, and the binding second generation was
+clean. The embedded copy now carries the same public-export rail and fixed-repository fail-closed
+GitHub resolver as the source scanner. The generated file itself checks cleanly and is present in
+the CLI publish simulation.
+
+The JSR audit covered all three `@netscript/cli` export targets and all 13
+`@netscript/plugin-workers` export targets discovered from their checked-in export maps. Dependency
+specifiers and publish include/exclude lists were reviewed from each member's `deno.json`: internal
+`@netscript/*` dependencies are pinned to 0.0.6, `@std/*` dependencies carry explicit versioned
+ranges, and `zod` uses the root npm catalog. The scoped dry-run wrapper materialized that catalog
+only in its throwaway workspace and published nothing. Both scoped publish simulations passed after
+checking every export target for slow types and enumerating their package files. Workers retains
+three existing `unanalyzable-dynamic-import` warnings whose runtime paths are deliberately computed;
+no warning was suppressed or changed in this slice.
+
+CLI full-export lint is green. Workers full-export lint is deliberately not called green: it exits 1
+with exactly 20 `private-type-ref` diagnostics across the 13 targets, zero `missing-jsdoc`, and zero
+other diagnostics. The authorized `workers-private-type-ref-1655` debt entry binds that strict
+no-increase baseline to open issue #1655 in milestone 0.0.8. Any count above 20 or any new
+diagnostic class is `FAIL_DEBT` until #1655 removes the baseline.
+
+| Evidence                                                         | Outcome                  | Exit | Receipt                                         |
+| ---------------------------------------------------------------- | ------------------------ | ---: | ----------------------------------------------- |
+| Stale generated consumer asset                                   | expected FAIL            |    1 | `receipts/slice-3/assets-red.json`              |
+| Clean second checked-in asset generation                         | PASS                     |    0 | `receipts/slice-3/assets-green.json`            |
+| Generated consumer asset structured check (1 file, fired)        | PASS                     |    0 | `receipts/slice-3/generated-check.json`         |
+| CLI full-export doc lint (3/3 targets, zero diagnostics)         | PASS                     |    0 | `receipts/slice-3/cli-doc-lint.json`            |
+| Workers full-export doc lint (13 targets, exact 20 private refs) | expected FAIL / accepted |    1 | `receipts/slice-3/workers-doc-lint.json`        |
+| Scoped CLI publish dry-run                                       | PASS                     |    0 | `receipts/slice-3/cli-publish-dry-run.json`     |
+| Scoped Workers publish dry-run                                   | PASS                     |    0 | `receipts/slice-3/workers-publish-dry-run.json` |
+| `quality:gate` (`quality:scan` + `arch:check`, zero failures)    | PASS                     |    0 | `receipts/slice-3/quality-gate.json`            |
+
+Every Slice 3 receipt records `actualGitHead` = signed Slice 2 head
+`f9acdb426d5438935ae75bee7dda987dbfe3d4cb`. None names a stash or another commit-ish outside branch
+history. Formatting is not applied to the generated asset or receipt directory: generator output is
+canonical and committed evidence bytes remain unchanged.
+
 ## Reconcile notes
 
 - Live #1378 and #1545 are open in milestone 0.0.7; `origin/main` equals the approved baseline.
@@ -170,6 +211,9 @@ All binding receipts record `actualGitHead` = signed Slice 1 head
 - Slice 2 live reconcile: PR #1653 remains open and draft at milestone 0.0.7 with exactly
   `status:impl`; its body still carries both closing keywords. Live #1378 and #1545 remain open. No
   label, milestone, issue, base, or readiness mutation was made.
+- Slice 3 live reconcile: issue #1655 remains open in milestone 0.0.8 and owns only removal of the
+  exact Workers lint baseline. No issue, label, milestone, PR readiness, or central-state mutation
+  was made; both dry runs were simulations and no publication occurred.
 
 ## Activity
 
@@ -207,14 +251,19 @@ All binding receipts record `actualGitHead` = signed Slice 1 head
   comment `5299297798`). Captured Slice 2 RED-first proof, implemented the checked-in local export
   graph and public-signature rule, preserved the corrective failed receipts, ran the named
   structured gates, and stopped before Slice 3 for substantive Tier-A review.
+- 2026-08-15 — Slice 2 supervisor sign-off landed at `f9acdb426d5438935ae75bee7dda987dbfe3d4cb` (PR
+  comment `5299457083`). Captured the stale generated asset as Slice 3 RED, regenerated only through
+  the checked-in task, audited the complete CLI and Workers JSR surfaces, registered the exact #1655
+  no-increase debt, ran the named structured gates, and stopped before Slice 4 for substantive
+  Tier-A review.
 
 ## Plan-Gate state
 
 - Historical OpenRouter artifact: advisory `FAIL_PLAN` at `8a4709afe`; its D-2/D-3/D-4 findings are
   resolved by coordinator authority and its D-1 editorial finding is resolved in live #1545.
 - Current formal verdict: cycle 2 `PASS` in `plan-eval.md`, evaluator artifact commit `c694cfb311`.
-- Slice state: **Slice 1 is signed off. Slice 2 implementation and evidence are complete and await
-  substantive Tier-A review.** Slice 3 has not started and is not authorized until supervisor
+- Slice state: **Slices 1 and 2 are signed off. Slice 3 implementation and evidence are complete and
+  await substantive Tier-A review.** Slice 4 has not started and is not authorized until supervisor
   sign-off.
 
 ## Tier-A sign-off — Slice 1

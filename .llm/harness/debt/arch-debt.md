@@ -2303,3 +2303,27 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Group the established attribute domains behind role-named bounded subdirectories while
   preserving the `@netscript/telemetry/attributes` export map and symbol names; telemetry package
   tests, scoped gates, full-export doc lint, publish dry-run, and `quality:gate` must remain green.
+
+## plugins/workers — published export private-type references (`workers-private-type-ref-1655`)
+
+- **Reason:** Full-export `deno doc --lint` over all 13 `@netscript/plugin-workers` export targets
+  reports exactly 20 pre-existing `private-type-ref` diagnostics. The same audit reports zero
+  `missing-jsdoc` and zero other diagnostics. Removing these references is a package API repair
+  outside the quality-scanner leaf; hiding them or claiming this audit green would make the
+  publication evidence untruthful.
+- **Owner:** `@netscript/plugin-workers` public-surface maintainers; issue #1655 in milestone 0.0.8.
+- **Target:** Resolve in #1655 without increasing or adding a diagnostic class before that repair.
+- **Linked plan:**
+  `.llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/plan.md`;
+  issues #1378, #1545, and #1655; PR #1653.
+- **Created:** 2026-08-15.
+- **Status:** open, DEBT_ACCEPTED for PR #1653 only at the strict baseline of 20 `private-type-ref`
+  diagnostics across 13 export targets. This is a no-increase allowance, not a full-export lint
+  pass.
+- **Gate:** Until #1655 closes, the 13-target full-export audit may report at most the recorded 20
+  `private-type-ref` diagnostics and must report zero `missing-jsdoc` and zero other diagnostics.
+  Any increase or new diagnostic class is `FAIL_DEBT`. Closure requires that audit to exit 0 with
+  zero diagnostics while the scoped Workers publish dry-run and `quality:gate` remain green.
+- **Evidence:**
+  `.llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/receipts/slice-3/workers-doc-lint.json`
+  records the exact baseline at signed Slice 2 head `f9acdb426d5438935ae75bee7dda987dbfe3d4cb`.
