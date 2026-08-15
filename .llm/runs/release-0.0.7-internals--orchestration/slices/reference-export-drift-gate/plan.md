@@ -1,5 +1,12 @@
 # Plan: reference-export-drift-gate
 
+> **AMENDED — coordinator scope amendment SA-1, 2026-08-15T16:40:42Z.** The authoritative amendment
+> record is `scope-amendment.md` in this slice directory. SA-1 authorizes exactly one additional
+> **test-only** implementation path and classifies `fresh-browser` as **N/A / waived**. Where this
+> plan and SA-1 conflict, **SA-1 governs**. The author's original text is preserved verbatim below
+> and annotated inline as `**AMENDED (SA-1)**`; nothing is deleted, so the original reasoning stays
+> readable in git history.
+
 ## Run metadata
 
 | Field                     | Value                                                                          |
@@ -42,10 +49,22 @@ tenth implementation path.
 | `packages/contracts/src/application/paginated-query.ts`     | Edit JSDoc only.                         | Change the shipped module example from the non-exporting root to `@netscript/contracts/query`. No runtime/type semantics.                                                                                                                                               |
 | `packages/contracts/src/public/mod.ts`                      | **Do not edit.**                         | The briefed contract symbols already resolve from the root. No export addition/removal is warranted.                                                                                                                                                                    |
 
-No tenth implementation path is authorized. In particular, do not touch
-`.llm/tools/docs/check-exports-drift_test.ts`, the Contracts reference page, any Fresh UI package
-source/config, MySQL package/reference paths, `deno.lock`, doctrine/debt, central cluster state, or
-another lane's worktree. If implementation needs one, stop and request rescope from the coordinator.
+**AMENDED (SA-1).** A **tenth** implementation path is now authorized, **test-only**:
+
+| Amended path                                  | Planned action                   | Per-path justification                                                                                                                                                                                                                                                                                                                                                              |
+| --------------------------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.llm/tools/docs/check-exports-drift_test.ts` | **Edit — test assertions only.** | S1 lands fail-closed coverage-policy semantics (D2-D5) whose refusal paths are load-bearing: empty/malformed reasons, unknown coverage modes, invented symbols, and omitted symbols must each exit nonzero. Proving that with one-off probes leaves no artifact that can fail a future CI run. Persistent test cases are the only durable proof. No product, config, or generated file may be edited under this path. |
+
+The original prohibition stands for **everything else**: do not touch the Contracts reference page,
+any Fresh UI package source/config, MySQL package/reference paths, `deno.lock`, doctrine/debt,
+central cluster state, or another lane's worktree. An **eleventh** path is rescope — stop and
+request it from the coordinator.
+
+~~No tenth implementation path is authorized. In particular, do not touch
+`.llm/tools/docs/check-exports-drift_test.ts`~~ (superseded by SA-1) ~~, the Contracts reference
+page, any Fresh UI package source/config, MySQL package/reference paths, `deno.lock`,
+doctrine/debt, central cluster state, or another lane's worktree. If implementation needs one, stop
+and request rescope from the coordinator.~~
 
 ## Locked decisions
 
@@ -74,7 +93,7 @@ another lane's worktree. If implementation needs one, stop and request rescope f
 | Whether the briefed Contracts root exports need edits          | resolved now                  | No; baseline-earned and explicitly reported.                                                        |
 | Whether package-source doc-lint debt should be fixed           | safe to defer                 | Outside frozen paths; record baseline reds without weakening gates.                                 |
 | Whether every mapped package should become symbol-complete now | safe to defer                 | This leaf makes non-complete status explicit/reasoned; unrelated prose expansion is separate scope. |
-| Whether Fresh browser proof must run                           | coordinator decision required | See `fresh-browser` classification below. The implementation lane may not execute it.               |
+| Whether Fresh browser proof must run                           | **resolved by SA-1**          | **N/A / waived.** No route/component/island/interaction behavior changes. `NOT_RUN` preserved; no runtime lease. |
 
 No unresolved decision besides the coordinator-owned browser classification would force source
 rework. Browser classification affects evidence only, not implementation design.
@@ -94,8 +113,12 @@ rework. Browser classification affects evidence only, not implementation design.
   - the `/query` import in shipped Contracts JSDoc.
 - Proves: direct drift command raw exit 0 only after all six Fresh UI entrypoints and the curated
   symbol boundary reconcile; the existing negative-fixture test still proves an added entrypoint is
-  red. One-off negative policy probes must report nonzero for empty reasons/unknown modes; they are
-  recorded as diagnostic evidence because the frozen surface forbids editing the test file.
+  red. ~~One-off negative policy probes must report nonzero for empty reasons/unknown modes; they are
+  recorded as diagnostic evidence because the frozen surface forbids editing the test file.~~
+  **AMENDED (SA-1):** those negative policy cases become **persistent test cases** in
+  `.llm/tools/docs/check-exports-drift_test.ts` — empty/malformed reason, unknown coverage mode,
+  invented symbol, and omitted symbol must each be asserted nonzero by the committed test, so the
+  refusal paths can fail a future CI run rather than only this author's terminal.
 - Slice review: confirm exclusions classify real exported symbols only, each reason is substantive,
   Dropzone remains visibly non-exported, and no Contracts runtime/export changes entered the diff.
 
@@ -132,7 +155,7 @@ is `NOT FIRED`.
 
 | Order | Gate                 | Classification and evidence                                                                                                                                                                                                                    |
 | ----- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1     | Focused checker test | Run `.llm/tools/docs/check-exports-drift_test.ts` unchanged; existing negative export fixture must pass. Add recorded one-off negative probes for invalid coverage policy and invented/omitted Fresh symbols; no scratch under measured roots. |
+| 1     | Focused checker test | **AMENDED (SA-1):** the existing negative export fixture must still pass, and the invalid-coverage-policy and invented/omitted-symbol cases are added as **committed test cases** in `.llm/tools/docs/check-exports-drift_test.ts` rather than one-off probes. Assertions only — no product/config/generated edit under this path; no scratch under measured roots. |
 | 2     | Direct export drift  | `deno task docs:exports-drift`; must enumerate/compare the configured surfaces and exit 0 only after reconciliation.                                                                                                                           |
 | 3     | `check`              | Frozen contract gate via durable receipt; wrapper-backed type selection must be nonempty.                                                                                                                                                      |
 | 4     | `test`               | Frozen full behavior gate via durable receipt, including docs/tool/workflow tests selected by the repository task.                                                                                                                             |
@@ -149,7 +172,14 @@ resource cleanup is planned.
 
 ## `fresh-browser` classification and request
 
-**Status: NOT FIRED — this lane is not authorized to execute it.**
+**AMENDED (SA-1) — RESOLVED: `fresh-browser` is classified N/A / WAIVED for this leaf.** The
+coordinator accepted the author's argument below: the verified plan changes checker, docs, shipped
+JSDoc, task, and workflow wiring only, and no route, component, island, CSS, or interaction
+behavior. **`NOT_RUN` evidence is preserved and reported as `NOT_RUN`** — it is never restated as a
+pass — and **no runtime lease is acquired**. Aspire, Docker, browsers, and `e2e:cli` remain
+prohibited in this lane.
+
+**Original author status: NOT FIRED — this lane is not authorized to execute it.**
 
 If granted, `fresh-browser` would prove only that the edited reference page builds/renders with
 usable headings, anchors, tables, code blocks, and responsive presentation in the real Fresh docs
@@ -215,13 +245,23 @@ static prerequisite, never permission to publish.
 - MySQL/#1293/#1112 paths and acceptance.
 - Symbol-complete prose expansion for unrelated entrypoint-only package mappings; their policy must
   become explicit in this leaf, but their pages do not enter scope.
-- New/edited tests outside the frozen paths, dependency/version/catalog/lock changes, doctrine/debt,
-  central milestone state, issue checkbox mutation, merge, publish, ready flip, or release work.
+- New/edited tests outside the frozen paths **except** the single path authorized by SA-1,
+  `.llm/tools/docs/check-exports-drift_test.ts` (test assertions only); dependency/version/catalog/
+  lock changes, doctrine/debt, central milestone state, issue checkbox mutation, merge, publish,
+  ready flip, or release work.
 - Aspire, Docker, browser execution, `e2e:cli`, scaffold/static/runtime smokes.
 
 ## PLAN-EVAL judgement
 
-**Fresh PLAN-EVAL: REQUIRED, but not granted or performed by this author.**
+**AMENDED (SA-1) — GRANTED.** The coordinator accepted the author's judgement and granted **exactly
+one** fresh PLAN-EVAL cycle 1, run in a **separate session** over the **amended immutable head**
+after this amendment passes a fresh Tier-A. Route: native **Fable 5 / medium / Remote Control**,
+**artifact-only** — the evaluator writes `plan-eval.md` and nothing else. On `PASS` the preserved
+original Codex author resumes through the serial slices, each followed by a fresh Tier-A gate. A
+`FAIL_PLAN` is reported as `FAIL_PLAN`.
+
+**Original author judgement: Fresh PLAN-EVAL: REQUIRED, but not granted or performed by this
+author.**
 
 The implementation volume is bounded, but the plan is decision-heavy: it changes what a green
 cross-package documentation gate means, introduces a reason-bearing omission contract, must separate
