@@ -216,6 +216,32 @@ Issue #1293 is open with `status:impl` and owns the Prisma MySQL exported adapte
 executable-example work. Neither the frozen nine paths nor SA-1/SA-2's four added paths contain a
 MySQL package or reference path. This leaf neither reads that work as a prerequisite nor changes it.
 
+### F10 — SA-3 generator cascade is exactly four paths; the MCP export corpus is baseline drift
+
+CI's `Agent docs corpus freshness` red is reproduced in an isolated clone at leaf head `ee67d12b4`:
+`check:agent-docs-prose` returns raw exit 1, while the same command at exact base `baf1cdf67`
+returns raw exit 0. Source tracing and serial scratch generation establish ownership:
+
+| Generator/check         | Raw result before regeneration                           | Paths added to the cumulative scratch diff                                                        | Finding                                                                                                                                                                    |
+| ----------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `gen:agent-docs-prose`  | generation raw exit 0                                    | `.llm/assets/agent-docs/prose.json.gz`; `.llm/assets/agent-docs/provenance.json`                  | The builder collects every rendered `pages/**/index.md`. The Fresh UI reference payload changes from 18,895 bytes / SHA-256 `86450e…4425` to 26,411 bytes / `d9d2fa…febe`. |
+| `gen:publish-assets`    | pre-regeneration check raw exit 0; generation raw exit 0 | `packages/mcp/src/publish-assets.generated.ts` only                                               | Fresh UI is absent from `MCP_EMBEDDED_DOC_PATHS`; only published `sourceCommit` changes, from `504de3f67` to `ee67d12b4`. Other publish outputs remain byte-identical.     |
+| `gen:assets-barrel`     | pre-regeneration check raw exit 0; generation raw exit 0 | `packages/cli/src/kernel/assets/agent-docs.generated.ts` only                                     | Reads the canonical gzip/provenance and embeds both. Sizes, digest, source commit, and base64 payload change.                                                              |
+| `gen:mcp-export-corpus` | check raw exit 1 at base and leaf                        | Would change `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` | Excluded: base and leaf regeneration produce byte-identical SHA-256 `314c9946…71f6`, proving the red predates and is independent of this leaf.                             |
+
+The canonical affected cascade is therefore the four expected candidates and no additional path. The
+generator manifest is deliberately not treated as an edit allowlist. A scratch second pass of the
+three applicable generators returned raw exit 0 for each and left the complete diff checksum
+unchanged (`2a44d9d8…2995f`); the next implementation pass will repeat that proof on the authorized
+checkout and then again at the clean committed content head.
+
+Publication is consumer-visible. `@netscript/cli` includes `src/**/*.ts` and imports the generated
+agent-docs asset from its public Deno agent-docs adapter. `@netscript/mcp` includes `**/*.ts` and
+its runtime infrastructure imports `publish-assets.generated.ts`. CLI has six exact internal pins
+(Aspire, Config, Fresh UI, MCP, Plugin, SDK) at `0.0.6`; MCP has exact Aspire and Telemetry
+attribute/query pins at `0.0.6`. Both members require a fresh JSR audit and isolated-declaration
+publish dry-run at the future content head.
+
 ## JSR/publication surface scan
 
 JSR audit is applicable because four shipped JSDoc files inside published `@netscript/contracts`
@@ -224,7 +250,7 @@ will change and the Fresh UI reference is derived from a published member.
 | Member                       | Planned publish delta                                                                                                                                                                                    | Export map                                                            | Exact `@netscript/*` pins                                                                                                                                               | Baseline evidence / risk                                                                                                                                                                                                                                               |
 | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@netscript/contracts@0.0.6` | Yes: JSDoc import text changes in `src/application/paginated-query.ts`, `src/application/transform-helpers.ts`, `schemas/filters.ts`, and `schemas/pagination.ts`; no runtime/type/export/schema change. | Four entrypoints: `.`, `./crud`, `./query`, `./transform`; unchanged. | None in member imports. `@orpc/contract@^1.14.6` and root-catalog `zod` are non-NetScript dependencies.                                                                 | `audit-jsr-package` raw exit 0; dry-run OK with one sanctioned oRPC slow-type INFO. Full-export `doc:lint` raw exit 1 with nine pre-existing private-type-ref diagnostics (eight contract primitives, one CRUD), not caused or fixed by these prose-only source edits. |
-| `@netscript/fresh-ui@0.0.6`  | No package file changes; reference/checker only. The plan still audits its real published surface rather than claiming "no publish delta" without inspection.                                            | Six entrypoints listed in F5; unchanged.                              | `@netscript/sdk/auto-update` and `@netscript/sdk/desktop` are both exact `jsr:@netscript/sdk@0.0.6/...`; `deps:why @netscript/sdk` raw exit 0 confirms live source use. | `audit-jsr-package` raw exit 0 and dry-run OK, while reporting existing folder/cardinality and slow-type warnings. Full-export `doc:lint` raw exit 1 with 123 existing `/interactive` diagnostics. Source repair is outside the frozen surface.                        |
+| `@netscript/fresh-ui@0.0.6`  | No Fresh UI member file changes, but SA-3 proves its reference change propagates into published CLI/MCP generated assets; the earlier leaf-wide no-publish-delta inference is superseded.                | Six entrypoints listed in F5; unchanged.                              | `@netscript/sdk/auto-update` and `@netscript/sdk/desktop` are both exact `jsr:@netscript/sdk@0.0.6/...`; `deps:why @netscript/sdk` raw exit 0 confirms live source use. | `audit-jsr-package` raw exit 0 and dry-run OK, while reporting existing folder/cardinality and slow-type warnings. Full-export `doc:lint` raw exit 1 with 123 existing `/interactive` diagnostics. Source repair is outside the frozen surface.                        |
 
 Root `compilerOptions.isolatedDeclarations` is `true`. The final canonical workspace
 `publish:dry-run` remains required because the Contracts JSDoc is part of the publish set. A green
@@ -258,10 +284,13 @@ reported baseline doc-lint debt or prove a real publish.
 - **Resolved by SA-1:** Fresh UI browser execution is N/A/waived for this surface. It remains
   `NOT_RUN`; the implementation lane must not request a runtime lease or fire it.
 - **Must resolve now:** Are the three additional Contracts examples deferred? No. The coordinator
-  granted import-line-only scope for all three, bringing the authorized implementation surface to
-  thirteen paths and making closure of #1296 honest once all four residual lines are repaired.
+  granted import-line-only scope for all three and made closure of #1296 honest once all four
+  residual lines were repaired. SA-3 subsequently brings the authorized surface to seventeen paths
+  for exactly four generated mirrors.
 - **Safe to defer:** Existing Fresh UI public-source doc-lint/slow-type remediation and Contracts
-  oRPC private-type-ref debt; neither is part of the thirteen authorized paths.
+  oRPC private-type-ref debt; neither is part of the seventeen authorized paths.
+- **Must exclude:** The baseline-red MCP export-surface corpus. Base/head canonical generation is
+  byte-identical, so regenerating it would launder unrelated drift into this leaf.
 - **Safe to defer:** Broadening symbol-complete coverage for every reference page. This leaf makes
   entrypoints-only policy explicit rather than silently claiming completeness; later leaves can
   promote packages one at a time.

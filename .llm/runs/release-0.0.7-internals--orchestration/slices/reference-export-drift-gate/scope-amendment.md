@@ -1,20 +1,20 @@
-# Scope amendments SA-1 / SA-1a / SA-2 — `reference-export-drift-gate` (#1666 / closes #1296)
+# Scope amendments SA-1 / SA-1a / SA-2 / SA-3 — `reference-export-drift-gate` (#1666 / closes #1296)
 
-| Field          | Value                                                                          |
-| -------------- | ------------------------------------------------------------------------------ |
-| Amendment IDs  | `SA-1`, `SA-1a`, `SA-2`                                                        |
-| Recorded (UTC) | SA-1 `2026-08-15T16:40:42Z`; SA-1a `2026-08-15T16:57Z`; SA-2 `2026-08-15`      |
-| Authority      | coordinator `codex-root-0.0.7`, relayed through the owner                      |
-| Recorded by    | `topic-internals-0.0.7`, Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34` |
-| Amends         | `plan.md`; SA-2 builds on evaluator `5d229e0f3` and SA-1a head `cb91b225d`     |
-| Leaf / lane    | `reference-export-drift-gate`, wave 2 internals                                |
-| Branch / base  | `fix/reference-export-drift-gate` / `baf1cdf67a4e931af17b4772ddf6101f36152184` |
-| Status         | SA-2 in force; latest ruling governs wherever amendments or `plan.md` conflict |
+| Field          | Value                                                                                                  |
+| -------------- | ------------------------------------------------------------------------------------------------------ |
+| Amendment IDs  | `SA-1`, `SA-1a`, `SA-2`, `SA-3`                                                                        |
+| Recorded (UTC) | SA-1 `2026-08-15T16:40:42Z`; SA-1a `2026-08-15T16:57Z`; SA-2 `2026-08-15`; SA-3 `2026-08-15T19:38:43Z` |
+| Authority      | coordinator `codex-root-0.0.7`, relayed through the owner                                              |
+| Recorded by    | `topic-internals-0.0.7`, Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34`                         |
+| Amends         | `plan.md`; SA-3 records the post-`ee67d12b4` CI freshness finding                                      |
+| Leaf / lane    | `reference-export-drift-gate`, wave 2 internals                                                        |
+| Branch / base  | `fix/reference-export-drift-gate` / `baf1cdf67a4e931af17b4772ddf6101f36152184`                         |
+| Status         | SA-3 in force; latest ruling governs wherever amendments or `plan.md` conflict                         |
 
 This is a **control-plane** record. It changes authorized scope and gate classification. SA-1 left
 D1-D11 intact; SA-2 narrows D8's JSDoc-only reconciliation to all four measured residual examples
-and binds N1-N5. It does **not** grant merge, publish, ready-flip, relabel, issue-closure,
-milestone, or release-writer authority.
+and binds N1-N5; SA-3 adds D12-D14 and four canonical generated paths. It does **not** grant merge,
+publish, ready-flip, relabel, issue-closure, milestone, or release-writer authority.
 
 ## A1 — Tenth implementation path AUTHORIZED (test-only)
 
@@ -189,3 +189,56 @@ A fresh PLAN-EVAL is **required** because SA-2 materially changes closure scope,
 coverage reporting, and the CI premise. It is not author-granted. After this run-artifact-only head
 is pushed, the coordinator must run fresh Tier-A and then grant/dispatch the final separate-session
 cycle. No JSDoc or product edit may begin without both Tier-A PASS and PLAN-EVAL cycle-2 PASS.
+
+## SA-3 — tracked agent-docs publication cascade (2026-08-15)
+
+CI at the preserved implementation/evaluation head `ee67d12b4` found the tracked agent-docs corpus
+stale after the Fresh UI reference rewrite. The prior IMPL-EVAL PASS remains append-only pre-finding
+evidence; readiness is revoked, PR #1666 is draft at `status:impl`, and a fresh delta IMPL-EVAL will
+be required at the future generated-content head.
+
+The coordinator grants rescope beyond the former thirteen-path ceiling for exactly the generator
+outputs that a scratch/base-control investigation proves are affected:
+
+| Path                                                     | Canonical owner        | Verified propagation                                                                                              |
+| -------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `.llm/assets/agent-docs/prose.json.gz`                   | `gen:agent-docs-prose` | Contains the rendered `pages/reference/fresh-ui/index.md`; the repaired page changes its bytes and corpus digest. |
+| `.llm/assets/agent-docs/provenance.json`                 | `gen:agent-docs-prose` | Must match the regenerated corpus sizes, digest, files, and source commit.                                        |
+| `packages/cli/src/kernel/assets/agent-docs.generated.ts` | `gen:assets-barrel`    | Publishes the changed gzip/base64 payload and provenance inside `@netscript/cli`.                                 |
+| `packages/mcp/src/publish-assets.generated.ts`           | `gen:publish-assets`   | Its bounded prose selection excludes Fresh UI, but its published corpus provenance advances `sourceCommit`.       |
+
+These four paths bring the live authorized implementation surface to **seventeen**. SA-3 supersedes
+the former fourteenth-path refusal for these paths only. An **eighteenth** path is a hard rescope
+refusal.
+
+### Explicit exclusion proved by the base control
+
+`gen:mcp-export-corpus` owns
+`packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`, but it is not
+in the leaf cascade. `check:mcp-export-corpus` returns raw exit 1 at both base `baf1cdf67` and the
+leaf head. Regenerating at both commits produced the same SHA-256
+`314c9946631c8db0e500ed0cf389ddc3dd66badaedb5b6643b3b9ab9453c71f6`. This is pre-existing generator
+drift, not an effect of the four Contracts JSDoc import-line corrections or the Fresh UI reference.
+The output is excluded and must remain untouched/red; no waiver is invented.
+
+The broad `PUBLISH_ASSET_OUTPUTS` manifest also does not authorize all listed outputs. Serial
+scratch generation found exactly two corpus files after `gen:agent-docs-prose`, added only the MCP
+publish asset after `gen:publish-assets`, and added only the CLI agent-docs barrel after
+`gen:assets-barrel`. No other manifest path moved.
+
+### Binding next-pass sequence
+
+No checkout generator runs in this SA-3 plan-only pass. After fresh coordinator Tier-A PASS only:
+
+1. Run `gen:agent-docs-prose`, `gen:publish-assets`, and `gen:assets-barrel` in that order; never
+   hand-edit generated files and do not run `gen:mcp-export-corpus`.
+2. Prove first/second regeneration diff identity, prove exactly four new paths, commit the content,
+   prove the committed tree clean, and rerun all three generators to prove no further diff.
+3. Recut the complete binding receipt set at that one clean committed content head, including all
+   former seven gates plus docs format tests/tagline and the three freshness gates. Re-audit
+   Contracts, Fresh UI, CLI, and MCP publication surfaces/pins and preserve every baseline red.
+4. Push by explicit refspec, post the structured slice comment, and stop for a second fresh Tier-A.
+   Fresh delta IMPL-EVAL is coordinator-owned and required before readiness.
+
+SA-3 grants no label, issue-checkbox, draft-state, close-gate, merge, publication, runtime, lock, or
+central-state authority. `fresh-browser` remains N/A/waived and `NOT_RUN`; no runtime lease exists.

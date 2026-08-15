@@ -202,3 +202,28 @@ self-certify.
 The detailed mutation record and receipt/red accounting are in `audit/refusal-mutation-tests.md` and
 `fix1-evidence.md`. The author stops after the explicit-refspec push and structured repair comment
 for coordinator Tier-A.
+
+## SA-3 plan-only amendment — agent-docs publication cascade
+
+- Trigger: quality CI at `ee67d12b4` found `Agent docs corpus freshness` red. The close-gate red is
+  a coordinator-owned label/mirror race and was not rerun. The preserved IMPL-EVAL PASS remains
+  append-only pre-finding evidence; readiness is revoked and PR #1666 remains draft/status:impl.
+- No generator ran against the author checkout. All causal probes ran in isolated clones under
+  `.llm/tmp/` at exact leaf head and exact base.
+- Leaf/base control: `check:agent-docs-prose` raw exit 1 at `ee67d12b4`, raw exit 0 at `baf1cdf67`.
+  `check:mcp-export-corpus` raw exit 1 at both commits.
+- Serial scratch generation found exactly four affected paths: agent-docs gzip, provenance, CLI
+  agent-docs generated source, and MCP publish-assets generated source. All applicable generator raw
+  exits were 0; a second pass left the cumulative diff checksum unchanged.
+- Exclusion proof: base and leaf `gen:mcp-export-corpus` outputs are byte-identical SHA-256
+  `314c9946631c8db0e500ed0cf389ddc3dd66badaedb5b6643b3b9ab9453c71f6`; its freshness red is baseline
+  drift and its generated path is not authorized.
+- Scope: SA-3 grants only the four verified generated paths, taking the implementation ceiling from
+  thirteen to seventeen. An eighteenth path is rescope. No generated file is hand-edited.
+- Publish correction: the CLI asset contains refreshed offline prose and provenance; MCP's bounded
+  prose excludes Fresh UI but its published provenance advances. Both are real JSR publish deltas.
+- Next action is blocked on fresh Tier-A PASS. Only then may the canonical three-generator sequence,
+  idempotence proof, coherent content-head receipt recut, explicit-refspec push, and second Tier-A
+  occur. Fresh delta IMPL-EVAL remains coordinator-owned and required before readiness.
+- `fresh-browser` stays N/A/waived and `NOT_RUN`; runtime, close-gate, label, issue-box,
+  draft-state, merge, publish, lock, and central-state mutations remain `NOT FIRED`.

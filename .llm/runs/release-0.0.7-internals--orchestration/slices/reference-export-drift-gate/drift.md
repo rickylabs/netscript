@@ -36,3 +36,22 @@
   evidence only, never as real-publish or install success.
 - **Boundary drift:** none. `fresh-browser` remains N/A / waived and `NOT_RUN`; every prohibited
   runtime, release, mutation, and cleanup command remains `NOT FIRED`.
+
+## SA-3 — post-IMPL-EVAL generated-publication finding
+
+- **Plan drift:** the original plan treated the Fresh UI reference as non-published prose and did
+  not follow `check:agent-docs-prose` into its tracked CLI/MCP mirrors. CI at `ee67d12b4` proved
+  that assumption incomplete. The preserved IMPL-EVAL PASS remains historical; readiness is
+  invalidated for the future changed head.
+- **Authorized correction:** coordinator rescope adds exactly four existing generated paths and
+  supersedes the former fourteenth-path refusal only for those paths. The live ceiling is seventeen;
+  an eighteenth path still refuses.
+- **Over-broad-generator trap avoided:** `gen:mcp-export-corpus` is red at base and leaf, but base
+  and leaf regeneration are byte-identical. Its output is excluded instead of absorbing unrelated
+  baseline drift to make a check quiet.
+- **Publication drift:** CLI embeds changed corpus bytes/provenance and MCP embeds changed corpus
+  provenance. The earlier leaf-wide no-publish-delta framing is corrected; no export/API/pin change
+  is inferred.
+- **Gate drift:** old receipts and IMPL-EVAL remain append-only evidence for old heads. All
+  applicable receipts must be recut coherently at one future clean committed content head, followed
+  by a fresh coordinator-owned delta IMPL-EVAL.

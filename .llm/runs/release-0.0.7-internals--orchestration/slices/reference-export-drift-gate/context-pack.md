@@ -6,8 +6,11 @@
 - Base: `baf1cdf67a4e931af17b4772ddf6101f36152184`
 - PR: #1666, draft, closes exactly #1296
 - PLAN-EVAL: cycle 2 `PASS` at `45c249b9c`
-- Implementation: S1 and S2 slice reviews `PASS`; S3 evidence complete and awaiting final
-  coordinator substantive review
+- Implementation: S1/S2 reviews passed; S3 and refusal-test repair completed; preserved IMPL-EVAL
+  PASS at `ee67d12b4` is pre-finding evidence only
+- Readiness: revoked after quality CI found stale tracked agent-docs mirrors; PR remains draft at
+  `status:impl`; issue boxes unchanged
+- Current pass: SA-3 plan-only amendment. No checkout generation until fresh Tier-A PASS
 - S3 immutable implementation head: `47ca22abe94b9d2e54d3778edc8944094b227886`
 - `fresh-browser`: N/A / waived, `NOT_RUN`; no runtime lease
 
@@ -47,7 +50,23 @@ accuracy aggregate invokes that named task once while retaining stdout/stderr fa
 and Pages displays the same command once from repository root behind its existing run guard. The
 workflow trigger surface is unchanged.
 
+## SA-3 verified cascade
+
+The Fresh UI reference change propagates through exactly four canonical outputs:
+
+- `.llm/assets/agent-docs/prose.json.gz`
+- `.llm/assets/agent-docs/provenance.json`
+- `packages/cli/src/kernel/assets/agent-docs.generated.ts`
+- `packages/mcp/src/publish-assets.generated.ts`
+
+The coordinator's rescope brings the implementation ceiling to seventeen paths; an eighteenth path
+requires rescope. `gen:mcp-export-corpus` is explicitly excluded: its check is red at base and leaf,
+and base/head regeneration produces byte-identical output. CLI/MCP generated sources are real
+publish deltas and require fresh JSR/member dry-run evidence.
+
 ## Resume rule
 
-Implementation author stops. Coordinator owns final substantive review, separate-session IMPL-EVAL,
-readiness, and merge decisions.
+Implementation author commits/pushes only this plan amendment, comments, and stops for fresh Tier-A.
+After Tier-A PASS, the author may run only the three canonical generators in `plan.md`, prove
+idempotence, recut coherent content-head evidence, push, and stop for a second Tier-A. Fresh delta
+IMPL-EVAL, readiness, issue boxes, close-gate, labels, and merge remain coordinator-owned.
