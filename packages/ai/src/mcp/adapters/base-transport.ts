@@ -5,6 +5,7 @@ import type {
   McpConnectionState,
   McpConnectOptions,
   McpConnectorConfig,
+  McpReadResourceResult,
   McpStateChangeHandler,
   McpToolDescriptor,
   McpToolResult,
@@ -63,7 +64,7 @@ export class BaseMcpTransport implements McpTransportPort {
       throw new AiError(`MCP transport "${this.serverId}" is closed.`);
     }
     this.transition('reconnecting');
-    await this.closeConnection();
+    await this.closeConnection(options);
     const signal = combineSignals(this.#stopController.signal, options.signal);
     let lastError: unknown;
     const attempts = maxReconnectAttempts(this.#backoff);
@@ -103,19 +104,36 @@ export class BaseMcpTransport implements McpTransportPort {
       throw new AiError(`MCP transport "${this.serverId}" is not connected.`);
     }
     const remoteName = this.#tools.get(name)?.remoteName ?? name;
-    return await connection.callTool(remoteName, args, {
-      signal: combineSignals(this.#stopController.signal, options.signal),
-    });
+    const signal = combineSignals(this.#stopController.signal, options.signal);
+    return await settleOperation(connection.callTool(remoteName, args, { signal }), signal);
   }
 
-  async stop(): Promise<void> {
+  async readResource(
+    uri: string,
+    options: McpConnectOptions = {},
+  ): Promise<McpReadResourceResult> {
+    if (this.#state !== 'connected') {
+      await this.connect(options);
+    }
+    const connection = this.#connection;
+    if (connection === undefined) {
+      throw new AiError(`MCP transport "${this.serverId}" is not connected.`);
+    }
+    const signal = combineSignals(this.#stopController.signal, options.signal);
+    return await settleOperation(connection.readResource(uri, { signal }), signal);
+  }
+
+  async stop(options: McpConnectOptions = {}): Promise<void> {
     if (this.#state === 'closed') {
       return;
     }
     this.#stopController.abort(new DOMException('MCP transport stopped.', 'AbortError'));
-    await this.closeConnection();
-    this.#tools = new Map();
-    this.transition('closed');
+    try {
+      await this.closeConnection(options);
+    } finally {
+      this.#tools = new Map();
+      this.transition('closed');
+    }
   }
 
   protected currentTools(): readonly McpToolDescriptor[] {
@@ -127,25 +145,31 @@ export class BaseMcpTransport implements McpTransportPort {
     signal: AbortSignal,
   ): Promise<readonly McpToolDescriptor[]> {
     this.#connection = connection;
-    const tools = await connection.listTools({ signal });
-    this.#tools = new Map(tools.map((tool) => [tool.name, tool]));
-    this.transition('connected');
-    return this.currentTools();
+    try {
+      const tools = await connection.listTools({ signal });
+      this.#tools = new Map(tools.map((tool) => [tool.name, tool]));
+      this.transition('connected');
+      return this.currentTools();
+    } catch (error) {
+      this.#connection = undefined;
+      closeLateConnection(connection);
+      throw error;
+    }
   }
 
   async open(options: McpConnectOptions): Promise<readonly McpToolDescriptor[]> {
     const signal = combineSignals(this.#stopController.signal, options.signal);
     signal.throwIfAborted();
-    const connection = await this.#connector(this.#config, { signal });
+    const connection = await settleConnection(this.#connector(this.#config, { signal }), signal);
     return await this.#replaceConnection(connection, signal);
   }
 
-  async closeConnection(): Promise<void> {
+  async closeConnection(options: McpConnectOptions = {}): Promise<void> {
     const connection = this.#connection;
     this.#connection = undefined;
     this.#tools = new Map();
     if (connection !== undefined) {
-      await connection.close();
+      await settleOperation(connection.close(options), options.signal);
     }
   }
 
@@ -159,4 +183,77 @@ export class BaseMcpTransport implements McpTransportPort {
       handler(next, previous);
     }
   }
+}
+
+function settleConnection(
+  operation: Promise<McpClientConnection>,
+  signal: AbortSignal,
+): Promise<McpClientConnection> {
+  if (signal.aborted) {
+    operation.then(closeLateConnection, () => {});
+    return Promise.reject(signal.reason);
+  }
+  return new Promise<McpClientConnection>((resolve, reject) => {
+    let settled = false;
+    const onAbort = (): void => {
+      settled = true;
+      reject(signal.reason);
+    };
+    signal.addEventListener('abort', onAbort, { once: true });
+    operation.then(
+      (connection) => {
+        signal.removeEventListener('abort', onAbort);
+        if (settled) {
+          closeLateConnection(connection);
+          return;
+        }
+        settled = true;
+        resolve(connection);
+      },
+      (error: unknown) => {
+        signal.removeEventListener('abort', onAbort);
+        if (!settled) {
+          settled = true;
+          reject(error);
+        }
+      },
+    );
+  });
+}
+
+function closeLateConnection(connection: McpClientConnection): void {
+  connection.close().catch(() => undefined);
+}
+
+function settleOperation<T>(operation: Promise<T>, signal?: AbortSignal): Promise<T> {
+  if (signal === undefined) {
+    return operation;
+  }
+  if (signal.aborted) {
+    return Promise.reject(signal.reason);
+  }
+  return new Promise<T>((resolve, reject) => {
+    let settled = false;
+    const onAbort = (): void => {
+      settled = true;
+      reject(signal.reason);
+    };
+    signal.addEventListener('abort', onAbort, { once: true });
+    operation.then(
+      (value) => {
+        signal.removeEventListener('abort', onAbort);
+        if (!settled) {
+          settled = true;
+          resolve(value);
+        }
+      },
+      (error: unknown) => {
+        signal.removeEventListener('abort', onAbort);
+        if (!settled) {
+          settled = true;
+          reject(error);
+        }
+      },
+    );
+  });
 }

@@ -186,6 +186,48 @@ Remote MCP tools land in the same `ToolRegistryPort` seam as local ones, so the 
 them identically. Pooled tool results surface embedded `ui://` resources as `uiResources` — the
 payload the `@netscript/fresh-ui` MCP widget renders.
 
+Treat remote MCP servers as optional infrastructure: give startup a caller-owned deadline, then
+inspect the synchronous snapshot. Reading `snapshot` performs no network I/O, so request handling
+can select ready servers without waiting on degraded peers.
+
+```typescript
+const startup = AbortSignal.timeout(1_500);
+await pool.connect({ signal: startup });
+
+const { statuses, readyClients } = pool.snapshot;
+for (const status of Object.values(statuses)) {
+  if (status.lastError) {
+    console.warn(`MCP ${status.serverId} is ${status.state}: ${status.lastError}`);
+  }
+}
+
+const search = readyClients.search;
+if (search) {
+  // Healthy peers remain usable even when another server timed out.
+  await search.listTools({ signal: AbortSignal.timeout(500) });
+}
+```
+
+When registering pooled tools, the optional signal passed to `registerMcpTools` bounds discovery
+and later automatic re-sync operations for that registration. It is not reused by registered tool
+calls. Use a registration-lifetime signal rather than a one-shot startup timeout; individual
+transport calls accept their own operation-specific signal.
+
+Retry only the degraded server instead of rebuilding healthy peers:
+
+```typescript
+const degraded = pool.server('search');
+if (degraded) {
+  await degraded.reconnect({ signal: AbortSignal.timeout(1_500) });
+}
+
+await pool.stop({ signal: AbortSignal.timeout(1_000) });
+```
+
+The same `McpConnectOptions` signal convention applies to connect, list, call, resource-read, and
+close operations. A timed-out server retains its last error in `snapshot.statuses`; a late
+connection is closed rather than inserted into `readyClients`.
+
 ## Public surface
 
 | Entry                 | What it gives you                                                                                 |

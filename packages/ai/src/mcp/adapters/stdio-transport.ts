@@ -4,6 +4,7 @@ import type {
   McpConnectionState,
   McpConnectOptions,
   McpConnectorConfig,
+  McpReadResourceResult,
   McpToolDescriptor,
   McpToolResult,
   McpTransportPort,
@@ -96,6 +97,14 @@ export class StdioMcpTransport implements McpTransportPort {
     return this.#delegate.callTool(name, args, options);
   }
 
+  /** Read a resource through the stdio connection. */
+  readResource(
+    uri: string,
+    options?: McpConnectOptions,
+  ): Promise<McpReadResourceResult> {
+    return this.#delegate.readResource(uri, options);
+  }
+
   /** Subscribe to lifecycle state changes. */
   onStateChange(
     handler: (state: McpConnectionState, previous: McpConnectionState) => void,
@@ -104,8 +113,8 @@ export class StdioMcpTransport implements McpTransportPort {
   }
 
   /** Close the transport and abort in-flight work. */
-  stop(): Promise<void> {
-    return this.#delegate.stop();
+  stop(options?: McpConnectOptions): Promise<void> {
+    return this.#delegate.stop(options);
   }
 }
 
