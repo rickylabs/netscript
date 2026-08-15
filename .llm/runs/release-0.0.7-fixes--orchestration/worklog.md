@@ -876,3 +876,55 @@ prove afterwards, by executed command, that the three files remain modified-but-
 Fresh fixes Tier-A reviews the amendment head next; on PASS the same author resumes for the single
 semantic correction and continues S2, the cascade, and the gates. No runtime lease, no
 Aspire/Docker/`e2e:cli`, PR draft at sole `status:plan`.
+
+## 2026-08-15 — #1669 S2 Tier-A PASS; IMPL-EVAL launched
+
+**Tier-A PASS at `9aa54ae2d4f53c705b0309ed472abf7bbccebe41`** (content `eba0b0924`, evidence
+`9aa54ae2d`). Scope exact; `cache-query_test.ts` stayed untouched, vindicating the S2-A judgement
+that the factory surface would suffice.
+
+The decisive evidence was reproduced rather than accepted: a detached worktree at pre-fix
+`ef3e43f06` with the new test gives **5 passed / 1 failed**, "Expected seeded-fresh, got fetched";
+`9aa54ae2d` gives **6 / 0**. All four branches (fresh-no-fetch, missing, expired, stale-blocking) are
+proven on the granted surface.
+
+Root gates: `deno task test` **4206 / 0 / 19** with no #1667 recurrence; root check re-run through
+the wrapper **uncached** (2925 files, 0 diagnostics) rather than accepting a task cache line. Docs
+sweep finds no surviving same-class claim; the cascade is **idempotent** — freshness gates pass and
+the tree stays clean. A1 is recorded as manual evidence with `docs-accuracy` explicitly not cited,
+correcting this topic's earlier error. The structured `[PHASE: IMPL] [VERDICT: COMPLETE]` receipt was
+already present, so no author round-trip was needed.
+
+**IMPL-EVAL launched — exactly one, fresh, opposite-family.**
+
+| Field | Value |
+| --- | --- |
+| Job id | `f40814ce` |
+| Session id | `f40814ce-5b41-49ae-8cf2-e65014de01de` |
+| OS PID | `634990` |
+| Bridge session id | `session_01CMrdm9P2YwHxiNCT49C4Hf` (resolvable; jobs record holds the non-resolvable `cse_…`) |
+| Remote Control URL | `https://claude.ai/code/session_01CMrdm9P2YwHxiNCT49C4Hf` |
+| `cwd` | `/home/codex/repos/netscript-007-leaf-cached-entry` |
+| Immutable source head | `9aa54ae2d4f53c705b0309ed472abf7bbccebe41`, worktree clean |
+| Requested route | native Claude · `claude-fable-5` · medium · Remote Control (`formal_impl_evaluation`) |
+| Observed route | `respawnFlags`: `--permission-mode bypassPermissions --remote-control --name "NetScript 0.0.7 #1669 IMPL-EVAL" --effort medium --model claude-fable-5` |
+| Route verdict | **matched** |
+
+Pre-launch sweep confirmed no rival evaluator. Attachment proven: first `type: user` transcript record
+is 8677 chars beginning `use harness`.
+
+The brief is written to make disagreement easy rather than confirmation cheap. It presents this
+topic's RED as a **claim** and tells the evaluator to rebuild the pre-fix state itself if it wants
+certainty. It carries this topic's own earlier A1 error forward explicitly — `docs-accuracy` has
+`requireText`/`forbidText` helpers but no chapter-3 assertion, so the S2 sentence is manual evidence
+and any claim citing that receipt as proof must be **rejected**. And it hands over the known-reds with
+their signatures (`surface:diff` red at base with base-vs-head equality as the real test, JSR
+`F-DOCT-5` at 13/13, six pinned doc-lint occurrences across five unique symbols, #1667's
+`expected 1, got 2`) so effort goes into judging the delta rather than rediscovering baseline noise.
+
+Two questions it is asked to judge that this topic cannot self-certify: whether the granted test
+surface was **genuinely** sufficient or whether a gap was papered over by withholding
+`cache-query_test.ts`, and whether any corrected docs wording **overcorrects** into denying the
+factory has stale-while-revalidate at all — which would trade one false claim for another.
+
+No runtime lease; PR remains draft at sole `status:plan`; merge decision stays with the coordinator.
