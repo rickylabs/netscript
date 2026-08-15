@@ -814,3 +814,12 @@ S2 Tier-A is `PASS` at fixes topic `a374977d8`; cycle-1 IMPL-EVAL is active on n
 Remote Control job `f40814ce`, URL `session_01CMrdm9P2YwHxiNCT49C4Hf`, over content `eba0b0924`
 plus evidence `9aa54ae2d`. #1664's same-author two-path repair remains independently active. Topic
 serialization is local to each supervisor; the runtime mutex remains free.
+
+At 19:14Z, #1666 final cycle-2 IMPL-EVAL is terminal `PASS` at evaluator commit `ee67d12b4`,
+comment `5303804773`. The evaluator independently mutation-proved all four refusals red, accepted the
+seven selected PASS receipts plus preserved scratch-contaminated red, and re-derived the remaining
+#1296 rows, scope, lock, discoverability, baseline reds, and browser waiver. The dispatch brief had
+two stale short-SHA sentences naming `47ca22abe`, but its correct binding section named `423867017`
+and the evaluator artifact/comment use `423867017` consistently; record the contradiction as
+non-impacting brief drift. Internals is preparing coordinator-owned readiness/close-gate evidence;
+no merge or issue-box mutation has occurred.

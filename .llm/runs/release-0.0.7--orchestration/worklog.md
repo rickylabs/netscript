@@ -1201,3 +1201,19 @@
   evidence `9aa54ae2d`.
 - Both evaluator leases are artifact-only. They may not mutate product, run runtime gates, merge,
   flip ready, relabel, close issues, or touch central state. #1664 continues independently.
+
+## 2026-08-15T19:14:29Z — #1666 final IMPL-EVAL passes
+
+- Cycle-2 native Fable 5/medium Remote Control IMPL-EVAL is terminal `PASS` at `ee67d12b4`, PR
+  comment `5303804773`. The evaluator wrote only `impl-eval.md` plus the preserved cycle-1 artifact,
+  independently made all four named tests red under their exact mutation, and accepted the repaired
+  checker/test/receipt/acceptance surface without a required fix.
+- Two sentences in the dispatched brief still named the cycle-1 implementation head `47ca22abe` for
+  receipt binding, contradicting the brief's correct three-head table and repair section. The live
+  evaluator artifact was already committed when detected, but it consistently binds all eight
+  physical `fix1` receipts to `423867017` and selects seven PASS gate ids with the initial red
+  preserved. The stale text therefore did not contaminate the verdict; the brief-generation mistake
+  remains append-only drift to prevent recurrence.
+- PR #1666 is still draft. Artifact-only-head Actions classified and skipped unrelated lanes while
+  the docs build remained green; internals is preparing the five-box coordinator close-gate mapping.
+  No ready flip, label change, issue edit, merge, or #1663 action has fired.

@@ -670,3 +670,9 @@ implementation thread.
 - **Termination idempotence must still fail precisely:** #1664 F6 does not permit a broad catch around
   child teardown. The plan tolerates only Deno's exact already-terminated `TypeError`, still awaits
   status and stderr drain, and requires unrelated kill and drain failures to propagate.
+- **Brief templating must replace short and full immutable SHAs:** #1666's cycle-2 brief correctly
+  bound content `423867017` and evidence `010da98a2` in its table and repair section, but two copied
+  cycle-1 sentences still named short `47ca22abe` for receipt sufficiency because only the full SHA
+  was replaced. The evaluator independently used the repaired head throughout, so verdict impact is
+  none; future brief assembly must assert there is no contradictory stale source-head token before
+  dispatch.

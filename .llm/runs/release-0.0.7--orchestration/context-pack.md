@@ -684,3 +684,10 @@ cycle-2 Fable 5/medium Remote Control IMPL-EVAL job `7a3b4645` is active at
 `a374977d8`; its Fable 5/medium Remote Control IMPL-EVAL job `f40814ce` is active at
 `session_01CMrdm9P2YwHxiNCT49C4Hf` over `eba0b0924`/`9aa54ae2d`. #1664's two-path repair continues
 in parallel under its topic-local serial queue; the runtime mutex is free.
+
+Newer terminal `2026-08-15T19:14:29Z`: #1666 final cycle-2 IMPL-EVAL passed at `ee67d12b4`, comment
+`5303804773`, over repaired content `423867017` and evidence `010da98a2`. The artifact correctly
+binds all eight physical fix1 receipts to the repaired content head and treats the first test receipt
+as preserved red. Two stale brief sentences named old `47ca22abe`, but the correct binding section
+and the entire evaluator output use `423867017`, so the contradiction is recorded as non-impacting
+brief drift. Internals is preparing coordinator readiness; no merge or issue-box edit has occurred.
