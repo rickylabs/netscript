@@ -3668,3 +3668,88 @@ adding a second service there, not inferred.
 
 No lease requested, no retry, no evaluator, no product mutation, no `fresh-browser`. Host was proven
 empty after the failed run and remains so.
+
+## 2026-08-15 — CORRECTION to the S5 attempt-3 Tier-A record, and the F5 amendment surface
+
+### Correction 1 — the count in my own table was wrong
+
+My previous table labelled the Aspire helpers "3-8" and called them "six" while naming **seven**.
+The correct arithmetic is **2 client + 3 payments + 7 Aspire helpers = 12**. The seven are
+`db-cli-mode.mts`, `index.mts`, `register-apps.mts`, `register-background.mts`,
+`register-infrastructure.mts`, `register-plugins.mts`, `register-tools.mts`. The durable record is
+corrected here; the earlier table's row label and word "six" are superseded.
+
+### Correction 2 — "out of scope" was a reasoning error, not a wording slip
+
+I classified the seven helpers as baseline **attribution** and then wrote that they were out of the
+**repair** scope. Those are different questions and I conflated them. `generated.deno-fmt-check` runs
+`deno fmt --check` across the whole generated workspace: it is pass/fail over all 172 files, so
+repairing only the two client modules leaves ten paths unformatted and the gate still red.
+
+**Attribution determines blame; it does not bound the repair of a load-bearing gate.** A gate that
+must go green needs every path it inspects to be canonical, whoever caused each one.
+
+### Read-only attribution at `c53726c69` — and the single root cause
+
+`formatOutput()` at
+`packages/cli/src/kernel/application/scaffold/support/post-scripts-init.ts:7` **exists at
+`c53726c69`, is unchanged by this leaf**, and is called from **exactly one** site:
+`init-pipeline.ts:80`, guarded by `if (!validated.dryRun)`. No post-init generation path calls it.
+
+That single fact explains every observation:
+
+| Artifact class | Created by | Formatted? | Result |
+| --- | --- | --- | --- |
+| `users` contract, `services/users/**` | `init` pipeline | **yes** — `formatOutput` | clean, absent from the 12 |
+| `payments` contract, `mod.ts`, `services/payments/**` | post-init `service add` | **no** | unformatted (paths 9-11) |
+| 7 Aspire helpers | post-init `service generate` | **no** | unformatted |
+| 2 client modules | post-init `service generate --with-client` | **no** | unformatted |
+
+So the `users`/`payments` asymmetry I flagged as a hypothesis is **resolved by measurement**: it is
+not about the generators, which are identical, but about *when* the artifact is produced. Paths 9-11
+are **pre-existing behaviour, leaf-triggered** — this leaf's two-service scenario is simply the first
+to add a service after init and reach it.
+
+The formatter diffs confirm one shared property rather than twelve defects: import member ordering
+and line collapsing in `routers/v1.ts`, a collapsed multi-line `export` in `mod.ts`, a collapsed
+line-break after `=` in `payments.contract.ts`, and — in the opposite direction — a long signature
+needing *wrapping* in `register-apps.mts`. Hand-authored emission is simply not canonical. Only a
+formatter makes it so.
+
+### F5 amendment surface — bounded
+
+**Reuse the existing `formatOutput` seam from the post-init generation paths**, over exactly the
+files each command wrote. No hand-formatting of any template or fixture, no new formatting
+implementation, no change to `formatOutput` itself.
+
+1. `packages/cli/src/public/features/services/generate/generate-service-command.ts` — after client
+   and Aspire generation, canonicalize the written set.
+2. `packages/cli/src/public/features/services/add/add-service.ts` — same for the contract, service,
+   and workspace output it writes.
+3. Whatever minimal accessor is needed to reach `formatOutput`/`collectFormattableScaffoldFiles`
+   from those features without duplicating the `deno fmt` exec.
+
+**Rationale:** it is the smallest existing shared seam that makes all twelve canonical, it is already
+the sanctioned mechanism for exactly this purpose, and it keeps generated-output formatting in one
+place rather than spreading `deno fmt` knowledge across features.
+
+### The risk that must shape the design — it can break F4
+
+A naive "write, then format" ordering **breaks the idempotency guarantee F4 just established**. The
+skip-if-identical check compares freshly rendered content against on-disk content
+(`workspace-mutator.ts:192`). If disk holds formatted text while the renderer still produces
+unformatted text, they never match, every run rewrites, and the F4 probe's "zero writes, byte-identical"
+assertion fails permanently.
+
+The fix must therefore **canonicalize before the identity comparison** — format the rendered content,
+then compare and skip — or otherwise guarantee the comparison is formatted-against-formatted. Format
+only what the command actually **wrote**, never what it skipped, so a no-write run stays a no-write
+run.
+
+This is the one place F5 can silently undo F4, so it is stated as the primary design constraint
+rather than a footnote.
+
+### Not done
+
+No product mutation, no runtime lease, no retry, no `fresh-browser`, no evaluator. Host remains
+proven empty.
