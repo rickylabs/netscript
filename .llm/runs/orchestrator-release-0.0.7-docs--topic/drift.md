@@ -405,3 +405,50 @@ The brief also declines to prescribe exact scoped fmt/lint invocations for `pack
 has twice prescribed scoped wrappers on paths root `deno.json` excludes, and the author correctly
 refused both. The author is instead asked to check `fmt.exclude`/`lint.exclude` against
 `packages/mcp/**` first and record what actually applies.
+
+## 2026-08-15 — owner rejection of the shipped comparison surface; lane rescoped
+
+The owner rejected the comparison surface merged at `e090f894f` in substance, not in detail.
+Recorded faithfully because this lane's own judgement produced it.
+
+**The verdict.** It built a deterministic system for everything with never-ending sub-issue
+protocols, produced a boring comparison page plus useless extra pages, cited other frameworks' docs
+inside our own docs, and presented NetScript as behind — not from honesty but from not understanding
+what NetScript composes. Competitors sell with short, powerful, opinionated pages and two tabs of
+concrete code; they do not publish a measurement protocol.
+
+**This orchestrator's contribution to the failure.** The category error was mine. I applied
+evidence-integrity rigor — the standard for a gate artifact — to a **positioning** artifact. That is
+what turned the evaluator's correct "unreproducible number" finding into a mandate that deleted the
+LOC comparison table, the ~12–15% route-code saving, and the Architectural Surface Coverage figures
+(87–93% against 40–53%) that were the most communicative content in the run. I then Tier-A signed
+off pages that were accurate and lifeless, because I was checking whether claims were provable
+rather than whether the page argued anything.
+
+**Recovery.** The original comment bodies were **not** lost. GitHub retains `userContentEdits`, and
+both 28,481- and 25,976-character originals were recovered via GraphQL and saved to
+`.llm/tmp/recovered/`. The estimates return in the new pages as clearly-labelled architectural
+estimates.
+
+**Actions taken.**
+
+- #1645–#1650 closed as `not_planned`, superseded, with `status:` removed per the not-shipped
+  lifecycle rule. The protocol backlog goes with the protocol.
+- Issue **#1659** filed in milestone `0.0.7` with the full rationale and acceptance.
+- New leaf `docs/comparison-vs-pages` created at worktree `/home/codex/repos/netscript-007-docs-vs`,
+  immutable base `e090f894ff3682405a36e4f896ffd2cc16f9a1f8`.
+- Fresh Codex author thread `01a0047a-aceb-7b53-9ba1-9191eedaaf1a` launched (gpt-5.6-sol, high). The
+  preserved thread `019ffcc9-16c2-7573-b7f6-d627172408e8` belongs to the merged worktree and stays
+  idle and intact; one sender per worktree forbids reusing it here.
+
+**Design, from the owner's answers.** Two pages, not one: `comparisons/frontend.md` (Next.js, Nuxt,
+SvelteKit, TanStack Start) and `comparisons/backend.md` (Nest.js, Hono, Encore.dev), because
+NetScript is a genuine contender in both categories and the feature highlights differ. Each carries
+a competitor selector; the NetScript side and narrative stay fixed and only the competitor text and
+the second code tab swap. Both migration pages are deleted.
+
+**The material the last attempt missed.** EIS-Chat exists to show how far NetScript can be pushed.
+The brief mines its session route for what NetScript actually composes — generated typed routes,
+`definePage()` with everything visible at the entry point, a shared cached resource, deferred layers
+with typed partial hrefs and per-region freshness, slot layout, metadata from the same cached read —
+and forbids naming or citing the private repository anywhere in the output.
