@@ -238,3 +238,17 @@ research/plan-only; preserve and wire the already-published `onConnectionError` 
 opposite-family PLAN-EVAL only if the clean returned plan remains decision-heavy after topic review.
 Aspire and Docker remain empty. Keep the four native Opus 5/high supervisors and enforce
 serialization only inside each topic.
+
+Resume from the newer authoritative `2026-08-15T09:08:30Z` checkpoint. Main remains
+`284dda90a17a13a7e5e8e9834e5411b58887131b`. Docs #1660 is ready at exact head `e35824d41` after a
+fresh exclusive-owner Tier-A PASS and all eight #1659 boxes; merge only after its current readiness
+CI is terminal green, then close/lifecycle-normalize #1659 and remove `impl-eval:skip`. The disclosed
+stash incident is fully recovered at exact object `7eb4ed16d…`; no data loss occurred. Internals
+#1658 has S3 signed off at `d3d31b3d0` and S4 local at `9b71e1bd2`, still before its required
+receipt/push/Tier-A stop. Fixes #1661 is implementing amendment 2 through pushed `099067c6b`, with
+both published transport wrappers and a Fresh cross-package check now binding. Features #1293
+PLAN-EVAL passed at `7780ba49e`; the evaluator job's terminal metadata stayed stale, so the
+coordinator verified the final response directly and woke the existing features supervisor to amend
+the plan and resume the original Codex author. Do not launch a duplicate evaluator. Preserve all
+four native Opus 5/high Remote Control supervisors, serialize only inside each topic, and keep the
+runtime mutex free unless a real resource-heavy gate requests it.

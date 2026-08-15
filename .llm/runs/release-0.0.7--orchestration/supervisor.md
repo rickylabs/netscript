@@ -377,3 +377,17 @@ check-test succeeded and unrelated deployment/runtime lanes skipped by policy. A
 Docker has no containers or volumes and only default networks. The post-freeze docs repair is
 tracked explicitly without rewriting the frozen 60-issue inventory. Serialization remains per topic
 orchestrator, not cluster-wide.
+
+### Live checkpoint — 2026-08-15T09:08:30Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | #1660 exact head `e35824d41` passed fresh exclusive-owner Tier-A; ready CI running | Coordinator merges only after terminal exact-head green; then #1659/lifecycle reconciliation and temporary skip-label removal |
+| internals | #1658 S3 signed off at `d3d31b3d0`; S4 local implementation `9b71e1bd2` is producing receipts | No S5, evaluator, provider spend, or runtime gate before S4 push/comment and fresh Tier-A |
+| fixes | #1661 amendment 2 running on the original Codex thread, pushed through `099067c6b` | Published-wrapper cancellation and cross-package Fresh compatibility must pass before Tier-A; no expensive gate |
+| features | #1293 PLAN-EVAL `PASS` at `7780ba49e`; existing supervisor reconciling the verdict and required plan amendment | Resume only the original author after plan amendment; no duplicate evaluator; #1112 remains a separate split-close follow-up |
+
+The #1293 evaluator's lifecycle metadata is stale but its delivered verdict tuple is independently
+verified. The docs stash incident caused no data loss and its final review was rerun under clean
+exclusive ownership. All four native Opus 5/high Remote Control topic supervisors remain preserved;
+serial queues are local to each topic and the shared runtime mutex is free.

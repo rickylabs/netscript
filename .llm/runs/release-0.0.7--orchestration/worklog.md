@@ -402,3 +402,29 @@
   0.0.6 but is never invoked. Coordinator disposition preserves and wires that API; deletion is not
   authorized. A fresh PLAN-EVAL is conditionally granted only after a clean decision-heavy plan and
   topic Tier-A, while #1112/reference prose remains docs-owned.
+
+## 2026-08-15T09:08:30Z — docs reaches readiness; #1293 PLAN-EVAL stall recovered
+
+- Docs #1660 repaired all four Tier-A findings at content `504de3f67`, refreshed the generated
+  cascade at exact head `e35824d41`, and then passed a fresh independent review under proven
+  exclusive worktree ownership. All eight #1659 acceptance boxes are checked with evidence;
+  readiness comment `5301508540` is posted and exact-head CI is running with no current failure.
+  The supervisor's earlier concurrent gate/stash error is fully disclosed: dropped stash object
+  `7eb4ed16d6944c1d1c904895bcb76b4361ad8a57` was restored exactly, no data was lost, and every
+  reported final gate was re-executed after the incident without contention.
+- Internals #1658 S3 product `d7fdbb1d9`, evidence `2e6a065d7`, and supervisor sign-off
+  `d3d31b3d0` are complete. S4 has a local implementation commit `9b71e1bd2`; its branch remains
+  remote-pinned to the S3 sign-off while the author writes structured receipts and stops for
+  another Tier-A review. S5 and formal IMPL-EVAL remain unauthorized until that stop.
+- Fixes #1661 amendment 2 is active after the topic proved the two published transport wrappers
+  were missing from the first correction and a required port member would break the Fresh package
+  test double. The same author has clean/pushed RED/product progression through `099067c6b`;
+  `readResource` is optional only on the broad port, required and abort-aware on the base plus both
+  published wrappers, and a cross-package Fresh check is mandatory before sign-off.
+- Features #1293's fresh Fable 5/medium PLAN-EVAL returned `PASS` with binding rulings at pushed
+  commit `7780ba49e`. The job registry incorrectly remained `working`; the coordinator attached to
+  session `75d9028e`, verified its terminal response and exact remote head, and steered the existing
+  features supervisor to reconcile the verdict, record the stale-terminal drift, amend `plan.md`,
+  and resume only the original Codex author. No duplicate evaluator was launched.
+- Serialization remains per topic. No runtime, browser, Aspire, Docker, OpenHands provider-spend,
+  or shared expensive-gate lease was started by this checkpoint.

@@ -329,3 +329,25 @@ implementation thread.
   #1657/#1651 head is healthy and file classification skips unrelated jobs correctly. It does not
   replace the final exact-main release gates/canary cadence, which remain pending after all
   committed work ships.
+
+## 2026-08-15T09:08:30Z — worktree exclusivity and delivered-verdict recovery
+
+- **Docs supervisor contention:** the supervisor ran mutating docs generators/gates while the Codex
+  author still owned the same worktree, then used a bare `git stash drop` after a conflicted pop.
+  That removed another lane's shared-repository stash rather than the probe stash. The printed
+  object id allowed exact recovery with `git stash store`: object
+  `7eb4ed16d6944c1d1c904895bcb76b4361ad8a57`, original message and 20+/25− `deno.lock` delta are
+  intact. Final Tier-A evidence was regenerated under zero-author-process, clean local=remote
+  exclusive ownership. Rule: never run mutating verification in a live author worktree; never use
+  stash pop/apply/drop without an explicit ref re-read immediately before the operation.
+- **#1293 terminal marker false negative:** Fable evaluator `75d9028e` committed and pushed a full
+  `PASS` at `7780ba49e` and displayed its terminal response, but `state.json` remained `working`
+  with no `firstTerminalAt`. A terminal-marker-only watcher therefore waited indefinitely. The
+  coordinator verified session output, immutable verdict artifact, local/remote equality, and exact
+  evaluator identity, then woke the existing features supervisor through `claude attach`. Delivery
+  evidence is the verified tuple, not the stale lifecycle marker; no duplicate evaluator is allowed.
+- **#1661 second scope correction:** the first amendment omitted the two published composition
+  wrappers and assumed a required `readResource` port member would be safe. The topic supervisor
+  found the out-of-scope Fresh fake implementor before CI. Amendment 2 makes the broad port member
+  optional while requiring real abort behavior on the base and both published wrappers; the Fresh
+  package check is now a mandatory cross-package compatibility proof.
