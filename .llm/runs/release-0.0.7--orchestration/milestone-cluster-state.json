@@ -115,7 +115,7 @@
         "pid": 26724,
         "bridgeSessionId": "session_014pCd2QWkCscgZpVdjcUPST",
         "remoteControlUrl": "https://claude.ai/code/session_014pCd2QWkCscgZpVdjcUPST",
-        "topicHeadSha": "f71e860f907d8cfad881d863f9e69489d3c106ea",
+        "topicHeadSha": "370ff6eba9b69ef91f064e91578c8ce3b0fefbe0",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle"
@@ -1341,14 +1341,14 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "3e8e146a4aedf8ee0afec15c83ddaefc171c71f9",
-      "currentPrHeadSha": "23db20f301d06ed1e4a9a65cbbf64349f89cb8c0",
+      "currentPrHeadSha": "d555cc9719fc81b7b5d6656471132c1a921fd5cf",
       "issueNumbers": [1461],
       "implementerAgentId": "01a00646-82a9-7ec2-88e7-16dea98a58fa",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/sdk-cached-entry-swr",
       "worktree": "/home/codex/repos/netscript-007-leaf-cached-entry",
       "prNumber": 1669,
-      "implementationState": "t1_same_page_narrative_plan_repair_pushed_fresh_tier_a_pass_plan_eval_active_no_product_mutation",
+      "implementationState": "plan_eval_pass_s1_cache_query_implementation_active_serially_on_preserved_author",
       "planHeadSha": "23db20f301d06ed1e4a9a65cbbf64349f89cb8c0",
       "dispatchTopicHeadSha": "f9bb928cedeaf91174db4e70f877143028481232",
       "planGate": "research and contract decisions only; resolve the stale docs paths, choose the supported API boundary, open one draft PR, and stop before implementation; PLAN-EVAL is required",
@@ -1357,13 +1357,29 @@
       "tierAPlanHeadSha": "23db20f301d06ed1e4a9a65cbbf64349f89cb8c0",
       "tierAPlanTopicCheckpointSha": "f71e860f907d8cfad881d863f9e69489d3c106ea",
       "tierAPlanFinding": "PASS: explicit dispositions cover tutorial lines 13, 15, 32, 75, 76, 80, 94, 100, and 107 plus both service-page claims; callable action and KV-only metadata read are separated page-wide; all prior concurrency, #1665, doc-lint, and four-mirror contracts remain intact",
-      "planEvaluationState": "active",
+      "planEvaluationState": "complete_pass",
       "planEvaluatorAgentId": "01f0eda8-24fe-41b0-919e-7426579ab868",
       "planEvaluatorBackgroundAgentId": "01f0eda8",
       "planEvaluatorBridgeSessionId": "cse_01SWnk7LwvoLaamvEwR5WLfX",
       "planEvaluatorRoute": "native claude-fable-5 / medium / Remote Control",
       "planEvaluationSourceHeadSha": "23db20f301d06ed1e4a9a65cbbf64349f89cb8c0",
       "planEvaluationGrantedAt": "2026-08-15T17:23:00.000Z",
+      "planEvaluationCompletedAt": "2026-08-15T17:34:00.000Z",
+      "planEvaluationVerdict": "PASS",
+      "planEvaluatorCommitSha": "d555cc9719fc81b7b5d6656471132c1a921fd5cf",
+      "planEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1669#issuecomment-5303412171",
+      "planEvaluationCorrection": "docs-accuracy does not bind the S2 page-level chapter-3 sentence; that acceptance remains manual Tier-A plus IMPL-EVAL evidence unless separately scoped tooling changes are authorized",
+      "implementationSlices": {
+        "s1": {
+          "state": "active",
+          "authorizedSurface": [
+            "packages/sdk/src/cache/cache-query.ts",
+            "packages/sdk/tests/cache/cache-query_test.ts",
+            ".llm/runs/fix-sdk-cached-entry-swr--0.0.7-wave5/**"
+          ],
+          "constraints": "policy-aware persistence-complete in-flight ownership; background-owned write failure resolves fetched data to a foreground joiner; rejection only on fetch failure; deterministic sleep-free two-reader proof with exactly one refresh; stop for fresh Tier-A before S2"
+        }
+      },
       "acceptanceFocus": "prove stale-while-revalidate with exactly one refresh for concurrent stale readers while carrying the four-link generated-doc asset cascade and known #1667/#1668 reds",
       "expensiveGateContract": "no runtime lease during research or planning",
       "receiptRefs": []
@@ -2426,7 +2442,7 @@
     },
     {
       "id": "sdk-cached-entry-swr-plan-eval-cycle-1",
-      "state": "active",
+      "state": "complete",
       "lane": "fixes",
       "leafId": "sdk-cached-entry-swr",
       "phase": "plan-eval",
@@ -2445,7 +2461,11 @@
       },
       "leaseOwner": "codex-root-0.0.7",
       "grantedAt": "2026-08-15T17:23:00.000Z",
-      "evaluationFocus": "no-new-public-API remedy, callable-action then KV-metadata composition, persistence-complete policy-aware single-flight, deterministic two-overlapping-reader proof, #1665 fail-safe preservation, exact two-page published claim dispositions, and four-mirror generated cascade closure"
+      "evaluationFocus": "no-new-public-API remedy, callable-action then KV-metadata composition, persistence-complete policy-aware single-flight, deterministic two-overlapping-reader proof, #1665 fail-safe preservation, exact two-page published claim dispositions, and four-mirror generated cascade closure",
+      "completedAt": "2026-08-15T17:34:00.000Z",
+      "verdict": "PASS",
+      "evaluatorCommitSha": "d555cc9719fc81b7b5d6656471132c1a921fd5cf",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1669#issuecomment-5303412171"
     }
   ],
   "expensiveGates": [
@@ -2598,5 +2618,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T17:32:06.000Z"
+  "updatedAt": "2026-08-15T17:36:05.000Z"
 }

@@ -586,3 +586,11 @@ Require fresh slice review before S2/S3. #1664 features Tier-A `0d0ba1b7a` rejec
 baseline claim as leaf-caused, but must still correct its seven-helper count, measure the three
 payments outputs against `c53726c69`, and identify a bounded repair that makes all twelve generated
 outputs formatter-clean. No runtime retry, fresh-browser, or F5 product mutation is authorized yet.
+
+Newer checkpoint `2026-08-15T17:36:05Z`: #1669 PLAN-EVAL is terminal `PASS` at evaluator commit
+`d555cc971`, comment `5303412171`; fixes topic `370ff6eba` dispatched S1 only to the preserved
+Sol/medium author. Carry evaluator advisories A2/A3 in product/tests and A1/A4 into S2; require fresh
+Tier-A before S2. #1664's corrected features record is `f5f75adc8`: all twelve format failures share
+the post-init canonicalization gap. F5 is authorized only as a same-author plan amendment with exact
+paths and formatted-against-formatted equality; a post-write-only call to current `formatOutput`
+would regress proven F4 and is not authorized. No runtime lease or fresh-browser run is active.

@@ -708,3 +708,11 @@ blanket attribution as leaf-caused because both generated client modules are unf
 durable count says six helpers while naming seven and its proposed out-of-scope baseline would keep
 the gate red. Coordinator has returned it for exact count correction, baseline measurement of the
 three payments paths, and a smallest all-twelve-output normalization seam before any F5 dispatch.
+
+At 17:36Z, #1669 PLAN-EVAL is terminal `PASS` at `d555cc971`, comment `5303412171`; fixes topic
+`370ff6eba` dispatched S1 only to the preserved Sol/medium author, with S2 held for fresh Tier-A.
+The evaluator's docs-accuracy refutation is accepted: the S2 page sentence is manual evidence unless
+a separate tooling scope is granted. Features corrected #1664's inventory at topic `f5f75adc8` and
+proved one post-init canonicalization gap. Coordinator authorized a focused plan amendment only and
+rejected post-write-only formatting because it would regress F4 on the next identical invocation;
+the amendment must name exact paths, canonicalize before equality/write, and stop for Tier-A.

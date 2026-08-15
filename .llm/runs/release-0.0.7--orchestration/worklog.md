@@ -1011,3 +1011,20 @@
   also exposed seven unchanged helper reds and three payments outputs needing baseline measurement.
   Coordinator returned the topic for a corrected 2 + 3 + 7 = 12 inventory and a repair that can
   actually make the load-bearing gate green; no F5 product dispatch or retry exists yet.
+
+## 2026-08-15T17:36:05Z — #1669 plan passes and S1 starts; #1664 F5 is held to F4
+
+- #1669's separate native Fable 5/medium Remote Control PLAN-EVAL returned `PASS` at evaluator
+  commit `d555cc971`, comment `5303412171`. It independently confirmed the no-new-public-API
+  callable-action design, policy-aware persistence-complete single-flight, deterministic two-reader
+  proof, exact two-page/four-mirror closure, and pinned raw doc-lint reds. It also correctly refuted
+  a Tier-A overclaim: `docs-accuracy` has no chapter-3 assertion, so the S2 sentence requires manual
+  Tier-A plus IMPL-EVAL evidence rather than a false mechanical receipt. Fixes topic `370ff6eba`
+  dispatched only S1 to the preserved Sol/medium author; S2 remains held for fresh slice review.
+- Features topic `f5f75adc8` corrected the format inventory to 2 clients + 3 payments outputs + 7
+  Aspire helpers and established one post-init canonicalization root cause. Coordinator authorized
+  a same-author F5 plan amendment only, while rejecting a post-write-only formatter shape because
+  it would compare unformatted rendered content to formatted disk content on the next run and
+  regress F4's zero-write invariant. The amendment must bind exact paths and canonicalize before
+  equality/write, then stop for fresh Tier-A. No product mutation, runtime retry, browser run, or
+  lease is active.
