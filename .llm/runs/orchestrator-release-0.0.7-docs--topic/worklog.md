@@ -849,3 +849,59 @@ and reachable.
 
 Gates are the five cheap docs rows plus the three structured wrappers for the tool and its test. No
 Aspire, Docker, E2E, scaffold, lease, or write of any kind to the read-only external input.
+
+## 2026-08-15 — formal IMPL-EVAL cycle 2 verdict: PASS
+
+Terminal at evaluated source `c7ce58a19494024c219e9970deeb3ece878232d6`. Artifact commit `71cc5a02c`
+(`evaluate.md` only); verdict comment `issuecomment-5300916189` (`2026-08-15T06:21:28Z`). Local,
+remote, and PR head all `71cc5a02c`; tree clean. PR remains draft at `status:impl`, milestone
+`0.0.7`, labels unchanged.
+
+All eight gates green in the evaluator's own run: `verify`, `docs:links`, `docs:accuracy`,
+`git diff --check`, lockfile guard, and the three structured wrappers for the measurement tool and
+its test — every raw exit `0`.
+
+### F1–F5 independently re-checked, all repaired
+
+The evaluator confirms it did not consult the cycle-1 evaluator, the generator, or this
+orchestrator, and it marked all five findings repaired on its own evidence.
+
+Its F2 work went beyond the brief. It did not stop at HTTP `200`: it compared blob SHAs served by
+`gh api contents?ref=43c702b97` against local `git hash-object` for both evidence files and found
+them identical, proving the permalinks serve the manifest **as it now stands** rather than a
+superseded version. It then verified the ordering with timestamps — the F3 amendment at `43c702b97`
+precedes the comment edits by 36 and 37 seconds — confirming the sequencing constraint this lane
+identified before dispatch actually held in execution rather than only in intent.
+
+### Three non-blocking findings
+
+**N1 — the published normalized SHA-256 does not reproduce from the stated procedure.** The digest
+`3d9d2eef…` appears in the PR body and four run artifacts. The evaluator applied **21** distinct
+normalizations, including the tool's own `serializeMeasurement` form, and none yields it; the
+predecessor digest `b9e96ed2…` likewise does not reproduce. Weight is limited because the property
+the digest stands for is independently true — fixed-`--observed-at` regeneration is byte-identical,
+which the evaluator proved directly and this orchestrator proved twice — and because the digest
+appears on no docs page and in neither canonical comment. It is nonetheless an unreproducible number
+offered as evidence inside a changeset about reproducible evidence, and it should be corrected
+before `status:ready-merge`: publish the exact normalization command, or replace the digest with the
+`cmp`/`diff` result that is actually reproducible.
+
+Note this digest originated in the leaf's own reporting and was **relayed by this orchestrator** in
+the S2 sign-off without independent reproduction. That is the same class of miss as cycle 1's F1 —
+accepting a stated number because the property behind it was true.
+
+**N2** — `plan.md`'s Status line is stale at this head. **N3** — two internal-record inaccuracies in
+`worklog.md`. Both non-blocking and confined to run artifacts.
+
+### Boundaries
+
+The evaluator authored no product file, left #1551, both canonical comments, the pin, labels, draft
+state, milestone, and all coordinator artifacts untouched, read the external input without writing,
+fetching, checking out, or re-pinning, wrote its reproduction to a scratch path outside both
+repositories, launched no agent, took no lease, and ran no expensive or shared gate.
+
+### Position
+
+The two-failure eval limit is not reached: cycle 1 `FAIL_FIX`, cycle 2 `PASS`. The lane holds for
+coordinator direction on N1–N3 and on any merge-readiness sequence. Nothing was readied, merged, or
+published from this lane.
