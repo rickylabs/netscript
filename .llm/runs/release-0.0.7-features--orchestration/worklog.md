@@ -1714,3 +1714,37 @@ partly "nothing ran" is not itself gate evidence, and two pending jobs mean the 
 Monitoring to terminal rather than reporting green early.
 
 **Not merging.** Merge is the coordinator's and is explicitly gated on terminal green.
+
+## 2026-08-15T10:27Z — #1662 merged; #1293 stays open by contract
+
+Verified independently rather than reconciled from the report:
+
+| Field | Value | Check |
+| --- | --- | --- |
+| Merged PR head | `f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf` | **identical** to the evaluated verdict head |
+| Merge commit | `3fc0f2f9221a8246f0d26a26189bafb2647be08a` | `git merge-base --is-ancestor` → true; it is the `origin/main` tip |
+| Subject | `feat(prisma-mysql): expose connected surface and wire connection errors (#1662)` | |
+| Merged at | `2026-08-15T10:27:29Z`, squash | |
+| PR #1662 | `MERGED`, sole `status:shipped` | single-`status:` law holds |
+| #1293 | **`OPEN`**, `status:impl`, wording unchanged | as the split-close contract requires |
+| Acceptance boxes | 1 ☐, 2 ☑, 3 ☑, 4 ☐ | exactly the contracted shape |
+
+The earlier `status:impl-eval` discrepancy is resolved — the PR now carries sole `status:shipped`.
+
+**The board is now honest in a way a normal close would not have been.** #1293 stays open with box 1
+unticked by design (R2.1/R2.2 — the concrete class deliberately stays out of the root surface) and
+box 4 unticked pending #1112. Boxes 2 and 3 are ticked on shipped evidence. Nothing claims work that
+was not done, and the issue's own wording was never bent to fit what one lane could reach.
+
+**Note for whoever eventually reworks box 1.** Its text requires "the surface-diff gate green", and
+the `surface-diff` CI job was **`skipped`** on this PR — 12 of the 20 current checks were skipped by
+the cheap-lane config; the 8 that actually ran were `build`, `check-test`, `close-gate`,
+`code-quality`, `quality`, `classify docs-site changes`, `core CI lane visibility`, and `build`.
+No false claim was made, because box 1 is unticked. But the R2.3 property it describes *was* proven —
+by the leaf's own `tests/surface_test.ts` asserting `'PrismaMySqlAdapter' in publicApi === false`, and
+by the IMPL-EVAL's independent `deno doc --json` of the root export map. Proven by artefact, not by
+that CI job. Recording it so a future reader does not assume the skipped job means the property is
+unverified.
+
+**#1112 is now unblocked** — the docs leaf has a shipped surface to write against, which is the
+prerequisite split-close described.
