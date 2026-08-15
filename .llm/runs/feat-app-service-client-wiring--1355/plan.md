@@ -560,11 +560,20 @@ current project-config discovery and warning semantics. The existing path-based
 current exact-file behavior.
 
 The smallest required API adjustment is optional text stdin on `ProcessPort.exec`; `DenoProcess`
-writes that text to a piped child stdin and closes it before collecting stdout/stderr. No new public
-package export is added. Post-init writers receive the formatter port through the existing public
-command composition root. They canonicalize rendered content **before** their equality or
-`willWrite` decision and write that exact canonical string. No post-write `deno fmt` call is added
-to either service command.
+writes the complete encoded input, closes the writer, and only then awaits child output. The timeout
+is armed across the write/close/output sequence; if it fires, the adapter kills the child, closes
+the writer in `finally`, awaits termination, and returns the timed-out result rather than leaving an
+open pipe. No new public package export is added. Post-init writers receive the formatter port
+through the existing public command composition root. They canonicalize rendered content
+**before** their equality or `willWrite` decision and write that exact canonical string. No
+post-write `deno fmt` call is added to either service command.
+
+The content contract resolves and allowlists the target extension before inspecting content. A
+missing or unsupported extension fails closed with a target-named error before spawning Deno; there
+is no default dialect. For a supported target whose rendered content is exactly empty, the adapter
+returns `''` without spawning a formatter. This explicit formatted-empty passthrough preserves an
+empty generated file without manufacturing whitespace while still refusing `empty` plus an unknown
+target dialect.
 
 This design is idempotent by construction. For a renderer `R` and canonicalizer `F`, both the
 comparison and write use `F(R(input))`. A same-input repeat computes the same canonical bytes and
@@ -590,7 +599,9 @@ F5 implementation may modify only these product paths:
 - `packages/cli/src/kernel/adapters/service/scaffolder.ts`
 - `packages/cli/src/public/features/generate/aspire/generate-aspire.ts`
 - `packages/cli/src/public/features/services/add/add-service.ts`
-- `packages/cli/src/public/features/services/services-group.ts`
+- `packages/cli/src/public/features/services/services-group.ts` — the root constructs the formatter,
+  while this group assembles `GenerateAspireDependencies` for `service generate`; it must project
+  that formatter into the Aspire-helper half so all seven helper owners canonicalize before compare.
 - `packages/cli/src/public/features/root/public-command-dependencies.ts`
 
 F5 focused-test mutations are bounded to:
@@ -643,6 +654,9 @@ amendment and Tier-A review before that path is touched.
 - **Errors:** missing-contract and missing-export types, wording, service name, and expected path are
   unchanged. New formatter failures name the target and preserve Deno stderr; init continues to
   convert formatter failure to its existing warning rather than changing init's error contract.
+- **Formatter inputs:** supported-extension empty content is an explicit zero-byte passthrough;
+  missing or unsupported extensions fail before process execution. Extension validation precedes
+  the empty-content branch, so an empty file cannot bypass dialect validation.
 - **F4:** the first post-plugin generate may converge changed inputs. Its canonical output is the
   snapshot. The immediately consecutive same-input generate computes the same canonical bytes,
   reports zero client/helper writes, and remains path/byte-identical.
@@ -654,7 +668,7 @@ amendment and Tier-A review before that path is touched.
 
 | Proof | Executable assertion | Bound test/evidence |
 | --- | --- | --- |
-| Formatter transport | Unformatted TS/MTS passed as stdin returns Deno-formatted stdout; target extension and existing generated style flags are exact; a second canonicalization is byte-identical; non-zero formatter exit names the target. | `deno-generated-source-formatter_test.ts`; `deno-process_test.ts`; `format-generated-files_test.ts`; `post-scripts-init_test.ts` |
+| Formatter transport | Unformatted TS/MTS passed as stdin returns Deno-formatted stdout; target extension and existing generated style flags are exact; a second canonicalization is byte-identical; supported-extension empty content returns `''` without spawning; missing/unsupported extensions (including empty content) fail before spawn. A timeout test sends stdin to a child that prints only after EOF and then hangs: stdout must prove EOF was observed, timeout must kill and return, and elapsed time must stay bounded, pinning write → close → await-output and writer closure on kill. Non-zero formatter exit names the target. | `deno-generated-source-formatter_test.ts`; `deno-process_test.ts`; `format-generated-files_test.ts`; `post-scripts-init_test.ts` |
 | Four writer owners | Client plans, the two contract paths (including version aggregate), service router output, and Aspire helper plans all compare/write the injected canonical string rather than raw render output. | `client-scaffolder_test.ts`; `version-registry_test.ts`; `scaffolder_test.ts`; `workspace-mutator_test.ts` |
 | Exact 12-path generated output | In a temporary real scaffold, run `init` for database-backed `users`, then `service add --name payments --with-client`, then `service generate`. Assert the exact 12 paths listed above exist and `deno fmt --check` passes for that exact set; also require the generated project's full `deno task fmt:check` to exit 0. No Aspire restore/start or Docker is involved. | new `service-client-generated-format_test.ts` in the ordinary cheap test gate |
 | Dry-run/force | Snapshot owned paths, run `service generate --dry-run`, and require zero byte changes; run `--force` and require identical canonical content to be reported/written rather than skipped. | existing generator/Aspire flag tests plus focused writer assertions |

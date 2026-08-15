@@ -554,3 +554,17 @@ behind the existing runtime adapter. Every affected writer compares and writes t
 string; no command formats target files after writing. Exact product/test ceilings, named
 inclusions/exclusions, preserved dry-run/force/C2/error/F4 contracts, and the cheap proof matrix are
 in `plan.md` and `reports/f5-plan-amendment.md`.
+
+### F5-A1 Tier-A plan repair
+
+Tier-A accepted the formatter-port direction and the complete 15-product/12-test ceiling, then
+required four additions only. The plan now binds a piped-stdin timeout regression whose child emits
+an EOF marker before hanging, proving the adapter writes, closes, then awaits output and still kills,
+closes, awaits, and returns when timed out. Supported-extension empty content is explicitly a
+zero-byte/no-spawn passthrough; absent or unsupported extensions fail before spawn, with extension
+validation preceding the empty branch. `services-group.ts` remains in the ceiling because it is the
+projection edge from the root-constructed formatter into `service generate`'s
+`GenerateAspireDependencies`, which is how the seven Aspire helpers receive the formatter.
+
+No product/test/template/fixture file, gate, runtime, browser, lease, evaluator, lockfile, or
+`docs/**` path was touched during F5-A1.

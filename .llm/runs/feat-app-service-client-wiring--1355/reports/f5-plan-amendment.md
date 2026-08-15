@@ -51,6 +51,12 @@ project-config discovery and warning behavior. `formatGeneratedFiles` delegates 
 adapter. Optional text stdin is added to `ProcessPort` and implemented by `DenoProcess`; there is no
 direct command execution in the domain/application writers and no package export change.
 
+`DenoProcess` arms timeout coverage across stdin transfer and output collection, writes all encoded
+input, closes the writer, then awaits child output. Writer closure also runs in `finally` after a
+kill so a timeout cannot strand an open pipe. The formatter validates the target extension before
+any empty-content branch: absent/unsupported extensions fail before spawn, while exactly empty
+content for a supported extension returns `''` without spawning Deno.
+
 Every post-init owner receives the port and calls it before equality/write. If `R` is rendering and
 `F` is canonicalization, both comparison and disk bytes are `F(R(input))`. The immediate repeat is
 therefore stable. Formatting the target after writing would instead compare `R(input)` with
@@ -73,7 +79,9 @@ Product inclusions:
 - `packages/cli/src/kernel/adapters/service/scaffolder.ts`
 - `packages/cli/src/public/features/generate/aspire/generate-aspire.ts`
 - `packages/cli/src/public/features/services/add/add-service.ts`
-- `packages/cli/src/public/features/services/services-group.ts`
+- `packages/cli/src/public/features/services/services-group.ts` — projects the formatter constructed
+  by the root into the `GenerateAspireDependencies` assembled for `service generate`; without it,
+  the seven-helper half cannot receive the formatter port
 - `packages/cli/src/public/features/root/public-command-dependencies.ts`
 
 Focused-test inclusions:
@@ -99,8 +107,12 @@ path outside this ceiling requires a new amendment before mutation.
 
 ## Proof matrix
 
-1. Unit-lock Deno stdin, extension selection, exact style flags, stable second canonicalization,
-   target-named failures, and bulk init delegation.
+1. Unit-lock Deno stdin, exact style flags, stable second canonicalization, target-named formatter
+   failures, and bulk init delegation. A child reads stdin to EOF, emits an EOF marker, then hangs;
+   the test requires the marker, a bounded timeout, and a returned timed-out result, pinning
+   write → close → await-output and writer closure on kill. Supported-extension empty content must
+   return `''` without spawning, while absent/unsupported extensions—including empty input—must fail
+   before spawn.
 2. Unit-lock canonical content before comparison/write for the client, contract/version, service,
    and Aspire owners.
 3. In a temporary real scaffold, execute database-backed `users` init, then

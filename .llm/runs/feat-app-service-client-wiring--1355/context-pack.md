@@ -98,11 +98,14 @@ or expensive command is authorized.
 - Exact F5 product/test ceilings and cheap proofs are in `plan.md` and
   `reports/f5-plan-amendment.md`. No product/test mutation, gate, lease, runtime, or browser action
   is authorized until fresh Tier-A review.
+- F5-A1 adds the four required plan proofs: piped-stdin timeout/EOF closure, explicit empty-content
+  passthrough, fail-closed missing/unknown extensions, and the concrete `services-group.ts`
+  formatter-projection reason. The accepted ceiling itself is unchanged.
 
 ## Next Steps
 
-1. Commit and explicitly push only the F5 amendment/run artifacts.
-2. Stop for fresh Tier-A review of the formatter abstraction, exact ceiling, and proof matrix.
+1. Commit and explicitly push only the F5-A1 amendment/run artifacts.
+2. Post the structured F5-A1 PLAN receipt and stop for fresh Tier-A review.
 3. Do not mutate product/tests or request a new expensive-gate lease before that review.
 
 ## Key Decisions
