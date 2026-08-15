@@ -119,39 +119,47 @@ contract.
 lease. And uniquely here: the leaf may **read** the OpenHands workflows but must not **fire** them —
 no dispatch, no evaluator trigger, manual or by label.
 
-### Current state — #1658 merge-ready, awaiting the coordinator's merge decision
+### Current state — four leaves shipped; wave 2 leaf active
 
-| Field        | Value                                                                                |
-| ------------ | ------------------------------------------------------------------------------------ |
-| PR head      | `bf07062987088809133ccacd380be6b016b511ed` (local = remote = PR, clean)              |
-| State        | `OPEN`, `draft=false`, **`MERGEABLE/CLEAN`**                                         |
-| Labels       | `type:fix`, **`status:impl-eval`**, `area:tooling`, `priority:p1`                    |
-| CI           | terminal, 68 checks: **8 SUCCESS / 60 SKIPPED / 0 failures**, all at this head       |
-| `close-gate` | **SUCCESS** at the PR head — independent confirmation the acceptance set is complete |
-| Boxes        | PR 0 unchecked; #1611 and #1613 both 0 unchecked, both `status:ready-merge`          |
-| Threads      | 0 total / 0 unanswered                                                               |
+| Leaf                                         | State                                                                       |
+| -------------------------------------------- | --------------------------------------------------------------------------- |
+| #1644 `harness-evidence-and-verdict-tooling` | merged `dd472102d` — #1561/#1563/#1621 shipped                              |
+| #1653 `quality-scan-allowance-rail`          | merged `473e8d75b` — #1378/#1545 shipped                                    |
+| #1656 `quality-scan-root-coverage`           | merged `7737d8903` — #1542 shipped                                          |
+| #1658 `openhands-dispatch-claim-and-refusal` | merged **`05fc3132b`** — #1611/#1613 CLOSED/COMPLETED, all `status:shipped` |
+| **`package-gate-honesty`**                   | **ACTIVE** — bootstrap/research/plan, stops at the plan gate                |
 
-Gate lineage: plan `cea999d18` → PLAN-EVAL `PASS` (`e15d78588`) → S1–S5 with five Tier-A sign-offs →
-IMPL-EVAL `PASS` at `f46d84630` (`8f62a6121`, comment `5301699397`) → F7 drift fix `5be6e08ba` → F1
-acceptance `bf0706298`.
+Live `main` = `05fc3132b6800a85eb6152691a961b658962571b` — the new immutable base. Waves 0 and 1 are
+complete.
 
-**One item for the coordinator before merge:** the PR carries `status:impl-eval`, set by the
-draft→ready automation, while `netscript-pr` requires `status:ready-merge` to merge. Both closing
-issues already carry it. Relabelling and merge are coordinator-owned.
+### Active leaf identity
 
-**No provider spend from the ready flip:** `impl-eval:skip` was absent, but the `OpenHands runner`
-workflow is `skipped` at this head and all `Phase eval PR` runs completed with only their `dispatch`
-job. Standing rule recorded: apply `impl-eval:skip` **before** the flip whenever a native formal
-IMPL-EVAL has already passed.
+- Worktree `/home/codex/repos/netscript-007-package-gate`
+- Branch `fix/package-gate-honesty` @ `05fc3132b`, **no upstream**
+- Codex thread `01a004ec-86a6-7c21-8886-81c09de099f5`, `openai · gpt-5.6-sol · medium`, route
+  matched
+- Steering: `codex exec resume 01a004ec-86a6-7c21-8886-81c09de099f5 -- "<follow-up>"`
+- Run dir `.llm/runs/release-0.0.7-internals--orchestration/slices/package-gate-honesty/`
+- Closes exactly **#1604** (prescribed `--cwd packages/cli test` always red), **#1618** (`deno fmt`
+  cannot verify `packages/mcp`), **#1622** (`closeScoreGap` pinned by no test)
 
-**Open non-blocking follow-ups from IMPL-EVAL:** F2 (add the formal case to the existing
-round-trip), F2b (export `HEURISTIC_TOKEN_RE` rather than asserting a copy), F3 (import
-`OPENHANDS_REFUSAL_MARKER_PREFIX` instead of re-hardcoding the marker), F4 (named exit code instead
-of an unhandled rejection on a missing `head.sha`).
+### ⚠ This leaf's contract includes the global expensive gate
+
+`provingGates` contain **`scaffold.runtime`** (aspire + docker + postgres), serialized cluster-wide
+at one holder. The leaf is forbidden from running it — now or at implementation — without the
+coordinator granting the mutex through this lane. It must plan for it and **ask, not take**.
+
+The frozen surface is also unusually loose (duplicate entries, wildcard `packages/*`), so the plan
+must narrow it with per-path justification and name what it deliberately will not touch.
+
+### Blocking coordinator action
+
+The leaf stops after `plan.md` with its PLAN-EVAL judgement; that gate is the coordinator's to
+grant.
 
 ### Remaining internals queue after this leaf
 
-wave 2 `package-gate-honesty` (#1604/#1618/#1622) and `reference-export-drift-gate` (#1296); wave 3
+wave 2 `reference-export-drift-gate` (#1296) — `package-gate-honesty` is now active; wave 3
 `jsdoc-example-compile-gate` (#1533) and `leak-check-process-descendants` (#1429); wave 4
 `fresh-defer-test-capability` (#1557/#1601).
 
