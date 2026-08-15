@@ -1,0 +1,36 @@
+{
+  "gateId": "docs-accuracy",
+  "invocationId": "ns1502-amend-docs-accuracy",
+  "argv": [
+    "deno",
+    "task",
+    "docs:accuracy"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-features-1502",
+  "gitHead": "67e12f02165089ec7431b72d1294147477906282",
+  "actualGitHead": "67e12f02165089ec7431b72d1294147477906282",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:387870",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "abd2f790513905992ce7f8d011e35482cb572e30b56c003578637bdb143a7679",
+  "lifecycleId": "worker:387870:ns1502-amend-docs-accuracy:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T07:58:30.542Z",
+  "startedAt": "2026-08-15T07:58:30.544Z",
+  "finishedAt": "2026-08-15T07:58:32.572Z",
+  "durationMs": 2028,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 277,
+    "sha256": "bf2fbbb61952ca5fd90edb44f79386a67b2095e909821d4179c9ca6d15173f6c",
+    "tail": "docs accuracy: PASS (4 saga pages checked for stale claims, 196 published source pages, 178 shipped corpus files, one query dialect exception page, mutation-map columns, 91/91 root/direct public commands from 149 recursive paths, 3 valid @netscript/fresh root imports checked)\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 654,
+    "sha256": "b822586cf965271a349cd56c7101f7aacc0d885bf2c739783f73c07bd8080182",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mdocs:accuracy\u001b[0m deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/check-accuracy-and-discoverability.ts\n\u001b[0m\u001b[33mWarning\u001b[0m The following peer dependency issues were found:\n\u001b[0m\u001b[38;5;245m└─┬\u001b[0m @tanstack/ai-preact@0.10.4\n\u001b[0m\u001b[38;5;245m  └──\u001b[0m peer @tanstack/ai@^0.41.0: resolved to 0.39.1\n\nThese packages were resolved to a version that does not satisfy a peer dependency constraint, which can cause runtime errors. To silence this warning, install a compatible version or add an \"overrides\" entry to your package.json or deno.json.\nLearn more: https://docs.deno.com/go/peer-deps\n",
+    "truncated": false
+  }
+}
