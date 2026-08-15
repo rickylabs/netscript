@@ -27,7 +27,7 @@
 import { dirname, isAbsolute, join, relative, resolve } from '@std/path';
 
 export const TOOL_NAME = 'measure-comparison-surface';
-export const TOOL_VERSION = '1.0.0';
+export const TOOL_VERSION = '1.1.0';
 
 export const CLASSIFICATIONS = [
   'framework-glue',
@@ -102,6 +102,9 @@ export interface ComparisonManifest {
   schemaVersion: 1;
   caseId: string;
   toolVersion: string;
+  frameworkVersions: Record<string, string>;
+  featureFlags: Record<string, string>;
+  inspectedAt: string;
   measurementPolicy: MeasurementPolicy;
   reproduction: ReproductionContract;
   sources: ManifestSource[];
@@ -136,6 +139,9 @@ export interface MeasurementOutput {
     version: typeof TOOL_VERSION;
   };
   observedAt: string;
+  frameworkVersions: Record<string, string>;
+  featureFlags: Record<string, string>;
+  inspectedAt: string;
   measurementPolicy: MeasurementPolicy;
   sources: MeasuredSource[];
   unmatchedSources: UnmatchedSource[];
@@ -194,6 +200,23 @@ function literalValue<T extends string>(value: unknown, literal: T, context: str
 function arrayValue(value: unknown, context: string): unknown[] {
   if (!Array.isArray(value)) fail(`${context} must be an array`);
   return value;
+}
+
+function stringRecord(value: unknown, context: string): Record<string, string> {
+  const record = objectValue(value, context);
+  const keys = Object.keys(record).sort();
+  if (keys.length === 0) fail(`${context} must not be empty`);
+  return Object.fromEntries(
+    keys.map((key) => [key, stringValue(record[key], `${context}.${key}`)]),
+  );
+}
+
+function inspectedDateValue(value: unknown): string {
+  const inspectedAt = stringValue(value, 'inspectedAt');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(inspectedAt) || Number.isNaN(Date.parse(inspectedAt))) {
+    fail('inspectedAt must be an ISO 8601 calendar date');
+  }
+  return inspectedAt;
 }
 
 function classificationValue(value: unknown, context: string): Classification {
@@ -340,6 +363,9 @@ export function parseManifest(value: unknown): ComparisonManifest {
     schemaVersion: 1,
     caseId: stringValue(manifest.caseId, 'caseId'),
     toolVersion,
+    frameworkVersions: stringRecord(manifest.frameworkVersions, 'frameworkVersions'),
+    featureFlags: stringRecord(manifest.featureFlags, 'featureFlags'),
+    inspectedAt: inspectedDateValue(manifest.inspectedAt),
     measurementPolicy: parsePolicy(manifest.measurementPolicy),
     reproduction: parseReproduction(manifest.reproduction),
     sources,
@@ -578,6 +604,9 @@ export async function measureComparisonSurface(
     caseId: manifest.caseId,
     tool: { name: TOOL_NAME, version: TOOL_VERSION },
     observedAt: timestamp,
+    frameworkVersions: manifest.frameworkVersions,
+    featureFlags: manifest.featureFlags,
+    inspectedAt: manifest.inspectedAt,
     measurementPolicy: manifest.measurementPolicy,
     sources,
     unmatchedSources: manifest.unmatchedSources,

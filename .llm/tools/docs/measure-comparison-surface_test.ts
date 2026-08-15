@@ -55,6 +55,15 @@ function manifest(revision: string, hash: string, path = 'surface.ts'): Comparis
     schemaVersion: 1,
     caseId: 'synthetic-session',
     toolVersion: TOOL_VERSION,
+    frameworkVersions: {
+      fresh: '^2.3.3',
+      netscript: '0.0.6',
+      nextjs: '16.3.0',
+    },
+    featureFlags: {
+      'nextjs.cacheComponents': 'deferred-no-implementation',
+    },
+    inspectedAt: '2026-08-15',
     measurementPolicy: {
       physicalLines: 'synthetic policy',
       nonblankLines: 'synthetic policy',
@@ -128,6 +137,15 @@ Deno.test('measurement is stable except for observedAt and never emits source co
     assertEquals(first.sources[0].includedTotals.fileCount, 1);
     assertEquals(first.unmatchedSources[0].status, 'absent');
     assertEquals(first.unmatchedSources[0].measurements.tokens.status, 'deferred');
+    assertEquals(first.frameworkVersions, {
+      fresh: '^2.3.3',
+      netscript: '0.0.6',
+      nextjs: '16.3.0',
+    });
+    assertEquals(first.featureFlags, {
+      'nextjs.cacheComponents': 'deferred-no-implementation',
+    });
+    assertEquals(first.inspectedAt, '2026-08-15');
     const serialized = serializeMeasurement(first);
     assert(!serialized.includes('PRIVATE_FIXTURE_SECRET'));
     assert(!serialized.includes(fixture.content));
@@ -193,6 +211,15 @@ Deno.test('manifest rejects unsafe paths and estimated unmatched values', () => 
     schemaVersion: 1,
     caseId: 'synthetic-session',
     toolVersion: TOOL_VERSION,
+    frameworkVersions: {
+      fresh: '^2.3.3',
+      netscript: '0.0.6',
+      nextjs: '16.3.0',
+    },
+    featureFlags: {
+      'nextjs.cacheComponents': 'deferred-no-implementation',
+    },
+    inspectedAt: '2026-08-15',
     measurementPolicy: {
       physicalLines: 'policy',
       nonblankLines: 'policy',

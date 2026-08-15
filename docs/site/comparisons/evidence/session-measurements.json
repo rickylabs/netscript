@@ -3,9 +3,18 @@
   "caseId": "nextjs-session",
   "tool": {
     "name": "measure-comparison-surface",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "observedAt": "2026-08-15T03:57:30Z",
+  "frameworkVersions": {
+    "fresh": "^2.3.3",
+    "netscript": "0.0.6",
+    "nextjs": "16.3.0"
+  },
+  "featureFlags": {
+    "nextjs.cacheComponents": "opt-in; mechanism mapping only; no implementation measured"
+  },
+  "inspectedAt": "2026-08-15",
   "measurementPolicy": {
     "physicalLines": "UTF-8 text is normalized from CRLF or CR to LF. A trailing newline terminates the final line without adding a phantom line; an empty file has zero physical lines.",
     "nonblankLines": "A physical line is nonblank when it contains at least one non-whitespace Unicode code point.",
