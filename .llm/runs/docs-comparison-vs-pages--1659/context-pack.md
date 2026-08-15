@@ -1,6 +1,6 @@
 # Context pack — comparison pages (#1659)
 
-Status: S1–S3 complete; S4 active.
+Status: S1–S4 complete; awaiting owner Tier-A review.
 
 The page argument is fixed: NetScript puts route identity, a shared read, streaming regions,
 freshness, layout, failure boundaries, and metadata at one entry point. The selector changes only
@@ -25,3 +25,8 @@ S3 adds the backend page: a Zod/oRPC route contract drives runtime validation, h
 the service client; the endpoint triggers a named worker whose payload is parsed by its own schema.
 All five NetScript symbols shown in that path resolve through `deno doc`. The full docs-site verifier
 is green now that both comparison routes exist.
+
+S4 refreshed the prose bundle, CLI asset barrel, and publish assets in the required order. All four
+freshness checks and every owner-specified docs/git gate now return zero. The only package diffs are
+the generated CLI agent-doc barrel and generated MCP publish corpus. No lockfile changed. The draft
+PR remains in implementation state; no evaluator or ready-for-review transition was launched.

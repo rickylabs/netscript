@@ -8,7 +8,7 @@
 | Branch | `docs/comparison-vs-pages` |
 | Base | `e090f894ff3682405a36e4f896ffd2cc16f9a1f8` |
 | Overlay | `SCOPE-docs` |
-| State | Implementation started |
+| State | S4 complete; awaiting owner Tier-A review |
 
 ## Progress
 
@@ -18,7 +18,7 @@
 | S1 | complete | Removed 1,802 lines of protocol/migration surface; landing page is 24 lines and navigation points only to the two new pages. |
 | S2 | complete | Fixed-first NetScript page, four competitor code panels, partial-I/O line, and compact architectural estimates. |
 | S3 | complete | One route contract, typed service client, validated worker payload, and three competitor implementations. |
-| S4 | active | Generated assets and complete gate evidence. |
+| S4 | complete | Three generated layers refreshed in order; all freshness, docs, and git gates pass. |
 
 ## Wrapper applicability
 
@@ -42,3 +42,24 @@
 - S3 `deno task --cwd docs/site verify`: exit `0`; 35,342 internal links across 227 pages resolve,
   and all 18 caveat markers resolve.
 - S3 rendered DOM inspection: three selector options and two rendered blocks per competitor.
+- S4 generators, in required order: `gen:agent-docs-prose` exit `0`, `gen:assets-barrel` exit `0`,
+  `gen:publish-assets` exit `0`.
+- The first pre-commit `check:assets-barrel` returned `1` because that task ends with a generated-file
+  diff against `HEAD`; after the run-owned generator output was committed locally, its final exit was
+  `0`. No generator repair was required.
+- S4 final freshness: `check:agent-docs-prose` exit `0`, `check:assets-barrel` exit `0`,
+  `check:publish-assets` exit `0`, `check:mcp-export-corpus` exit `0`.
+- S4 `deno task --cwd docs/site verify`: exit `0`; 638 files generated, 35,342 internal links
+  across 227 pages resolve, and 18 caveat markers resolve.
+- S4 `deno task docs:links`: exit `0`; 103 docs, zero broken links, zero broken anchors, zero
+  orphans.
+- S4 `deno task docs:accuracy`: exit `0`; 199 published pages and 181 shipped corpus files checked.
+- S4 `git diff --check`: exit `0`.
+- S4 `git diff --exit-code origin/main -- deno.lock docs/site/deno.lock`: exit `0`.
+- Removed-route scan across live docs and generated text: no matches.
+
+## Handoff
+
+- Draft PR remains `status:impl` and is not ready or merged.
+- No evaluator, browser, service, container, scaffold, or E2E lane ran.
+- Owner Tier-A review is the next action.
