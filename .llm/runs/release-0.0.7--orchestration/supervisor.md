@@ -506,3 +506,18 @@ service, key-isolation, idempotent regeneration, and live Rename/+1-refetch scen
 before lease acquisition; none exists at `1c1f45820`. The Fresh controlled-clock prerequisite does.
 Serialization remains per topic. The singleton runtime mutex is free; Docker and Aspire application
 ownership are empty.
+
+### Live transition — 2026-08-15T15:25:00Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Queue exhausted and parked at `0ca4c489f` | Do not invent post-freeze work |
+| internals | #1663 remains at the exceptional-final-PLAN-EVAL owner boundary on `194e22a3d` | No third evaluator or product mutation without the owner's explicit verdict |
+| fixes | #1665 formal IMPL-EVAL `PASS` at evaluator head `0fed4d7ff`; acceptance reconciled and exact-head readiness CI active | Merge only after current required checks are terminal green; next fixes leaf stays queued until shipped lifecycle is terminal |
+| features | #1664 F2 plan locked/pushed at `4be440020` before code; same original author implementing gates/probes/tests | No runtime lease, Aspire, Docker, `scaffold.runtime`, `fresh-browser`, or evaluator before renewed cheap receipts and fresh Tier-A |
+
+#1665's draft check set was vacuous and is not accepted as green; leaving draft at the evaluator
+head is what starts the required product validation. #1664's plan placement in `scaffold-gates.ts`
+is acceptable only if the final catalog proves the first three gates in both suites immediately
+after init and the live refetch gate in runtime only after readiness. The singleton runtime mutex
+remains free and serialization remains per topic.

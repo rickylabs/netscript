@@ -413,3 +413,15 @@ Rename/+1-refetch scaffold scenarios are absent. The preserved Sol/high author i
 exact precondition under the features supervisor, after which all affected cheap gates and four
 receipts must be renewed and independently reviewed. Fresh's controlled-clock browser prerequisite
 is already present. #1663 remains at its owner-only exceptional evaluator boundary.
+
+Resume from the authoritative `2026-08-15T15:25:00Z` transition. Main remains `baf1cdf67`; runtime
+ownership remains empty. #1665 formal IMPL-EVAL is terminal `PASS`: native Fable 5/medium Remote
+Control job `1fbb1c07-…` evaluated product head `9a26c107a` and pushed only `impl-eval.md` as
+`0fed4d7ff`, comment `5302881354`. All evidenced PR/issue acceptance boxes are reconciled,
+`status:ready-merge` is applied, and the PR is non-draft at that exact head with required readiness
+CI active. Merge only after current checks are terminal and truthful. #1664 F2 plan amendment
+`4be440020` was committed and pushed before product edits; the original Sol/high author is building
+the three shared scaffold/static gates, runtime-only CDP refetch gate, pure tests, and replacement
+receipts. Fresh Tier-A is mandatory before any S5 lease. #1663 still requires the exact owner
+decision on one exceptional third and final Fable 5/medium PLAN-EVAL at immutable `194e22a3d`;
+independent work does not wait on it.

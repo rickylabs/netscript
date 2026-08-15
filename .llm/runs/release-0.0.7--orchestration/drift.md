@@ -525,3 +525,12 @@ implementation thread.
   with default batching produces non-zero `failedBatches` and zero findings. That result is a
   fail-closed refusal, never a formatting pass; the original failed invocation remains append-only
   evidence rather than being erased by the corrected proof.
+- **Draft check sets are lifecycle placeholders, not product validation:** #1665 displayed two
+  successes and nineteen skipped checks while draft. The skip labels explain only intentionally
+  omitted scaffold/runtime families; draft state suppressed the required core jobs. Readiness must
+  be judged after verified acceptance reconciliation, lifecycle relabel, and a `ready_for_review`
+  event starts exact-head core CI. A zero-failure draft check set is never described as green.
+- **Plan-before-code ordering needs an immutable remote boundary:** #1664's F2 recovery first
+  committed and explicitly pushed `4be440020` containing the bounded files, four gate scenarios,
+  pure-test contract, and superseded-receipt rules. Product edits began only afterward. A dirty
+  local plan next to product code would not prove the recovery was constrained before execution.

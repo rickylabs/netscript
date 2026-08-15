@@ -723,3 +723,22 @@
   `users.list` refetch plus persisted DOM value. The same original Sol/high author must add a named,
   bounded CLI e2e proof slice, renew affected cheap gates and all four receipts, and stop for fresh
   Tier-A. `scaffold.runtime`, `fresh-browser`, Aspire, Docker, and the singleton lease remain unused.
+
+## 2026-08-15T15:25:00Z — #1665 passes formal evaluation; #1664 F2 plan locks before code
+
+- #1665's recovered exact evaluator `1fbb1c07-…` completed native Fable 5/medium Remote Control
+  IMPL-EVAL with terminal `PASS` against immutable product source `9a26c107a`. Its only mutation is
+  `impl-eval.md` at pushed head `0fed4d7ff`, comment `5302881354`. It independently reproduced
+  root test 4203/0/19, an uncached 2925-file zero-diagnostic check, SDK publish dry-run, the exact
+  six red doc diagnostics, the identical 517-entry surface MAJOR set at base and head, and the
+  13/13 JSR source-child baseline. The README raw-format observation is advisory because the
+  repository format gate is TypeScript-only.
+- Coordinator reconciled all verified acceptance evidence in place: five PR definition-of-done
+  boxes and thirteen issue boxes across #1598/#1619/#1620/#1623 are checked; #1637 defines none.
+  `status:plan` is replaced by `status:ready-merge`, and #1665 left draft at the same evaluated
+  head so required readiness CI—not the vacuous draft check set—now runs before merge.
+- #1664's same original Sol/high author committed and explicitly pushed the F2 plan amendment
+  `4be440020` before any product edit. It binds three scaffold/static gates into both service and
+  runtime suites after init, one live CDP refetch gate into runtime only after readiness, pure
+  fail-capable unit assertions, and four new exact-head binding receipts. Implementation is active;
+  the singleton lease, Aspire, Docker, `scaffold.runtime`, and `fresh-browser` remain unused.
