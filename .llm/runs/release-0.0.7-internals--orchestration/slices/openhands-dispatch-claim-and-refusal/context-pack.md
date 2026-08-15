@@ -6,20 +6,18 @@
 | --- | --- |
 | Run ID | `release-0.0.7-internals--orchestration/slices/openhands-dispatch-claim-and-refusal` |
 | Branch | `fix/openhands-dispatch-claim-and-refusal` |
-| Current phase | S4 complete; stopped for Tier-A slice review |
+| Current phase | S5 final evidence in progress |
 | Archetype | `6-cli-tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-Tier-A signed off S3 at `d3d31b3d0` with no changes and authorized S4. Literal command candidates
-now reach the trusted default-branch policy regardless of author association or grammar. Every
-ordinary reportable denial or generation-lookup exhaustion emits a controlled source-comment-keyed
-refusal, and a separate authorize step posts it at most once with `GITHUB_TOKEN` under only
-`issues: write`. The paid job remains gated on dispatch true. Generation lookup executes exactly
-five attempts with one-second waits and exhaustion names the missing phase status and source comment.
-All three durable receipts pass at implementation head `9b71e1bd2`; only root `test` behaviorally
-covers S4.
+Tier-A signed off S4 at `ad19d0e20` with no changes and authorized evidence-only S5. The live PR and
+both closing issues were reconciled without mutation. S1–S4 implementation is complete; S5 is
+creating one run-artifact checkpoint so the final `check`, `test`, and `quality-job` receipts attest
+one immutable branch-reachable head. Root `test` is the only gate that behaviorally covers this
+leaf; `check` and `quality-job` are required contract receipts whose package/plugin selections are
+non-covering.
 
 ## Completed
 
@@ -42,15 +40,18 @@ covers S4.
   policy + workflow suites 26/26).
 - S4 durable `check`, `test`, and `quality-job` PASS/0 receipts at `9b71e1bd2`; root test reported
   4,147 passed, 19 ignored, 0 failed.
+- Tier-A S4 sign-off commit `ad19d0e20`.
 
 ## In Progress
 
-- Nothing. S4 is being pushed/commented and this thread stops for Tier-A.
+- S5 run-only checkpoint and final same-head durable receipts.
 
 ## Next Steps
 
-1. Tier-A substantively reviews S4 and either requests a bounded repair or authorizes S5.
-2. Do not begin S5 without that authorization.
+1. Commit the run-only S5 checkpoint.
+2. Run final `check`, `test`, and `quality-job` receipts at that single checkpoint SHA.
+3. Record the DoD/N1–N5 audit, commit receipts, push, comment, and stop for Tier-A.
+4. IMPL-EVAL remains a separate-session coordinator action; do not trigger it here.
 
 ## Key Decisions
 
