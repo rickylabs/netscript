@@ -8,7 +8,7 @@
 | Branch | `docs/comparison-vs-pages` |
 | Base | `e090f894ff3682405a36e4f896ffd2cc16f9a1f8` |
 | Overlay | `SCOPE-docs` |
-| State | S4 complete; awaiting owner Tier-A review |
+| State | Tier-A corrections active |
 
 ## Progress
 
@@ -18,7 +18,9 @@
 | S1 | complete | Removed 1,802 lines of protocol/migration surface; landing page is 24 lines and navigation points only to the two new pages. |
 | S2 | complete | Fixed-first NetScript page, four competitor code panels, partial-I/O line, and compact architectural estimates. |
 | S3 | complete | One route contract, typed service client, validated worker payload, and three competitor implementations. |
-| S4 | complete | Three generated layers refreshed in order; all freshness, docs, and git gates pass. |
+| S4 | superseded | Initial generated layers and gates were green before Tier-A findings changed the backend page. |
+| S3R | complete | Backend estimate close and consumer-contract move added; real public export confirmed; all three scratch checks pass. |
+| S4R | pending | Regenerate all three layers and rerun every final gate from the corrected docs. |
 
 ## Wrapper applicability
 
@@ -57,9 +59,32 @@
 - S4 `git diff --check`: exit `0`.
 - S4 `git diff --exit-code origin/main -- deno.lock docs/site/deno.lock`: exit `0`.
 - Removed-route scan across live docs and generated text: no matches.
+- Tier-A T3: `deno doc --filter baseContract packages/contracts/mod.ts` exit `0`; the public root
+  exports the genuine `ReturnType<typeof oc.errors>` builder and documents the
+  `.route().input().output()` chain from `@netscript/contracts`. The fixture-shaped grep hit was
+  isolated to scaffolder-test text.
+- Tier-A T4 frontend scratch fixture: structured check wrapper raw exit `0`, covering the main
+  `definePage()` chain and the `loader: () => undefined` partial configuration.
+- Tier-A T4 backend scratch fixture: structured check wrapper raw exit `0`, covering the public
+  contract builder, `implement`, service clients, workers contract, and job handler. Scratch files
+  remain under `.llm/tmp/` and are not committed.
+- Tier-A T4 consumer-only scratch fixture: structured check wrapper raw exit `0`; importing the
+  contract object into `createServiceClient()` preserves the typed `create(...)` call without a
+  generated artifact.
+- S3R `deno task --cwd docs/site build`: raw exit `0`; docs source format, 638-file render, and
+  rendered-output checks pass.
+- Scratch verification briefly registered its directory as a workspace member so local package
+  catalogs resolved. That registration and the generated lock member were removed immediately;
+  `deno.json`, `deno.lock`, and `docs/site/deno.lock` returned to their committed state.
 
 ## Handoff
 
 - Draft PR remains `status:impl` and is not ready or merged.
 - No evaluator, browser, service, container, scaffold, or E2E lane ran.
-- Owner Tier-A review is the next action.
+- Owner re-review follows S3R and the replacement S4R evidence.
+
+## Reconcile notes
+
+- S3R: issue #1659 remains open and fully owned by draft PR #1660; `Closes #1659`, milestone
+  `0.0.7`, docs/CI labels, and exactly `status:impl` remain correct. The owner Tier-A findings are
+  implemented without changing scope or creating follow-up issues.

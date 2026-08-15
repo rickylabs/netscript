@@ -1,6 +1,6 @@
 # Context pack — comparison pages (#1659)
 
-Status: S1–S4 complete; awaiting owner Tier-A review.
+Status: owner Tier-A findings T1–T4 are implemented; replacement S4R generation is next.
 
 The page argument is fixed: NetScript puts route identity, a shared read, streaming regions,
 freshness, layout, failure boundaries, and metadata at one entry point. The selector changes only
@@ -30,3 +30,10 @@ S4 refreshed the prose bundle, CLI asset barrel, and publish assets in the requi
 freshness checks and every owner-specified docs/git gate now return zero. The only package diffs are
 the generated CLI agent-doc barrel and generated MCP publish corpus. No lockfile changed. The draft
 PR remains in implementation state; no evaluator or ready-for-review transition was launched.
+
+The owner accepted the frontend argument and returned four blocking implementation findings: give
+backend its own estimate close, add a second move proving that consumers import the contract object,
+confirm the real public `baseContract`, and compile both pages' NetScript snippets. Public docs prove
+`baseContract` is the real oRPC builder exported from `@netscript/contracts`; structured scratch
+checks now return zero for both frontend and backend. S3R owns the prose corrections, then S4R
+regenerates every asset and replaces the final gate evidence.

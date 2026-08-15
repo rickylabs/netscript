@@ -20,6 +20,8 @@ is launched.
 | S2 | Add the frontend page, fixed-first code comparison, compact estimate table, and progressive selector. | Docs-site verify plus source inspection. |
 | S3 | Add the backend page using public contracts, typed client, and worker APIs; add equivalent competitor examples. | API inspection plus docs-site verify. |
 | S4 | Run the three generators in order; prove four freshness gates and all owner-specified docs/git gates. | Raw exit codes recorded in the worklog and PR comment. |
+| S3R | Apply owner Tier-A findings: add the backend consumer-contract move and estimate table, confirm `baseContract`, and compile both pages' NetScript snippets. | `deno doc`, structured scratch checks, and docs-site build. |
+| S4R | Refresh all generated layers from the reviewed docs and replace the final freshness/docs/git evidence. | Raw exit codes recorded in the worklog and PR comment. |
 
 ## Constraints
 
@@ -27,4 +29,3 @@ is launched.
 - No framework behavior changes, lockfile changes, sub-issues, external dependencies, browser runs,
   services, or scaffold/E2E runs.
 - Draft PR only; exactly one `status:impl`; stop after S4 for owner Tier-A review.
-

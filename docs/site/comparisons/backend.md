@@ -43,4 +43,28 @@ validated payload to a named worker. There is no transport DTO to reconcile with
   ]
 }) }}
 
+## NetScript turns a contract change into a consumer compile error
+
+The consumer imports the contract object; nothing is generated. Add a required field to
+`CreateReport`, and every stale call becomes a TypeScript error at build time.
+
+```ts
+import { ReportsContractV1 } from '@acme/contracts';
+import { createServiceClient } from '@netscript/sdk/client';
+
+const reports = createServiceClient({ contract: ReportsContractV1, serviceName: 'reports' });
+await reports.create({ accountId, format: 'pdf' });
+```
+
+## NetScript keeps more of a backend change in one typed surface
+
+These are architectural estimates for this generic report endpoint, not benchmark results.
+
+| Architectural estimate | NetScript composition | Convention-split equivalent |
+| --- | ---: | ---: |
+| Request-shape sources to keep aligned | 1 contract object | ~2–4 DTO, schema, and client surfaces |
+| Consumer client after a contract change | Imported directly | Regenerated or hand-updated |
+| Files touched to add one required request field | ~2 | ~3–5 |
+| Architectural surface visible at entry | ~87–93% | ~40–53% |
+
 {{ comp.nextPrev({ prev: { label: "Frontend frameworks", href: "/comparisons/frontend/" }, next: { label: "Comparisons", href: "/comparisons/" } }) }}
