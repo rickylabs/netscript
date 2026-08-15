@@ -73,6 +73,9 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | 2026-08-15T12:49:56+02:00 | S0    | Draft PR           | Pushed only the Phase-1 run artifacts, opened draft PR #1664 with both closing keywords, attached milestone/taxonomy, and posted RESEARCH/PLAN comments.                                     |
 | 2026-08-15T12:58:24+02:00 | S0R   | Tier-A plan repair | Removed the false scaffold-runtime catalog/receipt proposal and specified exact two-service key, live invalidation, and controlled hydration scenarios; no implementation or expensive gate. |
 | 2026-08-15T13:12:59+02:00 | S0E1  | PLAN-EVAL cycle 1  | Evaluator returned `FAIL_PLAN`; direct emit and package README locations ruled; amended six plan-text gaps only, with implementation still stopped.                                          |
+| 2026-08-15T13:29:06+02:00 | S0E2  | PLAN-EVAL cycle 2  | Evaluator returned terminal `PASS`; verified `clientKey()` in published SDK 0.0.6 and released S1 only.                                                                                      |
+| 2026-08-15T13:29:06+02:00 | S1    | Plan amendment     | Bound C1/C2 to S2/S3, chose owned-module generation for `Enabled: false` services, and marked `generate-aspire_test.ts` new (C3).                                                            |
+| 2026-08-15T13:29:06+02:00 | S1    | SDK implementation | Corrected key-shape docs, pointed factory consumers to `clientKey()`, and added fail-capable resource match/mismatch regression tests without changing the SDK type/export surface.          |
 
 ## Decisions
 
@@ -83,7 +86,8 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | Directly emit the `clientKey()` filter            | The overload adds no policy and would couple generated output to SDK 0.0.7. | PLAN-EVAL cycle 1 ruling        |
 | Generator owns only `apps/<app>/lib/<service>.ts` | Separates explicit regeneration from the init-owned route showcase.         | PLAN-EVAL sweep A               |
 | Flags govern both command halves                  | `--dry-run` must mean no writes; force/default semantics stay coherent.     | PLAN-EVAL sweep B               |
-| Stop before implementation                        | User explicitly requested Phase 1 only.                                     | Leaf brief                      |
+| Generate modules for disabled services            | `Enabled` controls runtime registration, not manifest-owned source output.  | PLAN-EVAL cycle 2 C2            |
+| Stop after S1                                     | Implementation release is expressly limited to one bounded slice.           | Coordinator dispatch            |
 
 ## Drift
 
@@ -98,18 +102,22 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 
 ### Static Gates
 
-| Gate           | Command or check                             | Result  | Notes                                     |
-| -------------- | -------------------------------------------- | ------- | ----------------------------------------- |
-| Identity       | Direct git/POSIX read-only checks            | PASS    | Required base and clean start confirmed.  |
-| Product checks | Not run                                      | NOT_RUN | Phase 1 stop; no product code exists.     |
-| JSR audits     | Baseline manifest/export/pin inspection only | NOT_RUN | Full audits planned after implementation. |
+| Gate                    | Command or check                                                                                 | Result        | Notes                                                                                       |
+| ----------------------- | ------------------------------------------------------------------------------------------------ | ------------- | ------------------------------------------------------------------------------------------- |
+| Identity                | Direct git/POSIX read-only checks                                                                | PASS          | Required base and clean start confirmed.                                                    |
+| Focused check           | `.llm/tools/run-deno-check.ts` on both S1 SDK files                                              | PASS          | Two selected files; zero diagnostics.                                                       |
+| Focused test            | `.llm/tools/run-deno-test.ts` on `key-bridge_test.ts`                                            | PASS          | Two tests passed; match and mismatched-resource behavior exercised.                         |
+| Changed-module doc lint | `deno task doc:lint --root packages/sdk --entrypoints ./src/query-client/key-bridge.ts --pretty` | PASS          | Zero documentation errors.                                                                  |
+| SDK export-map doc lint | `deno task doc:lint --root packages/sdk --export-map --pretty`                                   | BASELINE_FAIL | Three pre-existing private-type-reference diagnostics outside S1; no missing-JSDoc finding. |
+| Quality gate            | `deno task quality:gate`                                                                         | PASS          | Quality scan clean; architecture check passed with baseline warnings.                       |
+| JSR audits              | Baseline manifest/export/pin inspection only                                                     | NOT_RUN       | Full audits planned after implementation.                                                   |
 
 ### Fitness Gates
 
-| Gate      | Result            | Evidence                              | Notes                                             |
-| --------- | ----------------- | ------------------------------------- | ------------------------------------------------- |
-| Plan gate | FAIL_PLAN cycle 1 | `plan-eval.md`; amended research/plan | Cycle 2 requires a separate coordinator dispatch. |
-| F-5/F-6   | PENDING_SCRIPT    | JSR section in research/plan          | Three publishable members applicable.             |
+| Gate      | Result         | Evidence                           | Notes                                 |
+| --------- | -------------- | ---------------------------------- | ------------------------------------- |
+| Plan gate | PASS cycle 2   | `plan-eval.md` through `c53726c69` | Terminal plan verdict; S1 released.   |
+| F-5/F-6   | PENDING_SCRIPT | JSR section in research/plan       | Three publishable members applicable. |
 
 ### Runtime Gates
 
@@ -127,9 +135,13 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 
 ## Handoff Notes
 
-- Cycle 1 ruled direct generated `clientKey()` invalidation and package README locations; do not
-  reopen those forks during implementation.
-- Cycle 2 should verify owned paths, whole-command flag compatibility, per-slice file lists, and the
-  count-plus-one invalidation assertion before any implementation begins.
-- No implementation, expensive gate, issue mutation, ready transition, or central-state mutation has
-  occurred in S0.
+- S1 changes documentation and semantic regression coverage only; the SDK exports, callable
+  signatures, and public types are unchanged.
+- The two product tests are
+  `bridgeInvalidation matches a query-factory key when resource and action
+  match` and
+  `bridgeInvalidation does not match a query-factory key when resource differs`.
+- Post-slice reconciliation found both issue closures, the terminal cycle-2 verdict, and the ruled
+  design intact. C1-C3 are recorded in `plan.md`; no rescope or additional issue is needed.
+- No expensive gate, lease, ready transition, lockfile change, docs change, evaluator launch, or S2
+  work occurred in S1.

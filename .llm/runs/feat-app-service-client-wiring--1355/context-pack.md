@@ -6,20 +6,18 @@
 | -------------- | ---------------------------------------------------- |
 | Run ID         | `feat-app-service-client-wiring--1355`               |
 | Branch         | `feat/app-service-client-wiring`                     |
-| Current phase  | `plan`                                               |
+| Current phase  | `impl`                                               |
 | Archetype      | `2 — Integration` (SDK seam; CLI 6/Fresh 4 retained) |
 | Scope overlays | `frontend`                                           |
 
 ## Current State
 
-Phase-1 research and planning are complete at baseline `3fc0f2f92`. The old fixed export names have
-already been repaired and moved, but the literal `service` key, dead invalidation, missing
-all-service generator, and both cache-age omissions remain. PLAN-EVAL is proposed required. No
-product implementation or expensive gate has run. Draft PR #1664 is open with both closing keywords,
-milestone `0.0.7`, the required taxonomy, acceptance mappings, and structured RESEARCH and PLAN
-comments. PLAN-EVAL cycle 1 returned `FAIL_PLAN` at `7f20a34fe`, ruling direct `clientKey()`
-emission and package README locations while identifying six plan-text gaps. Those gaps are amended
-without product changes; a separately dispatched cycle 2 remains the hard stop.
+PLAN-EVAL cycle 2 is terminal `PASS` at plan head `f7225be98`; verdict commit `c53726c69` released
+S1 only. S1 corrects the SDK bridge documentation and adds resource match/mismatch semantic tests
+without changing exports, types, or callable signatures. C1-C3 are bound into the later owning
+slices, including the exact SDK-0.0.6 import allowlist, pre-write contract failure, disabled-service
+generation policy, and new Aspire test marker. Draft PR #1664 retains both closing keywords and
+remains draft. No expensive gate has run.
 
 ## Completed
 
@@ -35,17 +33,20 @@ without product changes; a separately dispatched cycle 2 remains the hard stop.
   whole-command flag rulings.
 - Amended research, design, slices, compatibility, and exact scenarios without editing
   `packages/**`.
+- Received terminal PLAN-EVAL `PASS`, then implemented only S1.
+- Corrected the stale server/query-factory key shapes and documented `clientKey()` as the
+  factory-consistent path.
+- Added and passed two fail-capable `bridgeInvalidation` semantic tests; focused check,
+  changed-module doc lint, and `quality:gate` also pass.
 
 ## In Progress
 
-- Stopped before implementation; the cycle-1 repair awaits coordinator verification and a separate
-  PLAN-EVAL cycle-2 dispatch.
+- S1 is complete and stopped at its Tier-A boundary.
 
 ## Next Steps
 
-1. Topic orchestrator verifies the repaired plan head.
-2. Coordinator separately grants and launches PLAN-EVAL cycle 2.
-3. Only after cycle-2 PASS, begin S1 at a bounded Tier-A stop.
+1. Await a separate coordinator dispatch for S2.
+2. Keep both expensive gates lease-blocked until cheap convergence and explicit release.
 
 ## Key Decisions
 
@@ -56,31 +57,33 @@ without product changes; a separately dispatched cycle 2 remains the hard stop.
 | Both expensive gates are lease-blocked              | Leaf brief / plan      | Run only after cheap gates are green and coordinator releases. |
 | Direct `clientKey()` filter; no SDK overload        | PLAN-EVAL cycle 1      | Preserves SDK 0.0.6 compatibility and satisfies A6.            |
 | Client generator owns `apps/<app>/lib/<service>.ts` | PLAN-EVAL cycle 1      | Init-owned showcase remains separate but shares the template.  |
+| Disabled services receive owned modules             | PLAN-EVAL cycle 2 C2   | `Enabled` affects runtime registration, not source generation. |
 
 ## Files Changed
 
-| Path                                                             | Status | Notes                                     |
-| ---------------------------------------------------------------- | ------ | ----------------------------------------- |
-| `.llm/runs/feat-app-service-client-wiring--1355/supervisor.md`   | New    | Session identity and routes.              |
-| `.llm/runs/feat-app-service-client-wiring--1355/research.md`     | New    | Re-baselined findings and determinations. |
-| `.llm/runs/feat-app-service-client-wiring--1355/plan.md`         | New    | Contract-first slice and gate plan.       |
-| `.llm/runs/feat-app-service-client-wiring--1355/worklog.md`      | New    | Design ledger and Phase-1 record.         |
-| `.llm/runs/feat-app-service-client-wiring--1355/context-pack.md` | New    | Resumption state.                         |
-| `.llm/runs/feat-app-service-client-wiring--1355/drift.md`        | New    | Append-only rebaseline/reference drift.   |
+| Path                                                             | Status   | Notes                                     |
+| ---------------------------------------------------------------- | -------- | ----------------------------------------- |
+| `.llm/runs/feat-app-service-client-wiring--1355/supervisor.md`   | New      | Session identity and routes.              |
+| `.llm/runs/feat-app-service-client-wiring--1355/research.md`     | New      | Re-baselined findings and determinations. |
+| `.llm/runs/feat-app-service-client-wiring--1355/plan.md`         | New      | Contract-first slice and gate plan.       |
+| `.llm/runs/feat-app-service-client-wiring--1355/worklog.md`      | New      | Design ledger and Phase-1 record.         |
+| `.llm/runs/feat-app-service-client-wiring--1355/context-pack.md` | New      | Resumption state.                         |
+| `.llm/runs/feat-app-service-client-wiring--1355/drift.md`        | New      | Append-only rebaseline/reference drift.   |
+| `packages/sdk/src/query-client/key-bridge.ts`                    | Modified | Accurate key-shape docs and factory path. |
+| `packages/sdk/src/query-client/key-bridge_test.ts`               | New      | Match/mismatch semantic regressions.      |
 
 ## Gates
 
-| Gate family | Current status                                       | Evidence                           |
-| ----------- | ---------------------------------------------------- | ---------------------------------- |
-| Static      | Identity PASS; product gates NOT_RUN                 | `worklog.md`                       |
-| Fitness     | Cycle 1 `FAIL_PLAN`; amended; cycle 2 not dispatched | `plan-eval.md`, repaired artifacts |
-| Runtime     | NOT_RUN / lease-blocked                              | `plan.md` release conditions       |
-| Consumer    | NOT_RUN / implementation-dependent                   | `plan.md` S5                       |
+| Gate family | Current status                                                                                                                    | Evidence                     |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| Static      | Focused check/test/doc lint and quality gate PASS; full export-map doc lint has three unrelated baseline private-type diagnostics | `worklog.md`                 |
+| Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
+| Runtime     | NOT_RUN / lease-blocked                                                                                                           | `plan.md` release conditions |
+| Consumer    | NOT_RUN / implementation-dependent                                                                                                | `plan.md` S5                 |
 
 ## Open Questions
 
-- None for the implementation author; cycle 2 verifies completeness rather than reopening ruled
-  forks.
+- None for S1. S2 requires a separate implementation dispatch.
 
 ## Drift and Debt
 
