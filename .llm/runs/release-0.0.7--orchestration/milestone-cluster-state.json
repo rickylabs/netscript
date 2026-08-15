@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
-  "currentMainSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
+  "currentMainSha": "3e8e146a4aedf8ee0afec15c83ddaefc171c71f9",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -385,7 +385,7 @@
     },
     {
       "number": 1598,
-      "state": "open"
+      "state": "closed"
     },
     {
       "number": 1601,
@@ -421,11 +421,11 @@
     },
     {
       "number": 1619,
-      "state": "open"
+      "state": "closed"
     },
     {
       "number": 1620,
-      "state": "open"
+      "state": "closed"
     },
     {
       "number": 1621,
@@ -437,11 +437,11 @@
     },
     {
       "number": 1623,
-      "state": "open"
+      "state": "closed"
     },
     {
       "number": 1637,
-      "state": "open"
+      "state": "closed"
     }
   ],
   "leaves": [
@@ -1128,7 +1128,7 @@
     {
       "id": "sdk-cache-surface-and-telemetry",
       "lane": "fixes",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
       "currentPrHeadSha": "ac274a46489b9ab746e5be22ca71300ed94eaadb",
@@ -1138,7 +1138,7 @@
       "branch": "fix/sdk-cache-surface-and-telemetry",
       "worktree": "/home/codex/repos/netscript-007-leaf-sdk-cache",
       "prNumber": 1665,
-      "implementationState": "four_link_generated_asset_closure_complete_fresh_tier_a_and_final_chain_delta_eval_pass_exact_head_readiness_ci_active",
+      "implementationState": "merged_after_all_product_and_generated_asset_evaluations_passed",
       "dispatchTopicHeadSha": "7a81326a6",
       "planGate": "research and contract decisions only; open one draft PR and stop before implementation; PLAN-EVAL is required",
       "declaredSurface": [
@@ -1216,7 +1216,11 @@
       "implementationEvaluatorCommitSha": "0fed4d7ffb8c655a00846fbf545805bd2e184fb0",
       "implementationEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1665#issuecomment-5302881354",
       "implementationEvaluationScope": "artifact-only impl-eval.md; evaluated product tree remains immutable at 9a26c107a",
-      "readinessState": "final_delta_eval_pass_exact_head_readiness_check_test_active_all_other_checks_terminal_green_or_intentionally_skipped",
+      "readinessState": "complete",
+      "readinessDisposition": "exact-head checks terminal green or intentionally skipped, review threads empty, sole lifecycle status advanced to ready-merge, and coordinator squash merge complete",
+      "mergeCommitSha": "3e8e146a4aedf8ee0afec15c83ddaefc171c71f9",
+      "mergedAt": "2026-08-15T16:29:46.000Z",
+      "issueCompletionState": "PR #1665 shipped; issues #1598, #1619, #1620, #1623, and #1637 closed automatically from verified closing keywords",
       "readinessRunId": 31892668157,
       "readinessFailureJobId": 95031217843,
       "readinessFailure": "quality failed at Agent docs corpus freshness because the authorized docs/site/web-layer/query-bridge.md edit feeds the checked-in agent-docs bundle; prose.json.gz and provenance.json are stale",
@@ -1345,7 +1349,7 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
-      "currentPrHeadSha": "6e822a74b4de527a23da46f1c9c2f6ba6c94c72f",
+      "currentPrHeadSha": "3278cca346d7a9ce10ab78089af9ba45282cef20",
       "issueNumbers": [1355, 1360],
       "implementerAgentId": "01a004f9-f033-7592-a0bc-63927753fb43",
       "implementerRoute": "openai / gpt-5.6-sol / high / approval never / dangerFullAccess",
@@ -1460,6 +1464,7 @@
           "f3InputIsolationFinding": "cheap generated-project replay proved that importing the parent orchestration probe drags monorepo import-map dependencies into the generated app; a dependency-free internal input primitive was added to scope and pushed before that new file is created",
           "f3ProductHeadSha": "6e822a74b4de527a23da46f1c9c2f6ba6c94c72f",
           "f3ProductProof": "dependency-free service-client input derivation from each generated contract, canonical DB codegen before the contract gate, 29 focused tests, five-file structured check/fmt/lint, quality scan, and preserved generated-project cheap replay all passed before receipt generation",
+          "f3FirstCheckReceiptArtifactHeadSha": "3278cca346d7a9ce10ab78089af9ba45282cef20",
           "f3FirstCheckReceipt": ".llm/runs/feat-app-service-client-wiring--1355/receipts/s4-f3-check.json",
           "f3FirstCheckReceiptState": "FAIL_PRESERVED_EXIT_1",
           "f3FirstCheckReceiptFinding": "root structured check failed at unchanged packages/cli/src/kernel/diagnostics/verify-producer-reconnect.ts:268 with TS2322 Type Timeout is not assignable to type number",
@@ -2329,5 +2334,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T16:27:03.000Z"
+  "updatedAt": "2026-08-15T16:31:00.000Z"
 }

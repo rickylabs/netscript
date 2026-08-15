@@ -856,3 +856,20 @@
   same author is running isolated before/after attribution; no retry, lease, runtime gate, or
   evaluator is permitted until that evidence is terminal and any leaf-caused repair is scoped and
   pushed before mutation.
+
+## 2026-08-15T16:31:00Z — #1665 ships; #1664 preserves its failed binding evidence
+
+- #1665's final `check-test` completed successfully at `ac274a464`; every exact-head check was then
+  terminal green or intentionally skipped, `review_threads` remained empty, the PR head and closing
+  keywords were unchanged, and exactly one lifecycle label was advanced from `status:impl-eval` to
+  `status:ready-merge`. The coordinator squash-merged PR #1665 as
+  `3e8e146a4aedf8ee0afec15c83ddaefc171c71f9` at 16:29:46Z. Issues #1598, #1619, #1620, #1623,
+  and #1637 all closed automatically. The fixes supervisor is reconciling the terminal lifecycle and
+  may advance only its next dependency-ready queued leaf through the normal serial gates.
+- #1664 committed and pushed the original immutable-head failed receipt and attribution report as
+  artifact-only `3278cca34`. The pre-F3 `c53726c69` archive ran the same root check over 2,924 files
+  with zero diagnostics, whereas F3 selected 2,937 files and failed the unchanged reconnect timer
+  assignment. The supervisor therefore rejected a carried-baseline classification and instructed
+  the same original author to restore a non-Node path boundary, prove the victim and repaired probe
+  in one batch, preserve the failed receipt, and use distinct replacement receipts. No runtime or
+  evaluator work is active.

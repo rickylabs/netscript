@@ -490,3 +490,14 @@ receipt is preserved `FAIL` with TS2322 `Timeout` versus `number` in unchanged
 Sol/high author is proving before/after whether F3's `node:path` import contaminated the shared Deno
 timer typings; if leaf-caused, a bounded amendment must be committed and pushed before repair and a
 new receipt must use a distinct path. #1663 remains the only owner-only decision boundary.
+
+Resume from the authoritative `2026-08-15T16:31:00Z` transition. Main is now
+`3e8e146a4aedf8ee0afec15c83ddaefc171c71f9`: #1665 passed its last exact-head check, had zero review
+threads, advanced to sole `status:ready-merge`, and squash-merged; all five linked issues closed.
+The fixes supervisor is recording closure and may start only its next dependency-ready serial leaf.
+#1664's failed check receipt and report are preserved/pushed at artifact head `3278cca34`; its
+pre-F3 archive root check passed, so the new TS2322 is not a carried baseline. The same original
+Sol/high author is bounded to remove the F3 Node path/type pollution, after an immutable amendment,
+then prove the victim+probe in one batch before distinct replacement receipts and fresh Tier-A. No
+lease, Aspire, Docker, browser, runtime gate, or evaluator is authorized. #1663 remains the only
+owner-only decision boundary.

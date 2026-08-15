@@ -614,3 +614,19 @@ and preserved every named pre-existing red. #1664's first F3 binding receipt ins
 in the unchanged reconnect diagnostic. That does not establish non-causality: F3 replaced
 `@std/path` with `node:path` in the shared check batch, while the prior exact-head receipt passed.
 The original author is executing a before/after archive proof. Runtime ownership remains empty.
+
+### Live transition — 2026-08-15T16:31:00Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Queue exhausted and parked at `0ca4c489f` | Do not invent post-freeze work |
+| internals | #1663 remains at the exceptional-final-PLAN-EVAL owner boundary on `194e22a3d` | No third evaluator or product mutation without the owner's explicit verdict |
+| fixes | #1665 merged as `3e8e146a4`; topic supervisor reconciling closure then advancing its documented serial queue | Only one next dependency-ready leaf; preserve normal research/plan and evaluator gates |
+| features | #1664 preserved the failed binding receipt at pushed artifact head `3278cca34`; same-author repair evidence is active | Amendment-before-mutation, distinct replacement receipts, fresh Tier-A, then a new lease request only after clean audit |
+
+#1665 exact-head `check-test` completed successfully, leaving no pending or failing check and no
+review thread. The coordinator applied the sole `status:ready-merge` label and squash-merged the PR;
+all five closing-keyword issues closed automatically. #1664's isolated pre-F3 archive check passed,
+so the new shared-batch TS2322 cannot be classified as carried baseline. The features supervisor has
+bounded the likely repair to removing Node path/type pollution while preserving every F3 contract.
+Runtime ownership remains empty.
