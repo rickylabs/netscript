@@ -977,3 +977,11 @@ and returned zero findings. One separate native Fable 5/medium Remote Control cy
 active as job `dc433b8d`, bridge `cse_016v2se871QD9Q9Rd6YADAKC`, URL
 `https://claude.ai/code/session_016v2se871QD9Q9Rd6YADAKC`; argv and bidirectional bridge state are
 proven. No readiness or merge before its terminal verdict.
+
+At 21:42Z, #1671 S4 stopped honestly at evidence `db8aadd95` / comment `5304357008`. S3
+`c7cba6d9b` had already passed fresh fixes Tier-A at `580bd8ec0`. The S4 green set is preserved and
+surface-diff attributes only the approved +15 signature delta, but raw doc-lint adds leaf-owned
+private references (Contracts 9→11, SDK 3→13); later JSR/specifier/export gates are `NOT_RUN`.
+Coordinator authorizes same-author plan-only S4-R within exactly `contract-primitives.ts`,
+`errors.ts`, and `service-client.ts`, then fresh fixes Tier-A before product repair. No suppression,
+metadata, public barrel, seventh path, evaluator, or readiness action.

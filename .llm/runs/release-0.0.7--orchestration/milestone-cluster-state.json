@@ -1606,14 +1606,14 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb",
-      "currentPrHeadSha": "ca7ade409be0cc0c064e75f5bfa1bd109e06d013",
+      "currentPrHeadSha": "db8aadd9542c38a305efffbd7017c56d0abf4e01",
       "issueNumbers": [1350],
       "implementerAgentId": "01a006f3-ae2d-7941-bd17-2ac71dd3d0f0",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/sdk-typed-error-channel",
       "worktree": "/home/codex/repos/netscript-007-leaf-typed-error",
       "prNumber": 1671,
-      "implementationState": "slice_2_tier_a_pass_same_original_author_slice_3_active",
+      "implementationState": "slice_4_stopped_on_leaf_owned_doc_lint_red_repair_plan_authorized",
       "initialPlanHeadSha": "c7a6f3d32009cfe9344ab8ed613f1c54c205b07f",
       "initialPlanCommentUrl": "https://github.com/rickylabs/netscript/pull/1671#issuecomment-5303978621",
       "scopeOwnershipRuling": "approve packages/sdk/src/ports/service-client.ts as sixth path; deny packages/contracts/src/public/mod.ts and every NetScriptProcedureMeta definition/export; preserve the fourth generic as Record<never, never>; seventh path requires rescope",
@@ -1664,15 +1664,28 @@
           "validation": "fresh Tier-A verified all suppressions absent, exact six-code and code-specific-data assertions genuine, S1 RED wording preserved, 105-file check zero diagnostics, doctest 3/0, Contracts plus SDK 78/0, lint and format clean"
         },
         "s3": {
-          "state": "active_same_original_author",
+          "state": "complete_tier_a_pass",
+          "headSha": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+          "topicCheckpointSha": "580bd8ec0",
+          "commentUrl": "https://github.com/rickylabs/netscript/pull/1671#issuecomment-5304248240",
           "authorizedPaths": [
             "docs/site/services-sdk/sdk.md",
             "docs/site/services-sdk/how-to/discover-services.md"
           ],
-          "constraints": "one compile-accurate defined/non-defined failure narrative using delivered public API; schema-derived code-specific data; no product/test change, metadata claim, seventh path, or final S4 gates"
+          "constraints": "one compile-accurate defined/non-defined failure narrative using delivered public API; schema-derived code-specific data; no product/test change, metadata claim, seventh path, or final S4 gates",
+          "validation": "both pages name all six authoritative literals, branch literally on isSuccess and isDefined, terminate non-defined failures, show schema-derived code-specific data, and preserve compile/doctest/docs gates with lock and package bytes unchanged"
+        },
+        "s4": {
+          "state": "stopped_leaf_owned_doc_lint_red_evidence_pushed",
+          "evidenceHeadSha": "db8aadd9542c38a305efffbd7017c56d0abf4e01",
+          "commentUrl": "https://github.com/rickylabs/netscript/pull/1671#issuecomment-5304357008",
+          "greenSet": "uncached root check 2925 files; root test 4207/0/19; scoped lint/fmt 105 files; quality, architecture, docs source-format/accuracy, workspace publish and raw package publish all pass",
+          "surfaceDisposition": "raw surface:diff remains red; exact approved +15 signature delta only, no new exports/removals, and normalized base/head remainder both 972 with identical SHA-256 55744a8522197fbb450349ca7185631188c97add132c356e173259875ae9406c",
+          "blockingFinding": "raw doc-lint adds leaf-owned private-type references: Contracts 9 to 11 after three additions and one obsolete removal; SDK 3 to 13 with ten additions; JSR/specifier/export guards honestly NOT_RUN",
+          "repairPlanContract": "plan-only amendment first on same original Sol/medium author; correction ceiling is the already-authorized contract-primitives.ts, errors.ts, and service-client.ts plus existing run artifacts; no suppression, metadata, public/mod.ts, seventh path, test/docs/lock mutation, runtime, or evaluator"
         }
       },
-      "nextGate": "fresh fixes Tier-A after S3; no slice 4 before PASS",
+      "nextGate": "same-author S4-R plan-only amendment, fresh fixes Tier-A, then focused three-path product repair and completion of stopped gates",
       "expensiveGateContract": "no runtime lease; no Aspire, Docker, e2e:cli, browser, or runtime gate during plan evaluation",
       "receiptRefs": []
     },
@@ -3292,5 +3305,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T21:36:48.000Z"
+  "updatedAt": "2026-08-15T21:42:53.000Z"
 }

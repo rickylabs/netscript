@@ -781,3 +781,11 @@ implementation thread.
   saw `ok:true` in repository mode while the payload listed only package/plugin roots. Reading mode
   and selected paths exposed the false green; only the corrected non-empty `changed-files` selection
   over both `.llm/tools` files counts as repair evidence.
+- **Pinned baseline-red counts still require base/head identity attribution:** #1671 correctly kept
+  raw doc-lint red, then proved its counts changed from Contracts 9→11 and SDK 3→13. A known-red gate
+  is not permission to absorb new leaf-owned findings; stop the matrix, preserve later gates as
+  NOT_RUN, and repair only after a bounded amendment and fresh review.
+- **Supervisor verification must not write into an author-owned leaf:** the #1664 features Tier-A
+  audit regenerated the leaf leak report after the author commit. Its host result remains valid in
+  central state, but the bytes are supervisor-caused contamination and must be restored from the
+  author head before F8; future supervisor audits use supervisor-owned paths.

@@ -1477,3 +1477,16 @@
   `dc433b8d`, bridge `cse_016v2se871QD9Q9Rd6YADAKC`, URL
   `https://claude.ai/code/session_016v2se871QD9Q9Rd6YADAKC`. State proves
   `bridgeOutboundOnly:false` and exact remote-control/model/effort flags. Readiness remains held.
+
+## 2026-08-15T21:42:53Z — #1671 S4 stops on new private-type doc-lint reds
+
+- S3 docs head `c7cba6d9b` passed fresh fixes Tier-A at `580bd8ec0`; both pages contain all six
+  literals, explicit success/defined branching, terminal non-defined handling, and schema-derived
+  code-specific data. S4 then ran from that immutable content head.
+- S4 evidence `db8aadd95`, comment `5304357008`, preserves green uncached root check/test, scoped
+  lint/fmt, quality, architecture, docs, and publish gates. Raw surface-diff stays red but attributes
+  exactly the authorized +15 signature delta; the normalized 972-entry remainder is byte-identical.
+- Raw doc-lint is a real new leaf red: Contracts 9→11 and SDK 3→13 private-type references.
+  Remaining JSR/specifier/export gates are honestly `NOT_RUN`. No product was changed during S4.
+  Coordinator authorizes a plan-only repair amendment on the same author, limited to the three
+  already-owned product paths; fresh fixes Tier-A precedes any repair mutation.

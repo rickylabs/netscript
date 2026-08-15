@@ -816,3 +816,10 @@ changed-files mode selected both repaired paths with zero findings. Fresh cycle-
 Remote Control evaluator `dc433b8d` is active at bridge `cse_016v2se871QD9Q9Rd6YADAKC` / URL
 `https://claude.ai/code/session_016v2se871QD9Q9Rd6YADAKC`; transport flags and bidirectional bridge
 are proven. Readiness remains held. #1664 F8 attribution and #1671 S4 continue independently.
+
+Newer transition `2026-08-15T21:42:53Z`: #1671 S3 `c7cba6d9b` passed fixes Tier-A at `580bd8ec0`.
+S4 evidence `db8aadd95` / comment `5304357008` preserves its green matrix and exact authorized +15
+surface attribution but stops on real private-type doc-lint deltas: Contracts 9→11, SDK 3→13; later
+JSR/specifier/export guards are `NOT_RUN`. Coordinator authorizes a plan-only S4-R amendment on the
+same author within only `contract-primitives.ts`, `errors.ts`, `service-client.ts`, and existing run
+artifacts, followed by fresh fixes Tier-A before product repair. #1666 cycle 5 and #1664 F8 continue.
