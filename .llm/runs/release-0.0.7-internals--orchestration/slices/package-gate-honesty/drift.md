@@ -120,3 +120,55 @@ documentation.
   PLAN-EVAL cycle 2 `PASS`; no thirteenth path exists.
 - **Evidence:** Final green matrix, four individually named healthy selection probes, semantic
   equality, and byte-restoration evidence in `worklog.md`.
+
+## 2026-08-15 — Cycle-2 evaluation exposed a published consumer asset
+
+- **What:** The twelve-path plan treated `.llm/tools/run-deno-lint.ts` as maintainer-only, but the
+  canonical CLI asset generator embeds it verbatim in published
+  `packages/cli/src/kernel/assets/agent-tools.generated.ts`.
+- **Source:** Separate-session PLAN-EVAL cycle 2 at evaluator commit `c415daad2`, independently
+  confirmed by the coordinator.
+- **Expected:** The plan claimed no CLI publish delta and omitted generated-asset freshness.
+- **Actual:** The planned lint-wrapper edit changes installed consumer behavior, embedded tool text,
+  and `EMBEDDED_AGENT_TOOL_BUNDLE_HASH`; `check:assets-barrel` would fail unless the generated
+  barrel changes too.
+- **Severity:** significant plan correction
+- **Action:** accept coordinator grant of exactly the generated barrel as path thirteen;
+  regeneration must use `deno task gen:assets-barrel`, never a hand edit. Add the freshness gate and
+  disclose the consumer/JSR delta. No fourteenth path exists.
+- **Evidence:** Full archive-copy generator proof in `plan-eval.md` §7; research R16 and repaired
+  plan L7/S1/JSR/gate rows.
+
+## 2026-08-15 — Fixture-format explanation and root exclusions corrected
+
+- **What:** The earlier drift entry called `healthy/netscript.config.ts` "simply unformatted" and
+  treated root exclusion as only non-load-bearing protection. The root task also retained a
+  wrapper-level parent-family skip.
+- **Source:** PLAN-EVAL cycle 2 advisories A1/A2 and the coordinator's binding rulings.
+- **Expected:** The honest gate should apply the fixture's own config without allowing either a raw
+  root walk or a task-level selection filter to undo coverage.
+- **Actual:** The original bytes are valid under root style (`singleQuote: true`, width 100) but
+  invalid under the authoritative fixture-local config's defaults (double quotes, width 80). The
+  top-level root `exclude` is load-bearing for raw formatter walks because it prevents reversion to
+  root style, while it remains non-load-bearing for the standalone explicit-argv acceptance command.
+  Conversely, the `fmt:check` task's wrapper `--exclude` silently drops the whole doctor family and
+  must be removed.
+- **Severity:** significant plan clarification
+- **Action:** preserve the historical wording above as append-only drift, supersede it here, update
+  R14/L3/L10/worklog, retain only the top-level raw-walk boundary, and plan memoized `nearestConfig`
+  resolution per directory before root-scale execution.
+- **Evidence:** `plan-eval.md` §2/§5 and advisories A1/A2/A4; repaired `plan.md` L3/L10/L11 and gate
+  row 3.
+
+## 2026-08-15 — Ordinary PLAN-EVAL allowance exhausted; owner escalation owns disposition
+
+- **What:** Cycle 2 returned `FAIL_PLAN`; the harness allows only two `FAIL_PLAN` cycles before
+  escalation.
+- **Source:** `plan-eval.md` at `c415daad2`; coordinator repair brief.
+- **Expected:** No implementation begins without a disposed plan gate.
+- **Actual:** The coordinator resolved every finding and granted the exact thirteenth path, but no
+  cycle 3 exists absent owner escalation.
+- **Severity:** process gate
+- **Action:** repair and publish run artifacts only, then stop for Tier-A/owner review. Do not
+  request or assume another evaluator run and do not implement.
+- **Evidence:** Repaired thirteen-path plan and this commit's worklog/context pack.
