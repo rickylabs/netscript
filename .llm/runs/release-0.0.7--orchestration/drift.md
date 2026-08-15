@@ -175,3 +175,18 @@ implementation thread.
 - **Features / unchanged owner contract:** surfacing the #1651 option 1/2/3 decision did not grant
   authority. The PR, RFC, comments, labels, readiness, and merge state remain untouched until the
   owner's explicit verdict.
+
+## 2026-08-15T06:24:17Z — terminal docs gate and accepted fixes contract amendment
+
+- **Docs / no evaluator loop:** cycle-2 `PASS` found only merge-readiness hygiene. The incorrect
+  digest appears in the PR body and run journals, not canonical published docs/comments; replace it
+  with directly reproducible byte-identity evidence alongside N2/N3, use topic Tier-A, and do not
+  spend a third formal evaluation cycle.
+- **Fixes / significant contract amendment:** #1657's frozen four-file contract omitted the CI
+  trigger surfaces required to make its drift gate durable. T-3 proved a CLI catalog-template-only
+  diff could recreate the exact bug without running Fresh UI CI. The coordinator amended scope by
+  exactly `.github/workflows/fresh-ui-quality.yml`, `.github/scripts/ci-classify-changes.ts`, and
+  its test; weakening #1358, dropping its closing keyword, or deferring the known hole was rejected.
+- **Internals / evidence denominator:** #1656 S3 must describe the applicable JSR audit as an empty
+  publishable-member denominator with a rescope tripwire, not claim a vacuous publishability pass.
+  This is final evidence truthfulness inside the approved run-artifact-only slice, not new scope.

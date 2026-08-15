@@ -195,3 +195,20 @@
   Opus 5/medium Remote Control session `4ed649d5-9d62-4e24-a50a-081477607cee`. No competing docs
   author or evaluator exists. #1651 remains draft and unchanged pending the owner's explicit
   option 1/2/3 verdict; the hold does not block the other topic queues.
+
+## 2026-08-15T06:24:17Z — docs evaluation passes; final internals slice and fixes CI repair active
+
+- #1652's fresh cycle-2 IMPL-EVAL returned `PASS` at evaluator commit `71cc5a02c`. The evaluator
+  independently closed F1–F5 and ran the proportional docs/tool gates. Three non-blocking
+  merge-readiness journal defects remain: a normalized digest that does not reproduce despite
+  byte-identical regeneration, stale plan status, and two understatements. The original Codex
+  author owns one bounded cleanup followed by topic Tier-A; there is no cycle 3.
+- #1656 S2 passed topic Tier-A at implementation head `a7e9ee0d5` and sign-off head `4ae309d57`.
+  The 29→0 coverage transition, unchanged 37/37/35 census, real changed-file argument forwarding,
+  structured negative fixture, permissions, budget, and scope were re-executed. The preserved
+  author is now running final run-artifact-only S3; no formal evaluator is authorized yet.
+- #1657 Tier-A requested changes at review head `5fe600235`: CLI-only design-template edits did not
+  trigger the Fresh UI drift workflow or classifier, leaving #1358's close-gated durability claim
+  false. The coordinator chose the quality-preserving contract amendment, recorded at `c5e06661b`,
+  adding only the workflow, classifier, and classifier test. The original author owns this cheap CI
+  repair; the browser gate is not rerun and the runtime mutex remains free.

@@ -125,3 +125,13 @@ terminal PASS with evidence head `c792327c9`; Aspire, Docker containers, volumes
 survivors are empty, and fixes Tier-A is running. #1651 remains an unchanged draft awaiting owner
 choice 1 keep-and-narrow, 2 remove/defer C6, or 3 close as duplicate. Only the shared runtime mutex
 is cluster-wide; all evaluator and implementation serialization remains per topic.
+
+Resume from the authoritative `2026-08-15T06:24:17Z` checkpoint. Docs #1652 formal cycle 2 is
+terminal `PASS` at `71cc5a02c`; the preserved Codex author is correcting only evaluator N1–N3,
+then the docs supervisor performs one topic Tier-A and stops. Never launch cycle 3. Internals #1656
+S2 is signed off at `4ae309d57`; final S3 is run-artifact-only and active on the preserved author
+thread, after which coordinator may grant one fresh IMPL-EVAL. Fixes #1657 Tier-A found T-3 at
+`5fe600235`: CLI design-template-only changes bypassed the Fresh UI drift CI. The coordinator
+amended the contract at `c5e06661b` with exactly the Fresh UI workflow, classifier, and classifier
+test; repair/re-review is active, without another browser/Aspire/Docker pass. #1651 is unchanged
+and draft pending explicit owner option 1/2/3. Runtime mutex is free; serialization is per topic.

@@ -274,3 +274,16 @@ runtime mutex is held only by #1657 until its browser receipt and cleanup are te
 The singleton expensive-gate mutex is free: Aspire is empty, Docker has no containers or volumes,
 and the browser gate left no Chromium/Playwright survivors. Topic serialization remains local to
 each orchestrator; these three active gates run concurrently without cross-topic waiting.
+
+### Active completion checkpoint — 2026-08-15T06:24:17Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | #1652 IMPL-EVAL cycle 2 `PASS`; original author fixes only N1–N3, then topic Tier-A | No formal cycle 3, canonical-comment edit, ready flip, merge, or next docs leaf |
+| internals | #1656 S2 Tier-A `PASS`; final run-artifact-only S3 active | No product-path change or formal IMPL-EVAL before S3 topic sign-off |
+| fixes | #1657 T-3 contract amendment recorded; original author repairs workflow/classifier/test | Exactly three new CI files; no browser rerun, Aspire, Docker, formal IMPL-EVAL, or next fixes leaf |
+| features | #1651 remains draft and owner-blocked on explicit option 1/2/3 | Do not amend, reply, resolve, ready, or merge before the verdict |
+
+All three active workers are preserved original threads under the same four native Opus 5/high
+Remote Control topic supervisors. The completed browser lease has no residual process or resource
+ownership and the cluster-wide runtime mutex remains free.
