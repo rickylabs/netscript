@@ -105,3 +105,72 @@ is complete rather than silently narrowed.
 Tier-A **FAIL_FIX** at `eadd672d0`. One blocking finding, plan-only repair. PLAN-EVAL is **not**
 requested yet; it follows a re-review of the repaired head. No implementation, no evaluator, no
 readiness or label change, no runtime lease.
+
+---
+
+# Tier-A re-review — repaired head `23db20f301d06ed1e4a9a65cbbf64349f89cb8c0`
+
+| Field | Value |
+| --- | --- |
+| Head | `23db20f301d06ed1e4a9a65cbbf64349f89cb8c0` — local == remote == PR, clean, draft, sole `status:plan` |
+| Repair commit | `23db20f30 docs(plan): pin tutorial SWR dispositions` (from `eadd672d0`) |
+| Plan-only proof | `git diff --name-only origin/main..HEAD` outside `.llm/runs/` is **empty** |
+| Verdict | **PASS** |
+
+## T-1 — RESOLVED, and more completely than the finding required
+
+The plan gained a **Published-claim dispositions** table. It covers **nine** source lines, where the
+finding named five: `13`, `15`, `32`, `75`, `76`, `80`, `94`, `100`, `107` — plus `Services SDK 188`
+on the first authorized page.
+
+**My independent re-sweep of the authorized page returns exactly `13 15 32 75 76 80 94 100 107` —
+identical to the table.** Nothing is unaccounted for, and the author found `32`, `94`, and `107`
+which my sweep had seen only as context.
+
+The dispositions take the correct shape — neither deletion nor overcorrection:
+
+- **Retained** (13, 15, 75, 76): each accurately describes the factory's callable policy path, and
+  each gains required *nearby* scoping text naming the callable action and expressly excluding
+  `getCachedEntry()` from the refresh mechanism. The table states "Nearby text is part of the
+  required edit, not optional explanatory prose", which closes the loophole of retaining a line and
+  adding nothing.
+- **Corrected** (32, 80, 94, 100, 107): wording supplied for each.
+
+**Line 107 is the sharpest fix and the one that actually removes the defect.** It replaces
+pure-read-only loader guidance with a policy-aware composition — `await ordersQueries.list(input,
+{ preferFreshOnStale: true })` first, then `getCachedEntry(input)` for `{ data, cachedAt }` — and
+states the metadata read alone never fetches. The false implication was created by demonstrating a
+pure-read loader under an SWR promise; fixing the demonstrated loader removes it at the source rather
+than papering over the prose.
+
+**The one-sentence page-level acceptance now exists** (`plan.md:82-86`): "Taken as a whole, chapter 3
+identifies the callable procedure action as the SWR policy path, identifies `getCachedEntry()` as a
+KV-only metadata read, and demonstrates the loader composing the action before the metadata read, so
+it no longer implies that the demonstrated `getCachedEntry()` loader revalidates." Validation gate 7
+(`docs-accuracy`) now requires "every published-claim disposition is implemented, and chapter 3
+satisfies the one-sentence S2 page-level acceptance criterion", so the narrative criterion is
+mechanically gated rather than aspirational. The scope-vs-acceptance ambiguity is gone.
+
+## Nothing else moved
+
+| Check | Result |
+| --- | --- |
+| Doc-lint pin (rows 14a/14b) | **untouched** by the repair diff — still six occurrences across two invocations, five unique symbols, both expected-exit-1 and never reportable as a pass |
+| #1665 fail-safe / persistence-complete inflight / deterministic two-reader commitments | intact |
+| Authorized docs sources | still **exactly two** |
+| Excluded reds | #1667, #1668, `surface:diff`, `F-DOCT-5` still out of scope; gate 16 additionally requires reporting the queue flake once with the exact `expected 1, got 2` and **no green-seeking rerun** |
+| Phase | plan-only; no product mutation; PR draft at sole `status:plan`; no runtime lease |
+
+## Process note
+
+The first dispatch of this repair reported `*** NOT DELIVERED ***`. That was a **bug in this
+session's own verification script** — `BEFORE` captured two lines, so the integer comparison errored
+— not a delivery failure. The substantive proof (`rollout occurrences after dispatch: 3`, up from
+`0`) and the resulting commit both confirm delivery. The delivery-proof discipline itself remains
+correct and stays in force; the comparison is what needed fixing.
+
+## Outcome
+
+Tier-A **PASS** at `23db20f301d06ed1e4a9a65cbbf64349f89cb8c0`. Proceeding to exactly one separate
+native Claude Fable 5 · medium · Remote Control PLAN-EVAL over this immutable head. No implementation
+before its PASS.
