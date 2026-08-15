@@ -212,3 +212,23 @@
   false. The coordinator chose the quality-preserving contract amendment, recorded at `c5e06661b`,
   adding only the workflow, classifier, and classifier test. The original author owns this cheap CI
   repair; the browser gate is not rerun and the runtime mutex remains free.
+
+## 2026-08-15T06:54:51Z — formal outcomes reconciled and bounded repairs dispatched
+
+- Reconciled three independent topic queues without imposing a cluster-wide evaluator wait. Docs
+  #1652 remains inside its already-proven content contract and is repairing one deterministic
+  transitive asset barrel after current-head CI exposed staleness; formal cycle 3 is explicitly not
+  authorized. Current leaf head is `d4a0a8340`; the only product target added to the cleanup is
+  `packages/cli/src/kernel/assets/agent-docs.generated.ts`.
+- Internals #1656 completed formal IMPL-EVAL cycle 1 with `PASS` against immutable source
+  `2c4881fd7`, evaluator commit `addba1ab9`, comment `5301029660`, native Opus 5/medium Remote
+  Control session `ee2825f2-…`. It entered coordinator-controlled readiness. The pre-existing
+  `.llm/**` lint-exclusion blind spot is queued separately and does not rescope this leaf.
+- Fixes #1657 completed formal cycle 1 with `FAIL_FIX` against `939e73113`, evaluator commit
+  `a46b83831`, comment `5301015059`: the authored 66-entry registry template was correct, but the
+  embedded artifact actually consumed by `netscript init` still shipped 50 entries. The contract
+  was amended at `c3ccceeb1` by exactly `embedded.generated.ts`; one same-author repair, fresh
+  Tier-A, and at most one cycle-2 formal evaluation are authorized. No browser/runtime rerun.
+- Re-proved shared runtime hygiene: agentic runtime `no_change`, Aspire `[]`, Docker containers and
+  volumes empty. Existing supervisors were attached and steered in place, never relaunched. #1651
+  remains unchanged and draft pending the explicit owner option 1/2/3 disposition.

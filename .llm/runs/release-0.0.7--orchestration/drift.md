@@ -190,3 +190,32 @@ implementation thread.
 - **Internals / evidence denominator:** #1656 S3 must describe the applicable JSR audit as an empty
   publishable-member denominator with a rescope tripwire, not claim a vacuous publishability pass.
   This is final evidence truthfulness inside the approved run-artifact-only slice, not new scope.
+
+## 2026-08-15T06:54:51Z — shipped-artifact freshness and readiness trigger corrections
+
+- **Cross-leaf generated-asset blind spot:** two independent leaves changed authored inputs while
+  omitting the generated artifact consumed downstream. The docs prose bundle deterministically
+  feeds `agent-docs.generated.ts`; the Fresh UI registry template deterministically feeds
+  `embedded.generated.ts`. A green source-level/content gate is not proof that the shipped consumer
+  artifact is current. Any leaf touching `packages/cli/src/kernel/assets/**` or a generator input
+  must select and bind `check:assets-barrel` and the narrow generator explaining its delta before
+  Tier-A. Queue a tooling improvement once the internals lane is free so this dependency is surfaced
+  automatically rather than relying on lane memory.
+- **Evaluator-loop boundary:** #1652 already passed formal content evaluation cycle 2. Its current
+  failure is one deterministic representation of unchanged proven content, so fresh opposite-family
+  Tier-A plus current-head CI is sufficient; cycle 3 is forbidden. #1657 cycle 1 instead proved the
+  consumer-visible behavior false, so exactly one bounded same-author repair and cycle 2 are
+  justified after Tier-A. No further loop is implicit.
+- **Ready-transition ordering:** when a native formal evaluator already supplied the binding PASS,
+  apply `impl-eval:skip` before converting a PR from draft to ready. Reversing that order can dispatch
+  a duplicate OpenHands evaluator; this occurred on #1652 and the duplicate was canceled before
+  mutation.
+- **Lint evidence blind spot:** root `deno.json` excludes `.llm/**` from Deno lint. A mixed wrapper
+  batch can select new `.llm` tooling, have Deno silently drop it, and still exit 0 because other
+  files remain. #1656 independently linted its new files with the exact rules and found zero defects,
+  so this is non-blocking there; a dedicated tooling leaf must repair policy or disclose downstream
+  exclusion.
+- **Host and transport:** Aspire and Docker remain empty; only existing topic supervisors were
+  attached via `claude attach`. Coordinator transport remains GPT-5.6-SOL/high through the Codex
+  app-server Remote Control socket, never max. Steering does not authorize replacing any native
+  Claude Opus 5/high topic supervisor.

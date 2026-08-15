@@ -135,3 +135,17 @@ thread, after which coordinator may grant one fresh IMPL-EVAL. Fixes #1657 Tier-
 amended the contract at `c5e06661b` with exactly the Fresh UI workflow, classifier, and classifier
 test; repair/re-review is active, without another browser/Aspire/Docker pass. #1651 is unchanged
 and draft pending explicit owner option 1/2/3. Runtime mutex is free; serialization is per topic.
+
+Resume from the newer authoritative `2026-08-15T06:54:51Z` checkpoint. Docs #1652 is still on its
+original Codex author thread after head `d4a0a8340`: current-head CI exposed the deterministic
+`agent-docs.generated.ts` cascade from the refreshed prose bundle. The contract is amended by that
+one generated file plus run artifacts; obtain fresh opposite-family Tier-A and current-head CI, but
+never launch formal cycle 3. Internals #1656 formal IMPL-EVAL cycle 1 passed at evaluator commit
+`addba1ab9` for immutable source `2c4881fd7`; the preserved topic supervisor owns body/issue
+truthfulness, `impl-eval:skip`-before-ready ordering, and current-head CI, then stops before merge.
+Its `.llm/**` lint-exclusion finding is a separate follow-up, not a rescope. Fixes #1657 formal
+cycle 1 returned `FAIL_FIX` at `a46b83831`: the source template had 66 entries but the shipped
+`embedded.generated.ts` still had 50. Scope is amended by exactly that generated barrel; allow one
+same-author repair, fresh Tier-A, and one final Opus 5/medium Remote Control cycle 2, with no browser,
+Aspire, Docker, scaffold, or E2E rerun. #1651 remains frozen pending explicit owner choice 1/2/3.
+Runtime remains empty and the expensive-gate mutex free; serialization is only per topic.
