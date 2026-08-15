@@ -94,11 +94,10 @@ typed client when no provider exists in the browser. The key, mutation options, 
 helpers remain pure functions over the resource name, action name, and input. Call an explicitly
 provider-backed method from client code and the error tells you so:
 
+The angle-bracket token `<resolved import.meta.url>` stands for the install-specific resolved module URL.
+
 ```text
-[NetScript SDK] Cache provider not initialized. Add `import '@netscript/sdk/cache';` to your server
-entrypoint to register it, or call setCacheProvider(cacheQuery) during server bootstrap. If you see
-this in the browser, a server-only cache method (query, prefetch, getCachedData, getCachedEntry,
-invalidate) was called from client-side code — use queryOptions/mutationOptions/clientKey instead.
+[NetScript SDK] Cache provider not initialized in module <resolved import.meta.url>. Add `import '@netscript/sdk/cache';` to your server entrypoint to register it, or call setCacheProvider(cacheQuery) during server bootstrap. If initialization already ran, one possibility is that two `@netscript/sdk` module instances are loaded; check that `@netscript/fresh`, its subpaths, and `@netscript/sdk` resolve to one version. If you see this in the browser, a server-only cache method (query, prefetch, getCachedData, getCachedEntry, invalidate) was called from client-side code — use queryOptions/mutationOptions/clientKey instead.
 ```
 
 ## Two key tiers, deliberately not merged

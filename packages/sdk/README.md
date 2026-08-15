@@ -139,6 +139,20 @@ calls accept a static `operationId`, or use a fixed direct-method fallback. Oper
 lowercase, separator-normalized, and capped at 80 characters. They are contract metadata: never
 construct one from query props, tenant/user ids, cache keys, values, or URLs.
 
+Cache telemetry admits at most 256 distinct normalized operation namespaces per process. The first
+new namespace beyond that budget is collapsed to the fixed `overflow` namespace and named once in
+a `cache.namespace.overflow` span event; later over-budget namespaces also collapse to `overflow`
+without retaining or emitting their original ids. Composite construction only normalizes its
+static default. Admission happens when a real cache operation opens a span, so construction alone
+does not consume the process budget.
+
+Topology evidence validation is fail-safe. Missing, unbounded, or malformed provider evidence marks
+the active cache span with `outcome=error` and `topology_complete=false`, but it does not turn an
+otherwise successful loader, write, or invalidation into an application exception. Invalid reports
+are not partially emitted: an invalidation report is staged and merged only after the complete
+report validates. Provider descriptors are likewise validated inside the active span so malformed
+observability data remains visible without preventing the application operation.
+
 `backend_executed` is measured only when the `queryFn` closure is entered. It is `false` for a fresh
 hit, cache-only read, provider failure before the loader, and the losing trace in an in-flight join
 (`inflight_joined=true`); it becomes `true` for cold, blocking-stale, background-revalidation, and
