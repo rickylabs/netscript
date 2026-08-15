@@ -8,7 +8,7 @@
 | Branch | `fix/sdk-cache-surface-and-telemetry` |
 | Current phase | `plan` — scope granted, awaiting separate PLAN-EVAL |
 | Archetype | `3 — runtime behavior` slice; SDK inventory remains Archetype 2 |
-| Scope overlays | none |
+| Scope overlays | `SCOPE-docs` for one authorized Query Bridge quotation |
 
 ## Current State
 
@@ -16,8 +16,9 @@ Research and plan are complete at `main@baf1cdf67`. No product code has been imp
 contracts are locked: isolate post-loader persistence failure; fail-safe malformed evidence inside
 a span; cap namespaces at 256 with fixed `overflow`; include module identity plus a two-instance
 hypothesis; repair CacheStore evidence JSDoc. Tier-A plan review repairs now specify request-local
-overflow deferral, per-report invalidation rollback, exact raw doc-lint baselines, and named
-accepted site-doc drift. Draft PR #1665 is open with `status:plan` and milestone `0.0.7`.
+overflow deferral, per-report invalidation rollback, exact raw doc-lint baselines, and
+runtime/docs byte equality for D4's dynamic-URL quotation. Draft PR #1665 is open with
+`status:plan` and milestone `0.0.7`.
 
 ## Completed
 
@@ -32,7 +33,8 @@ accepted site-doc drift. Draft PR #1665 is open with `status:plan` and milestone
 
 ## Next Steps
 
-1. Preserve the exact grant: README plus three test files named in `scope-boundary.md`, no others.
+1. Preserve the exact grant: README, three test files, and the single Query Bridge page named in
+   `scope-boundary.md`; no others.
 2. Separate topic-orchestrator-owned PLAN-EVAL reads the repaired research/plan/Design and returns
    `PASS` or `FAIL_PLAN`.
 3. Only after PLAN-EVAL passes, resume this exact Codex thread for ordered implementation slices.
@@ -44,7 +46,7 @@ accepted site-doc drift. Draft PR #1665 is open with `status:plan` and milestone
 | Write failure isolation | `plan.md` D1 | Real Deno KV >65,536-byte RED required |
 | Telemetry fail-safe | `plan.md` D2 | Existing fail-loud test amended, not removed |
 | Runtime cardinality | `plan.md` D3 | 256 / `overflow`; request-local decision flushes first inside operation span; composite construction only syntax-normalizes |
-| Diagnostic | `plan.md` D4 | Hypothesis, not fact; keep module-local provider |
+| Diagnostic | `plan.md` D4 | Hypothesis, not fact; keep module-local provider; normalize only dynamic URL before byte-comparing the authorized docs quote |
 | JSDoc | `plan.md` D5 | Only CacheStore get/set/delete drift found |
 
 ## Files Changed
@@ -69,8 +71,7 @@ Only run artifacts under this run directory. The pre-existing `codex-thread-ids.
 - Drift: slice profile is Archetype 3 while doctrine inventory calls SDK Archetype 2; stricter
   runtime profile retained and logged.
 - Baseline: exact six named raw doc-lint diagnostics remain expected red/no-regression evidence.
-- Accepted drift: `FOLLOWUP-DOC-QUERY-BRIDGE-DIAGNOSTIC` updates the stranded exact message quote
-  outside this leaf's grant.
+- D4 docs alignment is fully owned in-scope.
 
 ## Commits
 

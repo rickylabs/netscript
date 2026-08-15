@@ -8,7 +8,7 @@ The declared product surface is limited to:
 - `packages/sdk/src/ports/cache-store.ts`
 
 No product file outside those four is authorized by this leaf plan. The topic orchestrator has
-granted exactly the following four additional acceptance/proof files and no others:
+granted exactly the following five additional acceptance/proof paths and no others:
 
 | Additional file | Why unavoidable | Published surface | Breaking? |
 | --- | --- | --- | --- |
@@ -16,6 +16,7 @@ granted exactly the following four additional acceptance/proof files and no othe
 | `packages/sdk/src/cache/cache-provider_test.ts` | #1598 explicitly requires a test for the resolved module identity and two-instance hypothesis. | No; excluded test | No |
 | `packages/sdk/tests/cache/cache-telemetry_test.ts` | Amend the deliberate fail-loud test, cover lookup/write/invalidation malformed evidence, validate an invalid descriptor inside a span, and prove the cardinality overflow event/collapse. | No; excluded test | No |
 | `packages/sdk/tests/cache/cache-query-kv-limit_test.ts` (new) | Required behavioral RED for #1637: preinitialize real in-memory Deno KV, use a real `KvCacheStore`, return a payload over 65,536 bytes, and prove the caller still receives it while the entry remains uncached. A synthetic throwing store is insufficient. | No; excluded test | No |
+| `docs/site/web-layer/query-bridge.md` | #1598 changes the exact provider diagnostic already quoted at line 98. Rewrite only that quotation using `<resolved import.meta.url>` for the install-specific segment, while all stable bytes match runtime. | Yes; published site prose | No; synchronizes an existing diagnostic contract |
 
 ## Deliberately not requested
 
@@ -34,10 +35,10 @@ Raw `deno doc --lint` must run separately across all 12 SDK entrypoints and acro
 diagnostic is allowed, and neither red invocation may be reported as a pass. The plugin-streams
 diagnostic in the combined run is outside SDK and is not this leaf's regression to repair.
 
-## Named accepted drift outside the grant
+## Documentation boundary
 
-`docs/site/web-layer/query-bridge.md:98` quotes the exact current uninitialized-provider error that
-D4 will replace. That file is outside the declared surface and the exact grant, so this leaf will
-not edit it. Record `FOLLOWUP-DOC-QUERY-BRIDGE-DIAGNOSTIC` as accepted drift: the topic orchestrator
-owns a documentation follow-up to synchronize the quoted message after D4 lands. This is a known
-stranded published-doc consumer, not a negative-search claim and not permission to widen the leaf.
+The Query Bridge page is the only authorized `docs/site/**` path. The D4 provider test will read its
+single-line diagnostic code block, normalize only the runtime-resolved module URL to
+`<resolved import.meta.url>`, and require byte equality. No other site page is swept or edited in
+this leaf; any incidentally discovered stale quotation is reported to the coordinator without a
+scope change.

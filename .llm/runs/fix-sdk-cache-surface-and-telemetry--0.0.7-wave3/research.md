@@ -121,7 +121,7 @@ barrels; no sibling package reads those source files directly. The public-surfac
 | `packages/cli` | Generated consumer surface. Scaffold code injects the side-effect cache import (`packages/cli/src/kernel/application/scaffold/writers/write-app-files.ts:314-323`), and its test asserts the exact emitted string (`write-app-files_test.ts:6-16`). The service-query template imports `createQueryFactories`; `embedded.generated.ts:23` contains the generated mirror. | This is the source-text/output assertion that makes a repo-root test necessary even though CLI files are not edited. |
 | `packages/mcp` | `publish-assets.generated.ts` embeds documentation that teaches the `@netscript/sdk/query` generated-factory surface. It does not import or re-export the four declared files. | Generated-asset freshness is covered by the repo-root tests/tooling; no matching cache-topology README text was found in the asset. |
 | `.llm/tools` | Release/docs tooling asserts the published surface. `release/baselines/public-surfaces.json:18704-18746` contains exact SDK symbol hashes including `CacheQuery`, `CacheStore`, and `CacheStoreEntry`; docs snippet support imports `@netscript/sdk/query`. | Add `deno task surface:diff` and keep the repo-root test suite. |
-| `docs/site` | Published documentation consumer. `docs/site/web-layer/query-bridge.md:98-103` quotes the exact current uninitialized-provider error that #1598 will rewrite. | Outside the declared surface and exact four-file grant; recorded as accepted drift `FOLLOWUP-DOC-QUERY-BRIDGE-DIAGNOSTIC`, not silently omitted. |
+| `docs/site` | Published documentation consumer. `docs/site/web-layer/query-bridge.md:98-103` quotes the exact current uninitialized-provider error that #1598 will rewrite. | The coordinator granted exactly this page as the fifth additional path. D4 must update its single code block and the provider test must normalize only the install-specific URL segment before byte-comparing it with runtime. No other site page is in scope. |
 
 No plugin directly reads, re-exports, or asserts on the four declared surfaces. The gate plan uses
 the **repo-root** structured `test` task, so SDK, Fresh, KV, CLI, MCP/generated-asset, and tooling
@@ -172,8 +172,8 @@ ruling, documented in `scope-boundary.md`, not evidence that this plan passed th
 
 ## Coordinator rulings and remaining gate
 
-1. Resolved: the coordinator authorized exactly the README/test files listed in
-   `scope-boundary.md`; no other file is granted.
+1. Resolved: the coordinator authorized exactly the README, three test files, and single Query
+   Bridge documentation page listed in `scope-boundary.md`; no other path is granted.
 2. Resolved: the coordinator accepted the six named raw doc-lint diagnostics as a strict
    no-regression baseline.
 3. Pending: PLAN-EVAL is granted separately by the coordinator; this session does not arrange it.

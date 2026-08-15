@@ -9,7 +9,7 @@
 | Phase | `plan` — hard stop before implementation |
 | Target | `packages/sdk` published cache/ports surface |
 | Archetype | `3 — runtime behavior` for this slice; package inventory remains Archetype 2 |
-| Scope overlays | none |
+| Scope overlays | `SCOPE-docs` for the single authorized site quotation |
 
 ## Archetype and doctrine verdict
 
@@ -153,9 +153,25 @@ Keep `_provider` module-local and change only the error wording. Include the eva
 `@netscript/sdk` module instances are loaded; check that `@netscript/fresh`, its subpaths, and
 `@netscript/sdk` resolve to one version.” This is explicitly a hypothesis, not a diagnosis.
 
-The adjacent test asserts the resolved module URL and both-instance/version-coherence hint.
-Evaluating `import.meta.url` for the message is allowed; no runtime asset or filesystem read is
-introduced.
+Lock the complete message template now, including punctuation and the SDK prefix:
+
+```text
+[NetScript SDK] Cache provider not initialized in module <resolved import.meta.url>. Add `import '@netscript/sdk/cache';` to your server entrypoint to register it, or call setCacheProvider(cacheQuery) during server bootstrap. If initialization already ran, one possibility is that two `@netscript/sdk` module instances are loaded; check that `@netscript/fresh`, its subpaths, and `@netscript/sdk` resolve to one version. If you see this in the browser, a server-only cache method (query, prefetch, getCachedData, getCachedEntry, invalidate) was called from client-side code — use queryOptions/mutationOptions/clientKey instead.
+```
+
+At runtime, the single token `<resolved import.meta.url>` is replaced by the evaluated module URL;
+all other bytes are fixed. Rewrite the quotation at
+`docs/site/web-layer/query-bridge.md:98` as the same single-line template. Adjacent prose states
+that the angle-bracket token represents the install-specific resolved URL, so the published page
+does not pin a machine path.
+
+The adjacent `cache-provider_test.ts` test captures the real error, extracts and normalizes only
+the resolved URL segment back to `<resolved import.meta.url>`, reads the authorized documentation
+code block, and compares the normalized runtime message to that block byte-for-byte. It separately
+asserts that the captured URL equals `new URL('./cache-provider.ts', import.meta.url).href`. This makes
+the `[NetScript SDK] ` prefix, all stable wording/punctuation, the hypothesis, and the browser hint
+an automated D4 acceptance item rather than an eyeball check. The docs read is test-only; published
+runtime code performs no asset or filesystem read.
 
 ### D5 — #1623: mandatory-evidence JSDoc
 
@@ -184,21 +200,23 @@ changes to already-published signatures and are non-breaking.
 
 ## Scope, non-scope, and hidden scope
 
-Product changes are limited to the four declared files. Required README/tests and the pre-existing
-doc-lint problem are enumerated in `scope-boundary.md`; implementation cannot start without the
-topic orchestrator's ruling.
+Product changes are limited to the four declared files. The coordinator granted exactly five
+additional paths: the README, three tests, and the single Query Bridge documentation page listed in
+`scope-boundary.md`. Implementation still cannot start before PLAN-EVAL passes.
 
 Non-scope: `no-store`, branded operation IDs, provider ownership/global singleton changes, KV
-provider implementation, Fresh/CLI/template edits, Aspire/Docker/e2e, canary/release, and unrelated
-doc-lint cleanup.
+provider implementation, Fresh/CLI/template edits, every other `docs/site/**` path,
+Aspire/Docker/e2e, canary/release, and unrelated doc-lint cleanup. Do not sweep or edit related site
+prose elsewhere in this leaf; if another exact quotation is encountered incidentally, report it
+without widening scope.
 
 Hidden consumer scope: SDK internal query factories/barrels, Fresh imports/re-exports, the KV
 backend exercised by the real RED, CLI generated-import assertions and embedded template mirror,
 MCP generated docs, the release public-surface baseline, and
 `docs/site/web-layer/query-bridge.md:98`, which quotes D4's exact current provider error. The
-repo-root test task covers executable asserting packages. The site quote is outside both declared
-scope and the exact four-file grant; it is accepted drift `FOLLOWUP-DOC-QUERY-BRIDGE-DIAGNOSTIC`
-and must be synchronized by a topic-orchestrator-owned documentation follow-up, not edited here.
+repo-root test task covers executable asserting packages. The site quote is now the fifth
+authorized additional path and is updated in the D4 slice; the provider test performs the explicit
+normalized byte comparison against the shipped documentation.
 
 ## Open-decision sweep
 
@@ -209,9 +227,9 @@ and must be synchronized by a topic-orchestrator-owned documentation follow-up, 
 | Namespace mechanism/bound/warning | resolved now | Runtime 256 / `overflow` / first-offender one-time span event; D3 |
 | Diagnostic wording | resolved now | Module URL plus hypothesis and coherence check; D4 |
 | JSDoc shapes | resolved now | Mandatory report shapes; D5 |
-| README/test files outside declared surface | resolved | Topic orchestrator granted exactly the four files in `scope-boundary.md`; no others |
+| README/test/site-doc files outside declared surface | resolved | Topic orchestrator granted exactly the five paths in `scope-boundary.md`; no others |
 | Existing full-export doc-lint red baseline | resolved for this leaf | Exact six named raw diagnostics accepted as the no-regression bar; zero new |
-| Exact site-doc quote becomes stale under D4 | accepted drift | `FOLLOWUP-DOC-QUERY-BRIDGE-DIAGNOSTIC`; topic orchestrator owns follow-up, leaf does not edit `docs/site/**` |
+| Exact site-doc quote under D4 | resolved in scope | Rewrite the one authorized Query Bridge code block and prove normalized byte identity in `cache-provider_test.ts` |
 | Per-action `no-store` | safe to defer | Requires wider published query/factory design |
 | Branded `operationId` | safe to defer | Breaking alternative rejected for this patch |
 | Provider ownership across duplicate SDK copies | safe to defer | Diagnostic must not pre-empt architecture decision |
@@ -222,11 +240,11 @@ and must be synchronized by a topic-orchestrator-owned documentation follow-up, 
 | --- | --- | --- | --- |
 | 1 | Make evidence validation fail-safe inside spans and bound namespace cardinality; amend the deliberate guard and document the contract. | declared `cache-telemetry.ts`, `cache-query.ts`, `cache-provider.ts`; granted `cache-telemetry_test.ts`, `README.md` | focused cache telemetry tests including partial-report rollback; structured SDK check/lint/fmt; doc/surface checks |
 | 2 | Isolate real KV persistence-limit failure after successful loader data. | declared `cache-query.ts`; granted new `cache-query-kv-limit_test.ts` | behavioral RED-before/GREEN-after real Deno KV test; SDK/root tests |
-| 3 | Improve duplicate-module diagnostic and repair mandatory-evidence JSDoc. | declared `cache-provider.ts`, `cache-store.ts`; granted `cache-provider_test.ts` | focused diagnostic test; ports doc sweep; doc/publish checks |
+| 3 | Improve duplicate-module diagnostic, synchronize its published quotation, and repair mandatory-evidence JSDoc. | declared `cache-provider.ts`, `cache-store.ts`; granted `cache-provider_test.ts`, `docs/site/web-layer/query-bridge.md` | focused diagnostic test including normalized byte-for-byte docs comparison; ports doc sweep; docs source-alignment/link check; doc/publish checks |
 | 4 | Merge-readiness evidence only: run full static/runtime-consumer/JSR/doctrine gates and update run artifacts/PR comments. | run directory only | complete validation table below; separate IMPL-EVAL remains mandatory |
 
 All slices stay below 30 and each updates `worklog.md`/`context-pack.md` in its commit. The exact
-four-file scope ruling is recorded; no product slice may begin until PLAN-EVAL passes.
+five-path scope ruling is recorded; no product slice may begin until PLAN-EVAL passes.
 
 ## Risk register
 
@@ -241,14 +259,15 @@ four-file scope ruling is recorded; no product slice may begin until PLAN-EVAL p
 | Legitimate app has >256 operation families | Fixed `overflow` preserves application behavior; documented telemetry tradeoff and one actionable event. |
 | Error event leaks request/tenant data | Only the first normalized over-budget id is emitted; guidance forbids identifiers; later raw ids are neither stored nor emitted. |
 | Public/export or sibling consumer regression | `surface:diff`, root structured `check` and `test`, Fresh/CLI assertions, publish dry run, exact-pin guard. |
+| Runtime diagnostic and published quotation diverge | Keep the docs block single-line with only a dynamic URL token; the provider test normalizes that one segment and byte-compares the rest. |
 | Existing doc-lint failures are mistaken for new success | Preserve exact baseline evidence and require orchestrator ruling; never report current FAIL as PASS. |
 
 ## Debt implications
 
 No new architecture debt is planned. The coordinator accepted the exact six named raw doc-lint
-diagnostics as this leaf's no-regression baseline; none may be described as a pass. The stale exact
-provider-message quote is accepted scope drift named
-`FOLLOWUP-DOC-QUERY-BRIDGE-DIAGNOSTIC`; its documentation follow-up is owned outside this leaf.
+diagnostics as this leaf's no-regression baseline; none may be described as a pass. The known
+provider-message quotation is repaired in the same D4 slice under the fifth authorized path and is
+fully owned by this leaf.
 
 ## Validation plan
 
@@ -259,6 +278,7 @@ Use wrappers as verdict sources and do not run Aspire, Docker, or `e2e:cli`.
 | 1 | Focused SDK check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/sdk --ext ts,tsx --pretty` | PASS; wrapper includes `--unstable-kv` by default |
 | 2 | Focused RED/GREEN tests | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all <focused test files>` | Current real-limit test RED for Deno KV rejection before fix; all focused tests PASS after fix |
 | 3 | SDK lint/fmt | structured `run-deno-lint.ts` and `run-deno-fmt.ts` with `--root packages/sdk --ext ts,tsx` | PASS |
+| 3b | D4 runtime/docs identity | Focused `cache-provider_test.ts` through `run-deno-test.ts` | PASS; real runtime message normalized only at its URL segment equals the single-line Query Bridge quotation byte-for-byte, and actual URL is non-empty/module-correct |
 | 4 | Repo-root assertions | `deno task test` | PASS; covers SDK, Fresh, KV, CLI, MCP/generated/tool assertions |
 | 5 | Repo-root check | `deno task check` | PASS |
 | 6 | Public surface diff | `deno task surface:diff` | Patch/non-breaking; no undeclared major change |
