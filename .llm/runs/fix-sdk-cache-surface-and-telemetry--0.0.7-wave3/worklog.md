@@ -85,12 +85,17 @@ behind `CacheStore`; it must not change source-query success semantics.
 | 2026-08-15 | S2 | D1 implementation | Changed only the post-loader persistence catch to record the existing read/write provider-error vocabulary and return resolved data. Loader, lookup, background refresh, and explicit `setCachedData()` failure behavior remain fail-loud. |
 | 2026-08-15 | S2 | Real-KV GREEN | The same real-Deno-KV test passes, proves the exact payload returns, one loader call, error/incomplete `cache.write` span event, uncached follow-up miss, and awaited `closeKv()` plus `resetKv()` teardown. |
 | 2026-08-15 | S2 | Reconcile | PR body now explicitly names the approved D2 `assertRejects` contract inversion. Draft state, acceptance boxes, labels, milestone, and issue state were not changed; S3 remains unauthorized. |
+| 2026-08-15 | S2 review | Tier-A PASS | S2 accepted at `1cf76c6dd`; coordinator authorized the final S3 slice only. |
+| 2026-08-15 | S3 | D4 implementation | Added the evaluated provider module URL and duplicate-SDK-instance hypothesis while retaining the browser hint and module-local provider ownership. Synchronized the Query Bridge quotation with one dynamic URL token. |
+| 2026-08-15 | S3 | D4 proof | The adjacent provider test captures the real error, verifies the exact module URL, normalizes only that URL, and byte-compares the complete single-line documentation fence. |
+| 2026-08-15 | S3 | D5 implementation | Repaired only `CacheStore.get`/`set`/`delete` JSDoc to describe mandatory read/write/invalidation evidence. The executed ports tag/evidence sweep found no other evidence-contract drift. |
+| 2026-08-15 | S3 | Reconcile | S1/S2 files remain byte-identical. Full focused/root/publish gates were run; the known stale `surface:diff` and exact six raw doc-lint diagnostics remain honestly red. PR metadata is updated after the S3 push; draft state, acceptance boxes, labels, milestone, and issue states remain unchanged. |
 
 ## Decisions
 
 See `plan.md` D1-D5. The topic orchestrator granted exactly the five additional paths in
-`scope-boundary.md`; no others. PLAN-EVAL and S1 Tier-A passed; the coordinator authorized and this
-slice completed S2 only. S3 remains forbidden until separate authorization.
+`scope-boundary.md`; no others. PLAN-EVAL, S1 Tier-A, and S2 Tier-A passed. The coordinator
+authorized and this slice completed S3 within its exact four-file implementation boundary.
 
 ## Gate Results
 
@@ -117,6 +122,19 @@ slice completed S2 only. S3 remains forbidden until separate authorization.
 | S2 repo-root check | PASS | 2,925 files; 25 batches; 0 failed batches; 0 diagnostics |
 | S2 repo-root test | PASS | 4,203 passed; 0 failed; 19 ignored; 4,222 total |
 | S2 quality gate | PASS with existing warnings | quality scan has no findings; architecture check has zero failures |
+| S3 D4 provider/docs test | PASS | 1 passed; 0 failed; exact URL extraction and normalized byte comparison |
+| S3 SDK check wrapper | PASS | 84 files; 1 batch; 0 failed batches; 0 diagnostics |
+| S3 SDK test wrapper | PASS | 66 passed; 0 failed |
+| S3 SDK lint wrapper | PASS | 84 files; 0 findings |
+| S3 SDK format wrapper | PASS | 84 files; 0 failed batches; 0 findings |
+| S3 repo-root check | PASS | 2,925 files; 25 batches; 0 failed batches; 0 diagnostics |
+| S3 repo-root test | PASS | 4,203 passed; 0 failed; 19 ignored; 4,222 total; known queue flake not observed |
+| S3 quality scan | PASS | no findings; 7 existing allowances; no allowance failures |
+| S3 architecture check | PASS with warnings | exit 0; all package/plugin `FAIL=0`; existing SDK cardinality warning remains |
+| S3 exact NetScript specifiers | PASS | 2,361 scanned; 1 allowance; 0 ranges; 0 failures |
+| S3 workspace publish dry run | PASS | exit 0; all SDK entrypoints checked |
+| S3 JSR audit | PASS with 2 known warnings | existing SDK source-cardinality and slow-type-banner warnings |
+| S3 raw doc lint | FAIL (expected baseline, no regression) | Both commands exit 1 with the exact six named diagnostics and no additional diagnostic |
 
 ## Handoff Notes
 
@@ -125,7 +143,7 @@ slice completed S2 only. S3 remains forbidden until separate authorization.
   in D4 and enforce its automated byte-comparison proof without sweeping other site docs.
 - S2's proof awaits both `closeKv()` and `resetKv()` in `finally`; the green repo-root suite confirms
   an `:memory:` KV does not leak into later files.
-- S3's authorized Query Bridge quotation is a deliberately single-line fenced-code entry. `deno
+- S3's Query Bridge quotation is a deliberately single-line fenced-code entry. `deno
   fmt` does not reflow it and no markdownlint configuration exists; a later formatter pass must not
   wrap it.
 - Keep S1's internal namespace admission, reset, and prologue helpers off `src/cache/mod.ts` and the

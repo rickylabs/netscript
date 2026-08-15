@@ -209,9 +209,12 @@ export function setCacheProvider(provider: CacheProvider): void {
 export function getCacheProvider(): CacheProvider {
   if (!_provider) {
     throw new Error(
-      '[NetScript SDK] Cache provider not initialized. ' +
+      `[NetScript SDK] Cache provider not initialized in module ${import.meta.url}. ` +
         "Add `import '@netscript/sdk/cache';` to your server entrypoint to register it, " +
         'or call setCacheProvider(cacheQuery) during server bootstrap. ' +
+        'If initialization already ran, one possibility is that two `@netscript/sdk` module ' +
+        'instances are loaded; check that `@netscript/fresh`, its subpaths, and `@netscript/sdk` ' +
+        'resolve to one version. ' +
         'If you see this in the browser, a server-only cache method ' +
         '(query, prefetch, getCachedData, getCachedEntry, invalidate) ' +
         'was called from client-side code — use queryOptions/mutationOptions/clientKey instead.',

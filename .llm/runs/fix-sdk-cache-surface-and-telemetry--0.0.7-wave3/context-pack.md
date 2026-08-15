@@ -6,18 +6,17 @@
 | --- | --- |
 | Run ID | `fix-sdk-cache-surface-and-telemetry--0.0.7-wave3` |
 | Branch | `fix/sdk-cache-surface-and-telemetry` |
-| Current phase | `implementation/S2` — S1 Tier-A PASS; S2 implemented and awaiting Tier-A review |
+| Current phase | `implementation/S3` — final slice implemented and awaiting fresh Tier-A review |
 | Archetype | `3 — runtime behavior` slice; SDK inventory remains Archetype 2 |
 | Scope overlays | `SCOPE-docs` for one authorized Query Bridge quotation |
 
 ## Current State
 
 PLAN-EVAL is terminal PASS at evaluated head `ee1b44c6d`, with evaluator artifact `cd5193b66`.
-S1 is Tier-A PASS at `0e4e26c51`. Coordinator-authorized S2 implements only D1: after a loader
-resolves, a real cache-persistence rejection records the existing read/write provider-error event
-and returns the resolved data uncached. The real Deno KV limit proof is captured RED before and
-GREEN after in `s2-report.md`. Draft PR #1665 remains open with `status:plan` and milestone `0.0.7`;
-S3 remains unauthorized.
+S1 is Tier-A PASS at `0e4e26c51`; S2 is Tier-A PASS at `1cf76c6dd`. Coordinator-authorized S3
+implements D4's module-identity diagnostic and synchronized site quotation plus D5's CacheStore
+mandatory-evidence JSDoc. The mechanical D4 proof and all focused/root/publish gates are captured
+in `s3-report.md`. Draft PR #1665 remains open/draft with `status:plan` and milestone `0.0.7`.
 
 ## Completed
 
@@ -35,12 +34,17 @@ S3 remains unauthorized.
   structured SDK check, lint, and format wrappers pass.
 - S2's real-KV proof passes, the full SDK suite passes 66/66, repo-root check passes 2,925 files,
   and repo-root test passes 4,203 tests with zero failures.
+- S3's provider test passes 1/1 and mechanically ties the real module URL plus stable diagnostic
+  bytes to the single-line Query Bridge fence.
+- CacheStore get/set/delete JSDoc now describes mandatory evidence; the executed whole-ports sweep
+  found no other evidence-contract drift.
+- Final S3 root check/test pass at 2,925 files and 4,203/0/19; quality, architecture, exact-pin,
+  publish dry-run, and JSR gates completed.
 
 ## Next Steps
 
-1. Commit and push S2, then stop for the coordinator's fresh Tier-A review.
-2. Do not begin S3's diagnostic, CacheStore JSDoc, provider test, or Query Bridge changes until
-   separately authorized.
+1. Commit and push S3 by explicit refspec, update PR #1665 metadata, and post the S3 receipt.
+2. Stop for the coordinator's fresh Tier-A review; do not launch or arrange an evaluator.
 
 ## Key Decisions
 
@@ -54,17 +58,17 @@ S3 remains unauthorized.
 
 ## Files Changed
 
-S2 changes only `cache-query.ts`, the new real-KV limit test, and run artifacts. Every S1 and S3
-path remains untouched in this slice.
+S3 changes exactly `cache-provider.ts`, `cache-store.ts`, `cache-provider_test.ts`, the authorized
+Query Bridge page, and run artifacts. S1 and S2 files remain byte-identical.
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | S2 PASS | SDK and repo-root structured check; SDK lint/fmt wrappers |
-| Fitness | S2 PASS with non-blocking warnings | quality scan has no findings; architecture check has zero failures |
-| Runtime | S2 PASS | real-KV proof 1/1; full SDK 66/66; repo-root 4,203 passed, 0 failed, 19 ignored |
-| Consumer | S2 PASS | repo-root structured check/test cover Fresh, CLI, and other asserting consumers |
+| Static | S3 PASS | SDK/root structured check; SDK lint/fmt wrappers |
+| Fitness | S3 PASS with non-blocking warnings | quality scan has no findings; architecture has zero failures; JSR retains two known warnings |
+| Runtime | S3 PASS | provider/docs proof 1/1; full SDK 66/66; repo-root 4,203 passed, 0 failed, 19 ignored |
+| Consumer | S3 PASS | Query Bridge byte comparison plus repo-root check/test |
 
 The supplemental repository-wide `surface:diff` invocation exits 1 against a stale workspace
 baseline and reports widespread signature changes in untouched packages; it is not represented as
@@ -73,7 +77,7 @@ a pass or as an S1-specific verdict. The direct S1 export proof is an empty diff
 
 ## Open Questions
 
-- S3 authorization only. S2 must stop after its Tier-A handoff.
+- Fresh Tier-A S3 review only. This implementation session does not arrange it.
 
 ## Drift and Debt
 
@@ -83,7 +87,7 @@ a pass or as an S1-specific verdict. The direct S1 export proof is an empty diff
 - D4 docs alignment is fully owned in-scope.
 - The `@netscript/kv` singleton is process-global. S2's proof awaits both `closeKv()` and
   `resetKv()` in `finally`; repo-root test ordering remains green.
-- S3's single-line Query Bridge fenced-code quotation must remain unwrapped; the formatter does not
+- S3's single-line Query Bridge fenced-code quotation remains unwrapped; the formatter does not
   reflow it and there is no markdownlint configuration.
 - S1's admission/reset/prologue helpers are direct-file internals and must remain off both barrels.
 
