@@ -985,3 +985,21 @@ private references (Contracts 9→11, SDK 3→13); later JSR/specifier/export ga
 Coordinator authorizes same-author plan-only S4-R within exactly `contract-primitives.ts`,
 `errors.ts`, and `service-client.ts`, then fresh fixes Tier-A before product repair. No suppression,
 metadata, public barrel, seventh path, evaluator, or readiness action.
+
+At 21:54Z, #1666 cycle-5 IMPL-EVAL is terminal `PASS` at evaluator commit `92988da30`, comment
+`5304391856`, native Fable 5/medium Remote Control
+`https://claude.ai/code/session_016v2se871QD9Q9Rd6YADAKC`; its evaluator lease is released. The
+coordinator repeated the live readiness preflights at the final head, rewrote the PR body, proved zero
+review threads plus mirror/close-gate PASS, applied `status:ready-merge` while draft with
+`impl-eval:skip` retained, and marked #1666 ready. CI `31910676720` and changed-source quality
+`31910676700` are active; no merge until the exact-head set is terminal and truthful.
+
+Fresh detached sessions prove the OpenAI account has no remaining implementation credits until
+`2026-08-20 05:31`; repeated Codex launch attempts are forbidden. The coordinator selected only
+documented in-plan artifact routes: #1664 uses a fresh separate Claude Opus 5/medium `chore_code`
+agent for the two-line F8 provenance correction, and #1671 uses a fresh separate Claude Sonnet 5/high
+`documentation_review` agent for the run-artifact-only S4-R amendment. Both then use a fresh Minimax
+M3/high PLAN-EVAL via the native-quota fallback. Topic supervisors remain reviewers/non-authors and
+may not self-certify. #1671's later product repair remains on the canonical Codex route after reset;
+no outside-plan product route is authorized. #1663's exceptional third-evaluator decision remains
+owner-only and untouched.

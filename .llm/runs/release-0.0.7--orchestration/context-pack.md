@@ -823,3 +823,18 @@ surface attribution but stops on real private-type doc-lint deltas: Contracts 9�
 JSR/specifier/export guards are `NOT_RUN`. Coordinator authorizes a plan-only S4-R amendment on the
 same author within only `contract-primitives.ts`, `errors.ts`, `service-client.ts`, and existing run
 artifacts, followed by fresh fixes Tier-A before product repair. #1666 cycle 5 and #1664 F8 continue.
+
+Newer transition `2026-08-15T21:54:00Z`: #1666 cycle-5 IMPL-EVAL passed at evaluator commit
+`92988da30`, comment `5304391856`, Remote Control
+`session_016v2se871QD9Q9Rd6YADAKC`. The final PR head is the same evaluator artifact commit; body,
+review threads, acceptance mirror, and local close-gate are current and green. #1666 is non-draft at
+`status:ready-merge` with exact-head CI `31910676720` plus changed-source quality `31910676700`
+active. Do not merge until all current-head checks are terminal and truthful.
+
+Codex capacity is account-wide exhausted until `2026-08-20 05:31`, proven by fresh detached threads
+`01a00766-…` (#1664) and `01a00767-…` (#1671); do not retry it. Continue the two executable
+artifact-only routes: #1664 F8 provenance correction via fresh canonical Claude Opus 5/medium
+`chore_code`, then fresh Minimax M3/high PLAN-EVAL; #1671 S4-R via fresh Claude Sonnet 5/high
+`documentation_review`, then fresh Minimax PLAN-EVAL. Supervisors do not author or self-certify.
+#1671 product repair waits for canonical Codex capacity; #1663 remains the sole owner-only exceptional
+third-evaluator boundary.

@@ -1490,3 +1490,29 @@
   Remaining JSR/specifier/export gates are honestly `NOT_RUN`. No product was changed during S4.
   Coordinator authorizes a plan-only repair amendment on the same author, limited to the three
   already-owned product paths; fresh fixes Tier-A precedes any repair mutation.
+
+## 2026-08-15T21:54:00Z — #1666 reaches exact-head CI; quota-blocked plan chores reroute canonically
+
+- #1666 cycle-5 IMPL-EVAL is terminal `PASS`. The fresh Fable 5/medium Remote Control evaluator
+  independently selected all nine changed source paths with zero quality findings, passed 12 focused
+  tests and six targeted mutation kills, proved malformed top-level values fail closed, reran root
+  check at 2,925 files and root test at 4,217/0/19, and preserved the four generated outputs plus
+  `deno.lock` byte-identically. Evaluator commit `92988da30`, comment `5304391856`, Remote Control
+  `session_016v2se871QD9Q9Rd6YADAKC`; its lease is terminal and released.
+- The coordinator rewrote #1666's PR body to the final repair/evaluator heads, verified zero review
+  threads, ran a live acceptance-mirror dry-run and local close-gate PASS at `92988da30`, applied
+  `status:ready-merge` while draft with attributed `impl-eval:skip` retained, posted readiness comment
+  `5304405717`, and marked the PR ready. Exact-head CI runs `31910676720` and `31910676700` are active;
+  merge is prohibited until every current-head context, especially changed-source code quality, is
+  terminal green or an intentional policy skip.
+- Fresh detached Sol probes prove the OpenAI implementation quota is account-wide, not thread-local:
+  #1664 thread `01a00766-…` and #1671 thread `01a00767-…` both returned
+  `usageLimitExceeded`, `hasCredits:false`, `balance:0`, reset `2026-08-20 05:31`. No further Codex
+  retry is authorized before reset.
+- This does not park plan-artifact maintenance. #1664's two-line F8 provenance restoration is routed
+  to a fresh separate canonical `chore_code` Claude Opus 5/medium agent, followed by a fresh Minimax
+  M3/high PLAN-EVAL through the native-quota fallback. #1671's run-artifact-only S4-R amendment is
+  routed to a fresh canonical `documentation_review` Claude Sonnet 5/high agent, followed by the same
+  fresh Minimax PLAN-EVAL fallback. Both supervisors remain non-authors and neither lane may
+  self-certify. #1671's later three-product-file repair remains parked on canonical Codex until reset;
+  no outside-plan product implementation is authorized.

@@ -789,3 +789,18 @@ implementation thread.
   audit regenerated the leaf leak report after the author commit. Its host result remains valid in
   central state, but the bytes are supervisor-caused contamination and must be restored from the
   author head before F8; future supervisor audits use supervisor-owned paths.
+- **A thread-local quota probe cannot establish account scope:** both affected leaves used one fresh
+  detached Codex session after preserving the original sender. Threads `01a00766-…` and
+  `01a00767-…` failed before inference with `usageLimitExceeded`, `hasCredits:false`, and zero
+  balance, proving the boundary is account-wide until `2026-08-20 05:31`. Stop retries once that
+  evidence exists; distinguish executable canonical plan-artifact chores from product implementation
+  that truly has no in-plan fallback.
+- **Quota fallback still preserves generator/evaluator separation:** #1664's provenance restoration
+  uses a fresh Claude Opus 5/medium `chore_code` generator and #1671's run-artifact-only amendment
+  uses a fresh Claude Sonnet 5/high `documentation_review` generator. Neither supervisor authors.
+  Each plan is then judged by a fresh Minimax M3/high PLAN-EVAL through the documented native-quota
+  fallback; no lane self-certifies and no outside-plan product implementation is inferred.
+- **Readiness re-entry repeats all live preflights after any repair:** cycle-5 PASS did not inherit
+  the earlier readiness snapshot. #1666 refreshed the final body, review threads, acceptance mirror,
+  close-gate, status ordering, and exact-head CI at `92988da30`; the earlier broad green cannot stand
+  in for the new changed-source quality run.
