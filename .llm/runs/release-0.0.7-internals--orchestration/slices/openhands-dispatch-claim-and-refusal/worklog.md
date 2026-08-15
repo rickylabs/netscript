@@ -2,12 +2,12 @@
 
 ## Run Metadata
 
-| Field | Value |
-| --- | --- |
-| Run ID | `release-0.0.7-internals--orchestration/slices/openhands-dispatch-claim-and-refusal` |
-| Branch | `fix/openhands-dispatch-claim-and-refusal` |
-| Archetype | `6-cli-tooling` |
-| Scope overlays | none |
+| Field          | Value                                                                                |
+| -------------- | ------------------------------------------------------------------------------------ |
+| Run ID         | `release-0.0.7-internals--orchestration/slices/openhands-dispatch-claim-and-refusal` |
+| Branch         | `fix/openhands-dispatch-claim-and-refusal`                                           |
+| Archetype      | `6-cli-tooling`                                                                      |
+| Scope overlays | none                                                                                 |
 
 ## Design
 
@@ -48,13 +48,13 @@
 
 ### Commit Slices
 
-| # | Slice | Proving gates | Files |
-| --- | --- | --- | --- |
-| S1 | Refusal and recursion policy guard | `check`, `test` | `.github/scripts/openhands-comment-trigger.mjs`; `.github/scripts/openhands-comment-trigger.test.ts` |
-| S2 | Formal comment producer contract | `check`, `test` | `.llm/tools/agentic/lib/agentic-lib.ts`; `.llm/tools/agentic/lib/agentic-lib_test.ts` |
-| S3 | CLI-owned live-head binding | `check`, `test` | `.llm/tools/agentic/openhands/dispatch-openhands.ts`; `.llm/tools/agentic/openhands/dispatch-openhands_test.ts` |
-| S4 | Pre-spend workflow reporting and aligned retry | `check`, `test`, `quality-job` | `.github/workflows/openhands-agent.yml`; `.llm/tools/agentic/openhands/phase-eval-workflow_test.ts` |
-| S5 | Full durable evidence and handoff | `check`, `test`, `quality-job` | run artifacts/receipts only |
+| #  | Slice                                          | Proving gates                  | Files                                                                                                           |
+| -- | ---------------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| S1 | Refusal and recursion policy guard             | `check`, `test`                | `.github/scripts/openhands-comment-trigger.mjs`; `.github/scripts/openhands-comment-trigger.test.ts`            |
+| S2 | Formal comment producer contract               | `check`, `test`                | `.llm/tools/agentic/lib/agentic-lib.ts`; `.llm/tools/agentic/lib/agentic-lib_test.ts`                           |
+| S3 | CLI-owned live-head binding                    | `check`, `test`                | `.llm/tools/agentic/openhands/dispatch-openhands.ts`; `.llm/tools/agentic/openhands/dispatch-openhands_test.ts` |
+| S4 | Pre-spend workflow reporting and aligned retry | `check`, `test`, `quality-job` | `.github/workflows/openhands-agent.yml`; `.llm/tools/agentic/openhands/phase-eval-workflow_test.ts`             |
+| S5 | Full durable evidence and handoff              | `check`, `test`, `quality-job` | run artifacts/receipts only                                                                                     |
 
 ### Deferred Scope
 
@@ -70,36 +70,36 @@ surfaces mirror those boundaries in the same order.
 
 ## Progress Log
 
-| Time | Slice | Step | Notes |
-| --- | --- | --- | --- |
-| 2026-08-15 | S0 | Bootstrap | Verified worktree/base; preserved coordinator thread metadata; committed templates; opened draft PR #1658. |
-| 2026-08-15 | Plan | Research | Re-read #1611/#1613 and traced producer, predicate, claim, refusal, retry, and tests. |
-| 2026-08-15 | Plan | Rescope stop | Recorded significant contract drift and stopped without widening the four-path envelope. |
-| 2026-08-15 | Plan | Contract amendment | Verified central amendment `feaf2da31`; replaced blocked plan with exact eight-path design and ordered slices. |
-| 2026-08-15 | Plan gate | PASS | Separate evaluator commit `e15d78588` records PASS against plan head `cea999d18`; implementation authorized at S1. |
-| 2026-08-15 | S1 | RED | Added candidate/refusal/recursion regressions first; targeted structured test wrapper exited 1 because the new policy exports did not exist. |
-| 2026-08-15 | S1 | Implementation | Added literal candidate classification, explicit five-reason reportable set, marker exclusions, and controlled source-comment refusal replies; targeted suite passed 16/16 after implementation. |
-| 2026-08-15 | S1 | Durable gates | At committed head `4aa04de34`, `check` passed with 2,922 package/plugin files selected and `test` passed with 4,138 passed / 19 ignored / 0 failed. Only `test` covers this leaf. |
-| 2026-08-15 | S1 | Reconcile | #1611 and #1613 remain open at milestone `0.0.7`; PR comments through PLAN-EVAL were read and introduced no new implementation adjustment. No issue mutation or out-of-scope label change was made. |
+| Time       | Slice     | Step               | Notes                                                                                                                                                                                               |
+| ---------- | --------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-15 | S0        | Bootstrap          | Verified worktree/base; preserved coordinator thread metadata; committed templates; opened draft PR #1658.                                                                                          |
+| 2026-08-15 | Plan      | Research           | Re-read #1611/#1613 and traced producer, predicate, claim, refusal, retry, and tests.                                                                                                               |
+| 2026-08-15 | Plan      | Rescope stop       | Recorded significant contract drift and stopped without widening the four-path envelope.                                                                                                            |
+| 2026-08-15 | Plan      | Contract amendment | Verified central amendment `feaf2da31`; replaced blocked plan with exact eight-path design and ordered slices.                                                                                      |
+| 2026-08-15 | Plan gate | PASS               | Separate evaluator commit `e15d78588` records PASS against plan head `cea999d18`; implementation authorized at S1.                                                                                  |
+| 2026-08-15 | S1        | RED                | Added candidate/refusal/recursion regressions first; targeted structured test wrapper exited 1 because the new policy exports did not exist.                                                        |
+| 2026-08-15 | S1        | Implementation     | Added literal candidate classification, explicit five-reason reportable set, marker exclusions, and controlled source-comment refusal replies; targeted suite passed 16/16 after implementation.    |
+| 2026-08-15 | S1        | Durable gates      | At committed head `4aa04de34`, `check` passed with 2,922 package/plugin files selected and `test` passed with 4,138 passed / 19 ignored / 0 failed. Only `test` covers this leaf.                   |
+| 2026-08-15 | S1        | Reconcile          | #1611 and #1613 remain open at milestone `0.0.7`; PR comments through PLAN-EVAL were read and introduced no new implementation adjustment. No issue mutation or out-of-scope label change was made. |
 
 ## Decisions
 
-| Decision | Reason | Source |
-| --- | --- | --- |
+| Decision                        | Reason                                                                                                                                                                                                                                                                                   | Source                                  |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
 | S1 precedes workflow broadening | S4 consumes the candidate/refusal API introduced by S1. Feature-branch commit order does not itself protect live spend: both the `issue_comment` workflow definition and trusted policy checkout resolve from the default branch, so intermediate branch commits cannot affect dispatch. | evaluator N1; `openhands-agent.yml:164` |
-| CLI alone resolves formal head | Verdict provenance cannot trust caller input. | amendment `feaf2da31` |
-| PLAN-EVAL required | Workflow permissions plus atomic claim/spend have silent and recursive failure modes. | coordinator decision; harness plan gate |
-| JSR audit N/A | No publishable package/plugin surface. | amended contract |
+| CLI alone resolves formal head  | Verdict provenance cannot trust caller input.                                                                                                                                                                                                                                            | amendment `feaf2da31`                   |
+| PLAN-EVAL required              | Workflow permissions plus atomic claim/spend have silent and recursive failure modes.                                                                                                                                                                                                    | coordinator decision; harness plan gate |
+| JSR audit N/A                   | No publishable package/plugin surface.                                                                                                                                                                                                                                                   | amended contract                        |
 
 ## Gate Results
 
-| Gate | Outcome | Exit | Receipt / evidence | Coverage meaning |
-| --- | --- | ---: | --- | --- |
-| Targeted RED | expected failure | 1 | structured test wrapper, before implementation; no durable PASS receipt | New policy exports did not exist. |
-| Targeted GREEN | PASS | 0 | structured test wrapper; 16/16 | Focused S1 regression feedback. |
-| `check` | PASS | 0 | `receipts/slice-1/check.json` at `4aa04de34` | Frozen-contract receipt only: selected 2,922 files under package/plugin roots and does not cover S1. |
-| `test` | PASS | 0 | `receipts/slice-1/test.json` at `4aa04de34`; 4,138 passed, 19 ignored, 0 failed | Load-bearing S1 behavioral proof; root discovery executed the policy suite. |
-| `quality-job` | NOT_RUN | — | S1 does not name this gate; scheduled for S4/S5 | Would share the non-covering package/plugin `check` dependency and is not independent proof. |
+| Gate           | Outcome          | Exit | Receipt / evidence                                                              | Coverage meaning                                                                                     |
+| -------------- | ---------------- | ---: | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Targeted RED   | expected failure |    1 | structured test wrapper, before implementation; no durable PASS receipt         | New policy exports did not exist.                                                                    |
+| Targeted GREEN | PASS             |    0 | structured test wrapper; 16/16                                                  | Focused S1 regression feedback.                                                                      |
+| `check`        | PASS             |    0 | `receipts/slice-1/check.json` at `4aa04de34`                                    | Frozen-contract receipt only: selected 2,922 files under package/plugin roots and does not cover S1. |
+| `test`         | PASS             |    0 | `receipts/slice-1/test.json` at `4aa04de34`; 4,138 passed, 19 ignored, 0 failed | Load-bearing S1 behavioral proof; root discovery executed the policy suite.                          |
+| `quality-job`  | NOT_RUN          |    — | S1 does not name this gate; scheduled for S4/S5                                 | Would share the non-covering package/plugin `check` dependency and is not independent proof.         |
 
 ## Handoff Notes
 
@@ -111,3 +111,49 @@ surfaces mirror those boundaries in the same order.
 - Evaluator N5 remains deliberately deferred to S4, the authorized workflow slice: refusal posting
   must use `GITHUB_TOKEN` beneath `issues: write`, never `PAT_TOKEN`.
 - This thread did not dispatch OpenHands/evaluator work or apply workflow-triggering labels.
+
+## Tier-A sign-off — Slice 1
+
+Signed off by `topic-internals-0.0.7` (Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34`, Opus 5
+/ high) at `f1567ce32806f30f80365d180e73e053eb7d8e05` (implementation `4aa04de34`, attestation
+`f1567ce32`). Supervisor commit, not the implementer's.
+
+Verified by execution, not by reading receipts:
+
+- **Scope holds.** Only `.github/scripts/openhands-comment-trigger.mjs` and its test — exactly S1's
+  two paths from the eight-path envelope. No drift into S2–S4 surfaces, no ninth path, no lock
+  churn.
+- **Supervisor re-ran the suite: 16 passed / 0 failed, exit 0.**
+- **The recursion guard is proven by round-trip, not asserted.** The refusal body is fed back
+  through the real predicates: `isOpenHandsCommentCandidate(refusal.body) === false`,
+  `decide(refusal.body).reason === 'not-command-candidate'`, and
+  `refusal.body.includes(OPENHANDS_COMMENT_COMMAND) === false`. A test that merely inspected the
+  wording would not have shown the bot's own reply is a non-candidate; running it through the actual
+  predicate does.
+- **N3 discharged by execution.** `WATCHER_HEURISTIC_TOKEN_RE.test(refusal.body) === false` runs the
+  very regex (`agentic-lib.ts:939`) that could otherwise mine a refusal as a verdict — proof rather
+  than careful word choice.
+- **N4 discharged exactly.** All five reasons — `command-not-first-token`,
+  `invalid-command-argument`, `unknown-command-argument`, `duplicate-command-argument`,
+  `author-not-authorized` — appear in both implementation and test, with a dedicated _"reportable
+  denial vocabulary is exactly the five policy refusal reasons"_ test (note **exactly**, which
+  forbids a superset as well as a subset) and a separate _"each malformed or unauthorized literal
+  candidate gets its attributable reason"_ test giving the per-reason assertions.
+- **Sanitization holds** — `untrustedLogin.body.includes('owner') === false`, so an untrusted
+  author's identity does not leak into the reply.
+- **Claim/collision behaviour untouched** — the diff removes no claim or spend logic; the only
+  addition in that area is a doc comment. Fail-closed zero-spend is preserved by not being
+  disturbed.
+
+**N1 corrected by the leaf, correctly.** `worklog.md:89` now justifies S1-before-S4 by the _"S4
+consumes the candidate/refusal API introduced by S1"_ dependency and states plainly that
+_"Feature-branch commit order does not itself protect live spend: both the `issue_comment` workflow
+definition and trusted policy checkout resolve from the default branch"_. That replaces the
+rationale I wrongly endorsed at Tier-A.
+
+**N2 honoured with unusual honesty.** The gate table records `check` as _"Frozen-contract receipt
+only … does not cover S1"_, `test` as _"Load-bearing S1 behavioral proof"_, and `quality-job` as
+**`NOT_RUN`** with _"not independent proof"_ — rather than presenting green receipts as three proofs
+or silently omitting the gate S1 does not name.
+
+Slice 2 is authorized.
