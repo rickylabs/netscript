@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------------------------------------------------------------------------- |
 | Run ID         | `fix-sdk-typed-error-channel--0.0.7-wave1`                                                                  |
 | Branch         | `fix/sdk-typed-error-channel`                                                                               |
-| Phase          | `plan` — coordinator-amended; awaiting fresh Tier-A review, then separate PLAN-EVAL                         |
+| Phase          | `implementation` — PLAN-EVAL PASS; S1 authorized and isolated                                               |
 | Target         | `packages/contracts`, `packages/sdk`, and two published docs pages                                          |
 | Archetype      | `1 — Small Contract` for this bounded contract slice (the SDK package remains doctrine Archetype 2 overall) |
 | Scope overlays | `docs`                                                                                                      |
@@ -49,7 +49,7 @@ type DefinedErrorLike = Error & {
 
 type NarrowDefined<TError> = Extract<TError, DefinedErrorLike> & DefinedError;
 
-type SafeFailure<TError> =
+type SafeFailure<TError = ThrowableError> =
   | ([Exclude<TError, DefinedErrorLike>, undefined, false, false] & {
     error: Exclude<TError, DefinedErrorLike>;
     data: undefined;
@@ -145,8 +145,9 @@ These are the complete authorized product/test/docs paths:
 
 This ceiling is exact. A seventh product, test, or docs path is a rescope requiring a fresh
 coordinator ruling. In particular, `packages/contracts/src/public/mod.ts`,
-`packages/contracts/README.md`, and the benchmark reference files are not authorized. The stale
-prose remains tracked follow-up debt rather than being absorbed into this leaf.
+`packages/contracts/README.md`, and the benchmark reference files are not authorized. Only the
+benchmark reference prose is confirmed stale and remains coordinator-owned follow-up debt; the
+contracts README's statement that the error map is applied remains true.
 
 ## Planned docs dispositions
 
@@ -180,6 +181,7 @@ if (!result.isSuccess && result.isDefined) {
 Expected base RED:
 
 ```text
+TS18046: 'discriminated.error' is of type 'unknown'.
 TS2339: Property 'code' does not exist on type 'never'.
 ```
 
@@ -213,7 +215,7 @@ test written only after the implementation or one using ambient re-declarations 
 
 | # | What the slice proves                                                                                                                                                                                                             | Files                                                            | Proving gate                                              |
 | - | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------- |
-| 1 | RED fixture uses real exports and fails with TS2339; then the four-generic builder retains all six error keys and the empty fourth metadata slot without defining metadata vocabulary.                                            | `contract-primitives.ts`, `readme-doctest_test.ts`               | Focused structured test/check; negative type assertions   |
+| 1 | RED fixture uses real exports and fails with TS18046 plus TS2339; then the four-generic builder retains all six error keys and the empty fourth metadata slot without defining metadata vocabulary.                               | `contract-primitives.ts`, `readme-doctest_test.ts`               | Focused structured test/check; negative type assertions   |
 | 2 | A real service method carries its six-literal contract error union into `safe()`; `SafeResult`/`isDefinedError` preserve code-specific data, reject plain errors, and the client port remains compatible with existing consumers. | `errors.ts`, `ports/service-client.ts`, `readme-doctest_test.ts` | Focused structured test/check; exact base RED turns green |
 | 3 | Both published pages tell one consistent, compile-accurate error story, including non-defined failure handling.                                                                                                                   | `sdk.md`, `how-to/discover-services.md`                          | `docs-source-format`, `docs-accuracy`, doctest            |
 | 4 | Published surfaces remain curated and all package gates are recorded without laundering known reds.                                                                                                                               | run artifacts only                                               | full selected validation set below                        |
@@ -223,20 +225,20 @@ test written only after the implementation or one using ambient re-declarations 
 Structured wrappers are the verdict source. The gate set is locked; command filters may be
 mechanically finalized after PLAN-EVAL but cannot expand the six-path edit ceiling:
 
-| Order | Gate           | Planned command/evidence                                                                                                                 | Expected result                                                                               |
-| ----- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| 1     | RED            | Structured focused test/check on the real-surface fixture before implementation                                                          | FAIL with TS2339 `code` on `never`; record once                                               |
-| 2     | Check          | `.llm/tools/run-deno-check.ts` scoped to affected TS, with `--unstable-kv`                                                               | PASS after implementation                                                                     |
-| 3     | Test           | `.llm/tools/run-deno-test.ts -- --allow-all packages/sdk/tests/readme-doctest_test.ts` plus affected package consumer tests               | PASS; if `typed-queue_test.ts` hits #1667 `expected 1, got 2`, report once and do not rerun   |
-| 4     | Lint           | `.llm/tools/run-deno-lint.ts` scoped to affected package TS                                                                              | PASS                                                                                          |
-| 5     | Format         | `.llm/tools/run-deno-fmt.ts --ext ts,tsx` scoped to affected package TS                                                                  | PASS                                                                                          |
-| 6     | Quality        | `deno task quality:scan`                                                                                                                 | PASS for the leaf diff                                                                        |
-| 7     | Doctrine       | `deno task arch:check`                                                                                                                   | PASS for the leaf; known base findings separated                                              |
-| 8     | Public surface | base-vs-head `surface:diff` sets/signatures                                                                                              | Raw gate remains known-red at base; no unintended new export, only approved signature changes |
-| 9     | Docs           | repository `docs-source-format` and `docs-accuracy` tasks                                                                                | PASS for both authorized pages                                                                |
-| 10    | Doc lint       | `deno task doc:lint --root packages/contracts --pretty` and SDK equivalent                                                               | Compare with pinned raw baselines; do not relabel baseline reds green                         |
-| 11    | Publish        | `deno task publish:dry-run` plus affected per-package raw dry-run where attribution is needed                                            | PASS; contracts sanctioned oRPC slow-type information reported honestly                       |
-| 12    | JSR            | repository JSR audits for `packages/contracts` and `packages/sdk`                                                                        | Report known SDK `F-DOCT-5` red; no new finding                                               |
+| Order | Gate           | Planned command/evidence                                                                                                    | Expected result                                                                               |
+| ----- | -------------- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| 1     | RED            | Structured focused test/check on the real-surface fixture before implementation                                             | FAIL once with TS18046 `unknown` and TS2339 `code` on `never`                                 |
+| 2     | Check          | `.llm/tools/run-deno-check.ts` scoped to affected TS, with `--unstable-kv`                                                  | PASS after implementation                                                                     |
+| 3     | Test           | `.llm/tools/run-deno-test.ts -- --allow-all packages/sdk/tests/readme-doctest_test.ts` plus affected package consumer tests | PASS; if `typed-queue_test.ts` hits #1667 `expected 1, got 2`, report once and do not rerun   |
+| 4     | Lint           | `.llm/tools/run-deno-lint.ts` scoped to affected package TS                                                                 | PASS                                                                                          |
+| 5     | Format         | `.llm/tools/run-deno-fmt.ts --ext ts,tsx` scoped to affected package TS                                                     | PASS                                                                                          |
+| 6     | Quality        | `deno task quality:scan`                                                                                                    | PASS for the leaf diff                                                                        |
+| 7     | Doctrine       | `deno task arch:check`                                                                                                      | PASS for the leaf; known base findings separated                                              |
+| 8     | Public surface | base-vs-head `surface:diff` sets/signatures                                                                                 | Raw gate remains known-red at base; no unintended new export, only approved signature changes |
+| 9     | Docs           | repository `docs-source-format` and `docs-accuracy` tasks                                                                   | PASS for both authorized pages                                                                |
+| 10    | Doc lint       | `deno task doc:lint --root packages/contracts --pretty` and SDK equivalent                                                  | Compare with pinned raw baselines; do not relabel baseline reds green                         |
+| 11    | Publish        | `deno task publish:dry-run` plus affected per-package raw dry-run where attribution is needed                               | PASS; contracts sanctioned oRPC slow-type information reported honestly                       |
+| 12    | JSR            | repository JSR audits for `packages/contracts` and `packages/sdk`                                                           | Report known SDK `F-DOCT-5` red; no new finding                                               |
 
 No Aspire, Docker, runtime lease, or `e2e:cli` gate is applicable or permitted.
 
@@ -272,13 +274,12 @@ No Aspire, Docker, runtime lease, or `e2e:cli` gate is applicable or permitted.
   and must not be reported as green or as leaf regressions.
 - No new error codes, client construction seam (#1349), server raising behavior (#1263), oRPC v2,
   type-soundness sweep (#1278), plugin-local base-contract repair, or generated reference rewrite.
-- Metadata definition, initialization, export, and semantic flow remain #1466 scope. Stale
-  contracts/benchmark prose is tracked follow-up debt; neither category may consume a seventh path
-  in this leaf without a fresh ruling.
+- Metadata definition, initialization, export, and semantic flow remain #1466 scope. Stale benchmark
+  reference prose is coordinator-owned follow-up debt; neither category may consume a seventh path
+  in this leaf without a fresh ruling. The contracts README is not stale on this point.
 
 ## Plan-Gate state
 
-The coordinator ruling resolves every “must resolve now” decision. Stale out-of-scope prose and
-#1466 metadata semantics are explicitly safe to defer. A fresh Tier-A reviews this amended head;
-then `PLAN-EVAL` runs in a separate session and remains a hard stop. No implementation may begin
-until that evaluator returns `PASS`.
+The coordinator ruling resolved every “must resolve now” decision. PLAN-EVAL returned terminal
+`PASS` in `plan-eval.md` at evaluator commit `f76a3c45b`. S1 alone is authorized; each landed slice
+still stops for fresh Tier-A review before the coordinator may authorize the next slice.
