@@ -10,8 +10,7 @@
  *   howto:      how-to recipe           (howto:add-a-plugin)
  *   tut:        tutorial chapter/track  (tut:first-workspace)
  *   explain:    explanation essay       (explain:architecture)
- *   compare:    comparison programme    (compare:methodology)
- *   migration:  migration roadmap       (migration:nextjs)
+ *   compare:    framework comparison    (compare:frontend)
  *   concept:    concept / mental-model page
  *   ref:        reference unit (ref:sagas -> /reference/sagas/)
  *               and sub-paths           (ref:sagas/presets -> /reference/sagas/presets/)
@@ -198,12 +197,8 @@ export const xref: Record<string, XrefTarget> = {
 
   // ─── Comparisons (compare:) ───────────────────────────────────────────────
   "compare:index": { href: "/comparisons/", label: "Comparisons" },
-  "compare:methodology": { href: "/comparisons/methodology/", label: "Comparison methodology" },
-  "compare:nextjs-session": { href: "/comparisons/nextjs-session/", label: "NetScript vs Next.js: Session page" },
-
-  // ─── Migration roadmaps (migration:) ─────────────────────────────────────
-  "migration:index": { href: "/migration/", label: "Migration roadmaps" },
-  "migration:nextjs": { href: "/migration/nextjs/", label: "Migrate from Next.js" },
+  "compare:frontend": { href: "/comparisons/frontend/", label: "NetScript vs frontend frameworks" },
+  "compare:backend": { href: "/comparisons/backend/", label: "NetScript vs backend frameworks" },
 
   // ─── Concept / mental-model pages (concept:) ───────────────────────────────
   "concept:contracts": { href: "/explanation/contracts/", label: "Contracts-first" },
