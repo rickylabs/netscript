@@ -256,3 +256,62 @@ Recorded so a later reader does not assume the glob was verified against GitHub.
 2. Ready flip, merge, publication, relabeling and issue closure remain coordinator-only.
 3. The expensive-gate lease is consumed; no further browser or runtime pass is authorized.
 4. No next leaf has been started.
+
+---
+
+# CORRECTION — this Tier-A PASS was wrong on the central question
+
+IMPL-EVAL cycle 1 (`a46b83831`, evaluated head `939e73113`) returned **`FAIL_FIX`** on finding
+**E-1**, which this Tier-A review missed. The correction is recorded here rather than by editing the
+sections above, so the error stays visible.
+
+## What I got wrong
+
+I verified template↔manifest semantics exhaustively — 66/66, ordered equality, field fidelity,
+collection membership, symmetric negative fixtures — and concluded the catalog was correct. **I never
+asked whether the template is what ships.** It is not.
+
+Verified myself after the verdict:
+
+| Check | Result |
+| --- | --- |
+| `git diff --name-only da574111a..HEAD -- …/assets/embedded.generated.ts` | **empty — never regenerated** |
+| `grep 'total: 5[0-9]' embedded.generated.ts` | **`total: 50`** |
+| `grep -c 'citation-chip' embedded.generated.ts` | **0** — the AI collection is absent from the shipped barrel |
+| `deno task check:assets-barrel` | **raw exit 1** — barrel stale |
+
+`TemplateRegistry`'s only content source is `EMBEDDED_TEMPLATE_CONTENT` from
+`embedded.generated.ts`, with a no-op `hydrate()` and no disk fallback, and that registry is what
+`netscript init` uses. So a project scaffolded from this branch still renders "All **50** items" and
+still hides the entire AI collection. The user-visible defect #1358 exists to fix is **unfixed on
+the consumer path**; only its source template was corrected.
+
+## Why the miss is not excusable by the contract
+
+The contract's `provingGates` list (`check`, `test`, `publish-dry-run`, `fresh-browser`) does not
+name `assets-barrel`, and no lane ran it — that is the evaluator's **E-2**. But this is a known
+repo-wide pattern, not an obscure one: the sibling scaffold leaf (#1654) regenerated
+`embedded.generated.ts` in **every** slice that touched an asset template, and this reviewer
+explicitly recorded that fact in that leaf's Tier-A. Here the file's **absence** from a two-file
+product diff should have been the first thing checked, precisely because a template edit without a
+barrel regen is the exact shape of a fix that passes every test and ships nothing.
+
+Reviewing generated-asset changes without asking "does the generated artifact carry this?" is the
+gap. The verification list for any future CLI asset-template slice must include the barrel diff and
+`check:assets-barrel`.
+
+## Corrected verdict
+
+The Tier-A `PASS_TO_IMPL_EVAL` above is **withdrawn**. The correct Tier-A verdict at head
+`939e73113` is **CHANGES_REQUESTED**, subsumed by the formal IMPL-EVAL `FAIL_FIX`.
+
+The T-3/N1/N2 findings and the R-1 residual in the sections above remain accurate and are unaffected
+— the classifier and workflow-ownership analysis stands, and the evaluator independently reached the
+same conclusion on those. What was missed is orthogonal to them.
+
+## Required repair (coordinator-owned)
+
+`deno task gen:assets-barrel` and commit the single regenerated `embedded.generated.ts`, then re-run
+`check:assets-barrel` and record the raw exit code. **`embedded.generated.ts` is outside the current
+contract surface**, so this needs a further coordinator amendment — the same boundary that produced
+the T-3 amendment. `assets-barrel` should also be added to the leaf's proving-gate set (E-2).
