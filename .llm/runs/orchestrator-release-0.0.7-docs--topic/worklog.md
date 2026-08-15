@@ -389,3 +389,39 @@ Leaf `docs/comparison-docs-programme` at `0a13c0162`, clean, local equals remote
 `98fc58997`. Codex thread `019ffcc9-16c2-7573-b7f6-d627172408e8` idle and preserved; no replacement
 sender was ever created. No merge, publish, readiness mutation, relabel, issue mutation, or
 Aspire/Docker/shared expensive-gate lease from this lane.
+
+## 2026-08-15 — coordinator provisioned the S2 input; S2 resumed
+
+The coordinator materialized the exact authorized EIS-Chat input. Reconciled by this orchestrator
+before dispatch — verified, not accepted on report:
+
+| Fact                          | Verified value                                               |
+| ----------------------------- | ------------------------------------------------------------ |
+| Input root                    | `/home/codex/repos/eis-chat-007-input`                       |
+| `git rev-parse HEAD`          | `5191de83f3da97559f21d8891c6c8afdf1cf473a` — exact pin match |
+| HEAD state                    | detached, not on a branch                                    |
+| Working tree                  | clean, no untracked entries                                  |
+| Tracked files                 | 1830                                                         |
+| Registration                  | real worktree of `/home/codex/repos/eis-chat`                |
+| Pinned object in parent clone | present (`git cat-file -t` → `commit`)                       |
+
+No pre-existing checkout was disturbed: `/home/codex/repos/eis-chat`,
+`/home/codex/repos/refs/eis-chat`, and `/home/codex/eis-chat-ref` all remain on `master` at
+`aeaf2df`, `5fdff77`, and `a08ebe5` respectively — the same values recorded when the blocker was
+raised. The coordinator added a revision rather than moving one, which is what makes the input
+immutable for the gate.
+
+This closes the fourth plan defect without a plan change: S2's tool contract required an authorized
+local root at the pinned revision, and one now exists. The contract's "verify the revision before
+reading, refuse on mismatch" clause becomes genuinely testable for the first time, so the brief
+requires the refusal path to carry a real test case.
+
+Pre-dispatch reconciliation: leaf at `0a13c0162`, `dirty=0`, local equals remote, daemon
+`running`/managed at `0.147.0`. Resumed the **same** thread `019ffcc9-16c2-7573-b7f6-d627172408e8`
+via `agentic:codex-resume`, detached, never `timeout`-wrapped, no replacement sender.
+
+Boundaries restated to the generator: the input root is strictly read-only — no fetch, pull,
+checkout, reset, commit, branch, or write anywhere under `/home/codex/repos/eis-chat*`; derived data
+only, never file contents. The `docs/site` build and rendered link check remain mandatory for this
+slice under Tier-A finding T2. Stop after S2 for Tier-A, whose gate this orchestrator will
+re-execute independently.
