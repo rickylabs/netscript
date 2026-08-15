@@ -382,52 +382,52 @@ Slice 5 is authorized.
 
 ### Progress
 
-| Time       | Step          | Notes |
-| ---------- | ------------- | ----- |
-| 2026-08-15 | Authorization | Fetched and verified clean exact head `ad19d0e20`, the Tier-A S4 sign-off; began evidence-only S5 without rebasing. |
+| Time       | Step          | Notes                                                                                                                                                                                         |
+| ---------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-15 | Authorization | Fetched and verified clean exact head `ad19d0e20`, the Tier-A S4 sign-off; began evidence-only S5 without rebasing.                                                                           |
 | 2026-08-15 | Reconcile     | Read live PR #1658, its latest S4 sign-off, and issues #1611/#1613. The PR remains draft; both issues remain open; no body checkbox, label, issue, readiness, or evaluator state was changed. |
-| 2026-08-15 | Checkpoint    | Prepared this run-only checkpoint so `check`, `test`, and `quality-job` can all attest one immutable branch-reachable head. No implementation path changed. |
+| 2026-08-15 | Checkpoint    | Prepared this run-only checkpoint so `check`, `test`, and `quality-job` can all attest one immutable branch-reachable head. No implementation path changed.                                   |
 
 ### Definition-of-Done truth audit (pre-final-receipt checkpoint)
 
-| PR-body row | Truth status | Evidence / remaining requirement |
-| --- | --- | --- |
-| Optional formal `--phase plan|impl`, PR-only/verdict-required/live-head/no caller head | Satisfied | S2 producer pair tests and S3 CLI tests; `receipts/slice-2/test.json`, `receipts/slice-3/test.json`; Tier-A S2/S3 sign-offs. |
-| Phase-absent PR and issue dispatch remain tuple-free | Satisfied | Explicit absence assertions in S2 plus both-target/zero-call assertions in S3. |
-| Formal dispatch acquires the existing tuple claim and refuses duplicates pre-spend | Satisfied | S1 producer round-trip and forced-collision production-policy coverage; `receipts/slice-1/test.json`; claim primitive preserved through S4. |
-| Every reportable denial gets exactly one sanitized, marker-bearing, token-free pre-spend reply | Satisfied | S1 exact five-reason assertions; S4 shipped reporter repeat-delivery count/sequence test; `receipts/slice-1/test.json`, `receipts/slice-4/test.json`. |
-| Status/refusal markers cannot recurse | Satisfied | S1 generated refusal round-tripped through production predicates and watcher heuristic; S4 exhaustion refusal repeats both guards. |
-| Manual generation lookup is 5×1s and exhaustion is attributable/fail-closed | Satisfied | S4 executable workflow extraction asserts five attempts, five 1000 ms waits, controlled refusal, and agent skip. |
-| Complete round-trip/collision/refusal/recursion/CLI/retry plus all three final gates recorded | Satisfied; PR checkbox deliberately unchanged | Behavioral parts landed in S1–S4. `receipts/slice-5/{check,test,quality-job}.json` all PASS at checkpoint `1390d3ead`; root `test` reports 4,147 passed / 19 ignored / 0 failed. The coordinator/IMPL-EVAL owns the checkbox transition. |
-| Separate-session PLAN-EVAL and IMPL-EVAL satisfied | Not yet satisfied | PLAN-EVAL PASS exists at `e15d78588`; IMPL-EVAL has not run and must remain a separate-session coordinator action after S5/Tier-A. |
+| PR-body row                                                                                    | Truth status                                             | Evidence / remaining requirement                                                                                                                                                                                                         |
+| ---------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Optional formal `--phase plan                                                                  | impl`, PR-only/verdict-required/live-head/no caller head | Satisfied                                                                                                                                                                                                                                |
+| Phase-absent PR and issue dispatch remain tuple-free                                           | Satisfied                                                | Explicit absence assertions in S2 plus both-target/zero-call assertions in S3.                                                                                                                                                           |
+| Formal dispatch acquires the existing tuple claim and refuses duplicates pre-spend             | Satisfied                                                | S1 producer round-trip and forced-collision production-policy coverage; `receipts/slice-1/test.json`; claim primitive preserved through S4.                                                                                              |
+| Every reportable denial gets exactly one sanitized, marker-bearing, token-free pre-spend reply | Satisfied                                                | S1 exact five-reason assertions; S4 shipped reporter repeat-delivery count/sequence test; `receipts/slice-1/test.json`, `receipts/slice-4/test.json`.                                                                                    |
+| Status/refusal markers cannot recurse                                                          | Satisfied                                                | S1 generated refusal round-tripped through production predicates and watcher heuristic; S4 exhaustion refusal repeats both guards.                                                                                                       |
+| Manual generation lookup is 5×1s and exhaustion is attributable/fail-closed                    | Satisfied                                                | S4 executable workflow extraction asserts five attempts, five 1000 ms waits, controlled refusal, and agent skip.                                                                                                                         |
+| Complete round-trip/collision/refusal/recursion/CLI/retry plus all three final gates recorded  | Satisfied; PR checkbox deliberately unchanged            | Behavioral parts landed in S1–S4. `receipts/slice-5/{check,test,quality-job}.json` all PASS at checkpoint `1390d3ead`; root `test` reports 4,147 passed / 19 ignored / 0 failed. The coordinator/IMPL-EVAL owns the checkbox transition. |
+| Separate-session PLAN-EVAL and IMPL-EVAL satisfied                                             | Not yet satisfied                                        | PLAN-EVAL PASS exists at `e15d78588`; IMPL-EVAL has not run and must remain a separate-session coordinator action after S5/Tier-A.                                                                                                       |
 
 ### N1–N5 disposition
 
-| Note | Status | Disposition |
-| --- | --- | --- |
-| N1 | Discharged | S1 corrected the ordering rationale: S4 follows S1 because S4 consumes the S1 API. Feature-branch intermediate commits cannot affect default-branch workflow/policy execution. |
-| N2 | Discharged | Every gate table names root `test` as load-bearing. `check` and `quality-job` are required receipts but their package/plugin selections do not cover this leaf. The new CLI suite was root-auto-discovered; no catalog/ninth path was added. |
-| N3 | Discharged | Controlled refusal vocabulary avoids bare watcher verdict tokens; S1 and S4 execute `WATCHER_HEURISTIC_TOKEN_RE` against generated refusal bodies. |
-| N4 | Discharged | S1 asserts the reportable-denial set is exactly the five required reasons and asserts each reason independently. |
-| N5 | Discharged | S4 posts refusal with `GITHUB_TOKEN` under authorize-job `contents: read` + `issues: write`; PAT remains claim-only, so the declared write grant is the actual ceiling. |
+| Note | Status     | Disposition                                                                                                                                                                                                                                  |
+| ---- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| N1   | Discharged | S1 corrected the ordering rationale: S4 follows S1 because S4 consumes the S1 API. Feature-branch intermediate commits cannot affect default-branch workflow/policy execution.                                                               |
+| N2   | Discharged | Every gate table names root `test` as load-bearing. `check` and `quality-job` are required receipts but their package/plugin selections do not cover this leaf. The new CLI suite was root-auto-discovered; no catalog/ninth path was added. |
+| N3   | Discharged | Controlled refusal vocabulary avoids bare watcher verdict tokens; S1 and S4 execute `WATCHER_HEURISTIC_TOKEN_RE` against generated refusal bodies.                                                                                           |
+| N4   | Discharged | S1 asserts the reportable-denial set is exactly the five required reasons and asserts each reason independently.                                                                                                                             |
+| N5   | Discharged | S4 posts refusal with `GITHUB_TOKEN` under authorize-job `contents: read` + `issues: write`; PAT remains claim-only, so the declared write grant is the actual ceiling.                                                                      |
 
 ### S5 boundaries
 
 - S5 owns only run artifacts and receipts; the eight implementation paths remain untouched.
 - The final three receipts will bind to the checkpoint commit created from this record.
-- No OpenHands/evaluator dispatch, label transition, ready flip, PR-body checkbox edit, issue mutation,
-  forbidden runtime gate, or lock/cache operation is authorized.
+- No OpenHands/evaluator dispatch, label transition, ready flip, PR-body checkbox edit, issue
+  mutation, forbidden runtime gate, or lock/cache operation is authorized.
 
 ### Final durable gates
 
 All three receipts attest the same immutable checkpoint `1390d3ead1d7d4381ace3d9403f559f009895643`,
 which is an ancestor of the final evidence commit and therefore reachable from the branch head.
 
-| Gate | Outcome | Exit | Receipt | Coverage meaning |
-| --- | --- | ---: | --- | --- |
-| `check` | PASS | 0 | `receipts/slice-5/check.json` | Required contract receipt; cached package/plugin selection, so it does not cover this leaf. |
-| `test` | PASS | 0 | `receipts/slice-5/test.json`; 4,147 passed, 19 ignored, 0 failed | Load-bearing behavioral proof; root auto-discovery executes the producer, policy, CLI, and workflow suites. |
-| `quality-job` | PASS | 0 | `receipts/slice-5/quality-job.json` | Required contract receipt; its package/plugin quality inputs are not independent behavioral coverage of this leaf. |
+| Gate          | Outcome | Exit | Receipt                                                          | Coverage meaning                                                                                                   |
+| ------------- | ------- | ---: | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `check`       | PASS    |    0 | `receipts/slice-5/check.json`                                    | Required contract receipt; cached package/plugin selection, so it does not cover this leaf.                        |
+| `test`        | PASS    |    0 | `receipts/slice-5/test.json`; 4,147 passed, 19 ignored, 0 failed | Load-bearing behavioral proof; root auto-discovery executes the producer, policy, CLI, and workflow suites.        |
+| `quality-job` | PASS    |    0 | `receipts/slice-5/quality-job.json`                              | Required contract receipt; its package/plugin quality inputs are not independent behavioral coverage of this leaf. |
 
 ### Final scope and handoff audit
 
@@ -439,3 +439,41 @@ which is an ancestor of the final evidence commit and therefore reachable from t
   The PR body remains unchanged and draft so the separate evaluator/coordinator can own both
   checkbox completion and lifecycle transition.
 - N1–N5 are all discharged; no implementation decision, drift, or debt remains open for IMPL-EVAL.
+
+## Tier-A sign-off — Slice 5 (final planned slice)
+
+Signed off by `topic-internals-0.0.7` (Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34`, Opus 5
+/ high) at `704c067e8f09fb47a3973faa7277321cac34f9ef` (evidence checkpoint `1390d3ead`, attestation
+`704c067e8`). Supervisor commit, not the implementer's. **All five planned slices are implemented.**
+
+Verified by execution at the final head:
+
+- **S5 is evidence-only, as required** — the diff from the S4 sign-off contains **no**
+  implementation path.
+- **The whole-leaf surface is exactly the eight contracted paths** — seven modified plus
+  `dispatch-openhands_test.ts` added — with **no ninth path**, no `catalog.ts`/`deno.json` edit, and
+  `.github/workflows/openhands-phase-eval.yml` untouched throughout. That empirically validates the
+  plan's claim that all eight required an edit, and confirms PLAN-EVAL N2's auto-discovery finding.
+- **Supervisor re-ran the load-bearing gate: `deno task test` → 4,147 passed / 0 failed / 19
+  ignored, exit 0.** Final receipts `check`, `test`, and `quality-job` all PASS at `1390d3ead`.
+- **No `deno.lock` churn across the entire leaf.**
+
+**DoD truth audit accepted.** Rows 1–7 are reported evidence-ready; **row 8 is reported _not_
+satisfied** because IMPL-EVAL has not run, and the PR body is left unchanged and draft so the
+separate evaluator and the coordinator own both checkbox completion and the lifecycle transition.
+Reporting an unsatisfiable row as unsatisfied — rather than ticking it because the rest of the work
+is done — is the behaviour the close-gate exists to protect.
+
+**N1–N5 disposition verified against what the slices actually landed**, not accepted as a summary:
+
+| Note | Verified                                                                                             |
+| ---- | ---------------------------------------------------------------------------------------------------- |
+| N1   | S1's `worklog.md` rationale now reads S4→S1 API dependency, with default-branch resolution stated    |
+| N2   | Every gate table names root `test` load-bearing; whole-leaf surface is eight paths, no catalog entry |
+| N3   | S1 and S4 execute `WATCHER_HEURISTIC_TOKEN_RE` against generated refusal bodies                      |
+| N4   | S1 asserts the denial set is **exactly** five and asserts each reason independently                  |
+| N5   | S4 posts with `GITHUB_TOKEN` under `contents: read` + `issues: write`; PAT remains claim-only        |
+
+Implementation of all five planned slices is complete. This lane does not flip readiness, apply
+`status:ready-merge`, tick PR-body boxes, merge, or publish. **Formal IMPL-EVAL remains
+coordinator-gated.**
