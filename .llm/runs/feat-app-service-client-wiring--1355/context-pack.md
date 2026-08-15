@@ -90,19 +90,17 @@ or expensive command is authorized.
 
 ## In Progress
 
-- F4 amendment is independently committed/pushed at `b40616a81`. The bounded probe/test repair is
-  implemented: first post-plugin convergence permits Aspire writes while preserving client 0/2;
-  the immediate repeat requires client 0/2, Aspire 0, and SHA-256 path/byte identity. Focused
-  format/lint/check pass and the shared-primitive test suite passes 11/0. Commit this content before
-  generating the fresh `s5-f4-*` receipt set. Lease released; no expensive gate is authorized.
+- F4 amendment is independently committed at `b40616a81`; repaired content is committed at
+  `7876aa109`. Focused validation passes and all four `s5-f4-*` binding receipts PASS at that exact
+  content head. Exact-set sufficiency is SUFFICIENT with no reasons. Earlier S5/S4 failures and
+  attributed baselines remain append-only. Lease released; no expensive gate is authorized.
 
 ## Next Steps
 
-1. Commit and explicitly push the bounded F4 probe/test implementation and run-artifact summary.
-2. At that clean immutable content head, run the four `s5-f4-*` binding gates serially through
-   `run-gate.ts` with the locked invocation IDs.
-3. Recompute sufficiency over exactly those four new files, post one structured F4 receipt, and stop
-   for fresh features Tier-A.
+1. Commit and explicitly push the four generated `s5-f4-*` receipts and evidence summary.
+2. Post one structured F4 receipt covering amendment, repair, sequence tests, and exact-set
+   sufficiency.
+3. Stop for fresh features Tier-A; do not request or run an expensive gate.
 
 ## Key Decisions
 
@@ -144,7 +142,7 @@ or expensive command is authorized.
 
 | Gate family | Current status                                                                                                                    | Evidence                     |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Static      | Four `s4-f3-fix1-*` binding receipts PASS at `193e665ba`; exact-set sufficiency SUFFICIENT. The original `s4-f3-check.json` FAIL at `6e822a74b` is preserved as historical evidence. | `worklog.md`; `reports/s4-f3-check-failure.md`; binding receipts |
+| Static      | Four `s5-f4-*` binding receipts PASS at `7876aa109`; exact-set sufficiency SUFFICIENT. All earlier FAIL and superseded evidence remains preserved. | `worklog.md`; binding receipts |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
 | Runtime     | `scaffold.runtime` FAIL: 20 passed / 1 failed / 0 skipped; `generated.service-client-contract` failed. Cleanup proven empty. | `reports/s5-runtime-failure.md`; suite-owned raw log |
 | Consumer    | `fresh-browser` NOT_RUN because the runtime prerequisite failed; no catalog receipt exists. | S5 conditional contract |

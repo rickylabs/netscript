@@ -486,3 +486,21 @@ rejects one Aspire write during the identical repeat, and independently rejects 
 when the printed repeat counts claim zero. Focused format/lint/check passed for both authorized files;
 the probe test suite passed 11/0. No generator, suite-order, manifest, template, SDK, Fresh, or public
 package surface changed. No expensive gate, browser, Aspire, Docker, lease, or evaluator ran.
+
+### F4 binding evidence
+
+The immutable F4 content head is `7876aa10911c2eeea4aafb217d651b28a90bac2c`. Four fresh serial
+`run-gate.ts` invocations attest that exact head with `gitHead == actualGitHead`, no mismatch
+override, distinct invocation IDs, and PASS/exit 0:
+
+| Receipt | Invocation ID | Result |
+| --- | --- | --- |
+| `receipts/s5-f4-check.json` | `app-service-client-wiring-s5-f4-check` | PASS — 2,937 files, 25 batches, zero failed batches and zero diagnostics. |
+| `receipts/s5-f4-test.json` | `app-service-client-wiring-s5-f4-test` | PASS — 4,213 passed, zero failed, 19 ignored. |
+| `receipts/s5-f4-publish-dry-run.json` | `app-service-client-wiring-s5-f4-publish-dry-run` | PASS — workspace publish simulation completed. |
+| `receipts/s5-f4-arch-check.json` | `app-service-client-wiring-s5-f4-arch-check` | PASS — zero doctrine failures; existing warnings remain visible. |
+
+`evaluateEvidenceSet` over exactly those four files is **SUFFICIENT** with an empty reason list.
+Every earlier receipt and report remains preserved, including the S5 runtime FAIL and raw log, the
+S4 red reports, Fresh 45 / SDK 3 `PRE_EXISTING_FAIL` entries, and the separately named plugin-streams
+diagnostic. No expensive gate or lease was requested or run.
