@@ -2749,3 +2749,64 @@ dry-runs, and four binding receipts `SUFFICIENT` at the content head.
 remain `NOT_RUN`; Aspire, Docker, S5, and evaluators are untouched. This is the one boundary this
 lane does not cross autonomously — it is coordinator authority, and the standing instruction is to
 stop here for explicit S5 lease review.
+
+## 2026-08-15 — S5-precondition finding F2: Release Condition 3 is unimplemented
+
+**No lease acquired. S5 not started.** S4 Tier-A `PASS` at `1c1f45820` and checkpoint `84568f2ff`
+remain valid for cheap convergence; this finding does not retract them.
+
+### Verified myself, not accepted on report
+
+Expensive-Gate Release Condition 3 (`plan.md:265-319`) requires, **before** the lease, an exact
+`scaffold.runtime` scenario set. Full-tree searches at `1c1f45820`:
+
+| Required artefact | Found |
+| --- | --- |
+| `paymentsQueries` | **zero** hits repo-wide |
+| `service add --name payments` / `'payments'` in `packages/cli/e2e/` | **zero** |
+| `+1` settled-refetch assertion (`plus exactly one`, `count + 1`, `listRequestCount`) | **zero** |
+| `git diff --name-only 3fc0f2f92..1c1f45820 -- packages/cli/e2e/` | exactly **two** files — `capability-suites.ts`, `suite-registry_test.ts` |
+
+Release Condition 4 (Fresh hydration) **is** satisfied — the fixture exists and `hydrationNow`
+appears three times in `query-hydration-age_browser.ts`. This is Condition 3 alone.
+
+### Part of this miss is mine, and it is worth naming precisely
+
+At T-2 I required the author to **name** the exact scenario assertions, and it did so unusually well
+— the command sequence, the two key arrays differing only at index 0, the settle-then-`+1` refetch,
+the persisted DOM value. I then verified at S3 and S4 Tier-A that the plan **documented** them, and I
+recorded them as "falsifiable". They are falsifiable *as written*. What I never checked was whether
+anything **implemented** them.
+
+Naming a scenario in a plan and building an executable proof are different deliverables, and
+Condition 3 requires the second before a lease. **A documented promise with nothing beneath it** is
+exactly the defect class this leaf has caught repeatedly — an option published but never invoked, a
+test named for a property it did not assert, a narrow run wearing a broad name. This time it was in
+our own precondition, and my review had been checking the paperwork against the paperwork.
+
+The general lesson, recorded because it will recur: when a gate precondition is expressed as
+*"the suite has been extended to assert X"*, the reviewable artefact is the **suite**, not the
+sentence describing it. Verifying the sentence is not verifying the condition.
+
+### Reopened as F2 on the same original author
+
+Two ordered steps dispatched to thread `01a004f9-f033-7592-a0bc-63927753fb43` — no replacement
+session:
+
+1. **Amend the run plan** with an exact bounded file list and executable proof design, committed and
+   pushed before implementing. The design must state plainly that these are gates and probes
+   `scaffold.runtime` will execute **when leased**, plus unit tests proving the probe logic itself
+   **without** running the expensive gate. We build the proof now; we do not run it.
+2. **Implement**, scoped to CLI e2e gate/probe/tests plus run artifacts unless a named dependency is
+   proven, following the existing `commandGate(GATE.X, …)` pattern in
+   `src/application/gates/scaffold/scaffold-gates.ts` with ids in `src/domain/cli-surface.ts`.
+
+This is **already-required accepted-plan behaviour, not an owner rescope** — nothing new is asked of
+the author.
+
+Then: affected cheap unit tests plus all four binding cheap gates re-run at the new content head with
+fresh invocation IDs. The current four receipts attest `32ea23f50` and are preserved as **superseded
+evidence**, explicitly not current final-head receipts.
+
+Prohibited and unchanged: runtime lease, `scaffold.runtime`, `fresh-browser`, Aspire, Docker,
+evaluator, readiness, label/metadata changes, `deno.lock`, `docs/**`.
