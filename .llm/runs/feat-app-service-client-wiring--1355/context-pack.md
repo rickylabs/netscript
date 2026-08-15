@@ -52,7 +52,9 @@ no-Aspire/no-Docker replay of real database codegen plus only the static probe e
 or expensive command is authorized. After the later F4/S5 cycles and accepted F5-A1 plan repair,
 Tier-A released F5 implementation at `630185e2c`. Canonical content is now produced before every
 post-init service-owner comparison/write; focused coverage and the cheap exact-12 real-scaffold
-proof are green. Binding exact-head receipts are pending the immutable content commit.
+proof are green. Four fresh binding receipts PASS at immutable content head `fda78ee438`: check
+selects 2,944 files with zero diagnostics, tests are 4,226/0 with 19 ignored, workspace publish
+dry-run passes, and architecture check has zero failures. Exact-set sufficiency is SUFFICIENT.
 
 ## Completed
 
@@ -99,14 +101,15 @@ proof are green. Binding exact-head receipts are pending the immutable content c
 - Focused formatter/writer/service tests are green, including EOF-before-timeout, empty/unknown
   extension behavior, dry-run, force, atomic prevalidation, and same-input idempotency.
 - The cheap real-scaffold proof verifies all 12 named post-init outputs, exact-set and full-project
-  formatting, zero/2/zero repeat counts, and byte identity. Binding exact-head receipts are next.
+  formatting, zero/2/zero repeat counts, and byte identity. Four exact-head binding receipts PASS
+  and exact-set sufficiency is SUFFICIENT.
 
 ## Next Steps
 
-1. Commit the F5 product/tests and current run evidence at a clean immutable content head.
-2. Run fresh exact-head `check`, `test`, `publish-dry-run`, and `arch-check` receipts serially.
-3. Recompute sufficiency over those four named receipts, commit/push evidence, post the F5 phase
-   comment, and stop for Tier-A. No expensive gate or lease is authorized.
+1. Commit and explicitly push the append-only F5 receipts and final run evidence.
+2. Post the structured F5 implementation receipt on draft PR #1664.
+3. Stop for fresh Tier-A. No expensive gate, lease, readiness transition, or evaluator is
+   authorized.
 
 ## Key Decisions
 
@@ -148,7 +151,7 @@ proof are green. Binding exact-head receipts are pending the immutable content c
 
 | Gate family | Current status                                                                                                                    | Evidence                     |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Static      | Four `s5-f4-*` binding receipts PASS at `7876aa109`; exact-set sufficiency SUFFICIENT. All earlier FAIL and superseded evidence remains preserved. | `worklog.md`; binding receipts |
+| Static      | Four `f5-*` binding receipts PASS at `fda78ee438`; 4,226/0 tests and exact-set sufficiency SUFFICIENT. All earlier FAIL and superseded evidence remains preserved. | `worklog.md`; binding receipts |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
 | Runtime     | Attempt 3 `scaffold.runtime` FAIL: 32 passed / 1 failed / 0 skipped; repaired service-client contract PASS, pre-existing `generated.deno-fmt-check` FAIL. Cleanup proven empty. | `reports/s5-attempt3-runtime-failure.md`; suite-owned raw log |
 | Consumer    | `fresh-browser` NOT_RUN because the attempt-3 runtime prerequisite failed; no catalog receipt exists. | S5 conditional contract |

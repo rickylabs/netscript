@@ -593,3 +593,22 @@ generate reports 0 client writes, 2 client skips, 0 Aspire writes, and byte-iden
 neutral-config single-batch CLI lint and format wrappers each select 898 files and report zero
 findings; the first default lint invocation remains an exploratory fail-closed exclusion/batching
 observation, not a verdict. Binding exact-head receipts remain pending until the content commit.
+
+### F5 binding evidence
+
+The immutable F5 content head is `fda78ee438ea40888e5fb3870a78df70cabb8c82`. Four fresh serial
+`run-gate.ts` invocations attest that exact head with `gitHead == actualGitHead`, unique invocation
+IDs, no mismatch override, and PASS/exit 0:
+
+| Receipt | Invocation ID | Result |
+| --- | --- | --- |
+| `receipts/f5-check.json` | `app-service-client-wiring-f5-check` | PASS — 2,944 files, 25 batches, zero failed batches and zero diagnostics. |
+| `receipts/f5-test.json` | `app-service-client-wiring-f5-test` | PASS — 4,226 passed, zero failed, 19 ignored (4,245 total results). |
+| `receipts/f5-publish-dry-run.json` | `app-service-client-wiring-f5-publish-dry-run` | PASS — workspace publish simulation completed. |
+| `receipts/f5-arch-check.json` | `app-service-client-wiring-f5-arch-check` | PASS — zero doctrine failures; existing warnings remain visible. |
+
+`evaluateEvidenceSet` recomputed over exactly those four named files as **SUFFICIENT** with an empty
+reason list. Older receipts remain append-only evidence and are not included in the F5 final-head
+set. The prior Fresh 45 and SDK 3 `PRE_EXISTING_FAIL` export-map baselines, including the separately
+named plugin-streams `StreamsInstrumentation` diagnostic, remain unchanged. No runtime/browser
+lease, Aspire, Docker, expensive gate, evaluator, readiness, lockfile, or documentation action ran.
