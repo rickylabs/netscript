@@ -187,3 +187,38 @@ only for registered background jobs. A foreground launch cannot prove its own ro
 of a job dir is **not** evidence a session is dead; check the session transcript under
 `~/.claude/projects/<slug>/<sessionId>.jsonl` before concluding anything. This is D-7's rule
 generalised: verify the artefact, never the absence of a signal.
+
+## D-13 — #1293's premise is stale: the connection-error hook is published but dead (significant)
+
+**Date:** 2026-08-15. Issue #1293 states as gap 2 "**No connection-error hook.**" That is not the
+live state. `packages/prisma-adapter-mysql/src/types.ts:39` already declares
+
+```ts
+/** Callback when connection errors occur */
+onConnectionError?: (err: Error) => void;
+```
+
+on `PrismaMySqlOptions`, and `src/mod.ts:51-58` already re-exports `PrismaMySqlOptions` from the
+package's public surface. The package is published at version `0.0.6`, so the option **is shipped**.
+
+It is also **never invoked**. A repository-wide search for `onConnectionError` returns exactly three
+hits: the declaration itself, `examples/basic-usage.ts:39` which passes a callback that can never
+fire, and `docs/site/reference/prisma-adapter-mysql/index.md:23`, which tells readers the hook "is
+not supported by the shipped adapter and is blocked on #1293". Nothing in `adapter.ts` calls it.
+
+So the real defect is worse and differently shaped than the issue describes: a **published option
+whose predicate can never fire**, shipped alongside an example that appears to use it. That is the
+same defect class this lane already found twice on #1502 — S1's undeclared diagnostic-code type and
+S2's `PluginCliCapabilityGrant.denied`, whose non-empty case could never occur — and
+`milestone-run.md` § Gate integrity names it the signature failure of this kind of work.
+
+Consequence for the leaf, recorded in its brief so it does not start from the stale premise: the
+work is not "add a hook". It is "decide between wiring the already-published option and removing
+it", and those two options are not symmetric — the option is in the published surface at `0.0.6`, so
+wiring it is additive while removing it is a breaking change. Gap 1 of the issue (`PrismaMySqlAdapter`
+unexported) **is** accurate: `src/adapter.ts:319` declares `class PrismaMySqlAdapter` with no
+`export`, and `src/mod.ts:40` re-exports only `PrismaMySql` and `PrismaMySqlAdapterFactory`.
+
+The docs page carries a forward reference to #1293 and will become false the moment this leaf ships.
+It is `docs/`-owned, not `packages/`-owned, so this leaf should report it rather than silently edit
+it — see the cross-lane boundary on #1112.

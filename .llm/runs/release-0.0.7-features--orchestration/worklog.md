@@ -1089,3 +1089,34 @@ launched one without.
 Fable 5's recorded allowance was exhausted earlier in this run (D-2), so the Opus 5 fallback is the
 realistic reviewer. Requested and observed routes will both be recorded; no route match will be
 claimed unless they match.
+
+### #1293 leaf dispatched
+
+| Field | Value |
+| --- | --- |
+| Leaf | `prisma-mysql-adapter-surface` (#1293), wave 1 |
+| Worktree | `/home/codex/repos/netscript-007-features-1293` |
+| Branch | `feat/prisma-mysql-adapter-surface` @ `284dda90a`, **no upstream by design** |
+| Base | live `origin/main` tip `284dda90a17a13a7e5e8e9834e5411b58887131b`, not the frozen dispatch base |
+| Codex thread | `01a0048f-8d95-7682-a3ce-1c1926aba75c` |
+| Rollout | `/home/codex/.codex/sessions/2026/08/15/rollout-2026-08-15T10-35-11-01a0048f-….jsonl` |
+| Requested route | provider=openai · model=gpt-5.6-sol · effort=high |
+| Observed route | provider=openai · model=gpt-5.6-sol · effort=high |
+| Route verdict | **matched** |
+| Runtime | approval=never · sandbox=dangerFullAccess |
+| Brief | `slices/impl-1293.md`, staged to `/home/codex/ns1293-prisma-mysql-surface-brief.md` (9,158 bytes) |
+| Steering | `codex exec resume 01a0048f-8d95-7682-a3ce-1c1926aba75c -- "<follow-up>"` — never a second `send-message-v2` at that worktree |
+
+Launched through `launch-codex-slice.ts` after a `--dry-run` that validated the brief (`use harness`
+and `## SKILL` both present), git safety (`branch` correct, `head 284dda90a`, `upstream NONE`,
+`dirty 0`), the `--expect-base` match, and the explicit `--provider/--model/--effort` triple. The
+launch was **not** wrapped in `timeout` — that kills the slice rather than the launch and leaves a
+rollout with no error.
+
+The leaf is briefed to stop after research and plan, and to **propose** its PLAN-EVAL determination
+with reasoning rather than decide it. It was told explicitly never to launch an evaluator itself.
+
+**Housekeeping note.** `launch-codex-slice.ts` writes `slices/codex-thread-ids.md` at a fixed path,
+so the next leaf launched into the same `--slice-dir` will overwrite this record. Copied to
+`slices/codex-thread-ids-1293.md` to preserve it; treat the unsuffixed file as launcher-owned and
+transient, and snapshot it after every dispatch.
