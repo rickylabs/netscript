@@ -487,3 +487,11 @@ invocation produced the terminal exit-0 proof above. No unrelated process was to
 - No browser, `fresh-browser`, Aspire, Docker, scaffold runtime, or `e2e:cli` command ran.
 - This is automated cleanup evidence, not self-certification. Stop after commit, explicit-refspec
   push, and one structured PR comment for fresh opposite-family Tier-A review of the cleanup delta.
+
+### Committed-head revalidation
+
+Cleanup product/CI head `695dd7b00` was revalidated after commit: the required three-path
+`origin/main..HEAD` diff command produced no output (raw exit 0); the two classifier probes again
+returned `needsDeno=true` (raw exit 0); scoped structured check, `quality:gate`, and
+`check:assets-barrel` each returned raw exit 0; and the structured root-discovery drift wrapper
+returned raw exit 0 with 1 passed and 0 failed. `check:assets-barrel` left no generated delta.

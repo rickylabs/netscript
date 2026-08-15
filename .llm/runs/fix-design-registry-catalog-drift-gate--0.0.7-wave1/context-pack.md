@@ -156,3 +156,8 @@ wrapper exit 0 (1 passed); scoped structured check exit 0; `quality:gate` exit 0
 unchanged. Exact next blocker after commit/push/comment: fresh opposite-family Tier-A review limited
 to this cleanup delta. No evaluator, readiness, label, merge, issue, browser, Aspire, Docker,
 scaffold, E2E, or next-leaf action is authorized.
+
+Committed cleanup head `695dd7b00` was revalidated directly: empty three-path diff against
+`origin/main`; both `needsDeno` probes true; structured check, `quality:gate`, asset-barrel
+freshness, and structured root drift test all exit 0. The evidence-only follow-up commit does not
+alter product or CI bytes.
