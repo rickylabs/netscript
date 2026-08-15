@@ -642,3 +642,7 @@ implementation thread.
   work even for a fresh non-expired entry. Stale concurrency tests alone could not expose that
   contract inversion. Policy-option acceptance must include the unaffected state as a zero-effect
   control while preserving independent expired-entry precedence.
+- **An allowlist should be checked against the pinned executable, not memory:** #1664's formatter
+  names 26 dialect tokens, including uncommon `xml`, `sql`, `vto`, and `njk`. A complete probe
+  against the pinned Deno accepted all 26 and rejected a non-member. That executable result closes
+  the contract question more reliably than assuming the help surface from recollection.

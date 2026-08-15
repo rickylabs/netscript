@@ -629,3 +629,10 @@ Newer stop `2026-08-15T18:17:33Z`: #1669 S2 exposed the pre-existing fresh-entry
 `cache-query.ts`, preserving expired precedence and applying the flag only when stale; the existing
 factory regression remains the proof. Fresh fixes Tier-A precedes source mutation and S2 resume. No
 additional test file, runtime lease, or final gate is authorized.
+
+Newer checkpoint `2026-08-15T18:25:53Z`: #1666 final Tier-A passed at `18eed10c9`; one artifact-only
+Fable 5/medium Remote Control IMPL-EVAL is launching over source `47ca22abe` and evidence
+`d095c1260`. #1669 S2-A `ef3e43f06` passed fixes Tier-A `684c37d63` and the same author resumed the
+one-line repair plus S2. #1664 F5 source `fda78ee43` / evidence `1263f655b` has four PASS/SUFFICIENT
+receipts and is under final features Tier-A before any runtime lease. #1663 and #1651 option 1 are
+unchanged.

@@ -754,3 +754,11 @@ back to the correction surface. The repaired condition must preserve expired-ent
 block only for stale entries; the already-authorized factory regression proves fresh/missing/two
 overlapping stale cases. Fresh fixes Tier-A is required before mutation; no extra test file, mirror,
 runtime lease, or gate is authorized yet.
+
+At 18:25Z, #1666 final Tier-A is `PASS` at internals topic `18eed10c9`; immutable source
+`47ca22abe` plus evidence `d095c1260` are entering one fresh Fable 5/medium Remote Control
+IMPL-EVAL, artifact-only. #1669 plan-only S2-A `ef3e43f06` passed fresh fixes Tier-A at `684c37d63`;
+the same author is resumed for the one predicate repair and remaining S2. #1664 F5 content
+`fda78ee43` plus evidence `1263f655b` have four unique PASS/SUFFICIENT receipts; final features
+Tier-A is active before any runtime lease. The pinned Deno probe accepts all 26 formatter allowlist
+members, and 15 product/11 test/zero outside-ceiling paths are touched.

@@ -1099,3 +1099,19 @@
   zero-fetch, missing one-fetch/current timestamp, and two overlapping blocking stale loaders with
   one shared refresh. No cache-query test or other source is granted without a fresh necessity
   finding. Current dirty docs/test changes remain uncommitted while the amendment is reviewed.
+
+## 2026-08-15T18:25:53Z — three fresh gates advance in parallel
+
+- #1666 final S3 Tier-A returned `PASS` at internals topic `18eed10c9`. Evidence head `d095c1260`
+  contains run artifacts only and attests immutable source `47ca22abe`; all seven receipts are unique,
+  exact-head PASS and recompute SUFFICIENT. One fresh native Fable 5/medium Remote Control IMPL-EVAL
+  is launching artifact-only. #1663 remains parked.
+- #1669 S2-A plan-only head `ef3e43f06` passed fresh fixes Tier-A at `684c37d63`. The exact five
+  artifact paths, baseline attribution, expired-preserving predicate, query-factory proof, and
+  preserved S1 A2/A3 plus 497/no-F1 invariants are accepted. The same author is resumed for the
+  one-line repair and remaining S2 work.
+- #1664 F5 content `fda78ee43` and evidence `1263f655b` are clean/pushed. Four exact-content-head
+  receipts PASS and recompute SUFFICIENT: check 2,944 files/25 batches/0 diagnostics; root test
+  4,226/0/19; publish dry-run; architecture check. Fresh features Tier-A is active. Independent
+  pinned-Deno probing accepts all 26 allowlist extensions; current surface is 15 product, 11 test,
+  zero outside the 27-path ceiling. No runtime lease exists.
