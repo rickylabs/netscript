@@ -76,12 +76,16 @@ behind `CacheStore`; it must not change source-query success semantics.
 | 2026-08-15 | Plan | Draft PR | Committed plan artifacts as `89be8da76`, pushed by explicit refspec, and opened draft PR #1665 with milestone `0.0.7`, exactly one `status:plan`, and RESEARCH/PLAN phase comments. |
 | 2026-08-15 | Plan repair | Tier-A `FAIL_FIX` | Repaired T-1 deferral across every normalization site, T-2 invalidation rollback/final-incomplete semantics, and T-3 exact raw six-diagnostic doc-lint baseline. Initial T-4 scope treatment was superseded by the coordinator's fifth-path grant. No product code changed. |
 | 2026-08-15 | Plan repair | T-4 superseding ruling | Added the single Query Bridge page to D4 and locked the dynamic-URL placeholder strategy plus automated byte-comparison proof. Exact five-additional-path scope recorded. |
+| 2026-08-15 | PLAN-EVAL | PASS | Terminal PASS at evaluated head `ee1b44c6d`; evaluator artifact committed as `cd5193b66`. Coordinator authorized S1 only. |
+| 2026-08-15 | S1 | D2 implementation | Made malformed lookup/write/invalidation evidence fail-safe inside the active span. Invalidation evidence is staged per report and merged only after complete validation. |
+| 2026-08-15 | S1 | D3 implementation | Added the 256-entry process registry, fixed `overflow` collapse, first-overflow span event, and operation-span prologue. Internal admission/reset/prologue helpers remain off both public barrels. |
+| 2026-08-15 | S1 | Focused proof | Telemetry-only suite passed 21/21; expanded cache/query suite passed 32/32. Required rollback, return-value, overflow, composite, reset, and descriptor-order cases are all exercised in `cache-telemetry_test.ts`. |
 
 ## Decisions
 
 See `plan.md` D1-D5. The topic orchestrator granted exactly the five additional paths in
-`scope-boundary.md`; no others. PLAN-EVAL is selected and pending, and implementation is forbidden
-until the coordinator separately grants it.
+`scope-boundary.md`; no others. PLAN-EVAL passed and the coordinator authorized S1 only. S2 and S3
+remain forbidden until separate authorization.
 
 ## Gate Results
 
@@ -91,12 +95,26 @@ until the coordinator separately grants it.
 | Exact NetScript specifiers at base | PASS | `scanned=2361 allowances=1 ranges=0 failures=0` |
 | JSR audit at base | PASS with 2 warnings | existing src cardinality + slow-type banner |
 | Raw full-export/cache doc lint at plan head | FAIL (pre-existing, expected exit 1) | Exact six named diagnostics locked in `plan.md`; zero-new comparison required, never a PASS |
-| Product implementation gates | NOT_RUN | plan-only phase |
+| S1 SDK check wrapper | PASS | 83 files; 0 failed batches; 0 diagnostics |
+| S1 telemetry test wrapper | PASS | 21 passed; 0 failed |
+| S1 expanded cache/query test wrapper | PASS | 32 passed; 0 failed |
+| S1 SDK lint wrapper | PASS | 83 files; 0 findings |
+| S1 SDK format wrapper | PASS | 83 files; 0 findings |
+| S1 quality scan | PASS | no findings; 7 existing allowances |
+| S1 architecture check | PASS with warnings | zero failures; the existing SDK source-directory cardinality warning remains non-blocking. Final compaction keeps both changed cache sources below the 500-line cap. |
+| Repository-wide surface diff | FAIL (baseline mismatch, not an S1 pass) | Exit 1 reports widespread undeclared signature drift across many untouched packages; it cannot isolate this leaf. The slice-specific barrel diff is empty, and no admission/reset/prologue helper is re-exported. |
 
 ## Handoff Notes
 
 - Inspect D1's real Deno KV RED and D2's replacement of the deliberate fail-loud guard first.
 - Scope is settled at exactly five additional paths; update only the named Query Bridge quotation
   in D4 and enforce its automated byte-comparison proof without sweeping other site docs.
-- Do not treat the draft PR or green publish dry run as PLAN-EVAL.
+- S2 must reset and close the process-global `@netscript/kv` singleton in teardown via
+  `resetKv()` / `closeKv()` (`packages/kv/application/shared.ts:187,208`) so root-test ordering cannot
+  inherit an `:memory:` KV.
+- S3's authorized Query Bridge quotation is a deliberately single-line fenced-code entry. `deno
+  fmt` does not reflow it and no markdownlint configuration exists; a later formatter pass must not
+  wrap it.
+- Keep S1's internal namespace admission, reset, and prologue helpers off `src/cache/mod.ts` and the
+  root barrel.
 - Draft PR: https://github.com/rickylabs/netscript/pull/1665

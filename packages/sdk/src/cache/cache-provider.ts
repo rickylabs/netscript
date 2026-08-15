@@ -20,14 +20,16 @@ import type { CacheProviderDescriptor } from '../ports/cache-topology.ts';
 import { CacheOperations } from '@netscript/telemetry/attributes';
 import { cacheTelemetryOwner, ownsCacheTelemetry } from './cache-provider-marker.ts';
 import {
+  admitCacheNamespace,
   CacheEvents,
+  type CacheNamespaceAdmission,
   type CacheTelemetry,
   createCacheSpanAttributes,
   createDefaultCacheTelemetry,
-  normalizeCacheNamespace,
   recordCacheExecutionState,
   recordCacheProviderError,
   recordCacheProviderTopologyUnknown,
+  recordCacheSpanPrologue,
 } from './cache-telemetry.ts';
 
 /**
@@ -83,20 +85,23 @@ export function createProviderBoundary(
 
   const traceUnsupported = async <T>(
     operation: typeof CacheOperations[keyof typeof CacheOperations],
-    namespace: string,
+    admission: CacheNamespaceAdmission,
     event: string,
     callback: (markBackendExecuted: () => void) => Promise<T>,
-  ): Promise<T> =>
-    await telemetry.withSpan(
+  ): Promise<T> => {
+    const { namespace } = admission;
+    const descriptor = provider.descriptor;
+    return await telemetry.withSpan(
       operation,
-      createCacheSpanAttributes(operation, namespace, provider.descriptor),
+      createCacheSpanAttributes(operation, namespace, descriptor),
       async (span) => {
+        recordCacheSpanPrologue(span, operation, admission, descriptor, event);
         const markBackendExecuted = (): void =>
           recordCacheExecutionState(
             span,
             operation,
             namespace,
-            provider.descriptor,
+            descriptor,
             true,
             false,
           );
@@ -106,26 +111,27 @@ export function createProviderBoundary(
             span,
             operation,
             namespace,
-            provider.descriptor,
+            descriptor,
             event,
           );
           return result;
         } catch (error) {
-          recordCacheProviderError(span, operation, namespace, provider.descriptor, event);
+          recordCacheProviderError(span, operation, namespace, descriptor, event);
           throw error;
         }
       },
     );
+  };
 
   return {
     get descriptor(): CacheProviderDescriptor {
       return provider.descriptor;
     },
     query: <TData>(queryKey: QueryKey, options: CacheQueryOptions<TData>): Promise<TData> => {
-      const namespace = normalizeCacheNamespace(options.operationId);
+      const admission = admitCacheNamespace(options.operationId);
       return traceUnsupported(
         CacheOperations.READ,
-        namespace,
+        admission,
         CacheEvents.LOOKUP,
         (markBackend) =>
           provider.query(queryKey, {
@@ -138,10 +144,10 @@ export function createProviderBoundary(
       );
     },
     prefetch: <TData>(queryKey: QueryKey, options: CacheQueryOptions<TData>): Promise<void> => {
-      const namespace = normalizeCacheNamespace(options.operationId);
+      const admission = admitCacheNamespace(options.operationId);
       return traceUnsupported(
         CacheOperations.READ,
-        namespace,
+        admission,
         CacheEvents.LOOKUP,
         (markBackend) =>
           provider.prefetch(queryKey, {
@@ -156,7 +162,7 @@ export function createProviderBoundary(
     getCachedData: <TData>(queryKey: QueryKey, operationId?: string): Promise<TData | null> =>
       traceUnsupported(
         CacheOperations.READ,
-        normalizeCacheNamespace(operationId, 'cache.cached-data'),
+        admitCacheNamespace(operationId, 'cache.cached-data'),
         CacheEvents.LOOKUP,
         () => provider.getCachedData(queryKey, operationId),
       ),
@@ -166,14 +172,14 @@ export function createProviderBoundary(
     ): Promise<CachedEntry<TData> | null> =>
       traceUnsupported(
         CacheOperations.READ,
-        normalizeCacheNamespace(operationId, 'cache.cached-entry'),
+        admitCacheNamespace(operationId, 'cache.cached-entry'),
         CacheEvents.LOOKUP,
         () => provider.getCachedEntry(queryKey, operationId),
       ),
     invalidateQueries: (prefix: QueryKey, operationId?: string): Promise<void> =>
       traceUnsupported(
         CacheOperations.INVALIDATE,
-        normalizeCacheNamespace(operationId, 'cache.invalidate-prefix'),
+        admitCacheNamespace(operationId, 'cache.invalidate-prefix'),
         CacheEvents.INVALIDATE,
         () => provider.invalidateQueries(prefix, operationId),
       ),
