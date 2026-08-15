@@ -1367,3 +1367,56 @@ stop-and-report, explicitly not something to paper over by adjusting the diff.
 
 S2 (classifier, notifier, `isConnectionError`, the `fatal` field) is withheld and released separately
 after the S1 Tier-A stop.
+
+### S1 Tier-A — `CHANGES_REQUESTED`
+
+Commit `ecb98cc88f9c86918ff535f7ada36b055df3e737`, pushed, local == remote, clean tree. Full review
+in `slices/tier-a-review-1293-s1.md`.
+
+**Verified by running it, not by reading the report:** diff scope is `adapter.ts`, `src/mod.ts`,
+`tests/surface_test.ts` plus leaf journals — no `deno.lock`, no `docs/**`. R2.1/R2.3 hold
+(`src/mod.ts:40` carries no `PrismaMySqlAdapter`); R2.4 holds (`adapter.ts:325` module-exported, not
+re-exported). `deno doc --lint` is now **exit 0, "Checked 1 file"**, down from six diagnostics.
+Publish dry-run still green with the same eight files. Annotations landed. `MySqlTransaction`
+correctly left unexported — the PLAN-EVAL's subject-4 analysis already established every transaction
+boundary is reachable through the fake `MysqlPoolClient`, so a second seam would have been surplus
+surface.
+
+The new `tests/surface_test.ts` is the right shape: it asserts the class is **absent** from the
+public API *and* **importable** from `src/adapter.ts`, so both halves of the ruling fail loudly if a
+later change violates either.
+
+**S1-F1 (significant) — the new public query type is wider than the contract it fronts, and a cast
+hides it.** Clearing the six `private-type-ref` diagnostics introduced overloads whose public arm
+takes a newly declared `PrismaMySqlQuery`, bridged to the implementation by
+`performIO(query as SqlQuery)`. That type is not an alias — its `argTypes` element diverges from
+upstream `ArgType` (`@prisma/driver-adapter-utils@7.8.0/dist/index.d.ts:12-20`) three ways:
+`scalarType` is `string` where upstream is a 12-member literal union (**widened**); `dbType` is
+required where upstream is optional; `arity` is optional where upstream requires it (**widened**).
+The two are mutually non-assignable, which is exactly why the assertion was needed — it is silencing
+a real incompatibility, not a nominal one.
+
+Concrete failure: `argTypes: [{ scalarType: 'BigInt', dbType: 'BIGINT' }]` type-checks against the
+public overload, is cast to `SqlQuery`, and reaches `mapArg` (`conversion.ts:161-205`) which branches
+on exact lowercase literals `'bigint'` / `'datetime'` / `'bytes'`. `'BigInt'` matches none, so it
+falls through to `return arg` and MySQL receives the raw string instead of a `BigInt`. Nothing
+errors at any layer.
+
+So S1 traded a documentation defect for a correctness one. Widening a public **input** type is the
+dangerous direction — it admits values the implementation cannot honour. Two acceptable remedies
+were given (structural exactness plus deletion of the cast, or a single-source-of-truth re-export),
+with an explicit instruction not to "fix" it by loosening the implementation signature.
+
+**S1-N1 (note)** — add bidirectional compile-time assignability assertions so future upstream drift
+becomes a `check` failure rather than being absorbed by a cast. That is what turns F1 from
+"fixed once" into "cannot silently regress".
+
+Also stated so it is *not* changed while fixing F1: `PrismaMySqlResultSet.columnTypes` is `number[]`
+against upstream `Array<ColumnType>`, but that widening is on the **return** path — it loses enum
+precision for consumers and cannot admit bad input. Not a finding.
+
+This is the third time on this milestone that a defect of the same family — a declared surface whose
+promise the implementation cannot keep — has been caught by re-deriving rather than reading. #1502
+S1's undeclared diagnostic-code type and S2's unreachable `denied` case were the first two; D-13's
+never-invoked published option was the third and is what this whole leaf exists to repair. Fix-up
+dispatched to the same thread; S2 remains withheld.
