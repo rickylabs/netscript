@@ -1369,7 +1369,7 @@
       "branch": "fix/sdk-cached-entry-swr",
       "worktree": "/home/codex/repos/netscript-007-leaf-cached-entry",
       "prNumber": 1669,
-      "implementationState": "s1_structural_repair_fresh_tier_a_pass_s2_dispatch_recovery_active",
+      "implementationState": "s1_structural_repair_fresh_tier_a_pass_s2_final_slice_active_same_author",
       "planHeadSha": "23db20f301d06ed1e4a9a65cbbf64349f89cb8c0",
       "dispatchTopicHeadSha": "f9bb928cedeaf91174db4e70f877143028481232",
       "planGate": "research and contract decisions only; resolve the stale docs paths, choose the supported API boundary, open one draft PR, and stop before implementation; PLAN-EVAL is required",
@@ -1405,6 +1405,12 @@
           ],
           "constraints": "policy-aware persistence-complete in-flight ownership; background-owned write failure resolves fetched data to a foreground joiner; rejection only on fetch failure; deterministic sleep-free two-reader proof with exactly one refresh; useful JSDoc/structure restored and F-1 closed by one coherent shared cache-entry read path",
           "validation": "fresh Tier-A executed 5/5 focused and 68/68 SDK tests, confirmed sleep-free A2/A3 proof, 497 documented lines with no F-1 and only pre-existing F-16, clean/pushed PR head, and honest append-only audit correction"
+        },
+        "s2": {
+          "state": "active",
+          "sourceHeadSha": "e100ea205b16a8ed22dbdb6b587212a852d6c416",
+          "scope": "two authorized docs sources, query-factory regression, exactly four generated mirrors, and run artifacts; page-level sentence is manual Tier-A plus IMPL-EVAL evidence rather than docs-accuracy proof",
+          "constraints": "apply all nine tutorial dispositions plus Services SDK claim, preserve callable-action SWR truth and A4 default-versus-preferFreshOnStale posture, regenerate the four-link cascade only, report pinned reds without repair, then stop for fresh Tier-A"
         }
       },
       "acceptanceFocus": "prove stale-while-revalidate with exactly one refresh for concurrent stale readers while carrying the four-link generated-doc asset cascade and known #1667/#1668 reds",
@@ -2651,5 +2657,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T18:07:44.000Z"
+  "updatedAt": "2026-08-15T18:11:19.000Z"
 }

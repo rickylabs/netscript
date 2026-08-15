@@ -619,3 +619,7 @@ structural repair `e100ea205` passed fresh fixes Tier-A at `c01f32141`; same-aut
 being recovered and must stop for another Tier-A before IMPL-EVAL. #1664 F5 product implementation
 continues independently inside the accepted 15-product/12-test ceiling. No runtime lease exists;
 #1663 and #1651 option 1 remain unchanged.
+
+Delivery update `2026-08-15T18:11:19Z`: #1669 S2 is now verified active on the original author with
+the exact two docs pages, one factory regression, four generated mirrors, and run artifacts. It must
+stop for fresh fixes Tier-A before IMPL-EVAL; no runtime lease or out-of-scope tooling change exists.

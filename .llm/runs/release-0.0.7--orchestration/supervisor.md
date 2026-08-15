@@ -741,3 +741,8 @@ repair head `e100ea205` passed fresh fixes Tier-A at `c01f32141`: all documentat
 the shared cache-entry reader is a coherent structural reduction, 5/5 focused and 68/68 SDK tests
 pass, and no F-1 remains. S2 dispatch recovery is active on the same original author; no runtime
 lease exists. #1664 F5 implementation continues independently inside its reviewed ceiling.
+
+At 18:11Z, #1669 S2 delivery is verified on the preserved author. Its exact final-slice surface is
+the two approved docs pages, one query-factory regression, four generated mirrors, and run artifacts;
+the docs-accuracy overclaim is forbidden and the tutorial sentence remains manual Tier-A plus
+IMPL-EVAL evidence. The author must preserve all pinned baseline reds and stop for fresh review.

@@ -1081,3 +1081,8 @@
   lines with no F-1. The earlier pushed head remains in history and its overclaim is superseded by
   PR comment `5303528330`. The same original author is being recovered into S2 only; IMPL-EVAL remains
   after fresh S2 review. No runtime lease is active.
+
+- Delivery recovery completed at 18:11Z: the original #1669 author is active on S2 with the exact
+  two-page/one-test/four-mirror grant. The dispatch explicitly carries A1 manual-evidence truth, A4
+  default-versus-`preferFreshOnStale` posture, generated-cascade containment, pinned red reporting,
+  and a hard stop for fresh Tier-A before IMPL-EVAL.
