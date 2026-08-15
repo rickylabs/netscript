@@ -1889,3 +1889,58 @@ Compatibility answered by D6 and `:157`.
 
 Repair dispatched to the same thread. PLAN-EVAL dispatches on the immutable repaired plan head; no
 implementation before `PASS`.
+
+### T-1 and T-2 accepted; PLAN-EVAL dispatched on the repaired head
+
+Repair commit `7f20a34fee4e99ac17edb6ed4de06a3ec9c1934b`, local == remote, tree clean, PR #1664 still
+draft.
+
+**T-1 verified fixed, by reading the repaired text rather than the report.** `plan.md:199` now states
+"`scaffold.runtime` is deliberately outside that catalog"; `:79` preserves "the deliberate
+evidence-class boundary"; and gate 7 at `:211` resolves to
+`deno task e2e:cli run scaffold.runtime --cleanup --format pretty` with "suite-owned exact-head
+output … plus central lease and cleanup record; **no run-gate receipt**". The binding set is now
+**five files** — four cheap `run-gate` receipts plus one `fresh-browser` receipt. No catalog entry is
+proposed and no receipt is hand-authored for a gate the catalog deliberately excludes. The single
+surviving "catalog entry" phrase (`:145`) refers to `fresh-browser`, which is correct and stays.
+
+**T-2 repaired past the minimum — the assertions are now falsifiable.** The new sections give a
+concrete `service add --name payments --with-client` / `service generate` sequence, a second
+`generate` asserting byte-identical output, and both `usersQueries` and `paymentsQueries`
+type-checking together without aliases. The key pairs share an identical input so the **only**
+distinguishing element is index 0, with the explicit rule that each pair differs only there and the
+users filter must not match the payments key. The invalidation proof is a **second** `users.list`
+network request plus the server-confirmed DOM value, and the plan states outright that "merely spying
+on `invalidateQueries` is insufficient" — which is the distinction between proving the call happened
+and proving it had an effect. Hydration is compared under one controlled clock,
+`hydrationNow - 60_000` versus `hydrationNow`, asserting query-function counts of `1` versus `0`
+rather than two uncontrolled wall-clock samples.
+
+That last point is the one worth keeping: an assertion that cannot fail is not evidence, and both
+scenario sets can now fail for the right reasons.
+
+### Gate dispatch
+
+| Field | Value |
+| --- | --- |
+| Job / session | `176aace4` / `176aace4-b2a2-4b16-bdaa-9db687c7d132` |
+| Bridge session | `cse_01TiYhwUCkdyjziEpFP3kgaS` (non-empty) |
+| Remote Control URL | `https://claude.ai/code/session_01TiYhwUCkdyjziEpFP3kgaS` |
+| Requested route | native Claude **Fable 5 · medium** · Remote Control (`lane-policy.md:45`) |
+| Observed route | `respawnFlags` = `--effort medium … --model claude-fable-5`; `providerEnv {}` |
+| Route verdict | **matched**, native Anthropic auth |
+| Evaluated plan head | `7f20a34fee4e99ac17edb6ed4de06a3ec9c1934b` (pinned; mismatch is a hard refusal) |
+| Brief delivered | `intent` length 9,295 bytes |
+
+Attachment was again confirmed by polling for a **non-empty** `bridgeSessionId` before recording it,
+rather than inferring attachment from correct route flags — the two are different claims, and the
+#1662 dispatch registered with a null bridge while its flags were already right.
+
+The brief binds the evaluator to **rule** on the open fork (additive `bridgeInvalidation(queryKey)`
+overload versus direct `{ queryKey: queries.list.clientKey() }` emission), including whether the
+direct-emit option leaves `bridgeInvalidation` a trap for the next caller; to re-derive the
+diagnoses from source rather than trust `research.md`; and to judge whether the pre-lease assertions
+can actually fail. The three settled items — gate necessity, gate class, and no-lease-now — are
+stated as compliance checks with their reasons, so "already decided" cannot read as a gap to fill.
+
+No implementation before `PASS`. Neither expensive gate run; no lease requested.
