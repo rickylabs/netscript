@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `release-0.0.7-internals--orchestration/slices/quality-scan-root-coverage` |
 | Branch | `fix/quality-scan-root-coverage` |
-| Current phase | `impl` — slice 2 awaiting Tier-A |
+| Current phase | `impl` — slice 3 awaiting Tier-A |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `service`, `docs` |
 | Draft PR | `#1656` |
@@ -14,72 +14,71 @@
 
 ## Current state
 
-PLAN-EVAL cycle 1 passed at `3b95a004fe8bc5c022c7a2601fafef9a1216be68`. Slice 1 was signed off
-by the topic supervisor at `a258bcc8c6365e12ee33b7e6a4657f52140f6308`. Slice 2 now binds the
-checker before both scanners, broadens `quality:scan` to `packages`, and has durable RED/GREEN
-forwarding plus all four planned S2 gate receipts. Work stops for Tier-A before S3.
+All three planned implementation slices are landed. S1 and S2 have topic-supervisor Tier-A
+sign-offs. S3 recorded the full frozen gate set, raw Git implementation-surface review, explicit
+empty-denominator JSR audit, and DoD evidence audit at signed-off S2 head
+`4ae309d5774676d710ba24f56119b028bc2c095c`. Work stops for S3 Tier-A before formal IMPL-EVAL.
 
-## Completed
+## Landed behavior
 
-- Preserved a reachable RED configuration commit `98360da7b`: the checker executes under a real
-  changed-file task invocation and rejects the 29 configured-root gaps before scanner execution.
-- Landed the green S2 binding at `15d894740`: both scan tasks invoke the checker first and
-  `quality:scan` uses `packages`, `plugins`, and `docs/site`.
-- Preserved `--max-allow 7`, all prior roots, and the scanner permissions
-  `--allow-net=api.github.com --allow-env=GITHUB_TOKEN,GH_TOKEN` byte-for-byte.
-- Rebound the live integration test to zero gaps/`ok:true`; moved structured CLI failure to an
-  intentionally incomplete temporary repository fixture.
-- Proved real forwarding: appended changed-file args reach the scanner, whose output reports
-  `mode:"changed-files"` and the exact single traversed path, after the checker reports green.
+- Checker derives 37 workspace members, 37 inside the named `packages/**`/`plugins/**` boundary,
+  and 35 publishable members.
+- `packages/bench` and `packages/cli/e2e` remain named `publish:false` exclusions.
+- Both quality tasks and the 36-root doctrine set cover every publishable member.
+- `quality:scan` traverses `packages`, `plugins`, and `docs/site`; repo scan retains five roots.
+- Changed-file PR mode still executes the checker, then forwards changed-file arguments only to the
+  scanner, whose output distinguishes actual traversal from configured roots.
+- Permanent fixtures fail on omitted members even though the live repository is green.
 
-## Current coverage facts
+## Exact implementation surface
 
-- Census: 37 workspace members, 37 inside the named boundary, 35 publishable.
-- Named non-publishable exclusions: `packages/bench`, `packages/cli/e2e`.
-- `quality:scan`: configured roots `docs/site`, `packages`, `plugins`; zero uncovered.
-- `quality:scan:repo`: configured roots `.llm/tools/fitness`, `.llm/tools/quality`, `docs/site`,
-  `packages`, `plugins`; zero uncovered.
-- Doctrine: 36 roots with all 35 publishable members covered.
-- Repository scans: zero findings, allowance count 7, no allowance failures.
+| Path | Final status |
+| --- | --- |
+| `.llm/tools/quality/check-root-coverage.ts` | fail-closed deterministic checker |
+| `.llm/tools/quality/check-root-coverage_test.ts` | nine semantic/live/CLI/forwarding tests |
+| `deno.json` | checker-first tasks and broad package root |
 
-## Exact edit surface status
+No package/plugin, workflow, scanner, doctrine tool, gate catalog, docs source, dependency, or
+lockfile changed.
 
-| Path | Status | Notes |
+## Final S3 gates
+
+| Gate | Status | Receipt |
 | --- | --- | --- |
-| `.llm/tools/quality/check-root-coverage.ts` | S1 complete; unchanged in S2 | Fail-closed coverage report. |
-| `.llm/tools/quality/check-root-coverage_test.ts` | S2 rebound | Green live binding plus permanent fixture-backed CLI failure. |
-| `deno.json` | S2 implemented | Checker-first task chains and broad package root. |
+| check | PASS 0 | `receipts/slice-3/check.json` |
+| full test | PASS 0; 4,128 passed / 19 ignored | `receipts/slice-3/test.json` |
+| quality job | PASS 0 | `receipts/slice-3/quality-job.json` |
+| publish dry run | PASS 0 | `receipts/slice-3/publish-dry-run.json` |
+| quality gate | PASS 0 | `receipts/slice-3/quality-gate.json` |
+| docs source format | PASS 0 from `docs/site` | `receipts/slice-3/docs-source-format-docs-cwd.json` |
+| docs source-format test | PASS 0; 6/6 | `receipts/slice-3/docs-source-format-test.json` |
+| docs accuracy | PASS 0 | `receipts/slice-3/docs-accuracy.json` |
 
-Everything else in the frozen outer bound remains deliberately untouched.
+`receipts/slice-3/docs-source-format.json` truthfully records the preceding wrong-root-cwd attempt
+as exit 1; it is not treated as a green gate.
 
-## Gates
+## JSR audit
 
-| Gate family | Current status | Evidence |
-| --- | --- | --- |
-| Plan-Gate | PASS cycle 1 | `plan-eval.md`, evaluator commit `3b95a004f` |
-| S1 | Tier-A signed off | supervisor commit `a258bcc8c` |
-| S2 forwarding | RED 1; GREEN 0 | `receipts/slice-2/{red-forwarding,forwarding}.json` |
-| S2 focused test | PASS 0, 9/9 | `receipts/slice-2/test.json` |
-| S2 proving gates | all PASS 0 | `receipts/slice-2/{quality-scan,quality-scan-repo,arch-check,quality-gate}.json` |
-| Publish/JSR | Empty touched-member denominator | No publishable member changed; final dry run remains S3 |
-| S3 frozen final gates | NOT FIRED | Awaiting S2 Tier-A |
+Applicable with an explicit touched-publishable-member denominator of **0**. Git diff from immutable
+base contains no `packages/**` or `plugins/**` path, so per-member export/pin/runtime-asset/
+`import.meta` rows are empty and the plan's rescope tripwire did not fire. The canonical workspace
+isolated-declaration publish dry run passes. Both lockfiles remain unchanged.
+
+## Definition of Done handoff
+
+- Ready to tick after coordinator review: root coverage/exclusions; omission failure invariant;
+  scanned-root reporting; frozen evidence set; JSR row with explicit empty-denominator record.
+- Not ready to tick: combined PLAN-EVAL/IMPL-EVAL row. PLAN-EVAL passed, but formal IMPL-EVAL has not
+  been authorized or run.
+- The implementation thread did not mutate the PR body or any checkbox.
 
 ## Next steps
 
-1. Topic supervisor performs Tier-A review of S2 and its receipts.
-2. Only after a fresh resume, run the frozen S3 final gate set and handoff checks.
-3. Stop before coordinator-granted formal IMPL-EVAL.
+1. Topic supervisor performs S3 Tier-A review.
+2. Coordinator decides whether to grant formal separate-session IMPL-EVAL.
+3. Only after IMPL-EVAL PASS may the coordinator update DoD boxes/status/readiness.
 
-## Drift and debt
+## S3 evidence head
 
-- Drift: launcher pre-seed, historical doctrine omission already repaired, evaluator route failure
-  and amendment, plus the accepted report-field naming drift are recorded in `drift.md`.
-- The supervisor corrected an over-constrained S2 dispatch; the implemented test rebinding was
-  already inside the approved plan and therefore is not scope drift.
-- Debt: none created, closed, or modified.
-
-## S2 commits
-
-- `98360da7b` — checker-first RED task wiring.
-- `15d894740` — broad-root binding, live test rebinding, fixture-backed CLI failure, RED receipt.
-- Final S2 evidence/run-artifact commit follows.
+- Gate-attested head: `4ae309d5774676d710ba24f56119b028bc2c095c`.
+- Final S3 run-artifact commit follows.

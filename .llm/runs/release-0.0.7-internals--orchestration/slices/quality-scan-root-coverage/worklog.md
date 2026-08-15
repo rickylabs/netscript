@@ -270,3 +270,69 @@ this test when its live integration assertion needs binding. The leaf was correc
 the constraint was mine and was withdrawn without a coordinator rescope.
 
 Slice 3 is authorized.
+
+## Slice 3 — final contract and publishability evidence
+
+S3 changes run artifacts only. All required gates ran at the signed-off, branch-reachable S2 head
+`4ae309d5774676d710ba24f56119b028bc2c095c`.
+
+### Final gate results
+
+| Gate | Exit | Receipt | Execution evidence |
+| --- | ---: | --- | --- |
+| check | 0 | `receipts/slice-3/check.json` | wrapper fired; 2,919 files, 25 batches, zero findings |
+| full test | 0 | `receipts/slice-3/test.json` | 4,128 passed, 19 ignored, 0 failed |
+| quality job | 0 | `receipts/slice-3/quality-job.json` | CI dependency graph fired; standalone check receipt covers its one cache hit |
+| publish dry run | 0 | `receipts/slice-3/publish-dry-run.json` | canonical workspace simulation ended `Success Dry run complete` |
+| quality gate | 0 | `receipts/slice-3/quality-gate.json` | checker/scanner and doctrine commands fired |
+| docs source format, incorrect root cwd | 1 | `receipts/slice-3/docs-source-format.json` | truthful invocation error: root has no `check:source-format` task |
+| docs source format, authoritative docs cwd | 0 | `receipts/slice-3/docs-source-format-docs-cwd.json` | `Docs source format: OK` |
+| docs source-format test | 0 | `receipts/slice-3/docs-source-format-test.json` | 6 passed, 0 failed from `docs/site` |
+| docs accuracy | 0 | `receipts/slice-3/docs-accuracy.json` | PASS with published-source/command/import corpus counts |
+
+The first docs source-format command fired from the wrong working directory and remains recorded as
+a failure, not relabeled as a pass. The approved plan says docs gates run from `docs/site` where
+required; the corrected durable receipt uses that cwd and passes without a source change.
+
+### JSR audit closeout — applicable, empty touched-member denominator
+
+- Git ground truth from immutable base `473e8d75b5281c93dc4729d99f3358a34f2bd687` to S2 sign-off
+  head shows no changed path under `packages/**` or `plugins/**`.
+- Touched publishable members: **0**. Therefore the per-member public-export and exact
+  `@netscript/*` pin audit has zero rows. This is an explicit empty denominator, not a vacuous
+  package-level pass.
+- Rescope tripwire: any changed publishable-member source/config/export would invalidate the empty
+  denominator and require stopping for member-level export, pin, runtime-asset, and `import.meta`
+  review. The Git diff proves that tripwire did not fire.
+- Runtime asset / top-level `import.meta` rejection has no touched publishable row to evaluate. The
+  internal checker use of `import.meta` is outside JSR publication and was already authorized.
+- The canonical workspace isolated-declaration publish simulation passes in
+  `receipts/slice-3/publish-dry-run.json`.
+- `deno.lock` and `docs/site/deno.lock` are byte-unchanged from the immutable base.
+
+### Definition of Done evidence audit
+
+The implementation thread did **not** edit the PR body or tick its boxes. The following statuses are
+the truthful handoff for the coordinator:
+
+| PR Definition-of-Done row | Truthful status | Evidence |
+| --- | --- | --- |
+| Configured scan/doctrine roots cover every published package and exclusions are named | ready to tick | S2 `quality-scan*.json` and S3 `quality-gate.json`: 37/37/35, zero gaps, Bench + CLI E2E named `publish:false`, 36 doctrine roots |
+| A test or gate fails when a published package is absent | ready to tick | permanent omission/descendant/future-member fixtures; fixture-backed CLI exit 1; S1/S2 RED receipts |
+| `quality:gate` reports which roots it scanned | ready to tick | checker configured-root arrays + scanner `scanned` arrays in S2 scan receipts; S3 composite gate fires that task before doctrine |
+| Required check/test/publish/quality/docs evidence is recorded | ready to tick | all eight authoritative S3 receipts pass; wrong-cwd docs failure retained plus correct-cwd pass |
+| Applicable JSR audit covers every touched publishable member and publishability risks | ready to tick with explicit empty-denominator note | zero touched publishable members by Git diff; rescope tripwire not fired; workspace publish dry run passes |
+| PLAN-EVAL and IMPL-EVAL pass before ready-for-review | **not ready to tick** | PLAN-EVAL cycle 1 passed; formal IMPL-EVAL has not been authorized or run, and PR remains draft |
+
+### Final implementation-surface review
+
+Outside run artifacts, immutable-base diff contains exactly the three locked paths:
+`.llm/tools/quality/check-root-coverage.ts`,
+`.llm/tools/quality/check-root-coverage_test.ts`, and `deno.json`. No publishable member, workflow,
+scanner, doctrine tool, gate catalog, docs source, dependency, or lockfile changed.
+
+### Handoff
+
+- S3 is stopped for topic-supervisor Tier-A review.
+- Formal IMPL-EVAL remains coordinator-gated and has not been launched.
+- PR remains draft; no DoD box, label, issue state, or readiness transition was mutated.
