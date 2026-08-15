@@ -460,6 +460,54 @@ wall-clock samples.
 - Current SDK query factory/client-key contract and Fresh query option are prerequisites already on
   the baseline.
 
+## F4 amendment — convergence before same-input idempotency
+
+Coordinator disposition at lease-release checkpoint `dbf87e379` rules the S5 failure as a probe
+sequence defect, not a product defect. Against the preserved generated project, after the failed
+probe's first post-plugin invocation had reconciled three changed Aspire helpers, the coordinator
+ran two more immediately consecutive identical `service generate` commands. Both exited 0 with
+zero client writes, two current client skips, and zero Aspire-helper writes. SHA-256 manifests for
+every `aspire/.helpers` file were identical before and after both commands. The first post-plugin
+invocation was therefore convergence after intervening plugin, runtime-schema, and database gates
+changed generator inputs; true same-input idempotency holds after that convergence.
+
+The corrected executable contract supersedes only the zero-Aspire-write assertion in the earlier
+runtime scenario:
+
+1. Run the first post-plugin `service generate`. It may reconcile Aspire helpers, but it must still
+   report zero service-client modules written and two current service-client modules skipped.
+2. After that command succeeds, snapshot all generator-owned client and Aspire-helper paths and
+   bytes. This is the converged baseline.
+3. Immediately run the identical `service generate` again, with no intervening mutation. Require
+   zero client modules written, two current client modules skipped, zero Aspire-helper files
+   written, and exact path/byte identity against the converged snapshot.
+
+The focused sequence regression must use the same exported probe primitive and fail if the second
+identical command reports an Aspire-helper write or if the post-command owned-output snapshot
+differs. The byte comparison is binding independently of the printed counts.
+
+F4 implementation scope is bounded to:
+
+- `packages/cli/e2e/src/application/gates/scaffold/service-client-runtime-probe.ts`
+- `packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts`
+- this run's plan/worklog/context and generated evidence only
+
+No generator, template, SDK, Fresh, manifest, suite ordering, or public API change is authorized.
+The four replacement binding receipts will be generated serially at the committed immutable content
+head with fresh IDs and without overwriting any earlier evidence:
+
+1. `receipts/s5-f4-check.json` — `app-service-client-wiring-s5-f4-check`
+2. `receipts/s5-f4-test.json` — `app-service-client-wiring-s5-f4-test`
+3. `receipts/s5-f4-publish-dry-run.json` — `app-service-client-wiring-s5-f4-publish-dry-run`
+4. `receipts/s5-f4-arch-check.json` — `app-service-client-wiring-s5-f4-arch-check`
+
+Sufficiency is recomputed over exactly those four files. No expensive gate, browser, Aspire, Docker,
+lease request, or evaluator is part of F4.
+
+Lease-head discipline is amended from S5: every preflight artifact must be committed and explicitly
+pushed before readiness is reported. The head named in a lease request is final and immutable; no
+preflight evidence commit may move it after a grant.
+
 ## Drift Watch
 
 - Any change to `origin/main`, query key shapes, service manifest identity, command topology,

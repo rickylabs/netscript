@@ -90,18 +90,18 @@ or expensive command is authorized.
 
 ## In Progress
 
-- S5 stopped at the leased `scaffold.runtime` gate on run-only head `ab78eaa35`; product content
-  remains `193e665ba`. The suite returned 20 passed / 1 failed / 0 skipped. Exact failure:
-  `generated.service-client-contract` observed three Aspire-helper writes on the later generate.
-  Suite cleanup and run-owned teardown completed, and final leak-check reports Aspire `ok`, Docker
-  `ok`, `survivors: []`. `fresh-browser` is NOT_RUN by the conditional contract.
+- F4 disposition is plan-only until its standalone amendment is committed and pushed. Coordinator
+  proof shows the first post-plugin generate was convergence after changed inputs; two following
+  identical generates were zero-write and byte-identical. The bounded repair moves the idempotency
+  snapshot/assertion to an immediately consecutive invocation while preserving client 0-write/2-skip
+  checks on both. The S5 FAIL remains append-only evidence. Lease released at `dbf87e379`; host empty.
 
 ## Next Steps
 
-1. Commit and explicitly push the suite-owned S5 log, failure attribution, and cleanup evidence.
-2. Post the structured S5 failure/cleanup receipt and return the lease with the host empty.
-3. Await a reviewed repair disposition; do not run `fresh-browser` or retry `scaffold.runtime` under
-   this lease.
+1. Commit and explicitly push the F4 plan/proof amendment before touching the probe or its test.
+2. Implement the bounded two-invocation probe sequence and focused negative/byte-identity test.
+3. Run affected cheap tests, commit a clean immutable content head, then generate the four fresh
+   `s5-f4-*` binding receipts and recompute exact-set sufficiency.
 
 ## Key Decisions
 

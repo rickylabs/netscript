@@ -447,3 +447,26 @@ The mandatory leak check then recorded Aspire `ok`, Docker `ok`, and `survivors:
 empty. The runtime failure blocked the conditional inter-gate audit, so `fresh-browser` is NOT_RUN
 and no browser receipt exists. Full verdict and cleanup evidence are in
 `reports/s5-runtime-failure.md`.
+
+## F4 authorization amendment — probe sequence, not generator behavior
+
+The runtime lease was released at central checkpoint `dbf87e379`; the host remains empty. The
+coordinator independently continued from the preserved generated project after the failed probe had
+reconciled its three Aspire-helper writes. Two further immediately consecutive identical
+`service generate` commands both exited 0 with zero clients written, two clients skipped, and zero
+Aspire helpers written. SHA-256 manifests of every `aspire/.helpers` file were unchanged across
+both invocations.
+
+Disposition: S5 observed convergence after plugin/runtime-schema/database inputs changed. The
+product's same-input idempotency is correct; the probe asserted the zero-write state one invocation
+too early. The S5 FAIL log, report, SHA-256, and all earlier red/baseline evidence remain unchanged.
+
+The bounded F4 repair allows the first post-plugin generate to reconcile Aspire helpers while still
+requiring zero client writes and two skips. It snapshots owned output only after that convergence,
+then performs an immediately consecutive identical generate requiring zero client writes, two
+skips, zero Aspire writes, and byte-identical owned output. The focused sequence test must fail for
+either a second identical helper write or a byte change. Exact files and fresh `s5-f4-*` receipt IDs
+are locked in `plan.md` before any product or test mutation.
+
+Process correction: preflight artifacts are committed and pushed before readiness is reported. A
+leased evidence head must remain immutable after the grant.
