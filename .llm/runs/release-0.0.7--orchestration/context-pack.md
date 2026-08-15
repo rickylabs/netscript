@@ -789,3 +789,13 @@ as job `be3774eb`, bridge `cse_01RQ7Eb4N4NaQEuAA6zPtpxV`. The prior `f281b8cf` l
 PASS and was reconciled from stale active state. Hold readiness, acceptance mirroring, close-gate,
 and merge until the integration evaluator is terminal. #1664 attempt 6 and #1671 S3 remain active
 independently; #1663 remains at the owner-only exceptional third-evaluator boundary.
+
+Newer transition `2026-08-15T21:18:24Z`: #1666 integration-delta IMPL-EVAL passed at artifact-only
+`05ac90d00`, comment `5304256350`, with native Fable 5/medium Remote Control proven at
+`session_01RQ7Eb4N4NaQEuAA6zPtpxV`; its lease is terminal. Readiness attempt 2 then passed live
+acceptance mirroring and close-gate run `31908897973`, checking all five #1296 rows, but dedicated
+changed-source run `31908898023` failed on two leaf-owned type-safety findings in
+`check-exports-drift.ts`. #1666 is therefore draft again at `status:impl`, unmerged. The same original
+Sol/medium author owns one focused repair; fresh internals Tier-A and a fresh delta evaluator precede
+any later ready flip. #1664's bounded attempt 6 and #1671 S4 continue independently; #1663 remains
+untouched at its owner-only exceptional evaluator boundary.

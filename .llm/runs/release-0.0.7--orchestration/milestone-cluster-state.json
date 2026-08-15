@@ -991,14 +991,14 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
-      "currentPrHeadSha": "021c7ffc62cea5b0f6728ddb8ee377393a647f44",
+      "currentPrHeadSha": "05ac90d00706d4bd9f3d93a59ab58bcdbfea5909",
       "issueNumbers": [1296],
       "implementerAgentId": "01a005d2-7c9d-7dd1-b6fc-531b72dc14e4",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/reference-export-drift-gate",
       "worktree": "/home/codex/repos/netscript-007-reference-export",
       "prNumber": 1666,
-      "implementationState": "post_eval_main_refresh_tier_a_pass_integration_delta_eval_active",
+      "implementationState": "integration_delta_eval_pass_readiness_revoked_quality_repair_active",
       "planHeadSha": "9d0b4bf128ba52fcd52091ba50590661d09470c1",
       "scopeAmendmentHeadSha": "a3f6b87b599e778db950daf6ccaecd847c088d19",
       "tierAPlanState": "PASS_SA2",
@@ -1158,15 +1158,29 @@
       "postDeltaMainRefreshTierAState": "PASS",
       "postDeltaMainRefreshTierATopicCheckpointSha": "6658ad9c060e37f02ff12c8f0525126f36f825c3",
       "postDeltaMainRefreshProof": "history-preserving merge parents are prior evaluator 0d4c82d6e and current main 0ef48c2ec; exactly four generated conflicts were resolved by the canonical cascade; both source contributions coexist; two cascade cycles are idempotent with no fifth output; 12 exact-content-head receipts pass; 14-of-17 path scope and deno.lock identity hold",
-      "integrationDeltaEvaluationState": "active",
+      "integrationDeltaEvaluationState": "complete_pass",
       "integrationDeltaEvaluatorAgentId": "be3774eb-9bc8-4cd1-bcd8-9cc59fd2a0a8",
       "integrationDeltaEvaluatorBackgroundAgentId": "be3774eb",
       "integrationDeltaEvaluatorPid": 807626,
       "integrationDeltaEvaluatorBridgeSessionId": "cse_01RQ7Eb4N4NaQEuAA6zPtpxV",
+      "integrationDeltaEvaluatorRemoteControlUrl": "https://claude.ai/code/session_01RQ7Eb4N4NaQEuAA6zPtpxV",
       "integrationDeltaEvaluatorRoute": "native claude-fable-5 / medium / Remote Control",
       "integrationDeltaEvaluationGrantedAt": "2026-08-15T21:03:05.052Z",
+      "integrationDeltaEvaluationCompletedAt": "2026-08-15T21:12:10.000Z",
+      "integrationDeltaEvaluationVerdict": "PASS",
+      "integrationDeltaEvaluatorCommitSha": "05ac90d00706d4bd9f3d93a59ab58bcdbfea5909",
+      "integrationDeltaEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1666#issuecomment-5304256350",
+      "integrationDeltaEvaluationFinding": "history-preserving union, exact four generated outputs, two-run convergence, twelve exact-content-head receipts, 14-of-17 scope, lock identity, prior reds, issue #1296 acceptance, and NOT_RUN boundaries independently pass; the older JSR audit timestamp is non-blocking because package configuration and exports are unchanged and publish-dry-run is head-bound",
       "integrationDeltaEvaluationScope": "artifact-only judgment of the current-main integration delta at content 8c03d8629 with evidence 021c7ffc6; re-derive history preservation, exact four-output generated union, two-run convergence, receipt binding, scope/lock/known-red honesty, and NOT_RUN boundaries; no runtime, readiness, issue mutation, or merge",
-      "sa4NextGate": "terminal integration-delta IMPL-EVAL verdict before any readiness restoration",
+      "readinessAttempt2HeadSha": "05ac90d00706d4bd9f3d93a59ab58bcdbfea5909",
+      "readinessAttempt2Mirror": "live close-gate run 31908897973 passed and checked all five acceptance rows on open issue #1296",
+      "readinessAttempt2CloseGateRunUrl": "https://github.com/rickylabs/netscript/actions/runs/31908897973",
+      "readinessAttempt2QualityRunUrl": "https://github.com/rickylabs/netscript/actions/runs/31908898023",
+      "readinessAttempt2QualityFinding": "changed-source quality failed on explicit-any at check-exports-drift.ts:356 and unsafe-cast at line 372; both are leaf-owned",
+      "readinessAttempt2RollbackAt": "2026-08-15T21:18:24.000Z",
+      "readinessAttempt2RollbackState": "PR returned to draft; status:ready-merge removed; status:impl restored; acceptance boxes remain checked but issue stays open; no merge",
+      "postIntegrationQualityRepairContract": "same original Sol/medium author repairs only the two type-safety findings without allowances or scanner weakening, runs focused and changed-source gates, commits and pushes, then fresh internals Tier-A precedes a fresh delta evaluator/readiness",
+      "sa4NextGate": "focused type-safety repair, fresh internals Tier-A, then fresh delta IMPL-EVAL before readiness restoration",
       "expensiveGateContract": "no runtime lease; scaffold.runtime and fresh-browser are matrix n/a for this checker/docs/JSDoc/task/workflow-only leaf",
       "receiptRefs": []
     },
@@ -2959,7 +2973,7 @@
     },
     {
       "id": "reference-export-drift-gate-integration-delta-impl-eval",
-      "state": "active",
+      "state": "complete",
       "lane": "internals",
       "leafId": "reference-export-drift-gate",
       "phase": "impl-eval",
@@ -2978,7 +2992,12 @@
       },
       "leaseOwner": "codex-root-0.0.7",
       "grantedAt": "2026-08-15T21:03:05.052Z",
-      "evaluationFocus": "current-main integration delta only: history-preserving merge, exact four-output generated union from #1665 plus #1666, two-run convergence/no fifth output, 12 exact-content-head receipts, 14-of-17 scope, lock identity, prior known reds, and NOT_RUN boundaries"
+      "evaluationFocus": "current-main integration delta only: history-preserving merge, exact four-output generated union from #1665 plus #1666, two-run convergence/no fifth output, 12 exact-content-head receipts, 14-of-17 scope, lock identity, prior known reds, and NOT_RUN boundaries",
+      "completedAt": "2026-08-15T21:12:10.000Z",
+      "verdict": "PASS",
+      "evaluatorCommitSha": "05ac90d00706d4bd9f3d93a59ab58bcdbfea5909",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1666#issuecomment-5304256350",
+      "remoteControlUrl": "https://claude.ai/code/session_01RQ7Eb4N4NaQEuAA6zPtpxV"
     }
   ],
   "expensiveGates": [
@@ -3211,5 +3230,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T21:03:30.000Z"
+  "updatedAt": "2026-08-15T21:18:24.000Z"
 }

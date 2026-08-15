@@ -761,3 +761,11 @@ implementation thread.
   integration-delta evaluator, reconcile the earlier evaluator against its pushed artifact and live
   verdict comment. Lane-local serialization is measured from live work plus terminal evidence, not
   from an unreconciled `active` string in the control plane.
+- **A broad quality PASS cannot overrule a narrower changed-source red:** #1666's core `quality` job
+  passed while the dedicated scanner correctly found an explicit `any` and unsafe cast in the leaf's
+  changed checker. Treat the narrower evidence as owned and blocking, revoke readiness, and repair the
+  code rather than rerunning or weakening the scanner.
+- **Acceptance mirroring may precede a later independent CI red:** #1666's close-gate truthfully
+  checked all five #1296 boxes before the separate code-quality workflow failed. Preserve those
+  evidence-backed boxes and the open issue, return the PR to draft, and let `Closes #1296` close the
+  issue only after a fully green repaired head merges.

@@ -950,3 +950,13 @@ native Fable 5/medium Remote Control integration-delta evaluator as job `be3774e
 `cse_01RQ7Eb4N4NaQEuAA6zPtpxV`. The earlier `f281b8cf` lease is reconciled terminal `PASS` at
 `0d4c82d6e`; it is not a second active evaluator. Readiness, issue mutation, close-gate, and merge
 remain held. #1664 attempt 6 and #1671 S3 continue independently under their existing contracts.
+
+At 21:18Z, #1666's integration-delta evaluator is terminal `PASS` at `05ac90d00` / comment
+`5304256350`; Remote Control was visible at
+`https://claude.ai/code/session_01RQ7Eb4N4NaQEuAA6zPtpxV`, and the evaluator lease is released.
+Readiness attempt 2 passed the acceptance mirror and close-gate, checking all five open #1296 rows,
+but dedicated changed-source CI `31908898023` found an explicit `any` and unsafe cast in the leaf's
+checker. The coordinator revoked readiness immediately: #1666 is draft at sole `status:impl`, no
+merge occurred, and broad quality's green does not override the focused red. Internals must use the
+same original Sol/medium author for one type-safe repair without allowances or scanner weakening,
+then perform fresh Tier-A and a fresh delta evaluator before readiness can be reconsidered.

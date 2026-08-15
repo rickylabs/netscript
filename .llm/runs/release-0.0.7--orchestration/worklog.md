@@ -1426,3 +1426,22 @@
   `be3774eb`, session `cse_01RQ7Eb4N4NaQEuAA6zPtpxV`, over `8c03d8629` / `021c7ffc6`. The older
   `f281b8cf` lease was stale in the control plane and is now reconciled to its already-proven PASS at
   `0d4c82d6e`; lane-local serialization therefore remains one active evaluator, not two.
+
+## 2026-08-15T21:18:24Z — #1666 delta passes, then changed-source CI revokes readiness
+
+- The fresh integration-delta evaluator returned terminal `PASS` at artifact-only head `05ac90d00`,
+  comment `5304256350`, and Remote Control session
+  `https://claude.ai/code/session_01RQ7Eb4N4NaQEuAA6zPtpxV`. It independently re-derived the
+  history-preserving four-output union, two-run convergence, twelve exact-content receipts,
+  14-of-17 scope, lock identity, known reds, all five #1296 acceptance rows, and NOT_RUN boundaries.
+  Evaluator job `be3774eb` is terminal and its lease is released.
+- Coordinator rewrote the PR body to the final heads, applied `status:ready-merge` and the existing
+  attributed `impl-eval:skip` while draft, verified the live acceptance mirror dry-run, then marked
+  #1666 ready. Core CI run `31908897973` passed close-gate and checked all five #1296 boxes; the issue
+  remains open pending merge. Broad `quality` also passed.
+- Dedicated changed-source run `31908898023` found two real leaf-owned findings in
+  `check-exports-drift.ts`: an explicit `any` at line 356 and an unsafe cast at line 372. This is not
+  retryable infrastructure. The coordinator immediately returned #1666 to draft, restored sole
+  `status:impl`, removed `status:ready-merge`, and did not merge. The same original Sol/medium author
+  is assigned one focused type-safe repair; fresh internals Tier-A and a fresh delta evaluator must
+  precede any later readiness restoration.
