@@ -788,3 +788,25 @@ receipt exists because scaffold was red; the second browser cleanup audit is not
 
 Full evidence and attribution are in `reports/s5-attempt5-runtime-failure.md`. All earlier attempts,
 reports, receipts, and carried baselines remain append-only.
+
+## F7 plan amendment — observable browser startup failure
+
+F7 is plan-only and awaits fresh Tier-A review. Coordinator measurement corrected attempt 5's
+previously unknown startup mechanism: no Linux browser candidate exists, Windows Chrome is selected,
+and missing WSL binfmt interop makes the exact child exit 2 with a shell/PE syntax error. The probe
+drained that diagnostic into a discard sink and did not inspect status while awaiting CDP, so it
+reported only a timeout. Path conversion and loopback handling are refuted and excluded.
+
+The bounded later repair stays inside the existing F6 probe/test pair. One named capture drains
+stderr continuously while retaining only a 32 KiB tail; one named startup helper races the existing
+target promise against child status and reports early exit code/signal plus captured stderr. The
+same raw drain remains owned by F6 termination. Deterministic cheap proofs cover an immediate code-2
+exit with sentinel stderr, bounded chatty output, live-child timeout distinction, source wiring, and
+all existing F6 cases.
+
+Executable resolution is unchanged. Explicit precondition failure, recorded skip, and host
+provisioning remain separate coordinator options with different acceptance consequences; F7 does
+not select one. The exact path ceiling and proof matrix are recorded in `plan.md` and
+`reports/f7-plan-amendment.md`. This slice changed run artifacts only and ran no test, gate, lease,
+browser, Aspire, Docker, evaluator, readiness action, or metadata action. All prior evidence remains
+append-only.

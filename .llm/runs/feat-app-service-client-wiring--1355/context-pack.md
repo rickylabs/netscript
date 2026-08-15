@@ -90,7 +90,10 @@ connection, mutation, or refetch assertion ran, so refetch behavior remains unpr
 failed. Full pretty and suite-owned NDJSON logs are hashed and preserved. Mandatory teardown and
 independent Aspire/Docker/process/port audits prove the host empty; only protected Aspire MCP
 helpers remain. The lease is released after cleanup. `fresh-browser` is NOT_RUN because the
-scaffold prerequisite failed.
+scaffold prerequisite failed. Coordinator follow-up establishes why startup was opaque: no Linux
+browser exists, the resolver selected Windows Chrome without WSL binfmt interop, that child exited 2
+with a shell/PE syntax error, and the probe discarded its stderr while ignoring early status. F7 is
+a plan-only, two-path diagnostic amendment; browser capability policy remains coordinator-owned.
 
 ## Completed
 
@@ -137,16 +140,18 @@ scaffold prerequisite failed.
   `publish-dry-run`, `arch-check`) passes at `7fa29ad3e` and recomputes SUFFICIENT. The original
   permission-denied `f6-test` stays append-only as a superseded environmental red outside the set.
 - Attempts 1–5 remain append-only. Attempt 5 exposes the next probe integration failure—no CDP
-  target—while preserving the unknown refetch verdict. Its cleanup is complete, the host is empty,
-  and the lease is released; no retry or browser gate is authorized.
+  target—while preserving the unknown refetch verdict. The exact startup mechanism is now measured,
+  and F7 binds an observable, bounded status/stderr repair without changing executable resolution.
+  Its cleanup is complete, the host is empty, and the lease is released; no retry or browser gate
+  is authorized.
 
 ## Next Steps
 
-1. Commit and push the S5 attempt-5 logs, failure report, final leak report, worklog, and context.
-2. Post `[PHASE: IMPL] [SLICE: S5]` with the 70-step verdict, both log hashes, failure boundary,
-   `fresh-browser` NOT_RUN, and final cleanup audit.
-3. Stop for coordinator/Tier-A disposition. Do not retry, repair, request a lease, or start browser
-   or evaluator work.
+1. Commit and push only the F7 plan/run artifacts.
+2. Post `[PHASE: PLAN] [SLICE: F7]` with the exact two-path ceiling, bounded startup-diagnostic seam,
+   proof matrix, and open coordinator host-policy options.
+3. Stop for fresh Tier-A. Do not mutate the two planned paths, request a lease, retry runtime, or
+   start browser/evaluator work.
 
 ## Key Decisions
 
@@ -190,7 +195,7 @@ scaffold prerequisite failed.
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
 | Static      | F6 check, test-attempt2 (4,229/0/19), publish dry-run, and arch-check PASS at `7fa29ad3e`; exact four-file set SUFFICIENT. Original `f6-test` FAIL is preserved as superseded environmental evidence outside the set. | four named passing receipts; quarantine and recovery reports |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
-| Runtime     | Attempt 5 `scaffold.runtime` FAIL: 69 passed / 1 failed / 0 skipped over 70 steps. Service-client and generated-format proofs PASS; leaf browser probe times out before CDP target/refetch assertions. Cleanup and independent host audit empty; lease released. | `reports/s5-attempt5-runtime-failure.md`; pretty + NDJSON logs |
+| Runtime     | Attempt 5 `scaffold.runtime` FAIL: 69 passed / 1 failed / 0 skipped over 70 steps. Service-client and generated-format proofs PASS; missing WSL browser capability makes the selected child exit 2, while the leaf probe masks status/stderr behind a CDP timeout. Cleanup and independent host audit empty; lease released. | `reports/s5-attempt5-runtime-failure.md`; pretty + NDJSON logs; F7 amendment |
 | Consumer    | `fresh-browser` NOT_RUN because attempt-5 scaffold prerequisite failed; no catalog receipt exists and browser cleanup audit was not reached. | S5 conditional contract |
 
 ## Open Questions
@@ -199,6 +204,9 @@ scaffold prerequisite failed.
   carries them with attribution and does not repair them inline.
 - The S2 service-suite `generated.deno-lint` expectation gap is resolved by the reviewed S4-FIX1
   test-only repair.
+- Browser capability disposition remains coordinator-owned: explicit precondition failure, a
+  recorded skip with changed acceptance semantics, or host provisioning. F7 chooses none, and no
+  attempt 6 is authorized.
 
 ## Drift and Debt
 

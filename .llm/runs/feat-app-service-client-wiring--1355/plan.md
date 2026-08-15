@@ -765,6 +765,137 @@ may the existing four binding cheap gates be refreshed at the committed content 
 `scaffold.runtime`, `fresh-browser`, Aspire, Docker, evaluator, readiness change, or product repair
 is authorized by this amendment.
 
+## F7 amendment — observable browser startup failure
+
+### Disposition and measured cause
+
+S5 attempt 5 is an honest red and is still not a refetch-behavior verdict. Its opaque timeout is a
+leaf-caused startup-diagnostic defect layered over an environmental missing-browser-capability gap.
+The suite reached all 70 steps with 69 passed, 1 failed, and 0 skipped; F5's
+`generated.deno-fmt-check` and F4's `generated.service-client-contract` remained green. F6 also did
+what it was intended to do: teardown returned control to the probe, allowing the first actual
+startup verdict. The refetch scenario itself remains unknown because the browser never started and
+the probe never connected CDP, navigated, mutated, or counted a refetch.
+
+Coordinator measurement closes the startup-mechanism question. None of the four Linux browser
+candidates in `findBrowserExecutable()` exists. The resolver therefore selects Windows Chrome,
+but this WSL instance has no `WSLInterop` or `WSLInterop-late` binfmt registration. The probe's exact
+browser argv exits immediately with code 2 while `/bin/sh` parses the PE executable and writes
+`Syntax error: word unexpected (expecting ")")` to stderr. The current probe continuously drains
+that pipe into a discard sink, never inspects early child status during startup, and consequently
+waits for a DevTools endpoint that can never appear before reporting only a timeout. The measured
+failure occurred before `--user-data-dir`, the loopback address, or any path translation could
+reach Chrome; Windows-path and `127.0.0.1` rewrites are explicitly rejected hypotheses.
+
+Attempt-5 evidence remains append-only:
+
+- `reports/s5-attempt5-runtime-failure.md`
+- `reports/s5-attempt5-scaffold-runtime-20260815-2139.log`, SHA-256
+  `ff349b40f7f70341934e170df7c67d147c0ed983173b41871421755ad55e062b`
+- `reports/s5-attempt5-scaffold-runtime-20260815-2139.ndjson`, SHA-256
+  `e35d6fbcbdfc0b046be3fec29fa5dee0b0369094645b75cb42fca1e0350bbc16`
+
+All four earlier S5 attempts and their hashes, `receipts/f6-test.json` as a superseded red, every
+S4/F4/F5/F6 report and receipt, Fresh's 45 and SDK's 3 `PRE_EXISTING_FAIL` diagnostics, and the
+separately named plugin-streams diagnostic remain unchanged.
+
+### Locked diagnostic seam
+
+The later repair adds two small E2E-internal seams in
+`service-client-browser-probe.ts`; they may be exported only for the existing same-package focused
+test and must not be re-exported through a CLI package barrel:
+
+```ts
+export interface BrowserStderrCapture {
+  readonly drain: Promise<void>;
+  text(): string;
+}
+
+export function captureBrowserStderr(
+  stream: ReadableStream<Uint8Array>,
+  maxBytes?: number,
+): BrowserStderrCapture
+
+export async function awaitBrowserStartup<TTarget>(
+  target: Promise<TTarget>,
+  status: Promise<Deno.CommandStatus>,
+  stderr: BrowserStderrCapture,
+): Promise<TTarget>
+```
+
+`captureBrowserStderr` starts consuming the pipe immediately and continuously through one reader.
+It retains only the final `32 * 1024` bytes by default, never an unbounded transcript; once more
+than the limit has been observed, `text()` prefixes the decoded tail with an explicit truncation
+marker. Retaining the tail preserves the browser's terminal diagnostic while bounding memory. The
+raw `drain` promise remains failure-capable and is the same promise passed to F6's
+`terminateBrowserProcess`; there is no second reader and no `.catch(() => undefined)` or discard
+sink. `text()` is consumed for an error only after `drain` completes.
+
+`awaitBrowserStartup` races the existing `waitForDebugTarget(port)` promise against the one
+`child.status` promise captured immediately after spawn. If the target wins, startup proceeds
+unchanged and the still-running capture continues until F6 cleanup terminates the browser. If
+status wins first, the helper awaits `stderr.drain` and throws a startup error containing the exact
+numeric exit code, signal value, and bounded stderr text (or an explicit `<empty>` marker). It must
+not translate that result into, wrap it behind, or wait for the generic DevTools timeout. If the
+target promise itself times out while the child is still alive, the existing
+`timed out waiting for Chrome DevTools target` result remains the verdict; early-exit diagnostics
+do not erase a real live-child timeout.
+
+`collectBrowserRefetchEvidence` creates one bounded capture and one status promise at spawn, passes
+the target/status/capture to `awaitBrowserStartup`, and passes that same capture's `drain` to
+`terminateBrowserProcess` in the existing enclosing cleanup. F6's exact already-terminated
+discriminator, status/drain awaiting, CDP close, stable request baseline, response-stage resume,
+evidence shape, and all refetch assertions remain unchanged.
+
+This fixes the startup instance of the same swallow class F6 removed from teardown: a child-process
+error remains observable while its pipe is still drained. It does not merely replace the current
+line with a different sink.
+
+### Executable resolution and open host-policy decision
+
+The later F7 diagnostic repair does **not** change `findBrowserExecutable()`: no candidate order,
+Windows path, WSL path conversion, interop launcher, debugging address, or loopback behavior changes.
+The measured defect requiring code is loss of child status/stderr, and the diagnostic seam is valid
+regardless of which executable a future host can run.
+
+The missing host capability is coordinator-owned and remains open. F7 records, but does not choose,
+these materially different dispositions:
+
+| Coordinator option | Consequence |
+| --- | --- |
+| Fail an explicit capability precondition | The scaffold gate remains red, but it fails before spawn with a direct no-runnable-browser reason. Implementing this changes executable-resolution policy and requires a fresh ruled amendment even if it stays within the same source file. |
+| Skip with a recorded reason | The runtime suite no longer proves the load-bearing refetch scenario on this host. This changes gate/suite acceptance semantics and necessarily exceeds the two-path F7 ceiling; it requires explicit coordinator approval and a newly bounded plan. |
+| Provide a runnable Linux browser or register supported WSL interop | No repo policy change is needed; a later leased run can execute the real refetch scenario. Host provisioning and validation are external coordinator work. |
+
+Until the coordinator selects a policy or supplies the missing capability, no attempt 6 or
+expensive-gate lease is warranted. The diagnostic repair itself may be reviewed and cheaply proven
+without deciding that policy.
+
+### Exact later path ceiling
+
+F7 implementation may modify exactly the two already-owned F6 paths:
+
+1. `packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts`
+2. `packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts`
+
+There is no new module, gate, suite, task, catalog, template, fixture, package barrel, SDK/Fresh,
+`docs/**`, or `deno.lock` path. `findBrowserExecutable()` behavior is excluded even though it lives
+in the first named file. A compiler-proven need for a third path, or any host-capability policy
+implementation, stops for another amendment and fresh Tier-A review.
+
+### Cheap deterministic proof matrix
+
+| Proof | Executable assertion in `service-client-runtime-probe_test.ts` |
+| --- | --- |
+| Immediate early exit | Spawn a real child that writes a unique stderr sentinel and exits with code 2. Start the same bounded capture, pass a never-resolving target promise plus the real `child.status` to `awaitBrowserStartup`, and require a rejection naming code 2 and the sentinel. Require the message not to contain `timed out waiting for Chrome DevTools target`. This reproduces the attempt-5 ordering without a browser. |
+| Bounded continuous drain | Spawn a child that writes more than 32 KiB, ending in a unique terminal sentinel, and exits. Require the early-exit error to carry the truncation marker and terminal sentinel while the retained stderr portion is bounded to the declared limit. This proves the pipe is drained rather than abandoned and cannot grow retained memory with a chatty browser. |
+| Live-child timeout distinction | With a still-pending status promise and a deterministic target promise that rejects with the existing DevTools timeout, require that exact timeout to propagate. This prevents the early-exit branch from relabeling a real live-child startup timeout. |
+| Production wiring and F6 preservation | Assert the source uses `captureBrowserStderr(child.stderr)`, captures `child.status`, delegates startup to `awaitBrowserStartup`, passes the same `.drain` to `terminateBrowserProcess`, and contains no `WritableStream({ write: () => undefined })` stderr sink. Rerun all existing F6 natural-exit, active-SIGTERM, three-negative, and cleanup-delegation proofs unchanged. |
+
+After a later Tier-A release, only the focused deterministic test and ordinary cheap binding gates
+may run. This amendment authorizes no lease, `scaffold.runtime`, `fresh-browser`, Aspire, Docker,
+evaluator, readiness/metadata change, or product repair.
+
 ## Drift Watch
 
 - Any change to `origin/main`, query key shapes, service manifest identity, command topology,
