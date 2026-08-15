@@ -2525,3 +2525,65 @@ explicit that this slice owns the **export-map** sweep and that anything beyond 
 `QueryClient` diagnostics is a finding with attribution rather than an inherited baseline.
 
 No lease. No runtime gate. No evaluator. Continuing the queue.
+
+## 2026-08-15 — S4 stop #2 accepted; export-map failures ruled carried baselines
+
+Head `e52aa44a63e7a24da33bf18af493bc2089c541fe`, local == remote. Commit adds
+`reports/s4-export-doc-failure.md`, `doc-lint-sdk.json`, three `exact-pins-*.json`, and journals.
+**No receipts, none hand-authored.**
+
+### Everything before the stop passed, including the invocation I had to correct
+
+| Member | TS format | TS lint | Exact `@netscript/*` pins | Export-map doc |
+| --- | --- | --- | --- | --- |
+| CLI | PASS — 887 files, 1 batch, 0 findings | PASS | PASS — 739 scanned, 0 failures | **PASS** — 3 entrypoints, 0 diagnostics |
+| Fresh | PASS — 201 files, 0 findings | PASS | PASS — 132 scanned, 0 failures | `PRE_EXISTING_FAIL` — 16 entrypoints, 45 diagnostics |
+| SDK | PASS — 84 files, 0 findings | PASS | PASS — 60 scanned, 0 failures | `PRE_EXISTING_FAIL` — 12 entrypoints, 3 diagnostics |
+
+`check:assets-barrel` exit 0, product tree clean. The CLI formatting line is the D-16 invocation
+working as measured — 887 files in a single batch with zero failed batches.
+
+### Attribution verified independently, including the claim that could have been false
+
+The author measured Fresh and SDK at `c53726c69` in a temp clone and reported identical results. I
+checked two things myself:
+
+- **Zero** of the nine diagnostic-bearing files differ between `c53726c69` and the candidate head —
+  `git diff --name-only` over all nine is empty.
+- The sharp check: **S3 modified `packages/fresh/deno.json`**, so "the same 16 entrypoints" was a
+  claim that could have been wrong. It is not — the only delta is the `test:browser` **task**, not
+  the `exports` map. The entrypoint set is unchanged, so the Fresh comparison is valid rather than
+  coincidentally similar.
+- `doc-lint-sdk.json` independently confirms 12 entrypoints, `exitCode 1`, 3 errors, all
+  `private-type-ref`.
+
+### The author avoided the specific trap this slice was set to catch
+
+The SDK sweep surfaced three diagnostics: the two carried `QueryClient` ones **plus**
+`plugin-streams-core/src/application/create-durable-stream.ts` —
+`DurableStreamProducerOptions["instrumentation"]` referencing private `StreamsInstrumentation`,
+reachable only through `packages/sdk/src/streams.ts`. It was reported as a **separate finding**,
+named as newly *exposed* by the full sweep rather than newly *caused*, and explicitly not folded into
+the two-diagnostic root-entrypoint baseline.
+
+That is the exact inverse of the earlier mislabel this leaf corrected. Then, a narrow run wore a
+broad name; here, a broad sweep could have quietly inherited a narrow baseline's excuse. Both are the
+same error — evidence described at the wrong scope — and this time it was avoided without prompting.
+
+### Tier-A ruling: carried baselines, not blockers — S4 continues
+
+The four contracted binding receipts are `check`, `test`, `publish-dry-run`, `arch-check`.
+Export-map doc-lint is **supplemental** acceptance evidence, not one of the four. A supplemental
+audit that fails identically at a pre-implementation commit, in files this leaf never touched, with
+an unchanged entrypoint set, is a baseline to carry with attribution — precisely as the SDK
+root-entrypoint `BASELINE_FAIL` was carried earlier in this same slice. **Carrying is not repairing**,
+so it does not breach the artifact-only boundary.
+
+The stop was nonetheless correct: the instruction was to stop and have the disposition reviewed, and
+that is what happened. The author was given the reasoning, not just the verdict, plus the standing
+rule for next time — **a red that reproduces at `c53726c69` is a carried baseline; a red that does
+not is a genuine finding and still stops the slice.**
+
+S4 resumes at per-member JSR audits, three isolated publish dry-runs, and the four `run-gate`-only
+receipts at the immutable head. No repair of any pre-existing diagnostic. No lease, no runtime gate,
+no evaluator.
