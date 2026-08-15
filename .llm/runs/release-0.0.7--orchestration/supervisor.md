@@ -692,3 +692,11 @@ At 17:19Z, #1664 attempt 3 stopped honestly after 32 passes on one red:
 run-owned teardown found nothing, and independent leak-check reports Aspire/Docker ok with zero
 survivors. The singleton lease is released; `fresh-browser` remains NOT_RUN. Preserve the raw log
 and attribute the format drift before any amendment, repair, or retry.
+
+At 17:29Z, #1461 repaired plan head `23db20f30` passed fresh fixes Tier-A at topic `f71e860f9`; its
+separate Fable 5/medium PLAN-EVAL is active as job `01f0eda8`, bridge
+`cse_01SWnk7LwvoLaamvEwR5WLfX`, exact source head, Remote Control. #1666's initial cycle-2 transport
+was interrupted after verification but before artifact or verdict; the same evaluator history was
+recovered without consuming another cycle as job `0e2d1e57`, bridge
+`cse_01K6SbsotG5MyjyjTd11SrfK`. Features is independently re-reviewing all twelve generated format
+paths because the author proved only one helper baseline while several red paths are leaf-owned.

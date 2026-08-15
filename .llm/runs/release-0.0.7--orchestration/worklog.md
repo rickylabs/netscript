@@ -984,3 +984,18 @@
   independent leak-check reports Aspire ok, Docker ok, zero survivors. The singleton lease is
   released. The author is preserving raw output and performing before/after attribution only; no
   product mutation or runtime retry is authorized.
+
+## 2026-08-15T17:29:40Z — two plan evaluators active; #1664 attribution challenged
+
+- #1461 T-1 repair `23db20f30` gives explicit dispositions for every matched claim on both
+  authorized pages, including tutorial lines 13, 15, 32, 75, 76, 80, 94, 100, and 107. Fresh fixes
+  Tier-A passed at `f71e860f9`. Separate native Fable 5/medium Remote Control evaluator job
+  `01f0eda8`, bridge `cse_01SWnk7LwvoLaamvEwR5WLfX`, is active over that immutable head.
+- #1666 cycle-2 session `580832d7...` completed re-derivation and was interrupted before writing an
+  artifact. There was no verdict or mutation, so the same evaluator history resumed—rather than a
+  replacement cycle—as job `0e2d1e57`, bridge `cse_01K6SbsotG5MyjyjTd11SrfK`, still Fable
+  5/medium Remote Control over `80046696e`.
+- #1664 evidence head `09a771c8e` preserves the 32/1/0 result and clean host. Coordinator rejected
+  a blanket pre-existing attribution based on one unchanged helper: the exact format red has twelve
+  paths, including leaf-owned generated users/payments clients and payments service/contract output.
+  Fresh features Tier-A must classify every path before a bounded repair ruling.

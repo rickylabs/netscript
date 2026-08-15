@@ -619,3 +619,12 @@ implementation thread.
   after all F4 receipts, the author report, and independent Tier-A were committed and pushed at
   `6f813b0db`. No preflight artifact may be appended between this grant and execution. This makes the
   exact authorized tree reproducible and prevents the attempt-2 grant/run head mismatch.
+- **One baseline witness cannot classify a multi-file gate red:** #1664 attempt 3 found twelve
+  unformatted generated paths. Proving one unchanged Aspire helper fails at the pre-implementation
+  template does not classify leaf-owned users/payments client and payments service/contract outputs.
+  Attribution must enumerate every failing path against both source ownership and baseline before a
+  coordinator can authorize a repair or call the gate pre-existing.
+- **Transport interruption before a verdict does not consume an evaluator cycle:** #1666 cycle 2
+  finished re-derivation but received an interruption before writing an artifact. Resuming the same
+  evaluator history under a new Remote Control attachment preserves independence and cycle identity;
+  launching a new evaluator or counting a third cycle would misstate what happened.

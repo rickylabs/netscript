@@ -571,3 +571,11 @@ Suite cleanup, run-owned teardown, and independent leak audit leave Aspire/Docke
 survivors, so the singleton lease is free. `fresh-browser` remains NOT_RUN. Preserve the raw log and
 complete generated-format attribution before any amendment or retry; no product mutation is
 authorized under the released lease. #1666 cycle-2 evaluator remains active independently.
+
+Newer checkpoint `2026-08-15T17:29:40Z`: #1461 repaired plan `23db20f30` passed fixes Tier-A at
+`f71e860f9`; PLAN-EVAL job `01f0eda8`, bridge `cse_01SWnk7LwvoLaamvEwR5WLfX`, is active native
+Fable 5/medium Remote Control. #1666 cycle-2's initial session was interrupted after verification
+but before artifact/verdict; the same history is recovered as job `0e2d1e57`, bridge
+`cse_01K6SbsotG5MyjyjTd11SrfK`, without consuming another cycle. #1664 evidence is pushed at
+`09a771c8e`; do not accept its blanket baseline attribution until fresh features Tier-A classifies
+all twelve unformatted generated paths, several of which are leaf-owned. No runtime lease is active.
