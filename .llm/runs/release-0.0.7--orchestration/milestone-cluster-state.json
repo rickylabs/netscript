@@ -72,7 +72,7 @@
         "pid": 23955,
         "bridgeSessionId": "session_01HqFtKQtyJcHBEn1MghQdFX",
         "remoteControlUrl": "https://claude.ai/code/session_01HqFtKQtyJcHBEn1MghQdFX",
-        "topicHeadSha": "dfd163f74ba9d32c916a82591bb74daf127dec60",
+        "topicHeadSha": "d5ade932be5bf541739e092a2eb4faf5a6668d20",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle"
@@ -114,7 +114,7 @@
         "pid": 26724,
         "bridgeSessionId": "session_014pCd2QWkCscgZpVdjcUPST",
         "remoteControlUrl": "https://claude.ai/code/session_014pCd2QWkCscgZpVdjcUPST",
-        "topicHeadSha": "1141d5a9f89480676bb87d68382d7243762253ea",
+        "topicHeadSha": "a46783f399acfcb7d73ad35dd32b03ef0ddd5390",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle"
@@ -664,13 +664,13 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "da574111af05a5cded74250128b196fcab870274",
-      "currentPrHeadSha": "a891c65203301ec96467f11d9fe3dcb77a09d5c8",
+      "currentPrHeadSha": "21403902b502925dd97ea8cea4e129eb8c83e0df",
       "issueNumbers": [1358],
       "implementerAgentId": "01a003f0-7821-7a10-a555-e619a9280479",
       "branch": "fix/design-registry-catalog-drift-gate",
       "worktree": "/home/codex/repos/netscript-007-leaf-design-registry-drift",
       "prNumber": 1657,
-      "implementationState": "post_eval_cleanup_complete_awaiting_tier_a",
+      "implementationState": "post_eval_cleanup_body_repair_running",
       "implementationCompletedHeadSha": "4a3c40321ac1e58aa337e02afeaa95fbc553ce7f",
       "freshBrowserGateState": "complete",
       "freshBrowserLeaseId": "design-registry-catalog-drift-fresh-browser",
@@ -712,13 +712,18 @@
       "nextImplementationEvaluationVerdict": "PASS",
       "nextImplementationEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1657#issuecomment-5301157020",
       "nextImplementationEvaluationCompletedAt": "2026-08-15T07:32:36.157Z",
-      "postEvaluationCleanupState": "complete_awaiting_fresh_tier_a",
+      "postEvaluationCleanupState": "tier_a_changes_requested_body_only_repair_running",
       "postEvaluationCleanupHeadSha": "a891c65203301ec96467f11d9fe3dcb77a09d5c8",
       "postEvaluationCleanupCommits": [
         "695dd7b005f65071b8f749ed84eb60faa3cd0f73",
         "a891c65203301ec96467f11d9fe3dcb77a09d5c8"
       ],
       "postEvaluationCleanupBoundary": "the three redundant T-3 CI deltas equal origin/main; core #1358 product work and prior formal PASS remain intact",
+      "postEvaluationCleanupTierAState": "CHANGES_REQUESTED",
+      "postEvaluationCleanupTierACommitSha": "21403902b502925dd97ea8cea4e129eb8c83e0df",
+      "postEvaluationCleanupTierACommentUrl": "https://github.com/rickylabs/netscript/pull/1657#issuecomment-5301270096",
+      "postEvaluationCleanupTierAFinding": "live PR body still reports the reverted T-3 slice and its validation as current and fails to qualify fresh-browser as form-navigation-only evidence",
+      "postEvaluationBodyRepairState": "authorized_same_author_running",
       "receiptRefs": [
         ".llm/runs/fix-design-registry-catalog-drift-gate--0.0.7-wave1/receipts/fresh-browser.json"
       ]
@@ -780,10 +785,10 @@
     {
       "id": "openhands-dispatch-claim-and-refusal",
       "lane": "internals",
-      "phase": "planned",
+      "phase": "implementing",
       "baseBranch": "main",
       "headSha": "7737d8903bb2925c3fcefbda362168fe297eebd4",
-      "currentPrHeadSha": "cea999d18ea2c2d4a6208fc209ce744d9be1d194",
+      "currentPrHeadSha": "e15d78588503f4a83d6322be9039abe1f52190a1",
       "issueNumbers": [1611, 1613],
       "implementerAgentId": "01a00443-abab-7261-8905-74ed71467929",
       "branch": "fix/openhands-dispatch-claim-and-refusal",
@@ -791,11 +796,11 @@
       "prNumber": 1658,
       "bootstrapHeadSha": "ca2266ecb4fe0cdd8a47059b4bca39761840f3b3",
       "researchHeadSha": "670e37beaa723f1b54218149a2485dd6b3e741e3",
-      "implementationState": "plan_repaired_plan_eval_running",
+      "implementationState": "slice_1_running",
       "planRepairHeadSha": "cea999d18ea2c2d4a6208fc209ce744d9be1d194",
       "planRepairTierAState": "PASS",
       "planRepairTierACommentUrl": "https://github.com/rickylabs/netscript/pull/1658#issuecomment-5301190104",
-      "planEvaluationState": "running",
+      "planEvaluationState": "complete",
       "planEvaluationCycle": 1,
       "planEvaluatedHeadSha": "cea999d18ea2c2d4a6208fc209ce744d9be1d194",
       "planEvaluatorAgentId": "7d544aec-22cc-4656-8483-6d957dbfbfda",
@@ -803,6 +808,19 @@
       "planEvaluatorBridgeSessionId": "session_01N9zhX5ZDUvvrBxcwoAYBCm",
       "planEvaluatorRoute": "native claude-opus-5 / medium / Remote Control",
       "planEvaluationGrantedAt": "2026-08-15T07:44:39.000Z",
+      "planEvaluatorCommitSha": "e15d78588503f4a83d6322be9039abe1f52190a1",
+      "planEvaluationVerdict": "PASS",
+      "planEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1658#issuecomment-5301255122",
+      "planEvaluationCompletedAt": "2026-08-15T07:54:58.339Z",
+      "implementationGrantedAt": "2026-08-15T07:59:47.000Z",
+      "implementationTopicCheckpointSha": "d5ade932be5bf541739e092a2eb4faf5a6668d20",
+      "implementationCarriedNotes": [
+        "S1-before-S4 is required by the API dependency, not live intermediate-branch spend safety",
+        "the root test receipt is the load-bearing gate for these dot-directory surfaces",
+        "refusal vocabulary must avoid bare evaluator verdict tokens",
+        "assert all five reportable denial reasons explicitly",
+        "post refusals with GITHUB_TOKEN so the declared issues:write job permission is the real ceiling"
+      ],
       "contractAmendment": {
         "state": "authorized",
         "authorizedAt": "2026-08-15T07:25:00.000Z",
@@ -823,15 +841,27 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "12276e6d86403ed1340ef79a963e87d401d643e9",
-      "currentPrHeadSha": "0e302ad3a5915b7a820adcac0a9d5bdc2d7d0019",
+      "currentPrHeadSha": "d45a92ba70e78cc1ff42617ca15f6782f4ea8c21",
       "evaluatorCommitSha": "3e0c8858b4a2552926d2965b62cbcc97a15c2935",
       "evaluationVerdict": "PASS",
       "implementationEvaluationVerdict": "PASS_CONDITIONAL",
       "implementationEvaluatorAgentId": "2a8cf0a6-7529-4ca6-97ce-69edcca3f84d",
       "implementationEvaluatorCommitSha": "0e302ad3a5915b7a820adcac0a9d5bdc2d7d0019",
-      "focusedAmendmentState": "same_author_running",
+      "focusedAmendmentState": "complete_awaiting_tier_a",
       "focusedAmendmentGrantedAt": "2026-08-15T07:47:32.000Z",
       "focusedAmendmentTopicCheckpointSha": "1bfc1cfcdff6d39c75f7190d1b79750f55b966c0",
+      "focusedAmendmentContentHeadSha": "67e12f02165089ec7431b72d1294147477906282",
+      "focusedAmendmentEvidenceHeadSha": "d45a92ba70e78cc1ff42617ca15f6782f4ea8c21",
+      "focusedAmendmentCommentUrl": "https://github.com/rickylabs/netscript/pull/1651#issuecomment-5301282095",
+      "focusedAmendmentGateVerdicts": {
+        "check": "PASS",
+        "test": "PASS",
+        "publish-dry-run": "PASS",
+        "arch-check": "PASS",
+        "docs-source-format": "PASS",
+        "docs-accuracy": "PASS"
+      },
+      "focusedAmendmentPrBodyState": "corrected",
       "ownerMergeHold": {
         "commentId": 5300440887,
         "reason": "RFC 0003/#1490 overlap audit found #1651 distinct overall but C6 ownership and adapter boundaries require an owner disposition before amendment",
@@ -1298,7 +1328,7 @@
     },
     {
       "id": "openhands-dispatch-claim-and-refusal-plan-eval-cycle-1",
-      "state": "running",
+      "state": "complete",
       "lane": "internals",
       "leafId": "openhands-dispatch-claim-and-refusal",
       "phase": "plan-eval",
@@ -1316,7 +1346,11 @@
         "remoteControlRequired": true
       },
       "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-15T07:44:39.000Z"
+      "grantedAt": "2026-08-15T07:44:39.000Z",
+      "completedAt": "2026-08-15T07:54:58.339Z",
+      "verdict": "PASS",
+      "evaluatorCommitSha": "e15d78588503f4a83d6322be9039abe1f52190a1",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1658#issuecomment-5301255122"
     }
   ],
   "expensiveGates": [
@@ -1410,5 +1444,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T07:48:51.000Z"
+  "updatedAt": "2026-08-15T08:04:33.000Z"
 }

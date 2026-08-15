@@ -336,3 +336,16 @@ The recovered features lane reused the existing native Opus 5/high supervisor, R
 and original Codex author; no replacement topic or author session was created. Evaluator and author
 serialization is per topic, so these three gates continue concurrently. The expensive runtime mutex
 remains unclaimed.
+
+### Live checkpoint — 2026-08-15T08:04:33Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Inventory complete; #1652 shipped as `e090f894f` | Preserve the terminal topic checkpoint |
+| internals | #1658 PLAN-EVAL `PASS` at `e15d78588`; preserved author implementing S1 with watcher armed | Stop after each S1–S5 slice for topic Tier-A; no OpenHands dispatch, new PLAN-EVAL, or runtime gate |
+| fixes | #1657 cleanup Tier-A found PR-body-only T-1/T-2/T-3; original author correcting the live body | Body-only, then one focused fresh recheck; preserve cycle-2 PASS and do not rerun product gates |
+| features | #1651 content `67e12f021` and evidence `d45a92ba7` are clean/pushed; six gates and PR-body provenance are correct | Fresh Tier-A, then one bounded final IMPL-EVAL; remain draft/status:impl |
+
+The #1658 evaluator's delivered-but-blocked state was reconciled from its commit, exact head equality,
+and PR comment before the stale session was explicitly stopped. The internals supervisor checkpointed
+`d5ade932b` and armed an S1 watcher. Serial order remains local to each topic.

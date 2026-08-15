@@ -205,3 +205,14 @@ fresh native Opus 5/medium Remote Control PLAN-EVAL in session `7d544aec-…`, b
 formal cycle 2 passed and its bounded cleanup is clean/pushed at `a891c6520`; the redundant three CI
 paths equal main and fresh cleanup Tier-A is next, with no cycle 3 or runtime rerun. Docs remains
 terminal. Serialization is per topic; the expensive runtime mutex is free.
+
+Resume from the newer authoritative `2026-08-15T08:04:33Z` checkpoint. Features #1651 completed the
+owner amendment at content `67e12f021` and evidence `d45a92ba7`; local=remote=PR, all six contracted
+receipts pass at the content head, the check provenance/body defects are corrected, and comment
+`5301282095` is posted. Fresh Tier-A and one bounded final IMPL-EVAL remain; keep draft/status:impl.
+Internals #1658 formal PLAN-EVAL passed at evaluator head `e15d78588`, comment `5301255122`; topic
+checkpoint `d5ade932b` carries N1–N5 and the preserved original Codex author is implementing S1 with
+a supervisor watcher armed. Stop at each slice for Tier-A, and do not dispatch OpenHands or runtime
+gates. Fixes #1657 cleanup Tier-A artifact `21403902b` requested only three PR-body truthfulness
+edits; same-author body correction and one focused fresh recheck are active, with cycle-2 product
+PASS unchanged and no gate rerun. Docs is terminal and the runtime mutex remains free.

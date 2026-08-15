@@ -267,3 +267,24 @@ implementation thread.
   workflow permissions, so one fresh PLAN-EVAL is warranted. The evaluator is independent Opus
   5/medium with active Remote Control, bound to `cea999d18`; this does not authorize implementation
   until a terminal `PASS` is committed and pushed.
+
+## 2026-08-15T08:04:33Z — delivered-state watchers and merge-record truth
+
+- **Evaluator lifecycle:** #1658's evaluator delivered a committed/pushed/commented `PASS` but used
+  `state: blocked` with no terminal timestamp. A terminal-only watcher therefore missed it. The
+  coordinator reconciled the immutable verdict tuple directly, stopped the stale evaluator, and
+  resumed the existing topic supervisor. Future evaluator watches must accept a verified verdict
+  commit + exact head equality + structured comment as delivery evidence, then stop the session by
+  exact PID rather than waiting indefinitely or using a broad pattern.
+- **#1658 carried implementation constraints:** S1-before-S4 is an API dependency, not live branch
+  spend protection; root `test` is the load-bearing gate for `.github`/`.llm` surfaces; refusal
+  vocabulary must avoid bare evaluator verdict tokens; all five reportable denial reasons need
+  explicit tests; and refusal posting must use `GITHUB_TOKEN` so the declared job permission is the
+  actual ceiling rather than an unconstrained PAT.
+- **#1657 merge record:** the cleanup implementation is correct, but the live PR body remained stale
+  after the three CI files were restored to main. A body-only correction is required to mark the
+  T-3 slice and its validation superseded and to qualify `fresh-browser` as form-navigation only.
+  This is not product drift, a gate rerun, or a formal evaluator cycle.
+- **#1651 evidence provenance closed:** the binding cached check receipt has empty stdout and must
+  not inherit cycle-1's 1,033-file/9-batch figures. The amended body now names the correct receipts,
+  content/evidence heads, and cached-hit semantics; fresh review must verify those live claims.

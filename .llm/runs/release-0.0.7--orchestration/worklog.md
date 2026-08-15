@@ -330,3 +330,22 @@
   `origin/main`; the core #1358 product changes and formal PASS remain intact. Fresh Tier-A is next.
 - All topic heads recorded here were clean when sampled. No expensive gate was launched, and the
   three topic-local queues continue independently rather than waiting on one another.
+
+## 2026-08-15T08:04:33Z — #1658 plan gate passes; #1651 amendment proven; #1657 body repair
+
+- #1658 formal PLAN-EVAL returned `PASS` against repaired plan `cea999d18`. Evaluator artifact head
+  `e15d78588503f4a83d6322be9039abe1f52190a1` is clean and equal across local, remote, and PR; comment
+  `5301255122` records the verdict. The evaluator stopped at a delivered `blocked` state without a
+  terminal timestamp, so the coordinator woke the existing topic supervisor, which independently
+  reconciled the artifact and then stopped the stale evaluator/watch. Topic checkpoint `d5ade932b`
+  carries notes N1–N5 and resumes only original author `01a00443-…` for S1.
+- #1651 original author committed normative keep-and-narrow content at `67e12f021` and evidence at
+  `d45a92ba70e78cc1ff42617ca15f6782f4ea8c21`; local, remote, and PR heads are equal and the tree is
+  clean. All six exact-content-head receipts are `PASS`, and the PR body now attributes the cached
+  check accurately while preserving the historical cycle-1 figures only with their real receipt.
+  Structured amendment comment `5301282095` is posted; fresh opposite-family Tier-A is next.
+- #1657 fresh cleanup Tier-A independently passed the product/revert proofs but returned
+  `CHANGES_REQUESTED` at artifact head `21403902b`, comment `5301270096`, because the live PR body
+  still described reverted T-3 code and left the form-navigation browser receipt unqualified. The
+  coordinator authorized only those merge-record text corrections on the preserved author thread,
+  followed by one focused fresh body recheck. Formal cycle-2 product `PASS` remains final.
