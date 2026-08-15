@@ -170,13 +170,17 @@ are empty. Full evidence is in `reports/s5-attempt6-runtime-failure.md`.
   child returns no evidence before the 900-second command boundary. The runtime gate is red and
   `fresh-browser` remains blocked. Cleanup and recoverable residue quarantine are complete; the
   host is empty and the leaf has relinquished lease use pending coordinator state update.
+- F8 attributes that silent red only as far as the evidence permits: the NDJSON has no CDP-stage
+  marker, while both `CdpClient.connect` and `CdpClient.send` contain independently reproducible
+  unbounded waits. The plan binds distinct inert-connection and missing-response tests and the
+  existing 20-second default, within the same two source/test paths. No repair is released yet.
 
 ## Next Steps
 
-1. Commit and push attempt-6 raw/NDJSON/selector evidence plus cleanup records.
-2. Post `[PHASE: IMPL] [SLICE: S5-A6]` with the runtime red, browser NOT_RUN state, and final audit.
-3. Stop for fresh coordinator/Tier-A disposition. Do not retry, run `fresh-browser`, mutate the
-   quarantine, request another lease, or start evaluation.
+1. Obtain fresh Tier-A on the F8 plan-only amendment and its exact two-path/proof ceiling.
+2. Do not implement until that review explicitly releases the repair.
+3. Attempt 7 remains prohibited until repair receipts and a second fresh Tier-A exist; do not run
+   `fresh-browser`, mutate a quarantine, request a lease, or start evaluation.
 
 ## Key Decisions
 
@@ -189,6 +193,7 @@ are empty. Full evidence is in `reports/s5-attempt6-runtime-failure.md`.
 | Client generator owns `apps/<app>/lib/<service>.ts` | PLAN-EVAL cycle 1      | Init-owned showcase remains separate but shares the template.  |
 | Disabled services receive owned modules             | PLAN-EVAL cycle 2 C2   | `Enabled` affects runtime registration, not source generation. |
 | Explicit browser override is strict                  | F7-C1                  | `NETSCRIPT_E2E_BROWSER_EXECUTABLE`; invalid values never fall back or skip. |
+| CDP waits fail before the suite boundary             | F8 plan                | Connect errors name URL; send errors name method; both default to 20 seconds. |
 
 ## Files Changed
 
@@ -221,7 +226,7 @@ are empty. Full evidence is in `reports/s5-attempt6-runtime-failure.md`.
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
 | Static      | F7 check, test-attempt2 (4,237/0/19), publish dry-run, and arch-check PASS at `e45144db6`; exact four-file set SUFFICIENT. Original `f7-test` FAIL is preserved as superseded environmental evidence outside the set. | four named passing receipts; quarantine and recovery reports |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
-| Runtime     | Attempt 6 `scaffold.runtime` FAIL: 69 passed / 1 failed / 0 skipped. Strict managed-Chromium selection succeeds; `behavior.service-client-refetch` exits 143 after 900,030 ms without returning evidence. Cleanup, recoverable D-18 quarantine, and final host audit complete. | `reports/s5-attempt6-runtime-failure.md`; hashed pretty + NDJSON + selector evidence |
+| Runtime     | Attempt 6 `scaffold.runtime` FAIL: 69 passed / 1 failed / 0 skipped. Strict managed-Chromium selection succeeds; `behavior.service-client-refetch` exits 143 after 900,030 ms without returning evidence. F8 records that the ledger cannot distinguish the two independently unbounded CDP transport waits. Cleanup, recoverable D-18 quarantine, and final host audit complete. | `reports/s5-attempt6-runtime-failure.md`; `reports/f8-plan-amendment.md`; hashed pretty + NDJSON + selector evidence |
 | Consumer    | `fresh-browser` NOT_RUN because attempt-6 scaffold prerequisite failed; no catalog receipt exists. | S5 conditional contract |
 
 ## Open Questions
@@ -230,9 +235,11 @@ are empty. Full evidence is in `reports/s5-attempt6-runtime-failure.md`.
   carries them with attribution and does not repair them inline.
 - The S2 service-suite `generated.deno-lint` expectation gap is resolved by the reviewed S4-FIX1
   test-only repair.
-- No browser-policy fork remains: the load-bearing runtime gate must prove refetch using a validated
-  explicit managed-browser override. F7-C1 still authorizes no attempt 6 or lease before Tier-A and
-  implementation convergence.
+- No browser-policy fork remains: attempt 6 proves the validated explicit managed-browser override
+  works, while the load-bearing runtime gate still must return settled-refetch evidence. No attempt
+  7 or lease is authorized before F8 repair receipts and fresh Tier-A.
+- Which CDP operation stopped attempt 6 is intentionally unresolved: the preserved ledger has no
+  stage marker. F8 makes connect and send separately diagnosable rather than choosing one by guess.
 
 ## Drift and Debt
 

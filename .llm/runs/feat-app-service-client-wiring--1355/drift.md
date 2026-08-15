@@ -134,3 +134,21 @@ current-state documentation.
   fallback, runnable/version validation, and no versioned cache literals; retain bounded stderr,
   race target startup against child status, and report source/path/code/signal/stderr on early exit.
 - **Evidence:** `plan.md` F7-C1 amendment and `reports/f7-plan-amendment.md`.
+
+## 2026-08-15 — F8 exposes two unbounded CDP transport waits
+
+- **What:** Attempt 6 successfully selects and starts managed Linux Chromium but the live
+  service-client browser probe returns no evidence before the suite's 900-second command boundary.
+- **Source:** preserved attempt-6 NDJSON and `service-client-browser-probe.ts` connection/command
+  transport implementation.
+- **Expected:** every probe wait either settles or fails with an operation-specific diagnostic well
+  before the outer suite boundary.
+- **Actual:** the ledger contains no stage marker and cannot distinguish the stopping operation.
+  Independently, `CdpClient.connect` has no settlement when a socket emits neither open nor error,
+  and `CdpClient.send` has no settlement when a sent id receives no response. Both paths are
+  unbounded while the surrounding event/poll/startup waits are bounded.
+- **Severity:** significant
+- **Action:** pending fresh Tier-A, bind both real no-settlement paths to the existing 20-second
+  policy with URL/method-specific errors, stale-pending cleanup, deterministic watchdog tests, and
+  unchanged F6/F7 contracts inside the existing two-path ceiling.
+- **Evidence:** `plan.md` F8 amendment and `reports/f8-plan-amendment.md`.

@@ -916,3 +916,30 @@ findings. The leaf relinquishes lease use only after that proof; central release
 
 No source/test, second runtime, browser gate, evaluator, readiness, metadata, lockfile,
 documentation, or deletion occurred. Attempt 6 and every prior red remain append-only.
+
+## F8 plan amendment — bounded and attributable CDP waits
+
+Attempt-6 attribution was narrowed from the preserved code and NDJSON rather than guessed. The
+runtime ledger proves `behavior.service-client-refetch` exited 143 at 900,030 ms with empty output,
+but records no CDP-stage marker. It therefore cannot select between the two unbounded primitives in
+`CdpClient`: `connect` waits only for open/error, and `send` waits only for a matching response id.
+All surrounding polling/event/version/startup waits are already bounded.
+
+The plan now binds separate inert-socket and missing-response tests using short production bounds
+and larger test watchdogs. Those tests make each no-settlement path fail deterministically and
+require distinct URL-versus-method diagnostics, while the production default remains the existing
+20,000 ms `TIMEOUT_MS`—45 times below the suite boundary. A timed-out response id is removed before
+rejection, and all F6 teardown and F7 selection/startup proofs remain required.
+
+The exact later ceiling remains two paths:
+
+1. `packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts`
+2. `packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts`
+
+Full attribution and the executable proof matrix are in `reports/f8-plan-amendment.md`. This entry
+and the amendment are plan/run artifacts only. No source, test, runtime, browser, Aspire, Docker,
+lease, evaluator, readiness, metadata, issue, lockfile, docs, or quarantine mutation is authorized.
+Attempt 7 remains prohibited until repair receipts and a second fresh Tier-A exist.
+
+The commit also preserves the already-present coordinator audit refresh in `leak-report.md`
+(timestamp and audited worktree only); it does not rerun or reinterpret that audit.

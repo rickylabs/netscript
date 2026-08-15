@@ -922,6 +922,73 @@ Linux browser override and require `behavior.service-client-refetch` to pass bef
 `fresh-browser` gate can run. This amendment itself authorizes no lease, expensive gate, Aspire,
 Docker, evaluator, readiness/metadata change, or product repair.
 
+## F8 amendment — bounded and attributable CDP transport waits
+
+### Attempt-6 attribution and evidentiary limit
+
+Attempt 6 proves F7: the selector used `NETSCRIPT_E2E_BROWSER_EXECUTABLE`, the exact configured
+managed Chromium path, and `Google Chrome for Testing 151.0.7922.34`; the browser genuinely
+launched. F4's service-client contract and F5's generated-format gates also passed again. The sole
+red, `behavior.service-client-refetch`, exited 143 (`128 + SIGTERM`) after the suite-owned
+900,030 ms boundary with empty stdout/stderr tails. That is not a refetch-behavior verdict because
+the probe returned no evidence.
+
+The preserved NDJSON has no progress marker between browser startup and the final outer kill, so it
+cannot distinguish the following two measured unbounded primitives:
+
+1. `CdpClient.connect(url)` settles only through `socket.onopen` or `socket.onerror`; a socket that
+   emits neither leaves it pending forever.
+2. `CdpClient.send(method, params)` settles only if `#receive` observes its id; a sent command with
+   no response leaves it pending forever. Every current `Page.enable`, `Runtime.enable`,
+   `Network.enable`, `Fetch.enable`, `Page.navigate`, `Fetch.continueResponse`, and helper-owned
+   `Runtime.evaluate` call crosses this seam.
+
+`waitUntil`, `CdpClient.waitFor`, browser version probing, and DevTools target startup are already
+bounded. The later repair will bound both independently demonstrated primitives because the
+required deterministic no-event and no-response transports each reproduce a real non-settling path;
+it will not claim that the runtime ledger selected one of them. Exact evidence, hashes, and the full
+proof design are in `reports/f8-plan-amendment.md`.
+
+### Locked two-path ceiling and transport contract
+
+F8 may later modify exactly:
+
+1. `packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts`
+2. `packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts`
+
+The existing source owns `CdpClient` and the timeout policy, while the existing test imports
+same-module E2E-internal seams. No third path, public package export, gate/suite/task/catalog,
+template/fixture, README, SDK/Fresh, `docs/**`, or `deno.lock` path is needed. A compiler-proven need
+outside this ceiling stops for another amendment and Tier-A.
+
+The later source change exposes only the minimum E2E-internal `CdpClient`/structural socket test
+seam; production still creates `new WebSocket(url)`. `connect` and `send` accept injectable timeout
+options for deterministic tests and use the existing `TIMEOUT_MS = 20_000` default in production.
+Connection expiry names `CDP WebSocket connection`, the exact URL, and `20000 ms`. Command expiry
+names `CDP response`, the exact method, and `20000 ms`. Twenty seconds is 45 times below the suite's
+900,000 ms boundary, leaving time for the F6 cleanup and diagnostic return before an outer SIGTERM.
+
+Timers clear on every normal settlement. A timed-out send deletes its id before rejection so late
+responses cannot settle stale work. A connection timeout detaches settlement handlers and closes
+the inert socket through the structural seam. No retry, reconnect, stage-guess, broad catch, or new
+transport abstraction is introduced.
+
+### Cheap deterministic proof matrix
+
+| Proof | Executable assertion in `service-client-runtime-probe_test.ts` |
+| --- | --- |
+| Never-opening connection | An injected socket emits neither open nor error. A short production bound must reject before a much larger test watchdog, naming the connection operation, exact URL, and bound. Removing the bound makes the watchdog fail quickly rather than hanging the suite. |
+| Never-returning send | An injected socket opens and records `Page.enable` but never returns its id. A short production bound must reject before the watchdog, naming the response operation, method, and bound; a late response cannot resurrect the removed pending entry. |
+| Normal settlement | A matching result and a matching CDP error arriving before the bound retain the existing resolution/rejection behavior and cancel the timer. |
+| Distinct diagnostics | The sentinel URL belongs only to the connection error and the sentinel method belongs only to the send error, making the two runtime-indistinguishable primitives separately attributable. |
+| F6 and F7 preservation | All termination/drain negatives and delegation remain green with no discard sink; strict selection, runnable/version probing, startup status/stderr, and no-versioned-cache-literal tests also remain green unchanged. |
+
+After a future Tier-A releases implementation, run the focused test and four fresh exact-head
+binding receipts (`check`, `test`, `publish-dry-run`, `arch-check`) before a second fresh Tier-A.
+Attempt 7 is prohibited until that repair/evidence review passes and a new coordinator lease is
+granted. This amendment authorizes no source/test mutation, runtime/browser gate, Aspire, Docker,
+lease, evaluator, readiness/merge/metadata, issue, lockfile, docs, or quarantine mutation.
+
 ## Drift Watch
 
 - Any change to `origin/main`, query key shapes, service manifest identity, command topology,
