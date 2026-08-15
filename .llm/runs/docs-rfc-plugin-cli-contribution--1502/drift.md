@@ -177,3 +177,24 @@ Drift is append-only. Package and plugin source remain read-only in this leaf.
   (or amends an appropriate existing scanner issue after re-audit) before removing the manual audit.
   This docs leaf does not change scanner or package source.
 - **Evidence:** RFC S3 hardcoded-host-command audit; `research.md`; parent-head receipt.
+
+## 2026-08-15 — Live main advanced inside an inspected auth CLI surface
+
+- **What:** `origin/main` advanced from the previously recorded `dd472102d` to `0b3ed5d5a` while S3
+  awaited review, and the new commit changes the implementation of the hardcoded `plugin auth`
+  command group inspected by this RFC.
+- **Source:** Raw fetch and diff of `0b3ed5d5a6aea451318f120988c25dfa3993a2ab`
+  (`fix(auth): require
+  an explicit streams session URL (#1643)`) against the approved immutable
+  leaf base.
+- **Expected:** A later mainline overlap with an inspected CLI/plugin surface is reconciled before
+  final evidence rather than hidden by a rebase.
+- **Actual:** The auth command changes one session flag default and tests, but does not move its
+  factory, change the direct public/local `auth` registration findings, create a plugin contribution
+  seam, or alter any RFC-owned type/ownership decision. The branch merge base remains the approved
+  `01e0960494c95ce56eb35892c211a095eb13e6ed`.
+- **Severity:** minor.
+- **Action:** Retain the immutable base, record the overlap, and run the final contracted gates at
+  the committed content head. The future implementation child re-baselines command behavior from
+  live main before writing its migration fixtures.
+- **Evidence:** S4 raw Git reconciliation in `worklog.md`; live commit `0b3ed5d5a`.

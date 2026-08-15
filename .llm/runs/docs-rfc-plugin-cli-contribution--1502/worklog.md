@@ -99,36 +99,38 @@ No author imports `@netscript/cli` internals, Cliffy, deploy, DevTools, or anoth
 
 ## Progress Log
 
-| Time                  | Slice  | Step      | Notes                                                                                                                                  |
-| --------------------- | ------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-13 21:45 CEST | S0     | activate  | Read all nine selected skills completely; activated harness/docs A4 workflow.                                                          |
-| 2026-08-13 21:55 CEST | S0     | reconcile | Fetched live `origin/main`; clean exact base, no upstream; #1502 open/zero comments; no existing PR.                                   |
-| 2026-08-13 22:05 CEST | S0     | research  | Read required harness/archetype/doctrine/RFC sources and live CLI/plugin public surfaces with `deno doc` before focused source.        |
-| 2026-08-13 22:20 CEST | S0     | consumers | Fetched #904–#908/comments and adjacent #424/#946/#1477; searched for duplicate general proposals.                                     |
-| 2026-08-13 22:25 CEST | S0     | JSR audit | Measured plugin/CLI export-map doc lint and recorded public-surface, slow-type, export, and asset risks.                               |
-| 2026-08-13 22:30 CEST | S0     | design    | Locked ownership, lifecycle, security, compatibility, epic shape, and no-global-expensive-gate contract.                               |
-| 2026-08-13 22:34 CEST | S0     | gates     | Scoped structured Markdown format, durable docs accuracy, and internal-link checks passed; no code/global expensive gate run.          |
-| 2026-08-13 22:48 CEST | S0R    | eval-read | Preserved evaluator-only commit `d71b78c3`; read all 145 lines of cycle-1 `FAIL_PLAN` before repair.                                   |
-| 2026-08-13 22:55 CEST | S0R    | contract  | Read coordinator key `rfc-plugin-cli-contribution`; recorded authoritative RFC-only mutation resolution as significant drift.          |
-| 2026-08-13 22:59 CEST | S0R    | JSR audit | Measured CLI/plugin exports, docs, exact internal pins, isolated-declaration posture, publish assets, and `import.meta` preflight.     |
-| 2026-08-13 23:00 CEST | S0R    | gates     | Structured check and focused tests, per-member publish dry-runs, and root architecture gate passed at evaluator head.                  |
-| 2026-08-13 23:08 CEST | S0R    | docs      | Structured run Markdown, docs-source-format, docs-accuracy, links, and live-glossary terminology review passed.                        |
-| 2026-08-15 01:20 CEST | S1     | eval-read | Read all 246 lines of cycle-2 `PASS`; evaluator-only head `3e0c8858b4a2552926d2965b62cbcc97a15c2935`.                                  |
-| 2026-08-15 01:25 CEST | S1     | reconcile | Clean local/remote evaluator head, no upstream; main advanced one non-overlapping tooling commit, recorded as minor drift.             |
-| 2026-08-15 01:32 CEST | S1     | contract  | Authored ownership, immutable descriptors/builder, nested router/collisions/order, static help/completion, and result/error contract.  |
-| 2026-08-15 01:35 CEST | S1     | notes     | Closed N-1 durable citation, N-2 Opus route, N-3 published symbol collision; retained N-4 for mandatory S4 final-head rerun.           |
-| 2026-08-15 01:37 CEST | S1     | gates     | Structured check, docs format/accuracy, owned Markdown, links, terminology, and live API/help sampling passed.                         |
-| 2026-08-15 01:48 CEST | S1-fix | review    | Read full Tier-A `CHANGES_REQUESTED` at topic commit `b774998f0`; F1–F3 are bounded S1 contract defects.                               |
-| 2026-08-15 01:49 CEST | S1-fix | contract  | Declared diagnostic tuple/union, made deep readonly type/runtime guarantees explicit, and made handler path validation normative.      |
-| 2026-08-15 01:51 CEST | S1-fix | gates     | Docs source format/accuracy, structured owned Markdown format, and internal links passed; no code or expensive gate ran.               |
-| 2026-08-15 01:58 CEST | S2     | release   | Reconciled Tier-A S1 PASS at `bd8b29bf3`; accepted F1–F3 and parent-head evidence convention; S2 released, S3 withheld.                |
-| 2026-08-15 02:00 CEST | S2     | inspect   | Verified live `generate plugins --dry-run` and `plugin doctor` flags/help plus current manifest and published CLI contribution shapes. |
-| 2026-08-15 02:06 CEST | S2     | contract  | Authored explicit registry freshness, selected bootstrap, capabilities, isolation, transaction, doctor, and pointer ownership.         |
-| 2026-08-15 02:08 CEST | S2     | gates     | Focused structured tests, architecture, docs format/accuracy/links, owned Markdown, terminology, and decision sweep passed.            |
-| 2026-08-15 02:24 CEST | S3     | release   | Reconciled Tier-A S2 PASS at `7a5eb580a`; all six S2 sections and parent-head evidence accepted; S3 released, S4 withheld.             |
-| 2026-08-15 02:27 CEST | S3     | research  | Refreshed accepted RFC laws, #904–#908 and adjacent issue ownership, JSR baseline, and exact host-side plugin coupling occurrences.    |
-| 2026-08-15 02:30 CEST | S3     | contract  | Authored compatibility, deploy supersession, coupling/duplicate audits, JSR obligations, and the unfiled PR-sized implementation epic. |
-| 2026-08-15 02:36 CEST | S3     | gates     | Docs format/accuracy/links, per-member publish dry-runs, JSR audits, and the repository coupling scan completed with baseline labels.  |
+| Time                  | Slice  | Step      | Notes                                                                                                                                    |
+| --------------------- | ------ | --------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-13 21:45 CEST | S0     | activate  | Read all nine selected skills completely; activated harness/docs A4 workflow.                                                            |
+| 2026-08-13 21:55 CEST | S0     | reconcile | Fetched live `origin/main`; clean exact base, no upstream; #1502 open/zero comments; no existing PR.                                     |
+| 2026-08-13 22:05 CEST | S0     | research  | Read required harness/archetype/doctrine/RFC sources and live CLI/plugin public surfaces with `deno doc` before focused source.          |
+| 2026-08-13 22:20 CEST | S0     | consumers | Fetched #904–#908/comments and adjacent #424/#946/#1477; searched for duplicate general proposals.                                       |
+| 2026-08-13 22:25 CEST | S0     | JSR audit | Measured plugin/CLI export-map doc lint and recorded public-surface, slow-type, export, and asset risks.                                 |
+| 2026-08-13 22:30 CEST | S0     | design    | Locked ownership, lifecycle, security, compatibility, epic shape, and no-global-expensive-gate contract.                                 |
+| 2026-08-13 22:34 CEST | S0     | gates     | Scoped structured Markdown format, durable docs accuracy, and internal-link checks passed; no code/global expensive gate run.            |
+| 2026-08-13 22:48 CEST | S0R    | eval-read | Preserved evaluator-only commit `d71b78c3`; read all 145 lines of cycle-1 `FAIL_PLAN` before repair.                                     |
+| 2026-08-13 22:55 CEST | S0R    | contract  | Read coordinator key `rfc-plugin-cli-contribution`; recorded authoritative RFC-only mutation resolution as significant drift.            |
+| 2026-08-13 22:59 CEST | S0R    | JSR audit | Measured CLI/plugin exports, docs, exact internal pins, isolated-declaration posture, publish assets, and `import.meta` preflight.       |
+| 2026-08-13 23:00 CEST | S0R    | gates     | Structured check and focused tests, per-member publish dry-runs, and root architecture gate passed at evaluator head.                    |
+| 2026-08-13 23:08 CEST | S0R    | docs      | Structured run Markdown, docs-source-format, docs-accuracy, links, and live-glossary terminology review passed.                          |
+| 2026-08-15 01:20 CEST | S1     | eval-read | Read all 246 lines of cycle-2 `PASS`; evaluator-only head `3e0c8858b4a2552926d2965b62cbcc97a15c2935`.                                    |
+| 2026-08-15 01:25 CEST | S1     | reconcile | Clean local/remote evaluator head, no upstream; main advanced one non-overlapping tooling commit, recorded as minor drift.               |
+| 2026-08-15 01:32 CEST | S1     | contract  | Authored ownership, immutable descriptors/builder, nested router/collisions/order, static help/completion, and result/error contract.    |
+| 2026-08-15 01:35 CEST | S1     | notes     | Closed N-1 durable citation, N-2 Opus route, N-3 published symbol collision; retained N-4 for mandatory S4 final-head rerun.             |
+| 2026-08-15 01:37 CEST | S1     | gates     | Structured check, docs format/accuracy, owned Markdown, links, terminology, and live API/help sampling passed.                           |
+| 2026-08-15 01:48 CEST | S1-fix | review    | Read full Tier-A `CHANGES_REQUESTED` at topic commit `b774998f0`; F1–F3 are bounded S1 contract defects.                                 |
+| 2026-08-15 01:49 CEST | S1-fix | contract  | Declared diagnostic tuple/union, made deep readonly type/runtime guarantees explicit, and made handler path validation normative.        |
+| 2026-08-15 01:51 CEST | S1-fix | gates     | Docs source format/accuracy, structured owned Markdown format, and internal links passed; no code or expensive gate ran.                 |
+| 2026-08-15 01:58 CEST | S2     | release   | Reconciled Tier-A S1 PASS at `bd8b29bf3`; accepted F1–F3 and parent-head evidence convention; S2 released, S3 withheld.                  |
+| 2026-08-15 02:00 CEST | S2     | inspect   | Verified live `generate plugins --dry-run` and `plugin doctor` flags/help plus current manifest and published CLI contribution shapes.   |
+| 2026-08-15 02:06 CEST | S2     | contract  | Authored explicit registry freshness, selected bootstrap, capabilities, isolation, transaction, doctor, and pointer ownership.           |
+| 2026-08-15 02:08 CEST | S2     | gates     | Focused structured tests, architecture, docs format/accuracy/links, owned Markdown, terminology, and decision sweep passed.              |
+| 2026-08-15 02:24 CEST | S3     | release   | Reconciled Tier-A S2 PASS at `7a5eb580a`; all six S2 sections and parent-head evidence accepted; S3 released, S4 withheld.               |
+| 2026-08-15 02:27 CEST | S3     | research  | Refreshed accepted RFC laws, #904–#908 and adjacent issue ownership, JSR baseline, and exact host-side plugin coupling occurrences.      |
+| 2026-08-15 02:30 CEST | S3     | contract  | Authored compatibility, deploy supersession, coupling/duplicate audits, JSR obligations, and the unfiled PR-sized implementation epic.   |
+| 2026-08-15 02:36 CEST | S3     | gates     | Docs format/accuracy/links, per-member publish dry-runs, JSR audits, and the repository coupling scan completed with baseline labels.    |
+| 2026-08-15 02:47 CEST | S4     | release   | Reconciled Tier-A S3 PASS at `171e4e62e`; no findings, no issue filing, S4 evidence-only scope released, S4 evaluator dispatch withheld. |
+| 2026-08-15 02:50 CEST | S4     | reconcile | Local/remote/PR heads match on a clean no-upstream branch; PR remains draft with sole `status:impl`; refreshed live `origin/main`.       |
 
 ## Decisions
 
@@ -297,17 +299,17 @@ Archetype-4 gates (F-1–F-12, F-14–F-19); this summary does not replace that 
 - FP-1 is repaired by the six-gate plan and cycle-1 receipts; FP-2 by measured CLI/plugin exports,
   exact pins, publish dry-runs, isolated-declaration posture, assets, and `import.meta` evidence;
   FP-3 by the authoritative RFC-only scope resolution and significant drift record.
-- N-1 through N-4 are carried: high author effort is corrected, `Closes #1502` is resolved to this
-  RFC leaf only, the terminology gate names `docs/site/glossary.md`, and the future roadmap lists
-  all 18 applicable Archetype-4 fitness gates.
+- N-1 through N-3 are closed. N-4 is the S4 load-bearing invariant: final durable receipts must
+  record `gitHead == actualGitHead ==` the committed content head, with no mismatch override.
 - The evaluator should inspect `plan.md` D3 (mount restriction), D6–D9 (static registry/lazy
   bootstrap/absent UX), D11–D15 (generation transaction and manifest evolution), and the
   duplicate-audit/epic shape first.
 - Verify that the public contract stays in `@netscript/plugin/cli`, host internals stay private, and
   the existing CLI helper migration is explicit.
-- Verify every issue #1502 decision and all five acceptance boxes have a planned evidence path.
-- After Tier-A accepts S3, release S4 for final-head contracted evidence; IMPL-EVAL remains a fresh
-  opposite-family session and this author does not write its verdict.
-- The author has written S1–S3 of `rfcs/0000-plugin-cli-contribution.md`; has not started S4,
-  self-evaluated, filed or mutated issues, changed lifecycle state, or expanded into package/plugin
-  source.
+- Verify all five #1502 acceptance entries point to openable final-head artifacts and leave the
+  issue mutation to the later close-gate mirror/coordinator.
+- The S4 content head is the commit containing this checkpoint. Start the six durable gates only
+  after that commit is clean. The follow-up commit may add receipts and update run journals, but it
+  may not change `rfcs/0000-plugin-cli-contribution.md` or any contract source.
+- Final IMPL-EVAL remains a fresh opposite-family session; this author does not dispatch it, write
+  `evaluate.md`, flip the draft PR ready, or self-certify.

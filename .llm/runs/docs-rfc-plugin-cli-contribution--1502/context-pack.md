@@ -6,7 +6,7 @@
 | -------------- | ---------------------------------------------- |
 | Run ID         | `docs-rfc-plugin-cli-contribution--1502`       |
 | Branch         | `docs/rfc-plugin-cli-contribution`             |
-| Current phase  | `impl` — S3 compatibility/roadmap authoring    |
+| Current phase  | `impl` — S4 final-head evidence reconciliation |
 | Archetype      | 4 — public DSL/builder (future implementation) |
 | Scope overlays | `SCOPE-docs`                                   |
 
@@ -17,9 +17,11 @@ preserved at `plan-eval-cycle-1.md`. Cycle 2 evaluated repaired head
 `12276e6d86403ed1340ef79a963e87d401d643e9` and returned `PASS` in evaluator-only commit
 `3e0c8858b4a2552926d2965b62cbcc97a15c2935`. Tier-A accepted S1 with its bounded fix-up at
 `bd8b29bf3a524280d28a39b21bc7adda277d2e27` and accepted S2 at
-`7a5eb580a8515b8dc1007308a9d917b5e7309f41`. The six S2 sections, F1–F3, and the `PASS_PARENT_HEAD`
-convention are closed. S3 is released for compatibility, supersession, duplicate audit, and the
-later epic. S4 remains blocked on the next Tier-A release.
+`7a5eb580a8515b8dc1007308a9d917b5e7309f41`. Tier-A accepted S3 with no findings at
+`171e4e62ebb2e47eb3af08df165394bb4d1bae55`; the six S3 sections, both carried S2 notes, and the
+honest scanner-gap treatment are closed. S4 is released only for committed-content evidence, receipt
+reconciliation, truthful PR completion state, and the separate IMPL-EVAL handoff. The PR remains
+draft at `status:impl`; this author does not dispatch or write IMPL-EVAL.
 
 ## Completed
 
@@ -74,19 +76,23 @@ later epic. S4 remains blocked on the next Tier-A release.
   accepting UTF-8-text-only generation in contract major 1.
 - Authored the S3 compatibility matrix, deploy migration/supersession table, hardcoded-command and
   amend/fold-first audits, per-surface JSR obligations, and unfiled PR-sized implementation epic.
+- Pushed S3 at `171e4e62ebb2e47eb3af08df165394bb4d1bae55`; Tier-A independently verified no issue
+  filing, 42/42 declared/used public symbols, all S3 sections, and no findings.
 
 ## In Progress
 
-- S3 validation, one reviewable commit, explicit-refspec push, PR body/comment update, and renewed
-  Tier-A topic-review stop. S4 has not begun.
+- Prepare the committed S4 content head. Only after that clean commit may the six final durable
+  gates run; the follow-up may change receipts and run journals but not RFC/contract content.
 
 ## Next Steps
 
-1. Topic orchestrator substantively reviews S3 and explicitly releases S4.
-2. S4 reruns all six contracted gates at the final author head and completes the JSR/docs evidence
-   set.
-3. A fresh native Claude Opus 5 medium session performs IMPL-EVAL; this author does not
-   self-certify.
+1. Commit this S4 pre-gate handoff state as the content head.
+2. From its clean tree, run durable `check`, `test`, per-member `publish-dry-run`, `arch-check`,
+   `docs-source-format`, and `docs-accuracy`, plus final JSR/docs/scope checks.
+3. Commit receipts and evidence journals only, push explicitly, reconcile the draft PR, and stop for
+   Tier-A review.
+4. A fresh native Claude Opus 5 medium session performs IMPL-EVAL only after coordinator dispatch;
+   this author does not self-certify.
 
 ## Key Decisions
 
@@ -122,22 +128,22 @@ later epic. S4 remains blocked on the next Tier-A release.
 
 | Gate family | Current status                                | Evidence                           |
 | ----------- | --------------------------------------------- | ---------------------------------- |
-| Static      | S3 docs/publish checks pass at parent head    | `worklog.md`; `receipts/`          |
+| Static      | final content-head receipt set pending        | `worklog.md`; `receipts/`          |
 | Fitness     | full A4 roadmap plus measured JSR obligations | RFC; `research.md`; `worklog.md`   |
 | Runtime     | N/A / global expensive gate not run           | docs-only scope                    |
 | Consumer    | research inventory complete                   | live issues/RFCs and `research.md` |
 
 ## Open Questions
 
-- S3 has no rework-forcing open decision. The later coordinator chooses epic milestone/priority and
-  amends/folds the mapped issues; exact FCP numeric limits remain future choices. S4 owns validation
-  and final evidence only and cannot reopen S1–S3 without recorded drift and a new review.
+- S4 has no contract decision. It owns final evidence only and cannot reopen S1–S3. Exact FCP
+  numeric limits, epic lifecycle metadata, and issue amendments remain future implementation work.
 
 ## Drift and Debt
 
-- Drift: attached author route, accepted-but-unshipped consumer seams, shallow existing `./cli`,
-  current plugin doc-lint baseline, coordinator-contract tension, glossary path, stale #1474
-  wording, and the quality-scanner rule gap are recorded in `drift.md`.
+- Open drift for IMPL-EVAL: attached author-route override; accepted-but-unshipped consumer seams;
+  shallow existing `./cli`; plugin doc/module baseline failures; coordinator contract tension; the
+  retired glossary path; immutable-base divergence from live main; stale #1474 wording; and the
+  quality-scanner direct-registration blind spot. Details and severities remain in `drift.md`.
 - Debt: no new or deepened architecture debt; source implementation is forbidden in this leaf.
 
 ## Commits
@@ -150,5 +156,7 @@ later epic. S4 remains blocked on the next Tier-A release.
 - S1 reviewed head: `86d0110a545e449dfa094fc961a37a327604d23a`.
 - S1 accepted fix-up head: `bd8b29bf3a524280d28a39b21bc7adda277d2e27`.
 - S2 exact head: `7a5eb580a8515b8dc1007308a9d917b5e7309f41`.
-- S3 exact head: recorded in the PR slice comment after explicit-refspec push.
+- S3 exact head: `171e4e62ebb2e47eb3af08df165394bb4d1bae55`.
+- S4 content head: the commit containing this pre-gate checkpoint; the exact SHA is recorded in the
+  receipt-only follow-up after all gates attest it.
 - See the draft PR commit list and per-slice comments after push; V3 uses no `commits.md`.
