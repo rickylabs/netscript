@@ -384,3 +384,19 @@ Per the stop rule, `test`, `publish-dry-run`, and `arch-check` were not run. No 
 authored for them. Exact-set sufficiency is **INSUFFICIENT**: the check receipt is non-passing and
 the other three contracted receipts are missing. No repair, expensive gate, lease action, Aspire,
 Docker, browser, or evaluator followed the failure.
+
+### S4-F3 checked repair — remove Node ambient typing from the shared graph
+
+Coordinator checkpoint `ca10ffaeb` records a three-way single-variable experiment: the unchanged
+`verify-producer-reconnect.ts` passes alone, fails when checked with the F3 probe importing
+`node:path`, and passes with the same probe importing `@std/path`. The mechanism is leaf-caused
+shared-graph type pollution: `node:path` introduces Node globals and changes `setTimeout` from the
+web-platform numeric handle to `NodeJS.Timeout`.
+
+The reviewed repair changes only the probe's path import back to
+`import { join, relative } from '@std/path';`. Its custom walker is retained after source inspection:
+it imports no Node or filesystem module and uses only `Deno.readDir` plus its own recursive call.
+The required discriminating check ran `verify-producer-reconnect.ts` and the repaired probe together
+in one `deno check --unstable-kv` invocation; both passed with exit 0. Contract-derived inputs,
+resource-prefix isolation, schema readiness, and both F3 negative tests are unchanged. The original
+`receipts/s4-f3-check.json` remains the immutable FAIL record and will not be overwritten.

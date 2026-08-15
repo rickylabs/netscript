@@ -90,21 +90,19 @@ or expensive command is authorized.
 
 ## In Progress
 
-- F3 product repair is committed at content head `6e822a74b4de527a23da46f1c9c2f6ba6c94c72f`.
-  The first replacement binding receipt, `receipts/s4-f3-check.json`, is `FAIL`/exit 1 for a newly
-  exposed TS2322 in untouched `verify-producer-reconnect.ts:268`. The same full check passes in an
-  isolated archive at `c53726c69`, so the red is not a carried baseline. The ordered run stopped;
-  the other three current-head receipts do not exist. The `s4-f2-fix1-*` set remains durable but
-  superseded. S5 and both expensive gates are blocked.
+- The reviewed F3 check repair restores `@std/path` in the service-client runtime probe. The custom
+  walker remains Deno-only. A single `deno check --unstable-kv` invocation over the repaired probe
+  and `verify-producer-reconnect.ts` passes both together, directly reversing the coordinator's
+  failing two-file experiment. Commit this content, then generate a fresh four-receipt replacement
+  set. Preserve `receipts/s4-f3-check.json` as the FAIL record at `6e822a74b`.
 
 ## Next Steps
 
-1. Obtain a reviewed disposition for the newly exposed binding-check failure recorded in
-   `reports/s4-f3-check-failure.md`; do not repair it implicitly.
-2. After a reviewed repair or other explicit disposition, commit a new immutable content head and
-   rerun all four binding gates with fresh invocation IDs.
-3. Keep S5, `scaffold.runtime`, and `fresh-browser` blocked until exact-set cheap sufficiency is
-   restored and a new coordinator lease is granted.
+1. Commit and explicitly push the reviewed one-line path-import repair plus its run-artifact record.
+2. Run all four binding gates serially at that immutable content head with fresh invocation IDs and
+   files, without overwriting `receipts/s4-f3-check.json`.
+3. Recompute exact-set sufficiency, post the structured receipt comment, and stop for Tier-A. Keep
+   S5, `scaffold.runtime`, and `fresh-browser` lease-blocked.
 
 ## Key Decisions
 
