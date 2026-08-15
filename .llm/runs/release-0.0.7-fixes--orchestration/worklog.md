@@ -236,3 +236,45 @@ implementing, merging, relabelling, running Aspire/Docker/e2e, launching another
 the Codex author thread.
 
 WIP during this gate: 1 implementation leaf (idle), 1 evaluator. No expensive lease held.
+
+## 2026-08-15 — #1665 PLAN-EVAL terminal PASS
+
+| Field | Value |
+| --- | --- |
+| Verdict | **PASS** (`plan-eval.md`, "the plan is buildable inside the authorized four+five surface") |
+| Evaluated source head | `ee1b44c6d401a9edb9c8690870ea2d9151f8f504` — the immutable granted head; the evaluator's own `git rev-parse HEAD` in its identity block equals it |
+| Artifact commit | `cd5193b66175b981f32e8ca5abd8b41f913068c7`, delta is **exactly one file**, `plan-eval.md` |
+| Pushed | local == remote == PR head `cd5193b66`; PR still draft, sole `status:plan` |
+| Product mutation | none — `git diff --name-only baf1cdf67..cd5193b66` outside `.llm/runs/` is empty |
+| PR comment | posted 2026-08-15T11:47:35Z, structured, naming evaluated head, base, route, and artifact commit |
+| Evaluator identity | recorded before mutation: PID `803215`, job `0287ccbe`, bridge `session_01GaNTjv6oY6MaxnKHH1ZfrB`, route `claude-fable-5`/`medium`/`--remote-control` **matched** |
+
+The evaluator independently re-derived T-1..T-4 and **confirmed all four repaired**, censusing the
+call sites itself rather than adopting the Tier-A table. It also confirmed the phase invariant by
+executed command (8 changed paths, all under `.llm/runs/`).
+
+**Correction to this topic's own Tier-A.** The evaluator's census reports "11 calls + def" for
+`normalizeCacheNamespace`. My Tier-A prose said "12 sites" while its own evidence table listed 11.
+Recounted: 11 is correct (`cache-query.ts:85,305,329,361,389`, `cache-provider.ts:125,141,159,169,176`,
+`composite-query.ts:42`). The T-1 finding, its citations, and the repair are unaffected — only the
+count label was wrong. `tier-a-1665.md` is corrected with an explicit correction note rather than a
+silent edit. The separate "12 entrypoints" references are the SDK doc-lint entrypoint set and are
+correct.
+
+**Four non-blocking advisories carried forward to implementation.** Two are genuinely new and neither
+the plan nor this topic's Tier-A had them:
+
+1. The D3 admitted-namespace registry is module-global and shared across every test file in one
+   `deno test` process — the 256-fill test must wrap its private reset in `try/finally` so a mid-test
+   failure cannot leak `overflow` into sibling test files.
+2. The `@netscript/kv` singleton is process-global, so the D1 KV-limit test must call
+   `resetKv()`/`closeKv()` (`shared.ts:187,208`) in teardown or root `deno task test` ordering can
+   inherit an `:memory:` KV. This is a real cross-test contamination risk in the exact singleton this
+   topic exercised when it verified the RED premise, and it was missed here.
+3. The single-line docs block exceeds prose wrap width; `deno fmt` does not reflow fenced blocks and
+   no markdownlint config exists, so it holds — but a later formatter pass must not re-wrap it.
+4. Keep the internal reset/admission/prologue helpers off `cache/mod.ts` so `surface:diff` stays
+   patch-level.
+
+Implementation has **not** been dispatched. The coordinator retains that grant. IMPL-EVAL remains
+mandatory and separate. WIP: 1 implementation leaf (idle, plan complete), 0 evaluators.

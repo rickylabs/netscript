@@ -23,7 +23,7 @@ all three are repairable in the plan without re-scoping the leaf.
 D3 requires the over-budget namespace to "emit one `cache.namespace.overflow` span event naming that
 offending normalized id", explicitly instead of `console.warn` (AP-13).
 
-`normalizeCacheNamespace` is called at **12 sites, and every one evaluates it as an argument, before
+`normalizeCacheNamespace` is called at **11 sites, and every one evaluates it as an argument, before
 any span exists**:
 
 | Site | Evidence |
@@ -143,7 +143,7 @@ must not be discovered after merge.
 
 ## Required repairs before PLAN-EVAL
 
-1. **T-1** — specify the deferral seam that lets the overflow event reach a span, at all 12 call
+1. **T-1** — specify the deferral seam that lets the overflow event reach a span, at all 11 call
    sites, and state explicitly what happens at `composite-query.ts:42` where no span exists.
 2. **T-2** — decide and state whether partial `invalidationsByTier` entries from a rejected report
    are rolled back or retained; commit to a test for the partial-failure case specifically.
@@ -172,7 +172,7 @@ first-overflow id) rather than a global pending flag; each span callback flushes
 `cache.namespace.overflow` signal as its first operation and *then* validates the descriptor. The
 plan states the ordering explicitly, noting it will not claim two separate actions are each "first" —
 the ordering conflict between D2 and D3 that the original plan would have hit. The deferral seam is
-applied to every executable caller from the 12-site census, and `composite-query.ts:42` is handled
+applied to every executable caller from the 11-site census, and `composite-query.ts:42` is handled
 honestly: no admission and no event at factory/module level, deferred to its first real operation.
 Risk register gained a matching row ("Overflow is detected before a span exists").
 
@@ -227,3 +227,17 @@ entries.
 Tier-A **PASS** at `ee1b44c6d`. Requesting the coordinator's fresh PLAN-EVAL grant. No evaluator
 launched by this session; PR remains draft at sole `status:plan`; no product code exists on the
 branch.
+
+---
+
+## Correction (recorded 2026-08-15, after PLAN-EVAL)
+
+This artifact originally said `normalizeCacheNamespace` is called at **12 sites**. The correct count
+is **11**; the evidence table in T-1 always listed 11, so the prose label was an arithmetic slip, not
+a mis-reading of the source. Recount:
+`git grep -n 'normalizeCacheNamespace(' packages/sdk/src` excluding the definition, imports, and the
+`cache/mod.ts` re-export yields 11 — `cache-query.ts:85,305,329,361,389` (5),
+`cache-provider.ts:125,141,159,169,176` (5), `composite-query.ts:42` (1). The independent PLAN-EVAL
+census reported "11 calls + def" and is correct. No finding, evidence citation, or repair is affected;
+only the count label. The "12 entrypoints" references elsewhere in this file refer to the SDK
+doc-lint entrypoint set and are correct.
