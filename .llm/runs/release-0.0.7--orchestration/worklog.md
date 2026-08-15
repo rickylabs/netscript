@@ -534,3 +534,17 @@
 - #1663's first probe used invalid token `fable-5` from `/tmp` without Remote Control and failed
   before inference; a premature Opus fallback was stopped before repository mutation. The corrected
   canonical `claude-fable-5` launch is the only formal cycle.
+
+## 2026-08-15T10:46:30Z — #1663 plan repair and #1661 readiness
+
+- #1663 cycle-1 PLAN-EVAL returned immutable `FAIL_PLAN` at `be2b18728`, comment `5301867229`.
+  Execution proved the proposed root exclusion cannot affect explicit file arguments, and also
+  established that `scaffold.runtime` adds no evidence for this surface.
+- Coordinator expanded the leaf contract to both optimized fmt/lint wrappers, their focused tests,
+  and at most one explicit marker inside the broken fixture subtree. The repair must keep the
+  malformed config byte-identical, avoid broad fixture skipping, prove non-empty exact no-flag fmt
+  and lint passes, and retain real-source negative controls. The runtime gate is waived. Same author,
+  plan repair only, then fresh Tier-A and PLAN-EVAL cycle 2.
+- #1661 repair-delta evaluator independently passed at `f74695bc4`, comment `5301873258`, after
+  reproducing 4152/0/19 and the publish invariant. Current exact-head CI is the only remaining
+  technical readiness gate; the fixes supervisor is updating the PR body in place before its tuple.

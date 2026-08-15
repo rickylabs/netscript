@@ -308,3 +308,11 @@ probe `bd8b4f90` and stopped Opus fallback `02d8d823` caused no mutation and con
 Fixes #1661 is at Tier-A head `de8944011` after one-file computed-import repair `45aca4adc` and
 root test 4152/0/19; fresh repair-delta evaluator `8a0ff845-…` is active. Preserve all native topic
 supervisors and authors, serialize only within each topic, and keep the runtime mutex free.
+
+Newer gate disposition at `2026-08-15T10:46:30Z`: #1663 cycle 1 is `FAIL_PLAN` at `be2b18728`.
+Coordinator rescope admits `.llm/tools/run-deno-{fmt,lint}.ts` plus their tests and at most one
+narrow marker under the broken fixture; the malformed config is immutable, broad fixture skipping
+is forbidden, both no-flag scoped commands and negative controls are binding. `scaffold.runtime`
+is waived as matrix-`n/a`. The same Codex author repairs only the plan before cycle 2. #1661's
+repair-delta evaluation is `PASS` at `f74695bc4`; await terminal exact-head CI and corrected PR
+metadata, then coordinator merge/lifecycle normalization and only then release the next fixes leaf.

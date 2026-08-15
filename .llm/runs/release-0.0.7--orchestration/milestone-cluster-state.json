@@ -166,7 +166,7 @@
         "sessionId": "19621a0b-c6a0-47c6-b826-93c1634a6875",
         "bridgeSessionId": "session_01LQBHX8KpA5aYtDraq46J8a",
         "remoteControlUrl": "https://claude.ai/code/session_01LQBHX8KpA5aYtDraq46J8a",
-        "topicHeadSha": "4be6821d95f830327b45c8f816c7f965e34bde49",
+        "topicHeadSha": "be2524a92",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
         "legacyState": "parked_idle"
@@ -906,10 +906,10 @@
     {
       "id": "package-gate-honesty",
       "lane": "internals",
-      "phase": "evaluating",
+      "phase": "planned",
       "baseBranch": "main",
       "headSha": "05fc3132b6800a85eb6152691a961b658962571b",
-      "currentPrHeadSha": "72d5aca66e46ca21d3d8becbc3d11a93bb9749ff",
+      "currentPrHeadSha": "be2b1872823cbbb07a393633fcccb684f753afc1",
       "issueNumbers": [1604, 1618, 1622],
       "implementerAgentId": "01a004ec-86a6-7c21-8886-81c09de099f5",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
@@ -918,16 +918,32 @@
       "prNumber": 1663,
       "bootstrapHeadSha": "25c29575c",
       "planHeadSha": "72d5aca66e46ca21d3d8becbc3d11a93bb9749ff",
-      "implementationState": "formal_plan_evaluation_active",
+      "implementationState": "plan_repair_rescope_authorized",
       "dispatchTopicHeadSha": "9aabef2c96f0de5c3bbff79bf3438f33a6c57c4d",
       "expensiveGateContract": "scaffold.runtime is planned but forbidden until the coordinator grants the cluster-wide Aspire/Docker/Postgres mutex after the plan gate",
       "planGate": "author must stop after bounded plan and report whether a fresh PLAN-EVAL is required",
-      "planEvaluationState": "active",
+      "planEvaluationState": "complete_fail_plan_cycle_1",
       "planEvaluatorAgentId": "9078ecb6-e8b3-4d4f-b85c-cb28a1cb34be",
       "planEvaluatorBackgroundAgentId": "9078ecb6",
       "planEvaluatorBridgeSessionId": "cse_0176qkbF4eKUt7TxJiEPdTrk",
       "planEvaluatorRoute": "native claude-fable-5 / medium / Remote Control",
       "planEvaluationGrantedAt": "2026-08-15T10:35:39.952Z",
+      "planEvaluationCompletedAt": "2026-08-15T10:43:00.000Z",
+      "planEvaluationVerdict": "FAIL_PLAN",
+      "planEvaluatorCommitSha": "be2b1872823cbbb07a393633fcccb684f753afc1",
+      "planEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1663#issuecomment-5301867229",
+      "coordinatorContractAmendment": {
+        "authorizedAt": "2026-08-15T10:45:30.000Z",
+        "wrapperSurfaces": [
+          ".llm/tools/run-deno-fmt.ts",
+          ".llm/tools/run-deno-fmt_test.ts",
+          ".llm/tools/run-deno-lint.ts",
+          ".llm/tools/run-deno-lint_test.ts"
+        ],
+        "markerAllowance": "at most one narrowly named marker inside packages/mcp/tests/fixtures/doctor/broken if the repaired plan proves marker-based subtree exclusion",
+        "negativeBoundary": "no broad tests/fixtures skip; malformed deno.json stays byte-identical; fmt and lint no-extra-flag commands must select real files and retain real-source negative controls",
+        "scaffoldRuntimeDisposition": "waived_matrix_n_a_focused_semantic_unit_is_load_bearing"
+      },
       "routeRecovery": {
         "malformedProbe": "bd8b4f90 failed pre-inference from /tmp with model token fable-5 and no Remote Control; zero cycle and no mutation",
         "stoppedFallback": "02d8d823 Opus fallback was stopped before repository mutation or verdict artifact",
@@ -990,10 +1006,10 @@
     {
       "id": "ai-mcp-pool-isolation",
       "lane": "fixes",
-      "phase": "implementing",
+      "phase": "ready",
       "baseBranch": "main",
       "headSha": "284dda90a17a13a7e5e8e9834e5411b58887131b",
-      "currentPrHeadSha": "de89440119ba45822f0bdc8350838088a6f04140",
+      "currentPrHeadSha": "f74695bc4d0b916ed52ae922d96263f00c5ca6df",
       "issueNumbers": [
         1448
       ],
@@ -1001,7 +1017,7 @@
       "branch": "fix/ai-mcp-pool-isolation",
       "worktree": "/home/codex/repos/netscript-007-leaf-ai-mcp-pool",
       "prNumber": 1661,
-      "implementationState": "repair_delta_formal_evaluation_active",
+      "implementationState": "repair_delta_pass_readiness_ci_active",
       "scopeBlockerHeadSha": "1d4533462a088ad902ac7dd71be88764463fcd5d",
       "scopeRulingTopicHeadSha": "df20bb5a694ad95afd33ff5ca4f141a4199182f5",
       "scopeRulingLeafArtifactSha": "6db182503b219d76c7db23f89c71ec9e467c2f40",
@@ -1048,12 +1064,17 @@
       "computedImportRepairTierASignoffHeadSha": "de89440119ba45822f0bdc8350838088a6f04140",
       "computedImportRepairTierAState": "PASS",
       "computedImportRepairRootTest": "PASS: 4152 passed, 19 ignored, 0 failed",
-      "implementationEvaluationCycle3State": "active",
+      "implementationEvaluationCycle3State": "complete",
       "implementationEvaluationCycle3SourceHeadSha": "de89440119ba45822f0bdc8350838088a6f04140",
       "implementationEvaluatorCycle3AgentId": "8a0ff845-1d0a-43d6-ae3c-03b4158f7943",
       "implementationEvaluatorCycle3BackgroundAgentId": "8a0ff845",
       "implementationEvaluatorCycle3BridgeSessionId": "cse_013K3BZ2ydVkYzXt6vgcxTJX",
       "implementationEvaluatorCycle3Route": "native claude-fable-5 / medium / Remote Control",
+      "implementationEvaluationCycle3CompletedAt": "2026-08-15T10:44:56.894Z",
+      "implementationEvaluationCycle3Verdict": "PASS",
+      "implementationEvaluatorCycle3CommitSha": "f74695bc4d0b916ed52ae922d96263f00c5ca6df",
+      "implementationEvaluationCycle3CommentUrl": "https://github.com/rickylabs/netscript/pull/1661#issuecomment-5301873258",
+      "readinessState": "active_exact_head_ci",
       "ciFailure": {
         "state": "resolved_repair_under_formal_evaluation",
         "runId": 31878428521,
@@ -1789,7 +1810,7 @@
     },
     {
       "id": "package-gate-honesty-plan-eval-cycle-1",
-      "state": "active",
+      "state": "complete",
       "lane": "internals",
       "leafId": "package-gate-honesty",
       "phase": "plan-eval",
@@ -1806,11 +1827,15 @@
       },
       "leaseOwner": "codex-root-0.0.7",
       "grantedAt": "2026-08-15T10:35:39.952Z",
-      "evaluationFocus": "six-path scope boundary, supported config exclusion, import.meta package roots, non-tautological score-gap mutation tests, honest two-member JSR evidence, runtime-gate necessity, and slice/checklist reconciliation"
+      "evaluationFocus": "six-path scope boundary, supported config exclusion, import.meta package roots, non-tautological score-gap mutation tests, honest two-member JSR evidence, runtime-gate necessity, and slice/checklist reconciliation",
+      "completedAt": "2026-08-15T10:43:00.000Z",
+      "verdict": "FAIL_PLAN",
+      "evaluatorCommitSha": "be2b1872823cbbb07a393633fcccb684f753afc1",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1663#issuecomment-5301867229"
     },
     {
       "id": "ai-mcp-pool-isolation-repair-delta-impl-eval-cycle-3",
-      "state": "active",
+      "state": "complete",
       "lane": "fixes",
       "leafId": "ai-mcp-pool-isolation",
       "phase": "impl-eval",
@@ -1827,7 +1852,11 @@
       },
       "leaseOwner": "codex-root-0.0.7",
       "grantedAt": "2026-08-15T10:36:12.512Z",
-      "evaluationFocus": "proportionate one-file computed-import repair delta and its CLI/publish blast radius; cycle-2 product verdict remains otherwise authoritative"
+      "evaluationFocus": "proportionate one-file computed-import repair delta and its CLI/publish blast radius; cycle-2 product verdict remains otherwise authoritative",
+      "completedAt": "2026-08-15T10:44:56.894Z",
+      "verdict": "PASS",
+      "evaluatorCommitSha": "f74695bc4d0b916ed52ae922d96263f00c5ca6df",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1661#issuecomment-5301873258"
     }
   ],
   "expensiveGates": [
@@ -1921,5 +1950,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T10:39:55.000Z"
+  "updatedAt": "2026-08-15T10:46:30.000Z"
 }

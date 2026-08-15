@@ -1425,6 +1425,10 @@
         "deno.json",
         "docs/site/durable-workflows/streams.md",
         "docs/site/quickstart.vto",
+        ".llm/tools/run-deno-fmt.ts",
+        ".llm/tools/run-deno-fmt_test.ts",
+        ".llm/tools/run-deno-lint.ts",
+        ".llm/tools/run-deno-lint_test.ts",
         "packages/cli/",
         "packages/*",
         "packages/cli",
@@ -1433,17 +1437,24 @@
         "packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-gates_test.ts",
         "packages/cli/e2e/tests/presentation/quickstart-command-drift_test.ts",
         "packages/mcp",
-        "packages/mcp/tests/fixtures/doctor/broken/deno.json"
+        "packages/mcp/tests/fixtures/doctor/broken/deno.json",
+        "packages/mcp/tests/fixtures/doctor/broken/<one-narrow-tooling-marker>"
       ],
       "provingGates": [
         "check",
         "test",
         "publish-dry-run",
         "quality-job",
-        "scaffold.runtime",
         "docs-source-format",
         "docs-accuracy"
       ],
+      "coordinatorAmendment": {
+        "authorizedAt": "2026-08-15T10:45:30.000Z",
+        "reason": "PLAN-EVAL cycle 1 proved root deno.json exclusions cannot affect explicit-file formatter or linter argv; owner issue evidence requires both optimized wrappers to recover without hiding real source findings",
+        "surface": "both structured fmt/lint wrappers, their focused tests, and at most one explicit marker inside the deliberately malformed fixture subtree",
+        "negativeBoundary": "do not broadly skip tests/fixtures; broken/deno.json remains byte-for-byte malformed; both no-extra-flag scoped commands must select non-empty real source and real MCP source defects must still fail",
+        "scaffoldRuntime": "waived: the archetype matrix is n/a and the documented-stream semantic unit executes the changed consumer path end-to-end"
+      },
       "jsrAudit": {
         "applicable": true,
         "risks": [

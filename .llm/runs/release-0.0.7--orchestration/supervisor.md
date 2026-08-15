@@ -454,3 +454,14 @@ The #1663 route incident is closed: malformed `fable-5` probe `bd8b4f90` failed 
 the premature Opus fallback `02d8d823` was stopped before mutation. The sole real cycle uses the
 canonical `claude-fable-5` token from the exact worktree with Remote Control. Serialization remains
 per topic, not across topics; the shared runtime mutex is free.
+
+### Formal-gate disposition — 2026-08-15T10:46:30Z
+
+#1663 PLAN-EVAL cycle 1 returned `FAIL_PLAN` at `be2b18728`: root `deno.json` exclusion cannot
+affect the wrappers' explicit-file argv. Coordinator rescope now admits both structured fmt/lint
+wrappers, their focused tests, and at most one narrow marker inside the broken fixture subtree.
+The malformed config stays byte-identical, broad fixture skipping is forbidden, and
+`scaffold.runtime` is waived as matrix-`n/a`; the same author is repairing the plan before cycle 2.
+
+#1661 repair-delta IMPL-EVAL returned `PASS` at `f74695bc4`; exact-head readiness CI is active.
+Merge remains coordinator-only after terminal green and metadata reconciliation.

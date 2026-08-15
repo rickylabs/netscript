@@ -426,3 +426,10 @@ implementation thread.
 - **Split-close shipment must be represented as a split:** #1662 is merged, but #1293 remains open.
   Central state records boxes 2/3 complete and boxes 1/4 open instead of collapsing the issue into
   the PR's shipped state.
+
+- **Config exclusion is not wrapper selection:** #1663 proved root `exclude` cannot protect a Deno
+  command when the structured wrapper has already enumerated and passed files explicitly. For an
+  intentionally invalid nested config, the tool family needs one explicit, tested fixture-boundary
+  mechanism shared by fmt and lint; configuration prose alone is not evidence. The contract now
+  requires non-empty selection and real-source negative controls so the repair cannot become a
+  broad fixture false green.
