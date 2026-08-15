@@ -119,3 +119,17 @@
 - #1654 retry 2 reached terminal `suite-end`: raw exit 0, 89 passed, 0 failed, 0 skipped, 602,896 ms.
   Committed receipts at head `0b2cf5e7c` prove empty Aspire/Docker/network/volume state and zero leak
   survivors. The fixes supervisor is independently executing Tier-A; no IMPL-EVAL has been granted.
+
+## 2026-08-15T05:16:27Z — docs S3 resumed; #1654 formal evaluation attached; #1656 opened
+
+- The #1652 owner-priority rewrite is terminal: both #1551 comments are verified true in-place
+  replacements, privacy-clean, and consistent with unchanged product pin `5191de83`. The exact
+  preserved Codex author thread `019ffcc9-16c2-7573-b7f6-d627172408e8` resumed approved S3 from
+  clean local/remote/PR head `54e1c3bff`; no rival thread or new PLAN-EVAL was created.
+- #1654 Tier-A passed at sign-off head `f178ac663`. Exactly one formal IMPL-EVAL is active in fresh
+  native Fable 5/medium session `19f1be7b-db7d-47c0-b0f1-7cfca302d44a`, Remote Control bridge
+  `session_01Qs22iAtnVYh2fLb26ABvja`, against that immutable local/remote/PR head. Its brief forbids
+  another expensive runtime/Aspire/Docker pass and binds the interrupted-attempt and cleanup audit.
+- Internals opened draft PR #1656 for #1542 at bootstrap head `5dc2d2148`, with its sole Codex
+  thread still restricted to research/plan. A formal Plan-Gate remains pending; the sibling leaf is
+  not dispatched concurrently inside the internals topic.

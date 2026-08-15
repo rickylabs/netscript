@@ -85,3 +85,11 @@ head exists, and `834a2b36` differs only by harness evidence. #1651 is
 not duplicate overall but remains owner-blocked: wait for option 1 keep-and-narrow, option 2
 remove/defer C6, or option 3 close-as-duplicate. Do not infer the verdict. All topic controllers and
 leaf threads remain the preserved originals; serialization is per topic, not cluster-wide.
+
+Resume from the newer `2026-08-15T05:16:27Z` checkpoint. #1652's two canonical issue-comment
+replacements are complete and approved S3 is running on the original Codex author thread from
+`54e1c3bff`. #1654 passed Tier-A at `f178ac663`; its one formal native Fable 5/medium IMPL-EVAL is
+attached as session `19f1be7b-db7d-47c0-b0f1-7cfca302d44a`, bridge
+`session_01Qs22iAtnVYh2fLb26ABvja`, with no expensive-gate authority. Internals has opened draft
+#1656 for #1542 at bootstrap head `5dc2d2148` and is still research/plan-only. Preserve #1651's
+owner hold and all four original Opus 5/high Remote Control topic supervisors.

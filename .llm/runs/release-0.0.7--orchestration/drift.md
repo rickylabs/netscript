@@ -111,3 +111,20 @@ implementation thread.
 - **Lifecycle / next queue:** #1653 merged only after cycle-2 `PASS`, direct acceptance validation,
   current-head CI, close-gate, and zero review threads. Its issues and PR carry `status:shipped`.
   Internals immediately advanced #1542; serialization remains per topic, not across the cluster.
+
+## 2026-08-15T05:16:27Z — exact-session steering and current evaluator route
+
+- **Transport trap / repaired before mutation:** native `claude --bg --resume <session>` allocated
+  new background session IDs instead of steering the two existing topic supervisors. The
+  coordinator stopped both duplicates immediately before either landed work, then used
+  `claude attach <background-id>` to deliver the grants directly to original supervisors
+  `c7597d28` and `fcf04b0f`. Their original PID/cwd/Remote Control bridges remained authoritative;
+  no topic worktree acquired dual ownership.
+- **Route re-baseline:** current `lane-policy.md` binds Codex-authored formal IMPL-EVAL to fresh
+  native Fable 5/medium. #1654 therefore uses session `19f1be7b-db7d-47c0-b0f1-7cfca302d44a`
+  and registry bridge `session_01Qs22iAtnVYh2fLb26ABvja`, rather than copying the older Opus route
+  from prior reset leases. The evaluator source is the Tier-A sign-off head `f178ac663`, not the
+  pre-sign-off implementation head `0b2cf5e7c`.
+- **No scope drift:** the completed #1551 rewrites satisfied the ordered prerequisite for S3; they
+  did not alter the evidence pin, equivalence contract, or approved docs boundary. Resuming the
+  original author thread is continuation, not a new plan cycle.
