@@ -715,3 +715,7 @@ implementation thread.
   proved `gen:mcp-export-corpus` produces the same rewritten bytes at base and leaf while its check is
   already red at base. Preserve and report that red; do not regenerate it merely because another MCP
   generated asset legitimately changes.
+- **Fixing cleanup can reveal the first real behavior verdict:** #1664 attempt 4 ended in teardown
+  before the refetch probe could report. F6 removed only that mask; attempt 5 then honestly failed on
+  DevTools target discovery. Treat this as new measured causality, not as failure of the teardown fix
+  or permission to retry unchanged.

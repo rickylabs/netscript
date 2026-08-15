@@ -879,3 +879,13 @@ The same original Sol/medium author is now running only the three canonical gene
 approved outputs; a second fresh Tier-A and delta IMPL-EVAL remain mandatory. Fixes filed the accepted
 non-blocking docs follow-up as #1670, then launched #1350 plan-only on fresh main `0ef48c2ec` with
 Codex thread `01a006f3-ae2d-7941-bd17-2ac71dd3d0f0`, Sol/medium. #1348 remains open and untouched.
+
+At 19:47Z, #1664 attempt 5 is terminal red at 69/1/0. F6 successfully removed the teardown mask;
+the behavior gate now reports its own failure: Chrome never exposed a DevTools target before the
+bounded wait expired. Raw log SHA-256 is
+`ff349b40f7f70341934e170df7c67d147c0ed983173b41871421755ad55e062b`. Suite Aspire cleanup passed;
+`fresh-browser` is `NOT_RUN`. The coordinator and features supervisor verified and removed only three
+stopped run-owned `aspire-managed` children by exact PID, then re-audited Aspire, Docker,
+application/browser/runtime processes, and relevant listeners empty. The lease is released. Preserve
+the red and require measured same-author attribution plus a plan-only amendment and fresh Tier-A
+before any mutation or retry; no evaluator is authorized.

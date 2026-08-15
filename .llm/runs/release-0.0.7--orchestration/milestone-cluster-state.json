@@ -1596,7 +1596,7 @@
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "f6_tier_a_pass_attempt5_singleton_runtime_lease_active",
+      "implementationState": "attempt5_red_cleanup_complete_lease_released_same_author_attribution_required",
       "dispatchTopicHeadSha": "0d0ba1b7a404c847acba2daed40c69d282906f69",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
@@ -1779,11 +1779,17 @@
           "f6ReplacementReceiptState": "PASS and SUFFICIENT: check, test-attempt2 4229/0/19, publish-dry-run, and arch-check all bind unchanged product 7fa29ad3e; preserved test red is superseded-only with identical 4248 total results",
           "f6FinalTierAState": "PASS",
           "f6FinalTierATopicCheckpointSha": "a4224dbb1",
-          "attempt5LeaseState": "active_singleton_runtime_lease",
+          "attempt5LeaseState": "released_after_terminal_red_and_clean_audit",
           "attempt5LeaseGrantedAt": "2026-08-15T19:39:00.000Z",
           "attempt5EvidenceHeadSha": "a8a160285d4f9bddb95a5dac6cfbde85e1265ebc",
           "attempt5Preflight": "leaf clean and local == remote == PR; aspire ps []; Docker zero; zero AppHost/DCP/application/browser/runtime processes and relevant listeners; transient aspire-managed nuget helper from ps query exited before the post-query audit",
-          "attempt4Next": "attempt 5 scaffold.runtime runs once under the singleton lease; mandatory cleanup/audit; fresh-browser only after scaffold PASS and clean audit; any red stops without retry; evaluator remains prohibited"
+          "attempt5RuntimeResult": "FAIL passed=69 failed=1 skipped=0 at behavior.service-client-refetch: timed out waiting for Chrome DevTools target; F6 teardown no longer masks the behavior verdict",
+          "attempt5RawLog": ".llm/runs/feat-app-service-client-wiring--1355/reports/s5-attempt5-scaffold-runtime-20260815-2139.log",
+          "attempt5RawLogSha256": "ff349b40f7f70341934e170df7c67d147c0ed983173b41871421755ad55e062b",
+          "attempt5FreshBrowser": "NOT_RUN because scaffold.runtime failed",
+          "attempt5Cleanup": "cleanup.aspire-stop PASS; Aspire [] and Docker zero; no AppHost/DCP/browser/runtime process or relevant listener; three stopped run-owned aspire-managed NuGet children 727834/727837/727843 verified under the attempt tree, removed by exact TERM/CONT, and independently re-audited absent",
+          "attempt5Next": "preserve evidence, measure Chrome launch/DevTools target causality on the same original Sol/high author, push a plan-only amendment before any product mutation, fresh Tier-A before any retry; no fresh-browser or evaluator",
+          "attempt4Next": "superseded by attempt-5 terminal red and attribution recovery"
         }
       },
       "planDecisionBoundary": "cycle 1 ruled direct emitted { queryKey: <svc>Queries.list.clientKey() } with no SDK overload; repair must lock generator-owned output paths, existing service generate overwrite/dry-run/force compatibility, package README homes, post-mutation request-count proof, per-slice paths, and qualified citations",

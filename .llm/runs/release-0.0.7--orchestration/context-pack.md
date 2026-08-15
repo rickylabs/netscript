@@ -731,3 +731,9 @@ the same author is generating exactly four approved corpus/publish outputs befor
 and fresh delta IMPL-EVAL. Non-blocking docs debt is filed as #1670. #1350 is active plan-only in
 `/home/codex/repos/netscript-007-leaf-typed-error` on exact main `0ef48c2ec`, Codex Sol/medium thread
 `01a006f3-ae2d-7941-bd17-2ac71dd3d0f0`; keep #1348 open.
+
+Newer stop `2026-08-15T19:47:30Z`: #1664 attempt 5 is red at 69/1/0 because Chrome never exposed a
+DevTools target; F6 teardown no longer masks the verdict. Raw log SHA is `ff349b40…e062b`.
+`fresh-browser` is `NOT_RUN`; suite cleanup plus exact-PID orphan cleanup left Aspire, Docker,
+application/browser/runtime processes and ports empty, so the lease is released. Same-author measured
+attribution and a plan-only amendment precede mutation, Tier-A, or any later retry.

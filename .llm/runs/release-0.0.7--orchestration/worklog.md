@@ -1312,3 +1312,19 @@
   `fix/sdk-typed-error-channel`, and attached Codex Sol/medium thread
   `01a006f3-ae2d-7941-bd17-2ac71dd3d0f0`. #1350 is plan-only and must open a draft PR then stop for
   PLAN-EVAL; #1348 remains open and untouched.
+
+## 2026-08-15T19:47:30Z — #1664 attempt 5 exposes the browser-launch failure
+
+- `scaffold.runtime` again completed 69 gates and stopped on one red, but F6 changed the quality of
+  the evidence: teardown no longer throws. `behavior.service-client-refetch` itself timed out while
+  waiting for the Chrome DevTools target. Raw log
+  `.llm/runs/feat-app-service-client-wiring--1355/reports/s5-attempt5-scaffold-runtime-20260815-2139.log`
+  hashes to `ff349b40f7f70341934e170df7c67d147c0ed983173b41871421755ad55e062b`.
+- Suite `cleanup.aspire-stop` passed and `fresh-browser` remained `NOT_RUN`. Post-run Aspire was `[]`,
+  Docker was empty, and no AppHost/DCP/browser/runtime process or relevant listener remained. Three
+  stopped `aspire-managed` NuGet children were proven run-owned by exact attempt-tree cwd and `/init`
+  parent, terminated by exact PID with TERM/CONT, and independently re-audited absent. Foreign Aspire
+  MCP helpers were untouched; the singleton lease is released.
+- No retry or product edit is authorized. Preserve the attempt-5 red, measure Chrome launch/target
+  causality on the same original Sol/high author, commit a plan-only amendment before mutation, then
+  require fresh features Tier-A before a later lease decision. No evaluator yet.
