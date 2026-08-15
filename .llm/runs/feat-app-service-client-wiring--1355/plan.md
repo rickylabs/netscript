@@ -76,10 +76,12 @@ Fresh islands preserve the server snapshot's real age across hydration.
 - Preserve atomicity by planning/validating every service and contract before the first write.
 - Extend `packages/fresh` browser coverage and its `test:browser` task so the contracted
   `fresh-browser` gate actually covers hydration age rather than only form navigation.
-- Resolve the missing durable `scaffold.runtime` catalog entry before claiming a `run-gate.ts`
-  receipt; do not silently hand-author the receipt.
-- Keep binding receipt sufficiency to exactly one receipt per contracted gate; JSR member reports
-  remain supplemental.
+- Preserve the deliberate evidence-class boundary: `scaffold.runtime` produces suite-owned
+  exact-head release-gate output plus the central lease/cleanup record, never a catalog/run-gate
+  receipt. `fresh-browser` remains catalog-backed.
+- Keep receipt sufficiency to exactly one receipt per receipt-producing contracted gate; JSR member
+  reports and the separate `scaffold.runtime` release-gate evidence remain supplemental to that
+  receipt set while still required for merge-readiness.
 
 ## Locked Decisions
 
@@ -95,13 +97,12 @@ Fresh islands preserve the server snapshot's real age across hydration.
 
 ## Open-Decision Sweep
 
-| Decision                                                                | Status                                       | Notes                                                                                                                      |
-| ----------------------------------------------------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Add key-array overload to `bridgeInvalidation` vs direct object literal | Must resolve in PLAN-EVAL                    | Recommend additive overload, retaining the legacy string signature.                                                        |
-| Durable `scaffold.runtime` runner route                                 | Must resolve before implementation gate work | Recommend an allowlisted exact catalog entry with tests, unless the orchestrator explicitly approves suite-owned evidence. |
-| Migration note location                                                 | Must resolve in PLAN-EVAL                    | Recommend published `packages/fresh/README.md`; `docs/**` remains prohibited.                                              |
-| Installed plugin contributions                                          | Safe to defer                                | #1348-gated; generate first-party manifest services only.                                                                  |
-| L1/L2 vs L3 `defineServices` dialect                                    | Safe to defer for this leaf                  | Preserve the current query-factory dialect; changing it is not needed to repair identity.                                  |
+| Decision                                                                | Status                      | Notes                                                                                     |
+| ----------------------------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------- |
+| Add key-array overload to `bridgeInvalidation` vs direct object literal | Must resolve in PLAN-EVAL   | Recommend additive overload, retaining the legacy string signature.                       |
+| Migration note location                                                 | Must resolve in PLAN-EVAL   | Recommend published `packages/fresh/README.md`; `docs/**` remains prohibited.             |
+| Installed plugin contributions                                          | Safe to defer               | #1348-gated; generate first-party manifest services only.                                 |
+| L1/L2 vs L3 `defineServices` dialect                                    | Safe to defer for this leaf | Preserve the current query-factory dialect; changing it is not needed to repair identity. |
 
 ## Proposed Public Contracts
 
@@ -170,32 +171,34 @@ contract in a real browser and document the beta-era migration in the published 
 
 ## Arch-Debt Implications
 
-| Entry                                              | Action               | Notes                                                                                |
-| -------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------ |
-| Existing doctrine debt ledger                      | None                 | No entry owns this seam and the plan does not accept new debt.                       |
-| Missing `.claude/05-frontend.md` overlay reference | Record drift only    | Docs changes are prohibited and not needed for the implementation.                   |
-| Missing `scaffold.runtime` run-gate catalog entry  | Resolve in PLAN-EVAL | If added, it is a minimal evidence-path prerequisite, not product architecture debt. |
+| Entry                                              | Action            | Notes                                                              |
+| -------------------------------------------------- | ----------------- | ------------------------------------------------------------------ |
+| Existing doctrine debt ledger                      | None              | No entry owns this seam and the plan does not accept new debt.     |
+| Missing `.claude/05-frontend.md` overlay reference | Record drift only | Docs changes are prohibited and not needed for the implementation. |
 
 ## Commit Slices and Tier-A Stops
 
-| Slice                       | Content                                                                                                                                                                                                                                           | Stop and evidence                                                                              |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| S0 — Phase 1                | Research, design ledger, plan, context, drift; open draft PR before code.                                                                                                                                                                         | Stop for orchestrator's PLAN-EVAL determination; RESEARCH and PLAN PR comments.                |
-| S1 — SDK key contract       | Add the accepted key-derived invalidation contract, explicit public types/JSDoc, semantic mismatch/non-collision tests, and type-negative fixture.                                                                                                | Commit; focused SDK check/test/doc-lint; slice comment; Tier-A stop.                           |
-| S2 — CLI generator contract | Contract-first request/result and plan/write use case; manifest enumeration, contract validation, content comparison, dry-run/force; route add/generate through one seam; per-router template key/invalidation; two-service and atomic negatives. | Commit; focused CLI check/tests/generated-asset freshness; slice comment; Tier-A stop.         |
-| S3 — canonical hydration    | Pass cache age in both islands, add generated-output positive/negative tests, Fresh real-browser hydration fixture/task, and approved package migration note.                                                                                     | Commit; focused CLI/Fresh checks/tests/doc-lint; slice comment; Tier-A stop.                   |
-| S4 — cheap convergence      | Run formatting/lint/asset checks, exact-pin/export/doc audits, three per-member isolated-declaration publish dry-runs, then the four cheap contracted gates at the committed candidate head.                                                      | Commit any evidence-only artifacts; recompute exact receipt sufficiency; comment; Tier-A stop. |
-| S5 — leased runtime proof   | After explicit coordinator release and singleton lease only: leak-check, `scaffold.runtime --cleanup`, then `fresh-browser`; verify cleanup and immutable head.                                                                                   | Exact two expensive receipts; comment; Tier-A stop.                                            |
-| S6 — IMPL-EVAL              | Fresh opposite-family evaluator inspects code, acceptance, receipts, PR threads, and compatibility; implementation session repairs any findings in new bounded slices.                                                                            | Tier-A verdict comment per cycle; never flip ready or merge.                                   |
+| Slice                       | Content                                                                                                                                                                                                                                           | Stop and evidence                                                                                    |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| S0 — Phase 1                | Research, design ledger, plan, context, drift; open draft PR before code.                                                                                                                                                                         | Stop for orchestrator's PLAN-EVAL determination; RESEARCH and PLAN PR comments.                      |
+| S1 — SDK key contract       | Add the accepted key-derived invalidation contract, explicit public types/JSDoc, semantic mismatch/non-collision tests, and type-negative fixture.                                                                                                | Commit; focused SDK check/test/doc-lint; slice comment; Tier-A stop.                                 |
+| S2 — CLI generator contract | Contract-first request/result and plan/write use case; manifest enumeration, contract validation, content comparison, dry-run/force; route add/generate through one seam; per-router template key/invalidation; two-service and atomic negatives. | Commit; focused CLI check/tests/generated-asset freshness; slice comment; Tier-A stop.               |
+| S3 — canonical hydration    | Pass cache age in both islands, add generated-output positive/negative tests, Fresh real-browser hydration fixture/task, and approved package migration note.                                                                                     | Commit; focused CLI/Fresh checks/tests/doc-lint; slice comment; Tier-A stop.                         |
+| S4 — cheap convergence      | Run formatting/lint/asset checks, exact-pin/export/doc audits, three per-member isolated-declaration publish dry-runs, then the four cheap contracted gates at the committed candidate head.                                                      | Commit any evidence-only artifacts; recompute exact receipt sufficiency; comment; Tier-A stop.       |
+| S5 — leased runtime proof   | After explicit coordinator release and singleton lease only: leak-check, run the exact `scaffold.runtime --cleanup --format pretty` command, then catalog-backed `fresh-browser`; verify cleanup and immutable head.                              | Suite-owned scaffold output + lease/cleanup record; one fresh-browser receipt; comment; Tier-A stop. |
+| S6 — IMPL-EVAL              | Fresh opposite-family evaluator inspects code, acceptance, receipts, PR threads, and compatibility; implementation session repairs any findings in new bounded slices.                                                                            | Tier-A verdict comment per cycle; never flip ready or merge.                                         |
 
 No implementation slice starts until S0 receives the owner/orchestrator determination and, if
 required as proposed, PLAN-EVAL PASS.
 
 ## Validation Plan
 
-All binding receipts are produced by `.llm/tools/gates/run-gate.ts` with distinct invocation IDs,
-the explicit committed `--git-head`, `gitHead == actualGitHead`, and no `--allow-git-head-mismatch`.
-Receipt directories are created before invocation; receipts are never edited by hand.
+All **receipt-producing** binding gates are invoked through `.llm/tools/gates/run-gate.ts` with
+distinct invocation IDs, the explicit committed `--git-head`, `gitHead == actualGitHead`, and no
+`--allow-git-head-mismatch`. Receipt directories are created before invocation; receipts are never
+edited by hand. `scaffold.runtime` is deliberately outside that catalog: its authority is the
+suite-owned exact-head output from the canonical one-pass command, plus the central expensive-gate
+lease and cleanup record defined by `.llm/harness/gates/release-gates.md`.
 
 | Order | Gate                 | Command/check                                                                                                            | Binding receipt or report                                                                                                                     |
 | ----- | -------------------- | ------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -205,20 +208,22 @@ Receipt directories are created before invocation; receipts are never edited by 
 | 4     | `test`               | `run-gate.ts --gate test --id app-service-client-wiring-s4-test ...`                                                     | `receipts/s4-test.json`                                                                                                                       |
 | 5     | `publish-dry-run`    | `run-gate.ts --gate publish-dry-run --id app-service-client-wiring-s4-publish-dry-run ...`                               | `receipts/s4-publish-dry-run.json`                                                                                                            |
 | 6     | `arch-check`         | `run-gate.ts --gate arch-check --id app-service-client-wiring-s4-arch-check ...`                                         | `receipts/s4-arch-check.json`                                                                                                                 |
-| 7     | `scaffold.runtime`   | After lease: allowlisted `run-gate.ts` command for `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`.   | `receipts/s5-scaffold-runtime.json`                                                                                                           |
+| 7     | `scaffold.runtime`   | After lease: `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`.                                         | Suite-owned exact-head output with raw exit code/failing suite names, plus central lease and cleanup record; no run-gate receipt.             |
 | 8     | `fresh-browser`      | After lease: `run-gate.ts --gate fresh-browser --id app-service-client-wiring-s5-fresh-browser --cwd packages/fresh ...` | `receipts/s5-fresh-browser.json`                                                                                                              |
 
-The exact binding sufficiency set is only these six files:
+The exact binding receipt set is only these five files:
 
 1. `receipts/s4-check.json`
 2. `receipts/s4-test.json`
 3. `receipts/s4-publish-dry-run.json`
 4. `receipts/s4-arch-check.json`
-5. `receipts/s5-scaffold-runtime.json`
-6. `receipts/s5-fresh-browser.json`
+5. `receipts/s5-fresh-browser.json`
 
-Sufficiency is recomputed from their immutable metadata and child reports at the final content head;
-supplemental JSR/member reports do not substitute for or duplicate the binding gate IDs.
+Receipt sufficiency is recomputed from their immutable metadata and child reports at the final
+content head; supplemental JSR/member reports do not substitute for or duplicate the binding gate
+IDs. Merge-readiness additionally requires the separately classified `scaffold.runtime` suite-owned
+output, exact-head proof, central lease, and cleanup record. It is not represented as a sixth
+receipt.
 
 ## Expensive-Gate Release Conditions
 
@@ -227,11 +232,75 @@ Request the lease only when all of the following are true:
 1. S1-S3 are committed and the draft PR head matches the local content head.
 2. All targeted tests, JSR audits, docs/public surface checks, exact-pin checks, and the four cheap
    contracted receipts are green at that same head.
-3. The scaffold suite has been extended to add/regenerate a second service and assert both module
-   type-checking, cross-tier key isolation, and actual invalidation behavior.
-4. The Fresh browser command includes old-versus-fresh server-snapshot hydration assertions.
+3. The scaffold suite contains the exact second-service and invalidation scenarios below.
+4. The Fresh browser command contains the exact old-versus-fresh hydration scenarios below.
 5. Leak-check shows no unexplained owner and no other leaf holds the singleton lease.
 6. The topic orchestrator explicitly releases this leaf to run both named gates.
+
+### Exact `scaffold.runtime` scenarios required before the lease
+
+1. Start from the suite's canonical generated project, whose initial service is `users`. Through the
+   same local CLI binary under test, run:
+
+   ```text
+   netscript service add --name payments --with-client --project-root <generated-project>
+   netscript service generate --project-root <generated-project>
+   ```
+
+   Then run `service generate` a second time and assert zero writes/byte-identical output. A
+   generated consumer imports `usersQueries` and `paymentsQueries` together and type-checks both
+   modules without aliases.
+2. With the identical list input `{ limit: 3, page: 1, sortBy: 'id', sortOrder: 'asc' }`, compare
+   these server keys:
+
+   ```ts
+   const usersServerKey = [
+     'users',
+     'list',
+     '{"limit":3,"page":1,"sortBy":"id","sortOrder":"asc"}',
+   ] as const;
+   const paymentsServerKey = [
+     'payments',
+     'list',
+     '{"limit":3,"page":1,"sortBy":"id","sortOrder":"asc"}',
+   ] as const;
+   ```
+
+   and these client keys:
+
+   ```ts
+   const usersClientKey = ['users', 'list', {
+     input: { limit: 3, page: 1, sortBy: 'id', sortOrder: 'asc' },
+   }] as const;
+   const paymentsClientKey = ['payments', 'list', {
+     input: { limit: 3, page: 1, sortBy: 'id', sortOrder: 'asc' },
+   }] as const;
+   ```
+
+   Each pair must differ only at index `0`; both filters must share their own factory's
+   `[resource, 'list']` prefix, and the users filter must not match the payments key.
+3. In the live generated app, load the successful users showcase, record the initial `users.list`
+   request, and click the first row's **Rename** control. The issued mutation is
+   `users.update({ id: representativeId, data: { name: renamedName } })`. Assert the optimistic row
+   appears, the mutation succeeds, and `onSettled` is followed by a **second** `users.list` network
+   request. The final DOM row must contain the persisted `renamedName` returned by that refetch. The
+   second list request plus server-confirmed DOM value is the observable invalidation proof; merely
+   spying on `invalidateQueries` is insufficient.
+
+### Exact `fresh-browser` hydration scenarios required before the lease
+
+Under one controlled browser clock, capture `hydrationNow` and render the same server snapshot with
+`staleTime: 15_000` twice:
+
+1. **Old snapshot:** `initialDataUpdatedAt = hydrationNow - 60_000`. Assert the server snapshot is
+   the first paint, its initial cache `dataUpdatedAt` is the old timestamp, the query enters
+   fetching/refetching, and the query function count becomes `1`.
+2. **Fresh snapshot:** `initialDataUpdatedAt = hydrationNow`. Assert the same server snapshot is the
+   first paint, cache `dataUpdatedAt` equals `hydrationNow`, fetching/refetching remain false, and
+   the query function count remains `0` during the bounded first-paint observation.
+
+The comparison is therefore `hydrationNow - 60_000` versus `hydrationNow`, not two uncontrolled
+wall-clock samples.
 
 ## Dependencies
 
@@ -247,5 +316,5 @@ Request the lease only when all of the following are true:
   canonical template paths, package export maps/pins, browser task scope, or gate catalog after this
   plan must be re-baselined and appended to `drift.md`.
 - Any implementation departure from the additive SDK overload, generator overwrite/atomicity
-  contract, README location, or six-file receipt set requires an explicit plan amendment and
-  evaluator visibility.
+  contract, README location, five-file receipt set, or separate scaffold release-gate evidence
+  requires an explicit plan amendment and evaluator visibility.

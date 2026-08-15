@@ -67,3 +67,21 @@ current-state documentation.
 - **Action:** PLAN-EVAL must choose a minimal catalog addition or an explicitly approved evidence
   exception before the expensive gate is leased.
 - **Evidence:** `research.md` open question 2; `plan.md` hidden scope and validation plan.
+
+## 2026-08-15 — correction: catalog absence is the release-gate boundary
+
+- **What:** Tier-A established that the preceding entry interpreted deliberate evidence-class
+  separation as missing plumbing.
+- **Source:** `.llm/harness/gates/release-gates.md:1-52` defines `scaffold.runtime` as a
+  release/merge-readiness gate with raw command evidence; `.llm/tools/gates/catalog.ts:54-66`
+  includes `fresh-browser` and deliberately has no `scaffold.runtime` entry.
+- **Expected:** The initial plan proposed adding a catalog entry or requesting an evidence
+  exception.
+- **Actual:** No catalog entry or exception is appropriate. `scaffold.runtime` produces suite-owned
+  exact-head output plus the central expensive-gate lease and cleanup record. Only `fresh-browser`
+  produces a run-gate receipt.
+- **Severity:** significant
+- **Action:** fix the plan, receipt set, context, and PR PLAN comment; never add the catalog entry
+  or hand-author a scaffold receipt.
+- **Evidence:** Tier-A plan review T-1 supplied by `topic-features-0.0.7`; repaired `plan.md`
+  validation and release-condition sections.

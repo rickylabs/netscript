@@ -224,7 +224,9 @@ coordinator explicitly releases the leaf, and the singleton expensive-gate lease
 - `scaffold.runtime` must run once in the evaluator/merge-readiness pass. It alone proves the public
   CLI creates/regenerates a real two-service project, the emitted modules type-check in their
   consumer workspace, the generated keys stay isolated through both cache tiers, the invalidation
-  workflow mutates observable cache state, and the whole Deno/Aspire/runtime path cleans up.
+  workflow mutates observable cache state, and the whole Deno/Aspire/runtime path cleans up. It is a
+  release/merge-readiness gate, so its evidence is the suite-owned exact-head output, raw exit code
+  and failing suite names, plus the central lease/cleanup record—not a run-gate receipt.
 - `fresh-browser` must then exercise the new hydration-age browser regression: old server data
   refetches at hydration, fresh server data does not, and the visible initial snapshot remains
   correct. Static Fresh tests cannot prove mount/hydration timing in a browser.
@@ -238,8 +240,5 @@ coordinator explicitly releases the leaf, and the singleton expensive-gate lease
 
 1. Accept the recommended additive `bridgeInvalidation(queryKey)` overload, or keep the SDK surface
    unchanged and emit `{ queryKey: queries.list.clientKey() }` directly?
-2. Add `scaffold.runtime` to the durable gate catalog so the user-required `run-gate.ts` path can
-   produce a head-attested receipt, or use a suite-owned receipt under an explicitly approved
-   exception? The current gate catalog contains `fresh-browser` but not `scaffold.runtime`.
-3. Confirm that the package-level Fresh README is the allowed home for the required migration note,
+2. Confirm that the package-level Fresh README is the allowed home for the required migration note,
    because the leaf is explicitly prohibited from editing `docs/**`.

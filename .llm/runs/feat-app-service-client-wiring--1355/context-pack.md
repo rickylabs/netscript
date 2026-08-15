@@ -17,7 +17,9 @@ already been repaired and moved, but the literal `service` key, dead invalidatio
 all-service generator, and both cache-age omissions remain. PLAN-EVAL is proposed required. No
 product implementation or expensive gate has run. Draft PR #1664 is open with both closing keywords,
 milestone `0.0.7`, the required taxonomy, acceptance mappings, and structured RESEARCH and PLAN
-comments.
+comments. Tier-A requested a plan-only repair: classify `scaffold.runtime` as suite-owned release
+gate evidence and make both expensive scenarios executable. That repair is now authored; formal
+PLAN-EVAL remains the hard stop.
 
 ## Completed
 
@@ -28,16 +30,17 @@ comments.
   conditions.
 - Committed and pushed S0, opened draft PR #1664, and advanced its single lifecycle label from
   `status:research` to `status:plan` alongside the two phase comments.
+- Applied the Tier-A T-1/T-2 plan repair without product, gate-catalog, lockfile, or docs changes.
 
 ## In Progress
 
-- Stopped before implementation while the topic orchestrator decides the proposed PLAN-EVAL
-  determination.
+- Stopped before implementation; the repaired plan awaits formal PLAN-EVAL after exact-head remote
+  synchronization.
 
 ## Next Steps
 
-1. Topic orchestrator decides the proposed PLAN-EVAL determination.
-2. If accepted, fresh opposite-family PLAN-EVAL decides the three open questions.
+1. Topic orchestrator verifies the repaired plan head and launches formal PLAN-EVAL separately.
+2. PLAN-EVAL decides the remaining SDK overload and migration-note questions.
 3. Only after PASS, begin S1 at a bounded Tier-A stop.
 
 ## Key Decisions
@@ -72,13 +75,13 @@ comments.
 ## Open Questions
 
 - SDK overload versus direct generated filter.
-- Durable `run-gate.ts` route for `scaffold.runtime`.
 - Package README as migration-note home under the `docs/**` prohibition.
 
 ## Drift and Debt
 
-- Drift: issue paths/names moved; naming fixed; stale SDK comment; missing frontend reference;
-  missing scaffold-runtime gate catalog entry.
+- Drift: issue paths/names moved; naming fixed; stale SDK comment; missing frontend reference; and
+  the initial plan misclassified `scaffold.runtime` as a catalog-backed receipt gate before Tier-A
+  corrected it to the release-gate class.
 - Debt: no new or updated architecture debt proposed.
 
 ## Commits
