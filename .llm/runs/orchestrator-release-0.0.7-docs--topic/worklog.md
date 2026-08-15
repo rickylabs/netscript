@@ -425,3 +425,51 @@ checkout, reset, commit, branch, or write anywhere under `/home/codex/repos/eis-
 only, never file contents. The `docs/site` build and rendered link check remain mandatory for this
 slice under Tier-A finding T2. Stop after S2 for Tier-A, whose gate this orchestrator will
 re-execute independently.
+
+## 2026-08-15 — Tier-A S2 sign-off: PASS (reproduction verified byte-identical)
+
+S2 terminal at `4e6d52b3d2cb0bf24aca9a47a67da46a213fef64`; PR comment `issuecomment-5300472067`.
+
+### Reproduction — the decisive evidence
+
+Re-ran the manifest's own documented command against the pinned root with `--observed-at` set to the
+committed `2026-08-15T03:57:30Z`, writing to a temp path. Raw exit `0`, and `cmp` reports the output
+**byte-identical** to the committed `session-measurements.json`. The published procedure genuinely
+regenerates the published numbers — the plan's central claim, now proven rather than asserted.
+
+### Gate re-executed by the orchestrator
+
+| Row                     | Raw exit | Result                                |
+| ----------------------- | -------- | ------------------------------------- |
+| `run-deno-check.ts`     | `0`      | 2 files, 0 occurrences                |
+| `run-deno-lint.ts`      | `2`      | N/A — not applicable                  |
+| `run-deno-fmt.ts`       | `0`      | 2 files, 0 findings                   |
+| `run-deno-test.ts`      | `0`      | 5 passed, 0 failed                    |
+| `git diff --check`      | `0`      | clean                                 |
+| `docs/site build`       | `0`      | 226 HTML files                        |
+| `docs/site check:links` | `0`      | 34,980 links across 226 pages resolve |
+
+The two site rows added under finding T2 earned their place: link and page counts are **identical**
+to S1's, and no `evidence` path exists in `_site`, proving the two JSON files were not rendered as
+pages and did not disturb the site. The approved `S2-evidence-repro` gate contained neither row.
+
+### Privacy audit
+
+Both JSON files carry only paths, classifications, and SHA-256 hashes; zero code-like tokens; every
+string over 200 characters is policy prose or the reproduction command. Unmatched Next.js metrics
+are `absent`/`deferred` with issue owners. The external input stayed clean and pinned at `5191de83…`
+through both the leaf's run and the orchestrator's reproduction. Lockfiles unchanged, leaf tree
+clean.
+
+### Raised for owner decision, not blocked
+
+The manifest publishes private-repository **paths**. This is inside the approved contract — the plan
+authorizes identifiers, and paths are identifiers, not code — but `rickylabs/netscript` is public,
+so those paths disclose the private product's URL structure and feature naming, irreversibly on
+merge. Abstracting them would weaken the reproducibility the manifest exists to provide, so this is
+a trade-off for the owner to settle while the PR is still draft, not a Tier-A block.
+
+### Lint applicability
+
+Recorded N/A with the root-config reason, explicitly not passed, skipped, or waived. The leaf's
+worklog states it in exactly those terms.
