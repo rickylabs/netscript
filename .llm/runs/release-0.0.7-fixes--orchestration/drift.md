@@ -211,3 +211,32 @@ publish dry-run apply to the exported surface. Accepting the archetype override 
 lighter public-surface bar.
 
 No expensive-gate lease granted.
+
+
+## Significant — #1448 amendment 2, and a cross-package break the leaf's stop did not catch
+
+Ruled at leaf head `b25ddb2d5`; ruling committed `6db182503`.
+
+Slices 1–2 landed inside contract (RED `70f8dc799`, pool isolation `9c07f5951`); product delta stayed
+within the authorized surface, `deno.json` exports and all locks untouched. The leaf then stopped
+again before slice 3, correctly: both published transports are **composition** wrappers over
+`BaseMcpTransport` (`stdio-transport.ts:46`, `streamable-http-transport.ts:47`) that forward
+`listTools`/`callTool` options but declare `stop()` with no options, and both are re-exported from
+`./mcp` — so port/base edits alone cannot make the published surface cancellable.
+
+**The stop's enumeration was incomplete, and that is the finding worth recording.**
+`grep -rn 'implements McpTransportPort'` returns **six** implementors, not four. One is
+`packages/fresh/src/runtime/ai/mcp-app-call-handler_test.ts:15` `FakeMcpTransport` — a **different
+package**, denied by Ruling 1, declaring `stop()` and **no `readResource`**. Authorizing only the two
+adapter files the leaf asked for would have left a cross-package type break that surfaced at CI.
+
+**Ruling 4:** surface extended to exactly ten files with the two concrete transports, delegation
+only. **Ruling 5:** widening `stop(options?)` on the port is assignable and breaks no implementor
+(verified against both wrappers and the Fresh double), but `readResource` must be **optional on the
+port** and **required + cancellable on the base and both published transports**, so `packages/fresh`
+keeps checking green. **Ruling 6:** the leaf's fear that optional-on-port would evade acceptance is
+answered behaviorally — the RED test must prove an in-flight `readResource` and `stop` actually
+settle on abort through a **published transport path**, not that a method exists or a type compiles.
+The author was additionally told to run a cross-package `packages/fresh` check before finishing.
+
+Serial queue preserved; `sdk-cache-surface-and-telemetry` remains queued.
