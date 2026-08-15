@@ -756,3 +756,48 @@ the plan remains valid while the docs need more work — a bounded fix slice on 
 thread, then fresh Tier-A and a re-run of the formal gate on the new head. The lane holds for
 coordinator direction. PR #1652 remains draft at `status:impl`, `Part of #1551`, no closing keyword,
 labels unchanged.
+
+## 2026-08-15 — bounded repair slice dispatched for all five IMPL-EVAL findings
+
+Pre-dispatch reconcile: leaf `e95f48380`, tree clean, local equals remote equals PR head; input
+clean at `5191de8`; the cycle-1 evaluator session `c6950ed9` confirmed `idle` with its artifact
+committed and verdict posted, so no concurrent writer holds the worktree. Resumed the preserved
+author thread `019ffcc9-16c2-7573-b7f6-d627172408e8`, detached, PID `164008`. No replacement sender.
+
+Findings dispatched with explicit dispositions:
+
+- **F1** — relabel the Channel `181 / 178` count to `inspected` and restore the shared `measured`
+  definition in comment `5265971722`'s legend. No remeasurement, no pin change. Publishing a Channel
+  manifest instead is allowed only if genuinely smaller, and the leaf must stop and report before
+  choosing it — that path would pull Channel evidence into 0.0.7 scope that #1649 owns.
+- **F2** — rewrite both mutable branch-ref URLs in comment `5265826161` in place to commit-SHA
+  permalinks.
+- **F3** — add `frameworkVersions`, `featureFlags`, `inspectedAt` to the manifest with schema, tool,
+  tests, and emitted measurements kept consistent and byte-stable reproduction preserved.
+- **F4** — rewrite the PR body to the actual landed S1/S2/S3/E0 and validation state, with no
+  Definition-of-Done box ticked that is not truthfully satisfied; the evaluation boxes stay
+  unchecked at cycle-1 `FAIL_FIX`.
+- **F5** — align the matrix heading to `Residual owner` per `methodology.md:130`.
+
+### Sequencing constraint identified before dispatch
+
+F3 changes the manifest, so an F2 permalink to `4e6d52b3d` would cite superseded content. The brief
+therefore requires the repository changes to land first and the comment edits to use the **resulting
+repair commit SHA**. It also flags that `nextjs-session.md:26-27` currently permalinks `4e6d52b3d…`,
+which F3 supersedes, and requires that permalink updated in the same slice — a consistency
+consequence the findings list does not state explicitly.
+
+Gates: the five cheap docs rows plus the structured check/fmt/test wrappers for the tool and its
+test, since F3 touches both. The lint row remains N/A on the root-config evidence. No Aspire,
+Docker, E2E, scaffold, or lease.
+
+### Tier-A interpretation, flagged to the coordinator
+
+The grant says "arrange independent Tier-A review". Read against the harness, Tier-A is the topic
+supervisor's role and "independent" means independent of the implementing lane, which this
+orchestrator satisfies. The alternative reading — a reviewer independent of _this orchestrator_,
+given that its cycle-1 Tier-A missed both blocking findings — is plausible but is not the harness's
+defined shape and no route was supplied for it. This lane will perform Tier-A itself, hardened
+specifically against the two classes it missed: label-versus-published-evidence reachability, and
+mutability of every published evidence URL. The coordinator can redirect to a separate reviewer if
+that was the intent.
