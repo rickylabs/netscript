@@ -3128,3 +3128,68 @@ belonging to sibling supervisors remain untouched, as recorded at lease acquisit
 narrow — derive the probe's list input from the generated contract instead of hardcoding it, or use
 the contract's actual field names — but it is a change to an authorized probe file and I am reporting
 before acting.
+
+## 2026-08-15 — S5 singleton runtime lease RELEASED
+
+Final audit before release, all clean:
+
+| Check | Result |
+| --- | --- |
+| `agentic:leak-check` | `aspire: ok`, `docker: ok`, **`survivors: []`** |
+| Docker containers | **zero** |
+| AppHost / DCP / `dotnet run` / Chromium | **none** |
+| Listening ports (5000/5001/8080/17xxx/18xxx) | **none** |
+
+No teardown was needed — nothing run-owned survived. The 8 foreign `aspire mcp start` processes
+belonging to sibling supervisors were never touched, exactly as recorded at acquisition.
+
+**Lease returned.** `fresh-browser` remains **NOT_RUN**. No repair was made while the lease was held.
+
+### My attribution was incomplete — corrected
+
+I reported "three type errors, head one being TS2345" and then characterised the failure solely as
+the probe's hardcoded payments input. That was wrong by omission. Verified from the log:
+
+| Line | Error | Meaning |
+| --- | --- | --- |
+| 22 | **TS2307** | `Cannot find module …/database/postgres/schema/.generated/zod/crud.ts` |
+| 25 | TS2345 | payments list input shape |
+| 36 | TS2345 | payments list input shape (second site) |
+
+The **TS2307 is independent**. `contracts/versions/v1/users.contract.ts` imports a generated Zod
+module that does not exist at that point in the scaffold lifecycle. Deriving a correct payments input
+would fix both TS2345s and **still leave the consumer failing to type-check**. I named three errors
+and then reasoned about one class of them, which is exactly the partial-attribution error this lane
+keeps catching in others — a count reported accurately, a cause reported incompletely.
+
+### Second correction: `assertIndexZeroOnly` is a false premise
+
+The plan's scenario asserts the users and payments key pairs are "identical after index 0". That
+assumes both services share a list input tail. Real generated contracts need not — and if they
+legitimately differ, the assertion is wrong in principle rather than merely mis-parameterised.
+
+What the scenario actually needs to prove is **resource prefix isolation** — each factory's own
+`[resource, 'list']` filter matches its own key and not the other's — plus each service's own typed
+input and filter behaviour. Byte-equal tails are a stronger claim than the design requires and one
+production contracts do not owe.
+
+### F3 scope, to be amended and pushed before any mutation
+
+Bounded to the authorized probe/test files. It must decide and document, from the canonical
+scaffold/database-generation lifecycle and the actual generated contracts, whether the probe should:
+
+- trigger an **already-owned** schema-generation prerequisite before type-checking, or
+- avoid importing an ungenerated contract path while still exercising the **real generated helpers**.
+
+Explicitly forbidden: inventing or vendoring a fake Zod module to satisfy the import. That would make
+the gate pass by faking the thing it exists to verify.
+
+Also required: replace `assertIndexZeroOnly` with resource-prefix-isolation plus per-service typed
+input/filter assertions; bind a **negative unit test that fails against the current hardcoded-input
+design**; and add coverage for the **missing-schema precondition** so the TS2307 class cannot recur
+silently.
+
+Sequence: amend and push F3 scope → same original Sol/high author thread `01a004f9-…` → commit, push,
+comment, stop → fresh topic Tier-A → request a **new** lease with preflight before rerunning
+`scaffold.runtime`. `fresh-browser` stays NOT_RUN. No evaluator, no label change, no undraft, no
+merge.
