@@ -403,3 +403,16 @@ serial queues are local to each topic and the shared runtime mutex is free.
 
 Serialization remains per lane, never across lanes. Coordinator retains sole merge/lifecycle
 authority. Topic supervisors remain native Claude Opus 5/high with Remote Control enabled.
+
+## 2026-08-15T09:41:25Z lane handoff
+
+| Lane | Current state | Binding next action |
+| --- | --- | --- |
+| docs | Assigned queue exhausted; merge/deploy reconciled at topic `0ca4c489f` | Stay preserved and parked; do not absorb fixes/internals/features allocations |
+| internals | #1658 final Tier-A PASS `f46d84630`; Opus 5/medium RC evaluator `740d2a3a-…` active after zero-cycle Fable probe failure | Accept only an immutable exact-head verdict, then perform the lifecycle transition before releasing the next internals leaf |
+| fixes | #1661 cycle 1 `FAIL_FIX` at `8d6b4726c`; original author repairing the registration-signal lifetime bug | Fresh Tier-A after pushed repair, then request a fresh formal IMPL-EVAL cycle 2; keep next leaf queued |
+| features | #1293 S1 accepted at `49fda0b77`; S2 implementation active | Review S2 independently at its clean pushed stop, then continue the planned per-slice serial sequence |
+
+The central evaluator singleton remains lane-local: internals may evaluate while fixes and features
+implement. No expensive runtime lease is held. Coordinator route remains GPT-5.6-SOL/high, never
+max; all topic supervisors remain their existing native Claude Opus 5/high Remote Control sessions.

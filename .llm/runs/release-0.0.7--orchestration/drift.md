@@ -368,3 +368,22 @@ implementation thread.
   corrected that role in-place: topic supervisors review, queue, and report; the coordinator alone
   performs exact-head merge/lifecycle normalization. #1660 was merged only after the coordinator
   independently reran review-thread and current-head PR gates.
+
+## 2026-08-15T09:41:25Z — lifetime defect and evaluator route recovery
+
+- **#1661 cancellation lifetime false green:** Tier-A verified that a signal was forwarded but did
+  not execute the lifetime contract. `registerMcpTools` captured its registration options inside
+  every registered call handler, while the README supplied `AbortSignal.timeout(1_500)` as a
+  startup bound and the test asserted the resulting post-timeout rejection. The formal evaluator's
+  before/after-deadline reproduction exposed the defect. New standing rule: cancellation plumbing
+  is not evidence of correct signal scope; lifetime contracts require a time-separated behavioral
+  test, and a test encoding the defect cannot make the gate green.
+- **#1658 Fable availability failure:** probe `e58c5f01` failed before inference with null tokens,
+  no output artifact, and no repository mutation. It consumes zero formal cycles. The coordinator
+  explicitly amended the route to the internals lane's established native Opus 5/medium Remote
+  Control fallback, rather than silently substituting or relaunching Fable. Replacement identity
+  was recorded before evaluator mutation.
+- **Autonomy interpretation:** a terminal `FAIL_FIX` inside an already-authorized surface does not
+  require another one-word coordinator grant. The fixes supervisor's pause was corrected using the
+  owner's standing full-autonomy mandate; only a genuine rescope or owner-only decision should stop
+  the bounded repair lifecycle.

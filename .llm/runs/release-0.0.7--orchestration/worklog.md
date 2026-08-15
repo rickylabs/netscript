@@ -456,3 +456,26 @@
   Control session `cb917802-ee26-4b89-86b9-0eee33c7de1b`, bridge
   `session_01Kwmr8XjoznnQsHUnkmfcnV`, PID `520689`, exact source `e3c74d7aa`. This is the canonical
   formal-IMPL-EVAL route for Codex-authored work, not an Opus override.
+
+## 2026-08-15T09:41:25Z — two formal-gate transitions and S1 acceptance
+
+- Docs supervisor independently reconciled #1660's merge and deployment, proved its assigned
+  allocation `[1551]` exhausted, and pushed parked topic checkpoint `0ca4c489f`. The supervisor
+  remains preserved; no unrelated docs-labelled issue was stolen from another topic allocation.
+- Internals #1658 passed final Tier-A at exact head `f46d84630`: 4,147 tests passed, 19 ignored,
+  zero failed in about 319 seconds; sign-off comment `5301628196`. The first Fable availability
+  probe `e58c5f01` failed before inference with null tokens and no mutation, so it consumes zero
+  evaluation cycles. The established native Opus 5/medium Remote Control fallback is active as
+  evaluator `740d2a3a-1677-459c-a6b1-a39398649d1a`, bridge
+  `cse_01NVeBmZE7SwH3Nvu3ep51zV`, against immutable head `f46d84630`.
+- Fixes #1661 IMPL-EVAL cycle 1 returned immutable pushed `FAIL_FIX` at `8d6b4726c`. Blocking F-1
+  proves the registration startup signal was captured by every later registered tool call; the
+  documented 1.5-second startup deadline therefore poisoned the registry after 1.5 seconds, and
+  the old test encoded that defect. Tier-A PASS was withdrawn at `1bdb09e13`. Under the owner's
+  autonomous-continuation mandate, the same original Codex author is now running the bounded
+  three-file RED-to-GREEN repair; the next fixes leaf remains queued.
+- Features #1293 S1 initially widened the public query input type and required a correctness-hiding
+  cast. Tier-A rejected it. The preserved author repaired the contract at `49fda0b77` with the exact
+  scalar union, correct optional/required fields, no cast, and bidirectional compile-time
+  assignability guards. S1 is accepted and S2 classifier/notifier wiring is active in the same
+  lane-local serial queue.

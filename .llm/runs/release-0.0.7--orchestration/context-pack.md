@@ -268,3 +268,14 @@ expensive-gate mutex.
 #1661's active evaluator is Fable 5/medium Remote Control session `cb917802-ee26-4b89-86b9-0eee33c7de1b`
 with bridge `session_01Kwmr8XjoznnQsHUnkmfcnV`, exact source `e3c74d7aa`. Its route/identity/lease
 were recorded before mutation at fixes topic head `57680baf3`; do not launch a duplicate.
+
+Resume from the authoritative `2026-08-15T09:41:25Z` checkpoint. Docs is exhausted and parked at
+topic `0ca4c489f`. Internals #1658 has final Tier-A PASS at `f46d84630` and exactly one active native
+Opus 5/medium Remote Control IMPL-EVAL, session `740d2a3a-1677-459c-a6b1-a39398649d1a`, bridge
+`cse_01NVeBmZE7SwH3Nvu3ep51zV`. Its preceding Fable probe `e58c5f01` was a zero-token,
+pre-inference availability failure and is not an evaluation cycle. Fixes #1661 cycle 1 is terminal
+`FAIL_FIX` at evaluator commit `8d6b4726c`; Tier-A was withdrawn at `1bdb09e13`, and the original
+Codex author is performing the bounded registration-signal lifetime repair before fresh Tier-A and
+IMPL-EVAL cycle 2. Features #1293 S1 is accepted at `49fda0b77`; S2 is active with an intentionally
+dirty implementation tree. Preserve every existing author thread and all four native topic
+supervisors. Serialize within each topic only; no cluster-wide serialization and no duplicate gate.
