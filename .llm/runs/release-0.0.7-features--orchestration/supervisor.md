@@ -68,3 +68,28 @@ change, central cluster-state mutation, or release-writer lease. Formal evaluato
 separate sessions on the exact route in `briefs/reset-gates/dispatch.json`; one evaluator globally
 at a time; Fable 5 requires a coordinator amendment. The pre-reset lane table's Fable bindings for
 #1502 PLAN-EVAL / IMPL-EVAL are superseded by that dispatch file.
+
+### Owner verdict — 2026-08-15 keep-and-narrow for #1651
+
+The owner selected option 1. The coordinator's authoritative checkpoint is
+`eb46e33fb6493ce6ef5350f7abd6e4da51854577` on `chore/release-0.0.7-orchestration` (clean, pushed);
+its cluster state moves features from `blocked` to `implementing`. The owner-overlap hold on PR #1651
+is **released**.
+
+| Field | Value |
+| --- | --- |
+| Authority | owner verdict via coordinator `codex-root-0.0.7`, checkpoint `eb46e33fb` |
+| Disposition | keep the distinct plugin CLI RFC; narrow C6 only |
+| Author | preserved original Codex thread `019ffcc5-d3e1-7c13-9815-e9956ec43683` — resumed, never replaced |
+| Leaf worktree | `/home/codex/repos/netscript-007-features-1502` |
+| Dispatch head | local = remote = PR head `0e302ad3a5915b7a820adcac0a9d5bdc2d7d0019` |
+| Brief | `slices/impl-1502-amendment.md` (8-point bounded contract) |
+| PLAN-EVAL | **not authorized and not required** — the owner resolved the sole design choice |
+| Gates | the six contracted gates rerun at the amended content head |
+| Review | fresh opposite-family Tier-A by this supervisor, over the exact amendment vs RFC 0003 / #1490 |
+| Final gate | exactly one fresh separate native Claude Opus 5 · **medium** · Remote Control IMPL-EVAL, bounded |
+| Loop policy | no open-ended loop; a substantive `FAIL` returns **once** to the same author; editorial notes need coordinator authorization for another formal cycle |
+
+Withheld from this lane and unchanged: reply to or resolution of owner comment `5300440887`, ticking
+#1502, ready-flip, relabel, merge, publish, and starting the next features leaf. PR #1651 stays
+**draft** at `status:impl`.

@@ -692,3 +692,155 @@ correctly. Returning the run to implementation over it would misstate the state 
 One bounded, body-only correction, which changes no head, no receipt, and no RFC content. It is
 **not yet applied** — verified live. Merge and the ready-flip remain coordinator decisions, and the
 verdict is explicitly conditional on this correction landing first.
+
+## 2026-08-15 — owner overlap gate on #1651, and the amendment grant
+
+### The gate
+
+Owner comment
+[`#issuecomment-5300440887`](https://github.com/rickylabs/netscript/pull/1651#issuecomment-5300440887)
+at `2026-08-15T04:04:16Z`: "Verify your RFC is not a duplicate or overlapping recently merged :
+rfcs/0003-command-composition-kit.md".
+
+The IMPL-EVAL session went terminal at `04:05:30Z` — **74 seconds later** — and had started at
+`03:50:58Z`, so it ran entirely before the comment existed. Its `PASS` therefore **does not discharge
+this gate** and is not merge authority. Recorded as an active hold on merge.
+
+The coordinator delegated a fresh independent read-only audit, which concluded **BLOCK pending
+amendment**: #1651 is *not* a duplicate overall — its plugin CLI discovery/routing/help/bootstrap/
+isolation core is distinct — but it carries material unresolved overlap with
+`rfcs/0003-command-composition-kit.md` and with live implementation ownership **#1490 under #1363**.
+
+### Audit findings verified independently against source
+
+Before briefing the amendment I checked the four load-bearing claims rather than relaying them:
+
+| Claim | Verification | Result |
+| --- | --- | --- |
+| "host-owned execution" is wrong | `rfcs/0000-plugin-cli-contribution.md:887` literally attributes "host-owned execution" to RFC 0003; RFC 0003 executes through `@netscript/service/commands` via `createCommandExecutor` composed by the consumer (`rfcs/0003…:207,308,472`) | **confirmed** — the phrase misstates the owner |
+| `PluginCliJson` ≡ `CommandJson` | both are the same six-member JSON union (`0000…` public surface vs `0003…:332-338`); only member order differs, which is meaningless structurally | **confirmed** — they are mutually assignable, so an unqualified cross-payload non-assignability claim is impossible in a structural type system |
+| Outcome vocabulary exists to map | `rfcs/0003…:497-498` — `applied \| replayed \| conflict \| rejected \| failed \| cancelled` and idempotency `claimed \| replayed \| not_requested \| missing \| mismatch \| busy` | **confirmed** |
+| Capability collision is real | `CommandStoreCapabilities` (`rfcs/0003…:671`) is transactional store capability; #1651's `PluginCliCapability` is an invocation permission token | **confirmed** — same word, different domain |
+
+### PLAN-EVAL determination — not required
+
+The coordinator asked for this determination before advancing. **A new PLAN-EVAL is not required**;
+proceed with Tier-A plus a fresh IMPL-EVAL.
+
+Reasoning: the approved plan already scoped compatibility with RFC 0003 explicitly — DoD box 5, the
+S3 slice scope, and locked decision D17 — and the RFC already states at line 887 that "A CLI handler
+may invoke a command executor". The amendment therefore *makes precise a relationship the plan
+already approved* rather than introducing new architecture. Ownership delimitation (#1363/#1490),
+the corrected execution-owner phrase, capability and identity-domain disambiguation, and conformance
+cases are all refinements. The nested adapter law and outcome mapping are the substantive additions,
+but they constrain a boundary the plan already authorized and change nothing about plugin CLI
+ownership, mounts, discovery, bootstrap, isolation, or the generation transaction. Checklist item 12
+explicitly preserves the distinct core.
+
+**Caveat carried into the brief:** if the author concludes that item 4 (a brand or discriminant on
+`PluginCliJson`) or item 5 (the adapter law) forces a change to an approved **locked decision** in the
+D-series rather than a refinement of one, that is a scope expansion — it must stop and report, not
+proceed on its own judgement.
+
+### Evaluator commit reconciled
+
+IMPL-EVAL verdict commit `0e302ad3a5915b7a820adcac0a9d5bdc2d7d0019` remains the branch head; local ==
+remote; tree clean. Its conditional medium finding — the PR body attributing "1,033 files, 9 batches,
+0 failed" to `check-final.json` — is folded into this amendment as checklist item 11, together with
+the sharper form I verified: `check-final.json` has `stdout.bytes: 0` and carries no figures at all,
+so the numbers must be attributed to `check-cli-plugin-cycle1.json` and the final receipt's cache hit
+described accurately.
+
+### Constraints held during the hold
+
+No reply to the owner comment, no resolution of it, no RFC or PR-body edit, no ready-flip, no
+relabel, no merge, no treating the evaluator `PASS` as merge authority.
+
+## 2026-08-15 — owner verdict: keep-and-narrow; hold released, amendment bounded
+
+### The verdict and its authority
+
+The owner selected **option 1 (keep-and-narrow)** for PR #1651. The coordinator committed the
+verdict at `eb46e33fb6493ce6ef5350f7abd6e4da51854577` on `chore/release-0.0.7-orchestration`
+(`chore(harness): narrow the plugin CLI RFC boundary`, clean and pushed). I read its
+`worklog.md`, `context-pack.md`, `supervisor.md`, `drift.md`, and `milestone-status.md` diffs
+before acting; the cluster state now records features as `implementing` with 1 in-flight leaf,
+where it previously read `blocked`.
+
+The owner-overlap hold recorded in the previous section is therefore **released**. The RFC is not
+split, not closed, and not folded. Only **C6** overlaps RFC 0003 / #1490, and the fix is an
+ownership narrowing, not a redesign.
+
+### The previous 12-item checklist is superseded
+
+The coordinator's earlier amendment checklist (items 1-12, recorded above) was written from the
+delegated audit's BLOCK-pending-amendment finding. The owner verdict replaces it with a narrower
+8-point contract. Items that survive are carried in the new brief; items that do **not** survive are
+recorded here so no later reader treats them as unfinished work:
+
+| Prior item | Disposition under the owner verdict |
+| --- | --- |
+| 1 name #1363/#1490 and delimit ownership | **carried** — now the core of the contract |
+| 2 #1490 retains route names / emitted artifacts / semantic validation | **carried and sharpened** — restated as provider, Prisma schema/models/indexes, migration lifecycle, generated bridge and transaction-client types, DB validation, receipt/audit/outbox semantics |
+| 3 correct "host-owned execution" | **carried** — an accuracy defect in the compatibility text (RFC 0000 line 887) |
+| 4 brand/discriminant on `PluginCliJson` | **not authorized** — a brand is a design change. The bounded repair is to *qualify* the unqualified non-assignability claim at line 891, which is currently false for the plain JSON value aliases |
+| 5 nested adapter law | **narrowed** — the adapter may map RFC-0003 domain output into `PluginCliGenerationPlan` / the shared executor; no new normative call-chain law is authorized |
+| 6 outcome mapping across the adapter | **not authorized** — that is RFC 0003/#1490 semantics, which #1651 must not define |
+| 7 cancellation/deadline settlement semantics | **not authorized** — same reason; RFC 0000 line 899 already assigns durable business rollback to RFC 0003 |
+| 8 capability disambiguation | **carried** — falls inside the ownership text |
+| 9 identity-domain mapping | **not authorized** — command identity is RFC 0003-owned |
+| 10 conformance cases for the boundaries | **narrowed** — conformance obligations follow the amended ownership text; no new cross-RFC outcome fixtures |
+| 11 PR-body provenance repair | **carried** — now contract point 8 |
+| 12 preserve the distinct core | **carried** — now contract point 1 |
+
+Writing items 4, 6, 7, and 9 into the RFC would have made #1651 define command-store semantics —
+exactly the direction the owner's point 4 forbids. The supersession is a narrowing, not a dropped
+obligation.
+
+### New contract dispatched to the author
+
+Eight points, verbatim in `slices/impl-1502-amendment.md`: preserve the distinct
+descriptor/router/registry/capability/bootstrap/isolation core; C6 owns only generic CLI
+contribution workspace-plan execution (canonical text plan validation, preview/apply safety, common
+stage/check/commit/rollback, generic registry/plan/journal doctor states); RFC 0003/#1490
+exclusively owns the command-store side; the adapter maps one into the other without either
+reimplementing the other; doctor split; preview-invariance of the planner (which closes the
+evaluator's carried C6 observation); amended compatibility/ownership text and C6 roadmap naming RFC
+0003 and #1490; and the PR-body provenance correction.
+
+### PLAN-EVAL: not required, and now settled by the owner
+
+My earlier determination stands and is reinforced: the owner resolved the sole design choice and no
+plan or scope expansion remains. No PLAN-EVAL cycle 3 exists. The caveat I carried — "stop if a
+locked D-series decision must change" — is retained in the brief, but the items that could have
+triggered it (a `PluginCliJson` brand, a normative outcome mapping) are the ones the verdict removed.
+
+### Pre-dispatch reconciliation
+
+| Check | Result |
+| --- | --- |
+| Coordinator checkpoint | `eb46e33fb` on `chore/release-0.0.7-orchestration`, clean, pushed |
+| Leaf local `HEAD` | `0e302ad3a5915b7a820adcac0a9d5bdc2d7d0019` |
+| Leaf remote `refs/heads/docs/rfc-plugin-cli-contribution` | `0e302ad3a5915b7a820adcac0a9d5bdc2d7d0019` |
+| Live PR #1651 head | `0e302ad3a5915b7a820adcac0a9d5bdc2d7d0019` |
+| Leaf tree | clean |
+| PR state | open **draft**, exactly one lifecycle label `status:impl` |
+| `pr-checks` | `ok=true`, 16 checks, 0 current failures — **all `skipped`**, so not gate evidence (D-6) |
+| Author thread `019ffcc5-…` | not loaded in the daemon and no agent in the leaf worktree; safe to resume |
+| Coordinator thread `019ffaa3-…` | working — not touched |
+
+### Body defects verified directly, not accepted on report
+
+- `check-final.json`: `outcome PASS`, `exitCode 0`, `durationMs 51`, `stdout.bytes 0`,
+  `sha256 e3b0c442…` (the empty-string digest). It carries **no** file/batch figures of any kind.
+- `check-cli-plugin-cycle1.json`: same `gateId: check`, `invocationId ns1502-plan-fix1-check-cli-plugin`,
+  `durationMs 71003`, at head `d71b78c3…` — a **different** head from the content head. This is where
+  "1,033 files / 9 batches / 0 failed" actually comes from.
+- The body's `check` row therefore cites a real receipt for numbers that receipt does not contain,
+  and the numbers that do exist attest a different commit. Re-pointing the citation is not a fix;
+  the figures must be dropped or relabelled as cycle-1 evidence, and the 51 ms final run described
+  plainly as a valid cached re-check.
+- Additional stale prose found while verifying: the body still names `c987f009e…` as the final
+  receipt/journal head (the branch has since advanced through `04d431028…` to `0e302ad3a`), and
+  "Next action: Tier-A topic review, then coordinator dispatch …" describes a handoff that has
+  already happened twice.

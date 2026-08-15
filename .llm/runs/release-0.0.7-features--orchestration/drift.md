@@ -99,3 +99,71 @@ against the supervisor's own tooling. Standing consequence for this lane: a watc
 signal only. A terminal PLAN-EVAL/IMPL-EVAL verdict is established from the committed artifact —
 verdict token, evaluated head, pushed commit, and live PR state — never from a watcher exit, a
 session's self-summary, or a job `state` field.
+
+## D-8 — an evaluator PASS that predates its own merge gate (significant)
+
+**Date:** 2026-08-15. IMPL-EVAL session `2a8cf0a6-…` started `04:03:50:58Z` and returned `PASS` at
+`04:05:30Z`. The owner's merge-gating comment `#issuecomment-5300440887` was created at `04:04:16Z` —
+inside that window, 74 seconds before the verdict. The evaluator neither saw nor could have addressed
+it.
+
+A terminal `PASS` is therefore **not** merge authority by itself: it certifies the head it evaluated
+against the brief it was given, and nothing about gates raised afterwards. This lane must check for
+gating comments created after an evaluator's start time before treating any verdict as clearing
+merge, and must never let a chronologically-earlier verdict discharge a later gate. Recorded because
+the two events were close enough that a careless reader would take the `PASS` as answering the
+comment.
+
+## D-9 — Tier-A reviewer routing conflicts with the reset contract (significant)
+
+**Date:** 2026-08-15. The coordinator's amendment grant requires "a fresh independent Tier-A review
+from the opposite persistent Codex session". The only persistent Codex sessions for this lane are the
+coordinator's own (`019ffaa3-…`, which this orchestrator must not steer) and the **parked** historical
+topic controller `019ffcc0-e1d2-7850-a308-354b670c6f3d`.
+
+The reset common contract says the parked thread is preserved and "never resume it as a topic
+controller". A one-off read-only review is not controller resumption, so the two instructions can be
+reconciled — but only under strict conditions, which this lane will impose: the parked thread is
+resumed **read-only**, pointed at the *leaf* worktree rather than the topic worktree, sequenced after
+the author turn is idle so the one-active-send-per-worktree rule holds, briefed to write and commit
+nothing and to report findings in its turn message only, and never to act as a controller or touch
+the topic branch. It is not re-parked as a controller afterwards.
+
+Additionally, harness law says the opposite-family reviewer of Codex-authored work is Claude. A Codex
+reviewer of Codex-authored work is same-family. This lane therefore treats the Codex review as an
+**additional independent perspective the coordinator asked for**, and still performs its own Claude
+Tier-A review, so the no-lane-self-certifies invariant is satisfied by a genuinely opposite-family
+reviewer regardless.
+
+## D-10 — the owner verdict narrows an amendment that was already briefed wider (significant)
+
+**Date:** 2026-08-15. The coordinator's first amendment grant carried a 12-item checklist derived
+from a delegated overlap audit. The owner's keep-and-narrow verdict then replaced it with an 8-point
+contract that is **strictly narrower**: four of the twelve items (a `PluginCliJson` brand, a
+normative outcome mapping across the adapter, cancellation/deadline settlement semantics, and
+identity-domain mapping) are no longer authorized, because writing them would make #1651 define
+command-store semantics that the same verdict assigns exclusively to RFC 0003 / #1490.
+
+The drift worth recording is the shape, not the change: an audit that asks "prove this is not a
+duplicate" naturally produces a checklist of *couplings to specify*, and specifying a coupling in
+the wrong document is how one RFC quietly annexes another's semantics. The owner's correction runs
+the opposite way — remove ownership from the overlapping section rather than document the overlap in
+more detail. The supersession table in `worklog.md` records each item's disposition so no later
+reader treats the four removed items as unfinished obligations.
+
+Consequence for this lane: the Tier-A review and the final IMPL-EVAL must check the amendment
+against **the 8-point contract**, and must treat any newly added command-store semantics in RFC 0000
+as a finding, not as thoroughness.
+
+## D-11 — the RFC's blanket non-assignability claim is false as written (minor)
+
+**Date:** 2026-08-15. `rfcs/0000-plugin-cli-contribution.md:891` states "assignability between the
+payloads is a failure, not reuse" without qualification. `PluginCliJson` and RFC 0003's `CommandJson`
+are the same six-member recursive JSON union (only member order differs), so they are mutually
+assignable today and a conformance test asserting the blanket rule would fail against RFC 0003.
+
+This is an accuracy defect in existing text, not a design gap. The bounded repair is to scope the
+law to the **envelope, definition, and result** payload types — where it is true and load-bearing —
+and to state that structurally identical plain-JSON value aliases are expected and are not evidence
+of coupling. Introducing a brand or discriminant to make the blanket claim true would be a design
+change, which the owner verdict does not authorize.
