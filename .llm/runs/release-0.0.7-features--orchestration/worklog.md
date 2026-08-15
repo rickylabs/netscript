@@ -2016,3 +2016,61 @@ Repair dispatched to the same author thread. The coordinator's grant was for **o
 repaired head, and it has been spent. **Cycle 2 is requested, not assumed** — this lane has never
 launched a formal gate without an explicit grant, and the comment itself is labelled cycle 1/2. No
 implementation before a cycle-2 `PASS`.
+
+## 2026-08-15 — #1664 PLAN-EVAL cycle 2: terminal `PASS`
+
+Verdict commit `c53726c69b98a35bf293b89aeece12279f470be3`, **appending** 148 lines to `plan-eval.md`
+rather than overwriting cycle 1 — the brief asked for that and it was honoured, so both cycles remain
+readable. Local == remote == PR #1664 head. PR comment `#issuecomment-5301997528` live.
+
+| Field | Value |
+| --- | --- |
+| Job / session | `8c756943` / `8c756943-11c8-45a2-84ab-8c8392898723` |
+| Bridge session | `cse_01UrhsQgBYpLZWHKAhCvESi6` (non-empty, recorded before mutation) |
+| Remote Control URL | `https://claude.ai/code/session_01UrhsQgBYpLZWHKAhCvESi6` |
+| Requested route | native Claude **Fable 5 · medium** · Remote Control |
+| Observed route | `respawnFlags` = `--effort medium … --model claude-fable-5`; `providerEnv {}` |
+| Route verdict | **matched** |
+| Evaluated head | `f7225be98c01b38f86712c1df0782aec06e34445` |
+| Brief delivered | `intent` length 10,512 bytes |
+
+`PASS` — "all six cycle-1 fixes are discharged in substance; every diagnosis re-derives from source;
+no plan-gate box is unchecked." N1 records no expensive gate, no lease, no catalog entry, and no code
+touched by the session.
+
+### The verification worth singling out
+
+The evaluator did not accept the compatibility argument that decided cycle 1 — it **checked the
+published artefact**. It confirmed `clientKey` is present in `@netscript/sdk@0.0.6` on
+`jsr.io/@netscript/sdk/0.0.6/src/query/query-factory.ts`, establishing that direct emit really does
+compile against the already-published SDK. Cycle 1's ruling rested on that claim; cycle 2 proved it
+rather than inheriting it. It also caught the residual the repair left behind: the S2 test *named*
+"SDK-0.0.6 compatibility" had no stated assertion — a test named for a property it does not yet
+assert, which is the same defect family this lane has been catching all milestone, one level up.
+
+### Three implementation constraints, not plan blockers
+
+- **C1** — make the SDK-0.0.6 compatibility test concrete. The rendered module must contain the
+  literal `{ queryKey: <svc>Queries.list.clientKey() } as const` **after** `<svc>Queries`, and import
+  from `@netscript/sdk/*` only symbols published in 0.0.6 — in practice `createServiceClient` and
+  `createQueryFactories`. The now-unused `bridgeInvalidation` import at
+  `service-query.ts.template:3` must be dropped or the generated app fails lint. **An allowlist
+  assertion on the rendered import set is what catches a future re-coupling** — not a comment, not a
+  version note.
+- **C2** — atomic-failure compatibility. `packages/cli/README.md` and the error message itself
+  (naming the service and the expected contract path) must state that `service generate` fails
+  **before any write**, Aspire helpers included, when a manifest service lacks its contract; and
+  `Enabled: false` services (`workspace-resolver.ts:28`) need an explicit documented policy on
+  whether they receive owned modules.
+- **C3** — mark `generate-aspire_test.ts` as **new** in S2 on the next amendment.
+
+### First implementation slice dispatched
+
+S1 per the approved plan — SDK semantics and docs, with the **type surface unchanged**: correct the
+stale module doc at `key-bridge.ts:4-7` (still claims `['cache_query', …]`), add a JSDoc pointer to
+`factory.<action>.clientKey()`, and add the semantic match/mismatch tests that lock the S6
+regression. C3 rides along as a plan amendment; C1 and C2 are recorded as binding constraints
+against the slices that own them.
+
+No `scaffold.runtime`, no `fresh-browser`, no lease, no expensive execution. Product tests and a
+Tier-A stop are required.
