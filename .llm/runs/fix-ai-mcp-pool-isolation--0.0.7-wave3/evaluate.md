@@ -277,3 +277,60 @@ None blocking. No new findings.
 - Before `status:ready-merge`: acceptance-evidence mirror / close-gate for the nine #1448 boxes and
   the two DoD boxes; no box ticked and no keyword changed by this evaluator.
 - No further IMPL-EVAL cycle; no PLAN-EVAL.
+
+---
+
+# IMPL-EVAL — repair-delta evaluation (O-3 check-test repair, bounded)
+
+Cycle-2 `PASS` at `df05344166` (verdict `4766b258f`) stands and is not re-audited here. This is a
+fresh, separate, proportionate evaluation of the one-file repair delta and its blast radius.
+
+## Metadata
+
+| Field | Value |
+| --- | --- |
+| Evaluator route (requested) | Native Claude `claude-fable-5` · effort `medium` · `/remote-control` on — canonical `formal_impl_evaluation` lane |
+| Observed route | job `8a0ff845` `state.json` `respawnFlags`: `--effort medium --permission-mode bypassPermissions --remote-control --name "NetScript 0.0.7 #1661 EVAL repair-delta" --model claude-fable-5` — matched |
+| Session id | `8a0ff845-1d0a-43d6-ae3c-03b4158f7943` (`~/.claude/sessions/714835.json`) |
+| Remote Control | `bridgeSessionId` `session_013K3BZ2ydVkYzXt6vgcxTJX` → `https://claude.ai/code/session_013K3BZ2ydVkYzXt6vgcxTJX` |
+| PID / cwd | `714835` / `/home/codex/repos/netscript-007-leaf-ai-mcp-pool` (branch `fix/ai-mcp-pool-isolation`) |
+| Date | 2026-08-15 |
+
+## Heads (resolved independently)
+
+| Ref | SHA |
+| --- | --- |
+| Evaluated head (Tier-A sign-off on repair) | `de89440119ba45822f0bdc8350838088a6f04140` — local `HEAD`, `git ls-remote origin`, and PR #1661 `headRefOid` all agree; PR **non-draft**, OPEN |
+| Repair product commit | `45aca4adcd35dd6a9b825db449284e400171a533` — ancestor; `git diff --name-only 45aca4adc de8944011` = `review-tier-a.md` only |
+| Cycle-2 PASS head / verdict | `df05344166` / `4766b258f` |
+| Immutable base | `284dda90a` — `git merge-base` = base |
+
+## Judgments
+
+| # | Question | Evidence | Result |
+| --- | --- | --- | --- |
+| 1 | Invariant restored, not just the test | Head `tanstack-connector.ts:11-12` defines `TANSTACK_MCP_SPECIFIER` / `TANSTACK_MCP_STDIO_SPECIFIER` as `['@tanstack','/ai-mcp(/stdio)'].join('')`, byte-identical to base `284dda90a:10-11`; used at all three dynamic-import sites (`:46`, `:71`, `:72`), matching base `:31,:50,:51`. `grep '@tanstack/ai-mcp' packages/ai/src` non-test → only a doc comment in `ports/mcp-transport.ts:6`; no static literal specifier remains in `packages/ai/src`. | ✅ |
+| 2 | CLI test not weakened; untouched files | `git diff --stat 284dda90a..HEAD -- packages/cli packages/fresh deno.lock packages/ai/deno.json` → empty. `workspace-mutator_test.ts:261-318` unchanged: still scans connector source with the `[…].join('')` regex and asserts both `@tanstack/ai-mcp` and `@tanstack/ai-mcp/stdio`. | ✅ |
+| 3 | Failure gone — failing test + repo-wide | `deno test --allow-all --unstable-kv packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts` → 19 passed / 0 failed, exit 0. **Repo-wide `deno task test`** (structured wrapper) → `passed 4152, failed 0, ignored 19, exitCode 0, 403.6s` vs CI's 4151/1. | ✅ |
+| 4 | Publish invariant | `deno publish --dry-run --allow-dirty` in `packages/ai` → `Success Dry run complete`, exit 0. | ✅ |
+| 5 | No regression to cycle-2 certification | `packages/ai/tests/mcp_test.ts` → 20 passed / 0 failed, including `registered calls outlive the registration discovery signal` (F-1). Delta touches no MCP runtime behaviour — only import specifier form. | ✅ |
+| 6 | O-3 drift correction states the truth | `drift.md:77-87` now records the prior disposition as wrong, names the cross-package packaging invariant, the observed `check-test` regression, the restoration, and before/after raw exit codes. Matches what I observed. | ✅ |
+
+Constraints honored: no Aspire/Docker/`scaffold.runtime`/`e2e:cli`/browser; `docker ps -a` empty
+before and after; read-only over source.
+
+## Findings
+
+None. No new findings; no debt entry needed.
+
+## Verdict (repair delta — final)
+
+| Field | Value |
+| --- | --- |
+| Verdict | **`PASS`** |
+| Rationale | The repair restores the computed optional-runtime invariant to base form at every site, the CLI test is unweakened and green, the repo-wide gate CI failed on is now 4152/0, the `packages/ai` publish dry-run is green, the F-1 lifetime separation and MCP suite are intact, and the O-3 drift entry now records the regression truthfully. |
+
+## Stops here
+
+Single bounded evaluation, no loop. No merge, relabel, box-tick, keyword or draft-state change,
+central-state mutation, or next leaf by this evaluator — readiness and merge are the coordinator's.
