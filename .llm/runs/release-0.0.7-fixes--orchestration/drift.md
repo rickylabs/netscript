@@ -356,3 +356,28 @@ decision; the next fixes leaf stays queued.
 - **Rule:** when a brief asserts ownership, cite the **normative** line, not any matching line, and
   check the target issue's own comments and live sibling issues before asserting it. An umbrella's
   checkbox is a status marker, not an ownership grant.
+
+## 2026-08-15 — #1671 S4-R blocked: Codex account usage limit exhausted
+
+- **What:** the S4-R plan-only amendment cannot be executed. `agentic:codex-resume` delivers the
+  message to thread `01a006f3-…`, but the Codex backend refuses to process it:
+  `ERROR: You've hit your usage limit. … try again at Aug 20th, 2026 5:31 AM.` Reported usage
+  `1,576,949` tokens.
+- **Evidence:** message delivery proven (rollout grep `2 → 4`, rollout mtime advanced 143s), so the
+  thread received the brief; the refusal is a backend quota decision, not a transport failure. Leaf
+  head remains `db8aadd9542c38a305efffbd7017c56d0abf4e01`, working tree clean, `deno.lock`
+  `LOCK-IDENTICAL`. No partial state was written.
+- **Gap this exposes in this topic's own delivery discipline:** rollout-grep proves a message was
+  **written to the thread**. It does **not** prove a model was able to **act on it**. The first S4-R
+  dispatch reported `DELIVERED` and looked healthy while the author was already quota-dead, and a
+  watcher was then armed for a head change that could never occur.
+- **Rule adopted:** delivery proof and liveness proof are different checks. After dispatch, confirm
+  the author actually progressed — a new commit, a worklog write, or an observable process — before
+  arming any waiter. Never arm a head-change watcher on an unproven-live author.
+- **Severity:** blocking, external, and not repairable by retry. Quota resets 2026-08-20 05:31.
+- **Not done and deliberately so:** no further retries (futile), and **no substitution of the
+  supervisor as implementer** — the supervise-only boundary and the Claude-workflow prohibition on
+  harness implementation slices both forbid it.
+- **Coordinator decision required.** Options: purchase Codex credits; hold #1671 until the 2026-08-20
+  reset; or authorize an alternative implementation lane for this leaf, which is a lane-policy
+  escalation rather than a supervisor call.
