@@ -8,16 +8,17 @@ import { CacheOperations, CacheOutcomes } from '@netscript/telemetry/attributes'
 import { DEFAULT_QUERY_CACHE_TIME, DEFAULT_QUERY_STALE_TIME } from './defaults.ts';
 import { cacheTelemetryOwner } from './cache-provider-marker.ts';
 import {
+  admitCacheNamespace,
   CacheEvents,
   type CacheTelemetry,
   type CacheTelemetrySpan,
   createCacheSpanAttributes,
   createDefaultCacheTelemetry,
-  normalizeCacheNamespace,
   recordCacheExecutionState,
   recordCacheInvalidation,
   recordCacheLookup,
   recordCacheProviderError,
+  recordCacheSpanPrologue as spanPrologue,
   recordCacheWrite,
 } from './cache-telemetry.ts';
 import { KvCacheStore } from './kv-cache-store.ts';
@@ -82,11 +83,15 @@ export class CacheQuery {
    * @returns Resolved query data.
    */
   query<TData>(queryKey: QueryKey, options: CacheQueryOptions<TData>): Promise<TData> {
-    const namespace = normalizeCacheNamespace(options.operationId);
+    const admission = admitCacheNamespace(options.operationId);
+    const { namespace } = admission;
     return this.telemetry.withSpan(
       CacheOperations.READ,
       createCacheSpanAttributes(CacheOperations.READ, namespace, this.descriptor),
-      async (span) => await this.queryInsideSpan(queryKey, options, namespace, span),
+      async (span) => {
+        spanPrologue(span, CacheOperations.READ, admission, this.descriptor, CacheEvents.LOOKUP);
+        return await this.queryInsideSpan(queryKey, options, namespace, span);
+      },
     );
   }
 
@@ -236,7 +241,7 @@ export class CacheQuery {
       let report: CacheWriteTopologyReport;
       try {
         report = await this.store.set(cacheKey, entry, { expireIn: cacheTime });
-      } catch (error) {
+      } catch {
         recordCacheProviderError(
           span,
           CacheOperations.READ,
@@ -244,7 +249,7 @@ export class CacheQuery {
           this.descriptor,
           CacheEvents.WRITE,
         );
-        throw error;
+        return data;
       }
       recordCacheWrite(span, CacheOperations.READ, namespace, this.descriptor, report);
       return data;
@@ -266,6 +271,13 @@ export class CacheQuery {
         CacheOperations.WRITE,
         createCacheSpanAttributes(CacheOperations.WRITE, namespace, this.descriptor),
         async (span) => {
+          spanPrologue(
+            span,
+            CacheOperations.WRITE,
+            { namespace },
+            this.descriptor,
+            CacheEvents.WRITE,
+          );
           try {
             recordCacheExecutionState(
               span,
@@ -302,11 +314,19 @@ export class CacheQuery {
 
   /** Invalidate a single query key. */
   invalidate(queryKey: QueryKey, operationId?: string): Promise<void> {
-    const namespace = normalizeCacheNamespace(operationId, 'cache.invalidate');
+    const admission = admitCacheNamespace(operationId, 'cache.invalidate');
+    const { namespace } = admission;
     return this.telemetry.withSpan(
       CacheOperations.INVALIDATE,
       createCacheSpanAttributes(CacheOperations.INVALIDATE, namespace, this.descriptor),
       async (span) => {
+        spanPrologue(
+          span,
+          CacheOperations.INVALIDATE,
+          admission,
+          this.descriptor,
+          CacheEvents.INVALIDATE,
+        );
         try {
           const report = await this.store.delete(toCacheStoreKey(queryKey));
           recordCacheInvalidation(span, namespace, this.descriptor, [report]);
@@ -326,11 +346,19 @@ export class CacheQuery {
 
   /** Invalidate all cached entries sharing a query-key prefix. */
   invalidateQueries(queryKeyPrefix: QueryKey, operationId?: string): Promise<void> {
-    const namespace = normalizeCacheNamespace(operationId, 'cache.invalidate-prefix');
+    const admission = admitCacheNamespace(operationId, 'cache.invalidate-prefix');
+    const { namespace } = admission;
     return this.telemetry.withSpan(
       CacheOperations.INVALIDATE,
       createCacheSpanAttributes(CacheOperations.INVALIDATE, namespace, this.descriptor),
       async (span) => {
+        spanPrologue(
+          span,
+          CacheOperations.INVALIDATE,
+          admission,
+          this.descriptor,
+          CacheEvents.INVALIDATE,
+        );
         const reports: CacheInvalidationTopologyReport[] = [];
         try {
           for await (const entry of this.store.list({ prefix: toCacheStoreKey(queryKeyPrefix) })) {
@@ -358,11 +386,13 @@ export class CacheQuery {
 
   /** Return cached data without fetching. */
   getCachedData<TData>(queryKey: QueryKey, operationId?: string): Promise<TData | null> {
-    const namespace = normalizeCacheNamespace(operationId, 'cache.cached-data');
+    const admission = admitCacheNamespace(operationId, 'cache.cached-data');
+    const { namespace } = admission;
     return this.telemetry.withSpan(
       CacheOperations.READ,
       createCacheSpanAttributes(CacheOperations.READ, namespace, this.descriptor),
       async (span) => {
+        spanPrologue(span, CacheOperations.READ, admission, this.descriptor, CacheEvents.LOOKUP);
         try {
           const cached = await this.store.get<CacheEntry<TData>>(toCacheStoreKey(queryKey));
           recordCacheLookup(span, namespace, this.descriptor, cached.report);
@@ -386,11 +416,13 @@ export class CacheQuery {
     queryKey: QueryKey,
     operationId?: string,
   ): Promise<CachedEntry<TData> | null> {
-    const namespace = normalizeCacheNamespace(operationId, 'cache.cached-entry');
+    const admission = admitCacheNamespace(operationId, 'cache.cached-entry');
+    const { namespace } = admission;
     return this.telemetry.withSpan(
       CacheOperations.READ,
       createCacheSpanAttributes(CacheOperations.READ, namespace, this.descriptor),
       async (span) => {
+        spanPrologue(span, CacheOperations.READ, admission, this.descriptor, CacheEvents.LOOKUP);
         try {
           const cached = await this.store.get<CacheEntry<TData>>(toCacheStoreKey(queryKey));
           recordCacheLookup(span, namespace, this.descriptor, cached.report);
@@ -420,6 +452,13 @@ export class CacheQuery {
       CacheOperations.WRITE,
       createCacheSpanAttributes(CacheOperations.WRITE, namespace, this.descriptor),
       async (span) => {
+        spanPrologue(
+          span,
+          CacheOperations.WRITE,
+          { namespace },
+          this.descriptor,
+          CacheEvents.WRITE,
+        );
         try {
           const report = await this.store.set(
             toCacheStoreKey(queryKey),

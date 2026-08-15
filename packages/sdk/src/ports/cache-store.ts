@@ -60,7 +60,8 @@ export interface CacheStore {
    * Retrieve a value by key.
    *
    * @param key - Composite key segments
-   * @returns Entry with the value or `{ value: null }` on cache miss
+   * @returns `{ value: T | null, report: CacheReadTopologyReport }`; a miss has a `null` value and
+   * ordered lookup evidence in `report`.
    */
   get<T>(key: CacheKey): Promise<CacheStoreEntry<T>>;
 
@@ -70,6 +71,7 @@ export interface CacheStore {
    * @param key     - Composite key segments
    * @param value   - Payload to cache (must be structured-clone-safe)
    * @param options - Optional `expireIn` in milliseconds
+   * @returns Ordered `CacheWriteTopologyReport` write and promotion evidence.
    */
   set(
     key: CacheKey,
@@ -81,6 +83,7 @@ export interface CacheStore {
    * Remove a single key from the store.
    *
    * @param key - Composite key segments
+   * @returns `CacheInvalidationTopologyReport` evidence for the invalidated tiers.
    */
   delete(key: CacheKey): Promise<CacheInvalidationTopologyReport>;
 
