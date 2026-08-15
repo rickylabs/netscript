@@ -3868,3 +3868,58 @@ failing paths — without it the helper owners would receive no formatter and ca
 **`PASS`.** The ceiling is honest, the dependency direction is sound, every one of the 12 failing
 paths has a bound owner, and the three transport safety properties now have assertions that can fail
 for the right reason. Product implementation is released under the reviewed 15+12 ceiling.
+
+## 2026-08-15 — Tier-A watch item pre-resolved (read-only; active author not interrupted)
+
+The coordinator flagged the new formatter's `SUPPORTED_EXTENSIONS` as possibly fail-open: a broad
+allowlist whose members Deno rejects would defer the error to spawn and weaken the stated
+"fails closed before spawn" contract. Measured rather than argued, read-only, while the author works.
+
+### Every allowlist member is accepted by the pinned toolchain
+
+Toolchain: **Deno 2.9.5** (stable, x86_64-unknown-linux-gnu). The allowlist at
+`deno-generated-source-formatter.ts:15` has **26** members. Piping empty stdin through
+`deno fmt --ext <token> -` for **all 26**:
+
+**Rejected by Deno: none.** The four the coordinator named specifically — `xml`, `sql`, `vto`, `njk`
+— are all valid `--ext` tokens on this version.
+
+So the stated failure mode **does not occur**: every extension the allowlist admits, Deno also
+admits, and nothing is deferred to spawn. The validation contract holds as written. **No narrowing is
+required to make it true.**
+
+The probe was not vacuous — `sass` **is** rejected by `deno fmt --ext` on this same version, so the
+accept-set is genuinely narrower than "anything plausible". `sass` is correctly absent from the
+allowlist.
+
+### The residual risk is version drift, not breadth
+
+The guarantee is toolchain-dependent. A future Deno dropping a token would reintroduce exactly the
+deferred-error failure mode the coordinator described, silently, because a hand-maintained list
+cannot notice. The durable fix is not a shorter list but an assertion that the list is a **subset of
+what Deno accepts** — a test that probes each member against the pinned formatter. Recommendation for
+the fresh review, not a blocker: bind that subset assertion in
+`deno-generated-source-formatter_test.ts`, which is already inside the ceiling.
+
+On breadth specifically: this leaf owns exactly `.ts` (5 paths) and `.mts` (7). A narrower list would
+be a defensible tightening, but the adapter is **shared** — `formatGeneratedFiles` also serves plugin
+install/remove, `generate-aspire-command`, and the composition root — so narrowing to the two dialects
+this leaf owns would constrain callers this leaf does not own. Breadth is justified by the shared
+seam; validity is now measured.
+
+### Ceiling compliance: 26 touched, all inside, zero outside
+
+| Group | Ceiling | Touched |
+| --- | --- | --- |
+| Product | 15 | **15 — all** |
+| Test | 12 | **11** |
+| Outside the ceiling | — | **0** |
+
+The single untouched ceiling member is `format-generated-files_test.ts`. That accounts for the 26/27
+and is not a violation: a ceiling is a maximum, not a quota. Whether that test is required is a fresh
+Tier-A question — the amendment binds `format-generated-files_test.ts` to the transport proof row, so
+if the delegation path is asserted elsewhere it may be genuinely unnecessary, and if it is not, it
+must be added.
+
+Author not interrupted; all observations are read-only. No product, template, or fixture mutation by
+this lane.
