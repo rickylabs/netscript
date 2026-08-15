@@ -289,3 +289,24 @@
   recursion. This is a necessary architectural gate, not a reflexive extra cycle.
 - Exact-main workflows for `e090f894f` were active without a failure at this checkpoint. Fixes #1657
   final IMPL-EVAL cycle 2 remained active and independent. Aspire/Docker stayed empty.
+
+## 2026-08-15T07:40:16Z — owner selects keep-and-narrow for #1651
+
+- The owner explicitly selected option 1 for PR #1651. The features-lane hold is released; the RFC
+  remains distinct and the preserved original Codex author may perform one focused RFC/journal/body
+  amendment under the existing native Opus 5/high Remote Control topic supervisor.
+- C6 owns only the generic CLI contribution workspace-plan executor, preview/apply safety,
+  staging/check/commit/rollback, and contribution-level registry/plan/journal doctor states. RFC
+  0003/#1490 exclusively owns command-store provider selection, Prisma schema/models/indexes,
+  migrations, generated bridge and transaction-client types, database validation, and transactional
+  business-command semantics. Their adapter may map the domain plan into the shared executor; neither
+  may reimplement the other's owned behavior.
+- Preview is plan-invariant: the planner returns the same canonical plan for preview and apply, while
+  the host alone decides whether to mutate. This closes the evaluator's carried C6 observation as
+  part of the same amendment.
+- The author must also correct the merge-facing check-receipt provenance claim and record the valid
+  input-cache hit. Re-run the six contracted gates at the amended content head, obtain fresh
+  opposite-family Tier-A, then exactly one bounded final IMPL-EVAL over the ownership amendment and
+  prior conditional finding. No PLAN-EVAL or open-ended evaluator cycle is authorized.
+- #1651 remains draft. Reply to owner comment `5300440887`, ready transition, issue mutation, and
+  merge remain withheld until the amended head, review, receipts, and live checks are reconciled.

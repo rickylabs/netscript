@@ -799,7 +799,7 @@
     {
       "id": "rfc-plugin-cli-contribution",
       "lane": "features",
-      "phase": "blocked",
+      "phase": "implementing",
       "baseBranch": "main",
       "headSha": "12276e6d86403ed1340ef79a963e87d401d643e9",
       "currentPrHeadSha": "0e302ad3a5915b7a820adcac0a9d5bdc2d7d0019",
@@ -811,13 +811,25 @@
       "ownerMergeHold": {
         "commentId": 5300440887,
         "reason": "RFC 0003/#1490 overlap audit found #1651 distinct overall but C6 ownership and adapter boundaries require an owner disposition before amendment",
-        "state": "awaiting_owner_verdict",
-        "auditVerdict": "BLOCK_PENDING_AMENDMENT",
+        "state": "resolved_keep_and_narrow",
+        "auditVerdict": "AMENDMENT_AUTHORIZED",
+        "ownerVerdict": "keep-and-narrow",
+        "decidedAt": "2026-08-15T07:40:16.000Z",
         "decisionOptions": [
           "keep-and-narrow",
           "remove-or-defer-c6",
           "close-as-duplicate"
-        ]
+        ],
+        "amendmentBoundary": {
+          "pluginCliOwnership": "generic CLI contribution workspace-plan execution, preview/apply safety, common staging/check/commit/rollback, and contribution-level doctor states",
+          "rfc0003Ownership": "command-store domain planning, provider selection, Prisma schema and models, migration creation/application/refusal, generated command-store bridge and transaction-client types, database-specific validation, and business-command transaction semantics",
+          "adapterLaw": "RFC 0003/#1490 may produce a domain plan through the shared CLI executor but neither side reimplements the other's owned semantics",
+          "forbiddenCliClaims": "C6 does not parse Prisma schemas, choose provider SQL/indexes, own migration lifecycle, or define command-store receipts/audit/outbox behavior",
+          "forbiddenRfc0003Claims": "RFC 0003/#1490 does not define a second generic CLI plugin mount or workspace staging/rollback engine",
+          "doctorBoundary": "C6 reports generic registry/plan/journal health; RFC 0003/#1490 reports command-store schema/migration/bridge health",
+          "previewInvariant": "the planner returns the same canonical plan in preview and apply; preview affects only host execution and mutation",
+          "formalReview": "fresh opposite-family Tier-A followed by one bounded final IMPL-EVAL over the amendment and prior conditional body correction"
+        }
       },
       "issueNumbers": [1502],
       "implementerAgentId": "019ffcc5-d3e1-7c13-9815-e9956ec43683",
@@ -1348,5 +1360,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T07:25:00.000Z"
+  "updatedAt": "2026-08-15T07:40:16.000Z"
 }

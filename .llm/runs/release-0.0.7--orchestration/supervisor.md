@@ -310,3 +310,15 @@ the other topics perform work that does not depend on that terminal result.
 | features | #1651 owner-blocked on explicit option 1/2/3 | No amendment, reply, readiness, relabel, or merge before owner verdict |
 
 Main is `e090f894f`. Per-topic queues remain independent; only the runtime mutex is global.
+
+### Live checkpoint — 2026-08-15T07:40:16Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Inventory complete; #1652 shipped as `e090f894f` | Preserve terminal supervisor checkpoint; no invented docs leaf |
+| internals | #1658 repaired plan `cea999d18` in Tier-A / authorized single PLAN-EVAL | No implementation before immutable-head `PASS`; no OpenHands dispatch |
+| fixes | #1657 same-author three-file redundant-CI cleanup active | Fresh Tier-A only after exact cleanup proofs; no formal cycle 3 or browser/Aspire/Docker/E2E |
+| features | Owner selected keep-and-narrow for #1651; focused C6 amendment authorized | Same Codex author, exact adapter boundary, six gates, fresh Tier-A, one final focused IMPL-EVAL; remain draft |
+
+Serialization remains per topic. The owner verdict releases only the features amendment hold; it does
+not grant readiness, issue mutation, comment resolution, or merge authority.

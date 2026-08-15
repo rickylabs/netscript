@@ -239,3 +239,11 @@ implementation thread.
   marker-bearing, command-token-free, and exactly once so status/refusal comments cannot recurse.
   Five one-second generation attempts match the automatic path; exhaustion becomes an attributable
   denial rather than a paid dispatch or an unreported throw.
+- **#1651 owner verdict / overlap disposition:** owner selected keep-and-narrow. The RFC is distinct;
+  only C6 overlaps RFC 0003/#1490. C6 retains generic CLI workspace-plan execution and common doctor
+  mechanics. RFC 0003/#1490 retains provider, Prisma schema/model/index, migration, bridge,
+  database-validation, receipt/audit/outbox, and transactional business-command semantics. The
+  adapter maps domain output to the common executor without reversing either ownership direction.
+  Preview must not influence plan construction. This substantive but bounded amendment invalidates
+  the pre-comment readiness claim and requires one fresh Tier-A plus one final focused IMPL-EVAL,
+  not a new PLAN-EVAL or an unbounded formal loop.

@@ -179,3 +179,17 @@ then run one fresh opposite-family PLAN-EVAL because the claim/spend and workflo
 is architectural. Fixes #1657 cycle-2 IMPL-EVAL remains active at `3d7819203`. Features #1651 stays
 frozen on owner choice 1/2/3. Main CI is running without a failure at this checkpoint; Aspire and
 Docker remain empty.
+
+Resume from the newer authoritative `2026-08-15T07:40:16Z` owner-verdict checkpoint. The owner chose
+option 1 for features #1651: keep the distinct plugin CLI RFC and narrow C6. Release the lane hold
+and resume only the preserved original Codex author. C6 owns the generic contribution workspace-plan
+executor, preview/apply safety, common stage/check/commit/rollback, and generic doctor states. RFC
+0003/#1490 exclusively owns command-store provider/Prisma/schema/migration/bridge/database and
+business-command semantics. The adapter maps the RFC-0003 domain plan into the shared executor; C6
+must not parse Prisma or own migrations, and RFC 0003 must not build a second generic CLI mount or
+workspace transaction engine. The planner must return the same canonical plan in preview and apply.
+Correct the PR-body receipt attribution and cache-hit note, rerun the six contracted gates at the
+amended content head, obtain fresh opposite-family Tier-A, and run one bounded final IMPL-EVAL; no
+new PLAN-EVAL or open loop. Keep the PR draft until coordinator readiness. Internals #1658 is at
+repaired plan `cea999d18` awaiting its authorized Opus 5/medium PLAN-EVAL. Fixes #1657 is removing
+only the three redundant T-3 CI deltas before fresh Tier-A. Docs remains terminal.
