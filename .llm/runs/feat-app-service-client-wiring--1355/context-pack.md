@@ -17,8 +17,9 @@ contract. Tier-A found that the add caller wrote appsettings/workspace/Aspire st
 the generator's atomic validation. S2-FIX hoists a shared validation-only pass ahead of
 `renderService`, so an unrelated missing manifest contract aborts `service add --with-client`
 before any write. Dry-run/force behavior, disabled-service generation, and direct `clientKey()`
-emission remain unchanged. Draft PR #1664 retains both closing keywords and remains draft. No
-expensive gate has run.
+emission remain unchanged. S2-FIX2 repairs the stale route-template test with an exhaustive SDK
+import-specifier allowlist plus direct-invalidation ordering coverage; the full CLI source suite is
+green. Draft PR #1664 retains both closing keywords and remains draft. No expensive gate has run.
 
 ## Completed
 
@@ -48,10 +49,12 @@ expensive gate has run.
 - Repaired S2-F1 by reusing validation-only client planning before the add path's first write; the
   add-specific missing-contract regression proves appsettings/workspace byte identity and absence
   of service, contract, and Aspire-helper output.
+- Repaired S2-F2 by removing the test's pre-C1 `bridgeInvalidation` expectation and asserting the
+  complete SDK import set equals only client/query, with the direct invalidation after queries.
 
 ## In Progress
 
-- S2-FIX is complete and stopped for a fresh S2 Tier-A review.
+- S2-FIX2 is complete and stopped for a fresh S2 Tier-A review.
 
 ## Next Steps
 
@@ -92,7 +95,7 @@ expensive gate has run.
 
 | Gate family | Current status                                                                                                                    | Evidence                     |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Static      | S2-FIX focused check (14 files), tests (32), and generated-asset freshness PASS. The earlier SDK root-entrypoint doc lint (`packages/sdk/mod.ts`) remains `BASELINE_FAIL` with two pre-existing diagnostics for that root run; S4 owns the full 12-entrypoint sweep. | `worklog.md` |
+| Static      | S2-FIX2 full CLI source suite PASS (598/598); prior S2-FIX focused check (14 files), tests (32), and asset freshness also PASS. The earlier SDK root-entrypoint doc lint (`packages/sdk/mod.ts`) remains `BASELINE_FAIL` with two pre-existing diagnostics for that root run; S4 owns the full 12-entrypoint sweep. | `worklog.md` |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
 | Runtime     | NOT_RUN / lease-blocked                                                                                                           | `plan.md` release conditions |
 | Consumer    | NOT_RUN / implementation-dependent                                                                                                | `plan.md` S5                 |

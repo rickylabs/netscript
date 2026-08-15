@@ -384,23 +384,28 @@ describe('app route template rendering', () => {
     const output = await adapter.render(appExampleServiceQueryTemplate, SAMPLE_APP_VARS);
     assertStringIncludes(output, "import { createServiceClient } from '@netscript/sdk/client';");
     assertStringIncludes(output, "import { createQueryFactories } from '@netscript/sdk/query';");
-    assertStringIncludes(
-      output,
-      "import { bridgeInvalidation } from '@netscript/sdk/query-client';",
-    );
+    assert(!output.includes('bridgeInvalidation'));
+    const sdkImportSpecifiers = [...new Set(
+      [...output.matchAll(/from '(@netscript\/sdk\/[^']+)'/g)].map((match) => match[1]),
+    )].sort();
+    assertEquals(sdkImportSpecifiers, [
+      '@netscript/sdk/client',
+      '@netscript/sdk/query',
+    ]);
     assertStringIncludes(output, 'TeamMembersContractV1,');
     assertStringIncludes(output, "export const teamMembersName = 'team-members';");
     assertStringIncludes(output, "export const teamMembersRouterName = 'teamMembers';");
     assertStringIncludes(
       output,
-      'export const teamMembersListInvalidation = bridgeInvalidation(',
-    );
-    assertStringIncludes(
-      output,
       'export const teamMembersClient = createServiceClient<typeof teamMembersContract>({',
     );
     assertStringIncludes(output, 'routerName: teamMembersRouterName,');
-    assertStringIncludes(output, 'export const teamMembersQueries = createQueryFactories({');
+    const queries = 'export const teamMembersQueries = createQueryFactories({';
+    const invalidation =
+      'export const teamMembersListInvalidation = { queryKey: teamMembersQueries.list.clientKey() } as const;';
+    assertStringIncludes(output, queries);
+    assertStringIncludes(output, invalidation);
+    assert(output.indexOf(invalidation) > output.indexOf(queries));
   });
 
   it('resource-local route contract owns typed path and search state', async () => {
