@@ -197,7 +197,10 @@ Deno.test('deno task runs the checker and forwards changed-file args only to the
     stderr: 'piped',
   }).output();
   const stdout = new TextDecoder().decode(output.stdout).trim();
-  const report = JSON.parse(stdout) as { ok: boolean; scannerTraversal: { observedByChecker: boolean } };
+  const report = JSON.parse(stdout) as {
+    ok: boolean;
+    scannerTraversal: { observedByChecker: boolean };
+  };
 
   assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
   assertEquals(report.ok, true);
