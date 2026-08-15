@@ -2877,3 +2877,54 @@ Ordered to the author: push the scope amendment first, then fix items 2 and 3, t
 code; then cheap unit tests and all four binding gates re-run at the new content head with fresh
 invocation IDs, with the S4-FIX1 receipts at `32ea23f50` preserved as superseded. Lease closed; no
 runtime execution; no readiness or metadata changes.
+
+## 2026-08-15 — repair-after-interception at `787cfa928` (NOT a pass)
+
+My pre-commit interception arrived **after** the author had already committed `787cfa928`. I
+re-inspected the landed head directly rather than assuming the message had taken effect, and both
+defects are present in the commit:
+
+| Defect | Location at `787cfa928` |
+| --- | --- |
+| Wrong resume for a response-stage pause | `service-client-browser-probe.ts:165` — `Fetch.continueRequest` |
+| Slept baseline, not proven quiet | `service-client-browser-probe.ts:146-147` — `await delay(750); const baseline = …` |
+
+The scope amendment `93fb5532d` ("isolate browser probe transport") **did** land and closed the
+authorization gap. That half of the interception worked; the two probe repairs did not, because the
+commit beat the message.
+
+### Why acceptance stopped immediately
+
+The author was mid-receipt-generation — `receipts/s4-f2-check.json` sat untracked at `787cfa928`.
+Receipts generated at that head would attest a content head containing an **unsound proof**, and
+that is strictly worse than having no receipts: it makes a defective probe look certified. A future
+reader — or the eventual IMPL-EVAL — would find four green binding receipts over a scenario that
+cannot execute correctly when leased.
+
+This is the same failure family the whole leaf has been catching, arriving at the evidence layer:
+a green artefact whose subject does not hold.
+
+### Repair steered on the same head — no reset, no rewrite
+
+`787cfa928` and `93fb5532d` are preserved in history deliberately. The record of what was built and
+when it was corrected is worth more than a tidy branch, and rewriting it would erase the evidence
+that the interception happened at all.
+
+Three repairs dispatched: `Fetch.continueResponse` for the response-stage resume (the pause design
+at `:125-127` and `:152-156` is already correct — only the resume call is wrong); an explicitly
+proven baseline requiring `listRequestIds.size > 0 && completedListIds.size === listRequestIds.size`
+held across a confirmation window; and a unit case that **rejects** a late-arriving initial request.
+
+That third repair is the one that matters structurally. A happy-path-only test is exactly why the
+defect survived into a commit, and the new case must fail if the baseline logic is ever reverted to
+a sleep. Otherwise the next author reintroduces it and nothing notices.
+
+### Evidence status
+
+Every receipt attesting `787cfa928`, including the in-flight `s4-f2-check.json`, is **superseded**
+and must never be presented as current final-head evidence. The earlier S4-FIX1 set at `32ea23f50`
+remains superseded as before. All four binding gates re-run at the corrected content head with fresh
+distinct invocation IDs.
+
+**Recorded as repair-after-interception, not `PASS`.** No lease acquired, no expensive gate run, no
+evaluator launched, no readiness or metadata change.
