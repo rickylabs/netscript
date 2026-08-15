@@ -2,13 +2,13 @@
 
 ## Run Metadata
 
-| Field          | Value                                                                |
-| -------------- | -------------------------------------------------------------------- |
-| Run ID         | `release-0.0.7-internals--orchestration/slices/package-gate-honesty` |
-| Branch         | `fix/package-gate-honesty`                                           |
-| Current phase  | twelve-path plan repaired; hard stop pending Tier-A/cycle 2 PASS     |
-| Archetype      | `6 — CLI / Tooling` (supporting MCP member A2)                       |
-| Scope overlays | `docs`                                                               |
+| Field          | Value                                                                 |
+| -------------- | --------------------------------------------------------------------- |
+| Run ID         | `release-0.0.7-internals--orchestration/slices/package-gate-honesty`  |
+| Branch         | `fix/package-gate-honesty`                                            |
+| Current phase  | cycle 2 `FAIL_PLAN`; thirteen-path repair pending Tier-A owner review |
+| Archetype      | `6 — CLI / Tooling` (supporting MCP member A2)                        |
+| Scope overlays | `docs`                                                                |
 
 ## Current state
 
@@ -17,7 +17,10 @@ cannot affect the optimized wrappers' explicit argv. The coordinator granted chi
 semantics plus nearest-config batching in both wrappers, then granted the exact formatting-only
 twelfth path exposed by the honest 114-file finding. Both exact no-extra-flag prototypes are now
 green at 114; all four healthy files remain selected, parsed meaning is equal, doctor is 4/4, and
-the malformed hash is unchanged. No checkout product/config implementation exists.
+the malformed hash is unchanged. Cycle 2 correctly returned `FAIL_PLAN` at evaluator commit
+`c415daad2`: the lint wrapper is embedded in published CLI source. The coordinator granted the exact
+generated barrel as path thirteen and ruled on root task selection, fixture-style wording, and
+nearest-config memoization. No checkout product/config/generated implementation exists.
 
 ## Completed
 
@@ -27,7 +30,7 @@ the malformed hash is unchanged. No checkout product/config implementation exist
 - All three issues re-read live.
 - Three cwd failures and MCP fmt config crash reproduced through structured wrappers.
 - `closeScoreGap` definition, consumption, and decorative test behavior traced.
-- Twelve-path repaired plan and per-member JSR audit plan locked; no thirteenth path.
+- Thirteen-path repaired plan and per-member JSR audit plan locked; no fourteenth path.
 - Exact no-extra-flag lint prototype green at 114; fmt reports exactly one genuine healthy-fixture
   finding at 114; separate fmt/lint negative controls red with real findings; doctor 4/4; all
   negative-control source files restored byte-exactly.
@@ -35,24 +38,29 @@ the malformed hash is unchanged. No checkout product/config implementation exist
   doctor remain green; original/formatted exports are equal.
 - All four healthy TS files were individually named selected by genuine or controlled fmt findings,
   and every controlled probe was restored byte-exactly.
+- Cycle-2 archive proof established that canonical lint-wrapper regeneration changes only
+  `agent-tools.generated.ts` among generated assets, including its embedded tool text and bundle
+  hash; `check:assets-barrel` is now planned.
 
 ## In progress
 
-- Awaiting fresh Tier-A review and separate-session PLAN-EVAL cycle 2.
+- Awaiting Tier-A/owner review after the second and final ordinary `FAIL_PLAN` cycle.
 
 ## Next steps
 
-1. Topic supervisor reviews the reachable twelve-path plan and launches PLAN-EVAL cycle 2 in a fresh
-   separate evaluator session.
-2. If and only if Tier-A and PLAN-EVAL cycle 2 both return `PASS`, coordinator grants implementation
-   authority.
-3. Future implementation follows S1-S4; `scaffold.runtime` remains waived `n/a` and must not run.
+1. Topic supervisor reviews the repaired thirteen-path plan under owner escalation.
+2. No cycle 3 is requested or assumed; implementation authority exists only after the supervisor
+   explicitly disposes the exhausted plan gate.
+3. If authorized later, implementation follows S1-S4; `scaffold.runtime` remains waived `n/a` and
+   must not run.
 
 ## Key decisions
 
 | Decision                                     | Source         | Notes                                                          |
 | -------------------------------------------- | -------------- | -------------------------------------------------------------- |
 | Child marker + config batching owns boundary | plan L3/L4     | Both green at 114 after granted formatting-only normalization. |
+| Published lint asset regenerated canonically | plan L7/S1     | Embedded tool text/hash change; no export/API-shape change.    |
+| Root task parent skip removed                | plan S1/gates  | Top-level raw-walk exclusion retained for fixture-local style. |
 | Module-derived CLI paths                     | plan L1/L2     | No ambient cwd and no weakened assertion.                      |
 | `0.5` pinned both directions                 | plan L5/L6     | Inside/outside identity conflict makes movement observable.    |
 | Formal PLAN-EVAL required                    | plan judgement | This thread cannot self-launch or self-certify.                |
@@ -71,29 +79,31 @@ the malformed hash is unchanged. No checkout product/config implementation exist
 10. `.llm/tools/run-deno-lint_test.ts`
 11. `packages/mcp/tests/fixtures/doctor/broken/.deno-fmt-lint-ignore`
 12. `packages/mcp/tests/fixtures/doctor/healthy/netscript.config.ts`
+13. `packages/cli/src/kernel/assets/agent-tools.generated.ts` (canonical regeneration only)
 
 Everything else in the frozen outer bound is read-only, especially both docs sources and the broken
-fixture config. A thirteenth path is rescope.
+fixture config. A fourteenth path is rescope.
 
 ## Gates
 
-| Gate family | Current status                       | Evidence                                       |
-| ----------- | ------------------------------------ | ---------------------------------------------- |
-| Plan-Gate   | cycle 1 `FAIL_PLAN`; cycle 2 pending | `plan-eval.md`; repaired `plan.md`.            |
-| Static      | NOT_RUN                              | No implementation.                             |
-| Fitness/JSR | planned                              | `research.md` and `plan.md` per-member tables. |
-| Runtime     | N/A                                  | Explicit coordinator waiver; must not run.     |
-| Consumer    | baseline failures reproduced         | `worklog.md` research diagnostics.             |
+| Gate family | Current status                        | Evidence                                       |
+| ----------- | ------------------------------------- | ---------------------------------------------- |
+| Plan-Gate   | cycle 2 `FAIL_PLAN`; owner escalation | `plan-eval.md`; repaired `plan.md`.            |
+| Static      | NOT_RUN                               | No implementation.                             |
+| Fitness/JSR | planned                               | `research.md` and `plan.md` per-member tables. |
+| Runtime     | N/A                                   | Explicit coordinator waiver; must not run.     |
+| Consumer    | baseline failures reproduced          | `worklog.md` research diagnostics.             |
 
 ## Open questions
 
-- None that change implementation shape; implementation authority still depends on fresh Tier-A and
-  cycle-2 `PASS`.
+- None that change implementation shape; implementation authority still depends on explicit
+  Tier-A/owner disposition. No cycle 3 is requested or assumed.
 
 ## Drift and debt
 
 - Drift: R8 falsified by execution; rejected parent-family false exclusion; corrected 114-file
-  proof; authorized formatting-only twelfth path.
+  proof; authorized formatting-only twelfth path; cycle-2 published-asset discovery; authorized
+  generated thirteenth path; corrected root-vs-fixture formatting semantics.
 - Debt: no new/closed entry; named CLI/MCP baseline debt remains unchanged.
 
 ## Commits

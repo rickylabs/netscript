@@ -14,14 +14,18 @@
 ### Public surface
 
 - No package export, subpath, symbol, binary, or command name changes.
-- `@netscript/cli` changes remain under publish-excluded `e2e/`.
+- `@netscript/cli` has an intentional published-byte delta: canonical regeneration embeds the
+  changed consumer `run-deno-lint.ts` and updates `EMBEDDED_AGENT_TOOL_BUNDLE_HASH`; an upgrading
+  consumer receives marker-aware, nearest-config-batched lint selection.
 - `@netscript/mcp` keeps `GUIDANCE_RANKING_POLICY` internal to its source graph; only the rationale
   comment and test change.
-- Root Deno configuration may carry the doctor-family exclusion only as non-load-bearing protection
-  for native directory walks.
+- Root Deno configuration carries the top-level doctor-family exclusion to stop raw root formatter
+  walks from reverting fixture-local-default formatting, but removes the `fmt:check` task's
+  wrapper-level family exclusion. The top-level entry does not satisfy standalone wrapper
+  acceptance.
 - The optimized fmt/lint wrappers gain two shared conventions: a marker excludes only its own
   subtree, and selected files are grouped by effective nearest Deno config before explicit argv is
-  built.
+  built. Nearest-config lookup is memoized per normalized directory before root-scale use.
 
 ### Domain vocabulary
 
@@ -47,19 +51,20 @@
 
 ### Commit slices
 
-| #  | Slice                                                                                                  | Gate                                                                                                               | Exact files                                       |
-| -- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
-| S1 | Make optimized MCP fmt/lint selection marker- and config-aware while retaining every unmarked sibling. | Both exact wrappers green at 114 + marked/unmarked/config-batch tests + negative controls + doctor/semantic proof. | Seven exact S1 paths in `plan.md`                 |
-| S2 | Make all three CLI tests package-cwd independent without weakening assertions.                         | Structured targeted 6/6 + exact package task + docs gates; final runtime consumer in S4.                           | Three exact CLI files in `plan.md`                |
-| S3 | Pin close-score policy on both sides and record rationale.                                             | Targeted test + widen/narrow RED controls + scoped MCP/quality gates.                                              | `guidance-index.ts`; `guidance-retrieval_test.ts` |
-| S4 | Integrated evidence for the applicable frozen gate set.                                                | Static/test/docs/publish/JSR gates; `scaffold.runtime` recorded coordinator-waived `n/a`.                          | Run artifacts/evidence only                       |
+| #  | Slice                                                                                                                                                    | Gate                                                                                                                                       | Exact files                                       |
+| -- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
+| S1 | Make optimized MCP fmt/lint selection marker- and config-aware while retaining every unmarked sibling; regenerate the published CLI consumer tool asset. | Both exact wrappers green at 114 + marked/unmarked/config-batch tests + negative controls + doctor/semantic proof + `check:assets-barrel`. | Eight exact S1 paths in `plan.md`                 |
+| S2 | Make all three CLI tests package-cwd independent without weakening assertions.                                                                           | Structured targeted 6/6 + exact package task + docs gates; final runtime consumer in S4.                                                   | Three exact CLI files in `plan.md`                |
+| S3 | Pin close-score policy on both sides and record rationale.                                                                                               | Targeted test + widen/narrow RED controls + scoped MCP/quality gates.                                                                      | `guidance-index.ts`; `guidance-retrieval_test.ts` |
+| S4 | Integrated evidence for the applicable frozen gate set.                                                                                                  | Static/test/docs/publish/JSR/generated-asset freshness gates; `scaffold.runtime` recorded coordinator-waived `n/a`.                        | Run artifacts/evidence only                       |
 
 ### Deferred scope
 
-- Any thirteenth product/config path, other wrapper/CI change, docs edit, malformed-fixture repair,
+- Any fourteenth product/config path, other wrapper/CI change, docs edit, malformed-fixture repair,
   public API change, dependency update, or algorithm change.
 - `scaffold.runtime`, Aspire, Docker, and `e2e:cli`; the gate is waived `n/a`, not pending.
-- All implementation until separate-session PLAN-EVAL `PASS`.
+- All implementation until Tier-A/owner escalation disposes the cycle-2 `FAIL_PLAN`; no cycle 3 is
+  requested or assumed.
 
 ### Contributor path
 
@@ -70,28 +75,31 @@ score order. Then prove both green behavior and a controlled red mutation throug
 
 ## Progress log
 
-| Time       | Slice     | Step                       | Notes                                                                                                                                                                    |
-| ---------- | --------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 2026-08-15 | bootstrap | activated                  | Exact worktree/branch/base verified; coordinator thread record preserved; commit `25c29575c`; draft PR #1663 opened.                                                     |
-| 2026-08-15 | research  | live issue/source read     | All three issues fetched live; exact three-test reproduction returned 3 pass / 3 fail from package cwd.                                                                  |
-| 2026-08-15 | research  | fmt controls               | Baseline exact command: 115 selected, config crash; wrapper exclude: 110 selected/green; explicit root config: 115 selected/green.                                       |
-| 2026-08-15 | plan      | Design checkpoint          | Six-file authoritative surface locked; formal PLAN-EVAL selected; implementation remains prohibited.                                                                     |
-| 2026-08-15 | plan-eval | cycle 1                    | `FAIL_PLAN` at evaluator commit `be2b18728`: root `exclude` cannot affect explicit wrapper argv; no product/config implementation occurred.                              |
-| 2026-08-15 | plan      | coordinator rescope        | Authority expanded to eleven exact paths: fmt/lint wrappers + tests and one marker; `scaffold.runtime` waived `n/a`.                                                     |
-| 2026-08-15 | plan      | rejected proof draft       | Parent-family marker made both wrappers green at 110 by excluding four unmarked healthy files; coordinator rejected it before push as a silent false-positive exclusion. |
-| 2026-08-15 | plan      | corrected mechanism proof  | Child-only marker + nearest-config batching selects 114: lint green, fmt one honest healthy-fixture finding, doctor 4/4, negative controls red, restorations byte-exact. |
-| 2026-08-15 | plan      | twelfth-path scratch proof | Formatting only `healthy/netscript.config.ts` makes exact fmt green at 114; lint and doctor remain green. Checkout path untouched pending grant.                         |
-| 2026-08-15 | plan      | twelfth-path grant         | Coordinator authorized that exact formatting-only path, bringing planned implementation to twelve paths; no semantic/config-value change and no thirteenth path.         |
-| 2026-08-15 | plan      | final 114-file proof       | Both exact no-extra-flag wrappers green; all four healthy TS files individually named selected; doctor/parsed meaning/hash/negative-control requirements proved.         |
+| Time       | Slice     | Step                       | Notes                                                                                                                                                                                                                                                              |
+| ---------- | --------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-08-15 | bootstrap | activated                  | Exact worktree/branch/base verified; coordinator thread record preserved; commit `25c29575c`; draft PR #1663 opened.                                                                                                                                               |
+| 2026-08-15 | research  | live issue/source read     | All three issues fetched live; exact three-test reproduction returned 3 pass / 3 fail from package cwd.                                                                                                                                                            |
+| 2026-08-15 | research  | fmt controls               | Baseline exact command: 115 selected, config crash; wrapper exclude: 110 selected/green; explicit root config: 115 selected/green.                                                                                                                                 |
+| 2026-08-15 | plan      | Design checkpoint          | Six-file authoritative surface locked; formal PLAN-EVAL selected; implementation remains prohibited.                                                                                                                                                               |
+| 2026-08-15 | plan-eval | cycle 1                    | `FAIL_PLAN` at evaluator commit `be2b18728`: root `exclude` cannot affect explicit wrapper argv; no product/config implementation occurred.                                                                                                                        |
+| 2026-08-15 | plan      | coordinator rescope        | Authority expanded to eleven exact paths: fmt/lint wrappers + tests and one marker; `scaffold.runtime` waived `n/a`.                                                                                                                                               |
+| 2026-08-15 | plan      | rejected proof draft       | Parent-family marker made both wrappers green at 110 by excluding four unmarked healthy files; coordinator rejected it before push as a silent false-positive exclusion.                                                                                           |
+| 2026-08-15 | plan      | corrected mechanism proof  | Child-only marker + nearest-config batching selects 114: lint green, fmt one honest healthy-fixture finding, doctor 4/4, negative controls red, restorations byte-exact.                                                                                           |
+| 2026-08-15 | plan      | twelfth-path scratch proof | Formatting only `healthy/netscript.config.ts` makes exact fmt green at 114; lint and doctor remain green. Checkout path untouched pending grant.                                                                                                                   |
+| 2026-08-15 | plan      | twelfth-path grant         | Coordinator authorized that exact formatting-only path, bringing the then-current bound to twelve; no semantic/config-value change. Cycle-2 F1 later superseded that bound.                                                                                        |
+| 2026-08-15 | plan      | final 114-file proof       | Both exact no-extra-flag wrappers green; all four healthy TS files individually named selected; doctor/parsed meaning/hash/negative-control requirements proved.                                                                                                   |
+| 2026-08-15 | plan-eval | cycle 2                    | `FAIL_PLAN` at evaluator commit `c415daad2`: planned lint-wrapper bytes also ship in the published CLI asset barrel; ordinary two-cycle allowance exhausted.                                                                                                       |
+| 2026-08-15 | plan      | thirteenth-path grant      | Coordinator granted canonical regeneration of exactly `agent-tools.generated.ts`, required generated-asset freshness, removal of the root task-level parent skip, corrected fixture-style wording, and nearest-config memoization. No implementation file changed. |
 
 ## Decisions
 
-| Decision                                    | Reason                                                                                                                               | Source                               |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ |
-| Child-only marker + nearest-config batching | Only the marked broken subtree may leave selection; grouping prevents config poisoning while keeping all four healthy files visible. | plan L3/L4; corrected pre-plan proof |
-| Module-derived paths                        | Package cwd is the defect; module location is stable.                                                                                | plan L1/L2                           |
-| Bidirectional score controls                | Current identity ordering masks both threshold directions.                                                                           | research R10-R12; plan L5/L6         |
-| Formal PLAN-EVAL                            | Multi-member/config/docs/JSR/runtime interactions are decision-heavy.                                                                | run-loop §4; plan judgement          |
+| Decision                                             | Reason                                                                                                                                                                                                   | Source                                   |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| Child-only marker + memoized nearest-config batching | Only the marked broken subtree may leave selection; grouping prevents config poisoning while keeping all four healthy files visible, and directory memoization makes the same rule viable at root scale. | plan L3/L4/L11; corrected pre-plan proof |
+| Canonically regenerated published lint asset         | `run-deno-lint.ts` is embedded in published CLI source; freshness and consumer behavior must be explicit.                                                                                                | cycle-2 F1; plan L7                      |
+| Module-derived paths                                 | Package cwd is the defect; module location is stable.                                                                                                                                                    | plan L1/L2                               |
+| Bidirectional score controls                         | Current identity ordering masks both threshold directions.                                                                                                                                               | research R10-R12; plan L5/L6             |
+| Formal PLAN-EVAL                                     | Multi-member/config/docs/JSR/runtime interactions are decision-heavy.                                                                                                                                    | run-loop §4; plan judgement              |
 
 ## Drift
 
@@ -105,6 +113,8 @@ score order. Then prove both green behavior and a controlled red mutation throug
 | Parent-family 110-file draft silently removed four unmarked healthy files and was rejected before push.             | significant plan correction    | yes                |
 | One genuine healthy-fixture fmt finding exposed a twelfth-path repair; proof led to an exact formatting-only grant. | significant resolved rescope   | yes                |
 | Coordinator granted the exact formatting-only twelfth path after the honest 114-file finding.                       | significant authorized rescope | yes                |
+| Cycle 2 exposed the published lint-wrapper asset and generated freshness gate omitted by the twelve-path plan.      | significant plan correction    | yes                |
+| Coordinator granted the generated barrel as exact path thirteen and ruled on root task exclusion/style wording.     | significant authorized rescope | yes                |
 
 ## Gate results
 
@@ -158,10 +168,13 @@ independently create a marked subtree and an equivalent unmarked sibling; count/
 require child-only skip, unmarked-sibling selection, and separate nearest-config batches in both
 tools.
 
-The original fmt finding is not a config-style conflict. `healthy/deno.json` contains a valid
-workspace and no fmt options. Three healthy TS files already pass; `healthy/netscript.config.ts` is
-simply unformatted. The coordinator granted this exact formatting-only twelfth path after the
-scratch proof. The planned change is exactly:
+The original bytes are correctly formatted under root options (`singleQuote: true`, width 100), but
+the wrapper correctly applies `healthy/deno.json` as the nearest authoritative config. Because that
+fixture config has no `fmt` options, Deno defaults (double quotes, width 80) apply and the same
+bytes are fixture-local-default-style-invalid. Three healthy TS files already pass those defaults.
+The coordinator granted this exact formatting-only twelfth path after the scratch proof. The
+top-level root exclusion is retained so raw root formatter walks cannot flip the normalized file
+back to root style. The planned change is exactly:
 
 ```diff
 -const config: { readonly plugins: readonly string[] } = { plugins: ['workers'] };
@@ -171,8 +184,23 @@ scratch proof. The planned change is exactly:
  export default config;
 ```
 
-The checkout path remains untouched in this plan-only pass. The grant expands implementation
-authority after Tier-A and PLAN-EVAL cycle 2 `PASS`; it does not authorize pre-gate tree mutation.
+The checkout path remains untouched in this plan-only pass. The grant expands planned surface only;
+it does not authorize pre-gate tree mutation.
+
+### Executed generated-asset consequence (cycle-2 archive copy, not checkout)
+
+The separate evaluator ran the canonical generator in a full `git archive HEAD` copy. The control
+barrel matched HEAD byte-for-byte. Replacing only the scratch copy of the planned `run-deno-lint.ts`
+prototype and running `deno task gen:assets-barrel` exited 0 and changed only
+`packages/cli/src/kernel/assets/agent-tools.generated.ts` among generated assets:
+
+- embedded `run-deno-lint.ts` text gained marker and nearest-config batching semantics;
+- `EMBEDDED_AGENT_TOOL_BUNDLE_HASH` changed;
+- `embedded.generated.ts` and `skills.generated.ts` stayed unchanged;
+- CI's independent freshness verdict is `deno task check:assets-barrel`.
+
+This proof is recorded at `plan-eval.md` §7. The checkout generated file remains untouched. Future
+implementation must regenerate it canonically and never hand-edit it.
 
 ### Static gates
 
@@ -182,10 +210,10 @@ authority after Tier-A and PLAN-EVAL cycle 2 `PASS`; it does not authorize pre-g
 
 ### Fitness gates
 
-| Gate             | Result                | Evidence                                       | Notes                                                                                |
-| ---------------- | --------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Plan-Gate        | cycle 1 `FAIL_PLAN`   | `plan-eval.md` at evaluator commit `be2b18728` | Plan repaired for required separate-session cycle 2; implementation remains blocked. |
-| JSR surface scan | PASS (planning input) | `research.md` JSR section                      | No public delta; both members still receive full planned audits.                     |
+| Gate             | Result                | Evidence                                       | Notes                                                                                                                                     |
+| ---------------- | --------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Plan-Gate        | cycle 2 `FAIL_PLAN`   | `plan-eval.md` at evaluator commit `c415daad2` | Ordinary two-cycle allowance exhausted; plan repaired for Tier-A/owner escalation, with no cycle 3 requested.                             |
+| JSR surface scan | PASS (planning input) | `research.md` JSR section                      | No export/API shape delta, but the published CLI embedded tool text/hash delta is now explicit; both members receive full planned audits. |
 
 ### Runtime gates
 
@@ -201,9 +229,9 @@ authority after Tier-A and PLAN-EVAL cycle 2 `PASS`; it does not authorize pre-g
 
 ## Handoff notes
 
-- Tier-A should review the now-reachable twelve-path plan. PLAN-EVAL cycle 2 should inspect L3's
-  child-only marker plus nearest-config batching, the four-file unmarked-sibling evidence, the
-  formatting-only semantic equality proof, the two-direction score controls, and the honest
-  treatment of existing CLI JSR debt.
-- No implementation authority exists before fresh Tier-A and cycle-2 `PASS`. The topic supervisor
-  owns that review/evaluator launch; `scaffold.runtime` is waived and must not run.
+- Tier-A should review the repaired thirteen-path plan: child-only marker plus memoized
+  nearest-config batching, all four healthy files retained, fixture-local-default normalization,
+  task-level parent exclusion removed, and canonical published-asset regeneration/freshness.
+- No implementation authority exists until Tier-A/owner escalation disposes the exhausted cycle-2
+  `FAIL_PLAN`. This thread does not request or assume cycle 3; `scaffold.runtime` is waived and must
+  not run.
