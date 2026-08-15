@@ -677,3 +677,10 @@ Follow-on `2026-08-15T19:05Z`: #1666 repair evidence `010da98a2` is now local ==
 comment `5303770640`; fresh internals Tier-A is active. #1664 F6 plan Tier-A passed at features topic
 `f436df086`, releasing the same author for exactly two paths and four new binding receipts before a
 second Tier-A. No runtime lease exists.
+
+Newer transition `2026-08-15T19:08:30Z`: #1666 repair Tier-A passed at `0646f429f` and final
+cycle-2 Fable 5/medium Remote Control IMPL-EVAL job `7a3b4645` is active at
+`session_01MDMbe68iYvjHBLuUGKZqBS` over `423867017`/`010da98a2`. #1669 final S2 Tier-A passed at
+`a374977d8`; its Fable 5/medium Remote Control IMPL-EVAL job `f40814ce` is active at
+`session_01CMrdm9P2YwHxiNCT49C4Hf` over `eba0b0924`/`9aa54ae2d`. #1664's two-path repair continues
+in parallel under its topic-local serial queue; the runtime mutex is free.

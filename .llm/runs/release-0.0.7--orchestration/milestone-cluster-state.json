@@ -73,7 +73,7 @@
         "pid": 23955,
         "bridgeSessionId": "session_01HqFtKQtyJcHBEn1MghQdFX",
         "remoteControlUrl": "https://claude.ai/code/session_01HqFtKQtyJcHBEn1MghQdFX",
-        "topicHeadSha": "fb6233442430b021fce73204495f4613f149140f",
+        "topicHeadSha": "0646f429fbea199f4b80075d62a79b3cb646283c",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle"
@@ -115,7 +115,7 @@
         "pid": 26724,
         "bridgeSessionId": "session_014pCd2QWkCscgZpVdjcUPST",
         "remoteControlUrl": "https://claude.ai/code/session_014pCd2QWkCscgZpVdjcUPST",
-        "topicHeadSha": "684c37d6319e2ff994dd0be8d5732736d2248a7d",
+        "topicHeadSha": "a374977d8a4ad7af68919afa508ec1107d7f4221",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle"
@@ -998,7 +998,7 @@
       "branch": "fix/reference-export-drift-gate",
       "worktree": "/home/codex/repos/netscript-007-reference-export",
       "prNumber": 1666,
-      "implementationState": "impl_eval_cycle1_fail_fix_repair_pushed_fresh_tier_a_active",
+      "implementationState": "impl_eval_cycle2_active_after_repair_tier_a_pass",
       "planHeadSha": "9d0b4bf128ba52fcd52091ba50590661d09470c1",
       "scopeAmendmentHeadSha": "a3f6b87b599e778db950daf6ccaecd847c088d19",
       "tierAPlanState": "PASS_SA2",
@@ -1081,6 +1081,15 @@
       "implementationRepairEvidenceState": "pushed_with_structured_comment_fresh_tier_a_active",
       "implementationRepairCommentUrl": "https://github.com/rickylabs/netscript/pull/1666#issuecomment-5303770640",
       "implementationRepairReceipts": "seven replacement gate receipts bind gitHead == actualGitHead == 423867017 and exit 0; the initial root-test receipt remains append-only exit 1 because a temporary mutation archive contained forbidden command strings, and test-attempt2 is the clean-tree PASS replacement",
+      "implementationRepairTierAState": "PASS",
+      "implementationRepairTierATopicCheckpointSha": "0646f429fbea199f4b80075d62a79b3cb646283c",
+      "implementationEvaluationCycle2State": "active",
+      "implementationEvaluationCycle2SourceHeadSha": "4238670173271bca4281eba7db6c2030d046bc73",
+      "implementationEvaluationCycle2EvidenceHeadSha": "010da98a230503bb27b46eb0edc5e979929f7fb1",
+      "implementationEvaluationCycle2AgentId": "7a3b4645-5548-42e6-84fa-35c1f90158dd",
+      "implementationEvaluationCycle2BackgroundAgentId": "7a3b4645",
+      "implementationEvaluationCycle2RemoteControlUrl": "https://claude.ai/code/session_01MDMbe68iYvjHBLuUGKZqBS",
+      "implementationEvaluationCycle2Route": "native claude-fable-5 / medium / Remote Control",
       "expensiveGateContract": "no runtime lease; scaffold.runtime and fresh-browser are matrix n/a for this checker/docs/JSDoc/task/workflow-only leaf",
       "receiptRefs": []
     },
@@ -1394,7 +1403,7 @@
       "branch": "fix/sdk-cached-entry-swr",
       "worktree": "/home/codex/repos/netscript-007-leaf-cached-entry",
       "prNumber": 1669,
-      "implementationState": "s2_complete_pushed_awaiting_fresh_tier_a",
+      "implementationState": "impl_eval_cycle1_active_after_s2_tier_a_pass",
       "planHeadSha": "23db20f301d06ed1e4a9a65cbbf64349f89cb8c0",
       "dispatchTopicHeadSha": "f9bb928cedeaf91174db4e70f877143028481232",
       "planGate": "research and contract decisions only; resolve the stale docs paths, choose the supported API boundary, open one draft PR, and stop before implementation; PLAN-EVAL is required",
@@ -1447,6 +1456,15 @@
         }
       },
       "acceptanceFocus": "prove stale-while-revalidate with exactly one refresh for concurrent stale readers while carrying the four-link generated-doc asset cascade and known #1667/#1668 reds",
+      "implementationTierAState": "PASS",
+      "implementationTierATopicCheckpointSha": "a374977d8a4ad7af68919afa508ec1107d7f4221",
+      "implementationEvaluationState": "active_cycle_1",
+      "implementationEvaluationSourceHeadSha": "eba0b092416831f5fada679a1c21247d065ca521",
+      "implementationEvaluationEvidenceHeadSha": "9aa54ae2d4f53c705b0309ed472abf7bbccebe41",
+      "implementationEvaluatorAgentId": "f40814ce-5b41-49ae-8cf2-e65014de01de",
+      "implementationEvaluatorBackgroundAgentId": "f40814ce",
+      "implementationEvaluatorRemoteControlUrl": "https://claude.ai/code/session_01CMrdm9P2YwHxiNCT49C4Hf",
+      "implementationEvaluatorRoute": "native claude-fable-5 / medium / Remote Control",
       "expensiveGateContract": "no runtime lease during research or planning",
       "receiptRefs": []
     },
@@ -2591,6 +2609,52 @@
       "evaluatorCommitSha": "4c09e9203afee52b43c10dfa1246eb0473ad7e40",
       "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1666#issuecomment-5303665087",
       "blockingFinding": "three refusal tests pass for an unrelated NotFound or masked OMITS cause; repair is test-only on an already-authorized path and all other re-derived judgments hold"
+    },
+    {
+      "id": "reference-export-drift-gate-impl-eval-cycle-2",
+      "state": "active",
+      "lane": "internals",
+      "leafId": "reference-export-drift-gate",
+      "phase": "impl-eval",
+      "cycle": 2,
+      "sourceHead": "4238670173271bca4281eba7db6c2030d046bc73",
+      "evidenceHead": "010da98a230503bb27b46eb0edc5e979929f7fb1",
+      "evaluatorAgentId": "7a3b4645-5548-42e6-84fa-35c1f90158dd",
+      "backgroundAgentId": "7a3b4645",
+      "bridgeSessionId": "session_01MDMbe68iYvjHBLuUGKZqBS",
+      "remoteControlUrl": "https://claude.ai/code/session_01MDMbe68iYvjHBLuUGKZqBS",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-fable-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-15T19:06:43.295Z",
+      "evaluationFocus": "cycle-1 refusal-test finding discharge, four independent mutation reds, replacement receipt integrity including preserved scratch-contaminated red, and complete re-derivation of issue 1296 acceptance, scope, lock, baseline reds, CI discoverability, and NOT_RUN waiver"
+    },
+    {
+      "id": "sdk-cached-entry-swr-impl-eval-cycle-1",
+      "state": "active",
+      "lane": "fixes",
+      "leafId": "sdk-cached-entry-swr",
+      "phase": "impl-eval",
+      "cycle": 1,
+      "sourceHead": "eba0b092416831f5fada679a1c21247d065ca521",
+      "evidenceHead": "9aa54ae2d4f53c705b0309ed472abf7bbccebe41",
+      "evaluatorAgentId": "f40814ce-5b41-49ae-8cf2-e65014de01de",
+      "backgroundAgentId": "f40814ce",
+      "bridgeSessionId": "session_01CMrdm9P2YwHxiNCT49C4Hf",
+      "remoteControlUrl": "https://claude.ai/code/session_01CMrdm9P2YwHxiNCT49C4Hf",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-fable-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-15T19:07:12.951Z",
+      "evaluationFocus": "S1 persistence-complete policy-aware single-flight, S2 stale-only fresh preference, deterministic overlap proofs, exact two-page published wording and A1/A4 manual evidence, four-mirror generated closure, honest baseline reds, receipt sufficiency, and no-new-public-API boundary"
     }
   ],
   "expensiveGates": [
@@ -2777,5 +2841,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T19:05:31.000Z"
+  "updatedAt": "2026-08-15T19:08:30.000Z"
 }

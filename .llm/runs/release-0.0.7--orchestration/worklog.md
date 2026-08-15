@@ -1187,3 +1187,17 @@
   comment is `5303770640`, so internals is performing fresh Tier-A without waiting on the old author
   process heuristic. #1664 F6 plan received fresh features Tier-A `PASS` at topic `f436df086`; the
   same original author is active on exactly the two reviewed paths, with no runtime action allowed.
+
+## 2026-08-15T19:08:30Z — two final implementation evaluators are attached
+
+- #1666 repair passed fresh internals Tier-A at `0646f429f`. Native Fable 5/medium Remote Control
+  cycle 2 is active as job `7a3b4645-5548-42e6-84fa-35c1f90158dd`, attached at
+  `https://claude.ai/code/session_01MDMbe68iYvjHBLuUGKZqBS`, and bound to repaired content
+  `423867017` plus evidence `010da98a2`. It is the final ordinary IMPL-EVAL cycle.
+- #1669 S2 passed fresh fixes Tier-A at `a374977d8`; root tests independently reproduced
+  4206/0/19 without the #1667 flake. Native Fable 5/medium Remote Control IMPL-EVAL cycle 1 is active
+  as job `f40814ce-5b41-49ae-8cf2-e65014de01de`, attached at
+  `https://claude.ai/code/session_01CMrdm9P2YwHxiNCT49C4Hf`, and bound to content `eba0b0924` plus
+  evidence `9aa54ae2d`.
+- Both evaluator leases are artifact-only. They may not mutate product, run runtime gates, merge,
+  flip ready, relabel, close issues, or touch central state. #1664 continues independently.

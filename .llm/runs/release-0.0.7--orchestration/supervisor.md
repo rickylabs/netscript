@@ -806,3 +806,11 @@ fresh internals Tier-A is active. #1664 F6 plan Tier-A passed at topic `f436df08
 Sol/high author is now implementing exactly the two reviewed paths and must stop after focused tests,
 four exact-content-head binding receipts, explicit push/comment, and a second fresh Tier-A. No
 runtime lease is active or requested.
+
+At 19:08Z, #1666 repair Tier-A is `PASS` at internals topic `0646f429f`; final ordinary cycle-2
+IMPL-EVAL is active as native Fable 5/medium Remote Control job `7a3b4645`, URL
+`session_01MDMbe68iYvjHBLuUGKZqBS`, over content `423867017` plus evidence `010da98a2`. #1669 final
+S2 Tier-A is `PASS` at fixes topic `a374977d8`; cycle-1 IMPL-EVAL is active on native Fable 5/medium
+Remote Control job `f40814ce`, URL `session_01CMrdm9P2YwHxiNCT49C4Hf`, over content `eba0b0924`
+plus evidence `9aa54ae2d`. #1664's same-author two-path repair remains independently active. Topic
+serialization is local to each supervisor; the runtime mutex remains free.
