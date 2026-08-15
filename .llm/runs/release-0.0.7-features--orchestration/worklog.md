@@ -2642,3 +2642,47 @@ All four binding gates must then be re-run at the new immutable head with fresh 
 two existing receipts attest `35061bc80`, which will no longer be the content head, and superseded
 receipts must never be presented as current. Carried baselines stay exactly as recorded — Fresh 45
 and SDK 3 remain `PRE_EXISTING_FAIL` with attribution, plugin-streams still named separately.
+
+## 2026-08-15 — S4 Tier-A: `PASS` at `1c1f458203cc458ff2c1fd20149c907998654f22`
+
+Fresh review on the immutable head. Every item executed independently.
+
+| # | Item | Result |
+| --- | --- | --- |
+| 1 | Head equality | local == remote == PR #1664 == `1c1f458203cc458ff2c1fd20149c907998654f22`; tree clean; **draft**; `OPEN` |
+| 2 | Labels | exactly **one** `status:` — `status:impl`; plus `area:cli/fresh/sdk`, `wave:v1`, `type:feat`, `gate:e2e`, `gate:jsr`, `priority:p1` |
+| 3 | **Repair scope and authorization** | commit `32ea23f50` is **one file, one insertion**: `+ GATE.GENERATED_DENO_LINT,` in `suite-registry_test.ts`. Exactly the repair my checkpoint `33158e0b9` authorized — the **test**, not the suite; `capability-suites.ts` untouched; assertion **not** weakened to a set or length comparison |
+| 4 | Order-sensitivity | the gate is appended after `GENERATED_SERVICE_CHECK`, and the order-sensitive `assertEquals` now **passes** — which proves the ordering more strongly than reading the suite source would |
+| 5 | Repair actually works | I re-ran `deno test ./e2e/tests/presentation/suite-registry_test.ts` myself: **19 passed, 0 failed** (was 18/1) |
+| 6 | **Four receipts** | all four present, `run-gate`-generated, fresh `-s4-fix1-` invocation IDs |
+| 7 | Attested content head | every receipt records `gitHead == actualGitHead == 32ea23f501900ca4d7de603e00709e09f41be3dc`, **no** `allowGitHeadMismatch` |
+| 8 | **Sufficiency, recomputed by hand** | four distinct `gateId`s — `arch-check`, `check`, `publish-dry-run`, `test` — all `PASS`/exit 0 at the content head ⇒ **SUFFICIENT** |
+| 9 | Superseded receipts | the earlier `s4-check`/`s4-test` attesting `35061bc80` were **replaced**, not left alongside. No stale receipt is presented as current |
+| 10 | Carried baselines | Fresh and SDK export-map rows remain **`PRE_EXISTING_FAIL`** with attribution, never `PASS`. The `PASS` entries on those rows are the format/lint/exact-pin columns, which genuinely passed — a different check, correctly labelled |
+| 11 | Plugin-streams diagnostic | still named **separately** (4 references), as newly *exposed* rather than newly *caused* |
+| 12 | Attribution provenance | measured at `c53726c69`; the report independently records that Fresh's 16-entrypoint export map is unchanged — the same check I ran myself last round |
+| 13 | Runtime gates | `scaffold.runtime` **NOT_RUN**, `fresh-browser` **NOT_RUN**, both against the explicit lease boundary |
+| 14 | Lease | **none** — no acquisition, grant, or hold recorded anywhere in the run directory |
+
+### What this slice actually demonstrated
+
+S4 is the first slice to run the **contracted** `test` gate rather than a stand-in, and it
+immediately caught a leaf-caused defect that three prior Tier-A rounds missed — including mine,
+because I had been verifying with `deno test ./src/`, which excludes `./e2e/`. The gate found in one
+run what a reliable-looking subset had hidden for three slices.
+
+The repair then held the line in both directions: it fixed the **stale expectation** rather than
+reverting the intentional suite change, and it did not reach for the easy escape of relaxing an
+order-sensitive `assertEquals` into a set comparison. That assertion's exactness is the only reason
+the defect surfaced at all; weakening it would have traded a passing suite for a blind one.
+
+**Verdict `PASS`.** S1-S4 are complete and Tier-A signed. Cheap convergence is fully established:
+four binding receipts SUFFICIENT at the content head, per-member formatting/lint/exact-pin/JSR audits
+green, three publish dry-runs done, and every red carried with measured attribution rather than
+repaired or relabelled.
+
+### S5 runtime-lease review requested
+
+The remaining work is the two expensive gates — `scaffold.runtime` and `fresh-browser` — which run
+**serially under one coordinator-granted lease**. This lane has not acquired one, has not requested
+one before now, and has run neither gate. Requesting the explicit S5 serial runtime-lease review.
