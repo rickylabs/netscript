@@ -421,3 +421,86 @@ creation and milestone scope remain the coordinator's.
 ## Outcome
 
 S2 Tier-A **PASS** at `1cf76c6dd`. The author's root receipt is now independently reproduced.
+
+---
+
+# Tier-A — implementation slice S3 (final) at `9a26c107afa75bf1f38b78fe96c6df533b156c36`
+
+| Field | Value |
+| --- | --- |
+| Head | `9a26c107afa75bf1f38b78fe96c6df533b156c36` — local == remote == PR, clean, draft, sole `status:plan` |
+| Prior head | `1cf76c6dd` (S2); one commit `9a26c107a fix(sdk): identify cache provider module and document evidence` |
+| Verdict | **PASS** — implementation complete across S1–S3 |
+
+## Scope
+
+Exactly the four authorized paths plus three run artifacts: `cache-provider.ts`, `ports/cache-store.ts`,
+`cache-provider_test.ts`, `docs/site/web-layer/query-bridge.md`. S1/S2 product and test files are
+byte-identical since `1cf76c6dd`.
+
+## D4
+
+`import.meta.url` is embedded in the message; the two-instances statement is framed as "one
+possibility ... check that ... resolve to one version" — a hypothesis, not a diagnosis; the existing
+browser/client-side clause is **preserved**; `_provider` remains module-local
+(`let _provider: CacheProvider | null = null`, `cache-provider.ts:57`) with no ownership change.
+
+**No guard was dropped**: `cache-provider_test.ts` has 1 `Deno.test` before and 1 after. The single
+test was strengthened, replacing an `assertStringIncludes` spot-check with a full normalized byte
+comparison: it extracts the resolved URL, asserts it equals
+`new URL('./cache-provider.ts', import.meta.url).href`, normalizes only that segment to
+`<resolved import.meta.url>`, reads the docs block, and `assertEquals` against it.
+
+The docs match uses `/```text\n([^\n]+)\n```/`. That `[^\n]+` is load-bearing: a re-wrap makes the
+match fail and the test go **red**, which is the required behaviour — the assertion cannot be
+satisfied by loosening it to a substring.
+
+**Advisory 3 is structurally resolved, not merely mitigated.** Root `fmt` includes only
+`packages/**/*.ts(x)` and `plugins/**/*.ts(x)`; `docs/site/deno.json` excludes `**/*.md`, `**/*.mdx`,
+`**/*.vto` with `proseWrap: preserve`. No formatter configured in this repo can reach that block.
+
+## D5
+
+`get`/`set`/`delete` `@returns` corrected to the real mandatory-evidence shapes. Sweep independently
+corroborated: `ports/**` contains only 8 `@returns` total (`cache-store.ts` 4, `query-key.ts` 2,
+`cache-entry.ts` 2); the non-cache-store ones describe key serialization and cache-entry
+semantics and match their signatures. No other superseded shape — the author's claim is accurate.
+
+## Gates — executed by this review
+
+| Gate | Result |
+| --- | --- |
+| `packages/sdk` suite | 66 passed / 0 failed |
+| `cache-provider_test.ts` | 1 passed / 0 failed |
+| check / lint / fmt (`packages/sdk`, 84 files) | 0 / 0 / 0 |
+| **root `deno task test`** | **4203 passed / 0 failed / 19 ignored** |
+| **root check, uncached wrapper** | **2925 files, 25 batches, 0 failed batches, 0 occurrences** |
+| raw `deno doc --lint` combined / cache | exit 1 — exactly the six pinned diagnostics, zero new |
+| `check:netscript-jsr-specifiers` | scanned 2361, ranges 0, failures 0 |
+| `quality:scan` | `ok:true`, 0 findings, 7 known allowances |
+| `arch:check` | **FAIL=0**, warnings only |
+| `deno publish --dry-run` (sdk) | **Success** |
+| JSR audit (sdk) | dry-run OK; 2 WARN, no error |
+
+**Root `deno task check` was not accepted from its cache.** The task printed "cached, inputs
+unchanged" despite S3 modifying three TypeScript files. A cache line is not a verdict, so the
+underlying wrapper was re-run uncached across `packages` + `plugins`: 2925 files, zero diagnostics.
+
+## Two red gates — both proven pre-existing at the merge base
+
+- **`surface:diff` fails: 517 undeclared major changes.** Run at base `baf1cdf67` in a detached
+  worktree: **also 517**. Base == head ⇒ this leaf contributes **zero net surface findings**.
+  Findings span ~20 packages the branch never touches (`watchers`, `logger`, `cron`, `aspire`, …),
+  i.e. a stale checked-in baseline. The author reported it honestly as a stale baseline; their count
+  was **524** against my **517** at both base and head — the discrepancy is recorded rather than
+  smoothed over, and the base==head equality is the operative no-regression evidence.
+- **JSR audit `F-DOCT-5`** (13 immediate children in `src`, cap 12): `git ls-tree` gives **13 at base
+  and 13 at head** — the leaf adds no directory. Pre-existing.
+
+Neither is this leaf's regression; neither may be described as a pass.
+
+## Outcome
+
+S3 Tier-A **PASS**. Implementation is complete across S1–S3; all five issues' behaviour is
+implemented and proven. Next gate is IMPL-EVAL in a fresh opposite-family session. No readiness or
+label change made; PR remains draft at sole `status:plan`.
