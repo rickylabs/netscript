@@ -579,3 +579,10 @@ but before artifact/verdict; the same history is recovered as job `0e2d1e57`, br
 `cse_01K6SbsotG5MyjyjTd11SrfK`, without consuming another cycle. #1664 evidence is pushed at
 `09a771c8e`; do not accept its blanket baseline attribution until fresh features Tier-A classifies
 all twelve unformatted generated paths, several of which are leaf-owned. No runtime lease is active.
+
+Newer checkpoint `2026-08-15T17:32:06Z`: #1666 final ordinary PLAN-EVAL passed at evaluator commit
+`45c249b9c`, comment `5303401348`; internals `fd96c2075` dispatched only S1 to the preserved author.
+Require fresh slice review before S2/S3. #1664 features Tier-A `0d0ba1b7a` rejects the blanket
+baseline claim as leaf-caused, but must still correct its seven-helper count, measure the three
+payments outputs against `c53726c69`, and identify a bounded repair that makes all twelve generated
+outputs formatter-clean. No runtime retry, fresh-browser, or F5 product mutation is authorized yet.

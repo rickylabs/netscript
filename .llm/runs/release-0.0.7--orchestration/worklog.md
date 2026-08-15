@@ -999,3 +999,15 @@
   a blanket pre-existing attribution based on one unchanged helper: the exact format red has twelve
   paths, including leaf-owned generated users/payments clients and payments service/contract output.
   Fresh features Tier-A must classify every path before a bounded repair ruling.
+
+## 2026-08-15T17:32:06Z — #1666 plan passes; #1664 repair surface remains under review
+
+- Recovered #1666 cycle-2 evaluator returned `PASS` at `45c249b9c`, comment `5303401348`. It
+  independently found no fifth wrong-root example, accepted the thirteen-path/refusal design and
+  N1-N5 mechanics, and kept all product paths immutable. Internals topic `fd96c2075` resumed the
+  preserved author into S1 only; S2/S3 remain serially gated by fresh slice review.
+- Features Tier-A at `0d0ba1b7a` correctly proved the format gate leaf-caused: both users and
+  payments client modules come from the leaf-modified scaffolder and violate `deno fmt`. The report
+  also exposed seven unchanged helper reds and three payments outputs needing baseline measurement.
+  Coordinator returned the topic for a corrected 2 + 3 + 7 = 12 inventory and a repair that can
+  actually make the load-bearing gate green; no F5 product dispatch or retry exists yet.

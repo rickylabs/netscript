@@ -700,3 +700,11 @@ was interrupted after verification but before artifact or verdict; the same eval
 recovered without consuming another cycle as job `0e2d1e57`, bridge
 `cse_01K6SbsotG5MyjyjTd11SrfK`. Features is independently re-reviewing all twelve generated format
 paths because the author proved only one helper baseline while several red paths are leaf-owned.
+
+At 17:32Z, #1666 cycle-2 PLAN-EVAL is terminal `PASS` at evaluator commit `45c249b9c`, comment
+`5303401348`; internals topic `fd96c2075` has resumed the preserved Sol/medium author into S1 only,
+with S2/S3 held for serial slice review. Features topic `0d0ba1b7a` correctly rejected #1664's
+blanket attribution as leaf-caused because both generated client modules are unformatted, but its
+durable count says six helpers while naming seven and its proposed out-of-scope baseline would keep
+the gate red. Coordinator has returned it for exact count correction, baseline measurement of the
+three payments paths, and a smallest all-twelve-output normalization seam before any F5 dispatch.
