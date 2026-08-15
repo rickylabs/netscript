@@ -173,3 +173,88 @@ replace the test at `:300` with a regression proving a registered call **succeed
 registration signal aborts, while keeping a discovery-abort test; and make the README pattern safe
 or state explicitly that the registration signal bounds the whole registration lifetime and must not
 be a startup timeout. The two currently contradict each other.
+
+---
+
+# Tier-A RE-REVIEW after the F-1 repair
+
+Reviewed head `e4944309361fe18efea20be8a3df364bb8754d82`. Repair base `1bdb09e13`. Same reviewer and
+session as above; same separation from the Codex author thread.
+
+## Verdict
+
+**PASS_TO_IMPL_EVAL** — bounded to the F-1 repair. Authorizes nothing beyond requesting the formal
+cycle-2 gate.
+
+## The behavioral check I failed to run last time
+
+My previous Tier-A passed this leaf while F-1 was live because I confirmed the signal was *plumbed*
+and never asked what its *scope* meant at runtime. So this time I **ran the contract** rather than
+reading it — a standalone repro against the real `registerMcpTools` and `createToolRegistry`,
+reproducing the README's own pattern with a short startup deadline:
+
+```
+call-before-deadline: ok
+startup signal aborted? true
+call-after-deadline:  ok        ← was ERR TimeoutError at e3c74d7aa
+signal attached to call? false
+F-1 RESOLVED
+```
+
+`startup.aborted === true` matters: the deadline genuinely fired, so this is not a test that passed
+by never reaching the failure condition.
+
+## The fix is minimal and correctly scoped
+
+```diff
+-        async (call) =>
+-          await transport.callTool(tool.name, parseArguments(call.arguments), options),
++        async (call) => await transport.callTool(tool.name, parseArguments(call.arguments)),
+```
+
+One line. `transport.listTools(options)` on the discovery path is **unchanged**, so registration-time
+cancellation is preserved rather than silently dropped — the specific regression I warned against.
+`registerMcpTools settles discovery when its caller aborts` (`:284`) is retained and green.
+
+## The wrong test is gone, and the right one replaces it
+
+- `registerMcpTools propagates cancellation to registered calls` — which **asserted the defect** —
+  is **removed** (0 occurrences).
+- `registered calls outlive the registration discovery signal` is added, aborting the registration
+  controller and then asserting the call **succeeds** and `transport.callSignal === undefined`.
+
+That inverts the assertion from "the bug is the contract" to "the bug cannot return".
+
+## Docs and code now agree
+
+`README.md:182` is `await registerMcpTools(registry, pool);` — no startup deadline — and `:211`
+states plainly that the optional signal passed to `registerMcpTools` **bounds discovery**. The
+startup deadline moved to `pool.connect({ signal: startup })` (`:194`), which is where a startup
+deadline belongs. The contradiction that made criterion 9 false is resolved.
+
+## Scope and gates
+
+| Check | Result |
+| --- | --- |
+| Repair delta | exactly the three authorized files — `register-tools.ts`, `mcp_test.ts`, `README.md` |
+| Outside the repair surface | **empty** |
+| `deno.lock`, `packages/ai/deno.json` exports, `packages/fresh` | **untouched** |
+| Focused MCP suite | exit 0 — **20 passed / 0 failed** |
+| `packages/ai` check | 98 files, 0 failed batches |
+| **`packages/fresh` cross-package check** | 197 files, 0 failed batches — Ruling 5's guarantee survives the change |
+| `deno task quality:scan` | `ok: true`, **0 findings** |
+| `deno task arch:check` | raw exit **0** |
+| `doc:lint --root packages/ai` | **0 errors / 0 private-type refs / 0 missing JSDoc** |
+| `deno publish --dry-run` | **Success** |
+| `docker ps -a` | empty — no expensive gate ran |
+
+**O-3 closed:** the `@tanstack` specifier change is now recorded in `drift.md`.
+
+O-1, O-2, O-4 and O-5 were correctly **not** taken this turn, as instructed.
+
+## What this does not certify
+
+Cycle-1's `FAIL_FIX` stands as the record of what was wrong; this re-review certifies only the
+repair. A fresh formal **IMPL-EVAL cycle 2** is mandatory and is requested next — this reviewer has
+now missed a blocking defect on this leaf once, so its `PASS` is an input to that gate, not a
+substitute for it.
