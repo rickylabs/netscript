@@ -85,3 +85,18 @@ current-state documentation.
   or hand-author a scaffold receipt.
 - **Evidence:** Tier-A plan review T-1 supplied by `topic-features-0.0.7`; repaired `plan.md`
   validation and release-condition sections.
+
+## 2026-08-15 — PLAN-EVAL ruled direct emission and explicit ownership
+
+- **What:** Cycle 1 rejected the proposed SDK identity-wrapper overload and found the plan omitted
+  generator-owned paths and whole-command flag behavior.
+- **Source:** `plan-eval.md` §§1 and evaluator sweeps A/B.
+- **Expected:** The initial plan recommended a new SDK overload and described regeneration without
+  locking its filesystem or Aspire-helper boundary.
+- **Actual:** The template directly emits `{ queryKey: <svc>Queries.list.clientKey() } as const`;
+  the generator owns only `apps/<app>/lib/<service>.ts`; dry-run/force govern both client and Aspire
+  output; package READMEs own the migration notes.
+- **Severity:** significant
+- **Action:** amend plan/research/design and keep implementation stopped until a separately
+  dispatched PLAN-EVAL cycle returns PASS.
+- **Evidence:** cycle-1 evaluator commit `ed34105e2ef344a5b590bca6985810f45f89b0ca`.

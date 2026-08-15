@@ -27,13 +27,13 @@ restructuring them.
 
 ## Axioms in Play
 
-| Axiom                            | Why it matters                                                                            |
-| -------------------------------- | ----------------------------------------------------------------------------------------- |
-| A1 — public types first          | Lock the key/invalidation and generator result contracts before their implementations.    |
-| A2 — simple over easy            | One router-derived identity must drive client, query, and invalidation code.              |
-| A6 — helpers justified           | A bridge overload is justified only if it makes a typed cross-tier contract discoverable. |
-| A8 — one reason per file         | Keep service discovery/planning, writes, and CLI presentation separate.                   |
-| A14 — tests/publish are doctrine | Semantic, consumer, browser, JSR, and publish proof are required.                         |
+| Axiom                            | Why it matters                                                                              |
+| -------------------------------- | ------------------------------------------------------------------------------------------- |
+| A1 — public types first          | Lock the key/invalidation and generator result contracts before their implementations.      |
+| A2 — simple over easy            | One router-derived identity must drive client, query, and invalidation code.                |
+| A6 — helpers justified           | `clientKey()` already supplies the typed path; an identity-wrapper overload adds no policy. |
+| A8 — one reason per file         | Keep service discovery/planning, writes, and CLI presentation separate.                     |
+| A14 — tests/publish are doctrine | Semantic, consumer, browser, JSR, and publish proof are required.                           |
 
 ## Goal
 
@@ -45,13 +45,15 @@ Fresh islands preserve the server snapshot's real age across hydration.
 
 - Preserve all six already-derived per-service export names.
 - Derive each query factory's resource from the manifest service/router identity.
-- Provide a typed/key-derived invalidation path and make both showcase call sites consume it.
+- Emit the invalidation filter directly from the typed query factory's `clientKey()` and make both
+  showcase call sites consume it.
 - Introduce an all-service client generator with content comparison, deterministic results,
   `--dry-run`, `--force`, and no-partial-write failure when a contract is absent.
 - Route both `service generate` and `service add --with-client` through the same generator seam.
 - Pass `props.cachedAt` as `initialDataUpdatedAt` in both canonical island variants.
 - Add semantic, type-negative, generated-output, real-browser, and runtime-E2E regression coverage.
-- Add one migration note in `packages/fresh/README.md`, subject to PLAN-EVAL confirmation.
+- Document the generator verb, whole-command flags, L1/L2 dialect, and regeneration migration in
+  `packages/cli/README.md`; document hydration age in `packages/fresh/README.md`.
 - Audit all exports, exact internal pins, isolated declarations/no-slow-types, and publish file
   lists for CLI, Fresh, and SDK.
 
@@ -74,6 +76,12 @@ Fresh islands preserve the server snapshot's real age across hydration.
 - Add a type-checking negative fixture proving a renamed procedure breaks the generated invalidation
   expression.
 - Preserve atomicity by planning/validating every service and contract before the first write.
+- Lock generator ownership to `apps/<app>/lib/<service>.ts` for every manifest service. The
+  init-owned `apps/<app>/routes/examples/service/(_lib)/service-query.ts` remains separate but is
+  rendered from the same canonical template.
+- Apply `service generate --dry-run` and `--force` to the complete command, including Aspire helper
+  output: dry-run performs no writes; default writes changed/missing and skips identical output;
+  force rewrites identical output.
 - Extend `packages/fresh` browser coverage and its `test:browser` task so the contracted
   `fresh-browser` gate actually covers hydration age rather than only form navigation.
 - Preserve the deliberate evidence-class boundary: `scaffold.runtime` produces suite-owned
@@ -85,52 +93,60 @@ Fresh islands preserve the server snapshot's real age across hydration.
 
 ## Locked Decisions
 
-| ID | Decision                                                                                                                        | Rationale                                                                                           |
-| -- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| D1 | The manifest's service key, transformed exactly as the router name, is the sole resource identity.                              | It already owns service discovery and routing and prevents cross-service collision by construction. |
-| D2 | Server and client full keys remain tier-specific; only their `[resource, action]` prefix converges.                             | The SDK intentionally represents server input as serialized text and TanStack input as `{ input }`. |
-| D3 | All service modules are planned and validated before writes, in resolver-sorted order.                                          | Deterministic output and no partial mutation on a missing contract.                                 |
-| D4 | Changed/missing files are written, identical files skipped, dry-run reports without writes, and force rewrites identical files. | Matches the established runtime-schema generator contract cited by #1355.                           |
-| D5 | Both canonical islands pass `initialDataUpdatedAt: props.cachedAt`.                                                             | The loader already exposes the timestamp and Fresh already owns the public option.                  |
-| D6 | Existing apps change only when newly generated or explicitly regenerated.                                                       | Package upgrades do not mutate consumer source.                                                     |
-| D7 | No expensive gate runs before a coordinator release and recorded singleton lease.                                               | Required by the leaf contract and AGENTS.md.                                                        |
+| ID | Decision                                                                                                                                                                                | Rationale                                                                                                |
+| -- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| D1 | The manifest's service key, transformed exactly as the router name, is the sole resource identity.                                                                                      | It already owns service discovery and routing and prevents cross-service collision by construction.      |
+| D2 | Server and client full keys remain tier-specific; only their `[resource, action]` prefix converges.                                                                                     | The SDK intentionally represents server input as serialized text and TanStack input as `{ input }`.      |
+| D3 | All service modules are planned and validated before writes, in resolver-sorted order.                                                                                                  | Deterministic output and no partial mutation on a missing contract.                                      |
+| D4 | Across client modules and Aspire helpers, changed/missing files are written, identical files skipped, dry-run reports without writes, and force rewrites identical files.               | Gives the existing composite verb one coherent whole-command contract.                                   |
+| D5 | Both canonical islands pass `initialDataUpdatedAt: props.cachedAt`.                                                                                                                     | The loader already exposes the timestamp and Fresh already owns the public option.                       |
+| D6 | Package upgrades alone do not edit apps; `service add --with-client` creates one owned module and `service generate` explicitly reconciles all owned client modules and Aspire helpers. | Direct emit still compiles in SDK-0.0.6-pinned apps; invoking the verb is the source-migration boundary. |
+| D7 | No expensive gate runs before a coordinator release and recorded singleton lease.                                                                                                       | Required by the leaf contract and AGENTS.md.                                                             |
+| D8 | Define `<svc>ListInvalidation` after `<svc>Queries` as `{ queryKey: <svc>Queries.list.clientKey() } as const`; add no SDK overload.                                                     | `clientKey()` is the existing typed seam; an identity wrapper violates A6 and would require SDK 0.0.7.   |
 
 ## Open-Decision Sweep
 
-| Decision                                                                | Status                      | Notes                                                                                     |
-| ----------------------------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------- |
-| Add key-array overload to `bridgeInvalidation` vs direct object literal | Must resolve in PLAN-EVAL   | Recommend additive overload, retaining the legacy string signature.                       |
-| Migration note location                                                 | Must resolve in PLAN-EVAL   | Recommend published `packages/fresh/README.md`; `docs/**` remains prohibited.             |
-| Installed plugin contributions                                          | Safe to defer               | #1348-gated; generate first-party manifest services only.                                 |
-| L1/L2 vs L3 `defineServices` dialect                                    | Safe to defer for this leaf | Preserve the current query-factory dialect; changing it is not needed to repair identity. |
+| Decision                             | Status                        | Notes                                                                                                                |
+| ------------------------------------ | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Invalidation construction            | Resolved by PLAN-EVAL cycle 1 | Direct emit from `<svc>Queries.list.clientKey()`; no SDK overload.                                                   |
+| Migration-note locations             | Resolved by PLAN-EVAL cycle 1 | CLI contract/migration in `packages/cli/README.md`; hydration age in `packages/fresh/README.md`; never `docs/**`.    |
+| Generator-owned app output           | Resolved by PLAN-EVAL cycle 1 | Own exactly `apps/<app>/lib/<service>.ts`; the route-example `(_lib)/service-query.ts` remains init-owned.           |
+| `service generate` flag scope        | Resolved by PLAN-EVAL cycle 1 | `--dry-run` and `--force` govern client modules and Aspire helpers as one command.                                   |
+| Installed plugin contributions       | Safe to defer                 | #1348-gated; generate first-party manifest services only.                                                            |
+| L1/L2 vs L3 `defineServices` dialect | Safe to defer for this leaf   | Emit and document the current query-factory (L1/L2) dialect; changing to L3 is unnecessary for identity correctness. |
 
 ## Proposed Public Contracts
 
 ### SDK
 
-Keep the existing function and add a source-key form:
-
-```ts
-bridgeInvalidation(resource: string, action?: string): QueryInvalidationFilter;
-bridgeInvalidation(queryKey: readonly unknown[]): QueryInvalidationFilter;
-```
-
-The generated module defines its query factory first, then derives the invalidation filter from
-`<service>Queries.list.clientKey()`. The `list` property is therefore contract-checked. Explicit
-public aliases/return types and JSDoc are required for isolated declarations and `deno doc --lint`.
+Keep the SDK type/export surface unchanged. Correct the stale module example in
+`packages/sdk/src/query-client/key-bridge.ts:4-7`, which still claims server keys begin with
+`cache_query`, and add JSDoc pointing factory consumers to `factory.<action>.clientKey()` as the
+factory-consistent invalidation prefix. Add semantic tests showing that
+`bridgeInvalidation(resource, 'list').queryKey` prefix-matches a factory only when the resource
+matches, and does not match when it differs. A named safe helper, if still wanted later, belongs in
+a separate issue together with a deprecation path for the string form; do not add it here.
 
 ### CLI
 
 Introduce a use-case-level request/result describing planned service-client files plus deterministic
-`written` and `skipped` collections. The generator reads sorted services from
-`ServiceWorkspaceResolver`, validates a corresponding contract for every service, renders the
-canonical module, compares content, and writes only after the full plan succeeds. The add and
-generate commands delegate to it; presentation only reports results.
+`written` and `skipped` collections. The generator owns exactly `apps/<app>/lib/<service>.ts`, reads
+sorted services from `ServiceWorkspaceResolver`, validates a corresponding contract for every
+service, renders the canonical L1/L2 query-factory module, compares content, and writes only after
+the full plan succeeds. The init-owned route-example
+`apps/<app>/routes/examples/service/(_lib)/service-query.ts` uses the same template but is not
+rewritten by `service generate`. The add and generate commands delegate to the client generator; the
+generate command applies dry-run/force consistently to its client and Aspire-helper halves and
+presentation only reports results. `packages/cli/README.md` documents this contract, the L1/L2
+dialect, the literal `service` → per-router namespace migration, and all six pre-#1424 renames:
+`exampleService{Name,RouterName,Contract,ListInvalidation,Client,Queries}` to their corresponding
+`<camelService>*` symbols.
 
 ### Fresh
 
 Do not add a new public type. Exercise the existing `IslandQueryOptions.initialDataUpdatedAt`
-contract in a real browser and document the beta-era migration in the published package README.
+contract through the public Fresh `useQuery` wrapper in a real browser and document hydration-age
+behavior in `packages/fresh/README.md`.
 
 ## Risk Register
 
@@ -178,15 +194,15 @@ contract in a real browser and document the beta-era migration in the published 
 
 ## Commit Slices and Tier-A Stops
 
-| Slice                       | Content                                                                                                                                                                                                                                           | Stop and evidence                                                                                    |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| S0 — Phase 1                | Research, design ledger, plan, context, drift; open draft PR before code.                                                                                                                                                                         | Stop for orchestrator's PLAN-EVAL determination; RESEARCH and PLAN PR comments.                      |
-| S1 — SDK key contract       | Add the accepted key-derived invalidation contract, explicit public types/JSDoc, semantic mismatch/non-collision tests, and type-negative fixture.                                                                                                | Commit; focused SDK check/test/doc-lint; slice comment; Tier-A stop.                                 |
-| S2 — CLI generator contract | Contract-first request/result and plan/write use case; manifest enumeration, contract validation, content comparison, dry-run/force; route add/generate through one seam; per-router template key/invalidation; two-service and atomic negatives. | Commit; focused CLI check/tests/generated-asset freshness; slice comment; Tier-A stop.               |
-| S3 — canonical hydration    | Pass cache age in both islands, add generated-output positive/negative tests, Fresh real-browser hydration fixture/task, and approved package migration note.                                                                                     | Commit; focused CLI/Fresh checks/tests/doc-lint; slice comment; Tier-A stop.                         |
-| S4 — cheap convergence      | Run formatting/lint/asset checks, exact-pin/export/doc audits, three per-member isolated-declaration publish dry-runs, then the four cheap contracted gates at the committed candidate head.                                                      | Commit any evidence-only artifacts; recompute exact receipt sufficiency; comment; Tier-A stop.       |
-| S5 — leased runtime proof   | After explicit coordinator release and singleton lease only: leak-check, run the exact `scaffold.runtime --cleanup --format pretty` command, then catalog-backed `fresh-browser`; verify cleanup and immutable head.                              | Suite-owned scaffold output + lease/cleanup record; one fresh-browser receipt; comment; Tier-A stop. |
-| S6 — IMPL-EVAL              | Fresh opposite-family evaluator inspects code, acceptance, receipts, PR threads, and compatibility; implementation session repairs any findings in new bounded slices.                                                                            | Tier-A verdict comment per cycle; never flip ready or merge.                                         |
+| Slice                         | Content                                                                                                                                                                                                                                                                                                                                                           | Files                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Stop and evidence                                                                                    |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| S0 — Phase 1                  | Research, design ledger, plan, context, drift; draft PR and PLAN-EVAL cycles before code.                                                                                                                                                                                                                                                                         | `.llm/runs/feat-app-service-client-wiring--1355/{research.md,plan.md,plan-eval.md,worklog.md,context-pack.md,drift.md,supervisor.md}`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Stop for formal PLAN-EVAL PASS; structured phase comments.                                           |
+| S1 — SDK semantics/docs       | Keep the SDK type surface unchanged; correct stale key-shape docs, point factory consumers to `clientKey()`, and lock matching/mismatching resource semantics.                                                                                                                                                                                                    | `packages/sdk/src/query-client/key-bridge.ts`; new `packages/sdk/src/query-client/key-bridge_test.ts`; run artifacts.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Commit; focused SDK check/test/doc-lint; slice comment; Tier-A stop.                                 |
+| S2 — CLI generator contract   | Add the exported request/result and atomic plan/write use case; own only `apps/<app>/lib/<service>.ts`; apply whole-command dry-run/force to client and Aspire outputs; route add/generate through one seam; emit direct `clientKey()` invalidation; add two-service, SDK-0.0.6 compatibility, procedure-rename type-negative, idempotency, and atomic negatives. | `packages/cli/mod.ts`; `packages/cli/src/public/features/services/services-group.ts`; `packages/cli/src/public/features/services/generate/{generate-service-command.ts,generate-service-clients.ts,generate-service-clients_test.ts,generated-service-client_type_test.ts}`; `packages/cli/src/public/features/services/add/{add-service.ts,add-service_test.ts}`; `packages/cli/src/public/features/generate/aspire/{generate-aspire.ts,generate-aspire_test.ts}`; `packages/cli/src/kernel/adapters/service/{client-scaffolder.ts,client-scaffolder_test.ts,workspace-mutator.ts,scaffolder_test.ts}`; `packages/cli/src/kernel/assets/app/routes/examples/service/(_lib)/service-query.ts.template`; `packages/cli/src/kernel/assets/embedded.generated.ts`; `packages/cli/e2e/suites/scaffold/capability-suites.ts`; run artifacts. | Commit; focused CLI check/tests/generated-asset freshness; slice comment; Tier-A stop.               |
+| S3 — canonical hydration/docs | Pass cache age in both islands, add generated-output omission coverage and public-wrapper browser fixture/task, and write both ruled package README notes including the exact six-symbol/namespace migration and L1/L2 dialect.                                                                                                                                   | `packages/cli/src/kernel/assets/app/routes/examples/(_islands)/{ServiceShowcaseLab.tsx.template,ServiceShowcaseLab.memory.tsx.template}`; `packages/cli/src/kernel/assets/embedded.generated.ts`; `packages/cli/src/kernel/templates/app/route-templates_test.ts`; `packages/cli/README.md`; `packages/fresh/tests/query-hydration-age_browser.ts`; new `packages/fresh/tests/fixtures/query-hydration-age-browser/{main.ts,app.tsx,vite.config.ts}`; `packages/fresh/deno.json`; `packages/fresh/README.md`; run artifacts.                                                                                                                                                                                                                                                                                                            | Commit; focused CLI/Fresh checks/tests/doc-lint; slice comment; Tier-A stop.                         |
+| S4 — cheap convergence        | Run formatting/lint/asset checks, exact-pin/export/doc audits, three per-member isolated-declaration publish dry-runs, then the four cheap contracted gates at the committed candidate head.                                                                                                                                                                      | `.llm/runs/feat-app-service-client-wiring--1355/{receipts,reports,worklog.md,context-pack.md}` only, unless a gate finds a separately reviewed scoped repair.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Commit any evidence-only artifacts; recompute exact receipt sufficiency; comment; Tier-A stop.       |
+| S5 — leased runtime proof     | After explicit coordinator release and singleton lease only: leak-check, run the exact `scaffold.runtime --cleanup --format pretty` command, then catalog-backed `fresh-browser`; verify cleanup and immutable head.                                                                                                                                              | Suite-owned scaffold output/cleanup record; `.llm/runs/feat-app-service-client-wiring--1355/receipts/s5-fresh-browser.json`; `worklog.md`; `context-pack.md`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Suite-owned scaffold output + lease/cleanup record; one fresh-browser receipt; comment; Tier-A stop. |
+| S6 — IMPL-EVAL                | Fresh opposite-family evaluator inspects code, acceptance, receipts, PR threads, and compatibility; implementation session repairs any findings in new bounded slices.                                                                                                                                                                                            | `.llm/runs/feat-app-service-client-wiring--1355/evaluate.md`; any repair files must be named in a new amended slice before editing.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Tier-A verdict comment per cycle; never flip ready or merge.                                         |
 
 No implementation slice starts until S0 receives the owner/orchestrator determination and, if
 required as proposed, PLAN-EVAL PASS.
@@ -247,9 +263,12 @@ Request the lease only when all of the following are true:
    netscript service generate --project-root <generated-project>
    ```
 
-   Then run `service generate` a second time and assert zero writes/byte-identical output. A
-   generated consumer imports `usersQueries` and `paymentsQueries` together and type-checks both
-   modules without aliases.
+   The add command creates the generator-owned `apps/<app>/lib/payments.ts`; generate reconciles
+   that file and creates `apps/<app>/lib/users.ts`. Then run `service generate` a second time and
+   assert zero writes and byte-identical client/Aspire output. A generated consumer imports
+   `usersQueries` from the owned users module and `paymentsQueries` from the owned payments module
+   and type-checks both without aliases. The init-owned route-example `(_lib)/service-query.ts` is
+   not rewritten.
 2. With the identical list input `{ limit: 3, page: 1, sortBy: 'id', sortOrder: 'asc' }`, compare
    these server keys:
 
@@ -279,13 +298,16 @@ Request the lease only when all of the following are true:
 
    Each pair must differ only at index `0`; both filters must share their own factory's
    `[resource, 'list']` prefix, and the users filter must not match the payments key.
-3. In the live generated app, load the successful users showcase, record the initial `users.list`
-   request, and click the first row's **Rename** control. The issued mutation is
+3. In the live generated app, load the successful users showcase, which imports the init-owned
+   `apps/<app>/routes/examples/service/(_lib)/service-query.ts` rendered from the same corrected
+   template. Wait for hydration/refetch activity to settle, record the current `users.list` request
+   count, and click the first row's **Rename** control. The issued mutation is
    `users.update({ id: representativeId, data: { name: renamedName } })`. Assert the optimistic row
-   appears, the mutation succeeds, and `onSettled` is followed by a **second** `users.list` network
-   request. The final DOM row must contain the persisted `renamedName` returned by that refetch. The
-   second list request plus server-confirmed DOM value is the observable invalidation proof; merely
-   spying on `invalidateQueries` is insufficient.
+   appears and the mutation response succeeds; only after that response settles, require the
+   `users.list` request count to equal the recorded count **plus exactly one**. The final DOM row
+   must contain the persisted `renamedName` returned by that refetch. The post-settle count delta
+   plus server-confirmed DOM value is the observable invalidation proof; merely spying on
+   `invalidateQueries` is insufficient.
 
 ### Exact `fresh-browser` hydration scenarios required before the lease
 
@@ -315,6 +337,7 @@ wall-clock samples.
 - Any change to `origin/main`, query key shapes, service manifest identity, command topology,
   canonical template paths, package export maps/pins, browser task scope, or gate catalog after this
   plan must be re-baselined and appended to `drift.md`.
-- Any implementation departure from the additive SDK overload, generator overwrite/atomicity
-  contract, README location, five-file receipt set, or separate scaffold release-gate evidence
-  requires an explicit plan amendment and evaluator visibility.
+- Any implementation departure from direct `clientKey()` emission, the locked generator-owned paths,
+  the whole-command overwrite/dry-run/force contract, the two package README locations, the
+  five-file receipt set, or separate scaffold release-gate evidence requires an explicit plan
+  amendment and evaluator visibility.

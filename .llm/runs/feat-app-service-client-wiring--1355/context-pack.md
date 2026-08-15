@@ -17,9 +17,9 @@ already been repaired and moved, but the literal `service` key, dead invalidatio
 all-service generator, and both cache-age omissions remain. PLAN-EVAL is proposed required. No
 product implementation or expensive gate has run. Draft PR #1664 is open with both closing keywords,
 milestone `0.0.7`, the required taxonomy, acceptance mappings, and structured RESEARCH and PLAN
-comments. Tier-A requested a plan-only repair: classify `scaffold.runtime` as suite-owned release
-gate evidence and make both expensive scenarios executable. That repair is now authored; formal
-PLAN-EVAL remains the hard stop.
+comments. PLAN-EVAL cycle 1 returned `FAIL_PLAN` at `7f20a34fe`, ruling direct `clientKey()`
+emission and package README locations while identifying six plan-text gaps. Those gaps are amended
+without product changes; a separately dispatched cycle 2 remains the hard stop.
 
 ## Completed
 
@@ -31,26 +31,31 @@ PLAN-EVAL remains the hard stop.
 - Committed and pushed S0, opened draft PR #1664, and advanced its single lifecycle label from
   `status:research` to `status:plan` alongside the two phase comments.
 - Applied the Tier-A T-1/T-2 plan repair without product, gate-catalog, lockfile, or docs changes.
+- Read the cycle-1 evaluator artifact in full and accepted its direct-emit, README, owned-path, and
+  whole-command flag rulings.
+- Amended research, design, slices, compatibility, and exact scenarios without editing
+  `packages/**`.
 
 ## In Progress
 
-- Stopped before implementation; the repaired plan awaits formal PLAN-EVAL after exact-head remote
-  synchronization.
+- Stopped before implementation; the cycle-1 repair awaits coordinator verification and a separate
+  PLAN-EVAL cycle-2 dispatch.
 
 ## Next Steps
 
-1. Topic orchestrator verifies the repaired plan head and launches formal PLAN-EVAL separately.
-2. PLAN-EVAL decides the remaining SDK overload and migration-note questions.
-3. Only after PASS, begin S1 at a bounded Tier-A stop.
+1. Topic orchestrator verifies the repaired plan head.
+2. Coordinator separately grants and launches PLAN-EVAL cycle 2.
+3. Only after cycle-2 PASS, begin S1 at a bounded Tier-A stop.
 
 ## Key Decisions
 
-| Decision                                          | Source                 | Notes                                                          |
-| ------------------------------------------------- | ---------------------- | -------------------------------------------------------------- |
-| Router identity is the resource identity          | `plan.md` D1           | Manifest-derived and collision-safe.                           |
-| Existing apps change only on generation           | Research compatibility | Regeneration is an explicit source migration.                  |
-| Both expensive gates are lease-blocked            | Leaf brief / plan      | Run only after cheap gates are green and coordinator releases. |
-| Typed bridge overload is recommended, not decided | Research/plan          | PLAN-EVAL owns the choice.                                     |
+| Decision                                            | Source                 | Notes                                                          |
+| --------------------------------------------------- | ---------------------- | -------------------------------------------------------------- |
+| Router identity is the resource identity            | `plan.md` D1           | Manifest-derived and collision-safe.                           |
+| Existing apps change only on generation             | Research compatibility | Regeneration is an explicit source migration.                  |
+| Both expensive gates are lease-blocked              | Leaf brief / plan      | Run only after cheap gates are green and coordinator releases. |
+| Direct `clientKey()` filter; no SDK overload        | PLAN-EVAL cycle 1      | Preserves SDK 0.0.6 compatibility and satisfies A6.            |
+| Client generator owns `apps/<app>/lib/<service>.ts` | PLAN-EVAL cycle 1      | Init-owned showcase remains separate but shares the template.  |
 
 ## Files Changed
 
@@ -65,17 +70,17 @@ PLAN-EVAL remains the hard stop.
 
 ## Gates
 
-| Gate family | Current status                                | Evidence                     |
-| ----------- | --------------------------------------------- | ---------------------------- |
-| Static      | Identity PASS; product gates NOT_RUN          | `worklog.md`                 |
-| Fitness     | Plan written; PLAN-EVAL pending determination | `research.md`, `plan.md`     |
-| Runtime     | NOT_RUN / lease-blocked                       | `plan.md` release conditions |
-| Consumer    | NOT_RUN / implementation-dependent            | `plan.md` S5                 |
+| Gate family | Current status                                       | Evidence                           |
+| ----------- | ---------------------------------------------------- | ---------------------------------- |
+| Static      | Identity PASS; product gates NOT_RUN                 | `worklog.md`                       |
+| Fitness     | Cycle 1 `FAIL_PLAN`; amended; cycle 2 not dispatched | `plan-eval.md`, repaired artifacts |
+| Runtime     | NOT_RUN / lease-blocked                              | `plan.md` release conditions       |
+| Consumer    | NOT_RUN / implementation-dependent                   | `plan.md` S5                       |
 
 ## Open Questions
 
-- SDK overload versus direct generated filter.
-- Package README as migration-note home under the `docs/**` prohibition.
+- None for the implementation author; cycle 2 verifies completeness rather than reopening ruled
+  forks.
 
 ## Drift and Debt
 

@@ -61,7 +61,8 @@ asserts derived export names but never asserts resource identity or a two-servic
 (`client-scaffolder_test.ts:8-30`).
 
 The canonical resource identity should be the configured service's router identity: derive it from
-the `NetScript.Services` manifest key (`workspace-mutator.ts:75-97`), using the same camel-case
+the `NetScript.Services` manifest key
+(`packages/cli/src/kernel/adapters/service/workspace-mutator.ts:75-97`), using the same camel-case
 transform already used by the generated router
 (`packages/cli/src/kernel/assets/service/router.ts.template:21-22`) and by `<service>RouterName`
 (`service-query.ts.template:8-10`). Thus `orders` remains `orders` and `order-service` becomes
@@ -140,34 +141,46 @@ not a new display label.
 - Apps that do not regenerate are not edited. Their generated source continues to compile and run
   exactly as before, including the existing cross-service collision, dead invalidation, and
   hydration-age defect.
-- New `service add --with-client` output uses the corrected key identity and hydration wiring.
-  Running the all-service generator upgrades existing modules. Following the established
-  content-comparison contract, identical modules are skipped, changed modules are rewritten,
-  `--dry-run` writes nothing, and `--force` rewrites even identical modules.
+- The all-service generator owns exactly `apps/<app>/lib/<service>.ts` for every manifest service.
+  `service add --with-client` creates that one service's owned module; `service generate` reconciles
+  every owned module. Differing client modules are rewritten without `--force`; identical output is
+  skipped; `--force` rewrites identical output.
+- The init-owned showcase module at `apps/<app>/routes/examples/service/(_lib)/service-query.ts` is
+  rendered from the same canonical template but is not generator-owned. `service generate` does not
+  rewrite that module in an existing app, so existing showcases retain their prior source until the
+  app is re-initialized or the owner migrates it.
+- `service generate --dry-run` and `--force` govern the entire composite command, not only the
+  client half. Dry-run plans client modules and Aspire helpers without any writes; default writes
+  changed/missing and skips identical output across both halves; force rewrites identical client and
+  Aspire output.
 - Regeneration is an intentional generated-source migration. Projects generated before PR #1424 may
-  need imports changed from `exampleService*` to derived names; that naming delta is already on
-  current `main`, not newly introduced by this leaf. Projects generated after #1424 retain their
-  names.
+  need six imports changed: `exampleServiceName`, `exampleServiceRouterName`,
+  `exampleServiceContract`, `exampleServiceListInvalidation`, `exampleServiceClient`, and
+  `exampleServiceQueries` become their corresponding `<camelService>*` symbols. That naming delta is
+  already on current `main`, not newly introduced by this leaf. Projects generated after #1424
+  retain their names.
 - The resource change intentionally abandons any process-local or persisted browser entries under
   the old literal `service` namespace. They become orphaned and are repopulated under the correct
   per-router key; no service/HTTP payload contract changes.
 - Passing `initialDataUpdatedAt` may cause an old server snapshot to refetch earlier. This is the
   documented behavior the option exists to preserve, not a TypeScript breaking change.
-- The proposed SDK overload is additive and retains the legacy string form of
-  `bridgeInvalidation(resource, action)`. Existing generated-but-not-regenerated apps therefore do
-  not need to change for an SDK upgrade.
+- No SDK overload is added. The generated invalidation constant directly uses the already-published
+  `<service>Queries.list.clientKey()` API, so a 0.0.7 CLI can add/regenerate an owned module in an
+  app still pinned to `jsr:@netscript/sdk@0.0.6` without creating a new SDK-version compile failure.
 
 ## Proposed public-contract delta across the three publishable packages
 
-| Package            | Proposed delta                                                                                                                                                                                                                                                                 | Compatibility posture                                                                                       |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| `@netscript/sdk`   | Add a key-derived `bridgeInvalidation(queryKey)` overload while retaining the string overload; the generated constant calls it with `<service>Queries.list.clientKey()`.                                                                                                       | Additive. The call site becomes procedure/property-checked; renaming `list` fails `deno check`.             |
-| `@netscript/cli`   | Make the per-router resource key a generated invariant; introduce one all-service, content-comparing client generator used by `service generate` and `service add --with-client`; expose deterministic written/skipped/dry-run/force results; pass `cachedAt` in both islands. | Generated output changes only when created/regenerated. Existing command remains and broadens consistently. |
-| `@netscript/fresh` | No new query API: keep the existing `IslandQueryOptions` contract, add real-browser coverage to its public behavior, include it in `test:browser`, and add the beta-era migration note in the package README (not `docs/**`).                                                  | No type break; makes the existing contract exercised and discoverable.                                      |
+| Package            | Ruled delta                                                                                                                                                                                                                                                                                                                                                                        | Compatibility posture                                                                                                                   |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `@netscript/sdk`   | No type/export change. Correct `key-bridge.ts`'s stale server-key example, point factory consumers to `factory.<action>.clientKey()`, and add semantic resource match/mismatch tests for the retained string helper.                                                                                                                                                               | Existing public API remains unchanged; doc-lint and publish dry-run still apply because the published module changes.                   |
+| `@netscript/cli`   | Emit `{ queryKey: <svc>Queries.list.clientKey() } as const` after `<svc>Queries`; own only `apps/<app>/lib/<service>.ts`; introduce the all-service content-comparing generator and whole-command dry-run/force behavior; pass `cachedAt`; document the verb, L1/L2 dialect, overwrite/result contract, six-symbol migration, and namespace migration in `packages/cli/README.md`. | Direct emit compiles against SDK 0.0.6; consumer source changes only when added/regenerated, and regeneration is explicitly documented. |
+| `@netscript/fresh` | No new query API: keep the existing `IslandQueryOptions` contract, add real-browser coverage through the public `useQuery` wrapper, include it in `test:browser`, and document hydration-age behavior in `packages/fresh/README.md`.                                                                                                                                               | No type break; makes the existing contract exercised and discoverable.                                                                  |
 
-The SDK overload is a recommendation for PLAN-EVAL, not an implementation decision made by this
-leaf. A direct `{ queryKey: queries.list.clientKey() }` constant would fix the template more
-locally, but would leave `bridgeInvalidation`'s safer, discoverable path unresolved.
+PLAN-EVAL cycle 1 ruled out the SDK overload under A6: `{ queryKey }` would be an identity wrapper
+adding no policy, would leave the string-form trap public, and would unnecessarily couple generated
+output to SDK 0.0.7. Rename safety is already supplied by `.list.clientKey()` property access. If a
+named helper is wanted later, it requires a separate issue and a deprecation path for the string
+form; this leaf does not add it.
 
 ## JSR audit surface scan
 
@@ -177,7 +190,7 @@ locally, but would leave `bridgeInvalidation`'s safer, discoverable path unresol
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@netscript/cli`   | Three exports; templates are included; six internal pins are exact `@0.0.6` (`packages/cli/deno.json:6-29,57-75`).                                                   | The member opts out of workspace `isolatedDeclarations` (`:46-55`), so new exported generator result/request types need explicit annotations plus the JSR/no-slow-type publish dry-run. |
 | `@netscript/fresh` | Sixteen exports including `./query`; four package names across five exact internal `@0.0.6` specifiers; README is published (`packages/fresh/deno.json:6-22,47-74`). | Audit the query subpath and changed README/file list; root isolated declarations remain in force.                                                                                       |
-| `@netscript/sdk`   | Twelve exports including `./query` and `./query-client`; the one internal pin is exact `@0.0.6` (`packages/sdk/deno.json:6-18,27-51`).                               | The overload is public and must carry explicit return/types, JSDoc, doc-lint, and no slow types.                                                                                        |
+| `@netscript/sdk`   | Twelve exports including `./query` and `./query-client`; the one internal pin is exact `@0.0.6` (`packages/sdk/deno.json:6-18,27-51`).                               | No type/export delta; audit the changed published JSDoc/tested semantics with full export-map doc-lint and publish dry-run.                                                             |
 
 No dependency or version change is planned. Implementation must run the repo JSR audit and full
 export-map `deno doc --lint` for each member, re-audit exact `@netscript/*` pins, inspect each
@@ -192,9 +205,9 @@ contract receipt; per-member reports are supplemental evidence.
   Keep for CLI, Fresh, and SDK
   (`docs/architecture/doctrine/10-codebase-verdict-and-handoff.md:25-54`).
 - A1 applies because the cache identity and generator result types precede implementation; A2 favors
-  one derived identity; A6 requires the bridge overload to encode real NetScript policy; A8 keeps
-  generation planning/writing separated; A14 makes semantic, browser, JSR, and publish gates part of
-  the architecture.
+  one derived identity; A6 rejects an identity-wrapper overload because `clientKey()` already owns
+  the discoverable typed path; A8 keeps generation planning/writing separated; A14 makes semantic,
+  browser, JSR, and publish gates part of the architecture.
 - Avoid AP-9 (parallel generators), AP-12 (new unowned clock reads), AP-18 (giant generated-string
   snapshots), AP-23 (generation logic inline in Cliffy composition), and AP-25 (filesystem writes
   outside an edge).
@@ -209,11 +222,11 @@ contract receipt; per-member reports are supplemental evidence.
 ### PLAN-EVAL — propose **required**
 
 `lane-policy.md:61-69` makes this conditional. This leaf is genuinely decision-heavy: cache resource
-identity is a public cross-tier contract; the safe invalidation shape requires choosing an additive
-SDK boundary rather than only patching a template; one generator must reconcile two command paths,
-content comparison, negative atomicity, and already-generated source compatibility; and the proof
-spans three publishable members plus two leased runtime gates. A fresh opposite-family PLAN-EVAL
-should decide the SDK overload and generator result/overwrite contract before implementation.
+identity is a public cross-tier contract; one generator must reconcile two command paths, owned
+output paths, whole-command flags, negative atomicity, and already-generated source compatibility;
+and the proof spans three publishable members plus two leased runtime gates. PLAN-EVAL cycle 1 ruled
+direct emission and package README locations while returning `FAIL_PLAN` for six plan-text gaps.
+Implementation remains stopped until a separately dispatched cycle returns PASS.
 
 ### Expensive gates — propose **required after cheap convergence and explicit lease**
 
@@ -236,9 +249,12 @@ coordinator explicitly releases the leaf, and the singleton expensive-gate lease
   publishability, formatting/lint, and architecture. They do not prove a generated app boots or a
   browser hydrates.
 
-## Open questions for PLAN-EVAL
+## PLAN-EVAL cycle-1 rulings
 
-1. Accept the recommended additive `bridgeInvalidation(queryKey)` overload, or keep the SDK surface
-   unchanged and emit `{ queryKey: queries.list.clientKey() }` directly?
-2. Confirm that the package-level Fresh README is the allowed home for the required migration note,
-   because the leaf is explicitly prohibited from editing `docs/**`.
+1. Emit `{ queryKey: <svc>Queries.list.clientKey() } as const` directly after `<svc>Queries`; add no
+   SDK overload.
+2. Put the documented generator contract/migration in `packages/cli/README.md` and the hydration-age
+   note in `packages/fresh/README.md`; do not edit `docs/**`.
+3. Generator-owned modules are exactly `apps/<app>/lib/<service>.ts`; the init-owned route showcase
+   stays separate while sharing the canonical template.
+4. Whole-command `--dry-run`/`--force` semantics cover both client and Aspire-helper output.
