@@ -733,3 +733,11 @@ is still terminalizing. #1664's plan-only repair `630185e2c` passed fresh featur
 ceiling with four fresh binding receipts before another Tier-A. #1669's same-author structural
 repair is active and has restored the useful JSDoc while consolidating duplicated cache-entry reads;
 S2 remains held. No runtime lease exists, and #1663's owner-only boundary is unchanged.
+
+At 18:07Z, #1666 S2 is fresh Tier-A `PASS` at topic `dbe72c50e`; S3 is running its final
+run-artifact-only evidence serially on exact source head `47ca22abe`. The live Pages classifier and
+build are terminal green while unrelated runtime/desktop/core lanes skipped. #1669's transparent
+repair head `e100ea205` passed fresh fixes Tier-A at `c01f32141`: all documentation is restored,
+the shared cache-entry reader is a coherent structural reduction, 5/5 focused and 68/68 SDK tests
+pass, and no F-1 remains. S2 dispatch recovery is active on the same original author; no runtime
+lease exists. #1664 F5 implementation continues independently inside its reviewed ceiling.

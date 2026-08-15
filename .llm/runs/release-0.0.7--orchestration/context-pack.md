@@ -612,3 +612,10 @@ topic `53f97644d`; the same original Sol/high author is implementing F5 under th
 runtime retry. #1669's same-author anti-gaming correction is structurally consolidating duplicate
 cache-entry reads with JSDoc restored; S2 remains held until commit/push and fresh fixes Tier-A. No
 runtime lease exists. #1663 and accepted #1651 option-1 keep-and-narrow remain unchanged.
+
+Newer checkpoint `2026-08-15T18:07:44Z`: #1666 S2 `47ca22abe` passed fresh internals Tier-A at
+`dbe72c50e`; final run-artifact-only S3 is active serially on the same author. #1669 transparent
+structural repair `e100ea205` passed fresh fixes Tier-A at `c01f32141`; same-author S2 dispatch is
+being recovered and must stop for another Tier-A before IMPL-EVAL. #1664 F5 product implementation
+continues independently inside the accepted 15-product/12-test ceiling. No runtime lease exists;
+#1663 and #1651 option 1 remain unchanged.

@@ -1067,3 +1067,17 @@
   `getCachedData`/`getCachedEntry` store-read spans with one private cache-entry read path. It is 497
   lines versus the 490-line base, an honest structural reduction with headroom. Commit/push and fresh
   fixes Tier-A remain pending; S2 is still blocked.
+
+## 2026-08-15T18:07:44Z — fresh slice reviews release #1666 S3 and #1669 S2
+
+- #1666 S2 `47ca22abe` passed fresh internals Tier-A at topic `dbe72c50e`. Independent review
+  reproduced direct and aggregate raw exit 0, checked least-privilege child execution, verified the
+  checker runs once per path, and observed the guarded Pages build terminal green. S3 is active on
+  the same original author and may create run artifacts only: seven exact-head receipts, focused
+  drift proof, JSR audits, thirteen-path authorization audit, and byte-identical lock proof.
+- #1669 transparent correction `e100ea205` passed fresh fixes Tier-A at `c01f32141`. The review
+  compared comment, blank-line, and code counts against base; executed 5/5 focused and 68/68 SDK
+  tests; verified both A2/A3 regressions are sleep-free; and confirmed the documented source is 497
+  lines with no F-1. The earlier pushed head remains in history and its overclaim is superseded by
+  PR comment `5303528330`. The same original author is being recovered into S2 only; IMPL-EVAL remains
+  after fresh S2 review. No runtime lease is active.
