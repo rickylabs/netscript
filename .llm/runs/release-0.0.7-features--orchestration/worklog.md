@@ -4369,3 +4369,67 @@ Measured same-author attribution of the DevTools timeout, then a **plan-only** a
 product mutation. **No `fresh-browser`, no attempt 6, no evaluator.** The author is still writing its
 leaf-side attempt-5 report; the attribution dispatch is queued behind that turn rather than
 interrupting it.
+
+## 2026-08-15 — Measured attribution of the DevTools timeout: the browser never ran
+
+The coordinator supplied a read-only clue and asked for measurement, not assumption, between
+**Windows interop path/address handling** and **early child exit**. Measurement refutes both stated
+candidates and lands one layer earlier.
+
+### The measured causal chain
+
+1. **No Linux browser exists on this host.** All four Linux candidates in `findBrowserExecutable()`
+   (`service-client-browser-probe.ts:379-382`) are absent; only
+   `/mnt/c/Program Files/Google/Chrome/Application/chrome.exe` and the Edge equivalent exist.
+2. So the probe resolves the **Windows** executable.
+3. **WSL interop is not registered.** `/proc/sys/fs/binfmt_misc/` contains only `register` and
+   `status` — there is **no `WSLInterop` or `WSLInterop-late` entry**. Windows `.exe` files therefore
+   cannot be executed from this instance at all.
+4. Executing it falls through to `/bin/sh`, which parses the PE binary as a shell script. I ran the
+   probe's exact argv:
+
+   ```text
+   exit=2
+   /mnt/c/Program Files/Google/Chrome/Application/chrome.exe: 1: Syntax error: word unexpected (expecting ")")
+   ```
+
+5. **The probe discards that message.** `service-client-browser-probe.ts:133` pipes stderr into
+   `new WritableStream({ write: () => undefined })` — every byte dropped, and the child's non-zero
+   status is never inspected on the startup path.
+6. The probe then polls `127.0.0.1:<port>/json/list` for a DevTools target that was never going to
+   exist, and reports **"timed out waiting for the Chrome DevTools target."**
+
+### Why both stated hypotheses are wrong
+
+- **Not Windows path handling.** `--user-data-dir=/tmp/netscript-…` never reached Chrome; nothing
+  parsed it. The Linux-path concern is real in principle and simply not what happened here.
+- **Not 127.0.0.1 address handling.** No process ever bound the port. A WSL-versus-Windows loopback
+  mismatch cannot explain a listener that was never created.
+
+Both were plausible, and measuring cost one command each. Had the amendment been written against
+either, it would have "fixed" path translation or loopback addressing while the browser continued not
+to launch — and the symptom, a bare timeout, would have been unchanged.
+
+### The second-order finding is the one worth keeping
+
+The one-line stderr names the failure exactly. It was thrown away by a `write: () => undefined` sink
+identical in spirit to the swallow F6 just removed from the same file's teardown. **The same defect
+class appeared twice in one probe**: F6 fixed the teardown swallow, and the startup swallow — a
+different line, same reasoning — survived because nothing forced it into view. That is why attempts 4
+and 5 produced two different opaque symptoms from one diagnosable cause.
+
+### Amendment direction (plan-only; no mutation before the gate)
+
+1. **Preserve actionable child status and stderr on startup failure** — if the child exits before a
+   DevTools target appears, surface its exit code and captured stderr rather than reporting a bare
+   timeout. This is the fix that would have made attempt 5 self-diagnosing.
+2. **Prove the executable path only as far as measurement requires.** The Linux/WSL dual-path question
+   is *not* what failed here; a fabricated interop fix would be scope invented from a refuted
+   hypothesis.
+3. The environmental fact — no Linux Chrome and no registered WSL interop — is a **host capability
+   gap**, not a product defect. Whether the gate should skip with a clear precondition failure, or the
+   host should provide a Linux browser, is a coordinator decision and not this lane's to take.
+
+Author was still writing its leaf-side attempt-5 report at the time of this measurement; the
+amendment dispatch is queued behind that turn. No product mutation, no `fresh-browser`, no attempt 6,
+no evaluator.
