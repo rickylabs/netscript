@@ -109,3 +109,67 @@ No `// deno-lint-ignore`, `// quality-allow`, `as any`, or `as unknown as` was i
 1. A fresh opposite-family **IMPL-EVAL** is mandatory and is not launched here.
 2. Ready flip, relabel, merge, publication, and issue closure remain coordinator-only.
 3. No expensive-gate lease exists or was requested; none is needed for this leaf's gate set.
+
+---
+
+# CORRECTION — this Tier-A PASS is withdrawn (IMPL-EVAL F-1)
+
+IMPL-EVAL cycle 1 (`8d6b4726c`, evaluated head `e3c74d7aa`, canonical Fable 5 · medium) returned
+**`FAIL_FIX`** on blocking finding **F-1**, which this Tier-A missed.
+
+## What I got wrong
+
+I marked live criterion 6 (`registerMcpTools` accepts/propagates cancellation) **met** because the
+`options` argument was forwarded into `callTool`. I checked that propagation *exists*. I never asked
+what forwarding a **registration-scoped** signal into **per-call** handlers means at runtime.
+
+Verified in source after the verdict:
+
+- `register-tools.ts:38-41` — the registered handler closes over `options`, the `registerMcpTools`
+  argument, and passes it to `transport.callTool(...)`. The registration signal therefore *is* the
+  per-call signal for **every** tool, for the lifetime of the registry.
+- `README.md:194-195` — the documented failure-isolated pattern is
+  `const startup = AbortSignal.timeout(1_500); await registerMcpTools(registry, pool, { signal: startup })`.
+  Following the documentation, **every tool call made more than 1.5 s after startup rejects with
+  `TimeoutError`**.
+- `mcp_test.ts:300` — `registerMcpTools propagates cancellation to registered calls` aborts the
+  registration controller and asserts the handler **rejects**. The suite therefore **encodes the
+  defect as desired behavior**, which is exactly why every gate was green and why a
+  green-gate review could not catch it.
+
+The evaluator did what I should have: a read-only runtime repro —
+`call-before-deadline: ok` → `call-after-deadline: ERR TimeoutError`.
+
+## This is the third instance of one pattern
+
+| # | Leaf | Miss | Root cause |
+| --- | --- | --- | --- |
+| E-1 | #1657 | verified template↔manifest semantics; never asked whether the template is what ships | checked shape, not delivery |
+| G-1 | #1657 | inferred `packages/fresh-ui` was outside the root workspace from a substring match against a glob | inferred a negative from a pattern |
+| **F-1** | **#1661** | verified a signal is forwarded; never asked what its **scope** means at runtime | checked shape, not behavior |
+
+All three: I checked the shape and not the behavior. The corrective rule already adopted in this
+lane — *execute the check; never infer from a pattern match* — is necessary but was not sufficient,
+because here I did read the code. The sharper rule this adds:
+
+> **For any cancellation, lifetime, or scope contract, run it.** A signal that is *plumbed* is not a
+> signal that is *correctly scoped*. Green tests are no defense when the test encodes the defect.
+
+## Corrected verdict
+
+The Tier-A `PASS_TO_IMPL_EVAL` above is **withdrawn**. The correct verdict at `3a4bc66c4` /
+`e3c74d7aa` is **CHANGES_REQUESTED**, subsumed by the formal IMPL-EVAL `FAIL_FIX`.
+
+Everything else in that review stands and the evaluator independently reached the same conclusions:
+contract integrity (ten files, `deno.json`/`deno.lock`/`packages/fresh` untouched), Ruling 2's
+synchronous I/O-free snapshot, Ruling 5's optional-on-port `readResource` with the cross-package
+check green, and Ruling 6's published-transport cancellation bar. The miss is orthogonal to those.
+
+## Fix scope — no new amendment required
+
+F-1's remedy is **inside the already-authorized ten-file surface**: `register-tools.ts`,
+`mcp_test.ts`, `README.md`. Decouple registration/discovery cancellation from per-call cancellation;
+replace the test at `:300` with a regression proving a registered call **succeeds** after the
+registration signal aborts, while keeping a discovery-abort test; and make the README pattern safe
+or state explicitly that the registration signal bounds the whole registration lifetime and must not
+be a startup timeout. The two currently contradict each other.
