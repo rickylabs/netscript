@@ -4795,3 +4795,70 @@ either direction.
 
 Measured attribution of the 900-second no-evidence condition, then a plan-only amendment before any
 product mutation. No attempt 7, no `fresh-browser`, no evaluator, no readiness.
+
+## 2026-08-15 — BLOCKER: the preserved author is out of credit until 2026-08-20; my contamination is still committed
+
+### What happened
+
+The bounded restoration dispatch reached the author, which then failed to act:
+
+```text
+ERROR: You've hit your usage limit. Visit https://chatgpt.com/codex/settings/usage
+to purchase more credits or try again at Aug 20th, 2026 5:31 AM.
+tokens used 6,106,885
+```
+
+Codex thread `01a004f9-f033-7592-a0bc-63927753fb43` — the preserved original author for this leaf
+across every slice from S1 through F8 — is **unavailable until 2026-08-20 05:31**. This is a hard
+quota exhaustion, not a transient error, and no retry will change it.
+
+### State left behind
+
+| Item | Value |
+| --- | --- |
+| Leaf head | `d8d5ee61924d0c3c7ed657ab96f610bc142cfd6a`, local == remote |
+| Tree | clean |
+| F8 amendment | committed and pushed, **plan-only** apart from the one contaminated file |
+| Outstanding defect | `leak-report.md` in `d8d5ee619` still carries **my** audit's bytes |
+
+The exact residue, unchanged:
+
+```diff
+-Generated: 2026-08-15T21:24:46.689Z
+-Worktree: `/home/codex/worktrees/netscript-s5-a6-ed3f78e0d`
++Generated: 2026-08-15T21:33:41.742Z
++Worktree: `/home/codex/repos/netscript-007-features-1355`
+```
+
+### Why I have not fixed it myself
+
+The correction is one file and two lines, and I could restore it in seconds. I have not, because the
+coordinator's instruction was explicit that **the author** restores it, and ownership is the entire
+point of the finding: a supervisor writing into a worktree whose commits another agent signs is what
+created the problem. Fixing my contamination by writing into that worktree *again* — this time
+authoring a commit on the author's branch — would repeat the ownership violation while claiming to
+correct it. That is a decision to escalate, not to take unilaterally.
+
+**I can perform the restoration immediately if the coordinator authorises it**, and it is trivially
+verifiable: `git diff 2385cdb72 HEAD -- …/leak-report.md` must come back empty.
+
+### Options, for the coordinator
+
+1. **Authorise this supervisor to restore the file** on the leaf branch, as a new commit that states
+   the reverted lines were supervisor-generated. Fastest; costs the ownership boundary once more,
+   deliberately and on the record.
+2. **Assign another implementation agent** to make the one-file restoration.
+3. **Accept the contamination as recorded** — it is two provenance lines in a run artifact, already
+   attributed to me in D-19 and here, and the F8 *plan content* is unaffected — and let the next
+   author fix it when quota returns on 2026-08-20.
+4. **Wait for the preserved author.** Preserves the thread's continuity across the whole leaf, at the
+   cost of ~4 days.
+
+### What is not blocked
+
+F8's amendment content is committed and pushed and can be reviewed now. Fresh Tier-A on the bounded
+CDP-wait contract does not depend on the contaminated line and I can run it immediately — noting that
+any Tier-A must record the outstanding contamination rather than treat the head as pristine.
+
+Nothing else in this lane is running. No lease is held. All four quarantines remain intact and no
+prior evidence has been altered.
