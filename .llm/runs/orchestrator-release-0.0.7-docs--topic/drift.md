@@ -161,3 +161,44 @@ This is the same string-match trap already recorded twice in this run. The corre
 the exact PID (`[ -d /proc/<pid> ]`) or the rollout's last record, never a pattern match against a
 command line that may contain the pattern as data. Cost: ~75 minutes of idle lane time. No work was
 lost and no wrong action was taken.
+
+## 2026-08-15 — S2's mandatory lint row targets paths the repo excludes from lint by design
+
+The leaf reached the end of S2 implementation and blocked on the approved gate's lint command, which
+exits `2`. It did not substitute another config, modify root configuration, or add a config file,
+and it committed nothing. Correct on all counts.
+
+Reproduced independently by the orchestrator. The exact mandated invocation returns exit `2` with
+`"filesSelected":2` and `"excludedBatches":1`: the wrapper selected both files, Deno excluded them,
+and the wrapper refused a false green — which is `run-deno-lint.ts` behaving as designed.
+
+Root `deno.json` sets
+`lint.exclude: [".llm/", "tools/", "packages/cli/",
+"packages/mcp/tests/fixtures/doctor/"]`. There
+is no `.llm/deno.json`, and CI does not lint `.llm/tools`. `.llm/**` is therefore outside lint
+coverage by deliberate repo-wide configuration, so the approved `S2-evidence-repro` gate mandated
+linting two paths the repository excludes by design. Note `fmt.exclude` does **not** list `.llm/`,
+which is why the fmt row is legitimate and passes.
+
+The remaining rows, all executed by the orchestrator rather than accepted from the leaf:
+
+| Row                 | Raw exit | Result                           |
+| ------------------- | -------- | -------------------------------- |
+| `run-deno-check.ts` | `0`      | 2 files, 0 occurrences           |
+| `run-deno-lint.ts`  | `2`      | unsatisfiable — `.llm/` excluded |
+| `run-deno-fmt.ts`   | `0`      | 2 files, 0 findings              |
+| `run-deno-test.ts`  | `0`      | 5 passed, 0 failed               |
+| `git diff --check`  | `0`      | clean                            |
+
+Disposition (topic-orchestrator ruling, severity `significant`, no rescope, no scope growth): the
+lint row is recorded **N/A — not applicable**, in the same category as the leaf contract's
+`jsrAudit.applicable: false`, never as passed, skipped, or waived. Two corrections were explicitly
+refused: borrowing `docs/site/deno.json` to lint repo tooling would apply unrelated rules and
+manufacture a meaningless green, and editing root `deno.json` is repo-wide tooling configuration
+outside a docs leaf that would surface findings across other `.llm` tools.
+
+This is the **fifth** defect of one family inside a plan that formal PLAN-EVAL cycle 1 passed: a
+slice whose acceptance, gate, or inputs cannot be satisfied from that slice's own file list and the
+repository's actual configuration. The four previous instances were S1's unsatisfiable rendered-nav
+assertion, S1's four links into a later slice's section, S1's gate being unable to prove its own
+link contract, and S2's local-roots contract with no slice creating the root.
