@@ -146,3 +146,134 @@ treated as inputs to verify, not as conclusions; every row below was re-derived 
 2. PR #1661 stays draft; `status:` relabel (N-1) is coordinator-only.
 3. Before any `status:ready-merge`: the PR body carries `Closes #1448` while all nine issue acceptance boxes and the two remaining DoD boxes are unchecked — the acceptance-evidence mirror / close-gate must run after cycle-2 PASS. No box was ticked and no keyword changed by this evaluator.
 4. Optionally log O-3 as a one-line drift entry.
+
+---
+
+# IMPL-EVAL — cycle 2 (final)
+
+Fresh separate session. Not the Codex author (`01a0048d-61b0-76a2-8117-5f8ce0466495`), not the
+topic orchestrator that ruled the amendments and signed Tier-A twice, not the cycle-1 evaluator
+session. The orchestrator's Tier-A re-review `PASS_TO_IMPL_EVAL`, both rulings, and the cycle-1
+record were treated as inputs to verify; every row below was re-executed here at the evaluated head.
+
+## Metadata
+
+| Field | Value |
+| --- | --- |
+| Evaluator route (requested) | Native Claude `claude-fable-5` · effort `medium` · `/remote-control` on — canonical `formal_impl_evaluation` lane (`lane-policy.md:46`) |
+| Observed route | job `eb7149da` `state.json` `respawnFlags`: `--effort medium --permission-mode bypassPermissions --remote-control --name "NetScript 0.0.7 #1661 IMPL-EVAL c2" --model claude-fable-5` — matched |
+| Session id | `eb7149da-1689-44af-970e-ddd6e78022fa` (`~/.claude/sessions/608782.json`) |
+| Remote Control | `bridgeSessionId` `session_01CaAEKsH35CP2QgfNUVdXK1` (registry form) → `https://claude.ai/code/session_01CaAEKsH35CP2QgfNUVdXK1` |
+| PID / cwd | `608782` / `/home/codex/repos/netscript-007-leaf-ai-mcp-pool` (branch `fix/ai-mcp-pool-isolation`) |
+| Date | 2026-08-15 |
+
+## Heads (resolved independently)
+
+| Ref | SHA |
+| --- | --- |
+| Evaluated head (Tier-A re-review sign-off) | `df05344166adaeb2b8e2f2f6ec741e1032d29045` — local `HEAD`, fetched `origin/fix/ai-mcp-pool-isolation`, and PR #1661 `headRefOid` all agree; PR draft, base `main` |
+| Repair head | `e4944309361fe18efea20be8a3df364bb8754d82` — verified ancestor; `git diff --name-only e4944309 df05344` = `review-tier-a.md` only |
+| Cycle-1 evaluated head / verdict | `e3c74d7aa` / `8d6b4726c` |
+| Immutable base | `284dda90a17a13a7e5e8e9834e5411b58887131b` — `git merge-base` of base and head is the base |
+
+## F-1 closure — verified behaviorally, not from the diff
+
+Read-only repro outside the repo (`$CLAUDE_JOB_DIR/tmp/repro-c2.ts`), through the **published**
+`StreamableHttpMcpTransport` from `packages/ai/mcp.ts` + `createToolRegistry` from `tools.ts`,
+using the README's *old* pattern (`registerMcpTools(registry, transport, { signal: AbortSignal.timeout(50) })`):
+
+```
+call-before-deadline: complete ok
+startup signal aborted? true TimeoutError          ← the deadline genuinely fired
+call-after-deadline: complete ok                   ← was ERR TimeoutError at e3c74d7aa
+signals seen by callTool (per call): [ signal(aborted=false), signal(aborted=false) ]
+discovery under aborted registration signal: rejected:AbortError | listTools saw aborted signal? true
+```
+
+- The signal that reaches the connection's `callTool` is the transport's own stop-controller
+  combined signal (`base-transport.ts:108`, `combineSignals(this.#stopController.signal, options.signal)`
+  with `options.signal === undefined`) — **not** the registration signal; it is unaborted after the
+  deadline. Per-call cancellation via a caller-supplied per-call signal remains available on the
+  transport itself.
+- **Discovery cancellation was not dropped:** `addCurrent` still calls `transport.listTools(options)`
+  (`register-tools.ts:35`); the repro shows registration rejecting `AbortError` with the aborted
+  signal reaching `listTools`. Re-sync on `connected` re-uses the same path (matches README text).
+- **RED independently re-established:** temporary detached worktree at RED commit `59eca0647`
+  (removed afterwards): focused test → `0 passed | 1 failed`, raw exit **1**; at the evaluated head
+  the same test is green (suite 20/20).
+
+## The test set
+
+| Requirement | Result |
+| --- | --- |
+| Old defect-asserting test `registerMcpTools propagates cancellation to registered calls` gone | PASS — 0 occurrences in `mcp_test.ts` |
+| Replacement asserts success-after-abort | PASS — `mcp_test.ts:300` `registered calls outlive the registration discovery signal`: aborts the registration controller, then asserts the handler resolves `{toolCallId:'demo:demo_search', content:'{}', state:'complete'}` and `transport.callSignal === undefined` |
+| Discovery-abort test retained | PASS — `mcp_test.ts:284` `registerMcpTools settles discovery when its caller aborts` unchanged, green |
+
+## Docs/code agreement (criterion 9)
+
+`README.md:194-195` now puts the startup deadline on `pool.connect({ signal: startup })`; `:182`
+registers with no deadline; `:211-214` states the `registerMcpTools` signal bounds discovery and
+later automatic re-sync and "is not reused by registered tool calls". Verified against
+`register-tools.ts` (`listTools(options)` on discovery and on the `connected` re-sync; no options on
+the call handler; `stop(stopOptions)` separate). Criterion 9 is **true now**: the documented pattern
+is the safe one and describes the signal's real scope. AP-19 cleared.
+
+## Everything cycle 1 checked — re-checked at `df05344`
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Product delta is exactly the ten authorized files | PASS | `git diff --name-only 284dda90a df05344 -- . ':(exclude).llm/**'` → the same ten `packages/ai` files |
+| Repair delta (`e3c74d7aa..e4944309`) | PASS | exactly `register-tools.ts`, `mcp_test.ts`, `README.md` (+ artifacts) |
+| `packages/ai/deno.json` exports, `deno.lock`, `packages/fresh` | PASS | `git diff --stat base..head` on all three → empty |
+| No suppressions introduced | PASS | grep of `+` lines for `deno-lint-ignore` / `quality-allow` / `as any` / `as unknown as` / `@ts-ignore` / `@ts-expect-error` → none |
+| Ruling 2 (sync, I/O-free, per-`serverId`, state + `lastError`, `McpConnectionState`, additive) | PASS | `pool.ts:108` `get snapshot()` getter over `#transports`/`#lastErrors`, no `await`/`fetch` in body; `McpServerStatus`/`McpTransportPoolSnapshot` exported as types from `mcp.ts:63,69` |
+| Ruling 5 — cross-package `packages/fresh` check | PASS | `run-deno-check.ts --root packages/fresh --ext ts,tsx` → 197 files, 2 batches, 0 failed, exit 0; direct `deno check --unstable-kv packages/fresh/src/runtime/ai/mcp-app-call-handler_test.ts` exit 0 |
+| Ruling 6 — published-transport cancellation | PASS | tests `:517/:551/:583/:613/:642` unchanged and green in the 20/20 run; repro above adds registration-through-published-transport evidence |
+| Live #1448 criteria 1–8 | met | unchanged from cycle 1 (source unchanged outside the three repair files); criterion 6 still met — options accepted and propagated to discovery, re-sync, and `stop`, no longer to registered calls |
+| Live #1448 criterion 9 | **met** | see docs/code agreement above |
+| Process: RED→GREEN pair, named gates, per-slice PR comment with raw exit codes | PASS | PR comment `[PHASE: IMPL]` for `59eca0647`/`e49443093`; RED exit 1 independently reproduced |
+| Generator ≠ evaluator; no self-certification | PASS | Codex authored; Opus orchestrator re-reviewed; this is a third, fresh session |
+| Close-gate (rule 12) | not yet applicable | PR draft; nine issue boxes and two DoD boxes unchecked; `Closes #1448` present — coordinator must run the acceptance mirror before any `status:ready-merge`; nothing ticked here |
+
+## Static gates — re-executed by this evaluator at `df05344`
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| MCP focused tests | `run-deno-test.ts -- --allow-all packages/ai/tests/mcp_test.ts` | exit 0 · **20 passed / 0 failed** |
+| `packages/ai` check | `run-deno-check.ts --root packages/ai --ext ts,tsx` (`--unstable-kv`) | exit 0 · 98 files · 0 failed |
+| `packages/fresh` check | `run-deno-check.ts --root packages/fresh --ext ts,tsx` | exit 0 · 197 files · 0 failed |
+| `packages/ai` lint / fmt | `run-deno-lint.ts` / `run-deno-fmt.ts --root packages/ai --ext ts,tsx` | exit 0 / exit 0 · 0 findings |
+| doc lint | `deno doc --lint packages/ai/mcp.ts` | exit 0 |
+| quality scan | `deno task quality:scan` | exit 0 · `ok:true` · `findings:[]` · 0 allowances in `packages/ai` |
+| arch check | `deno task arch:check` | exit 0 · baseline `export default` warnings only |
+| publish dry-run | `deno publish --dry-run --allow-dirty` in `packages/ai` | exit 0 · Success |
+| Aspire / Docker / `scaffold.runtime` / `e2e:cli` / browser | — | NOT_RUN by constraint; no lease; `docker ps -a` empty after this evaluation |
+
+## Cycle-1 observations — disposition
+
+| ID | Status now | Blocking? |
+| --- | --- | --- |
+| O-3 | closed — `drift.md` carries the "Slice 5 publish graph" entry (a trailing bullet under the attribution entry rather than its own dated heading; record is complete, form is cosmetic) | no |
+| O-1 (`Reflect.*` in tests) | deferred as instructed | no — published instances still exercised |
+| O-2 (connector-level list/call abort not test-proven) | deferred | no — Ruling 6's bar met; code-verified |
+| O-4 (`pool.connect` resolves partial on abort) | deferred; README's new `pool.connect({signal})` + snapshot pattern is consistent with it | no |
+| O-5 (duplicate-name throw mid-loop) | pre-existing | no |
+
+## Findings
+
+None blocking. No new findings.
+
+## Verdict (cycle 2 — final)
+
+| Field | Value |
+| --- | --- |
+| Verdict | **`PASS`** |
+| Rationale | F-1 is closed and proven at runtime through a published transport: the startup deadline fires, later registered calls succeed, no registration signal reaches `callTool`, and discovery cancellation is intact. The defect-encoding test is gone and replaced by a success-after-abort regression that was independently red at `59eca0647`; the discovery-abort test remains. README and code agree, making criterion 9 true. The twice-amended ten-file contract, Rulings 2/5/6, lock/export/`packages/fresh` hygiene, and every cheap structured gate re-verify green at `df05344`. No doctrine violation, no debt entry needed. |
+
+## Stops here — coordinator readiness disposition (not taken)
+
+- PR #1661 remains **draft**; `status:plan` label still lags (N-1) — relabel is coordinator-only.
+- Before `status:ready-merge`: acceptance-evidence mirror / close-gate for the nine #1448 boxes and
+  the two DoD boxes; no box ticked and no keyword changed by this evaluator.
+- No further IMPL-EVAL cycle; no PLAN-EVAL.
