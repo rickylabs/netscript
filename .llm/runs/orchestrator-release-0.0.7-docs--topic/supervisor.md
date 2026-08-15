@@ -9,10 +9,10 @@
 | Observed route (process argv)       | `--model claude-opus-5 --effort high --permission-mode bypassPermissions --remote-control netscript-007-docs`      |
 | Route verdict                       | matched                                                                                                            |
 | Claude session id                   | `fcf04b0f-3c2f-4844-9508-84c52ce8298c`                                                                             |
-| `bridgeSessionId`                   | `session_01PLRauSHN1PnvrNF2ucefF6` (non-empty)                                                                     |
-| Remote Control URL                  | `https://claude.ai/code/session_01PLRauSHN1PnvrNF2ucefF6`                                                          |
-| Remote Control state                | attached; native Anthropic client, CLI `2.1.233`, `kind: bg`                                                       |
-| PID                                 | `2429469`                                                                                                          |
+| `bridgeSessionId`                   | `session_01SBHRTmr6ddueUYzCbcXrRV` (current; supersedes `session_01PLRauSHN1PnvrNF2ucefF6`, whose PID is dead)      |
+| Remote Control URL                  | `https://claude.ai/code/session_01SBHRTmr6ddueUYzCbcXrRV`                                                          |
+| Remote Control state                | attached; native Anthropic client, `--remote-control`, resumed on the same Claude session id                       |
+| PID                                 | `11850` (respawn of `2429469`; the Claude session id is unchanged)                                                 |
 | Exact cwd                           | `/home/codex/repos/netscript-007-docs`                                                                             |
 | Worktree                            | `/home/codex/repos/netscript-007-docs`                                                                             |
 | Branch                              | `orchestrator/release-0.0.7-docs` (no upstream by design; push by explicit refspec only)                           |
@@ -23,6 +23,7 @@
 | Leaf implementer Codex thread       | `019ffcc9-16c2-7573-b7f6-d627172408e8` (gpt-5.6-sol · high · idle; steer by `codex exec resume`, never a new send) |
 | Lane issue scope                    | #1551 only (one committed milestone issue)                                                                         |
 | Lane status                         | **EXHAUSTED / PARKED** — allocation `[1551]` shipped; no docs-lane issue open                                      |
+| Last reconciliation                 | 2026-08-15 vs coordinator state `353bd087a` (`updatedAt` 11:51Z, `currentMainSha` `baf1cdf67`) — allocation unchanged |
 
 Attachment is proved by the native session registry entry `~/.claude/sessions/2429469.json`, whose
 `pid`, `cwd`, and non-empty `bridgeSessionId` match the live process, plus the process argv above.

@@ -1271,3 +1271,52 @@ estimates. Five operating rules earned along the way are recorded in `context-pa
 Preserved and idle for any reactivation: Codex threads `019ffcc9-16c2-7573-b7f6-d627172408e8` and
 `01a0047a-aceb-7b53-9ba1-9191eedaaf1a`. Immutable base `729386c567bfbd0b8c7f86a4ed09348f0a8a4ad8`.
 No coordinator-owned merge state was mutated by this lane.
+
+## Resumed reconciliation — 2026-08-15, main at `baf1cdf67`
+
+The lane was resumed after a context break and reconciled against the coordinator's own control
+plane rather than against this run's cached record. Nothing was dispatched, because nothing is
+allocated.
+
+**Identity re-proved.** PID `2429469` is dead; this session is a respawn at PID `11850` on the
+unchanged Claude session `fcf04b0f-3c2f-4844-9508-84c52ce8298c`, argv
+`--model claude-opus-5 --effort high --remote-control --name netscript-007-docs`, cwd
+`/home/codex/repos/netscript-007-docs`. The bridge id rotated to
+`session_01SBHRTmr6ddueUYzCbcXrRV`; the URL previously published in `supervisor.md` is dead and has
+been corrected. A respawn rotates the bridge id while preserving the session id — a published
+Remote Control URL is therefore not durable across a respawn and must be re-read, not carried
+forward.
+
+**Coordinator state read at source.** `chore/release-0.0.7-orchestration` commit `353bd087a`
+(14:38 local, `updatedAt` `2026-08-15T11:51:00Z`) carries `currentMainSha`
+`baf1cdf67a4e931af17b4772ddf6101f36152184`, matching `origin/main`. It allocates the docs lane
+exactly `[1551]` — unchanged — and records both docs leaves as `phase: merged`
+(`comparison-docs-programme` → #1652, `comparison-vs-pages` → #1660,
+`implementationState: merged_and_published`). No docs leaf sits in `planned` or `impl`. No new
+docs allocation, no dependency release, no re-intake directed at this lane.
+
+**Allocation exclusivity re-checked against every open 0.0.7 issue.** All 46 are claimed by another
+lane: internals `[1296, 1378, 1429, 1533, 1542, 1545, 1557, 1561, 1563, 1601, 1604, 1611, 1613,
+1618, 1621, 1622]`, fixes `[1093, 1112, 1243, 1249, 1262, 1263, 1350, 1351, 1353, 1357, 1358, 1448,
+1461, 1462, 1481, 1543, 1544, 1588, 1598, 1609, 1610, 1616, 1619, 1620, 1623, 1637]`, features
+`[1293, 1348, 1349, 1352, 1354, 1355, 1360, 1451, 1452, 1455, 1458, 1466, 1467, 1502, 1590, 1591,
+1592]`. The one open docs-titled issue outside those sets, `#1642`
+(`docs(aspire): expose detached non-TTY start state…`), is milestoned **Backlog / Triage**, not
+0.0.7, so it is not this milestone's work to take. Re-intake is coordinator-owned
+(`milestone-run.md` §"the coordinator owns scheduling, dependency release, merge authority,
+re-intake") — a topic orchestrator that self-allocates from the backlog breaks exclusivity, so this
+lane reports idle capacity instead.
+
+**Published surface re-verified after three later merges** (`05fc3132b`, `3fc0f2f92`, `baf1cdf67`
+landed on top of `729386c56`). `/netscript/comparisons/` 200 "Comparisons", `/comparisons/frontend/`
+200 "NetScript vs Next.js, Nuxt, SvelteKit, and TanStack Start", `/comparisons/backend/` 200
+"NetScript vs Nest.js, Hono, and Encore.dev"; `/comparisons/methodology/` and `/migration/` still
+404. The deleted protocol surface has stayed deleted through later deploys.
+
+**Lane hygiene.** All three docs worktrees clean at their recorded heads —
+`netscript-007-docs` `0ca4c489f`, `netscript-007-docs-vs` `615786c1a`,
+`netscript-007-docs-comparison` `a465836b4`. No live Codex author process for either preserved
+thread. Topic branch matches `origin` at `0ca4c489f` by `git ls-remote`.
+
+Lane remains **EXHAUSTED / PARKED**, now against a verified-current control plane. It is available
+for immediate dispatch on coordinator allocation.
