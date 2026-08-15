@@ -2,12 +2,12 @@
 
 ## Run Metadata
 
-| Field | Value |
-| --- | --- |
-| Run ID | `release-0.0.7-internals--orchestration/slices/quality-scan-root-coverage` |
-| Branch | `fix/quality-scan-root-coverage` |
-| Archetype | `6 — CLI / Tooling` |
-| Scope overlays | `service`, `docs` |
+| Field          | Value                                                                      |
+| -------------- | -------------------------------------------------------------------------- |
+| Run ID         | `release-0.0.7-internals--orchestration/slices/quality-scan-root-coverage` |
+| Branch         | `fix/quality-scan-root-coverage`                                           |
+| Archetype      | `6 — CLI / Tooling`                                                        |
+| Scope overlays | `service`, `docs`                                                          |
 
 ## Design
 
@@ -23,8 +23,8 @@
 
 ### Domain vocabulary
 
-- Published denominator — an existing `WorkspaceMember` with `publishable:true` and a
-  `packages/**` or `plugins/**` root.
+- Published denominator — an existing `WorkspaceMember` with `publishable:true` and a `packages/**`
+  or `plugins/**` root.
 - `ConfiguredRootSet` — normalized roots extracted for one quality task.
 - `RootCoverage` — task name, configured roots, and uncovered published members.
 - `RootCoverageReport` — census, named boundary and `publish:false` exclusions, quality-task
@@ -50,11 +50,11 @@
 
 ### Commit slices
 
-| # | Slice | Gate | Files |
-| --- | --- | --- | --- |
-| 1 | Fail-closed coverage contract + fixtures | focused durable test; scoped check/lint/fmt | `.llm/tools/quality/check-root-coverage.ts`, `_test.ts`, run artifacts |
-| 2 | Bind both scan tasks to broad roots and checker | quality-scan, quality-scan-repo, arch-check, quality-gate | `deno.json`, conditional test adjustment, run artifacts |
-| 3 | Final frozen gate set and handoff | check, test, quality-job, publish-dry-run, docs-source-format(+test), docs-accuracy | run artifacts only |
+| # | Slice                                           | Gate                                                                                | Files                                                                  |
+| - | ----------------------------------------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| 1 | Fail-closed coverage contract + fixtures        | focused durable test; scoped check/lint/fmt                                         | `.llm/tools/quality/check-root-coverage.ts`, `_test.ts`, run artifacts |
+| 2 | Bind both scan tasks to broad roots and checker | quality-scan, quality-scan-repo, arch-check, quality-gate                           | `deno.json`, conditional test adjustment, run artifacts                |
+| 3 | Final frozen gate set and handoff               | check, test, quality-job, publish-dry-run, docs-source-format(+test), docs-accuracy | run artifacts only                                                     |
 
 ### Deferred scope
 
@@ -70,52 +70,52 @@ checker and its semantic fixtures, not package lists in multiple tasks.
 
 ## Progress log
 
-| Time | Slice | Step | Notes |
-| --- | --- | --- | --- |
-| 2026-08-15T07:10:07+02:00 | Bootstrap | Activated | Identity and mandatory run artifacts committed at the immutable baseline. |
-| 2026-08-15T07:11:26+02:00 | Bootstrap | Draft PR | PR #1656 opened from bootstrap commit; required labels and milestone applied. |
-| 2026-08-15 | Plan | Research complete | Live issue, task roots, 35-member publish census, 36-root doctrine census, tests, CI, JSR risk, and #1653 findings re-baselined. |
-| 2026-08-15 | Plan | Design checkpoint | Exact three-path implementation surface and three ordered slices locked. |
-| 2026-08-15 | Plan eval | PASS | Cycle 1 passed at `3b95a004f`; immutable plan `da76d9d84` remained byte-identical. |
-| 2026-08-15 | S1 | RED | Contract test committed at `2c9aa89c0`; durable receipt failed before the checker existed. |
-| 2026-08-15 | S1 | Implementation | Checker and nine tests implemented; `deno.json` remains unchanged. |
-| 2026-08-15 | S1 | Design checkpoint | Configured roots and observed traversal are separate; out-of-boundary workspace members are named and counted. |
+| Time                      | Slice     | Step              | Notes                                                                                                                            |
+| ------------------------- | --------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-15T07:10:07+02:00 | Bootstrap | Activated         | Identity and mandatory run artifacts committed at the immutable baseline.                                                        |
+| 2026-08-15T07:11:26+02:00 | Bootstrap | Draft PR          | PR #1656 opened from bootstrap commit; required labels and milestone applied.                                                    |
+| 2026-08-15                | Plan      | Research complete | Live issue, task roots, 35-member publish census, 36-root doctrine census, tests, CI, JSR risk, and #1653 findings re-baselined. |
+| 2026-08-15                | Plan      | Design checkpoint | Exact three-path implementation surface and three ordered slices locked.                                                         |
+| 2026-08-15                | Plan eval | PASS              | Cycle 1 passed at `3b95a004f`; immutable plan `da76d9d84` remained byte-identical.                                               |
+| 2026-08-15                | S1        | RED               | Contract test committed at `2c9aa89c0`; durable receipt failed before the checker existed.                                       |
+| 2026-08-15                | S1        | Implementation    | Checker and nine tests implemented; `deno.json` remains unchanged.                                                               |
+| 2026-08-15                | S1        | Design checkpoint | Configured roots and observed traversal are separate; out-of-boundary workspace members are named and counted.                   |
 
 ## Decisions
 
-| Decision | Reason | Source |
-| --- | --- | --- |
-| PLAN-EVAL required | Cross-repository denominator and ancestry semantics are decision-heavy despite small code volume. | harness run-loop + plan-gate |
-| Do not edit doctrine checker | Dynamic 36-root discovery is already current and independently tested; new coverage tool verifies its published subset. | research F5 |
-| Do not edit scanner | Existing `scanned` output satisfies reporting; task configuration and fail-closed coverage are the defect. | research F4 |
-| Prove forwarding by execution | A temp workspace runs the real checker first in an `&&` task and records `--changed-file` only at the final command. | PLAN-EVAL advisory A |
-| Never equate configured roots with traversal | `observedByChecker:false`, `traversedPaths:null`, and a note prevent a traversal claim. | PLAN-EVAL advisory A |
-| Name the denominator boundary | Exact parent patterns plus excluded count/paths/reason are emitted even when the count is zero. | PLAN-EVAL advisory B |
+| Decision                                     | Reason                                                                                                                  | Source                       |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| PLAN-EVAL required                           | Cross-repository denominator and ancestry semantics are decision-heavy despite small code volume.                       | harness run-loop + plan-gate |
+| Do not edit doctrine checker                 | Dynamic 36-root discovery is already current and independently tested; new coverage tool verifies its published subset. | research F5                  |
+| Do not edit scanner                          | Existing `scanned` output satisfies reporting; task configuration and fail-closed coverage are the defect.              | research F4                  |
+| Prove forwarding by execution                | A temp workspace runs the real checker first in an `&&` task and records `--changed-file` only at the final command.    | PLAN-EVAL advisory A         |
+| Never equate configured roots with traversal | `observedByChecker:false`, `traversedPaths:null`, and a note prevent a traversal claim.                                 | PLAN-EVAL advisory A         |
+| Name the denominator boundary                | Exact parent patterns plus excluded count/paths/reason are emitted even when the count is zero.                         | PLAN-EVAL advisory B         |
 
 ## Drift
 
-| Drift | Severity | Logged in drift.md |
-| --- | --- | --- |
-| Launcher pre-seeded the run directory | minor | yes |
-| Historical `arch:check` omission is already fixed on the immutable base | minor | yes |
+| Drift                                                                   | Severity | Logged in drift.md |
+| ----------------------------------------------------------------------- | -------- | ------------------ |
+| Launcher pre-seeded the run directory                                   | minor    | yes                |
+| Historical `arch:check` omission is already fixed on the immutable base | minor    | yes                |
 
 ## Gate results — slice 1
 
-| Gate | Exit | Commit attested | Receipt |
-| --- | ---: | --- | --- |
-| focused test (RED) | 1 | `2c9aa89c0` | `receipts/slice-1/red-test.json` |
-| focused test (GREEN; 8/8 before final CLI-failure case) | 0 | `22e35f4be` | `receipts/slice-1/test.json` |
-| check (package roots + explicit S1 roots) | 0 | `22e35f4be` | `receipts/slice-1/check.json` |
-| lint (package roots + explicit S1 roots) | 0 | `22e35f4be` | `receipts/slice-1/lint.json` |
-| format check (package roots + explicit S1 roots) | 0 | `22e35f4be` | `receipts/slice-1/fmt-check.json` |
-| focused final test (GREEN; 9/9) | 0 | `a2f33ca4f` | `receipts/slice-1/final-test.json` |
-| final check (wrapper fired; 2,921 files) | 0 | `a2f33ca4f` | `receipts/slice-1/final-check.json` |
-| final lint (wrapper fired; 2,036 files) | 0 | `a2f33ca4f` | `receipts/slice-1/final-lint.json` |
-| final format check (wrapper fired; 2,036 files) | 0 | `a2f33ca4f` | `receipts/slice-1/final-fmt-check.json` |
+| Gate                                                    | Exit | Commit attested | Receipt                                 |
+| ------------------------------------------------------- | ---: | --------------- | --------------------------------------- |
+| focused test (RED)                                      |    1 | `2c9aa89c0`     | `receipts/slice-1/red-test.json`        |
+| focused test (GREEN; 8/8 before final CLI-failure case) |    0 | `22e35f4be`     | `receipts/slice-1/test.json`            |
+| check (package roots + explicit S1 roots)               |    0 | `22e35f4be`     | `receipts/slice-1/check.json`           |
+| lint (package roots + explicit S1 roots)                |    0 | `22e35f4be`     | `receipts/slice-1/lint.json`            |
+| format check (package roots + explicit S1 roots)        |    0 | `22e35f4be`     | `receipts/slice-1/fmt-check.json`       |
+| focused final test (GREEN; 9/9)                         |    0 | `a2f33ca4f`     | `receipts/slice-1/final-test.json`      |
+| final check (wrapper fired; 2,921 files)                |    0 | `a2f33ca4f`     | `receipts/slice-1/final-check.json`     |
+| final lint (wrapper fired; 2,036 files)                 |    0 | `a2f33ca4f`     | `receipts/slice-1/final-lint.json`      |
+| final format check (wrapper fired; 2,036 files)         |    0 | `a2f33ca4f`     | `receipts/slice-1/final-fmt-check.json` |
 
-An initial final static launch was intercepted by Deno task input caching. Those cached receipts were
-discarded rather than called passes; reordered explicit roots forced the wrappers to fire and emit
-the selection summaries cited above.
+An initial final static launch was intercepted by Deno task input caching. Those cached receipts
+were discarded rather than called passes; reordered explicit roots forced the wrappers to fire and
+emit the selection summaries cited above.
 
 JSR audit touched-publishable-member denominator is empty: S1 changes internal `.llm` tooling and
 tests only. No public exports, dependency pins, runtime assets, `import.meta` reads, package config,
@@ -127,3 +127,49 @@ or lockfile changed. The repository publish dry run remains a frozen final-gate 
   the approved S2 task binding.
 - S2 must not start until the topic supervisor reviews this slice.
 - No formal IMPL-EVAL has been launched.
+
+## Tier-A sign-off — Slice 1
+
+Signed off by `topic-internals-0.0.7` (Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34`, Opus 5
+/ high) at implementation head `dbbedde346f91341208875aee7b5108bd3805dc7`, with F1 closed at
+`179219b02d7901a534917ba1570bc91be1551036`. Supervisor commit, not the implementer's; no lane
+self-certified.
+
+Verified by execution at the landed head, not from receipts:
+
+- **Fail-closed proven.** Running the checker exits **1** with `ok:false` and a single error naming
+  the 29 published members `quality:scan` does not cover — the expected RED state before S2 wires
+  the roots.
+- **Census reproduces the evaluator exactly.** `workspaceMembers: 37`, `membersInsideBoundary: 37`,
+  `publishableMembersInsideBoundary: 35`; non-publishable exactly `packages/bench` and
+  `packages/cli/e2e`, each with `reason: publish:false`. Per task: `quality:scan` 3 configured roots
+  / 29 uncovered; `quality:scan:repo` 5 roots / 0 uncovered. Doctrine 36 roots with 0 uncovered
+  published members, confirming the 35 ⊂ 36 subset.
+- **Determinism holds.** Every path array is lexically sorted and two consecutive runs are
+  byte-identical, which is what makes these receipts comparable across commits.
+- **Scope holds.** Only `check-root-coverage.ts` and its test; `deno.json` correctly deferred to S2.
+  No third path, no `deno.lock` churn.
+- **RED-first held.** `red-test.json` exit 1, then `test.json` exit 0; nine slice-1 receipts, all
+  PASS except that intentional red.
+
+Advisory discharge:
+
+- **B — discharged.** `boundary` emits `includedParents`, a `description` naming #1542, and
+  `excludedWorkspaceMembers` with `count`, `paths`, and
+  `reason: "outside packages/** and
+  plugins/**"`. A future publishable member under `examples/*`
+  or `apps/*` becomes visible rather than silently dropped, and the denominator itself was not
+  expanded — the boundary is named, not moved.
+- **A, JSON half — discharged.** `scannerTraversal` reports `observedByChecker: false`,
+  `traversedPaths: null`, and the note that configured roots are configuration coverage only. The
+  report cannot be misread as a claim that the scanner traversed those roots.
+- **A, wiring half — deferred to S2 by design.** Proving the checker still executes when
+  `--changed-file` is appended depends on the `deno.json` chain S2 owns. It must be asserted there
+  by receipt, not reasoned about from `deno task` argument-forwarding behaviour.
+
+F1 closed: three locked output field names had changed without a record. The implemented names are
+more precise, so the fix was to record rather than revert; the drift entry now carries the full
+expected→actual mapping, the unchanged fields, the rationale, and an explicit note that `census`,
+`boundary`, and `scannerTraversal` are advisory-driven additions rather than unplanned scope.
+
+Slice 2 is authorized.
