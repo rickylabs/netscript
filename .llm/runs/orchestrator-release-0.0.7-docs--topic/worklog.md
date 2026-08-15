@@ -652,3 +652,56 @@ coordinator amendment.
 Two facts handed to that evaluator: `plan.md` was amended post-gate to record E0, so it differs from
 the artifact gated at `d35cbca30`; and five plan defects of one family were found and corrected
 during implementation, all recorded in the leaf's `drift.md`.
+
+## 2026-08-15 — formal IMPL-EVAL dispatched at the immutable S3 head
+
+Coordinator granted the single formal gate after the terminal Tier-A S3 PASS. Per-topic
+serialization confirmed satisfied before launch: zero evaluator sessions were attached to the leaf
+worktree.
+
+Pre-launch reconcile: leaf `15429cf84`, tree clean, local equals remote equals PR head.
+
+### Evaluator identity (attachment proved)
+
+| Field              | Value                                                                                                            |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| Role               | formal IMPL-EVAL, PR #1652, evaluated head `15429cf8487cfe3504ae0443fd435d2a72d4528b`                            |
+| Requested route    | native Claude · Opus 5 · effort **medium** · Remote Control · `bypassPermissions`                                |
+| Observed route     | `respawnFlags`: `--model claude-opus-5 --effort medium --remote-control --permission-mode bypassPermissions`     |
+| Route verdict      | **matched**                                                                                                      |
+| Claude session id  | `c6950ed9-7405-4f28-9464-1e1977f2979c`                                                                           |
+| Background job id  | `c6950ed9`                                                                                                       |
+| PID                | `138125`                                                                                                         |
+| Exact cwd          | `/home/codex/repos/netscript-007-docs-comparison`                                                                |
+| `bridgeSessionId`  | `session_01QjkTyGWr2HSHrLLVLdfhCR` (non-empty, sessions-registry form)                                           |
+| Remote Control URL | `https://claude.ai/code/session_01QjkTyGWr2HSHrLLVLdfhCR`                                                        |
+| Family separation  | opposite family to Codex author `019ffcc9-16c2-7573-b7f6-d627172408e8`; fresh session, never used for generation |
+
+### Launcher lesson applied and verified
+
+The earlier PLAN-EVAL launch lost its wrapper brief to the variadic `--add-dir` flag. This launch
+put the single-value `--name` immediately before the positional prompt. Verified two ways rather
+than assumed: `respawnFlags` contains **no** long prompt string, and the transcript's first
+`type:"user"` record is 7,561 characters opening with `use harness  # Formal IMPL-EVAL` and
+containing the exact evaluated head. The brief reached the evaluator.
+
+### Brief contents
+
+The evaluator judges the complete changeset — the two rewritten #1551 comments including
+`created_at` immutability and absence of any follow-up, the 8×8 matrix and six-column rule,
+counts/pins/comment consistency re-derived rather than accepted, migration scope, navigation and
+xrefs, the journaled `_data.ts` divergence, and private-source/secret leakage across pages, evidence
+JSON, tool, and both comments.
+
+It was handed two facts up front rather than left to discover them: that `plan.md` was amended after
+the PLAN-EVAL gate to record E0, and that five plan defects of one family were corrected during
+implementation. It was explicitly told not to accept this orchestrator's rulings — including the S2
+lint N/A determination — but to verify them.
+
+Gates are proportional and cheap only: `verify`, `docs:links`, `docs:accuracy`, `git diff --check`,
+and the lockfile guard. No Aspire, Docker, product E2E, scaffold, or resource lease. The evaluator
+may commit and push only `evaluate.md` plus required bookkeeping, then post one attributed verdict
+comment, and may not implement, ready, merge, publish, relabel, touch #1551, change the pin, or
+re-edit the rewritten comments.
+
+The lane stops after this single formal gate and awaits the coordinator.
