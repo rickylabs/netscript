@@ -6,18 +6,17 @@
 | --- | --- |
 | Run ID | `release-0.0.7-internals--orchestration/slices/openhands-dispatch-claim-and-refusal` |
 | Branch | `fix/openhands-dispatch-claim-and-refusal` |
-| Current phase | S1 complete; stopped for Tier-A slice review |
+| Current phase | S2 implementation complete; durable gates pending |
 | Archetype | `6-cli-tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-PLAN-EVAL passed in separate evaluator commit `e15d78588` against plan head `cea999d18`. S1 is the
-only authorized implementation slice. Its RED/GREEN loop proves literal candidates reach the
-trusted policy, the five reportable reasons are explicit, status/refusal markers stop recursion,
-and controlled refusal replies are source-attributable, sanitized, command-token-free, and immune
-to the watcher fallback verdict vocabulary. Durable `check` and `test` receipts pass at committed
-head `4aa04de34`; `test` is the only receipt that behaviorally covers the leaf.
+Tier-A signed off S1 at `6f725ad3b` with no changes and authorized S2. S2 is the only active slice:
+the pure producer now validates phase/head as a complete formal pair, rejects invalid phases and
+malformed immutable heads, emits both tokens together, and explicitly emits neither token in
+non-formal mode. The focused suite is GREEN at 75/75; durable receipts remain to be created at a
+committed S2 head.
 
 ## Completed
 
@@ -29,15 +28,17 @@ head `4aa04de34`; `test` is the only receipt that behaviorally covers the leaf.
 - Separate PLAN-EVAL PASS at `e15d78588`.
 - S1 targeted RED (exit 1 before exports existed) and GREEN (exit 0, 16/16 tests).
 - S1 durable `check` PASS/0 and `test` PASS/0 receipts at `4aa04de34`.
+- Tier-A S1 sign-off commit `6f725ad3b`.
+- S2 targeted RED (exit 1 before the tuple surface existed) and GREEN (exit 0, 75/75 tests).
 
 ## In Progress
 
-- Nothing. S1 is being pushed/commented and this thread stops for Tier-A.
+- Commit S2, create durable `check`/`test` receipts, push/comment, then stop for Tier-A.
 
 ## Next Steps
 
-1. Tier-A substantively reviews S1 and either requests a bounded repair or authorizes S2.
-2. If authorized, begin S2 only; otherwise repair S1 without widening the envelope.
+1. Record S2 durable `check` and `test` receipts with the N2 coverage distinction.
+2. Push/comment S2 and stop for Tier-A; do not begin S3.
 
 ## Key Decisions
 
@@ -70,6 +71,9 @@ head `4aa04de34`; `test` is the only receipt that behaviorally covers the leaf.
 | `test` | PASS | `receipts/slice-1/test.json`, exit 0 at `4aa04de34`; 4,138 passed, 19 ignored, 0 failed; load-bearing |
 | `quality-job` | NOT_RUN | not an S1 gate; scheduled for S4/S5 and not independent behavioral proof |
 | JSR | N/A | no publishable surface |
+
+S2 durable gates are pending its committed implementation head. Its targeted producer suite passed
+75/75; `quality-job` remains `NOT_RUN` because S2 names only `check` and `test`.
 
 ## Open Questions
 

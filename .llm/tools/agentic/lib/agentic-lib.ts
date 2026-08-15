@@ -511,12 +511,17 @@ export function parseRepoSlug(slug: string): RepoSlug {
 // OpenHands dispatch comment (pure)
 // ---------------------------------------------------------------------------
 
+/** Formal evaluator phase carried with an immutable PR head. */
+export type OpenHandsDispatchPhase = 'plan' | 'impl';
+
 export interface DispatchOptions {
   model?: string;
   outputMode?: string;
   iterations?: number | string;
   provider?: string;
   effort?: string;
+  phase?: OpenHandsDispatchPhase;
+  head?: string;
   prompt: string;
 }
 
@@ -526,6 +531,18 @@ export interface DispatchOptions {
  * the issue-comment authorization policy.
  */
 export function buildOpenHandsComment(o: DispatchOptions): string {
+  const hasPhase = o.phase !== undefined;
+  const hasHead = o.head !== undefined;
+  if (hasPhase !== hasHead) {
+    throw new Error('Formal OpenHands dispatch requires phase and head together');
+  }
+  if (hasPhase && o.phase !== 'plan' && o.phase !== 'impl') {
+    throw new Error('Formal OpenHands dispatch phase must be plan or impl');
+  }
+  if (hasHead && !/^[0-9a-f]{40}$/.test(o.head!)) {
+    throw new Error('Formal OpenHands dispatch head must be a 40-character lowercase hex SHA');
+  }
+
   const tokens = ['@openhands-agent'];
   if (o.model) tokens.push(`model=${o.model}`);
   if (o.provider) tokens.push(`provider=${o.provider}`);
@@ -534,6 +551,7 @@ export function buildOpenHandsComment(o: DispatchOptions): string {
   if (o.iterations !== undefined && String(o.iterations) !== '') {
     tokens.push(`iterations=${o.iterations}`);
   }
+  if (hasPhase && hasHead) tokens.push(`phase=${o.phase}`, `head=${o.head}`);
   return `${tokens.join(' ')}\n\n${o.prompt.replace(/\r/g, '')}`;
 }
 

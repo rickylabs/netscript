@@ -157,3 +157,35 @@ only … does not cover S1"_, `test` as _"Load-bearing S1 behavioral proof"_, an
 or silently omitting the gate S1 does not name.
 
 Slice 2 is authorized.
+
+## Slice 2 — Formal comment producer contract
+
+### Progress
+
+| Time | Step | Notes |
+| --- | --- | --- |
+| 2026-08-15 | Authorization | Fast-forwarded to Tier-A S1 sign-off `6f725ad3b`; began S2 only. |
+| 2026-08-15 | RED | Added symmetric formal-pair and non-formal-omission tests first; targeted structured wrapper exited 1 because `DispatchOptions` had no `phase`/`head` surface. |
+| 2026-08-15 | Implementation | Kept `buildOpenHandsComment` pure; added optional typed phase/head inputs, runtime pair/phase/SHA validation, paired emission, and explicit tuple-free assertions. Targeted suite passed 75/75. |
+
+### Decisions
+
+- The producer accepts a formal tuple only as `phase: 'plan' | 'impl'` plus a 40-character lowercase
+  hexadecimal head. Either field alone, an invalid phase, or malformed head throws before output.
+- Without both fields, the command line emits neither `phase=` nor `head=`.
+- The producer performs no GitHub read and resolves no head; S3 remains the sole owner of the live
+  PR lookup.
+
+### Gate status
+
+Durable S2 `check` and `test` receipts are pending the committed implementation head. The targeted
+RED/GREEN loop used the structured test wrapper: RED exit 1 before the producer surface existed,
+then GREEN exit 0 with 75/75 tests. As in S1, only root `test` discovers this `.llm/` test surface;
+`check` selects package/plugin roots and will be recorded as a contract receipt, not independent
+behavioral proof. `quality-job` is `NOT_RUN` because S2 does not name it.
+
+### Handoff boundary
+
+- S2 stops after durable receipts, push, and its PR comment for Tier-A review.
+- S3 is not authorized and no CLI or workflow path was changed.
+- No OpenHands/evaluator dispatch or workflow-triggering label transition occurred.
