@@ -1,0 +1,36 @@
+{
+  "gateId": "docs-source-format",
+  "invocationId": "ns1502-s2-docs-source-format",
+  "argv": [
+    "deno",
+    "task",
+    "check:source-format"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-features-1502/docs/site",
+  "gitHead": "bd8b29bf3a524280d28a39b21bc7adda277d2e27",
+  "actualGitHead": "bd8b29bf3a524280d28a39b21bc7adda277d2e27",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:2593417",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "7df8bab0d5ea56d089ed8928db4d6d201ba84f0ba8e4a4e40d021bc609754c9b",
+  "lifecycleId": "worker:2593417:ns1502-s2-docs-source-format:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T00:11:06.417Z",
+  "startedAt": "2026-08-15T00:11:06.421Z",
+  "finishedAt": "2026-08-15T00:11:06.569Z",
+  "durationMs": 148,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 23,
+    "sha256": "a91dbfc7ba015ebd64902c27740032f3798207dc0ebae57d2526342b219899c5",
+    "tail": "Docs source format: OK\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 563,
+    "sha256": "863bdc5d9ebaf3ff951285b2f0cdbdc4d8e6cf27b53f34ef5cad2e2e9730f49a",
+    "tail": "Warning: config file file:///home/codex/repos/netscript-007-features-1502/docs/site/deno.json is not a member of the workspace at file:///home/codex/repos/netscript-007-features-1502/. Ignoring the parent workspace config.\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck:source-format\u001b[0m deno run --no-lock --allow-read _plugins/check-source-format.ts .\nWarning: config file file:///home/codex/repos/netscript-007-features-1502/docs/site/deno.json is not a member of the workspace at file:///home/codex/repos/netscript-007-features-1502/. Ignoring the parent workspace config.\n",
+    "truncated": false
+  }
+}

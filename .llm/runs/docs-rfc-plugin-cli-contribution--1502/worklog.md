@@ -99,42 +99,49 @@ No author imports `@netscript/cli` internals, Cliffy, deploy, DevTools, or anoth
 
 ## Progress Log
 
-| Time                  | Slice  | Step      | Notes                                                                                                                                 |
-| --------------------- | ------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-13 21:45 CEST | S0     | activate  | Read all nine selected skills completely; activated harness/docs A4 workflow.                                                         |
-| 2026-08-13 21:55 CEST | S0     | reconcile | Fetched live `origin/main`; clean exact base, no upstream; #1502 open/zero comments; no existing PR.                                  |
-| 2026-08-13 22:05 CEST | S0     | research  | Read required harness/archetype/doctrine/RFC sources and live CLI/plugin public surfaces with `deno doc` before focused source.       |
-| 2026-08-13 22:20 CEST | S0     | consumers | Fetched #904–#908/comments and adjacent #424/#946/#1477; searched for duplicate general proposals.                                    |
-| 2026-08-13 22:25 CEST | S0     | JSR audit | Measured plugin/CLI export-map doc lint and recorded public-surface, slow-type, export, and asset risks.                              |
-| 2026-08-13 22:30 CEST | S0     | design    | Locked ownership, lifecycle, security, compatibility, epic shape, and no-global-expensive-gate contract.                              |
-| 2026-08-13 22:34 CEST | S0     | gates     | Scoped structured Markdown format, durable docs accuracy, and internal-link checks passed; no code/global expensive gate run.         |
-| 2026-08-13 22:48 CEST | S0R    | eval-read | Preserved evaluator-only commit `d71b78c3`; read all 145 lines of cycle-1 `FAIL_PLAN` before repair.                                  |
-| 2026-08-13 22:55 CEST | S0R    | contract  | Read coordinator key `rfc-plugin-cli-contribution`; recorded authoritative RFC-only mutation resolution as significant drift.         |
-| 2026-08-13 22:59 CEST | S0R    | JSR audit | Measured CLI/plugin exports, docs, exact internal pins, isolated-declaration posture, publish assets, and `import.meta` preflight.    |
-| 2026-08-13 23:00 CEST | S0R    | gates     | Structured check and focused tests, per-member publish dry-runs, and root architecture gate passed at evaluator head.                 |
-| 2026-08-13 23:08 CEST | S0R    | docs      | Structured run Markdown, docs-source-format, docs-accuracy, links, and live-glossary terminology review passed.                       |
-| 2026-08-15 01:20 CEST | S1     | eval-read | Read all 246 lines of cycle-2 `PASS`; evaluator-only head `3e0c8858b4a2552926d2965b62cbcc97a15c2935`.                                 |
-| 2026-08-15 01:25 CEST | S1     | reconcile | Clean local/remote evaluator head, no upstream; main advanced one non-overlapping tooling commit, recorded as minor drift.            |
-| 2026-08-15 01:32 CEST | S1     | contract  | Authored ownership, immutable descriptors/builder, nested router/collisions/order, static help/completion, and result/error contract. |
-| 2026-08-15 01:35 CEST | S1     | notes     | Closed N-1 durable citation, N-2 Opus route, N-3 published symbol collision; retained N-4 for mandatory S4 final-head rerun.          |
-| 2026-08-15 01:37 CEST | S1     | gates     | Structured check, docs format/accuracy, owned Markdown, links, terminology, and live API/help sampling passed.                        |
-| 2026-08-15 01:48 CEST | S1-fix | review    | Read full Tier-A `CHANGES_REQUESTED` at topic commit `b774998f0`; F1–F3 are bounded S1 contract defects.                              |
-| 2026-08-15 01:49 CEST | S1-fix | contract  | Declared diagnostic tuple/union, made deep readonly type/runtime guarantees explicit, and made handler path validation normative.     |
-| 2026-08-15 01:51 CEST | S1-fix | gates     | Docs source format/accuracy, structured owned Markdown format, and internal links passed; no code or expensive gate ran.              |
+| Time                  | Slice  | Step      | Notes                                                                                                                                  |
+| --------------------- | ------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-13 21:45 CEST | S0     | activate  | Read all nine selected skills completely; activated harness/docs A4 workflow.                                                          |
+| 2026-08-13 21:55 CEST | S0     | reconcile | Fetched live `origin/main`; clean exact base, no upstream; #1502 open/zero comments; no existing PR.                                   |
+| 2026-08-13 22:05 CEST | S0     | research  | Read required harness/archetype/doctrine/RFC sources and live CLI/plugin public surfaces with `deno doc` before focused source.        |
+| 2026-08-13 22:20 CEST | S0     | consumers | Fetched #904–#908/comments and adjacent #424/#946/#1477; searched for duplicate general proposals.                                     |
+| 2026-08-13 22:25 CEST | S0     | JSR audit | Measured plugin/CLI export-map doc lint and recorded public-surface, slow-type, export, and asset risks.                               |
+| 2026-08-13 22:30 CEST | S0     | design    | Locked ownership, lifecycle, security, compatibility, epic shape, and no-global-expensive-gate contract.                               |
+| 2026-08-13 22:34 CEST | S0     | gates     | Scoped structured Markdown format, durable docs accuracy, and internal-link checks passed; no code/global expensive gate run.          |
+| 2026-08-13 22:48 CEST | S0R    | eval-read | Preserved evaluator-only commit `d71b78c3`; read all 145 lines of cycle-1 `FAIL_PLAN` before repair.                                   |
+| 2026-08-13 22:55 CEST | S0R    | contract  | Read coordinator key `rfc-plugin-cli-contribution`; recorded authoritative RFC-only mutation resolution as significant drift.          |
+| 2026-08-13 22:59 CEST | S0R    | JSR audit | Measured CLI/plugin exports, docs, exact internal pins, isolated-declaration posture, publish assets, and `import.meta` preflight.     |
+| 2026-08-13 23:00 CEST | S0R    | gates     | Structured check and focused tests, per-member publish dry-runs, and root architecture gate passed at evaluator head.                  |
+| 2026-08-13 23:08 CEST | S0R    | docs      | Structured run Markdown, docs-source-format, docs-accuracy, links, and live-glossary terminology review passed.                        |
+| 2026-08-15 01:20 CEST | S1     | eval-read | Read all 246 lines of cycle-2 `PASS`; evaluator-only head `3e0c8858b4a2552926d2965b62cbcc97a15c2935`.                                  |
+| 2026-08-15 01:25 CEST | S1     | reconcile | Clean local/remote evaluator head, no upstream; main advanced one non-overlapping tooling commit, recorded as minor drift.             |
+| 2026-08-15 01:32 CEST | S1     | contract  | Authored ownership, immutable descriptors/builder, nested router/collisions/order, static help/completion, and result/error contract.  |
+| 2026-08-15 01:35 CEST | S1     | notes     | Closed N-1 durable citation, N-2 Opus route, N-3 published symbol collision; retained N-4 for mandatory S4 final-head rerun.           |
+| 2026-08-15 01:37 CEST | S1     | gates     | Structured check, docs format/accuracy, owned Markdown, links, terminology, and live API/help sampling passed.                         |
+| 2026-08-15 01:48 CEST | S1-fix | review    | Read full Tier-A `CHANGES_REQUESTED` at topic commit `b774998f0`; F1–F3 are bounded S1 contract defects.                               |
+| 2026-08-15 01:49 CEST | S1-fix | contract  | Declared diagnostic tuple/union, made deep readonly type/runtime guarantees explicit, and made handler path validation normative.      |
+| 2026-08-15 01:51 CEST | S1-fix | gates     | Docs source format/accuracy, structured owned Markdown format, and internal links passed; no code or expensive gate ran.               |
+| 2026-08-15 01:58 CEST | S2     | release   | Reconciled Tier-A S1 PASS at `bd8b29bf3`; accepted F1–F3 and parent-head evidence convention; S2 released, S3 withheld.                |
+| 2026-08-15 02:00 CEST | S2     | inspect   | Verified live `generate plugins --dry-run` and `plugin doctor` flags/help plus current manifest and published CLI contribution shapes. |
+| 2026-08-15 02:06 CEST | S2     | contract  | Authored explicit registry freshness, selected bootstrap, capabilities, isolation, transaction, doctor, and pointer ownership.         |
+| 2026-08-15 02:08 CEST | S2     | gates     | Focused structured tests, architecture, docs format/accuracy/links, owned Markdown, terminology, and decision sweep passed.            |
 
 ## Decisions
 
-| Decision                                                               | Reason                                                                                       | Source                                     |
-| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| Existing `@netscript/plugin/cli` owns the public DSL.                  | It is already published; new package would duplicate ownership.                              | `deno.json`, doctrine, `plan.md` D1.       |
-| Host-declared extensible mount, nested children only.                  | Deploy needs `deploy` children; arbitrary top-level capture is unsafe.                       | #904/#908, doctrine, D3.                   |
-| Static help/completion; selected-handler lazy bootstrap.               | Startup, determinism, and isolation.                                                         | #905, RFC 0001/frontend law, D6–D8.        |
-| Host-neutral mutation plan, host-owned transaction.                    | Preview/no-write, path containment, rollback, and one-generator/two-callers.                 | current scaffolder gap, RFC 0005, D11–D13. |
-| Installer/runtime pointers cross-check; `.passthrough()` prerequisite. | Current `.strict()` rejects future top-level blocks; payload duplication drifts.             | live schema, RFC 0005 F-3, D14–D15.        |
-| No evaluator dispatch.                                                 | User requires separate-session handoff only.                                                 | brief, supervisor identity.                |
-| Contract surfaces are inspection-only; all six gates still bind.       | Authoritative cycle-1 dispatch resolves FP-3 without waiving FP-1/FP-2 evidence.             | contract key, `drift.md`, D22.             |
-| `Closes #1502` stays; future implementation is separate and unfiled.   | #1502 is completed by this RFC leaf, not used as the proposed implementation epic.           | cycle-1 dispatch, D23.                     |
-| Live `PluginCliResult` is not redefined.                               | It is already JSR-published with an incompatible shape; v1 uses `PluginCliInvocationResult`. | cycle-2 N-3; `deno doc`; RFC S1.           |
+| Decision                                                                | Reason                                                                                         | Source                                     |
+| ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| Existing `@netscript/plugin/cli` owns the public DSL.                   | It is already published; new package would duplicate ownership.                                | `deno.json`, doctrine, `plan.md` D1.       |
+| Host-declared extensible mount, nested children only.                   | Deploy needs `deploy` children; arbitrary top-level capture is unsafe.                         | #904/#908, doctrine, D3.                   |
+| Static help/completion; selected-handler lazy bootstrap.                | Startup, determinism, and isolation.                                                           | #905, RFC 0001/frontend law, D6–D8.        |
+| Host-neutral mutation plan, host-owned transaction.                     | Preview/no-write, path containment, rollback, and one-generator/two-callers.                   | current scaffolder gap, RFC 0005, D11–D13. |
+| Installer/runtime pointers cross-check; `.passthrough()` prerequisite.  | Current `.strict()` rejects future top-level blocks; payload duplication drifts.               | live schema, RFC 0005 F-3, D14–D15.        |
+| No evaluator dispatch.                                                  | User requires separate-session handoff only.                                                   | brief, supervisor identity.                |
+| Contract surfaces are inspection-only; all six gates still bind.        | Authoritative cycle-1 dispatch resolves FP-3 without waiving FP-1/FP-2 evidence.               | contract key, `drift.md`, D22.             |
+| `Closes #1502` stays; future implementation is separate and unfiled.    | #1502 is completed by this RFC leaf, not used as the proposed implementation epic.             | cycle-1 dispatch, D23.                     |
+| Live `PluginCliResult` is not redefined.                                | It is already JSR-published with an incompatible shape; v1 uses `PluginCliInvocationResult`.   | cycle-2 N-3; `deno doc`; RFC S1.           |
+| Plugin executable code runs in a terminable denied-permission boundary. | Dynamic import has no `AbortSignal`; a promise race alone cannot stop module evaluation.       | doctrine A13; D8; RFC S2.                  |
+| Generator commands can request only `workspace:read`.                   | Preview stays effect-free and workspace mutation remains entirely host-owned.                  | D11–D13; RFC S2.                           |
+| Installer pointer is discovery authority; runtime pointer cross-checks. | Static audit needs both phases without duplicating descriptors or treating either as registry. | D14–D15; RFC S2.                           |
 
 ## Drift
 
@@ -186,6 +193,16 @@ No author imports `@netscript/cli` internals, Cliffy, deploy, DevTools, or anoth
 | S1 fix-up owned Markdown format                  | structured `run-deno-fmt.ts` wrapper report                                                  | PASS               | 10 files, 0 findings; not a durable receipt and has no outcome, exit code, or Git head.             |
 | S1 fix-up owned Markdown format write            | structured `run-deno-fmt.ts --write` wrapper report                                          | PASS               | Kept as wrapper output; excluded from the durable receipt set.                                      |
 | S1 fix-up docs links                             | `deno task docs:links`                                                                       | PASS               | 103 docs, 0 broken links/anchors/orphans.                                                           |
+| S2 focused CLI/plugin test                       | durable structured test over the approved 16 files                                           | PASS_PARENT_HEAD   | 88 passed, 0 failed; attests parent `bd8b29bf3`; `receipts/test-cli-plugin-s2.json`.                |
+| S2 architecture check                            | durable root `arch-check` gate                                                               | PASS_PARENT_HEAD   | 0 failures; existing warnings retained; attests `bd8b29bf3`; `receipts/arch-check-s2.json`.         |
+| S2 docs source format                            | durable `docs-source-format` gate                                                            | PASS_PARENT_HEAD   | `Docs source format: OK`; attests `bd8b29bf3`; `receipts/docs-source-format-s2.json`.               |
+| S2 docs accuracy                                 | durable root `docs-accuracy` gate                                                            | PASS_PARENT_HEAD   | 91/91; pre-existing peer warning only; attests `bd8b29bf3`; `receipts/docs-accuracy-s2.json`.       |
+| S2 owned Markdown format                         | structured `run-deno-fmt.ts` wrapper report                                                  | PASS               | 10 files, 0 findings; no outcome, exit code, or Git head; not a durable receipt.                    |
+| S2 owned Markdown format write                   | structured `run-deno-fmt.ts --write` wrapper report                                          | PASS               | Kept as wrapper output; excluded from the durable receipt set.                                      |
+| S2 docs links                                    | `deno task docs:links`                                                                       | PASS               | 103 docs, 0 broken links/anchors/orphans.                                                           |
+| S2 terminology                                   | comparison with `docs/site/glossary.md`                                                      | PASS               | Permission-token meaning is explicitly distinguished from product-area capability vocabulary.       |
+| S2 live surface/help sampling                    | `deno doc --filter` plus focused `netscript-dev generate/plugin --help`                      | PASS               | Registry and doctor flags plus current manifest/runtime ownership are accurately described.         |
+| S2 decision completeness                         | focused normative-section and vocabulary sweep                                               | PASS               | All six dispatched S2 sections are normative; compatibility/migration/roadmap remain explicit S3.   |
 | `quality:gate`                                   | docs-only policy                                                                             | N/A                | Actual diff does not touch `packages/**` or `plugins/**`.                                           |
 
 The three durable receipts from the original S1 turn—`check-cli-plugin-s1.json`,
@@ -194,9 +211,19 @@ commit `86d0110a5`; the gates ran on the working tree before that tree was commi
 two durable S1 fix-up receipts attest parent `86d0110a5`, not the fix-up commit. This intermediate
 evidence is intentionally non-binding: S4 reruns the contracted set at the final author head.
 
+The four durable S2 receipts—`test-cli-plugin-s2.json`, `arch-check-s2.json`,
+`docs-source-format-s2.json`, and `docs-accuracy-s2.json`—attest accepted S1 parent commit
+`bd8b29bf3`, not the eventual S2 commit: the gates ran over the S2 working tree before it was
+committed. They are labelled `PASS_PARENT_HEAD` under the accepted leaf convention. S4's final-head
+rerun remains the binding IMPL-EVAL evidence.
+
 `source-format-s1.json`, `source-format-s1-write.json`, and their `-fixup` counterparts are
 structured wrapper reports. They carry no `outcome`, `exitCode`, or `gitHead` and are not counted as
 `run-gate.ts` durable receipts.
+
+`source-format-s2.json` and `source-format-s2-write.json` are likewise structured wrapper reports,
+not durable `run-gate.ts` receipts. They carry no `outcome`, `exitCode`, or `gitHead` and are
+excluded from the S4 durable-receipt set.
 
 ### Fitness Gates
 
@@ -245,6 +272,6 @@ Archetype-4 gates (F-1–F-12, F-14–F-19); this summary does not replace that 
   the existing CLI helper migration is explicit.
 - Verify every issue #1502 decision and all five acceptance boxes have a planned evidence path.
 - Record the formal verdict only in `plan-eval.md`; do not author the RFC in the evaluator session.
-- The author has written only S1 of `rfcs/0000-plugin-cli-contribution.md`; has not started S2,
-  self-evaluated, dispatched a rival evaluator, changed lifecycle state during this fix-up, or
-  expanded into package/plugin source.
+- The author has written S1 and S2 of `rfcs/0000-plugin-cli-contribution.md`; has not started S3,
+  self-evaluated, dispatched a rival evaluator, changed lifecycle state, or expanded into
+  package/plugin source.

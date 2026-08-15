@@ -129,3 +129,20 @@ Drift is append-only. Package and plugin source remain read-only in this leaf.
 - **Action:** declare the finite tuple/union, express recursive readonly plus runtime copy/freeze,
   and require normalized in-package handler paths before import. Stop again before S2.
 - **Evidence:** S1 fix-up diff, docs-scoped receipts, and PR fix-up comment.
+
+## 2026-08-15 — Live preview spelling differs by host-owned command
+
+- **What:** The accepted plan uses preview/no-write as a semantic contract, while the live
+  authoritative registry generator spells that mode `--dry-run` and the S1 contributed-command
+  example spells it `--preview`.
+- **Source:** Live `netscript-dev generate plugins --help` at accepted S1 head `bd8b29bf3`; plan
+  D12; RFC S1 example.
+- **Expected:** Plugin authors do not own or parse transaction-mode flags; the host supplies the
+  spelling appropriate to each command.
+- **Actual:** Both spellings can select the same host no-write state. The RFC now names the live
+  registry spelling and fixes identical zero-stage/zero-write semantics for either host spelling.
+- **Severity:** minor.
+- **Action:** Keep `--dry-run` for the live `generate plugins` claim, permit host-owned `--preview`
+  on contributed commands, and forbid plugins from implementing either flag. S3 must not treat the
+  spelling difference as a new contribution axis.
+- **Evidence:** RFC S2 guide and transaction sections; live-help sampling recorded in `worklog.md`.

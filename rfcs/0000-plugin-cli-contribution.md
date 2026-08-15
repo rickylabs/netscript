@@ -18,16 +18,16 @@ under a host-declared mount. The public definition DSL belongs to the existing
 workspace mutation transaction remain private to `@netscript/cli`.
 
 A contribution is immutable static data. It declares routes, arguments, options, help, examples,
-aliases, capabilities, stable identifiers, and package-relative handler references without
+aliases, capabilities, stable identifiers, and package-relative handler/generator references without
 constructing a host command object or executing plugin code. The host validates the complete route
 tree before parsing, derives help and shell completion from the static descriptors, and imports only
-the selected handler when a command is invoked.
+the selected handler or planner when its command is invoked.
 
 This draft is being authored in reviewable slices. The public ownership, descriptor, router,
-help/completion, and error contract are normative below. Discovery, bootstrap isolation,
-transactional generation, doctor integration, compatibility with adjacent RFCs, and the later
-implementation roadmap are completed by the following RFC slices; no product implementation is part
-of this RFC PR.
+help/completion, error, discovery, bootstrap-isolation, capability, transactional-generation,
+doctor, and manifest-pointer contracts are normative below. Compatibility with adjacent RFCs, deploy
+supersession, and the later implementation roadmap are completed by the following RFC slice; no
+product implementation is part of this RFC PR.
 
 ## Motivation
 
@@ -157,6 +157,33 @@ Thrown values are not part of the public contract. The host catches an unknown t
 boundary and normalizes it to a redacted `plugin-failure` diagnostic. Cancellation and deadlines are
 host-owned invocation facts rather than exception conventions.
 
+### Install and refresh contributed commands
+
+An installed plugin advertises one explicit CLI contribution pointer in its installer metadata and
+the same pointer in its runtime plugin definition. Install, update, remove, and maintainer sync feed
+the complete configured pointer set to the same authoritative registry generator used by
+`netscript generate plugins`. The generator replaces the registry only after every pointer,
+descriptor, mount, collision, and capability check passes. It never scans `node_modules` or guesses
+from package names.
+
+The live CLI already exposes `netscript generate plugins --dry-run`; the proposed lifecycle keeps
+that spelling for registry preview. A missing or stale registry never silently falls back to ambient
+discovery: built-ins remain available, contributed routes stay disabled, and the diagnostic
+instructs the user to regenerate and run `netscript plugin doctor`.
+
+### Preview and apply generated files
+
+A command that changes a workspace selects a generator planner instead of a normal handler. The
+planner receives parsed invocation data and a capability-scoped, read-only workspace view, then
+returns a deterministic `PluginCliGenerationPlan`. It cannot write files, spawn a process, call the
+network, or import CLI host internals.
+
+The host validates the complete plan before mutation. Preview mode renders the same canonical plan
+without creating a stage, journal, or file and without invoking a post-step. Apply mode acquires the
+workspace mutation lock, stages output, validates it, commits it through the host transaction, and
+rolls back on failure. The host owns text/JSON rendering and reports created, modified, deleted, and
+byte-identical skipped paths after the transaction reaches a terminal state.
+
 ## Reference-level explanation
 
 ### Status and authority
@@ -226,9 +253,30 @@ export interface PluginCliHandlerRef {
   readonly export: string;
 }
 
+export interface PluginCliGeneratorDefinition {
+  readonly module: `./${string}`;
+  readonly export: string;
+}
+
 export type PluginCliDeepReadonly<T> = T extends (...args: never[]) => unknown ? T
   : T extends object ? { readonly [K in keyof T]: PluginCliDeepReadonly<T[K]> }
   : T;
+
+export const PLUGIN_CLI_CAPABILITIES = [
+  'workspace:read',
+  'network:request',
+  'process:run',
+  'environment:read',
+  'secret:read',
+] as const;
+
+export type PluginCliCapability = typeof PLUGIN_CLI_CAPABILITIES[number];
+
+export interface PluginCliCapabilityGrant {
+  readonly requested: readonly PluginCliCapability[];
+  readonly granted: readonly PluginCliCapability[];
+  readonly denied: readonly PluginCliCapability[];
+}
 
 export interface PluginCliArgumentDefinition {
   readonly id: string;
@@ -267,6 +315,7 @@ export interface PluginCliCommandDefinition {
   readonly examples?: readonly string[];
   readonly capabilities?: readonly PluginCliCapability[];
   readonly handler?: PluginCliHandlerRef;
+  readonly generator?: PluginCliGeneratorDefinition;
   readonly children?: readonly PluginCliCommandDefinition[];
 }
 
@@ -288,21 +337,25 @@ builder must validate the input, copy it into host-owned data, and recursively f
 definition so the same guarantee holds at runtime. Token grammar, serializability, path safety, and
 cross-definition collisions are validation obligations because TypeScript cannot prove them.
 
-The `` `./${string}` `` handler-module type is only a package-relative shape hint. It accepts values
-such as `./../escape.ts`; normative validation must normalize the reference, reject every parent
-traversal, and prove that the resolved target remains inside the contributing package before any
-import occurs.
+The `` `./${string}` `` executable-module type used by handler and generator references is only a
+package-relative shape hint. It accepts values such as `./../escape.ts`; normative validation must
+normalize the reference, reject every parent traversal, and prove that the resolved target remains
+inside the contributing package before any import occurs.
 
-The concrete `PluginCliCapability` union and generation fields are completed with the S2 security
-and transaction model. Their placement is fixed here; their values are not improvised in S1.
+The capability tuple and generator field are the complete contract-major-1 surface. A normal handler
+may request any listed capability. A generator may request only `workspace:read`; workspace mutation
+belongs to the host transaction and there is intentionally no `workspace:write` capability. Adding a
+capability is additive, while broadening an existing capability's meaning is a major-version event.
 
 #### Descriptor invariants
 
-- `plugin`, command `id`, option `id`, and handler `export` are non-empty stable identifiers.
+- `plugin`, command `id`, option `id`, and handler/generator `export` are non-empty stable
+  identifiers.
 - A route `segment`, alias, and option spelling is a normalized token, not a path or shell fragment.
 - Handler modules are package-relative `./...` references. Absolute paths, URLs, bare specifiers,
   parent traversal, and self-import through a published JSR specifier are invalid.
-- A command has a handler, children, or both. A leaf without a handler is invalid.
+- A command has a handler, a generator, children, or one executable plus children. `handler` and
+  `generator` are mutually exclusive, and a leaf without either executable is invalid.
 - Positional arguments are ordered. At most one is variadic; it is last. Required arguments cannot
   follow an optional argument.
 - Long and short option spellings are unique over the effective command scope. Built-in host options
@@ -317,7 +370,8 @@ The router composes a canonical registry in two phases:
 
 1. Validate each definition independently, bind it to a host-declared extensible mount, normalize
    its route tokens, and retain owner provenance.
-2. Validate the combined tree before any user argument is parsed or any handler module is imported.
+2. Validate the combined tree before any user argument is parsed or any handler/generator module is
+   imported.
 
 The canonical command path is `mount + ancestor segments + segment`. Comparison uses the host's
 documented token normalization and is independent of locale. Aliases participate in the same
@@ -423,18 +477,401 @@ details. Changing the meaning of `PluginCliResult` or removing the compatibility
 next public package/contract major; the name is never silently reassigned. The later implementation
 epic must carry a dedicated migration child and consumer fixtures for this boundary.
 
-### S2 and S3 normative sections still to be completed
+### Capability grants and invocation ports
 
-The next RFC slices complete, without changing the S1 ownership boundary:
+The following execution shapes are public because plugin handlers must compile without importing a
+host adapter. They are capability-scoped ports, not `@netscript/cli` internals:
 
-- discovery and generated-registry lifecycle;
-- selected-handler async bootstrap, cancellation, isolation, and plugin-absent UX;
-- capability grants and the host-owned generation transaction, preview/no-write, rollback, doctor,
-  and manifest pointer contract;
+```ts
+export type PluginCliOutputMode = 'text' | 'json';
+
+export interface PluginCliInvocation {
+  readonly commandId: string;
+  readonly route: readonly string[];
+  readonly arguments: Readonly<Record<string, PluginCliJson>>;
+  readonly options: Readonly<Record<string, PluginCliJson>>;
+  readonly outputMode: PluginCliOutputMode;
+  readonly preview: boolean;
+}
+
+export interface PluginCliWorkspaceText {
+  readonly path: string;
+  readonly text: string;
+  readonly sha256: string;
+}
+
+export interface PluginCliWorkspaceEntry {
+  readonly path: string;
+  readonly kind: 'file' | 'directory';
+  readonly sha256?: string;
+}
+
+export interface PluginCliWorkspaceReadPort {
+  readText(path: string, signal: AbortSignal): Promise<PluginCliWorkspaceText | undefined>;
+  list(path: string, signal: AbortSignal): Promise<readonly PluginCliWorkspaceEntry[]>;
+}
+
+export interface PluginCliNetworkRequest {
+  readonly url: string;
+  readonly method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  readonly headers?: Readonly<Record<string, string>>;
+  readonly body?: string;
+}
+
+export interface PluginCliNetworkResponse {
+  readonly status: number;
+  readonly headers: Readonly<Record<string, string>>;
+  readonly body: string;
+}
+
+export interface PluginCliNetworkPort {
+  request(
+    request: PluginCliNetworkRequest,
+    signal: AbortSignal,
+  ): Promise<PluginCliNetworkResponse>;
+}
+
+export interface PluginCliProcessRequest {
+  readonly executable: string;
+  readonly arguments: readonly string[];
+  readonly cwd?: string;
+  readonly environment?: Readonly<Record<string, string>>;
+}
+
+export interface PluginCliProcessResult {
+  readonly code: number;
+  readonly stdout: string;
+  readonly stderr: string;
+}
+
+export interface PluginCliProcessPort {
+  run(request: PluginCliProcessRequest, signal: AbortSignal): Promise<PluginCliProcessResult>;
+}
+
+export interface PluginCliEnvironmentPort {
+  read(name: string, signal: AbortSignal): Promise<string | undefined>;
+}
+
+export interface PluginCliSecretPort {
+  read(name: string, signal: AbortSignal): Promise<string | undefined>;
+}
+
+export interface PluginCliInvocationContext {
+  readonly signal: AbortSignal;
+  readonly deadline: string;
+  readonly grant: PluginCliCapabilityGrant;
+  readonly workspace?: PluginCliWorkspaceReadPort;
+  readonly network?: PluginCliNetworkPort;
+  readonly process?: PluginCliProcessPort;
+  readonly environment?: PluginCliEnvironmentPort;
+  readonly secrets?: PluginCliSecretPort;
+}
+
+export type PluginCliHandler = (
+  invocation: PluginCliInvocation,
+) => Promise<PluginCliInvocationResult>;
+
+export type PluginCliHandlerFactory = (
+  context: PluginCliInvocationContext,
+) => PluginCliHandler | Promise<PluginCliHandler>;
+```
+
+Every capability has one bounded meaning:
+
+| Capability         | Port and bound                                                                                                             |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `workspace:read`   | Read/list normalized project-relative paths beneath the selected workspace; no arbitrary path resolution or write method.  |
+| `network:request`  | Host-mediated request constrained by configured origins, methods, byte limits, deadline, and redaction policy.             |
+| `process:run`      | Direct executable plus argument vector under an allowlist; never a shell string, inherited environment, or free cwd.       |
+| `environment:read` | Read a named allowlisted variable; enumeration and the host's full environment are unavailable.                            |
+| `secret:read`      | Read a named configured secret through a redacting port; enumeration and inclusion in output or diagnostics are forbidden. |
+
+Here `PluginCliCapability` is a permission token for one CLI invocation. It does not redefine the
+docs-site use of “capability” for a first-class NetScript product area.
+
+The host computes the grant as the intersection of the command's declared request, the installed
+manifest pointer's advertised maximum, host policy, and invocation authorization. V1 capabilities
+are required rather than optional: if any requested value is denied, the host returns
+`capability-denied` before importing the handler or planner. Undeclared ports are absent, and each
+granted port still policy-checks every operation. Ambient Deno read, write, network, environment,
+process, FFI, and subprocess permissions are denied in the plugin execution boundary; capability
+names authorize only the corresponding host-mediated ports.
+
+Requested, granted, and denied arrays are unique and sorted in tuple order. `deadline` is an RFC
+3339 timestamp for portable diagnostics; the host enforces it with its own monotonic timer rather
+than trusting plugin time or wall-clock comparisons.
+
+### Discovery and generated-registry lifecycle
+
+Discovery begins from the configured installed-plugin set and its explicit
+`PluginCliManifestPointer` values. There is no directory convention, package-name inference,
+`node_modules` traversal, or import-on-miss fallback. The pointer shape is public and parse-only:
+
+```ts
+export interface PluginCliManifestPointer {
+  readonly plugin: string;
+  readonly contract: PluginCliContractVersion;
+  readonly module: `./${string}`;
+  readonly export: string;
+  readonly capabilities: readonly PluginCliCapability[];
+}
+```
+
+`module` names the static contribution-definition entrypoint, not a handler. It follows the same
+normalization, parent-traversal rejection, package-containment, export-map, and self-import rules as
+handler and generator references. `capabilities` is the sorted union requested by every command in
+the definition, allowing installation policy to be evaluated without importing the descriptor.
+
+The host runs one full-replace registry transaction after successful plugin install, update, remove,
+or maintainer sync and when the user explicitly invokes `netscript generate plugins`. That live
+command remains authoritative and currently exposes `--dry-run`, `--project-root`, and `--verbose`.
+Generation performs these phases in order:
+
+1. Parse every configured installer pointer without importing plugin code.
+2. Resolve and import only each static definition entrypoint in a bounded, permission-denied,
+   terminable diagnostic boundary. Descriptor entrypoints may construct and export frozen data; they
+   may not import a handler/planner, inspect the workspace or environment, call the network, spawn a
+   process, mutate globals, or perform top-level filesystem work.
+3. Validate pointer/definition identity, family and major, capability equality, descriptor grammar,
+   mount openness, path containment, and the complete collision tree.
+4. Canonically sort and serialize a candidate registry containing descriptor data and executable
+   pointers, never imported factories or closures.
+5. Commit the candidate atomically. A failed candidate leaves the previous registry file intact, but
+   the previous file is not considered current when its input fingerprint differs.
+
+The registry header records its schema version, generator version, canonical manifest-set digest,
+exact package version/integrity or local-source identity, descriptor-source hashes, descriptor
+digest, and generation timestamp. Startup recomputes the parse-only manifest/source fingerprint
+without importing a plugin. A missing registry, unsupported registry schema, manifest newer than the
+registry, changed pointer/version/integrity, or changed tracked local descriptor source marks it
+stale.
+
+Registry generation and an explicit doctor probe are the only descriptor-load phases. Validation of
+the committed registry during ordinary startup, help, completion, and route selection is
+import-free.
+
+Missing or stale state fails closed for contributed routes. Built-in commands continue to work;
+normal help/completion is built from built-ins plus intentional absent-owner stubs, not from an
+untrusted stale registry. An attempted contributed route returns `handler-unavailable` with a
+redacted detail kind such as `registry-missing` or `registry-stale` and remediation to run
+`netscript generate plugins` followed by `netscript plugin doctor`. The host never silently
+regenerates during startup, help, completion, or dispatch.
+
+### Selected-handler asynchronous bootstrap
+
+CLI startup, registry freshness validation, route parsing, help, and completion import no plugin
+module. After a fresh registry selects one canonical route, the host performs this sequence:
+
+1. Parse and validate arguments/options using the static descriptor.
+2. Compute the complete capability grant and fail on any denial.
+3. Create a host-owned, permission-denied, terminable execution boundary for that plugin and route.
+4. Resolve, normalize, and import only the selected handler module, verify the named export is a
+   `PluginCliHandlerFactory`, then invoke the factory with the narrowed context.
+5. Invoke the returned handler and normalize its result at the host boundary.
+
+A handler module may initialize immutable local constants and declare its factory at module load. It
+may not read the workspace/environment, access a secret, call the network, spawn a process, write a
+file, register global hooks, print, or run command behavior at import time. Those operations are
+available only through granted ports after the factory is invoked.
+
+Dynamic `import()` returns a promise but accepts no `AbortSignal`; racing that promise in the CLI
+process would report a timeout without stopping module evaluation. Therefore bootstrap executes in a
+boundary the host can terminate. The host owns both the user-cancellation controller and a
+configurable absolute deadline, propagates the signal through the factory, handler, and every port,
+and terminates the boundary when cancellation or deadline wins. If import plus factory creation does
+not settle before the deadline, the host returns `bootstrap-timeout`; late resolution cannot attach
+to the registry or emit output.
+
+User cancellation is a host control outcome outside `PluginCliInvocationResult`; it terminates the
+boundary and does not blame the plugin with a diagnostic code. If an already-created handler or
+planner fails to settle by its invocation deadline, the host normalizes that executable failure to
+`plugin-failure` with a redacted `execution-deadline` detail. `bootstrap-timeout` remains specific
+to import and factory creation.
+
+`handler-unavailable` means an installed plugin has a fresh selected registry entry but its module
+cannot be resolved/imported, its export is absent, or the export has the wrong callable shape.
+`plugin-failure` begins only after a callable factory or handler is reached and then throws an
+unknown value. The host normalizes and redacts both classes; thrown values never become result data.
+No failure removes or restarts a sibling plugin, disables a built-in, or changes the committed
+registry.
+
+### Isolation and plugin-absent UX
+
+Each selected plugin invocation has its own cancellation, deadline, capability ports, buffered
+output, and crash boundary. The host attributes diagnostics to plugin, command ID, canonical route,
+and lifecycle phase without exposing secrets, raw thrown objects, host paths, or stack traces in
+ordinary output. Text and JSON are rendered only after the boundary returns a normalized result.
+
+`plugin-absent` is distinct from a broken installed plugin. It applies only when an explicitly
+invoked host-declared optional route has an absent-owner stub and the owning plugin is not
+installed. The diagnostic names the unavailable route and the expected plugin and includes a
+host-authored, statically validated remediation command or documentation URL. The host must use a
+command the installed CLI actually supports; it does not synthesize a package-install spelling.
+Default help lists installed children and only those absent stubs the host intentionally marks
+visible.
+
+An installed plugin with a missing/stale registry or a bad executable pointer is
+`handler-unavailable`, not `plugin-absent`. Capability refusal is `capability-denied`; a terminated
+bootstrap is `bootstrap-timeout`; a post-bootstrap throw is `plugin-failure`. These stable
+distinctions keep installation advice, repair advice, and plugin fault reports from collapsing into
+one generic error.
+
+### Host-owned generation plan and transaction
+
+A generator definition points to an exported `PluginCliGeneratorFactory`. It follows the same safe
+module/export validation as a handler but may declare only `workspace:read`:
+
+```ts
+export type PluginCliGenerationOperation =
+  | {
+    readonly kind: 'create';
+    readonly path: string;
+    readonly content: string;
+  }
+  | {
+    readonly kind: 'modify';
+    readonly path: string;
+    readonly expectedSha256: string;
+    readonly content: string;
+  }
+  | {
+    readonly kind: 'delete';
+    readonly path: string;
+    readonly expectedSha256: string;
+  }
+  | {
+    readonly kind: 'skip';
+    readonly path: string;
+    readonly reason: string;
+  };
+
+export interface PluginCliGenerationPlan {
+  readonly planId: string;
+  readonly operations: readonly PluginCliGenerationOperation[];
+  readonly messages?: readonly PluginCliMessage[];
+}
+
+export interface PluginCliGenerationContext {
+  readonly signal: AbortSignal;
+  readonly deadline: string;
+  readonly grant: PluginCliCapabilityGrant;
+  readonly workspace: PluginCliWorkspaceReadPort;
+}
+
+export type PluginCliGenerationPlanner = (
+  invocation: PluginCliInvocation,
+) => Promise<PluginCliGenerationPlan>;
+
+export type PluginCliGeneratorFactory = (
+  context: PluginCliGenerationContext,
+) => PluginCliGenerationPlanner | Promise<PluginCliGenerationPlanner>;
+```
+
+After route selection and capability approval, the host imports only that command's generator module
+in the same terminable boundary used for handlers, verifies the factory, and invokes the returned
+planner. A generator module has the same side-effect-free import-time rule as a handler module, and
+a generator command never imports or invokes its `handler` because the fields are mutually
+exclusive.
+
+Plan contents are UTF-8 text and workspace-relative `/`-separated paths. The host rejects absolute
+paths, URLs, empty segments, `.`/`..`, NULs, case-folded duplicates, symlink/reparse escapes,
+conflicting operations, writes outside host-declared transaction roots, non-identical
+create-over-existing, modify/delete digest mismatches, unsorted duplicate targets, and configured
+size/count limits. An identical create or modify is normalized to `skip`. A plan contains no
+callbacks, commands, network requests, post-scripts, binary handles, or host path. Invalid input
+returns `plan-invalid` before any stage or workspace mutation exists.
+
+The transaction is an explicit host state machine:
+
+```text
+planned -> validated -> staged -> checked -> committing -> committed
+                         |          |            |
+                         +----------+------------+-> rolling-back -> rolled-back
+                                                        |
+                                                        +-> recovery-required
+```
+
+Preview stops after `validated`: it renders the canonical operation set and diagnostics and creates
+no stage, lock, journal, file, subprocess, network request, or post-step. The current authoritative
+registry command spells this mode `--dry-run`; contributed commands may expose a host-owned
+`--preview`. Both select the same no-write transaction mode, and plugins never parse or implement
+the flag themselves.
+
+Apply acquires the host workspace-mutation lock, snapshots target digests, creates a host-owned
+stage on the same filesystem, renders create/modify results there, represents deletes in the
+journal, and runs the host-selected focused format/check/validation set against the staged view.
+Immediately before commit it rechecks the source digests. A generated root that can be replaced by
+one rename is swapped atomically; a multi-path commit uses a durable ordered journal and backups and
+is atomic to cooperating NetScript commands under the lock. Success is reported only after every
+operation is committed and the journal is cleared.
+
+Validation is derived by the host from affected paths, never selected or suppressed by a plugin. If
+a plan affects a public `packages/**` or `plugins/**` surface, apply includes structured checking,
+the affected full export-map `deno doc --lint` bar, the repository's per-member publish dry-run,
+exact internal `@netscript/*` dependency-pin checks, and runtime-asset/`import.meta` preflight where
+applicable. Generated publish assets are checked-in TypeScript constants rather than runtime file
+reads or import attributes. Preview names the gates that would run but executes no subprocess.
+
+Any staging, validation, commit, or rollback error returns `commit-failed`. The host rolls back to
+the recorded pre-commit bytes before releasing the lock. If process death prevents complete
+rollback, the durable journal remains `recovery-required`; the next mutating command refuses to run
+and doctor reports the exact recovery action. Byte-identical create/modify output becomes `skip`,
+and final buffered output distinguishes planned, created, modified, deleted, and skipped paths in a
+stable path order.
+
+### Doctor integration and manifest-pointer ownership
+
+The plugin publisher owns the two source declarations of `PluginCliManifestPointer` and must keep
+them byte-for-byte equivalent after canonical key/capability ordering:
+
+- the top-level parse-only `cli` block in published `scaffold.plugin.json`, which is the installer
+  discovery and pre-import permission authority; and
+- `PluginContributions.cli.contribution` in the runtime `definePlugin()` value, which is the runtime
+  identity cross-check.
+
+Only the pointer is repeated. The descriptor tree exists once at its exported module; handler and
+planner code stay at their own referenced modules. The installer owns the installed manifest record,
+and `@netscript/cli` owns the generated registry, input fingerprints, mutation journal, and doctor
+report. Neither manifest is an alternate registry.
+
+`netscript plugin doctor` checks, without repairing implicitly:
+
+- installer/runtime pointer equality for plugin, family, major, module, export, and capabilities;
+- supported family/major, normalized package-contained pointer, published export-map presence, and
+  exact package version/integrity or local-source identity;
+- pointer capability equality with the descriptor's sorted command-capability union;
+- registry presence, schema support, input and descriptor digests, tracked-source freshness,
+  canonical ordering, and absence of stale/removed entries;
+- isolated descriptor-export load and shape without importing any handler or generator module;
+- executable-pointer module and export-map reachability plus prior attributed load diagnostics; and
+- abandoned stage/journal state, rollback/recovery requirements, and prior normalized bootstrap or
+  transaction failures.
+
+Doctor reports stable `ok`, `warning`, or `error` checks with remediation and a nonzero command
+result when an error remains. It does not install, update, regenerate, rewrite pointers, grant a
+capability, delete a journal, or execute a plugin handler. The live command currently accepts
+`--project-root` and `--resource`; the latter names its diagnostic-evidence receipt and does not
+change the checks.
+
+The new top-level installer block is sequenced after the accepted manifest-forward-compatibility
+prerequisite: the outer plugin manifest must permit future blocks, while the known `cli` block is
+validated strictly. The live schema is still top-level `.strict()`, so this RFC describes a target
+contract rather than claiming the pointer is shipped. S3 decides how the prerequisite is folded into
+existing board work; it may not weaken pointer validation or change ownership.
+
+### S3 normative sections still to be completed
+
+The next RFC slice completes, without changing the S1/S2 contract:
+
 - compatibility with accepted frontend, SDK, runtime, command-composition, and DevTools RFCs;
-- deploy #904–#908 supersession, duplicate audit, JSR obligations, and the later epic roadmap.
+- deploy #904–#908 migration/supersession and the hardcoded-host-command audit;
+- the amend/fold-first duplicate audit, JSR obligations, and later implementation epic with PR-sized
+  children; and
+- migration sequencing and compatibility fixtures beyond the already-fixed published
+  `PluginCliResult` collision.
 
-These are explicit draft gaps, not implementation discretion.
+These are explicit S3 draft gaps, not implementation discretion. Discovery, bootstrap, isolation,
+capabilities, generation, doctor behavior, and pointer ownership are normative in S2.
 
 ## Drawbacks
 
