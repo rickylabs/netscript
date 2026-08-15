@@ -308,3 +308,47 @@ Dispatched to the preserved thread `019ffcc9-16c2-7573-b7f6-d627172408e8` (PID `
 replacement sender. The brief also warns that the coordinator's "obsolete pin" wording does not
 apply: the S2 manifest, procedure, and measurements are correct at this pin and must not be edited
 to manufacture a change. S3 remains held until the rewrites are verified.
+
+## 2026-08-15 — the agent-docs refresh cascades into a `packages/**` generated asset
+
+The authorized CI repair fixed its target and exposed a dependent staleness one layer down. Both
+facts are established by execution, not inference.
+
+**The authorized repair worked.** `d4a0a8340` refreshed `.llm/assets/agent-docs/prose.json.gz` and
+`provenance.json`. Verified by the orchestrator at that head: `check:agent-docs-prose` raw exit `0`,
+`"fresh":true`, `"stalePaths":[]`. The regenerated bundle's `sha256`
+`6f25560210cae276a3a5149e7315b1e9682406acdfe342cadbe1c7f35c629efb` and `uncompressedBytes` `4783855`
+match exactly the values the pre-fix checker had computed as expected, confirming this was purely a
+stale-asset problem and the regeneration is the precise fix. The CI step that previously failed —
+`quality` → **"Agent docs corpus freshness"** — is no longer the failing step.
+
+**A different step now fails.** At `d4a0a8340`, run `31870102809` job `94977326331`, `quality` fails
+at step **#14 "Generated asset freshness"**, which runs gate `assets-barrel`
+(`.github/workflows/ci.yml:376-381`), i.e. `check:assets-barrel`.
+
+**Root cause, established by reading the generator and running it.**
+`.llm/tools/generate-cli-assets-barrel.ts` reads `.llm/assets/agent-docs/provenance.json` at line
+382 and `.llm/assets/agent-docs/prose.json.gz` at line 389, and emits
+`packages/cli/src/kernel/assets/agent-docs.generated.ts`. Refreshing the agent-docs bundle therefore
+_necessarily_ invalidates that embedded copy. Running `deno task gen:assets-barrel` in the leaf
+worktree modifies exactly one tracked file —
+`packages/cli/src/kernel/assets/agent-docs.generated.ts` — an 11-insertion/6-deletion delta carrying
+`sourceCommit` `6f9620c0c` → `c8e3f26d8` and the new byte counts. The orchestrator restored that
+file immediately both times; the leaf worktree is clean.
+
+**This is not a leaf error.** The repair brief forbade `packages/**` changes, and the leaf obeyed
+exactly. The dependency is structural: the docs bundle is an input to a CLI-embedded generated
+asset, so the two cannot be refreshed independently.
+
+Disposition: **escalated, not resolved.** Completing this repair requires regenerating one file
+under `packages/**`, which sits outside this docs lane's authorized surface and outside the boundary
+this orchestrator set. It is generated output rather than hand-written product code, and its only
+change is the provenance/byte-count triple that follows mechanically from the already-authorized
+bundle refresh — but the authorization is the coordinator's to give, not this lane's to assume. No
+`packages/**` file was committed.
+
+Recommendation: authorize one bounded follow-up running `deno task gen:assets-barrel`, committing
+only `packages/cli/src/kernel/assets/agent-docs.generated.ts`, and proving `check:assets-barrel`
+through the structured gate wrapper. Leaving the two assets refreshed while the embedded copy stays
+stale is the one outcome to avoid — it keeps CI red and leaves the CLI shipping a bundle that no
+longer matches the published docs.
