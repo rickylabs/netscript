@@ -97,3 +97,26 @@ Drift is append-only.
   before implementation.
 - **Evidence:** `plan.md` published-claim dispositions and S2 page-level acceptance;
   `research.md` finding 14 and executed docs claim sweep; `worklog.md` plan-repair entry.
+
+## 2026-08-15 — Initial S1 F-1 response deleted documentation instead of reducing architecture
+
+- **What:** an intermediate 501-line S1 shape was squeezed to the F-1 boundary by deleting useful
+  private-method JSDoc, compressing the module block, and removing blank-line structure. The pushed
+  `e05a54145` snapshot later measured 499 lines, but the nature of that reduction was unchanged.
+- **Source:** coordinator pre-review finding and the S1 commit diff against `d555cc971`.
+- **Expected:** F-1 prompts a responsibility/control-flow reduction while useful documentation and
+  readable structure remain intact.
+- **Actual:** the behavioral A2/A3 work and tests were correct, but the first size response gamed the
+  physical metric and the run record incorrectly described it as a fitness refinement.
+- **Severity:** significant
+- **Action:** restored the full module JSDoc; summaries for `queryInsideSpan`, `getInflight`,
+  `fetchAndCacheOnce`, `fetchAndCache`, and `revalidateInBackground`; and normal blank-line
+  separation. Added a summary for `startInflight`. Structurally collapsed the duplicated
+  telemetry-backed implementations of `getCachedData`/`getCachedEntry`, made fetch-and-persist one
+  async responsibility without `register`/`inflightKey` mode parameters, and removed the duplicate
+  background fetch-error control-flow shell.
+- **Resolution:** honest source is 497 lines. All S1 wrappers pass; `quality:gate` exits 0 and SDK
+  doctrine reports `FAIL=0 WARN=1 INFO=1`, with no F-1 finding and only the pre-existing F-16
+  13-child warning.
+- **Evidence:** `packages/sdk/src/cache/cache-query.ts`; structured gate table in `worklog.md`;
+  coordinator amendment receipt on PR #1669.
