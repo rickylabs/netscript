@@ -47,19 +47,17 @@
 
 ### Commit slices
 
-| #  | Slice                                                                                                  | Gate                                                                                                                   | Exact files                                       |
-| -- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| S1 | Make optimized MCP fmt/lint selection marker- and config-aware while retaining every unmarked sibling. | 114-file selection + honest single fmt blocker + green lint + marked/unmarked tests + negative controls + doctor test. | Six exact S1 paths in `plan.md`                   |
-| S2 | Make all three CLI tests package-cwd independent without weakening assertions.                         | Structured targeted 6/6 + exact package task + docs gates; final runtime consumer in S4.                               | Three exact CLI files in `plan.md`                |
-| S3 | Pin close-score policy on both sides and record rationale.                                             | Targeted test + widen/narrow RED controls + scoped MCP/quality gates.                                                  | `guidance-index.ts`; `guidance-retrieval_test.ts` |
-| S4 | Integrated evidence for the applicable frozen gate set.                                                | Static/test/docs/publish/JSR gates; `scaffold.runtime` recorded coordinator-waived `n/a`.                              | Run artifacts/evidence only                       |
+| #  | Slice                                                                                                  | Gate                                                                                                               | Exact files                                       |
+| -- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
+| S1 | Make optimized MCP fmt/lint selection marker- and config-aware while retaining every unmarked sibling. | Both exact wrappers green at 114 + marked/unmarked/config-batch tests + negative controls + doctor/semantic proof. | Seven exact S1 paths in `plan.md`                 |
+| S2 | Make all three CLI tests package-cwd independent without weakening assertions.                         | Structured targeted 6/6 + exact package task + docs gates; final runtime consumer in S4.                           | Three exact CLI files in `plan.md`                |
+| S3 | Pin close-score policy on both sides and record rationale.                                             | Targeted test + widen/narrow RED controls + scoped MCP/quality gates.                                              | `guidance-index.ts`; `guidance-retrieval_test.ts` |
+| S4 | Integrated evidence for the applicable frozen gate set.                                                | Static/test/docs/publish/JSR gates; `scaffold.runtime` recorded coordinator-waived `n/a`.                          | Run artifacts/evidence only                       |
 
 ### Deferred scope
 
-- Any twelfth product/config path, other wrapper/CI change, docs edit, malformed-fixture repair,
+- Any thirteenth product/config path, other wrapper/CI change, docs edit, malformed-fixture repair,
   public API change, dependency update, or algorithm change.
-- `packages/mcp/tests/fixtures/doctor/healthy/netscript.config.ts` until the coordinator grants the
-  pending twelfth-path rescope; its formatting-only patch is proved in scratch.
 - `scaffold.runtime`, Aspire, Docker, and `e2e:cli`; the gate is waived `n/a`, not pending.
 - All implementation until separate-session PLAN-EVAL `PASS`.
 
@@ -83,6 +81,8 @@ score order. Then prove both green behavior and a controlled red mutation throug
 | 2026-08-15 | plan      | rejected proof draft       | Parent-family marker made both wrappers green at 110 by excluding four unmarked healthy files; coordinator rejected it before push as a silent false-positive exclusion. |
 | 2026-08-15 | plan      | corrected mechanism proof  | Child-only marker + nearest-config batching selects 114: lint green, fmt one honest healthy-fixture finding, doctor 4/4, negative controls red, restorations byte-exact. |
 | 2026-08-15 | plan      | twelfth-path scratch proof | Formatting only `healthy/netscript.config.ts` makes exact fmt green at 114; lint and doctor remain green. Checkout path untouched pending grant.                         |
+| 2026-08-15 | plan      | twelfth-path grant         | Coordinator authorized that exact formatting-only path, bringing planned implementation to twelve paths; no semantic/config-value change and no thirteenth path.         |
+| 2026-08-15 | plan      | final 114-file proof       | Both exact no-extra-flag wrappers green; all four healthy TS files individually named selected; doctor/parsed meaning/hash/negative-control requirements proved.         |
 
 ## Decisions
 
@@ -95,15 +95,16 @@ score order. Then prove both green behavior and a controlled red mutation throug
 
 ## Drift
 
-| Drift                                                                                                   | Severity                       | Logged in drift.md |
-| ------------------------------------------------------------------------------------------------------- | ------------------------------ | ------------------ |
-| Launcher preseeded exact thread record before clean check.                                              | minor                          | yes                |
-| Root task already had a wrapper-level fixture exclude, but standalone acceptance command remains red.   | minor research clarification   | yes                |
-| R8 root-exclusion conclusion was falsified by evaluator execution.                                      | significant                    | yes                |
-| Child-only marker proof selected 114 but left fmt red on the healthy nested config.                     | significant design finding     | yes                |
-| Coordinator expanded the edit surface from six to eleven paths and waived `scaffold.runtime`.           | significant authorized rescope | yes                |
-| Parent-family 110-file draft silently removed four unmarked healthy files and was rejected before push. | significant plan correction    | yes                |
-| One genuine healthy-fixture fmt finding remains; its twelfth-path repair is proved but unauthorized.    | significant pending rescope    | yes                |
+| Drift                                                                                                               | Severity                       | Logged in drift.md |
+| ------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ------------------ |
+| Launcher preseeded exact thread record before clean check.                                                          | minor                          | yes                |
+| Root task already had a wrapper-level fixture exclude, but standalone acceptance command remains red.               | minor research clarification   | yes                |
+| R8 root-exclusion conclusion was falsified by evaluator execution.                                                  | significant                    | yes                |
+| Child-only marker proof selected 114 but left fmt red on the healthy nested config.                                 | significant design finding     | yes                |
+| Coordinator expanded the edit surface from six to eleven paths and waived `scaffold.runtime`.                       | significant authorized rescope | yes                |
+| Parent-family 110-file draft silently removed four unmarked healthy files and was rejected before push.             | significant plan correction    | yes                |
+| One genuine healthy-fixture fmt finding exposed a twelfth-path repair; proof led to an exact formatting-only grant. | significant resolved rescope   | yes                |
+| Coordinator granted the exact formatting-only twelfth path after the honest 114-file finding.                       | significant authorized rescope | yes                |
 
 ## Gate results
 
@@ -124,29 +125,43 @@ edits. Commands were unpiped; exit status below is the direct child process stat
 uses `.deno-fmt-lint-ignore` inside `doctor/broken/` to skip only that directory, then groups the
 114 remaining files by effective nearest Deno config before batching.
 
-| Proof                                | Exact command / mutation                                                                                    | Raw exit | Selection / failed batches                                                                            | Verdict                                                         |
-| ------------------------------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| Baseline fmt                         | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/mcp --ext ts,tsx` in checkout | 1        | 115 selected; 1 failed batch; 0 findings                                                              | RED config-parse crash                                          |
-| Baseline lint                        | equivalent `run-deno-lint.ts` command in checkout                                                           | 1        | 115 selected; 1 crash batch (`failures.length`; lint currently has no named `failedBatches` JSON key) | RED config-parse crash                                          |
-| Corrected fmt                        | exact fmt command, no `--exclude`/`--config`                                                                | 1        | 114 selected; 2 config batches; 1 failed batch; exactly 1 finding                                     | Honest RED naming only `doctor/healthy/netscript.config.ts`     |
-| Corrected lint                       | exact lint command, no `--exclude`/`--config`                                                               | 0        | 114 selected; 2 config batches; 0 crash/failed batches; 0 occurrences                                 | GREEN, non-empty                                                |
-| Doctor semantics                     | structured `doctor-families_test.ts`                                                                        | 0        | 4 passed / 0 failed                                                                                   | GREEN; marker file does not perturb asserted directory behavior |
-| Fmt negative                         | append unformatted export to real `packages/mcp/mod.ts`, exact fmt command                                  | 1        | 114 selected; 2 failed batches; 2 findings: deliberate `mod.ts` defect plus known healthy fixture     | RED with the real deliberate formatting finding still visible   |
-| Lint negative                        | append unused binding to real `packages/mcp/cli.ts`, exact lint command                                     | 1        | 114 selected; one `no-unused-vars` occurrence naming `packages/mcp/cli.ts`; no crash batch            | RED for a real lint violation                                   |
-| Restoration                          | archive-restore then `cmp`/SHA-256                                                                          | 0        | `mod.ts` hash `8a76331e…c86d841`; `cli.ts` hash `1964acf7…03b87b` match checkout                      | Byte-exact restore asserted                                     |
-| Malformed fixture                    | SHA-256/cmp against checkout                                                                                | 0        | both `deno.json` hashes `6815999d…37361`                                                              | Deliberately malformed fixture remains byte-identical           |
-| Proposed twelfth path (scratch only) | `deno fmt packages/mcp/tests/fixtures/doctor/healthy/netscript.config.ts`, then both exact wrappers         | 0        | fmt: 114 selected / 2 batches / `failedBatches: 0`; lint: 114 / 2 / 0 occurrences                     | Final fmt and lint GREEN; doctor rerun 4/4 GREEN                |
+| Proof                               | Exact command / mutation                                                                                               | Raw exit | Selection / failed batches                                                                            | Verdict                                                                       |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Baseline fmt                        | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/mcp --ext ts,tsx` in checkout            | 1        | 115 selected; 1 failed batch; 0 findings                                                              | RED config-parse crash                                                        |
+| Baseline lint                       | equivalent `run-deno-lint.ts` command in checkout                                                                      | 1        | 115 selected; 1 crash batch (`failures.length`; lint currently has no named `failedBatches` JSON key) | RED config-parse crash                                                        |
+| Corrected fmt                       | exact fmt command, no `--exclude`/`--config`                                                                           | 1        | 114 selected; 2 config batches; 1 failed batch; exactly 1 finding                                     | Honest RED naming only `doctor/healthy/netscript.config.ts`                   |
+| Corrected lint                      | exact lint command, no `--exclude`/`--config`                                                                          | 0        | 114 selected; 2 config batches; 0 crash/failed batches; 0 occurrences                                 | GREEN, non-empty                                                              |
+| Doctor semantics                    | structured `doctor-families_test.ts`                                                                                   | 0        | 4 passed / 0 failed                                                                                   | GREEN; marker file does not perturb asserted directory behavior               |
+| Healthy-file selection probe        | after normalization, temporarily add a fmt defect to each of the three generated healthy registries; exact fmt command | 1        | 114 selected; 2 batches; 3 findings individually naming all three registry files                      | Proves the unmarked generated siblings remain selected; restored byte-exactly |
+| Fmt negative after normalization    | append unformatted export to real `packages/mcp/mod.ts`, exact fmt command                                             | 1        | 114 selected; 2 batches; 1 failed batch; exactly 1 finding naming `packages/mcp/mod.ts`               | RED for a real source formatting defect                                       |
+| Lint negative                       | append unused binding to real `packages/mcp/cli.ts`, exact lint command                                                | 1        | 114 selected; one `no-unused-vars` occurrence naming `packages/mcp/cli.ts`; no crash batch            | RED for a real lint violation                                                 |
+| Restoration                         | archive-restore then `cmp`/SHA-256                                                                                     | 0        | `mod.ts` hash `8a76331e…c86d841`; `cli.ts` hash `1964acf7…03b87b` match checkout                      | Byte-exact restore asserted                                                   |
+| Malformed fixture                   | SHA-256/cmp against checkout                                                                                           | 0        | both `deno.json` hashes `6815999d…37361`                                                              | Deliberately malformed fixture remains byte-identical                         |
+| Granted twelfth path (scratch only) | `deno fmt packages/mcp/tests/fixtures/doctor/healthy/netscript.config.ts`, then both exact wrappers                    | 0        | fmt: 114 selected / 2 batches / `failedBatches: 0`; lint: 114 / 2 / 0 occurrences                     | Final fmt and lint GREEN; doctor rerun 4/4 GREEN                              |
+| Parsed-meaning equality             | import original and formatted config with `deno eval --no-config`; compare serialized default exports                  | 0        | original and formatted both `{"plugins":["workers"]}`; `equal: true`                                  | Formatting-only; parsed/config value unchanged                                |
 
 Collateral is exact: 115→114 for both wrappers. The only file removed from automatic selection is
 `packages/mcp/tests/fixtures/doctor/broken/netscript.config.ts`. All four unmarked healthy TS files
-remain selected, as do the unrelated export-surface and telemetry fixture TS files. Planned wrapper
-tests independently create a marked subtree and an equivalent unmarked sibling; count/path
-assertions require child-only skip, unmarked-sibling selection, and separate nearest-config batches
-in both tools.
+remain selected and were individually named by real fmt findings during the proof:
 
-The remaining fmt finding is not a config-style conflict. `healthy/deno.json` contains a valid
+1. `packages/mcp/tests/fixtures/doctor/healthy/netscript.config.ts` — the genuine pre-normalization
+   finding.
+2. `packages/mcp/tests/fixtures/doctor/healthy/.netscript/generated/plugin-ai/agents.registry.ts` —
+   controlled selection probe, restored hash `c5ca3e52…ba1546`.
+3. `packages/mcp/tests/fixtures/doctor/healthy/.netscript/generated/plugin-ai/tools.registry.ts` —
+   controlled selection probe, restored hash `c5ca3e52…ba1546`.
+4. `packages/mcp/tests/fixtures/doctor/healthy/.netscript/generated/plugin-workers/job-registry.ts`
+   — controlled selection probe, restored hash `c5ca3e52…ba1546`.
+
+Unrelated export-surface and telemetry fixture TS files also remain selected. Planned wrapper tests
+independently create a marked subtree and an equivalent unmarked sibling; count/path assertions
+require child-only skip, unmarked-sibling selection, and separate nearest-config batches in both
+tools.
+
+The original fmt finding is not a config-style conflict. `healthy/deno.json` contains a valid
 workspace and no fmt options. Three healthy TS files already pass; `healthy/netscript.config.ts` is
-simply unformatted. The scratch-only proposed change is exactly:
+simply unformatted. The coordinator granted this exact formatting-only twelfth path after the
+scratch proof. The planned change is exactly:
 
 ```diff
 -const config: { readonly plugins: readonly string[] } = { plugins: ['workers'] };
@@ -156,7 +171,8 @@ simply unformatted. The scratch-only proposed change is exactly:
  export default config;
 ```
 
-That checkout path is a twelfth path and remains untouched pending coordinator grant.
+The checkout path remains untouched in this plan-only pass. The grant expands implementation
+authority after Tier-A and PLAN-EVAL cycle 2 `PASS`; it does not authorize pre-gate tree mutation.
 
 ### Static gates
 
@@ -185,8 +201,9 @@ That checkout path is a twelfth path and remains untouched pending coordinator g
 
 ## Handoff notes
 
-- Tier-A must first dispose the pending twelfth-path request. PLAN-EVAL cycle 2 should then inspect
-  L3's child-only marker plus nearest-config batching, the marked/unmarked sibling guard, the
-  two-direction score controls, and the honest treatment of existing CLI JSR debt.
-- No implementation authority exists. The topic supervisor owns the rescope decision and future
-  cycle-2 evaluator launch; `scaffold.runtime` is waived and must not run.
+- Tier-A should review the now-reachable twelve-path plan. PLAN-EVAL cycle 2 should inspect L3's
+  child-only marker plus nearest-config batching, the four-file unmarked-sibling evidence, the
+  formatting-only semantic equality proof, the two-direction score controls, and the honest
+  treatment of existing CLI JSR debt.
+- No implementation authority exists before fresh Tier-A and cycle-2 `PASS`. The topic supervisor
+  owns that review/evaluator launch; `scaffold.runtime` is waived and must not run.
