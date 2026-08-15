@@ -4926,3 +4926,59 @@ altered.
 I have a preference and will state it plainly: **option 1 or 2**, because leaving a foreign write
 inside an author-signed commit is the kind of provenance defect this lane has spent the entire leaf
 refusing to accept from anyone else.
+
+## 2026-08-15 — Option 2 attempted and blocked: the Codex quota is account-level
+
+The coordinator selected option 2 — a fresh separate Codex Sol/high agent with exclusive ownership of
+the F8 provenance correction. I executed it. It does not work, and the reason rules out every
+Codex-based option before 2026-08-20.
+
+### What I did
+
+1. Wrote a bounded corrective brief scoped to `leak-report.md` plus a minimal provenance note, with
+   explicit prohibitions on gates, audits, runtime, and — pointedly — on running `leak-check` at all,
+   since regenerating that file is the defect being repaired.
+2. First launch was **correctly refused** by the launcher:
+   `{"stage":"sender-ownership","ok":false,"code":"duplicate_sender_risk"}` — the leaf worktree
+   already holds the original author's sender. That guard is right: a second sender there is exactly
+   the rival-author violation the doctrine forbids.
+3. Gave the corrective agent its **own detached worktree** at `d8d5ee619`
+   (`/home/codex/worktrees/ns1664-f8-prov`), with instructions to push by explicit refspec — the same
+   shape the original author used for attempt 6.
+4. Dry-run validated: brief valid, `head d8d5ee619`, `dirty 0`.
+5. Launched. The agent was created as thread `01a00766-3240-7dd0-91df-7e335142f0cb` and then
+   **immediately hit the same limit**:
+
+```text
+{"method":"error","params":{"error":{"message":"You've hit your usage limit. …
+```
+
+### The decisive fact
+
+The quota is **account-level, not thread-level**. A brand-new thread on a clean worktree failed
+identically to the exhausted original. Therefore **no Codex implementation agent of any identity can
+act on this repository before 2026-08-20 05:31** — option 2 is not merely slow, it is unavailable,
+and option 4 collapses into the same wait.
+
+I removed the unused detached worktree rather than leaving litter. The leaf is untouched at
+`d8d5ee619`, clean, local == remote == PR.
+
+### What remains
+
+| Option | Status |
+| --- | --- |
+| 1 — supervisor performs the one-file restoration | **the only path to correction before 2026-08-20** |
+| 2 — fresh Codex agent | **blocked**, proven by direct attempt |
+| 3 — accept and annotate, review F8 plan content on its merits | available now |
+| 4 — wait for the preserved author | ≥ 4 days, same account limit |
+
+I have not taken option 1 on my own initiative, for the reason I gave before: the contamination came
+from a supervisor writing into an author-owned worktree, and repairing it the same way trades one
+provenance defect for another. But that objection is now weighed against a four-day hold on a
+two-line fix, and the coordinator has already ruled twice that the correction should happen promptly.
+
+**I will proceed with option 1 on coordinator authorisation**, committing as a separate corrective
+owner with the commit message stating plainly that a supervisor both caused and repaired the foreign
+bytes — so the record shows the exception rather than hiding it. Alternatively, option 3 is
+defensible: the defect is two provenance lines in a run artifact, fully attributed in D-19 and here,
+and F8's plan content is unaffected and reviewable now.
