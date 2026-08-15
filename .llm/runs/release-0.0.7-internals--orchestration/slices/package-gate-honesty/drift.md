@@ -103,3 +103,20 @@ documentation.
 - **Action:** prepare proof only; do not touch the checkout path until the coordinator grants it as
   a twelfth path. Implementation and PLAN-EVAL cycle 2 remain blocked.
 - **Evidence:** Proposed one-file diff and fmt/lint/doctor results in `worklog.md`.
+
+## 2026-08-15 — Coordinator granted formatting-only twelfth path
+
+- **What:** The coordinator added `packages/mcp/tests/fixtures/doctor/healthy/netscript.config.ts`
+  to the planned implementation surface, bringing the bound to twelve paths.
+- **Source:** Topic-supervisor grant after review of plan head `ccf256884` and the honest R14/R15
+  scratch proof.
+- **Expected:** The real 114-file fmt finding must be fixed without hiding any unmarked file.
+- **Actual:** Deno formatting alone expands the object and normalizes quotes. Original and formatted
+  modules both export `{"plugins":["workers"]}`; both exact wrappers are green at 114, doctor is
+  4/4, and the malformed config hash remains
+  `6815999dbd68bd1ab5bb137b59808cb1f1a38fb3393c9133721f439c0ad37361`.
+- **Severity:** significant authorized rescope
+- **Action:** accept in the plan only. Do not mutate the checkout path before fresh Tier-A and
+  PLAN-EVAL cycle 2 `PASS`; no thirteenth path exists.
+- **Evidence:** Final green matrix, four individually named healthy selection probes, semantic
+  equality, and byte-restoration evidence in `worklog.md`.
