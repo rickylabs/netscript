@@ -90,16 +90,21 @@ or expensive command is authorized.
 
 ## In Progress
 
-- F3 product repair is ready to commit. After its immutable content head exists, generate the four
-  fresh `s4-f3-*` binding receipts. The `s4-f2-fix1-*` receipts remain durable but superseded for
-  final-head evidence; S5 and both expensive gates are blocked.
+- F3 product repair is committed at content head `6e822a74b4de527a23da46f1c9c2f6ba6c94c72f`.
+  The first replacement binding receipt, `receipts/s4-f3-check.json`, is `FAIL`/exit 1 for a newly
+  exposed TS2322 in untouched `verify-producer-reconnect.ts:268`. The same full check passes in an
+  isolated archive at `c53726c69`, so the red is not a carried baseline. The ordered run stopped;
+  the other three current-head receipts do not exist. The `s4-f2-fix1-*` set remains durable but
+  superseded. S5 and both expensive gates are blocked.
 
 ## Next Steps
 
-1. Commit and explicitly push the bounded F3 product/test/run-artifact repair.
-2. Generate four fresh `s4-f3-*` binding receipts at that immutable content head.
-3. Recompute exact-set sufficiency, post the receipt
-   comment, and stop for Tier-A with all expensive gates lease-blocked.
+1. Obtain a reviewed disposition for the newly exposed binding-check failure recorded in
+   `reports/s4-f3-check-failure.md`; do not repair it implicitly.
+2. After a reviewed repair or other explicit disposition, commit a new immutable content head and
+   rerun all four binding gates with fresh invocation IDs.
+3. Keep S5, `scaffold.runtime`, and `fresh-browser` blocked until exact-set cheap sufficiency is
+   restored and a new coordinator lease is granted.
 
 ## Key Decisions
 
@@ -141,7 +146,7 @@ or expensive command is authorized.
 
 | Gate family | Current status                                                                                                                    | Evidence                     |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Static      | Supplemental package evidence complete with attributed doc baselines; all four S4-F2 repair binding receipts PASS at `2c8219968`, exact-set sufficiency SUFFICIENT. | `worklog.md`; `reports/s4-test-failure.md`; binding receipts |
+| Static      | S4-F2 repair receipts PASS at `2c8219968` but are superseded. Current `s4-f3-check.json` is FAIL at `6e822a74b`; the other three replacement receipts are missing, so exact-set sufficiency is INSUFFICIENT. | `worklog.md`; `reports/s4-f3-check-failure.md`; binding receipts |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
 | Runtime     | NOT_RUN / lease-blocked                                                                                                           | `plan.md` release conditions |
 | Consumer    | NOT_RUN / implementation-dependent                                                                                                | `plan.md` S5                 |

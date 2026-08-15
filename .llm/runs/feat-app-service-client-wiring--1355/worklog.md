@@ -361,3 +361,26 @@ unit test.
   A cheap replay against the preserved failed generated project ran real standalone database
   codegen, then the static probe only; both completed with exit 0. No Aspire, Docker, browser,
   `scaffold.runtime`, or lease was used for the replay.
+
+### S4-F3 binding stop — current-head check failure
+
+The first replacement binding invocation stopped the ordered gate run at immutable content head
+`6e822a74b4de527a23da46f1c9c2f6ba6c94c72f`:
+
+- `receipts/s4-f3-check.json`, invocation
+  `app-service-client-wiring-s4-f3-check`, is `FAIL`/exit 1 with
+  `gitHead == actualGitHead` and no mismatch override.
+- The structured root check selected 2,937 files in 25 batches and reported one TS2322:
+  `packages/cli/e2e/src/application/gates/scaffold/verify-producer-reconnect.ts:268`, where
+  `Timeout` is not assignable to `number`.
+- That file is unchanged from both `2c8219968` and the pre-implementation verdict head
+  `c53726c69`; blame attributes the line to merged PR #1402 commit `3ce91f2c2`.
+- An isolated archive at `c53726c69` ran the same `deno task check` command over 2,924 files in
+  25 batches with zero diagnostics and exit 0. The current failure therefore does **not** reproduce
+  at the named earlier head. It is a newly exposed binding-gate failure at this leaf's head, not a
+  carried baseline, even though the diagnostic-bearing file itself is untouched.
+
+Per the stop rule, `test`, `publish-dry-run`, and `arch-check` were not run. No receipts were
+authored for them. Exact-set sufficiency is **INSUFFICIENT**: the check receipt is non-passing and
+the other three contracted receipts are missing. No repair, expensive gate, lease action, Aspire,
+Docker, browser, or evaluator followed the failure.
