@@ -781,3 +781,11 @@ plus clean audit; no retry/evaluator. #1671 S2 `ca7ade409` passed fixes Tier-A a
 active on exactly the two docs pages, with S4, metadata, #1348, and #1466 untouched. #1666 merged-main
 content `8c03d8629` has twelve exact-head PASS receipts and remains unpushed until its append-only
 integration evidence is complete.
+
+Newer transition `2026-08-15T21:03:30Z`: #1666 current-main refresh is now clean/pushed at evidence
+`021c7ffc6` over merge content `8c03d8629`, with PR comment `5304205247`. Fresh internals Tier-A
+passed at `6658ad9c0`; one native Fable 5/medium Remote Control integration-delta evaluator is active
+as job `be3774eb`, bridge `cse_01RQ7Eb4N4NaQEuAA6zPtpxV`. The prior `f281b8cf` lease is terminal
+PASS and was reconciled from stale active state. Hold readiness, acceptance mirroring, close-gate,
+and merge until the integration evaluator is terminal. #1664 attempt 6 and #1671 S3 remain active
+independently; #1663 remains at the owner-only exceptional third-evaluator boundary.

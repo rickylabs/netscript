@@ -757,3 +757,7 @@ implementation thread.
   receipts have the same 4,256 total results; only the scanner failure flipped, from 4236/1/19 to
   4237/0/19 after quarantine. Preserve both, exclude the red only in the declared passing evidence
   set, and require exact-head equality without a mismatch waiver.
+- **A new evaluator must not stack on a stale terminal lease:** before registering #1666's
+  integration-delta evaluator, reconcile the earlier evaluator against its pushed artifact and live
+  verdict comment. Lane-local serialization is measured from live work plus terminal evidence, not
+  from an unreconciled `active` string in the control plane.

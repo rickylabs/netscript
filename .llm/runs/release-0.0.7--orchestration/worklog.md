@@ -1412,3 +1412,17 @@
   and `SafeFailure<TError = ThrowableError>` remains. Fresh fixes Tier-A passed at `ac0b2c4c3` after
   105-file check, doctest 3/0, Contracts plus SDK 78/0, lint, and format. S3 alone is released over
   `sdk.md` and `how-to/discover-services.md`; no product, metadata, final-gate, or runtime scope.
+
+## 2026-08-15T21:03:30Z — #1666 integration refresh passes Tier-A and enters delta evaluation
+
+- #1666 integrated current main without rewriting evaluated history. Merge content `8c03d8629`
+  retains prior evaluator `0d4c82d6e` and main `0ef48c2ec` as its two parents; artifact evidence
+  `021c7ffc6` is clean, explicitly pushed, and commented at `5304205247`.
+- The integration proves the exact four generated conflict outputs contain both #1665 and #1666,
+  two canonical cascade cycles converge without a fifth output, all twelve selected receipts bind
+  `8c03d8629` and pass, the implementation set remains 14-of-17, and `deno.lock` is unchanged.
+  Fresh internals Tier-A passed at topic `6658ad9c0`.
+- One fresh native Fable 5/medium Remote Control integration-delta evaluator is active as job
+  `be3774eb`, session `cse_01RQ7Eb4N4NaQEuAA6zPtpxV`, over `8c03d8629` / `021c7ffc6`. The older
+  `f281b8cf` lease was stale in the control plane and is now reconciled to its already-proven PASS at
+  `0d4c82d6e`; lane-local serialization therefore remains one active evaluator, not two.

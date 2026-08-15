@@ -940,3 +940,13 @@ the verified managed Chrome 151 override, cleanup/audit, then `fresh-browser` on
 inter-gate audit. #1671 S2 `ca7ade409` passed fresh fixes Tier-A at `ac0b2c4c3`; S3 alone is released
 to the same author for the two docs pages, with S4 and metadata still held. #1666 current-main union
 `8c03d8629` has twelve exact-head PASS receipts and is assembling append-only evidence before push.
+
+At 21:03Z, #1666's history-preserving current-main refresh is clean, pushed, and independently
+Tier-A `PASS`. Content merge `8c03d8629` has parents `0d4c82d6e` and `0ef48c2ec`; artifact head
+`021c7ffc6` and comment `5304205247` preserve exactly four generated conflicts, the combined #1665
+and #1666 corpus, two-run convergence with no fifth output, twelve exact-content-head PASS receipts,
+14-of-17 scope, and byte-identical `deno.lock`. Internals checkpoint `6658ad9c0` launched one fresh
+native Fable 5/medium Remote Control integration-delta evaluator as job `be3774eb`, bridge
+`cse_01RQ7Eb4N4NaQEuAA6zPtpxV`. The earlier `f281b8cf` lease is reconciled terminal `PASS` at
+`0d4c82d6e`; it is not a second active evaluator. Readiness, issue mutation, close-gate, and merge
+remain held. #1664 attempt 6 and #1671 S3 continue independently under their existing contracts.
