@@ -471,3 +471,53 @@ S4 carries one instruction that N-4 makes load-bearing — the gates must attest
 which requires committing content first and running the gates against the clean committed tree, not
 the pre-commit working tree. After S4's Tier-A stop, IMPL-EVAL is a **fresh separate
 opposite-family session**, and the ready-flip decision belongs to the coordinator, not this lane.
+
+## 2026-08-15 — S4 Tier-A review: `CHANGES_REQUESTED` on one reproducibility defect
+
+Content head `120859d5c762706702cd45a3f2be19664e335e22`, final head
+`c987f009e502df0bbeb33c3d23f508bc6f320238`, turn ended `2026-08-15T01:03:49Z` with the Tier-A stop
+line, thread idle. Full review: `slices/tier-a-review-1502-s4.md`.
+
+### N-4 is fully discharged
+
+The carried risk since PLAN-EVAL cycle 2 is closed. All six contracted gates — `check`, `test`,
+`publish-dry-run`, `arch-check`, `docs-source-format`, `docs-accuracy` — record
+`gitHead == actualGitHead == 120859d5c`, the content head, with no `allowGitHeadMismatch` anywhere.
+All 17 final receipts share that single head and none is non-`PASS`. The two-commit structure is
+exactly as instructed: content commits first, gates run against the clean committed tree, receipts
+land in a follow-up whose delta is confined to the run directory.
+
+### Independently verified
+
+PR #1651 is `draft: true`, `state: open`, status labels `['status:impl']` — no ready-flip, exactly
+one lifecycle label. The PR body's Definition-of-Done has 9 of 10 boxes ticked, and the single
+unticked box is "A fresh opposite-family IMPL-EVAL records `PASS`; Tier-A S4 topic review is
+complete" — precisely the one that cannot yet be true, which is the #260 failure mode correctly
+avoided. The `acceptance-evidence` block has **0 `PENDING`** entries and `Closes #1502` is intact.
+Scope carries no `packages/**`, `plugins/**`, or `deno.lock`.
+
+### S4-F1 — the `SUFFICIENT` claim is not reproducible from the receipt directory
+
+`worklog.md:241` in the leaf records "The repository evidence-set evaluator reports `SUFFICIENT` with
+no reasons" without saying which receipt set it covers. Three final receipts share one `gateId`:
+`publish-dry-run-final.json`, `publish-dry-run-cli-final.json`, and
+`publish-dry-run-plugin-final.json` are all `gateId: 'publish-dry-run'` with distinct
+`invocationId`s. `.llm/tools/gates/evidence-set.ts:20–22` computes duplicates over
+`receipts.map(r => r.gateId)` and marks any repeat "duplicate or contradictory", which makes the set
+insufficient — so the `SUFFICIENT` verdict can only have come from a hand-picked subset.
+
+That subset is defensible (six contracted gates; per-member runs are supplemental), but the verdict
+as written is unreproducible, and the leaf's own handoff at `worklog.md:358` instructs the IMPL-EVAL
+evaluator to "independently re-check the six-receipt metadata and sufficiency". An evaluator who does
+that by globbing the final receipts gets **INSUFFICIENT** and will reasonably conclude the evidence
+set is broken. The gates genuinely passed at the content head — this is a labelling and
+reproducibility defect, not a false green — but it lands squarely on the next actor, so it is fixed
+now rather than carried into IMPL-EVAL.
+
+Remedy: either give the per-member receipts distinct gate IDs so the whole directory recomputes
+`SUFFICIENT` (preferred), or record the exact six receipt filenames the verdict covers and mark the
+per-member receipts supplemental. Either way, re-run the evaluator and record the invocation used, so
+the claim is checkable rather than asserted.
+
+The six binding gates need not be re-run: the fix touches receipt metadata and journal prose only,
+and the recorded command, exit code, and attested head are unchanged.
