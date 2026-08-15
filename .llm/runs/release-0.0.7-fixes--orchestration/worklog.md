@@ -837,3 +837,42 @@ unchanged" after real input changes must be re-run uncached rather than logged a
 
 No runtime lease, no Aspire/Docker/`e2e:cli`, PR stays draft at sole `status:plan`, hard stop at fresh
 Tier-A before IMPL-EVAL.
+
+## 2026-08-15 — #1669 S2 halted on a pre-existing baseline defect; S2-A plan-only amendment dispatched
+
+**The author stopped rather than fixing it silently, and that was correct** — the same
+scope-boundary judgement it showed on the tutorial page. It is worth naming as a pattern rather than
+a one-off: this author has now twice declined to widen its own surface and asked for a ruling
+instead, and both times the finding was real.
+
+**Defect verified independently, not accepted on report.** `cache-query.ts:165` evaluates
+`if (isExpired || preferFreshOnStale)` **before** the `if (isFresh)` branch at `:176`. So a fresh,
+non-expired entry read with `preferFreshOnStale: true` takes the blocking fetch path instead of
+returning its hit — contradicting the option's stale-only public contract.
+
+**Classification confirmed by execution:** the identical line exists at base
+`main@3e8e146a4:170`. This is a **pre-existing baseline defect exposed by S2**, not an S1 regression.
+That attribution matters and is pinned in the brief so the record cannot later be misread.
+
+**S2-A dispatched — plan-only.** Authorized addition: exactly
+`packages/sdk/src/cache/cache-query.ts`; `query-factory_test.ts` was already authorized.
+`cache-query_test.ts` and every other path are **not** granted, and a further need must be proven by
+a fresh amendment review rather than assumed.
+
+Required corrected condition, as ruled: expired keeps precedence and fetches; otherwise only
+`!isFresh && preferFreshOnStale` takes the blocking path; a fresh non-expired entry never fetches and
+falls through to the existing `if (isFresh) return cached.value.data`. The amendment must also record
+that S1's A2/A3 behaviour and the 497-line / no-F-1 result survive — the correction is a condition
+change, not licence to reopen the file-size question.
+
+**Commit-hygiene hazard flagged explicitly in the brief.** The working tree holds three uncommitted
+S2 files — both authorized docs pages and `query-factory_test.ts`. The amendment must commit **only**
+run-artifact files **by exact path**, and the brief forbids `git add -A`, `git add .`, and
+`git commit -a` by name, because any of them would sweep in-progress S2 source into the amendment
+commit and destroy the plan-only property of the head that Tier-A is about to review. The author must
+prove afterwards, by executed command, that the three files remain modified-but-uncommitted and that
+`git show --stat HEAD` lists only run-artifact paths.
+
+Fresh fixes Tier-A reviews the amendment head next; on PASS the same author resumes for the single
+semantic correction and continues S2, the cascade, and the gates. No runtime lease, no
+Aspire/Docker/`e2e:cli`, PR draft at sole `status:plan`.
