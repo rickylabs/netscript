@@ -80,42 +80,67 @@ gate.
 
 ## Next action
 
-**Both internals leaves are through their formal gates. Nothing in this lane is running.**
+**Wave 0 is shipped. Wave 1 leaf `quality-scan-root-coverage` (#1542) is active.**
 
-| Leaf                                         | State                                                                                                       |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| #1644 `harness-evidence-and-verdict-tooling` | IMPL-EVAL `PASS`; **merged to `main`** as `dd472102d`                                                       |
-| #1653 `quality-scan-allowance-rail`          | IMPL-EVAL cycle 1 `FAIL_FIX` → editorial fix → **cycle 2 `PASS`**; draft at `status:impl`, head `70177e808` |
+| Leaf                                         | State                                                                                                                                        |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| #1644 `harness-evidence-and-verdict-tooling` | IMPL-EVAL `PASS` → **merged** `dd472102d`; #1561/#1563/#1621 shipped                                                                         |
+| #1653 `quality-scan-allowance-rail`          | cycle 1 `FAIL_FIX` → editorial fix → cycle 2 `PASS` → **merged** `473e8d75b`; #1378/#1545 CLOSED/COMPLETED, all 14 acceptance boxes mirrored |
+| #1542 `quality-scan-root-coverage`           | **ACTIVE** — bootstrap/research/plan in progress, stops at the plan gate                                                                     |
 
-#1653 awaits **coordinator merge disposition only**. Reconciled facts:
+Live `main` = `473e8d75b5281c93dc4729d99f3358a34f2bd687` — this is the new immutable base.
 
-- `origin/main` = `0b3ed5d5a`; the leaf merges cleanly at `70177e808` (`git merge-tree` clean).
-- Verdict names `84bbcf9a1`; PR head is `70177e808`, delta is exactly `evaluate-cycle-2.md` — the
-  same evaluator-artifact pattern already accepted on #1644.
-- Close-gate mapping validates at 0 errors / 0 warnings with exact coverage (#1378 9/9, #1545 5/5),
-  re-checked after the evaluator's own comment landed.
-- 16 PR-body DoD boxes and 9 + 5 issue acceptance boxes remain unchecked, pending the
-  `status:ready-merge` mirror run. Those are coordinator actions; this lane does not tick them.
+### Active leaf identity
 
-## Open follow-ups (neither blocks this leaf)
+- Worktree `/home/codex/repos/netscript-007-quality-root-coverage`
+- Branch `fix/quality-scan-root-coverage` @ `473e8d75b`, **no upstream** (explicit refspec pushes)
+- Codex thread `01a003d2-61ee-7ec0-8c74-075b3d631168`, `openai · gpt-5.6-sol · medium`, route
+  matched
+- Steering: `codex exec resume 01a003d2-61ee-7ec0-8c74-075b3d631168 -- "<follow-up>"` — never a
+  second `send-message-v2` at that worktree
+- Run dir `.llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-root-coverage/`
+- Closes exactly **#1542**
+
+### Frozen contract (outer bound, to be narrowed in the plan)
+
+Archetype `6-cli-tooling`; overlays `service` + `docs`. Surfaces:
+`.llm/tools/fitness/check-doctrine.ts`, `.llm/tools/quality`, `deno.json`, `docs/site`,
+`packages/*`, `packages/cli/e2e`, `packages/cli/src`, `packages/plugin-streams-core`,
+`packages/plugin-workers-core`, `plugins/*`. Proving gates: `check`, `test`, `publish-dry-run`,
+`quality-job`, `docs-source-format`, `docs-accuracy`. JSR audit applicable — exact export and
+`@netscript` dependency pins, isolated-declaration publish dry-run, reject runtime asset /
+`import.meta` reads.
+
+**Not this leaf's to take:** Aspire, Docker, or the global expensive-gate lease.
+
+### Blocking coordinator action
+
+The leaf stops after `plan.md` with its PLAN-EVAL judgement. **The evaluator grant is the
+coordinator's**; this lane does not self-launch one. `openhands-dispatch-claim-and-refusal` is next
+in the internals queue and must not be dispatched until #1542 reaches its serial stop.
+
+## Open follow-ups from #1653 (neither blocks anything)
 
 - **Double attribution** — a publicly reachable `any` is reported by both `explicit-any` and
-  `public-any` at the same `file:line` (3 findings for 2 defects). No effect on `ok`, budget, or
-  `allowCount`; one marker suppresses both. Locked plan behaviour; single-attribution is a suggested
+  `public-any` at the same `file:line`. No effect on `ok`, budget, or `allowCount`. Suggested
   #1276/#1378 follow-up.
 - **Silent unknown-flag handling** — a typo'd `--max-allow` leaves `maxAllow` undefined and disables
-  the ceiling. Verified pre-existing at base `01e096049`, not a regression; committed tasks spell
-  the flag correctly. Optional hardening.
+  the ceiling. Pre-existing at base, not a regression; committed tasks spell the flag correctly.
 
 ## Standing lessons from this run
 
 - Baseline `acceptance-evidence` blocks must be **replaced, not appended** — the mirror concatenates
-  body + all comments, so a stale block turns every box into a duplicate/not-yet-done error.
+  body + all comments, so a stale block turns every box into a duplicate/not-yet-done error. This
+  cost #1653 a `FAIL_FIX`.
 - `mirror-acceptance-evidence.ts --dry-run` proves nothing without `status:ready-merge`; its label
-  guard skips validation. Execute the three validators directly.
+  guard skips validation. Execute `acceptanceCheckboxes` + `parseAcceptanceEvidence` +
+  `validateEvidenceMapping` directly against live body, comments, and issue bodies.
 - `.llm/tools/quality/scan-code-quality.ts` must keep the inline `jsr:@std/path@^1` specifier — it
-  ships to consumers. A future lint pass will want to "fix" it; the binding `test` gate is what
-  protects it (drift `D-12`).
+  ships to consumers via `agent-tools.generated.ts`. A future lint pass will want to "fix" it; the
+  binding `test` gate is what protects it (drift `D-12`).
+- Never `deno fmt` across a directory containing `receipts/`; never attest an object outside branch
+  history; a command that did not fire is NOT FIRED, and an empty-selection wrapper exit is a
+  refusal, not a green.
 - Never pipe an agent launch into a filter, and prove a session's non-existence before relaunching.
 - Prove process ownership from `/proc/<pid>/exe` excluding self; parse structured output rather than
   pattern-matching text.
