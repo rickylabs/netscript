@@ -343,3 +343,21 @@ instead drags unrelated parent import-map dependencies into its check. The bound
 adds one dependency-free input-probe module. It uses only the actual schema instance's
 `toJSONSchema` and `parse` methods, and is imported by both the generated consumer and the negative
 unit test.
+
+### S4-F3 implementation
+
+- Preserved `database.codegen` at its canonical service/runtime position and moved
+  `generated.service-client-contract` immediately after it in both order-sensitive suite lists.
+- Added `assertGeneratedServiceSchemaReady`, which fails before the consumer write/import unless a
+  real `database/<engine>/schema/.generated/zod/crud.ts` exists. The negative unit uses that exact
+  exported primitive; it does not create a stub module.
+- Removed `LIST_INPUT` and `assertIndexZeroOnly`. The generated consumer imports each real helper's
+  contract and queries, derives each list input independently through the dependency-free
+  `deriveProcedureInput`, and parameterizes the result with that helper's own key input type.
+- Key evidence now requires each service's independently validated input, exact own resource/action
+  filters, four own TanStack prefix matches, and four cross-service non-matches. It never compares
+  users/payments tails.
+- Focused check passed for five files. The probe and order-sensitive registry tests passed 29/0.
+  A cheap replay against the preserved failed generated project ran real standalone database
+  codegen, then the static probe only; both completed with exit 0. No Aspire, Docker, browser,
+  `scaffold.runtime`, or lease was used for the replay.

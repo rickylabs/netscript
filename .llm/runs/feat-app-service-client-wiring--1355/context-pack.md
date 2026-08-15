@@ -44,7 +44,12 @@ failures. Exact-set recomputation is SUFFICIENT. A subsequently leased `scaffold
 failed): database codegen still followed the probe, leaving the real generated Zod import absent,
 and the probe reused a users-shaped input against the offset-based payments contract. Cleanup passed,
 the leak report is clean, and the lease was released before F3 repair. F3 scope/design is being
-committed before product edits; no new lease or expensive command is authorized.
+committed before product edits. F3 now preserves canonical database codegen and moves the static
+probe after it, fails explicitly if real generated Zod output is absent, derives users/payments
+inputs independently from their real generated contract schemas, and proves own/cross key-prefix
+behavior without tail equality. Focused check is clean, probe plus registry tests pass 29/0, and a
+no-Aspire/no-Docker replay of real database codegen plus only the static probe exits 0. No new lease
+or expensive command is authorized.
 
 ## Completed
 
@@ -85,16 +90,15 @@ committed before product edits; no new lease or expensive command is authorized.
 
 ## In Progress
 
-- F3 authorization amendment: reorder the already-owned database codegen prerequisite, derive
-  per-service inputs from real generated contracts, replace false tail equality, and bind missing-
-  schema/divergent-input negatives. The `s4-f2-fix1-*` receipts remain valid for `2c8219968` but
-  become superseded after the repair content head; S5 and both expensive gates are blocked.
+- F3 product repair is ready to commit. After its immutable content head exists, generate the four
+  fresh `s4-f3-*` binding receipts. The `s4-f2-fix1-*` receipts remain durable but superseded for
+  final-head evidence; S5 and both expensive gates are blocked.
 
 ## Next Steps
 
-1. Commit and explicitly push the F3 plan/worklog/context amendment before product edits.
-2. Implement only the four bounded CLI E2E probe/suite/test files and run affected cheap tests.
-3. Generate four fresh `s4-f3-*` binding receipts, recompute exact-set sufficiency, post the receipt
+1. Commit and explicitly push the bounded F3 product/test/run-artifact repair.
+2. Generate four fresh `s4-f3-*` binding receipts at that immutable content head.
+3. Recompute exact-set sufficiency, post the receipt
    comment, and stop for Tier-A with all expensive gates lease-blocked.
 
 ## Key Decisions
@@ -131,6 +135,7 @@ committed before product edits; no new lease or expensive command is authorized.
 | `packages/fresh/tests/query-hydration-age_browser.ts` and fixture | New | Controlled old/fresh public-wrapper browser scenarios. |
 | `packages/fresh/deno.json` | Modified | Include hydration-age coverage in the lease-gated browser task. |
 | `packages/cli/e2e/tests/presentation/suite-registry_test.ts` | Modified | Exact service-suite expectation now includes the intentional generated lint gate in emitted order. |
+| `packages/cli/e2e/src/application/gates/scaffold/service-client-{runtime,input}-probe.ts` | New | Real-contract, schema-ready two-service static proof. |
 
 ## Gates
 

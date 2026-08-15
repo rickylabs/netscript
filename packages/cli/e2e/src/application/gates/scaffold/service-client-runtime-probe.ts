@@ -1,7 +1,6 @@
 /** Executable proof for generated two-service clients and live list invalidation. */
 
-import { walk } from '@std/fs';
-import { join, relative } from '@std/path';
+import { join, relative } from 'node:path';
 import { partialMatchKey } from 'npm:@tanstack/query-core@^5.101.0';
 import {
   collectBrowserRefetchEvidence,
@@ -11,7 +10,9 @@ import { generatedAppHomeUrlsFromAppHost, readPinnedAppPort } from './generated-
 
 const EVIDENCE_MARKER = '__NETSCRIPT_SERVICE_CLIENT_EVIDENCE__';
 const PROBE_FILE = '__service_client_e2e_probe.ts';
-const LIST_INPUT = { limit: 3, page: 1, sortBy: 'id', sortOrder: 'asc' } as const;
+const GENERATED_ZOD_CRUD_SUFFIX = '/schema/.generated/zod/crud.ts';
+const INPUT_DERIVATION_MODULE_URL =
+  new URL('./service-client-input-probe.ts', import.meta.url).href;
 
 export interface FileFingerprint {
   readonly size: number;
@@ -21,6 +22,8 @@ export interface FileFingerprint {
 export type FileSnapshot = Readonly<Record<string, FileFingerprint>>;
 
 export interface ServiceKeyEvidence {
+  readonly usersInput: unknown;
+  readonly paymentsInput: unknown;
   readonly usersServerKey: readonly unknown[];
   readonly paymentsServerKey: readonly unknown[];
   readonly usersServerFilter: readonly unknown[];
@@ -44,20 +47,31 @@ export function assertByteIdentical(before: FileSnapshot, after: FileSnapshot): 
 
 /** Require generated server/client keys to isolate resources under real TanStack prefix rules. */
 export function assertServiceKeyIsolation(evidence: ServiceKeyEvidence): void {
-  const expectedKeys = {
-    usersServerKey: ['users', 'list', JSON.stringify(LIST_INPUT)],
-    paymentsServerKey: ['payments', 'list', JSON.stringify(LIST_INPUT)],
-    usersClientKey: ['users', 'list', { input: LIST_INPUT }],
-    paymentsClientKey: ['payments', 'list', { input: LIST_INPUT }],
-  } as const;
+  const expectedKeys: Readonly<Record<string, readonly unknown[]>> = {
+    usersServerKey: ['users', 'list', JSON.stringify(evidence.usersInput)],
+    paymentsServerKey: ['payments', 'list', JSON.stringify(evidence.paymentsInput)],
+    usersClientKey: ['users', 'list', { input: evidence.usersInput }],
+    paymentsClientKey: ['payments', 'list', { input: evidence.paymentsInput }],
+  };
   for (const [name, expected] of Object.entries(expectedKeys)) {
-    const observed = evidence[name as keyof typeof expectedKeys];
+    const observed = evidence[name as keyof ServiceKeyEvidence];
     if (JSON.stringify(observed) !== JSON.stringify(expected)) {
       throw new Error(`${name} did not equal ${JSON.stringify(expected)}`);
     }
   }
-  assertIndexZeroOnly(evidence.usersServerKey, evidence.paymentsServerKey, 'server');
-  assertIndexZeroOnly(evidence.usersClientKey, evidence.paymentsClientKey, 'client');
+
+  const expectedFilters: Readonly<Record<string, readonly unknown[]>> = {
+    usersServerFilter: ['users', 'list'],
+    paymentsServerFilter: ['payments', 'list'],
+    usersClientFilter: ['users', 'list'],
+    paymentsClientFilter: ['payments', 'list'],
+  };
+  for (const [name, expected] of Object.entries(expectedFilters)) {
+    const observed = evidence[name as keyof ServiceKeyEvidence];
+    if (JSON.stringify(observed) !== JSON.stringify(expected)) {
+      throw new Error(`${name} did not equal ${JSON.stringify(expected)}`);
+    }
+  }
 
   const ownMatches = [
     partialMatchKey(evidence.usersServerKey, evidence.usersServerFilter),
@@ -68,11 +82,14 @@ export function assertServiceKeyIsolation(evidence: ServiceKeyEvidence): void {
   if (ownMatches.some((matches) => !matches)) {
     throw new Error('a generated list filter did not prefix-match its own factory key');
   }
-  if (
-    partialMatchKey(evidence.paymentsServerKey, evidence.usersServerFilter) ||
-    partialMatchKey(evidence.paymentsClientKey, evidence.usersClientFilter)
-  ) {
-    throw new Error('the users list filter matched a payments factory key');
+  const crossMatches = [
+    partialMatchKey(evidence.paymentsServerKey, evidence.usersServerFilter),
+    partialMatchKey(evidence.usersServerKey, evidence.paymentsServerFilter),
+    partialMatchKey(evidence.paymentsClientKey, evidence.usersClientFilter),
+    partialMatchKey(evidence.usersClientKey, evidence.paymentsClientFilter),
+  ];
+  if (crossMatches.some(Boolean)) {
+    throw new Error('a generated list filter matched the other service factory key');
   }
 }
 
@@ -96,17 +113,31 @@ export function assertSettledRefetch(evidence: SettledRefetchEvidence): void {
 }
 
 /** Source of the no-alias generated consumer executed by the static gate. */
-export function serviceClientConsumerSource(): string {
-  return `import { usersQueries } from './users.ts';
-import { paymentsQueries } from './payments.ts';
+export function serviceClientConsumerSource(
+  derivationModuleUrl: string = INPUT_DERIVATION_MODULE_URL,
+): string {
+  return `import { deriveProcedureInput } from ${JSON.stringify(derivationModuleUrl)};
+import { usersContract, usersQueries } from './users.ts';
+import { paymentsContract, paymentsQueries } from './payments.ts';
 
-const input = { limit: 3, page: 1, sortBy: 'id', sortOrder: 'asc' } as const;
-const usersServerKey = usersQueries.list.key(input);
-const paymentsServerKey = paymentsQueries.list.key(input);
-const usersClientKey = usersQueries.list.clientKey(input);
-const paymentsClientKey = paymentsQueries.list.clientKey(input);
+type UsersListInput = Parameters<typeof usersQueries.list.key>[0];
+type PaymentsListInput = Parameters<typeof paymentsQueries.list.key>[0];
+const usersInput = deriveProcedureInput<UsersListInput>(
+  usersContract.list['~orpc'].inputSchema,
+  'users.list',
+);
+const paymentsInput = deriveProcedureInput<PaymentsListInput>(
+  paymentsContract.list['~orpc'].inputSchema,
+  'payments.list',
+);
+const usersServerKey = usersQueries.list.key(usersInput);
+const paymentsServerKey = paymentsQueries.list.key(paymentsInput);
+const usersClientKey = usersQueries.list.clientKey(usersInput);
+const paymentsClientKey = paymentsQueries.list.clientKey(paymentsInput);
 
 console.log('${EVIDENCE_MARKER}' + JSON.stringify({
+  usersInput,
+  paymentsInput,
   usersServerKey,
   paymentsServerKey,
   usersServerFilter: usersServerKey.slice(0, 2),
@@ -125,6 +156,7 @@ export async function probeGeneratedServiceClients(
   appName: string,
   cliPrefix: readonly string[],
 ): Promise<void> {
+  await assertGeneratedServiceSchemaReady(projectRoot);
   const before = await snapshotOwnedOutput(projectRoot, appName);
   const generation = await runCommand(
     [...cliPrefix, 'service', 'generate', '--project-root', projectRoot],
@@ -161,6 +193,24 @@ export async function probeGeneratedServiceClients(
   }
 }
 
+/** Require the real database-codegen output before importing a generated service contract. */
+export async function assertGeneratedServiceSchemaReady(projectRoot: string): Promise<string> {
+  const databaseRoot = join(projectRoot, 'database');
+  try {
+    for await (const path of walkFiles(databaseRoot)) {
+      const normalized = path.replaceAll('\\', '/');
+      if (normalized.endsWith(GENERATED_ZOD_CRUD_SUFFIX)) return path;
+    }
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound)) throw error;
+  }
+  throw new Error(
+    `generated service contracts require database codegen before the client probe; expected ${
+      join(databaseRoot, '<engine>', 'schema', '.generated', 'zod', 'crud.ts')
+    }`,
+  );
+}
+
 /** Exercise the generated Rename control and observe the settled network/DOM contract. */
 export async function probeLiveServiceRefetch(
   projectRoot: string,
@@ -184,32 +234,14 @@ export async function probeLiveServiceRefetch(
   throw lastError instanceof Error ? lastError : new Error('no generated app URL was probeable');
 }
 
-function assertIndexZeroOnly(
-  usersKey: readonly unknown[],
-  paymentsKey: readonly unknown[],
-  tier: string,
-): void {
-  if (usersKey[0] !== 'users' || paymentsKey[0] !== 'payments') {
-    throw new Error(`${tier} keys do not carry users/payments resource identities`);
-  }
-  if (usersKey.length !== paymentsKey.length) {
-    throw new Error(`${tier} key lengths differ`);
-  }
-  for (let index = 1; index < usersKey.length; index++) {
-    if (JSON.stringify(usersKey[index]) !== JSON.stringify(paymentsKey[index])) {
-      throw new Error(`${tier} keys differ beyond resource index 0 at index ${index}`);
-    }
-  }
-}
-
 async function snapshotOwnedOutput(projectRoot: string, appName: string): Promise<FileSnapshot> {
   const paths = [
     join(projectRoot, 'apps', appName, 'lib', 'users.ts'),
     join(projectRoot, 'apps', appName, 'lib', 'payments.ts'),
   ];
   const aspireRoot = join(projectRoot, 'aspire');
-  for await (const entry of walk(aspireRoot, { includeDirs: false, exts: ['.mts'] })) {
-    paths.push(entry.path);
+  for await (const path of walkFiles(aspireRoot)) {
+    if (path.endsWith('.mts')) paths.push(path);
   }
   const snapshot: Record<string, FileFingerprint> = {};
   for (const path of paths.sort()) {
@@ -220,6 +252,14 @@ async function snapshotOwnedOutput(projectRoot: string, appName: string): Promis
     };
   }
   return snapshot;
+}
+
+async function* walkFiles(root: string): AsyncGenerator<string> {
+  for await (const entry of Deno.readDir(root)) {
+    const path = join(root, entry.name);
+    if (entry.isDirectory) yield* walkFiles(path);
+    else if (entry.isFile) yield path;
+  }
 }
 
 interface CommandResult {

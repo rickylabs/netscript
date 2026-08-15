@@ -1,11 +1,14 @@
-import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
+import { assertEquals, assertRejects, assertStringIncludes, assertThrows } from '@std/assert';
+import { z } from 'zod';
 
 import { createSmokeProject } from '../../../src/application/builders/workspace/smoke-project-factory.ts';
 import { waitForCompletedStableBaseline } from '../../../src/application/gates/scaffold/service-client-browser-probe.ts';
 import { generatedAppName } from '../../../src/application/gates/scaffold/generated-app-name.ts';
 import { createScaffoldGates } from '../../../src/application/gates/scaffold/scaffold-gates.ts';
+import { deriveProcedureInput } from '../../../src/application/gates/scaffold/service-client-input-probe.ts';
 import {
   assertByteIdentical,
+  assertGeneratedServiceSchemaReady,
   assertServiceKeyIsolation,
   assertSettledRefetch,
   type FileSnapshot,
@@ -18,29 +21,32 @@ import type { CommandGateDefinition } from '../../../src/domain/gate-definition.
 import type { RunContext, RunOptions } from '../../../src/domain/run-context.ts';
 import { resolveSuite } from '../../../src/presentation/cli/suites/registry.ts';
 
-const INPUT = { limit: 3, page: 1, sortBy: 'id', sortOrder: 'asc' } as const;
+const USERS_INPUT = { limit: 3, page: 1, sortBy: 'id', sortOrder: 'asc' } as const;
+const PAYMENTS_INPUT = { limit: 3, offset: 0 } as const;
 
 function keyEvidence(): ServiceKeyEvidence {
   return {
-    usersServerKey: ['users', 'list', JSON.stringify(INPUT)],
-    paymentsServerKey: ['payments', 'list', JSON.stringify(INPUT)],
+    usersInput: USERS_INPUT,
+    paymentsInput: PAYMENTS_INPUT,
+    usersServerKey: ['users', 'list', JSON.stringify(USERS_INPUT)],
+    paymentsServerKey: ['payments', 'list', JSON.stringify(PAYMENTS_INPUT)],
     usersServerFilter: ['users', 'list'],
     paymentsServerFilter: ['payments', 'list'],
-    usersClientKey: ['users', 'list', { input: INPUT }],
-    paymentsClientKey: ['payments', 'list', { input: INPUT }],
+    usersClientKey: ['users', 'list', { input: USERS_INPUT }],
+    paymentsClientKey: ['payments', 'list', { input: PAYMENTS_INPUT }],
     usersClientFilter: ['users', 'list'],
     paymentsClientFilter: ['payments', 'list'],
   };
 }
 
-Deno.test('service client probe accepts only index-zero resource isolation and own prefixes', () => {
+Deno.test('service client probe accepts distinct typed inputs with isolated own prefixes', () => {
   assertServiceKeyIsolation(keyEvidence());
 
   assertThrows(
     () =>
       assertServiceKeyIsolation({
         ...keyEvidence(),
-        paymentsClientKey: ['payments', 'find', { input: INPUT }],
+        paymentsClientKey: ['payments', 'find', { input: PAYMENTS_INPUT }],
       }),
     Error,
     'paymentsClientKey did not equal',
@@ -52,8 +58,62 @@ Deno.test('service client probe accepts only index-zero resource isolation and o
         usersClientFilter: ['payments', 'list'],
       }),
     Error,
-    'did not prefix-match its own factory key',
+    'usersClientFilter did not equal',
   );
+  assertThrows(
+    () =>
+      assertServiceKeyIsolation({
+        ...keyEvidence(),
+        usersServerFilter: ['payments', 'list'],
+      }),
+    Error,
+    'usersServerFilter did not equal',
+  );
+});
+
+Deno.test('procedure inputs are derived independently from divergent real schema contracts', () => {
+  const usersSchema = z.object({
+    page: z.number().int().min(1).default(1),
+    limit: z.number().int().min(1).default(10),
+    sortOrder: z.enum(['asc', 'desc']).default('desc'),
+  });
+  const paymentsSchema = z.object({
+    limit: z.number().int().positive(),
+    offset: z.number().int().nonnegative(),
+    search: z.string().min(1).optional(),
+  });
+
+  assertThrows(() => paymentsSchema.parse(USERS_INPUT));
+  const usersInput = deriveProcedureInput<z.output<typeof usersSchema>>(
+    usersSchema,
+    'users.list',
+  );
+  const paymentsInput = deriveProcedureInput<z.output<typeof paymentsSchema>>(
+    paymentsSchema,
+    'payments.list',
+  );
+  assertEquals(usersInput, { page: 1, limit: 10, sortOrder: 'desc' });
+  assertEquals(paymentsInput, { limit: 1, offset: 0 });
+
+  const source = serviceClientConsumerSource('file:///probe/service-client-runtime-probe.ts');
+  assertStringIncludes(source, 'deriveProcedureInput<UsersListInput>');
+  assertStringIncludes(source, 'deriveProcedureInput<PaymentsListInput>');
+  assertStringIncludes(source, "usersContract.list['~orpc'].inputSchema");
+  assertStringIncludes(source, "paymentsContract.list['~orpc'].inputSchema");
+  assertEquals(source.includes('const input ='), false);
+});
+
+Deno.test('service client schema precondition rejects a project before database codegen', async () => {
+  const projectRoot = await Deno.makeTempDir({ prefix: 'netscript-service-schema-missing-' });
+  try {
+    await assertRejects(
+      () => assertGeneratedServiceSchemaReady(projectRoot),
+      Error,
+      'database/<engine>/schema/.generated/zod/crud.ts',
+    );
+  } finally {
+    await Deno.remove(projectRoot, { recursive: true });
+  }
 });
 
 Deno.test('service client probe rejects any second-generation byte drift', () => {
@@ -150,12 +210,15 @@ Deno.test('browser refetch probe keeps the stable baseline and response-stage re
 
 Deno.test('generated consumer imports usersQueries and paymentsQueries together without aliases', () => {
   const source = serviceClientConsumerSource();
-  assertStringIncludes(source, "import { usersQueries } from './users.ts';");
-  assertStringIncludes(source, "import { paymentsQueries } from './payments.ts';");
+  assertStringIncludes(source, "import { usersContract, usersQueries } from './users.ts';");
+  assertStringIncludes(
+    source,
+    "import { paymentsContract, paymentsQueries } from './payments.ts';",
+  );
   assertEquals(source.includes(' as usersQueries'), false);
   assertEquals(source.includes(' as paymentsQueries'), false);
-  assertStringIncludes(source, 'usersQueries.list.key(input)');
-  assertStringIncludes(source, 'paymentsQueries.list.clientKey(input)');
+  assertStringIncludes(source, 'usersQueries.list.key(usersInput)');
+  assertStringIncludes(source, 'paymentsQueries.list.clientKey(paymentsInput)');
 });
 
 Deno.test('service client gates emit the required commands and probe modes', () => {
@@ -205,17 +268,20 @@ Deno.test('service client gates emit the required commands and probe modes', () 
 });
 
 Deno.test('service and runtime suites preserve executable service-client gate order', () => {
-  const staticIds = [
-    GATE.SCAFFOLD_INIT,
-    GATE.SCAFFOLD_SERVICE_CLIENT_ADD,
-    GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE,
-    GATE.GENERATED_SERVICE_CLIENT_CONTRACT,
-  ];
   const serviceIds = resolveSuite(SCAFFOLD.SERVICE).gates.map((gate) => gate.id);
   const runtimeIds = resolveSuite(SCAFFOLD.RUNTIME).gates.map((gate) => gate.id);
-  assertEquals(serviceIds.slice(1, 1 + staticIds.length), staticIds);
   assertEquals(runtimeIds.slice(0, 1), [GATE.PREFLIGHT_DENO]);
-  assertEquals(runtimeIds.slice(2, 2 + staticIds.length), staticIds);
+  for (const ids of [serviceIds, runtimeIds]) {
+    assertEquals(
+      ids.indexOf(GATE.SCAFFOLD_SERVICE_CLIENT_ADD) <
+        ids.indexOf(GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE),
+      true,
+    );
+    assertEquals(
+      ids.indexOf(GATE.DATABASE_CODEGEN) + 1,
+      ids.indexOf(GATE.GENERATED_SERVICE_CLIENT_CONTRACT),
+    );
+  }
   assertEquals(serviceIds.includes(GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH), false);
   assertEquals(
     runtimeIds.indexOf(GATE.BEHAVIOR_SERVICE_HEALTH) <

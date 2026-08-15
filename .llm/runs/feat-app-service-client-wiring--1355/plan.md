@@ -344,16 +344,17 @@ probe additionally calls exported
 consumer. It requires a real `database/<engine>/schema/.generated/zod/crud.ts` and emits the expected
 pattern when absent. The order-sensitive registry/probe tests require `database.codegen` before the
 contract probe, and a temporary-directory unit test exercises that same exported readiness
-primitive in missing and present states.
+primitive in the missing state.
 
 The shared `LIST_INPUT` and `assertIndexZeroOnly` premise are removed. After schema readiness, the
-probe dynamically imports the actual generated `users.ts` and `payments.ts` helpers, reads each
-exported contract's `list['~orpc'].inputSchema`, and passes each schema to exported
-`deriveProcedureInput`. That primitive converts the real Zod input schema to input-mode JSON Schema,
-constructs only its required/defaulted witness values, then validates the witness through the same
-contract schema before returning it. `serviceClientConsumerSource` receives two separate derived
-values and emits two separately typed calls; its `deno check` therefore proves each value against
-its own real generated query helper rather than against plan prose.
+temporary consumer imports the actual generated `users.ts` and `payments.ts` helpers under the
+generated app's own Deno config. It reads each exported contract's
+`list['~orpc'].inputSchema` and passes each schema to exported `deriveProcedureInput`, parameterized
+by that helper's own `Parameters<typeof queries.list.key>[0]` type. The primitive converts the real
+Zod input schema to input-mode JSON Schema, constructs only its required/defaulted witness values,
+then validates the witness through the same contract schema before returning it. The consumer emits
+two separately typed calls; its `deno check` therefore proves each value against its own real
+generated query helper rather than against plan prose.
 
 `assertServiceKeyIsolation` now proves only the owed contract: users/payments server and client keys
 carry their own `[resource, 'list']` prefixes; every own filter matches its own key under TanStack's
@@ -404,35 +405,27 @@ Sufficiency is recomputed over only those four replacement files. No `scaffold.r
    `usersQueries` from the owned users module and `paymentsQueries` from the owned payments module
    and type-checks both without aliases. The init-owned route-example `(_lib)/service-query.ts` is
    not rewritten.
-2. With the identical list input `{ limit: 3, page: 1, sortBy: 'id', sortOrder: 'asc' }`, compare
-   these server keys:
+2. After the suite-owned database codegen prerequisite, derive `usersInput` from
+   `usersContract.list['~orpc'].inputSchema` and `paymentsInput` independently from
+   `paymentsContract.list['~orpc'].inputSchema`. Type both through their own generated query
+   helper parameter and require these server keys:
 
    ```ts
-   const usersServerKey = [
-     'users',
-     'list',
-     '{"limit":3,"page":1,"sortBy":"id","sortOrder":"asc"}',
-   ] as const;
-   const paymentsServerKey = [
-     'payments',
-     'list',
-     '{"limit":3,"page":1,"sortBy":"id","sortOrder":"asc"}',
-   ] as const;
+   const usersServerKey = ['users', 'list', JSON.stringify(usersInput)] as const;
+   const paymentsServerKey = ['payments', 'list', JSON.stringify(paymentsInput)] as const;
    ```
 
    and these client keys:
 
    ```ts
-   const usersClientKey = ['users', 'list', {
-     input: { limit: 3, page: 1, sortBy: 'id', sortOrder: 'asc' },
-   }] as const;
-   const paymentsClientKey = ['payments', 'list', {
-     input: { limit: 3, page: 1, sortBy: 'id', sortOrder: 'asc' },
-   }] as const;
+   const usersClientKey = ['users', 'list', { input: usersInput }] as const;
+   const paymentsClientKey = ['payments', 'list', { input: paymentsInput }] as const;
    ```
 
-   Each pair must differ only at index `0`; both filters must share their own factory's
-   `[resource, 'list']` prefix, and the users filter must not match the payments key.
+   Each input must have been accepted by its own real contract schema. Each server/client filter
+   must equal its own factory's `[resource, 'list']` prefix and TanStack-prefix-match its own key;
+   neither users filter may match a payments key and neither payments filter may match a users key.
+   No equality is required between the two input tails.
 3. In the live generated app, load the successful users showcase, which imports the init-owned
    `apps/<app>/routes/examples/service/(_lib)/service-query.ts` rendered from the same corrected
    template. Wait for hydration/refetch activity to settle, record the current `users.list` request
