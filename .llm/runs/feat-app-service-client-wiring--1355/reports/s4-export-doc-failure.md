@@ -94,3 +94,18 @@ every binding receipt is absent:
    `app-service-client-wiring-s4-publish-dry-run`; missing / NOT_RUN.
 4. `receipts/s4-arch-check.json` — invocation ID `app-service-client-wiring-s4-arch-check`; missing /
    NOT_RUN.
+
+## Tier-A disposition and resume
+
+Tier-A independently verified that none of the nine diagnostic-bearing files changed from
+`c53726c69` to the leaf head and that Fresh's 16-entrypoint export map is unchanged. It therefore
+ruled both supplemental audit reds to be carried pre-existing baselines rather than blockers:
+
+- Fresh remains **`PRE_EXISTING_FAIL`**, carried with attribution: 45 diagnostics split into 28
+  private references and 17 missing-JSDoc findings across six files.
+- SDK remains **`PRE_EXISTING_FAIL`**, carried with attribution: the two previously measured
+  `QueryClient` diagnostics plus the distinct plugin-streams diagnostic newly *exposed* by the full
+  sweep, not newly *caused* by this leaf.
+
+Neither result is relabelled PASS or merged into a single undifferentiated baseline. Tier-A released
+the remaining supplemental JSR/publish audits and four contracted binding gates to continue.

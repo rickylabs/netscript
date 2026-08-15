@@ -19,10 +19,11 @@ has not run because the gate remains lease-blocked. The ruled CLI generator/migr
 hydration notes live in the publishable package READMEs. Full CLI and Fresh non-browser suites are
 green. S4 resumed from its initial fail-closed formatting record using explicit per-member configs:
 format, lint, asset freshness, and exact-pin audits pass. The full export-map doc audit passes for
-CLI but stops the slice on Fresh's 45 and SDK's 3 pre-existing diagnostics. Exact full-command
-measurement at pre-implementation commit `c53726c69` reproduces both sets, including the distinct
-plugin-streams diagnostic. Draft PR #1664 retains both closing keywords and remains draft. No
-binding receipt or expensive gate has run.
+CLI and carries Fresh's 45 and SDK's 3 pre-existing diagnostics with exact attribution at
+`c53726c69`; the plugin-streams finding remains distinct as newly exposed, not newly caused. All
+three per-member JSR audits exit 0 with WARN-only findings, and all three checked per-member publish
+dry-runs pass. Draft PR #1664 retains both closing keywords and remains draft. Binding gates are
+next; no expensive gate has run.
 
 ## Completed
 
@@ -63,13 +64,13 @@ binding receipt or expensive gate has run.
 
 ## In Progress
 
-- S4 is stopped at the full export-map doc audit with attribution recorded; JSR audits,
-  isolated-declaration/publish dry-runs, and binding gates are NOT_RUN.
+- S4 supplemental audits are complete; binding receipts remain to run at the next clean committed
+  content head.
 
 ## Next Steps
 
-1. Await coordinator direction on the pre-existing full export-map documentation failures; do not
-   resume S4 or start S5 without a separate dispatch.
+1. Commit the supplemental evidence, verify a clean immutable content head, and run only the four
+   released S4 binding gates through `run-gate.ts`.
 2. Keep both expensive gates lease-blocked until explicit release.
 
 ## Key Decisions
@@ -110,15 +111,15 @@ binding receipt or expensive gate has run.
 
 | Gate family | Current status                                                                                                                    | Evidence                     |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Static      | Per-member format/lint, asset freshness, exact pins, and CLI export-map doc audit pass. Fresh export-map doc audit has 45 pre-existing diagnostics and SDK has 3, reproduced at `c53726c69`; later JSR/dry-run/binding gates are NOT_RUN. | `worklog.md`; `reports/s4-format-failure.md`; `reports/s4-export-doc-failure.md` |
+| Static      | Format/lint/assets/exact pins pass. CLI doc audit passes; Fresh 45 and SDK 3 remain separately attributed carried baselines. Three per-member JSR audits exit 0 and three checked publish dry-runs pass. Binding gates remain. | `worklog.md`; `reports/s4-format-failure.md`; `reports/s4-export-doc-failure.md`; per-member reports |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
 | Runtime     | NOT_RUN / lease-blocked                                                                                                           | `plan.md` release conditions |
 | Consumer    | NOT_RUN / implementation-dependent                                                                                                | `plan.md` S5                 |
 
 ## Open Questions
 
-- Whether the coordinator will separately scope the pre-existing Fresh/SDK documentation defects
-  or direct another evidence policy; this artifact-only slice does not repair them inline.
+- The Fresh/SDK documentation defects require separate scope if they are to be repaired; this leaf
+  carries them with attribution and does not repair them inline.
 
 ## Drift and Debt
 

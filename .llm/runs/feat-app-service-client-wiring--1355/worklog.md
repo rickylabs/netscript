@@ -85,6 +85,8 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | 2026-08-15T14:40:00+02:00 | S4    | Cheap convergence stop | The first ordered formatting-wrapper invocation exited 2 because root `fmt.exclude` rejected selected CLI batches. Exact-command measurement at pre-implementation commit `c53726c69` reproduced the same three excluded batches; stopped before every later gate. |
 | 2026-08-15T14:49:51+02:00 | S4    | Configured format/lint resume | Per-member TypeScript format and lint wrappers passed; CLI used the released absolute neutral config and one 1000-file batch. Asset freshness and all three exact-pin audits passed. |
 | 2026-08-15T14:49:51+02:00 | S4    | Export-map audit stop | CLI's full export-map doc audit passed. Fresh failed with 45 diagnostics and SDK with 3; exact full-command measurement at pre-implementation `c53726c69` reproduced both totals and the plugin-streams finding. Stopped before JSR, dry-run, and binding gates. |
+| 2026-08-15T16:26:07+02:00 | S4    | Carried-baseline disposition | Tier-A independently confirmed unchanged diagnostic files and entrypoint sets, then ruled Fresh's 45 and SDK's 3 supplemental doc-audit diagnostics carried `PRE_EXISTING_FAIL` baselines. The plugin-streams finding stays separately named as newly exposed, not newly caused. |
+| 2026-08-15T16:26:07+02:00 | S4    | Per-member publish audits | CLI, Fresh, and SDK JSR audits each exited 0 with WARN-only doctrine/banner findings; three separate checked per-member publish dry-runs passed at `e52aa44a6` with no slow-type or file-list failure. |
 
 ## Decisions
 
@@ -98,6 +100,7 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | Generate modules for disabled services            | `Enabled` controls runtime registration, not manifest-owned source output.  | PLAN-EVAL cycle 2 C2            |
 | Stop after S3                                     | Implementation release is expressly limited to one bounded slice.           | Coordinator dispatch            |
 | Stop S4 on first red gate                         | The dispatch requires exact attribution and a stop before later audits/gates. | Coordinator dispatch            |
+| Carry attributed supplemental doc baselines       | Tier-A verified identical pre-implementation failures in untouched files and an unchanged export map; binding gates remain authoritative. | Coordinator S4 stop #2 ruling |
 
 ## Drift
 
@@ -142,11 +145,17 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | S4 CLI full export-map doc audit | `run-deno-doc-lint.ts --root packages/cli` | PASS | All 3 entrypoints; zero diagnostics. |
 | S4 Fresh full export-map doc audit | `run-deno-doc-lint.ts --root packages/fresh` | PRE_EXISTING_FAIL | 16 entrypoints; 45 deduplicated diagnostics (28 private references, 17 missing JSDoc), reproduced at `c53726c69`. |
 | S4 SDK full export-map doc audit | `run-deno-doc-lint.ts --root packages/sdk` | PRE_EXISTING_FAIL | 12 entrypoints; 3 deduplicated private references, including the separate plugin-streams finding; reproduced at `c53726c69`. |
+| S4 CLI JSR audit | `audit-jsr-package.ts --root packages/cli --out reports/jsr-audit-cli.json` | PASS_WITH_WARNINGS | Exit 0; 3 exports, audit-internal dry-run OK, 19 WARN-only existing vocabulary/cardinality/banner findings, zero FAIL. |
+| S4 Fresh JSR audit | `audit-jsr-package.ts --root packages/fresh --out reports/jsr-audit-fresh.json` | PASS_WITH_WARNINGS | Exit 0; 16 exports, audit-internal dry-run OK, 2 WARN-only cardinality/banner findings, zero FAIL. |
+| S4 SDK JSR audit | `audit-jsr-package.ts --root packages/sdk --out reports/jsr-audit-sdk.json` | PASS_WITH_WARNINGS | Exit 0; 12 exports, audit-internal dry-run OK, 2 WARN-only cardinality/banner findings, zero FAIL. |
+| S4 CLI per-member publish dry-run | `deno task publish:dry-run --member packages/cli` via supplemental `run-gate.ts` report | PASS | Exit 0; checked publish file list and public slow types at `e52aa44a6`. |
+| S4 Fresh per-member publish dry-run | `deno task publish:dry-run --member packages/fresh` via supplemental `run-gate.ts` report | PASS | Exit 0; checked publish file list and isolated declarations at `e52aa44a6`. |
+| S4 SDK per-member publish dry-run | `deno task publish:dry-run --member packages/sdk` via supplemental `run-gate.ts` report | PASS | Exit 0; checked publish file list and isolated declarations at `e52aa44a6`. |
 | Changed-module doc lint | `deno task doc:lint --root packages/sdk --entrypoints ./src/query-client/key-bridge.ts --pretty` | PASS          | Zero documentation errors.                                                                  |
 | CLI entrypoint doc lint | `deno task doc:lint --root packages/cli --entrypoints ./mod.ts --pretty`                          | PASS          | Zero documentation errors, including the new exported generator contract.                  |
 | SDK root-entrypoint doc lint (`packages/sdk/mod.ts`) | `deno doc --lint packages/sdk/mod.ts`                                              | BASELINE_FAIL | Exactly two pre-existing `private-type-ref` errors for this root-entrypoint run: `QueryClientPort` at `src/ports/query-client.ts:41` and `createNetScriptQueryClient` at `src/query-client/query-client-factory.ts:44`, both referencing private `QueryClient`; measured before S1 and carried unchanged. The full 12-entrypoint export-map sweep is S4 and may surface further diagnostics. |
 | Quality gate            | `deno task quality:gate`                                                                         | PASS          | Quality scan clean; architecture check passed with baseline warnings.                       |
-| JSR audits              | Exact-pin inspection passed per member; per-member JSR audit not reached                          | NOT_RUN       | Ordered stop at full export-map doc audit.                                                   |
+| JSR audits              | Per-member package audit plus exact-pin and checked publish dry-run evidence                       | PASS_WITH_WARNINGS | All three audits exit 0; reports remain distinct per member.                              |
 
 ### Fitness Gates
 
@@ -201,7 +210,8 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 - No expensive gate, lease, ready transition, lockfile change, `docs/**` change, evaluator launch,
   or S4 work occurred in S3.
 - S4 resumed with explicit per-member format configs: format, lint, asset freshness, and exact-pin
-  audits passed. The full export-map doc audit passed for CLI but reproduced pre-existing Fresh
-  (45) and SDK (3) failures at `c53726c69`, including the distinct plugin-streams diagnostic.
-- S4 stopped again before per-member JSR audits, isolated-declaration/publish dry-runs, binding
-  gates, expensive gates, or an evaluator. No receipt was generated or hand-authored.
+  audits passed. The full export-map doc audit passed for CLI and carries separately attributed
+  pre-existing Fresh (45) and SDK (3) failures reproduced at `c53726c69`; plugin-streams remains a
+  distinct newly exposed finding.
+- All three per-member JSR audits exit 0 with WARN-only findings, and all three checked per-member
+  publish dry-runs pass. Binding gates remain next; expensive gates and evaluator remain prohibited.
