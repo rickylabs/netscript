@@ -521,3 +521,60 @@ the claim is checkable rather than asserted.
 
 The six binding gates need not be re-run: the fix touches receipt metadata and journal prose only,
 and the recorded command, exit code, and attested head are unchanged.
+
+## 2026-08-15 — S4 fix-up accepted; #1502 leaf is IMPL-EVAL-ready
+
+Fix-up commit `04d431028c1fe455dc18c05e3fa0779e7b593046` (local == remote == PR head), tree clean,
+turn ended `2026-08-15T01:12:56Z` with `TIER-A STOP: slice S4 fix-up ready for topic review and
+IMPL-EVAL handoff`, thread idle.
+
+### S4-F1 closed, and the fix is reproducible
+
+The author chose remedy **(b)** and executed it completely. `worklog.md` now names the six receipt
+IDs that constitute the contracted evidence set — `ns1502-s4-final-check`, `…-test`,
+`…-publish-workspace`, `…-arch-check`, `…-docs-source-format`, `…-docs-accuracy` — records the exact
+evaluator invocation and its `sufficiency: "SUFFICIENT"` / `reasons: []` result, and states plainly
+that a naive `receipts/*final*.json` glob is **intentionally** not the contracted set because it
+carries all three `publish-dry-run` receipts and therefore trips the duplicate-gate-ID rule. The
+supplemental receipts are named explicitly, and the IMPL-EVAL handoff instruction was updated to
+hand the evaluator the same scope, which was the actual failure mode.
+
+**Recomputed independently rather than trusting the recorded string** (the netscript-tools rule, and
+this lane's own D-7): loading the six named receipts gives 6/6 matched, zero duplicate `gateId`s,
+zero duplicate `invocationId`s, gate IDs exactly `{check, test, publish-dry-run, arch-check,
+docs-source-format, docs-accuracy}`, a single `gitHead` `120859d5c`, `gitHead == actualGitHead` for
+all six, no `allowGitHeadMismatch`, and six `PASS` outcomes → **SUFFICIENT**.
+
+Also confirmed by diff, not by report: `git diff c987f009e..HEAD -- receipts/` is empty, so **no
+receipt file changed**, and `git diff 120859d5c..HEAD -- rfcs/` is empty, so the RFC content is
+unchanged since the attested content head. The fix was genuinely journal-only.
+
+### Tier-A sign-off — S4 accepted
+
+**S1, S2, S3, and S4 are all signed off.** The #1502 leaf is complete as an RFC deliverable and ready
+for IMPL-EVAL. Final state:
+
+| Field | Value |
+| --- | --- |
+| Final head | `04d431028c1fe455dc18c05e3fa0779e7b593046` |
+| Content head (what the gates attest) | `120859d5c762706702cd45a3f2be19664e335e22` |
+| Deliverable | `rfcs/0000-plugin-cli-contribution.md`, Draft/0000, ~1,090 lines |
+| Binding evidence | six contracted gates, all `PASS` at the content head, recomputed `SUFFICIENT` |
+| PR | #1651 open **draft**, exactly one `status:impl`, 0 review threads, 0 current CI failures |
+| DoD | 9/10 ticked; the only open box is IMPL-EVAL `PASS` + Tier-A completion |
+| Acceptance | five `acceptance-evidence` entries, 0 `PENDING`, `Closes #1502` intact |
+| Boundaries held | no `packages/**`/`plugins/**`/`deno.lock` change, no issue filed (verified `total_count: 0`), no ready-flip, no merge/publish, no expensive-gate lease, `scaffold.runtime` never run |
+
+### Handed back to the coordinator
+
+This lane's work on #1502 is done and **stops here**. The next two actions are the coordinator's, not
+this orchestrator's:
+
+1. **Dispatch IMPL-EVAL** — a fresh separate opposite-family session on the route the coordinator
+   assigns. This lane will not dispatch it, and the Codex author cannot self-evaluate.
+2. **Decide the ready-flip** — the PR stays draft at `status:impl` until the coordinator decides;
+   note that draft→ready is itself an automation trigger, so the order matters.
+
+Open drift for the evaluator's attention: D-1 (Codex leaf mobile visibility unproven — deliberately
+not repaired), D-4 (issue #1502 still carries `status:research`; this lane's relabel grant covered PR
+#1651 only), D-6, D-7. The leaf's own `drift.md` carries its slice-level entries.

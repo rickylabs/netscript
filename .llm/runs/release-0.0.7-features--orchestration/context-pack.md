@@ -1,7 +1,8 @@
 # Context pack — NetScript 0.0.7 features lane
 
-Status as of 2026-08-15: PLAN-EVAL cycle 2 for PR #1651 returned **`PASS`**; the plan gate is
-closed and the leaf is in **implementation (S1, RFC authoring)** on the resumed Codex author thread.
+Status as of 2026-08-15: the #1502 leaf is **complete and IMPL-EVAL-ready**. PLAN-EVAL cycle 2
+returned `PASS`; slices S1–S4 are implemented, Tier-A reviewed, and signed off. Nothing is running in
+this lane. The next actions — IMPL-EVAL dispatch and the ready-flip — belong to the coordinator.
 
 ## Control
 
@@ -45,20 +46,40 @@ authority (`briefs/topic-features/implement.md`, commit `8775be7b3`) and state t
 `@netscript/plugin/cli` export and its migration disposition; **N-4** the contracted receipts attest
 `d71b78c3…`, so the S4 final-head rerun is what binds for IMPL-EVAL.
 
-## Implementation phase
+## Implementation phase — complete
 
-Leaf head is now `3e0c8858b4a2552926d2965b62cbcc97a15c2935` (verdict commit). PR #1651 moved
-`status:plan-eval` → `status:impl` under explicit coordinator grant; it stays **draft**.
+| Field | Value |
+| --- | --- |
+| Final head | `04d431028c1fe455dc18c05e3fa0779e7b593046` |
+| Content head (attested by every binding gate) | `120859d5c762706702cd45a3f2be19664e335e22` |
+| Deliverable | `rfcs/0000-plugin-cli-contribution.md`, Draft/0000 |
+| PR #1651 | open **draft**, exactly one `status:impl`, 0 review threads, 0 current CI failures |
+| Binding evidence | six contracted gates all `PASS` at the content head; sufficiency independently recomputed `SUFFICIENT` |
+| DoD | 9/10; the only open box is IMPL-EVAL `PASS` + Tier-A completion |
+| Acceptance | five entries, 0 `PENDING`, `Closes #1502` intact |
 
-Authoring runs on the **existing** Codex thread `019ffcc5-d3e1-7c13-9815-e9956ec43683` — resumed,
-never replaced. Steering is `.llm/tools/agentic/codex/codex-resume.ts --thread-id
-019ffcc5-d3e1-7c13-9815-e9956ec43683 --message …`; never fire a second `send-message-v2` at that
-worktree. Slices S1–S4 are bounded, each with structured receipts and a Tier-A stop before the next.
+Slice history and Tier-A outcomes: S1 `CHANGES_REQUESTED` (F1 undeclared diagnostic-code type, F2
+shallow-vs-deep readonly, F3 handler-ref traversal) → fixed → accepted; S2 accepted with S2-N1
+(a grant field whose non-empty case could never occur) and S2-N2 carried; S3 accepted with no
+findings, both carried notes closed; S4 `CHANGES_REQUESTED` (S4-F1 unreproducible sufficiency claim)
+→ fixed via remedy (b) → accepted. Reviews are in `slices/tier-a-review-1502-s1.md` and
+`slices/tier-a-review-1502-s4.md`; briefs in `slices/impl-1502-*.md`.
 
-Standing prohibitions: no merge, no publish, no ready-flip, no expensive-gate lease
-(`scaffold.runtime` is forbidden for this leaf), no package/plugin source mutation, no issue filing,
-no `#1348` mutation, no central cluster-state change. IMPL-EVAL is a separate fresh opposite-family
-session after S4 and Tier-A review.
+The Codex author thread `019ffcc5-d3e1-7c13-9815-e9956ec43683` is **idle** with all work pushed.
+If it must be steered again, resume it — `.llm/tools/agentic/codex/codex-resume.ts --thread-id
+019ffcc5-d3e1-7c13-9815-e9956ec43683 --message …` — and never fire a second `send-message-v2` at
+that worktree.
+
+## Next actions belong to the coordinator
+
+1. **Dispatch IMPL-EVAL** — a fresh separate opposite-family session on the coordinator-assigned
+   route. This lane does not dispatch it; the Codex author cannot self-evaluate.
+2. **Decide the ready-flip** — the PR stays draft at `status:impl`. Draft→ready is itself an
+   automation trigger, so sequence it deliberately.
+
+Standing prohibitions for this lane are unchanged: no merge, publish, ready-flip, relabel beyond the
+PR #1651 grant already exercised, issue filing, `#1348` mutation, central cluster-state change, or
+expensive-gate lease. `scaffold.runtime` was never run and remains forbidden for this leaf.
 
 ## Open drift
 
