@@ -1,115 +1,195 @@
-# IMPL-EVAL cycle 2 — reference-export-drift-gate (PR #1666)
+# IMPL-EVAL cycle 3 (fresh delta) — reference-export-drift-gate (PR #1666)
 
 ## Verdict
 
 **PASS**
 
-Cycle 1 (`FAIL_FIX` at `4c09e9203`, preserved verbatim as `impl-eval-cycle-1.md`) raised one
-finding, F1: three of the four committed refusal tests could not fail on the regression they name.
-The repair at implementation head `423867017` is confined to
-`.llm/tools/docs/check-exports-drift_test.ts`; the checker is byte-identical to the head cycle 1
-judged. I re-derived F1 closure by mutation on my own `git archive` copy (table below): each of the
-four named tests now fails, on the exit-code assertion, when its refusal branch is removed. No new
-finding. Everything re-derived in cycle 1 was spot-checked or re-run and holds.
+This is the fresh delta evaluation of the SA-3/SA-4 generated publication cascade that invalidated
+the earlier PASS at `ee67d12b4` (preserved verbatim, append-only, as `impl-eval-cycle-2.md`; cycle 1
+remains `impl-eval-cycle-1.md`). Every item in the brief was re-derived in this session, not re-read
+from the author's or supervisor's evidence. No finding. The one item the supervisor declared as
+carried rather than re-derived — generator idempotence — I ran end to end, including the full Lume
+docs-site build, twice at the content head and once from the pre-content head, on scratch worktrees
+outside `.llm/tmp/`.
 
 ## Binding
 
-| Field                         | Value                                                                                                                                                  |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Evaluator                     | Claude Fable 5, fresh separate session (opposite-family to Codex GPT-5.6 Sol author thread `01a005d2-7c9d-7dd1-b6fc-531b72dc14e4`)                     |
-| Session                       | `claude.ai/code/session_01MDMbe68iYvjHBLuUGKZqBS` (bg job `7a3b4645`)                                                                                  |
-| Immutable implementation head | `4238670173271bca4281eba7db6c2030d046bc73` — the code judged                                                                                           |
-| Evidence head                 | `010da98a230503bb27b46eb0edc5e979929f7fb1` — `receipts/fix1/`, `audit/`, `fix1-evidence.md`, worklog                                                   |
-| Base                          | `baf1cdf67a4e931af17b4772ddf6101f36152184` (= `merge-base HEAD origin/main`)                                                                           |
-| Local / remote / PR head      | `git rev-parse HEAD`, `git ls-remote origin refs/heads/fix/reference-export-drift-gate`, `gh pr view 1666 --json headRefOid` all `010da98a2`; PR draft |
-| Receipt `gitHead`             | all eight `fix1` receipts: `gitHead == actualGitHead == 423867017` — carried by the evidence commit, verified as intended binding, not a mismatch      |
-| Prior cycle                   | `4c09e9203` FAIL_FIX (F1); supervisor checkpoint `0646f429f` noted                                                                                     |
+| Field                       | Value                                                                                                                                                                 |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Evaluator                   | Claude Fable 5, fresh separate session; opposite-family to Codex GPT-5.6 Sol author thread `01a005d2-7c9d-7dd1-b6fc-531b72dc14e4`                                     |
+| Session                     | `claude.ai/code/session_01UDGunAVYYPRC6KBNxEwZWA` (bg job `f281b8cf`, Remote Control)                                                                                 |
+| Immutable content head      | `46528ae4c71b3744f0af64bd749d01d831f70c89` — the code judged                                                                                                          |
+| Recovery evidence head      | `b67414f4f26d53f00fc50adf3a5787d3bffae077` — `receipts/sa4/`, `audit/sa4/`, `sa4-evidence.md`, worklog                                                                |
+| Base                        | `baf1cdf67a4e931af17b4772ddf6101f36152184`                                                                                                                            |
+| Prior heads                 | `ee67d12b4` (cycle-2 PASS, untouched), `f98cfabac` (SA-3 plan), `440fa65ca` (cascade evidence)                                                                        |
+| Local / remote / PR head    | `git rev-parse HEAD`, `git fetch` + `origin/fix/reference-export-drift-gate`, `gh pr view 1666 --json headRefOid` all `b67414f4f`; PR OPEN, draft, `status:impl`      |
+| Receipt binding             | all 13 `receipts/sa4/*.json`: `gitHead == actualGitHead == 46528ae4c` — carried by the evidence commit, verified as the intended content-head binding, not a mismatch |
+| Product content b674 = 4652 | `git diff --name-status 46528ae4c b67414f4f` lists only `.llm/runs/.../reference-export-drift-gate/*` (24 run-artifact paths); zero product paths                     |
 
-Reproductions ran read-only in place or in `$CLAUDE_JOB_DIR/tmp/mut` (a `git archive 423867017`
-extraction **outside** `.llm/tmp/`, removed afterwards). No `.llm/tmp/` tarball was created; the
-`forbidden-commands_test.ts` scan passes in place. Tree clean at the end. No Aspire / Docker /
-browser / `e2e:cli` / scaffold / runtime smokes; no lease.
+Reproductions ran in `git worktree add --detach` copies under `$CLAUDE_JOB_DIR/tmp/` (`wt-content` @
+`46528ae4c`, `wt-pre` @ `f98cfabac`, `wt-base` @ `baf1cdf67`), all removed at exit. No archive or
+tarball was created under `.llm/tmp/`. No Aspire / Docker / browser / `e2e:cli` / scaffold smoke /
+close-gate / publish ran. Nothing outside this file (plus the rename of the prior file) was written.
 
-## F1 closure — re-derived by mutation (my runs, not the author's table)
+## Findings against the ten brief items
 
-Archive copy of `423867017`; checker mutated, committed test file unchanged; one named test per run
-via `--filter`, all reporting `1 failed | 5 filtered out`.
+### 1. Four-output cascade — re-derived, exact
 
-| Mutant on `check-exports-drift.ts`                                                                                                             | Named test                                               | Result                                                  |
-| ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------- |
-| L421 OMITS branch → `if (false)`                                                                                                               | `refuses an omitted symbol through the injectable seam`  | **FAILED**, `assertSingleRefusal` actual 0 / expected 1 |
-| L435 INVENTS branch → `if (false && …)`                                                                                                        | `refuses an invented symbol through the injectable seam` | **FAILED**, actual 0 / expected 1                       |
-| L543 nonempty-reason error → `if (false)`; both `isNonemptyString(coverage.reason)` guards → `true`; `.trim()` → `String(...)` (full coercion) | `refuses an empty or malformed coverage reason`          | **FAILED**, actual 0 / expected 1                       |
-| L566 `entrypoints-only` branch also accepts `mode === 'unknown'`                                                                               | `refuses an unknown coverage mode`                       | **FAILED**, actual 0 / expected 1                       |
-| restored copy                                                                                                                                  | full file                                                | 6 passed / 0 failed                                     |
+At `wt-pre` (`f98cfabac`: Fresh UI page changed, generated outputs not yet regenerated) I ran the
+three canonical generators in order and read `git status` after each:
 
-Why the tests now discriminate (read from the diff `47ca22abe..423867017`): all four use the real
-on-disk `withSymbolFixture` package + doc, so a `NotFound` read can no longer stand in for a
-refusal; `checkDriftCapturingErrors` captures `console.error`; `assertSingleRefusal` requires code
-1, **exactly one** error, the branch-specific message, and asserts `Failed to read` is absent; the
-invented case documents `['actualSymbol', 'inventedSymbol']` so OMITS cannot mask INVENTS. Cycle 1
-required exactly this.
+| Step                   | Raw exit | Tracked paths modified after step                                                |
+| ---------------------- | -------: | -------------------------------------------------------------------------------- |
+| `gen:agent-docs-prose` |        0 | `.llm/assets/agent-docs/prose.json.gz`, `.llm/assets/agent-docs/provenance.json` |
+| `gen:publish-assets`   |        0 | + `packages/mcp/src/publish-assets.generated.ts`                                 |
+| `gen:assets-barrel`    |        0 | + `packages/cli/src/kernel/assets/agent-docs.generated.ts`                       |
 
-**Checker unmoved:** `git diff 47ca22abe 423867017 -- .llm/tools/docs/check-exports-drift.ts` is
-empty (0 lines); the repair commit's stat is the single test file. No checker behaviour changed to
-make a test pass.
+Nothing else moved (no untracked, no other tracked path; the `PUBLISH_ASSET_OUTPUTS` manifest's
+other outputs, `packages/fresh-ui/registry.generated.ts`, `embedded.generated.ts`, etc., stayed
+byte-identical). Compared to the committed content head: `prose.json.gz` **byte-identical**,
+`publish-assets.generated.ts` **byte-identical** (`sourceCommit: 'f98cfabac'` reproduced because
+that was HEAD there); `provenance.json` and `agent-docs.generated.ts` differ **only** in
+`extractionTimestamp` (wall clock of my run) — expected and content-neutral. No fifth affected
+output; no included-but-unaffected file. `gen:mcp-export-corpus` was not run and its output
+`export-surface-corpus.generated.ts` did not move.
 
-## Receipts and the preserved red
+### 2. Idempotence — re-derived, holds (the declared gap is closed here)
 
-- `receipts/fix1/`: eight files. `arch-check`, `check`, `docs-accuracy`, `docs-source-format`,
-  `publish-dry-run`, `quality-job` PASS/exit 0; `test.json` **FAIL/exit 1** preserved;
-  `test-attempt2.json` PASS/exit 0 (4,203 / 0 / 19). All `gitHead == actualGitHead == 423867017`.
-- `test.json` red is honestly explained: its stdout tail shows the single failure is
-  `forbidden-commands_test.ts` finding `docker …`/`aspire stop --all` strings inside
-  `.llm/tmp/refusal-mutants-full-423867017/source.tar` — the author's own mutation archive, not a
-  product regression. `fix1-evidence.md`, `worklog.md`, and `evidence-set-fix1.json` (which lists
-  `test-attempt2` as the `test` receipt) all state it as RED, not relabelled. `test-attempt2`
-  legitimately supersedes it: same head, same argv, run after the scratch was removed. Retaining the
-  red rather than deleting it is correct.
-- Sufficiency for a test-only delta: `test` (full root discovery incl. the tool tests) and `check`
-  are the gates the delta can affect; the other five are unchanged-surface re-cuts at the new head
-  and cost nothing to include. Set judged **sufficient**. Also re-ran in place: focused test 6/0,
-  `deno check --unstable-kv` on checker + test OK, `forbidden-commands_test.ts` OK.
+At `wt-content` (`46528ae4c`, clean, `git status --short | wc -l` = 0):
 
-## Re-derived / carried judgments
+- Run 1: `gen:agent-docs-prose` (full `deno task --cwd docs/site build` + bundle) → 0,
+  `gen:publish-assets` → 0, `gen:assets-barrel` → 0; `git status --short` **empty**.
+- Run 2: same three, all raw 0; `git status --short` **empty**.
+- Then `check:agent-docs-prose` → 0, `check:assets-barrel` → 0, `check:publish-assets` → 0;
+  `check:mcp-export-corpus` → **1**; status still empty.
 
-| #  | Item                         | This cycle                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| -- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1  | #1296 acceptance / `Closes`  | **Re-run.** Enumerated all nine shipped Contracts example imports (`grep` over `packages/contracts/**/*.ts`, non-test): root ×3, `/query` ×3 files, `/crud` ×2, `/transform` ×1. `deno doc --no-lock --filter` against the export-map entrypoints (`mod.ts`/`query.ts`/`transform.ts`/`crud.ts`): all 11 symbols OK at their claimed entrypoint; the six repaired symbols MISS on root. **No fifth wrong-root example survives.** `Closes #1296` earned; close-gate mapping (five boxes) remains coordinator-owned and is correctly documented as such in `fix1-evidence.md`. Cycle-1 advisory on `pagination.ts` free identifiers (#1533) unchanged. |
-| 2  | Fail-closed refusal coverage | **Re-run** (this cycle's core). Four refusal cases committed as discriminating tests — see mutation table.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| 3  | Per-package accounting       | **Re-run.** `deno task docs:exports-drift` → eight `Coverage [...]` lines (fresh-ui/config/contracts/telemetry `complete`; plugin/queue/sdk/service `entrypoints-only` with reason; telemetry `omitted-symbol-groups=1`), `PASS`, exit 0. Enforcement path unchanged since cycle 1 (checker unmoved) — truth of `complete` carried from cycle 1's verification.                                                                                                                                                                                                                                                                                       |
-| 4  | Fresh UI / Contracts truth   | **Re-run.** `deno doc --json` union over the six export-map entries = 28/11/35/82/16/7 → 168 unique symbols; every `Symbol`-table cell on the page split on `/`, generics stripped → 168 exports all present; the only 7 on-page non-exports are `DROPZONE_INGEST_SOURCES`, `DROPZONE_REJECTED_REASONS`, `DropzoneIngestDetails`, `DropzoneIngestSource`, `DropzoneProps`, `DropzoneRejectedFile`, `DropzoneRejectedReason` — under `## Dropzone (registry component)`, labelled "a copy-source registry component, not a package export", and the mapping's `documentedNonExports` group. Not passed off as exports.                                 |
-| 5  | S2 discoverability           | **Re-run.** `deno.json:85` `docs:exports-drift` (`--no-lock --allow-read --allow-run=deno`, narrower than base's `--allow-all` child argv); `check-accuracy-and-discoverability.ts:292-300` spawns the named task once, fail-closed; `pages.yml:143-145` one root step (Pages does not run `docs:accuracy`, so no double execution); `ci.yml:366` reaches it only via `docs-accuracy` gate. PR body §"enforcement" says plainly the enforcement chain pre-existed and the leaf adds discoverability. `docs:accuracy` PASS exit 0 in place.                                                                                                            |
-| 6  | JSR / pins / publish delta   | **Carried** from cycle 1 (Contracts/Fresh UI package files unchanged since; `git diff --quiet` on both `deno.json` clean). `publish-dry-run` re-cut PASS at `423867017`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| 7  | Baseline reds                | **Spot-checked.** `audit/doc-lint-contracts.json` totalErrors 9 (all private-type-ref); `audit/doc-lint-fresh-ui.json` 123 (96+27); `s3-evidence.md:47` carries both as **RED, raw exit 1**; oRPC INFO / `F-DOCT-4` WARN retained (`:46`, `:22`). Not in any PASS receipt, attributed to baseline; the delta since cycle 1 touches none of those files.                                                                                                                                                                                                                                                                                               |
-| 8  | Scope and lock               | **Re-run.** `git diff --name-only baf1cdf67 010da98a2` minus `.llm/runs` = **10** paths (same ten as cycle 1); `docs/exports` absent; `deno.lock`, `contract-primitives.ts`, `src/public/mod.ts`, both package `deno.json` byte-identical to base (`git diff --quiet` exit 0).                                                                                                                                                                                                                                                                                                                                                                        |
-| 9  | Receipt sufficiency          | **Re-run.** See "Receipts and the preserved red" above; seven gate ids present, `test` satisfied by `test-attempt2`, all bound to `423867017`, `evidence-set-fix1.json` SUFFICIENT with named receipt ids.                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| 10 | `fresh-browser` NOT_RUN      | **Re-run.** `grep` across slice artifacts and PR body: only `NOT_RUN` / N/A / waived (SA-1); never restated as pass; no lease.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+Mechanism confirmed in `.llm/tools/docs/build-agent-docs-bundle.ts` `writeCorpus`: when the
+canonical uncompressed corpus equals the existing gzip's payload the existing compressed bytes and
+the prior `sourceCommit`/`extractionTimestamp` are retained, so a rebuild at any later commit is a
+no-op unless prose content changes. That is why `sourceCommit` stays `f98cfabac` at `46528ae4c` and
+why the tree is stable. Cost was not prohibitive (~2–3 min per generator pass); it was run, not
+inferred.
 
-## Process notes (non-blocking, unchanged from cycle 1)
+### 3. Both root-test receipts — verified
 
-- Design checkpoint is carried by the locked D1–D11 table in `plan.md` + PLAN-EVAL cycle-2 PASS
-  `45c249b9c`; the worklog now names that pointer explicitly.
-- Close-gate before `ready-merge` is coordinator-owned: five #1296 boxes, `acceptance-evidence`
-  block, PR DoD last box.
+| Receipt                  | invocationId                         | gitHead     | exit | passed/failed/ignored | total | file SHA-256 (prefix) |
+| ------------------------ | ------------------------------------ | ----------- | ---: | --------------------- | ----: | --------------------- |
+| `receipts/sa4/test.json` | `reference-export-sa4-test`          | `46528ae4c` |    1 | 4202 / 1 / 19         |  4222 | `2715babef54414d6…`   |
+| `test-attempt2.json`     | `reference-export-sa4-test-attempt2` | `46528ae4c` |    0 | 4203 / 0 / 19         |  4222 | `855a1509c099c9e4…`   |
 
-## Executed command log (abridged)
+Read from each receipt's `stdout.tail` summary block; distinct `invocationId`, `lifecycleId`,
+`runnerIdentity`. The red is retained in the tree at `b67414f4f`, and its full SHA-256 matches the
+value stated in `sa4-evidence.md`. The single failure in `test.json` is the sole test in
+`.llm/tools/agentic/teardown/forbidden-commands_test.ts` (bulk-teardown scan), finding exactly one
+path, `.llm/tmp/claude/hooks/unscoped/events.jsonl`. That is the only delta between the two runs
+(4202+1 → 4203+0, ignored unchanged).
 
-- binding: `git rev-parse HEAD`; `git ls-remote origin refs/heads/fix/reference-export-drift-gate`;
-  `gh pr view 1666 --json headRefOid,baseRefOid,isDraft,state`; `git merge-base HEAD origin/main`
-- `git diff 47ca22abe 423867017 -- .llm/tools/docs/check-exports-drift.ts | wc -l` → 0
-- `git archive 423867017 | tar -x -C $CLAUDE_JOB_DIR/tmp/mut`; four `sed` mutants +
-  `deno test
-  --no-lock --allow-all --filter <name>` each →
-  `FAILED | 0 passed | 1 failed | 5 filtered out`; restored → 6 passed; `rm -rf` mutant dir
-- in place: `deno test --allow-all .llm/tools/docs/check-exports-drift_test.ts` → 6/0;
-  `deno test --allow-all .llm/tools/agentic/teardown/forbidden-commands_test.ts` → 1/0;
-  `deno check --unstable-kv` checker+test → OK
-- `deno task docs:exports-drift` → 8 coverage lines, PASS, exit 0; `deno task docs:accuracy` → PASS,
-  exit 0
-- `packages/contracts`: `deno doc --no-lock --filter <sym> <entry>` ×11 OK at claimed entry, ×6 MISS
-  on root
-- `packages/fresh-ui`: `deno doc --no-lock --json <entry>` ×6 → 168 unique; page-cell diff → 7
-  Dropzone-only
-- receipts: `jq` over `receipts/fix1/*.json` (ids, outcome, exit, gitHead/actualGitHead)
-- forbidden-surface `git diff --quiet` → clean; `docs/exports` absent; 10 product paths
+### 4. Quarantine attribution — honest; scanner unweakened; event unedited; recoverable
+
+- **Scanner unweakened:** `git diff baf1cdf67 b67414f4f -- .llm/tools/agentic/teardown/` is empty;
+  the test still walks the whole repo skipping only `.git`, `node_modules`, `_fresh`, `.netscript`,
+  `runs` and `.llm/runs/`. `.llm/tmp/` is _inside_ its scan root and is `.gitignore`d (line 17),
+  which is exactly how an untracked hook transcript can fail the suite.
+- **Mechanism verified first-hand:** the repo's own `.claude/settings.json` PreToolUse/PostToolUse
+  hooks run `.llm/tools/agentic/claude/claude-hook-log.ts`, which appends every tool input to
+  `.llm/tmp/claude/hooks/<NETSCRIPT_RUN_ID | unscoped>/events.jsonl` (unchanged since `b13ca0fa9`,
+  no diff base→head). During this evaluation the hook recreated that file for **my** session and
+  captured my own probe commands, which quoted the token — I quarantined that file to
+  `$CLAUDE_JOB_DIR/quarantine/` at exit for the same reason. The attribution is therefore not a
+  story; it is the default behaviour of the checked-in hook and would recur for any Claude session
+  in this checkout that mentions the token.
+- **Event unedited / attribution correct:** destination
+  `/home/codex/.claude/jobs/f7691917/quarantine/sa4-hooks-unscoped/events.jsonl` exists, 262,354
+  bytes, 180 lines, mtime `2026-08-15 21:12:52 +0200`, SHA-256
+  `d0251bc2f8c78814724cb2e6c2460102260a39aadb3a21551b81244efbaceab2` (matches the recorded pre-move
+  value). Line 177 parses as `ts: 2026-08-15T19:11:51.339Z`, `sessionId: null`, `tool_name: Bash`;
+  the token sits in `event.tool_input.command` inside supervisor prose describing the earlier
+  `receipts/fix1/test.json` contamination (`.llm/tmp/refusal-mutant`). Exactly one line in the file
+  contains the token. The source subtree was absent before my session recreated it.
+- **Not laundering:** the forbidden-commands test passes in `wt-content` with the full docs `_site`
+  build present (`ok | 1 passed`), and `test-attempt2` passed with the same product bytes, so no
+  product path carried the token. The environmental fix removed a supervisor transcript, not a
+  product failure.
+
+### 5. Scope discipline — 14 of 17, no eighteenth, lock identical
+
+`git diff --name-status baf1cdf67 46528ae4c` minus `.llm/runs/` = exactly 14 paths: `pages.yml`, the
+four generated outputs, `check-accuracy-and-discoverability.ts`, `check-exports-drift.ts`,
+`check-exports-drift_test.ts`, `deno.json`, `docs/site/reference/fresh-ui/index.md`,
+`paginated-query.ts`, `transform-helpers.ts`, `schemas/filters.ts`, `schemas/pagination.ts`. All lie
+inside the 17-path contract (9 frozen + SA-1 test + SA-2 ×3 + SA-3 ×4). The three do-not-touch
+entries hold: `docs/exports` absent in tree and index; `contract-primitives.ts` and
+`src/public/mod.ts` have empty diffs base→`b67414f4f`. `deno.lock` blob
+`a1522e6ecc98dd4232312385b0cea4e52f5fa4b2` at base, content head and evidence head.
+`46528ae4c..
+b67414f4f` adds run artifacts only.
+
+### 6. Receipt coherence and sufficiency — sufficient for this delta
+
+Thirteen receipts, all `gitHead == actualGitHead == 46528ae4c`, ids `reference-export-sa4-*`, exit 0
+except the preserved `test.json`. `audit/sa4/evidence-set.json` names twelve gate ids and selects
+`test-attempt2` for `test`; recomputed by hand: every expected gate id has a bound receipt. For this
+delta the load-bearing gates are the three freshness checks (`agent-docs-prose`, `assets-barrel`,
+`publish-assets`), root `check`/`test`, `quality-job` (composite incl. lint / fmt / deps),
+`docs-accuracy` (which spawns the export-drift checker), `publish-dry-run`, and the four JSR audits
+in `audit/sa4/`. All present, all bound. I independently re-ran the three freshness checks,
+`docs:exports-drift` (raw 0, eight package coverage lines, terminal PASS), the checker test (6/0),
+and the forbidden-commands test (1/0) at the content head. Sufficient.
+
+### 7. CLI/MCP publication selection — verified, JSR table honest
+
+`packages/mcp/src/publish-assets.generated.ts` `MCP_EMBEDDED_DOCS_PROVENANCE.paths` is the bounded
+12-document list (`llms.txt` + 11 pages); `pages/reference/fresh-ui/index.md` is **not** in it. The
+content-head diff for that file is a single line (`sourceCommit` `504de3f67` → `f98cfabac`);
+`sha256`/`sourceBytes`/`documentCount` unchanged. `agent-docs.generated.ts` changes the base64
+payload line and the six provenance fields (`sourceCommit`, `extractionTimestamp`,
+`uncompressedBytes` 4,753,233→4,768,211, `compressedBytes` 1,363,117→1,367,454, `sha256`
+`a7c72177…`→`78d5fed4…`). The `sa4-evidence.md` member table states both deltas as they are.
+
+### 8. Known reds stay red — confirmed pre-existing
+
+- `check:mcp-export-corpus`: raw **1** at `wt-base` (`baf1cdf67`) and raw **1** at `wt-content`;
+  "MCP export-surface corpus is stale". Not regenerated, not waived;
+  `export-surface-corpus.
+  generated.ts` unchanged base→head.
+- `run-deno-doc-lint.ts --root packages/contracts`: exit 1, `{errors 9, privateTypeRef 9}` at base
+  **and** content head. `packages/fresh-ui`: exit 1,
+  `{errors 123, privateTypeRef 96,
+  missingJSDoc 27}` at base **and** content head. Baseline,
+  unchanged.
+
+### 9. Issue #1296 acceptance — `Closes #1296` is earned; boxes left unchecked
+
+- Box 1 (JSDoc imports compile): the four `@example` lines now import from `/query` and
+  `/transform`; a scratch probe importing all six symbols from those subpaths type-checked and ran
+  (`deno run`), printing the expected types. `contract-primitives.ts` was already correct at base.
+- Box 2 (inventory advertises no non-exports): `docs:exports-drift` reports `contracts` in
+  `mode=complete`, 0 omitted / 0 documented-non-export groups, PASS.
+- Box 3 (Fresh UI matches published exports): `fresh-ui` in `mode=complete` over six entrypoints, 0
+  omitted-symbol groups, 1 explicitly labelled documented-non-export group (Dropzone copy-source),
+  PASS.
+- Box 4 (machine-readable omissions): reason-bearing coverage discriminant with fail-closed refusal
+  tests (cycle-1/2 mutation evidence stands; test file unchanged since `423867017`).
+- Box 5 (runbook + wired verification): named `docs:exports-drift` task, Pages step, runbook on the
+  Fresh UI page, and `docs:accuracy` still spawns the checker fail-closed.
+
+Boxes remain unchecked and coordinator-owned; I did not touch them. PR body carries `Closes #1296`
+as its own line.
+
+### 10. `NOT_RUN` boundaries — reported as such
+
+`fresh-browser` N/A/waived, `NOT_RUN`, no runtime lease; close-gate `NOT_RUN`, deliberately not
+rerun by me. Neither is restated as a pass anywhere in `sa4-evidence.md`, the PR comments, or here.
+Note for the coordinator: GitHub CI is `skipped` at `46528ae4c`/`440fa65ca`/`b67414f4f` because the
+PR is draft; the freshness gates CI failed at `ee67d12b4` were satisfied here by local receipts plus
+my independent reruns, and CI will re-exercise them on the ready flip.
+
+## Evaluator commit and exit hygiene
+
+- Only `impl-eval.md` written; prior canonical file renamed to `impl-eval-cycle-2.md` (content
+  byte-identical, `git mv`). Committed on a detached evaluator worktree at `b67414f4f` and pushed by
+  explicit refspec `HEAD:refs/heads/fix/reference-export-drift-gate`.
+- Scratch worktrees `wt-content`, `wt-pre`, `wt-base` and probe files removed; my session's
+  `.llm/tmp/claude/hooks/unscoped/events.jsonl` moved to
+  `/home/codex/.claude/jobs/f281b8cf/quarantine/hooks-unscoped/` so the forbidden-commands scan
+  stays green for the next runner; `git status --short` empty in the shared checkout at exit.
