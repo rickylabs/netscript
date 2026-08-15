@@ -1,5 +1,8 @@
 # S3 evidence — reference-export-drift-gate
 
+> Historical receipt set for pre-repair head `47ca22abe`. Current-head receipt claims are superseded
+> by `fix1-evidence.md` and `receipts/fix1/`; this file remains as the original S3 record.
+
 ## Attestation
 
 - Immutable implementation head: `47ca22abe94b9d2e54d3778edc8944094b227886`

@@ -175,3 +175,30 @@ evidence-set report is `SUFFICIENT` with no reasons.
 S3 stops after the run-artifact commit, explicit-refspec push, and structured PR comment. The
 coordinator owns final substantive review, IMPL-EVAL, readiness, and merge. The author does not
 self-certify.
+
+## FAIL_FIX repair — discriminating refusal tests
+
+- Authorization: evaluator F1 at `4c09e9203`; test-quality repair only.
+- Immutable repaired implementation head: `4238670173271bca4281eba7db6c2030d046bc73`.
+- Repair scope: exactly `.llm/tools/docs/check-exports-drift_test.ts`; checker behavior and every
+  product/docs/task/workflow path remained unchanged.
+- The four refusal tests now use real fixture paths and require the branch-specific captured error.
+  The invented case documents `actualSymbol` plus `inventedSymbol`, preventing OMITS from masking
+  INVENTS.
+- Full-repository archive mutation tests returned raw exit 1 for each named INVENTS, unknown-mode,
+  malformed-reason, and OMITS test; the restored six-test suite returned raw exit 0.
+- Seven authoritative receipts under `receipts/fix1/` all returned PASS/raw exit 0 and attest the
+  repaired head. `audit/evidence-set-fix1.json` is `SUFFICIENT` with no reasons.
+- The preliminary full-test receipt remains RED/raw exit 1 because the safety test inspected the
+  run-owned mutation archive; after explicit scratch cleanup, attempt 2 passed 4,203/0/19.
+- The five issue boxes map separately to Contracts example imports, Contracts reference inventory,
+  Fresh UI reference truth, machine-readable omissions, and runbook/discoverable verification. No
+  box, acceptance-evidence block, or issue state was mutated.
+- Design checkpoint: the locked D1-D11 table in `plan.md` plus PLAN-EVAL cycle-2 PASS at `45c249b9c`
+  is the recorded design checkpoint.
+- `fresh-browser` remains `NOT_RUN`, N/A / waived. All prohibited runtime and publication actions
+  remain `NOT FIRED`.
+
+The detailed mutation record and receipt/red accounting are in `audit/refusal-mutation-tests.md` and
+`fix1-evidence.md`. The author stops after the explicit-refspec push and structured repair comment
+for coordinator Tier-A.
