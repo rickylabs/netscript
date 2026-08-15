@@ -1,8 +1,4 @@
-/**
- * Internal cache-query implementation.
- *
- * @module
- */
+/** Internal cache-query implementation. @module */
 
 import { CacheOperations, CacheOutcomes } from '@netscript/telemetry/attributes';
 import { DEFAULT_QUERY_CACHE_TIME, DEFAULT_QUERY_STALE_TIME } from './defaults.ts';
@@ -95,7 +91,6 @@ export class CacheQuery {
     );
   }
 
-  /** Execute the cache policy while the logical read span is active. */
   private async queryInsideSpan<TData>(
     queryKey: QueryKey,
     options: CacheQueryOptions<TData>,
@@ -136,11 +131,6 @@ export class CacheQuery {
       );
       return inflight;
     };
-
-    const inflight = this.getInflight<TData>(inflightKey);
-    if (inflight) {
-      return await joinInflight(inflight);
-    }
 
     let cached;
     try {
@@ -184,7 +174,14 @@ export class CacheQuery {
       }
 
       if (revalidateOnStale) {
-        this.revalidateInBackground(measuredQueryFn, key, cacheTime, namespace);
+        this.revalidateInBackground(
+          measuredQueryFn,
+          key,
+          inflightKey,
+          cacheTime,
+          namespace,
+          joinInflight,
+        );
       }
       return cached.value.data;
     }
@@ -201,12 +198,9 @@ export class CacheQuery {
     );
   }
 
-  /** Return an existing in-flight fetch for this query key. */
   private getInflight<TData>(inflightKey: string): Promise<TData> | undefined {
     return this.inflightRequests.get(inflightKey) as Promise<TData> | undefined;
   }
-
-  /** Recheck in-flight state before starting a cache refresh. */
   private fetchAndCacheOnce<TData>(
     queryFn: () => Promise<TData>,
     cacheKey: Deno.KvKey,
@@ -223,92 +217,107 @@ export class CacheQuery {
     return this.fetchAndCache(queryFn, cacheKey, inflightKey, cacheTime, namespace, span);
   }
 
-  /** Enter the measured loader and record its resulting cache write. */
-  private async fetchAndCache<TData>(
+  private fetchAndCache<TData>(
     queryFn: () => Promise<TData>,
     cacheKey: Deno.KvKey,
     inflightKey: string,
     cacheTime: number,
     namespace: string,
     span: CacheTelemetrySpan,
+    operation: typeof CacheOperations.READ | typeof CacheOperations.WRITE = CacheOperations.READ,
+    register = true,
   ): Promise<TData> {
-    const promise = queryFn();
-    this.inflightRequests.set(inflightKey, promise);
-
-    try {
-      const data = await promise;
-      const entry: CacheEntry<TData> = { data, timestamp: Date.now() };
+    const execute = async (): Promise<TData> => {
+      const data = await queryFn();
       let report: CacheWriteTopologyReport;
       try {
-        report = await this.store.set(cacheKey, entry, { expireIn: cacheTime });
-      } catch {
-        recordCacheProviderError(
-          span,
-          CacheOperations.READ,
-          namespace,
-          this.descriptor,
-          CacheEvents.WRITE,
+        report = await this.store.set(
+          cacheKey,
+          { data, timestamp: Date.now() } satisfies CacheEntry<TData>,
+          { expireIn: cacheTime },
         );
+      } catch {
+        recordCacheProviderError(span, operation, namespace, this.descriptor, CacheEvents.WRITE);
         return data;
       }
-      recordCacheWrite(span, CacheOperations.READ, namespace, this.descriptor, report);
+      recordCacheWrite(span, operation, namespace, this.descriptor, report);
       return data;
-    } finally {
-      this.inflightRequests.delete(inflightKey);
-    }
+    };
+    return register ? this.startInflight(inflightKey, execute) : execute();
   }
-
-  /** Continue stale refresh work under an explicitly captured read context. */
+  private startInflight<T>(key: string, run: () => Promise<T>): Promise<T> {
+    const operation = Promise.resolve().then(run).finally(() => {
+      if (this.inflightRequests.get(key) === operation) {
+        this.inflightRequests.delete(key);
+      }
+    });
+    this.inflightRequests.set(key, operation);
+    return operation;
+  }
   private revalidateInBackground<TData>(
     queryFn: () => Promise<TData>,
     cacheKey: Deno.KvKey,
+    inflightKey: string,
     cacheTime: number,
     namespace: string,
+    joinInflight: (inflight: Promise<TData>) => Promise<TData>,
   ): void {
+    const inflight = this.getInflight<TData>(inflightKey);
+    if (inflight) {
+      void joinInflight(inflight);
+      return;
+    }
     const parent = this.telemetry.captureParent();
-    void parent.run(() =>
-      this.telemetry.withSpan(
-        CacheOperations.WRITE,
-        createCacheSpanAttributes(CacheOperations.WRITE, namespace, this.descriptor),
-        async (span) => {
-          spanPrologue(
-            span,
+    const operation = this.startInflight(
+      inflightKey,
+      () =>
+        parent.run(() =>
+          this.telemetry.withSpan(
             CacheOperations.WRITE,
-            { namespace },
-            this.descriptor,
-            CacheEvents.WRITE,
-          );
-          try {
-            recordCacheExecutionState(
-              span,
-              CacheOperations.WRITE,
-              namespace,
-              this.descriptor,
-              true,
-              false,
-            );
-            const data = await queryFn();
-            const report = await this.store.set(
-              cacheKey,
-              { data, timestamp: Date.now() } satisfies CacheEntry<TData>,
-              { expireIn: cacheTime },
-            );
-            recordCacheWrite(span, CacheOperations.WRITE, namespace, this.descriptor, report);
-          } catch (error) {
-            recordCacheProviderError(
-              span,
-              CacheOperations.WRITE,
-              namespace,
-              this.descriptor,
-              CacheEvents.WRITE,
-            );
-            throw error;
-          }
-        },
-      )
-    ).catch(() => {
-      // The write span records background refresh failures. Preserve SWR by
-      // keeping those failures detached from the stale-data caller.
+            createCacheSpanAttributes(CacheOperations.WRITE, namespace, this.descriptor),
+            async (span) => {
+              spanPrologue(
+                span,
+                CacheOperations.WRITE,
+                { namespace },
+                this.descriptor,
+                CacheEvents.WRITE,
+              );
+              recordCacheExecutionState(
+                span,
+                CacheOperations.WRITE,
+                namespace,
+                this.descriptor,
+                true,
+                false,
+              );
+              try {
+                return await this.fetchAndCache(
+                  queryFn,
+                  cacheKey,
+                  inflightKey,
+                  cacheTime,
+                  namespace,
+                  span,
+                  CacheOperations.WRITE,
+                  false,
+                );
+              } catch (error) {
+                recordCacheProviderError(
+                  span,
+                  CacheOperations.WRITE,
+                  namespace,
+                  this.descriptor,
+                  CacheEvents.WRITE,
+                );
+                throw error;
+              }
+            },
+          )
+        ),
+    );
+    void operation.catch(() => {
+      // The write span records failures; keep them detached from the stale-data caller.
     });
   }
 

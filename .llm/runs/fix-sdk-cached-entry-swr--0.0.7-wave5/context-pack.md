@@ -6,17 +6,16 @@
 | -------------- | ------------------------------------------------------------- |
 | Run ID         | `fix-sdk-cached-entry-swr--0.0.7-wave5`                       |
 | Branch         | `fix/sdk-cached-entry-swr`                                    |
-| Current phase  | `plan` — awaiting external PLAN-EVAL                          |
+| Current phase  | `implement` — S1 complete, awaiting fresh Tier-A              |
 | Archetype      | `3 — Runtime/Behavior` slice; SDK package remains Archetype 2 |
 | Scope overlays | `docs`                                                        |
 
 ## Current State
 
-Research and a concrete two-slice design are complete at
-`main@3e8e146a4aedf8ee0afec15c83ddaefc171c71f9`. Remedy 1 is locked: use the existing cache-aware
-callable action in blocking mode before `getCachedEntry()`, add no published API, and separately fix
-background single-flight ownership. No product code has been changed. Implementation is blocked
-until the topic orchestrator confirms a separate PLAN-EVAL `PASS`.
+PLAN-EVAL is terminal `PASS` at plan head `23db20f30` with artifact head `d555cc971`. S1 is complete:
+`CacheQuery` now uses policy-aware, persistence-complete single-flight ownership, and deterministic
+regressions cover overlapping stale SWR readers plus a blocking joiner after a background-owned
+write failure. No published API changed. S2 has not started and remains outside the current slice.
 
 ## Completed
 
@@ -42,17 +41,26 @@ until the topic orchestrator confirms a separate PLAN-EVAL `PASS`.
   path.
 - Ran JSR research baselines: package publish dry-run green; audit helper exit 0 with known
   warnings; doc-lint remains red.
+- Implemented synchronous background refresh registration before fetch/write awaits. A second stale
+  SWR reader returns stale immediately and observes the one registered operation.
+- Made the registered operation cover fetch and persistence handling. Fetch success plus write
+  failure resolves fetched data for any owner/joiner; only fetch failure rejects, preserving PR
+  #1665's fail-safe behavior and detached background telemetry.
+- Added a sleep-free two-reader SWR regression with a manually blocked fetcher and exact call count
+  1, plus the background-write-failure/blocking-joiner regression required by PLAN-EVAL A2.
+- Passed all six authorized S1 gates; the SDK's known F-16 13-child warning remains unchanged and no
+  new F-1 file-size debt was introduced.
 
 ## In Progress
 
-- Plan-only Tier-A repair is ready for a fresh Tier-A pass and separate PLAN-EVAL. Product, tests,
-  and docs content remain untouched.
+- S1 implementation is ready for fresh Tier-A review. The PR remains draft with sole
+  `status:plan`; S2 files are untouched.
 
 ## Next Steps
 
-1. Topic orchestrator arranges separate PLAN-EVAL and confirms `PASS`.
-2. Only after that confirmation, implement S1 exactly as planned and record gate/reconcile evidence.
-3. Implement S2, regenerate the cascade in fixed order, then run merge-readiness gates.
+1. Coordinator runs fresh Tier-A over the pushed S1 head.
+2. Only after the next authorization, implement S2 and regenerate the cascade in fixed order.
+3. Run final merge-readiness gates in the authorized final slice.
 4. Separate-session IMPL-EVAL remains mandatory before ready/merge.
 
 ## Key Decisions
@@ -62,26 +70,38 @@ until the topic orchestrator confirms a separate PLAN-EVAL `PASS`.
 | Remedy 1, no public export            | `research.md`, `plan.md`          | Existing callable action satisfies acceptance; `getCachedEntry` remains pure read.                                           |
 | Policy-aware per-key single-flight    | `plan.md` D4                      | SWR overlap returns stale for both while one refresh runs; blocking/missing joins persistence-complete promise.              |
 | Exactly two docs sources plus cascade | Coordinator ruling; `research.md` | Edit only `services-sdk/sdk.md` and live-dashboard chapter 3 after PLAN-EVAL; never `_site`; generate the same four mirrors. |
+| Write-failure join semantics          | PLAN-EVAL A2                      | Fetch success resolves data even if persistence fails; background records the error and stays detached; only fetch failure rejects. |
+| Synchronous background registration   | PLAN-EVAL A3                      | The scheduling reader installs the operation before any fetch/write await; tests use manually controlled promises, not sleeps. |
 
 ## Files Changed
 
-| Path                                                | Status  | Notes                                                                           |
-| --------------------------------------------------- | ------- | ------------------------------------------------------------------------------- |
-| `.llm/runs/fix-sdk-cached-entry-swr--0.0.7-wave5/*` | amended | Plan-phase artifacts only; coordinator-created `codex-thread-ids.md` preserved. |
+| Path | Status | Notes |
+| ---- | ------ | ----- |
+| `packages/sdk/src/cache/cache-query.ts` | changed | Policy-aware, persistence-complete single-flight; no export change. |
+| `packages/sdk/tests/cache/cache-query_test.ts` | changed | Deterministic overlapping-SWR and write-failure joiner regressions. |
+| `.llm/runs/fix-sdk-cached-entry-swr--0.0.7-wave5/worklog.md` | amended | S1 implementation, gate, and advisory evidence. |
+| `.llm/runs/fix-sdk-cached-entry-swr--0.0.7-wave5/context-pack.md` | amended | Current slice handoff; coordinator-created artifacts preserved. |
 
 ## Gates
 
-| Gate family   | Current status             | Evidence                                                                                                                                      |
-| ------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Static        | NOT_RUN for implementation | Prohibited before PLAN-EVAL; research inspection only.                                                                                        |
-| Fitness / JSR | Baseline captured          | Publish dry-run exit 0; audit exit 0 with known warnings; two doc-lint commands remain expected red at exactly 3+3 named diagnostics.         |
-| Runtime       | NOT_RUN                    | Planned deterministic overlapping-reader tests.                                                                                               |
-| Consumer/docs | Plan evidence only         | Claim sweep accounts for every authorized-page same-class line and adds no third source; ordered generation exited 0, both pages are provenance inputs, and no undeclared tracked path changed. |
+| Gate family | Current status | Evidence |
+| ----------- | -------------- | -------- |
+| Static | PASS | Structured SDK check/lint/fmt: 84 files, 0 failed batches/occurrences/findings. |
+| Fitness | PASS for S1 | `quality:gate` exit 0; repository scan 0 findings; SDK `FAIL=0`, known F-16 `WARN=1`, `INFO=1`. |
+| Runtime | PASS | Focused cache tests 5/5; full SDK tests 68/68; 0 failed/ignored/unique failures. |
+| Consumer/docs | NOT_RUN for S2 | Authorized pages, query-factory regression, and generated cascade are outside S1 and untouched. |
+| Final/root | NOT_RUN | Root `test`/`check`, publish/JSR, and final docs gates belong to later slices. Aspire, Docker, and `e2e:cli` were not run. |
+
+## PLAN-EVAL Advisories for S2
+
+- A1: the page-level sentence is manual evidence for Tier-A and IMPL-EVAL against the rendered page
+  and disposition table. The docs-accuracy receipt cannot prove it; do not edit `.llm/tools/**`.
+- A4: the line-107 explanation must say that the default call without `preferFreshOnStale` is the
+  non-blocking SWR path and the flag is chosen here so `cachedAt` reflects the refreshed value.
 
 ## Open Questions
 
-- None that can force rework before PLAN-EVAL. Implementation remains blocked on its separate
-  verdict.
+- None within S1. Further implementation is blocked pending the coordinator's post-Tier-A direction.
 
 ## Drift and Debt
 
@@ -91,4 +111,5 @@ until the topic orchestrator confirms a separate PLAN-EVAL `PASS`.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments. No implementation commit exists yet.
+- Plan head `23db20f30`; terminal PLAN-EVAL artifact head `d555cc971`.
+- S1 implementation commit and pushed head will be recorded in the PR slice receipt.

@@ -37,8 +37,10 @@
   `stale → background-refreshing → persistence-attempted → settled`.
 - Concurrency: per-key single-flight. SWR readers do not join in a blocking sense; they share
   ownership by observing/starting one registered background operation and returning stale data.
-- Failure: preserve PR #1665. Foreground cache-write failure returns fetched data; background
-  failure is recorded under captured telemetry context and detached; map cleanup runs in `finally`.
+- Failure: preserve PR #1665. If fetch succeeds and persistence fails, the registered operation
+  resolves to fetched data for every owner and joiner; a background owner records the provider
+  error under captured telemetry context and remains detached. Only fetch failure rejects. Map
+  cleanup runs after the persistence attempt or its fail-safe handling completes.
 - Clock: preserve existing `Date.now()` timestamp seam; do not add or deepen runtime clock usage in
   this focused change. Tests control seed timestamps and synchronization without sleeps.
 - Cancellation: no new long-running handle or cancellable public operation is introduced.
@@ -83,6 +85,10 @@ action in `src/query/query-factory.ts` into `src/cache/cache-query.ts`, and add 
 | 2026-08-15 | Plan           | Research and design      | Re-baselined at `3e8e146a4`; no product code changed. Hard stop pending topic-orchestrator PLAN-EVAL PASS.                                                                         |
 | 2026-08-15 | Plan amendment | Coordinator scope ruling | Added exactly the live-dashboard chapter-3 source; swept surrounding docs; executed the ordered generation chain with no undeclared tracked path; no product/docs content changed. |
 | 2026-08-15 | Plan repair    | Tier-A T-1               | Reconciled tutorial scope with S2 using explicit dispositions for every same-class line; re-ran the exact-two-page and site-wide sweeps; no product/docs content changed.          |
+| 2026-08-15 | Plan eval      | Terminal PASS             | PLAN-EVAL passed at plan head `23db20f30` (`plan-eval.md` artifact head `d555cc971`); implementation authorization received for S1 only.                                      |
+| 2026-08-15 | S1             | Single-flight runtime     | Made in-flight ownership policy-aware and persistence-complete without changing exports or PR #1665 fail-safe/telemetry behavior.                                            |
+| 2026-08-15 | S1             | Deterministic regressions | Added overlapping stale SWR and background-write-failure/blocking-joiner tests; both use manually controlled promises and no timing sleeps.                                  |
+| 2026-08-15 | S1             | Fitness refinement        | Compacted the touched runtime file to 499 lines (base 490) so S1 adds no F-1 file-size debt; the known SDK F-16 13-child warning remains unchanged.                           |
 
 ## Decisions
 
@@ -91,6 +97,25 @@ action in `src/query/query-factory.ts` into `src/cache/cache-query.ts`, and add 
 | Remedy 1; no new export    | Existing action owns all stale policy and can block before metadata read.                                 | `research.md`, doctrine A1/A2, issue #1461              |
 | Policy-aware map semantics | SWR readers must not become blocking readers merely because refresh is registered.                        | `cache-query.ts`, acceptance concurrency/policy bullets |
 | Full lifecycle promise     | Joined blocking loader must observe the persisted refreshed timestamp immediately after query completion. | `research.md` finding 9                                 |
+| Synchronous registration   | The scheduling SWR reader registers the shared operation before any fetch/write await, so later readers deterministically observe it. | PLAN-EVAL A3; overlapping-reader regression |
+| Non-fatal write join       | Fetch success plus write failure resolves fetched data for foreground/background owners and joiners; only fetch failure rejects. | PLAN-EVAL A2; write-failure regression |
+
+## PLAN-EVAL Advisories Carried Forward
+
+- **A1 — S2 manual evidence:** the page-level acceptance sentence is not asserted by
+  `.llm/tools/docs/check-accuracy-and-discoverability.ts`. In S2 it must be proved manually by the
+  Tier-A slice review and IMPL-EVAL reading the disposition table against the rendered page. A
+  `docs-accuracy` receipt may support its own checks but must not be cited as proof of that sentence;
+  no `.llm/tools/**` change is authorized.
+- **A4 — S2 tutorial posture:** near the corrected line-107 loader, state that the default call
+  without `preferFreshOnStale` is the non-blocking SWR path, while the example deliberately sets
+  `preferFreshOnStale: true` so `cachedAt` reflects the refreshed value.
+- **A2 — implemented in S1:** the map-registered fetch-and-persist operation returns fetched data
+  after a handled write failure for any owner/joiner. Background telemetry records the provider
+  error and detached ownership remains intact; fetch failure is the only rejection path.
+- **A3 — implemented in S1:** `startInflight` installs the shared promise synchronously and defers
+  its callback to the next microtask. The overlapping-reader test fully awaits reader 1, starts
+  reader 2, then releases a manually blocked fetcher; it is sleep-free and pins calls to exactly 1.
 
 ## Drift
 
@@ -117,14 +142,23 @@ action in `src/query/query-factory.ts` into `src/cache/cache-query.ts`, and add 
 
 ### Static / Fitness / Runtime / Consumer Gates
 
-All implementation gates are `NOT_RUN`: product implementation is prohibited until a separate
-PLAN-EVAL returns `PASS`. Aspire, Docker, and `e2e:cli` are explicitly prohibited and unnecessary.
+| Gate | Structured verdict | Evidence |
+| ---- | ------------------ | -------- |
+| Focused cache tests | **PASS** (exit 0) | `run-deno-test.ts -- --allow-all packages/sdk/tests/cache/cache-query_test.ts`: passed 5, failed 0, ignored 0, total 5, unique failures 0. |
+| SDK tests | **PASS** (exit 0) | `run-deno-test.ts -- --allow-all packages/sdk/`: passed 68, failed 0, ignored 0, total 68, unique failures 0. |
+| SDK check | **PASS** (exit 0) | `run-deno-check.ts --root packages/sdk --ext ts,tsx`: 84 files, 1 batch, 0 failed batches, 0 occurrences; wrapper used `--unstable-kv`. |
+| SDK lint | **PASS** (exit 0) | `run-deno-lint.ts --root packages/sdk --ext ts,tsx`: 84 files, 1 batch, 0 occurrences and 0 rules. |
+| SDK format | **PASS** (exit 0) | `run-deno-fmt.ts --root packages/sdk --ext ts,tsx`: 84 files, 1 batch, 0 failed batches, 0 findings. |
+| Repository quality | **PASS** (exit 0) | `rtk proxy deno task quality:gate`: repository scan `ok: true`, 0 findings; SDK doctrine `FAIL=0`, `WARN=1`, `INFO=1`; the one warning is the known F-16 13-child finding. |
+
+Root `test`/`check`, S2 consumer/docs gates, and final publish/JSR gates remain `NOT_RUN` by slice
+boundary. Aspire, Docker, and `e2e:cli` were not run and no runtime lease was acquired.
 
 ## Handoff Notes
 
-- PLAN-EVAL should inspect the option-1 rationale, policy-aware single-flight design, overlapping
-  test synchronization, exactly-two-page docs scope, the tutorial's per-line dispositions and
-  page-level acceptance sentence, derived cascade evidence, and split 3+3 expected-red doc-lint
-  baselines first.
-- Do not infer approval from this plan or draft PR. Wait for explicit topic-orchestrator
-  confirmation of PLAN-EVAL PASS.
+- S1 is complete on exactly `cache-query.ts`, `cache-query_test.ts`, and run artifacts. S2 has not
+  started; the two docs pages, query-factory regression, and four generated mirrors are untouched.
+- Fresh Tier-A should review policy-aware joining, persistence-complete cleanup, A2 write-failure
+  join semantics, A3 synchronous registration, and the two deterministic regressions.
+- Stop after the S1 receipt. Do not begin S2 until the coordinator provides the next authorization;
+  separate-session IMPL-EVAL remains mandatory after implementation is complete.
