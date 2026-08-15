@@ -928,3 +928,50 @@ surface was **genuinely** sufficient or whether a gap was papered over by withho
 factory has stale-while-revalidate at all — which would trade one false claim for another.
 
 No runtime lease; PR remains draft at sole `status:plan`; merge decision stays with the coordinator.
+
+## 2026-08-15 — #1669 IMPL-EVAL terminal PASS; merge readiness handed to coordinator
+
+| Field | Value |
+| --- | --- |
+| Verdict | **PASS** — "Blocking items: none" |
+| Evaluated head | `9aa54ae2d4f53c705b0309ed472abf7bbccebe41`; the evaluator's own `git rev-parse HEAD` equals it |
+| Artifact commit | `313cc08d572ea7db1764abf2efdcc11f7a63abde` — **artifact-only**; product mutation vs the evaluated head is empty, so the verdict binding survives to the current PR head |
+| Route | `claude-fable-5` · medium · Remote Control — matched; job `f40814ce`, PID `634990`, bridge `session_01CMrdm9P2YwHxiNCT49C4Hf` |
+
+It re-executed every required static/fitness/runtime gate rather than accepting this topic's results,
+confirmed the approved scope is complete on exactly the authorized surface, and confirmed the known
+reds (`surface:diff`, `F-DOCT-5`, both pinned doc-lint invocations) are unchanged base→head and stated
+honestly as reds.
+
+**One figure of this topic's was refuted.** The `surface:diff` base==head *conclusion* is confirmed,
+but the record's **524** count is wrong — 517 observed. This topic measured 517 twice and recorded the
+implementer's 524 as an unreproduced discrepancy; the evaluator has now settled it. The stale figure
+should be corrected in the leaf record. Immaterial to the verdict, but it is a number in a run record
+that is simply wrong.
+
+**Five non-blocking advisories carried**, two of which are genuinely out of this leaf's scope and need
+a coordinator ruling rather than silent absorption:
+
+1. A unit-level fresh+flag case in `cache-query_test.ts` — that path remains ungranted by design.
+2. **Chapter 4, `layers.md`, and the homepage loaders are not yet on the action-then-metadata shape.**
+   This is the same false-narrative class the leaf just corrected, on pages outside the exactly-two
+   docs grant. It needs a ruling; it must not be quietly widened into this PR.
+3. A warm-stale write-failure caveat on the `??` fallback.
+4. The stale `524` `surface:diff` figure.
+5. `plan.md:237` wording versus actual `docs-accuracy` capability — the same class as the A1 error.
+
+## Merge-readiness tuple — coordinator-owned
+
+| Condition | State |
+| --- | --- |
+| Gates | PLAN-EVAL PASS, S1/S2-A/S2 Tier-A PASS, **IMPL-EVAL PASS** — all terminal |
+| PR head | `313cc08d5`, local == remote == PR, clean, `MERGEABLE` |
+| Verdict binding | intact — the evaluator's commit is artifact-only atop the evaluated head |
+| **Draft** | **still draft** — blocks merge |
+| **Label** | **`status:plan`** — not `status:ready-merge` |
+| **Boxes** | **PR 11 unchecked**; issue #1461 **6 unchecked** and still `status:triage` |
+| **CI** | expected **vacuous** while draft — real lanes run only after the PR leaves draft |
+
+No readiness, label, box, or merge action taken by this topic. Next fixes leaf
+(`sdk-typed-error-channel`, #1350) stays queued until #1669 merges and its shipped lifecycle is
+terminal.
