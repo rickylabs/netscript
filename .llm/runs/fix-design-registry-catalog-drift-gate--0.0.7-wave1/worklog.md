@@ -227,3 +227,48 @@ deno run --allow-read --allow-write --allow-run --allow-env \
 
 No product source changed during the leased gate. Automated evidence is not Tier-A review or
 IMPL-EVAL; this implementation thread stops after committing/pushing the receipt and bookkeeping.
+
+## Bounded Tier-A T-3 Repair — 2026-08-15
+
+Coordinator amendment head: `c5e06661b1b957f64f86b8bd6aec8da7c3dd2064`. This section is
+append-only; every earlier review, receipt, and gate row remains unchanged.
+
+N1 clarification: `registryMeta.total` and `registryMeta.version` remain static template literals;
+their equality with the manifest is enforced by the semantic drift gate rather than computed during
+generation.
+
+### Ownership Repair
+
+- Both `pull_request.paths` and `push.paths` in `fresh-ui-quality.yml` now own
+  `packages/cli/src/kernel/assets/app/routes/(design)/**`.
+- `ci-classify-changes.ts` mirrors that exact ownership through the normalized prefix
+  `packages/cli/src/kernel/assets/app/routes/(design)/`, setting `freshUi: true` only for that
+  design-asset subtree in addition to `packages/fresh-ui/**`.
+- The positive test verifies a catalog-template-only diff requests Fresh UI and that the workflow
+  contains the same filter twice; the negative test verifies an unrelated CLI file does not request
+  Fresh UI.
+
+### Repair Gate Evidence
+
+| Gate | Exact command | Raw exit | Result |
+| --- | --- | ---: | --- |
+| Red positive fixture | `run-deno-test.ts -- --allow-read .github/scripts/ci-classify-changes.test.ts` | 1 | Expected pre-fix failure: `POSITIVE: CLI design assets request the Fresh UI gate` observed `needsFreshUi=false`; 61 passed, 1 failed. |
+| Classifier/workflow suite | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-read .github/scripts/ci-classify-changes.test.ts` | 0 | 62 passed, 0 failed, including workflow structure. |
+| Positive ownership test | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-read --filter 'POSITIVE: CLI design assets request the Fresh UI gate' .github/scripts/ci-classify-changes.test.ts` | 0 | 1 passed, 0 failed. |
+| Negative scope test | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-read --filter 'NEGATIVE: unrelated CLI changes do not request the Fresh UI gate' .github/scripts/ci-classify-changes.test.ts` | 0 | 1 passed, 0 failed. |
+| Existing registry drift test | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-read packages/fresh-ui/tests/registry-doc-drift.test.ts` | 0 | 5 passed, 0 failed. |
+| Structured check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --file .github/scripts/ci-classify-changes.ts --file .github/scripts/ci-classify-changes.test.ts` | 0 | 2 files, 0 failed batches; wrapper supplied `--unstable-kv`. |
+| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --file .github/scripts/ci-classify-changes.ts --file .github/scripts/ci-classify-changes.test.ts` | 0 | 2 files, no findings. |
+| Initial scoped format verdict | `run-deno-fmt.ts` over the touched workflow + classifier files | 1 | Two TypeScript formatting findings; corrected with targeted `deno fmt`. YAML was not selected by the TypeScript wrapper. |
+| Corrected scoped format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file .github/scripts/ci-classify-changes.ts --file .github/scripts/ci-classify-changes.test.ts` | 0 | 2 files, no findings. |
+| Code quality | `deno task quality:scan` | 0 | `ok: true`, no findings; seven pre-existing reviewed allowances. |
+| Architecture | `deno task arch:check` | 0 | No failures; existing warnings only. |
+
+### Repair Boundaries
+
+- The original four product files are byte-unchanged from amendment head `c5e06661b`.
+- `deno.lock`, `packages/cli/deno.lock`, and `packages/fresh-ui/deno.lock` are unchanged.
+- `review-tier-a.md`, `receipts/fresh-browser.json`, and `drift.md` are unchanged.
+- No `fresh-browser`, Aspire, Docker, CLI E2E, or other expensive gate ran.
+- Automated repair gates are not Tier-A sign-off; stop after commit, explicit-refspec push, and one
+  structured PR comment for a fresh T-3/N1/N2 review.
