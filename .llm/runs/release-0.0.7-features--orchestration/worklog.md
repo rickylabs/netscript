@@ -1120,3 +1120,141 @@ with reasoning rather than decide it. It was told explicitly never to launch an 
 so the next leaf launched into the same `--slice-dir` will overwrite this record. Copied to
 `slices/codex-thread-ids-1293.md` to preserve it; treat the unsuffixed file as launcher-owned and
 transient, and snapshot it after every dispatch.
+
+## 2026-08-15 — coordinator grant: conditional PLAN-EVAL and the compatibility disposition
+
+### The disposition is now decided, and it closes D-13's open question
+
+**Preserve and wire** `PrismaMySqlOptions.onConnectionError`. Do **not** remove a shipped public
+option without owner breaking-change authority.
+
+This resolves the wire-or-remove choice I put to the leaf. The reasoning it encodes is the one D-13
+identified: the option is already published at `0.0.6` and already re-exported from the package's
+public surface, so wiring it is additive while removing it breaks consumers who typed against it —
+and a lane orchestrator has no authority to spend a breaking change. The dead-predicate defect is
+real, but the remedy is to make the predicate fire, not to delete the surface that promised it.
+
+### Conditional gate
+
+One fresh opposite-family PLAN-EVAL is authorized **only if both** hold:
+
+1. the same author returns a **clean, pushed, decision-heavy** plan; and
+2. my **Tier-A plan review** has run first.
+
+A plan that turns out mechanical does not get a formal gate — that is `lane-policy.md:61-64`'s
+conditional rule working as intended, and the conditional grant does not convert a mechanical plan
+into a decision-heavy one.
+
+### What the PLAN-EVAL must evaluate, when it runs
+
+Callback **timing and error semantics**; the public adapter export; explicit slow-type annotations;
+tests; and the surface/JSR gates. That list is narrower than "review the plan" and I will bind the
+evaluator to it rather than letting it roam.
+
+### Boundaries reaffirmed
+
+Docs-owned #1112 and the `docs/site/reference/prisma-adapter-mysql/` edits stay **out of this leaf**,
+with the follow-up dependency recorded rather than silently absorbed. No rival author; no launch
+before the author stops; the features serial queue continues autonomously after the gate.
+
+### Sequencing consequence
+
+The author is mid-turn at the time of this grant, so the disposition is **not** relayed yet — one
+active send per worktree. It goes to the same thread `01a0048f-8d95-7682-a3ce-1c1926aba75c` the
+moment its turn ends, before any gate, so the plan it finalizes is built on the decided disposition
+rather than on an open question.
+
+**Watch item:** `git status` in the leaf worktree already shows a modified `deno.lock`. The brief
+forbids lock churn absent a reviewed need; most likely a side effect of a `deno check` / `deno doc`
+run. Flagged for Tier-A — a plan-phase leaf should return a clean tree apart from its own run
+artifacts.
+
+## 2026-08-15 — coordinator close-gate ruling for #1293: split-close
+
+The acceptance-box-4 conflict I escalated is resolved, and resolved the conservative way.
+
+**Ruling.** #1293 acceptance box 4 is **preserved unchanged**. The product PR carries
+`Part of #1293` with **no closing keyword** and may merge on its own product gates and evaluation
+while #1293 remains open. That merge satisfies the #1293 → #1112 implementation prerequisite; the
+fixes/docs-example leaf then runs in its own orchestrator. Only after #1112 rewrites and verifies the
+executable example may box 4 be checked and #1293 closed.
+
+**Why this is the right shape.** The alternative was amending box 4 down to its package-owned half so
+`Closes #1293` could stand. That would have made the close-gate pass by shrinking the acceptance
+criterion to fit what one lane could reach — the failure mode `netscript-pr` records as the #260
+precedent, a box ticked without the evidence behind it. Split-close instead keeps the criterion
+honest and lets the issue stay open until the work it actually describes is done. It costs an extra
+open issue and buys a truthful board.
+
+**Consequences carried into the leaf and the gate.**
+
+- The PR body uses `Part of #1293`. A bare `#N` or `Refs #N` does not auto-close, which is exactly
+  the property wanted here — but the body must also state the remaining scope explicitly rather than
+  relying on the absence of a keyword to communicate it.
+- `acceptance-evidence` mirrors only the boxes this leaf can truthfully discharge. Box 4 is named as
+  blocked on #1112 with the prerequisite relationship stated.
+- #1293 keeps exactly one `status:` label through this leaf's life and does **not** move to
+  `status:shipped` when the product PR merges.
+- The PLAN-EVAL is **barred** from weakening, reinterpreting, or deciding this contract. It is a
+  cross-lane close contract, not a design decision, and an evaluator that "helpfully" proposes
+  `Closes #1293` would be relitigating coordinator authority. This is written into the evaluator
+  brief as a constraint with a stated reason, so it reads as a boundary rather than an omission.
+
+### #1293 Tier-A plan review and PLAN-EVAL dispatch
+
+**Tier-A plan review: `ACCEPTED` — decision-heavy.** Full artifact in
+`slices/tier-a-plan-review-1293.md`. I re-derived every load-bearing measured baseline rather than
+accepting it, because a wrong baseline poisons every later "we fixed it" claim:
+
+| Claim | Result |
+| --- | --- |
+| six pre-existing `private-type-ref` doc-lint errors | **confirmed** — "Found 6 documentation lint errors" |
+| capability probe swallows every failure | **confirmed** — `adapter.ts:700-718` returns `{ supportsRelationJoins: false }` on any error, so a bad credential is indistinguishable from an old server |
+| raw publish dry-run green, no real slow type | **confirmed** — `Success Dry run complete`, 8 files |
+| `examples/**` outside the publish set | **confirmed** — no `examples/` path in the 8 |
+| upstream keeps its connected class private, hook scoped narrowly | **confirmed and sharper** — `@prisma/adapter-mariadb@7.8.0` exports only the `PrismaMariaDb` factory; documents `onConnectionError` as "Callback attached to transaction connection `error` events"; invokes it at one site |
+
+Two facts the research did not draw out, added to the record and to the evaluator brief: our
+published signature is `(err: Error) => void`, **wider** than upstream's `(err: SqlError)` and
+unnarrowable without a breaking change, so the predicate must be carried by documentation and tests
+rather than by the type; and upstream's narrow predicate does **not** satisfy #1293's stated
+"pool fails" motivation. Precedent and intent genuinely conflict — the strongest single argument
+that `PLAN-EVAL: N/A` would have been wrong here.
+
+Three non-blocking gaps raised: duplicate-notification is a test assertion rather than a named
+design constraint; `executeScript` is enumerated in research but absent from the slice plan; and the
+box-4 conflict needed authority neither the leaf nor the gate holds.
+
+**Close-contract contradiction caught before dispatch.** The first pushed plan `ba2b4b7aa` predated
+the split-close ruling and still said "The PR body must eventually carry `Closes #1293`" in three
+places. An evaluator reading a plan that says `Closes` while its brief says `Part of` would either
+report a false contradiction or try to adjudicate a contract it was barred from touching. One tight
+same-author amendment turn fixed it: plan head `23c4d671b57282ddf2e5c3b834ac8e787d1dff09` adds
+locked decision **D8**, flips the open-decision row to `RESOLVED — coordinator ruling: split-close`,
+and rewrites the acceptance-evidence, S3 Tier-A-stop, and risk rows to the decided contract.
+Verified after: **zero** residual `Closes #1293`, local == remote, clean tree.
+
+**Gate dispatched.** Brief `slices/plan-eval-1293.md`, pinned to the exact plan head so a mismatch is
+a hard refusal.
+
+| Field | Value |
+| --- | --- |
+| Job / session | `75d9028e` / `75d9028e-0277-4b1c-bc2f-cefd0ce68dd7` |
+| Bridge session | `cse_01T55opXUMc1mMKDZaA8bRf3` (non-empty → Remote Control attached) |
+| cwd | `/home/codex/repos/netscript-007-features-1293` |
+| Requested route | native Claude **Fable 5 · medium** · Remote Control (`lane-policy.md:45`, opposite-family for a Codex plan) |
+| Observed route | `respawnFlags` = `--effort medium … --model claude-fable-5`; `providerEnv {}` |
+| Route verdict | **matched** — no fallback needed |
+| Brief delivered | `intent` length 11,790 bytes |
+| Created | `2026-08-15T08:56:43Z` |
+
+The gate is bound to the coordinator's five subjects and required to **rule** on the three open
+design decisions rather than hand them back. The three settled items — wire-don't-remove, #1112 out
+of scope, and split-close — are stated as boundaries with their reasons, with explicit instruction
+that disagreement earns one observational sentence and nothing more, so "already decided" cannot read
+as a gap the evaluator should fill.
+
+**D-2 update.** That entry recorded Fable 5 as unavailable when its allowance was exhausted during
+#1502's cycle 1, forcing the Opus 5 fallback. Fable 5 · medium was **accepted** for this dispatch
+with `providerEnv {}`, so the exhaustion was transient and the policy-preferred evaluator route is
+live again. No fallback is claimed here.
