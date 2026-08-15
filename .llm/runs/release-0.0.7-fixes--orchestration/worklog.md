@@ -1174,3 +1174,40 @@ repair first. No S1 acceptance item may require a type #1466 has not defined.
 
 Hard stop at fresh Tier-A before slice 2. No evaluator, no runtime lease, no Aspire/Docker/`e2e:cli`,
 no #1348/#1466 mutation, PR draft at sole `status:plan`.
+
+## 2026-08-15 — S4-R routed to documentation_review after account-wide Codex quota proof
+
+**Route change is quota-driven and recorded as such.** The canonical Codex implementation route is
+exhausted **account-wide** (`usageLimitExceeded`, `willRetry:false`, `hasCredits:false`,
+`balance:"0"`, `limitId:premium`, reset 2026-08-20 05:31), proven by a fresh thread
+`01a00767-…` in a fresh worktree failing identically. S4-R is **run-artifact-only plan maintenance**,
+which sits inside the documentation-authoring exception, so it is routed to a
+`documentation_review` agent. **The product repair itself stays parked on the Codex route** and is
+explicitly out of this agent's authority.
+
+| Field | Value |
+| --- | --- |
+| Job id | `944115a6` |
+| Session id | `944115a6-0ac7-477f-81c1-e9e57519d507` |
+| OS PID | `1035332` |
+| Bridge session id | `session_01TYBPuyVoK8Bc8926DfnPah` |
+| Remote Control URL | `https://claude.ai/code/session_01TYBPuyVoK8Bc8926DfnPah` |
+| `cwd` | `/home/codex/repos/netscript-007-leaf-typed-error-s4r` (dedicated detached worktree) |
+| Scratch branch | `s4r/doc-amendment` at exact content head `db8aadd9542c38a305efffbd7017c56d0abf4e01` |
+| Requested route | native Claude · `claude-sonnet-5` · effort `high` · Remote Control, `documentation_review` lane |
+| Observed route | `respawnFlags`: `--permission-mode bypassPermissions --remote-control --name "NetScript 0.0.7 #1671 S4-R doc-amendment" --effort high --model claude-sonnet-5` |
+| Route verdict | **matched** |
+| Attachment | first `type: user` record 6496 chars beginning `use harness` — proven, not assumed |
+
+The dedicated worktree preserves the occupied leaf sender registry; the scratch branch is never
+pushed, and the agent pushes only by explicit refspec to `fix/sdk-typed-error-channel`. Its authority
+is deliberately narrower than an implementation slice: existing run artifacts, commit/push, rewrite
+the S4 receipt comment, stop. No product/test/docs/lock file, no new file, no repair, no runtime, no
+evaluator, no label/issue/checkbox/readiness/merge, and #1348/#1466 untouched.
+
+It is told plainly that it is the **generator** and must not self-review or self-certify. A separate
+**Minimax M3 · high** PLAN-EVAL follows via the canonical native-quota fallback, preserving
+generator ≠ evaluator across a route where both native families are unavailable or already used.
+Terminal PASS is required before the three-product-file repair is released — and that repair remains
+on the Codex route regardless, so no outside-plan product implementation is authorized by this
+routing.
