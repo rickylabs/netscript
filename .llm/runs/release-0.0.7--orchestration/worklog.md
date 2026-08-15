@@ -873,3 +873,26 @@
   the same original author to restore a non-Node path boundary, prove the victim and repaired probe
   in one batch, preserve the failed receipt, and use distinct replacement receipts. No runtime or
   evaluator work is active.
+
+## 2026-08-15T16:43:09Z — F3 repair passes and receives the singleton runtime lease
+
+- #1664's isolated attribution proved the leaf caused the shared-batch timer red: the unchanged
+  victim passes alone and with the F3 probe on `@std/path`, but fails when the probe imports
+  `node:path`. Features checkpoint `ca10ffaeb` recorded that evidence before the same Sol/high author
+  repaired the boundary. Product head `193e665ba` restores only a Deno-native path dependency and
+  evidence head `8940e9266` preserves the first FAIL plus four distinct PASS/SUFFICIENT receipts:
+  root check 2,937 files/25 batches/0 diagnostics, root test 4,212/0/19, publish dry-run PASS, and
+  architecture zero failures. Fresh features Tier-A independently reran the decisive combined batch
+  and passed at topic `c7ce2c3f6`.
+- Clean preflight verified leaf local = remote = PR at `8940e9266`, zero Docker containers, no Aspire
+  application/AppHost/DCP, no browser, no relevant listener, and no competing expensive lease. The
+  coordinator persisted active lease `app-service-client-wiring-f3-runtime` before dispatch. The
+  features supervisor must run suite-owned `scaffold.runtime` first, clean Aspire/Docker and prove an
+  empty host, then may run catalog-backed `fresh-browser` serially only on scaffold PASS; a second
+  cleanup and empty-host audit are mandatory before release.
+- Central state now also reconciles #1663's stale evaluator lease to its terminal cycle-2
+  `FAIL_PLAN` owner boundary; no third evaluator was launched. Internals #1666 is clean/pushed at
+  amended plan head `a3f6b87b5`, with the tenth refusal-test path and browser waiver recorded before
+  fresh Tier-A/PLAN-EVAL. Fixes #1461 is active on its original/new Sol/medium author in
+  research/plan-only mode. PR #1665 and its five closed issues have sole `status:shipped`; follow-up
+  export-corpus debt is tracked by #1668.

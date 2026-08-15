@@ -501,3 +501,21 @@ Sol/high author is bounded to remove the F3 Node path/type pollution, after an i
 then prove the victim+probe in one batch before distinct replacement receipts and fresh Tier-A. No
 lease, Aspire, Docker, browser, runtime gate, or evaluator is authorized. #1663 remains the only
 owner-only decision boundary.
+
+Resume from the authoritative `2026-08-15T16:43:09Z` transition. Main is
+`3e8e146a4aedf8ee0afec15c83ddaefc171c71f9`. #1665 and all five linked issues have sole
+`status:shipped`; #1668 owns the unrelated stale MCP export corpus. Fixes topic `f9bb928ce` has one
+research/plan-only #1461 author at base main, no evaluator or runtime lease. Internals topic
+`f96e4f787` pushed #1666's coordinator scope amendment as `a3f6b87b5`; run fresh Tier-A over that
+immutable head, then exactly one fresh separate native Fable 5/medium Remote Control PLAN-EVAL.
+#1663 remains parked at the owner-only exceptional-third-evaluator boundary and its stale active
+cycle-2 lease record is corrected to terminal `FAIL_PLAN`; do not relaunch or mutate it.
+
+#1664 is clean/pushed at evidence head `8940e9266`, content head `193e665ba`. The Node-global repair
+has fresh features Tier-A PASS at topic `c7ce2c3f6` and four replacement receipts are
+PASS/SUFFICIENT while the original FAIL stays append-only. It owns the singleton active lease
+`app-service-client-wiring-f3-runtime`: run suite-owned `scaffold.runtime` first, mandatory
+Aspire/Docker cleanup plus empty-host audit; only on PASS run catalog-backed `fresh-browser`
+serially, then browser/runtime cleanup and final audit. No evaluator before both runtime gates and
+topic reconciliation. Coordinator route remains GPT-5.6-SOL/high through Codex Remote Control,
+never max. Preserve every native Claude topic supervisor and the #1651 option-1 adapter boundary.

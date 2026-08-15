@@ -578,3 +578,15 @@ implementation thread.
   timer return type into a Deno check batch; file ownership alone cannot establish non-causality.
   Preserve the original failed receipt, prove the import/batch effect with an isolated before/after,
   and require amendment-before-repair plus a distinct replacement receipt if the leaf caused it.
+- **Lease records must follow terminal truth, not session attachment metadata:** #1663 cycle 2 had
+  already committed `FAIL_PLAN`, but central `evaluatorLeases` still said `active`. That stale bit
+  could falsely consume the lane evaluator limit or invite an unsafe resume. The record is now
+  terminal with the exact verdict commit/comment and the exceptional-third-cycle owner boundary.
+- **Runtime retry authority belongs to the evidence head:** #1664's second runtime attempt is leased
+  at artifact head `8940e9266`, not merely product head `193e665ba`, so the preserved first FAIL,
+  replacement receipts, and Tier-A provenance are immutable inputs to the gate. The runtime probe
+  executes product content, but coordinator authorization binds the complete reviewed evidence tree.
+- **Fail-closed gate semantics need durable negative tests:** #1666's tenth path is justified because
+  one-off terminal probes cannot fail a future CI run. Empty/malformed reasons, unknown coverage
+  modes, invented symbols, and omitted symbols must remain persistent assertions even though that
+  adds one test-only file to the originally frozen surface.

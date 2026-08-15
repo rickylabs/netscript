@@ -630,3 +630,18 @@ all five closing-keyword issues closed automatically. #1664's isolated pre-F3 ar
 so the new shared-batch TS2322 cannot be classified as carried baseline. The features supervisor has
 bounded the likely repair to removing Node path/type pollution while preserving every F3 contract.
 Runtime ownership remains empty.
+
+### Live transition — 2026-08-15T16:43:09Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Queue exhausted and parked | Do not invent post-freeze work |
+| internals | #1666 scope amendment `a3f6b87b5` is pushed; fresh Tier-A is next | Then one Fable 5/medium Remote Control PLAN-EVAL cycle 1; keep #1663 parked at its owner-only third-cycle boundary |
+| fixes | #1461 Sol/medium author is researching and planning from main `3e8e146a4` | No product mutation before draft plan, fresh Tier-A, and required PLAN-EVAL; no runtime lease |
+| features | #1664 repair evidence `8940e9266` and Tier-A topic `c7ce2c3f6` are PASS; singleton runtime lease is active | Run `scaffold.runtime`, clean/audit, then `fresh-browser` only on PASS, clean/audit again; no evaluator yet |
+
+#1664 local, remote, and PR heads are equal and the clean-host preflight found zero Docker, Aspire
+application/AppHost/DCP, browser, relevant port, or competing lease owner. #1665 lifecycle is fully
+normalized to shipped and #1668 owns its unrelated export-corpus follow-up. The coordinator remains
+GPT-5.6-SOL/high over Codex Remote Control, never max; all existing native Claude topic supervisors
+and #1651's accepted keep-and-narrow adapter boundary are preserved.
