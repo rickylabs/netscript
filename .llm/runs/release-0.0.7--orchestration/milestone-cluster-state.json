@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
-  "currentMainSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
+  "currentMainSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -73,7 +73,7 @@
         "pid": 23955,
         "bridgeSessionId": "session_01HqFtKQtyJcHBEn1MghQdFX",
         "remoteControlUrl": "https://claude.ai/code/session_01HqFtKQtyJcHBEn1MghQdFX",
-        "topicHeadSha": "a3c4f6b92b37e647d44f9f295155949e1aabb530",
+        "topicHeadSha": "dd5ec91e5",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle"
@@ -115,7 +115,7 @@
         "pid": 26724,
         "bridgeSessionId": "session_014pCd2QWkCscgZpVdjcUPST",
         "remoteControlUrl": "https://claude.ai/code/session_014pCd2QWkCscgZpVdjcUPST",
-        "topicHeadSha": "42a743a7f431e66cbacf4b930016fd24f6360ce4",
+        "topicHeadSha": "a4b3b0c5a",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle"
@@ -166,7 +166,7 @@
         "sessionId": "19621a0b-c6a0-47c6-b826-93c1634a6875",
         "bridgeSessionId": "session_01LQBHX8KpA5aYtDraq46J8a",
         "remoteControlUrl": "https://claude.ai/code/session_01LQBHX8KpA5aYtDraq46J8a",
-        "topicHeadSha": "be2524a92",
+        "topicHeadSha": "680e0b0d2",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
         "legacyState": "parked_idle"
@@ -1006,7 +1006,7 @@
     {
       "id": "ai-mcp-pool-isolation",
       "lane": "fixes",
-      "phase": "ready",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "284dda90a17a13a7e5e8e9834e5411b58887131b",
       "currentPrHeadSha": "f74695bc4d0b916ed52ae922d96263f00c5ca6df",
@@ -1017,7 +1017,7 @@
       "branch": "fix/ai-mcp-pool-isolation",
       "worktree": "/home/codex/repos/netscript-007-leaf-ai-mcp-pool",
       "prNumber": 1661,
-      "implementationState": "repair_delta_pass_readiness_ci_active",
+      "implementationState": "merged_and_lifecycle_normalized",
       "scopeBlockerHeadSha": "1d4533462a088ad902ac7dd71be88764463fcd5d",
       "scopeRulingTopicHeadSha": "df20bb5a694ad95afd33ff5ca4f141a4199182f5",
       "scopeRulingLeafArtifactSha": "6db182503b219d76c7db23f89c71ec9e467c2f40",
@@ -1074,7 +1074,11 @@
       "implementationEvaluationCycle3Verdict": "PASS",
       "implementationEvaluatorCycle3CommitSha": "f74695bc4d0b916ed52ae922d96263f00c5ca6df",
       "implementationEvaluationCycle3CommentUrl": "https://github.com/rickylabs/netscript/pull/1661#issuecomment-5301873258",
-      "readinessState": "active_exact_head_ci",
+      "readinessState": "complete",
+      "readinessChecks": "21 terminal current-head checks: success or policy skip, zero failures/active; zero review threads; corrected PR body; MERGEABLE/CLEAN",
+      "mergeCommitSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
+      "mergedAt": "2026-08-15T10:54:05.000Z",
+      "issueCompletionState": "#1448 closed; PR #1661 and issue #1448 both have sole status:shipped",
       "ciFailure": {
         "state": "resolved_repair_under_formal_evaluation",
         "runId": 31878428521,
@@ -1155,17 +1159,21 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
-      "currentPrHeadSha": null,
+      "currentPrHeadSha": "6aea4a5eaac4932605435d2a346da2c545f33d92",
       "issueNumbers": [1355, 1360],
       "implementerAgentId": "01a004f9-f033-7592-a0bc-63927753fb43",
       "implementerRoute": "openai / gpt-5.6-sol / high / approval never / dangerFullAccess",
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
-      "prNumber": null,
-      "implementationState": "research_plan_only",
+      "prNumber": 1664,
+      "implementationState": "tier_a_plan_repair_active",
       "dispatchTopicHeadSha": "4be6821d95f830327b45c8f816c7f965e34bde49",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
-      "expensiveGateContract": "scaffold.runtime and fresh-browser are forbidden until topic review establishes each is load-bearing and the coordinator grants the required lease",
+      "tierAPlanState": "CHANGES_REQUESTED",
+      "tierAPlanTopicCheckpointSha": "680e0b0d2",
+      "planEvaluationRequired": true,
+      "planDecisionBoundary": "keep additive SDK overload versus direct queryKey filter open for formal PLAN-EVAL; repair scaffold.runtime release-gate evidence class and exact scenario assertions first",
+      "expensiveGateContract": "both gates are load-bearing after cheap convergence: scaffold.runtime uses its suite-owned release-gate command/evidence plus central lease (never run-gate catalog); fresh-browser uses the catalog receipt; run serially only after coordinator grant",
       "receiptRefs": []
     },
     {
@@ -1924,7 +1932,7 @@
     }
   ],
   "exactMainEvidence": {
-    "gitHead": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
+    "gitHead": "baf1cdf67a4e931af17b4772ddf6101f36152184",
     "surface": "repository",
     "expectedGateIds": [
       "arch-check",
@@ -1950,5 +1958,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T10:46:30.000Z"
+  "updatedAt": "2026-08-15T10:56:30.000Z"
 }

@@ -465,3 +465,14 @@ The malformed config stays byte-identical, broad fixture skipping is forbidden, 
 
 #1661 repair-delta IMPL-EVAL returned `PASS` at `f74695bc4`; exact-head readiness CI is active.
 Merge remains coordinator-only after terminal green and metadata reconciliation.
+
+### Live transition — 2026-08-15T10:56:30Z
+
+#1661 reached terminal exact-head green and was coordinator squash-merged as main `baf1cdf67`;
+#1448 auto-closed and both surfaces have sole `status:shipped`. The fixes lane is reconciling before
+releasing `sdk-cache-surface-and-telemetry` from current main.
+
+Draft #1664 is at clean Phase-1 head `6aea4a5ea`. PLAN-EVAL is required. Tier-A requested one
+repair: preserve `scaffold.runtime` as a suite-owned release gate rather than inventing a run-gate
+catalog entry/receipt, and name the exact two-service/invalidation/hydration assertions. Both
+expensive gates remain load-bearing after cheap convergence; no lease exists yet.

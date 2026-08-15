@@ -433,3 +433,12 @@ implementation thread.
   mechanism shared by fmt and lint; configuration prose alone is not evidence. The contract now
   requires non-empty selection and real-source negative controls so the repair cannot become a
   broad fixture false green.
+- **Exact-head reruns inspect the full PR:** #1661's evaluator-only final commit caused another
+  repo-wide CI run because the PR still contains product changes. The classifier already maps
+  `.llm/runs/**` to no capabilities when that is the whole diff; it correctly did not pretend the
+  full PR was artifact-only. Redundant elapsed time is not sufficient reason to weaken exact-head
+  attestation.
+- **Release gates are not static catalog gates:** #1664's plan treated the absent
+  `scaffold.runtime` catalog entry as missing plumbing. The absence is deliberate: the harness
+  owns it as a suite-run release-gate class. Its exact-head output and central cleanup lease are the
+  evidence; only `fresh-browser` receives a normal run-gate receipt.

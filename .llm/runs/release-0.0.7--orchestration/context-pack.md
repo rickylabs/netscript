@@ -316,3 +316,13 @@ is forbidden, both no-flag scoped commands and negative controls are binding. `s
 is waived as matrix-`n/a`. The same Codex author repairs only the plan before cycle 2. #1661's
 repair-delta evaluation is `PASS` at `f74695bc4`; await terminal exact-head CI and corrected PR
 metadata, then coordinator merge/lifecycle normalization and only then release the next fixes leaf.
+
+Resume from the newer `2026-08-15T10:56:30Z` transition. Main is
+`baf1cdf67a4e931af17b4772ddf6101f36152184`: #1661/#1448 are shipped and the fixes supervisor must
+release `sdk-cache-surface-and-telemetry` only after durable reconciliation. #1664 is draft at
+clean head `6aea4a5ea`; PLAN-EVAL is required, but its author is first repairing the Tier-A evidence
+class: `scaffold.runtime` is suite-owned release-gate evidence and never a catalog/run-gate receipt,
+while `fresh-browser` is a catalog gate. Both remain lease-blocked and load-bearing after cheap
+convergence. #1663 remains on the same Codex plan-repair turn after its marker prototype revealed a
+second honest nested-config batching seam; accept only a proof that keeps healthy unmarked fixtures
+selected and both real-source negative controls alive.

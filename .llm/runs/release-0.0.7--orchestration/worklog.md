@@ -548,3 +548,19 @@
 - #1661 repair-delta evaluator independently passed at `f74695bc4`, comment `5301873258`, after
   reproducing 4152/0/19 and the publish invariant. Current exact-head CI is the only remaining
   technical readiness gate; the fixes supervisor is updating the PR body in place before its tuple.
+
+## 2026-08-15T10:56:30Z — #1661 shipped and #1664 plan gated
+
+- Independently verified #1661 at exact head `f74695bc4`: current check-test 4152/0/19, quality and
+  all required contexts terminal green/policy-skipped, zero review threads, corrected PR body,
+  MERGEABLE/CLEAN. Transitioned it to sole `status:ready-merge`, re-resolved the tuple, and
+  coordinator squash-merged as main `baf1cdf67` at 10:54:05Z. #1448 auto-closed; PR and issue are
+  normalized to sole `status:shipped`.
+- The final evaluator-only commit still reran full CI because classification correctly considers
+  the complete PR diff, not merely the last commit. That is exact-head attestation, not a path
+  classifier false positive, so no skip weakening is authorized.
+- #1664 opened correctly at its first slice and stopped clean at `6aea4a5ea`. Coordinator requires
+  formal PLAN-EVAL and agrees both runtime gates are load-bearing only after cheap convergence.
+  Tier-A rejected the proposed `scaffold.runtime` catalog entry: it remains the separate
+  suite-owned release-gate class, while `fresh-browser` retains its normal run-gate receipt. The
+  same author is repairing this evidence class and making scenario assertions falsifiable.
