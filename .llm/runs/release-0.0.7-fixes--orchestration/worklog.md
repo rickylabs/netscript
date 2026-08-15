@@ -368,3 +368,63 @@ Local evidence is the substantive proof today: root `deno task test` `4203/0/19`
 
 Draft state, labels, box ticking, and merge remain the coordinator's. This topic made no readiness or
 label change. Next fixes leaf stays queued until #1665 merge and shipped lifecycle are terminal.
+
+## 2026-08-15 — #1665 IMPL-EVAL terminal PASS; merge-readiness review
+
+| Field | Value |
+| --- | --- |
+| Verdict | **PASS** — "all five issue acceptances met at runtime"; blocking list **empty** |
+| Evaluated source head | `9a26c107afa75bf1f38b78fe96c6df533b156c36`; the evaluator's own `git rev-parse HEAD` in its identity block equals it |
+| Artifact commit | `0fed4d7ffb8c655a00846fbf545805bd2e184fb0`, delta is **exactly one file**, `impl-eval.md` |
+| Product tree | `git diff 9a26c107a..0fed4d7ff -- packages/ plugins/ docs/ tools/ deno.json deno.lock` is **empty**, so the verdict still binds to the current PR head's product tree |
+| Evaluator identity | PID `126694`, job `1fbb1c07`, session `1fbb1c07-3b05-4d90-ab9c-c827c5aca2d5`, bridge `session_01JePyQuiERLe8GeWWKQp5wL`, cwd = leaf worktree |
+| Route | requested/observed `claude-fable-5` · `medium` · `--remote-control` — **matched** (from `respawnFlags`) |
+| Attachment | first `type: user` record 7868 chars beginning `use harness` |
+
+Generator ≠ evaluator held four ways: Codex `01a00516-…` (`gpt-5.6-sol`) implemented; this
+orchestrator (Opus 5) ran all three Tier-As; PLAN-EVAL was a third session; this is a fourth.
+
+**The evaluator improved on this topic's own evidence in two places.**
+
+1. **`surface:diff` no-regression.** I compared *counts* (517 at head, 517 at base). The evaluator
+   diffed the **sorted MAJOR sets** at base and head and found them **identical** — a strictly
+   stronger proof, since equal counts could in principle mask an added/removed pair. It also named
+   the stale artifact: `baselines/public-surfaces.json`.
+2. **The 524-vs-517 discrepancy is resolved.** The evaluator obtained 517 twice and recorded the
+   implementer's 524 as **"Not reproduced"**, most likely measured mid-slice against different local
+   state. Either number is a stale-baseline FAIL, never a pass.
+
+It also reported the `typed-queue` flake honestly as **"Not hit — single run, not re-run"**
+(`4203/0/19`, exit 0), rather than implying repeated confirmation.
+
+## Merge-readiness review — NOT ready; three coordinator actions outstanding
+
+CI on head `0fed4d7ff` reads green, and that reading is misleading: **2 pass, 19 skipping, zero
+failures — because the PR is still a draft.** Everything that would actually verify this change is
+skipped: `check-test`, `quality`, `code-quality`, `code-quality-repo`, `surface-diff`, and
+`close-gate`. Only `build` and `classify docs-site changes` ran. The `ci:skip-e2e` /
+`ci:skip-scaffold` labels do not explain those skips — the draft state does. **This PR has not been
+validated by CI at all.** The real verification is local: root `deno task test` `4203/0/19` (twice by
+this topic, once by the evaluator), root check uncached over 2925 files, and the focused SDK gates.
+
+Outstanding, all coordinator-only:
+
+1. **Flip out of draft** — this is what actually starts the core CI lanes on `0fed4d7ff`.
+2. **Tick the five acceptance boxes.** All five are now evidenced: PLAN-EVAL PASS (`cd5193b66`);
+   real-KV RED→GREEN (RED independently reproduced by this topic in a detached pre-fix worktree,
+   GREEN at S2/S3); no public surface widened (helpers absent from `src/mod.ts` and
+   `src/cache/mod.ts`, confirmed by the evaluator); gate bar met with the two pre-existing reds
+   named as pre-existing; IMPL-EVAL PASS (`0fed4d7ff`).
+3. **Advance `status:plan`** to the correct lifecycle label. It is stale — the leaf is past plan,
+   impl, and impl-eval.
+
+Note for whoever performs step 1: flipping to non-draft will run CI at `0fed4d7ff`, whose product
+tree is identical to the evaluated head, so the IMPL-EVAL verdict remains bound to what CI will test.
+Ticking boxes or relabelling does not re-trigger CI.
+
+Both carried red gates remain red and must not be described otherwise: `surface:diff` (stale
+`baselines/public-surfaces.json`, identical MAJOR sets at base and head) and JSR `F-DOCT-5`
+(13 children at base and head). The six pinned doc-lint diagnostics are unchanged.
+
+Still recommended and still not filed by this session: a tracked issue for the `packages/queue`
+`typed-queue_test.ts` DLQ timing flake.
