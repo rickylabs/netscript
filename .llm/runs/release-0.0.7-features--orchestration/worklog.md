@@ -3338,3 +3338,54 @@ verified by the same composition that exposed the defect, not by a broader green
 
 **Verdict `PASS`.** Cheap convergence is re-established at `193e665ba`. `fresh-browser` remains
 NOT_RUN, no lease is held, and no evaluator has been launched.
+
+## 2026-08-15 — S5 expensive-gate lease granted and dispatched
+
+Central lease record `32df87c7c`. Singleton runtime lease held by this leaf.
+
+**Pre-dispatch verification, done by me rather than accepted:**
+
+| Check | Result |
+| --- | --- |
+| Heads | local == remote == PR #1664 == `8940e9266630a3cc5368153722747e45d30aec3b` |
+| Content head | `193e665ba0592273622253e3e9a1ebfc019b1be9` |
+| Content→evidence delta | run artifacts only — no product source |
+| Tree / PR | clean / **draft** |
+| Host | `agentic:leak-check` → aspire `ok`, docker `ok`, **`survivors: []`** |
+
+The host proof matters more than the head proof here: it establishes that anything running from this
+point is attributable to this lease. Without it, a pre-existing container discovered later would be
+indistinguishable from one this leaf leaked.
+
+**The dispatched contract, serial and conditional:**
+
+1. **`scaffold.runtime`** via `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`. It
+   is the **release-gate class**, so its evidence is suite-owned exact-head output plus the central
+   lease/cleanup record — **no `run-gate` receipt, no catalog entry**. That distinction was ruled at
+   plan stage (T-1) and holds here.
+2. **Mandatory cleanup and an empty-host proof regardless of verdict.** A failed gate does not excuse
+   a dirty host. Proof is `leak-check` with both probes `ok` and `survivors: []`; anything else is a
+   leak to report, not tidy away. `--owned-root` declared if the suite starts resources outside the
+   worktree, so ownership is provable rather than escalating as someone else's.
+3. **`fresh-browser` only if step 1 PASSED and the inter-gate audit is clean** — host proven empty,
+   tree clean, head unchanged. If `scaffold.runtime` fails, stop; do not run the second gate "to see
+   if it also works". Unlike step 1, `fresh-browser` **is** catalog-backed (`catalog.ts:55` →
+   `deno task test:browser`) and produces a normal `run-gate` receipt at the immutable head.
+4. **Final cleanup and empty-host proof** to the same standard.
+
+Worth noting what step 3 will exercise for the first time: S3's `query-hydration-age_browser.ts`
+fixture, comparing `hydrationNow - 60_000` against `hydrationNow` with query-function counts of 1
+versus 0. Every earlier slice wired and type-checked it; this is the first execution. The #1360 seam
+shipped unexercised once already — that is the whole reason the fixture exists — so this run is the
+first real evidence the hydration fix behaves rather than merely compiles.
+
+**Failure handling:** stop and attribute, naming the failing suite/test and whether it reproduces at
+a pre-implementation commit; no product repair under the lease, since a runtime failure needs review
+before a fix exactly as the S4 gates did; and cleanup still runs.
+
+**Evidence is append-only.** `s4-format-failure.md`, `s4-export-doc-failure.md`,
+`s4-test-failure.md`, the Fresh 45 and SDK 3 `PRE_EXISTING_FAIL` entries and the separately named
+plugin-streams diagnostic all stay exactly as written. A green S5 does not retroactively tidy a red
+S4.
+
+No evaluator, no S6, no other lane touched.
