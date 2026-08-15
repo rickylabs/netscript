@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
-  "currentMainSha": "473e8d75b5281c93dc4729d99f3358a34f2bd687",
+  "currentMainSha": "da574111af05a5cded74250128b196fcab870274",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -42,10 +42,10 @@
         "observedEffort": "high",
         "backgroundAgentId": "fcf04b0f",
         "sessionId": "fcf04b0f-3c2f-4844-9508-84c52ce8298c",
-        "pid": 2429469,
+        "pid": 23964,
         "bridgeSessionId": "session_01PLRauSHN1PnvrNF2ucefF6",
         "remoteControlUrl": "https://claude.ai/code/session_01PLRauSHN1PnvrNF2ucefF6",
-        "topicHeadSha": "f0508b2e6999d70c88204f67fb1a55b0c21f4575",
+        "topicHeadSha": "b08e18ca253b0ed21a97057d2b311c4359fcebb1",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e19b-71d1-95ce-8c72559eb026",
         "legacyState": "parked_offline"
@@ -69,10 +69,10 @@
         "observedEffort": "high",
         "backgroundAgentId": "f7691917",
         "sessionId": "f7691917-0be2-4bcd-8839-43d3fc809c34",
-        "pid": 2429478,
+        "pid": 23955,
         "bridgeSessionId": "session_01HqFtKQtyJcHBEn1MghQdFX",
         "remoteControlUrl": "https://claude.ai/code/session_01HqFtKQtyJcHBEn1MghQdFX",
-        "topicHeadSha": "aed0e5d89557de2e75e3569b0e0ba5ea80862fb0",
+        "topicHeadSha": "917a1bc727e5b2c3b98bea4243f7a2d5a741f7f5",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle"
@@ -111,10 +111,10 @@
         "observedEffort": "high",
         "backgroundAgentId": "c7597d28",
         "sessionId": "c7597d28-6774-44c9-aa00-b8b40b776165",
-        "pid": 2430399,
+        "pid": 26724,
         "bridgeSessionId": "session_014pCd2QWkCscgZpVdjcUPST",
         "remoteControlUrl": "https://claude.ai/code/session_014pCd2QWkCscgZpVdjcUPST",
-        "topicHeadSha": "2b1fe8e2e1e8a0b5620175816e67b9e3846e94f4",
+        "topicHeadSha": "c469704f6ba472fda9761c36b955422f1b99b817",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle"
@@ -153,7 +153,7 @@
       "orchestratorAgentId": "topic-features-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "active",
+        "state": "blocked",
         "worktree": "/home/codex/repos/netscript-007-features",
         "branch": "orchestrator/release-0.0.7-features",
         "requestedModel": "claude-opus-5",
@@ -163,10 +163,9 @@
         "observedEffort": "high",
         "backgroundAgentId": "19621a0b",
         "sessionId": "19621a0b-c6a0-47c6-b826-93c1634a6875",
-        "pid": 2430404,
         "bridgeSessionId": "session_01LQBHX8KpA5aYtDraq46J8a",
         "remoteControlUrl": "https://claude.ai/code/session_01LQBHX8KpA5aYtDraq46J8a",
-        "topicHeadSha": "fed3f81197f00d8a23bdc98705f0cba0e57fc2f5",
+        "topicHeadSha": "318fddcd2c239599d0f46d7f0e72ae604066363c",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
         "legacyState": "parked_idle"
@@ -221,11 +220,11 @@
     },
     {
       "number": 1262,
-      "state": "open"
+      "state": "closed"
     },
     {
       "number": 1263,
-      "state": "open"
+      "state": "closed"
     },
     {
       "number": 1293,
@@ -369,7 +368,7 @@
     },
     {
       "number": 1588,
-      "state": "open"
+      "state": "closed"
     },
     {
       "number": 1590,
@@ -451,9 +450,15 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "d35cbca30872d1f55118d63437638e93270c2ac3",
-      "currentPrHeadSha": "54e1c3bff7efc5df9da51bc06a15976717fa0929",
+      "currentPrHeadSha": "e95f4838038a27a0f209d2ce37c9f53bd4ed4299",
       "evaluatorCommitSha": "a790e91e26a4fb84636b4f3c57bd6444196b4ca9",
       "evaluationVerdict": "PASS",
+      "implementationEvaluationState": "complete",
+      "implementationEvaluationCycle": 1,
+      "implementationEvaluatedHeadSha": "15429cf8487cfe3504ae0443fd435d2a72d4528b",
+      "implementationEvaluatorAgentId": "c6950ed9-7405-4f28-9464-1e1977f2979c",
+      "implementationEvaluatorCommitSha": "e95f4838038a27a0f209d2ce37c9f53bd4ed4299",
+      "implementationEvaluationVerdict": "FAIL_FIX",
       "issueNumbers": [1551],
       "implementerAgentId": "019ffcc9-16c2-7573-b7f6-d627172408e8",
       "evaluatorAgentId": "40a06314-b69a-4ca0-a4a0-1224c5e377ca",
@@ -472,8 +477,11 @@
         "completedAt": "2026-08-15T05:07:09.377Z",
         "requireInPlaceReplacement": true
       },
-      "s3State": "running",
-      "s3GrantedAt": "2026-08-15T05:13:42.084Z"
+      "s3State": "complete",
+      "s3GrantedAt": "2026-08-15T05:13:42.084Z",
+      "s3CompletedHeadSha": "15429cf8487cfe3504ae0443fd435d2a72d4528b",
+      "repairState": "running",
+      "repairGrantedAt": "2026-08-15T05:48:07.224Z"
     },
     {
       "id": "quality-scan-allowance-rail",
@@ -544,10 +552,10 @@
     {
       "id": "scaffold-generated-output-correctness",
       "lane": "fixes",
-      "phase": "evaluating",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5",
-      "currentPrHeadSha": "f178ac663597a7b9cfd2e6a528026426d39d1173",
+      "currentPrHeadSha": "7cfaf70cc5a42e74af4ae8b7be76d5a5cbf4fcc5",
       "evaluatorCommitSha": "b8fc5eb53a530d337602f7dc377239651a57d428",
       "evaluationCycle": 2,
       "evaluationVerdict": "PASS",
@@ -560,8 +568,21 @@
       "planRepairHeadSha": "5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5",
       "tierASignoffHeadSha": "f178ac663597a7b9cfd2e6a528026426d39d1173",
       "tierAVerdict": "PASS_TO_IMPL_EVAL",
-      "implementationEvaluationState": "running",
+      "implementationEvaluationState": "complete",
       "implementationEvaluatorAgentId": "19f1be7b-db7d-47c0-b0f1-7cfca302d44a",
+      "implementationEvaluatorCommitSha": "70843d169d4e7f4c8f810d663a142cc66b7969ff",
+      "implementationEvaluationVerdict": "PASS",
+      "mergeCommitSha": "da574111af05a5cded74250128b196fcab870274",
+      "mergedAt": "2026-08-15T05:36:48.000Z",
+      "postMergeCi": {
+        "state": "success",
+        "ciRunId": 31867377599,
+        "docsRunId": 31867378176,
+        "codeQualityRunId": 31867377620,
+        "checkTestDuration": "8m54s",
+        "qualityDuration": "1m48s",
+        "warning": "actions/upload-artifact@v5 forced to Node.js 24 because Node.js 20 is deprecated"
+      },
       "issueNumbers": [1262, 1263, 1588],
       "implementerAgentId": "019ffcca-8be0-74c2-bb0e-c82cf5ce3c85",
       "evaluatorAgentId": "06451c1e-a9b8-47d2-8934-be2247ef5347",
@@ -596,18 +617,44 @@
       }
     },
     {
+      "id": "design-registry-catalog-drift-gate",
+      "lane": "fixes",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "headSha": "da574111af05a5cded74250128b196fcab870274",
+      "currentPrHeadSha": null,
+      "issueNumbers": [1358],
+      "implementerAgentId": "01a003f0-7821-7a10-a555-e619a9280479",
+      "branch": "fix/design-registry-catalog-drift-gate",
+      "worktree": "/home/codex/repos/netscript-007-leaf-design-registry-drift",
+      "freshBrowserGateState": "pending_coordinator_lease",
+      "receiptRefs": []
+    },
+    {
       "id": "quality-scan-root-coverage",
       "lane": "internals",
-      "phase": "planned",
+      "phase": "implementing",
       "baseBranch": "main",
       "headSha": "473e8d75b5281c93dc4729d99f3358a34f2bd687",
-      "currentPrHeadSha": "5dc2d214877994835dd8afc808a4e0dbb0db8e5b",
+      "currentPrHeadSha": "3b95a004fe8bc5c022c7a2601fafef9a1216be68",
       "issueNumbers": [1542],
       "implementerAgentId": "01a003d2-61ee-7ec0-8c74-075b3d631168",
       "branch": "fix/quality-scan-root-coverage",
       "worktree": "/home/codex/repos/netscript-007-quality-root-coverage",
       "prNumber": 1656,
-      "planEvaluationState": "pending",
+      "planEvaluationState": "complete",
+      "planEvaluationCycle": 1,
+      "planEvaluatedHeadSha": "da76d9d8440a969f0715ca035ea6304bbf039efd",
+      "planEvaluatorAgentId": "97ef1950-cda3-450e-9451-052a15015b3a",
+      "planEvaluatorCommitSha": "3b95a004fe8bc5c022c7a2601fafef9a1216be68",
+      "planEvaluationVerdict": "PASS",
+      "implementationState": "running",
+      "implementationGrantedAt": "2026-08-15T05:48:07.224Z",
+      "priorRouteFailure": {
+        "route": "native-claude/claude-fable-5/medium",
+        "classification": "transport_model_unavailable_zero_token",
+        "countedAsEvaluationCycle": false
+      },
       "receiptRefs": []
     },
     {
@@ -895,7 +942,7 @@
     },
     {
       "id": "scaffold-generated-output-correctness-impl-eval",
-      "state": "running",
+      "state": "complete",
       "lane": "fixes",
       "leafId": "scaffold-generated-output-correctness",
       "phase": "impl-eval",
@@ -913,7 +960,63 @@
         "remoteControlRequired": true
       },
       "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-15T05:14:52.510Z"
+      "grantedAt": "2026-08-15T05:14:52.510Z",
+      "completedAt": "2026-08-15T05:21:53.000Z",
+      "verdict": "PASS",
+      "evaluatorCommitSha": "70843d169d4e7f4c8f810d663a142cc66b7969ff",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1654#issuecomment-5300713042"
+    },
+    {
+      "id": "comparison-docs-programme-impl-eval-cycle-1",
+      "state": "complete",
+      "lane": "docs",
+      "leafId": "comparison-docs-programme",
+      "phase": "impl-eval",
+      "cycle": 1,
+      "sourceHead": "15429cf8487cfe3504ae0443fd435d2a72d4528b",
+      "evaluatorAgentId": "c6950ed9-7405-4f28-9464-1e1977f2979c",
+      "backgroundAgentId": "c6950ed9",
+      "pid": 138125,
+      "bridgeSessionId": "session_01QjkTyGWr2HSHrLLVLdfhCR",
+      "remoteControlUrl": "https://claude.ai/code/session_01QjkTyGWr2HSHrLLVLdfhCR",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-opus-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-15T05:38:37.962Z",
+      "completedAt": "2026-08-15T05:46:49.000Z",
+      "verdict": "FAIL_FIX",
+      "evaluatorCommitSha": "e95f4838038a27a0f209d2ce37c9f53bd4ed4299",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1652#issuecomment-5300794391"
+    },
+    {
+      "id": "quality-scan-root-coverage-plan-eval-cycle-1",
+      "state": "complete",
+      "lane": "internals",
+      "leafId": "quality-scan-root-coverage",
+      "phase": "plan-eval",
+      "cycle": 1,
+      "sourceHead": "da76d9d8440a969f0715ca035ea6304bbf039efd",
+      "evaluatorAgentId": "97ef1950-cda3-450e-9451-052a15015b3a",
+      "backgroundAgentId": "97ef1950",
+      "pid": 145718,
+      "bridgeSessionId": "session_01BA2jJuyVsFhRJkVKoTMihe",
+      "remoteControlUrl": "https://claude.ai/code/session_01BA2jJuyVsFhRJkVKoTMihe",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-opus-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-15T05:39:01.786Z",
+      "completedAt": "2026-08-15T05:47:21.000Z",
+      "verdict": "PASS",
+      "evaluatorCommitSha": "3b95a004fe8bc5c022c7a2601fafef9a1216be68",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1656#issuecomment-5300796497"
     }
   ],
   "expensiveGates": [
@@ -956,7 +1059,7 @@
     }
   ],
   "exactMainEvidence": {
-    "gitHead": "0b3ed5d5a6aea451318f120988c25dfa3993a2ab",
+    "gitHead": "da574111af05a5cded74250128b196fcab870274",
     "surface": "repository",
     "expectedGateIds": [
       "arch-check",
@@ -982,5 +1085,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T05:16:27.170Z"
+  "updatedAt": "2026-08-15T05:52:01.212Z"
 }

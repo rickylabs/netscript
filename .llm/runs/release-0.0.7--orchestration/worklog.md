@@ -133,3 +133,29 @@
 - Internals opened draft PR #1656 for #1542 at bootstrap head `5dc2d2148`, with its sole Codex
   thread still restricted to research/plan. A formal Plan-Gate remains pending; the sibling leaf is
   not dispatched concurrently inside the internals topic.
+
+## 2026-08-15T05:52:01Z — #1654 shipped; docs repair and internals implementation active
+
+- PR #1654 passed formal IMPL-EVAL at evaluator commit `70843d169`, merged as
+  `da574111af05a5cded74250128b196fcab870274`, and closed #1262/#1263/#1588 as completed. Its
+  post-merge `ci` run `31867377599`, Pages run `31867378176`, and code-quality run `31867377620`
+  all passed. The only annotation is the non-failing Node.js 20 deprecation on
+  `actions/upload-artifact@v5`; no product or release gate failed. Main remains exactly `da574111a`.
+- PR #1652 formal IMPL-EVAL cycle 1 returned `FAIL_FIX` at evaluator commit `e95f483803` after all
+  five proportional docs gates passed. The two blockers are evidence integrity, not architecture:
+  a Channel count labelled `Measured` without a published aggregate, and mutable branch URLs in
+  canonical comment `5265826161`. Three minor consistency defects accompany them. The original
+  Codex author thread `019ffcc9-16c2-7573-b7f6-d627172408e8` is running one bounded F1–F5 repair;
+  no second formal cycle is authorized before fresh Tier-A.
+- PR #1656 formal PLAN-EVAL cycle 1 returned `PASS` at evaluator commit `3b95a004f`. The earlier
+  Fable launch remains a zero-token model-unavailable transport failure, not an evaluation cycle.
+  The original Codex implementation thread `01a003d2-61ee-7ec0-8c74-075b3d631168` is implementing
+  the approved three-file plan with both evaluator advisories carried explicitly and no expensive
+  gate. The live Remote Control bridge is `session_01BA2jJuyVsFhRJkVKoTMihe`; the job artifact's
+  `cse_…` alias is not the owner-visible URL form.
+- Fixes advanced its next serial leaf, #1358, on original Codex thread
+  `01a003f0-7821-7a10-a555-e619a9280479`. It is bounded to the four contracted registry surfaces
+  and must stop before `fresh-browser` for a coordinator lease. Aspire and Docker were empty at
+  this checkpoint, so the global expensive-gate mutex is free.
+- #1651 remains untouched and draft. Features is blocked only on the explicit owner option 1/2/3
+  verdict; that lane-local hold does not serialize docs, internals, or fixes.

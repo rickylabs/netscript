@@ -236,3 +236,16 @@ Coordinator transport remains GPT-5.6-SOL/high, never max. The resumed Claude co
 change after an unattended-process interruption, but their session IDs, branches, worktrees, and
 Remote Control bridges remain authoritative and must not be replaced. Continue supervising useful
 work in the other topics while #1651 waits; the owner hold is lane-local, not a cluster stop.
+
+### Active completion checkpoint — 2026-08-15T05:52:01Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | #1652 formal cycle 1 is `FAIL_FIX`; original author thread repairs F1–F5, then fresh Tier-A | No cycle 2, ready flip, merge, or expensive gate before a new coordinator grant |
+| internals | #1656 PLAN-EVAL cycle 1 is `PASS`; original author thread implements the approved three-file plan | Carry changed-file and denominator-boundary advisories; stop before IMPL-EVAL |
+| fixes | #1654 shipped as `da574111a`; #1358 is the next serial leaf and is implementing | Stop before `fresh-browser` and request the singleton expensive-gate lease |
+| features | #1651 is draft and owner-blocked on explicit option 1/2/3 | Do not amend, reply, resolve, ready, or merge before the verdict |
+
+Main post-merge CI, Pages, and code quality are green. Aspire and Docker are empty, and no expensive
+lease is held. Formal evaluator serialization is independent per topic; only resource-heavy
+Aspire/Docker/E2E uses the cluster-wide mutex.

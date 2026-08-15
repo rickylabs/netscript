@@ -93,3 +93,15 @@ attached as session `19f1be7b-db7d-47c0-b0f1-7cfca302d44a`, bridge
 `session_01Qs22iAtnVYh2fLb26ABvja`, with no expensive-gate authority. Internals has opened draft
 #1656 for #1542 at bootstrap head `5dc2d2148` and is still research/plan-only. Preserve #1651's
 owner hold and all four original Opus 5/high Remote Control topic supervisors.
+
+Resume from the authoritative `2026-08-15T05:52:01Z` checkpoint. Main is `da574111a` after #1654
+shipped with green post-merge CI/Pages/code-quality; #1262/#1263/#1588 are closed completed and the
+host is empty. Docs #1652 is in one bounded F1–F5 repair on its original Codex author thread after
+formal IMPL-EVAL cycle 1 `FAIL_FIX` at `e95f48380`; authorize cycle 2 only after the repaired head
+receives fresh independent Tier-A. Internals #1656 passed PLAN-EVAL cycle 1 at `3b95a004f` and is
+implementing its approved three-file plan on the original Codex thread; the earlier Fable attempt
+was zero-token route drift, not a cycle. Fixes #1358 is implementing and must request the singleton
+lease before `fresh-browser`. #1651 remains draft and unchanged until the owner explicitly selects
+1 keep-and-narrow, 2 remove/defer C6, or 3 close-as-duplicate. Preserve all four topic supervisor
+session IDs and Remote Control bridges; serialization remains per topic, while Aspire/Docker/E2E
+alone share the global expensive-gate mutex.

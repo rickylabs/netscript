@@ -128,3 +128,21 @@ implementation thread.
 - **No scope drift:** the completed #1551 rewrites satisfied the ordered prerequisite for S3; they
   did not alter the evidence pin, equivalence contract, or approved docs boundary. Resuming the
   original author thread is continuation, not a new plan cycle.
+
+## 2026-08-15T05:52:01Z — evaluator identity and evidence-integrity corrections
+
+- **Bridge identity:** #1656's evaluator artifact records the daemon/job alias
+  `cse_01BA2jJuyVsFhRJkVKoTMihe`, while the live bridge-status system event exposes the working
+  owner URL as `session_01BA2jJuyVsFhRJkVKoTMihe`. Central state records the `session_…` form and
+  retains the job artifact unchanged as historical evidence; no evaluator is relaunched for an
+  attachment-prefix discrepancy.
+- **Cycle accounting:** the pre-cycle #1656 Fable attempt failed before inference with zero tokens,
+  no verdict, no artifact, and no repository mutation. It remains transport/model-unavailable
+  drift rather than PLAN-EVAL cycle 1. The subsequent Opus 5/medium PASS is the first formal cycle.
+- **Docs gate value:** #1652's own cheap gates were all green while the independent evaluator found
+  two reproducibility defects in published claims. The correct response is one bounded same-plan
+  repair plus fresh Tier-A and formal re-evaluation; neither a new PLAN-EVAL nor a weakened evidence
+  definition is justified.
+- **Host hygiene:** #1654's merge and main CI introduced no AppHost or container residue. The
+  coordinator preflight again observed `aspire ps --format Json` = `[]`, no Docker containers, and
+  no Docker volumes before leaving the global lease free for #1358's eventual browser boundary.
