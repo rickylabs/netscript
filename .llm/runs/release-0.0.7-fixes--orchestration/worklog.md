@@ -702,3 +702,55 @@ declared out of scope and pre-existing red.
 
 No implementation before its PASS. No readiness or label change; PR stays draft at sole
 `status:plan`; no runtime lease.
+
+## 2026-08-15 — #1669 PLAN-EVAL terminal PASS; S1 authorized and dispatched
+
+| Field | Value |
+| --- | --- |
+| Verdict | **PASS** — "Implementation of S1 then S2 may begin under the locked decisions; advisories A1–A4 are refinements … not plan defects" |
+| Evaluated head | `23db20f301d06ed1e4a9a65cbbf64349f89cb8c0`; the evaluator's own `git rev-parse HEAD` equals it |
+| Artifact commit | `d555cc9719fc81b7b5d6656471132c1a921fd5cf` — plan-only preserved; product mutation vs base still empty |
+| Route | `claude-fable-5` · medium · Remote Control — matched; job `01f0eda8`, PID `391331`, bridge `session_01SWnk7LwvoLaamvEwR5WLfX` |
+
+It confirmed six Tier-A claims by execution — callable action owns SWR, exactly two docs sources and
+the four-file cascade, disposition-table completeness site-wide, retained lines accurate and
+corrected lines not overcorrecting, the line-107 composition working against the API, and the
+doc-lint pins at 3+3 / exit 1 / **five unique symbols**.
+
+### It refuted one of this topic's Tier-A claims, and the refutation is correct
+
+Tier-A stated that validation gate 7 (`docs-accuracy`) *binds* the S2 page-level sentence, calling the
+narrative criterion "mechanically gated rather than aspirational". **That was wrong.** I verified the
+refutation rather than accepting it: `.llm/tools/docs/check-accuracy-and-discoverability.ts` does have
+`requireText`/`forbidText` helpers (`:11`, `:17`) and uses them with hardcoded needles for other
+pages (`:235-237`), but there is **no assertion for chapter 3**, so the script cannot judge that
+sentence.
+
+Root cause on this side: the plan's *expected result* column was read as evidence that the gate
+enforces the criterion, without opening the script. That is the same failure mode as the earlier
+`--report` flag claim — asserting a tool's capability from a description instead of executing it.
+Rule reaffirmed: **a gate's stated expectation is not proof the gate can evaluate it; open the
+implementation.**
+
+Consequence (advisory A1): the S2 page-level sentence is **manual evidence** — Tier-A slice review
+plus IMPL-EVAL reading the disposition table against the rendered page — and any worklog citing the
+`docs-accuracy` receipt as proof of S2 must be rejected. Worth surfacing to the coordinator: the repo
+already has the exact primitive to make this mechanical, so a `.llm/tools` scope ruling could convert
+A1 from manual evidence into a real gate. Not taken unilaterally.
+
+### S1 dispatched to the preserved author
+
+Surface: `packages/sdk/src/cache/cache-query.ts`, `packages/sdk/tests/cache/cache-query_test.ts`, run
+artifacts. Docs pages, the factory test, and the four mirrors are S2 and explicitly excluded.
+
+Advisories carried: **A2** — the map-registered operation must resolve to data when the fetch
+succeeds and only the write fails, whoever owns it, so a blocking joiner inherits #1665's non-fatal
+write; rejection propagates only for fetch failure, with a test for background-owned write failure.
+**A3** — register the background refresh synchronously in the scheduling reader's turn before any
+`await`, or order the test reader-1-awaited → reader-2-started → release, keeping the proof
+sleep-free; no timing sleep to force a pass. **A1** and **A4** recorded for S2.
+
+Out of scope: #1667, #1668, `surface:diff`, `F-DOCT-5`; the queue flake is to be reported once with
+the exact `expected 1, got 2` and never rerun seeking green. No Aspire/Docker/`e2e:cli`, no runtime
+lease, root gates deferred to the final slice. PR stays draft at sole `status:plan`; hard stop at
+fresh Tier-A before S2.
