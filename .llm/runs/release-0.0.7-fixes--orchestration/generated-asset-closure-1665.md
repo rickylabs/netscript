@@ -148,3 +148,41 @@ as green.
 **Closure, now doubly established: the branch-caused generated-asset set is exactly the four
 `derivedAssetCascadePaths` — links 2–4 downstream of the Query Bridge source edit — and there is no
 fifth.**
+
+---
+
+## Link 3 landed — `27a64ea4c` (verified)
+
+`git diff --name-only 72d57229f..27a64ea4c` = `packages/cli/src/kernel/assets/agent-docs.generated.ts`
+plus three run artifacts. Exactly one product path; local == remote == PR; tree clean.
+
+The barrel diff is precisely the six provenance fields flipping from the stale corpus to the current
+one — exactly what this orchestrator's isolated probe predicted before the repair was written:
+
+| Field | Before | After |
+| --- | --- | --- |
+| `sourceCommit` | `504de3f67` | `0fed4d7ff` |
+| `extractionTimestamp` | `2026-08-15T08:52:56.248Z` | `2026-08-15T15:32:16.221Z` |
+| `uncompressedBytes` | 4753233 | 4753909 |
+| `compressedBytes` | 1363117 | 1363396 |
+| `sha256` | `a7c72177…` | `6df99eb8…` |
+
+One file, 6 insertions / 6 deletions. No other barrel entry moved.
+
+## Link 4 dispatched — amendment active
+
+Evidence confirms the amendment recorded above, so it is now in force: the same original Codex thread
+`01a00516-2033-7ed3-936a-a616cee47447` is dispatched for canonical `deno task gen:publish-assets`,
+authorized for **only** `packages/mcp/src/publish-assets.generated.ts` plus run artifacts, with a hard
+stop if any other tracked path moves.
+
+Dispatch was gated on the author going idle (≥75 s) rather than fired immediately, because
+`gen:*` tasks mutate the tree and a second sender into a live turn is a writer conflict.
+
+The brief requires all three cascade gates — `check:publish-assets`, `check:assets-barrel`,
+`check:agent-docs-prose` — to be run **together on the final head**. That is the point of this slice:
+it proves links 2, 3 and 4 are *simultaneously* fresh, rather than each having been green at a
+different moment. It also re-states that `check:mcp-export-corpus` is red at base and outside scope,
+so it cannot be swept into the repair.
+
+No fresh Tier-A and no further evaluator until that single content head exists.
