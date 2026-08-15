@@ -13,28 +13,31 @@
 - Issue #1296 is open on milestone 27, now titled `0.0.7`. Issue #1293 remains open at
   `status:impl`; its MySQL paths are outside this leaf.
 
-The carried-in measurements are partly stale. A1's direct-search observation is reproducible, but
-its conclusion that the drift checker is "wired to nothing" is false at the frozen baseline. A3's
-Contracts-root conclusion is correct, while a different source JSDoc import remains wrong.
+The carried-in measurements are partly stale. A1's narrow name search is reproducible, but it missed
+a gate-catalog indirection and a `Deno.Command` child edge: the checker is already enforced
+fail-closed in non-draft CI. This was an error in the coordinator's dispatch premise, not an author
+finding. A3's four named root exports are correct, but the full shipped-example inventory contains
+four other source imports from entrypoints that do not export their symbols.
 
 ## Live acceptance contract
 
 Issue #1296 has five close-gated boxes. Independent re-baselining classifies them as follows:
 
-| Issue row                                               | Baseline state                                                                                                                                          | Leaf treatment                                                                                                                                                |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Contracts examples import from the real exporting path  | already satisfied for the specifically named `baseContract`, `BaseContractRoute`, `BaseContractOutputRoute`, and `OffsetPaginationQuerySchema` examples | Preserve and state as baseline-earned, not leaf-earned. A separate `paginatedQuery` module example is still wrong and belongs to the live inventory repair.   |
-| Contracts reference inventory advertises no non-exports | reference page/checker pass, but `paginated-query.ts` advertises `paginatedQuery` from the root where it is not exported                                | Correct the shipped module JSDoc to `@netscript/contracts/query`; do not edit the already-green reference page outside the frozen surface.                    |
-| Fresh UI reference matches published exports            | not satisfied                                                                                                                                           | Repair against all six entrypoints and enable an explicit symbol-coverage policy.                                                                             |
-| Intentional omissions are machine-readable              | not satisfied                                                                                                                                           | Replace boolean/silent symbol coverage with a discriminated, reason-bearing policy consumed by the checker.                                                   |
-| Maintainer regeneration runbook and verification wiring | partially satisfied                                                                                                                                     | Preserve the existing fail-closed `docs:accuracy` edge, make it directly addressable/discoverable, add Pages CI execution, and document the update procedure. |
+| Issue row                                               | Baseline state                                                                                                                                                                                                                                                | Leaf treatment                                                                                                                                             |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Contracts examples import from the real exporting path  | **partially satisfied**: five of the nine implementation-example lines are correct (two CRUD, three root); all four specifically briefed root symbols also resolve, but four implementation examples import six symbols from a root that does not export them | Preserve the baseline-earned examples and repair only the four incorrect `@example` import lines under the coordinator's JSDoc-only rescope.               |
+| Contracts reference inventory advertises no non-exports | manual reference page/checker pass, but the same four shipped examples advertise six symbols from non-exporting entrypoints                                                                                                                                   | Correct `paginated-query.ts`, `transform-helpers.ts`, `schemas/filters.ts`, and `schemas/pagination.ts`; do not edit the already-green reference page.     |
+| Fresh UI reference matches published exports            | not satisfied                                                                                                                                                                                                                                                 | Repair against all six entrypoints and enable an explicit symbol-coverage policy.                                                                          |
+| Intentional omissions are machine-readable              | not satisfied                                                                                                                                                                                                                                                 | Replace boolean/silent symbol coverage with a discriminated, reason-bearing policy consumed by the checker.                                                |
+| Maintainer regeneration runbook and verification wiring | enforcement is already satisfied fail-closed in non-draft CI; direct discoverability and the runbook are absent                                                                                                                                               | Preserve the enforced `docs:accuracy` chain, add a named task and explicit Pages step, and document the update procedure without claiming new enforcement. |
 
-The four live rows in the frozen brief therefore remain meaningful, but row 4 begins from partial,
-not zero, implementation.
+The four live rows in the frozen brief therefore remain meaningful. Contracts reconciliation is
+partly baseline-earned and partly live; the last row is a discoverability/runbook repair over an
+already-enforced gate, not new enforcement.
 
 ## Findings
 
-### F1 — direct task/workflow discovery is empty, but runtime wiring already exists
+### F1 — the checker is already enforced fail-closed; its direct identity is undiscoverable
 
 The exact unpiped baseline checks were:
 
@@ -47,19 +50,29 @@ grep -rnE 'check-exports-drift|exports-drift' deno.json .github/workflows/
 WIRING_SEARCH_RAW_EXIT=1
 ```
 
-That search cannot establish "wired to nothing" because it excludes the aggregator source.
-`.llm/tools/docs/check-accuracy-and-discoverability.ts:291-301` creates a `Deno.Command('deno')`
-whose argv directly runs `check-exports-drift.ts`, checks the real child exit code, and throws on
-nonzero. `git blame` attributes that edge to PR #1292's merge commit `6c3b534fc`.
+That search cannot establish enforcement because the workflow calls a gate id and the checker is a
+child spawned from source. The independently followed baseline chain is:
 
-`deno task docs:accuracy` also completed with raw exit 0 and printed its terminal PASS after the
-awaited child edge. `docs:maintenance` invokes `docs:accuracy`, and the durable gate catalog maps
-`docs-accuracy` to that task. Therefore the checker already guards local documentation accuracy and
-maintenance. What is missing is:
+```text
+.github/workflows/ci.yml:362-367  Docs accuracy check
+  -> run-gate.ts --gate docs-accuracy --id quality-docs-accuracy
+     (quality job at :282; non-draft PR guard at :287; step guard env.RUN == 'true')
+  -> .llm/tools/gates/catalog.ts:59
+     'docs-accuracy' -> ['deno', 'task', 'docs:accuracy']
+  -> deno.json:85
+     docs:accuracy -> check-accuracy-and-discoverability.ts
+  -> check-accuracy-and-discoverability.ts:291-301
+     spawns check-exports-drift.ts; prints child stdout/stderr and throws on nonzero
+```
+
+`deno task docs:accuracy` completed with raw exit 0 and printed its terminal PASS after the awaited
+child edge. `docs:maintenance` also invokes `docs:accuracy`. The gate is therefore already enforced
+fail-closed for qualifying non-draft CI and through the local accuracy/maintenance aggregates. What
+is missing is discoverability:
 
 1. a named `docs:exports-drift` task that maintainers and automation can discover and invoke;
-2. a direct workflow execution path — Pages currently runs snippets/build/links/caveats, not export
-   drift or `docs:accuracy`;
+2. an explicitly named Pages step — Pages currently runs snippets/build/links/caveats, while CI
+   quality reaches export drift only as the unnamed child of `docs:accuracy`;
 3. a runbook that tells maintainers how to derive and reconcile the surface.
 
 ### F2 — `docs/exports` is a stale frozen-contract entry, not a generated target
@@ -76,39 +89,49 @@ Creating `docs/exports` would introduce a third inventory that can itself drift 
 the issue requirement not to maintain a second handwritten entrypoint list. The path will remain
 absent and will be named as a deliberate non-touch in the plan.
 
-### F3 — the specifically briefed Contracts root surface is already correct
+### F3 — full nine-line Contracts implementation-example inventory is only partly correct
 
-`packages/contracts/src/public/mod.ts` re-exports:
+The inventory below enumerates every `from '@netscript/contracts…'` line in the shipped
+implementation sources under `crud/`, `src/`, and `schemas/` (entrypoint self-documentation in
+`mod.ts`, `crud.ts`, `query.ts`, and `transform.ts` is separately correct and is not one of these
+nine implementation examples):
 
-- `baseContract` and `BaseContract` at lines 2-3;
-- `BaseContractOutputRoute` and `BaseContractRoute` at lines 4-7;
-- `OffsetPaginationQuerySchema` in the schema export block.
+|  # | Source line                                  | Imported symbols / entrypoint                              | Baseline verdict                  |
+| -: | -------------------------------------------- | ---------------------------------------------------------- | --------------------------------- |
+|  1 | `crud/create-crud-contract.ts:6`             | `createCrudContract` from `/crud`                          | correct; `/crud` `EXIT=0`         |
+|  2 | `crud/create-crud-contract.ts:250`           | `createCrudContract` from `/crud`                          | correct; `/crud` `EXIT=0`         |
+|  3 | `src/application/contract-primitives.ts:72`  | `baseContract` from root                                   | correct; root `EXIT=0`            |
+|  4 | `src/application/contract-primitives.ts:112` | `baseContract`, `BaseContractRoute` from root              | correct; root `EXIT=0` per symbol |
+|  5 | `src/application/contract-primitives.ts:144` | `baseContract`, `BaseContractOutputRoute` from root        | correct; root `EXIT=0` per symbol |
+|  6 | `src/application/paginated-query.ts:6`       | `paginatedQuery` from root                                 | **wrong**; use `/query`           |
+|  7 | `src/application/transform-helpers.ts:6`     | `createTransformer` from root                              | **wrong**; use `/transform`       |
+|  8 | `schemas/filters.ts:6`                       | `FilterConditionSchema`, `buildPrismaWhere` from root      | **wrong**; use `/query`           |
+|  9 | `schemas/pagination.ts:6`                    | `PaginationInputSchema`, `createPaginatedOutput` from root | **wrong**; use `/query`           |
 
-Four independent `deno doc --filter` commands against `packages/contracts/mod.ts` returned raw exit
-0 and rendered each of `baseContract`, `BaseContractRoute`, `BaseContractOutputRoute`, and
-`OffsetPaginationQuerySchema`. The examples in `contract-primitives.ts` import the first three from
-`@netscript/contracts`, and the root module example imports the pagination schema from the same
-root. Those are valid, copyable imports at baseline.
+Independent unpiped `deno doc --no-lock --filter` commands also confirmed the specifically briefed
+`OffsetPaginationQuerySchema` root example: `baseContract`, `BaseContractRoute`,
+`BaseContractOutputRoute`, and `OffsetPaginationQuerySchema` each returned root `EXIT=0`.
+`createCrudContract` returned `/crud` `EXIT=0`. These are baseline-earned and remain untouched.
 
-No edit to `contract-primitives.ts` or `src/public/mod.ts` is earned by this leaf. The PR must say
-that row was already satisfied rather than claiming it as implementation.
+### F4 — six symbols across four shipped examples use the wrong entrypoint
 
-### F4 — a different shipped Contracts JSDoc import is still wrong
+The raw per-symbol exit evidence is:
 
-`packages/contracts/src/application/paginated-query.ts` begins its published `@module` example with:
+| Symbol                  | `packages/contracts/mod.ts` | Correct entrypoint      |
+| ----------------------- | --------------------------: | ----------------------- |
+| `paginatedQuery`        |                    `EXIT=1` | `query.ts` `EXIT=0`     |
+| `createTransformer`     |                    `EXIT=1` | `transform.ts` `EXIT=0` |
+| `FilterConditionSchema` |                    `EXIT=1` | `query.ts` `EXIT=0`     |
+| `buildPrismaWhere`      |                    `EXIT=1` | `query.ts` `EXIT=0`     |
+| `PaginationInputSchema` |                    `EXIT=1` | `query.ts` `EXIT=0`     |
+| `createPaginatedOutput` |                    `EXIT=1` | `query.ts` `EXIT=0`     |
 
-```ts
-import { paginatedQuery } from '@netscript/contracts';
-```
-
-The root `deno doc --json packages/contracts/mod.ts` surface has 70 symbols and does not contain
-`paginatedQuery`; the `./query` entrypoint does. The manual Contracts page already lists
-`paginatedQuery`, `offsetPaginatedQuery`, and `cursorPaginatedQuery` under
-`@netscript/contracts/query`, and the current exports/symbol drift checker passes that manual page.
-
-This reconciles issue #1110's wording ("correct the source JSDoc import that currently points at the
-wrong root entrypoint") with the current tree. The live source fix is in `paginated-query.ts`, not
-in the already-correct `contract-primitives.ts` examples named by #1296.
+All four files are included by the Contracts publish set (`src/**/*.ts` or `schemas/**/*.ts`), so
+their JSDoc ships. The coordinator granted a JSDoc-only rescope for exactly those four import-line
+repairs (the original `paginated-query.ts` plus three additions). No runtime, type, export, or
+schema change is planned. This makes `Closes #1296` honest only because the rescope covers the
+entire residual inventory; the already-correct reference page, `contract-primitives.ts`, and public
+root remain untouched.
 
 ### F5 — Fresh UI entrypoints are complete, but symbol coverage is disabled
 
@@ -169,14 +192,15 @@ that leaves Fresh UI, Plugin, Queue, SDK, and Service silently entrypoint-only.
 
 A discriminated coverage object fits the existing consumer:
 
-- `mode: 'complete'` — run `deno doc` for every derived entrypoint, and flatten explicit
-  reason-bearing omission groups into the exclusion set;
+- `mode: 'complete'` — carry a nonempty coverage reason, run `deno doc` for every derived
+  entrypoint, and flatten explicit reason-bearing omission groups into the exclusion set;
 - `mode: 'entrypoints-only'` — skip symbol comparison only when a nonempty reason is present;
 - a reason-bearing allow-list for doc-only copy-source symbols where a page explicitly labels them
   as non-package exports.
 
-This retains the current `Set`-based comparison, makes invalid/empty policy a hard refusal, and
-avoids a new inventory directory or handwritten export map.
+This retains the current `Set`-based comparison, makes invalid/empty policy a hard refusal, supports
+an every-run mode/reason/omission-count report, and avoids a new inventory directory or handwritten
+export map.
 
 ### F8 — workflow trigger coverage already fits the leaf
 
@@ -189,18 +213,18 @@ Aspire resource is necessary.
 ### F9 — MySQL is independently owned and must not block this leaf
 
 Issue #1293 is open with `status:impl` and owns the Prisma MySQL exported adapter and remaining
-executable-example work. The frozen nine-path surface contains no MySQL package or reference path.
-This leaf neither reads that work as a prerequisite nor changes it.
+executable-example work. Neither the frozen nine paths nor SA-1/SA-2's four added paths contain a
+MySQL package or reference path. This leaf neither reads that work as a prerequisite nor changes it.
 
 ## JSR/publication surface scan
 
-JSR audit is applicable because one shipped JSDoc file inside published `@netscript/contracts` will
-change and the Fresh UI reference is derived from a published member.
+JSR audit is applicable because four shipped JSDoc files inside published `@netscript/contracts`
+will change and the Fresh UI reference is derived from a published member.
 
-| Member                       | Planned publish delta                                                                                                                                         | Export map                                                            | Exact `@netscript/*` pins                                                                                                                                               | Baseline evidence / risk                                                                                                                                                                                                                                             |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@netscript/contracts@0.0.6` | Yes: `src/application/paginated-query.ts` JSDoc ships under `src/**/*.ts`; no runtime/type/export change.                                                     | Four entrypoints: `.`, `./crud`, `./query`, `./transform`; unchanged. | None in member imports. `@orpc/contract@^1.14.6` and root-catalog `zod` are non-NetScript dependencies.                                                                 | `audit-jsr-package` raw exit 0; dry-run OK with one sanctioned oRPC slow-type INFO. Full-export `doc:lint` raw exit 1 with nine pre-existing private-type-ref diagnostics (eight contract primitives, one CRUD), not caused or fixed by this prose-only source edit. |
-| `@netscript/fresh-ui@0.0.6`  | No package file changes; reference/checker only. The plan still audits its real published surface rather than claiming "no publish delta" without inspection. | Six entrypoints listed in F5; unchanged.                              | `@netscript/sdk/auto-update` and `@netscript/sdk/desktop` are both exact `jsr:@netscript/sdk@0.0.6/...`; `deps:why @netscript/sdk` raw exit 0 confirms live source use. | `audit-jsr-package` raw exit 0 and dry-run OK, while reporting existing folder/cardinality and slow-type warnings. Full-export `doc:lint` raw exit 1 with 123 existing `/interactive` diagnostics. Source repair is outside the frozen surface.                      |
+| Member                       | Planned publish delta                                                                                                                                                                                    | Export map                                                            | Exact `@netscript/*` pins                                                                                                                                               | Baseline evidence / risk                                                                                                                                                                                                                                               |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@netscript/contracts@0.0.6` | Yes: JSDoc import text changes in `src/application/paginated-query.ts`, `src/application/transform-helpers.ts`, `schemas/filters.ts`, and `schemas/pagination.ts`; no runtime/type/export/schema change. | Four entrypoints: `.`, `./crud`, `./query`, `./transform`; unchanged. | None in member imports. `@orpc/contract@^1.14.6` and root-catalog `zod` are non-NetScript dependencies.                                                                 | `audit-jsr-package` raw exit 0; dry-run OK with one sanctioned oRPC slow-type INFO. Full-export `doc:lint` raw exit 1 with nine pre-existing private-type-ref diagnostics (eight contract primitives, one CRUD), not caused or fixed by these prose-only source edits. |
+| `@netscript/fresh-ui@0.0.6`  | No package file changes; reference/checker only. The plan still audits its real published surface rather than claiming "no publish delta" without inspection.                                            | Six entrypoints listed in F5; unchanged.                              | `@netscript/sdk/auto-update` and `@netscript/sdk/desktop` are both exact `jsr:@netscript/sdk@0.0.6/...`; `deps:why @netscript/sdk` raw exit 0 confirms live source use. | `audit-jsr-package` raw exit 0 and dry-run OK, while reporting existing folder/cardinality and slow-type warnings. Full-export `doc:lint` raw exit 1 with 123 existing `/interactive` diagnostics. Source repair is outside the frozen surface.                        |
 
 Root `compilerOptions.isolatedDeclarations` is `true`. The final canonical workspace
 `publish:dry-run` remains required because the Contracts JSDoc is part of the publish set. A green
@@ -226,15 +250,18 @@ reported baseline doc-lint debt or prove a real publish.
 ## Open questions resolved for planning
 
 - **Must resolve now:** Create `docs/exports`? No. It is stale contract scope and duplicative.
-- **Must resolve now:** Is the drift checker currently unwired? No. It is indirectly fail-closed;
-  the plan makes the edge named and adds workflow execution without claiming a new gate from zero.
+- **Must resolve now:** Is export drift enforced? Yes. Non-draft CI already reaches it fail-closed
+  through `quality` -> gate catalog -> `docs:accuracy` -> the spawned checker. The plan improves
+  direct discoverability and adds an explicit Pages identity without claiming new enforcement.
 - **Must resolve now:** How are omissions represented? A reason-bearing discriminated policy in
   `AUTHORITATIVE_MAPPING`, consumed directly by the existing checker.
-- **Must resolve now:** Is Fresh UI browser execution necessary? No for export truth; only the
-  coordinator may require it as rendered-reference assurance. The implementation lane is forbidden
-  from firing it.
+- **Resolved by SA-1:** Fresh UI browser execution is N/A/waived for this surface. It remains
+  `NOT_RUN`; the implementation lane must not request a runtime lease or fire it.
+- **Must resolve now:** Are the three additional Contracts examples deferred? No. The coordinator
+  granted import-line-only scope for all three, bringing the authorized implementation surface to
+  thirteen paths and making closure of #1296 honest once all four residual lines are repaired.
 - **Safe to defer:** Existing Fresh UI public-source doc-lint/slow-type remediation and Contracts
-  oRPC private-type-ref debt; neither can be fixed within the frozen nine paths.
+  oRPC private-type-ref debt; neither is part of the thirteen authorized paths.
 - **Safe to defer:** Broadening symbol-complete coverage for every reference page. This leaf makes
   entrypoints-only policy explicit rather than silently claiming completeness; later leaves can
   promote packages one at a time.
