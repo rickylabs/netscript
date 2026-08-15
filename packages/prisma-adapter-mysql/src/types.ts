@@ -35,7 +35,12 @@ export interface MySqlConnectionConfig {
 export interface PrismaMySqlOptions {
   /** Database schema name */
   database?: string;
-  /** Callback when connection errors occur */
+  /**
+   * Observes driver errors that `isConnectionError` classifies as connection failures: fatal
+   * handshake/transport errors, server-capacity errors 1040/1203, and the adapter's closed set of
+   * transport/pool codes. Authentication, access, and missing-database errors 1045/1044/1049 fire
+   * only when driver-fatal; callback failure is contained and never replaces the primary error.
+   */
   onConnectionError?: (err: Error) => void;
 }
 
