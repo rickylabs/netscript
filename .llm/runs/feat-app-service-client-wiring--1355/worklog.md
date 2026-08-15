@@ -331,8 +331,15 @@ released before any repair.
 
 F3 is bounded to the existing service-client runtime probe, its unit test, the service/runtime suite
 ordering and order-sensitive registry test, plus run artifacts. The locked design moves the static
-probe after the already-owned standalone database codegen gate at its canonical position, adds an explicit
-generated-schema precondition, derives separate inputs from the two real generated contract schemas,
+probe after the already-owned standalone database codegen gate at its canonical position, adds an
+explicit generated-schema precondition, derives separate inputs from the two real generated contract schemas,
 and replaces index-zero-only tail equality with own/cross resource-prefix and per-service input
 assertions. Exact design and negative tests are recorded in `plan.md`. No product file changes until
 this amendment is committed and explicitly pushed.
+
+A cheap replay after real standalone database codegen proved the parent-process dynamic import does
+not inherit the generated app's alias map; importing the entire orchestration probe from the app
+instead drags unrelated parent import-map dependencies into its check. The bounded design therefore
+adds one dependency-free input-probe module. It uses only the actual schema instance's
+`toJSONSchema` and `parse` methods, and is imported by both the generated consumer and the negative
+unit test.
