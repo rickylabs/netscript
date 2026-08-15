@@ -1,213 +1,242 @@
-# PLAN-EVAL — release-0.0.7-internals--orchestration/slices/package-gate-honesty
+# PLAN-EVAL cycle 2 — release-0.0.7-internals--orchestration/slices/package-gate-honesty
 
-- Plan evaluator session: Claude Code `9078ecb6-e8b3-4d4f-b85c-cb28a1cb34be` / 2026-08-15
+- Plan evaluator session: Claude Code `517ac0e7-9951-40ec-ab48-d0175a6d7ebb` / 2026-08-15
 - Run: `release-0.0.7-internals--orchestration/slices/package-gate-honesty`
-- Surface / archetype: `packages/cli` E2E harness + `packages/mcp` + root `deno.json` / Archetype 6
-  (CLI / Tooling), supporting MCP member A2
+- Surface / archetype: `packages/cli` E2E harness + `packages/mcp` + root `deno.json` + `.llm/tools`
+  fmt/lint wrappers / Archetype 6 (CLI / Tooling), supporting MCP member A2
 - Scope overlays: `docs`
-- **Evaluated head:** `72d5aca66e46ca21d3d8becbc3d11a93bb9749ff` (plan head)
+- **Evaluated head:** `df1d7a96d7fd4ecca0bd61710ba90ff67449da0b` (repaired plan head)
 - **Immutable base:** `05fc3132b6800a85eb6152691a961b658962571b`
+- **Prior cycle:** cycle 1 `FAIL_PLAN` at evaluator commit
+  `be2b1872823cbbb07a393633fcccb684f753afc1`, preserved verbatim as `plan-eval-cycle-1.md` in this
+  directory.
 
 ## Identity, independence, route
 
-| Field                           | Value                                                                                                                                  |
-| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Model                           | Anthropic Claude Fable 5 (`claude-fable-5`)                                                                                            |
-| Session ID                      | `9078ecb6-e8b3-4d4f-b85c-cb28a1cb34be`                                                                                                 |
-| `bridgeSessionId`               | `cse_0176qkbF4eKUt7TxJiEPdTrk` (Remote Control, non-empty)                                                                             |
-| Daemon short / job              | `9078ecb6` (`~/.claude/jobs/9078ecb6/state.json`, backend `daemon`)                                                                    |
-| PID                             | shell parent `711275` (`claude bg-spare`), evaluator shell `728133`                                                                    |
-| cwd                             | `/home/codex/repos/netscript-007-package-gate`                                                                                         |
-| Requested route                 | `formal_plan_evaluation`: Anthropic / Fable 5 / medium / `--remote-control`                                                            |
-| Observed route (`respawnFlags`) | `--model claude-fable-5 --effort medium --remote-control --permission-mode bypassPermissions --name "NetScript 0.0.7 #1663 PLAN-EVAL"` |
-| Route verdict                   | matched (native opposite-family binding in `lane-policy.md:45`)                                                                        |
+| Field                           | Value                                                                                                                                     |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Model                           | Anthropic Claude Fable 5 (`claude-fable-5`)                                                                                               |
+| Session ID                      | `517ac0e7-9951-40ec-ab48-d0175a6d7ebb`                                                                                                    |
+| `bridgeSessionId`               | `cse_01McQHBVtbuX4WYDsaVXEYAn` (Remote Control, non-empty)                                                                                |
+| Daemon short / job              | `517ac0e7` (`~/.claude/jobs/517ac0e7/state.json`, backend `daemon`)                                                                       |
+| PID                             | shell parent `795739` (`claude bg-spare`, spare claim `dc2413ce`); `state.json` carries no `pid` key                                      |
+| cwd                             | `/home/codex/repos/netscript-007-package-gate`                                                                                            |
+| Requested route                 | formal PLAN-EVAL cycle 2: Anthropic / Fable 5 / medium / `--remote-control`                                                               |
+| Observed route (`respawnFlags`) | `--effort medium --permission-mode bypassPermissions --remote-control --name "NetScript 0.0.7 #1663 PLAN-EVAL c2" --model claude-fable-5` |
+| Route verdict                   | matched (native opposite-family binding for a Codex GPT-5.6 Sol-authored plan)                                                            |
 
-Independence: this session is a fresh Claude session and is not the Codex GPT-5.6 Sol author thread
-`01a004ec-86a6-7c21-8886-81c09de099f5` nor the topic supervisor
-`f7691917-0be2-4bcd-8839-43d3fc809c34`. It shares no conversation state with either; it read only
-the committed run artifacts, the PR, the issues, and the tree.
+Independence: fresh Claude session; not the Codex author thread
+`01a004ec-86a6-7c21-8886-81c09de099f5`, not the cycle-1 evaluator session `9078ecb6-…`, not the
+topic supervisor. Inputs were the committed run artifacts, the PR, the tree, and my own executions.
 
 ## Target verification
 
-| Check                                                      | Observed                                                                                                                                         |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Local `HEAD`                                               | `72d5aca66e46ca21d3d8becbc3d11a93bb9749ff`                                                                                                       |
-| `git ls-remote origin refs/heads/fix/package-gate-honesty` | `72d5aca66e46ca21d3d8becbc3d11a93bb9749ff`                                                                                                       |
-| PR #1663 `headRefOid`                                      | `72d5aca66e46ca21d3d8becbc3d11a93bb9749ff`                                                                                                       |
-| `git diff --stat 05fc3132b HEAD`                           | 7 files, all under `.llm/runs/release-0.0.7-internals--orchestration/slices/package-gate-honesty/` (+579/-0); **no product source changed**      |
-| PR state                                                   | draft; base `main`; milestone `0.0.7`; labels `type:fix`, `area:tooling`, `status:research`; body `Closes #1604`, `Closes #1618`, `Closes #1622` |
-| Worktree                                                   | clean before and after evaluation (all evaluator experiments ran in `$CLAUDE_JOB_DIR/tmp` copies, never in the checkout)                         |
+| Check                                                      | Observed                                                                                                                                                                                       |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Local `HEAD`                                               | `df1d7a96d7fd4ecca0bd61710ba90ff67449da0b`                                                                                                                                                     |
+| `git ls-remote origin refs/heads/fix/package-gate-honesty` | `df1d7a96d7fd4ecca0bd61710ba90ff67449da0b`                                                                                                                                                     |
+| PR #1663 `headRefOid`                                      | `df1d7a96d7fd4ecca0bd61710ba90ff67449da0b` — no mismatch                                                                                                                                       |
+| `git diff --stat 05fc3132b HEAD`                           | 8 files, +992/-0, all under this run dir; **no product/config path changed**                                                                                                                   |
+| PR state                                                   | draft; base `main`; milestone `0.0.7`; labels `type:fix`, `area:tooling`, **`status:research`** (brief expected `status:plan-eval` — supervisor's to fix, not mine)                            |
+| PR body `## Slices`                                        | S1 marker/batching/normalization, S2 CLI cwd, S3 `closeScoreGap`, S4 gates — **now reconciles** with `plan.md` S1–S4 (cycle-1 F2 fixed)                                                        |
+| Tree at exit                                               | `git status --short` empty; no `.deno-fmt-lint-ignore` anywhere outside `.llm/tmp/`; `healthy/netscript.config.ts` still single-line/single-quoted; `broken/deno.json` sha256 `6815999d…37361` |
+
+All reproductions ran on `git archive HEAD` copies under `$CLAUDE_JOB_DIR/tmp/` (never the
+checkout), on Deno 2.9.5. The author's own scratch prototype
+(`.llm/tmp/package-gate-honesty-plan-proof.xd8Msn/`) was read only to learn the proposed wrapper
+code; every number below is my own run.
 
 ## Checklist results
 
-| Plan-Gate item                          | Result                     | Evidence / location                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| --------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Research present and current            | PASS                       | `research.md` re-baselined against `main` @ `05fc3132b` on 2026-08-15. Spot-checked R3 (`service-env-gates.ts:26-27,44-66`, `_test.ts:31-34,96-102`), R5 (`run-documented-stream-example.ts:1-15`), R10/R11 (`guidance-index.ts:33-44,181-211`; `guidance-retrieval_test.ts:76-95`) — all match the tree. R7's numbers (115 selected / 1 crash; 110 / green with wrapper `--exclude`) reproduced by execution. R8's _conclusion_ is falsified by execution — see finding F1. |
-| Decisions locked                        | FAIL                       | L1, L2, L4, L5, L6, L7, L8, L9 are stated with rationale and hold. **L3 (`plan.md:90`) is locked on a mechanism that does not achieve the slice's own passing condition** (F1).                                                                                                                                                                                                                                                                                              |
-| Open-decision sweep                     | FAIL                       | The plan's sweep (`plan.md:100-108`) marks "root exclusion versus wrapper change" resolved by L3. Evaluator-run sweep finds it _unresolved_: no in-plan mechanism makes the #1618 acceptance command exit 0 (F1). Deferring it forces S1 rework → automatic unchecked box.                                                                                                                                                                                                   |
-| Commit slices (< 30, gate + files each) | PASS (with reconcile note) | Four slices (`plan.md:115-120`), ordered, each names proof, files, gates. Numbering conflicts with the PR body checklist (F2).                                                                                                                                                                                                                                                                                                                                               |
-| Risk register                           | PASS                       | `plan.md:160-172`. Row 2 ("`fmt.exclude` may select differently") anticipated the class of F1 but the mitigation ("use the top-level boundary") is the thing that fails.                                                                                                                                                                                                                                                                                                     |
-| Gate set selected                       | PASS (with rationale note) | Frozen contract gates all mapped (`plan.md:150-158`); A6/F-* + docs overlay covered. `scaffold.runtime` rationale is overstated (F3, advisory).                                                                                                                                                                                                                                                                                                                              |
-| Deferred scope explicit                 | PASS                       | `plan.md:181-189`.                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| jsr-audit surface scan (pkg/plugin)     | PASS                       | `research.md` § jsr-audit surface scan + `plan.md:122-131`; both publishable members scoped correctly (see item 4).                                                                                                                                                                                                                                                                                                                                                          |
+| Plan-Gate item                          | Result                   | Evidence / location                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| --------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Research present and current            | PASS                     | `research.md` re-baselined @ `05fc3132b`; R8 correctly re-recorded as falsified; R14/R15 numbers (114/2 batches, one honest finding, lint green, doctor 4/4) **reproduced by execution** (§1–§3 below). R14's "no style conflict" wording is inaccurate (advisory A2) but not load-bearing.                                                                                                                                                                                          |
+| Decisions locked                        | PASS                     | L1–L10 stated with rationale. L3 now holds by execution: child-only marker + nearest-config batching reach the exact acceptance commands green (§1–§4). L7 ("wrapper behavior changes only at selection") is true of the wrappers but omits the consumer-shipped copy (F1).                                                                                                                                                                                                          |
+| Open-decision sweep                     | **FAIL**                 | Evaluator-run sweep finds one decision the plan did not flag and that forces rework if deferred: `.llm/tools/run-deno-lint.ts` is embedded verbatim in the **published** `packages/cli/src/kernel/assets/agent-tools.generated.ts`; editing it under the twelve-path surface makes CI `assets-barrel` red and requires a thirteenth path (F1, executed). Automatic unchecked box.                                                                                                    |
+| Commit slices (< 30, gate + files each) | PASS (with F1 reconcile) | Four ordered slices, each with proof/files/gates (`plan.md` S1–S4); numbering matches the PR body. S1's file list and S4's gate list must absorb F1.                                                                                                                                                                                                                                                                                                                                 |
+| Risk register                           | PASS                     | `plan.md` risk table; row 1–2 correctly anticipate parent-family/blanket skips and the "exclude the healthy file" temptation.                                                                                                                                                                                                                                                                                                                                                        |
+| Gate set selected                       | PASS (with F1 gap)       | Frozen contract gates mapped; `scaffold.runtime` correctly `n/a` by coordinator waiver. **Missing:** the CI "Generated asset freshness" gate (`deno task check:assets-barrel`, `.github/workflows/ci.yml:376-381`), which the plan's `ci:quality` row does not include (`deno.json:21-32`) and which F1 turns red.                                                                                                                                                                   |
+| Deferred scope explicit                 | PASS                     | `plan.md` § Explicit deferrals / non-scope.                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| jsr-audit (package/plugin waves)        | **FAIL**                 | `@netscript/cli` row states "None; all edits are under publish-excluded `e2e/`". False once `run-deno-lint.ts` changes: `packages/cli/src/kernel/assets/agent-tools.generated.ts` (published under `src/**/*.ts`, `packages/cli/deno.json:57-68`) must be regenerated, changing the embedded tool text and `EMBEDDED_AGENT_TOOL_BUNDLE_HASH` (F1). The `@netscript/mcp` row and the two-member audit plan otherwise remain proportionate; baseline CLI debt is not mislabeled green. |
 
-## The six specific proofs
+## The eight specific proofs (re-derived, not re-read)
 
-### 1. Root `deno.json` exclusion — **FAILS by execution** (F1)
+### 1. Child-only marker semantics — PASS by code reading + execution
 
-The plan's L3/S1 claim (`plan.md:51,90,117`; `research.md` R8) is that adding the fixture directory
-to root `exclude` makes the exact #1618 acceptance command
-(`deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/mcp --ext ts,tsx`)
-exit 0 with `failedBatches: 0`, without touching the wrapper.
+The proposed mechanism (author prototype, to be implemented in S1) checks for
+`<dir>/.deno-fmt-lint-ignore` at the top of `collectRoot` and returns before descending — so only
+the marked directory's own subtree leaves selection; the parent walk and every sibling continue.
+Executed on my archive copy with the marker in `doctor/broken/` only: **115 → 114** for both
+wrappers, and all four `doctor/healthy/**` TS files were individually named by findings in a single
+run (§3). A `--root` pointed directly at the marked directory yields empty selection and the
+wrapper's existing non-empty refusal (honest red, not silent green). Explicit `--file`/file-`--root`
+arguments bypass the marker — consistent with the plan's "automatic selection" wording. A
+parent-family or blanket `tests/fixtures` skip would drop the four healthy files (110) and cannot
+satisfy the plan's "114 with exactly one file removed" condition; the plan's wrapper-test rows name
+both directions (marked subtree skipped, unmarked sibling still selected). Sufficient at plan level.
 
-Executed on Deno 2.9.5 against a `git archive HEAD` copy of `deno.json`, `deno.lock`, `packages/`,
-`plugins/`, `.llm/tools/run-deno-fmt.ts` in `$CLAUDE_JOB_DIR/tmp/repo-copy`, with
-`"exclude": [".llm/tmp/", "packages/mcp/tests/fixtures/doctor/"]` written into the copied root
-`deno.json`:
+### 2. Nearest-config batching — PASS, and it is genuinely load-bearing
+
+Executed control: HEAD wrapper (single batch) with only the broken subtree removed via
+`--exclude '^packages/mcp/tests/fixtures/doctor/broken/'` → 114 selected, **1 failed batch, exit
+1**:
 
 ```text
-{"command":"deno fmt --check","mode":"check","summary":{"filesSelected":115,"batches":1,"failedBatches":1,"findings":0,"ignoredFindings":0},"findings":[]}
-1 deno fmt batch(es) failed without producing formatting findings.
-error: Failed to parse "workspace" configuration.
-Caused by:
-    invalid type: string "packages/*", expected struct WorkspaceConfig
-EXIT=1
+error: Command resolved to multiple config files. Ensure all specified paths are within the same workspace.
+  First: file:///…/repo-copy/deno.json
+  Second: file:///…/repo-copy/packages/mcp/tests/fixtures/doctor/healthy/deno.json
 ```
 
-Control in the same copy, wrapper `--exclude '^packages/mcp/tests/fixtures/doctor/'`:
-`filesSelected:110, failedBatches:0`, EXIT=0.
+So removing the malformed file alone is not enough: Deno refuses explicit argv spanning two
+workspaces (`healthy/deno.json` is a non-member nested workspace root). Grouping by effective
+nearest `deno.json`/`deno.jsonc` (walk from the file's directory up to `cwd`) yields two groups (110
+under `packages/mcp/deno.json`, 4 under `healthy/deno.json`) → fmt 114/2 batches, lint 114/2
+batches, no crash. Properties checked: files are partitioned by `Map` then `flatMap`-ed — none
+dropped or merged; order changes only across groups (irrelevant to per-file findings); no empty
+group can exist; a group whose nearest config is malformed still crashes but as an attributable
+failed batch of its own (honest red, no cross-poisoning); files whose nearest config lies above
+`cwd` share the `<no-config>` key, which is still one consistent group; `--config` short-circuits to
+plain chunking (Deno disables discovery). Over-splitting a single workspace into root/member groups
+is harmless (same resolution per file). Cost: one `stat` pair per ancestor directory per file —
+negligible at 114, acceptable at root scale (advisory A4: memoize per directory).
 
-Why: `.llm/tools/run-deno-fmt.ts` does its own file selection (`collectRoot`, lines 263-286;
-`SKIP_DIRS` + regex filters only — it never reads `deno.json` `exclude`) and passes every selected
-file **explicitly** to `deno fmt --check` (`runBatch`, lines 312-331). The 5 fixture `.ts` files
-under `packages/mcp/tests/fixtures/doctor/**` are therefore always in argv, and Deno resolves the
-nearest config for an explicitly named file regardless of root `exclude`. Minimal-repro matrix
-(scratch project, explicit `src/a.ts` + `tests/fixtures/doctor/broken/netscript.config.ts`):
+### 3. The 114 count and the collateral claim — PASS by execution
 
-| Config variant                            | Explicit-file `deno fmt --check` | Directory-arg `deno fmt --check packages/mcp`               |
-| ----------------------------------------- | -------------------------------- | ----------------------------------------------------------- |
-| no exclusion                              | crash                            | ok (fixture `deno.json` treated as a JSON file, not config) |
-| root `exclude: [fixture dir]`             | **crash**                        | ok, fixture skipped                                         |
-| root `fmt.exclude: [fixture dir]`         | crash                            | —                                                           |
-| member `packages/mcp/deno.json` `exclude` | crash                            | —                                                           |
-| CLI `--ignore=<fixture dir>`              | crash                            | —                                                           |
-| root exclude + `--config deno.json`       | ok (only via wrapper flag)       | —                                                           |
+My run after normalization with a formatting defect injected into each of the three generated
+registries: `filesSelected:114, batches:2, findings:4`, naming
+`healthy/.netscript/generated/plugin-ai/agents.registry.ts`, `…/plugin-ai/tools.registry.ts`,
+`…/plugin-workers/job-registry.ts`, **and** `healthy/netscript.config.ts` (the genuine finding) —
+all four healthy TS files proven selected in one invocation; registries restored byte-exact (`cmp`
+vs checkout). Exactly one file leaves selection: `broken/netscript.config.ts`. The plan's proof
+(three injected + one genuine) is sufficient; the fourth file is equally covered.
 
-So root `exclude` is a supported, narrowly scoped, non-masking boundary for directory walks (it
-provably does not hide `packages/mcp/src/**` — 110 real files still format, and the negative control
-via the wrapper path is unaffected), **but it is not the mechanism that satisfies #1618's acceptance
-row 1** as written, because the wrapper's explicit-argv invocation bypasses it. The plan's S1
-passing condition ("Exact scoped fmt wrapper returns exit 0, `failedBatches: 0`", `plan.md:117`) is
-unreachable inside the six-file surface as planned.
+### 4. Both wrappers green with no extra flags — PASS by execution
 
-### 2. `import.meta`-derived roots (#1604) — PASS by close reading
+Exact commands, unpiped exit status, on the copy with marker + batching + `deno fmt` applied to
+`healthy/netscript.config.ts` only:
 
-- `service-env-gates_test.ts:34` already derives `REPO_ROOT` via
-  `import.meta.resolve('../../../../../../../../')` — eight segments from
-  `packages/cli/e2e/src/application/gates/scaffold/service-env/` land on the repo root (counted).
-  Resolving the `.ts` argument against it for `Deno.stat` (`:96-102`) is correct from both cwds; the
-  gate command itself keeps the relative `GATE_DIR/...` argument and `commandGate` runs with
-  `cwd = context.project.repoRoot` (`gate-factory.ts:53,67`), so production semantics are unchanged
-  (L2 verified).
-- `quickstart-command-drift_test.ts:5` reads `'docs/site/quickstart.vto'` — module is four segments
-  below root; the assertion (`:15`) is untouched.
-- `run-documented-stream-example.ts:3,10-14` — `DOC_PATH` and the `.llm/tmp` scratch dir are both
-  cwd-relative; the module is seven segments below root. The only production consumer is
-  `consume-flow-b-stream.ts:127`, spawned by `otel-gates.ts:53-64` with cwd = repoRoot, where the
-  anchored absolute path equals today's cwd-relative resolution. No behaviour shift.
-- Risk row "off by one directory" (`plan.md:166`) plus L1 cover the derivation; the plan does not
-  state the segment counts — the implementer should assert a known repo file exists at the derived
-  root, as the mitigation says.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/mcp --ext ts,tsx` →
+  **EXIT 0**, `filesSelected:114, batches:2, failedBatches:0, findings:0`.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/mcp --ext ts,tsx` →
+  **EXIT 0**, `filesSelected:114, batches:2`, 0 occurrences.
 
-### 3. `closeScoreGap` observability (#1622) — PASS by close reading
+Also green with the plan's root `deno.json` `exclude` entry added (wrapper ignores it, as cycle 1
+proved). No `--exclude`, no `--config`.
 
-`orderGuidanceSections` (`guidance-index.ts:181-211`) groups leader-relative with
-`leader.score - candidate.score <= closeScoreGap` and re-sorts each group by slug. The plan's L5
-adds one early-slug candidate exactly at `leader − 0.5` (inside: reorders ahead of the leader on
-slug; a narrower gap leaves it behind → fails) and one early-slug candidate at `leader − (0.5+ε)`
-(outside: stays behind on score; a wider gap pulls it ahead → fails). Expected orders are literal
-slug lists, not derived from the constant, so the assertion is non-tautological in both directions.
-Float check: `10.4 - 9.9 === 0.5` and `10.5 - 10.0 === 0.5` in V8; `10.4 - 9.8` is
-`0.5999999999999996`, still `> 0.5` — the risk row (`plan.md:169`) correctly tells the implementer
-to prefer exactly representable values and a visibly larger outside ε. The existing `pages/gamma`
-element (`guidance-retrieval_test.ts:80`) is correctly diagnosed as decorative (R11).
+### 5. The twelfth path is formatting-only — PASS, with one wording correction
 
-### 4. Two-member JSR/publish evidence — PASS
+`deno fmt packages/mcp/tests/fixtures/doctor/healthy/netscript.config.ts` in the copy produced
+exactly the plan's diff (object expanded, `'workers'` → `"workers"`). `deno eval --no-config` import
+of original vs formatted: both `{"plugins":["workers"]}`, equal. Doctor reads this file only through
+`/\bplugins\s*:/` (`project-wiring-doctor-family.ts:101-103`), which the formatted text still
+matches; `doctor-families_test.ts` **4 passed / 0 failed** with the marker present.
+Serialized-export equality plus "the diff is what `deno fmt` emitted" is sufficient for a
+formatting-only claim.
 
-- `@netscript/cli`: all edits under `e2e/`, which `packages/cli/deno.json:69-72` publish-excludes;
-  `isolatedDeclarations: false` (`:50`) and the doc-lint completeness debt are named as **baseline**
-  (`research.md` § `@netscript/cli`; `plan.md:126,170`) with "no new diagnostic" as the bar — not
-  reported clean.
-- `@netscript/mcp`: `src/**` is published, `tests/` excluded (`packages/mcp/deno.json:24-27`); the
-  policy comment is publishable, so the full member audit + doc-lint + isolated-declaration +
-  dry-run is proportionate; the test is not published. Static `import.meta`/`Deno.read*` scan on the
-  changed published file is the right rejection rule.
+Correction (advisory A2): R14's "there is no style conflict … the source is simply unformatted" is
+inaccurate. Under the repo root config (`singleQuote: true`, `lineWidth: 100`) the **original** file
+is correctly formatted (`deno fmt --check --config deno.json` on the original passes; baseline
+`--config deno.json` run was 115/0 findings), and the **formatted** file is flagged. The finding
+exists because the wrapper's nearest-config semantics make `healthy/deno.json` (Deno defaults:
+double quotes, width 80) authoritative for that subtree. That is the correct choice for a fixture
+that models a consumer project, but the plan should say so, because it also means the root
+`deno.json` `exclude` is **not** merely "non-load-bearing": a raw root `deno fmt` walk applies root
+style to that subtree (executed: raw `deno fmt --check packages/mcp` sees 136 files / 6 unformatted
+without the exclude vs 127 / 4 with it) and would flip the file back, re-redding the wrapper. Keep
+the exclude and state its real role.
 
-### 5. `scaffold.runtime` load-bearing? — **not on the merits** (F3, advisory)
+### 6. `broken/deno.json` byte-identical; negative controls fire and restore — PASS by execution
 
-The only changed production path is `run-documented-stream-example.ts`, whose full semantic
-behaviour (doc read → extract → temp module → import → SSE consume) is executed end-to-end by its
-unit test (`run-documented-stream-example_test.ts`) against a local `Deno.serve`. After anchoring,
-running that unit test from both cwds proves the change; the `scaffold.runtime` consumer
-(`consume-flow-b-stream.ts` from cwd = repoRoot) exercises the identical absolute path. The gate
-matrix (`gates/archetype-gate-matrix.md:66-75`) classes `scaffold.runtime` as `n/a` for runs that do
-not touch scaffold output / plugin scaffolding / DB wiring / Aspire helper generation / publish
-shape — none of which this leaf touches. It is in the plan only because the frozen contract lists
-it; the plan's rationale ("required because the changed helper is called by the full scaffold
-consumer path", `plan.md:81-82`) overstates its evidentiary value. If the coordinator keeps it, the
-plan's execution contract (exact one-pass command, `--cleanup --format pretty`, current head,
-mutex-gated, NOT_RUN otherwise, `plan.md:120,158`) is sufficient. Recommendation to the coordinator:
-waive it for this leaf and record the waiver, rather than serialize an aspire+docker+postgres run
-for a path already proven by a unit test.
+sha256 `6815999dbd68bd1ab5bb137b59808cb1f1a38fb3393c9133721f439c0ad37361` in checkout and copy. Fmt
+negative (`export const   y=2` appended to `packages/mcp/mod.ts`) → EXIT 1, 114/2, one finding
+naming `packages/mcp/mod.ts`; lint negative (unused binding in `packages/mcp/cli.ts`) → EXIT 1,
+114/2, one `no-unused-vars` occurrence, no crash batch. Both restored and `cmp`-equal to the
+checkout.
 
-### 6. PR checklist vs plan slice order — **do not reconcile** (F2)
+### 7. Publish/JSR proportionality — **FAILS on the CLI row** (F1)
 
-| #  | PR #1663 body `## Slices`                        | `plan.md:117-120`                       |
-| -- | ------------------------------------------------ | --------------------------------------- |
-| S1 | Make the three CLI package tests cwd-independent | `deno.json` fixture exclusion (MCP fmt) |
-| S2 | Exclude malformed fixtures from MCP formatting   | The three CLI files                     |
-| S3 | Pin `closeScoreGap`                              | same                                    |
-| S4 | Gates + `scaffold.runtime`                       | same                                    |
+`.llm/tools/**` is not itself published, but `.llm/tools/run-deno-lint.ts` is a consumer-installed
+tool (`.llm/tools/consumer-tools.json:18-22`) embedded verbatim by
+`.llm/tools/generate-cli-assets-barrel.ts` into
+`packages/cli/src/kernel/assets/agent-tools.generated.ts`, which `@netscript/cli` publishes
+(`src/**/*.ts`) and `netscript agent init` installs into consumer projects
+(`init-agent_test.ts:527-556`). Executed on a full `git archive HEAD` copy:
 
-S1/S2 are swapped between the two surfaces; per-slice PR comments and checkbox ticks would drift.
+- control (unmodified copy): `deno task gen:assets-barrel` → barrel identical to HEAD (fresh);
+- with the prototype `run-deno-lint.ts` in place: `deno task gen:assets-barrel` → EXIT 0,
+  `agent-tools.generated.ts` **CHANGED** (contains `nearestConfig`;
+  `EMBEDDED_AGENT_TOOL_BUNDLE_HASH` changes); `embedded.generated.ts` and `skills.generated.ts`
+  unchanged.
+
+Consequences the plan does not account for: (a) CI job "Generated asset freshness"
+(`run-gate.ts --gate assets-barrel` = `deno task check:assets-barrel`, `ci.yml:376-381`) fails
+unless the barrel is regenerated; (b) regenerating edits a **thirteenth path** that is published CLI
+source, contradicting the surface bound, the "Frozen contract entries deliberately not touched"
+bullet ("no other CLI file, … generated asset … is edited") and the JSR table's `@netscript/cli`
+"None"; (c) the consumer-installed copy of `run-deno-lint.ts` acquires marker + nearest-config
+batching semantics — a consumer-facing behaviour change that the plan's L7/A1 wording does not
+mention. `run-deno-fmt.ts` is not in `consumer-tools.json` (only mentioned as text in
+`skills.generated.ts`), so the two wrappers' publish exposure differs. `@netscript/mcp` remains
+proportionate as planned.
+
+### 8. Surface discipline — twelve paths one-for-one, but the bound is not implementable green
+
+The twelve rows in `plan.md` match the coordinator grant described in the brief (6 original + 4
+wrapper files + marker + healthy config), the thirteenth-path guard is present, and slice numbering
+now reconciles with the PR body. Because of F1 the bound as written cannot be implemented with CI
+green; the coordinator must decide between (i) granting
+`packages/cli/src/kernel/assets/agent-tools.generated.ts` (regenerated only, via
+`deno task gen:assets-barrel`, verified by `check:assets-barrel`) as a thirteenth path and recording
+the CLI publish delta, or (ii) removing the two lint-wrapper paths (and the marker's lint clause)
+from this leaf, leaving lint's identical crash to a follow-up. That is a plan decision, not an
+implementation detail.
 
 ## Open-decision sweep (evaluator-run)
 
-1. **#1618 mechanism** — unresolved (F1). The plan must pick a mechanism that empirically satisfies
-   the acceptance command. Options I verified or can bound: (a) wrapper change in
-   `.llm/tools/run-deno-fmt.ts` (skip fixture trees / pass `--config` — the issue's own option 2;
-   **outside the frozen file surface**, needs coordinator rescope); (b) stop the fixture's `.ts`
-   files from being selectable or present as `.ts` (issue option 3 — construct the malformed fixture
-   at runtime in the doctor test, or otherwise keep no `.ts` under a directory whose nearest config
-   is deliberately broken; inside `packages/mcp`, which is in-surface, and still "not repairing the
-   fixture"). Root `exclude` may additionally be kept as belt-and-braces for directory-walk tools,
-   but it cannot be the load-bearing decision.
-2. Everything else in the plan's sweep holds.
+1. **Barrel / thirteenth path** — unflagged, forces rework if deferred (F1). → `FAIL_PLAN`.
+2. **Root task-level exclusion** (`deno.json:140` `fmt:check`
+   `--exclude … packages/mcp/tests/fixtures/doctor/ …`) — `deno.json` is already in-surface; after
+   S1 this wrapper-level parent-family exclusion becomes the same silent over-exclusion of the four
+   healthy files at the root gate that R9 calls a "false-green blind spot". Not rework-forcing
+   (advisory A1) but the plan should state whether it is removed in the same `deno.json` edit or why
+   it stays.
+3. Everything else in the plan's sweep holds.
 
 ## Verdict
 
 `FAIL_PLAN`
 
-### If FAIL_PLAN — required fixes
+### Required fixes
 
-1. **L3 / S1 / R8** (`plan.md:51,90,102,117,164-165`; `research.md` R8) — observed: root `exclude`
-   leaves the exact acceptance command at `filesSelected:115, failedBatches:1`, EXIT=1 (evidence
-   above). Required: re-decide the #1618 mechanism with an executed pre-plan proof of the exact
-   command exiting 0 with `failedBatches: 0` and non-empty selection, the doctor test still green,
-   and the fixture still malformed; if the chosen mechanism needs `.llm/tools/run-deno-fmt.ts`,
-   obtain the coordinator's explicit surface rescope before locking it, and update the "not touched"
-   list (`plan.md:70`) accordingly. Update S1's file list, gate row 4 and risk rows 1-2 to match.
-2. **Slice numbering** (PR #1663 body `## Slices` vs `plan.md:117-120`) — required: make the two
-   agree (either renumber the plan or edit the PR body) before any implementation slice is
-   committed, so per-slice comments and checkbox ticks reference the same S-number.
-3. **`scaffold.runtime` rationale** (`plan.md:81-82`, S4) — required wording fix, not a mechanism
-   change: state that the gate is contract-frozen, that the matrix classes it `n/a` for this
-   surface, and that the coordinator may waive it; do not claim the helper change needs it.
-   (Advisory on its own; would not block a PASS.)
+1. **F1 — published asset barrel (`plan.md` surface table, "not touched" list, JSR table
+   `@netscript/cli` row, S1 files, S4/gate rows 3 and 6, L7).** Observed:
+   `.llm/tools/run-deno-lint.ts` is embedded in
+   `packages/cli/src/kernel/assets/agent-tools.generated.ts`; `deno task gen:assets-barrel` on a
+   HEAD copy with the planned lint wrapper changes that published file, and CI `check:assets-barrel`
+   diffs it (evidence §7). Required: coordinator decision recorded in `drift.md` — either grant the
+   regenerated barrel as an exact thirteenth path (regeneration-only, no hand edit; add
+   `check:assets-barrel` to the gate plan; state the `@netscript/cli` publish delta honestly in the
+   JSR table: embedded tool text + `EMBEDDED_AGENT_TOOL_BUNDLE_HASH`, no export/API change; note the
+   consumer-installed tool's new marker/batching semantics), or drop the lint-wrapper paths from
+   this leaf and re-prove the remaining surface. Update the surface bound, the "not touched" bullet,
+   and L7/A1 accordingly.
+
+### Advisory (do not block a PASS on their own)
+
+- **A1** — decide and record the fate of the `fmt:check` task-level doctor exclusion
+  (`deno.json:140`) now that the wrapper is marker/config-aware; leaving it is a silent
+  parent-family skip at the root gate.
+- **A2** — reword R14 / L10 / drift: the healthy finding is root-style-vs-fixture-default-style, not
+  "simply unformatted"; the fixture's own config is authoritative under nearest-config semantics,
+  and the root `deno.json` `exclude` is what keeps raw root walks from reverting it (§5).
+- **A3** — PR carries `status:research`; brief and phase say `status:plan-eval` (supervisor).
+- **A4** — memoize `nearestConfig` per directory before this runs at root scale (implementation
+  note).
 
 ## Notes
 
-- Nothing was executed against the checkout; all reproductions ran on `git archive HEAD` copies or
-  minimal scratch projects under `$CLAUDE_JOB_DIR/tmp`. No expensive gate, Aspire, Docker, or
-  `e2e:cli` was run. No labels, issues, or central state were changed.
-- Cycle count: this is PLAN-EVAL cycle 1 of the two allowed.
+- Nothing was executed against the checkout; no product/config path, marker, or fixture was mutated
+  in the tree (verified at exit). No `scaffold.runtime`, Aspire, Docker, or `e2e:cli` was run. No
+  labels, issues, ready-state, or central state were changed.
+- Cycle count: this is PLAN-EVAL cycle 2 of the two allowed. Per `plan-gate.md`, a further
+  `FAIL_PLAN` would escalate to the user; F1 is a single, bounded coordinator decision.
