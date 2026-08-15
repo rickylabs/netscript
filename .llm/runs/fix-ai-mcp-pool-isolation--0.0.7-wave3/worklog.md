@@ -233,3 +233,35 @@ and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
 - `deno task quality:scan` raw exit `0`, no findings.
 - `deno task arch:check` raw exit `0`, baseline warnings only.
 - `deno.lock` unchanged. No expensive runtime gate ran.
+
+## 2026-08-15 — Slice 5 degraded-infrastructure docs and final JSR audit
+
+- Documented bounded startup/teardown, synchronous snapshot inspection, healthy-client selection,
+  degraded-server retry, and last-error reporting in `packages/ai/README.md`.
+- Replaced the touched connector's computed TanStack module specifiers with literal imports so JSR
+  can analyze and rewrite the exact `npm:@tanstack/ai-mcp@0.2.1` package mapping. Explicit runtime
+  narrowing now preserves the stdio boundary without assertions.
+- Structured AI check: `deno run --allow-read --allow-run
+  .llm/tools/run-deno-check.ts --root packages/ai --ext ts,tsx`, raw exit `0` (98 files;
+  `--unstable-kv`).
+- Mandatory cross-package check: `deno run --allow-read --allow-run
+  .llm/tools/run-deno-check.ts --root packages/fresh --ext ts,tsx`, raw exit `0` (197 files, 2
+  batches; `--unstable-kv`).
+- Structured AI tests: `deno run --allow-read --allow-write --allow-run
+  .llm/tools/run-deno-test.ts -- --allow-all packages/ai/tests`, raw exit `0` (138 passed).
+- Structured AI lint/fmt: `run-deno-lint.ts --root packages/ai --ext ts,tsx` and
+  `run-deno-fmt.ts --root packages/ai --ext ts,tsx`, raw exit `0` each (98 files).
+- `deno doc --lint packages/ai/mcp.ts`: raw exit `0` (1 file).
+- `deno task quality:scan`: raw exit `0`, no findings. `deno task arch:check`: raw exit `0`,
+  repository baseline warnings only.
+- `deno task publish:dry-run`: raw exit `0`; isolated-declaration checks include
+  `packages/ai/mcp.ts`, and the touched connector emits no unanalyzable-import warning.
+- JSR surface audit: existing `./mcp` export reused; no new `deno.json` export; TanStack dependency
+  is exactly pinned; touched publishable TypeScript has no `import.meta`, runtime file/asset read,
+  import attribute, or runtime `@netscript/*` dependency. Static hazard scan raw exit `1` means no
+  matches. Prohibited escape-hatch scan raw exit `1` means no matches.
+- `git diff --quiet <immutable-base> -- deno.lock` returned raw exit `0` (no difference). No
+  asset/template surface was touched, so `check:assets-barrel` is not applicable.
+- No Aspire, Docker, browser, scaffold runtime, or CLI E2E command ran. Implementation is complete;
+  exact next blocker is the topic orchestrator's substantive Tier-A review/sign-off, followed by a
+  separately launched opposite-family IMPL-EVAL.

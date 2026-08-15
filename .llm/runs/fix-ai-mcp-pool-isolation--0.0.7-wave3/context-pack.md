@@ -151,3 +151,22 @@ amendment.
 - Full MCP tests raw exit `0` with 20 passing; targeted check/lint/fmt, quality, and architecture
   gates all exit `0`.
 - Next: optional/degraded documentation and the complete JSR/publish gate set.
+
+## 2026-08-15 — Slice 5 final gate update (append-only)
+
+- Optional/degraded MCP usage is documented with caller-owned deadlines, synchronous status and
+  ready-client selection, targeted retry, and bounded shutdown.
+- The TanStack connector now uses literal imports backed by the exact
+  `npm:@tanstack/ai-mcp@0.2.1` package pin; publish analysis no longer flags this touched module.
+- Final structured gates: AI check `0` (98 files), read-only Fresh check `0` (197 files), AI tests
+  `0` (138 passed), AI lint `0`, and AI fmt `0`.
+- Final public/fitness gates: `deno doc --lint packages/ai/mcp.ts` `0`, quality scan `0`, architecture
+  check `0`, and workspace publish dry run `0` with isolated declarations.
+- JSR audit confirms the existing `./mcp` export is reused, all new exports have explicit declared
+  types, and touched publishable code contains no runtime asset/`import.meta` reads or unpinned
+  internal package imports.
+- `deno.lock` remains unchanged. No expensive runtime gate ran.
+- `PLAN-EVAL: N/A` remains justified by the two topic-orchestrator rulings: implementation was
+  mechanical after the exact ten-file surface and behavioral contracts were specified.
+- Implementation-agent work is complete. Stop for topic-orchestrator Tier-A review/sign-off; the
+  opposite-family IMPL-EVAL remains evaluator-owned and has not been launched here.

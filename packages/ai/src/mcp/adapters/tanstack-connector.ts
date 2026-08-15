@@ -8,9 +8,6 @@ import type {
   McpToolResult,
 } from '../../ports/mcp-transport.ts';
 
-const TANSTACK_MCP_SPECIFIER = ['@tanstack', '/ai-mcp'].join('');
-const TANSTACK_MCP_STDIO_SPECIFIER = ['@tanstack', '/ai-mcp/stdio'].join('');
-
 interface TanstackHttpConnectorConfig extends McpConnectorConfig {
   readonly serverId: string;
   readonly url: string;
@@ -43,7 +40,7 @@ interface TanstackClient {
 export function createTanstackHttpConnector(): McpClientConnector {
   return async (config, options) => {
     options.signal.throwIfAborted();
-    const mcp = await import(TANSTACK_MCP_SPECIFIER);
+    const mcp = await import('@tanstack/ai-mcp');
     options.signal.throwIfAborted();
     const client = await settleWithSignal<TanstackClient>(
       mcp.createMCPClient({
@@ -68,16 +65,16 @@ export function createTanstackHttpConnector(): McpClientConnector {
 export function createTanstackStdioConnector(): McpClientConnector {
   return async (config, options) => {
     options.signal.throwIfAborted();
-    const mcp = await import(TANSTACK_MCP_SPECIFIER);
-    const stdio = await import(TANSTACK_MCP_STDIO_SPECIFIER);
+    const mcp = await import('@tanstack/ai-mcp');
+    const stdio = await import('@tanstack/ai-mcp/stdio');
     options.signal.throwIfAborted();
     const client = await settleWithSignal<TanstackClient>(
       mcp.createMCPClient({
         transport: stdio.stdioTransport({
-          command: config.command,
-          args: config.args,
-          env: config.env,
-          cwd: config.cwd,
+          command: requireString(config, 'command'),
+          args: readStringArray(config, 'args'),
+          env: readStringRecord(config, 'env'),
+          cwd: readString(config, 'cwd'),
         }),
         prefix: config.serverId,
         name: 'netscript-ai',
@@ -229,6 +226,39 @@ function readObject(
 function readString(value: unknown, key: string): string | undefined {
   const target = readProperty(value, key);
   return typeof target === 'string' ? target : undefined;
+}
+
+function requireString(value: unknown, key: string): string {
+  const result = readString(value, key);
+  if (result === undefined) {
+    throw new TypeError(`MCP connector config requires a string ${key}`);
+  }
+  return result;
+}
+
+function readStringArray(value: unknown, key: string): string[] | undefined {
+  const target = readProperty(value, key);
+  return Array.isArray(target) && target.every((item) => typeof item === 'string')
+    ? [...target]
+    : undefined;
+}
+
+function readStringRecord(
+  value: unknown,
+  key: string,
+): Readonly<Record<string, string>> | undefined {
+  const target = readObject(value, key);
+  if (target === undefined) {
+    return undefined;
+  }
+  const result: Record<string, string> = {};
+  for (const [name, item] of Object.entries(target)) {
+    if (typeof item !== 'string') {
+      return undefined;
+    }
+    result[name] = item;
+  }
+  return Object.freeze(result);
 }
 
 function readProperty(value: unknown, key: string): unknown {
