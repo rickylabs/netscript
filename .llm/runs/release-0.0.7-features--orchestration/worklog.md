@@ -3827,3 +3827,44 @@ These are **additions to the proof matrix and one justification**, not removals:
 15/12 ceiling is unnecessary on the evidence, and the dependency direction is sound.
 
 No product dispatch until this topic commit is pushed and the additions land.
+
+## 2026-08-15 — F5-A1 Tier-A: `PASS` at `630185e2cd391203f07bb3ba6a1eece80fed25ec`
+
+local == remote == PR #1664; **plan-only confirmed** — `git diff 3204ffa98..630185e2c` outside
+`.llm/runs/` is empty. Ceiling unchanged at **15 product + 12 test = 27**: the repair added
+justification and proofs without widening scope.
+
+### The four repairs, each verified against the file
+
+**1. Timeout/kill with stdin piped — and the test can actually fail.** `plan.md:563-564` pins the
+ordering: "writes the complete encoded input, closes the writer, and only then awaits child output.
+The timeout is armed across the write/close/output sequence; if it fires, the adapter kills the
+child, closes …". The test design at `:671` is the strong part: a child that **prints only after
+EOF and then hangs**, so stdout content *proves* the writer was closed — that output is unobtainable
+without closure — while a bounded elapsed time proves no hang and the kill returned.
+
+That asserts the **cause**, not the symptom. A test that merely checked "timeout returned" would pass
+against an implementation that never closed the writer and simply got killed. This one cannot.
+
+**2. Empty rendered content — defined.** `:657` and `:671`: supported-extension empty content is an
+explicit zero-byte passthrough returning `''` **without spawning**. Behaviour is specified rather
+than left to adapter accident, and it avoids a pointless process spawn.
+
+**3. Unknown/absent extension fails closed — with ordering.** `:571-572`: the contract "resolves and
+allowlists the target extension **before inspecting content**", and a missing or unsupported
+extension "fails closed with a target-named error **before spawning Deno**". `:658` restates that
+extension validation precedes content handling, and `:671` closes the interaction explicitly —
+missing/unsupported extensions fail before spawn **including for empty content**. So the two new
+behaviours compose in a defined order rather than racing.
+
+**4. `services-group.ts` justified concretely, not asserted.** `:602-604`: the composition root
+constructs the formatter, but this group assembles `GenerateAspireDependencies` for
+`service generate`, "so it must project that formatter into the Aspire-helper half so all seven
+helper owners canonicalize before compare." That is checkable and maps directly to 7 of the 12
+failing paths — without it the helper owners would receive no formatter and canonicalize nothing.
+
+### Verdict
+
+**`PASS`.** The ceiling is honest, the dependency direction is sound, every one of the 12 failing
+paths has a bound owner, and the three transport safety properties now have assertions that can fail
+for the right reason. Product implementation is released under the reviewed 15+12 ceiling.
