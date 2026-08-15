@@ -3923,3 +3923,79 @@ must be added.
 
 Author not interrupted; all observations are read-only. No product, template, or fixture mutation by
 this lane.
+
+## 2026-08-15 — F5 final Tier-A: `PASS` at `1263f655b37d64a258619403398ca7117ea000d5`
+
+Content head `fda78ee438ea40888e5fb3870a78df70cabb8c82`; local == remote == PR #1664; content→evidence
+delta **evidence only**. Receipt comment `#issuecomment-5303621020`.
+
+### Four binding receipts — sufficiency recomputed independently
+
+| Receipt | gateId | invocationId | outcome | exit | head equality | override |
+| --- | --- | --- | --- | --- | --- | --- |
+| `f5-check.json` | `check` | `…-f5-check` | PASS | 0 | `fda78ee43 == fda78ee43` | none |
+| `f5-test.json` | `test` | `…-f5-test` | PASS | 0 | same | none |
+| `f5-publish-dry-run.json` | `publish-dry-run` | `…-f5-publish-dry-run` | PASS | 0 | same | none |
+| `f5-arch-check.json` | `arch-check` | `…-f5-arch-check` | PASS | 0 | same | none |
+
+Four distinct `gateId`s → **`SUFFICIENT`**. The binding `test` gate is repo-wide `deno task test`:
+**4226 passed / 0 failed / 19 ignored / 4245 total**, up from 4221 — the new proofs are inside the
+contracted gate, not beside it.
+
+### The invariant held: no hidden post-write formatter
+
+`grep` for `formatGeneratedFiles|formatOutput|deno.*fmt` across
+`packages/cli/src/public/features/services/**` and `generate-aspire.ts` returns **zero** non-test
+hits. Canonicalization is genuinely before the decision in both owners:
+
+- `client-scaffolder.ts:78` — `plan()` formats, returning `{path, content}`; `needsWrite` then
+  compares `fs.readFile(plan.path) !== plan.content` and `write` writes that same `plan.content`.
+- `workspace-mutator.ts:194-201` — `content` is formatted **first**, then
+  `changed = force || !exists || readFile(path) !== content`, then `writeFile(path, content)`.
+
+Both sides of every comparison are `F(R(input))`, and the bytes compared are the bytes written.
+
+**Optionality risk checked, not assumed.** `workspace-mutator`'s `formatter` is optional with an
+unformatted fallback, so an omitting caller would silently regress the gate. Both live callers pass
+it — `generate-aspire.ts:85` `formatter: dependencies.formatter` and `add-service.ts:104`
+`{ formatter: dependencies.formatter }`. Latent risk noted; the 12-path e2e proof would catch a
+future omission.
+
+### Executable proofs, run by me
+
+| Proof | Result |
+| --- | --- |
+| Exact-12-path generated output | **1 passed** — "post-init service generation leaves the exact 12 owned outputs formatted and stable" |
+| Transport: timeout/EOF/empty/extension | **8 passed / 0 failed**, including "DenoProcess closes piped stdin before timeout kills and awaits the child" |
+| F4 idempotency + S2 atomic prevalidation | **12 passed / 0 failed** |
+| Semantic split preserved | "post-init formatting retains non-throwing warning semantics" passes — init still **warns**, generated still **throws** |
+
+### The untouched 27th path is genuinely unnecessary
+
+`format-generated-files.ts` now delegates to `DenoGeneratedSourceFormatter(process).formatFiles(...)`
+instead of exec'ing `deno fmt` directly. Its **pre-existing** test was not modified, and asserts the
+observable contract — "uses scaffold style and the exact file list" and "propagates formatter
+failures". It **passes unmodified**.
+
+That is stronger evidence than a rewritten test would have been: a test that had to change to
+accommodate the refactor would have proven the behaviour changed. Passing untouched proves the
+delegation is behaviour-preserving. **26/27 is correct**, not a gap.
+
+### Ceiling and extensions
+
+**26 paths touched, zero outside the approved ceiling.** All 15 product paths, 11 of 12 test paths.
+
+`SUPPORTED_EXTENSIONS` remains 26 members, and **all 26 are accepted by the pinned Deno 2.9.5**
+`fmt --ext` — re-probed at this head, zero rejected. The allowlist is not fail-open and nothing is
+deferred to spawn. Carried recommendation, not a blocker: assert the list is a **subset of what Deno
+accepts** so version drift cannot silently reintroduce the deferred-error mode.
+
+### Verdict `PASS` — requesting a new singleton runtime lease
+
+S1-S3, F4, and F5 are Tier-A signed. Cheap convergence is complete and the generated `fmt` defect
+that failed `scaffold.runtime` three times is repaired at its single root cause.
+
+Per **D-17**, the readiness head is already final and pushed, so a lease bound to it cannot move
+before execution: **`1263f655b37d64a258619403398ca7117ea000d5`**.
+
+No Aspire, Docker, `scaffold.runtime`, or `fresh-browser` was run. No lease taken. No evaluator.
