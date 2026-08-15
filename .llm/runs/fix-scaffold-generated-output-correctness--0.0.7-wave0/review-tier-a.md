@@ -102,12 +102,26 @@ it so the choice is deliberate rather than assumed.
 
 ## Evidence-chain observation (not a defect in this leaf)
 
-`scaffold.runtime` has no durable-receipt route: `.llm/tools/gates/run-gate.ts` accepts only gates
-listed in `catalog.ts`, which has no `scaffold.runtime`/CLI-E2E entry, and `packages/cli/e2e/cli.ts`
-exposes no `--report` flag. The implementation thread correctly refused to edit the catalog, alter
-the fixed command, or fabricate a receipt, and stopped instead — that refusal is recorded as correct
-fail-closed behavior. The approved plan's own contract (preserve the suite's JSON/domain report) was
-used instead, and the resulting receipt is complete. The repo-level gap deserves its own issue.
+> **Corrected 2026-08-15 after IMPL-EVAL cycle 1.** The original version of this section claimed
+> `packages/cli/e2e/cli.ts` "exposes no `--report` flag". **That was wrong.**
+> `e2e:cli run --report <path>` exists at the immutable base —
+> `packages/cli/e2e/src/presentation/cli/commands/run-command.ts:30`,
+> `.option('--report <path:string>', 'Write final JSON report')` — and CI already uses it
+> (`.github/workflows/e2e-cli.yml`). The error was mine: I grepped the thin `cli.ts` entry point and
+> concluded from its absence instead of the command module. Corrected below.
+
+`scaffold.runtime` has no durable-receipt route, and the gap is **only** in the run-gate catalog:
+`.llm/tools/gates/run-gate.ts` accepts only gates listed in `.llm/tools/gates/catalog.ts`, which has
+no `scaffold.runtime`/CLI-E2E entry (its nearest id, `scaffold-versions`, maps to
+`check:scaffold-versions`). Any issue filed for this should target that catalog entry alone, not the
+E2E reporting surface, which is adequate.
+
+The implementation thread's refusal remains correct and its stated reasons remain valid: the
+**authorized** command was fixed and did not include `--report`, so adding the flag would have
+altered a command the coordinator pinned, and `run-gate.ts` would still have rejected the
+uncatalogued gate. It refused to edit the catalog, alter the fixed command, or fabricate a receipt,
+and stopped instead — recorded as correct fail-closed behavior. The approved plan's own contract
+(preserve the suite's JSON/domain report) was used, and the resulting receipt is complete.
 
 ## Standing stops after this sign-off
 
