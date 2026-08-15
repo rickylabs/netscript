@@ -80,24 +80,51 @@ gate.
 
 ## Next action
 
-**#1542 / PR #1656 is READY and awaiting the coordinator's merge decision. Nothing is running in the
-internals lane.**
+**Internals has shipped three leaves; the fourth is active.**
 
-| Field          | Value                                                                                    |
-| -------------- | ---------------------------------------------------------------------------------------- |
-| PR head        | `b80794470cd175ad89d27c06a764ab1d032d3d9f` (local = remote = PR)                         |
-| State          | `OPEN`, `draft=false`, **`MERGEABLE/CLEAN`**                                             |
-| Labels         | `type:fix`, `status:ready-merge`, `area:tooling`, `impl-eval:skip` — one `status:` label |
-| CI             | terminal, 64 checks: **11 SUCCESS / 53 SKIPPED / 0 failures**, all at this head          |
-| Review threads | 0 total / 0 unanswered                                                                   |
-| Body / issue   | PR 11 checked / 0 unchecked; issue #1542 3 checked / 0 unchecked                         |
+| Leaf                                         | State                                                         |
+| -------------------------------------------- | ------------------------------------------------------------- |
+| #1644 `harness-evidence-and-verdict-tooling` | merged `dd472102d` — #1561/#1563/#1621 shipped                |
+| #1653 `quality-scan-allowance-rail`          | merged `473e8d75b` — #1378/#1545 shipped                      |
+| #1656 `quality-scan-root-coverage`           | merged `7737d8903` — #1542 CLOSED/COMPLETED, `status:shipped` |
+| **`openhands-dispatch-claim-and-refusal`**   | **ACTIVE** — bootstrap/research/plan, stops at the plan gate  |
 
-Gate lineage: plan `da76d9d84` → PLAN-EVAL cycle 1 `PASS` (`3b95a004f`) → slices `dbbedde34`,
-`a7e9ee0d5`, `0147e238f` with supervisor sign-offs `a258bcc8c`, `4ae309d57`, `2c4881fd7` → IMPL-EVAL
-`PASS` at evaluated head `2c4881fd7` (`addba1ab9`) → disposition record `b80794470`. The delta from
-the evaluated head is run artifacts only; no product source moved after evaluation.
+Live `main` = `7737d8903bb2925c3fcefbda362168fe297eebd4` — the new immutable base.
 
-This lane does not merge. `openhands-dispatch-claim-and-refusal` remains queued and undispatched.
+### Active leaf identity
+
+- Worktree `/home/codex/repos/netscript-007-openhands-dispatch`
+- Branch `fix/openhands-dispatch-claim-and-refusal` @ `7737d8903`, **no upstream**
+- Codex thread `01a00443-abab-7261-8905-74ed71467929`, `openai · gpt-5.6-sol · medium`, route
+  matched
+- Steering: `codex exec resume 01a00443-abab-7261-8905-74ed71467929 -- "<follow-up>"`
+- Run dir
+  `.llm/runs/release-0.0.7-internals--orchestration/slices/openhands-dispatch-claim-and-refusal/`
+- Closes exactly **#1611** (p1, dispatch helper must emit phase/head and acquire the existing claim)
+  and **#1613** (p2, report refused OpenHands commands to their author; align generation retry)
+
+### Frozen contract (outer bound, to be narrowed in the plan)
+
+Archetype `6-cli-tooling`, no overlays. Four surfaces:
+`.github/scripts/openhands-comment-trigger.mjs`, `.github/workflows/openhands-agent.yml`,
+`.github/workflows/openhands-phase-eval.yml`, `.llm/tools/agentic/lib/agentic-lib.ts`. Proving
+gates: `check`, `test`, `quality-job`. **JSR audit not applicable** — no publishable surface in
+contract.
+
+**Not this leaf's to take:** Aspire, Docker, browser/desktop, E2E, or the global expensive-gate
+lease. And uniquely here: the leaf may **read** the OpenHands workflows but must not **fire** them —
+no dispatch, no evaluator trigger, manual or by label.
+
+### Blocking coordinator action
+
+The leaf stops after `plan.md` with its PLAN-EVAL judgement. That gate is the coordinator's to
+grant; this lane does not self-launch an evaluator.
+
+### Remaining internals queue after this leaf
+
+wave 2 `package-gate-honesty` (#1604/#1618/#1622) and `reference-export-drift-gate` (#1296); wave 3
+`jsdoc-example-compile-gate` (#1533) and `leak-check-process-descendants` (#1429); wave 4
+`fresh-defer-test-capability` (#1557/#1601).
 
 ## Queued internals follow-up — L-2 (needs a coordinator scope decision)
 
