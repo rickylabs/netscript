@@ -1111,3 +1111,54 @@ no-op, and a post-commit receipt bound to the full committed `gitHead`.
 Merge disposition belongs to the coordinator. This lane has not merged, published, relabelled, or
 started the next docs leaf, and holds there until this leaf reaches a terminal merge disposition.
 This topic remained independent of the internals, fixes, and features lanes throughout.
+
+## 2026-08-15 — #1652 merged; docs lane 0.0.7 scope complete; no next leaf exists
+
+### Merge reconciled and independently verified
+
+| Fact                   | Value                                                                 |
+| ---------------------- | --------------------------------------------------------------------- |
+| Merge commit on `main` | `e090f894ff3682405a36e4f896ffd2cc16f9a1f8`                            |
+| `origin/main` subject  | `docs(positioning): seed the Next.js comparison programme (#1652)`    |
+| Merged from            | `a465836b4cc1c40262a473de07b5744e70b20ead`                            |
+| Merged at              | `2026-08-15T07:21:13Z`                                                |
+| PR #1652               | `merged: true`, state `closed`, labels normalized to `status:shipped` |
+| `impl-eval:skip`       | **removed** post-merge, as the coordinator committed to doing         |
+| Issue #1551            | `closed` / `completed`, `status:shipped`                              |
+
+The `impl-eval:skip` removal matters to the record: the label had been redispatch suppression, and
+leaving it on a shipped PR whose IMPL-EVAL genuinely passed at cycle 2 would have read as a waived
+evaluation. The terminal record now shows the evaluation as earned.
+
+### No next eligible docs leaf — the lane's committed scope is exhausted
+
+The coordinator's instruction was to select and dispatch the next eligible docs leaf. **There is
+none**, established from the central control plane rather than assumed:
+
+- `milestone-cluster-state.json` → docs lane `issueNumbers: [1551]` — one issue, now closed.
+- Docs leaves in cluster state and `milestone-leaf-plan.json`: exactly one,
+  `comparison-docs-programme` (issues `[1551]`, wave 0) — merged.
+
+Seven open 0.0.7 issues carry `area:docs` or `type:docs`, so a label-based read would wrongly
+suggest remaining docs work. Checked against allocation instead: **every one belongs to another
+lane** — internals `#1533`; fixes `#1112`, `#1350`, `#1461`, `#1623`; features `#1360`, `#1502`.
+None is allocated to docs. Taking one would breach the coordinator's exclusive issue allocation and
+the lane independence this topic has held throughout.
+
+The six residual issues this run filed — `#1645`–`#1650` — are all open in **Backlog / Triage**, not
+0.0.7. They were deliberately deferred so the comparison programme could ship a bounded slice, and
+they are not eligible 0.0.7 work.
+
+### Position
+
+Nothing was dispatched, because dispatching would have required either inventing scope or taking
+another lane's issue. The docs lane has delivered its entire committed 0.0.7 allocation: one issue,
+one leaf, merged and shipped at `e090f894f`.
+
+This is returned to the coordinator as a scope decision: either allocate further 0.0.7 docs scope to
+this lane, promote one or more of `#1645`–`#1650` out of Backlog, or mark the docs lane terminal for
+0.0.7. The supervisor session and the original Codex author thread
+`019ffcc9-16c2-7573-b7f6-d627172408e8` are preserved and idle, ready for either outcome. No formal
+cycle was relaunched for #1652.
+
+Immutable base for any next docs leaf: `e090f894ff3682405a36e4f896ffd2cc16f9a1f8`.
