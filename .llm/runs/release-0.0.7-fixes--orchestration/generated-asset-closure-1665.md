@@ -85,3 +85,66 @@ The product IMPL-EVAL PASS (`9a26c107a`, five issue contracts) and the delta IMP
 (`7549d9fc0`, source→`.llm/assets` fidelity, proven at content level) both stand **for their actual
 scopes**. Neither is invalidated by a newly discovered downstream mirror; neither closes it either.
 No fresh Tier-A and no further evaluator until links 2–4 sit on **one content head**.
+
+---
+
+## Historical precedent — PR #1652, and what it means
+
+The coordinator's central state already recorded this cascade. Verified from **two independent
+sources** rather than accepted on citation:
+
+1. **Central state.** `netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/
+   milestone-cluster-state.json:512-517` records `derivedAssetCascadePaths` as exactly:
+
+   ```json
+   [".llm/assets/agent-docs/prose.json.gz",
+    ".llm/assets/agent-docs/provenance.json",
+    "packages/cli/src/kernel/assets/agent-docs.generated.ts",
+    "packages/mcp/src/publish-assets.generated.ts"]
+   ```
+
+   with `readinessState: "complete"` and `mergeCommitSha: e090f894ff3682405a36e4f896ffd2cc16f9a1f8`.
+
+2. **The shipped diff itself.** `gh pr view 1652 --json files` shows PR #1652
+   ("docs(positioning): seed the Next.js comparison programme", MERGED 2026-08-15T07:21:13Z, head
+   `a465836b4` — matching the stated repair head) changed 25 files, of which the generated ones are
+   **exactly those four paths and no others**.
+
+**The precedent and this run's independently-derived closure agree exactly**, which matters because
+the two derivations share no method. #1652 established the cascade empirically by repairing it; this
+run derived it by executing every `gen:*`/`check:*` pair at two heads and reading
+`generate-publish-assets.ts:34-37`'s declared input list. Convergent evidence from independent
+methods is the strongest form available here, and it upgrades the closure claim from "no fifth gate
+fired" to "no fifth mirror exists, corroborated by a prior shipped repair of the same cascade".
+
+### Process miss — the cascade was known and was not reused
+
+This four-link cascade was **already persisted in central state before #1665 touched Query Bridge
+docs**, and it was not consulted. Had it been, links 2–4 would have been in the S3 scope grant and
+gate set from the start, and this leaf would have taken one repair instead of three discoveries.
+
+The coordinator has recorded this as a coordinator/process miss. This orchestrator's share is
+concrete and worth stating plainly: when the five-path widening authorized a `docs/site/**` edit, I
+reviewed it for formatter and byte-comparison risk and did not ask whether the milestone state
+already knew what a docs edit cascades into. The lookup was available and cheap. **Standing
+correction for this topic: before authorizing any `docs/site/**` edit, read
+`derivedAssetCascadePaths` from the milestone cluster state and fold the whole cascade into the slice
+scope and proving set up front.**
+
+### Fifth-link determination against the prior cascade — explicit
+
+`check:mcp-export-corpus` / the MCP export-surface corpus is **NOT** a member of the #1652
+`derivedAssetCascadePaths` set. Two independent facts agree on its classification:
+
+- it is **stale at the merge base `baf1cdf67`** (executed, exit 1) as well as on the branch;
+- it does not appear in the prior cascade, and `generate-export-surface-corpus.ts` reads neither
+  `docs/site`, nor `agent-docs`, nor `.llm/assets`.
+
+**Determination: pre-existing unrelated red — NOT a new branch-caused mirror.** It belongs to the
+same family as `surface:diff` (stale `baselines/public-surfaces.json`) and JSR `F-DOCT-5`: red before
+this leaf existed, outside its authorized surface, not to be repaired here, and never to be reported
+as green.
+
+**Closure, now doubly established: the branch-caused generated-asset set is exactly the four
+`derivedAssetCascadePaths` — links 2–4 downstream of the Query Bridge source edit — and there is no
+fifth.**
