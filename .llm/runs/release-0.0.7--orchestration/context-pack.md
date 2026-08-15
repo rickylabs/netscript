@@ -65,7 +65,7 @@ E2E/Aspire gate needs it.
 Completion supervision resumed at `2026-08-15T03:46:43Z`. The live continuation point is no longer
 the reset-gate table above: docs S2 is active after exact pinned-input provisioning; internals #1653
 and features #1651 are in fresh Opus 5/high IMPL-EVAL sessions `430d5f91-…` and `2a8cf0a6-…`;
-fixes #1654 is repairing Tier-A finding T-1 on its original Codex thread before the coordinator may
-grant slice 6's singleton expensive-gate lease. Keep the coordinator turn active through those
+fixes #1654 repaired Tier-A finding T-1 at `ebad68c80`, and now holds the singleton slice-6
+`scaffold.runtime` lease granted only after empty Aspire/Docker/central-lease preflight. Keep the coordinator turn active through those
 terminal results and subsequent merge-readiness decisions. A supervisor's parked checkpoint is
 never itself a reason to yield.

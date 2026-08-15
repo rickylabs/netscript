@@ -525,7 +525,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5",
-      "currentPrHeadSha": "cab6d1feb813a88afde7403ee21de44503503fa0",
+      "currentPrHeadSha": "ebad68c80bc9079ba835901eb2245a1a31ab7b62",
       "evaluatorCommitSha": "b8fc5eb53a530d337602f7dc377239651a57d428",
       "evaluationCycle": 2,
       "evaluationVerdict": "PASS",
@@ -784,7 +784,19 @@
       "grantedAt": "2026-08-15T03:50:58.194Z"
     }
   ],
-  "expensiveGates": [],
+  "expensiveGates": [
+    {
+      "id": "scaffold-generated-output-correctness-runtime",
+      "state": "running",
+      "lane": "fixes",
+      "leafId": "scaffold-generated-output-correctness",
+      "gateId": "scaffold.runtime",
+      "preGateHead": "ebad68c80bc9079ba835901eb2245a1a31ab7b62",
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-15T04:02:33.167Z",
+      "scope": "one isolated scaffold.runtime pass covering issues 1262, 1263, and 1588; Aspire/Docker cleanup mandatory"
+    }
+  ],
   "canaryCheckpoints": [
     {
       "id": "checkpoint-foundations",

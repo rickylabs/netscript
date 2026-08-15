@@ -218,6 +218,7 @@ topic:
 | fixes | T-1 bounded MSSQL regression repair resumed on original Codex thread `019ffcca-8be0-…`; slice 6 and its singleton lease remain pending |
 | features | #1651 fresh IMPL-EVAL running in Opus 5/high session `2a8cf0a6-7529-…`, bridge `session_01Y48WxcCgzUAWfJmGmhBykc`, source `04d431028` |
 
-Neither formal evaluator consumes the global expensive-gate mutex. `expensiveGates` remains empty
-until the fixes cheap-gate repair is signed off and the coordinator grants the one
-`scaffold.runtime`/Aspire/Docker lease.
+Neither formal evaluator consumes the global expensive-gate mutex. At `2026-08-15T04:02:33Z`,
+fixes T-1 passed Tier-A at `ebad68c80`; a clean `aspire ps`/Docker/central-state preflight then
+granted the one `scaffold.runtime`/Aspire/Docker lease to #1654. No other expensive gate may start
+until that isolated pass is terminal and its mandatory cleanup is verified.
