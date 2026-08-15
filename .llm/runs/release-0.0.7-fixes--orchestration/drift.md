@@ -269,3 +269,47 @@ coordinator, who owns labels in this lane:
    the cycle-2 IMPL-EVAL verdict, which is bound to `df05344166` / `4766b258f`.
 
 Recorded so no one merges believing the ready-merge lifecycle already completed.
+
+
+## Significant — O-3 was a real cross-package regression, not bookkeeping
+
+`check-test` on PR #1661 is a **current failure** (`agentic:pr-checks` → `current-fail`,
+`currentFailures=1`; not superseded). Structured receipt from artifact
+`ci-check-test-gate-receipts-31878428521-1`: **4151 passed / 1 failed / 14 ignored**, one unique
+failure —
+
+```
+root-level scaffold runtime imports resolve in both package-source modes
+  packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts:261
+  AssertionError: expected @netscript/ai to compute the @tanstack/ai-mcp runtime specifier
+```
+
+Cause: slice 5 replaced the connector's computed constants
+(`['@tanstack', '/ai-mcp'].join('')`, present at base `284dda90a`) with literal
+`await import('@tanstack/ai-mcp')`. `workspace-mutator_test.ts:306-320` scans the connector's
+**source text** for the `[…].join('')` pattern and requires **both** `@tanstack/ai-mcp` and
+`@tanstack/ai-mcp/stdio` — the computed form deliberately keeps optional MCP out of the static JSR
+import graph so generated projects own runtime resolution.
+
+**Two supervisory failures, recorded plainly:**
+
+1. **Disposition.** IMPL-EVAL cycle 1 raised this as **O-3**, non-blocking, "coordinator awareness;
+   a one-line drift entry would make the record complete". This orchestrator accepted that framing
+   and required only a drift line. The evaluator's own evidence said the change was "not named in
+   either ruling" — that should have prompted *why is it asserted elsewhere?*, not a note. Cycle 2
+   inherited the disposition and did not revisit it.
+2. **Gate selection.** Tier-A ran the focused MCP suite plus `packages/ai` and `packages/fresh`
+   checks — scoped to the packages the delta *touched*. The assertion lives in **`packages/cli`**,
+   which the delta does not touch but which asserts on `packages/ai`'s **source text**. A repo-wide
+   `deno task test` would have caught it locally; package-scoped gates structurally could not.
+
+**Rule added:** when a change alters a package's *source text* in a way another package may assert
+on — specifier construction, export shape, generated-artifact content — package-scoped gates are
+insufficient. Run the repo-wide suite, or identify the asserting package and gate it explicitly.
+
+Bounded RED→GREEN repair dispatched to the original author on the same thread, restoring both
+computed constants in `tanstack-connector.ts` (already in the ten-file contract), explicitly barring
+any weakening of the CLI test, and widening the gate set to include the `packages/cli` check. Because
+this is a **post-IMPL-EVAL product mutation**, a fresh Tier-A and a proportionate fresh formal
+evaluation of the delta are required before readiness is revisited. Merge remains the coordinator's
+decision; the next fixes leaf stays queued.
