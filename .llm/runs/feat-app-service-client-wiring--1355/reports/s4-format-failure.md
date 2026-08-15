@@ -42,3 +42,35 @@ absent:
 2. `receipts/s4-test.json` — missing / NOT_RUN.
 3. `receipts/s4-publish-dry-run.json` — missing / NOT_RUN.
 4. `receipts/s4-arch-check.json` — missing / NOT_RUN.
+
+## Resume evidence amendment
+
+The coordinator released S4 to resume from evidence commit
+`ee479ea851927818404c6311dac78e07a4eef1b5` with explicit per-member configurations. This section
+is append-only; it preserves the original fail-closed result above and records why the replacement
+evidence is narrower and trustworthy.
+
+### Package-quality TypeScript formatting
+
+- CLI: PASS — `filesSelected=887`, `batches=1`, `failedBatches=0`, `findings=0`. The wrapper used
+  the absolute neutral config
+  `/home/codex/repos/netscript-007-features-1355/packages/runtime-config/deno.json` and
+  `--batch-size 1000`, so every selected file was checked in one batch without inheriting the root
+  CLI exclusion.
+- Fresh: PASS — `filesSelected=201`, `batches=2`, `failedBatches=0`, `findings=0`, using the
+  absolute `packages/fresh/deno.json` config.
+- SDK: PASS — `filesSelected=84`, `batches=1`, `failedBatches=0`, `findings=0`, using the absolute
+  `packages/sdk/deno.json` config.
+
+The neutral runtime-config format settings are style-identical to the root settings
+(`useTabs: false`, `lineWidth: 100`, `indentWidth: 2`, `semiColons: true`, `singleQuote: true`) and
+do not exclude CLI. The CLI result is batching-sensitive: the same neutral config with the default
+200-file batching fail-closes four of five batches despite zero findings, while a batch size greater
+than the 887-file selection checks the complete selection in one passing batch. This is an observed
+wrapper/Deno interaction, not a formatting defect.
+
+The separate bare `deno fmt --check` Markdown scan reports one finding among 176 files in
+`packages/cli/e2e/README.md`. That file is untouched by this leaf—
+`git log 3fc0f2f92..HEAD -- packages/cli/e2e/README.md` is empty—so the finding is pre-existing and
+out of scope. Per `AGENTS.md`, that broad Markdown scan is explicitly **not** used as the
+package-quality formatting verdict above.

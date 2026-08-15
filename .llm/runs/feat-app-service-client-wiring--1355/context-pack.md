@@ -17,11 +17,12 @@ age in both canonical island dialects, guards the emitted shape, and adds a cont
 fixture through the public Fresh query wrapper. The browser fixture is wired into `test:browser` but
 has not run because the gate remains lease-blocked. The ruled CLI generator/migration and Fresh
 hydration notes live in the publishable package READMEs. Full CLI and Fresh non-browser suites are
-green. S4 stopped at its first ordered gate: the combined formatting wrapper exited 2 because the
-root Deno format config excludes CLI batches that the wrapper selected. The exact command reproduces
-at pre-implementation commit `c53726c69`, so this is pre-existing invocation/configuration failure,
-not a leaf product regression. Draft PR #1664 retains both closing keywords and remains draft. No
-expensive gate has run.
+green. S4 resumed from its initial fail-closed formatting record using explicit per-member configs:
+format, lint, asset freshness, and exact-pin audits pass. The full export-map doc audit passes for
+CLI but stops the slice on Fresh's 45 and SDK's 3 pre-existing diagnostics. Exact full-command
+measurement at pre-implementation commit `c53726c69` reproduces both sets, including the distinct
+plugin-streams diagnostic. Draft PR #1664 retains both closing keywords and remains draft. No
+binding receipt or expensive gate has run.
 
 ## Completed
 
@@ -62,11 +63,12 @@ expensive gate has run.
 
 ## In Progress
 
-- S4 is stopped after the first red gate with attribution recorded; all later S4 steps are NOT_RUN.
+- S4 is stopped at the full export-map doc audit with attribution recorded; JSR audits,
+  isolated-declaration/publish dry-runs, and binding gates are NOT_RUN.
 
 ## Next Steps
 
-1. Await coordinator direction on the pre-existing formatting invocation/config mismatch; do not
+1. Await coordinator direction on the pre-existing full export-map documentation failures; do not
    resume S4 or start S5 without a separate dispatch.
 2. Keep both expensive gates lease-blocked until explicit release.
 
@@ -108,15 +110,15 @@ expensive gate has run.
 
 | Gate family | Current status                                                                                                                    | Evidence                     |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Static      | S4 format wrapper PRE_EXISTING_FAIL at its first ordered step (exit 2, three Deno-excluded batches, zero findings), reproduced at `c53726c69`. All later S4 checks/audits/gates are NOT_RUN. | `worklog.md`; `reports/s4-format-failure.md` |
+| Static      | Per-member format/lint, asset freshness, exact pins, and CLI export-map doc audit pass. Fresh export-map doc audit has 45 pre-existing diagnostics and SDK has 3, reproduced at `c53726c69`; later JSR/dry-run/binding gates are NOT_RUN. | `worklog.md`; `reports/s4-format-failure.md`; `reports/s4-export-doc-failure.md` |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
 | Runtime     | NOT_RUN / lease-blocked                                                                                                           | `plan.md` release conditions |
 | Consumer    | NOT_RUN / implementation-dependent                                                                                                | `plan.md` S5                 |
 
 ## Open Questions
 
-- Whether the coordinator wants S4 formatting rerun as separate per-member/configured wrapper
-  invocations; the current combined invocation cannot produce an honest verdict.
+- Whether the coordinator will separately scope the pre-existing Fresh/SDK documentation defects
+  or direct another evidence policy; this artifact-only slice does not repair them inline.
 
 ## Drift and Debt
 

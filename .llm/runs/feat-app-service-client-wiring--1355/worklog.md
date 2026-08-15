@@ -83,6 +83,8 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | 2026-08-15T14:29:01+02:00 | S3    | Hydration implementation | Passed loader-owned `cachedAt` through `initialDataUpdatedAt` in both canonical island dialects, added omission guards, and canonically regenerated the shipped asset barrel. |
 | 2026-08-15T14:29:01+02:00 | S3    | Browser/docs contract | Added the lease-gated public-wrapper old/fresh browser fixture and task without running it; documented service regeneration/migration and Fresh hydration age in the ruled package READMEs. |
 | 2026-08-15T14:40:00+02:00 | S4    | Cheap convergence stop | The first ordered formatting-wrapper invocation exited 2 because root `fmt.exclude` rejected selected CLI batches. Exact-command measurement at pre-implementation commit `c53726c69` reproduced the same three excluded batches; stopped before every later gate. |
+| 2026-08-15T14:49:51+02:00 | S4    | Configured format/lint resume | Per-member TypeScript format and lint wrappers passed; CLI used the released absolute neutral config and one 1000-file batch. Asset freshness and all three exact-pin audits passed. |
+| 2026-08-15T14:49:51+02:00 | S4    | Export-map audit stop | CLI's full export-map doc audit passed. Fresh failed with 45 diagnostics and SDK with 3; exact full-command measurement at pre-implementation `c53726c69` reproduced both totals and the plugin-streams finding. Stopped before JSR, dry-run, and binding gates. |
 
 ## Decisions
 
@@ -131,11 +133,20 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | S3 Fresh export-map doc lint | `cd packages/fresh && deno task doc-lint` | BASELINE_FAIL | 45 pre-existing `private-type-ref` diagnostics; S3 changes no Fresh source/export type, and the task command is unchanged. Full attribution remains S4-owned. |
 | README standard | `deno task docs:readme:check` | BASELINE_FAIL | Only `packages/bench/README.md` lacks an Install section; both S3 package READMEs conform. |
 | S4 combined format wrapper | `run-deno-fmt.ts --root packages/cli --root packages/fresh --root packages/sdk --ext ts,tsx` | PRE_EXISTING_FAIL | Exit 2: three batches selected by the wrapper were excluded by root Deno config; zero formatting findings. Exact command reproduces at `c53726c69`. See `reports/s4-format-failure.md`. |
+| S4 CLI TypeScript format | `run-deno-fmt.ts --root packages/cli --ext ts,tsx --config <absolute runtime-config/deno.json> --batch-size 1000` | PASS | 887 files in one batch; zero failed batches and zero findings. Default batching is fail-close sensitive; see the append-only format report. |
+| S4 Fresh TypeScript format | `run-deno-fmt.ts --root packages/fresh --ext ts,tsx --config <absolute fresh/deno.json>` | PASS | 201 files, two batches, zero failed batches and zero findings. |
+| S4 SDK TypeScript format | `run-deno-fmt.ts --root packages/sdk --ext ts,tsx --config <absolute sdk/deno.json>` | PASS | 84 files, one batch, zero failed batches and zero findings. |
+| S4 per-member TypeScript lint | `run-deno-lint.ts` with the same three member roots/configs | PASS | CLI 887, Fresh 201, SDK 84 files; zero findings. |
+| S4 asset freshness | `deno task check:assets-barrel` | PASS | Exit 0; product tree remained clean. |
+| S4 exact-pin audits | Per-member `scanNetscriptJsrSpecifiers` reports | PASS | CLI 739, Fresh 132, SDK 60 files scanned; zero failures. CLI has one reviewed exact-target alias allowance. |
+| S4 CLI full export-map doc audit | `run-deno-doc-lint.ts --root packages/cli` | PASS | All 3 entrypoints; zero diagnostics. |
+| S4 Fresh full export-map doc audit | `run-deno-doc-lint.ts --root packages/fresh` | PRE_EXISTING_FAIL | 16 entrypoints; 45 deduplicated diagnostics (28 private references, 17 missing JSDoc), reproduced at `c53726c69`. |
+| S4 SDK full export-map doc audit | `run-deno-doc-lint.ts --root packages/sdk` | PRE_EXISTING_FAIL | 12 entrypoints; 3 deduplicated private references, including the separate plugin-streams finding; reproduced at `c53726c69`. |
 | Changed-module doc lint | `deno task doc:lint --root packages/sdk --entrypoints ./src/query-client/key-bridge.ts --pretty` | PASS          | Zero documentation errors.                                                                  |
 | CLI entrypoint doc lint | `deno task doc:lint --root packages/cli --entrypoints ./mod.ts --pretty`                          | PASS          | Zero documentation errors, including the new exported generator contract.                  |
 | SDK root-entrypoint doc lint (`packages/sdk/mod.ts`) | `deno doc --lint packages/sdk/mod.ts`                                              | BASELINE_FAIL | Exactly two pre-existing `private-type-ref` errors for this root-entrypoint run: `QueryClientPort` at `src/ports/query-client.ts:41` and `createNetScriptQueryClient` at `src/query-client/query-client-factory.ts:44`, both referencing private `QueryClient`; measured before S1 and carried unchanged. The full 12-entrypoint export-map sweep is S4 and may surface further diagnostics. |
 | Quality gate            | `deno task quality:gate`                                                                         | PASS          | Quality scan clean; architecture check passed with baseline warnings.                       |
-| JSR audits              | Baseline manifest/export/pin inspection only                                                     | NOT_RUN       | Full audits planned after implementation.                                                   |
+| JSR audits              | Exact-pin inspection passed per member; per-member JSR audit not reached                          | NOT_RUN       | Ordered stop at full export-map doc audit.                                                   |
 
 ### Fitness Gates
 
@@ -189,6 +200,8 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
   public `@netscript/fresh/query` wrapper. It is wired into `test:browser` but remains unrun.
 - No expensive gate, lease, ready transition, lockfile change, `docs/**` change, evaluator launch,
   or S4 work occurred in S3.
-- S4 stopped on the first ordered red result. No lint, asset freshness, per-member audit,
-  isolated-declaration/publish dry-run, binding gate, expensive gate, or evaluator ran; no receipt
-  was generated or hand-authored.
+- S4 resumed with explicit per-member format configs: format, lint, asset freshness, and exact-pin
+  audits passed. The full export-map doc audit passed for CLI but reproduced pre-existing Fresh
+  (45) and SDK (3) failures at `c53726c69`, including the distinct plugin-streams diagnostic.
+- S4 stopped again before per-member JSR audits, isolated-declaration/publish dry-runs, binding
+  gates, expensive gates, or an evaluator. No receipt was generated or hand-authored.
