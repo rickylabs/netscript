@@ -623,3 +623,21 @@
   classification skipped every unrelated/costly lane.
 - Corrected #1663 recovery wording: local-only `71e803807` was amended before its first remote push;
   no remote history rewrite occurred and the original author thread was preserved.
+
+## 2026-08-15T11:36:00Z — first feature slice accepted and hidden CLI asset surfaced
+
+- #1664 S1 is independently Tier-A `PASS` at `5ac6efa30`, features checkpoint `6ea7a17fb`.
+  The SDK public surface is unchanged; the focused check and two semantic tests use TanStack's real
+  `partialMatchKey` behavior and pass. Two `QueryClient` private-type-ref doc-lint findings were
+  reproduced on the pre-S1 head and are carried as baseline, not misreported as green or folded into
+  this leaf. The same original author is executing S2 only; both expensive gates remain unleased.
+- #1663 cycle-2 PLAN-EVAL returned `FAIL_PLAN` at `c415daad2`, comment `5302030430`. Execution found
+  that `run-deno-lint.ts` is embedded verbatim in the published CLI agent-tool bundle. Coordinator
+  keeps the wrapper architecture and grants exactly path 13,
+  `packages/cli/src/kernel/assets/agent-tools.generated.ts`, regeneration-only, with asset freshness
+  and the CLI publish/hash behavior delta binding. The redundant task-level doctor skip must be
+  removed while the root formatter exclusion remains. No product mutation is authorized yet.
+- #1665's first bounded plan repair is pushed at `92bf26e11`: the overflow handoff, per-report
+  invalidation staging, and raw six-diagnostic doc-lint baseline are substantively repaired. The
+  superseding fifth-path docs ruling is being reconciled on the same author before fresh Tier-A;
+  no evaluator or implementation has started.

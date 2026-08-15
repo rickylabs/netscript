@@ -357,3 +357,13 @@ repairing the overflow-event ordering, rejected-report staging, and raw six-diag
 baseline. Exactly four README/test proof paths plus `docs/site/web-layer/query-bridge.md` are
 authorized; no unrelated SDK doc-lint remediation. Preserve all native topic supervisors and
 original Codex authors; serialization is per topic only.
+
+Resume from the newer `2026-08-15T11:36:00Z` transition. Main remains `baf1cdf67`. #1664 S1 is
+Tier-A PASS at `5ac6efa30`, features checkpoint `6ea7a17fb`; the same author is running S2 only,
+with the two pre-existing SDK `QueryClient` doc-lint diagnostics carried honestly and no expensive
+gate lease. #1663 cycle 2 is `FAIL_PLAN` at `c415daad2`, comment `5302030430`; coordinator grants
+exactly the generated CLI agent-tools barrel as path 13 plus asset freshness, removes the redundant
+task-level doctor skip, and retains the root formatter exclusion. Plan repair only; another formal
+failure escalates to the owner. #1665 has a first repair head `92bf26e11`; the same author is
+reconciling the fifth docs path before fresh Tier-A. Preserve supervisors/authors and serialize only
+inside each topic.

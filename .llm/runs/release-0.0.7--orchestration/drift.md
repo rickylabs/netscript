@@ -479,3 +479,16 @@ implementation thread.
   mutates its budget before span creation while preserving a string-only helper signature, yet
   promises a one-time event carrying the first overflow id. Tier-A must require an explicit
   metadata/event handoff or an equivalent implementable design; prose cannot bridge ordering.
+- **Optimized tool sources can have generated publish consumers:** #1663's lint wrapper is also a
+  `consumer-tools.json` asset embedded in `@netscript/cli`. Changing the source without regenerating
+  `agent-tools.generated.ts` would make asset freshness red and ship stale installed tooling. The
+  generated barrel is therefore an exact, regeneration-only thirteenth path, not an unrelated
+  expansion; the publish/hash behavior delta and freshness gate are binding evidence.
+- **A task skip and a formatter boundary serve different purposes:** the task-level doctor-family
+  exclusion would keep healthy fixtures invisible after the child-only marker repair and must go.
+  The root formatter exclusion remains necessary to prevent root style from rewriting a fixture
+  that is intentionally judged under its nearest local/default formatting boundary.
+- **Baseline red must stay named red:** #1664 S1 did not touch the two `QueryClient` private-type-ref
+  diagnostics, and they reproduce before the slice. The leaf records those exact failures as
+  pre-existing supplemental evidence; it neither calls the doc-lint invocation green nor silently
+  widens the feature slice to fix them.

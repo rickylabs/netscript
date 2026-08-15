@@ -166,7 +166,7 @@
         "sessionId": "19621a0b-c6a0-47c6-b826-93c1634a6875",
         "bridgeSessionId": "session_01LQBHX8KpA5aYtDraq46J8a",
         "remoteControlUrl": "https://claude.ai/code/session_01LQBHX8KpA5aYtDraq46J8a",
-      "topicHeadSha": "3cd7db193ae516c6d86879669ba91a840231add5",
+      "topicHeadSha": "6ea7a17fb",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
         "legacyState": "parked_idle"
@@ -909,7 +909,7 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "05fc3132b6800a85eb6152691a961b658962571b",
-      "currentPrHeadSha": "df1d7a96d7fd4ecca0bd61710ba90ff67449da0b",
+      "currentPrHeadSha": "c415daad2af38690c6195b02c4e949bdc8c8ae6c",
       "issueNumbers": [1604, 1618, 1622],
       "implementerAgentId": "01a004ec-86a6-7c21-8886-81c09de099f5",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
@@ -918,7 +918,7 @@
       "prNumber": 1663,
       "bootstrapHeadSha": "25c29575c",
       "planHeadSha": "df1d7a96d7fd4ecca0bd61710ba90ff67449da0b",
-      "implementationState": "tier_a_pass_plan_eval_cycle_2_active_no_product_mutation",
+      "implementationState": "plan_eval_cycle_2_fail_plan_exact_thirteenth_asset_path_repair_authorized_no_product_mutation",
       "dispatchTopicHeadSha": "b5f72901d0f30d56046c7f7241e09fb8cb3bfcad",
       "expensiveGateContract": "scaffold.runtime is matrix n/a and coordinator-waived for this surface; no lease may be requested and no runtime gate is executed",
       "planGate": "author must stop after bounded plan and report whether a fresh PLAN-EVAL is required",
@@ -926,7 +926,7 @@
       "tierAPlanHeadSha": "df1d7a96d7fd4ecca0bd61710ba90ff67449da0b",
       "tierAPlanTopicCheckpointSha": "5728a7f14",
       "tierAPlanFinding": "prototype-only proof keeps the checkout fixture unformatted and marker absent while exact scratch wrappers select 114 and pass; all four healthy files are observed selected, doctor is 4/4, malformed hash and parsed meaning are stable, and negative controls restore byte-exactly",
-      "planEvaluationState": "active_cycle_2",
+      "planEvaluationState": "complete_fail_cycle_2_bounded_repair_active",
       "planEvaluatorAgentId": "517ac0e7",
       "planEvaluatorBackgroundAgentId": "517ac0e7",
       "planEvaluatorBridgeSessionId": "cse_01McQHBVtbuX4WYDsaVXEYAn",
@@ -934,6 +934,15 @@
       "planEvaluationGrantedAt": "2026-08-15T11:24:31.000Z",
       "planEvaluationSourceHeadSha": "df1d7a96d7fd4ecca0bd61710ba90ff67449da0b",
       "planEvaluatorRemoteControlUrl": "https://claude.ai/code/session_01McQHBVtbuX4WYDsaVXEYAn",
+      "planEvaluationCycle2": {
+        "state": "complete",
+        "verdict": "FAIL_PLAN",
+        "evaluatorAgentId": "517ac0e7-9951-40ec-ab48-d0175a6d7ebb",
+        "bridgeSessionId": "cse_01McQHBVtbuX4WYDsaVXEYAn",
+        "evaluatorCommitSha": "c415daad2af38690c6195b02c4e949bdc8c8ae6c",
+        "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1663#issuecomment-5302030430",
+        "blockingFinding": "run-deno-lint.ts is embedded into the published CLI consumer-tool bundle, so its planned change requires the generated agent-tools barrel and asset freshness gate"
+      },
       "planEvaluationCycle1": {
         "state": "complete",
         "verdict": "FAIL_PLAN",
@@ -953,7 +962,11 @@
         "markerAllowance": "at most one narrowly named marker inside packages/mcp/tests/fixtures/doctor/broken if the repaired plan proves marker-based subtree exclusion",
         "formattingNormalizationPath": "packages/mcp/tests/fixtures/doctor/healthy/netscript.config.ts; formatting-only, no semantic/schema/config-value change, actual mutation forbidden before PLAN-EVAL cycle 2 PASS",
         "negativeBoundary": "no broad tests/fixtures or parent-family skip; malformed deno.json stays byte-identical; fmt and lint no-extra-flag commands must select real files, retain doctor/healthy as selected, and retain real-source negative controls",
-        "scaffoldRuntimeDisposition": "waived_matrix_n_a_focused_semantic_unit_is_load_bearing"
+        "scaffoldRuntimeDisposition": "waived_matrix_n_a_focused_semantic_unit_is_load_bearing",
+        "generatedAssetPath": "packages/cli/src/kernel/assets/agent-tools.generated.ts; exact thirteenth path, canonical regeneration only",
+        "assetGate": "check:assets-barrel/generated asset freshness is binding and the @netscript/cli publish/hash/installed-consumer behavior delta must be declared",
+        "rootTaskSkipDisposition": "remove the fmt:check task-level doctor exclusion so healthy fixtures remain visible; retain the root formatter exclusion that protects fixture-local default style",
+        "cycleEscalation": "a further formal FAIL_PLAN after this bounded repair is owner escalation"
       },
       "rejectedPlanRepair": {
         "localCommitSha": "71e803807bce3ed17cca0ec86925aadc6a378126",
@@ -1118,14 +1131,14 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
-      "currentPrHeadSha": "20e7aed418efb46c23897debf610fb74b0c4fbef",
+      "currentPrHeadSha": "92bf26e11a77121d899bfb3592b62b72a7503bec",
       "issueNumbers": [1637, 1619, 1620, 1598, 1623],
       "implementerAgentId": "01a00516-2033-7ed3-936a-a616cee47447",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/sdk-cache-surface-and-telemetry",
       "worktree": "/home/codex/repos/netscript-007-leaf-sdk-cache",
       "prNumber": 1665,
-      "implementationState": "tier_a_fail_fix_bounded_plan_repair_active_same_author",
+      "implementationState": "tier_a_fail_fix_t1_t3_repair_pushed_t4_five_path_reconciliation_active_same_author",
       "dispatchTopicHeadSha": "8169b1a0e1ac263b619635aec2cfc12a5feea2df",
       "planGate": "research and contract decisions only; open one draft PR and stop before implementation; PLAN-EVAL is required",
       "declaredSurface": [
@@ -1146,6 +1159,7 @@
       "tierAPlanHeadSha": "20e7aed418efb46c23897debf610fb74b0c4fbef",
       "tierAPlanTopicCheckpointSha": "3fdf4b2c70b2692de19a8db7f6b9b5d68eccd19b",
       "tierAPlanFindingState": "bounded repair active: define a span-time overflow deferral seam including composite-query no-span behavior; stage invalidation entries per report so rejected partial evidence cannot leak; replace aggregate doc-lint wrapper evidence with raw combined and cache-entrypoint baselines naming the six exact diagnostics; update the exact published query-bridge page",
+      "planRepairHeadSha": "92bf26e11a77121d899bfb3592b62b72a7503bec",
       "planEvaluationState": "blocked_until_fresh_tier_a_pass_no_evaluator_launched",
       "ciSkipSmoke": "plan/run-artifact-only PR #1665 skipped check-test, quality, desktop-native-linux, both scaffold runtimes, scaffold-static, deps-report, surface-diff, close-gate, and lane visibility checks as classified",
       "crossPackageGateContract": "repo-root test or every asserting package gate must be named; package-local green is insufficient for SDK source/public-surface changes",
@@ -1219,15 +1233,15 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
-      "currentPrHeadSha": "c53726c69b98a35bf293b89aeece12279f470be3",
+      "currentPrHeadSha": "5ac6efa308599eac9290977215af5c951fcf46ee",
       "issueNumbers": [1355, 1360],
       "implementerAgentId": "01a004f9-f033-7592-a0bc-63927753fb43",
       "implementerRoute": "openai / gpt-5.6-sol / high / approval never / dangerFullAccess",
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "plan_eval_pass_first_bounded_implementation_slice_authorized",
-      "dispatchTopicHeadSha": "3cd7db193ae516c6d86879669ba91a840231add5",
+      "implementationState": "s1_tier_a_pass_s2_generator_contract_active_no_expensive_gate",
+      "dispatchTopicHeadSha": "6ea7a17fb",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
       "tierAPlanRepairHeadSha": "f7225be98c01b38f86712c1df0782aec06e34445",
@@ -1257,6 +1271,21 @@
         "document and error the atomic missing-contract failure, including service/path and an explicit Enabled:false service policy",
         "mark generate-aspire_test.ts as new"
       ],
+      "implementationSlices": {
+        "s1": {
+          "state": "complete_tier_a_pass",
+          "headSha": "5ac6efa308599eac9290977215af5c951fcf46ee",
+          "topicCheckpointSha": "6ea7a17fb",
+          "commentUrl": "https://github.com/rickylabs/netscript/pull/1664#issuecomment-5302026558",
+          "surfaceDelta": "none; JSDoc correction plus semantic TanStack partialMatchKey match/mismatch regression tests",
+          "validation": "focused SDK check and 2/2 tests pass; quality gate pass; two pre-existing QueryClient private-type-ref diagnostics carried as baseline"
+        },
+        "s2": {
+          "state": "active_same_original_author",
+          "scope": "CLI generator contract, emitted import allowlist and literal order, atomic missing-contract behavior, owned modules for Enabled:false, generated asset freshness",
+          "stop": "Tier-A before S3; no scaffold.runtime or fresh-browser"
+        }
+      },
       "planDecisionBoundary": "cycle 1 ruled direct emitted { queryKey: <svc>Queries.list.clientKey() } with no SDK overload; repair must lock generator-owned output paths, existing service generate overwrite/dry-run/force compatibility, package README homes, post-mutation request-count proof, per-slice paths, and qualified citations",
       "expensiveGateContract": "both gates are load-bearing after cheap convergence: scaffold.runtime uses its suite-owned release-gate command/evidence plus central lease (never run-gate catalog); fresh-browser uses the catalog receipt; run serially only after coordinator grant",
       "receiptRefs": []
@@ -2118,5 +2147,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T11:25:08.000Z"
+  "updatedAt": "2026-08-15T11:36:00.000Z"
 }
