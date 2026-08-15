@@ -190,3 +190,17 @@ amendment.
 - Discovery-time cancellation coverage remains intact and separate.
 - Next: remove the registration options from the registered-call closure, align README wording,
   run the bounded gate set, and stop for a fresh independent Tier-A review.
+
+## 2026-08-15 — F-1 repair GREEN (append-only)
+
+- Registered handlers no longer capture the discovery/re-sync signal; the new post-abort call
+  regression is green while the independent discovery-abort regression remains green.
+- README separates one-shot `pool.connect` startup deadlines from registration-lifetime signals and
+  documents that registered calls do not inherit the latter.
+- Final evidence: focused regression `0` (1 pass), MCP suite `0` (20 passes), AI check `0`, Fresh
+  check `0`, lint `0`, fmt `0`, quality `0`, architecture `0`, doc lint `0`, and package publish
+  dry run `0`.
+- Repair delta is exactly the three authorized product files; Fresh, `packages/ai/deno.json`, and
+  `deno.lock` remain unchanged. O-3 is recorded append-only in `drift.md`.
+- Stop for a fresh independent Tier-A review, then evaluator-owned IMPL-EVAL cycle 2. No expensive
+  gate ran and no acceptance state was changed.

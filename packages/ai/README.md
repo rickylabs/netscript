@@ -192,7 +192,7 @@ can select ready servers without waiting on degraded peers.
 
 ```typescript
 const startup = AbortSignal.timeout(1_500);
-await registerMcpTools(registry, pool, { signal: startup });
+await pool.connect({ signal: startup });
 
 const { statuses, readyClients } = pool.snapshot;
 for (const status of Object.values(statuses)) {
@@ -207,6 +207,11 @@ if (search) {
   await search.listTools({ signal: AbortSignal.timeout(500) });
 }
 ```
+
+When registering pooled tools, the optional signal passed to `registerMcpTools` bounds discovery
+and later automatic re-sync operations for that registration. It is not reused by registered tool
+calls. Use a registration-lifetime signal rather than a one-shot startup timeout; individual
+transport calls accept their own operation-specific signal.
 
 Retry only the degraded server instead of rebuilding healthy peers:
 

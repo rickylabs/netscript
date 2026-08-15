@@ -36,8 +36,7 @@ export async function registerMcpTools(
     for (const tool of tools) {
       registry.register(
         tool,
-        async (call) =>
-          await transport.callTool(tool.name, parseArguments(call.arguments), options),
+        async (call) => await transport.callTool(tool.name, parseArguments(call.arguments)),
       );
       registered.add(tool.name);
     }

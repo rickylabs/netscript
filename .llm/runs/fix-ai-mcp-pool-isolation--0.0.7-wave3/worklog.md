@@ -280,3 +280,30 @@ and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
 - `PLAN-EVAL: N/A` remains justified: the evaluator prescribed an exact three-file, mechanical
   lifetime decoupling with no contract or architecture decision remaining.
 - No implementation or README change is included in this RED slice. No expensive gate ran.
+
+## 2026-08-15 — IMPL-EVAL cycle 1 F-1 repair GREEN
+
+- Decoupled registered calls from the registration discovery/re-sync signal by restoring the
+  handler's signal-free `transport.callTool(name, args)` invocation. Discovery and automatic
+  re-sync still call `transport.listTools(options)` unchanged; registration stop still accepts and
+  forwards its own operation-specific options.
+- README now uses `pool.connect({ signal: startup })` for a one-shot degraded-startup deadline and
+  states that `registerMcpTools` signals scope discovery/re-sync rather than registered calls.
+- Focused regression command (same as RED): raw exit `0`, 1 passed / 0 failed. Full structured MCP
+  suite raw exit `0`, 20 passed / 0 failed, including the unchanged discovery-abort regression.
+- Structured AI check raw exit `0` (98 files, `--unstable-kv`); mandatory structured Fresh check
+  raw exit `0` (197 files, 2 batches, `--unstable-kv`).
+- Structured AI lint raw exit `0`. Initial structured fmt check raw exit `1` for one line-wrap
+  finding; scoped formatting followed by the same wrapper returned raw exit `0` (98 files).
+- `deno task quality:scan` raw exit `0`, no findings. `deno task arch:check` raw exit `0`, baseline
+  repository warnings only.
+- `deno doc --lint packages/ai/mcp.ts` raw exit `0`. Package-local
+  `deno publish --dry-run --allow-dirty` raw exit `0`, with isolated declarations and no warnings.
+- Repair product delta from handoff head `1bdb09e13` is exactly the three authorized files.
+  `packages/fresh`, `packages/ai/deno.json`, and `deno.lock` quiet-diff checks each returned raw
+  exit `0` (unchanged). Prohibited-pattern and runtime-JSR-hazard scans each returned expected
+  no-match exit `1`.
+- No O-1 cleanup or O-2/O-4/O-5 work was taken. No Aspire, Docker, browser, scaffold runtime, or
+  CLI E2E command ran.
+- Exact next blocker: fresh independent Tier-A review of this repair, followed by separately owned
+  IMPL-EVAL cycle 2; this implementation session does not self-certify.
