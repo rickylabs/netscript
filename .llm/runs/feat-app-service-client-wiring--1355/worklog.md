@@ -254,3 +254,25 @@ The initial compile-pass design placed the pure/static contract and Chrome DevTo
 file, the bounded list is amended to name `service-client-browser-probe.ts` as the internal transport
 dependency. The runtime probe retains all assertions and orchestration; the adapter owns only Chrome
 discovery and CDP mechanics. No public surface, gate, scenario, or expensive-gate authority changes.
+
+### S4-F2 implementation
+
+- Registered `scaffold.service-client-add`, `scaffold.service-client-generate`,
+  `generated.service-client-contract`, and `behavior.service-client-refetch` as finite gate IDs.
+- Both service and runtime suites run init → payments add → first generate → static contract probe;
+  runtime alone runs the browser probe after service health.
+- The static probe snapshots both owned client modules and every Aspire `.mts`, runs the second
+  generate, requires both zero-write output lines and exact path/byte identity, then checks and runs
+  a temporary no-alias consumer importing `usersQueries` and `paymentsQueries` together.
+- The consumer emits the exact four planned keys. Assertions require the concrete server/client
+  arrays, index-0-only resource variance, four own-prefix TanStack matches, and both users→payments
+  cross-prefix mismatches.
+- The browser adapter pauses the successful `users.update` response through Chrome DevTools, proves
+  the renamed optimistic row before releasing it, waits for mutation settlement and one completed
+  `users.list` request, then records the final persisted row. The runtime assertion requires exactly
+  `baseline + 1`; it never instruments `invalidateQueries`.
+- Focused structured check: 7 files, 1 batch, zero diagnostics. Focused structured lint: 7 files,
+  1 batch, zero findings. Probe + suite-registry tests: 25 passed, 0 failed. Repository quality scan:
+  PASS, zero findings and seven unchanged reviewed allowances.
+- `scaffold.runtime`, `fresh-browser`, Aspire, Docker, and Chrome were not run. No lease was requested
+  or acquired.

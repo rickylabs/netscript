@@ -31,7 +31,8 @@ receipts now PASS at that head, including 4,202/0 tests and the workspace publis
 remain lease-blocked and unrun. Tier-A subsequently proved Expensive-Gate Release Condition 3 was
 documentation-only: no CLI E2E gate executed the planned second-service, key-isolation, or
 settled-refetch scenarios. S4-F2 is therefore a pre-S5 implementation repair. Its plan amendment is
-locked before E2E code, and no lease or expensive command is authorized.
+locked before E2E code. The four gates and split static/CDP probe are implemented with 25/0 focused
+tests and clean focused check/lint; no lease or expensive command is authorized.
 
 ## Completed
 
@@ -72,8 +73,8 @@ locked before E2E code, and no lease or expensive command is authorized.
 
 ## In Progress
 
-- S4-F2 plan amendment: add executable CLI E2E gates/probes for Release Condition 3, then replace
-  the four cheap receipts at the new immutable content head. S5 remains blocked.
+- S4-F2 implementation is ready to commit. After that immutable content head exists, replace all
+  four cheap receipts with fresh `s4-f2-*` evidence. S5 remains blocked.
 
 ## Next Steps
 

@@ -56,6 +56,9 @@ Deno.test('capability suites select only their scoped gates', () => {
   assertEquals(service.gates.map((gate) => gate.id), [
     GATE.PREFLIGHT_DENO,
     GATE.SCAFFOLD_INIT,
+    GATE.SCAFFOLD_SERVICE_CLIENT_ADD,
+    GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE,
+    GATE.GENERATED_SERVICE_CLIENT_CONTRACT,
     GATE.SERVICE_LIST,
     GATE.DATABASE_CODEGEN,
     GATE.GENERATED_SERVICE_CHECK,
@@ -122,6 +125,16 @@ Deno.test('true userland suite runs init, four no-samples plugin installs, asser
 Deno.test('runtime suite includes full scaffold, database, runtime, and behavior gates', () => {
   const runtime = resolveSuite(SCAFFOLD.RUNTIME);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_INIT), true);
+  const serviceClientOrder = [
+    GATE.SCAFFOLD_INIT,
+    GATE.SCAFFOLD_SERVICE_CLIENT_ADD,
+    GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE,
+    GATE.GENERATED_SERVICE_CLIENT_CONTRACT,
+  ].map((id) => runtime.gates.findIndex((gate) => gate.id === id));
+  assertEquals(
+    serviceClientOrder,
+    [...serviceClientOrder].sort((left, right) => left - right),
+  );
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_INIT), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_GENERATE), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_SEED), true);
@@ -200,6 +213,11 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AUTH_READY), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AUTH_SESSION), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AI_CHAT_ROUTE), true);
+  assertEquals(
+    runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_SERVICE_HEALTH) <
+      runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH),
+    true,
+  );
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_UI_RENDER), true);
   assertEquals(
     runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_MCP_WIDGET_ROUNDTRIP),
