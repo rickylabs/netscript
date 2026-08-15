@@ -527,3 +527,11 @@ plan head `7e5be1514`; before PLAN-EVAL, fixes Tier-A must reconcile the raw doc
 scope to include the second demonstrably false cache-refresh claim at
 `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md`. No product mutation yet. #1664
 continues to own the only runtime lease and is running scaffold first.
+
+Newer runtime truth `2026-08-15T16:53:06Z`: #1664 evidence head `e1dcb726b` records
+`scaffold.runtime` FAIL (20/1/0) at `generated.service-client-contract`; fresh-browser is NOT_RUN and
+the singleton lease is released after a verified empty Aspire/Docker/browser host. The leaf's probe
+mistook the first reconciliation after plugin configuration changed for a same-input idempotency
+rerun. Require an immutable F4 plan amendment before repair, then one allowed reconciliation plus a
+second identical invocation that writes zero clients and zero helpers, fresh cheap receipts and
+features Tier-A before any new lease. Preserve every prior FAIL and do not launch an evaluator.

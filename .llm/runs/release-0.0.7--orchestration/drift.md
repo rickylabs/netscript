@@ -595,3 +595,9 @@ implementation thread.
   `getCachedEntry` read refreshes stale data in the background. Regenerating the same four mirrors
   while knowingly leaving that second false claim would preserve user-facing drift. The exact
   tutorial source is a justified plan amendment, not a later cleanup.
+- **Idempotency must hold inputs constant:** #1664's S5 gate ran `service generate` once before
+  installing plugins and again after plugin configuration had changed the Aspire model. Three helper
+  rewrites on the latter invocation are reconciliation, not evidence of non-idempotency. A valid
+  assertion permits that convergence run and requires zero writes only on the immediately following
+  identical invocation. Calling temporally separated, different-input runs “first” and “second”
+  creates an expensive false-positive gate.

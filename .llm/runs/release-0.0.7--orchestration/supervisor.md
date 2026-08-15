@@ -650,3 +650,9 @@ At 16:49Z, #1666 advanced to one active formal PLAN-EVAL (`68c31fcc`, Fable 5/me
 Control) after fresh Tier-A PASS at topic `d5f5ea55a`. #1461 is now draft PR #1669 at plan head
 `7e5be1514`; fixes Tier-A must require a pre-implementation amendment for the duplicate false
 live-dashboard cache-refresh claim and reconcile the doc-lint baseline before evaluator dispatch.
+
+At 16:53Z, #1664 `scaffold.runtime` stopped at 20/1/0 on the leaf's own false idempotency premise.
+The host is empty, the lease is released, and fresh-browser remains NOT_RUN. Features must push an
+F4 proof-contract amendment before same-author repair: allow post-plugin reconciliation, then demand
+zero client/helper writes from the next identical invocation; renew cheap receipts and Tier-A before
+requesting another runtime lease. No evaluator is authorized.

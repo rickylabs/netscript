@@ -911,3 +911,19 @@
   the same false background-refresh claim in
   `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md`; that exact path requires a
   scope amendment before implementation so the leaf does not knowingly leave duplicate stale prose.
+
+## 2026-08-15T16:53:06Z — #1664 runtime stops on a false idempotency premise; lease released cleanly
+
+- #1664 ran the exact suite-owned `scaffold.runtime` command at run-only head `ab78eaa35`, product
+  content `193e665ba`, and returned 20 passed / 1 failed / 0 skipped. The sole red was the leaf's new
+  `generated.service-client-contract`: after multiple plugin installs changed the Aspire-helper
+  inputs, a later `service generate` wrote zero client modules, skipped both current clients, and
+  reconciled three Aspire helper files. The probe called that a second idempotency run and demanded
+  zero helper writes, but the intervening plugin mutations mean it was not a consecutive same-input
+  rerun. This is a leaf-caused proof-contract false positive, not a carried product failure.
+- Evidence head `e1dcb726b` and PR comment `5303253456` preserve the raw suite log and exact failure.
+  Suite cleanup passed; run-owned teardown removed nothing; independent final leak-check reports
+  Aspire ok, Docker ok, and zero survivors. Fresh-browser is truthfully NOT_RUN. The coordinator
+  released the singleton lease. F4 must be amended and pushed before mutation, then prove one
+  reconciliation run followed by a second identical zero-client/zero-helper run; cheap receipts and
+  fresh Tier-A are required before another lease.

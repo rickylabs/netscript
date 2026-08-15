@@ -1407,14 +1407,14 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
-      "currentPrHeadSha": "8940e9266630a3cc5368153722747e45d30aec3b",
+      "currentPrHeadSha": "e1dcb726b983dd10981f4fc8df5ea8c638686e77",
       "issueNumbers": [1355, 1360],
       "implementerAgentId": "01a004f9-f033-7592-a0bc-63927753fb43",
       "implementerRoute": "openai / gpt-5.6-sol / high / approval never / dangerFullAccess",
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "f3_node_global_pollution_repaired_same_author_all_four_receipts_pass_fresh_tier_a_pass_runtime_lease_active",
+      "implementationState": "s5_runtime_failed_leaf_gate_idempotency_contract_fresh_browser_not_run_lease_released_clean_host_awaiting_f4_amendment",
       "dispatchTopicHeadSha": "d2e83f690",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
@@ -1536,7 +1536,13 @@
           "f3RepairTierAState": "PASS",
           "f3RepairTierATopicCheckpointSha": "c7ce2c3f6ba49fb3d56d5dd43722f5764a3abfae",
           "f3RepairTierAProof": "fresh topic review independently reran the decisive one-batch check at exit 0 and verified exact receipt identity, scope, preserved FAIL trail, and clean immutable evidence head",
-          "runtimeGates": "singleton lease active at evidence head 8940e9266; scaffold.runtime must run first and fresh-browser may run serially only after scaffold PASS plus mandatory clean inter-gate audit"
+          "s5RunHeadSha": "ab78eaa35c1753f9e8c526dbd234c7073758008b",
+          "s5EvidenceHeadSha": "e1dcb726b983dd10981f4fc8df5ea8c638686e77",
+          "s5RuntimeResult": "FAIL passed=20 failed=1 skipped=0 at generated.service-client-contract; post-plugin service generate wrote zero client modules, skipped two current clients, and wrote three Aspire helper files while the probe required zero helper writes",
+          "s5FailureClass": "leaf-caused proof-contract failure: the asserted zero-write run followed plugin installation that legitimately changes Aspire-helper inputs, so it is not yet a same-input idempotency rerun",
+          "s5Cleanup": "cleanup.aspire-stop PASS; run-owned teardown empty; independent final leak check Aspire ok, Docker ok, survivors empty; fresh-browser NOT_RUN",
+          "f4RequiredScope": "amend and push before mutation; distinguish reconciliation after plugin-input changes from a true consecutive same-input idempotency rerun, then prove the second identical invocation writes zero clients and zero Aspire helpers; preserve the FAIL and rerun cheap proofs/four receipts/fresh Tier-A before any new lease",
+          "runtimeGates": "scaffold.runtime attempt 2 terminal FAIL with clean host and lease released; fresh-browser NOT_RUN; no retry or evaluator before F4 repair and fresh Tier-A"
         }
       },
       "planDecisionBoundary": "cycle 1 ruled direct emitted { queryKey: <svc>Queries.list.clientKey() } with no SDK overload; repair must lock generator-owned output paths, existing service generate overwrite/dry-run/force compatibility, package README homes, post-mutation request-count proof, per-slice paths, and qualified citations",
@@ -2389,7 +2395,7 @@
     },
     {
       "id": "app-service-client-wiring-f3-runtime",
-      "state": "active",
+      "state": "complete",
       "lane": "features",
       "leafId": "app-service-client-wiring",
       "gateId": "scaffold.runtime_then_fresh-browser",
@@ -2398,7 +2404,23 @@
       "leaseOwner": "codex-root-0.0.7",
       "grantedAt": "2026-08-15T16:43:09.204Z",
       "attempt": 2,
-      "scope": "run scaffold.runtime first through the suite-owned release command and preserve its receipt; mandatory Aspire/Docker cleanup and clean inter-gate audit; only on PASS run fresh-browser serially through the catalog receipt, then browser/runtime cleanup and a final empty-host audit"
+      "scope": "run scaffold.runtime first through the suite-owned release command and preserve its receipt; mandatory Aspire/Docker cleanup and clean inter-gate audit; only on PASS run fresh-browser serially through the catalog receipt, then browser/runtime cleanup and a final empty-host audit",
+      "runHead": "ab78eaa35c1753f9e8c526dbd234c7073758008b",
+      "evidenceHead": "e1dcb726b983dd10981f4fc8df5ea8c638686e77",
+      "completedAt": "2026-08-15T16:53:06.441Z",
+      "verdict": "FAIL_FIX",
+      "summary": "scaffold.runtime 20 passed / 1 failed / 0 skipped; generated.service-client-contract rejected three post-plugin Aspire-helper writes; fresh-browser NOT_RUN",
+      "receiptRefs": [
+        ".llm/runs/feat-app-service-client-wiring--1355/reports/s5-scaffold-runtime-20260815-184907.log",
+        ".llm/runs/feat-app-service-client-wiring--1355/reports/s5-runtime-failure.md",
+        ".llm/runs/feat-app-service-client-wiring--1355/leak-report.md"
+      ],
+      "cleanup": {
+        "aspirePostcondition": "ok_empty",
+        "dockerPostcondition": "ok_empty",
+        "survivors": 0,
+        "freshBrowser": "NOT_RUN"
+      }
     }
   ],
   "canaryCheckpoints": [
@@ -2440,5 +2462,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T16:49:14.337Z"
+  "updatedAt": "2026-08-15T16:53:06.441Z"
 }
