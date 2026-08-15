@@ -4675,3 +4675,45 @@ point where it would have been diagnostic — and that habit is now closed in bo
 startup (F7).
 
 No lease requested, no attempt 6, no browser, Aspire, Docker, evaluator, or readiness change.
+
+## 2026-08-15 — S5 attempt 6: singleton runtime lease ACQUIRED by this topic
+
+**Lease held by `topic-features-0.0.7` for PR #1664 only.**
+
+| Binding | Value |
+| --- | --- |
+| Content head | `e45144db643f6bde85552a615812c8371e4ce792` |
+| Evidence head | `ed3f78e0d87784b1869166bd2574737c62fac0af` |
+| Tier-A | PASS at topic `4a65a2670` |
+| Browser override | `/home/codex/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome` |
+
+**Preconditions verified by me, not accepted:**
+
+- local == remote == PR == `ed3f78e0d`; leaf tree clean.
+- Override is **executable** and `--version` returns exactly
+  `Google Chrome for Testing 151.0.7922.34`, matching the coordinator's value.
+- `leak-check` → aspire `ok`, docker `ok`, `survivors: []`; `docker ps -aq` = 0.
+- **D-18 residue check clear** — `find .llm/tmp -type d ! -readable` returns nothing. This is the
+  check whose absence let attempt 5's root-owned Postgres tree block the following gate; it is now
+  part of every empty-host proof this lane makes.
+
+Three readable stale trees were moved recoverably to `/tmp/netscript-preattempt6-quarantine.9mNpwE`;
+the earlier quarantines at `/tmp/netscript-f6-quarantine.7kXcDX` and
+`/tmp/netscript-f7-quarantine.iXF6fb` remain. Nothing deleted.
+
+### What is different about this attempt
+
+Every prior failure was diagnosed and repaired at its root cause rather than retried:
+
+| Attempt | Failure | Repair |
+| --- | --- | --- |
+| 1 | `generated.service-client-contract` — idempotency asserted one sequence position too early | F4 |
+| 3 | `generated.deno-fmt-check` — 12 unformatted files; post-init generation never reused the init formatting seam | F5 |
+| 4 | `behavior.service-client-refetch` — unguarded `child.kill` threw in teardown | F6 |
+| 5 | same gate — Windows `.exe` selected, no WSL interop, stderr discarded, bare timeout | F7 |
+
+`passed` has climbed 20 → 32 → 69 → 69. The browser override closes the last known cause: the probe
+now selects an executable that **runs**, and if it does not, it reports the exit code and bounded
+stderr instead of a DevTools timeout.
+
+Lease released only after cleanup and an independent audit are proven.
