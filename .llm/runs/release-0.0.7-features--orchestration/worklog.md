@@ -2986,3 +2986,42 @@ confirmed** — on evidence, not on dispatch.
 
 Status remains **repair-after-interception, not `PASS`**. No lease, no expensive gate, no evaluator,
 no readiness or metadata change.
+
+## 2026-08-15 — F2 Tier-A: `PASS` at `b14975af7657869dfb36f5e07d2ef393c1ef989c`
+
+Content head `2c8219968`, evidence head `b14975af7`. Obsolete boundary waiter cancelled before it
+could fire a redundant dispatch — the only live `codex-resume` at that moment belonged to a
+**different lane** (`netscript-007-leaf-sdk-cache`, PR #1665), so no cross-lane interference.
+
+| # | Item | Result |
+| --- | --- | --- |
+| 1 | Head equality | local == remote == PR #1664 == `b14975af7`; tree clean |
+| 2 | PR state | **draft**, labels unchanged, exactly one `status:` (`status:impl`) |
+| 3 | **Repair 1** | `Fetch.continueResponse` at `:183`; `continueRequest` gone entirely |
+| 4 | **Repair 2** | `clickRefreshExpression()` at `:161`/`:277-280`, `startsWith('Refresh')`, and it **throws** if the control is not rendered rather than proceeding silently. The `delay(750)` baseline is gone |
+| 5 | **Repair 3 / shared primitive** | `waitForCompletedStableBaseline` is **exported** from the probe and **imported by the test** — the same code path, not a parallel copy |
+| 6 | Negative case is genuinely fail-capable | driven with an injected sequence `{1,1} → {2,1} → {2,2}×3`: a late initial request breaks stability mid-flight. Asserts `baseline === 2` **and** `observation === 5`, proving the helper refused the premature `{1,1}` and waited through the late arrival. Injected `now`/`sleep`/`pollMs`/`confirmationMs` make it deterministic with no real timing |
+| 7 | Regression guard on repair 1 | a further test reads the probe source and asserts the response-stage resume, so reverting `continueResponse` fails a test rather than only failing when leased |
+| 8 | **Four receipts at the content head** | `s4-f2-fix1-{check,test,publish-dry-run,arch-check}`, all `run-gate`-generated, all `PASS`/exit 0, `gitHead == actualGitHead == 2c8219968`, **no** `allowGitHeadMismatch` |
+| 9 | **Sufficiency, recomputed by hand** | four distinct `gateId`s ⇒ **SUFFICIENT** |
+| 10 | Superseded sets retained honestly | `s4-*` at `32ea23f50`; `s4-f2-check` at `787cfa928`; and `s4-f2-test` at `787cfa928` recorded as **`INTERRUPTED`, exit 143** — my SIGTERM, kept in the record rather than deleted |
+| 11 | Probe tests re-run by me | **8 passed, 0 failed** |
+| 12 | Runtime gates | `scaffold.runtime` and `fresh-browser` **NOT_RUN**; no lease anywhere |
+
+### Two details worth keeping
+
+**The `INTERRUPTED` receipt was not tidied away.** The author could have deleted `s4-f2-test.json`;
+instead it carries `outcome: INTERRUPTED, exitCode: 143`. The interrupt is therefore auditable from
+the evidence rather than only from my journal. Ten receipt files across three generations, each
+distinguishable by both filename and attested head, so no superseded receipt can be mistaken for a
+current one.
+
+**The negative test earns its place.** It does not merely assert the happy path passes; it feeds the
+helper a sequence in which a late initial request arrives *after* the count first looks stable, and
+proves the helper declines to accept the premature reading. That is precisely the false-`+1` the
+whole scenario exists to exclude, and it is the case a happy-path test would have missed — as one
+did, which is why this finding existed at all.
+
+**Verdict `PASS`.** F2 is closed. Expensive-Gate Release Condition 3 is now backed by executable
+proof rather than plan prose, Condition 4 remains satisfied, and cheap convergence is re-established
+at the corrected content head.
