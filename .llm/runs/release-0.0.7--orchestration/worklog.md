@@ -428,3 +428,27 @@
   and resume only the original Codex author. No duplicate evaluator was launched.
 - Serialization remains per topic. No runtime, browser, Aspire, Docker, OpenHands provider-spend,
   or shared expensive-gate lease was started by this checkpoint.
+
+## 2026-08-15T09:28:54Z — docs ships after a stale-CI repair; three product lanes advance
+
+- Docs readiness CI at `e35824d41` found a false-positive exact corpus snapshot in
+  `snippet-extractor_test.ts`: the test name promised alias/floor protection, but unrelated new
+  TypeScript fences changed total corpus counts. The preserved author replaced those totals at
+  `615786c1a` with named invariants (`tsLike` partition, Tier-1 partition, checked/exempt partition,
+  monotonic floors/cap, zero malformed). Focused structured test passed 6/6; a fresh exclusive-owner
+  Tier-A PASS is durable in comment `5301575337`; docs content was not changed to satisfy the test.
+- Exact-head PR gates then passed: review threads 0/0, structured current-head checks 21 with zero
+  current failures, repo check/test, quality, and docs build. Coordinator squash-merged #1660 at
+  `729386c56`; #1659 auto-closed with 8/8 boxes; issue and PR are `status:shipped`, and the temporary
+  `impl-eval:skip` label is removed. Main-push Pages run `31876977060` passed. Both comparison pages
+  return HTTP 200 with their expected frontend/backend titles.
+- Internals #1658 finished S5 at `704c067e8` with final `check`, load-bearing `test`, and
+  `quality-job` receipts all PASS at checkpoint `1390d3ead`; the native topic supervisor is running
+  the final substantive Tier-A review before formal IMPL-EVAL.
+- Fixes #1661 completed the twice-amended ten-file implementation at `3a4bc66c4`. Tier-A reran the
+  gate set, independently proved `packages/fresh` remains green (197 files, zero failed batches),
+  and signed off at `e3c74d7aa` / comment `5301585728`. The coordinator granted exactly one fresh
+  opposite-family formal IMPL-EVAL lease; the next fixes leaf stays queued until it is terminal.
+- Features #1293 plan rulings are durably amended at `feb8b0355`; the supervisor verified every
+  amendment item and released S1 on the preserved Codex author. The owner-only acceptance-box-1
+  wording edit remains unresolved but does not block the split-close product implementation.

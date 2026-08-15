@@ -351,3 +351,20 @@ implementation thread.
   found the out-of-scope Fresh fake implementor before CI. Amendment 2 makes the broad port member
   optional while requiring real abort behavior on the base and both published wrappers; the Fresh
   package check is now a mandatory cross-package compatibility proof.
+
+## 2026-08-15T09:28:54Z — docs census false positive and merge-authority correction
+
+- **Stale census contract:** #1660 readiness CI failed because the docs snippet census test pinned
+  unrelated whole-corpus totals. New frontend/backend examples legitimately raised those values
+  while every safety property remained healthy. The repair asserts only the named contract:
+  TypeScript aliases exist and sum to `tsLike`; Tier-1/outside-floor and checked/exempt partitions
+  balance; floors/caps remain enforced; malformed stays zero. This turns future content growth from
+  noise into a skip-safe gate without weakening malformed or Tier-1 protection.
+- **Tier-A durability gap:** the first repair verification was locally substantive but not durable;
+  coordinator inspection caught that the prior posted review still named `e35824d41`. The docs
+  supervisor posted a fresh exact-head review at `615786c1a` before merge. Local green output alone
+  does not discharge the harness review gate.
+- **Merge authority:** the docs supervisor had stated it would merge after CI. The coordinator
+  corrected that role in-place: topic supervisors review, queue, and report; the coordinator alone
+  performs exact-head merge/lifecycle normalization. #1660 was merged only after the coordinator
+  independently reran review-thread and current-head PR gates.

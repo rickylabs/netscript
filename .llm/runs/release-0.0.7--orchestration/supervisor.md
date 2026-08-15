@@ -391,3 +391,15 @@ The #1293 evaluator's lifecycle metadata is stale but its delivered verdict tupl
 verified. The docs stash incident caused no data loss and its final review was rerun under clean
 exclusive ownership. All four native Opus 5/high Remote Control topic supervisors remain preserved;
 serial queues are local to each topic and the shared runtime mutex is free.
+
+## 2026-08-15T09:28:54Z lane handoff
+
+| Lane | Current state | Binding next action |
+| --- | --- | --- |
+| docs | #1660 merged as `729386c56`; #1659 closed/shipped; Pages and both published URLs verified | Reconcile topic artifacts, then dispatch the next eligible docs leaf or record queue exhaustion; no merge authority |
+| internals | #1658 S5 pushed `704c067e8`; all final receipts PASS | Fresh Tier-A at the final content/evidence head, then request one formal IMPL-EVAL lease |
+| fixes | #1661 Tier-A PASS/sign-off `e3c74d7aa`; evaluator lease granted | Launch exactly one fresh opposite-family formal IMPL-EVAL; keep next fixes leaf queued until terminal |
+| features | #1293 amendment `feb8b0355` verified and S1 released | Complete S1 only, stop for Tier-A, then continue the planned serial slices |
+
+Serialization remains per lane, never across lanes. Coordinator retains sole merge/lifecycle
+authority. Topic supervisors remain native Claude Opus 5/high with Remote Control enabled.

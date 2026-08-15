@@ -252,3 +252,15 @@ coordinator verified the final response directly and woke the existing features 
 the plan and resume the original Codex author. Do not launch a duplicate evaluator. Preserve all
 four native Opus 5/high Remote Control supervisors, serialize only inside each topic, and keep the
 runtime mutex free unless a real resource-heavy gate requests it.
+
+Resume from the newer authoritative `2026-08-15T09:28:54Z` checkpoint. Current main is
+`729386c567bfbd0b8c7f86a4ed09348f0a8a4ad8`: docs #1660 is merged, #1659 is closed 8/8 and shipped,
+Pages push run `31876977060` passed, and both `/comparisons/frontend/` and
+`/comparisons/backend/` are live with HTTP 200. The readiness failure was a stale exact-corpus
+snapshot, repaired at `615786c1a` into stable named invariants and freshly Tier-A reviewed in comment
+`5301575337`; never revert it to total-count pinning. Internals #1658 has final S5 evidence at
+`704c067e8` with all three receipts green and is in final Tier-A. Fixes #1661 is Tier-A PASS at
+`e3c74d7aa`; one fresh opposite-family IMPL-EVAL lease is granted and launching. Features #1293 is
+implementing S1 after the verified plan amendment `feb8b0355`. Preserve the original author threads,
+all four native Opus 5/high Remote Control supervisors, per-topic serialization, and the free
+expensive-gate mutex.

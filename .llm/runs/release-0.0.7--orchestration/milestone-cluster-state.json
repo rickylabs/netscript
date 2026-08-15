@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
-  "currentMainSha": "284dda90a17a13a7e5e8e9834e5411b58887131b",
+  "currentMainSha": "729386c567bfbd0b8c7f86a4ed09348f0a8a4ad8",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -45,7 +45,7 @@
         "pid": 23964,
         "bridgeSessionId": "session_01PLRauSHN1PnvrNF2ucefF6",
         "remoteControlUrl": "https://claude.ai/code/session_01PLRauSHN1PnvrNF2ucefF6",
-        "topicHeadSha": "113571b0caeeca54ea10f327b97eaf6edf7b48fa",
+        "topicHeadSha": "51576392e49aec67f0f5e845e67919b10a4cc2c2",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e19b-71d1-95ce-8c72559eb026",
         "legacyState": "parked_offline"
@@ -72,7 +72,7 @@
         "pid": 23955,
         "bridgeSessionId": "session_01HqFtKQtyJcHBEn1MghQdFX",
         "remoteControlUrl": "https://claude.ai/code/session_01HqFtKQtyJcHBEn1MghQdFX",
-        "topicHeadSha": "8d45f8eea62980172c88aaad39e15a5fd5f82790",
+        "topicHeadSha": "b5d5a2d4057c3d5df2e21e71d5d9dcc7c41e4a12",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle"
@@ -114,7 +114,7 @@
         "pid": 26724,
         "bridgeSessionId": "session_014pCd2QWkCscgZpVdjcUPST",
         "remoteControlUrl": "https://claude.ai/code/session_014pCd2QWkCscgZpVdjcUPST",
-        "topicHeadSha": "df20bb5a694ad95afd33ff5ca4f141a4199182f5",
+        "topicHeadSha": "98e50fa413dd6e0f7faaea2aa2f941ebb9da46a3",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle"
@@ -165,7 +165,7 @@
         "sessionId": "19621a0b-c6a0-47c6-b826-93c1634a6875",
         "bridgeSessionId": "session_01LQBHX8KpA5aYtDraq46J8a",
         "remoteControlUrl": "https://claude.ai/code/session_01LQBHX8KpA5aYtDraq46J8a",
-        "topicHeadSha": "1a385ad89d66284de80176cab1f2711ba6f16562",
+        "topicHeadSha": "710c039f0033186ef68e2481824c82121279e5f8",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
         "legacyState": "parked_idle"
@@ -795,7 +795,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "7737d8903bb2925c3fcefbda362168fe297eebd4",
-      "currentPrHeadSha": "6f725ad3bf72f00cf1a439e3dad7acb6789dbb4c",
+      "currentPrHeadSha": "704c067e8f09fb47a3973faa7277321cac34f9ef",
       "issueNumbers": [1611, 1613],
       "implementerAgentId": "01a00443-abab-7261-8905-74ed71467929",
       "branch": "fix/openhands-dispatch-claim-and-refusal",
@@ -803,7 +803,7 @@
       "prNumber": 1658,
       "bootstrapHeadSha": "ca2266ecb4fe0cdd8a47059b4bca39761840f3b3",
       "researchHeadSha": "670e37beaa723f1b54218149a2485dd6b3e741e3",
-      "implementationState": "slice_4_running",
+      "implementationState": "final_slice_tier_a_running",
       "planRepairHeadSha": "cea999d18ea2c2d4a6208fc209ce744d9be1d194",
       "planRepairTierAState": "PASS",
       "planRepairTierACommentUrl": "https://github.com/rickylabs/netscript/pull/1658#issuecomment-5301190104",
@@ -838,6 +838,17 @@
       "slice3TierASignoffHeadSha": "d3d31b3d071e1b0f6a0ef40013da2489775b08c1",
       "slice3TierACommentUrl": "https://github.com/rickylabs/netscript/pull/1658#issuecomment-5301464449",
       "slice4LocalImplementationHeadSha": "9b71e1bd29eb5eea5856d528973f85aa685b3172",
+      "slice4EvidenceHeadSha": "ab4b8185f545b4890f7fcbc0e00a114afecb4087",
+      "slice4TierAState": "PASS",
+      "slice4TierASignoffHeadSha": "ad19d0e201137865879db74d2819be980919d334",
+      "slice4TierACommentUrl": "https://github.com/rickylabs/netscript/pull/1658#issuecomment-5301555163",
+      "slice5CheckpointHeadSha": "1390d3ead1d7d4381ace3d9403f559f009895643",
+      "slice5EvidenceHeadSha": "704c067e8f09fb47a3973faa7277321cac34f9ef",
+      "slice5GateVerdicts": {
+        "check": "PASS",
+        "test": "PASS",
+        "quality-job": "PASS"
+      },
       "implementationCarriedNotes": [
         "S1-before-S4 is required by the API dependency, not live intermediate-branch spend safety",
         "the root test receipt is the load-bearing gate for these dot-directory surfaces",
@@ -862,10 +873,10 @@
     {
       "id": "comparison-vs-pages",
       "lane": "docs",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "e090f894ff3682405a36e4f896ffd2cc16f9a1f8",
-      "currentPrHeadSha": "e35824d413cafc8324291dd832f301a0be186163",
+      "currentPrHeadSha": "615786c1a93c39e7f6b9a1b40b5cee39b163ff8a",
       "issueNumbers": [],
       "ownerDirectedIssueNumbers": [
         1659
@@ -875,17 +886,27 @@
       "branch": "docs/comparison-vs-pages",
       "worktree": "/home/codex/repos/netscript-007-docs-vs",
       "prNumber": 1660,
-      "implementationState": "ready_ci_running",
+      "implementationState": "merged_and_published",
       "slice1HeadSha": "efaa77b97b2ba02d356898cab967b0b48cf92547",
       "slice2HeadSha": "34b4d69755e8cc57d3f05c9a36099a226160aeda",
       "slice3HeadSha": "94568ab94f27c2167e2f6bfdd71bb80905857bb2",
       "slice4HeadSha": "0b67ef39e25805d68056ea76978cb69c2968a36c",
       "tierARepairHeadSha": "504de3f67f21e27b06695e9099fb6f752a827e9a",
       "replacementGeneratedAssetsHeadSha": "e35824d413cafc8324291dd832f301a0be186163",
+      "censusInvariantRepairHeadSha": "615786c1a93c39e7f6b9a1b40b5cee39b163ff8a",
       "tierAState": "PASS",
-      "tierACommentUrl": "https://github.com/rickylabs/netscript/pull/1660#issuecomment-5301508540",
-      "readinessState": "current_head_ci_running",
+      "tierACommentUrl": "https://github.com/rickylabs/netscript/pull/1660#issuecomment-5301575337",
+      "readinessState": "merged",
       "formalImplementationEvaluation": "owner-authorized skip; independent Tier-A is the only review",
+      "mergeCommitSha": "729386c567bfbd0b8c7f86a4ed09348f0a8a4ad8",
+      "mergedAt": "2026-08-15T09:25:56.000Z",
+      "issueCompletionState": "closed_8_of_8_status_shipped",
+      "pagesDeploymentRunId": 31876977060,
+      "pagesDeploymentState": "PASS",
+      "publishedUrls": [
+        "https://rickylabs.github.io/netscript/comparisons/frontend/",
+        "https://rickylabs.github.io/netscript/comparisons/backend/"
+      ],
       "reviewContentionIncident": {
         "state": "fully_recovered",
         "restoredStashSha": "7eb4ed16d6944c1d1c904895bcb76b4361ad8a57",
@@ -906,7 +927,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "284dda90a17a13a7e5e8e9834e5411b58887131b",
-      "currentPrHeadSha": "099067c6b9a68fdf163fd50d9abe24466348d034",
+      "currentPrHeadSha": "e3c74d7aaf3b7734b5a44a5be248c01f004c21e5",
       "issueNumbers": [
         1448
       ],
@@ -914,7 +935,7 @@
       "branch": "fix/ai-mcp-pool-isolation",
       "worktree": "/home/codex/repos/netscript-007-leaf-ai-mcp-pool",
       "prNumber": 1661,
-      "implementationState": "amended_slices_running",
+      "implementationState": "formal_impl_eval_launching",
       "scopeBlockerHeadSha": "1d4533462a088ad902ac7dd71be88764463fcd5d",
       "scopeRulingTopicHeadSha": "df20bb5a694ad95afd33ff5ca4f141a4199182f5",
       "scopeRulingLeafArtifactSha": "6db182503b219d76c7db23f89c71ec9e467c2f40",
@@ -929,12 +950,18 @@
       ],
       "amendment2Contract": "readResource remains optional on McpTransportPort for packages/fresh compatibility, but is required and abort-aware on BaseMcpTransport and both published wrappers; stop(options) forwards the signal through both wrappers; cross-package Fresh check is mandatory",
       "publicContract": "additive synchronous I/O-free per-server snapshot keyed by serverId with McpConnectionState and last error; cancellable close takes a signal options bag; pool.stop settles per server",
+      "implementationHeadSha": "3a4bc66c4832baf8f209e47cc08c3a336e2ff100",
+      "tierAState": "PASS_TO_IMPL_EVAL",
+      "tierASignoffHeadSha": "e3c74d7aaf3b7734b5a44a5be248c01f004c21e5",
+      "tierACommentUrl": "https://github.com/rickylabs/netscript/pull/1661#issuecomment-5301585728",
+      "crossPackageFreshCheck": "PASS: 197 files, 0 failed batches",
+      "formalImplementationEvaluation": "coordinator lease granted at 2026-08-15T09:28:00Z; fresh opposite-family evaluator launch in progress",
       "receiptRefs": []
     },
     {
       "id": "prisma-mysql-adapter-surface",
       "lane": "features",
-      "phase": "planned",
+      "phase": "implementing",
       "baseBranch": "main",
       "headSha": "284dda90a17a13a7e5e8e9834e5411b58887131b",
       "issueNumbers": [
@@ -943,7 +970,7 @@
       "implementerAgentId": "01a0048f-8d95-7682-a3ce-1c1926aba75c",
       "branch": "feat/prisma-mysql-adapter-surface",
       "worktree": "/home/codex/repos/netscript-007-features-1293",
-      "implementationState": "plan_amendment_before_slice_1",
+      "implementationState": "slice_1_running",
       "compatibilityDisposition": "preserve and wire the already-published PrismaMySqlOptions.onConnectionError hook; removal is not authorized",
       "planEvaluationState": "complete",
       "planEvaluatedHeadSha": "23c4d671b57282ddf2e5c3b834ac8e787d1dff09",
@@ -954,6 +981,8 @@
       "planEvaluatorCommitSha": "7780ba49e119377f2be39cac5ed110fc12758bfc",
       "planEvaluationVerdict": "PASS",
       "planEvaluationCompletedAt": "2026-08-15T09:02:23.000Z",
+      "planAmendmentHeadSha": "feb8b0355215e7282b87787117dc5c244653250d",
+      "planAmendmentTierAState": "PASS",
       "planEvaluatorTerminalMetadata": "stale working state; terminal response and exact pushed verdict commit independently verified by coordinator",
       "splitCloseContract": "product PR uses Part of #1293 and may merge on product gates while #1293 remains open; #1112 must rewrite and verify the docs example before box 4 and issue closure",
       "docsFollowUp": "#1112 and the prisma-adapter-mysql reference remain docs-owned and are not part of this product leaf",
@@ -1584,5 +1613,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T09:08:30.000Z"
+  "updatedAt": "2026-08-15T09:28:54.000Z"
 }
