@@ -535,3 +535,13 @@ mistook the first reconciliation after plugin configuration changed for a same-i
 rerun. Require an immutable F4 plan amendment before repair, then one allowed reconciliation plus a
 second identical invocation that writes zero clients and zero helpers, fresh cheap receipts and
 features Tier-A before any new lease. Preserve every prior FAIL and do not launch an evaluator.
+
+Newer checkpoint `2026-08-15T16:57:59Z`: no evaluator or expensive lease is active. #1666 cycle-1
+PLAN-EVAL is terminal `FAIL_PLAN` at `5d229e0f3`; leaf artifact head `cb91b225d`, topic
+`818575d18`. SA-2 authorizes only three JSDoc import-line paths—Contracts transform helper to the
+transform subpath, filter and pagination schemas to the query subpath—plus plan/run artifacts. The
+plan must correct the false claim that docs-accuracy lacks CI enforcement, address N1-N5, pass fresh
+Tier-A, then use one fresh Fable 5/medium Remote Control cycle-2 evaluator. #1663 stays parked.
+#1664 F4 is active on the original Sol/high author after exact consecutive-run/hash proof confirmed
+the gate premise was false. #1461 is plan-only at `ebf8977c1`; its second docs-source amendment is
+being delivered on the preserved author before Tier-A/evaluation.

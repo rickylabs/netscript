@@ -927,3 +927,20 @@
   released the singleton lease. F4 must be amended and pushed before mutation, then prove one
   reconciliation run followed by a second identical zero-client/zero-helper run; cheap receipts and
   fresh Tier-A are required before another lease.
+
+## 2026-08-15T16:57:59Z — #1666 cycle 1 fails honestly; three-lane repairs continue
+
+- #1666's fresh Fable 5/medium Remote Control PLAN-EVAL returned `FAIL_PLAN` at evaluator commit
+  `5d229e0f3`, comment `5303254623`. It found three additional shipped Contracts JSDoc examples that
+  import symbols from the non-exporting root, so issue #1296 row 1 was not otherwise satisfied.
+  Coordinator authorized exactly those three JSDoc-only paths and kept `Closes #1296`: transformer
+  imports move to `/transform`; filter/pagination examples move to `/query`. SA-2 must also correct
+  the inherited wiring claim—`docs-accuracy` is already fail-closed in non-draft CI—and address all
+  evaluator N1-N5 before fresh Tier-A and one cycle-2 evaluator. #1663 remains untouched.
+- #1664's false-positive attribution is now empirically terminal: after the failed post-plugin run
+  reconciled three helper files, two consecutive identical generates each reported 0 clients
+  written, 2 clients skipped, 0 helpers written, and complete helper hashes stayed byte-identical.
+  Features F4 is active on the preserved author under amendment-before-mutation rules.
+- #1461 plan head `ebf8977c1` reconciled its SDK doc-lint baseline. Fixes topic `20856dce0` is
+  delivering the already-authorized second tutorial page amendment to the same author; no product
+  mutation, evaluator, or runtime lease exists yet.

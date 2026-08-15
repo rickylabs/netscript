@@ -601,3 +601,12 @@ implementation thread.
   assertion permits that convergence run and requires zero writes only on the immediately following
   identical invocation. Calling temporally separated, different-input runs “first” and “second”
   creates an expensive false-positive gate.
+- **Search breadth can invert CI truth:** #1666 research grepped only root tasks and workflow text
+  for the checker name, then concluded the drift check was unwired. The actual fail-closed path is
+  `ci.yml` docs-accuracy gate → catalog task → accuracy script → child drift checker. The missing
+  contract is discoverable naming/runbook visibility, not enforcement. Wiring audits must follow the
+  executable call graph before claiming absence.
+- **Issue-wide example sweeps belong before scope freeze:** one known wrong Contracts import led the
+  #1666 plan to mark acceptance row 1 otherwise satisfied, but an exhaustive shipped-source sweep
+  found three more identical defects. When acceptance is phrased for a package family, planning must
+  enumerate the whole publish set, not stop at the issue's cited exemplar.

@@ -656,3 +656,10 @@ The host is empty, the lease is released, and fresh-browser remains NOT_RUN. Fea
 F4 proof-contract amendment before same-author repair: allow post-plugin reconciliation, then demand
 zero client/helper writes from the next identical invocation; renew cheap receipts and Tier-A before
 requesting another runtime lease. No evaluator is authorized.
+
+At 16:58Z all singleton leases are free. #1666 cycle-1 PLAN-EVAL failed at `5d229e0f3`; SA-2 grants
+three exact Contracts JSDoc import-line repairs and one fresh cycle-2 evaluator only after repaired
+plan Tier-A. #1664 is in same-author F4 plan/proof repair after consecutive zero-write/hash evidence
+proved the S5 idempotency assertion was positioned before convergence. #1461 remains plan-only while
+its exact second tutorial source is added to scope. All three lanes remain independent and serial
+within themselves; #1663 and docs stay parked.
