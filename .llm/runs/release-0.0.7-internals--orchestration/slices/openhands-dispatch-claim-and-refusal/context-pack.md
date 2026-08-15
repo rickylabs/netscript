@@ -6,17 +6,17 @@
 | --- | --- |
 | Run ID | `release-0.0.7-internals--orchestration/slices/openhands-dispatch-claim-and-refusal` |
 | Branch | `fix/openhands-dispatch-claim-and-refusal` |
-| Current phase | S2 complete; stopped for Tier-A slice review |
+| Current phase | S3 implementation complete; durable gates pending |
 | Archetype | `6-cli-tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-Tier-A signed off S1 at `6f725ad3b` with no changes and authorized S2. S2 is the only active slice:
-the pure producer now validates phase/head as a complete formal pair, rejects invalid phases and
-malformed immutable heads, emits both tokens together, and explicitly emits neither token in
-non-formal mode. Durable `check` and `test` receipts pass at implementation head `28a8a9184`; only
-`test` covers this `.llm/` producer surface.
+Tier-A signed off S2 at `0886c2427` with no changes and authorized S3. The CLI now accepts only the
+optional formal phases `plan|impl`, refuses formal issue and disabled-verdict requests, exposes no
+`--head`, and resolves the live PR head itself immediately before trigger construction. Controlled
+dependencies prove formal GET-before-emission/POST ordering without network access; non-formal PR
+and issue dry-runs explicitly remain tuple-free and make no GitHub/token calls.
 
 ## Completed
 
@@ -31,15 +31,18 @@ non-formal mode. Durable `check` and `test` receipts pass at implementation head
 - Tier-A S1 sign-off commit `6f725ad3b`.
 - S2 targeted RED (exit 1 before the tuple surface existed) and GREEN (exit 0, 75/75 tests).
 - S2 durable `check` PASS/0 and `test` PASS/0 receipts at `28a8a9184`.
+- Tier-A S2 sign-off commit `0886c2427`.
+- S3 targeted RED (exit 1 before the injected runner existed) and GREEN (exit 0, 80/80 tests).
 
 ## In Progress
 
-- Nothing. S2 is being pushed/commented and this thread stops for Tier-A.
+- Commit S3 and run the durable `check` and root `test` gates against the reachable implementation
+  commit. Only root `test` covers this leaf.
 
 ## Next Steps
 
-1. Tier-A substantively reviews S2 and either requests a bounded repair or authorizes S3.
-2. Do not begin S3 without that authorization.
+1. Record S3 durable receipts, push, and post the per-slice PR comment.
+2. Stop for Tier-A substantive S3 review; do not begin S4 without authorization.
 
 ## Key Decisions
 
@@ -74,6 +77,9 @@ non-formal mode. Durable `check` and `test` receipts pass at implementation head
 | S2 | `check` | PASS | `receipts/slice-2/check.json`, cached exit 0 at `28a8a9184`; package/plugin selection does not cover S2 |
 | S2 | `test` | PASS | `receipts/slice-2/test.json`, exit 0 at `28a8a9184`; 4,140 passed, 19 ignored, 0 failed; load-bearing |
 | S2 | `quality-job` | NOT_RUN | not an S2 gate; scheduled for S4/S5 and not independent behavioral proof |
+| S3 | `check` | PENDING | package/plugin selection does not cover S3 |
+| S3 | `test` | PENDING | load-bearing root auto-discovery gate after implementation commit |
+| S3 | `quality-job` | NOT_RUN | not an S3 gate; scheduled for S4/S5 and not independent behavioral proof |
 | all | JSR | N/A | no publishable surface |
 
 ## Open Questions

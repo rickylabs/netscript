@@ -224,3 +224,40 @@ Verified by execution:
   named, rather than banking a green receipt that does not cover these paths.
 
 Slice 3 is authorized.
+
+## Slice 3 — CLI-owned live-head binding
+
+### Progress
+
+| Time       | Step           | Notes                                                                                                                                                                                                                         |
+| ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-15 | Authorization  | Fast-forwarded to Tier-A S2 sign-off `0886c2427`; began S3 only.                                                                                                                                                              |
+| 2026-08-15 | RED            | Added deterministic CLI tests first; the targeted structured wrapper exited 1 because the injected dispatch runner and dependency contract did not exist.                                                                    |
+| 2026-08-15 | Implementation | Added optional constrained `--phase`, formal PR/verdict guards, injected file/token/GitHub ports, and a live PR-head read immediately before trigger construction. No `--head` parser surface was added. Targeted suite passed 80/80. |
+
+### Decisions
+
+- Formal dispatch resolves the authenticated live PR head after all prompt/route/target validation
+  and immediately before building the emitted comment; dry-run performs the same binding read.
+- The CLI exposes no caller-owned head input. `--head` remains an unknown argument and has an
+  explicit regression assertion.
+- Non-formal PR and issue dry-runs preserve their existing no-token/no-network behavior and assert
+  the absence of both tuple tokens.
+- The GitHub and token boundaries are injected only to make the real sequencing deterministic in
+  tests; production wiring continues to use the existing helpers.
+
+### Gate status
+
+| Gate           | Outcome          | Exit | Receipt / evidence                                                     | Coverage meaning                                                                  |
+| -------------- | ---------------- | ---: | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Targeted RED   | expected failure |    1 | structured test wrapper before implementation; no durable PASS receipt | Missing runner/dependency exports proved the tests preceded implementation.       |
+| Targeted GREEN | PASS             |    0 | structured test wrapper; 80/80                                         | Focused CLI sequencing, refusal, and tuple-free behavioral feedback.              |
+| `check`        | PENDING          |    — | `receipts/slice-3/check.json` after implementation commit               | Frozen-contract receipt only; package/plugin roots do not cover S3.               |
+| `test`         | PENDING          |    — | `receipts/slice-3/test.json` after implementation commit                | Will be the load-bearing S3 proof through root auto-discovery of the new test.     |
+| `quality-job`  | NOT_RUN          |    — | S3 does not name this gate; scheduled for S4/S5                         | Shares the non-covering package/plugin check dependency; not independent proof.   |
+
+### Handoff boundary
+
+- S3 stops after durable receipts, push, and its PR comment for Tier-A review.
+- S4 is not authorized and no workflow path was changed.
+- No live GitHub API, OpenHands/evaluator dispatch, or workflow-triggering label transition occurred.
