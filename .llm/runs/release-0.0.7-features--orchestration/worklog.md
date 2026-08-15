@@ -4982,3 +4982,51 @@ owner with the commit message stating plainly that a supervisor both caused and 
 bytes — so the record shows the exception rather than hiding it. Alternatively, option 3 is
 defensible: the defect is two provenance lines in a run artifact, fully attributed in D-19 and here,
 and F8's plan content is unaffected and reviewable now.
+
+## 2026-08-15 — F8 provenance correction routed to a fresh chore_code agent (quota-driven)
+
+Codex is account-wide quota-blocked until 2026-08-20 05:31 (evidence: detached thread
+`01a00766-3240-7dd0-91df-7e335142f0cb` created, then the usage-limit error; accepted centrally as
+sufficient). The correction is therefore routed off the Codex family entirely rather than waiting or
+being self-authored.
+
+### Route
+
+`lane-policy.md` maps **`chore_code`** to **Claude · Anthropic · Opus 5 · medium**, which is the
+canonical lane for a delegated code chore of exactly this size — one file restored to a known blob
+plus an in-place comment rewrite.
+
+| Field | Value |
+| --- | --- |
+| Job / session | `41950acc` / `41950acc-c711-4b96-b3a8-066e5b71536b` |
+| Bridge session | `cse_01FCKmfUm5L3NTan9hwDy58f` (non-empty) |
+| Remote Control URL | `https://claude.ai/code/session_01FCKmfUm5L3NTan9hwDy58f` |
+| Requested route | native Claude **Opus 5 · medium** (`chore_code`) |
+| Observed route | `respawnFlags` = `--effort medium … --model claude-opus-5`; `providerEnv {}` |
+| Route verdict | **matched**, native Anthropic auth |
+| Worktree | `/home/codex/worktrees/ns1664-f8-prov` — **dedicated detached** at `d8d5ee619` |
+| Leaf worktree | untouched, clean, `d8d5ee619` |
+
+Requested and observed agree, and `providerEnv {}` confirms this is native Anthropic rather than an
+OpenRouter route — recorded because the quota-driven reroute is exactly the kind of substitution that
+must be provable rather than asserted.
+
+### Ownership discipline held
+
+The supervisor neither authors nor self-certifies this correction. I did not restore the file myself,
+despite it being two lines, because the defect *is* a supervisor writing into a worktree whose commits
+another agent signs — repairing it the same way would trade one provenance defect for another. A
+separate corrective owner signs the fix.
+
+The dedicated detached worktree is **preserved**, not removed, per the standing instruction. All four
+quarantines remain intact.
+
+### Next
+
+On the chore agent's explicit push and exact proof — `leak-report.md` blob byte-identical to
+`2385cdb72`, `git diff 2385cdb72..HEAD` containing only legitimate F8 plan artifacts, and
+`local == remote == PR` clean — the amendment goes to a **fresh Minimax M3 · high OpenRouter
+PLAN-EVAL**, the canonical native-quota fallback, since this is a plan-only changeset and the Codex
+review family is unavailable. Generator ≠ evaluator, and the supervisor is neither.
+
+No runtime, lease, product or test mutation, readiness, or merge.
