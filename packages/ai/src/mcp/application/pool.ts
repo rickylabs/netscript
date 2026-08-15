@@ -5,6 +5,7 @@ import type {
   McpStateChangeHandler,
   McpToolDescriptor,
   McpToolResult,
+  McpTransportPoolSnapshot,
   McpTransportPort,
 } from '../../ports/mcp-transport.ts';
 import { createMcpTransport, type McpTransportConfig } from './factory.ts';
@@ -69,6 +70,8 @@ export class McpTransportPool implements McpTransportPort {
   readonly serverId: string;
   readonly #transports = new Map<string, McpTransportPort>();
   readonly #routes = new Map<string, ToolRoute>();
+  readonly #lastErrors = new Map<string, string>();
+  readonly #readyServerIds = new Set<string>();
   readonly #handlers = new Set<McpStateChangeHandler>();
   readonly #toolNameSeparator: string;
   #state: McpConnectionState = 'disconnected';
@@ -101,10 +104,28 @@ export class McpTransportPool implements McpTransportPort {
     return this.#transports.get(serverId);
   }
 
+  /** Read current per-server status and ready clients without network I/O. */
+  get snapshot(): McpTransportPoolSnapshot {
+    const statuses: Record<string, McpTransportPoolSnapshot['statuses'][string]> = {};
+    const readyClients: Record<string, McpTransportPort> = {};
+    for (const [serverId, transport] of this.#transports) {
+      const lastError = this.#lastErrors.get(serverId);
+      statuses[serverId] = {
+        serverId,
+        state: transport.state,
+        ...(lastError === undefined ? {} : { lastError }),
+      };
+      if (this.#readyServerIds.has(serverId)) {
+        readyClients[serverId] = transport;
+      }
+    }
+    return { statuses, readyClients };
+  }
+
   /** Open every pooled transport and return prefixed tool descriptors. */
   async connect(options: McpConnectOptions = {}): Promise<readonly McpToolDescriptor[]> {
     this.#transition('connecting');
-    const tools = await this.#collectTools((transport) => transport.connect(options));
+    const tools = await this.#collectTools((transport) => transport.connect(options), options);
     this.#transition('connected');
     return tools;
   }
@@ -112,14 +133,14 @@ export class McpTransportPool implements McpTransportPort {
   /** Reconnect every pooled transport and return prefixed tool descriptors. */
   async reconnect(options: McpConnectOptions = {}): Promise<readonly McpToolDescriptor[]> {
     this.#transition('reconnecting');
-    const tools = await this.#collectTools((transport) => transport.reconnect(options));
+    const tools = await this.#collectTools((transport) => transport.reconnect(options), options);
     this.#transition('connected');
     return tools;
   }
 
   /** List tools from all pooled transports without tearing down warm connections. */
   async listTools(options: McpConnectOptions = {}): Promise<readonly McpToolDescriptor[]> {
-    const tools = await this.#collectTools((transport) => transport.listTools(options));
+    const tools = await this.#collectTools((transport) => transport.listTools(options), options);
     this.#refreshState();
     return tools;
   }
@@ -153,12 +174,34 @@ export class McpTransportPool implements McpTransportPort {
 
   async #collectTools(
     list: (transport: McpTransportPort) => Promise<readonly McpToolDescriptor[]>,
+    options: McpConnectOptions,
   ): Promise<readonly McpToolDescriptor[]> {
     const allTools: McpToolDescriptor[] = [];
+    const transports = [...this.#transports.values()];
+    const results = await Promise.allSettled(transports.map((transport) =>
+      settleWithSignal(
+        list(transport),
+        options.signal,
+        () =>
+          transport.stop().catch((error: unknown) => {
+            this.#lastErrors.set(transport.serverId, errorMessage(error));
+          }),
+      )
+    ));
     this.#routes.clear();
-    for (const transport of this.#transports.values()) {
-      const tools = await list(transport);
-      for (const tool of tools) {
+    for (const [index, result] of results.entries()) {
+      const transport = transports[index];
+      if (transport === undefined) {
+        continue;
+      }
+      if (result.status === 'rejected') {
+        this.#readyServerIds.delete(transport.serverId);
+        this.#lastErrors.set(transport.serverId, errorMessage(result.reason));
+        continue;
+      }
+      this.#readyServerIds.add(transport.serverId);
+      this.#lastErrors.delete(transport.serverId);
+      for (const tool of result.value) {
         const prefixed = this.#prefixTool(transport.serverId, tool);
         if (this.#routes.has(prefixed.name)) {
           throw new AiError(`Duplicate MCP tool name "${prefixed.name}" in pool.`);
@@ -225,6 +268,50 @@ export class McpTransportPool implements McpTransportPort {
       handler(next, previous);
     }
   }
+}
+
+function settleWithSignal<T>(
+  operation: Promise<T>,
+  signal: AbortSignal | undefined,
+  onLateSuccess: () => Promise<void>,
+): Promise<T> {
+  if (signal === undefined) {
+    return operation;
+  }
+  if (signal.aborted) {
+    operation.then(onLateSuccess, () => {});
+    return Promise.reject(signal.reason);
+  }
+  return new Promise<T>((resolve, reject) => {
+    let settled = false;
+    const onAbort = (): void => {
+      settled = true;
+      reject(signal.reason);
+    };
+    signal.addEventListener('abort', onAbort, { once: true });
+    operation.then(
+      (value) => {
+        signal.removeEventListener('abort', onAbort);
+        if (settled) {
+          onLateSuccess();
+          return;
+        }
+        settled = true;
+        resolve(value);
+      },
+      (error: unknown) => {
+        signal.removeEventListener('abort', onAbort);
+        if (!settled) {
+          settled = true;
+          reject(error);
+        }
+      },
+    );
+  });
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }
 
 /** Create a multi-server MCP pool from serializable transport configs. */

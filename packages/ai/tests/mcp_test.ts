@@ -258,6 +258,15 @@ Deno.test('McpTransportPool isolates a never-settling server during startup', as
   assertEquals(tools.map((tool) => tool.name), ['healthy__search']);
   assertEquals(stalled.connectCount, 1);
   assertEquals(healthy.connectCount, 1);
+  assertEquals(pool.snapshot.statuses.stalled?.serverId, 'stalled');
+  assertEquals(pool.snapshot.statuses.stalled?.state, 'connecting');
+  assertEquals(
+    pool.snapshot.statuses.stalled?.lastError,
+    'The operation was aborted due to timeout',
+  );
+  assertEquals(pool.snapshot.statuses.healthy?.state, 'connected');
+  assertEquals(pool.snapshot.readyClients.healthy, healthy);
+  assertEquals(pool.snapshot.readyClients.stalled, undefined);
 });
 
 Deno.test('McpTransportPool keeps transports warm across turns', async () => {

@@ -131,3 +131,22 @@ and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
 - The former scope blocker is resolved by commit `e2faaab15def77c131806aa6cf565d77bd6fe92c`.
 - Next action is the committed RED regression slice; no implementation source has yet changed.
 - No Aspire, Docker, browser, scaffold runtime, or CLI E2E command has run.
+
+## 2026-08-15 — Slice 2 pool isolation and snapshot
+
+- Changed pool tool collection from sequential awaits to concurrent per-server settlement.
+- Caller abort now settles a non-cooperative pending server while preserving already-ready peers;
+  a late success is stopped and cleanup failure is retained.
+- Added the synchronous `snapshot` accessor with per-server state/last error and ready clients, and
+  exported its explicit types from the existing `./mcp` entrypoint.
+- Focused RED regression: same structured command as slice 1, raw exit `0` (1 passed).
+- Full MCP test file: `deno run --allow-read --allow-write --allow-run
+  .llm/tools/run-deno-test.ts -- --allow-all packages/ai/tests/mcp_test.ts`, raw exit `0` (12 passed).
+- Structured targeted check: `deno run --allow-read --allow-run
+  .llm/tools/run-deno-check.ts --file packages/ai/src/ports/mcp-transport.ts --file
+  packages/ai/src/mcp/application/pool.ts --file packages/ai/mcp.ts --file
+  packages/ai/tests/mcp_test.ts --ext ts`, raw exit `0`; wrapper used `--unstable-kv`.
+- Structured targeted lint: same four files through `run-deno-lint.ts --ext ts`, raw exit `0`.
+- Structured targeted fmt check: same four files through `run-deno-fmt.ts --ext ts`, raw exit `0`
+  after scoped formatter normalization. The pre-format check exited `1` with three findings.
+- `deno.lock` unchanged. No expensive gate ran.

@@ -117,6 +117,24 @@ export type McpStateChangeHandler = (
   previous: McpConnectionState,
 ) => void;
 
+/** Last observed lifecycle status for one server in an MCP transport pool. */
+export interface McpServerStatus {
+  /** Stable id assigned to the MCP server connection. */
+  readonly serverId: string;
+  /** Last synchronously observed lifecycle state. */
+  readonly state: McpConnectionState;
+  /** Message from the last failed pool operation, when degraded. */
+  readonly lastError?: string;
+}
+
+/** Immediate, I/O-free view of pooled MCP server health and ready clients. */
+export interface McpTransportPoolSnapshot {
+  /** Per-server lifecycle status keyed by server id. */
+  readonly statuses: Readonly<Record<string, McpServerStatus>>;
+  /** Ready transport clients keyed by server id. */
+  readonly readyClients: Readonly<Record<string, McpTransportPort>>;
+}
+
 /** Result of opening a low-level MCP client connection. */
 export interface McpClientConnection {
   /** List tools advertised by the connected server. */

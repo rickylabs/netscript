@@ -81,3 +81,14 @@ amendment.
 - Current phase: RED regression slice, before implementation.
 - Next: commit the focused healthy + never-settling RED test, then implement each locked slice.
 - A ninth package file or new public decision is an immediate drift/stop boundary.
+
+## 2026-08-15 — Slice 2 update (append-only)
+
+- Pool startup/list/reconnect tool collection now settles concurrently per server.
+- A caller deadline preserves fulfilled healthy peers, records the stalled peer's error, and closes
+  a late successful connection.
+- `pool.snapshot` is synchronous and I/O-free, returning readonly `statuses` and `readyClients`
+  records keyed by server id; public types are exported through existing `packages/ai/mcp.ts`.
+- Focused and full MCP tests, targeted check (`--unstable-kv`), lint, and fmt are green with raw
+  exit code `0`.
+- Next slice: port/base/TanStack resource-read and close cancellation plus late cleanup.

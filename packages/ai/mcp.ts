@@ -58,10 +58,12 @@ export {
   type McpConnectionState,
   type McpConnectOptions,
   type McpConnectorConfig,
+  type McpServerStatus,
   type McpStateChangeHandler,
   type McpToolDescriptor,
   type McpToolParameters,
   type McpToolRegistry,
   type McpToolResult,
+  type McpTransportPoolSnapshot,
   type McpTransportPort,
 } from './src/ports/mcp-transport.ts';
