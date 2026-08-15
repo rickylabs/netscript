@@ -1790,3 +1790,27 @@ does not, and is any of it breaking" is a real question for a generator fix, not
 
 The leaf stops after research and plan, and proposes both determinations — PLAN-EVAL necessity and
 expensive-gate timing — rather than deciding either.
+
+### Coordinator correction — no expensive-gate lease request at this stage
+
+Standing constraint updated before the Phase-1 stop: **do not wait for, or request,
+`scaffold.runtime` now.** No `scaffold.runtime` or `fresh-browser` lease may be sought or granted
+before coordinator review of the plan. My previous report said I would return for the lease "once the
+plan justifies it" — the correct sequence is that the plan goes to coordinator review first, and the
+lease question is decided there, not raised by this lane when the plan lands.
+
+What that changes concretely at the Phase-1 stop: the fenced-gate instruction to the author is
+unchanged (it may plan for the gates but not run them), but my review must additionally judge
+**whether each expensive gate is genuinely load-bearing** for this leaf rather than assume the
+contract's six-gate list is self-justifying. A gate named in a contract is a claim that it proves
+something nothing cheaper proves; that claim is checkable, and checking it is part of the review
+rather than a step after it.
+
+Review scope at the stop, per the correction: citations re-verified at `3fc0f2f92`, the concrete key
+shapes, the compatibility answer, the slice plan, and whether PLAN-EVAL **and each expensive gate**
+are load-bearing. Plus the process gate this lane owes: the draft PR must exist and carry
+`Closes #1355` and `Closes #1360`.
+
+Author `01a004f9-f033-7592-a0bc-63927753fb43` remains the preserved sole author and is actively
+producing `research.md` / `plan.md` from base `3fc0f2f92`. No PR yet, no commits yet, tree clean.
+Monitoring to a clean pushed Phase-1 stop.
