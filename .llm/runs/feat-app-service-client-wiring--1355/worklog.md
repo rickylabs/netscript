@@ -943,3 +943,21 @@ Attempt 7 remains prohibited until repair receipts and a second fresh Tier-A exi
 
 The commit also preserves the already-present coordinator audit refresh in `leak-report.md`
 (timestamp and audited worktree only); it does not rerun or reinterpret that audit.
+
+## Provenance correction — leak-report.md restored to its author blob
+
+The F8 plan-only commit `d8d5ee619` carried a change to `leak-report.md` that the plan author did
+not produce. A supervisor host audit ran into the author's checkout and rewrote the report's
+`Generated` timestamp and `Worktree` line to `2026-08-15T21:33:41.742Z` /
+`/home/codex/repos/netscript-007-features-1355`. The author's own values are
+`2026-08-15T21:24:46.689Z` / `/home/codex/worktrees/netscript-s5-a6-ed3f78e0d`, recorded from the
+attempt-6 detached checkout.
+
+This commit restores `leak-report.md` byte-for-byte to its blob at `2385cdb72`, so the branch again
+carries only the author's audit values. The earlier worklog sentence describing that change as a
+preserved coordinator audit refresh is superseded: those bytes were foreign, not preserved evidence.
+
+The repair is append-only and was made by a separate corrective owner in a dedicated detached
+worktree. `d8d5ee619` is not amended, reset, rebased, or rewritten; it stands as an intermediate
+contaminated plan head. F8 plan content is untouched. No gate, audit, leak-check, browser, Aspire,
+Docker, lease, evaluator, readiness, metadata, issue, label, lockfile, or docs action occurred.
