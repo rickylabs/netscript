@@ -458,3 +458,13 @@ the branch-caused generated closure is exactly four paths and authorizes only
 `packages/mcp/src/publish-assets.generated.ts` after link 3 lands; no Tier-A/evaluator/readiness
 before all links converge on one content head. #1652 had already recorded this exact cascade, and
 the missed precedent is now explicit drift. #1663's owner-only decision is unchanged.
+
+Resume from the authoritative `2026-08-15T16:03:00Z` transition. Runtime ownership is empty again.
+#1664 `scaffold.runtime` at `b14975af7` passed six gates then failed the static generated-client
+consumer with one missing canonical DB-Zod module and two real payments-input type mismatches;
+cleanup is proven clean and `fresh-browser` is NOT_RUN. Features topic `d2e83f690` releases the
+lease. F3 must be scoped/pushed before same-author mutation, cover all three diagnostics and the
+false equal-tail assumption, then pass fresh Tier-A before requesting a new lease. #1665 link 3 is
+clean/pushed at `27a64ea4c`; fixes topic `a9176278a` is serially dispatching the same original author
+for only `packages/mcp/src/publish-assets.generated.ts`. No fixes Tier-A/evaluator/readiness until
+that fourth link lands. #1663's owner-only decision remains unchanged.

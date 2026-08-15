@@ -565,5 +565,22 @@ request. Runtime ownership remains empty.
 #1665's fourth branch-caused link is `packages/mcp/src/publish-assets.generated.ts`; there is no
 fifth checked-in mirror. The identical four-path cascade was already known from shipped #1652, so
 not reusing it when #1665 changed Query Bridge docs is recorded as a coordinator/process miss.
-#1664's lease preflight found zero Docker containers, Aspire/AppHost/DCP or browser processes,
-relevant ports, or competing lease owners. The PR remains draft and labels remain unchanged.
+#1664's lease preflight found zero Docker containers, Aspire application/AppHost/DCP or browser
+processes, relevant ports, or competing lease owners; idle Aspire MCP helpers are not application
+resources. The PR remains draft and labels remain unchanged.
+
+### Live transition — 2026-08-15T16:03:00Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Queue exhausted and parked at `0ca4c489f` | Do not invent post-freeze work |
+| internals | #1663 remains at the exceptional-final-PLAN-EVAL owner boundary on `194e22a3d` | No third evaluator or product mutation without the owner's explicit verdict |
+| fixes | #1665 link 3 is clean/pushed at `27a64ea4c`; same-author link-4 dispatch is queued from topic `a9176278a` | Canonical `gen:publish-assets` only, hard stop on any extra path; no Tier-A/evaluator/readiness before it lands |
+| features | #1664 `scaffold.runtime` failed honestly after 6 passes; cleanup is clean and lease released at topic `d2e83f690` | Amend F3 before mutation, same author repair, fresh Tier-A, then request a new lease; `fresh-browser` is NOT_RUN |
+
+#1664's runtime failure contains three independent compiler diagnostics: missing generated database
+Zod output and two payments list-input mismatches. The original report characterized only the input
+shape and was corrected before repair. F3 must use the real users/payments contracts, prove resource
+prefix isolation without assuming identical input tails, and resolve the canonical schema-generation
+precondition without inventing a fake generated module. #1665 remains serial: publish assets consume
+the just-landed CLI barrel.

@@ -790,7 +790,7 @@
 - #1664's author completed four fresh exact-head receipts at evidence head `b14975af7`: check,
   4210/0 tests with 19 ignored, publish dry-run, and architecture check all exited 0. The evidence
   evaluator returned `SUFFICIENT`; fresh features Tier-A independently confirmed the three probe
-  repairs and pushed `63d190d4b`. After a clean Docker/Aspire/browser/port audit, the coordinator
+  repairs and pushed `63d190d4b`. After a clean Docker/Aspire-application/browser/port audit, the coordinator
   granted the singleton S5 lease: `scaffold.runtime` first with cleanup, then `fresh-browser` only
   after a clean inter-gate audit. PR #1664 stays draft and no evaluator is authorized yet.
 - #1665's original author regenerated exactly the authorized CLI barrel and independently found the
@@ -802,3 +802,20 @@
   Failure to reuse that precedent for #1665 caused two avoidable readiness cycles. The correction is
   now structural: converge source, corpus, CLI barrel, and MCP publish asset on one content head
   before fresh Tier-A, the focused delta evaluator, or readiness can resume.
+
+## 2026-08-15T16:03:00Z — runtime gate falsifies its proof; link 3 lands cleanly
+
+- #1664 acquired the S5 lease only after preflight and ran the suite-owned `scaffold.runtime` gate.
+  Service add and generate passed, but `generated.service-client-contract` failed: the temporary
+  consumer imports a users contract whose canonical DB Zod output does not yet exist, and sends the
+  users list input shape to the differently typed payments list factory. Result was 6 pass / 1 fail /
+  0 skipped. `fresh-browser` never started. In-suite Aspire cleanup and post-run leak-check passed;
+  Docker, AppHost/DCP, ports, and survivors are empty. The lease is released at topic `d2e83f690`.
+- The first feature attribution mentioned three errors but explained only the two input mismatches.
+  Coordinator interception required F3 to include TS2307, inspect the canonical DB-generation
+  lifecycle, remove the false equal-tail assumption, and prove each real service's typed key/filter
+  behavior. Scope amendment must be pushed before the same original author mutates; fresh Tier-A is
+  mandatory before a new runtime lease.
+- #1665 link 3 landed at `27a64ea4c`, exactly the CLI generated barrel plus run artifacts, explicitly
+  pushed with repair receipt `5303037805`. The fixes supervisor inspected the predicted six
+  provenance-field deltas and queued the already-amended link-4 brief on the same author thread.

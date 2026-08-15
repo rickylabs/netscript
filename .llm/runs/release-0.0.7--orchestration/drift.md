@@ -559,3 +559,9 @@ implementation thread.
   gate instead of consulting that persisted closure. A docs-source change now requires a historical
   cascade lookup plus exhaustive checked-in-mirror proof before readiness, not incremental CI
   discovery one artifact at a time.
+- **A real generated project can falsify a fully green fixture model:** #1664's cheap probe tests
+  shared one invented list input across users and payments and assumed equal key tails. The runtime
+  scaffold proved the services expose different real input contracts and that the users contract
+  also has a canonical DB-Zod generation predecessor. Gate plans must derive executable inputs and
+  prerequisites from generated artifacts, and Tier-A must reject fixture-only agreement when a
+  real-project gate is the stated proof.

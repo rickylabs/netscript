@@ -1131,15 +1131,15 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
-      "currentPrHeadSha": "72d57229f28e3010c43d76fbecd3b3082680804f",
+      "currentPrHeadSha": "27a64ea4c122312e46ffc9602509c191bcd0dd71",
       "issueNumbers": [1637, 1619, 1620, 1598, 1623],
       "implementerAgentId": "01a00516-2033-7ed3-936a-a616cee47447",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/sdk-cache-surface-and-telemetry",
       "worktree": "/home/codex/repos/netscript-007-leaf-sdk-cache",
       "prNumber": 1665,
-      "implementationState": "product_and_corpus_delta_eval_pass_preserved_link3_author_active_link4_scope_amended_after_exact_four_link_closure_proof",
-      "dispatchTopicHeadSha": "92ea9f829",
+      "implementationState": "product_and_corpus_delta_eval_pass_preserved_link3_complete_link4_same_author_dispatch_queued_after_exact_four_link_closure_proof",
+      "dispatchTopicHeadSha": "a9176278a",
       "planGate": "research and contract decisions only; open one draft PR and stop before implementation; PLAN-EVAL is required",
       "declaredSurface": [
         "packages/sdk/src/cache/cache-provider.ts",
@@ -1238,7 +1238,7 @@
         "unrelatedQueueFlakeIssue": 1667
       },
       "embeddedAgentDocsBarrelRepair": {
-        "state": "same_original_author_active_on_exact_link3_repair",
+        "state": "complete_exact_one_product_path_plus_run_artifacts",
         "readinessRunId": 31893659579,
         "readinessFailureJobId": 95033583015,
         "failure": "Generated asset freshness runs check:assets-barrel; regeneration changes packages/cli/src/kernel/assets/agent-docs.generated.ts from the old embedded corpus to the fresh prose asset",
@@ -1246,10 +1246,12 @@
         "authorizedPaths": [
           "packages/cli/src/kernel/assets/agent-docs.generated.ts"
         ],
+        "repairHeadSha": "27a64ea4c122312e46ffc9602509c191bcd0dd71",
+        "commentUrl": "https://github.com/rickylabs/netscript/pull/1665#issuecomment-5303037805",
         "requiredReview": "fresh fixes Tier-A plus one proportionate asset-chain fidelity delta evaluator before readiness resumes"
       },
       "publishAssetsRepair": {
-        "state": "scope_amended_before_mutation_waiting_for_link3_commit",
+        "state": "scope_amended_before_mutation_same_original_author_dispatch_queued_after_link3_commit",
         "scopeAmendmentTopicCheckpointSha": "92ea9f8298ce6a9cd448233a98d56b063ff14c53",
         "authorizedPaths": [
           "packages/mcp/src/publish-assets.generated.ts"
@@ -1338,8 +1340,8 @@
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "f2_corrected_evidence_tier_a_pass_s5_singleton_runtime_lease_granted_scaffold_runtime_first",
-      "dispatchTopicHeadSha": "63d190d4b",
+      "implementationState": "f2_corrected_evidence_tier_a_pass_s5_scaffold_runtime_failed_cleanly_f3_scope_attribution_active_lease_released",
+      "dispatchTopicHeadSha": "d2e83f690",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
       "tierAPlanRepairHeadSha": "f7225be98c01b38f86712c1df0782aec06e34445",
@@ -1413,7 +1415,7 @@
           ]
         },
         "s5": {
-          "state": "runtime_lease_granted_scaffold_runtime_then_fresh_browser_serial",
+          "state": "scaffold_runtime_failed_probe_contract_mismatch_cleaned_lease_released_f3_scope_research_active",
           "finding": "accepted plan release condition 3 is unmet: no payments service add/generate/idempotency, users/payments key-isolation, or live Rename plus exactly-one settled refetch scenario exists in the scaffold.runtime suite",
           "freshBrowserPrecondition": "present: controlled hydrationNow old-versus-fresh fixture and catalog-backed task wiring",
           "f2PlanAmendmentHeadSha": "4be44002079a3a22a581810d12239f800175df12",
@@ -1433,10 +1435,14 @@
           "f2ReceiptState": "four fresh exact-head receipts PASS and independently SUFFICIENT at b14975af7; all 787cfa928 receipts are superseded-only",
           "f2PlanDesign": "three scaffold/static gates selected by scaffold.service and scaffold.runtime immediately after scaffold.init; one CDP settled-refetch behavior gate selected only by scaffold.runtime after live readiness; pure fail-capable unit assertions and four new exact-head binding receipts before fresh Tier-A",
           "requiredRecovery": "amend an exact bounded CLI e2e gate/probe/test slice, implement on the original Sol/high author, rerun affected cheap tests and all four binding gates, and pass fresh Tier-A before any lease",
-          "leaseState": "granted_to_features_after_clean_host_audit",
+          "leaseState": "released_after_terminal_scaffold_runtime_failure_and_clean_audit",
           "leaseGrantedAt": "2026-08-15T15:56:55Z",
-          "leasePreflight": "leaf clean and local == remote; zero Docker containers; no Aspire/AppHost/DCP, browser, relevant port, or other lease owner",
-          "runtimeGates": "scaffold.runtime authorized first with cleanup; fresh-browser only after terminal result and clean inter-gate audit; never concurrent"
+          "leasePreflight": "leaf clean and local == remote; zero Docker containers; no Aspire application/AppHost/DCP, browser, relevant port, or other lease owner; idle Aspire MCP helpers are not application resources",
+          "scaffoldRuntimeResult": "FAILED passed=6 failed=1 skipped=0 at generated.service-client-contract; two new add/generate gates passed",
+          "scaffoldRuntimeFindings": "TS2307 missing database/postgres/schema/.generated/zod/crud.ts plus two TS2345 payments list input mismatches; current hardcoded shared input and equal-tail proof assumptions do not match the real users/payments contracts",
+          "cleanupResult": "cleanup.aspire-stop PASS; leak-check aspire/docker ok and survivors empty; zero containers and no AppHost/DCP; foreign Aspire MCP helpers untouched",
+          "f3RequiredScope": "amend before mutation; inspect canonical schema-generation lifecycle and real contracts; prove resource-prefix isolation with each service's own typed input; same original author; fresh Tier-A before a new lease",
+          "runtimeGates": "scaffold.runtime terminal FAIL; fresh-browser NOT_RUN; new lease requires F3 repair, fresh Tier-A, and clean preflight"
         }
       },
       "planDecisionBoundary": "cycle 1 ruled direct emitted { queryKey: <svc>Queries.list.clientKey() } with no SDK overload; repair must lock generator-owned output paths, existing service generate overwrite/dry-run/force compatibility, package README homes, post-mutation request-count proof, per-slice paths, and qualified citations",
