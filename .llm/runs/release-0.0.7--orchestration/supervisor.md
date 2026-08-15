@@ -521,3 +521,19 @@ head is what starts the required product validation. #1664's plan placement in `
 is acceptable only if the final catalog proves the first three gates in both suites immediately
 after init and the live refetch gate in runtime only after readiness. The singleton runtime mutex
 remains free and serialization remains per topic.
+
+### Live transition — 2026-08-15T15:34:28Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Queue exhausted and parked at `0ca4c489f` | Do not invent post-freeze work |
+| internals | #1663 remains at the exceptional-final-PLAN-EVAL owner boundary on `194e22a3d` | No third evaluator or product mutation without the owner's explicit verdict |
+| fixes | #1665 readiness quality failed on stale generated agent-docs assets; scope amendment `ef396767a`, same original author regenerating and verifying exactly two assets | Fresh fixes Tier-A and a proportionate source-to-generated delta evaluation are required before readiness resumes |
+| features | #1664 plan split `93fb5532d` preceded product head `787cfa928`, but topic `37372cbae` intercepted two executable CDP proof defects | Same-author additive repair, renewed receipts, and fresh Tier-A before any runtime lease |
+
+#1665's formal product evaluation remains valid, but its exact-head readiness claim does not: the
+authorized query-bridge source edit feeds the checked-in agent-docs bundle. The canonical generator
+changed only `prose.json.gz` and `provenance.json`; bounded checks are active. #1664's first product
+commit uses `Fetch.continueRequest` for a response-stage pause and snapshots its request baseline
+after a fixed sleep. Those cannot prove a settled `+1` refetch. The same author is repairing the
+committed head without rewriting history. Runtime ownership remains empty.

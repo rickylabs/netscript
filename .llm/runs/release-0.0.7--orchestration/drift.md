@@ -534,3 +534,14 @@ implementation thread.
   committed and explicitly pushed `4be440020` containing the bounded files, four gate scenarios,
   pure-test contract, and superseded-receipt rules. Product edits began only afterward. A dirty
   local plan next to product code would not prove the recovery was constrained before execution.
+- **Generated documentation freshness follows source dependency, not human file category:** #1665
+  changed an authorized `docs/site` page whose rendered counterpart is part of the checked-in agent
+  corpus. Docs accuracy passing does not imply corpus freshness; the canonical generator and its
+  exact two-asset diff are a required readiness consequence of that source edit.
+- **A `+1` network assertion needs a proven quiet baseline:** a fixed delay before counting requests
+  lets a late initial request impersonate the expected refetch. The proof must first establish that
+  all observed initial requests completed and the count stayed stable across a confirmation window,
+  and a negative unit case must demonstrate rejection of the late-arrival sequence.
+- **CDP continuation is stage-specific:** a request paused by Fetch at `requestStage: Response` must
+  resume with `Fetch.continueResponse`. Using `Fetch.continueRequest` can turn the first leased run
+  into an apparent infrastructure hang even though the defect is entirely in the unexecuted proof.

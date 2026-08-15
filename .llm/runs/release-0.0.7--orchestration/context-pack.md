@@ -425,3 +425,15 @@ the three shared scaffold/static gates, runtime-only CDP refetch gate, pure test
 receipts. Fresh Tier-A is mandatory before any S5 lease. #1663 still requires the exact owner
 decision on one exceptional third and final Fable 5/medium PLAN-EVAL at immutable `194e22a3d`;
 independent work does not wait on it.
+
+Resume from the authoritative `2026-08-15T15:34:28Z` transition. Main remains `baf1cdf67`; Docker,
+Aspire application ownership, and the singleton runtime lease remain empty. #1665's formal product
+IMPL-EVAL PASS stands, but readiness run `31892668157` failed quality job `95031217843` because the
+authorized query-bridge edit invalidated exactly two checked-in agent-docs bundle assets. Fixes topic
+`ef396767a` authorizes only those assets plus run artifacts; the preserved Sol/medium author is
+regenerating and verifying them, followed by fresh Tier-A and a focused fidelity delta evaluation.
+#1664 pushed exact transport-split plan amendment `93fb5532d` before product head `787cfa928`, but
+features topic `37372cbae` intercepted the wrong response-stage CDP resume and an unproven fixed-sleep
+request baseline. The same Sol/high author is repairing additively and must renew all four receipts
+before fresh Tier-A. No runtime lease or evaluator is permitted. #1663's owner-only decision is
+unchanged; independent lanes continue.

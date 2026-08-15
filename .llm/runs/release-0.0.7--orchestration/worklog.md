@@ -742,3 +742,24 @@
   runtime suites after init, one live CDP refetch gate into runtime only after readiness, pure
   fail-capable unit assertions, and four new exact-head binding receipts. Implementation is active;
   the singleton lease, Aspire, Docker, `scaffold.runtime`, and `fresh-browser` remain unused.
+
+## 2026-08-15T15:34:28Z — readiness finding recovered; executable proof defects intercepted
+
+- #1665 exact-head readiness run `31892668157` passed close-gate, change classification, lint,
+  TypeScript format, and docs accuracy, then quality job `95031217843` failed honestly at
+  `check:agent-docs-prose`. The authorized query-bridge page is a bundle source, leaving only
+  `.llm/assets/agent-docs/prose.json.gz` and `provenance.json` stale. The fixes supervisor committed
+  and pushed scope amendment `ef396767a`; the same original Sol/medium author ran the canonical
+  generator, proved the immediate diff contains exactly those two assets, and is executing bounded
+  freshness/docs/SDK/no-new-doc-diagnostic gates. Formal product IMPL-EVAL PASS is preserved, but
+  readiness is withdrawn until fresh Tier-A and a focused fidelity delta evaluation pass.
+- #1664 justified the browser transport split because the combined probe crossed the 500-line
+  doctrine threshold and pushed exact plan amendment `93fb5532d` before product commit `787cfa928`.
+  Direct inspection then found two executable defects still present: a response-stage Fetch pause
+  resumed through `Fetch.continueRequest`, and a fixed 750ms sleep established a baseline without
+  proving every initial request completed and remained stable. Topic checkpoint `37372cbae` records
+  the interception. The same original Sol/high author must repair additively, add the negative
+  late-initial-request case, renew all four binding receipts, and stop for fresh Tier-A. No runtime
+  lease or evaluator is authorized.
+- The unrelated typed-queue DLQ count timing flake is tracked separately as #1667 rather than being
+  hidden by retries or folded into either leaf.
