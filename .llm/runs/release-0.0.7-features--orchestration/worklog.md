@@ -1420,3 +1420,40 @@ promise the implementation cannot keep — has been caught by re-deriving rather
 S1's undeclared diagnostic-code type and S2's unreachable `denied` case were the first two; D-13's
 never-invoked published option was the third and is what this whole leaf exists to repair. Fix-up
 dispatched to the same thread; S2 remains withheld.
+
+### S1 accepted after fix-up; S2 released
+
+Fix-up commit `49fda0b77b4db4a91f1cb25e23b13e4bf1259699`, pushed, local == remote, clean tree.
+Scope: `adapter.ts`, `tests/surface_test.ts`, leaf journals. No `deno.lock`, no `docs/**`.
+
+**S1-F1 closed, and verified by the check that actually proves it.** The author took remedy (a):
+`scalarType` is now the exact 12-member literal union, `dbType?: string` is optional, `arity` is
+required. Two independent signals confirm the divergence is genuinely gone rather than edited around:
+
+1. `deno check --unstable-kv ./mod.ts ./tests/surface_test.ts` **passes**, which means the
+   bidirectional guards `_toUpstream`/`_fromUpstream` compile — `PrismaMySqlQuery` and upstream
+   `SqlQuery` are now **mutually assignable**. This is the load-bearing proof; the guard is not
+   decoration, it is the test of the fix.
+2. `grep "as SqlQuery"` returns **NONE**. The cast existed only because the types diverged, so its
+   disappearance corroborates (1). Had the author "fixed" the types but kept the cast, that would
+   have been the tell that they still did not line up — which is exactly why the remedy said the
+   cast must become unnecessary.
+
+**S1-N1 closed.** The guards live in `tests/surface_test.ts` and are covered by the contracted
+`check` gate, so future upstream drift in `ArgType`/`SqlResultSet` breaks the build instead of being
+absorbed by an assertion.
+
+Re-verified after the fix-up: `deno doc --lint` clean ("Checked 1 file"); `deno publish --dry-run`
+`Success` with the same eight files; R2.3 still holds (`src/mod.ts:40` carries no
+`PrismaMySqlAdapter`); and **no S2 wiring leaked** — the only `onConnectionError` in `src/` is the
+untouched pre-existing declaration at `types.ts:39`. Slice discipline held.
+
+**S2 released** to the same thread. It carries the classifier (`isConnectionError` in `errors.ts`,
+module-internal, with the closed transport-code set and the `fatal` signal mysql2 actually sets), the
+R1.2 auth/access rule (1045/1044/1049 fire only when the driver marked them fatal; 1040/1203 always),
+the R1.6 single choke point with its structural justification (only the outer
+`connectionLifecycle.catch` sees `pool.getConnection()` failure), R1.5 containment with `===`
+identity assertions, R1.4/R3 probe behaviour including the accepted cost that `connect()` still
+resolves against a dead host, and R1.7's split treatment of `executeScript`. Tests must be capable of
+failing: exact call counts, identity equality, and classifier-false negatives at every firing
+boundary.
