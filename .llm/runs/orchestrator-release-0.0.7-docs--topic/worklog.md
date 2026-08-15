@@ -345,3 +345,47 @@ than treated as a one-off.
 Privacy boundary restated to the generator: identifiers, classifications, hashes, and aggregates
 only; never file contents; unmatched Next.js values stay absent/deferred, never zero or estimated.
 Stop after S2 for Tier-A, which will again re-execute the gate independently.
+
+## 2026-08-15 — S2 blocked; evidence preserved; lane holding for a coordinator decision
+
+S2 never started. The leaf stopped before writing the measurement tool, its test, the manifest, or
+the measurements JSON, and before reading any consumer file. No fetch, clone, checkout, or worktree
+creation occurred.
+
+Blocker evidence committed at `0a13c0162`
+(`docs(comparison): record the S2 immutable-input
+blocker`) — exactly the three run artifacts, no S2
+code path, both lockfiles unchanged, pushed to `origin/docs/comparison-docs-programme`, worktree
+clean. The leaf's `drift.md` entry carries both facts this orchestrator verified independently: the
+pinned commit is the current `refs/heads/master` tip on the authorized remote, and `research.md:51`
+records GitHub-only inspection with no checkout, which is why the local-roots tool contract has no
+input to read. It is marked severity `significant`, blocked, no rescope, no scope growth, and names
+the PLAN-EVAL miss.
+
+### Escalated to the coordinator — not resolved by this lane
+
+The likely fix is a single `git fetch` into an already-authorized clone. This lane did not run it.
+Provisioning that input writes private consumer source to disk from an external remote, which sits
+outside the docs-authoring boundary granted here, even though `leaf-contracts.json` lists
+`external:EIS-Chat@5191de83f3da97559f21d8891c6c8afdf1cf473a` as an authorized file surface for this
+leaf. That tension is the coordinator's to settle.
+
+Options put to the coordinator, with the recorded recommendation:
+
+1. authorize the fetch into one existing clone at the pinned revision — minimal, preserves the
+   tool's determinism, requires no plan change (**recommended**);
+2. re-specify the tool to read through authorized GitHub access as P0 did — rejected in
+   recommendation because a network-dependent measurement tool contradicts the plan's own
+   byte-stability and pinned-input reproduction requirements;
+3. defer S2/S3 measurement content to a residual issue — a milestone scope change, coordinator-only.
+
+Re-pinning to an available revision is called out as the option to refuse: the entire research
+baseline was corrected against `5191de83`, so swapping the pin invalidates that work.
+
+### Lane state while holding
+
+Leaf `docs/comparison-docs-programme` at `0a13c0162`, clean, local equals remote. PR #1652 draft at
+`status:impl`, milestone `0.0.7`, labels unchanged. S1 remains terminal and Tier-A signed off at
+`98fc58997`. Codex thread `019ffcc9-16c2-7573-b7f6-d627172408e8` idle and preserved; no replacement
+sender was ever created. No merge, publish, readiness mutation, relabel, issue mutation, or
+Aspire/Docker/shared expensive-gate lease from this lane.
