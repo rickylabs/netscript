@@ -1436,7 +1436,7 @@
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "f4_probe_repair_and_four_receipts_tier_a_pass_attempt_3_runtime_lease_active",
+      "implementationState": "attempt_3_scaffold_runtime_failed_generated_fmt_check_after_32_passes_clean_host_lease_released_attribution_active_fresh_browser_not_run",
       "dispatchTopicHeadSha": "35f3a6975b1aaae20a384e5d655cc3483e0b2a56",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
@@ -1572,7 +1572,9 @@
           "f4TierAState": "PASS",
           "f4TierATopicCheckpointSha": "35f3a6975b1aaae20a384e5d655cc3483e0b2a56",
           "f4TierAProof": "amendment preceded product repair; first post-plugin generate may converge, then an immediately identical generate must write zero clients/helpers and preserve SHA-256 path/byte identity; focused sequence and two negative cases passed 11/0; prior FAIL trail intact",
-          "runtimeGates": "attempt 3 lease active at immutable final evidence head 6f813b0db after clean-host preflight; run scaffold.runtime first, clean/audit, then fresh-browser only on PASS, clean/audit again; no evaluator yet"
+          "attempt3RuntimeResult": "FAIL passed=32 failed=1 skipped=0 at generated.deno-fmt-check; repaired generated.service-client-contract passed; generated workspace fmt:check exited 1",
+          "attempt3Cleanup": "cleanup.aspire-stop PASS; run-owned teardown removed no AppHosts/containers/escalations; independent leak check Aspire ok, Docker ok, survivors empty",
+          "runtimeGates": "attempt 3 scaffold.runtime terminal FAIL with clean host and lease released; fresh-browser NOT_RUN; preserve raw evidence and attribute generated fmt failure before any amendment or retry; no evaluator"
         }
       },
       "planDecisionBoundary": "cycle 1 ruled direct emitted { queryKey: <svc>Queries.list.clientKey() } with no SDK overload; repair must lock generator-owned output paths, existing service generate overwrite/dry-run/force compatibility, package README homes, post-mutation request-count proof, per-slice paths, and qualified citations",
@@ -2483,7 +2485,7 @@
     },
     {
       "id": "app-service-client-wiring-f4-runtime",
-      "state": "active",
+      "state": "complete",
       "lane": "features",
       "leafId": "app-service-client-wiring",
       "gateId": "scaffold.runtime_then_fresh-browser",
@@ -2500,6 +2502,15 @@
         "relevantListeningPorts": 0,
         "otherLeaseOwners": 0,
         "idleAspireMcpHelpers": "foreign_tooling_preserved"
+      },
+      "completedAt": "2026-08-15T17:19:05.522Z",
+      "verdict": "FAIL_FIX",
+      "summary": "scaffold.runtime passed 32 gates then failed generated.deno-fmt-check; repaired service-client contract passed; fresh-browser NOT_RUN",
+      "cleanup": {
+        "aspirePostcondition": "ok_empty",
+        "dockerPostcondition": "ok_empty",
+        "survivors": 0,
+        "freshBrowser": "NOT_RUN"
       }
     }
   ],
@@ -2542,5 +2553,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T17:18:10.000Z"
+  "updatedAt": "2026-08-15T17:19:55.000Z"
 }

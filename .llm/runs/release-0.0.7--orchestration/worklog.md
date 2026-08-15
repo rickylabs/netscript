@@ -974,3 +974,13 @@
   over exact head `80046696e`. The bridge identifier has not yet been emitted, so central state
   records pending attachment metadata and the observed native session/process proof. This is cycle
   2 of 2; a further `FAIL_PLAN` returns to the owner boundary rather than creating cycle 3.
+
+## 2026-08-15T17:19:55Z — #1664 attempt 3 stops at generated format and releases cleanly
+
+- Suite-owned `scaffold.runtime` passed 32 gates, including the repaired service-client convergence
+  and identical-repeat proof, then failed only `generated.deno-fmt-check`; generated workspace
+  `fmt:check` exited 1. `fresh-browser` is ineligible and remains NOT_RUN.
+- `cleanup.aspire-stop` passed. Run-owned teardown found no AppHost, container, or escalation, and
+  independent leak-check reports Aspire ok, Docker ok, zero survivors. The singleton lease is
+  released. The author is preserving raw output and performing before/after attribution only; no
+  product mutation or runtime retry is authorized.

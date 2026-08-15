@@ -564,3 +564,10 @@ native Fable 5/medium session `580832d7-53e8-4828-ad41-e2f9219c9340`, PID 379716
 Remote Control and bound to that exact head. Bridge metadata is truthfully pending until emitted.
 Do not begin the three JSDoc edits or any product work before a terminal PASS; a FAIL returns to the
 owner boundary. #1664 runtime attempt 3 continues independently under its existing singleton lease.
+
+Newer runtime truth `2026-08-15T17:19:55Z`: #1664 attempt 3 is terminal `FAIL_FIX`, 32 passed / 1
+failed / 0 skipped at `generated.deno-fmt-check`; the repaired service-client contract passed.
+Suite cleanup, run-owned teardown, and independent leak audit leave Aspire/Docker empty with zero
+survivors, so the singleton lease is free. `fresh-browser` remains NOT_RUN. Preserve the raw log and
+complete generated-format attribution before any amendment or retry; no product mutation is
+authorized under the released lease. #1666 cycle-2 evaluator remains active independently.

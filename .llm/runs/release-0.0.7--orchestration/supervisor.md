@@ -685,3 +685,10 @@ session `580832d7-53e8-4828-ad41-e2f9219c9340`, PID 379716, launched with Remote
 exact head. Its bridge attachment metadata is not yet emitted and is recorded as pending rather than
 invented. This evaluator runs concurrently with #1664's leased runtime because serialization is per
 orchestrator; neither lane may start a second evaluator/gate of its own.
+
+At 17:19Z, #1664 attempt 3 stopped honestly after 32 passes on one red:
+`generated.deno-fmt-check` ran the generated workspace's `fmt:check` and exited 1. The repaired
+`generated.service-client-contract` passed, so F4 is proven effective. Suite cleanup passed,
+run-owned teardown found nothing, and independent leak-check reports Aspire/Docker ok with zero
+survivors. The singleton lease is released; `fresh-browser` remains NOT_RUN. Preserve the raw log
+and attribute the format drift before any amendment, repair, or retry.
