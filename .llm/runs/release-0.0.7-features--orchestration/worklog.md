@@ -3999,3 +3999,82 @@ Per **D-17**, the readiness head is already final and pushed, so a lease bound t
 before execution: **`1263f655b37d64a258619403398ca7117ea000d5`**.
 
 No Aspire, Docker, `scaffold.runtime`, or `fresh-browser` was run. No lease taken. No evaluator.
+
+## 2026-08-15 — S5 attempt 4: `scaffold.runtime` FAIL at 69/1; F5 and F4 both proven in the runtime
+
+Leaf head `7df60832a8c804743442b66d2332fb75249e25a7`, local == remote. Lease `4619f4408`, executed
+head `1263f655b` — **equals the lease-bound head**, so D-17 held again.
+
+| Field | Value |
+| --- | --- |
+| Verdict | **FAIL**, raw exit 1, `passed=69 failed=1 skipped=0` |
+| Raw output | `reports/s5-attempt4-scaffold-runtime-20260815-2037.log` |
+| SHA-256 | `b476da4ce039d03785e46669d51919b48c41fbae80ca41ca9188bcbb53e97f23` — re-hashed by me, matches |
+| `fresh-browser` | **NOT_RUN**, no receipt — correctly gated |
+
+### The repairs worked, and the runtime proves it
+
+`passed` went **20 → 32 → 69** across attempts 1, 3 and 4. Specifically:
+
+- **`generated.deno-fmt-check` — the sole attempt-3 failure — PASSED in 343 ms.** F5's
+  canonicalize-before-equality fix is confirmed against a real generated project, not just the cheap
+  12-path proof.
+- `generated.service-client-contract` passed in 5,142 ms — F4's probe repair still holds.
+- `generated.deno-check` and `generated.deno-lint` also passed.
+
+Each attempt has failed further into the suite than the last, which is what genuine progress looks
+like: attempt 1 died at the client-contract probe, attempt 3 at generated formatting, attempt 4 at a
+behavioural browser gate 37 gates deeper.
+
+### S5-A4-F1 — an unguarded kill in the probe's `finally`
+
+`behavior.service-client-refetch` ("Prove settled users update invalidates and refetches its list
+once") ran 40,602 ms and then threw during **teardown**:
+
+```text
+TypeError: Child process has already terminated
+    at ChildProcess.kill
+    at collectBrowserRefetchEvidence (service-client-browser-probe.ts:211:11)
+```
+
+The exception happened in cleanup and prevented the gate returning its collected evidence, so the
+behavioural scenario is **not reported as passing** — but neither is it reported as failing on its
+own terms. What failed is the teardown, not necessarily the behaviour.
+
+**Attribution verified independently: leaf-caused.**
+`git cat-file -e c53726c69:…/service-client-browser-probe.ts` → **exit 128**, "exists on disk, but not
+in `c53726c69`". The probe did not exist at baseline, so this cannot be carried.
+
+**The defect is one unguarded line among defended neighbours.** Read at
+`service-client-browser-probe.ts:209-215`:
+
+```ts
+} finally {
+  client?.close();                                     // optional-chained
+  child.kill('SIGTERM');                               // ← unguarded
+  await child.status.catch(() => undefined);           // catch-guarded
+  await drain;
+  await Deno.remove(profile, { recursive: true }).catch(() => undefined); // catch-guarded
+}
+```
+
+Every other teardown step is defensive — optional chaining, `.catch()` swallows. Only the kill
+assumes the child is still alive. A browser child that exits on its own before teardown is entirely
+ordinary, so the probe is correct on the happy path and throws on the *tidier* one.
+
+### Mandatory cleanup — proven, and re-verified by me
+
+Suite-owned `cleanup.aspire-stop` passed; run-owned teardown applied with nothing to stop, remove, or
+escalate; the author's `leak-check` at `18:48:31Z` returned aspire `ok`, docker `ok`, `survivors: []`.
+**I re-ran `leak-check` afterwards and got the same.** The Aspire MCP start helpers were preserved as
+instructed. Cleanup ran despite the gate failing, which is the point of making it unconditional.
+
+### Disposition
+
+The bounded repair is to guard the kill so teardown tolerates an already-terminated child, matching
+the defensiveness of every neighbouring line — then re-run the behavioural gate to learn whether the
+scenario itself passes, which attempt 4 could not tell us.
+
+All prior evidence preserved append-only: three earlier S5 attempts with hashed raw logs, every
+S4/F4/F5 report and receipt, and the carried Fresh 45 / SDK 3 baselines with plugin-streams named
+separately. No repair, retry, or browser gate was run under the lease. No evaluator.
