@@ -737,3 +737,8 @@ DevTools target; F6 teardown no longer masks the verdict. Raw log SHA is `ff349b
 `fresh-browser` is `NOT_RUN`; suite cleanup plus exact-PID orphan cleanup left Aspire, Docker,
 application/browser/runtime processes and ports empty, so the lease is released. Same-author measured
 attribution and a plan-only amendment precede mutation, Tier-A, or any later retry.
+
+Newer reconciliation `2026-08-15T19:57:21Z`: the #1669 evaluator lease record is terminal `PASS`
+at artifact `313cc08d5`/comment `5303850473`, matching its already-terminal leaf and shipped GitHub
+lifecycle. Cluster `currentMainSha` is corrected to live remote main `0ef48c2ec`. The remaining
+Claude PID is a background spare, not an evaluator, and is preserved. No lane or runtime lease moved.

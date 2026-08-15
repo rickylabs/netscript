@@ -889,3 +889,10 @@ stopped run-owned `aspire-managed` children by exact PID, then re-audited Aspire
 application/browser/runtime processes, and relevant listeners empty. The lease is released. Preserve
 the red and require measured same-author attribution plus a plan-only amendment and fresh Tier-A
 before any mutation or retry; no evaluator is authorized.
+
+At 19:57Z, the coordinator reconciled a control-plane-only stale record after independently checking
+the live #1669 evaluator artifact, verdict comment, shipped leaf lifecycle, and remote `main`. The
+evaluator lease is terminal `PASS` at `313cc08d5` rather than active, and `currentMainSha` is the
+actual shipped main `0ef48c2ec`. PID `391331` is only a native Claude background spare, not a live
+evaluation, so it remains untouched. This repair changes no topic supervisor, leaf, PR, issue, gate,
+or runtime lease.

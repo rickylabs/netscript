@@ -1328,3 +1328,15 @@
 - No retry or product edit is authorized. Preserve the attempt-5 red, measure Chrome launch/target
   causality on the same original Sol/high author, commit a plan-only amendment before mutation, then
   require fresh features Tier-A before a later lease decision. No evaluator yet.
+
+## 2026-08-15T19:57:21Z — terminal evaluator metadata reconciled
+
+- Live #1669 evidence already proved evaluator cycle 1 completed `PASS` at artifact-only
+  `313cc08d572ea7e6d55ec2faf5def6ae7dd2e6eb`, comment `5303850473`, before the exact-head close gate
+  and merge. The leaf record and GitHub lifecycle were terminal, but the parallel evaluator-lease
+  record still said `active`.
+- Remote `main` is exactly `0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb`; the cluster's
+  `currentMainSha` still named its pre-#1669 predecessor. Both stale fields are now reconciled from
+  independent live evidence. The observed PID is a Claude background spare and was not stopped.
+- No supervisor, leaf worktree, PR/issue state, acceptance box, evaluator artifact, or runtime lease
+  changed. This is an atomic control-plane truth repair only.

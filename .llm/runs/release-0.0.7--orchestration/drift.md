@@ -719,3 +719,7 @@ implementation thread.
   before the refetch probe could report. F6 removed only that mask; attempt 5 then honestly failed on
   DevTools target discovery. Treat this as new measured causality, not as failure of the teardown fix
   or permission to retry unchanged.
+- **Terminal leaf and evaluator-lease state must agree:** #1669's leaf, evaluator artifact, verdict
+  comment, CI, merge, and issue lifecycle were all terminal while its separate evaluator-lease entry
+  remained `active`. Reconcile the lease from those independent facts and distinguish a native Claude
+  background spare from a live evaluator before considering process cleanup.
