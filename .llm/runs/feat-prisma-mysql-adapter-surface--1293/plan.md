@@ -101,17 +101,18 @@ PLAN-EVAL must approve the exact constructor/client-port contract before impleme
 | D5 | The package example imports the package root and remains excluded from publication.                                     | It is consumer evidence, not artifact content.                                                                                    |
 | D6 | No site-doc edit; record `docs/site/reference/prisma-adapter-mysql/index.md:23` as docs-lane drift/handoff.             | Explicit lane boundary.                                                                                                           |
 | D7 | Final proving evidence consists of exactly four durable receipts: `check`, `test`, `publish-dry-run`, and `arch-check`. | Leaf contract. Supporting surface/doc/JSR checks do not silently become extra contracted receipt IDs.                             |
+| D8 | **Coordinator ruling:** split-close is the cross-lane close contract; this leaf does not reopen or reinterpret it.      | The product PR is `Part of #1293`; #1293 stays open until #1112 completes acceptance box 4.                                       |
 
 ## Open-decision sweep
 
-| Decision                                                               | Status                                      | Notes                                                                                                                                                               |
-| ---------------------------------------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Value-class export versus existing public connected interface          | **must resolve now**                        | Deferral changes implementation shape, public symbol set, tests, and doc-lint work. Recommendation: keep class internal and revise acceptance.                      |
-| Hook predicate across pool/query/transaction/disposal boundaries       | **must resolve now**                        | A blanket `onError()` override reports SQL errors; upstream event-only behavior does not meet the issue's pool-failure motivation.                                  |
-| Capability probe failure: notify-and-fallback versus notify-and-reject | **must resolve now**                        | Changes `connect()` behavior. Current code silently falls back.                                                                                                     |
-| Acceptance box 4 versus #1112/docs ownership                           | **escalated to coordinator, unresolved**    | Close-gate/issue-scope authority is external to this leaf; reference #1112 without a closing keyword, state the remaining scope, and never mark docs work complete. |
-| Commit/rollback/disposal notification                                  | safe to defer only after predicate is fixed | Expected recommendation: preserve normal rejection/cleanup and do not call a connection hook unless the selected predicate classifies the error as connection loss. |
-| Dependency versions                                                    | safe to defer                               | No dependency change is needed; audit only.                                                                                                                         |
+| Decision                                                               | Status                                         | Notes                                                                                                                                                                                                                                   |
+| ---------------------------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Value-class export versus existing public connected interface          | **must resolve now**                           | Deferral changes implementation shape, public symbol set, tests, and doc-lint work. Recommendation: keep class internal and revise acceptance.                                                                                          |
+| Hook predicate across pool/query/transaction/disposal boundaries       | **must resolve now**                           | A blanket `onError()` override reports SQL errors; upstream event-only behavior does not meet the issue's pool-failure motivation.                                                                                                      |
+| Capability probe failure: notify-and-fallback versus notify-and-reject | **must resolve now**                           | Changes `connect()` behavior. Current code silently falls back.                                                                                                                                                                         |
+| Acceptance box 4 versus #1112/docs ownership                           | **RESOLVED — coordinator ruling: split-close** | Preserve box 4 unchanged. The product PR is `Part of #1293` without a closing keyword and may merge on product gates; #1293 remains open and does not become `status:shipped` until #1112 rewrites and verifies the executable example. |
+| Commit/rollback/disposal notification                                  | safe to defer only after predicate is fixed    | Expected recommendation: preserve normal rejection/cleanup and do not call a connection hook unless the selected predicate classifies the error as connection loss.                                                                     |
+| Dependency versions                                                    | safe to defer                                  | No dependency change is needed; audit only.                                                                                                                                                                                             |
 
 ## Proposed hook contract for evaluator review
 
@@ -181,7 +182,9 @@ reviews the slice and releases it.
 - Files: `examples/basic-usage.ts`, `drift.md`, `worklog.md`, `context-pack.md`, PR handoff text.
 - Supporting checks: example check/test selected in S1/S2; confirm raw publish file list still
   excludes `examples/**`.
-- Tier-A stop: verify no docs-owned file changed and acceptance box 4 has an owner-approved mapping.
+- Tier-A stop: verify no docs-owned file changed; the product PR is `Part of #1293` with no closing
+  keyword, names box 4 as blocked on #1112, and states that product merge satisfies #1112's
+  implementation prerequisite without closing or shipping #1293.
 
 ### Final evidence pass at committed content head
 
@@ -205,12 +208,12 @@ four-receipt set.
 
 ## Acceptance evidence map
 
-| #1293 checkbox                                                    | Planned evidence                                                                                                                                                                                                                                                                           |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `PrismaMySqlAdapter` exported ... surface-diff green              | Owner-approved Choice A value export plus `surface:diff` minor row, public-import test, and clean `deno doc`; **or** owner revises the checkbox before Choice B can discharge it. No incidental export.                                                                                    |
-| Connection-error hook named, typed, documented, regression-tested | Existing `PrismaMySqlOptions.onConnectionError` JSDoc plus focused boundary/predicate tests that fail if notification stops, over-fires, duplicates, or masks the primary error.                                                                                                           |
-| Explicit annotations; `deno doc --lint` clean                     | Explicit base-member annotations, replacement of all six measured private refs, raw and structured full-export doc-lint exit 0, and publish dry-run with no real slow-type warning.                                                                                                        |
-| #1112 example rewritten and executable                            | Package-owned example updated and verified here; PR references #1112 without a closing keyword and states the site rewrite remains docs-owned. Before close-gate, owner/coordinator must reconcile the literal box with that boundary; this leaf will not falsely mark docs work complete. |
+| #1293 checkbox                                                    | Planned evidence                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PrismaMySqlAdapter` exported ... surface-diff green              | Owner-approved Choice A value export plus `surface:diff` minor row, public-import test, and clean `deno doc`; **or** owner revises the checkbox before Choice B can discharge it. No incidental export.                                                                                                                                                                                                               |
+| Connection-error hook named, typed, documented, regression-tested | Existing `PrismaMySqlOptions.onConnectionError` JSDoc plus focused boundary/predicate tests that fail if notification stops, over-fires, duplicates, or masks the primary error.                                                                                                                                                                                                                                      |
+| Explicit annotations; `deno doc --lint` clean                     | Explicit base-member annotations, replacement of all six measured private refs, raw and structured full-export doc-lint exit 0, and publish dry-run with no real slow-type warning.                                                                                                                                                                                                                                   |
+| #1112 example rewritten and executable                            | **Blocked on #1112 under the coordinator's split-close contract.** This leaf updates and verifies only the package-owned example, and its product merge satisfies #1112's implementation prerequisite. The PR references #1112 without a closing keyword, states the remaining docs-owned rewrite and executable verification explicitly, does not claim box 4, and does not close or move #1293 to `status:shipped`. |
 
 ## Fitness gates and JSR applicability
 
@@ -227,19 +230,19 @@ four-receipt set.
 
 ## Risk register
 
-| Risk                                                                            | Mitigation                                                                                              |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Hook reports every SQL error under a misleading name                            | Lock a classifier/event predicate and negative-test constraint/query errors.                            |
-| Callback throws and masks the driver's primary error                            | Contain callback failure; assert original rejection identity/mapping.                                   |
-| Same transaction failure notifies twice through lifecycle and operation catches | Centralize notification and assert exact call count.                                                    |
-| Exporting class leaks private constructor/base types                            | PLAN-EVAL Choice A/B; no implementation until public signature is explicitly approved and doc-lintable. |
-| `connect()` silently succeeds after capability-query failure                    | Explicit owner ruling; regression test chosen behavior.                                                 |
-| Pre-existing doc-lint failures are misreported as new success baseline          | Preserve the measured six-error baseline and enumerate the owned repairs.                               |
-| JSR helper banner is mistaken for a real slow type                              | Use raw dry-run as authority and record helper discrepancy.                                             |
-| Example or tests accidentally enter publish artifact                            | Review raw dry-run file list and preserve `publish.exclude`.                                            |
-| Docs warning becomes false                                                      | Record `docs/site/...:23` in `drift.md`/PR handoff; do not edit it.                                     |
-| Close-gate cannot mirror acceptance box 4 honestly                              | Owner/coordinator acceptance reconciliation before ready-merge; never use false evidence.               |
-| Validation churns `deno.lock`                                                   | Inspect raw Git status/diff after every command; do not accept unrelated lock changes.                  |
+| Risk                                                                            | Mitigation                                                                                                                                              |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hook reports every SQL error under a misleading name                            | Lock a classifier/event predicate and negative-test constraint/query errors.                                                                            |
+| Callback throws and masks the driver's primary error                            | Contain callback failure; assert original rejection identity/mapping.                                                                                   |
+| Same transaction failure notifies twice through lifecycle and operation catches | Centralize notification and assert exact call count.                                                                                                    |
+| Exporting class leaks private constructor/base types                            | PLAN-EVAL Choice A/B; no implementation until public signature is explicitly approved and doc-lintable.                                                 |
+| `connect()` silently succeeds after capability-query failure                    | Explicit owner ruling; regression test chosen behavior.                                                                                                 |
+| Pre-existing doc-lint failures are misreported as new success baseline          | Preserve the measured six-error baseline and enumerate the owned repairs.                                                                               |
+| JSR helper banner is mistaken for a real slow type                              | Use raw dry-run as authority and record helper discrepancy.                                                                                             |
+| Example or tests accidentally enter publish artifact                            | Review raw dry-run file list and preserve `publish.exclude`.                                                                                            |
+| Docs warning becomes false                                                      | Record `docs/site/...:23` in `drift.md`/PR handoff; do not edit it.                                                                                     |
+| Product evidence cannot discharge acceptance box 4                              | Apply the decided split-close contract: product PR uses `Part of #1293`; box 4 remains blocked on #1112, and #1293 stays open and not `status:shipped`. |
+| Validation churns `deno.lock`                                                   | Inspect raw Git status/diff after every command; do not accept unrelated lock changes.                                                                  |
 
 ## Arch-debt implications
 
@@ -254,6 +257,9 @@ four-receipt set.
 - Watch and record if the selected hook predicate diverges from this plan, if capability probing
   changes fatality, if any public client type becomes necessary, if publish membership changes, or
   if the docs-owned line 23 is modified by another lane.
-- The PR body must eventually carry `Closes #1293`, reference #1112 without a closing keyword, use
-  milestone `0.0.7`, taxonomy labels including exactly one `status:`, and an exact fenced
-  `acceptance-evidence` mapping after the acceptance conflict is resolved.
+- The PR body carries `Part of #1293` with no closing keyword, references #1112 without a closing
+  keyword, and states the remaining scope explicitly rather than relying on the absence of a keyword
+  to communicate it. It uses milestone `0.0.7`, taxonomy labels including exactly one `status:`, and
+  an exact fenced `acceptance-evidence` block that mirrors only the boxes this leaf can truthfully
+  discharge, naming box 4 as blocked on #1112 and stating that this product merge satisfies #1112's
+  implementation prerequisite. The product merge does not move #1293 to `status:shipped`.
