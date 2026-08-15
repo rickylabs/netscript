@@ -297,3 +297,14 @@ at `f52aa471c`; it is non-draft/`status:ready-merge` with exact-head CI active, 
 open and unchanged for the owner-worded concrete-class criterion plus docs #1112. Preserve every
 topic supervisor and author thread, serialize only within topics, and keep the runtime mutex free
 until a documented gate asks for it.
+
+Resume from the newer authoritative `2026-08-15T10:39:55Z` checkpoint. Main is
+`3fc0f2f9221a8246f0d26a26189bafb2647be08a`: #1662 is merged/shipped, while #1293 remains open
+with only boxes 2 and 3 checked. Features has released #1355/#1360 research/plan on original Codex
+thread `01a004f9-…`, exact base `3fc0f2f92`; do not implement or run `scaffold.runtime` or
+`fresh-browser` before plan review and a coordinator lease. Internals #1663 is at immutable plan
+head `72d5aca66` under the sole real Fable 5/medium Remote Control PLAN-EVAL `9078ecb6-…`; invalid
+probe `bd8b4f90` and stopped Opus fallback `02d8d823` caused no mutation and consume no cycle.
+Fixes #1661 is at Tier-A head `de8944011` after one-file computed-import repair `45aca4adc` and
+root test 4152/0/19; fresh repair-delta evaluator `8a0ff845-…` is active. Preserve all native topic
+supervisors and authors, serialize only within each topic, and keep the runtime mutex free.

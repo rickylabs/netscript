@@ -440,3 +440,17 @@ Aspire/Docker/browser mutex is still free and all three active leaves avoid expe
 
 Main is `05fc3132b6800a85eb6152691a961b658962571b`. Per-topic queues remain independent. Docker,
 Aspire application processes, Playwright, and Chromium are empty; the expensive-gate mutex is free.
+
+## Live checkpoint — 2026-08-15T10:39:55Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Queue exhausted and parked at `0ca4c489f` | Do not invent post-freeze work |
+| internals | Draft #1663 plan head `72d5aca66` is under fresh Fable 5/medium Remote Control PLAN-EVAL `9078ecb6-…` | No implementation or `scaffold.runtime` before the immutable verdict and topic reconciliation |
+| fixes | #1661 repaired the computed-import CI regression at `45aca4adc`, passed full root test 4152/0/19, and is under repair-delta evaluator `8a0ff845-…` at `de8944011` | Merge only after the bounded verdict and current exact-head checks are terminal green |
+| features | #1662 shipped as main `3fc0f2f92`; #1355/#1360 research/plan is active on preserved Codex author `01a004f9-…` | Stop at plan; no implementation, `scaffold.runtime`, or `fresh-browser` before review and a coordinator lease |
+
+The #1663 route incident is closed: malformed `fable-5` probe `bd8b4f90` failed pre-inference and
+the premature Opus fallback `02d8d823` was stopped before mutation. The sole real cycle uses the
+canonical `claude-fable-5` token from the exact worktree with Remote Control. Serialization remains
+per topic, not across topics; the shared runtime mutex is free.

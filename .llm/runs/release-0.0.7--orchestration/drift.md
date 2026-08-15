@@ -410,3 +410,19 @@ implementation thread.
   may plan `scaffold.runtime`, but cannot execute Aspire/Docker/Postgres without the coordinator's
   cluster-wide mutex. The mutex is currently free; a future grant will be tied to a reviewed slice,
   pre-gate head, and mandatory cleanup proof.
+
+## 2026-08-15T10:39:55Z — canonical model token and repair-delta authority
+
+- **Claude model aliases are not interchangeable:** the #1663 supervisor launched `fable-5` from
+  `/tmp` without Remote Control; it failed before inference with no artifact or mutation. It then
+  started an unauthorized Opus fallback, which the coordinator stopped before mutation. The known
+  working canonical token is `claude-fable-5`; the corrected exact-worktree Remote Control launch
+  is the sole evaluation cycle. Future supervisors must copy canonical tokens from a proven launch,
+  not abbreviate them.
+- **A full product re-evaluation is not required for a bounded post-PASS repair:** #1661 cycle 2
+  remains authoritative for the ten-file product contract. The one-file computed-import restoration
+  gets a fresh, proportionate formal evaluation over its actual CLI/publish blast radius plus the
+  previously failing root suite, avoiding both under-review and wasteful re-audit.
+- **Split-close shipment must be represented as a split:** #1662 is merged, but #1293 remains open.
+  Central state records boxes 2/3 complete and boxes 1/4 open instead of collapsing the issue into
+  the PR's shipped state.

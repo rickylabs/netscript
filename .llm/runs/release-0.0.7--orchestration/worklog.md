@@ -515,3 +515,22 @@
   split-close evidence. The PR is now non-draft with sole `status:ready-merge`; #1293 remains open
   at `status:impl`, with its wording unchanged. Exact-head `check-test` and `quality` are active.
 - Runtime hygiene remains clean and the expensive-gate mutex is free.
+
+## 2026-08-15T10:39:55Z — feature shipment and two formal gates
+
+- #1662 reached terminal exact-head green with zero review threads and was coordinator squash-merged
+  as `3fc0f2f92`. The PR has sole `status:shipped`; #1293 deliberately remains open, with only
+  acceptance boxes 2 and 3 checked and owner-worded boxes 1 and 4 still open.
+- Features released its next serial leaf, `app-service-client-wiring` (#1355/#1360), on preserved
+  Codex thread `01a004f9-f033-7592-a0bc-63927753fb43` from main `3fc0f2f92`. It is research/plan
+  only and must stop before implementation or either declared expensive gate.
+- Internals #1663 stopped clean at plan head `72d5aca66`, covering exactly six proposed product/config
+  paths. Fresh Fable 5/medium Remote Control PLAN-EVAL `9078ecb6-e8b3-4d4f-b85c-cb28a1cb34be`,
+  bridge `cse_0176qkbF4eKUt7TxJiEPdTrk`, is active on that immutable head.
+- #1661 restored both optional TanStack computed specifiers in one file at `45aca4adc`; Tier-A
+  `de8944011` independently passed the previous CLI failure, package publish proof, and the full
+  repository suite (4152 passed, 0 failed, 19 ignored). Fresh proportionate evaluator
+  `8a0ff845-1d0a-43d6-ae3c-03b4158f7943`, bridge `cse_013K3BZ2ydVkYzXt6vgcxTJX`, is active.
+- #1663's first probe used invalid token `fable-5` from `/tmp` without Remote Control and failed
+  before inference; a premature Opus fallback was stopped before repository mutation. The corrected
+  canonical `claude-fable-5` launch is the only formal cycle.
