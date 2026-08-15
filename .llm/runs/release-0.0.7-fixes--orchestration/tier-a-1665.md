@@ -331,3 +331,93 @@ D2 fail-safe contract, including that invalid reports are never partially emitte
 
 S1 Tier-A **PASS** at `0e4e26c51`. Stopping here per the coordinator's instruction: S2 is not started,
 no evaluator launched, PR remains draft at sole `status:plan`.
+
+---
+
+# Tier-A — implementation slice S2 at `1cf76c6dd691378eddbbd9cd3c8a82d50c30fa2f`
+
+| Field | Value |
+| --- | --- |
+| Head | `1cf76c6dd691378eddbbd9cd3c8a82d50c30fa2f` — local == remote == PR, clean, draft, sole `status:plan` |
+| Prior head | `0e4e26c51` (S1); one commit `1cf76c6dd fix(sdk): isolate cache persistence failures` |
+| PR receipt | comment `5302265198`, scope matches |
+| Verdict | **PASS** |
+
+## Scope — exact
+
+`cache-query.ts`, new `tests/cache/cache-query-kv-limit_test.ts`, and three run artifacts. S1 files
+(`cache-telemetry.ts`, `cache-provider.ts`, `cache-telemetry_test.ts`, `README.md`) are byte-identical
+since `0e4e26c51`. S3 paths (`ports/cache-store.ts`, `cache-provider_test.ts`, `docs/`) untouched vs
+base.
+
+## The change
+
+Two lines. The `try/catch` around `await this.store.set(...)` already existed and already recorded
+`recordCacheProviderError`; S2 replaces `throw error` with `return data`. `recordCacheWrite` stays
+outside the `try`, so only persistence is isolated — not the write-report recording.
+
+## RED/GREEN — reproduced independently, not accepted from the slice report
+
+I built a detached worktree at pre-fix `0e4e26c51`, copied in the S2 test, and ran it:
+`exitCode 1`, 1 failure, stack `Kv.set → DenoKvAdapter.set → KvCacheStore.set →
+CacheQuery.fetchAndCache`. That is the real adapter/backend limit path failing for exactly the reason
+#1637 names — not a synthetic store. The worktree was then removed; the leaf tree was never touched.
+GREEN at `1cf76c6dd`: focused test `1/0`, full `packages/sdk` suite `66/0` (S1 was `65/0`).
+
+## Fail-loud boundaries
+
+`setCachedData` keeps its uncaught `store.set` (`cache-query.ts:463`) and the new test proves it
+**behaviourally** with `assertRejects(..., TypeError, 'Value too large (max 65536 bytes)')` — the
+over-catching risk (AP-10) is closed by execution, not by assertion that a boundary exists.
+Teardown is `try/finally` with **both** `await closeKv()` and `await resetKv()`; both are `async`, so
+awaiting matters.
+
+Investigated and cleared: `cache-query.ts:290-305` is a second `queryFn`+`store.set` pair on the
+background-revalidation path that still throws. Its call site ends in `.catch(() => {})` which keeps
+failures detached from the stale-data caller while the span still records the provider error. Correct
+by design and pre-existing — no finding.
+
+## Gates — executed by this review
+
+| Gate | Result |
+| --- | --- |
+| `run-deno-check.ts --root packages/sdk` | 0 occurrences, 84 files |
+| `run-deno-lint.ts --root packages/sdk` | exit 0, 0 occurrences |
+| `run-deno-fmt.ts --root packages/sdk` | 0 findings |
+| focused real-KV test | 1 passed / 0 failed |
+| `packages/sdk` suite | 66 passed / 0 failed |
+| raw `deno doc --lint` combined / cache entrypoint | exit 1 — exactly the six pinned diagnostics, zero new |
+| root `deno task check` | cached, inputs unchanged, 0 diagnostics |
+| root `deno task test` | see below |
+
+## Root-suite flake — recorded, not an S2 regression
+
+My first root run at `1cf76c6dd` was **RED**: `4202 passed / 1 failed / 19 ignored`. The failure was
+`packages/queue/tests/typed-queue_test.ts:31` — "createTypedQueue sends invalid dequeue messages to
+the configured DLQ store", `AssertionError` expecting 1 DLQ record and getting 2. That contradicted
+the author's `4203/0/19` receipt, so the receipt was not accepted until resolved.
+
+Causation established rather than assumed:
+
+- the queue test passes **alone** (`3/0`) and passes **in one process with the new KV-limit test**
+  (`4/0`) — no direct contamination;
+- the branch touches **nothing** under `packages/queue` (`git diff --name-only base..HEAD | grep
+  queue` is empty), and the test file is unchanged since `317e4b509` (0.0.1-beta.5);
+- a **second root run at the identical head returned `4203 passed / 0 failed / 19 ignored`**,
+  reproducing the author's receipt exactly.
+
+Same tree, one red run and one green run ⇒ **non-deterministic**. The mechanism is visible in the
+test: it polls up to 200 ms until `deadLetters.depth()` is non-zero, then aborts the listener and
+stops the queue. If a Deno KV redelivery of the invalid message lands between the poll exiting at
+depth 1 and the listener actually stopping, a second DLQ record is written — the observed `2` vs `1`.
+Nothing in that sequence involves the SDK cache.
+
+**This is a pre-existing repo-level flake and is not recorded in any known-flaky list.** It will cost
+CI runs across every lane, not just this one. Recommend a tracked issue against `packages/queue` to
+make the assertion redelivery-tolerant (assert *at least* one validation_failed record, or drain
+after abort) rather than leaving a timing-sensitive equality. **Not filed by this session** — issue
+creation and milestone scope remain the coordinator's.
+
+## Outcome
+
+S2 Tier-A **PASS** at `1cf76c6dd`. The author's root receipt is now independently reproduced.
