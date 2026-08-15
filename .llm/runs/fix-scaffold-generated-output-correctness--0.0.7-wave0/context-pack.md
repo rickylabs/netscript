@@ -33,6 +33,11 @@
   hard stop because no singleton expensive-gate lease exists.
 - Slice 2 emits only the selected provider's URL helpers in engine modules and Prisma config;
   SQLite retains direct env/fallback resolution, `PrismaLibSql`, and its generated typed client.
+- Slice 2 landed as `32cd429c095d7bab35b62e7c74ca8d71bdc0f070` with decisive generator tests,
+  `quality:scan`, and `arch:check` green.
+- Slice 3 generates a typed idempotent representative row for the resolved model, preserves a
+  truthful direct-call no-model branch, and makes normal scaffolding pass the resolved model and
+  SQLite database filename into its generators.
 - Opposite-family IMPL-EVAL remains mandatory after implementation and Tier-A review.
 - Same-thread steering must use the exact Deno-suite command in `codex-thread-ids.md`; direct
   `codex exec resume` is prohibited.
