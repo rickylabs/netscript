@@ -4192,3 +4192,55 @@ written. A later green never retroactively tidies an earlier red.
 
 Open drift: D-1 through D-17, with D-17 (a leased head must not move after grant) the most
 operationally live.
+
+## 2026-08-15 — F6 root `test` receipt is an honest FAIL; cause is environmental, not the delta
+
+`f6-test.json` verified by me field by field: `gateId test`, `invocationId
+app-service-client-wiring-f6-test`, **`FAIL`**, exit 1, and
+`gitHead == actualGitHead == 7fa29ad3e` — the receipt honestly attests the content head it ran at
+rather than being suppressed or re-run into green.
+
+Summary: **4228 passed / 1 failed / 19 ignored / 4248 total, uniqueFailures 1.**
+
+The single failure is:
+
+```text
+PermissionDenied: Permission denied (os error 13): readdir
+  '<cwd>//.llm/tmp/cli-e2e/plugin-smoke-20260815-203755/.data/postgres/18/docker'
+```
+
+### The counts corroborate the attribution rather than merely being consistent with it
+
+At F5 the same binding gate reported 4226/0/19 = **4245** results. Here it reports 4228 passed of
+**4248** — three more results, two more passing. So the F6 delta **added tests and they pass**; the
+only failure is a directory walk into attempt-4's abandoned temp tree, owned root/dnsmasq from the
+Postgres container that ran under the attempt-4 lease. That is a stale-artifact permission problem,
+not a product or test defect, and the arithmetic makes that checkable rather than asserted.
+
+Docker is empty and no process cwd referenced the tree.
+
+### Quarantine verified, not accepted
+
+The coordinator moved the exact stale tree recoverably. I checked both halves myself:
+
+- `/home/codex/repos/netscript-007-features-1355/.llm/tmp/cli-e2e/plugin-smoke-20260815-203755` —
+  **absent**
+- `/tmp/netscript-f6-quarantine.7kXcDX/plugin-smoke-20260815-203755` — **present**
+
+Recoverable, not deleted, so the attempt-4 artifact remains available if it is ever needed as
+evidence.
+
+### Disposition
+
+`f6-test.json` stays **append-only** — the red is not overwritten. A distinct
+`f6-test-attempt2` receipt runs at the **unchanged** content head `7fa29ad3e`; only on its PASS do
+`publish-dry-run` and `arch-check` follow, then recomputed sufficiency, push, comment, and fresh
+Tier-A.
+
+This is the right shape: the environmental blocker is removed from the environment, not from the
+record, and the re-run is a **new** invocation ID at the same content rather than a retry that erases
+what happened. A green `f6-test-attempt2` beside a red `f6-test` tells the true story; a single green
+would not.
+
+The author is still mid-turn on the F6 repair and has **not** been interrupted; the resume is queued
+behind its current turn.
