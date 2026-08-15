@@ -473,3 +473,34 @@ a trade-off for the owner to settle while the PR is still draft, not a Tier-A bl
 
 Recorded N/A with the root-config reason, explicitly not passed, skipped, or waived. The leaf's
 worklog states it in exactly those terms.
+
+## 2026-08-15 — S3 dispatched (final approved slice)
+
+Pre-handoff reconcile: leaf `4e6d52b3d`, clean, local equals remote; external input clean at
+`5191de8`. Resumed the same thread `019ffcc9-16c2-7573-b7f6-d627172408e8`, detached, PID `2780982`.
+No replacement sender has ever been created for this leaf.
+
+Two obligations were carried explicitly into the brief so they cannot be lost between slices:
+
+1. **S3 inherits the rendered-root assertion.** The S1 correction deferred "both `/comparisons/` and
+   `/migration/` render under Concepts" to the slice that owns the migration files. S3 must assert
+   both, and re-add the migration wiring S1 was made to drop — the `migration:index` xref entry and
+   its legend line — now that pages exist to make the links resolve.
+2. **`_data.ts` is not in the approved S3 file list**, yet restoring `/migration/` to the Concepts
+   `roots` requires it. The brief names this in advance as a seventh content file and a divergence
+   to be recorded in `drift.md` and stated in the PR comment, rather than added silently. Flagging
+   it before dispatch rather than catching it at review is the direct lesson of the five earlier
+   defects.
+
+The S3 gate needs no orchestrator addition: `deno task --cwd docs/site verify` already chains
+`build && check:links && check:caveats`, so the rendered link contract that finding T2 exposed is
+covered natively here. The `deno doc` rows are read-only public-surface inspection and authorize no
+`packages/**` edit.
+
+Numbers discipline restated: every published figure must trace to the S2 manifest and measurements,
+no new numbers computed in prose, no deferred value restated as measured. Privacy boundary restated,
+including an instruction not to _widen_ the path disclosure already raised to the coordinator — the
+case page references classifications and aggregates and enumerates no additional private paths.
+
+Stop after S3 for Tier-A, whose gate this orchestrator will re-execute; then the run stops again for
+a separate opposite-family IMPL-EVAL, which the leaf may not launch.
