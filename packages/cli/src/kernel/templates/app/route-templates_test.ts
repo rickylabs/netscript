@@ -594,6 +594,7 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'teamMembersQueries.update.mutationOptions()');
     assertStringIncludes(output, 'teamMembersQueries.delete.mutationOptions()');
     assertStringIncludes(output, 'useQuery<ServiceListData>');
+    assertStringIncludes(output, 'initialDataUpdatedAt: props.cachedAt,');
     assertStringIncludes(output, 'useMutation<ServiceRecord, unknown, CreateInput>');
     assertStringIncludes(output, 'createOptimisticListMutationCallbacks<ServiceListData');
     assertStringIncludes(output, 'the cached list rolled back');
@@ -610,6 +611,7 @@ describe('app route template rendering', () => {
     const island = await adapter.render(appServiceShowcaseMemoryIslandTemplate, SAMPLE_APP_VARS);
     const shared = await adapter.render(appServiceShowcaseMemorySharedTemplate, SAMPLE_APP_VARS);
     assertStringIncludes(island, 'createOptimisticListMutationCallbacks<ServiceListData');
+    assertStringIncludes(island, 'initialDataUpdatedAt: props.cachedAt,');
     assertStringIncludes(island, 'the cached list rolled back');
     assertStringIncludes(island, "data-state='loading'");
     assertStringIncludes(island, "data-state='error'");

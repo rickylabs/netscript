@@ -12,13 +12,11 @@
 
 ## Current State
 
-PLAN-EVAL cycle 2 is terminal `PASS`. S1 is accepted and S2 implements the released CLI generator
-contract. Tier-A found that the add caller wrote appsettings/workspace/Aspire state before entering
-the generator's atomic validation. S2-FIX hoists a shared validation-only pass ahead of
-`renderService`, so an unrelated missing manifest contract aborts `service add --with-client`
-before any write. Dry-run/force behavior, disabled-service generation, and direct `clientKey()`
-emission remain unchanged. S2-FIX2 repairs the stale route-template test with an exhaustive SDK
-import-specifier allowlist plus direct-invalidation ordering coverage; the full CLI source suite is
+PLAN-EVAL cycle 2 is terminal `PASS`; S1 and S2 are accepted. S3 now preserves loader-owned cache
+age in both canonical island dialects, guards the emitted shape, and adds a controlled-clock browser
+fixture through the public Fresh query wrapper. The browser fixture is wired into `test:browser` but
+has not run because the gate remains lease-blocked. The ruled CLI generator/migration and Fresh
+hydration notes live in the publishable package READMEs. Full CLI and Fresh non-browser suites are
 green. Draft PR #1664 retains both closing keywords and remains draft. No expensive gate has run.
 
 ## Completed
@@ -51,15 +49,21 @@ green. Draft PR #1664 retains both closing keywords and remains draft. No expens
   of service, contract, and Aspire-helper output.
 - Repaired S2-F2 by removing the test's pre-C1 `bridgeInvalidation` expectation and asserting the
   complete SDK import set equals only client/query, with the direct invalidation after queries.
+- Passed `props.cachedAt` as `initialDataUpdatedAt` in both DB and memory showcase islands and
+  regenerated `embedded.generated.ts` canonically.
+- Added omission regressions for both rendered islands and a lease-gated browser fixture comparing
+  an old (`hydrationNow - 60_000`) and fresh (`hydrationNow`) snapshot at `staleTime: 15_000`.
+- Documented the generator ownership/flags/atomic validation/disabled-service/dialect/migration
+  contract in the CLI README and the hydration-age contract in the Fresh README.
 
 ## In Progress
 
-- S2-FIX2 is complete and stopped for a fresh S2 Tier-A review.
+- S3 is complete and stopped for fresh Tier-A and pre-expensive-gate convergence review.
 
 ## Next Steps
 
-1. Await the coordinator's fresh S2 Tier-A verdict; do not start S3.
-2. Keep both expensive gates lease-blocked until cheap convergence and explicit release.
+1. Await the coordinator's S3 Tier-A and pre-expensive-gate convergence verdict; do not start S4.
+2. Keep both expensive gates lease-blocked until explicit release.
 
 ## Key Decisions
 
@@ -90,19 +94,23 @@ green. Draft PR #1664 retains both closing keywords and remains draft. No expens
 | `packages/cli/src/kernel/assets/embedded.generated.ts`           | Modified | Regenerated shipped template asset.       |
 | `packages/cli/src/public/features/services/generate/*_test.ts`   | New      | Generator semantics and type-negative proof. |
 | `packages/cli/src/public/features/generate/aspire/generate-aspire_test.ts` | New | Whole-command option propagation. |
+| `packages/cli/src/kernel/assets/app/routes/examples/(_islands)/ServiceShowcaseLab*.tsx.template` | Modified | Preserve loader-owned cache age in both dialects. |
+| `packages/cli/README.md` and `packages/fresh/README.md` | Modified | Ruled generator migration and hydration-age notes. |
+| `packages/fresh/tests/query-hydration-age_browser.ts` and fixture | New | Controlled old/fresh public-wrapper browser scenarios. |
+| `packages/fresh/deno.json` | Modified | Include hydration-age coverage in the lease-gated browser task. |
 
 ## Gates
 
 | Gate family | Current status                                                                                                                    | Evidence                     |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Static      | S2-FIX2 full CLI source suite PASS (598/598); prior S2-FIX focused check (14 files), tests (32), and asset freshness also PASS. The earlier SDK root-entrypoint doc lint (`packages/sdk/mod.ts`) remains `BASELINE_FAIL` with two pre-existing diagnostics for that root run; S4 owns the full 12-entrypoint sweep. | `worklog.md` |
+| Static      | CLI check and full source suite PASS (598/598); Fresh check and full non-browser suite PASS (245/245). CLI export doc lint passes. Fresh export-map doc lint carries 45 pre-existing diagnostics; S4 owns final attribution. Asset freshness is rechecked at the committed head. | `worklog.md` |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
 | Runtime     | NOT_RUN / lease-blocked                                                                                                           | `plan.md` release conditions |
 | Consumer    | NOT_RUN / implementation-dependent                                                                                                | `plan.md` S5                 |
 
 ## Open Questions
 
-- None for S2-FIX. S3 remains blocked pending a fresh Tier-A verdict and separate dispatch.
+- None for S3. S4 remains blocked pending fresh Tier-A and separate dispatch.
 
 ## Drift and Debt
 

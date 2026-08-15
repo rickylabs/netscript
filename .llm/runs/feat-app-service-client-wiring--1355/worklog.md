@@ -80,6 +80,8 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | 2026-08-15T13:51:18+02:00 | S2    | Regression proof   | Added two-service/import/literal-order, disabled-service, idempotency/force/dry-run, collision, procedure-rename, add-flow, Aspire flag, and atomic no-partial-write coverage.                 |
 | 2026-08-15T14:02:38+02:00 | S2-FIX | Tier-A repair     | Tier-A found that `addService` performed its own writes before the generator's atomic validation. Hoisted a shared validation-only pass ahead of `renderService` and added an add-specific unrelated-missing-contract zero-write regression. |
 | 2026-08-15T14:15:00+02:00 | S2-FIX2 | Tier-A repair    | Replaced the stale route-template assertion for removed `bridgeInvalidation` wiring with an exhaustive two-specifier SDK import allowlist, absence check, and direct-invalidation ordering assertion. |
+| 2026-08-15T14:29:01+02:00 | S3    | Hydration implementation | Passed loader-owned `cachedAt` through `initialDataUpdatedAt` in both canonical island dialects, added omission guards, and canonically regenerated the shipped asset barrel. |
+| 2026-08-15T14:29:01+02:00 | S3    | Browser/docs contract | Added the lease-gated public-wrapper old/fresh browser fixture and task without running it; documented service regeneration/migration and Fresh hydration age in the ruled package READMEs. |
 
 ## Decisions
 
@@ -91,7 +93,7 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | Generator owns only `apps/<app>/lib/<service>.ts` | Separates explicit regeneration from the init-owned route showcase.         | PLAN-EVAL sweep A               |
 | Flags govern both command halves                  | `--dry-run` must mean no writes; force/default semantics stay coherent.     | PLAN-EVAL sweep B               |
 | Generate modules for disabled services            | `Enabled` controls runtime registration, not manifest-owned source output.  | PLAN-EVAL cycle 2 C2            |
-| Stop after S2                                     | Implementation release is expressly limited to one bounded slice.           | Coordinator dispatch            |
+| Stop after S3                                     | Implementation release is expressly limited to one bounded slice.           | Coordinator dispatch            |
 
 ## Drift
 
@@ -118,6 +120,14 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | S2-FIX focused test     | `.llm/tools/run-deno-test.ts` on service, Aspire-generate, runtime-schema, and service-adapter tests | PASS       | 32 tests passed; zero failed or ignored, including the add-path zero-write regression.       |
 | S2-FIX generated assets | `deno task check:assets-barrel`                                                                 | PASS          | No generated asset changed; the committed barrel remains fresh.                             |
 | S2-FIX2 full CLI source suite | `cd packages/cli && deno test --allow-all ./src/`                                             | PASS          | 598 tests passed; zero failed. The stale pre-C1 route-template assertion is repaired.        |
+| S3 CLI check | `cd packages/cli && deno task check` | PASS | All six CLI entrypoints checked with zero diagnostics. |
+| S3 Fresh check | `cd packages/fresh && deno task check` | PASS | All configured entrypoints and both streams type checks passed. |
+| S3 full CLI source suite | `cd packages/cli && deno test --allow-all ./src/` | PASS | 598 tests passed (534 steps); zero failed. |
+| S3 full Fresh non-browser suite | `cd packages/fresh && deno task test` | PASS | 245 tests passed; zero failed. Browser-named files are intentionally outside this task. |
+| S3 route-template regression | `cd packages/cli && deno test --allow-all ./src/kernel/templates/app/route-templates_test.ts` | PASS | One test group passed (26 steps), including both cache-age omission assertions. |
+| S3 CLI export doc lint | `cd packages/cli && deno doc --lint ./mod.ts ./scaffolding.ts ./testing.ts` | PASS | Three public entrypoints checked with zero diagnostics. |
+| S3 Fresh export-map doc lint | `cd packages/fresh && deno task doc-lint` | BASELINE_FAIL | 45 pre-existing `private-type-ref` diagnostics; S3 changes no Fresh source/export type, and the task command is unchanged. Full attribution remains S4-owned. |
+| README standard | `deno task docs:readme:check` | BASELINE_FAIL | Only `packages/bench/README.md` lacks an Install section; both S3 package READMEs conform. |
 | Changed-module doc lint | `deno task doc:lint --root packages/sdk --entrypoints ./src/query-client/key-bridge.ts --pretty` | PASS          | Zero documentation errors.                                                                  |
 | CLI entrypoint doc lint | `deno task doc:lint --root packages/cli --entrypoints ./mod.ts --pretty`                          | PASS          | Zero documentation errors, including the new exported generator contract.                  |
 | SDK root-entrypoint doc lint (`packages/sdk/mod.ts`) | `deno doc --lint packages/sdk/mod.ts`                                              | BASELINE_FAIL | Exactly two pre-existing `private-type-ref` errors for this root-entrypoint run: `QueryClientPort` at `src/ports/query-client.ts:41` and `createNetScriptQueryClient` at `src/query-client/query-client-factory.ts:44`, both referencing private `QueryClient`; measured before S1 and carried unchanged. The full 12-entrypoint export-map sweep is S4 and may surface further diagnostics. |
@@ -162,5 +172,8 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
   contract, client, or Aspire-helper writes.
 - Post-slice reconciliation found both issue closures, the terminal cycle-2 verdict, and the ruled
   design intact; no rescope or additional issue is needed.
+- S3's controlled browser fixture compares `hydrationNow - 60_000` with `hydrationNow`, exposing
+  snapshot text, `dataUpdatedAt`, fetching/refetching state, and query-function count through the
+  public `@netscript/fresh/query` wrapper. It is wired into `test:browser` but remains unrun.
 - No expensive gate, lease, ready transition, lockfile change, `docs/**` change, evaluator launch,
-  or S3 work occurred in S2.
+  or S4 work occurred in S3.
