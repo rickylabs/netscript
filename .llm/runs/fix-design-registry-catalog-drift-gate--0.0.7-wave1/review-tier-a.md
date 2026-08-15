@@ -521,3 +521,259 @@ CLI actually ships (verified by decoding the barrel to 66 items with the AI coll
 `registryCollections`), closes E-2 with a bound gate plus a structured receipt and an independently
 re-executed raw exit `0`, and correctly inherits the `fresh-browser` lease. Worktree left clean; no
 source was modified by this review.
+
+
+---
+
+## Fresh opposite-family Tier-A — bounded to the T-3 revert cleanup delta (2026-08-15)
+
+Fresh reviewer, launched by topic orchestrator `topic-fixes-0.0.7`. Opposite-family to the Codex
+author (`01a003f0-7821-7a10-a555-e619a9280479`, `gpt-5.6-sol`). **Nothing inherited** — the
+orchestrator's two recorded analytical errors on this leaf (E-1, G-1) mean prior conclusions carry
+no weight here. Every claim below is backed by a command I executed in this session at this head.
+This review is bounded to the cleanup delta; it does not re-open the leaf and does not touch the
+formal IMPL-EVAL cycle-2 `PASS`.
+
+### Route, session, and environment
+
+| Field           | Value                                                                                                                                                                                                                                                                                      |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Requested route | Claude · Opus 5 · medium (opposite-family reviewer for a `gpt-5.6-sol`-authored delta)                                                                                                                                                                                                     |
+| Observed route  | `claude-opus-5`, `--effort medium` — read from `/home/codex/.claude/jobs/b4e0f2a9/state.json` `respawnFlags`                                                                                                                                                                               |
+| Session id      | `b4e0f2a9-ead2-4e25-a157-b562852db914`                                                                                                                                                                                                                                                     |
+| Bridge id       | `session_0126UWXkosw4JB5soLwAfLjV` (from `~/.claude/sessions/363768.json` `bridgeSessionId`)                                                                                                                                                                                               |
+| Session PID     | `363768` (bg session; review shell PID `376200`)                                                                                                                                                                                                                                           |
+| cwd             | `/home/codex/repos/netscript-007-leaf-design-registry-drift`                                                                                                                                                                                                                               |
+| Route note      | Opposite-family — the non-negotiable constraint — is satisfied. Opus 5 · medium is the `lane-policy.md` "code chores" delegation default rather than a rung of the #794 effort-paired ladder (`Sol·low → Opus·high`, `Sol·medium → Fable·low`). Recorded as an observation, not a finding. |
+
+### Head resolution — three independent sources agree
+
+| Source         | Command                                                                  | SHA                                        |
+| -------------- | ------------------------------------------------------------------------ | ------------------------------------------ |
+| Local worktree | `git rev-parse HEAD`                                                     | `a891c65203301ec96467f11d9fe3dcb77a09d5c8` |
+| Remote branch  | `git ls-remote origin refs/heads/fix/design-registry-catalog-drift-gate` | `a891c65203301ec96467f11d9fe3dcb77a09d5c8` |
+| PR #1657       | `gh pr view 1657 --json headRefOid`                                      | `a891c65203301ec96467f11d9fe3dcb77a09d5c8` |
+
+All three equal the mandated review head. `git rev-parse origin/main` =
+`e090f894ff3682405a36e4f896ffd2cc16f9a1f8`. `git merge-base origin/main HEAD` =
+`da574111af05a5cded74250128b196fcab870274` = the stated leaf base, which confirms `origin/main`
+advanced independently of this branch and that a diff against it mixes main-side movement with the
+leaf delta.
+
+---
+
+### 1. Is the revert complete and exact? — **YES**
+
+`git diff --stat origin/main..HEAD` over the three paths produced **no output** (raw exit `0`).
+Byte-equality re-proved independently by object id, at three levels:
+
+| Path                                          | `origin/main` blob                         | `HEAD` blob | worktree `hash-object` |
+| --------------------------------------------- | ------------------------------------------ | ----------- | ---------------------- |
+| `.github/workflows/fresh-ui-quality.yml`      | `feaa080ace89d63c6856c66123208a7bf54f347b` | same        | same                   |
+| `.github/scripts/ci-classify-changes.ts`      | `0508a0401b13ae4fb6b13370fcad72441a92262e` | same        | same                   |
+| `.github/scripts/ci-classify-changes.test.ts` | `464ed2d30248abfc5c20c38a7b6ac3e7f60fdf46` | same        | same                   |
+
+Nothing else was reverted or collaterally changed. `git diff --name-status da574111a..HEAD` — the
+leaf's own delta, against its base — lists **no** `.github/**` path at all, and no `deno.lock`
+anywhere. `git status --porcelain` was empty before and after every command I ran.
+
+### 2. Is the core #1358 work retained? — **YES**
+
+`git diff --name-status da574111af05a5cded74250128b196fcab870274..HEAD` returns exactly three
+product files plus the run directory:
+
+- `M packages/cli/src/kernel/assets/app/routes/(design)/design/(_shared)/registry.ts.template`
+- `M packages/cli/src/kernel/assets/embedded.generated.ts`
+- `M packages/fresh-ui/tests/registry-doc-drift.test.ts`
+- `A .llm/runs/fix-design-registry-catalog-drift-gate--0.0.7-wave1/**` (harness artifacts only)
+
+The template declares `total: 66` (`registry.ts.template:33`); no `total: 50` survives anywhere in
+the leaf delta.
+
+**Distinguishing main-side movement.** `git diff --name-status origin/main..HEAD` additionally shows
+`deno.json`, `docs/site/**`, `.llm/assets/agent-docs/**`,
+`packages/cli/src/kernel/assets/agent-docs.generated.ts`,
+`packages/mcp/src/publish-assets.generated.ts`, `.llm/tools/docs/**`, `.llm/tools/quality/**`, and
+the `docs-comparison-docs-programme--1551` / `quality-scan-root-coverage` run directories. Since
+`merge-base(origin/main, HEAD) == da574111a`, every one of those is `origin/main`-side movement the
+leaf never touched — confirmed by their total absence from the base-relative diff above. No
+collateral leaf change hides in that set.
+
+### 3. Does the coverage claim that justifies the revert hold? — **YES**
+
+I executed the classifier directly rather than reading it, importing `decide`/`classifyPath` from
+`.github/scripts/ci-classify-changes.ts` at this head (raw exit `0`):
+
+| Input path                                                      | `needsDeno` | `needsFreshUi` |
+| --------------------------------------------------------------- | ----------- | -------------- |
+| `packages/fresh-ui/registry.manifest.ts`                        | **`true`**  | `true`         |
+| `packages/cli/…/(design)/design/(_shared)/registry.ts.template` | **`true`**  | `false`        |
+| `packages/cli/src/kernel/assets/embedded.generated.ts`          | `true`      | `false`        |
+| `packages/fresh-ui/tests/registry-doc-drift.test.ts`            | `true`      | `true`         |
+
+Each was also run as a one-file `decide({eventName:'pull_request'})` PR diff, with the same result.
+So **both** owned surfaces request the root Deno lane.
+
+`ci.yml:180` `check-test` runs under
+`RUN: needs.classify.result != 'success' || needs.classify.outputs.needs_deno == 'true'` and its
+"Repo-wide test" step invokes `--gate test`, which `.llm/tools/gates/catalog.ts:35` maps to
+`['deno','task','test']`, which root `deno.json` defines as `run-deno-test.ts -- --allow-all` at the
+repo root. Root discovery reaches `packages/fresh-ui`: root `workspace` is
+`["packages/*","packages/cli/e2e","plugins/*","examples/*","apps/*"]`, root `exclude` is
+`[".llm/tmp/"]` only, root `test` config is undefined, and `packages/fresh-ui/deno.json` has
+`exclude: []` and no `test` config. There is **no** test-side exclusion of Fresh UI — the G-1
+premise is false, re-derived here from the config rather than inherited.
+
+Focused drift test, executed **from the repo root**:
+
+```
+deno test --allow-all packages/fresh-ui/tests/registry-doc-drift.test.ts
+→ ok | 5 passed | 0 failed    RAW EXIT 0
+```
+
+The five tests are the JSDoc collection-name check, the manifest↔catalog equality check, and the
+three symmetric negative fixtures (manifest-only item, catalog-only item, metadata drift).
+
+**Redundancy of the reverted expansion, independently confirmed.**
+`.github/workflows/fresh-ui-quality.yml` at `origin/main` runs exactly four gates — `check`, `lint`,
+`fresh-ui-lock-regression`, `clean-worktree`. **It has no test step.** Wiring the CLI design assets
+into its `paths:` could not have executed `registry-doc-drift.test.ts` under any circumstance; it
+would only have duplicated check/lint work on CLI design PRs. The revert removes cost and removes
+zero coverage.
+
+**Plain statement on #1358's close-gated `gate:` box** — _"the drift gate runs in CI on every change
+to `packages/fresh-ui/registry.manifest.ts` or the CLI design assets"_: **satisfied at this head
+without the reverted expansion.** Both paths set `needs_deno=true`; `check-test` is the required job
+guarded on `needs_deno`; that job runs the root `test` gate; root discovery reaches the drift test;
+the drift test passes. See N-1 below for the one qualification.
+
+### 4. Does the barrel remain fixed? — **YES**
+
+```
+docker ps -a                       → header only, no containers (before)
+git status --porcelain             → empty (before)
+deno task check:assets-barrel      → RAW EXIT 0
+git status --porcelain             → empty (after)
+docker ps -a                       → header only, no containers (after)
+```
+
+The task regenerates seven generated targets and then `git diff --exit-code`s them; exit `0` with a
+clean tree afterwards proves the committed `embedded.generated.ts` is the generator's fixed point at
+this head — i.e. the shipped barrel, not just the template, carries the 66-item catalog. Nothing
+required restoration; the tree was never left dirty.
+
+### 5. Are the journals truthful? — **Artifacts: yes. PR body: no (see T-1…T-3).**
+
+The appended corrections in `drift.md` (`ab78faac5`), `worklog.md` and `context-pack.md`
+(`695dd7b00`, `a891c6520`) are accurate against what I executed:
+
+- They state plainly that the T-3 root-cause claim was **wrong** (`packages/fresh-ui` **is** matched
+  by the `packages/*` workspace glob; the negative was inferred from a substring filter, not
+  executed) and that the expansion was **redundant** (no test step in `fresh-ui-quality.yml`). Both
+  re-derived above.
+- They correct **G-2** correctly. I verified the receipt myself: `receipts/fresh-browser.json` has
+  `argv ['deno','task','test:browser']`, `cwd .../packages/fresh`,
+  `gitHead == actualGitHead == 4a3c40321`; and `packages/fresh/deno.json` defines `test:browser` as
+  `deno test --allow-all ./tests/form-navigation_browser.ts`. It is the **form-navigation** browser
+  regression and never rendered the generated design gallery. `ci.yml:263` names the same gate
+  "Managed form browser regression".
+- `worklog.md` carries an explicit supersession clause — _"Earlier wording that paired the leased
+  browser receipt with gallery consumer proof is superseded by this correction"_ — which is the
+  correct handling under the run's append-only immutability rule. Residual pre-correction wording
+  inside `evaluate.md` (the cycle-2 gate table at `:126`) and this file's earlier sections is
+  therefore **not** a finding: it is immutable history that the appended correction governs, and
+  `evaluate.md` raises G-2 against its own table at `:546`/`:596`.
+
+The **PR #1657 body**, however, is a live, mutable, merge-time record and was **not** brought in
+line with either correction. That is where the surviving misleading wording lives.
+
+---
+
+### Findings
+
+**T-1 — blocking. The PR body checks off a slice whose entire product change is reverted.**
+`## Slices` reads `- [x] S3 Close the T-3 CLI design-asset CI ownership gap — a09331497`. At review
+head `a891c652` the S3 product change does not exist: the three CI paths are byte-identical to
+`origin/main` (blob ids in §1) and `git diff --name-status da574111a..HEAD` contains no `.github/**`
+path. A reader of the merge record would conclude this PR closed a CI ownership gap that it does not
+touch. Remediation is a PR-body edit only: strike or reword S3 to record it as landed and then
+reverted as redundant, citing `695dd7b00`.
+
+**T-2 — blocking. The PR body lists validation evidence for code no longer in the PR.**
+`## Validation` reads
+`T-3 classifier/workflow suite — exit 0; 62 passed, 0 failed; focused positive
+and negative ownership tests each exit 0`.
+That suite validated the reverted `ci-classify-changes.test.ts` expansion. Presented under
+"Validation" it asserts current proof of an absent change. Remediation: remove that bullet or mark
+it superseded, and add the cleanup proofs actually current at this head (empty three-path diff; both
+`needsDeno` probes `true`; root-discovery drift test `5 passed`; `check:assets-barrel` exit `0`).
+
+**T-3 — blocking. The G-2 correction did not reach the PR body; the browser claim still reads as
+gallery coverage.** `## Definition of Done` carries
+`- [x] fresh-browser has coordinator-leased
+evidence; receipt: …/receipts/fresh-browser.json`, and
+`## Validation` carries `fresh-browser — PASS,
+exit 0, 2 passed / 0 failed`. Neither says what that
+receipt covers. On a PR titled _"gate the generated design registry catalog"_, an unqualified
+checked `fresh-browser` DoD box reads as browser proof of the generated gallery — exactly the claim
+`drift.md` and `worklog.md` now correct ("_it never rendered the generated design gallery_"). The
+receipt is valid and immutable for its actual gate; the PR body must say which gate that is.
+Remediation: qualify both lines as the **form-navigation** regression under `packages/fresh`, and
+state that #1358 consumer proof is the static pair (decoded 66-item embedded barrel + symmetric
+drift gate).
+
+**T-4 — non-blocking, same class as T-1.** `## Drift / Debt` still records _"Significant amendment:
+Tier-A T-3 required the coordinator-authorized three-file CI ownership repair recorded in
+`drift.md`"_ with no note that the repair was subsequently reverted. Truthful as history; incomplete
+as current state. Folding it into the T-1 edit resolves it.
+
+**N-1 — non-blocking qualification on the `gate:` box, not introduced by this delta.** Both
+`ci.yml`'s `check-test` (`:183`) and `fresh-ui-quality.yml`'s `classify` job are guarded by
+`github.event.pull_request.draft == false`. While #1657 remains draft the drift gate does not
+execute in CI on this PR. This is pre-existing repo-wide policy affecting every lane equally, it is
+unchanged by the revert, and it resolves itself the moment the coordinator marks the PR ready. The
+#1358 box is satisfied for non-draft PRs and for pushes to `main`. Recorded so that no one reads a
+green draft PR as evidence the gate ran.
+
+**N-2 — non-blocking, worth naming explicitly.** The drift test compares the **manifest** to the
+**template** (`registry-doc-drift.test.ts:29-31` reads
+`../../cli/src/kernel/assets/app/routes/(design)/design/(_shared)/registry.ts.template`); it does
+not read `embedded.generated.ts`. Barrel↔template is guarded by a _different_ gate — `assets-barrel`
+in `ci.yml`'s `quality` job (`:379`), also guarded on `needs_deno` via `RUN_DENO`. The manifest →
+template → barrel chain is therefore fully gated at this head, but by **two** gates, not the single
+"drift gate" #1358's box names. This is the E-1 lesson made structural; it is covered, and I note it
+only so a future reader does not assume the drift test alone protects the shipped artifact.
+
+### Boundary compliance
+
+- Read-only over source: no `packages/`, `plugins/`, or `.github/` file was modified. Only this
+  artifact and harness bookkeeping are committed.
+- Cheap structured gates only. Commands run: `git` inspection, a `deno eval`/`deno run` classifier
+  probe, one focused `deno test`, `deno task check:assets-barrel`, `gh` reads. **No** browser,
+  `fresh-browser`, Aspire, Docker, scaffold runtime, or `e2e:cli`; no lease requested.
+  `docker ps -a` empty before and after.
+- Worktree clean at every checkpoint; `deno.lock`, `packages/cli/deno.lock`, and
+  `packages/fresh-ui/deno.lock` untouched.
+- No acceptance box ticked, no readiness, no merge, no relabel, no publish, no issue mutation, no
+  closing-keyword change. PR remains draft with exactly one `status:` label (`status:impl`).
+
+### Verdict
+
+**`CHANGES_REQUESTED`.**
+
+Scope items 1–4 pass outright, each on executed evidence: the revert is byte-exact and
+collateral-free; the leaf's three-file product delta is intact with `total: 66`; the coverage claim
+that justifies the revert is true, and the reverted workflow provably could never have run the drift
+test; the shipped barrel is the generator fixed point at exit `0` with a clean tree. The formal
+IMPL-EVAL cycle-2 `PASS` is untouched by this review and nothing about the product delta is in
+question.
+
+The block is scope item 5, and it is entirely on the **live PR body**, which still (T-1) checks off
+a reverted slice as delivered, (T-2) presents validation of removed code as current, and (T-3)
+carries the uncorrected G-2 browser claim that the run journals have already superseded. The PR body
+is the merge-time record and the close-gate mirror source; merging it as written would land a false
+account of what this PR did. Remediation is three text edits to the PR body — no source change, no
+gate rerun.
+
+A `CHANGES_REQUESTED` here authorizes the PR-body correction and nothing else. Readiness, merge,
+label changes, and #1358 closure remain coordinator-only.

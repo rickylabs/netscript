@@ -495,3 +495,30 @@ Cleanup product/CI head `695dd7b00` was revalidated after commit: the required t
 returned `needsDeno=true` (raw exit 0); scoped structured check, `quality:gate`, and
 `check:assets-barrel` each returned raw exit 0; and the structured root-discovery drift wrapper
 returned raw exit 0 with 1 passed and 0 failed. `check:assets-barrel` left no generated delta.
+
+## Fresh Opposite-Family Tier-A — T-3 Cleanup Delta (2026-08-15)
+
+Reviewer session `b4e0f2a9-ead2-4e25-a157-b562852db914`, bridge `session_0126UWXkosw4JB5soLwAfLjV`,
+PID `363768`, route `claude-opus-5` · effort `medium` (observed from `respawnFlags`). Review head
+`a891c65203301ec96467f11d9fe3dcb77a09d5c8`, confirmed identical across local `HEAD`,
+`git ls-remote origin`, and PR `headRefOid`.
+
+**Verdict: `CHANGES_REQUESTED`.** Artifact: `review-tier-a.md` § "Fresh opposite-family Tier-A —
+bounded to the T-3 revert cleanup delta".
+
+| Scope item                           | Result             | Evidence executed                                                                                                                                                                                                                                                                                          |
+| ------------------------------------ | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Revert complete and exact            | PASS               | Empty `git diff origin/main..HEAD` over the three paths; identical blob ids at `origin/main`/`HEAD`/worktree; no `.github/**` in the base-relative leaf diff                                                                                                                                               |
+| Core #1358 work retained             | PASS               | `git diff --name-status da574111a..HEAD` = exactly the template, `embedded.generated.ts`, `registry-doc-drift.test.ts`; `merge-base(origin/main, HEAD) == da574111a` separates main-side movement                                                                                                          |
+| Coverage claim justifying the revert | PASS               | Classifier probe raw exit 0, `needsDeno=true` for both owned surfaces; root workspace/exclude config shows no Fresh UI test exclusion; `deno test --allow-all packages/fresh-ui/tests/registry-doc-drift.test.ts` from repo root → 5 passed, 0 failed, raw exit 0; `fresh-ui-quality.yml` has no test step |
+| Barrel remains fixed                 | PASS               | `deno task check:assets-barrel` raw exit 0, `git status --porcelain` empty before and after, `docker ps -a` empty before and after                                                                                                                                                                         |
+| Journals truthful                    | **FAIL (PR body)** | Run artifacts accurate and correctly superseded; PR #1657 body still checks off reverted slice S3, lists T-3 suite evidence as current validation, and carries the uncorrected G-2 `fresh-browser` DoD claim                                                                                               |
+
+Blocking findings T-1/T-2/T-3 are PR-body text only — no source change and no gate rerun is owed.
+Non-blocking: T-4 (stale Drift/Debt entry), N-1 (draft-gated CI means the drift gate does not run
+while #1657 is draft — pre-existing policy, not this delta), N-2 (manifest→template and
+template→barrel are two distinct gates, both `needs_deno`-guarded; both green).
+
+Boundaries: read-only over source; no browser, `fresh-browser`, Aspire, Docker, scaffold runtime, or
+`e2e:cli`; no lease requested; locks untouched; PR left draft with exactly one `status:impl`; no
+acceptance box, label, milestone, readiness, merge, or issue state changed.
