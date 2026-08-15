@@ -4433,3 +4433,60 @@ and 5 produced two different opaque symptoms from one diagnosable cause.
 Author was still writing its leaf-side attempt-5 report at the time of this measurement; the
 amendment dispatch is queued behind that turn. No product mutation, no `fresh-browser`, no attempt 6,
 no evaluator.
+
+## 2026-08-15 — CORRECTION: my "no Linux browser exists" claim was an overclaim
+
+The coordinator found managed Linux Chromium binaries I had reported absent. **I verified and they
+are real and executable:**
+
+```text
+/home/codex/.cache/ms-playwright/chromium-1232/chrome-linux64/chrome → Google Chrome for Testing 151.0.7922.10
+/home/codex/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome → Google Chrome for Testing 151.0.7922.34
+```
+
+Both return a version string on `--version`. Puppeteer caches are additionally present per the
+coordinator.
+
+### What I actually measured versus what I wrote
+
+I measured that **none of the probe's six allowlist candidates resolve to a Linux binary** — the four
+`/usr/bin/*` entries are absent, leaving only the two `/mnt/c/…` Windows paths. From that I wrote
+"**No Linux browser exists on this host**". Those are different claims, and I generalised an
+allowlist miss into a fact about the machine.
+
+This is the same overclaim class I have corrected in others repeatedly this session — a
+root-entrypoint doc-lint run labelled "full SDK export-map", one helper file generalised to twelve
+paths, and my own `packages/cli/src/` subset reported as the suite at S2-F2. The discipline I applied
+to their evidence, I failed to apply to my own: I searched a **list**, not the **host**, and
+described the result as if I had searched the host.
+
+### What survives and what changes
+
+**The causal chain survives unchanged** and was independently correct: the probe selects a Windows
+`.exe`; `/proc/sys/fs/binfmt_misc/` has no `WSLInterop` entry so it cannot execute; `/bin/sh` parses
+the PE binary and exits 2 with `Syntax error: word unexpected (expecting ")")`;
+`service-client-browser-probe.ts:133` discards that stderr into a no-op sink; the probe polls for a
+DevTools target that never existed and reports a bare timeout. Every step of that is still measured
+and still holds.
+
+**The disposition changes materially.** This is **not** a host capability gap and **not** a
+coordinator environment decision. It is a **probe allowlist defect**: the allowlist ignores managed
+browser caches that contain working Linux binaries, then falls through to a Windows executable that
+cannot run here. The gate can and must prove refetch. **No environment skip.**
+
+My F7 dispatch carried the wrong framing — it told the author the capability gap was environmental
+and offered "skip with a recorded reason" as an option for the coordinator to choose. That option
+does not exist, because the browser it claimed was missing is present. Correcting the dispatch.
+
+### Corrected amendment direction
+
+1. Measure a managed Linux binary with **bounded `--version` / early-exit evidence**.
+2. Preserve **child exit status plus bounded stderr** on startup failure — unchanged, and still the
+   fix that would have made attempt 5 self-diagnosing.
+3. Provide a **portable explicit executable-selection boundary** — prefer an explicit env/config path
+   over hard-coding versioned cache paths like `chromium-1232`, which rot on the next Playwright
+   update.
+4. **The gate must prove refetch. No environment skip.**
+
+Fresh Tier-A before implementation; no attempt 6 until diagnostics and selection repair are both
+bound and reviewed; runtime lease stays free during planning.
