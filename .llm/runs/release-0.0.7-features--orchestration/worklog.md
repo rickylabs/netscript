@@ -4132,3 +4132,63 @@ repair for another amendment and fresh Tier-A. Unchanged and stated: CDP client 
 evidence shape, request baseline, response-stage resume, and all browser assertions.
 
 **Verdict `PASS`.** Repair released to the same author for the two owned paths.
+
+## 2026-08-15 — Low-credit checkpoint / handoff
+
+### State at pause
+
+| Item | Value |
+| --- | --- |
+| Topic branch | `orchestrator/release-0.0.7-features`, **clean**, local == remote |
+| Leaf branch | `feat/app-service-client-wiring`, PR **#1664**, open **draft** |
+| Leaf head at pause | `7fa29ad3e` — `fix(cli-e2e): preserve browser probe cleanup errors` |
+| Author thread | `01a004f9-f033-7592-a0bc-63927753fb43`, Sol/high — **still running the F6 repair turn**; not interrupted |
+| Runtime lease | **none held**; attempt-5 not requested |
+
+### Where the leaf actually is
+
+Shipped this milestone: **#1502** (PR #1651) and **#1293** (PR #1662), both merged. In flight:
+**#1355/#1360** on PR #1664.
+
+Completed and Tier-A signed on #1664: S1, S2 (with two findings repaired), S3, F4 (probe convergence
+vs idempotency), F5 (post-init canonicalization, 15+12 ceiling), and the F6 **plan** amendment.
+Four binding receipts were `SUFFICIENT` at each of the F4 and F5 content heads.
+
+`scaffold.runtime` has failed four times, each further into the suite — `passed` 20 → 32 → 69 — and
+each failure was attributed by measurement and repaired at its root cause:
+
+1. attempt 1: `generated.service-client-contract` — probe asserted idempotency one sequence position
+   too early; repaired by F4.
+2. attempt 3: `generated.deno-fmt-check`, 12 unformatted generated files — post-init generation never
+   reused the init formatting seam; repaired by F5. **Confirmed passing in attempt 4 at 343 ms.**
+3. attempt 4: `behavior.service-client-refetch` — unguarded `child.kill('SIGTERM')` in the probe's
+   `finally` threw during teardown; F6 repairs it.
+
+### Immediate next actions, in order
+
+1. **Wait for the F6 repair turn to finish.** Do not launch a rival send at
+   `/home/codex/repos/netscript-007-features-1355`; resume the same thread only.
+2. **Fresh Tier-A on the F6 repair.** Verify the two-path ceiling holds; that the discriminator is
+   still the conjunction `instanceof TypeError && message === 'Child process has already terminated'`
+   and has not degraded into a message-only check; that **all three** negative proofs exist, including
+   the non-`TypeError`-with-terminated-message case that pins the `instanceof` half; that the raw
+   `pipeTo(...)` drain replaced the swallowed `.catch(() => {})`; that profile removal is in an
+   **enclosing** `finally`; and that the probe has no unguarded `child.kill` left. Verify four fresh
+   binding receipts at one content head and **recompute sufficiency**. Require the **full** repo-wide
+   `deno task test` count — the binding gate is ~4245 results; a `packages/cli/src/` subset once hid a
+   real failure from three consecutive reviews.
+3. **On PASS:** push the topic checkpoint and **request the coordinator attempt-5 runtime lease.**
+   Do not run `scaffold.runtime`, `fresh-browser`, Aspire, or Docker without it. Per **D-17**, quote a
+   head that is already final and pushed so the lease cannot bind a head that then moves.
+4. **On FAIL_FIX:** return to the same author with a bounded repair; do not widen the ceiling.
+
+### Standing constraints for the successor
+
+No merge, publish, ready-flip, evaluator launch, issue mutation, `#1348` touch, central cluster-state
+change, or expensive gate without an explicit coordinator grant. Evidence is **append-only** — the
+four S5 raw logs and their SHA-256s, every S4/F4/F5/F6 report and receipt, and the carried Fresh 45 /
+SDK 3 `PRE_EXISTING_FAIL` baselines with the plugin-streams diagnostic named separately, all stay as
+written. A later green never retroactively tidies an earlier red.
+
+Open drift: D-1 through D-17, with D-17 (a leased head must not move after grant) the most
+operationally live.
