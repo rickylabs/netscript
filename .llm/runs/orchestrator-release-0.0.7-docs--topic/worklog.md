@@ -504,3 +504,56 @@ case page references classifications and aggregates and enumerates no additional
 
 Stop after S3 for Tier-A, whose gate this orchestrator will re-execute; then the run stops again for
 a separate opposite-family IMPL-EVAL, which the leaf may not launch.
+
+## 2026-08-15 — E0 owner-priority correction: both comments rewritten in place, Tier-A PASS
+
+Terminal at leaf `54e1c3bff7efc5df9da51bc06a15976717fa0929`; sign-off comment
+`issuecomment-5300659348`.
+
+| Comment                                                                    | Updated                | Length          |
+| -------------------------------------------------------------------------- | ---------------------- | --------------- |
+| https://github.com/rickylabs/netscript/issues/1551#issuecomment-5265826161 | `2026-08-15T04:58:05Z` | 28,481 → 10,040 |
+| https://github.com/rickylabs/netscript/issues/1551#issuecomment-5265971722 | `2026-08-15T04:58:11Z` | 25,976 → 11,774 |
+
+Both `created_at` unchanged, proving true in-place replacement rather than new comments. No
+follow-up was posted and neither body is framed as an update; both titles dropped "Draft" and now
+open as the definitive current case study.
+
+| Route                           | Previously published | At the pin    |
+| ------------------------------- | -------------------- | ------------- |
+| `…/session/[session]/index.tsx` | 119 / 117            | **94 / 92**   |
+| `…/channel/[channel]/index.tsx` | 208 / 204            | **181 / 178** |
+
+Both labelled `measured`; every superseded figure removed rather than footnoted.
+
+### Orchestrator verification
+
+Ancestry re-checked (`d838cfca`, `b261f463` ancestors; `834a2b36` identical tree, evidence-only);
+line counts re-derived from the read-only input; update-framing scan clean apart from the legitimate
+word "revision"; privacy scan clean with the largest excerpt 45 lines of a 181-line file showing a
+`definePage()` builder chain and no business data.
+
+Scope held exactly: the commit touches **only five run artifacts**.
+`docs/site/comparisons/evidence/`, `.llm/tools/docs/`, and every S1 page are byte-unchanged since
+the S2 sign-off — the leaf correctly refused to manufacture edits to a pin that is not obsolete, so
+S2's manifest, procedure, and measurements remain valid exactly as signed off. Lockfiles unchanged,
+leaf tree clean, input clean at the pin. No `docs/site/**` change, so the site build and link rows
+were not applicable and were not claimed.
+
+PR verified after the slice: draft `true`, `Part of #1551` present, no closing keyword, milestone
+`0.0.7`, exactly one `status:` (`status:impl`), labels unchanged.
+
+### Recorded for IMPL-EVAL
+
+`plan.md` was amended after the PLAN-EVAL gate to add the inserted E0 slice and refresh its status
+line, so the evaluator will assess a plan that differs from the artifact gated at `d35cbca30`. The
+amendment documents the insertion and asserts no locked decision changed; it does not alter one.
+Surfaced deliberately so the difference is not discovered as a surprise.
+
+### Correction to this lane's earlier reasoning
+
+The preceding hold was this orchestrator's error, not a real blocker. It searched for refs newer
+than the pin, found none, and concluded no improvements existed. The correct comparison was the pin
+against what the comments described: the comments predate improvements that are ancestors of the
+pin. The coordinator's correction and the owner's statement were both right, and the lane lost time
+on a false blocker.
