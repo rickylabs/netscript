@@ -194,6 +194,29 @@ Every Slice 3 receipt records `actualGitHead` = signed Slice 2 head
 history. Formatting is not applied to the generated asset or receipt directory: generator output is
 canonical and committed evidence bytes remain unchanged.
 
+### Slice 4 — final-head acceptance and consumer portability repair
+
+The first full final-head test was a genuine RED: 4,108 passed and one failed because the installed
+consumer scanner could not resolve the repository-only `@std/path` import when invoked from a
+foreign working directory. The failure was introduced in Slice 2 while satisfying the repo lint rule
+and was copied faithfully into the generated asset in Slice 3. A direct installed-bundle probe
+reproduced Deno's `Import "@std/path" not a dependency` error.
+
+The minimum repair stays within the approved scanner/generated-asset surfaces: restore the
+consumer-safe `jsr:@std/path@^1` specifier that existed at the immutable base, regenerate through
+`deno task gen:assets-barrel`, and rerun the existing consumer integration test. The focused
+pre-commit probe passed 19/19, but is explicitly non-binding because its working tree contained the
+repair; `receipts/slice-4/consumer-tool-green-precommit.json` is retained only as diagnostic
+evidence. Binding final evidence will be rerun against the landed repair commit before Slice 4 is
+presented for Tier-A review.
+
+| Evidence                                                  | Outcome       | Exit | Receipt                                               |
+| --------------------------------------------------------- | ------------- | ---: | ----------------------------------------------------- |
+| Live PR/issue close-gate baseline (not allowlisted)       | expected FAIL |    1 | live observation; no fabricated durable receipt       |
+| Full repository test before portability repair            | expected FAIL |    1 | `receipts/slice-4/test.json`                          |
+| Consumer integration pre-commit diagnostic (19/19)        | PASS probe    |    0 | `receipts/slice-4/consumer-tool-green-precommit.json` |
+| Full structured check before the one-line portability fix | PASS          |    0 | `receipts/slice-4/check.json`                         |
+
 ## Reconcile notes
 
 - Live #1378 and #1545 are open in milestone 0.0.7; `origin/main` equals the approved baseline.
@@ -214,6 +237,10 @@ canonical and committed evidence bytes remain unchanged.
 - Slice 3 live reconcile: issue #1655 remains open in milestone 0.0.8 and owns only removal of the
   exact Workers lint baseline. No issue, label, milestone, PR readiness, or central-state mutation
   was made; both dry runs were simulations and no publication occurred.
+- Slice 4 live reconcile: the close-gate is expected RED while all issue and PR-body checkboxes
+  remain coordinator-owned and unchecked. Its failure was observed read-only but not represented as
+  a `run-gate.ts` receipt because `close-gate` is not in the allowlisted catalog and this leaf may
+  not widen that tooling surface.
 
 ## Activity
 
@@ -256,15 +283,19 @@ canonical and committed evidence bytes remain unchanged.
   the checked-in task, audited the complete CLI and Workers JSR surfaces, registered the exact #1655
   no-increase debt, ran the named structured gates, and stopped before Slice 4 for substantive
   Tier-A review.
+- 2026-08-15 — Slice 3 supervisor sign-off landed at `83f7a18479720ac9e61c796de64593baa081e77f`.
+  Slice 4's full-test RED exposed the installed scanner's repo-only import alias; restored its prior
+  explicit JSR specifier, regenerated the authorized asset, and retained both the failing full-test
+  receipt and the non-binding focused pre-commit diagnostic.
 
 ## Plan-Gate state
 
 - Historical OpenRouter artifact: advisory `FAIL_PLAN` at `8a4709afe`; its D-2/D-3/D-4 findings are
   resolved by coordinator authority and its D-1 editorial finding is resolved in live #1545.
 - Current formal verdict: cycle 2 `PASS` in `plan-eval.md`, evaluator artifact commit `c694cfb311`.
-- Slice state: **Slices 1 and 2 are signed off. Slice 3 implementation and evidence are complete and
-  await substantive Tier-A review.** Slice 4 has not started and is not authorized until supervisor
-  sign-off.
+- Slice state: **Slices 1 through 3 are signed off. Slice 4 is in progress.** Its initial full-test
+  RED found an authorized-surface consumer portability regression; the repair must be committed and
+  all binding final gates rerun at that landed implementation head before Tier-A handoff.
 
 ## Tier-A sign-off — Slice 1
 

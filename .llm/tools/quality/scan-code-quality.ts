@@ -1,4 +1,4 @@
-import { dirname, relative, resolve } from '@std/path';
+import { dirname, relative, resolve } from 'jsr:@std/path@^1';
 import { extractFencedBlocks } from '../docs/snippet-extractor.ts';
 
 export type QualityRule =

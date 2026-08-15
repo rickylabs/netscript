@@ -19,8 +19,12 @@
   entry binds it to open #1655 in milestone 0.0.8. Both scoped publish dry-runs, the generated-file
   check, and `quality:gate` exit 0. Receipts are under `receipts/slice-3/` at the signed Slice 2
   parent; none names a stash or non-history commit-ish.
-- **Stop state:** Slice 3 now awaits substantive Tier-A review. Do not begin Slice 4 or create a
-  supervisor sign-off commit from the author lane.
+- Slice 3 is signed off at `83f7a18479720ac9e61c796de64593baa081e77f`.
+- **Current state:** Slice 4 is in progress. Its first full-test receipt is expected RED (4,108
+  pass, 1 fail): the installed consumer scanner cannot resolve the repo-only `@std/path` alias from
+  a foreign CWD. The authorized minimum repair restores `jsr:@std/path@^1` in the source scanner and
+  regenerates the embedded asset. A focused pre-commit diagnostic is green 19/19 but is not binding;
+  final gates must be rerun against the landed repair commit.
 - Draft PR #1653 directly targets `main`, remains draft, and retains exactly `status:impl`.
 - Branch: `chore/quality-scan-allowance-rail`, no upstream. Base:
   `01e0960494c95ce56eb35892c211a095eb13e6ed`.
@@ -67,6 +71,7 @@ Native Claude Opus 5 cycle 2 evaluated repaired head `09dfb092d` in separate ses
 the evaluator artifact commit is `c694cfb311d378f4796280649042c8c275c828ed` and the verdict comment
 is `5299133651`.
 
-Next action: the topic orchestrator performs substantive Tier-A review of Slice 3 using the author
-commit and `receipts/slice-3/`. This author thread remains stopped before Slice 4. The final
-IMPL-EVAL remains a separate opposite-family session after all four slices and supervisor reviews.
+Next action: land the authorized consumer portability repair, rerun Slice 4's binding final gates at
+that implementation commit, update acceptance evidence without ticking coordinator-owned PR-body
+boxes, then stop for substantive Tier-A review. The final IMPL-EVAL remains a separate
+opposite-family session after Slice 4 supervisor review.
