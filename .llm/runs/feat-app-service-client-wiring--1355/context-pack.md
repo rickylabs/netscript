@@ -68,8 +68,12 @@ wrong-type/wrong-message negatives without a browser or new harness.
 Fresh Tier-A passed F6 at `36da13fa1`. The repair is implemented in exactly the two authorized
 files: the helper now applies the exact discriminator, awaits status and raw drain, and preserves
 unrelated errors; the existing test file executes natural-exit, active-SIGTERM, three-negative, and
-delegation proofs. The structured focused suite is 14/0. Binding receipts are pending the immutable
-content commit.
+delegation proofs. The structured focused suite is 14/0. Immutable content commit `7fa29ad3e` has a
+passing binding `check`, but binding `test` stops the sequence at 4,228 passed / 1 failed / 19
+ignored because the unchanged forbidden-command walker cannot read a mode-0700 `dnsmasq:root`
+Postgres directory under the S5 attempt-4 `plugin-smoke-20260815-203755` workspace. This is
+runtime-workspace residue rather than an F6 source regression, but the binding set is red and
+insufficient. No retry or downstream gate ran.
 
 ## Completed
 
@@ -112,19 +116,17 @@ content commit.
 
 - F6 implementation is complete inside `service-client-browser-probe.ts` and
   `service-client-runtime-probe_test.ts`; no third path was required.
-- The focused deterministic suite passes 14/0. The four binding receipts have not run yet and the
-  F5 receipt set remains historical evidence until replaced at the F6 content head.
+- The focused deterministic suite passes 14/0. F6 `check` passes and F6 `test` fails only on the
+  permission-denied S5 workspace residue; `publish-dry-run` and `arch-check` were not run.
 - The attempt-4 raw failure remains append-only; refetch behavior is still unknown and no lease or
   expensive gate is authorized.
 
 ## Next Steps
 
-1. Commit the two-file repair and current run artifacts as the immutable F6 content head; confirm a
-   clean tree.
-2. Run fresh distinct `check`, `test`, `publish-dry-run`, and `arch-check` receipts serially at that
-   one head, then recompute exact-set sufficiency.
-3. Commit/push evidence, post `[PHASE: IMPL] [SLICE: F6]`, and stop for fresh Tier-A without any
-   expensive-gate or lease action.
+1. Commit and push the two generated F6 receipts plus the binding-failure attribution artifacts.
+2. Post `[PHASE: IMPL] [SLICE: F6]` with the PASS/FAIL/missing exact set and `INSUFFICIENT` verdict.
+3. Stop for fresh Tier-A disposition. Do not mutate the protected runtime residue, retry the gate,
+   or start either downstream binding gate without reviewed authorization.
 
 ## Key Decisions
 
@@ -166,7 +168,7 @@ content commit.
 
 | Gate family | Current status                                                                                                                    | Evidence                     |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Static      | Four `f5-*` binding receipts PASS at `fda78ee438`; 4,226/0 tests and exact-set sufficiency SUFFICIENT. All earlier FAIL and superseded evidence remains preserved. | `worklog.md`; binding receipts |
+| Static      | F6 check PASS; F6 test FAIL at `7fa29ad3e` on permission-denied S5 runtime-workspace residue (4,228/1/19). Publish/arch NOT_RUN; exact-set sufficiency INSUFFICIENT. Earlier receipts remain preserved. | `receipts/f6-check.json`; `receipts/f6-test.json`; failure report |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
 | Runtime     | Attempt 4 `scaffold.runtime` FAIL: 69 passed / 1 failed / 0 skipped; service-client contract and generated format PASS, leaf probe cleanup failed on an already-terminated browser child. Cleanup proven empty. | `reports/s5-attempt4-runtime-failure.md`; suite-owned raw log |
 | Consumer    | `fresh-browser` NOT_RUN because the attempt-4 runtime prerequisite failed; no catalog receipt exists. | S5 conditional contract |

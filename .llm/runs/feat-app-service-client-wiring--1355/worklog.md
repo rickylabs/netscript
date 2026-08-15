@@ -682,3 +682,29 @@ The attempt-4 raw log still hashes to
 browser, Aspire, Docker, lease, evaluator, readiness, lockfile, documentation, template, fixture, or
 third product/test path was touched. Four fresh binding receipts remain pending until this content
 and run state are committed at a clean immutable head.
+
+### F6 binding stop — permission-denied runtime residue
+
+The immutable content head is `7fa29ad3ed10ad903b9cbbd518111e6bf2754761`. The serial binding
+sequence stopped after `test`; no downstream gate ran and no missing receipt was authored.
+
+| Contracted receipt | Invocation ID | Outcome |
+| --- | --- | --- |
+| `receipts/f6-check.json` | `app-service-client-wiring-f6-check` | PASS / exit 0 — 2,944 files, 25 batches, zero diagnostics |
+| `receipts/f6-test.json` | `app-service-client-wiring-f6-test` | FAIL / exit 1 — 4,228 passed, 1 failed, 19 ignored (4,248 total) |
+| `receipts/f6-publish-dry-run.json` | not invoked | missing / NOT_RUN |
+| `receipts/f6-arch-check.json` | not invoked | missing / NOT_RUN |
+
+The sole failure is the unchanged
+`.llm/tools/agentic/teardown/forbidden-commands_test.ts` trying to traverse
+`.llm/tmp/cli-e2e/plugin-smoke-20260815-203755/.data/postgres/18/docker`. That descendant is mode
+`0700` and owned by `dnsmasq:root`; the outer workspace was created at 20:37:56 during S5 attempt 4.
+The teardown test has no diff from `c53726c69` and was last changed by `4634afe56` on 2026-08-03.
+This is earlier runtime-workspace filesystem residue rather than an F6 two-file source regression,
+but a red binding receipt cannot be carried or called sufficient. Nothing was chmodded/deleted,
+there was no retry, and the gate sequence stopped.
+
+`evaluateEvidenceSet` over exactly the four named paths reports **INSUFFICIENT**: `test` is `FAIL`,
+and `publish-dry-run` plus `arch-check` receipts are missing. The check PASS and test FAIL receipts
+both have `gitHead == actualGitHead == 7fa29ad3e` with no mismatch override. Full attribution and
+the preserved-evidence statement are in `reports/f6-binding-test-failure.md`.
