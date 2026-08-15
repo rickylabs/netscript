@@ -72,12 +72,14 @@ fixes #1654 repaired Tier-A finding T-1 at `ebad68c80`, and now holds the single
 terminal results and subsequent merge-readiness decisions. A supervisor's parked checkpoint is
 never itself a reason to yield.
 
-Resume from the authoritative `2026-08-15T04:39:17Z` checkpoint, not the stale paragraph above.
+Resume from the authoritative `2026-08-15T04:48:32Z` checkpoint, not the stale paragraph above.
 #1653's cycle-1 editorial finding is addressed and cycle 2 is live in evaluator `31c4cfa9-…` at
 `84bbcf9a1`. #1654 attempt 1 was interrupted at `database.generate` with no verdict; its exact
 Aspire/Docker residue, network, and Garnet volume were removed and the one retry is authorized under
 the still-exclusive lease. #1652 must first rewrite issue comments `5265826161` and `5265971722` in
-place from a new immutable EIS-Chat baseline, with recalculated feature/effort estimates. #1651 is
+place from authoritative EIS-Chat `5191de83`, with recalculated feature/effort estimates. The
+comments predate the material route improvements already contained in that pin; no newer product
+head exists, and `834a2b36` differs only by harness evidence. #1651 is
 not duplicate overall but remains owner-blocked: wait for option 1 keep-and-narrow, option 2
 remove/defer C6, or option 3 close-as-duplicate. Do not infer the verdict. All topic controllers and
 leaf threads remain the preserved originals; serialization is per topic, not cluster-wide.

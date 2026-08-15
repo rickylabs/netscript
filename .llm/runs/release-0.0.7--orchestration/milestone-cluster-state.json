@@ -464,6 +464,10 @@
         "requestCommentId": 5300459514,
         "targetCommentIds": [5265826161, 5265971722],
         "oldEvidenceHead": "5191de83f3da97559f21d8891c6c8afdf1cf473a",
+        "authoritativeEvidenceHead": "5191de83f3da97559f21d8891c6c8afdf1cf473a",
+        "newerProductHeadExists": false,
+        "evidenceOnlyBranchHead": "834a2b36",
+        "commentChronologyConfirmed": true,
         "state": "running",
         "requireInPlaceReplacement": true
       }
@@ -904,5 +908,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T04:39:17.923Z"
+  "updatedAt": "2026-08-15T04:48:32.669Z"
 }

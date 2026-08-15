@@ -87,8 +87,10 @@
   lane may not amend, reply, resolve, mark ready, or merge before that verdict.
 - Owner comment `5300459514` made the two canonical #1551 case-study comments (`5265826161`,
   `5265971722`) the docs lane's first priority. The preserved docs supervisor and original Codex
-  thread must fetch a new immutable EIS-Chat head, recompute the surfaces and estimates, and replace
-  both comment bodies in place rather than append follow-ups. PR #1652 stays draft and partial.
+  thread must use authoritative EIS-Chat `5191de83`, recompute the surfaces and estimates, and
+  replace both comment bodies in place rather than append follow-ups. The comments predate material
+  route improvements already contained in the pin; `834a2b36` is evidence-only and no newer product
+  head exists. PR #1652 stays draft and partial.
 - #1653 IMPL-EVAL cycle 1 returned `FAIL_FIX` only because superseded acceptance blocks remained in
   the PR body. Internals reproduced the exact 9+5 errors, removed only the stale body blocks, and
   proved exact 9/9 and 5/5 mappings. Fresh cycle 2 is running in native Opus 5/high Remote Control

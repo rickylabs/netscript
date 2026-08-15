@@ -86,3 +86,12 @@ implementation thread.
 - **Editorial evaluator loop:** #1653 cycle 1's only blocker was stale duplicated PR-body evidence;
   the repair changed no code or committed content. A single fresh cycle 2 verifies the live body and
   cycle-1 integrity. Further evaluator cycling requires a new substantive finding.
+
+## 2026-08-15T04:48:32Z — EIS-Chat evidence chronology correction
+
+- **Correction / evidence baseline:** no newer EIS-Chat product head exists. Current default master
+  and the immutable comparison input are both `5191de83`; the later-looking `834a2b36` branch delta
+  is harness evidence only. The two #1551 comments were written before material route changes that
+  are already ancestors of `5191de83`, so the stale surface is the public comment bodies rather than
+  the S2 pin. Recompute and replace both comments against `5191de83`; do not invent a later product
+  ref or open another PLAN-EVAL for this evidence/publication correction.
