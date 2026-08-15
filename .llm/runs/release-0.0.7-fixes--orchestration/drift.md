@@ -134,3 +134,44 @@ It was reverted with `git checkout --` before dispatch and the tree re-verified 
 `ca8773f66` with the barrel back to `total: 50`, so the repair delta is authored by the Codex leaf
 and not by this supervisor. Recorded because a supervisor-authored product change would breach the
 supervise-only law even when the content is deterministic.
+
+## Non-formal efficiency correction — T-3 CI expansion reverted after cycle-2 G-1
+
+Recorded by `topic-fixes-0.0.7` on coordinator disposition; leaf-local record at `ab78faac5`.
+**Formal IMPL-EVAL cycle 2 `PASS` at `3d7819203f59e68eb5b45f6871a03c41ca43cd2f` stands unchanged and
+final. This is not a formal cycle and there is no cycle 3.**
+
+Cycle-2 finding **G-1**, independently re-verified by this orchestrator: root `deno.json` declares
+`workspace: ["packages/*", …]`, which **does** match `packages/fresh-ui`; the earlier "not in the
+root workspace" claim came from filtering workspace entries for the literal string `fresh`, which a
+glob does not contain. Running the root `deno test` with a filter reaches
+`registry-doc-drift.test.ts` and passes (1 passed, exit 0), and the classifier sets
+`needsDeno = true` for both the manifest and the CLI design-asset template under `ci.yml`'s required
+`check-test` job. **#1358's close-gated requirement was therefore already satisfied before the T-3
+amendment existed**, and `fresh-ui-quality.yml` has no test step, so the wiring added zero
+drift-gate coverage and only duplicated check/lint work.
+
+Disposition: return exactly `.github/workflows/fresh-ui-quality.yml`,
+`.github/scripts/ci-classify-changes.ts`, and `.github/scripts/ci-classify-changes.test.ts` to
+current `origin/main` bytes (`e090f894ff3682405a36e4f896ffd2cc16f9a1f8`); retain all core #1358
+product, gate, and barrel work; append truthful journal corrections for T-3/G-1 and G-2. **G-2**:
+the inherited `fresh-browser` receipt is the form-navigation regression and never rendered the
+gallery; static consumer evidence (decoded barrel + drift gate) is accepted. No browser, Aspire,
+Docker, scaffold, or E2E run.
+
+### Orchestrator accountability — a repeated pattern, not an isolated slip
+
+This is the **second** analytical error by this topic orchestrator on this leaf, with the same root
+cause both times: **concluding from a narrow probe instead of executing the check.**
+
+1. **E-1** — verified template↔manifest semantics exhaustively but never asked whether the template
+   is what ships; the shipped barrel still read `total: 50`. Caught by formal IMPL-EVAL cycle 1.
+2. **G-1** — filtered workspace globs for a substring and concluded `packages/fresh-ui` was outside
+   the root workspace; it is not. That false negative drove a blocking Tier-A finding, a coordinator
+   contract amendment, an implementation slice, and now a revert. Caught by formal IMPL-EVAL cycle 2.
+
+Both were caught by formal evaluation, which is the gate working as designed. The cost, however,
+landed on the lane: a supervisor whose probes are weaker than its conclusions manufactures work for
+the agents it supervises. Corrective rule adopted for this lane: **execute the check; never infer a
+negative from a pattern match** — and when a finding would expand a contract, re-derive its premise
+by execution before escalating it.
