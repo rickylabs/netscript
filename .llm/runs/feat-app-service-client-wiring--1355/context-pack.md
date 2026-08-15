@@ -54,7 +54,11 @@ Tier-A released F5 implementation at `630185e2c`. Canonical content is now produ
 post-init service-owner comparison/write; focused coverage and the cheap exact-12 real-scaffold
 proof are green. Four fresh binding receipts PASS at immutable content head `fda78ee438`: check
 selects 2,944 files with zero diagnostics, tests are 4,226/0 with 19 ignored, workspace publish
-dry-run passes, and architecture check has zero failures. Exact-set sufficiency is SUFFICIENT.
+dry-run passes, and architecture check has zero failures. Exact-set sufficiency is SUFFICIENT. S5
+attempt 4 then ran at the unchanged leased evidence head: the runtime suite passed 69 gates,
+including service-client contract and generated format, but failed `behavior.service-client-refetch`
+when its leaf-added probe tried to kill an already-terminated browser child during cleanup. Final
+teardown/leak proof is empty; `fresh-browser` was not run.
 
 ## Completed
 
@@ -106,10 +110,10 @@ dry-run passes, and architecture check has zero failures. Exact-set sufficiency 
 
 ## Next Steps
 
-1. Commit and explicitly push the append-only F5 receipts and final run evidence.
-2. Post the structured F5 implementation receipt on draft PR #1664.
-3. Stop for fresh Tier-A. No expensive gate, lease, readiness transition, or evaluator is
-   authorized.
+1. Commit and explicitly push only the append-only S5 attempt-4 evidence.
+2. Post the structured S5 failure/cleanup receipt on draft PR #1664.
+3. Stop for coordinator disposition. Do not repair the probe or run `fresh-browser` without a new
+   reviewed authorization.
 
 ## Key Decisions
 
@@ -153,8 +157,8 @@ dry-run passes, and architecture check has zero failures. Exact-set sufficiency 
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
 | Static      | Four `f5-*` binding receipts PASS at `fda78ee438`; 4,226/0 tests and exact-set sufficiency SUFFICIENT. All earlier FAIL and superseded evidence remains preserved. | `worklog.md`; binding receipts |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
-| Runtime     | Attempt 3 `scaffold.runtime` FAIL: 32 passed / 1 failed / 0 skipped; repaired service-client contract PASS, pre-existing `generated.deno-fmt-check` FAIL. Cleanup proven empty. | `reports/s5-attempt3-runtime-failure.md`; suite-owned raw log |
-| Consumer    | `fresh-browser` NOT_RUN because the attempt-3 runtime prerequisite failed; no catalog receipt exists. | S5 conditional contract |
+| Runtime     | Attempt 4 `scaffold.runtime` FAIL: 69 passed / 1 failed / 0 skipped; service-client contract and generated format PASS, leaf probe cleanup failed on an already-terminated browser child. Cleanup proven empty. | `reports/s5-attempt4-runtime-failure.md`; suite-owned raw log |
+| Consumer    | `fresh-browser` NOT_RUN because the attempt-4 runtime prerequisite failed; no catalog receipt exists. | S5 conditional contract |
 
 ## Open Questions
 

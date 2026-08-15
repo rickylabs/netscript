@@ -612,3 +612,21 @@ reason list. Older receipts remain append-only evidence and are not included in 
 set. The prior Fresh 45 and SDK 3 `PRE_EXISTING_FAIL` export-map baselines, including the separately
 named plugin-streams `StreamsInstrumentation` diagnostic, remain unchanged. No runtime/browser
 lease, Aspire, Docker, expensive gate, evaluator, readiness, lockfile, or documentation action ran.
+
+## S5 attempt 4 — runtime lease verdict
+
+The singleton lease at central `4619f4408` was bound to leaf evidence head `1263f655b` and content
+head `fda78ee438`. The suite executed at exactly `1263f655b`; no pre-gate commit moved the leased
+head. `scaffold.runtime` returned exit 1 with `passed=69 failed=1 skipped=0`. The repaired
+`generated.service-client-contract` and `generated.deno-fmt-check` gates both passed. The sole
+failure was `behavior.service-client-refetch`: its leaf-added browser probe unconditionally called
+`child.kill('SIGTERM')` in `finally` after the child had already terminated, throwing before the
+collected evidence could be returned. The probe path is absent at pre-implementation `c53726c69`,
+so the failure is leaf-caused rather than carried. Raw output and attribution are preserved in
+`reports/s5-attempt4-runtime-failure.md` and the hashed attempt-4 log.
+
+Suite cleanup passed. Run-owned teardown applied with no stopped AppHosts, removed containers, or
+escalations. The final leak check reports Aspire `ok`, Docker `ok`, and `survivors: []`; Aspire MCP
+start helpers were untouched. Because the prerequisite suite failed, `fresh-browser` is `NOT_RUN`
+and no receipt exists. No repair, retry, evaluator, readiness, lockfile, or documentation action
+occurred under the lease.
