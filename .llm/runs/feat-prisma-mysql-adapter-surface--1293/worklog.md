@@ -226,3 +226,69 @@ symbol. The already-published `PrismaMySqlQuery` shape is unchanged.
 - Package TypeScript format check: 0 findings.
 - Structured doc lint: 0 findings, exit 0.
 - Raw publish dry-run: exit 0, eight files.
+
+## S1 Tier-A fix-up — S1-F1 and S1-N1
+
+Tier-A review found that the initial `PrismaMySqlQuery` declaration was mutually non-assignable
+with Prisma 7.8.0's `SqlQuery`, and that `query as SqlQuery` hid a real input-contract mismatch.
+The fix-up takes review option (a):
+
+- `scalarType` is the exact 12-member lowercase literal union from upstream `ArgScalarType`;
+- `dbType?: string` is optional;
+- `arity: 'scalar' | 'list'` is required;
+- the overload pairs and `as SqlQuery` assertions are removed; and
+- `surface_test.ts` assigns `PrismaMySqlQuery` to `SqlQuery` and back at compile time.
+
+The deliberately noted return-path widening in `PrismaMySqlResultSet.columnTypes` remains unchanged.
+
+### Raw doc lint after the Tier-A fix-up
+
+Command:
+
+```text
+deno doc --lint packages/prisma-adapter-mysql/mod.ts
+```
+
+Raw output and exit code:
+
+```text
+Checked 1 file
+EXIT_CODE=0
+```
+
+### Raw publish dry-run after the Tier-A fix-up
+
+Command (cwd `packages/prisma-adapter-mysql`):
+
+```text
+deno publish --dry-run --allow-dirty
+```
+
+Raw output and exit code (terminal ANSI styling removed; no output omitted):
+
+```text
+Checking for slow types in the public API...
+Simulating publish of @netscript/prisma-adapter-mysql@0.0.6 with files:
+   file:///home/codex/repos/netscript-007-features-1293/packages/prisma-adapter-mysql/README.md (4.87KB)
+   file:///home/codex/repos/netscript-007-features-1293/packages/prisma-adapter-mysql/deno.json (677B)
+   file:///home/codex/repos/netscript-007-features-1293/packages/prisma-adapter-mysql/mod.ts (94B)
+   file:///home/codex/repos/netscript-007-features-1293/packages/prisma-adapter-mysql/src/adapter.ts (21.16KB)
+   file:///home/codex/repos/netscript-007-features-1293/packages/prisma-adapter-mysql/src/conversion.ts (8.1KB)
+   file:///home/codex/repos/netscript-007-features-1293/packages/prisma-adapter-mysql/src/errors.ts (4.99KB)
+   file:///home/codex/repos/netscript-007-features-1293/packages/prisma-adapter-mysql/src/mod.ts (1.49KB)
+   file:///home/codex/repos/netscript-007-features-1293/packages/prisma-adapter-mysql/src/types.ts (3.15KB)
+Success Dry run complete
+EXIT_CODE=0
+```
+
+The final package-isolated surface rows are:
+
+```text
+MAJOR PrismaMySqlAdapterFactory: export signature changed
+MAJOR PrismaMySqlConnectedAdapter: export signature changed
+MAJOR PrismaMySqlQuery: export signature changed
+MAJOR PrismaMySqlTransactionAdapter: export signature changed
+MINOR PrismaMySqlTransactionOptions: symbol added
+```
+
+`PrismaMySqlAdapter` remains absent from the root snapshot.

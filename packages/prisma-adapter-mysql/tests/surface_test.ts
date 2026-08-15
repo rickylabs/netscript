@@ -1,8 +1,14 @@
 import { assertEquals, assertFalse } from 'jsr:@std/assert@1';
+import type { SqlQuery } from '@prisma/driver-adapter-utils';
 
 import * as publicApi from '../mod.ts';
 import { PrismaMySqlAdapter } from '../src/adapter.ts';
-import type { PrismaMySqlTransactionOptions } from '../mod.ts';
+import type { PrismaMySqlQuery, PrismaMySqlTransactionOptions } from '../mod.ts';
+
+const _toUpstream: SqlQuery = {} as PrismaMySqlQuery;
+const _fromUpstream: PrismaMySqlQuery = {} as SqlQuery;
+void _toUpstream;
+void _fromUpstream;
 
 Deno.test('root surface exposes transaction options without the concrete adapter', () => {
   const options: PrismaMySqlTransactionOptions = { usePhantomQuery: false };

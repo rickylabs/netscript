@@ -104,15 +104,11 @@ class MySqlQueryable<TClient extends MysqlQueryableClient> implements SqlQueryab
   /**
    * Execute a raw SQL query and return results.
    */
-  queryRaw(query: SqlQuery): Promise<SqlResultSet>;
-  queryRaw(query: PrismaMySqlQuery): Promise<PrismaMySqlResultSet>;
-  async queryRaw(
-    query: SqlQuery | PrismaMySqlQuery,
-  ): Promise<SqlResultSet> {
+  async queryRaw(query: SqlQuery): Promise<SqlResultSet> {
     const tag = '[js::query_raw]';
     debug(`${tag} %O`, query);
 
-    const result = await this.performIO(query as SqlQuery);
+    const result = await this.performIO(query);
 
     const fields = result.fields ?? [];
     const columnNames = fields.map((f) => f.name);
@@ -132,13 +128,11 @@ class MySqlQueryable<TClient extends MysqlQueryableClient> implements SqlQueryab
   /**
    * Execute a raw SQL statement and return affected row count.
    */
-  executeRaw(query: SqlQuery): Promise<number>;
-  executeRaw(query: PrismaMySqlQuery): Promise<number>;
-  async executeRaw(query: SqlQuery | PrismaMySqlQuery): Promise<number> {
+  async executeRaw(query: SqlQuery): Promise<number> {
     const tag = '[js::execute_raw]';
     debug(`${tag} %O`, query);
 
-    const result = await this.performIO(query as SqlQuery);
+    const result = await this.performIO(query);
     return result.affectedRows ?? 0;
   }
 
@@ -455,11 +449,23 @@ export interface PrismaMySqlQuery {
   /** Prisma argument metadata for each argument. */
   argTypes: Array<{
     /** Prisma scalar type name. */
-    scalarType: string;
+    scalarType:
+      | 'string'
+      | 'int'
+      | 'bigint'
+      | 'float'
+      | 'decimal'
+      | 'boolean'
+      | 'enum'
+      | 'uuid'
+      | 'json'
+      | 'datetime'
+      | 'bytes'
+      | 'unknown';
     /** Database-specific type name. */
-    dbType: string;
+    dbType?: string;
     /** Whether the argument is a scalar or list. */
-    arity?: 'scalar' | 'list';
+    arity: 'scalar' | 'list';
   }>;
 }
 

@@ -17,6 +17,10 @@ rows. No baseline or major-declaration file was edited to conceal the repository
 
 `PrismaMySqlQuery` was already public but is not identical to Prisma 7.8.0's `SqlQuery`: its
 `scalarType` is broader, `dbType` is required, and `arity` is optional. Tightening that shipped
-alias would have created an unruled breaking delta. S1 preserves it and adds internal overloads so
-the concrete adapter satisfies both Prisma's driver contract and the package-owned connected
-interface. No runtime behavior changes.
+alias creates an additional surface signature row.
+
+The initial S1 commit preserved the old shape with internal overloads, but Tier-A review rejected
+that workaround because the widened input admitted values `mapArg` cannot honor and the
+`as SqlQuery` assertion hid the incompatibility. The fix-up therefore makes the package-owned type
+structurally exact, removes the overloads/assertion, and adds bidirectional compile-time guards.
+This entry records the discovery and superseded approach; the fix-up is authoritative.
