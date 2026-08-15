@@ -1,0 +1,38 @@
+{
+  "gateId": "quality-scan",
+  "invocationId": "quality-root-coverage-s2-red-forwarding",
+  "argv": [
+    "deno",
+    "task",
+    "quality:scan",
+    "--changed-file",
+    ".llm/tools/quality/check-root-coverage.ts"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-root-coverage",
+  "gitHead": "98360da7b0c887ca8f995779dbf54343dff3ce98",
+  "actualGitHead": "98360da7b0c887ca8f995779dbf54343dff3ce98",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:01a003d2-61ee-7ec0-8c74-075b3d631168",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "8c8a1a9dddb780574d0911494834a436461fa4be175e16665dbce5263d868cc6",
+  "lifecycleId": "codex:01a003d2-61ee-7ec0-8c74-075b3d631168:quality-root-coverage-s2-red-forwarding:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-15T06:15:16.022Z",
+  "startedAt": "2026-08-15T06:15:16.026Z",
+  "finishedAt": "2026-08-15T06:15:16.241Z",
+  "durationMs": 215,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 3811,
+    "sha256": "8273ead49db728e9537ffcfa8e54b7fbc14feb71252cd64f2e6f3f0287d20aa4",
+    "tail": "{\"ok\":false,\"census\":{\"workspaceMembers\":37,\"membersInsideBoundary\":37,\"publishableMembersInsideBoundary\":35},\"boundary\":{\"includedParents\":[\"packages/**\",\"plugins/**\"],\"description\":\"The #1542 denominator is limited to workspace members under packages/** and plugins/**.\",\"excludedWorkspaceMembers\":{\"count\":0,\"paths\":[],\"reason\":\"outside packages/** and plugins/**\"}},\"publishableMembers\":[\"packages/ai\",\"packages/aspire\",\"packages/auth-better-auth\",\"packages/auth-kv-oauth\",\"packages/auth-workos\",\"packages/cli\",\"packages/config\",\"packages/contracts\",\"packages/cron\",\"packages/database\",\"packages/fresh\",\"packages/fresh-ui\",\"packages/kv\",\"packages/logger\",\"packages/mcp\",\"packages/plugin\",\"packages/plugin-ai-core\",\"packages/plugin-auth-core\",\"packages/plugin-sagas-core\",\"packages/plugin-streams-core\",\"packages/plugin-triggers-core\",\"packages/plugin-workers-core\",\"packages/prisma-adapter-mysql\",\"packages/queue\",\"packages/runtime-config\",\"packages/sdk\",\"packages/service\",\"packages/telemetry\",\"packages/watchers\",\"plugins/ai\",\"plugins/auth\",\"plugins/sagas\",\"plugins/streams\",\"plugins/triggers\",\"plugins/workers\"],\"excludedNonPublishableMembers\":[{\"path\":\"packages/bench\",\"reason\":\"publish:false\"},{\"path\":\"packages/cli/e2e\",\"reason\":\"publish:false\"}],\"qualityTasks\":[{\"task\":\"quality:scan\",\"configuredRoots\":[\"docs/site\",\"packages/cli/src\",\"plugins\"],\"uncoveredPublishedMembers\":[\"packages/ai\",\"packages/aspire\",\"packages/auth-better-auth\",\"packages/auth-kv-oauth\",\"packages/auth-workos\",\"packages/cli\",\"packages/config\",\"packages/contracts\",\"packages/cron\",\"packages/database\",\"packages/fresh\",\"packages/fresh-ui\",\"packages/kv\",\"packages/logger\",\"packages/mcp\",\"packages/plugin\",\"packages/plugin-ai-core\",\"packages/plugin-auth-core\",\"packages/plugin-sagas-core\",\"packages/plugin-streams-core\",\"packages/plugin-triggers-core\",\"packages/plugin-workers-core\",\"packages/prisma-adapter-mysql\",\"packages/queue\",\"packages/runtime-config\",\"packages/sdk\",\"packages/service\",\"packages/telemetry\",\"packages/watchers\"]},{\"task\":\"quality:scan:repo\",\"configuredRoots\":[\".llm/tools/fitness\",\".llm/tools/quality\",\"docs/site\",\"packages\",\"plugins\"],\"uncoveredPublishedMembers\":[]}],\"doctrine\":{\"configuredRoots\":[\"packages/ai\",\"packages/aspire\",\"packages/auth-better-auth\",\"packages/auth-kv-oauth\",\"packages/auth-workos\",\"packages/bench\",\"packages/cli\",\"packages/config\",\"packages/contracts\",\"packages/cron\",\"packages/database\",\"packages/fresh\",\"packages/fresh-ui\",\"packages/kv\",\"packages/logger\",\"packages/mcp\",\"packages/plugin\",\"packages/plugin-ai-core\",\"packages/plugin-auth-core\",\"packages/plugin-sagas-core\",\"packages/plugin-streams-core\",\"packages/plugin-triggers-core\",\"packages/plugin-workers-core\",\"packages/prisma-adapter-mysql\",\"packages/queue\",\"packages/runtime-config\",\"packages/sdk\",\"packages/service\",\"packages/telemetry\",\"packages/watchers\",\"plugins/ai\",\"plugins/auth\",\"plugins/sagas\",\"plugins/streams\",\"plugins/triggers\",\"plugins/workers\"],\"uncoveredPublishedMembers\":[]},\"scannerTraversal\":{\"observedByChecker\":false,\"traversedPaths\":null,\"note\":\"configuredRoots are configuration coverage only; scanner mode and traversed paths belong to the scanner run report\"},\"errors\":[\"quality:scan does not cover: packages/ai, packages/aspire, packages/auth-better-auth, packages/auth-kv-oauth, packages/auth-workos, packages/cli, packages/config, packages/contracts, packages/cron, packages/database, packages/fresh, packages/fresh-ui, packages/kv, packages/logger, packages/mcp, packages/plugin, packages/plugin-ai-core, packages/plugin-auth-core, packages/plugin-sagas-core, packages/plugin-streams-core, packages/plugin-triggers-core, packages/plugin-workers-core, packages/prisma-adapter-mysql, packages/queue, packages/runtime-config, packages/sdk, packages/service, packages/telemetry, packages/watchers\"]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 365,
+    "sha256": "7dd1ce95148bb849342044edef172f67f622f884b083267e7ba23c4f28094037",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mquality:scan\u001b[0m deno run --allow-read .llm/tools/quality/check-root-coverage.ts && deno run --allow-read --allow-net=api.github.com --allow-env=GITHUB_TOKEN,GH_TOKEN .llm/tools/quality/scan-code-quality.ts --root packages/cli/src --root plugins --root docs/site --max-allow 7 '--changed-file' '.llm/tools/quality/check-root-coverage.ts'\n",
+    "truncated": false
+  }
+}
