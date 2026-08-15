@@ -2,21 +2,21 @@
 
 ## Run Metadata
 
-| Field          | Value                                                     |
-| -------------- | --------------------------------------------------------- |
-| Run ID         | `fix-sdk-typed-error-channel--0.0.7-wave1`                |
-| Branch         | `fix/sdk-typed-error-channel`                             |
-| Current phase  | `plan` — awaiting scope/ownership ruling before PLAN-EVAL |
-| Archetype      | `1 — Small Contract` slice                                |
-| Scope overlays | `docs`                                                    |
+| Field          | Value                                                          |
+| -------------- | -------------------------------------------------------------- |
+| Run ID         | `fix-sdk-typed-error-channel--0.0.7-wave1`                     |
+| Branch         | `fix/sdk-typed-error-channel`                                  |
+| Current phase  | `plan` — amended; awaiting fresh Tier-A review, then PLAN-EVAL |
+| Archetype      | `1 — Small Contract` slice                                     |
+| Scope overlays | `docs`                                                         |
 
 ## Current state
 
 Research and a concrete error contract are complete. No product or docs implementation exists. The
 base RED is TS2339 because `safe()` erases `TError` and `isDefinedError()` narrows the result to
-`never`. Exact end-to-end repair cannot fit the declared five-file surface because
-`packages/sdk/src/ports/service-client.ts` is the loss point. Procedure metadata additionally has a
-live owner conflict with #1466 and requires the curated contracts barrel if assigned here.
+`never`. The coordinator authorized `packages/sdk/src/ports/service-client.ts` as the sixth and
+final product path. #1466 owns metadata definition/export; this leaf keeps only the existing fourth
+generic slot as `Record<never, never>` and makes no metadata semantic claim.
 
 ## Completed
 
@@ -28,11 +28,9 @@ live owner conflict with #1466 and requires the curated contracts barrel if assi
 
 ## Next steps
 
-1. Topic orchestrator rules on `packages/sdk/src/ports/service-client.ts` scope.
-2. Topic orchestrator rules whether #1350 supersedes #1466 for procedure metadata and, if so,
-   authorizes `packages/contracts/src/public/mod.ts` plus any required SDK metadata type surface.
-3. Update the plan with that ruling if needed; separate session performs PLAN-EVAL.
-4. Only after PLAN-EVAL PASS may implementation begin.
+1. Fresh Tier-A reviews the amended head.
+2. A separate session performs PLAN-EVAL after that review passes.
+3. Only after PLAN-EVAL PASS may implementation begin.
 
 ## Key decisions
 
@@ -40,7 +38,9 @@ live owner conflict with #1466 and requires the curated contracts barrel if assi
 - `SafeResult` gains literal defined/non-defined failure arms and failure `data: undefined`.
 - No broad fallback error union; error identity must originate in the real client promise.
 - Breaking published change, not patch-level.
-- No new SDK error export; metadata exports are conditional on ownership ruling.
+- No new export. The empty fourth metadata generic remains explicit; all metadata vocabulary belongs
+  to #1466.
+- The exact six-path ceiling is locked; any seventh product/test/docs path requires a fresh ruling.
 
 ## Files changed
 
@@ -56,12 +56,12 @@ launcher-created `codex-thread-ids.md` is preserved. No declared product/doc fil
 
 ## Open questions
 
-- Required sixth file authorization.
-- Metadata owner and required barrel/SDK metadata scope.
-- Disposition of already-stale out-of-scope contracts/benchmark prose.
+- None that can force implementation rework. Stale contracts/benchmark prose is tracked follow-up
+  debt outside the six-path ceiling.
 
 ## Drift and debt
 
-- Drift: significant scope and live-ownership conflicts; see `drift.md`.
+- Drift: the earlier scope and ownership conflicts are resolved by the coordinator amendment; see
+  the append-only resolution in `drift.md`.
 - Debt: no new debt accepted.
 - Commit trail: draft PR commit list plus phase comment; no `commits.md`.

@@ -39,3 +39,16 @@
 - **Evidence:** `packages/bench/tasks/t1-storefront-api/reference/README.md:45-47`;
   `packages/bench/tasks/t1-storefront-api/reference/netscript/router.ts:7-8`;
   `packages/contracts/README.md:13-76`.
+
+## 2026-08-15 — Coordinator resolution locks six paths and #1466 metadata ownership
+
+- **What:** The coordinator corrected the original brief after reconciling #1348's amendment and
+  #1350 comment 5227724542.
+- **Resolution:** `packages/sdk/src/ports/service-client.ts` is authorized as the sixth and final
+  product path. Any seventh product/test/docs path requires a fresh ruling.
+- **Metadata:** #1466 owns definition, initialization, export, and semantic proof. #1350 retains
+  only the explicit fourth generic slot as `Record<never, never>` and introduces no vocabulary.
+- **Denied:** The contracts public barrel and all metadata export work.
+- **Deferred:** Stale contracts/benchmark prose remains tracked follow-up debt outside this leaf.
+- **Phase effect:** The plan has no remaining must-resolve decision, but fresh Tier-A review and a
+  separate PLAN-EVAL `PASS` remain hard stops before implementation.

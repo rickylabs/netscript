@@ -8,17 +8,17 @@
   inference after metadata initialization (`rfcs/0001-sdk-client-contributions.md:1317-1333`) and
   keeps contribution/preparation failures outside the contract-defined channel
   (`rfcs/0001-sdk-client-contributions.md:1032-1088`).
-- Normative for the builder: RFC 0001 requires an explicit publishable annotation preserving both
-  the concrete common error map and `NetScriptProcedureMeta`, and rejects the current
+- Normative for the builder: RFC 0001 requires an explicit publishable annotation that preserves the
+  concrete common error map and the fourth metadata generic, and rejects the current
   `ReturnType<typeof oc.errors>` spelling (`rfcs/0001-sdk-client-contributions.md:347-370`).
-- Normative for this lane: the slice brief says #1350 owns procedure-metadata preservation and
-  limits changes to five declared files. This conflicts with current GitHub state: #1466 is an open
-  child titled “define NetScriptProcedureMeta without erasing contract errors,” and #1350's only
-  existing comment says metadata initialization is not owned by #1350. RFC 0001 itself records that
-  Stage 0 had to choose #1350 or a dependent child
-  (`rfcs/0001-sdk-client-contributions.md:1267-1277`). The brief is treated as the latest
-  instruction for planning, but the contradictory live ownership cannot be verified and needs the
-  topic orchestrator's ruling before implementation.
+- Normative coordinator amendment on 2026-08-15: #1350 owns only the literal-preserving error
+  repair. #1466 owns procedure-metadata definition, initialization, and export. This supersedes the
+  earlier brief wording and resolves the conflict recorded in the original research. This leaf keeps
+  the fourth generic explicitly as `Record<never, never>` so #1466 can replace it later, but does
+  not define, export, or semantically prove any metadata vocabulary.
+- Normative scope ceiling: the original five paths plus `packages/sdk/src/ports/service-client.ts`
+  are the exact six authorized product/test/docs paths. Any seventh path requires a fresh
+  coordinator ruling.
 
 ## 1. Current error path and exact loss points
 
@@ -128,13 +128,13 @@ rg -n '\bServiceClient(Method|Shape|<)|Procedure(Output|Input)FromNode' \
 
 ### Outside `packages/sdk`
 
-| Consumer                           | Evidence                                                                                                                                                                                                                                    | Consequence                                                                                                                                                                                            |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `@netscript/fresh` diagnostics     | `packages/fresh/src/diagnostics/error/extract.ts:1-39`                                                                                                                                                                                      | Imports `isDefinedError`, then manually casts code/status. It must still compile and preserve runtime detection; it is the only non-SDK package source importing the helper.                           |
-| `@netscript/contracts/crud`        | `packages/contracts/crud/create-crud-contract.ts:29-44,109-117,350-379`                                                                                                                                                                     | Directly consumes public `baseContract` and `BaseContractRoute`; exact error/meta generics must remain assignable.                                                                                     |
-| Workers health soundness test      | `plugins/workers/services/src/routers/health-soundness_test.ts:3-53`                                                                                                                                                                        | Asserts `BaseContractRoute` handler inference; metadata/error tightening must not regress input/output soundness.                                                                                      |
-| CLI scaffold/template assertions   | `packages/cli/e2e/tests/application/gates/generated-router-template_test.ts:35-41`; `packages/cli/src/kernel/adapters/contracts/contract-source.ts:63-77`; `packages/cli/src/public/features/plugins/new/new-plugin-use-case.ts:390-416`    | Some generated contracts import root `baseContract`; the parser recognizes its route chain. No template change is planned.                                                                             |
-| Benchmark/reference/docs consumers | `packages/bench/tasks/t1-storefront-api/rubric.md:16`; `packages/bench/tasks/t1-storefront-api/reference/README.md:45-47`; `packages/bench/tasks/t1-storefront-api/reference/netscript/router.ts:7-8`; `packages/contracts/README.md:13-76` | Several statements explicitly describe the current erasure. They become stale after repair but are outside the declared surface, creating another documentation rescope question for the orchestrator. |
+| Consumer                           | Evidence                                                                                                                                                                                                                                    | Consequence                                                                                                                                                                  |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@netscript/fresh` diagnostics     | `packages/fresh/src/diagnostics/error/extract.ts:1-39`                                                                                                                                                                                      | Imports `isDefinedError`, then manually casts code/status. It must still compile and preserve runtime detection; it is the only non-SDK package source importing the helper. |
+| `@netscript/contracts/crud`        | `packages/contracts/crud/create-crud-contract.ts:29-44,109-117,350-379`                                                                                                                                                                     | Directly consumes public `baseContract` and `BaseContractRoute`; exact error/meta generics must remain assignable.                                                           |
+| Workers health soundness test      | `plugins/workers/services/src/routers/health-soundness_test.ts:3-53`                                                                                                                                                                        | Asserts `BaseContractRoute` handler inference; metadata/error tightening must not regress input/output soundness.                                                            |
+| CLI scaffold/template assertions   | `packages/cli/e2e/tests/application/gates/generated-router-template_test.ts:35-41`; `packages/cli/src/kernel/adapters/contracts/contract-source.ts:63-77`; `packages/cli/src/public/features/plugins/new/new-plugin-use-case.ts:390-416`    | Some generated contracts import root `baseContract`; the parser recognizes its route chain. No template change is planned.                                                   |
+| Benchmark/reference/docs consumers | `packages/bench/tasks/t1-storefront-api/rubric.md:16`; `packages/bench/tasks/t1-storefront-api/reference/README.md:45-47`; `packages/bench/tasks/t1-storefront-api/reference/netscript/router.ts:7-8`; `packages/contracts/README.md:13-76` | Several statements explicitly describe the current erasure. They become stale after repair but are tracked follow-up debt outside this leaf's exact six-path ceiling.        |
 
 First-party plugin-core files found by the base-contract search define their own local
 `baseContract: ReturnType<typeof oc.errors>` rather than importing `@netscript/contracts`
@@ -196,20 +196,16 @@ unless `packages/sdk/src/ports/service-client.ts` is changed.
   red. Its helper also reports a slow-type warning by counting the “Checking for slow types” banner;
   raw `deno publish --dry-run --allow-dirty` exits 0 with no actual slow-type diagnostic. Record the
   raw result as authority per `netscript-tools`.
-- No new entrypoint is needed for the error repair. If metadata is in this leaf, RFC 0001 requires
-  new root exports, which cannot be achieved within the declared files because the curated barrel is
-  `packages/contracts/src/public/mod.ts:1-6`.
+- No new entrypoint is needed or authorized. `packages/contracts/src/public/mod.ts` is explicitly
+  denied for this leaf; there is no metadata definition/export branch in the approved plan.
 
-## Open questions requiring a ruling
+## Coordinator ruling and remaining deferred scope
 
-1. **Scope expansion:** authorize `packages/sdk/src/ports/service-client.ts`. Without it, exact
-   procedure error inference is impossible and the accepted error contract cannot be met.
-2. **Metadata owner:** does this brief supersede live #1466 and #1350's existing maintainer comment?
-   If yes, authorize `packages/contracts/src/public/mod.ts` (and likely the SDK contract metadata
-   port/type surface) so the RFC-mandated root metadata exports and propagation can exist. If no,
-   #1350 should preserve the fourth `ContractBuilder` generic as `Record<never, never>` and leave
-   initialization/export/propagation to #1466.
-3. **Stale but out-of-scope published prose:** authorize updates to `packages/contracts/README.md`
-   and benchmark reference prose that explicitly says the root base contract is erased, or accept a
-   tracked docs follow-up. Leaving those statements unchanged would violate the brief's own
-   surrounding-narrative rule.
+1. **Resolved:** `packages/sdk/src/ports/service-client.ts` is the authorized sixth path. It is
+   required to preserve the real promise error channel.
+2. **Resolved:** #1466 owns metadata definition, initialization, and export. #1350 preserves only
+   the existing fourth `ContractBuilder` generic as `Record<never, never>` and makes no metadata
+   semantic claim.
+3. **Safe to defer:** `packages/contracts/README.md` and benchmark reference prose remain tracked
+   follow-up debt. They are not authorized here. Any attempt to edit either location—or any other
+   seventh product/test/docs path—is a rescope requiring a fresh ruling.
