@@ -1494,3 +1494,56 @@ the four contracted receipts at the committed content head with sufficiency reco
 files named, the evaluator's binding D7 raw-output condition, and the draft PR carrying
 **`Part of #1293`** with no closing keyword, box 1 marked "not discharged as worded" and box 4 marked
 blocked on #1112.
+
+### S3 Tier-A — accepted; leaf is IMPL-EVAL-ready
+
+| Field | Value |
+| --- | --- |
+| Content head | `3dee41263e5e34a9f59972edb43a345c8d4494c0` |
+| Evidence head | `d8d255bdc103eb120cc7b8835dfe3ce870017c32` (local == remote) |
+| PR | **#1662**, open **draft**, milestone `0.0.7`, exactly one `status:impl` |
+| Labels | `status:impl, wave:v1, type:feat, gate:jsr, priority:p2, area:database, area:packages` |
+
+**Four contracted receipts, verified field by field and sufficiency recomputed by hand:**
+
+| invocationId | gateId | outcome | exit | `gitHead == actualGitHead == 3dee41263` | override |
+| --- | --- | --- | --- | --- | --- |
+| `prisma-mysql-1293-check` | `check` | PASS | 0 | yes | absent |
+| `prisma-mysql-1293-test` | `test` | PASS | 0 | yes | absent |
+| `prisma-mysql-1293-publish-dry-run` | `publish-dry-run` | PASS | 0 | yes | absent |
+| `prisma-mysql-1293-arch-check` | `arch-check` | PASS | 0 | yes | absent |
+
+Four distinct `gateId`s, so the `evidence-set.ts` duplicate rule does not fire. **SUFFICIENT**,
+recomputed rather than read.
+
+**The close contract held exactly.** A scan of the PR body for `closes #` / `fixes #` / `resolves #`
+returns **nothing**; line 4 carries `Part of #1293.`; #1112 is referenced without a keyword; and the
+body states the remaining scope explicitly rather than leaving the absent keyword to imply it.
+
+**The `acceptance-evidence` block is honest, which is the whole point of split-close.** Box 1 reads
+"Not discharged as worded under PLAN-EVAL R2.1/R2.2" and explains what satisfies the stated need
+instead; box 4 reads "Blocked on #1112. This product change supplies its implementation
+prerequisite". Neither is ticked. A block that mirrored the checkboxes by asserting completion would
+have been the #260 failure this gate exists to stop — and it would have passed a naive close-gate.
+
+**The evaluator's D7 condition is discharged.** `worklog.md` carries the raw
+`deno doc --lint packages/prisma-adapter-mysql/mod.ts` invocation, its output (`Checked 1 file`) and
+exit code, plus the raw `deno publish --dry-run` tail (`Success Dry run complete`) and eight-file
+list, at the content head — not summaries. That was the explicit condition for accepting D7's
+four-receipt scoping.
+
+**Boundaries held across the whole range `284dda90a..d8d255bdc`:** no `docs/**` path and no
+`deno.lock` in the diff. `docs/site/reference/prisma-adapter-mysql/index.md:23` — which becomes false
+on merge — is **named in the PR and in leaf `drift.md`, and left unedited** for the docs lane. The
+example now imports `../mod.ts` and stays outside the publish set.
+
+### Stopping here — IMPL-EVAL needs a coordinator grant
+
+The leaf is implementation-complete and evidence-complete. IMPL-EVAL is mandatory for this work
+(`lane-policy.md:46`, native opposite-family, Fable 5 · medium for Codex work) and this lane holds
+**no** standing evaluator-dispatch grant — the PLAN-EVAL grant was explicit, one-shot, and closed
+with "do not launch another evaluator". Requesting the dispatch grant rather than assuming it.
+
+Also carried up, unchanged and still owner/coordinator business: #1293 acceptance **box 1** will
+remain unticked by design under R2.1/R2.2. Rewording it is an issue edit no one in this lane may
+make.
