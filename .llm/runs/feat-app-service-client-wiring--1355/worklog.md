@@ -316,3 +316,23 @@ export-map doc lint PASS; Fresh export-map doc lint `PRE_EXISTING_FAIL` with 45 
 diagnostics; SDK export-map doc lint `PRE_EXISTING_FAIL` with three attributed diagnostics, including
 the separately named plugin-streams `StreamsInstrumentation` finding; all three JSR audits exit 0
 with warnings only, and all three per-member isolated declaration/publish dry-runs pass.
+
+## S5 gate 1 failure — F3 authorization amendment
+
+The coordinator leased and ran `scaffold.runtime` at PR/evidence head `b14975af7`; the suite reported
+six passed and one failed. `scaffold.service-client-add` and
+`scaffold.service-client-generate` both passed against the real generated project. The static
+`generated.service-client-contract` probe failed with the three compiler diagnostics preserved in
+`.llm/tmp/cli-e2e/plugin-smoke-20260815-175817.log`: one TS2307 for the not-yet-generated
+`database/postgres/schema/.generated/zod/crud.ts`, plus two TS2345 diagnostics because its shared
+plan-derived input does not satisfy the generated payments list contract. Cleanup passed, the
+checked-in `leak-report.md` records no surviving Aspire resources, and the central lease was
+released before any repair.
+
+F3 is bounded to the existing service-client runtime probe, its unit test, the service/runtime suite
+ordering and order-sensitive registry test, plus run artifacts. The locked design reorders the
+already-owned standalone database codegen gate before the static probe, adds an explicit
+generated-schema precondition, derives separate inputs from the two real generated contract schemas,
+and replaces index-zero-only tail equality with own/cross resource-prefix and per-service input
+assertions. Exact design and negative tests are recorded in `plan.md`. No product file changes until
+this amendment is committed and explicitly pushed.

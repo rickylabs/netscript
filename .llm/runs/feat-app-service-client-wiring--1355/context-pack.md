@@ -39,7 +39,12 @@ baseline across a 500 ms quiet window, and adds late-initial-request plus source
 (focused probe file: 8/0). The two receipts at `787cfa928` are superseded-only. Four replacement
 binding receipts now PASS at corrected content head `2c8219968`: check has zero diagnostics, tests
 are 4,210/0 with 19 ignored, workspace publish dry-run passes, and architecture check has zero
-failures. Exact-set recomputation is SUFFICIENT. No lease or expensive command is authorized.
+failures. Exact-set recomputation is SUFFICIENT. A subsequently leased `scaffold.runtime` run at
+`b14975af7` passed both real add/generate gates but failed the static contract probe (6 passed / 1
+failed): database codegen still followed the probe, leaving the real generated Zod import absent,
+and the probe reused a users-shaped input against the offset-based payments contract. Cleanup passed,
+the leak report is clean, and the lease was released before F3 repair. F3 scope/design is being
+committed before product edits; no new lease or expensive command is authorized.
 
 ## Completed
 
@@ -80,15 +85,17 @@ failures. Exact-set recomputation is SUFFICIENT. No lease or expensive command i
 
 ## In Progress
 
-- S4-F2 recovery evidence is complete and awaits fresh Tier-A review. The four current
-  `s4-f2-fix1-*` receipts attest `2c8219968` and recompute SUFFICIENT. The
-  `s4-f2-{check,test}.json` receipts at `787cfa928` remain superseded-only, and S5 remains blocked.
+- F3 authorization amendment: reorder the already-owned database codegen prerequisite, derive
+  per-service inputs from real generated contracts, replace false tail equality, and bind missing-
+  schema/divergent-input negatives. The `s4-f2-fix1-*` receipts remain valid for `2c8219968` but
+  become superseded after the repair content head; S5 and both expensive gates are blocked.
 
 ## Next Steps
 
-1. Commit and push the four generated receipts and evidence summary.
-2. Post the structured S4 receipt comment naming each current receipt and the superseded pair.
-3. Stop for fresh Tier-A review; keep S5 and both expensive gates lease-blocked.
+1. Commit and explicitly push the F3 plan/worklog/context amendment before product edits.
+2. Implement only the four bounded CLI E2E probe/suite/test files and run affected cheap tests.
+3. Generate four fresh `s4-f3-*` binding receipts, recompute exact-set sufficiency, post the receipt
+   comment, and stop for Tier-A with all expensive gates lease-blocked.
 
 ## Key Decisions
 

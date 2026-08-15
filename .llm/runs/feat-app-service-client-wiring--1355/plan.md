@@ -211,6 +211,7 @@ behavior in `packages/fresh/README.md`.
 | S3 — canonical hydration/docs | Pass cache age in both islands, add generated-output omission coverage and public-wrapper browser fixture/task, and write both ruled package README notes. The CLI README includes the exact six-symbol/namespace migration, L1/L2 dialect, whole-command flags, pre-write contract failure (Aspire included), expected contract path/export, and `Enabled: false` module policy.                                                                                                                                                                                                                                                          | `packages/cli/src/kernel/assets/app/routes/examples/(_islands)/{ServiceShowcaseLab.tsx.template,ServiceShowcaseLab.memory.tsx.template}`; `packages/cli/src/kernel/assets/embedded.generated.ts`; `packages/cli/src/kernel/templates/app/route-templates_test.ts`; `packages/cli/README.md`; `packages/fresh/tests/query-hydration-age_browser.ts`; new `packages/fresh/tests/fixtures/query-hydration-age-browser/{main.ts,app.tsx,vite.config.ts}`; `packages/fresh/deno.json`; `packages/fresh/README.md`; run artifacts.                                                                                                                                                                                                                                                                                                                                                                  | Commit; focused CLI/Fresh checks/tests/doc-lint; slice comment; Tier-A stop.                         |
 | S4 — cheap convergence        | Run formatting/lint/asset checks, exact-pin/export/doc audits, three per-member isolated-declaration publish dry-runs, then the four cheap contracted gates at the committed candidate head.                                                                                                                                                                                                                                                                                                                                                                                                                                               | `.llm/runs/feat-app-service-client-wiring--1355/{receipts,reports,worklog.md,context-pack.md}` only, unless a gate finds a separately reviewed scoped repair.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Commit any evidence-only artifacts; recompute exact receipt sufficiency; comment; Tier-A stop.       |
 | S4-F2 — executable runtime precondition | Repair Expensive-Gate Release Condition 3 without running an expensive gate: register the two-service add/generate commands, a static idempotency/type/key probe, and a live settled-refetch browser probe; unit-test the probe assertions and exact suite order; then replace the cheap binding evidence at the new immutable content head. | `packages/cli/e2e/src/domain/cli-surface.ts`; `packages/cli/e2e/src/application/gates/scaffold/scaffold-gates.ts`; new `packages/cli/e2e/src/application/gates/scaffold/service-client-runtime-probe.ts`; new internal transport dependency `packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts`; new `packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts`; `packages/cli/e2e/suites/scaffold/capability-suites.ts`; `packages/cli/e2e/tests/presentation/suite-registry_test.ts`; `.llm/runs/feat-app-service-client-wiring--1355/{plan.md,worklog.md,context-pack.md,receipts}`. | Commit and push this plan amendment before E2E code; after implementation run focused cheap tests and four fresh binding receipts; comment; Tier-A stop. No lease or expensive execution. |
+| S4-F3 — real-contract static probe | Repair the failed leased runtime probe without rerunning it: make the already-owned database codegen gate an explicit prerequisite, fail fast when its real Zod output is absent, derive separate list inputs from each generated helper's actual contract schema, and assert resource-prefix isolation plus each service's own key/input behavior without a byte-equal-tail premise. | `packages/cli/e2e/suites/scaffold/capability-suites.ts`; `packages/cli/e2e/src/application/gates/scaffold/service-client-runtime-probe.ts`; `packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts`; `packages/cli/e2e/tests/presentation/suite-registry_test.ts`; `.llm/runs/feat-app-service-client-wiring--1355/{plan.md,worklog.md,context-pack.md,leak-report.md,receipts}`. | Commit and explicitly push this amendment before product edits; then implement, run affected cheap tests and four fresh binding receipts, comment, and stop for Tier-A. No lease or expensive execution. |
 | S5 — leased runtime proof     | After explicit coordinator release and singleton lease only: leak-check, run the exact `scaffold.runtime --cleanup --format pretty` command, then catalog-backed `fresh-browser`; verify cleanup and immutable head.                                                                                                                                                                                                                                                                                                                                                                                                                       | Suite-owned scaffold output/cleanup record; `.llm/runs/feat-app-service-client-wiring--1355/receipts/s5-fresh-browser.json`; `worklog.md`; `context-pack.md`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Suite-owned scaffold output + lease/cleanup record; one fresh-browser receipt; comment; Tier-A stop. |
 | S6 — IMPL-EVAL                | Fresh opposite-family evaluator inspects code, acceptance, receipts, PR threads, and compatibility; implementation session repairs any findings in new bounded slices.                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | `.llm/runs/feat-app-service-client-wiring--1355/evaluate.md`; any repair files must be named in a new amended slice before editing.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Tier-A verdict comment per cycle; never flip ready or merge.                                         |
 
@@ -323,6 +324,58 @@ ever presented as current after the browser-probe repair. At the corrected commi
 
 Sufficiency is recomputed only over those four new files. Receipt generation still precedes neither
 the lease nor either expensive command.
+
+### S4-F3 executable repair after the first leased scaffold failure
+
+The first leased `scaffold.runtime` run at evidence head `b14975af7` stopped with six gates passed
+and one failed. Both real generator gates passed; `generated.service-client-contract` failed with
+one missing generated-Zod import (TS2307) and two invalid shared-input calls (TS2345). Cleanup ran,
+the leak report records no surviving Aspire resources, and the lease was released before repair.
+
+The missing schema is a lifecycle prerequisite, not probe-owned output. `GATE.DATABASE_CODEGEN` is
+already the canonical standalone/no-Aspire schema generator (`deno task db:generate` under the
+selected `database/<engine>` workspace), but both service and runtime suites currently select it
+after the service-client contract probe. S4-F3 moves that same gate before
+`GATE.GENERATED_SERVICE_CLIENT_CONTRACT` in both suites; it does not duplicate the command inside
+the probe and does not create a fake Zod module. The probe additionally calls exported
+`assertGeneratedServiceSchemaReady(projectRoot)` before importing helpers or writing the temporary
+consumer. It requires a real `database/<engine>/schema/.generated/zod/crud.ts` and emits the expected
+pattern when absent. The order-sensitive registry/probe tests require `database.codegen` before the
+contract probe, and a temporary-directory unit test exercises that same exported readiness
+primitive in missing and present states.
+
+The shared `LIST_INPUT` and `assertIndexZeroOnly` premise are removed. After schema readiness, the
+probe dynamically imports the actual generated `users.ts` and `payments.ts` helpers, reads each
+exported contract's `list['~orpc'].inputSchema`, and passes each schema to exported
+`deriveProcedureInput`. That primitive converts the real Zod input schema to input-mode JSON Schema,
+constructs only its required/defaulted witness values, then validates the witness through the same
+contract schema before returning it. `serviceClientConsumerSource` receives two separate derived
+values and emits two separately typed calls; its `deno check` therefore proves each value against
+its own real generated query helper rather than against plan prose.
+
+`assertServiceKeyIsolation` now proves only the owed contract: users/payments server and client keys
+carry their own `[resource, 'list']` prefixes; every own filter matches its own key under TanStack's
+real `partialMatchKey`; neither resource filter matches the other service's key; and each key's
+input component equals that service's independently derived and contract-validated input. It does
+not compare the users and payments input tails.
+
+The negative divergent-contract unit case invokes `deriveProcedureInput` with a users-style schema
+and an offset-based payments schema, proves the old shared literal is rejected by the latter, and
+proves the generated consumer contains distinct derived inputs. Reverting to the old hardcoded
+single input therefore breaks the same primitive/wiring test before an expensive run. The schema
+precondition test invokes the same exported readiness function used by the live probe; no parallel
+copy or source-only promise substitutes for either behavior.
+
+The four `s4-f2-fix1-*` receipts at content head `2c8219968` remain durable but become superseded
+after S4-F3 moves the content head. The replacement exact set uses fresh invocation IDs and files:
+
+1. `receipts/s4-f3-check.json`
+2. `receipts/s4-f3-test.json`
+3. `receipts/s4-f3-publish-dry-run.json`
+4. `receipts/s4-f3-arch-check.json`
+
+Sufficiency is recomputed over only those four replacement files. No `scaffold.runtime`,
+`fresh-browser`, Aspire, Docker, evaluator, or lease action is part of S4-F3.
 
 ### Exact `scaffold.runtime` scenarios required before the lease
 
