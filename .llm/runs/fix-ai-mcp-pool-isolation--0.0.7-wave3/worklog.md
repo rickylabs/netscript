@@ -52,6 +52,17 @@
 After amendment, begin at `packages/ai/mcp.ts`, follow the public port to `src/mcp/application/pool.ts`,
 and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
 
+### Amended Commit Slices
+
+| # | Slice | Gate | Files |
+| - | --- | --- | --- |
+| 0.1 | Re-lock plan after coordinator ruling | artifact consistency | run artifacts only |
+| 1 | Commit healthy + never-settling RED regression | structured focused test, expected RED | test + run artifacts |
+| 2 | Per-server pool settlement and public snapshot | focused test, check, lint, fmt | pool, port, entrypoint, tests + artifacts |
+| 3 | Resource-read/close cancellation and late cleanup | focused test, check, lint, fmt | port, base, TanStack, tests + artifacts |
+| 4 | Registration cancellation propagation | focused test, check, lint, fmt | registration, tests + artifacts |
+| 5 | Optional/degraded docs and full proving gates | all contract/JSR gates | README + artifacts |
+
 ## Progress Log
 
 | Time | Slice | Step | Notes |
@@ -59,6 +70,8 @@ and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
 | 2026-08-15 10:32 CEST | 0 | bootstrap | Verified branch/head/base and read live issue #1448. |
 | 2026-08-15 10:37 CEST | 0 | research | Reproduced sequential failure, non-settling pool abort, and non-settling TanStack connect abort red-first. |
 | 2026-08-15 10:40 CEST | 0 | scope gate | Found required test/docs/port/base-transport changes outside the frozen three-file surface; stopped before source edits. |
+| 2026-08-15 | 0.1 | scope ruling | Read committed `scope-ruling.md`; exact eight-file package surface and public contract are now authorized. |
+| 2026-08-15 | 0.1 | plan re-lock | Recorded `PLAN-EVAL: N/A`; all prior RED evidence remains immutable and implementation can proceed mechanically. |
 
 ## Decisions
 
@@ -66,6 +79,7 @@ and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
 | --- | --- | --- |
 | `PLAN-EVAL: BLOCKED / not launched` | The contract cannot express the live acceptance fix. The brief requires a stop and coordinator-granted amendment rather than opening an evaluator. | user contract; research findings |
 | Do not implement a partial three-file fix | It would leave explicit acceptance criteria unsatisfied and falsely imply issue closure. | live issue #1448 |
+| `PLAN-EVAL: N/A` after amendment | The ruling fixes the public shape, cancellation convention, exact surface, lifecycle behavior, and gates; no decision-heavy question remains. | committed `scope-ruling.md` |
 
 ## Drift
 
@@ -110,3 +124,8 @@ and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
   contract decision.
 - This agent has not self-certified, launched PLAN-EVAL/IMPL-EVAL, or run expensive gates.
 
+## Amendment Handoff Update
+
+- The former scope blocker is resolved by commit `e2faaab15def77c131806aa6cf565d77bd6fe92c`.
+- Next action is the committed RED regression slice; no implementation source has yet changed.
+- No Aspire, Docker, browser, scaffold runtime, or CLI E2E command has run.

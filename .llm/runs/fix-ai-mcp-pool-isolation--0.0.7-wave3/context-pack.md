@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-ai-mcp-pool-isolation--0.0.7-wave3` |
 | Branch | `fix/ai-mcp-pool-isolation` |
-| Current phase | `plan` — blocked before PLAN-EVAL/implementation |
+| Current phase | `plan` — amended contract re-locked; RED test next |
 | Archetype | `2 — Integration` (coordinator-frozen leaf profile) |
 | Scope overlays | `none` |
 
@@ -16,7 +16,8 @@ The defect is reproduced red-first at immutable base `284dda90a`. Pool startup i
 neither the pool nor the default TanStack connector settles when aborted during a never-ending
 connect. No source has been changed. The live acceptance criteria require test, docs, port, and
 lifecycle files outside the frozen writable surface, so the run stopped for a coordinator
-amendment.
+amendment. The committed ruling now authorizes exactly eight package files and resolves the public
+snapshot and cancellation decisions; prior evidence remains immutable.
 
 ## Completed
 
@@ -26,16 +27,19 @@ amendment.
 - Reproduced pool failure isolation and cancellation defects.
 - Scanned the current `./mcp` JSR/public surface and upstream TanStack API.
 - Recorded `PLAN-EVAL: BLOCKED / not launched`.
+- Read the committed scope ruling and re-locked the plan against its exact eight-file surface.
+- Recorded `PLAN-EVAL: N/A` after amendment because the remaining work is fully specified and
+  mechanical.
 
 ## In Progress
 
-- Nothing. The run is intentionally stopped at the frozen-scope boundary.
+- Preparing the committed healthy + never-settling RED regression before implementation.
 
 ## Next Steps
 
-1. Topic orchestrator/coordinator decides whether to amend the authorized surface.
-2. Resolve the public degraded/status snapshot and cancellable-close contract.
-3. If granted, update plan/design and obtain coordinator direction on PLAN-EVAL before implementation.
+1. Commit and push the focused RED regression with its raw nonzero exit code.
+2. Implement the pool/snapshot, cancellation, registration, and docs slices separately.
+3. Run all structured, architecture, quality, JSR, doc-lint, and publish-dry-run gates.
 
 ## Key Decisions
 
@@ -43,6 +47,8 @@ amendment.
 | --- | --- | --- |
 | Stop rather than land a partial fix | user frozen contract | Test/docs/resource-read/close acceptance cannot fit. |
 | No `Closes #1448` | netscript-pr + live acceptance | Bootstrap PR does not resolve the issue. |
+| Synchronous snapshot; options-bag cancellation | committed scope ruling | Public and lifecycle decisions are coordinator-locked. |
+| `PLAN-EVAL: N/A` | amended complete contract | No decision-heavy question remains; evaluator separation is preserved for IMPL-EVAL. |
 
 ## Files Changed
 
@@ -61,7 +67,7 @@ amendment.
 
 ## Open Questions
 
-- Exact amended file list and public status/close design.
+- None. A newly required file or public decision is drift and a stop boundary.
 
 ## Drift and Debt
 
@@ -71,4 +77,3 @@ amendment.
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments.
-

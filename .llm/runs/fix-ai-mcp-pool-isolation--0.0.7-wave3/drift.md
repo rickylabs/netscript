@@ -28,3 +28,15 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept — explicit coordinator override recorded in `supervisor.md`.
 - **Evidence:** frozen contract and doctrine tables.
+
+## 2026-08-15 — Scope mismatch resolved by coordinator amendment
+
+- **What:** The coordinator added the five test/port/base/public/docs files required by the live
+  acceptance contract and ruled the exact synchronous snapshot and cancellation semantics.
+- **Source:** committed `scope-ruling.md` at
+  `e2faaab15def77c131806aa6cf565d77bd6fe92c`.
+- **Expected:** The leaf remains stopped until explicit authorization arrives.
+- **Actual:** The amended exactly-eight-file package surface can express the complete fix.
+- **Severity:** resolved
+- **Action:** accept — re-lock the plan, record `PLAN-EVAL: N/A`, and proceed red-first.
+- **Evidence:** amended plan and context pack; prior stop evidence remains unchanged.
