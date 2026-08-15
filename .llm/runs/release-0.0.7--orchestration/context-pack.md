@@ -468,3 +468,14 @@ false equal-tail assumption, then pass fresh Tier-A before requesting a new leas
 clean/pushed at `27a64ea4c`; fixes topic `a9176278a` is serially dispatching the same original author
 for only `packages/mcp/src/publish-assets.generated.ts`. No fixes Tier-A/evaluator/readiness until
 that fourth link lands. #1663's owner-only decision remains unchanged.
+
+Resume from the authoritative `2026-08-15T16:14:20Z` transition. Runtime ownership remains empty.
+#1665 is clean/pushed at final cascade head `9a2c74c41`; fixes Tier-A PASS checkpoint `cbd32230e`
+independently proves all three freshness gates pass simultaneously and leave a clean generated tree.
+Fresh Fable 5/medium Remote Control evaluator `262ef8e1-…`, bridge
+`cse_01E3QfD1wkvb1naZKS6m7bp2`, is active over only the full four-link asset-chain delta. Do not
+resume readiness until its artifact-only terminal verdict. #1664 pushed dependency-isolation plan
+amendment `c4a900adc` before creating the newly authorized internal primitive after generated-app
+replay proved the parent probe cannot be imported through the app's import map. Same author remains
+active on cheap tests and four receipts; no new lease before fresh features Tier-A. #1663's exact
+owner-only decision remains unchanged.

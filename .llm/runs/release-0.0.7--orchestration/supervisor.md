@@ -584,3 +584,17 @@ shape and was corrected before repair. F3 must use the real users/payments contr
 prefix isolation without assuming identical input tails, and resolve the canonical schema-generation
 precondition without inventing a fake generated module. #1665 remains serial: publish assets consume
 the just-landed CLI barrel.
+
+### Live transition — 2026-08-15T16:14:20Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Queue exhausted and parked at `0ca4c489f` | Do not invent post-freeze work |
+| internals | #1663 remains at the exceptional-final-PLAN-EVAL owner boundary on `194e22a3d` | No third evaluator or product mutation without the owner's explicit verdict |
+| fixes | #1665 final cascade head `9a2c74c41` passed fresh Tier-A at topic `cbd32230e`; fresh chain evaluator `262ef8e1-…` / bridge `cse_01E3Q…` is active | Evaluator artifact-only; no readiness/relabel/merge until terminal PASS and exact-head reconciliation |
+| features | #1664 pushed F3 input-isolation amendment `c4a900adc` before the new module; same author continues cheap proof | Four new receipts and fresh Tier-A before any new runtime lease; `fresh-browser` remains NOT_RUN |
+
+The #1665 closure proof is simultaneous rather than historical: the three generators all pass and
+leave the same detached tree clean. #1664's new internal module is a justified proof-transport split,
+not a product-surface expansion: the generated app cannot resolve the parent probe's monorepo import
+map, so only dependency-free input derivation moves. Runtime ownership remains empty.

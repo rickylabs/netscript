@@ -565,3 +565,10 @@ implementation thread.
   also has a canonical DB-Zod generation predecessor. Gate plans must derive executable inputs and
   prerequisites from generated artifacts, and Tier-A must reject fixture-only agreement when a
   real-project gate is the stated proof.
+- **A generated app cannot inherit the harness package's import map by assumption:** #1664's first
+  F3 draft imported the parent orchestration probe to reuse input derivation. Cheap replay against
+  the preserved generated project showed that this also imports monorepo-only dependencies the app
+  cannot resolve. Shared executable proof primitives used inside generated consumers must be
+  dependency-free (or live in an app-resolvable package), and that boundary must be exercised before
+  the expensive scaffold gate. The author pushed `c4a900adc` to name the isolated internal module
+  before creating it.

@@ -819,3 +819,20 @@
 - #1665 link 3 landed at `27a64ea4c`, exactly the CLI generated barrel plus run artifacts, explicitly
   pushed with repair receipt `5303037805`. The fixes supervisor inspected the predicted six
   provenance-field deltas and queued the already-amended link-4 brief on the same author thread.
+
+## 2026-08-15T16:14:20Z — four-link closure passes; F3 isolates generated-app dependencies
+
+- #1665 link 4 landed cleanly at `9a2c74c41`, exactly
+  `packages/mcp/src/publish-assets.generated.ts` plus run artifacts, with receipt `5303077056`.
+  Fresh fixes Tier-A ran `check:agent-docs-prose`, `check:assets-barrel`, and
+  `check:publish-assets` together on that immutable head in a detached worktree; all three exited 0
+  and all generators left the tree clean. Topic checkpoint `cbd32230e` records PASS and the honest
+  lint coverage limits. Exactly one fresh native Fable 5/medium Remote Control chain evaluator is
+  active as `262ef8e1-…`, bridge `cse_01E3QfD1wkvb1naZKS6m7bp2`; its mutation is artifact-only and
+  readiness remains fenced until its terminal verdict.
+- #1664's cheap replay found that importing the parent runtime probe into a generated app pulls in
+  parent-package import-map dependencies. The original Sol/high author widened only the internal
+  proof surface, committing and explicitly pushing `c4a900adc` before creating the new
+  dependency-free input-derivation module. Earlier F3 product edits remain inside the prior grant;
+  the new file had not been created at the immutable amendment boundary. The author continues cheap
+  tests and four fresh receipts; no runtime lease, Aspire, Docker, or browser gate is active.
