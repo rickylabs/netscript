@@ -131,6 +131,9 @@ No author imports `@netscript/cli` internals, Cliffy, deploy, DevTools, or anoth
 | 2026-08-15 02:36 CEST | S3     | gates     | Docs format/accuracy/links, per-member publish dry-runs, JSR audits, and the repository coupling scan completed with baseline labels.    |
 | 2026-08-15 02:47 CEST | S4     | release   | Reconciled Tier-A S3 PASS at `171e4e62e`; no findings, no issue filing, S4 evidence-only scope released, S4 evaluator dispatch withheld. |
 | 2026-08-15 02:50 CEST | S4     | reconcile | Local/remote/PR heads match on a clean no-upstream branch; PR remains draft with sole `status:impl`; refreshed live `origin/main`.       |
+| 2026-08-15 03:03 CEST | S4     | content   | Committed all remaining journal/handoff content at `120859d5c`; the tree was clean before any final proving gate ran.                    |
+| 2026-08-15 03:12 CEST | S4     | gates     | All six contracted gates passed durably with both recorded heads equal to content head `120859d5c` and no mismatch override.             |
+| 2026-08-15 03:18 CEST | S4     | audit     | Final JSR, export-map doc-lint, exact-pin, asset, import-meta, scanner, formatting, link, scope, and lock checks reconciled.             |
 
 ## Decisions
 
@@ -165,6 +168,7 @@ No author imports `@netscript/cli` internals, Cliffy, deploy, DevTools, or anoth
 | `SCOPE-docs` points to a retired glossary path; live glossary is `docs/site/glossary.md`. | minor       | yes                |
 | #1474's live body lags accepted RFC 0005's ratified `.passthrough()` decision.            | significant | yes                |
 | `quality:scan:repo` misses direct plugin factory imports/registrations.                   | significant | yes                |
+| Live main advanced inside the inspected hardcoded `plugin auth` command surface.          | minor       | yes                |
 
 ## Gate Results
 
@@ -228,6 +232,45 @@ No author imports `@netscript/cli` internals, Cliffy, deploy, DevTools, or anoth
 | S3 issue/RFC reference audit                     | live `gh` state plus accepted RFC/source comparison                                          | PASS_RESEARCH      | No second general RFC; existing owners and exact hardcoded occurrences are mapped.                   |
 | S3 terminology                                   | comparison with `docs/site/glossary.md`                                                      | PASS               | Contribution, plugin, capability, registry, manifest, transaction, and doctor keep canonical senses. |
 | `quality:gate`                                   | docs-only policy                                                                             | N/A                | Actual diff does not touch `packages/**` or `plugins/**`.                                            |
+
+### S4 binding evidence
+
+The following is the singular six-receipt evidence set for IMPL-EVAL. Every receipt was created by
+`run-gate.ts` from a clean tree and records
+`gitHead == actualGitHead == 120859d5c762706702cd45a3f2be19664e335e22`; none enables
+`allowGitHeadMismatch`. The repository evidence-set evaluator reports `SUFFICIENT` with no reasons
+for exactly these six inputs. These rows are therefore `PASS`, not `PASS_PARENT_HEAD`.
+
+| Contracted gate    | Result | Durable receipt                          | Content attested |
+| ------------------ | ------ | ---------------------------------------- | ---------------- |
+| `check`            | PASS   | `receipts/check-final.json`              | `120859d5c`      |
+| `test`             | PASS   | `receipts/test-final.json`               | `120859d5c`      |
+| `publish-dry-run`  | PASS   | `receipts/publish-dry-run-final.json`    | `120859d5c`      |
+| `arch-check`       | PASS   | `receipts/arch-check-final.json`         | `120859d5c`      |
+| docs source format | PASS   | `receipts/docs-source-format-final.json` | `120859d5c`      |
+| docs accuracy      | PASS   | `receipts/docs-accuracy-final.json`      | `120859d5c`      |
+
+The canonical workspace publish simulation is the one `publish-dry-run` member of the binding set.
+`publish-dry-run-cli-final.json` and `publish-dry-run-plugin-final.json` are supplemental durable
+surface receipts at the same content head; keeping duplicate gate IDs outside the singular evidence
+set preserves the receipt-set law. `netscript-jsr-specifiers-final.json`,
+`publish-assets-final.json`, and `quality-scan-repo-final.json` are also supplemental durable PASS
+receipts at that head. The quality scan retains its documented direct-registration blind spot.
+
+Final structured JSR reports preserve the measured baseline rather than relabeling it as introduced:
+`jsr-audit-cli-final.json` has three export-map entries and passes with existing warnings;
+`jsr-audit-plugin-final.json` has thirteen entries and the known four missing-`@module` failures,
+while its embedded isolated-declaration publish dry-run passes. Full export-map doc lint remains
+zero errors for CLI (`doc-lint-cli-final.json`) and the known 15 private-type references for plugin
+(`doc-lint-plugin-final.json`). `release:preflight` passed with zero text-import, import-attribute,
+file-URL/`import.meta`, or self-import findings. These reports supplement, and do not replace, the
+binding six receipts.
+
+The final owned-Markdown `run-deno-fmt.ts` write/check outputs are structured wrapper reports. They
+have no durable receipt `outcome`, `exitCode`, or `gitHead` fields and are excluded from the six-
+receipt count. The only delta after content head `120859d5c` is receipt and run-journal evidence
+under `.llm/runs/docs-rfc-plugin-cli-contribution--1502/`; there is no RFC, package, plugin,
+contract, or lock-file content delta. This closes PLAN-EVAL note N-4 for the author handoff.
 
 The three durable receipts from the original S1 turn—`check-cli-plugin-s1.json`,
 `docs-source-format-s1.json`, and `docs-accuracy-s1.json`—attest parent commit `3e0c8858b`, not S1
@@ -299,8 +342,9 @@ Archetype-4 gates (F-1–F-12, F-14–F-19); this summary does not replace that 
 - FP-1 is repaired by the six-gate plan and cycle-1 receipts; FP-2 by measured CLI/plugin exports,
   exact pins, publish dry-runs, isolated-declaration posture, assets, and `import.meta` evidence;
   FP-3 by the authoritative RFC-only scope resolution and significant drift record.
-- N-1 through N-3 are closed. N-4 is the S4 load-bearing invariant: final durable receipts must
-  record `gitHead == actualGitHead ==` the committed content head, with no mismatch override.
+- N-1 through N-4 are closed. The six binding receipts record
+  `gitHead == actualGitHead == 120859d5c762706702cd45a3f2be19664e335e22`, with no mismatch override;
+  the receipt/journal-only follow-up does not change RFC or contract content.
 - The evaluator should inspect `plan.md` D3 (mount restriction), D6–D9 (static registry/lazy
   bootstrap/absent UX), D11–D15 (generation transaction and manifest evolution), and the
   duplicate-audit/epic shape first.
@@ -308,8 +352,11 @@ Archetype-4 gates (F-1–F-12, F-14–F-19); this summary does not replace that 
   the existing CLI helper migration is explicit.
 - Verify all five #1502 acceptance entries point to openable final-head artifacts and leave the
   issue mutation to the later close-gate mirror/coordinator.
-- The S4 content head is the commit containing this checkpoint. Start the six durable gates only
-  after that commit is clean. The follow-up commit may add receipts and update run journals, but it
-  may not change `rfcs/0000-plugin-cli-contribution.md` or any contract source.
+- Content head `120859d5c762706702cd45a3f2be19664e335e22` is the immutable gate target. The
+  follow-up contains only receipts and run journals; independently verify the final-head diff has no
+  change to `rfcs/0000-plugin-cli-contribution.md`, `packages/**`, `plugins/**`, or `deno.lock`.
+- The evaluator must independently re-check the six-receipt metadata and sufficiency, RFC ownership
+  and declared vocabulary, all five #1502 mappings, measured JSR baselines, open drift, draft/label
+  state, and the absence of issue filing or source mutation.
 - Final IMPL-EVAL remains a fresh opposite-family session; this author does not dispatch it, write
   `evaluate.md`, flip the draft PR ready, or self-certify.

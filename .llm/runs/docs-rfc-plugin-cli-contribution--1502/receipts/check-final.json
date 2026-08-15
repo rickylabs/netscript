@@ -1,0 +1,38 @@
+{
+  "gateId": "check",
+  "invocationId": "ns1502-s4-final-check",
+  "argv": [
+    "deno",
+    "task",
+    "check",
+    "--include",
+    "^packages/(cli|plugin)/"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-features-1502",
+  "gitHead": "120859d5c762706702cd45a3f2be19664e335e22",
+  "actualGitHead": "120859d5c762706702cd45a3f2be19664e335e22",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:2669989",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "7479befafd391058144b441e8570628c28ccd308268f82f217a4acc54bc2a0d5",
+  "lifecycleId": "worker:2669989:ns1502-s4-final-check:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T00:51:36.284Z",
+  "startedAt": "2026-08-15T00:51:36.286Z",
+  "finishedAt": "2026-08-15T00:51:36.337Z",
+  "durationMs": 51,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 302,
+    "sha256": "cc927711f8d449538e77838dced83d976ade790efb2ba7c36ac9d5d0e7b16d22",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck\u001b[0m \u001b[0m\u001b[38;5;245mdeno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--include' '^packages/(cli|plugin)/'\u001b[0m (cached, inputs unchanged)\n",
+    "truncated": false
+  }
+}

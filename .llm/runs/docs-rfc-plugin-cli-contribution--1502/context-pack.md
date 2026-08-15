@@ -19,9 +19,11 @@ preserved at `plan-eval-cycle-1.md`. Cycle 2 evaluated repaired head
 `bd8b29bf3a524280d28a39b21bc7adda277d2e27` and accepted S2 at
 `7a5eb580a8515b8dc1007308a9d917b5e7309f41`. Tier-A accepted S3 with no findings at
 `171e4e62ebb2e47eb3af08df165394bb4d1bae55`; the six S3 sections, both carried S2 notes, and the
-honest scanner-gap treatment are closed. S4 is released only for committed-content evidence, receipt
-reconciliation, truthful PR completion state, and the separate IMPL-EVAL handoff. The PR remains
-draft at `status:impl`; this author does not dispatch or write IMPL-EVAL.
+honest scanner-gap treatment are closed. S4 content was committed at
+`120859d5c762706702cd45a3f2be19664e335e22`; all six contracted durable receipts attest that exact
+clean head with no mismatch override. The remaining follow-up is receipt/journal-only and cannot
+change the RFC contract. The PR remains draft at `status:impl`; this author does not dispatch or
+write IMPL-EVAL.
 
 ## Completed
 
@@ -78,19 +80,26 @@ draft at `status:impl`; this author does not dispatch or write IMPL-EVAL.
   amend/fold-first audits, per-surface JSR obligations, and unfiled PR-sized implementation epic.
 - Pushed S3 at `171e4e62ebb2e47eb3af08df165394bb4d1bae55`; Tier-A independently verified no issue
   filing, 42/42 declared/used public symbols, all S3 sections, and no findings.
+- Committed the S4 content head at `120859d5c762706702cd45a3f2be19664e335e22`, then ran all six
+  contracted gates from its clean tree. Every binding receipt records that value as both `gitHead`
+  and `actualGitHead`, without a mismatch override.
+- Re-ran the CLI/plugin publish and JSR checks, exact-pin and publish-asset gates, release
+  preflight, full export-map doc lint, repository quality scan, owned Markdown format, and docs
+  links. Existing plugin JSR/doc-lint baselines remain measured failures; no source change was
+  introduced.
 
 ## In Progress
 
-- Prepare the committed S4 content head. Only after that clean commit may the six final durable
-  gates run; the follow-up may change receipts and run journals but not RFC/contract content.
+- Commit the S4 receipts and run journals as an evidence-only final head, then reconcile PR #1651
+  and stop for Tier-A review and coordinator-owned IMPL-EVAL dispatch.
 
 ## Next Steps
 
-1. Commit this S4 pre-gate handoff state as the content head.
-2. From its clean tree, run durable `check`, `test`, per-member `publish-dry-run`, `arch-check`,
-   `docs-source-format`, and `docs-accuracy`, plus final JSR/docs/scope checks.
-3. Commit receipts and evidence journals only, push explicitly, reconcile the draft PR, and stop for
-   Tier-A review.
+1. Commit the receipt/journal-only S4 follow-up and prove its diff contains no RFC, product source,
+   contract, or lock-file content.
+2. Push by explicit refspec, reconcile the draft PR's DoD/acceptance evidence, and post one S4 phase
+   comment.
+3. Stop for Tier-A topic review.
 4. A fresh native Claude Opus 5 medium session performs IMPL-EVAL only after coordinator dispatch;
    this author does not self-certify.
 
@@ -116,22 +125,22 @@ draft at `status:impl`; this author does not dispatch or write IMPL-EVAL.
 | `.llm/runs/docs-rfc-plugin-cli-contribution--1502/supervisor.md`   | updated   | Correct high-effort requested/observed identity. |
 | `.llm/runs/docs-rfc-plugin-cli-contribution--1502/research.md`     | updated   | Contract resolution and measured JSR baseline.   |
 | `.llm/runs/docs-rfc-plugin-cli-contribution--1502/plan.md`         | updated   | Repaired scope, gates, risks, slices, roadmap.   |
-| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/worklog.md`      | updated   | Design checkpoint and cycle-1 evidence log.      |
-| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/context-pack.md` | updated   | Resumable cycle-2 handoff.                       |
+| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/worklog.md`      | updated   | Full slice and final evidence journal.           |
+| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/context-pack.md` | updated   | Resumable IMPL-EVAL handoff.                     |
 | `.llm/runs/docs-rfc-plugin-cli-contribution--1502/drift.md`        | updated   | Significant contract tension and resolution.     |
 | `.llm/runs/docs-rfc-plugin-cli-contribution--1502/plan-eval.md`    | preserved | Cycle-1 evaluator verdict; author did not edit.  |
 | `.llm/runs/docs-rfc-plugin-cli-contribution--1502/evaluate.md`     | unchanged | Later separate IMPL-EVAL placeholder.            |
-| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/receipts/`       | updated   | Structured/durable S0R and JSR evidence.         |
-| `rfcs/0000-plugin-cli-contribution.md`                             | added     | S1–S3 normative contract; S4 validation pending. |
+| `.llm/runs/docs-rfc-plugin-cli-contribution--1502/receipts/`       | updated   | Binding final and supplemental JSON evidence.    |
+| `rfcs/0000-plugin-cli-contribution.md`                             | added     | Complete S1–S3 normative RFC contract.           |
 
 ## Gates
 
-| Gate family | Current status                                | Evidence                           |
-| ----------- | --------------------------------------------- | ---------------------------------- |
-| Static      | final content-head receipt set pending        | `worklog.md`; `receipts/`          |
-| Fitness     | full A4 roadmap plus measured JSR obligations | RFC; `research.md`; `worklog.md`   |
-| Runtime     | N/A / global expensive gate not run           | docs-only scope                    |
-| Consumer    | research inventory complete                   | live issues/RFCs and `research.md` |
+| Gate family | Current status                                | Evidence                              |
+| ----------- | --------------------------------------------- | ------------------------------------- |
+| Static      | six binding content-head receipts PASS        | `worklog.md`; `receipts/*-final.json` |
+| Fitness     | full A4 roadmap plus measured JSR obligations | RFC; `research.md`; `worklog.md`      |
+| Runtime     | N/A / global expensive gate not run           | docs-only scope                       |
+| Consumer    | research inventory complete                   | live issues/RFCs and `research.md`    |
 
 ## Open Questions
 
@@ -142,8 +151,9 @@ draft at `status:impl`; this author does not dispatch or write IMPL-EVAL.
 
 - Open drift for IMPL-EVAL: attached author-route override; accepted-but-unshipped consumer seams;
   shallow existing `./cli`; plugin doc/module baseline failures; coordinator contract tension; the
-  retired glossary path; immutable-base divergence from live main; stale #1474 wording; and the
-  quality-scanner direct-registration blind spot. Details and severities remain in `drift.md`.
+  retired glossary path; immutable-base divergence including the new auth-command overlap; stale
+  #1474 wording; and the quality-scanner direct-registration blind spot. Details and severities
+  remain in `drift.md`.
 - Debt: no new or deepened architecture debt; source implementation is forbidden in this leaf.
 
 ## Commits
@@ -157,6 +167,7 @@ draft at `status:impl`; this author does not dispatch or write IMPL-EVAL.
 - S1 accepted fix-up head: `bd8b29bf3a524280d28a39b21bc7adda277d2e27`.
 - S2 exact head: `7a5eb580a8515b8dc1007308a9d917b5e7309f41`.
 - S3 exact head: `171e4e62ebb2e47eb3af08df165394bb4d1bae55`.
-- S4 content head: the commit containing this pre-gate checkpoint; the exact SHA is recorded in the
-  receipt-only follow-up after all gates attest it.
+- S4 content head: `120859d5c762706702cd45a3f2be19664e335e22`.
+- S4 final head: the receipt/journal-only commit containing this handoff; record its exact SHA in
+  the PR body/comment after commit.
 - See the draft PR commit list and per-slice comments after push; V3 uses no `commits.md`.
