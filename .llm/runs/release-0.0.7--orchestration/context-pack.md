@@ -326,3 +326,13 @@ while `fresh-browser` is a catalog gate. Both remain lease-blocked and load-bear
 convergence. #1663 remains on the same Codex plan-repair turn after its marker prototype revealed a
 second honest nested-config batching seam; accept only a proof that keeps healthy unmarked fixtures
 selected and both real-source negative controls alive.
+
+Resume from the authoritative `2026-08-15T11:03:30Z` transition. Main remains
+`baf1cdf67a4e931af17b4772ddf6101f36152184`. #1664's repaired plan is immutable at
+`7f20a34fee4e99ac17edb6ed4de06a3ec9c1934b`; fresh native Fable 5/medium Remote Control PLAN-EVAL
+`176aace4-b2a2-4b16-bdaa-9db687c7d132`, bridge `cse_01TiYhwUCkdyjziEpFP3kgaS`, is the sole active
+features evaluator. Do not lease or run `scaffold.runtime` or `fresh-browser` before plan PASS,
+implementation, cheap convergence, and a later explicit central grant. #1663's local-only
+`71e803807` plan repair is rejected and unpushed because its 115-to-110 parent skip hid four healthy
+files; remote remains `be2b18728`. Preserve the same Codex thread and accept only the corrected
+115-to-114, healthy-selected, config-aware batching plan before fresh Tier-A and cycle 2.

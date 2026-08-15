@@ -442,3 +442,18 @@ implementation thread.
   `scaffold.runtime` catalog entry as missing plumbing. The absence is deliberate: the harness
   owns it as a suite-run release-gate class. Its exact-head output and central cleanup lease are the
   evidence; only `fresh-browser` receives a normal run-gate receipt.
+
+- **A narrow marker cannot license parent-family suppression:** #1663's first repaired-plan draft
+  made a marker inside `doctor/broken` suppress `doctor/healthy` as well. The arithmetic exposed the
+  false green: 115 to 110 equals one broken plus four healthy TS files. The accepted target is 114,
+  with healthy files named as selected. Nested valid configs are a batching concern, not permission
+  to remove unmarked files from a quality gate.
+- **An unpushed local artifact commit is recoverable evidence, not an immutable verdict:** the
+  rejected #1663 plan existed only in local commit `71e803807`; product/config paths were untouched
+  and the remote PR head never moved. The coordinator preserved history, stopped the exact writer,
+  and resumed the same author thread with a corrective commit rather than force-pushing or replacing
+  the author.
+- **Plan scenarios must prove effects, not method calls:** #1664's accepted repair requires the
+  invalidation gate to observe a second request and refreshed server value; spying on
+  `invalidateQueries` would pass against the existing defect. Hydration similarly compares old and
+  fresh timestamps under one controlled clock with different query-function counts.

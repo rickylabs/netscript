@@ -564,3 +564,22 @@
   Tier-A rejected the proposed `scaffold.runtime` catalog entry: it remains the separate
   suite-owned release-gate class, while `fresh-browser` retains its normal run-gate receipt. The
   same author is repairing this evidence class and making scenario assertions falsifiable.
+
+## 2026-08-15T11:03:30Z — #1664 formal plan gate and #1663 false-green interception
+
+- #1664's preserved author repaired the gate-class contract and exact scenarios at immutable head
+  `7f20a34fe`: `scaffold.runtime` remains suite-owned release-gate evidence, `fresh-browser` remains
+  the catalog receipt gate, multi-service key arrays are named, invalidation requires an observed
+  second network request plus server-confirmed DOM value, and hydration runs under one controlled
+  clock. Fresh Tier-A passed at features topic `b52641ece`.
+- Granted and verified one native Fable 5/medium Remote Control PLAN-EVAL on that exact head:
+  session `176aace4-b2a2-4b16-bdaa-9db687c7d132`, bridge
+  `cse_01TiYhwUCkdyjziEpFP3kgaS`. Neither expensive gate is leased or running.
+- Intercepted #1663's unpushed repaired-plan commit `71e803807` because a marker under
+  `doctor/broken` suppressed the whole doctor family: 115 to 110 removed the one broken fixture TS
+  file plus all four healthy unmarked TS files. That is a false-positive exclusion, not a gate fix.
+- The exact active author PID was stopped before push; remote #1663 remains `be2b18728`. The same
+  Codex thread is being resumed with the conjunctive 114-file contract: skip only the marked broken
+  subtree, preserve all healthy fixture selection, and group explicit argv by effective nearest
+  Deno config inside the already-authorized fmt/lint wrappers. No product implementation or twelfth
+  path is authorized.
