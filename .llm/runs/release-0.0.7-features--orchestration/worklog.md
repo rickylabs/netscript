@@ -4862,3 +4862,67 @@ any Tier-A must record the outstanding contamination rather than treat the head 
 
 Nothing else in this lane is running. No lease is held. All four quarantines remain intact and no
 prior evidence has been altered.
+
+## 2026-08-15 — F8 provenance recovery is blocked: the assigned author cannot act
+
+The coordinator's recovery instruction assigns the correction to the **same original Sol/high
+author**. That is not executable. I re-probed the thread directly after receiving the instruction,
+rather than relying on the earlier error:
+
+```text
+$ codex-resume --thread-id 01a004f9-f033-7592-a0bc-63927753fb43 --message "…reply with ACK"
+ERROR: You've hit your usage limit. … try again at Aug 20th, 2026 5:31 AM.
+tokens used 6,106,885
+```
+
+Thread `01a004f9-…` is hard-blocked until **2026-08-20 05:31** — roughly four and a half days out.
+The instruction and my blocker report (`db2aa93b2`) crossed, so this fact was almost certainly not in
+hand when the recovery was written.
+
+### Every step of the instruction depends on the blocked one
+
+| Step | Status |
+| --- | --- |
+| Restore `leak-report.md` byte-for-byte from `2385cdb72` | **blocked** — assigned to the author |
+| Append provenance note to run worklog/drift/context | blocked — same author, same commit |
+| Rewrite PR comment `5304365403` to cite the corrected head | blocked — **no corrected head exists yet** |
+| Verify final diff and head equality | blocked — nothing to verify |
+| Fresh Tier-A on the corrected head | blocked, and explicitly withheld from `d8d5ee619` |
+
+So this is not a partially-executable instruction where I can make progress on the edges. The
+restoration is the root of the chain.
+
+### What I did not do
+
+I did not restore the file myself. The correction is two lines and I could do it in seconds, but the
+coordinator assigned it to the author twice now, and ownership is the substance of the finding, not a
+formality — a supervisor writing into a worktree whose commits another agent signs is precisely what
+created this. Doing it again, this time authoring a commit on the author's branch, would repeat the
+violation while claiming to repair it.
+
+I also did not rewrite PR comment `5304365403`, because the instruction requires it to cite "the new
+clean correction head", and that head does not exist. Editing it now could only make it cite the
+contaminated head or a fiction.
+
+### Current state, unchanged and clean apart from the known defect
+
+Leaf `d8d5ee61924d0c3c7ed657ab96f610bc142cfd6a`, local == remote == PR, tree clean. F8's plan content
+— `plan.md`, `drift.md`, `worklog.md`, `reports/f8-plan-amendment.md` — is intact and unaffected. The
+sole defect is the two supervisor-generated provenance lines in `leak-report.md`, fully attributed
+here and in D-19. No lease held, nothing running, all four quarantines intact, no prior evidence
+altered.
+
+### Disposition required from the coordinator
+
+1. **Authorise this supervisor to make the one-file restoration**, as a new commit stating the
+   reverted lines were supervisor-generated. Then I rewrite the PR comment to the corrected head and
+   run fresh Tier-A immediately.
+2. **Assign a different implementation agent** to it, preserving the ownership boundary.
+3. **Accept and annotate** — two provenance lines in a run artifact, already attributed; review F8's
+   plan content on its merits with the contamination recorded rather than hidden.
+4. **Wait for the preserved author** until 2026-08-20, preserving thread continuity at the cost of
+   the milestone's schedule.
+
+I have a preference and will state it plainly: **option 1 or 2**, because leaving a foreign write
+inside an author-signed commit is the kind of provenance defect this lane has spent the entire leaf
+refusing to accept from anyone else.
