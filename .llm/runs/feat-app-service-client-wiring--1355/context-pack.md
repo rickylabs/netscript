@@ -28,7 +28,10 @@ The focused test passes 19/19 at `c53726c69`, so this was leaf-caused rather tha
 authorized a one-line, order-sensitive expectation repair at `32ea23f50`; all four fresh binding
 receipts now PASS at that head, including 4,202/0 tests and the workspace publish dry-run. Draft PR
 #1664 retains both closing keywords and remains draft. S4 is cheaply sufficient; expensive gates
-remain lease-blocked and unrun.
+remain lease-blocked and unrun. Tier-A subsequently proved Expensive-Gate Release Condition 3 was
+documentation-only: no CLI E2E gate executed the planned second-service, key-isolation, or
+settled-refetch scenarios. S4-F2 is therefore a pre-S5 implementation repair. Its plan amendment is
+locked before E2E code, and no lease or expensive command is authorized.
 
 ## Completed
 
@@ -69,14 +72,15 @@ remain lease-blocked and unrun.
 
 ## In Progress
 
-- S4-FIX1 is complete with the reviewed one-line test repair and four fresh PASS binding receipts;
-  awaiting fresh Tier-A review.
+- S4-F2 plan amendment: add executable CLI E2E gates/probes for Release Condition 3, then replace
+  the four cheap receipts at the new immutable content head. S5 remains blocked.
 
 ## Next Steps
 
-1. Stop for fresh Tier-A review; do not start S5 or request an expensive-gate lease without explicit
-   coordinator release.
-2. Keep both expensive gates lease-blocked until explicit release.
+1. Commit and push the S4-F2 plan amendment before touching CLI E2E code.
+2. Implement only the bounded gate/probe/test surface, run affected cheap unit tests, and replace
+   all four binding cheap receipts at the new content head.
+3. Stop for fresh Tier-A review; keep S5 and both expensive gates lease-blocked.
 
 ## Key Decisions
 

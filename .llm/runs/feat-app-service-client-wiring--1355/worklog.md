@@ -233,3 +233,18 @@ invocation ID, attests `gitHead == actualGitHead ==
 - Tier-A authorized and the leaf landed the exact order-sensitive expectation repair. All four
   replacement binding receipts now pass at `32ea23f50`; S4 cheap sufficiency is SUFFICIENT. Runtime
   gates remain lease-blocked and no evaluator has run.
+
+## S5-precondition F2 — executable-proof plan amendment
+
+Tier-A accepted S4 cheap convergence but independently proved Expensive-Gate Release Condition 3
+false: the exact second-service/key-isolation/settled-refetch scenarios existed only in `plan.md`,
+not in `packages/cli/e2e/`. This is an implementation omission inside the accepted plan, not a
+rescope and not authority to start S5.
+
+The bounded S4-F2 amendment registers three cheap scaffold/static gates in both the service and
+runtime suites plus one live behavior gate in runtime only. A single checked-in probe owns the
+second-generate byte comparison, no-alias consumer check, actual generated key evidence, and CDP
+settled-refetch observation; a unit test exercises its pure assertions without Chrome, Aspire,
+Docker, or either expensive suite. The exact files, gate order, assertions, and replacement receipt
+set are locked in `plan.md` before product edits. Existing S4-FIX1 receipts remain valid at
+`32ea23f50` but become superseded once the content head moves.
