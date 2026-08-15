@@ -182,34 +182,36 @@ No rescope was required and no fourth path entered the slice.
 
 ### Progress
 
-| Step | Commit | Result |
-| --- | --- | --- |
-| RED task wiring | `98360da7b` | Checker runs before the still-narrow scanner task; changed-file invocation exits 1 with 29 uncovered. |
-| Green binding | `15d894740` | `quality:scan` uses broad `packages`, `plugins`, `docs/site`; both tasks invoke the checker first. |
+| Step                | Commit      | Result                                                                                                     |
+| ------------------- | ----------- | ---------------------------------------------------------------------------------------------------------- |
+| RED task wiring     | `98360da7b` | Checker runs before the still-narrow scanner task; changed-file invocation exits 1 with 29 uncovered.      |
+| Green binding       | `15d894740` | `quality:scan` uses broad `packages`, `plugins`, `docs/site`; both tasks invoke the checker first.         |
 | Live test rebinding | `15d894740` | Live integration expects zero gaps/`ok:true`; structured CLI failure uses an incomplete temp-repo fixture. |
 
 ### Advisory A — wiring proof
 
-- `red-forwarding.json` invokes `deno task quality:scan --changed-file
-  .llm/tools/quality/check-root-coverage.ts` at the narrow-root commit. The checker emits the full
-  37/37/35 census and exits 1 on 29 uncovered members before the scanner can run.
-- `forwarding.json` repeats the exact changed-file invocation at the green binding. The checker emits
-  `ok:true`, both task gap arrays are empty, and the next JSON object is the scanner report with
-  `mode:"changed-files"` and `scanned:[".llm/tools/quality/check-root-coverage.ts"]`.
+- `red-forwarding.json` invokes
+  `deno task quality:scan --changed-file
+  .llm/tools/quality/check-root-coverage.ts` at the
+  narrow-root commit. The checker emits the full 37/37/35 census and exits 1 on 29 uncovered members
+  before the scanner can run.
+- `forwarding.json` repeats the exact changed-file invocation at the green binding. The checker
+  emits `ok:true`, both task gap arrays are empty, and the next JSON object is the scanner report
+  with `mode:"changed-files"` and `scanned:[".llm/tools/quality/check-root-coverage.ts"]`.
 - Both receipt stderr records show the appended `--changed-file` tokens after the final scanner
   command and its preserved `--max-allow 7`; they never enter checker root parsing.
 
 ### Gate results — slice 2
 
-| Gate | Exit | Commit attested | Receipt |
-| --- | ---: | --- | --- |
-| changed-file forwarding RED | 1 | `98360da7b` | `receipts/slice-2/red-forwarding.json` |
-| focused test (9/9) | 0 | `15d894740` | `receipts/slice-2/test.json` |
-| changed-file forwarding GREEN | 0 | `15d894740` | `receipts/slice-2/forwarding.json` |
-| quality scan | 0 | `15d894740` | `receipts/slice-2/quality-scan.json` |
-| repository quality scan | 0 | `15d894740` | `receipts/slice-2/quality-scan-repo.json` |
-| doctrine architecture check | 0 | `15d894740` | `receipts/slice-2/arch-check.json` |
-| composite quality gate | 0 | `15d894740` | `receipts/slice-2/quality-gate.json` |
+| Gate                          | Exit | Commit attested | Receipt                                   |
+| ----------------------------- | ---: | --------------- | ----------------------------------------- |
+| changed-file forwarding RED   |    1 | `98360da7b`     | `receipts/slice-2/red-forwarding.json`    |
+| focused test (9/9)            |    0 | `15d894740`     | `receipts/slice-2/test.json`              |
+| changed-file forwarding GREEN |    0 | `15d894740`     | `receipts/slice-2/forwarding.json`        |
+| quality scan                  |    0 | `15d894740`     | `receipts/slice-2/quality-scan.json`      |
+| repository quality scan       |    0 | `15d894740`     | `receipts/slice-2/quality-scan-repo.json` |
+| doctrine architecture check   |    0 | `15d894740`     | `receipts/slice-2/arch-check.json`        |
+| composite quality gate        |    0 | `15d894740`     | `receipts/slice-2/quality-gate.json`      |
 
 The normal scanner report records exact traversal roots `packages`, `plugins`, `docs/site`, zero
 findings, `allowCount:7`, and no allowance failures. The repo scanner records `packages`, `plugins`,
@@ -226,3 +228,45 @@ the internal test, and run evidence; no package/plugin export, dependency pin, r
 - S2 is stopped for topic-supervisor Tier-A review.
 - S3 and its frozen final gate set are not started.
 - No formal IMPL-EVAL has been launched.
+
+## Tier-A sign-off — Slice 2
+
+Signed off by `topic-internals-0.0.7` (Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34`, Opus 5
+/ high) at implementation head `a7e9ee0d5c8c15bade0e1d5c656e77d9105ddbf2`. Supervisor commit, not
+the implementer's.
+
+Verified by execution at the landed head:
+
+- **The coverage gap is closed.** The checker now exits **0** with `ok:true` and `errors: []`.
+  `quality:scan` roots moved from the descendant `packages/cli/src` to broad `packages`, taking its
+  uncovered count from **29 to 0**; `quality:scan:repo` and doctrine both remain at 0. The census is
+  unchanged at 37/37/35 and both `publish:false` exclusions are still named. The 29→0 transition
+  against slice 1's recorded RED is the evidence acceptance criteria 1 and 3 rest on.
+- **Advisory A's wiring half is proven, not argued.** The `red-forwarding` → `forwarding` receipt
+  pair runs the _identical_ argv `deno task quality:scan --changed-file …` at exit 1 then exit 0. I
+  reproduced it independently: with `--changed-file` appended the checker still executes (its
+  `census`/`boundary`/`scannerTraversal` JSON is present) and the scanner receives the file
+  (`mode: changed-files`, `scanned: [<the file>]`). D5's assumption about `deno task` forwarding
+  trailing arguments to the last command in an `&&` chain is now an asserted fact.
+- **Criterion 2 survives the repo becoming healthy.** Structured CLI failure moved to a temp fixture
+  (`@fixture/covered` / `@fixture/uncovered`) rather than being deleted, and the fixture suite still
+  proves omission, descendant-root rejection, broad-root future-member coverage, empty census, and
+  malformed/missing task roots. Had that assertion simply been dropped, criterion 2 would have
+  silently stopped being tested the moment coverage went green.
+- **Permissions and budget preserved byte-for-byte.** `--max-allow 7`, `plugins`, `docs/site`, and
+  `--allow-net=api.github.com --allow-env=GITHUB_TOKEN,GH_TOKEN` are intact on the scanner, so
+  #1653's fail-closed owner resolver is unaffected. The checker itself correctly runs with
+  `--allow-read` only.
+- **Scope and hygiene hold.** Only `deno.json` and `check-root-coverage_test.ts` outside run
+  artifacts — the surface the approved plan's S2 authorizes. No `check-root-coverage.ts` edit, no
+  fourth path, no `deno.lock` churn.
+- **Focused suite re-run by the supervisor: 9 passed, 0 failed.** Slice-2 receipts: `quality-scan`,
+  `quality-scan-repo`, `quality-gate`, `arch-check`, `test`, and `forwarding` all exit 0, with
+  `red-forwarding` retained at exit 1 as the RED proof.
+
+Note on the preceding stop: S2's first turn halted with no commits because my brief restricted the
+slice to `deno.json` alone, contradicting the approved plan's S2 file list, which already authorizes
+this test when its live integration assertion needs binding. The leaf was correct to stop and ask;
+the constraint was mine and was withdrawn without a coordinator rescope.
+
+Slice 3 is authorized.
