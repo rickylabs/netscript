@@ -234,5 +234,6 @@ Drift is append-only. Package and plugin source remain read-only in this leaf.
 - **Decision impact:** This refines locked D11–D18 and does not change an approved D-series
   decision. The owner expressly authorized no new PLAN-EVAL. Any package/plugin implementation or
   wider ownership change would still require a coordinator amendment and new plan gate.
-- **Evidence:** RFC compatibility/ownership/doctor/roadmap/prior-art amendment, content-head commit,
-  and fresh six-gate evidence recorded in the following journal commit.
+- **Evidence:** RFC compatibility/ownership/doctor/roadmap/prior-art amendment at content head
+  `67e12f02165089ec7431b72d1294147477906282`; six fresh `*-amend.json` receipts all pass and attest
+  that head; the exact six-file evidence-set evaluation is `SUFFICIENT` with no reasons.

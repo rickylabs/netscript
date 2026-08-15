@@ -193,3 +193,14 @@ command, and the per-member publish receipts labelled supplemental/excluded. The
 - No locked D-series decision changed, so the bounded owner brief authorizes amendment without a new
   PLAN-EVAL. The next external actions after author evidence are renewed Tier-A review and a fresh
   coordinator-dispatched IMPL-EVAL; this author launches neither.
+- Amendment content head: `67e12f02165089ec7431b72d1294147477906282`.
+- Binding amendment evidence is the exact six-file set `check-amend.json`, `test-amend.json`,
+  `publish-dry-run-amend.json`, `arch-check-amend.json`, `docs-source-format-amend.json`, and
+  `docs-accuracy-amend.json`. Every receipt passes at the content head; the repository evaluator
+  reports `SUFFICIENT` with no reasons.
+- The evidence-head commit contains only those six receipts plus `worklog.md`, `context-pack.md`,
+  and `drift.md`. Its exact SHA is recorded in the PR amendment comment and supervisor report after
+  commit/push.
+- Re-review must verify the narrowed C6/RFC-0003 boundary, preview invariance, the repaired PR-body
+  evidence language, and the six explicitly named receipts. It must not glob older `*final*.json`
+  receipts or infer issue-thread coverage from the code-review-thread gate.

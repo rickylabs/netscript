@@ -432,3 +432,62 @@ Archetype-4 gates (F-1–F-12, F-14–F-19); this summary does not replace that 
 - **Evidence sequence:** Commit the RFC and these content journals first. From that clean content
   head, rerun the six contracted gates with fresh `ns1502-amend-*` invocation IDs; then record the
   exact six-file evidence-set invocation and result in a receipt/journal-only follow-up.
+
+### Owner-amendment binding evidence
+
+Content head `67e12f02165089ec7431b72d1294147477906282` was clean before every gate. All six
+receipts record `gitHead == actualGitHead` at that content head, omit `allowGitHeadMismatch`, and
+passed with exit code 0.
+
+| Contracted gate    | Result | Invocation ID                     | Durable receipt                          |
+| ------------------ | ------ | --------------------------------- | ---------------------------------------- |
+| `check`            | PASS   | `ns1502-amend-check`              | `receipts/check-amend.json`              |
+| `test`             | PASS   | `ns1502-amend-test`               | `receipts/test-amend.json`               |
+| `publish-dry-run`  | PASS   | `ns1502-amend-publish-workspace`  | `receipts/publish-dry-run-amend.json`    |
+| `arch-check`       | PASS   | `ns1502-amend-arch-check`         | `receipts/arch-check-amend.json`         |
+| docs source format | PASS   | `ns1502-amend-docs-source-format` | `receipts/docs-source-format-amend.json` |
+| docs accuracy      | PASS   | `ns1502-amend-docs-accuracy`      | `receipts/docs-accuracy-amend.json`      |
+
+The scoped check was a valid cached re-check: it completed in 64 ms, returned exit code 0, emitted
+no stdout, and reported the cached/inputs-unchanged fact on stderr. It does not carry the cycle-1
+`1,033 files, 9 batches, 0 failed` figures. Those figures belong only to
+`check-cli-plugin-cycle1.json` at `d71b78c3`, not to this binding evidence.
+
+The following is the exact evidence-set invocation used. It consumes only the six named amendment
+receipts; no `receipts/*final*.json` or other glob is part of the contracted set.
+
+```bash
+deno eval '
+import { evaluateEvidenceSet } from "./.llm/tools/gates/evidence-set.ts";
+const directory = ".llm/runs/docs-rfc-plugin-cli-contribution--1502/receipts";
+const filenames = [
+  "check-amend.json",
+  "test-amend.json",
+  "publish-dry-run-amend.json",
+  "arch-check-amend.json",
+  "docs-source-format-amend.json",
+  "docs-accuracy-amend.json",
+];
+const receipts = await Promise.all(
+  filenames.map(async (filename) => JSON.parse(await Deno.readTextFile(`${directory}/${filename}`))),
+);
+console.log(JSON.stringify(evaluateEvidenceSet({
+  immutableHead: "67e12f02165089ec7431b72d1294147477906282",
+  surface: "docs-rfc-plugin-cli-contribution--1502-owner-amendment",
+  expectedGateIds: [
+    "check",
+    "test",
+    "publish-dry-run",
+    "arch-check",
+    "docs-source-format",
+    "docs-accuracy",
+  ],
+  receipts,
+}), null, 2));
+'
+```
+
+Result: `SUFFICIENT`, with `reasons: []`, the six expected gate IDs, and exactly the six
+`ns1502-amend-*` receipt IDs above. The receipt/journal follow-up changes no RFC, contract,
+package/plugin source, or lock content. Tier-A review and the final fresh opposite-family IMPL-EVAL
+remain coordinator-owned and are not launched by this author.
