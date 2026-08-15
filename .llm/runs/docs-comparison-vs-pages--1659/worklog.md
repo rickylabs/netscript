@@ -106,3 +106,27 @@
   implemented without changing scope or creating follow-up issues.
 - S4R: the replacement generated assets and all requested gates are complete. PR #1660 remains a
   draft with `status:impl`; the next action is owner re-review, not evaluation or merge readiness.
+
+## Readiness repair — snippet census contract
+
+- Readiness CI `31876017360` failed only because the real-corpus test pinned corpus totals that the
+  two comparison pages legitimately increased. The repair replaces that snapshot with alias,
+  partition, floor, budget, and malformed-input invariants; no production or docs content changed.
+- Invariant reconciliation:
+
+  | Invariant | Previous corpus | Current corpus |
+  | --- | --- | --- |
+  | `tsLike === ts + tsx + typescript` | `295 === 211 + 77 + 7` | `297 === 212 + 78 + 7` |
+  | `tier1 + outsideFloor === tsLike` | `35 + 260 === 295` | `35 + 262 === 297` |
+  | `checked + exempt === tier1` | `21 + 14 === 35` | `21 + 14 === 35` |
+  | Floors, budget, malformed | `35 >= 35`; `21 >= 21`; `14 <= 14`; `0` | `35 >= 35`; `21 >= 21`; `14 <= 14`; `0` |
+
+- Structured targeted test: raw exit `0`; 6 passed, 0 failed.
+- Structured targeted check: raw exit `0`; 1 file selected, 0 diagnostics.
+- Scoped formatting: N/A because root `fmt.include` selects only package/plugin TypeScript.
+- Scoped lint: N/A because root `lint.exclude` explicitly excludes `.llm/`.
+- Docs-site and freshness gates: N/A because this repair changes no docs content or generated asset.
+- `git diff --check`: raw exit `0`.
+- `git diff --exit-code origin/main -- deno.lock docs/site/deno.lock`: raw exit `0`.
+- Reconcile: issue #1659 remains owned by draft PR #1660 with `Closes #1659`; PR status and labels
+  are unchanged. No evaluator, readiness transition, or merge action ran.

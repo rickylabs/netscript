@@ -38,3 +38,9 @@ confirm the real public `baseContract`, and compile both pages' NetScript snippe
 checks now return zero for both frontend and backend. S3R owns the prose corrections, then S4R
 regenerated every asset and replaced the final gate evidence. All four freshness checks, all three
 docs gates, and both git hygiene gates pass. The draft PR remains `status:impl` for owner re-review.
+
+Readiness CI `31876017360` then exposed one corpus-snapshot false positive in the snippet extractor
+test. A narrowly scoped repair now asserts alias recognition, census partition consistency, the
+existing Tier-1 floors and exemption budget, and zero malformed fences without pinning corpus
+totals. Its targeted structured test and check pass; docs/freshness gates are N/A. The repair is the
+only post-S4R code change, and the PR remains draft and unmerged for fresh Tier-A ownership.
