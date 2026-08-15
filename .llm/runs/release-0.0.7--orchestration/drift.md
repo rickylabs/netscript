@@ -545,3 +545,11 @@ implementation thread.
 - **CDP continuation is stage-specific:** a request paused by Fetch at `requestStage: Response` must
   resume with `Fetch.continueResponse`. Using `Fetch.continueRequest` can turn the first leased run
   into an apparent infrastructure hang even though the defect is entirely in the unexecuted proof.
+- **Generated dependencies can form a chain:** refreshing the canonical prose assets is insufficient
+  when a second checked-in artifact embeds them. `check:agent-docs-prose` may pass while
+  `check:assets-barrel` correctly fails; readiness must traverse corpus source → prose asset → CLI
+  embedded barrel rather than stopping at the first fresh node.
+- **Hydrated data can make zero network requests:** a proof that merely waits for an observed list
+  request hangs when `initialData` remains fresh, while accepting stable zero lets a late request
+  impersonate mutation `+1`. Triggering Refresh establishes a deterministic completed baseline
+  before the mutation count begins.

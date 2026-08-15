@@ -537,3 +537,18 @@ changed only `prose.json.gz` and `provenance.json`; bounded checks are active. #
 commit uses `Fetch.continueRequest` for a response-stage pause and snapshots its request baseline
 after a fixed sleep. Those cannot prove a settled `+1` refetch. The same author is repairing the
 committed head without rewriting history. Runtime ownership remains empty.
+
+### Live transition — 2026-08-15T15:50:53Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Queue exhausted and parked at `0ca4c489f` | Do not invent post-freeze work |
+| internals | #1663 remains at the exceptional-final-PLAN-EVAL owner boundary on `194e22a3d` | No third evaluator or product mutation without the owner's explicit verdict |
+| fixes | #1665 corpus repair passed Tier-A and delta evaluation, but readiness exposed a second transitive generated dependency; scope checkpoint `215aae4b2` authorizes only the embedded CLI agent-docs barrel | Same-author generation, fresh Tier-A, and one focused asset-chain delta verdict before readiness |
+| features | #1664 corrected probe head `2c8219968` is pushed; fresh four-receipt generation active | No runtime lease until current-head receipts and fresh Tier-A pass |
+
+#1665's exact corpus fidelity verdict remains valid for its two-asset scope, but quality run
+`31893659579` / job `95033583015` fails `check:assets-barrel`: the CLI embedded agent-docs barrel
+still contains the old corpus. #1664 now forces a Refresh-driven completed/stable list baseline,
+uses `Fetch.continueResponse`, and tests the shared stability primitive against a late initial
+request. Runtime ownership remains empty.

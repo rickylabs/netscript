@@ -437,3 +437,14 @@ features topic `37372cbae` intercepted the wrong response-stage CDP resume and a
 request baseline. The same Sol/high author is repairing additively and must renew all four receipts
 before fresh Tier-A. No runtime lease or evaluator is permitted. #1663's owner-only decision is
 unchanged; independent lanes continue.
+
+Resume from the authoritative `2026-08-15T15:50:53Z` transition. Main remains `baf1cdf67`; runtime
+ownership is empty. #1665 two-asset corpus repair `7549d9fc0` passed fresh Tier-A `7fe2f433e` and
+fresh Fable 5/medium Remote Control delta evaluation `PASS` at artifact head `72d57229f`, but
+readiness run `31893659579` / quality job `95033583015` exposed the next transitive dependency:
+`check:assets-barrel` changes only `packages/cli/src/kernel/assets/agent-docs.generated.ts` because
+it still embeds the old corpus. Fixes scope checkpoint `215aae4b2` authorizes that one path plus run
+artifacts; same-author generation, fresh Tier-A, and a focused asset-chain delta verdict remain.
+#1664 corrected head `2c8219968` is pushed and fresh receipts are active: deterministic Refresh-
+driven completed/stable baseline, response-stage `Fetch.continueResponse`, and shared negative late-
+initial-request proof. No runtime lease before fresh Tier-A. #1663 owner boundary is unchanged.

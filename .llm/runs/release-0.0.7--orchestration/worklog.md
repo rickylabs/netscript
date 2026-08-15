@@ -763,3 +763,24 @@
   lease or evaluator is authorized.
 - The unrelated typed-queue DLQ count timing flake is tracked separately as #1667 rather than being
   hidden by retries or folded into either leaf.
+
+## 2026-08-15T15:50:53Z — corpus fidelity passes; transitive barrel and zero-request baseline caught
+
+- #1665 repair `7549d9fc0` passed fresh fixes Tier-A at topic `7fe2f433e`. Fresh Fable 5/medium
+  Remote Control delta evaluator `08eb7184`, bridge `cse_01Jc8aRcLQFVyVWKogq6SaFC`, independently
+  regenerated and byte-compared the corpus, proved only query-bridge plus its aggregate changed,
+  preserved the prior product verdict, and returned `PASS` at artifact head `72d57229f` with comment
+  `5302983190`.
+- Exact-head readiness still failed: run `31893659579`, quality job `95033583015`, reaches
+  `check:assets-barrel`, whose canonical regeneration changes only
+  `packages/cli/src/kernel/assets/agent-docs.generated.ts` from the old embedded corpus to the new
+  one. The fixes supervisor reproduced that in a disposable worktree, removed it, and pushed exact
+  scope amendment `215aae4b2`. Both prior PASS verdicts remain valid for their actual scopes; neither
+  proves this newly discovered transitive generated dependency. Same-author repair, fresh Tier-A,
+  and one focused asset-chain delta verdict are required before readiness resumes.
+- #1664's author repaired additively at `2c8219968` and pushed local == remote == PR. The live probe
+  now clicks the generated Refresh control because hydrated data with `staleTime: 15_000` may issue
+  zero automatic list requests; it then requires at least one observed request, all IDs completed,
+  and a stable confirmation window before recording baseline. Response-stage Fetch resumes through
+  `continueResponse`, and the same exported stability primitive is driven by the negative late-
+  initial-request unit case. Focused tests are 8/0; fresh binding receipts are active. Lease closed.
