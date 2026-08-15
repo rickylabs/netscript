@@ -142,3 +142,15 @@ Drift is append-only.
   source and `quality:gate` result with no F-1 finding must survive without comment/spacing games.
 - **Resolution:** scope amendment recorded; source correction remains blocked pending fresh fixes
   Tier-A over the plan-only amendment head.
+
+## 2026-08-15 — S2-A baseline predicate defect resolved
+
+- **Authorization:** fresh fixes Tier-A passed amendment head `ef3e43f06`.
+- **Action:** changed only the condition to
+  `isExpired || (!isFresh && preferFreshOnStale)`; `cache-query.ts` remains 497 lines with every S1
+  A2/A3 behavior, restored JSDoc block, and blank-line boundary intact.
+- **Proof:** the authorized factory test passes 6/6 and separately proves fresh+flag makes zero
+  upstream calls, expired with the flag false fetches once, and two overlapping stale+flag readers
+  share exactly one blocking refresh and one persisted timestamp.
+- **Resolution:** baseline defect corrected without new public surface or a
+  `cache-query_test.ts` edit. Fresh S2 Tier-A remains required after push.

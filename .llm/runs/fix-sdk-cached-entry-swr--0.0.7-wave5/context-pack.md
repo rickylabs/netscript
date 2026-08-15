@@ -6,17 +6,17 @@
 | -------------- | ------------------------------------------------------------- |
 | Run ID         | `fix-sdk-cached-entry-swr--0.0.7-wave5`                       |
 | Branch         | `fix/sdk-cached-entry-swr`                                    |
-| Current phase  | `plan amendment S2-A` — awaiting fresh fixes Tier-A           |
+| Current phase  | `implement` — S2 content complete; freshness head pending     |
 | Archetype      | `3 — Runtime/Behavior` slice; SDK package remains Archetype 2 |
 | Scope overlays | `docs`                                                        |
 
 ## Current State
 
-PLAN-EVAL is terminal `PASS` at plan head `23db20f30` with artifact head `d555cc971`, and S1 Tier-A
-passed at `e100ea205`. S2 authoring exposed a pre-existing defect: the stale-only
-`preferFreshOnStale` option is evaluated before the fresh-hit branch, so the corrected published
-loader fetches on a fresh entry. The coordinator authorized exactly `cache-query.ts` as an added
-S2-A correction surface, but this turn is plan-only. No published API changes.
+PLAN-EVAL and both S1/S2-A Tier-A reviews passed. S2 implementation is complete: the baseline
+fresh-hit predicate is corrected without changing exports or accepted S1 behavior, the factory
+regression proves fresh/stale/expired branches, exactly two docs pages carry the truthful
+action-then-metadata contract, and exactly four generated mirrors changed. All pre-commit gates are
+terminal; the content must now be committed so the Git-diff-based freshness gates can judge it.
 
 ## Completed
 
@@ -58,24 +58,35 @@ S2-A correction surface, but this turn is plan-only. No published API changes.
 - Fresh Tier-A accepted S1 at `e100ea205` with its A2/A3 semantics and 497-line/no-F-1 result.
 - Confirmed the baseline predicate at `main@3e8e146a4:170` and the identical S1-head predicate at
   `e100ea205:165`; the defect is baseline behavior exposed by S2, not an S1 regression.
+- Fresh fixes Tier-A passed S2-A at `ef3e43f06`.
+- Changed only the approved predicate in `cache-query.ts`; it remains 497 lines with S1 A2/A3 and
+  restored documentation/blank-line structure intact.
+- Added the authorized factory proof: fresh+flag is a zero-call hit; expired fetches with the flag
+  false; overlapping stale+flag loaders issue exactly one blocking refresh and share its timestamp.
+- Applied every docs disposition. A4 is explicit at tutorial lines 117-118. A1 is recorded as
+  manual Tier-A/IMPL-EVAL evidence and is not attributed to the docs-accuracy receipt.
+- Generated prose → CLI barrel → MCP publish assets in order; Git reported only the four declared
+  generated mirrors beyond the four authored S2 paths.
+- Completed scoped/root/runtime/docs/quality/publish/JSR gates. Root check is 2,925/25 batches with
+  zero findings; root tests are 4,206 passed, 0 failed, 19 ignored. The two doc-lint invocations
+  remain exactly-three-diagnostic expected reds; surface diff remains the known 524-major baseline
+  red; JSR F-DOCT-5 remains the known 13-child warning.
 
 ## In Progress
 
-- The three authored S2 files remain modified but uncommitted and must be preserved exactly:
-  `docs/site/services-sdk/sdk.md`,
-  `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md`, and
-  `packages/sdk/tests/query/query-factory_test.ts`.
-- The S2-A plan amendment authorizes the later condition
-  `isExpired || (!isFresh && preferFreshOnStale)` in `cache-query.ts`; no source correction is made
-  on this amendment head. The PR remains draft with sole `status:plan`.
+- The S2 content and preliminary evidence are ready to commit. The PR remains draft with sole
+  `status:plan`.
+- The first assets-barrel receipt is honestly red because it compares the authorized, regenerated
+  dirty mirror to pre-S2 `HEAD`. Commit this content, then run all three freshness gates sequentially
+  on that unchanged committed content head.
 
 ## Next Steps
 
-1. Coordinator runs fresh fixes Tier-A over the pushed plan-only S2-A amendment head.
-2. Only on PASS, change the one predicate in `cache-query.ts`, preserving expired precedence and
-   the fresh-hit fallthrough plus all accepted S1 behavior and the 497-line/no-F-1 result.
-3. Continue S2, regenerate the cascade in fixed order, and run final merge-readiness gates.
-4. Separate-session IMPL-EVAL remains mandatory before ready/merge.
+1. Commit the complete authorized S2 content plus this preliminary harness record.
+2. Run agent-docs, assets-barrel, and publish-assets freshness sequentially on that unchanged head.
+3. Record final receipts in an artifact-only commit, push explicitly, update/comment PR #1669, and
+   stop for fresh Tier-A.
+4. Separate-session IMPL-EVAL remains mandatory later; do not launch it in this session.
 
 ## Key Decisions
 
@@ -97,8 +108,11 @@ S2-A correction surface, but this turn is plan-only. No published API changes.
 | `.llm/runs/fix-sdk-cached-entry-swr--0.0.7-wave5/worklog.md` | amended | S1 implementation, gate, and advisory evidence. |
 | `.llm/runs/fix-sdk-cached-entry-swr--0.0.7-wave5/context-pack.md` | amended | Current slice handoff; coordinator-created artifacts preserved. |
 | `.llm/runs/fix-sdk-cached-entry-swr--0.0.7-wave5/drift.md` | appended | Records and resolves the initial F-1 metric-gaming response. |
-| Three authorized S2 source/test paths | modified, uncommitted | Preserved exactly during the plan-only S2-A amendment; not staged or committed. |
-| Five S2-A run artifacts | amended | Record the baseline defect, exact condition, proof surface, and stop boundary. |
+| `packages/sdk/src/cache/cache-query.ts` | changed in S2 | Exact one-line stale-only predicate correction; still 497 lines. |
+| `packages/sdk/tests/query/query-factory_test.ts` | changed in S2 | Published loader regression with fresh/stale/expired and overlap proofs. |
+| Two authorized docs sources | changed in S2 | Complete disposition table and A4 action/read posture. |
+| Four declared generated mirrors | changed in S2 | Ordered prose → barrel → publish-assets cascade; no additional tracked path. |
+| Run artifacts | amended | Implementation, A1/A4, gate, and handoff evidence. |
 
 ## Gates
 
@@ -107,15 +121,15 @@ S2-A correction surface, but this turn is plan-only. No published API changes.
 | Static | PASS | Structured SDK check/lint/fmt: 84 files, 0 failed batches/occurrences/findings. |
 | Fitness | PASS for S1 | Re-run on 497-line documented source: `quality:gate` exit 0; repository scan 0 findings; SDK `FAIL=0`, no F-1, known F-16 `WARN=1`, `INFO=1`. |
 | Runtime | PASS | Focused cache tests 5/5; full SDK tests 68/68; 0 failed/ignored/unique failures. |
-| Consumer/docs | S2 discovery RED; cascade NOT_RUN | Focused query-factory run passed 5 and failed 1 (`Expected seeded-fresh, got fetched`); full SDK passed 68 and failed 1 with the same baseline defect. Generated cascade has not begun. |
-| Final/root | NOT_RUN | Root `test`/`check`, publish/JSR, and final docs gates belong to later slices. Aspire, Docker, and `e2e:cli` were not run. |
+| Consumer/docs | PASS except pre-commit Git-diff freshness | Factory 6/6; docs format/accuracy and agent-docs prose receipts PASS. First assets-barrel receipt RED only because the declared changed mirror is not committed yet; final three-head check pending. |
+| Final/root | PASS with named baseline reds | Check 2,925 files/25 batches; tests 4,206 pass/0 fail/19 ignored; quality/arch/publish/specifiers PASS. Doc lint 3+3 and surface diff 524 majors remain pinned baseline red. |
 
 ## PLAN-EVAL Advisories for S2
 
-- A1: the page-level sentence is manual evidence for Tier-A and IMPL-EVAL against the rendered page
-  and disposition table. The docs-accuracy receipt cannot prove it; do not edit `.llm/tools/**`.
-- A4: the line-107 explanation must say that the default call without `preferFreshOnStale` is the
-  non-blocking SWR path and the flag is chosen here so `cachedAt` reflects the refreshed value.
+- A1 implemented: the page-level sentence is explicitly reserved for Tier-A/IMPL-EVAL manual review
+  against the rendered page and disposition table; docs-accuracy is not cited as its proof.
+- A4 implemented: tutorial lines 117-118 name default non-blocking SWR and explain that this loader
+  sets the flag so `cachedAt` reflects the refreshed value.
 
 ## S2-A Proof and Boundary
 
@@ -131,7 +145,7 @@ S2-A correction surface, but this turn is plan-only. No published API changes.
 
 ## Open Questions
 
-- None within the amendment. Runtime mutation is blocked pending fresh fixes Tier-A.
+- None. Only the post-commit freshness receipts and PR handoff remain.
 
 ## Drift and Debt
 

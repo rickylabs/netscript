@@ -92,6 +92,12 @@ action in `src/query/query-factory.ts` into `src/cache/cache-query.ts`, and add 
 | 2026-08-15 | S1             | Tier-A PASS               | Fresh Tier-A accepted S1 at `e100ea205`, including A2/A3 semantics and the honest 497-line/no-F-1 structural reduction. |
 | 2026-08-15 | S2             | Baseline defect exposed   | The authorized factory regression's fresh phase failed: `preferFreshOnStale: true` fetched despite a fresh non-expired entry. Base `main@3e8e146a4:170` contains the same predicate, so this is not an S1 regression. |
 | 2026-08-15 | S2-A           | Plan-only scope amendment | Coordinator authorized exactly `cache-query.ts` for the predicate correction. Preserved the three authored S2 files uncommitted; no source/docs/test mutation belongs to this amendment commit. |
+| 2026-08-15 | S2-A           | Tier-A PASS               | Fresh fixes Tier-A passed the exact five-artifact amendment at `ef3e43f06`; implementation resumed without widening the authorized surface. |
+| 2026-08-15 | S2             | Fresh-hit correction      | Changed only the predicate to `isExpired || (!isFresh && preferFreshOnStale)`; `cache-query.ts` remains 497 lines and every accepted S1 A2/A3 behavior and documentation block is untouched. |
+| 2026-08-15 | S2             | Loader regression         | Factory test proves fresh+flag makes 0 calls, expired with the flag false fetches once, and two overlapping stale+flag readers block on exactly one refresh and receive one persisted timestamp. |
+| 2026-08-15 | S2             | Published guidance        | Applied every disposition across exactly the two authorized pages. A4 explicitly contrasts default non-blocking SWR with the example's blocking flag; no prose implies that the factory lacks SWR. |
+| 2026-08-15 | S2             | Generated cascade         | Ran prose → barrel → publish-assets in order. Executed `git status --short`/`git diff --name-only` found exactly the four declared generated mirrors and no fifth tracked path. |
+| 2026-08-15 | S2             | Merge-readiness gates     | Scoped/root/runtime/docs/quality/publish gates completed; final freshness rerun awaits the committed S2 content head because `check:assets-barrel` compares generated output to `HEAD`. |
 
 ## Decisions
 
@@ -107,14 +113,17 @@ action in `src/query/query-factory.ts` into `src/cache/cache-query.ts`, and add 
 
 ## PLAN-EVAL Advisories Carried Forward
 
-- **A1 — S2 manual evidence:** the page-level acceptance sentence is not asserted by
+- **A1 — implemented as manual evidence:** the page-level acceptance sentence is not asserted by
   `.llm/tools/docs/check-accuracy-and-discoverability.ts`. In S2 it must be proved manually by the
   Tier-A slice review and IMPL-EVAL reading the disposition table against the rendered page. A
   `docs-accuracy` receipt may support its own checks but must not be cited as proof of that sentence;
-  no `.llm/tools/**` change is authorized.
-- **A4 — S2 tutorial posture:** near the corrected line-107 loader, state that the default call
-  without `preferFreshOnStale` is the non-blocking SWR path, while the example deliberately sets
-  `preferFreshOnStale: true` so `cachedAt` reflects the refreshed value.
+  no `.llm/tools/**` change was made. The manual sentence presented to those reviewers is: taken as
+  a whole, chapter 3 identifies the callable action as the SWR policy path, identifies
+  `getCachedEntry()` as a KV-only metadata read, and demonstrates action-then-metadata composition,
+  so the page no longer implies that the demonstrated metadata reader revalidates.
+- **A4 — implemented:** the corrected loader says the default callable action without
+  `preferFreshOnStale` is the non-blocking SWR path and this example sets the flag so `cachedAt`
+  reflects the refreshed value (`03-sdk-cache-first-query.md:117-118`).
 - **A2 — implemented in S1:** the map-registered fetch-and-persist operation returns fetched data
   after a handled write failure for any owner/joiner. Background telemetry records the provider
   error and detached ownership remains intact; fetch failure is the only rejection path.
@@ -157,20 +166,35 @@ action in `src/query/query-factory.ts` into `src/cache/cache-query.ts`, and add 
 | SDK format | **PASS** (exit 0) | `run-deno-fmt.ts --root packages/sdk --ext ts,tsx`: 84 files, 1 batch, 0 failed batches, 0 findings. |
 | Repository quality | **PASS** (exit 0) | Re-run on the restored 497-line source with `rtk proxy deno task quality:gate`: repository scan `ok: true`, 0 findings; SDK doctrine `FAIL=0`, `WARN=1`, `INFO=1`; no F-1 finding. The one SDK warning is the known F-16 13-child finding. |
 | S2 factory regression discovery | **RED** (exit 1) | Focused query-factory wrapper: passed 5, failed 1; fresh phase expected `seeded-fresh`, got `fetched`. Full SDK wrapper: passed 68, failed 1 with the same failure. This is the expected evidence exposing the pre-existing predicate defect, not an S1 regression. |
+| Focused factory test | **PASS** (exit 0) | Structured wrapper: passed 6, failed 0, ignored 0, total 6, unique failures 0. Fresh+flag calls `0`; expired with flag false calls `1`; overlapping stale+flag refresh calls exactly `1`. |
+| Full SDK tests | **PASS** (exit 0) | Structured wrapper: passed 69, failed 0, ignored 0, total 69, unique failures 0. |
+| Root check | **PASS** (exit 0) | Structured wrapper selected 2,925 files in 25 batches; 0 failed batches and 0 occurrences. It executed on changed inputs rather than returning a cache line. |
+| Root tests | **PASS** (exit 0) | Structured wrapper: passed 4,206, failed 0, ignored 19, total 4,225, unique failures 0. Queue flake #1667 did not occur; run was not repeated. |
+| Docs source format | **PASS** receipt (exit 0) | `Docs source format: OK`. |
+| Docs accuracy | **PASS** receipt (exit 0) | Script's own checks passed. Per A1, this receipt is not evidence for the chapter-3 page-level sentence. |
+| Agent-docs prose freshness | **PASS** receipt (exit 0) | Fresh with `stalePaths: []` on the generated content state. |
+| Assets-barrel freshness, pre-commit | **RED** receipt (exit 1) | Expected sequencing result: task regenerated the authorized dirty mirror then `git diff --exit-code` compared it with pre-S2 `HEAD`. Retained honestly; rerun is required only after committing this changed content state. |
+| Quality gate | **PASS** receipt (exit 0) | Repository scan 0 findings. SDK `FAIL=0 WARN=1 INFO=1`; the one warning is known F-16. `cache-query.ts` remains 497 lines with no F-1. |
+| Architecture check | **PASS** receipt (exit 0) | Dependency checks and all-roots doctrine scan exit 0; SDK known F-16 remains unchanged. |
+| Root publish dry-run | **PASS** receipt (exit 0) | Full workspace simulation completed successfully. |
+| Package raw publish dry-run | **PASS** (exit 0) | All 12 SDK entrypoints checked; no actual slow-type diagnostic; intended 58-file source-only list; `Success Dry run complete`. |
+| SDK JSR audit | **PASS with known warnings** (exit 0) | `files=84`, `loc=9922`, 12 exports; known F-DOCT-5 13-child warning and banner-parser F-JSR-7 only. Raw dry-run adjudicates the latter. |
+| NetScript JSR specifiers | **PASS** receipt (exit 0) | Scanned 2,361, allowances 1, ranges 0, failures 0. |
+| Combined SDK doc lint | **EXPECTED RED** (exit 1) | Exactly 3 pinned `private-type-ref` diagnostics: `QueryClientPort`/`QueryClient` at `src/ports/query-client.ts:41:1`; `createNetScriptQueryClient`/`QueryClient` at `src/query-client/query-client-factory.ts:44:1`; external `DurableStreamProducerOptions["instrumentation"]`/`StreamsInstrumentation` at `packages/plugin-streams-core/src/application/create-durable-stream.ts:41:3`. Zero new; never a pass. |
+| Cache-entrypoint doc lint | **EXPECTED RED** (exit 1) | Exactly 3 pinned `private-type-ref` diagnostics in `src/cache/kv-cache-store.ts`: `KvCacheStore`/`CacheStore` at `48:1`; `get`/`CacheKey` and `get`/`CacheStoreEntry` at `97:3`. Zero new; never a pass. |
+| Surface diff | **KNOWN BASELINE RED** (exit 1) | `verdict: major`, 524 undeclared majors from stale `public-surfaces.json`; no published export was added or changed by this leaf. Out of repair scope. |
 
-Root `test`/`check`, S2 consumer/docs gates, and final publish/JSR gates remain `NOT_RUN` by slice
-boundary. Aspire, Docker, and `e2e:cli` were not run and no runtime lease was acquired.
+The post-commit `assets-barrel` and `publish-assets` freshness receipts remain pending so all three
+cascade checks can judge one committed content head. Aspire, Docker, and `e2e:cli` were not run and
+no runtime lease was acquired.
 
 ## Handoff Notes
 
-- S1 passed Tier-A at `e100ea205`. Its policy-aware persistence-complete ownership, A2 non-fatal
-  write join, A3 synchronous registration, documentation, and honest 497-line/no-F-1 result are
-  locked invariants for the S2-A condition correction.
-- S2 authored changes remain uncommitted in exactly the two authorized docs pages and
-  `packages/sdk/tests/query/query-factory_test.ts`. This amendment does not commit, revert, stash,
-  or otherwise mutate them; generation has not begun.
-- Fresh fixes Tier-A should review the added `cache-query.ts` surface, baseline citation, exact
-  `isExpired || (!isFresh && preferFreshOnStale)` condition, query-factory-only proof, and preserved
-  S1/F-1 invariants.
-- Stop after this plan-only amendment. Do not make the semantic correction until fresh fixes Tier-A
-  passes; separate-session IMPL-EVAL remains mandatory after implementation is complete.
+- S2 implementation is complete on exactly the authorized runtime predicate, factory test, two docs
+  pages, four generated mirrors, and run artifacts. `cache-query_test.ts` was not touched in S2.
+- After committing the content head, run the three freshness receipts sequentially without changing
+  either docs page or mirror. Then record their terminal results in an artifact-only receipt commit.
+- A1 remains manual reviewer evidence: fresh Tier-A and later IMPL-EVAL must read the disposition
+  table against the rendered page. The docs-accuracy PASS is explicitly not cited for that claim.
+- Stop after push and the S2 PR receipt for fresh Tier-A. Do not launch IMPL-EVAL or change the draft
+  or sole `status:plan` state.

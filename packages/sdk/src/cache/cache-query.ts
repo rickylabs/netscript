@@ -162,7 +162,7 @@ export class CacheQuery {
         ttlMs: cacheTime,
       });
 
-      if (isExpired || preferFreshOnStale) {
+      if (isExpired || (!isFresh && preferFreshOnStale)) {
         return await this.fetchAndCacheOnce(
           measuredQueryFn,
           key,
