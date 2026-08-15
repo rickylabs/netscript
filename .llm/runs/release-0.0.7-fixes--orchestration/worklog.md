@@ -193,3 +193,46 @@ silently picking the weaker option to stay inside the box — the pattern that w
 **Holds still in force.** No expensive Aspire/Docker/`e2e:cli` gate without a fresh coordinator
 lease; no evaluator launched by the leaf; PR stays draft; issues stay coordinator-relabelled.
 WIP after this release: 1 implementation leaf, 0 evaluators.
+
+## 2026-08-15 — #1665 PLAN-EVAL launched (coordinator-granted, Tier-A PASS)
+
+Coordinator granted PLAN-EVAL on immutable exact source head `ee1b44c6d` after the Tier-A PASS
+checkpoint `318bd087c`. Exactly one fresh evaluator launched; no implementation dispatched.
+
+| Field | Value |
+| --- | --- |
+| Job id | `0287ccbe` |
+| Session id | `0287ccbe-2740-45ee-b378-33d1c1c59429` |
+| OS PID | `803215` |
+| Bridge session id | `session_01GaNTjv6oY6MaxnKHH1ZfrB` (resolvable form, from `~/.claude/sessions/803215.json`) |
+| Remote Control URL | `https://claude.ai/code/session_01GaNTjv6oY6MaxnKHH1ZfrB` |
+| `cwd` | `/home/codex/repos/netscript-007-leaf-sdk-cache` |
+| Source head at launch | `ee1b44c6d401a9edb9c8690870ea2d9151f8f504`, worktree clean |
+| Requested route | native Claude · `claude-fable-5` · effort `medium` · Remote Control — canonical `formal_plan_evaluation` for a Codex-authored plan |
+| Observed route | `respawnFlags`: `--permission-mode bypassPermissions --remote-control --name "NetScript 0.0.7 #1665 PLAN-EVAL" --effort medium --model claude-fable-5` |
+| Route verdict | **matched** |
+| Backend / CLI | `daemon` · `2.1.233` |
+
+Note the jobs record also carries `bridgeSessionId` in the `cse_01GaNTjv6oY6MaxnKHH1ZfrB` form, which
+does **not** resolve as a URL; the resolvable `session_…` form comes from the per-PID session file.
+Both are recorded so the identity cannot be confused later.
+
+**Attachment proven, not assumed.** The first `type: user` record in
+`~/.claude/projects/-home-codex-repos-netscript-007-leaf-sdk-cache/0287ccbe-….jsonl` is 8233 chars
+and begins `use harness` — the 8299-byte brief landed rather than being swallowed by a preceding
+variadic flag, which is the failure mode that leaves a background session silently idle. Job state
+was `working` at launch+5s.
+
+**Generator ≠ evaluator holds three ways.** The Codex author (`01a00516-…`, `gpt-5.6-sol`) wrote the
+plan; the topic orchestrator (Opus 5) performed Tier-A in its own session; this Fable 5 session is a
+third, fresh, opposite-family session. The brief instructs it to re-derive T-1..T-4 independently and
+explicitly not to adopt the Tier-A findings as established fact.
+
+The brief requires: identity recorded before mutation; an executed proof that the branch carries no
+product mutation; independent re-derivation of T-1..T-4, the exact five-path scope, D1–D5
+feasibility, and validation honesty; `plan-eval.md` committed and pushed by explicit refspec; and a
+structured PR verdict comment. Verdict vocabulary is `PASS` / `FAIL_PLAN`. It is prohibited from
+implementing, merging, relabelling, running Aspire/Docker/e2e, launching another agent, or steering
+the Codex author thread.
+
+WIP during this gate: 1 implementation leaf (idle), 1 evaluator. No expensive lease held.
