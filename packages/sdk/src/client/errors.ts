@@ -4,7 +4,11 @@
  * @module
  */
 
-import { isDefinedError as orpcIsDefinedError } from '@orpc/client';
+import {
+  type ClientPromiseResult,
+  isDefinedError as orpcIsDefinedError,
+  type ThrowableError,
+} from '@orpc/client';
 
 /**
  * Public shape of an oRPC defined error.
@@ -33,20 +37,47 @@ export type SafeSuccess<TOutput> = [null, TOutput, false, true] & {
   isSuccess: true;
 };
 
-/**
- * Failure branch returned by {@link safe}.
- */
-export type SafeFailure<TError = unknown> = [TError, null, boolean, false] & {
-  error: TError;
-  data: null;
-  isDefined: boolean;
+type DefinedErrorLike = Error & {
+  readonly defined: boolean;
+  readonly code: string;
+  readonly status: number;
+  readonly data: unknown;
+};
+
+type NarrowDefined<TError> = Extract<TError, DefinedErrorLike> & DefinedError;
+
+type NonDefinedSafeFailure<TError> = [
+  Exclude<TError, DefinedErrorLike>,
+  undefined,
+  false,
+  false,
+] & {
+  error: Exclude<TError, DefinedErrorLike>;
+  data: undefined;
+  isDefined: false;
+  isSuccess: false;
+};
+
+type DefinedSafeFailure<TError> = [NarrowDefined<TError>, undefined, true, false] & {
+  error: NarrowDefined<TError>;
+  data: undefined;
+  isDefined: true;
   isSuccess: false;
 };
 
 /**
+ * Failure branch returned by {@link safe}.
+ */
+export type SafeFailure<TError = ThrowableError> =
+  | NonDefinedSafeFailure<TError>
+  | DefinedSafeFailure<TError>;
+
+/**
  * Tuple/object result returned by {@link safe}.
  */
-export type SafeResult<TOutput, TError = unknown> = SafeSuccess<TOutput> | SafeFailure<TError>;
+export type SafeResult<TOutput, TError = ThrowableError> =
+  | SafeSuccess<TOutput>
+  | SafeFailure<TError>;
 
 function createSafeSuccess<TOutput>(data: TOutput): SafeSuccess<TOutput> {
   const tuple = [null, data, false, true] as SafeSuccess<TOutput>;
@@ -57,11 +88,20 @@ function createSafeSuccess<TOutput>(data: TOutput): SafeSuccess<TOutput> {
   return tuple;
 }
 
-function createSafeFailure<TError>(error: TError, isDefined: boolean): SafeFailure<TError> {
-  const tuple = [error, null, isDefined, false] as SafeFailure<TError>;
-  tuple.error = error;
-  tuple.data = null;
-  tuple.isDefined = isDefined;
+function createSafeFailure<TError>(error: TError): SafeFailure<TError> {
+  if (isDefinedError(error)) {
+    const tuple = [error, undefined, true, false] as DefinedSafeFailure<TError>;
+    tuple.error = error;
+    tuple.data = undefined;
+    tuple.isDefined = true;
+    tuple.isSuccess = false;
+    return tuple;
+  }
+
+  const tuple = [error, undefined, false, false] as NonDefinedSafeFailure<TError>;
+  tuple.error = error as Exclude<TError, DefinedErrorLike>;
+  tuple.data = undefined;
+  tuple.isDefined = false;
   tuple.isSuccess = false;
   return tuple;
 }
@@ -72,7 +112,7 @@ function createSafeFailure<TError>(error: TError, isDefined: boolean): SafeFailu
  * @param error - Unknown thrown value.
  * @returns `true` when the error is an oRPC defined error.
  */
-export function isDefinedError<T>(error: T): error is Extract<T, DefinedError> {
+export function isDefinedError<T>(error: T): error is NarrowDefined<T> {
   return orpcIsDefinedError(error);
 }
 
@@ -83,10 +123,12 @@ export function isDefinedError<T>(error: T): error is Extract<T, DefinedError> {
  * @param promise - Promise to resolve safely.
  * @returns Safe tuple/object result.
  */
-export async function safe<TOutput>(promise: PromiseLike<TOutput>): Promise<SafeResult<TOutput>> {
+export async function safe<TOutput, TError = ThrowableError>(
+  promise: ClientPromiseResult<TOutput, TError>,
+): Promise<SafeResult<TOutput, TError>> {
   try {
     return createSafeSuccess(await promise);
   } catch (error) {
-    return createSafeFailure(error, isDefinedError(error));
+    return createSafeFailure<TError>(error as TError);
   }
 }

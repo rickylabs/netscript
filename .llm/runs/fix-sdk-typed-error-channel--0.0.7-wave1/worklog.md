@@ -61,19 +61,25 @@ forces the exact key union to stay synchronized. No code union or metadata vocab
 
 ## Progress log
 
-| Time       | Slice | Step               | Notes                                                                                                                                       |
-| ---------- | ----- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-15 | Plan  | Bootstrap/research | Re-baselined exact branch/base; read required skills, doctrine, harness, Accepted RFC, issues, and docs.                                    |
-| 2026-08-15 | Plan  | Public inspection  | `deno doc` confirmed current `safe`, `isDefinedError`, `SafeResult`, and `baseContract` signatures.                                         |
-| 2026-08-15 | Plan  | RED                | Executed TS2339 `error.code` on `never` with `deno eval --check --unstable-kv`.                                                             |
-| 2026-08-15 | Plan  | Consumer scan      | Executed whole-repo searches; identified `@netscript/fresh`, CRUD, query/desktop/type fixtures, CLI/template, docs, and baseline consumers. |
-| 2026-08-15 | Plan  | Rescope            | Required out-of-scope `service-client.ts`; conditional contracts barrel; live #1466 ownership conflict. Stopped all product work.           |
-| 2026-08-15 | Plan  | Amendment          | Coordinator authorized the sixth client-port path, assigned metadata vocabulary to #1466, denied the barrel, and locked six paths.          |
-| 2026-08-15 | Eval  | PLAN-EVAL          | Terminal PASS at `f76a3c45b`; incorporated advisories A1-A5 without editing the evaluator artifact.                                         |
-| 2026-08-15 | S1    | RED                | Real-export fixture recorded TS18046 (`unknown`) and TS2339 (`never`) together in one structured run; not rerun for tidier output.          |
-| 2026-08-15 | S1    | Builder            | Exact `typeof commonErrorMap` error generic and explicit `Record<never, never>` fourth slot; no metadata vocabulary or new export.          |
-| 2026-08-15 | S1    | Fixture            | Uses contracts-root `CursorPaginationInputSchema` and `SuccessSchema`; asserts six keys, undeclared rejection, and empty meta slot.         |
-| 2026-08-15 | S1    | Gates              | Focused structured check/test/lint/format pass; CRUD and workers soundness consumers included. Root/final-slice gates not run.              |
+| Time       | Slice | Step               | Notes                                                                                                                                         |
+| ---------- | ----- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-15 | Plan  | Bootstrap/research | Re-baselined exact branch/base; read required skills, doctrine, harness, Accepted RFC, issues, and docs.                                      |
+| 2026-08-15 | Plan  | Public inspection  | `deno doc` confirmed current `safe`, `isDefinedError`, `SafeResult`, and `baseContract` signatures.                                           |
+| 2026-08-15 | Plan  | RED                | Executed TS2339 `error.code` on `never` with `deno eval --check --unstable-kv`.                                                               |
+| 2026-08-15 | Plan  | Consumer scan      | Executed whole-repo searches; identified `@netscript/fresh`, CRUD, query/desktop/type fixtures, CLI/template, docs, and baseline consumers.   |
+| 2026-08-15 | Plan  | Rescope            | Required out-of-scope `service-client.ts`; conditional contracts barrel; live #1466 ownership conflict. Stopped all product work.             |
+| 2026-08-15 | Plan  | Amendment          | Coordinator authorized the sixth client-port path, assigned metadata vocabulary to #1466, denied the barrel, and locked six paths.            |
+| 2026-08-15 | Eval  | PLAN-EVAL          | Terminal PASS at `f76a3c45b`; incorporated advisories A1-A5 without editing the evaluator artifact.                                           |
+| 2026-08-15 | S1    | RED                | Real-export fixture recorded TS18046 (`unknown`) and TS2339 (`never`) together in one structured run; not rerun for tidier output.            |
+| 2026-08-15 | S1    | Builder            | Exact `typeof commonErrorMap` error generic and explicit `Record<never, never>` fourth slot; no metadata vocabulary or new export.            |
+| 2026-08-15 | S1    | Fixture            | Uses contracts-root `CursorPaginationInputSchema` and `SuccessSchema`; asserts six keys, undeclared rejection, and empty meta slot.           |
+| 2026-08-15 | S1    | Gates              | Focused structured check/test/lint/format pass; CRUD and workers soundness consumers included. Root/final-slice gates not run.                |
+| 2026-08-15 | S1    | Tier-A             | Fresh Tier-A PASS at `dc034d680`; coordinator authorized S2 only.                                                                             |
+| 2026-08-15 | S2    | Public inspection  | `deno doc` confirmed upstream `ClientPromiseResult`, `ErrorFromErrorMap`, `ThrowableError`, and literal `SafeResult` arms before source edit. |
+| 2026-08-15 | S2    | Error channel      | Defaulted three-parameter `ServiceClientMethod` carries the real error map; `SafeFailure<TError = ThrowableError>` retains its default.       |
+| 2026-08-15 | S2    | Assertions         | Removed both S2 suppressions and replaced them with exact code-union/defined-error assertions plus code-specific data and plain-error guards. |
+| 2026-08-15 | S2    | Consumers          | Checked query, desktop, RFC, assignability, service-query, and Fresh consumers; ran SDK query/desktop plus Fresh extraction tests.            |
+| 2026-08-15 | S2    | Reconcile          | Observed S1 Tier-A PASS; no issue/label/checklist mutation, no #1348/#1466 touch, no scope adjustment, and S3 remains blocked.                |
 
 ## Gate results
 
@@ -87,6 +93,10 @@ forces the exact key union to stay synchronized. No code union or metadata vocab
 | S1 focused test                       | PASS                                   | 3/3 results; SDK doctest + workers health soundness                            |
 | S1 focused lint                       | PASS                                   | 2 edited TS files, 0 findings                                                  |
 | S1 focused format write/check         | PASS                                   | 2 edited TS files, 0 findings; final check clean                               |
+| S2 focused check                      | PASS                                   | 15 affected files, 1 batch, 0 diagnostics                                      |
+| S2 focused/consumer tests             | PASS                                   | 12/12 results across 4 test files                                              |
+| S2 focused lint                       | PASS after one recorded correction     | Initial 2 `verbatim-module-syntax`; final 3 files, 0 findings                  |
+| S2 focused format write/check         | PASS                                   | 3 edited TS files, 0 findings                                                  |
 | Root/final-slice gates                | NOT RUN                                | Explicitly reserved for slice 4                                                |
 
 ### S1 structured JSON verdicts
@@ -241,8 +251,132 @@ Focused format write and final check:
 }
 ```
 
+### S2 structured JSON verdicts
+
+Final focused check, including SDK query/desktop/RFC/assignability/service-query consumers and the
+Fresh error-extraction consumer:
+
+```json
+{
+  "exitCode": 0,
+  "command": "deno check --unstable-kv <files>",
+  "selection": { "filesSelected": 15, "batches": 1, "failedBatches": 0 },
+  "summary": {
+    "totalOccurrences": 0,
+    "uniqueOccurrences": 0,
+    "uniqueCodes": 0,
+    "uniquePaths": 0
+  },
+  "groups": []
+}
+```
+
+Final focused and consumer tests:
+
+```json
+{
+  "exitCode": 0,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all",
+    "packages/sdk/tests/readme-doctest_test.ts",
+    "packages/sdk/tests/query/query-factory_test.ts",
+    "packages/sdk/tests/desktop/desktop-rpc-client_test.ts",
+    "packages/fresh/src/diagnostics/error/extract_test.ts"
+  ],
+  "summary": {
+    "passed": 12,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 12,
+    "uniqueFailures": 0
+  },
+  "failures": []
+}
+```
+
+The first lint run failed and was corrected rather than hidden:
+
+```json
+{
+  "exitCode": 1,
+  "selection": { "filesSelected": 3, "batches": 1 },
+  "summary": {
+    "totalOccurrences": 2,
+    "uniqueOccurrences": 2,
+    "uniqueRules": 1,
+    "uniquePaths": 1
+  },
+  "groups": [
+    {
+      "rule": "verbatim-module-syntax",
+      "message": "Import identifier only used in types",
+      "count": 2,
+      "path": "packages/sdk/tests/readme-doctest_test.ts",
+      "locations": ["4:3", "6:3"]
+    }
+  ],
+  "resolution": "Marked both exported schema imports type-only."
+}
+```
+
+Final focused lint:
+
+```json
+{
+  "exitCode": 0,
+  "selection": { "filesSelected": 3, "batches": 1 },
+  "summary": {
+    "totalOccurrences": 0,
+    "uniqueOccurrences": 0,
+    "uniqueRules": 0,
+    "uniquePaths": 0
+  },
+  "groups": []
+}
+```
+
+Final focused format write and check:
+
+```json
+{
+  "exitCode": 0,
+  "command": "deno fmt",
+  "mode": "write",
+  "summary": {
+    "filesSelected": 3,
+    "batches": 1,
+    "failedBatches": 0,
+    "findings": 0,
+    "ignoredFindings": 0
+  },
+  "findings": []
+}
+```
+
+```json
+{
+  "exitCode": 0,
+  "command": "deno fmt --check",
+  "mode": "check",
+  "summary": {
+    "filesSelected": 3,
+    "batches": 1,
+    "failedBatches": 0,
+    "findings": 0,
+    "ignoredFindings": 0
+  },
+  "findings": []
+}
+```
+
+The S2 doctest-only run also passed 3/3 before the broader 12-test consumer run. The S1 RED block
+above was not edited or rerun. `typed-queue_test.ts` was not selected, so #1667 was not encountered.
+Root/final-slice gates were not run.
+
 ## Handoff
 
-S1 is complete and stops here for fresh Tier-A review. Slice 2 is not authorized in this session;
-`errors.ts`, `ports/service-client.ts`, and both docs pages remain untouched. No evaluator was
-launched and no metadata acceptance box was ticked.
+S2 is complete and stops here for fresh Tier-A review. Slice 3 and both docs pages remain untouched.
+No evaluator was launched, no acceptance box was ticked, and no metadata vocabulary was introduced.

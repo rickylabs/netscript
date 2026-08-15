@@ -6,16 +6,17 @@
 | -------------- | ------------------------------------------------------------ |
 | Run ID         | `fix-sdk-typed-error-channel--0.0.7-wave1`                   |
 | Branch         | `fix/sdk-typed-error-channel`                                |
-| Current phase  | `implementation` — S1 complete; awaiting fresh Tier-A review |
+| Current phase  | `implementation` — S2 complete; awaiting fresh Tier-A review |
 | Archetype      | `1 — Small Contract` slice                                   |
 | Scope overlays | `docs`                                                       |
 
 ## Current state
 
-PLAN-EVAL is terminal PASS at evaluator commit `f76a3c45b`. S1 records both real-export REDs
-(TS18046 `unknown`, TS2339 `never`), then makes the contracts builder carry the exact six-key error
-map and explicit empty fourth slot. S2 error-channel files remain untouched. #1466 owns metadata
-definition/export; S1 introduces no metadata vocabulary or acceptance claim.
+PLAN-EVAL is terminal PASS at evaluator commit `f76a3c45b`; S1 Tier-A passed at `dc034d680`. S2
+preserves the exact six-key contract error union through the real `ServiceClient` promise marker,
+`safe()`, and `isDefinedError()`. The two S1 suppressions are now positive exact-type assertions,
+including code-specific data. #1466 still owns metadata definition/export; no metadata vocabulary or
+acceptance claim was introduced.
 
 ## Completed
 
@@ -27,11 +28,16 @@ definition/export; S1 introduces no metadata vocabulary or acceptance claim.
 - Separate-session PLAN-EVAL PASS with advisories A1-A5 incorporated.
 - S1 builder annotation and real-export regression fixture using contracts-exported schemas.
 - S1 structured check/test/lint/format gates.
+- S1 fresh Tier-A PASS at `dc034d680`.
+- S2 uses upstream public `ClientPromiseResult`, `ErrorFromErrorMap`, and `ThrowableError` types to
+  carry the procedure error map without a local schema shim or ambient declaration.
+- S2 literal failure arms, real positive assertions, runtime identity test, and focused consumer
+  compatibility checks/tests.
 
 ## Next steps
 
-1. Fresh Tier-A reviews the landed S1 head and structured evidence.
-2. Stop. Slice 2 requires fresh coordinator authorization after that review.
+1. Commit and push S2, then post its receipt on draft PR #1671.
+2. Stop for fresh Tier-A. Slice 3 remains unauthorized in this session.
 
 ## Key decisions
 
@@ -46,23 +52,29 @@ definition/export; S1 introduces no metadata vocabulary or acceptance claim.
 ## Files changed
 
 - `packages/contracts/src/application/contract-primitives.ts`
+- `packages/sdk/src/client/errors.ts`
+- `packages/sdk/src/ports/service-client.ts`
 - `packages/sdk/tests/readme-doctest_test.ts`
 - existing files under `.llm/runs/fix-sdk-typed-error-channel--0.0.7-wave1/`
 
-No S2-S4 file was modified.
+No docs/S3-S4 product file was modified.
 
 ## Gates
 
 - PLAN-EVAL: PASS (`plan-eval.md`, `f76a3c45b`).
 - S1 RED: expected FAIL with exactly TS18046 and TS2339, captured once.
 - S1 focused check/test/lint/format: PASS; full JSON is in `worklog.md`.
+- S2 focused check: PASS, 15 affected source/test/type-fixture files, 0 diagnostics.
+- S2 consumer tests: PASS, 12/12 results across SDK doctest/query/desktop and Fresh extraction.
+- S2 lint and format: PASS after correcting two type-only imports; the initial lint red is retained
+  in `worklog.md`.
 - Root quality/publish/docs/JSR gates: not run; reserved for the final slice.
 - Baseline JSR/publish inspection is recorded in `research.md` and `worklog.md`.
 
 ## Open questions
 
-- None for S1. Benchmark reference prose is coordinator-owned follow-up debt; the contracts README
-  correction is recorded in `research.md` without editing that seventh path.
+- Live service integration tests requiring a runtime lease were not run because this slice forbids a
+  lease. Benchmark reference prose remains coordinator-owned follow-up debt.
 
 ## Drift and debt
 
