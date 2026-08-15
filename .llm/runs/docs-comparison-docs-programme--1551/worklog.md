@@ -51,6 +51,8 @@ The draft PR is partial and must say `Part of #1551`. Follow-ups #1645–#1650 o
 | 2026-08-15 | Formal PLAN-EVAL cycle 1 reconciled. | fresh native Claude Opus 5/low opposite-family session; `PASS` on `d35cbca30872d1f55118d63437638e93270c2ac3`; evaluator-only commits `9ae97c934` and `a790e91e2`; verdict is external authority, not generator self-certification |
 | 2026-08-15 | S1 authored within the exact six-file content boundary and gated. | build, links, terminology, front matter, prose, and comparison navigation pass; topic-orchestrator correction defers the S3-owned `/migration/` rendered-root assertion without rescope |
 | 2026-08-15 | Tier-A S1 review found premature migration references and an insufficient link gate. | four `/migration/` references removed; rendered `check:links` added to S1; significant/no-rescope correction recorded for later IMPL-EVAL |
+| 2026-08-15 | Topic orchestrator signed off S1 and authorized S2. | Tier-A PASS at `98fc58997c3ff5ca21403ba67521c584a5d26a0e`; generator entered S2 without treating the sign-off as self-certification |
+| 2026-08-15 | S2 immutable local-input precondition checked. | no authorized checkout at `5191de83f3da97559f21d8891c6c8afdf1cf473a`; stopped before private source reads, tool/JSON creation, gates, commit, push, or PR comment |
 
 ## Gate log
 
@@ -102,6 +104,21 @@ The fix strictly reduces S1's published surface. S3 still owns all migration pag
 navigation, and the assertion that both comparison and migration roots render. Stop again for
 topic-orchestrator Tier-A re-review; no S2 or S3 work has begun.
 
+### S2 immutable-input precondition
+
+| Gate | Commands / procedure | Scope | Result | Findings | Proceeded |
+| --- | --- | --- | --- | --- | --- |
+| Branch baseline | raw local HEAD, branch, status, upstream, and remote-ref inspection | S2 worktree | PASS | clean `98fc58997c3ff5ca21403ba67521c584a5d26a0e`; remote matches; no upstream | yes |
+| Authorized local root | read-only `git rev-parse HEAD` on available EIS-Chat checkouts plus bounded exact-head search | existing local checkouts only | **BLOCKED** | observed heads `aeaf2df5…`, `5fdff778…`, and `a08ebe55…`; none equals required `5191de83…` | no |
+| Required revision object | read-only `git cat-file -t 5191de83f3da97559f21d8891c6c8afdf1cf473a` | the two obvious EIS-Chat object stores | **BLOCKED** | required commit object is absent, so no existing detached local root can be resolved without fetching or copying private source | no |
+| Remote revision | topic-orchestrator-verified `git ls-remote origin` | authorized EIS-Chat remote | PASS | pinned commit is current `HEAD` and `refs/heads/master`; it is not lost or rewritten, only absent from the parked local clones | no |
+| Plan dependency | reconcile `research.md:51` with the S2 local-roots contract | approved research and plan | **BLOCKED** | research explicitly used GitHub-only inspection with no checkout; no approved slice provisions the local input later required by S2; formal PLAN-EVAL cycle 1 passed over the gap | no |
+| Privacy/scope containment | observe stop conditions | S2 authorization | PASS | no consumer file read; no fetch, checkout, clone, new worktree, source copy, tool/JSON creation, S2 gate, or external mutation | no |
+
+The planned S2 aggregate cannot be truthfully produced until an already-authorized local checkout
+at the exact pinned revision is available. A different head, estimate, or network-fetched input is
+not an acceptable substitute.
+
 ### Planned S3 docs-audit rows
 
 | Gate | Commands / procedure | Scope | Result | Findings | Proceeded |
@@ -116,4 +133,4 @@ topic-orchestrator Tier-A re-review; no S2 or S3 work has begun.
 | Cross-page contradictions | compare broad explanation, methodology, case, migration, builder/defer docs, and matrix rows | related public surfaces | NOT RUN | implementation not started | no |
 
 No S2/S3 implementation gate, release gate, scaffold suite, E2E suite, or expensive-gate lease has
-been run. S1 stops at the completed gate above for topic-orchestrator Tier-A slice review.
+been run. S2 is blocked pending coordinator disposition of the missing local-input dependency.

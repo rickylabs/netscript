@@ -2,9 +2,10 @@
 
 ## Current state
 
-Phase: formal PLAN-EVAL cycle 1 passed; the bounded Tier-A S1 fix is complete and awaiting its
-single commit, explicit push, structured PR comment, and topic-orchestrator re-review. S2/S3 have
-not started.
+Phase: S1 is signed off by the topic orchestrator at
+`98fc58997c3ff5ca21403ba67521c584a5d26a0e`. S2 is authorized but blocked before implementation
+because no authorized local EIS-Chat root is at the required immutable revision. The coordinator
+owns disposition of that plan dependency. S3 has not started.
 
 Branch/worktree: `docs/comparison-docs-programme` in
 `/home/codex/repos/netscript-007-docs-comparison`, no upstream. The re-baselined branch/remote head
@@ -72,6 +73,11 @@ Every slice is under 30 files, has a named gate, commits its worklog/context upd
 
 ## Next authorized action
 
-After the Tier-A fix commit, explicit push, and structured PR comment, stop for topic-orchestrator
-re-review. Do not begin S2 or S3 without a new authorization. Do not treat the external PLAN-EVAL
-PASS or the generator's gate report as self-certification.
+Wait for coordinator disposition. The pinned revision remains current `HEAD` and
+`refs/heads/master` on the authorized EIS-Chat remote, but the local clones do not contain it.
+`research.md:51` records GitHub-only inspection with no checkout, while S2 later requires an
+authorized local root; formal PLAN-EVAL cycle 1 passed over that unprovisioned dependency.
+
+Do not fetch, clone, check out, create a worktree, or copy private source to resolve it. Do not
+substitute a different revision. Until the coordinator rules, do not create the measurement
+tool/JSON or begin S3.

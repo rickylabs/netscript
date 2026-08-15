@@ -50,3 +50,33 @@ S3 retains ownership of the migration pages, xrefs, navigation, and both-root
 rendered assertion. Formal PLAN-EVAL cycle 1 passed over both the premature
 references and the insufficient S1 link gate; this entry keeps both misses visible
 to later IMPL-EVAL.
+
+## 2026-08-15 — S2 pinned local input is unavailable
+
+Severity: **significant** — implementation precondition missing. Status: **blocked**.
+Rescope: **none**. Scope growth: **none**.
+
+The approved S2 design requires an authorized local EIS-Chat root whose repository
+revision is exactly `5191de83f3da97559f21d8891c6c8afdf1cf473a` before the measurement
+tool reads any file. The available read-only checkouts were at `aeaf2df5…`,
+`5fdff778…`, and `a08ebe55…`; a bounded filesystem search found no checkout at the
+required revision, and the two obvious EIS-Chat object stores did not contain the
+required commit object.
+
+The revision is not lost or rewritten. The topic orchestrator independently
+verified that `git ls-remote origin` on the authorized
+`https://github.com/rickylabs/eis-chat.git` remote reports the pinned commit as
+both `HEAD` and `refs/heads/master`; the local clones are parked on other branches
+and have never fetched that tip.
+
+The missing input follows from the approved plan itself rather than from remote
+availability. `research.md:51` records that the private repository was inspected
+only through authorized GitHub access at the immutable commit and that no checkout
+was made. The S2 tool contract then requires an authorized local root, but no slice
+creates one. Formal PLAN-EVAL cycle 1 passed over that unsatisfied dependency.
+
+S2 stopped before reading consumer files or creating the tool, manifest, or
+measurements. No fetch, checkout, clone, worktree creation, private-source copy, or
+other attempt to materialize the missing revision was made. Truthful aggregate
+reproduction requires an already-authorized local root at the pinned revision; a
+different revision or network-derived estimate cannot satisfy the evidence contract.
