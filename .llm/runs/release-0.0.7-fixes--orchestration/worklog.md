@@ -609,3 +609,46 @@ head — plus the three known-red gates (#1668 corpus, `surface:diff`, `F-DOCT-5
 and never-to-report-green, and the #1667 flake pre-briefed with its signature.
 
 WIP after dispatch: 1 implementation leaf, 0 evaluators. No lease held.
+
+## 2026-08-15 — #1665 shipped; #1461/#1669 released with a coordinator scope widening
+
+**#1665 terminal.** Merged 2026-08-15T16:29:46Z as main `3e8e146a4aedf8ee0afec15c83ddaefc171c71f9`
+from head `ac274a464`. All five issues — #1598, #1619, #1620, #1623, #1637 — `CLOSED` at sole
+`status:shipped`. Shipped lifecycle terminal, so the serial queue advances.
+
+**Next leaf: `sdk-cached-entry-swr` (#1461), PR #1669.**
+
+| Field | Value |
+| --- | --- |
+| Worktree | `/home/codex/repos/netscript-007-leaf-cached-entry` |
+| Branch | `fix/sdk-cached-entry-swr` (no upstream by design) |
+| Base | `3e8e146a4` — the #1665 merge commit |
+| Plan head | `7e5be1514e33a0b88d53da523b73a5d330b06674`, local == remote == PR, clean |
+| Author thread | `01a00646-82a9-7ec2-88e7-16dea98a58fa`, openai · `gpt-5.6-sol` · medium — **matched**, preserved (not replaced) |
+| PR | #1669 draft, base `main`, sole `status:plan` |
+| Phase proof | `git diff --name-only origin/main..HEAD` outside `.llm/runs/` is empty — plan-only |
+
+**Coordinator scope ruling verified before acting on it.** The claim that
+`docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md:100` independently repeats the false
+statement is **confirmed** — line 100 reads "`getCachedEntry` returns immediately from KV when warm,
+and *the stale entry refreshes in the background*". That is the same falsehood #1461 exists to
+correct.
+
+Worth recording in the author's favour: the plan had **already found it** (`plan.md:189`) and
+deliberately refused to edit it, classifying any docs source outside `services-sdk/sdk.md` as a
+frozen-contract expansion requiring a ruling (`plan.md:199`). That is the scope-boundary behaviour
+this lane wants, and the ruling vindicates the report rather than correcting an oversight.
+
+**Amendment dispatched to the preserved original author** (plan-only, no product edit): declare the
+second docs source as authorized, state the corrected wording without overcorrecting — `getCachedEntry`
+is a pure cache read and the fix must not imply a refresh mechanism the fast path lacks — sweep both
+authorized pages and the surrounding tutorial story for any other false
+`getCachedEntry`/revalidation claim by executed command, and **verify by executing generation** that
+the mirror cascade still touches only the four declared paths rather than accepting that assertion.
+A third page found in the sweep is to be reported, not absorbed.
+
+Explicitly excluded: `#1667`, `#1668`, and every other named red. No runtime lease acquired; no
+Aspire/Docker/`e2e:cli`. PR stays draft at sole `status:plan`.
+
+Fresh Tier-A runs over the amended head next, then exactly one separate native Fable 5 · medium ·
+Remote Control PLAN-EVAL over that immutable head. No implementation before its PASS.
