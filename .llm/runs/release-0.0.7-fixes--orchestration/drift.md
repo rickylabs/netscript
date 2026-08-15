@@ -77,3 +77,29 @@ needs `scaffolder.ts` plus a new `generate-database-seed.ts` seam to emit model-
 empty-schema seed output. Those generator surfaces are absent from the frozen contract. No product
 change was committed; draft PR #1654 is clean/paused at `42572af32`. A coordinator amendment and a
 separate PLAN-EVAL are required before implementation resumes.
+
+## Significant — #1358 leaf contract amended for Tier-A finding T-3
+
+Coordinator disposition recorded by `topic-fixes-0.0.7` at leaf head
+`5fe60023530d89b888a028d5269909636ac03b8a`; leaf-local record committed at `c5e06661b`.
+
+Tier-A `CHANGES_REQUESTED` on PR #1657 found that the landed drift gate never runs on CLI-side
+edits: `registry-doc-drift.test.ts` executes only through `.github/workflows/fresh-ui-quality.yml`,
+whose `paths:` filters exclude `packages/cli/src/kernel/assets/app/routes/(design)/**`; `ci.yml`
+never references `fresh-ui`; `ci-classify-changes.ts` sets `freshUi` only for `packages/fresh-ui/`
+paths; and `packages/fresh-ui` is outside the root workspace, so the root `deno task test` cannot
+compensate. A later template-only edit would re-introduce the 50-of-66 drift with no CI signal.
+
+Issue #1358's acceptance carries that requirement as a **close-gated** `gate:` box, and PR #1657
+carries `Closes #1358`. The coordinator explicitly declined to weaken the box, re-scope it, drop the
+closing keyword, or defer a knowingly false CI surface, and instead amended the frozen contract with
+exactly three files: `.github/workflows/fresh-ui-quality.yml`, `.github/scripts/ci-classify-changes.ts`,
+and `.github/scripts/ci-classify-changes.test.ts`.
+
+The original four product surfaces, the locks, the issue closing semantics, the draft/`status:impl`
+lifecycle, and all prior evidence are preserved. The repair is bounded to CI-ownership wiring plus
+focused positive/negative classifier tests proving a CLI design-only diff requests the Fresh UI gate
+**without** broadening unrelated CLI diffs. Gates are proportional — cheap classifier/workflow
+structure tests plus the existing drift/check/quality/arch set; `fresh-browser`, Aspire, Docker and
+any expensive lease remain out of scope, and the consumed lease's `PASS` receipt at product head
+`4a3c40321` stays valid because the repair changes no product file.
