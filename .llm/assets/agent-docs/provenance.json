@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "version": "0.0.6",
-  "sourceCommit": "c8e3f26d8",
-  "extractionTimestamp": "2026-08-15T06:37:52.605Z",
+  "sourceCommit": "504de3f67",
+  "extractionTimestamp": "2026-08-15T08:52:56.248Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -25,9 +25,9 @@
     "pages/background-processing/polyglot-tasks/index.md",
     "pages/background-processing/workers/index.md",
     "pages/cli-reference/index.md",
+    "pages/comparisons/backend/index.md",
+    "pages/comparisons/frontend/index.md",
     "pages/comparisons/index.md",
-    "pages/comparisons/methodology/index.md",
-    "pages/comparisons/nextjs-session/index.md",
     "pages/concepts/index.md",
     "pages/data-persistence/database/index.md",
     "pages/data-persistence/how-to/choose-a-queue-provider/index.md",
@@ -62,8 +62,6 @@
     "pages/identity-access/index.md",
     "pages/identity-access/session-lifecycles/index.md",
     "pages/index.md",
-    "pages/migration/index.md",
-    "pages/migration/nextjs/index.md",
     "pages/observability/how-to/add-opentelemetry/index.md",
     "pages/observability/how-to/index.md",
     "pages/observability/index.md",
@@ -188,7 +186,7 @@
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 4783855,
-  "compressedBytes": 1372269,
-  "sha256": "6f25560210cae276a3a5149e7315b1e9682406acdfe342cadbe1c7f35c629efb"
+  "uncompressedBytes": 4753233,
+  "compressedBytes": 1363117,
+  "sha256": "a7c72177e9226e07f88e0ac09f8eb762f341fc3f3842a3a6886cd227d0d59cc8"
 }
