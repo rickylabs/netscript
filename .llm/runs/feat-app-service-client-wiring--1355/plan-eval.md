@@ -242,3 +242,151 @@ Items 1–4 are unchecked-box fixes; 5–6 are cheap and should ride the same am
 - N4 Under the direct-emit ruling nothing in the plan changes the SDK type surface; if the author
   still wants a named SDK helper later, file it separately with a deprecation path for the string
   form — that is the only shape that removes the trap.
+
+---
+
+# PLAN-EVAL cycle 2 of 2 — feat-app-service-client-wiring--1355
+
+- Plan evaluator session: fresh native Claude session, 2026-08-15 (cycle 2 of 2; final plan cycle)
+- Subject: `research.md` and `plan.md` at repaired head `f7225be98c01b38f86712c1df0782aec06e34445`
+- Cycle 1 rulings (direct emit, no SDK overload; README homes, never `docs/**`; gate class) are
+  treated as binding and were not re-opened.
+
+## Attachment identity
+
+| Field              | Value                                                                                                                                                                             |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Session ID         | `8c756943-11c8-45a2-84ab-8c8392898723`                                                                                                                                            |
+| Bridge session ID  | `cse_01UrhsQgBYpLZWHKAhCvESi6`                                                                                                                                                    |
+| Remote Control URL | `https://claude.ai/code/session_01UrhsQgBYpLZWHKAhCvESi6`                                                                                                                         |
+| PID                | `792001` (`claude bg-spare …`, spare-claimed process; argv carries neither `--model` nor `--effort`)                                                                               |
+| cwd                | `/home/codex/repos/netscript-007-features-1355`                                                                                                                                   |
+| Requested route    | native Claude Fable 5 · medium · Remote Control (`lane-policy.md:45`)                                                                                                             |
+| Observed route     | `jobs/8c756943/state.json` `respawnFlags`: `--effort medium --permission-mode bypassPermissions --remote-control --name "NetScript 0.0.7 #1664 PLAN-EVAL c2" --model claude-fable-5` |
+| Match              | yes (read from `respawnFlags`, not argv)                                                                                                                                          |
+
+## Immutable identity check
+
+- local `HEAD` = `f7225be98c01b38f86712c1df0782aec06e34445`;
+  `git ls-remote origin refs/heads/feat/app-service-client-wiring` = same;
+  `gh pr view 1664 --json headRefOid` = same; `isDraft=true`; state `OPEN`; body lines 7–8 carry
+  `Closes #1355` / `Closes #1360`.
+- `git status --porcelain` empty. No refusal condition.
+- Repair delta `7f20a34fe..f7225be98` touches only run artifacts (`plan.md`, `research.md`,
+  `context-pack.md`, `drift.md`, `worklog.md`, `plan-eval.md`); no `packages/**` change, as required.
+
+## § 1 Cycle-1 fixes — discharged?
+
+| Fix | Result | Where it is discharged (checked against the file, not the summary) |
+| --- | ------ | ------------------------------------------------------------------ |
+| 1 fork ruling | **Discharged** | `plan.md:34` (A6 row), D8 `:105`, Open-Decision `:111`, SDK contract `:122-128` (JSDoc fix of `key-bridge.ts:4-7` + pointer to `factory.<action>.clientKey()`, semantic match/mismatch tests, later helper needs its own issue + deprecation path), S1 `:200`, Drift Watch `:340`; `research.md:167-169,179-183,254-255`; `context-pack.md:57`; `drift.md` entry. Both constraints that produced the ruling (A6 identity wrapper; SDK-0.0.6 coupling) are recorded, not just the conclusion. Verified independently that `clientKey` is present in the **published** `@netscript/sdk@0.0.6` (`jsr.io/@netscript/sdk/0.0.6/src/query/query-factory.ts` contains `clientKey`), so the compat rationale is true, not asserted. Residual: the S2 test named "SDK-0.0.6 compatibility" (`plan.md:201`) has no stated assertion — see constraint C1. |
+| 2 output paths locked | **Discharged** | Hidden scope `:79-81`; D6 `:103`; Open-Decision `:113`; CLI contract `:133-137`; scenario 1 `:266-271` (add creates `lib/payments.ts`, generate reconciles it and creates `lib/users.ts`, `(_lib)/service-query.ts` not rewritten); scenario 3 `:301-303` names the init-owned module rendered from the same corrected template; `research.md` Finding 5 `:144-151`. Consistent with `client-scaffolder.ts` (`apps/<app>/lib/<service>.ts`) at this head. |
+| 3 `service generate` compat | **Discharged** | Hidden scope `:82-84`; D4 `:101` (whole-command semantics incl. Aspire helpers); Open-Decision `:114`; CLI contract `:138-140`; `research.md:146-147` (differing modules rewritten without `--force`) and `:152-155` (dry-run/force govern both halves). |
+| 4 documentation home | **Discharged** | Scope `:55-56`; Open-Decision `:112`; CLI contract `:140-143` lists all six `exampleService*` symbols and the `service` → per-router namespace migration; Fresh `:147-149`; S3 files `:202` include both READMEs; `research.md:176-177`. Nothing under `docs/**` (Non-Scope `:65`). |
+| 5 scenario 3 tightened | **Discharged** | `plan.md:303-310`: settle first, record `users.list` count, click Rename, require count **+ exactly one** only after the mutation response settles, DOM shows server-returned `renamedName`; `invalidateQueries` spying explicitly insufficient. |
+| 6 housekeeping | **Discharged** | Per-slice file lists in `plan.md:197-205`; `research.md:65` now cites `packages/cli/src/kernel/adapters/service/workspace-mutator.ts:75-97` (verified: `upsertServiceAppsettingsEntry`, `NetScript.Services[serviceName]`). Existence check of every listed pre-existing S2/S3 file passed except `generate-aspire_test.ts`, which does not exist yet and is not marked "new" (cosmetic; the file is legitimately new). |
+
+## § 2 Diagnoses re-derived at `f7225be98` (source unchanged from `3fc0f2f92`)
+
+- Key-shape mismatch — **holds.** `queryOptions().queryKey = [resource, action, { input }]`
+  (`query-factory.ts:145-152`); `clientKey() = [resource, action(, {input})]` (`:179-183`);
+  `bridgeInvalidation = { queryKey: [resource, action] | [resource] }` (`key-bridge.ts:19-37`);
+  template emits `bridgeInvalidation(<svc>RouterName, 'list')` (`service-query.ts.template:11-14`)
+  against a factory registered under the literal key `service` (`:22-27`).
+- `'service'` collision — **holds.** `createQueryFactories` uses `Object.entries` keys as
+  `resource` (`query-factory.ts:214-220`).
+- #1360 — **holds.** Both islands pass `initialData`/`staleTime: 15_000` and omit
+  `initialDataUpdatedAt` (`ServiceShowcaseLab.tsx.template:57-58`, memory `:60-61`); `cachedAt`
+  only feeds a stat (`:148`, memory `:119`). `IslandQueryOptions.initialDataUpdatedAt`
+  (`query-types.ts:135-136`) is consumed by `useInitialQueryData` → `setQueryData(..., { updatedAt })`
+  (`hooks.ts:125-143`); islands' `useQuery` is Fresh's wrapper over `useIslandQuery`
+  (`hooks.ts:212-216`), so the `fresh-browser` fixture on the public `useQuery` proves the same
+  path.
+- Citation drift — **honest**; `key-bridge.ts:4-7` still says `cache_query`. No further moved
+  citation found among those spot-checked (`workspace-resolver.ts:19-36`,
+  `generate-service-command.ts:21-41`, `add-service.ts:69-79`, `query-types.ts:127-140`).
+
+## § 3 Three-member scope
+
+- SDK: type/export surface unchanged (`plan.md:122`); doc-lint + publish dry-run still owed because
+  a published module changes (`research.md:175`). Precise.
+- CLI: request/result contract with deterministic `written`/`skipped`, atomic plan-then-write,
+  owned path, whole-command flags, README-documented (`plan.md:132-143`); explicit-annotation risk
+  for `isolatedDeclarations:false` named (`:160`, `research.md:191`). Public behaviour is stated,
+  not implicit.
+- Fresh: no new type; browser coverage through the public wrapper + README note (`:147-149`).
+- Per-member JSR obligations: enumerated per member (`research.md:189-199`; `plan.md:222`), exact
+  `@0.0.6` pins asserted per member. Discharged per member, not in aggregate.
+
+## § 4 Compatibility
+
+- Generated-but-not-regenerated apps: no package upgrade edits consumer source (D6, Finding 5
+  `:141-143`). Direct emit compiles against SDK 0.0.6 (verified above). Nothing breaking found for
+  untouched apps.
+- Apps that *run* `service generate` after upgrading: (a) differing client modules are rewritten
+  without `--force` — stated; (b) new `lib/<service>.ts` files appear for init-created services —
+  additive, covered by scenario 1; (c) **not stated:** because the whole command plans/validates
+  every service and contract before the first write (`plan.md:78,100`), an existing app with a
+  manifest service whose `<Pascal>ContractV1` export is missing will now have the previously
+  Aspire-only `service generate` fail *entirely* (Aspire half withheld too). `service add` always
+  scaffolds the contract (`add-service.ts:44-56`), so this needs a deleted/renamed contract; edge
+  case, but it is a behaviour change of an existing verb — see constraint C2.
+- Pre-#1424 migration: six symbols listed and namespace/orphaned-cache consequence stated
+  (`plan.md:141-143`, `research.md:156-164`). Actionable.
+
+## § 5 Pre-lease scenario assertions
+
+- Scenario 1 (`plan.md:258-271`): concrete command pair, "zero writes and byte-identical" second
+  run, consumer importing `usersQueries` + `paymentsQueries` type-checked, `(_lib)` untouched —
+  falsifiable, checkable.
+- Scenario 2 (`:272-300`): literal arrays for server and client keys, "differ only at index 0",
+  own-prefix match plus cross-service non-match — falsifiable by deep-equal + `partialMatchKey`.
+- Scenario 3 (`:301-310`): count delta of exactly one after settle plus server-confirmed DOM value.
+  It can fail (no second request if the prefix does not match; DOM stuck on optimistic value if the
+  refetch never lands; a hydration-age refetch cannot inflate it because the baseline is recorded
+  after settle). Sufficient.
+- Hydration (`:312-325`): controlled `hydrationNow`, `−60_000` vs `hydrationNow`, qf-count 1 vs 0,
+  `dataUpdatedAt` equality — falsifiable.
+- The plan does **not** claim existing suites prove any of this: `packages/cli/e2e/suites/scaffold/`
+  contains no `service add`/`--with-client` (only the quickstart suite does), and
+  `packages/fresh/deno.json:26` `test:browser` runs only `form-navigation_browser.ts`; the plan frames
+  both extensions as lease preconditions (`:251-252`, hidden scope `:85-86`).
+
+## § 6 Slices and evidence set
+
+- Seven slices S0–S6, each ending at a Tier-A stop; expensive work isolated to S5 after S4
+  convergence and lease (`plan.md:199-205`, D7).
+- Gate-class repair complete and consistent, no residue: `catalog.ts` has no `scaffold.runtime`
+  entry, `fresh-browser` at `catalog.ts:55`; `release-gates.md:22` owns `scaffold.runtime`;
+  `plan.md:87-92,212-217,227,238-242` and `drift.md` correction entry agree. Five-file receipt set
+  (`:230-236`) is honest: the sixth gate is proven by suite-owned exact-head output + lease/cleanup
+  record and is required for merge-readiness (`:240-242`), not left unproven. Minor: `worklog.md`
+  S5 row says "Receipts/reports only", which is loose relative to the plan's class boundary — not
+  plan text.
+
+## Verdict
+
+`PASS`
+
+All six cycle-1 fixes are discharged in substance; every diagnosis re-derives from source; no
+plan-gate box is unchecked. The following are **implementation constraints**, not plan blockers,
+and IMPL-EVAL should verify them:
+
+- **C1 — make the "SDK-0.0.6 compatibility" test concrete.** The rendered module must (a) contain
+  the literal `{ queryKey: <svc>Queries.list.clientKey() } as const` defined after `<svc>Queries`,
+  and (b) import from `@netscript/sdk/*` only symbols already published in 0.0.6 — in practice
+  `createServiceClient` and `createQueryFactories`; the now-unused `bridgeInvalidation` import
+  (`service-query.ts.template:3`) must be dropped or the generated app fails lint. An allowlist
+  assertion on the rendered import set is what catches a future re-coupling.
+- **C2 — atomic-failure compat.** State in `packages/cli/README.md` (and in the error message, naming
+  the service and expected contract path) that `service generate` fails before any write — Aspire
+  helpers included — when a manifest service lacks its contract; and decide/document whether
+  `Enabled: false` services (`workspace-resolver.ts:28`) receive owned modules.
+- **C3 — mark `generate-aspire_test.ts` as new** in S2 on the next amendment.
+
+## Notes
+
+- N1 Already-decided items complied with: no expensive gate run, no lease, no catalog entry, no
+  code touched by this session.
+- N2 Ruling on the fork restated for the record: **direct emit, no SDK overload** (cycle 1),
+  compliance verified at this head.
