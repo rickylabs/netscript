@@ -587,6 +587,43 @@ verdict required; expensive gates and lease requests barred; read-only over sour
 
 The next fixes leaf stays **queued** until the verdict **and** the lifecycle transition are terminal.
 
+### #1661 post-cycle-2 repair — proportionate formal evaluation, lease recorded pre-mutation
+
+Coordinator granted exactly one fresh native Claude evaluator for the post-cycle-2 repair delta.
+Identity captured while the leaf tree was **verified clean at the evaluated head**, so
+"before mutation" is a checked fact.
+
+| Field | Value |
+| --- | --- |
+| Scope | **delta `4766b258f..de8944011` only** — not a leaf re-audit; cycle-2 `PASS` at `df05344166` stands |
+| **Evaluated head** | `de89440119ba45822f0bdc8350838088a6f04140` — local = remote = PR; tree clean |
+| Repair product commit | `45aca4adcd35dd6a9b825db449284e400171a533` (ancestor; artifact-only delta to the evaluated head) |
+| Requested route | canonical native Claude `claude-fable-5` · `medium` · `--remote-control` |
+| Observed route | `respawnFlags: ["--effort","medium","--permission-mode","bypassPermissions","--remote-control","--name","NetScript 0.0.7 #1661 EVAL repair-delta","--model","claude-fable-5"]` |
+| Background id | `8a0ff845` |
+| Claude session id | `8a0ff845-1d0a-43d6-ae3c-03b4158f7943` |
+| PID | `714835` |
+| cwd | `/home/codex/repos/netscript-007-leaf-ai-mcp-pool` (exact leaf; sole session) |
+| Registry `bridgeSessionId` | **`session_013K3BZ2ydVkYzXt6vgcxTJX`** — non-empty, sessions-registry form |
+| Remote Control URL | `https://claude.ai/code/session_013K3BZ2ydVkYzXt6vgcxTJX` |
+| Verdict | _pending — immutable pushed verdict required_ |
+
+Brief scope matches the grant: both computed constants and **all three** import sites; the CLI
+assertion unchanged; optional-JSR-graph intent plus publish dry-run; **repo-wide** and
+asserting-package evidence re-run by the evaluator rather than accepted; no runtime MCP contract
+regression; no unrelated path. Read-only over source; no expensive gate, product repair, readiness
+flip, relabel or merge inside the evaluator; one immutable pushed verdict commit and one comment.
+
+**"Capable of failing" — already proven empirically, not by construction.** The grant asks that the
+CLI assertion be unchanged *and capable of failing*. It demonstrably is: CI `check-test` **did fail
+on this exact assertion** at head `4766b258f` (4151 passed / **1 failed**, `currentFailures=1`,
+`workspace-mutator_test.ts:261`). A vacuous assertion could not have produced that failure, so the
+capability is established by observed behaviour rather than by inspection. The evaluator is asked to
+confirm the assertion text is unchanged; its falsifiability is already on the record.
+
+On `PASS` this lane reconciles and hands exact merge readiness back. `sdk-cache-surface-and-telemetry`
+stays queued until the coordinator's terminal merge.
+
 ## Wave 0 lane assignments
 
 | Leaf | Branch | Implementation route | Formal evaluator (per `dispatch.json`) |
