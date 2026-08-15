@@ -295,3 +295,24 @@ one-request candidate is discarded when a second initial request arrives late an
 after the two-request state completes and remains quiet; a source-wiring regression locks both the
 stable helper call and the response-stage resume. Focused result: 8 passed, 0 failed. No browser,
 Aspire, Docker, or expensive suite ran.
+
+### S4-F2 repaired binding evidence
+
+The corrected immutable content head is
+`2c82199680e4b3cfc8e93d831acd5d160f0b5db9`. Four fresh `run-gate.ts` invocations attest that
+exact head with `gitHead == actualGitHead`, no mismatch override, unique IDs, and PASS/exit 0:
+
+| Receipt | Invocation ID | Result |
+| --- | --- | --- |
+| `receipts/s4-f2-fix1-check.json` | `app-service-client-wiring-s4-f2-fix1-check` | PASS — 2,936 files, 25 batches, zero diagnostics. |
+| `receipts/s4-f2-fix1-test.json` | `app-service-client-wiring-s4-f2-fix1-test` | PASS — 4,210 passed, zero failed, 19 ignored. |
+| `receipts/s4-f2-fix1-publish-dry-run.json` | `app-service-client-wiring-s4-f2-fix1-publish-dry-run` | PASS — workspace publish simulation completed. |
+| `receipts/s4-f2-fix1-arch-check.json` | `app-service-client-wiring-s4-f2-fix1-arch-check` | PASS — zero architecture failures; existing warnings remain visible. |
+
+Recomputation through `evaluateEvidenceSet` over exactly those four files is **SUFFICIENT** with an
+empty reason list. The older `s4-f2-check.json` and `s4-f2-test.json` remain superseded-only evidence
+for `787cfa928`; they are not included. The earlier per-member audits remain unchanged: CLI
+export-map doc lint PASS; Fresh export-map doc lint `PRE_EXISTING_FAIL` with 45 attributed
+diagnostics; SDK export-map doc lint `PRE_EXISTING_FAIL` with three attributed diagnostics, including
+the separately named plugin-streams `StreamsInstrumentation` finding; all three JSR audits exit 0
+with warnings only, and all three per-member isolated declaration/publish dry-runs pass.

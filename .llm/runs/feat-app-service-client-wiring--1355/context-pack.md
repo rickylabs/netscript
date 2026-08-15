@@ -36,8 +36,10 @@ tests and clean focused check/lint. Recovery review then found that the first br
 a response-stage pause with the wrong CDP command and used a fixed-delay baseline. The additive
 repair switches to `Fetch.continueResponse`, explicitly establishes a completed positive list
 baseline across a 500 ms quiet window, and adds late-initial-request plus source-wiring regressions
-(focused probe file: 8/0). The two receipts at `787cfa928` are superseded-only. No lease or expensive
-command is authorized.
+(focused probe file: 8/0). The two receipts at `787cfa928` are superseded-only. Four replacement
+binding receipts now PASS at corrected content head `2c8219968`: check has zero diagnostics, tests
+are 4,210/0 with 19 ignored, workspace publish dry-run passes, and architecture check has zero
+failures. Exact-set recomputation is SUFFICIENT. No lease or expensive command is authorized.
 
 ## Completed
 
@@ -78,17 +80,15 @@ command is authorized.
 
 ## In Progress
 
-- The S4-F2 browser-probe repair is ready to commit. After that immutable content head exists,
-  produce four fresh `s4-f2-fix1-*` binding receipts. The `s4-f2-{check,test}.json` receipts at
-  `787cfa928` remain superseded-only, and S5 remains blocked.
+- S4-F2 recovery evidence is complete and awaits fresh Tier-A review. The four current
+  `s4-f2-fix1-*` receipts attest `2c8219968` and recompute SUFFICIENT. The
+  `s4-f2-{check,test}.json` receipts at `787cfa928` remain superseded-only, and S5 remains blocked.
 
 ## Next Steps
 
-1. Commit and push the additive response-resume/stable-baseline repair.
-2. Run all four binding cheap gates through `run-gate.ts` at that corrected immutable head with fresh
-   `s4-f2-fix1-*` invocation IDs and filenames.
-3. Recompute exact-set sufficiency and stop for fresh Tier-A review; keep S5 and both expensive gates
-   lease-blocked.
+1. Commit and push the four generated receipts and evidence summary.
+2. Post the structured S4 receipt comment naming each current receipt and the superseded pair.
+3. Stop for fresh Tier-A review; keep S5 and both expensive gates lease-blocked.
 
 ## Key Decisions
 
@@ -129,7 +129,7 @@ command is authorized.
 
 | Gate family | Current status                                                                                                                    | Evidence                     |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Static      | Supplemental package evidence complete with attributed doc baselines; all four replacement binding receipts PASS at `32ea23f50`, exact-set sufficiency SUFFICIENT. | `worklog.md`; `reports/s4-test-failure.md`; binding receipts |
+| Static      | Supplemental package evidence complete with attributed doc baselines; all four S4-F2 repair binding receipts PASS at `2c8219968`, exact-set sufficiency SUFFICIENT. | `worklog.md`; `reports/s4-test-failure.md`; binding receipts |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
 | Runtime     | NOT_RUN / lease-blocked                                                                                                           | `plan.md` release conditions |
 | Consumer    | NOT_RUN / implementation-dependent                                                                                                | `plan.md` S5                 |
