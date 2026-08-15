@@ -508,6 +508,163 @@ Lease-head discipline is amended from S5: every preflight artifact must be commi
 pushed before readiness is reported. The head named in a lease request is final and immutable; no
 preflight evidence commit may move it after a grant.
 
+## F5 amendment — canonical post-init generated content
+
+### Disposition and attribution
+
+S5 attempt 3 reached `generated.deno-fmt-check` after the repaired F4 probe passed and reported 12
+unformatted files. The earlier S5 report remains append-only, but its attribution is corrected here:
+the formatting omission predates this leaf, while the failing post-init service-generation state is
+inside this leaf's generated-output contract and cannot be carried as a merge baseline. At both
+pre-implementation `c53726c69` and the current head,
+`packages/cli/src/kernel/application/scaffold/support/post-scripts-init.ts:7` defines the only init
+formatter, and `packages/cli/src/kernel/application/scaffold/init-pipeline.ts:80` is its only caller.
+`init` output is formatted after its write phases; `service add`, `service generate`, and the four
+post-init writer paths have no equivalent pre-write canonicalization.
+
+The generated quality runner's current exact-set report reproduces the accepted 12-path arithmetic:
+
+| Generated path | Owner / write decision |
+| --- | --- |
+| `apps/<app>/lib/users.ts` | `ServiceClientScaffolder.plan` / `needsWrite` / `write` |
+| `apps/<app>/lib/payments.ts` | `ServiceClientScaffolder.plan` / `needsWrite` / `write` |
+| `contracts/versions/v1/payments.contract.ts` | `createContractScaffolder.writeServiceContract` / `writeTracked` |
+| `contracts/versions/v1/mod.ts` | `ContractVersionRegistry.regenerate` direct filesystem write |
+| `services/payments/src/routers/v1.ts` | `ServiceScaffolder.writeRendered` / `writeGenerated` |
+| `aspire/.helpers/register-apps.mts` | `regenerateAspireHelpers` generated-file equality/write loop |
+| `aspire/.helpers/index.mts` | `regenerateAspireHelpers` generated-file equality/write loop |
+| `aspire/.helpers/db-cli-mode.mts` | `regenerateAspireHelpers` generated-file equality/write loop |
+| `aspire/.helpers/register-tools.mts` | `regenerateAspireHelpers` generated-file equality/write loop |
+| `aspire/.helpers/register-infrastructure.mts` | `regenerateAspireHelpers` generated-file equality/write loop |
+| `aspire/.helpers/register-background.mts` | `regenerateAspireHelpers` generated-file equality/write loop |
+| `aspire/.helpers/register-plugins.mts` | `regenerateAspireHelpers` generated-file equality/write loop |
+
+The three payments-derived non-client paths are the new contract, its regenerated v1 aggregate,
+and the generated v1 service router. The seven helpers and three payments paths do not pass through
+the client scaffolder, so a client-only formatter would repair only two of 12.
+
+### Locked abstraction
+
+Add one internal `GeneratedSourceFormatterPort` with two deliberately different operations:
+
+1. a content-in/content-out operation that accepts the target path plus rendered source and invokes
+   Deno's formatter over stdin (`deno fmt --ext <target-extension> -`); and
+2. a bulk path operation for the existing init/post-script caller.
+
+One `DenoGeneratedSourceFormatter` adapter owns both command shapes. It is a transport around the
+sanctioned Deno formatter, not a local formatting algorithm. The content operation reuses the
+existing generated-file policy from `format-generated-files.ts` (`--no-config`, line width 100,
+single quotes, and target-derived extension). The bulk operation lets `formatOutput` retain its
+current project-config discovery and warning semantics. The existing path-based
+`formatGeneratedFiles` helper delegates to the same adapter, so its plugin callers retain their
+current exact-file behavior.
+
+The smallest required API adjustment is optional text stdin on `ProcessPort.exec`; `DenoProcess`
+writes that text to a piped child stdin and closes it before collecting stdout/stderr. No new public
+package export is added. Post-init writers receive the formatter port through the existing public
+command composition root. They canonicalize rendered content **before** their equality or
+`willWrite` decision and write that exact canonical string. No post-write `deno fmt` call is added
+to either service command.
+
+This design is idempotent by construction. For a renderer `R` and canonicalizer `F`, both the
+comparison and write use `F(R(input))`. A same-input repeat computes the same canonical bytes and
+compares them to those same bytes on disk. The rejected design compared `R(input)` to previously
+post-formatted `F(R(input))`, which would force a rewrite forever whenever formatting changed the
+rendered source.
+
+### Exact product and focused-test ceiling
+
+F5 implementation may modify only these product paths:
+
+- new `packages/cli/src/kernel/ports/generated-source-formatter-port.ts`
+- `packages/cli/src/kernel/ports/process-port.ts`
+- new
+  `packages/cli/src/kernel/adapters/runtime/process/deno-generated-source-formatter.ts`
+- `packages/cli/src/kernel/adapters/runtime/process/deno-process.ts`
+- `packages/cli/src/kernel/application/scaffold/support/format-generated-files.ts`
+- `packages/cli/src/kernel/application/scaffold/support/post-scripts-init.ts`
+- `packages/cli/src/kernel/adapters/service/client-scaffolder.ts`
+- `packages/cli/src/kernel/adapters/service/workspace-mutator.ts`
+- `packages/cli/src/kernel/adapters/contracts/contract-scaffolder.ts`
+- `packages/cli/src/kernel/adapters/contracts/version-registry.ts`
+- `packages/cli/src/kernel/adapters/service/scaffolder.ts`
+- `packages/cli/src/public/features/generate/aspire/generate-aspire.ts`
+- `packages/cli/src/public/features/services/add/add-service.ts`
+- `packages/cli/src/public/features/services/services-group.ts`
+- `packages/cli/src/public/features/root/public-command-dependencies.ts`
+
+F5 focused-test mutations are bounded to:
+
+- new
+  `packages/cli/src/kernel/adapters/runtime/process/deno-generated-source-formatter_test.ts`
+- `packages/cli/src/kernel/adapters/runtime/process/deno-process_test.ts`
+- `packages/cli/src/kernel/application/scaffold/support/format-generated-files_test.ts`
+- new `packages/cli/src/kernel/application/scaffold/support/post-scripts-init_test.ts`
+- `packages/cli/src/kernel/adapters/service/client-scaffolder_test.ts`
+- new `packages/cli/src/kernel/adapters/service/workspace-mutator_test.ts`
+- `packages/cli/src/kernel/adapters/service/scaffolder_test.ts`
+- new `packages/cli/src/kernel/adapters/contracts/version-registry_test.ts`
+- `packages/cli/src/public/features/generate/aspire/generate-aspire_test.ts`
+- `packages/cli/src/public/features/services/add/add-service_test.ts`
+- `packages/cli/src/public/features/services/generate/generate-service-clients_test.ts`
+- new
+  `packages/cli/e2e/tests/application/gates/service-client-generated-format_test.ts`
+
+The following named paths are explicitly excluded:
+
+- `packages/cli/src/public/features/services/add/render-service.ts` remains an orchestration-only
+  delegate; its contract and service scaffolders own canonical content.
+- `packages/cli/src/public/features/services/generate/generate-service-clients.ts` keeps its current
+  full-plan-before-write and `willWrite` flow; `ServiceClientScaffolder.plan` supplies canonical
+  content before that flow compares anything.
+- `packages/cli/src/public/features/services/generate/generate-service-command.ts` keeps the current
+  flag propagation and reporting contract; formatter wiring belongs to its dependencies.
+- `packages/cli/src/public/features/services/add/add-service-command.ts` keeps parsing/reporting
+  only. `add-service.ts` is included solely to pass the injected formatter into Aspire planning.
+- `packages/cli/src/kernel/application/scaffold/workspace-init.ts` remains unchanged: init keeps one
+  bulk `formatOutput` phase after all init writes, now routed through the shared formatter adapter.
+- All baseline templates, `embedded.generated.ts`, browser fixtures, SDK/Fresh files, `docs/**`, and
+  `deno.lock` are excluded. No template or fixture is hand-formatted to satisfy the gate.
+
+This is the hard path ceiling. A compiler-proven need outside it requires another explicit
+amendment and Tier-A review before that path is touched.
+
+### Preserved contracts
+
+- **Dry run:** rendering and in-memory canonicalization may execute, but the existing dry-run branch
+  still performs zero target writes for clients and helpers. The exact-path snapshot must remain
+  byte-identical.
+- **Force:** canonicalization precedes the decision, but `force` remains the first write condition;
+  identical canonical output is still rewritten and reported as written.
+- **Atomic prevalidation:** `addService` still invokes `validateServiceClientContracts` before
+  `renderService`, appsettings/workspace mutation, client writes, or Aspire writes. Client planning
+  canonicalizes in memory during that validation-only pass, so all manifest contracts and client
+  render/format work complete before the first target write. No try/rollback path is introduced.
+- **Errors:** missing-contract and missing-export types, wording, service name, and expected path are
+  unchanged. New formatter failures name the target and preserve Deno stderr; init continues to
+  convert formatter failure to its existing warning rather than changing init's error contract.
+- **F4:** the first post-plugin generate may converge changed inputs. Its canonical output is the
+  snapshot. The immediately consecutive same-input generate computes the same canonical bytes,
+  reports zero client/helper writes, and remains path/byte-identical.
+- **Counts/ownership:** service-add and service-generate result paths and written/skipped counts
+  remain owned by the current writers. Formatting creates no extra logical output or hidden target
+  write.
+
+### Cheap proof matrix
+
+| Proof | Executable assertion | Bound test/evidence |
+| --- | --- | --- |
+| Formatter transport | Unformatted TS/MTS passed as stdin returns Deno-formatted stdout; target extension and existing generated style flags are exact; a second canonicalization is byte-identical; non-zero formatter exit names the target. | `deno-generated-source-formatter_test.ts`; `deno-process_test.ts`; `format-generated-files_test.ts`; `post-scripts-init_test.ts` |
+| Four writer owners | Client plans, the two contract paths (including version aggregate), service router output, and Aspire helper plans all compare/write the injected canonical string rather than raw render output. | `client-scaffolder_test.ts`; `version-registry_test.ts`; `scaffolder_test.ts`; `workspace-mutator_test.ts` |
+| Exact 12-path generated output | In a temporary real scaffold, run `init` for database-backed `users`, then `service add --name payments --with-client`, then `service generate`. Assert the exact 12 paths listed above exist and `deno fmt --check` passes for that exact set; also require the generated project's full `deno task fmt:check` to exit 0. No Aspire restore/start or Docker is involved. | new `service-client-generated-format_test.ts` in the ordinary cheap test gate |
+| Dry-run/force | Snapshot owned paths, run `service generate --dry-run`, and require zero byte changes; run `--force` and require identical canonical content to be reported/written rather than skipped. | existing generator/Aspire flag tests plus focused writer assertions |
+| C2 atomic failure | With an unrelated manifest service missing its V1 contract, `service add --with-client` retains byte-identical appsettings/workspace state and never invokes helper writing; message still names the service and full expected path. | existing `add-service_test.ts`, rerun unchanged except formatter dependency fixture wiring |
+| F4 same-input idempotency | After any allowed convergence, snapshot canonical client/helper output, run the immediately identical generate, require zero clients/helpers written, two client skips, and exact SHA-256 path/byte identity. The focused negative still fails on a second identical helper write or byte drift. | existing `assertServiceGenerationSequence` and `service-client-runtime-probe_test.ts`, plus the temporary real-scaffold sequence |
+
+Only focused cheap tests and the four binding catalog gates are eligible after Tier-A releases this
+repair. No runtime/browser lease, `scaffold.runtime`, `fresh-browser`, Aspire, Docker, or evaluator
+is part of the amendment or its implementation slice.
+
 ## Drift Watch
 
 - Any change to `origin/main`, query key shapes, service manifest identity, command topology,

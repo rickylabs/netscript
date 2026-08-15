@@ -100,3 +100,19 @@ current-state documentation.
 - **Action:** amend plan/research/design and keep implementation stopped until a separately
   dispatched PLAN-EVAL cycle returns PASS.
 - **Evidence:** cycle-1 evaluator commit `ed34105e2ef344a5b590bca6985810f45f89b0ca`.
+
+## 2026-08-15 — F5 post-init canonicalization amendment
+
+- **What:** S5 reached a 12-file generated format failure after F4 passed; the existing formatter is
+  init-only and a post-write repair would invalidate same-input idempotency.
+- **Source:** suite-owned S5 attempt-3 log; exact structured `fmt:check` path set; unchanged
+  `post-scripts-init.ts:7` and sole `init-pipeline.ts:80` caller at `c53726c69` and current head.
+- **Expected:** the earlier plan treated generated content comparison/write as sufficient once F4
+  proved a repeated renderer result was byte-identical.
+- **Actual:** raw rendered content can be stable yet non-canonical. Formatting only after write makes
+  the next raw-render-versus-formatted-disk comparison permanently unequal.
+- **Severity:** significant
+- **Action:** pending Tier-A, add one Deno-backed formatter port with bulk-path and content-in/out
+  operations; canonicalize all four writer outputs before equality and writing. Preserve templates
+  and fixtures unchanged.
+- **Evidence:** `plan.md` F5 amendment and `reports/f5-plan-amendment.md`.

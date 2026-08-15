@@ -90,19 +90,20 @@ or expensive command is authorized.
 
 ## In Progress
 
-- S5 attempt 3 executed at its exact lease-bound head `6f813b0db`. F4's repaired
-  `generated.service-client-contract` passed. The suite later stopped at pre-existing
-  `generated.deno-fmt-check`: 12 unformatted files / 172 selected, totals 32 passed / 1 failed /
-  0 skipped, raw exit 1. Cleanup is proven empty. `fresh-browser` is NOT_RUN by the conditional
-  contract. No product repair occurred.
+- F5 is a plan amendment only. The accepted root cause is the single init-only `formatOutput` seam:
+  init files are formatted, while the four post-init service writers compare and write raw rendered
+  content. The 12 failing outputs are mapped exactly to two clients, three payments-derived
+  contract/service files, and seven Aspire helpers. The locked repair canonicalizes rendered
+  content through Deno before equality/write and retains a separate bulk path operation for init.
+- Exact F5 product/test ceilings and cheap proofs are in `plan.md` and
+  `reports/f5-plan-amendment.md`. No product/test mutation, gate, lease, runtime, or browser action
+  is authorized until fresh Tier-A review.
 
 ## Next Steps
 
-1. Commit and explicitly push the attempt-3 suite log, attribution, cleanup proof, and preflight
-   run-artifact timestamp after the completed gate sequence.
-2. Post the structured S5 attempt-3 receipt with runtime FAIL and browser NOT_RUN verdicts.
-3. Stop for coordinator disposition; do not repair the pre-existing helper-format defect or request
-   another lease.
+1. Commit and explicitly push only the F5 amendment/run artifacts.
+2. Stop for fresh Tier-A review of the formatter abstraction, exact ceiling, and proof matrix.
+3. Do not mutate product/tests or request a new expensive-gate lease before that review.
 
 ## Key Decisions
 

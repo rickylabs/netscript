@@ -529,3 +529,28 @@ Suite cleanup passed. Run-owned teardown found no AppHost, container, or escalat
 leak check reports Aspire `ok`, Docker `ok`, `survivors: []`. The runtime failure blocked
 `fresh-browser`; it is NOT_RUN and has no receipt. No product repair occurred under the lease.
 Full evidence is in `reports/s5-attempt3-runtime-failure.md`.
+
+## F5 plan amendment — canonicalize before compare/write
+
+At `2026-08-15T19:45:11+02:00`, F5 was authorized for plan/run artifacts only. No product or test
+file was touched, no binding gate was run, and no lease was requested. One read-only replay of the
+preserved generated project's already-failing `deno task fmt:check` enumerated the exact path set;
+it was diagnostic attribution, not a replacement verdict. The coordinator accepted the 12-path
+arithmetic and corrected the earlier attribution: the missing post-init formatting seam is
+pre-existing, but the failing generated state is within this leaf's service add/generate contract
+and must be repaired rather than carried.
+
+A read-only replay of the preserved generated project's structured `fmt:check` output named the
+exact 12 paths: two app client modules; the payments contract, v1 contract aggregate, and payments
+v1 router; and seven Aspire helpers (`register-apps`, `index`, `db-cli-mode`, `register-tools`,
+`register-infrastructure`, `register-background`, and `register-plugins`). The plan maps each path
+to `client-scaffolder`, `contract-scaffolder`/`version-registry`, service `scaffolder`, or service
+`workspace-mutator`.
+
+The amendment locks one internal formatter port backed only by `deno fmt`: a bulk path method keeps
+init's current behavior, while a target-extension-aware stdin method returns canonical content for
+post-init equality and writes. `ProcessPort` gains optional text stdin so command execution stays
+behind the existing runtime adapter. Every affected writer compares and writes the same canonical
+string; no command formats target files after writing. Exact product/test ceilings, named
+inclusions/exclusions, preserved dry-run/force/C2/error/F4 contracts, and the cheap proof matrix are
+in `plan.md` and `reports/f5-plan-amendment.md`.
