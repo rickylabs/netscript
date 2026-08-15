@@ -637,3 +637,8 @@ implementation thread.
   closed through the aggregate docs-accuracy chain. Its S2 task and Pages label make that existing
   policy independently runnable and visible; they must not cause the checker to execute twice in one
   aggregate path or be described as enforcement that did not previously exist.
+- **A named stale-only option needs a fresh-entry negative control:** #1669's docs regression found
+  that `preferFreshOnStale` was evaluated before the fresh-hit return, so the option forced network
+  work even for a fresh non-expired entry. Stale concurrency tests alone could not expose that
+  contract inversion. Policy-option acceptance must include the unaffected state as a zero-effect
+  control while preserving independent expired-entry precedence.

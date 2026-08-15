@@ -746,3 +746,11 @@ At 18:11Z, #1669 S2 delivery is verified on the preserved author. Its exact fina
 the two approved docs pages, one query-factory regression, four generated mirrors, and run artifacts;
 the docs-accuracy overclaim is forbidden and the tutorial sentence remains manual Tier-A plus
 IMPL-EVAL evidence. The author must preserve all pinned baseline reds and stop for fresh review.
+
+At 18:17Z, #1669 S2 stopped before generation/commit on a real pre-existing SDK defect: the current
+branch fetches a fresh entry whenever `preferFreshOnStale` is true, contradicting the option's
+stale-only contract. Coordinator authorized a plan-only amendment adding exactly `cache-query.ts`
+back to the correction surface. The repaired condition must preserve expired-entry precedence and
+block only for stale entries; the already-authorized factory regression proves fresh/missing/two
+overlapping stale cases. Fresh fixes Tier-A is required before mutation; no extra test file, mirror,
+runtime lease, or gate is authorized yet.

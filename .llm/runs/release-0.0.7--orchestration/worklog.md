@@ -1086,3 +1086,16 @@
   two-page/one-test/four-mirror grant. The dispatch explicitly carries A1 manual-evidence truth, A4
   default-versus-`preferFreshOnStale` posture, generated-cascade containment, pinned red reporting,
   and a hard stop for fresh Tier-A before IMPL-EVAL.
+
+## 2026-08-15T18:17:33Z — #1669 executable docs proof exposes a pre-existing option defect
+
+- The new query-factory regression correctly stopped S2 before generation or commit: a fresh cached
+  entry still fetched when called with `preferFreshOnStale: true`. Inspection confirms the condition
+  `isExpired || preferFreshOnStale` predates S1 and runs before `isFresh`, contradicting the public
+  stale-only option contract.
+- Coordinator authorized plan artifacts first and exactly one additional source path,
+  `packages/sdk/src/cache/cache-query.ts`. The repair must retain expired-entry precedence while
+  applying the preference only to stale entries. The existing authorized factory test covers fresh
+  zero-fetch, missing one-fetch/current timestamp, and two overlapping blocking stale loaders with
+  one shared refresh. No cache-query test or other source is granted without a fresh necessity
+  finding. Current dirty docs/test changes remain uncommitted while the amendment is reviewed.

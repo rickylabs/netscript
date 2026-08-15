@@ -623,3 +623,9 @@ continues independently inside the accepted 15-product/12-test ceiling. No runti
 Delivery update `2026-08-15T18:11:19Z`: #1669 S2 is now verified active on the original author with
 the exact two docs pages, one factory regression, four generated mirrors, and run artifacts. It must
 stop for fresh fixes Tier-A before IMPL-EVAL; no runtime lease or out-of-scope tooling change exists.
+
+Newer stop `2026-08-15T18:17:33Z`: #1669 S2 exposed the pre-existing fresh-entry bug in
+`preferFreshOnStale` and stopped before generation/commit. A plan-only amendment may add exactly
+`cache-query.ts`, preserving expired precedence and applying the flag only when stale; the existing
+factory regression remains the proof. Fresh fixes Tier-A precedes source mutation and S2 resume. No
+additional test file, runtime lease, or final gate is authorized.
