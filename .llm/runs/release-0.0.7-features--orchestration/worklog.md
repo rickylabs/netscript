@@ -3277,3 +3277,64 @@ lease.
 
 The author is currently running its own isolated pre-F3 archive check on the same thread; the repair
 dispatches at its stop, on that same thread, with no replacement.
+
+## 2026-08-15 — F3 repair Tier-A: `PASS` at `8940e9266630a3cc5368153722747e45d30aec3b`
+
+Content head `193e665ba`, evidence head `8940e9266`. Local == remote == PR #1664; tree clean; PR
+**draft**; exactly one `status:impl`.
+
+### The repair is one line, and it is the line the evidence named
+
+`git show --stat 193e665ba` — **2 insertions/deletions across a single source line** in
+`service-client-runtime-probe.ts`, plus journals. `import { join, relative } from '@std/path';`
+replaces the `node:path` import, and **no `node:` specifier remains anywhere in the probe**. The F3
+substance is untouched: contract-derived inputs, resource-prefix isolation assertions,
+schema-precondition handling, and both negative tests all survive.
+
+### The decisive check, re-run by me at the repaired head
+
+The same one-batch composition that produced the failure:
+
+```
+deno check --unstable-kv verify-producer-reconnect.ts service-client-runtime-probe.ts
+EXIT=0
+```
+
+That closes the loop opened by the three-way experiment — B failed at `6e822a74b`, C passed with the
+specifier swapped, and the real repaired head now reproduces C. I required this specific check rather
+than accepting a green full run, because a full run cannot distinguish a real fix from a favourable
+batch ordering, and batch ordering is exactly what this defect was made of.
+
+### Four replacement receipts, verified field by field
+
+| Receipt | gateId | outcome | exit | head |
+| --- | --- | --- | --- | --- |
+| `s4-f3-fix1-check` | `check` | PASS | 0 | `193e665ba` |
+| `s4-f3-fix1-test` | `test` | PASS | 0 | `193e665ba` |
+| `s4-f3-fix1-publish-dry-run` | `publish-dry-run` | PASS | 0 | `193e665ba` |
+| `s4-f3-fix1-arch-check` | `arch-check` | PASS | 0 | `193e665ba` |
+
+Four distinct `gateId`s, all `PASS`/exit 0, every one `gitHead == actualGitHead == 193e665ba` with
+**no** `allowGitHeadMismatch`, all attesting a **single** head. **Sufficiency recomputed by hand:
+SUFFICIENT.**
+
+### The FAIL trail is intact, which matters as much as the pass
+
+`s4-f3-check.json` remains `FAIL` / exit 1 at `6e822a74b`, and commit `3278cca34` remains an ancestor
+of the leaf head. The failure, its attribution, and its repair are all readable from the evidence
+alone — nobody has to take my word that the red happened or that it was leaf-caused.
+
+### What this episode established
+
+Two half-proofs composed into one. The author's isolated `git archive` at `c53726c69` (2,924 files,
+25 batches, 0 failed, exit 0) ruled out a carried baseline and it **declined to invent a mechanism**;
+my three-way single-variable experiment supplied the mechanism. Neither alone was sufficient — without
+the archive I could not exclude a baseline, and without the experiment the cause was speculation.
+
+The generalisable rule: **a red in an untouched file is not evidence of non-causality when the
+checker batches.** "We didn't change that file" is a hypothesis, not a defence. Only an executed
+before/after with a single variable separates coincidence from cause — and the fix must then be
+verified by the same composition that exposed the defect, not by a broader green.
+
+**Verdict `PASS`.** Cheap convergence is re-established at `193e665ba`. `fresh-browser` remains
+NOT_RUN, no lease is held, and no evaluator has been launched.
