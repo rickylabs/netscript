@@ -12,12 +12,12 @@
 
 ## Current State
 
-PLAN-EVAL cycle 2 is terminal `PASS` at plan head `f7225be98`; verdict commit `c53726c69` released
-S1 only. S1 corrects the SDK bridge documentation and adds resource match/mismatch semantic tests
-without changing exports, types, or callable signatures. C1-C3 are bound into the later owning
-slices, including the exact SDK-0.0.6 import allowlist, pre-write contract failure, disabled-service
-generation policy, and new Aspire test marker. Draft PR #1664 retains both closing keywords and
-remains draft. No expensive gate has run.
+PLAN-EVAL cycle 2 is terminal `PASS`. S1 is accepted and S2 implements the released CLI generator
+contract: all manifest services receive owned modules, all expected V1 contracts are validated
+before any client or Aspire write, dry-run/force govern both command halves, and invalidation is
+emitted directly from `<svc>Queries.list.clientKey()` after the query factory. The rendered SDK
+import allowlist is executable coverage. Draft PR #1664 retains both closing keywords and remains
+draft. No expensive gate has run.
 
 ## Completed
 
@@ -33,19 +33,25 @@ remains draft. No expensive gate has run.
   whole-command flag rulings.
 - Amended research, design, slices, compatibility, and exact scenarios without editing
   `packages/**`.
-- Received terminal PLAN-EVAL `PASS`, then implemented only S1.
+- Received terminal PLAN-EVAL `PASS`, implemented and stopped after accepted S1, then implemented
+  only the separately released S2.
 - Corrected the stale server/query-factory key shapes and documented `clientKey()` as the
   factory-consistent path.
 - Added and passed two fail-capable `bridgeInvalidation` semantic tests; focused check,
   changed-module doc lint, and `quality:gate` also pass.
+- Added an exported all-service generator with deterministic plan/write results and kept its owned
+  path to `apps/<app>/lib/<service>.ts`.
+- Added 0.0.6-compatible rendered-import/literal-order tests, two-service isolation, disabled-service,
+  atomic failure, idempotency, dry-run/force, collision, procedure-rename, add-flow, and Aspire flag
+  coverage; regenerated `embedded.generated.ts`.
 
 ## In Progress
 
-- S1 is complete and stopped at its Tier-A boundary.
+- S2 is complete and stopped at its Tier-A boundary.
 
 ## Next Steps
 
-1. Await a separate coordinator dispatch for S2.
+1. Await a separate coordinator dispatch for S3.
 2. Keep both expensive gates lease-blocked until cheap convergence and explicit release.
 
 ## Key Decisions
@@ -71,19 +77,25 @@ remains draft. No expensive gate has run.
 | `.llm/runs/feat-app-service-client-wiring--1355/drift.md`        | New      | Append-only rebaseline/reference drift.   |
 | `packages/sdk/src/query-client/key-bridge.ts`                    | Modified | Accurate key-shape docs and factory path. |
 | `packages/sdk/src/query-client/key-bridge_test.ts`               | New      | Match/mismatch semantic regressions.      |
+| `packages/cli/mod.ts` and service generate/add feature files     | Modified | Export and wire the all-service generator. |
+| `packages/cli/src/kernel/adapters/service/*`                     | Modified | Validate, plan, compare, and write owned modules. |
+| `packages/cli/src/kernel/assets/app/routes/examples/service/(_lib)/service-query.ts.template` | Modified | Per-service query namespace and direct invalidation. |
+| `packages/cli/src/kernel/assets/embedded.generated.ts`           | Modified | Regenerated shipped template asset.       |
+| `packages/cli/src/public/features/services/generate/*_test.ts`   | New      | Generator semantics and type-negative proof. |
+| `packages/cli/src/public/features/generate/aspire/generate-aspire_test.ts` | New | Whole-command option propagation. |
 
 ## Gates
 
 | Gate family | Current status                                                                                                                    | Evidence                     |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Static      | Focused check/test/doc lint and quality gate PASS; full export-map doc lint has three unrelated baseline private-type diagnostics | `worklog.md`                 |
+| Static      | Focused S2 check (14 files), tests (31), CLI doc lint, and quality gate PASS; SDK export doc lint carries exactly two unrelated pre-existing private-type diagnostics | `worklog.md` |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
 | Runtime     | NOT_RUN / lease-blocked                                                                                                           | `plan.md` release conditions |
 | Consumer    | NOT_RUN / implementation-dependent                                                                                                | `plan.md` S5                 |
 
 ## Open Questions
 
-- None for S1. S2 requires a separate implementation dispatch.
+- None for S2. S3 requires a separate implementation dispatch.
 
 ## Drift and Debt
 

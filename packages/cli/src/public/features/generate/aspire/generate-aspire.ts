@@ -7,6 +7,10 @@ import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/temp
 export interface GenerateAspireRequest {
   /** Absolute project root. */
   readonly projectRoot: string;
+  /** Report helper changes without writing them. */
+  readonly dryRun?: boolean;
+  /** Rewrite identical helper files. */
+  readonly force?: boolean;
 }
 
 /** Dependencies for Aspire helper generation. */
@@ -26,6 +30,7 @@ export interface GenerateAspireDependencies {
     fs: FileSystemPort,
     scaffolder: ScaffolderPort,
     templateAdapter: TemplatePort,
+    options?: { readonly dryRun?: boolean; readonly force?: boolean },
   ) => Promise<readonly string[]>;
 }
 
@@ -66,6 +71,7 @@ async function executeGenerateAspire(
     dependencies.fs,
     dependencies.scaffolder,
     dependencies.templateAdapter,
+    { dryRun: request.dryRun, force: request.force },
   );
   return { helperFiles };
 }

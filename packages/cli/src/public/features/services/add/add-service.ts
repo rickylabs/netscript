@@ -12,6 +12,7 @@ import type { AddServiceInput } from './add-service-input.ts';
 import { planServiceAdd } from './plan-service-add.ts';
 import { renderService, type RenderServiceDependencies } from './render-service.ts';
 import { ServiceClientScaffolder } from '../../../../kernel/adapters/service/client-scaffolder.ts';
+import { generateServiceClients } from '../generate/generate-service-clients.ts';
 
 /** Dependencies used by the public add-service flow. */
 export interface AddServiceDependencies extends RenderServiceDependencies {
@@ -69,14 +70,19 @@ export async function addService(
   if (plan.withClient && !dependencies.clientScaffolder) {
     throw new Error('Typed client scaffolding dependency is required for --with-client.');
   }
-  const clientPath = plan.withClient
-    ? await dependencies.clientScaffolder!.scaffold(
-      plan.projectRoot,
-      plan.projectName,
-      plan.serviceName,
-      plan.overwrite,
-    )
+  const clientResult = plan.withClient
+    ? await generateServiceClients({
+      projectRoot: plan.projectRoot,
+      dryRun: false,
+      force: plan.overwrite,
+    }, {
+      readProjectName: () => Promise.resolve(plan.projectName),
+      serviceResolver: dependencies.serviceResolver,
+      clientScaffolder: dependencies.clientScaffolder!,
+    })
     : undefined;
+  const clientPath = clientResult?.planned.find((file) => file.serviceName === plan.serviceName)
+    ?.path;
 
   return {
     ...rendered,

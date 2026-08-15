@@ -1,4 +1,4 @@
-import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
+import type { CliffyCommand } from '../../../kernel/presentation/command-types.ts';
 import { Command } from '@cliffy/command';
 
 import { createServiceAddCommand } from './add/add-service-command.ts';
@@ -8,6 +8,7 @@ import { createServiceConfigCommands } from './configure/service-config-command.
 import type { PublicCommandDependencies } from '../root/public-command-dependencies.ts';
 import { createServiceRemoveCommand } from './remove/remove-service-command.ts';
 import { createServiceAddHandlerCommand } from './add-handler/add-service-handler-command.ts';
+import { readServiceProjectMetadata } from '../../../kernel/adapters/service/workspace-mutator.ts';
 
 /** Create the public service command group. */
 export function createServiceCommand(
@@ -54,6 +55,12 @@ export function createServiceCommand(
           fs: dependencies.fs,
           scaffolder: dependencies.scaffolder,
           templateAdapter: dependencies.templateAdapter,
+        },
+        generateServiceClientsDependencies: {
+          readProjectName: async (projectRoot) =>
+            (await readServiceProjectMetadata(projectRoot, dependencies.fs)).projectName,
+          serviceResolver: dependencies.serviceAddDependencies.serviceResolver,
+          clientScaffolder: dependencies.serviceAddDependencies.clientScaffolder,
         },
       }),
     );

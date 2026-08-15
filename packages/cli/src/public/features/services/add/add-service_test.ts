@@ -14,6 +14,7 @@ import { ServiceWorkspaceResolver } from '../../../../kernel/adapters/service/wo
 import { addService } from './add-service.ts';
 import { planServiceAdd } from './plan-service-add.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
+import { ServiceClientScaffolder } from '../../../../kernel/adapters/service/client-scaffolder.ts';
 
 // This flow renders root project metadata via sync template generators, which
 // require a previously-awaited registry hydration. The test drives the flow
@@ -53,6 +54,7 @@ describe('public add service flow', () => {
       serviceReferences: ['users'],
       projectRoot: '/workspace/alpha',
       overwrite: false,
+      withClient: true,
     }, {
       fs,
       scaffolder,
@@ -67,6 +69,7 @@ describe('public add service flow', () => {
         workspaceResolver: new ContractWorkspaceResolver(fs),
       }),
       serviceScaffolder: new ServiceScaffolder(scaffolder, fs, templateAdapter),
+      clientScaffolder: new ServiceClientScaffolder(scaffolder, fs),
       regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
     });
 
@@ -85,6 +88,12 @@ describe('public add service flow', () => {
     assertEquals(rootDenoJson.workspace.includes('./services/billing'), true);
     assertStringIncludes(contractMod, './billing.contract.ts');
     assertEquals(result.helperFiles.length, 1);
+    assertEquals(result.clientPath, '/workspace/alpha/apps/web/lib/billing.ts');
+    if (!result.clientPath) throw new Error('Expected generated client path.');
+    assertStringIncludes(
+      await fs.readFile(result.clientPath),
+      '{ queryKey: billingQueries.list.clientKey() } as const',
+    );
   });
 });
 

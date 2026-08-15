@@ -146,6 +146,10 @@ export async function regenerateAspireHelpers(
   fs: FileSystemPort,
   scaffolder: ScaffolderPort,
   templateAdapter: TemplatePort,
+  options: {
+    readonly dryRun?: boolean;
+    readonly force?: boolean;
+  } = {},
 ): Promise<readonly string[]> {
   const appsettingsPath = join(projectRoot, SCAFFOLD_FILES.APPSETTINGS);
   if (!await fs.exists(appsettingsPath)) {
@@ -163,11 +167,13 @@ export async function regenerateAspireHelpers(
     );
   }
 
-  await reconcilePluginReferences(projectRoot, fs);
+  if (!options.dryRun) await reconcilePluginReferences(projectRoot, fs);
 
   const parsed = await parseAppSettings(appsettingsPath);
   const rawAppsettings = JSON.parse(await fs.readFile(appsettingsPath)) as unknown;
-  const projectConfig = await loadProjectConfig({ cwd: projectRoot }, { process: new DenoProcess() });
+  const projectConfig = await loadProjectConfig({ cwd: projectRoot }, {
+    process: new DenoProcess(),
+  });
   const registeredPlugins = await loadRegisteredPluginMetadata(projectRoot, projectConfig);
   const config = applyRegisteredPluginPermissions(
     preservePluginEnvironment(parsed.config, rawAppsettings),
@@ -183,19 +189,23 @@ export async function regenerateAspireHelpers(
   const written: string[] = [];
   for (const file of files) {
     const path = join(aspireDir, file.path);
-    if (await scaffolder.writeFile(path, file.content, true)) {
-      written.push(path);
-    }
+    const changed = options.force || !await fs.exists(path) ||
+      await fs.readFile(path) !== file.content;
+    if (!changed) continue;
+    written.push(path);
+    if (!options.dryRun) await scaffolder.writeFile(path, file.content, true);
   }
 
   return written;
 }
 
-function applyRegisteredPluginPermissions<TConfig extends {
-  Plugins: Record<string, unknown>;
-  BackgroundProcessors: Record<string, unknown>;
-  Defaults: unknown;
-}>(
+function applyRegisteredPluginPermissions<
+  TConfig extends {
+    Plugins: Record<string, unknown>;
+    BackgroundProcessors: Record<string, unknown>;
+    Defaults: unknown;
+  },
+>(
   config: TConfig,
   registeredPlugins: Readonly<Record<string, RegisteredPluginConfig>>,
 ): TConfig {

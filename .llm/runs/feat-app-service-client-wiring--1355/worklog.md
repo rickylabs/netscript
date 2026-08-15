@@ -76,6 +76,8 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | 2026-08-15T13:29:06+02:00 | S0E2  | PLAN-EVAL cycle 2  | Evaluator returned terminal `PASS`; verified `clientKey()` in published SDK 0.0.6 and released S1 only.                                                                                      |
 | 2026-08-15T13:29:06+02:00 | S1    | Plan amendment     | Bound C1/C2 to S2/S3, chose owned-module generation for `Enabled: false` services, and marked `generate-aspire_test.ts` new (C3).                                                            |
 | 2026-08-15T13:29:06+02:00 | S1    | SDK implementation | Corrected key-shape docs, pointed factory consumers to `clientKey()`, and added fail-capable resource match/mismatch regression tests without changing the SDK type/export surface.          |
+| 2026-08-15T13:51:18+02:00 | S2    | CLI implementation | Added all-manifest service-client planning/reconciliation, whole-command dry-run/force, pre-write V1 contract validation, per-service resource identities, direct `clientKey()` invalidation, and regenerated the embedded asset. |
+| 2026-08-15T13:51:18+02:00 | S2    | Regression proof   | Added two-service/import/literal-order, disabled-service, idempotency/force/dry-run, collision, procedure-rename, add-flow, Aspire flag, and atomic no-partial-write coverage.                 |
 
 ## Decisions
 
@@ -87,7 +89,7 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | Generator owns only `apps/<app>/lib/<service>.ts` | Separates explicit regeneration from the init-owned route showcase.         | PLAN-EVAL sweep A               |
 | Flags govern both command halves                  | `--dry-run` must mean no writes; force/default semantics stay coherent.     | PLAN-EVAL sweep B               |
 | Generate modules for disabled services            | `Enabled` controls runtime registration, not manifest-owned source output.  | PLAN-EVAL cycle 2 C2            |
-| Stop after S1                                     | Implementation release is expressly limited to one bounded slice.           | Coordinator dispatch            |
+| Stop after S2                                     | Implementation release is expressly limited to one bounded slice.           | Coordinator dispatch            |
 
 ## Drift
 
@@ -105,10 +107,14 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | Gate                    | Command or check                                                                                 | Result        | Notes                                                                                       |
 | ----------------------- | ------------------------------------------------------------------------------------------------ | ------------- | ------------------------------------------------------------------------------------------- |
 | Identity                | Direct git/POSIX read-only checks                                                                | PASS          | Required base and clean start confirmed.                                                    |
-| Focused check           | `.llm/tools/run-deno-check.ts` on both S1 SDK files                                              | PASS          | Two selected files; zero diagnostics.                                                       |
-| Focused test            | `.llm/tools/run-deno-test.ts` on `key-bridge_test.ts`                                            | PASS          | Two tests passed; match and mismatched-resource behavior exercised.                         |
+| S1 focused check        | `.llm/tools/run-deno-check.ts` on both S1 SDK files                                              | PASS          | Two selected files; zero diagnostics.                                                       |
+| S1 focused test         | `.llm/tools/run-deno-test.ts` on `key-bridge_test.ts`                                            | PASS          | Two tests passed; match and mismatched-resource behavior exercised.                         |
+| S2 focused check        | `.llm/tools/run-deno-check.ts` on the 14 touched S2 TypeScript files                             | PASS          | Fourteen selected files; zero diagnostics.                                                  |
+| S2 focused test         | `.llm/tools/run-deno-test.ts` on service, Aspire-generate, runtime-schema, and service-adapter tests | PASS       | 31 tests passed; zero failed or ignored.                                                     |
+| Generated assets        | `deno task check:assets-barrel`                                                                    | PASS          | Regeneration left the committed `embedded.generated.ts` and all other generated barrels unchanged. |
 | Changed-module doc lint | `deno task doc:lint --root packages/sdk --entrypoints ./src/query-client/key-bridge.ts --pretty` | PASS          | Zero documentation errors.                                                                  |
-| SDK export-map doc lint | `deno task doc:lint --root packages/sdk --export-map --pretty`                                   | BASELINE_FAIL | Three pre-existing private-type-reference diagnostics outside S1; no missing-JSDoc finding. |
+| CLI entrypoint doc lint | `deno task doc:lint --root packages/cli --entrypoints ./mod.ts --pretty`                          | PASS          | Zero documentation errors, including the new exported generator contract.                  |
+| SDK export-map doc lint | `deno doc --lint packages/sdk/mod.ts`                                                            | BASELINE_FAIL | Exactly two pre-existing `private-type-ref` errors: `QueryClientPort` at `src/ports/query-client.ts:41` and `createNetScriptQueryClient` at `src/query-client/query-client-factory.ts:44`, both referencing private `QueryClient`; measured before S1 and carried unchanged. |
 | Quality gate            | `deno task quality:gate`                                                                         | PASS          | Quality scan clean; architecture check passed with baseline warnings.                       |
 | JSR audits              | Baseline manifest/export/pin inspection only                                                     | NOT_RUN       | Full audits planned after implementation.                                                   |
 
@@ -135,13 +141,15 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 
 ## Handoff Notes
 
-- S1 changes documentation and semantic regression coverage only; the SDK exports, callable
-  signatures, and public types are unchanged.
-- The two product tests are
-  `bridgeInvalidation matches a query-factory key when resource and action
-  match` and
-  `bridgeInvalidation does not match a query-factory key when resource differs`.
+- S2 owns only `apps/<app>/lib/<service>.ts`; the route-example
+  `routes/examples/service/(_lib)/service-query.ts` remains init-owned.
+- Generated modules import exactly `createServiceClient` from `@netscript/sdk/client` and
+  `createQueryFactories` from `@netscript/sdk/query`, then define
+  `{ queryKey: <svc>Queries.list.clientKey() } as const` after `<svc>Queries`.
+- `service generate` discovers every manifest entry, including `Enabled: false`, validates every
+  expected `contracts/versions/v1/<service>.contract.ts` and export before client or Aspire writes,
+  and applies `--dry-run`/`--force` to both halves.
 - Post-slice reconciliation found both issue closures, the terminal cycle-2 verdict, and the ruled
-  design intact. C1-C3 are recorded in `plan.md`; no rescope or additional issue is needed.
-- No expensive gate, lease, ready transition, lockfile change, docs change, evaluator launch, or S2
-  work occurred in S1.
+  design intact; no rescope or additional issue is needed.
+- No expensive gate, lease, ready transition, lockfile change, `docs/**` change, evaluator launch,
+  or S3 work occurred in S2.
