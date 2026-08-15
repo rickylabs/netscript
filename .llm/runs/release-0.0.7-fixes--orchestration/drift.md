@@ -103,3 +103,34 @@ focused positive/negative classifier tests proving a CLI design-only diff reques
 structure tests plus the existing drift/check/quality/arch set; `fresh-browser`, Aspire, Docker and
 any expensive lease remain out of scope, and the consumed lease's `PASS` receipt at product head
 `4a3c40321` stays valid because the repair changes no product file.
+
+## Significant — #1358 leaf contract amended a second time for IMPL-EVAL finding E-1
+
+Coordinator disposition recorded by `topic-fixes-0.0.7` at leaf head `ca8773f66`; leaf-local record
+committed at `c3ccceeb1`.
+
+IMPL-EVAL cycle 1 returned `FAIL_FIX` on E-1: the leaf repaired the source template but never
+regenerated `packages/cli/src/kernel/assets/embedded.generated.ts`, the only content source
+`TemplateRegistry` reads (`hydrate()` is a no-op, no disk fallback). Independently confirmed — the
+file is absent from the whole product diff, still carries `total: 50`, has **zero** `citation-chip`
+occurrences, and `check:assets-barrel` exits 1 — so `netscript init` still scaffolds a gallery
+rendering "All 50 items" with the AI collection hidden. Secondary E-2: `assets-barrel` was absent
+from `provingGates` and never run by any lane, which is why the staleness survived every green gate.
+
+The contract is amended with **exactly one generated product path**,
+`packages/cli/src/kernel/assets/embedded.generated.ts`, plus append-only run artifacts recording the
+amendment and its proof. `check:assets-barrel` is bound into the validation plan with raw exit and
+structured receipt required. The regenerated delta is retained only if it is exactly
+`gen:assets-barrel` output with no other generated target moving; expected shape is one file, one
+line.
+
+No Aspire, Docker, browser, scaffold-runtime, or E2E rerun: the leased `fresh-browser` product
+surface is byte-identical and this repair only synchronizes its embedded representation, so the
+receipt at product head `4a3c40321` stays valid.
+
+**Supervisor boundary self-report.** Verifying E-1 required `deno task check:assets-barrel`, whose
+`gen:assets-barrel` half mutates the tree; that left the barrel modified in the leaf working tree.
+It was reverted with `git checkout --` before dispatch and the tree re-verified clean at
+`ca8773f66` with the barrel back to `total: 50`, so the repair delta is authored by the Codex leaf
+and not by this supervisor. Recorded because a supervisor-authored product change would breach the
+supervise-only law even when the content is deterministic.
