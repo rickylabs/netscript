@@ -159,3 +159,21 @@
   this checkpoint, so the global expensive-gate mutex is free.
 - #1651 remains untouched and draft. Features is blocked only on the explicit owner option 1/2/3
   verdict; that lane-local hold does not serialize docs, internals, or fixes.
+
+## 2026-08-15T06:07:53Z — repaired docs re-evaluation and #1657 browser lease released
+
+- #1652's original Codex author completed the bounded F1–F5 repair at clean pushed head
+  `c7ce58a19`. The docs supervisor independently re-derived all five corrections, immutable-link
+  reachability, in-place comment chronology, evidence labels, and DoD state, then recorded hardened
+  Tier-A `PASS` at topic head `3aedb4cce` and comment `5300864119`. Exactly one fresh native Opus
+  5/medium Remote Control IMPL-EVAL cycle 2 is now authorized against that immutable source; a
+  further failure escalates rather than loops.
+- #1656 reached slice-1 head `dbbedde34`. Executed Tier-A found the implementation substantively
+  correct and the red-first/denominator/advisory evidence valid, but requested one drift-only
+  bookkeeping repair: record why three locked JSON field names were clarified. The original author
+  thread owns that bounded correction and must stop before S2 until supervisor sign-off.
+- #1657 completed its non-browser implementation at clean pushed head `4a3c40321`. After an
+  independent empty Aspire/Docker/volume preflight and confirmation that the prior runtime lease is
+  terminal, the coordinator granted one catalogued `fresh-browser` pass. The lease is confined to
+  Playwright/Chromium and requires a durable receipt, stray-process cleanup, and empty-host
+  postcondition before Tier-A or any evaluator.

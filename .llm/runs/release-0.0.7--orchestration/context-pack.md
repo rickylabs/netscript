@@ -105,3 +105,12 @@ lease before `fresh-browser`. #1651 remains draft and unchanged until the owner 
 1 keep-and-narrow, 2 remove/defer C6, or 3 close-as-duplicate. Preserve all four topic supervisor
 session IDs and Remote Control bridges; serialization remains per topic, while Aspire/Docker/E2E
 alone share the global expensive-gate mutex.
+
+Resume from the authoritative `2026-08-15T06:07:53Z` checkpoint. Docs #1652 repaired formal
+cycle-1 findings at `c7ce58a19`, passed hardened supervisor Tier-A at `3aedb4cce`, and has one fresh
+Opus 5/medium Remote Control IMPL-EVAL cycle 2 authorized against that immutable head. Internals
+#1656 is functionally green at `dbbedde34` but must record its three justified JSON field-name
+clarifications in `drift.md` and obtain slice-1 sign-off before S2. Fixes #1657 holds the singleton
+`fresh-browser` lease at `4a3c40321`; only Playwright/Chromium is in scope and cleanup plus empty
+Aspire/Docker are mandatory before the lease completes. #1651 remains unchanged and draft pending
+the owner's explicit 1/2/3 disposition. Do not serialize these topic-local actions across lanes.

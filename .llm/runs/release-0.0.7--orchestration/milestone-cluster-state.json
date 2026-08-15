@@ -45,7 +45,7 @@
         "pid": 23964,
         "bridgeSessionId": "session_01PLRauSHN1PnvrNF2ucefF6",
         "remoteControlUrl": "https://claude.ai/code/session_01PLRauSHN1PnvrNF2ucefF6",
-        "topicHeadSha": "b08e18ca253b0ed21a97057d2b311c4359fcebb1",
+        "topicHeadSha": "3aedb4ccefb230ef89939e93adaa243501286815",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e19b-71d1-95ce-8c72559eb026",
         "legacyState": "parked_offline"
@@ -447,10 +447,10 @@
     {
       "id": "comparison-docs-programme",
       "lane": "docs",
-      "phase": "implementing",
+      "phase": "evaluating",
       "baseBranch": "main",
       "headSha": "d35cbca30872d1f55118d63437638e93270c2ac3",
-      "currentPrHeadSha": "e95f4838038a27a0f209d2ce37c9f53bd4ed4299",
+      "currentPrHeadSha": "c7ce58a19494024c219e9970deeb3ece878232d6",
       "evaluatorCommitSha": "a790e91e26a4fb84636b4f3c57bd6444196b4ca9",
       "evaluationVerdict": "PASS",
       "implementationEvaluationState": "complete",
@@ -480,8 +480,19 @@
       "s3State": "complete",
       "s3GrantedAt": "2026-08-15T05:13:42.084Z",
       "s3CompletedHeadSha": "15429cf8487cfe3504ae0443fd435d2a72d4528b",
-      "repairState": "running",
-      "repairGrantedAt": "2026-08-15T05:48:07.224Z"
+      "repairState": "complete",
+      "repairGrantedAt": "2026-08-15T05:48:07.224Z",
+      "repairCompletedHeadSha": "c7ce58a19494024c219e9970deeb3ece878232d6",
+      "repairCommits": [
+        "43c702b973a71b539ec16e4b93f2c7a2c09d9ab6",
+        "c7ce58a19494024c219e9970deeb3ece878232d6"
+      ],
+      "repairCommentUrl": "https://github.com/rickylabs/netscript/pull/1652#issuecomment-5300842325",
+      "repairTierAState": "PASS",
+      "repairTierACommitSha": "3aedb4ccefb230ef89939e93adaa243501286815",
+      "repairTierACommentUrl": "https://github.com/rickylabs/netscript/pull/1652#issuecomment-5300864119",
+      "nextImplementationEvaluationState": "dispatching_cycle_2",
+      "nextImplementationEvaluatedHeadSha": "c7ce58a19494024c219e9970deeb3ece878232d6"
     },
     {
       "id": "quality-scan-allowance-rail",
@@ -619,15 +630,20 @@
     {
       "id": "design-registry-catalog-drift-gate",
       "lane": "fixes",
-      "phase": "implementing",
+      "phase": "gating",
       "baseBranch": "main",
       "headSha": "da574111af05a5cded74250128b196fcab870274",
-      "currentPrHeadSha": null,
+      "currentPrHeadSha": "4a3c40321ac1e58aa337e02afeaa95fbc553ce7f",
       "issueNumbers": [1358],
       "implementerAgentId": "01a003f0-7821-7a10-a555-e619a9280479",
       "branch": "fix/design-registry-catalog-drift-gate",
       "worktree": "/home/codex/repos/netscript-007-leaf-design-registry-drift",
-      "freshBrowserGateState": "pending_coordinator_lease",
+      "prNumber": 1657,
+      "implementationState": "complete_pending_fresh_browser",
+      "implementationCompletedHeadSha": "4a3c40321ac1e58aa337e02afeaa95fbc553ce7f",
+      "freshBrowserGateState": "running",
+      "freshBrowserLeaseId": "design-registry-catalog-drift-fresh-browser",
+      "freshBrowserGrantedAt": "2026-08-15T06:07:21.000Z",
       "receiptRefs": []
     },
     {
@@ -636,7 +652,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "473e8d75b5281c93dc4729d99f3358a34f2bd687",
-      "currentPrHeadSha": "3b95a004fe8bc5c022c7a2601fafef9a1216be68",
+      "currentPrHeadSha": "dbbedde346f91341208875aee7b5108bd3805dc7",
       "issueNumbers": [1542],
       "implementerAgentId": "01a003d2-61ee-7ec0-8c74-075b3d631168",
       "branch": "fix/quality-scan-root-coverage",
@@ -648,8 +664,12 @@
       "planEvaluatorAgentId": "97ef1950-cda3-450e-9451-052a15015b3a",
       "planEvaluatorCommitSha": "3b95a004fe8bc5c022c7a2601fafef9a1216be68",
       "planEvaluationVerdict": "PASS",
-      "implementationState": "running",
+      "implementationState": "tier_a_changes_requested",
       "implementationGrantedAt": "2026-08-15T05:48:07.224Z",
+      "slice1HeadSha": "dbbedde346f91341208875aee7b5108bd3805dc7",
+      "slice1TierAState": "CHANGES_REQUESTED",
+      "slice1TierAFinding": "record the justified JSON output-field renames in drift.md; implementation behavior is substantively correct",
+      "slice1TierACommentUrl": "https://github.com/rickylabs/netscript/pull/1656#issuecomment-5300867545",
       "priorRouteFailure": {
         "route": "native-claude/claude-fable-5/medium",
         "classification": "transport_model_unavailable_zero_token",
@@ -1044,6 +1064,19 @@
         "interruptedAtGate": "database.generate",
         "cleanup": "complete"
       }
+    },
+    {
+      "id": "design-registry-catalog-drift-fresh-browser",
+      "state": "running",
+      "lane": "fixes",
+      "leafId": "design-registry-catalog-drift-gate",
+      "gateId": "fresh-browser",
+      "preGateHead": "4a3c40321ac1e58aa337e02afeaa95fbc553ce7f",
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-15T06:07:21.000Z",
+      "scope": "one contract-approved Playwright/Chromium fresh-browser pass for PR #1657; no Aspire, Docker, or Postgres; stray browser/runtime cleanup and empty-host recheck mandatory",
+      "attempt": 1,
+      "command": "deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/gates/run-gate.ts --gate fresh-browser --id fresh-browser-1657 --cwd packages/fresh --output .llm/runs/fix-design-registry-catalog-drift-gate--0.0.7-wave1/receipts/fresh-browser.json"
     }
   ],
   "canaryCheckpoints": [
@@ -1085,5 +1118,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T05:52:01.212Z"
+  "updatedAt": "2026-08-15T06:07:53.000Z"
 }

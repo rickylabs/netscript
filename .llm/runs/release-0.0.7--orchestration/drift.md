@@ -146,3 +146,17 @@ implementation thread.
 - **Host hygiene:** #1654's merge and main CI introduced no AppHost or container residue. The
   coordinator preflight again observed `aspire ps --format Json` = `[]`, no Docker containers, and
   no Docker volumes before leaving the global lease free for #1358's eventual browser boundary.
+
+## 2026-08-15T06:07:53Z — bounded review corrections and browser lease
+
+- **Docs / no plan drift:** #1652's F1–F5 repair changes evidence metadata, immutable references,
+  labels, matrix vocabulary, and truthful merge-facing state inside the approved contract. Hardened
+  Tier-A passed, so cycle 2 is a required fresh implementation evaluation, not another plan cycle.
+- **Internals / significant but bounded:** #1656 implemented clearer output names
+  `publishableMembers`, `excludedNonPublishableMembers`, and `uncoveredPublishedMembers` instead of
+  the shorter plan names. The semantics are correct, but the locked-name movement must be explicit
+  in the leaf drift record before sign-off; no source rollback or scope expansion is authorized.
+- **Expensive-gate lease:** #1657's `fresh-browser` command is a catalogued, CI-mirrored gate and
+  consumes the singleton lease even though it does not start Aspire or Docker. Empty host state was
+  re-proved before grant; the lease remains running until browser/runtime process cleanup and empty
+  Aspire/Docker postconditions are recorded.

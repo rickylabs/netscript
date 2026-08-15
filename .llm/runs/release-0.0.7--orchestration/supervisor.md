@@ -249,3 +249,15 @@ work in the other topics while #1651 waits; the owner hold is lane-local, not a 
 Main post-merge CI, Pages, and code quality are green. Aspire and Docker are empty, and no expensive
 lease is held. Formal evaluator serialization is independent per topic; only resource-heavy
 Aspire/Docker/E2E uses the cluster-wide mutex.
+
+### Active completion checkpoint — 2026-08-15T06:07:53Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | #1652 repair Tier-A `PASS` at `c7ce58a19`; dispatching fresh IMPL-EVAL cycle 2 | One fresh Opus 5/medium evaluator only; no repair, readiness, merge, or next leaf inside the evaluation session |
+| internals | #1656 S1 Tier-A requested one drift-only JSON field-name record at `dbbedde34` | Same author thread, F1 only, then supervisor sign-off; do not start S2 yet |
+| fixes | #1657 one `fresh-browser` lease running at `4a3c40321` | Playwright/Chromium only; durable receipt and exact process/Aspire/Docker cleanup before Tier-A |
+| features | #1651 remains draft and owner-blocked on explicit option 1/2/3 | Do not amend, reply, resolve, ready, or merge before the verdict |
+
+All checked PR heads equal their remote refs and current workflows have no failures. The singleton
+runtime mutex is held only by #1657 until its browser receipt and cleanup are terminal.
