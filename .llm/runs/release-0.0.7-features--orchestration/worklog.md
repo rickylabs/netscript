@@ -2130,3 +2130,57 @@ regeneration must be real and pass the asset-freshness check — template-only e
 scaffold stale, which is the trap recorded in memory as `cli-asset-edits-need-barrel-regen`.
 
 No expensive gate, no lease, no S3.
+
+## 2026-08-15 — S2 evidence correction accepted; S2 Tier-A `FAIL_FIX` on a C2 ordering defect
+
+### Evidence attribution corrected at `a8cc5a1d1047b5305c11b78514c52fa4f15983c9`
+
+The executed command `deno doc --lint packages/sdk/mod.ts` had been labelled "SDK export-map doc
+lint" in `worklog.md:117`, "**Full** SDK export-map doc lint" in PR body line 70, and "SDK
+export-map doc-lint baseline" in the S2 comment. That is the SDK **root-entrypoint** run, not the
+plan's 12-entrypoint export-map sweep — which is S4 and may surface further diagnostics, including
+the separate plugin-streams one.
+
+The status half was honest throughout — `BASELINE_FAIL`, never `PASS`. Only the **coverage claim**
+overstated: a narrower command wearing a broader name. That is the same failure family this leaf
+keeps catching one level down, a label asserting more than the thing beneath it delivers, and it is
+worth noting that it appeared in *our own* evidence rather than in someone else's.
+
+All three surfaces now read "SDK root-entrypoint doc lint (`packages/sdk/mod.ts`)", retain
+`BASELINE_FAIL`, and state that the full 12-entrypoint sweep is S4. The relabel was recorded as an
+`[EVIDENCE-CORRECTION]` PR comment rather than a silent edit, so the correction is itself auditable.
+
+### S2-F1 — `addService` writes Aspire helpers before contract validation (FAIL_FIX)
+
+`add-service.ts:46-92` orders: `upsertServiceAppsettingsEntry` → `addServiceWorkspaceMember` →
+`regenerateHelpers` (**Aspire writes**) → `generateServiceClients` (**where validation lives**).
+
+Concrete failure: manifest holds `users` (contract present) and `orders` (existing, missing
+`contracts/versions/v1/orders.contract.ts`). `netscript service add --name payments --with-client`
+writes the appsettings entry, the workspace member, and the Aspire helpers; then
+`generateServiceClients` validates every manifest contract, finds `orders` missing, and throws
+`ScaffoldValidationError` (`generate-service-clients.ts:113`). The writes have already landed.
+
+That violates the approved C2 contract verbatim — "validate every expected V1 contract **before any
+client/Aspire write**".
+
+**Why the existing atomic test did not catch it.** `generate-service-clients.ts:80` states "Complete
+every contract/path/render validation before the first write", and that is true: the generate path
+plans everything, then writes. Its internal atomicity is real, and the service-generate-only atomic
+test correctly proves it. But **atomicity of a component does not compose into atomicity of a caller
+that performs its own writes first.** The `add` path wraps an atomic unit in a non-atomic prologue,
+so the existing test proves the property on the one call graph that already had it and is silent on
+the one that does not. It is not a weaker test — it tests a different call graph. This is exactly why
+the coordinator's instruction not to accept the generate-only test as proof for the shared add path
+was the right call, and why a passing suite is not the same as a covered contract.
+
+Required fix dispatched: hoist validation of every manifest service's V1 contract ahead of the first
+write in the add path — explicitly **not** try/rollback, because C2 says fail *before* writing rather
+than undo after, and a rollback introduces both a window and its own partial-failure mode — plus a
+focused test on the **`addService --with-client`** path asserting the rejection names the missing
+service and its expected path and that **zero** writes occurred (no Aspire helper, no appsettings, no
+workspace member). Whole-command `--dry-run`/`--force` semantics and the `Enabled: false` policy are
+preserved across the reorder.
+
+S3 remains unrequested and undispatched; it needs a coordinator grant regardless of this outcome. No
+expensive gate, no lease.
