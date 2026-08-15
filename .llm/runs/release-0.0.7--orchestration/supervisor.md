@@ -678,3 +678,10 @@ application processes, relevant listening ports, or competing lease owners. All 
 were already committed before the lease, so the authorized evidence head cannot move as it did on
 attempt 2. Coordinator remains GPT-5.6-SOL/high through Remote Control, never max. Native Claude
 topic supervisors and #1651 option-1 keep-and-narrow architecture remain preserved.
+
+At 17:18Z, #1666 is in its final ordinary PLAN-EVAL cycle 2 after plan-only head `80046696e` passed
+fresh internals Tier-A at topic `bb8c12f56`. The evaluator is a fresh native Fable 5/medium process,
+session `580832d7-53e8-4828-ad41-e2f9219c9340`, PID 379716, launched with Remote Control over that
+exact head. Its bridge attachment metadata is not yet emitted and is recorded as pending rather than
+invented. This evaluator runs concurrently with #1664's leased runtime because serialization is per
+orchestrator; neither lane may start a second evaluator/gate of its own.

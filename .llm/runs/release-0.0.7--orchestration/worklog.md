@@ -962,3 +962,15 @@
   lines 13, 15, 75, 76, and 80 while demonstrating pure-read `getCachedEntry`. The preserved author
   must give each line an explicit retain/correct disposition before PLAN-EVAL. #1666 SA-2 remains
   plan-only on its preserved author; no evaluator or product mutation exists there yet.
+
+## 2026-08-15T17:18:10Z — #1666 SA-2 passes Tier-A and cycle 2 attaches
+
+- The preserved #1666 author committed and explicitly pushed plan-only SA-2 head `80046696e` with
+  the full nine-line Contracts inventory, four wrong-root examples, thirteen-path/fourteenth-refusal
+  guards, corrected existing CI enforcement chain, all N1-N5 mechanics, and four-file #1533
+  sequencing. No JSDoc or product edit occurred.
+- Internals Tier-A passed at topic `bb8c12f56`. Fresh native evaluator session
+  `580832d7-53e8-4828-ad41-e2f9219c9340`, PID 379716, runs Fable 5/medium with `--remote-control`
+  over exact head `80046696e`. The bridge identifier has not yet been emitted, so central state
+  records pending attachment metadata and the observed native session/process proof. This is cycle
+  2 of 2; a further `FAIL_PLAN` returns to the owner boundary rather than creating cycle 3.

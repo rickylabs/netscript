@@ -557,3 +557,10 @@ authorized page's five additional SWR narrative lines explicitly, re-review, the
 PASS. #1666 SA-2 plan repair continues on the preserved author under topic `071b2a812`; #1663 stays
 at its owner-only boundary. Coordinator route remains GPT-5.6-SOL/high, never max; preserve native
 Claude supervisors and #1651 option 1.
+
+Newer attachment checkpoint `2026-08-15T17:18:10Z`: #1666 plan-only SA-2 head `80046696e` passed
+fresh Tier-A at internals topic `bb8c12f56`. Final ordinary PLAN-EVAL cycle 2 is active as fresh
+native Fable 5/medium session `580832d7-53e8-4828-ad41-e2f9219c9340`, PID 379716, launched with
+Remote Control and bound to that exact head. Bridge metadata is truthfully pending until emitted.
+Do not begin the three JSDoc edits or any product work before a terminal PASS; a FAIL returns to the
+owner boundary. #1664 runtime attempt 3 continues independently under its existing singleton lease.
