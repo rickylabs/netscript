@@ -422,3 +422,28 @@ export-map doc lint `PRE_EXISTING_FAIL` with 45 attributed diagnostics; SDK expo
 `PRE_EXISTING_FAIL` with three attributed diagnostics, including the separately named
 plugin-streams `StreamsInstrumentation` finding; all three per-member JSR audits exit 0 with
 warnings only, and all three isolated-declaration/publish dry-runs pass.
+
+## S5 leased expensive-gate stop
+
+The coordinator granted the singleton runtime lease at central checkpoint `32df87c7c` after proving
+an empty host. Its fresh preflight leak timestamp was committed as run-only head `ab78eaa35`; product
+content remained `193e665ba`. The exact release-class command
+`deno task e2e:cli run scaffold.runtime --cleanup --format pretty` returned exit 1 with
+`passed=20 failed=1 skipped=0`.
+
+The sole failure was `generated.service-client-contract`. Both
+`scaffold.service-client-add` and `scaffold.service-client-generate` passed against the generated
+project, as did database codegen. The later static probe observed zero client writes and three
+Aspire-helper writes where it required both counts to be zero. The suite-owned raw JSONL output is
+preserved byte-for-byte at `reports/s5-scaffold-runtime-20260815-184907.log` with SHA-256
+`e45934adc737626e6b5d05dc1c8dccbb8fb7c2cab0bab76b828520150206d225`.
+
+The exact failure cannot reproduce at pre-implementation `c53726c69` because neither the gate/probe
+nor the new combined client/Aspire `service generate` contract exists there. It is leaf-caused and
+is not carried as a baseline. No repair or rerun occurred under the lease.
+
+Suite cleanup passed. Run-owned teardown reported no AppHosts, containers, or escalations to remove.
+The mandatory leak check then recorded Aspire `ok`, Docker `ok`, and `survivors: []`. The host is
+empty. The runtime failure blocked the conditional inter-gate audit, so `fresh-browser` is NOT_RUN
+and no browser receipt exists. Full verdict and cleanup evidence are in
+`reports/s5-runtime-failure.md`.

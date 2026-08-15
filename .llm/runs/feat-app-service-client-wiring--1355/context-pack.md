@@ -90,18 +90,18 @@ or expensive command is authorized.
 
 ## In Progress
 
-- The reviewed F3 check repair is committed at content head
-  `193e665ba0592273622253e3e9a1ebfc019b1be9`. The targeted two-file check passes and all four fresh
-  `s4-f3-fix1-*` binding receipts PASS at that head. Exact-set recomputation is SUFFICIENT. Preserve
-  `receipts/s4-f3-check.json` as the historical FAIL at `6e822a74b`; S5 and both expensive gates
-  remain blocked pending fresh Tier-A and a coordinator lease.
+- S5 stopped at the leased `scaffold.runtime` gate on run-only head `ab78eaa35`; product content
+  remains `193e665ba`. The suite returned 20 passed / 1 failed / 0 skipped. Exact failure:
+  `generated.service-client-contract` observed three Aspire-helper writes on the later generate.
+  Suite cleanup and run-owned teardown completed, and final leak-check reports Aspire `ok`, Docker
+  `ok`, `survivors: []`. `fresh-browser` is NOT_RUN by the conditional contract.
 
 ## Next Steps
 
-1. Commit and explicitly push the four generated `s4-f3-fix1-*` receipts and this evidence summary.
-2. Post the structured S4-F3 repair receipt comment and stop for fresh Tier-A.
-3. Keep S5, `scaffold.runtime`, and `fresh-browser` blocked until the coordinator grants a new
-   expensive-gate lease.
+1. Commit and explicitly push the suite-owned S5 log, failure attribution, and cleanup evidence.
+2. Post the structured S5 failure/cleanup receipt and return the lease with the host empty.
+3. Await a reviewed repair disposition; do not run `fresh-browser` or retry `scaffold.runtime` under
+   this lease.
 
 ## Key Decisions
 
@@ -145,8 +145,8 @@ or expensive command is authorized.
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
 | Static      | Four `s4-f3-fix1-*` binding receipts PASS at `193e665ba`; exact-set sufficiency SUFFICIENT. The original `s4-f3-check.json` FAIL at `6e822a74b` is preserved as historical evidence. | `worklog.md`; `reports/s4-f3-check-failure.md`; binding receipts |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
-| Runtime     | NOT_RUN / lease-blocked                                                                                                           | `plan.md` release conditions |
-| Consumer    | NOT_RUN / implementation-dependent                                                                                                | `plan.md` S5                 |
+| Runtime     | `scaffold.runtime` FAIL: 20 passed / 1 failed / 0 skipped; `generated.service-client-contract` failed. Cleanup proven empty. | `reports/s5-runtime-failure.md`; suite-owned raw log |
+| Consumer    | `fresh-browser` NOT_RUN because the runtime prerequisite failed; no catalog receipt exists. | S5 conditional contract |
 
 ## Open Questions
 
