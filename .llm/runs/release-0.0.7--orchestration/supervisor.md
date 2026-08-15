@@ -222,3 +222,17 @@ Neither formal evaluator consumes the global expensive-gate mutex. At `2026-08-1
 fixes T-1 passed Tier-A at `ebad68c80`; a clean `aspire ps`/Docker/central-state preflight then
 granted the one `scaffold.runtime`/Aspire/Docker lease to #1654. No other expensive gate may start
 until that isolated pass is terminal and its mandatory cleanup is verified.
+
+### Active completion checkpoint — 2026-08-15T04:39:17Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Rewrite #1551 comments `5265826161` and `5265971722` in place from a newly fetched immutable EIS-Chat head, then reconcile S3 | Preserve original Codex thread; no appended follow-up, ready flip, merge, or false PLAN-EVAL shortcut |
+| internals | Fresh #1653 IMPL-EVAL cycle 2 in `31c4cfa9-…`, Opus 5/high Remote Control, source `84bbcf9a1` | One evaluator in this topic; cycle is verification of the body-only repair, not permission for an endless loop |
+| fixes | One clean retry of #1654 `scaffold.runtime` after attempt 1 was interrupted with no verdict and fully cleaned | Sole global expensive lease; exact AppHost cleanup and empty Docker postcondition mandatory before Tier-A/IMPL-EVAL |
+| features | Owner decision hold for #1651 after RFC 0003/#1490 overlap audit | Keep draft; no amendment, reply, resolution, readiness, or merge before explicit option 1/2/3 verdict |
+
+Coordinator transport remains GPT-5.6-SOL/high, never max. The resumed Claude controller PIDs may
+change after an unattended-process interruption, but their session IDs, branches, worktrees, and
+Remote Control bridges remain authoritative and must not be replaced. Continue supervising useful
+work in the other topics while #1651 waits; the owner hold is lane-local, not a cluster stop.

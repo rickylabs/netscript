@@ -65,3 +65,24 @@ immediately, maintain per-topic concurrency, and stay active until merge/release
 genuine owner-only blocker. The current repair provisioned docs' pinned external input, launched the
 two waiting IMPL-EVALs, and resumed fixes' bounded Tier-A repair without replacing any supervisor or
 implementation thread.
+
+## 2026-08-15T04:39:17Z — post-evaluation owner holds and runtime interruption
+
+- **Significant / owner contract:** #1651 passed its planned evaluation before owner comment
+  `5300440887`, so that result cannot authorize readiness. The delegated overlap audit found a
+  narrower amendment boundary rather than a duplicate RFC. Preserve the RFC and the PR unchanged
+  until the owner selects one of the surfaced dispositions; no implicit recommendation is authority.
+- **Significant / evidence baseline:** #1652's approved plan used EIS-Chat `5191de83`, but the owner
+  reports both examples materially improved and requires the two existing issue comments rewritten
+  in place. This is not an append-only status update. The docs lane must determine whether the newly
+  fetched immutable baseline stays within the locked evidence contract; open another PLAN-EVAL only
+  if it changes locked architecture or scope.
+- **Operational / expensive gate:** #1654 attempt 1 produced a prefix of green gate events but no
+  suite verdict and left AppHost-owned stopped resources. It is classified
+  `interrupted_no_verdict`, never PASS/FAIL. Exact ownership evidence permitted scoped removal of
+  three containers, their empty Aspire network, and Garnet's anonymous volume. One retry is granted
+  because the interruption was transport/infrastructure, not a product verdict; no further retry is
+  implicit.
+- **Editorial evaluator loop:** #1653 cycle 1's only blocker was stale duplicated PR-body evidence;
+  the repair changed no code or committed content. A single fresh cycle 2 verifies the live body and
+  cycle-1 integrity. Further evaluator cycling requires a new substantive finding.

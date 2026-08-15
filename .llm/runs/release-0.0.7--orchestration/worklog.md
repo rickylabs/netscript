@@ -78,3 +78,26 @@
   complete. Each topic's formal evaluator queue runs serially, while the four topics may evaluate in
   parallel. Implementation stays on WSL Codex Sol with per-slice effort; evaluator selection follows
   the owner-amended Opus-default/Fable-exception policy.
+
+## 2026-08-15T04:39:17Z — owner corrections and interrupted runtime reconciliation
+
+- Delegated audit of owner comment `5300440887` found #1651 distinct overall but materially
+  overlapping RFC 0003/#1490 at C6. PR #1651 remains draft under
+  `BLOCK_PENDING_AMENDMENT`; the owner has been shown three explicit dispositions and the features
+  lane may not amend, reply, resolve, mark ready, or merge before that verdict.
+- Owner comment `5300459514` made the two canonical #1551 case-study comments (`5265826161`,
+  `5265971722`) the docs lane's first priority. The preserved docs supervisor and original Codex
+  thread must fetch a new immutable EIS-Chat head, recompute the surfaces and estimates, and replace
+  both comment bodies in place rather than append follow-ups. PR #1652 stays draft and partial.
+- #1653 IMPL-EVAL cycle 1 returned `FAIL_FIX` only because superseded acceptance blocks remained in
+  the PR body. Internals reproduced the exact 9+5 errors, removed only the stale body blocks, and
+  proved exact 9/9 and 5/5 mappings. Fresh cycle 2 is running in native Opus 5/high Remote Control
+  session `31c4cfa9-6610-4813-a4d2-482080fc562e`, bridge
+  `session_01A8dNQhZgaysPzhnEDm2MrA`, against head `84bbcf9a1`.
+- #1654's first `scaffold.runtime` attempt has no terminal verdict. Its structured log ends after
+  `database.migration-artifacts` passed and `database.generate` started. The orphan check proved
+  three exact run-owned exited containers; ownership-aware teardown removed PostgreSQL and Redis,
+  label/network correlation proved Garnet belonged to the same AppHost, and the coordinator removed
+  that exact container, empty Aspire network, and anonymous volume. `aspire ps` and `docker ps -a`
+  are empty. A single clean retry is authorized on the original Codex thread under the same global
+  lease; partial attempt-1 output is not acceptance evidence.
