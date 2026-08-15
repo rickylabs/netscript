@@ -240,3 +240,32 @@ settle on abort through a **published transport path**, not that a method exists
 The author was additionally told to run a cross-package `packages/fresh` check before finishing.
 
 Serial queue preserved; `sdk-cache-surface-and-telemetry` remains queued.
+
+
+## Observed — #1661 label state differs from the coordinator's reconciliation message
+
+Not leaf drift; a live-state correction recorded before it can propagate.
+
+The coordinator's reconciliation states the PR label is `status:ready-merge`. **It is not.** Verified
+twice via `gh pr view 1661 --json labels`: the PR carries **exactly one** `status:` label and it is
+**`status:impl-eval`**. Full set: `type:fix`, `status:impl-eval`, `area:ai-core`, `gate:jsr`,
+`priority:p1`. Issue #1448 is `status:impl`, as stated.
+
+Everything else in that message reconciles exactly: PR non-draft at `4766b258f`, **0 unchecked boxes
+on the PR**, **9/9 checked on #1448 with 0 unchecked**, review threads `0/0`, and `close-gate`,
+`quality` and `code-quality` all **pass** at the exact head. `check-test` is **pending**, which is
+why `mergeStateStatus` is **`BLOCKED`** rather than `CLEAN`.
+
+**Why the label matters, concretely.** Per `netscript-pr`, merge requires `status:ready-merge`, and
+CI's acceptance-evidence **mirror** runs only for that label. The `close-gate` job that passed here
+ran while the PR was at `status:impl-eval` — its unchecked-box condition is genuinely satisfied
+(0/0), but the lifecycle has not reached the state the merge bar names. Two consequences for the
+coordinator, who owns labels in this lane:
+
+1. Setting `status:ready-merge` is required before merge, and must replace `status:impl-eval` —
+   exactly one `status:` label at all times.
+2. `ci.yml` does **not** listen to `labeled`, so after applying the label the **`close-gate` job
+   should be re-run** rather than pushing an empty commit. A push would move the head and invalidate
+   the cycle-2 IMPL-EVAL verdict, which is bound to `df05344166` / `4766b258f`.
+
+Recorded so no one merges believing the ready-merge lifecycle already completed.
