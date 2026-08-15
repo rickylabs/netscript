@@ -38,6 +38,11 @@
 - Slice 3 generates a typed idempotent representative row for the resolved model, preserves a
   truthful direct-call no-model branch, and makes normal scaffolding pass the resolved model and
   SQLite database filename into its generators.
+- Slice 3 landed as `275ae091c3c73e7893672554276b013a20d01944` with its decisive seed/scaffolder
+  tests, `quality:scan`, and `arch:check` green.
+- Slice 4 gives persistent generated GET/update/delete by-id handlers the contract-defined
+  `NOT_FOUND` path, narrows Prisma translation to `P2025`, and retains regression coverage for the
+  already-green common 404 OpenAPI projection. Memory showcase routers remain excluded.
 - Opposite-family IMPL-EVAL remains mandatory after implementation and Tier-A review.
 - Same-thread steering must use the exact Deno-suite command in `codex-thread-ids.md`; direct
   `codex exec resume` is prohibited.

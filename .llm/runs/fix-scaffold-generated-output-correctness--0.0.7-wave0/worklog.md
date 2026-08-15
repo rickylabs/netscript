@@ -36,6 +36,8 @@
 | 2026-08-15T00:05:12Z | Slice 2 reconcile: #1262/#1263/#1588 remain open, PR #1654 remains draft at exactly one `status:impl`, cycle-2 PASS is the latest coordinator/evaluator input, and no scope, issue-link, milestone, or closing-keyword adjustment is authorized. | live PR/issue reads |
 | 2026-08-15T00:09:09Z | Slice 3 replaced the placebo query with a generated typed `findFirst`/`create` seed, added the truthful direct-call no-model branch, passed resolved model/database names through the scaffolder, regenerated the embedded asset, and cleared its decisive and required package gates. | focused seed/scaffolder tests; `quality:scan`; `arch:check` |
 | 2026-08-15T00:09:09Z | Slice 3 reconcile: the only new PR comment is the recorded slice-2 implementation evidence; #1262/#1263/#1588 remain open and PR #1654 remains draft at exactly one `status:impl`. No external finding or authorized lifecycle/scope change appeared. | live PR read; prior live issue reads |
+| 2026-08-15T00:13:41Z | Slice 4 gave the persistent generated router a defined `NOT_FOUND` path for missing GET rows, translated only Prisma `P2025` for update/delete, retained the already-green common 404 OpenAPI projection assertion, regenerated the embedded asset, and cleared its decisive and required package gates. | generated-router template tests; `quality:scan`; `arch:check` |
+| 2026-08-15T00:13:41Z | Slice 4 reconcile: the only new PR comment is the recorded slice-3 implementation evidence; #1262/#1263/#1588 remain open and PR #1654 remains draft at exactly one `status:impl`. No external finding or authorized lifecycle/scope change appeared. | live PR read; prior live issue reads |
 
 ## Gate evidence
 
@@ -49,6 +51,10 @@
 | 3 | `deno task quality:scan` | PASS, raw exit 0; 0 findings, 7 pre-existing bounded allowances |
 | 3 | `deno task arch:check` | PASS, raw exit 0; no doctrine FAIL rows (warning-only baseline census retained) |
 | 3 | `deno task gen:assets-barrel` | PASS, raw exit 0; generated mirror refreshed without hand editing |
+| 4 | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/e2e/tests/application/gates/generated-router-template_test.ts` | PASS, raw exit 0; 3 passed, 0 failed |
+| 4 | `deno task quality:scan` | PASS, raw exit 0; 0 findings, 7 pre-existing bounded allowances |
+| 4 | `deno task arch:check` | PASS, raw exit 0; no doctrine FAIL rows (warning-only baseline census retained) |
+| 4 | `deno task gen:assets-barrel` | PASS, raw exit 0; generated mirror refreshed without hand editing |
 
 `scaffold.runtime`, Aspire, and Docker remain forbidden until the coordinator-owned global
 expensive-gate lease is explicitly granted. The eventual one-pass verdict is shared by all three
