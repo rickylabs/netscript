@@ -304,6 +304,8 @@ Slice 4 is authorized.
 | 2026-08-15 | Authorization  | Fast-forwarded to Tier-A S3 sign-off `d3d31b3d0`; began S4 only.                                                                                                                                                                         |
 | 2026-08-15 | RED            | Replaced old workflow-filter assertions and added executable retry/refusal/dedup tests first; targeted wrapper exited 1 with 7 passed / 3 failed because literal routing and the embedded helpers did not exist.                           |
 | 2026-08-15 | Implementation | Routed every literal candidate to trusted policy, added 5×1s lookup with controlled exhaustion, emitted source-keyed refusal outputs, and posted them once in an authorize-job step before the paid job. Policy + workflow suites pass 26/26. |
+| 2026-08-15 | Durable gates  | At `9b71e1bd2`, cached package/plugin `check`, root `test`, and `quality-job` passed. Root test reported 4,147 passed / 19 ignored / 0 failed; only `test` covers S4.                                             |
+| 2026-08-15 | Reconcile      | Read S3 supervisor sign-off comment `5301464449`; #1611/#1613 remain open and unchanged at milestone `0.0.7`. No plan adjustment, issue mutation, or label change was needed.                                                               |
 
 ### Decisions
 
@@ -327,9 +329,9 @@ Slice 4 is authorized.
 | -------------- | ---------------- | ---: | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | Targeted RED   | expected failure |    1 | structured test wrapper before implementation; 7 passed / 3 failed     | Missing workflow routing/helpers proved tests preceded implementation.           |
 | Targeted GREEN | PASS             |    0 | structured test wrapper; policy + workflow suites 26/26                | Focused executable S4 policy, retry, dedup, ordering, and permission feedback.   |
-| `check`        | PENDING          |    — | `receipts/slice-4/check.json` after implementation commit               | Frozen-contract receipt only; package/plugin roots do not cover S4.              |
-| `test`         | PENDING          |    — | `receipts/slice-4/test.json` after implementation commit                | Will be the load-bearing S4 proof through root discovery.                        |
-| `quality-job`  | PENDING          |    — | `receipts/slice-4/quality-job.json` after implementation commit         | Required contract receipt; shares non-covering package/plugin quality inputs.    |
+| `check`        | PASS             |    0 | `receipts/slice-4/check.json` at `9b71e1bd2`; unchanged-input cache hit | Frozen-contract receipt only; package/plugin roots do not cover S4.              |
+| `test`         | PASS             |    0 | `receipts/slice-4/test.json` at `9b71e1bd2`; 4,147 passed, 19 ignored  | Load-bearing S4 proof; root discovery executed policy/workflow suites.            |
+| `quality-job`  | PASS             |    0 | `receipts/slice-4/quality-job.json` at `9b71e1bd2`                     | Required contract receipt; package/plugin quality inputs do not cover S4.        |
 
 ### Handoff boundary
 

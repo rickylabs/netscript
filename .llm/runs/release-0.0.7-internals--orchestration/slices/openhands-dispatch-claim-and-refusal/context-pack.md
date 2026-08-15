@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `release-0.0.7-internals--orchestration/slices/openhands-dispatch-claim-and-refusal` |
 | Branch | `fix/openhands-dispatch-claim-and-refusal` |
-| Current phase | S4 implementation complete; durable gates pending |
+| Current phase | S4 complete; stopped for Tier-A slice review |
 | Archetype | `6-cli-tooling` |
 | Scope overlays | none |
 
@@ -18,6 +18,8 @@ ordinary reportable denial or generation-lookup exhaustion emits a controlled so
 refusal, and a separate authorize step posts it at most once with `GITHUB_TOKEN` under only
 `issues: write`. The paid job remains gated on dispatch true. Generation lookup executes exactly
 five attempts with one-second waits and exhaustion names the missing phase status and source comment.
+All three durable receipts pass at implementation head `9b71e1bd2`; only root `test` behaviorally
+covers S4.
 
 ## Completed
 
@@ -38,16 +40,17 @@ five attempts with one-second waits and exhaustion names the missing phase statu
 - Tier-A S3 sign-off commit `d3d31b3d0`.
 - S4 targeted RED (exit 1; 7 passed / 3 failed before workflow helpers) and focused GREEN (exit 0;
   policy + workflow suites 26/26).
+- S4 durable `check`, `test`, and `quality-job` PASS/0 receipts at `9b71e1bd2`; root test reported
+  4,147 passed, 19 ignored, 0 failed.
 
 ## In Progress
 
-- Commit S4 and run durable `check`, root `test`, and `quality-job` receipts against the reachable
-  implementation commit. Only root `test` behaviorally covers this leaf.
+- Nothing. S4 is being pushed/commented and this thread stops for Tier-A.
 
 ## Next Steps
 
-1. Record S4 durable receipts, push, and post the per-slice PR comment.
-2. Stop for Tier-A substantive S4 review; do not begin S5 without authorization.
+1. Tier-A substantively reviews S4 and either requests a bounded repair or authorizes S5.
+2. Do not begin S5 without that authorization.
 
 ## Key Decisions
 
@@ -85,9 +88,9 @@ five attempts with one-second waits and exhaustion names the missing phase statu
 | S3 | `check` | PASS | `receipts/slice-3/check.json`, exit 0 at `d7fdbb1d9`; package/plugin selection does not cover S3 |
 | S3 | `test` | PASS | `receipts/slice-3/test.json`, exit 0 at `d7fdbb1d9`; 4,145 passed, 19 ignored, 0 failed; load-bearing |
 | S3 | `quality-job` | NOT_RUN | not an S3 gate; scheduled for S4/S5 and not independent behavioral proof |
-| S4 | `check` | PENDING | package/plugin selection does not cover S4 |
-| S4 | `test` | PENDING | load-bearing root discovery gate after implementation commit |
-| S4 | `quality-job` | PENDING | required contract receipt; package/plugin quality inputs do not cover S4 |
+| S4 | `check` | PASS | `receipts/slice-4/check.json`, exit 0 at `9b71e1bd2`; package/plugin selection does not cover S4 |
+| S4 | `test` | PASS | `receipts/slice-4/test.json`, exit 0 at `9b71e1bd2`; 4,147 passed, 19 ignored, 0 failed; load-bearing |
+| S4 | `quality-job` | PASS | `receipts/slice-4/quality-job.json`, exit 0 at `9b71e1bd2`; non-covering package/plugin quality inputs |
 | all | JSR | N/A | no publishable surface |
 
 ## Open Questions
