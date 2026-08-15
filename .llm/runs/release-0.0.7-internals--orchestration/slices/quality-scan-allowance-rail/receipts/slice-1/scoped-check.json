@@ -1,0 +1,42 @@
+{
+  "gateId": "check",
+  "invocationId": "quality-rail-s1-scoped-check",
+  "argv": [
+    "deno",
+    "task",
+    "check",
+    "--file",
+    ".llm/tools/quality/scan-code-quality.ts",
+    "--file",
+    ".llm/tools/quality/scan-code-quality_test.ts",
+    "--include",
+    "^(\\.llm/tools/quality/scan-code-quality(?:_test)?\\.ts|packages/cli/src/public/features/root/public-command-dependencies\\.ts|packages/cli/src/public/public-api\\.ts|plugins/workers/streams/producer\\.ts)$"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-rail",
+  "gitHead": "c694cfb311d378f4796280649042c8c275c828ed",
+  "actualGitHead": "c694cfb311d378f4796280649042c8c275c828ed",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "c61175a0a089baf12111dc6b75880f3d30e4497cbb61c7fa0bca19533bedbdef",
+  "lifecycleId": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069:quality-rail-s1-scoped-check:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-14T23:41:29.312Z",
+  "startedAt": "2026-08-14T23:41:29.315Z",
+  "finishedAt": "2026-08-14T23:41:36.011Z",
+  "durationMs": 6696,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 291,
+    "sha256": "93025c901a849a08122efeb79129adfd2f71227fab33521f9bfad739f09c2c7b",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/codex/repos/netscript-007-quality-rail\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":5,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 541,
+    "sha256": "e59ef3a1872bdce513af4f945be01bf2dad6fd1b8915bf9e067ef5daa660e620",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--file' '.llm/tools/quality/scan-code-quality.ts' '--file' '.llm/tools/quality/scan-code-quality_test.ts' '--include' '^(\\.llm/tools/quality/scan-code-quality(?:_test)?\\.ts|packages/cli/src/public/features/root/public-command-dependencies\\.ts|packages/cli/src/public/public-api\\.ts|plugins/workers/streams/producer\\.ts)$'\n",
+    "truncated": false
+  }
+}

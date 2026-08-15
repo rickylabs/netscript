@@ -1,0 +1,36 @@
+{
+  "gateId": "test",
+  "invocationId": "slice-4-final-test-binding",
+  "argv": [
+    "deno",
+    "task",
+    "test"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-rail",
+  "gitHead": "71c26445838eb5bca654607947ad247cbea78273",
+  "actualGitHead": "71c26445838eb5bca654607947ad247cbea78273",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:2671748",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "cdeeeeb04d1fe46e682481ff8c9574f8f541631aeb293f72988215c22a501182",
+  "lifecycleId": "worker:2671748:slice-4-final-test-binding:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T00:52:10.664Z",
+  "startedAt": "2026-08-15T00:52:10.667Z",
+  "finishedAt": "2026-08-15T00:57:04.313Z",
+  "durationMs": 285063,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 266,
+    "sha256": "813e8f303b6e2d9aec0aa44fc737863614f9f63fd1b6ccbd347010899304b2fa",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\"],\"cwd\":\"/home/codex/repos/netscript-007-quality-rail\",\"exitCode\":0,\"durationMs\":284959,\"summary\":{\"passed\":4109,\"failed\":0,\"ignored\":19,\"totalResults\":4128,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 127,
+    "sha256": "d8c71713aba1eb302702bcf55c321886c40fa2beba1801afb19ff811dd358567",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mtest\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all\n",
+    "truncated": false
+  }
+}

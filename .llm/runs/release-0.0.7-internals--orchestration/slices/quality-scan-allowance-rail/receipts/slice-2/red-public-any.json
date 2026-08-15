@@ -1,0 +1,37 @@
+{
+  "gateId": "test",
+  "invocationId": "quality-rail-s2-red-public-any",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    ".llm/tools/quality/scan-code-quality_test.ts"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-rail",
+  "gitHead": "3c398528996a715da8daebe04969e6aba90263e9",
+  "actualGitHead": "3c398528996a715da8daebe04969e6aba90263e9",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "a1c069664330eaaa8c4a8e201ed8c1fe74f5c9784110d6c09f2a4e1652fd7629",
+  "lifecycleId": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069:quality-rail-s2-red-public-any:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-14T23:59:14.068Z",
+  "startedAt": "2026-08-14T23:59:14.072Z",
+  "finishedAt": "2026-08-14T23:59:15.104Z",
+  "durationMs": 1033,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 2158,
+    "sha256": "565b42e9a036a1e03d5790af749df30c28313c45b82e4baf6ef9fc8c8ba6a666",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\".llm/tools/quality/scan-code-quality_test.ts\"],\"cwd\":\"/home/codex/repos/netscript-007-quality-rail\",\"exitCode\":1,\"durationMs\":931,\"summary\":{\"passed\":21,\"failed\":3,\"ignored\":0,\"totalResults\":24,\"uniqueFailures\":3},\"failures\":[{\"message\":\"AssertionError: Values are not equal.\\n\\n\\n    [Diff] Actual / Expected\\n\\n\\n+   [\\n+     \\\"public-any:packages/example/mod.ts:1\\\",\\n+     \\\"public-any:packages/example/mod.ts:4\\\",\\n+     \\\"public-any:packages/example/mod.ts:6\\\",\\n+     \\\"public-any:packages/example/mod.ts:9\\\",\\n+     \\\"public-any:packages/example/mod.ts:13\\\",\\n+     \\\"public-any:packages/example/mod.ts:16\\\",\\n+     \\\"public-any:packages/example/mod.ts:20\\\",\\n+   ]\\n-   []\\n\\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\\n    at file://<cwd>/.llm/tools/quality/scan-code-quality_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"public-any reports exported declarations and excludes local-only controls\",\"file\":\"./.llm/tools/quality/scan-code-quality_test.ts\",\"line\":479}]},{\"message\":\"AssertionError: Values are not equal.\\n\\n\\n    [Diff] Actual / Expected\\n\\n\\n+   [\\n+     \\\"public-any:packages/example/named.ts:1\\\",\\n+     \\\"public-any:packages/example/star.ts:1\\\",\\n+   ]\\n-   []\\n\\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\\n    at file://<cwd>/.llm/tools/quality/scan-code-quality_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"public-any follows named and star re-exports without exposing sibling locals\",\"file\":\"./.llm/tools/quality/scan-code-quality_test.ts\",\"line\":533}]},{\"message\":\"AssertionError: Values are not equal.\\n\\n\\n    [Diff] Actual / Expected\\n\\n\\n+   [\\n+     \\\"public-export-unresolved:packages/example/mod.ts:1\\\",\\n+   ]\\n-   []\\n\\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\\n    at file://<cwd>/.llm/tools/quality/scan-code-quality_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"public export graph fails closed for an unresolved local edge\",\"file\":\"./.llm/tools/quality/scan-code-quality_test.ts\",\"line\":575}]}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 174,
+    "sha256": "3ec86fd6d24c0008a491bfa3577d6f7562beabf0510c4d0648ff2985162f9253",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mtest\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all '.llm/tools/quality/scan-code-quality_test.ts'\n",
+    "truncated": false
+  }
+}

@@ -1,0 +1,518 @@
+# Worklog — quality-scan-allowance-rail
+
+## Identity
+
+- Worktree: `/home/codex/repos/netscript-007-quality-rail`
+- Branch: `chore/quality-scan-allowance-rail`
+- Base: `01e0960494c95ce56eb35892c211a095eb13e6ed`
+- Issues: #1378 + #1545
+- Route requested/observed: OpenAI Codex GPT-5.6 Sol, high
+- Draft PR: #1653 — `https://github.com/rickylabs/netscript/pull/1653`
+
+## Design
+
+### Public surface
+
+The product-facing output is the behavior of `quality:scan`, `quality:scan:repo`, and the embedded
+consumer copy of the scanner. The rule observes published CLI/workers declarations but does not
+change their API shape. Package export maps were inspected with `deno doc` before focused source
+reads.
+
+### Domain vocabulary and ports
+
+- `PublicExportGraph` classifies checked-in local exports and re-exports.
+- `PublicAnyFinding` identifies a reachable declaration/signature and its export path.
+- `QualityAllowance` is a single source location, issue number, and reason.
+- `AllowanceIssueResolver` is the injected state boundary; its command adapter is fail closed.
+- `AllowancePolicyFailure` covers malformed/unverified registration and budget overflow.
+
+The scanner remains the sole tool/application boundary. No new package layer, CLI spine, feature
+axis, plugin extension, or backend protocol is introduced. A narrow GitHub adapter is the external
+port. Coordinator commit `874eacc0d` authorizes its exact focused-test, consumer-manifest,
+generated-asset, and debt-registry peers; no other widening is permitted.
+
+### Constants and configuration
+
+The measured live population is 7. Both task maxima converge to 7 and may only decrease with removed
+allowances. All seven registration comments use open, milestoned #1276 T3 and retain their specific
+reason. #1545 is the closing one-time registration issue, never the durable source owner. Syntax and
+state enums are named in the scanner; issue owner IDs remain in source comments, not a second table.
+
+### Ordered commit slices
+
+1. Registration rail: RED-first allowance/state tests, seven #1276-linked records with specific
+   reasons, fail-closed resolver, budgets at 7; push only once green.
+2. Exported-any rail: RED-first public-vs-local/re-export tests, then deterministic export graph and
+   token-aware enforcement.
+3. Consumer/JSR synchronization: generated asset through checked-in generator, clean second run, CLI
+   full-export evidence, Workers strict 20-diagnostic no-increase evidence, and one #1655-linked
+   `DEBT_ACCEPTED` entry.
+4. Final evidence/sign-off artifacts after Tier-A reviews and global-gate lease; request IMPL-EVAL.
+
+Each implementation slice will name its literal commit SHA and receipts in a structured PR comment.
+#1545 registration precedes #1378 exported-any enforcement; no transient pushed red head is
+permitted.
+
+### Deferred and excluded work
+
+The #1276 T3 root-cause removal and #1655 Workers private-type repair remain excluded, as do #1278
+Inventory B, #1276 T1–T2/T4–T5, #1245, #1249, #1379, and #1380. No type weakening, broad
+suppression, `as unknown as`, `as any`, `@ts-ignore`, or unregistered allowance will be introduced
+to green a gate.
+
+### Contributor path
+
+A contributor sees one scanner diagnostic that names the source location, public export path or
+allowance defect, and the required remediation: remove the unsafe construct, narrow it, or link a
+specific reason to a verified open milestoned issue without exceeding the non-increasing budget.
+
+## Gates
+
+### Baseline at dispatch SHA
+
+- Focused structured tests: 19 passed, 0 failed.
+- Durable `quality-scan`: PASS, 7 allowances, 0 findings.
+- Durable `quality-scan-repo`: PASS, 7 allowances, 0 findings.
+- CLI full-export doc lint: PASS.
+- Workers full-export doc lint: FAIL with 20 pre-existing private-type-ref diagnostics.
+
+Receipts: `receipts/baseline/quality-tests.json`, `quality-scan.json`, and `quality-scan-repo.json`.
+
+Final proving gates and per-slice structured commands are specified in `plan.md`. Global/expensive
+gates require the coordinator's singleton lease.
+
+### Slice 1 — registration rail
+
+The scanner now accepts only `quality-allow: #<issue> — <specific reason>`, counts every
+syntactically valid record against the fixed budget, deduplicates issue lookups, and fails closed
+for unavailable, malformed, closed, or unmilestoned owner state. All seven source records retain
+their existing reasons and bind to #1276 T3. Both task maxima are 7.
+
+The production resolver is fixed to `rickylabs/netscript` on `api.github.com`. It uses
+`GITHUB_TOKEN` or `GH_TOKEN` when available and otherwise deliberately uses the anonymous public
+API, including in fork PRs and installed consumer copies. Offline, missing-net-permission,
+malformed, and rate-limited responses remain failures; they never silently skip ownership
+validation. Root tasks declare scoped net/env permissions, the consumer manifest declares
+`read`/`env`/`net`, and the generated CLI asset was regenerated only through `gen:assets-barrel`.
+
+| Evidence                                                      | Outcome       | Exit | Receipt                                              |
+| ------------------------------------------------------------- | ------------- | ---: | ---------------------------------------------------- |
+| RED focused allowance contract                                | expected FAIL |    1 | `receipts/slice-1/red-test.json`                     |
+| Focused scanner suite (21 tests)                              | PASS          |    0 | `receipts/slice-1/focused-green-1.json`              |
+| Scoped structured check (5 files)                             | PASS          |    0 | `receipts/slice-1/scoped-check.json`                 |
+| Scoped structured lint (5 files)                              | PASS          |    0 | `receipts/slice-1/scoped-lint.json`                  |
+| Scoped structured format (5 files)                            | PASS          |    0 | `receipts/slice-1/scoped-fmt.json`                   |
+| `quality:scan` (7 verified records)                           | PASS          |    0 | `receipts/slice-1/quality-scan.json`                 |
+| `quality:scan:repo` (7 verified records)                      | PASS          |    0 | `receipts/slice-1/quality-scan-repo.json`            |
+| `quality:gate` (`quality:scan` + `arch:check`)                | PASS          |    0 | `receipts/slice-1/quality-gate.json`                 |
+| Allowance budget stash-probe attestation (superseded)         | PASS          |    0 | `receipts/slice-1/allowance-budget.json`             |
+| Allowance budget landed-head attestation (8 → 7, no increase) | PASS          |    0 | `receipts/slice-1/allowance-budget-landed-head.json` |
+| Generated asset clean second generation                       | PASS          |    0 | `receipts/slice-1/assets-clean.json`                 |
+
+The original allowance-budget receipt is preserved but superseded because its second argv input,
+`3136358e484f8df30b778d2ae838dd9103077d10`, is a stash object outside branch history and therefore
+is not a durable, independently rerunnable attestation. The binding replacement receipt compares the
+immutable base directly with landed Slice 1 commit `586b5513500caa1fd5ce07878f4ba96606064555` and
+records exit 0. All other receipts record the pre-commit evaluator head and their exact argv; none
+is presented as a clean-worktree or supervisor sign-off receipt.
+
+### Slice 2 — exported/publicly reachable `any`
+
+The scanner now discovers checked-in package export roots, follows deterministic local named/star
+re-export and import/export edges, and applies a token-aware `public-any` rule to reachable type
+aliases, interfaces, function signatures, class public members, and explicitly typed exported
+values. Local-only declarations, comments, strings, private/protected class members, and
+implementation bodies remain outside this rule. Each public finding carries its declaration kind and
+reachable export path; an unresolvable local public edge fails closed as `public-export-unresolved`.
+External package edges remain outside the approved checked-in local graph and are covered from those
+packages' own export roots.
+
+Public-only findings use the same verified `quality-allow` record path as the existing line rules:
+the marker must parse, its owner must resolve open and milestoned, and the record counts against the
+fixed budget. A malformed marker cannot suppress the public rail. The focused suite preserves the
+docs-fence and all six soundness-fixture regressions from #1549.
+
+| Evidence                                                           | Outcome       | Exit | Receipt                                              |
+| ------------------------------------------------------------------ | ------------- | ---: | ---------------------------------------------------- |
+| RED public/local/re-export/unresolved matrix (21 pass, 3 fail)     | expected FAIL |    1 | `receipts/slice-2/red-public-any.json`               |
+| First implementation pass; external edges misclassified            | expected FAIL |    1 | `receipts/slice-2/focused-green-1.json`              |
+| Focused scanner suite (25 tests)                                   | PASS          |    0 | `receipts/slice-2/focused-green-binding.json`        |
+| Scoped structured check (2 files, actually fired)                  | PASS          |    0 | `receipts/slice-2/scoped-check-fired.json`           |
+| Root lint selection excluded `.llm` files; false-green refused     | expected FAIL |    2 | `receipts/slice-2/scoped-lint-1.json`                |
+| Checked-in lint config found the pre-existing inline import prefix | expected FAIL |    1 | `receipts/slice-2/scoped-lint-committed-config.json` |
+| Scoped structured lint with checked-in config (actually fired)     | PASS          |    0 | `receipts/slice-2/scoped-lint-fired.json`            |
+| Initial exact-source format check                                  | expected FAIL |    1 | `receipts/slice-2/scoped-fmt-1.json`                 |
+| Exact two-source structured format check (actually fired)          | PASS          |    0 | `receipts/slice-2/scoped-fmt-fired.json`             |
+| `quality:scan` (7 verified records, zero findings)                 | PASS          |    0 | `receipts/slice-2/quality-scan-binding.json`         |
+| `quality:scan:repo` (7 verified records, zero findings)            | PASS          |    0 | `receipts/slice-2/quality-scan-repo-binding.json`    |
+| `quality:gate` (`quality:scan` + `arch:check`, zero failures)      | PASS          |    0 | `receipts/slice-2/quality-gate-binding.json`         |
+
+The check/lint/format task cache inputs do not include `.llm/tools/quality/**`; unique harmless
+batch-size arguments forced the final wrapper processes to execute instead of accepting a cached
+task result. Formatting targeted only the two TypeScript sources and never the receipt directory.
+All binding receipts record `actualGitHead` = signed Slice 1 head
+`3c398528996a715da8daebe04969e6aba90263e9`; none names a stash or any non-history commit-ish.
+
+### Slice 3 — consumer synchronization and JSR evidence
+
+The checked-in generator synchronized the embedded consumer scanner after Slice 2. The RED asset
+receipt proves the signed Slice 2 head was stale; `gen:assets-barrel` then changed only
+`packages/cli/src/kernel/assets/agent-tools.generated.ts`, and the binding second generation was
+clean. The embedded copy now carries the same public-export rail and fixed-repository fail-closed
+GitHub resolver as the source scanner. The generated file itself checks cleanly and is present in
+the CLI publish simulation.
+
+The JSR audit covered all three `@netscript/cli` export targets and all 13
+`@netscript/plugin-workers` export targets discovered from their checked-in export maps. Dependency
+specifiers and publish include/exclude lists were reviewed from each member's `deno.json`: internal
+`@netscript/*` dependencies are pinned to 0.0.6, `@std/*` dependencies carry explicit versioned
+ranges, and `zod` uses the root npm catalog. The scoped dry-run wrapper materialized that catalog
+only in its throwaway workspace and published nothing. Both scoped publish simulations passed after
+checking every export target for slow types and enumerating their package files. Workers retains
+three existing `unanalyzable-dynamic-import` warnings whose runtime paths are deliberately computed;
+no warning was suppressed or changed in this slice.
+
+CLI full-export lint is green. Workers full-export lint is deliberately not called green: it exits 1
+with exactly 20 `private-type-ref` diagnostics across the 13 targets, zero `missing-jsdoc`, and zero
+other diagnostics. The authorized `workers-private-type-ref-1655` debt entry binds that strict
+no-increase baseline to open issue #1655 in milestone 0.0.8. Any count above 20 or any new
+diagnostic class is `FAIL_DEBT` until #1655 removes the baseline.
+
+| Evidence                                                         | Outcome                  | Exit | Receipt                                         |
+| ---------------------------------------------------------------- | ------------------------ | ---: | ----------------------------------------------- |
+| Stale generated consumer asset                                   | expected FAIL            |    1 | `receipts/slice-3/assets-red.json`              |
+| Clean second checked-in asset generation                         | PASS                     |    0 | `receipts/slice-3/assets-green.json`            |
+| Generated consumer asset structured check (1 file, fired)        | PASS                     |    0 | `receipts/slice-3/generated-check.json`         |
+| CLI full-export doc lint (3/3 targets, zero diagnostics)         | PASS                     |    0 | `receipts/slice-3/cli-doc-lint.json`            |
+| Workers full-export doc lint (13 targets, exact 20 private refs) | expected FAIL / accepted |    1 | `receipts/slice-3/workers-doc-lint.json`        |
+| Scoped CLI publish dry-run                                       | PASS                     |    0 | `receipts/slice-3/cli-publish-dry-run.json`     |
+| Scoped Workers publish dry-run                                   | PASS                     |    0 | `receipts/slice-3/workers-publish-dry-run.json` |
+| `quality:gate` (`quality:scan` + `arch:check`, zero failures)    | PASS                     |    0 | `receipts/slice-3/quality-gate.json`            |
+
+Every Slice 3 receipt records `actualGitHead` = signed Slice 2 head
+`f9acdb426d5438935ae75bee7dda987dbfe3d4cb`. None names a stash or another commit-ish outside branch
+history. Formatting is not applied to the generated asset or receipt directory: generator output is
+canonical and committed evidence bytes remain unchanged.
+
+### Slice 4 — final-head acceptance and consumer portability repair
+
+The first full final-head test was a genuine RED: 4,108 passed and one failed because the installed
+consumer scanner could not resolve the repository-only `@std/path` import when invoked from a
+foreign working directory. The failure was introduced in Slice 2 while satisfying the repo lint rule
+and was copied faithfully into the generated asset in Slice 3. A direct installed-bundle probe
+reproduced Deno's `Import "@std/path" not a dependency` error.
+
+The minimum repair stays within the approved scanner/generated-asset surfaces: restore the
+consumer-safe `jsr:@std/path@^1` specifier that existed at the immutable base, regenerate through
+`deno task gen:assets-barrel`, and rerun the existing consumer integration test. The focused
+pre-commit probe passed 19/19, but is explicitly non-binding because its working tree contained the
+repair; `receipts/slice-4/consumer-tool-green-precommit.json` is retained only as diagnostic
+evidence. The repair landed at `71c26445838eb5bca654607947ad247cbea78273`; every binding final
+receipt below names that exact history commit and reports matching `actualGitHead`.
+
+| Evidence                                                         | Outcome       | Exit | Receipt                                               |
+| ---------------------------------------------------------------- | ------------- | ---: | ----------------------------------------------------- |
+| Live PR/issue close-gate baseline (not allowlisted)              | expected FAIL |    1 | live observation; no fabricated durable receipt       |
+| Full repository test before portability repair                   | expected FAIL |    1 | `receipts/slice-4/test.json`                          |
+| Consumer integration pre-commit diagnostic (19/19)               | PASS probe    |    0 | `receipts/slice-4/consumer-tool-green-precommit.json` |
+| Consumer integration at landed repair (19/19)                    | PASS          |    0 | `receipts/slice-4/consumer-tool-green.json`           |
+| Clean generated-asset second run                                 | PASS          |    0 | `receipts/slice-4/assets.json`                        |
+| Binding full structured check (2,919 files, 63 batches)          | PASS          |    0 | `receipts/slice-4/check-binding.json`                 |
+| Binding full repository test (4,109 pass, 0 fail, 19 ignored)    | PASS          |    0 | `receipts/slice-4/test-binding.json`                  |
+| Root quality job; check/lint/format and companion checks fired   | PASS          |    0 | `receipts/slice-4/quality-job.json`                   |
+| `quality:gate` (`quality:scan` + `arch:check`)                   | PASS          |    0 | `receipts/slice-4/quality-gate.json`                  |
+| `quality:scan` (7 verified records, zero findings/failures)      | PASS          |    0 | `receipts/slice-4/quality-scan.json`                  |
+| `quality:scan:repo` (7 verified records, zero findings/failures) | PASS          |    0 | `receipts/slice-4/quality-scan-repo.json`             |
+| Standalone doctrine/architecture gate                            | PASS          |    0 | `receipts/slice-4/arch-check.json`                    |
+| Fresh browser suite (2/2)                                        | PASS          |    0 | `receipts/slice-4/fresh-browser.json`                 |
+| Docs source-format check                                         | PASS          |    0 | `receipts/slice-4/docs-source-format.json`            |
+| Docs source-format regression suite (6/6)                        | PASS          |    0 | `receipts/slice-4/docs-source-format-test.json`       |
+| Docs accuracy/discoverability                                    | PASS          |    0 | `receipts/slice-4/docs-accuracy.json`                 |
+| Scoped CLI publish simulation                                    | PASS          |    0 | `receipts/slice-4/cli-publish-dry-run.json`           |
+| Scoped Workers publish simulation                                | PASS          |    0 | `receipts/slice-4/workers-publish-dry-run.json`       |
+
+The Workers publish simulation retains its three existing `unanalyzable-dynamic-import` warnings. No
+warning was suppressed, no publication occurred, and the separate Workers full-export lint remains
+the exact accepted 20-`private-type-ref` failure owned by #1655 — it is not green.
+
+### Definition of Done truth audit before Tier-A
+
+This table records truth only; the author did **not** tick PR-body boxes.
+
+| PR Definition of Done row                                              | State before Slice 4 Tier-A | Evidence                                                                             |
+| ---------------------------------------------------------------------- | --------------------------- | ------------------------------------------------------------------------------------ |
+| Separate-session PLAN-EVAL records `PASS`                              | TRUE                        | `plan-eval.md`, evaluator commit `c694cfb311`, verdict comment `5299133651`          |
+| Coordinator resolves contract clarifications                           | TRUE                        | coordinator comment `5286261678`, central commit `874eacc0d`, D-6 through D-8        |
+| #1545 registration precedes #1378 enforcement                          | TRUE                        | Slice 1 registration `586b55135` precedes Slice 2 enforcement `f869a5bfe`            |
+| Seven allowances have reasons and open, milestoned ownership           | TRUE                        | final scan receipts: seven records, all #1276, no owner failures                     |
+| Both maxima equal population and cannot rise without same-change issue | TRUE                        | `deno.json` maxima 7 plus `slice-1/allowance-budget-landed-head.json`                |
+| RED-first acceptance matrix                                            | TRUE                        | Slice 1/2 RED and green receipts; focused suite 25/25; Tier-A S1/S2 verification     |
+| Generated asset regenerated and second run clean                       | TRUE                        | Slice 3 RED/green plus final `slice-4/assets.json` at `71c264458`                    |
+| CLI/Workers JSR audits and scoped dry-runs recorded without publish    | TRUE                        | Slice 3 doc-lint audit, exact Workers debt baseline, final dry-run receipts          |
+| All binding proving gates pass at one implementation SHA               | TRUE                        | all binding Slice 4 receipts name `71c264458`; historical RED/probes are non-binding |
+| Every implementation slice receives Tier-A review                      | PENDING                     | Slices 1–3 signed; Slice 4 must now receive substantive Tier-A review                |
+| Separate opposite-family IMPL-EVAL passes                              | PENDING                     | not launched; only after Slice 4 Tier-A sign-off                                     |
+| PR remains draft for coordinator disposition                           | TRUE                        | live PR #1653 is draft at exactly `status:impl`                                      |
+
+## Reconcile notes
+
+- Live #1378 and #1545 are open in milestone 0.0.7; `origin/main` equals the approved baseline.
+- #1549 already delivered docs fences, soundness preservation, original budget wiring, and typed
+  triggers examples; preserve rather than duplicate it.
+- Current allowance population is 7; live #1545 has been reconciled from stale 8 to 7.
+- Coordinator comment `5286261678` and central commit `874eacc0d` resolve the former authority
+  blockers: #1276 T3 owns all seven records, the four exact coupled surfaces are authorized, and
+  #1655 owns Workers lint repair with strict no-increase evidence here.
+- Slice 1 live reconcile: PR #1653 remains open, draft, milestone 0.0.7, and exactly `status:impl`;
+  both closing keywords remain in its body. Fetched `origin/main` advanced from the immutable base
+  to `dd472102d` through merged #1644 only. Its diff does not overlap this leaf's authorized
+  scanner/package/plugin/generated surfaces, so the locked base was retained and no rebase or #1644
+  worktree/PR mutation occurred.
+- Slice 2 live reconcile: PR #1653 remains open and draft at milestone 0.0.7 with exactly
+  `status:impl`; its body still carries both closing keywords. Live #1378 and #1545 remain open. No
+  label, milestone, issue, base, or readiness mutation was made.
+- Slice 3 live reconcile: issue #1655 remains open in milestone 0.0.8 and owns only removal of the
+  exact Workers lint baseline. No issue, label, milestone, PR readiness, or central-state mutation
+  was made; both dry runs were simulations and no publication occurred.
+- Slice 4 live reconcile: the close-gate is expected RED while all issue and PR-body checkboxes
+  remain coordinator-owned and unchecked. Its failure was observed read-only but not represented as
+  a `run-gate.ts` receipt because `close-gate` is not in the allowlisted catalog and this leaf may
+  not widen that tooling surface.
+- Slice 4 fetched `origin/main` at `0b3ed5d5`; the evaluator-approved branch was not rebased. The
+  coordinator's current drift policy reserves the cluster-wide expensive mutex for shared
+  resource-heavy E2E/Aspire gates. This slice ran only static/browser proving gates and scoped
+  publish simulations, while the user explicitly prohibited the mutex and E2E/runtime smoke; no
+  lease or central state was mutated.
+
+## Activity
+
+- 2026-08-13 — read all required skills, overlays, doctrine, gate, evaluator, and coordinator
+  inputs.
+- 2026-08-13 — fetched live issue bodies/comments; inspected current scanner/tests/tasks/CI and
+  published surfaces; re-measured current-head counts.
+- 2026-08-13 — wrote research/design/plan artifacts and a separate evaluator request. No product
+  implementation started.
+- 2026-08-13 — committed bootstrap as `12f0929f3db0507b37216dcfefa21301f5255399`, pushed by explicit
+  refspec, opened draft PR #1653 directly against `main`, applied milestone 0.0.7/taxonomy, posted
+  RESEARCH and PLAN comments, and handed off at `status:plan-eval`.
+- 2026-08-13 — late Claude-compatible OpenRouter evaluator run (Claude session
+  `977b0618-1b0c-4957-8369-698d3c5274c6`, OpenRouter `minimax/minimax-m3` / high; native
+  `fable-5`/medium fallback per the lane policy) evaluated the plan at `c573beda9` against leaf base
+  `01e096049` and returned `FAIL_PLAN`. At that historical head, three must-resolve-now items
+  (`drift.md` D-2, D-3, D-4) were open and listed in `plan-eval.md`; D-1 (#1545 stale prose) was
+  editorial. Implementation hard stop remained in force. No product, package, plugin, generated, or
+  workflow source was inspected or edited.
+- 2026-08-13 — the owner/coordinator classified the late Claude-compatible OpenRouter `FAIL_PLAN` as
+  advisory only and stopped all milestone Claude/OpenRouter evaluator work until the 2026-08-15
+  00:00 Europe/Zurich reset. Coordinator comment `5286261678` and central commit `874eacc0d`
+  resolved D-1 through D-4 without implementation.
+- 2026-08-13 — repaired plan/design/evaluator metadata only, removed the two untracked evaluator
+  prompts and failed self-referential JSONL, left `.llm/harness/debt/arch-debt.md` untouched, and
+  stopped at `status:plan-eval` awaiting a fresh formal post-reset verdict.
+- 2026-08-15 — resumed at formal PLAN-EVAL cycle 2 `PASS`; captured the Slice 1 RED receipt, landed
+  the fail-closed registration/resolver rail and R-1/R-2 regressions, regenerated the authorized
+  consumer asset, ran the named structured gates, and stopped before Slice 2 for Tier-A review.
+- 2026-08-15 — substantive Tier-A content review passed in PR comment `5299267431`; reran the sole
+  E1 allowance-budget attestation against landed commit `586b5513500caa1fd5ce07878f4ba96606064555`,
+  preserved the superseded stash-probe receipt, and stopped before Slice 2 pending supervisor
+  sign-off.
+- 2026-08-15 — Slice 1 supervisor sign-off landed at `3c398528996a715da8daebe04969e6aba90263e9` (PR
+  comment `5299297798`). Captured Slice 2 RED-first proof, implemented the checked-in local export
+  graph and public-signature rule, preserved the corrective failed receipts, ran the named
+  structured gates, and stopped before Slice 3 for substantive Tier-A review.
+- 2026-08-15 — Slice 2 supervisor sign-off landed at `f9acdb426d5438935ae75bee7dda987dbfe3d4cb` (PR
+  comment `5299457083`). Captured the stale generated asset as Slice 3 RED, regenerated only through
+  the checked-in task, audited the complete CLI and Workers JSR surfaces, registered the exact #1655
+  no-increase debt, ran the named structured gates, and stopped before Slice 4 for substantive
+  Tier-A review.
+- 2026-08-15 — Slice 3 supervisor sign-off landed at `83f7a18479720ac9e61c796de64593baa081e77f`.
+  Slice 4's full-test RED exposed the installed scanner's repo-only import alias; restored its prior
+  explicit JSR specifier, regenerated the authorized asset, and retained both the failing full-test
+  receipt and the non-binding focused pre-commit diagnostic.
+- 2026-08-15 — landed the portability repair at `71c26445838eb5bca654607947ad247cbea78273` and reran
+  every binding Slice 4 proving gate at that history commit. Full test is 4,109/0, both quality
+  scans report `allowCount: 7` with zero findings/owner failures, all named contract gates pass, and
+  both publish commands remained dry runs.
+
+## Plan-Gate state
+
+- Historical OpenRouter artifact: advisory `FAIL_PLAN` at `8a4709afe`; its D-2/D-3/D-4 findings are
+  resolved by coordinator authority and its D-1 editorial finding is resolved in live #1545.
+- Current formal verdict: cycle 2 `PASS` in `plan-eval.md`, evaluator artifact commit `c694cfb311`.
+- Slice state: **Slices 1 through 3 are signed off. Slice 4 is in progress.** Its initial full-test
+  RED found an authorized-surface consumer portability regression; the repair must be committed and
+  all binding final gates rerun at that landed implementation head before Tier-A handoff.
+
+## Tier-A sign-off — Slice 1
+
+Signed off by `topic-internals-0.0.7` (Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34`, Opus 5
+/ high). This commit is the supervisor's, not the implementer's; no lane self-certified.
+
+Reviewed at the landed content, not from receipts:
+
+- Authorized surface holds — all eight non-run-artifact paths are in the leaf contract
+  `fileSurfaces`; no tenth surface.
+- Registration is comment-only. Per-file `as unknown as` / `any` counts are unchanged:
+  `packages/cli/src/public/public-api.ts` 5 → 5,
+  `packages/cli/src/public/features/root/public-command-dependencies.ts` 1 → 1,
+  `plugins/workers/streams/producer.ts` 1 → 1. Every source edit appends `#1276 —` to a pre-existing
+  `quality-allow` reason. The `as unknown as` occurrences elsewhere in the diff are fixture string
+  literals inside `scan-code-quality_test.ts`, where sample violating code is the scanner's test
+  input by construction.
+- Allowance population independently counted at the landed head: **7**, every record bound to #1276.
+  `deno task quality:scan` → `ok:true`, `allowCount: 7`, zero findings, zero `allowanceFailures`.
+- R-1 verified behaviourally in both directions rather than accepted as a claim. Permissions are
+  narrowly scoped (`--allow-net=api.github.com --allow-env=GITHUB_TOKEN,GH_TOKEN`), not blanket.
+  Network denied → exit **1**, `ok:false`, seven `owner-unavailable` failures each naming the exact
+  remedy. Network allowed → exit **0**, `ok:true`, resolver verified #1276 live. The rail fails
+  closed and does not silently no-op when unconfigured.
+- R-2 verified: `scan-code-quality_test.ts:360` pins `Backlog / Triage` owners as accepted, which is
+  the milestone shape that would otherwise fail all seven records on day one. Closed, unmilestoned,
+  malformed, offline, rate-limited (403 + `x-ratelimit-remaining: 0`), and fork-without-token states
+  are also covered.
+- RED-first order holds — `red-test.json` exit 1, then `focused-green-1.json` exit 0 across 21
+  tests.
+- Budgets converge downward to the measured population: `quality:scan:repo` `--max-allow` 8 → 7.
+- Lock hygiene holds — no `deno.lock` and no incidental source churn in either commit.
+- E1 closed: the binding budget attestation is now
+  `receipts/slice-1/allowance-budget-landed-head.json` (`gitHead` = `actualGitHead` =
+  `586b5513500caa1fd5ce07878f4ba96606064555`), independently re-run by the supervisor with exit 0.
+  The superseded stash-probe receipt is retained on disk and its defect is recorded as D-11 rather
+  than hidden.
+
+Noted for IMPL-EVAL, not a slice defect: the slice-1 gate receipts record `actualGitHead` as the
+parent `c694cfb311…`. That is the normal pre-commit gate pattern and matches the convention
+IMPL-EVAL already accepted on #1644 — receipts attest a process in a working tree at a commit, not
+tree cleanliness.
+
+## Tier-A sign-off — Slice 2
+
+Signed off by `topic-internals-0.0.7` (Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34`, Opus 5
+/ high) at implementation head `f869a5bfed83a09b67b0725b2679d0aa30ad491c`. Supervisor commit, not
+the implementer's; no lane self-certified.
+
+Verified by execution at the landed head, not from receipts:
+
+- **Scope holds.** Only `.llm/tools/quality/scan-code-quality.ts`, its focused test, and this run
+  directory changed. No `packages/**` or `plugins/**` edit, no `deno.json`/task change, no
+  `deno.lock` churn.
+- **The new rail is real and correctly bounded.** Slice 2 adds `public-any` and
+  `public-export-unresolved` alongside the pre-existing line-level `explicit-any` classifier. The
+  public/local separation is asserted as an **exact** finding set via `assertEquals` over
+  `rule:file:line`, with deliberate local controls in the fixture — `type Local`, `function local`,
+  `class LocalService`, `private hidden`, and a body-local `const hidden: any` inside an exported
+  function. A superset would fail the assertion, so local leakage into `public-any` cannot pass
+  silently.
+- **Focused suite re-run by the supervisor: 25 passed, 0 failed, exit 0.**
+- **`quality:gate` re-run by the supervisor at the landed head: exit 0, `ok:true`, `findings: []`,
+  `allowCount: 7`.** The `arch:check` output carries only pre-existing non-blocking F-5/F-6
+  `export default` WARNs.
+- **RED-first order holds** — `red-public-any.json` exit 1 across the public/local/re-export matrix,
+  then `focused-green-binding.json` exit 0.
+- **The lint FAIL → PASS sequence is a real fix, not a suppression.** `scoped-lint-committed-config`
+  exit 1 caught a pre-existing inline import specifier; the fix replaced
+  `import { relative, resolve } from 'jsr:@std/path@^1'` with
+  `import { dirname, relative, resolve } from '@std/path'`. No lint config, task, or `deno.json`
+  change accompanied it, and `scoped-lint-1` exit 2 was correctly refused as an empty-selection
+  false green rather than banked as a pass.
+- **No new suppressions in real code.** Every `any` / `as unknown as` added in this diff is a
+  fixture string literal inside `scan-code-quality_test.ts`, where sample violating code is the
+  scanner's own input by construction.
+- **The E1 lesson was applied.** Every slice-2 binding receipt records the signed Slice 1 parent
+  `3c398528996a715da8daebe04969e6aba90263e9`; none names a stash or any object outside branch
+  history.
+
+Carried to IMPL-EVAL, not a slice defect: `explicit-any` (broad, line-level) and `public-any`
+(export-graph reachability) now coexist. Their overlap and precedence is locked plan behaviour that
+PLAN-EVAL cycle 2 passed, but IMPL-EVAL should confirm the combination reports each violation once
+with the intended rule attribution rather than double-counting.
+
+Slice 3 is authorized.
+
+## Tier-A sign-off — Slice 3
+
+Signed off by `topic-internals-0.0.7` (Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34`, Opus 5
+/ high) at implementation head `2977c8333b18a3b310342fd21726461717f56675`. Supervisor commit, not
+the implementer's.
+
+Verified by execution at the landed head:
+
+- **The Workers baseline claim is exact.** Supervisor re-ran `doc:lint --root plugins/workers`:
+  `totalErrors: 20`, `totalPrivateTypeRef: 20`, `totalMissingJSDoc: 0`, `totalOther: 0`, exitCode 1
+  across all 13 export targets. The leaf records it as `expected FAIL / accepted` and the PR comment
+  states **not green**. No diagnostic class was hidden and no green was claimed — the exact honesty
+  requirement for this baseline.
+- **The debt entry is complete and correctly scoped.** `workers-private-type-ref-1655` carries
+  Reason, Owner (`@netscript/plugin-workers` maintainers, #1655 in milestone 0.0.8), Target (resolve
+  without increasing or adding a diagnostic class first), and Linked plan. It states plainly that
+  hiding the diagnostics or claiming the audit green would make the publication evidence untruthful.
+- **The generated asset is genuinely regenerated, not hand-edited.** Supervisor re-ran
+  `deno task check:assets-barrel` (which runs `gen:assets-barrel` then `git diff --exit-code`): exit
+  0 with a clean worktree, so the committed asset is byte-identical to generator output. RED-first
+  held — `assets-red.json` exit 1 on the stale asset, `assets-green.json` exit 0 after.
+- **`quality:gate` re-run by the supervisor:** exit 0, `ok:true`, `findings: []`, `allowCount: 7`.
+- **Scope holds** — `arch-debt.md` and the generated asset are both in the leaf contract
+  `fileSurfaces`; plus this run directory. No lock churn.
+- **The E1 lesson held again.** Every slice-3 receipt names the signed Slice 2 parent
+  `f9acdb426d5438935ae75bee7dda987dbfe3d4cb`; none names a stash or non-history object.
+
+Supervisor note: an initial check of mine grepped for `private-type-ref` against output whose key is
+`privateTypeRef`, returning zero and briefly appearing to contradict the leaf's count. The pattern
+was wrong, not the evidence. Recorded so the corrected count is the one on record.
+
+Slice 4 is authorized.
+
+## Tier-A sign-off — Slice 4 (final planned slice)
+
+Signed off by `topic-internals-0.0.7` (Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34`, Opus 5
+/ high). Author head `e3a5a2d28793437f5e1ddb52c0b6cac1a42d2dd1`, binding implementation head
+`71c26445838eb5bca654607947ad247cbea78273`. Supervisor commit, not the implementer's.
+
+### Correction to the Slice 2 sign-off
+
+My Slice 2 sign-off called the `jsr:@std/path@^1` → `@std/path` import change "a real fix, not a
+suppression". That was true about _suppression_ and wrong about _consequence_.
+`scan-code-quality.ts` is shipped to consumers through `agent-tools.generated.ts`, and a bare
+`@std/path` specifier cannot resolve from a consumer CWD outside this repo's import map. I checked
+that the change was not a suppression and did not ask the next question — whether the file it edited
+leaves the repository.
+
+The binding `test` gate caught what my review missed: `receipts/slice-4/test.json` at the signed
+Slice 3 head failed 1 of 4,128 results, with a direct installed-bundle probe reporting
+`Import "@std/path" not a dependency`. Slice 4 restored the immutable-base specifier. I verified the
+base state independently — `git show 01e096049:.llm/tools/quality/scan-code-quality.ts` reads
+`import { relative, resolve } from 'jsr:@std/path@^1'` — so Slice 4 is a **restoration**, and Slice
+2 was the deviation. The lint invocation that motivated it reaches `.llm/tools/**`, which is outside
+the root lint selection and outside this leaf's binding gate set; consumer portability is a
+correctness property and outranks it. Recorded as leaf drift `D-12`.
+
+### Verified by execution at the landed head
+
+- **Consumer portability repair proven:** supervisor re-ran the consumer integration test — **19
+  passed / 0 failed**, exit 0.
+- **`quality:gate`:** exit 0, `ok:true`, `allowCount: 7`.
+- **Generated asset:** `check:assets-barrel` (generate-then-diff) exit 0 with a clean worktree —
+  committed asset byte-identical to generator output after the restoration.
+- **Scope holds:** the only non-run-artifact files in the whole slice are
+  `.llm/tools/quality/scan-code-quality.ts` and
+  `packages/cli/src/kernel/assets/agent-tools.generated.ts`, both in the leaf contract
+  `fileSurfaces`. No suppression, no lint-config change, no `deno.json` change, no lock churn.
+- **RED-first held at slice scope:** `test.json` exit 1 → `test-binding.json` exit 0 (4,109 pass / 0
+  fail / 19 ignored).
+- **Binding final gate set is complete and green at `71c264458`:** `check-binding`, `test-binding`,
+  `quality-job`, `quality-gate`, `arch-check`, `quality-scan`, `quality-scan-repo`, `assets`,
+  `fresh-browser`, `docs-source-format`, `docs-source-format-test`, `docs-accuracy`, and both
+  publish dry-runs.
+- **Workers baseline still honestly not green** — the accepted exact-20 `private-type-ref` baseline
+  owned by #1655 is unchanged and is not claimed as passing.
+
+### DoD truth audit accepted
+
+The implementer reported 10/12 rows true, naming the two pending rows as Slice 4 Tier-A review and
+separate opposite-family IMPL-EVAL. Both are structurally impossible for it to satisfy itself, it
+did not tick them, and it left the PR-body boxes untouched. That is the correct behaviour — a
+criterion that cannot be truthfully ticked is escalated, not ticked. This sign-off closes the first
+of the two; **IMPL-EVAL remains open and is the coordinator's to grant.**
+
+Implementation of all four planned slices is complete. This lane does not flip readiness, apply
+`status:ready-merge`, tick PR-body boxes, merge, or publish.

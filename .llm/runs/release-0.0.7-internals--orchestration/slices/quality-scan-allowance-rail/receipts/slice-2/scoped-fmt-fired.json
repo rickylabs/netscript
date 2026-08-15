@@ -1,0 +1,46 @@
+{
+  "gateId": "fmt-check",
+  "invocationId": "quality-rail-s2-fmt-contract",
+  "argv": [
+    "deno",
+    "task",
+    "fmt:check",
+    "--file",
+    ".llm/tools/quality/scan-code-quality.ts",
+    "--file",
+    ".llm/tools/quality/scan-code-quality_test.ts",
+    "--include",
+    "^(\\.llm/tools/quality/scan-code-quality(?:_test)?\\.ts)$",
+    "--exclude",
+    "a^",
+    "--batch-size",
+    "23"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-rail",
+  "gitHead": "3c398528996a715da8daebe04969e6aba90263e9",
+  "actualGitHead": "3c398528996a715da8daebe04969e6aba90263e9",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "9a5b9d607ae38526381b83c9f3aa6a4c4b95c5143cabff1685036b5d2fe994ae",
+  "lifecycleId": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069:quality-rail-s2-fmt-contract:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T00:15:13.491Z",
+  "startedAt": "2026-08-15T00:15:13.496Z",
+  "finishedAt": "2026-08-15T00:15:14.167Z",
+  "durationMs": 671,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 206,
+    "sha256": "a8dac77947ce77dac5f7919e3d40c25ce712189f1bb75de35fda58db4f8b5148",
+    "tail": "{\"command\":\"deno fmt --check\",\"cwd\":\"/home/codex/repos/netscript-007-quality-rail\",\"mode\":\"check\",\"summary\":{\"filesSelected\":2,\"batches\":1,\"failedBatches\":0,\"findings\":0,\"ignoredFindings\":0},\"findings\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 507,
+    "sha256": "a04ec44de69807198ecf6eff4c1cb8265c908a27c0bfaabbb782abed0e4d90a4",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mfmt:check\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings '--file' '.llm/tools/quality/scan-code-quality.ts' '--file' '.llm/tools/quality/scan-code-quality_test.ts' '--include' '^(\\.llm/tools/quality/scan-code-quality(?:_test)?\\.ts)$' '--exclude' 'a^' '--batch-size' '23'\n",
+    "truncated": false
+  }
+}
