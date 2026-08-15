@@ -379,3 +379,27 @@ Product commit: `4ca76fa751608ec1f0e2eab248fcd603f855272b`.
 - No browser, `fresh-browser`, Aspire, Docker, scaffold runtime, or `e2e:cli` gate ran.
 - Automated gate evidence is not self-certification. The terminal blocker is fresh opposite-family
   Tier-A review limited to this repair delta.
+
+## Fresh Tier-A Review of the E-1 Repair Delta — 2026-08-15
+
+Review head `acfb2d2064c057c6d805a2d36fcb09201ca247e5`, resolved three ways (local `HEAD`,
+`origin`, PR #1657 `headRefOid`) — all match. Fresh opposite-family reviewer, session
+`f7b48b24-96b6-4e62-b1c6-37d6a9ac45e9`, bridge `session_011pmnHd9xRTLDJFJuNL3kEw`, PID `266646`,
+route `claude-opus-5` (Anthropic native, high effort). No prior conclusion inherited.
+
+| Check | Exact command | Raw exit | Result |
+| --- | --- | ---: | --- |
+| Asset-barrel freshness, re-executed | `deno task check:assets-barrel` | 0 | Committed barrel is the generator's fixed point; worktree clean before and after. |
+| Structured check, CLI assets | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli/src/kernel/assets --ext ts` | 0 | 7 files, 1 batch, 0 findings. |
+| Template registry unit tests | `deno test --allow-all --unstable-kv packages/cli/src/kernel/application/registries/template-registry_test.ts packages/cli/src/kernel/adapters/templates/template-asset_test.ts` | 0 | 6 passed, 0 failed. |
+| Fresh UI drift gate | `deno test --allow-all --unstable-kv packages/fresh-ui/tests/registry-doc-drift.test.ts` | 0 | 5 passed, 0 failed. |
+
+Barrel decoded directly (not inferred from `total: 66`): the design-catalog value is byte-identical
+to the on-disk template (15404 bytes, strict equality), `registryMeta` holds **66** structurally
+counted entries, `registryCollections` exports **8** collections including `ai` with 15 items.
+
+Verdict **`PASS_TO_IMPL_EVAL`**, bounded to the repair delta. No blocking findings; three
+non-blocking observations (receipt head vs review head, E-2 binding placement, pre-existing
+`packages/cli` fmt exclusion) recorded in `review-tier-a.md`. No source modified; no browser,
+Aspire, Docker, scaffold-runtime, or `e2e:cli` gate run — `docker ps -a` empty throughout. PR left
+`OPEN`, draft, exactly one `status:impl`; `Closes #1358` untouched; no issue mutated.

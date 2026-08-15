@@ -315,3 +315,209 @@ same conclusion on those. What was missed is orthogonal to them.
 `check:assets-barrel` and record the raw exit code. **`embedded.generated.ts` is outside the current
 contract surface**, so this needs a further coordinator amendment — the same boundary that produced
 the T-3 amendment. `assets-barrel` should also be added to the leaf's proving-gate set (E-2).
+
+---
+
+## Fresh Tier-A Review — E-1 Repair Delta — 2026-08-15
+
+**Verdict: `PASS_TO_IMPL_EVAL`** — bounded to the E-1 repair delta. Authorizes nothing beyond the
+next formal gate; ready-flip, merge, and issue closure remain coordinator-only.
+
+### Reviewer identity and route
+
+| Field | Value |
+| --- | --- |
+| Role | Fresh opposite-family Tier-A reviewer (launched by `topic-fixes-0.0.7`) |
+| Requested route | Claude / Anthropic, Opus 5, high effort (opposite-family to Codex author `01a003f0-7821-7a10-a555-e619a9280479`, `gpt-5.6-sol`) |
+| Observed route | `claude-opus-5` (Anthropic native), background CLI session, v2.1.233 |
+| Session id | `f7b48b24-96b6-4e62-b1c6-37d6a9ac45e9` |
+| Bridge id | `session_011pmnHd9xRTLDJFJuNL3kEw` (from `~/.claude/sessions/266646.json`) |
+| PID | `266646` |
+| Job id | `f7b48b24` |
+| cwd | `/home/codex/repos/netscript-007-leaf-design-registry-drift` |
+
+No prior conclusion was inherited. Every claim below was re-derived by executed command.
+
+### Head resolution
+
+| Source | Value |
+| --- | --- |
+| Local `HEAD` | `acfb2d2064c057c6d805a2d36fcb09201ca247e5` |
+| `git ls-remote origin refs/heads/fix/design-registry-catalog-drift-gate` | `acfb2d2064c057c6d805a2d36fcb09201ca247e5` |
+| PR #1657 `headRefOid` | `acfb2d2064c057c6d805a2d36fcb09201ca247e5` |
+
+Three-way match. PR state `OPEN`, `draft: true`, labels `type:fix, area:cli, area:fresh-ui,
+gate:jsr, priority:p1, status:impl` — exactly one `status:` label. Body line 10 still reads
+`- Closes #1358`, unmodified.
+
+### Q1 — The repair delta
+
+**Claim: the repair commit changes exactly one product file, by exactly the deterministic generator
+output. VERIFIED.**
+
+`git show --stat 4ca76fa75` → 4 files: three append-only run artifacts (`context-pack.md`,
+`plan.md`, `worklog.md`) plus one product file,
+`packages/cli/src/kernel/assets/embedded.generated.ts` at `2 +-`. `git diff --numstat da574111..acfb2d206 -- '*generated*'` → a single row, `1 1
+packages/cli/src/kernel/assets/embedded.generated.ts`: one insertion, one deletion, on the
+`template_005` generated source line. Content moves `total: 50` → `total: 66`;
+`citation-chip` occurrences go 0 → 1; `registryCollections` occurrences go 0 → 1.
+
+No other generated target moved. Verified per-path across the full leaf range
+`da574111..acfb2d206`:
+
+| Generated target | State |
+| --- | --- |
+| `packages/cli/src/kernel/assets/embedded.generated.ts` | CHANGED (the amended path) |
+| `packages/cli/src/kernel/assets/skills.generated.ts` | unchanged |
+| `packages/cli/src/kernel/assets/agent-tools.generated.ts` | unchanged |
+| `packages/cli/src/kernel/assets/agent-docs.generated.ts` | unchanged |
+| `packages/plugin/src/kernel/assets/embedded.generated.ts` | unchanged |
+| `packages/fresh-ui/registry.generated.ts` | unchanged |
+| `packages/service/src/primitives/scalar.generated.ts` | unchanged |
+
+**Regenerated, not hand-edited — proven, not asserted.** I ran the generator half myself
+(`deno task check:assets-barrel`, whose first half is `gen:assets-barrel`) in a clean tree at the
+review head: raw exit `0`, and `git status --porcelain` was empty both before and after. Running the
+deterministic generator reproduces the committed bytes exactly; a hand edit could not survive that.
+Independently, I decoded the barrel's design-catalog value and compared it byte-for-byte to the
+authored template on disk — `disk === embedded`, both `15404` bytes.
+
+`deno.lock`, `deno.json`, and the per-package locks are unchanged across `da574111..acfb2d206`.
+
+### Q2 — The scope amendment
+
+**Claim: nothing outside the amended surface changed, and the four original product files are
+byte-unchanged. VERIFIED.**
+
+Full non-run-artifact diff over `da574111..acfb2d206` is exactly six paths:
+
+```
+.github/scripts/ci-classify-changes.test.ts        (T-3 amendment)
+.github/scripts/ci-classify-changes.ts             (T-3 amendment)
+.github/workflows/fresh-ui-quality.yml             (T-3 amendment)
+packages/cli/src/kernel/assets/app/routes/(design)/design/(_shared)/registry.ts.template
+packages/cli/src/kernel/assets/embedded.generated.ts   (E-1 amendment)
+packages/fresh-ui/tests/registry-doc-drift.test.ts
+```
+
+That is the original contract surface + the three T-3 CI files + the one E-1 generated path, and
+nothing else. Sharper still: `git diff --name-only 939e73113..acfb2d206 -- packages plugins .github`
+(from the T-3 Tier-A PASS head forward) returns a **single** path — the barrel. So the four original
+product files and all three T-3 CI files are byte-unchanged since the last reviewed product head,
+which is exactly what the `drift.md` E-1 amendment declares.
+
+### Q3 — E-1 closure
+
+**Claim: the fix now reaches the artifact the CLI ships. VERIFIED, by decoding the committed barrel
+rather than trusting `total: 66`.**
+
+Read path re-derived at `packages/cli/src/kernel/application/registries/template-registry.ts`:
+the constructor's only content source is `EMBEDDED_TEMPLATE_CONTENT` (line 18, imported line 3);
+`read()` resolves from the in-memory map (lines 41-47); `hydrate()` is `return Promise.resolve()`
+(lines 49-52); there is no `Deno.readTextFile`, no disk fallback, and `write()` rejects. A repo-wide
+grep confirms the only non-test consumer of `EMBEDDED_TEMPLATE_CONTENT` is that file. The key
+`app/routes/(design)/design/(_shared)/registry.ts.template` is present in
+`packages/cli/src/kernel/assets/manifest.ts:10` as `appRoutesDesignSharedRegistry`, so it is actually
+registered and scaffolded.
+
+I then imported the **committed** barrel and parsed its design-catalog value directly:
+
+| Property decoded from the barrel | Observed |
+| --- | --- |
+| `EMBEDDED_TEMPLATE_CONTENT` entry count | 103 |
+| Design-catalog value length | 15404 bytes, byte-identical to the on-disk template |
+| `registryMeta` object entries | **66** (counted structurally, not read off `total:`) |
+| `registryMeta.total` declaration | `66` |
+| `registryCollections` export | present, **8** collections |
+| Collection names | `foundation, ai, forms-core, surface-core, feedback-core, layout-foundations, dashboard-blocks, desktop` |
+| `ai` collection membership | 15 items incl. `citation-chip`, `model-selector`, `tool-call-card`, `prompt-input`, `mcp-ui-widget`, `render-ui` |
+
+The AI collection is present in the shipped artifact, not only in the template. E-1's user-visible
+defect — `netscript init` scaffolding a gallery that reads "All 50 items" with the AI collection
+hidden — is closed on the consumer path.
+
+Supporting cheap gates I executed at the review head:
+
+| Command | Raw exit |
+| --- | ---: |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli/src/kernel/assets --ext ts` | 0 (7 files, 0 findings) |
+| `deno test --allow-all --unstable-kv packages/cli/.../template-registry_test.ts packages/cli/.../template-asset_test.ts` | 0 (6 passed) |
+| `deno test --allow-all --unstable-kv packages/fresh-ui/tests/registry-doc-drift.test.ts` | 0 (5 passed) |
+
+### Q4 — E-2 closure and gate bindings
+
+**Claim: `check:assets-barrel` is bound into the leaf's validation plan and a structured receipt with
+a raw exit code exists. VERIFIED, with one recorded observation.**
+
+- Binding: `plan.md:172` (S4 row of the appended "E-1 Bounded Repair Amendment" table) names
+  `deno task check:assets-barrel` as a bound proving gate, and `plan.md:176` states it is now a
+  required leaf gate.
+- Receipt: `receipts/assets-barrel.json` exists — `gateId: assets-barrel`,
+  `invocationId: assets-barrel-1657-e1`, `outcome: PASS`, `exitCode: 0`, `attempt: 1`,
+  `schemaVersion: 1`, `durationMs: 541`, empty stdout (correct for a silent
+  `git diff --exit-code`), stderr containing only the two task banners.
+
+**Independently re-executed at the review head:**
+
+```
+deno task check:assets-barrel   → RAW EXIT 0
+```
+
+`git status --porcelain` was empty immediately afterwards. The command's mutating first half caused
+no residual modification because the committed barrel is already the generator's fixed point, so no
+restoration was required and the worktree is left clean.
+
+### Q5 — The inherited-browser-head argument
+
+**The inherited receipt legitimately still covers this head. Stated plainly: yes.**
+
+Three independent legs, each executed:
+
+1. **The leased product surface is byte-identical.** `git diff --name-only 4a3c40321..acfb2d206 --
+   packages plugins .github` returns four paths: the three T-3 CI files and the CLI barrel. The
+   browser-gated template `registry.ts.template` is **not** among them — it has not moved since the
+   lease was consumed.
+2. **The barrel is a representation, not an independent surface.** I proved this by equality, not by
+   architecture argument: the barrel's design-catalog value is byte-for-byte the on-disk template
+   (`15404 === 15404`, strict equality true), and `gen:assets-barrel` reproduces it deterministically
+   from that template. It carries no content the browser gate could observe that the template does
+   not already carry.
+3. **The consumed lease does not exercise this surface at all.** `receipts/fresh-browser.json`
+   records `deno task test:browser` in `cwd packages/fresh`, running
+   `tests/form-navigation_browser.ts` — 2 tests, both `ok`, `exitCode 0` at `gitHead 4a3c40321`. That
+   suite is Fresh form-navigation; it has no dependency on the CLI asset barrel or the design
+   registry template. So the repair cannot have invalidated it even in principle.
+
+A `fresh-browser` rerun is not required at this head. No browser, Aspire, Docker, scaffold-runtime,
+or `e2e:cli` gate was run or requested by this review. `docker ps -a` reported zero containers before
+and after.
+
+### Findings
+
+No blocking findings. Three non-blocking observations, each checkable:
+
+- **O-1 (informational).** `receipts/assets-barrel.json` records `gitHead` /`actualGitHead` =
+  `4ca76fa75` (the product commit), not the review head `acfb2d206`. This is not a stale receipt:
+  `acfb2d206` touches only `.llm/runs/**`, so the product tree is byte-identical between the two
+  heads, and I re-executed the gate at `acfb2d206` myself (raw exit 0). Recording it so a later
+  reader does not mistake the head delta for drift.
+- **O-2 (bookkeeping).** The E-2 binding lives in the appended amendment table (`plan.md:172`), not
+  in the original nine-row Validation Plan table at `plan.md:137`, which still has no
+  `assets-barrel` row. Appending is the correct behaviour under the run's immutability rule, so this
+  is not a defect — but a reader consulting only the original table would still not see the gate.
+- **O-3 (pre-existing repo config).**
+  `run-deno-fmt.ts --root packages/cli/src/kernel/assets --ext ts` reports `findings: 0` but
+  `failedBatches: 1` with "excluded by Deno; refusing a false-green gate", because the root `fmt`
+  config excludes `packages/cli`. This is pre-existing repository configuration, not introduced by
+  this delta; the author recorded the same behaviour and obtained a `0` verdict via an equivalent
+  temporary config. No formatting change is owed by this delta.
+
+### Verdict
+
+**`PASS_TO_IMPL_EVAL`.** The repair delta is exactly one generated product file, is the
+deterministic generator output (proven by reproducing it), stays inside the amended surface, leaves
+the four original product files and three T-3 CI files byte-unchanged, closes E-1 on the artifact the
+CLI actually ships (verified by decoding the barrel to 66 items with the AI collection and
+`registryCollections`), closes E-2 with a bound gate plus a structured receipt and an independently
+re-executed raw exit `0`, and correctly inherits the `fresh-browser` lease. Worktree left clean; no
+source was modified by this review.
