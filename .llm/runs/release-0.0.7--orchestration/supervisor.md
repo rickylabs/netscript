@@ -204,3 +204,20 @@ laws remain binding. The exact current assignments and rationales live in
 
 The four PLAN-EVAL passes do not authorize replacement implementation sessions: each topic
 supervisor must resume the recorded existing Codex leaf thread. `expensiveGates` is still empty.
+
+### Active completion checkpoint — 2026-08-15T03:50:58Z
+
+The coordinator must remain active through terminal lane handoffs; a topic checkpoint is not a
+completion condition. The four topics continue concurrently, with serialization only inside each
+topic:
+
+| Lane | Live action |
+| --- | --- |
+| docs | S2 resumed on original Codex thread `019ffcc9-16c2-…` after coordinator provisioned exact immutable EIS-Chat input `5191de83` at `/home/codex/repos/eis-chat-007-input` |
+| internals | #1653 fresh IMPL-EVAL running in Opus 5/high session `430d5f91-a073-…`, bridge `session_01NFwTgbof8vAYdg9wex15fM`, source `2d5e4f5ae` |
+| fixes | T-1 bounded MSSQL regression repair resumed on original Codex thread `019ffcca-8be0-…`; slice 6 and its singleton lease remain pending |
+| features | #1651 fresh IMPL-EVAL running in Opus 5/high session `2a8cf0a6-7529-…`, bridge `session_01Y48WxcCgzUAWfJmGmhBykc`, source `04d431028` |
+
+Neither formal evaluator consumes the global expensive-gate mutex. `expensiveGates` remains empty
+until the fixes cheap-gate repair is signed off and the coordinator grants the one
+`scaffold.runtime`/Aspire/Docker lease.

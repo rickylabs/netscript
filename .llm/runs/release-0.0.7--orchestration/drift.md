@@ -53,3 +53,15 @@ resource-heavy E2E/Aspire gates.
 
 No implementation drift is accepted. The plan repair changes orchestration evidence and public issue
 contracts only; leaf implementation remains blocked until PLAN-EVAL approval.
+
+## 2026-08-15T03:46:43Z — coordinator inactivity after dispatch
+
+The coordinator yielded after releasing four topic lanes and did not supervise their subsequent
+terminal checkpoints for more than two hours. All four topic supervisors eventually parked on work
+that required coordinator authority, so useful progress stopped despite preserved healthy sessions.
+This violated the milestone completion mandate. The correction is operational, not explanatory:
+reconcile every lane at each checkpoint, clear coordinator-owned inputs/evaluator grants/leases
+immediately, maintain per-topic concurrency, and stay active until merge/release terminality or a
+genuine owner-only blocker. The current repair provisioned docs' pinned external input, launched the
+two waiting IMPL-EVALs, and resumed fixes' bounded Tier-A repair without replacing any supervisor or
+implementation thread.
