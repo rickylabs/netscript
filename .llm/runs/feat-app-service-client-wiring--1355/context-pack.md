@@ -90,17 +90,19 @@ or expensive command is authorized.
 
 ## In Progress
 
-- F4 amendment is independently committed at `b40616a81`; repaired content is committed at
-  `7876aa109`. Focused validation passes and all four `s5-f4-*` binding receipts PASS at that exact
-  content head. Exact-set sufficiency is SUFFICIENT with no reasons. Earlier S5/S4 failures and
-  attributed baselines remain append-only. Lease released; no expensive gate is authorized.
+- S5 attempt 3 executed at its exact lease-bound head `6f813b0db`. F4's repaired
+  `generated.service-client-contract` passed. The suite later stopped at pre-existing
+  `generated.deno-fmt-check`: 12 unformatted files / 172 selected, totals 32 passed / 1 failed /
+  0 skipped, raw exit 1. Cleanup is proven empty. `fresh-browser` is NOT_RUN by the conditional
+  contract. No product repair occurred.
 
 ## Next Steps
 
-1. Commit and explicitly push the four generated `s5-f4-*` receipts and evidence summary.
-2. Post one structured F4 receipt covering amendment, repair, sequence tests, and exact-set
-   sufficiency.
-3. Stop for fresh features Tier-A; do not request or run an expensive gate.
+1. Commit and explicitly push the attempt-3 suite log, attribution, cleanup proof, and preflight
+   run-artifact timestamp after the completed gate sequence.
+2. Post the structured S5 attempt-3 receipt with runtime FAIL and browser NOT_RUN verdicts.
+3. Stop for coordinator disposition; do not repair the pre-existing helper-format defect or request
+   another lease.
 
 ## Key Decisions
 
@@ -144,8 +146,8 @@ or expensive command is authorized.
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
 | Static      | Four `s5-f4-*` binding receipts PASS at `7876aa109`; exact-set sufficiency SUFFICIENT. All earlier FAIL and superseded evidence remains preserved. | `worklog.md`; binding receipts |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
-| Runtime     | `scaffold.runtime` FAIL: 20 passed / 1 failed / 0 skipped; `generated.service-client-contract` failed. Cleanup proven empty. | `reports/s5-runtime-failure.md`; suite-owned raw log |
-| Consumer    | `fresh-browser` NOT_RUN because the runtime prerequisite failed; no catalog receipt exists. | S5 conditional contract |
+| Runtime     | Attempt 3 `scaffold.runtime` FAIL: 32 passed / 1 failed / 0 skipped; repaired service-client contract PASS, pre-existing `generated.deno-fmt-check` FAIL. Cleanup proven empty. | `reports/s5-attempt3-runtime-failure.md`; suite-owned raw log |
+| Consumer    | `fresh-browser` NOT_RUN because the attempt-3 runtime prerequisite failed; no catalog receipt exists. | S5 conditional contract |
 
 ## Open Questions
 

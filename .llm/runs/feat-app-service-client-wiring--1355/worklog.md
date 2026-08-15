@@ -504,3 +504,28 @@ override, distinct invocation IDs, and PASS/exit 0:
 Every earlier receipt and report remains preserved, including the S5 runtime FAIL and raw log, the
 S4 red reports, Fresh 45 / SDK 3 `PRE_EXISTING_FAIL` entries, and the separately named plugin-streams
 diagnostic. No expensive gate or lease was requested or run.
+
+## S5 attempt 3 — F4 passes, pre-existing generated format gate fails
+
+Central lease checkpoint `2da4e1b0e874e6d5740355dcd9efd8267dcbf2b0` bound the run to immutable
+leaf head `6f813b0db35df38dcd9dc7f1ea333e997399fac0`; the suite executed at that exact
+head. No commit occurred between grant and execution. The coordinator preflight's refreshed
+`leak-report.md` timestamp remained a run-only working-tree change until after the sequence.
+
+The exact release-class command returned exit 1 with `passed=32 failed=1 skipped=0`. F4's repaired
+`generated.service-client-contract` passed in the real generated project. The sole later failure was
+`generated.deno-fmt-check`: `deno task fmt:check` reported 12 unformatted files among 172 selected
+files. The suite-owned raw JSONL log is preserved at
+`reports/s5-attempt3-scaffold-runtime-20260815-191609.log`, SHA-256
+`677e7912ff0e6e77cd61ecb68a106607b7e6305324575bb5e84c78771f81302c`.
+
+Attribution is pre-existing: the captured diff maps to `aspire/.helpers/register-plugins.mts`; that
+file alone reproduces formatter exit 1, its generator template is byte-unchanged from
+pre-implementation `c53726c69`, and the baseline runtime suite already runs the unchanged service
+environment regeneration before the unchanged generated format gate. This leaf did not touch that
+generator. The single-file check supports attribution only; it does not replace the suite verdict.
+
+Suite cleanup passed. Run-owned teardown found no AppHost, container, or escalation, and the final
+leak check reports Aspire `ok`, Docker `ok`, `survivors: []`. The runtime failure blocked
+`fresh-browser`; it is NOT_RUN and has no receipt. No product repair occurred under the lease.
+Full evidence is in `reports/s5-attempt3-runtime-failure.md`.
