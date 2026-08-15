@@ -150,3 +150,16 @@ and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
 - Structured targeted fmt check: same four files through `run-deno-fmt.ts --ext ts`, raw exit `0`
   after scoped formatter normalization. The pre-format check exited `1` with three findings.
 - `deno.lock` unchanged. No expensive gate ran.
+
+## 2026-08-15 — Slice 3 scope stop
+
+- The public `StdioMcpTransport` and `StreamableHttpMcpTransport` classes are composition wrappers,
+  not subclasses of `BaseMcpTransport`.
+- A port/base-only resource-read addition cannot be called through those exported concrete class
+  types, and their current `stop()` declarations do not expose the ruled options bag.
+- Required additional files are exactly
+  `packages/ai/src/mcp/adapters/stdio-transport.ts` and
+  `packages/ai/src/mcp/adapters/streamable-http-transport.ts`.
+- Slice 3 stopped before source edits. No gate was approximated; prior slice-2 green evidence
+  remains valid.
+- `deno.lock` unchanged. No Aspire, Docker, browser, scaffold runtime, or CLI E2E command ran.

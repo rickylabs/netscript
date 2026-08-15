@@ -40,3 +40,20 @@ Drift is append-only.
 - **Severity:** resolved
 - **Action:** accept — re-lock the plan, record `PLAN-EVAL: N/A`, and proceed red-first.
 - **Evidence:** amended plan and context pack; prior stop evidence remains unchanged.
+
+## 2026-08-15 — Published concrete transport delegates remain outside amended surface
+
+- **What:** The ruled port/base resource-read and close cancellation contract requires the two
+  published composition wrappers to delegate `readResource(options)` and expose `stop(options)`.
+- **Source:** `packages/ai/src/mcp/adapters/stdio-transport.ts` and
+  `packages/ai/src/mcp/adapters/streamable-http-transport.ts`; both implement
+  `McpTransportPort` by composition over `BaseMcpTransport` and are exported from `./mcp`.
+- **Expected:** The amended eight-file surface can expose cancellable resource-read and close on
+  every published MCP transport.
+- **Actual:** Adding the methods only to the port/base either breaks interface conformance or leaves
+  the concrete public classes without callable/delegated operations. Making `readResource`
+  optional would evade, rather than satisfy, the acceptance contract.
+- **Severity:** significant
+- **Action:** rescope — stop slice 3 before edits and request explicit authorization for exactly
+  the two concrete adapter files.
+- **Evidence:** focused source inspection after slice 2; no slice-3 source changes were made.

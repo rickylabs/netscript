@@ -92,3 +92,13 @@ amendment.
 - Focused and full MCP tests, targeted check (`--unstable-kv`), lint, and fmt are green with raw
   exit code `0`.
 - Next slice: port/base/TanStack resource-read and close cancellation plus late cleanup.
+
+## 2026-08-15 — Slice 3 blocked update (append-only)
+
+- New exact blocker: published concrete stdio and Streamable-HTTP transports compose the base and
+  must explicitly delegate the ruled resource-read and close-options APIs.
+- Required amendment: authorize only
+  `packages/ai/src/mcp/adapters/stdio-transport.ts` and
+  `packages/ai/src/mcp/adapters/streamable-http-transport.ts` in addition to the current eight.
+- No slice-3 source edit or gate run occurred. The branch remains at the completed slice-2
+  implementation plus this artifact-only stop record.
