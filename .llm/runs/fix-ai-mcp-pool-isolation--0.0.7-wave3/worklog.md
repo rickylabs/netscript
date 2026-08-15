@@ -174,3 +174,14 @@ and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
 - `PLAN-EVAL: N/A` remains justified because the ruling resolves all behavioral and type decisions.
 - Next action: commit published-transport `readResource` and `stop` abort tests RED before slice-3
   implementation.
+
+## 2026-08-15 — Slice 3 committed cancellation RED
+
+- Added behavioral tests through exported `StreamableHttpMcpTransport` for an in-flight resource
+  read and an in-flight close.
+- Structured command: `deno run --allow-read --allow-write --allow-run
+  .llm/tools/run-deno-test.ts -- --allow-all --filter "published transport"
+  packages/ai/tests/mcp_test.ts`.
+- Raw exit `1`: 0 passed, 2 failed. Resource-read was absent; close ignored the passed signal and
+  timed out.
+- No cancellation implementation source changed in this RED slice.

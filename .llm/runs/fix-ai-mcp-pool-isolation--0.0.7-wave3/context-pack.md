@@ -112,3 +112,11 @@ amendment.
 - `stop(options?)` is widened on the port and must forward its signal in both published wrappers.
 - `packages/fresh` remains read-only/out of scope; its structured cross-package check is mandatory.
 - `PLAN-EVAL: N/A` remains locked. Next: committed RED cancellation tests.
+
+## 2026-08-15 — Slice 3 cancellation RED update (append-only)
+
+- Published-path cancellation tests are RED with structured raw exit `1` (0 passed, 2 failed).
+- Current behavior: published transport has no `readResource`; `stop` ignores the caller signal and
+  remains pending beyond the bounded observer.
+- Next: port/base/TanStack cancellation plus delegation-only wrapper changes, then cross-package
+  Fresh compatibility check.

@@ -106,3 +106,20 @@ Observed structured verdict: raw exit code `1`; `0` passed, `1` failed. The fail
 `TimeoutError: The operation was aborted due to timeout` at the pool connect await. With the
 never-settling transport first, the healthy transport was not reached. This is the committed RED
 test required by the amendment; implementation had not begun.
+
+## 2026-08-15 — Published-transport cancellation RED after Amendment 2
+
+Command:
+
+```text
+deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all --filter "published transport" packages/ai/tests/mcp_test.ts
+```
+
+Observed structured verdict: raw exit code `1`; `0` passed, `2` failed.
+
+- `readResource`: the exported Streamable-HTTP transport had no callable method.
+- `stop`: the published transport ignored the caller options; its pending close did not see the
+  signal and the bounded observer returned `timed-out` instead of `rejected`.
+
+The tests execute through the published transport instance rather than calling the base or
+connector directly. The observer bounds each pending operation at 40 ms so the RED run terminates.

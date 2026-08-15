@@ -138,6 +138,21 @@ function headersOf(value: unknown): Readonly<Record<string, string>> | undefined
   return Object.fromEntries(entries);
 }
 
+function settlementWithin(
+  promise: Promise<unknown>,
+  timeoutMs = 40,
+): Promise<'fulfilled' | 'rejected' | 'timed-out'> {
+  return Promise.race([
+    promise.then(
+      (): 'fulfilled' => 'fulfilled',
+      (): 'rejected' => 'rejected',
+    ),
+    new Promise<'timed-out'>((resolve) => {
+      setTimeout(() => resolve('timed-out'), timeoutMs);
+    }),
+  ]);
+}
+
 Deno.test('createMcpTransport selects stdio and Streamable-HTTP transports', () => {
   const stdio = createMcpTransport({
     kind: 'stdio',
@@ -394,4 +409,70 @@ Deno.test('stop aborts in-flight connect work and moves to closed', async () => 
   assertEquals(signalSeen?.aborted, true);
   assertEquals(transport.state, 'closed');
   await assertRejects(() => pending);
+});
+
+Deno.test('published transport readResource settles when its caller aborts', async () => {
+  let resourceSignal: AbortSignal | undefined;
+  const transport = new StreamableHttpMcpTransport({
+    serverId: 'demo',
+    url: 'https://mcp.example.test',
+    connector: () =>
+      Promise.resolve({
+        ...connection([]),
+        readResource(_uri: string, options: McpConnectOptions = {}): Promise<never> {
+          resourceSignal = options.signal;
+          return new Promise((_resolve, reject) => {
+            options.signal?.addEventListener('abort', () => reject(options.signal?.reason), {
+              once: true,
+            });
+          });
+        },
+      }),
+  });
+  await transport.connect();
+  const controller = new AbortController();
+  const readResource = Reflect.get(transport, 'readResource');
+  assert(typeof readResource === 'function');
+
+  const pending: Promise<unknown> = Reflect.apply(
+    readResource,
+    transport,
+    ['resource://demo/pending', { signal: controller.signal }],
+  );
+  controller.abort(new DOMException('resource deadline', 'AbortError'));
+
+  assertEquals(await settlementWithin(pending), 'rejected');
+  assertEquals(resourceSignal?.aborted, true);
+});
+
+Deno.test('published transport stop settles when its caller aborts', async () => {
+  let closeSignal: AbortSignal | undefined;
+  const transport = new StreamableHttpMcpTransport({
+    serverId: 'demo',
+    url: 'https://mcp.example.test',
+    connector: () =>
+      Promise.resolve({
+        ...connection([]),
+        close(options: McpConnectOptions = {}): Promise<never> {
+          closeSignal = options.signal;
+          return new Promise((_resolve, reject) => {
+            options.signal?.addEventListener('abort', () => reject(options.signal?.reason), {
+              once: true,
+            });
+          });
+        },
+      }),
+  });
+  await transport.connect();
+  const controller = new AbortController();
+
+  const pending: Promise<unknown> = Reflect.apply(
+    transport.stop,
+    transport,
+    [{ signal: controller.signal }],
+  );
+  controller.abort(new DOMException('close deadline', 'AbortError'));
+
+  assertEquals(await settlementWithin(pending), 'rejected');
+  assertEquals(closeSignal?.aborted, true);
 });
