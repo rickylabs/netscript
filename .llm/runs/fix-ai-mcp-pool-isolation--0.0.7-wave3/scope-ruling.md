@@ -94,3 +94,84 @@ Contract gates `check`, `test`, `publish-dry-run`, `arch-check` stand, plus `qua
 `packages/**`, the JSR audit, and `deno doc --lint` on the touched entrypoint per Ruling 3.
 
 **No expensive-gate lease is granted.** No Aspire, Docker, `scaffold.runtime`, or `e2e:cli`.
+
+---
+
+# Amendment 2 — concrete published transports, and a cross-package break the stop did not catch
+
+Ruled at leaf head `b25ddb2d5ba36ea12be0ef475aaf13850307f343`.
+
+## The slice-3 stop is upheld — and it was under-scoped
+
+Verified independently, not from the report. Both classes are **composition** wrappers exported from
+`./mcp`:
+
+- `stdio-transport.ts:46` — `export class StdioMcpTransport implements McpTransportPort` with
+  `readonly #delegate: BaseMcpTransport`, forwarding `listTools(options)` and
+  `callTool(…, options)` but declaring `stop(): Promise<void>` with **no options** (`:107`).
+- `streamable-http-transport.ts:47` — same shape, `stop()` at `:111`.
+- Both are re-exported from `packages/ai/mcp.ts` (`:45`, `:49`).
+
+So the leaf is right that port/base changes alone cannot deliver cancellable resource-read and close
+on the **published** transports.
+
+**But the enumeration was incomplete.** `grep -rn 'implements McpTransportPort'` finds **six**
+implementors, not four. The one that matters:
+
+- `packages/fresh/src/runtime/ai/mcp-app-call-handler_test.ts:15` —
+  `class FakeMcpTransport implements McpTransportPort`, in a **different package**, which my
+  Ruling 1 explicitly denied this leaf from touching.
+
+That double declares `stop(): Promise<void>` and has **no `readResource`**. Authorizing only the two
+adapter files would therefore have left a cross-package type break the stop did not see.
+
+## Ruling 4 — surface, now exactly ten files
+
+Authorized, **delegation only**:
+
+9. `packages/ai/src/mcp/adapters/stdio-transport.ts`
+10. `packages/ai/src/mcp/adapters/streamable-http-transport.ts`
+
+Forward `options` on `stop` and add `readResource(options)` forwarding to the base delegate. **No
+behavior change in these wrappers beyond pass-through.** Denials from Ruling 1 stand unchanged;
+`packages/fresh` remains **out of scope**.
+
+## Ruling 5 — how to add the members without a cross-package break
+
+**`stop(options?: …)` — widen freely.** A class declaring `stop(): Promise<void>` remains assignable
+to an interface member `stop(options?: T): Promise<void>`; fewer parameters is legal. Verified
+against both published wrappers *and* the Fresh double. So widening `stop` on the port breaks **no**
+implementor. The two wrappers must still **forward** the signal — conformance is free, cancellability
+is not.
+
+**`readResource` — must NOT be a required member of `McpTransportPort`.** Adding it as required
+breaks `FakeMcpTransport` in `packages/fresh`, which this leaf may not touch and which belongs to
+another lane's package. Instead:
+
+- **required and genuinely cancellable** on `BaseMcpTransport` and on both published transports;
+- **optional** on the port (`readResource?(…)`).
+
+## Ruling 6 — the evasion guard the leaf was right to fear
+
+The leaf argued that making `readResource` optional "would evade, rather than satisfy, the
+acceptance contract". That concern is correct in spirit and is answered by a **behavioral** bar, not
+an interface one:
+
+> The RED test must prove cancellation **through a published transport path** — that an in-flight
+> `readResource` and an in-flight `stop` actually settle on abort — not merely that a method exists
+> or that a type compiles.
+
+Optional-on-the-port must not become optional-in-behavior. Criterion 4 targets the **default
+connector path**, and that path runs through `BaseMcpTransport` and the two published transports, all
+of which are in scope and all of which must be cancellable.
+
+## Attribution correction
+
+The prior drift entry credits the first amendment to "the coordinator". It was ruled by the **topic
+orchestrator** under delegated coordinator authority. Immaterial to the work; corrected so the
+record is accurate.
+
+## Unchanged
+
+Gate set, the no-lease bar, the additive-only public-surface rule, `isolatedDeclarations`, and the
+no-new-`deno.json`-export denial all stand.
