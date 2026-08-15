@@ -363,3 +363,20 @@ EXIT_CODE=0
 ```
 
 The publish set remains the same eight files; tests and examples remain excluded.
+
+## S3 — package example and cross-lane handoff
+
+- Starting head: `47ad48c9dcfe408e5de150fdb3a65d0f2111ee1f`.
+- `examples/basic-usage.ts` now imports `PrismaMySql` from the package root (`../mod.ts`), not the
+  source barrel. Its connection-error callback describes only the classifier-backed behavior that
+  S2 ships.
+- The example remains intentionally outside the publish set through `publish.exclude` in the
+  package `deno.json`; the final raw dry-run file list is recorded with the final evidence.
+- The split-close contract remains binding: the product PR is only `Part of #1293`; #1293 remains
+  open, and acceptance box 4 remains blocked until #1112 rewrites and verifies its docs-owned
+  executable example.
+- The docs-owned stale statement is recorded in `drift.md` for the #1112/docs lane. No file under
+  `docs/**` is changed by this leaf.
+
+The final gate receipts and raw D7 evidence are added only after this content is committed, so each
+gate attests the immutable S3 content head rather than an uncommitted implementation tree.

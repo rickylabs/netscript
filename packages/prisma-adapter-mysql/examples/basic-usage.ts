@@ -18,7 +18,7 @@
  * ```
  */
 
-import { PrismaMySql } from '../src/mod.ts';
+import { PrismaMySql } from '../mod.ts';
 
 // Example configuration
 const config = {
@@ -36,6 +36,7 @@ async function main() {
   // Create the adapter factory
   const adapter = new PrismaMySql(config, {
     database: config.db,
+    // Observes fatal handshake/transport, capacity, and pool connection errors.
     onConnectionError: (err) => {
       console.error('Connection error:', err.message);
     },

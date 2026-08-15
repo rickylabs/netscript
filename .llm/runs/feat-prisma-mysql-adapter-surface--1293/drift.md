@@ -32,3 +32,14 @@ cannot inject a fake client into the capability probe. S2 adds a module-only exp
 `getCapabilities` function and tests it with a fake client, then constructs the connected adapter
 from the returned fallback capabilities. The factory calls that same function with its options.
 The helper is not root re-exported, and the root-surface test asserts its absence.
+
+## S3 cross-lane documentation drift
+
+When this product change merges, the statement at
+`docs/site/reference/prisma-adapter-mysql/index.md:23` that the connection-error hook is "not
+supported by the shipped adapter and is blocked on #1293" becomes false. That file is docs-owned
+and is deliberately not edited in this leaf. The draft product PR must name the stale statement so
+the docs/#1112 orchestrator can update it after the implementation prerequisite lands.
+
+#1293 acceptance box 4 also remains outside this leaf: #1112 must rewrite and verify its executable
+example against the shipped surface before that box can be checked and #1293 can close.
