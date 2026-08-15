@@ -578,3 +578,87 @@ head) remain red, untouched, and are not this leaf's to repair. Neither may be r
 Repair Tier-A **PASS** at `7549d9fc0`. Next: a proportionate fresh delta evaluator confined to
 source-to-generated fidelity and the repair artifact. No readiness, label reconciliation, or merge
 until that verdict lands.
+
+---
+
+# Tier-A — full generated-asset closure at `9a2c74c41990c1e2a56c9714834fff97feb63466`
+
+| Field | Value |
+| --- | --- |
+| Head | `9a2c74c41990c1e2a56c9714834fff97feb63466` — local == remote == PR, clean |
+| Cascade commits | `7549d9fc0` (link 2), `27a64ea4c` (link 3), `9a2c74c41` (link 4) |
+| Verdict | **PASS** — the four-link cascade is closed on one content head |
+
+## The decisive check: all three gates fresh **simultaneously**
+
+Each link had been green at some moment; nothing had yet shown they were green *together*. Run in a
+detached worktree at `9a2c74c41` (never the leaf — `gen:assets-barrel` mutates the tree):
+
+| Gate | Result |
+| --- | --- |
+| `deno task check:publish-assets` | **EXIT 0** |
+| `deno task check:assets-barrel` | **EXIT 0** |
+| `deno task check:agent-docs-prose` | **EXIT 0**, `"fresh":true`, `"stalePaths":[]` |
+| `git status --porcelain` **after all three generators ran** | **empty** |
+
+That final empty line is the closure proof: three independent generators executed against this head
+and produced byte-identical output to what is checked in. Because `gen:publish-assets` *consumes* the
+CLI barrel (`generate-publish-assets.ts:34-37`), a clean tree here also proves the links converged
+rather than each having been fixed against a different upstream state.
+
+## Scope across the whole cascade
+
+`git diff --name-only 7549d9fc0..9a2c74c41` = `packages/cli/src/kernel/assets/agent-docs.generated.ts`,
+`packages/mcp/src/publish-assets.generated.ts`, and run artifacts. Nothing else.
+
+Across the **entire PR** (`baf1cdf67..9a2c74c41`), the only non-generated `packages/**` files touched
+are the eight S1–S3 authorized ones: `README.md`, `cache-provider.ts`, `cache-provider_test.ts`,
+`cache-query.ts`, `cache-telemetry.ts`, `ports/cache-store.ts`, `tests/cache/cache-query-kv-limit_test.ts`,
+`tests/cache/cache-telemetry_test.ts` — plus the granted `docs/site/web-layer/query-bridge.md`. No
+hand-written source drifted while chasing generated mirrors.
+
+## Repair diffs — minimal and exactly as predicted
+
+- **Link 3** (`27a64ea4c`): one file, 6 insertions / 6 deletions — the six provenance fields flipping
+  `504de3f67`→`0fed4d7ff`, `a7c72177…`→`6df99eb8…`, 4753233→4753909. Exactly what this orchestrator's
+  isolated probe predicted **before** the repair was written.
+- **Link 4** (`9a2c74c41`): **one line** — `sourceCommit: '504de3f67'` → `'0fed4d7ff'`. Nothing else.
+
+## Fifth-mirror question — three independent agreements
+
+1. This orchestrator's two-head probe: `check:mcp-export-corpus` stale at **base** as well as branch;
+   `check:emitted-samples` passes; no other `check:*` has a checked-in mirror.
+2. Shipped precedent PR #1652: `derivedAssetCascadePaths` is exactly these four paths, corroborated
+   by its own diff.
+3. The author's own downstream closure audit: "the checked-in cascade closes here; no fifth generated
+   mirror was found."
+
+**Closure holds.**
+
+## Gates — executed by this review
+
+| Gate | Result |
+| --- | --- |
+| `run-deno-check.ts --root packages/mcp` | 115 files, 0 occurrences, 0 failed batches |
+| `deno lint packages/mcp/src/publish-assets.generated.ts` | exit 0 |
+| `deno fmt --check` (same) | exit 0 |
+| raw `deno doc --lint` combined / cache entrypoint | exit 1 — exactly the six pinned diagnostics, unchanged |
+
+**Honest coverage note.** `run-deno-lint.ts --root packages/mcp` **failed to produce a verdict** —
+it errored with `invalid type: string "packages/*", expected struct WorkspaceConfig`, a wrapper/config
+incompatibility, not a lint finding. Rather than report a non-result, the file was linted directly
+(exit 0). Separately, `packages/cli/src/kernel/assets/agent-docs.generated.ts` is **excluded from both
+lint and fmt** by repo config (`lint.exclude` and `fmt.exclude` both list `packages/cli/`), so
+`deno lint` on it returns "No target files found". That file's correctness is instead guaranteed by
+`check:assets-barrel`, which asserts byte-exact regeneration equality — a stronger property than lint.
+
+## Unchanged pre-existing reds
+
+`surface:diff` (stale `baselines/public-surfaces.json`), JSR `F-DOCT-5` (13 children at base and
+head), and `check:mcp-export-corpus` (stale at base) remain red, untouched, outside scope, and are not
+to be reported as green.
+
+## Outcome
+
+Closure Tier-A **PASS** at `9a2c74c41`. Next and last gate: one proportionate delta evaluator over
+asset-chain fidelity across the full cascade. No readiness, label change, or merge until that verdict.
