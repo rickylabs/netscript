@@ -1230,3 +1230,23 @@
 - Ready-for-review created current-head CI run `31903523137` plus current companion workflows. Merge
   remains prohibited until the real acceptance mirror checks all five issue boxes, close-gate and
   core visibility report SUCCESS rather than SKIPPED, and every required current-head check is green.
+
+## 2026-08-15T19:24:31Z — readiness rollback and two evidence-preserving recoveries
+
+- #1666 CI run `31903523137` exposed two different conditions. `close-gate` raced the ready label,
+  observed no `status:ready-merge`, and therefore left all five #1296 boxes unchanged. That run is
+  eligible for an existing-run rerun only after the real blocker is repaired. `quality` is a genuine
+  leaf-owned red: `docs/site/reference/fresh-ui/index.md` changed while
+  `.llm/assets/agent-docs/prose.json.gz` and `provenance.json` remained stale, with the generator-owned
+  CLI/MCP publish cascade still to be verified.
+- The coordinator immediately removed `status:ready-merge`, restored `status:impl`, converted #1666
+  back to draft, and left #1296 untouched. The accepted cycle-2 IMPL-EVAL remains append-only
+  pre-finding evidence but cannot authorize readiness at a future head. Internals received a precise
+  same-author plan-before-mutation rescope: verify the exact four-link cascade, fresh Tier-A, generate
+  and recut applicable receipts, a second Tier-A, then a fresh delta IMPL-EVAL.
+- #1664 product `7fa29ad3e` passed its first F6 binding check, then the root test stopped honestly at
+  4228/1/19 because `forbidden-commands_test` traversed an ignored root-owned attempt-4 Postgres data
+  directory. Evidence `4c7792f20` preserves both receipts and the attribution. With Docker empty and
+  no process owning the path, the exact tree was moved recoverably to
+  `/tmp/netscript-f6-quarantine.7kXcDX/plugin-smoke-20260815-203755`. Features must create a distinct
+  `f6-test-attempt2` at unchanged content; no receipt is overwritten and no product repair is implied.

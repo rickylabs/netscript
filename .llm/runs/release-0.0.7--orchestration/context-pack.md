@@ -696,3 +696,13 @@ Newer transition `2026-08-15T19:18:20Z`: #1666 is non-draft at `status:ready-mer
 `ee67d12b4`. All nine PR DoD boxes are current/checked; comment `5303825255` contains the sole five-row
 #1296 acceptance mapping; the live dry-run passed before readiness. Current CI run `31903523137` is
 active and must produce a real mirror mutation plus green close-gate/core visibility before merge.
+
+Newer rollback `2026-08-15T19:24:31Z`: #1666 is draft again with `status:impl`; its close-gate red
+was a ready-label race and mutated no #1296 box, while quality found a real omitted agent-docs corpus
+regeneration caused by the changed Fresh UI reference page. Internals owns a same-original-author,
+plan-first exact cascade rescope, fresh Tier-A before generation, renewed exact-head receipts, a
+second Tier-A, and a fresh delta IMPL-EVAL before readiness. #1664 is at evidence `4c7792f20` over
+product `7fa29ad3e`: the first root-test receipt remains red because an ignored root-owned Postgres
+temp tree was traversed. That exact tree is recoverably quarantined under
+`/tmp/netscript-f6-quarantine.7kXcDX`; a distinct unchanged-head attempt 2 is active. Runtime leases
+remain free; #1663 and #1651 option 1 are unchanged.

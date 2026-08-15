@@ -676,3 +676,16 @@ implementation thread.
   was replaced. The evaluator independently used the repaired head throughout, so verdict impact is
   none; future brief assembly must assert there is no contradictory stale source-head token before
   dispatch.
+- **A passing evaluator does not excuse a later generated-freshness red:** #1666's evaluator
+  correctly judged the declared source/evidence head, but ready CI then proved that the changed Fresh
+  UI reference page had not propagated into the tracked agent-docs corpus. Readiness was revoked;
+  generated closure must be verified and explicitly included before the next content head, followed
+  by fresh Tier-A and delta IMPL-EVAL.
+- **Close-gate races and product reds require different recovery:** #1666's mirror saw the old label
+  and safely mutated nothing, so that same workflow may be rerun after readiness is restored. The
+  simultaneous corpus-freshness red is owned and cannot be retried away. Keep both classifications
+  explicit rather than treating an entire CI run as one failure class.
+- **Ignored runtime debris can still poison repo-wide scanners:** #1664's root test traversed a
+  root-owned Postgres data directory under an ignored e2e temp tree and raised `PermissionDenied`.
+  Preserve the red receipt, recoverably quarantine only the proven unowned tree after Docker/process
+  audits, and use a distinct unchanged-head receipt for the environmental retry.

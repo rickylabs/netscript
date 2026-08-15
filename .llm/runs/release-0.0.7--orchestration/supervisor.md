@@ -830,3 +830,15 @@ acceptance mapping is comment `5303825255`, and the live mirror dry-run accepts 
 The coordinator changed `status:impl` to `status:ready-merge` while draft, verified the dry-run, then
 marked the PR ready for review. Current-head CI run `31903523137` and companion workflows are active;
 the real mirror must mutate all five boxes and close-gate/core visibility must succeed before merge.
+
+At 19:24Z, #1666 readiness is revoked after current-head CI distinguished one orchestration race
+from one real owned omission. The close-gate ran before the live `status:ready-merge` label was
+visible, so it made no #1296 mutation and is rerunnable later; quality independently proved the
+Fresh UI reference rewrite left the tracked agent-docs corpus stale. The coordinator returned #1666
+to draft/`status:impl`, removed `status:ready-merge`, preserved the cycle-2 PASS as pre-finding
+evidence, and authorized only a same-author plan-first generator-cascade rescope, two fresh Tier-A
+reviews, renewed exact-head receipts, and a delta IMPL-EVAL before readiness. #1664 meanwhile
+preserved its first F6 root-test receipt red at evidence `4c7792f20`: 4228/1/19 was caused by the
+scanner entering an ignored root-owned Postgres temp tree. The exact tree is recoverably quarantined
+at `/tmp/netscript-f6-quarantine.7kXcDX`; attempt 2 must be distinct at unchanged product
+`7fa29ad3e`. No runtime lease is active. #1663 and #1651 option 1 remain untouched.
