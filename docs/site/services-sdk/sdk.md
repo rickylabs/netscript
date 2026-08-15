@@ -185,7 +185,7 @@ The L3 alternative builds all three layers from one map:
   {
     label: "Server loader (definePage layer)",
     lang: "ts",
-    code: "// routes/(dashboard)/orders/(_loaders)/orders-list.ts\nimport { ordersQueries } from '@app/lib/orders.ts';\n\n// Cache-first: read the KV entry (with cachedAt) for SWR; fall back to a fetch.\nexport const loadOrders = async () => {\n  const entry = await ordersQueries.list.getCachedEntry({ limit: 20 });\n  if (entry) return entry; // serve cached; SDK reloads stale in the background\n  return { data: await ordersQueries.list.queryOptions({ limit: 20 }).queryFn(), cachedAt: Date.now() };\n};"
+    code: "// routes/(dashboard)/orders/(_loaders)/orders-list.ts\nimport { ordersQueries } from '@app/lib/orders.ts';\n\n// The callable action owns cache policy; block on stale so metadata is current.\nexport const loadOrders = async () => {\n  const input = { limit: 20 };\n  const data = await ordersQueries.list(input, { preferFreshOnStale: true });\n  // getCachedEntry is a KV-only metadata read; it never fetches or revalidates.\n  const entry = await ordersQueries.list.getCachedEntry(input);\n  return entry ?? { data, cachedAt: Date.now() }; // fail safe if persistence did not land\n};"
   },
   {
     label: "Island (TanStack hydration)",

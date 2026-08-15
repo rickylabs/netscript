@@ -13,6 +13,9 @@ Fresh app. The SDK gives you a typed client built from the same contract, and a 
 wraps every procedure in a KV-backed stale-while-revalidate cache. For an operations screen that
 posture matters: the queue paints instantly from the last-known rows — even while the `orders`
 service is mid-redeploy — and refreshes in the background instead of blocking the person watching it.
+That SWR behavior belongs to the callable procedure action (for example,
+`await ordersQueries.list(input)`); `getCachedEntry(input)` is a separate KV-only metadata read and
+never schedules a refresh.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" },
@@ -28,8 +31,8 @@ service is mid-redeploy — and refreshes in the background instead of blocking 
 A single module, `apps/dashboard/lib/orders.ts`, that exports a typed `ordersClient` and a
 `ordersQueries` query utility. The client is derived from `typeof ordersContract`, so calling
 `ordersClient.list({ … })` is type-checked against the contract you wrote in chapter 2. The query
-factory adds per-procedure helpers — `queryOptions()`, `clientKey()`, and the cache-first
-`getCachedEntry()` — that chapters 4 and 5 build the page on.
+factory adds per-procedure helpers — `queryOptions()`, `clientKey()`, and the KV-only
+`getCachedEntry()` metadata read — that chapters 4 and 5 build the page on.
 
 ## Before you begin
 
@@ -77,11 +80,14 @@ procedure in exactly that — a KV-backed stale-while-revalidate layer. Add it t
 
 ```ts
 // apps/dashboard/lib/orders.ts (add below the client)
-// Server-side query factories — KV-backed stale-while-revalidate.
+// Server-side query factories — callable actions use KV-backed stale-while-revalidate.
 export const ordersQueries = createQueryFactories({
   orders: { contract: ordersContract, client: ordersClient },
 }).orders;
 ```
+
+The callable procedure action owns that stale policy. `getCachedEntry(input)` only inspects the KV
+value and timestamp; it does not execute the policy.
 
 `ordersQueries` carries one entry per contract procedure (`list`, `getById`, `getStats`, …),
 each a small object of typed helpers. The four you will use across the next chapters:
@@ -91,21 +97,25 @@ each a small object of typed helpers. The four you will use across the next chap
   rows: [
     { name: ".queryOptions(input)", type: "(input) => options", desc: "A TanStack Query options object (queryKey + queryFn) for the client island — chapter 4 passes it straight to useQuery." },
     { name: ".clientKey(input?)", type: "(input?) => key", desc: "The stable query key the client uses to read, write, and invalidate this procedure's cache." },
-    { name: ".getCachedEntry(input)", type: "(input) => Promise<entry | null>", desc: "Server-side cache-first read: resolves to { data, cachedAt } from the KV cache, or null on a cold cache. This is the page loader's fast path." },
+    { name: ".getCachedEntry(input)", type: "(input) => Promise<entry | null>", desc: "Server-side KV metadata read: resolves to { data, cachedAt } from KV, or null on a cold cache. It does not evaluate staleness or fetch." },
     { name: ".key(input)", type: "(input) => key", desc: "The server-side KV cache key for the entry." }
   ]
 }) }}
 
 {{ comp callout { type: "tip", title: "Why KV, and why cache-first" } }}
-The cache is backed by KV (Redis in your Aspire stack — the default <code>--cache-backend</code>, registered at the top of <code>main.ts</code> in chapter 1; <code>garnet</code> and <code>deno-kv</code> are alternatives). Cache-first means a page render does not block on the service: <code>getCachedEntry</code> returns immediately from KV when warm, and the stale entry refreshes in the background. A cold cache resolves to <code>null</code>, which the page handles with a skeleton — you wire that in chapter 4.
+The cache is backed by KV (Redis in your Aspire stack — the default <code>--cache-backend</code>, registered at the top of <code>main.ts</code> in chapter 1; <code>garnet</code> and <code>deno-kv</code> are alternatives). <code>getCachedEntry</code> is a pure KV read: on a warm cache it returns <code>{ data, cachedAt }</code>; on a cold cache it returns <code>null</code>. It does not evaluate staleness or start revalidation; the callable action or page/client policy must do that explicitly.
 {{ /comp }}
 
 ## Step 3 — Understand the calling shapes
 
 You now have two ways to read orders, for two different places in the stack:
 
-- **Server, cache-first** — `await ordersQueries.list.getCachedEntry(input)` inside a page loader.
-  Resolves to `{ data, cachedAt }` from KV, or `null`. Used in chapter 4's `definePage` loaders.
+- **Server, policy-aware cache read** — first run
+  `const data = await ordersQueries.list(input, { preferFreshOnStale: true })`, then read
+  `const entry = await ordersQueries.list.getCachedEntry(input)` and return
+  `entry ?? { data, cachedAt: Date.now() }`. The metadata read alone never fetches or revalidates.
+  The default callable action without the flag is the non-blocking SWR path; this loader chooses
+  `preferFreshOnStale: true` so `cachedAt` reflects the refreshed value.
 - **Client, in an island** — `useQuery(ordersQueries.list.queryOptions(input))` inside a Fresh
   island. Used in chapter 4's `QueryIsland` for client-side reads and refetch.
 
