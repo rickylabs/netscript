@@ -82,6 +82,7 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | 2026-08-15T14:15:00+02:00 | S2-FIX2 | Tier-A repair    | Replaced the stale route-template assertion for removed `bridgeInvalidation` wiring with an exhaustive two-specifier SDK import allowlist, absence check, and direct-invalidation ordering assertion. |
 | 2026-08-15T14:29:01+02:00 | S3    | Hydration implementation | Passed loader-owned `cachedAt` through `initialDataUpdatedAt` in both canonical island dialects, added omission guards, and canonically regenerated the shipped asset barrel. |
 | 2026-08-15T14:29:01+02:00 | S3    | Browser/docs contract | Added the lease-gated public-wrapper old/fresh browser fixture and task without running it; documented service regeneration/migration and Fresh hydration age in the ruled package READMEs. |
+| 2026-08-15T14:40:00+02:00 | S4    | Cheap convergence stop | The first ordered formatting-wrapper invocation exited 2 because root `fmt.exclude` rejected selected CLI batches. Exact-command measurement at pre-implementation commit `c53726c69` reproduced the same three excluded batches; stopped before every later gate. |
 
 ## Decisions
 
@@ -94,6 +95,7 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | Flags govern both command halves                  | `--dry-run` must mean no writes; force/default semantics stay coherent.     | PLAN-EVAL sweep B               |
 | Generate modules for disabled services            | `Enabled` controls runtime registration, not manifest-owned source output.  | PLAN-EVAL cycle 2 C2            |
 | Stop after S3                                     | Implementation release is expressly limited to one bounded slice.           | Coordinator dispatch            |
+| Stop S4 on first red gate                         | The dispatch requires exact attribution and a stop before later audits/gates. | Coordinator dispatch            |
 
 ## Drift
 
@@ -128,6 +130,7 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | S3 CLI export doc lint | `cd packages/cli && deno doc --lint ./mod.ts ./scaffolding.ts ./testing.ts` | PASS | Three public entrypoints checked with zero diagnostics. |
 | S3 Fresh export-map doc lint | `cd packages/fresh && deno task doc-lint` | BASELINE_FAIL | 45 pre-existing `private-type-ref` diagnostics; S3 changes no Fresh source/export type, and the task command is unchanged. Full attribution remains S4-owned. |
 | README standard | `deno task docs:readme:check` | BASELINE_FAIL | Only `packages/bench/README.md` lacks an Install section; both S3 package READMEs conform. |
+| S4 combined format wrapper | `run-deno-fmt.ts --root packages/cli --root packages/fresh --root packages/sdk --ext ts,tsx` | PRE_EXISTING_FAIL | Exit 2: three batches selected by the wrapper were excluded by root Deno config; zero formatting findings. Exact command reproduces at `c53726c69`. See `reports/s4-format-failure.md`. |
 | Changed-module doc lint | `deno task doc:lint --root packages/sdk --entrypoints ./src/query-client/key-bridge.ts --pretty` | PASS          | Zero documentation errors.                                                                  |
 | CLI entrypoint doc lint | `deno task doc:lint --root packages/cli --entrypoints ./mod.ts --pretty`                          | PASS          | Zero documentation errors, including the new exported generator contract.                  |
 | SDK root-entrypoint doc lint (`packages/sdk/mod.ts`) | `deno doc --lint packages/sdk/mod.ts`                                              | BASELINE_FAIL | Exactly two pre-existing `private-type-ref` errors for this root-entrypoint run: `QueryClientPort` at `src/ports/query-client.ts:41` and `createNetScriptQueryClient` at `src/query-client/query-client-factory.ts:44`, both referencing private `QueryClient`; measured before S1 and carried unchanged. The full 12-entrypoint export-map sweep is S4 and may surface further diagnostics. |
@@ -149,6 +152,15 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | ------------------ | ------- | ----------------------- | --------------------------- |
 | `scaffold.runtime` | NOT_RUN | Explicit lease boundary | Prohibited without release. |
 | `fresh-browser`    | NOT_RUN | Explicit lease boundary | Prohibited without release. |
+
+### S4 binding receipt sufficiency
+
+**INSUFFICIENT.** S4 stopped before binding gates, so each exact contracted file is absent:
+
+1. `receipts/s4-check.json` — missing / NOT_RUN.
+2. `receipts/s4-test.json` — missing / NOT_RUN.
+3. `receipts/s4-publish-dry-run.json` — missing / NOT_RUN.
+4. `receipts/s4-arch-check.json` — missing / NOT_RUN.
 
 ### Consumer Gates
 
@@ -177,3 +189,6 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
   public `@netscript/fresh/query` wrapper. It is wired into `test:browser` but remains unrun.
 - No expensive gate, lease, ready transition, lockfile change, `docs/**` change, evaluator launch,
   or S4 work occurred in S3.
+- S4 stopped on the first ordered red result. No lint, asset freshness, per-member audit,
+  isolated-declaration/publish dry-run, binding gate, expensive gate, or evaluator ran; no receipt
+  was generated or hand-authored.

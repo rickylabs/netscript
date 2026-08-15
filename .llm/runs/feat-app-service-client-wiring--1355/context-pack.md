@@ -12,12 +12,16 @@
 
 ## Current State
 
-PLAN-EVAL cycle 2 is terminal `PASS`; S1 and S2 are accepted. S3 now preserves loader-owned cache
+PLAN-EVAL cycle 2 is terminal `PASS`; S1, S2, and S3 are accepted. S3 preserves loader-owned cache
 age in both canonical island dialects, guards the emitted shape, and adds a controlled-clock browser
 fixture through the public Fresh query wrapper. The browser fixture is wired into `test:browser` but
 has not run because the gate remains lease-blocked. The ruled CLI generator/migration and Fresh
 hydration notes live in the publishable package READMEs. Full CLI and Fresh non-browser suites are
-green. Draft PR #1664 retains both closing keywords and remains draft. No expensive gate has run.
+green. S4 stopped at its first ordered gate: the combined formatting wrapper exited 2 because the
+root Deno format config excludes CLI batches that the wrapper selected. The exact command reproduces
+at pre-implementation commit `c53726c69`, so this is pre-existing invocation/configuration failure,
+not a leaf product regression. Draft PR #1664 retains both closing keywords and remains draft. No
+expensive gate has run.
 
 ## Completed
 
@@ -58,11 +62,12 @@ green. Draft PR #1664 retains both closing keywords and remains draft. No expens
 
 ## In Progress
 
-- S3 is complete and stopped for fresh Tier-A and pre-expensive-gate convergence review.
+- S4 is stopped after the first red gate with attribution recorded; all later S4 steps are NOT_RUN.
 
 ## Next Steps
 
-1. Await the coordinator's S3 Tier-A and pre-expensive-gate convergence verdict; do not start S4.
+1. Await coordinator direction on the pre-existing formatting invocation/config mismatch; do not
+   resume S4 or start S5 without a separate dispatch.
 2. Keep both expensive gates lease-blocked until explicit release.
 
 ## Key Decisions
@@ -103,14 +108,15 @@ green. Draft PR #1664 retains both closing keywords and remains draft. No expens
 
 | Gate family | Current status                                                                                                                    | Evidence                     |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Static      | CLI check and full source suite PASS (598/598); Fresh check and full non-browser suite PASS (245/245). CLI export doc lint passes. Fresh export-map doc lint carries 45 pre-existing diagnostics; S4 owns final attribution. Asset freshness is rechecked at the committed head. | `worklog.md` |
+| Static      | S4 format wrapper PRE_EXISTING_FAIL at its first ordered step (exit 2, three Deno-excluded batches, zero findings), reproduced at `c53726c69`. All later S4 checks/audits/gates are NOT_RUN. | `worklog.md`; `reports/s4-format-failure.md` |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
 | Runtime     | NOT_RUN / lease-blocked                                                                                                           | `plan.md` release conditions |
 | Consumer    | NOT_RUN / implementation-dependent                                                                                                | `plan.md` S5                 |
 
 ## Open Questions
 
-- None for S3. S4 remains blocked pending fresh Tier-A and separate dispatch.
+- Whether the coordinator wants S4 formatting rerun as separate per-member/configured wrapper
+  invocations; the current combined invocation cannot produce an honest verdict.
 
 ## Drift and Debt
 
