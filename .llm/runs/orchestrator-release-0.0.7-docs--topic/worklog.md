@@ -1026,3 +1026,52 @@ label, milestone, or issue state changed.
 
 Cycle-2 `PASS` remains the content verdict; no IMPL-EVAL cycle 3 was launched. Lane stops for
 coordinator readiness disposition.
+
+## 2026-08-15 — Tier-A closure on the generated cascade: PASS; readiness withheld
+
+Final head `a465836b4cc1c40262a473de07b5744e70b20ead`; local, remote, and PR head agree; tree clean.
+Review artifact: `tier-a-generated-cascade-review.md`.
+
+One stale input propagated through three generators, each fix exposing the next consumer:
+`build-agent-docs-bundle.ts` → the two agent-docs assets (`c8e3f26d85`);
+`generate-cli-assets-barrel.ts:382,389` → `packages/cli/.../agent-docs.generated.ts` (`d4a0a8340`);
+`generate-publish-assets.ts:34-43` → `packages/mcp/src/publish-assets.generated.ts` (`d24c3fa03`).
+Layers 2 and 3 are the two causal CI failures in the `d4a0` → final window and both are closed.
+
+All four freshness gates re-executed by the reviewer at the final head — `check:agent-docs-prose`,
+`check:assets-barrel`, `check:publish-assets`, `check:mcp-export-corpus` — every one raw exit `0`,
+tree clean afterwards. They were run only after confirming the author's turn was idle, so no
+concurrent process could contaminate a receipt or a build directory. `mcp-export-corpus` was checked
+to prove it was never implicated, not because it was suspected.
+
+Determinism proved at both generated heads: `gen:assets-barrel` at `d24c3fa03` and
+`gen:publish-assets` at `a465836b4` each exit `0` with a clean tree, so the committed bytes are the
+generators' deterministic output.
+
+Structured receipt validated: `publish-assets.json` carries `exitCode 0` and
+`gitHead a465836b4cc1c40262a473de07b5744e70b20ead` — the full committed head, so a genuine
+post-commit receipt rather than the staged-state artifact Tier-A rejected at layer 2.
+
+Preservation: against the cycle-2 source `c7ce58a19`, `docs/site`, `.llm/tools`, and both lockfiles
+are byte-unchanged. Nine files total since that source — two agent-docs assets, five run artifacts,
+two generated package assets. No canonical comment, pin, label, milestone, or issue state changed.
+
+### The reviewable failure was process, not code
+
+Layers 2 and 3 were each discovered by a CI run rather than predicted, and a repo memory already
+recorded the layer-1→2 coupling. The closure only became systematic at layer 3, when this lane
+enumerated and ran every freshness check in the repository before dispatching instead of fixing the
+reported symptom. That enumeration is the practice worth keeping: when a generated asset is stale,
+find the full consumer closure first.
+
+### Readiness withheld
+
+Actions at the final head: `Code quality` success, `Deploy docs site to Pages` success, three runs
+skipped, and **`ci` run `31871283408` still `in_progress`**. Not terminal, therefore not green, and
+not reported as green. Readiness will be reconciled only from the terminal state of `quality` and
+`check-test` at the exact head, and published as a **new authoritative PR comment** rather than by
+editing the stale one — the earlier `pr-checks`-snapshot error is corrected append-only in
+`drift.md`, not rewritten.
+
+No Definition-of-Done box ticked, no ready flip, merge, publish, relabel, or next docs leaf. This
+topic remains independent of the internals, fixes, and features lanes.
