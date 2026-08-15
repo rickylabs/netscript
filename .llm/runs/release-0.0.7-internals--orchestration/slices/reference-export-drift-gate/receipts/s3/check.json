@@ -1,0 +1,36 @@
+{
+  "gateId": "check",
+  "invocationId": "reference-export-s3-check",
+  "argv": [
+    "deno",
+    "task",
+    "check"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-reference-export",
+  "gitHead": "47ca22abe94b9d2e54d3778edc8944094b227886",
+  "actualGitHead": "47ca22abe94b9d2e54d3778edc8944094b227886",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:467415",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "4d047f094f79368dc9665d43561bfb73db3e73dc13a4afdd4bd6e4407c01316f",
+  "lifecycleId": "worker:467415:reference-export-s3-check:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T18:03:42.134Z",
+  "startedAt": "2026-08-15T18:03:42.137Z",
+  "finishedAt": "2026-08-15T18:06:36.994Z",
+  "durationMs": 166639,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 299,
+    "sha256": "09feb3c08a0efdef3b0eb29887a2490ebbf99f4bf645dcf8aecc68c6d2275059",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/codex/repos/netscript-007-reference-export\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":2924,\"batches\":25,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 192,
+    "sha256": "8e7cb67a36cfafde9a120b0109ba1f06cbe2c185d7d3fac8967000ed6e61dfec",
+    "tail": "Task check deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"\n",
+    "truncated": false
+  }
+}

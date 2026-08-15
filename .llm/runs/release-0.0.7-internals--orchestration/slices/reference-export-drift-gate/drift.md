@@ -24,3 +24,15 @@
 - **Controlled mutation:** one Fresh UI symbol row was changed only in-memory/on-disk for the
   negative proof, backed up under `.llm/tmp`, and restored in `finally`. SHA-256 and byte equality
   matched, the scratch directory was removed, and the path has no diff.
+
+## S3
+
+- **Implementation drift:** none. S3 edits run artifacts only; all receipts attest the exact S2
+  implementation head.
+- **Gate drift:** none. All seven contracted durable gates fired and produced PASS receipts. The
+  full-export Contracts and Fresh UI doc-lint commands remain separate honest reds at raw exit 1;
+  they are not part of the seven PASS receipts and were not waived.
+- **Publication framing:** no drift. Dry runs are recorded as static packaging/isolated-declaration
+  evidence only, never as real-publish or install success.
+- **Boundary drift:** none. `fresh-browser` remains N/A / waived and `NOT_RUN`; every prohibited
+  runtime, release, mutation, and cleanup command remains `NOT FIRED`.

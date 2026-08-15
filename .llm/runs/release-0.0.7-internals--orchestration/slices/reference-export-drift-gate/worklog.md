@@ -120,3 +120,58 @@ workflow trigger, `deno.lock`, central state, or other lane was touched.
 
 S2 stops after commit, explicit-refspec push, and its structured PR comment. The coordinator owns
 the required substantive slice review. S3 must not begin until that review authorizes continuation.
+
+## S3 — history-bound contract and publication evidence
+
+- Authorization: coordinator S2 slice-review `PASS` at `47ca22abe`.
+- Scope: run artifacts only; no implementation-path edit.
+- Immutable implementation head: `47ca22abe94b9d2e54d3778edc8944094b227886`.
+
+### Durable gate set
+
+Seven `run-gate.ts` receipts under `receipts/s3/` attest the exact immutable head. The generated
+evidence-set report is `SUFFICIENT` with no reasons.
+
+| Gate                 | Raw exit | Result                                              |
+| -------------------- | -------: | --------------------------------------------------- |
+| `check`              |        0 | PASS; 2,924 selected files, 25 batches, 0 findings  |
+| `test`               |        0 | PASS; 4,203 passed, 0 failed, 19 ignored            |
+| `quality-job`        |        0 | PASS; dependency-catalog warnings retained          |
+| `arch-check`         |        0 | PASS; existing doctrine WARN/INFO findings retained |
+| `docs-source-format` |        0 | PASS from `docs/site` cwd                           |
+| `docs-accuracy`      |        0 | PASS; existing TanStack peer warning retained       |
+| `publish-dry-run`    |        0 | PASS; static workspace simulation only              |
+
+### Focused and JSR evidence
+
+- Direct named drift: raw exit 0, all eight coverage reports, terminal PASS.
+- Focused checker test: raw exit 0, 6 passed / 0 failed.
+- Contracts JSR audit: raw exit 0; all four edited JSDoc files present in the publish set; one
+  sanctioned oRPC slow-type INFO.
+- Fresh UI JSR audit: raw exit 0; all six exports inspected; existing structural/cardinality and
+  slow-type WARN findings preserved.
+- Exact pins: Contracts has zero `@netscript/*` member imports; Fresh UI has exactly two, both fixed
+  to `jsr:@netscript/sdk@0.0.6/...`. `deps:why @netscript/sdk` raw exit 0 confirms live use.
+- Contracts full-export doc lint: **raw exit 1, RED**; unchanged 9 private-type-ref diagnostics,
+  with `/query` and `/transform` clean.
+- Fresh UI full-export doc lint: **raw exit 1, RED**; unchanged 123 `/interactive` diagnostics (96
+  private-type-ref, 27 missing-jsdoc), with the other five entrypoints clean.
+
+### History and boundary evidence
+
+- Thirteen-path classifier: raw exit 0; 10 changed implementation paths, all authorized; every other
+  changed/pending path is within this run directory.
+- Forbidden-surface direct Git diff: raw exit 0.
+- `deno.lock` base, immutable-head, and working-tree blob IDs are identical:
+  `a1522e6ecc98dd4232312385b0cea4e52f5fa4b2`.
+- `run-gate.ts --help` was an unsupported tooling probe (raw exit 1); no gate fired. Valid gates
+  were launched only after reading the source contract/catalog.
+- `fresh-browser` remains `NOT_RUN`, N/A / waived. No runtime lease exists or was requested.
+- All prohibited runtime, publish, merge, readiness, label, issue, milestone, cluster, and cleanup
+  actions remain `NOT FIRED`.
+
+## Final author handoff
+
+S3 stops after the run-artifact commit, explicit-refspec push, and structured PR comment. The
+coordinator owns final substantive review, IMPL-EVAL, readiness, and merge. The author does not
+self-certify.
