@@ -477,3 +477,48 @@ The two pre-existing baseline reds are unchanged and must not be called green: `
 `baselines/public-surfaces.json`, identical MAJOR sets base↔head) and JSR `F-DOCT-5` (13 children at
 base and head). The `packages/queue` `typed-queue_test.ts` flake remains unfiled and still warrants a
 tracked issue.
+
+## 2026-08-15 — #1665 asset-chain delta IMPL-EVAL terminal PASS
+
+| Field | Value |
+| --- | --- |
+| Verdict | **PASS** — "the four-link chain is closed and convergent at `9a2c74c41`; no fifth mirror; no unauthorized source movement; pre-existing reds untouched." Blocking items: **none** |
+| Evaluated head | `9a2c74c41990c1e2a56c9714834fff97feb63466` |
+| Artifact commit | `ac274a46489b9ab746e5be22ca71300ed94eaadb`, **artifact-only**; local == remote == PR |
+| PR comment | <https://github.com/rickylabs/netscript/pull/1665#issuecomment-5303120561> @ 2026-08-15T16:19:58Z |
+| Evaluator | job `262ef8e1`, session `262ef8e1-1907-4c83-a2cd-4af142b8a95a`, PID `200529` |
+| Bridge / RC | `session_01E3QfD1wkvb1naZKS6m7bp2` → <https://claude.ai/code/session_01E3QfD1wkvb1naZKS6m7bp2> |
+| Route | requested/observed `claude-fable-5` · `medium` · `--remote-control` — **matched** |
+
+**Every supervisor claim was independently confirmed**, including the three cascade gates EXIT 0 with
+porcelain empty after all three generators, link 3's 6+/6− provenance diff, link 4's single
+`sourceCommit` line, `packages/mcp` check 115 files / 0 occurrences, the #1652
+`derivedAssetCascadePaths` precedent (from both central state and the shipped diff),
+`check:mcp-export-corpus` stale at base, and `check:emitted-samples` passing at both heads.
+
+**It also confirmed the two coverage limits this topic self-reported** rather than letting them pass
+unexamined — the `run-deno-lint.ts --root packages/mcp` workspace-config parse error that yields no
+verdict, and `agent-docs.generated.ts` being excluded from both lint and fmt with its correctness
+resting on `check:assets-barrel` byte equality. Surfacing the weakest joints in one's own evidence and
+having an independent pass press on them is the point of the gate.
+
+One metric difference worth recording: the evaluator characterised `surface:diff` as **965
+MAJOR/MINOR lines** at both heads, where this topic reported **517 undeclared major changes** — the
+error-summary count versus an output-line count. Different metrics, identical conclusion: red at base
+and branch alike, `baselines/public-surfaces.json` stale and untouched.
+
+Three non-blocking advisories, all correct and none this leaf's to fix: `check:mcp-export-corpus`
+stale on `main` (wants its own chore branch); the `run-deno-lint.ts` per-package tooling gap; and that
+the root suite was not rerun in this remit, so the `typed-queue` flake was not observed.
+
+## Lifecycle state after the chain closure
+
+PR head `ac274a464`, **non-draft**, `MERGEABLE`/`BLOCKED`, label `status:impl-eval`. Product and docs
+tree is **byte-identical to the product-IMPL-EVAL head `9a26c107a`**
+(`git diff 9a26c107a..ac274a464 -- packages/sdk/ docs/` empty), so all three prior PASS verdicts
+remain bound to the tree now under test. CI: 5 pass, 13 skipping, **2 pending**.
+
+All four gates in this leaf's chain are now terminal PASS: PLAN-EVAL (`cd5193b66`), product IMPL-EVAL
+(`9a26c107a`), corpus delta (`7549d9fc0`), asset-chain delta (`9a2c74c41`). Readiness actions —
+terminal CI at this exact head, issue-side acceptance boxes, and the `status:impl-eval` → ready-merge
+progression — remain coordinator-only, as does merge.
