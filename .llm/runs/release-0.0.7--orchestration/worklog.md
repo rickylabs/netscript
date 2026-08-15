@@ -583,3 +583,20 @@
   subtree, preserve all healthy fixture selection, and group explicit argv by effective nearest
   Deno config inside the already-authorized fmt/lint wrappers. No product implementation or twelfth
   path is authorized.
+
+## 2026-08-15T11:09:30Z — two plan repairs and the next fixes leaf
+
+- #1664 cycle-1 PLAN-EVAL completed `FAIL_PLAN` at immutable evaluator commit `ed34105e2`, comment
+  `5301947232`. It ruled direct `{ queryKey: <svc>Queries.list.clientKey() }` emission with no SDK
+  overload, then required plan-text decisions for generator-owned paths, the existing
+  `service generate` overwrite/dry-run/force contract, package README homes, post-mutation request
+  counting, per-slice paths, and one qualified citation. The same Codex author is repairing only
+  plan artifacts; neither expensive gate ran.
+- The #1663 114-file prototype exposed one legitimate fmt finding rather than another wrapper bug:
+  only `doctor/healthy/netscript.config.ts` is genuinely unformatted; the other three healthy files
+  and all lint checks pass. Coordinator granted that exact twelfth path as formatting-only planned
+  surface, with actual mutation still blocked until fresh Tier-A and PLAN-EVAL cycle 2 PASS.
+- Fixes durably reconciled #1661 at topic `8169b1a0e` and released
+  `sdk-cache-surface-and-telemetry` (#1637/#1619/#1620/#1598/#1623) from main `baf1cdf67` on matched
+  Sol/medium Codex thread `01a00516-2033-7ed3-936a-a616cee47447`. It is research/plan-only and must
+  open one draft PR before stopping for PLAN-EVAL.

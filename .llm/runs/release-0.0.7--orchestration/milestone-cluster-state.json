@@ -73,7 +73,7 @@
         "pid": 23955,
         "bridgeSessionId": "session_01HqFtKQtyJcHBEn1MghQdFX",
         "remoteControlUrl": "https://claude.ai/code/session_01HqFtKQtyJcHBEn1MghQdFX",
-        "topicHeadSha": "77ce00ab5b990db09ba4d731aa93418822a46792",
+        "topicHeadSha": "8bdd8e67a787a53c00279ab961f360aeaf1fbcdc",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle"
@@ -115,7 +115,7 @@
         "pid": 26724,
         "bridgeSessionId": "session_014pCd2QWkCscgZpVdjcUPST",
         "remoteControlUrl": "https://claude.ai/code/session_014pCd2QWkCscgZpVdjcUPST",
-        "topicHeadSha": "a4b3b0c5a",
+        "topicHeadSha": "8169b1a0e1ac263b619635aec2cfc12a5feea2df",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle"
@@ -941,6 +941,7 @@
           ".llm/tools/run-deno-lint_test.ts"
         ],
         "markerAllowance": "at most one narrowly named marker inside packages/mcp/tests/fixtures/doctor/broken if the repaired plan proves marker-based subtree exclusion",
+        "formattingNormalizationPath": "packages/mcp/tests/fixtures/doctor/healthy/netscript.config.ts; formatting-only, no semantic/schema/config-value change, actual mutation forbidden before PLAN-EVAL cycle 2 PASS",
         "negativeBoundary": "no broad tests/fixtures or parent-family skip; malformed deno.json stays byte-identical; fmt and lint no-extra-flag commands must select real files, retain doctor/healthy as selected, and retain real-source negative controls",
         "scaffoldRuntimeDisposition": "waived_matrix_n_a_focused_semantic_unit_is_load_bearing"
       },
@@ -1102,6 +1103,32 @@
       "receiptRefs": []
     },
     {
+      "id": "sdk-cache-surface-and-telemetry",
+      "lane": "fixes",
+      "phase": "planned",
+      "baseBranch": "main",
+      "headSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
+      "currentPrHeadSha": null,
+      "issueNumbers": [1637, 1619, 1620, 1598, 1623],
+      "implementerAgentId": "01a00516-2033-7ed3-936a-a616cee47447",
+      "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
+      "branch": "fix/sdk-cache-surface-and-telemetry",
+      "worktree": "/home/codex/repos/netscript-007-leaf-sdk-cache",
+      "prNumber": null,
+      "implementationState": "research_and_plan_active",
+      "dispatchTopicHeadSha": "8169b1a0e1ac263b619635aec2cfc12a5feea2df",
+      "planGate": "research and contract decisions only; open one draft PR and stop before implementation; PLAN-EVAL is required",
+      "declaredSurface": [
+        "packages/sdk/src/cache/cache-provider.ts",
+        "packages/sdk/src/cache/cache-query.ts",
+        "packages/sdk/src/cache/cache-telemetry.ts",
+        "packages/sdk/src/ports/cache-store.ts"
+      ],
+      "crossPackageGateContract": "repo-root test or every asserting package gate must be named; package-local green is insufficient for SDK source/public-surface changes",
+      "expensiveGateContract": "no Aspire, Docker, or e2e:cli gate is currently load-bearing or authorized",
+      "receiptRefs": []
+    },
+    {
       "id": "prisma-mysql-adapter-surface",
       "lane": "features",
       "phase": "merged",
@@ -1168,27 +1195,31 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
-      "currentPrHeadSha": "7f20a34fee4e99ac17edb6ed4de06a3ec9c1934b",
+      "currentPrHeadSha": "ed34105e2ef344a5b590bca6985810f45f89b0ca",
       "issueNumbers": [1355, 1360],
       "implementerAgentId": "01a004f9-f033-7592-a0bc-63927753fb43",
       "implementerRoute": "openai / gpt-5.6-sol / high / approval never / dangerFullAccess",
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "plan_eval_cycle_1_active",
+      "implementationState": "plan_repair_cycle_1_active",
       "dispatchTopicHeadSha": "4be6821d95f830327b45c8f816c7f965e34bde49",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
       "tierAPlanRepairHeadSha": "7f20a34fee4e99ac17edb6ed4de06a3ec9c1934b",
       "tierAPlanTopicCheckpointSha": "b52641ece5ed622e65deacc776274882c8e8176f",
       "planEvaluationRequired": true,
-      "planEvaluationState": "active_cycle_1",
+      "planEvaluationState": "complete_fail_plan_cycle_1",
       "planEvaluatorAgentId": "176aace4-b2a2-4b16-bdaa-9db687c7d132",
       "planEvaluatorBackgroundAgentId": "176aace4",
       "planEvaluatorBridgeSessionId": "cse_01TiYhwUCkdyjziEpFP3kgaS",
       "planEvaluatorRoute": "native claude-fable-5 / medium / Remote Control",
       "planEvaluationGrantedAt": "2026-08-15T11:02:50.000Z",
-      "planDecisionBoundary": "keep additive SDK overload versus direct queryKey filter open for formal PLAN-EVAL; repair scaffold.runtime release-gate evidence class and exact scenario assertions first",
+      "planEvaluationCompletedAt": "2026-08-15T11:08:17.776Z",
+      "planEvaluationVerdict": "FAIL_PLAN",
+      "planEvaluatorCommitSha": "ed34105e2ef344a5b590bca6985810f45f89b0ca",
+      "planEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1664#issuecomment-5301947232",
+      "planDecisionBoundary": "cycle 1 ruled direct emitted { queryKey: <svc>Queries.list.clientKey() } with no SDK overload; repair must lock generator-owned output paths, existing service generate overwrite/dry-run/force compatibility, package README homes, post-mutation request-count proof, per-slice paths, and qualified citations",
       "expensiveGateContract": "both gates are load-bearing after cheap convergence: scaffold.runtime uses its suite-owned release-gate command/evidence plus central lease (never run-gate catalog); fresh-browser uses the catalog receipt; run serially only after coordinator grant",
       "receiptRefs": []
     },
@@ -1884,7 +1915,7 @@
     },
     {
       "id": "app-service-client-wiring-plan-eval-cycle-1",
-      "state": "active",
+      "state": "complete",
       "lane": "features",
       "leafId": "app-service-client-wiring",
       "phase": "plan-eval",
@@ -1893,7 +1924,7 @@
       "evaluatorAgentId": "176aace4-b2a2-4b16-bdaa-9db687c7d132",
       "backgroundAgentId": "176aace4",
       "bridgeSessionId": "cse_01TiYhwUCkdyjziEpFP3kgaS",
-      "remoteControlUrl": "https://claude.ai/code/cse_01TiYhwUCkdyjziEpFP3kgaS",
+      "remoteControlUrl": "https://claude.ai/code/session_01TiYhwUCkdyjziEpFP3kgaS",
       "route": {
         "provider": "native-claude",
         "model": "claude-fable-5",
@@ -1903,7 +1934,11 @@
       "leaseOwner": "codex-root-0.0.7",
       "grantedAt": "2026-08-15T11:02:50.000Z",
       "startedAt": "2026-08-15T11:03:18.527Z",
-      "evaluationFocus": "public SDK/generator boundary, backwards compatibility, exact multi-service query-key isolation, mutation-triggered refetch observability, hydration timestamp behavior, release-gate evidence classes, and expensive-gate lease preconditions"
+      "evaluationFocus": "public SDK/generator boundary, backwards compatibility, exact multi-service query-key isolation, mutation-triggered refetch observability, hydration timestamp behavior, release-gate evidence classes, and expensive-gate lease preconditions",
+      "completedAt": "2026-08-15T11:08:17.776Z",
+      "verdict": "FAIL_PLAN",
+      "evaluatorCommitSha": "ed34105e2ef344a5b590bca6985810f45f89b0ca",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1664#issuecomment-5301947232"
     }
   ],
   "expensiveGates": [
@@ -1997,5 +2032,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T11:03:30.000Z"
+  "updatedAt": "2026-08-15T11:09:30.000Z"
 }

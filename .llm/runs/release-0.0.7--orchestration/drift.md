@@ -457,3 +457,17 @@ implementation thread.
   invalidation gate to observe a second request and refreshed server value; spying on
   `invalidateQueries` would pass against the existing defect. Hydration similarly compares old and
   fresh timestamps under one controlled clock with different query-function counts.
+
+- **A legitimate finding must be fixed, not classified away:** once #1663 stopped hiding the healthy
+  fixture family, fmt exposed exactly one genuinely unformatted file. The correct rescope is one
+  formatting-only path with semantic equivalence proof; neither a broader marker nor a special
+  config flag is acceptable. Coverage stays 114 selected and all healthy files remain visible.
+- **An identity helper is not automatically an API improvement:** #1664's proposed
+  `bridgeInvalidation(queryKey)` overload added no policy beyond `{ queryKey }`, left the unsafe
+  string form intact, and would have coupled new CLI output to SDK 0.0.7. Direct emission from the
+  already-published typed `clientKey()` surface is both narrower and compatible with 0.0.6-pinned
+  consumer apps.
+- **Existing verbs need migration contracts when their owned output expands:** adding client-module
+  regeneration to `service generate` changes what a familiar Aspire-oriented command overwrites.
+  The plan must state owned paths and whether dry-run/force cover both halves before implementation;
+  naming deterministic output without that compatibility answer is incomplete.

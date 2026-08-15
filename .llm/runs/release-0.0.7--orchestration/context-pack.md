@@ -336,3 +336,13 @@ implementation, cheap convergence, and a later explicit central grant. #1663's l
 `71e803807` plan repair is rejected and unpushed because its 115-to-110 parent skip hid four healthy
 files; remote remains `be2b18728`. Preserve the same Codex thread and accept only the corrected
 115-to-114, healthy-selected, config-aware batching plan before fresh Tier-A and cycle 2.
+
+Resume from the newer `2026-08-15T11:09:30Z` transition. #1664 cycle 1 is terminal `FAIL_PLAN` at
+`ed34105e2ef344a5b590bca6985810f45f89b0ca`, comment `5301947232`; the same Codex author is applying
+the six plan-text findings, with direct `clientKey()` emission ruled and no SDK overload. #1663's
+reviewed surface now includes exactly one twelfth path,
+`packages/mcp/tests/fixtures/doctor/healthy/netscript.config.ts`, formatting-only; actual product
+mutation remains forbidden before Tier-A and cycle-2 PASS. Fixes has independently released
+`sdk-cache-surface-and-telemetry` on Sol/medium thread
+`01a00516-2033-7ed3-936a-a616cee47447`, base main `baf1cdf67`, research/plan and draft-PR only.
+Preserve all three authors and native topic supervisors; serialize only inside each topic.
