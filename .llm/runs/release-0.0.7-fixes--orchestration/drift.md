@@ -335,3 +335,24 @@ decision; the next fixes leaf stays queued.
      issued once and assumed landed.
 - **Consequence:** none beyond delay — no wrong work was performed, because the undelivered message
   could not cause a scope change. Re-dispatched under a retry loop with rollout-grep delivery proof.
+
+## 2026-08-15 — supervisor brief mis-stated #1350/#1466 metadata ownership
+
+- **What:** the #1350 slice brief asserted "#1350 owns procedure metadata preservation", sourced from a
+  checked box in #1348's body.
+- **Actual:** #1348's own amendment header states "Stage 0 is accepted; **#1466 owns procedure
+  metadata**", #1350's owner comment `5227724542` says that issue "remains focused on the
+  `safe()`/literal-preserving error repair" and does not own metadata initialization, and #1466 is
+  open as "[sdk-client S2] feat(sdk): define NetScriptProcedureMeta without erasing contract errors".
+- **Cause:** a single checked line in a long umbrella body was quoted without reconciling it against
+  that same body's normative header, the target issue's own owner comment, or the live sibling child.
+  Two statements in one issue described different things — #1466 owns metadata *definition*, #1350
+  owns *error preservation* — and the brief compressed them into one wrong claim.
+- **Detection:** the leaf author refused to plan against it, recorded the contradiction in
+  `research.md:14-21`, and requested a ruling instead of proceeding. Third consecutive time an author
+  in this lane has stopped on a real scope/ownership problem rather than widening.
+- **Severity:** significant — had it not been caught, this leaf would have defined and exported
+  `NetScriptProcedureMeta`, duplicating #1466 and pre-empting the accepted Stage order.
+- **Rule:** when a brief asserts ownership, cite the **normative** line, not any matching line, and
+  check the target issue's own comments and live sibling issues before asserting it. An umbrella's
+  checkbox is a status marker, not an ownership grant.

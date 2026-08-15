@@ -1102,3 +1102,36 @@ doc-lint, #1667's `expected 1, got 2`) are handed over so they are reported red 
 rediscovered.
 
 Plan-first: no implementation before PLAN-EVAL PASS. No runtime lease; no Aspire/Docker/`e2e:cli`.
+
+## 2026-08-15 — #1350 plan stopped on scope/ownership; coordinator ruling dispatched
+
+Plan landed at `c7a6f3d32` (draft PR **#1671**, `status:plan`, plan-only — no product mutation), then
+**stopped** on three items rather than proceeding. All three were real.
+
+**Ruling dispatched to the same author `01a006f3-…`, plan-only:**
+
+- **APPROVED** sixth product path `packages/sdk/src/ports/service-client.ts` — the real
+  `ServiceClientMethod` promise is where `TError` is erased, so `errors.ts` alone cannot deliver
+  end-to-end preservation.
+- **DENIED** `packages/contracts/src/public/mod.ts` and any `NetScriptProcedureMeta`
+  definition/export. #1466 (Stage 1b) owns definition and export; #1348's accepted order is #1350
+  error repair first, then #1466 metadata. #1350 must preserve the fourth generic slot with
+  `Record<never, never>` so later metadata is not erased, without inventing or exporting the
+  vocabulary and without claiming the later fixture is proven here.
+- **Third item** — stale published prose in `packages/contracts/README.md` and benchmark reference
+  text — is a **seventh path** and therefore a rescope. Reported as tracked follow-up debt, not
+  edited. Same disposition as PR #1669's adjacent-page debt, which became issue #1670.
+
+The amendment must set an exact **six-path ceiling** with a seventh declared a rescope, **remove** the
+conditional `public/mod.ts` branch outright (a denied option must not survive as a conditional in an
+approved plan), revise acceptance to **six concrete error literals plus meta-generic non-erasure
+without `NetScriptProcedureMeta`**, and keep the breaking-change disclosure.
+
+**Supervisor error recorded in `drift.md`.** My brief asserted "#1350 owns procedure metadata
+preservation" from a checked box in #1348, without reconciling it against that same body's normative
+header ("#1466 owns procedure metadata"), #1350's owner comment `5227724542`, or the live #1466
+child. The author caught it and refused to plan against it. Uncaught, this leaf would have defined
+and exported `NetScriptProcedureMeta`, duplicating #1466 and pre-empting the accepted Stage order.
+
+Next: fresh Tier-A on the amended head; PLAN-EVAL only after Tier-A PASS; no implementation, runtime
+lease, or #1348/#1466 mutation before that PASS.
