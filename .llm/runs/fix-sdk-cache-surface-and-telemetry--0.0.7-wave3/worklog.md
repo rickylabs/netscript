@@ -92,6 +92,8 @@ behind `CacheStore`; it must not change source-query success semantics.
 | 2026-08-15 | S3 | Reconcile | S1/S2 files remain byte-identical. Full focused/root/publish gates were run; the known stale `surface:diff` and exact six raw doc-lint diagnostics remain honestly red. PR metadata is updated after the S3 push; draft state, acceptance boxes, labels, milestone, and issue states remain unchanged. |
 | 2026-08-15 | Post-IMPL-EVAL repair | Agent-docs bundle | Readiness CI exposed branch-caused generated drift from the authorized Query Bridge source edit. Regenerated only `prose.json.gz` and `provenance.json` with `gen:agent-docs-prose`; the immediate porcelain check contained exactly those two assets. |
 | 2026-08-15 | Post-IMPL-EVAL repair | Validation | Agent-docs freshness and full docs-site verification pass; SDK lint/fmt remain clean; both raw doc-lint invocations retain exactly the pinned three-plus-three baseline diagnostics. No root/Aspire/Docker/CLI E2E or evaluator was run. |
+| 2026-08-15 | Second post-eval repair | CLI agent-docs barrel | Readiness CI exposed the third asset-chain link. `gen:assets-barrel` changed only `packages/cli/src/kernel/assets/agent-docs.generated.ts`; the immediate porcelain output named exactly that path. |
+| 2026-08-15 | Second post-eval repair | Downstream audit | `check:publish-assets` check-only mode found a fourth stale link at `packages/mcp/src/publish-assets.generated.ts`. It remains untouched and is reported for a new scope ruling. Whole-repo generator/consumer searches found no fifth checked-in generated artifact. |
 
 ## Decisions
 
@@ -141,6 +143,12 @@ authorized and this slice completed S3 within its exact four-file implementation
 | Repair docs-site verify | PASS | Source/render checks pass; 35,342 internal links and 18 caveat markers resolve |
 | Repair SDK lint/format wrappers | PASS | 84 files; zero lint occurrences, format findings, or failed batches |
 | Repair raw doc lint | FAIL (expected baseline, no regression) | Combined and cache-only commands each exit 1 with their exact three named diagnostics; zero new |
+| Second repair assets barrel | PASS | Exit 0; regenerate-then-diff clean across all seven outputs with the authorized CLI delta staged |
+| Second repair agent-docs freshness | PASS | Exit 0; `fresh=true`, `stalePaths=[]`, source commit `0fed4d7ff` |
+| Second repair CLI check wrapper | PASS | 883 files; 8 batches; zero failed batches or diagnostics |
+| Second repair CLI lint/format wrappers | NOT A PASS | Both exit 2 because Deno excludes CLI targets; explicit one-file runs are also excluded. Diagnostic batch-size-1 lint additionally exposes seven unrelated E2E fixture catalog failures. |
+| Second repair raw doc lint | FAIL (expected baseline, no regression) | Both invocations retain exactly the pinned three-plus-three diagnostics; zero new |
+| Downstream publish-assets audit | FAIL (out-of-scope generated drift) | Exit 1 names only `packages/mcp/src/publish-assets.generated.ts`; no mutation performed |
 
 ## Handoff Notes
 
@@ -157,3 +165,5 @@ authorized and this slice completed S3 within its exact four-file implementation
 - Draft PR: https://github.com/rickylabs/netscript/pull/1665
 - The post-IMPL-EVAL generated-assets repair is recorded in
   `generated-assets-repair-report.md`; stop for the coordinator's fresh Tier-A and delta evaluation.
+- The second repair and the newly discovered fourth asset-chain link are recorded in
+  `assets-barrel-repair-report.md`; the MCP generated file needs a separate scope ruling.
