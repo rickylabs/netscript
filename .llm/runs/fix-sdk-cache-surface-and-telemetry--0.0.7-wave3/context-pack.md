@@ -6,17 +6,18 @@
 | --- | --- |
 | Run ID | `fix-sdk-cache-surface-and-telemetry--0.0.7-wave3` |
 | Branch | `fix/sdk-cache-surface-and-telemetry` |
-| Current phase | `implementation/S3` — final slice implemented and awaiting fresh Tier-A review |
+| Current phase | `post-IMPL-EVAL repair` — generated bundle refreshed; awaiting fresh Tier-A and delta evaluation |
 | Archetype | `3 — runtime behavior` slice; SDK inventory remains Archetype 2 |
 | Scope overlays | `SCOPE-docs` for one authorized Query Bridge quotation |
 
 ## Current State
 
 PLAN-EVAL is terminal PASS at evaluated head `ee1b44c6d`, with evaluator artifact `cd5193b66`.
-S1 is Tier-A PASS at `0e4e26c51`; S2 is Tier-A PASS at `1cf76c6dd`. Coordinator-authorized S3
-implements D4's module-identity diagnostic and synchronized site quotation plus D5's CacheStore
-mandatory-evidence JSDoc. The mechanical D4 proof and all focused/root/publish gates are captured
-in `s3-report.md`. Draft PR #1665 remains open/draft with `status:plan` and milestone `0.0.7`.
+S1 is Tier-A PASS at `0e4e26c51`; S2 is Tier-A PASS at `1cf76c6dd`; the complete implementation
+received terminal IMPL-EVAL PASS at `0fed4d7ff`. Readiness CI then found the agent-docs bundle stale
+because S3's authorized Query Bridge edit feeds its manifest. The canonical generator refreshed
+only `prose.json.gz` and `provenance.json`; freshness and docs-site verification now pass. Evidence
+is captured in `generated-assets-repair-report.md`.
 
 ## Completed
 
@@ -40,11 +41,15 @@ in `s3-report.md`. Draft PR #1665 remains open/draft with `status:plan` and mile
   found no other evidence-contract drift.
 - Final S3 root check/test pass at 2,925 files and 4,203/0/19; quality, architecture, exact-pin,
   publish dry-run, and JSR gates completed.
+- Post-IMPL-EVAL generated bundle now records source commit `0fed4d7ff`; its freshness check reports
+  `fresh=true` and no stale paths. Full docs-site verification, SDK lint, and SDK format pass.
 
 ## Next Steps
 
-1. Commit and push S3 by explicit refspec, update PR #1665 metadata, and post the S3 receipt.
-2. Stop for the coordinator's fresh Tier-A review; do not launch or arrange an evaluator.
+1. Commit and push only the two generated assets plus repair run artifacts by explicit refspec.
+2. Post the bounded repair receipt on PR #1665.
+3. Stop for the coordinator's fresh Tier-A and source-to-generated delta evaluation; do not launch
+   or arrange either evaluation.
 
 ## Key Decisions
 
@@ -58,17 +63,17 @@ in `s3-report.md`. Draft PR #1665 remains open/draft with `status:plan` and mile
 
 ## Files Changed
 
-S3 changes exactly `cache-provider.ts`, `cache-store.ts`, `cache-provider_test.ts`, the authorized
-Query Bridge page, and run artifacts. S1 and S2 files remain byte-identical.
+The bounded repair changes exactly the two authorized `.llm/assets/agent-docs/` files plus run
+artifacts. It does not change the landed S1-S3 product, test, or site sources.
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | S3 PASS | SDK/root structured check; SDK lint/fmt wrappers |
+| Static | Repair PASS | SDK lint/fmt wrappers remain clean across 84 files |
 | Fitness | S3 PASS with non-blocking warnings | quality scan has no findings; architecture has zero failures; JSR retains two known warnings |
 | Runtime | S3 PASS | provider/docs proof 1/1; full SDK 66/66; repo-root 4,203 passed, 0 failed, 19 ignored |
-| Consumer | S3 PASS | Query Bridge byte comparison plus repo-root check/test |
+| Consumer | Repair PASS | Agent-docs freshness reports no stale paths; full docs-site verify passes |
 
 The supplemental repository-wide `surface:diff` invocation exits 1 against a stale workspace
 baseline and reports widespread signature changes in untouched packages; it is not represented as
@@ -77,7 +82,8 @@ a pass or as an S1-specific verdict. The direct S1 export proof is an empty diff
 
 ## Open Questions
 
-- Fresh Tier-A S3 review only. This implementation session does not arrange it.
+- Fresh Tier-A and proportionate source-to-generated delta evaluation only. This implementation
+  session does not arrange either one.
 
 ## Drift and Debt
 

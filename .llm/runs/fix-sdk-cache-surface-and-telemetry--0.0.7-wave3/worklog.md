@@ -90,6 +90,8 @@ behind `CacheStore`; it must not change source-query success semantics.
 | 2026-08-15 | S3 | D4 proof | The adjacent provider test captures the real error, verifies the exact module URL, normalizes only that URL, and byte-compares the complete single-line documentation fence. |
 | 2026-08-15 | S3 | D5 implementation | Repaired only `CacheStore.get`/`set`/`delete` JSDoc to describe mandatory read/write/invalidation evidence. The executed ports tag/evidence sweep found no other evidence-contract drift. |
 | 2026-08-15 | S3 | Reconcile | S1/S2 files remain byte-identical. Full focused/root/publish gates were run; the known stale `surface:diff` and exact six raw doc-lint diagnostics remain honestly red. PR metadata is updated after the S3 push; draft state, acceptance boxes, labels, milestone, and issue states remain unchanged. |
+| 2026-08-15 | Post-IMPL-EVAL repair | Agent-docs bundle | Readiness CI exposed branch-caused generated drift from the authorized Query Bridge source edit. Regenerated only `prose.json.gz` and `provenance.json` with `gen:agent-docs-prose`; the immediate porcelain check contained exactly those two assets. |
+| 2026-08-15 | Post-IMPL-EVAL repair | Validation | Agent-docs freshness and full docs-site verification pass; SDK lint/fmt remain clean; both raw doc-lint invocations retain exactly the pinned three-plus-three baseline diagnostics. No root/Aspire/Docker/CLI E2E or evaluator was run. |
 
 ## Decisions
 
@@ -135,6 +137,10 @@ authorized and this slice completed S3 within its exact four-file implementation
 | S3 workspace publish dry run | PASS | exit 0; all SDK entrypoints checked |
 | S3 JSR audit | PASS with 2 known warnings | existing SDK source-cardinality and slow-type-banner warnings |
 | S3 raw doc lint | FAIL (expected baseline, no regression) | Both commands exit 1 with the exact six named diagnostics and no additional diagnostic |
+| Repair agent-docs freshness | PASS | Exit 0; `fresh=true`, `stalePaths=[]`, provenance source commit `0fed4d7ff` |
+| Repair docs-site verify | PASS | Source/render checks pass; 35,342 internal links and 18 caveat markers resolve |
+| Repair SDK lint/format wrappers | PASS | 84 files; zero lint occurrences, format findings, or failed batches |
+| Repair raw doc lint | FAIL (expected baseline, no regression) | Combined and cache-only commands each exit 1 with their exact three named diagnostics; zero new |
 
 ## Handoff Notes
 
@@ -149,3 +155,5 @@ authorized and this slice completed S3 within its exact four-file implementation
 - Keep S1's internal namespace admission, reset, and prologue helpers off `src/cache/mod.ts` and the
   root barrel.
 - Draft PR: https://github.com/rickylabs/netscript/pull/1665
+- The post-IMPL-EVAL generated-assets repair is recorded in
+  `generated-assets-repair-report.md`; stop for the coordinator's fresh Tier-A and delta evaluation.
