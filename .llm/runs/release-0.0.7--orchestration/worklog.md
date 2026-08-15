@@ -784,3 +784,21 @@
   and a stable confirmation window before recording baseline. Response-stage Fetch resumes through
   `continueResponse`, and the same exported stability primitive is driven by the negative late-
   initial-request unit case. Focused tests are 8/0; fresh binding receipts are active. Lease closed.
+
+## 2026-08-15T15:57:31Z — F2 Tier-A passes and the known four-link asset cascade is restored
+
+- #1664's author completed four fresh exact-head receipts at evidence head `b14975af7`: check,
+  4210/0 tests with 19 ignored, publish dry-run, and architecture check all exited 0. The evidence
+  evaluator returned `SUFFICIENT`; fresh features Tier-A independently confirmed the three probe
+  repairs and pushed `63d190d4b`. After a clean Docker/Aspire/browser/port audit, the coordinator
+  granted the singleton S5 lease: `scaffold.runtime` first with cleanup, then `fresh-browser` only
+  after a clean inter-gate audit. PR #1664 stays draft and no evaluator is authorized yet.
+- #1665's original author regenerated exactly the authorized CLI barrel and independently found the
+  next consumer, `packages/mcp/src/publish-assets.generated.ts`, correctly refusing to mutate it
+  outside the `215aae4b2` grant. The fixes supervisor proved `check:publish-assets` is red only on the
+  branch and named one path; exhaustively classified the only fifth candidate as a pre-existing red;
+  and pushed the link-4 amendment and exact closure proof at `92ea9f829` before mutation.
+- Central state already contained the same four-path generated-asset cascade from shipped #1652.
+  Failure to reuse that precedent for #1665 caused two avoidable readiness cycles. The correction is
+  now structural: converge source, corpus, CLI barrel, and MCP publish asset on one content head
+  before fresh Tier-A, the focused delta evaluator, or readiness can resume.

@@ -448,3 +448,13 @@ artifacts; same-author generation, fresh Tier-A, and a focused asset-chain delta
 #1664 corrected head `2c8219968` is pushed and fresh receipts are active: deterministic Refresh-
 driven completed/stable baseline, response-stage `Fetch.continueResponse`, and shared negative late-
 initial-request proof. No runtime lease before fresh Tier-A. #1663 owner boundary is unchanged.
+
+Resume from the authoritative `2026-08-15T15:57:31Z` transition. Main remains `baf1cdf67`.
+#1664 evidence head `b14975af7` has four PASS/SUFFICIENT receipts and fresh features Tier-A PASS at
+topic `63d190d4b`. The features lane owns the singleton S5 runtime lease on a clean host and must run
+`scaffold.runtime` then `fresh-browser` serially with cleanup and audits; the PR stays draft and no
+evaluator is authorized yet. #1665 link-3 author remains active. Fixes checkpoint `92ea9f829` proves
+the branch-caused generated closure is exactly four paths and authorizes only
+`packages/mcp/src/publish-assets.generated.ts` after link 3 lands; no Tier-A/evaluator/readiness
+before all links converge on one content head. #1652 had already recorded this exact cascade, and
+the missed precedent is now explicit drift. #1663's owner-only decision is unchanged.

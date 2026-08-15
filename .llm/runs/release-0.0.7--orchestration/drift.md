@@ -553,3 +553,9 @@ implementation thread.
   request hangs when `initialData` remains fresh, while accepting stable zero lets a late request
   impersonate mutation `+1`. Triggering Refresh establishes a deterministic completed baseline
   before the mutation count begins.
+- **Generated-asset closure must reuse prior dependency evidence:** shipped #1652 already proved the
+  exact Query Bridge cascade through prose assets, the CLI embedded barrel, and the MCP publish
+  asset. #1665 repeated two readiness failures because coordination stopped at each newly failing
+  gate instead of consulting that persisted closure. A docs-source change now requires a historical
+  cascade lookup plus exhaustive checked-in-mirror proof before readiness, not incremental CI
+  discovery one artifact at a time.

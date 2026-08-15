@@ -1138,8 +1138,8 @@
       "branch": "fix/sdk-cache-surface-and-telemetry",
       "worktree": "/home/codex/repos/netscript-007-leaf-sdk-cache",
       "prNumber": 1665,
-      "implementationState": "product_and_corpus_delta_eval_pass_preserved_embedded_agent_docs_barrel_repair_active_after_second_readiness_failure",
-      "dispatchTopicHeadSha": "215aae4b2",
+      "implementationState": "product_and_corpus_delta_eval_pass_preserved_link3_author_active_link4_scope_amended_after_exact_four_link_closure_proof",
+      "dispatchTopicHeadSha": "92ea9f829",
       "planGate": "research and contract decisions only; open one draft PR and stop before implementation; PLAN-EVAL is required",
       "declaredSurface": [
         "packages/sdk/src/cache/cache-provider.ts",
@@ -1216,7 +1216,7 @@
       "implementationEvaluatorCommitSha": "0fed4d7ffb8c655a00846fbf545805bd2e184fb0",
       "implementationEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1665#issuecomment-5302881354",
       "implementationEvaluationScope": "artifact-only impl-eval.md; evaluated product tree remains immutable at 9a26c107a",
-      "readinessState": "blocked_by_branch_caused_agent_docs_corpus_freshness_failure_repair_active",
+      "readinessState": "blocked_until_all_four_generated_asset_links_converge_then_fresh_tier_a_and_delta_eval_pass",
       "readinessRunId": 31892668157,
       "readinessFailureJobId": 95031217843,
       "readinessFailure": "quality failed at Agent docs corpus freshness because the authorized docs/site/web-layer/query-bridge.md edit feeds the checked-in agent-docs bundle; prose.json.gz and provenance.json are stale",
@@ -1238,7 +1238,7 @@
         "unrelatedQueueFlakeIssue": 1667
       },
       "embeddedAgentDocsBarrelRepair": {
-        "state": "scope_amended_same_original_author_dispatch_pending",
+        "state": "same_original_author_active_on_exact_link3_repair",
         "readinessRunId": 31893659579,
         "readinessFailureJobId": 95033583015,
         "failure": "Generated asset freshness runs check:assets-barrel; regeneration changes packages/cli/src/kernel/assets/agent-docs.generated.ts from the old embedded corpus to the fresh prose asset",
@@ -1247,6 +1247,16 @@
           "packages/cli/src/kernel/assets/agent-docs.generated.ts"
         ],
         "requiredReview": "fresh fixes Tier-A plus one proportionate asset-chain fidelity delta evaluator before readiness resumes"
+      },
+      "publishAssetsRepair": {
+        "state": "scope_amended_before_mutation_waiting_for_link3_commit",
+        "scopeAmendmentTopicCheckpointSha": "92ea9f8298ce6a9cd448233a98d56b063ff14c53",
+        "authorizedPaths": [
+          "packages/mcp/src/publish-assets.generated.ts"
+        ],
+        "generatorOrder": "gen:publish-assets must run only after the CLI agent-docs barrel repair lands because the publish generator consumes that barrel",
+        "closureProof": "exactly four branch-caused links; check:mcp-export-corpus is red at both branch and base and is unrelated; check:emitted-samples passes; no fifth checked-in mirror",
+        "historicalPrecedent": "PR #1652 already recorded the same four-path cascade; failure to reuse that known closure is a coordinator/process miss"
       },
       "acceptanceState": "all 5 PR definition-of-done boxes and all 13 issue acceptance boxes on #1598/#1619/#1620/#1623 checked from verified evidence; #1637 defines no boxes",
       "ciSkipSmoke": "plan/run-artifact-only PR #1665 skipped check-test, quality, desktop-native-linux, both scaffold runtimes, scaffold-static, deps-report, surface-diff, close-gate, and lane visibility checks as classified",
@@ -1321,15 +1331,15 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
-      "currentPrHeadSha": "2c82199680e4b3cfc8e93d831acd5d160f0b5db9",
+      "currentPrHeadSha": "b14975af7657869dfb36f5e07d2ef393c1ef989c",
       "issueNumbers": [1355, 1360],
       "implementerAgentId": "01a004f9-f033-7592-a0bc-63927753fb43",
       "implementerRoute": "openai / gpt-5.6-sol / high / approval never / dangerFullAccess",
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "f2_probe_defects_repaired_at_pushed_head_binding_receipts_active_no_lease",
-      "dispatchTopicHeadSha": "7385fac16",
+      "implementationState": "f2_corrected_evidence_tier_a_pass_s5_singleton_runtime_lease_granted_scaffold_runtime_first",
+      "dispatchTopicHeadSha": "63d190d4b",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
       "tierAPlanRepairHeadSha": "f7225be98c01b38f86712c1df0782aec06e34445",
@@ -1403,7 +1413,7 @@
           ]
         },
         "s5": {
-          "state": "blocked_prelease_f2_product_head_requires_same_author_probe_repair",
+          "state": "runtime_lease_granted_scaffold_runtime_then_fresh_browser_serial",
           "finding": "accepted plan release condition 3 is unmet: no payments service add/generate/idempotency, users/payments key-isolation, or live Rename plus exactly-one settled refetch scenario exists in the scaffold.runtime suite",
           "freshBrowserPrecondition": "present: controlled hydrationNow old-versus-fresh fixture and catalog-backed task wiring",
           "f2PlanAmendmentHeadSha": "4be44002079a3a22a581810d12239f800175df12",
@@ -1415,13 +1425,18 @@
           "f2InterceptionFindings": "response-stage Fetch pause incorrectly resumes with Fetch.continueRequest; fixed 750ms baseline does not prove all initial list requests completed and remained stable, so a late initial request can satisfy +1 without a refetch",
           "f2RequiredRepair": "same original author must use Fetch.continueResponse, prove a completed stable baseline across a confirmation window, add a rejecting late-initial-request unit case, renew affected cheap tests and all four receipts at the corrected head, then stop for fresh Tier-A",
           "f2CorrectedProductHeadSha": "2c82199680e4b3cfc8e93d831acd5d160f0b5db9",
+          "f2CorrectedEvidenceHeadSha": "b14975af7657869dfb36f5e07d2ef393c1ef989c",
           "f2HardRecoveryTopicCheckpointSha": "7385fac16",
+          "f2TierAState": "PASS",
+          "f2TierATopicCheckpointSha": "63d190d4be8ecbcc317971ea7a840e64d3553bae",
           "f2CorrectedProof": "Refresh-driven deterministic list baseline; at least one request observed; all observed IDs completed and count stable across confirmation window; response-stage pause resumes with Fetch.continueResponse; shared primitive negative test rejects late initial request",
-          "f2ReceiptState": "fresh four-receipt generation active at corrected head; all 787cfa928 receipts are superseded-only",
+          "f2ReceiptState": "four fresh exact-head receipts PASS and independently SUFFICIENT at b14975af7; all 787cfa928 receipts are superseded-only",
           "f2PlanDesign": "three scaffold/static gates selected by scaffold.service and scaffold.runtime immediately after scaffold.init; one CDP settled-refetch behavior gate selected only by scaffold.runtime after live readiness; pure fail-capable unit assertions and four new exact-head binding receipts before fresh Tier-A",
           "requiredRecovery": "amend an exact bounded CLI e2e gate/probe/test slice, implement on the original Sol/high author, rerun affected cheap tests and all four binding gates, and pass fresh Tier-A before any lease",
-          "leaseState": "not_granted",
-          "runtimeGates": "NOT_RUN"
+          "leaseState": "granted_to_features_after_clean_host_audit",
+          "leaseGrantedAt": "2026-08-15T15:56:55Z",
+          "leasePreflight": "leaf clean and local == remote; zero Docker containers; no Aspire/AppHost/DCP, browser, relevant port, or other lease owner",
+          "runtimeGates": "scaffold.runtime authorized first with cleanup; fresh-browser only after terminal result and clean inter-gate audit; never concurrent"
         }
       },
       "planDecisionBoundary": "cycle 1 ruled direct emitted { queryKey: <svc>Queries.list.clientKey() } with no SDK overload; repair must lock generator-owned output paths, existing service generate overwrite/dry-run/force compatibility, package README homes, post-mutation request-count proof, per-slice paths, and qualified citations",

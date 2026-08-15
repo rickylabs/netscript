@@ -552,3 +552,18 @@ committed head without rewriting history. Runtime ownership remains empty.
 still contains the old corpus. #1664 now forces a Refresh-driven completed/stable list baseline,
 uses `Fetch.continueResponse`, and tests the shared stability primitive against a late initial
 request. Runtime ownership remains empty.
+
+### Live transition — 2026-08-15T15:57:31Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Queue exhausted and parked at `0ca4c489f` | Do not invent post-freeze work |
+| internals | #1663 remains at the exceptional-final-PLAN-EVAL owner boundary on `194e22a3d` | No third evaluator or product mutation without the owner's explicit verdict |
+| fixes | #1665 link-3 author is active; exact four-link closure and link-4 scope amendment are pushed at `92ea9f829` | Finish link 3, then the same author regenerates only link 4; no Tier-A/evaluator/readiness until one closure head |
+| features | #1664 fresh F2 Tier-A passed at evidence head `b14975af7` / topic `63d190d4b`; singleton S5 runtime lease granted | `scaffold.runtime` then `fresh-browser`, serially, with clean audit between and after; no evaluator yet |
+
+#1665's fourth branch-caused link is `packages/mcp/src/publish-assets.generated.ts`; there is no
+fifth checked-in mirror. The identical four-path cascade was already known from shipped #1652, so
+not reusing it when #1665 changed Query Bridge docs is recorded as a coordinator/process miss.
+#1664's lease preflight found zero Docker containers, Aspire/AppHost/DCP or browser processes,
+relevant ports, or competing lease owners. The PR remains draft and labels remain unchanged.
