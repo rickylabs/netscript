@@ -667,3 +667,22 @@
   freshness contracts. Because two formal PLAN-EVAL cycles are already consumed, the coordinator
   surfaced the exact owner-only decision: authorize one exceptional final evaluator or stop the
   leaf. No implementation starts while that decision is pending; other topics continue.
+
+## 2026-08-15T12:21:00Z — independent slice gates catch two stale contracts and release next work
+
+- #1664 S2 required two bounded same-author repairs before acceptance. Tier-A first proved the add
+  path wrote appsettings, workspace membership, and Aspire helpers before the generator's
+  all-manifest contract validation; `f784606d0` extracted a shared preflight and added a true
+  zero-write `addService --with-client` regression. The broader CLI suite then exposed a second,
+  directly S2-caused false positive: `route-templates_test.ts` still required the forbidden
+  `bridgeInvalidation` import. `3669e9b87` replaced that stale assertion with exhaustive SDK import
+  set equality, forbidden-symbol coverage, and direct-literal ordering. Fresh Tier-A independently
+  reproduced 598/0 and asset freshness, passing S2 at features topic `3eab955b1`.
+- Coordinator released #1664 S3 only: canonical cache-age hydration, omission coverage, the
+  public-wrapper browser fixture/task, package README notes, and canonical embedded regeneration.
+  `fresh-browser` and `scaffold.runtime` remain unleased and forbidden until the next Tier-A.
+- #1665 S1 passed fresh Tier-A at product head `0e4e26c51`, fixes topic `f6f8f0fcb`. The supervisor
+  re-executed SDK check/lint/fmt, cache 26/0, whole SDK 65/0, and both raw doc-lint surfaces with
+  exactly the six pinned red diagnostics. Coordinator released S2 only: real Deno KV persistence
+  failure isolation with RED-before/GREEN-after and awaited `closeKv()`/`resetKv()` teardown. S3
+  and every expensive gate remain fenced.

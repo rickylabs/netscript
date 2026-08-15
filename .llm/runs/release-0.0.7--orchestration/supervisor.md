@@ -476,3 +476,17 @@ Draft #1664 is at clean Phase-1 head `6aea4a5ea`. PLAN-EVAL is required. Tier-A 
 repair: preserve `scaffold.runtime` as a suite-owned release gate rather than inventing a run-gate
 catalog entry/receipt, and name the exact two-service/invalidation/hydration assertions. Both
 expensive gates remain load-bearing after cheap convergence; no lease exists yet.
+
+### Live transition — 2026-08-15T12:21:00Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Queue exhausted and parked at `0ca4c489f` | Do not invent post-freeze work |
+| internals | #1663 repaired plan `194e22a3d` passed Tier-A at `b2e0529be`, but two ordinary PLAN-EVAL failures are consumed | No product mutation or exceptional final evaluator before the owner's explicit verdict |
+| fixes | #1665 S1 passed Tier-A at `0e4e26c51` / topic `f6f8f0fcb`; same author executing S2 real-KV isolation | Stop after S2 for fresh Tier-A; no S3, evaluator, Aspire, Docker, or e2e |
+| features | #1664 S2 passed Tier-A at `3669e9b87` / topic `3eab955b1`; same author executing S3 hydration/browser-fixture/docs | Stop after S3 for fresh Tier-A; both expensive gates remain unleased and NOT_RUN |
+
+S2 acceptance on #1664 required both call-graph review and the full CLI suite: the focused suites
+were green while a stale template assertion still encoded the removed bridge import. The repaired
+gate is now executable in all three dimensions: exact allowed import set, forbidden legacy symbol,
+and direct invalidation literal order. Runtime ownership remains empty.

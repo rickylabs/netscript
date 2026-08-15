@@ -115,7 +115,7 @@
         "pid": 26724,
         "bridgeSessionId": "session_014pCd2QWkCscgZpVdjcUPST",
         "remoteControlUrl": "https://claude.ai/code/session_014pCd2QWkCscgZpVdjcUPST",
-        "topicHeadSha": "7658df7e2",
+        "topicHeadSha": "f6f8f0fcb",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle"
@@ -166,7 +166,7 @@
         "sessionId": "19621a0b-c6a0-47c6-b826-93c1634a6875",
         "bridgeSessionId": "session_01LQBHX8KpA5aYtDraq46J8a",
         "remoteControlUrl": "https://claude.ai/code/session_01LQBHX8KpA5aYtDraq46J8a",
-      "topicHeadSha": "6ea7a17fb",
+      "topicHeadSha": "3eab955b1",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
         "legacyState": "parked_idle"
@@ -1131,15 +1131,15 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
-      "currentPrHeadSha": "cd5193b66175b981f32e8ca5abd8b41f913068c7",
+      "currentPrHeadSha": "0e4e26c51e9dcbac7dbd0e30eb5db19130e4d7d0",
       "issueNumbers": [1637, 1619, 1620, 1598, 1623],
       "implementerAgentId": "01a00516-2033-7ed3-936a-a616cee47447",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/sdk-cache-surface-and-telemetry",
       "worktree": "/home/codex/repos/netscript-007-leaf-sdk-cache",
       "prNumber": 1665,
-      "implementationState": "plan_eval_pass_s1_fail_safe_telemetry_cardinality_active_same_author",
-      "dispatchTopicHeadSha": "7658df7e2",
+      "implementationState": "s1_tier_a_pass_s2_real_kv_persistence_isolation_active_same_author",
+      "dispatchTopicHeadSha": "f6f8f0fcb",
       "planGate": "research and contract decisions only; open one draft PR and stop before implementation; PLAN-EVAL is required",
       "declaredSurface": [
         "packages/sdk/src/cache/cache-provider.ts",
@@ -1175,10 +1175,19 @@
       "planEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1665#issuecomment-5302080198",
       "implementationSlices": {
         "s1": {
-          "state": "active_same_original_author",
+          "state": "complete_tier_a_pass",
+          "headSha": "0e4e26c51e9dcbac7dbd0e30eb5db19130e4d7d0",
+          "topicCheckpointSha": "f6f8f0fcb",
+          "commentUrl": "https://github.com/rickylabs/netscript/pull/1665#issuecomment-5302163687",
           "scope": "fail-safe evidence validation and bounded namespace cardinality/prologue in three cache product files plus cache telemetry tests and SDK README",
           "constraints": "partway invalidation rollback, normal data return on malformed evidence, request-local first overflow, composite no-admission until real operation, try/finally reset, internal helpers stay off cache/mod.ts",
-          "stop": "focused structured evidence then Tier-A; no S2/S3 or expensive gate"
+          "validation": "fresh Tier-A re-executed structured SDK check/lint/fmt with zero findings, cache tests 26/0, full SDK suite 65/0, and both raw doc-lint surfaces with exactly the six pinned red diagnostics and zero new or vanished findings"
+        },
+        "s2": {
+          "state": "active_same_original_author",
+          "scope": "post-loader real Deno KV persistence-limit isolation in cache-query.ts plus the new cache-query-kv-limit_test.ts and run artifacts",
+          "constraints": "real in-memory Deno KV RED-before/GREEN-after, exact payload return and uncached miss, cache.write error evidence, awaited closeKv/resetKv teardown, lookup/queryFn/setCachedData remain fail-loud",
+          "stop": "structured SDK and root regression evidence then Tier-A; no S3 or expensive gate"
         }
       },
       "ciSkipSmoke": "plan/run-artifact-only PR #1665 skipped check-test, quality, desktop-native-linux, both scaffold runtimes, scaffold-static, deps-report, surface-diff, close-gate, and lane visibility checks as classified",
@@ -1253,15 +1262,15 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
-      "currentPrHeadSha": "5ac6efa308599eac9290977215af5c951fcf46ee",
+      "currentPrHeadSha": "3669e9b8730dae3ef65b4dee02d5ce5770a467b7",
       "issueNumbers": [1355, 1360],
       "implementerAgentId": "01a004f9-f033-7592-a0bc-63927753fb43",
       "implementerRoute": "openai / gpt-5.6-sol / high / approval never / dangerFullAccess",
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "s1_tier_a_pass_s2_generator_contract_active_no_expensive_gate",
-      "dispatchTopicHeadSha": "6ea7a17fb",
+      "implementationState": "s2_tier_a_pass_after_two_fail_fix_rounds_s3_canonical_hydration_docs_active_no_expensive_gate",
+      "dispatchTopicHeadSha": "3eab955b1",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
       "tierAPlanRepairHeadSha": "f7225be98c01b38f86712c1df0782aec06e34445",
@@ -1301,9 +1310,21 @@
           "validation": "focused SDK check and 2/2 tests pass; quality gate pass; two pre-existing QueryClient private-type-ref diagnostics carried as baseline"
         },
         "s2": {
-          "state": "active_same_original_author",
+          "state": "complete_tier_a_pass_after_two_fail_fix_rounds",
+          "headSha": "3669e9b8730dae3ef65b4dee02d5ce5770a467b7",
+          "topicCheckpointSha": "3eab955b1",
+          "commentUrl": "https://github.com/rickylabs/netscript/pull/1664#issuecomment-5302177061",
           "scope": "CLI generator contract, emitted import allowlist and literal order, atomic missing-contract behavior, owned modules for Enabled:false, generated asset freshness",
-          "stop": "Tier-A before S3; no scaffold.runtime or fresh-browser"
+          "validation": "fresh Tier-A reproduced full CLI source suite 598/0 and asset freshness; C2 validates every existing manifest contract before renderService or any write; C1 exhaustively equals the two allowed SDK imports, forbids bridgeInvalidation, and orders direct clientKey invalidation after queries",
+          "failFixes": [
+            "addService originally wrote appsettings/workspace/Aspire helpers before all-manifest contract validation; repaired with a shared preflight and zero-write add-path regression",
+            "route-templates_test.ts still demanded the removed bridgeInvalidation import; repaired in-slice with exhaustive import-set equality, forbidden-symbol, and literal-order assertions"
+          ]
+        },
+        "s3": {
+          "state": "active_same_original_author",
+          "scope": "canonical cache-age hydration in both service showcase islands, generated omission coverage, public-wrapper browser fixture/task, CLI and Fresh package README notes, canonical embedded asset regeneration",
+          "stop": "focused cheap CLI/Fresh evidence then Tier-A and pre-expensive-gate review; no fresh-browser or scaffold.runtime lease yet"
         }
       },
       "planDecisionBoundary": "cycle 1 ruled direct emitted { queryKey: <svc>Queries.list.clientKey() } with no SDK overload; repair must lock generator-owned output paths, existing service generate overwrite/dry-run/force compatibility, package README homes, post-mutation request-count proof, per-slice paths, and qualified citations",

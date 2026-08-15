@@ -505,3 +505,12 @@ implementation thread.
   evaluator exposed a real generated publish consumer and the repaired plan now passes fresh
   Tier-A. The coordinator cannot silently invent cycle three; one exceptional final evaluator is an
   explicit owner decision, while product mutation remains prohibited and independent lanes proceed.
+- **Component atomicity does not compose through a mutating caller:** #1664's generator validated
+  all contracts before its own writes, but `addService` had already mutated appsettings, workspace,
+  and Aspire helpers. A true add-path zero-write test and shared preflight were required; a green
+  generator-only atomicity test could not prove the caller contract.
+- **A proven product correction can make an old test the false positive:** after #1664 correctly
+  removed `bridgeInvalidation`, the full CLI suite—not the focused service suites—found a template
+  test still demanding that forbidden import. The assertion was repaired in the same slice to
+  prove exact import-set equality, absence, and literal order. A later slice label cannot justify
+  knowingly carrying a red suite or a stale already-disproven contract.

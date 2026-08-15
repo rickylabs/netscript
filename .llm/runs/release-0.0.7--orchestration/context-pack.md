@@ -381,3 +381,12 @@ count, and the original Codex author is executing S1 only. #1663's repaired thir
 clean at `194e22a3d`, Tier-A PASS at `b2e0529be`, but implementation remains blocked at the genuine
 owner boundary because both ordinary plan-evaluation cycles failed; a single exceptional final
 PLAN-EVAL was recommended and requested. #1664 S2 remains active independently. No runtime lease.
+
+Resume from the authoritative `2026-08-15T12:21:00Z` transition. Main remains `baf1cdf67`. #1664
+S2 is Tier-A PASS at leaf `3669e9b87`, features topic `3eab955b1`, after two real FAIL_FIX rounds:
+pre-write add-path contract validation and the stale `bridgeInvalidation` template assertion. The
+same author is executing S3 only; neither `fresh-browser` nor `scaffold.runtime` is leased or
+authorized. #1665 S1 is Tier-A PASS at `0e4e26c51`, fixes topic `f6f8f0fcb`; the same author is
+executing S2 only with a real in-memory Deno KV RED/GREEN proof and awaited singleton teardown.
+#1663 remains unchanged at its exceptional-final-evaluator owner boundary. Preserve all native
+topic supervisors and original Codex authors; serialization remains per topic only.
