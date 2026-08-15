@@ -119,38 +119,35 @@ contract.
 lease. And uniquely here: the leaf may **read** the OpenHands workflows but must not **fire** them —
 no dispatch, no evaluator trigger, manual or by label.
 
-### Current state — implementation complete, awaiting IMPL-EVAL grant
+### Current state — #1658 merge-ready, awaiting the coordinator's merge decision
 
-**All five planned slices are implemented and Tier-A signed off.** Leaf head
-`f46d84630c54210a09ff4ed39537da1e66964a52`, local = remote = PR, worktree clean. PR **#1658** draft
-at `status:impl`, milestone `0.0.7`, closing **#1611** + **#1613**.
+| Field        | Value                                                                                |
+| ------------ | ------------------------------------------------------------------------------------ |
+| PR head      | `bf07062987088809133ccacd380be6b016b511ed` (local = remote = PR, clean)              |
+| State        | `OPEN`, `draft=false`, **`MERGEABLE/CLEAN`**                                         |
+| Labels       | `type:fix`, **`status:impl-eval`**, `area:tooling`, `priority:p1`                    |
+| CI           | terminal, 68 checks: **8 SUCCESS / 60 SKIPPED / 0 failures**, all at this head       |
+| `close-gate` | **SUCCESS** at the PR head — independent confirmation the acceptance set is complete |
+| Boxes        | PR 0 unchecked; #1611 and #1613 both 0 unchecked, both `status:ready-merge`          |
+| Threads      | 0 total / 0 unanswered                                                               |
 
-| Slice                         | Implementation            | Sign-off    |
-| ----------------------------- | ------------------------- | ----------- |
-| S1 refusal/recursion guard    | `4aa04de34` / `f1567ce32` | `6f725ad3b` |
-| S2 formal producer contract   | `28a8a9184` / `5869cb46d` | `0886c2427` |
-| S3 CLI live-head binding      | `d7fdbb1d9` / `2e6a065d7` | `d3d31b3d0` |
-| S4 pre-spend workflow + retry | `9b71e1bd2` / `ab4b8185f` | `ad19d0e20` |
-| S5 final evidence             | `1390d3ead` / `704c067e8` | `f46d84630` |
+Gate lineage: plan `cea999d18` → PLAN-EVAL `PASS` (`e15d78588`) → S1–S5 with five Tier-A sign-offs →
+IMPL-EVAL `PASS` at `f46d84630` (`8f62a6121`, comment `5301699397`) → F7 drift fix `5be6e08ba` → F1
+acceptance `bf0706298`.
 
-Gate lineage: plan `cea999d18` → PLAN-EVAL `PASS` (`e15d78588`, comment `5301255122`) → S1–S5.
+**One item for the coordinator before merge:** the PR carries `status:impl-eval`, set by the
+draft→ready automation, while `netscript-pr` requires `status:ready-merge` to merge. Both closing
+issues already carry it. Relabelling and merge are coordinator-owned.
 
-**Whole-leaf surface is exactly the eight contracted paths** — no ninth, no catalog/config edit,
-`openhands-phase-eval.yml` untouched. Supervisor-verified `deno task test` → **4,147 passed / 0
-failed**; final `check`/`test`/`quality-job` receipts PASS; no lock churn.
+**No provider spend from the ready flip:** `impl-eval:skip` was absent, but the `OpenHands runner`
+workflow is `skipped` at this head and all `Phase eval PR` runs completed with only their `dispatch`
+job. Standing rule recorded: apply `impl-eval:skip` **before** the flip whenever a native formal
+IMPL-EVAL has already passed.
 
-**DoD:** rows 1–7 evidence-ready; **row 8 not satisfied** (IMPL-EVAL has not run). PR body unchanged
-and draft — checkbox completion and lifecycle transition are the evaluator's and coordinator's.
-
-**N1–N5 all discharged**, verified against the landed slices rather than the summary. N1 corrected a
-Tier-A rationale of mine; N5 made the permission ceiling real (`GITHUB_TOKEN` under `contents: read`
-
-- `issues: write`, PAT claim-only).
-
-### Blocking coordinator action
-
-**Formal IMPL-EVAL grant.** Not launched — no evaluator, no OpenHands dispatch, no evaluator label,
-no readiness flip, no merge. Nothing is running in the internals lane.
+**Open non-blocking follow-ups from IMPL-EVAL:** F2 (add the formal case to the existing
+round-trip), F2b (export `HEURISTIC_TOKEN_RE` rather than asserting a copy), F3 (import
+`OPENHANDS_REFUSAL_MARKER_PREFIX` instead of re-hardcoding the marker), F4 (named exit code instead
+of an unhandled rejection on a missing `head.sha`).
 
 ### Remaining internals queue after this leaf
 
