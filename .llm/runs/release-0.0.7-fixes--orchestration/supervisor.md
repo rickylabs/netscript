@@ -634,3 +634,86 @@ stays queued until the coordinator's terminal merge.
 Neither implementation lane may self-certify. The topic orchestrator performs the Tier-A
 substantive slice review after automated gates, and a separate opposite-family IMPL-EVAL remains
 mandatory before coordinator handoff.
+
+---
+
+## HANDOFF — low-credit pause, 2026-08-15
+
+### Exact state at pause
+
+| Item | Value |
+| --- | --- |
+| Topic branch | `orchestrator/release-0.0.7-fixes` @ **`c8cada87e7d80eed4dc8d75e5aba59c4776357f3`**, local == remote, **clean** |
+| Leaf branch | `fix/sdk-cached-entry-swr` @ **`9aa54ae2d4f53c705b0309ed472abf7bbccebe41`**, local == remote == PR #1669 head, **clean** |
+| PR #1669 | draft, sole `status:plan`, base `main` |
+| Active work | IMPL-EVAL job `f40814ce` — **still running** in its own session (state `working`) |
+| Hygiene | zero Docker containers; zero leaked temp worktrees; no runtime lease held |
+
+Nothing is uncommitted anywhere. Both branches are pushed and remote-synchronized.
+
+### Milestone position
+
+Fixes lane, milestone 0.0.7. **Five leaves shipped**: #1243/PR#1643, #1262+#1263+#1588/PR#1654,
+#1358/PR#1657, #1448/PR#1661, and #1598+#1619+#1620+#1623+#1637/PR#1665 (merged as main
+`3e8e146a4`). **Current leaf**: `sdk-cached-entry-swr` (#1461) on PR #1669.
+
+#1669 is **implementation-complete and Tier-A PASSED**, awaiting only the in-flight IMPL-EVAL:
+
+- PLAN-EVAL PASS at `23db20f30` (artifact `d555cc971`)
+- S1 Tier-A PASS at `e100ea205` — A2/A3 implemented, sleep-free determinism proof, F-1 resolved
+  honestly at 497 lines with documentation restored
+- S2-A Tier-A PASS at `ef3e43f06` — plan-only amendment for the baseline predicate defect
+- S2 Tier-A PASS at `9aa54ae2d` — RED/GREEN reproduced independently, root test `4206/0/19`
+
+### First recovery action
+
+**Read `/home/codex/.claude/jobs/f40814ce/state.json`.** Do **not** launch a second IMPL-EVAL — a
+rival evaluator is the one thing that would damage this leaf's gate integrity.
+
+- Identity: session `f40814ce-5b41-49ae-8cf2-e65014de01de`, PID `634990`, bridge
+  `session_01CMrdm9P2YwHxiNCT49C4Hf`
+  (`https://claude.ai/code/session_01CMrdm9P2YwHxiNCT49C4Hf`), route `claude-fable-5` · medium ·
+  Remote Control — **matched**, bound to head `9aa54ae2d`.
+- If `state` is terminal: read
+  `.llm/runs/fix-sdk-cached-entry-swr--0.0.7-wave5/impl-eval.md` for the verdict, confirm the
+  evaluator's commit is **artifact-only** (`git diff --name-only 9aa54ae2d..HEAD` outside
+  `.llm/runs/` must be empty), and confirm its PR comment posted.
+- If `state` is still `working`: leave it alone and wait. It has its own budget.
+
+**On IMPL-EVAL PASS**: report the merge-readiness tuple to the coordinator. Do **not** merge, tick
+acceptance boxes, relabel, or flip out of draft — all four are coordinator-owned. Expect the CI green
+on a draft PR to be **vacuous** (most lanes `skipped`); real lanes run only after the PR leaves draft.
+
+**On FAIL_FIX**: resume the same original author `01a00646-82a9-7ec2-88e7-16dea98a58fa` in
+`/home/codex/repos/netscript-007-leaf-cached-entry`. Never create a replacement thread.
+
+### Carried facts a successor must not rediscover
+
+- **Pre-existing reds, not this leaf's**: `surface:diff` (fails at base too — compare base-vs-head
+  sets, not raw counts), JSR `F-DOCT-5` (13 children at base *and* head), and the six pinned raw
+  doc-lint occurrences across **five** unique symbols (`KvCacheStore.prototype.get` emits two at one
+  location). None may be reported as green.
+- **#1667** — `packages/queue/tests/typed-queue_test.ts` DLQ flake, signature `expected 1, got 2`.
+  Non-deterministic and unrelated to this branch. Report once; never rerun seeking green.
+- **A1** — the S2 page-level sentence is **manual evidence**.
+  `.llm/tools/docs/check-accuracy-and-discoverability.ts` has `requireText`/`forbidText` helpers but
+  **no chapter-3 assertion**, so a `docs-accuracy` receipt cannot prove it. This was a supervisor
+  error caught by the previous evaluator.
+- **Next queued leaf**: `sdk-typed-error-channel` (#1350, wave 1). Release only after #1669 merges
+  **and** its issue/PR shipped lifecycle is terminal.
+
+### Operating lessons earned this run
+
+1. `agentic:codex-resume` **exit 0 is not delivery proof** — it returns 0 while reporting
+   `thread-store conflict: already has an active writer`. Prove delivery by grepping the target
+   rollout for a distinctive brief phrase, run idle checks in a **separate command** from the
+   dispatch they gate, and retry on conflict.
+2. The practical steering guarantee is "before the author's **current turn** ends", not "before
+   commit". A correct pre-commit finding can still land after a commit; that is acceptable on a draft
+   PR and preferable to corrupting a live turn.
+3. **A gate's stated expectation is not proof the gate can evaluate it** — open the implementation
+   before claiming a criterion is mechanically enforced.
+4. A `deno task` line reading "cached, inputs unchanged" is **not a verdict** when inputs changed;
+   re-run the underlying wrapper uncached.
+5. A fitness gate exists to force a design question; satisfying it by deleting the answer inverts its
+   purpose. Never accept "no debt" for a file sitting one line inside a boundary.
