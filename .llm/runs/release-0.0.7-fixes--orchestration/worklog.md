@@ -1061,3 +1061,44 @@ PR leaves draft, so this is not yet the full merge-gate signal.
 
 Readiness preserved and unchanged; no box, label, draft, or merge mutation. `#1350` remains held until
 #1669 merge is terminal.
+
+## 2026-08-15 — #1669 SHIPPED; #1670 filed; #1350 released
+
+**#1669 terminal.** Merged 2026-08-15T19:39:50Z as main `0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb`
+from exact head `313cc08d5` — the IMPL-EVAL-bound head, so no verdict was stranded. #1461 `CLOSED`/
+`COMPLETED` one second later with **6/6** boxes checked; PR and issue both normalized to sole
+`status:shipped`. Sixth fixes leaf shipped this milestone.
+
+**#1670 filed** — exactly one issue, from the accepted draft:
+`https://github.com/rickylabs/netscript/issues/1670`, milestone `Backlog / Triage`, labels
+`type:docs`, `area:sdk`, `priority:p3`, `status:triage`. The explicit non-blocking framing survived
+(4 matches incl. "these pages are **not wrong**"), so the debt cannot later be misread as a #1461
+acceptance failure.
+
+**#1350 released** — `sdk-typed-error-channel`, wave 1, archetype 1-small-contract with a `docs`
+overlay.
+
+| Field | Value |
+| --- | --- |
+| Thread | `01a006f3-ae2d-7941-bd17-2ac71dd3d0f0` @ 2026-08-15T21:43:48Z |
+| Worktree | `/home/codex/repos/netscript-007-leaf-typed-error` |
+| Branch | `fix/sdk-typed-error-channel` (no upstream by design) |
+| Base | `main@0ef48c2ec` — the #1669 merge commit |
+| Route | openai · `gpt-5.6-sol` · medium — requested/observed **matched** |
+| Pre-launch git safety | `head=0ef48c2ec upstream=NONE dirty=0`; brief 7184 bytes, contract-valid |
+
+**The one DAG edge was verified, not assumed.** `#1348 → #1350` is `rfc-prerequisite`. #1348's body
+records "Stage 0 is accepted", `- [x] RFC 0001 is merged in the house shape and is the normative
+contract for 0.0.7`, and `- [x] #1350 owns procedure metadata preservation`. The prerequisite is
+genuinely satisfied, so #1348's OPEN state does not block. The brief instructs the author explicitly
+**not** to close, tick, or relabel #1348, and to treat the merged RFC as normative wherever #1350's
+historical proposal text conflicts with it.
+
+Two lessons from the previous leaf were written into the brief as obligations: enumerate **every**
+line of an error-handling narrative with an explicit disposition rather than fixing one sentence and
+leaving the surrounding story false, and name the expected **RED** because a test that only passes
+after the change proves nothing. The known pre-existing reds (`surface:diff`, `F-DOCT-5`, pinned
+doc-lint, #1667's `expected 1, got 2`) are handed over so they are reported red rather than
+rediscovered.
+
+Plan-first: no implementation before PLAN-EVAL PASS. No runtime lease; no Aspire/Docker/`e2e:cli`.
