@@ -419,6 +419,69 @@ decisive gate and amend the slice-2 comment with the removal rationale.
 requested — a leaf must not enter the formal gate carrying a known unrecorded coverage regression.
 Slice 6 remains blocked on the ungranted `scaffold.runtime` singleton lease regardless.
 
+#### T-1 RESOLVED — Tier-A PASS at `ebad68c80bc9079ba835901eb2245a1a31ab7b62`
+
+Bounded fix-up dispatched to the same thread `019ffcca-8be0…` at immutable base `cab6d1feb`;
+returned one commit `ebad68c80 test(cli): restore mssql loopback regression`, clean, pushed.
+
+Diff is **+55 lines across 3 files** — `generators_test.ts` (+21), leaf `worklog.md` (+28),
+leaf `context-pack.md` (+6). `git diff --name-only cab6d1feb..HEAD -- . ':(exclude).llm/**'
+':(exclude)*_test.ts'` is **empty**: no product source changed, exactly as bounded. `deno.lock`
+unchanged; `docker ps -a` empty.
+
+**Gates re-executed independently by this lane:**
+
+| Gate | Result |
+| --- | --- |
+| Slice-2 decisive gate | `exitCode 0`, **10 passed / 0 failed** |
+| `deno task quality:scan` | `ok: true`, **0 findings**, 7 allowances — all pre-existing, none in a touched file |
+| `deno task arch:check` | raw exit **0**, no doctrine FAIL rows |
+| `git diff --check cab6d1feb..HEAD` | clean |
+| `deno task check:assets-barrel` | raw exit **0** — embedded assets are in sync with templates |
+
+**The restored case is a superset of the deleted one.** It pins the `tcp:` strip, the
+`[host,port]` split with the `1433` default, `port.trim() || '1433'`, `normalizeSqlServerHost(host.trim())`,
+**all three** loopback spellings (`127.0.0.1`, `::1`, `[::1]`), `return 'localhost'`, and the
+empty-host fallback `return host || 'localhost'`. The deleted case pinned only `127.0.0.1` and
+`return 'localhost'`. Coverage is strictly better than before slice 2.
+
+**The four-engine matrix is intact** — all five `forbidden` lists unchanged, no assertion weakened.
+Anchored `it()` counts: base `5b3c6fcf2` = **11**, slice 2 `cab6d1feb` = **8**, now = **9**. The
+remaining −2 versus base is genuine consolidation, and the accounting justifies each case
+individually.
+
+**The five-case accounting is complete and checkable.** Each removed case is dispositioned as
+*subsumed by the matrix* with the specific covering assertion named, or *restored here*. Spot-checked
+two: the postgres case's `defineConfig, env` / `env('DATABASE_URL')` / `normalizePostgresUrl` claims
+are present in the matrix's `prismaRequired`, and the sqlite construction claims are present in both
+`engineRequired` and the retained dedicated case.
+
+**RED-first was genuinely demonstrated, and honestly reported.** The first probe — mutating the
+`.template` source alone — returned raw exit 0 with 10 passing. Rather than claim RED, the thread
+recorded it as a false-green and diagnosed the cause: **these generator tests consume
+`embedded.generated.ts`, not the `.template` files**, so a template edit is invisible until
+`gen:assets-barrel` mirrors it. After regenerating, the restored assertion produced the expected
+**RED (raw exit 1)**; source was restored verbatim (embedded file back to sha256
+`2f82179c3dbbb875d9c499aa93704b12d543da8f23ebb9e91b44d0d87147e3d7`) and the gate returned **GREEN
+(raw exit 0)**. Reporting a false-green as a discovery instead of dressing it up as RED is the
+behavior this gate exists to get.
+
+That seam is worth carrying forward but is **not an open hole**: `deno task check:assets-barrel`
+(`deno.json:115`) regenerates and `git diff --exit-code`s the embedded barrels, and it passes at
+this head. Template-vs-embedded drift is caught by that dedicated gate, not by the unit tests — the
+plan already lists asset freshness in its gate family, which is correct.
+
+The thread also recorded that the scoped lint/fmt wrappers **failed closed** (raw exit 2, three
+attempts) because `deno.json` excludes `packages/cli/`, and it refused to report false-green
+evidence; it re-ran them under a temporary no-exclude config preserving the repository
+`recommended`/`jsr` rules, got 0 findings on the one touched file, and removed the temporary config.
+That is the correct handling of a wrapper that cannot see its target, and it matches the
+independently-known fact that `packages/cli` sits outside root `deno fmt` (recorded as N2 on #1643).
+
+**Tier-A verdict: PASS** for T-1 and slices 2–5. The leaf-level supervisor sign-off commit is
+deliberately **not** made yet: the final implementation head does not exist until slice 6 runs, and
+slice 6 needs the singleton lease. IMPL-EVAL is not launched.
+
 ## Wave 0 lane assignments
 
 | Leaf | Branch | Implementation route | Formal evaluator (per `dispatch.json`) |
