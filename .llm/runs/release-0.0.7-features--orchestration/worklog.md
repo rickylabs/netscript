@@ -4078,3 +4078,57 @@ scenario itself passes, which attempt 4 could not tell us.
 All prior evidence preserved append-only: three earlier S5 attempts with hashed raw logs, every
 S4/F4/F5 report and receipt, and the carried Fresh 45 / SDK 3 baselines with plugin-streams named
 separately. No repair, retry, or browser gate was run under the lease. No evaluator.
+
+## 2026-08-15 — F6 plan amendment Tier-A: `PASS` at `36da13fa1e8ffcff5a9d9ce930634655675bbcda`
+
+local == remote == PR #1664 (draft); receipt `#issuecomment-5303765269`. **Run-artifact-only
+confirmed** — `git diff 7df60832a..36da13fa1` outside `.llm/runs/` is empty.
+
+### The discriminator question is answered with runtime evidence, not assumption
+
+I asked whether the runtime supports a typed property or only message matching, because those differ
+materially in robustness. The amendment investigated rather than guessed (`plan.md:720-731`): Deno's
+`ChildProcess.kill` returns `void` and documents **no typed exception, error code, or state
+predicate** for an already-exited process, so the narrowest available discriminator is the
+conjunction
+
+```ts
+error instanceof TypeError && error.message === 'Child process has already terminated'
+```
+
+**Only that conjunction is tolerated.** A different `TypeError`, a non-`TypeError` carrying the same
+message, or any other thrown value is rethrown unchanged, and "no bare catch is allowed". That is the
+honest answer to a question whose comfortable answer would have been a bare `catch`.
+
+### All four requirements met, two exceeded
+
+| Requirement | Status |
+| --- | --- |
+| Named helper, tolerates only the known condition, awaits status/drain, no swallowing | **met** — `terminateBrowserProcess(child, drain)`; status awaited explicitly even though Deno documents it as never rejecting, "to prove process reaping and sequencing" |
+| Deterministic already-terminated proof | **met** — spawn, attach raw stderr drain, await natural successful exit, call helper, require no throw plus the same resolved status and completed drain. Reproduces attempt 4 with no browser and no runtime suite |
+| Active-child termination proof | **met** — the existing allow-all E2E unit seam supports a real `Deno.Command`, so no new harness. I had explicitly permitted declining this if the seam did not support it; the amendment confirmed it does rather than taking the exit |
+| Unrelated-error propagation | **exceeded** — three cases, not one: an unrelated `TypeError` propagates as the exact object; a **non-`TypeError` carrying the terminated message is rejected**, pinning both halves of the conjunction; and a rejecting raw drain propagates after a successful kill/status |
+
+The second negative case matters most. A message-only check would pass every other test in the plan
+while silently widening the tolerance; only that case pins the `instanceof` half.
+
+### Two things the author caught that I had not required
+
+1. **A second swallow in the same teardown.** The drain becomes the raw `pipeTo(...)` promise instead
+   of the current eagerly-swallowed `.catch(() => {})`, so unrelated drain errors propagate too. I had
+   flagged only the kill; the same defect class sat one line away.
+2. **Correct layering of the two cleanups.** Profile removal stays in an **enclosing** `finally`, so
+   an unrelated termination or drain error is preserved for the caller while the temporary profile
+   still gets its best-effort removal. The tolerant cleanup does not shadow the intolerant one.
+
+A production-delegation assertion also pins that the probe calls the helper and **no longer contains
+an unguarded `child.kill('SIGTERM')` in its `finally`** — a regression guard on the exact defect site.
+
+### Ceiling
+
+Exactly the two already-owned paths, with an explicit prohibition on new source, test, template,
+fixture, barrel, task, catalog, SDK/Fresh, `docs/**`, or `deno.lock`, and a third path stopping the
+repair for another amendment and fresh Tier-A. Unchanged and stated: CDP client close, refetch
+evidence shape, request baseline, response-stage resume, and all browser assertions.
+
+**Verdict `PASS`.** Repair released to the same author for the two owned paths.
