@@ -89,7 +89,9 @@ gate.
 | #1656 `quality-scan-root-coverage`           | merged `7737d8903` — #1542 CLOSED/COMPLETED, `status:shipped` |
 | **`openhands-dispatch-claim-and-refusal`**   | **ACTIVE** — bootstrap/research/plan, stops at the plan gate  |
 
-Live `main` = `7737d8903bb2925c3fcefbda362168fe297eebd4` — the new immutable base.
+Live `main` = `7737d8903bb2925c3fcefbda362168fe297eebd4` — the new immutable base. Its post-merge
+workflow set is **terminal and clean**: run `31871224548` (`ci`) COMPLETED/SUCCESS, and across all 8
+runs at that exact SHA there are **0 pending, 0 failed**. No further main polling is required.
 
 ### Active leaf identity
 
@@ -98,6 +100,8 @@ Live `main` = `7737d8903bb2925c3fcefbda362168fe297eebd4` — the new immutable b
 - Codex thread `01a00443-abab-7261-8905-74ed71467929`, `openai · gpt-5.6-sol · medium`, route
   matched
 - Steering: `codex exec resume 01a00443-abab-7261-8905-74ed71467929 -- "<follow-up>"`
+- Draft PR **#1658** `fix(agentic): bind OpenHands dispatch claims and refusals` @ `ca2266ecb`,
+  `type:fix`/`area:tooling`/`status:research`, milestone `0.0.7`
 - Run dir
   `.llm/runs/release-0.0.7-internals--orchestration/slices/openhands-dispatch-claim-and-refusal/`
 - Closes exactly **#1611** (p1, dispatch helper must emit phase/head and acquire the existing claim)
