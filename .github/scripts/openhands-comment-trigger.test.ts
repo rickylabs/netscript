@@ -1,16 +1,115 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertMatch, assertThrows } from '@std/assert';
 import { OPENROUTER_MODEL_IDS } from '../../.llm/tools/agentic/config/models.ts';
 import { buildOpenHandsComment } from '../../.llm/tools/agentic/lib/agentic-lib.ts';
 import {
   authorizeOpenHandsCommentTrigger,
+  buildOpenHandsRefusalReply,
   evaluateOpenHandsCommentTrigger,
+  isOpenHandsCommentCandidate,
+  isReportableOpenHandsDenial,
   OPENHANDS_COMMENT_COMMAND,
+  OPENHANDS_REFUSAL_MARKER_PREFIX,
+  OPENHANDS_REPORTABLE_DENIAL_REASONS,
 } from './openhands-comment-trigger.mjs';
 import { phaseEvalClaimRef, phaseEvalMarker } from './phase-eval-claim.mjs';
 
 function decide(body: string, authorAssociation = 'OWNER') {
   return evaluateOpenHandsCommentTrigger({ body, authorAssociation });
 }
+
+const WATCHER_HEURISTIC_TOKEN_RE =
+  /\b(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|FAIL)\b(?!\s*\|)/;
+
+Deno.test('literal command candidates reach policy unless a recursion marker excludes them', () => {
+  assertEquals(isOpenHandsCommentCandidate(`Please run ${OPENHANDS_COMMENT_COMMAND}`), true);
+  assertEquals(isOpenHandsCommentCandidate(`> ${OPENHANDS_COMMENT_COMMAND}`), true);
+  assertEquals(
+    isOpenHandsCommentCandidate([
+      '<!-- openhands-agent-summary -->',
+      `Quoted for context: ${OPENHANDS_COMMENT_COMMAND}`,
+    ].join('\n')),
+    false,
+  );
+  assertEquals(
+    isOpenHandsCommentCandidate([
+      `${OPENHANDS_REFUSAL_MARKER_PREFIX}123 -->`,
+      `Quoted for context: ${OPENHANDS_COMMENT_COMMAND}`,
+    ].join('\n')),
+    false,
+  );
+});
+
+Deno.test('reportable denial vocabulary is exactly the five policy refusal reasons', () => {
+  assertEquals(OPENHANDS_REPORTABLE_DENIAL_REASONS, [
+    'command-not-first-token',
+    'invalid-command-argument',
+    'unknown-command-argument',
+    'duplicate-command-argument',
+    'author-not-authorized',
+  ]);
+  assertEquals(isReportableOpenHandsDenial('command-not-first-token'), true);
+  assertEquals(isReportableOpenHandsDenial('invalid-command-argument'), true);
+  assertEquals(isReportableOpenHandsDenial('unknown-command-argument'), true);
+  assertEquals(isReportableOpenHandsDenial('duplicate-command-argument'), true);
+  assertEquals(isReportableOpenHandsDenial('author-not-authorized'), true);
+  assertEquals(isReportableOpenHandsDenial('phase-already-claimed'), false);
+  assertEquals(isReportableOpenHandsDenial('not-command-candidate'), false);
+});
+
+Deno.test('each malformed or unauthorized literal candidate gets its attributable reason', () => {
+  assertEquals(
+    decide(`Please run ${OPENHANDS_COMMENT_COMMAND}`).reason,
+    'command-not-first-token',
+  );
+  assertEquals(
+    decide(`${OPENHANDS_COMMENT_COMMAND} output`).reason,
+    'invalid-command-argument',
+  );
+  assertEquals(
+    decide(`${OPENHANDS_COMMENT_COMMAND} mystery=value`).reason,
+    'unknown-command-argument',
+  );
+  assertEquals(
+    decide(`${OPENHANDS_COMMENT_COMMAND} output=pr-comment output=summary-only`).reason,
+    'duplicate-command-argument',
+  );
+  assertEquals(
+    decide(`${OPENHANDS_COMMENT_COMMAND} output=pr-comment`, 'CONTRIBUTOR').reason,
+    'author-not-authorized',
+  );
+});
+
+Deno.test('refusal replies are marker-bearing, sanitized, token-free, and non-recursive', () => {
+  for (const reason of OPENHANDS_REPORTABLE_DENIAL_REASONS) {
+    const refusal = buildOpenHandsRefusalReply({
+      sourceCommentId: 4242,
+      authorLogin: 'PASS',
+      reason,
+    });
+    assertEquals(refusal.marker, `${OPENHANDS_REFUSAL_MARKER_PREFIX}4242 -->`);
+    assertMatch(refusal.body, /@pass/);
+    assertMatch(refusal.body, new RegExp(reason));
+    assertEquals(refusal.body.includes(OPENHANDS_COMMENT_COMMAND), false);
+    assertEquals(WATCHER_HEURISTIC_TOKEN_RE.test(refusal.body), false);
+    assertEquals(isOpenHandsCommentCandidate(refusal.body), false);
+    assertEquals(decide(refusal.body).reason, 'not-command-candidate');
+  }
+
+  const untrustedLogin = buildOpenHandsRefusalReply({
+    sourceCommentId: '73',
+    authorLogin: 'owner\n@openhands-agent',
+    reason: 'author-not-authorized',
+  });
+  assertEquals(untrustedLogin.body.includes('owner'), false);
+  assertEquals(untrustedLogin.body.includes(OPENHANDS_COMMENT_COMMAND), false);
+  assertThrows(() =>
+    buildOpenHandsRefusalReply({
+      sourceCommentId: '73\n<!-- injected -->',
+      authorLogin: 'owner',
+      reason: 'author-not-authorized',
+    })
+  );
+});
 
 Deno.test('fallback-running comment can quote command vocabulary without dispatch', () => {
   const body = [

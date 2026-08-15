@@ -44,7 +44,7 @@ import {
   wslHome,
   wslUser,
 } from './agentic-lib.ts';
-import { assert, assertEquals } from '@std/assert';
+import { assert, assertEquals, assertThrows } from '@std/assert';
 import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
 import { formatReleasePrCreationError } from '../../release/cut.ts';
 
@@ -350,11 +350,54 @@ Deno.test('buildOpenHandsComment emits the trigger line and body', () => {
   assert(first.includes('effort=xhigh'), 'carries effort');
   assert(body.includes('use harness'), 'includes the prompt body');
 });
+Deno.test('buildOpenHandsComment emits a validated formal phase and immutable head pair', () => {
+  const head = 'a'.repeat(40);
+  const body = buildOpenHandsComment({
+    model: 'x/y',
+    phase: 'plan',
+    head,
+    prompt: 'use harness\n## SKILL\n- x',
+  });
+  const first = body.split('\n')[0];
+  assert(first.includes('phase=plan'), 'formal command carries phase');
+  assert(first.includes(`head=${head}`), 'formal command carries immutable head');
+});
+Deno.test('buildOpenHandsComment rejects incomplete or malformed formal tuples', () => {
+  const head = 'a'.repeat(40);
+  assertThrows(() =>
+    buildOpenHandsComment({
+      phase: 'impl',
+      prompt: 'use harness\n## SKILL\n- x',
+    })
+  );
+  assertThrows(() =>
+    buildOpenHandsComment({
+      head,
+      prompt: 'use harness\n## SKILL\n- x',
+    })
+  );
+  assertThrows(() =>
+    buildOpenHandsComment({
+      phase: 'review' as 'plan',
+      head,
+      prompt: 'use harness\n## SKILL\n- x',
+    })
+  );
+  assertThrows(() =>
+    buildOpenHandsComment({
+      phase: 'impl',
+      head: 'not-an-immutable-head',
+      prompt: 'use harness\n## SKILL\n- x',
+    })
+  );
+});
 Deno.test('buildOpenHandsComment omits unset tokens and strips CRLF', () => {
   const body = buildOpenHandsComment({ model: 'x/y', prompt: 'use harness\r\n## SKILL\r\n' });
   const first = body.split('\n')[0];
   assert(!first.includes('iterations='), 'no iterations token when unset');
   assert(!first.includes('output='), 'no output token when unset');
+  assert(!first.includes('phase='), 'non-formal command has no phase token');
+  assert(!first.includes('head='), 'non-formal command has no head token');
   assert(!body.includes('\r'), 'CRLF stripped from body');
 });
 

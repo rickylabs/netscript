@@ -1,0 +1,36 @@
+{
+  "gateId": "test",
+  "invocationId": "openhands-dispatch-s3-test",
+  "argv": [
+    "deno",
+    "task",
+    "test"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-openhands-dispatch",
+  "gitHead": "d7fdbb1d9e86e30100781ba420a4340b1a16abc6",
+  "actualGitHead": "d7fdbb1d9e86e30100781ba420a4340b1a16abc6",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:478011",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "dea5411037d3c2da9ae86c0aa2b93d7bd0478a058b7deff839f6a1005f280a66",
+  "lifecycleId": "worker:478011:openhands-dispatch-s3-test:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T08:41:45.608Z",
+  "startedAt": "2026-08-15T08:41:45.615Z",
+  "finishedAt": "2026-08-15T08:46:58.364Z",
+  "durationMs": 303668,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 272,
+    "sha256": "fc81aafa3f641f1ec19728c191b989a96a711db5c71cca5b47b830ec3829a47a",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\"],\"cwd\":\"/home/codex/repos/netscript-007-openhands-dispatch\",\"exitCode\":0,\"durationMs\":303484,\"summary\":{\"passed\":4145,\"failed\":0,\"ignored\":19,\"totalResults\":4164,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 127,
+    "sha256": "d8c71713aba1eb302702bcf55c321886c40fa2beba1801afb19ff811dd358567",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mtest\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all\n",
+    "truncated": false
+  }
+}
