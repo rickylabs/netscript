@@ -40,6 +40,8 @@
 | 2026-08-15T00:13:41Z | Slice 4 reconcile: the only new PR comment is the recorded slice-3 implementation evidence; #1262/#1263/#1588 remain open and PR #1654 remains draft at exactly one `status:impl`. No external finding or authorized lifecycle/scope change appeared. | live PR read; prior live issue reads |
 | 2026-08-15T00:19:39Z | Slice 5 extended the existing live database verifier to prove the generated `Seed User` list row, defined `NOT_FOUND` responses for a guaranteed-missing GET/PATCH/DELETE ID, and all three 404 OpenAPI projections in the later shared runtime execution. Its focused, structured check/test/lint/fmt and required package gates are green without starting a runtime. | focused verifier tests; structured wrappers; `quality:scan`; `arch:check` |
 | 2026-08-15T00:19:39Z | Slice 5 reconcile: the only new PR comment is the recorded slice-4 implementation evidence; #1262/#1263/#1588 remain open and PR #1654 remains draft at exactly one `status:impl`. No external finding or authorized lifecycle/scope change appeared. | live PR read; prior live issue reads |
+| 2026-08-15T03:56:02Z | T-1 bounded fix-up restored the removed MSSQL Aspire loopback regression case without changing the four-engine required/forbidden matrix. The case pins `tcp:` stripping, comma/port parsing with the `1433` default, `127.0.0.1`/`::1`/`[::1]` normalization, and empty-host fallback in generated MSSQL Prisma output. The source-only mutation stayed green because tests consume the embedded registry; regenerating the temporary mutation produced the expected RED, then both product files were restored to their original hashes before the final PASS. | `generators_test.ts`; structured RED/GREEN wrapper output; product-file hashes |
+| 2026-08-15T03:56:02Z | T-1 reconcile: PR #1654 remains open and draft at exactly one `status:impl`; its remote head was the immutable fix-up base `cab6d1feb8` before this commit, and the latest external input remained this thread's slice-5 comment. No lifecycle, scope, lease, issue-link, milestone, or closing-keyword change is authorized. | live PR read |
 
 ## Gate evidence
 
@@ -63,6 +65,32 @@
 | 5 | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts --file packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts --ext ts` | PASS, raw exit 0; 2 files, 0 findings |
 | 5 | `deno task quality:scan` | PASS, raw exit 0; 0 findings, 7 pre-existing bounded allowances |
 | 5 | `deno task arch:check` | PASS, raw exit 0; no doctrine FAIL rows (warning-only baseline census retained) |
+| T-1 probe | Structured decisive test after neutralizing the source asset only | EXPECTED-SEAM DISCOVERY, raw exit 0; 10 passed because the generator test hydrates the embedded registry |
+| T-1 probe | `deno task gen:assets-barrel` after temporary source neutralization | PASS, raw exit 0; mirrored the temporary branch into the consumed registry |
+| T-1 RED | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/src/kernel/templates/database/generators_test.ts` | EXPECTED FAIL, raw exit 1; restored MSSQL case rejected the missing `127.0.0.1` loopback predicate |
+| T-1 restore | `deno task gen:assets-barrel` after restoring the source verbatim | PASS, raw exit 0; restored the embedded file to SHA-256 `2f82179c3dbbb875d9c499aa93704b12d543da8f23ebb9e91b44d0d87147e3d7` |
+| T-1 GREEN | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/src/kernel/templates/database/generators_test.ts` | PASS, raw exit 0; 10 structured results passed, 0 failed; source-level `it()` count is 9 |
+| T-1 lint setup | Three scoped wrapper attempts using the workspace/member configuration | FAIL-CLOSED, raw exits 2, 2, 2; Deno excluded `packages/cli/`, and the wrapper refused false-green evidence |
+| T-1 lint | `run-deno-lint.ts --file packages/cli/src/kernel/templates/database/generators_test.ts --ext ts,tsx` with a temporary no-exclude config preserving the repository `recommended`/`jsr` rules | PASS, raw exit 0; 1 file, 0 findings; temporary config removed |
+| T-1 fmt setup | Scoped wrapper attempt using the workspace configuration | FAIL-CLOSED, raw exit 2; Deno excluded `packages/cli/`, and the wrapper refused false-green evidence |
+| T-1 fmt | `run-deno-fmt.ts --file packages/cli/src/kernel/templates/database/generators_test.ts --ext ts,tsx` with a temporary no-exclude config preserving repository formatting rules | PASS, raw exit 0; 1 file, 0 findings; temporary config removed |
+| T-1 | `deno task quality:scan` | PASS, raw exit 0; 0 findings, 7 pre-existing bounded allowances |
+| T-1 | `deno task arch:check` | PASS, raw exit 0; no doctrine FAIL rows (warning-only baseline census retained) |
+| T-1 | `git diff --check` | PASS, raw exit 0; no whitespace errors |
+
+## Slice 2 test-consolidation accounting — T-1
+
+Slice 2 changed the source-level `it()` count from 11 to 8 by replacing five cases with the
+four-engine matrix plus one stronger SQLite construction case. T-1 raises the count to 9 without
+altering any matrix entry or forbidden-symbol assertion.
+
+| Removed case | Disposition | Specific current coverage |
+| ------------ | ----------- | ------------------------- |
+| `generates Prisma config with Aspire env key and sqlite fallback URL` | **Subsumed by the matrix.** | SQLite `engineRequired` pins `resolveConnectionString('PRIMARY_DB_URI', 'file:./alpha_app.db')`; `prismaRequired` pins the direct `defineConfig` import and `'file:./alpha_app.db'`; its forbidden list excludes all server normalizers/parsers. The dedicated SQLite construction case additionally pins the env-key → `DATABASE_URL` → fallback chain. |
+| `generates Prisma config with the env import and fallback for postgres` | **Subsumed by the matrix.** | PostgreSQL `prismaRequired` pins `defineConfig, env`, `env('DATABASE_URL')`, and `normalizePostgresUrl`. |
+| `normalizes mssql Aspire loopback endpoints to hostname URLs` | **Restored here.** | The additive case pins generated `tcp:` stripping, `[host, port]` splitting, the `1433` default, all three loopback spellings, and empty-host fallback. |
+| `generates engine modules with adapter setup where required` | **Subsumed by the matrix.** | MSSQL `engineRequired` pins `PrismaMssql`, `MssqlClient`, and `normalizeMssqlUrl`; the same matrix iteration generates both engine-module and Prisma-config output while forbidding PostgreSQL/MySQL helpers. |
+| `constructs the sqlite engine module with the libsql driver adapter` | **Subsumed by the matrix.** | SQLite `engineRequired` pins `PrismaLibSql`, `SqliteClient`, and the exact config-key/file fallback; the retained dedicated case strengthens this with the typed client import, both `PrismaLibSql` construction sites, and the no-adapter prohibition. |
 
 `scaffold.runtime`, Aspire, and Docker remain forbidden until the coordinator-owned global
 expensive-gate lease is explicitly granted. The eventual one-pass verdict is shared by all three

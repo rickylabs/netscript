@@ -51,6 +51,12 @@
   sequence without starting the runtime.
 - Implementation slices 2–5 are complete. Slice 6 remains unstarted and lease-blocked pending the
   topic orchestrator's substantive Tier-A review and explicit singleton expensive-gate grant.
+- T-1 restores the one lost slice-2 behavior pin as an additive ninth source-level `it()` case:
+  generated MSSQL output must retain `tcp:`/comma/`1433` endpoint parsing, normalize
+  `127.0.0.1`/`::1`/`[::1]` to `localhost`, and fall back to `localhost` for an empty host. The
+  four-engine required/forbidden matrix remains unchanged. A temporary source+embedded
+  neutralization produced raw exit 1, both product files were restored to their original hashes,
+  and the final structured test/lint/fmt plus `quality:scan`/`arch:check` evidence is green.
 - Opposite-family IMPL-EVAL remains mandatory after implementation and Tier-A review.
 - Same-thread steering must use the exact Deno-suite command in `codex-thread-ids.md`; direct
   `codex exec resume` is prohibited.

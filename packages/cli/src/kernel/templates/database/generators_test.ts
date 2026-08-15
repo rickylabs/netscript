@@ -209,6 +209,27 @@ describe('database template generators', () => {
     }
   });
 
+  it('normalizes mssql Aspire loopback endpoints to hostname URLs', () => {
+    const mssql = registry.get('mssql');
+    const output = generatePrismaConfig(mssql, {
+      configKey: 'mssql',
+      databaseName: 'netscript',
+    });
+
+    assertStringIncludes(output, "const trimmed = value.replace(/^tcp:/i, '');");
+    assertStringIncludes(
+      output,
+      "const [host = 'localhost', port = '1433'] = trimmed.split(',', 2);",
+    );
+    assertStringIncludes(output, 'host: normalizeSqlServerHost(host.trim())');
+    assertStringIncludes(output, "port: port.trim() || '1433'");
+    assertStringIncludes(output, "host === '127.0.0.1'");
+    assertStringIncludes(output, "host === '::1'");
+    assertStringIncludes(output, "host === '[::1]'");
+    assertStringIncludes(output, "return 'localhost'");
+    assertStringIncludes(output, "return host || 'localhost'");
+  });
+
   it('constructs sqlite with the libsql adapter and generated typed client', () => {
     const sqlite = registry.get('sqlite');
     const output = generateEngineMod(sqlite, {
