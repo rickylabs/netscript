@@ -119,3 +119,72 @@ coordinator to untick if the close-gate wants a clean slate.
 
 S1 Tier-A **PASS** at `dc034d680`. Slice 2 is not authorized by this review. No evaluator, no runtime
 lease, no #1348/#1466 mutation; PR draft at sole `status:plan`.
+
+---
+
+# Tier-A — S2 at `ca7ade409be0cc0c064e75f5bfa1bd109e06d013`
+
+| Field | Value |
+| --- | --- |
+| Head | `ca7ade409be0cc0c064e75f5bfa1bd109e06d013` — local == remote == PR, clean, draft, sole `status:plan` |
+| Commit | `ca7ade409 fix(sdk): preserve typed service errors` |
+| Verdict | **PASS** |
+
+## Scope — exact
+
+`errors.ts`, `ports/service-client.ts`, `readme-doctest_test.ts`, plus two **existing** run
+artifacts. No seventh path, no new file, and **no docs work** — both published pages remain untouched
+for slice 3.
+
+## The two `@ts-expect-error` markers — converted to real proofs
+
+This was the requirement most likely to be satisfied vacuously, and it was not. Zero
+`@ts-expect-error` and zero `@ts-ignore` remain; the diff adds **no** `as any`, `as unknown as`, or
+`@ts-ignore`. Both became positive `Assert<Equal<…>>` assertions:
+
+- `_SafePreservesExactErrorCode` — `Equal<typeof discriminated.error.code, ExpectedBaseErrorCode>`,
+  proving the six-literal union survives `safe()`;
+- `_UndeclaredBaseErrorRejected` — `Equal<Extract<'NOT_DECLARED', BaseErrorCode>, never>`, proving a
+  non-defined code is rejected;
+- `_SafePreservesNotFoundData` — code-specific data preserved under narrowing;
+- plus a value-level `const preservedCode: ExpectedBaseErrorCode = discriminated.error.code`.
+
+**The author also closed a vacuity hole I had not named.** `_EmptyBaseMetaSlotPreserved` asserts
+`Equal<BaseMeta, Record<never, never>>`, which would pass trivially if `BaseMeta` were `any` — so it
+added `_BaseMetaIsNotAny` asserting `Equal<IsAny<BaseMeta>, false>` alongside it. That is the
+difference between a type test and a type test that can actually fail.
+
+## Constraints held
+
+| Constraint | Evidence |
+| --- | --- |
+| `SafeFailure<TError = ThrowableError>` retained exactly | `errors.ts:71` |
+| No local zod map, no ambient redeclaration | diff adds 0 `from 'zod'` / `declare module` / `declare global` |
+| No `NetScriptProcedureMeta` | absent from both `packages/sdk/src` and `packages/contracts/src` |
+| No additional boxes ticked | still 3, unchanged from S1 |
+| #1348 / #1466 | untouched |
+
+## S1 RED evidence — preserved, with a note
+
+`worklog.md` shows 16 deleted lines, which against an append-only instruction warranted checking
+rather than assuming. It is a **table reflow**, not evidence loss: the S1 RED row survives verbatim at
+`:73` — "recorded TS18046 (`unknown`) and TS2339 (`never`) together in one structured run; not rerun
+for tidier output" — and `TS18046` still appears three times. The deletions are old rows re-emitted
+with new column padding, plus the S1→S2 closing paragraph.
+
+Non-blocking note: strictly, the file was rewritten rather than appended. No evidence was altered or
+removed, so this does not fail the slice, but a literal append would have made the check unnecessary.
+
+## Gates — executed by this review
+
+| Gate | Result |
+| --- | --- |
+| check (`sdk` + `contracts`, 105 files) | 0 occurrences, 0 failed batches |
+| `readme-doctest_test.ts` | **3 / 0** (2 at S1) |
+| `packages/sdk` + `packages/contracts` suites | **78 / 0** (77 at S1) |
+| lint / fmt (`packages/sdk`) | 0 / 0 |
+
+## Outcome
+
+S2 Tier-A **PASS** at `ca7ade409`. Slice 3 (both docs pages) is **not** authorized by this review. No
+evaluator, no runtime lease, no #1348/#1466 mutation; PR draft at sole `status:plan`.
