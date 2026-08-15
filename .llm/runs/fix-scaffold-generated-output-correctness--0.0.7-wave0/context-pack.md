@@ -7,7 +7,7 @@
 - Approved coordinator artifacts:
   `/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/`.
 - No upstream; explicit push refspec only; draft PR against `main`; no merge or publication.
-- Draft PR: #1654, labeled with exactly one phase label, `status:plan-eval`, and milestone `0.0.7`.
+- Draft PR: #1654, labeled with exactly one phase label, `status:impl`, and milestone `0.0.7`.
 - Housekeeping intake head: `42572af323e396d061d8b2e99e0f6a4c62076c31`; local and remote
   branch heads matched and the branch still had no upstream.
 - One grouped `scaffold.runtime` execution/receipt; never split the three issues.
@@ -27,8 +27,12 @@
   OD-2 as the direct generator no-`modelName` contract, adds `generate-engine-mod.ts` and exact
   proves/gate/files accounting to slices 2–6, and records the existing tutorial baseline-row claim
   as verified-by-inspection in scope.
-- Current hard stop: cycle 2 requires an updated immutable source brief and a separate explicit
-  coordinator grant. This plan-author thread does not launch or request it.
+- PLAN-EVAL cycle 2 recorded `PASS` at evaluated head `5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5`;
+  evaluator commit `b8fc5eb53a530d337602f7dc377239651a57d428` closes the plan gate.
+- Implementation slices 2–5 are active in the original same thread. Slice 6 remains the current
+  hard stop because no singleton expensive-gate lease exists.
+- Slice 2 emits only the selected provider's URL helpers in engine modules and Prisma config;
+  SQLite retains direct env/fallback resolution, `PrismaLibSql`, and its generated typed client.
 - Opposite-family IMPL-EVAL remains mandatory after implementation and Tier-A review.
 - Same-thread steering must use the exact Deno-suite command in `codex-thread-ids.md`; direct
   `codex exec resume` is prohibited.

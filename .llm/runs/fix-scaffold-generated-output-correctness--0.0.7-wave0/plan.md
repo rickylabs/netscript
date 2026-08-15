@@ -2,11 +2,11 @@
 
 ## Status
 
-**PLAN-EVAL CYCLE 1 FAIL_PLAN REPAIRED; IMPLEMENTATION BLOCKED.** Research is complete and the
-design remains non-mechanical. Coordinator comment `5286194892` authorizes the exact
-generator/scaffolder seams below. Product implementation remains prohibited until the coordinator
-supplies an updated immutable source brief and separately grants a fresh opposite-family PLAN-EVAL
-cycle 2; only an unqualified PASS permits implementation.
+**PLAN-EVAL CYCLE 2 PASS; IMPLEMENTATION ACTIVE THROUGH SLICE 5.** Research is complete and the
+design remains binding. Coordinator comment `5286194892` authorizes the exact generator/scaffolder
+seams below, and evaluator commit `b8fc5eb53a530d337602f7dc377239651a57d428` records cycle-2
+`PASS` against evaluated head `5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5`. Slices 2–5 may
+proceed in order. Slice 6 remains prohibited until the singleton expensive-gate lease is granted.
 
 ## Frozen boundary
 
@@ -218,9 +218,8 @@ After explicit lease:
 
 ## Plan gate
 
-Decision: **PLAN-EVAL required**. Cycle 1 recorded `FAIL_PLAN`; this same-thread repair resolves its
-three binding findings without implementation. Cycle 2 may start only after an updated immutable
-source brief and a separate explicit coordinator grant. A fresh native opposite-family evaluator
-must review this repaired plan and append its verdict to `plan-eval.md`. Implementation may resume
-only on an unqualified PASS committed to this branch. This thread does not launch, request, or
-simulate cycle 2.
+Decision: **PLAN-EVAL required and satisfied**. Cycle 1 recorded `FAIL_PLAN`; the same-thread repair
+resolved its three binding findings. A fresh native opposite-family evaluator then recorded cycle-2
+`PASS` in `plan-eval.md` at evaluator commit `b8fc5eb53a530d337602f7dc377239651a57d428`.
+That verdict authorizes ordered implementation slices 2–5 only; it does not grant the singleton
+lease required by slice 6 and does not replace Tier-A review or the mandatory IMPL-EVAL.
