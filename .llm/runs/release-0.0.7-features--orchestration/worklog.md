@@ -3224,3 +3224,56 @@ single stale timestamp is a reason to look, never a reason to act.
 
 Holding position and monitoring to the author's own stop. `fresh-browser` remains NOT_RUN, no lease
 is held or requested, and no evaluator is launched.
+
+## 2026-08-15 — F3 check receipt FAIL is **leaf-caused**, proven by executed experiment
+
+`receipts/s4-f3-check.json` is terminal **FAIL / exit 1** at `6e822a74b` (`gitHead ==
+actualGitHead`). Structured diagnostic: 2,937 files, 25 batches, **1 failed batch**, one occurrence
+of **TS2322 "Type 'Timeout' is not assignable to type 'number'"** at
+`verify-producer-reconnect.ts:268:5`. The FAIL receipt is preserved; no retry-to-green was attempted
+and no further receipts were generated.
+
+### The import change
+
+| Head | Probe imports |
+| --- | --- |
+| `b14975af7` (four check receipts **passed**) | `import { walk } from '@std/fs'; import { join, relative } from '@std/path';` |
+| `6e822a74b` (check **FAILS**) | `import { join, relative } from 'node:path';` — `@std/*` gone, custom walker added |
+
+### Three-way executed proof — "file unchanged" was correctly rejected as a defence
+
+`verify-producer-reconnect.ts` is untouched by this leaf. That proves nothing on its own, because
+what changed is not the file but its **type environment**. I ran the single-variable experiment:
+
+| Test | Batch | Result |
+| --- | --- | --- |
+| **A** | victim file **alone** | **PASS**, rc 0 |
+| **B** | victim + F3 probe (`node:path`) | **FAIL** — TS2322 at `:268` |
+| **C** | victim + same probe, only `node:path` → `@std/path` swapped, run in a detached worktree at `6e822a74b` so relative imports resolve | **PASS** — both files check clean |
+
+The only variable between B and C is the import specifier. Conclusion: importing `node:path` pulls
+Node's global typings into the shared check graph, so `setTimeout` resolves to `NodeJS.Timeout`
+rather than `number`, and an unrelated file's explicit `number` timeout id stops type-checking.
+**Leaf-caused, by batch composition.**
+
+An earlier attempt at test C failed with two errors because I had copied the probe outside its
+directory and broken its relative imports — an artefact of my setup, not a result. Re-run properly in
+a detached worktree, it passes. Recording that because a discarded bad measurement is part of the
+evidence trail, and reporting only the clean run would misrepresent how the conclusion was reached.
+
+### Why this class of red is dangerous
+
+Nothing in the diff touches the failing file, so every cheap heuristic — "did we change it?",
+"is it in our surface?" — says not ours. The structured wrapper's batching is what couples them, and
+only an executed before/after can separate coincidence from cause. This is the fourth distinct
+instance on this leaf of a claim that reads true at one layer and false at the layer beneath.
+
+### Bounded amendment, checkpointed before any repair
+
+Scope: **restore `@std/path` in the already-authorized probe** — evidence-based per test C, not
+inferred — and keep the custom walker only if it does not reintroduce Node typings; otherwise restore
+`@std/fs` `walk` as at `b14975af7`. Nothing else changes. No retry-to-green, no other receipts, no
+lease.
+
+The author is currently running its own isolated pre-F3 archive check on the same thread; the repair
+dispatches at its stop, on that same thread, with no replacement.
