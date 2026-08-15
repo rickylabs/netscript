@@ -2,21 +2,86 @@
 
 ## Re-baseline
 
-- Carried-in source: issues #1604, #1618, and #1622 plus the coordinator's frozen contract.
+- Carried-in source: live issues #1604, #1618, and #1622 plus the coordinator's frozen contract.
 - Re-derived against `main` @ `05fc3132b6800a85eb6152691a961b658962571b` on 2026-08-15.
-- What changed vs the carried-in version: pending live issue and source research.
+- The local branch differed from that immutable base only by the harness bootstrap commit while this
+  research was performed; none of the researched product paths differed from the base.
+- What changed vs the issue reports: their three defects reproduce at this base. Root `fmt:check`
+  already supplies a wrapper-level fixture exclusion (`deno.json:139-148`), but the issue's exact
+  standalone scoped command does not inherit task arguments and still aborts. That distinction is
+  load-bearing for the plan.
+
+## Live issue contracts
+
+| Issue | Current state                     | Acceptance that constrains the plan                                                                                                                                                                                           |
+| ----- | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #1604 | open, `priority:p2`, milestone 27 | Package-cwd task green; all three paths cwd-independent or explicitly skipped; no assertion removed/weakened.                                                                                                                 |
+| #1618 | open, `priority:p2`, milestone 27 | Exact scoped formatter exits 0 with no crashed batches; malformed doctor fixture remains malformed and tested; a real source formatting defect is reported as a formatting finding; sibling invalid-config fixtures surveyed. |
+| #1622 | open, `priority:p2`, milestone 27 | Widening and narrowing `closeScoreGap` both make a test fail; misleading boundary label corrected; empirical rationale recorded.                                                                                              |
 
 ## Findings
 
-| # | Finding | How to verify |
-| - | ------- | ------------- |
-| 1 | Pending research. | Pending `file:line` evidence. |
+| #   | Finding                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | `file:line` / command evidence                                                                                                                                                                                                                                                           |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1  | `packages/cli` defines its canonical package test as `deno test --allow-all`, so `deno task --cwd packages/cli test` deliberately runs every nested CLI/E2E unit with `packages/cli` as process cwd.                                                                                                                                                                                                                                                                      | `packages/cli/deno.json:14-22`.                                                                                                                                                                                                                                                          |
+| R2  | Exactly three tests fail under that cwd. The structured targeted reproduction selected only the three named test files and returned `passed: 3`, `failed: 3`: the documented-stream test cannot read `docs/site/durable-workflows/streams.md`; quickstart drift cannot read `docs/site/quickstart.vto`; the service-env script-existence test cannot stat `packages/cli/e2e/.../configure-service-env.ts`.                                                                | `run-deno-test.ts --cwd packages/cli -- --allow-all <three files>`; test locations below.                                                                                                                                                                                                |
+| R3  | The service-env failure is not the subprocess probe. The gate registry intentionally stores `GATE_DIR` relative to repository root and returns a relative script argument for the fixture gate, while the test calls `Deno.stat(script)` directly. The same test already derives `REPO_ROOT` from `import.meta` and uses it for subprocess cwd, so the honest fix is to resolve the asserted command path against that root without changing the production gate command. | `packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-gates.ts:26-27,46-64`; `packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-gates_test.ts:31-34,96-102,124-143`.                                                                            |
+| R4  | The quickstart drift test directly reads a repo-root-relative string. Its assertion compares every marked shell line with `QUICKSTART_DOCUMENTED_COMMANDS`; only path acquisition is defective.                                                                                                                                                                                                                                                                           | `packages/cli/e2e/tests/presentation/quickstart-command-drift_test.ts:4-15`.                                                                                                                                                                                                             |
+| R5  | The documented-stream test calls a helper whose `DOC_PATH` and `.llm/tmp` paths are process-cwd-relative. The failing read is `DOC_PATH`; the helper then extracts and actually imports the published example. Anchoring repository-owned source/scratch paths to a module-derived repo root retains the semantic runtime assertion.                                                                                                                                      | `packages/cli/e2e/src/application/gates/scaffold/run-documented-stream-example.ts:1-15,21-30,33-39`; `run-documented-stream-example_test.ts:4-35`.                                                                                                                                       |
+| R6  | The malformed MCP fixture is deliberate and exactly malformed as reported: `workspace` is a string, while Deno expects an array/object workspace config. The doctor test reads the fixture by module-derived absolute path and asserts `deno_workspace: fail`; changing the fixture would destroy the test.                                                                                                                                                               | `packages/mcp/tests/fixtures/doctor/broken/deno.json:1`; `packages/mcp/tests/doctor-families_test.ts:10-33`; `project-wiring-doctor-family.ts:78-87`.                                                                                                                                    |
+| R7  | The exact formatter reproduction selects 115 TS/TSX files, exits 1, reports one failed batch and zero findings, then identifies a config-parse crash. Wrapper-level `--exclude '^packages/mcp/tests/fixtures/doctor/'` selects 110 files and exits 0. Passing explicit `--config deno.json` selects all 115 and exits 0 because it disables nested auto-discovery.                                                                                                        | Research commands recorded in this session; wrapper filtering and explicit-config support are at `.llm/tools/run-deno-fmt.ts:67-87,103-201,255-301,312-331`; crash refusal at `:370-415,439-488`.                                                                                        |
+| R8  | The supported in-repo solution that keeps the issue's exact no-extra-flag command is Deno's root configuration exclusion. Root `exclude` is the cross-tool mechanism for a directory Deno should never discover as real configuration; `fmt.exclude`/CLI `--ignore` are formatter-only mechanisms. This plan uses the narrow cross-tool root exclusion for the deliberately invalid fixture tree; the doctor test's explicit runtime read is unaffected.                  | Root `exclude` currently contains only `.llm/tmp/` at `deno.json:10-12`; official Deno config reference: `https://docs.deno.com/runtime/reference/deno_json/#exclude`; formatter-specific alternative: `https://docs.deno.com/runtime/reference/cli/fmt/#including-and-excluding-files`. |
+| R9  | Root `fmt:check` already excludes the doctor fixture at the wrapper-selection layer, which is why only editing that task would not fix the acceptance command and would leave the false-green blind spot.                                                                                                                                                                                                                                                                 | `deno.json:139-148` versus the exact issue command with no `--exclude`.                                                                                                                                                                                                                  |
+| R10 | `GUIDANCE_RANKING_POLICY.closeScoreGap` is a typed exported internal-module policy value of `0.5`. `orderGuidanceSections` first sorts by route/score/identity, then groups candidates whose score is at most that value below the group leader, and reorders each close group by slug.                                                                                                                                                                                   | `packages/mcp/src/domain/docs/guidance-index.ts:20-44,181-211`.                                                                                                                                                                                                                          |
+| R11 | The only close-score unit uses a 10.4 leader and 9.8 `outside-leader-band`, but that candidate's `pages/gamma` slug already sorts last. Widening the band therefore does not alter the asserted order. No just-inside control exists either, so narrowing is also unpinned.                                                                                                                                                                                               | `packages/mcp/tests/guidance-retrieval_test.ts:76-95`; live #1622 mutation evidence reports `0.5 -> 5` remained green.                                                                                                                                                                   |
+| R12 | The empirical rationale can be made exact without inventing score-scale meaning: the observed pair's gap is about `0.3019801981861221`; `0.5` leaves `0.1980198018138779` headroom, about 2.6 times the observed regeneration movement `0.0748587451731435`.                                                                                                                                                                                                              | Live #1622 body; policy definition `guidance-index.ts:33-44`.                                                                                                                                                                                                                            |
+| R13 | The full repository has no other deliberately malformed `workspace: "packages/*"` fixture. The healthy MCP sibling correctly uses an array.                                                                                                                                                                                                                                                                                                                               | `rg` over `packages/**`, `plugins/**`, `.llm/tools/**`; `packages/mcp/tests/fixtures/doctor/healthy/deno.json:1`.                                                                                                                                                                        |
 
-## jsr-audit surface scan (package/plugin waves)
+## jsr-audit surface scan
 
-- Surface scanned: pending exact touched publishable-member selection.
-- Slow-type / surface risks: pending.
+JSR audit is applicable because the plan touches two publishable workspace members, even though the
+CLI edits are under its publish-excluded E2E harness and MCP's public export map does not change.
+
+### `@netscript/cli`
+
+- Export map: `.`, `./scaffolding`, and `./testing`; binary `netscript`
+  (`packages/cli/deno.json:6-13`).
+- Planned edits are only under `packages/cli/e2e/**`, which the publish allow/exclude rules omit
+  (`packages/cli/deno.json:57-76`). No public symbol, export key, binary, or publish asset changes.
+- Exact internal `@netscript/*` pins are all `0.0.6`: aspire, config, fresh-ui, mcp, plugin, and sdk
+  (`packages/cli/deno.json:23-29`). No dependency edit is planned.
+- Existing debt: package `isolatedDeclarations` is false (`packages/cli/deno.json:46-55`) and the
+  public doc-lint completeness debt remains open (`arch-debt.md:870-885`). This leaf must not claim
+  to close it or weaken the existing publish task.
+- Runtime asset / `import.meta` rule: module-relative reads are confined to publish-excluded E2E
+  tests/helpers. No new read or `import.meta` use may enter the published CLI graph.
+
+### `@netscript/mcp`
+
+- Export map: `.`, `./cli`, and `./openapi-projection` (`packages/mcp/deno.json:6-10`). The planned
+  `guidance-index.ts` comment and test do not add or change an exported package entrypoint or
+  symbol.
+- Exact internal `@netscript/*` pins are `@netscript/aspire@0.0.6` and two telemetry subpaths at
+  `@netscript/telemetry@0.0.6` (`packages/mcp/deno.json:11-17`). No dependency edit is planned.
+- `src/**/*.ts` is published while `tests/` is excluded (`packages/mcp/deno.json:19-31`). Therefore
+  the policy-comment change is publishable and must pass the package audit, full export-map
+  doc-lint, isolated-declaration analysis, and publish dry-run; the regression test itself is not
+  published.
+- `guidance-index.ts` has no runtime asset read and no `import.meta` use. The plan forbids adding
+  either. `deno doc --filter GuidanceResult packages/mcp/mod.ts` resolves the current public
+  contract cleanly; the internal policy remains intentionally absent from the package export map.
+- Existing debt `MCP-A6-V2-SHAPE` and `mcp-tool-contracts-a8-1102` are not touched or deepened
+  (`arch-debt.md:2073-2093,2220-2234`).
+
+### Planned JSR gates
+
+For both members: full export-map `doc:lint`; `audit-jsr-package.ts`; exact-pin scan; root
+isolated-declaration check/publish simulation; and member/root publish dry-run. Inspect publish file
+lists and fail on any new runtime asset read, top-level `import.meta`/`fromFileUrl`, self-bare
+import, slow type, or non-exact `@netscript/*` dependency. Existing documented CLI debt is baseline,
+not a waiver for a new finding.
 
 ## Open questions
 
-- Which exact paths are necessary inside the unusually broad frozen outer bound?
+- None that may change implementation shape. Coordinator ownership of the serialized
+  `scaffold.runtime` mutex is an execution precondition, not an open design decision.
