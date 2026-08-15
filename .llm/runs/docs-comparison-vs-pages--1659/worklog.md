@@ -17,8 +17,8 @@
 | Planning | complete | Owner contract locked; public APIs checked; Plan-Gate recorded N/A. |
 | S1 | complete | Removed 1,802 lines of protocol/migration surface; landing page is 24 lines and navigation points only to the two new pages. |
 | S2 | complete | Fixed-first NetScript page, four competitor code panels, partial-I/O line, and compact architectural estimates. |
-| S3 | active | Backend argument. |
-| S4 | queued | Generated assets and complete gate evidence. |
+| S3 | complete | One route contract, typed service client, validated worker payload, and three competitor implementations. |
+| S4 | active | Generated assets and complete gate evidence. |
 
 ## Wrapper applicability
 
@@ -37,3 +37,8 @@
 - S2 `deno task --cwd docs/site build`: exit `0` after the final frontend edit.
 - S2 rendered DOM inspection: four selector options and two rendered blocks per competitor; only
   the first competitor lacks `hidden` in the source HTML.
+- S3 public API docs: `baseContract`, `createServiceClient`, `workersContract`, `defineJobHandler`,
+  and `createSuccessResult` each returned exit `0` from `deno doc` on the workspace package surface.
+- S3 `deno task --cwd docs/site verify`: exit `0`; 35,342 internal links across 227 pages resolve,
+  and all 18 caveat markers resolve.
+- S3 rendered DOM inspection: three selector options and two rendered blocks per competitor.

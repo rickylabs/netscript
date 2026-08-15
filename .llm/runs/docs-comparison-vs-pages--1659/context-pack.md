@@ -1,6 +1,6 @@
 # Context pack — comparison pages (#1659)
 
-Status: S1–S2 complete; S3 active.
+Status: S1–S3 complete; S4 active.
 
 The page argument is fixed: NetScript puts route identity, a shared read, streaming regions,
 freshness, layout, failure boundaries, and metadata at one entry point. The selector changes only
@@ -20,3 +20,8 @@ competitor is the complete no-JavaScript view. The frontend page uses the public
 surface and keeps server streaming separate from typed-partial refresh ownership. The first full
 verify reached the link checker and found only the planned S3 backend route; the standalone site
 build is green.
+
+S3 adds the backend page: a Zod/oRPC route contract drives runtime validation, handler typing, and
+the service client; the endpoint triggers a named worker whose payload is parsed by its own schema.
+All five NetScript symbols shown in that path resolve through `deno doc`. The full docs-site verifier
+is green now that both comparison routes exist.
