@@ -3753,3 +3753,77 @@ rather than a footnote.
 
 No product mutation, no runtime lease, no retry, no `fresh-browser`, no evaluator. Host remains
 proven empty.
+
+## 2026-08-15 — F5 amendment Tier-A at `3204ffa98a7e4db932515851145538fe899f381b`: `FAIL_FIX`
+
+local == remote; **no product, template, or fixture mutation** — `git diff 09a771c8e..3204ffa98`
+outside `.llm/runs/` is empty. Amendment artifacts only, as instructed.
+
+### What passes, re-derived rather than accepted
+
+**The proposed seam is not what my own surface proposed, and it is better.** I had suggested reusing
+`formatOutput`; the amendment instead adds an **internal** `GeneratedSourceFormatterPort` with two
+deliberately distinct operations — content-in/content-out over `deno fmt --ext <ext> -`, and a bulk
+path operation for init — with one `DenoGeneratedSourceFormatter` owning both. Critically, the
+existing `formatGeneratedFiles` **delegates to the same adapter**, so there is no second formatting
+path. That is the answer to "smallest honest abstraction" and it is stronger than either option I had
+in hand.
+
+**Dependency direction is honest.** `formatGeneratedFiles` already exists with four callers
+(`public-command-dependencies:322`, `install-plugin:257`, `remove-plugin:162`,
+`generate-aspire-command:29`) and already takes `ProcessPort`, so extending that port is consistent
+with the established direction rather than inventing a rival one. "No new public package export is
+added" — internal port, no JSR surface change.
+
+**ProcessPort blast radius, inventoried.** 52 files reference `ProcessPort`; only **12** implement
+`exec`, of which exactly **one** is production (`deno-process.ts`) and ~11 are test fakes. Optional
+stdin compiles for all of them. The risk that fakes silently ignore stdin is **structurally
+neutralised** by the dedicated formatter port: writers depend on `GeneratedSourceFormatterPort`, not
+on raw `ProcessPort` + stdin, so a faked formatter returns content honestly instead of no-oping.
+
+**Semantic split preserved, not unified.** Content operation keeps generated-file policy
+(`--no-config`, width 100, single quotes, target-derived extension, throw-on-failure); the bulk
+operation lets `formatOutput` retain project-config discovery and **warning** semantics, and init
+"continues to convert formatter failure to its existing warning rather than changing init's error
+contract". Plugin callers "retain their current exact-file behavior".
+
+**Idempotency proven by construction, not asserted.** For renderer `R` and canonicalizer `F`, both
+the comparison and the write use `F(R(input))`, so a same-input repeat compares identical bytes to
+identical bytes. The rejected design compared `R(input)` against previously post-formatted
+`F(R(input))`. "No post-write `deno fmt` call is added to either service command."
+
+**All 12 failing paths have a bound owner** — client-scaffolder (2), workspace-mutator (7),
+contract-scaffolder (1), **version-registry** (`contracts/versions/v1/mod.ts`), service/scaffolder
+(`services/payments/src/routers/v1.ts`). The arithmetic closes: 2+7+1+1+1 = 12. Naming
+`version-registry.ts` as the `mod.ts` owner is a genuine catch I had not bound.
+
+**The ceiling is 15 product + 12 test = 27, with an explicit exclusion list carrying per-path
+justification** — `render-service.ts`, `generate-service-clients.ts`, `generate-service-command.ts`,
+`add-service-command.ts`, and `workspace-init.ts` all stay unchanged with reasons, and all templates,
+`embedded.generated.ts`, fixtures, SDK/Fresh, `docs/**`, and `deno.lock` are excluded with "No
+template or fixture is hand-formatted to satisfy the gate."
+
+### `FAIL_FIX` — three required additions and one justification
+
+The coordinator named three transport safety properties. The matrix's transport row covers
+stdin→formatted stdout, exact extension and style flags, byte-identical second canonicalization, and
+non-zero exit naming the target. It does **not** cover:
+
+1. **Timeout/kill preservation with stdin piped.** `ProcessPort.exec` carries `timeoutMs` and the
+   adapter "kills and awaits the child". A killed child holding an open stdin pipe is a classic hang,
+   and this is the one interaction the widening actually puts at risk. Add an executable assertion in
+   `deno-process_test.ts` that a timeout still kills and returns with stdin piped.
+2. **Empty input.** Assert the defined behaviour when rendered content is empty — formatted empty
+   output, or fail-closed — rather than leaving it to the adapter's accident.
+3. **Absent or unknown target extension fails closed.** The content operation derives `--ext` from
+   the target path; assert an unresolvable extension is refused rather than silently formatting as a
+   default dialect.
+
+4. **Justify or drop `packages/cli/src/public/features/services/services-group.ts`.** Every excluded
+   path carries a reason; this included path does not. `public-command-dependencies.ts` is already the
+   composition root, so state what the group additionally requires or remove it from the ceiling.
+
+These are **additions to the proof matrix and one justification**, not removals: nothing in the
+15/12 ceiling is unnecessary on the evidence, and the dependency direction is sound.
+
+No product dispatch until this topic commit is pushed and the additions land.
