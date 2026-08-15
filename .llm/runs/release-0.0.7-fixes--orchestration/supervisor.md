@@ -482,6 +482,39 @@ independently-known fact that `packages/cli` sits outside root `deno fmt` (recor
 deliberately **not** made yet: the final implementation head does not exist until slice 6 runs, and
 slice 6 needs the singleton lease. IMPL-EVAL is not launched.
 
+### #1657 IMPL-EVAL — owner-route amendment recorded
+
+| Field | Value |
+| --- | --- |
+| Gate | IMPL-EVAL, first and only cycle, PR #1657 (#1358) |
+| **Exact evaluated head** | `939e7311317365db7681de5e3c7c56a73412424e` — equal across local, `FETCH_HEAD`, `ls-remote`, PR `headRefOid`; contains the Tier-A sign-off |
+| Reviewed product/repair head | `a093314973b2039183ee408ef7501cd9e08ea0aa` — verified **ancestor**; delta to evaluated head is artifact-only |
+| Gated product head (browser lease) | `4a3c40321ac1e58aa337e02afeaa95fbc553ce7f` |
+| Requested route | native first-party Claude Code · `claude-opus-5` · effort `medium` · `--remote-control` |
+| Observed route | `respawnFlags: ["--effort","medium","--permission-mode","bypassPermissions","--remote-control","--name","NetScript 0.0.7 #1657 IMPL-EVAL","--model","claude-opus-5"]` |
+| Background id | `04897102` |
+| Claude session id | `04897102-bcd6-4918-8b72-dc0151035883` |
+| PID | `202494` |
+| cwd | `/home/codex/repos/netscript-007-leaf-design-registry-drift` (exact leaf; sole session there) |
+| Registry `bridgeSessionId` | `session_01GbqPgckdxHEZzXzNu7DKNp` (non-empty, sessions-registry form) |
+| Remote Control URL | `https://claude.ai/code/session_01GbqPgckdxHEZzXzNu7DKNp` |
+| Independence | fresh session, separate from the Codex author `01a003f0-7821-7a10-a555-e619a9280479` **and** from this topic orchestrator; opposite-family to the implementer |
+| Verdict | _pending_ |
+
+**Owner-route amendment.** `lane-policy.md:46` renders `formal_impl_evaluation` as
+**Fable 5 · medium** for Codex-authored work — the route #1654's IMPL-EVAL actually used. For this
+gate the coordinator overrode it to **native Claude `claude-opus-5` · medium** and explicitly
+forbade substituting Fable, OpenRouter, or any other transport. Recorded here so the deviation from
+the rendered lane table is auditable and is not later misread as an unauthorized substitution. The
+binding invariants are unaffected: the evaluator is a fresh session, is not the generator, and is
+opposite-family to the Codex implementer.
+
+The brief bars rerunning `fresh-browser`, Aspire, Docker, and `e2e:cli` (the singleton lease is
+consumed), keeps evaluation read-only over source, permits one artifact-only evaluator commit plus a
+single structured PR comment, and forbids a second cycle, ready flip, merge, issue mutation, and any
+next leaf. It also directs the evaluator to re-derive the T-3 classifier behavior itself rather than
+accept the Tier-A table, and to judge residual R-1.
+
 ## Wave 0 lane assignments
 
 | Leaf | Branch | Implementation route | Formal evaluator (per `dispatch.json`) |
