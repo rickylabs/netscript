@@ -15,7 +15,9 @@
 Phase-1 research and planning are complete at baseline `3fc0f2f92`. The old fixed export names have
 already been repaired and moved, but the literal `service` key, dead invalidation, missing
 all-service generator, and both cache-age omissions remain. PLAN-EVAL is proposed required. No
-product implementation or expensive gate has run.
+product implementation or expensive gate has run. Draft PR #1664 is open with both closing keywords,
+milestone `0.0.7`, the required taxonomy, acceptance mappings, and structured RESEARCH and PLAN
+comments.
 
 ## Completed
 
@@ -24,11 +26,13 @@ product implementation or expensive gate has run.
 - Re-verified both issue contracts and all current code paths.
 - Recorded compatibility, three-package public delta, JSR bar, slice plan, receipt set, and lease
   conditions.
+- Committed and pushed S0, opened draft PR #1664, and advanced its single lifecycle label from
+  `status:research` to `status:plan` alongside the two phase comments.
 
 ## In Progress
 
-- Commit S0 run artifacts, push with the explicit refspec, open the draft PR, attach milestone and
-  taxonomy, and post RESEARCH/PLAN comments.
+- Stopped before implementation while the topic orchestrator decides the proposed PLAN-EVAL
+  determination.
 
 ## Next Steps
 
@@ -79,4 +83,4 @@ product implementation or expensive gate has run.
 
 ## Commits
 
-- See the draft PR's commit list and per-slice PR comments after S0 is pushed.
+- See draft PR #1664's commit list and per-slice PR comments.

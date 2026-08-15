@@ -62,11 +62,12 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 
 ## Progress Log
 
-| Time                      | Slice | Step     | Notes                                                                                                                                       |
-| ------------------------- | ----- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-15T12:39:58+02:00 | S0    | Identity | Clean tree; branch/base/origin exact; no upstream/remote branch by design.                                                                  |
-| 2026-08-15T12:39:58+02:00 | S0    | Research | Re-verified SDK, CLI generator/templates, Fresh hydration hook/tests, commands, package manifests, and issue acceptance at the pinned base. |
-| 2026-08-15T12:39:58+02:00 | S0    | Plan     | Proposed PLAN-EVAL required and both expensive gates required only after cheap convergence and coordinator release.                         |
+| Time                      | Slice | Step     | Notes                                                                                                                                                    |
+| ------------------------- | ----- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-15T12:39:58+02:00 | S0    | Identity | Clean tree; branch/base/origin exact; no upstream/remote branch by design.                                                                               |
+| 2026-08-15T12:39:58+02:00 | S0    | Research | Re-verified SDK, CLI generator/templates, Fresh hydration hook/tests, commands, package manifests, and issue acceptance at the pinned base.              |
+| 2026-08-15T12:39:58+02:00 | S0    | Plan     | Proposed PLAN-EVAL required and both expensive gates required only after cheap convergence and coordinator release.                                      |
+| 2026-08-15T12:49:56+02:00 | S0    | Draft PR | Pushed only the Phase-1 run artifacts, opened draft PR #1664 with both closing keywords, attached milestone/taxonomy, and posted RESEARCH/PLAN comments. |
 
 ## Decisions
 
