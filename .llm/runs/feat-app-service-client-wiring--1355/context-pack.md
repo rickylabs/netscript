@@ -24,8 +24,11 @@ CLI and carries Fresh's 45 and SDK's 3 pre-existing diagnostics with exact attri
 three per-member JSR audits exit 0 with WARN-only findings, and all three checked per-member publish
 dry-runs pass. Binding `check` passes at `35061bc80`, but binding `test` fails one of 4,221 results:
 S2 added `generated.deno-lint` to the service suite without updating its E2E registry expectation.
-The focused test passes 19/19 at `c53726c69`, so this is leaf-caused rather than carried. Draft PR
-#1664 retains both closing keywords and remains draft. Later binding and expensive gates are unrun.
+The focused test passes 19/19 at `c53726c69`, so this was leaf-caused rather than carried. Tier-A
+authorized a one-line, order-sensitive expectation repair at `32ea23f50`; all four fresh binding
+receipts now PASS at that head, including 4,202/0 tests and the workspace publish dry-run. Draft PR
+#1664 retains both closing keywords and remains draft. S4 is cheaply sufficient; expensive gates
+remain lease-blocked and unrun.
 
 ## Completed
 
@@ -66,13 +69,13 @@ The focused test passes 19/19 at `c53726c69`, so this is leaf-caused rather than
 
 ## In Progress
 
-- S4 is stopped on a newly introduced binding test failure after `check` passed. No repair is
-  authorized in this artifact-only slice.
+- S4-FIX1 is complete with the reviewed one-line test repair and four fresh PASS binding receipts;
+  awaiting fresh Tier-A review.
 
 ## Next Steps
 
-1. Await a separately reviewed scoped repair for the stale service-suite registry expectation; do
-   not run the remaining S4 binding gates or start S5 without release.
+1. Stop for fresh Tier-A review; do not start S5 or request an expensive-gate lease without explicit
+   coordinator release.
 2. Keep both expensive gates lease-blocked until explicit release.
 
 ## Key Decisions
@@ -108,12 +111,13 @@ The focused test passes 19/19 at `c53726c69`, so this is leaf-caused rather than
 | `packages/cli/README.md` and `packages/fresh/README.md` | Modified | Ruled generator migration and hydration-age notes. |
 | `packages/fresh/tests/query-hydration-age_browser.ts` and fixture | New | Controlled old/fresh public-wrapper browser scenarios. |
 | `packages/fresh/deno.json` | Modified | Include hydration-age coverage in the lease-gated browser task. |
+| `packages/cli/e2e/tests/presentation/suite-registry_test.ts` | Modified | Exact service-suite expectation now includes the intentional generated lint gate in emitted order. |
 
 ## Gates
 
 | Gate family | Current status                                                                                                                    | Evidence                     |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Static      | Supplemental package evidence is complete with attributed doc baselines. Binding `check` PASS; binding `test` FAIL on one leaf-caused stale E2E expectation; publish/arch NOT_RUN. | `worklog.md`; `reports/s4-test-failure.md`; binding receipts |
+| Static      | Supplemental package evidence complete with attributed doc baselines; all four replacement binding receipts PASS at `32ea23f50`, exact-set sufficiency SUFFICIENT. | `worklog.md`; `reports/s4-test-failure.md`; binding receipts |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
 | Runtime     | NOT_RUN / lease-blocked                                                                                                           | `plan.md` release conditions |
 | Consumer    | NOT_RUN / implementation-dependent                                                                                                | `plan.md` S5                 |
@@ -122,7 +126,8 @@ The focused test passes 19/19 at `c53726c69`, so this is leaf-caused rather than
 
 - The Fresh/SDK documentation defects require separate scope if they are to be repaired; this leaf
   carries them with attribution and does not repair them inline.
-- The S2 service-suite `generated.deno-lint` expectation needs a separately released scoped repair.
+- The S2 service-suite `generated.deno-lint` expectation gap is resolved by the reviewed S4-FIX1
+  test-only repair.
 
 ## Drift and Debt
 

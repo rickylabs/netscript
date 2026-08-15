@@ -88,6 +88,8 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | 2026-08-15T16:26:07+02:00 | S4    | Carried-baseline disposition | Tier-A independently confirmed unchanged diagnostic files and entrypoint sets, then ruled Fresh's 45 and SDK's 3 supplemental doc-audit diagnostics carried `PRE_EXISTING_FAIL` baselines. The plugin-streams finding stays separately named as newly exposed, not newly caused. |
 | 2026-08-15T16:26:07+02:00 | S4    | Per-member publish audits | CLI, Fresh, and SDK JSR audits each exited 0 with WARN-only doctrine/banner findings; three separate checked per-member publish dry-runs passed at `e52aa44a6` with no slow-type or file-list failure. |
 | 2026-08-15T16:40:03+02:00 | S4    | Binding-gate stop | `check` passed at immutable content head `35061bc80`; `test` failed 1 of 4,221 results because S2 added `generated.deno-lint` to the service suite without updating its E2E registry expectation. The focused test passes 19/19 at `c53726c69`, proving a leaf-caused red; stopped before publish/arch gates and repair. |
+| 2026-08-15T16:52:21+02:00 | S4-FIX1 | Scoped test repair | Tier-A authorized the exact one-line expectation repair. Added `GENERATED_DENO_LINT` after `GENERATED_SERVICE_CHECK` without changing the suite or weakening array equality; committed as `32ea23f50`. |
+| 2026-08-15T16:52:21+02:00 | S4-FIX1 | Binding convergence | Replaced both superseded receipts and produced all four fresh `s4-fix1-*` receipts at `32ea23f50`: check, test (4,202/0 with 19 ignored), workspace publish dry-run, and arch-check all PASS with exact head matches. |
 
 ## Decisions
 
@@ -156,6 +158,10 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 | S4 binding test | `run-gate.ts --gate test --id app-service-client-wiring-s4-test` | FAIL | Receipt attests `35061bc80`; 4,201 passed, 1 failed, 19 ignored. Stale service-suite gate expectation is leaf-caused and does not reproduce at `c53726c69`. |
 | S4 binding publish dry-run | Planned `app-service-client-wiring-s4-publish-dry-run` | NOT_RUN | Ordered stop at binding test failure; no receipt exists. |
 | S4 binding arch check | Planned `app-service-client-wiring-s4-arch-check` | NOT_RUN | Ordered stop at binding test failure; no receipt exists. |
+| S4-FIX1 binding check | `app-service-client-wiring-s4-fix1-check` | PASS | Fresh receipt attests `32ea23f50`; 2,933 files, 25 batches, zero diagnostics. |
+| S4-FIX1 binding test | `app-service-client-wiring-s4-fix1-test` | PASS | Fresh receipt attests `32ea23f50`; 4,202 passed, zero failed, 19 ignored. |
+| S4-FIX1 binding publish dry-run | `app-service-client-wiring-s4-fix1-publish-dry-run` | PASS | Fresh workspace dry-run receipt attests `32ea23f50`; exit 0. |
+| S4-FIX1 binding arch check | `app-service-client-wiring-s4-fix1-arch-check` | PASS | Fresh receipt attests `32ea23f50`; exit 0 with baseline warnings and zero failures. |
 | Changed-module doc lint | `deno task doc:lint --root packages/sdk --entrypoints ./src/query-client/key-bridge.ts --pretty` | PASS          | Zero documentation errors.                                                                  |
 | CLI entrypoint doc lint | `deno task doc:lint --root packages/cli --entrypoints ./mod.ts --pretty`                          | PASS          | Zero documentation errors, including the new exported generator contract.                  |
 | SDK root-entrypoint doc lint (`packages/sdk/mod.ts`) | `deno doc --lint packages/sdk/mod.ts`                                              | BASELINE_FAIL | Exactly two pre-existing `private-type-ref` errors for this root-entrypoint run: `QueryClientPort` at `src/ports/query-client.ts:41` and `createNetScriptQueryClient` at `src/query-client/query-client-factory.ts:44`, both referencing private `QueryClient`; measured before S1 and carried unchanged. The full 12-entrypoint export-map sweep is S4 and may surface further diagnostics. |
@@ -180,14 +186,15 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 
 ### S4 binding receipt sufficiency
 
-**INSUFFICIENT.** Recomputed over the exact contracted set:
+**SUFFICIENT.** Recomputed over the exact contracted set; every receipt is PASS/exit 0, has a unique
+invocation ID, attests `gitHead == actualGitHead ==
+32ea23f501900ca4d7de603e00709e09f41be3dc`, and carries no mismatch override:
 
-1. `receipts/s4-check.json` — PASS; invocation `app-service-client-wiring-s4-check`, attested head
-   `35061bc80ab39c8aa428ca91e44de47d59dbcf82`.
-2. `receipts/s4-test.json` — FAIL; invocation `app-service-client-wiring-s4-test`, attested head
-   `35061bc80ab39c8aa428ca91e44de47d59dbcf82`.
-3. `receipts/s4-publish-dry-run.json` — missing / NOT_RUN.
-4. `receipts/s4-arch-check.json` — missing / NOT_RUN.
+1. `receipts/s4-check.json` — `app-service-client-wiring-s4-fix1-check`.
+2. `receipts/s4-test.json` — `app-service-client-wiring-s4-fix1-test`.
+3. `receipts/s4-publish-dry-run.json` —
+   `app-service-client-wiring-s4-fix1-publish-dry-run`.
+4. `receipts/s4-arch-check.json` — `app-service-client-wiring-s4-fix1-arch-check`.
 
 ### Consumer Gates
 
@@ -223,3 +230,6 @@ contract and deterministically creates or reconciles `apps/<app>/lib/<service>.t
 - All three per-member JSR audits exit 0 with WARN-only findings, and all three checked per-member
   publish dry-runs pass. Binding `check` passes, but binding `test` exposes one leaf-caused stale E2E
   registry expectation; publish/arch binding gates, expensive gates, and evaluator remain unrun.
+- Tier-A authorized and the leaf landed the exact order-sensitive expectation repair. All four
+  replacement binding receipts now pass at `32ea23f50`; S4 cheap sufficiency is SUFFICIENT. Runtime
+  gates remain lease-blocked and no evaluator has run.
