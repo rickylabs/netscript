@@ -15,7 +15,8 @@
 Research and plan are complete at `main@baf1cdf67`. No product code has been implemented. Five
 contracts are locked: isolate post-loader persistence failure; fail-safe malformed evidence inside
 a span; cap namespaces at 256 with fixed `overflow`; include module identity plus a two-instance
-hypothesis; repair CacheStore evidence JSDoc.
+hypothesis; repair CacheStore evidence JSDoc. Draft PR #1665 is open with `status:plan` and
+milestone `0.0.7`.
 
 ## Completed
 
@@ -25,6 +26,8 @@ hypothesis; repair CacheStore evidence JSDoc.
 - Base publish dry run and exact-specifier guard passed.
 - Existing full-export doc-lint failure captured rather than hidden.
 - `research.md`, `plan.md`, Design checkpoint, and `scope-boundary.md` written.
+- Plan artifacts committed as `89be8da76`, pushed by explicit refspec, and published on draft PR
+  https://github.com/rickylabs/netscript/pull/1665 with RESEARCH and PLAN phase comments.
 
 ## Next Steps
 
@@ -71,5 +74,5 @@ Only run artifacts under this run directory. The pre-existing `codex-thread-ids.
 
 ## Commits
 
-- See the draft PR commit list + per-slice PR comments. No implementation commit exists.
-
+- `89be8da76` — plan/research/Design/scope-boundary bootstrap.
+- See draft PR #1665's live commit list and phase comments. No implementation commit exists.

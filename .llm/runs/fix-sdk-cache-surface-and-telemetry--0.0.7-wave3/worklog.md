@@ -71,6 +71,7 @@ behind `CacheStore`; it must not change source-query success semantics.
 | --- | --- | --- | --- |
 | 2026-08-15 | Plan | Research | Re-baselined call graphs, evidence reaches, producers, cross-package consumers/assertions, ports docs, and JSR surface. |
 | 2026-08-15 | Plan | Design | Locked five issue contracts; wrote scope-boundary report. No product code changed. |
+| 2026-08-15 | Plan | Draft PR | Committed plan artifacts as `89be8da76`, pushed by explicit refspec, and opened draft PR #1665 with milestone `0.0.7`, exactly one `status:plan`, and RESEARCH/PLAN phase comments. |
 
 ## Decisions
 
@@ -92,4 +93,4 @@ separate evaluator returns `PASS` and the topic orchestrator rules on scope.
 - Inspect D1's real Deno KV RED and D2's replacement of the deliberate fail-loud guard first.
 - Decide the additional README/test files and doc-lint baseline before approving implementation.
 - Do not treat the draft PR or green publish dry run as PLAN-EVAL.
-
+- Draft PR: https://github.com/rickylabs/netscript/pull/1665
