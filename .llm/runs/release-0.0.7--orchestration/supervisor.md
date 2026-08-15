@@ -322,3 +322,17 @@ Main is `e090f894f`. Per-topic queues remain independent; only the runtime mutex
 
 Serialization remains per topic. The owner verdict releases only the features amendment hold; it does
 not grant readiness, issue mutation, comment resolution, or merge authority.
+
+### Live checkpoint — 2026-08-15T07:48:51Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Inventory complete; #1652 shipped as `e090f894f` | Preserve the terminal topic checkpoint; do not invent a new docs leaf |
+| internals | #1658 repaired-plan PLAN-EVAL is working in fresh Opus 5/medium Remote Control session `7d544aec-…` against immutable `cea999d18` | No implementation, OpenHands dispatch, or status transition before the formal plan verdict is `PASS` |
+| fixes | #1657 post-evaluation cleanup is clean/pushed at `a891c6520`; fresh opposite-family Tier-A is the next gate | Preserve the cycle-2 `PASS`; no cycle 3, browser/Aspire/Docker/E2E rerun, readiness, or merge before cleanup review |
+| features | #1651 focused keep-and-narrow amendment is running on preserved Codex thread `019ffcc5-…`; topic checkpoint `1bfc1cfcd` is clean/pushed | Keep draft/status:impl; six exact-head gates, fresh Tier-A, and one bounded final IMPL-EVAL remain mandatory |
+
+The recovered features lane reused the existing native Opus 5/high supervisor, Remote Control bridge,
+and original Codex author; no replacement topic or author session was created. Evaluator and author
+serialization is per topic, so these three gates continue concurrently. The expensive runtime mutex
+remains unclaimed.

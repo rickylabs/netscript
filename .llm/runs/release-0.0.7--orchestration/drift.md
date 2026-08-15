@@ -247,3 +247,23 @@ implementation thread.
   Preview must not influence plan construction. This substantive but bounded amendment invalidates
   the pre-comment readiness claim and requires one fresh Tier-A plus one final focused IMPL-EVAL,
   not a new PLAN-EVAL or an unbounded formal loop.
+
+## 2026-08-15T07:48:51Z — transport recovery and evidence corrections
+
+- **Features / transport, not scope drift:** the owner verdict was delivered to the existing
+  `19621a0b-…` native Opus 5/high Remote Control supervisor, which checkpointed `1bfc1cfcd` and
+  resumed the recorded Codex author `019ffcc5-…`. No replacement supervisor or author was created.
+  The amendment remains limited to the already-authorized C6/RFC-0003 boundary and provenance fix.
+- **Fixes / false-positive CI expansion removed:** formal #1657 cycle 2 passed the product work but
+  proved the T-3 rationale false: root workspace discovery and required `check-test` already run the
+  drift test for both relevant surfaces, while the added Fresh UI job contained no test step. The
+  exact three redundant CI deltas are therefore restored to main at `a891c6520`; this is efficiency
+  cleanup, not withdrawal of the product verdict or a third formal cycle.
+- **Fixes / browser evidence wording:** the inherited browser receipt proves the Fresh form-navigation
+  suite only; it never rendered the generated design gallery. #1358 consumer proof rests on the
+  decoded shipped barrel, source-template equality, rendered-section coverage computation, and the
+  symmetric root drift gate. No unleased runtime claim is retained.
+- **Internals / required architectural gate:** #1658's repaired plan changes claim/spend atomicity and
+  workflow permissions, so one fresh PLAN-EVAL is warranted. The evaluator is independent Opus
+  5/medium with active Remote Control, bound to `cea999d18`; this does not authorize implementation
+  until a terminal `PASS` is committed and pushed.

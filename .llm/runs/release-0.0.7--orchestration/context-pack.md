@@ -193,3 +193,15 @@ amended content head, obtain fresh opposite-family Tier-A, and run one bounded f
 new PLAN-EVAL or open loop. Keep the PR draft until coordinator readiness. Internals #1658 is at
 repaired plan `cea999d18` awaiting its authorized Opus 5/medium PLAN-EVAL. Fixes #1657 is removing
 only the three redundant T-3 CI deltas before fresh Tier-A. Docs remains terminal.
+
+Resume from the newer authoritative `2026-08-15T07:48:51Z` checkpoint. Features #1651 is no longer
+held: topic checkpoint `1bfc1cfcd` is clean/pushed and the preserved original Codex author
+`019ffcc5-…` is performing the one bounded keep-and-narrow amendment from immutable starting head
+`0e302ad3a`. It must preserve the plugin CLI architecture, narrow only C6/RFC-0003 ownership,
+correct receipt provenance, run six exact-head gates, then stop for fresh Tier-A and one focused
+IMPL-EVAL. Internals #1658 repaired plan `cea999d18` passed topic Tier-A and is under its single
+fresh native Opus 5/medium Remote Control PLAN-EVAL in session `7d544aec-…`, bridge
+`session_01N9zhX5ZDUvvrBxcwoAYBCm`; implementation remains forbidden before `PASS`. Fixes #1657's
+formal cycle 2 passed and its bounded cleanup is clean/pushed at `a891c6520`; the redundant three CI
+paths equal main and fresh cleanup Tier-A is next, with no cycle 3 or runtime rerun. Docs remains
+terminal. Serialization is per topic; the expensive runtime mutex is free.

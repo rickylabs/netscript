@@ -310,3 +310,23 @@
   prior conditional finding. No PLAN-EVAL or open-ended evaluator cycle is authorized.
 - #1651 remains draft. Reply to owner comment `5300440887`, ready transition, issue mutation, and
   merge remain withheld until the amended head, review, receipts, and live checks are reconciled.
+
+## 2026-08-15T07:48:51Z — owner amendment dispatched; cleanup and plan-eval advance
+
+- Features supervisor `19621a0b-…` reconciled the owner verdict into clean pushed topic checkpoint
+  `1bfc1cfcdff6d39c75f7190d1b79750f55b966c0` and resumed only the preserved original Codex author
+  `019ffcc5-d3e1-7c13-9815-e9956ec43683`. The leaf remained clean at `0e302ad3a` when dispatched.
+  Its focused brief preserves the distinct plugin CLI architecture, narrows C6 to the shared
+  workspace-plan executor, corrects receipt provenance, and requires all six contracted gates.
+- Internals #1658 repaired its plan on the original author thread and reached clean local=remote=PR
+  head `cea999d18ea2c2d4a6208fc209ce744d9be1d194`. Topic Tier-A passed in comment `5301190104`.
+  One fresh native `claude-opus-5`/medium Remote Control PLAN-EVAL is now working in session
+  `7d544aec-22cc-4656-8483-6d957dbfbfda`, bridge `session_01N9zhX5ZDUvvrBxcwoAYBCm`; its live
+  transcript and respawn flags independently confirm the requested route and immutable head.
+- Fixes #1657 cycle-2 IMPL-EVAL is terminal `PASS` at evaluator commit `ed9ee7663` and comment
+  `5301157020`. The original author then removed the three redundant T-3 CI deltas, recorded the
+  rationale/browser-evidence corrections, and pushed proof head
+  `a891c65203301ec96467f11d9fe3dcb77a09d5c8`. The three paths now have an empty delta versus
+  `origin/main`; the core #1358 product changes and formal PASS remain intact. Fresh Tier-A is next.
+- All topic heads recorded here were clean when sampled. No expensive gate was launched, and the
+  three topic-local queues continue independently rather than waiting on one another.

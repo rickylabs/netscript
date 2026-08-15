@@ -72,7 +72,7 @@
         "pid": 23955,
         "bridgeSessionId": "session_01HqFtKQtyJcHBEn1MghQdFX",
         "remoteControlUrl": "https://claude.ai/code/session_01HqFtKQtyJcHBEn1MghQdFX",
-        "topicHeadSha": "0e62e1d7504d9f9fb5e49586902073afe9dcd79f",
+        "topicHeadSha": "dfd163f74ba9d32c916a82591bb74daf127dec60",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle"
@@ -114,7 +114,7 @@
         "pid": 26724,
         "bridgeSessionId": "session_014pCd2QWkCscgZpVdjcUPST",
         "remoteControlUrl": "https://claude.ai/code/session_014pCd2QWkCscgZpVdjcUPST",
-        "topicHeadSha": "89251150502ff1251becb2f6a69ed77f263f52af",
+        "topicHeadSha": "1141d5a9f89480676bb87d68382d7243762253ea",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle"
@@ -153,7 +153,7 @@
       "orchestratorAgentId": "topic-features-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "blocked",
+        "state": "active",
         "worktree": "/home/codex/repos/netscript-007-features",
         "branch": "orchestrator/release-0.0.7-features",
         "requestedModel": "claude-opus-5",
@@ -165,7 +165,7 @@
         "sessionId": "19621a0b-c6a0-47c6-b826-93c1634a6875",
         "bridgeSessionId": "session_01LQBHX8KpA5aYtDraq46J8a",
         "remoteControlUrl": "https://claude.ai/code/session_01LQBHX8KpA5aYtDraq46J8a",
-        "topicHeadSha": "318fddcd2c239599d0f46d7f0e72ae604066363c",
+        "topicHeadSha": "1bfc1cfcdff6d39c75f7190d1b79750f55b966c0",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
         "legacyState": "parked_idle"
@@ -664,13 +664,13 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "da574111af05a5cded74250128b196fcab870274",
-      "currentPrHeadSha": "3d7819203f59e68eb5b45f6871a03c41ca43cd2f",
+      "currentPrHeadSha": "a891c65203301ec96467f11d9fe3dcb77a09d5c8",
       "issueNumbers": [1358],
       "implementerAgentId": "01a003f0-7821-7a10-a555-e619a9280479",
       "branch": "fix/design-registry-catalog-drift-gate",
       "worktree": "/home/codex/repos/netscript-007-leaf-design-registry-drift",
       "prNumber": 1657,
-      "implementationState": "impl_eval_cycle_2_running",
+      "implementationState": "post_eval_cleanup_complete_awaiting_tier_a",
       "implementationCompletedHeadSha": "4a3c40321ac1e58aa337e02afeaa95fbc553ce7f",
       "freshBrowserGateState": "complete",
       "freshBrowserLeaseId": "design-registry-catalog-drift-fresh-browser",
@@ -703,11 +703,22 @@
       "repairTierAState": "PASS",
       "repairTierACommitSha": "3d7819203f59e68eb5b45f6871a03c41ca43cd2f",
       "repairTierACommentUrl": "https://github.com/rickylabs/netscript/pull/1657#issuecomment-5301086718",
-      "nextImplementationEvaluationState": "running",
+      "nextImplementationEvaluationState": "complete",
       "nextImplementationEvaluationCycle": 2,
       "nextImplementationEvaluatedHeadSha": "3d7819203f59e68eb5b45f6871a03c41ca43cd2f",
       "nextImplementationEvaluatorAgentId": "1df19d27-ce81-4027-99ac-49f3b9ec26bc",
       "nextImplementationEvaluatorBridgeSessionId": "session_018WYHfqzFKKve37TL7hsPQD",
+      "nextImplementationEvaluatorCommitSha": "ed9ee76636db864031762c3a874db2e06e6353d3",
+      "nextImplementationEvaluationVerdict": "PASS",
+      "nextImplementationEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1657#issuecomment-5301157020",
+      "nextImplementationEvaluationCompletedAt": "2026-08-15T07:32:36.157Z",
+      "postEvaluationCleanupState": "complete_awaiting_fresh_tier_a",
+      "postEvaluationCleanupHeadSha": "a891c65203301ec96467f11d9fe3dcb77a09d5c8",
+      "postEvaluationCleanupCommits": [
+        "695dd7b005f65071b8f749ed84eb60faa3cd0f73",
+        "a891c65203301ec96467f11d9fe3dcb77a09d5c8"
+      ],
+      "postEvaluationCleanupBoundary": "the three redundant T-3 CI deltas equal origin/main; core #1358 product work and prior formal PASS remain intact",
       "receiptRefs": [
         ".llm/runs/fix-design-registry-catalog-drift-gate--0.0.7-wave1/receipts/fresh-browser.json"
       ]
@@ -772,7 +783,7 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "7737d8903bb2925c3fcefbda362168fe297eebd4",
-      "currentPrHeadSha": "670e37beaa723f1b54218149a2485dd6b3e741e3",
+      "currentPrHeadSha": "cea999d18ea2c2d4a6208fc209ce744d9be1d194",
       "issueNumbers": [1611, 1613],
       "implementerAgentId": "01a00443-abab-7261-8905-74ed71467929",
       "branch": "fix/openhands-dispatch-claim-and-refusal",
@@ -780,8 +791,18 @@
       "prNumber": 1658,
       "bootstrapHeadSha": "ca2266ecb4fe0cdd8a47059b4bca39761840f3b3",
       "researchHeadSha": "670e37beaa723f1b54218149a2485dd6b3e741e3",
-      "implementationState": "contract_rescope_authorized_plan_repair_pending",
-      "planEvaluationState": "required_after_repaired_plan",
+      "implementationState": "plan_repaired_plan_eval_running",
+      "planRepairHeadSha": "cea999d18ea2c2d4a6208fc209ce744d9be1d194",
+      "planRepairTierAState": "PASS",
+      "planRepairTierACommentUrl": "https://github.com/rickylabs/netscript/pull/1658#issuecomment-5301190104",
+      "planEvaluationState": "running",
+      "planEvaluationCycle": 1,
+      "planEvaluatedHeadSha": "cea999d18ea2c2d4a6208fc209ce744d9be1d194",
+      "planEvaluatorAgentId": "7d544aec-22cc-4656-8483-6d957dbfbfda",
+      "planEvaluatorBackgroundAgentId": "7d544aec",
+      "planEvaluatorBridgeSessionId": "session_01N9zhX5ZDUvvrBxcwoAYBCm",
+      "planEvaluatorRoute": "native claude-opus-5 / medium / Remote Control",
+      "planEvaluationGrantedAt": "2026-08-15T07:44:39.000Z",
       "contractAmendment": {
         "state": "authorized",
         "authorizedAt": "2026-08-15T07:25:00.000Z",
@@ -808,6 +829,9 @@
       "implementationEvaluationVerdict": "PASS_CONDITIONAL",
       "implementationEvaluatorAgentId": "2a8cf0a6-7529-4ca6-97ce-69edcca3f84d",
       "implementationEvaluatorCommitSha": "0e302ad3a5915b7a820adcac0a9d5bdc2d7d0019",
+      "focusedAmendmentState": "same_author_running",
+      "focusedAmendmentGrantedAt": "2026-08-15T07:47:32.000Z",
+      "focusedAmendmentTopicCheckpointSha": "1bfc1cfcdff6d39c75f7190d1b79750f55b966c0",
       "ownerMergeHold": {
         "commentId": 5300440887,
         "reason": "RFC 0003/#1490 overlap audit found #1651 distinct overall but C6 ownership and adapter boundaries require an owner disposition before amendment",
@@ -1249,7 +1273,7 @@
     },
     {
       "id": "design-registry-catalog-drift-gate-impl-eval-cycle-2",
-      "state": "running",
+      "state": "complete",
       "lane": "fixes",
       "leafId": "design-registry-catalog-drift-gate",
       "phase": "impl-eval",
@@ -1266,7 +1290,33 @@
         "remoteControlRequired": true
       },
       "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-15T07:10:00.000Z"
+      "grantedAt": "2026-08-15T07:10:00.000Z",
+      "completedAt": "2026-08-15T07:32:36.157Z",
+      "verdict": "PASS",
+      "evaluatorCommitSha": "ed9ee76636db864031762c3a874db2e06e6353d3",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1657#issuecomment-5301157020"
+    },
+    {
+      "id": "openhands-dispatch-claim-and-refusal-plan-eval-cycle-1",
+      "state": "running",
+      "lane": "internals",
+      "leafId": "openhands-dispatch-claim-and-refusal",
+      "phase": "plan-eval",
+      "cycle": 1,
+      "sourceHead": "cea999d18ea2c2d4a6208fc209ce744d9be1d194",
+      "evaluatorAgentId": "7d544aec-22cc-4656-8483-6d957dbfbfda",
+      "backgroundAgentId": "7d544aec",
+      "pid": 347868,
+      "bridgeSessionId": "session_01N9zhX5ZDUvvrBxcwoAYBCm",
+      "remoteControlUrl": "https://claude.ai/code/session_01N9zhX5ZDUvvrBxcwoAYBCm",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-opus-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-15T07:44:39.000Z"
     }
   ],
   "expensiveGates": [
@@ -1360,5 +1410,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T07:40:16.000Z"
+  "updatedAt": "2026-08-15T07:48:51.000Z"
 }
