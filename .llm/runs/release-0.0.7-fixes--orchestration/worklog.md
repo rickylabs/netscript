@@ -316,3 +316,55 @@ third, fresh, opposite-family session.
 
 Monitoring to terminal. No second evaluator launched, no readiness or label change, PR remains draft
 at sole `status:plan`.
+
+## 2026-08-15 — #1665 IMPL-EVAL terminal PASS; implementation complete, readiness handed to coordinator
+
+| Field | Value |
+| --- | --- |
+| Verdict | **PASS** — "all five issue acceptances met at runtime at `9a26c107a`; scope boundary respected"; blocking list **empty** |
+| Evaluated source head | `9a26c107afa75bf1f38b78fe96c6df533b156c36`; the evaluator's own `git rev-parse HEAD` in its identity block equals it |
+| Artifact commit | `0fed4d7ffb8c655a00846fbf545805bd2e184fb0` — **artifact-only** (`impl-eval.md`); product tree unchanged from `9a26c107a` |
+| PR comment | `[PHASE: IMPL-EVAL] [VERDICT: PASS]` posted 2026-08-15T15:21:02Z |
+| Route | `claude-fable-5` · medium · Remote Control — matched |
+
+**Verdict-to-merge-head binding.** The verdict is bound to `9a26c107a` while the PR head is now
+`0fed4d7ff`. That delta is the evaluator's own artifact commit and contains no product, test, or docs
+change (`git diff --name-only 9a26c107a..0fed4d7ff` outside `.llm/runs/` is empty), so the verdict
+remains valid at the current merge head. Any further push would break that binding and require a
+fresh verdict.
+
+**It re-derived rather than ratified, and improved on this topic's Tier-A in one place.** On the
+`surface:diff` finding it did not stop at matching counts: it diffed the **sorted MAJOR sets** at base
+and head and found them *identical* — a stronger no-regression proof than the count equality this
+topic recorded. It also independently **could not reproduce the implementer's 524**, obtaining 517
+twice, which corroborates the discrepancy recorded here rather than leaving it open. `F-DOCT-5`
+confirmed pre-existing at 13/13. The `typed-queue` flake was **not hit** in its single root run
+(`4203/0/19`), consistent with non-determinism rather than a regression. Carried FAILs are reported
+as red, never as green.
+
+## Merge-readiness tuple — exact, coordinator-owned
+
+| Condition | State |
+| --- | --- |
+| Implementation | complete S1–S3; Tier-A PASS on each slice; IMPL-EVAL PASS |
+| PR head | `0fed4d7ff`, local == remote == PR, clean |
+| Mergeable | `MERGEABLE` / `CLEAN` |
+| Review threads | `PASS` — 0 threads, 0 unanswered |
+| **Draft** | **still draft** — blocks merge |
+| **Label** | **`status:plan`** — not `status:ready-merge`; blocks merge and the acceptance-evidence mirror |
+| **Acceptance boxes** | **PR 5 unchecked**; issues #1598 (4), #1619 (3), #1620 (3), #1623 (3) unchecked; #1637 0 unchecked — 13 issue boxes outstanding |
+| **CI** | `pr-checks PASS`, `checks=21`, `currentFailures=0` — **but this is a vacuous green** |
+
+**The CI green must not be read as validation.** At head `0fed4d7ff` nearly every substantive lane
+reports `conclusion=skipped` — `check-test`, `quality`, `surface-diff`, `code-quality-repo`,
+`deps-report`, `authorize` — with only `classify docs-site changes` actually succeeding. Zero
+failures because almost nothing executed, which is the draft/`ci:skip-*` posture, not evidence the
+change passed CI. Real lanes run when the PR flips out of draft; the merge decision should wait for
+that run, not for the current `currentFailures=0`.
+
+Local evidence is the substantive proof today: root `deno task test` `4203/0/19`, root check re-run
+**uncached** over 2925 files with zero diagnostics, `publish --dry-run` Success, `arch:check` FAIL=0,
+`quality:scan` ok, doc-lint unchanged at the six pinned diagnostics.
+
+Draft state, labels, box ticking, and merge remain the coordinator's. This topic made no readiness or
+label change. Next fixes leaf stays queued until #1665 merge and shipped lifecycle are terminal.
