@@ -836,3 +836,23 @@
   dependency-free input-derivation module. Earlier F3 product edits remain inside the prior grant;
   the new file had not been created at the immutable amendment boundary. The author continues cheap
   tests and four fresh receipts; no runtime lease, Aspire, Docker, or browser gate is active.
+
+## 2026-08-15T16:27:03Z — final asset-chain evaluation passes; F3 check receipt stops honestly
+
+- #1665's fresh native Fable 5/medium Remote Control chain evaluator returned `PASS`, committed only
+  `delta-eval-asset-chain.md` as `ac274a464`, pushed explicitly, and published verdict comment
+  `5303120561`. It independently reproduced all three generators simultaneously, byte-compared the
+  common prose/provenance payload through the CLI barrel and MCP asset, found no fifth branch-caused
+  mirror, and confirmed the authorized source set plus all carried reds. Fixes topic checkpoint
+  `7a81326a6` reconciles the terminal verdict. Exact-head readiness has all checks terminal green or
+  intentionally skipped except `check-test`, which remains active; merge and relabel stay fenced.
+- #1664's original Sol/high author completed and pushed F3 product head `6e822a74b`: canonical DB
+  codegen precedes the contract gate, real generated service schemas derive their own inputs through
+  a dependency-free primitive, focused tests are 29/0, and bounded structured checks are clean.
+  The first new immutable-head receipt then failed root check honestly at unchanged
+  `verify-producer-reconnect.ts:268` with `Type 'Timeout' is not assignable to type 'number'`.
+  Receipt `s4-f3-check.json` is preserved and all later receipts stopped. Because F3 replaced
+  `@std/path` with `node:path` in a shared Deno batch while the pre-F3 exact-head receipt passed, the
+  same author is running isolated before/after attribution; no retry, lease, runtime gate, or
+  evaluator is permitted until that evidence is terminal and any leaf-caused repair is scoped and
+  pushed before mutation.

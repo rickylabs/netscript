@@ -479,3 +479,14 @@ amendment `c4a900adc` before creating the newly authorized internal primitive af
 replay proved the parent probe cannot be imported through the app's import map. Same author remains
 active on cheap tests and four receipts; no new lease before fresh features Tier-A. #1663's exact
 owner-only decision remains unchanged.
+
+Resume from the authoritative `2026-08-15T16:27:03Z` transition. Runtime ownership remains empty.
+#1665's final four-link chain delta evaluator is terminal `PASS` at artifact-only head `ac274a464`,
+comment `5303120561`, and fixes topic checkpoint `7a81326a6`; exact-head readiness has only
+`check-test` active, so do not relabel or merge until it is terminal green and review threads are
+rechecked. #1664 is clean/pushed at F3 product head `6e822a74b`, but its first fresh root-check
+receipt is preserved `FAIL` with TS2322 `Timeout` versus `number` in unchanged
+`verify-producer-reconnect.ts:268`. Stop all later receipts and expensive work. The same original
+Sol/high author is proving before/after whether F3's `node:path` import contaminated the shared Deno
+timer typings; if leaf-caused, a bounded amendment must be committed and pushed before repair and a
+new receipt must use a distinct path. #1663 remains the only owner-only decision boundary.

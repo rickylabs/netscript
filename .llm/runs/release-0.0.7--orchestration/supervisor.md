@@ -598,3 +598,19 @@ The #1665 closure proof is simultaneous rather than historical: the three genera
 leave the same detached tree clean. #1664's new internal module is a justified proof-transport split,
 not a product-surface expansion: the generated app cannot resolve the parent probe's monorepo import
 map, so only dependency-free input derivation moves. Runtime ownership remains empty.
+
+### Live transition — 2026-08-15T16:27:03Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Queue exhausted and parked at `0ca4c489f` | Do not invent post-freeze work |
+| internals | #1663 remains at the exceptional-final-PLAN-EVAL owner boundary on `194e22a3d` | No third evaluator or product mutation without the owner's explicit verdict |
+| fixes | #1665 final chain evaluator `PASS` at artifact head `ac274a464`; exact-head readiness has only `check-test` active | Do not relabel or merge until that final check is terminal green and review threads are rechecked |
+| features | #1664 F3 product head `6e822a74b` is clean/pushed, but the first new root-check receipt is preserved `FAIL` | Stop every later receipt, lease, runtime gate, and evaluator until same-author isolated causality is proven and any leaf-caused repair is amended before mutation |
+
+#1665's evaluator independently reproduced all three freshness gates in one clean detached tree,
+matched the prose payload and provenance through both generated consumers, found no fifth mirror,
+and preserved every named pre-existing red. #1664's first F3 binding receipt instead reports TS2322
+in the unchanged reconnect diagnostic. That does not establish non-causality: F3 replaced
+`@std/path` with `node:path` in the shared check batch, while the prior exact-head receipt passed.
+The original author is executing a before/after archive proof. Runtime ownership remains empty.

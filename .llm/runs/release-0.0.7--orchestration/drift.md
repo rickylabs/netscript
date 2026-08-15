@@ -572,3 +572,9 @@ implementation thread.
   dependency-free (or live in an app-resolvable package), and that boundary must be exercised before
   the expensive scaffold gate. The author pushed `c4a900adc` to name the isolated internal module
   before creating it.
+- **An unchanged diagnostic can still be made red by shared-batch type pollution:** #1664 F3's
+  first exact-head root-check receipt failed an old explicit `number` timer assignment only after
+  the proof code changed from `@std/path` to `node:path`. Node imports can introduce a different
+  timer return type into a Deno check batch; file ownership alone cannot establish non-causality.
+  Preserve the original failed receipt, prove the import/batch effect with an isolated before/after,
+  and require amendment-before-repair plus a distinct replacement receipt if the leaf caused it.
