@@ -1,8 +1,8 @@
 # Plan — comparison docs programme #1551
 
-Status: formal opposite-family PLAN-EVAL cycle 1 passed. S1 and S2 have topic-orchestrator Tier-A
-sign-off. An owner-priority evidence/publication correction is inserted before the authorized S3
-slice; S3 remains paused until that correction is reviewed.
+Status: all approved slices plus the inserted E0 correction landed and received topic-orchestrator
+Tier-A sign-off. IMPL-EVAL cycle 1 `FAIL_FIX` was repaired at `c7ce58a19`; cycle 2 returned `PASS`
+on that source head, with evaluator record `71cc5a02c` and verdict comment `5300916189`.
 
 ## Objective
 

@@ -2,12 +2,13 @@
 
 ## Current state
 
-Phase: S1, S2, E0, and S3 landed. Formal IMPL-EVAL cycle 1 returned `FAIL_FIX` on evaluated head
-`15429cf8487cfe3504ae0443fd435d2a72d4528b` (evaluator-only commit `e95f4838038a27a0f209d2ce37c9f53bd4ed4299`,
-verdict comment `5300794391`). The bounded five-finding repair is complete locally: evidence
-metadata is immutable at prerequisite commit `43c702b973a71b539ec16e4b93f2c7a2c09d9ab6`, both canonical
-comments are corrected in place, and the public case plus run record pass all applicable gates.
-The next stop is topic-orchestrator Tier-A review; formal IMPL-EVAL cycle 2 has not been launched.
+Phase: S1, S2, E0, and S3 landed and received topic-orchestrator Tier-A sign-off. Formal IMPL-EVAL
+cycle 1 returned `FAIL_FIX` on `15429cf8487cfe3504ae0443fd435d2a72d4528b`; its five findings were
+repaired at `c7ce58a19494024c219e9970deeb3ece878232d6` and signed off in comment `5300864119`. Formal
+IMPL-EVAL cycle 2 returned `PASS` on that repaired source (evaluator-only commit
+`71cc5a02cde091f862c9892464ea77cc962b3675`, verdict comment `5300916189`). No further evaluator
+will run. This bounded merge-readiness cleanup corrects three non-blocking record findings before
+topic-orchestrator Tier-A verification.
 
 Branch/worktree: `docs/comparison-docs-programme` in
 `/home/codex/repos/netscript-007-docs-comparison`, no upstream. The re-baselined branch/remote head
@@ -78,8 +79,9 @@ No packages/plugins, locks/dependencies, consumer code copy, publication/release
   `5 / 325 / 307 / 14 / 2,669` for files/physical/nonblank/comment/tokens; Next.js remains an absent
   source with every static measurement deferred.
 - Evidence tool `1.1.0`, the manifest, and the aggregate carry `frameworkVersions`, `featureFlags`,
-  and `inspectedAt`. Fixed-timestamp reproduction is byte-identical; after deleting `/observedAt`,
-  the normalized SHA-256 is `3d9d2eeffdce67c34dbeb12275fae8889b00578793fedf2894672037c3e654d2`.
+  and `inspectedAt`. Running the documented tool with `--observed-at 2026-08-15T03:57:30Z` and then
+  comparing its output with the checked-in aggregate using `cmp` reproduces byte-identical output
+  (raw `cmp` exit `0`). No normalized digest is used as evidence.
 - The case and Session comment link the evidence through prerequisite commit `43c702b…`, never a
   mutable branch ref or the superseded `4e6d52b…` evidence version. The matrix heading is
   `Residual owner`, matching the methodology.
@@ -115,8 +117,8 @@ Every slice is under 30 files, has a named gate, commits its worklog/context upd
 
 ## Next authorized action
 
-Commit and explicitly push the docs/run-artifact repair, rewrite draft PR #1652's body to its actual
-landed and cycle-1-failed state, post one structured repair comment, then stop for topic-orchestrator
-Tier-A review. Keep the PR draft at `status:impl`, preserve `Part of #1551`, and leave the Tier-A
-repair-review and IMPL-EVAL cycle-2 boxes unchecked. Do not launch cycle 2 or treat generator
-verification as certification. Keep `/home/codex/repos/eis-chat-007-input` strictly read-only.
+Commit and explicitly push the merge-readiness record cleanup, replace the bad digest in draft PR
+#1652's body, tick only the already-proven Tier-A cycle-1-repair checkbox, and post one structured
+cleanup comment. Then stop for topic-orchestrator Tier-A verification. Keep the PR draft at
+`status:impl`, preserve `Part of #1551`, and make no readiness disposition, further evaluation, or
+other checkbox change. Keep `/home/codex/repos/eis-chat-007-input` strictly read-only.

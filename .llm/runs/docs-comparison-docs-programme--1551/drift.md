@@ -198,3 +198,28 @@ case page at that target and records the in-place comment edits. This is a seque
 not a rescope or scope expansion. Both canonical comments are edited in place with no addendum or
 follow-up, the PR remains draft and partial, and formal IMPL-EVAL cycle 2 remains a separate
 opposite-family gate after topic-orchestrator Tier-A review.
+
+## 2026-08-15 — normalized digest claims do not reproduce
+
+Severity: **minor** — merge-readiness evidence-record correction. Status: **resolved pending Tier-A
+verification**. Rescope: **none**. Scope growth: **none**.
+
+IMPL-EVAL cycle 2 returned `PASS` on repaired source
+`c7ce58a19494024c219e9970deeb3ece878232d6` while identifying that the historical normalized
+SHA-256 claims `b9e96ed2…` and `3d9d2ee…` above do not reproduce from their respective checked-in
+aggregates. An independent retry of the tool's own serialization policy—delete `observedAt`, then
+write `JSON.stringify(value, null, 2) + "\n"`—produced `0be43e05…`, not `3d9d2ee…`. The historical
+entries remain unchanged under append-only discipline so the incorrect claims are visible rather
+than concealed.
+
+The underlying repeatability property remains true. This exact command was run against the
+authorized pinned root:
+
+```text
+deno run --allow-read --allow-write --allow-run .llm/tools/docs/measure-comparison-surface.ts --manifest docs/site/comparisons/evidence/session-source-manifest.json --root eis-chat=/home/codex/repos/eis-chat-007-input --observed-at 2026-08-15T03:57:30Z --output .llm/tmp/session-measurements-repro.json
+cmp .llm/tmp/session-measurements-repro.json docs/site/comparisons/evidence/session-measurements.json
+```
+
+`cmp` returned raw exit `0`, proving byte-identical fixed-timestamp regeneration. Current records
+and the PR body use that checkable receipt instead of either normalized digest. No manifest,
+measurement, tool, test, product/docs content, consumer pin, or private input changed.

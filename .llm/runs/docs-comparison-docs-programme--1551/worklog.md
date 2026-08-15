@@ -67,9 +67,12 @@ The draft PR is partial and must say `Part of #1551`. Follow-ups #1645–#1650 o
 | 2026-08-15 | Early rendered-link verification found site-relative evidence JSON links unresolved. | evidence JSON is intentionally not copied to `_site`; links changed to immutable blobs at signed-off S2 commit `4e6d52b3d`, then the complete verifier passed |
 | 2026-08-15 | S3 docs audit and manual review completed. | all named commands raw exit `0`; 36,084 rendered links resolve across 229 pages; both roots render under Concepts; matrix, evidence, privacy, terminology, front matter, and cross-page consistency assertions pass |
 | 2026-08-15 | Formal IMPL-EVAL cycle 1 returned `FAIL_FIX`. | evaluated head `15429cf8487cfe3504ae0443fd435d2a72d4528b`; evaluator-only commit `e95f4838038a27a0f209d2ce37c9f53bd4ed4299`; verdict comment `5300794391`; two blocking and three minor findings accepted for bounded repair |
-| 2026-08-15 | Immutable evidence metadata repaired first. | tool `1.1.0`, manifest, aggregate, and tests add `frameworkVersions`, `featureFlags`, and `inspectedAt`; fixed-timestamp reproduction is byte-identical; normalized SHA-256 `3d9d2eeffdce67c34dbeb12275fae8889b00578793fedf2894672037c3e654d2`; prerequisite commit `43c702b973a71b539ec16e4b93f2c7a2c09d9ab6` pushed explicitly |
+| 2026-08-15 | Immutable evidence metadata repaired first. | tool `1.1.0`, manifest, aggregate, and tests add `frameworkVersions`, `featureFlags`, and `inspectedAt`; regeneration at fixed `--observed-at 2026-08-15T03:57:30Z` is byte-identical by `cmp` raw exit `0`; prerequisite commit `43c702b973a71b539ec16e4b93f2c7a2c09d9ab6` pushed explicitly |
 | 2026-08-15 | Both canonical comments repaired in place. | Session comment `5265826161` now uses immutable `43c702b…` evidence permalinks and was updated at `2026-08-15T05:53:57Z`; Channel comment `5265971722` labels `181 / 178` inspected, restores the shared measured definition, and was updated at `2026-08-15T05:53:58Z`; no follow-up comment |
 | 2026-08-15 | Public case and final repair gates completed. | case evidence permalinks target `43c702b…`, tool metadata matches `1.1.0`, matrix says `Residual owner`; all applicable proportional gate rows raw exit `0`; lint remains N/A by deliberate root configuration |
+| 2026-08-15 | Topic orchestrator signed off the cycle-1 repair. | Tier-A PASS comment `5300864119` on repaired source `c7ce58a19494024c219e9970deeb3ece878232d6` |
+| 2026-08-15 | Formal IMPL-EVAL cycle 2 returned `PASS`. | evaluated source `c7ce58a19494024c219e9970deeb3ece878232d6`; evaluator-only commit `71cc5a02cde091f862c9892464ea77cc962b3675`; verdict comment `5300916189`; no further formal evaluator will run |
+| 2026-08-15 | Merge-readiness evidence receipt corrected. | the claimed normalized digests do not reproduce; the tool's canonical normalization yields `0be43e05…`, so the record now uses the independently reproduced fixed-timestamp command and `cmp` raw exit `0` instead |
 
 ## Gate log
 
@@ -156,8 +159,8 @@ not an acceptable substitute.
 The topic orchestrator ruled the lint row not applicable because the repository deliberately
 excludes `.llm/**` from lint coverage. No alternate config was used as gate evidence and no root
 configuration changed. Regeneration from the exact pinned input reproduces the checked-in
-aggregate; after deleting the declared `/observedAt` field, the normalized SHA-256 is
-`b9e96ed24fa64fe4a9d06bc4c51e5be1c6da8938ff4cba0baec7945cb5cdbaa9`.
+aggregate byte-for-byte at the same declared observation timestamp. The later merge-readiness
+correction records that the separately claimed normalized digest did not reproduce.
 
 ### E0-canonical-comment-correction
 
@@ -206,9 +209,9 @@ evaluator had been run. S3 stopped for topic-orchestrator Tier-A review without 
 | --- | --- | --- | --- |
 | F1 — Channel evidence label | in-place edit and API readback of comment `5265971722` | PASS | `181 / 178` remains an honestly inspected count with its inline procedure; it is no longer called measured; the shared measured definition again requires a published script, pinned inputs, raw aggregate output, and environment metadata; no Channel evidence or remeasurement was added |
 | F2 — immutable evidence links | land evidence commit `43c702b973a71b539ec16e4b93f2c7a2c09d9ab6`, then edit comment `5265826161` and the Session case to use its SHA permalinks | PASS | both comment links and both page links resolve through the immutable evidence commit rather than a mutable branch or superseded S2 commit |
-| F3 — manifest metadata | regenerate at fixed `--observed-at`; `cmp`; normalize two alternate outputs by deleting `/observedAt`; tool tests | PASS | manifest and aggregate carry `frameworkVersions`, `featureFlags`, and `inspectedAt`; fixed-timestamp output is byte-identical; normalized SHA-256 is `3d9d2eeffdce67c34dbeb12275fae8889b00578793fedf2894672037c3e654d2`; aggregates are unchanged |
+| F3 — manifest metadata | `deno run --allow-read --allow-write --allow-run .llm/tools/docs/measure-comparison-surface.ts --manifest docs/site/comparisons/evidence/session-source-manifest.json --root eis-chat=/home/codex/repos/eis-chat-007-input --observed-at 2026-08-15T03:57:30Z --output .llm/tmp/session-measurements-repro.json`; then `cmp .llm/tmp/session-measurements-repro.json docs/site/comparisons/evidence/session-measurements.json` | PASS / raw `cmp` exit `0` | manifest and aggregate carry `frameworkVersions`, `featureFlags`, and `inspectedAt`; fixed-timestamp output is byte-identical; aggregates are unchanged |
 | F4 — PR truthfulness | rewrite draft PR #1652 body after repository repair lands | PENDING external publication step | prepared body records landed P0/S1/S2/E0/S3 and cycle-1 repair, preserves `Part of #1551`, keeps Tier-A repair review and IMPL-EVAL cycle 2 unchecked, and does not change draft state or labels |
-| F5 — matrix terminology | inspect the case-study matrix against methodology section 5 | PASS | final column is `Residual owner`, matching the methodology contract |
+| F5 — matrix terminology | inspect the case-study matrix against methodology section 7 | PASS | final column is `Residual owner`, matching `## 7. Complete every matrix row` and its contract |
 | Docs verifier | `rtk proxy deno task --cwd docs/site verify` | PASS / raw exit `0` | 644 files generated; 229 rendered pages pass semantics; all 36,084 internal links and 18 caveat markers resolve |
 | Source links | `rtk proxy deno task docs:links` | PASS / raw exit `0` | 103 docs sources; zero broken links, anchors, or enforced orphans |
 | Accuracy | `rtk proxy deno task docs:accuracy` | PASS / raw exit `0` | 201 published source pages pass; unrelated existing peer-dependency warning remains non-failing |
@@ -226,3 +229,19 @@ state description, and matrix terminology only. The two-commit order is required
 cannot contain a permalink to the not-yet-known SHA of its own commit: `43c702b…` creates the
 immutable evidence target, and the following docs/run-artifact commit links and records it. Stop
 after the draft-PR handoff for topic-orchestrator Tier-A review; do not launch IMPL-EVAL cycle 2.
+
+### Merge-readiness record cleanup after IMPL-EVAL cycle 2
+
+| Finding / gate | Command or evidence | Result | Finding |
+| --- | --- | --- | --- |
+| N1 — normalized digest | delete `observedAt`, serialize with `JSON.stringify(value, null, 2) + "\n"`, then SHA-256 the immutable `43c702b…` aggregate | DOES NOT REPRODUCE | canonical output is `0be43e058bd8fdce8f4076fce9e94101fd43c643eadfef88475576245899c014`, not the claimed `3d9d2ee…`; the digest claim is removed from current records |
+| N1 — byte-identical reproduction | exact measurement command recorded in the F3 row above; then `cmp .llm/tmp/session-measurements-repro.json docs/site/comparisons/evidence/session-measurements.json` | PASS / raw exit `0` | fixed `--observed-at 2026-08-15T03:57:30Z` regeneration is byte-identical; scratch output was removed after comparison |
+| N2 — plan status | compare `plan.md` status with landed slices, Tier-A comment `5300864119`, and cycle-2 verdict `5300916189` | PASS | only the Status paragraph changed; locked decisions, slice definitions, and gate lists are untouched |
+| N3 — internal records | compare the matrix contract with methodology section 7 and the PR checkbox with Tier-A sign-off comment `5300864119` | PASS | worklog citation corrected to section 7; only the already-proven Tier-A repair-review checkbox is authorized for the PR body |
+| Diff hygiene | `git diff --check` | PASS / raw exit `0` | no whitespace errors before and after final run-artifact updates |
+| Lock hygiene | `git diff --exit-code origin/main -- deno.lock docs/site/deno.lock` | PASS / raw exit `0` | both lockfiles unchanged |
+| Conditional docs-site gate | changed-path inspection | N/A | no `docs/site/**` path changed, so the conditional site verifier does not apply |
+
+No canonical #1551 comment, evidence file, product/docs content, pin, label, milestone, issue state,
+draft state, or readiness disposition changed. Stop after the single cleanup commit, explicit push,
+PR-body correction, and structured PR comment for topic-orchestrator Tier-A verification.
