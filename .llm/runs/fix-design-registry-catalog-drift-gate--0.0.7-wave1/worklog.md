@@ -522,3 +522,13 @@ template→barrel are two distinct gates, both `needs_deno`-guarded; both green)
 Boundaries: read-only over source; no browser, `fresh-browser`, Aspire, Docker, scaffold runtime, or
 `e2e:cli`; no lease requested; locks untouched; PR left draft with exactly one `status:impl`; no
 acceptance box, label, milestone, readiness, merge, or issue state changed.
+
+## Fresh body recheck of T-1…T-5 (2026-08-15)
+
+Fresh opposite-family reviewer (Claude Opus 5, effort medium; session
+`96d469bb-709e-4a44-ab34-c75bf849e0c9`, bridge `session_01NbxH4k3reZ5dPJaADA9qCj`, PID `418737`) ran
+a body-only recheck at head `21403902b`. Verdict **`PASS`** — all five corrections truthfully
+resolved in the live PR body, plus an independent sweep of the remainder finding no further false or
+stale statement. Full ledger in `review-tier-a.md` (appendix). Read-only: no body edit, no label
+change, no acceptance box ticked, no gate rerun; `docker ps -a` empty throughout. The `PASS`
+authorizes only handing #1657 to the coordinator for readiness disposition.

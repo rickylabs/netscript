@@ -777,3 +777,106 @@ gate rerun.
 
 A `CHANGES_REQUESTED` here authorizes the PR-body correction and nothing else. Readiness, merge,
 label changes, and #1358 closure remain coordinator-only.
+
+---
+
+## Appendix — Fresh body recheck of T-1…T-5 (2026-08-15)
+
+Append-only. Nothing above this line is amended.
+
+### Identity and route
+
+| Field | Value |
+| --- | --- |
+| Role | fresh opposite-family body recheck (not a leaf review) |
+| Requested route | `--model claude-opus-5 --effort medium` (job `96d469bb` `respawnFlags`) |
+| Observed route | Claude Opus 5, effort medium |
+| Session id | `96d469bb-709e-4a44-ab34-c75bf849e0c9` |
+| Bridge session id | `session_01NbxH4k3reZ5dPJaADA9qCj` |
+| PID | `418737` |
+| cwd | `/home/codex/repos/netscript-007-leaf-design-registry-drift` |
+| Review head | `21403902b502925dd97ea8cea4e129eb8c83e0df` |
+| Opposite to | Codex author `01a003f0-7821-7a10-a555-e619a9280479` (`gpt-5.6-sol`) |
+
+### Scope
+
+Live PR #1657 body only, fetched with `gh pr view 1657 --json body` at review head. The code,
+gates, receipts, and run artifacts were **not** re-reviewed; the prior fresh Tier-A above already
+passed scope items 1–4. Every prior finding was re-derived from the live body and the repository —
+nothing was inherited from the orchestrator's summary.
+
+### Verification ledger
+
+| # | Claim under recheck | Evidence executed | Result |
+| --- | --- | --- | --- |
+| T-1 | `## Slices` S3 records the T-3 expansion as landed-then-reverted, citing `695dd7b00` | Live body reads "Landed the T-3 CLI design-asset CI ownership expansion (`a09331497`), then reverted it as redundant (`695dd7b00`)"; both shas `git cat-file -t` = commit and ancestors of HEAD | RESOLVED |
+| T-2a | The reverted classifier-suite `62 passed` evidence is gone | `grep` over live body: zero occurrences of `62 passed` / "classifier/workflow suite — exit 0" | RESOLVED |
+| T-2b | Empty three-path `origin/main..HEAD` diff | `git fetch origin main` (fresh `origin/main` = `e090f894f`), then `git diff --stat origin/main..HEAD -- .github/workflows/fresh-ui-quality.yml .github/scripts/ci-classify-changes.ts .github/scripts/ci-classify-changes.test.ts` → no output, exit `0` | TRUE at this head |
+| T-2c | Leaf delta carries no `.github/**` | `git diff --name-only $(git merge-base origin/main HEAD)..HEAD` → 3 product/test files + run artifacts only | TRUE |
+| T-2d | `needsDeno = true` for both surfaces | `ci-classify-changes.ts:274` `CODE_PREFIXES` (`:65-69` = `packages/`, `plugins/`, `apps/`) returns `deno: true` unconditionally for any `packages/**` path — matches both `packages/fresh-ui/registry.manifest.ts` and the CLI `registry.ts.template` with no extension test | TRUE |
+| T-2e | Root-discovery drift test, 5 passed | `grep -c '^Deno.test' packages/fresh-ui/tests/registry-doc-drift.test.ts` = `5` | CONSISTENT |
+| T-2f | `check:assets-barrel` exit 0 receipt | `receipts/assets-barrel.json`: `outcome PASS`, `exitCode 0`, `gitHead == actualGitHead == 4ca76fa75…` — the product head the body names | TRUE |
+| T-3 | Both `fresh-browser` lines name the form-navigation regression under `packages/fresh`, deny gallery rendering, and name the static consumer pair | Live body carries the qualification in **both** the `## Validation` bullet and the DoD box; `receipts/fresh-browser.json` = `argv ['deno','task','test:browser']`, `cwd …/packages/fresh`, tail `running 2 tests from ./tests/form-navigation_browser.ts … 2 passed | 0 failed`, `exitCode 0` | RESOLVED |
+| T-3b | "decoded 66-item embedded barrel" is accurate | Imported `packages/cli/src/kernel/assets/embedded.generated.ts` and read the `registry.ts.template` entry: `total=66`, `version=0.1.0`, 66 `kind:` entries | TRUE |
+| T-4 | Drift/Debt T-3 amendment notes the revert | Live body: "cycle-2 G-1 subsequently showed it was redundant, and `695dd7b00` reverted it" | RESOLVED |
+| T-5a | `Phase:` and `Do not merge until…` reflect Tier-A + IMPL-EVAL cycle 2 complete/`PASS`, recheck + coordinator readiness outstanding | Both lines present and so worded; `3d7819203f59e68eb5b45f6871a03c41ca43cd2f` exists and is an ancestor of HEAD | RESOLVED |
+| T-5b | DoD not collapsed; PR not described as ready | 9 DoD boxes, 8 `[x]`, exactly 1 `[ ]` (the cleanup-recheck/readiness line); no readiness language anywhere in the body | TRUE |
+
+### Independent sweep of the rest of the body
+
+Re-derived rather than assumed:
+
+- **S3's revert justification is factually true, not merely asserted.** `fresh-ui-quality.yml` has no
+  test step (`Frozen package type-check`, `Package lint`, `Frozen-lock failure regression`,
+  `Clean worktree invariant`, receipt upload — no `deno task test`), so the reverted expansion could
+  not have run the drift gate. `ci.yml`'s `check-test` runs the root `test` gate (`:247`) under
+  `needs_deno` (`:188`), and `registry-doc-drift.test.ts` imports the manifest (`:2`) and reads the
+  CLI template (`:31`) in one test — a single root test run covers both #1358 surfaces.
+- **#1358 acceptance boxes:** issue `OPEN`, all 7 acceptance boxes `[ ]`. Zero ticked.
+- **`Closes #1358`** present under `## Scope`; no closing keyword added or removed by this recheck.
+- **Labels:** exactly one `status:` label (`status:impl`); PR `OPEN` and `draft`.
+- **Every `## Validation` bullet still describes work present at this head.** The E-1 bullets
+  re-cover CLI check/fmt, `quality:gate`, JSR audit, and publish dry-run at the post-E-1 head
+  `4ca76fa75`, so the earlier slice-time CLI gates are not left as the only cover for a file that
+  changed after them. `4ca76fa75` touched only `embedded.generated.ts` (1 line) plus journals, and
+  the template has been unchanged since `1308c0b39`, so the Fresh UI package-test bullet is not
+  stale with respect to the template it exercises.
+- **`Aspire / Docker / CLI E2E — NOT RUN`** is truthful and remains so: no such gate was run here.
+
+### Non-blocking observations (no remediation required)
+
+- **O-1.** `## Slices` S3 remains `[x]` for work whose product change is fully reverted. The bullet
+  text discloses the revert in the same sentence and cites `695dd7b00`, so it cannot be read as
+  delivered work; the checkbox marks the slice dispositioned, not shipped. Recorded, not a finding.
+- **O-2.** The `## Harness` phase line reports the formal Tier-A `PASS_TO_IMPL_EVAL` without also
+  naming the later cleanup-delta Tier-A `CHANGES_REQUESTED` (`21403902b`) that this recheck answers.
+  The unchecked DoD box and the `Do not merge until…` line both keep that pending state visible, so
+  the record is not misleading; a coordinator may still prefer the fuller chronology.
+- **O-3.** N-1 from the review above still holds: while #1657 is draft, `check-test` and the Fresh UI
+  `classify` job are guarded by `pull_request.draft == false`, so the drift gate has not executed in
+  CI on this PR. The body makes no claim that it has.
+
+### Boundary compliance
+
+Read-only over the PR, the body, all labels, and all source: no body edit, no label change, no
+acceptance box ticked, no readiness, no merge, no publish, no issue mutation, no closing-keyword
+change. Commands were `gh` reads, `git` inspection, `grep`/`sed` reads, and two `deno eval` reads of
+committed files. **No** browser, `fresh-browser`, Aspire, Docker, scaffold runtime, or `e2e:cli` run;
+no lease requested. `docker ps -a` empty before and after. Lock files untouched. Only this artifact
+and harness bookkeeping are committed.
+
+### Verdict
+
+**`PASS`.**
+
+All five corrections are truthfully resolved in the live body, each verified against the repository
+rather than against the prior review's narrative: the reverted slice is disclosed as reverted with
+its sha, the removed-code evidence is gone and replaced by four proofs that are current at
+`21403902b`, both `fresh-browser` lines name the gate they actually cover and hand #1358's consumer
+proof to the static pair, the drift-debt amendment records its own reversal, and the phase/merge/DoD
+lines describe a PR with formal Tier-A and IMPL-EVAL cycle 2 complete and exactly one item
+outstanding. The independent sweep of the remaining body found no further false, stale, or
+misleading statement.
+
+This `PASS` authorizes exactly one thing: handing PR #1657 to the coordinator for a readiness
+disposition. Readiness, relabel, merge, and #1358 closure remain coordinator-only.
