@@ -114,19 +114,22 @@ The leaf-local `impl-eval-request.md` still binds Fable 5 medium (pre-reset). Th
 supersedes it with Opus 5 medium; the reset-gate brief is the launch authority and the leaf artifact
 is read for target/scope/obligations only.
 
-## Blocking coordinator decisions (open as of 2026-08-15T15:12:56Z)
+## Coordinator decisions — status as of 2026-08-15T16:38:58Z
 
-The lane is at `limits.activeImplementationSlicesPerLane: 2` with both slices parked, so **no
-internals work can advance until one of these is decided**. Nothing here is blocked on an agent.
+Six decisions were raised on 2026-08-15T15:12:56Z. The coordinator resolved **2 through 6** on
+2026-08-15T16:38:58Z. **Decision 1 remains open and is owner-only.**
 
-| # | Decision | Leaf | Why it blocks |
-| - | -------- | ---- | ------------- |
-| 1 | **Owner exception** for one final PLAN-EVAL cycle | #1663 `package-gate-honesty` | Cycle 2 of 2 spent; central state reads `owner_exception_required_for_one_final_cycle_after_two_failures`. Tier-A PASS at `194e22a3d`. A third cycle is owner-only. |
-| 2 | **Bounded tenth path**, test-only: `.llm/tools/docs/check-exports-drift_test.ts` | #1666 `reference-export-drift-gate` | S1 lands fail-closed coverage-policy semantics (D2-D5) whose refusal paths would be proven only by non-persistent one-off probes. The test file sits outside the nine frozen surfaces. |
-| 3 | **`fresh-browser` waiver / `n/a`** | #1666 | Contract lists it as a proving gate; this lane may not execute it. Plan classifies it `NOT FIRED` and argues it is not genuinely required — no route, component, island, or interaction changes. |
-| 4 | **PLAN-EVAL cycle 1 grant + evaluator lease** | #1666 | Author judged a fresh separate-session evaluation required and declined to assume a verdict. Tier-A PASS at `9d0b4bf12`. |
-| 5 | **L-2 scope call** | none yet | Root lint drops ~1,027 ts/tsx files including 700 under the published `packages/cli`, which has no lint config of its own. Whether that exclusion is deliberate debt is a scope decision, not a supervisor call. Sequences after #1663, which is already editing `deno.json` and the lint wrapper. |
-| 6 | **Wave-3 sequencing** | #1533 vs #1666 | #1533's gate would go red on `paginated-query.ts` if it lands before #1666 fixes that example. Honest red, but it should be chosen deliberately. |
+| #   | Decision                                                                         | Leaf                            | Status                                                                                                                                                                                                                              |
+| --- | -------------------------------------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Owner exception** for one final PLAN-EVAL cycle                                | #1663 `package-gate-honesty`    | **OPEN — owner-only.** Cycle 2 of 2 spent; central state reads `owner_exception_required_for_one_final_cycle_after_two_failures`. Tier-A PASS at `194e22a3d`. The leaf is parked at that immutable head; this lane must not relaunch, resume, mutate, or re-review it. |
+| 2   | **Bounded tenth path**, test-only: `.llm/tools/docs/check-exports-drift_test.ts` | #1666 `reference-export-drift-gate` | **AUTHORIZED**, test-only, because persistent fail-closed refusal coverage is load-bearing. Scope/plan amended as **SA-1** and pushed before implementation.                                                                     |
+| 3   | **`fresh-browser` waiver / `n/a`**                                               | #1666                           | **N/A / WAIVED.** The verified plan changes checker/docs/JSDoc/task/workflow wiring only — no route, component, island, or interaction behavior. `NOT_RUN` evidence is preserved and **no runtime lease is acquired**.               |
+| 4   | **PLAN-EVAL cycle 1 grant + evaluator lease**                                    | #1666                           | **GRANTED**, exactly one fresh cycle, **after** the SA-1 amendment receives fresh Tier-A, over the amended immutable head. Route: native **Fable 5 / medium / Remote Control**, separate session, **artifact-only**.                  |
+| 5   | **L-2 scope call**                                                               | none yet                        | **DEFERRED until #1663 is terminal** — L-2 overlaps that leaf's `deno.json` / lint-wrapper surface. It does **not** block #1666.                                                                                                     |
+| 6   | **Wave-3 sequencing**                                                            | #1533 vs #1666                  | **#1666 sequences BEFORE #1533**, so the new example-compiler gate does not knowingly land red on the already-identified `paginated-query` JSDoc.                                                                                    |
+
+On PLAN-EVAL `PASS`, the **preserved original Codex author** is resumed through the plan's serial
+slices, each followed by a fresh Tier-A gate. A `FAIL_PLAN` is reported as such, not worked around.
 
 Queued behind the WIP limit: wave 3 `jsdoc-example-compile-gate` (#1533) and
 `leak-check-process-descendants` (#1429); wave 4 `fresh-defer-test-capability` (#1557/#1601).

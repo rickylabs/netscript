@@ -163,7 +163,33 @@ wave 2 `reference-export-drift-gate` (#1296) — `package-gate-honesty` is now a
 `jsdoc-example-compile-gate` (#1533) and `leak-check-process-descendants` (#1429); wave 4
 `fresh-defer-test-capability` (#1557/#1601).
 
-## Queued internals follow-up — L-2 (needs a coordinator scope decision)
+## Coordinator rulings 2026-08-15T16:38:58Z (decisions 2-6 resolved; 1 stays owner-only)
+
+Authoritative statement is the decision table in `supervisor.md`. Resumable summary:
+
+- **#1663 `package-gate-honesty`** stays parked at immutable `194e22a3d`. Its third/final PLAN-EVAL
+  is the **sole owner-only** decision. **Do not relaunch, resume, mutate, or re-review it.**
+- **#1666 `reference-export-drift-gate`** is the active leaf and executes now:
+  1. Scope amendment **SA-1** authorizes exactly one tenth implementation path,
+     `.llm/tools/docs/check-exports-drift_test.ts`, **test-only** — persistent fail-closed refusal
+     coverage is load-bearing and must not be left to non-persistent one-off probes. SA-1 is
+     committed and explicitly pushed **before** implementation.
+  2. `fresh-browser` is **N/A / waived**. `NOT_RUN` evidence is preserved; **no runtime lease.**
+  3. After SA-1 receives fresh Tier-A, exactly **one** PLAN-EVAL cycle 1 runs over the amended
+     immutable head — native **Fable 5 / medium / Remote Control**, separate session,
+     **artifact-only** (writes `plan-eval.md` and nothing else).
+  4. On `PASS`, resume the **preserved original Codex author** through the plan's serial slices,
+     each followed by a fresh Tier-A gate.
+- **#1666 sequences before #1533**, so the example-compiler gate does not knowingly land red on the
+  already-identified `paginated-query` JSDoc.
+- **L-2 is deferred until #1663 is terminal** (overlapping `deno.json` / lint-wrapper surface). It
+  does not block #1666.
+
+Central `leaf-contracts.json` still freezes nine `fileSurfaces` for this leaf. It is
+coordinator-owned; this lane does **not** edit it. SA-1 is the leaf-local record of the tenth path,
+and the central reconciliation is reported upstream — see `drift.md`.
+
+## Queued internals follow-up — L-2 (DEFERRED until #1663 is terminal)
 
 Root `deno.json` `lint.exclude` contains `.llm/`, so `deno lint` silently drops every `.llm` tooling
 file; in a mixed wrapper batch the false-green guard cannot fire, so a `lint` receipt can read exit
