@@ -78,11 +78,10 @@ implementation thread.
   fetched immutable baseline stays within the locked evidence contract; open another PLAN-EVAL only
   if it changes locked architecture or scope.
 - **Operational / expensive gate:** #1654 attempt 1 produced a prefix of green gate events but no
-  suite verdict and left AppHost-owned stopped resources. It is classified
-  `interrupted_no_verdict`, never PASS/FAIL. Exact ownership evidence permitted scoped removal of
-  three containers, their empty Aspire network, and Garnet's anonymous volume. One retry is granted
-  because the interruption was transport/infrastructure, not a product verdict; no further retry is
-  implicit.
+  suite verdict and left AppHost-owned stopped resources. It is classified `interrupted_no_verdict`,
+  never PASS/FAIL. Exact ownership evidence permitted scoped removal of three containers, their
+  empty Aspire network, and Garnet's anonymous volume. One retry is granted because the interruption
+  was transport/infrastructure, not a product verdict; no further retry is implicit.
 - **Editorial evaluator loop:** #1653 cycle 1's only blocker was stale duplicated PR-body evidence;
   the repair changed no code or committed content. A single fresh cycle 2 verifies the live body and
   cycle-1 integrity. Further evaluator cycling requires a new substantive finding.
@@ -115,15 +114,15 @@ implementation thread.
 ## 2026-08-15T05:16:27Z — exact-session steering and current evaluator route
 
 - **Transport trap / repaired before mutation:** native `claude --bg --resume <session>` allocated
-  new background session IDs instead of steering the two existing topic supervisors. The
-  coordinator stopped both duplicates immediately before either landed work, then used
-  `claude attach <background-id>` to deliver the grants directly to original supervisors
-  `c7597d28` and `fcf04b0f`. Their original PID/cwd/Remote Control bridges remained authoritative;
-  no topic worktree acquired dual ownership.
+  new background session IDs instead of steering the two existing topic supervisors. The coordinator
+  stopped both duplicates immediately before either landed work, then used
+  `claude attach <background-id>` to deliver the grants directly to original supervisors `c7597d28`
+  and `fcf04b0f`. Their original PID/cwd/Remote Control bridges remained authoritative; no topic
+  worktree acquired dual ownership.
 - **Route re-baseline:** current `lane-policy.md` binds Codex-authored formal IMPL-EVAL to fresh
-  native Fable 5/medium. #1654 therefore uses session `19f1be7b-db7d-47c0-b0f1-7cfca302d44a`
-  and registry bridge `session_01Qs22iAtnVYh2fLb26ABvja`, rather than copying the older Opus route
-  from prior reset leases. The evaluator source is the Tier-A sign-off head `f178ac663`, not the
+  native Fable 5/medium. #1654 therefore uses session `19f1be7b-db7d-47c0-b0f1-7cfca302d44a` and
+  registry bridge `session_01Qs22iAtnVYh2fLb26ABvja`, rather than copying the older Opus route from
+  prior reset leases. The evaluator source is the Tier-A sign-off head `f178ac663`, not the
   pre-sign-off implementation head `0b2cf5e7c`.
 - **No scope drift:** the completed #1551 rewrites satisfied the ordered prerequisite for S3; they
   did not alter the evidence pin, equivalence contract, or approved docs boundary. Resuming the
@@ -137,8 +136,8 @@ implementation thread.
   retains the job artifact unchanged as historical evidence; no evaluator is relaunched for an
   attachment-prefix discrepancy.
 - **Cycle accounting:** the pre-cycle #1656 Fable attempt failed before inference with zero tokens,
-  no verdict, no artifact, and no repository mutation. It remains transport/model-unavailable
-  drift rather than PLAN-EVAL cycle 1. The subsequent Opus 5/medium PASS is the first formal cycle.
+  no verdict, no artifact, and no repository mutation. It remains transport/model-unavailable drift
+  rather than PLAN-EVAL cycle 1. The subsequent Opus 5/medium PASS is the first formal cycle.
 - **Docs gate value:** #1652's own cheap gates were all green while the independent evaluator found
   two reproducibility defects in published claims. The correct response is one bounded same-plan
   repair plus fresh Tier-A and formal re-evaluation; neither a new PLAN-EVAL nor a weakened evidence
@@ -166,8 +165,8 @@ implementation thread.
 - **Internals / supervisor correction:** the S2 dispatch said only `deno.json` could change, while
   the approved plan explicitly allowed `check-root-coverage_test.ts` when its live assertion needed
   rebinding. The Codex author stopped without a commit and requested clarification. The preserved
-  supervisor corrected the brief from the approved plan, recorded the mistake, and resumed the
-  same thread; this is not a scope expansion or another evaluation cycle.
+  supervisor corrected the brief from the approved plan, recorded the mistake, and resumed the same
+  thread; this is not a scope expansion or another evaluation cycle.
 - **Fixes / lease closure:** #1657's browser receipt is terminal PASS and cleanup is independently
   empty across actual Chromium/Playwright processes, Aspire, Docker containers, and volumes. The
   expensive-gate record is complete before Tier-A begins, so no runtime ownership is carried into
@@ -194,8 +193,8 @@ implementation thread.
 ## 2026-08-15T06:54:51Z — shipped-artifact freshness and readiness trigger corrections
 
 - **Cross-leaf generated-asset blind spot:** two independent leaves changed authored inputs while
-  omitting the generated artifact consumed downstream. The docs prose bundle deterministically
-  feeds `agent-docs.generated.ts`; the Fresh UI registry template deterministically feeds
+  omitting the generated artifact consumed downstream. The docs prose bundle deterministically feeds
+  `agent-docs.generated.ts`; the Fresh UI registry template deterministically feeds
   `embedded.generated.ts`. A green source-level/content gate is not proof that the shipped consumer
   artifact is current. Any leaf touching `packages/cli/src/kernel/assets/**` or a generator input
   must select and bind `check:assets-barrel` and the narrow generator explaining its delta before
@@ -207,46 +206,47 @@ implementation thread.
   consumer-visible behavior false, so exactly one bounded same-author repair and cycle 2 are
   justified after Tier-A. No further loop is implicit.
 - **Ready-transition ordering:** when a native formal evaluator already supplied the binding PASS,
-  apply `impl-eval:skip` before converting a PR from draft to ready. Reversing that order can dispatch
-  a duplicate OpenHands evaluator; this occurred on #1652 and the duplicate was canceled before
-  mutation.
+  apply `impl-eval:skip` before converting a PR from draft to ready. Reversing that order can
+  dispatch a duplicate OpenHands evaluator; this occurred on #1652 and the duplicate was canceled
+  before mutation.
 - **Lint evidence blind spot:** root `deno.json` excludes `.llm/**` from Deno lint. A mixed wrapper
   batch can select new `.llm` tooling, have Deno silently drop it, and still exit 0 because other
-  files remain. #1656 independently linted its new files with the exact rules and found zero defects,
-  so this is non-blocking there; a dedicated tooling leaf must repair policy or disclose downstream
-  exclusion.
+  files remain. #1656 independently linted its new files with the exact rules and found zero
+  defects, so this is non-blocking there; a dedicated tooling leaf must repair policy or disclose
+  downstream exclusion.
 - **Host and transport:** Aspire and Docker remain empty; only existing topic supervisors were
   attached via `claude attach`. Coordinator transport remains GPT-5.6-SOL/high through the Codex
   app-server Remote Control socket, never max. Steering does not authorize replacing any native
   Claude Opus 5/high topic supervisor.
-- **L-2 disposition:** the `.llm/**` mixed-batch lint exclusion false-green is real and pre-existing,
-  but it is not part of #1656 or the contracted #1611+#1613 leaf. It is ordered after the current
-  internals wave-1 leaf as a dedicated issue/contract because the correct repair changes repository-
-  wide lint policy. No excluded-file workaround, manual receipt laundering, or fold-in is allowed.
+- **L-2 disposition:** the `.llm/**` mixed-batch lint exclusion false-green is real and
+  pre-existing, but it is not part of #1656 or the contracted #1611+#1613 leaf. It is ordered after
+  the current internals wave-1 leaf as a dedicated issue/contract because the correct repair changes
+  repository- wide lint policy. No excluded-file workaround, manual receipt laundering, or fold-in
+  is allowed.
 - **Main evidence boundary:** #1656 advanced main to `7737d8903`. Pages, code quality, and Fresh UI
   quality were green at the checkpoint, while core `ci` remained in progress. Do not use the partial
   workflow set as exact-main release evidence or a canary qualification; keep watching the exact
   head until terminal.
 - **#1658 significant contract drift:** the original contract named four paths but omitted the real
-  manual dispatch CLI and every directly affected regression suite; it also named the already-correct
-  automatic phase workflow as a mutation target. Research head `670e37bea` stopped without widening.
-  The corrected eight-path contract adds the producer and tests, removes the phase workflow from the
-  mutation envelope, and requires a new CLI integration test. This is an authorized rescope, not
-  opportunistic scope growth.
+  manual dispatch CLI and every directly affected regression suite; it also named the
+  already-correct automatic phase workflow as a mutation target. Research head `670e37bea` stopped
+  without widening. The corrected eight-path contract adds the producer and tests, removes the phase
+  workflow from the mutation envelope, and requires a new CLI integration test. This is an
+  authorized rescope, not opportunistic scope growth.
 - **#1658 semantic lock:** formal manual evaluation is selected only by `--phase plan|impl`, is
-  PR-only and verdict-bound, and carries a CLI-resolved live head; non-formal work remains tuple-free.
-  The workflow may admit literal command candidates, but every denial reply must be sanitized,
-  marker-bearing, command-token-free, and exactly once so status/refusal comments cannot recurse.
-  Five one-second generation attempts match the automatic path; exhaustion becomes an attributable
-  denial rather than a paid dispatch or an unreported throw.
-- **#1651 owner verdict / overlap disposition:** owner selected keep-and-narrow. The RFC is distinct;
-  only C6 overlaps RFC 0003/#1490. C6 retains generic CLI workspace-plan execution and common doctor
-  mechanics. RFC 0003/#1490 retains provider, Prisma schema/model/index, migration, bridge,
-  database-validation, receipt/audit/outbox, and transactional business-command semantics. The
-  adapter maps domain output to the common executor without reversing either ownership direction.
-  Preview must not influence plan construction. This substantive but bounded amendment invalidates
-  the pre-comment readiness claim and requires one fresh Tier-A plus one final focused IMPL-EVAL,
-  not a new PLAN-EVAL or an unbounded formal loop.
+  PR-only and verdict-bound, and carries a CLI-resolved live head; non-formal work remains
+  tuple-free. The workflow may admit literal command candidates, but every denial reply must be
+  sanitized, marker-bearing, command-token-free, and exactly once so status/refusal comments cannot
+  recurse. Five one-second generation attempts match the automatic path; exhaustion becomes an
+  attributable denial rather than a paid dispatch or an unreported throw.
+- **#1651 owner verdict / overlap disposition:** owner selected keep-and-narrow. The RFC is
+  distinct; only C6 overlaps RFC 0003/#1490. C6 retains generic CLI workspace-plan execution and
+  common doctor mechanics. RFC 0003/#1490 retains provider, Prisma schema/model/index, migration,
+  bridge, database-validation, receipt/audit/outbox, and transactional business-command semantics.
+  The adapter maps domain output to the common executor without reversing either ownership
+  direction. Preview must not influence plan construction. This substantive but bounded amendment
+  invalidates the pre-comment readiness claim and requires one fresh Tier-A plus one final focused
+  IMPL-EVAL, not a new PLAN-EVAL or an unbounded formal loop.
 
 ## 2026-08-15T07:48:51Z — transport recovery and evidence corrections
 
@@ -259,12 +259,12 @@ implementation thread.
   drift test for both relevant surfaces, while the added Fresh UI job contained no test step. The
   exact three redundant CI deltas are therefore restored to main at `a891c6520`; this is efficiency
   cleanup, not withdrawal of the product verdict or a third formal cycle.
-- **Fixes / browser evidence wording:** the inherited browser receipt proves the Fresh form-navigation
-  suite only; it never rendered the generated design gallery. #1358 consumer proof rests on the
-  decoded shipped barrel, source-template equality, rendered-section coverage computation, and the
-  symmetric root drift gate. No unleased runtime claim is retained.
-- **Internals / required architectural gate:** #1658's repaired plan changes claim/spend atomicity and
-  workflow permissions, so one fresh PLAN-EVAL is warranted. The evaluator is independent Opus
+- **Fixes / browser evidence wording:** the inherited browser receipt proves the Fresh
+  form-navigation suite only; it never rendered the generated design gallery. #1358 consumer proof
+  rests on the decoded shipped barrel, source-template equality, rendered-section coverage
+  computation, and the symmetric root drift gate. No unleased runtime claim is retained.
+- **Internals / required architectural gate:** #1658's repaired plan changes claim/spend atomicity
+  and workflow permissions, so one fresh PLAN-EVAL is warranted. The evaluator is independent Opus
   5/medium with active Remote Control, bound to `cea999d18`; this does not authorize implementation
   until a terminal `PASS` is committed and pushed.
 
@@ -282,9 +282,9 @@ implementation thread.
   explicit tests; and refusal posting must use `GITHUB_TOKEN` so the declared job permission is the
   actual ceiling rather than an unconstrained PAT.
 - **#1657 merge record:** the cleanup implementation is correct, but the live PR body remained stale
-  after the three CI files were restored to main. A body-only correction is required to mark the
-  T-3 slice and its validation superseded and to qualify `fresh-browser` as form-navigation only.
-  This is not product drift, a gate rerun, or a formal evaluator cycle.
+  after the three CI files were restored to main. A body-only correction is required to mark the T-3
+  slice and its validation superseded and to qualify `fresh-browser` as form-navigation only. This
+  is not product drift, a gate rerun, or a formal evaluator cycle.
 - **#1651 evidence provenance closed:** the binding cached check receipt has empty stdout and must
   not inherit cycle-1's 1,033-file/9-batch figures. The amended body now names the correct receipts,
   content/evidence heads, and cached-hit semantics; fresh review must verify those live claims.
@@ -301,9 +301,31 @@ implementation thread.
   record distinguishes static gallery proof from the form-navigation browser receipt; exact-head CI
   then exercised root `check-test`, while desktop/scaffold/runtime lanes skipped by classification.
 - **Lifecycle drift corrected:** merged #1643 and closed #1243 retained stale
-  `status:ready-merge`/`status:triage` labels. They were normalized to exactly `status:shipped` after
-  verifying the merge/close tuple and 3/3 issue boxes. This was bookkeeping repair, not product or
-  acceptance mutation.
+  `status:ready-merge`/`status:triage` labels. They were normalized to exactly `status:shipped`
+  after verifying the merge/close tuple and 3/3 issue boxes. This was bookkeeping repair, not
+  product or acceptance mutation.
 - **Supervisor transport preserved:** post-merge grants were delivered by `claude attach` to the
   existing feature/fix background IDs. No `--resume` duplicate, replacement bridge, or second topic
   owner was created.
+
+## 2026-08-15T08:45:30Z — post-freeze docs intake and two public-contract corrections
+
+- **Docs #1659 is owner-directed post-freeze work:** the frozen inventory remains the audited
+  60-issue milestone set, so central state records #1659 as `ownerDirectedIssueNumbers` rather than
+  silently rewriting intake/DAG ownership. It still uses the existing docs supervisor and original
+  Codex author and remains subject to the normal Tier-A/readiness/merge gates.
+- **#1448 scope drift is real, not opportunistic expansion:** four acceptance requirements were
+  unreachable in the original three-file envelope. The exact five-file amendment stays wholly inside
+  `packages/ai/**`; it adds no export entry and no consumer work. Public status is synchronous and
+  I/O-free, uses `McpConnectionState`, retains last error per server, and close cancellation is an
+  additive options-bag contract. `pool.stop()` must settle per server so one failed close cannot
+  strand its peers.
+- **#1293 filed premise is stale:** `onConnectionError` exists on the published options type and in
+  the example but is not called. Compatibility wins: wire the shipped hook with explicit semantics,
+  test it, and export the intended adapter surface; do not remove a public option without owner
+  authority. The stale reference page and #1112 example are reported to docs after the product leaf,
+  not folded across lane ownership.
+- **Main CI is evidence, not release qualification:** run `31874580034` proves the merged
+  #1657/#1651 head is healthy and file classification skips unrelated jobs correctly. It does not
+  replace the final exact-main release gates/canary cadence, which remain pending after all
+  committed work ships.

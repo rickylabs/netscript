@@ -45,7 +45,7 @@
         "pid": 23964,
         "bridgeSessionId": "session_01PLRauSHN1PnvrNF2ucefF6",
         "remoteControlUrl": "https://claude.ai/code/session_01PLRauSHN1PnvrNF2ucefF6",
-        "topicHeadSha": "f7d2fdda6b36330d77f8d416904bd895c96c925a",
+        "topicHeadSha": "b494a51ab2a3e11a8698d05880fb806f3ed82eae",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e19b-71d1-95ce-8c72559eb026",
         "legacyState": "parked_offline"
@@ -72,7 +72,7 @@
         "pid": 23955,
         "bridgeSessionId": "session_01HqFtKQtyJcHBEn1MghQdFX",
         "remoteControlUrl": "https://claude.ai/code/session_01HqFtKQtyJcHBEn1MghQdFX",
-        "topicHeadSha": "d5ade932be5bf541739e092a2eb4faf5a6668d20",
+        "topicHeadSha": "636e3acf5b39984ce2e357f65522a3e6ee40cfe0",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle"
@@ -114,7 +114,7 @@
         "pid": 26724,
         "bridgeSessionId": "session_014pCd2QWkCscgZpVdjcUPST",
         "remoteControlUrl": "https://claude.ai/code/session_014pCd2QWkCscgZpVdjcUPST",
-        "topicHeadSha": "a46783f399acfcb7d73ad35dd32b03ef0ddd5390",
+        "topicHeadSha": "af53757e6748e3a2cbf7ca8077d856ac4e8f2a02",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle"
@@ -165,7 +165,7 @@
         "sessionId": "19621a0b-c6a0-47c6-b826-93c1634a6875",
         "bridgeSessionId": "session_01LQBHX8KpA5aYtDraq46J8a",
         "remoteControlUrl": "https://claude.ai/code/session_01LQBHX8KpA5aYtDraq46J8a",
-        "topicHeadSha": "1bfc1cfcdff6d39c75f7190d1b79750f55b966c0",
+        "topicHeadSha": "ef9279e1268d37a318801234e62108344037de35",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
         "legacyState": "parked_idle"
@@ -803,7 +803,7 @@
       "prNumber": 1658,
       "bootstrapHeadSha": "ca2266ecb4fe0cdd8a47059b4bca39761840f3b3",
       "researchHeadSha": "670e37beaa723f1b54218149a2485dd6b3e741e3",
-      "implementationState": "slice_2_running",
+      "implementationState": "slice_3_running",
       "planRepairHeadSha": "cea999d18ea2c2d4a6208fc209ce744d9be1d194",
       "planRepairTierAState": "PASS",
       "planRepairTierACommentUrl": "https://github.com/rickylabs/netscript/pull/1658#issuecomment-5301190104",
@@ -828,6 +828,11 @@
       "slice1TierACommentUrl": "https://github.com/rickylabs/netscript/pull/1658#issuecomment-5301346790",
       "slice1RootTest": "PASS: 4138 passed, 19 ignored, 0 failed",
       "slice2ImplementationHeadSha": "28a8a9184201a7dc27532f057ddbe35e4e11215b",
+      "slice2EvidenceHeadSha": "5869cb46d5157fd4bd42ef2afaf357286a823506",
+      "slice2TierAState": "PASS",
+      "slice2TierASignoffHeadSha": "0886c2427fb78d26fd3aaa009f958ddf10895c76",
+      "slice2TierACommentUrl": "https://github.com/rickylabs/netscript/pull/1658#issuecomment-5301401476",
+      "slice3LocalImplementationHeadSha": "d7fdbb1d9e86e30100781ba420a4340b1a16abc6",
       "implementationCarriedNotes": [
         "S1-before-S4 is required by the API dependency, not live intermediate-branch spend safety",
         "the root test receipt is the load-bearing gate for these dot-directory surfaces",
@@ -847,6 +852,82 @@
         ],
         "formalPlanEvaluationRequired": true
       },
+      "receiptRefs": []
+    },
+    {
+      "id": "comparison-vs-pages",
+      "lane": "docs",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "headSha": "e090f894ff3682405a36e4f896ffd2cc16f9a1f8",
+      "currentPrHeadSha": "0b67ef39e25805d68056ea76978cb69c2968a36c",
+      "issueNumbers": [],
+      "ownerDirectedIssueNumbers": [
+        1659
+      ],
+      "ownerDirectedPostFreeze": true,
+      "implementerAgentId": "01a0047a-aceb-7b53-9ba1-9191eedaaf1a",
+      "branch": "docs/comparison-vs-pages",
+      "worktree": "/home/codex/repos/netscript-007-docs-vs",
+      "prNumber": 1660,
+      "implementationState": "tier_a_repair_running",
+      "slice1HeadSha": "efaa77b97b2ba02d356898cab967b0b48cf92547",
+      "slice2HeadSha": "34b4d69755e8cc57d3f05c9a36099a226160aeda",
+      "slice3HeadSha": "94568ab94f27c2167e2f6bfdd71bb80905857bb2",
+      "slice4HeadSha": "0b67ef39e25805d68056ea76978cb69c2968a36c",
+      "tierAState": "CHANGES_REQUESTED",
+      "tierAFindings": [
+        "add honest backend architectural estimates",
+        "add a second backend argument proving same-contract imports without a generated client",
+        "verify the public baseContract chain with deno doc",
+        "type-check both central NetScript snippets with uncommitted scratch fixtures"
+      ],
+      "receiptRefs": []
+    },
+    {
+      "id": "ai-mcp-pool-isolation",
+      "lane": "fixes",
+      "phase": "implementing",
+      "baseBranch": "main",
+      "headSha": "284dda90a17a13a7e5e8e9834e5411b58887131b",
+      "currentPrHeadSha": "1d4533462a088ad902ac7dd71be88764463fcd5d",
+      "issueNumbers": [
+        1448
+      ],
+      "implementerAgentId": "01a0048d-61b0-76a2-8117-5f8ce0466495",
+      "branch": "fix/ai-mcp-pool-isolation",
+      "worktree": "/home/codex/repos/netscript-007-leaf-ai-mcp-pool",
+      "prNumber": 1661,
+      "implementationState": "scope_amended_resume_pending",
+      "scopeBlockerHeadSha": "1d4533462a088ad902ac7dd71be88764463fcd5d",
+      "scopeRulingTopicHeadSha": "af53757e6748e3a2cbf7ca8077d856ac4e8f2a02",
+      "scopeRulingLeafArtifactSha": "e2faaab15",
+      "amendedFiles": [
+        "packages/ai/tests/mcp_test.ts",
+        "packages/ai/src/ports/mcp-transport.ts",
+        "packages/ai/src/mcp/adapters/base-transport.ts",
+        "packages/ai/mcp.ts",
+        "packages/ai/README.md"
+      ],
+      "publicContract": "additive synchronous I/O-free per-server snapshot keyed by serverId with McpConnectionState and last error; cancellable close takes a signal options bag; pool.stop settles per server",
+      "receiptRefs": []
+    },
+    {
+      "id": "prisma-mysql-adapter-surface",
+      "lane": "features",
+      "phase": "planned",
+      "baseBranch": "main",
+      "headSha": "284dda90a17a13a7e5e8e9834e5411b58887131b",
+      "issueNumbers": [
+        1293
+      ],
+      "implementerAgentId": "01a0048f-8d95-7682-a3ce-1c1926aba75c",
+      "branch": "feat/prisma-mysql-adapter-surface",
+      "worktree": "/home/codex/repos/netscript-007-features-1293",
+      "implementationState": "research_running",
+      "compatibilityDisposition": "preserve and wire the already-published PrismaMySqlOptions.onConnectionError hook; removal is not authorized",
+      "planEvaluationState": "authorized_if_decision_heavy_after_clean_plan_and_topic_review",
+      "docsFollowUp": "#1112 and the prisma-adapter-mysql reference remain docs-owned and are not part of this product leaf",
       "receiptRefs": []
     },
     {
@@ -1448,7 +1529,7 @@
     }
   ],
   "exactMainEvidence": {
-    "gitHead": "e090f894ff3682405a36e4f896ffd2cc16f9a1f8",
+    "gitHead": "284dda90a17a13a7e5e8e9834e5411b58887131b",
     "surface": "repository",
     "expectedGateIds": [
       "arch-check",
@@ -1474,5 +1555,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T08:31:20.000Z"
+  "updatedAt": "2026-08-15T08:45:30.000Z"
 }

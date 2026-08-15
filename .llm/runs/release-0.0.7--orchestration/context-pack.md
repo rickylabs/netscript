@@ -51,40 +51,39 @@ and bypass permissions. Their exact session/PID/bridge/URL/topic-head receipts l
 later task explicitly authorizes its alternate-worker delegation surface.
 
 Live checkpoint advanced at `2026-08-14T23:54:29Z`: `main` is now
-`0b3ed5d5a6aea451318f120988c25dfa3993a2ab` after coordinator merges of #1644 and #1643. Reset orders 1, 2,
-3, 4, 5, and 6 are terminal `PASS`; orders 3/4/5/6 have been returned to their preserved Codex
+`0b3ed5d5a6aea451318f120988c25dfa3993a2ab` after coordinator merges of #1644 and #1643. Reset orders
+1, 2, 3, 4, 5, and 6 are terminal `PASS`; orders 3/4/5/6 have been returned to their preserved Codex
 implementation threads through the existing Claude topic supervisors. Fixes order 5 first returned
 `FAIL_PLAN` cycle 1, was repaired at `5b3c6fcf2` by the original Codex plan-author thread, then
-passed fresh PLAN-EVAL cycle 2 at evaluator commit `b8fc5eb53` in session `06451c1e-…`. PR #1654
-is draft at `status:impl`; only its preserved Codex thread `019ffcca-8be0-…` is authorized to
-implement. Reset orders 1 and 2 are merged. Continue to
-serialize only inside each topic orchestrator; never introduce a cluster-wide
-evaluator wait, and keep the separate shared-resource `expensiveGates` mutex empty until a genuine
-E2E/Aspire gate needs it.
+passed fresh PLAN-EVAL cycle 2 at evaluator commit `b8fc5eb53` in session `06451c1e-…`. PR #1654 is
+draft at `status:impl`; only its preserved Codex thread `019ffcca-8be0-…` is authorized to
+implement. Reset orders 1 and 2 are merged. Continue to serialize only inside each topic
+orchestrator; never introduce a cluster-wide evaluator wait, and keep the separate shared-resource
+`expensiveGates` mutex empty until a genuine E2E/Aspire gate needs it.
 
 Completion supervision resumed at `2026-08-15T03:46:43Z`. The live continuation point is no longer
 the reset-gate table above: docs S2 is active after exact pinned-input provisioning; internals #1653
-is in fresh Opus 5/high IMPL-EVAL session `430d5f91-…`; features #1651's session `2a8cf0a6-…`
-ended conditional `PASS` at `0e302ad3a`, but owner comment `5300440887` supersedes readiness and
-requires the active delegated RFC-0003 duplicate/overlap audit;
-fixes #1654 repaired Tier-A finding T-1 at `ebad68c80`, and now holds the singleton slice-6
-`scaffold.runtime` lease granted only after empty Aspire/Docker/central-lease preflight. Keep the coordinator turn active through those
-terminal results and subsequent merge-readiness decisions. A supervisor's parked checkpoint is
-never itself a reason to yield.
+is in fresh Opus 5/high IMPL-EVAL session `430d5f91-…`; features #1651's session `2a8cf0a6-…` ended
+conditional `PASS` at `0e302ad3a`, but owner comment `5300440887` supersedes readiness and requires
+the active delegated RFC-0003 duplicate/overlap audit; fixes #1654 repaired Tier-A finding T-1 at
+`ebad68c80`, and now holds the singleton slice-6 `scaffold.runtime` lease granted only after empty
+Aspire/Docker/central-lease preflight. Keep the coordinator turn active through those terminal
+results and subsequent merge-readiness decisions. A supervisor's parked checkpoint is never itself a
+reason to yield.
 
 Resume from the authoritative `2026-08-15T05:06:31Z` checkpoint, not the stale paragraph above.
 #1653 cycle 2 passed at `70177e808`; current-head CI and close-gate passed, it merged as
-`473e8d75b`, and #1378/#1545 closed `COMPLETED` with terminal labels. Internals has advanced its next
-serial leaf, `quality-scan-root-coverage` (#1542), to harness bootstrap/research/plan. #1654's clean
-retry reached one terminal `suite-end`, 89/0/0, and cleanup receipt proves empty Aspire, Docker,
-custom-network, volume, and leak-survivor state; head `0b2cf5e7c` is in Tier-A review and the shared
-lease is complete. #1652 must first rewrite issue comments `5265826161` and `5265971722` in
-place from authoritative EIS-Chat `5191de83`, with recalculated feature/effort estimates. The
+`473e8d75b`, and #1378/#1545 closed `COMPLETED` with terminal labels. Internals has advanced its
+next serial leaf, `quality-scan-root-coverage` (#1542), to harness bootstrap/research/plan. #1654's
+clean retry reached one terminal `suite-end`, 89/0/0, and cleanup receipt proves empty Aspire,
+Docker, custom-network, volume, and leak-survivor state; head `0b2cf5e7c` is in Tier-A review and
+the shared lease is complete. #1652 must first rewrite issue comments `5265826161` and `5265971722`
+in place from authoritative EIS-Chat `5191de83`, with recalculated feature/effort estimates. The
 comments predate the material route improvements already contained in that pin; no newer product
-head exists, and `834a2b36` differs only by harness evidence. #1651 is
-not duplicate overall but remains owner-blocked: wait for option 1 keep-and-narrow, option 2
-remove/defer C6, or option 3 close-as-duplicate. Do not infer the verdict. All topic controllers and
-leaf threads remain the preserved originals; serialization is per topic, not cluster-wide.
+head exists, and `834a2b36` differs only by harness evidence. #1651 is not duplicate overall but
+remains owner-blocked: wait for option 1 keep-and-narrow, option 2 remove/defer C6, or option 3
+close-as-duplicate. Do not infer the verdict. All topic controllers and leaf threads remain the
+preserved originals; serialization is per topic, not cluster-wide.
 
 Resume from the newer `2026-08-15T05:16:27Z` checkpoint. #1652's two canonical issue-comment
 replacements are complete and approved S3 is running on the original Codex author thread from
@@ -101,19 +100,19 @@ formal IMPL-EVAL cycle 1 `FAIL_FIX` at `e95f48380`; authorize cycle 2 only after
 receives fresh independent Tier-A. Internals #1656 passed PLAN-EVAL cycle 1 at `3b95a004f` and is
 implementing its approved three-file plan on the original Codex thread; the earlier Fable attempt
 was zero-token route drift, not a cycle. Fixes #1358 is implementing and must request the singleton
-lease before `fresh-browser`. #1651 remains draft and unchanged until the owner explicitly selects
-1 keep-and-narrow, 2 remove/defer C6, or 3 close-as-duplicate. Preserve all four topic supervisor
+lease before `fresh-browser`. #1651 remains draft and unchanged until the owner explicitly selects 1
+keep-and-narrow, 2 remove/defer C6, or 3 close-as-duplicate. Preserve all four topic supervisor
 session IDs and Remote Control bridges; serialization remains per topic, while Aspire/Docker/E2E
 alone share the global expensive-gate mutex.
 
-Resume from the authoritative `2026-08-15T06:07:53Z` checkpoint. Docs #1652 repaired formal
-cycle-1 findings at `c7ce58a19`, passed hardened supervisor Tier-A at `3aedb4cce`, and has one fresh
-Opus 5/medium Remote Control IMPL-EVAL cycle 2 authorized against that immutable head. Internals
-#1656 is functionally green at `dbbedde34` but must record its three justified JSON field-name
-clarifications in `drift.md` and obtain slice-1 sign-off before S2. Fixes #1657 holds the singleton
-`fresh-browser` lease at `4a3c40321`; only Playwright/Chromium is in scope and cleanup plus empty
-Aspire/Docker are mandatory before the lease completes. #1651 remains unchanged and draft pending
-the owner's explicit 1/2/3 disposition. Do not serialize these topic-local actions across lanes.
+Resume from the authoritative `2026-08-15T06:07:53Z` checkpoint. Docs #1652 repaired formal cycle-1
+findings at `c7ce58a19`, passed hardened supervisor Tier-A at `3aedb4cce`, and has one fresh Opus
+5/medium Remote Control IMPL-EVAL cycle 2 authorized against that immutable head. Internals #1656 is
+functionally green at `dbbedde34` but must record its three justified JSON field-name clarifications
+in `drift.md` and obtain slice-1 sign-off before S2. Fixes #1657 holds the singleton `fresh-browser`
+lease at `4a3c40321`; only Playwright/Chromium is in scope and cleanup plus empty Aspire/Docker are
+mandatory before the lease completes. #1651 remains unchanged and draft pending the owner's explicit
+1/2/3 disposition. Do not serialize these topic-local actions across lanes.
 
 Resume from the authoritative `2026-08-15T06:19:11Z` checkpoint. Docs #1652 cycle-2 IMPL-EVAL is
 still working in the fresh native Opus 5/medium Remote Control session `4ed649d5-…` against clean
@@ -127,14 +126,14 @@ choice 1 keep-and-narrow, 2 remove/defer C6, or 3 close as duplicate. Only the s
 is cluster-wide; all evaluator and implementation serialization remains per topic.
 
 Resume from the authoritative `2026-08-15T06:24:17Z` checkpoint. Docs #1652 formal cycle 2 is
-terminal `PASS` at `71cc5a02c`; the preserved Codex author is correcting only evaluator N1–N3,
-then the docs supervisor performs one topic Tier-A and stops. Never launch cycle 3. Internals #1656
-S2 is signed off at `4ae309d57`; final S3 is run-artifact-only and active on the preserved author
-thread, after which coordinator may grant one fresh IMPL-EVAL. Fixes #1657 Tier-A found T-3 at
-`5fe600235`: CLI design-template-only changes bypassed the Fresh UI drift CI. The coordinator
-amended the contract at `c5e06661b` with exactly the Fresh UI workflow, classifier, and classifier
-test; repair/re-review is active, without another browser/Aspire/Docker pass. #1651 is unchanged
-and draft pending explicit owner option 1/2/3. Runtime mutex is free; serialization is per topic.
+terminal `PASS` at `71cc5a02c`; the preserved Codex author is correcting only evaluator N1–N3, then
+the docs supervisor performs one topic Tier-A and stops. Never launch cycle 3. Internals #1656 S2 is
+signed off at `4ae309d57`; final S3 is run-artifact-only and active on the preserved author thread,
+after which coordinator may grant one fresh IMPL-EVAL. Fixes #1657 Tier-A found T-3 at `5fe600235`:
+CLI design-template-only changes bypassed the Fresh UI drift CI. The coordinator amended the
+contract at `c5e06661b` with exactly the Fresh UI workflow, classifier, and classifier test;
+repair/re-review is active, without another browser/Aspire/Docker pass. #1651 is unchanged and draft
+pending explicit owner option 1/2/3. Runtime mutex is free; serialization is per topic.
 
 Resume from the newer authoritative `2026-08-15T06:54:51Z` checkpoint. Docs #1652 is still on its
 original Codex author thread after head `d4a0a8340`: current-head CI exposed the deterministic
@@ -146,39 +145,38 @@ truthfulness, `impl-eval:skip`-before-ready ordering, and current-head CI, then 
 Its `.llm/**` lint-exclusion finding is a separate follow-up, not a rescope. Fixes #1657 formal
 cycle 1 returned `FAIL_FIX` at `a46b83831`: the source template had 66 entries but the shipped
 `embedded.generated.ts` still had 50. Scope is amended by exactly that generated barrel; allow one
-same-author repair, fresh Tier-A, and one final Opus 5/medium Remote Control cycle 2, with no browser,
-Aspire, Docker, scaffold, or E2E rerun. #1651 remains frozen pending explicit owner choice 1/2/3.
-Runtime remains empty and the expensive-gate mutex free; serialization is only per topic.
+same-author repair, fresh Tier-A, and one final Opus 5/medium Remote Control cycle 2, with no
+browser, Aspire, Docker, scaffold, or E2E rerun. #1651 remains frozen pending explicit owner choice
+1/2/3. Runtime remains empty and the expensive-gate mutex free; serialization is only per topic.
 
 Resume from the newer authoritative `2026-08-15T07:12:16Z` checkpoint. Main is
 `7737d8903bb2925c3fcefbda362168fe297eebd4` after #1656 merged from exact source `b80794470`; #1542
 is closed completed and both PR/issue carry `status:shipped`. Internals has advanced its next serial
 leaf, draft PR #1658 `openhands-dispatch-claim-and-refusal` (#1611+#1613), on preserved Codex thread
-`01a00443-…` at immutable base `7737d8903` and bootstrap `ca2266ecb`; its current authority ends after
-research/plan. The L-2 mixed
-lint-batch exclusion false-green is a separate later tooling leaf, not a fold-in or workaround.
-Fixes #1657 passed fresh Tier-A at `3d7819203`; its single final Opus 5/medium Remote Control
-IMPL-EVAL cycle 2 is running in session `1df19d27-…` over that exact local=remote=PR head. Docs #1652
-is at final cascade head `a465836b4`; all four freshness gates pass and its supervisor is waiting on
-fresh Tier-A plus terminal exact-head Actions, with formal cycle 3 forbidden. Features #1651 remains
-untouched and owner-blocked on choice 1 keep-and-narrow C6, 2 remove/defer C6, or 3 close as
-duplicate. Main CI has no failure at checkpoint but core `ci` is still in progress. Agentic runtime
-is `no_change`; Aspire, Docker containers, and volumes are empty. Preserve all four native topic
-supervisors and enforce serialization per topic only.
+`01a00443-…` at immutable base `7737d8903` and bootstrap `ca2266ecb`; its current authority ends
+after research/plan. The L-2 mixed lint-batch exclusion false-green is a separate later tooling
+leaf, not a fold-in or workaround. Fixes #1657 passed fresh Tier-A at `3d7819203`; its single final
+Opus 5/medium Remote Control IMPL-EVAL cycle 2 is running in session `1df19d27-…` over that exact
+local=remote=PR head. Docs #1652 is at final cascade head `a465836b4`; all four freshness gates pass
+and its supervisor is waiting on fresh Tier-A plus terminal exact-head Actions, with formal cycle 3
+forbidden. Features #1651 remains untouched and owner-blocked on choice 1 keep-and-narrow C6, 2
+remove/defer C6, or 3 close as duplicate. Main CI has no failure at checkpoint but core `ci` is
+still in progress. Agentic runtime is `no_change`; Aspire, Docker containers, and volumes are empty.
+Preserve all four native topic supervisors and enforce serialization per topic only.
 
 Resume from the newer authoritative `2026-08-15T07:25:00Z` checkpoint. Docs #1652 merged from
-`a465836b4` as main `e090f894ff3682405a36e4f896ffd2cc16f9a1f8`; #1551 closed completed and the
-docs lane has no residual bound 0.0.7 leaf. Internals #1658 stopped at research head `670e37bea`
-because its original frozen contract excluded the real CLI producer and regression tests. The
-coordinator replaced it with the exact eight-path mutation envelope recorded in `leaf-contracts.json`;
+`a465836b4` as main `e090f894ff3682405a36e4f896ffd2cc16f9a1f8`; #1551 closed completed and the docs
+lane has no residual bound 0.0.7 leaf. Internals #1658 stopped at research head `670e37bea` because
+its original frozen contract excluded the real CLI producer and regression tests. The coordinator
+replaced it with the exact eight-path mutation envelope recorded in `leaf-contracts.json`;
 `.github/workflows/openhands-phase-eval.yml` is read-only precedent. Formal mode is explicit
-`--phase plan|impl`, PR-only, verdict-bound, and uses a live CLI-resolved head; non-formal mode stays
-tuple-free. Refusals are one sanitized non-recursive pre-spend reply, and lookup retry is 5×1s with
-an attributable fail-closed exhaustion result. Resume the same Codex author only to rewrite the plan,
-then run one fresh opposite-family PLAN-EVAL because the claim/spend and workflow-permission boundary
-is architectural. Fixes #1657 cycle-2 IMPL-EVAL remains active at `3d7819203`. Features #1651 stays
-frozen on owner choice 1/2/3. Main CI is running without a failure at this checkpoint; Aspire and
-Docker remain empty.
+`--phase plan|impl`, PR-only, verdict-bound, and uses a live CLI-resolved head; non-formal mode
+stays tuple-free. Refusals are one sanitized non-recursive pre-spend reply, and lookup retry is 5×1s
+with an attributable fail-closed exhaustion result. Resume the same Codex author only to rewrite the
+plan, then run one fresh opposite-family PLAN-EVAL because the claim/spend and workflow-permission
+boundary is architectural. Fixes #1657 cycle-2 IMPL-EVAL remains active at `3d7819203`. Features
+#1651 stays frozen on owner choice 1/2/3. Main CI is running without a failure at this checkpoint;
+Aspire and Docker remain empty.
 
 Resume from the newer authoritative `2026-08-15T07:40:16Z` owner-verdict checkpoint. The owner chose
 option 1 for features #1651: keep the distinct plugin CLI RFC and narrow C6. Release the lane hold
@@ -223,7 +221,20 @@ then shipped as current main `284dda90a`; the owner keep-and-narrow boundary pas
 IMPL-EVAL at `ec69100c8`, the owner disposition is answered in comment `5301349600`, and #1502 is
 closed with 5/5 boxes and shipped labels. Both temporary `impl-eval:skip` labels were removed.
 Internals #1658 S1 passed topic Tier-A at `6f725ad3b` after load-bearing root test 4,138/0; the same
-Codex author is implementing S2 at `28a8a9184` and must stop again for Tier-A before S3. Features and
-fixes supervisors were steered in place to reconcile the merges and advance only their own frozen
-queues; fixes must preserve the #1348→#1350 prerequisite. Combined-main CI is active without a
-failure. Runtime mutex remains free; no Aspire/Docker/browser gate is active.
+Codex author is implementing S2 at `28a8a9184` and must stop again for Tier-A before S3. Features
+and fixes supervisors were steered in place to reconcile the merges and advance only their own
+frozen queues; fixes must preserve the #1348→#1350 prerequisite. Combined-main CI is active without
+a failure. Runtime mutex remains free; no Aspire/Docker/browser gate is active.
+
+Resume from the newer authoritative `2026-08-15T08:45:30Z` checkpoint. Exact current main remains
+`284dda90a17a13a7e5e8e9834e5411b58887131b`, and combined-main workflow `31874580034` is terminal
+success. Docs is active again under the owner's post-freeze #1659 replacement: draft #1660 at
+`0b67ef39e` is on the original Codex author thread and repairing four Tier-A findings before a fresh
+topic re-review. Internals #1658 S2 passed at `0886c2427`; S3 implementation is local at `d7fdbb1d9`
+and must stop for Tier-A before S4. Fixes #1661 correctly stopped artifact-only at `1d4533462`;
+topic ruling `af53757e6` expands exactly five `packages/ai/**` paths and fixes the additive public
+status/cancellable-close contract before resuming the same author. Features #1293 is
+research/plan-only; preserve and wire the already-published `onConnectionError` option, and run one
+opposite-family PLAN-EVAL only if the clean returned plan remains decision-heavy after topic review.
+Aspire and Docker remain empty. Keep the four native Opus 5/high supervisors and enforce
+serialization only inside each topic.
