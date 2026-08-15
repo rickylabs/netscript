@@ -109,3 +109,55 @@ Disposition: both returned to the leaf as blocking Tier-A findings for one bound
 the `/migration/` wiring from S1, and add `check:links` to the S1 gate with its raw exit code
 recorded. Both strictly reduce what S1 ships; neither changes scope. Recorded here because two
 independent defects in one approved plan is a signal about the gate, not just about this leaf.
+
+## 2026-08-15 — S2 requires a local checkout that no slice creates and research says was never made
+
+The leaf stopped before writing any S2 code with
+`BLOCKED: no authorized local EIS-Chat checkout exists at 5191de83f3da97559f21d8891c6c8afdf1cf473a`.
+It committed nothing, read no consumer file contents, and did not fetch, clone, check out another
+revision, or create a worktree. The report is accurate and the stop was correct.
+
+Independently verified by the orchestrator. `git cat-file -t` returns `could not get object info`
+for that commit in all three local checkouts, and `git branch -a --contains` returns
+`no such commit`:
+
+| Checkout                          | HEAD      | Has pinned object |
+| --------------------------------- | --------- | ----------------- |
+| `/home/codex/repos/eis-chat`      | `aeaf2df` | no                |
+| `/home/codex/repos/refs/eis-chat` | `5fdff77` | no                |
+| `/home/codex/eis-chat-ref`        | `a08ebe5` | no                |
+
+**The revision is not lost.** `git ls-remote origin` on the same authorized remote
+(`https://github.com/rickylabs/eis-chat.git`, configured identically in all three checkouts) reports
+`5191de83f3da97559f21d8891c6c8afdf1cf473a` as both `HEAD` and `refs/heads/master` — it is the
+current master tip, never rewritten. The three local clones are simply parked on other branches and
+have never fetched it.
+
+**Root cause is a fourth plan defect of the same family.** `research.md:51` records that P0
+inspected the private repository "only through existing authorized GitHub access at immutable commit
+`5191de83…`. **No checkout**, consumer code copy, or business-data extraction occurred." The
+approved S2 tool contract then requires the tool to read "authorized **local** roots" and to
+"require the immutable repository revision before reading files". So S2 depends on a local checkout
+at that revision which no prior slice creates and which the plan's own research states was never
+made. The slice cannot satisfy its contract from its own inputs, and formal PLAN-EVAL cycle 1 passed
+over it — the same per-slice self-consistency gap as the three defects found in S1.
+
+Disposition: **escalated to the coordinator, not resolved by this lane.** Provisioning the input
+means fetching private consumer source onto disk from an external remote. That is outside the
+docs-authoring boundary this orchestrator was granted, even though the coordinator's own
+`leaf-contracts.json` lists `external:EIS-Chat@5191de83f3da97559f21d8891c6c8afdf1cf473a` as an
+authorized file surface for this leaf. No fetch, clone, or checkout was performed. S2 remains
+un-started and the leaf holds at `98fc58997`.
+
+## 2026-08-15 — orchestrator tooling defect delayed the blocker by ~75 minutes
+
+The S2 watcher's turn-ended branch matched `codex exec resume …` against `ps` output, which also
+matches this session's own shell wrapper carrying that literal string in its command line. The
+branch therefore could never fire, and the blocker — reported by the leaf at `02:05` — surfaced only
+when the watcher hit its 75-minute timeout at `03:20`. The commit-detection branch was exact and
+unaffected.
+
+This is the same string-match trap already recorded twice in this run. The correct liveness test is
+the exact PID (`[ -d /proc/<pid> ]`) or the rollout's last record, never a pattern match against a
+command line that may contain the pattern as data. Cost: ~75 minutes of idle lane time. No work was
+lost and no wrong action was taken.
