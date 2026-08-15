@@ -90,19 +90,18 @@ or expensive command is authorized.
 
 ## In Progress
 
-- The reviewed F3 check repair restores `@std/path` in the service-client runtime probe. The custom
-  walker remains Deno-only. A single `deno check --unstable-kv` invocation over the repaired probe
-  and `verify-producer-reconnect.ts` passes both together, directly reversing the coordinator's
-  failing two-file experiment. Commit this content, then generate a fresh four-receipt replacement
-  set. Preserve `receipts/s4-f3-check.json` as the FAIL record at `6e822a74b`.
+- The reviewed F3 check repair is committed at content head
+  `193e665ba0592273622253e3e9a1ebfc019b1be9`. The targeted two-file check passes and all four fresh
+  `s4-f3-fix1-*` binding receipts PASS at that head. Exact-set recomputation is SUFFICIENT. Preserve
+  `receipts/s4-f3-check.json` as the historical FAIL at `6e822a74b`; S5 and both expensive gates
+  remain blocked pending fresh Tier-A and a coordinator lease.
 
 ## Next Steps
 
-1. Commit and explicitly push the reviewed one-line path-import repair plus its run-artifact record.
-2. Run all four binding gates serially at that immutable content head with fresh invocation IDs and
-   files, without overwriting `receipts/s4-f3-check.json`.
-3. Recompute exact-set sufficiency, post the structured receipt comment, and stop for Tier-A. Keep
-   S5, `scaffold.runtime`, and `fresh-browser` lease-blocked.
+1. Commit and explicitly push the four generated `s4-f3-fix1-*` receipts and this evidence summary.
+2. Post the structured S4-F3 repair receipt comment and stop for fresh Tier-A.
+3. Keep S5, `scaffold.runtime`, and `fresh-browser` blocked until the coordinator grants a new
+   expensive-gate lease.
 
 ## Key Decisions
 
@@ -144,7 +143,7 @@ or expensive command is authorized.
 
 | Gate family | Current status                                                                                                                    | Evidence                     |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Static      | S4-F2 repair receipts PASS at `2c8219968` but are superseded. Current `s4-f3-check.json` is FAIL at `6e822a74b`; the other three replacement receipts are missing, so exact-set sufficiency is INSUFFICIENT. | `worklog.md`; `reports/s4-f3-check-failure.md`; binding receipts |
+| Static      | Four `s4-f3-fix1-*` binding receipts PASS at `193e665ba`; exact-set sufficiency SUFFICIENT. The original `s4-f3-check.json` FAIL at `6e822a74b` is preserved as historical evidence. | `worklog.md`; `reports/s4-f3-check-failure.md`; binding receipts |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
 | Runtime     | NOT_RUN / lease-blocked                                                                                                           | `plan.md` release conditions |
 | Consumer    | NOT_RUN / implementation-dependent                                                                                                | `plan.md` S5                 |

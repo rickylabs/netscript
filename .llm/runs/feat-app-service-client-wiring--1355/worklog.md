@@ -400,3 +400,25 @@ The required discriminating check ran `verify-producer-reconnect.ts` and the rep
 in one `deno check --unstable-kv` invocation; both passed with exit 0. Contract-derived inputs,
 resource-prefix isolation, schema readiness, and both F3 negative tests are unchanged. The original
 `receipts/s4-f3-check.json` remains the immutable FAIL record and will not be overwritten.
+
+### S4-F3 repaired binding evidence
+
+The repaired immutable content head is `193e665ba0592273622253e3e9a1ebfc019b1be9`. Four fresh,
+serial `run-gate.ts` invocations attest that exact head with `gitHead == actualGitHead`, no mismatch
+override, unique invocation IDs, and PASS/exit 0:
+
+| Receipt | Invocation ID | Result |
+| --- | --- | --- |
+| `receipts/s4-f3-fix1-check.json` | `app-service-client-wiring-s4-f3-fix1-check` | PASS — 2,937 files, 25 batches, zero failed batches and zero diagnostics. |
+| `receipts/s4-f3-fix1-test.json` | `app-service-client-wiring-s4-f3-fix1-test` | PASS — 4,212 passed, zero failed, 19 ignored. |
+| `receipts/s4-f3-fix1-publish-dry-run.json` | `app-service-client-wiring-s4-f3-fix1-publish-dry-run` | PASS — workspace publish simulation completed. |
+| `receipts/s4-f3-fix1-arch-check.json` | `app-service-client-wiring-s4-f3-fix1-arch-check` | PASS — zero doctrine failures; existing warnings remain visible. |
+
+`evaluateEvidenceSet` recomputed over exactly those four files is **SUFFICIENT** with an empty
+reason list. `receipts/s4-f3-check.json` remains the preserved FAIL evidence at `6e822a74b` and is
+not included in current-head sufficiency. Earlier `s4-f2-fix1-*` receipts likewise remain durable
+but superseded. Supplemental package evidence is unchanged: CLI export-map doc lint PASS; Fresh
+export-map doc lint `PRE_EXISTING_FAIL` with 45 attributed diagnostics; SDK export-map doc lint
+`PRE_EXISTING_FAIL` with three attributed diagnostics, including the separately named
+plugin-streams `StreamsInstrumentation` finding; all three per-member JSR audits exit 0 with
+warnings only, and all three isolated-declaration/publish dry-runs pass.
