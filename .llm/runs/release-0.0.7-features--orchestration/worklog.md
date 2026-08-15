@@ -2686,3 +2686,66 @@ repaired or relabelled.
 The remaining work is the two expensive gates — `scaffold.runtime` and `fresh-browser` — which run
 **serially under one coordinator-granted lease**. This lane has not acquired one, has not requested
 one before now, and has run neither gate. Requesting the explicit S5 serial runtime-lease review.
+
+## 2026-08-15 — S4 Tier-A: `PASS` at `1c1f458203cc458ff2c1fd20149c907998654f22`
+
+Content head `32ea23f501900ca4d7de603e00709e09f41be3dc`; evidence head `1c1f45820`; local == remote.
+
+### The repair was exactly scoped
+
+`git show 32ea23f50 --stat` → **1 file, 1 insertion**: `+ GATE.GENERATED_DENO_LINT,` in
+`suite-registry_test.ts`. The suite was not touched and the assertion was not weakened to a set or
+length comparison.
+
+**Order verified, not assumed.** `capability-suites.ts:27-32` emits `GENERATED_DENO_LINT` at position
+6; the test expects it at position 6. Since `assertEquals` on an array is order-sensitive, a fix that
+appended blindly could have passed by luck; this one matches the emission order.
+
+Previously failing test re-run at the fixed head: **19 passed / 0 failed** (was 18/1).
+
+### Four binding receipts — verified field by field, sufficiency recomputed
+
+| Receipt | gateId | invocationId | outcome | exit | head equality | override |
+| --- | --- | --- | --- | --- | --- | --- |
+| `s4-check.json` | `check` | `…-s4-fix1-check` | PASS | 0 | `32ea23f50 == 32ea23f50` | none |
+| `s4-test.json` | `test` | `…-s4-fix1-test` | PASS | 0 | same | none |
+| `s4-publish-dry-run.json` | `publish-dry-run` | `…-s4-fix1-publish-dry-run` | PASS | 0 | same | none |
+| `s4-arch-check.json` | `arch-check` | `…-s4-fix1-arch-check` | PASS | 0 | same | none |
+
+Four distinct `gateId`s, so the `evidence-set.ts` duplicate rule does not fire. **Sufficiency
+recomputed independently: `SUFFICIENT`.** The author's own claim names all four files with their
+invocation IDs rather than asserting a bare verdict. The superseded `s4-*` receipts attesting
+`35061bc80` were **replaced** with fresh `s4-fix1-*` IDs, not re-presented as current.
+
+Content→evidence delta is **evidence only** — receipts, reports, journals. No product source.
+
+### The binding gate's real scope, and the correction it forced
+
+`s4-test.json` records `argv: ["deno","task","test"]` → repo-wide
+`deno test --reporter=tap --allow-all`, **4202 passed / 0 failed / 19 ignored / 4221 total**, exit 0,
+301s.
+
+That is the number worth keeping. Across S2 and S3 I verified with `deno test ./src/` in
+`packages/cli` and reported 598/0 — about **14%** of the contracted gate's scope, and blind to
+`./e2e/` where S4-F1 lived. The subset was not wrong about what it measured; it was silent about what
+it did not, and three consecutive green runs made it feel authoritative. The rule this leaf leaves
+behind: **the contracted evidence is the gate, and a stand-in command earns no authority from having
+been reliable.**
+
+### Carried baselines preserved
+
+`PRE_EXISTING_FAIL` is recorded four times in `s4-export-doc-failure.md`, and the plugin-streams
+diagnostic remains named separately four times. Fresh's 45 and SDK's 3 export-map diagnostics are
+carried with attribution and were not repaired — the artifact-only boundary held even while a scoped
+product repair was authorized alongside it.
+
+### S4 complete — stopping for the explicit S5 lease review
+
+S1-S4 are Tier-A signed. Cheap convergence is fully established: formatting, lint, asset freshness,
+per-member exact-pins, per-member export-map doc audits with attribution, three isolated publish
+dry-runs, and four binding receipts `SUFFICIENT` at the content head.
+
+**Not requested and not taken:** the expensive-gate lease. `scaffold.runtime` and `fresh-browser`
+remain `NOT_RUN`; Aspire, Docker, S5, and evaluators are untouched. This is the one boundary this
+lane does not cross autonomously — it is coordinator authority, and the standing instruction is to
+stop here for explicit S5 lease review.
