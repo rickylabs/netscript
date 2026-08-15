@@ -871,3 +871,271 @@ helper/upstream alias introduced to express it.
 
 No Aspire, Docker, browser, `e2e:cli`, runtime lease, or evaluator was used. No issue, label,
 checkbox, readiness, or metadata state was changed.
+
+## S4-R — plan-only amendment: finding→correction mapping
+
+Generator: native Claude session (see `supervisor.md` § S4-R Amendment Supervisor Identity). This
+section amends the S4 stop with a per-finding disposition. No product/test/docs/lock file was
+touched to produce this section; every mechanism below was verified against an isolated scratch
+probe outside the repository tree (`deno doc --lint` on synthetic fixtures), not against the actual
+S1/S2 source, and against the real `@orpc/client`/`@orpc/contract`/`@orpc/shared` `.d.ts` files
+already resolved in this workspace's Deno cache. The repair itself remains a separate, freshly
+authorized implementation slice.
+
+### How `deno doc --lint`'s `private-type-ref` actually resolves (probe-verified)
+
+The diagnostic is **syntactic and single-hop**, not a deep semantic graph walk:
+
+1. It flags a directly-named identifier in a public declaration's own text (including default type
+   parameter values) when that identifier resolves to a symbol not exported/reachable from the
+   entrypoint being linted.
+2. It does **not** recurse into a flagged private type's own body — `BaseContractErrors` (private
+   relative to `packages/contracts/src/public/mod.ts`, though file-level `export`ed) is flagged when
+   named by `baseContract`, but its own internal reference to `MergedErrorMap`/`commonErrorMap` is
+   never separately checked, because `BaseContractErrors` itself isn't a root symbol being linted
+   from that entrypoint.
+3. TypeScript's built-in utility types (`Omit`, `Extract`, `Exclude`, `Record`, `Pick`, `Readonly`)
+   are never themselves flagged; only their generic *arguments* are, if those name private types.
+4. An anonymous inline object/tuple/conditional type literal with no name at all cannot be flagged —
+   there is nothing to resolve.
+5. `typeof aBinding` is flagged exactly like a named type alias when `aBinding` is a private local or
+   an un-reexported import — **but** `typeof aPublicAliasForTheSameValue` is not flagged, because the
+   check resolves the specific identifier used, not the underlying value.
+
+Probe evidence (scratch fixture, not part of this repo):
+
+```text
+public type 'usesTypeofDirectly' references private type 'secretConst'      # typeof private const -> flagged
+public type 'usesPrivateAliasByName' references private type 'PrivateAlias' # named private alias -> flagged
+usesInlineAnon: { x: number }                                               # inline literal -> clean
+public type 'fnWithDefault' references private type 'PrivateDefault'        # generic default -> flagged
+fnWithErrorDefault<T = Error>                                               # global default -> clean
+public type 'usesOmit' references private type 'Base'                       # Omit<Base,'q'> flags Base, not Omit
+usesPrivateBinding -> flagged; usesPublicBinding (typeof PublicName, same value) -> clean
+```
+
+Also confirmed directly against `packages/contracts/mod.ts`/`packages/sdk` entrypoints at head
+`c7cba6d9b`: the 3 contracts and 10 SDK additions are exactly and only the ones the S4 receipt
+already named; the other 4 pre-existing findings (7 in `BaseContractRoute`/`BaseContractOutputRoute`,
+1 in `crud/create-crud-contract.ts`, plus SDK's 3 unrelated pre-existing findings in
+`query-client.ts`/`query-client-factory.ts`/`plugin-streams-core`) are baseline noise, unchanged by
+this leaf, and out of scope for this amendment.
+
+### Root-cause origin of each private type
+
+| Private type | Origin | Nature |
+| --- | --- | --- |
+| `ThrowableError` | `@orpc/shared`, re-exported by `@orpc/client` | `type ThrowableError = Registry extends {throwableError: infer T} ? T : Error` — with the empty ambient `Registry` interface (confirmed: no `declare module '@orpc/shared'` augmentation exists anywhere in this repo), this resolves to exactly `Error`. |
+| `ClientPromiseResult<T,E>` | `@orpc/client`/`@orpc/shared` | `= PromiseWithError<T,E> = Promise<T> & { __error?: { type: E } }` — a real `Promise` plus an optional phantom marker property that never exists at runtime, used only so `safe()` can recover `E` at the type level. |
+| `NonDefinedSafeFailure`, `DefinedSafeFailure`, `NarrowDefined`, `DefinedErrorLike` | local to `errors.ts`, declared without `export` | Package-owned helper aliases already private by design; the finding is that the *public* `SafeFailure`/`isDefinedError` declarations name them directly. |
+| `ProcedureErrorFromNode` | local to `service-client.ts`, declared without `export` | Reaches into oRPC's own `ErrorMap`/`ErrorFromErrorMap` (also private to us) to derive `TError` from a raw `~orpc.errorMap`. |
+| `ContractBuilder`, `Schema` | `@orpc/contract` | `Schema<TIn,TOut> = StandardSchemaV1<TIn,TOut>` (a real standard, but not re-exported by us); `ContractBuilder` is oRPC's own chainable builder **class** (`.route()/.input()/.output()/.errors()/.meta()`, ~15+ members across 4 interfaces). |
+| `BaseContractErrors` | local to `contract-primitives.ts`, `export`ed from the file but not re-exported by `src/public/mod.ts` | Private relative to the publish entrypoint, not relative to the file. |
+
+### Finding → correction mapping (13 findings, grouped by symbol per the requested table)
+
+| # | Finding (public type → private type) | Disposition | Correction | Why type-safe, not a suppression |
+| - | --- | --- | --- | --- |
+| 1 | `SafeFailure` → `ThrowableError` | **Inlined (default swap)** | `SafeFailure<TError = Error>` (was `= ThrowableError`) | `ThrowableError` resolves to exactly `Error` in this dependency graph today (empty `Registry`, no augmentation anywhere in-repo). Same resolved default, spelled without importing the private name. Documented trade-off below. |
+| 2 | `SafeFailure` → `NonDefinedSafeFailure` | **Restructured away (inlined)** | The public `SafeFailure<TError>` union's non-defined arm is written inline: `[Exclude<TError, DEL>, undefined, false, false] & { error: Exclude<TError, DEL>; data: undefined; isDefined: false; isSuccess: false }`, where `DEL` is `DefinedErrorLike`'s body inlined (see #3). | Byte-identical resolved type; only the source-level reference to the private alias is removed. `NonDefinedSafeFailure` itself stays declared, unchanged, for internal use by `createSafeFailure` (a non-exported function, never linted). |
+| 3 | `SafeFailure` → `DefinedSafeFailure` | **Restructured away (inlined)** | Defined arm inlined the same way: `[Extract<TError, DEL> & DefinedError, undefined, true, false] & {...}`, with `DEL = Error & { readonly defined: boolean; readonly code: string; readonly status: number; readonly data: unknown }` (i.e. `DefinedErrorLike`'s current body) written out at each of the (now 4, across the two arms) points it's needed. `DefinedError` is already a public export — safe to name directly. | Same reasoning as #2. `DefinedErrorLike` itself is not itself flag-eligible until named from a public declaration; inlining its body avoids ever naming it there. Verified inline-literal exemption via probe. |
+| 4 | `SafeResult` → `ThrowableError` | **Inlined (default swap)** | `SafeResult<TOutput, TError = Error>` | Same as #1; `SafeResult` only adds `SafeSuccess<TOutput> \| SafeFailure<TError>`, no other private ref. |
+| 5 | `isDefinedError` → `NarrowDefined` | **Restructured away (inlined)** | `export function isDefinedError<T>(error: T): error is Extract<T, Error & { readonly defined: boolean; readonly code: string; readonly status: number; readonly data: unknown }> & DefinedError` | `NarrowDefined<T> = Extract<T, DefinedErrorLike> & DefinedError`; both `NarrowDefined` and `DefinedErrorLike` are inlined at the one call site that needs them publicly. Predicate result type is unchanged bit-for-bit. |
+| 6 | `safe` → `ThrowableError` | **Inlined (default swap)** | `safe<TOutput, TError = Error>(...)` | Same as #1. |
+| 7 | `safe` → `ClientPromiseResult` | **Restructured away (inlined)** | Parameter type becomes `promise: Promise<TOutput> & { __error?: { type: TError } }` (drop the `type ClientPromiseResult`/`type ThrowableError` imports from `@orpc/client`; keep the runtime `isDefinedError as orpcIsDefinedError` value import, which is not a type and was never flagged). | Structurally identical to `PromiseWithError<TOutput,TError>` (`@orpc/shared`'s real definition, confirmed from the installed `.d.ts`). Any real oRPC client promise is structurally assignable to this literal; the phantom `__error` marker is preserved so `TError` inference still works — it is not dropped, only un-named. |
+| 8 | `ServiceClientMethod` → `ThrowableError` | **Inlined (default swap)** | `ServiceClientMethod<TInput, TOutput, TError = Error>` | Same reasoning as #1, in `service-client.ts`. |
+| 9 | `ServiceClientMethod` → `ClientPromiseResult` | **Restructured away (inlined)** | Return type becomes `(input: TInput, options?: ServiceRequestOptions) => Promise<TOutput> & { __error?: { type: TError } }` | Same reasoning as #7; duplicated locally in `service-client.ts` rather than shared across files, since sharing would require exporting a new internal type (forbidden). |
+| 10 | `ServiceClientShape` → `ProcedureErrorFromNode` | **Restructured away (inlined, redesigned)** | See dedicated subsection below — this is the one finding that required redesigning the private helper's *body*, not just its call site. | See below. |
+| 11 | `baseContract` → `BaseContractErrors` | **Restructured away (inlined)** | See dedicated subsection below. | See below. |
+| 12 | `baseContract` → `Schema` | **Made public (existing NetScript alias)** | See dedicated subsection below. | See below. |
+| 13 | `baseContract` → `ContractBuilder` | **UNRESOLVED — reports, does not plan around** | None proposed. | See below. |
+
+### #10 — `ServiceClientShape` → `ProcedureErrorFromNode` (service-client.ts)
+
+Naively inlining `ProcedureErrorFromNode`'s current body into `ServiceClientShape` does **not**
+work: its body directly names `ErrorMap` and `ErrorFromErrorMap` (both private, from
+`@orpc/contract`), so inlining would just relocate the private reference one level up (new findings
+on those two names instead of on `ProcedureErrorFromNode`) — that is the "suppression wearing a
+different hat" failure mode the brief warns about, so it was rejected.
+
+Correction: redesign `ProcedureErrorFromNode`'s body so it never names an oRPC-private type, mirroring
+the same "NetScript-owned structural mirror" technique `ContractSchemaInput`/`ContractSchemaOutput`/
+`ContractProcedureMetadata` already use for input/output instead of depending on oRPC's own procedure
+type. Inlined directly into `ServiceClientShape`:
+
+```ts
+export type ServiceClientShape<TContract extends ContractLike> = TContract extends
+  ContractProcedureLike ? ServiceClientMethod<
+    ProcedureInputFromNode<TContract>,
+    ProcedureOutputFromNode<TContract>,
+    TContract extends {
+      readonly '~orpc': {
+        readonly errorMap: infer TErrorMap extends Record<string, { readonly data?: unknown } | undefined>;
+      };
+    } ? {
+        [K in keyof TErrorMap]: K extends string
+          ? TErrorMap[K] extends { readonly data?: infer TDataSchema }
+            ? Error & {
+                readonly defined: true;
+                readonly code: K;
+                readonly status: number;
+                readonly data: ContractSchemaOutput<TDataSchema>;
+              }
+            : never
+          : never;
+      }[keyof TErrorMap] | Error
+      : Error
+  >
+  : { [K in keyof TContract]: TContract[K] extends ContractLike ? ServiceClient<TContract[K]> : never };
+```
+
+Why this is type-safe rather than a shim: it does not import `DefinedError` from `errors.ts` (that
+would fail differently — see note below), it does not name `ErrorMap`/`ErrorFromErrorMap`/`ORPCError`,
+and it reuses `ContractSchemaOutput`, already public and already used elsewhere in this file for the
+identical purpose (schema → inferred value type). The intersection literal `Error & {readonly
+defined: true; code: K; status: number; data: ContractSchemaOutput<TDataSchema>}` is structurally
+identical to what `DefinedError<K, ContractSchemaOutput<TDataSchema>>` would produce (confirmed
+against `errors.ts`'s own `DefinedError` interface shape) and to what oRPC's real `ORPCError<K,TData>`
+class actually looks like at runtime (`extends Error { readonly defined: boolean; code; status; data
+}`, confirmed from `@orpc/client`'s installed `.d.ts`) — real thrown contract errors structurally
+satisfy it. This is the same "duck-type against oRPC's real runtime shape" technique `errors.ts`
+already uses for `DefinedErrorLike`, applied at a different call site. The constraint on `infer
+TErrorMap` is narrowed from oRPC's own `ErrorMap` to an equivalent-width `Record<string, {data?:
+unknown} \| undefined>` structural bound — width-compatible with any real `~orpc.errorMap` value, so
+no real contract narrows out.
+
+**Note on why `DefinedError` (from `errors.ts`) was not imported instead:** `ports/mod.ts` (an
+existing SDK entrypoint that re-exports `ServiceClientShape`) does not currently re-export
+`DefinedError` — it is exported only via `client/mod.ts`. Since the private-type-ref check is
+per-entrypoint, importing `DefinedError` into `service-client.ts` would make `ServiceClientShape`
+pass when linted through `client/mod.ts` but newly fail when linted through `ports/mod.ts` (a type
+public via one subpath is still "private" relative to another subpath that doesn't re-export it).
+Fixing that would require editing `ports/mod.ts` — a fourth file, out of scope. The inline
+intersection literal above avoids the cross-entrypoint dependency entirely.
+
+### #11 — `baseContract` → `BaseContractErrors` (contract-primitives.ts)
+
+Inlining `BaseContractErrors`'s current body (`MergedErrorMap<Record<never,never>, typeof
+commonErrorMap>`) naively relocates the problem to `MergedErrorMap` (private) and then to
+`commonErrorMap` (a private local const — probe-confirmed that `typeof aPrivateConst` is itself
+flagged). Two facts resolve this cleanly:
+
+1. **`MergedErrorMap<Record<never,never>, T>` is provably equivalent to plain `T`.** Verified against
+   the real `@orpc/contract@1.14.6` types in a scratch fixture: `type ErrorsA = MergedErrorMap<Record<never,never>, CommonErrorMapType>` and `type ErrorsB = CommonErrorMapType` type-checked as mutually
+   assignable (`ErrorsA extends ErrorsB` and `ErrorsB extends ErrorsA` both `true`) — merging onto an
+   empty base is a no-op. So the third generic slot can be `typeof commonErrorMap`'s structure
+   directly, no `MergedErrorMap`/`Omit` needed.
+2. **The six schemas already have public aliases.** `domain/schemas.ts` exports both the private
+   lowercase values used to build `commonErrorMap` (`notFoundErrorSchema`, etc.) *and* public
+   PascalCase re-exports of the identical value (`export const NotFoundErrorSchema =
+   notFoundErrorSchema;`, etc.), and the six PascalCase names are already re-exported through
+   `packages/contracts/src/public/mod.ts`. Probe-confirmed: `typeof PublicAlias` (for the same value)
+   is not flagged even though `typeof privateBinding` is.
+
+Correction — switch `contract-primitives.ts`'s import of the six schemas from the private lowercase
+names to the public PascalCase names (same file, same `../domain/schemas.ts` module, no edit to
+`domain/schemas.ts` itself), use them for both `commonErrorMap`'s value *and* the inlined annotation:
+
+```ts
+Readonly<{
+  NOT_FOUND: Readonly<{ status: 404; message: 'Resource not found'; data: typeof NotFoundErrorSchema }>;
+  VALIDATION_ERROR: Readonly<{ status: 422; message: 'Validation failed'; data: typeof ValidationErrorSchema }>;
+  UNAUTHORIZED: Readonly<{ status: 401; message: 'Authentication required'; data: typeof UnauthorizedErrorSchema }>;
+  FORBIDDEN: Readonly<{ status: 403; message: 'Access denied'; data: typeof ForbiddenErrorSchema }>;
+  RATE_LIMITED: Readonly<{ status: 429; message: 'Too many requests'; data: typeof RateLimitErrorSchema }>;
+  SERVICE_UNAVAILABLE: Readonly<{ status: 503; message: 'Service temporarily unavailable'; data: typeof ServiceUnavailableErrorSchema }>;
+}>
+```
+
+This preserves the exact six literal codes and code-specific `data` types (the public PascalCase
+export is declared `ContractSchema<X,X>`-typed on the same runtime value, itself a public,
+already-used NetScript structural type — see #12). **Verification owed at implementation time:**
+`deno check` must confirm `oc.errors(commonErrorMap)`'s actual call-site constraint
+(`U extends ErrorMap`) still accepts the value once `commonErrorMap` is built from the
+`ContractSchema`-typed public aliases rather than the raw Zod-typed private ones; this was verified
+structurally (standard-schema shape) but not against the exact live `oc.errors` overload.
+
+### #12 — `baseContract` → `Schema` (contract-primitives.ts)
+
+`Schema<TIn,TOut>` is oRPC's private alias for `StandardSchemaV1<TIn,TOut>`. NetScript already has a
+public structural mirror of exactly this shape: `ContractSchema<TOutput,TInput>`
+(`domain/schema-types.ts`, re-exported via `src/public/mod.ts`), documented in-file as "Standard
+Schema metadata consumed by oRPC and other validator-neutral callers" — i.e. it was built to be
+duck-type-compatible with standard-schema consumers such as oRPC's own builder.
+
+Correction: replace both `Schema<unknown, unknown>` generic arguments on `baseContract`'s annotation
+with `ContractSchema<unknown, unknown>`. This makes the reference public (option "make the referenced
+type public" from the diagnostic's own hint) using a name NetScript already exports — no new export
+is introduced. **Verification owed at implementation time:** `deno check` must confirm
+`ContractBuilder`'s generic constraint (`TInputSchema/TOutputSchema extends AnySchema`) accepts
+`ContractSchema<unknown,unknown>` in the "no `.input()`/`.output()` called yet" position, and that
+the class's covariance/method-checking doesn't reject the substitution. The structural shapes match
+(`~standard: {version, vendor, validate}`), but class-generic substitutability was reasoned, not
+`deno check`-proven, in this plan-only turn.
+
+### #13 — `baseContract` → `ContractBuilder` (contract-primitives.ts) — UNRESOLVED
+
+This is the one finding this amendment does **not** resolve, and reports rather than plans around,
+per the brief's explicit instruction.
+
+`ContractBuilder` is oRPC's own chainable builder **class** (`ContractProcedureBuilder` /
+`...WithInput` / `...WithOutput` / `...WithInputOutput`, ~15+ chained methods, extending
+`ContractProcedure`). An explicit type annotation on `baseContract` is mandatory — `deno doc --lint`
+requires one (an unannotated `const` initialized from a generic call is a different, worse
+diagnostic class: `missing-explicit-type`), and the annotation must name the actual return type of
+`oc.errors(commonErrorMap)`, which is a `ContractBuilder<...>` instance.
+
+Three paths were considered and all three are blocked by this leaf's own constraints:
+
+1. **Re-export `ContractBuilder` (and `Schema`, transitively) from `src/public/mod.ts`.** This is the
+   textbook "make the referenced type public" fix the diagnostic itself suggests — but `src/public/mod.ts`
+   is the explicitly forbidden fourth file, and doing so is also a new export name, both prohibited
+   by this amendment's scope.
+2. **Locally reconstruct `ContractBuilder`'s full structural surface as an inline/private type.**
+   Technically possible (TypeScript permits anonymous structural interfaces with methods) but this
+   means hand-duplicating oRPC's entire builder algebra (`.route()/.input()/.output()/.errors()/.meta()`
+   across four builder interfaces plus the base `ContractProcedure` members) inside NetScript's own
+   package, permanently coupled to oRPC's exact internal shape and guaranteed to drift on the next
+   `@orpc/contract` version bump. This is exactly what doctrine AP-1/AP-9 forbid ("do not grow
+   `errors.ts`/contract primitives into a generic error framework or invent a second client algebra")
+   and what the plan's own risk register already flags ("tight builder annotation breaks
+   CRUD/plugin/handler inference"). Rejected as unsafe, not merely inconvenient.
+3. **Revert to an inference-erasing annotation** (e.g. `ReturnType<typeof oc.errors>`, the pre-leaf
+   base state, which only names `oc` and reproduces the *already-pinned* baseline finding instead of
+   a new one). This was the actual base-commit approach. Rejected: `ReturnType` on an *uninstantiated*
+   generic function collapses `oc.errors`'s type parameter to its `ErrorMap` upper bound, which erases
+   the exact six literal codes back to oRPC's full ~13-code vocabulary — the precise regression #1350
+   exists to fix. Directly violates the "accepted exact six error codes" invariant this amendment is
+   bound to preserve. Rejected.
+
+No fourth option was found that both (a) keeps the explicit, literal-preserving annotation and (b)
+never names `ContractBuilder`. This is reported as a genuine architectural limit of the three-file,
+no-new-export ceiling, not an oversight — a coordinator ruling is needed on whether to authorize a
+narrow, single-purpose re-export of `ContractBuilder`/`Schema` type names only (a scope amendment
+touching `src/public/mod.ts`), or to accept `baseContract → ContractBuilder` as permanent,
+irreducible, leaf-owned known-red debt alongside the existing pinned baseline.
+
+### Surface-delta effect
+
+Every proposed correction above (#1–#12) is **purely notational**: each rewrites how a type is
+*spelled* in source (inlined vs. named, or renamed to an existing public alias for the identical
+value), without changing what the type *resolves to*. `SafeFailure<TError = Error>` resolves to the
+same shape as `SafeFailure<TError = ThrowableError>` did (given the empty `Registry`); the inlined
+`ProcedureErrorFromNode` replacement produces the same per-code `DefinedError`-shaped union the
+locked plan already specified. None of this changes any of the 15 authorized breaking signature
+changes recorded in `worklog.md`'s `surface-diff` receipt — the delta stays exactly 15, neither
+exceeded nor silently shrunk. Finding #13 (`ContractBuilder`) is unresolved but also does not change
+the surface delta; it leaves `baseContract`'s resolved type exactly as S1 already locked it (only its
+open doc-lint finding count is unchanged: contracts moves from 11 to net **9 pinned-baseline-parity +
+1 new (`ContractBuilder`, replacing the pinned `oc`)** if this specific mapping is implemented as
+proposed — i.e. from +2 new down to +1 new, not to zero, pending the coordinator ruling on #13). SDK
+resolves cleanly to **0 new** (all 10 findings dispositioned without residue).
+
+### What this amendment does not do
+
+- It does not implement any of the above in `contract-primitives.ts`, `errors.ts`, or
+  `service-client.ts`. Those remain at the S1–S3 landed content; nothing in the three authorized
+  product files changed as part of S4-R.
+- It does not add, suppress, or ignore any doc-lint diagnostic.
+- It does not touch `packages/contracts/src/public/mod.ts`, `#1348`, or `#1466`.
+- It does not tick any PR checkbox or change `status:` labels.

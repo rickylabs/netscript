@@ -78,3 +78,28 @@
   and specifier/export guards are not run or claimed pending coordinator disposition.
 - **Scope:** A correction necessarily returns to already-landed product paths and therefore needs a
   fresh authorized implementation slice; no seventh path is implied or authorized here.
+
+## 2026-08-15 — S4-R amends the stop with a finding→correction mapping; one finding unresolved
+
+- **What:** A separate, plan-only Claude session (native route, quota-exhausted Codex route excluded
+  per `CLAUDE.md`'s documentation-authoring exception) mapped all 13 new leaf-owned `private-type-ref`
+  findings (contracts 3, SDK 10) to individual type-safe corrections, verified against isolated
+  scratch probes of `deno doc --lint`'s actual resolution rules and against the real installed
+  `@orpc/*` `.d.ts` files. Full mapping is in `worklog.md` § S4-R.
+- **Result:** 12 of 13 findings resolve cleanly (all 10 SDK findings; 2 of 3 contracts findings —
+  `BaseContractErrors` and `Schema`). One contracts finding — `baseContract → ContractBuilder` — does
+  **not** resolve within the three-file/no-new-export ceiling: it requires either re-exporting
+  `ContractBuilder`/`Schema` from `src/public/mod.ts` (the forbidden fourth path), duplicating oRPC's
+  entire builder class locally (rejected as an AP-1/AP-9 violation and a drift/maintenance hazard), or
+  reverting to an inference-erasing annotation (rejected — it reintroduces the exact "six codes erase
+  to open `ErrorMap`" regression #1350 exists to fix).
+- **Severity:** significant — narrows the S4 blocker from 2 files/13 findings to 1 file/1 finding, but
+  does not close it; a coordinator ruling is still required before the repair slice can proceed.
+- **Action:** Coordinator must choose: (a) authorize a narrow `src/public/mod.ts` re-export of
+  `ContractBuilder`/`Schema` type names as a scope amendment, or (b) accept `baseContract →
+  ContractBuilder` as permanent, irreducible, leaf-owned known-red debt alongside the existing pinned
+  baseline (contracts would then land at 9 base + 1 new = 10 total findings, down from today's 11,
+  with the 1 remaining new finding explicitly justified rather than silently carried).
+- **Scope:** No product/test/docs/lock file was touched to produce this mapping. `#1348`/`#1466`
+  untouched. The repair itself remains a fresh, separately authorized implementation slice; this
+  session did not implement it.

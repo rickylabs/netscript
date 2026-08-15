@@ -6,7 +6,7 @@
 | -------------- | ---------------------------------------------------------- |
 | Run ID         | `fix-sdk-typed-error-channel--0.0.7-wave1`                 |
 | Branch         | `fix/sdk-typed-error-channel`                              |
-| Current phase  | `implementation` — S4 stopped on new raw doc-lint findings |
+| Current phase  | `implementation` — S4 stopped; S4-R amended with finding→correction mapping, 1 finding unresolved |
 | Archetype      | `1 — Small Contract` slice                                 |
 | Scope overlays | `docs`                                                     |
 
@@ -39,9 +39,21 @@ introduced.
 
 ## Next steps
 
-1. Coordinator disposition is required for the new raw doc-lint findings.
-2. Any correction must be a fresh authorized product slice; S4 remains run-artifact-only.
-3. After correction, rerun the incomplete final matrix at a newly locked immutable content head.
+1. S4-R (separate plan-only Claude session, `worklog.md` § S4-R) mapped all 13 new findings to
+   corrections; 12 of 13 resolve cleanly (all 10 SDK; `BaseContractErrors` and `Schema` in contracts).
+   `baseContract → ContractBuilder` is unresolved and needs a coordinator ruling: authorize a narrow
+   `src/public/mod.ts` re-export of `ContractBuilder`/`Schema`, or accept it as permanent leaf-owned
+   known-red debt.
+2. Once the coordinator rules on `ContractBuilder`, the correction is a fresh authorized product slice
+   over the same three files (`contract-primitives.ts`, `errors.ts`, `service-client.ts`); S4-R itself
+   remains run-artifact-only, same as S4.
+3. Two items are flagged as "reasoned, not `deno check`-proven" in S4-R and need verification at
+   implementation time: (a) `oc.errors(commonErrorMap)` still type-checks once `commonErrorMap` is
+   built from the public `ContractSchema`-typed schema aliases instead of the private Zod-typed ones;
+   (b) `ContractBuilder`'s generic constraint accepts `ContractSchema<unknown,unknown>` in the
+   pre-`.input()`/`.output()` position.
+4. After the repair lands, rerun the incomplete final matrix (JSR audits, specifier/export guards)
+   at a newly locked immutable content head.
 
 ## Key decisions
 
@@ -77,6 +89,9 @@ No docs/S3-S4 product file was modified.
   subtracting those changes the 972-finding base/head sets have identical SHA-256 digests.
 - S4 raw doc lint: blocking new RED; Contracts 9 -> 11 and SDK 3 -> 13.
 - JSR audits and selected specifier/export guards: NOT RUN after the mandated S4 stop.
+- S4-R (plan-only): 12/13 findings mapped to type-safe corrections (SDK 10/10, contracts 2/3);
+  `baseContract -> ContractBuilder` unresolved pending coordinator ruling. No gate was (re-)executed;
+  this is a mapping, not a rerun.
 
 ## Open questions
 
