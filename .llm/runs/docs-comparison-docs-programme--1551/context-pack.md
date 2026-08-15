@@ -2,10 +2,10 @@
 
 ## Current state
 
-Phase: S1 and S2 are signed off by the topic orchestrator, with S2 Tier-A PASS at
-`4e6d52b3d2cb0bf24aca9a47a67da46a213fef64`. An owner-priority evidence/publication correction was
-inserted before S3. Both canonical #1551 comments have been replaced in place against the unchanged
-EIS-Chat pin, and the five run artifacts record the reconciled baseline. S3 has not started.
+Phase: S1, S2, and E0 are signed off by the topic orchestrator; E0 Tier-A PASS is at
+`54e1c3bff7efc5df9da51bc06a15976717fa0929`. Final slice S3 publishes the deferred Session case,
+migration index/roadmap, stable xrefs, and both Concepts roots. Its complete docs audit passes and
+the slice stops for topic-orchestrator Tier-A review. No IMPL-EVAL has been launched.
 
 Branch/worktree: `docs/comparison-docs-programme` in
 `/home/codex/repos/netscript-007-docs-comparison`, no upstream. The re-baselined branch/remote head
@@ -66,7 +66,16 @@ No packages/plugins, locks/dependencies, consumer code copy, publication/release
 - The owner-authorized comments use only minimal illustrative current excerpts and contain no
   business data, credentials, domain models, CSS, fixtures, or wholesale source dumps.
 - The correction does not change the equivalence contract, matrix shape, or held presentation/domain
-  premise. No fresh PLAN-EVAL is required; S3 remains paused pending Tier-A review of E0.
+  premise. No fresh PLAN-EVAL was required; E0 is signed off.
+- The public Session case matches canonical comment `5265826161`: exact pin, measured `94 / 92`
+  primary route, current feature inventory and ownership, evidence labels, and deferred owners.
+- Every number in the case is carried from the S2 manifest/aggregate. The complete included total is
+  `5 / 325 / 307 / 14 / 2,669` for files/physical/nonblank/comment/tokens; Next.js remains an absent
+  source with every static measurement deferred.
+- S3 adds the case-proven migration placeholder only. Full concept parity remains with #1650.
+- Both `/comparisons/` and `/migration/` render under Concepts. S3 had to touch `docs/site/_data.ts`
+  because the approved S3 list omitted the sole Concepts-root registry; the anticipated significant,
+  no-rescope/no-growth correction is append-only in `drift.md`.
 
 ## Planned slices
 
@@ -79,7 +88,8 @@ No packages/plugins, locks/dependencies, consumer code copy, publication/release
   complete at handoff for Tier-A review, with S2 evidence files deliberately untouched.
 - S3: Session case, migration index/roadmap, xrefs/index, worklog/context, full docs audit. S3
   inherits the `/migration/` rendered-root assertion and must assert both `/comparisons/` and
-  `/migration/` after its two migration pages land.
+  `/migration/` after its two migration pages land. Complete at handoff, including the anticipated
+  `_data.ts` plus `drift.md` correction.
 
 Every slice is under 30 files, has a named gate, commits its worklog/context update, pushes explicitly, and posts a structured draft-PR comment.
 
@@ -94,7 +104,7 @@ Every slice is under 30 files, has a named gate, commits its worklog/context upd
 
 ## Next authorized action
 
-Commit and explicitly push the five-path E0 correction, post one structured implementation comment
-on draft PR #1652, then stop for topic-orchestrator Tier-A review. Do not begin S3 or treat the
+Commit and explicitly push the nine-path S3 slice, post one structured implementation comment on
+draft PR #1652, then stop for topic-orchestrator Tier-A review. Do not launch IMPL-EVAL or treat the
 generator's verification as certification. Keep `/home/codex/repos/eis-chat-007-input` strictly
 read-only.

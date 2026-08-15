@@ -62,6 +62,10 @@ The draft PR is partial and must say `Part of #1551`. Follow-ups #1645–#1650 o
 | 2026-08-15 | Unchanged EIS-Chat authority and comment-time baselines re-verified. | local `HEAD == origin/master == 5191de83…`; `834a2b36` has the identical tree and is evidence-only; all eight material commits are ancestral; input remains clean and read-only |
 | 2026-08-15 | Current Session and Channel surfaces inspected and route counts reproduced. | Session `94 / 92` physical/nonblank versus published `119 / 117` and inspected snapshot `121 / 119`; Channel `181 / 178` versus `208 / 204`; stale ASC, feature, effort, and time figures removed rather than estimated |
 | 2026-08-15 | Both canonical #1551 comment bodies replaced in place. | Session `5265826161` updated `2026-08-15T04:58:05Z`; Channel `5265971722` updated `2026-08-15T04:58:11Z`; API bodies byte-match the prepared definitive replacements; no follow-up comment posted |
+| 2026-08-15 | Topic orchestrator signed off E0 and authorized final slice S3. | Tier-A PASS at `54e1c3bff`; local/remote/PR head agreed and tree was clean; canonical comments and S2 evidence remained settled |
+| 2026-08-15 | S3 case, xrefs, migration roadmap, and Concepts wiring authored. | case uses only S2 measured numbers, labels all other evidence, preserves the complete equivalence contract, and maps only case-proven migration concepts; `_data.ts` divergence recorded append-only |
+| 2026-08-15 | Early rendered-link verification found site-relative evidence JSON links unresolved. | evidence JSON is intentionally not copied to `_site`; links changed to immutable blobs at signed-off S2 commit `4e6d52b3d`, then the complete verifier passed |
+| 2026-08-15 | S3 docs audit and manual review completed. | all named commands raw exit `0`; 36,084 rendered links resolve across 229 pages; both roots render under Concepts; matrix, evidence, privacy, terminology, front matter, and cross-page consistency assertions pass |
 
 ## Gate log
 
@@ -168,18 +172,27 @@ aggregate; after deleting the declared `/observedAt` field, the normalized SHA-2
 | Site gates | docs build and rendered-link checks | `docs/site/**` | N/A | E0 changes no docs-site file, so the conditional site gates do not apply | yes |
 | PR state/body | read-only #1652 inspection | draft PR metadata and body | PASS | remains draft and partial with `Part of #1551`; the body records no stale example estimate, so no body/checklist or label mutation is warranted | yes |
 
-### Planned S3 docs-audit rows
+### S3-docs-audit
 
 | Gate | Commands / procedure | Scope | Result | Findings | Proceeded |
 | --- | --- | --- | --- | --- | --- |
-| Links | `deno task --cwd docs/site verify`; `deno task docs:links` | new/changed public pages and whole site | NOT RUN | implementation not started | no |
-| Clean site build | `deno task --cwd docs/site verify` from clean generated output | full docs site | NOT RUN | implementation not started | no |
-| Changed-line internal wording | exact diff/`awk`/`rg` command from `plan.md` | added public lines only | NOT RUN | implementation not started | no |
-| Specifier scan | exact versionless `jsr:@netscript` scan from `plan.md` | comparisons and migration trees | NOT RUN | implementation not started | no |
-| Command/API sampling | three `deno doc` commands from `plan.md` | cited builder/defer mechanisms | NOT RUN | implementation not started | no |
-| Navigation/front matter | rendered nav plus front-matter/title/description inspection | five planned public pages and both Concepts roots | NOT RUN | S3 inherits the `/migration/` rendered-root assertion and must assert both `/comparisons/` and `/migration/` after its migration pages land | no |
-| Prose | neutral-language/evidence/private-detail review | all changed public prose | NOT RUN | implementation not started | no |
-| Cross-page contradictions | compare broad explanation, methodology, case, migration, builder/defer docs, and matrix rows | related public surfaces | NOT RUN | implementation not started | no |
+| Clean site, rendered links, caveats | `rtk proxy deno task --cwd docs/site verify` | full docs site | PASS / raw exit `0` | 644 files generated; 229 HTML pages pass rendered semantics; all 36,084 internal links resolve; 18 caveat markers across 14 pages resolve | yes |
+| Source links | `rtk proxy deno task docs:links` | 103 published docs sources | PASS / raw exit `0` | zero broken links, anchors, or orphans | yes |
+| Terminology and discoverability | `rtk proxy deno task docs:accuracy` plus manual comparison with `docs/site/glossary.md` | 201 published source pages and changed prose | PASS / raw exit `0` | accuracy/discoverability passes; evidence, contract, request-scoped resource, route, partial, presentation, domain, and deferred vocabulary is consistent with the glossary; existing peer warning is unrelated and non-failing | yes |
+| `definePage` API sample | `deno doc --filter definePage packages/fresh/src/application/builders/mod.ts` | public builder surface only | PASS / raw exit `0` | public page-builder factory and composition surface support the inspected attribution | yes |
+| `definePartial` API sample | `deno doc --filter definePartial packages/fresh/src/application/builders/mod.ts` | public partial-builder surface only | PASS / raw exit `0` | public partial binding surface supports the inspected attribution | yes |
+| Defer API sample | `deno doc packages/fresh/src/application/defer/mod.ts` | public defer surface only | PASS / raw exit `0` | published defer policy surface supports the freshness terminology; no package source edit | yes |
+| Diff hygiene | `git diff --check` | complete dirty S3 diff | PASS / raw exit `0` | no whitespace errors | yes |
+| Lock hygiene | `git diff --exit-code origin/main -- deno.lock docs/site/deno.lock` | both lockfiles | PASS / raw exit `0` | both lockfiles unchanged | yes |
+| Changed-line internal wording | dirty-tree equivalent of the plan's diff/`awk`/`rg` scan, run from `origin/main` and from S3 baseline `54e1c3bff` | branch-wide and S3-only added public lines | PASS / branch `rg` raw exit `0`; S3 `rg` raw exit `1` | branch-wide scan's only match is the already-signed-off S2 manifest's literal reproduction command containing `.llm/tools`; S3 has the expected no matches, so no new public prose exposes issue-number shorthand, harness, evaluator, worktree, or orchestrator wording | yes |
+| Versionless specifier scan | exact `rg` scan from `plan.md` | comparisons and migration trees | PASS / raw `rg` exit `1` | expected no matches; no versionless `jsr:@netscript` specifier appears | yes |
+| Navigation and front matter | manual source/rendered inspection after final verifier | comparison case, migration pages, and Concepts menu | PASS | both `/comparisons/` and `/migration/` render under Concepts; the new case, migration index, and Next.js roadmap have title/description and matching rendered title/H1; `_data.ts` necessity is recorded in `drift.md` | yes |
+| Matrix completeness | inspect each matrix source row and delimiter shape | case mechanism matrix | PASS | every responsibility row has populated NetScript/Next.js mechanisms plus evidence, loser overhead, confidence, version sensitivity, and follow-up; no row declares an unsupported winner | yes |
+| Evidence and privacy | compare every case number with S2 aggregate/manifest; prose/privacy review | case, index, migration pages | PASS | measured Session `94 / 92` and every aggregate cell trace exactly to S2; unmatched Next.js values remain absent/deferred; no private contents, CSS, fixtures, domain models, business prose, or credentials appear | yes |
+| Prose and migration scope | compare with methodology, glossary, broad explanation, public builder/defer docs, and residual map | all changed public prose | PASS | migration maps only case-proven concepts and links the full-parity owner; `explanation/compared` stays linked and non-contradictory; unmeasured conclusions are inspected, inferred, or deferred with owners | yes |
+| Canonical-comment consistency | compare case page with live comment `5265826161` and S2 authority | pin, counts, feature inventory, labels, deferrals | PASS | same pin, `94 / 92` measurement, generated routes, route-bound partials, cache-seed preservation, layout-faithful fallbacks, cold-navigation behavior, ownership boundaries, evidence labels, and deferred owners; no contradiction | yes |
+| Scope | raw changed-path enumeration from S3 baseline | complete S3 slice | PASS | seven planned non-drift paths plus anticipated `_data.ts` and required `drift.md`; no package/plugin, lock, S2 evidence, external input, or unrelated path | yes |
 
-No S3 implementation gate, release gate, scaffold suite, E2E suite, or expensive-gate lease has
-been run. E0 stops for topic-orchestrator Tier-A review; this generator does not self-certify.
+No release gate, scaffold suite, E2E suite, expensive-gate lease, or evaluator has been run. S3
+stops here for topic-orchestrator Tier-A review; this generator does not self-certify or begin
+IMPL-EVAL.

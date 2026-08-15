@@ -150,3 +150,20 @@ remain correct; manufacturing changes to them would reduce reproducibility, so t
 untouched. The current implementation does not break the approved equivalence contract, change the
 mechanism-matrix shape, or invalidate the presentation/domain-held-constant premise. This correction
 therefore needs no fresh PLAN-EVAL. S3 remained unstarted throughout.
+
+## 2026-08-15 — S3 Concepts-root assertion requires `_data.ts`
+
+Severity: **significant** — approved slice-boundary correction. Status: **resolved in S3**.
+Rescope: **none**. Scope growth: **none**.
+
+The S1 correction explicitly deferred the assertion that both `/comparisons/` and `/migration/`
+render under Concepts until S3, when the migration pages exist. The approved S3 file list includes
+the migration pages and xrefs but omits `docs/site/_data.ts`, the only source of the Concepts root
+list. At the E0 baseline that list contains `/explanation/` and `/comparisons/` only, so the inherited
+assertion is unsatisfiable without changing `_data.ts`.
+
+Topic-orchestrator authority anticipated this exact divergence and required it to be recorded rather
+than added silently. S3 therefore adds `/migration/` to the existing Concepts roots in `_data.ts`
+alongside the pages that make the route resolve. This changes neither the approved information
+architecture nor milestone scope; it is the minimum file needed to satisfy the already-approved
+two-root acceptance statement. No package, plugin, lockfile, or additional content scope is added.

@@ -22,9 +22,13 @@ results.
 
 ## Current case
 
-The first bounded case will examine a deferred Session page design in NetScript and Next.js. No
-completed case result or measured number is published yet. Until the evidence manifest, repeatable
-procedure, and case matrix land together, the case remains **deferred**.
+The first bounded case compares a deferred Session page design in NetScript and Next.js `16.3.0`:
+
+- {{ comp.xref({ key: "compare:nextjs-session", text: "NetScript vs Next.js: Session page" }) }}
+
+It publishes a pinned NetScript static measurement and an inspected mechanism mapping. It does not
+publish a runnable Next.js equivalent or comparative benchmark; those values remain explicitly
+deferred.
 
 ## Programme roadmap
 
@@ -38,7 +42,9 @@ has explicit owners:
 - [Further comparison cases and topic prioritization](https://github.com/rickylabs/netscript/issues/1649)
 - [Full Next.js concept map and migration parity checklist](https://github.com/rickylabs/netscript/issues/1650)
 
-Migration guidance is deferred to issue #1650 until case-backed mappings become available. A
-roadmap owner is not evidence: each future page must still satisfy the methodology below.
+The {{ comp.xref({ key: "migration:nextjs", text: "Migrate from Next.js roadmap" }) }} maps only
+concepts established by the current case. The full parity checklist remains owned by
+[the migration-map follow-up](https://github.com/rickylabs/netscript/issues/1650). A roadmap owner
+is not evidence: each future page must still satisfy the methodology above.
 
 {{ comp.nextPrev({ prev: { label: "How NetScript's path compares", href: "/explanation/compared/" }, next: { label: "Comparison methodology", href: "/comparisons/methodology/" } }) }}
