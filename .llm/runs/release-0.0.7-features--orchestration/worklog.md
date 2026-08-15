@@ -4308,3 +4308,64 @@ Per **D-17** the readiness head is already final and pushed, so a lease bound to
 before execution: **`a8a160285d4f9bddb95a5dac6cfbde85e1265ebc`**, content `7fa29ad3e…`.
 
 `scaffold.runtime` and `fresh-browser` remain `NOT_RUN`; no lease taken, no evaluator, no ready flip.
+
+## 2026-08-15 — S5 attempt 5: terminal red at 69/1/0; run-owned cleanup completed by this lane
+
+Lease over immutable evidence `a8a160285d4f9bddb95a5dac6cfbde85e1265ebc`, product
+`7fa29ad3ed10ad903b9cbbd518111e6bf2754761`.
+
+| Field | Value |
+| --- | --- |
+| Verdict | **FAIL** — `passed=69 failed=1 skipped=0` |
+| Failing gate | `behavior.service-client-refetch` — **timed out waiting for the Chrome DevTools target** |
+| Raw log | `reports/s5-attempt5-scaffold-runtime-20260815-2139.log` |
+| SHA-256 | `ff349b40f7f70341934e170df7c67d147c0ed983173b41871421755ad55e062b` — **re-hashed by me, exact match** |
+| `cleanup.aspire-stop` | passed |
+| `fresh-browser` | **NOT_RUN** — correctly gated on a scaffold PASS |
+
+### F6 worked, and that is why this failure is new information
+
+Attempt 4 died in `collectBrowserRefetchEvidence`'s `finally` with an unguarded
+`child.kill('SIGTERM')`, so the gate could not report anything about the behaviour. Attempt 5 reaches
+a **behavioural** verdict: the Chrome DevTools target never became available within the timeout. The
+gate now fails on its own terms rather than during teardown — which is exactly what F6 was for.
+
+Counts held at 69 passing, matching attempt 4, so nothing regressed; the same single gate is still
+the frontier.
+
+### Run-owned cleanup — ownership proven before any signal
+
+Three stopped children remained: PIDs **727834, 727837, 727843**, state `Tl`, started 21:43:48.
+I did not act on the coordinator's list alone — I verified each one first:
+
+- `readlink /proc/<pid>/cwd` → `…/netscript-007-features-1355/.llm/tmp/cli-e2e/plugin-smoke-20260815-213942/aspire`
+  for all three. **Ownership proven by path containment inside this leaf's worktree.**
+- Parent PID `11780` is `/init`, so they were reparented orphans rather than children of a live
+  foreign helper — terminating them could not disturb anything else.
+
+They were in state `T` (stopped), which cannot process a pending `SIGTERM`. Sequence used: **`TERM`
+then `CONT`** on each exact PID, so the continued process acts on the delivered signal. All three
+exited within 5 s. **The bounded `KILL` escalation was not needed and was not used.**
+
+### Independent re-audit after cleanup
+
+| Probe | Result |
+| --- | --- |
+| The three run-owned PIDs | **absent** |
+| Any process with cwd under `plugin-smoke-20260815-213942` | **0** — full `/proc` sweep |
+| `agentic:leak-check` | aspire `ok`, docker `ok`, **`survivors: []`** |
+| `docker ps -aq` | **0** |
+| Foreign aspire mcp helpers | **12 present and untouched** — preserved as instructed |
+
+The last row matters as much as the others: a cleanup that swept the host indiscriminately would have
+looked identical in the first four rows and destroyed a foreign lane's tooling. Ownership was proven
+by containment and the sweep was scoped to it.
+
+**Lease released** — cleanup is proven and the host is empty.
+
+### Next, in order
+
+Measured same-author attribution of the DevTools timeout, then a **plan-only** amendment before any
+product mutation. **No `fresh-browser`, no attempt 6, no evaluator.** The author is still writing its
+leaf-side attempt-5 report; the attribution dispatch is queued behind that turn rather than
+interrupting it.
