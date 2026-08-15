@@ -416,3 +416,58 @@ internally consistent as written. This mirrors how PLAN-EVAL cycle 2 carried N-1
 DevTools RFCs; deploy #904–#908 migration/supersession and the hardcoded-host-command audit; the
 amend/fold-first duplicate audit; JSR obligations; and the later implementation epic with PR-sized
 children. **S4 is not released by this sign-off.**
+
+## 2026-08-15 — S3 Tier-A review: accepted; S4 released as the final slice
+
+S3 commit `171e4e62ebb2e47eb3af08df165394bb4d1bae55` (local == remote == PR head), tree clean, turn
+ended `2026-08-15T00:44:39Z` with the literal `TIER-A STOP: slice S3 ready for topic review`, thread
+idle, S4 not started. Scope is 14 files — the RFC (+222 lines), the run dir, and nine receipts —
+with **no `packages/**`, `plugins/**`, or `deno.lock`**.
+
+### Verification
+
+| Check | Method | Result |
+| --- | --- | --- |
+| **No issue filed** | live GitHub search, `repo:rickylabs/netscript is:issue created:>=2026-08-14` | **`total_count: 0`** — verified against GitHub, not accepted from the turn report |
+| PR lifecycle | live search `is:pr is:draft is:open label:status:impl` | #1651 present — draft, open, exactly one `status:` label |
+| All six S3 sections | RFC section map | compatibility (876), deploy supersession (903), hardcoded-command audit (926), duplicate audit (946), JSR obligations (972), epic proposal (998) |
+| Declare-before-use sweep re-run | full-document extraction | still 42 declared / 42 used / 0 undeclared |
+| Durable receipts | five gates incl. `quality-scan-repo-s3`, both `publish-dry-run-*-s3` | `PASS`, `gitHead == actualGitHead == 7a5eb580a`, `PASS_PARENT_HEAD` labelling retained |
+
+### Both carried obligations closed
+
+- **S2-N1** resolved as option (a), and resolved properly: RFC 603–610 names
+  `PluginCliFailure.details.capabilityDecision` on `capability-denied` as the concrete public
+  location where `denied` is non-empty, states that the plugin module is never imported and cannot
+  observe that decision, and fixes the plugin-facing invariant as `denied.length === 0` with
+  `granted` element-for-element equal to `requested`. The field is no longer a predicate that can
+  never fire; it now has a named observation site and a stated invariant everywhere else.
+- **S2-N2** closed: RFC 1053–1055 records UTF-8-text-only generation as a contract-major-1 drawback
+  and points binary assets at a later explicitly bounded operation.
+
+### The audit did not launder a green scan into a clean verdict
+
+This is the part worth recording. RFC 938–944 reports that `deno task quality:scan:repo` returned
+zero findings with seven existing allowances — and then explicitly refuses to let that stand as the
+coupling audit: "That result proves the scanner's current equality/predicate rules, not the absence
+of direct command coupling: the scanner does not flag a plugin-specific factory import followed by
+`.command('ai' | 'auth', ...)`." It then supplies the manual audit with concrete `file:line`
+findings (`public/features/plugins/plugins-group.ts`, the diverging `local/` composition root,
+`ast-extractor.ts`, and the broad `./cli -A` dispatch seam), and assigns the scanner rule-shape gap
+to a future guard rather than treating #745 or #1542 as its silent owner.
+
+That is `milestone-run.md`'s "pass is distinguishable from did-not-run" applied unprompted at a
+level of rigour the brief asked for but could not have specified. The duplicate audit is likewise
+real board reconciliation — eleven existing issues with per-issue amend/fold/depend dispositions and
+an instruction that a later epic author repeats the search because live GitHub beats the snapshot.
+
+### Disposition
+
+**S3 accepted with no findings.** No fix-up round.
+
+**S4 is released** as the final implementation slice: final-head reconciliation of all six contracted
+proving gates, truthful DoD and `acceptance-evidence` updates, and the IMPL-EVAL handoff package.
+S4 carries one instruction that N-4 makes load-bearing — the gates must attest the **content head**,
+which requires committing content first and running the gates against the clean committed tree, not
+the pre-commit working tree. After S4's Tier-A stop, IMPL-EVAL is a **fresh separate
+opposite-family session**, and the ready-flip decision belongs to the coordinator, not this lane.
