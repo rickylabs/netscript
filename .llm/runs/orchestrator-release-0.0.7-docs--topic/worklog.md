@@ -257,3 +257,49 @@ My first Tier-A report called the `cse_…` bridge id a transcription slip. It w
 files genuinely carry different values, and the evaluator had read the jobs file. The prior entry
 already records the accurate root cause; noted here so no reader takes the earlier framing as the
 finding.
+
+## 2026-08-15 — Tier-A S1 sign-off: PASS (independently re-executed)
+
+S1 is terminal at `98fc58997c3ff5ca21403ba67521c584a5d26a0e` = `3a8c73841` (S1) + `98fc58997`
+(Tier-A fix). Sign-off is the supervisor's, per the harness slice-review invariant. PR comment
+`issuecomment-5299334257`.
+
+### Verification the orchestrator executed itself
+
+Waited for `task_complete` in the leaf rollout before touching the worktree, so the build could not
+collide with a live turn. The `pgrep` hits that looked like a running agent were this session's own
+shell wrappers carrying the pattern in their command line — identified by reading the rollout's last
+record, not by string match.
+
+| Check                                   | Raw exit | Result                                             |
+| --------------------------------------- | -------- | -------------------------------------------------- |
+| `deno task --cwd docs/site build`       | `0`      | 226 HTML files, 4 documented-syntax allowances     |
+| `deno task --cwd docs/site check:links` | `0`      | 34,980 internal links across 226 pages all resolve |
+
+Both reproduce the leaf's reported evidence exactly. Rendered assertions checked against `_site`
+directly: `/netscript/comparisons/` and `/netscript/comparisons/methodology/` appear in the Concepts
+menu right after the explanation entries and are carried on 176 pages; `/netscript/migration/` has
+zero hrefs anywhere in the rendered site. Head unchanged at `98fc58997` and the worktree stayed
+clean after the build. Local, remote, and PR head all agree.
+
+One self-correction during verification: an initial grep for `href="/comparisons/` returned zero and
+briefly looked like a contradiction of the navigation assertion. That was this orchestrator's error
+— the site renders under a `/netscript/` base path. Re-checked with the correct prefix and the
+assertion holds. No finding was raised on it.
+
+### Findings resolved
+
+- **T1** — four `/migration/` references removed (`_data.ts` root, `migration:index` xref entry plus
+  its legend line, `comparisons/index.md` body xref, `methodology.md` `nextPrev.next`). `git grep`
+  at the signed-off head returns zero matches. Replacements preserve meaning rather than deleting
+  content: the roadmap sentence now names #1650 in plain text.
+- **T2** — `check:links` added as a mandatory S1 gate row and is the check that produced the
+  34,980-link proof.
+
+### Standing observation
+
+Three defects surfaced inside one PASSed plan: an S1 acceptance unsatisfiable from its own file
+list, four links into a section owned by a later slice, and an S1 gate structurally unable to prove
+its own content contract. The common thread is per-slice self-consistency, which the PLAN-EVAL
+checklist does not currently test. Raised to the coordinator as a checklist gap, not as a reason to
+doubt this leaf — the plan's substance held and the leaf stopped correctly at every boundary.
