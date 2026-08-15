@@ -1214,3 +1214,60 @@ suppresses the automatic ready-transition dispatch; it does not represent a waiv
 `/netscript/comparisons/frontend/` and `/netscript/comparisons/backend/`, plus the rewritten
 `/netscript/comparisons/` chooser. The site deploys from `main`, so these resolve only after a merge
 performed by the coordinator; until then they are paths rather than live links.
+
+## 2026-08-15 — #1660 merged; docs lane recorded EXHAUSTED / PARKED
+
+### Merge reconciled, verified independently
+
+| Fact                  | Value                                                                  |
+| --------------------- | ---------------------------------------------------------------------- |
+| Merge commit          | `729386c567bfbd0b8c7f86a4ed09348f0a8a4ad8`                             |
+| `origin/main` subject | `docs(comparisons): replace the protocol with an argument (#1660)`     |
+| Merged from / at      | `615786c1a` at `2026-08-15T09:25:56Z`                                  |
+| PR #1660              | `merged: true`, closed, `status:shipped`, `impl-eval:skip` **removed** |
+| Issue #1659           | closed/completed, **8/8** boxes, `status:shipped`                      |
+
+Removing `impl-eval:skip` post-merge matters to the record: it had been redispatch suppression, and
+leaving it on a shipped PR would have implied a waived evaluation.
+
+### Published surface verified by this lane, not taken on report
+
+| URL                                   | Status  | Title                                                     |
+| ------------------------------------- | ------- | --------------------------------------------------------- |
+| `/netscript/comparisons/`             | **200** | Comparisons · NetScript Docs                              |
+| `/netscript/comparisons/frontend/`    | **200** | NetScript vs Next.js, Nuxt, SvelteKit, and TanStack Start |
+| `/netscript/comparisons/backend/`     | **200** | NetScript vs Nest.js, Hono, and Encore.dev                |
+| `/netscript/comparisons/methodology/` | **404** | protocol page gone from the live site                     |
+| `/netscript/migration/`               | **404** | gone                                                      |
+
+The selector markup is present on both comparison pages. The 404s matter as much as the 200s: they
+prove the protocol surface was actually removed from publication, not merely superseded.
+
+### No next eligible docs leaf — lane exhausted
+
+Established from the control plane rather than from labels. `milestone-cluster-state.json` allocates
+the docs lane exactly `[1551]`, which is closed; **zero** docs-lane issues remain open. Six open
+0.0.7 issues still carry `area:docs`/`type:docs`, so a label-based read would wrongly suggest
+remaining docs work — but every one belongs to another lane: fixes `#1112`, `#1350`, `#1461`,
+`#1623`; internals `#1533`; features `#1360`. Taking any would breach exclusive issue allocation.
+
+Nothing was dispatched. The lane is recorded **EXHAUSTED / PARKED** for 0.0.7 in `supervisor.md` and
+`context-pack.md`, both of which had been stale since the opening reconciliation and are now current
+as a resumable record.
+
+### Lane summary
+
+Two leaves shipped. The second deleted most of the first — a 151-line methodology page, a 171-line
+case study, 372 lines of private-repository evidence JSON, a 718-line measurement tool and its
+276-line test, and both migration pages — and replaced them with two opinionated comparison pages
+carrying a competitor selector.
+
+The reviewable failure of this lane was the category error behind the first attempt: applying
+evidence-integrity rigor to a **positioning** artifact. It produced a protocol nobody needed and
+deleted the most communicative content in the run because it was not script-reproducible. The
+estimates were recovered from GitHub `userContentEdits` and restored as labelled architectural
+estimates. Five operating rules earned along the way are recorded in `context-pack.md`.
+
+Preserved and idle for any reactivation: Codex threads `019ffcc9-16c2-7573-b7f6-d627172408e8` and
+`01a0047a-aceb-7b53-9ba1-9191eedaaf1a`. Immutable base `729386c567bfbd0b8c7f86a4ed09348f0a8a4ad8`.
+No coordinator-owned merge state was mutated by this lane.

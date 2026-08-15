@@ -18,11 +18,11 @@
 | Branch                              | `orchestrator/release-0.0.7-docs` (no upstream by design; push by explicit refspec only)                           |
 | Topic run                           | `.llm/runs/orchestrator-release-0.0.7-docs--topic`                                                                 |
 | Preserved parked Codex topic thread | `019ffcc0-e19b-71d1-95ce-8c72559eb026` (parked/offline; never resumed as topic controller)                         |
-| Leaf                                | `comparison-docs-programme`, PR #1652, exact head `d35cbca30872d1f55118d63437638e93270c2ac3`                       |
+| Leaves (both shipped)               | `comparison-docs-programme` → PR #1652 → `e090f894f`; `comparison-vs-pages` → PR #1660 → `729386c56`               |
 | Leaf worktree / branch              | `/home/codex/repos/netscript-007-docs-comparison` / `docs/comparison-docs-programme`                               |
 | Leaf implementer Codex thread       | `019ffcc9-16c2-7573-b7f6-d627172408e8` (gpt-5.6-sol · high · idle; steer by `codex exec resume`, never a new send) |
 | Lane issue scope                    | #1551 only (one committed milestone issue)                                                                         |
-| Formal hold                         | fresh PLAN-EVAL cycle 1, reset dispatch order 6; implementation must not resume                                    |
+| Lane status                         | **EXHAUSTED / PARKED** — allocation `[1551]` shipped; no docs-lane issue open                                      |
 
 Attachment is proved by the native session registry entry `~/.claude/sessions/2429469.json`, whose
 `pid`, `cwd`, and non-empty `bridgeSessionId` match the live process, plus the process argv above.
