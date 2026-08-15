@@ -119,41 +119,38 @@ contract.
 lease. And uniquely here: the leaf may **read** the OpenHands workflows but must not **fire** them —
 no dispatch, no evaluator trigger, manual or by label.
 
-### Current state — implementation authorized
+### Current state — implementation complete, awaiting IMPL-EVAL grant
 
-PLAN-EVAL returned **`PASS`** at evaluated head `cea999d18ea2c2d4a6208fc209ce744d9be1d194`;
-evaluator commit `e15d78588503f4a83d6322be9039abe1f52190a1` (artifact only), comment `5301255122`.
-Local = remote = PR = `e15d78588`. The original Codex author `01a00443-abab-7261-8905-74ed71467929`
-is resumed for **S1–S5**, one slice per turn with a Tier-A stop between each.
+**All five planned slices are implemented and Tier-A signed off.** Leaf head
+`f46d84630c54210a09ff4ed39537da1e66964a52`, local = remote = PR, worktree clean. PR **#1658** draft
+at `status:impl`, milestone `0.0.7`, closing **#1611** + **#1613**.
 
-**Five PLAN-EVAL notes carried into implementation:**
+| Slice                         | Implementation            | Sign-off    |
+| ----------------------------- | ------------------------- | ----------- |
+| S1 refusal/recursion guard    | `4aa04de34` / `f1567ce32` | `6f725ad3b` |
+| S2 formal producer contract   | `28a8a9184` / `5869cb46d` | `0886c2427` |
+| S3 CLI live-head binding      | `d7fdbb1d9` / `2e6a065d7` | `d3d31b3d0` |
+| S4 pre-spend workflow + retry | `9b71e1bd2` / `ab4b8185f` | `ad19d0e20` |
+| S5 final evidence             | `1390d3ead` / `704c067e8` | `f46d84630` |
 
-- **N1** — the S1-before-S4 rationale is wrong as written: `issue_comment` workflows and the trusted
-  policy checkout both resolve from the **default branch** (`openhands-agent.yml:164`), so no
-  intermediate commit on this branch affects live dispatch. The ordering stands on the **S4→S1 API
-  dependency**. My Tier-A review endorsed the wrong reasoning; correction owed in `worklog.md`.
-- **N2** — **`test` is the only proving gate with real coverage here.** `check`/`quality-job` walk
-  roots that exclude all eight paths, so three green receipts are **not** three independent proofs.
-  The new `dispatch-openhands_test.ts` is auto-discovered — **no ninth path**.
-- **N3** — refusal constants must avoid bare verdict tokens, or `agentic-lib.ts:939`
-  `HEURISTIC_TOKEN_RE` lets a watcher mine a refusal as a verdict.
-- **N4** — implement and assert **test-by-reason** the five denial reasons:
-  `command-not-first-token`, `invalid-command-argument`, `unknown-command-argument`,
-  `duplicate-command-argument`, `author-not-authorized`.
-- **N5** — post refusals with **`GITHUB_TOKEN`** under the new `issues: write` grant, not the
-  `permissions:`-unconstrained `secrets.PAT_TOKEN` (`openhands-agent.yml:174`), so the declared
-  minimal grant is the real ceiling.
+Gate lineage: plan `cea999d18` → PLAN-EVAL `PASS` (`e15d78588`, comment `5301255122`) → S1–S5.
 
-**Not this leaf's to take:** OpenHands dispatch or any evaluator trigger (it edits the dispatch
-surface — firing it spends real budget), Aspire, Docker, browser/desktop, E2E, expensive-gate lease.
-The plan gate is closed; no new PLAN-EVAL.
+**Whole-leaf surface is exactly the eight contracted paths** — no ninth, no catalog/config edit,
+`openhands-phase-eval.yml` untouched. Supervisor-verified `deno task test` → **4,147 passed / 0
+failed**; final `check`/`test`/`quality-job` receipts PASS; no lock churn.
 
-### Evaluator session hygiene
+**DoD:** rows 1–7 evidence-ready; **row 8 not satisfied** (IMPL-EVAL has not run). PR body unchanged
+and draft — checkbox completion and lifecycle transition are the evaluator's and coordinator's.
 
-Evaluator sessions here linger in `state: blocked` with `firstTerminalAt: null` after delivering,
-pushing, and commenting — seen on `ee2825f2` (#1656) and `7d544aec` (#1658). **Reconcile verdicts
-from the durable artifacts** (evaluator commit, pushed head equality, structured PR comment), not
-from session state, then stop the session explicitly. Both are stopped; the lane is quiescent.
+**N1–N5 all discharged**, verified against the landed slices rather than the summary. N1 corrected a
+Tier-A rationale of mine; N5 made the permission ceiling real (`GITHUB_TOKEN` under `contents: read`
+
+- `issues: write`, PAT claim-only).
+
+### Blocking coordinator action
+
+**Formal IMPL-EVAL grant.** Not launched — no evaluator, no OpenHands dispatch, no evaluator label,
+no readiness flip, no merge. Nothing is running in the internals lane.
 
 ### Remaining internals queue after this leaf
 
