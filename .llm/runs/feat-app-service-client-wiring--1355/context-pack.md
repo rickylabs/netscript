@@ -90,18 +90,19 @@ or expensive command is authorized.
 
 ## In Progress
 
-- F4 disposition is plan-only until its standalone amendment is committed and pushed. Coordinator
-  proof shows the first post-plugin generate was convergence after changed inputs; two following
-  identical generates were zero-write and byte-identical. The bounded repair moves the idempotency
-  snapshot/assertion to an immediately consecutive invocation while preserving client 0-write/2-skip
-  checks on both. The S5 FAIL remains append-only evidence. Lease released at `dbf87e379`; host empty.
+- F4 amendment is independently committed/pushed at `b40616a81`. The bounded probe/test repair is
+  implemented: first post-plugin convergence permits Aspire writes while preserving client 0/2;
+  the immediate repeat requires client 0/2, Aspire 0, and SHA-256 path/byte identity. Focused
+  format/lint/check pass and the shared-primitive test suite passes 11/0. Commit this content before
+  generating the fresh `s5-f4-*` receipt set. Lease released; no expensive gate is authorized.
 
 ## Next Steps
 
-1. Commit and explicitly push the F4 plan/proof amendment before touching the probe or its test.
-2. Implement the bounded two-invocation probe sequence and focused negative/byte-identity test.
-3. Run affected cheap tests, commit a clean immutable content head, then generate the four fresh
-   `s5-f4-*` binding receipts and recompute exact-set sufficiency.
+1. Commit and explicitly push the bounded F4 probe/test implementation and run-artifact summary.
+2. At that clean immutable content head, run the four `s5-f4-*` binding gates serially through
+   `run-gate.ts` with the locked invocation IDs.
+3. Recompute sufficiency over exactly those four new files, post one structured F4 receipt, and stop
+   for fresh features Tier-A.
 
 ## Key Decisions
 

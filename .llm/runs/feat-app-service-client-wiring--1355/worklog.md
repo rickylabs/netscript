@@ -470,3 +470,19 @@ are locked in `plan.md` before any product or test mutation.
 
 Process correction: preflight artifacts are committed and pushed before readiness is reported. A
 leased evidence head must remain immutable after the grant.
+
+### F4 implementation
+
+The static probe now delegates both post-plugin commands to the exported E2E-only
+`assertServiceGenerationSequence` primitive. The first command requires zero client writes and two
+skips but permits Aspire-helper convergence. The primitive snapshots all owned client/Aspire output
+after that command, immediately runs the identical command again, requires zero client writes, two
+skips, and zero Aspire writes, then invokes the existing SHA-256 path/byte comparison against a
+second snapshot.
+
+The focused sequence test calls that same primitive and locks the exact event order
+`generate → snapshot → generate → snapshot`. It accepts three Aspire writes during convergence,
+rejects one Aspire write during the identical repeat, and independently rejects helper byte drift
+when the printed repeat counts claim zero. Focused format/lint/check passed for both authorized files;
+the probe test suite passed 11/0. No generator, suite-order, manifest, template, SDK, Fresh, or public
+package surface changed. No expensive gate, browser, Aspire, Docker, lease, or evaluator ran.

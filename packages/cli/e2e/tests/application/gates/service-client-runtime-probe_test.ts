@@ -9,6 +9,7 @@ import { deriveProcedureInput } from '../../../src/application/gates/scaffold/se
 import {
   assertByteIdentical,
   assertGeneratedServiceSchemaReady,
+  assertServiceGenerationSequence,
   assertServiceKeyIsolation,
   assertSettledRefetch,
   type FileSnapshot,
@@ -128,6 +129,71 @@ Deno.test('service client probe rejects any second-generation byte drift', () =>
       assertByteIdentical(before, {
         ...before,
         'apps/alpha/lib/users.ts': { size: 6, sha256: 'changed' },
+      }),
+    Error,
+    'second service generate changed owned output',
+  );
+});
+
+Deno.test('service generation converges once then rejects repeated writes or byte drift', async () => {
+  const converged: FileSnapshot = {
+    'apps/alpha/lib/payments.ts': { size: 8, sha256: 'payments' },
+    'apps/alpha/lib/users.ts': { size: 5, sha256: 'users' },
+    'aspire/.helpers/services.mts': { size: 7, sha256: 'aspire' },
+  };
+  const result = (aspireWrites: number) => ({
+    code: 0,
+    stdout:
+      `Wrote 0 service client modules.\nSkipped 2 current service client modules.\nWrote ${aspireWrites} Aspire helper files.\n`,
+    stderr: '',
+  });
+
+  let generateCall = 0;
+  let snapshotCall = 0;
+  const events: string[] = [];
+  const generations = [result(3), result(0)];
+  const snapshots = [converged, { ...converged }];
+  await assertServiceGenerationSequence({
+    generate: () => {
+      events.push(`generate:${generateCall + 1}`);
+      return Promise.resolve(generations[generateCall++]!);
+    },
+    snapshot: () => {
+      events.push(`snapshot:${snapshotCall + 1}`);
+      return Promise.resolve(snapshots[snapshotCall++]!);
+    },
+  });
+  assertEquals(generateCall, 2);
+  assertEquals(snapshotCall, 2);
+  assertEquals(events, ['generate:1', 'snapshot:1', 'generate:2', 'snapshot:2']);
+
+  generateCall = 0;
+  await assertRejects(
+    () =>
+      assertServiceGenerationSequence({
+        generate: () => Promise.resolve([result(3), result(1)][generateCall++]!),
+        snapshot: () => Promise.resolve(converged),
+      }),
+    Error,
+    'consecutive service generate did not report Wrote 0 Aspire helper files.',
+  );
+
+  generateCall = 0;
+  snapshotCall = 0;
+  await assertRejects(
+    () =>
+      assertServiceGenerationSequence({
+        generate: () => Promise.resolve([result(3), result(0)][generateCall++]!),
+        snapshot: () =>
+          Promise.resolve(
+            [
+              converged,
+              {
+                ...converged,
+                'aspire/.helpers/services.mts': { size: 8, sha256: 'changed' },
+              },
+            ][snapshotCall++]!,
+          ),
       }),
     Error,
     'second service generate changed owned output',

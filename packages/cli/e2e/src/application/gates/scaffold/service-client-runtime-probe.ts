@@ -21,6 +21,12 @@ export interface FileFingerprint {
 
 export type FileSnapshot = Readonly<Record<string, FileFingerprint>>;
 
+/** Injectable command and snapshot seam for the convergence/idempotency sequence. */
+export interface ServiceGenerationSequenceDependencies {
+  readonly generate: () => Promise<CommandResult>;
+  readonly snapshot: () => Promise<FileSnapshot>;
+}
+
 export interface ServiceKeyEvidence {
   readonly usersInput: unknown;
   readonly paymentsInput: unknown;
@@ -43,6 +49,28 @@ export function assertByteIdentical(before: FileSnapshot, after: FileSnapshot): 
       }`,
     );
   }
+}
+
+/** Converge changed inputs, then prove an immediately repeated generation is byte-idempotent. */
+export async function assertServiceGenerationSequence(
+  dependencies: ServiceGenerationSequenceDependencies,
+): Promise<void> {
+  const convergence = await dependencies.generate();
+  requireSuccess(convergence, 'post-plugin service generate');
+  requireOutputMarkers(convergence, 'post-plugin service generate', [
+    'Wrote 0 service client modules.',
+    'Skipped 2 current service client modules.',
+  ]);
+
+  const converged = await dependencies.snapshot();
+  const repeated = await dependencies.generate();
+  requireSuccess(repeated, 'consecutive service generate');
+  requireOutputMarkers(repeated, 'consecutive service generate', [
+    'Wrote 0 service client modules.',
+    'Skipped 2 current service client modules.',
+    'Wrote 0 Aspire helper files.',
+  ]);
+  assertByteIdentical(converged, await dependencies.snapshot());
 }
 
 /** Require generated server/client keys to isolate resources under real TanStack prefix rules. */
@@ -150,25 +178,21 @@ console.log('${EVIDENCE_MARKER}' + JSON.stringify({
 `;
 }
 
-/** Execute the second-generation, byte, type, and key contract against a generated project. */
+/** Execute convergence, consecutive idempotency, type, and key contracts in a generated project. */
 export async function probeGeneratedServiceClients(
   projectRoot: string,
   appName: string,
   cliPrefix: readonly string[],
 ): Promise<void> {
   await assertGeneratedServiceSchemaReady(projectRoot);
-  const before = await snapshotOwnedOutput(projectRoot, appName);
-  const generation = await runCommand(
-    [...cliPrefix, 'service', 'generate', '--project-root', projectRoot],
-    projectRoot,
-  );
-  requireSuccess(generation, 'second service generate');
-  for (const marker of ['Wrote 0 service client modules.', 'Wrote 0 Aspire helper files.']) {
-    if (!generation.stdout.includes(marker)) {
-      throw new Error(`second service generate did not report ${marker}\n${generation.stdout}`);
-    }
-  }
-  assertByteIdentical(before, await snapshotOwnedOutput(projectRoot, appName));
+  await assertServiceGenerationSequence({
+    generate: () =>
+      runCommand(
+        [...cliPrefix, 'service', 'generate', '--project-root', projectRoot],
+        projectRoot,
+      ),
+    snapshot: () => snapshotOwnedOutput(projectRoot, appName),
+  });
 
   const appRoot = join(projectRoot, 'apps', appName);
   const probePath = join(appRoot, 'lib', PROBE_FILE);
@@ -290,6 +314,18 @@ function requireSuccess(result: CommandResult, label: string): void {
     throw new Error(
       `${label} failed (${result.code})\nstdout:\n${result.stdout}\nstderr:\n${result.stderr}`,
     );
+  }
+}
+
+function requireOutputMarkers(
+  result: CommandResult,
+  label: string,
+  markers: readonly string[],
+): void {
+  for (const marker of markers) {
+    if (!result.stdout.includes(marker)) {
+      throw new Error(`${label} did not report ${marker}\n${result.stdout}`);
+    }
   }
 }
 
