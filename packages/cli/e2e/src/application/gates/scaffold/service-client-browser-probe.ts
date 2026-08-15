@@ -3,9 +3,34 @@
 const LIST_PATH = '/api/rpc/v1/users/list';
 const UPDATE_PATH = '/api/rpc/v1/users/update';
 const TIMEOUT_MS = 20_000;
+const BROWSER_VERSION_TIMEOUT_MS = 5_000;
+const BROWSER_OUTPUT_LIMIT_BYTES = 32 * 1024;
 const BASELINE_CONFIRMATION_MS = 500;
 const BASELINE_POLL_MS = 50;
 const ALREADY_TERMINATED_CHILD_MESSAGE = 'Child process has already terminated';
+const BUILT_IN_BROWSER_SOURCE = 'built-in allowlist';
+const BROWSER_CANDIDATES = [
+  '/usr/bin/google-chrome',
+  '/usr/bin/google-chrome-stable',
+  '/usr/bin/chromium',
+  '/usr/bin/chromium-browser',
+  '/mnt/c/Program Files/Google/Chrome/Application/chrome.exe',
+  '/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
+] as const;
+
+/** Environment variable that selects the exact browser executable for CLI runtime E2E. */
+export const BROWSER_EXECUTABLE_ENV = 'NETSCRIPT_E2E_BROWSER_EXECUTABLE';
+
+export interface BrowserExecutableSelection {
+  readonly path: string;
+  readonly source: typeof BROWSER_EXECUTABLE_ENV | typeof BUILT_IN_BROWSER_SOURCE;
+  readonly version: string;
+}
+
+export interface BoundedTextCapture {
+  readonly drain: Promise<void>;
+  text(): string;
+}
 
 export interface SettledRefetchEvidence {
   readonly baselineListRequestCount: number;
@@ -113,27 +138,42 @@ class CdpClient {
 
 /** Collect the mutation/refetch evidence from one live generated app URL. */
 export async function collectBrowserRefetchEvidence(url: string): Promise<SettledRefetchEvidence> {
-  const executable = await findBrowserExecutable();
+  const selection = await selectBrowserExecutable();
   const port = reservePort();
   const profile = await Deno.makeTempDir({ prefix: 'netscript-service-client-cdp-' });
-  const child = new Deno.Command(executable, {
-    args: [
-      '--headless=new',
-      '--disable-gpu',
-      '--disable-dev-shm-usage',
-      '--no-sandbox',
-      '--disable-background-networking',
-      `--remote-debugging-port=${port}`,
-      `--user-data-dir=${profile}`,
-      'about:blank',
-    ],
-    stdout: 'null',
-    stderr: 'piped',
-  }).spawn();
-  const drain = child.stderr.pipeTo(new WritableStream({ write: () => undefined }));
+  let child: Deno.ChildProcess;
+  try {
+    child = new Deno.Command(selection.path, {
+      args: [
+        '--headless=new',
+        '--disable-gpu',
+        '--disable-dev-shm-usage',
+        '--no-sandbox',
+        '--disable-background-networking',
+        `--remote-debugging-port=${port}`,
+        `--user-data-dir=${profile}`,
+        'about:blank',
+      ],
+      stdout: 'null',
+      stderr: 'piped',
+    }).spawn();
+  } catch (error) {
+    await Deno.remove(profile, { recursive: true }).catch(() => undefined);
+    throw new Error(
+      `${selectionLabel(selection)} failed to start headless: ${errorMessage(error)}`,
+      { cause: error },
+    );
+  }
+  const stderr = captureBoundedText(child.stderr);
+  const childStatus = child.status;
   let client: CdpClient | undefined;
   try {
-    const target = await waitForDebugTarget(port);
+    const target = await awaitBrowserStartup(
+      selection,
+      waitForDebugTarget(port),
+      childStatus,
+      stderr,
+    );
     client = await CdpClient.connect(target.webSocketDebuggerUrl);
     await client.send('Page.enable');
     await client.send('Runtime.enable');
@@ -180,7 +220,7 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
       rowContainsExpression(renamedName),
       (value) => value,
     );
-    const status = paused.responseStatusCode;
+    const mutationStatus = paused.responseStatusCode;
     await client.send('Fetch.continueResponse', { requestId: paused.requestId });
     if (typeof paused.networkId === 'string') {
       await client.waitFor(
@@ -202,7 +242,8 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
     return {
       baselineListRequestCount: baseline,
       finalListRequestCount: listRequestIds.size,
-      mutationSucceeded: typeof status === 'number' && status >= 200 && status < 300,
+      mutationSucceeded: typeof mutationStatus === 'number' && mutationStatus >= 200 &&
+        mutationStatus < 300,
       optimisticRowContainedRenamedName: optimistic,
       finalRowContainedRenamedName: finalRow,
       renamedName,
@@ -210,11 +251,186 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
   } finally {
     client?.close();
     try {
-      await terminateBrowserProcess(child, drain);
+      await terminateBrowserProcess(child, stderr.drain);
     } finally {
       await Deno.remove(profile, { recursive: true }).catch(() => undefined);
     }
   }
+}
+
+/** Select a runnable Chrome-family executable, honoring a strict explicit override. */
+export async function selectBrowserExecutable(
+  override: string | undefined = Deno.env.get(BROWSER_EXECUTABLE_ENV),
+  probe: (path: string) => Promise<string> = probeBrowserVersion,
+): Promise<BrowserExecutableSelection> {
+  if (override !== undefined) {
+    const displayPath = override.length === 0 ? '<empty>' : override;
+    if (override.length === 0) {
+      throw new Error(`${BROWSER_EXECUTABLE_ENV} browser executable <empty>: value is empty`);
+    }
+    try {
+      return {
+        path: override,
+        source: BROWSER_EXECUTABLE_ENV,
+        version: await probe(override),
+      };
+    } catch (error) {
+      throw new Error(
+        `${BROWSER_EXECUTABLE_ENV} browser executable ${JSON.stringify(displayPath)}: ${
+          errorMessage(error)
+        }`,
+        { cause: error },
+      );
+    }
+  }
+
+  const failures: string[] = [];
+  for (const candidate of BROWSER_CANDIDATES) {
+    try {
+      return {
+        path: candidate,
+        source: BUILT_IN_BROWSER_SOURCE,
+        version: await probe(candidate),
+      };
+    } catch (error) {
+      failures.push(`${JSON.stringify(candidate)}: ${errorMessage(error)}`);
+    }
+  }
+  throw new Error(
+    `no runnable Chrome-family executable found; ${failures.join('; ')}. ` +
+      `Set ${BROWSER_EXECUTABLE_ENV} to an executable browser path.`,
+  );
+}
+
+/** Validate a browser executable with a bounded, observable `--version` probe. */
+export async function probeBrowserVersion(
+  path: string,
+  timeoutMs = BROWSER_VERSION_TIMEOUT_MS,
+): Promise<string> {
+  let info: Deno.FileInfo;
+  try {
+    info = await Deno.stat(path);
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) throw new Error('path does not exist');
+    throw new Error(`path could not be inspected: ${errorMessage(error)}`, { cause: error });
+  }
+  if (!info.isFile) throw new Error('path is not a file');
+  if (info.mode !== null && Deno.build.os !== 'windows' && (info.mode & 0o111) === 0) {
+    throw new Error('path is not executable');
+  }
+
+  let child: Deno.ChildProcess;
+  try {
+    child = new Deno.Command(path, {
+      args: ['--version'],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).spawn();
+  } catch (error) {
+    throw new Error(`failed to start version probe: ${errorMessage(error)}`, { cause: error });
+  }
+
+  const stdout = captureBoundedText(child.stdout);
+  const stderr = captureBoundedText(child.stderr);
+  const drain = Promise.all([stdout.drain, stderr.drain]).then(() => undefined);
+  const timeout = Promise.withResolvers<'timeout'>();
+  const timeoutId = setTimeout(() => timeout.resolve('timeout'), timeoutMs);
+  const result = await Promise.race([
+    child.status.then((status) => ({ kind: 'status' as const, status })),
+    timeout.promise.then(() => ({ kind: 'timeout' as const })),
+  ]);
+  clearTimeout(timeoutId);
+
+  if (result.kind === 'timeout') {
+    await terminateBrowserProcess(child, drain);
+    throw new Error(`version probe timed out after ${timeoutMs} ms`);
+  }
+  await drain;
+  if (!result.status.success) {
+    throw new Error(
+      `version probe exited with code ${result.status.code}, signal ${
+        result.status.signal ?? 'none'
+      }; ` +
+        `stderr: ${stderr.text() || '<empty>'}`,
+    );
+  }
+
+  const output = [stdout.text(), stderr.text()].filter((entry) => entry.length > 0).join('\n');
+  const version = output.split(/\r?\n/).find((line) =>
+    /(?:Google Chrome(?: for Testing)?|Chromium|Microsoft Edge)/i.test(line)
+  )?.trim();
+  if (!version) {
+    throw new Error(`unrecognized browser version output: ${output || '<empty>'}`);
+  }
+  return version;
+}
+
+/** Drain a byte stream while retaining only a bounded tail for diagnostics. */
+export function captureBoundedText(
+  stream: ReadableStream<Uint8Array>,
+  maxBytes = BROWSER_OUTPUT_LIMIT_BYTES,
+): BoundedTextCapture {
+  if (!Number.isSafeInteger(maxBytes) || maxBytes <= 0) {
+    throw new RangeError('maxBytes must be a positive safe integer');
+  }
+  let retained = new Uint8Array(0);
+  let observedBytes = 0;
+  const drain = stream.pipeTo(
+    new WritableStream<Uint8Array>({
+      write(chunk) {
+        observedBytes += chunk.byteLength;
+        if (chunk.byteLength >= maxBytes) {
+          retained = chunk.slice(chunk.byteLength - maxBytes);
+          return;
+        }
+        const keepFromRetained = Math.min(retained.byteLength, maxBytes - chunk.byteLength);
+        const next = new Uint8Array(keepFromRetained + chunk.byteLength);
+        next.set(retained.subarray(retained.byteLength - keepFromRetained));
+        next.set(chunk, keepFromRetained);
+        retained = next;
+      },
+    }),
+  );
+  return {
+    drain,
+    text() {
+      const tail = new TextDecoder().decode(retained);
+      return observedBytes > maxBytes ? `[truncated to final ${maxBytes} bytes]\n${tail}` : tail;
+    },
+  };
+}
+
+/** Return a DevTools target or surface an early browser exit with bounded diagnostics. */
+export async function awaitBrowserStartup<TTarget>(
+  selection: BrowserExecutableSelection,
+  target: Promise<TTarget>,
+  status: Promise<Deno.CommandStatus>,
+  stderr: BoundedTextCapture,
+): Promise<TTarget> {
+  const result = await Promise.race([
+    target.then(
+      (value) => ({ kind: 'target' as const, value }),
+      (error) => ({ kind: 'target-error' as const, error }),
+    ),
+    status.then((value) => ({ kind: 'status' as const, value })),
+  ]);
+
+  if (result.kind === 'target') return result.value;
+  if (result.kind === 'target-error') {
+    throw new Error(
+      `${selectionLabel(selection)} did not expose a DevTools target: ${
+        errorMessage(result.error)
+      }`,
+      { cause: result.error },
+    );
+  }
+
+  await stderr.drain;
+  throw new Error(
+    `${selectionLabel(selection)} exited before exposing a DevTools target: ` +
+      `code ${result.value.code}, signal ${result.value.signal ?? 'none'}; ` +
+      `stderr: ${stderr.text() || '<empty>'}`,
+  );
 }
 
 /** Terminate the browser child while preserving unrelated cleanup failures. */
@@ -374,23 +590,14 @@ function reservePort(): number {
   return port;
 }
 
-async function findBrowserExecutable(): Promise<string> {
-  const candidates = [
-    '/usr/bin/google-chrome',
-    '/usr/bin/google-chrome-stable',
-    '/usr/bin/chromium',
-    '/usr/bin/chromium-browser',
-    '/mnt/c/Program Files/Google/Chrome/Application/chrome.exe',
-    '/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
-  ];
-  for (const candidate of candidates) {
-    try {
-      if ((await Deno.stat(candidate)).isFile) return candidate;
-    } catch (error) {
-      if (!(error instanceof Deno.errors.NotFound)) throw error;
-    }
-  }
-  throw new Error(`no supported Chrome/Chromium executable found: ${candidates.join(', ')}`);
+function selectionLabel(selection: BrowserExecutableSelection): string {
+  return `browser executable selected from ${selection.source} at ${
+    JSON.stringify(selection.path)
+  }`;
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }
 
 function delay(milliseconds: number): Promise<void> {

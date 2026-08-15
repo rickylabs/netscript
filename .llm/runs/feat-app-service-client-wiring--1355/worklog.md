@@ -816,3 +816,30 @@ The exact path ceiling and proof matrix are recorded in `plan.md` and
 `reports/f7-plan-amendment.md`. This correction changed run artifacts only and ran no test, gate,
 lease, browser, Aspire, Docker, evaluator, readiness action, or metadata action. All prior evidence
 remains append-only.
+
+## F7 implementation — strict executable selection and bounded startup evidence
+
+Fresh Tier-A passed F7-C1 at `a2e9515f5`. Implementation remained inside the exact two-path
+probe/test ceiling. The probe now selects a browser only after a bounded runnable `--version`
+check, treats `NETSCRIPT_E2E_BROWSER_EXECUTABLE` as exclusive when present, and carries source/path
+metadata through real headless startup. Built-in candidates use the same probe, so a present but
+unrunnable Windows PE is recorded as a failure rather than returned because it exists.
+
+One 32 KiB tail capture continuously drains startup stderr. `awaitBrowserStartup` races the target
+against the one captured child-status promise, reports bounded stderr and exit status on early
+termination, and preserves a live target error's cause/text without inventing status. The raw drain
+continues into the unchanged F6 termination helper. CDP/refetch behavior, response-stage resume,
+stable baseline, and settled `+1` assertion are unchanged.
+
+The first focused run was honestly red on two test assumptions: invalid executable images become a
+shell exit 127 in this Deno runtime, and the self-source file URL needed a `URL` object. After a
+test-only correction within the ceiling, the structured focused suite passed **22/0** with the
+managed Chromium 151 path supplied only through the environment. A direct selector measurement
+returned source `NETSCRIPT_E2E_BROWSER_EXECUTABLE`, the exact runtime path, and
+`Google Chrome for Testing 151.0.7922.34`. Focused structured check/lint/format selected the three
+related probe files and returned zero diagnostics/findings. Full details are in
+`reports/f7-implementation.md`.
+
+The four binding receipts remain pending until product/test plus this run state are committed at a
+clean immutable content head. No expensive gate, lease, browser, Aspire, Docker, evaluator,
+readiness, metadata, lockfile, documentation, or third product/test path was touched.

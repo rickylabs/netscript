@@ -146,14 +146,20 @@ defect and binds a strict explicit override; it is not an environmental capabili
   managed Linux Chromium exists, so the repair must select an explicitly configured executable and
   retain bounded status/stderr diagnostics. Cleanup is complete, the host is empty, and the lease is
   released; no retry or browser gate is authorized.
+- Fresh Tier-A passed F7-C1 at `a2e9515f5`. The two-path repair is implemented: strict override and
+  runnable built-in selection, bounded `--version` validation, a continuously drained 32 KiB stderr
+  tail, and a target/status startup race. The focused deterministic suite passes 22/0 with a
+  managed Chromium 151 path supplied only through the environment; direct selection reports the
+  exact override path/source and `Google Chrome for Testing 151.0.7922.34`. F6 teardown and all
+  refetch assertions remain intact. Binding receipts await a clean immutable content commit.
 
 ## Next Steps
 
-1. Commit and push only the F7-C1 plan/run artifacts.
-2. Post `[PHASE: PLAN] [SLICE: F7-C1]` with the exact two-path ceiling, strict
-   `NETSCRIPT_E2E_BROWSER_EXECUTABLE` semantics, bounded startup diagnostics, and proof matrix.
-3. Stop for fresh Tier-A. Do not mutate the two planned paths, request a lease, retry runtime, or
-   start browser/evaluator work.
+1. Commit the F7 two-path implementation and current run artifacts at one immutable content head.
+2. Run the four ordinary binding gates serially through `run-gate.ts` with distinct F7 invocation
+   IDs, then recompute sufficiency over the four exact receipt files.
+3. Commit/push the generated evidence, post `[PHASE: IMPL] [SLICE: F7]`, and stop for fresh Tier-A.
+   Do not request a lease, retry runtime, run either expensive browser gate, or start evaluation.
 
 ## Key Decisions
 
