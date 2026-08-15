@@ -367,3 +367,10 @@ task-level doctor skip, and retains the root formatter exclusion. Plan repair on
 failure escalates to the owner. #1665 has a first repair head `92bf26e11`; the same author is
 reconciling the fifth docs path before fresh Tier-A. Preserve supervisors/authors and serialize only
 inside each topic.
+
+Newer exact transition at `2026-08-15T11:44:15Z`: #1665's final repaired plan is clean/pushed at
+`ee1b44c6d`, Tier-A PASS at fixes topic `318bd087c`. Its sole fresh native Fable 5/medium Remote
+Control PLAN-EVAL is active as session `0287ccbe-2740-45ee-b378-33d1c1c59429`, bridge
+`cse_01GaNTjv6oY6MaxnKHH1ZfrB`, on that immutable head. Do not implement before verdict. #1664 S2
+and #1663's bounded cycle-two repair remain active independently on their original Codex authors;
+neither has an expensive gate lease.

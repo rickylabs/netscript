@@ -492,3 +492,8 @@ implementation thread.
   diagnostics, and they reproduce before the slice. The leaf records those exact failures as
   pre-existing supplemental evidence; it neither calls the doc-lint invocation green nor silently
   widens the feature slice to fix them.
+- **Dynamic runtime identity needs a normalized documentation contract:** #1665 cannot quote a
+  per-install `import.meta.url` byte-for-byte as a fixed machine string. The accepted boundary uses
+  one `<resolved import.meta.url>` token in the published single-line template, then normalizes only
+  the real URL segment in the focused provider test and compares every stable byte, including the
+  SDK prefix. This repairs the known page in place without inventing perpetual stale prose.

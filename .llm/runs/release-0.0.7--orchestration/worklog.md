@@ -641,3 +641,15 @@
   invalidation staging, and raw six-diagnostic doc-lint baseline are substantively repaired. The
   superseding fifth-path docs ruling is being reconciled on the same author before fresh Tier-A;
   no evaluator or implementation has started.
+
+## 2026-08-15T11:44:15Z — #1665 final plan admitted to formal evaluation
+
+- The same #1665 author completed the superseding fifth-path repair at clean/pushed head
+  `ee1b44c6d`: the stale query-bridge diagnostic is owned in place with a single dynamic URL token,
+  the runtime test must normalize only that token before byte comparison, and the obsolete debt
+  record is removed. The branch still contains run artifacts only.
+- Fresh Tier-A passed at fixes topic `318bd087c`, independently closing T-1 through T-4 and
+  confirming exactly four declared plus five granted paths. Coordinator released one fresh native
+  Fable 5/medium Remote Control PLAN-EVAL: session `0287ccbe-2740-45ee-b378-33d1c1c59429`, bridge
+  `cse_01GaNTjv6oY6MaxnKHH1ZfrB`, exact cwd and source head `ee1b44c6d`. No implementation or
+  expensive gate is authorized before its terminal verdict.

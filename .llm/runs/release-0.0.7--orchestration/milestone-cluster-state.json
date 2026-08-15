@@ -115,7 +115,7 @@
         "pid": 26724,
         "bridgeSessionId": "session_014pCd2QWkCscgZpVdjcUPST",
         "remoteControlUrl": "https://claude.ai/code/session_014pCd2QWkCscgZpVdjcUPST",
-      "topicHeadSha": "3fdf4b2c70b2692de19a8db7f6b9b5d68eccd19b",
+        "topicHeadSha": "318bd087c",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle"
@@ -1131,14 +1131,14 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
-      "currentPrHeadSha": "92bf26e11a77121d899bfb3592b62b72a7503bec",
+      "currentPrHeadSha": "ee1b44c6d401a9edb9c8690870ea2d9151f8f504",
       "issueNumbers": [1637, 1619, 1620, 1598, 1623],
       "implementerAgentId": "01a00516-2033-7ed3-936a-a616cee47447",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/sdk-cache-surface-and-telemetry",
       "worktree": "/home/codex/repos/netscript-007-leaf-sdk-cache",
       "prNumber": 1665,
-      "implementationState": "tier_a_fail_fix_t1_t3_repair_pushed_t4_five_path_reconciliation_active_same_author",
+      "implementationState": "final_repaired_plan_tier_a_pass_plan_eval_active_no_product_mutation",
       "dispatchTopicHeadSha": "8169b1a0e1ac263b619635aec2cfc12a5feea2df",
       "planGate": "research and contract decisions only; open one draft PR and stop before implementation; PLAN-EVAL is required",
       "declaredSurface": [
@@ -1155,12 +1155,20 @@
         "docs/site/web-layer/query-bridge.md"
       ],
       "scopeRuling": "the four acceptance/proof paths and the one exact published page quoting the changed diagnostic are granted; unrelated SDK doc-lint remediation is not added to this five-issue leaf; Tier-A must bind the existing named diagnostics as a strict zero-new-diagnostic baseline or reject the plan",
-      "tierAPlanState": "FAIL_FIX",
-      "tierAPlanHeadSha": "20e7aed418efb46c23897debf610fb74b0c4fbef",
-      "tierAPlanTopicCheckpointSha": "3fdf4b2c70b2692de19a8db7f6b9b5d68eccd19b",
-      "tierAPlanFindingState": "bounded repair active: define a span-time overflow deferral seam including composite-query no-span behavior; stage invalidation entries per report so rejected partial evidence cannot leak; replace aggregate doc-lint wrapper evidence with raw combined and cache-entrypoint baselines naming the six exact diagnostics; update the exact published query-bridge page",
+      "tierAPlanState": "PASS_AFTER_FAIL_FIX_REPAIR",
+      "tierAPlanHeadSha": "ee1b44c6d401a9edb9c8690870ea2d9151f8f504",
+      "tierAPlanTopicCheckpointSha": "318bd087c",
+      "tierAPlanFindingState": "T-1 through T-4 closed: request-local span deferral, per-report invalidation staging, exact named red doc-lint baseline, and normalized published diagnostic quote inside the exact five-path grant",
       "planRepairHeadSha": "92bf26e11a77121d899bfb3592b62b72a7503bec",
-      "planEvaluationState": "blocked_until_fresh_tier_a_pass_no_evaluator_launched",
+      "finalPlanRepairHeadSha": "ee1b44c6d401a9edb9c8690870ea2d9151f8f504",
+      "planEvaluationState": "active_fresh_fable5_medium_remote_control",
+      "planEvaluatorAgentId": "0287ccbe-2740-45ee-b378-33d1c1c59429",
+      "planEvaluatorBackgroundAgentId": "0287ccbe",
+      "planEvaluatorBridgeSessionId": "cse_01GaNTjv6oY6MaxnKHH1ZfrB",
+      "planEvaluatorRoute": "native claude-fable-5 / medium / Remote Control",
+      "planEvaluatorRemoteControlUrl": "https://claude.ai/code/session_01GaNTjv6oY6MaxnKHH1ZfrB",
+      "planEvaluationSourceHeadSha": "ee1b44c6d401a9edb9c8690870ea2d9151f8f504",
+      "planEvaluationGrantedAt": "2026-08-15T11:42:12.000Z",
       "ciSkipSmoke": "plan/run-artifact-only PR #1665 skipped check-test, quality, desktop-native-linux, both scaffold runtimes, scaffold-static, deps-report, surface-diff, close-gate, and lane visibility checks as classified",
       "crossPackageGateContract": "repo-root test or every asserting package gate must be named; package-local green is insufficient for SDK source/public-surface changes",
       "expensiveGateContract": "no Aspire, Docker, or e2e:cli gate is currently load-bearing or authorized",
@@ -2147,5 +2155,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T11:36:00.000Z"
+  "updatedAt": "2026-08-15T11:44:15.000Z"
 }
