@@ -264,3 +264,47 @@ The conditional ruling, for when an improved revision does become available:
 
 S3 is held rather than resumed. Its case-study content consumes the same evidence baseline, so
 starting it before the baseline question is settled risks discarding the work.
+
+## 2026-08-15 — correction: the stale artifacts are the comments, not the pin
+
+The preceding entry framed this as "no improved EIS-Chat revision exists" and held the lane. That
+framing was wrong, and the coordinator's correction plus the owner's direct statement are right.
+
+The error was in the comparison, not the data. This orchestrator searched for refs **newer than the
+pin** and correctly found none. The right comparison is the pin against **what the comments
+describe**. The two comments were authored 2026-08-12 at `11:02:26Z` and `11:17:48Z`; the
+improvements landed later the same day and over the following day, and every one of them is an
+**ancestor of** `5191de83f3da97559f21d8891c6c8afdf1cf473a`. The improved code has been inside the
+immutable input all along.
+
+Re-verified before dispatch:
+
+| Claim                                     | Verification                                                                           |
+| ----------------------------------------- | -------------------------------------------------------------------------------------- |
+| `d838cfca` route-bound partials           | ancestor of pin — `refactor(fresh): bind partials to generated routes`, 08-13 17:42    |
+| `b261f463` typed document form navigation | ancestor of pin — `refactor(fresh): adopt typed document form navigation`, 08-13 17:27 |
+| `834a2b36` evidence-only                  | tree identical to pin; `docs(harness): pass umbrella implementation reevaluation`      |
+| no newer product commit                   | `origin/master` == `5191de83…`                                                         |
+
+Commits touching the two example routes after the comments and ancestral to the pin: `16b822c`,
+`3332be2`, `f231ecb`, `0d00c28`, `0acf521`, `aeee408`.
+
+Measured staleness of the comments against the pinned source:
+
+| Route                           | Comment claims | At comment time | At pin        | Delta      |
+| ------------------------------- | -------------- | --------------- | ------------- | ---------- |
+| `…/session/[session]/index.tsx` | 119 / 117      | 121             | **94 / 92**   | −25 (−21%) |
+| `…/channel/[channel]/index.tsx` | 208 / 204      | 208             | **181 / 178** | −27 (−13%) |
+
+Disposition: **no fresh PLAN-EVAL required.** This is an evidence/publication correction inside the
+approved architecture and the unchanged baseline — the pin, the equivalence contract, the evidence
+vocabulary, the matrix columns, and every other locked decision are untouched, so S1 and S2
+sign-offs stand at `4e6d52b3d`. The leaf was instructed to stop and report if the current
+implementation actually breaks the equivalence contract, changes the mechanism-matrix shape, or
+invalidates the presentation/domain-held-constant premise, since those would be locked-plan changes
+needing a gate.
+
+Dispatched to the preserved thread `019ffcc9-16c2-7573-b7f6-d627172408e8` (PID `60595`); no
+replacement sender. The brief also warns that the coordinator's "obsolete pin" wording does not
+apply: the S2 manifest, procedure, and measurements are correct at this pin and must not be edited
+to manufacture a change. S3 remains held until the rewrites are verified.
