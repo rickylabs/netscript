@@ -63,3 +63,14 @@ was no retry, and no downstream binding gate was started.
 
 No `scaffold.runtime`, `fresh-browser`, runtime lease, browser process, Aspire, Docker, evaluator,
 readiness, metadata, lockfile, documentation, or product repair occurred during this stop.
+
+## Coordinator disposition and environment-only recovery
+
+The coordinator accepted this receipt as an environmental red, quarantined the S5 attempt-5 tree
+recoverably at `/tmp/netscript-f7-quarantine.iXF6fb`, and authorized one clean-checkout rerun. The
+original receipt remains unchanged and excluded from the passing evidence set.
+
+At the same immutable content commit, `receipts/f7-test-attempt2.json` passes with 4,237 passed,
+zero failed, 19 ignored, and the same 4,256 total results. Conditional publish dry-run and
+architecture check then pass serially. Exact-set recovery evidence is recorded separately in
+`reports/f7-binding-recovery.md`; this failure record is not relabelled or overwritten.

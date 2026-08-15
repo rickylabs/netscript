@@ -863,3 +863,28 @@ architecture receipt was run or authored, and there was no retry or residue muta
 `test` is `FAIL` and the latter two receipts are missing. Full evidence is in
 `reports/f7-binding-test-failure.md`. No expensive gate, lease, browser, Aspire, Docker, evaluator,
 readiness, metadata, lockfile, documentation, or product repair occurred.
+
+### F7 environment-only binding recovery
+
+Coordinator disposition accepted the first F7 test receipt as an environmental red and moved the
+S5 attempt-5 workspace recoverably to `/tmp/netscript-f7-quarantine.iXF6fb`. The original red and
+evidence commit `885f352e7` remain append-only. The original passing `f7-check.json` was retained and
+not rerun.
+
+Because the leaf worktree contained a coordinator-owned `leak-report.md` modification, recovery ran
+from the clean detached worktree `/home/codex/worktrees/netscript-f7-binding-e45144db6` at exact
+content `e45144db643f6bde85552a615812c8371e4ce792`. Its short status was empty before and after. No
+head mismatch waiver was used.
+
+`f7-test-attempt2` passed **4,237/0/19** across the same **4,256** total results. Only then did
+`f7-publish-dry-run` pass, followed serially by `f7-arch-check` with zero doctrine failures. Every
+new receipt has `gitHead == actualGitHead == e45144db643f6bde85552a615812c8371e4ce792`.
+
+`evaluateEvidenceSet` over exactly `receipts/f7-check.json`,
+`receipts/f7-test-attempt2.json`, `receipts/f7-publish-dry-run.json`, and
+`receipts/f7-arch-check.json` reports **SUFFICIENT** with an empty reason list. The original
+`receipts/f7-test.json` stays excluded as a superseded red; including it would cause both duplicate
+`test` evidence and a failing outcome. Full evidence is in `reports/f7-binding-recovery.md`.
+
+No source/test, runtime attempt, lease, expensive gate, browser, Aspire, Docker, evaluator,
+readiness, metadata, lockfile, documentation, quarantine, or coordinator-owned leak report changed.

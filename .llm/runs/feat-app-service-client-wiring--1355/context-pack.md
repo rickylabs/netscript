@@ -151,16 +151,19 @@ defect and binds a strict explicit override; it is not an environmental capabili
   tail, and a target/status startup race. The focused deterministic suite passes 22/0 with a
   managed Chromium 151 path supplied only through the environment; direct selection reports the
   exact override path/source and `Google Chrome for Testing 151.0.7922.34`. F6 teardown and all
-  refetch assertions remain intact. Binding check passes at content `e45144db6`; binding test is an
-  honest environmental red (4,236/1/19) on the unreadable S5 attempt-5 Postgres residue. No retry or
-  downstream receipt ran; the exact four-file set is currently INSUFFICIENT.
+  refetch assertions remain intact. The first binding test remains an honest environmental red on
+  S5 attempt-5 residue. After recoverable coordinator quarantine, one clean-checkout attempt passes
+  4,237/0/19 over the same 4,256 results; conditional publish and architecture gates also pass at
+  content `e45144db6`. The exact set uses test-attempt2, excludes the original red, and is SUFFICIENT.
 
 ## Next Steps
 
-1. Commit and push the F7 check PASS, test FAIL, exact attribution, and insufficient-set result.
-2. Post `[PHASE: IMPL] [SLICE: F7] [GATE-STOP]` naming the two present and two missing receipts.
-3. Stop for coordinator/Tier-A disposition. Do not retry, mutate the runtime residue, request a
-   lease, run downstream/expensive gates, or start evaluation.
+1. Commit/push the three recovery receipts and append-only recovery report without staging the
+   coordinator-owned `leak-report.md` modification.
+2. Post `[PHASE: IMPL] [SLICE: F7] [BINDING-RECOVERY]` naming the exact sufficient four-file set and
+   the excluded superseded red.
+3. Stop for fresh features Tier-A. Do not request a lease, run attempt 6 or expensive gates, mutate
+   quarantine, or start evaluation.
 
 ## Key Decisions
 
