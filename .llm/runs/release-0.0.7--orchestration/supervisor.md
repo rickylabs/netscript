@@ -823,3 +823,10 @@ two stale short-SHA sentences naming `47ca22abe`, but its correct binding sectio
 and the evaluator artifact/comment use `423867017` consistently; record the contradiction as
 non-impacting brief drift. Internals is preparing coordinator-owned readiness/close-gate evidence;
 no merge or issue-box mutation has occurred.
+
+At 19:18Z, coordinator close-gate preparation for #1666 is complete at unchanged evaluated head
+`ee67d12b4`: PR body now has nine checked current DoD boxes, the sole machine-readable #1296
+acceptance mapping is comment `5303825255`, and the live mirror dry-run accepts all five entries.
+The coordinator changed `status:impl` to `status:ready-merge` while draft, verified the dry-run, then
+marked the PR ready for review. Current-head CI run `31903523137` and companion workflows are active;
+the real mirror must mutate all five boxes and close-gate/core visibility must succeed before merge.

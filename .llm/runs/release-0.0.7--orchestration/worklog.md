@@ -1217,3 +1217,16 @@
 - PR #1666 is still draft. Artifact-only-head Actions classified and skipped unrelated lanes while
   the docs build remained green; internals is preparing the five-box coordinator close-gate mapping.
   No ready flip, label change, issue edit, merge, or #1663 action has fired.
+
+## 2026-08-15T19:18:20Z — #1666 enters the real close-gate
+
+- The coordinator updated the PR body to reflect the delivered repair/evaluator heads and checked
+  all nine authoritative Definition-of-Done rows. One `acceptance-evidence` block maps the exact five
+  live #1296 boxes by index to evaluator/repair/readiness URLs in PR comment `5303825255`.
+- `status:impl` was replaced by `status:ready-merge` while the PR remained draft. The live mirror
+  dry-run accepted the mapping against issue-body SHA-256
+  `f66987e42a7c88f7a1741cfb0fdc5f25f7189686d9c6b43a18e5f9ba4cd14037` and proposed #1296 without
+  mutation. The PR was then marked ready for review, preserving head `ee67d12b4` and the evaluator.
+- Ready-for-review created current-head CI run `31903523137` plus current companion workflows. Merge
+  remains prohibited until the real acceptance mirror checks all five issue boxes, close-gate and
+  core visibility report SUCCESS rather than SKIPPED, and every required current-head check is green.

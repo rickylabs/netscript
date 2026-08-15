@@ -691,3 +691,8 @@ binds all eight physical fix1 receipts to the repaired content head and treats t
 as preserved red. Two stale brief sentences named old `47ca22abe`, but the correct binding section
 and the entire evaluator output use `423867017`, so the contradiction is recorded as non-impacting
 brief drift. Internals is preparing coordinator readiness; no merge or issue-box edit has occurred.
+
+Newer transition `2026-08-15T19:18:20Z`: #1666 is non-draft at `status:ready-merge`, unchanged head
+`ee67d12b4`. All nine PR DoD boxes are current/checked; comment `5303825255` contains the sole five-row
+#1296 acceptance mapping; the live dry-run passed before readiness. Current CI run `31903523137` is
+active and must produce a real mirror mutation plus green close-gate/core visibility before merge.

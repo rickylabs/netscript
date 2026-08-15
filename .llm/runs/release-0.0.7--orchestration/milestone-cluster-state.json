@@ -988,7 +988,7 @@
     {
       "id": "reference-export-drift-gate",
       "lane": "internals",
-      "phase": "planned",
+      "phase": "gating",
       "baseBranch": "main",
       "headSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
       "currentPrHeadSha": "ee67d12b4023b62241c2b2aeeec2f27f33b38747",
@@ -998,7 +998,7 @@
       "branch": "fix/reference-export-drift-gate",
       "worktree": "/home/codex/repos/netscript-007-reference-export",
       "prNumber": 1666,
-      "implementationState": "impl_eval_cycle2_pass_coordinator_readiness_preparation",
+      "implementationState": "impl_eval_cycle2_pass_ready_merge_close_gate_ci_active",
       "planHeadSha": "9d0b4bf128ba52fcd52091ba50590661d09470c1",
       "scopeAmendmentHeadSha": "a3f6b87b599e778db950daf6ccaecd847c088d19",
       "tierAPlanState": "PASS_SA2",
@@ -1094,6 +1094,13 @@
       "implementationEvaluationCycle2Verdict": "PASS",
       "implementationEvaluationCycle2CommitSha": "ee67d12b4023b62241c2b2aeeec2f27f33b38747",
       "implementationEvaluationCycle2CommentUrl": "https://github.com/rickylabs/netscript/pull/1666#issuecomment-5303804773",
+      "readinessState": "status_ready_merge_non_draft_current_head_ci_active",
+      "readinessHeadSha": "ee67d12b4023b62241c2b2aeeec2f27f33b38747",
+      "readinessPreparedCommentUrl": "https://github.com/rickylabs/netscript/pull/1666#issuecomment-5303815717",
+      "acceptanceEvidenceCommentUrl": "https://github.com/rickylabs/netscript/pull/1666#issuecomment-5303825255",
+      "acceptanceMirrorDryRun": "PASS at live issue #1296 body f66987e42a7c88f7a1741cfb0fdc5f25f7189686d9c6b43a18e5f9ba4cd14037; five entries mapped; no mutation",
+      "closeGateCiRunId": 31903523137,
+      "closeGateCiRunUrl": "https://github.com/rickylabs/netscript/actions/runs/31903523137",
       "expensiveGateContract": "no runtime lease; scaffold.runtime and fresh-browser are matrix n/a for this checker/docs/JSDoc/task/workflow-only leaf",
       "receiptRefs": []
     },
@@ -2850,5 +2857,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T19:14:29.000Z"
+  "updatedAt": "2026-08-15T19:18:20.000Z"
 }
