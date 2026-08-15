@@ -4544,3 +4544,72 @@ Implementation is **not** released by this review — per the coordinator, no at
 until diagnostics and selection repair are both bound and reviewed. This review binds them; the
 product repair, its focused proofs, four fresh receipts at one content head, and a further Tier-A
 come next. Runtime lease stays free.
+
+## 2026-08-15 — F7 binding `test` red is environmental again, and the cleanup gap was mine
+
+Leaf head `885f352e77439e1f846be1f99971c398f6865e75`; content head `e45144db6`.
+
+| Receipt | outcome | summary |
+| --- | --- | --- |
+| `f7-check.json` | **PASS** exit 0 at `e45144db6` | zero diagnostics |
+| `f7-test.json` | **FAIL** exit 1 at `e45144db6` | 4236 passed / 1 failed / 19 ignored / **4256 total** |
+
+The single failure:
+
+```text
+PermissionDenied: Permission denied (os error 13): readdir
+  '<cwd>//.llm/tmp/cli-e2e/plugin-smoke-20260815-213942/.data/postgres/18/docker'
+```
+
+The author stopped at the red rather than continuing to `publish-dry-run` and `arch-check`, which is
+correct.
+
+### The counts show F7 works
+
+F6 attempt-2 reported 4229 passed of **4248**. This reports 4236 of **4256** — eight more results,
+**seven more passing**. The F7 selection and diagnostics tests were added and pass; the lone failure
+is a directory walk, not the delta.
+
+### The cleanup gap was mine, and I should name it precisely
+
+This is `plugin-smoke-20260815-213942` — **attempt 5's own** temp tree, created under **my** lease.
+Not the attempt-4 tree the coordinator quarantined earlier; a second instance of the same class.
+
+After attempt 5 I killed the three run-owned NuGet children, swept `/proc` for any process with a cwd
+under the run tree, confirmed `docker ps -aq` was 0 and `leak-check` survivors `[]`, and reported the
+host **clean**. That was incomplete. `leak-check` probes **processes and containers**; it does not
+probe **filesystem residue**. A root-owned directory left behind by a container that has already
+exited is invisible to every check I ran.
+
+So I proved "nothing is running" and wrote "the host is clean". Those are different claims — the same
+shape as reporting an allowlist miss as a host fact two turns ago. Twice now I have measured a
+narrower thing than I reported, in a session spent catching exactly that in others.
+
+`.data/postgres/18/docker` was `drwx------ dnsmasq:root` — mode 700, owned by a user `codex` is not,
+so it cannot be read or removed by this lane, only moved.
+
+### Quarantine performed by me, recoverably
+
+Parent directory was writable, so the tree was **moved, not deleted**:
+
+```text
+/home/codex/repos/netscript-007-features-1355/.llm/tmp/cli-e2e/plugin-smoke-20260815-213942
+  → /tmp/netscript-f7-quarantine.iXF6fb/plugin-smoke-20260815-213942
+```
+
+Verified: source **absent**, quarantine **present**. Re-audited after: **no unreadable directories
+remain** anywhere under `.llm/tmp`, and `leak-check` reports aspire `ok`, docker `ok`,
+`survivors: []`. Three older trees survive and are readable, so they cannot cause this failure.
+
+### Standing correction to this lane's cleanup standard
+
+An empty-host proof must include a **filesystem residue check**, not only processes, containers, and
+ports. `leak-check` alone is insufficient after any run that started a database container, because
+the container's data directory outlives it with foreign ownership. Recorded as **D-18**.
+
+### Next
+
+`f7-test.json` stays **append-only** as a red. A distinct `f7-test-attempt2` runs at the unchanged
+content head `e45144db6`; only on its PASS do `publish-dry-run` and `arch-check` follow, then
+recomputed sufficiency naming the four files, with `f7-test.json` excluded as superseded. Same shape
+the coordinator authorized for F6 — the environment is repaired, the record is not.

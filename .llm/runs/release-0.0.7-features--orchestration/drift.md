@@ -318,3 +318,30 @@ already final. A lease request quoting a head that later moves is a request quot
 Related: [[eval-verdict-head-must-equal-merge-head]] is the same property one phase later — there the
 trap is a verdict certifying a head that is not the head merged; here it is a lease authorizing a
 head that is not the head executed.
+
+## D-18 — an empty-host proof that omits filesystem residue is incomplete (significant)
+
+**Date:** 2026-08-15. After S5 attempt 5 I terminated the three run-owned NuGet children, swept
+`/proc` for any process with a cwd under the run tree, confirmed `docker ps -aq` was 0, and confirmed
+`agentic:leak-check` reported aspire `ok`, docker `ok`, `survivors: []`. I reported the host clean.
+
+The next binding `test` gate then failed on `readdir` of
+`.llm/tmp/cli-e2e/plugin-smoke-20260815-213942/.data/postgres/18/docker`, a `drwx------ dnsmasq:root`
+directory left behind by attempt 5's Postgres container. `leak-check` probes **processes and
+containers**; a data directory whose container has already exited is invisible to it, and to every
+other check I ran.
+
+This is the second time in the same session that a run has been blocked by exactly this residue — the
+coordinator quarantined attempt 4's `plugin-smoke-20260815-203755` tree for the same reason — so it is
+a recurring class rather than an incident.
+
+**Standing rule for this lane:** an empty-host proof after any run that started a database container
+must additionally check for **unreadable or foreign-owned filesystem residue** under the run's temp
+root, e.g. `find .llm/tmp -type d ! -readable`. Processes, containers, and ports being clear is
+necessary and not sufficient. Residue is **moved to a timestamped quarantine, never deleted**, so the
+artifact stays available as evidence.
+
+The wider lesson is the one this session keeps repeating in different costumes: I proved "nothing is
+running" and wrote "the host is clean". Reporting a narrower measurement in broader words is the same
+error as an allowlist miss reported as a host fact, and it is worth more vigilance in one's own
+evidence than in someone else's.
