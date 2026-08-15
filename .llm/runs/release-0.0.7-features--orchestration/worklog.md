@@ -1944,3 +1944,75 @@ can actually fail. The three settled items — gate necessity, gate class, and n
 stated as compliance checks with their reasons, so "already decided" cannot read as a gap to fill.
 
 No implementation before `PASS`. Neither expensive gate run; no lease requested.
+
+## 2026-08-15 — #1664 PLAN-EVAL cycle 1: `FAIL_PLAN`, fork ruled
+
+Verdict commit `ed34105e2ef344a5b590bca6985810f45f89b0ca`, `plan-eval.md` alone (244 lines), now the
+branch head; local == remote == PR #1664. Structured comment posted:
+`#issuecomment-5301947232`, labelled cycle 1/2. Evaluator: session
+`176aace4-b2a2-4b16-bdaa-9db687c7d132`, bridge `cse_01TiYhwUCkdyjziEpFP3kgaS`, requested = observed =
+**Fable 5 · medium · Remote Control**, `providerEnv {}`. It complied with all three already-decided
+items: no expensive gate run, no lease taken, gate class unchanged.
+
+Explicitly **not** a rescope — "archetype, scope, and gate set are right; the plan is incomplete, not
+wrong." Six required fixes, all plan text, no code.
+
+### The fork is ruled: direct emit, no SDK overload
+
+```ts
+export const <svc>ListInvalidation = { queryKey: <svc>Queries.list.clientKey() } as const;
+```
+
+The ruling is stronger than the plan's own recommendation, and the decisive argument is one the plan
+did not make:
+
+- The proposed `bridgeInvalidation(queryKey)` overload would be `{ queryKey }` — an **identity
+  wrapper adding no policy**. Under A6 that is not a justified public helper, and `clientKey()`
+  already is the SDK's discoverable typed cross-tier path, landed for exactly this purpose in #1265.
+- It **does not remove the trap**: the string overload `bridgeInvalidation(resource, action)` stays
+  public either way, so the overload adds a safe sibling beside the trap rather than closing it.
+- Rename safety is identical under both options.
+- The asymmetry is **compatibility**. The overload would couple the CLI template to SDK ≥ 0.0.7: a
+  0.0.7 CLI running `service add --with-client` inside a project pinned to
+  `jsr:@netscript/sdk@0.0.6` would emit a module that fails `deno check` until the app bumps its pin.
+  Direct emit compiles against the already-published SDK, so D6 holds for the
+  "newly generated into an existing app" case as well — a case the plan's own compatibility rule did
+  not actually cover.
+
+That last point is the substance of the gate. The plan reasoned about regeneration of existing apps
+but not about a *new* generation into an app pinned to an older SDK, and the overload was precisely
+the change that would have broken it. This is what a plan gate is for: not to bless the recommended
+option, but to find the case the recommender did not enumerate.
+
+A second decision was ruled that the plan had left implicit: migration notes belong in **package
+READMEs** (`packages/fresh/README.md` for the hydration-age note, `packages/cli/README.md` for the
+verb, its overwrite/dry-run/force contract, and the regeneration migration), not `docs/**`. Both are
+inside publish file lists, and the CLI README entry is what actually discharges the #1355 acceptance
+box "A **documented** verb regenerates …".
+
+### The six required fixes
+
+1. Record the fork ruling across `plan.md:102`, `:111-120`, `:184`, `:319` and
+   `research.md:164,168-170,239-241` — with the SDK work now being a stale-module-doc correction at
+   `key-bridge.ts:4-7` (it still says `['cache_query', …]`), a JSDoc pointer to
+   `factory.<action>.clientKey()`, and semantic match/mismatch tests that lock the S6 regression.
+2. Lock generator-owned output paths and restate scenarios 1/3 and Finding 5 against them.
+3. State `service generate` compatibility: differing client modules are rewritten without `--force`;
+   say whether `--dry-run`/`--force` govern the Aspire-helper half.
+4. Name the documentation home for the verb and the hydration note.
+5. Tighten scenario 3 to "list-request count + 1 after the mutation settles".
+6. Housekeeping: per-slice file lists; qualify the `workspace-mutator.ts` citation.
+
+Carried forward as confirmed-good and not to be disturbed: the gate-class boundary, the five-file
+binding receipt set, and the pre-lease scenarios (subject to fix 5).
+
+Note N4 is worth keeping visible: if a named SDK helper is still wanted, it is a **separate issue
+with a deprecation path for the string form** — that is the only shape that removes the trap rather
+than adding a sibling to it. Not this leaf.
+
+### Cycle 2 needs a coordinator grant
+
+Repair dispatched to the same author thread. The coordinator's grant was for **one** PLAN-EVAL on the
+repaired head, and it has been spent. **Cycle 2 is requested, not assumed** — this lane has never
+launched a formal gate without an explicit grant, and the comment itself is labelled cycle 1/2. No
+implementation before a cycle-2 `PASS`.
