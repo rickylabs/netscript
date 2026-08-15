@@ -57,3 +57,25 @@ coordinator amended the route for this gate to native Claude **Opus 5, effort `m
 Control enabled, evaluating the immutable plan head `da76d9d8440a969f0715ca035ea6304bbf039efd`. The
 Fable amendment above remains recorded as the rationale that was granted and attempted; it is
 superseded for execution only, not withdrawn as a judgement about the plan's architectural weight.
+
+## 2026-08-15 — Root-coverage report field names made population-explicit
+
+- **What:** Slice 1 implemented three report field names more precisely than the output contract
+  locked by `plan.md:64` without recording the naming change at implementation time.
+- **Source:** Tier-A finding F1 in PR comment `5300867545`; `plan.md:64`;
+  `.llm/tools/quality/check-root-coverage.ts`.
+- **Expected → actual mapping:**
+  - `publishedMembers` → `publishableMembers`
+  - `excludedMembers` → `excludedNonPublishableMembers`
+  - per-gate `uncoveredMembers` → `uncoveredPublishedMembers`
+- **Unchanged locked fields:** `ok` and per-gate `configuredRoots` retain their planned names.
+- **Rationale:** `publishable` matches the workspace discovery predicate `publish !== false`, while
+  `uncoveredPublishedMembers` states exactly which population is uncovered. The exclusion name
+  likewise states that these members are excluded specifically because they are non-publishable.
+- **Advisory-driven additions:** `census`, `boundary`, and `scannerTraversal` were added to discharge
+  the PLAN-EVAL advisories concerning the explicit parent-directory denominator and the distinction
+  between configured roots and paths actually traversed. They are required clarifications, not
+  deviations or unplanned scope expansion.
+- **Severity:** minor
+- **Action:** accept the implemented names and record the contract drift; no implementation or test
+  change.
