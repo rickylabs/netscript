@@ -4244,3 +4244,67 @@ would not.
 
 The author is still mid-turn on the F6 repair and has **not** been interrupted; the resume is queued
 behind its current turn.
+
+## 2026-08-15 — F6 Tier-A: `PASS` at `a8a160285d4f9bddb95a5dac6cfbde85e1265ebc`
+
+local == remote; content head `7fa29ad3ed10ad903b9cbbd518111e6bf2754761`; **no product change since
+that content head** — `git diff 7fa29ad3e..HEAD` outside `.llm/runs/` is empty.
+
+### The two test receipts corroborate the environmental attribution exactly
+
+| Receipt | outcome | passed | failed | **totalResults** |
+| --- | --- | --- | --- | --- |
+| `f6-test.json` | **FAIL** | 4228 | 1 | **4248** |
+| `f6-test-attempt2.json` | **PASS** | **4229** | 0 | **4248** |
+
+`totalResults` is **identical** and `4228 + 1 = 4229`. Exactly one test flipped from fail to pass and
+nothing else moved — no test skipped, dropped, ignored, or filtered to reach green. That is the
+strongest available form of this evidence: had the author narrowed the run to escape the failure, the
+total would have fallen. It did not.
+
+All five receipts attest `gitHead == actualGitHead == 7fa29ad3e…` with no `allowGitHeadMismatch`, and
+`check`, `publish-dry-run`, and `arch-check` all PASS at the same content head.
+
+### Sufficiency recomputed by me — including proving the duplicate rule fires
+
+The contracted set is exactly four files: `f6-check.json`, **`f6-test-attempt2.json`**,
+`f6-publish-dry-run.json`, `f6-arch-check.json`.
+
+```text
+evaluateEvidenceSet(... four named files ...) → { sufficiency: "SUFFICIENT", reasons: [] }
+```
+
+And, to prove the exclusion is load-bearing rather than cosmetic, I re-ran it **with the red
+included**:
+
+```text
+→ reasons: [ "gate test has duplicate or contradictory receipts",
+             "test did not pass (FAIL)" ]
+```
+
+So `f6-test.json` genuinely cannot be in the passing set — two `test` receipts trip
+`evidence-set.ts`'s duplicate rule *and* the FAIL. The author's framing is correct and necessary: the
+red is retained as a **superseded** record, explicitly outside the claimed set, exactly as
+`worklog.md:749` states. A naive `f6-*.json` glob would return INSUFFICIENT over genuinely passing
+gates.
+
+**A correction to my own first recomputation.** My initial run reported `INSUFFICIENT` with four
+"targets <sha>" reasons — because I passed the abbreviated head `7fa29ad3e` while the receipts carry
+the full 40-character SHA, and the evaluator compares exact strings. That was my error, not a defect
+in the evidence. Recorded because it is precisely the false-alarm trap in
+`sufficiency-verdict-needs-named-receipt-set`: an independent recomputation done carelessly
+manufactures a failure against sound receipts, and a reviewer who stopped there would have sent a
+correct slice back for repair.
+
+### Verdict
+
+**`PASS`.** The F6 teardown repair is complete, the binding gate is green at 4229/0 with the total
+unchanged, sufficiency is independently `SUFFICIENT` over the four named files, the environmental red
+is preserved append-only, and no product changed after the content head.
+
+### Requesting the coordinator attempt-5 runtime lease
+
+Per **D-17** the readiness head is already final and pushed, so a lease bound to it cannot move
+before execution: **`a8a160285d4f9bddb95a5dac6cfbde85e1265ebc`**, content `7fa29ad3e…`.
+
+`scaffold.runtime` and `fresh-browser` remain `NOT_RUN`; no lease taken, no evaluator, no ready flip.
