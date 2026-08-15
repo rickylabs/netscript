@@ -113,3 +113,20 @@ Anthropic-authenticated Remote Control session, not a provider-gateway session.
 The leaf-local `impl-eval-request.md` still binds Fable 5 medium (pre-reset). The reset dispatch
 supersedes it with Opus 5 medium; the reset-gate brief is the launch authority and the leaf artifact
 is read for target/scope/obligations only.
+
+## Blocking coordinator decisions (open as of 2026-08-15T15:12:56Z)
+
+The lane is at `limits.activeImplementationSlicesPerLane: 2` with both slices parked, so **no
+internals work can advance until one of these is decided**. Nothing here is blocked on an agent.
+
+| # | Decision | Leaf | Why it blocks |
+| - | -------- | ---- | ------------- |
+| 1 | **Owner exception** for one final PLAN-EVAL cycle | #1663 `package-gate-honesty` | Cycle 2 of 2 spent; central state reads `owner_exception_required_for_one_final_cycle_after_two_failures`. Tier-A PASS at `194e22a3d`. A third cycle is owner-only. |
+| 2 | **Bounded tenth path**, test-only: `.llm/tools/docs/check-exports-drift_test.ts` | #1666 `reference-export-drift-gate` | S1 lands fail-closed coverage-policy semantics (D2-D5) whose refusal paths would be proven only by non-persistent one-off probes. The test file sits outside the nine frozen surfaces. |
+| 3 | **`fresh-browser` waiver / `n/a`** | #1666 | Contract lists it as a proving gate; this lane may not execute it. Plan classifies it `NOT FIRED` and argues it is not genuinely required — no route, component, island, or interaction changes. |
+| 4 | **PLAN-EVAL cycle 1 grant + evaluator lease** | #1666 | Author judged a fresh separate-session evaluation required and declined to assume a verdict. Tier-A PASS at `9d0b4bf12`. |
+| 5 | **L-2 scope call** | none yet | Root lint drops ~1,027 ts/tsx files including 700 under the published `packages/cli`, which has no lint config of its own. Whether that exclusion is deliberate debt is a scope decision, not a supervisor call. Sequences after #1663, which is already editing `deno.json` and the lint wrapper. |
+| 6 | **Wave-3 sequencing** | #1533 vs #1666 | #1533's gate would go red on `paginated-query.ts` if it lands before #1666 fixes that example. Honest red, but it should be chosen deliberately. |
+
+Queued behind the WIP limit: wave 3 `jsdoc-example-compile-gate` (#1533) and
+`leak-check-process-descendants` (#1429); wave 4 `fresh-defer-test-capability` (#1557/#1601).
