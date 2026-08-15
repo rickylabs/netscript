@@ -1,6 +1,8 @@
 # Plan — comparison docs programme #1551
 
-Status: implementation blocked pending a separate opposite-family PLAN-EVAL `PASS` supplied through the topic orchestrator.
+Status: formal opposite-family PLAN-EVAL cycle 1 passed. S1 and S2 have topic-orchestrator Tier-A
+sign-off. An owner-priority evidence/publication correction is inserted before the authorized S3
+slice; S3 remains paused until that correction is reviewed.
 
 ## Objective
 
@@ -16,7 +18,9 @@ The result teaches readers how to evaluate mechanisms without presenting provisi
 ## Non-goals and stop conditions
 
 - No public runnable Session fixture, comparative runtime/LSP benchmark, human/agent study, 50-topic programme, or full migration guide.
-- No `packages/**`, `plugins/**`, dependency, lockfile, generated route, release, publication, scaffold, or expensive E2E change.
+- No `packages/**`, `plugins/**`, dependency, lockfile, generated route, release/package
+  publication, scaffold, or expensive E2E change. Owner-authorized in-place correction of the two
+  canonical #1551 case comments is the only external publication mutation in the inserted slice.
 - No copy of private EIS-Chat code, CSS, domain models, fixtures, or business prose.
 - No update to #1551's body, status, milestone, or completion state from this leaf.
 - No ready-for-review transition, merge, self-evaluation, Tier-A certification, or release action.
@@ -129,6 +133,50 @@ git diff --check
 Manual assertions: regenerated JSON is byte-stable after removing the declared observation timestamp; the checked-in aggregates reproduce from authorized pinned inputs; no private source content or credentials are present; unmatched values remain explicitly deferred.
 
 Commit intent: `docs(comparison): publish reproducible Session evidence inputs`.
+
+### E0 — owner-priority canonical case evidence correction
+
+This inserted slice precedes S3 and does not alter the locked IA, equivalence contract,
+presentation/domain premise, mechanism-matrix shape, source pin, or milestone scope. A fresh
+PLAN-EVAL is therefore not required under the topic-orchestrator ruling.
+
+Repository files:
+
+- `.llm/runs/docs-comparison-docs-programme--1551/research.md`
+- `.llm/runs/docs-comparison-docs-programme--1551/plan.md`
+- `.llm/runs/docs-comparison-docs-programme--1551/worklog.md`
+- `.llm/runs/docs-comparison-docs-programme--1551/context-pack.md`
+- `.llm/runs/docs-comparison-docs-programme--1551/drift.md`
+
+External in-place replacements, with no follow-up comment:
+
+- issue comment `5265826161`, Session case;
+- issue comment `5265971722`, Channel/form case.
+
+Content contract:
+
+- retain the exact EIS-Chat pin and identify `834a2b36` as identical-tree evidence only;
+- verify every material feature against pinned source, then replace both bodies with minimal current
+  snippets and complete inspected surface inventories;
+- reproduce physical/nonblank primary-route counts; delete unreproducible Next.js, ASC, feature,
+  dependency-depth, effort, and time figures rather than carrying estimates;
+- distinguish framework capabilities from consumer-owned helpers/presentation;
+- map Next.js fairly to exact `16.3.0` primary documentation; and
+- state that the S2 manifest/procedure/output remain correct and unchanged at the same pin.
+
+Gate `E0-canonical-comment-correction`:
+
+- raw Git verifies `HEAD == origin/master == 5191de83…`, the identical `834a2b36` tree, named-commit
+  ancestry, exact route counts, and a clean read-only input;
+- the GitHub API returns both requested IDs with replacement bodies byte-identical to the prepared
+  definitive bodies and new `updated_at` timestamps;
+- `git diff --check` passes;
+- changed paths are the five run artifacts only;
+- neither lockfile differs; and
+- #1652 remains draft, partial, `Part of #1551`, with no label/body/checklist mutation because the
+  refreshed evidence changes neither PR scope nor estimates recorded in its body.
+
+Commit intent: `docs(comparison): refresh pinned EIS-Chat case evidence`.
 
 ### S3 — deferred Session case and migration roadmap
 

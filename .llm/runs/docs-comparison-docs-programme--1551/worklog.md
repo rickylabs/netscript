@@ -32,6 +32,7 @@ The draft PR is partial and must say `Part of #1551`. Follow-ups #1645–#1650 o
 - P0: run bootstrap/research/plan only; stop for PLAN-EVAL.
 - S1: methodology and minimum Concepts navigation.
 - S2: immutable source manifest, deterministic aggregate measurement tool/tests, and raw aggregate output.
+- E0: owner-priority in-place correction of the two canonical #1551 case comments at the unchanged pin.
 - S3: deferred Session case, migration roadmap, complete docs audit, then Tier-A stop.
 
 ## Progress log
@@ -57,6 +58,10 @@ The draft PR is partial and must say `Part of #1551`. Follow-ups #1645–#1650 o
 | 2026-08-15 | S2 tool, tests, manifest, and aggregate drafted. | same-timestamp checked-in output reproduces; removing `/observedAt` yields stable digest `b9e96ed24fa64fe4a9d06bc4c51e5be1c6da8938ff4cba0baec7945cb5cdbaa9`; measured-file output has path/classification/hash/counts only; Next.js is absent/deferred |
 | 2026-08-15 | Literal S2 lint gate refused a false green. | mandatory wrapper exit `2`: root config excludes `.llm/`; explicit existing-config diagnostic exit `0`, two files and zero findings; stopped for gate correction |
 | 2026-08-15 | Topic orchestrator corrected the S2 lint row to N/A and S2 gates completed. | root `.llm/` exclusion is deliberate repo-wide configuration, so exit `2` is fail-closed evidence rather than a pass, skip, or waiver; all applicable tool, site, diff, privacy, reproduction, scope, and lock checks pass |
+| 2026-08-15 | Topic orchestrator signed off S2 and inserted an owner-priority evidence correction before S3. | Tier-A PASS at `4e6d52b3d`; S3 remained unstarted and the repository tree was clean when E0 began |
+| 2026-08-15 | Unchanged EIS-Chat authority and comment-time baselines re-verified. | local `HEAD == origin/master == 5191de83…`; `834a2b36` has the identical tree and is evidence-only; all eight material commits are ancestral; input remains clean and read-only |
+| 2026-08-15 | Current Session and Channel surfaces inspected and route counts reproduced. | Session `94 / 92` physical/nonblank versus published `119 / 117` and inspected snapshot `121 / 119`; Channel `181 / 178` versus `208 / 204`; stale ASC, feature, effort, and time figures removed rather than estimated |
+| 2026-08-15 | Both canonical #1551 comment bodies replaced in place. | Session `5265826161` updated `2026-08-15T04:58:05Z`; Channel `5265971722` updated `2026-08-15T04:58:11Z`; API bodies byte-match the prepared definitive replacements; no follow-up comment posted |
 
 ## Gate log
 
@@ -146,6 +151,23 @@ configuration changed. Regeneration from the exact pinned input reproduces the c
 aggregate; after deleting the declared `/observedAt` field, the normalized SHA-256 is
 `b9e96ed24fa64fe4a9d06bc4c51e5be1c6da8938ff4cba0baec7945cb5cdbaa9`.
 
+### E0-canonical-comment-correction
+
+| Gate | Commands / procedure | Scope | Result | Findings | Proceeded |
+| --- | --- | --- | --- | --- | --- |
+| Immutable authority | raw `git rev-parse`, `git status`, `git rev-parse <rev>^{tree}`, `git diff --exit-code`, and named-commit ancestry checks | strictly read-only `/home/codex/repos/eis-chat-007-input` | PASS / raw exit `0` | `HEAD` and `origin/master` are the exact unchanged pin; `834a2b36` has the identical tree and is evidence-only; all named improvements are ancestral; input clean | yes |
+| Route metrics | deterministic physical/nonblank line counting at the inspected comment-time snapshots and pin | two primary example routes only | PASS / raw exit `0` | Session published `119 / 117`, inspected snapshot `121 / 119`, pin `94 / 92`; Channel `208 / 204` to `181 / 178`; every delta reproduced | yes |
+| Feature inventory | focused source inspection at the pin | routes, generated-route aliases, partials, form/schema, helpers, and fallbacks named in the replacements | PASS | route-bound partials, typed document form navigation, generated route contracts, cache-seed preservation, layout-faithful deferred states, and cold-navigation stabilization confirmed against source rather than commit subjects | yes |
+| Primary Next.js evidence | exact `16.3.0` release and official routing, Cache Components, request-input, cache-clock, Suspense, parallel-route, navigation, forms, typed-routes, and metadata docs | mechanisms discussed in the two comments | PASS | NetScript improvements are described as current NetScript capabilities; Next.js mechanisms are not scored as regressions where no isomorphic equivalent exists | yes |
+| In-place publication | GitHub issue-comment edit API for comments `5265826161` and `5265971722` | existing canonical #1551 comments only | PASS | both bodies are complete definitive replacements from the first line; no update/addendum framing and no follow-up comment | yes |
+| Publication verification | exact API-body byte comparison and metadata readback | both edited comments | PASS / raw exit `0` | bodies match exactly; `updated_at` values are `2026-08-15T04:58:05Z` and `2026-08-15T04:58:11Z` | yes |
+| S2 evidence currency | compare S2 manifest, tool, and measurements pin/procedure with the unchanged authority | four S2 evidence files | PASS | they already target the exact pin and reproduce byte-identically; no edit is warranted and none was made | yes |
+| Locked-plan check | compare current implementations with the approved equivalence contract, matrix shape, and presentation/domain-held-constant premise | locked S3 architecture and evidence contract | PASS | no premise breaks and no mechanism-matrix shape changes; this is an evidence/publication correction, so no fresh PLAN-EVAL is required | yes |
+| Diff hygiene | `git diff --check` | complete E0 diff | PASS / raw exit `0` | no whitespace errors | yes |
+| Scope and locks | raw changed-path enumeration (raw exit `0`); `git diff --exit-code origin/main -- deno.lock docs/site/deno.lock` (raw exit `0`); S2 evidence-file diff from `HEAD` (raw exit `0`) | E0 repository changes | PASS | exactly five run artifacts; no `docs/site/**`, package/plugin, lock, S2 evidence, or S3 path | yes |
+| Site gates | docs build and rendered-link checks | `docs/site/**` | N/A | E0 changes no docs-site file, so the conditional site gates do not apply | yes |
+| PR state/body | read-only #1652 inspection | draft PR metadata and body | PASS | remains draft and partial with `Part of #1551`; the body records no stale example estimate, so no body/checklist or label mutation is warranted | yes |
+
 ### Planned S3 docs-audit rows
 
 | Gate | Commands / procedure | Scope | Result | Findings | Proceeded |
@@ -160,4 +182,4 @@ aggregate; after deleting the declared `/observedAt` field, the normalized SHA-2
 | Cross-page contradictions | compare broad explanation, methodology, case, migration, builder/defer docs, and matrix rows | related public surfaces | NOT RUN | implementation not started | no |
 
 No S3 implementation gate, release gate, scaffold suite, E2E suite, or expensive-gate lease has
-been run. S2 stops here for topic-orchestrator Tier-A review; this generator does not self-certify.
+been run. E0 stops for topic-orchestrator Tier-A review; this generator does not self-certify.

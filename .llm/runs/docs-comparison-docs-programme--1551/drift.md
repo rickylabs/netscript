@@ -120,3 +120,33 @@ No alternate config is used as gate evidence, and root lint configuration remain
 unchanged. Formal PLAN-EVAL cycle 1 passed over this incompatibility. The correction
 changes only the applicability of an unsatisfiable gate row; it does not change the
 S2 files, evidence contract, milestone scope, or planned S3 work.
+
+## 2026-08-15 — canonical case comments corrected at the unchanged pin
+
+Severity: **significant** — public evidence correction. Status: **resolved in E0**.
+Rescope: **none**. Scope growth: **none**.
+
+The two canonical #1551 case comments described older inspected snapshots even though the locked
+EIS-Chat pin itself remained current. Read-only verification established that local `HEAD` and
+`origin/master` are still `5191de83f3da97559f21d8891c6c8afdf1cf473a`; no newer product commit
+exists. Commit `834a2b36a5c9ef4acf82f8f1f400522d8dab234b` resolves to the same tree as the
+pin and is evidence-only, not a replacement baseline.
+
+Focused source inspection confirmed the pinned examples already contain the material improvements
+that the old comment prose omitted: generated route contracts, route-bound partials, typed document
+form navigation, cache-seed preservation across partial navigation, layout-faithful deferred states,
+and cold-navigation stabilization. The primary Session route is `94 / 92` physical/nonblank lines
+at the pin, versus the comment's published `119 / 117` claim and the inspected `121 / 119` snapshot.
+The Channel route is `181 / 178`, versus `208 / 204` at the inspected snapshot.
+
+Owner authority required complete in-place replacement of comments `5265826161` and `5265971722`.
+The definitive bodies use minimal current illustrative excerpts, enumerate the inspected surfaces,
+distinguish framework capability from consumer ownership, remove unreproducible ASC/feature/effort
+estimates, and keep the Next.js `16.3.0` comparison tied to primary documentation. They contain no
+business data, credentials, domain models, CSS, fixtures, or wholesale private-source dump.
+
+The S2 manifest, measurement procedure, and measurement JSON already target the unchanged pin and
+remain correct; manufacturing changes to them would reduce reproducibility, so they are deliberately
+untouched. The current implementation does not break the approved equivalence contract, change the
+mechanism-matrix shape, or invalidate the presentation/domain-held-constant premise. This correction
+therefore needs no fresh PLAN-EVAL. S3 remained unstarted throughout.

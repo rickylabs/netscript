@@ -2,12 +2,10 @@
 
 ## Current state
 
-Phase: S1 is signed off by the topic orchestrator at
-`98fc58997c3ff5ca21403ba67521c584a5d26a0e`. The coordinator provisioned the exact immutable S2
-input, and the S2 tool, tests, manifest, and aggregate have completed their applicable gates. The
-topic orchestrator ruled the literal lint row N/A because root configuration deliberately excludes
-`.llm/**`; the wrapper's raw exit `2` remains recorded as fail-closed evidence, not as a pass, skip,
-or waiver. S2 stops for Tier-A review. S3 has not started.
+Phase: S1 and S2 are signed off by the topic orchestrator, with S2 Tier-A PASS at
+`4e6d52b3d2cb0bf24aca9a47a67da46a213fef64`. An owner-priority evidence/publication correction was
+inserted before S3. Both canonical #1551 comments have been replaced in place against the unchanged
+EIS-Chat pin, and the five run artifacts record the reconciled baseline. S3 has not started.
 
 Branch/worktree: `docs/comparison-docs-programme` in
 `/home/codex/repos/netscript-007-docs-comparison`, no upstream. The re-baselined branch/remote head
@@ -47,6 +45,17 @@ No packages/plugins, locks/dependencies, consumer code copy, publication/release
   config or change root configuration to make the row appear applicable.
 
 - The EIS-Chat authority is only commit `5191de83f3da97559f21d8891c6c8afdf1cf473a`; its Session route uses `ctx.path`, generated route binding, stable generated-route aliases, an `entries` resource, cached entry reads, and three authoritative partial routes.
+- `origin/master` has not advanced beyond that pin. `834a2b36a5c9ef4acf82f8f1f400522d8dab234b`
+  has the same tree and is evidence-only, not a newer product baseline.
+- Canonical comment `5265826161` is the definitive current Session analysis and was updated in place
+  at `2026-08-15T04:58:05Z`; comment `5265971722` is the definitive current Channel/form analysis
+  and was updated in place at `2026-08-15T04:58:11Z`. No follow-up comment was posted.
+- Reproduced primary-route counts are Session `94 / 92` physical/nonblank (published claim
+  `119 / 117`, inspected snapshot `121 / 119`) and Channel `181 / 178` (formerly `208 / 204`).
+- The pinned examples now prove generated route contracts, route-bound partials, layout-faithful
+  deferred fallbacks, cache-seed preservation across partial navigation, typed document form
+  navigation, and cold-navigation stabilization. Framework capabilities remain distinguished from
+  consumer-owned helpers and presentation.
 - Context/MCP topology I/O lives in the context partial, not a page-level resource.
 - `defineRegion` and generic region presentation are consumer-local, not NetScript exports.
 - The consumer pins NetScript `0.0.6` and Fresh `^2.3.3`; do not relabel it as 0.0.7 behavior.
@@ -54,6 +63,10 @@ No packages/plugins, locks/dependencies, consumer code copy, publication/release
 - Next.js is pinned to exact stable `16.3.0`. Cache Components are opt-in. Its `stale`, `revalidate`, and `expire` clocks, tag invalidation, Suspense, parallel-route failure isolation, and RSC transport must remain distinct.
 - Ordinary sibling components do not by themselves prove independent error isolation; the inspected closest mechanism is parallel-route slots with scoped error files.
 - Private code/CSS/fixtures never enter the repository. Publish identifiers, classifications, procedures, and aggregates only.
+- The owner-authorized comments use only minimal illustrative current excerpts and contain no
+  business data, credentials, domain models, CSS, fixtures, or wholesale source dumps.
+- The correction does not change the equivalence contract, matrix shape, or held presentation/domain
+  premise. No fresh PLAN-EVAL is required; S3 remains paused pending Tier-A review of E0.
 
 ## Planned slices
 
@@ -62,6 +75,8 @@ No packages/plugins, locks/dependencies, consumer code copy, publication/release
   references and adds the rendered-link gate; complete at handoff for re-review.
 - S2: measurement tool/test, immutable source manifest, aggregate JSON, worklog/context, plus the
   significant/no-rescope lint-applicability drift record; complete at handoff for Tier-A review.
+- E0: in-place canonical-comment correction plus research/plan/worklog/context/drift reconciliation;
+  complete at handoff for Tier-A review, with S2 evidence files deliberately untouched.
 - S3: Session case, migration index/roadmap, xrefs/index, worklog/context, full docs audit. S3
   inherits the `/migration/` rendered-root assertion and must assert both `/comparisons/` and
   `/migration/` after its two migration pages land.
@@ -79,7 +94,7 @@ Every slice is under 30 files, has a named gate, commits its worklog/context upd
 
 ## Next authorized action
 
-Commit and explicitly push the complete seven-path S2 slice, post one structured implementation
-comment on draft PR #1652, then stop for topic-orchestrator Tier-A review. Do not begin S3 or treat
-the generator's gate execution as certification. Keep `/home/codex/repos/eis-chat-007-input`
-strictly read-only.
+Commit and explicitly push the five-path E0 correction, post one structured implementation comment
+on draft PR #1652, then stop for topic-orchestrator Tier-A review. Do not begin S3 or treat the
+generator's verification as certification. Keep `/home/codex/repos/eis-chat-007-input` strictly
+read-only.

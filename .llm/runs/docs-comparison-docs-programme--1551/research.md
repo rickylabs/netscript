@@ -5,7 +5,7 @@
 | Authority | Reconciled evidence | Consequence |
 | --- | --- | --- |
 | Git | `docs/comparison-docs-programme` has no upstream and is exactly at live `origin/main` `01e0960494c95ce56eb35892c211a095eb13e6ed` after `git fetch origin main`. | All carried claims were re-checked from this base. Pushes must name the full remote ref. |
-| Live issue | #1551 is open in milestone `0.0.7` with `type:docs`, `area:docs`, `priority:p2`, and `status:triage`; all 17 deliverables remain unchecked. Two comments explicitly describe provisional, inspected baselines rather than benchmarks. | Issue comments are leads, not evidence. This leaf cannot truthfully close the live issue as written. |
+| Live issue | #1551 is open in milestone `0.0.7` with `type:docs`, `area:docs`, `priority:p2`, and `status:triage`; all 17 deliverables remain unchecked. Its two canonical case comments are now definitive pinned analyses, while runnable parity and comparative benchmarks remain deferred. | The corrected comments distinguish measured, inspected, inferred, and deferred claims. This leaf still cannot truthfully close the live issue as written. |
 | Coordinator | The approved coordinator artifacts at `/home/codex/repos/netscript-547-lffix/.llm/runs/release-0.0.7--orchestration/` bound this leaf to methodology/minimum navigation, one deferred Session case, a migration placeholder, and residual follow-ups. | The broader 17-deliverable/50-topic programme is not 0.0.7 scope. |
 | Harness | `SCOPE-docs`, the run loop, lane policy, docs audit, handoff protocol, plan gate/protocol, and this run's supervisor contract were read in full. | Separate opposite-family PLAN-EVAL and IMPL-EVAL are mandatory. The topic orchestrator owns Tier-A review; this generator never self-certifies. |
 
@@ -48,22 +48,29 @@ Relevant current NetScript docs and public API inspection establish these bounda
 
 ## Immutable EIS-Chat inspection
 
-The private repository was inspected only through existing authorized GitHub access at immutable commit `5191de83f3da97559f21d8891c6c8afdf1cf473a`. No checkout, consumer code copy, or business-data extraction occurred.
+Initial P0 research inspected the private repository through existing authorized GitHub access at
+immutable commit `5191de83f3da97559f21d8891c6c8afdf1cf473a`. The coordinator later provisioned the
+strictly read-only local worktree `/home/codex/repos/eis-chat-007-input` at that same commit for S2
+reproduction and the owner-priority canonical-comment correction. No consumer source is copied into
+this repository and no business data is extracted.
 
 Inspected source inventory:
 
 - `apps/dashboard/routes/project/[project]/channel/[channel]/session/[session]/index.tsx`
+- `apps/dashboard/routes/project/[project]/channel/[channel]/index.tsx`
 - `apps/dashboard/router.ts`
 - `apps/dashboard/lib/session-regions.ts`
+- `apps/dashboard/lib/channel-regions.ts`
 - `apps/dashboard/routes/project/[project]/channel/[channel]/session/[session]/(_components)/session-regions.tsx`
 - `apps/dashboard/components/blocks/region.tsx`
 - `apps/dashboard/routes/partials/session-header/[project]/[channel]/[session].tsx`
 - `apps/dashboard/routes/partials/session/[channel]/[session]/transcript.tsx`
 - `apps/dashboard/routes/partials/session/[channel]/[session]/context.tsx`
+- the six generated-route-bound Channel partials and the typed create-session form/schema leaves
 - `apps/dashboard/assets/blocks/session.css`
 - the root and dashboard Deno manifests
 
-Material corrections to the provisional #1551 comment:
+Pinned facts carried into the canonical #1551 comments:
 
 - The pinned route uses `ctx.path` and generated `.withRoute(...)` binding, not the comment's `ctx.params` sketch.
 - Stable `appRoutes` aliases point to generated route leaves; the application facade does not duplicate path patterns.
@@ -73,8 +80,51 @@ Material corrections to the provisional #1551 comment:
 - The local three-region helper and generic region primitives are consumer presentation/support code, not NetScript framework surface.
 - `session.css` is a substantial route-specific presentation leaf with a two-column grid, overflow containment, an independently scrolling context rail, a mobile breakpoint, and failure styles. Presentation must be held constant and reported separately in any future equivalence fixture.
 - The consumer pins NetScript `0.0.6` and Fresh `^2.3.3`. The case is evidence about that immutable consumer revision, not a claim about unreleased 0.0.7 behavior.
+- The Channel route uses the same generated `.withRoute(...)`/`ctx.path` chain, five concurrent
+  cache-backed entry reads, seven layers, six route-bound authoritative partials, and six
+  layout-faithful deferred fallbacks.
+- Its form values are inferred from the Zod schema; mutation output is derived from the typed
+  service-client return; typed query invalidation and a generated-route redirect remain visible in
+  the builder; and the form leaf selects framework-owned document navigation.
+- Session-grid links retain a normal href and explicitly request client navigation for plain
+  activations, preserving progressive fallback while avoiding an unintended cold full-document
+  transition.
 
-The comment's estimated line counts and ASC totals are discarded. Implementation may publish only outputs regenerated from an immutable source manifest with exact inclusion/exclusion classes. Private source text will not be checked in; only paths, commit/blob identifiers, classification, procedures, and aggregate outputs may be public.
+The superseded comments' estimated LOC ranges, ASC, feature scores, dependency depth, and effort/time
+figures are discarded. The definitive bodies publish only reproduced primary-route counts and, for
+the Session surface, the S2 manifest's aggregate output. Private source text is not checked in;
+minimal illustrative excerpts in the owner-authored issue comments remain bounded to identifiers
+and framework composition, without business data, domain models, CSS, fixtures, or credentials.
+
+## Canonical comment baseline reconciliation
+
+The canonical comments were created at `2026-08-12T11:02:26Z` (Session, comment `5265826161`) and
+`2026-08-12T11:17:48Z` (Channel, comment `5265971722`). Their inspected snapshots predated the
+improvements integrated into the eventual pin even though the pin itself never changed.
+
+Read-only Git verification established:
+
+- local `HEAD` and `origin/master` are both
+  `5191de83f3da97559f21d8891c6c8afdf1cf473a`; no newer product commit exists;
+- `834a2b36a5c9ef4acf82f8f1f400522d8dab234b` and the pin both resolve to tree
+  `710327bd994fe1c2d0d07821b773316a49d070fa`, so the former is evidence-only;
+- the named layout, cache-policy, cold-navigation, generated-route, service-platform,
+  cache-preservation, document-form-navigation, and route-bound-partial commits are all ancestral
+  to the pin; and
+- the read-only input remains clean.
+
+Reproduced physical/nonblank counts:
+
+| Example | Published comment claim | Inspected comment-time snapshot | Pinned route | Delta from snapshot |
+| --- | ---: | ---: | ---: | ---: |
+| Session | 119 / 117 | 121 / 119 | 94 / 92 | -27 / -27 (-22.3% / -22.7%) |
+| Channel | 208 / 204 | 208 / 204 | 181 / 178 | -27 / -26 (-13.0% / -12.7%) |
+
+The Session claim-to-pin delta is -25 / -25 (-21.0% / -21.4%). Both comment bodies were replaced
+in place with current snippets, complete inspected feature inventories, exact pinned counts,
+explicit evidence labels, and fair Next.js `16.3.0` primary citations. The existing S2 manifest,
+measurement tool, and measurements already target the unchanged pin and reproduce byte-identically;
+they remain correct and are deliberately untouched.
 
 ## Next.js version and primary evidence
 
