@@ -3193,3 +3193,34 @@ Sequence: amend and push F3 scope → same original Sol/high author thread `01a0
 comment, stop → fresh topic Tier-A → request a **new** lease with preflight before rerunning
 `scaffold.runtime`. `fresh-browser` stays NOT_RUN. No evaluator, no label change, no undraft, no
 merge.
+
+## 2026-08-15 — F3 author liveness check: **ACTIVE**, no recovery performed
+
+The staleness report ("no rollout progress since `16:17:29Z`") did not match observed state. Checked
+before acting rather than acting on the claim:
+
+| Probe | Observation |
+| --- | --- |
+| Rollout mtime | `18:19:22` against a wall clock of `18:19:37` — **15 seconds old** |
+| `codex-status` | `working`, `activityAgeMs ≈ 15037`, last activity `wait {cell_id: 56, yield_time_ms: 30000}` |
+| Rollout growth over 45 s | **+8,069 bytes** |
+| `cell_id` progression | **56 → 58** |
+| Receipts | **`s4-f3-check.json` now exists** — it is generating the four receipts serially, right now |
+| My F3 dispatch process | still running |
+
+The author is executing the already-authorized remaining mandate autonomously. **No recovery, no
+replacement thread, no duplicate dispatch** — intervening would have duplicated in-flight receipt
+generation and risked the message-swallow failure that cost a cycle earlier today.
+
+This is the same discipline as the hard recovery, applied in the opposite direction. Then I asserted
+activity without checking and was wrong; here the claim was of *inactivity* and the artefacts
+disprove it. A `wait` cell with a 30-second yield reads as silence from outside while being ordinary
+in-turn behaviour — a long gate is running underneath it. **Process silence is not process death**,
+just as an absent job dir was not death (D-12) and a `working` state was not life (D-14).
+
+Standing rule reinforced for this lane: before recovering a lane, sample the rollout **twice** and
+require growth, and check whether the artefacts it should be producing have started appearing. A
+single stale timestamp is a reason to look, never a reason to act.
+
+Holding position and monitoring to the author's own stop. `fresh-browser` remains NOT_RUN, no lease
+is held or requested, and no evaluator is launched.
