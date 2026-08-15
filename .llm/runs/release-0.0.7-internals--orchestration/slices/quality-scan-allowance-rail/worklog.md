@@ -461,3 +461,58 @@ Supervisor note: an initial check of mine grepped for `private-type-ref` against
 was wrong, not the evidence. Recorded so the corrected count is the one on record.
 
 Slice 4 is authorized.
+
+## Tier-A sign-off — Slice 4 (final planned slice)
+
+Signed off by `topic-internals-0.0.7` (Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34`, Opus 5
+/ high). Author head `e3a5a2d28793437f5e1ddb52c0b6cac1a42d2dd1`, binding implementation head
+`71c26445838eb5bca654607947ad247cbea78273`. Supervisor commit, not the implementer's.
+
+### Correction to the Slice 2 sign-off
+
+My Slice 2 sign-off called the `jsr:@std/path@^1` → `@std/path` import change "a real fix, not a
+suppression". That was true about _suppression_ and wrong about _consequence_.
+`scan-code-quality.ts` is shipped to consumers through `agent-tools.generated.ts`, and a bare
+`@std/path` specifier cannot resolve from a consumer CWD outside this repo's import map. I checked
+that the change was not a suppression and did not ask the next question — whether the file it edited
+leaves the repository.
+
+The binding `test` gate caught what my review missed: `receipts/slice-4/test.json` at the signed
+Slice 3 head failed 1 of 4,128 results, with a direct installed-bundle probe reporting
+`Import "@std/path" not a dependency`. Slice 4 restored the immutable-base specifier. I verified the
+base state independently — `git show 01e096049:.llm/tools/quality/scan-code-quality.ts` reads
+`import { relative, resolve } from 'jsr:@std/path@^1'` — so Slice 4 is a **restoration**, and Slice
+2 was the deviation. The lint invocation that motivated it reaches `.llm/tools/**`, which is outside
+the root lint selection and outside this leaf's binding gate set; consumer portability is a
+correctness property and outranks it. Recorded as leaf drift `D-12`.
+
+### Verified by execution at the landed head
+
+- **Consumer portability repair proven:** supervisor re-ran the consumer integration test — **19
+  passed / 0 failed**, exit 0.
+- **`quality:gate`:** exit 0, `ok:true`, `allowCount: 7`.
+- **Generated asset:** `check:assets-barrel` (generate-then-diff) exit 0 with a clean worktree —
+  committed asset byte-identical to generator output after the restoration.
+- **Scope holds:** the only non-run-artifact files in the whole slice are
+  `.llm/tools/quality/scan-code-quality.ts` and
+  `packages/cli/src/kernel/assets/agent-tools.generated.ts`, both in the leaf contract
+  `fileSurfaces`. No suppression, no lint-config change, no `deno.json` change, no lock churn.
+- **RED-first held at slice scope:** `test.json` exit 1 → `test-binding.json` exit 0 (4,109 pass / 0
+  fail / 19 ignored).
+- **Binding final gate set is complete and green at `71c264458`:** `check-binding`, `test-binding`,
+  `quality-job`, `quality-gate`, `arch-check`, `quality-scan`, `quality-scan-repo`, `assets`,
+  `fresh-browser`, `docs-source-format`, `docs-source-format-test`, `docs-accuracy`, and both
+  publish dry-runs.
+- **Workers baseline still honestly not green** — the accepted exact-20 `private-type-ref` baseline
+  owned by #1655 is unchanged and is not claimed as passing.
+
+### DoD truth audit accepted
+
+The implementer reported 10/12 rows true, naming the two pending rows as Slice 4 Tier-A review and
+separate opposite-family IMPL-EVAL. Both are structurally impossible for it to satisfy itself, it
+did not tick them, and it left the PR-body boxes untouched. That is the correct behaviour — a
+criterion that cannot be truthfully ticked is escalated, not ticked. This sign-off closes the first
+of the two; **IMPL-EVAL remains open and is the coordinator's to grant.**
+
+Implementation of all four planned slices is complete. This lane does not flip readiness, apply
+`status:ready-merge`, tick PR-body boxes, merge, or publish.
