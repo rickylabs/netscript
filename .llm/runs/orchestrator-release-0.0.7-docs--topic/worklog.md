@@ -1075,3 +1075,39 @@ editing the stale one — the earlier `pr-checks`-snapshot error is corrected ap
 
 No Definition-of-Done box ticked, no ready flip, merge, publish, relabel, or next docs leaf. This
 topic remains independent of the internals, fixes, and features lanes.
+
+## 2026-08-15 — exact-head Actions terminal green; readiness reconciled
+
+Run `31871283408` at `a465836b4cc1c40262a473de07b5744e70b20ead` reached `status=completed`,
+`conclusion=success`, **0 job failures**. `quality` completed/success and `check-test`
+completed/success — the two the coordinator required. `close-gate`, `classify changes`, and
+`core CI lane visibility` also success; `deps-report` skipped. Sibling runs at the same head:
+`Code quality` success, `Deploy docs site to Pages` success, three skipped.
+
+This is the terminal state of the specific run at the exact head, read from Actions — not an
+`agentic:pr-checks` snapshot. That distinction is the whole content of the earlier correction.
+
+Authoritative reconciliation posted as a **new** comment `issuecomment-5301124116`, superseding the
+CI status in `5301061539`. The stale comment was left intact deliberately: the record is corrected
+forward rather than rewritten, matching how the leaf handled its own superseded digest claims.
+
+### PR state observed, not set by this lane
+
+Head `a465836b4`, draft `false`, **21/21 checkboxes checked**, `Part of #1551` with no closing
+keyword, labels `area:docs` · `type:docs` · `priority:p2` · `ci:skip-e2e` · `ci:skip-scaffold` ·
+`status:impl-eval` · `impl-eval:skip`.
+
+The final checkbox ticks, the draft flip, and the `impl-eval:skip` label were all applied outside
+this lane. Nothing was ticked, flipped, or relabelled here — the two Definition-of-Done boxes this
+lane had twice flagged as a false negative were resolved by the coordinator before the condition to
+tick them was reached, so no action was needed or taken.
+
+### Lane position
+
+Content verdict remains IMPL-EVAL cycle 2 `PASS` at `c7ce58a19`; no cycle 3 launched. The generated
+cascade is closed with all four freshness gates green at the final head, both generators proved
+no-op, and a post-commit receipt bound to the full committed `gitHead`.
+
+Merge disposition belongs to the coordinator. This lane has not merged, published, relabelled, or
+started the next docs leaf, and holds there until this leaf reaches a terminal merge disposition.
+This topic remained independent of the internals, fixes, and features lanes throughout.
