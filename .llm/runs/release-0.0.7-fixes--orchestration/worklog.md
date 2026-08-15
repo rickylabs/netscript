@@ -1028,3 +1028,36 @@ still `status:triage`; CI vacuous while draft.
 - Box 8 must cite manual evidence, never the `docs-accuracy` receipt.
 - Advisory needing a ruling, not silent widening: chapter 4, `layers.md`, and the homepage loaders are
   still on the old shape — the same false-narrative class, on pages outside the exactly-two grant.
+
+## 2026-08-15 — coordinator ruling on #1669 advisories; follow-up drafted, PASS preserved
+
+**Correction to this topic's own advisory framing.** I characterised chapter 4, `layers.md`, and the
+homepage loaders as "the same false-narrative class" the leaf had just corrected. **That was wrong**,
+and the coordinator/evaluator reading is right. Verified directly at head `313cc08d5`:
+`04-definePage-QueryIsland.md:124`, `layers.md:184`, and `index.vto:71` each use `getCachedEntry` as a
+**pure read with a fallback** and attach **no** revalidation claim — a targeted
+`getCachedEntry…(revalidat|refresh)` sweep returns **zero** hits on all three. The homepage example
+even carries an explicit cold-cache fallback to `queryOptions(input).queryFn()`.
+
+So this is **cross-page consistency debt**, not a #1461 acceptance failure. The distinction matters
+because my framing would have justified widening a PR that has already passed its formal gate — the
+exact outcome the ruling forbids. #1669 is **not** widened and its IMPL-EVAL PASS stands.
+
+The warm-stale write-failure caveat is likewise a real edge-case docs gap, explicitly non-blocking for
+the proven common path.
+
+**Follow-up drafted, not filed:** `followup-draft-1669.md` in this run directory, covering (a)
+action-then-metadata consistency across the three surfaces and (b) a truthful warm-stale
+persistence-failure return shape. No implementation, no external issue creation, no edits to any docs
+or SDK surface. It records that (b) is genuinely under-specified rather than wrong: under #1665's
+non-fatal write contract, a refresh that fetches successfully but fails to persist leaves the older
+entry in cache, so `getCachedEntry` returns it, the `??` fallback never fires, and the loader returns
+stale `data`/`cachedAt` while a fresh `data` sits in the same scope. Correct at every layer; simply
+undocumented.
+
+**Exact-head CI at `313cc08d5`:** `pr-checks PASS`, `checks=59`, `currentFailures=0`, evaluated
+2026-08-15T19:34:37Z. The draft-posture caveat still applies — some lanes remain `skipped` until the
+PR leaves draft, so this is not yet the full merge-gate signal.
+
+Readiness preserved and unchanged; no box, label, draft, or merge mutation. `#1350` remains held until
+#1669 merge is terminal.
