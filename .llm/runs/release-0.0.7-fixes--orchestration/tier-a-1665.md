@@ -241,3 +241,93 @@ a mis-reading of the source. Recount:
 census reported "11 calls + def" and is correct. No finding, evidence citation, or repair is affected;
 only the count label. The "12 entrypoints" references elsewhere in this file refer to the SDK
 doc-lint entrypoint set and are correct.
+
+---
+
+# Tier-A — implementation slice S1 at `0e4e26c51e9dcbac7dbd0e30eb5db19130e4d7d0`
+
+| Field | Value |
+| --- | --- |
+| Head | `0e4e26c51e9dcbac7dbd0e30eb5db19130e4d7d0` — local == remote == PR, clean, draft, sole `status:plan` |
+| Prior head | `cd5193b66` (PLAN-EVAL artifact); one commit `0e4e26c51 fix(sdk): make cache telemetry fail-safe` |
+| Verdict | **PASS** |
+
+## Scope — exact, no leakage
+
+`git diff --name-only cd5193b66..0e4e26c51` = the five authorized paths plus two run artifacts:
+`cache-telemetry.ts`, `cache-query.ts`, `cache-provider.ts`, `tests/cache/cache-telemetry_test.ts`,
+`README.md`, `context-pack.md`, `worklog.md`. **No S2 file** (`cache-query-kv-limit_test.ts` not
+created) and **no S3 file** (`cache-store.ts`, `cache-provider_test.ts`, `docs/site/**` untouched).
+The uninitialized-provider message is unchanged, so the D4 wording boundary held.
+
+## The six required proofs — verified by reading the assertions, not the names
+
+1. **Partway third-entry rollback — PROVEN.** `cache-telemetry_test.ts:329`. The malformed report
+   carries `memory/l1`, `redis/l2`, then `INVALID/durable`, so it fails on the **third** entry after
+   two were staged. It asserts span `outcome=error`, `topology_complete=false`, exactly 2
+   `cache.invalidate` events, that the only complete-evidence tier emitted is `['durable']` (from the
+   *other*, valid report), and adds an explicit negative assertion that no complete-evidence event
+   carries `l1` or `l2`. That is the T-2 hole closed and proven, not asserted.
+2. **Normal data return under malformed evidence — PROVEN.** `:257` (lookup) and `:297` (write). The
+   lookup case asserts the loader ran exactly once, the payload `'loaded'` returned, the span is
+   `outcome=error` / `topology_complete=false` / `backend_executed=true`, and — the key line —
+   `span.status === 'unset'`. Observability degrades; the application does not.
+3. **Request-local first-overflow semantics — PROVEN.** `:477`.
+4. **Composite construct-then-admit — PROVEN.** `:536`; `composite-query.ts:42` correctly still calls
+   bare `normalizeCacheNamespace` (syntax only, no admission).
+5. **`try/finally` registry reset — PRESENT.** Both cardinality tests reset before and in `finally`
+   (`:483-531`, `:537-570`), so a mid-test failure cannot leak `overflow` into sibling files.
+6. **Descriptor validation inside the span — PROVEN**, folded into `:477`.
+
+## Implementation review
+
+`recordIncompleteTopology` is now `void` and its `throw` is gone. All three call sites short-circuit
+explicitly: lookup returns `CacheOutcomes.ERROR`, write gained the missing `return`, and invalidation
+stages each report into a per-report `stagedInvalidations` map merged into the aggregate only after
+the whole report validates. A `topologyComplete` flag is threaded to the final span attributes, so a
+partially-rejected invalidation now reports incomplete rather than the previous hardcoded `true` —
+better than the minimum the finding required.
+
+`validateDescriptor` was removed from `createCacheSpanAttributes` and moved into
+`recordCacheSpanPrologue`, which flushes any pending overflow event **then** validates — the stated
+order. All 10 executable admission sites use `admitCacheNamespace`; every span callback calls the
+prologue as its **first statement** (`cache-query.ts:92,274,323,355,395,425,455`;
+`cache-provider.ts:98`). Note the import is aliased as `spanPrologue` in `cache-query.ts` — a grep for
+the original symbol name misses it, which is worth remembering rather than mistaking for a gap.
+
+## Gates — executed by this review, not accepted from the slice report
+
+| Gate | Result |
+| --- | --- |
+| `run-deno-check.ts --root packages/sdk` | 0 occurrences, 83 files, 0 failed batches |
+| `run-deno-lint.ts --root packages/sdk` | exit 0, 0 occurrences |
+| `run-deno-fmt.ts --root packages/sdk` | 0 findings |
+| `run-deno-test.ts packages/sdk/tests/cache/` | **26 passed / 0 failed** |
+| `run-deno-test.ts packages/sdk/` (whole package) | **65 passed / 0 failed** |
+| Raw `deno doc --lint` combined | exit 1 — **exactly diagnostics 1–3**, same names and locations |
+| Raw `deno doc --lint ./src/cache/mod.ts` | exit 1 — **exactly diagnostics 4–6**, same names and locations |
+
+Doc-lint no-regression bar is met precisely: **zero new, zero disappeared**. Neither invocation is
+reported as a pass.
+
+`cache/mod.ts` is untouched and none of `admitCacheNamespace`, `resetCacheNamespaceRegistry`,
+`recordCacheSpanPrologue`, `CacheNamespaceAdmission` appear on any barrel, so the new surface stays
+internal. No `console.*` was introduced. README documents both the D3 cardinality behaviour and the
+D2 fail-safe contract, including that invalid reports are never partially emitted.
+
+## Residual risk carried to later slices (not S1 blockers)
+
+- **Cross-package coverage has not run.** I ran the whole `packages/sdk` suite rather than only the
+  focused files, but `packages/fresh` and `packages/cli` consume this runtime behaviour and were not
+  exercised. Root `deno task test` must run before merge readiness — this is the O-3 class and must
+  not be deferred past the final slice.
+- The amended `:237` test changed contract deliberately (`assertRejects` → data-returning). That is
+  the approved D2 decision and is documented in README; it must be called out in the PR body so it
+  is not mistaken for a weakened guard.
+- Advisory 2 (process-global `@netscript/kv` needs `resetKv()`/`closeKv()` teardown) belongs to S2 and
+  is still outstanding.
+
+## Outcome
+
+S1 Tier-A **PASS** at `0e4e26c51`. Stopping here per the coordinator's instruction: S2 is not started,
+no evaluator launched, PR remains draft at sole `status:plan`.
