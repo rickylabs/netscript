@@ -14,7 +14,7 @@
 | Implementation route       | requested OpenAI/Codex `gpt-5.6-sol` high                                           |
 | Thread id / observed route | `019ffcca-8be0-74c2-bb0e-c82cf5ce3c85`; OpenAI `gpt-5.6-sol` high (matched)         |
 | PLAN-EVAL                  | cycle 2 `PASS`; evaluator commit `b8fc5eb53a530d337602f7dc377239651a57d428` |
-| IMPL-EVAL                  | mandatory fresh opposite-family session                                             |
+| IMPL-EVAL                  | cycle 1 `PASS`; native Claude Fable 5 / medium, session `19f1be7b-db7d-47c0-b0f1-7cfca302d44a`, bridge `session_01Qs22iAtnVYh2fLb26ABvja`; see `evaluate.md` |
 
 The three issues remain one PR and consume one shared `scaffold.runtime` verdict. The implementation
 session updates this file with observed route identity and may not self-certify.
