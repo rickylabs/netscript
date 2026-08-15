@@ -159,3 +159,100 @@ follow-up issue.
 2. Ready flip, merge, publication, relabeling, and issue closure remain coordinator-only.
 3. The expensive-gate lease is consumed; no further browser or runtime pass is authorized.
 4. PR #1657 remains `OPEN`, draft, `MERGEABLE`, exactly one `status:impl`.
+
+---
+
+# Tier-A RE-REVIEW after the T-3 contract-amendment repair
+
+Reviewed head: `a093314973b2039183ee408ef7501cd9e08ea0aa`. Repair base: `c5e06661b` (amendment
+record). Same reviewer/session as above; same separation from the Codex author thread.
+
+## Verdict
+
+**PASS_TO_IMPL_EVAL.** T-3, N1 and N2 are all resolved. One new non-blocking residual (R-1) is
+recorded for the coordinator. This authorizes nothing further — IMPL-EVAL, ready flip, merge,
+publication, relabeling and issue closure all remain coordinator-only.
+
+## T-3 — RESOLVED
+
+The repair touched exactly the three amended files plus two run artifacts; nothing else.
+
+**The classifier half is proven by execution, not by reading its tests.** I imported `classifyPath`
+and ran it directly:
+
+| Case | Path | `freshUi` |
+| --- | --- | --- |
+| POSITIVE | `…/assets/app/routes/(design)/design/(_shared)/registry.ts.template` | **true** |
+| POSITIVE | `…/assets/app/routes/(design)/design/components/index.tsx.template` | **true** |
+| REGRESSION | `packages/fresh-ui/registry.manifest.ts` | **true** (unbroken) |
+| NEGATIVE | `packages/cli/src/kernel/adapters/database/scaffolder.ts` | false |
+| NEGATIVE | `packages/cli/bin/netscript.ts` | false |
+| NEGATIVE | `packages/cli/src/kernel/assets/database/seed.ts.template` | false |
+| NEGATIVE | `packages/service/src/mod.ts` | false |
+
+The third negative matters most: it is another path under `packages/cli/src/kernel/assets/` that is
+**not** under `(design)`, and it stays false. Ownership was scoped by the design-asset prefix
+`packages/cli/src/kernel/assets/app/routes/(design)/`, so unrelated CLI diffs were not broadened —
+which was the explicit constraint on this repair.
+
+**The workflow half** carries `packages/cli/src/kernel/assets/app/routes/(design)/**` in **both**
+the `pull_request` and `push` `paths:` filters (occurrence count 2; the YAML parses with 11 paths on
+each trigger and the design path present in both).
+
+Tests re-executed by this reviewer: `ci-classify-changes.test.ts` **62 passed / 0 failed**;
+`registry-doc-drift.test.ts` **5 passed / 0 failed**. The added cases are named
+`POSITIVE: CLI design assets request the Fresh UI gate` (asserts `needsFreshUi === true`) and
+`NEGATIVE: unrelated CLI changes do not request the Fresh UI gate` (asserts `needsFreshUi === false`).
+
+`deno task quality:scan` → `ok: true`, 0 findings. `deno task arch:check` → raw exit 0.
+
+## Preservation — verified
+
+- **The four original product files are byte-identical** to the gated product head:
+  `git diff --stat 4a3c40321..HEAD -- packages/` is **empty**. The consumed `fresh-browser` lease's
+  `PASS` receipt at `4a3c40321` therefore remains valid; the repair could not have invalidated it.
+- `deno.lock`, the CLI lock and the Fresh-UI lock: unchanged.
+- `review-tier-a.md` (pre-existing section), `receipts/fresh-browser.json` and `drift.md`: unchanged
+  by the repair commit.
+- `Closes #1358` intact; PR `OPEN`, draft, exactly one `status:impl`.
+- No expensive gate ran: `docker ps -a` empty, no chromium/playwright survivors.
+
+## N1 — RESOLVED
+
+`worklog.md` now records: "`registryMeta.total` and `registryMeta.version` remain static template
+literals; their equality with the manifest is enforced by the semantic drift gate rather than
+computed during generation." That is accurate and prevents a reviewer from reading the issue's
+"derived from" wording as describing a computation that does not exist.
+
+## N2 — RESOLVED
+
+The PR Definition-of-Done `fresh-browser` box is now checked and cites
+`receipts/fresh-browser.json`. The only remaining unchecked box is Tier-A / IMPL-EVAL, which is
+correct at this point in the lifecycle.
+
+## R-1 — new, non-blocking residual for the coordinator
+
+**The parenthesized path glob has no precedent in this repository and no empirical run yet.**
+`packages/cli/src/kernel/assets/app/routes/(design)/**` is the **first** use of `(` in any workflow
+`paths:` filter here — the only two occurrences in `.github/` are the two lines this repair added.
+
+This matters because the `paths:` filter is the **outer** gate: `fresh-ui-quality.yml` is a separate
+workflow, so if its filter fails to match, the workflow never starts and the classifier inside it
+never runs. The classifier being provably correct does not rescue a non-matching filter.
+
+Assessment: GitHub's filter-pattern syntax treats `*`, `**`, `?`, `+`, `!`, `[]` and `\` as special
+and parentheses as literal characters, so the pattern should match. But it is unproven here —
+`fresh-ui-quality` currently reports `skipping` on this draft, so there is no run to point at.
+
+Not blocking: the documented semantics support it, and this PR touches `packages/fresh-ui/**`
+regardless, so the gate runs for this change either way. It becomes empirically provable at the
+ready flip, when `fresh-ui-quality` executes for real. **Recommended:** at ready flip, confirm the
+workflow actually triggers, and if it does not, the filter needs an escaped or restructured pattern.
+Recorded so a later reader does not assume the glob was verified against GitHub.
+
+## Standing stops
+
+1. **IMPL-EVAL is not launched** and is not authorized by this review.
+2. Ready flip, merge, publication, relabeling and issue closure remain coordinator-only.
+3. The expensive-gate lease is consumed; no further browser or runtime pass is authorized.
+4. No next leaf has been started.
