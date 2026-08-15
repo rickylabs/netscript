@@ -4613,3 +4613,65 @@ the container's data directory outlives it with foreign ownership. Recorded as *
 content head `e45144db6`; only on its PASS do `publish-dry-run` and `arch-check` follow, then
 recomputed sufficiency naming the four files, with `f7-test.json` excluded as superseded. Same shape
 the coordinator authorized for F6 — the environment is repaired, the record is not.
+
+## 2026-08-15 — F7 binding recovery Tier-A: `PASS` at `ed3f78e0d87784b1869166bd2574737c62fac0af`
+
+Content head `e45144db643f6bde85552a615812c8371e4ce792`; local == remote == PR #1664 (draft);
+delta from content head is **evidence only**; no source or test changed during recovery.
+
+### Five receipts, all attesting the exact content head
+
+| Receipt | gate | outcome | summary |
+| --- | --- | --- | --- |
+| `f7-check.json` | `check` | **PASS** | zero diagnostics — original, not re-run |
+| `f7-test.json` | `test` | **FAIL** | 4236 passed / 1 failed / **4256** — preserved red |
+| `f7-test-attempt2.json` | `test` | **PASS** | **4237** passed / 0 failed / **4256** |
+| `f7-publish-dry-run.json` | `publish-dry-run` | **PASS** | — |
+| `f7-arch-check.json` | `arch-check` | **PASS** | — |
+
+Every one records `gitHead == actualGitHead == e45144db6` with **no `allowGitHeadMismatch`**. The
+clean-checkout requirement did its job: the leaf worktree still carries a modified `leak-report.md`
+from my own audit runs, so a receipt taken in place could not have satisfied that equality honestly.
+
+### The totals prove nothing was skipped to reach green
+
+`4256` in **both** test receipts, and `4236 + 1 = 4237`. Exactly one test flipped fail→pass and
+nothing else moved — no test dropped, ignored, or filtered. Had the run been narrowed to escape the
+`readdir` failure, the total would have fallen. It did not. This is the second time this pattern has
+settled an environmental attribution cleanly, after F6's 4248/4248.
+
+### Sufficiency recomputed by me, and the exclusion proven load-bearing
+
+```text
+FOUR NAMED -> { "sufficiency": "SUFFICIENT", "reasons": [] }
+WITH RED    -> { "sufficiency": "INSUFFICIENT",
+                 "reasons": ["gate test has duplicate or contradictory receipts",
+                             "test did not pass (FAIL)"] }
+```
+
+So naming `f7-test-attempt2` as the superseding receipt and excluding `f7-test.json` is mechanically
+required, not presentational — two `test` receipts trip the duplicate rule *and* the FAIL. I used the
+**full 40-character SHA** this time; at F6 I passed an abbreviated head and manufactured a false
+INSUFFICIENT against sound receipts, which is exactly the trap that makes a careless recomputation
+worse than none.
+
+### Environment
+
+No unreadable directories remain under `.llm/tmp`. The attempt-5 residue stays quarantined at
+`/tmp/netscript-f7-quarantine.iXF6fb/plugin-smoke-20260815-213942` — **moved, not deleted**, so the
+artifact survives as evidence. All five S5 attempt logs, both preserved reds, and every prior report
+and receipt remain append-only.
+
+### Verdict
+
+**`PASS`.** F7's selection and diagnostics repair is complete and green on all four contracted gates
+at one immutable content head, with the environmental red preserved beside it rather than erased.
+
+The probe now selects a browser because it **runs**, not because a file exists; an explicit
+`NETSCRIPT_E2E_BROWSER_EXECUTABLE` override fails loudly rather than falling through; and startup
+failures surface exit code and bounded stderr instead of a bare DevTools timeout. The three opaque
+symptoms across attempts 3, 4 and 5 all traced to variants of one habit — evidence discarded at the
+point where it would have been diagnostic — and that habit is now closed in both teardown (F6) and
+startup (F7).
+
+No lease requested, no attempt 6, no browser, Aspire, Docker, evaluator, or readiness change.
