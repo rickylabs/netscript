@@ -299,21 +299,21 @@ Slice 4 is authorized.
 
 ### Progress
 
-| Time       | Step           | Notes                                                                                                                                                                                                                                    |
-| ---------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-15 | Authorization  | Fast-forwarded to Tier-A S3 sign-off `d3d31b3d0`; began S4 only.                                                                                                                                                                         |
-| 2026-08-15 | RED            | Replaced old workflow-filter assertions and added executable retry/refusal/dedup tests first; targeted wrapper exited 1 with 7 passed / 3 failed because literal routing and the embedded helpers did not exist.                           |
+| Time       | Step           | Notes                                                                                                                                                                                                                                         |
+| ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-15 | Authorization  | Fast-forwarded to Tier-A S3 sign-off `d3d31b3d0`; began S4 only.                                                                                                                                                                              |
+| 2026-08-15 | RED            | Replaced old workflow-filter assertions and added executable retry/refusal/dedup tests first; targeted wrapper exited 1 with 7 passed / 3 failed because literal routing and the embedded helpers did not exist.                              |
 | 2026-08-15 | Implementation | Routed every literal candidate to trusted policy, added 5×1s lookup with controlled exhaustion, emitted source-keyed refusal outputs, and posted them once in an authorize-job step before the paid job. Policy + workflow suites pass 26/26. |
-| 2026-08-15 | Durable gates  | At `9b71e1bd2`, cached package/plugin `check`, root `test`, and `quality-job` passed. Root test reported 4,147 passed / 19 ignored / 0 failed; only `test` covers S4.                                             |
-| 2026-08-15 | Reconcile      | Read S3 supervisor sign-off comment `5301464449`; #1611/#1613 remain open and unchanged at milestone `0.0.7`. No plan adjustment, issue mutation, or label change was needed.                                                               |
+| 2026-08-15 | Durable gates  | At `9b71e1bd2`, cached package/plugin `check`, root `test`, and `quality-job` passed. Root test reported 4,147 passed / 19 ignored / 0 failed; only `test` covers S4.                                                                         |
+| 2026-08-15 | Reconcile      | Read S3 supervisor sign-off comment `5301464449`; #1611/#1613 remain open and unchanged at milestone `0.0.7`. No plan adjustment, issue mutation, or label change was needed.                                                                 |
 
 ### Decisions
 
 - The PAT remains confined to the trusted policy step because formal authorization must create/read
-  the existing claim ref. Refusal publication is a separate step using `GITHUB_TOKEN`; therefore
-  the authorize job's `issues: write` grant is the actual comment-write ceiling.
-- The authorize job grants only `contents: read` for trusted policy checkout and `issues: write`
-  for refusal publication. It has no `pull-requests: write` or provider permission.
+  the existing claim ref. Refusal publication is a separate step using `GITHUB_TOKEN`; therefore the
+  authorize job's `issues: write` grant is the actual comment-write ceiling.
+- The authorize job grants only `contents: read` for trusted policy checkout and `issues: write` for
+  refusal publication. It has no `pull-requests: write` or provider permission.
 - Ordinary five-reason denials use the S1 controlled builder. Generation exhaustion uses the same
   source-comment marker vocabulary but names the missing phase-status generation and five exhausted
   attempts without reflecting command text.
@@ -325,16 +325,55 @@ Slice 4 is authorized.
 
 ### Gate status
 
-| Gate           | Outcome          | Exit | Receipt / evidence                                                     | Coverage meaning                                                                 |
-| -------------- | ---------------- | ---: | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| Targeted RED   | expected failure |    1 | structured test wrapper before implementation; 7 passed / 3 failed     | Missing workflow routing/helpers proved tests preceded implementation.           |
-| Targeted GREEN | PASS             |    0 | structured test wrapper; policy + workflow suites 26/26                | Focused executable S4 policy, retry, dedup, ordering, and permission feedback.   |
-| `check`        | PASS             |    0 | `receipts/slice-4/check.json` at `9b71e1bd2`; unchanged-input cache hit | Frozen-contract receipt only; package/plugin roots do not cover S4.              |
-| `test`         | PASS             |    0 | `receipts/slice-4/test.json` at `9b71e1bd2`; 4,147 passed, 19 ignored  | Load-bearing S4 proof; root discovery executed policy/workflow suites.            |
-| `quality-job`  | PASS             |    0 | `receipts/slice-4/quality-job.json` at `9b71e1bd2`                     | Required contract receipt; package/plugin quality inputs do not cover S4.        |
+| Gate           | Outcome          | Exit | Receipt / evidence                                                      | Coverage meaning                                                               |
+| -------------- | ---------------- | ---: | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Targeted RED   | expected failure |    1 | structured test wrapper before implementation; 7 passed / 3 failed      | Missing workflow routing/helpers proved tests preceded implementation.         |
+| Targeted GREEN | PASS             |    0 | structured test wrapper; policy + workflow suites 26/26                 | Focused executable S4 policy, retry, dedup, ordering, and permission feedback. |
+| `check`        | PASS             |    0 | `receipts/slice-4/check.json` at `9b71e1bd2`; unchanged-input cache hit | Frozen-contract receipt only; package/plugin roots do not cover S4.            |
+| `test`         | PASS             |    0 | `receipts/slice-4/test.json` at `9b71e1bd2`; 4,147 passed, 19 ignored   | Load-bearing S4 proof; root discovery executed policy/workflow suites.         |
+| `quality-job`  | PASS             |    0 | `receipts/slice-4/quality-job.json` at `9b71e1bd2`                      | Required contract receipt; package/plugin quality inputs do not cover S4.      |
 
 ### Handoff boundary
 
 - S4 stops after all three durable receipts, push, and its PR comment for Tier-A review.
 - S5 is not authorized and no read-only phase workflow path was changed.
 - No OpenHands/evaluator dispatch, live workflow trigger, or status-label transition occurred.
+
+## Tier-A sign-off — Slice 4
+
+Signed off by `topic-internals-0.0.7` (Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34`, Opus 5
+/ high) at `ab4b8185f545b4890f7fcbc0e00a114afecb4087` (implementation `9b71e1bd2`, attestation
+`ab4b8185f`). Supervisor commit, not the implementer's.
+
+Verified by execution:
+
+- **Scope holds** — `openhands-agent.yml` + `phase-eval-workflow_test.ts` only, and
+  `.github/workflows/openhands-phase-eval.yml` is **untouched across the whole leaf**, so the
+  read-only precedent boundary held from the rescope through to the last implementation slice.
+- **Supervisor re-ran the workflow suite: 10 passed / 0 failed.** RED-first is recorded honestly —
+  the targeted wrapper first exited 1 at 7 passed / 3 failed because literal routing and the
+  embedded helpers did not yet exist.
+- **N5 discharged, and the ceiling is now real rather than declared.** The authorize job's
+  `permissions:` block gains `issues: write` beside `contents: read`, annotated _"one
+  source-comment-keyed refusal via GITHUB_TOKEN"_, and the refusal step posts with
+  `${{ secrets.GITHUB_TOKEN }}`. The evidence states it outright: _"Refusal publication is a
+  separate step using `GITHUB_TOKEN`; therefore the authorize job's `issues: write` grant is the
+  actual comment-write ceiling"_, with _"no `pull-requests: write` or provider permission"_. That
+  lets IMPL-EVAL **check** the bound instead of inferring it. The surviving `PAT_TOKEN` reference is
+  a later checkout step, not the refusal path.
+- **Dedup is proved by count across a repeat delivery, not by presence.** The test extracts the
+  embedded `reportRefusalOnce` from the workflow YAML and executes it via `new Function` — testing
+  the shipped implementation rather than a reimplementation — then asserts
+  `calls === ['list', 'post', 'list']`, `calls.filter(c => c === 'post').length === 1`, and
+  `bodies.length === 1`, with the second invocation returning `false`. A second delivery provably
+  produces no second reply.
+- **The 5×1s retry is pinned exactly**: `attempts === [1,2,3,4,5]` and
+  `sleeps === [1000,1000,1000,1000,1000]`, with `result === undefined` on exhaustion and the
+  embedded exhaustion-refusal asserted present — so exhaustion is attributable rather than the
+  precedent's bare `throw`.
+- **Gate honesty held even where the gate is contractually required.** `quality-job` ran and PASSed,
+  yet is recorded as _"Required contract receipt; package/plugin quality inputs do not cover S4"_ —
+  the leaf declines to bank a required-but-non-covering gate as coverage. `test` remains the
+  load-bearing proof at 4,147 passed.
+
+Slice 5 is authorized.
