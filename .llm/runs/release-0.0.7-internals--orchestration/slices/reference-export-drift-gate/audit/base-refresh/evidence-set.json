@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "immutableHead": "8c03d862931b64573df9a4bac76ebf266e0ec175",
+  "surface": "reference-export-drift-gate post-eval base refresh",
+  "expectedGateIds": [
+    "agent-docs-prose",
+    "arch-check",
+    "assets-barrel",
+    "check",
+    "docs-accuracy",
+    "docs-source-format",
+    "docs-source-format-test",
+    "docs-tagline",
+    "publish-assets",
+    "publish-dry-run",
+    "quality-job",
+    "test"
+  ],
+  "receiptIds": [
+    "reference-export-base-refresh-agent-docs-prose",
+    "reference-export-base-refresh-arch-check",
+    "reference-export-base-refresh-assets-barrel",
+    "reference-export-base-refresh-check",
+    "reference-export-base-refresh-docs-accuracy",
+    "reference-export-base-refresh-docs-source-format",
+    "reference-export-base-refresh-docs-source-format-test",
+    "reference-export-base-refresh-docs-tagline",
+    "reference-export-base-refresh-publish-assets",
+    "reference-export-base-refresh-publish-dry-run",
+    "reference-export-base-refresh-quality-job",
+    "reference-export-base-refresh-test"
+  ],
+  "sufficiency": "SUFFICIENT",
+  "reasons": []
+}

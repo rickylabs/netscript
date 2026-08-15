@@ -1,0 +1,36 @@
+{
+  "gateId": "docs-tagline",
+  "invocationId": "reference-export-base-refresh-docs-tagline",
+  "argv": [
+    "deno",
+    "task",
+    "docs:tagline:check"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-reference-export",
+  "gitHead": "8c03d862931b64573df9a4bac76ebf266e0ec175",
+  "actualGitHead": "8c03d862931b64573df9a4bac76ebf266e0ec175",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:874245",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "60c91e98d6eb11efdae740e9f5017c3c3a8615859ac310f2ce514c644e3575b6",
+  "lifecycleId": "worker:874245:reference-export-base-refresh-docs-tagline:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T20:51:30.036Z",
+  "startedAt": "2026-08-15T20:51:30.041Z",
+  "finishedAt": "2026-08-15T20:51:30.234Z",
+  "durationMs": 192,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 105,
+    "sha256": "a1d59212ae3a7b1d83d1120f6c2db1508896116ba56e5803fbb2be04f3a35f09",
+    "tail": "JSR tagline length gate — cap 250 bytes\n  checked=36 over=0\n  OK — every tagline lands whole on JSR.\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 115,
+    "sha256": "44b5df6596dfb4e9ead6020e23a6641ce5b5b9c98c73b34d9818108cfd959a86",
+    "tail": "Task docs:tagline:check deno run --no-lock --allow-read .llm/tools/validation/check-jsr-tagline-length.ts --pretty\n",
+    "truncated": false
+  }
+}

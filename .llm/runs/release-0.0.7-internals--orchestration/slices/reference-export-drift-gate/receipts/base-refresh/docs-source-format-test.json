@@ -1,0 +1,36 @@
+{
+  "gateId": "docs-source-format-test",
+  "invocationId": "reference-export-base-refresh-docs-source-format-test",
+  "argv": [
+    "deno",
+    "task",
+    "test:source-format"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-reference-export/docs/site",
+  "gitHead": "8c03d862931b64573df9a4bac76ebf266e0ec175",
+  "actualGitHead": "8c03d862931b64573df9a4bac76ebf266e0ec175",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:874131",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "56c5fa6b34d26b7a471a4e7bc432a72ac9e5347fabc7c38c608ad8444eb3a80c",
+  "lifecycleId": "worker:874131:reference-export-base-refresh-docs-source-format-test:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T20:51:23.567Z",
+  "startedAt": "2026-08-15T20:51:23.571Z",
+  "finishedAt": "2026-08-15T20:51:25.242Z",
+  "durationMs": 181,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 560,
+    "sha256": "71da5a96f460c1ed621fcd53589c6b2bedd06385c44ccd2dd8a6ebad10ae363b",
+    "tail": "running 6 tests from ./_plugins/check-source-format_test.ts\nrejects raw newlines inside quoted Vento component arguments ... ok (6ms)\nrejects Markdown headings in Vento pages without Markdown rendering ... ok (11ms)\naccepts multiline component objects whose individual strings stay valid ... ok (1ms)\nrejects literal Vento placeholders in any rendered page ... ok (1ms)\nallows only the bounded CLI string-template documentation tokens ... ok (1ms)\nrejects CLI documentation tokens beyond the bounded allowance ... ok (809µs)\n\nok | 6 passed | 0 failed (29ms)\n\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 566,
+    "sha256": "a6c0b3a4a9ce9ce036d0a94beeacb7bf156ebc6f0495ec9c1c7e6aa6314075e0",
+    "tail": "Warning: config file file:///home/codex/repos/netscript-007-reference-export/docs/site/deno.json is not a member of the workspace at file:///home/codex/repos/netscript-007-reference-export/. Ignoring the parent workspace config.\nTask test:source-format deno test --no-lock --allow-read --allow-write _plugins/check-source-format_test.ts\nWarning: config file file:///home/codex/repos/netscript-007-reference-export/docs/site/deno.json is not a member of the workspace at file:///home/codex/repos/netscript-007-reference-export/. Ignoring the parent workspace config.\n",
+    "truncated": false
+  }
+}

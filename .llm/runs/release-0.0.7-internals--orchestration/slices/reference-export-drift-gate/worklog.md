@@ -271,3 +271,24 @@ for coordinator Tier-A.
   test receipts remain in the evidence index with exact totals. No third attempt ran.
 - No scanner, product/source/generated path, lock, runtime, close-gate, PR state, label, or issue
   state changed.
+
+## Post-eval base refresh — current main integration
+
+Merged current main `0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb` without rewriting evaluated history.
+The merge commit `8c03d862931b64573df9a4bac76ebf266e0ec175` preserves `0d4c82d6e` as its first
+parent and current main as its second parent. Preflight and merge both found exactly the four
+generated publication conflicts briefed by the coordinator.
+
+The first canonical corpus run returned raw exit 1 because the conflict-marked provenance was not
+valid JSON. First-parent provenance was used only as a temporary valid metadata seed, after which
+the canonical generator overwrote the final corpus and provenance from merged inputs. The complete
+generator cascade then returned raw exit 0, and two post-commit full reruns were clean and
+idempotent. Decompressed corpus evidence contains both #1665's query-bridge duplicate-module
+guidance and #1666's Fresh UI reason-bearing omission workflow.
+
+Twelve structured receipts under `receipts/base-refresh/` all PASS at the exact integration head.
+Root test totals are 4,211 passed / 0 failed / 19 ignored. The seventeen-path classifier, no-fifth
+combined-diff proof, history/append-only audit, and lock proof are raw-exit-0. A malformed focused
+checker invocation omitted write permission and returned raw exit 1; the corrected command returned
+raw exit 0 with 6/0, while the authoritative full-suite receipt was already green. Full details are
+in `base-refresh-evidence.md` and `audit/base-refresh/`.
