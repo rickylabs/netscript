@@ -1,6 +1,6 @@
 # Context pack — comparison pages (#1659)
 
-Status: owner Tier-A findings T1–T4 are implemented; replacement S4R generation is next.
+Status: owner Tier-A findings T1–T4 are implemented; S4R assets and final gates are complete.
 
 The page argument is fixed: NetScript puts route identity, a shared read, streaming regions,
 freshness, layout, failure boundaries, and metadata at one entry point. The selector changes only
@@ -36,4 +36,5 @@ backend its own estimate close, add a second move proving that consumers import 
 confirm the real public `baseContract`, and compile both pages' NetScript snippets. Public docs prove
 `baseContract` is the real oRPC builder exported from `@netscript/contracts`; structured scratch
 checks now return zero for both frontend and backend. S3R owns the prose corrections, then S4R
-regenerates every asset and replaces the final gate evidence.
+regenerated every asset and replaced the final gate evidence. All four freshness checks, all three
+docs gates, and both git hygiene gates pass. The draft PR remains `status:impl` for owner re-review.

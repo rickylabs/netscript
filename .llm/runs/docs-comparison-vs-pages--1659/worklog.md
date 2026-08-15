@@ -8,7 +8,7 @@
 | Branch | `docs/comparison-vs-pages` |
 | Base | `e090f894ff3682405a36e4f896ffd2cc16f9a1f8` |
 | Overlay | `SCOPE-docs` |
-| State | Tier-A corrections active |
+| State | S4R complete; awaiting owner re-review |
 
 ## Progress
 
@@ -20,7 +20,7 @@
 | S3 | complete | One route contract, typed service client, validated worker payload, and three competitor implementations. |
 | S4 | superseded | Initial generated layers and gates were green before Tier-A findings changed the backend page. |
 | S3R | complete | Backend estimate close and consumer-contract move added; real public export confirmed; all three scratch checks pass. |
-| S4R | pending | Regenerate all three layers and rerun every final gate from the corrected docs. |
+| S4R | complete | Three layers regenerated in order; final freshness/docs/git gates pass. |
 
 ## Wrapper applicability
 
@@ -73,6 +73,22 @@
   generated artifact.
 - S3R `deno task --cwd docs/site build`: raw exit `0`; docs source format, 638-file render, and
   rendered-output checks pass.
+- S4R generators, in required order: `gen:agent-docs-prose` raw exit `0`,
+  `gen:assets-barrel` raw exit `0`, `gen:publish-assets` raw exit `0`.
+- S4R generated diff is limited to the prose bundle/provenance, generated CLI agent-doc barrel,
+  and generated MCP publish corpus.
+- S4R final freshness: `check:agent-docs-prose` raw exit `0`, `check:assets-barrel` raw exit `0`,
+  `check:publish-assets` raw exit `0`, `check:mcp-export-corpus` raw exit `0`.
+- The first parallel S4R freshness pass produced a transient `check:agent-docs-prose` exit `1`, and
+  the first docs verify produced a transient exit `1`, while a concurrent owner-side gate process
+  rewrote the shared generated site directory. The foreign process was left untouched; both checks
+  returned `0` when rerun sequentially after it exited.
+- S4R `deno task --cwd docs/site verify`: raw exit `0`; 638 files generated, 35,342 internal links
+  across 227 pages resolve, and all 18 caveat markers resolve.
+- S4R `deno task docs:links`: raw exit `0`; 103 docs, zero broken links, zero broken anchors, zero
+  orphans.
+- S4R `deno task docs:accuracy`: raw exit `0`; 199 published pages and 181 shipped corpus files
+  checked.
 - Scratch verification briefly registered its directory as a workspace member so local package
   catalogs resolved. That registration and the generated lock member were removed immediately;
   `deno.json`, `deno.lock`, and `docs/site/deno.lock` returned to their committed state.
@@ -88,3 +104,5 @@
 - S3R: issue #1659 remains open and fully owned by draft PR #1660; `Closes #1659`, milestone
   `0.0.7`, docs/CI labels, and exactly `status:impl` remain correct. The owner Tier-A findings are
   implemented without changing scope or creating follow-up issues.
+- S4R: the replacement generated assets and all requested gates are complete. PR #1660 remains a
+  draft with `status:impl`; the next action is owner re-review, not evaluation or merge readiness.
