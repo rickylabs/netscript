@@ -241,7 +241,7 @@ export class CacheQuery {
       let report: CacheWriteTopologyReport;
       try {
         report = await this.store.set(cacheKey, entry, { expireIn: cacheTime });
-      } catch (error) {
+      } catch {
         recordCacheProviderError(
           span,
           CacheOperations.READ,
@@ -249,7 +249,7 @@ export class CacheQuery {
           this.descriptor,
           CacheEvents.WRITE,
         );
-        throw error;
+        return data;
       }
       recordCacheWrite(span, CacheOperations.READ, namespace, this.descriptor, report);
       return data;

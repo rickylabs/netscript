@@ -80,12 +80,17 @@ behind `CacheStore`; it must not change source-query success semantics.
 | 2026-08-15 | S1 | D2 implementation | Made malformed lookup/write/invalidation evidence fail-safe inside the active span. Invalidation evidence is staged per report and merged only after complete validation. |
 | 2026-08-15 | S1 | D3 implementation | Added the 256-entry process registry, fixed `overflow` collapse, first-overflow span event, and operation-span prologue. Internal admission/reset/prologue helpers remain off both public barrels. |
 | 2026-08-15 | S1 | Focused proof | Telemetry-only suite passed 21/21; expanded cache/query suite passed 32/32. Required rollback, return-value, overflow, composite, reset, and descriptor-order cases are all exercised in `cache-telemetry_test.ts`. |
+| 2026-08-15 | S1 review | Tier-A PASS | S1 accepted at `0e4e26c51`; coordinator authorized S2 only. |
+| 2026-08-15 | S2 | Real-KV RED | New proof failed before the product edit with the real Deno KV `TypeError: Value too large (max 65536 bytes)` through `KvCacheStore.set()` and `CacheQuery.fetchAndCache()`. Structured JSON is preserved in `s2-report.md`. |
+| 2026-08-15 | S2 | D1 implementation | Changed only the post-loader persistence catch to record the existing read/write provider-error vocabulary and return resolved data. Loader, lookup, background refresh, and explicit `setCachedData()` failure behavior remain fail-loud. |
+| 2026-08-15 | S2 | Real-KV GREEN | The same real-Deno-KV test passes, proves the exact payload returns, one loader call, error/incomplete `cache.write` span event, uncached follow-up miss, and awaited `closeKv()` plus `resetKv()` teardown. |
+| 2026-08-15 | S2 | Reconcile | PR body now explicitly names the approved D2 `assertRejects` contract inversion. Draft state, acceptance boxes, labels, milestone, and issue state were not changed; S3 remains unauthorized. |
 
 ## Decisions
 
 See `plan.md` D1-D5. The topic orchestrator granted exactly the five additional paths in
-`scope-boundary.md`; no others. PLAN-EVAL passed and the coordinator authorized S1 only. S2 and S3
-remain forbidden until separate authorization.
+`scope-boundary.md`; no others. PLAN-EVAL and S1 Tier-A passed; the coordinator authorized and this
+slice completed S2 only. S3 remains forbidden until separate authorization.
 
 ## Gate Results
 
@@ -103,15 +108,23 @@ remain forbidden until separate authorization.
 | S1 quality scan | PASS | no findings; 7 existing allowances |
 | S1 architecture check | PASS with warnings | zero failures; the existing SDK source-directory cardinality warning remains non-blocking. Final compaction keeps both changed cache sources below the 500-line cap. |
 | Repository-wide surface diff | FAIL (baseline mismatch, not an S1 pass) | Exit 1 reports widespread undeclared signature drift across many untouched packages; it cannot isolate this leaf. The slice-specific barrel diff is empty, and no admission/reset/prologue helper is re-exported. |
+| S2 real-KV RED | EXPECTED FAIL | Structured exit 1; one failure with the real Deno KV 65,536-byte `TypeError` |
+| S2 real-KV GREEN | PASS | Structured exit 0; 1 passed, 0 failed |
+| S2 SDK check wrapper | PASS | 84 files; 0 failed batches; 0 diagnostics |
+| S2 SDK test wrapper | PASS | 66 passed; 0 failed |
+| S2 SDK lint wrapper | PASS | 84 files; 0 findings |
+| S2 SDK format wrapper | PASS after one corrected formatting finding | Final: 84 files; 0 failed batches; 0 findings |
+| S2 repo-root check | PASS | 2,925 files; 25 batches; 0 failed batches; 0 diagnostics |
+| S2 repo-root test | PASS | 4,203 passed; 0 failed; 19 ignored; 4,222 total |
+| S2 quality gate | PASS with existing warnings | quality scan has no findings; architecture check has zero failures |
 
 ## Handoff Notes
 
 - Inspect D1's real Deno KV RED and D2's replacement of the deliberate fail-loud guard first.
 - Scope is settled at exactly five additional paths; update only the named Query Bridge quotation
   in D4 and enforce its automated byte-comparison proof without sweeping other site docs.
-- S2 must reset and close the process-global `@netscript/kv` singleton in teardown via
-  `resetKv()` / `closeKv()` (`packages/kv/application/shared.ts:187,208`) so root-test ordering cannot
-  inherit an `:memory:` KV.
+- S2's proof awaits both `closeKv()` and `resetKv()` in `finally`; the green repo-root suite confirms
+  an `:memory:` KV does not leak into later files.
 - S3's authorized Query Bridge quotation is a deliberately single-line fenced-code entry. `deno
   fmt` does not reflow it and no markdownlint configuration exists; a later formatter pass must not
   wrap it.

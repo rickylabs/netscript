@@ -6,17 +6,18 @@
 | --- | --- |
 | Run ID | `fix-sdk-cache-surface-and-telemetry--0.0.7-wave3` |
 | Branch | `fix/sdk-cache-surface-and-telemetry` |
-| Current phase | `implementation/S1` — PLAN-EVAL passed; S1 implemented and awaiting Tier-A review |
+| Current phase | `implementation/S2` — S1 Tier-A PASS; S2 implemented and awaiting Tier-A review |
 | Archetype | `3 — runtime behavior` slice; SDK inventory remains Archetype 2 |
 | Scope overlays | `SCOPE-docs` for one authorized Query Bridge quotation |
 
 ## Current State
 
 PLAN-EVAL is terminal PASS at evaluated head `ee1b44c6d`, with evaluator artifact `cd5193b66`.
-Coordinator-authorized S1 implements only D2 and D3: fail-safe malformed evidence inside an active
-span, per-report invalidation rollback, a 256-entry process namespace budget with fixed `overflow`,
-and a first-overflow operation-span event. Draft PR #1665 remains open with `status:plan` and
-milestone `0.0.7`; S2 and S3 remain unauthorized.
+S1 is Tier-A PASS at `0e4e26c51`. Coordinator-authorized S2 implements only D1: after a loader
+resolves, a real cache-persistence rejection records the existing read/write provider-error event
+and returns the resolved data uncached. The real Deno KV limit proof is captured RED before and
+GREEN after in `s2-report.md`. Draft PR #1665 remains open with `status:plan` and milestone `0.0.7`;
+S3 remains unauthorized.
 
 ## Completed
 
@@ -32,12 +33,13 @@ milestone `0.0.7`; S2 and S3 remain unauthorized.
   and run artifacts.
 - The telemetry-only wrapper passes 21/21; the expanded focused cache/query wrapper passes 32/32;
   structured SDK check, lint, and format wrappers pass.
+- S2's real-KV proof passes, the full SDK suite passes 66/66, repo-root check passes 2,925 files,
+  and repo-root test passes 4,203 tests with zero failures.
 
 ## Next Steps
 
-1. Commit and push S1, then stop for the coordinator's fresh Tier-A review.
-2. Do not begin S2's real-KV limit test until separately authorized.
-3. Do not begin S3's diagnostic, CacheStore JSDoc, provider test, or Query Bridge changes until
+1. Commit and push S2, then stop for the coordinator's fresh Tier-A review.
+2. Do not begin S3's diagnostic, CacheStore JSDoc, provider test, or Query Bridge changes until
    separately authorized.
 
 ## Key Decisions
@@ -52,17 +54,17 @@ milestone `0.0.7`; S2 and S3 remain unauthorized.
 
 ## Files Changed
 
-S1 changes only the three authorized cache source files, `cache-telemetry_test.ts`, this package's
-README, and run artifacts. The new S2 test and every S3 path remain untouched.
+S2 changes only `cache-query.ts`, the new real-KV limit test, and run artifacts. Every S1 and S3
+path remains untouched in this slice.
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | S1 PASS | structured SDK check/lint/fmt wrappers |
-| Fitness | S1 PASS with non-blocking warnings | quality scan has no findings; architecture check has zero failures |
-| Runtime | S1 PASS | telemetry 21/21; expanded focused cache/query suite 32/32 |
-| Consumer | Deferred by slice contract | repo-root test is forbidden in S1 and planned later |
+| Static | S2 PASS | SDK and repo-root structured check; SDK lint/fmt wrappers |
+| Fitness | S2 PASS with non-blocking warnings | quality scan has no findings; architecture check has zero failures |
+| Runtime | S2 PASS | real-KV proof 1/1; full SDK 66/66; repo-root 4,203 passed, 0 failed, 19 ignored |
+| Consumer | S2 PASS | repo-root structured check/test cover Fresh, CLI, and other asserting consumers |
 
 The supplemental repository-wide `surface:diff` invocation exits 1 against a stale workspace
 baseline and reports widespread signature changes in untouched packages; it is not represented as
@@ -71,7 +73,7 @@ a pass or as an S1-specific verdict. The direct S1 export proof is an empty diff
 
 ## Open Questions
 
-- S2/S3 authorization only. S1 must stop after its Tier-A handoff.
+- S3 authorization only. S2 must stop after its Tier-A handoff.
 
 ## Drift and Debt
 
@@ -79,8 +81,8 @@ a pass or as an S1-specific verdict. The direct S1 export proof is an empty diff
   runtime profile retained and logged.
 - Baseline: exact six named raw doc-lint diagnostics remain expected red/no-regression evidence.
 - D4 docs alignment is fully owned in-scope.
-- The `@netscript/kv` singleton is process-global. S2 teardown must use `resetKv()` / `closeKv()` to
-  prevent an in-memory KV from leaking into root-test ordering.
+- The `@netscript/kv` singleton is process-global. S2's proof awaits both `closeKv()` and
+  `resetKv()` in `finally`; repo-root test ordering remains green.
 - S3's single-line Query Bridge fenced-code quotation must remain unwrapped; the formatter does not
   reflow it and there is no markdownlint configuration.
 - S1's admission/reset/prologue helpers are direct-file internals and must remain off both barrels.
@@ -89,5 +91,6 @@ a pass or as an S1-specific verdict. The direct S1 export proof is an empty diff
 
 - `89be8da76` — plan/research/Design/scope-boundary bootstrap.
 - `cd5193b66` — terminal PLAN-EVAL artifact on top of evaluated head `ee1b44c6d`.
-- S1 implementation — this slice's implementation/evidence commit; exact hash is recorded in the
+- `0e4e26c51` — S1 implementation, accepted by Tier-A.
+- S2 implementation — this slice's implementation/evidence commit; exact hash is recorded in the
   PR progress comment and coordinator handoff.
