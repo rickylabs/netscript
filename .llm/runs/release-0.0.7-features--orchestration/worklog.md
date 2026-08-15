@@ -352,3 +352,67 @@ cancellation, isolation, plugin-absent UX, capability grants, and the host-owned
 transaction with preview/no-write, rollback, doctor, and manifest-pointer contract. Same bounded
 discipline — one commit, structured receipts, explicit-refspec push, PR comment, run dir in the same
 commit, then a Tier-A stop. S3 is not released by this sign-off.
+
+## 2026-08-15 — S2 Tier-A review: accepted with one carried obligation; S3 released
+
+S2 commit `7a5eb580a8515b8dc1007308a9d917b5e7309f41` (local == remote == PR head), tree clean, turn
+ended `2026-08-15T00:14:04Z` with the literal `TIER-A STOP: slice S2 ready for topic review`, thread
+idle, S3 not started. Scope is 10 files — the RFC (+485 lines) plus the run dir and six receipts —
+with **no `packages/**`, `plugins/**`, or `deno.lock`**.
+
+### Verification performed
+
+| Check | Method | Result |
+| --- | --- | --- |
+| All six contracted S2 sections present | RFC section map | capabilities (480), discovery/registry lifecycle (604), bootstrap (660), isolation/plugin-absent (698), generation transaction (719), doctor/pointer ownership (822); S3 gaps declared (862) |
+| **Declare-before-use sweep** | extracted all 42 `PluginCli*`/`PLUGIN_CLI_*` identifiers from every fenced `ts` block and diffed used vs declared | **42 declared, 42 used, 0 undeclared, 0 orphaned** — the F1 defect class is closed across the whole contract, not just at the one site that was reported |
+| S1 invariants updated in place, not bolted on | RFC 340, 345, 352, 357–358 | the leaf invariant now reads "handler, a generator, children, or one executable plus children" with `handler`/`generator` mutually exclusive; F3's shape-hint sentence generalized to cover generator refs |
+| Live CLI claim: `netscript generate plugins` | `generate-plugin-registries-command.ts:51–53` | `--dry-run`, `--project-root`, `--verbose` — exactly the three claimed, no more |
+| Live CLI claim: `netscript plugin doctor` | `doctor-plugin-command.ts:56,58` | `--project-root <path:string>`, `--resource <name:string>` — exactly as claimed |
+| Receipts | four durable gates | `PASS`, `gitHead == actualGitHead == bd8b29bf3`, labelled `PASS_PARENT_HEAD`; wrapper reports labelled and excluded from the S4 durable set |
+| Honesty about unshipped surface | RFC 856–860 | states the live manifest schema is still top-level `.strict()`, so the new installer block is a target contract with a named prerequisite rather than a shipped claim |
+
+The technically strongest part is the bootstrap section: it identifies that dynamic `import()`
+returns a promise but accepts no `AbortSignal`, so racing it would report a timeout while module
+evaluation continued, and derives the terminable-boundary requirement from that. It also separates
+`handler-unavailable`, `plugin-failure`, `bootstrap-timeout`, `capability-denied`, and
+`plugin-absent` so install advice, repair advice, and fault reports cannot collapse into one generic
+error.
+
+### S2-N1 — a field whose non-empty case can never occur (carried into S3)
+
+`PluginCliCapabilityGrant` (RFC 275–279) declares `requested`, `granted`, and `denied`, and that
+grant is handed to plugin code via `PluginCliInvocationContext.grant` (562) and
+`PluginCliGenerationContext.grant` (757). But line 594 makes denial fatal **before** the handler or
+planner is imported: "if any requested value is denied, the host returns `capability-denied` before
+importing the handler or planner."
+
+So in every grant a handler or planner can actually observe, `denied` is necessarily empty and
+`granted` is necessarily equal to `requested` — three fields carrying one field's information, and
+the RFC never says where a non-empty `denied` is observed. This is the exact defect class
+`milestone-run.md` § Gate integrity names as the signature failure of this kind of work: 0.0.4
+shipped two guards whose predicate could never be true and both looked correct. Resolve it one of
+three ways — state that the grant type is shared with a host-side diagnostic path where `denied` is
+non-empty; narrow the plugin-facing context to `granted` alone; or record explicitly that in contract
+major 1 a plugin-visible grant always has `denied === []` and `granted === requested`, with the
+forward-compatibility reason for keeping the shape. Any is acceptable; silence is not.
+
+### S2-N2 — text-only generation is a real constraint and is not in Drawbacks (observation)
+
+`PluginCliGenerationOperation` carries `content: string` and line 776 fixes plan contents as UTF-8
+text, so a contributed generator cannot emit a binary asset. That is a defensible boundary and
+follows from excluding binary handles, but a scaffold generator wanting to emit an image or archive
+will hit it. Name it in `## Drawbacks` alongside the other accepted costs rather than leaving it to
+be discovered.
+
+### Disposition
+
+**S2 is accepted and signed off.** S2-N1 and S2-N2 are carried into S3 as bounded obligations rather
+than triggering a separate fix-up round: unlike S1's F1–F3, which were a hole and two outright
+contradictions, these are an unstated implication and a missing drawback — the contract is
+internally consistent as written. This mirrors how PLAN-EVAL cycle 2 carried N-1..N-4 into S1.
+
+**S3 is released**: compatibility with the accepted frontend, SDK, runtime, command-composition and
+DevTools RFCs; deploy #904–#908 migration/supersession and the hardcoded-host-command audit; the
+amend/fold-first duplicate audit; JSR obligations; and the later implementation epic with PR-sized
+children. **S4 is not released by this sign-off.**
