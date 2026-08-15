@@ -303,3 +303,45 @@ list, four links into a section owned by a later slice, and an S1 gate structura
 its own content contract. The common thread is per-slice self-consistency, which the PLAN-EVAL
 checklist does not currently test. Raised to the coordinator as a checklist gap, not as a reason to
 doubt this leaf — the plan's substance held and the leaf stopped correctly at every boundary.
+
+## 2026-08-15 — S2 authorized and dispatched
+
+Coordinator authorized S2 immediately on a terminal S1 sign-off, with docs-lane-only serialization
+(no waiting on fixes, internals, or features).
+
+Pre-handoff reconciliation: local `HEAD`, `origin/docs/comparison-docs-programme`, and the daemon's
+view all read `98fc58997`, `dirty=0`, `upstream=NONE` by design, `agents: 0 recent`; Codex daemon
+`running`/managed at `0.147.0` with the control socket intact. Topic checkpoint `706b3ace6` pushed
+before the handoff.
+
+Steered the **same** thread `019ffcc9-16c2-7573-b7f6-d627172408e8` via `agentic:codex-resume`
+(detached, not `timeout`-wrapped). Live PID `2573062`. No replacement sender was created.
+
+### S2 boundary
+
+Six files: the measurement tool and its test under `.llm/tools/docs/`, the two evidence JSON files
+under `docs/site/comparisons/evidence/`, plus `worklog.md` and `context-pack.md`; `drift.md` only on
+divergence.
+
+### Gate strengthened before dispatch (carried from Tier-A finding T2)
+
+The approved `S2-evidence-repro` gate is five commands — check/lint/fmt/test wrappers plus
+`git diff --check` — and contains **no site build and no rendered link check**, even though S2
+writes two new files under `docs/site/**`. As written it cannot prove that adding those files leaves
+the site building and every link resolving: the same structural blind spot that let four dangling
+links through S1's green gate.
+
+Added as mandatory to S2, and as a standing rule for any slice touching `docs/site/**`:
+
+```text
+rtk proxy deno task --cwd docs/site build
+rtk proxy deno task --cwd docs/site check:links
+```
+
+This strengthens evidence and changes no scope. It is the third instance of the same plan-level
+pattern — a slice gate that cannot prove that slice's own contract — and is recorded as such rather
+than treated as a one-off.
+
+Privacy boundary restated to the generator: identifiers, classifications, hashes, and aggregates
+only; never file contents; unmatched Next.js values stay absent/deferred, never zero or estimated.
+Stop after S2 for Tier-A, which will again re-execute the gate independently.
