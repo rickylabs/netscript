@@ -143,3 +143,11 @@ amendment.
 - Focused structured test raw exit `1`: `registerMcpTools` ignored caller cancellation and pending
   discovery remained unsettled.
 - Next: additive registration/registration-stop options and signal forwarding.
+
+## 2026-08-15 — Slice 4 green update (append-only)
+
+- Registration discovery, registered calls, and registration teardown now forward caller options.
+- Existing call sites remain source-compatible through optional/default arguments.
+- Full MCP tests raw exit `0` with 20 passing; targeted check/lint/fmt, quality, and architecture
+  gates all exit `0`.
+- Next: optional/degraded documentation and the complete JSR/publish gate set.

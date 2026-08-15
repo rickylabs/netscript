@@ -220,3 +220,16 @@ and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
 - Focused structured registration test raw exit `1`: caller abort was not forwarded to pending
   discovery, which timed out instead of rejecting.
 - No registration implementation source changed in the RED commit.
+
+## 2026-08-15 — Slice 4 registration cancellation implementation
+
+- Added an optional `McpConnectOptions` argument to `registerMcpTools` and its registration handle's
+  `stop`, preserving all existing two-argument/zero-argument call sites.
+- Forwarded the registration signal through discovery and registered tool calls; registration stop
+  forwards its own caller options to transport stop.
+- Full structured MCP test file raw exit `0`, 20 passed, including discovery and registered-call
+  cancellation.
+- Targeted four-file structured check (`--unstable-kv`), lint, and fmt each raw exit `0`.
+- `deno task quality:scan` raw exit `0`, no findings.
+- `deno task arch:check` raw exit `0`, baseline warnings only.
+- `deno.lock` unchanged. No expensive runtime gate ran.

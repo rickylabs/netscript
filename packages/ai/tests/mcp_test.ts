@@ -159,6 +159,20 @@ class AbortableListTransport extends RecordingTransport {
   }
 }
 
+class AbortableCallTransport extends RecordingTransport {
+  callSignal: AbortSignal | undefined;
+
+  override callTool(
+    name: string,
+    args: Readonly<Record<string, unknown>>,
+    options: McpConnectOptions = {},
+  ): Promise<McpToolResult> {
+    this.callSignal = options.signal;
+    options.signal?.throwIfAborted();
+    return super.callTool(name, args, options);
+  }
+}
+
 function headersOf(value: unknown): Readonly<Record<string, string>> | undefined {
   if (typeof value !== 'object' || value === null) {
     return undefined;
@@ -281,6 +295,25 @@ Deno.test('registerMcpTools settles discovery when its caller aborts', async () 
 
   assertEquals(await settlementWithin(pending), 'rejected');
   assertEquals(transport.listSignal?.aborted, true);
+});
+
+Deno.test('registerMcpTools propagates cancellation to registered calls', async () => {
+  const registry = createToolRegistry();
+  const transport = new AbortableCallTransport('demo', [searchTool]);
+  const controller = new AbortController();
+  await registerMcpTools(registry, transport, { signal: controller.signal });
+  const handler = registry.resolveHandler('demo_search');
+  assert(handler !== undefined);
+  controller.abort(new DOMException('tool deadline', 'AbortError'));
+
+  await assertRejects(() =>
+    Promise.resolve(handler({
+      id: 'call-1',
+      name: 'demo_search',
+      arguments: '{"q":"netscript"}',
+    }))
+  );
+  assertEquals(transport.callSignal?.aborted, true);
 });
 
 Deno.test('McpTransportPool keys servers and prefixes remote tool names', async () => {

@@ -1,11 +1,15 @@
-import type { McpToolRegistry, McpTransportPort } from '../../ports/mcp-transport.ts';
+import type {
+  McpConnectOptions,
+  McpToolRegistry,
+  McpTransportPort,
+} from '../../ports/mcp-transport.ts';
 
 /** Handle returned by {@linkcode registerMcpTools}. */
 export interface McpToolRegistration {
   /** Names currently surfaced into the registry. */
   readonly toolNames: readonly string[];
   /** Remove all surfaced tools and detach state listeners. */
-  stop(): Promise<void>;
+  stop(options?: McpConnectOptions): Promise<void>;
 }
 
 /**
@@ -14,6 +18,7 @@ export interface McpToolRegistration {
 export async function registerMcpTools(
   registry: McpToolRegistry,
   transport: McpTransportPort,
+  options: McpConnectOptions = {},
 ): Promise<McpToolRegistration> {
   const registered = new Set<string>();
   let syncing: Promise<void> | undefined;
@@ -27,14 +32,12 @@ export async function registerMcpTools(
 
   const addCurrent = async (): Promise<void> => {
     removeRegistered();
-    const tools = await transport.listTools();
+    const tools = await transport.listTools(options);
     for (const tool of tools) {
       registry.register(
         tool,
         async (call) =>
-          await transport.callTool(tool.name, parseArguments(call.arguments), {
-            signal: undefined,
-          }),
+          await transport.callTool(tool.name, parseArguments(call.arguments), options),
       );
       registered.add(tool.name);
     }
@@ -54,7 +57,7 @@ export async function registerMcpTools(
       removeRegistered();
     }
     if (state === 'connected') {
-      syncCurrent();
+      syncCurrent().catch(() => removeRegistered());
     }
   });
 
@@ -64,10 +67,10 @@ export async function registerMcpTools(
     get toolNames(): readonly string[] {
       return [...registered];
     },
-    async stop(): Promise<void> {
+    async stop(stopOptions: McpConnectOptions = {}): Promise<void> {
       unsubscribe();
       removeRegistered();
-      await transport.stop();
+      await transport.stop(stopOptions);
     },
   };
 }
