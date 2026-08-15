@@ -250,3 +250,71 @@ bounded: draft PR, no verdict bound to that head, remedied by a follow-up commit
 S1 Tier-A **PASS** at `e100ea205`. Proceeding to S2 (docs correction, factory-loader regression, and
 the four-mirror cascade) carrying advisories **A1** (S2 page sentence is manual evidence — a
 `docs-accuracy` receipt must not be cited as proof) and **A4** (line-107 posture clause).
+
+---
+
+# Tier-A — plan-only amendment S2-A at `ef3e43f06c807356aeabfc172427239bcafd5144`
+
+| Field | Value |
+| --- | --- |
+| Head | `ef3e43f06c807356aeabfc172427239bcafd5144` — local == remote == PR, draft, sole `status:plan` |
+| Commit | `docs(harness): amend S2 fresh-hit scope` |
+| Verdict | **PASS** |
+
+## Commit hygiene — the hazard this amendment was most likely to hit
+
+| Check | Result |
+| --- | --- |
+| Paths in the commit | **exactly 5**, all under `.llm/runs/fix-sdk-cached-entry-swr--0.0.7-wave5/` (`context-pack.md`, `drift.md`, `plan.md`, `research.md`, `worklog.md`) |
+| Non-run-artifact paths | **0** |
+| Three in-progress S2 files | still **modified-but-uncommitted**: `docs/site/services-sdk/sdk.md`, `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md`, `packages/sdk/tests/query/query-factory_test.ts` |
+
+A reflexive `git add -A` here would have swept in-progress S2 source into the amendment commit and
+destroyed the plan-only property of the very head under review. It did not happen. Verified by
+executed command rather than accepted from the slice report.
+
+## Exact condition — as ruled
+
+`plan.md:79` states the correction verbatim:
+
+```ts
+if (isExpired || (!isFresh && preferFreshOnStale)) {
+```
+
+`plan.md:85` records that expired precedence is unchanged and that only a stale entry with
+`preferFreshOnStale` enters the blocking path. Risk row `:185` re-pins the same predicate, and
+`plan.md:145-146` states the failure mode plainly — applying the blocking preference before the
+fresh-hit branch without a `!isFresh` guard "silently converts a fresh hit into an upstream fetch and
+falsifies the published contract". A fresh non-expired entry therefore falls through to the existing
+`if (isFresh) return cached.value.data`.
+
+## Baseline citation — correct, and independently reproduced
+
+`drift.md:133` cites the defect at **both** `main@3e8e146a4:170` **and** accepted S1 head
+`e100ea205:165`, before `if (isFresh)`. `:134` classifies it as a "pre-existing baseline defect
+exposed by S2, not introduced by S1". This review reproduced both locations directly. Citing the S1
+head alongside the base is the right call — it forecloses any later reading of this as an S1
+regression.
+
+## Query-factory-only proof — sufficient, no further path needed
+
+`query-factory_test.ts` constructs `new CacheQuery(store)` against a `MemoryCacheStore` and installs
+it via `setCacheProvider` (`:57-58`, `:80-81`). It therefore controls the store directly, can seed an
+entry with a chosen timestamp, and can count loader invocations — everything required to prove
+"fresh + `preferFreshOnStale` ⇒ no fetch", "stale + flag ⇒ blocking fetch", and "expired ⇒ fetch".
+
+**The granted surface is adequate; `cache-query_test.ts` is not needed** and correctly stays
+ungranted. The amendment does not ask for it.
+
+## S1 preservation
+
+Risk row `:185` requires retaining expired precedence, **all A2/A3 machinery and documentation**, and
+re-running focused/full SDK plus `quality:gate` with the file remaining below the F-1 threshold.
+`plan.md:273` scopes S2-A to "only the exact fresh-hit predicate correction". The change is a
+one-line predicate edit, so the 497-line / no-F-1 result is unaffected by construction. The amendment
+commit touched no source at all, so S1's landed behaviour is intact at this head by definition.
+
+## Outcome
+
+S2-A Tier-A **PASS** at `ef3e43f06`. Resuming the same original author for the single-line source
+correction and S2 continuation. No evaluator, no runtime lease, PR stays draft at sole `status:plan`.
