@@ -515,6 +515,43 @@ single structured PR comment, and forbids a second cycle, ready flip, merge, iss
 next leaf. It also directs the evaluator to re-derive the T-3 classifier behavior itself rather than
 accept the Tier-A table, and to judge residual R-1.
 
+### #1661 IMPL-EVAL — canonical route, lease recorded before mutation
+
+Coordinator granted exactly one fresh, separate, opposite-family formal IMPL-EVAL. Identity, route,
+and lease are recorded **before** the evaluator mutates anything, per the grant.
+
+| Field | Value |
+| --- | --- |
+| Gate | IMPL-EVAL cycle 1, PR #1661 (#1448) |
+| **Evaluated head** | `e3c74d7aaf3b7734b5a44a5be248c01f004c21e5` — the Tier-A sign-off; equal across local, `origin`, and PR `headRefOid`; tree clean |
+| Reviewed implementation head | `3a4bc66c4832baf8f209e47cc08c3a336e2ff100` (ancestor; delta to evaluated head is artifact-only) |
+| Immutable base | `284dda90a17a13a7e5e8e9834e5411b58887131b` |
+| **Requested route** | **canonical** `formal_impl_evaluation` — native Claude `claude-fable-5` · effort `medium` · `--remote-control` |
+| Observed route | `respawnFlags: ["--effort","medium","--permission-mode","bypassPermissions","--remote-control","--name","NetScript 0.0.7 #1661 IMPL-EVAL","--model","claude-fable-5"]` |
+| Background id | `cb917802` |
+| Claude session id | `cb917802-ee26-4b89-86b9-0eee33c7de1b` |
+| PID | `520689` |
+| cwd | `/home/codex/repos/netscript-007-leaf-ai-mcp-pool` (exact leaf; sole session there) |
+| Registry `bridgeSessionId` | `session_01Kwmr8XjoznnQsHUnkmfcnV` (non-empty, sessions-registry form) |
+| Remote Control URL | `https://claude.ai/code/session_01Kwmr8XjoznnQsHUnkmfcnV` |
+| Independence | fresh session, separate from the Codex author `01a0048d-61b0-76a2-8117-5f8ce0466495` **and** from this orchestrator, which ruled both amendments and signed Tier-A |
+| Verdict | _pending — immutable pushed verdict required_ |
+
+**Route note.** `lane-policy.md:46` renders `formal_impl_evaluation` as **Fable 5 · medium for Codex
+work**. The coordinator's grant said "canonical routing policy", so this gate uses **Fable 5**, not
+the Opus override that an earlier leaf in this lane carried under an explicit owner amendment. The
+distinction is recorded so the two are not later conflated.
+
+The brief tells the evaluator plainly that this orchestrator's Tier-A `PASS` and both contract
+rulings are **inputs to verify, not substitutes for its judgment**, and names this orchestrator's
+two prior analytical errors so nothing is inherited. It requires an **immutable pushed verdict**
+(artifact-only commit, explicit refspec), bars Aspire/Docker/`scaffold.runtime`/`e2e:cli`/browser and
+any lease request, keeps evaluation read-only over source, and forbids a second cycle, ready flip,
+merge, relabel, issue mutation, and any next leaf.
+
+The next fixes leaf (`sdk-cache-surface-and-telemetry`) stays **queued** until this evaluator and the
+lifecycle transition are terminal.
+
 ## Wave 0 lane assignments
 
 | Leaf | Branch | Implementation route | Formal evaluator (per `dispatch.json`) |
