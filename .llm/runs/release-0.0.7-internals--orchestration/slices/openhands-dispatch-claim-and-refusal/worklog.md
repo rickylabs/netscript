@@ -26,7 +26,9 @@
 - `ImmutableHead` — live 40-character PR SHA read by the CLI, never caller-supplied.
 - `PhaseClaimKey = { generation, phase, head }` — existing exactly-once spend identity.
 - `CommandCandidate` — literal command-token occurrence not excluded by status/refusal marker.
-- `ReportableDenial` — policy denial that requires one author-visible reply.
+- `ReportableDenial` — exactly `command-not-first-token`, `invalid-command-argument`,
+  `unknown-command-argument`, `duplicate-command-argument`, or `author-not-authorized`; each
+  requires one author-visible reply.
 - `RefusalMarker` — stable source-comment-keyed idempotency/recursion marker.
 - `GenerationRetry` — five attempts at one-second intervals, matching read-only precedent.
 
@@ -74,23 +76,30 @@ surfaces mirror those boundaries in the same order.
 | 2026-08-15 | Plan | Research | Re-read #1611/#1613 and traced producer, predicate, claim, refusal, retry, and tests. |
 | 2026-08-15 | Plan | Rescope stop | Recorded significant contract drift and stopped without widening the four-path envelope. |
 | 2026-08-15 | Plan | Contract amendment | Verified central amendment `feaf2da31`; replaced blocked plan with exact eight-path design and ordered slices. |
+| 2026-08-15 | Plan gate | PASS | Separate evaluator commit `e15d78588` records PASS against plan head `cea999d18`; implementation authorized at S1. |
+| 2026-08-15 | S1 | RED | Added candidate/refusal/recursion regressions first; targeted structured test wrapper exited 1 because the new policy exports did not exist. |
+| 2026-08-15 | S1 | Implementation | Added literal candidate classification, explicit five-reason reportable set, marker exclusions, and controlled source-comment refusal replies; targeted suite passed 16/16 after implementation. |
 
 ## Decisions
 
 | Decision | Reason | Source |
 | --- | --- | --- |
-| S1 precedes workflow broadening | The production guard and token-free reply must be proven before literal candidates reach workflow authorization. | coordinator semantics; `plan.md` |
+| S1 precedes workflow broadening | S4 consumes the candidate/refusal API introduced by S1. Feature-branch commit order does not itself protect live spend: both the `issue_comment` workflow definition and trusted policy checkout resolve from the default branch, so intermediate branch commits cannot affect dispatch. | evaluator N1; `openhands-agent.yml:164` |
 | CLI alone resolves formal head | Verdict provenance cannot trust caller input. | amendment `feaf2da31` |
 | PLAN-EVAL required | Workflow permissions plus atomic claim/spend have silent and recursive failure modes. | coordinator decision; harness plan gate |
 | JSR audit N/A | No publishable package/plugin surface. | amended contract |
 
 ## Gate Results
 
-No implementation gate was fired in this planning turn. `check`, `test`, and `quality-job` remain
-`NOT_RUN`, never PASS. No receipts were created.
+Durable slice receipts are pending the committed S1 head. The targeted RED/GREEN loop used the
+structured test wrapper directly: RED exit 1 before implementation, then GREEN exit 0 with 16/16
+tests after implementation. Of the frozen proving gates, only `test` exercises this leaf;
+`check` and `quality-job` select package/plugin roots and will be recorded as contract receipts,
+not as independent behavioral proof.
 
 ## Handoff Notes
 
-- Plan is ready for Tier-A review, then a separate native opposite-family PLAN-EVAL.
-- No implementation begins until PLAN-EVAL PASS.
+- PLAN-EVAL passed in separate evaluator commit `e15d78588` before implementation.
+- S1 stops after its durable receipts, push, and PR comment for Tier-A substantive review.
+- S2 is not authorized until that review.
 - This thread did not dispatch OpenHands/evaluator work or apply workflow-triggering labels.
