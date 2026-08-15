@@ -514,3 +514,14 @@ implementation thread.
   test still demanding that forbidden import. The assertion was repaired in the same slice to
   prove exact import-set equality, absence, and literal order. A later slice label cannot justify
   knowingly carrying a red suite or a stale already-disproven contract.
+- **A gate command is not evidence that its planned scenario exists:** #1664 reached four cheap
+  PASS receipts and requested the runtime lease, but the accepted pre-lease contract required a
+  concrete second-service `payments` flow, cross-resource key isolation, idempotent regeneration,
+  and a live Rename with exactly one settled refetch. The branch only added a gate to the suite;
+  none of those assertions existed. Lease review must inspect scenario presence, not infer it from
+  suite membership or a future command name.
+- **Structured formatter correctness can depend on batching as well as config:** the CLI format
+  proof needs an absolute neutral same-style config and a single 1000-file batch. The same config
+  with default batching produces non-zero `failedBatches` and zero findings. That result is a
+  fail-closed refusal, never a formatting pass; the original failed invocation remains append-only
+  evidence rather than being erased by the corrected proof.

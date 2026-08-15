@@ -700,3 +700,26 @@
   `publish-dry-run`, `arch-check`). A red result must stop for exact attribution; it cannot trigger
   an inline product repair. `scaffold.runtime`, `fresh-browser`, Aspire, Docker, S5, and every
   evaluator remain explicitly unauthorized and the singleton runtime lease remains free.
+
+## 2026-08-15T15:12:31Z — final cheap evidence converges; pre-lease scenario gap intercepted
+
+- #1665 completed S2 at `1cf76c6dd` and S3 at `9a26c107a`. The fixes supervisor independently
+  reproduced the real Deno KV RED, focused 1/0, SDK 66/0, root 4203/0/19, uncached 2925-file check,
+  exact fail-loud/teardown boundaries, normalized provider-message/docs identity, mandatory-evidence
+  JSDoc, exact six named red diagnostics, publish dry-run, quality, and architecture evidence. Its
+  S3 Tier-A checkpoint is `aa4749da4`. One fresh native Fable 5/medium Remote Control IMPL-EVAL is
+  active as job `1fbb1c07-…`, bridge `cse_01JePyQuiERLe8GeWWKQp5wL`, bound to `9a26c107a`; evaluator
+  mutation is verdict-artifact-only.
+- #1664 S4 needed two honest stops. First, the formatter wrapper exposed a root-exclusion plus
+  multi-batch interaction; the corrected CLI proof used the same neutral style in one 1000-file
+  batch and retained the original failure report. Second, the binding test gate—not the earlier
+  `./src/` stand-in—found the leaf-caused stale service-suite expectation. Topic review authorized
+  one exact order-sensitive insertion; fresh receipts then passed check, test 4202/0/19,
+  publish-dry-run, and arch-check at content head `32ea23f50`. S4 Tier-A passed at evidence head
+  `1c1f45820`, topic `84568f2ff`.
+- Coordinator rejected the initial S5 lease request because accepted `plan.md` release condition 3
+  is not implemented. Full-tree and base-to-head searches find no `payments` add/generate scenario,
+  no users/payments key-isolation proof, and no live Rename assertion requiring exactly one settled
+  `users.list` refetch plus persisted DOM value. The same original Sol/high author must add a named,
+  bounded CLI e2e proof slice, renew affected cheap gates and all four receipts, and stop for fresh
+  Tier-A. `scaffold.runtime`, `fresh-browser`, Aspire, Docker, and the singleton lease remain unused.

@@ -401,3 +401,15 @@ must stop for attribution and scoped review. No runtime lease exists and `scaffo
 rerunning the full root check/test after tightening KV initialization inside the mandatory
 `try/finally`; its earlier green receipts were correctly invalidated rather than reused. #1663
 remains at the genuine owner-only exceptional-evaluator boundary.
+
+Resume from the authoritative `2026-08-15T15:12:31Z` transition. Main remains `baf1cdf67` and
+runtime ownership remains empty. #1665 implementation is complete through S3 at `9a26c107a`, fixes
+Tier-A `aa4749da4`; its sole fresh Fable 5/medium Remote Control IMPL-EVAL is active as
+`1fbb1c07-…`, bridge `cse_01JePyQuiERLe8GeWWKQp5wL`, and may change only `impl-eval.md`. #1664 S4
+cheap convergence is Tier-A PASS at evidence head `1c1f45820`, content head `32ea23f50`, topic
+`84568f2ff`, with four renewed PASS receipts. Do not grant its S5 lease yet: coordinator finding F2
+proved the plan-required `payments` second-service, key-isolation, idempotent regeneration, and live
+Rename/+1-refetch scaffold scenarios are absent. The preserved Sol/high author is recovering that
+exact precondition under the features supervisor, after which all affected cheap gates and four
+receipts must be renewed and independently reviewed. Fresh's controlled-clock browser prerequisite
+is already present. #1663 remains at its owner-only exceptional evaluator boundary.

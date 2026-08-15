@@ -490,3 +490,19 @@ S2 acceptance on #1664 required both call-graph review and the full CLI suite: t
 were green while a stale template assertion still encoded the removed bridge import. The repaired
 gate is now executable in all three dimensions: exact allowed import set, forbidden legacy symbol,
 and direct invalidation literal order. Runtime ownership remains empty.
+
+### Live transition — 2026-08-15T15:12:31Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Queue exhausted and parked at `0ca4c489f` | Do not invent post-freeze work |
+| internals | #1663 remains at the exceptional-final-PLAN-EVAL owner boundary on `194e22a3d` | No third evaluator or product mutation without the owner's explicit verdict |
+| fixes | #1665 S3 Tier-A `PASS` at `9a26c107a` / topic `aa4749da4`; fresh Fable 5/medium Remote Control IMPL-EVAL `1fbb1c07-…` is active | Verdict artifact only; no runtime gate, readiness, relabel, or product repair during evaluation |
+| features | #1664 S4 Tier-A `PASS` at `1c1f45820` / topic `84568f2ff`, but pre-lease finding F2 is under bounded same-author recovery | No lease or expensive gate until the missing exact scaffold scenarios exist, cheap receipts are renewed, and fresh Tier-A passes |
+
+#1664's four cheap receipts are genuine and sufficient at content head `32ea23f50`, but cheap
+convergence is not itself a runtime-lease grant. The accepted plan requires the `payments` second
+service, key-isolation, idempotent regeneration, and live Rename/+1-refetch scenarios to exist
+before lease acquisition; none exists at `1c1f45820`. The Fresh controlled-clock prerequisite does.
+Serialization remains per topic. The singleton runtime mutex is free; Docker and Aspire application
+ownership are empty.
