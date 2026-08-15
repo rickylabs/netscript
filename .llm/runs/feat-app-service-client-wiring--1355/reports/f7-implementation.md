@@ -69,3 +69,12 @@ boundary exists.
 All five S5 attempt logs and hashes, the superseded-red `f6-test.json`, every prior report/receipt,
 and the Fresh/SDK attributed baselines remain append-only and unchanged. No runtime lease,
 `scaffold.runtime`, `fresh-browser`, Aspire, Docker, evaluator, readiness, or metadata action ran.
+
+## Binding stop
+
+At immutable content head `e45144db643f6bde85552a615812c8371e4ce792`, `f7-check.json` passes
+with zero diagnostics and `f7-test.json` fails only while the unchanged teardown walker traverses
+the preserved Postgres-owned S5 attempt-5 workspace. The test gate reports 4,236 passed, 1 failed,
+19 ignored, and 4,256 total—exactly eight more total results than F6, matching the eight added F7
+tests. `publish-dry-run` and `arch-check` were not started and no receipts were authored. Exact-set
+sufficiency is `INSUFFICIENT`; see `reports/f7-binding-test-failure.md` for full attribution.

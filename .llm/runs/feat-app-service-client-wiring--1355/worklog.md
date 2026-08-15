@@ -843,3 +843,23 @@ related probe files and returned zero diagnostics/findings. Full details are in
 The four binding receipts remain pending until product/test plus this run state are committed at a
 clean immutable content head. No expensive gate, lease, browser, Aspire, Docker, evaluator,
 readiness, metadata, lockfile, documentation, or third product/test path was touched.
+
+### F7 binding stop — unreadable attempt-5 runtime workspace
+
+Immutable content head `e45144db643f6bde85552a615812c8371e4ce792` has a passing binding
+`check` receipt and an honest failing binding `test` receipt. The sole failure is the unchanged
+forbidden-command walker receiving `PermissionDenied` under the preserved
+`plugin-smoke-20260815-213942/.data/postgres/18/docker` tree (mode `0700`, owner `dnsmasq:root`). The
+walker has no diff from `c53726c69` and was last changed by `4634afe56` on 2026-08-03. This is S5
+attempt-5 runtime residue, not F7 source.
+
+The full result arithmetic is 4,236 passed / 1 failed / 19 ignored (4,256 total). F6 attempt 2 had
+4,248 total; the exact eight-result increase matches the focused test file's 14→22 increase, and all
+eight pass in the 22/0 focused run. The binding red still stops the sequence: no publish or
+architecture receipt was run or authored, and there was no retry or residue mutation.
+
+`evaluateEvidenceSet` over exactly `receipts/f7-check.json`, `receipts/f7-test.json`,
+`receipts/f7-publish-dry-run.json`, and `receipts/f7-arch-check.json` reports **INSUFFICIENT** because
+`test` is `FAIL` and the latter two receipts are missing. Full evidence is in
+`reports/f7-binding-test-failure.md`. No expensive gate, lease, browser, Aspire, Docker, evaluator,
+readiness, metadata, lockfile, documentation, or product repair occurred.

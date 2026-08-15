@@ -151,15 +151,16 @@ defect and binds a strict explicit override; it is not an environmental capabili
   tail, and a target/status startup race. The focused deterministic suite passes 22/0 with a
   managed Chromium 151 path supplied only through the environment; direct selection reports the
   exact override path/source and `Google Chrome for Testing 151.0.7922.34`. F6 teardown and all
-  refetch assertions remain intact. Binding receipts await a clean immutable content commit.
+  refetch assertions remain intact. Binding check passes at content `e45144db6`; binding test is an
+  honest environmental red (4,236/1/19) on the unreadable S5 attempt-5 Postgres residue. No retry or
+  downstream receipt ran; the exact four-file set is currently INSUFFICIENT.
 
 ## Next Steps
 
-1. Commit the F7 two-path implementation and current run artifacts at one immutable content head.
-2. Run the four ordinary binding gates serially through `run-gate.ts` with distinct F7 invocation
-   IDs, then recompute sufficiency over the four exact receipt files.
-3. Commit/push the generated evidence, post `[PHASE: IMPL] [SLICE: F7]`, and stop for fresh Tier-A.
-   Do not request a lease, retry runtime, run either expensive browser gate, or start evaluation.
+1. Commit and push the F7 check PASS, test FAIL, exact attribution, and insufficient-set result.
+2. Post `[PHASE: IMPL] [SLICE: F7] [GATE-STOP]` naming the two present and two missing receipts.
+3. Stop for coordinator/Tier-A disposition. Do not retry, mutate the runtime residue, request a
+   lease, run downstream/expensive gates, or start evaluation.
 
 ## Key Decisions
 
