@@ -2074,3 +2074,59 @@ against the slices that own them.
 
 No `scaffold.runtime`, no `fresh-browser`, no lease, no expensive execution. Product tests and a
 Tier-A stop are required.
+
+### S1 Tier-A — accepted; S2 released
+
+Commit `5ac6efa308599eac9290977215af5c951fcf46ee`, pushed, local == remote, clean tree. Scope:
+`packages/sdk/src/query-client/key-bridge.ts`, new `key-bridge_test.ts`, run artifacts. No
+`packages/cli`, no `packages/fresh`, no `deno.lock`, no `docs/**`.
+
+| Check | Result |
+| --- | --- |
+| **Public surface delta** | **none** — the `key-bridge.ts` diff adds no exported symbol. D8 honoured |
+| Stale doc | `cache_query` gone from the file entirely |
+| JSDoc pointer | present at `key-bridge.ts:30` → `factory.<action>.clientKey()` |
+| `deno check` | clean |
+| `deno test ./src/query-client/` | **2 passed, 0 failed** |
+| PR comment | `[PHASE: IMPL] [SLICE: S1]` posted — the per-slice trail is working |
+
+**The test choice is the strong part.** It imports `partialMatchKey` from `@tanstack/query-core`
+rather than hand-rolling a prefix comparison, so it proves the **actual matcher TanStack uses for
+invalidation**. A locally reimplemented comparison could agree with a wrong assumption and still pass;
+this cannot. That is what makes it a genuine S6 regression lock rather than a restatement of the
+author's own model.
+
+**The author sharpened two constraints beyond instruction.** C1's allowlist is now specific to module
+specifiers — exactly `createServiceClient` from `@netscript/sdk/client` and `createQueryFactories`
+from `@netscript/sdk/query` — where my dispatch named only the symbols. And C2's `Enabled: false`
+question, which the evaluator merely asked to be *decided*, was decided: all manifest entries
+including disabled ones receive owned modules (`plan.md:210`). C3's `generate-aspire_test.ts` is
+marked new.
+
+### Measured baseline carried — pre-existing SDK doc-lint failures
+
+`deno doc --lint packages/sdk/mod.ts` reports **2 `private-type-ref` errors**, both on `QueryClient`:
+`src/ports/query-client.ts:41` (`QueryClientPort`) and
+`src/query-client/query-client-factory.ts:44` (`createNetScriptQueryClient`).
+
+I measured the same two at `c53726c69` — **before** S1 — in files S1 never touched, using a detached
+worktree at that commit rather than inferring it. So S1 neither caused nor fixed them. Recorded now
+rather than at final evidence time because the plan lists "full export-map doc-lint" as supplemental
+per-member evidence: the SDK result must be reported as **2 pre-existing errors carried**, never as
+clean, and never relabelled as this leaf's work. Fixing them is a separate decision to raise, not
+something to fold silently into a later slice.
+
+This is the discipline that caught #1293's real defect — measure the baseline before you change
+anything, so a later green cannot be mistaken for work you did, and a later red cannot be blamed on
+you.
+
+### S2 released
+
+The CLI generator contract slice, with C1 restated as an **executable allowlist assertion** rather
+than a described property, C2's pre-write validation naming the service and expected contract path,
+generator ownership fixed at `apps/<app>/lib/<service>.ts` with the route example staying init-owned,
+whole-command `--dry-run`/`--force`, and an explicit instruction that `embedded.generated.ts`
+regeneration must be real and pass the asset-freshness check — template-only edits leave the shipped
+scaffold stale, which is the trap recorded in memory as `cli-asset-edits-need-barrel-regen`.
+
+No expensive gate, no lease, no S3.
