@@ -557,3 +557,42 @@ than the pin, found none, and concluded no improvements existed. The correct com
 against what the comments described: the comments predate improvements that are ancestors of the
 pin. The coordinator's correction and the owner's statement were both right, and the lane lost time
 on a false blocker.
+
+## 2026-08-15 — S3 resumed after the E0 correction (final approved slice)
+
+Pre-handoff reconcile: leaf `54e1c3bff` with local, remote, and PR head in agreement and a clean
+tree; thread idle at `task_complete`; Codex daemon `running`/managed at `0.147.0`; read-only input
+clean at `5191de8`. Resumed the same thread `019ffcc9-16c2-7573-b7f6-d627172408e8`, detached, PID
+`109856`. No replacement sender has ever been created for this leaf.
+
+Three items were marked settled in the brief so the leaf does not reopen them:
+
+- the two rewritten #1551 comments are canonical as they stand — no further edit, addendum, or
+  follow-up;
+- the pin does not change, and no new input root is provisioned;
+- the coordinator has ruled that the manifest's published reproducibility identifiers are **not** a
+  blocker. This lane raised that as an owner-awareness item at S2 sign-off; it is now decided and
+  will not be re-raised.
+
+Two obligations carried forward from earlier corrections, restated up front rather than left to be
+caught at review:
+
+1. S3 inherits the rendered-root assertion deferred from S1 and must assert that **both**
+   `/comparisons/` and `/migration/` render under Concepts, re-adding the migration xref wiring S1
+   was made to drop.
+2. `_data.ts` remains outside the approved S3 file list, so restoring `/migration/` to the Concepts
+   `roots` is a divergence to be recorded in `drift.md` and stated in the PR comment, never added
+   silently.
+
+One new consistency obligation, created by E0: the docs case page and the rewritten comment
+`5265826161` must not contradict each other on pin, measured counts, feature inventory, evidence
+labels, or deferrals. Where they conflict, the S2 evidence files are authoritative — fix the page
+and report the discrepancy rather than silently reconciling.
+
+The S3 gate needs no orchestrator addition: `deno task --cwd docs/site verify` already chains
+`build && check:links && check:caveats`, so the rendered link contract exposed by finding T2 is
+covered natively. The `deno doc` rows are read-only public-surface inspection and authorize no
+`packages/**` edit.
+
+Stop is after S3 for Tier-A, whose gate this orchestrator will re-execute; then the run stops for a
+separate opposite-family IMPL-EVAL that the leaf may not launch.
