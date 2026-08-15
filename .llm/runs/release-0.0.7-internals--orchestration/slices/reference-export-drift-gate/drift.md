@@ -55,3 +55,19 @@
 - **Gate drift:** old receipts and IMPL-EVAL remain append-only evidence for old heads. All
   applicable receipts must be recut coherently at one future clean committed content head, followed
   by a fresh coordinator-owned delta IMPL-EVAL.
+
+## SA-4 — canonical generation
+
+- **Implementation drift:** none. Canonical generation changed exactly the four approved cascade
+  paths; two pre-commit passes were byte-idempotent, and the clean content-head rerun was a no-op.
+- **Evidence red:** the head-bound full-test receipt is raw exit 1 because the repository safety
+  scan found `aspire stop --all` in foreign `.llm/tmp/claude/hooks/unscoped/events.jsonl`. The red
+  is preserved and the evidence set remains `INSUFFICIENT`; foreign scratch was not deleted to
+  manufacture a green.
+- **Known baseline reds:** Contracts and Fresh UI doc-lint remain raw exit 1 at their unchanged
+  counts. `check:mcp-export-corpus` remains raw exit 1 and its generator was not run.
+- **Publication framing:** CLI and MCP member dry-runs explicitly include the regenerated assets;
+  this is static packaging evidence, not real-publish proof. All exact internal member pins remain
+  `0.0.6`.
+- **Boundary drift:** none. Seventeen-path and lock audits pass; fresh-browser and close-gate remain
+  `NOT_RUN`, and all runtime/readiness/coordinator mutations remain `NOT FIRED`.

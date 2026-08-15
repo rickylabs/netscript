@@ -227,3 +227,27 @@ for coordinator Tier-A.
   occur. Fresh delta IMPL-EVAL remains coordinator-owned and required before readiness.
 - `fresh-browser` stays N/A/waived and `NOT_RUN`; runtime, close-gate, label, issue-box,
   draft-state, merge, publish, lock, and central-state mutations remain `NOT FIRED`.
+
+## SA-4 canonical generation and coherent content-head evidence
+
+- Fresh Tier-A passed SA-3 at `f98cfabac`; canonical generation then ran in locked D12 order.
+- The first fully observed and second idempotence passes returned raw exit 0 for all three owners.
+  Both produced exactly the four approved outputs and the same binary diff SHA-256
+  `a47278e3c07b2c31358ca2e5d1fbdf9f5539e265e280848b875b9ab6984ae9bc`.
+- Generated content was committed alone at `46528ae4c71b3744f0af64bd749d01d831f70c89`. A clean-head
+  third owner pass returned raw exit 0 for all three generators and left no diff.
+- Twelve receipts were recut at that one immutable head. Eleven are PASS/raw 0. Full `test` is
+  honestly RED/raw 1 because a repository safety test found a forbidden command in foreign
+  `.llm/tmp/claude/hooks/unscoped/events.jsonl`; 4,202 tests passed, 1 failed, and 19 were ignored.
+  The evidence-set result is therefore `INSUFFICIENT`, not relabeled green.
+- Focused drift/checker/Pages checks are green. `check:mcp-export-corpus` remains the recorded
+  baseline RED/raw 1 without generation. Contracts and Fresh UI doc-lint remain RED/raw 1 at 9 and
+  123 findings respectively.
+- Four JSR audits returned raw 0; exact internal pin counts are Contracts 0, Fresh UI 2, CLI 6, MCP
+  3, all present pins exact `0.0.6`. CLI and MCP member dry-runs selected their regenerated publish
+  files explicitly.
+- Seventeen-path classifier, forbidden-surface audit, and lock proof returned raw 0. Fourteen
+  implementation paths changed, all authorized; the lock blob remains
+  `a1522e6ecc98dd4232312385b0cea4e52f5fa4b2`.
+- Close-gate and all runtime/prohibited actions remain `NOT_RUN` / `NOT FIRED`. The author stops
+  after the run-artifact commit, explicit-refspec push, and structured comment for fresh Tier-A.

@@ -1,0 +1,202 @@
+{
+  "pkg": {
+    "name": "@netscript/mcp",
+    "version": "0.0.6",
+    "description": "Token-bounded MCP tools for NetScript diagnostics, telemetry insights, docs, and CLI actions.",
+    "root": "packages/mcp"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./cli": "./cli.ts",
+    "./openapi-projection": "./openapi-projection.ts"
+  },
+  "files": {
+    "total": 115,
+    "loc": 12506,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 9007
+      },
+      {
+        "path": "cli.ts",
+        "bytes": 12467
+      },
+      {
+        "path": "openapi-projection.ts",
+        "bytes": 1163
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": true,
+    "readmeLines": 355,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true,
+      "./cli": true,
+      "./openapi-projection": true
+    },
+    "descriptionLen": 93
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "API_SERVICE_RESULT_LIMIT",
+        "AppsettingsEndpointSource",
+        "AspireCliEndpointSource",
+        "DEFAULT_CLI_COMMAND",
+        "DEFAULT_COMMAND_POLICY",
+        "DEFAULT_COMMAND_TIMEOUT_MS",
+        "DEFAULT_OUTPUT_TAIL_BYTES",
+        "DEFAULT_SERVICE_ENDPOINT_CONCURRENCY",
+        "DEFAULT_SERVICE_ENDPOINT_RESPONSE_BYTE_LIMIT",
+        "DEFAULT_SERVICE_ENDPOINT_TIMEOUT_MS",
+        "DEFAULT_TRUNCATION_POLICY",
+        "DIAGNOSTIC_RECEIPT_TTL_MS",
+        "DocsCorpusUnavailableError",
+        "ENDPOINT_SOURCES",
+        "ENDPOINT_SOURCE_PRECEDENCE",
+        "EXPORT_JSDOC_CHARACTER_LIMIT",
+        "EXPORT_SIGNATURE_CHARACTER_LIMIT",
+        "EXPORT_SURFACE_SCHEMA_VERSION",
+        "EmbeddedDocsCorpus",
+        "EmbeddedExportSurfaceCorpus",
+        "FIND_EXPORT_RESULT_LIMIT",
+        "FetchServiceEndpointProbe",
+        "FilesystemDiagnosticEvidence",
+        "FilesystemDocsCorpus",
+        "GUIDANCE_CONFIDENCE_LEVELS",
+        "GUIDANCE_DEFAULT_RECOMMENDATIONS",
+        "GUIDANCE_LINK_RELATIONS",
+        "GUIDANCE_MAX_CODE_CHARACTERS",
+        "GUIDANCE_MAX_CODE_EXCERPTS_PER_RECOMMENDATION",
+        "GUIDANCE_MAX_EXCERPT_CHARACTERS",
+        "GUIDANCE_MAX_FALLBACK_CHARACTERS",
+        "GUIDANCE_MAX_INTENT_CHARACTERS",
+        "GUIDANCE_MAX_RECOMMENDATIONS",
+        "GUIDANCE_MAX_RELATED_LINKS",
+        "GUIDANCE_MAX_WHY_CHARACTERS",
+        "GUIDANCE_STAGES",
+        "LIST_PACKAGE_EXPORT_RESULT_LIMIT",
+        "MAX_INDEXED_DOC_LENGTH",
+        "MCP_AGENT_INSTRUCTIONS",
+        "MCP_PROTOCOL_VERSION",
+        "OPENAPI_CURL_AUTH_NOTE",
+        "OverrideEndpointSource",
+        "PluginDoctorFamily",
+        "RunManifestEndpointSource",
+        "SEARCH_EXPORT_RESULT_LIMIT",
+        "SERVICE_ENDPOINT_STATUSES",
+        "SERVICE_OPERATION_RESULT_LIMIT",
+        "SOURCE_FAILURE_CODES",
+        "SPEC_UNAVAILABLE_AUTH_GUIDANCE",
+        "SpawnCommandExecutor",
+        "StaticCommandCatalog",
+        "TOOL_INPUT_SCHEMAS",
+        "TOOL_NAMES",
+        "TOOL_OUTPUT_SCHEMAS",
+        "UNWIRED_COMMAND_DESCRIPTOR",
+        "createDoctorFlow",
+        "createExecuteCommandFlow",
+        "createExportSurfaceFlows",
+        "createFindGuidanceFlow",
+        "createGetOperationSchemaFlow",
+        "createListApiServicesFlow",
+        "createListCommandsFlow",
+        "createListServiceOperationsFlow",
+        "createMcpServer",
+        "createRecordDriftFlow",
+        "createServiceEndpointDirectory",
+        "createToolRegistry",
+        "decideCommand",
+        "diagnosticEvidenceRefusal",
+        "recordDrift",
+        "slugifyDocsHeading",
+        "truncateResult",
+        "validateSchema"
+      ],
+      "rawCount": 73
+    },
+    "./cli": {
+      "exported": [
+        "McpCliOptions",
+        "createMcpCliServer",
+        "resolveDocsRoot",
+        "runMcpStdioServer"
+      ],
+      "rawCount": 5
+    },
+    "./openapi-projection": {
+      "exported": [
+        "HTTP_METHODS",
+        "SCHEMA_VIEW_NAMES",
+        "describeOpenApiOperation",
+        "indexOpenApiOperations",
+        "projectOperationSchemaViews",
+        "resolveCanonicalOperation"
+      ],
+      "rawCount": 6
+    }
+  },
+  "tests": {
+    "fileCount": 29,
+    "files": [
+      "tests/description-ladder_test.ts",
+      "tests/schema-views_test.ts",
+      "tests/service-endpoint-directory_test.ts",
+      "tests/telemetry-aggregation_test.ts",
+      "tests/truncation_test.ts",
+      "tests/docs-source-policy_test.ts",
+      "tests/canonical-identity_test.ts",
+      "tests/telemetry-live-fixture_test.ts",
+      "tests/command_flows_test.ts",
+      "tests/docs_test.ts",
+      "tests/guidance-retrieval_test.ts",
+      "tests/openapi-read-tools_test.ts",
+      "tests/doctor_test.ts",
+      "tests/command_adapters_test.ts",
+      "tests/export-surface-flows_test.ts",
+      "tests/registry_test.ts",
+      "tests/service-endpoint-sources_test.ts",
+      "tests/guidance-contract_test.ts",
+      "tests/export-surface-mirror-free_test.ts",
+      "tests/guidance-evaluation_test.ts",
+      "tests/embedded-export-surface-corpus_test.ts",
+      "tests/command_composition_test.ts",
+      "tests/operation-index_test.ts",
+      "tests/telemetry-flows_test.ts",
+      "tests/stdio_test.ts",
+      "tests/release-embedded-docs-corpus_test.ts",
+      "tests/telemetry-endpoint_test.ts",
+      "tests/drift-evidence_test.ts",
+      "tests/doctor-families_test.ts"
+    ]
+  },
+  "gates": [
+    {
+      "gate": "F-DOCT-5 cardinality",
+      "level": "WARN",
+      "message": "directory has 14 immediate children; doctrine cap is 12",
+      "path": "src/domain"
+    },
+    {
+      "gate": "F-DOCT-5 cardinality",
+      "level": "WARN",
+      "message": "directory has 16 immediate children; doctrine cap is 12",
+      "path": "src/application/flows"
+    },
+    {
+      "gate": "F-JSR-7 slow-types",
+      "level": "WARN",
+      "message": "Checking for slow types in the public API..."
+    }
+  ],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [
+      "Checking for slow types in the public API..."
+    ],
+    "rawTail": "   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/domain/telemetry-summaries.ts (3.6KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/domain/tool-contracts.ts (13.1KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/domain/tool-types.ts (2.11KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/aspire-doctor-family.ts (2.01KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/embedded-docs-corpus.ts (3.12KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/export-surfaces/embedded-export-surface-corpus.ts (6.27KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts (403.2KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/fetch-telemetry-probe.ts (1.23KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/filesystem-diagnostic-evidence.ts (1.72KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/filesystem-docs-corpus.ts (15.25KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/plugin-doctor-family.ts (1.31KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/project-wiring-doctor-family.ts (4.91KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/release-embedded-docs-corpus.ts (5.4KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/service-endpoints/appsettings-endpoint-source.ts (3.29KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/service-endpoints/aspire-cli-command.ts (1.07KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/service-endpoints/aspire-cli-endpoint-source.ts (10.33KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/service-endpoints/aspire-cli-output.ts (2.55KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/service-endpoints/endpoint-url.ts (1.06KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/service-endpoints/fetch-service-endpoint-probe.ts (6.7KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/service-endpoints/override-endpoint-source.ts (3.51KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/service-endpoints/run-manifest-endpoint-source.ts (4.79KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/spawn-command-executor.ts (4.72KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/static-command-catalog.ts (1.33KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/stdio-transport.ts (1.27KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/infrastructure/telemetry-query-adapter.ts (3.11KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/ports/export-surface-corpus-port.ts (2.54KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/ports/service-endpoint-directory-port.ts (8.93KB)\n   file:///home/codex/repos/netscript-007-reference-export/packages/mcp/src/publish-assets.generated.ts (281.23KB)\nSuccess Dry run complete\n"
+  }
+}

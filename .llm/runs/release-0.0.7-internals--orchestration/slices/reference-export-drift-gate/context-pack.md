@@ -64,9 +64,20 @@ requires rescope. `gen:mcp-export-corpus` is explicitly excluded: its check is r
 and base/head regeneration produces byte-identical output. CLI/MCP generated sources are real
 publish deltas and require fresh JSR/member dry-run evidence.
 
+## SA-4 generated-content state
+
+- Fresh Tier-A passed SA-3 and canonical generation is complete at immutable content head
+  `46528ae4c71b3744f0af64bd749d01d831f70c89`.
+- Exactly four approved generated files changed. Two pre-commit passes produced the same diff hash;
+  the post-commit owner rerun and all freshness checks left no diff.
+- Twelve coherent receipts attest that head: eleven PASS and full `test` honestly FAIL/raw 1 due to
+  foreign `.llm/tmp/claude/hooks/unscoped/events.jsonl` content. The evidence set is intentionally
+  `INSUFFICIENT`; details are in `sa4-evidence.md`.
+- Known Contracts/Fresh UI doc-lint reds and `check:mcp-export-corpus` red remain preserved.
+  JSR/member selection proves the regenerated CLI and MCP assets ship to upgrading consumers.
+
 ## Resume rule
 
-Implementation author commits/pushes only this plan amendment, comments, and stops for fresh Tier-A.
-After Tier-A PASS, the author may run only the three canonical generators in `plan.md`, prove
-idempotence, recut coherent content-head evidence, push, and stop for a second Tier-A. Fresh delta
-IMPL-EVAL, readiness, issue boxes, close-gate, labels, and merge remain coordinator-owned.
+Implementation author commits/pushes SA-4 run artifacts, comments, and stops for the second fresh
+Tier-A. Fresh delta IMPL-EVAL, readiness, issue boxes, close-gate, labels, draft state, and merge
+remain coordinator-owned.

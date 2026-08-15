@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "immutableHead": "46528ae4c71b3744f0af64bd749d01d831f70c89",
+  "surface": "reference-export-drift-gate SA-4 generated publication cascade",
+  "expectedGateIds": [
+    "agent-docs-prose",
+    "arch-check",
+    "assets-barrel",
+    "check",
+    "docs-accuracy",
+    "docs-source-format",
+    "docs-source-format-test",
+    "docs-tagline",
+    "publish-assets",
+    "publish-dry-run",
+    "quality-job",
+    "test"
+  ],
+  "receiptIds": [
+    "reference-export-sa4-agent-docs-prose",
+    "reference-export-sa4-arch-check",
+    "reference-export-sa4-assets-barrel",
+    "reference-export-sa4-check",
+    "reference-export-sa4-docs-accuracy",
+    "reference-export-sa4-docs-source-format",
+    "reference-export-sa4-docs-source-format-test",
+    "reference-export-sa4-docs-tagline",
+    "reference-export-sa4-publish-assets",
+    "reference-export-sa4-publish-dry-run",
+    "reference-export-sa4-quality-job",
+    "reference-export-sa4-test"
+  ],
+  "sufficiency": "INSUFFICIENT",
+  "reasons": [
+    "test did not pass (FAIL)"
+  ]
+}
