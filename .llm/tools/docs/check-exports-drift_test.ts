@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertStringIncludes } from '@std/assert';
 import { join, relative } from '@std/path';
 import {
   checkDrift,
@@ -83,32 +83,34 @@ Deno.test('symbol parsing is table-aware and normalizes display generics', () =>
   assertEquals([...docSymbols].sort(), ['Alpha', 'DataGridColumn']);
 });
 
-function fixtureMapping(symbolCoverage: unknown): unknown {
-  return [{
-    name: 'fixture',
-    packagePath: 'unused',
-    docPath: 'unused',
-    packageName: '@netscript/fixture',
-    excludedExports: [],
-    symbolCoverage,
-  }];
+interface CapturedCheck {
+  code: number;
+  errors: string[];
 }
 
-Deno.test('drift checker refuses an empty or malformed coverage reason', async () => {
-  assertEquals(
-    await checkDrift(fixtureMapping({ mode: 'entrypoints-only', reason: '   ' })),
-    1,
-  );
-  assertEquals(
-    await checkDrift(fixtureMapping({ mode: 'entrypoints-only', reason: 42 })),
-    1,
-  );
-});
+async function checkDriftCapturingErrors(mapping: unknown): Promise<CapturedCheck> {
+  const originalError = console.error;
+  const errors: string[] = [];
+  console.error = (...args: unknown[]) => {
+    errors.push(args.map((arg) => String(arg)).join(' '));
+  };
+  try {
+    return { code: await checkDrift(mapping), errors };
+  } finally {
+    console.error = originalError;
+  }
+}
 
-Deno.test('drift checker refuses an unknown coverage mode', async () => {
-  const code = await checkDrift(fixtureMapping({ mode: 'unknown', reason: 'fixture policy' }));
-  assertEquals(code, 1);
-});
+function assertSingleRefusal(result: CapturedCheck, expectedCause: string): void {
+  assertEquals(result.code, 1);
+  assertEquals(result.errors.length, 1);
+  assertStringIncludes(result.errors[0], expectedCause);
+  assertEquals(result.errors[0].includes('Failed to read'), false);
+}
+
+function withCoverage(mapping: readonly PackageMapping[], symbolCoverage: unknown): unknown {
+  return mapping.map((candidate) => ({ ...candidate, symbolCoverage }));
+}
 
 async function withSymbolFixture(
   documentedSymbols: readonly string[],
@@ -155,13 +157,44 @@ async function withSymbolFixture(
 }
 
 Deno.test('drift checker refuses an invented symbol through the injectable seam', async () => {
-  await withSymbolFixture(['inventedSymbol'], async (mapping) => {
-    assertEquals(await checkDrift(mapping), 1);
+  await withSymbolFixture(['actualSymbol', 'inventedSymbol'], async (mapping) => {
+    const result = await checkDriftCapturingErrors(mapping);
+    assertSingleRefusal(
+      result,
+      "INVENTS nonexistent/unexported symbol 'inventedSymbol'",
+    );
   });
 });
 
 Deno.test('drift checker refuses an omitted symbol through the injectable seam', async () => {
   await withSymbolFixture([], async (mapping) => {
-    assertEquals(await checkDrift(mapping), 1);
+    const result = await checkDriftCapturingErrors(mapping);
+    assertSingleRefusal(result, "OMITS exported symbol 'actualSymbol'");
+  });
+});
+
+Deno.test('drift checker refuses an empty or malformed coverage reason', async () => {
+  await withSymbolFixture(['actualSymbol'], async (mapping) => {
+    for (const reason of ['   ', 42]) {
+      const result = await checkDriftCapturingErrors(
+        withCoverage(mapping, { mode: 'entrypoints-only', reason }),
+      );
+      assertSingleRefusal(
+        result,
+        'mapping[0].symbolCoverage.reason must be a nonempty string',
+      );
+    }
+  });
+});
+
+Deno.test('drift checker refuses an unknown coverage mode', async () => {
+  await withSymbolFixture(['actualSymbol'], async (mapping) => {
+    const result = await checkDriftCapturingErrors(
+      withCoverage(mapping, { mode: 'unknown', reason: 'fixture policy' }),
+    );
+    assertSingleRefusal(
+      result,
+      "mapping[0].symbolCoverage.mode is unknown: 'unknown'",
+    );
   });
 });
