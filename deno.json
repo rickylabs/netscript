@@ -82,6 +82,7 @@
     "agentic:rollout-canary": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env .llm/tools/agentic/runtime/cli/rollout-canary-cli.ts",
     "design:sync": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env tools/design-sync/mod.ts",
     "docs:links": "deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --pretty",
+    "docs:exports-drift": "deno run --no-lock --allow-read --allow-run=deno .llm/tools/docs/check-exports-drift.ts",
     "docs:accuracy": "deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/check-accuracy-and-discoverability.ts",
     "docs:snippets": "deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-snippets.ts",
     "docs:snippets:test": "deno test --allow-read --allow-write --allow-run .llm/tools/docs/snippet-extractor_test.ts .llm/tools/docs/snippet-compiler_test.ts .llm/tools/docs/pages-workflow_test.ts",

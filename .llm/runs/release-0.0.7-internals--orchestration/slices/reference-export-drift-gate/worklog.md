@@ -64,7 +64,59 @@ The checker was not tuned quiet:
 No Aspire, Docker, browser, `e2e:cli`, scaffold/runtime smoke, publish, S2 task/workflow wiring, or
 S3 durable gate receipt was fired.
 
+## S2 — named discoverability paths
+
+- Authorization: coordinator S1 slice-review `PASS` at `678840603`.
+- Scope: S2 only. S3 was not started.
+- Commit: the S2 commit containing this amendment; the pushed SHA is recorded in the structured PR
+  comment.
+
+### Implementation
+
+- Added `docs:exports-drift` as a directly invocable task with only `--allow-read` and
+  `--allow-run=deno`. The checker does not receive environment, write, network, or broad
+  `--allow-all` permission.
+- Replaced the accuracy checker's hidden raw-script argv with one `deno task docs:exports-drift`
+  child invocation. Existing nonzero handling remains intact: the child's stdout and stderr are
+  surfaced before the aggregate throws.
+- Added one explicitly named Pages build step that runs `deno task docs:exports-drift` from the
+  repository root, behind `if: env.RUN == 'true'` and without `working-directory`.
+- This is a discoverability repair over the pre-existing fail-closed non-draft CI enforcement chain;
+  it does not claim S2 created enforcement.
+
+### Evidence
+
+| Proof                           | Result                                                                                                                                                             |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Explicit wiring search          | raw exit 0; one task definition, one aggregate call, one Pages command                                                                                             |
+| Named `docs:exports-drift` task | raw exit 0 before and after the negative diagnostic; terminal PASS                                                                                                 |
+| `deno task docs:accuracy`       | raw exit 0; terminal `docs accuracy: PASS`                                                                                                                         |
+| Single-execution audit          | raw exit 0; maintenance reaches drift only through one accuracy call, accuracy calls the task once, and Pages calls the task once without also calling accuracy    |
+| Permission audit                | raw exit 0; task text exactly matches `--allow-read --allow-run=deno` and no broader permission                                                                    |
+| Pages trigger/guard/root audit  | raw exit 0; pre-`jobs` workflow prefix byte-identical to S1 HEAD, guard present, no working directory                                                              |
+| Pages workflow structural test  | raw exit 0; 1 passed, 0 failed                                                                                                                                     |
+| CI classifier/workflow test     | raw exit 0; 60 passed, 0 failed                                                                                                                                    |
+| Docs source-format gate         | raw exit 0; `Docs source format: OK`                                                                                                                               |
+| Docs source-format tests        | raw exit 0; 6 passed, 0 failed                                                                                                                                     |
+| Structured check wrapper        | raw exit 0; one file selected, no findings                                                                                                                         |
+| Structured format wrapper       | raw exit 0; all six changed files selected, no findings                                                                                                            |
+| Controlled named-task drift     | raw child exit 1; surfaced invented and omitted ActionMenu names                                                                                                   |
+| Controlled aggregate drift      | raw child exit 1; surfaced child output and threw fail-closed                                                                                                      |
+| Controlled-drift restoration    | raw diagnostic exit 0; SHA-256 before/after `e822e8503636fd9f99ae816172baab0815d034f3fe745f9c58f10e9293b34db`, byte-exact, scratch removed, target diff raw exit 0 |
+| Thirteen-path audit             | raw exit 0; three approved S2 implementation paths plus three slice artifacts, no unauthorized or forbidden path                                                   |
+| `fresh-browser`                 | `NOT_RUN` — N/A / waived; no runtime lease                                                                                                                         |
+
+One extra structured lint probe returned raw exit 2 because Deno excluded the `.llm` file under the
+repository lint configuration; the wrapper correctly refused an empty selection instead of claiming
+green. A diagnostic `deno lint --no-config` on that exact file returned raw exit 0. The first
+single-execution assertion probe also returned raw exit 1 because its shell-embedded YAML quote was
+stripped; the corrected character-code assertion returned raw exit 0 with every count, guard,
+permission, and trigger check true. Neither diagnostic red is treated as a product verdict.
+
+No Aspire, Docker, browser, `e2e:cli`, scaffold/runtime smoke, publish, S3 durable gate receipt,
+workflow trigger, `deno.lock`, central state, or other lane was touched.
+
 ## Handoff
 
-S1 stops after commit, explicit-refspec push, and its structured PR comment. The coordinator owns
-the required substantive slice review. S2 must not begin until that review authorizes continuation.
+S2 stops after commit, explicit-refspec push, and its structured PR comment. The coordinator owns
+the required substantive slice review. S3 must not begin until that review authorizes continuation.
