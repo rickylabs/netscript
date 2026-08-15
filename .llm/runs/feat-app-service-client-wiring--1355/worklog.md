@@ -630,3 +630,28 @@ escalations. The final leak check reports Aspire `ok`, Docker `ok`, and `survivo
 start helpers were untouched. Because the prerequisite suite failed, `fresh-browser` is `NOT_RUN`
 and no receipt exists. No repair, retry, evaluator, readiness, lockfile, or documentation action
 occurred under the lease.
+
+## F6 plan amendment — precise browser-child termination
+
+F6 is plan-only and awaits fresh Tier-A review. The attempt-4 failure is recorded as a leaf-caused
+probe teardown defect and explicitly not a verdict on settled-refetch behavior: cleanup threw before
+the evidence value returned. Attempt progression remains visible at 20 → 32 → 69 passing gates;
+the real generated-project run confirms F5 because `generated.deno-fmt-check` passed in 343 ms and
+confirms F4 remained intact because `generated.service-client-contract` passed.
+
+The locked repair uses `terminateBrowserProcess(child, drain)` in the existing browser-probe module.
+Deno exposes no typed already-terminated error code or state property on `ChildProcess.kill`; the
+narrow condition is the runtime-observed `TypeError` with exact message
+`Child process has already terminated`. Every other kill error and every raw drain error propagates.
+The helper awaits status and drain and returns the status. Focused proofs cover a naturally exited
+child, a ready/running child terminated with SIGTERM, an unrelated `TypeError`, and a non-TypeError
+with the same message. The existing test seam supports all cases directly, so no new harness/path is
+planned.
+
+Later product/test scope is exactly the existing probe and its existing focused test. This amendment
+changed only run artifacts; it ran no test, binding/expensive gate, browser, Aspire, Docker,
+evaluator, lease, readiness, lockfile, or documentation action. The attempt-4 raw log and report,
+all earlier attempts/reports/receipts, and all carried baselines remain append-only and unchanged.
+The worktree already contained a timestamp-only refresh of `leak-report.md` when F6 began; its
+Aspire/Docker `ok` and empty-survivor content is unchanged, and F6 neither reran leak-check nor
+rewrote that artifact.

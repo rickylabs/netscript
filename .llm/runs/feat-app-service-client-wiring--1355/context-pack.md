@@ -58,7 +58,12 @@ dry-run passes, and architecture check has zero failures. Exact-set sufficiency 
 attempt 4 then ran at the unchanged leased evidence head: the runtime suite passed 69 gates,
 including service-client contract and generated format, but failed `behavior.service-client-refetch`
 when its leaf-added probe tried to kill an already-terminated browser child during cleanup. Final
-teardown/leak proof is empty; `fresh-browser` was not run.
+teardown/leak proof is empty; `fresh-browser` was not run. F6 is now a plan-only amendment awaiting
+fresh Tier-A. The teardown exception remains explicitly not a refetch-behavior verdict. Its later
+two-path repair introduces a named internal termination helper that tolerates only the exact
+runtime-observed already-terminated `TypeError`, awaits child status and the raw stderr drain, and
+rethrows unrelated errors. Cheap deterministic proofs cover natural exit, active SIGTERM, and
+wrong-type/wrong-message negatives without a browser or new harness.
 
 ## Completed
 
@@ -99,21 +104,20 @@ teardown/leak proof is empty; `fresh-browser` was not run.
 
 ## In Progress
 
-- Tier-A released F5 product implementation at `630185e2c`. The internal formatter port, one Deno
-  adapter, stdin-capable process transport, four canonicalizing writer owners, and service-command
-  composition are implemented inside the exact ceiling.
-- Focused formatter/writer/service tests are green, including EOF-before-timeout, empty/unknown
-  extension behavior, dry-run, force, atomic prevalidation, and same-input idempotency.
-- The cheap real-scaffold proof verifies all 12 named post-init outputs, exact-set and full-project
-  formatting, zero/2/zero repeat counts, and byte identity. Four exact-head binding receipts PASS
-  and exact-set sufficiency is SUFFICIENT.
+- F6 is plan-only. Exact later scope is
+  `service-client-browser-probe.ts` plus `service-client-runtime-probe_test.ts`; no third path is
+  authorized.
+- The helper signature, exact `TypeError` plus message discriminator, raw-drain propagation, and
+  natural-exit/active-child/negative proof matrix are locked in `plan.md` and the F6 report.
+- The attempt-4 raw failure remains append-only; refetch behavior is still unknown and no new lease
+  or expensive gate is authorized.
 
 ## Next Steps
 
-1. Commit and explicitly push only the append-only S5 attempt-4 evidence.
-2. Post the structured S5 failure/cleanup receipt on draft PR #1664.
-3. Stop for coordinator disposition. Do not repair the probe or run `fresh-browser` without a new
-   reviewed authorization.
+1. Commit and explicitly push only the F6 amendment/run artifacts.
+2. Post `[PHASE: PLAN] [SLICE: F6]` on draft PR #1664.
+3. Stop for fresh Tier-A. Do not mutate either authorized source/test path before release, and do
+   not request or run an expensive-gate lease.
 
 ## Key Decisions
 

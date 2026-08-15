@@ -679,6 +679,92 @@ Only focused cheap tests and the four binding catalog gates are eligible after T
 repair. No runtime/browser lease, `scaffold.runtime`, `fresh-browser`, Aspire, Docker, or evaluator
 is part of the amendment or its implementation slice.
 
+## F6 amendment — precise browser-child termination
+
+### Disposition and preserved evidence
+
+S5 attempt 4 is a leaf-caused probe teardown failure, not a refetch-behavior verdict. The suite
+reached `passed=69 failed=1 skipped=0`; `generated.deno-fmt-check` passed in 343 ms against the real
+generated project, confirming F5 beyond the cheap 12-path proof, and
+`generated.service-client-contract` remained green, preserving F4. The only failure was
+`behavior.service-client-refetch`: its `finally` block called `child.kill('SIGTERM')` after the
+browser child had already exited, and that cleanup exception prevented the collected evidence from
+returning. The refetch scenario is therefore still **unknown**, not pass or fail.
+
+The attempt progression remains append-only evidence: 20 passed in attempt 1, 32 passed in attempt
+3, and 69 passed in attempt 4. The attempt-4 report and raw output remain unchanged at
+`reports/s5-attempt4-runtime-failure.md` and
+`reports/s5-attempt4-scaffold-runtime-20260815-2037.log`; the raw log SHA-256 remains
+`b476da4ce039d03785e46669d51919b48c41fbae80ca41ca9188bcbb53e97f23`. All earlier S5 attempts,
+S4/F4/F5 reports and receipts, the Fresh 45 and SDK 3 `PRE_EXISTING_FAIL` baselines, and the
+separately named plugin-streams diagnostic remain preserved.
+
+### Locked helper contract
+
+Add the small named internal helper below to
+`service-client-browser-probe.ts`, immediately after `collectBrowserRefetchEvidence` and before
+`waitForCompletedStableBaseline`:
+
+```ts
+export async function terminateBrowserProcess(
+  child: Pick<Deno.ChildProcess, 'kill' | 'status'>,
+  drain: Promise<void>,
+): Promise<Deno.CommandStatus>
+```
+
+The export is only a same-package E2E test seam; no package barrel or public `@netscript/cli`
+surface re-exports it. This helper is justified under A6 because it encodes the probe's precise
+termination policy and gives the focused test the same side-effect seam production uses. A third
+helper file would add indirection without another consumer and is prohibited.
+
+The helper calls `child.kill('SIGTERM')`. Deno's local `ChildProcess.kill` API returns `void` and
+documents no typed exception, error code, or state predicate for an already-exited process. The
+attempt-4 runtime exposes only `TypeError: Child process has already terminated`, so the narrowest
+available discriminator is exactly:
+
+```ts
+error instanceof TypeError && error.message === 'Child process has already terminated'
+```
+
+Only that conjunction is tolerated. A different `TypeError`, a non-`TypeError` with the same
+message, or any other thrown value is rethrown unchanged; no bare catch is allowed. After either a
+successful signal or the one tolerated already-terminated result, the helper awaits `child.status`,
+then awaits the stderr `drain`, and returns the resolved status. The pipe promise passed as `drain`
+must be the raw `pipeTo(...)` promise rather than the current eagerly swallowed
+`.catch(() => {})`, so unrelated drain errors also propagate. Deno documents `status` as never
+rejecting, but it is still awaited explicitly to prove process reaping and sequencing.
+
+`collectBrowserRefetchEvidence` delegates its child cleanup to this helper. Profile removal remains
+in an enclosing `finally`, so an unrelated termination/drain error is preserved for the caller
+while the temporary profile still receives its existing best-effort removal. The CDP client close,
+refetch evidence shape, request baseline, response-stage resume, and all browser assertions remain
+unchanged.
+
+### Exact path ceiling
+
+The later F6 repair may modify exactly these two already-owned paths:
+
+1. `packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts`
+2. `packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts`
+
+There is no new source, test, template, fixture, barrel, task, catalog, SDK/Fresh, `docs/**`, or
+`deno.lock` path. A compiler-proven need for a third path stops the repair for another explicit
+amendment and fresh Tier-A review.
+
+### Cheap deterministic proof matrix
+
+| Proof | Executable assertion in `service-client-runtime-probe_test.ts` |
+| --- | --- |
+| Already-terminated child | Spawn a short Deno child, attach its raw stderr drain, await its natural successful exit, then call `terminateBrowserProcess`. Require no throw, the same resolved successful status, and completed drain. This deterministically reproduces attempt 4 without a browser or runtime suite. |
+| Active child termination | The existing allow-all E2E unit-test seam supports a real `Deno.Command`; no new harness is needed. Spawn a child that signals readiness and remains running, call the same helper, and require the returned status to show `SIGTERM`/unsuccessful termination only after the raw drain completes. This proves the helper still terminates and awaits an active child rather than merely tolerating exited ones. |
+| Unrelated error propagation | Invoke the same helper through its structural `Pick` seam with a `kill` implementation that throws an unrelated `TypeError`, and require the exact error object to propagate. Also reject a non-`TypeError` carrying the terminated-child message, pinning both halves of the discriminator, and require a rejecting raw drain promise to propagate after a successful kill/status. All three cases make future broad catches fail. |
+| Production delegation | Keep a focused source/delegation assertion that the browser probe calls `terminateBrowserProcess(child, drain)` and no longer contains an unguarded `child.kill('SIGTERM')` in its `finally` block. |
+
+If Tier-A later releases F6 implementation, the focused test file runs first; only after it is green
+may the existing four binding cheap gates be refreshed at the committed content head. No lease,
+`scaffold.runtime`, `fresh-browser`, Aspire, Docker, evaluator, readiness change, or product repair
+is authorized by this amendment.
+
 ## Drift Watch
 
 - Any change to `origin/main`, query key shapes, service manifest identity, command topology,
