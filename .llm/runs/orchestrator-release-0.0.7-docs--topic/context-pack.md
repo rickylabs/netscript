@@ -9,8 +9,8 @@ is in flight. This file is the resumable record.
 | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
 | Lane allocation (`milestone-cluster-state.json`) | `[1551]` — closed/completed, `status:shipped`                                                                          |
 | Docs-lane issues still open                      | **none**                                                                                                               |
-| Latest `main`                                    | `729386c567bfbd0b8c7f86a4ed09348f0a8a4ad8`                                                                             |
-| Supervisor                                       | native Claude Opus 5 / high, session `fcf04b0f-3c2f-4844-9508-84c52ce8298c`, bridge `session_01PLRauSHN1PnvrNF2ucefF6` |
+| Latest `main` (2026-08-15 reconciliation)        | `baf1cdf67a4e931af17b4772ddf6101f36152184` — this lane's last merge `729386c56` is three commits behind it            |
+| Supervisor                                       | native Claude Opus 5 / high, session `fcf04b0f-3c2f-4844-9508-84c52ce8298c`, bridge `session_01SBHRTmr6ddueUYzCbcXrRV` |
 | Topic branch                                     | `orchestrator/release-0.0.7-docs`, push by explicit refspec only                                                       |
 
 ## What shipped
@@ -64,7 +64,10 @@ snippets were type-checked in scratch fixtures.
 
 ## If this lane is reactivated
 
-Immutable base is `729386c567bfbd0b8c7f86a4ed09348f0a8a4ad8`. The preserved Codex author threads are
+Branch from **current `origin/main`**, not from this lane's last merge — as of the 2026-08-15
+reconciliation that is `baf1cdf67a4e931af17b4772ddf6101f36152184`; re-read it before dispatch rather
+than trusting this line. `729386c567bfbd0b8c7f86a4ed09348f0a8a4ad8` is only the immutable head this
+lane shipped. The preserved Codex author threads are
 `019ffcc9-16c2-7573-b7f6-d627172408e8` (#1652 leaf, merged worktree) and
 `01a0047a-aceb-7b53-9ba1-9191eedaaf1a` (#1660 leaf, worktree
 `/home/codex/repos/netscript-007-docs-vs`) — both idle and intact. One sender per worktree: a new
