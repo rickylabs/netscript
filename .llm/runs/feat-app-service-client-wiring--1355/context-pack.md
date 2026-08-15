@@ -82,6 +82,16 @@ same 4,248 results. Conditional publish and architecture gates then passed at th
 exact passing set uses `f6-test-attempt2` and is SUFFICIENT; the first `f6-test` remains a preserved
 superseded red outside that set.
 
+S5 attempt 5 then executed exactly once at leased evidence head `a8a160285d`. The 70-step runtime
+suite reports 69 passed / 1 failed / 0 skipped. Service-client add/generate, the two-service contract
+probe, and generated check/lint/format all pass. The sole red is the leaf-added
+`behavior.service-client-refetch` probe timing out before a Chrome DevTools target appears; no CDP
+connection, mutation, or refetch assertion ran, so refetch behavior remains unproven rather than
+failed. Full pretty and suite-owned NDJSON logs are hashed and preserved. Mandatory teardown and
+independent Aspire/Docker/process/port audits prove the host empty; only protected Aspire MCP
+helpers remain. The lease is released after cleanup. `fresh-browser` is NOT_RUN because the
+scaffold prerequisite failed.
+
 ## Completed
 
 - Verified branch/worktree/base/clean-tree identity and no designed upstream.
@@ -126,15 +136,17 @@ superseded red outside that set.
 - The focused deterministic suite passes 14/0. The four-file F6 set (`check`, `test-attempt2`,
   `publish-dry-run`, `arch-check`) passes at `7fa29ad3e` and recomputes SUFFICIENT. The original
   permission-denied `f6-test` stays append-only as a superseded environmental red outside the set.
-- The attempt-4 raw failure remains append-only; refetch behavior is still unknown and no lease or
-  expensive gate is authorized.
+- Attempts 1–5 remain append-only. Attempt 5 exposes the next probe integration failure—no CDP
+  target—while preserving the unknown refetch verdict. Its cleanup is complete, the host is empty,
+  and the lease is released; no retry or browser gate is authorized.
 
 ## Next Steps
 
-1. Commit and push the three new receipts and recovery evidence.
-2. Post the amended `[PHASE: IMPL] [SLICE: F6]` receipt with the quarantine attribution, attempt-2
-   result, exact four-file passing set, and preserved superseded red.
-3. Stop for fresh Tier-A. Do not start an expensive gate, lease, evaluator, or new slice.
+1. Commit and push the S5 attempt-5 logs, failure report, final leak report, worklog, and context.
+2. Post `[PHASE: IMPL] [SLICE: S5]` with the 70-step verdict, both log hashes, failure boundary,
+   `fresh-browser` NOT_RUN, and final cleanup audit.
+3. Stop for coordinator/Tier-A disposition. Do not retry, repair, request a lease, or start browser
+   or evaluator work.
 
 ## Key Decisions
 
@@ -178,8 +190,8 @@ superseded red outside that set.
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
 | Static      | F6 check, test-attempt2 (4,229/0/19), publish dry-run, and arch-check PASS at `7fa29ad3e`; exact four-file set SUFFICIENT. Original `f6-test` FAIL is preserved as superseded environmental evidence outside the set. | four named passing receipts; quarantine and recovery reports |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
-| Runtime     | Attempt 4 `scaffold.runtime` FAIL: 69 passed / 1 failed / 0 skipped; service-client contract and generated format PASS, leaf probe cleanup failed on an already-terminated browser child. Cleanup proven empty. | `reports/s5-attempt4-runtime-failure.md`; suite-owned raw log |
-| Consumer    | `fresh-browser` NOT_RUN because the attempt-4 runtime prerequisite failed; no catalog receipt exists. | S5 conditional contract |
+| Runtime     | Attempt 5 `scaffold.runtime` FAIL: 69 passed / 1 failed / 0 skipped over 70 steps. Service-client and generated-format proofs PASS; leaf browser probe times out before CDP target/refetch assertions. Cleanup and independent host audit empty; lease released. | `reports/s5-attempt5-runtime-failure.md`; pretty + NDJSON logs |
+| Consumer    | `fresh-browser` NOT_RUN because attempt-5 scaffold prerequisite failed; no catalog receipt exists and browser cleanup audit was not reached. | S5 conditional contract |
 
 ## Open Questions
 

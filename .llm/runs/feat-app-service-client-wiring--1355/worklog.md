@@ -748,3 +748,43 @@ The conditional downstream gates then ran serially at the same content head and 
 `evaluateEvidenceSet` over exactly those four named files reports **SUFFICIENT** with no reasons.
 The earlier `receipts/f6-test.json` remains preserved as a superseded red and is not part of this
 passing set. Full recovery evidence is in `reports/f6-binding-recovery.md`.
+
+## S5 attempt 5 — runtime lease verdict
+
+The singleton runtime lease was granted against immutable leaf evidence head `a8a160285d` over
+product head `7fa29ad3e`, and that exact leaf head executed. The coordinator's preflight
+`leak-report.md` timestamp refresh landed after its clean-tree observation; it was the only dirty
+path before execution and did not move the leased head or touch product.
+
+`deno task e2e:cli run scaffold.runtime --cleanup --format pretty` ran exactly once and **FAILED**
+with inner exit code 1. The suite-owned terminal report contains 70 steps: 69 passed, 1 failed, 0
+skipped. Family counts are preflight 2/2, scaffold 15/15, generated 11/11, runtime 21/21, database
+5/5, behavior 13/14, and cleanup 2/2. The suite-owned NDJSON retains every exact step ID, verdict,
+duration, and evidence object, including the synthetic Docker-prune pass not emitted as a separate
+pretty gate line.
+
+F4/F5 proofs remained green in the real generated project: service-client add/generate,
+`generated.service-client-contract`, generated check/lint, and `generated.deno-fmt-check` all
+passed. The sole failure was `behavior.service-client-refetch`, which timed out waiting for a Chrome
+DevTools target before connecting CDP or exercising the mutation/refetch assertions. This is a
+leaf-added probe/runtime-integration failure and **not a refetch-behavior verdict**; at
+pre-implementation `c53726c69` both the probe path and gate ID are absent. The exact browser startup
+mechanism remains unknown because stderr was drained without retention. No repair or retry ran.
+
+Pretty raw log:
+`reports/s5-attempt5-scaffold-runtime-20260815-2139.log`, SHA-256
+`ff349b40f7f70341934e170df7c67d147c0ed983173b41871421755ad55e062b`.
+Suite-owned NDJSON:
+`reports/s5-attempt5-scaffold-runtime-20260815-2139.ndjson`, SHA-256
+`e35d6fbcbdfc0b046be3fec29fa5dee0b0369094645b75cb42fca1e0350bbc16`.
+
+Suite cleanup passed. Run-owned teardown applied with zero AppHosts, containers, or escalations.
+Final leak-check at `2026-08-15T19:48:35.122Z` reports Aspire `ok`, Docker `ok`, and
+`survivors: []`; Aspire inventory is empty, Docker is empty, no AppHost/DCP/application/browser/
+runtime process or relevant listener remains, and only protected `aspire mcp start` helpers appear
+in the process audit. Three run-owned stopped NuGet helpers exited naturally before TERM could be
+delivered. The host is empty and the leaf releases the lease. `fresh-browser` is **NOT_RUN** and no
+receipt exists because scaffold was red; the second browser cleanup audit is not reached.
+
+Full evidence and attribution are in `reports/s5-attempt5-runtime-failure.md`. All earlier attempts,
+reports, receipts, and carried baselines remain append-only.
