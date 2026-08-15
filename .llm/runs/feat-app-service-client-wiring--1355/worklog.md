@@ -708,3 +708,22 @@ there was no retry, and the gate sequence stopped.
 and `publish-dry-run` plus `arch-check` receipts are missing. The check PASS and test FAIL receipts
 both have `gitHead == actualGitHead == 7fa29ad3e` with no mismatch override. Full attribution and
 the preserved-evidence statement are in `reports/f6-binding-test-failure.md`.
+
+### F6 environmental attribution and recoverable quarantine
+
+Coordinator review accepted `receipts/f6-test.json` as an honest append-only red and established
+the environmental mechanism. F5 had 4,226 passed / 0 failed / 19 ignored (4,245 total); F6 attempt
+1 had 4,228 passed / 1 failed / 19 ignored (4,248 total). The three-result increase includes two
+new passes, proving the F6 test delta executes successfully while the single failure remains the
+permission-denied walk into S5 attempt 4's abandoned Postgres-owned tree.
+
+The exact failing path was
+`.llm/tmp/cli-e2e/plugin-smoke-20260815-203755/.data/postgres/18/docker`. The coordinator quarantined
+the outer workspace recoverably: the source
+`.llm/tmp/cli-e2e/plugin-smoke-20260815-203755` is verified absent, while
+`/tmp/netscript-f6-quarantine.7kXcDX/plugin-smoke-20260815-203755` is verified present. The leaf did
+not delete, chmod, move, or mutate it. `receipts/f6-test.json` stays red and is never overwritten or
+claimed in a later passing set. One distinct `f6-test-attempt2` may retest the environment at the
+unchanged content head `7fa29ad3e`; if it fails, the sequence stops without a third attempt.
+
+Full attribution and quarantine details are in `reports/f6-environment-quarantine.md`.

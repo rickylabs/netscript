@@ -73,7 +73,11 @@ passing binding `check`, but binding `test` stops the sequence at 4,228 passed /
 ignored because the unchanged forbidden-command walker cannot read a mode-0700 `dnsmasq:root`
 Postgres directory under the S5 attempt-4 `plugin-smoke-20260815-203755` workspace. This is
 runtime-workspace residue rather than an F6 source regression, but the binding set is red and
-insufficient. No retry or downstream gate ran.
+insufficient. Coordinator review accepted that red append-only and quarantined the abandoned tree
+recoverably: the repo source is absent and
+`/tmp/netscript-f6-quarantine.7kXcDX/plugin-smoke-20260815-203755` is present. The F5/F6 count delta
+(4,245 total to 4,248 total, with two additional passes) proves the new F6 tests execute and pass.
+Exactly one environment rerun is authorized at unchanged content head `7fa29ad3e`.
 
 ## Completed
 
@@ -117,16 +121,18 @@ insufficient. No retry or downstream gate ran.
 - F6 implementation is complete inside `service-client-browser-probe.ts` and
   `service-client-runtime-probe_test.ts`; no third path was required.
 - The focused deterministic suite passes 14/0. F6 `check` passes and F6 `test` fails only on the
-  permission-denied S5 workspace residue; `publish-dry-run` and `arch-check` were not run.
+  permission-denied S5 workspace residue; the original red stays append-only. The coordinator has
+  moved that tree to a recoverable quarantine, and one `f6-test-attempt2` is pending at unchanged
+  content head `7fa29ad3e`; `publish-dry-run` and `arch-check` remain conditional on that pass.
 - The attempt-4 raw failure remains append-only; refetch behavior is still unknown and no lease or
   expensive gate is authorized.
 
 ## Next Steps
 
-1. Commit and push the two generated F6 receipts plus the binding-failure attribution artifacts.
-2. Post `[PHASE: IMPL] [SLICE: F6]` with the PASS/FAIL/missing exact set and `INSUFFICIENT` verdict.
-3. Stop for fresh Tier-A disposition. Do not mutate the protected runtime residue, retry the gate,
-   or start either downstream binding gate without reviewed authorization.
+1. Commit and push the environmental attribution before the authorized rerun.
+2. Run exactly one distinct `f6-test-attempt2` at content head `7fa29ad3e`; stop on failure.
+3. Only on PASS, run fresh `publish-dry-run` and `arch-check`, recompute the exact four-file set
+   using `f6-test-attempt2`, then commit/push/comment and stop for Tier-A.
 
 ## Key Decisions
 
