@@ -3058,3 +3058,73 @@ Cleanup contract for this lease: `--cleanup` on the scaffold suite; `agentic:lea
 between, and after; `agentic:teardown` scoped only to positively proven run-owned resources; any
 foreign resource reported rather than removed. The lease returns only after a final clean
 Docker/Aspire/browser/port audit.
+
+## 2026-08-15 — S5 gate 1 `scaffold.runtime`: **FAILED**, sequence stopped after clean cleanup
+
+Ran the suite-owned release-gate command at leaf head `b14975af7657869dfb36f5e07d2ef393c1ef989c`:
+`deno task e2e:cli run scaffold.runtime --cleanup --format pretty`. Result:
+**passed=6 failed=1 skipped=0**, exit 1.
+
+Gates that passed include both of the new ones — `scaffold.service-client-add` (1342 ms) and
+`scaffold.service-client-generate` (817 ms). So the two-service add/generate scenario works against a
+real generated project. The failure is the third gate, `generated.service-client-contract`.
+
+### Exact attribution — the probe's input shape does not exist in the generated contract
+
+The static probe writes a temporary consumer that calls
+`paymentsQueries.list.clientKey(input)` with
+
+```ts
+{ limit: 3, page: 1, sortBy: 'id', sortOrder: 'asc' }
+```
+
+The **generated** `payments` contract declares the list input as
+`{ limit: number; offset: number; search?: string }`
+(`contracts/versions/v1/payments.contract.ts:37`). Type-check fails with three errors, the head one
+being:
+
+```
+TS2345: Property 'offset' is missing in type
+  '{ limit: 3; page: 1; sortBy: "id"; sortOrder: "asc" }'
+  but required in type '{ limit: number; offset: number; search?: string }'
+```
+
+thrown from `service-client-runtime-probe.ts:250` via `probeGeneratedServiceClients` at `:149`.
+
+**This is not a product defect.** The generator, the emitted modules, and the key derivation are all
+fine — the *probe's* hardcoded input is wrong.
+
+### Where the wrong input came from, and why only this gate could catch it
+
+That literal comes from `plan.md` scenario 2, which I reviewed at T-2 and accepted as concrete and
+falsifiable. It **is** falsifiable — it just falsified. The input was **invented in plan prose rather
+than derived from the real generated contract**, and every cheap layer agreed with it: the unit
+tests pass because they drive fixtures, not a scaffolded project.
+
+This is the third instance of one root pattern on this leaf — a specification whose text nothing
+beneath it satisfies. First the published-but-dead `onConnectionError`; then Release Condition 3
+documented but unimplemented; now a scenario input that no generated contract accepts. Each was
+invisible to the layer above it and only fell to the layer that actually executes.
+
+**It is also the clearest possible justification for the lease.** No amount of further cheap
+convergence would have surfaced this: the shapes only meet when a real project is generated and
+type-checked. The expensive gate bought a proof that the proof was wrong.
+
+### Sequence stopped; cleanup verified
+
+Per the lease contract, `fresh-browser` was **not** started. `cleanup.aspire-stop` PASSED within the
+suite, and the post-failure audit is clean:
+
+| Check | Result |
+| --- | --- |
+| `agentic:leak-check` | `aspire: ok`, `docker: ok`, **`survivors: []`** |
+| Docker containers | **zero** |
+| AppHost / DCP / `dotnet run` | **none** |
+
+No teardown was required — nothing run-owned survived. The 8 foreign `aspire mcp start` processes
+belonging to sibling supervisors remain untouched, as recorded at lease acquisition.
+
+**The lease is still held** and no repair has been made. Attribution first, per contract. The fix is
+narrow — derive the probe's list input from the generated contract instead of hardcoding it, or use
+the contract's actual field names — but it is a change to an authorized probe file and I am reporting
+before acting.
