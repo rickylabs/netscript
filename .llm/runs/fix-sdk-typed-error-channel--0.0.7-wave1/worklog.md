@@ -81,9 +81,9 @@ forces the exact key union to stay synchronized. No code union or metadata vocab
 | 2026-08-15 | S2    | Consumers          | Checked query, desktop, RFC, assignability, service-query, and Fresh consumers; ran SDK query/desktop plus Fresh extraction tests.            |
 | 2026-08-15 | S2    | Reconcile          | Observed S1 Tier-A PASS; no issue/label/checklist mutation, no #1348/#1466 touch, no scope adjustment, and S3 remains blocked.                |
 | 2026-08-15 | S3    | Narrative          | Both published pages now scope contract typing to input/output/declared errors and keep transport/arbitrary throws on the non-defined branch. |
-| 2026-08-15 | S3    | Examples           | Literal `isSuccess` then `isDefined` branches terminate every failure path; all six codes and code-selected schema data are shown.             |
-| 2026-08-15 | S3    | Compile proof      | SDK fence passed `docs:snippets`; discover Step 3/4 and copyable function passed page-isolated checks with a real `baseContract` fixture.       |
-| 2026-08-15 | S3    | Gates              | Source format, accuracy, source/rendered links, caveats, build, doctest, and focused example compilation passed; final gates remain S4-only.   |
+| 2026-08-15 | S3    | Examples           | Literal `isSuccess` then `isDefined` branches terminate every failure path; all six codes and code-selected schema data are shown.            |
+| 2026-08-15 | S3    | Compile proof      | SDK fence passed `docs:snippets`; discover Step 3/4 and copyable function passed page-isolated checks with a real `baseContract` fixture.     |
+| 2026-08-15 | S3    | Gates              | Source format, accuracy, source/rendered links, caveats, build, doctest, and focused example compilation passed; final gates remain S4-only.  |
 
 ## Gate results
 
@@ -104,11 +104,11 @@ forces the exact key union to stay synchronized. No code union or metadata vocab
 | S3 docs source format                 | PASS                                   | Structured receipt; exit 0, `Docs source format: OK`                           |
 | S3 docs accuracy                      | PASS                                   | Structured receipt; 199 published source pages checked                         |
 | S3 SDK snippet compile                | PASS                                   | 36 Tier-1 candidates, 22 checked, 14 existing exemptions                       |
-| S3 discover example compile           | PASS                                   | Step 3/4 pair and end-to-end function; real base-contract fixture               |
-| S3 SDK doctest                        | PASS                                   | 3/3 results                                                                     |
-| S3 source links                       | PASS                                   | 103 docs; 0 broken links, anchors, or orphans                                   |
-| S3 site verify                        | PASS                                   | Build, rendered-output, rendered links, and caveats; raw exit 0                 |
-| S3 scope/lock hygiene                 | PASS                                   | Four landed product/test files and `deno.lock` unchanged                        |
+| S3 discover example compile           | PASS                                   | Step 3/4 pair and end-to-end function; real base-contract fixture              |
+| S3 SDK doctest                        | PASS                                   | 3/3 results                                                                    |
+| S3 source links                       | PASS                                   | 103 docs; 0 broken links, anchors, or orphans                                  |
+| S3 site verify                        | PASS                                   | Build, rendered-output, rendered links, and caveats; raw exit 0                |
+| S3 scope/lock hygiene                 | PASS                                   | Four landed product/test files and `deno.lock` unchanged                       |
 | Root/final-slice gates                | NOT RUN                                | Explicitly reserved for slice 4                                                |
 
 ### S1 structured JSON verdicts
@@ -390,17 +390,17 @@ Root/final-slice gates were not run.
 
 ### S3 disposition receipt
 
-| Planned location | Disposition | Final location and wording |
-| ---------------- | ----------- | -------------------------- |
-| `sdk.md:12-20` | Retained with required scope | `sdk.md:12-22` now limits non-drift to input, output, and declared-error types; transport/arbitrary throws are explicitly non-defined failures. |
-| `sdk.md:31-38` | Retained and corrected | `sdk.md:33-41` says the L1 method's input, output, and declared-error union are inferred from the contract. |
-| `sdk.md:58-70` | Retained and corrected | `sdk.md:61-71` says `baseContract` error schemas flow through the client promise and `safe()`, while runtime non-defined failures remain outside the contract. |
-| `sdk.md:113-114` | Retained with cross-reference | `sdk.md:118-120` scopes direct-call inference to input/output/declared errors and points rejecting calls to the `safe()` section. |
-| `sdk.md:196-198` | Replaced completely | `sdk.md:203-249` names all six codes, branches on literal `isSuccess` then `isDefined`, throws non-defined failures, demonstrates `NOT_FOUND` schema data, and scopes `isDefinedError`. |
-| `discover-services.md:9-14` | Retained with required scope | `discover-services.md:11-15` names input/output/declared errors and keeps discovery/transport failures non-defined. |
-| `discover-services.md:96-101,114-115` | Retained and corrected | `discover-services.md:99-118` states `baseContract` carries the six errors and the call comment includes declared-error inference; the prerequisite row also names declared errors. |
-| `discover-services.md:135-154` | Replaced completely | `discover-services.md:137-176` names all six codes, uses literal discriminants, terminates every failure, demonstrates `NOT_FOUND` schema data, and scopes `isDefinedError`. |
-| `discover-services.md:205-229` | Replaced completely | `discover-services.md:227-264` makes the copyable function return only from `isSuccess`, throws the non-defined branch, and demonstrates `VALIDATION_ERROR` schema data before throwing the defined failure. |
+| Planned location                      | Disposition                   | Final location and wording                                                                                                                                                                                   |
+| ------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `sdk.md:12-20`                        | Retained with required scope  | `sdk.md:12-22` now limits non-drift to input, output, and declared-error types; transport/arbitrary throws are explicitly non-defined failures.                                                              |
+| `sdk.md:31-38`                        | Retained and corrected        | `sdk.md:33-41` says the L1 method's input, output, and declared-error union are inferred from the contract.                                                                                                  |
+| `sdk.md:58-70`                        | Retained and corrected        | `sdk.md:61-71` says `baseContract` error schemas flow through the client promise and `safe()`, while runtime non-defined failures remain outside the contract.                                               |
+| `sdk.md:113-114`                      | Retained with cross-reference | `sdk.md:118-120` scopes direct-call inference to input/output/declared errors and points rejecting calls to the `safe()` section.                                                                            |
+| `sdk.md:196-198`                      | Replaced completely           | `sdk.md:203-249` names all six codes, branches on literal `isSuccess` then `isDefined`, throws non-defined failures, demonstrates `NOT_FOUND` schema data, and scopes `isDefinedError`.                      |
+| `discover-services.md:9-14`           | Retained with required scope  | `discover-services.md:11-15` names input/output/declared errors and keeps discovery/transport failures non-defined.                                                                                          |
+| `discover-services.md:96-101,114-115` | Retained and corrected        | `discover-services.md:99-118` states `baseContract` carries the six errors and the call comment includes declared-error inference; the prerequisite row also names declared errors.                          |
+| `discover-services.md:135-154`        | Replaced completely           | `discover-services.md:137-176` names all six codes, uses literal discriminants, terminates every failure, demonstrates `NOT_FOUND` schema data, and scopes `isDefinedError`.                                 |
+| `discover-services.md:205-229`        | Replaced completely           | `discover-services.md:227-264` makes the copyable function return only from `isSuccess`, throws the non-defined branch, and demonstrates `VALIDATION_ERROR` schema data before throwing the defined failure. |
 
 ### S3 structured JSON verdicts
 
@@ -432,8 +432,8 @@ Final docs-accuracy receipt:
 }
 ```
 
-This accuracy PASS proves only the invariants implemented by that script; it is not treated as
-proof of the page-level error narrative.
+This accuracy PASS proves only the invariants implemented by that script; it is not treated as proof
+of the page-level error narrative.
 
 SDK-page snippet compilation:
 
@@ -540,3 +540,334 @@ this slice and remain known red; no green claim is made. `typed-queue_test.ts` w
 S3 is complete and stops here for fresh Tier-A review. No S4 work started, no evaluator was
 launched, no acceptance box was ticked, and no metadata vocabulary or acceptance claim was
 introduced.
+
+## S4 final-gate receipt — stopped on new raw doc-lint findings
+
+All executed S4 receipts certify immutable content head `c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd`.
+For every receipt below, the head read before the gate and the actual head verified afterward were
+identical; no waiver was used. `deno.lock` also remained byte-identical throughout.
+
+The matrix stopped after raw Contracts and SDK `deno doc --lint` attribution proved new leaf-owned
+private-type-reference findings. Correcting those findings would require edits to the already-landed
+S1/S2 product files, which S4 forbids. The remaining JSR audits and specifier/export guards were
+therefore not executed and are not claimed.
+
+### Executed structured verdicts
+
+```json
+{
+  "gateId": "root-check",
+  "gitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "actualGitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "uncached": true,
+  "selection": { "filesSelected": 2925, "batches": 25, "failedBatches": 0 },
+  "summary": { "totalOccurrences": 0, "uniqueOccurrences": 0, "uniqueCodes": 0, "uniquePaths": 0 }
+}
+```
+
+```json
+{
+  "gateId": "root-test",
+  "gitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "actualGitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "uncached": true,
+  "durationMs": 335918,
+  "summary": {
+    "passed": 4207,
+    "failed": 0,
+    "ignored": 19,
+    "totalResults": 4226,
+    "uniqueFailures": 0
+  },
+  "typedQueue1667Encountered": false
+}
+```
+
+```json
+{
+  "gateId": "scoped-lint",
+  "gitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "actualGitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "selection": {
+    "roots": ["packages/contracts", "packages/sdk"],
+    "filesSelected": 105,
+    "batches": 1
+  },
+  "summary": { "totalOccurrences": 0, "uniqueOccurrences": 0, "uniqueRules": 0, "uniquePaths": 0 }
+}
+```
+
+```json
+{
+  "gateId": "scoped-fmt",
+  "gitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "actualGitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "mode": "check",
+  "selection": {
+    "roots": ["packages/contracts", "packages/sdk"],
+    "filesSelected": 105,
+    "batches": 1
+  },
+  "summary": { "failedBatches": 0, "findings": 0, "ignoredFindings": 0 }
+}
+```
+
+```json
+{
+  "gateId": "quality-scan",
+  "gitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "actualGitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "rootCoverage": {
+    "workspaceMembers": 37,
+    "publishableMembersInsideBoundary": 35,
+    "uncoveredPublishedMembers": []
+  },
+  "scan": {
+    "roots": ["packages", "plugins", "docs/site"],
+    "findings": [],
+    "allowCount": 7,
+    "allowanceFailures": []
+  },
+  "existingAllowances": { "issue": 1276, "count": 7 }
+}
+```
+
+```json
+{
+  "gateId": "arch-check",
+  "gitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "actualGitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "uncachedUnderlyingCommands": true,
+  "affectedPackages": {
+    "contracts": { "fail": 0, "warn": 2, "info": 1 },
+    "sdk": { "fail": 0, "warn": 1, "info": 1 }
+  },
+  "notes": [
+    "The repository's existing npm-catalog warnings were emitted but are non-failing.",
+    "zod-alignment PASS: zod@3.25.76 and zod@4.4.3; residual v3 owners unchanged."
+  ]
+}
+```
+
+```json
+{
+  "gateId": "docs-source-format",
+  "gitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "actualGitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "summary": "Docs source format: OK"
+}
+```
+
+```json
+{
+  "gateId": "docs-accuracy",
+  "gitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "actualGitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "summary": {
+    "publishedSourcePages": 199,
+    "shippedCorpusFiles": 181,
+    "publicCommands": "91/91 root/direct from 149 recursive paths",
+    "freshRootImports": 6
+  },
+  "existingWarning": "@tanstack/ai-preact@0.10.4 peer expects @tanstack/ai@^0.41.0; resolved 0.39.1"
+}
+```
+
+### Public-surface attribution
+
+The raw gate remains RED at both base and head. Raw finding sets are not equal because this leaf is
+an explicitly breaking published-contract change. The delta is exactly the 15 planned signature
+changes on existing symbols/export paths; it adds no symbol or export path. After subtracting that
+authorized delta, the base and head finding sets are byte-for-byte equivalent as normalized JSON.
+
+```json
+{
+  "gateId": "surface-diff",
+  "gitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "actualGitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "waiver": null,
+  "outcome": "RED",
+  "exitCode": 1,
+  "classification": "KNOWN BASE RED plus authorized breaking signature delta",
+  "base": {
+    "gitTree": "0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb",
+    "findingCount": 972,
+    "undeclaredMajorCount": 524,
+    "findingSetSha256": "55744a8522197fbb450349ca7185631188c97add132c356e173259875ae9406c"
+  },
+  "head": {
+    "findingCount": 987,
+    "undeclaredMajorCount": 539,
+    "findingSetSha256": "7720483a169a126af09a3117875d410ac74171f94005b8386dd32f201e8690a1"
+  },
+  "attribution": {
+    "authorizedDeltaCount": 15,
+    "unexpectedAdded": [],
+    "unexpectedRemoved": [],
+    "headAfterAuthorizedDeltaCount": 972,
+    "headAfterAuthorizedDeltaSha256": "55744a8522197fbb450349ca7185631188c97add132c356e173259875ae9406c",
+    "attributedBaselineSetsEqual": true,
+    "newExports": []
+  },
+  "authorizedSymbols": [
+    "@netscript/contracts . baseContract",
+    "@netscript/sdk . SafeFailure",
+    "@netscript/sdk . SafeResult",
+    "@netscript/sdk . ServiceClientMethod",
+    "@netscript/sdk . ServiceClientShape",
+    "@netscript/sdk . isDefinedError",
+    "@netscript/sdk . safe",
+    "@netscript/sdk ./client SafeFailure",
+    "@netscript/sdk ./client SafeResult",
+    "@netscript/sdk ./client ServiceClientMethod",
+    "@netscript/sdk ./client ServiceClientShape",
+    "@netscript/sdk ./client isDefinedError",
+    "@netscript/sdk ./client safe",
+    "@netscript/sdk ./ports ServiceClientMethod",
+    "@netscript/sdk ./ports ServiceClientShape"
+  ]
+}
+```
+
+### Publish dry-runs
+
+```json
+{
+  "gateId": "publish-dry-run",
+  "gitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "actualGitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "summary": "Workspace dry run complete",
+  "existingWarnings": [
+    "unanalyzable dynamic imports in unrelated packages",
+    "ignored npm lifecycle scripts"
+  ]
+}
+```
+
+```json
+{
+  "gateId": "contracts-raw-publish-dry-run",
+  "gitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "actualGitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "command": "deno publish --dry-run --allow-dirty --allow-slow-types",
+  "sanctionedWarning": "Publishing a library with slow types is not recommended"
+}
+```
+
+```json
+{
+  "gateId": "sdk-raw-publish-dry-run",
+  "gitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "actualGitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "command": "deno publish --dry-run --allow-dirty",
+  "actualSlowTypeDiagnostics": 0
+}
+```
+
+### Blocking raw doc-lint delta
+
+Both raw gates remain RED, but their finding sets are not merely the pinned baseline. Contracts has
+three added findings and one removed minified upstream identity (`oc`), for a net +2. SDK has ten
+added findings and no removals. Every added finding names an S1/S2 public signature or a private
+helper/upstream alias introduced to express it.
+
+```json
+{
+  "gateId": "contracts-raw-doc-lint",
+  "gitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "actualGitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "waiver": null,
+  "outcome": "RED",
+  "exitCode": 1,
+  "base": { "gitTree": "0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb", "count": 9 },
+  "head": { "count": 11 },
+  "added": [
+    ["baseContract", "ContractBuilder"],
+    ["baseContract", "Schema"],
+    ["baseContract", "BaseContractErrors"]
+  ],
+  "removed": [["baseContract", "oc"]],
+  "classification": "NEW LEAF-OWNED RED; S4 BLOCKER"
+}
+```
+
+```json
+{
+  "gateId": "sdk-raw-doc-lint",
+  "gitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "actualGitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "waiver": null,
+  "outcome": "RED",
+  "exitCode": 1,
+  "base": { "gitTree": "0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb", "count": 3 },
+  "head": { "count": 13 },
+  "added": [
+    ["ServiceClientMethod", "ThrowableError"],
+    ["ServiceClientMethod", "ClientPromiseResult"],
+    ["ServiceClientShape", "ProcedureErrorFromNode"],
+    ["SafeFailure", "ThrowableError"],
+    ["SafeFailure", "NonDefinedSafeFailure"],
+    ["SafeFailure", "DefinedSafeFailure"],
+    ["SafeResult", "ThrowableError"],
+    ["isDefinedError", "NarrowDefined"],
+    ["safe", "ThrowableError"],
+    ["safe", "ClientPromiseResult"]
+  ],
+  "removed": [],
+  "classification": "NEW LEAF-OWNED RED; S4 BLOCKER"
+}
+```
+
+### Not executed after the mandated stop
+
+```json
+{
+  "gitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "actualGitHead": "c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd",
+  "waiver": null,
+  "outcome": "NOT_RUN",
+  "reason": "S4 stopped when new doc-lint findings proved that source changes would be required",
+  "gates": [
+    "contracts-jsr-audit",
+    "sdk-jsr-audit (known F-DOCT-5 red not reclassified)",
+    "netscript-jsr-specifiers",
+    "selected export guards"
+  ]
+}
+```
+
+No Aspire, Docker, browser, `e2e:cli`, runtime lease, or evaluator was used. No issue, label,
+checkbox, readiness, or metadata state was changed.

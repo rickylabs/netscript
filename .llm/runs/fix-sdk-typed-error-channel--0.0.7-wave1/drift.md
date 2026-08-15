@@ -62,3 +62,19 @@
 - **Action:** Corrected existing research/plan/context artifacts. No new file or debt entry was
   created; the coordinator owns any later issue for the benchmark prose.
 - **Scope:** Both locations remain outside the exact six-path ceiling; no product/docs edit here.
+
+## 2026-08-15 — S4 raw doc-lint findings exceed the pinned baselines
+
+- **What:** The plan-locked raw Contracts and SDK `deno doc --lint` gates are still red and now
+  contain leaf-owned private-type-reference findings beyond their base sets.
+- **Source:** Executed raw lint at immutable head `c7cba6d9b`, then executed the same commands over
+  an archive of `main@0ef48c2e`; exact identity deltas are recorded in `worklog.md`.
+- **Expected:** Pinned raw reds remain red with no new leaf-owned findings.
+- **Actual:** Contracts changes from 9 to 11 (three additions, one removal); SDK changes from 3 to
+  13 (ten additions). The additions name `baseContract`, `ServiceClientMethod`,
+  `ServiceClientShape`, `SafeFailure`, `SafeResult`, `isDefinedError`, and `safe`.
+- **Severity:** blocking final-gate regression.
+- **Action:** Stop S4. Do not edit S1/S2 product files in the run-artifact-only slice. Remaining JSR
+  and specifier/export guards are not run or claimed pending coordinator disposition.
+- **Scope:** A correction necessarily returns to already-landed product paths and therefore needs a
+  fresh authorized implementation slice; no seventh path is implied or authorized here.

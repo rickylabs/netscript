@@ -2,21 +2,24 @@
 
 ## Run Metadata
 
-| Field          | Value                                                        |
-| -------------- | ------------------------------------------------------------ |
-| Run ID         | `fix-sdk-typed-error-channel--0.0.7-wave1`                   |
-| Branch         | `fix/sdk-typed-error-channel`                                |
-| Current phase  | `implementation` — S2 complete; awaiting fresh Tier-A review |
-| Archetype      | `1 — Small Contract` slice                                   |
-| Scope overlays | `docs`                                                       |
+| Field          | Value                                                      |
+| -------------- | ---------------------------------------------------------- |
+| Run ID         | `fix-sdk-typed-error-channel--0.0.7-wave1`                 |
+| Branch         | `fix/sdk-typed-error-channel`                              |
+| Current phase  | `implementation` — S4 stopped on new raw doc-lint findings |
+| Archetype      | `1 — Small Contract` slice                                 |
+| Scope overlays | `docs`                                                     |
 
 ## Current state
 
-PLAN-EVAL is terminal PASS at evaluator commit `f76a3c45b`; S1 Tier-A passed at `dc034d680`. S2
-preserves the exact six-key contract error union through the real `ServiceClient` promise marker,
-`safe()`, and `isDefinedError()`. The two S1 suppressions are now positive exact-type assertions,
-including code-specific data. #1466 still owns metadata definition/export; no metadata vocabulary or
-acceptance claim was introduced.
+PLAN-EVAL is terminal PASS at evaluator commit `f76a3c45b`; S1-S3 each passed fresh Tier-A. The
+delivered product preserves the exact six-key contract error union through the real `ServiceClient`
+promise marker, `safe()`, and `isDefinedError()`, and the two published docs pages carry one
+compile-accurate narrative. S4 root check/test, scoped lint/format, quality, architecture, docs,
+surface attribution, and publish dry-runs completed. Raw doc lint then proved new leaf-owned
+private-type-reference findings (Contracts 9 -> 11; SDK 3 -> 13), so S4 stopped without product
+changes. #1466 still owns metadata definition/export; no metadata vocabulary or acceptance claim was
+introduced.
 
 ## Completed
 
@@ -36,8 +39,9 @@ acceptance claim was introduced.
 
 ## Next steps
 
-1. Commit and push S2, then post its receipt on draft PR #1671.
-2. Stop for fresh Tier-A. Slice 3 remains unauthorized in this session.
+1. Coordinator disposition is required for the new raw doc-lint findings.
+2. Any correction must be a fresh authorized product slice; S4 remains run-artifact-only.
+3. After correction, rerun the incomplete final matrix at a newly locked immutable content head.
 
 ## Key decisions
 
@@ -68,8 +72,11 @@ No docs/S3-S4 product file was modified.
 - S2 consumer tests: PASS, 12/12 results across SDK doctest/query/desktop and Fresh extraction.
 - S2 lint and format: PASS after correcting two type-only imports; the initial lint red is retained
   in `worklog.md`.
-- Root quality/publish/docs/JSR gates: not run; reserved for the final slice.
-- Baseline JSR/publish inspection is recorded in `research.md` and `worklog.md`.
+- S4 root check/test, scoped lint/format, quality, architecture, docs, and publish dry-runs: PASS.
+- S4 raw `surface:diff`: known base RED plus exactly 15 authorized signature changes; after
+  subtracting those changes the 972-finding base/head sets have identical SHA-256 digests.
+- S4 raw doc lint: blocking new RED; Contracts 9 -> 11 and SDK 3 -> 13.
+- JSR audits and selected specifier/export guards: NOT RUN after the mandated S4 stop.
 
 ## Open questions
 
