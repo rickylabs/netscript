@@ -799,3 +799,12 @@ changed-source run `31908898023` failed on two leaf-owned type-safety findings i
 Sol/medium author owns one focused repair; fresh internals Tier-A and a fresh delta evaluator precede
 any later ready flip. #1664's bounded attempt 6 and #1671 S4 continue independently; #1663 remains
 untouched at its owner-only exceptional evaluator boundary.
+
+Newer transition `2026-08-15T21:31:49Z`: #1664 attempt 6 is terminal red at evidence `2385cdb72`,
+comment `5304325367`: valid managed Chrome 151 selection, 69 PASS / 1 FAIL / 0 skipped, exit 143 at
+the 900,030 ms `behavior.service-client-refetch` boundary, no output evidence, no retry, and
+`fresh-browser` `NOT_RUN`. Raw log is `1bf8cb03…aaa0`; NDJSON is `ffab7e7f…e356`. Final independent
+Aspire/Docker/process/port/residue audit is empty after exact cleanup of three stopped run-owned
+helpers and recoverable quarantine of the unreadable generated project at
+`/tmp/netscript-s5-a6-quarantine-20260815-4M9v8k`. Runtime lease is released. Fresh features Tier-A
+must attribute the hang before any repair/retry/evaluator; #1666 repair and #1671 S4 remain active.

@@ -960,3 +960,12 @@ checker. The coordinator revoked readiness immediately: #1666 is draft at sole `
 merge occurred, and broad quality's green does not override the focused red. Internals must use the
 same original Sol/medium author for one type-safe repair without allowances or scanner weakening,
 then perform fresh Tier-A and a fresh delta evaluator before readiness can be reconsidered.
+
+At 21:31Z, #1664 attempt 6 is terminal `FAIL_FIX` with evidence `2385cdb72` / comment
+`5304325367`. The strict managed override selected Chrome for Testing 151 successfully, then
+`scaffold.runtime` passed 69 gates and the refetch browser child produced no evidence before exit 143
+at 900,030 ms. `fresh-browser` is `NOT_RUN`; no retry occurred. Three stopped run-owned Aspire
+helpers were cleaned exactly, the unreadable generated Postgres tree is preserved recoverably under
+`/tmp/netscript-s5-a6-quarantine-20260815-4M9v8k`, and the final Aspire/Docker/process/port/residue
+audit is empty. Release the singleton runtime lease. Features must now perform fresh Tier-A causal
+classification before any repair amendment, retry, or evaluator.

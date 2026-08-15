@@ -769,3 +769,11 @@ implementation thread.
   checked all five #1296 boxes before the separate code-quality workflow failed. Preserve those
   evidence-backed boxes and the open issue, return the PR to draft, and let `Closes #1296` close the
   issue only after a fully green repaired head merges.
+- **Valid browser selection does not prove browser behavior completion:** #1664 attempt 6 proved the
+  strict managed Chrome override and still hung until the suite's 900-second child boundary with no
+  refetch evidence. Preserve the red as an unattributed browser-probe timeout; do not regress to the
+  superseded target-discovery diagnosis or claim an application-refetch failure without evidence.
+- **A green suite leak report does not replace the independent host audit:** Aspire and Docker were
+  already green when #1664's separate scan found three stopped run-owned helpers plus unreadable
+  database residue. Exact cleanup and recoverable quarantine were required before releasing the
+  runtime lease.

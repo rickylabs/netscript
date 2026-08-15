@@ -1445,3 +1445,20 @@
   `status:impl`, removed `status:ready-merge`, and did not merge. The same original Sol/medium author
   is assigned one focused type-safe repair; fresh internals Tier-A and a fresh delta evaluator must
   precede any later readiness restoration.
+
+## 2026-08-15T21:31:49Z — #1664 attempt 6 reaches an honest browser-probe timeout
+
+- The one authorized `scaffold.runtime` run selected the strict managed-browser override exactly:
+  Chrome for Testing `151.0.7922.34` from `NETSCRIPT_E2E_BROWSER_EXECUTABLE`. It passed 69 gates and
+  failed only `behavior.service-client-refetch`; the child emitted no evidence and exited 143 at the
+  suite-owned 900,030 ms boundary. Raw exit is 1, retry count is zero, and `fresh-browser` is
+  `NOT_RUN` because its prerequisite failed.
+- Evidence head `2385cdb72` is clean, explicitly pushed, and commented at `5304325367`. Raw log hash
+  is `1bf8cb03…aaa0`; structured NDJSON hash is `ffab7e7f…e356`; the browser-selection JSON is
+  separate. The red is not relabelled as a proven application-refetch failure: valid browser
+  selection is proven, but the deeper hang remains for fresh Tier-A attribution.
+- Suite cleanup passed. The independent audit found three stopped run-owned Aspire NuGet helpers
+  and one unreadable Postgres directory; exact helper cleanup succeeded, and the generated project
+  moved recoverably—not deleted—to `/tmp/netscript-s5-a6-quarantine-20260815-4M9v8k`. Final Aspire,
+  Docker, process, port, and unreadable-residue audits are empty. The singleton runtime lease is
+  released; no evaluator or later runtime attempt is authorized.

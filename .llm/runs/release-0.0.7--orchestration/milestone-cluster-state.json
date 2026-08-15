@@ -1729,14 +1729,14 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
-      "currentPrHeadSha": "ed3f78e0d87784b1869166bd2574737c62fac0af",
+      "currentPrHeadSha": "2385cdb72602c149c29cc637870ddca3db09e0cd",
       "issueNumbers": [1355, 1360],
       "implementerAgentId": "01a004f9-f033-7592-a0bc-63927753fb43",
       "implementerRoute": "openai / gpt-5.6-sol / high / approval never / dangerFullAccess",
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "f7_tier_a_pass_attempt_6_singleton_runtime_lease_active",
+      "implementationState": "attempt_6_terminal_red_clean_audit_evidence_pushed_fresh_tier_a_pending",
       "dispatchTopicHeadSha": "0d0ba1b7a404c847acba2daed40c69d282906f69",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
@@ -1960,14 +1960,25 @@
           "f7ReplacementReceiptState": "PASS and SUFFICIENT at immutable content e45144db6: retained check; test-attempt2 4237/0/19 with total 4256; publish-dry-run; arch-check; original 4236/1/19 test red preserved and excluded as superseded evidence",
           "f7FinalTierAState": "PASS",
           "f7FinalTierATopicCheckpointSha": "4a65a2670",
-          "attempt6LeaseState": "active_singleton_runtime_lease",
+          "attempt6LeaseState": "released_after_terminal_red_clean_audit_and_pushed_evidence",
           "attempt6LeaseGrantedAt": "2026-08-15T20:55:30.000Z",
-          "attempt6EvidenceHeadSha": "ed3f78e0d87784b1869166bd2574737c62fac0af",
+          "attempt6PreGateEvidenceHeadSha": "ed3f78e0d87784b1869166bd2574737c62fac0af",
           "attempt6ContentHeadSha": "e45144db643f6bde85552a615812c8371e4ce792",
           "attempt6TopicCheckpointSha": "ac1ec35cf",
           "attempt6BrowserOverride": "/home/codex/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome — Google Chrome for Testing 151.0.7922.34",
           "attempt6Preflight": "leaf clean and local == remote == PR; aspire ps []; aspire stop no AppHost; Docker zero; no AppHost/DCP/browser/runtime process or relevant listener; no unreadable residue; three older readable plugin-smoke trees recoverably moved to /tmp/netscript-preattempt6-quarantine.9mNpwE",
           "attempt6Contract": "one suite-owned scaffold.runtime with strict managed-browser override; cleanup and independent Aspire/Docker/process/port/residue audit; fresh-browser once only on scaffold PASS plus clean audit; final cleanup/audit; no retry or evaluator",
+          "attempt6RuntimeResult": "FAIL passed=69 failed=1 skipped=0 at behavior.service-client-refetch; managed Chrome was selected successfully, but the child returned no refetch evidence and exited 143 at the suite-owned 900030ms boundary",
+          "attempt6RawLog": ".llm/runs/feat-app-service-client-wiring--1355/reports/s5-attempt6-scaffold-runtime-20260815-205715.log",
+          "attempt6RawLogSha256": "1bf8cb03aaa3be0ba900254abdaf3065aa9f7c8cae5989bac37ed396a919aaa0",
+          "attempt6NdjsonSha256": "ffab7e7f0b7764c7d2e0eca5873fa9d5cfee7c5f278743a8886e7bbba53de356",
+          "attempt6BrowserSelectionEvidence": ".llm/runs/feat-app-service-client-wiring--1355/reports/s5-attempt6-browser-selection-20260815-205715.json; source NETSCRIPT_E2E_BROWSER_EXECUTABLE; Google Chrome for Testing 151.0.7922.34",
+          "attempt6FreshBrowser": "NOT_RUN because scaffold.runtime failed; no catalog receipt exists",
+          "attempt6Cleanup": "cleanup.aspire-stop and suite Docker cleanup passed; three stopped run-owned Aspire NuGet helpers exited after exact TERM plus CONT; generated project with its unreadable Postgres directory moved recoverably to /tmp/netscript-s5-a6-quarantine-20260815-4M9v8k; final Aspire, Docker, process, port, and unreadable-residue audits are empty",
+          "attempt6EvidenceHeadSha": "2385cdb72602c149c29cc637870ddca3db09e0cd",
+          "attempt6EvidenceCommentUrl": "https://github.com/rickylabs/netscript/pull/1664#issuecomment-5304325367",
+          "attempt6CompletedAt": "2026-08-15T21:30:55.000Z",
+          "attempt6Next": "fresh features Tier-A must classify the 900-second browser-probe hang before any repair amendment, runtime retry, or evaluator",
           "attempt4Next": "superseded by attempt-5 terminal red and attribution recovery"
         }
       },
@@ -3169,7 +3180,7 @@
     },
     {
       "id": "app-service-client-wiring-f7-runtime",
-      "state": "active",
+      "state": "complete",
       "lane": "features",
       "leafId": "app-service-client-wiring",
       "gateId": "scaffold.runtime_then_fresh-browser",
@@ -3188,6 +3199,20 @@
         "unreadableResidue": 0,
         "otherLeaseOwners": 0,
         "staleReadableResidue": "three exact run-owned trees moved recoverably to /tmp/netscript-preattempt6-quarantine.9mNpwE"
+      },
+      "completedAt": "2026-08-15T21:30:55.000Z",
+      "verdict": "FAIL_FIX",
+      "summary": "scaffold.runtime passed 69 and failed behavior.service-client-refetch at 900030ms / exit 143 after valid managed-Chrome selection; fresh-browser NOT_RUN",
+      "evidenceHead": "2385cdb72602c149c29cc637870ddca3db09e0cd",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1664#issuecomment-5304325367",
+      "cleanup": {
+        "aspirePostcondition": "ok_empty",
+        "dockerPostcondition": "ok_empty",
+        "processPostcondition": "ok_empty_after_three_exact_run_owned_helpers_exited",
+        "portPostcondition": "ok_empty",
+        "unreadableResiduePostcondition": "ok_empty_after_recoverable_quarantine",
+        "quarantine": "/tmp/netscript-s5-a6-quarantine-20260815-4M9v8k",
+        "freshBrowser": "NOT_RUN"
       }
     }
   ],
@@ -3230,5 +3255,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T21:18:24.000Z"
+  "updatedAt": "2026-08-15T21:31:49.000Z"
 }
