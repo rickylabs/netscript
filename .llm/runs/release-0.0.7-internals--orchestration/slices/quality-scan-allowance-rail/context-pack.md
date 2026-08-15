@@ -20,11 +20,16 @@
   check, and `quality:gate` exit 0. Receipts are under `receipts/slice-3/` at the signed Slice 2
   parent; none names a stash or non-history commit-ish.
 - Slice 3 is signed off at `83f7a18479720ac9e61c796de64593baa081e77f`.
-- **Current state:** Slice 4 is in progress. Its first full-test receipt is expected RED (4,108
-  pass, 1 fail): the installed consumer scanner cannot resolve the repo-only `@std/path` alias from
-  a foreign CWD. The authorized minimum repair restores `jsr:@std/path@^1` in the source scanner and
-  regenerates the embedded asset. A focused pre-commit diagnostic is green 19/19 but is not binding;
-  final gates must be rerun against the landed repair commit.
+- Slice 4's initial full-test receipt is expected RED (4,108 pass, 1 fail): it found the installed
+  consumer scanner could not resolve the repo-only `@std/path` alias from a foreign CWD. The
+  authorized minimum repair restored `jsr:@std/path@^1` and regenerated the embedded asset at
+  `71c26445838eb5bca654607947ad247cbea78273`.
+- **Stop state:** Slice 4 implementation and binding evidence are complete and await substantive
+  Tier-A review. At `71c264458`, consumer integration is 19/19, full test is 4,109/0, full check
+  covers 2,919 files, `quality:gate` and standalone architecture pass, both scans report seven
+  verified records and no findings/failures, Fresh browser is 2/2, docs format/format-test/accuracy
+  pass, generated assets are clean, and both scoped publish simulations pass. Receipts are under
+  `receipts/slice-4/`.
 - Draft PR #1653 directly targets `main`, remains draft, and retains exactly `status:impl`.
 - Branch: `chore/quality-scan-allowance-rail`, no upstream. Base:
   `01e0960494c95ce56eb35892c211a095eb13e6ed`.
@@ -71,7 +76,7 @@ Native Claude Opus 5 cycle 2 evaluated repaired head `09dfb092d` in separate ses
 the evaluator artifact commit is `c694cfb311d378f4796280649042c8c275c828ed` and the verdict comment
 is `5299133651`.
 
-Next action: land the authorized consumer portability repair, rerun Slice 4's binding final gates at
-that implementation commit, update acceptance evidence without ticking coordinator-owned PR-body
-boxes, then stop for substantive Tier-A review. The final IMPL-EVAL remains a separate
-opposite-family session after Slice 4 supervisor review.
+Next action: the topic orchestrator performs substantive Tier-A review of Slice 4 at implementation
+commit `71c264458` and the final author evidence commit. The author did not tick PR-body boxes. The
+separate opposite-family IMPL-EVAL remains pending until Slice 4 supervisor sign-off; do not launch
+it from this author stop.

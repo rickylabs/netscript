@@ -207,15 +207,52 @@ consumer-safe `jsr:@std/path@^1` specifier that existed at the immutable base, r
 `deno task gen:assets-barrel`, and rerun the existing consumer integration test. The focused
 pre-commit probe passed 19/19, but is explicitly non-binding because its working tree contained the
 repair; `receipts/slice-4/consumer-tool-green-precommit.json` is retained only as diagnostic
-evidence. Binding final evidence will be rerun against the landed repair commit before Slice 4 is
-presented for Tier-A review.
+evidence. The repair landed at `71c26445838eb5bca654607947ad247cbea78273`; every binding final
+receipt below names that exact history commit and reports matching `actualGitHead`.
 
-| Evidence                                                  | Outcome       | Exit | Receipt                                               |
-| --------------------------------------------------------- | ------------- | ---: | ----------------------------------------------------- |
-| Live PR/issue close-gate baseline (not allowlisted)       | expected FAIL |    1 | live observation; no fabricated durable receipt       |
-| Full repository test before portability repair            | expected FAIL |    1 | `receipts/slice-4/test.json`                          |
-| Consumer integration pre-commit diagnostic (19/19)        | PASS probe    |    0 | `receipts/slice-4/consumer-tool-green-precommit.json` |
-| Full structured check before the one-line portability fix | PASS          |    0 | `receipts/slice-4/check.json`                         |
+| Evidence                                                         | Outcome       | Exit | Receipt                                               |
+| ---------------------------------------------------------------- | ------------- | ---: | ----------------------------------------------------- |
+| Live PR/issue close-gate baseline (not allowlisted)              | expected FAIL |    1 | live observation; no fabricated durable receipt       |
+| Full repository test before portability repair                   | expected FAIL |    1 | `receipts/slice-4/test.json`                          |
+| Consumer integration pre-commit diagnostic (19/19)               | PASS probe    |    0 | `receipts/slice-4/consumer-tool-green-precommit.json` |
+| Consumer integration at landed repair (19/19)                    | PASS          |    0 | `receipts/slice-4/consumer-tool-green.json`           |
+| Clean generated-asset second run                                 | PASS          |    0 | `receipts/slice-4/assets.json`                        |
+| Binding full structured check (2,919 files, 63 batches)          | PASS          |    0 | `receipts/slice-4/check-binding.json`                 |
+| Binding full repository test (4,109 pass, 0 fail, 19 ignored)    | PASS          |    0 | `receipts/slice-4/test-binding.json`                  |
+| Root quality job; check/lint/format and companion checks fired   | PASS          |    0 | `receipts/slice-4/quality-job.json`                   |
+| `quality:gate` (`quality:scan` + `arch:check`)                   | PASS          |    0 | `receipts/slice-4/quality-gate.json`                  |
+| `quality:scan` (7 verified records, zero findings/failures)      | PASS          |    0 | `receipts/slice-4/quality-scan.json`                  |
+| `quality:scan:repo` (7 verified records, zero findings/failures) | PASS          |    0 | `receipts/slice-4/quality-scan-repo.json`             |
+| Standalone doctrine/architecture gate                            | PASS          |    0 | `receipts/slice-4/arch-check.json`                    |
+| Fresh browser suite (2/2)                                        | PASS          |    0 | `receipts/slice-4/fresh-browser.json`                 |
+| Docs source-format check                                         | PASS          |    0 | `receipts/slice-4/docs-source-format.json`            |
+| Docs source-format regression suite (6/6)                        | PASS          |    0 | `receipts/slice-4/docs-source-format-test.json`       |
+| Docs accuracy/discoverability                                    | PASS          |    0 | `receipts/slice-4/docs-accuracy.json`                 |
+| Scoped CLI publish simulation                                    | PASS          |    0 | `receipts/slice-4/cli-publish-dry-run.json`           |
+| Scoped Workers publish simulation                                | PASS          |    0 | `receipts/slice-4/workers-publish-dry-run.json`       |
+
+The Workers publish simulation retains its three existing `unanalyzable-dynamic-import` warnings. No
+warning was suppressed, no publication occurred, and the separate Workers full-export lint remains
+the exact accepted 20-`private-type-ref` failure owned by #1655 — it is not green.
+
+### Definition of Done truth audit before Tier-A
+
+This table records truth only; the author did **not** tick PR-body boxes.
+
+| PR Definition of Done row                                              | State before Slice 4 Tier-A | Evidence                                                                             |
+| ---------------------------------------------------------------------- | --------------------------- | ------------------------------------------------------------------------------------ |
+| Separate-session PLAN-EVAL records `PASS`                              | TRUE                        | `plan-eval.md`, evaluator commit `c694cfb311`, verdict comment `5299133651`          |
+| Coordinator resolves contract clarifications                           | TRUE                        | coordinator comment `5286261678`, central commit `874eacc0d`, D-6 through D-8        |
+| #1545 registration precedes #1378 enforcement                          | TRUE                        | Slice 1 registration `586b55135` precedes Slice 2 enforcement `f869a5bfe`            |
+| Seven allowances have reasons and open, milestoned ownership           | TRUE                        | final scan receipts: seven records, all #1276, no owner failures                     |
+| Both maxima equal population and cannot rise without same-change issue | TRUE                        | `deno.json` maxima 7 plus `slice-1/allowance-budget-landed-head.json`                |
+| RED-first acceptance matrix                                            | TRUE                        | Slice 1/2 RED and green receipts; focused suite 25/25; Tier-A S1/S2 verification     |
+| Generated asset regenerated and second run clean                       | TRUE                        | Slice 3 RED/green plus final `slice-4/assets.json` at `71c264458`                    |
+| CLI/Workers JSR audits and scoped dry-runs recorded without publish    | TRUE                        | Slice 3 doc-lint audit, exact Workers debt baseline, final dry-run receipts          |
+| All binding proving gates pass at one implementation SHA               | TRUE                        | all binding Slice 4 receipts name `71c264458`; historical RED/probes are non-binding |
+| Every implementation slice receives Tier-A review                      | PENDING                     | Slices 1–3 signed; Slice 4 must now receive substantive Tier-A review                |
+| Separate opposite-family IMPL-EVAL passes                              | PENDING                     | not launched; only after Slice 4 Tier-A sign-off                                     |
+| PR remains draft for coordinator disposition                           | TRUE                        | live PR #1653 is draft at exactly `status:impl`                                      |
 
 ## Reconcile notes
 
@@ -241,6 +278,11 @@ presented for Tier-A review.
   remain coordinator-owned and unchecked. Its failure was observed read-only but not represented as
   a `run-gate.ts` receipt because `close-gate` is not in the allowlisted catalog and this leaf may
   not widen that tooling surface.
+- Slice 4 fetched `origin/main` at `0b3ed5d5`; the evaluator-approved branch was not rebased. The
+  coordinator's current drift policy reserves the cluster-wide expensive mutex for shared
+  resource-heavy E2E/Aspire gates. This slice ran only static/browser proving gates and scoped
+  publish simulations, while the user explicitly prohibited the mutex and E2E/runtime smoke; no
+  lease or central state was mutated.
 
 ## Activity
 
@@ -287,6 +329,10 @@ presented for Tier-A review.
   Slice 4's full-test RED exposed the installed scanner's repo-only import alias; restored its prior
   explicit JSR specifier, regenerated the authorized asset, and retained both the failing full-test
   receipt and the non-binding focused pre-commit diagnostic.
+- 2026-08-15 — landed the portability repair at `71c26445838eb5bca654607947ad247cbea78273` and reran
+  every binding Slice 4 proving gate at that history commit. Full test is 4,109/0, both quality
+  scans report `allowCount: 7` with zero findings/owner failures, all named contract gates pass, and
+  both publish commands remained dry runs.
 
 ## Plan-Gate state
 
