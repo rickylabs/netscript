@@ -362,6 +362,63 @@ The stale "cycle 2 pending" wording in the **leaf-local** `plan.md` §Status, `s
 leaf-owned, and a supervisor editing it would blur the generator/reviewer boundary. This topic run's
 own artifacts are refreshed in this commit.
 
+### Slices 2–5 landed — topic Tier-A review, sign-off HELD on one finding
+
+Thread `019ffcca-8be0…` returned after four slice commits, stopping before slice 6 as instructed.
+Head `cab6d1feb813a88afde7403ee21de44503503fa0`, clean, pushed (remote == local).
+
+| Slice | Commit | Issue | Decisive gate result (as claimed) |
+| --- | --- | --- | --- |
+| 2 | `32cd429c0 fix(cli): emit selected database provider helpers` | #1588 | `generators_test.ts` — exit 0, 9 passed |
+| 3 | `275ae091c fix(cli): generate truthful database seeds` | #1262 | seed + scaffolder tests — exit 0, 6 passed |
+| 4 | `589a01a55 fix(cli): define generated missing-row errors` | #1263 | `generated-router-template_test.ts` — exit 0, 3 passed |
+| 5 | `cab6d1feb test(cli): prepare grouped scaffold acceptance` | #1262/#1263 | `verify-live-db-endpoint_test.ts` |
+
+**Independently re-executed by this lane (not read from the report):**
+
+- Slice-2 decisive gate rerun: `exitCode 0`, `passed 9 / failed 0` — reproduces the claim exactly.
+- `deno task quality:scan`: `"ok":true`, `findings: []`, `allowCount 7`. All seven allowances are
+  **pre-existing** (`public-api.ts`, `public-command-dependencies.ts`, `plugins/workers/streams`);
+  **none is in a file this leaf touched**. No new `// quality-allow`, `// deno-lint-ignore`,
+  `as any`, or `as unknown as` was introduced to green a wrapper — the specific defect class the
+  brief called review-blocking is absent.
+- `deno task arch:check`: warnings only, no doctrine FAIL rows.
+- Boundary: product delta is 16 files, all inside the approved surface; `deno.lock` unchanged;
+  `docker ps -a` empty; no `scaffold.runtime`/Aspire/Docker/publish process was started.
+- PR #1654 still `OPEN`, draft, exactly one `status:impl`, no closing keyword added.
+
+#### Finding T-1 (non-blocking for the delivered behavior; must be resolved before IMPL-EVAL)
+
+**A pre-existing behavior lost its only regression test, and the slice comment does not record it.**
+
+`packages/cli/src/kernel/templates/database/generators_test.ts` went from **11 `it()` cases to 8**.
+Five were removed, two added. The replacement four-engine required/forbidden-symbol matrix is
+genuinely *stronger* for #1588's actual property — forbidden-symbol coverage is new and is the core
+of the issue — so the restructure is sound in intent. But one deleted case,
+`it('normalizes mssql Aspire loopback endpoints to hostname URLs')`, was the only pin on a behavior
+that is still live generated code:
+
+- `assets/database/connection-helpers.ts.template:148` still defines `normalizeSqlServerHost`, and
+  `:145` still calls it from `parseSqlServerEndpoint`, inside the `@netscript-provider:mssql` block;
+  the same code is mirrored into `embedded.generated.ts`.
+- Its behavior — `127.0.0.1` / `::1` / `[::1]` → `localhost` — now has **zero test coverage**:
+  `grep -rn normalizeSqlServerHost` gives 3 source hits and **0** test hits. `parseSqlServerEndpoint`
+  appears in tests only as a *forbidden* symbol for other engines, never as a behavioral assertion.
+
+The slice-2 PR comment records what the new matrix proves but not that five cases were removed or
+why. `netscript-harness` is explicit: tests are not deleted or bypassed unless the rationale is
+recorded. This is a coverage regression on a behavior unrelated to the three issues, introduced as a
+side effect of an otherwise-good refactor.
+
+**Cheapest correct fix:** one bounded fix-up on the same thread `019ffcca-8be0…` restoring a focused
+assertion that mssql output normalizes a loopback host to `localhost` (or, if the behavior is
+genuinely intended to be dropped, stating that explicitly with evidence). Then re-run the slice-2
+decisive gate and amend the slice-2 comment with the removal rationale.
+
+**Sign-off is held.** No supervisor sign-off commit is made while T-1 is open, and IMPL-EVAL is not
+requested — a leaf must not enter the formal gate carrying a known unrecorded coverage regression.
+Slice 6 remains blocked on the ungranted `scaffold.runtime` singleton lease regardless.
+
 ## Wave 0 lane assignments
 
 | Leaf | Branch | Implementation route | Formal evaluator (per `dispatch.json`) |

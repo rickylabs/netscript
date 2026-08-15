@@ -32,22 +32,25 @@ dispatch order.
   `session revoke --auth-url` → `http://localhost:8094/api/v1/auth` default, same pin class as #1243
   but outside its narrowing; it needs its own issue.
 - `scaffold-generated-output-correctness` (#1262, #1263, #1588, PR #1654, **`status:impl`**, draft):
-  Plan gate is **closed** — PLAN-EVAL cycle 2 `PASS` at `5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5`,
-  verdict commit `b8fc5eb53`, cycle-1 `FAIL_PLAN` preserved byte-identical as
-  `plan-eval-cycle-1.md`. **Implementation is running on the original Codex thread
-  `019ffcca-8be0-74c2-bb0e-c82cf5ce3c85`** (resumed, never replaced; exactly one sender at that
-  worktree) from head `b8fc5eb53`.
+  **Slices 2-5 are landed** at head `cab6d1feb813a88afde7403ee21de44503503fa0`, clean and pushed,
+  on the original thread `019ffcca-8be0-74c2-bb0e-c82cf5ce3c85`: `32cd429c0` (#1588 provider-selected
+  output), `275ae091c` (#1262 truthful seed), `589a01a55` (#1263 defined missing-row errors),
+  `cab6d1feb` (grouped acceptance prep). Plan gate closed at cycle-2 `PASS`.
 
-  Authorized this turn: **slices 2 -> 5 only, stopping before slice 6.** Slice 6 is the one-pass
-  `deno task e2e:cli run scaffold.runtime` and needs the **singleton expensive-gate lease, which
-  remains ungranted**. Each slice follows the plan's `Proves -> Decisive gate -> Files`, uses the
-  structured wrappers as sole verdict source, and — because every one touches `packages/**` — must
-  also clear `deno task quality:scan` and `deno task arch:check`; a new `// deno-lint-ignore`,
-  `as any`, or `as unknown as` added to green a wrapper is review-blocking, not a pass.
+  **Topic Tier-A review is done and sign-off is HELD on finding T-1.** Verified independently: the
+  slice-2 gate reproduces 9/0, `quality:scan` is clean with all 7 allowances pre-existing and none
+  in a touched file (no new suppression to green a wrapper), `arch:check` has no FAIL rows,
+  `deno.lock` is unchanged, and no runtime/Aspire/Docker process ran.
 
-  Still ahead after slice 5, none of it lifted by the plan PASS: topic Tier-A substantive review and
-  the supervisor sign-off commit, the coordinator lease decision for slice 6, and a mandatory fresh
-  opposite-family IMPL-EVAL. No lane self-certifies.
+  **T-1:** `generators_test.ts` went 11 -> 8 `it()` cases. The replacement four-engine
+  required/forbidden matrix is stronger for #1588, but the deleted mssql loopback-normalization case
+  was the only pin on `normalizeSqlServerHost`, which is still live generated code and now has zero
+  test coverage; the slice-2 comment does not record the removal or its rationale. Fix is one
+  bounded fix-up on the same thread, then re-run the slice-2 gate and amend the comment.
+
+  Blocked until T-1 clears: the supervisor sign-off commit and the mandatory fresh opposite-family
+  IMPL-EVAL. Blocked independently: slice 6, which needs the **ungranted** `scaffold.runtime`
+  singleton lease.
 
 Both 2026-08-13 "coordinator decision required" blockers are resolved; see `worklog.md`.
 
