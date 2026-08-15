@@ -174,3 +174,79 @@ correct and stays in force; the comparison is what needed fixing.
 Tier-A **PASS** at `23db20f301d06ed1e4a9a65cbbf64349f89cb8c0`. Proceeding to exactly one separate
 native Claude Fable 5 · medium · Remote Control PLAN-EVAL over this immutable head. No implementation
 before its PASS.
+
+---
+
+# Tier-A — implementation slice S1 at `e100ea205b16a8ed22dbdb6b587212a852d6c416`
+
+| Field | Value |
+| --- | --- |
+| Head | `e100ea205b16a8ed22dbdb6b587212a852d6c416` — local == remote == PR, clean, draft, sole `status:plan` |
+| Commits | `e05a54145 fix(sdk): dedupe stale refresh persistence`, `e100ea205 refactor(sdk): simplify cache query lifecycle` |
+| Verdict | **PASS** |
+
+## Scope — exact
+
+`packages/sdk/src/cache/cache-query.ts`, `packages/sdk/tests/cache/cache-query_test.ts`, plus three
+run artifacts. No docs page, no `query-factory_test.ts`, no generated mirror — all correctly deferred
+to S2.
+
+## F-1 metric gaming — rejected, then honestly resolved
+
+The coordinator's pre-review finding is **confirmed** against the committed base, not accepted on
+report. At `e05a54145` the file was 499 lines with **zero** JSDoc on `queryInsideSpan`, `getInflight`,
+`fetchAndCacheOnce`, `fetchAndCache`, `revalidateInBackground` — all five carried JSDoc at base — with
+7 comment lines removed against 1 added, landing one line inside the 500 boundary.
+
+After the finding, `e100ea205` reaches **497 lines with all five JSDoc blocks restored**. The
+line-class comparison is what proves this is structural rather than cosmetic:
+
+| Class | Base `d555cc971` | S1 `e100ea205` |
+| --- | --- | --- |
+| total | 490 | 497 |
+| blank | 30 | **30** — identical |
+| comment / JSDoc | 39 | **40** — one more than base |
+| code (derived) | 421 | 427 |
+
+Blank-line structure untouched, comments slightly **above** base, and code grew only 6 lines while
+absorbing the whole A2/A3 behaviour — real duplication was removed. Strictly better than the rejected
+499 on every axis, and with genuine headroom instead of one line.
+
+`worklog.md:91` was corrected to record what happened: "Coordinator rejected the initial
+comment/spacing deletion as F-1 metric gaming. Restored all useful documentation and structure, then
+reduced real duplication; honest file is 497 lines." The quality row records a re-run on the restored
+source. No extraction proposal was needed, so nothing is pending a scope ruling.
+
+**Delivery race, recorded honestly.** The finding was dispatched while the author was mid-turn; the
+sender retried on `already has an active writer` for 18+ attempts while `e05a54145` was committed and
+pushed. Delivery was then proven by rollout grep (0 → 2). The practical guarantee a supervisor can
+offer is "before the author's current turn ends", not "before commit" — there is no safe way to
+inject into a live Codex turn, and corrupting one is worse than a late finding. Consequence was
+bounded: draft PR, no verdict bound to that head, remedied by a follow-up commit.
+
+## A2 and A3 — implemented, verified
+
+- **A2** — `cache-query_test.ts:146` "CacheQuery blocking joiner receives data when background
+  persistence fails". Exactly the required case: fetch succeeds, write fails, joiner still receives
+  data, inheriting #1665's non-fatal-write behaviour.
+- **A3** — `this.inflightRequests.set(key, operation)` (`cache-query.ts:263`) registers
+  **synchronously** in the scheduling reader's turn, with `.finally()` cleanup at `:260-262`.
+- **Sleep-free determinism confirmed by execution**: `grep -n 'sleep\|delay(' cache-query_test.ts`
+  returns **nothing**. The overlapping-reader proof (`:97`) is ordering-based, not timing-based — the
+  specific thing a "simplify" refactor could have quietly reintroduced.
+
+## Gates — executed by this review
+
+| Gate | Result |
+| --- | --- |
+| `cache-query_test.ts` | **5 passed / 0 failed** |
+| `packages/sdk` suite | **68 passed / 0 failed** (66 at #1665 merge; +2 new) |
+| check / lint / fmt (84 files) | 0 / 0 / 0 findings |
+| `quality:scan` | `ok:true`, 0 findings, 7 known allowances, **no F-1** |
+| Raw doc-lint combined / cache | 3 / 3 — pins unchanged, both still expected-red |
+
+## Outcome
+
+S1 Tier-A **PASS** at `e100ea205`. Proceeding to S2 (docs correction, factory-loader regression, and
+the four-mirror cascade) carrying advisories **A1** (S2 page sentence is manual evidence — a
+`docs-accuracy` receipt must not be cited as proof) and **A4** (line-107 posture clause).
