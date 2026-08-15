@@ -12,21 +12,53 @@
 
 ## Findings
 
-| #  | Finding                                                                                                                                                                                                                                                                                                                                                                                                          | How to verify                                                                                                                                     |
-| -- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1  | The exact offending published loader snippet lives in `docs/site/services-sdk/sdk.md`, line 188. It calls `getCachedEntry()`, returns any hit immediately, and falsely claims the SDK reloads stale data in the background.                                                                                                                                                                                      | `rg -n -F 'serve cached; SDK reloads stale in the background' docs/site`; `docs/site/services-sdk/sdk.md:184-200`                                 |
-| 2  | Contract path `docs/sdk` does not exist.                                                                                                                                                                                                                                                                                                                                                                         | `test -e docs/sdk` exits non-zero.                                                                                                                |
-| 3  | Contract path `docs/site/_site/capabilities/sdk/index.md` does not exist, and `_site/` is excluded as generated Lume output rather than source. It must never be hand-edited.                                                                                                                                                                                                                                    | `test -e docs/site/_site/capabilities/sdk/index.md` exits non-zero; `.llm/tools/docs/snippet-policy.ts:45-48` excludes `_site`.                   |
-| 4  | The other two frozen surfaces exist: `docs/site/services-sdk/sdk.md` and `packages/sdk/src/cache/cache-query.ts`. The corrected frozen surface list is those two paths only.                                                                                                                                                                                                                                     | Direct path checks.                                                                                                                               |
-| 5  | `getCachedEntry()` is a published pure read: it reads the store and converts `timestamp` to `cachedAt`; it receives no stale policy or fetcher.                                                                                                                                                                                                                                                                  | `deno doc --filter CacheQuery packages/sdk/mod.ts`; `packages/sdk/src/cache/cache-query.ts:414-442`.                                              |
-| 6  | The callable `ActionMethod` already owns the complete declared cache policy (`staleTime`, `cacheTime`, `revalidateOnStale`, `preferFreshOnStale`) and the service fetcher. A blocking stale read is already expressible by calling it with `preferFreshOnStale: true` before reading metadata.                                                                                                                   | `packages/sdk/src/ports/query-factory.ts:35-80`; `packages/sdk/src/query/query-factory.ts:65-87`; `packages/sdk/src/ports/query-options.ts:9-35`. |
-| 7  | `CacheQuery.query()` implements fresh, missing, expired, blocking-stale, and SWR branches. The existing test suite covers single-reader SWR, blocking stale, and cold-cache foreground dedupe, but not two overlapping stale SWR readers.                                                                                                                                                                        | `packages/sdk/src/cache/cache-query.ts:98-202`; `packages/sdk/tests/cache/cache-query_test.ts:5-72`.                                              |
-| 8  | Background revalidation bypasses `inflightRequests`: `revalidateInBackground()` calls `queryFn()` and `store.set()` directly. Two stale readers that both pass the initial map check can therefore schedule duplicate refreshes.                                                                                                                                                                                 | `packages/sdk/src/cache/cache-query.ts:261-313`.                                                                                                  |
-| 9  | Simply registering the background refresh in the current map is insufficient: the unconditional pre-store map join at lines 140-143 would make a later SWR reader block for fresh data rather than return stale data, and the current foreground map stores only the loader promise rather than the full loader-plus-persistence lifecycle. Policy-aware joining and persistence-complete promises are required. | `packages/sdk/src/cache/cache-query.ts:140-143, 227-258`.                                                                                         |
-| 10 | `docs/site/web-layer/query-bridge.md` is already accurate: it calls `getCachedEntry()` a read, not a fetch, and identifies the callable action as the SWR/blocking path. This is the source-alignment anchor for the corrected example.                                                                                                                                                                          | `docs/site/web-layer/query-bridge.md:157-191`.                                                                                                    |
-| 11 | `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md:100` contains a second false prose claim that a stale `getCachedEntry()` hit refreshes in the background. It is outside the frozen contract and is not the exact issue-cited snippet. Adding it would be a scope expansion; it is reported, not silently edited.                                                                                 | `rg -n 'getCachedEntry.*stale entry refreshes' docs/site`; page lines 99-108.                                                                     |
-| 12 | Editing the owned site source has the proven generated cascade: agent-docs prose/provenance, CLI agent-docs barrel, then MCP publish assets. All four generated files exist at this baseline.                                                                                                                                                                                                                    | Root tasks `gen:agent-docs-prose`, `gen:assets-barrel`, `gen:publish-assets`; direct file checks.                                                 |
-| 13 | `services-sdk/sdk.md` is a Tier-1 snippet-policy page. The published example also needs a runtime regression because its `comp.tabbedCode` string is not by itself sufficient proof of concurrent behavior.                                                                                                                                                                                                      | `.llm/tools/docs/snippet-policy.ts:4-17`; `packages/sdk/tests/query/query-factory_test.ts`.                                                       |
+| #  | Finding                                                                                                                                                                                                                                                                                                                                                                                                                                               | How to verify                                                                                                                                                      |
+| -- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1  | The exact offending published loader snippet lives in `docs/site/services-sdk/sdk.md`, line 188. It calls `getCachedEntry()`, returns any hit immediately, and falsely claims the SDK reloads stale data in the background.                                                                                                                                                                                                                           | `rg -n -F 'serve cached; SDK reloads stale in the background' docs/site`; `docs/site/services-sdk/sdk.md:184-200`                                                  |
+| 2  | Contract path `docs/sdk` does not exist.                                                                                                                                                                                                                                                                                                                                                                                                              | `test -e docs/sdk` exits non-zero.                                                                                                                                 |
+| 3  | Contract path `docs/site/_site/capabilities/sdk/index.md` does not exist, and `_site/` is excluded as generated Lume output rather than source. It must never be hand-edited.                                                                                                                                                                                                                                                                         | `test -e docs/site/_site/capabilities/sdk/index.md` exits non-zero; `.llm/tools/docs/snippet-policy.ts:45-48` excludes `_site`.                                    |
+| 4  | The other two frozen surfaces exist: `docs/site/services-sdk/sdk.md` and `packages/sdk/src/cache/cache-query.ts`. Those remain the corrected original contract paths; the coordinator subsequently authorized exactly one additional docs source, recorded in finding 11.                                                                                                                                                                             | Direct path checks; coordinator scope ruling for PR #1669.                                                                                                         |
+| 5  | `getCachedEntry()` is a published pure read: it reads the store and converts `timestamp` to `cachedAt`; it receives no stale policy or fetcher.                                                                                                                                                                                                                                                                                                       | `deno doc --filter CacheQuery packages/sdk/mod.ts`; `packages/sdk/src/cache/cache-query.ts:414-442`.                                                               |
+| 6  | The callable `ActionMethod` already owns the complete declared cache policy (`staleTime`, `cacheTime`, `revalidateOnStale`, `preferFreshOnStale`) and the service fetcher. A blocking stale read is already expressible by calling it with `preferFreshOnStale: true` before reading metadata.                                                                                                                                                        | `packages/sdk/src/ports/query-factory.ts:35-80`; `packages/sdk/src/query/query-factory.ts:65-87`; `packages/sdk/src/ports/query-options.ts:9-35`.                  |
+| 7  | `CacheQuery.query()` implements fresh, missing, expired, blocking-stale, and SWR branches. The existing test suite covers single-reader SWR, blocking stale, and cold-cache foreground dedupe, but not two overlapping stale SWR readers.                                                                                                                                                                                                             | `packages/sdk/src/cache/cache-query.ts:98-202`; `packages/sdk/tests/cache/cache-query_test.ts:5-72`.                                                               |
+| 8  | Background revalidation bypasses `inflightRequests`: `revalidateInBackground()` calls `queryFn()` and `store.set()` directly. Two stale readers that both pass the initial map check can therefore schedule duplicate refreshes.                                                                                                                                                                                                                      | `packages/sdk/src/cache/cache-query.ts:261-313`.                                                                                                                   |
+| 9  | Simply registering the background refresh in the current map is insufficient: the unconditional pre-store map join at lines 140-143 would make a later SWR reader block for fresh data rather than return stale data, and the current foreground map stores only the loader promise rather than the full loader-plus-persistence lifecycle. Policy-aware joining and persistence-complete promises are required.                                      | `packages/sdk/src/cache/cache-query.ts:140-143, 227-258`.                                                                                                          |
+| 10 | `docs/site/web-layer/query-bridge.md` is already accurate: it calls `getCachedEntry()` a read, not a fetch, and identifies the callable action as the SWR/blocking path. This is the source-alignment anchor for the corrected example.                                                                                                                                                                                                               | `docs/site/web-layer/query-bridge.md:157-191`.                                                                                                                     |
+| 11 | `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md:100` contains a second false clause: “the stale entry refreshes in the background” directly follows the `getCachedEntry` warm-read claim. The coordinator authorized this one page and no third docs source. Its correction must say that `getCachedEntry` only returns `{ data, cachedAt }` from warm KV or `null` from cold KV; it does not evaluate staleness or initiate refresh. | Executed docs claim sweep below; page lines 99-108.                                                                                                                |
+| 12 | Editing either authorized site source has the same generated cascade: agent-docs prose/provenance, CLI agent-docs barrel, then MCP publish assets. The ordered plan-phase generation run exited 0 for all three tasks and produced no tracked delta or undeclared path because the current content head was already synchronized.                                                                                                                     | `deno task gen:agent-docs-prose`; `deno task gen:assets-barrel`; `deno task gen:publish-assets`; then `git status --short` and `git diff --name-only`, both empty. |
+| 13 | `services-sdk/sdk.md` is a Tier-1 snippet-policy page. The published example also needs a runtime regression because its `comp.tabbedCode` string is not by itself sufficient proof of concurrent behavior.                                                                                                                                                                                                                                           | `.llm/tools/docs/snippet-policy.ts:4-17`; `packages/sdk/tests/query/query-factory_test.ts`.                                                                        |
+| 14 | The two-page plus surrounding-tutorial sweep found no third page that falsely assigns revalidation to `getCachedEntry()`. Broad SWR statements in chapter 3 describe the callable query factory; chapter 4's background-refresh statements are attached to `definePage` layer/client policy, while its `getCachedEntry()` use remains a pure resource read. Those mechanisms are distinct and need no third source edit.                              | Executed docs claim sweep below; adjudicated matches at chapter 3 lines 13-15, 74-80, 94-100, 107-110 and chapter 4 lines 14, 124, 176-195, 231-242.               |
+| 15 | Both authorized pages are inputs to the existing agent-docs bundle, so the second source does not authorize a fifth generated mirror.                                                                                                                                                                                                                                                                                                                 | `.llm/assets/agent-docs/provenance.json:127,145` lists `pages/services-sdk/sdk/index.md` and `pages/tutorials/live-dashboard/03-sdk-cache-first-query/index.md`.   |
+
+## Executed docs claim sweep
+
+```text
+rtk rg -n -C 4 -i "getCachedEntry|stale.{0,100}(refresh|revalidat)|(?:refresh|revalidat).{0,100}stale|background" docs/site/services-sdk/sdk.md docs/site/tutorials/live-dashboard --glob '*.md'
+rtk rg -n -i "getCachedEntry|stale.{0,100}(refresh|revalidat)|(?:refresh|revalidat).{0,100}stale" docs/site --glob '*.md' --glob '!_site/**'
+```
+
+The first command swept both authorized pages plus the surrounding live-dashboard tutorial story;
+the second checked all site source for a third page. The only false direct assignments of refresh to
+`getCachedEntry()` are the authorized service example at line 188 and live-dashboard chapter 3 at
+line 100. Chapter 3's other SWR prose describes the callable factory, and chapter 4's refresh prose
+describes `definePage` layer/client policy. No third docs source qualifies for edit.
+
+## Executed generated-mirror verification
+
+```text
+rtk proxy deno task gen:agent-docs-prose
+rtk proxy deno task gen:assets-barrel
+rtk proxy deno task gen:publish-assets
+rtk rg -n 'services-sdk/sdk|tutorials/live-dashboard/03-sdk-cache-first-query' .llm/assets/agent-docs/provenance.json
+git status --short
+git diff --name-only
+```
+
+All three generators exited 0 in the required order. Provenance names both authorized rendered
+pages. With no docs content edit permitted in this amendment, the already-synchronized content head
+produced an empty tracked delta; therefore execution found no generated path outside the four
+declared mirrors. The implementation slice must repeat the comparison after the two docs edits and
+stop if a fifth path appears.
 
 ## Contract decision
 
@@ -47,6 +79,16 @@ This choice is driven by the acceptance contract, not size:
 
 The choice **does not add published surface**. No `queryEntry()` export, provider method, action
 method, or composite-query method is planned, so no published-surface scope ruling is required.
+
+For the coordinator-authorized tutorial page, the planned replacement is deliberately narrower than
+the surrounding SWR story:
+
+> `getCachedEntry` is a pure KV read: on a warm cache it returns `{ data, cachedAt }`; on a cold
+> cache it returns `null`. It does not evaluate staleness or start revalidation; the callable action
+> or page/client policy must do that explicitly.
+
+This preserves the truthful factory-level and page/client refresh mechanisms without inventing one
+inside the fast path.
 
 ## Concurrency proof design
 
@@ -79,10 +121,14 @@ same persisted refresh, and the service client counter must equal one. This guar
 
 ## Corrected and derived surface list
 
-### Frozen contract correction
+### Corrected and authorized contract
 
 - `docs/site/services-sdk/sdk.md`
+- `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md` (the coordinator's exact
+  one-source expansion)
 - `packages/sdk/src/cache/cache-query.ts`
+
+The authorized docs sources are exactly the first two paths. No third docs source is in scope.
 
 Removed from the contract because they do not exist:
 
@@ -94,7 +140,7 @@ Removed from the contract because they do not exist:
 - `packages/sdk/tests/cache/cache-query_test.ts`
 - `packages/sdk/tests/query/query-factory_test.ts`
 
-### Derived asset cascade required by the site-source edit
+### Derived asset cascade required by either site-source edit
 
 - `.llm/assets/agent-docs/prose.json.gz`
 - `.llm/assets/agent-docs/provenance.json`
@@ -102,7 +148,8 @@ Removed from the contract because they do not exist:
 - `packages/mcp/src/publish-assets.generated.ts`
 
 Generation order is fixed: `gen:agent-docs-prose` → `gen:assets-barrel` → `gen:publish-assets`. The
-three freshness checks must pass together on one content head.
+three freshness checks must pass together on one content head. The ordered plan-phase execution
+completed with no tracked delta or undeclared path, and provenance names both authorized pages.
 
 ## jsr-audit surface scan
 
@@ -117,15 +164,14 @@ three freshness checks must pass together on one content head.
   types” banner. The raw dry-run is authoritative for actual slow types.
 - No published export is planned. The JSR risk is therefore regression-only: preserve export maps,
   keep raw publish dry-run green, and do not deepen the known folder-cardinality finding.
-- Raw doc-lint baseline discrepancy: the explicit all-export invocation exits `1` with three unique
-  `private-type-ref` diagnostics — `QueryClientPort` → `QueryClient`, `createNetScriptQueryClient` →
-  `QueryClient`, and `DurableStreamProducerOptions["instrumentation"]` → `StreamsInstrumentation`.
-  The brief's pinned count of six could not be reproduced at the exact checked-out SHA.
-  `deno doc --lint
-  packages/sdk/mod.ts` yields the first two; the structured full-export runner
-  also reports the same three unique files. This run must never report doc-lint as green and must
-  preserve the observed names/count while the topic orchestrator reconciles the supplied
-  six-diagnostic command.
+- Raw doc-lint no-regression has two expected-red invocations. The combined 12-entrypoint command
+  exits `1` with exactly three diagnostics: `QueryClientPort` → private `QueryClient`,
+  `createNetScriptQueryClient` → private `QueryClient`, and
+  `DurableStreamProducerOptions["instrumentation"]` → private `StreamsInstrumentation` (the last is
+  in `plugin-streams-core` and outside this leaf). The cache-only command separately exits `1` with
+  exactly three `KvCacheStore` diagnostics named in `plan.md` row 14b. “Six” was the sum across the
+  two commands. Both must preserve their exact named sets with zero new diagnostics; neither is a
+  pass.
 
 ## Known-red boundaries
 
@@ -139,10 +185,4 @@ three freshness checks must pass together on one content head.
 
 ## Open questions
 
-- **Safe to defer:** should the coordinator separately expand the frozen surface to correct the
-  adjacent tutorial claim at `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md:100`?
-  It is not the exact issue-cited example, and the planned generated cascade already covers any
-  later site-source addition, so deferral does not force code rework.
-- **Safe to defer to PLAN-EVAL/coordinator:** which exact raw full-surface doc-lint invocation
-  produced the brief's six diagnostics? The checked-out baseline produces three unique diagnostics;
-  this affects evidence wording, not the selected implementation design.
+- None that can force implementation rework. PLAN-EVAL remains the required external decision gate.

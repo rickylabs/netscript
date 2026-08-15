@@ -50,3 +50,25 @@ Drift is append-only.
   its three named diagnostics and no others; neither may be reported as a pass.
 - **Resolution:** brief ambiguity corrected by the orchestrator.
 - **Evidence:** `plan.md` validation rows 14a–14b and the orchestrator's correction at `7e5be1514`.
+
+## 2026-08-15 — Coordinator authorizes exactly one adjacent tutorial source
+
+- **What:** the earlier scope-boundary report is resolved by adding
+  `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md` and no other docs source.
+- **Source:** coordinator scope ruling for PR #1669.
+- **Expected:** the leaf would edit only `docs/site/services-sdk/sdk.md` until a ruling.
+- **Actual:** the authorized docs set is now exactly those two pages. The second page's line 100
+  independently says a stale `getCachedEntry` result refreshes in the background.
+- **Severity:** significant
+- **Action:** resolved — include the second page in S2 and correct it to say that `getCachedEntry`
+  only returns `{ data, cachedAt }` from warm KV or `null` from cold KV; it does not evaluate
+  staleness or initiate revalidation. Do not edit a third docs source.
+- **Verification:** the two-page, surrounding-tutorial, and site-wide source sweeps found no third
+  false assignment of revalidation to `getCachedEntry()`. The ordered `gen:agent-docs-prose` →
+  `gen:assets-barrel` → `gen:publish-assets` run exited 0 throughout; provenance includes both
+  authorized pages, and the clean synchronized content head produced no tracked delta or undeclared
+  generated path.
+- **Resolution:** exact one-source expansion authorized by the coordinator; fresh PLAN-EVAL still
+  required before implementation.
+- **Evidence:** `research.md` findings 11-15; `plan.md` S2 and validation row 8; `worklog.md`
+  plan-amendment evidence.
