@@ -636,3 +636,13 @@ Fable 5/medium Remote Control IMPL-EVAL is launching over source `47ca22abe` and
 one-line repair plus S2. #1664 F5 source `fda78ee43` / evidence `1263f655b` has four PASS/SUFFICIENT
 receipts and is under final features Tier-A before any runtime lease. #1663 and #1651 option 1 are
 unchanged.
+
+Newer checkpoint `2026-08-15T18:30:23Z`: #1664 final F5 Tier-A is `PASS` at features topic
+`9a5521aa0`. A fresh Aspire-orchestration preflight found local/remote/PR all at immutable evidence
+`1263f655b`, `aspire ps` empty, zero running Docker containers, no AppHost/DCP/application/browser
+processes, no relevant listeners, and no competing lease. Attempt 4 now owns the singleton runtime
+lease: `scaffold.runtime` first, mandatory cleanup/audit, then `fresh-browser` only on PASS and a
+second cleanup/audit. #1666 IMPL-EVAL is active under native Fable 5/medium Remote Control session
+`3882ca70-7857-46ca-aa24-8b1ae2664516`, bridge `cse_013RnnFDtHQhEbFhJCLbkEsD`, artifact-only over
+implementation `47ca22abe` and evidence `d095c1260`. #1669 has applied exactly the approved predicate
+correction while its two docs pages and query-factory test remain in the bounded S2 author turn.

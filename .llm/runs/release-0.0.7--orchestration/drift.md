@@ -646,3 +646,7 @@ implementation thread.
   names 26 dialect tokens, including uncommon `xml`, `sql`, `vto`, and `njk`. A complete probe
   against the pinned Deno accepted all 26 and rejected a non-member. That executable result closes
   the contract question more reliably than assuming the help surface from recollection.
+- **A retry lease must bind the reviewed evidence tree, not merely repaired source:** #1664 attempt
+  4 is authorized only at evidence `1263f655b`, whose parent content is `fda78ee43` and whose four
+  binding receipts plus final Tier-A are already pushed. The clean-host preflight precedes the grant,
+  so any subsequent head movement invalidates the lease before runtime execution.

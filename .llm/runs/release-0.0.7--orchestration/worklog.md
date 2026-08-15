@@ -1115,3 +1115,19 @@
   4,226/0/19; publish dry-run; architecture check. Fresh features Tier-A is active. Independent
   pinned-Deno probing accepts all 26 allowlist extensions; current surface is 15 product, 11 test,
   zero outside the 27-path ceiling. No runtime lease exists.
+
+## 2026-08-15T18:30:23Z — final F5 review passes and attempt-4 runtime lease is granted
+
+- #1664 final fresh features Tier-A is `PASS` at topic `9a5521aa0`. The review accepted the exact
+  15-product/11-test/zero-outside surface, exact-12 generated formatting proof, immediate
+  byte-identical repeat, retained F4 and S2 atomicity, and the timeout/EOF/zero-byte/extension
+  boundaries. Local, remote, and PR heads equal immutable evidence `1263f655b`.
+- The Aspire-orchestration preflight is clean: `aspire ps --format Json` returned `[]`; Docker has
+  zero running containers; no AppHost, DCP, application, browser, or relevant listener exists; no
+  competing runtime lease exists. Idle `aspire mcp start` helpers remain untouched. Attempt 4 owns
+  the singleton lease at evidence `1263f655b` / content `fda78ee43`: run `scaffold.runtime`, clean
+  and audit, then run `fresh-browser` only on PASS and clean/audit again. No evaluator is authorized.
+- #1666 IMPL-EVAL is confirmed active as native Fable 5/medium Remote Control session
+  `3882ca70-7857-46ca-aa24-8b1ae2664516`, bridge `cse_013RnnFDtHQhEbFhJCLbkEsD`, judging immutable
+  implementation `47ca22abe` plus evidence `d095c1260` artifact-only. #1669 has made exactly the
+  approved one-line `!isFresh` predicate correction and continues the bounded S2 completion.

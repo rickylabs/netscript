@@ -762,3 +762,13 @@ the same author is resumed for the one predicate repair and remaining S2. #1664 
 `fda78ee43` plus evidence `1263f655b` have four unique PASS/SUFFICIENT receipts; final features
 Tier-A is active before any runtime lease. The pinned Deno probe accepts all 26 formatter allowlist
 members, and 15 product/11 test/zero outside-ceiling paths are touched.
+
+At 18:30Z, #1664 final F5 Tier-A is `PASS` at `9a5521aa0`. Coordinator preflight under the Aspire
+orchestration contract found the leaf clean and local/remote/PR equal at `1263f655b`, `aspire ps []`,
+zero Docker containers, zero AppHost/DCP/application/browser processes, zero relevant listeners, and
+no competing runtime lease; foreign Aspire MCP helpers remain untouched. Attempt 4 now holds the
+singleton runtime lease at immutable evidence `1263f655b` / content `fda78ee43`. Features must run
+suite-owned `scaffold.runtime`, preserve the exact result, clean/audit, and run `fresh-browser` only
+if scaffold passes, followed by final cleanup/audit; no evaluator yet. #1666's native Fable 5/medium
+Remote Control IMPL-EVAL is active as `3882ca70`, bridge `cse_013RnnFDtHQhEbFhJCLbkEsD`. #1669's
+author has applied the exact approved one-line predicate correction and remains bounded to S2.

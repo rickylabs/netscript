@@ -998,7 +998,7 @@
       "branch": "fix/reference-export-drift-gate",
       "worktree": "/home/codex/repos/netscript-007-reference-export",
       "prNumber": 1666,
-      "implementationState": "s3_evidence_fresh_tier_a_pass_impl_eval_launching_artifact_only",
+      "implementationState": "s3_evidence_fresh_tier_a_pass_impl_eval_active_artifact_only",
       "planHeadSha": "9d0b4bf128ba52fcd52091ba50590661d09470c1",
       "scopeAmendmentHeadSha": "a3f6b87b599e778db950daf6ccaecd847c088d19",
       "tierAPlanState": "PASS_SA2",
@@ -1060,9 +1060,15 @@
           "validation": "seven unique PASS receipts recompute SUFFICIENT at immutable source head; 4203/0 root tests, 2924-file check, honest Contracts 9 and Fresh UI 123 doc-lint reds, exact pins/JSR findings, ten changed implementation paths within thirteen, lock blob identical, all prohibited/runtime gates NOT_RUN"
         }
       },
-      "implementationEvaluationState": "launching_fresh_fable5_medium_remote_control",
+      "implementationEvaluationState": "active_fresh_fable5_medium_remote_control",
       "implementationEvaluationSourceHeadSha": "47ca22abe94b9d2e54d3778edc8944094b227886",
       "implementationEvaluationEvidenceHeadSha": "d095c1260a2474f3ae16cd5b17f3bfcbbada9c94",
+      "implementationEvaluatorAgentId": "3882ca70-7857-46ca-aa24-8b1ae2664516",
+      "implementationEvaluatorBackgroundAgentId": "3882ca70",
+      "implementationEvaluatorBridgeSessionId": "cse_013RnnFDtHQhEbFhJCLbkEsD",
+      "implementationEvaluatorRoute": "native claude-fable-5 / medium / Remote Control",
+      "implementationEvaluationGrantedAt": "2026-08-15T18:25:26.499Z",
+      "implementationEvaluationScope": "artifact-only verdict over immutable implementation 47ca22abe and evidence d095c1260; only impl-eval.md plus one structured PR comment; no product mutation, merge, ready flip, relabel, issue close, runtime lease, or repair",
       "expensiveGateContract": "no runtime lease; scaffold.runtime and fresh-browser are matrix n/a for this checker/docs/JSDoc/task/workflow-only leaf",
       "receiptRefs": []
     },
@@ -1503,7 +1509,7 @@
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "f5_content_and_four_binding_receipts_pushed_final_tier_a_active_no_runtime_lease",
+      "implementationState": "f5_final_tier_a_pass_attempt4_runtime_lease_active_immutable_evidence_head",
       "dispatchTopicHeadSha": "0d0ba1b7a404c847acba2daed40c69d282906f69",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
@@ -1541,7 +1547,9 @@
       "f5ContentHeadSha": "fda78ee438ea40888e5fb3870a78df70cabb8c82",
       "f5EvidenceHeadSha": "1263f655b37d64a258619403398ca7117ea000d5",
       "f5BindingReceiptState": "four_unique_pass_recomputed_sufficient_check_2944_files_test_4226_0_19_publish_dry_run_arch_check",
-      "f5FinalTierAState": "active",
+      "f5FinalTierAState": "PASS",
+      "f5FinalTierATopicCheckpointSha": "9a5521aa084e482722e928a4720e389df306c84c",
+      "f5FinalTierAProof": "fresh review accepted 15 product and 11 test paths with zero outside the 27-path ceiling, reproduced the exact-12 generated fmt proof plus immediate byte-identical repeat, retained F4 and S2 atomicity, and independently checked timeout, EOF, zero-byte, extension, and all four pre-write canonicalization boundaries",
       "f5AllowlistWatchTopicCheckpointSha": "bb538cd4f",
       "f5PlanAmendmentSurface": "15 product plus 12 focused-test paths around an internal GeneratedSourceFormatterPort, ProcessPort stdin transport, four pre-write canonicalizing writer owners, and a cheap exact-12-path add/generate/full-fmt proof",
       "f5PlanRepairRequired": "closed at 630185e2c: executable EOF-before-timeout/kill closure, supported zero-byte passthrough, extension allowlist refusal before content inspection, and services-group dependency projection are bound; product implementation released under unchanged 15-product/12-test ceiling",
@@ -1658,7 +1666,12 @@
           "attempt3TierAState": "FAIL_FIX_LEAF_CAUSED",
           "attempt3TierATopicCheckpointSha": "0d0ba1b7a404c847acba2daed40c69d282906f69",
           "attempt3TierAProof": "exact twelve-path reproduction proves users/payments client modules from the leaf-modified client scaffolder are unformatted; seven unchanged Aspire helpers are baseline; three payments service/contract outputs remain to be measured at the pre-implementation head; blanket pre-existing attribution rejected",
-          "runtimeGates": "attempt 3 scaffold.runtime terminal FAIL with clean host and lease released; fresh-browser NOT_RUN; preserve raw evidence and attribute generated fmt failure before any amendment or retry; no evaluator"
+          "runtimeGates": "attempt 4 singleton lease active at immutable evidence head 1263f655b after final Tier-A PASS and clean-host preflight; run scaffold.runtime first, clean and audit, then fresh-browser only on PASS; no evaluator until both gates and topic reconciliation are terminal",
+          "attempt4LeaseState": "active",
+          "attempt4LeaseGrantedAt": "2026-08-15T18:30:23.000Z",
+          "attempt4PreGateHeadSha": "1263f655b37d64a258619403398ca7117ea000d5",
+          "attempt4ContentHeadSha": "fda78ee438ea40888e5fb3870a78df70cabb8c82",
+          "attempt4Preflight": "leaf clean and local == remote == PR; aspire ps []; zero Docker containers; zero AppHost/DCP/application/browser processes; zero relevant listening ports; zero competing runtime lease owners; idle Aspire MCP helpers preserved"
         }
       },
       "planDecisionBoundary": "cycle 1 ruled direct emitted { queryKey: <svc>Queries.list.clientKey() } with no SDK overload; repair must lock generator-owned output paths, existing service generate overwrite/dry-run/force compatibility, package README homes, post-mutation request-count proof, per-slice paths, and qualified citations",
@@ -2633,6 +2646,27 @@
         "survivors": 0,
         "freshBrowser": "NOT_RUN"
       }
+    },
+    {
+      "id": "app-service-client-wiring-f5-runtime",
+      "state": "active",
+      "lane": "features",
+      "leafId": "app-service-client-wiring",
+      "gateId": "scaffold.runtime_then_fresh-browser",
+      "preGateHead": "1263f655b37d64a258619403398ca7117ea000d5",
+      "contentHead": "fda78ee438ea40888e5fb3870a78df70cabb8c82",
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-15T18:30:23.000Z",
+      "attempt": 4,
+      "scope": "run suite-owned scaffold.runtime first at immutable evidence head 1263f655b; preserve exact raw result; mandatory Aspire/Docker cleanup and clean inter-gate audit; only on PASS run catalog-backed fresh-browser serially, then browser/runtime cleanup and final empty-host audit; no evaluator until both gates and topic reconciliation are terminal",
+      "preflight": {
+        "leafState": "clean_local_remote_pr_equal",
+        "dockerContainers": 0,
+        "aspireApplicationProcesses": 0,
+        "relevantListeningPorts": 0,
+        "otherLeaseOwners": 0,
+        "idleAspireMcpHelpers": "foreign_tooling_preserved"
+      }
     }
   ],
   "canaryCheckpoints": [
@@ -2674,5 +2708,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T18:25:53.000Z"
+  "updatedAt": "2026-08-15T18:30:23.000Z"
 }
