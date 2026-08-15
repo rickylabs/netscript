@@ -3,9 +3,11 @@
 ## Current state
 
 Phase: S1 is signed off by the topic orchestrator at
-`98fc58997c3ff5ca21403ba67521c584a5d26a0e`. S2 is authorized but blocked before implementation
-because no authorized local EIS-Chat root is at the required immutable revision. The coordinator
-owns disposition of that plan dependency. S3 has not started.
+`98fc58997c3ff5ca21403ba67521c584a5d26a0e`. The coordinator provisioned the exact immutable S2
+input, and the S2 tool, tests, manifest, and aggregate have completed their applicable gates. The
+topic orchestrator ruled the literal lint row N/A because root configuration deliberately excludes
+`.llm/**`; the wrapper's raw exit `2` remains recorded as fail-closed evidence, not as a pass, skip,
+or waiver. S2 stops for Tier-A review. S3 has not started.
 
 Branch/worktree: `docs/comparison-docs-programme` in
 `/home/codex/repos/netscript-007-docs-comparison`, no upstream. The re-baselined branch/remote head
@@ -40,6 +42,9 @@ No packages/plugins, locks/dependencies, consumer code copy, publication/release
 - `S1-method-nav` now runs `rtk proxy deno task --cwd docs/site check:links` immediately after the
   site build. The build and repository-level `docs:links` task do not replace this rendered-site
   link proof.
+- The S2 lint row is N/A: root `deno.json` deliberately excludes `.llm/**` repo-wide, and the exact
+  wrapper therefore exits `2` instead of manufacturing a false green. Do not borrow a docs-site
+  config or change root configuration to make the row appear applicable.
 
 - The EIS-Chat authority is only commit `5191de83f3da97559f21d8891c6c8afdf1cf473a`; its Session route uses `ctx.path`, generated route binding, stable generated-route aliases, an `entries` resource, cached entry reads, and three authoritative partial routes.
 - Context/MCP topology I/O lives in the context partial, not a page-level resource.
@@ -55,7 +60,8 @@ No packages/plugins, locks/dependencies, consumer code copy, publication/release
 - S1: `_data.ts`, xrefs, comparison index/methodology, worklog/context, plus the authorized
   significant/no-rescope `drift.md` corrections. The Tier-A fix removes premature migration
   references and adds the rendered-link gate; complete at handoff for re-review.
-- S2: measurement tool/test, immutable source manifest, aggregate JSON, worklog/context.
+- S2: measurement tool/test, immutable source manifest, aggregate JSON, worklog/context, plus the
+  significant/no-rescope lint-applicability drift record; complete at handoff for Tier-A review.
 - S3: Session case, migration index/roadmap, xrefs/index, worklog/context, full docs audit. S3
   inherits the `/migration/` rendered-root assertion and must assert both `/comparisons/` and
   `/migration/` after its two migration pages land.
@@ -73,11 +79,7 @@ Every slice is under 30 files, has a named gate, commits its worklog/context upd
 
 ## Next authorized action
 
-Wait for coordinator disposition. The pinned revision remains current `HEAD` and
-`refs/heads/master` on the authorized EIS-Chat remote, but the local clones do not contain it.
-`research.md:51` records GitHub-only inspection with no checkout, while S2 later requires an
-authorized local root; formal PLAN-EVAL cycle 1 passed over that unprovisioned dependency.
-
-Do not fetch, clone, check out, create a worktree, or copy private source to resolve it. Do not
-substitute a different revision. Until the coordinator rules, do not create the measurement
-tool/JSON or begin S3.
+Commit and explicitly push the complete seven-path S2 slice, post one structured implementation
+comment on draft PR #1652, then stop for topic-orchestrator Tier-A review. Do not begin S3 or treat
+the generator's gate execution as certification. Keep `/home/codex/repos/eis-chat-007-input`
+strictly read-only.

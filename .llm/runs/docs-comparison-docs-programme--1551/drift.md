@@ -80,3 +80,43 @@ measurements. No fetch, checkout, clone, worktree creation, private-source copy,
 other attempt to materialize the missing revision was made. Truthful aggregate
 reproduction requires an already-authorized local root at the pinned revision; a
 different revision or network-derived estimate cannot satisfy the evidence contract.
+
+## 2026-08-15 — S2 lint gate excludes its own approved files
+
+Severity: **significant** — gate-coverage correction required. Status: **blocked**.
+Rescope: **none**. Scope growth: **none**.
+
+After the coordinator provisioned the exact read-only EIS-Chat input, S2 created the
+approved tool, test, manifest, and derived aggregate. The literal approved lint gate
+selected both `.llm/tools/docs/measure-comparison-surface*.ts` files, but root
+`deno.json` excludes `.llm/` from `deno lint`. Deno therefore reported “No target
+files found”; the structured wrapper correctly refused a false green and exited `2`
+with one excluded batch and no lint occurrences.
+
+A diagnostic rerun using the existing `docs/site/deno.json` via the wrapper's
+documented `--config` option selected both files and exited `0` with zero findings.
+That proves the sources are lint-clean under an existing config, but it cannot be
+substituted for the mandatory command without topic-orchestrator authority. Changing
+root config or adding another config file would exceed the approved S2 file list.
+
+Formal PLAN-EVAL cycle 1 passed over the incompatibility between the S2 file paths
+and its lint command. S2 stopped without a commit, push, PR comment, root-config
+change, or S3 work pending a gate correction.
+
+## 2026-08-15 — S2 lint row ruled not applicable
+
+Severity: **significant** — gate-applicability correction. Status: **resolved for
+S2**. Rescope: **none**. Scope growth: **none**.
+
+Topic orchestrator `topic-docs-0.0.7` independently reproduced the exact lint
+command's raw exit `2` with two selected files and one excluded batch, then ruled
+the row **N/A — not applicable**. Root `deno.json` deliberately excludes `.llm/`
+from lint coverage repo-wide; there is no `.llm/deno.json`, and CI does not lint
+`.llm/tools`. The wrapper therefore worked as designed by failing closed instead
+of reporting a false green. The result is not recorded as passed, skipped, or
+waived.
+
+No alternate config is used as gate evidence, and root lint configuration remains
+unchanged. Formal PLAN-EVAL cycle 1 passed over this incompatibility. The correction
+changes only the applicability of an unsatisfiable gate row; it does not change the
+S2 files, evidence contract, milestone scope, or planned S3 work.

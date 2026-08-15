@@ -53,6 +53,10 @@ The draft PR is partial and must say `Part of #1551`. Follow-ups #1645–#1650 o
 | 2026-08-15 | Tier-A S1 review found premature migration references and an insufficient link gate. | four `/migration/` references removed; rendered `check:links` added to S1; significant/no-rescope correction recorded for later IMPL-EVAL |
 | 2026-08-15 | Topic orchestrator signed off S1 and authorized S2. | Tier-A PASS at `98fc58997c3ff5ca21403ba67521c584a5d26a0e`; generator entered S2 without treating the sign-off as self-certification |
 | 2026-08-15 | S2 immutable local-input precondition checked. | no authorized checkout at `5191de83f3da97559f21d8891c6c8afdf1cf473a`; stopped before private source reads, tool/JSON creation, gates, commit, push, or PR comment |
+| 2026-08-15 | Coordinator provisioned the exact immutable input and S2 resumed. | `/home/codex/repos/eis-chat-007-input`; detached clean HEAD `5191de83f3da97559f21d8891c6c8afdf1cf473a`; treated strictly read-only |
+| 2026-08-15 | S2 tool, tests, manifest, and aggregate drafted. | same-timestamp checked-in output reproduces; removing `/observedAt` yields stable digest `b9e96ed24fa64fe4a9d06bc4c51e5be1c6da8938ff4cba0baec7945cb5cdbaa9`; measured-file output has path/classification/hash/counts only; Next.js is absent/deferred |
+| 2026-08-15 | Literal S2 lint gate refused a false green. | mandatory wrapper exit `2`: root config excludes `.llm/`; explicit existing-config diagnostic exit `0`, two files and zero findings; stopped for gate correction |
+| 2026-08-15 | Topic orchestrator corrected the S2 lint row to N/A and S2 gates completed. | root `.llm/` exclusion is deliberate repo-wide configuration, so exit `2` is fail-closed evidence rather than a pass, skip, or waiver; all applicable tool, site, diff, privacy, reproduction, scope, and lock checks pass |
 
 ## Gate log
 
@@ -119,6 +123,29 @@ The planned S2 aggregate cannot be truthfully produced until an already-authoriz
 at the exact pinned revision is available. A different head, estimate, or network-fetched input is
 not an acceptable substitute.
 
+### S2-evidence-repro — complete after lint applicability correction
+
+| Gate | Commands / procedure | Scope | Result | Findings | Proceeded |
+| --- | --- | --- | --- | --- | --- |
+| Pinned input | raw Git revision, detached-state, status, and tracked-file inspection before source reads | `/home/codex/repos/eis-chat-007-input` | PASS | exact clean detached `5191de83f3da97559f21d8891c6c8afdf1cf473a`, 1,830 tracked files; no external mutation | yes |
+| Reproduction | run the checked-in tool at the checked-in timestamp and two alternate timestamps; compare serialized output after deleting `/observedAt` | manifest, measurement JSON, authorized input root | PASS | same-timestamp output exactly matches the checked-in JSON; timestamp-normalized outputs are byte-stable with SHA-256 `b9e96ed2…`; no private source text field is emitted | yes |
+| Check | exact approved structured `run-deno-check.ts` command | tool and test | PASS / raw exit `0` | two files, one batch, zero TypeScript occurrences | yes |
+| Lint | exact approved structured `run-deno-lint.ts` command | tool and test | **N/A — not applicable / raw exit `2`** | root `deno.json` deliberately excludes `.llm/` repo-wide; the wrapper selected both paths, observed one excluded batch, and correctly failed closed instead of reporting a false green. The topic orchestrator ruled this row not applicable—not passed, skipped, or waived | yes |
+| Format | exact approved structured `run-deno-fmt.ts` command | tool and test | PASS / raw exit `0` | two files, one batch, zero findings | yes |
+| Tests | exact approved structured `run-deno-test.ts` command | tool test | PASS / raw exit `0` | five passed, zero failed or ignored | yes |
+| Site build | `rtk proxy deno task --cwd docs/site build` | full rendered docs site | PASS / raw exit `0` | source format and rendered-output checks pass; 635 files generated and 226 HTML files checked. The evidence JSON files are not rendered as pages or copied into `_site` | yes |
+| Rendered links | `rtk proxy deno task --cwd docs/site check:links` | generated `_site` after the S2 build | PASS / raw exit `0` | all 34,980 internal links across 226 pages resolve | yes |
+| Diff hygiene | `git diff --check` | complete dirty S2 diff | PASS / raw exit `0` | no whitespace errors after final run-artifact updates | yes |
+| Privacy/deferred shape | parse both public JSON files and inspect emitted fields and credential patterns | manifest and aggregate only | PASS | twelve measured file records expose only path, classification, SHA-256, and counts; no private source content, CSS, fixtures, business prose, credentials, source-text fields, or credential-like material; all unmatched Next.js metrics are `deferred` under an `absent` source | yes |
+| Methodology consistency | compare the manifest procedure and access precondition with `docs/site/comparisons/methodology.md` | S1 public contract and S2 evidence | PASS | both require authorized access to the pinned private revision, publish only derived metadata and aggregates, and make repeatability conditional on that access; no contradiction | yes |
+| Scope and locks | raw changed-path enumeration; lockfile diff from S2 baseline | complete S2 slice | PASS | exactly six approved S2 paths plus the authorized `drift.md`; both lockfiles unchanged; no `packages/**`, `plugins/**`, migration, or S3 path | yes |
+
+The topic orchestrator ruled the lint row not applicable because the repository deliberately
+excludes `.llm/**` from lint coverage. No alternate config was used as gate evidence and no root
+configuration changed. Regeneration from the exact pinned input reproduces the checked-in
+aggregate; after deleting the declared `/observedAt` field, the normalized SHA-256 is
+`b9e96ed24fa64fe4a9d06bc4c51e5be1c6da8938ff4cba0baec7945cb5cdbaa9`.
+
 ### Planned S3 docs-audit rows
 
 | Gate | Commands / procedure | Scope | Result | Findings | Proceeded |
@@ -132,5 +159,5 @@ not an acceptable substitute.
 | Prose | neutral-language/evidence/private-detail review | all changed public prose | NOT RUN | implementation not started | no |
 | Cross-page contradictions | compare broad explanation, methodology, case, migration, builder/defer docs, and matrix rows | related public surfaces | NOT RUN | implementation not started | no |
 
-No S2/S3 implementation gate, release gate, scaffold suite, E2E suite, or expensive-gate lease has
-been run. S2 is blocked pending coordinator disposition of the missing local-input dependency.
+No S3 implementation gate, release gate, scaffold suite, E2E suite, or expensive-gate lease has
+been run. S2 stops here for topic-orchestrator Tier-A review; this generator does not self-certify.
