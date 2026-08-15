@@ -1135,3 +1135,42 @@ and exported `NetScriptProcedureMeta`, duplicating #1466 and pre-empting the acc
 
 Next: fresh Tier-A on the amended head; PLAN-EVAL only after Tier-A PASS; no implementation, runtime
 lease, or #1348/#1466 mutation before that PASS.
+
+## 2026-08-15 — #1671 PLAN-EVAL terminal PASS; S1 dispatched
+
+| Field | Value |
+| --- | --- |
+| Verdict | **PASS** |
+| Evaluated head | `2fa2f71dc5b498c16221461439e53b9f5dc1d5d5` |
+| Artifact commit | `f76a3c45bce42cab81c2b481d4abf03be1104bb0` — **artifact-only** (verified: non-`.llm/runs/` diff from the evaluated head is empty), local == remote == PR |
+| PR comment | 5304059808 |
+| Route | `claude-fable-5` · medium · Remote Control, session `session_015RuDy1h3UiCkLzo1PLk5Sc` — matched |
+
+**S1 released to the same original author `01a006f3-…`** — plan slice 1 only:
+`contract-primitives.ts` + `readme-doctest_test.ts` + run artifacts. Slices 2–4 files are fenced off,
+including `ports/service-client.ts`, which is authorized for the **leaf** but belongs to slice 2.
+
+Five advisories carried as obligations:
+
+- **A1 — both RED diagnostics.** The plan's validation row 1 expected only `TS2339`. The evaluator
+  requires **`TS18046` *and* `TS2339`**. This is the sharpest of the five: one diagnostic is not the
+  whole defect, and a fixture that shows only the `never` property error would understate what is
+  broken. Brief requires both captured with structured output, recorded once, with no re-running for
+  a tidier failure.
+- **A2 — exported `@netscript/contracts` schemas only.** No SDK-side zod mapping, no seventh path; if
+  a shim seems necessary, stop and report, because that is a rescope rather than an implementation
+  detail.
+- **A3 — retain `SafeFailure<TError = ThrowableError>`**, default parameter intact while the arms
+  change.
+- **A4 — research corrections stay in existing artifacts.** No `arch-debt.md`, no new file, no
+  seventh path. Deduplicated debt is the supervisor/coordinator's to file later, on the #1669 → #1670
+  precedent; the author must not file it.
+- **A5 — tick nothing.** Metadata acceptance is a coordinator close-gate concern.
+
+The ownership boundary is repeated in the brief because it is load-bearing: preserve the fourth
+generic as `Record<never, never>` so later metadata is not erased, but do not define, export, or
+depend on `NetScriptProcedureMeta` — #1466 owns that and #1348's accepted order puts #1350's error
+repair first. No S1 acceptance item may require a type #1466 has not defined.
+
+Hard stop at fresh Tier-A before slice 2. No evaluator, no runtime lease, no Aspire/Docker/`e2e:cli`,
+no #1348/#1466 mutation, PR draft at sole `status:plan`.
