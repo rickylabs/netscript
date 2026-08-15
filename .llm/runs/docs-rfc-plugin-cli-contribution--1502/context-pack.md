@@ -6,7 +6,7 @@
 | -------------- | ---------------------------------------------- |
 | Run ID         | `docs-rfc-plugin-cli-contribution--1502`       |
 | Branch         | `docs/rfc-plugin-cli-contribution`             |
-| Current phase  | `impl` — S2 lifecycle/transaction authoring    |
+| Current phase  | `impl` — S3 compatibility/roadmap authoring    |
 | Archetype      | 4 — public DSL/builder (future implementation) |
 | Scope overlays | `SCOPE-docs`                                   |
 
@@ -16,9 +16,10 @@ Cycle-1 PLAN-EVAL evaluated `a02f9690154b7384ca8e6503ea91d644b397368a`, returned
 preserved at `plan-eval-cycle-1.md`. Cycle 2 evaluated repaired head
 `12276e6d86403ed1340ef79a963e87d401d643e9` and returned `PASS` in evaluator-only commit
 `3e0c8858b4a2552926d2965b62cbcc97a15c2935`. Tier-A accepted S1 with its bounded fix-up at
-`bd8b29bf3a524280d28a39b21bc7adda277d2e27`; F1–F3 and the `PASS_PARENT_HEAD` convention are closed.
-S2 is released for discovery/bootstrap/isolation/capabilities/generation/doctor/pointers. S3 and S4
-remain blocked on the next Tier-A release.
+`bd8b29bf3a524280d28a39b21bc7adda277d2e27` and accepted S2 at
+`7a5eb580a8515b8dc1007308a9d917b5e7309f41`. The six S2 sections, F1–F3, and the `PASS_PARENT_HEAD`
+convention are closed. S3 is released for compatibility, supersession, duplicate audit, and the
+later epic. S4 remains blocked on the next Tier-A release.
 
 ## Completed
 
@@ -67,19 +68,24 @@ remain blocked on the next Tier-A release.
 - Authored the S2 normative lifecycle: explicit pointer discovery, generated-registry freshness,
   selected-only terminable bootstrap, concrete capability grants/ports, absent UX, host generation
   transaction, doctor checks, and manifest ownership.
+- Refreshed the accepted frontend/SDK/runtime/command/DevTools laws, live deploy #904–#908 state,
+  and adjacent issue ownership before proposing any child.
+- Resolved S2-N1 through a redacted host-side denied-grant diagnostic and S2-N2 by explicitly
+  accepting UTF-8-text-only generation in contract major 1.
+- Authored the S3 compatibility matrix, deploy migration/supersession table, hardcoded-command and
+  amend/fold-first audits, per-surface JSR obligations, and unfiled PR-sized implementation epic.
 
 ## In Progress
 
-- S2 one reviewable commit, explicit-refspec push, PR body/comment update, and renewed Tier-A
-  topic-review stop. The docs-scoped validation set is green against the accepted S1 parent head.
+- S3 validation, one reviewable commit, explicit-refspec push, PR body/comment update, and renewed
+  Tier-A topic-review stop. S4 has not begun.
 
 ## Next Steps
 
-1. Topic orchestrator substantively reviews S2 and explicitly releases S3.
-2. Author S3 without package/plugin mutation only after that release.
-3. S4 reruns all six contracted gates at the final author head and completes the JSR/docs evidence
+1. Topic orchestrator substantively reviews S3 and explicitly releases S4.
+2. S4 reruns all six contracted gates at the final author head and completes the JSR/docs evidence
    set.
-4. A fresh native Claude Opus 5 medium session performs IMPL-EVAL; this author does not
+3. A fresh native Claude Opus 5 medium session performs IMPL-EVAL; this author does not
    self-certify.
 
 ## Key Decisions
@@ -94,6 +100,8 @@ remain blocked on the next Tier-A release.
 | Deploy and DevTools are independent consumers of the same seam.                             | #1502 + D17                           | No cross-imports.                 |
 | Contract file surfaces are audit-only; all six gates and JSR audit remain binding.          | cycle-1 dispatch + D22                | Code expansion needs amendment.   |
 | `Closes #1502` completes this RFC leaf; the implementation epic is separate and unfiled.    | cycle-1 dispatch + D23                | No future epic is auto-closed.    |
+| Deploy/DevTools independently consume the shared seam; accepted payloads stay separate.     | RFC S3 compatibility/supersession     | No cross-imports.                 |
+| Existing issues are amended/folded before any later child is filed.                         | live S3 duplicate audit               | Nothing filed by this leaf.       |
 
 ## Files Changed
 
@@ -108,28 +116,28 @@ remain blocked on the next Tier-A release.
 | `.llm/runs/docs-rfc-plugin-cli-contribution--1502/plan-eval.md`    | preserved | Cycle-1 evaluator verdict; author did not edit.  |
 | `.llm/runs/docs-rfc-plugin-cli-contribution--1502/evaluate.md`     | unchanged | Later separate IMPL-EVAL placeholder.            |
 | `.llm/runs/docs-rfc-plugin-cli-contribution--1502/receipts/`       | updated   | Structured/durable S0R and JSR evidence.         |
-| `rfcs/0000-plugin-cli-contribution.md`                             | added     | S1/S2 normative contract; S3 gaps explicit.      |
+| `rfcs/0000-plugin-cli-contribution.md`                             | added     | S1–S3 normative contract; S4 validation pending. |
 
 ## Gates
 
-| Gate family | Current status                                 | Evidence                               |
-| ----------- | ---------------------------------------------- | -------------------------------------- |
-| Static      | S2 docs/focused-test/architecture rerun passed | `worklog.md`; `receipts/`              |
-| Fitness     | full A4 roadmap plus measured JSR baseline     | `plan.md`; `research.md`; `worklog.md` |
-| Runtime     | N/A / global expensive gate not run            | docs-only scope                        |
-| Consumer    | research inventory complete                    | live issues/RFCs and `research.md`     |
+| Gate family | Current status                                | Evidence                           |
+| ----------- | --------------------------------------------- | ---------------------------------- |
+| Static      | S3 docs/publish checks pass at parent head    | `worklog.md`; `receipts/`          |
+| Fitness     | full A4 roadmap plus measured JSR obligations | RFC; `research.md`; `worklog.md`   |
+| Runtime     | N/A / global expensive gate not run           | docs-only scope                    |
+| Consumer    | research inventory complete                   | live issues/RFCs and `research.md` |
 
 ## Open Questions
 
-- S2 has no rework-forcing open decision. Exact numeric limits, absent-stub visibility, and host
-  copy remain FCP choices. S3 owns only compatibility, deploy supersession, duplicate audit, and
-  roadmap/migration evidence; it cannot reopen the S1/S2 architecture.
+- S3 has no rework-forcing open decision. The later coordinator chooses epic milestone/priority and
+  amends/folds the mapped issues; exact FCP numeric limits remain future choices. S4 owns validation
+  and final evidence only and cannot reopen S1–S3 without recorded drift and a new review.
 
 ## Drift and Debt
 
 - Drift: attached author route, accepted-but-unshipped consumer seams, shallow existing `./cli`,
-  current plugin doc-lint baseline, coordinator-contract tension, and glossary path are recorded in
-  `drift.md`.
+  current plugin doc-lint baseline, coordinator-contract tension, glossary path, stale #1474
+  wording, and the quality-scanner rule gap are recorded in `drift.md`.
 - Debt: no new or deepened architecture debt; source implementation is forbidden in this leaf.
 
 ## Commits
@@ -141,5 +149,6 @@ remain blocked on the next Tier-A release.
 - Cycle-2 PASS verdict head: `3e0c8858b4a2552926d2965b62cbcc97a15c2935`.
 - S1 reviewed head: `86d0110a545e449dfa094fc961a37a327604d23a`.
 - S1 accepted fix-up head: `bd8b29bf3a524280d28a39b21bc7adda277d2e27`.
-- S2 exact head: recorded in the PR slice comment after explicit-refspec push.
+- S2 exact head: `7a5eb580a8515b8dc1007308a9d917b5e7309f41`.
+- S3 exact head: recorded in the PR slice comment after explicit-refspec push.
 - See the draft PR commit list and per-slice comments after push; V3 uses no `commits.md`.

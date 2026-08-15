@@ -125,23 +125,31 @@ No author imports `@netscript/cli` internals, Cliffy, deploy, DevTools, or anoth
 | 2026-08-15 02:00 CEST | S2     | inspect   | Verified live `generate plugins --dry-run` and `plugin doctor` flags/help plus current manifest and published CLI contribution shapes. |
 | 2026-08-15 02:06 CEST | S2     | contract  | Authored explicit registry freshness, selected bootstrap, capabilities, isolation, transaction, doctor, and pointer ownership.         |
 | 2026-08-15 02:08 CEST | S2     | gates     | Focused structured tests, architecture, docs format/accuracy/links, owned Markdown, terminology, and decision sweep passed.            |
+| 2026-08-15 02:24 CEST | S3     | release   | Reconciled Tier-A S2 PASS at `7a5eb580a`; all six S2 sections and parent-head evidence accepted; S3 released, S4 withheld.             |
+| 2026-08-15 02:27 CEST | S3     | research  | Refreshed accepted RFC laws, #904–#908 and adjacent issue ownership, JSR baseline, and exact host-side plugin coupling occurrences.    |
+| 2026-08-15 02:30 CEST | S3     | contract  | Authored compatibility, deploy supersession, coupling/duplicate audits, JSR obligations, and the unfiled PR-sized implementation epic. |
+| 2026-08-15 02:36 CEST | S3     | gates     | Docs format/accuracy/links, per-member publish dry-runs, JSR audits, and the repository coupling scan completed with baseline labels.  |
 
 ## Decisions
 
-| Decision                                                                | Reason                                                                                         | Source                                     |
-| ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| Existing `@netscript/plugin/cli` owns the public DSL.                   | It is already published; new package would duplicate ownership.                                | `deno.json`, doctrine, `plan.md` D1.       |
-| Host-declared extensible mount, nested children only.                   | Deploy needs `deploy` children; arbitrary top-level capture is unsafe.                         | #904/#908, doctrine, D3.                   |
-| Static help/completion; selected-handler lazy bootstrap.                | Startup, determinism, and isolation.                                                           | #905, RFC 0001/frontend law, D6–D8.        |
-| Host-neutral mutation plan, host-owned transaction.                     | Preview/no-write, path containment, rollback, and one-generator/two-callers.                   | current scaffolder gap, RFC 0005, D11–D13. |
-| Installer/runtime pointers cross-check; `.passthrough()` prerequisite.  | Current `.strict()` rejects future top-level blocks; payload duplication drifts.               | live schema, RFC 0005 F-3, D14–D15.        |
-| No evaluator dispatch.                                                  | User requires separate-session handoff only.                                                   | brief, supervisor identity.                |
-| Contract surfaces are inspection-only; all six gates still bind.        | Authoritative cycle-1 dispatch resolves FP-3 without waiving FP-1/FP-2 evidence.               | contract key, `drift.md`, D22.             |
-| `Closes #1502` stays; future implementation is separate and unfiled.    | #1502 is completed by this RFC leaf, not used as the proposed implementation epic.             | cycle-1 dispatch, D23.                     |
-| Live `PluginCliResult` is not redefined.                                | It is already JSR-published with an incompatible shape; v1 uses `PluginCliInvocationResult`.   | cycle-2 N-3; `deno doc`; RFC S1.           |
-| Plugin executable code runs in a terminable denied-permission boundary. | Dynamic import has no `AbortSignal`; a promise race alone cannot stop module evaluation.       | doctrine A13; D8; RFC S2.                  |
-| Generator commands can request only `workspace:read`.                   | Preview stays effect-free and workspace mutation remains entirely host-owned.                  | D11–D13; RFC S2.                           |
-| Installer pointer is discovery authority; runtime pointer cross-checks. | Static audit needs both phases without duplicating descriptors or treating either as registry. | D14–D15; RFC S2.                           |
+| Decision                                                                | Reason                                                                                                                         | Source                                     |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
+| Existing `@netscript/plugin/cli` owns the public DSL.                   | It is already published; new package would duplicate ownership.                                                                | `deno.json`, doctrine, `plan.md` D1.       |
+| Host-declared extensible mount, nested children only.                   | Deploy needs `deploy` children; arbitrary top-level capture is unsafe.                                                         | #904/#908, doctrine, D3.                   |
+| Static help/completion; selected-handler lazy bootstrap.                | Startup, determinism, and isolation.                                                                                           | #905, RFC 0001/frontend law, D6–D8.        |
+| Host-neutral mutation plan, host-owned transaction.                     | Preview/no-write, path containment, rollback, and one-generator/two-callers.                                                   | current scaffolder gap, RFC 0005, D11–D13. |
+| Installer/runtime pointers cross-check; `.passthrough()` prerequisite.  | Current `.strict()` rejects future top-level blocks; payload duplication drifts.                                               | live schema, RFC 0005 F-3, D14–D15.        |
+| No evaluator dispatch.                                                  | User requires separate-session handoff only.                                                                                   | brief, supervisor identity.                |
+| Contract surfaces are inspection-only; all six gates still bind.        | Authoritative cycle-1 dispatch resolves FP-3 without waiving FP-1/FP-2 evidence.                                               | contract key, `drift.md`, D22.             |
+| `Closes #1502` stays; future implementation is separate and unfiled.    | #1502 is completed by this RFC leaf, not used as the proposed implementation epic.                                             | cycle-1 dispatch, D23.                     |
+| Live `PluginCliResult` is not redefined.                                | It is already JSR-published with an incompatible shape; v1 uses `PluginCliInvocationResult`.                                   | cycle-2 N-3; `deno doc`; RFC S1.           |
+| Plugin executable code runs in a terminable denied-permission boundary. | Dynamic import has no `AbortSignal`; a promise race alone cannot stop module evaluation.                                       | doctrine A13; D8; RFC S2.                  |
+| Generator commands can request only `workspace:read`.                   | Preview stays effect-free and workspace mutation remains entirely host-owned.                                                  | D11–D13; RFC S2.                           |
+| Installer pointer is discovery authority; runtime pointer cross-checks. | Static audit needs both phases without duplicating descriptors or treating either as registry.                                 | D14–D15; RFC S2.                           |
+| Capability grants use S2-N1 resolution (a).                             | A denied grant is visible only in redacted host diagnostics; successful plugin contexts retain the same stable decision shape. | Tier-A S2-N1; RFC S2/S3.                   |
+| Contract major 1 generation is UTF-8 text only.                         | The existing plan type is honest and previewable; binary output needs a separately bounded future operation.                   | Tier-A S2-N2; RFC Drawbacks.               |
+| Amend or fold existing issues before proposing a new child.             | #904–#908, #1093, and #1473–#1477 already own substantial implementation scope.                                                | live S3 issue audit; RFC roadmap.          |
+| The implementation epic is proposed but not filed.                      | This leaf closes only the RFC tracking issue; an epic never carries a closing keyword and later filers own lifecycle metadata. | `netscript-pr`; RFC roadmap.               |
 
 ## Drift
 
@@ -153,57 +161,71 @@ No author imports `@netscript/cli` internals, Cliffy, deploy, DevTools, or anoth
 | Existing plugin public doc-lint baseline includes a `./cli` private type.                 | significant | yes                |
 | Coordinator contract shape conflicts with the authoritative RFC-only mutation boundary.   | significant | yes                |
 | `SCOPE-docs` points to a retired glossary path; live glossary is `docs/site/glossary.md`. | minor       | yes                |
+| #1474's live body lags accepted RFC 0005's ratified `.passthrough()` decision.            | significant | yes                |
+| `quality:scan:repo` misses direct plugin factory imports/registrations.                   | significant | yes                |
 
 ## Gate Results
 
 ### Static Gates
 
-| Gate                                             | Command or check                                                                             | Result             | Notes                                                                                               |
-| ------------------------------------------------ | -------------------------------------------------------------------------------------------- | ------------------ | --------------------------------------------------------------------------------------------------- |
-| Live public-surface inspection                   | `deno doc packages/cli/mod.ts`; `deno doc packages/plugin/mod.ts`; focused `deno doc`/source | PASS               | Research only; exact exports and commands inventoried.                                              |
-| JSR doc-lint baseline (`@netscript/plugin`)      | structured full export-map runner                                                            | BASELINE_FAIL      | 15 private-type refs package-wide; one on `./cli`; `receipts/doc-lint-plugin-cycle1.json`.          |
-| JSR doc-lint baseline (`@netscript/cli`)         | structured full export-map runner                                                            | PASS               | 0 diagnostics across three entrypoints; `receipts/doc-lint-cli-cycle1.json`.                        |
-| Initial S0 scoped Markdown format                | `run-deno-fmt.ts --root <run-dir> --ext md --output ...`                                     | PASS               | 8 files, 1 batch, 0 findings; `receipts/source-format.json`.                                        |
-| Initial S0 durable docs accuracy                 | `run-gate.ts --gate docs-accuracy --id ...-s0-accuracy`                                      | PASS               | Exit 0; `receipts/docs-accuracy.json`; pre-existing peer warning only.                              |
-| Cycle-1 scoped Markdown format                   | structured `run-deno-fmt.ts` report                                                          | PASS               | 8 files, 1 batch, 0 findings; `receipts/source-format-cycle1.json`.                                 |
-| Contracted docs source format                    | durable `docs-source-format` gate from `docs/site`                                           | PASS               | `Docs source format: OK`; `receipts/docs-source-format-cycle1.json`.                                |
-| Contracted docs accuracy                         | durable root `docs-accuracy` gate                                                            | PASS               | Current command/export corpus green; `receipts/docs-accuracy-cycle1.json`; existing peer warning.   |
-| Internal docs links                              | `deno task docs:links`                                                                       | PASS               | 103 docs, 0 broken links/anchors, 0 orphans.                                                        |
-| Docs terminology (live glossary)                 | focused comparison with `docs/site/glossary.md`                                              | PASS_PLAN          | Existing capability/contribution/manifest/plugin/registry meanings preserved; final RFC reruns.     |
-| Contracted structured check                      | durable `check` gate with CLI/plugin include                                                 | PASS               | 1,033 files, 9 batches, 0 failed; `receipts/check-cli-plugin-cycle1.json`.                          |
-| Contracted structured test                       | durable focused `test` gate over 16 CLI/plugin files                                         | PASS               | 88 passed, 0 failed; `receipts/test-cli-plugin-cycle1.json`.                                        |
-| Contracted publish dry-run (`@netscript/cli`)    | canonical per-member wrapper through durable gate                                            | PASS               | Static dry-run only; `receipts/publish-dry-run-cli-cycle1.json`.                                    |
-| Contracted publish dry-run (`@netscript/plugin`) | canonical per-member wrapper through durable gate                                            | PASS               | Static dry-run only; `receipts/publish-dry-run-plugin-cycle1.json`.                                 |
-| Contracted architecture check                    | durable root `arch-check` gate                                                               | PASS               | 0 failures; existing warnings retained in receipt; `receipts/arch-check-cycle1.json`.               |
-| Exact internal `@netscript/*` pins               | durable `netscript-jsr-specifiers` gate                                                      | PASS               | 2,360 scanned, 1 documented allowance, 0 ranges/failures.                                           |
-| Publish-asset freshness                          | durable `publish-assets` gate                                                                | PASS               | Generated publish assets current; `receipts/publish-assets-cycle1.json`.                            |
-| Runtime asset / `import.meta` preflight          | `deno task release:preflight`                                                                | PASS               | 0 text-import, import-attribute, file-URL, and self-import findings; JSON audit receipt retained.   |
-| JSR package audit (`@netscript/cli`)             | `audit-jsr-package.ts --root packages/cli --out ...`                                         | PASS_WITH_WARNINGS | Dry-run succeeds; existing helper/cardinality warnings and parser banner recorded.                  |
-| JSR package audit (`@netscript/plugin`)          | `audit-jsr-package.ts --root packages/plugin --out ...`                                      | BASELINE_FAIL      | Dry-run succeeds; four existing missing `@module` tags make audit exit 1.                           |
-| S1 structured check                              | durable `check` gate with CLI/plugin include                                                 | PASS_PARENT_HEAD   | Receipt attests parent `3e0c8858b`, not S1 head `86d0110a5`; S4 final-head rerun binds.             |
-| S1 docs source format                            | durable `docs-source-format` gate                                                            | PASS_PARENT_HEAD   | Receipt attests parent `3e0c8858b`, not S1 head `86d0110a5`; `receipts/docs-source-format-s1.json`. |
-| S1 docs accuracy                                 | durable `docs-accuracy` gate                                                                 | PASS_PARENT_HEAD   | Receipt attests parent `3e0c8858b`, not S1 head `86d0110a5`; `receipts/docs-accuracy-s1.json`.      |
-| S1 owned Markdown format                         | structured `run-deno-fmt.ts` wrapper report                                                  | PASS               | 10 files, 0 findings; not a durable receipt and carries no outcome, exit code, or Git head.         |
-| S1 owned Markdown format write                   | structured `run-deno-fmt.ts --write` wrapper report                                          | PASS               | `source-format-s1-write.json`; not a durable receipt and is excluded from the S4 receipt set.       |
-| S1 docs links                                    | `deno task docs:links`                                                                       | PASS               | 103 docs, 0 broken links/anchors/orphans.                                                           |
-| S1 terminology                                   | comparison with `docs/site/glossary.md`                                                      | PASS               | Capability, contribution, manifest, plugin, and registry retain glossary meanings.                  |
-| S1 live surface/help sampling                    | `deno doc --filter` plus `netscript-dev --help`                                              | PASS               | Confirms legacy result/command shapes and current top-level tree.                                   |
-| S1 fix-up docs source format                     | durable `docs-source-format` gate                                                            | PASS_PARENT_HEAD   | Attests `86d0110a5`, not the fix-up commit; `receipts/docs-source-format-s1-fixup.json`.            |
-| S1 fix-up docs accuracy                          | durable `docs-accuracy` gate                                                                 | PASS_PARENT_HEAD   | Attests `86d0110a5`, not the fix-up commit; `receipts/docs-accuracy-s1-fixup.json`.                 |
-| S1 fix-up owned Markdown format                  | structured `run-deno-fmt.ts` wrapper report                                                  | PASS               | 10 files, 0 findings; not a durable receipt and has no outcome, exit code, or Git head.             |
-| S1 fix-up owned Markdown format write            | structured `run-deno-fmt.ts --write` wrapper report                                          | PASS               | Kept as wrapper output; excluded from the durable receipt set.                                      |
-| S1 fix-up docs links                             | `deno task docs:links`                                                                       | PASS               | 103 docs, 0 broken links/anchors/orphans.                                                           |
-| S2 focused CLI/plugin test                       | durable structured test over the approved 16 files                                           | PASS_PARENT_HEAD   | 88 passed, 0 failed; attests parent `bd8b29bf3`; `receipts/test-cli-plugin-s2.json`.                |
-| S2 architecture check                            | durable root `arch-check` gate                                                               | PASS_PARENT_HEAD   | 0 failures; existing warnings retained; attests `bd8b29bf3`; `receipts/arch-check-s2.json`.         |
-| S2 docs source format                            | durable `docs-source-format` gate                                                            | PASS_PARENT_HEAD   | `Docs source format: OK`; attests `bd8b29bf3`; `receipts/docs-source-format-s2.json`.               |
-| S2 docs accuracy                                 | durable root `docs-accuracy` gate                                                            | PASS_PARENT_HEAD   | 91/91; pre-existing peer warning only; attests `bd8b29bf3`; `receipts/docs-accuracy-s2.json`.       |
-| S2 owned Markdown format                         | structured `run-deno-fmt.ts` wrapper report                                                  | PASS               | 10 files, 0 findings; no outcome, exit code, or Git head; not a durable receipt.                    |
-| S2 owned Markdown format write                   | structured `run-deno-fmt.ts --write` wrapper report                                          | PASS               | Kept as wrapper output; excluded from the durable receipt set.                                      |
-| S2 docs links                                    | `deno task docs:links`                                                                       | PASS               | 103 docs, 0 broken links/anchors/orphans.                                                           |
-| S2 terminology                                   | comparison with `docs/site/glossary.md`                                                      | PASS               | Permission-token meaning is explicitly distinguished from product-area capability vocabulary.       |
-| S2 live surface/help sampling                    | `deno doc --filter` plus focused `netscript-dev generate/plugin --help`                      | PASS               | Registry and doctor flags plus current manifest/runtime ownership are accurately described.         |
-| S2 decision completeness                         | focused normative-section and vocabulary sweep                                               | PASS               | All six dispatched S2 sections are normative; compatibility/migration/roadmap remain explicit S3.   |
-| `quality:gate`                                   | docs-only policy                                                                             | N/A                | Actual diff does not touch `packages/**` or `plugins/**`.                                           |
+| Gate                                             | Command or check                                                                             | Result             | Notes                                                                                                |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------- |
+| Live public-surface inspection                   | `deno doc packages/cli/mod.ts`; `deno doc packages/plugin/mod.ts`; focused `deno doc`/source | PASS               | Research only; exact exports and commands inventoried.                                               |
+| JSR doc-lint baseline (`@netscript/plugin`)      | structured full export-map runner                                                            | BASELINE_FAIL      | 15 private-type refs package-wide; one on `./cli`; `receipts/doc-lint-plugin-cycle1.json`.           |
+| JSR doc-lint baseline (`@netscript/cli`)         | structured full export-map runner                                                            | PASS               | 0 diagnostics across three entrypoints; `receipts/doc-lint-cli-cycle1.json`.                         |
+| Initial S0 scoped Markdown format                | `run-deno-fmt.ts --root <run-dir> --ext md --output ...`                                     | PASS               | 8 files, 1 batch, 0 findings; `receipts/source-format.json`.                                         |
+| Initial S0 durable docs accuracy                 | `run-gate.ts --gate docs-accuracy --id ...-s0-accuracy`                                      | PASS               | Exit 0; `receipts/docs-accuracy.json`; pre-existing peer warning only.                               |
+| Cycle-1 scoped Markdown format                   | structured `run-deno-fmt.ts` report                                                          | PASS               | 8 files, 1 batch, 0 findings; `receipts/source-format-cycle1.json`.                                  |
+| Contracted docs source format                    | durable `docs-source-format` gate from `docs/site`                                           | PASS               | `Docs source format: OK`; `receipts/docs-source-format-cycle1.json`.                                 |
+| Contracted docs accuracy                         | durable root `docs-accuracy` gate                                                            | PASS               | Current command/export corpus green; `receipts/docs-accuracy-cycle1.json`; existing peer warning.    |
+| Internal docs links                              | `deno task docs:links`                                                                       | PASS               | 103 docs, 0 broken links/anchors, 0 orphans.                                                         |
+| Docs terminology (live glossary)                 | focused comparison with `docs/site/glossary.md`                                              | PASS_PLAN          | Existing capability/contribution/manifest/plugin/registry meanings preserved; final RFC reruns.      |
+| Contracted structured check                      | durable `check` gate with CLI/plugin include                                                 | PASS               | 1,033 files, 9 batches, 0 failed; `receipts/check-cli-plugin-cycle1.json`.                           |
+| Contracted structured test                       | durable focused `test` gate over 16 CLI/plugin files                                         | PASS               | 88 passed, 0 failed; `receipts/test-cli-plugin-cycle1.json`.                                         |
+| Contracted publish dry-run (`@netscript/cli`)    | canonical per-member wrapper through durable gate                                            | PASS               | Static dry-run only; `receipts/publish-dry-run-cli-cycle1.json`.                                     |
+| Contracted publish dry-run (`@netscript/plugin`) | canonical per-member wrapper through durable gate                                            | PASS               | Static dry-run only; `receipts/publish-dry-run-plugin-cycle1.json`.                                  |
+| Contracted architecture check                    | durable root `arch-check` gate                                                               | PASS               | 0 failures; existing warnings retained in receipt; `receipts/arch-check-cycle1.json`.                |
+| Exact internal `@netscript/*` pins               | durable `netscript-jsr-specifiers` gate                                                      | PASS               | 2,360 scanned, 1 documented allowance, 0 ranges/failures.                                            |
+| Publish-asset freshness                          | durable `publish-assets` gate                                                                | PASS               | Generated publish assets current; `receipts/publish-assets-cycle1.json`.                             |
+| Runtime asset / `import.meta` preflight          | `deno task release:preflight`                                                                | PASS               | 0 text-import, import-attribute, file-URL, and self-import findings; JSON audit receipt retained.    |
+| JSR package audit (`@netscript/cli`)             | `audit-jsr-package.ts --root packages/cli --out ...`                                         | PASS_WITH_WARNINGS | Dry-run succeeds; existing helper/cardinality warnings and parser banner recorded.                   |
+| JSR package audit (`@netscript/plugin`)          | `audit-jsr-package.ts --root packages/plugin --out ...`                                      | BASELINE_FAIL      | Dry-run succeeds; four existing missing `@module` tags make audit exit 1.                            |
+| S1 structured check                              | durable `check` gate with CLI/plugin include                                                 | PASS_PARENT_HEAD   | Receipt attests parent `3e0c8858b`, not S1 head `86d0110a5`; S4 final-head rerun binds.              |
+| S1 docs source format                            | durable `docs-source-format` gate                                                            | PASS_PARENT_HEAD   | Receipt attests parent `3e0c8858b`, not S1 head `86d0110a5`; `receipts/docs-source-format-s1.json`.  |
+| S1 docs accuracy                                 | durable `docs-accuracy` gate                                                                 | PASS_PARENT_HEAD   | Receipt attests parent `3e0c8858b`, not S1 head `86d0110a5`; `receipts/docs-accuracy-s1.json`.       |
+| S1 owned Markdown format                         | structured `run-deno-fmt.ts` wrapper report                                                  | PASS               | 10 files, 0 findings; not a durable receipt and carries no outcome, exit code, or Git head.          |
+| S1 owned Markdown format write                   | structured `run-deno-fmt.ts --write` wrapper report                                          | PASS               | `source-format-s1-write.json`; not a durable receipt and is excluded from the S4 receipt set.        |
+| S1 docs links                                    | `deno task docs:links`                                                                       | PASS               | 103 docs, 0 broken links/anchors/orphans.                                                            |
+| S1 terminology                                   | comparison with `docs/site/glossary.md`                                                      | PASS               | Capability, contribution, manifest, plugin, and registry retain glossary meanings.                   |
+| S1 live surface/help sampling                    | `deno doc --filter` plus `netscript-dev --help`                                              | PASS               | Confirms legacy result/command shapes and current top-level tree.                                    |
+| S1 fix-up docs source format                     | durable `docs-source-format` gate                                                            | PASS_PARENT_HEAD   | Attests `86d0110a5`, not the fix-up commit; `receipts/docs-source-format-s1-fixup.json`.             |
+| S1 fix-up docs accuracy                          | durable `docs-accuracy` gate                                                                 | PASS_PARENT_HEAD   | Attests `86d0110a5`, not the fix-up commit; `receipts/docs-accuracy-s1-fixup.json`.                  |
+| S1 fix-up owned Markdown format                  | structured `run-deno-fmt.ts` wrapper report                                                  | PASS               | 10 files, 0 findings; not a durable receipt and has no outcome, exit code, or Git head.              |
+| S1 fix-up owned Markdown format write            | structured `run-deno-fmt.ts --write` wrapper report                                          | PASS               | Kept as wrapper output; excluded from the durable receipt set.                                       |
+| S1 fix-up docs links                             | `deno task docs:links`                                                                       | PASS               | 103 docs, 0 broken links/anchors/orphans.                                                            |
+| S2 focused CLI/plugin test                       | durable structured test over the approved 16 files                                           | PASS_PARENT_HEAD   | 88 passed, 0 failed; attests parent `bd8b29bf3`; `receipts/test-cli-plugin-s2.json`.                 |
+| S2 architecture check                            | durable root `arch-check` gate                                                               | PASS_PARENT_HEAD   | 0 failures; existing warnings retained; attests `bd8b29bf3`; `receipts/arch-check-s2.json`.          |
+| S2 docs source format                            | durable `docs-source-format` gate                                                            | PASS_PARENT_HEAD   | `Docs source format: OK`; attests `bd8b29bf3`; `receipts/docs-source-format-s2.json`.                |
+| S2 docs accuracy                                 | durable root `docs-accuracy` gate                                                            | PASS_PARENT_HEAD   | 91/91; pre-existing peer warning only; attests `bd8b29bf3`; `receipts/docs-accuracy-s2.json`.        |
+| S2 owned Markdown format                         | structured `run-deno-fmt.ts` wrapper report                                                  | PASS               | 10 files, 0 findings; no outcome, exit code, or Git head; not a durable receipt.                     |
+| S2 owned Markdown format write                   | structured `run-deno-fmt.ts --write` wrapper report                                          | PASS               | Kept as wrapper output; excluded from the durable receipt set.                                       |
+| S2 docs links                                    | `deno task docs:links`                                                                       | PASS               | 103 docs, 0 broken links/anchors/orphans.                                                            |
+| S2 terminology                                   | comparison with `docs/site/glossary.md`                                                      | PASS               | Permission-token meaning is explicitly distinguished from product-area capability vocabulary.        |
+| S2 live surface/help sampling                    | `deno doc --filter` plus focused `netscript-dev generate/plugin --help`                      | PASS               | Registry and doctor flags plus current manifest/runtime ownership are accurately described.          |
+| S2 decision completeness                         | focused normative-section and vocabulary sweep                                               | PASS               | All six dispatched S2 sections are normative; compatibility/migration/roadmap remain explicit S3.    |
+| S3 hardcoded-host scanner                        | durable `quality-scan-repo` gate                                                             | PASS_PARENT_HEAD   | Zero scanner findings and 7 allowances at `7a5eb580a`; manual audit found a rule-shape blind spot.   |
+| S3 docs source format                            | durable `docs-source-format` gate                                                            | PASS_PARENT_HEAD   | `Docs source format: OK`; attests `7a5eb580a`; `receipts/docs-source-format-s3.json`.                |
+| S3 docs accuracy                                 | durable root `docs-accuracy` gate                                                            | PASS_PARENT_HEAD   | 91/91; existing peer warning only; attests `7a5eb580a`; `receipts/docs-accuracy-s3.json`.            |
+| S3 publish dry-run (`@netscript/cli`)            | canonical per-member wrapper through durable gate                                            | PASS_PARENT_HEAD   | Static simulation passed at `7a5eb580a`; `receipts/publish-dry-run-cli-s3.json`.                     |
+| S3 publish dry-run (`@netscript/plugin`)         | canonical per-member wrapper through durable gate                                            | PASS_PARENT_HEAD   | Static simulation passed at `7a5eb580a`; `receipts/publish-dry-run-plugin-s3.json`.                  |
+| S3 JSR package audit (`@netscript/cli`)          | structured `audit-jsr-package.ts` report                                                     | PASS_WITH_WARNINGS | Three exports; dry-run passes; 19 existing helper/cardinality/parser-banner warnings.                |
+| S3 JSR package audit (`@netscript/plugin`)       | structured `audit-jsr-package.ts` report                                                     | BASELINE_FAIL      | Thirteen exports; dry-run passes; four existing missing-module-tag failures and two warnings.        |
+| S3 owned Markdown format                         | structured `run-deno-fmt.ts` wrapper report                                                  | PASS               | 10 files, 0 findings; no outcome, exit code, or Git head; not a durable receipt.                     |
+| S3 owned Markdown format write                   | structured `run-deno-fmt.ts --write` wrapper report                                          | PASS               | Kept as wrapper output and excluded from the S4 durable-receipt set.                                 |
+| S3 docs links                                    | `deno task docs:links`                                                                       | PASS               | 103 docs, 0 broken links/anchors/orphans.                                                            |
+| S3 issue/RFC reference audit                     | live `gh` state plus accepted RFC/source comparison                                          | PASS_RESEARCH      | No second general RFC; existing owners and exact hardcoded occurrences are mapped.                   |
+| S3 terminology                                   | comparison with `docs/site/glossary.md`                                                      | PASS               | Contribution, plugin, capability, registry, manifest, transaction, and doctor keep canonical senses. |
+| `quality:gate`                                   | docs-only policy                                                                             | N/A                | Actual diff does not touch `packages/**` or `plugins/**`.                                            |
 
 The three durable receipts from the original S1 turn—`check-cli-plugin-s1.json`,
 `docs-source-format-s1.json`, and `docs-accuracy-s1.json`—attest parent commit `3e0c8858b`, not S1
@@ -224,6 +246,19 @@ structured wrapper reports. They carry no `outcome`, `exitCode`, or `gitHead` an
 `source-format-s2.json` and `source-format-s2-write.json` are likewise structured wrapper reports,
 not durable `run-gate.ts` receipts. They carry no `outcome`, `exitCode`, or `gitHead` and are
 excluded from the S4 durable-receipt set.
+
+The durable `quality-scan-repo-s3.json` receipt attests accepted S2 parent `7a5eb580a`, not the
+eventual S3 commit. Its `PASS_PARENT_HEAD` means the scanner command passed over the S3 working
+tree; it does not erase the separately documented direct-import rule gap. S4's final-head contracted
+receipts remain the binding IMPL-EVAL evidence.
+
+The other four durable S3 receipts—`docs-source-format-s3.json`, `docs-accuracy-s3.json`,
+`publish-dry-run-cli-s3.json`, and `publish-dry-run-plugin-s3.json`—also attest accepted S2 parent
+`7a5eb580a`, not the eventual S3 commit. The two `jsr-audit-*-s3.json` files are structured audit
+reports, not `run-gate.ts` receipts; the plugin report's exit 1 is the measured four-module-tag
+baseline from the audit invocation, while both embedded dry-runs succeed. `source-format-s3.json`
+and `source-format-s3-write.json` are structured formatter reports with no `outcome`, `exitCode`, or
+`gitHead` and are excluded from the S4 durable-receipt set.
 
 ### Fitness Gates
 
@@ -257,8 +292,8 @@ Archetype-4 gates (F-1–F-12, F-14–F-19); this summary does not replace that 
 ## Handoff Notes
 
 - Cycle-1 `FAIL_PLAN` evaluated `a02f9690154b7384ca8e6503ea91d644b397368a`; evaluator-only commit
-  `d71b78c3116db4ec3aaaa0447dd527fcd4867f6f` is preserved. Cycle 2 must evaluate the repaired plan
-  head recorded in the PR's single PLAN-UPDATE comment.
+  `d71b78c3116db4ec3aaaa0447dd527fcd4867f6f` is preserved. Cycle 2 passed repaired plan head
+  `12276e6d86403ed1340ef79a963e87d401d643e9` in evaluator-only commit `3e0c8858b`.
 - FP-1 is repaired by the six-gate plan and cycle-1 receipts; FP-2 by measured CLI/plugin exports,
   exact pins, publish dry-runs, isolated-declaration posture, assets, and `import.meta` evidence;
   FP-3 by the authoritative RFC-only scope resolution and significant drift record.
@@ -271,7 +306,8 @@ Archetype-4 gates (F-1–F-12, F-14–F-19); this summary does not replace that 
 - Verify that the public contract stays in `@netscript/plugin/cli`, host internals stay private, and
   the existing CLI helper migration is explicit.
 - Verify every issue #1502 decision and all five acceptance boxes have a planned evidence path.
-- Record the formal verdict only in `plan-eval.md`; do not author the RFC in the evaluator session.
-- The author has written S1 and S2 of `rfcs/0000-plugin-cli-contribution.md`; has not started S3,
-  self-evaluated, dispatched a rival evaluator, changed lifecycle state, or expanded into
-  package/plugin source.
+- After Tier-A accepts S3, release S4 for final-head contracted evidence; IMPL-EVAL remains a fresh
+  opposite-family session and this author does not write its verdict.
+- The author has written S1–S3 of `rfcs/0000-plugin-cli-contribution.md`; has not started S4,
+  self-evaluated, filed or mutated issues, changed lifecycle state, or expanded into package/plugin
+  source.

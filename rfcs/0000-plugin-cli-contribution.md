@@ -25,9 +25,8 @@ the selected handler or planner when its command is invoked.
 
 This draft is being authored in reviewable slices. The public ownership, descriptor, router,
 help/completion, error, discovery, bootstrap-isolation, capability, transactional-generation,
-doctor, and manifest-pointer contracts are normative below. Compatibility with adjacent RFCs, deploy
-supersession, and the later implementation roadmap are completed by the following RFC slice; no
-product implementation is part of this RFC PR.
+doctor, manifest-pointer, compatibility, migration, and later-implementation roadmap contracts are
+normative below. No product implementation or issue filing is part of this RFC PR.
 
 ## Motivation
 
@@ -272,6 +271,10 @@ export const PLUGIN_CLI_CAPABILITIES = [
 
 export type PluginCliCapability = typeof PLUGIN_CLI_CAPABILITIES[number];
 
+/**
+ * One host capability decision. A successful copy reaches plugin code; a denied copy is emitted
+ * only as redacted host diagnostic data and prevents plugin import.
+ */
 export interface PluginCliCapabilityGrant {
   readonly requested: readonly PluginCliCapability[];
   readonly granted: readonly PluginCliCapability[];
@@ -597,9 +600,19 @@ granted port still policy-checks every operation. Ambient Deno read, write, netw
 process, FFI, and subprocess permissions are denied in the plugin execution boundary; capability
 names authorize only the corresponding host-mediated ports.
 
-Requested, granted, and denied arrays are unique and sorted in tuple order. `deadline` is an RFC
-3339 timestamp for portable diagnostics; the host enforces it with its own monotonic timer rather
-than trusting plugin time or wall-clock comparisons.
+This RFC chooses S2 review resolution **(a): `PluginCliCapabilityGrant` is shared with a host-side
+diagnostic path**. When a request is denied, `PluginCliFailure.details` for `capability-denied`
+contains a redacted `{ capabilityDecision: PluginCliCapabilityGrant }`; that is the public location
+where `denied` is non-empty. The plugin module is not imported and cannot observe that decision.
+When the same type reaches `PluginCliInvocationContext.grant` or `PluginCliGenerationContext.grant`,
+its invariant is `denied.length === 0` and `granted` is element-for-element equal to `requested`.
+Keeping one decision shape lets JSON diagnostics and successful invocation telemetry use the same
+stable vocabulary without making denial recoverable inside plugin code.
+
+Requested, granted, and denied arrays are unique and sorted in tuple order. The host includes only
+capability names, never policy rules, authorization material, environment values, or secrets, in the
+diagnostic copy. `deadline` is an RFC 3339 timestamp for portable diagnostics; the host enforces it
+with its own monotonic timer rather than trusting plugin time or wall-clock comparisons.
 
 ### Discovery and generated-registry lifecycle
 
@@ -856,22 +869,175 @@ change the checks.
 The new top-level installer block is sequenced after the accepted manifest-forward-compatibility
 prerequisite: the outer plugin manifest must permit future blocks, while the known `cli` block is
 validated strictly. The live schema is still top-level `.strict()`, so this RFC describes a target
-contract rather than claiming the pointer is shipped. S3 decides how the prerequisite is folded into
-existing board work; it may not weaken pointer validation or change ownership.
+contract rather than claiming the pointer is shipped. Existing issue #1474 owns that prerequisite
+and must be amended to the already-ratified `.passthrough()` outcome before implementation; this RFC
+does not file or mutate it.
 
-### S3 normative sections still to be completed
+### Compatibility with accepted contribution RFCs
 
-The next RFC slice completes, without changing the S1/S2 contract:
+The adjacent contribution designs are compatibility authorities, not a common payload package. The
+checkable rule is: reuse their lifecycle and ownership laws where the same failure class exists,
+then give the `plugin-cli` axis its own family, schema, errors, and host adapter.
 
-- compatibility with accepted frontend, SDK, runtime, command-composition, and DevTools RFCs;
-- deploy #904–#908 migration/supersession and the hardcoded-host-command audit;
-- the amend/fold-first duplicate audit, JSR obligations, and later implementation epic with PR-sized
-  children; and
-- migration sequencing and compatibility fixtures beyond the already-fixed published
-  `PluginCliResult` collision.
+| Authority                                                                         | Laws this RFC reuses                                                                                                                                                                                                                                                                | Payloads and behavior deliberately not shared                                                                                                                                                                                                                                                                                                                        |
+| --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Accepted frontend design from PR #890                                             | Parse-only explicit pointer; `(family, major)` negotiation; host-owned identity and collision checks; deterministic generated full replace-set including empty output; stage, check, atomic swap or rollback; stale/orphan doctor checks.                                           | No `FrontendManifestEnvelope`, route/island/zone/nav/theme union, Fresh host descriptor, gateway, CSS, or UI quarantine taxonomy appears in `@netscript/plugin/cli`. CLI mount/route identity and executable pointers remain CLI-owned.                                                                                                                              |
+| [RFC 0001 — SDK client contributions](./0001-sdk-client-contributions.md)         | NetScript-owned upstream-free public types; explicit module/export references; named family/major; duplicate rejection with both owners; order-independent successful composition; generated literal imports; stable redacted errors; activation is explicit rather than automatic. | An SDK `prepare()` callback, header/context/cache ownership, transport retry epoch, and SDK error class are not command descriptors or handlers. A CLI handler may call an SDK client, but the CLI router never imports SDK contributor types or treats install order as execution order.                                                                            |
+| [RFC 0002 — runtime-versioned automation](./0002-runtime-versioned-automation.md) | Registered families replace hardcoded topic/plugin switches; schemas and stable identities drive generation; one management contract serves multiple presentation callers; thin connector plugins compose rather than own host infrastructure.                                      | Runtime definitions, revision activation, stores, execution boundaries, and the `netscript automation` management contract stay runtime-owned. They may sit behind a CLI handler; they do not become `PluginCliCommandDefinition` fields or use the workspace generation transaction for durable runtime state.                                                      |
+| [RFC 0003 — command composition kit](./0003-command-composition-kit.md)           | Contract-first definitions, host-owned execution, explicit cancellation, stable redacted failures, previewable scaffold output, and one implementation behind multiple callers.                                                                                                     | A `CommandDefinition` is transactional business intent with idempotency, database receipt/audit/outbox, and same-commit laws. A `PluginCliInvocation` is presentation/dispatch input and promises none of those. A CLI handler may invoke a command executor; `PluginCliGenerationPlan` mutates workspace files only and cannot stand in for a database transaction. |
+| [RFC 0005 — DevTools contributions](./0005-devtools-contribution.md)              | Named family/major, explicit pointer, generated static registry, provenance-aware collision diagnostics, order independent of discovery, host-owned replace-set transaction, empty removal output, byte-identical skip, and doctor visibility.                                      | No `ContributionEnvelope`, DevTools kind registry, panel/link/diagnostic payload, generated host process, host zone, or quarantine card crosses into the CLI axis. DevTools may contribute `devtools` commands through this seam, while its panels and generated host remain RFC 0005-owned.                                                                         |
 
-These are explicit S3 draft gaps, not implementation discretion. Discovery, bootstrap, isolation,
-capabilities, generation, doctor behavior, and pointer ownership are normative in S2.
+These mappings are conformance obligations. Cross-consumer fixtures must prove the common laws with
+each consumer's own payload type; assignability between the payloads is a failure, not reuse. The
+only dependency shared by deploy and DevTools is the public `@netscript/plugin/cli` contract plus
+the private host adapter in `@netscript/cli`. Neither imports the other's plugin, generator, or
+diagnostic types.
+
+There are two intentional lifecycle differences. First, frontend and DevTools can quarantine one bad
+visual contribution while retaining a host shell; a missing or stale CLI registry disables its
+contributed routes because presenting an executable route the host cannot safely dispatch is worse
+than omission. Second, RFC 0003 owns durable business rollback; this RFC's rollback restores
+workspace bytes only. Tests must preserve those differences instead of forcing a universal envelope
+or transaction abstraction.
+
+### Deploy #904–#908 migration and supersession
+
+The deploy proposal remains a first consumer, not a second general CLI architecture. After this RFC
+is accepted, maintainers reconcile the already-open issues in place:
+
+| Issue                                | Disposition after this RFC                                                                                                                                                                                                                                                                                             | Scope that remains deploy-owned                                                                                                                                                                                      |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #904 — mount-children contract       | **General contract superseded.** Remove its deploy-local `CliCommandContribution`, builder, merger, and verifier ownership; amend it to a deploy conformance issue using `PluginCliContributionDefinition`.                                                                                                            | A `deploy` host mount fixture, reserved-name/duplicate-owner negatives, and deploy `verify-plugin` expectations.                                                                                                     |
+| #905 — bootstrap/isolation/absent UX | **General host lifecycle superseded.** Fold its loader/bootstrap implementation into the shared host lifecycle child instead of creating a deploy loader.                                                                                                                                                              | Deploy-specific startup-budget, broken-deploy-plugin isolation, and absent-deploy-plugin remediation fixtures.                                                                                                       |
+| #906 — doctor/tooling/axes           | **Split, not closed wholesale.** The CLI pointer, capabilities, and contribution doctor states are superseded by this RFC. Its independent installer `officialSource: tooling`, generic doctor-check migration, and broader contribution-axis questions remain only if a focused re-audit shows they are still needed. | Deploy tooling install/copy behavior and compatibility of any retained auth-doctor migration; no deploy-specific CLI pointer field.                                                                                  |
+| #907 — deploy plugin composition     | **Migrated, not superseded.** Keep it as the thin deploy plugin implementation.                                                                                                                                                                                                                                        | Deploy target descriptors, permission profiles, credential/adapter diagnosis, core-only dependency, and deploy registry consumer proof. It declares the shared CLI pointer and imports only `@netscript/plugin/cli`. |
+| #908 — deploy command children       | **Router mechanics superseded; command behavior retained.** It no longer defines a mount/router/capability API.                                                                                                                                                                                                        | `target add/remove`, `capabilities`, `cells apply`, secrets/rollback/emit/down grammar and deploy-domain behavior, expressed as shared descriptors, handlers, and generation plans.                                  |
+
+Thus #904–#906 lose or split their general-host portions; #907 and #908 remain delivery work. No
+issue closes merely because this RFC is merged. The deploy epic amends those issue bodies before
+implementation so one PR cannot silently satisfy both a superseded host API and the accepted seam.
+
+DevTools follows the same rule. Existing #1477 retains the generated DevTools host and
+`devtools generate|start` behavior, but its command group is described through this seam. RFC 0005
+continues to own the host process, panels, production exclusion, and DevTools registry. Deploy and
+DevTools can therefore appear in the same CLI registry without either package importing the other;
+the host detects collisions before importing either executable.
+
+### Hardcoded host-command audit and migration
+
+The audit distinguishes direct plugin coupling from generic legacy dispatch. At accepted S2 head
+`7a5eb580a`, the real production occurrences are:
+
+| Surface                                                                            | Finding                                                                                                                                                                                                           | Required disposition                                                                                                                                                                     |
+| ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/cli/src/public/features/plugins/plugins-group.ts:17-18,66-72,117-125`    | The public host imports and registers first-party `ai` and `auth` command factories directly. Adding another peer command group requires a host edit.                                                             | Migrate behavior-equivalent descriptors/handlers under the appropriate host-declared mount; retain help/exit/output snapshots; remove the direct imports only after those fixtures pass. |
+| `packages/cli/src/local/features/plugins/plugins-group.ts:3,81-89`                 | The local contributor host separately hardcodes `auth`, so the two composition roots already disagree.                                                                                                            | Consume the same generated descriptor registry with local source resolution; no second local-only contribution API.                                                                      |
+| `packages/plugin/src/sdk/discovery/ast-extractor.ts:4-8,29-31`                     | Core discovery recognizes only `defineJob`, `defineSaga`, and `defineWebhook`. This is builder/axis coupling rather than a CLI route, but it is the same closed-extension failure.                                | Existing #1093 remains the owner. The CLI epic depends on or amends its explicit-pointer outcome and does not add another walker rule.                                                   |
+| `packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb.ts:96-130` | Generic framework verbs execute an entire package `./cli` subprocess with `-A`. This is not a hardcoded plugin name, but it is the legacy broad-permission execution seam the selected-handler boundary replaces. | Keep a compatibility adapter until install/info/update/remove consumers migrate; do not equate generic dispatch with safe selected-handler bootstrap.                                    |
+
+The repository-wide `deno task quality:scan:repo` audit was run for S3 and returned zero findings
+with seven existing allowances. That result proves the scanner's current equality/predicate rules,
+not the absence of direct command coupling: the scanner does not flag a plugin-specific factory
+import followed by `.command('ai' | 'auth', ...)`. The future migration child must add a focused
+guard for direct host imports/registrations (or extend the scanner with a fixture) before deleting
+the manual audit. Closed #745 is the enforcement precedent; open #1542 concerns scan-root coverage,
+not this rule-shape gap, so neither is silently treated as an implementation owner.
+
+### Amend/fold-first duplicate audit
+
+This audit was refreshed from live GitHub state before proposing the roadmap. It is a board
+reconciliation contract, not authorization to mutate the board:
+
+| Existing issue              | Overlap with the later epic                                                             | Amend/fold-first result                                                                                                                                                                        |
+| --------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #904–#908                   | Contract, bootstrap, doctor, deploy consumer, and deploy commands.                      | Apply the supersession table above; reuse all five issues rather than file deploy replacements.                                                                                                |
+| #1093                       | Third-party explicit discovery and removal of the hardcoded builder table.              | Amend or depend on its generic discovery outcome; do not create another discovery child.                                                                                                       |
+| #1473                       | Path containment and scoped generator subprocesses.                                     | Reuse its resolver/permission gates in the shared generation child; do not duplicate its security fix.                                                                                         |
+| #1474                       | Top-level manifest `.passthrough()` prerequisite.                                       | Amend its now-stale “owner fork” wording to the already-ratified outcome, then use it as the prerequisite; do not file a replacement.                                                          |
+| #1475                       | Transactional generated replace-set.                                                    | Amend/fold the host transaction primitive so CLI and DevTools share one host-owned implementation while keeping DevTools payload emission separate. Do not create a second transaction engine. |
+| #1476                       | DevTools-specific doctor/quarantine states.                                             | Keep its payload diagnoses in RFC 0005; share only generic registry-freshness and transaction-residue checks.                                                                                  |
+| #1477                       | Generated DevTools host and command group.                                              | Amend the CLI-group portion to consume this seam; keep host generation/launch in the issue.                                                                                                    |
+| #946                        | Optional frontend convention discovery.                                                 | Keep separate. It may call the host generation transaction but cannot replace explicit pointers or own CLI discovery.                                                                          |
+| #1354                       | Re-runnable resource-route slice generator with dry-run/idempotence/no-write negatives. | Keep separate as a generation-plan consumer. Only its optional plugin-contribution clause depends on contribution work.                                                                        |
+| #424 (closed)               | Historical dashboard CLI/auto-launch and flat URLs.                                     | Do not revive. RFC 0005 successors #1472/#1477 already own the surviving behavior.                                                                                                             |
+| #745 (closed), #1542 (open) | Quality enforcement precedent and scan-root completeness.                               | Reuse #745's rule vocabulary; decide whether direct-registration detection amends #1542 or stays in the migration child. Do not mislabel a clean scan as a clean coupling audit.               |
+
+Searches for `plugin CLI`, `CLI contribution`, `command contribution`, `generated registry`,
+`transactional generator`, `manifest pointer`, and hardcoded plugin commands found no second open
+general CLI-contribution RFC. A later epic author repeats the search immediately before filing,
+because live GitHub wins over this snapshot. If an owner already exists, the proposed row is
+amended/folded or becomes a dependency; “different epic” is not a reason to duplicate
+infrastructure.
+
+### JSR and publish-surface obligations
+
+`jsrAudit.applicable` is true because the implementation changes published plugin contracts even
+though this RFC leaf changes only documentation. The S0R measurements are the baseline; S3 carries
+them forward without relabelling existing failures as success:
+
+| Publishable surface                                 | Measured baseline                                                                                                                                                                                                                                                                           | Required implementation exit                                                                                                                                                                                                                                                                                                |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@netscript/plugin/cli`                             | The plugin package has 13 export-map entries. Full-map doc lint has 15 existing `private-type-ref` findings, including `applyScaffoldPlan` exposing private `ScaffoldArtifact`; `./cli` also lacks an `@module` tag. The package dry-run succeeds under its sanctioned slow-type carve-out. | The touched subpath has zero doc-lint diagnostics, explicit isolated-declaration-safe annotations on recursive builders/factories, module and symbol docs with runnable examples, a reviewed clean publish file list, ESM-only code, and no new package-wide diagnostic. The carve-out is not permission to add slow types. |
+| `@netscript/plugin/protocol` and `./config`         | Exported and published today; installer schema is top-level `.strict()` and runtime `cli` contribution is shallow. Internal `@netscript/*` pins measured exact.                                                                                                                             | Forward-compat and malformed-pointer phase fixtures, documented family/major/errors, exact release-matched internal pins, and consumer imports from every new/changed export. Known pointer blocks stay strict even when the outer manifest passes through unknown keys.                                                    |
+| `@netscript/cli`                                    | Three export-map entries, full-map doc lint clean, per-member dry-run green, but `isolatedDeclarations` is disabled. Templates/assets are part of the publish set.                                                                                                                          | Registry, Cliffy, bootstrap, and transaction adapters remain private. Any public testing helper has explicit declarations and docs. Dry-run file lists, `deno doc --lint`, and a packed/JSR consumer prove no accidental host-internal export.                                                                              |
+| First-party deploy/DevTools/other consumer subpaths | Not one homogeneous package surface; each plugin's export map and publish include differ.                                                                                                                                                                                                   | Each consumer audits its complete export map and publish list, exact internal pins, README permissions/examples, import-side-effect safety, no self-import, and clean consumer import. A consumer cannot inherit the core package receipt.                                                                                  |
+
+Every publishable child runs the repository JSR audit, full export-map doc lint, canonical
+per-member publish dry-run, and a clean consumer install/import. Recursive generics and inferred
+async factories receive explicit annotations. Internal imports within `@netscript/plugin` are
+relative, never the package's own bare JSR subpath. Generated descriptor/registry assets are
+checked-in TypeScript constants or intentionally published source; runtime `Deno.read*`, import
+attributes, and unguarded `import.meta.url` filesystem resolution are release blockers even when
+local dry-run passes. A dry run is static evidence, not publication or remote-graph proof.
+
+Exact internal `@netscript/*` versions are release-matched pins, not ranges. The implementation uses
+the repository dependency/publish wrappers and runs an isolated-declaration probe for the new public
+symbols. It never uses an ad-hoc registry query, local publication, or a green package-wide baseline
+to waive a touched-subpath failure.
+
+### Later implementation epic and PR-sized children
+
+This RFC proposes, but does **not file**, an epic titled **“Epic: Typed plugin CLI contributions”**.
+If filed later, it uses `type:umbrella`, `epic:cli-contrib`, `area:cli`, `area:plugins`, the
+coordinator-selected priority and milestone, and **no closing keyword**. It closes manually only
+after every child is complete. Every child body says `Part of #<epic>`; exactly one PR resolves each
+child issue and that PR uses `Closes #<child>`. This RFC PR's `Closes #1502` completes only the RFC
+tracking issue and does not close or pre-file future implementation work.
+
+The dependency-ordered work proposal is below. C1–C7 and C10 are each one new PR-sized child. C8 and
+C9 are reuse groups, not mega-children: after their bodies are amended, every referenced open issue
+remains one PR-sized child with one resolving PR. The grouping only makes the cross-consumer
+dependency order legible.
+
+| Order/group    | Proposed work item                                                                                                              | Board disposition before filing                                                                                       | Primary exit evidence                                                                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C1             | Manifest forward compatibility and strict `cli` pointer validation.                                                             | Amend/use #1474; no new issue unless it closes independently before adoption.                                         | Old CLI ignores unknown outer block; malformed known pointer fails at generation; plugin package gates and JSR audit.                               |
+| C2             | `@netscript/plugin/cli` v1 descriptor, builder, result, diagnostic, capability, handler, and generator contracts.               | New shared-contract child only after #904/#906 are narrowed; it must not duplicate their deploy-local types.          | Archetype-4 type/conformance suite, full export-map docs, isolated-declaration probe, dry-run and consumer import.                                  |
+| C3             | Runtime `PluginContributions.cli` axis, installer/runtime equality, owner-aware merger, mount registry, and collision verifier. | Amend/fold generic portions of #904/#906 and depend on #1093's discovery outcome.                                     | Permutation/collision/owner-provenance fixtures; no host plugin-name switch; plugin protocol/config gates.                                          |
+| C4             | Generated CLI registry and install/update/remove/sync lifecycle.                                                                | Amend/fold shared infrastructure with #1475; keep its DevTools emitter payload separate.                              | Full replace-set, empty removal, fingerprint freshness, byte-identical skip, staged validation and atomic swap.                                     |
+| C5             | Selected-only bootstrap, isolation, cancellation/deadline, import-free help/completion, and absent UX.                          | Amend/use #905 rather than filing an equivalent host-bootstrap issue.                                                 | Plugin-less startup budget; sibling isolation; denial-before-import; timeout/cancel; help/completion no-load fixtures.                              |
+| C6             | Host-owned generation-plan transaction and doctor integration.                                                                  | Reuse #1473 containment/scoping, #1475 transaction, and #1476's DevTools-specific doctor consumer; do not fork them.  | Preview zero-effect, path/symlink/digest negatives, staged gates, rollback/crash recovery, registry/transaction doctor states.                      |
+| C7             | Legacy CLI compatibility: current `PluginCli*`, direct public/local `ai`/`auth` groups, and broad `./cli -A` dispatch.          | New migration child only if a final search finds no owner; decide whether the direct-registration guard amends #1542. | Help/output/exit snapshots, adapter parity, zero direct plugin factory imports in host composition, strengthened quality guard, deprecation window. |
+| C8 reuse group | Deploy consumer conformance, partitioned along the five existing #904–#908 issue boundaries.                                    | Amend and deliver each existing issue independently; file no replacement deploy child.                                | Shared descriptors under `deploy`; target grammar/generation behavior; no DevTools import; per-issue deploy package JSR/conformance gates.          |
+| C9 reuse group | DevTools consumer conformance, partitioned along existing #1475, #1476, and #1477 boundaries.                                   | Amend and deliver each existing issue independently; file no replacement DevTools command child.                      | Shared `devtools` descriptors/generation caller; generated host remains RFC 0005-owned; no deploy import; per-issue DevTools gates.                 |
+| C10            | Documentation, public testing kit, JSR consumer matrix, and cross-consumer conformance.                                         | New only after searching for a docs/testing owner; fold any matching accepted issue.                                  | Executable author guide, testing exports, deploy+DevTools synthetic consumers, full JSR/docs/compatibility evidence.                                |
+
+C1 precedes all manifest-visible work. C2 precedes C3–C7. C3 and the transaction prerequisites
+precede consumers. C8/C9 can proceed in parallel only after the shared contracts and host lifecycle
+they consume are merged. C10 is the integration proof, not a substitute for per-child gates.
+
+Every implementation child carries the complete applicable Archetype-4 fitness manifest: F-1 file
+size, F-2 helper reinvention, F-3 layering, F-4 inheritance, F-5 public surface, F-6 JSR
+publishability, F-7 documentation score, F-8 workspace `lib` override, F-9 permissions, F-10 test
+shape, F-11 forbidden folders, F-12 naming, F-14 console use, F-15 upstream re-exports, F-16 folder
+cardinality, F-17 abstract/derived co-location, F-18 sub-barrels, and F-19 scoped runners. A child
+may mark one inapplicable only with a path-based reason in its own locked plan. CLI-host children
+also run the Archetype-6/quality gates required by their actual files. No child inherits another
+child's JSR or publish receipt.
+
+Nothing in this roadmap is filed, assigned a milestone, or added to an existing epic by this RFC
+leaf. The authorized later epic owner repeats the duplicate audit, obtains coordinator scope, then
+amends/folds existing issues before creating only the genuinely missing children.
 
 ## Drawbacks
 
@@ -884,6 +1050,10 @@ capabilities, generation, doctor behavior, and pointer ownership are normative i
   instead of exporting host implementation details accidentally.
 - Keeping a compatibility adapter temporarily preserves two authoring models. The alternative is an
   unannounced breaking redefinition of published symbols.
+- Generation plans are UTF-8 text only in contract major 1. A plugin cannot emit an image, archive,
+  font, or other binary asset through this seam; binary assets must already ship in a package or be
+  handled by a later explicitly bounded binary operation with its own size, digest, preview, and
+  publishability rules.
 
 ## Rationale and alternatives
 
@@ -923,8 +1093,9 @@ descriptor field changes meaning, or when a published symbol is reassigned. Thos
 new public major, documented compatibility window, deprecation evidence, and consumer migration.
 
 The `PluginCliResult` collision is resolved now: v1 introduces `PluginCliInvocationResult`; it does
-not redefine the published name. Broader migration mechanics and the hardcoded host-command audit
-are completed in S3.
+not redefine the published name. The later C7 migration retains adapters and behavior snapshots
+until direct `ai`/`auth` registrations and broad package-CLI dispatch have equivalent shared-seam
+coverage; removal or semantic reassignment waits for the next public major.
 
 ## Prior art
 
@@ -934,7 +1105,8 @@ are completed in S3.
   pointers, generated registries, collision provenance, and transaction ownership for another named
   contribution axis. This RFC reuses those laws, not its payloads.
 - The accepted frontend, SDK, and runtime contribution designs similarly separate static discovery
-  from executable behavior. Their compatibility relationship is made explicit in S3.
+  from executable behavior. The compatibility matrix above fixes the reused laws and rejected
+  payload sharing.
 
 ## Unresolved questions
 

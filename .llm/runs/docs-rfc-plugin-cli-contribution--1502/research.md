@@ -76,18 +76,18 @@ unrecorded contract mutation.
 
 ## Live consumer-proposal inventory
 
-| Proposal                                        | Current state                                                     | What survives under the shared RFC                                                                   | Duplicate/supersession disposition to propose later                                                                                                       |
-| ----------------------------------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| #904 — deploy host mount-children contract      | open, `status:plan`, 0.0.11; comment says #1502 owns general seam | Deploy is a real first consumer; reserved mount and duplicate-owner tests remain acceptance.         | Supersede its general contract/builder/merger scope with the future #1502 core-contract child; amend #904 to a deploy conformance consumer only.          |
-| #905 — async bootstrap/isolation/absent UX      | open, `status:plan`, 0.0.11                                       | Startup budget, one-broken-plugin isolation, install hint remain cross-seam conformance cases.       | Fold general host bootstrap into a future host-integration child; retain only deploy fixture coverage.                                                    |
-| #906 — doctor/tooling/contribution axes         | open, `status:plan`, 0.0.11                                       | Data-driven doctor, manifest capability declaration, and v1 compatibility are shared prerequisites.  | Split generic protocol/doctor work into the future epic; retain deploy-specific manifest/tooling acceptance only after duplicate audit.                   |
-| #907 — deploy manifest triad/composition root   | open, `status:plan`, 0.0.11                                       | Thin plugin and generated registry ownership remain deploy consumer proof.                           | Keep as deploy plugin implementation; replace dependencies on deploy-only host abstractions with the accepted shared seam.                                |
-| #908 — deploy command children/router           | open, `status:plan`, 0.0.11; comment says it must consume #1502   | Target-specific grammar and behavior remain entirely deploy-owned.                                   | Keep; it supplies commands through the shared descriptor/generator seam and does not define host APIs.                                                    |
-| #1477 — DevTools generated host + command group | open, `status:triage`, 0.0.15                                     | `devtools generate                                                                                   | start` is a concrete command/generator consumer; generated host remains userland.                                                                         |
-| #424 — old dashboard CLI/auto-launch            | closed `not_planned`                                              | Only historical CLI discoverability/auto-launch intent.                                              | Already superseded by #1472/#1477; do not revive or duplicate.                                                                                            |
-| #946 — frontend convention generator            | open, 0.0.15                                                      | Explicit manifest remains contract; convention generation is optional sugar.                         | Keep separate payload generator; it may invoke the shared generation transaction but does not own CLI discovery.                                          |
-| #1354 — typed resource-slice generator          | open                                                              | Dry-run, idempotency, negative no-write, and one generator/two callers are compatible consumer laws. | Keep independent; optional plugin-contribution inclusion is a downstream consumer, not the shared seam.                                                   |
-| #1474 — manifest `.passthrough()` prerequisite  | open, 0.0.15                                                      | General forward-compatible manifest parsing is required before any new top-level pointer.            | Duplicate audit must decide whether the 0.0.7 generic protocol child delivers it and #1474 becomes DevTools verification only. Do not file or mutate now. |
+| Proposal                                        | Current state                                                     | What survives under the shared RFC                                                                   | Duplicate/supersession disposition to propose later                                                                                              |
+| ----------------------------------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| #904 — deploy host mount-children contract      | open, `status:plan`, 0.0.11; comment says #1502 owns general seam | Deploy is a real first consumer; reserved mount and duplicate-owner tests remain acceptance.         | Supersede its general contract/builder/merger scope with the future #1502 core-contract child; amend #904 to a deploy conformance consumer only. |
+| #905 — async bootstrap/isolation/absent UX      | open, `status:plan`, 0.0.11                                       | Startup budget, one-broken-plugin isolation, install hint remain cross-seam conformance cases.       | Fold general host bootstrap into a future host-integration child; retain only deploy fixture coverage.                                           |
+| #906 — doctor/tooling/contribution axes         | open, `status:plan`, 0.0.11                                       | Data-driven doctor, manifest capability declaration, and v1 compatibility are shared prerequisites.  | Split generic protocol/doctor work into the future epic; retain deploy-specific manifest/tooling acceptance only after duplicate audit.          |
+| #907 — deploy manifest triad/composition root   | open, `status:plan`, 0.0.11                                       | Thin plugin and generated registry ownership remain deploy consumer proof.                           | Keep as deploy plugin implementation; replace dependencies on deploy-only host abstractions with the accepted shared seam.                       |
+| #908 — deploy command children/router           | open, `status:plan`, 0.0.11; comment says it must consume #1502   | Target-specific grammar and behavior remain entirely deploy-owned.                                   | Keep; it supplies commands through the shared descriptor/generator seam and does not define host APIs.                                           |
+| #1477 — DevTools generated host + command group | open, `status:triage`, 0.0.15                                     | `devtools generate` and `devtools start` are concrete command/generator consumers.                   | Keep the generated host userland and amend its command group to consume the shared seam.                                                         |
+| #424 — old dashboard CLI/auto-launch            | closed `not_planned`                                              | Only historical CLI discoverability/auto-launch intent.                                              | Already superseded by #1472/#1477; do not revive or duplicate.                                                                                   |
+| #946 — frontend convention generator            | open, 0.0.15                                                      | Explicit manifest remains contract; convention generation is optional sugar.                         | Keep separate payload generator; it may invoke the shared generation transaction but does not own CLI discovery.                                 |
+| #1354 — typed resource-slice generator          | open                                                              | Dry-run, idempotency, negative no-write, and one generator/two callers are compatible consumer laws. | Keep independent; optional plugin-contribution inclusion is a downstream consumer, not the shared seam.                                          |
+| #1474 — manifest `.passthrough()` prerequisite  | open, 0.0.15                                                      | General forward-compatible manifest parsing is required before any new top-level pointer.            | Amend its stale owner-fork wording to RFC 0005's ratified `.passthrough()` result; use it as the prerequisite and file no replacement.           |
 
 The later RFC proposes an implementation epic and this mapping, but this leaf files no epic/child
 and changes no existing issue.
@@ -182,3 +182,52 @@ JSR/package risks that must be named in the RFC implementation roadmap:
 
 No implementation-forcing question remains open for PLAN-EVAL; `plan.md` records the remaining
 policy/FCP choices that are safe to defer.
+
+## S3 live compatibility and duplicate refresh
+
+Tier-A accepted S2 at `7a5eb580a8515b8dc1007308a9d917b5e7309f41` and released S3 only. On 2026-08-15
+the author refreshed the accepted frontend design, RFCs 0001, 0002, 0003, and 0005, deploy
+#904–#908, and adjacent open work before proposing any implementation child. The search covered
+`plugin CLI`, `CLI contribution`, generated registries, manifest pointers, hardcoded host commands,
+and generation transactions. No second open general plugin-CLI contribution RFC exists.
+
+The compatibility result is law reuse without payload reuse:
+
+- frontend, SDK, runtime, command-composition, and DevTools retain their own payloads and owners;
+- explicit pointers, named family majors, provenance-aware collision checks, deterministic
+  replace-sets, stable redacted errors, and host-owned transactions are reused where applicable;
+- RFC 0003 business transactions do not become workspace transactions, and DevTools/frontend
+  quarantine behavior does not make an unsafe executable CLI route visible; and
+- deploy and DevTools consume `@netscript/plugin/cli` independently and never import one another.
+
+The refreshed amend/fold-first audit found these existing owners:
+
+| Existing work | S3 disposition                                                                                                                                                       |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #904–#908     | Amend the open deploy proposals in place: #904–#906 lose or split their general-host scope, while #907–#908 remain deploy implementation/behavior work.              |
+| #1093         | Owns generic explicit builder discovery and removal of the closed AST builder table; the later epic depends on or amends it.                                         |
+| #1473         | Owns path containment and scoped subprocess permissions used by generation.                                                                                          |
+| #1474         | Owns manifest forward compatibility, but its body still says F-3 is unresolved even though accepted RFC 0005 ratifies `.passthrough()`; amend rather than duplicate. |
+| #1475         | Owns the DevTools replace-set transaction; fold its reusable host transaction law into the shared implementation rather than create a competing writer.              |
+| #1476         | Remains the DevTools-specific diagnostic payload consumer.                                                                                                           |
+| #1477         | Remains the DevTools generated-host and command consumer.                                                                                                            |
+| #946 / #1354  | Remain separate frontend/resource generators that may consume the host transaction.                                                                                  |
+| #424          | Closed historical dashboard proposal; do not revive it.                                                                                                              |
+| #745 / #1542  | Closed enforcement precedent and open scan-root coverage respectively; neither currently owns the direct-import rule gap.                                            |
+
+The host-coupling audit found direct first-party registration at
+`packages/cli/src/public/features/plugins/plugins-group.ts:17-18,66-72,117-125` (`ai`, `auth`) and
+`packages/cli/src/local/features/plugins/plugins-group.ts:3,81-89` (`auth`). It also found the
+generic broad-permission legacy subprocess at
+`packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb.ts:96-130` and the
+closed-extension SDK builder table at
+`packages/plugin/src/sdk/discovery/ast-extractor.ts:4-8,29-31`. The durable S3 `quality:scan:repo`
+receipt passes with zero findings and seven allowances at the accepted S2 parent head, but its rules
+do not detect plugin-specific imports followed by direct `.command()` registration. It is therefore
+scanner evidence, not a clean hardcoded-command verdict.
+
+S3 carries forward, rather than re-derives, the measured JSR baseline: exact internal pins and
+runtime-asset/`import.meta` preflight are green; both member publish dry-runs are green; CLI opts
+out of isolated declarations; and plugin retains 15 private-type doc diagnostics plus four missing
+module tags. Every proposed publishable child has an explicit export, exact-pin, declaration, asset,
+`import.meta`, doc-lint, and per-member publish-dry-run obligation in the RFC roadmap.

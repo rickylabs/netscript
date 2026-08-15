@@ -146,3 +146,34 @@ Drift is append-only. Package and plugin source remain read-only in this leaf.
   on contributed commands, and forbid plugins from implementing either flag. S3 must not treat the
   spelling difference as a new contribution axis.
 - **Evidence:** RFC S2 guide and transaction sections; live-help sampling recorded in `worklog.md`.
+
+## 2026-08-15 — Manifest issue body lags the accepted RFC decision
+
+- **What:** Open issue #1474 still describes installer-manifest forward compatibility as an
+  unresolved F-3 choice, while accepted RFC 0005 has ratified top-level `.passthrough()`.
+- **Source:** Live #1474 body and RFC 0005 §6/W1-d, refreshed during S3 at accepted parent
+  `7a5eb580a`.
+- **Expected:** The later implementation prerequisite should have one already-decided schema rule.
+- **Actual:** The durable RFC authority and the live implementation issue can lead readers to
+  different conclusions if #1474 is consumed unchanged.
+- **Severity:** significant.
+- **Action:** The future epic amends #1474 in place to the ratified outcome before implementation;
+  this RFC leaf files or mutates no issue and creates no duplicate protocol child.
+- **Evidence:** `research.md` S3 duplicate refresh and RFC S3 amend/fold-first table.
+
+## 2026-08-15 — Repository quality scan misses direct plugin command registration
+
+- **What:** `deno task quality:scan:repo` reports zero findings, but the host still directly imports
+  and registers first-party `ai` and `auth` command factories.
+- **Source:** Durable `receipts/quality-scan-repo-s3.json` plus
+  `packages/cli/src/public/features/plugins/plugins-group.ts:17-18,66-72,117-125` and
+  `packages/cli/src/local/features/plugins/plugins-group.ts:3,81-89`.
+- **Expected:** A hardcoded-host-command audit identifies real coupling even when its syntax is not
+  covered by the existing equality/predicate scanner rules.
+- **Actual:** The scanner passes with seven existing allowances because it does not recognize a
+  plugin-specific import followed by direct `.command()` registration.
+- **Severity:** significant.
+- **Action:** Interpret the S3 gate narrowly; the later migration child adds a focused fixture/guard
+  (or amends an appropriate existing scanner issue after re-audit) before removing the manual audit.
+  This docs leaf does not change scanner or package source.
+- **Evidence:** RFC S3 hardcoded-host-command audit; `research.md`; parent-head receipt.
