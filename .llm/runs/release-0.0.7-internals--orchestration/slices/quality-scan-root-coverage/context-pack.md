@@ -62,8 +62,8 @@ Everything else in the frozen outer bound remains deliberately untouched.
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Plan-Gate | PASS cycle 1 | `plan-eval.md`, evaluator commit `3b95a004f` |
-| S1 focused test | RED 1, GREEN 0 | `receipts/slice-1/red-test.json`, `test.json` |
-| S1 static | check 0; lint 0; fmt 0 | `receipts/slice-1/{check,lint,fmt-check}.json` |
+| S1 focused test | RED 1; final GREEN 0 (9/9) | `receipts/slice-1/red-test.json`, `final-test.json` |
+| S1 static | final check 0; lint 0; fmt 0, all wrappers fired | `receipts/slice-1/final-{check,lint,fmt-check}.json` |
 | Publish/JSR | Empty touched-member denominator | S1 touches internal `.llm` files only; final dry run planned |
 | Docs | NOT FIRED | Frozen final gates planned for S3 |
 
@@ -77,4 +77,5 @@ Everything else in the frozen outer bound remains deliberately untouched.
 
 - `2c9aa89c0` — S1 RED contract test.
 - `22e35f4be` — S1 checker implementation plus durable RED receipt.
-- Final S1 evidence/run-artifact commit follows after terminal receipts.
+- `a2f33ca4f` — structured CLI-failure case plus first terminal evidence/run-artifact checkpoint.
+- Final S1 receipt-only commit follows.

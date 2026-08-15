@@ -108,6 +108,14 @@ checker and its semantic fixtures, not package lists in multiple tasks.
 | check (package roots + explicit S1 roots) | 0 | `22e35f4be` | `receipts/slice-1/check.json` |
 | lint (package roots + explicit S1 roots) | 0 | `22e35f4be` | `receipts/slice-1/lint.json` |
 | format check (package roots + explicit S1 roots) | 0 | `22e35f4be` | `receipts/slice-1/fmt-check.json` |
+| focused final test (GREEN; 9/9) | 0 | `a2f33ca4f` | `receipts/slice-1/final-test.json` |
+| final check (wrapper fired; 2,921 files) | 0 | `a2f33ca4f` | `receipts/slice-1/final-check.json` |
+| final lint (wrapper fired; 2,036 files) | 0 | `a2f33ca4f` | `receipts/slice-1/final-lint.json` |
+| final format check (wrapper fired; 2,036 files) | 0 | `a2f33ca4f` | `receipts/slice-1/final-fmt-check.json` |
+
+An initial final static launch was intercepted by Deno task input caching. Those cached receipts were
+discarded rather than called passes; reordered explicit roots forced the wrappers to fire and emit
+the selection summaries cited above.
 
 JSR audit touched-publishable-member denominator is empty: S1 changes internal `.llm` tooling and
 tests only. No public exports, dependency pins, runtime assets, `import.meta` reads, package config,
