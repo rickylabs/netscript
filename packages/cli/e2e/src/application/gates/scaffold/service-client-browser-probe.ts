@@ -5,6 +5,7 @@ const UPDATE_PATH = '/api/rpc/v1/users/update';
 const TIMEOUT_MS = 20_000;
 const BASELINE_CONFIRMATION_MS = 500;
 const BASELINE_POLL_MS = 50;
+const ALREADY_TERMINATED_CHILD_MESSAGE = 'Child process has already terminated';
 
 export interface SettledRefetchEvidence {
   readonly baselineListRequestCount: number;
@@ -129,7 +130,7 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
     stdout: 'null',
     stderr: 'piped',
   }).spawn();
-  const drain = child.stderr.pipeTo(new WritableStream({ write: () => undefined })).catch(() => {});
+  const drain = child.stderr.pipeTo(new WritableStream({ write: () => undefined }));
   let client: CdpClient | undefined;
   try {
     const target = await waitForDebugTarget(port);
@@ -208,11 +209,29 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
     };
   } finally {
     client?.close();
-    child.kill('SIGTERM');
-    await child.status.catch(() => undefined);
-    await drain;
-    await Deno.remove(profile, { recursive: true }).catch(() => undefined);
+    try {
+      await terminateBrowserProcess(child, drain);
+    } finally {
+      await Deno.remove(profile, { recursive: true }).catch(() => undefined);
+    }
   }
+}
+
+/** Terminate the browser child while preserving unrelated cleanup failures. */
+export async function terminateBrowserProcess(
+  child: Pick<Deno.ChildProcess, 'kill' | 'status'>,
+  drain: Promise<void>,
+): Promise<Deno.CommandStatus> {
+  try {
+    child.kill('SIGTERM');
+  } catch (error) {
+    const alreadyTerminated = error instanceof TypeError &&
+      error.message === ALREADY_TERMINATED_CHILD_MESSAGE;
+    if (!alreadyTerminated) throw error;
+  }
+  const status = await child.status;
+  await drain;
+  return status;
 }
 
 /** Wait until at least one request is complete and the completed count remains quiet. */

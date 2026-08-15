@@ -655,3 +655,30 @@ all earlier attempts/reports/receipts, and all carried baselines remain append-o
 The worktree already contained a timestamp-only refresh of `leak-report.md` when F6 began; its
 Aspire/Docker `ok` and empty-survivor content is unchanged, and F6 neither reran leak-check nor
 rewrote that artifact.
+
+## F6 implementation — precise browser-child termination
+
+Fresh Tier-A passed the amendment at `36da13fa1`. Implementation stayed inside the exact two-path
+ceiling. `terminateBrowserProcess` now sends SIGTERM, tolerates only the exact runtime-observed
+`TypeError` plus message conjunction, explicitly awaits child status and the raw stderr drain, and
+returns the status. Every other kill or drain error propagates unchanged. The browser probe delegates
+to the helper, and temporary-profile removal is in an enclosing `finally`; CDP close, baseline,
+response-stage resume, evidence shape, and browser assertions are unchanged.
+
+The existing focused test file now executes all four proof groups: naturally exited child; ready and
+active child terminated with SIGTERM after drain completion; unrelated `TypeError`, same-message
+non-`TypeError`, and raw-drain rejection by exact object identity; and source-level delegation with
+no unguarded kill in the probe's `finally`. The first focused wrapper invocation stopped before test
+execution on a test sink callback that accidentally returned the accumulated string. After changing
+that callback to return `void` and formatting only the authorized files, the same structured command
+passed **14/0**:
+
+```text
+deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts
+```
+
+The attempt-4 raw log still hashes to
+`b476da4ce039d03785e46669d51919b48c41fbae80ca41ca9188bcbb53e97f23`. No expensive gate,
+browser, Aspire, Docker, lease, evaluator, readiness, lockfile, documentation, template, fixture, or
+third product/test path was touched. Four fresh binding receipts remain pending until this content
+and run state are committed at a clean immutable head.

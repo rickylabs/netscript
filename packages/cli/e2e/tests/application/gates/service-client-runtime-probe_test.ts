@@ -1,8 +1,17 @@
-import { assertEquals, assertRejects, assertStringIncludes, assertThrows } from '@std/assert';
+import {
+  assertEquals,
+  assertRejects,
+  assertStrictEquals,
+  assertStringIncludes,
+  assertThrows,
+} from '@std/assert';
 import { z } from 'zod';
 
 import { createSmokeProject } from '../../../src/application/builders/workspace/smoke-project-factory.ts';
-import { waitForCompletedStableBaseline } from '../../../src/application/gates/scaffold/service-client-browser-probe.ts';
+import {
+  terminateBrowserProcess,
+  waitForCompletedStableBaseline,
+} from '../../../src/application/gates/scaffold/service-client-browser-probe.ts';
 import { generatedAppName } from '../../../src/application/gates/scaffold/generated-app-name.ts';
 import { createScaffoldGates } from '../../../src/application/gates/scaffold/scaffold-gates.ts';
 import { deriveProcedureInput } from '../../../src/application/gates/scaffold/service-client-input-probe.ts';
@@ -261,6 +270,124 @@ Deno.test('quiet baseline rejects a late initial request before accepting the co
   assertEquals(observation, 5);
 });
 
+Deno.test('browser termination tolerates a naturally exited child and awaits its drain', async () => {
+  const child = new Deno.Command(Deno.execPath(), {
+    args: [
+      'eval',
+      `await Deno.stderr.write(new TextEncoder().encode('natural-exit'))`,
+    ],
+    stdout: 'null',
+    stderr: 'piped',
+  }).spawn();
+  let stderr = '';
+  let drainCompleted = false;
+  const drain = child.stderr
+    .pipeThrough(new TextDecoderStream())
+    .pipeTo(
+      new WritableStream<string>({
+        write(chunk) {
+          stderr += chunk;
+        },
+      }),
+    )
+    .then(() => {
+      drainCompleted = true;
+    });
+
+  const naturalStatus = await child.status;
+  const terminatedStatus = await terminateBrowserProcess(child, drain);
+
+  assertEquals(naturalStatus, { success: true, code: 0, signal: null });
+  assertEquals(terminatedStatus, naturalStatus);
+  assertEquals(stderr, 'natural-exit');
+  assertEquals(drainCompleted, true);
+});
+
+Deno.test('browser termination sends SIGTERM to an active child and awaits its drain', async () => {
+  const child = new Deno.Command(Deno.execPath(), {
+    args: [
+      'eval',
+      `console.error('ready'); setInterval(() => {}, 1_000);`,
+    ],
+    stdout: 'null',
+    stderr: 'piped',
+  }).spawn();
+  const ready = Promise.withResolvers<void>();
+  let stderr = '';
+  let drainCompleted = false;
+  const drain = child.stderr
+    .pipeThrough(new TextDecoderStream())
+    .pipeTo(
+      new WritableStream<string>({
+        write(chunk) {
+          stderr += chunk;
+          if (stderr.includes('ready')) ready.resolve();
+        },
+      }),
+    )
+    .then(() => {
+      drainCompleted = true;
+    });
+  let terminationStarted = false;
+
+  try {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<never>((_resolve, reject) => {
+      timeoutId = setTimeout(() => reject(new Error('active child did not become ready')), 5_000);
+    });
+    try {
+      await Promise.race([ready.promise, timeout]);
+    } finally {
+      clearTimeout(timeoutId);
+    }
+
+    terminationStarted = true;
+    const status = await terminateBrowserProcess(child, drain);
+    assertEquals(status.success, false);
+    assertEquals(status.signal, 'SIGTERM');
+    assertStringIncludes(stderr, 'ready');
+    assertEquals(drainCompleted, true);
+  } finally {
+    if (!terminationStarted) await terminateBrowserProcess(child, drain);
+  }
+});
+
+Deno.test('browser termination propagates unrelated kill and drain errors unchanged', async () => {
+  const successfulStatus: Deno.CommandStatus = { success: true, code: 0, signal: null };
+  const unrelatedTypeError = new TypeError('permission denied');
+  const wrongType = new Error('Child process has already terminated');
+
+  for (const expected of [unrelatedTypeError, wrongType]) {
+    const actual = await assertRejects(() =>
+      terminateBrowserProcess(
+        {
+          kill: () => {
+            throw expected;
+          },
+          status: Promise.resolve(successfulStatus),
+        },
+        Promise.resolve(),
+      )
+    );
+    assertStrictEquals(actual, expected);
+  }
+
+  const drainError = new Error('stderr drain failed');
+  const drain = new Promise<void>((_resolve, reject) => {
+    setTimeout(() => reject(drainError), 0);
+  });
+  const actual = await assertRejects(() =>
+    terminateBrowserProcess(
+      {
+        kill: () => undefined,
+        status: Promise.resolve(successfulStatus),
+      },
+      drain,
+    )
+  );
+  assertStrictEquals(actual, drainError);
+});
+
 Deno.test('browser refetch probe keeps the stable baseline and response-stage resume', async () => {
   const source = await Deno.readTextFile(
     new URL(
@@ -272,6 +399,11 @@ Deno.test('browser refetch probe keeps the stable baseline and response-stage re
   assertEquals(source.includes('await delay(750)'), false);
   assertStringIncludes(source, "client.send('Fetch.continueResponse'");
   assertEquals(source.includes("client.send('Fetch.continueRequest'"), false);
+  const cleanupStart = source.indexOf('  } finally {');
+  const helperStart = source.indexOf('/** Terminate the browser child');
+  const cleanup = source.slice(cleanupStart, helperStart);
+  assertStringIncludes(cleanup, 'await terminateBrowserProcess(child, drain);');
+  assertEquals(cleanup.includes("child.kill('SIGTERM')"), false);
 });
 
 Deno.test('generated consumer imports usersQueries and paymentsQueries together without aliases', () => {

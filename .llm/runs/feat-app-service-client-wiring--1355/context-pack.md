@@ -65,6 +65,12 @@ runtime-observed already-terminated `TypeError`, awaits child status and the raw
 rethrows unrelated errors. Cheap deterministic proofs cover natural exit, active SIGTERM, and
 wrong-type/wrong-message negatives without a browser or new harness.
 
+Fresh Tier-A passed F6 at `36da13fa1`. The repair is implemented in exactly the two authorized
+files: the helper now applies the exact discriminator, awaits status and raw drain, and preserves
+unrelated errors; the existing test file executes natural-exit, active-SIGTERM, three-negative, and
+delegation proofs. The structured focused suite is 14/0. Binding receipts are pending the immutable
+content commit.
+
 ## Completed
 
 - Verified branch/worktree/base/clean-tree identity and no designed upstream.
@@ -104,20 +110,21 @@ wrong-type/wrong-message negatives without a browser or new harness.
 
 ## In Progress
 
-- F6 is plan-only. Exact later scope is
-  `service-client-browser-probe.ts` plus `service-client-runtime-probe_test.ts`; no third path is
-  authorized.
-- The helper signature, exact `TypeError` plus message discriminator, raw-drain propagation, and
-  natural-exit/active-child/negative proof matrix are locked in `plan.md` and the F6 report.
-- The attempt-4 raw failure remains append-only; refetch behavior is still unknown and no new lease
-  or expensive gate is authorized.
+- F6 implementation is complete inside `service-client-browser-probe.ts` and
+  `service-client-runtime-probe_test.ts`; no third path was required.
+- The focused deterministic suite passes 14/0. The four binding receipts have not run yet and the
+  F5 receipt set remains historical evidence until replaced at the F6 content head.
+- The attempt-4 raw failure remains append-only; refetch behavior is still unknown and no lease or
+  expensive gate is authorized.
 
 ## Next Steps
 
-1. Commit and explicitly push only the F6 amendment/run artifacts.
-2. Post `[PHASE: PLAN] [SLICE: F6]` on draft PR #1664.
-3. Stop for fresh Tier-A. Do not mutate either authorized source/test path before release, and do
-   not request or run an expensive-gate lease.
+1. Commit the two-file repair and current run artifacts as the immutable F6 content head; confirm a
+   clean tree.
+2. Run fresh distinct `check`, `test`, `publish-dry-run`, and `arch-check` receipts serially at that
+   one head, then recompute exact-set sufficiency.
+3. Commit/push evidence, post `[PHASE: IMPL] [SLICE: F6]`, and stop for fresh Tier-A without any
+   expensive-gate or lease action.
 
 ## Key Decisions
 
