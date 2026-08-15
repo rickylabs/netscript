@@ -349,3 +349,30 @@
   still described reverted T-3 code and left the form-navigation browser receipt unqualified. The
   coordinator authorized only those merge-record text corrections on the preserved author thread,
   followed by one focused fresh body recheck. Formal cycle-2 product `PASS` remains final.
+
+## 2026-08-15T08:31:20Z — owner amendment and design-registry fix shipped; #1658 S2 active
+
+- #1657's focused body recheck returned `PASS` at exact head `b71c1ee72`, comment `5301330685`.
+  The coordinator checked all seven #1358 acceptance boxes, applied the one-`status:` readiness
+  transition with `impl-eval:skip`, observed current-head CI terminal green with no unresolved
+  review threads, and squash-merged the protected head as main `6917c656e`. #1358 closed and both
+  issue and PR now carry `status:shipped`; the temporary skip label was removed.
+- #1651's final bounded amendment IMPL-EVAL returned `PASS` with no substantive findings at
+  evaluator commit `ec69100c8`, comment `5301336480`. It independently re-read RFC 0003, recomputed
+  the exact six-receipt evidence set, resolved all 12 cited SHAs, and verified live #1490-under-#1363
+  ownership. The coordinator answered owner comment `5300440887` in disposition comment
+  `5301349600`, checked all five #1502 boxes, completed readiness, then squash-merged the exact head
+  as current main `284dda90a`. #1502 and PR #1651 now carry `status:shipped` and the temporary skip
+  label is absent.
+- #1658 S1 reached product head `4aa04de34`, evidence head `f1567ce32`, and supervisor sign-off
+  `6f725ad3b`. The load-bearing root test passed 4,138 with 19 ignored and zero failed; the supervisor
+  independently re-ran the 16 focused tests and verified the refusal body through the production
+  predicates. S2 is active on the preserved Codex author thread at local implementation head
+  `28a8a9184`, with only structured `check`/`test` receipts allowed before the next Tier-A stop.
+- Existing native features and fixes supervisors were steered through `claude attach`, preserving
+  their Remote Control bridges and sessions. Features is reconciling the shipped RFC and selecting
+  the next frozen leaf; fixes is reconciling #1657 and respecting #1350's open #1348 prerequisite.
+  Discovered legacy lifecycle drift was corrected: merged #1643 and closed #1243 now carry
+  `status:shipped` rather than stale ready/triage labels.
+- Combined-main CI for `284dda90a` is running without a failure at this checkpoint. No runtime,
+  browser, Aspire, Docker, evaluator, or expensive-gate lease was launched for either merge.

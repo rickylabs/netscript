@@ -349,3 +349,16 @@ remains unclaimed.
 The #1658 evaluator's delivered-but-blocked state was reconciled from its commit, exact head equality,
 and PR comment before the stale session was explicitly stopped. The internals supervisor checkpointed
 `d5ade932b` and armed an S1 watcher. Serial order remains local to each topic.
+
+### Live checkpoint — 2026-08-15T08:31:20Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Inventory complete; #1652 remains shipped | Preserve terminal topic inventory |
+| internals | #1658 S1 signed off at `6f725ad3b`; same author implementing S2 at `28a8a9184` | Structured check/test, then stop for fresh topic Tier-A; no S3, OpenHands dispatch, evaluator, or runtime gate before sign-off |
+| fixes | #1657 shipped as `6917c656e`; supervisor reconciling the merge and frozen queue | Preserve #1348→#1350 prerequisite; do not invent a leaf if no eligible work remains |
+| features | #1651 shipped as current main `284dda90a`; supervisor reconciling the merge and frozen queue | Preserve owner-approved RFC boundary and dispatch only the next eligible frozen leaf |
+
+The two shipped PRs have complete acceptance boxes, zero temporary evaluator-skip labels, and
+`status:shipped`. Serial queues remain per topic. Combined-main CI is running without a failure and
+the expensive runtime mutex is free.

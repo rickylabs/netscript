@@ -288,3 +288,22 @@ implementation thread.
 - **#1651 evidence provenance closed:** the binding cached check receipt has empty stdout and must
   not inherit cycle-1's 1,033-file/9-batch figures. The amended body now names the correct receipts,
   content/evidence heads, and cached-hit semantics; fresh review must verify those live claims.
+
+## 2026-08-15T08:31:20Z — shipped boundaries and lifecycle normalization
+
+- **#1651 owner overlap gate closed:** keep-and-narrow is now merge truth, not a pending option. The
+  final evaluator found no substantive defect after independently checking RFC 0003's six owned
+  duties, the bidirectional adapter prohibitions, exact evidence sufficiency, and live #1490/#1363
+  parentage. Two summary-table editorial omissions do not reopen the formal loop because normative
+  host/process and plan-vs-transaction ownership survives elsewhere in the RFC.
+- **#1657 false-positive cleanup closed:** removing the redundant Fresh UI workflow/classifier
+  expansion did not withdraw the product proof. The final body recheck confirmed the merge-facing
+  record distinguishes static gallery proof from the form-navigation browser receipt; exact-head CI
+  then exercised root `check-test`, while desktop/scaffold/runtime lanes skipped by classification.
+- **Lifecycle drift corrected:** merged #1643 and closed #1243 retained stale
+  `status:ready-merge`/`status:triage` labels. They were normalized to exactly `status:shipped` after
+  verifying the merge/close tuple and 3/3 issue boxes. This was bookkeeping repair, not product or
+  acceptance mutation.
+- **Supervisor transport preserved:** post-merge grants were delivered by `claude attach` to the
+  existing feature/fix background IDs. No `--resume` duplicate, replacement bridge, or second topic
+  owner was created.

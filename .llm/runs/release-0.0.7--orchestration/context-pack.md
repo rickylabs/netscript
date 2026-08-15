@@ -216,3 +216,14 @@ a supervisor watcher armed. Stop at each slice for Tier-A, and do not dispatch O
 gates. Fixes #1657 cleanup Tier-A artifact `21403902b` requested only three PR-body truthfulness
 edits; same-author body correction and one focused fresh recheck are active, with cycle-2 product
 PASS unchanged and no gate rerun. Docs is terminal and the runtime mutex remains free.
+
+Resume from the newer authoritative `2026-08-15T08:31:20Z` checkpoint. Fixes #1657 shipped as main
+`6917c656e`; #1358 is closed with 7/7 acceptance boxes and shipped lifecycle labels. Features #1651
+then shipped as current main `284dda90a`; the owner keep-and-narrow boundary passed final bounded
+IMPL-EVAL at `ec69100c8`, the owner disposition is answered in comment `5301349600`, and #1502 is
+closed with 5/5 boxes and shipped labels. Both temporary `impl-eval:skip` labels were removed.
+Internals #1658 S1 passed topic Tier-A at `6f725ad3b` after load-bearing root test 4,138/0; the same
+Codex author is implementing S2 at `28a8a9184` and must stop again for Tier-A before S3. Features and
+fixes supervisors were steered in place to reconcile the merges and advance only their own frozen
+queues; fixes must preserve the #1348→#1350 prerequisite. Combined-main CI is active without a
+failure. Runtime mutex remains free; no Aspire/Docker/browser gate is active.
