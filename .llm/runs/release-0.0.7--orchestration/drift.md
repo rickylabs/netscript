@@ -658,3 +658,15 @@ implementation thread.
   a browser child that had already terminated, then failed while sending SIGTERM. The gate stays red,
   but attribution must distinguish successful child completion, early failure, and idempotent cleanup
   before treating this as evidence for or against the settled-refetch contract.
+- **`aspire ps []` is not a complete host-cleanliness proof:** attempt 4 left four stopped
+  `aspire-managed nuget search` utility children whose AppHost/resource inventory was empty. The
+  coordinator must pair Aspire and Docker state with an explicit process/listener audit, remove only
+  exact attributable PIDs, then re-audit while preserving foreign `aspire mcp start` helpers.
+- **A failed receipt can remain truthful beside its replacement:** #1666's first root-test receipt at
+  the repaired head failed because a temporary mutation archive itself contained forbidden command
+  strings. Removing the scratch input and writing a distinct `test-attempt2` PASS preserves both the
+  environmental failure and the clean-tree verdict; overwriting the first receipt would launder the
+  trail.
+- **Termination idempotence must still fail precisely:** #1664 F6 does not permit a broad catch around
+  child teardown. The plan tolerates only Deno's exact already-terminated `TypeError`, still awaits
+  status and stderr drain, and requires unrelated kill and drain failures to propagate.

@@ -661,3 +661,19 @@ when cleanup called `kill(SIGTERM)` on an already-terminated browser child. Raw 
 `b476da4ce039d03785e46669d51919b48c41fbae80ca41ca9188bcbb53e97f23`. Suite cleanup passed and an
 independent Aspire/Docker/process/port audit is empty, so the lease is released and `fresh-browser`
 is `NOT_RUN`. Preserve evidence and attribute before any repair; no retry or evaluator is authorized.
+
+Newer transition `2026-08-15T19:03:12Z`: #1664 plan-only F6 is pushed at `36da13fa1` and undergoing
+fresh features Tier-A; only the existing browser probe plus test may later change, with no attempt-5
+lease until implementation receipts and a second Tier-A pass. #1666 has discriminating test content
+`423867017` and local evidence `010da98a2`; seven replacement receipts pass at the content head, the
+initial scratch-contaminated root-test red is preserved, and internals owns push/comment, fresh
+Tier-A, then cycle-2 Fable 5/medium Remote Control IMPL-EVAL. #1669 S2 is clean/pushed at
+`9aa54ae2d` over `eba0b0924`, comment `5303754598`, and fixes is performing fresh Tier-A before its
+separate IMPL-EVAL. The runtime mutex is free. Explicit process auditing removed four stopped
+attempt-4 `aspire-managed` utility children missed by `aspire ps`; Aspire, Docker, application,
+browser, and port state is now empty. #1663 remains owner-only and #1651 option 1 is preserved.
+
+Follow-on `2026-08-15T19:05Z`: #1666 repair evidence `010da98a2` is now local == remote == PR with
+comment `5303770640`; fresh internals Tier-A is active. #1664 F6 plan Tier-A passed at features topic
+`f436df086`, releasing the same author for exactly two paths and four new binding receipts before a
+second Tier-A. No runtime lease exists.

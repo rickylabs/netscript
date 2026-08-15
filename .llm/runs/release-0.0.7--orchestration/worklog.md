@@ -1158,3 +1158,32 @@
   Docker zero, no AppHost/DCP/application/browser process, and no relevant listener. The singleton
   lease is released; `fresh-browser` remains `NOT_RUN`. Preserve evidence and attribute the child
   lifecycle contract before any scoped repair; no retry, browser gate, or evaluator is authorized.
+
+## 2026-08-15T19:03:12Z — completed leaf heads are recovered into fresh review
+
+- #1664's same-author F6 plan-only amendment is clean and explicitly pushed at `36da13fa1`, with
+  structured PR receipt `5303765269`. It authorizes no new path: the later repair is confined to the
+  existing browser probe and runtime-probe test, names an internal termination helper, tolerates only
+  Deno's exact already-terminated `TypeError`, awaits status and drain, and requires deterministic
+  natural-exit, active-termination, unrelated-error, drain-rejection, and production-delegation
+  proofs. Fresh features Tier-A is active; no source repair or runtime lease precedes its PASS.
+- #1666's focused test repair is committed at `423867017`; local evidence `010da98a2` contains all
+  seven replacement receipts at that immutable content head. Each replacement exits 0 and binds
+  `gitHead == actualGitHead`. The first root-test receipt remains red because the author's temporary
+  mutation archive contained forbidden command strings; the archive was removed and the distinct
+  `test-attempt2` receipt is green. Internals is completing explicit push/comment before fresh Tier-A
+  and cycle-2 native Fable 5/medium Remote Control IMPL-EVAL.
+- #1669 S2 is clean and pushed at evidence `9aa54ae2d` over content `eba0b0924`, with implementation
+  receipt `5303754598`. The focused factory suite is 6/0, SDK is 69/0, root is 4206/0/19, root check
+  is 2925 files with zero failures, all three committed-head generated freshness gates pass, and the
+  known doc-lint and surface-diff reds remain reported red. Fresh fixes Tier-A is active before a
+  separate IMPL-EVAL; no runtime lease is involved.
+- Cleanup verification went beyond `aspire ps []`: an explicit process scan found four stopped
+  `aspire-managed nuget search` children left by attempt 4. Exact-PID TERM/CONT and bounded KILL
+  removed them without touching foreign `aspire mcp start` helpers. Final `aspire ps` is `[]`, Docker
+  is empty, and no AppHost/DCP/application/browser process or relevant listener remains.
+
+- Follow-on delivery proof: #1666 local, remote, and PR now equal `010da98a2`; structured repair
+  comment is `5303770640`, so internals is performing fresh Tier-A without waiting on the old author
+  process heuristic. #1664 F6 plan received fresh features Tier-A `PASS` at topic `f436df086`; the
+  same original author is active on exactly the two reviewed paths, with no runtime action allowed.
