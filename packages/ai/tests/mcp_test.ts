@@ -145,6 +145,20 @@ class AbortableStopTransport extends RecordingTransport {
   }
 }
 
+class AbortableListTransport extends RecordingTransport {
+  listSignal: AbortSignal | undefined;
+
+  override listTools(options: McpConnectOptions = {}): Promise<readonly McpToolDescriptor[]> {
+    this.listSignal = options.signal;
+    return new Promise((_resolve, reject) => {
+      options.signal?.throwIfAborted();
+      options.signal?.addEventListener('abort', () => reject(options.signal?.reason), {
+        once: true,
+      });
+    });
+  }
+}
+
 function headersOf(value: unknown): Readonly<Record<string, string>> | undefined {
   if (typeof value !== 'object' || value === null) {
     return undefined;
@@ -251,6 +265,22 @@ Deno.test('registerMcpTools adds tools on connect and removes them on stop', asy
   await registration.stop();
   assertEquals(registry.has('demo_search'), false);
   assertEquals(transport.state, 'closed');
+});
+
+Deno.test('registerMcpTools settles discovery when its caller aborts', async () => {
+  const registry = createToolRegistry();
+  const transport = new AbortableListTransport('demo', []);
+  const controller = new AbortController();
+
+  const pending: Promise<unknown> = Reflect.apply(
+    registerMcpTools,
+    undefined,
+    [registry, transport, { signal: controller.signal }],
+  );
+  controller.abort(new DOMException('registration deadline', 'AbortError'));
+
+  assertEquals(await settlementWithin(pending), 'rejected');
+  assertEquals(transport.listSignal?.aborted, true);
 });
 
 Deno.test('McpTransportPool keys servers and prefixes remote tool names', async () => {

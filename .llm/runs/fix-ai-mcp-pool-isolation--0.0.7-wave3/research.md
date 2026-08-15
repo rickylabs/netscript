@@ -135,3 +135,15 @@ deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- -
 Observed structured verdict: raw exit code `1`; 0 passed, 1 failed. The healthy peer closed, but
 the pool operation remained pending and the bounded observer produced `timed-out` rather than
 `fulfilled`. The caller signal was not forwarded to the hanging peer.
+
+## 2026-08-15 — Registration cancellation RED
+
+Command:
+
+```text
+deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all --filter "registerMcpTools settles discovery when its caller aborts" packages/ai/tests/mcp_test.ts
+```
+
+Observed structured verdict: raw exit code `1`; 0 passed, 1 failed. `registerMcpTools` ignored its
+third options argument, the transport's pending discovery saw no signal, and the observer returned
+`timed-out` instead of `rejected`.

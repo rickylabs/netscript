@@ -214,3 +214,9 @@ and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
 - `deno task quality:scan`: raw exit `0`, no findings.
 - `deno task arch:check`: raw exit `0`; existing warning census only, no failures.
 - `deno.lock` unchanged. No expensive runtime gate ran.
+
+## 2026-08-15 — Slice 4 registration cancellation RED
+
+- Focused structured registration test raw exit `1`: caller abort was not forwarded to pending
+  discovery, which timed out instead of rejecting.
+- No registration implementation source changed in the RED commit.

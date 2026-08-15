@@ -137,3 +137,9 @@ amendment.
 - Mandatory read-only Fresh cross-package check exits `0` across 197 files; its test double remains
   unchanged because the port resource member is optional.
 - Next slice: registration cancellation propagation.
+
+## 2026-08-15 — Slice 4 registration RED update (append-only)
+
+- Focused structured test raw exit `1`: `registerMcpTools` ignored caller cancellation and pending
+  discovery remained unsettled.
+- Next: additive registration/registration-stop options and signal forwarding.
