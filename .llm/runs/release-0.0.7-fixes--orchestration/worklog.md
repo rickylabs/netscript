@@ -278,3 +278,41 @@ the plan nor this topic's Tier-A had them:
 
 Implementation has **not** been dispatched. The coordinator retains that grant. IMPL-EVAL remains
 mandatory and separate. WIP: 1 implementation leaf (idle, plan complete), 0 evaluators.
+
+## 2026-08-15 — #1665 IMPL-EVAL already in flight; no rival launched
+
+Before launching the IMPL-EVAL this session intended, a pre-launch sweep of running Claude jobs found
+one **already active** for this leaf. It was not launched from this turn. Rather than start a second
+evaluator — which would have created exactly the rival the lane forbids — it was verified and adopted.
+
+| Field | Value |
+| --- | --- |
+| Job id | `1fbb1c07` |
+| Session id | `1fbb1c07-3b05-4d90-ab9c-c827c5aca2d5` |
+| OS PID | `126694` (`kind=bg`, CLI `2.1.233`) |
+| Bridge session id | `session_01JePyQuiERLe8GeWWKQp5wL` (resolvable form, from `~/.claude/sessions/126694.json`) |
+| Remote Control URL | `https://claude.ai/code/session_01JePyQuiERLe8GeWWKQp5wL` |
+| `cwd` | `/home/codex/repos/netscript-007-leaf-sdk-cache` |
+| Created / last update | `2026-08-15T15:10:18Z` / `15:10:42Z` — active, `tokens=1141` at observation |
+| Requested route | native Claude · `claude-fable-5` · medium · Remote Control (`formal_impl_evaluation`) |
+| Observed route | `respawnFlags`: `--permission-mode bypassPermissions --remote-control --name "NetScript 0.0.7 #1665 IMPL-EVAL" --effort medium --model claude-fable-5` |
+| Route verdict | **matched** |
+
+Note the jobs record carries `pid: null` and the `cse_01JePyQuiERLe8GeWWKQp5wL` bridge form; the live
+PID and the resolvable `session_…` form come from the per-PID session file. `pid: null` here is a
+jobs-record artifact, not evidence of an orphaned session — the process is real and `updatedAt`
+advanced to the same second as the observation.
+
+**Head binding verified from its own transcript, not assumed.** Its first `type: user` record (7868
+chars) binds it to immutable source head `9a26c107afa75bf1f38b78fe96c6df533b156c36` and base
+`baf1cdf67`, and instructs it to re-derive every claim independently — "Do not adopt Tier-A findings,
+the slice reports, or this brief's evidence as established fact… If you disagree with the supervisor,
+say so; that is the point of this gate." That is the correct lane framing, so the gate is sound and
+duplicating it would only have destroyed the generator≠evaluator property by splitting attention.
+
+Generator ≠ evaluator holds three ways: Codex `01a00516-…` (`gpt-5.6-sol`) implemented; this topic
+orchestrator (Opus 5) performed Tier-A on S1/S2/S3 in its own session; this Fable 5 session is a
+third, fresh, opposite-family session.
+
+Monitoring to terminal. No second evaluator launched, no readiness or label change, PR remains draft
+at sole `status:plan`.
