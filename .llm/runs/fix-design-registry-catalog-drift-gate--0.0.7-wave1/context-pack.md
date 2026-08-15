@@ -104,3 +104,16 @@ focused positive/negative tests.
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments after S0 is pushed.
+
+## E-1 Repair Resumption — 2026-08-15
+
+The coordinator authorized one additional generated product path after IMPL-EVAL `FAIL_FIX`:
+`packages/cli/src/kernel/assets/embedded.generated.ts`. The red freshness gate exits 1 at amendment
+head `c3ccceeb13cd71895ea4ac3229f03a15472dac86`. The required generator produces exactly one changed
+file and one generated source-line replacement (`1 insertion, 1 deletion`), updates the embedded
+catalog total to 66, and includes the AI catalog. No other generated target or lock moves.
+
+Current next step: commit the deterministic generated representation, then obtain the post-fix
+`assets-barrel` raw verdict and durable receipt plus the bounded CLI quality/publish evidence. No
+expensive gate is authorized or required; fresh opposite-family Tier-A review remains the terminal
+handoff after push and the single structured PR comment.

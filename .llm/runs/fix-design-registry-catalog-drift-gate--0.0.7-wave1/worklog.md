@@ -333,3 +333,20 @@ ownership re-derived by executing `classifyPath`, including near-miss prefixes: 
   `aspire ps` reports no AppHost.
 - PR left `OPEN`, draft, exactly one `status:impl`; `Closes #1358` untouched; no issue mutated; no
   next leaf begun. Single bounded cycle — no evaluator loop, no PLAN-EVAL.
+
+## Bounded E-1 Embedded-Barrel Repair — 2026-08-15
+
+Coordinator amendment head: `c3ccceeb13cd71895ea4ac3229f03a15472dac86`. Prior evidence and
+rows remain immutable; this section is append-only.
+
+### Red and Deterministic Regeneration
+
+| Check | Exact command | Raw exit | Evidence |
+| --- | --- | ---: | --- |
+| Red freshness verdict | `deno task check:assets-barrel` | 1 | Reproduced the evaluator finding; the task regenerated then found the stale CLI barrel. |
+| Required regeneration | `deno task gen:assets-barrel` | 0 | Exact delta: `packages/cli/src/kernel/assets/embedded.generated.ts | 2 +-`; one insertion and one deletion on the single generated source line. |
+
+No other generated target moved. The regenerated barrel contains `registryMeta.total: 66` and the
+complete catalog content including `citation-chip`. The repair retains no hand edit and adds
+`check:assets-barrel` to the bound validation plan. Post-fix gate evidence follows in an append-only
+entry after the generated product commit so the durable receipt records that exact Git head.

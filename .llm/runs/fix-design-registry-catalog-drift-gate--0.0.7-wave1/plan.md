@@ -162,3 +162,16 @@ inputs and will remain byte-unchanged unless implementation evidence proves othe
   hard stop for coordinator review.
 - Any gate requiring browser/E2E/Aspire/Docker execution is an authority boundary, not an implicit
   permission to run it.
+
+## E-1 Bounded Repair Amendment — Embedded CLI Barrel
+
+Coordinator amendment head: `c3ccceeb13cd71895ea4ac3229f03a15472dac86`.
+
+| Slice | Scope | Bound proof |
+| --- | --- | --- |
+| S4 | Regenerate only `packages/cli/src/kernel/assets/embedded.generated.ts` from the already-gated CLI asset source. | `deno task check:assets-barrel`, structured CLI check/fmt, `quality:gate`, CLI JSR audit, and CLI publish dry-run all exit 0. |
+
+The determinism stop is exact: retain the generated delta only when `deno task gen:assets-barrel`
+moves the CLI embedded barrel alone. No other generated target, product source, or lock may move.
+`check:assets-barrel` is now a required leaf gate because it binds the authored scaffold asset to
+the representation consumed by `TemplateRegistry` and published by `@netscript/cli`.
