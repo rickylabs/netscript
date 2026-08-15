@@ -498,3 +498,40 @@ that the author's commit `9a98ffe6e` superseded, so nothing of value was in it.
 results stand, but they were taken under contention and should not have been run when they were. The
 final Tier-A for #1660 will be re-executed under proven exclusive ownership so its evidence is clean
 in provenance as well as in result.
+
+## 2026-08-15 — readiness CI false positive: an exact-corpus census snapshot
+
+Readiness CI `31876017360` at `e35824d41` is terminal FAIL in `Repo-wide test` only, from a single
+assertion in `.llm/tools/docs/snippet-extractor_test.ts:58`, the test named
+`'real corpus census recognizes aliases and protects the Tier-1 candidate floor'`.
+
+It asserts the entire census as one exact object. The two new comparison pages legitimately move
+`scanned` 578→580, `ts` 211→212, `tsx` 77→78, `tsLike` 295→297, `outsideFloor` 260→262. Everything
+the test is named for is unchanged: `tier1` 35, `checked` 21, `exempt` 14, `malformed` 0,
+`typescript` 7.
+
+**Assessed as a test defect, not a content defect.** The test's own name states two purposes —
+recognise aliases and protect the Tier-1 floor — and pinning `scanned`/`outsideFloor` serves
+neither. Those totals move whenever anyone adds a docs page, so the test fails on unrelated work and
+trains people to bump numbers until it passes. The floors already exist as proper first-class
+assertions in the same file (`below floor 35`, `below floor 21`, `exceeds budget 14`), so the
+snapshot adds brittleness on top of contracts already expressed correctly.
+
+Verified by this orchestrator that every genuine invariant holds under **both** corpora, which is
+the decisive evidence that the snapshot was the only broken thing:
+
+| Invariant                                                         | old          | new          |
+| ----------------------------------------------------------------- | ------------ | ------------ |
+| `tsLike === ts + tsx + typescript`                                | 211+77+7=295 | 212+78+7=297 |
+| `tier1 + outsideFloor === tsLike`                                 | 35+260=295   | 35+262=297   |
+| `checked + exempt === tier1`                                      | 21+14=35     | 21+14=35     |
+| `malformed === 0`, `tier1 >= 35`, `checked >= 21`, `exempt <= 14` | holds        | holds        |
+
+Repair dispatched to the original author thread `01a0047a-aceb-7b53-9ba1-9191eedaaf1a`: replace the
+snapshot with relationship, consistency, floor, and budget assertions; do not pin `scanned` or
+`outsideFloor`; leave every other test untouched. The comparison pages are correct and must not be
+edited to satisfy a test — that inversion is exactly how a brittle snapshot corrupts real content.
+
+Merge is blocked until the repair lands, a fresh Tier-A passes under proven exclusive ownership, and
+current-head CI is terminal green. No mutating gate will run in the author worktree while its thread
+is active.
