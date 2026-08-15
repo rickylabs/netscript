@@ -1,0 +1,36 @@
+{
+  "gateId": "test",
+  "invocationId": "app-service-client-wiring-s4-test",
+  "argv": [
+    "deno",
+    "task",
+    "test"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-features-1355",
+  "gitHead": "35061bc80ab39c8aa428ca91e44de47d59dbcf82",
+  "actualGitHead": "35061bc80ab39c8aa428ca91e44de47d59dbcf82",
+  "timeoutMs": 3600000,
+  "runnerIdentity": "worker:42591",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "3ed6a0843c2557419c82e80655eecc6a9f71286d8964849fae1c413d53eeabff",
+  "lifecycleId": "worker:42591:app-service-client-wiring-s4-test:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-15T14:32:23.941Z",
+  "startedAt": "2026-08-15T14:32:23.943Z",
+  "finishedAt": "2026-08-15T14:39:12.505Z",
+  "durationMs": 392446,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 886,
+    "sha256": "31a7e1006154c4b49ce905434bf9c72fd07b694683d73c321c32ad7cff5a95ac",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\"],\"cwd\":\"/home/codex/repos/netscript-007-features-1355\",\"exitCode\":1,\"durationMs\":392346,\"summary\":{\"passed\":4201,\"failed\":1,\"ignored\":19,\"totalResults\":4221,\"uniqueFailures\":1},\"failures\":[{\"message\":\"AssertionError: Values are not equal.\\n\\n\\n    [Diff] Actual / Expected\\n\\n\\n    [\\n      \\\"preflight.deno\\\",\\n      \\\"scaffold.init\\\",\\n      \\\"service.list\\\",\\n      \\\"database.codegen\\\",\\n      \\\"generated.service-check\\\",\\n-     \\\"generated.deno-lint\\\",\\n    ]\\n\\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\\n    at file://<cwd>/packages/cli/e2e/tests/presentation/suite-registry_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"capability suites select only their scoped gates\",\"file\":\"./packages/cli/e2e/tests/presentation/suite-registry_test.ts\",\"line\":54}]}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 101,
+    "sha256": "5ae7e9d1dade1dc447e471529cd4f870e6b8391091eb2b26d56244ed895c3917",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all\n",
+    "truncated": false
+  }
+}

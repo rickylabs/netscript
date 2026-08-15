@@ -22,8 +22,10 @@ format, lint, asset freshness, and exact-pin audits pass. The full export-map do
 CLI and carries Fresh's 45 and SDK's 3 pre-existing diagnostics with exact attribution at
 `c53726c69`; the plugin-streams finding remains distinct as newly exposed, not newly caused. All
 three per-member JSR audits exit 0 with WARN-only findings, and all three checked per-member publish
-dry-runs pass. Draft PR #1664 retains both closing keywords and remains draft. Binding gates are
-next; no expensive gate has run.
+dry-runs pass. Binding `check` passes at `35061bc80`, but binding `test` fails one of 4,221 results:
+S2 added `generated.deno-lint` to the service suite without updating its E2E registry expectation.
+The focused test passes 19/19 at `c53726c69`, so this is leaf-caused rather than carried. Draft PR
+#1664 retains both closing keywords and remains draft. Later binding and expensive gates are unrun.
 
 ## Completed
 
@@ -64,13 +66,13 @@ next; no expensive gate has run.
 
 ## In Progress
 
-- S4 supplemental audits are complete; binding receipts remain to run at the next clean committed
-  content head.
+- S4 is stopped on a newly introduced binding test failure after `check` passed. No repair is
+  authorized in this artifact-only slice.
 
 ## Next Steps
 
-1. Commit the supplemental evidence, verify a clean immutable content head, and run only the four
-   released S4 binding gates through `run-gate.ts`.
+1. Await a separately reviewed scoped repair for the stale service-suite registry expectation; do
+   not run the remaining S4 binding gates or start S5 without release.
 2. Keep both expensive gates lease-blocked until explicit release.
 
 ## Key Decisions
@@ -111,7 +113,7 @@ next; no expensive gate has run.
 
 | Gate family | Current status                                                                                                                    | Evidence                     |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Static      | Format/lint/assets/exact pins pass. CLI doc audit passes; Fresh 45 and SDK 3 remain separately attributed carried baselines. Three per-member JSR audits exit 0 and three checked publish dry-runs pass. Binding gates remain. | `worklog.md`; `reports/s4-format-failure.md`; `reports/s4-export-doc-failure.md`; per-member reports |
+| Static      | Supplemental package evidence is complete with attributed doc baselines. Binding `check` PASS; binding `test` FAIL on one leaf-caused stale E2E expectation; publish/arch NOT_RUN. | `worklog.md`; `reports/s4-test-failure.md`; binding receipts |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
 | Runtime     | NOT_RUN / lease-blocked                                                                                                           | `plan.md` release conditions |
 | Consumer    | NOT_RUN / implementation-dependent                                                                                                | `plan.md` S5                 |
@@ -120,6 +122,7 @@ next; no expensive gate has run.
 
 - The Fresh/SDK documentation defects require separate scope if they are to be repaired; this leaf
   carries them with attribution and does not repair them inline.
+- The S2 service-suite `generated.deno-lint` expectation needs a separately released scoped repair.
 
 ## Drift and Debt
 
