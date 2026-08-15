@@ -1547,3 +1547,58 @@ with "do not launch another evaluator". Requesting the dispatch grant rather tha
 Also carried up, unchanged and still owner/coordinator business: #1293 acceptance **box 1** will
 remain unticked by design under R2.1/R2.2. Rewording it is an issue edit no one in this lane may
 make.
+
+### #1293 / PR #1662 IMPL-EVAL dispatched under coordinator lease
+
+Pre-dispatch reconciliation, all four sources agreeing before any mutation:
+
+| Source | Value |
+| --- | --- |
+| Local `HEAD` | `d8d255bdc103eb120cc7b8835dfe3ce870017c32` |
+| Remote ref | `d8d255bdc…` |
+| Live PR #1662 head | `d8d255bdc…`, open **draft** |
+| Tree | clean |
+| Content→evidence delta | `acceptance-evidence.md`, `context-pack.md`, `worklog.md`, and the four receipts — **verified by diff**, no source file |
+
+| Field | Value |
+| --- | --- |
+| Lease | coordinator `codex-root-0.0.7`, exactly one evaluator, PR #1662 / #1293, immutable head `d8d255bdc` |
+| Job / session | `e64f33f0` / `e64f33f0-c88e-4fc7-9e79-63c01fed94db` |
+| Bridge session | `cse_01XrFMbPHpry6tL3v9ZmRsLK`, `bridgeOutboundOnly: false` |
+| Remote Control URL | `https://claude.ai/code/session_01XrFMbPHpry6tL3v9ZmRsLK` (the `session_` form — the jobs-file `cse_` form does not resolve) |
+| Requested route | native Claude **Fable 5 · medium** · Remote Control (`lane-policy.md:46`, opposite-family for Codex work) |
+| Observed route | `respawnFlags` = `--effort medium … --model claude-fable-5`; `providerEnv {}` |
+| Route verdict | **matched**, native Anthropic auth |
+| Brief delivered | `intent` length 10,912 bytes |
+| Created | `2026-08-15T10:11:15Z` |
+
+**Attachment was not claimed on first read.** At registration `bridgeSessionId` was `null` — the
+route flags were already correct, but Remote Control had not attached. Rather than record the route
+match as an attachment, this lane polled until the bridge was non-empty and only then wrote the
+identity above. A route match proves how a session was launched; a non-empty bridge proves it is
+reachable, and the lease requires both before mutation.
+
+The brief binds the evaluator to all six lease subjects and instructs it to record identity and lease
+**before** touching anything, with an immutable pushed verdict.
+
+Three obligations written in deliberately, beyond restating the subjects:
+
+1. **Re-derive the S1 defect rather than trust it closed.** Tier-A returned a public input type
+   widened past the contract it fronted with a cast hiding it. The evaluator must confirm mutual
+   assignability, that the cast is *gone*, and specifically that the bidirectional guards **would
+   fail if the types diverged** — a guard that cannot fail is not a guard — then check the same
+   widening class across every other public type the leaf added.
+2. **Judge whether the tests can fail.** A hook suite asserting only "callback was called" passes
+   against the blanket `onError()` override R1 rejected. The evaluator must say which properties the
+   suite would actually catch, and hunt for a boundary that fires twice or not at all.
+3. **Judge the honest-undischarged framing, not just accept it.** Boxes 1 and 4 are deliberately
+   unticked, which is correct here — but "declared undischarged" is also the shape a lane would use
+   to dodge proving something provable, so the evaluator is asked whether the framing is accurate or
+   evasive.
+
+Settled items are stated as compliance checks rather than open questions: the coordinator rulings,
+PLAN-EVAL R1–R3, and the owner-only #1293 box-1 wording, which the lease confirms **does not block**
+this product evaluation.
+
+The next features leaf, `app-service-client-wiring` (#1355, #1360), stays queued until this PR
+lifecycle is terminal.
