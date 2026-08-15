@@ -66,24 +66,36 @@ export interface GenerateServiceClientsDependencies {
   };
 }
 
+/** Validate and render every manifest service client without writing files. */
+export async function validateServiceClientContracts(
+  projectRoot: string,
+  dependencies: GenerateServiceClientsDependencies,
+): Promise<readonly Omit<PlannedServiceClientFile, 'willWrite'>[]> {
+  const discovered = await dependencies.serviceResolver.discoverServices(projectRoot);
+  assertUniqueResourceIdentities(discovered.map((service) => service.name));
+
+  const projectName = await dependencies.readProjectName(projectRoot);
+  const validated: Omit<PlannedServiceClientFile, 'willWrite'>[] = [];
+  for (const service of discovered) {
+    validated.push(await dependencies.clientScaffolder.plan(
+      projectRoot,
+      projectName,
+      service.name,
+    ));
+  }
+  return validated;
+}
+
 /** Validate, plan, and reconcile every manifest service client. */
 export async function generateServiceClients(
   request: GenerateServiceClientsRequest,
   dependencies: GenerateServiceClientsDependencies,
 ): Promise<GenerateServiceClientsResult> {
-  const discovered = await dependencies.serviceResolver.discoverServices(request.projectRoot);
-  assertUniqueResourceIdentities(discovered.map((service) => service.name));
-
-  const projectName = await dependencies.readProjectName(request.projectRoot);
+  const validated = await validateServiceClientContracts(request.projectRoot, dependencies);
   const planned: PlannedServiceClientFile[] = [];
 
   // Complete every contract/path/render validation before the first write.
-  for (const service of discovered) {
-    const file = await dependencies.clientScaffolder.plan(
-      request.projectRoot,
-      projectName,
-      service.name,
-    );
+  for (const file of validated) {
     planned.push({
       ...file,
       willWrite: await dependencies.clientScaffolder.needsWrite(file, request.force),

@@ -13,11 +13,12 @@
 ## Current State
 
 PLAN-EVAL cycle 2 is terminal `PASS`. S1 is accepted and S2 implements the released CLI generator
-contract: all manifest services receive owned modules, all expected V1 contracts are validated
-before any client or Aspire write, dry-run/force govern both command halves, and invalidation is
-emitted directly from `<svc>Queries.list.clientKey()` after the query factory. The rendered SDK
-import allowlist is executable coverage. Draft PR #1664 retains both closing keywords and remains
-draft. No expensive gate has run.
+contract. Tier-A found that the add caller wrote appsettings/workspace/Aspire state before entering
+the generator's atomic validation. S2-FIX hoists a shared validation-only pass ahead of
+`renderService`, so an unrelated missing manifest contract aborts `service add --with-client`
+before any write. Dry-run/force behavior, disabled-service generation, and direct `clientKey()`
+emission remain unchanged. Draft PR #1664 retains both closing keywords and remains draft. No
+expensive gate has run.
 
 ## Completed
 
@@ -44,14 +45,17 @@ draft. No expensive gate has run.
 - Added 0.0.6-compatible rendered-import/literal-order tests, two-service isolation, disabled-service,
   atomic failure, idempotency, dry-run/force, collision, procedure-rename, add-flow, and Aspire flag
   coverage; regenerated `embedded.generated.ts`.
+- Repaired S2-F1 by reusing validation-only client planning before the add path's first write; the
+  add-specific missing-contract regression proves appsettings/workspace byte identity and absence
+  of service, contract, and Aspire-helper output.
 
 ## In Progress
 
-- S2 is complete and stopped at its Tier-A boundary.
+- S2-FIX is complete and stopped for a fresh S2 Tier-A review.
 
 ## Next Steps
 
-1. Await a separate coordinator dispatch for S3.
+1. Await the coordinator's fresh S2 Tier-A verdict; do not start S3.
 2. Keep both expensive gates lease-blocked until cheap convergence and explicit release.
 
 ## Key Decisions
@@ -88,14 +92,14 @@ draft. No expensive gate has run.
 
 | Gate family | Current status                                                                                                                    | Evidence                     |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Static      | Focused S2 check (14 files), tests (31), CLI doc lint, and quality gate PASS; SDK export doc lint carries exactly two unrelated pre-existing private-type diagnostics | `worklog.md` |
+| Static      | S2-FIX focused check (14 files), tests (32), and generated-asset freshness PASS. The earlier SDK root-entrypoint doc lint (`packages/sdk/mod.ts`) remains `BASELINE_FAIL` with two pre-existing diagnostics for that root run; S4 owns the full 12-entrypoint sweep. | `worklog.md` |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
 | Runtime     | NOT_RUN / lease-blocked                                                                                                           | `plan.md` release conditions |
 | Consumer    | NOT_RUN / implementation-dependent                                                                                                | `plan.md` S5                 |
 
 ## Open Questions
 
-- None for S2. S3 requires a separate implementation dispatch.
+- None for S2-FIX. S3 remains blocked pending a fresh Tier-A verdict and separate dispatch.
 
 ## Drift and Debt
 
