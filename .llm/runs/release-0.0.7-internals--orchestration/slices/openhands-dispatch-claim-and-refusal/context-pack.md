@@ -6,18 +6,18 @@
 | --- | --- |
 | Run ID | `release-0.0.7-internals--orchestration/slices/openhands-dispatch-claim-and-refusal` |
 | Branch | `fix/openhands-dispatch-claim-and-refusal` |
-| Current phase | S5 final evidence in progress |
+| Current phase | S5 complete; stopped for Tier-A final slice review |
 | Archetype | `6-cli-tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-Tier-A signed off S4 at `ad19d0e20` with no changes and authorized evidence-only S5. The live PR and
-both closing issues were reconciled without mutation. S1–S4 implementation is complete; S5 is
-creating one run-artifact checkpoint so the final `check`, `test`, and `quality-job` receipts attest
-one immutable branch-reachable head. Root `test` is the only gate that behaviorally covers this
-leaf; `check` and `quality-job` are required contract receipts whose package/plugin selections are
-non-covering.
+Tier-A signed off S4 at `ad19d0e20` with no changes. Evidence-only S5 is complete: final `check`,
+`test`, and `quality-job` receipts all PASS at immutable checkpoint `1390d3ead`, which remains
+reachable from the branch head. Root `test` is the only behavioral proof (4,147 passed, 19 ignored,
+0 failed); `check` and `quality-job` are required but non-covering package/plugin receipts. The DoD
+truth audit finds rows 1–7 evidence-ready and row 8 open solely because separate-session IMPL-EVAL
+has not run. The draft PR body and lifecycle state were deliberately not changed.
 
 ## Completed
 
@@ -41,17 +41,18 @@ non-covering.
 - S4 durable `check`, `test`, and `quality-job` PASS/0 receipts at `9b71e1bd2`; root test reported
   4,147 passed, 19 ignored, 0 failed.
 - Tier-A S4 sign-off commit `ad19d0e20`.
+- S5 same-head final `check`, `test`, and `quality-job` PASS receipts at `1390d3ead`.
+- DoD row-by-row and N1–N5 disposition audit recorded in `worklog.md`.
 
 ## In Progress
 
-- S5 run-only checkpoint and final same-head durable receipts.
+- Nothing. S5 is complete and stopped for Tier-A.
 
 ## Next Steps
 
-1. Commit the run-only S5 checkpoint.
-2. Run final `check`, `test`, and `quality-job` receipts at that single checkpoint SHA.
-3. Record the DoD/N1–N5 audit, commit receipts, push, comment, and stop for Tier-A.
-4. IMPL-EVAL remains a separate-session coordinator action; do not trigger it here.
+1. Tier-A substantively reviews S5 evidence and either requests a run-artifact repair or signs off.
+2. Coordinator launches separate-session IMPL-EVAL after Tier-A; this thread must not trigger it.
+3. Coordinator/evaluator owns PR-body checkboxes and the later lifecycle transition.
 
 ## Key Decisions
 
@@ -92,6 +93,9 @@ non-covering.
 | S4 | `check` | PASS | `receipts/slice-4/check.json`, exit 0 at `9b71e1bd2`; package/plugin selection does not cover S4 |
 | S4 | `test` | PASS | `receipts/slice-4/test.json`, exit 0 at `9b71e1bd2`; 4,147 passed, 19 ignored, 0 failed; load-bearing |
 | S4 | `quality-job` | PASS | `receipts/slice-4/quality-job.json`, exit 0 at `9b71e1bd2`; non-covering package/plugin quality inputs |
+| S5 | `check` | PASS | `receipts/slice-5/check.json`, exit 0 at `1390d3ead`; cached package/plugin selection does not cover leaf |
+| S5 | `test` | PASS | `receipts/slice-5/test.json`, exit 0 at `1390d3ead`; 4,147 passed, 19 ignored, 0 failed; load-bearing |
+| S5 | `quality-job` | PASS | `receipts/slice-5/quality-job.json`, exit 0 at `1390d3ead`; required but non-covering package/plugin inputs |
 | all | JSR | N/A | no publishable surface |
 
 ## Open Questions

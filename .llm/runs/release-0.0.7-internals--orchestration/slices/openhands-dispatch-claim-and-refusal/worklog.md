@@ -398,7 +398,7 @@ Slice 5 is authorized.
 | Every reportable denial gets exactly one sanitized, marker-bearing, token-free pre-spend reply | Satisfied | S1 exact five-reason assertions; S4 shipped reporter repeat-delivery count/sequence test; `receipts/slice-1/test.json`, `receipts/slice-4/test.json`. |
 | Status/refusal markers cannot recurse | Satisfied | S1 generated refusal round-tripped through production predicates and watcher heuristic; S4 exhaustion refusal repeats both guards. |
 | Manual generation lookup is 5×1s and exhaustion is attributable/fail-closed | Satisfied | S4 executable workflow extraction asserts five attempts, five 1000 ms waits, controlled refusal, and agent skip. |
-| Complete round-trip/collision/refusal/recursion/CLI/retry plus all three final gates recorded | Pending final receipts | Behavioral parts landed in S1–S4. This row becomes evidence-ready only after the three S5 receipts attest this checkpoint head; the PR checkbox remains coordinator-owned. |
+| Complete round-trip/collision/refusal/recursion/CLI/retry plus all three final gates recorded | Satisfied; PR checkbox deliberately unchanged | Behavioral parts landed in S1–S4. `receipts/slice-5/{check,test,quality-job}.json` all PASS at checkpoint `1390d3ead`; root `test` reports 4,147 passed / 19 ignored / 0 failed. The coordinator/IMPL-EVAL owns the checkbox transition. |
 | Separate-session PLAN-EVAL and IMPL-EVAL satisfied | Not yet satisfied | PLAN-EVAL PASS exists at `e15d78588`; IMPL-EVAL has not run and must remain a separate-session coordinator action after S5/Tier-A. |
 
 ### N1–N5 disposition
@@ -417,3 +417,25 @@ Slice 5 is authorized.
 - The final three receipts will bind to the checkpoint commit created from this record.
 - No OpenHands/evaluator dispatch, label transition, ready flip, PR-body checkbox edit, issue mutation,
   forbidden runtime gate, or lock/cache operation is authorized.
+
+### Final durable gates
+
+All three receipts attest the same immutable checkpoint `1390d3ead1d7d4381ace3d9403f559f009895643`,
+which is an ancestor of the final evidence commit and therefore reachable from the branch head.
+
+| Gate | Outcome | Exit | Receipt | Coverage meaning |
+| --- | --- | ---: | --- | --- |
+| `check` | PASS | 0 | `receipts/slice-5/check.json` | Required contract receipt; cached package/plugin selection, so it does not cover this leaf. |
+| `test` | PASS | 0 | `receipts/slice-5/test.json`; 4,147 passed, 19 ignored, 0 failed | Load-bearing behavioral proof; root auto-discovery executes the producer, policy, CLI, and workflow suites. |
+| `quality-job` | PASS | 0 | `receipts/slice-5/quality-job.json` | Required contract receipt; its package/plugin quality inputs are not independent behavioral coverage of this leaf. |
+
+### Final scope and handoff audit
+
+- S5 changed only `worklog.md`, `context-pack.md`, and `receipts/slice-5/*.json`.
+- Across the leaf, the production/test mutation surface is exactly the amended eight paths.
+- `.github/workflows/openhands-phase-eval.yml` and `deno.lock` are unchanged from immutable base
+  `7737d8903`; no ninth catalog/config path exists.
+- DoD rows 1–7 are truthfully evidence-ready. Row 8 is not satisfied because IMPL-EVAL has not run.
+  The PR body remains unchanged and draft so the separate evaluator/coordinator can own both
+  checkbox completion and lifecycle transition.
+- N1–N5 are all discharged; no implementation decision, drift, or debt remains open for IMPL-EVAL.
