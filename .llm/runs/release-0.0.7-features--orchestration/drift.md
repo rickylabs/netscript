@@ -167,3 +167,23 @@ law to the **envelope, definition, and result** payload types — where it is tr
 and to state that structurally identical plain-JSON value aliases are expected and are not evidence
 of coupling. Introducing a brand or discriminant to make the blanket claim true would be a design
 change, which the owner verdict does not authorize.
+
+## D-12 — a foreground Claude launch is invisible to every liveness signal this lane uses (minor)
+
+**Date:** 2026-08-15. The final IMPL-EVAL was first launched as `claude --effort medium … --model
+claude-opus-5 "<brief>"` without `--bg`. That starts a real, working session, but a **foreground**
+one: it creates no `/home/codex/.claude/jobs/<id>/` directory, and its stdout redirect stays empty
+until exit. Both of this lane's liveness checks — job-state polling and the redirect log — therefore
+reported nothing, and I killed a session that was mid-work.
+
+Nothing was lost: the transcript held 69 records, all reads (11 `Bash`, 2 `Read`, 1 `Skill`,
+1 `ListAgents`), with no commit, artifact, or PR comment, and the worktree was clean afterwards. The
+relaunch with `--bg` registered `e8cd9765` immediately.
+
+Two standing consequences for this lane. First, **always pass `--bg` when launching an evaluator**,
+not only for supervision convenience but because `respawnFlags` — the only trustworthy source for a
+bg session's observed route (argv omits `--model`/`--effort` for spare-claimed sessions) — exists
+only for registered background jobs. A foreground launch cannot prove its own route. Second, absence
+of a job dir is **not** evidence a session is dead; check the session transcript under
+`~/.claude/projects/<slug>/<sessionId>.jsonl` before concluding anything. This is D-7's rule
+generalised: verify the artefact, never the absence of a signal.

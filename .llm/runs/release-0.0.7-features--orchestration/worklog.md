@@ -844,3 +844,77 @@ triggered it (a `PluginCliJson` brand, a normative outcome mapping) are the ones
   receipt/journal head (the branch has since advanced through `04d431028…` to `0e302ad3a`), and
   "Next action: Tier-A topic review, then coordinator dispatch …" describes a handoff that has
   already happened twice.
+
+## 2026-08-15 — amendment landed, Tier-A signed, final IMPL-EVAL dispatched
+
+### Author turn (preserved thread `019ffcc5-…`)
+
+Two commits, no replacement session, no rival `send-message-v2`:
+
+| Head | Commit | Contents |
+| --- | --- | --- |
+| Content | `67e12f02165089ec7431b72d1294147477906282` | `docs(rfc): narrow C6 to generic workspace plans` — RFC + three leaf journals |
+| Evidence | `d45a92ba70e78cc1ff42617ca15f6782f4ea8c21` | `docs(harness): bind owner amendment evidence` — journals + six receipts |
+
+Local == remote == live PR head == `d45a92ba7`; tree clean; PR **draft**; exactly one `status:impl`.
+
+### Tier-A — `ACCEPTED_WITH_FINDINGS`
+
+Full review in `slices/tier-a-review-1502-amendment.md`. The independent basis — including RFC
+0003's own ownership text at `:783-820` and defects A-G — was written **before** the author's turn
+completed, so the review is not shaped by the author's account of its own work.
+
+Everything re-derived rather than accepted:
+
+- All eight contract points are decided in RFC text: `:211-223` ownership block, `:799-804`
+  preview-invariance, `:813-819` adapter direction with both prohibitions, `:886-890` doctor split,
+  `:918` compat row, `:922-926` assignability, `:993` #1490 amend/fold row, `:1053` C6 roadmap row,
+  `:1136-1139` prior art.
+- "host-owned execution" is gone — zero occurrences.
+- **Over-correction checked, not just under-correction.** All four forbidden items absent; every
+  grep hit on outcome/idempotency/outbox vocabulary is a disclaimer of ownership or a pre-existing
+  row re-emitted by column rewrap.
+- Six receipts: distinct `gateId`s, all `PASS`/exit 0, every one `gitHead == actualGitHead ==
+  67e12f021`, no `allowGitHeadMismatch`. **Sufficiency recomputed by hand — `SUFFICIENT`.**
+- Scope clean across `0e302ad3a..d45a92ba7`: RFC 0003 untouched, no `packages/**`, `plugins/**`, or
+  `deno.lock`.
+- Symbol integrity re-derived: 42 declared, 42 used, 0 undeclared. The three symbols appearing once
+  in code and again in prose match the S4 baseline.
+- The prior conditional finding is genuinely closed, and the replacement claim is accurate:
+  `check-amend.json` has `durationMs 64`, `stdout.bytes 0`, and `stderr.tail` ending
+  `(cached, inputs unchanged)`; its stderr sha256 `cc927711…` is identical to `check-final.json`'s.
+
+**AF-1 (editorial, closed).** The body cited "reproducibility fix `04d431d9c`" — not a valid object;
+the real commit is `04d431028`. I validated all 15 SHA-like tokens in the body; that was the only
+unresolvable one (`5300440887` is the comment id). A dead SHA is not openable evidence, so it is a
+miss inside assigned point 8 rather than a new issue. Closed by a bounded body-only correction turn
+to the same author — not a formal cycle, and it moved no head, so the six receipts still bind.
+Re-verified afterwards: every body SHA resolves, `04d431d9c` is gone, head still `d45a92ba7`.
+
+The author also posted an `OWNER-AMENDMENT — KEEP AND NARROW` phase comment. Checked: it reports its
+own phase and does **not** reply to or resolve owner comment `5300440887`.
+
+### Final IMPL-EVAL dispatched
+
+Brief: `slices/impl-eval-1502-amendment.md`, bounded to the amendment, the prior conditional
+finding, evidence reachability, and duplicate/ownership proof — and instructing the evaluator that
+**over-correction is also a finding**.
+
+| Field | Value |
+| --- | --- |
+| Job / session | `e8cd9765` / `e8cd9765-9f6c-4418-bbc2-4a24f221f2d4` |
+| Bridge session | `cse_01Cwg2ukqsMkwpuca5xhzVaG` (non-empty → Remote Control attached) |
+| cwd | `/home/codex/repos/netscript-007-features-1502` |
+| Requested route | native Claude Opus 5 · medium · Remote Control |
+| Observed route | `respawnFlags` = `--effort medium … --remote-control … --model claude-opus-5`; `providerEnv {}` |
+| Route verdict | **matched**, native Anthropic auth, opposite-family to the Codex author |
+| CLI | `2.1.233` |
+| Brief delivered | `intent` length 10,095 bytes |
+| Created | `2026-08-15T08:11:17Z` |
+
+**Launch correction worth recording.** The first launch omitted `--bg`, so it started a foreground
+session that registered no job dir and wrote nothing to its redirect log. I read that as a stall and
+killed it — it was in fact working. No damage: its transcript shows 69 records of reads only (11
+Bash, 2 Read, 1 Skill, 1 ListAgents), zero commits, zero artifacts, zero PR comments, and the tree
+was clean afterwards. Relaunching with `--bg` also restores the route proof, since `respawnFlags`
+only exists for registered background jobs. Recorded as D-12.
