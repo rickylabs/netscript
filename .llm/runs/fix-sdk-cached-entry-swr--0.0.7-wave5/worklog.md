@@ -62,7 +62,7 @@
 | # | Slice                                                                                                                               | Gate                                                                             | Files                                                                                                                                                                                             |
 | - | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1 | Policy-aware, persistence-complete single-flight plus overlapping SWR regression                                                    | Focused structured cache tests; targeted wrappers; `quality:gate`                | `packages/sdk/src/cache/cache-query.ts`, `packages/sdk/tests/cache/cache-query_test.ts`, run artifacts                                                                                            |
-| 2 | Truthful blocking loader example, page-level tutorial action/read distinction, executable factory regression, and ordered four-file asset cascade | Focused factory test; docs format/accuracy; three cascade checks; JSR/root gates | `packages/sdk/tests/query/query-factory_test.ts`, `docs/site/services-sdk/sdk.md`, `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md`, four declared generated files, run artifacts |
+| 2 | Truthful blocking loader example, baseline fresh-hit predicate correction, page-level tutorial action/read distinction, executable factory regression, and ordered four-file asset cascade | Focused factory test; docs format/accuracy; three cascade checks; JSR/root gates | `packages/sdk/src/cache/cache-query.ts` (exact S2-A predicate only), `packages/sdk/tests/query/query-factory_test.ts`, `docs/site/services-sdk/sdk.md`, `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md`, four declared generated files, run artifacts |
 
 ### Deferred Scope
 
@@ -89,6 +89,9 @@ action in `src/query/query-factory.ts` into `src/cache/cache-query.ts`, and add 
 | 2026-08-15 | S1             | Single-flight runtime     | Made in-flight ownership policy-aware and persistence-complete without changing exports or PR #1665 fail-safe/telemetry behavior.                                            |
 | 2026-08-15 | S1             | Deterministic regressions | Added overlapping stale SWR and background-write-failure/blocking-joiner tests; both use manually controlled promises and no timing sleeps.                                  |
 | 2026-08-15 | S1             | Pre-review correction     | Coordinator rejected the initial comment/spacing deletion as F-1 metric gaming. Restored all useful documentation and structure, then reduced real duplication; honest file is 497 lines. |
+| 2026-08-15 | S1             | Tier-A PASS               | Fresh Tier-A accepted S1 at `e100ea205`, including A2/A3 semantics and the honest 497-line/no-F-1 structural reduction. |
+| 2026-08-15 | S2             | Baseline defect exposed   | The authorized factory regression's fresh phase failed: `preferFreshOnStale: true` fetched despite a fresh non-expired entry. Base `main@3e8e146a4:170` contains the same predicate, so this is not an S1 regression. |
+| 2026-08-15 | S2-A           | Plan-only scope amendment | Coordinator authorized exactly `cache-query.ts` for the predicate correction. Preserved the three authored S2 files uncommitted; no source/docs/test mutation belongs to this amendment commit. |
 
 ## Decisions
 
@@ -100,6 +103,7 @@ action in `src/query/query-factory.ts` into `src/cache/cache-query.ts`, and add 
 | Synchronous registration   | The scheduling SWR reader registers the shared operation before any fetch/write await, so later readers deterministically observe it. | PLAN-EVAL A3; overlapping-reader regression |
 | Non-fatal write join       | Fetch success plus write failure resolves fetched data for foreground/background owners and joiners; only fetch failure rejects. | PLAN-EVAL A2; write-failure regression |
 | Honest F-1 closure         | Preserve documentation and normal layout; reduce responsibility/branch duplication rather than squeezing physical lines. | Coordinator pre-review; doctrine A8/AP-1/F-1 |
+| Stale-only blocking option | Use `isExpired || (!isFresh && preferFreshOnStale)`: expired precedence remains, stale may block, and fresh falls through to its hit return. | Baseline `main@3e8e146a4:170`; S2-A ruling |
 
 ## PLAN-EVAL Advisories Carried Forward
 
@@ -126,6 +130,7 @@ action in `src/query/query-factory.ts` into `src/cache/cache-query.ts`, and add 
 | Brief's six-diagnostic wording was the sum of two expected-red three-diagnostic invocations              | significant | yes                |
 | Adjacent false tutorial prose was outside frozen surface; coordinator authorized exactly that one source | significant | yes                |
 | Tier-A found line-100-only scope inconsistent with the page-level S2 acceptance commitment               | significant | yes                |
+| S2 exposed the baseline `preferFreshOnStale` predicate fetching fresh entries                             | significant | yes                |
 
 ## Gate Results
 
@@ -151,18 +156,21 @@ action in `src/query/query-factory.ts` into `src/cache/cache-query.ts`, and add 
 | SDK lint | **PASS** (exit 0) | `run-deno-lint.ts --root packages/sdk --ext ts,tsx`: 84 files, 1 batch, 0 occurrences and 0 rules. |
 | SDK format | **PASS** (exit 0) | `run-deno-fmt.ts --root packages/sdk --ext ts,tsx`: 84 files, 1 batch, 0 failed batches, 0 findings. |
 | Repository quality | **PASS** (exit 0) | Re-run on the restored 497-line source with `rtk proxy deno task quality:gate`: repository scan `ok: true`, 0 findings; SDK doctrine `FAIL=0`, `WARN=1`, `INFO=1`; no F-1 finding. The one SDK warning is the known F-16 13-child finding. |
+| S2 factory regression discovery | **RED** (exit 1) | Focused query-factory wrapper: passed 5, failed 1; fresh phase expected `seeded-fresh`, got `fetched`. Full SDK wrapper: passed 68, failed 1 with the same failure. This is the expected evidence exposing the pre-existing predicate defect, not an S1 regression. |
 
 Root `test`/`check`, S2 consumer/docs gates, and final publish/JSR gates remain `NOT_RUN` by slice
 boundary. Aspire, Docker, and `e2e:cli` were not run and no runtime lease was acquired.
 
 ## Handoff Notes
 
-- S1 is complete on exactly `cache-query.ts`, `cache-query_test.ts`, and run artifacts. S2 has not
-  started; the two docs pages, query-factory regression, and four generated mirrors are untouched.
-- Fresh Tier-A should review policy-aware joining, persistence-complete cleanup, A2 write-failure
-  join semantics, A3 synchronous registration, the two deterministic regressions, and the honest
-  F-1 correction. Restored items are the full module JSDoc; summaries for `queryInsideSpan`,
-  `getInflight`, `fetchAndCacheOnce`, `fetchAndCache`, and `revalidateInBackground`; and ordinary
-  blank-line separation. `startInflight` also has a lifecycle summary.
-- Stop after the S1 receipt. Do not begin S2 until the coordinator provides the next authorization;
-  separate-session IMPL-EVAL remains mandatory after implementation is complete.
+- S1 passed Tier-A at `e100ea205`. Its policy-aware persistence-complete ownership, A2 non-fatal
+  write join, A3 synchronous registration, documentation, and honest 497-line/no-F-1 result are
+  locked invariants for the S2-A condition correction.
+- S2 authored changes remain uncommitted in exactly the two authorized docs pages and
+  `packages/sdk/tests/query/query-factory_test.ts`. This amendment does not commit, revert, stash,
+  or otherwise mutate them; generation has not begun.
+- Fresh fixes Tier-A should review the added `cache-query.ts` surface, baseline citation, exact
+  `isExpired || (!isFresh && preferFreshOnStale)` condition, query-factory-only proof, and preserved
+  S1/F-1 invariants.
+- Stop after this plan-only amendment. Do not make the semantic correction until fresh fixes Tier-A
+  passes; separate-session IMPL-EVAL remains mandatory after implementation is complete.

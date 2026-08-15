@@ -120,3 +120,25 @@ Drift is append-only.
   13-child warning.
 - **Evidence:** `packages/sdk/src/cache/cache-query.ts`; structured gate table in `worklog.md`;
   coordinator amendment receipt on PR #1669.
+
+## 2026-08-15 — S2 exposes a baseline fresh-hit predicate defect
+
+- **What:** the corrected published loader calls the cache-aware action with
+  `preferFreshOnStale: true`; its fresh-entry regression receives fetched data instead of the seeded
+  fresh hit because the preference is evaluated before the fresh branch.
+- **Source:** S2 focused query-factory regression and coordinator scope ruling S2-A.
+- **Expected:** expired entries fetch; otherwise only `!isFresh && preferFreshOnStale` blocks;
+  fresh non-expired entries fall through to the existing zero-fetch return.
+- **Actual:** `if (isExpired || preferFreshOnStale)` appears at
+  `main@3e8e146a4:170` and at accepted S1 head `e100ea205:165`, before `if (isFresh)`.
+- **Classification:** pre-existing baseline defect exposed by S2, not introduced by S1.
+- **Severity:** significant
+- **Action:** coordinator authorized exactly `packages/sdk/src/cache/cache-query.ts` as an S2-A
+  correction surface. After fresh fixes Tier-A passes, change only the predicate to
+  `isExpired || (!isFresh && preferFreshOnStale)` and prove it in the already-authorized
+  `packages/sdk/tests/query/query-factory_test.ts`. No `cache-query_test.ts` edit is authorized.
+- **Preserved invariants:** S1 A2/A3 policy-aware persistence-complete ownership, synchronous
+  registration, and non-fatal write joiner semantics remain unchanged. The documented 497-line
+  source and `quality:gate` result with no F-1 finding must survive without comment/spacing games.
+- **Resolution:** scope amendment recorded; source correction remains blocked pending fresh fixes
+  Tier-A over the plan-only amendment head.

@@ -48,6 +48,9 @@ metadata carries the persisted refresh timestamp.
 - Make the in-flight lifecycle policy-aware in `CacheQuery`: background SWR refreshes participate in
   dedupe without forcing other SWR readers to block, while missing/expired/blocking readers join the
   same persistence-complete operation.
+- Correct the pre-existing `preferFreshOnStale` predicate in `CacheQuery` so the option applies only
+  to stale entries: expired entries retain fetch precedence, non-expired stale entries block only
+  when the option is true, and fresh non-expired entries retain their zero-fetch hit path.
 - Preserve every PR #1665 request-local admission, telemetry, cache-write fail-safe, and telemetry
   evidence fail-safe behavior.
 - Add deterministic concurrent engine and factory-loader regressions mapped to all six acceptance
@@ -59,6 +62,39 @@ metadata carries the persisted refresh timestamp.
   action, describe `getCachedEntry()` as a KV-only metadata read, and make the demonstrated loader
   compose the policy action before the metadata read.
 - Regenerate and commit the four declared derived assets in the mandated order.
+
+### S2-A baseline predicate correction
+
+The S2 factory regression exposed an unavoidable baseline defect in the runtime used by the
+published composition. At `main@3e8e146a4:170`, `if (isExpired || preferFreshOnStale)` runs before
+the fresh-hit branch, so a fresh non-expired entry fetches whenever `preferFreshOnStale: true`.
+That contradicts the option's stale-only contract and would make the corrected loader example fail
+the acceptance requirement that fresh entries cause zero upstream calls. This condition is
+identical at the S1 head (`e100ea205:165`), so the defect predates S1 and was exposed by S2; it is
+not an S1 regression.
+
+The exact authorized correction is:
+
+```ts
+if (isExpired || (!isFresh && preferFreshOnStale)) {
+  // existing blocking fetch path
+}
+if (isFresh) return cached.value.data;
+```
+
+Expired precedence is unchanged. Otherwise, only a stale entry with `preferFreshOnStale` enters the
+blocking fetch path; a fresh non-expired entry falls through to the existing fresh return. This is a
+condition correction, not a redesign: S1's policy-aware, persistence-complete in-flight ownership,
+synchronous background registration, and non-fatal write behavior for owners/joiners must remain
+unchanged. The documented 497-line source and `quality:gate` result with no F-1 finding must also
+survive; no comment/spacing removal or unrelated file-size work is authorized.
+
+Proof stays entirely in the already-authorized
+`packages/sdk/tests/query/query-factory_test.ts`: the published loader composition seeds a fresh
+entry and asserts the preserved value/timestamp with upstream calls exactly `0`; its empty-store
+phase asserts one fetch and a current `cachedAt`; and two overlapping stale blocking loaders share a
+manually blocked fetch, assert exactly one refresh, and observe the same refreshed timestamp. No
+change to `packages/sdk/tests/cache/cache-query_test.ts` is authorized by S2-A.
 
 ### Published-claim dispositions
 
@@ -92,6 +128,8 @@ demonstrated `getCachedEntry()` loader revalidates.
 - No third docs source. The authorized docs set is exactly `docs/site/services-sdk/sdk.md` and
   `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md`; any further same-class claim is
   reported for a ruling rather than silently edited.
+- No S2-A edit to `packages/sdk/tests/cache/cache-query_test.ts` or any runtime path other than the
+  exact predicate correction in `packages/sdk/src/cache/cache-query.ts`.
 - No repair of `check:mcp-export-corpus` (#1668), `surface:diff`, JSR `F-DOCT-5`, or queue flake
   #1667.
 - No Aspire, Docker, or `e2e:cli`; they are prohibited leased singletons and are not needed to prove
@@ -104,6 +142,9 @@ demonstrated `getCachedEntry()` loader revalidates.
   loader can resolve and read metadata before the winning caller has written the refreshed entry.
 - The early unconditional in-flight join must become policy-aware. A second SWR reader should return
   stale data while sharing the one background refresh, not unexpectedly block for fresh data.
+- The blocking preference is stale-only. Applying it before the fresh-hit branch without an
+  `!isFresh` guard silently converts a fresh hit into an upstream fetch and falsifies the published
+  loader regression.
 - Both authorized site sources feed the same four checked-in generated files and require all three
   freshness gates on the same content head. The plan-amendment generation run found both pages in
   agent-docs provenance and produced no tracked path outside that declared set.
@@ -141,6 +182,7 @@ demonstrated `getCachedEntry()` loader revalidates.
 | Either docs edit leaves generated mirrors inconsistent.                 | Generate prose → CLI barrel → publish assets, then run all three freshness checks on one unchanged head. Plan-phase execution confirmed both pages are provenance inputs and no undeclared tracked path changed.                                                  |
 | New export or slow type slips in.                                       | No public type files planned; compare `deno doc`, run package/root publish dry-run, and hold doc-lint to the observed red no-regression set.                                                                                                                      |
 | Root queue flake appears.                                               | Report `expected 1, got 2` as #1667 exactly and do not rerun solely for green.                                                                                                                                                                                    |
+| The S2-A predicate correction disturbs accepted S1 lifecycle behavior or reopens F-1. | Change only the condition to `isExpired || (!isFresh && preferFreshOnStale)`; retain expired precedence, all A2/A3 machinery and documentation, and re-run focused/full SDK plus `quality:gate` with the file remaining below the F-1 threshold. |
 
 ## Anti-Patterns to Resolve or Avoid
 
@@ -177,9 +219,10 @@ demonstrated `getCachedEntry()` loader revalidates.
 | #  | Slice                                                              | What it proves                                                                                                                                                                                                                                                                                             | Gates                                                                                                                                                                           | Files                                                                                                                                                                                                                                                                                                                                                                               |
 | -- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | S1 | Make refresh ownership policy-aware and persistence-complete       | Fresh/missing/blocking/SWR behavior is preserved; two overlapping stale SWR readers return stale and issue exactly one refresh; refreshed cache data/timestamp eventually land; PR #1665 fail-safe/telemetry behavior remains.                                                                             | Focused structured SDK cache tests; targeted check/lint/fmt; `quality:gate`                                                                                                     | `packages/sdk/src/cache/cache-query.ts`; `packages/sdk/tests/cache/cache-query_test.ts`; run `worklog.md`/`context-pack.md`                                                                                                                                                                                                                                                         |
-| S2 | Publish the truthful loader contract and its executable regression | Corrected action-then-metadata loader makes zero/fetch-once/blocking-stale decisions correctly, overlapping blocking loaders share one refresh and see the refreshed timestamp, both docs pages distinguish policy execution from the pure KV read, the tutorial satisfies the page-level acceptance sentence above, and all four generated mirrors share one content head. | Focused query-factory test; `docs-source-format`; `docs-accuracy`; `check:agent-docs-prose`; `check:assets-barrel`; `check:publish-assets`; scoped/root/publish/JSR merge gates | `packages/sdk/tests/query/query-factory_test.ts`; `docs/site/services-sdk/sdk.md`; `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md`; `.llm/assets/agent-docs/prose.json.gz`; `.llm/assets/agent-docs/provenance.json`; `packages/cli/src/kernel/assets/agent-docs.generated.ts`; `packages/mcp/src/publish-assets.generated.ts`; run `worklog.md`/`context-pack.md` |
+| S2 | Publish the truthful loader contract and its executable regression | Corrected action-then-metadata loader makes zero/fetch-once/blocking-stale decisions correctly, overlapping blocking loaders share one refresh and see the refreshed timestamp, both docs pages distinguish policy execution from the pure KV read, the tutorial satisfies the page-level acceptance sentence above, and all four generated mirrors share one content head. | Focused query-factory test; `docs-source-format`; `docs-accuracy`; `check:agent-docs-prose`; `check:assets-barrel`; `check:publish-assets`; scoped/root/publish/JSR merge gates | `packages/sdk/src/cache/cache-query.ts` (S2-A exact predicate correction); `packages/sdk/tests/query/query-factory_test.ts`; `docs/site/services-sdk/sdk.md`; `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md`; `.llm/assets/agent-docs/prose.json.gz`; `.llm/assets/agent-docs/provenance.json`; `packages/cli/src/kernel/assets/agent-docs.generated.ts`; `packages/mcp/src/publish-assets.generated.ts`; run `worklog.md`/`context-pack.md` |
 
-No implementation slice may begin until the topic orchestrator confirms PLAN-EVAL `PASS`.
+PLAN-EVAL passed before S1. The S2-A semantic correction may not begin until the coordinator's
+fresh fixes Tier-A passes this amendment head.
 
 ## Validation Plan
 
@@ -227,6 +270,9 @@ or `e2e:cli`, and will not describe any of them as green.
 
 - Any implementation need to touch a provider/port/factory/export file is a published-surface
   expansion and must stop for a ruling.
+- S2-A authorizes only the exact fresh-hit predicate correction in `cache-query.ts`; any further
+  runtime change, any `cache-query_test.ts` change, or any loss of S1 A2/A3/F-1 evidence must stop
+  for a ruling.
 - Any docs source outside `docs/site/services-sdk/sdk.md` and
   `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md` is a scope expansion and must be
   reported before edit.

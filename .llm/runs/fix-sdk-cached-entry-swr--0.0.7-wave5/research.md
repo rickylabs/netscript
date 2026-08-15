@@ -29,6 +29,7 @@
 | 13 | `services-sdk/sdk.md` is a Tier-1 snippet-policy page. The published example also needs a runtime regression because its `comp.tabbedCode` string is not by itself sufficient proof of concurrent behavior.                                                                                                                                                                                                                                           | `.llm/tools/docs/snippet-policy.ts:4-17`; `packages/sdk/tests/query/query-factory_test.ts`.                                                                        |
 | 14 | The repaired two-page sweep accounts for every same-class claim: the plan retains tutorial lines 13, 15, 75, and 76 with explicit nearby callable-action scoping; corrects tutorial lines 32, 80, 94, 100, and 107; retains the accurate services-SDK timestamp-decision description at line 138; and corrects its false loader at line 188. Chapter 4 line 231 is a checked-and-cleared third-page claim about `withPolicy('balanced')`, plausibly true of that policy rather than a claim that `getCachedEntry()` refreshes; it remains out of scope and unedited. | Executed docs claim sweep below; `plan.md` published-claim disposition table; chapter 4 lines 231-242. |
 | 15 | Both authorized pages are inputs to the existing agent-docs bundle, so the second source does not authorize a fifth generated mirror.                                                                                                                                                                                                                                                                                                                 | `.llm/assets/agent-docs/provenance.json:127,145` lists `pages/services-sdk/sdk/index.md` and `pages/tutorials/live-dashboard/03-sdk-cache-first-query/index.md`.   |
+| 16 | The S2 factory regression exposed a pre-existing fresh-hit defect: `CacheQuery` evaluates `if (isExpired || preferFreshOnStale)` before `if (isFresh)`, so a fresh non-expired cache entry fetches when the stale-only preference is true. The identical condition exists at `main@3e8e146a4:170` and at the accepted S1 head `e100ea205:165`; this is baseline behavior exposed by S2, not an S1 regression. The coordinator authorized exactly `packages/sdk/src/cache/cache-query.ts` as an added S2 correction surface. | `git show 3e8e146a4:packages/sdk/src/cache/cache-query.ts \| nl -ba \| sed -n '160,178p'`; `git show e100ea205:packages/sdk/src/cache/cache-query.ts \| nl -ba \| sed -n '155,175p'`; focused query-factory regression currently fails its fresh phase with `Expected seeded-fresh, got fetched`. |
 
 ## Executed docs claim sweep
 
@@ -138,6 +139,12 @@ same persisted refresh, and the service client counter must equal one. This guar
   one-source expansion)
 - `packages/sdk/src/cache/cache-query.ts`
 
+S2-A authorizes only one additional correction within that existing runtime path: replace the
+baseline condition with `isExpired || (!isFresh && preferFreshOnStale)`. Expired entries continue
+to fetch first; otherwise only stale entries with the preference block; fresh non-expired entries
+fall through to the existing hit return. This adds no public surface and must preserve S1's A2/A3
+single-flight/write-failure behavior and the honest 497-line, no-F-1 result.
+
 The authorized docs sources are exactly the first two paths. No third docs source is in scope.
 
 Removed from the contract because they do not exist:
@@ -149,6 +156,11 @@ Removed from the contract because they do not exist:
 
 - `packages/sdk/tests/cache/cache-query_test.ts`
 - `packages/sdk/tests/query/query-factory_test.ts`
+
+The S2-A behavior proof is confined to the already-authorized query-factory test: fresh plus
+`preferFreshOnStale` keeps the seeded data/timestamp and makes exactly zero calls; missing fetches
+once with a current timestamp; and two overlapping stale blocking loaders make exactly one refresh
+and observe one refreshed timestamp. `cache-query_test.ts` is not an S2-A edit surface.
 
 ### Derived asset cascade required by either site-source edit
 
