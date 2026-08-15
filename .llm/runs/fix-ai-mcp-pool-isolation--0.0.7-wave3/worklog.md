@@ -72,6 +72,7 @@ and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
 | 2026-08-15 10:40 CEST | 0 | scope gate | Found required test/docs/port/base-transport changes outside the frozen three-file surface; stopped before source edits. |
 | 2026-08-15 | 0.1 | scope ruling | Read committed `scope-ruling.md`; exact eight-file package surface and public contract are now authorized. |
 | 2026-08-15 | 0.1 | plan re-lock | Recorded `PLAN-EVAL: N/A`; all prior RED evidence remains immutable and implementation can proceed mechanically. |
+| 2026-08-15 | 1 | committed RED | Structured focused test exited `1` with `TimeoutError`; healthy peer remained unavailable behind the stalled first peer. |
 
 ## Decisions
 
@@ -97,6 +98,7 @@ and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
 | red-first pool stall | `deno eval --unstable-kv ...` | RED reproduced · raw exit 0 | pending after abort; healthy connects 0 |
 | red-first pool rejection | `deno eval --unstable-kv ...` | RED reproduced · raw exit 0 | rejected; healthy connects 0 |
 | red-first TanStack connect abort | `timeout 3s deno eval --unstable-kv ...` | RED reproduced · raw exit 124 | abort fired; connector never settled |
+| committed RED regression | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all --filter "McpTransportPool isolates a never-settling server during startup" packages/ai/tests/mcp_test.ts` | RED · raw exit 1 | 0 passed, 1 failed; TimeoutError |
 | check/test/lint/fmt | structured wrappers | NOT_RUN | No implementation; stopped at scope boundary. |
 
 ### Fitness Gates

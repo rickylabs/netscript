@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-ai-mcp-pool-isolation--0.0.7-wave3` |
 | Branch | `fix/ai-mcp-pool-isolation` |
-| Phase | `plan` — amended contract re-locked; implementation unblocked |
+| Phase | `plan` — blocked before implementation |
 | Target | `packages/ai` MCP integration surface |
 | Archetype | `2 — Integration` (coordinator-frozen leaf profile) |
 | Scope overlays | `none` |
@@ -34,33 +34,26 @@ Archetype 4; this run follows the narrower, explicit leaf contract and records t
 ## Goal
 
 Make optional MCP infrastructure failure-isolated and cancellation-aware while preserving healthy
-peers and exposing immediate per-server status. The coordinator's committed scope ruling now
-authorizes the complete implementation surface.
+peers and exposing immediate per-server status. The current frozen surface cannot deliver that goal
+in full.
 
 ## Scope
 
-- Amended writable package files (exactly eight):
+- Frozen implementation files:
   - `packages/ai/src/mcp/adapters/tanstack-connector.ts`
   - `packages/ai/src/mcp/application/pool.ts`
   - `packages/ai/src/mcp/application/register-tools.ts`
-  - `packages/ai/tests/mcp_test.ts`
-  - `packages/ai/src/ports/mcp-transport.ts`
-  - `packages/ai/src/mcp/adapters/base-transport.ts`
-  - `packages/ai/mcp.ts`
-  - `packages/ai/README.md`
 - Harness run artifacts under this run directory.
 
 ## Non-Scope
 
 - No Aspire, Docker, browser, CLI E2E, or scaffold runtime gates without a fresh lease.
-- No changes outside the amended eight package files without a further coordinator amendment.
-- No new `packages/ai/deno.json` export; reuse the published `./mcp` entrypoint.
-- No EIS-Chat consumer-side implementation or changes to another package's ports/adapters/docs.
+- No changes outside the frozen files without a coordinator amendment.
 
 ## Hidden Scope
 
-- None after the committed amendment. Any newly discovered required file is drift and an immediate
-  stop boundary.
+- The live acceptance criteria require a test, documentation, resource-read cancellation,
+  cancellable close, and a public degraded/error snapshot. These cross the frozen boundary.
 
 ## Locked Decisions
 
@@ -69,17 +62,14 @@ authorizes the complete implementation surface.
 | D1 | Stop before implementation and request a surface amendment. | The user explicitly forbids inferring authority outside the three files. |
 | D2 | Do not use `Closes #1448` on the blocked draft PR. | This bootstrap does not fully resolve the live issue. |
 | D3 | Preserve per-server identity and use Web Platform cancellation after amendment. | Archetype 2 and doctrine A7/A13. |
-| D4 | Expose a synchronous, I/O-free readonly snapshot keyed by `serverId`, with `McpConnectionState`, `lastError`, and ready clients. | Scope ruling criteria 3 and 8; additive published contract. |
-| D5 | Reuse an options bag carrying `signal` for resource-read and close/stop operations. | Scope ruling; mirrors `McpConnectOptions`. |
-| D6 | Settle startup and stop independently per server, retaining failures and closing late successes. | Scope ruling criteria 2–5. |
 
 ## Open-Decision Sweep
 
 | Decision | Status | Notes |
 | --- | --- | --- |
-| Exact public degraded/error snapshot shape | resolved | Synchronous readonly server map plus ready clients; reuse `McpConnectionState`. |
-| Whether `close`/`stop` gains caller options or cancellation remains internal | resolved | Options bag with `signal`, matching `McpConnectOptions`. |
-| Exact amended test/docs/port surface | resolved | Eight package files enumerated in `scope-ruling.md`. |
+| Exact public degraded/error snapshot shape | must resolve now | Affects `./mcp` public surface and isolated declarations. |
+| Whether `close`/`stop` gains caller options or cancellation remains internal | must resolve now | Current ports expose no signal on close/stop. |
+| Exact amended test/docs/port surface | must resolve now | Coordinator authority required. |
 
 ## Risk Register
 
@@ -102,8 +92,8 @@ authorizes the complete implementation surface.
 
 | Gate | Required | Expected evidence |
 | --- | --- | --- |
-| F-3/F-5/F-6/F-7/F-10/F-19 and Archetype-2 matrix | yes | structured wrappers, doc lint, JSR audit, publish dry run, arch check |
-| Code quality | yes | `deno task quality:scan` and `deno task arch:check` |
+| F-3/F-5/F-6/F-7/F-10/F-19 and Archetype-2 matrix | yes after amendment | structured wrappers, doc lint, JSR audit, publish dry run, arch check |
+| Code quality | yes after amendment | `deno task quality:scan` and `deno task arch:check` |
 
 ## Arch-Debt Implications
 
@@ -113,26 +103,37 @@ authorizes the complete implementation surface.
 
 ## Validation Plan
 
-The proving gates are `check`, `test`, `publish-dry-run`, and `arch-check`, plus scoped lint/fmt,
-`quality:scan`, `deno doc --lint packages/ai/mcp.ts`, and the package JSR audit. Targeted workspace
-checks use `--unstable-kv`; structured wrappers are the verdict source for check/test/lint/fmt.
-
-## Implementation Slices
-
-1. Commit the focused RED regression: one healthy server and one never-settling server.
-2. Make pool startup/reconnect independently settled and add the synchronous public snapshot.
-3. Plumb cancellation through resource reads and close/stop, including late-success cleanup.
-4. Propagate registration cancellation without changing existing call sites.
-5. Document optional/degraded usage and run the complete proving gate set.
-
-## PLAN-EVAL Decision
-
-`PLAN-EVAL: N/A`. The amended contract is now complete and mechanical: it fixes the exact writable
-surface, public snapshot semantics, existing lifecycle vocabulary, cancellation convention,
-per-server settlement behavior, public entrypoint, documentation requirement, and gate set. No
-architectural or product decision remains for a separate evaluator. This does not waive the later
-Tier-A review or opposite-family IMPL-EVAL.
+The proving gates remain `check`, `test`, `publish-dry-run`, and `arch-check`, plus scoped lint/fmt,
+`quality:scan`, doc lint, and the package JSR audit. They are intentionally `NOT_RUN` until the
+coordinator amends the surface and implementation exists.
 
 ## Drift Watch
 
-- Any required edit beyond the amended eight package files is new drift and an immediate stop.
+- Any attempt to satisfy the test, docs, resource-read, close, or public-status acceptance inside
+  only the three frozen files would be a partial/hidden surface change and must remain blocked.
+
+## 2026-08-15 — Amended plan (append-only)
+
+The coordinator ruling at `e2faaab15def77c131806aa6cf565d77bd6fe92c` resolves the recorded
+blocker without changing the prior decision record.
+
+- Exact writable package surface: the original three files plus
+  `packages/ai/tests/mcp_test.ts`, `packages/ai/src/ports/mcp-transport.ts`,
+  `packages/ai/src/mcp/adapters/base-transport.ts`, `packages/ai/mcp.ts`, and
+  `packages/ai/README.md`.
+- Public contract: a synchronous I/O-free readonly snapshot keyed by `serverId`, using
+  `McpConnectionState`, retaining `lastError`, and exposing ready clients alongside statuses.
+- Lifecycle contract: an options bag carrying `signal` for resource-read and close/stop;
+  per-server startup/stop settlement; late-success cleanup.
+- Denied scope: any ninth package file, a new `deno.json` export, consumer-side EIS-Chat changes,
+  or changes in another package.
+- Slices: (1) committed RED regression, (2) pool settlement + snapshot, (3) resource/close
+  cancellation, (4) registration propagation, and (5) docs + full gates.
+- Gates: structured check/test/lint/fmt, quality scan, architecture check, JSR audit,
+  `deno doc --lint packages/ai/mcp.ts`, and publish dry run.
+
+`PLAN-EVAL: N/A`. The amendment fixes the exact surface, public semantics, lifecycle vocabulary,
+cancellation convention, settlement behavior, public entrypoint, documentation, and gates. No
+decision-heavy question remains; Tier-A review and opposite-family IMPL-EVAL remain external.
+
+Any required edit beyond the amended eight package files is new drift and an immediate stop.

@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-ai-mcp-pool-isolation--0.0.7-wave3` |
 | Branch | `fix/ai-mcp-pool-isolation` |
-| Current phase | `plan` — amended contract re-locked; RED test next |
+| Current phase | `plan` — blocked before PLAN-EVAL/implementation |
 | Archetype | `2 — Integration` (coordinator-frozen leaf profile) |
 | Scope overlays | `none` |
 
@@ -16,8 +16,7 @@ The defect is reproduced red-first at immutable base `284dda90a`. Pool startup i
 neither the pool nor the default TanStack connector settles when aborted during a never-ending
 connect. No source has been changed. The live acceptance criteria require test, docs, port, and
 lifecycle files outside the frozen writable surface, so the run stopped for a coordinator
-amendment. The committed ruling now authorizes exactly eight package files and resolves the public
-snapshot and cancellation decisions; prior evidence remains immutable.
+amendment.
 
 ## Completed
 
@@ -27,19 +26,16 @@ snapshot and cancellation decisions; prior evidence remains immutable.
 - Reproduced pool failure isolation and cancellation defects.
 - Scanned the current `./mcp` JSR/public surface and upstream TanStack API.
 - Recorded `PLAN-EVAL: BLOCKED / not launched`.
-- Read the committed scope ruling and re-locked the plan against its exact eight-file surface.
-- Recorded `PLAN-EVAL: N/A` after amendment because the remaining work is fully specified and
-  mechanical.
 
 ## In Progress
 
-- Preparing the committed healthy + never-settling RED regression before implementation.
+- Nothing. The run is intentionally stopped at the frozen-scope boundary.
 
 ## Next Steps
 
-1. Commit and push the focused RED regression with its raw nonzero exit code.
-2. Implement the pool/snapshot, cancellation, registration, and docs slices separately.
-3. Run all structured, architecture, quality, JSR, doc-lint, and publish-dry-run gates.
+1. Topic orchestrator/coordinator decides whether to amend the authorized surface.
+2. Resolve the public degraded/status snapshot and cancellable-close contract.
+3. If granted, update plan/design and obtain coordinator direction on PLAN-EVAL before implementation.
 
 ## Key Decisions
 
@@ -47,8 +43,6 @@ snapshot and cancellation decisions; prior evidence remains immutable.
 | --- | --- | --- |
 | Stop rather than land a partial fix | user frozen contract | Test/docs/resource-read/close acceptance cannot fit. |
 | No `Closes #1448` | netscript-pr + live acceptance | Bootstrap PR does not resolve the issue. |
-| Synchronous snapshot; options-bag cancellation | committed scope ruling | Public and lifecycle decisions are coordinator-locked. |
-| `PLAN-EVAL: N/A` | amended complete contract | No decision-heavy question remains; evaluator separation is preserved for IMPL-EVAL. |
 
 ## Files Changed
 
@@ -67,7 +61,7 @@ snapshot and cancellation decisions; prior evidence remains immutable.
 
 ## Open Questions
 
-- None. A newly required file or public decision is drift and a stop boundary.
+- Exact amended file list and public status/close design.
 
 ## Drift and Debt
 
@@ -77,3 +71,13 @@ snapshot and cancellation decisions; prior evidence remains immutable.
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments.
+
+## 2026-08-15 — Amendment update (append-only)
+
+- Coordinator ruling `e2faaab15def77c131806aa6cf565d77bd6fe92c` authorizes exactly eight
+  package files and resolves the synchronous snapshot and options-bag cancellation contracts.
+- `PLAN-EVAL: N/A`: the amended work is fully specified and mechanical; evaluator separation is
+  retained for later Tier-A review and opposite-family IMPL-EVAL.
+- Current phase: RED regression slice, before implementation.
+- Next: commit the focused healthy + never-settling RED test, then implement each locked slice.
+- A ninth package file or new public decision is an immediate drift/stop boundary.

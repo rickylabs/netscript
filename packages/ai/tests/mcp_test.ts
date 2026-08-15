@@ -115,6 +115,19 @@ class RecordingTransport implements McpTransportPort {
   }
 }
 
+class NeverSettlingTransport extends RecordingTransport {
+  override connect(options: McpConnectOptions = {}): Promise<readonly McpToolDescriptor[]> {
+    this.connectCount += 1;
+    this.state = 'connecting';
+    return new Promise((_resolve, reject) => {
+      options.signal?.throwIfAborted();
+      options.signal?.addEventListener('abort', () => reject(options.signal?.reason), {
+        once: true,
+      });
+    });
+  }
+}
+
 function headersOf(value: unknown): Readonly<Record<string, string>> | undefined {
   if (typeof value !== 'object' || value === null) {
     return undefined;
@@ -228,6 +241,23 @@ Deno.test('McpTransportPool keys servers and prefixes remote tool names', async 
   assertEquals(pool.serverIds, ['alpha', 'beta']);
   assertEquals(tools.map((tool) => tool.name), ['alpha__search', 'beta__search']);
   assertEquals(tools.map((tool) => tool.remoteName), ['search', 'search']);
+});
+
+Deno.test('McpTransportPool isolates a never-settling server during startup', async () => {
+  const stalled = new NeverSettlingTransport('stalled', []);
+  const healthy = new RecordingTransport('healthy', [{
+    ...searchTool,
+    name: 'search',
+    remoteName: 'search',
+    serverId: 'healthy',
+  }]);
+  const pool = createMcpTransportPoolFromTransports({ transports: [stalled, healthy] });
+
+  const tools = await pool.connect({ signal: AbortSignal.timeout(20) });
+
+  assertEquals(tools.map((tool) => tool.name), ['healthy__search']);
+  assertEquals(stalled.connectCount, 1);
+  assertEquals(healthy.connectCount, 1);
 });
 
 Deno.test('McpTransportPool keeps transports warm across turns', async () => {

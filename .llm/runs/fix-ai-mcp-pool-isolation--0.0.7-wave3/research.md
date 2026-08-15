@@ -94,3 +94,15 @@ interrupt the pending TanStack connection.
   vocabulary or be a pool-owned snapshot type? That is a public-surface decision requiring
   coordinator approval and likely PLAN-EVAL.
 
+## 2026-08-15 — Committed RED regression after scope amendment
+
+Command:
+
+```text
+deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all --filter "McpTransportPool isolates a never-settling server during startup" packages/ai/tests/mcp_test.ts
+```
+
+Observed structured verdict: raw exit code `1`; `0` passed, `1` failed. The failure was
+`TimeoutError: The operation was aborted due to timeout` at the pool connect await. With the
+never-settling transport first, the healthy transport was not reached. This is the committed RED
+test required by the amendment; implementation had not begun.
