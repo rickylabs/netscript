@@ -1457,3 +1457,40 @@ identity assertions, R1.4/R3 probe behaviour including the accepted cost that `c
 resolves against a dead host, and R1.7's split treatment of `executeScript`. Tests must be capable of
 failing: exact call counts, identity equality, and classifier-false negatives at every firing
 boundary.
+
+### S2 Tier-A — accepted, no findings
+
+Commit `47ad48c9dcfe408e5de150fdb3a65d0f2111ee1f`, pushed, local == remote, clean tree. Scope:
+`adapter.ts`, `errors.ts`, `types.ts`, three test files, leaf journals. No `deno.lock`, no `docs/**`.
+
+Every ruling verified structurally rather than from the report:
+
+| Ruling | Verification |
+| --- | --- |
+| R1.6 single choke point | `notifyConnectionError` (`adapter.ts:34-47`) is the **only** code touching `options.onConnectionError` — grep returns three hits, all inside it |
+| R1.6 transaction placement | inner catch (~`421-424`) rejects `connectionReady` and rethrows **without notifying**; the outer `connectionLifecycle.catch` (`429-434`) is the sole observer. Constructor injection at `445` preserves the single-call-site property across the transaction boundary |
+| R1.1 classifier | `fatal === true \|\| errno 1040 \|\| errno 1203 \|\| code ∈ MYSQL_CONNECTION_ERROR_CODES`, gated behind `isDriverError`; `MySqlError.fatal?: boolean` at `errors.ts:17`; **not** root-exported |
+| R1.4/R3 probe | `notifyConnectionError(options, e)` fires **before** `return { supportsRelationJoins: false }`, so it lands before `connect()` resolves, fallback preserved |
+| R1.5 containment | callback in its own try/catch, failure to `debug`, never rethrown |
+| R1.3 | JSDoc states the predicate and names `isConnectionError`; no event listener added |
+| R2.3 | `src/mod.ts:40` still carries no `PrismaMySqlAdapter` |
+
+Gates re-run by me: `deno check` clean, `deno test` **46 passed / 0 failed**, `deno doc --lint`
+clean, `deno publish --dry-run` green.
+
+The test that carries the most weight is `connection_errors_test.ts:218-219`:
+`assertStrictEquals(withThrowingCallback, withoutCallback)` proves the primary rejection is the
+**same object** whether or not the callback throws. That is identity rather than shape, which is the
+only form of the assertion that can actually catch R1.5 being violated. Call counts are asserted
+exactly (0 and 1) with classifier-false negatives at the firing boundaries, so a blanket
+`onError`-override implementation — the design the ruling rejected — would fail these tests rather
+than pass them.
+
+**The point of the leaf is now discharged:** the option D-13 found published-but-dead since `0.0.6`
+actually fires, and a test fails if it stops.
+
+**S3 released** — example against `../mod.ts`, journals including the docs-owned staleness record,
+the four contracted receipts at the committed content head with sufficiency recomputed and the four
+files named, the evaluator's binding D7 raw-output condition, and the draft PR carrying
+**`Part of #1293`** with no closing keyword, box 1 marked "not discharged as worded" and box 4 marked
+blocked on #1112.
