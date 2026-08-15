@@ -51,3 +51,71 @@ comment `5227724542`, and the open #1466 — not against this topic's summary of
 Tier-A **PASS** at `2fa2f71dc`. Proceeding to exactly one separate native Claude Fable 5 · medium ·
 Remote Control PLAN-EVAL, artifact-only, bound to this head. No implementation before its PASS;
 #1348, #1466, and runtime untouched.
+
+---
+
+# Tier-A — S1 at `dc034d680b53c2845e9b82f73c6c709f2c51e2b3`
+
+| Field | Value |
+| --- | --- |
+| Head | `dc034d680b53c2845e9b82f73c6c709f2c51e2b3` — local == remote == PR, clean, draft, sole `status:plan` |
+| Commit | `dc034d680 fix(contracts): preserve exact base error map` |
+| Verdict | **PASS** |
+
+## Scope — exact
+
+`packages/contracts/src/application/contract-primitives.ts`,
+`packages/sdk/tests/readme-doctest_test.ts`, and five **existing** run artifacts. No seventh path, no
+`arch-debt.md`, no new file. Slice-2 files (`errors.ts`, `ports/service-client.ts`) and both docs
+pages are **untouched** — including `service-client.ts`, which is authorized for the leaf but belongs
+to slice 2.
+
+## The five advisories
+
+- **A1 — both REDs recorded.** `worklog.md:73` "Real-export fixture recorded TS18046 (`unknown`) and
+  TS2339 (`never`) **together in one structured run; not rerun for tidier output**", with the
+  structured `"code": "TS18046"` payload at `:109` and the expectation pinned at `:85` as "Exactly
+  TS18046 + TS2339 in one structured check". This was the sharpest advisory — the plan had expected
+  only TS2339 — and it is satisfied precisely, including the no-rerun discipline.
+- **A2 — no SDK zod mapping.** The SDK side of the diff adds **zero** `zod` lines; the fixture is
+  built from exported `@netscript/contracts` schemas. No seventh path.
+- **A3 — `SafeFailure` default untouched.** `errors.ts` and `service-client.ts` are not in the diff,
+  so the default type parameter is intact by construction; it is slice 2's to change.
+- **A4 — corrections stayed in existing artifacts.** Five existing run files edited, no new file
+  created.
+- **A5 — see observation below.**
+
+## Ownership boundary held
+
+`NetScriptProcedureMeta` appears **nowhere** in `packages/contracts/src` or `packages/sdk/src` — not
+defined, not exported, not depended on. The fourth generic is preserved as `Record<never, never>`
+(`contract-primitives.ts:116`, `:134`, `:166`), so later metadata is not erased while #1466 retains
+definition and export.
+
+## Gates — executed by this review
+
+| Gate | Result |
+| --- | --- |
+| check (`contracts` + `sdk`, 105 files) | 0 occurrences, 0 failed batches |
+| `readme-doctest_test.ts` | **2 / 0** |
+| `packages/contracts` + `packages/sdk` suites | **77 / 0** |
+
+## Non-blocking observation — A5 ticks
+
+Three PR boxes are ticked: `P0 research + concrete plan + design checkpoint — c7a6f3d32`,
+`P0a coordinator scope/ownership amendment — 2fa2f71dc`, and "Coordinator ruling is incorporated as
+the exact six-path ceiling with **no metadata-export branch**".
+
+All three are **process boxes carrying commit evidence**, and none claims metadata acceptance — the
+third asserts the *absence* of a metadata-export branch, which is the opposite of over-claiming. A5's
+purpose, keeping metadata acceptance for the coordinator's close-gate, is intact.
+
+Recorded because **my brief was stricter than the ruling**: A5 said "do not tick metadata boxes" and
+I hardened it to "tick nothing on the PR or on any issue". By that letter the author over-ticked; by
+A5's intent it did not. I am not failing Tier-A on my own over-hardening, and I flag it for the
+coordinator to untick if the close-gate wants a clean slate.
+
+## Outcome
+
+S1 Tier-A **PASS** at `dc034d680`. Slice 2 is not authorized by this review. No evaluator, no runtime
+lease, no #1348/#1466 mutation; PR draft at sole `status:plan`.
