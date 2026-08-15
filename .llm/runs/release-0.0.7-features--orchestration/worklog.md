@@ -2231,3 +2231,40 @@ does not catch a third being added — only set equality does), and assert the d
 literal appears **after** `<svc>Queries` per C1's ordering clause.
 
 S3 remains unrequested and undispatched pending a coordinator grant. No expensive gate, no lease.
+
+## 2026-08-15 — S2 Tier-A: `PASS` at `3669e9b8730dae3ef65b4dee02d5ce5770a467b7`
+
+Complete re-run on the immutable head. Every item verified by executing it, not by reading the
+author's report.
+
+| # | Item | Result |
+| --- | --- | --- |
+| 1 | Exact head | local == remote == PR #1664 == `3669e9b8730dae3ef65b4dee02d5ce5770a467b7`, tree clean, PR **draft** |
+| 2 | Fix scope | `route-templates_test.ts` + run artifacts only — no source, no `deno.lock`, no `docs/**` |
+| 3 | **Exhaustive import-set equality** | `route-templates_test.ts:388-394` extracts every `@netscript/sdk/*` specifier by regex, dedupes, sorts, and `assertEquals` against exactly `['@netscript/sdk/client','@netscript/sdk/query']` — **set equality**, so a third import fails |
+| 4 | **Forbidden bridge import** | `assert(!output.includes('bridgeInvalidation'))` at `:387` — any occurrence fails, not merely the import line |
+| 5 | **Literal ordering** | `assert(output.indexOf(invalidation) > output.indexOf(queries))` at `:408` — proves the invalidation is defined after `<svc>Queries`, C1's ordering clause |
+| 6 | C2 pre-write fix intact | `add-service.ts:70` still calls `validateServiceClientContracts` before `renderService` and any write, via the shared pass imported at `:15-18` |
+| 7 | Asset freshness | `check:assets-barrel` **exit 0**, clean tree after regeneration — re-ran the generator rather than trusting the diff |
+| 8 | **Full CLI suite** | `deno test --allow-all ./src/` → **598 passed, 0 failed**, reproduced independently; matches the author's reported count exactly |
+| 9 | Expensive gates | `scaffold.runtime` **NOT_RUN**, `fresh-browser` **NOT_RUN**, both recorded against the explicit lease boundary |
+
+C1 is now what it was always meant to be: an executable allowlist rather than a described property.
+The three assertions together are falsifiable in the three distinct ways the constraint can be
+violated — a new import added, the stale bridge import returned, or the literal emitted before the
+factory it derives from. Presence checks alone would have caught none of them.
+
+**Verdict: `PASS`.** Both findings from earlier rounds are closed. S2-F1 (Aspire writes before
+contract validation) was a real C2 violation caught by coordinator probe; S2-F2 (a test still
+asserting the pre-C1 contract) was caught only because the **full** suite was run rather than the
+targeted subset — the targeted suites were 24/24 green while the suite was red.
+
+### S3 authorization requested, not assumed
+
+S2 is complete and the PR is draft at exactly one `status:`. S3 covers the canonical island cache
+age, the browser fixture/task, and the two ruled package README notes
+(`packages/cli/README.md`, `packages/fresh/README.md`). Per the standing instruction, S3 is
+**requested** and will not be dispatched before a coordinator grant.
+
+Still withheld and unrequested: the expensive-gate lease. Both gates remain `NOT_RUN` and run only
+serially under one coordinator-granted lease, after all cheap gates and a pre-gate Tier-A.
