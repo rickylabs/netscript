@@ -645,3 +645,8 @@ application/AppHost/DCP, browser, relevant port, or competing lease owner. #1665
 normalized to shipped and #1668 owns its unrelated export-corpus follow-up. The coordinator remains
 GPT-5.6-SOL/high over Codex Remote Control, never max; all existing native Claude topic supervisors
 and #1651's accepted keep-and-narrow adapter boundary are preserved.
+
+At 16:49Z, #1666 advanced to one active formal PLAN-EVAL (`68c31fcc`, Fable 5/medium Remote
+Control) after fresh Tier-A PASS at topic `d5f5ea55a`. #1461 is now draft PR #1669 at plan head
+`7e5be1514`; fixes Tier-A must require a pre-implementation amendment for the duplicate false
+live-dashboard cache-refresh claim and reconcile the doc-lint baseline before evaluator dispatch.

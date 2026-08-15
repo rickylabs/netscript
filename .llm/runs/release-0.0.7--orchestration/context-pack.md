@@ -519,3 +519,11 @@ Aspire/Docker cleanup plus empty-host audit; only on PASS run catalog-backed `fr
 serially, then browser/runtime cleanup and final audit. No evaluator before both runtime gates and
 topic reconciliation. Coordinator route remains GPT-5.6-SOL/high through Codex Remote Control,
 never max. Preserve every native Claude topic supervisor and the #1651 option-1 adapter boundary.
+
+Newer checkpoint `2026-08-15T16:49:14Z`: #1666 Tier-A PASS is pushed at topic `d5f5ea55a` and its
+single authorized native Fable 5/medium Remote Control PLAN-EVAL is active as job `68c31fcc`, bridge
+`cse_01DcmCJnvESF3a4nVDvUR8u8`, source `a3f6b87b5`, artifact-only. #1461 opened draft PR #1669 at
+plan head `7e5be1514`; before PLAN-EVAL, fixes Tier-A must reconcile the raw doc-lint count and amend
+scope to include the second demonstrably false cache-refresh claim at
+`docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md`. No product mutation yet. #1664
+continues to own the only runtime lease and is running scaffold first.

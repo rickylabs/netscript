@@ -590,3 +590,8 @@ implementation thread.
   one-off terminal probes cannot fail a future CI run. Empty/malformed reasons, unknown coverage
   modes, invented symbols, and omitted symbols must remain persistent assertions even though that
   adds one test-only file to the originally frozen surface.
+- **A corrected example must close its duplicate prose claims:** #1461's exact stale-loader snippet
+  lives in `services-sdk/sdk.md`, but the live-dashboard tutorial separately says a pure
+  `getCachedEntry` read refreshes stale data in the background. Regenerating the same four mirrors
+  while knowingly leaving that second false claim would preserve user-facing drift. The exact
+  tutorial source is a justified plan amendment, not a later cleanup.

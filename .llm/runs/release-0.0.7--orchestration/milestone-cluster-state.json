@@ -73,7 +73,7 @@
         "pid": 23955,
         "bridgeSessionId": "session_01HqFtKQtyJcHBEn1MghQdFX",
         "remoteControlUrl": "https://claude.ai/code/session_01HqFtKQtyJcHBEn1MghQdFX",
-        "topicHeadSha": "f96e4f78720300288f02ff312792305e018d949d",
+        "topicHeadSha": "d5f5ea55a218fa4b482a90d11f6b5c86e7e324de",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle"
@@ -998,11 +998,20 @@
       "branch": "fix/reference-export-drift-gate",
       "worktree": "/home/codex/repos/netscript-007-reference-export",
       "prNumber": 1666,
-      "implementationState": "coordinator_scope_amendment_pushed_awaiting_fresh_tier_a_before_plan_eval_cycle_1",
+      "implementationState": "scope_amendment_tier_a_pass_plan_eval_cycle_1_active",
       "planHeadSha": "9d0b4bf128ba52fcd52091ba50590661d09470c1",
       "scopeAmendmentHeadSha": "a3f6b87b599e778db950daf6ccaecd847c088d19",
-      "tierAPlanState": "REVIEW_REQUIRED_AT_AMENDED_HEAD",
-      "planEvaluationState": "authorized_after_fresh_tier_a",
+      "tierAPlanState": "PASS",
+      "tierAPlanHeadSha": "a3f6b87b599e778db950daf6ccaecd847c088d19",
+      "tierAPlanTopicCheckpointSha": "d5f5ea55a218fa4b482a90d11f6b5c86e7e324de",
+      "tierAPlanFinding": "amendment-only diff, existing refusal test 1/0, persistent tenth-path contract coherent, central contract drift named, docs build remains binding; fresh-browser waiver accepted with rendered-reference-page risk explicitly recorded",
+      "planEvaluationState": "active_cycle_1",
+      "planEvaluatorAgentId": "68c31fcc-f93b-496f-8c0b-10e6736dded7",
+      "planEvaluatorBackgroundAgentId": "68c31fcc",
+      "planEvaluatorBridgeSessionId": "cse_01DcmCJnvESF3a4nVDvUR8u8",
+      "planEvaluatorRoute": "native claude-fable-5 / medium / Remote Control",
+      "planEvaluationSourceHeadSha": "a3f6b87b599e778db950daf6ccaecd847c088d19",
+      "planEvaluationGrantedAt": "2026-08-15T16:46:12.000Z",
       "authorizedAdditionalSurface": [
         ".llm/tools/docs/check-exports-drift_test.ts"
       ],
@@ -1316,12 +1325,15 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "3e8e146a4aedf8ee0afec15c83ddaefc171c71f9",
+      "currentPrHeadSha": "7e5be1514e33a0b88d53da523b73a5d330b06674",
       "issueNumbers": [1461],
       "implementerAgentId": "01a00646-82a9-7ec2-88e7-16dea98a58fa",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/sdk-cached-entry-swr",
       "worktree": "/home/codex/repos/netscript-007-leaf-cached-entry",
-      "implementationState": "research_and_bounded_plan_active_no_product_mutation",
+      "prNumber": 1669,
+      "implementationState": "research_and_plan_pushed_draft_pr_awaiting_topic_tier_a_and_scope_ruling_no_product_mutation",
+      "planHeadSha": "7e5be1514e33a0b88d53da523b73a5d330b06674",
       "dispatchTopicHeadSha": "f9bb928cedeaf91174db4e70f877143028481232",
       "planGate": "research and contract decisions only; resolve the stale docs paths, choose the supported API boundary, open one draft PR, and stop before implementation; PLAN-EVAL is required",
       "acceptanceFocus": "prove stale-while-revalidate with exactly one refresh for concurrent stale readers while carrying the four-link generated-doc asset cascade and known #1667/#1668 reds",
@@ -2300,6 +2312,28 @@
       "evaluatorCommitSha": "c415daad2af38690c6195b02c4e949bdc8c8ae6c",
       "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1663#issuecomment-5302030430",
       "ownerBoundary": "two ordinary PLAN-EVAL failures exhausted; one exceptional third and final fresh native claude-fable-5 / medium / Remote Control PLAN-EVAL requires explicit owner authorization"
+    },
+    {
+      "id": "reference-export-drift-gate-plan-eval-cycle-1",
+      "state": "active",
+      "lane": "internals",
+      "leafId": "reference-export-drift-gate",
+      "phase": "plan-eval",
+      "cycle": 1,
+      "sourceHead": "a3f6b87b599e778db950daf6ccaecd847c088d19",
+      "evaluatorAgentId": "68c31fcc-f93b-496f-8c0b-10e6736dded7",
+      "backgroundAgentId": "68c31fcc",
+      "bridgeSessionId": "cse_01DcmCJnvESF3a4nVDvUR8u8",
+      "remoteControlUrl": "https://claude.ai/code/session_01DcmCJnvESF3a4nVDvUR8u8",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-fable-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-15T16:46:12.000Z",
+      "evaluationFocus": "SA-1 tenth-path durable refusal coverage, truthful coverage accounting, generated reference/docs build chain, public SDK and workflow wiring, explicit browser waiver risk, #1666-before-#1533 sequencing, and strict artifact-only scope"
     }
   ],
   "expensiveGates": [
@@ -2406,5 +2440,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T16:43:09.204Z"
+  "updatedAt": "2026-08-15T16:49:14.337Z"
 }

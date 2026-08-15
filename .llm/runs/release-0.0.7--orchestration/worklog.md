@@ -896,3 +896,18 @@
   fresh Tier-A/PLAN-EVAL. Fixes #1461 is active on its original/new Sol/medium author in
   research/plan-only mode. PR #1665 and its five closed issues have sole `status:shipped`; follow-up
   export-corpus debt is tracked by #1668.
+
+## 2026-08-15T16:49:14Z — #1666 enters formal plan evaluation; #1461 plan surfaces a second stale claim
+
+- Internals independently passed Tier-A on #1666 amended head `a3f6b87b5` and pushed topic
+  checkpoint `d5f5ea55a`. Separate evaluator job `68c31fcc`, bridge
+  `cse_01DcmCJnvESF3a4nVDvUR8u8`, is verified native Claude Fable 5/medium Remote Control and active
+  artifact-only over that exact head. The rendered reference page makes the browser waiver a named
+  risk, not evidence of absence; docs build/source gates remain binding and fresh-browser remains
+  truthfully NOT_RUN.
+- Fixes author pushed plan-only head `7e5be1514` and opened draft PR #1669 for #1461. It chooses the
+  existing callable action plus metadata read rather than a new public API and plans real overlapping
+  stale-reader proof plus the known four-link generated-asset cascade. Coordinator audit also found
+  the same false background-refresh claim in
+  `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md`; that exact path requires a
+  scope amendment before implementation so the leaf does not knowingly leave duplicate stale prose.
