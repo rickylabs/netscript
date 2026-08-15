@@ -549,11 +549,17 @@
       "phase": "evaluating",
       "baseBranch": "main",
       "headSha": "12276e6d86403ed1340ef79a963e87d401d643e9",
-      "currentPrHeadSha": "04d431028c1fe455dc18c05e3fa0779e7b593046",
+      "currentPrHeadSha": "0e302ad3a5915b7a820adcac0a9d5bdc2d7d0019",
       "evaluatorCommitSha": "3e0c8858b4a2552926d2965b62cbcc97a15c2935",
       "evaluationVerdict": "PASS",
-      "implementationEvaluationVerdict": null,
+      "implementationEvaluationVerdict": "PASS_CONDITIONAL",
       "implementationEvaluatorAgentId": "2a8cf0a6-7529-4ca6-97ce-69edcca3f84d",
+      "implementationEvaluatorCommitSha": "0e302ad3a5915b7a820adcac0a9d5bdc2d7d0019",
+      "ownerMergeHold": {
+        "commentId": 5300440887,
+        "reason": "independent duplicate and overlap audit required against rfcs/0003-command-composition-kit.md",
+        "state": "running"
+      },
       "issueNumbers": [1502],
       "implementerAgentId": "019ffcc5-d3e1-7c13-9815-e9956ec43683",
       "evaluatorAgentId": "28cc8106-967b-4fb7-90f3-dd95054ae953",
@@ -743,7 +749,7 @@
     },
     {
       "id": "quality-scan-allowance-rail-impl-eval",
-      "state": "running",
+      "state": "complete",
       "lane": "internals",
       "leafId": "quality-scan-allowance-rail",
       "phase": "impl-eval",
@@ -781,7 +787,10 @@
         "remoteControlRequired": true
       },
       "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-15T03:50:58.194Z"
+      "grantedAt": "2026-08-15T03:50:58.194Z",
+      "completedAt": "2026-08-15T04:05:30.689Z",
+      "verdict": "PASS_CONDITIONAL",
+      "evaluatorCommitSha": "0e302ad3a5915b7a820adcac0a9d5bdc2d7d0019"
     }
   ],
   "expensiveGates": [

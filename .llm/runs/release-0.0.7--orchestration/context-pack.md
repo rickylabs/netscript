@@ -64,7 +64,9 @@ E2E/Aspire gate needs it.
 
 Completion supervision resumed at `2026-08-15T03:46:43Z`. The live continuation point is no longer
 the reset-gate table above: docs S2 is active after exact pinned-input provisioning; internals #1653
-and features #1651 are in fresh Opus 5/high IMPL-EVAL sessions `430d5f91-…` and `2a8cf0a6-…`;
+is in fresh Opus 5/high IMPL-EVAL session `430d5f91-…`; features #1651's session `2a8cf0a6-…`
+ended conditional `PASS` at `0e302ad3a`, but owner comment `5300440887` supersedes readiness and
+requires the active delegated RFC-0003 duplicate/overlap audit;
 fixes #1654 repaired Tier-A finding T-1 at `ebad68c80`, and now holds the singleton slice-6
 `scaffold.runtime` lease granted only after empty Aspire/Docker/central-lease preflight. Keep the coordinator turn active through those
 terminal results and subsequent merge-readiness decisions. A supervisor's parked checkpoint is

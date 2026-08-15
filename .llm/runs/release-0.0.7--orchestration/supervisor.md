@@ -216,7 +216,7 @@ topic:
 | docs | S2 resumed on original Codex thread `019ffcc9-16c2-…` after coordinator provisioned exact immutable EIS-Chat input `5191de83` at `/home/codex/repos/eis-chat-007-input` |
 | internals | #1653 fresh IMPL-EVAL running in Opus 5/high session `430d5f91-a073-…`, bridge `session_01NFwTgbof8vAYdg9wex15fM`, source `2d5e4f5ae` |
 | fixes | T-1 bounded MSSQL regression repair resumed on original Codex thread `019ffcca-8be0-…`; slice 6 and its singleton lease remain pending |
-| features | #1651 fresh IMPL-EVAL running in Opus 5/high session `2a8cf0a6-7529-…`, bridge `session_01Y48WxcCgzUAWfJmGmhBykc`, source `04d431028` |
+| features | #1651 IMPL-EVAL ended conditional `PASS` at `0e302ad3a`; owner comment `5300440887` now holds merge/readiness pending a fresh delegated RFC-0003 duplicate/overlap audit |
 
 Neither formal evaluator consumes the global expensive-gate mutex. At `2026-08-15T04:02:33Z`,
 fixes T-1 passed Tier-A at `ebad68c80`; a clean `aspire ps`/Docker/central-state preflight then
