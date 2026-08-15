@@ -1341,3 +1341,29 @@ exported connected-adapter contract satisfies the stated need. Rewording box 1 i
 edit. This does **not** block the product PR — split-close already keeps #1293 open — but the board
 will carry a box that is deliberately unticked for a reason that is not "unfinished work", and that
 should be recorded by whoever owns the issue text.
+
+### Plan amendment verified; S1 released
+
+Amended plan head `feb8b0355215e7282b87787117dc5c244653250d`, pushed, local == remote, clean tree.
+I checked all four required items against the file rather than accepting the author's report:
+
+| Required item | Verified at |
+| --- | --- |
+| D9 = R1.1–R1.3, R1.5–R1.8 | `plan.md:105` — classifier, single choke point, preserved rejections, containment |
+| D10 = R2.1–R2.4 | `:106` — Choice B, connected-adapter contract retained, module-local class export for tests, "box 1 not discharged as worded" |
+| D11 = R1.4/R3 | `:107` — probe notifies per D9 and preserves the conservative fallback |
+| `executeScript` in S2's boundary list | `:129-130`, `:198` |
+| Raw doc-lint / dry-run evidence obligation | `:237` |
+| Box 1 marked not discharged as worded, with escalation stated | `:245` |
+
+The summaries are faithful rather than weakened — D10 carries the `surface:diff` prohibition and the
+escalation, not just "Choice B". Nothing sent back.
+
+**S1 released** to the same author thread `01a0048f-…`, serially. Scope: Choice B export map, the
+R2.4 module-scoped test seam with no root re-export, all six `private-type-ref` repairs, explicit
+`provider`/`adapterName` annotations, and **raw** doc-lint and dry-run output recorded rather than
+summarised. `surface:diff` showing a `PrismaMySqlAdapter` root export is drift against R2.3 and a
+stop-and-report, explicitly not something to paper over by adjusting the diff.
+
+S2 (classifier, notifier, `isConnectionError`, the `fatal` field) is withheld and released separately
+after the S1 Tier-A stop.
