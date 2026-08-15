@@ -772,3 +772,11 @@ suite-owned `scaffold.runtime`, preserve the exact result, clean/audit, and run 
 if scaffold passes, followed by final cleanup/audit; no evaluator yet. #1666's native Fable 5/medium
 Remote Control IMPL-EVAL is active as `3882ca70`, bridge `cse_013RnnFDtHQhEbFhJCLbkEsD`. #1669's
 author has applied the exact approved one-line predicate correction and remains bounded to S2.
+
+At 18:41Z, #1666 cycle-1 IMPL-EVAL is terminal `FAIL_FIX` at `4c09e9203`, comment `5303665087`.
+The evaluator proved three of four refusal tests are non-discriminating: a missing fixture path can
+stand in for reason/mode refusal, and OMITS can mask INVENTS. Checker behavior and all other ten
+judgments hold. Internals topic `3c8db8178` recovered the same original Sol/medium author on exactly
+the already-authorized test path. Require specific refusal-cause assertions, a real fixture, no
+INVENTS/OMITS masking, four mutation reds, all seven receipts re-cut at one head, and fresh Tier-A
+before one cycle-2 IMPL-EVAL. No product or workflow repair, runtime lease, or #1663 mutation.

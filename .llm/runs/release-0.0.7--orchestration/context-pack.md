@@ -646,3 +646,11 @@ second cleanup/audit. #1666 IMPL-EVAL is active under native Fable 5/medium Remo
 `3882ca70-7857-46ca-aa24-8b1ae2664516`, bridge `cse_013RnnFDtHQhEbFhJCLbkEsD`, artifact-only over
 implementation `47ca22abe` and evidence `d095c1260`. #1669 has applied exactly the approved predicate
 correction while its two docs pages and query-factory test remain in the bounded S2 author turn.
+
+Newer transition `2026-08-15T18:41:18Z`: #1666 cycle-1 IMPL-EVAL returned `FAIL_FIX` at
+`4c09e9203`, comment `5303665087`, with exactly one test-quality defect. Three refusal tests can pass
+for an unrelated NotFound or a masking OMITS result; the checker itself and every other re-derived
+judgment hold. Internals topic `3c8db8178` returned only the authorized test path to the same original
+Sol/medium author, requiring specific-cause assertions, four independent mutation reds, and all seven
+receipts re-cut on one new head before fresh Tier-A and cycle-2 IMPL-EVAL. #1664 attempt-4 runtime
+continues independently under its immutable lease; #1669 S2 continues independently.

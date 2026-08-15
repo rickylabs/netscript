@@ -1131,3 +1131,17 @@
   `3882ca70-7857-46ca-aa24-8b1ae2664516`, bridge `cse_013RnnFDtHQhEbFhJCLbkEsD`, judging immutable
   implementation `47ca22abe` plus evidence `d095c1260` artifact-only. #1669 has made exactly the
   approved one-line `!isFresh` predicate correction and continues the bounded S2 completion.
+
+## 2026-08-15T18:41:18Z — #1666 IMPL-EVAL finds one durable-test defect
+
+- #1666 cycle-1 IMPL-EVAL is terminal `FAIL_FIX` at evaluator commit `4c09e9203`, comment
+  `5303665087`. The evaluator mutation-tested all four refusal assertions: OMITS is discriminating,
+  but reason, mode, and INVENTS can stay green because a fixture `NotFound` or a simultaneous OMITS
+  error supplies the same nonzero result. The checker behavior and every other acceptance, scope,
+  receipt, baseline-red, pin, lock, wiring, and waiver judgment independently hold.
+- Internals topic `3c8db8178` returned the exact already-authorized test path to the same original
+  Sol/medium author. The repair must assert each specific refusal cause, use a real fixture directory,
+  prevent OMITS from masking INVENTS, mutation-prove all four named tests fail independently, re-cut
+  all seven receipts at one new immutable head, and stop for fresh Tier-A before cycle-2 IMPL-EVAL.
+  No product, checker, workflow, runtime, merge, label, ready, issue, or central-scope mutation is
+  authorized.

@@ -991,14 +991,14 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
-      "currentPrHeadSha": "d095c1260a2474f3ae16cd5b17f3bfcbbada9c94",
+      "currentPrHeadSha": "4c09e9203afee52b43c10dfa1246eb0473ad7e40",
       "issueNumbers": [1296],
       "implementerAgentId": "01a005d2-7c9d-7dd1-b6fc-531b72dc14e4",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/reference-export-drift-gate",
       "worktree": "/home/codex/repos/netscript-007-reference-export",
       "prNumber": 1666,
-      "implementationState": "s3_evidence_fresh_tier_a_pass_impl_eval_active_artifact_only",
+      "implementationState": "impl_eval_cycle1_fail_fix_test_only_f1_same_author_repair_active",
       "planHeadSha": "9d0b4bf128ba52fcd52091ba50590661d09470c1",
       "scopeAmendmentHeadSha": "a3f6b87b599e778db950daf6ccaecd847c088d19",
       "tierAPlanState": "PASS_SA2",
@@ -1060,7 +1060,7 @@
           "validation": "seven unique PASS receipts recompute SUFFICIENT at immutable source head; 4203/0 root tests, 2924-file check, honest Contracts 9 and Fresh UI 123 doc-lint reds, exact pins/JSR findings, ten changed implementation paths within thirteen, lock blob identical, all prohibited/runtime gates NOT_RUN"
         }
       },
-      "implementationEvaluationState": "active_fresh_fable5_medium_remote_control",
+      "implementationEvaluationState": "complete_fail_fix_cycle_1_bounded_test_repair_active",
       "implementationEvaluationSourceHeadSha": "47ca22abe94b9d2e54d3778edc8944094b227886",
       "implementationEvaluationEvidenceHeadSha": "d095c1260a2474f3ae16cd5b17f3bfcbbada9c94",
       "implementationEvaluatorAgentId": "3882ca70-7857-46ca-aa24-8b1ae2664516",
@@ -1069,6 +1069,13 @@
       "implementationEvaluatorRoute": "native claude-fable-5 / medium / Remote Control",
       "implementationEvaluationGrantedAt": "2026-08-15T18:25:26.499Z",
       "implementationEvaluationScope": "artifact-only verdict over immutable implementation 47ca22abe and evidence d095c1260; only impl-eval.md plus one structured PR comment; no product mutation, merge, ready flip, relabel, issue close, runtime lease, or repair",
+      "implementationEvaluationCompletedAt": "2026-08-15T18:38:01.455Z",
+      "implementationEvaluationVerdict": "FAIL_FIX",
+      "implementationEvaluatorCommitSha": "4c09e9203afee52b43c10dfa1246eb0473ad7e40",
+      "implementationEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1666#issuecomment-5303665087",
+      "implementationEvaluationFinding": "three of four committed refusal tests are non-discriminating: NotFound can substitute for reason/mode refusal and OMITS can mask INVENTS; checker behavior and all other acceptance rows independently hold",
+      "implementationRepairScope": "same original Sol/medium author; exactly .llm/tools/docs/check-exports-drift_test.ts plus existing run artifacts; assert specific refusal causes, use a real fixture directory, prevent OMITS masking INVENTS, mutation-prove all four tests red independently, then re-cut all seven receipts at one new immutable head and stop for fresh Tier-A",
+      "implementationRepairTopicCheckpointSha": "3c8db8178eb227e87c1ad72c8ccccdafb60c7a40",
       "expensiveGateContract": "no runtime lease; scaffold.runtime and fresh-browser are matrix n/a for this checker/docs/JSDoc/task/workflow-only leaf",
       "receiptRefs": []
     },
@@ -2535,6 +2542,34 @@
       "verdict": "PASS",
       "evaluatorCommitSha": "d555cc9719fc81b7b5d6656471132c1a921fd5cf",
       "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1669#issuecomment-5303412171"
+    },
+    {
+      "id": "reference-export-drift-gate-impl-eval-cycle-1",
+      "state": "complete",
+      "lane": "internals",
+      "leafId": "reference-export-drift-gate",
+      "phase": "impl-eval",
+      "cycle": 1,
+      "sourceHead": "47ca22abe94b9d2e54d3778edc8944094b227886",
+      "evidenceHead": "d095c1260a2474f3ae16cd5b17f3bfcbbada9c94",
+      "evaluatorAgentId": "3882ca70-7857-46ca-aa24-8b1ae2664516",
+      "backgroundAgentId": "3882ca70",
+      "bridgeSessionId": "cse_013RnnFDtHQhEbFhJCLbkEsD",
+      "remoteControlUrl": "https://claude.ai/code/session_013RnnFDtHQhEbFhJCLbkEsD",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-fable-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-15T18:25:26.499Z",
+      "completedAt": "2026-08-15T18:38:01.455Z",
+      "evaluationFocus": "issue 1296 acceptance, durable fail-closed refusal coverage, truthful per-package accounting, Contracts/Fresh UI reference truth, single-execution discoverability wiring, JSR/pins/baseline reds, scope/lock, seven-receipt sufficiency, and NOT_RUN waiver honesty",
+      "verdict": "FAIL_FIX",
+      "evaluatorCommitSha": "4c09e9203afee52b43c10dfa1246eb0473ad7e40",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1666#issuecomment-5303665087",
+      "blockingFinding": "three refusal tests pass for an unrelated NotFound or masked OMITS cause; repair is test-only on an already-authorized path and all other re-derived judgments hold"
     }
   ],
   "expensiveGates": [
@@ -2708,5 +2743,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T18:30:23.000Z"
+  "updatedAt": "2026-08-15T18:41:18.000Z"
 }

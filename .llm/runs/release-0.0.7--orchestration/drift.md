@@ -650,3 +650,7 @@ implementation thread.
   4 is authorized only at evidence `1263f655b`, whose parent content is `fda78ee43` and whose four
   binding receipts plus final Tier-A are already pushed. The clean-host preflight precedes the grant,
   so any subsequent head movement invalidates the lease before runtime execution.
+- **Nonzero is not proof of the named refusal:** #1666's committed policy tests initially asserted
+  only exit 1. A missing fixture could produce that exit after the reason/mode branch was removed,
+  and OMITS could preserve it after INVENTS was removed. Durable negative tests must assert the
+  specific cause and mutation-prove that removing only that branch makes the named test red.
