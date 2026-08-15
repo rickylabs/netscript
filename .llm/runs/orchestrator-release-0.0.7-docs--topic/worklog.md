@@ -801,3 +801,51 @@ defined shape and no route was supplied for it. This lane will perform Tier-A it
 specifically against the two classes it missed: label-versus-published-evidence reachability, and
 mutability of every published evidence URL. The coordinator can redirect to a separate reviewer if
 that was the intent.
+
+## 2026-08-15 — formal IMPL-EVAL cycle 2 dispatched
+
+Pre-launch reconcile: local `HEAD`, `origin/docs/comparison-docs-programme`, PR head, and the
+coordinator's target SHA **all four** equal `c7ce58a19494024c219e9970deeb3ece878232d6`; tree clean.
+
+The cycle-1 evaluator `c6950ed9` was retired with `claude stop` before launch — it was `idle` with
+its artifact committed and verdict posted, so this is clean shutdown of finished work, not the
+killing of a live agent. Sessions attached to the leaf worktree afterwards: **0**. That makes the
+one-evaluator-per-topic invariant crisp and guarantees cycle 2 cannot reuse the cycle-1 session.
+
+### Evaluator identity
+
+| Field              | Value                                                                                                                                         |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Role               | formal IMPL-EVAL **cycle 2**, evaluated source `c7ce58a19494024c219e9970deeb3ece878232d6`                                                     |
+| Requested route    | native Claude · Opus 5 · effort **medium** · Remote Control · `bypassPermissions`                                                             |
+| Observed route     | `respawnFlags`: `--model claude-opus-5 --effort medium --remote-control --permission-mode bypassPermissions`                                  |
+| Route verdict      | **matched**                                                                                                                                   |
+| Claude session id  | `4ed649d5-9d62-4e24-a50a-081477607cee`                                                                                                        |
+| Background job id  | `4ed649d5`                                                                                                                                    |
+| PID                | `145190`                                                                                                                                      |
+| Exact cwd          | `/home/codex/repos/netscript-007-docs-comparison`                                                                                             |
+| `bridgeSessionId`  | `session_013RN66nBipHogdecXX4uZ9G`                                                                                                            |
+| Remote Control URL | `https://claude.ai/code/session_013RN66nBipHogdecXX4uZ9G`                                                                                     |
+| Family separation  | fresh session, opposite family to Codex author `019ffcc9-16c2-7573-b7f6-d627172408e8`, and distinct from retired cycle-1 evaluator `c6950ed9` |
+
+Brief delivery verified rather than assumed: `respawnFlags` contains no swallowed long string, and
+the transcript's first `type:"user"` record is 8,595 characters opening
+`use harness  # Formal
+IMPL-EVAL cycle 2` and containing the exact evaluated source.
+
+### Brief emphasis
+
+The evaluator is told this is cycle 2 of a two-failure limit, so a further `FAIL_*` escalates rather
+than loops — raising the cost of both a false pass and a false fail. It must re-check F1–F5 itself
+rather than inherit any account, and it is told explicitly that **this orchestrator's own cycle-1
+Tier-A missed F1 and F2**, so the repair review's conclusions are claims to test rather than
+findings to adopt.
+
+It is additionally pointed at the sequencing/provenance risk in concrete terms: verify that the SHA
+cited by the comments and by `nextjs-session.md` still contains the current manifest, via
+`git diff <cited-sha> c7ce58a19 -- docs/site/comparisons/evidence/`, and treat a non-empty diff as a
+finding. Provenance is generalized beyond F2 — every published claim must cite something immutable
+and reachable.
+
+Gates are the five cheap docs rows plus the three structured wrappers for the tool and its test. No
+Aspire, Docker, E2E, scaffold, lease, or write of any kind to the read-only external input.
