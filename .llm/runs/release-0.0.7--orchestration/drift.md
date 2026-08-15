@@ -694,3 +694,7 @@ implementation thread.
   GitHub, and passed a live acceptance-mirror dry-run before `ready_for_review`. This ordering avoids
   the label race observed on #1666 and keeps automatic phase evaluation from duplicating a completed
   native evaluator.
+- **Lifecycle probes may briefly create their own helper:** the #1664 attempt-5 preflight observed
+  `aspire ps []`, then caught the query's transient `aspire-managed nuget search` child in the same
+  instant. Lease decisions require a separate post-query process audit; that audit was empty. Do not
+  kill a healthy transient helper or mistake the command's own child for pre-existing runtime debt.

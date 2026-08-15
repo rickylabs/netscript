@@ -1265,3 +1265,17 @@
   `20b6370fdf3ed8491c30a052c75b6a6c33b529b4a278c8a39a6243847f47387e`.
 - Ready-for-review then created exact-head CI run `31904125478`. No issue box has yet been mutated and
   merge remains prohibited until the mirror, close-gate, required checks, and visibility are green.
+
+## 2026-08-15T19:39:00Z — #1664 attempt 5 receives the singleton runtime lease
+
+- Evidence `a8a160285` is clean/pushed and binds product `7fa29ad3e`; fresh features Tier-A passed at
+  topic `a4224dbb1`. The first and replacement test receipts each contain 4,248 total results:
+  4228/1/19 red before quarantine versus 4229/0/19 after it. Check, replacement test, publish dry-run,
+  and architecture receipts are the four selected PASS/SUFFICIENT gates; the original red remains.
+- Coordinator preflight proved local == remote == PR, `aspire ps []`, Docker zero, and no
+  AppHost/DCP/application/browser/runtime process or relevant listener. The `aspire ps` query briefly
+  spawned its own managed NuGet helper; a separate post-query audit proved it exited rather than
+  misclassifying it as a leak.
+- Attempt 5 owns the singleton lease. Run suite-owned `scaffold.runtime` exactly once, clean and audit,
+  then run `fresh-browser` only if scaffold passed and the audit is empty. Any red stops without a
+  retry or second expensive gate; evaluator/readiness remain prohibited.

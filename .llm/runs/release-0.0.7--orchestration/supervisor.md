@@ -851,3 +851,12 @@ issue-body SHA-256 `20b6370fdf3ed8491c30a052c75b6a6c33b529b4a278c8a39a6243847f47
 Only then was the PR marked ready. Exact-head CI run `31904125478` is active; merge and #1350 dispatch
 remain blocked until the real mirror, close-gate, required core checks, and generated closure are
 terminal green. This readiness action uses no runtime lease.
+
+At 19:39Z, #1664 F6 final Tier-A is `PASS` at topic `a4224dbb1`, pushed evidence `a8a160285` over
+product `7fa29ad3e`. The preserved red and replacement root-test receipts have the identical 4248
+total results: exactly one failure became a pass, with no removed or skipped test. All four selected
+receipts are PASS/SUFFICIENT. Coordinator preflight found local/remote/PR equality, a clean leaf,
+`aspire ps []`, Docker zero, no application/browser/runtime process or relevant listener; the
+query's transient `aspire-managed` helper exited before the post-query audit. Attempt 5 now owns the
+singleton runtime lease: `scaffold.runtime` once, cleanup/audit, then `fresh-browser` only on PASS,
+followed by final cleanup/audit. Any red stops; no evaluator or retry is authorized.

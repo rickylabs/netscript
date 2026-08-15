@@ -1570,7 +1570,7 @@
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "f6_first_binding_test_red_preserved_environment_quarantined_attempt2_active",
+      "implementationState": "f6_tier_a_pass_attempt5_singleton_runtime_lease_active",
       "dispatchTopicHeadSha": "0d0ba1b7a404c847acba2daed40c69d282906f69",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
@@ -1749,7 +1749,15 @@
           "f6FirstEvidenceHeadSha": "4c7792f2094a0f2e2e4b23fa7ebde62f7eeb3205",
           "f6FirstReceiptState": "check PASS; root test FAIL preserved at 4228 passed / 1 failed / 19 ignored because the repo scanner reached a root-owned ignored attempt-4 Postgres data directory",
           "f6EnvironmentalDisposition": "the exact ignored tree .llm/tmp/cli-e2e/plugin-smoke-20260815-203755 was recoverably moved to /tmp/netscript-f6-quarantine.7kXcDX; Docker and owning processes were absent; the original red receipt remains append-only",
-          "attempt4Next": "run distinct f6-test-attempt2 at unchanged content 7fa29ad3e after quarantine; only on PASS continue publish-dry-run and arch-check, recompute sufficiency, commit/push/comment, and stop for fresh Tier-A before any attempt-5 runtime lease"
+          "f6FinalEvidenceHeadSha": "a8a160285d4f9bddb95a5dac6cfbde85e1265ebc",
+          "f6ReplacementReceiptState": "PASS and SUFFICIENT: check, test-attempt2 4229/0/19, publish-dry-run, and arch-check all bind unchanged product 7fa29ad3e; preserved test red is superseded-only with identical 4248 total results",
+          "f6FinalTierAState": "PASS",
+          "f6FinalTierATopicCheckpointSha": "a4224dbb1",
+          "attempt5LeaseState": "active_singleton_runtime_lease",
+          "attempt5LeaseGrantedAt": "2026-08-15T19:39:00.000Z",
+          "attempt5EvidenceHeadSha": "a8a160285d4f9bddb95a5dac6cfbde85e1265ebc",
+          "attempt5Preflight": "leaf clean and local == remote == PR; aspire ps []; Docker zero; zero AppHost/DCP/application/browser/runtime processes and relevant listeners; transient aspire-managed nuget helper from ps query exited before the post-query audit",
+          "attempt4Next": "attempt 5 scaffold.runtime runs once under the singleton lease; mandatory cleanup/audit; fresh-browser only after scaffold PASS and clean audit; any red stops without retry; evaluator remains prohibited"
         }
       },
       "planDecisionBoundary": "cycle 1 ruled direct emitted { queryKey: <svc>Queries.list.clientKey() } with no SDK overload; repair must lock generator-owned output paths, existing service generate overwrite/dry-run/force compatibility, package README homes, post-mutation request-count proof, per-slice paths, and qualified citations",

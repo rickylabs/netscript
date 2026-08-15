@@ -713,3 +713,9 @@ rows are current. Sole acceptance mapping comment `5303873817` covers all six li
 live mirror dry-run passed. `impl-eval:skip` and `status:ready-merge` were verified while draft before
 the ready flip, avoiding #1666's label race. Exact-head CI run `31904125478` is active. Do not merge
 or release the serial #1350 leaf until mirror/close-gate/required checks are terminal green.
+
+Newer lease `2026-08-15T19:39:00Z`: #1664 final F6 Tier-A passed at `a4224dbb1`; evidence
+`a8a160285` is clean/pushed over product `7fa29ad3e`, with four selected PASS/SUFFICIENT receipts and
+the environmental red preserved. Host preflight is empty after an explicit post-`aspire ps` audit.
+Attempt 5 owns the singleton runtime lease: one `scaffold.runtime`, cleanup/audit, `fresh-browser`
+only after PASS, then final cleanup/audit. Stop on any red; no retry or evaluator yet.
