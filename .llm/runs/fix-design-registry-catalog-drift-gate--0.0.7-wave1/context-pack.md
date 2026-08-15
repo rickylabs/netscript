@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-design-registry-catalog-drift-gate--0.0.7-wave1` |
 | Branch | `fix/design-registry-catalog-drift-gate` |
-| Current phase | `implement` |
+| Current phase | `gate — fresh-browser lease boundary` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `frontend` |
 
@@ -14,8 +14,9 @@
 
 The immutable base and branch identity are verified. Red research measured 66 live manifest items,
 50 generated gallery entries/declared total, 16 manifest-only names, and 0 catalog-only names. S1
-now projects all 66 authoritative items in order, declares total 66, and includes all eight ordered
-collection memberships. A semantic probe reports exact items/meta/collections with raw exit 0.
+projects all 66 authoritative items in order, declares total 66, and includes all eight ordered
+collection memberships. S2 adds the semantic live gate and named symmetric/field negative fixtures.
+All authorized non-browser gates pass; `fresh-browser` is the exact coordinator-lease boundary.
 
 ## Completed
 
@@ -27,17 +28,21 @@ collection memberships. A semantic probe reports exact items/meta/collections wi
 - Opened draft PR #1657 on bootstrap commit `c3f978f5a`, targeting `main`, with `Closes #1358`,
   milestone 0.0.7, correct taxonomy, one `status:plan`, and the S0 structured comment.
 - Completed the S1 template projection: 66 items, eight collections, exact metadata.
+- Completed S2's semantic drift comparator and live/negative gate: 5 focused tests and all 172
+  Fresh UI package tests pass.
+- Completed authorized check/lint/fmt, quality, architecture, JSR audit, exact-pin, and publish
+  dry-run gates with raw exit 0.
 
 ## In Progress
 
-- S1 bookkeeping, commit, explicit-refspec push, structured PR comment, and phase-label transition.
+- S2 bookkeeping, commit, explicit-refspec push, and structured PR comment.
 
 ## Next Steps
 
-1. Commit and push S1; post its exact raw-exit evidence and move the sole phase label to
-   `status:impl`.
-2. S2: add the semantic real/negative drift tests and run authorized gates.
-3. Stop at the `fresh-browser` lease boundary and hand off for Tier-A review.
+1. Commit and push S2; post its exact raw-exit evidence while retaining sole `status:impl`.
+2. Stop and obtain a fresh coordinator lease before running `fresh-browser`.
+3. Hand off to the topic orchestrator for substantive Tier-A review/sign-off, then the separately
+   owned opposite-family IMPL-EVAL.
 
 ## Key Decisions
 
@@ -53,20 +58,21 @@ collection memberships. A semantic probe reports exact items/meta/collections wi
 | --- | --- | --- |
 | `.llm/runs/fix-design-registry-catalog-drift-gate--0.0.7-wave1/*` | new | Coordinator thread identity preserved; mandatory harness artifacts added. |
 | `packages/cli/src/kernel/assets/app/routes/(design)/design/(_shared)/registry.ts.template` | changed | Complete ordered item/meta/collection projection. |
+| `packages/fresh-ui/tests/registry-doc-drift.test.ts` | changed | Semantic live comparison and named symmetric/field negative fixtures. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | S1 semantic projection green; structured gates pending S2 | 66/66, 0 missing/extra, exact eight collections, exit 0 |
-| Fitness | pending | `quality:scan`, `arch:check`, JSR audits planned |
+| Static | PASS | Focused 5/5, Fresh UI 172/172, CLI/Fresh UI checks, focused lint/fmt: exit 0 |
+| Fitness | PASS | `quality:scan`, `arch:check`, both JSR audits/publish dry-runs: exit 0 |
 | Runtime | lease-blocked | Aspire/Docker/E2E/browser not run |
-| Consumer | pending | static generated catalog then lease-gated browser proof |
+| Consumer | static PASS; browser lease-blocked | 66/66 items and 8/8 collections exact; `fresh-browser` not run |
 
 ## Open Questions
 
-- None for implementation. A fresh coordinator lease is required only when `fresh-browser` becomes
-  the remaining gate.
+- None for implementation. `fresh-browser` is now the remaining proving gate and requires a fresh
+  coordinator lease.
 
 ## Drift and Debt
 
