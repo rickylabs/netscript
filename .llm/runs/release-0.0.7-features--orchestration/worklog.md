@@ -4717,3 +4717,81 @@ now selects an executable that **runs**, and if it does not, it reports the exit
 stderr instead of a DevTools timeout.
 
 Lease released only after cleanup and an independent audit are proven.
+
+## 2026-08-15 — S5 attempt 6: red at 69/1/0; F7 proven, cause moves one layer deeper
+
+Leaf head `2385cdb72602c149c29cc637870ddca3db09e0cd`, local == remote. Lease record `ac1ec35cf`.
+
+| Field | Value |
+| --- | --- |
+| Executed checkout | `/home/codex/worktrees/netscript-s5-a6-ed3f78e0d`, HEAD `ed3f78e0d` — **the leased evidence head** |
+| Verdict | **FAIL**, raw exit 1, **69 passed / 1 failed / 0 skipped** |
+| Sole failed gate | `behavior.service-client-refetch` — child exited **143** after **900,030 ms** |
+| Raw log | `s5-attempt6-scaffold-runtime-20260815-205715.log`, SHA-256 `1bf8cb03…aaa0` |
+| NDJSON ledger | `…205715.ndjson`, SHA-256 `ffab7e7f…356` |
+| `fresh-browser` | **NOT_RUN** — correctly gated |
+
+The author ran from a **fresh detached checkout at the exact leased commit** because the leaf carried
+a `leak-report.md` timestamp change from preflight. It neither overwrote nor staged that file, and no
+commit occurred between grant and execution. That is the D-17 discipline applied without being told
+again.
+
+### F7 is proven — and this is the first attempt where selection is not in question
+
+The selector's own record:
+
+```json
+{ "path": "/home/codex/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome",
+  "source": "NETSCRIPT_E2E_BROWSER_EXECUTABLE",
+  "version": "Google Chrome for Testing 151.0.7922.34" }
+```
+
+`source` is the override, not a built-in candidate. So F7 works: the probe selected a real, runnable
+Linux Chromium and reported which source chose it. Requiring that evidence **regardless of verdict**
+is what makes this attempt informative rather than another opaque red.
+
+`generated.service-client-contract` (F4) and `generated.deno-fmt-check` (F5) both passed again.
+
+### What actually failed, stated without over-reading
+
+Exit **143** is `128 + 15` — SIGTERM at the suite's 900-second command boundary. The child did not
+crash; it ran fifteen minutes and was killed. Its stdout/stderr tails are **empty**.
+
+The author's framing is exactly right and I am not improving on it: attempt 6 proves F7 selected a
+valid explicit browser, and the gate still returns no mutation/refetch evidence before the boundary.
+The deeper cause is **unattributed pending review**. It is not relabelled as a product refetch failure
+and not called a pass.
+
+Note what changed and what did not: attempts 4 and 5 failed *before* the browser was usable — teardown
+threw, then the executable could not run. This is the first attempt where the browser genuinely
+launched and the gate still produced nothing. The frontier has moved from "can we start a browser" to
+"why does the refetch scenario produce no evidence in 900 s", which is a different question and needs
+its own measurement.
+
+### Cleanup and audit — the author applied D-18 itself
+
+Suite cleanup passed and removed three suite-created containers. The author then found three
+run-owned Aspire NuGet children (`896151`, `896186`, `896190`), revalidated them immediately before
+acting, cleared them with `SIGTERM`+`SIGCONT` with no `SIGKILL`, and left foreign Aspire MCP helpers
+untouched. Its **D-18 scan found one unreadable run-owned directory** —
+`…/plugin-smoke-20260815-225723/.data/postgres/18/docker` — and the whole generated project plus its
+suite log were **moved, not deleted**, to `/tmp/netscript-s5-a6-quarantine-20260815-4M9v8k/`.
+
+That is the standard I recorded three attempts ago after failing it myself, now applied by the author
+without prompting.
+
+**My independent audit:** `leak-check` aspire `ok`, docker `ok`, `survivors: []`; `docker ps -aq` = 0;
+D-18 residue scan clear; precise process sweep for `chrome-linux64|/dcp|AppHost` returns **0**; no
+process anywhere has a cwd under any `plugin-smoke-*` tree. All four quarantines intact:
+`f6`, `f7`, `preattempt6`, and `s5-a6`.
+
+A first `grep -ic` returned "3" with no way to see what matched; the precise listing showed zero. I
+re-checked rather than reporting either number — a count without identities is not a finding in
+either direction.
+
+**Lease released.** Cleanup and audit are proven.
+
+### Next
+
+Measured attribution of the 900-second no-evidence condition, then a plan-only amendment before any
+product mutation. No attempt 7, no `fresh-browser`, no evaluator, no readiness.
