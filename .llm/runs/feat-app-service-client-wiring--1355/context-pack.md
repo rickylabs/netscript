@@ -77,7 +77,10 @@ insufficient. Coordinator review accepted that red append-only and quarantined t
 recoverably: the repo source is absent and
 `/tmp/netscript-f6-quarantine.7kXcDX/plugin-smoke-20260815-203755` is present. The F5/F6 count delta
 (4,245 total to 4,248 total, with two additional passes) proves the new F6 tests execute and pass.
-Exactly one environment rerun is authorized at unchanged content head `7fa29ad3e`.
+The one environment rerun passed at unchanged content head `7fa29ad3e` with 4,229/0/19 across the
+same 4,248 results. Conditional publish and architecture gates then passed at that same head. The
+exact passing set uses `f6-test-attempt2` and is SUFFICIENT; the first `f6-test` remains a preserved
+superseded red outside that set.
 
 ## Completed
 
@@ -120,19 +123,18 @@ Exactly one environment rerun is authorized at unchanged content head `7fa29ad3e
 
 - F6 implementation is complete inside `service-client-browser-probe.ts` and
   `service-client-runtime-probe_test.ts`; no third path was required.
-- The focused deterministic suite passes 14/0. F6 `check` passes and F6 `test` fails only on the
-  permission-denied S5 workspace residue; the original red stays append-only. The coordinator has
-  moved that tree to a recoverable quarantine, and one `f6-test-attempt2` is pending at unchanged
-  content head `7fa29ad3e`; `publish-dry-run` and `arch-check` remain conditional on that pass.
+- The focused deterministic suite passes 14/0. The four-file F6 set (`check`, `test-attempt2`,
+  `publish-dry-run`, `arch-check`) passes at `7fa29ad3e` and recomputes SUFFICIENT. The original
+  permission-denied `f6-test` stays append-only as a superseded environmental red outside the set.
 - The attempt-4 raw failure remains append-only; refetch behavior is still unknown and no lease or
   expensive gate is authorized.
 
 ## Next Steps
 
-1. Commit and push the environmental attribution before the authorized rerun.
-2. Run exactly one distinct `f6-test-attempt2` at content head `7fa29ad3e`; stop on failure.
-3. Only on PASS, run fresh `publish-dry-run` and `arch-check`, recompute the exact four-file set
-   using `f6-test-attempt2`, then commit/push/comment and stop for Tier-A.
+1. Commit and push the three new receipts and recovery evidence.
+2. Post the amended `[PHASE: IMPL] [SLICE: F6]` receipt with the quarantine attribution, attempt-2
+   result, exact four-file passing set, and preserved superseded red.
+3. Stop for fresh Tier-A. Do not start an expensive gate, lease, evaluator, or new slice.
 
 ## Key Decisions
 
@@ -174,7 +176,7 @@ Exactly one environment rerun is authorized at unchanged content head `7fa29ad3e
 
 | Gate family | Current status                                                                                                                    | Evidence                     |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| Static      | F6 check PASS; F6 test FAIL at `7fa29ad3e` on permission-denied S5 runtime-workspace residue (4,228/1/19). Publish/arch NOT_RUN; exact-set sufficiency INSUFFICIENT. Earlier receipts remain preserved. | `receipts/f6-check.json`; `receipts/f6-test.json`; failure report |
+| Static      | F6 check, test-attempt2 (4,229/0/19), publish dry-run, and arch-check PASS at `7fa29ad3e`; exact four-file set SUFFICIENT. Original `f6-test` FAIL is preserved as superseded environmental evidence outside the set. | four named passing receipts; quarantine and recovery reports |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
 | Runtime     | Attempt 4 `scaffold.runtime` FAIL: 69 passed / 1 failed / 0 skipped; service-client contract and generated format PASS, leaf probe cleanup failed on an already-terminated browser child. Cleanup proven empty. | `reports/s5-attempt4-runtime-failure.md`; suite-owned raw log |
 | Consumer    | `fresh-browser` NOT_RUN because the attempt-4 runtime prerequisite failed; no catalog receipt exists. | S5 conditional contract |

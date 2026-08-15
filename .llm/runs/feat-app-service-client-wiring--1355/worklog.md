@@ -727,3 +727,24 @@ claimed in a later passing set. One distinct `f6-test-attempt2` may retest the e
 unchanged content head `7fa29ad3e`; if it fails, the sequence stops without a third attempt.
 
 Full attribution and quarantine details are in `reports/f6-environment-quarantine.md`.
+
+### F6 binding recovery — attempt 2 and exact-set sufficiency
+
+The sole authorized environmental rerun passed at unchanged content head `7fa29ad3e`:
+`receipts/f6-test-attempt2.json` (`app-service-client-wiring-f6-test-attempt2`) records 4,229 passed /
+0 failed / 19 ignored (4,248 total), exit 0, with matching `gitHead` and `actualGitHead`. The total
+still includes all three F6-added results; after quarantine they all pass. This confirms the first
+receipt's permission failure was environmental.
+
+The conditional downstream gates then ran serially at the same content head and passed:
+
+| Contracted receipt | Invocation ID | Outcome |
+| --- | --- | --- |
+| `receipts/f6-check.json` | `app-service-client-wiring-f6-check` | PASS / exit 0 — 2,944 files, 25 batches, zero diagnostics |
+| `receipts/f6-test-attempt2.json` | `app-service-client-wiring-f6-test-attempt2` | PASS / exit 0 — 4,229 passed, 0 failed, 19 ignored |
+| `receipts/f6-publish-dry-run.json` | `app-service-client-wiring-f6-publish-dry-run` | PASS / exit 0 |
+| `receipts/f6-arch-check.json` | `app-service-client-wiring-f6-arch-check` | PASS / exit 0 — zero doctrine failures |
+
+`evaluateEvidenceSet` over exactly those four named files reports **SUFFICIENT** with no reasons.
+The earlier `receipts/f6-test.json` remains preserved as a superseded red and is not part of this
+passing set. Full recovery evidence is in `reports/f6-binding-recovery.md`.
