@@ -596,3 +596,59 @@ covered natively. The `deno doc` rows are read-only public-surface inspection an
 
 Stop is after S3 for Tier-A, whose gate this orchestrator will re-execute; then the run stops for a
 separate opposite-family IMPL-EVAL that the leaf may not launch.
+
+## 2026-08-15 — Tier-A S3 sign-off: PASS. All approved slices complete.
+
+S3 terminal at `15429cf8487cfe3504ae0443fd435d2a72d4528b`; sign-off comment
+`issuecomment-5300735863`. Local, remote, and PR head all agree.
+
+### Gate re-executed by the orchestrator after the turn went idle
+
+| Row                               | Raw exit | Result                                                                    |
+| --------------------------------- | -------- | ------------------------------------------------------------------------- |
+| `docs/site verify`                | `0`      | 229 HTML files; 36,084 links across 229 pages resolve; 18 caveats resolve |
+| `docs:links`                      | `0`      | 103 docs; 0 broken links/anchors/orphans                                  |
+| `docs:accuracy`                   | `0`      | PASS; 201 source pages, 91/91 public commands                             |
+| `deno doc --filter definePage`    | `0`      | resolves                                                                  |
+| `deno doc --filter definePartial` | `0`      | resolves                                                                  |
+| `deno doc …/defer/mod.ts`         | `0`      | resolves                                                                  |
+| `git diff --check`                | `0`      | clean                                                                     |
+| lockfile guard vs `origin/main`   | `0`      | both unchanged                                                            |
+
+Link coverage rose from 34,980/226 at S2 to 36,084/229 — the three new pages, everything resolving.
+
+### The S1 → S3 assertion loop is closed with rendered proof
+
+Read directly from `_site/index.html` under Concepts: `/netscript/comparisons/`,
+`/netscript/comparisons/methodology/`, `/netscript/comparisons/nextjs-session/`,
+`/netscript/migration/`, and `/netscript/migration/nextjs/`. Both roots present. This is the exact
+assertion S1 could not satisfy from its own file list; deferring it to the owning slice was the
+right correction and it is now proven rather than asserted.
+
+### The anticipated divergence held its shape
+
+S3 touched nine files — the seven approved plus `drift.md` and `docs/site/_data.ts`. The `_data.ts`
+need was predicted in the dispatch brief before the slice ran, and the leaf recorded it at severity
+`significant` with no rescope and no scope growth. Predicting it in advance rather than catching it
+at review is the direct payoff of the five earlier defects.
+
+### Content verification
+
+Case page reports 94 physical / 92 nonblank, labelled `measured`, matching rewritten comment
+`5265826161` exactly; no superseded figure appears. Mechanism matrix is 8 columns × 8 rows with zero
+empty cells, exceeding the six the plan requires; aggregate table 6 × 6 complete; both migration
+pages link #1650. Input stayed clean at the pin through both the slice and the orchestrator's gate
+run.
+
+### Lane position
+
+All approved implementation slices (S1, S2, S3) plus the inserted E0 correction are complete and
+Tier-A signed off. The run stops here for the separate opposite-family IMPL-EVAL, which this
+orchestrator will not self-launch. Route per the reset dispatch policy: fresh native Claude,
+opposite-family to Codex author `019ffcc9-16c2-7573-b7f6-d627172408e8`, Remote Control attached,
+serialized within this topic, effort right-sized; Fable 5 not pre-dispatched and requiring a
+coordinator amendment.
+
+Two facts handed to that evaluator: `plan.md` was amended post-gate to record E0, so it differs from
+the artifact gated at `d35cbca30`; and five plan defects of one family were found and corrected
+during implementation, all recorded in the leaf's `drift.md`.
