@@ -258,3 +258,47 @@ Noted for IMPL-EVAL, not a slice defect: the slice-1 gate receipts record `actua
 parent `c694cfb311…`. That is the normal pre-commit gate pattern and matches the convention
 IMPL-EVAL already accepted on #1644 — receipts attest a process in a working tree at a commit, not
 tree cleanliness.
+
+## Tier-A sign-off — Slice 2
+
+Signed off by `topic-internals-0.0.7` (Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34`, Opus 5
+/ high) at implementation head `f869a5bfed83a09b67b0725b2679d0aa30ad491c`. Supervisor commit, not
+the implementer's; no lane self-certified.
+
+Verified by execution at the landed head, not from receipts:
+
+- **Scope holds.** Only `.llm/tools/quality/scan-code-quality.ts`, its focused test, and this run
+  directory changed. No `packages/**` or `plugins/**` edit, no `deno.json`/task change, no
+  `deno.lock` churn.
+- **The new rail is real and correctly bounded.** Slice 2 adds `public-any` and
+  `public-export-unresolved` alongside the pre-existing line-level `explicit-any` classifier. The
+  public/local separation is asserted as an **exact** finding set via `assertEquals` over
+  `rule:file:line`, with deliberate local controls in the fixture — `type Local`, `function local`,
+  `class LocalService`, `private hidden`, and a body-local `const hidden: any` inside an exported
+  function. A superset would fail the assertion, so local leakage into `public-any` cannot pass
+  silently.
+- **Focused suite re-run by the supervisor: 25 passed, 0 failed, exit 0.**
+- **`quality:gate` re-run by the supervisor at the landed head: exit 0, `ok:true`, `findings: []`,
+  `allowCount: 7`.** The `arch:check` output carries only pre-existing non-blocking F-5/F-6
+  `export default` WARNs.
+- **RED-first order holds** — `red-public-any.json` exit 1 across the public/local/re-export matrix,
+  then `focused-green-binding.json` exit 0.
+- **The lint FAIL → PASS sequence is a real fix, not a suppression.** `scoped-lint-committed-config`
+  exit 1 caught a pre-existing inline import specifier; the fix replaced
+  `import { relative, resolve } from 'jsr:@std/path@^1'` with
+  `import { dirname, relative, resolve } from '@std/path'`. No lint config, task, or `deno.json`
+  change accompanied it, and `scoped-lint-1` exit 2 was correctly refused as an empty-selection
+  false green rather than banked as a pass.
+- **No new suppressions in real code.** Every `any` / `as unknown as` added in this diff is a
+  fixture string literal inside `scan-code-quality_test.ts`, where sample violating code is the
+  scanner's own input by construction.
+- **The E1 lesson was applied.** Every slice-2 binding receipt records the signed Slice 1 parent
+  `3c398528996a715da8daebe04969e6aba90263e9`; none names a stash or any object outside branch
+  history.
+
+Carried to IMPL-EVAL, not a slice defect: `explicit-any` (broad, line-level) and `public-any`
+(export-graph reachability) now coexist. Their overlap and precedence is locked plan behaviour that
+PLAN-EVAL cycle 2 passed, but IMPL-EVAL should confirm the combination reports each violation once
+with the intended rule attribution rather than double-counting.
+
+Slice 3 is authorized.
