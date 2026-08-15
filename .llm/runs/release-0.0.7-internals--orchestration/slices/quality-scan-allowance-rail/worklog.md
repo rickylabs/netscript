@@ -351,3 +351,36 @@ PLAN-EVAL cycle 2 passed, but IMPL-EVAL should confirm the combination reports e
 with the intended rule attribution rather than double-counting.
 
 Slice 3 is authorized.
+
+## Tier-A sign-off — Slice 3
+
+Signed off by `topic-internals-0.0.7` (Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34`, Opus 5
+/ high) at implementation head `2977c8333b18a3b310342fd21726461717f56675`. Supervisor commit, not
+the implementer's.
+
+Verified by execution at the landed head:
+
+- **The Workers baseline claim is exact.** Supervisor re-ran `doc:lint --root plugins/workers`:
+  `totalErrors: 20`, `totalPrivateTypeRef: 20`, `totalMissingJSDoc: 0`, `totalOther: 0`, exitCode 1
+  across all 13 export targets. The leaf records it as `expected FAIL / accepted` and the PR comment
+  states **not green**. No diagnostic class was hidden and no green was claimed — the exact honesty
+  requirement for this baseline.
+- **The debt entry is complete and correctly scoped.** `workers-private-type-ref-1655` carries
+  Reason, Owner (`@netscript/plugin-workers` maintainers, #1655 in milestone 0.0.8), Target (resolve
+  without increasing or adding a diagnostic class first), and Linked plan. It states plainly that
+  hiding the diagnostics or claiming the audit green would make the publication evidence untruthful.
+- **The generated asset is genuinely regenerated, not hand-edited.** Supervisor re-ran
+  `deno task check:assets-barrel` (which runs `gen:assets-barrel` then `git diff --exit-code`): exit
+  0 with a clean worktree, so the committed asset is byte-identical to generator output. RED-first
+  held — `assets-red.json` exit 1 on the stale asset, `assets-green.json` exit 0 after.
+- **`quality:gate` re-run by the supervisor:** exit 0, `ok:true`, `findings: []`, `allowCount: 7`.
+- **Scope holds** — `arch-debt.md` and the generated asset are both in the leaf contract
+  `fileSurfaces`; plus this run directory. No lock churn.
+- **The E1 lesson held again.** Every slice-3 receipt names the signed Slice 2 parent
+  `f9acdb426d5438935ae75bee7dda987dbfe3d4cb`; none names a stash or non-history object.
+
+Supervisor note: an initial check of mine grepped for `private-type-ref` against output whose key is
+`privateTypeRef`, returning zero and briefly appearing to contradict the leaf's count. The pattern
+was wrong, not the evidence. Recorded so the corrected count is the one on record.
+
+Slice 4 is authorized.
