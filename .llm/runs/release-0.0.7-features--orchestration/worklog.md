@@ -3518,3 +3518,75 @@ at `ab78eaa35`. Nothing was misattributed — the product content head was uncha
 run artifacts only — but a lease names a head so that what ran is provably what was authorized, and a
 head that can advance between grant and execution downgrades that proof to a judgement. Standing rule
 adopted: every preflight artifact is committed and pushed before readiness is reported.
+
+## 2026-08-15 — F4 Tier-A: `PASS` at `6f813b0db35df38dcd9dc7f1ea333e997399fac0`
+
+local == remote == PR #1664 == `6f813b0db35df38dcd9dc7f1ea333e997399fac0`; tree clean; PR **draft**.
+Content head `7876aa109`; content→evidence delta is **evidence only**.
+
+### Amendment-first ordering held
+
+| Order | Commit | Role |
+| --- | --- | --- |
+| 1 | `b40616a81` | `chore(harness): bound F4 convergence proof` — the amendment, **before** any product mutation |
+| 2 | `7876aa109` | `test(cli): prove post-convergence idempotency` — the probe repair |
+| 3 | `6f813b0db` | `chore(harness): record F4 binding evidence` — receipts |
+
+The reasoning was committed before the repair, so it survives independently of the repair's outcome.
+
+### The repair is correctly placed and correctly asserted
+
+Scope: `e2e/src/application/gates/scaffold/service-client-runtime-probe.ts` and its new test, plus
+journals. **No generator, template, suite-order, manifest, SDK, Fresh, or public-surface change** —
+the product was never the defect, and it was not touched.
+
+The corrected contract, read from the code rather than the report: the probe accepts Aspire-helper
+convergence on the first post-plugin generate while still requiring 0 client writes and 2 skips,
+snapshots all owned client and Aspire output, immediately reruns the identical command, and requires
+zero clients, two skips, zero Aspire writes **and SHA-256 path/byte identity** against a second
+snapshot.
+
+**Byte-identity, not a zero count** — the distinction I insisted on. A count of zero is satisfiable by
+a no-op path that never compared anything; a SHA-256 comparison is not. This is the same shape as
+S2's non-invocation-proving stub, where a plain file-absence check would have passed for the wrong
+reason.
+
+### The negative tests can actually fail
+
+`service-client-runtime-probe_test.ts` — **11 passed / 0 failed**, run by me. Two cases carry the
+guarantee:
+
+- `:120` "service client probe **rejects any second-generation byte drift**"
+- `:138` "service generation **converges once then rejects repeated writes or byte drift**"
+
+The sequence test drives `generations = [result(3), result(0)]` — three Aspire writes accepted during
+convergence, zero required on the identical repeat — and asserts the exact event order
+`generate:1, snapshot:1, generate:2, snapshot:2`, so the snapshot-and-compare sequence is enforced
+rather than merely the counts. It then resets and exercises the rejecting arm. A probe that silently
+skipped the second comparison would fail this test.
+
+### Four binding receipts — verified, sufficiency recomputed
+
+| Receipt | gateId | invocationId | outcome | exit | head equality | override |
+| --- | --- | --- | --- | --- | --- | --- |
+| `s5-f4-check.json` | `check` | `…-s5-f4-check` | PASS | 0 | `7876aa109 == 7876aa109` | none |
+| `s5-f4-test.json` | `test` | `…-s5-f4-test` | PASS | 0 | same | none |
+| `s5-f4-publish-dry-run.json` | `publish-dry-run` | `…-s5-f4-publish-dry-run` | PASS | 0 | same | none |
+| `s5-f4-arch-check.json` | `arch-check` | `…-s5-f4-arch-check` | PASS | 0 | same | none |
+
+Four distinct `gateId`s, no override. **Sufficiency recomputed independently: `SUFFICIENT`.**
+
+### Prior evidence preserved
+
+The S5 raw log re-hashes to `e45934adc737626e6b5d05dc1c8dccbb8fb7c2cab0bab76b828520150206d225` —
+unchanged. All S4 failure reports, per-member audits, and the carried Fresh 45 / SDK 3
+`PRE_EXISTING_FAIL` baselines with plugin-streams named separately remain in place. A corrected probe
+did not retroactively tidy the S5 FAIL.
+
+**No `fresh-browser` receipt exists** (0 matches) and `fresh-browser` remains recorded `NOT_RUN`. No
+runtime lease was requested or taken; no evaluator launched.
+
+### Lease-readiness
+
+Per **D-17**, the readiness head is already final and pushed, so a lease granted against it cannot
+move before execution: **`6f813b0db35df38dcd9dc7f1ea333e997399fac0`**, local == remote == PR.
