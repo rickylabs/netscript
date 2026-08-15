@@ -93,3 +93,20 @@ is **released**.
 Withheld from this lane and unchanged: reply to or resolution of owner comment `5300440887`, ticking
 #1502, ready-flip, relabel, merge, publish, and starting the next features leaf. PR #1651 stays
 **draft** at `status:impl`.
+
+### Amendment closed — 2026-08-15 terminal `PASS`
+
+| Field | Value |
+| --- | --- |
+| Content head | `67e12f02165089ec7431b72d1294147477906282` |
+| Evidence head | `d45a92ba70e78cc1ff42617ca15f6782f4ea8c21` |
+| Verdict head | `ec69100c89195adb776c4cef3724c8c3683c553c` — local = remote = PR |
+| Tier-A | `ACCEPTED_WITH_FINDINGS`; AF-1 (dead SHA in body) closed by a body-only correction |
+| IMPL-EVAL | terminal `PASS`, no substantive findings, two editorial notes |
+| Evaluator | session `e8cd9765-9f6c-4418-bbc2-4a24f221f2d4`, bridge `cse_01Cwg2ukqsMkwpuca5xhzVaG`, PID `375750`, native Opus 5 · medium · Remote Control, requested = observed |
+| PR comment | `https://github.com/rickylabs/netscript/pull/1651#issuecomment-5301336480` |
+| PR state | open **draft**, exactly one `status:impl`, 0 review threads |
+
+Nothing is running in this lane. Every gate it owes is closed. The ready-flip, the reply to or
+resolution of owner comment `5300440887`, ticking #1502, merge, publish, and the next features leaf
+all remain withheld and belong to `codex-root-0.0.7`.

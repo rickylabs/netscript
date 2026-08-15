@@ -1,10 +1,10 @@
 # Context pack — NetScript 0.0.7 features lane
 
-Status as of 2026-08-15: the owner selected **keep-and-narrow** for PR #1651. The overlap hold is
-released and the lane is back in `impl` on a **bounded 8-point amendment** carried by the original
-Codex author. The prior IMPL-EVAL `PASS` is historical: it predates the owner's merge gate and no
-longer certifies the head that will ship. No new PLAN-EVAL exists. Merge and the ready-flip remain
-with the coordinator.
+Status as of 2026-08-15: the owner's **keep-and-narrow** amendment for PR #1651 is **complete and
+signed off**. Tier-A returned `ACCEPTED_WITH_FINDINGS` (one editorial finding, closed) and the
+bounded final IMPL-EVAL returned terminal **`PASS`** with no substantive findings. Nothing is
+running in this lane. The PR is draft at `status:impl`; the ready-flip, the reply to owner comment
+`5300440887`, and merge all remain with the coordinator.
 
 ## Control
 
@@ -27,8 +27,8 @@ Authoritative coordinator checkpoint: `eb46e33fb6493ce6ef5350f7abd6e4da51854577`
   discloses the advance; the prior IMPL-EVAL tested and confirmed it does not invalidate the RFC's
   coupling findings.
 - Topic branch `orchestrator/release-0.0.7-features` carries orchestration evidence only.
-- Sole leaf: `rfc-plugin-cli-contribution` (#1502), draft PR **#1651**, dispatch head
-  `0e302ad3a5915b7a820adcac0a9d5bdc2d7d0019` (local = remote = PR), exactly one lifecycle label
+- Sole leaf: `rfc-plugin-cli-contribution` (#1502), draft PR **#1651**, head
+  `ec69100c89195adb776c4cef3724c8c3683c553c` (local = remote = PR), exactly one lifecycle label
   `status:impl`, 0 review threads.
 - Leaf worktree `/home/codex/repos/netscript-007-features-1502` is clean at the branch head with no
   upstream and no active agent.
@@ -39,7 +39,29 @@ Authoritative coordinator checkpoint: `eb46e33fb6493ce6ef5350f7abd6e4da51854577`
   idle from `codex-status`, not `codex-watch --mode turn` (D-5).
 - `rfc-a-stage0-ratification-board` (#1348) stays a coordinator-only checkpoint with no leaf PR.
 
-## Active work — the owner-verdict amendment
+## Completed — the owner-verdict amendment
+
+| Head | Commit | Contents |
+| --- | --- | --- |
+| Content | `67e12f02165089ec7431b72d1294147477906282` | RFC narrowing + leaf journals |
+| Evidence | `d45a92ba70e78cc1ff42617ca15f6782f4ea8c21` | journals + six `ns1502-amend-*` receipts |
+| Verdict | `ec69100c89195adb776c4cef3724c8c3683c553c` | `evaluate-amendment.md` only |
+
+Tier-A: `ACCEPTED_WITH_FINDINGS` (`slices/tier-a-review-1502-amendment.md`) — sufficiency recomputed
+by hand, symbol integrity re-derived 42/42, over-correction checked. One editorial finding AF-1 (a
+dead SHA `04d431d9c` in the body; real commit `04d431028`) closed by a bounded body-only correction.
+
+IMPL-EVAL: terminal **`PASS`**, `evaluate-amendment.md:3`, no substantive findings, two editorial
+notes (`rfcs/0000:213` dropped "process execution" from a summary row; `:918` dropped the
+"cannot stand in for a database transaction" sentence — substance survives at `:841`/`:852` and
+`:816-822` respectively). Evaluator: session `e8cd9765-9f6c-4418-bbc2-4a24f221f2d4`, bridge
+`cse_01Cwg2ukqsMkwpuca5xhzVaG`, PID `375750`, native Claude Opus 5 · medium · Remote Control,
+requested = observed, opposite-family to the Codex author. Comment:
+`https://github.com/rickylabs/netscript/pull/1651#issuecomment-5301336480`.
+
+**D-8 re-checked:** the evaluator started `08:11:17Z` and the only later PR comment is its own
+verdict at `08:18:00Z`. No gate was raised inside the window, so this verdict does not repeat the
+D-8 failure. It still certifies a head, not a merge.
 
 Brief: `slices/impl-1502-amendment.md`. Eight points, no scope beyond them:
 
@@ -74,17 +96,16 @@ and identity-domain mapping — because writing them would make #1651 define com
 the same verdict assigns exclusively to RFC 0003. Full supersession table in `worklog.md`; shape of
 the drift in D-10.
 
-## Sequence after the author turn
+## Next actions belong to the coordinator
 
-1. Author: amended content commit → rerun the six contracted gates at that content head → a
-   receipt/journal-only commit if required → explicit push → local = remote = PR equality.
-2. This supervisor: fresh independent **opposite-family Tier-A** over the exact amendment versus
-   RFC 0003 / #1490, plus a recheck of the conditional body correction.
-3. On Tier-A `PASS`: exactly one fresh separate native Claude Opus 5 · **medium** · Remote Control
-   IMPL-EVAL, bounded to the amendment, the prior conditional finding, evidence reachability, and
-   duplicate/ownership proof.
-4. No open-ended loop. A substantive `FAIL` returns **once** to the same author; editorial notes do
-   not trigger another formal cycle without coordinator authorization.
+1. **Decide the ready-flip and merge.** Every gate this lane owes is closed. Draft→ready is itself
+   an automation trigger, so sequence it deliberately.
+2. **Answer or resolve owner comment `5300440887`.** This lane never replied to it; the amendment
+   addresses it substantively but does not discharge it procedurally.
+3. **Optionally fold the two editorial notes.** Both are summary-text losses where the normative
+   substance survives elsewhere; neither warrants a formal cycle without coordinator authorization.
+4. **#1502 lifecycle label** still reads `status:research` (D-4); this lane's relabel grant covers
+   PR #1651 only.
 
 ## Closed gate — PLAN-EVAL cycle 2 `PASS`
 
@@ -152,4 +173,5 @@ D-8 (the IMPL-EVAL `PASS` predates its own merge gate),
 D-9 (Tier-A reviewer routing vs the reset contract — resolved in practice: this supervisor performs
 the opposite-family review),
 D-10 (the owner verdict narrows an amendment that was briefed wider),
-D-11 (the RFC's blanket non-assignability claim is false as written).
+D-11 (the RFC's blanket non-assignability claim is false as written — **resolved** at `:922-926`),
+D-12 (a foreground Claude launch registers no job dir and cannot prove its own route).

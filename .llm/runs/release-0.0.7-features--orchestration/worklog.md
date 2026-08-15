@@ -918,3 +918,55 @@ killed it — it was in fact working. No damage: its transcript shows 69 records
 Bash, 2 Read, 1 Skill, 1 ListAgents), zero commits, zero artifacts, zero PR comments, and the tree
 was clean afterwards. Relaunching with `--bg` also restores the route proof, since `respawnFlags`
 only exists for registered background jobs. Recorded as D-12.
+
+### Final IMPL-EVAL — terminal `PASS`, no substantive findings
+
+Verdict artifact `evaluate-amendment.md:3` (`## VERDICT: PASS`), 280 lines, verdict-only commit
+`ec69100c89195adb776c4cef3724c8c3683c553c` touching that one file. PR comment:
+`https://github.com/rickylabs/netscript/pull/1651#issuecomment-5301336480`. Local == remote == PR
+head == `ec69100c8`. PR still **draft**, exactly one `status:impl`. The evaluator relabelled nothing
+and did not flip the PR.
+
+Evaluator identity as recorded in its own artifact: session `e8cd9765-9f6c-4418-bbc2-4a24f221f2d4`,
+bridge `cse_01Cwg2ukqsMkwpuca5xhzVaG`, PID `375750`, cwd the leaf worktree, requested = observed =
+native Claude Opus 5 · medium · Remote Control, read from job `respawnFlags`.
+
+I did not take the `PASS` on its word. Spot-checking the artifact against its own claims:
+
+- It re-read `rfcs/0003-command-composition-kit.md:783-820` independently and mapped each of the six
+  `netscript db command-store add` duties onto a term in the C6 exclusion list at `rfcs/0000:221-227`
+  — duty 1 → provider selection, 2 → Prisma models, 3 → migration/indexes, 4 → generated bridge,
+  5 → transaction-client types, 6 → migration refusal — concluding the boundary "partitions rather
+  than describes" and closes without gap or overlap. That is the same derivation I made
+  independently at Tier-A, reached from source rather than from my review.
+- It checked **over-correction**, not just compliance: all four forbidden items absent, with the
+  cancellation/deadline case argued correctly by hunk ranges (every such line predates the amendment
+  and no hunk intersects them).
+- It recomputed sufficiency itself, re-ran the evaluator over exactly the six named files, and
+  independently rediscovered the glob trap — naming the three `publish-dry-run` collisions plus six
+  receipts with no `gateId` at all.
+- It validated merge-facing reachability beyond what was asked: twelve of twelve body SHAs resolve
+  and are ancestors of the pushed head, all six receipt links exist at `blob/d45a92ba7`, and three
+  fragment anchors resolve to real headings.
+- It verified `#1490 under #1363` against the **live board** rather than the RFC's table — #1490
+  `OPEN`, milestone `0.0.10`, and the `sub_issues` endpoint on #1363 returning `1482…1491`.
+
+**Two editorial notes carried, no substantive findings.** Neither returns work to the author under
+the coordinator's loop policy, and neither changes a decision, gate, or ownership boundary:
+
+1. `rfcs/0000:213` — the package-ownership summary row lost the words "process execution" in the
+   rewrite. Host ownership of gate subprocesses survives normatively at `:841` and `:852`, so the
+   decision stands; the table is simply less complete than the body it summarizes.
+2. `rfcs/0000:918` — the compatibility cell dropped "`PluginCliGenerationPlan` mutates workspace
+   files only and cannot stand in for a database transaction". The substance survives as an
+   ownership prohibition at `:816-822`, so nothing is lost, but the plan-versus-DB-transaction
+   contrast now exists only in negative form.
+
+### D-8 re-check before treating this verdict as terminal
+
+D-8 exists because the previous IMPL-EVAL returned `PASS` 74 seconds after an owner gating comment it
+never saw. Applying that rule here: the evaluator started `2026-08-15T08:11:17Z`, and the only PR
+comment created after that timestamp is the evaluator's own verdict comment at `08:18:00Z`. No owner
+or reviewer gate was raised inside the evaluation window, so this verdict does not repeat the D-8
+failure. It remains a verdict on the head it evaluated, not merge authority — the ready-flip and
+merge stay with the coordinator.
