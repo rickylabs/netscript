@@ -32,7 +32,12 @@ remain lease-blocked and unrun. Tier-A subsequently proved Expensive-Gate Releas
 documentation-only: no CLI E2E gate executed the planned second-service, key-isolation, or
 settled-refetch scenarios. S4-F2 is therefore a pre-S5 implementation repair. Its plan amendment is
 locked before E2E code. The four gates and split static/CDP probe are implemented with 25/0 focused
-tests and clean focused check/lint; no lease or expensive command is authorized.
+tests and clean focused check/lint. Recovery review then found that the first browser adapter resumed
+a response-stage pause with the wrong CDP command and used a fixed-delay baseline. The additive
+repair switches to `Fetch.continueResponse`, explicitly establishes a completed positive list
+baseline across a 500 ms quiet window, and adds late-initial-request plus source-wiring regressions
+(focused probe file: 8/0). The two receipts at `787cfa928` are superseded-only. No lease or expensive
+command is authorized.
 
 ## Completed
 
@@ -73,15 +78,17 @@ tests and clean focused check/lint; no lease or expensive command is authorized.
 
 ## In Progress
 
-- S4-F2 implementation is ready to commit. After that immutable content head exists, replace all
-  four cheap receipts with fresh `s4-f2-*` evidence. S5 remains blocked.
+- The S4-F2 browser-probe repair is ready to commit. After that immutable content head exists,
+  produce four fresh `s4-f2-fix1-*` binding receipts. The `s4-f2-{check,test}.json` receipts at
+  `787cfa928` remain superseded-only, and S5 remains blocked.
 
 ## Next Steps
 
-1. Commit and push the S4-F2 plan amendment before touching CLI E2E code.
-2. Implement only the bounded gate/probe/test surface, run affected cheap unit tests, and replace
-   all four binding cheap receipts at the new content head.
-3. Stop for fresh Tier-A review; keep S5 and both expensive gates lease-blocked.
+1. Commit and push the additive response-resume/stable-baseline repair.
+2. Run all four binding cheap gates through `run-gate.ts` at that corrected immutable head with fresh
+   `s4-f2-fix1-*` invocation IDs and filenames.
+3. Recompute exact-set sufficiency and stop for fresh Tier-A review; keep S5 and both expensive gates
+   lease-blocked.
 
 ## Key Decisions
 

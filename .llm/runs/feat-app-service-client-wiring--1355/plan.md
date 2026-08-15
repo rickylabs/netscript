@@ -286,31 +286,40 @@ users service, and database are live:
    consumer is removed in `finally`.
 4. `behavior.service-client-refetch` runs the checked-in probe in browser mode against the live
    generated `/examples/users?preview=success` route. Chrome DevTools network evidence identifies
-   the `users.list` and `users.update` RPC requests. After hydration and network quiet, the probe
-   records the baseline list count and clicks the first Rename control. It pauses the successful
-   update response long enough to prove the optimistic row already contains `renamedName`, resumes
-   the response, waits for it to settle, and then requires the list count to be exactly baseline +
-   1 and the final row to contain that same persisted `renamedName`. An `invalidateQueries` spy is
+   the `users.list` and `users.update` RPC requests. Because cache-age hydration may correctly
+   suppress an automatic client refetch, the probe explicitly clicks the showcase Refresh control,
+   then accepts a baseline only after `listRequestIds.size > 0` and every observed list request is
+   completed for a 500 ms confirmation window. A late initial request invalidates the candidate
+   baseline and restarts that window. The probe then clicks the first Rename control, pauses the
+   successful update response long enough to prove the optimistic row already contains
+   `renamedName`, resumes that response with `Fetch.continueResponse`, waits for
+   `Network.loadingFinished` on its `networkId`, and requires the list count to be exactly baseline
+   + 1 and the final row to contain that same persisted `renamedName`. An `invalidateQueries` spy is
    not evidence.
 
 The new unit test imports the checked-in probe logic directly and proves fail-capable positive and
 negative cases for byte identity, index-0-only key isolation, own/cross prefix matching, and the
-settled `baseline + 1` plus persisted-DOM contract. It also asserts all four command definitions and
-the two suites' order without starting Aspire, Docker, Chrome, `scaffold.runtime`, or
-`fresh-browser`. The suite/probe code is therefore ready for the eventual leased command, while this
-slice remains cheap-only. The probe delegates only Chrome discovery and DevTools protocol transport
-to `service-client-browser-probe.ts`; this named internal dependency keeps the executable contract
+settled `baseline + 1` plus persisted-DOM contract. Its late-initial-request case presents a
+completed one-request candidate, then a second incomplete request, and proves the one-request
+candidate is rejected until both requests complete and remain stable. A source-wiring assertion
+prevents the browser adapter from reverting that helper to a fixed sleep and locks the response-stage
+resume to `Fetch.continueResponse`. The test also asserts all four command definitions and the two
+suites' order without starting Aspire, Docker, Chrome, `scaffold.runtime`, or `fresh-browser`. The
+suite/probe code is therefore ready for the eventual leased command, while this slice remains
+cheap-only. The probe delegates only Chrome discovery and DevTools protocol transport to
+`service-client-browser-probe.ts`; this named internal dependency keeps the executable contract
 module below the doctrine F-1 500-line review threshold and does not add a public surface or scenario.
 
 The S4-FIX1 receipts under `receipts/s4-{check,test,publish-dry-run,arch-check}.json` remain durable
-superseded evidence for content head `32ea23f50`; they are never presented as current after S4-F2.
-At the new committed content head, `run-gate.ts` creates a distinct exact set with fresh invocation
-IDs and filenames:
+superseded evidence for content head `32ea23f50`. The interrupted `s4-f2-check.json` and
+`s4-f2-test.json` attest the unsound `787cfa928` head and are also superseded-only; neither set is
+ever presented as current after the browser-probe repair. At the corrected committed content head,
+`run-gate.ts` creates a distinct exact set with fresh invocation IDs and filenames:
 
-1. `receipts/s4-f2-check.json`
-2. `receipts/s4-f2-test.json`
-3. `receipts/s4-f2-publish-dry-run.json`
-4. `receipts/s4-f2-arch-check.json`
+1. `receipts/s4-f2-fix1-check.json`
+2. `receipts/s4-f2-fix1-test.json`
+3. `receipts/s4-f2-fix1-publish-dry-run.json`
+4. `receipts/s4-f2-fix1-arch-check.json`
 
 Sufficiency is recomputed only over those four new files. Receipt generation still precedes neither
 the lease nor either expensive command.

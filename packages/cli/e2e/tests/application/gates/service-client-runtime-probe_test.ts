@@ -1,6 +1,7 @@
 import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
 
 import { createSmokeProject } from '../../../src/application/builders/workspace/smoke-project-factory.ts';
+import { waitForCompletedStableBaseline } from '../../../src/application/gates/scaffold/service-client-browser-probe.ts';
 import { generatedAppName } from '../../../src/application/gates/scaffold/generated-app-name.ts';
 import { createScaffoldGates } from '../../../src/application/gates/scaffold/scaffold-gates.ts';
 import {
@@ -103,6 +104,48 @@ Deno.test('settled refetch proof requires mutation, optimistic row, exactly +1, 
     Error,
     'persisted row did not contain Ada*',
   );
+});
+
+Deno.test('quiet baseline rejects a late initial request before accepting the completed count', async () => {
+  let now = 0;
+  let observation = 0;
+  const observations = [
+    { requestCount: 1, completedCount: 1 },
+    { requestCount: 2, completedCount: 1 },
+    { requestCount: 2, completedCount: 2 },
+    { requestCount: 2, completedCount: 2 },
+    { requestCount: 2, completedCount: 2 },
+  ] as const;
+
+  const baseline = await waitForCompletedStableBaseline(
+    () => observations[Math.min(observation++, observations.length - 1)],
+    {
+      confirmationMs: 100,
+      pollMs: 50,
+      timeoutMs: 500,
+      now: () => now,
+      sleep: (milliseconds) => {
+        now += milliseconds;
+        return Promise.resolve();
+      },
+    },
+  );
+
+  assertEquals(baseline, 2);
+  assertEquals(observation, 5);
+});
+
+Deno.test('browser refetch probe keeps the stable baseline and response-stage resume', async () => {
+  const source = await Deno.readTextFile(
+    new URL(
+      '../../../src/application/gates/scaffold/service-client-browser-probe.ts',
+      import.meta.url,
+    ),
+  );
+  assertStringIncludes(source, 'await waitForCompletedStableBaseline(() => ({');
+  assertEquals(source.includes('await delay(750)'), false);
+  assertStringIncludes(source, "client.send('Fetch.continueResponse'");
+  assertEquals(source.includes("client.send('Fetch.continueRequest'"), false);
 });
 
 Deno.test('generated consumer imports usersQueries and paymentsQueries together without aliases', () => {

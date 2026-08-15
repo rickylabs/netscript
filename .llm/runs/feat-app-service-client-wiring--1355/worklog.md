@@ -276,3 +276,22 @@ discovery and CDP mechanics. No public surface, gate, scenario, or expensive-gat
   PASS, zero findings and seven unchanged reviewed allowances.
 - `scaffold.runtime`, `fresh-browser`, Aspire, Docker, and Chrome were not run. No lease was requested
   or acquired.
+
+### S4-F2 recovery repair
+
+The first S4-F2 content head, `787cfa928`, had two browser-transport defects discovered before any
+runtime lease: it resumed a response-stage Fetch pause with `Fetch.continueRequest`, and it captured
+the list baseline after a fixed 750 ms delay without proving all observed requests had completed or
+that the count was quiet. The run-gate-generated `receipts/s4-f2-check.json` (PASS) and
+`receipts/s4-f2-test.json` (INTERRUPTED) attest only that unsound head. They are preserved as
+**superseded evidence** and are never part of current-head sufficiency.
+
+The additive repair uses `Fetch.continueResponse` and retains the subsequent
+`Network.loadingFinished` wait on the paused response's `networkId`. It explicitly triggers the
+showcase Refresh control, requires a positive request count with every observed list request
+completed, and holds that candidate unchanged for a 500 ms confirmation window before recording the
+baseline. Any late or incomplete request resets the candidate. The negative unit sequence proves a
+one-request candidate is discarded when a second initial request arrives late and is accepted only
+after the two-request state completes and remains quiet; a source-wiring regression locks both the
+stable helper call and the response-stage resume. Focused result: 8 passed, 0 failed. No browser,
+Aspire, Docker, or expensive suite ran.

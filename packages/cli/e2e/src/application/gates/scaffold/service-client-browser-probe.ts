@@ -3,6 +3,8 @@
 const LIST_PATH = '/api/rpc/v1/users/list';
 const UPDATE_PATH = '/api/rpc/v1/users/update';
 const TIMEOUT_MS = 20_000;
+const BASELINE_CONFIRMATION_MS = 500;
+const BASELINE_POLL_MS = 50;
 
 export interface SettledRefetchEvidence {
   readonly baselineListRequestCount: number;
@@ -11,6 +13,19 @@ export interface SettledRefetchEvidence {
   readonly optimisticRowContainedRenamedName: boolean;
   readonly finalRowContainedRenamedName: boolean;
   readonly renamedName: string;
+}
+
+export interface RequestCompletionCounts {
+  readonly requestCount: number;
+  readonly completedCount: number;
+}
+
+interface StableBaselineOptions {
+  readonly confirmationMs?: number;
+  readonly pollMs?: number;
+  readonly timeoutMs?: number;
+  readonly now?: () => number;
+  readonly sleep?: (milliseconds: number) => Promise<void>;
 }
 
 interface CdpEvent {
@@ -143,8 +158,11 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
     await client.send('Page.navigate', { url });
     await client.waitFor('Page.loadEventFired');
     const originalName = await waitForExpression<string>(client, rowNameExpression());
-    await delay(750);
-    const baseline = listRequestIds.size;
+    await evaluate(client, clickRefreshExpression());
+    const baseline = await waitForCompletedStableBaseline(() => ({
+      requestCount: listRequestIds.size,
+      completedCount: completedListIds.size,
+    }));
     const renamedName = `${originalName}*`;
 
     await evaluate(client, clickRenameExpression());
@@ -162,7 +180,7 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
       (value) => value,
     );
     const status = paused.responseStatusCode;
-    await client.send('Fetch.continueRequest', { requestId: paused.requestId });
+    await client.send('Fetch.continueResponse', { requestId: paused.requestId });
     if (typeof paused.networkId === 'string') {
       await client.waitFor(
         'Network.loadingFinished',
@@ -197,6 +215,40 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
   }
 }
 
+/** Wait until at least one request is complete and the completed count remains quiet. */
+export async function waitForCompletedStableBaseline(
+  observe: () => RequestCompletionCounts,
+  options: StableBaselineOptions = {},
+): Promise<number> {
+  const confirmationMs = options.confirmationMs ?? BASELINE_CONFIRMATION_MS;
+  const pollMs = options.pollMs ?? BASELINE_POLL_MS;
+  const timeoutMs = options.timeoutMs ?? TIMEOUT_MS;
+  const now = options.now ?? Date.now;
+  const sleep = options.sleep ?? delay;
+  const started = now();
+  let candidateCount: number | undefined;
+  let stableSince: number | undefined;
+
+  while (now() - started < timeoutMs) {
+    const { requestCount, completedCount } = observe();
+    const allObservedRequestsCompleted = requestCount > 0 && completedCount === requestCount;
+    if (!allObservedRequestsCompleted) {
+      candidateCount = undefined;
+      stableSince = undefined;
+    } else if (candidateCount !== requestCount) {
+      candidateCount = requestCount;
+      stableSince = now();
+    } else if (stableSince !== undefined && now() - stableSince >= confirmationMs) {
+      return requestCount;
+    }
+    await sleep(pollMs);
+  }
+
+  throw new Error(
+    'timed out waiting for a completed users.list baseline to remain stable',
+  );
+}
+
 function rowNameExpression(): string {
   return `(() => {
     const button = [...document.querySelectorAll('button')].find((entry) => entry.textContent?.trim() === 'Rename');
@@ -217,6 +269,15 @@ function clickRenameExpression(): string {
   return `(() => {
     const button = [...document.querySelectorAll('button')].find((entry) => entry.textContent?.trim() === 'Rename');
     if (!button) throw new Error('Rename control was not rendered');
+    button.click();
+    return true;
+  })()`;
+}
+
+function clickRefreshExpression(): string {
+  return `(() => {
+    const button = [...document.querySelectorAll('button')].find((entry) => entry.textContent?.trim().startsWith('Refresh'));
+    if (!button) throw new Error('Refresh control was not rendered');
     button.click();
     return true;
   })()`;
