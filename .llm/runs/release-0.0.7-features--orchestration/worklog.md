@@ -578,3 +578,58 @@ this orchestrator's:
 Open drift for the evaluator's attention: D-1 (Codex leaf mobile visibility unproven — deliberately
 not repaired), D-4 (issue #1502 still carries `status:research`; this lane's relabel grant covered PR
 #1651 only), D-6, D-7. The leaf's own `drift.md` carries its slice-level entries.
+
+## 2026-08-15 — #1651 IMPL-EVAL dispatch (coordinator grant)
+
+### Pre-launch reconciliation
+
+| Source | Value | Result |
+| --- | --- | --- |
+| Granted final head | `04d431028c1fe455dc18c05e3fa0779e7b593046` | reference |
+| Leaf worktree `git rev-parse HEAD` | `04d431028…` | match; clean; no upstream |
+| `git ls-remote origin refs/heads/docs/rfc-plugin-cli-contribution` | `04d431028…` | match |
+| Live PR #1651 `head.sha` | `04d431028…` | match |
+| Content head ancestry | `git merge-base --is-ancestor 120859d5c… HEAD` | **YES**; the only two commits between are `c987f009e` (receipts) and `04d431028` (sufficiency journal) |
+| PR state | live | open, draft, exactly one `status:impl` |
+
+**New fact recorded:** live `origin/main` has advanced from the immutable dispatch base
+`01e0960494c95ce56eb35892c211a095eb13e6ed` to `0b3ed5d5a6aea451318f120988c25dfa3993a2ab`. PR #1651's
+`base.sha` still records the old base. The leaf already disclosed the advance in its `drift.md` and
+asserts it does not alter the RFC's ownership/coupling findings. The evaluator is bound to **test
+that assertion rather than accept it** — a stale claim about the live CLI/plugin surface is a
+finding.
+
+### Evaluator identity
+
+| Field | Value |
+| --- | --- |
+| Role | formal IMPL-EVAL; fresh session, opposite-family to Codex author `019ffcc5-…` |
+| Claude session id | `2a8cf0a6-7529-4ca6-97ce-69edcca3f84d` |
+| Job id | `2a8cf0a6` |
+| Bridge session id | `session_01Y48WxcCgzUAWfJmGmhBykc` (job state records the `cse_…` form) |
+| Remote Control URL | `https://claude.ai/code/session_01Y48WxcCgzUAWfJmGmhBykc` |
+| Remote Control label | `netscript-007-features-1502-impleval` |
+| PID | `2718910` |
+| Exact cwd | `/home/codex/repos/netscript-007-features-1502` |
+| Requested route | native Claude Opus 5 · **high** · Remote Control |
+| Observed route | `respawnFlags`: `--model claude-opus-5 --effort high --permission-mode bypassPermissions --remote-control` |
+| Route verdict | **matched**; no Fable, no substitution |
+| Provider boundary | `providerEnv: {}` — native Anthropic auth, so the Remote Control claim is legitimate |
+| Brief delivery | job `intent` is 8,125 bytes and begins `use harness` — the full brief was received, not swallowed by a preceding variadic flag |
+| Launch state | `working` / `busy` |
+
+Distinct from both the PLAN-EVAL session (`28cc8106-…`, terminal) and this orchestrator
+(`19621a0b-…`). One evaluator in this topic; features serialization is internal to features and does
+not wait on other lanes.
+
+### Evaluator authority as briefed
+
+May change only `evaluate.md`, push the verdict commit, and post one structured
+`[PHASE: IMPL-EVAL] [VERDICT: …]` comment. Explicitly forbidden: ready-flip, relabel, merge, publish,
+issue filing/closing, central cluster-state mutation, expensive-gate lease, `scaffold.runtime`,
+editing the RFC or package/plugin source, and resuming the Codex author thread.
+
+The brief binds independent recomputation rather than acceptance on nine axes, including recomputing
+the SUFFICIENT set itself from the six named `invocationId`s — with the duplicate-`gateId` trap
+stated up front so the evaluator does not mistake a deliberate scoping for broken evidence — and
+re-deriving the defect classes Tier-A already closed rather than trusting they stay closed.
