@@ -2928,3 +2928,61 @@ distinct invocation IDs.
 
 **Recorded as repair-after-interception, not `PASS`.** No lease acquired, no expensive gate run, no
 evaluator launched, no readiness or metadata change.
+
+## 2026-08-15 — hard recovery: obsolete turn interrupted, thread resumed, ACK verified
+
+### My prior report was wrong, and the correction matters
+
+I stated the author was amending. It was not. Direct process inspection showed PID `139619` — my
+**original F2 dispatch** — still running at 26:17, with child `193278` executing
+`run-gate.ts --gate test --id app-service-client-wiring-s4-f2-test --git-head 787cfa928`. My two
+later dispatches (scope interception, repair) had **exited without reaching a listening turn**.
+
+That is why the repairs never happened. `codex-resume` returning is not evidence the message was
+consumed — a busy thread swallows it. I asserted progress from a dispatch I had launched rather than
+from a state I had observed, which is the same error this lane keeps catching in artefacts: trusting
+the act of producing evidence instead of the evidence.
+
+The one dispatch that *did* land was the scope interception — the author committed `93fb5532d`
+("isolate browser probe transport"). Its own rollout explains why, and adds a reason I did not have:
+combining generated-output logic with the CDP transport pushed the probe to **572 lines**, crossing
+the **F-1 500-line** doctrine threshold. It recorded a named internal dependency before creating the
+module. So the split was doctrine-driven, not stylistic — stronger justification than my inspection
+alone established.
+
+### Interrupt executed, everything preserved
+
+| Target | Result |
+| --- | --- |
+| `run-gate --gate test` (`193278`) at `787cfa928` | stopped |
+| `codex exec resume` launcher (`139619`) | stopped |
+| Commit history | intact — `787cfa928`, `93fb5532d`, `4be440020` |
+| Branch / worktree | `feat/app-service-client-wiring`, untouched |
+| Thread rollout | intact, 13.7 MB |
+| Supervisor | untouched |
+
+Stopping was urgent because the author had already spent 6m26s on a check receipt and was 48s into
+the test gate — all at a head whose live probe is unsound. Its own message confirms the check
+"passed at `787cfa928` over 2,936 files with zero diagnostics", which is exactly the danger: a
+genuinely green receipt certifying a content head containing a proof that cannot execute correctly
+when leased.
+
+`receipts/s4-f2-check.json` and `s4-f2-test.json` are retained as **superseded evidence only**.
+
+### ACK verified as an agent record, not an echo of my own prompt
+
+The rollout markers alone were not sufficient — my dispatch text is written into the same file, so
+grepping for the terms I sent would have confirmed nothing. I parsed for `payload.type ==
+'agent_message'` specifically. The author's own words:
+
+> "Confirmed. I'm implementing exactly three repairs before any new receipt run: (a) resume the
+> response-stage interception with `Fetch.continueResponse`, (b) replace the 750 ms snapshot with a
+> completed-and-stable confirmation window, and (c) add a negative unit case where a late initial
+> `users.list` request invalidates the candidate baseline. The `787cfa928` check/test receipts are
+> superseded-only and will not be presented as current evidence."
+
+All three repairs acknowledged in its own words, plus the superseded-receipt semantics. **Recovery
+confirmed** — on evidence, not on dispatch.
+
+Status remains **repair-after-interception, not `PASS`**. No lease, no expensive gate, no evaluator,
+no readiness or metadata change.
