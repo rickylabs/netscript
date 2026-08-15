@@ -33,7 +33,9 @@ The leaf preserves the already-correct Contracts root exports/examples and does 
 
 ## Exact narrowed edit surface (locked)
 
-The nine frozen implementation paths are narrowed as follows. Run artifacts requested by the
+The nine frozen implementation paths are narrowed as follows. **AMENDED (SA-1a):** SA-1 adds a
+tenth, test-only path; the authorized surface is **nine frozen + the SA-1 tenth**, and every
+path-count statement in this plan is to be read that way. Run artifacts requested by the
 coordinator (`research.md`, `plan.md`, and later harness evidence) are control-plane records, not a
 tenth implementation path.
 
@@ -142,7 +144,8 @@ rework. Browser classification affects evidence only, not implementation design.
 - Files: slice run artifacts only; no implementation path edits.
 - Proves at the exact committed head: `check`, `test`, `publish-dry-run`, `quality-job`,
   `arch-check`, `docs-source-format`, and `docs-accuracy` through durable receipts; focused direct
-  drift and JSR evidence; exact nine-path diff audit; no lock churn.
+  drift and JSR evidence; exact authorized-path diff audit — **AMENDED (SA-1a):** the audit bound is
+  the **ten** authorized paths (nine frozen + the SA-1 test-only tenth), not nine; no lock churn.
 - Handoff: coordinator performs Tier-A substantive review and grants/dispatches PLAN-EVAL and later
   IMPL-EVAL according to the recorded gates. The author neither self-certifies nor advances the PR
   to ready.
@@ -165,7 +168,7 @@ is `NOT FIRED`.
 | 8     | `docs-accuracy`      | Must fire the named drift child and propagate its real exit; terminal PASS alone is accepted only with the source/task binding reviewed.                                                                                                       |
 | 9     | `publish-dry-run`    | Canonical workspace simulation at the exact head; proves the shipped Contracts JSDoc and isolated declarations package statically. Review member/file output; do not infer real-publish success.                                               |
 | 10    | JSR audit            | Re-run package audit for Contracts and reference-subject audit for Fresh UI; preserve/report sanctioned or pre-existing reds exactly. Verify exact NetScript pins from member config.                                                          |
-| 11    | Git/path/lock audit  | Direct raw Git commands prove only frozen implementation paths plus run artifacts changed; `docs/exports`, `deno.lock`, package export maps, and MySQL paths remain untouched.                                                                 |
+| 11    | Git/path/lock audit  | **AMENDED (SA-1a):** direct raw Git commands prove only the **ten authorized** implementation paths (nine frozen + the SA-1 test-only tenth) plus run artifacts changed; `docs/exports`, `deno.lock`, package export maps, and MySQL paths remain untouched.                                                                 |
 
 No Aspire, Docker, browser, `e2e:cli`, scaffold runtime, service runtime, publish, release cut, or
 resource cleanup is planned.
@@ -230,7 +233,7 @@ static prerequisite, never permission to publish.
 | Page truth changes while hardcoded count stays green                             | Do not encode 168 as a permanent expected constant; derive it every run and report the measured count.                                                 |
 | Hidden wiring is mistaken for absent wiring                                      | PR/research state baseline indirect edge explicitly; S2 improves discoverability/workflow coverage without claiming prior work as leaf-earned.         |
 | Pages CI duplicates or bypasses local gate                                       | Both edges call the same named task; `docs:accuracy` remains the local aggregate and Pages gets one direct step.                                       |
-| Workflow edit requires an unauthorized test edit                                 | Run existing workflow tests unchanged. If they fail and require source changes outside the nine paths, stop for rescope rather than editing tests.     |
+| Workflow edit requires an unauthorized test edit                                 | Run existing workflow tests unchanged. If they fail and require source changes outside the **ten authorized** paths, stop for rescope rather than editing tests. Note the SA-1 tenth path is test-assertions-only and is not a licence to edit workflow source.     |
 | Existing package JSR/doc-lint debt is mistaken for regression or silently waived | Record baseline raw reds in research/JSR table and compare final results; do not weaken checker/audit settings or enter package source.                |
 | Large Fresh reference edit renders poorly                                        | Docs format/build/links are required; browser remains coordinator-classified and may be granted externally.                                            |
 | Lock or package surface churn appears during validation                          | Direct diff audit; do not stage `deno.lock`; stop if exports, pins, versions, or unrelated publishable source changes.                                 |

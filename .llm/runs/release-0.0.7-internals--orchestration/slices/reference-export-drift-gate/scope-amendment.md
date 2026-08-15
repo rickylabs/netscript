@@ -104,3 +104,21 @@ directory.
   pass, a command that did not fire is `NOT FIRED`, and scratch stays out of measured roots.
 - The prohibition on merge, publish, ready flip, relabel beyond the leaf's own `status:`, issue
   closure, milestone change, central-state mutation, and touching another lane's worktree.
+
+## SA-1a — correction to SA-1 (2026-08-15T16:57Z)
+
+SA-1 authorized the tenth path but left four path-count statements in `plan.md` reading "nine".
+One of them was load-bearing: validation row 11 and the S3 evidence line defined the diff audit as
+an **exact nine-path** audit, so the audit gate as written would have refused the very path SA-1
+authorized — or pushed the author to drop the test file to make the gate quiet. That is the same
+coverage-versus-compliance failure this leaf exists to remove, introduced by the amendment meant to
+prevent it.
+
+Corrected in `plan.md` at lines 36, 148, 171, and 236, each annotated `AMENDED (SA-1a)`: the
+authorized surface is **ten** paths — nine frozen plus the SA-1 test-only tenth — and the diff audit
+is bound to ten. The risk-register row additionally restates that the tenth path is
+test-assertions-only and is not a licence to edit workflow source. `plan.md:206` ("nine
+private-type-ref reds") is an unrelated `doc:lint` baseline count and is deliberately unchanged.
+
+Found by an independent Tier-A pass, not by the Tier-A that admitted SA-1 — that pass grepped for
+the authorized filename and never grepped for the count. Recorded in the topic drift log.
