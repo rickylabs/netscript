@@ -73,40 +73,75 @@ Callers must explicitly short-circuit unsafe evidence processing:
 - lookup records error/incomplete evidence and returns `CacheOutcomes.ERROR` without indexing an
   empty/invalid chain;
 - write records error/incomplete evidence and returns before iterating the invalid report;
-- invalidation records error/incomplete evidence, skips that report, and may retain other valid
-  bounded tier evidence without throwing.
+- invalidation stages each report into a fresh per-report map and merges that map into the aggregate
+  only after the entire report passes descriptor, outcome, bound, and cross-report tier-consistency
+  validation. A rejected report contributes **zero** tier events, including entries validated before
+  its later failure. Valid reports remain emit-able, but the span-level final
+  `topologyComplete` stays `false` if any report was rejected so the final attribute cannot overwrite
+  the incomplete signal with `true`.
 
 The existing test at `cache-telemetry_test.ts:237` will be **amended, not deleted**: the same
 unbounded report must still mark the span `error`/incomplete, but the loader must execute and its
 payload must return. Add write and invalidation malformed-report cases so changing the shared
-helper does not silently weaken the other two guards.
+helper does not silently weaken the other two guards. The invalidation case must fail partway
+through one report: entries 1–2 are valid and entry 3 has an invalid descriptor/outcome (with a
+valid report also present to prove isolation). Assert that entries 1–2 from the rejected report are
+not emitted, valid-report evidence may remain, and the final span stays incomplete/error. A
+first-entry failure is insufficient proof of rollback.
 
-Remove descriptor validation from pre-span attribute construction. Add an internal validation
-step invoked as the first operation inside each cache span callback; a bad descriptor records an
-error/incomplete event on the created span and proceeds fail-safe. A test uses a non-conforming
-custom descriptor and asserts both normal data return and a recorded span problem. Document this
-explicitly in `packages/sdk/README.md`.
+Remove descriptor validation from pre-span attribute construction. Add one internal span-prologue
+helper invoked as the first operation inside each cache span callback; it flushes any pending
+namespace-overflow event and then validates the descriptor while the span exists. A bad descriptor
+records an error/incomplete event and proceeds fail-safe. This single prologue makes D2 and D3's
+deferral order explicit rather than claiming two separate actions are each first. A test uses a
+non-conforming custom descriptor and asserts both normal data return and a recorded span problem.
+Document this explicitly in `packages/sdk/README.md`.
 
 ### D3 — #1620: runtime cardinality budget with fixed overflow
 
 Keep public `QueryParams.operationId?: string` unchanged; a branded type would be a breaking compile
-change and requires the prohibited `query-options.ts` scope. Instead add an internal process-wide
-runtime budget in `cache-telemetry.ts`:
+change and requires the prohibited `query-options.ts` scope. Instead split syntax normalization
+from internal namespace admission in `cache-telemetry.ts`. Public
+`normalizeCacheNamespace(): string` remains a pure, signature-compatible syntax normalizer. A new
+non-re-exported admission helper returns an internal decision object containing the admitted
+namespace plus an optional first-overflow id. That request-local decision—not a global pending raw
+id—crosses the pre-span argument-evaluation seam:
 
 - syntax normalization remains lowercase/80-character bounded;
 - retain at most **256** distinct normalized namespaces;
-- the first normalized id that crosses the budget is mapped to fixed **`overflow`** and emits one
-  `cache.namespace.overflow` span event naming that offending normalized id;
+- the first normalized id that crosses the budget is mapped to fixed **`overflow`** and carries a
+  pending `cache.namespace.overflow` signal naming that offending normalized id;
 - all later over-budget ids map to `overflow` without retaining or emitting their raw ids; a single
   boolean plus the 256-entry admitted set keeps memory and telemetry cardinality bounded;
-- the warning is a span event, not `console.warn`, so published runtime code remains structured and
+- the mapped namespace is available for `createCacheSpanAttributes(...)`; the **first statement in
+  the created span callback** invokes the D2/D3 span-prologue helper, which flushes the decision's
+  pending signal and validates the descriptor inside the span. The decision is local to that
+  invocation, so concurrent operations cannot steal or misattribute the offender;
+- the warning remains a span event, not `console.warn`, so published runtime code is structured and
   AP-13 compliant.
 
-Apply the budget at both the package-owned `CacheQuery` and unowned `CacheProvider` boundary. Keep
-`normalizeCacheNamespace()`'s public string signature stable. Tests reset only the private registry,
-fill 256 stable values, assert the 257th collapses and names the offender exactly once, and prove
-repeats/new overflow values remain fixed. Existing factory tests must stay green unchanged:
-`resource.action`, normalized composite default, and `composite` all remain admitted static values.
+Apply that deferral seam to every executable caller identified by the source census (12 source
+occurrences: the function definition plus 11 calls):
+
+- `cache-query.ts:85,305,329,361,389`: each operation obtains an admission decision before
+  `withSpan`, uses `decision.namespace` in the span attributes, then flushes the pending signal as
+  part of the first-statement span prologue. At `:85`, descriptor validation is also performed by
+  that prologue; neither pre-span concern can emit before the span exists.
+- `cache-provider.ts:125,141,159,169,176`: `traceUnsupported` accepts the admission decision rather
+  than only a string, uses its namespace for attributes, and flushes it first inside its own span
+  callback. This covers both the precomputed and inline current call shapes.
+- `composite-query.ts:42`: there is intentionally **no admission and no event at factory/module
+  time**, because no span or request exists. It performs syntax normalization only. The actual
+  later `query`, `getCachedData`, `getCachedEntry`, or invalidation call is admitted and, if needed,
+  warned at the package-owned query or unowned-provider boundary where a span exists. Constructing
+  an unused composite therefore consumes no namespace budget and strands no warning.
+
+Tests reset only the private registry, fill 256 stable values, assert the 257th span receives the
+deferred event and names the offender exactly once, and prove repeats/new overflow values remain
+fixed. Include a composite-factory test proving construction alone neither admits nor emits and its
+first real operation is handled at the spanned boundary. Existing factory tests must stay green
+unchanged: `resource.action`, normalized composite default, and `composite` all remain admitted
+static values.
 
 This is a patch-level behavior hardening, not a TypeScript breaking change. It intentionally trades
 fine-grained telemetry beyond 256 operation families for bounded backend cost.
@@ -159,8 +194,11 @@ doc-lint cleanup.
 
 Hidden consumer scope: SDK internal query factories/barrels, Fresh imports/re-exports, the KV
 backend exercised by the real RED, CLI generated-import assertions and embedded template mirror,
-MCP generated docs, and the release public-surface baseline. The repo-root test task covers the
-asserting packages.
+MCP generated docs, the release public-surface baseline, and
+`docs/site/web-layer/query-bridge.md:98`, which quotes D4's exact current provider error. The
+repo-root test task covers executable asserting packages. The site quote is outside both declared
+scope and the exact four-file grant; it is accepted drift `FOLLOWUP-DOC-QUERY-BRIDGE-DIAGNOSTIC`
+and must be synchronized by a topic-orchestrator-owned documentation follow-up, not edited here.
 
 ## Open-decision sweep
 
@@ -171,8 +209,9 @@ asserting packages.
 | Namespace mechanism/bound/warning | resolved now | Runtime 256 / `overflow` / first-offender one-time span event; D3 |
 | Diagnostic wording | resolved now | Module URL plus hypothesis and coherence check; D4 |
 | JSDoc shapes | resolved now | Mandatory report shapes; D5 |
-| README/test files outside declared surface | **must resolve before implementation** | Topic orchestrator scope ruling |
-| Existing full-export doc-lint red baseline | **must resolve before implementation** | Authorize remediation surface or accept exact no-regression debt |
+| README/test files outside declared surface | resolved | Topic orchestrator granted exactly the four files in `scope-boundary.md`; no others |
+| Existing full-export doc-lint red baseline | resolved for this leaf | Exact six named raw diagnostics accepted as the no-regression bar; zero new |
+| Exact site-doc quote becomes stale under D4 | accepted drift | `FOLLOWUP-DOC-QUERY-BRIDGE-DIAGNOSTIC`; topic orchestrator owns follow-up, leaf does not edit `docs/site/**` |
 | Per-action `no-store` | safe to defer | Requires wider published query/factory design |
 | Branded `operationId` | safe to defer | Breaking alternative rejected for this patch |
 | Provider ownership across duplicate SDK copies | safe to defer | Diagnostic must not pre-empt architecture decision |
@@ -181,22 +220,23 @@ asserting packages.
 
 | # | Slice / proof | Files | Proving gates |
 | --- | --- | --- | --- |
-| 1 | Make evidence validation fail-safe inside spans and bound namespace cardinality; amend the deliberate guard and document the contract. | declared `cache-telemetry.ts`, `cache-query.ts`, `cache-provider.ts`; pending `cache-telemetry_test.ts`, `README.md` | focused cache telemetry tests; structured SDK check/lint/fmt; doc/surface checks |
-| 2 | Isolate real KV persistence-limit failure after successful loader data. | declared `cache-query.ts`; pending new `cache-query-kv-limit_test.ts` | behavioral RED-before/GREEN-after real Deno KV test; SDK/root tests |
-| 3 | Improve duplicate-module diagnostic and repair mandatory-evidence JSDoc. | declared `cache-provider.ts`, `cache-store.ts`; pending `cache-provider_test.ts` | focused diagnostic test; ports doc sweep; doc/publish checks |
+| 1 | Make evidence validation fail-safe inside spans and bound namespace cardinality; amend the deliberate guard and document the contract. | declared `cache-telemetry.ts`, `cache-query.ts`, `cache-provider.ts`; granted `cache-telemetry_test.ts`, `README.md` | focused cache telemetry tests including partial-report rollback; structured SDK check/lint/fmt; doc/surface checks |
+| 2 | Isolate real KV persistence-limit failure after successful loader data. | declared `cache-query.ts`; granted new `cache-query-kv-limit_test.ts` | behavioral RED-before/GREEN-after real Deno KV test; SDK/root tests |
+| 3 | Improve duplicate-module diagnostic and repair mandatory-evidence JSDoc. | declared `cache-provider.ts`, `cache-store.ts`; granted `cache-provider_test.ts` | focused diagnostic test; ports doc sweep; doc/publish checks |
 | 4 | Merge-readiness evidence only: run full static/runtime-consumer/JSR/doctrine gates and update run artifacts/PR comments. | run directory only | complete validation table below; separate IMPL-EVAL remains mandatory |
 
-All slices stay below 30 and each updates `worklog.md`/`context-pack.md` in its commit. No product
-slice may begin until PLAN-EVAL passes and the scope ruling is recorded.
+All slices stay below 30 and each updates `worklog.md`/`context-pack.md` in its commit. The exact
+four-file scope ruling is recorded; no product slice may begin until PLAN-EVAL passes.
 
 ## Risk register
 
 | Risk | Mitigation |
 | --- | --- |
 | A broad catch hides source or lookup failures | Catch only `store.set()` after `data` resolves; explicit write APIs and loader failures remain fail-loud. |
-| Telemetry recorder continues into invalid arrays after removing `throw` | Explicit early returns/skip behavior per recorder; direct tests for lookup, write, invalidation. |
-| Invalid descriptor still fails before span | Remove validation from argument construction and run it first inside span callbacks; assert span existence. |
-| Cardinality registry becomes a memory leak | Cap admitted set at 256 and retain only one overflow-warning boolean; never retain later offending ids. |
+| Telemetry recorder continues into invalid arrays after removing `throw` | Lookup/write return explicitly; invalidation stages each report and merges only on full success. A third-entry failure test proves rejected partial entries cannot escape and final topology remains incomplete. |
+| Invalid descriptor still fails before span | Remove validation from argument construction; make the combined D2/D3 prologue the first callback statement and assert span existence. |
+| Cardinality registry becomes a memory leak | Cap admitted set at 256 and retain only one overflow-warning boolean; carry only the first request-local pending id and never retain later offending ids. |
+| Overflow is detected before a span exists | Carry an internal admission decision into each span callback and flush first; composite factory construction only syntax-normalizes and defers admission to its first real operation. |
 | Cardinality state makes tests order-dependent | Direct-file internal test reset around cardinality tests; no public reset export. |
 | Legitimate app has >256 operation families | Fixed `overflow` preserves application behavior; documented telemetry tradeoff and one actionable event. |
 | Error event leaks request/tenant data | Only the first normalized over-budget id is emitted; guidance forbids identifiers; later raw ids are neither stored nor emitted. |
@@ -205,10 +245,10 @@ slice may begin until PLAN-EVAL passes and the scope ruling is recorded.
 
 ## Debt implications
 
-No new architecture debt is planned. Existing SDK doc-lint failures are unregistered/pre-existing
-at this base and require the explicit ruling in `scope-boundary.md`. If baseline acceptance is
-chosen, the orchestrator must authorize a named debt entry/closing gate; this leaf will not invent
-one before PLAN-EVAL.
+No new architecture debt is planned. The coordinator accepted the exact six named raw doc-lint
+diagnostics as this leaf's no-regression baseline; none may be described as a pass. The stale exact
+provider-message quote is accepted scope drift named
+`FOLLOWUP-DOC-QUERY-BRIDGE-DIAGNOSTIC`; its documentation follow-up is owned outside this leaf.
 
 ## Validation plan
 
@@ -224,7 +264,8 @@ Use wrappers as verdict sources and do not run Aspire, Docker, or `e2e:cli`.
 | 6 | Public surface diff | `deno task surface:diff` | Patch/non-breaking; no undeclared major change |
 | 7 | Exact NetScript pins | `deno task check:netscript-jsr-specifiers` | PASS, zero ranges/failures |
 | 8 | JSR audit | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/sdk --text` | No new finding relative to captured baseline |
-| 9 | Full export docs | `deno task doc:lint --root packages/sdk --pretty` | Outcome per orchestrator ruling: clean after authorized remediation, or exact accepted baseline with no new diagnostics; current state is FAIL |
+| 9a | Raw full-export docs | From `packages/sdk`: `deno doc --lint ./mod.ts ./src/auto-update/mod.ts ./src/desktop/mod.ts ./src/cache/mod.ts ./src/client/mod.ts ./src/collections/mod.ts ./src/discovery/mod.ts ./src/ports/mod.ts ./src/query/mod.ts ./src/query-client/mod.ts ./src/streams.ts ./src/telemetry/mod.ts` | Exit 1 with exactly diagnostics 1–3 below, by name/location, and no others; never report as PASS |
+| 9b | Raw cache-entrypoint docs | From `packages/sdk`: `deno doc --lint ./src/cache/mod.ts` | Exit 1 with exactly diagnostics 4–6 below, by name/location, and no others; never report as PASS |
 | 10 | Publish dry run | `deno task publish:dry-run` and package-local `deno publish --dry-run --allow-dirty` as needed for attribution | PASS; SDK publish list/types clean relative to approved bar |
 | 11 | Code quality | `deno task quality:scan` | PASS/no new finding |
 | 12 | Architecture | `deno task arch:check` | PASS/no unaccepted debt |
@@ -232,3 +273,25 @@ Use wrappers as verdict sources and do not run Aspire, Docker, or `e2e:cli`.
 PLAN-EVAL and IMPL-EVAL are separate-session gates owned by the topic orchestrator. This session
 does not launch either.
 
+The raw doc-lint baseline was measured at plan head `20e7aed41`, whose product tree is
+byte-identical to base `baf1cdf67`; both commands exit 1. Capture full unfiltered stderr/stdout and
+the exit code for each invocation. The exact accepted diagnostics are:
+
+1. `private-type-ref`: public type `QueryClientPort` references private type `QueryClient` —
+   `packages/sdk/src/ports/query-client.ts:41:1`.
+2. `private-type-ref`: public type `createNetScriptQueryClient` references private type
+   `QueryClient` — `packages/sdk/src/query-client/query-client-factory.ts:44:1`.
+3. `private-type-ref`: public type
+   `DurableStreamProducerOptions["instrumentation"]` references private type
+   `StreamsInstrumentation` — `packages/plugin-streams-core/src/application/create-durable-stream.ts:41:3`.
+   This is outside `packages/sdk` and is not an SDK regression.
+4. `private-type-ref`: `KvCacheStore` references private type `CacheStore` —
+   `packages/sdk/src/cache/kv-cache-store.ts:48:1`.
+5. `private-type-ref`: `KvCacheStore.prototype.get` references private type `CacheKey` —
+   `packages/sdk/src/cache/kv-cache-store.ts:97:3`.
+6. `private-type-ref`: `KvCacheStore.prototype.get` references private type `CacheStoreEntry` —
+   `packages/sdk/src/cache/kv-cache-store.ts:97:3`.
+
+The verdict is strict named comparison: both invocations must retain exit 1, all six expected
+diagnostics must remain present in their respective runs, and any additional diagnostic is a leaf
+regression. A fixed baseline diagnostic is separately explained, never silently hidden by a count.

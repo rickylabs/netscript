@@ -47,9 +47,9 @@
 
 | # | Slice | Gate | Files |
 | --- | --- | --- | --- |
-| 1 | Fail-safe evidence + in-span descriptor validation + cardinality bound | focused telemetry tests, SDK wrappers | declared cache files plus pending README/telemetry test approval |
-| 2 | Real Deno KV write-limit isolation | real RED/GREEN test, root test | `cache-query.ts` plus pending new test approval |
-| 3 | Module diagnostic + CacheStore JSDoc | focused test, doc/publish checks | declared provider/store plus pending provider test approval |
+| 1 | Fail-safe evidence + in-span descriptor validation + cardinality bound | focused telemetry tests, SDK wrappers | declared cache files plus granted README/telemetry test |
+| 2 | Real Deno KV write-limit isolation | real RED/GREEN test, root test | `cache-query.ts` plus granted new KV-limit test |
+| 3 | Module diagnostic + CacheStore JSDoc | focused test, doc/publish checks | declared provider/store plus granted provider test |
 | 4 | Merge-readiness evidence | full gate plan | run artifacts only |
 
 ### Deferred Scope
@@ -72,11 +72,13 @@ behind `CacheStore`; it must not change source-query success semantics.
 | 2026-08-15 | Plan | Research | Re-baselined call graphs, evidence reaches, producers, cross-package consumers/assertions, ports docs, and JSR surface. |
 | 2026-08-15 | Plan | Design | Locked five issue contracts; wrote scope-boundary report. No product code changed. |
 | 2026-08-15 | Plan | Draft PR | Committed plan artifacts as `89be8da76`, pushed by explicit refspec, and opened draft PR #1665 with milestone `0.0.7`, exactly one `status:plan`, and RESEARCH/PLAN phase comments. |
+| 2026-08-15 | Plan repair | Tier-A `FAIL_FIX` | Repaired T-1 deferral across every normalization site, T-2 invalidation rollback/final-incomplete semantics, T-3 exact raw six-diagnostic doc-lint baseline, and T-4 named accepted site-doc drift. Exact four-file scope grant recorded; no product code changed. |
 
 ## Decisions
 
-See `plan.md` D1-D5. PLAN-EVAL is selected and pending; implementation is forbidden until a
-separate evaluator returns `PASS` and the topic orchestrator rules on scope.
+See `plan.md` D1-D5. The topic orchestrator granted exactly the four additional files in
+`scope-boundary.md`; no others. PLAN-EVAL is selected and pending, and implementation is forbidden
+until the coordinator separately grants it.
 
 ## Gate Results
 
@@ -85,12 +87,13 @@ separate evaluator returns `PASS` and the topic orchestrator rules on scope.
 | Package publish dry run at base | PASS | `deno publish --dry-run --allow-dirty` from `packages/sdk` |
 | Exact NetScript specifiers at base | PASS | `scanned=2361 allowances=1 ranges=0 failures=0` |
 | JSR audit at base | PASS with 2 warnings | existing src cardinality + slow-type banner |
-| Full SDK doc lint at base | FAIL (pre-existing) | private-type refs; see `research.md` and `scope-boundary.md` |
+| Raw full-export/cache doc lint at plan head | FAIL (pre-existing, expected exit 1) | Exact six named diagnostics locked in `plan.md`; zero-new comparison required, never a PASS |
 | Product implementation gates | NOT_RUN | plan-only phase |
 
 ## Handoff Notes
 
 - Inspect D1's real Deno KV RED and D2's replacement of the deliberate fail-loud guard first.
-- Decide the additional README/test files and doc-lint baseline before approving implementation.
+- Scope is settled at exactly four additional files; enforce the six named raw doc-lint baseline
+  and the accepted site-doc follow-up without widening it.
 - Do not treat the draft PR or green publish dry run as PLAN-EVAL.
 - Draft PR: https://github.com/rickylabs/netscript/pull/1665

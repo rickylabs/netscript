@@ -23,10 +23,25 @@
 ## 2026-08-15 — current SDK doc-lint baseline is red
 
 - **What:** Full-export `deno doc --lint` is required as the publish documentation bar.
-- **Source:** `deno task doc:lint --root packages/sdk --pretty`; raw cache-entrypoint doc lint.
+- **Source:** raw `deno doc --lint` across all 12 package entrypoints and raw
+  `deno doc --lint ./src/cache/mod.ts`; exact commands/diagnostics are in `plan.md` steps 9a/9b.
 - **Expected:** Clean publish documentation surface.
 - **Actual:** Pre-existing `private-type-ref` diagnostics, including three in
   `packages/sdk/src/cache/kv-cache-store.ts`, which is outside the declared surface.
 - **Severity:** significant.
-- **Action:** stop before implementation and request the explicit ruling in `scope-boundary.md`.
+- **Action:** coordinator accepted the exact six named raw diagnostics recorded in `plan.md` as the
+  strict no-regression bar. Both raw invocations remain expected exit 1 and must never be reported
+  as PASS; no remediation surface was granted.
 
+## 2026-08-15 — accepted drift: exact provider message remains quoted in site docs
+
+- **Name:** `FOLLOWUP-DOC-QUERY-BRIDGE-DIAGNOSTIC`.
+- **What:** `docs/site/web-layer/query-bridge.md:98` quotes the exact uninitialized-provider message
+  that D4 changes.
+- **Expected:** Published documentation and the runtime diagnostic change atomically.
+- **Actual:** `docs/site/**` is outside the declared surface and the coordinator's exact four-file
+  grant, so this leaf is forbidden to update the quote.
+- **Severity:** significant, accepted scope drift.
+- **Action:** leave the file untouched and require a topic-orchestrator-owned documentation
+  follow-up after D4 lands. Do not treat the stale quote as undiscovered or as permission to widen
+  this leaf.

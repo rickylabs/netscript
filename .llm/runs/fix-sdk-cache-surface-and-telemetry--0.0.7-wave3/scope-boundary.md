@@ -7,9 +7,8 @@ The declared product surface is limited to:
 - `packages/sdk/src/cache/cache-telemetry.ts`
 - `packages/sdk/src/ports/cache-store.ts`
 
-No product file outside those four is authorized by this leaf plan. The following additional files
-are nevertheless required to satisfy explicit acceptance and proof obligations. Implementation is
-blocked until the topic orchestrator rules on them.
+No product file outside those four is authorized by this leaf plan. The topic orchestrator has
+granted exactly the following four additional acceptance/proof files and no others:
 
 | Additional file | Why unavoidable | Published surface | Breaking? |
 | --- | --- | --- | --- |
@@ -26,19 +25,19 @@ blocked until the topic orchestrator rules on them.
   `query-options.ts` and generated factory changes. It is deferred pending separate scope.
 - Provider ownership/globalization: #1598 is diagnostic only; `_provider` remains module-local.
 
-## Pre-existing doc-lint ruling
+## Pre-existing doc-lint ruling — exact baseline accepted
 
-The required full-export command is currently red before this slice. The cache entrypoint reports
-three `private-type-ref` errors in `packages/sdk/src/cache/kv-cache-store.ts:48,97`; the full SDK map
-also reports refs in other query/query-client/streams files. Making `deno doc --lint` globally zero
-would therefore require additional product files, at minimum `kv-cache-store.ts` for the cache
-subpath and potentially multiple unrelated SDK/plugin-streams files for the full map. Those files
-are outside the four declared surfaces and are not silently added here.
+The coordinator accepted a strict no-regression baseline rather than widening remediation scope.
+Raw `deno doc --lint` must run separately across all 12 SDK entrypoints and across
+`./src/cache/mod.ts`; both exit 1. The exact six named diagnostics and commands are locked in
+`plan.md` validation steps 9a/9b. No count-only wrapper result can satisfy this gate, no new
+diagnostic is allowed, and neither red invocation may be reported as a pass. The plugin-streams
+diagnostic in the combined run is outside SDK and is not this leaf's regression to repair.
 
-Requested ruling:
+## Named accepted drift outside the grant
 
-1. authorize the four acceptance/proof files in the table; and
-2. either authorize a separately enumerated doc-lint remediation surface after PLAN-EVAL, or accept
-   the exact pre-existing baseline as named debt with a strict no-regression comparison for this
-   leaf. The plan does not claim the current red command is a pass.
-
+`docs/site/web-layer/query-bridge.md:98` quotes the exact current uninitialized-provider error that
+D4 will replace. That file is outside the declared surface and the exact grant, so this leaf will
+not edit it. Record `FOLLOWUP-DOC-QUERY-BRIDGE-DIAGNOSTIC` as accepted drift: the topic orchestrator
+owns a documentation follow-up to synchronize the quoted message after D4 lands. This is a known
+stranded published-doc consumer, not a negative-search claim and not permission to widen the leaf.

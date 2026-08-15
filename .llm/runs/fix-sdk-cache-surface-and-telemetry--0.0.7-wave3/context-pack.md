@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-sdk-cache-surface-and-telemetry--0.0.7-wave3` |
 | Branch | `fix/sdk-cache-surface-and-telemetry` |
-| Current phase | `plan` — awaiting PLAN-EVAL and scope ruling |
+| Current phase | `plan` — scope granted, awaiting separate PLAN-EVAL |
 | Archetype | `3 — runtime behavior` slice; SDK inventory remains Archetype 2 |
 | Scope overlays | none |
 
@@ -15,8 +15,9 @@
 Research and plan are complete at `main@baf1cdf67`. No product code has been implemented. Five
 contracts are locked: isolate post-loader persistence failure; fail-safe malformed evidence inside
 a span; cap namespaces at 256 with fixed `overflow`; include module identity plus a two-instance
-hypothesis; repair CacheStore evidence JSDoc. Draft PR #1665 is open with `status:plan` and
-milestone `0.0.7`.
+hypothesis; repair CacheStore evidence JSDoc. Tier-A plan review repairs now specify request-local
+overflow deferral, per-report invalidation rollback, exact raw doc-lint baselines, and named
+accepted site-doc drift. Draft PR #1665 is open with `status:plan` and milestone `0.0.7`.
 
 ## Completed
 
@@ -31,11 +32,10 @@ milestone `0.0.7`.
 
 ## Next Steps
 
-1. Topic orchestrator reviews `scope-boundary.md` and authorizes/declines extra files and doc-lint
-   handling.
-2. Separate topic-orchestrator-owned PLAN-EVAL reads research/plan/Design and returns `PASS` or
-   `FAIL_PLAN`.
-3. Only after both approvals, resume this exact Codex thread for ordered implementation slices.
+1. Preserve the exact grant: README plus three test files named in `scope-boundary.md`, no others.
+2. Separate topic-orchestrator-owned PLAN-EVAL reads the repaired research/plan/Design and returns
+   `PASS` or `FAIL_PLAN`.
+3. Only after PLAN-EVAL passes, resume this exact Codex thread for ordered implementation slices.
 
 ## Key Decisions
 
@@ -43,7 +43,7 @@ milestone `0.0.7`.
 | --- | --- | --- |
 | Write failure isolation | `plan.md` D1 | Real Deno KV >65,536-byte RED required |
 | Telemetry fail-safe | `plan.md` D2 | Existing fail-loud test amended, not removed |
-| Runtime cardinality | `plan.md` D3 | 256 / `overflow` / first-offender one-time span event |
+| Runtime cardinality | `plan.md` D3 | 256 / `overflow`; request-local decision flushes first inside operation span; composite construction only syntax-normalizes |
 | Diagnostic | `plan.md` D4 | Hypothesis, not fact; keep module-local provider |
 | JSDoc | `plan.md` D5 | Only CacheStore get/set/delete drift found |
 
@@ -62,15 +62,15 @@ Only run artifacts under this run directory. The pre-existing `codex-thread-ids.
 
 ## Open Questions
 
-- Scope authorization for README/tests.
-- Clean-vs-baselined handling of existing full-export doc-lint failures.
+- PLAN-EVAL verdict only. Scope and doc-lint handling are resolved by the coordinator.
 
 ## Drift and Debt
 
 - Drift: slice profile is Archetype 3 while doctrine inventory calls SDK Archetype 2; stricter
   runtime profile retained and logged.
-- Debt: current SDK doc-lint failures are pre-existing and not registered for this leaf; ruling
-  required.
+- Baseline: exact six named raw doc-lint diagnostics remain expected red/no-regression evidence.
+- Accepted drift: `FOLLOWUP-DOC-QUERY-BRIDGE-DIAGNOSTIC` updates the stranded exact message quote
+  outside this leaf's grant.
 
 ## Commits
 

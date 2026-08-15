@@ -121,6 +121,7 @@ barrels; no sibling package reads those source files directly. The public-surfac
 | `packages/cli` | Generated consumer surface. Scaffold code injects the side-effect cache import (`packages/cli/src/kernel/application/scaffold/writers/write-app-files.ts:314-323`), and its test asserts the exact emitted string (`write-app-files_test.ts:6-16`). The service-query template imports `createQueryFactories`; `embedded.generated.ts:23` contains the generated mirror. | This is the source-text/output assertion that makes a repo-root test necessary even though CLI files are not edited. |
 | `packages/mcp` | `publish-assets.generated.ts` embeds documentation that teaches the `@netscript/sdk/query` generated-factory surface. It does not import or re-export the four declared files. | Generated-asset freshness is covered by the repo-root tests/tooling; no matching cache-topology README text was found in the asset. |
 | `.llm/tools` | Release/docs tooling asserts the published surface. `release/baselines/public-surfaces.json:18704-18746` contains exact SDK symbol hashes including `CacheQuery`, `CacheStore`, and `CacheStoreEntry`; docs snippet support imports `@netscript/sdk/query`. | Add `deno task surface:diff` and keep the repo-root test suite. |
+| `docs/site` | Published documentation consumer. `docs/site/web-layer/query-bridge.md:98-103` quotes the exact current uninitialized-provider error that #1598 will rewrite. | Outside the declared surface and exact four-file grant; recorded as accepted drift `FOLLOWUP-DOC-QUERY-BRIDGE-DIAGNOSTIC`, not silently omitted. |
 
 No plugin directly reads, re-exports, or asserts on the four declared surfaces. The gate plan uses
 the **repo-root** structured `test` task, so SDK, Fresh, KV, CLI, MCP/generated-asset, and tooling
@@ -160,7 +161,8 @@ Current commands and results:
 | --- | --- | --- |
 | `deno publish --dry-run --allow-dirty` from `packages/sdk` | PASS | Publish simulation succeeds; no product assets or runtime file reads are needed. |
 | JSR audit script for `packages/sdk` | PASS with 2 warnings | Existing `src/` cardinality warning and slow-type banner; 83 files / 9,270 LOC / 12 exports. |
-| `deno task doc:lint --root packages/sdk --pretty` | FAIL | Current full-export baseline has `private-type-ref` diagnostics and no `missing-jsdoc`. The cache entrypoint alone has three in `kv-cache-store.ts:48,97`; other export paths add pre-existing refs outside this slice. |
+| Raw `deno doc --lint` over all 12 exports | FAIL (exit 1) | Exact named baseline is three diagnostics: `QueryClientPort` at `ports/query-client.ts:41:1`, `createNetScriptQueryClient` at `query-client/query-client-factory.ts:44:1`, and the external `DurableStreamProducerOptions["instrumentation"]` at `packages/plugin-streams-core/src/application/create-durable-stream.ts:41:3`. |
+| Raw `deno doc --lint ./src/cache/mod.ts` | FAIL (exit 1) | Exact named baseline is three `KvCacheStore` private refs at `kv-cache-store.ts:48:1` and `:97:3`; no count-only wrapper is used as the regression verdict. |
 | `deno task check:netscript-jsr-specifiers` | PASS | `scanned=2361`, `ranges=0`, `failures=0`. |
 
 The planned implementation adds no public symbol or dependency, so `surface:diff` should classify it
@@ -168,11 +170,10 @@ as patch/non-breaking. Existing exact workspace publication pins for SDK depende
 unchanged; no logger dependency is introduced. The full-export doc-lint red baseline is a scope
 ruling, documented in `scope-boundary.md`, not evidence that this plan passed that gate.
 
-## Open questions requiring the topic orchestrator
+## Coordinator rulings and remaining gate
 
-1. Authorize the README/test files listed in `scope-boundary.md`; they are outside the declared four
-   product files but are explicitly required by issue acceptance and the behavioral RED contract.
-2. Decide whether this slice may carry the existing `deno doc --lint` baseline as named debt/no
-   regression, or whether the cache/full-export private-type references must be fixed under a
-   separately widened surface.
-
+1. Resolved: the coordinator authorized exactly the README/test files listed in
+   `scope-boundary.md`; no other file is granted.
+2. Resolved: the coordinator accepted the six named raw doc-lint diagnostics as a strict
+   no-regression baseline.
+3. Pending: PLAN-EVAL is granted separately by the coordinator; this session does not arrange it.
