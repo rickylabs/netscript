@@ -17,7 +17,9 @@ The `@netscript/sdk` is the **typed client and data layer** for NetScript: it tu
 wraps each contract action in a **cache-first query factory** (KV-backed SWR), and bridges
 those into [TanStack Query](https://tanstack.com/query) for islands. The contract object is
 the single source of truth — the *same* object the [service](/services-sdk/services/)
-implements is the one the client imports, so caller and server **cannot drift**.
+implements is the one the client imports, so its input, output, and declared-error types cannot
+drift between caller and server. Transport failures and arbitrary thrown values are not declared
+contract errors; `safe()` keeps those failures on its non-defined branch.
 {{ comp.badge({ status: "pre-1.0" }) }}
 
 {{ comp.diagram({
@@ -30,7 +32,8 @@ implements is the one the client imports, so caller and server **cannot drift**.
 
 The SDK is layered. **L1** is the typed client: `createServiceClient<Contract>()` resolves a
 service URL from [Aspire service discovery](/explanation/aspire/) and returns a callable
-object whose method signatures are inferred from the contract. **L2** wraps each contract
+object whose method input, output, and declared-error union are inferred from the contract.
+**L2** wraps each contract
 action in a query factory (`createQueryFactories`) that runs through a shared KV-backed cache
 provider and exposes `queryOptions`/`mutationOptions`/`clientKey`/`key`/`getCachedEntry` per
 action. **L3** is the `defineServices()` preset that builds clients, server query factories,
@@ -62,8 +65,10 @@ lives: not inside server code, but in a standalone, versioned contract package t
 the client, **and** the OpenAPI/Scalar surface all import. And the derivation goes further than
 method types — from one contract action the factory derives the server KV cache key (`key()`),
 the client TanStack key (`clientKey()`), the `queryOptions`/`mutationOptions` helpers, and the
-SWR cache reads. One edit to the contract updates the client, the docs surface, and the query
-layer together — there is no separate turn to keep them in sync.
+SWR cache reads. For routes built from `baseContract`, the same derivation carries the declared
+error schemas through the client promise and `safe()`. One edit to those contract-owned types
+updates the client, the docs surface, and the query layer together; transport and arbitrary thrown
+failures remain runtime, non-defined failures rather than being promoted into that contract.
 
 This is how a production chat application built on NetScript wires its dashboard:
 the typed client is built straight off the contract type, so a route added to the contract shows
@@ -110,7 +115,8 @@ export const ordersQueries = createQueryFactories({
   orders: { contract: ordersContract, client: ordersClient },
 }).orders;
 
-// Direct typed call: `.list()` is fully inferred from the contract.
+// Direct call: input, output, and declared errors are inferred from the contract.
+// Calls still reject on failure; use safe() as shown below when you want a result value.
 const recent = await ordersClient.list({ limit: 10 });
 ```
 
@@ -191,13 +197,56 @@ The L3 alternative builds all three layers from one map:
     label: "Island (TanStack hydration)",
     lang: "tsx",
     code: "// orders/(_islands)/OrdersQueryIsland.tsx\nimport { useQuery, useQueryClient } from '@netscript/fresh/query';\nimport { ordersQueries } from '@app/lib/orders.ts';\n\n// Same contract action → same query key as the server loader, so the island\n// hydrates from server state instead of refetching on mount.\nconst OrdersList = () => {\n  const qc = useQueryClient();\n  const orders = useQuery(ordersQueries.list.queryOptions({ limit: 20 }));\n  // invalidate by prefix after a write:\n  const refresh = () => qc.invalidateQueries({ queryKey: ordersQueries.list.clientKey() });\n  return null; // render orders.data\n};"
-  },
-  {
-    label: "Safe error narrowing",
-    lang: "ts",
-    code: "// services/orders/src/routers/v1.ts — service-to-service call\nimport { safe, isDefinedError } from '@netscript/sdk/client';\nimport { usersClient } from '@app/lib/users.ts';\n\nconst [error, user, isDefined] = await safe(usersClient.getById({ id }));\nif (error) {\n  // narrow to a typed, contract-declared error\n  if (isDefinedError(error)) return { code: error.code, status: error.status };\n  throw error;\n}"
   }
 ] }) }}
+
+## Safe error narrowing
+
+For a route built from `baseContract`, the defined channel is exactly `NOT_FOUND`,
+`VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMITED`, or `SERVICE_UNAVAILABLE`.
+`safe()` returns a `SafeResult`: test `isSuccess` first, then test `isDefined` on the failure.
+That second test prevents a transport failure or arbitrary thrown value from falling through as a
+successful result. On the defined branch, `data` is inferred from the schema registered for the
+selected `code`; it is neither an open property bag nor `any`.
+
+```ts
+import { baseContract } from '@netscript/contracts';
+import { createServiceClient, safe } from '@netscript/sdk/client';
+import { z } from 'zod';
+
+const usersContract = {
+  getById: baseContract
+    .route({ method: 'GET', path: '/users/{id}' })
+    .input(z.object({ id: z.string() }))
+    .output(z.object({ id: z.string(), name: z.string() })),
+};
+const usersClient = createServiceClient({ contract: usersContract, serviceName: 'users' });
+
+type StandardErrorCode =
+  | 'NOT_FOUND'
+  | 'VALIDATION_ERROR'
+  | 'UNAUTHORIZED'
+  | 'FORBIDDEN'
+  | 'RATE_LIMITED'
+  | 'SERVICE_UNAVAILABLE';
+
+export async function loadUser(id: string) {
+  const result = await safe(usersClient.getById({ id }));
+  if (result.isSuccess) return result.data;
+  if (!result.isDefined) throw result.error;
+
+  const code: StandardErrorCode = result.error.code;
+  if (result.error.code === 'NOT_FOUND') {
+    // NOT_FOUND selects its schema: { resourceType, resourceId }.
+    console.error(result.error.data.resourceType, result.error.data.resourceId);
+  }
+  throw new Error(`users.getById failed: ${code}`, { cause: result.error });
+}
+```
+
+`isDefinedError(failure.error)` is the predicate form when you already have a typed failure union.
+It preserves the defined members present in that input type; it does not turn an arbitrary
+`unknown` value into one of the contract's declared errors.
 
 ## Production notes
 

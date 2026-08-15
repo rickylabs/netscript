@@ -80,6 +80,10 @@ forces the exact key union to stay synchronized. No code union or metadata vocab
 | 2026-08-15 | S2    | Assertions         | Removed both S2 suppressions and replaced them with exact code-union/defined-error assertions plus code-specific data and plain-error guards. |
 | 2026-08-15 | S2    | Consumers          | Checked query, desktop, RFC, assignability, service-query, and Fresh consumers; ran SDK query/desktop plus Fresh extraction tests.            |
 | 2026-08-15 | S2    | Reconcile          | Observed S1 Tier-A PASS; no issue/label/checklist mutation, no #1348/#1466 touch, no scope adjustment, and S3 remains blocked.                |
+| 2026-08-15 | S3    | Narrative          | Both published pages now scope contract typing to input/output/declared errors and keep transport/arbitrary throws on the non-defined branch. |
+| 2026-08-15 | S3    | Examples           | Literal `isSuccess` then `isDefined` branches terminate every failure path; all six codes and code-selected schema data are shown.             |
+| 2026-08-15 | S3    | Compile proof      | SDK fence passed `docs:snippets`; discover Step 3/4 and copyable function passed page-isolated checks with a real `baseContract` fixture.       |
+| 2026-08-15 | S3    | Gates              | Source format, accuracy, source/rendered links, caveats, build, doctest, and focused example compilation passed; final gates remain S4-only.   |
 
 ## Gate results
 
@@ -97,6 +101,14 @@ forces the exact key union to stay synchronized. No code union or metadata vocab
 | S2 focused/consumer tests             | PASS                                   | 12/12 results across 4 test files                                              |
 | S2 focused lint                       | PASS after one recorded correction     | Initial 2 `verbatim-module-syntax`; final 3 files, 0 findings                  |
 | S2 focused format write/check         | PASS                                   | 3 edited TS files, 0 findings                                                  |
+| S3 docs source format                 | PASS                                   | Structured receipt; exit 0, `Docs source format: OK`                           |
+| S3 docs accuracy                      | PASS                                   | Structured receipt; 199 published source pages checked                         |
+| S3 SDK snippet compile                | PASS                                   | 36 Tier-1 candidates, 22 checked, 14 existing exemptions                       |
+| S3 discover example compile           | PASS                                   | Step 3/4 pair and end-to-end function; real base-contract fixture               |
+| S3 SDK doctest                        | PASS                                   | 3/3 results                                                                     |
+| S3 source links                       | PASS                                   | 103 docs; 0 broken links, anchors, or orphans                                   |
+| S3 site verify                        | PASS                                   | Build, rendered-output, rendered links, and caveats; raw exit 0                 |
+| S3 scope/lock hygiene                 | PASS                                   | Four landed product/test files and `deno.lock` unchanged                        |
 | Root/final-slice gates                | NOT RUN                                | Explicitly reserved for slice 4                                                |
 
 ### S1 structured JSON verdicts
@@ -376,7 +388,155 @@ The S2 doctest-only run also passed 3/3 before the broader 12-test consumer run.
 above was not edited or rerun. `typed-queue_test.ts` was not selected, so #1667 was not encountered.
 Root/final-slice gates were not run.
 
+### S3 disposition receipt
+
+| Planned location | Disposition | Final location and wording |
+| ---------------- | ----------- | -------------------------- |
+| `sdk.md:12-20` | Retained with required scope | `sdk.md:12-22` now limits non-drift to input, output, and declared-error types; transport/arbitrary throws are explicitly non-defined failures. |
+| `sdk.md:31-38` | Retained and corrected | `sdk.md:33-41` says the L1 method's input, output, and declared-error union are inferred from the contract. |
+| `sdk.md:58-70` | Retained and corrected | `sdk.md:61-71` says `baseContract` error schemas flow through the client promise and `safe()`, while runtime non-defined failures remain outside the contract. |
+| `sdk.md:113-114` | Retained with cross-reference | `sdk.md:118-120` scopes direct-call inference to input/output/declared errors and points rejecting calls to the `safe()` section. |
+| `sdk.md:196-198` | Replaced completely | `sdk.md:203-249` names all six codes, branches on literal `isSuccess` then `isDefined`, throws non-defined failures, demonstrates `NOT_FOUND` schema data, and scopes `isDefinedError`. |
+| `discover-services.md:9-14` | Retained with required scope | `discover-services.md:11-15` names input/output/declared errors and keeps discovery/transport failures non-defined. |
+| `discover-services.md:96-101,114-115` | Retained and corrected | `discover-services.md:99-118` states `baseContract` carries the six errors and the call comment includes declared-error inference; the prerequisite row also names declared errors. |
+| `discover-services.md:135-154` | Replaced completely | `discover-services.md:137-176` names all six codes, uses literal discriminants, terminates every failure, demonstrates `NOT_FOUND` schema data, and scopes `isDefinedError`. |
+| `discover-services.md:205-229` | Replaced completely | `discover-services.md:227-264` makes the copyable function return only from `isSuccess`, throws the non-defined branch, and demonstrates `VALIDATION_ERROR` schema data before throwing the defined failure. |
+
+### S3 structured JSON verdicts
+
+Final source-format receipt:
+
+```json
+{
+  "gateId": "docs-source-format",
+  "invocationId": "fix-sdk-typed-error-channel-s3-source-format-final",
+  "gitHead": "ca7ade409be0cc0c064e75f5bfa1bd109e06d013",
+  "outcome": "PASS",
+  "exitCode": 0,
+  "durationMs": 444,
+  "stdout": "Docs source format: OK"
+}
+```
+
+Final docs-accuracy receipt:
+
+```json
+{
+  "gateId": "docs-accuracy",
+  "invocationId": "fix-sdk-typed-error-channel-s3-docs-accuracy-final",
+  "gitHead": "ca7ade409be0cc0c064e75f5bfa1bd109e06d013",
+  "outcome": "PASS",
+  "exitCode": 0,
+  "durationMs": 11532,
+  "summary": "199 published source pages; 91/91 root/direct public commands from 149 recursive paths"
+}
+```
+
+This accuracy PASS proves only the invariants implemented by that script; it is not treated as
+proof of the page-level error narrative.
+
+SDK-page snippet compilation:
+
+```json
+{
+  "gate": "docs:snippets",
+  "outcome": "PASS",
+  "exitCode": 0,
+  "census": {
+    "scanned": 581,
+    "tsLike": 298,
+    "tier1": 36,
+    "checked": 22,
+    "exempt": 14,
+    "outsideFloor": 262,
+    "malformed": 0
+  }
+}
+```
+
+The SDK error fence is in the Tier-1 floor and compiles directly against the real
+`@netscript/contracts` and `@netscript/sdk/client` workspace entrypoints. Discover-services is
+outside the current day-one snippet floor, so its changed examples were compiled page-isolated in
+two batches. The only supplied prelude replaced the project-local `@my-app/contracts` import with a
+real `baseContract` route of the same `list` input/output shape; the documented client construction,
+branching, exact code annotation, and code-specific `data` accesses were unchanged:
+
+```json
+{
+  "gate": "discover-services-error-examples",
+  "verdict": "PASS",
+  "results": [
+    {
+      "source": [105, 146],
+      "code": 0,
+      "rootLockUnchanged": true,
+      "temporaryLockRewritten": true,
+      "diagnostics": "Check discover-services.md Step 3/4"
+    },
+    {
+      "source": [232],
+      "code": 0,
+      "rootLockUnchanged": true,
+      "temporaryLockRewritten": true,
+      "diagnostics": "Check discover-services.md end-to-end function"
+    }
+  ]
+}
+```
+
+SDK doctest:
+
+```json
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all",
+    "packages/sdk/tests/readme-doctest_test.ts"
+  ],
+  "exitCode": 0,
+  "durationMs": 5485,
+  "summary": { "passed": 3, "failed": 0, "ignored": 0, "totalResults": 3 },
+  "failures": []
+}
+```
+
+Link/build/scope verdicts:
+
+```json
+{
+  "docsSourceLinks": {
+    "command": "deno task docs:links",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "docs": 103,
+    "brokenLinks": 0,
+    "brokenAnchors": 0,
+    "orphans": 0
+  },
+  "siteVerify": {
+    "command": "deno task --cwd docs/site verify",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "covers": ["source-format", "build", "rendered-output", "rendered-links", "caveats"]
+  },
+  "scope": {
+    "outcome": "PASS",
+    "productAndTestFilesByteIdentical": true,
+    "denoLockUnchanged": true,
+    "newFiles": 0
+  }
+}
+```
+
+The known raw-red `surface:diff`, JSR `F-DOCT-5`, and pinned raw doc-lint baselines were not run in
+this slice and remain known red; no green claim is made. `typed-queue_test.ts` was not selected, so
+#1667 was not encountered. Root/final-slice gates remain reserved for S4.
+
 ## Handoff
 
-S2 is complete and stops here for fresh Tier-A review. Slice 3 and both docs pages remain untouched.
-No evaluator was launched, no acceptance box was ticked, and no metadata vocabulary was introduced.
+S3 is complete and stops here for fresh Tier-A review. No S4 work started, no evaluator was
+launched, no acceptance box was ticked, and no metadata vocabulary or acceptance claim was
+introduced.
