@@ -188,3 +188,65 @@ removed, so this does not fail the slice, but a literal append would have made t
 
 S2 Tier-A **PASS** at `ca7ade409`. Slice 3 (both docs pages) is **not** authorized by this review. No
 evaluator, no runtime lease, no #1348/#1466 mutation; PR draft at sole `status:plan`.
+
+---
+
+# Tier-A — S3 at `c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd`
+
+| Field | Value |
+| --- | --- |
+| Head | `c7cba6d9bd6aef1fbeb0e8e9778a5d979c8544bd` — local == remote == PR, clean, draft, sole `status:plan` |
+| Commit | `c7cba6d9b docs(sdk): document typed error channel` |
+| Verdict | **PASS** |
+
+## Scope — exact
+
+`docs/site/services-sdk/sdk.md`, `docs/site/services-sdk/how-to/discover-services.md`, and one
+**existing** run artifact. `git diff --name-only ca7ade409..HEAD -- packages/` is **empty** — no
+product or test change, as required. No seventh path, no new file.
+
+## Lock hygiene — the guardrail held
+
+`git diff --quiet ca7ade409 HEAD -- deno.lock` → **LOCK-IDENTICAL**. No `zod@4.1.12` and no other
+lock mutation was committed.
+
+Recorded for accuracy: the reported drift was **not reproducible** when this topic checked it. At that
+moment the worktree lock was byte-identical to `ca7ade409` (sha256 `edfa0c24b70e0d83` both sides),
+`zod@4.1.12` occurred zero times in both, and only the two docs pages were modified. The guardrail was
+therefore dispatched as **preventive rather than corrective**, and said so plainly to the author — an
+instruction to "restore the lock you broke" would have misdescribed reality to it. The requirement was
+still binding at commit time, and the committed head satisfies it.
+
+## The six-literal channel — verified against source, not against assumption
+
+The authoritative set from `contract-primitives.ts` and the doctest's `ExpectedBaseErrorCode` is
+**`NOT_FOUND`, `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMITED`,
+`SERVICE_UNAVAILABLE`**. **All six appear on both pages.**
+
+Worth recording: an initial check using a guessed literal set showed "5 of 6" and looked like a gap.
+The guess was wrong — `BAD_REQUEST` is not one of the six; `VALIDATION_ERROR` is. Deriving the set
+from source before filing anything is what prevented a false finding.
+
+## Story correctness
+
+Literal branching is present on both pages — `sdk.md` `isSuccess`×2 / `isDefined`×3,
+`discover-services.md` `isSuccess`×3 / `isDefined`×4 — so a plain or non-defined failure cannot fall
+through as success in the documented examples. `NetScriptProcedureMeta` appears **zero** times on
+either page, and no metadata acceptance claim is made. Box count unchanged at 3.
+
+## Gates — executed by this review
+
+| Gate | Result |
+| --- | --- |
+| `docs-source-format` | **PASS** |
+| `docs-accuracy` | **PASS** |
+| doctest / compile evidence | **3 / 0** |
+| product + test paths touched | **none** |
+
+`docs-accuracy` is recorded as proving what that script asserts and nothing more; it is not cited as
+evidence for a page-level narrative claim it does not check.
+
+## Outcome
+
+S3 Tier-A **PASS** at `c7cba6d9b`. S4 final gates are **not** authorized by this review. No evaluator,
+no runtime lease, no #1348/#1466 mutation; PR draft at sole `status:plan`.
