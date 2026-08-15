@@ -653,3 +653,17 @@
   Fable 5/medium Remote Control PLAN-EVAL: session `0287ccbe-2740-45ee-b378-33d1c1c59429`, bridge
   `cse_01GaNTjv6oY6MaxnKHH1ZfrB`, exact cwd and source head `ee1b44c6d`. No implementation or
   expensive gate is authorized before its terminal verdict.
+
+## 2026-08-15T11:51:00Z — #1665 implementation admitted; #1663 reaches owner boundary
+
+- #1665 PLAN-EVAL independently passed at evaluator commit `cd5193b66`, comment `5302080198`.
+  It reproduced the eleven calls plus definition, the partial invalidation leak, all six named red
+  doc diagnostics, the dynamic-URL docs proof, the real Deno KV failure route, and the exact 4+5
+  surface. The fixes supervisor corrected its own non-semantic 12-vs-11 call-count wording at topic
+  `7658df7e2`. Coordinator released only S1 on the same original author: fail-safe telemetry plus
+  bounded namespace admission, no KV-limit or diagnostic/JSDoc slice yet, and no expensive gate.
+- #1663's final artifact-only repair is clean/pushed at `194e22a3d`; fresh Tier-A passed at internals
+  topic `b2e0529be`, preserving all 114-file, 4/4 doctor, byte restoration, publish delta, and asset
+  freshness contracts. Because two formal PLAN-EVAL cycles are already consumed, the coordinator
+  surfaced the exact owner-only decision: authorize one exceptional final evaluator or stop the
+  leaf. No implementation starts while that decision is pending; other topics continue.

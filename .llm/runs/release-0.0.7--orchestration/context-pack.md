@@ -374,3 +374,10 @@ Control PLAN-EVAL is active as session `0287ccbe-2740-45ee-b378-33d1c1c59429`, b
 `cse_01GaNTjv6oY6MaxnKHH1ZfrB`, on that immutable head. Do not implement before verdict. #1664 S2
 and #1663's bounded cycle-two repair remain active independently on their original Codex authors;
 neither has an expensive gate lease.
+
+Resume from the newer `2026-08-15T11:51:00Z` transition. #1665 PLAN-EVAL is terminal PASS at
+`cd5193b66`, comment `5302080198`; fixes topic is `7658df7e2` after correcting its own call-site
+count, and the original Codex author is executing S1 only. #1663's repaired thirteen-path plan is
+clean at `194e22a3d`, Tier-A PASS at `b2e0529be`, but implementation remains blocked at the genuine
+owner boundary because both ordinary plan-evaluation cycles failed; a single exceptional final
+PLAN-EVAL was recommended and requested. #1664 S2 remains active independently. No runtime lease.

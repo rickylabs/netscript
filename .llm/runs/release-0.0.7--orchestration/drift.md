@@ -497,3 +497,11 @@ implementation thread.
   one `<resolved import.meta.url>` token in the published single-line template, then normalizes only
   the real URL segment in the focused provider test and compares every stable byte, including the
   SDK prefix. This repairs the known page in place without inventing perpetual stale prose.
+- **Evaluator census labels must match their own evidence:** #1665's Tier-A prose called the
+  namespace census twelve call sites while its table and the fresh evaluator correctly found eleven
+  calls plus the function definition. The topic artifact was corrected before implementation; the
+  mechanism, paths, and verdict were unchanged.
+- **Two failed plan cycles create an owner boundary even after a sound repair:** #1663's second
+  evaluator exposed a real generated publish consumer and the repaired plan now passes fresh
+  Tier-A. The coordinator cannot silently invent cycle three; one exceptional final evaluator is an
+  explicit owner decision, while product mutation remains prohibited and independent lanes proceed.
