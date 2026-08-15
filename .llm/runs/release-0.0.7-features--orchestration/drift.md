@@ -267,3 +267,32 @@ same rule silently stopped applying here purely because the artefact it writes t
 commit, so the commit trail has somewhere to live from the start. A leaf that defers PR creation to
 its final slice cannot satisfy the per-slice comment rule no matter how disciplined the author is —
 the requirement and the sequencing are coupled, and the coupling is the orchestrator's to get right.
+
+## D-16 — `run-deno-fmt.ts` fail-closes on multi-batch runs even with a no-exclude config (minor)
+
+**Date:** 2026-08-15. Formatting evidence for `packages/cli` cannot come from the root config, which
+excludes `packages/cli/` under `fmt.exclude` by design. The documented workaround is an explicit
+neutral same-style config — `packages/runtime-config/deno.json` (`useTabs: false`, `lineWidth: 100`,
+`indentWidth: 2`, `semiColons: true`, `singleQuote: true`, **no exclude**).
+
+Passing that config is **not sufficient on its own**. Measured at head `ee479ea85`:
+
+| Invocation | Result |
+| --- | --- |
+| `--root packages/cli --ext ts,tsx --config packages/runtime-config/deno.json` (relative, default `--batch-size 200`) | 887 files, 5 batches, **4 failedBatches**, 0 findings — fail-closed |
+| same with an **absolute** config path and `--batch-size 1000` | 887 files, **1 batch, 0 failedBatches, 0 findings** |
+
+So two details are load-bearing together: the config path must be absolute, and the batch size must
+exceed the file count so the run is a single batch. With the same config split across five batches,
+four still fail-close.
+
+The wrapper is behaving correctly in both cases — it refuses a false green when Deno drops files the
+wrapper selected (`run-deno-fmt.ts:374` describes this as a non-finding failure class). What is
+recorded here is that the documented neutral-config workaround silently does not work at default
+batching, which reads as "the workaround failed" rather than "the batching is wrong".
+
+**How to apply:** when gathering structured formatting evidence for a root the repo config excludes,
+pass the neutral config by **absolute path** and set `--batch-size` above the selected file count,
+then confirm `failedBatches: 0` before treating `findings: 0` as a verdict. A `findings: 0` with
+non-zero `failedBatches` is not a pass — it is a refusal, and reporting it as a pass would be the
+same overclaim this leaf corrected in its SDK doc-lint labelling.

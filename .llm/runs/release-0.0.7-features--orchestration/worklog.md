@@ -2451,3 +2451,37 @@ isolated-declaration/publish dry-runs, then the four binding receipts at the imm
 
 No lease requested. `scaffold.runtime`, `fresh-browser`, Aspire, Docker, S5, and evaluators remain
 untouched.
+
+### S4 resumed on the original thread — with a corrected invocation
+
+Dispatched from immutable evidence head `ee479ea851927818404c6311dac78e07a4eef1b5`.
+
+**Author identity confirmed live**, not assumed: `codex-status` reports thread
+`01a004f9-f033-7592-a0bc-63927753fb43`, `gpt-5.6-sol` · high, `working`, cwd
+`/home/codex/repos/netscript-007-features-1355` — matching the original recorded in
+`slices/codex-thread-ids-1355.md`. No replacement session was created at any point in this leaf.
+
+**The prescribed invocation needed correction, found by running it before relaying it.** The neutral
+config is genuinely style-identical to root and carries no exclude — verified by parsing
+`packages/runtime-config/deno.json` rather than trusting the description. But passing it alone still
+fail-closed at 887 files / 5 batches / **4 failed**. It reproduces the expected 887 / 1 / 0 only with
+the config path **absolute** *and* `--batch-size 1000` so the run is a single batch. Recorded as
+**D-16**, because the workaround silently not working at default batching reads as "the workaround
+failed" rather than "the batching is wrong", and the next lane to hit it deserves the difference.
+
+Had that gone out unverified, the author would have hit the same red a second time and stopped again
+— a wasted cycle caused by relaying an instruction I had not executed.
+
+The rest went out unchanged: `reports/s4-format-failure.md` stays **append-only** as the record of
+why the evidence path changed; Fresh and SDK use their own configs; the `packages/cli/e2e/README.md`
+Markdown finding is recorded as pre-existing, untouched by this leaf, and explicitly not a
+package-quality verdict per `AGENTS.md`; and the ordered contract resumes — lint and asset freshness,
+per-member audits, three isolated publish dry-runs, then four `run-gate`-only receipts at the
+immutable head with independently recomputed sufficiency naming all four files.
+
+Reinforced in the dispatch: receipts only from `run-gate.ts` and never hand edited; a genuine red
+stops before any repair, attributed by measurement at a named commit; and this slice owns the full
+12-entrypoint export-map sweep, so anything beyond the two carried `QueryClient` diagnostics is a
+finding with attribution rather than an inherited baseline.
+
+No lease. `scaffold.runtime`, `fresh-browser`, Aspire, Docker, S5, and evaluators untouched.
