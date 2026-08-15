@@ -185,3 +185,10 @@ and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
 - Raw exit `1`: 0 passed, 2 failed. Resource-read was absent; close ignored the passed signal and
   timed out.
 - No cancellation implementation source changed in this RED slice.
+
+### Pool teardown RED addendum
+
+- Structured focused pool-stop test raw exit `1`: the pool remained `timed-out` instead of
+  `fulfilled` after caller abort, proving a hanging close still blocks aggregate teardown.
+- Healthy peer teardown did run; the missing behavior is caller-signal propagation and independent
+  aggregate settlement.

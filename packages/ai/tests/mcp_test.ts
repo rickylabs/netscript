@@ -128,6 +128,20 @@ class NeverSettlingTransport extends RecordingTransport {
   }
 }
 
+class AbortableStopTransport extends RecordingTransport {
+  stopSignal: AbortSignal | undefined;
+
+  override stop(options: McpConnectOptions = {}): Promise<void> {
+    this.stopSignal = options.signal;
+    return new Promise((_resolve, reject) => {
+      options.signal?.throwIfAborted();
+      options.signal?.addEventListener('abort', () => reject(options.signal?.reason), {
+        once: true,
+      });
+    });
+  }
+}
+
 function headersOf(value: unknown): Readonly<Record<string, string>> | undefined {
   if (typeof value !== 'object' || value === null) {
     return undefined;
@@ -282,6 +296,25 @@ Deno.test('McpTransportPool isolates a never-settling server during startup', as
   assertEquals(pool.snapshot.statuses.healthy?.state, 'connected');
   assertEquals(pool.snapshot.readyClients.healthy, healthy);
   assertEquals(pool.snapshot.readyClients.stalled, undefined);
+});
+
+Deno.test('McpTransportPool stop settles hanging servers independently', async () => {
+  const stalled = new AbortableStopTransport('stalled', []);
+  const healthy = new RecordingTransport('healthy', []);
+  const pool = createMcpTransportPoolFromTransports({ transports: [stalled, healthy] });
+  await pool.connect();
+  const controller = new AbortController();
+
+  const pending: Promise<unknown> = Reflect.apply(
+    pool.stop,
+    pool,
+    [{ signal: controller.signal }],
+  );
+  controller.abort(new DOMException('pool close deadline', 'AbortError'));
+
+  assertEquals(await settlementWithin(pending), 'fulfilled');
+  assertEquals(stalled.stopSignal?.aborted, true);
+  assertEquals(healthy.state, 'closed');
 });
 
 Deno.test('McpTransportPool keeps transports warm across turns', async () => {

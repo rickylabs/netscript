@@ -120,3 +120,8 @@ amendment.
   remains pending beyond the bounded observer.
 - Next: port/base/TanStack cancellation plus delegation-only wrapper changes, then cross-package
   Fresh compatibility check.
+
+### Pool teardown RED addendum
+
+- Focused structured pool-stop test raw exit `1`: a hanging server kept `pool.stop()` pending after
+  caller abort even though its healthy peer closed.

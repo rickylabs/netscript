@@ -123,3 +123,15 @@ Observed structured verdict: raw exit code `1`; `0` passed, `2` failed.
 
 The tests execute through the published transport instance rather than calling the base or
 connector directly. The observer bounds each pending operation at 40 ms so the RED run terminates.
+
+### Pool stop settlement RED
+
+Command:
+
+```text
+deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all --filter "McpTransportPool stop settles hanging servers independently" packages/ai/tests/mcp_test.ts
+```
+
+Observed structured verdict: raw exit code `1`; 0 passed, 1 failed. The healthy peer closed, but
+the pool operation remained pending and the bounded observer produced `timed-out` rather than
+`fulfilled`. The caller signal was not forwarded to the hanging peer.
