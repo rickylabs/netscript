@@ -452,3 +452,7 @@
 - Features #1293 plan rulings are durably amended at `feb8b0355`; the supervisor verified every
   amendment item and released S1 on the preserved Codex author. The owner-only acceptance-box-1
   wording edit remains unresolved but does not block the split-close product implementation.
+- Fixes evaluator identity is recorded before evaluator mutation: fresh Fable 5/medium Remote
+  Control session `cb917802-ee26-4b89-86b9-0eee33c7de1b`, bridge
+  `session_01Kwmr8XjoznnQsHUnkmfcnV`, PID `520689`, exact source `e3c74d7aa`. This is the canonical
+  formal-IMPL-EVAL route for Codex-authored work, not an Opus override.

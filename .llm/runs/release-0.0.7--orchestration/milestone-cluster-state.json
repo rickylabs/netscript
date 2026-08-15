@@ -114,7 +114,7 @@
         "pid": 26724,
         "bridgeSessionId": "session_014pCd2QWkCscgZpVdjcUPST",
         "remoteControlUrl": "https://claude.ai/code/session_014pCd2QWkCscgZpVdjcUPST",
-        "topicHeadSha": "98e50fa413dd6e0f7faaea2aa2f941ebb9da46a3",
+        "topicHeadSha": "57680baf3e7702286049adb16a77b04bf99606a2",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle"
@@ -955,7 +955,11 @@
       "tierASignoffHeadSha": "e3c74d7aaf3b7734b5a44a5be248c01f004c21e5",
       "tierACommentUrl": "https://github.com/rickylabs/netscript/pull/1661#issuecomment-5301585728",
       "crossPackageFreshCheck": "PASS: 197 files, 0 failed batches",
-      "formalImplementationEvaluation": "coordinator lease granted at 2026-08-15T09:28:00Z; fresh opposite-family evaluator launch in progress",
+      "formalImplementationEvaluation": "active on canonical native claude-fable-5 / medium / Remote Control route",
+      "implementationEvaluatorAgentId": "cb917802-ee26-4b89-86b9-0eee33c7de1b",
+      "implementationEvaluatorBackgroundAgentId": "cb917802",
+      "implementationEvaluatorBridgeSessionId": "session_01Kwmr8XjoznnQsHUnkmfcnV",
+      "implementationEvaluatorSourceHeadSha": "e3c74d7aaf3b7734b5a44a5be248c01f004c21e5",
       "receiptRefs": []
     },
     {
@@ -1520,6 +1524,29 @@
       "verdict": "PASS",
       "evaluatorCommitSha": "e15d78588503f4a83d6322be9039abe1f52190a1",
       "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1658#issuecomment-5301255122"
+    },
+    {
+      "id": "ai-mcp-pool-isolation-impl-eval-cycle-1",
+      "state": "active",
+      "lane": "fixes",
+      "leafId": "ai-mcp-pool-isolation",
+      "phase": "impl-eval",
+      "cycle": 1,
+      "sourceHead": "e3c74d7aaf3b7734b5a44a5be248c01f004c21e5",
+      "evaluatorAgentId": "cb917802-ee26-4b89-86b9-0eee33c7de1b",
+      "backgroundAgentId": "cb917802",
+      "pid": 520689,
+      "bridgeSessionId": "session_01Kwmr8XjoznnQsHUnkmfcnV",
+      "remoteControlUrl": "https://claude.ai/code/session_01Kwmr8XjoznnQsHUnkmfcnV",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-fable-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-15T09:28:00.000Z",
+      "attachedAt": "2026-08-15T09:28:23.000Z"
     }
   ],
   "expensiveGates": [
@@ -1613,5 +1640,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T09:28:54.000Z"
+  "updatedAt": "2026-08-15T09:30:45.000Z"
 }

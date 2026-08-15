@@ -264,3 +264,7 @@ snapshot, repaired at `615786c1a` into stable named invariants and freshly Tier-
 implementing S1 after the verified plan amendment `feb8b0355`. Preserve the original author threads,
 all four native Opus 5/high Remote Control supervisors, per-topic serialization, and the free
 expensive-gate mutex.
+
+#1661's active evaluator is Fable 5/medium Remote Control session `cb917802-ee26-4b89-86b9-0eee33c7de1b`
+with bridge `session_01Kwmr8XjoznnQsHUnkmfcnV`, exact source `e3c74d7aa`. Its route/identity/lease
+were recorded before mutation at fixes topic head `57680baf3`; do not launch a duplicate.
