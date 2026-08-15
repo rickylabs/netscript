@@ -149,3 +149,19 @@ cycle 1 returned `FAIL_FIX` at `a46b83831`: the source template had 66 entries b
 same-author repair, fresh Tier-A, and one final Opus 5/medium Remote Control cycle 2, with no browser,
 Aspire, Docker, scaffold, or E2E rerun. #1651 remains frozen pending explicit owner choice 1/2/3.
 Runtime remains empty and the expensive-gate mutex free; serialization is only per topic.
+
+Resume from the newer authoritative `2026-08-15T07:12:16Z` checkpoint. Main is
+`7737d8903bb2925c3fcefbda362168fe297eebd4` after #1656 merged from exact source `b80794470`; #1542
+is closed completed and both PR/issue carry `status:shipped`. Internals has advanced its next serial
+leaf, draft PR #1658 `openhands-dispatch-claim-and-refusal` (#1611+#1613), on preserved Codex thread
+`01a00443-…` at immutable base `7737d8903` and bootstrap `ca2266ecb`; its current authority ends after
+research/plan. The L-2 mixed
+lint-batch exclusion false-green is a separate later tooling leaf, not a fold-in or workaround.
+Fixes #1657 passed fresh Tier-A at `3d7819203`; its single final Opus 5/medium Remote Control
+IMPL-EVAL cycle 2 is running in session `1df19d27-…` over that exact local=remote=PR head. Docs #1652
+is at final cascade head `a465836b4`; all four freshness gates pass and its supervisor is waiting on
+fresh Tier-A plus terminal exact-head Actions, with formal cycle 3 forbidden. Features #1651 remains
+untouched and owner-blocked on choice 1 keep-and-narrow C6, 2 remove/defer C6, or 3 close as
+duplicate. Main CI has no failure at checkpoint but core `ci` is still in progress. Agentic runtime
+is `no_change`; Aspire, Docker containers, and volumes are empty. Preserve all four native topic
+supervisors and enforce serialization per topic only.

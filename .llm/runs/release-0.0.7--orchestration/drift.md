@@ -219,3 +219,11 @@ implementation thread.
   attached via `claude attach`. Coordinator transport remains GPT-5.6-SOL/high through the Codex
   app-server Remote Control socket, never max. Steering does not authorize replacing any native
   Claude Opus 5/high topic supervisor.
+- **L-2 disposition:** the `.llm/**` mixed-batch lint exclusion false-green is real and pre-existing,
+  but it is not part of #1656 or the contracted #1611+#1613 leaf. It is ordered after the current
+  internals wave-1 leaf as a dedicated issue/contract because the correct repair changes repository-
+  wide lint policy. No excluded-file workaround, manual receipt laundering, or fold-in is allowed.
+- **Main evidence boundary:** #1656 advanced main to `7737d8903`. Pages, code quality, and Fresh UI
+  quality were green at the checkpoint, while core `ci` remained in progress. Do not use the partial
+  workflow set as exact-main release evidence or a canary qualification; keep watching the exact
+  head until terminal.

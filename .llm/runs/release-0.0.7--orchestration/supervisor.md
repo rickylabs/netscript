@@ -287,3 +287,15 @@ each orchestrator; these three active gates run concurrently without cross-topic
 All three active workers are preserved original threads under the same four native Opus 5/high
 Remote Control topic supervisors. The completed browser lease has no residual process or resource
 ownership and the cluster-wide runtime mutex remains free.
+
+## Live checkpoint — 2026-08-15T07:12:16Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | #1652 final generated-asset cascade at `a465836b4`; fresh Tier-A plus exact-head Actions running | No formal cycle 3, next docs leaf, or readiness claim before exact-head terminal green |
+| internals | #1656 shipped as `7737d8903`; draft #1658 (#1611+#1613) research/plan active from bootstrap `ca2266ecb` on preserved Codex thread `01a00443-…` | No implementation or OpenHands dispatch before the plan gate; L-2 stays a later dedicated leaf |
+| fixes | #1657 fresh Tier-A `PASS`; formal IMPL-EVAL cycle 2 running in native Opus 5/medium session `1df19d27-…` | One final formal cycle only; no browser/Aspire/Docker/E2E rerun |
+| features | #1651 frozen on explicit owner option 1/2/3 | No amendment, reply, readiness, relabel, or merge before owner verdict |
+
+The topics do not wait on each other. Main is `7737d8903`; its post-merge core CI is watched while
+the other topics perform work that does not depend on that terminal result.

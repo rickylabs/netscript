@@ -232,3 +232,31 @@
 - Re-proved shared runtime hygiene: agentic runtime `no_change`, Aspire `[]`, Docker containers and
   volumes empty. Existing supervisors were attached and steered in place, never relaunched. #1651
   remains unchanged and draft pending the explicit owner option 1/2/3 disposition.
+
+## 2026-08-15T07:12:16Z — #1656 shipped; all three unblocked topics advance independently
+
+- Merged internals PR #1656 by squash with exact-head protection at source `b80794470`; live main is
+  now `7737d8903bb2925c3fcefbda362168fe297eebd4`. Before merge, the source had 0 pending and 0
+  failing checks, 0 review threads, and issue #1542 had 3/3 acceptance boxes checked. PR #1656 and
+  issue #1542 are now terminal `status:shipped`; the issue is `CLOSED/COMPLETED`.
+- The preserved internals supervisor reconciled that merge and selected its next lane-local serial
+  leaf, `openhands-dispatch-claim-and-refusal` for #1611 + #1613, now draft PR #1658. The original Codex route was
+  launched at immutable main `7737d8903` in worktree
+  `/home/codex/repos/netscript-007-openhands-dispatch`, thread `01a00443-…`, GPT-5.6-SOL/medium.
+  It bootstrapped cleanly at `ca2266ecb`; this turn is research/plan only and cannot implement or
+  dispatch OpenHands.
+- The L-2 mixed-batch lint exclusion false-green is not folded into #1656 or the new leaf. It remains
+  a dedicated tooling candidate after the contracted OpenHands leaf because repairing it changes
+  repository-wide lint policy and needs its own issue/contract.
+- Fixes #1657 reached fresh opposite-family Tier-A `PASS` at exact head `3d7819203`, then launched
+  its single authorized formal cycle-2 evaluator in native Opus 5/medium Remote Control session
+  `1df19d27-…`, bridge `session_018WYHfqzFKKve37TL7hsPQD`. Local, remote, and PR source heads were
+  equal at launch. No further formal loop is implicit.
+- Docs #1652 reached the terminal deterministic asset-cascade head `a465836b4`; the three generated
+  layers are agent-doc prose/provenance, the CLI embedded agent-doc barrel, and the MCP publish
+  assets barrel. Its supervisor independently re-ran all four freshness gates successfully and is
+  waiting for exact-head Actions plus fresh Tier-A. Formal cycle 3 remains forbidden.
+- Main post-merge workflows at `7737d8903` had no failures at this checkpoint: Pages, code quality,
+  and Fresh UI quality were successful; core `ci` remained in progress. Agentic runtime remained
+  `no_change`; Aspire, Docker containers, and Docker volumes remained empty. Serialization remains
+  per topic, with only the global runtime/expensive-gate mutex shared.

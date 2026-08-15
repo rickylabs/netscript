@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
-  "currentMainSha": "da574111af05a5cded74250128b196fcab870274",
+  "currentMainSha": "7737d8903bb2925c3fcefbda362168fe297eebd4",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -45,7 +45,7 @@
         "pid": 23964,
         "bridgeSessionId": "session_01PLRauSHN1PnvrNF2ucefF6",
         "remoteControlUrl": "https://claude.ai/code/session_01PLRauSHN1PnvrNF2ucefF6",
-        "topicHeadSha": "370038fb63b5825bd3548031fffe9dc3612fccb3",
+        "topicHeadSha": "d07050ac72d845487e91a55a44623fcadbad13ef",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e19b-71d1-95ce-8c72559eb026",
         "legacyState": "parked_offline"
@@ -72,7 +72,7 @@
         "pid": 23955,
         "bridgeSessionId": "session_01HqFtKQtyJcHBEn1MghQdFX",
         "remoteControlUrl": "https://claude.ai/code/session_01HqFtKQtyJcHBEn1MghQdFX",
-        "topicHeadSha": "90cda2a3b9975db8a7112339f5fd07cfbc8bdac3",
+        "topicHeadSha": "0e62e1d7504d9f9fb5e49586902073afe9dcd79f",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle"
@@ -450,7 +450,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "d35cbca30872d1f55118d63437638e93270c2ac3",
-      "currentPrHeadSha": "d4a0a8340aa5fc2b61d9526845808c227c07f115",
+      "currentPrHeadSha": "a465836b4cc1c40262a473de07b5744e70b20ead",
       "evaluatorCommitSha": "a790e91e26a4fb84636b4f3c57bd6444196b4ca9",
       "evaluationVerdict": "PASS",
       "implementationEvaluationState": "complete_cycle_2",
@@ -499,9 +499,20 @@
       "nextImplementationEvaluationVerdict": "PASS",
       "nextImplementationEvaluatorCommitSha": "71cc5a02cde091f862c9892464ea77cc962b3675",
       "nextImplementationEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1652#issuecomment-5300916189",
-      "mergeReadinessCleanupState": "derived_asset_repair_running",
-      "derivedAssetRepairHeadSha": "d4a0a8340aa5fc2b61d9526845808c227c07f115",
-      "derivedAssetRepairPath": "packages/cli/src/kernel/assets/agent-docs.generated.ts",
+      "mergeReadinessCleanupState": "derived_asset_cascade_tier_a_and_ci_running",
+      "derivedAssetRepairHeadSha": "a465836b4cc1c40262a473de07b5744e70b20ead",
+      "derivedAssetRepairPath": "packages/mcp/src/publish-assets.generated.ts",
+      "derivedAssetCascadeHeads": [
+        "d4a0a8340aa5fc2b61d9526845808c227c07f115",
+        "d24c3fa03197cfcf0adcc91eca08847d6a26bd8c",
+        "a465836b4cc1c40262a473de07b5744e70b20ead"
+      ],
+      "derivedAssetCascadePaths": [
+        ".llm/assets/agent-docs/prose.json.gz",
+        ".llm/assets/agent-docs/provenance.json",
+        "packages/cli/src/kernel/assets/agent-docs.generated.ts",
+        "packages/mcp/src/publish-assets.generated.ts"
+      ],
       "derivedAssetRepairFormalCycle3": "not_authorized",
       "mergeReadinessCleanupFindings": [
         "replace the non-reproducible normalized digest claim with directly reproducible byte-identical evidence",
@@ -648,13 +659,13 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "da574111af05a5cded74250128b196fcab870274",
-      "currentPrHeadSha": "c3ccceeb13cd71895ea4ac3229f03a15472dac86",
+      "currentPrHeadSha": "3d7819203f59e68eb5b45f6871a03c41ca43cd2f",
       "issueNumbers": [1358],
       "implementerAgentId": "01a003f0-7821-7a10-a555-e619a9280479",
       "branch": "fix/design-registry-catalog-drift-gate",
       "worktree": "/home/codex/repos/netscript-007-leaf-design-registry-drift",
       "prNumber": 1657,
-      "implementationState": "repairing_impl_eval_e1_e2",
+      "implementationState": "impl_eval_cycle_2_running",
       "implementationCompletedHeadSha": "4a3c40321ac1e58aa337e02afeaa95fbc553ce7f",
       "freshBrowserGateState": "complete",
       "freshBrowserLeaseId": "design-registry-catalog-drift-fresh-browser",
@@ -684,9 +695,14 @@
       "implementationEvaluationVerdict": "FAIL_FIX",
       "implementationEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1657#issuecomment-5301015059",
       "repairScopeAmendmentHeadSha": "c3ccceeb13cd71895ea4ac3229f03a15472dac86",
-      "repairTierAState": "pending",
-      "nextImplementationEvaluationState": "authorized_after_tier_a_pass",
+      "repairTierAState": "PASS",
+      "repairTierACommitSha": "3d7819203f59e68eb5b45f6871a03c41ca43cd2f",
+      "repairTierACommentUrl": "https://github.com/rickylabs/netscript/pull/1657#issuecomment-5301086718",
+      "nextImplementationEvaluationState": "running",
       "nextImplementationEvaluationCycle": 2,
+      "nextImplementationEvaluatedHeadSha": "3d7819203f59e68eb5b45f6871a03c41ca43cd2f",
+      "nextImplementationEvaluatorAgentId": "1df19d27-ce81-4027-99ac-49f3b9ec26bc",
+      "nextImplementationEvaluatorBridgeSessionId": "session_018WYHfqzFKKve37TL7hsPQD",
       "receiptRefs": [
         ".llm/runs/fix-design-registry-catalog-drift-gate--0.0.7-wave1/receipts/fresh-browser.json"
       ]
@@ -694,10 +710,10 @@
     {
       "id": "quality-scan-root-coverage",
       "lane": "internals",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "473e8d75b5281c93dc4729d99f3358a34f2bd687",
-      "currentPrHeadSha": "addba1ab977ed194dbce73deccfa94cac268e807",
+      "currentPrHeadSha": "b80794470cd175ad89d27c06a764ab1d032d3d9f",
       "issueNumbers": [1542],
       "implementerAgentId": "01a003d2-61ee-7ec0-8c74-075b3d631168",
       "branch": "fix/quality-scan-root-coverage",
@@ -709,7 +725,7 @@
       "planEvaluatorAgentId": "97ef1950-cda3-450e-9451-052a15015b3a",
       "planEvaluatorCommitSha": "3b95a004fe8bc5c022c7a2601fafef9a1216be68",
       "planEvaluationVerdict": "PASS",
-      "implementationState": "impl_eval_pass_readiness_running",
+      "implementationState": "complete",
       "implementationGrantedAt": "2026-08-15T05:48:07.224Z",
       "slice1HeadSha": "dbbedde346f91341208875aee7b5108bd3805dc7",
       "slice1TierAState": "PASS",
@@ -738,8 +754,28 @@
       "implementationEvaluatorCommitSha": "addba1ab977ed194dbce73deccfa94cac268e807",
       "implementationEvaluationVerdict": "PASS",
       "implementationEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1656#issuecomment-5301029660",
-      "readinessState": "running",
+      "readinessState": "complete",
       "readinessFollowUp": "pre-existing .llm lint exclusion can silently omit tooling files from mixed lint batches",
+      "mergeCommitSha": "7737d8903bb2925c3fcefbda362168fe297eebd4",
+      "mergedAt": "2026-08-15T07:09:12.000Z",
+      "issueCompletionState": "closed_completed",
+      "receiptRefs": []
+    },
+    {
+      "id": "openhands-dispatch-claim-and-refusal",
+      "lane": "internals",
+      "phase": "planned",
+      "baseBranch": "main",
+      "headSha": "7737d8903bb2925c3fcefbda362168fe297eebd4",
+      "currentPrHeadSha": "ca2266ecb4fe0cdd8a47059b4bca39761840f3b3",
+      "issueNumbers": [1611, 1613],
+      "implementerAgentId": "01a00443-abab-7261-8905-74ed71467929",
+      "branch": "fix/openhands-dispatch-claim-and-refusal",
+      "worktree": "/home/codex/repos/netscript-007-openhands-dispatch",
+      "prNumber": 1658,
+      "bootstrapHeadSha": "ca2266ecb4fe0cdd8a47059b4bca39761840f3b3",
+      "implementationState": "bootstrap_research_plan_running",
+      "planEvaluationState": "pending_author_judgement",
       "receiptRefs": []
     },
     {
@@ -1180,6 +1216,27 @@
       "verdict": "PASS",
       "evaluatorCommitSha": "addba1ab977ed194dbce73deccfa94cac268e807",
       "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1656#issuecomment-5301029660"
+    },
+    {
+      "id": "design-registry-catalog-drift-gate-impl-eval-cycle-2",
+      "state": "running",
+      "lane": "fixes",
+      "leafId": "design-registry-catalog-drift-gate",
+      "phase": "impl-eval",
+      "cycle": 2,
+      "sourceHead": "3d7819203f59e68eb5b45f6871a03c41ca43cd2f",
+      "evaluatorAgentId": "1df19d27-ce81-4027-99ac-49f3b9ec26bc",
+      "backgroundAgentId": "1df19d27",
+      "bridgeSessionId": "session_018WYHfqzFKKve37TL7hsPQD",
+      "remoteControlUrl": "https://claude.ai/code/session_018WYHfqzFKKve37TL7hsPQD",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-opus-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-15T07:10:00.000Z"
     }
   ],
   "expensiveGates": [
@@ -1247,7 +1304,7 @@
     }
   ],
   "exactMainEvidence": {
-    "gitHead": "da574111af05a5cded74250128b196fcab870274",
+    "gitHead": "7737d8903bb2925c3fcefbda362168fe297eebd4",
     "surface": "repository",
     "expectedGateIds": [
       "arch-check",
@@ -1273,5 +1330,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T06:54:51.000Z"
+  "updatedAt": "2026-08-15T07:12:16.000Z"
 }
