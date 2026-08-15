@@ -162,13 +162,13 @@ Slice 2 is authorized.
 
 ### Progress
 
-| Time | Step | Notes |
-| --- | --- | --- |
-| 2026-08-15 | Authorization | Fast-forwarded to Tier-A S1 sign-off `6f725ad3b`; began S2 only. |
-| 2026-08-15 | RED | Added symmetric formal-pair and non-formal-omission tests first; targeted structured wrapper exited 1 because `DispatchOptions` had no `phase`/`head` surface. |
+| Time       | Step           | Notes                                                                                                                                                                                           |
+| ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-15 | Authorization  | Fast-forwarded to Tier-A S1 sign-off `6f725ad3b`; began S2 only.                                                                                                                                |
+| 2026-08-15 | RED            | Added symmetric formal-pair and non-formal-omission tests first; targeted structured wrapper exited 1 because `DispatchOptions` had no `phase`/`head` surface.                                  |
 | 2026-08-15 | Implementation | Kept `buildOpenHandsComment` pure; added optional typed phase/head inputs, runtime pair/phase/SHA validation, paired emission, and explicit tuple-free assertions. Targeted suite passed 75/75. |
-| 2026-08-15 | Durable gates | At `28a8a9184`, cached package/plugin `check` passed and root `test` passed with 4,140 passed / 19 ignored / 0 failed. Only `test` covers S2. |
-| 2026-08-15 | Reconcile | Read S1 supervisor sign-off comment `5301346790`; #1611/#1613 remain open and unchanged at milestone `0.0.7`. No plan adjustment or issue mutation was needed. |
+| 2026-08-15 | Durable gates  | At `28a8a9184`, cached package/plugin `check` passed and root `test` passed with 4,140 passed / 19 ignored / 0 failed. Only `test` covers S2.                                                   |
+| 2026-08-15 | Reconcile      | Read S1 supervisor sign-off comment `5301346790`; #1611/#1613 remain open and unchanged at milestone `0.0.7`. No plan adjustment or issue mutation was needed.                                  |
 
 ### Decisions
 
@@ -180,16 +180,47 @@ Slice 2 is authorized.
 
 ### Gate status
 
-| Gate | Outcome | Exit | Receipt / evidence | Coverage meaning |
-| --- | --- | ---: | --- | --- |
-| Targeted RED | expected failure | 1 | structured test wrapper before implementation; no durable PASS receipt | Type-check rejected absent `phase`/`head` producer fields. |
-| Targeted GREEN | PASS | 0 | structured test wrapper; 75/75 | Focused pair-validation and tuple-omission feedback. |
-| `check` | PASS | 0 | `receipts/slice-2/check.json` at `28a8a9184`; unchanged-input cache hit | Frozen-contract receipt only; package/plugin roots do not cover S2. |
-| `test` | PASS | 0 | `receipts/slice-2/test.json` at `28a8a9184`; 4,140 passed, 19 ignored, 0 failed | Load-bearing S2 behavioral proof; root discovery executed the producer suite. |
-| `quality-job` | NOT_RUN | — | S2 does not name this gate; scheduled for S4/S5 | Shares the non-covering package/plugin check dependency and is not independent proof. |
+| Gate           | Outcome          | Exit | Receipt / evidence                                                              | Coverage meaning                                                                      |
+| -------------- | ---------------- | ---: | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Targeted RED   | expected failure |    1 | structured test wrapper before implementation; no durable PASS receipt          | Type-check rejected absent `phase`/`head` producer fields.                            |
+| Targeted GREEN | PASS             |    0 | structured test wrapper; 75/75                                                  | Focused pair-validation and tuple-omission feedback.                                  |
+| `check`        | PASS             |    0 | `receipts/slice-2/check.json` at `28a8a9184`; unchanged-input cache hit         | Frozen-contract receipt only; package/plugin roots do not cover S2.                   |
+| `test`         | PASS             |    0 | `receipts/slice-2/test.json` at `28a8a9184`; 4,140 passed, 19 ignored, 0 failed | Load-bearing S2 behavioral proof; root discovery executed the producer suite.         |
+| `quality-job`  | NOT_RUN          |    — | S2 does not name this gate; scheduled for S4/S5                                 | Shares the non-covering package/plugin check dependency and is not independent proof. |
 
 ### Handoff boundary
 
 - S2 stops after durable receipts, push, and its PR comment for Tier-A review.
 - S3 is not authorized and no CLI or workflow path was changed.
 - No OpenHands/evaluator dispatch or workflow-triggering label transition occurred.
+
+## Tier-A sign-off — Slice 2
+
+Signed off by `topic-internals-0.0.7` (Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34`, Opus 5
+/ high) at `5869cb46d5157fd4bd42ef2afaf357286a823506` (implementation `28a8a9184`, attestation
+`5869cb46d`). Supervisor commit, not the implementer's.
+
+Verified by execution:
+
+- **Scope holds** — only `agentic-lib.ts` and its test, exactly S2's two paths. No drift, no lock
+  churn.
+- **Supervisor re-ran the suite: 75 passed / 0 failed, exit 0.**
+- **The two halves are proved symmetrically**, which was the requirement. Formal mode asserts
+  presence — `first.includes('phase=plan')` and
+  `first.includes(\`head=${head}\`)`— and non-formal
+  mode asserts **absence** —`!first.includes('phase=')`and`!first.includes('head=')`.
+  Checking only the formal side would have let tuple plumbing leak into the non-formal path
+  unnoticed, which is precisely what the locked contract forbids.
+- **Half-tuples are rejected, not tolerated.** Three distinct failures:
+  `'requires phase and head together'`, `'phase must be plan or impl'`, and
+  `'head must be a 40-character lowercase hex SHA'` enforced by `/^[0-9a-f]{40}$/`. That shape
+  matters — an abbreviated or uppercase SHA would not bind a verdict to exactly one commit, which is
+  the whole purpose of the tuple.
+- **The producer stayed pure.** No `fetch`, Octokit, GitHub client, or `await` was added; it
+  validates and formats only. Live head resolution remains S3's alone, so the producer stays
+  testable without network and two components never claim authority over the same fact.
+- **N2 honesty carried forward** — the S2 gate table again records `test` as the load-bearing proof
+  (4,140 passed / 0 failed) and `quality-job` as `NOT_RUN` with the non-covering `check` dependency
+  named, rather than banking a green receipt that does not cover these paths.
+
+Slice 3 is authorized.
