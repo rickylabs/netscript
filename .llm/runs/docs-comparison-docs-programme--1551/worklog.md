@@ -283,3 +283,40 @@ and SHA-256 `6f25560210cae276a3a5149e7315b1e9682406acdfe342cadbe1c7f35c629efb`.
 Final slice scope is the two generated assets plus append-only updates to `worklog.md`,
 `context-pack.md`, and `drift.md`. No evaluated docs page, evidence input, product path, lockfile,
 consumer pin, canonical comment, or PR/issue metadata changed.
+
+### Derived CLI asset amendment — embedded agent docs
+
+The coordinator authorized the deterministic consequence of the approved corpus refresh:
+`.llm/tools/generate-cli-assets-barrel.ts` reads the refreshed agent-docs provenance and gzip and
+emits `packages/cli/src/kernel/assets/agent-docs.generated.ts`. **PLAN-EVAL: N/A** because this is
+deterministic regenerated output from an already-approved input change, with no new architecture,
+sequencing, scope, risk, or trade-off decision.
+
+`deno task gen:assets-barrel` returned raw exit `0`. Changed-path inspection immediately afterward
+showed only `plan.md` plus the authorized agent-docs target; no other barrel target moved. The
+generated target has exactly 11 insertions and 6 deletions and carries source commit `c8e3f26d8`,
+4,783,855 uncompressed bytes, 1,372,269 compressed bytes, and SHA-256
+`6f25560210cae276a3a5149e7315b1e9682406acdfe342cadbe1c7f35c629efb`.
+
+| Gate | Command / evidence | Result | Finding |
+| --- | --- | --- | --- |
+| Barrel freshness, unstaged diagnostic | exact durable command below before staging the generated delta | FAIL / raw exit `1` | `check:assets-barrel` ends with `git diff --exit-code` against the index, so it truthfully saw the unstaged intended delta |
+| Barrel freshness, staged diagnostic | `deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/gates/run-gate.ts --gate assets-barrel --id quality-assets-barrel --output .llm/tmp/gate-receipts/quality/assets-barrel.json` after staging only the generated target | PASS / raw exit `0` | regeneration matched the staged bytes, but this is not the authoritative CI-equivalent proof because the target still differed from `HEAD`; the exact command will be rerun after commit and its receipt reported on PR #1652 |
+| Framework quality | `rtk proxy deno task quality:gate` | PASS / raw exit `0` | `quality:scan` reported no findings; chained `arch:check` ran distinctly and passed, so no duplicate standalone run was needed |
+| Scoped type check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli/src/kernel/assets --ext ts` | PASS / raw exit `0` | 7 files selected, 1 batch, 0 findings |
+| Scoped format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli/src/kernel/assets --ext ts` | N/A — not applicable / raw exit `2` | root `deno.json` excludes `packages/cli/` from `fmt` by deliberate repo-wide configuration; the wrapper selected the batch, observed the exclusion, and failed closed rather than reporting a false green |
+| CLI publish surface | `deno publish --dry-run --allow-dirty` from `packages/cli` | PASS / raw exit `0` | chosen as the narrower, directly relevant proof that the embedded generated source is accepted in the CLI publish surface; existing dynamic-import warnings are unrelated |
+
+The format row is not passed, skipped, or waived. A package-config diagnostic also returned raw
+exit `2`, confirming that substituting `packages/cli/deno.json` does not manufacture a meaningful
+format verdict. Root `lint.exclude` also excludes `packages/cli/`; no inapplicable lint row was run.
+
+The post-commit durable receipt is intentionally not claimed in this pre-commit record. The
+one-commit slice contract requires the final exact wrapper run against the committed head; its raw
+exit, immutable head, and receipt path will be posted in the structured PR handoff.
+
+| Preservation gate | Command / evidence | Result | Finding |
+| --- | --- | --- | --- |
+| Diff hygiene | `git diff --check && git diff --cached --check` | PASS / raw exit `0` | no whitespace errors across staged and unstaged portions of the one slice |
+| Lock hygiene | `git diff --exit-code origin/main -- deno.lock docs/site/deno.lock` | PASS / raw exit `0` | both lockfiles unchanged |
+| Exact scope | union of `git diff --name-only` and `git diff --cached --name-only` | PASS / raw exit `0` | exactly the generated target, `plan.md`, `worklog.md`, `context-pack.md`, and `drift.md`; no other source, docs content, or barrel target changed |

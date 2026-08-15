@@ -140,3 +140,22 @@ docs links, docs accuracy, diff hygiene, and lock hygiene also returned raw exit
 Next authorized action is the single generated-asset commit, explicit-refspec push, and one
 structured PR comment, then stop for topic-orchestrator Tier-A verification. Preserve the externally
 set `draft: false` / `status:impl-eval` state and make no PR, issue, evidence, pin, or content change.
+
+## Derived CLI asset amendment
+
+The coordinator authorized `packages/cli/src/kernel/assets/agent-docs.generated.ts` as the sole
+generated package surface required by the approved corpus refresh. `plan.md` records **PLAN-EVAL:
+N/A** because the output is deterministic from already-approved inputs and introduces no new plan
+decision. `deno task gen:assets-barrel` returned raw exit `0` and produced exactly the expected
+11-insertion / 6-deletion delta; no other barrel target moved.
+
+Pre-commit gates: `quality:gate` raw exit `0` with no scanner finding and a distinct passing chained
+`arch:check`; scoped type check raw exit `0`; CLI `deno publish --dry-run --allow-dirty` raw exit
+`0`. Scoped format is N/A, not passed/skipped/waived: root `deno.json` deliberately excludes all of
+`packages/cli/`, and the wrapper failed closed at raw exit `2` after selecting seven files.
+
+The diff-based durable barrel gate returned raw exit `1` while the target was unstaged and raw exit
+`0` after it was staged. The latter proves byte agreement with the index but is not the final
+CI-equivalent receipt. After the single amendment commit, rerun the exact durable command against
+the committed head, explicitly push, post the structured PR comment, and stop for Tier-A review.
+Preserve the current PR lifecycle state and all issue/comment/pin boundaries.

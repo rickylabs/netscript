@@ -238,3 +238,26 @@ assets. The file-list delta is exactly the five expected pages, with no removals
 additions. The durable `agent-docs-prose` gate then returned raw exit `0`; receipt
 `.llm/tmp/gate-receipts/docs-comparison-docs-programme--1551/agent-docs-prose.json`. This is a stale
 generated-asset repair, not a content, evidence, plan, pin, or acceptance change.
+
+## 2026-08-15 — corpus refresh required its deterministic embedded CLI copy
+
+**Severity:** significant contract correction; coordinator-authorized; no milestone rescope and no
+scope growth beyond the derived output.
+
+The original docs-leaf boundary excluded `packages/**`, but
+`.llm/tools/generate-cli-assets-barrel.ts` deterministically embeds the approved agent-docs gzip and
+provenance in `packages/cli/src/kernel/assets/agent-docs.generated.ts`. Refreshing the input bundle
+therefore necessarily made that generated copy stale. The coordinator authorized this one generated
+surface only; `plan.md` now records the exception and **PLAN-EVAL: N/A** because no architecture or
+locked-plan decision changes.
+
+The generator moved only the authorized agent-docs target with the expected 11-insertion /
+6-deletion shape. The exact durable freshness gate initially returned raw exit `1` while the
+intended delta was unstaged, then raw exit `0` after staging; because its final check compares the
+working tree with the index, only the mandated post-commit rerun is authoritative for CI parity.
+
+The prescribed scoped format row was also unsatisfiable: root `deno.json` deliberately excludes
+`packages/cli/` from `fmt`. The wrapper selected seven files, observed Deno excluding the batch, and
+failed closed at raw exit `2`. The topic orchestrator ruled the row **N/A — not applicable**, never
+passed, skipped, or waived. No alternate config, suppression, generated-file hand edit, or root
+configuration change was used.

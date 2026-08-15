@@ -27,6 +27,19 @@ The result teaches readers how to evaluate mechanisms without presenting provisi
 
 Any need to cross those boundaries is significant drift and a hard stop for topic-orchestrator direction.
 
+### Authorized derived-asset amendment — 2026-08-15
+
+For the deterministic follow-up to the approved agent-docs corpus refresh only,
+`packages/cli/src/kernel/assets/agent-docs.generated.ts` is an authorized generated file surface.
+The generator reads the already-approved `.llm/assets/agent-docs/provenance.json` and
+`.llm/assets/agent-docs/prose.json.gz` inputs; this exception authorizes no other `packages/**` or
+generator target and changes no locked design decision, slice definition, gate list, non-goal, or
+deferred acceptance owner.
+
+**PLAN-EVAL: N/A.** This amendment emits deterministic regenerated output from an already-approved
+input change. It adds no architecture, sequencing, scope, risk, or trade-off decision requiring a
+fresh planning evaluation.
+
 ## Locked design decisions
 
 1. **IA:** add `/comparisons/` and `/migration/` as roots in the existing Concepts lane; do not create a sixth top-level lane.
