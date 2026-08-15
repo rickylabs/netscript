@@ -504,3 +504,77 @@ Neither is this leaf's regression; neither may be described as a pass.
 S3 Tier-A **PASS**. Implementation is complete across S1–S3; all five issues' behaviour is
 implemented and proven. Next gate is IMPL-EVAL in a fresh opposite-family session. No readiness or
 label change made; PR remains draft at sole `status:plan`.
+
+---
+
+# Tier-A — generated-asset repair at `7549d9fc052e604212f12e617b05085a061f9e0b`
+
+| Field | Value |
+| --- | --- |
+| Head | `7549d9fc052e604212f12e617b05085a061f9e0b` — local == remote == PR, clean |
+| Prior head | `0fed4d7ff`; one commit `7549d9fc0 chore(docs): refresh agent docs bundle for query bridge` |
+| Author state | idle ≥90 s before gates ran; gates were held until then because `gen:agent-docs-prose` writes `docs/site/_site` and racing an active author yields an untrustworthy verdict |
+| Verdict | **PASS** |
+
+## Scope — exactly the amendment, nothing more
+
+`git diff --name-only 0fed4d7ff..7549d9fc0` = `.llm/assets/agent-docs/prose.json.gz`,
+`.llm/assets/agent-docs/provenance.json`, and three run artifacts (`context-pack.md`,
+`generated-assets-repair-report.md`, `worklog.md`).
+`git diff --name-only … -- packages/ plugins/ docs/ tools/ deno.json deno.lock` is **empty**.
+`baselines/public-surfaces.json` untouched.
+
+**The prior product IMPL-EVAL PASS is preserved:**
+`git diff 9a26c107a..7549d9fc0 -- packages/ plugins/ docs/ tools/ deno.json deno.lock` is **empty**,
+so the product tree the evaluator judged is byte-identical at this head.
+
+## Source-to-generated fidelity — corroborated against a pre-repair measurement
+
+The strongest evidence here is that the expected output was computed **before the repair existed**.
+When this orchestrator independently reproduced the failure at `0fed4d7ff`, the freshness check
+reported the *fresh* provenance it expected:
+
+```text
+uncompressedBytes: 4753909    sha256: 6df99eb856ebf1cd8b1daf6bd610a6f3ee4db804c41e465ca5be500ef35853fe
+```
+
+The committed asset carries **exactly** those values. The regeneration therefore reproduces content
+this session derived from the authorized source edit — not something taken on the author's word.
+
+`provenance.json` delta is exactly what a faithful, targeted regeneration looks like:
+
+| Field | Before | After |
+| --- | --- | --- |
+| `sourceCommit` | `504de3f67` | `0fed4d7ff` |
+| `extractionTimestamp` | `2026-08-15T08:52:56.248Z` | `2026-08-15T15:32:16.221Z` |
+| `uncompressedBytes` | 4753233 | 4753909 |
+| `compressedBytes` | 1363117 | 1363396 |
+| `sha256` | `a7c72177…` | `6df99eb8…` |
+
+The `files` manifest is **unchanged** — no page added or removed. This is a content refresh of the
+existing corpus, not a bulk rebuild sweeping in unrelated drift, which was the hard-stop condition in
+the repair brief.
+
+## Gates — executed by this review at the repair head
+
+| Gate | Result |
+| --- | --- |
+| `deno task check:agent-docs-prose` | **exit 0**, `fresh: true`, `stalePaths: []`, `sourceCommit 0fed4d7ff` |
+| `run-deno-lint.ts --root packages/sdk` | exit 0, 0 occurrences, 84 files |
+| `run-deno-fmt.ts --root packages/sdk` | 0 findings, 84 files |
+| raw `deno doc --lint` combined / cache entrypoint | exit 1 — exactly the six pinned diagnostics, unchanged |
+
+The author's report claimed `check:agent-docs-prose` exit 0 / `fresh: true`, `docs/site verify`
+exit 0, lint and fmt exit 0, and honestly reported doc-lint as **exit 1** on both invocations rather
+than as a pass. The claims that matter were re-executed here and hold.
+
+## Unchanged red gates
+
+`surface:diff` (stale `baselines/public-surfaces.json`) and JSR `F-DOCT-5` (13 children at base and
+head) remain red, untouched, and are not this leaf's to repair. Neither may be reported as green.
+
+## Outcome
+
+Repair Tier-A **PASS** at `7549d9fc0`. Next: a proportionate fresh delta evaluator confined to
+source-to-generated fidelity and the repair artifact. No readiness, label reconciliation, or merge
+until that verdict lands.
