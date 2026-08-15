@@ -17,18 +17,21 @@ state remain with `codex-root-0.0.7`.
 
 ## Lane state
 
-- Live `origin/main` = `01e0960494c95ce56eb35892c211a095eb13e6ed`, still the immutable dispatch base.
+- Live `origin/main` = `0b3ed5d5a6aea451318f120988c25dfa3993a2ab`. It has **advanced** past the
+  immutable dispatch base `01e0960494c95ce56eb35892c211a095eb13e6ed`, which PR #1651's `base.sha`
+  still records. The leaf disclosed the advance; the IMPL-EVAL tested the claim that it does not
+  invalidate the RFC's coupling findings and confirmed it holds.
 - Topic branch `orchestrator/release-0.0.7-features` carries orchestration evidence only.
-- Sole active leaf: `rfc-plugin-cli-contribution` (#1502), draft PR **#1651**, head
-  `12276e6d86403ed1340ef79a963e87d401d643e9`, base `main`, exactly one lifecycle label
-  `status:plan-eval`, 0 review threads, 0 current CI failures (all checks `skipped` — D-6).
-- Leaf worktree `/home/codex/repos/netscript-007-features-1502` on `docs/rfc-plugin-cli-contribution`
-  is clean at that head with no upstream and no active agent.
-- Author thread `019ffcc5-d3e1-7c13-9815-e9956ec43683` is idle with its plan-fix pushed and
-  reconciled. Steering is `codex exec resume 019ffcc5-d3e1-7c13-9815-e9956ec43683 -- "<follow-up>"`
-  via `.llm/tools/agentic/codex/codex-resume.ts`. Never fire a second `send-message-v2` at that
-  worktree. Its turn ended without a `task_complete` marker — read idle from `codex-status`, not
-  `codex-watch --mode turn` (D-5).
+- Sole leaf: `rfc-plugin-cli-contribution` (#1502), draft PR **#1651**, branch head
+  `0e302ad3a5915b7a820adcac0a9d5bdc2d7d0019` (the IMPL-EVAL verdict commit), exactly one lifecycle
+  label `status:impl`, 0 review threads. Evaluated final head was `04d431028…`; every binding gate
+  attests content head `120859d5c…`.
+- Leaf worktree `/home/codex/repos/netscript-007-features-1502` is clean at the branch head with no
+  upstream and no active agent.
+- Author thread `019ffcc5-d3e1-7c13-9815-e9956ec43683` is idle with all work pushed. Steering is
+  `.llm/tools/agentic/codex/codex-resume.ts --thread-id 019ffcc5-… --message …`. Never fire a second
+  `send-message-v2` at that worktree. An earlier turn ended without a `task_complete` marker — read
+  idle from `codex-status`, not `codex-watch --mode turn` (D-5).
 - `rfc-a-stage0-ratification-board` (#1348) stays a coordinator-only checkpoint with no leaf PR.
 
 ## Closed gate — PLAN-EVAL cycle 2 `PASS`
@@ -71,12 +74,26 @@ If it must be steered again, resume it — `.llm/tools/agentic/codex/codex-resum
 019ffcc5-d3e1-7c13-9815-e9956ec43683 --message …` — and never fire a second `send-message-v2` at
 that worktree.
 
+## IMPL-EVAL — terminal `PASS`, conditional
+
+Verdict `PASS` at `evaluate.md:380`, verdict-only commit `0e302ad3a` (touches `evaluate.md` alone),
+evaluated final head `04d431028…` / content head `120859d5c…`. Evaluator: fresh session
+`2a8cf0a6-7529-4ca6-97ce-69edcca3f84d`, bridge `session_01Y48WxcCgzUAWfJmGmhBykc`, PID `2718910`,
+native Claude Opus 5 · high · Remote Control, requested = observed, opposite-family to the Codex
+author. It relabelled nothing and did not flip the PR.
+
+**One correction is outstanding and blocks merge by the verdict's own terms.** The PR body's `check`
+row cites "1,033 files, 9 batches, 0 failed" against `check-final.json`, but that receipt has
+`stdout.bytes: 0` and carries no figures at all; the numbers come from `check-cli-plugin-cycle1.json`
+— a cycle-1 receipt at a different head. The fix must **drop or relabel** the figures, not merely
+re-point the citation, because no final receipt supports them. Body-only: changes no head, no
+receipt, no RFC content.
+
 ## Next actions belong to the coordinator
 
-1. **Dispatch IMPL-EVAL** — a fresh separate opposite-family session on the coordinator-assigned
-   route. This lane does not dispatch it; the Codex author cannot self-evaluate.
-2. **Decide the ready-flip** — the PR stays draft at `status:impl`. Draft→ready is itself an
-   automation trigger, so sequence it deliberately.
+1. **Land the body correction** (or grant this lane to dispatch it) — the verdict is conditional on it.
+2. **Decide the ready-flip and merge** — the PR stays draft at `status:impl`. Draft→ready is itself
+   an automation trigger, so sequence it deliberately.
 
 Standing prohibitions for this lane are unchanged: no merge, publish, ready-flip, relabel beyond the
 PR #1651 grant already exercised, issue filing, `#1348` mutation, central cluster-state change, or
