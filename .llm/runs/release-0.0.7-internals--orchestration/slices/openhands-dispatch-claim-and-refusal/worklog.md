@@ -229,13 +229,13 @@ Slice 3 is authorized.
 
 ### Progress
 
-| Time       | Step           | Notes                                                                                                                                                                                                                         |
-| ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-15 | Authorization  | Fast-forwarded to Tier-A S2 sign-off `0886c2427`; began S3 only.                                                                                                                                                              |
-| 2026-08-15 | RED            | Added deterministic CLI tests first; the targeted structured wrapper exited 1 because the injected dispatch runner and dependency contract did not exist.                                                                    |
+| Time       | Step           | Notes                                                                                                                                                                                                                                 |
+| ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-15 | Authorization  | Fast-forwarded to Tier-A S2 sign-off `0886c2427`; began S3 only.                                                                                                                                                                      |
+| 2026-08-15 | RED            | Added deterministic CLI tests first; the targeted structured wrapper exited 1 because the injected dispatch runner and dependency contract did not exist.                                                                             |
 | 2026-08-15 | Implementation | Added optional constrained `--phase`, formal PR/verdict guards, injected file/token/GitHub ports, and a live PR-head read immediately before trigger construction. No `--head` parser surface was added. Targeted suite passed 80/80. |
-| 2026-08-15 | Durable gates  | At `d7fdbb1d9`, cached package/plugin `check` passed and root `test` passed with 4,145 passed / 19 ignored / 0 failed. Only `test` covers S3.                                                                                   |
-| 2026-08-15 | Reconcile      | Read the S2 supervisor sign-off comment `5301401476`; #1611/#1613 remain open and unchanged at milestone `0.0.7`. No plan adjustment, issue mutation, or label change was needed.                                                   |
+| 2026-08-15 | Durable gates  | At `d7fdbb1d9`, cached package/plugin `check` passed and root `test` passed with 4,145 passed / 19 ignored / 0 failed. Only `test` covers S3.                                                                                         |
+| 2026-08-15 | Reconcile      | Read the S2 supervisor sign-off comment `5301401476`; #1611/#1613 remain open and unchanged at milestone `0.0.7`. No plan adjustment, issue mutation, or label change was needed.                                                     |
 
 ### Decisions
 
@@ -250,16 +250,47 @@ Slice 3 is authorized.
 
 ### Gate status
 
-| Gate           | Outcome          | Exit | Receipt / evidence                                                     | Coverage meaning                                                                  |
-| -------------- | ---------------- | ---: | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Targeted RED   | expected failure |    1 | structured test wrapper before implementation; no durable PASS receipt | Missing runner/dependency exports proved the tests preceded implementation.       |
-| Targeted GREEN | PASS             |    0 | structured test wrapper; 80/80                                         | Focused CLI sequencing, refusal, and tuple-free behavioral feedback.              |
-| `check`        | PASS             |    0 | `receipts/slice-3/check.json` at `d7fdbb1d9`; unchanged-input cache hit | Frozen-contract receipt only; package/plugin roots do not cover S3.               |
-| `test`         | PASS             |    0 | `receipts/slice-3/test.json` at `d7fdbb1d9`; 4,145 passed, 19 ignored  | Load-bearing S3 proof; root discovery executed the new CLI suite.                  |
-| `quality-job`  | NOT_RUN          |    — | S3 does not name this gate; scheduled for S4/S5                         | Shares the non-covering package/plugin check dependency; not independent proof.   |
+| Gate           | Outcome          | Exit | Receipt / evidence                                                      | Coverage meaning                                                                |
+| -------------- | ---------------- | ---: | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Targeted RED   | expected failure |    1 | structured test wrapper before implementation; no durable PASS receipt  | Missing runner/dependency exports proved the tests preceded implementation.     |
+| Targeted GREEN | PASS             |    0 | structured test wrapper; 80/80                                          | Focused CLI sequencing, refusal, and tuple-free behavioral feedback.            |
+| `check`        | PASS             |    0 | `receipts/slice-3/check.json` at `d7fdbb1d9`; unchanged-input cache hit | Frozen-contract receipt only; package/plugin roots do not cover S3.             |
+| `test`         | PASS             |    0 | `receipts/slice-3/test.json` at `d7fdbb1d9`; 4,145 passed, 19 ignored   | Load-bearing S3 proof; root discovery executed the new CLI suite.               |
+| `quality-job`  | NOT_RUN          |    — | S3 does not name this gate; scheduled for S4/S5                         | Shares the non-covering package/plugin check dependency; not independent proof. |
 
 ### Handoff boundary
 
 - S3 stops after durable receipts, push, and its PR comment for Tier-A review.
 - S4 is not authorized and no workflow path was changed.
-- No live GitHub API, OpenHands/evaluator dispatch, or workflow-triggering label transition occurred.
+- No live GitHub API, OpenHands/evaluator dispatch, or workflow-triggering label transition
+  occurred.
+
+## Tier-A sign-off — Slice 3
+
+Signed off by `topic-internals-0.0.7` (Claude session `f7691917-0be2-4bcd-8839-43d3fc809c34`, Opus 5
+/ high) at `2e6a065d774dd21cc4f9913eacc291622d27bc76` (implementation `d7fdbb1d9`, attestation
+`2e6a065d7`). Supervisor commit, not the implementer's.
+
+Verified by execution:
+
+- **Scope holds** — `dispatch-openhands.ts` modified and `dispatch-openhands_test.ts` added, exactly
+  S3's two paths. **No `catalog.ts`, `deno.json`, or lock edit**, confirming PLAN-EVAL N2's finding
+  that the new suite is auto-discovered and needs no ninth path.
+- **Supervisor re-ran the suite: 5 passed / 0 failed, exit 0.**
+- **All five required properties are proved, not merely implemented.** The five tests map one-to-one
+  onto them, and two are worth naming:
+  - **The absence of `--head` is proved by passing it.** The test supplies `--head <40 hex>` and
+    asserts `Unknown argument: --head` on stderr, and the CLI source contains no `--head` at all.
+    Proving a flag is rejected is stronger than never implementing it, because a later refactor that
+    quietly accepts it would fail this test.
+  - **Late resolution is proved by an exact call-sequence assertion**, not by inspection:
+    `assertEquals(h.calls, ['token', 'GET …/pulls/42', 'POST …/issues/42/comments'])`. Nothing sits
+    between head resolution and the post, and any extra or reordered call breaks the assertion — so
+    a stale head cannot creep in, and there is provably **exactly one** post.
+- **Non-formal dispatch is proved inert**: `assertEquals(h.calls, [])` — **zero** GitHub calls —
+  plus the absence of both tokens, asserted across **both** PR and issue targets rather than PR
+  alone.
+- **N2 honesty carried forward** — `test` recorded as the load-bearing S3 proof (4,145 passed) and
+  `quality-job` as `NOT_RUN` naming the non-covering `check` dependency.
+
+Slice 4 is authorized.
