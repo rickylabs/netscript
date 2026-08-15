@@ -2587,3 +2587,58 @@ not is a genuine finding and still stops the slice.**
 S4 resumes at per-member JSR audits, three isolated publish dry-runs, and the four `run-gate`-only
 receipts at the immutable head. No repair of any pre-existing diagnostic. No lease, no runtime gate,
 no evaluator.
+
+## 2026-08-15 — S4 binding `test` gate RED, caused by this leaf
+
+Head `b0e8b20fc0ef5402bd5de2bcb86fab71a30f6af4`, local == remote. Two receipts exist, both
+`run-gate`-generated at `35061bc80` with `gitHead == actualGitHead` and no mismatch override:
+
+| Receipt | gateId | invocationId | outcome | exit |
+| --- | --- | --- | --- | --- |
+| `s4-check.json` | `check` | `app-service-client-wiring-s4-check` | **PASS** | 0 |
+| `s4-test.json` | `test` | `app-service-client-wiring-s4-test` | **FAIL** | 1 |
+
+This is a **binding** gate, not supplemental, so the carried-baseline reasoning does not apply.
+
+### S4-F1 — a gate was added to a capability suite; its registry test was never updated
+
+`packages/cli/e2e/tests/presentation/suite-registry_test.ts:54` asserts
+`resolveSuite(SCAFFOLD.SERVICE).gates` equals exactly five gates. This leaf's diff against
+`c53726c69` adds exactly one line to `packages/cli/e2e/suites/scaffold/capability-suites.ts`:
+
+```
++  GATE.GENERATED_DENO_LINT,
+```
+
+The suite now selects six while the test expects five. Reproduced at the candidate head —
+`deno test ./e2e/tests/presentation/suite-registry_test.ts` → 18 passed, **1 failed**. It cannot
+reproduce at `c53726c69` because the added line does not exist there. **Attribution: caused by this
+leaf**, so by the standing rule it stops the slice rather than being carried.
+
+### Why it survived S2 and S3 Tier-A — my gap, and worth stating plainly
+
+I verified those slices with `deno test --allow-all ./src/`, which **excludes `./e2e/`**. The binding
+`test` gate has wider scope, so the 598/0 result I reported — and reproduced independently — never
+covered this file. My claim at the time was accurate about what it measured and silent about what it
+did not.
+
+That is precisely the shape of S2-F2, one level up. There, a targeted subset was green while the
+suite was red, and I caught it by running the full suite. Here, "the full suite" was itself a subset
+of the contracted gate. The lesson generalises: **the contracted evidence is the gate, not whatever
+command I chose to stand in for it** — and a subset that has been reliable for three slices is the
+most persuasive kind of wrong. S4 running the actual binding gate is what exposed it, which is
+exactly what a binding gate is for.
+
+### Scoped repair authorized
+
+This is the "separately reviewed scoped repair" the S4 grant contemplates, now reviewed. The **test**
+is stale, not the suite: adding `GATE.GENERATED_DENO_LINT` to the service capability suite was
+intentional S2 scope — generated output should be lint-checked. So the expectation is updated to
+include it, in the position the suite actually emits it; `assertEquals` on an array is order-sensitive
+and a pass achieved by luck of ordering would be worthless. The assertion must **not** be weakened to
+a set or length comparison — its entire value is exactness.
+
+All four binding gates must then be re-run at the new immutable head with fresh invocation IDs. The
+two existing receipts attest `35061bc80`, which will no longer be the content head, and superseded
+receipts must never be presented as current. Carried baselines stay exactly as recorded — Fresh 45
+and SDK 3 remain `PRE_EXISTING_FAIL` with attribution, plugin-streams still named separately.
