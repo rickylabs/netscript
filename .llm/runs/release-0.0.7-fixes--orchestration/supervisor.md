@@ -552,6 +552,41 @@ merge, relabel, issue mutation, and any next leaf.
 The next fixes leaf (`sdk-cache-surface-and-telemetry`) stays **queued** until this evaluator and the
 lifecycle transition are terminal.
 
+### #1661 IMPL-EVAL cycle 2 — lease and identity recorded pre-mutation
+
+Coordinator granted exactly one fresh separate opposite-family evaluator. Identity captured while
+the leaf tree was still **clean at the evaluated head** — the evaluator had not yet written
+anything, so this record genuinely precedes mutation.
+
+| Field | Value |
+| --- | --- |
+| Gate | IMPL-EVAL **cycle 2** (final), PR #1661 (#1448) |
+| **Evaluated head** | `df05344166adaeb2b8e2f2f6ec741e1032d29045` — the fresh Tier-A sign-off; equal across local, `origin`, PR; tree clean |
+| Repair head | `e4944309361fe18efea20be8a3df364bb8754d82` — verified **ancestor**, artifact-only delta to the evaluated head |
+| Cycle-1 record | verdict `8d6b4726c` `FAIL_FIX` at `e3c74d7aa` (F-1) |
+| Requested route | **canonical** `formal_impl_evaluation` — native Claude `claude-fable-5` · `medium` · `--remote-control` |
+| Observed route | `respawnFlags: ["--effort","medium","--permission-mode","bypassPermissions","--remote-control","--name","NetScript 0.0.7 #1661 IMPL-EVAL c2","--model","claude-fable-5"]` |
+| Background id | `eb7149da` |
+| Claude session id | `eb7149da-1689-44af-970e-ddd6e78022fa` |
+| PID | `608782` |
+| cwd | `/home/codex/repos/netscript-007-leaf-ai-mcp-pool` (exact leaf; sole session) |
+| Registry `bridgeSessionId` | `session_01CaAEKsH35CP2QgfNUVdXK1` |
+| Remote Control URL | `https://claude.ai/code/session_01CaAEKsH35CP2QgfNUVdXK1` |
+| Independence | fresh; separate from the Codex author `01a0048d-61b0-76a2-8117-5f8ce0466495` **and** from this orchestrator, which ruled both amendments and signed Tier-A twice |
+| Verdict | _pending — immutable pushed verdict required_ |
+
+**Serialization note.** Per owner policy evaluator serialization is **per topic**, so the internals
+lane's active evaluator does not block this fixes-lane lease. This lane holds exactly one evaluator.
+
+The brief binds the evaluator to **cycle-1 F-1 and the RED→GREEN lifetime repair**, and requires
+F-1 closure to be verified **behaviorally by running it**, not read from the diff — including
+confirming that discovery cancellation was not silently dropped while per-call cancellation was
+removed. It states that this orchestrator's Tier-A `PASS` and its rulings are **inputs to verify**,
+not substitutes, and that cycle 1 caught F-1 *after* a Tier-A `PASS` on that head. Immutable pushed
+verdict required; expensive gates and lease requests barred; read-only over source; final cycle.
+
+The next fixes leaf stays **queued** until the verdict **and** the lifecycle transition are terminal.
+
 ## Wave 0 lane assignments
 
 | Leaf | Branch | Implementation route | Formal evaluator (per `dispatch.json`) |
