@@ -1389,9 +1389,13 @@
       "overlays": [],
       "fileSurfaces": [
         ".github/scripts/openhands-comment-trigger.mjs",
+        ".github/scripts/openhands-comment-trigger.test.ts",
         ".github/workflows/openhands-agent.yml",
-        ".github/workflows/openhands-phase-eval.yml",
-        ".llm/tools/agentic/lib/agentic-lib.ts"
+        ".llm/tools/agentic/lib/agentic-lib.ts",
+        ".llm/tools/agentic/lib/agentic-lib_test.ts",
+        ".llm/tools/agentic/openhands/dispatch-openhands.ts",
+        ".llm/tools/agentic/openhands/dispatch-openhands_test.ts",
+        ".llm/tools/agentic/openhands/phase-eval-workflow_test.ts"
       ],
       "provingGates": [
         "check",

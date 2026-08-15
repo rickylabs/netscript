@@ -165,3 +165,17 @@ untouched and owner-blocked on choice 1 keep-and-narrow C6, 2 remove/defer C6, o
 duplicate. Main CI has no failure at checkpoint but core `ci` is still in progress. Agentic runtime
 is `no_change`; Aspire, Docker containers, and volumes are empty. Preserve all four native topic
 supervisors and enforce serialization per topic only.
+
+Resume from the newer authoritative `2026-08-15T07:25:00Z` checkpoint. Docs #1652 merged from
+`a465836b4` as main `e090f894ff3682405a36e4f896ffd2cc16f9a1f8`; #1551 closed completed and the
+docs lane has no residual bound 0.0.7 leaf. Internals #1658 stopped at research head `670e37bea`
+because its original frozen contract excluded the real CLI producer and regression tests. The
+coordinator replaced it with the exact eight-path mutation envelope recorded in `leaf-contracts.json`;
+`.github/workflows/openhands-phase-eval.yml` is read-only precedent. Formal mode is explicit
+`--phase plan|impl`, PR-only, verdict-bound, and uses a live CLI-resolved head; non-formal mode stays
+tuple-free. Refusals are one sanitized non-recursive pre-spend reply, and lookup retry is 5×1s with
+an attributable fail-closed exhaustion result. Resume the same Codex author only to rewrite the plan,
+then run one fresh opposite-family PLAN-EVAL because the claim/spend and workflow-permission boundary
+is architectural. Fixes #1657 cycle-2 IMPL-EVAL remains active at `3d7819203`. Features #1651 stays
+frozen on owner choice 1/2/3. Main CI is running without a failure at this checkpoint; Aspire and
+Docker remain empty.

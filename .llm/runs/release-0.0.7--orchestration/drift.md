@@ -227,3 +227,15 @@ implementation thread.
   quality were green at the checkpoint, while core `ci` remained in progress. Do not use the partial
   workflow set as exact-main release evidence or a canary qualification; keep watching the exact
   head until terminal.
+- **#1658 significant contract drift:** the original contract named four paths but omitted the real
+  manual dispatch CLI and every directly affected regression suite; it also named the already-correct
+  automatic phase workflow as a mutation target. Research head `670e37bea` stopped without widening.
+  The corrected eight-path contract adds the producer and tests, removes the phase workflow from the
+  mutation envelope, and requires a new CLI integration test. This is an authorized rescope, not
+  opportunistic scope growth.
+- **#1658 semantic lock:** formal manual evaluation is selected only by `--phase plan|impl`, is
+  PR-only and verdict-bound, and carries a CLI-resolved live head; non-formal work remains tuple-free.
+  The workflow may admit literal command candidates, but every denial reply must be sanitized,
+  marker-bearing, command-token-free, and exactly once so status/refusal comments cannot recurse.
+  Five one-second generation attempts match the automatic path; exhaustion becomes an attributable
+  denial rather than a paid dispatch or an unreported throw.

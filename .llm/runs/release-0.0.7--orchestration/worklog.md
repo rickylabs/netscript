@@ -260,3 +260,32 @@
   and Fresh UI quality were successful; core `ci` remained in progress. Agentic runtime remained
   `no_change`; Aspire, Docker containers, and Docker volumes remained empty. Serialization remains
   per topic, with only the global runtime/expensive-gate mutex shared.
+
+## 2026-08-15T07:25:00Z — docs shipped; #1658 contract corrected at the research boundary
+
+- Docs PR #1652 merged from exact source `a465836b4` as main
+  `e090f894ff3682405a36e4f896ffd2cc16f9a1f8` after fresh Tier-A, 0 pending/0 failing checks, 0
+  review threads, 21/21 PR boxes, and a clean mergeability result. Issue #1551 closed completed;
+  both PR and issue are `status:shipped`. The two canonical issue examples were independently
+  re-read as in-place replacements with no follow-up-update framing. The temporary
+  `impl-eval:skip` redispatch-suppression label was removed after merge so it cannot imply the earned
+  cycle-2 evaluation was waived.
+- Internals draft #1658 stopped correctly at research head `670e37bea`: the frozen four-path
+  contract excluded the actual `dispatch-openhands.ts` producer and all required regression suites,
+  while including `openhands-phase-eval.yml`, whose retry behavior is already the correct reference.
+  No implementation or evaluator was launched against the invalid envelope.
+- Coordinator amended the exact mutation contract to eight paths: the trusted trigger module and
+  test, manual workflow, dispatch builder and test, real dispatch CLI and a new CLI integration test,
+  plus the workflow contract regression test. The automatic phase workflow is read-only precedent.
+- Locked semantics: `--phase plan|impl` alone selects formal PR evaluation; formal mode is PR-only,
+  requires the verdict contract, and the CLI resolves the live PR head rather than accepting a
+  caller-supplied head. Without `--phase`, existing PR/issue dispatch remains tuple-free. Literal
+  command candidates reach the trusted predicate; a denial gets one sanitized marker-bearing reply
+  before spend that contains no command token and cannot recurse. Manual generation lookup adopts
+  the existing five attempts at one-second intervals and returns an attributable fail-closed denial
+  on exhaustion.
+- A fresh opposite-family PLAN-EVAL is required after the original author rewrites the plan because
+  this leaf changes atomic claim/spend behavior, job write permission, event admission, and refusal
+  recursion. This is a necessary architectural gate, not a reflexive extra cycle.
+- Exact-main workflows for `e090f894f` were active without a failure at this checkpoint. Fixes #1657
+  final IMPL-EVAL cycle 2 remained active and independent. Aspire/Docker stayed empty.

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
-  "currentMainSha": "7737d8903bb2925c3fcefbda362168fe297eebd4",
+  "currentMainSha": "e090f894ff3682405a36e4f896ffd2cc16f9a1f8",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -45,7 +45,7 @@
         "pid": 23964,
         "bridgeSessionId": "session_01PLRauSHN1PnvrNF2ucefF6",
         "remoteControlUrl": "https://claude.ai/code/session_01PLRauSHN1PnvrNF2ucefF6",
-        "topicHeadSha": "d07050ac72d845487e91a55a44623fcadbad13ef",
+        "topicHeadSha": "f7d2fdda6b36330d77f8d416904bd895c96c925a",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e19b-71d1-95ce-8c72559eb026",
         "legacyState": "parked_offline"
@@ -447,10 +447,11 @@
     {
       "id": "comparison-docs-programme",
       "lane": "docs",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "d35cbca30872d1f55118d63437638e93270c2ac3",
       "currentPrHeadSha": "a465836b4cc1c40262a473de07b5744e70b20ead",
+      "prNumber": 1652,
       "evaluatorCommitSha": "a790e91e26a4fb84636b4f3c57bd6444196b4ca9",
       "evaluationVerdict": "PASS",
       "implementationEvaluationState": "complete_cycle_2",
@@ -499,7 +500,7 @@
       "nextImplementationEvaluationVerdict": "PASS",
       "nextImplementationEvaluatorCommitSha": "71cc5a02cde091f862c9892464ea77cc962b3675",
       "nextImplementationEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1652#issuecomment-5300916189",
-      "mergeReadinessCleanupState": "derived_asset_cascade_tier_a_and_ci_running",
+      "mergeReadinessCleanupState": "complete",
       "derivedAssetRepairHeadSha": "a465836b4cc1c40262a473de07b5744e70b20ead",
       "derivedAssetRepairPath": "packages/mcp/src/publish-assets.generated.ts",
       "derivedAssetCascadeHeads": [
@@ -514,6 +515,10 @@
         "packages/mcp/src/publish-assets.generated.ts"
       ],
       "derivedAssetRepairFormalCycle3": "not_authorized",
+      "readinessState": "complete",
+      "mergeCommitSha": "e090f894ff3682405a36e4f896ffd2cc16f9a1f8",
+      "mergedAt": "2026-08-15T07:21:13.000Z",
+      "issueCompletionState": "closed_completed",
       "mergeReadinessCleanupFindings": [
         "replace the non-reproducible normalized digest claim with directly reproducible byte-identical evidence",
         "update the stale plan status",
@@ -767,15 +772,28 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "7737d8903bb2925c3fcefbda362168fe297eebd4",
-      "currentPrHeadSha": "ca2266ecb4fe0cdd8a47059b4bca39761840f3b3",
+      "currentPrHeadSha": "670e37beaa723f1b54218149a2485dd6b3e741e3",
       "issueNumbers": [1611, 1613],
       "implementerAgentId": "01a00443-abab-7261-8905-74ed71467929",
       "branch": "fix/openhands-dispatch-claim-and-refusal",
       "worktree": "/home/codex/repos/netscript-007-openhands-dispatch",
       "prNumber": 1658,
       "bootstrapHeadSha": "ca2266ecb4fe0cdd8a47059b4bca39761840f3b3",
-      "implementationState": "bootstrap_research_plan_running",
-      "planEvaluationState": "pending_author_judgement",
+      "researchHeadSha": "670e37beaa723f1b54218149a2485dd6b3e741e3",
+      "implementationState": "contract_rescope_authorized_plan_repair_pending",
+      "planEvaluationState": "required_after_repaired_plan",
+      "contractAmendment": {
+        "state": "authorized",
+        "authorizedAt": "2026-08-15T07:25:00.000Z",
+        "formalCliMode": "explicit --phase plan|impl, PR-only, verdict contract required, CLI resolves live PR head before emitting phase/head",
+        "nonFormalCliMode": "no --phase, tuple-free, PR and issue dispatch remain supported",
+        "refusalPolicy": "literal command candidates reach trusted policy; denied attempts receive one sanitized marker-bearing reply before spend with no command token and no recursion",
+        "generationRetry": "manual path uses the existing five attempts at one-second intervals and returns an attributable fail-closed denial on exhaustion",
+        "readOnlySurfaces": [
+          ".github/workflows/openhands-phase-eval.yml"
+        ],
+        "formalPlanEvaluationRequired": true
+      },
       "receiptRefs": []
     },
     {
@@ -1304,7 +1322,7 @@
     }
   ],
   "exactMainEvidence": {
-    "gitHead": "7737d8903bb2925c3fcefbda362168fe297eebd4",
+    "gitHead": "e090f894ff3682405a36e4f896ffd2cc16f9a1f8",
     "surface": "repository",
     "expectedGateIds": [
       "arch-check",
@@ -1330,5 +1348,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T07:12:16.000Z"
+  "updatedAt": "2026-08-15T07:25:00.000Z"
 }

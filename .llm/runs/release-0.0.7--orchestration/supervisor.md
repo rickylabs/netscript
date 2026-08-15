@@ -299,3 +299,14 @@ ownership and the cluster-wide runtime mutex remains free.
 
 The topics do not wait on each other. Main is `7737d8903`; its post-merge core CI is watched while
 the other topics perform work that does not depend on that terminal result.
+
+## Live checkpoint — 2026-08-15T07:25:00Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | #1652 shipped as `e090f894f`; lane inventory has no residual 0.0.7 docs leaf | Preserve supervisor checkpoint; do not invent work outside the bound inventory |
+| internals | #1658 research head `670e37bea`; central eight-path contract amendment authorized, same author repairs plan | No implementation before fresh opposite-family PLAN-EVAL `PASS`; phase workflow is read-only |
+| fixes | #1657 final IMPL-EVAL cycle 2 remains active at immutable source `3d7819203` | This is the final formal cycle; no browser/Aspire/Docker/E2E rerun |
+| features | #1651 owner-blocked on explicit option 1/2/3 | No amendment, reply, readiness, relabel, or merge before owner verdict |
+
+Main is `e090f894f`. Per-topic queues remain independent; only the runtime mutex is global.
