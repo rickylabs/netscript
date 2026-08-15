@@ -80,36 +80,42 @@ gate.
 
 ## Next action
 
-**Both dispatched gates are closed and #1653 implementation is complete.** All four planned slices
-landed, each with a supervisor Tier-A sign-off commit:
+**Both internals leaves are through their formal gates. Nothing in this lane is running.**
 
-| Slice                                                    | Implementation head | Sign-off commit |
-| -------------------------------------------------------- | ------------------- | --------------- |
-| S1 registration + fail-closed resolver                   | `586b55135`         | `3c3985289`     |
-| S2 `public-any` / `public-export-unresolved` enforcement | `f869a5bfe`         | `f9acdb426`     |
-| S3 consumer asset + JSR/debt evidence                    | `2977c8333`         | `83f7a1847`     |
-| S4 consumer portability restoration + final gates        | `71c264458`         | `2d5e4f5ae`     |
+| Leaf                                         | State                                                                                                       |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| #1644 `harness-evidence-and-verdict-tooling` | IMPL-EVAL `PASS`; **merged to `main`** as `dd472102d`                                                       |
+| #1653 `quality-scan-allowance-rail`          | IMPL-EVAL cycle 1 `FAIL_FIX` → editorial fix → **cycle 2 `PASS`**; draft at `status:impl`, head `70177e808` |
 
-Leaf head `2d5e4f5ae`, local = remote, worktree clean, PR #1653 draft at `status:impl`.
+#1653 awaits **coordinator merge disposition only**. Reconciled facts:
 
-The leaf is parked awaiting the **coordinator's IMPL-EVAL grant**. IMPL-EVAL is a formal gate
-needing a fresh separate opposite-family session on the reset dispatch route; this lane does not
-launch it. Readiness flip, `status:ready-merge`, PR-body box ticking, merge, and publication are all
-coordinator-owned.
+- `origin/main` = `0b3ed5d5a`; the leaf merges cleanly at `70177e808` (`git merge-tree` clean).
+- Verdict names `84bbcf9a1`; PR head is `70177e808`, delta is exactly `evaluate-cycle-2.md` — the
+  same evaluator-artifact pattern already accepted on #1644.
+- Close-gate mapping validates at 0 errors / 0 warnings with exact coverage (#1378 9/9, #1545 5/5),
+  re-checked after the evaluator's own comment landed.
+- 16 PR-body DoD boxes and 9 + 5 issue acceptance boxes remain unchecked, pending the
+  `status:ready-merge` mirror run. Those are coordinator actions; this lane does not tick them.
 
-DoD stands at 10/12 truthfully tickable rows. The two open rows were Slice 4 Tier-A review (closed
-by `2d5e4f5ae`) and IMPL-EVAL (open).
+## Open follow-ups (neither blocks this leaf)
 
-## Carried into IMPL-EVAL
+- **Double attribution** — a publicly reachable `any` is reported by both `explicit-any` and
+  `public-any` at the same `file:line` (3 findings for 2 defects). No effect on `ok`, budget, or
+  `allowCount`; one marker suppresses both. Locked plan behaviour; single-attribution is a suggested
+  #1276/#1378 follow-up.
+- **Silent unknown-flag handling** — a typo'd `--max-allow` leaves `maxAllow` undefined and disables
+  the ceiling. Verified pre-existing at base `01e096049`, not a regression; committed tasks spell
+  the flag correctly. Optional hardening.
 
-- **`explicit-any` vs `public-any` overlap** — the broad line-level classifier and the export-graph
-  rule now coexist. Locked plan behaviour that PLAN-EVAL passed, but confirm each violation is
-  reported once with the intended attribution.
-- **`D-12` import-specifier trade-off** — `.llm/tools/quality/scan-code-quality.ts` must keep the
-  inline `jsr:@std/path@^1` specifier because it ships to consumers via `agent-tools.generated.ts`.
-  A future lint pass over `.llm/tools/**` will want to "fix" it again; it must not. The binding
-  `test` gate is what protects this.
-- **Workers JSR baseline** — accepted exact-20 `private-type-ref`, owned by #1655 in 0.0.8, strict
-  no-increase, and never to be claimed green.
-- **Receipt head convention** — slice receipts attest the pre-commit parent, matching what IMPL-EVAL
-  already accepted on #1644.
+## Standing lessons from this run
+
+- Baseline `acceptance-evidence` blocks must be **replaced, not appended** — the mirror concatenates
+  body + all comments, so a stale block turns every box into a duplicate/not-yet-done error.
+- `mirror-acceptance-evidence.ts --dry-run` proves nothing without `status:ready-merge`; its label
+  guard skips validation. Execute the three validators directly.
+- `.llm/tools/quality/scan-code-quality.ts` must keep the inline `jsr:@std/path@^1` specifier — it
+  ships to consumers. A future lint pass will want to "fix" it; the binding `test` gate is what
+  protects it (drift `D-12`).
+- Never pipe an agent launch into a filter, and prove a session's non-existence before relaunching.
+- Prove process ownership from `/proc/<pid>/exe` excluding self; parse structured output rather than
+  pattern-matching text.
