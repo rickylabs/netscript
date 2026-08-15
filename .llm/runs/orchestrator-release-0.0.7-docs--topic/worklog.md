@@ -905,3 +905,73 @@ repositories, launched no agent, took no lease, and ran no expensive or shared g
 The two-failure eval limit is not reached: cycle 1 `FAIL_FIX`, cycle 2 `PASS`. The lane holds for
 coordinator direction on N1–N3 and on any merge-readiness sequence. Nothing was readied, merged, or
 published from this lane.
+
+## 2026-08-15 — terminal lease reconciled; N1–N3 cleanup complete; Tier-A PASS
+
+### Terminal gate independently verified
+
+Evaluator commit `71cc5a02cde091f862c9892464ea77cc962b3675` is **artifact-only** — exactly one file,
+`evaluate.md`. Evaluated immutable source `c7ce58a19494024c219e9970deeb3ece878232d6`; verdict
+comment `5300916189`. No further formal evaluator was launched; all five cycle-1 blockers are
+closed.
+
+### Cleanup — `0251b281c` then `c8e3f26d8`
+
+**N1.** The orchestrator computed the normalization itself rather than relaying it: deleting
+`observedAt` and serializing as `JSON.stringify(o, null, 2) + "\n"` yields
+`0be43e058bd8fdce8f4076fce9e94101fd43c643eadfef88475576245899c014`, matching both the leaf and the
+evaluator, while `3d9d2eef…` does not reproduce. The alternate forms `75edd56a…` (no trailing
+newline) and `baf8c1dc…` (compact) also match the evaluator's reported values — three independent
+confirmations. The live F3 gate row now carries the exact measurement command and `cmp` raw exit `0`
+in place of a digest, and the PR body carries the same reproducible evidence with the bad digest
+removed.
+
+`drift.md` shows **zero deletions**: the correction is appended at `:209` and the historical entries
+are preserved, which is the right handling for an append-only log.
+
+**N2.** `plan.md` Status refreshed to the actual state; locked decisions, slice definitions, and
+gate lists untouched.
+
+**N3.** `worklog.md` citation corrected to `## 7. Complete every matrix row`. Both Tier-A repair
+checkboxes ticked — correct, because the finding named the Slices and Definition-of-Done locations
+of one fact.
+
+### Residual found by Tier-A and repaired
+
+Two standing claims of the non-reproducing predecessor digest survived the first cleanup at
+`worklog.md:58` and `:147` — the latter a gate row marked `PASS` whose cited evidence was
+`b9e96ed2…`, which is exactly what N1 objected to. Fixed at `c8e3f26d8` by annotating those two rows
+in place with a superseded pointer rather than rewriting them: the standing claim is neutralised
+where it appears while the dated record of what was originally reported survives. Rewriting them
+would have been revisionism of the kind the append-only rule exists to prevent. A scan now returns
+**zero** un-annotated digest mentions.
+
+Raising this rather than signing off around it was deliberate. This lane had already missed the same
+class twice — cycle-1's F1, and relaying this very digest at S2 sign-off without reproducing it.
+
+### Tier-A verdict: PASS on precisely these fixes
+
+| Check                    | Result                                                                       |
+| ------------------------ | ---------------------------------------------------------------------------- |
+| Heads                    | local = remote = `c8e3f26d85c201827812e8292adb668d88b9c19d`                  |
+| Working tree             | clean                                                                        |
+| `git diff --check`       | raw exit `0`                                                                 |
+| Lockfile guard vs `main` | raw exit `0`, both unchanged                                                 |
+| External input           | clean at `5191de83…`, never written                                          |
+| Canonical #1551 comments | untouched by both commits                                                    |
+| Product/docs content     | untouched — cleanup commits contain run artifacts only                       |
+| PR state                 | draft, `status:impl`, milestone `0.0.7`, `Part of #1551`, no closing keyword |
+
+No `docs/site/**` path changed in either commit, so the site verifier was not applicable and was not
+claimed.
+
+### Observation left for the coordinator's readiness disposition
+
+Two boxes remain unchecked — "Fresh opposite-family IMPL-EVAL cycle 2 PASS" and "Separate
+opposite-family IMPL-EVAL passes" — although cycle 2 returned `PASS` and both are now truthfully
+checkable. They were left unchecked on the explicit instruction to tick only the already-proven
+Tier-A repair checkbox. Understating completion is the safe direction, but the coordinator may want
+them ticked as part of the readiness disposition rather than carried as a false negative.
+
+The lane stops here for that disposition. No ready flip, merge, publish, PLAN-EVAL, IMPL-EVAL cycle
+3, or next leaf.
