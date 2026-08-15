@@ -1602,3 +1602,65 @@ this product evaluation.
 
 The next features leaf, `app-service-client-wiring` (#1355, #1360), stays queued until this PR
 lifecycle is terminal.
+
+## 2026-08-15 — #1293 / PR #1662 IMPL-EVAL terminal `PASS`
+
+Verdict commit `f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf`, adding `evaluate.md` alone (138 lines).
+Local == remote == live PR head == `f52aa471c`. PR #1662 open **draft**, exactly one `status:impl`.
+Structured comment posted:
+`https://github.com/rickylabs/netscript/pull/1662#issuecomment-5301776738`.
+
+Evaluator: session `e64f33f0-c88e-4fc7-9e79-63c01fed94db`, bridge `cse_01XrFMbPHpry6tL3v9ZmRsLK`,
+requested = observed = **Fable 5 · medium · Remote Control**, `providerEnv {}`, opposite-family to
+the Codex author. Identity and lease recorded before mutation, as the lease required.
+
+**Substantive findings: none.** Four editorial notes.
+
+### It discharged all three obligations I wrote past the subject list
+
+1. **It falsified the guard rather than admiring it.** I asked whether the bidirectional guards
+   *could* fail. It built a scratch file with a deliberately widened control type and confirmed
+   `TS2322 Type 'Wide' is not assignable to type 'SqlQuery'` fires, while
+   `Eq<PrismaMySqlQuery, SqlQuery>` type-checks as `true`. So the guard would have caught the
+   original S1 defect. That is an experiment, not an inspection, and it is the only thing that
+   actually settles the question.
+2. **It swept the same defect class across every public type** — `Eq<…>` true for
+   `PrismaMySqlTransactionOptions`, `PrismaMySqlConnectionInfo`, `PrismaMySqlIsolationLevel` — and
+   found one that is **false**: `PrismaMySqlResultSet.columnTypes: number[]` against upstream
+   `ColumnType[]`. It then did the part that matters: checked `git show 284dda90a:…/adapter.ts` and
+   established the widening is **pre-existing at base**, output-side, with no runtime conversion
+   skipped, and therefore not chargeable to this leaf. That is the same conclusion I reached at
+   Tier-A and deliberately recorded as "not a finding", reached independently and with a stronger
+   proof.
+3. **It answered the blanket-`onError` question concretely**, naming the boundaries that never pass
+   through `onError` at all — `executeScript`, transaction acquisition, commit/rollback, disposal,
+   post-ready lifecycle — each asserting exactly one call with `assertStrictEquals`. It found no
+   boundary firing twice or not at all, and confirmed isolation/`BEGIN` failures traverse both
+   catches yet still count once.
+
+It also recomputed sufficiency itself, re-ran the raw D7 doc-lint and dry-run at the evidence head and
+confirmed byte-identical results, and ran `arch:check` and `quality:scan` on its own initiative —
+both exit 0 with only pre-existing allowances outside this package.
+
+### E2 is my process miss, not the author's
+
+The evaluator found PR #1662 carries **zero per-slice comments**, against `run-loop.md:117`, which
+expects a per-slice PR comment trail. The evidence is complete — the PR body's slice list and the
+in-repo `worklog.md` carry the trail — but the harness form was not followed.
+
+That is an orchestrator error, and specifically mine: I sequenced the PR to open at **S3** rather
+than at S1, so S1 and S2 had no PR to comment on, and I never instructed the author to backfill.
+On the #1502 leaf the PR existed from the plan phase and every slice got its comment; here the
+ordering silently removed the surface the rule depends on. Recorded as **D-15** with the fix for the
+next leaf: open the draft PR at the first slice so the commit trail has somewhere to live.
+
+E1 (pre-existing `columnTypes` widening, a candidate follow-up surface tightening), E3 (no literal
+`## Design` heading; the design lives in `plan.md` D1–D11 plus the rulings), and E4
+(`startTransaction` boundaries tested only with a non-throwing callback, containment covered
+transitively through the single shared notifier) are carried and non-blocking.
+
+### Lane state
+
+The #1293 leaf is gate-complete: PLAN-EVAL `PASS`, Tier-A on every slice, IMPL-EVAL `PASS`, four
+exact-head receipts `SUFFICIENT`, close contract intact. **Merge authority is the coordinator's** and
+the PR lifecycle is not yet terminal, so `app-service-client-wiring` (#1355, #1360) stays queued.

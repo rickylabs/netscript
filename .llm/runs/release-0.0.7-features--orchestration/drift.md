@@ -249,3 +249,21 @@ Verification actually used here, none of it depending on job state: verdict comm
 resolves and touches `plan-eval.md` alone; `git ls-remote` and local `HEAD` both return it; the tree
 is clean; and the artefact carries the verdict token, the evaluated head, and a route match read
 from `respawnFlags`.
+
+## D-15 — opening the PR at S3 removed the per-slice comment trail (minor, orchestrator error)
+
+**Date:** 2026-08-15. The #1293 IMPL-EVAL found PR #1662 carries zero per-slice comments, against
+`run-loop.md:117`, which expects a per-slice PR comment trail. The evidence is complete by other
+means — the PR body's slice list and the leaf `worklog.md` both carry it — so this is a form
+deviation, not an evidence gap. It is still a rule this lane did not follow.
+
+The cause is a sequencing choice I made as orchestrator, not anything the author did. I put PR
+creation in **S3**, so when S1 and S2 completed there was no PR to comment on, and I never
+instructed a backfill. The contrast with #1502 is instructive: there the draft PR existed from the
+plan phase, and every slice and Tier-A verdict got its structured comment as a matter of course. The
+same rule silently stopped applying here purely because the artefact it writes to did not exist yet.
+
+**Fix for the next features leaf:** open the draft PR at the **first** slice, before any code
+commit, so the commit trail has somewhere to live from the start. A leaf that defers PR creation to
+its final slice cannot satisfy the per-slice comment rule no matter how disciplined the author is —
+the requirement and the sequencing are coupled, and the coupling is the orchestrator's to get right.
