@@ -2305,3 +2305,48 @@ precisely because a targeted subset was green while the suite was red.
 
 Stops at a Tier-A stop for fresh review and pre-expensive-gate convergence. No S4, no evaluator, no
 readiness.
+
+## 2026-08-15 — S3 Tier-A: `PASS` at `1df8a5274d2adc7657eb785a37266aa0f1f7540d`
+
+Local == remote == PR #1664 head, tree clean, PR **draft**. Every item executed, not read.
+
+| # | Item | Result |
+| --- | --- | --- |
+| 1 | Scope | 13 files, **all** within the capped surface — both island templates, `embedded.generated.ts`, `route-templates_test.ts`, both READMEs, `packages/fresh/deno.json`, the browser test + three new fixture files, run artifacts. Nothing outside |
+| 2 | #1360 fix, **both** islands | `initialDataUpdatedAt: props.cachedAt` at `ServiceShowcaseLab.tsx.template:58` and `.memory.tsx.template:61`; the display label is retained at `:149`/`:120`, so `cachedAt` now serves both purposes instead of being computed, threaded and discarded |
+| 3 | Omission coverage | per-island assertions at `route-templates_test.ts:597` and `:614` |
+| 4 | C1 assertions preserved | all four still present — set equality, absent bridge import, literal ordering |
+| 5 | Browser fixture + task | `test:browser` now runs `form-navigation_browser.ts` **and** `query-hydration-age_browser.ts`; **not executed** |
+| 6 | Fresh README | hydration-age note explaining that `staleTime` is measured from the server load rather than from hydration |
+| 7 | CLI README | L1/L2 dialect, `Enabled: false` policy, `--dry-run`/`--force` with skip-vs-rewrite semantics, the six-symbol migration list, and the namespace change **including** that persisted cache entries under the old namespace are orphaned and may need clearing |
+| 8 | Asset freshness | `check:assets-barrel` **exit 0**, clean tree after canonical regeneration |
+| 9 | Fresh gates | `deno check` clean; non-browser tests **3 passed / 0 failed** |
+| 10 | **Full CLI suite** | `deno test --allow-all ./src/` → **598 passed / 0 failed**, exit 0, reproduced independently |
+| 11 | Expensive gates | `scaffold.runtime` and `fresh-browser` both **NOT_RUN** against the lease boundary; Aspire and Docker untouched; no lease requested |
+
+**The browser task wiring is the right shape, not merely present.** `catalog.ts:55` maps the
+`fresh-browser` gate to `deno task test:browser`, so extending *that* task means the gate will
+actually cover hydration when it runs under lease. A parallel task would have looked equivalent and
+never been invoked by the gate.
+
+**One honest note on the test count.** The full CLI suite reads 598 at both S2 and S3 because the
+omission assertions were added inside existing `it` bodies rather than as new cases, so the count is
+unchanged by construction — not a sign the new coverage is absent. The assertions are
+`assertStringIncludes` against rendered output and are falsifiable by construction: drop
+`initialDataUpdatedAt` from either template and they fail. A dedicated case per island would read
+more clearly, but that is style, not coverage, and is not worth a round trip.
+
+**One discrepancy in the grant, recorded because it is a path, not a scope, issue.** The coordinator
+grant listed the islands under `examples/service/(_islands)/`; they actually live at
+`examples/(_islands)/`. The author edited the real files. No scope deviation occurred — the grant's
+path string carried an extra segment.
+
+### Verdict `PASS`; handing back for pre-expensive-gate convergence review
+
+S1, S2 and S3 are complete and Tier-A signed. Cheap convergence is established: full CLI suite green,
+Fresh check and non-browser tests green, asset barrel fresh, C1 and S2 atomicity preserved across two
+subsequent slices.
+
+**Not requested and not taken:** the expensive-gate lease. Both gates remain `NOT_RUN`. Per the
+standing instruction this lane stops here for the coordinator's pre-expensive-gate convergence
+review; S4, the evaluator, and readiness are all unstarted.
