@@ -128,8 +128,30 @@ Six decisions were raised on 2026-08-15T15:12:56Z. The coordinator resolved **2 
 | 5   | **L-2 scope call**                                                               | none yet                        | **DEFERRED until #1663 is terminal** — L-2 overlaps that leaf's `deno.json` / lint-wrapper surface. It does **not** block #1666.                                                                                                     |
 | 6   | **Wave-3 sequencing**                                                            | #1533 vs #1666                  | **#1666 sequences BEFORE #1533**, so the new example-compiler gate does not knowingly land red on the already-identified `paginated-query` JSDoc.                                                                                    |
 
-On PLAN-EVAL `PASS`, the **preserved original Codex author** is resumed through the plan's serial
-slices, each followed by a fresh Tier-A gate. A `FAIL_PLAN` is reported as such, not worked around.
+### Outcome of decision 4 — PLAN-EVAL cycle 1 returned `FAIL_PLAN`
+
+Cycle 1 of 2 ran at `2026-08-15T16:52Z` over the amended head `a3f6b87b5` and returned
+**`FAIL_PLAN`** with one blocking finding, B1. The evaluator behaved as briefed: artifact-only
+(`5d229e0f3` adds `plan-eval.md` and nothing else), pushed, PR left draft at `status:plan`,
+`fresh-browser` left `NOT_RUN`, no runtime lease. **Cycle 1 is spent; cycle 2 is unlaunched.**
+
+B1, re-derived independently by this lane and confirmed: three shipped Contracts JSDoc examples
+beyond the one in scope import from a non-exporting root — `transform-helpers.ts:6`,
+`schemas/filters.ts:6`, `schemas/pagination.ts:6`. All four defective files are in the publish set.
+The plan records acceptance row 1 as baseline-satisfied apart from one file, which is false, and it
+locks `Closes #1296`.
+
+### Open decisions
+
+| #   | Decision                                                                | Leaf                            | Why it blocks                                                                                                                                                                                                                                                     |
+| --- | ----------------------------------------------------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Owner exception** for one final PLAN-EVAL cycle                       | #1663 `package-gate-honesty`    | **Owner-only**, unchanged. Parked at immutable `194e22a3d`.                                                                                                                                                                                                       |
+| 7   | **Scope call on B1** — (a) JSDoc-only amendment for the three additional files, or (b) keep the frozen surface, record row 1 unmet, and drop `Closes #1296` in favour of a referenced follow-up | #1666 | This lane has no scope authority, and the closing keyword governs whether merging auto-closes an issue whose row 1 is still unmet in three published files. Either branch also requires correcting SA-1 A4: #1533's gate would go red on **four** files, not one. |
+| 8   | **PLAN-EVAL cycle 2 grant**                                             | #1666                           | Contingent on 7. Re-running the evaluator against an unchanged scope would only reproduce B1 and spend the last cycle for nothing, so cycle 2 stays unlaunched until 7 is answered.                                                                                |
+
+On a later PLAN-EVAL `PASS`, the **preserved original Codex author** is resumed through the plan's
+serial slices, each followed by a fresh Tier-A gate. A `FAIL_PLAN` is reported as such, not worked
+around.
 
 Queued behind the WIP limit: wave 3 `jsdoc-example-compile-gate` (#1533) and
 `leak-check-process-descendants` (#1429); wave 4 `fresh-defer-test-capability` (#1557/#1601).

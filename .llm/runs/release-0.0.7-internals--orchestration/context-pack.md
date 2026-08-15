@@ -180,8 +180,9 @@ Authoritative statement is the decision table in `supervisor.md`. Resumable summ
      **artifact-only** (writes `plan-eval.md` and nothing else).
   4. On `PASS`, resume the **preserved original Codex author** through the plan's serial slices,
      each followed by a fresh Tier-A gate.
-- **#1666 sequences before #1533**, so the example-compiler gate does not knowingly land red on the
-  already-identified `paginated-query` JSDoc.
+- **#1666 sequences before #1533.** **Superseded in part:** PLAN-EVAL B1 found three more defective
+  files, so #1533's gate would go red on **four**. #1666 as currently scoped does not clear that
+  red. See open decision 7.
 - **L-2 is deferred until #1663 is terminal** (overlapping `deno.json` / lint-wrapper surface). It
   does not block #1666.
 
@@ -224,3 +225,32 @@ zero findings. It is the same coverage-versus-compliance defect #1542 just fixed
 - Never pipe an agent launch into a filter, and prove a session's non-existence before relaunching.
 - Prove process ownership from `/proc/<pid>/exe` excluding self; parse structured output rather than
   pattern-matching text.
+
+## PLAN-EVAL cycle 1 outcome — `FAIL_PLAN` (2026-08-15T16:52Z)
+
+Head `a3f6b87b5`; evaluator commit `5d229e0f3` (artifact-only, pushed, PR left draft at
+`status:plan`). **Cycle 1 of 2 spent; cycle 2 unlaunched.** The leaf is parked at `5d229e0f3`.
+
+**B1, independently confirmed by this lane.** Beyond `paginated-query.ts:6`, three more shipped
+Contracts JSDoc examples import from a non-exporting root:
+
+| File | Symbols | Root resolution |
+| ---- | ------- | --------------- |
+| `packages/contracts/src/application/transform-helpers.ts:6` | `createTransformer` | exit 1 |
+| `packages/contracts/schemas/filters.ts:6` | `FilterConditionSchema`, `buildPrismaWhere` | exit 1 |
+| `packages/contracts/schemas/pagination.ts:6` | `PaginationInputSchema`, `createPaginatedOutput` | exit 1 |
+
+Measured with `deno doc --no-lock --filter <symbol> packages/contracts/mod.ts`, raw exit unpiped;
+each symbol resolves from `./query` or `./transform`. `baseContract` returns exit 0, so
+`contract-primitives.ts` is correct as claimed. All four defective files ship —
+`publish.include` carries `src/**/*.ts` and `schemas/**/*.ts`. `schemas/pagination.ts:8`
+additionally uses `baseContract` without importing it, so fixing the specifier alone leaves that
+example uncopyable.
+
+Why it blocks the **plan**: `research.md` F3/F4 and `plan.md` D8 record acceptance row 1 as
+baseline-satisfied apart from one file (false), the three files sit **outside** the frozen surface,
+and `plan.md` locks `Closes #1296` — so merging as scoped would auto-close an issue whose row 1 is
+still unmet in three published files. That is a scope decision, not an author decision.
+
+**Do not launch cycle 2 before decision 7 is answered** — an unchanged scope reproduces B1 and
+spends the last granted cycle for nothing.
