@@ -1814,3 +1814,78 @@ are load-bearing. Plus the process gate this lane owes: the draft PR must exist 
 Author `01a004f9-f033-7592-a0bc-63927753fb43` remains the preserved sole author and is actively
 producing `research.md` / `plan.md` from base `3fc0f2f92`. No PR yet, no commits yet, tree clean.
 Monitoring to a clean pushed Phase-1 stop.
+
+## 2026-08-15 — #1355/#1360 Phase-1 stop, Tier-A review, and the gate-class repair
+
+### Phase-1 stop verified
+
+| Check | Result |
+| --- | --- |
+| Author process `01a004f9-…` | **terminal** |
+| Tree | clean |
+| local == remote == PR head | all `6aea4a5eaac4932605435d2a346da2c545f33d92` |
+| PR **#1664** | open **draft** |
+| Closing keywords | **`Closes #1355`** and **`Closes #1360`**, body lines 7-8 |
+| PR opened at first slice | yes — **D-15 discharged**; the per-slice comment trail has an artefact from commit one |
+
+### Coordinator determination, recorded durably
+
+**PLAN-EVAL is required.** The additive SDK overload, the public generator result/overwrite
+contract, three publishable members, the compatibility migration, and two distinct runtime consumers
+are decision-heavy. I concur independently: the plan's own open question 1 — accept an additive
+`bridgeInvalidation(queryKey)` overload, or emit `{ queryKey: queries.list.clientKey() }` directly and
+leave the SDK surface untouched — is a real architectural fork, correctly left open for the gate.
+
+**Both expensive gates are load-bearing, only after cheap convergence.** `scaffold.runtime` because
+this leaf changes generated scaffold/client output *and* generator command behaviour, so the only
+proof the emitted app still builds and runs is running the emitted app. `fresh-browser` separately,
+because hydration timing — whether `initialDataUpdatedAt` actually preserves snapshot age across
+hydration — cannot be observed without a real browser; a unit test proves the option was passed, not
+that TanStack honoured it. Neither substitutes for the other. **No lease now and none requested.**
+
+### T-1 — the gate-class error, verified from source before relaying
+
+The plan routed `scaffold.runtime` through `run-gate.ts` and proposed adding a catalog entry
+(`plan.md:79`, `:101`, `:177`, `:208`), listing `receipts/s5-scaffold-runtime.json` among the binding
+receipts (`:217`). I checked the repo rather than accepting the correction:
+
+- `.llm/tools/gates/catalog.ts` has **no** `scaffold.runtime` entry; the only "scaffold" match is
+  `scaffold-versions` → `deno task check:scaffold-versions`, a different gate.
+- `fresh-browser` **is** a catalog gate — `catalog.ts:55` → `deno task test:browser`.
+- `.llm/harness/gates/release-gates.md:7` declares itself "the **single source** for the release-gate
+  class"; `:22` names `scaffold.runtime` with `deno task e2e:cli run scaffold.runtime --cleanup
+  --format pretty`; `:26` calls it a merge-readiness gate that also runs pre-release.
+
+The absence from the catalog is **deliberate**. Adding an entry would fold a release-gate into the
+per-slice static-gate class — a category error, not a plumbing detail — and
+`s5-scaffold-runtime.json` would be a hand-authored run-gate receipt for a gate the catalog
+intentionally excludes. This lane has spent the milestone refusing exactly that shape of evidence
+from others; authoring it ourselves would be worse. Corrected: evidence is the **suite-owned
+exact-head output** plus the **central expensive-gate lease and cleanup record**, and the binding
+receipt list names only gates that actually produce receipts.
+
+### T-2 — the assertions must be nameable
+
+`plan.md:224-229` names the right properties — module type-checking, cross-tier key isolation, actual
+invalidation behaviour, old-versus-fresh hydration — but not assertions anyone could write or check.
+Required: which command sequence adds the second service, which two key arrays are compared and what
+distinguishes them, what mutation is issued and what observable proves invalidation *took effect*
+rather than was merely called, and which two timestamps the hydration assertion compares. Otherwise
+"the suite has been extended" is unfalsifiable and the lease precondition it gates is a formality.
+
+Worth recording that the author got the harder half right on its own: `plan.md:222-233` frames the
+suite extension as a **precondition to achieve**, not as a claim that the existing suite already
+proves two-service key isolation. That is the exact overclaim the coordinator warned against, and it
+was not made.
+
+### What the plan already gets right
+
+Citations re-derived at `3fc0f2f92` with drift recorded rather than absorbed (`research.md:50`, `:93`,
+`:203`) — the discipline #1293 taught, where a trusted-but-false issue premise would have built the
+wrong thing. The key-shape mismatch shown as concrete arrays (`:39-48`): generated queries produce
+`['service','list',{input:…}]` while `bridgeInvalidation()` returns `[resource, action]`, which is
+both the dead-invalidation defect and the two-service collision in one piece of evidence.
+Compatibility answered by D6 and `:157`.
+
+Repair dispatched to the same thread. PLAN-EVAL dispatches on the immutable repaired plan head; no
+implementation before `PASS`.
