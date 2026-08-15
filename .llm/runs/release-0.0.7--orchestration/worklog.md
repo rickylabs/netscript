@@ -1145,3 +1145,16 @@
   all seven receipts at one new immutable head, and stop for fresh Tier-A before cycle-2 IMPL-EVAL.
   No product, checker, workflow, runtime, merge, label, ready, issue, or central-scope mutation is
   authorized.
+
+## 2026-08-15T18:48:52Z — #1664 attempt 4 stops at a cleanup exception and releases the lease
+
+- Suite-owned `scaffold.runtime` passed 69 gates, including the previously red generated format
+  gate, then failed `behavior.service-client-refetch`: after the browser child had already exited,
+  `collectBrowserRefetchEvidence` called `child.kill('SIGTERM')` and Deno threw `TypeError: Child
+  process has already terminated`. Raw exit is red; no behavioral verdict is inferred from the
+  cleanup exception. Raw log SHA-256 is
+  `b476da4ce039d03785e46669d51919b48c41fbae80ca41ca9188bcbb53e97f23`.
+- Suite `cleanup.aspire-stop` passed. Independent Aspire-orchestration audit reports `aspire ps []`,
+  Docker zero, no AppHost/DCP/application/browser process, and no relevant listener. The singleton
+  lease is released; `fresh-browser` remains `NOT_RUN`. Preserve evidence and attribute the child
+  lifecycle contract before any scoped repair; no retry, browser gate, or evaluator is authorized.

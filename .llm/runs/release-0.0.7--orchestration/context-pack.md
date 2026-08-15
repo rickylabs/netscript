@@ -654,3 +654,10 @@ judgment hold. Internals topic `3c8db8178` returned only the authorized test pat
 Sol/medium author, requiring specific-cause assertions, four independent mutation reds, and all seven
 receipts re-cut on one new head before fresh Tier-A and cycle-2 IMPL-EVAL. #1664 attempt-4 runtime
 continues independently under its immutable lease; #1669 S2 continues independently.
+
+Newer stop `2026-08-15T18:48:52Z`: #1664 attempt-4 `scaffold.runtime` is terminal red at 69/1/0.
+The previously failing generated format gate passed; `behavior.service-client-refetch` instead threw
+when cleanup called `kill(SIGTERM)` on an already-terminated browser child. Raw log hash is
+`b476da4ce039d03785e46669d51919b48c41fbae80ca41ca9188bcbb53e97f23`. Suite cleanup passed and an
+independent Aspire/Docker/process/port audit is empty, so the lease is released and `fresh-browser`
+is `NOT_RUN`. Preserve evidence and attribute before any repair; no retry or evaluator is authorized.

@@ -654,3 +654,7 @@ implementation thread.
   only exit 1. A missing fixture could produce that exit after the reason/mode branch was removed,
   and OMITS could preserve it after INVENTS was removed. Durable negative tests must assert the
   specific cause and mutation-prove that removing only that branch makes the named test red.
+- **A cleanup exception cannot stand in for the behavior verdict:** #1664's live refetch probe reached
+  a browser child that had already terminated, then failed while sending SIGTERM. The gate stays red,
+  but attribution must distinguish successful child completion, early failure, and idempotent cleanup
+  before treating this as evidence for or against the settled-refetch contract.

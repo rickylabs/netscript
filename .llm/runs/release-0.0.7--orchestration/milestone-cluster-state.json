@@ -1516,7 +1516,7 @@
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "f5_final_tier_a_pass_attempt4_runtime_lease_active_immutable_evidence_head",
+      "implementationState": "attempt4_scaffold_runtime_fail_69_1_cleaned_lease_released_attribution_pending",
       "dispatchTopicHeadSha": "0d0ba1b7a404c847acba2daed40c69d282906f69",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
@@ -1673,12 +1673,18 @@
           "attempt3TierAState": "FAIL_FIX_LEAF_CAUSED",
           "attempt3TierATopicCheckpointSha": "0d0ba1b7a404c847acba2daed40c69d282906f69",
           "attempt3TierAProof": "exact twelve-path reproduction proves users/payments client modules from the leaf-modified client scaffolder are unformatted; seven unchanged Aspire helpers are baseline; three payments service/contract outputs remain to be measured at the pre-implementation head; blanket pre-existing attribution rejected",
-          "runtimeGates": "attempt 4 singleton lease active at immutable evidence head 1263f655b after final Tier-A PASS and clean-host preflight; run scaffold.runtime first, clean and audit, then fresh-browser only on PASS; no evaluator until both gates and topic reconciliation are terminal",
-          "attempt4LeaseState": "active",
+          "runtimeGates": "attempt 4 scaffold.runtime terminal FAIL at behavior.service-client-refetch after 69 passes; fresh-browser NOT_RUN; suite cleanup passed, independent host audit empty, singleton lease released; preserve raw evidence and attribute the already-terminated-child cleanup exception before any repair",
+          "attempt4LeaseState": "released_after_terminal_scaffold_runtime_failure_and_clean_audit",
           "attempt4LeaseGrantedAt": "2026-08-15T18:30:23.000Z",
           "attempt4PreGateHeadSha": "1263f655b37d64a258619403398ca7117ea000d5",
           "attempt4ContentHeadSha": "fda78ee438ea40888e5fb3870a78df70cabb8c82",
-          "attempt4Preflight": "leaf clean and local == remote == PR; aspire ps []; zero Docker containers; zero AppHost/DCP/application/browser processes; zero relevant listening ports; zero competing runtime lease owners; idle Aspire MCP helpers preserved"
+          "attempt4Preflight": "leaf clean and local == remote == PR; aspire ps []; zero Docker containers; zero AppHost/DCP/application/browser processes; zero relevant listening ports; zero competing runtime lease owners; idle Aspire MCP helpers preserved",
+          "attempt4RuntimeResult": "FAIL passed=69 failed=1 skipped=0 at behavior.service-client-refetch; collectBrowserRefetchEvidence called child.kill(SIGTERM) after the child had already terminated",
+          "attempt4RawLog": ".llm/runs/feat-app-service-client-wiring--1355/reports/s5-attempt4-scaffold-runtime-20260815-2037.log",
+          "attempt4RawLogSha256": "b476da4ce039d03785e46669d51919b48c41fbae80ca41ca9188bcbb53e97f23",
+          "attempt4Cleanup": "suite cleanup.aspire-stop PASS; independent aspire ps []; Docker zero; no AppHost/DCP/application/browser process or relevant listener; foreign Aspire MCP helpers preserved",
+          "attempt4FreshBrowser": "NOT_RUN because scaffold.runtime failed",
+          "attempt4Next": "preserve evidence and obtain same-author plus fresh Tier-A attribution of whether an already-terminated browser child is successful probe completion or a product/probe contract failure; no repair, retry, browser gate, or evaluator before a scoped ruling"
         }
       },
       "planDecisionBoundary": "cycle 1 ruled direct emitted { queryKey: <svc>Queries.list.clientKey() } with no SDK overload; repair must lock generator-owned output paths, existing service generate overwrite/dry-run/force compatibility, package README homes, post-mutation request-count proof, per-slice paths, and qualified citations",
@@ -2684,7 +2690,7 @@
     },
     {
       "id": "app-service-client-wiring-f5-runtime",
-      "state": "active",
+      "state": "complete",
       "lane": "features",
       "leafId": "app-service-client-wiring",
       "gateId": "scaffold.runtime_then_fresh-browser",
@@ -2701,6 +2707,19 @@
         "relevantListeningPorts": 0,
         "otherLeaseOwners": 0,
         "idleAspireMcpHelpers": "foreign_tooling_preserved"
+      },
+      "completedAt": "2026-08-15T18:48:52.000Z",
+      "verdict": "FAIL_FIX",
+      "summary": "scaffold.runtime passed 69 gates and failed behavior.service-client-refetch because cleanup killed an already-terminated child; fresh-browser NOT_RUN",
+      "receiptRefs": [
+        ".llm/runs/feat-app-service-client-wiring--1355/reports/s5-attempt4-scaffold-runtime-20260815-2037.log"
+      ],
+      "rawLogSha256": "b476da4ce039d03785e46669d51919b48c41fbae80ca41ca9188bcbb53e97f23",
+      "cleanup": {
+        "aspirePostcondition": "ok_empty",
+        "dockerPostcondition": "ok_empty",
+        "survivors": 0,
+        "freshBrowser": "NOT_RUN"
       }
     }
   ],
@@ -2743,5 +2762,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T18:41:18.000Z"
+  "updatedAt": "2026-08-15T18:48:52.000Z"
 }

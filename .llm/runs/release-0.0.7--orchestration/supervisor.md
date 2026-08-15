@@ -780,3 +780,11 @@ judgments hold. Internals topic `3c8db8178` recovered the same original Sol/medi
 the already-authorized test path. Require specific refusal-cause assertions, a real fixture, no
 INVENTS/OMITS masking, four mutation reds, all seven receipts re-cut at one head, and fresh Tier-A
 before one cycle-2 IMPL-EVAL. No product or workflow repair, runtime lease, or #1663 mutation.
+
+At 18:48Z, #1664 attempt-4 `scaffold.runtime` stopped red at 69 passed / 1 failed / 0 skipped. The
+generated formatting gate that failed attempt 3 is now green. The sole red is
+`behavior.service-client-refetch`: `collectBrowserRefetchEvidence` called `child.kill('SIGTERM')`
+after the browser child had already terminated, producing a Deno `TypeError`. Preserve the raw log
+at SHA-256 `b476da4ce039d03785e46669d51919b48c41fbae80ca41ca9188bcbb53e97f23`; do not infer the refetch
+behavior from a cleanup exception. Suite cleanup passed and the independent host audit is empty.
+Lease released, `fresh-browser` `NOT_RUN`; same-author plus fresh Tier-A attribution precedes scope.
