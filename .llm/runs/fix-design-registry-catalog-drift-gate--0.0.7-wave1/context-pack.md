@@ -117,3 +117,14 @@ Current next step: commit the deterministic generated representation, then obtai
 `assets-barrel` raw verdict and durable receipt plus the bounded CLI quality/publish evidence. No
 expensive gate is authorized or required; fresh opposite-family Tier-A review remains the terminal
 handoff after push and the single structured PR comment.
+
+### E-1 Repair Completed
+
+Product commit `4ca76fa751608ec1f0e2eab248fcd603f855272b` contains the sole generated
+product delta. `check:assets-barrel`, its durable receipt, structured check/fmt, `quality:gate`, CLI
+JSR audit, and CLI publish dry-run all have terminal raw exit 0. The receipt outcome is `PASS` at
+that exact product head. All original product/CI surfaces and all three locks remain unchanged.
+
+Exact next blocker: push the evidence commit and post one structured implementation comment, then
+stop for the coordinator's fresh opposite-family Tier-A review of E-1/E-2. No readiness, evaluator,
+merge, issue, label, milestone, or expensive-gate action is authorized.

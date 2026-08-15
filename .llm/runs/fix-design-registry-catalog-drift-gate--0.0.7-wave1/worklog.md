@@ -350,3 +350,32 @@ No other generated target moved. The regenerated barrel contains `registryMeta.t
 complete catalog content including `citation-chip`. The repair retains no hand edit and adds
 `check:assets-barrel` to the bound validation plan. Post-fix gate evidence follows in an append-only
 entry after the generated product commit so the durable receipt records that exact Git head.
+
+### Post-Fix Gate Evidence
+
+Product commit: `4ca76fa751608ec1f0e2eab248fcd603f855272b`.
+
+| Gate | Exact command | Raw exit | Result |
+| --- | --- | ---: | --- |
+| Asset-barrel freshness | `deno task check:assets-barrel` | 0 | Generated outputs are committed and fresh. |
+| Durable asset-barrel receipt | `deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/gates/run-gate.ts --gate assets-barrel --id assets-barrel-1657-e1 --cwd . --output .llm/runs/fix-design-registry-catalog-drift-gate--0.0.7-wave1/receipts/assets-barrel.json` | 0 | `PASS`; receipt Git head and actual Git head both `4ca76fa751608ec1f0e2eab248fcd603f855272b`. |
+| Structured generated-file check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --file packages/cli/src/kernel/assets/embedded.generated.ts` | 0 | One file, one batch, zero failed batches; wrapper supplied `--unstable-kv`. |
+| Initial structured generated-file fmt selection | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file packages/cli/src/kernel/assets/embedded.generated.ts` | 2 | Correctly refused false-green because the root fmt config excludes `packages/cli`. No file changed. |
+| Package-root structured fmt selection | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx` | 2 | Same intentional root-config exclusion; preserved as command-selection evidence. No file changed. |
+| Structured generated-file fmt verdict | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file packages/cli/src/kernel/assets/embedded.generated.ts --config /tmp/netscript-e1-fmt.json` | 0 | One file, one batch, zero findings using a temporary equivalent formatting config; the config was deleted immediately afterwards. |
+| Quality and architecture | `deno task quality:gate` | 0 | `quality:scan` returned `ok: true`; `arch:check` had no failures and only existing warnings. |
+| CLI JSR audit | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/cli --text` | 0 | Dry-run OK; existing doctrine/slow-type warnings only; no new export, runtime asset-read, or `import.meta` finding from this generated constant. |
+| CLI publish dry-run | `cd packages/cli && deno task publish:dry-run` | 0 | `@netscript/cli@0.0.6` simulation succeeded; existing dynamic-import/import-meta analysis warnings only. |
+
+### E-1 Repair Boundaries
+
+- Diff from amendment head contains one product file only:
+  `packages/cli/src/kernel/assets/embedded.generated.ts`; all other changed paths are append-only run
+  artifacts and the durable receipt.
+- The four original product files and all three T-3 CI files are byte-unchanged from amendment head
+  `c3ccceeb13cd71895ea4ac3229f03a15472dac86`.
+- `deno.lock`, `packages/cli/deno.lock`, and `packages/fresh-ui/deno.lock` are unchanged.
+- No `// deno-lint-ignore`, `// quality-allow`, `as any`, or `as unknown as` was added.
+- No browser, `fresh-browser`, Aspire, Docker, scaffold runtime, or `e2e:cli` gate ran.
+- Automated gate evidence is not self-certification. The terminal blocker is fresh opposite-family
+  Tier-A review limited to this repair delta.
