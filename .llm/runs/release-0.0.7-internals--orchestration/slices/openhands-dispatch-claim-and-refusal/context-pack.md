@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `release-0.0.7-internals--orchestration/slices/openhands-dispatch-claim-and-refusal` |
 | Branch | `fix/openhands-dispatch-claim-and-refusal` |
-| Current phase | S3 implementation complete; durable gates pending |
+| Current phase | S3 complete; stopped for Tier-A slice review |
 | Archetype | `6-cli-tooling` |
 | Scope overlays | none |
 
@@ -17,6 +17,7 @@ optional formal phases `plan|impl`, refuses formal issue and disabled-verdict re
 `--head`, and resolves the live PR head itself immediately before trigger construction. Controlled
 dependencies prove formal GET-before-emission/POST ordering without network access; non-formal PR
 and issue dry-runs explicitly remain tuple-free and make no GitHub/token calls.
+Durable receipts pass at implementation head `d7fdbb1d9`; only root `test` covers S3.
 
 ## Completed
 
@@ -33,16 +34,16 @@ and issue dry-runs explicitly remain tuple-free and make no GitHub/token calls.
 - S2 durable `check` PASS/0 and `test` PASS/0 receipts at `28a8a9184`.
 - Tier-A S2 sign-off commit `0886c2427`.
 - S3 targeted RED (exit 1 before the injected runner existed) and GREEN (exit 0, 80/80 tests).
+- S3 durable `check` PASS/0 and `test` PASS/0 receipts at `d7fdbb1d9`.
 
 ## In Progress
 
-- Commit S3 and run the durable `check` and root `test` gates against the reachable implementation
-  commit. Only root `test` covers this leaf.
+- Nothing. S3 is being pushed/commented and this thread stops for Tier-A.
 
 ## Next Steps
 
-1. Record S3 durable receipts, push, and post the per-slice PR comment.
-2. Stop for Tier-A substantive S3 review; do not begin S4 without authorization.
+1. Tier-A substantively reviews S3 and either requests a bounded repair or authorizes S4.
+2. Do not begin S4 without that authorization.
 
 ## Key Decisions
 
@@ -77,8 +78,8 @@ and issue dry-runs explicitly remain tuple-free and make no GitHub/token calls.
 | S2 | `check` | PASS | `receipts/slice-2/check.json`, cached exit 0 at `28a8a9184`; package/plugin selection does not cover S2 |
 | S2 | `test` | PASS | `receipts/slice-2/test.json`, exit 0 at `28a8a9184`; 4,140 passed, 19 ignored, 0 failed; load-bearing |
 | S2 | `quality-job` | NOT_RUN | not an S2 gate; scheduled for S4/S5 and not independent behavioral proof |
-| S3 | `check` | PENDING | package/plugin selection does not cover S3 |
-| S3 | `test` | PENDING | load-bearing root auto-discovery gate after implementation commit |
+| S3 | `check` | PASS | `receipts/slice-3/check.json`, exit 0 at `d7fdbb1d9`; package/plugin selection does not cover S3 |
+| S3 | `test` | PASS | `receipts/slice-3/test.json`, exit 0 at `d7fdbb1d9`; 4,145 passed, 19 ignored, 0 failed; load-bearing |
 | S3 | `quality-job` | NOT_RUN | not an S3 gate; scheduled for S4/S5 and not independent behavioral proof |
 | all | JSR | N/A | no publishable surface |
 

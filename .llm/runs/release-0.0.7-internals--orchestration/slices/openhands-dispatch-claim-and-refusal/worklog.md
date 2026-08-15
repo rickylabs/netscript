@@ -234,6 +234,8 @@ Slice 3 is authorized.
 | 2026-08-15 | Authorization  | Fast-forwarded to Tier-A S2 sign-off `0886c2427`; began S3 only.                                                                                                                                                              |
 | 2026-08-15 | RED            | Added deterministic CLI tests first; the targeted structured wrapper exited 1 because the injected dispatch runner and dependency contract did not exist.                                                                    |
 | 2026-08-15 | Implementation | Added optional constrained `--phase`, formal PR/verdict guards, injected file/token/GitHub ports, and a live PR-head read immediately before trigger construction. No `--head` parser surface was added. Targeted suite passed 80/80. |
+| 2026-08-15 | Durable gates  | At `d7fdbb1d9`, cached package/plugin `check` passed and root `test` passed with 4,145 passed / 19 ignored / 0 failed. Only `test` covers S3.                                                                                   |
+| 2026-08-15 | Reconcile      | Read the S2 supervisor sign-off comment `5301401476`; #1611/#1613 remain open and unchanged at milestone `0.0.7`. No plan adjustment, issue mutation, or label change was needed.                                                   |
 
 ### Decisions
 
@@ -252,8 +254,8 @@ Slice 3 is authorized.
 | -------------- | ---------------- | ---: | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | Targeted RED   | expected failure |    1 | structured test wrapper before implementation; no durable PASS receipt | Missing runner/dependency exports proved the tests preceded implementation.       |
 | Targeted GREEN | PASS             |    0 | structured test wrapper; 80/80                                         | Focused CLI sequencing, refusal, and tuple-free behavioral feedback.              |
-| `check`        | PENDING          |    — | `receipts/slice-3/check.json` after implementation commit               | Frozen-contract receipt only; package/plugin roots do not cover S3.               |
-| `test`         | PENDING          |    — | `receipts/slice-3/test.json` after implementation commit                | Will be the load-bearing S3 proof through root auto-discovery of the new test.     |
+| `check`        | PASS             |    0 | `receipts/slice-3/check.json` at `d7fdbb1d9`; unchanged-input cache hit | Frozen-contract receipt only; package/plugin roots do not cover S3.               |
+| `test`         | PASS             |    0 | `receipts/slice-3/test.json` at `d7fdbb1d9`; 4,145 passed, 19 ignored  | Load-bearing S3 proof; root discovery executed the new CLI suite.                  |
 | `quality-job`  | NOT_RUN          |    — | S3 does not name this gate; scheduled for S4/S5                         | Shares the non-covering package/plugin check dependency; not independent proof.   |
 
 ### Handoff boundary
