@@ -1395,3 +1395,20 @@
   tree recoverably to `/tmp/netscript-f7-quarantine.iXF6fb`, verified leak-check clean, and recorded
   `d81b99143`. The original author may run one exact-content `test-attempt2`, then publish and
   architecture gates only on PASS, before another Tier-A. Runtime remains unleased.
+
+
+## 2026-08-15T20:56:25Z — #1664 attempt 6 leased; #1671 S3 released
+
+- #1664 F7 recovery evidence `ed3f78e0d` and comment `5304173729` retain the exact-head check,
+  superseding test-attempt2 at 4237/0/19, publish dry-run, and architecture PASS receipts; the original
+  4236/1/19 red remains. Fresh features Tier-A passed at `4a65a2670`. Aspire was empty, Docker zero,
+  runtime/browser processes and ports absent, and no unreadable residue remained. Three older readable
+  plugin-smoke trees were moved—not deleted—to `/tmp/netscript-preattempt6-quarantine.9mNpwE`.
+  Features checkpoint `ac1ec35cf` owns the singleton attempt-6 lease over content `e45144db6` and
+  evidence `ed3f78e0d`, using managed Chrome 151.0.7922.34. One scaffold run, mandatory audit, and
+  conditional one fresh-browser run are authorized; no retry or evaluator.
+- #1671 S2 is clean/pushed/commented at `ca7ade409` / `5304171376`. Both suppressions became positive
+  exact-union/data assertions; public oRPC error types flow through `ServiceClientMethod` and `safe`,
+  and `SafeFailure<TError = ThrowableError>` remains. Fresh fixes Tier-A passed at `ac0b2c4c3` after
+  105-file check, doctest 3/0, Contracts plus SDK 78/0, lint, and format. S3 alone is released over
+  `sdk.md` and `how-to/discover-services.md`; no product, metadata, final-gate, or runtime scope.

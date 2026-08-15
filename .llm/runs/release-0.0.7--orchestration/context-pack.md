@@ -770,3 +770,14 @@ S1 `dc034d680` passed fresh fixes Tier-A at `7281cebac`; S2 only is active in `e
 environmental unreadable attempt-5 residue, preserved at evidence `885f352e7`. The run-owned tree is
 recoverably quarantined at `/tmp/netscript-f7-quarantine.iXF6fb`; one exact-content test retry and
 the remaining two cheap gates are active before fresh Tier-A. No runtime lease or readiness action.
+
+
+Newer lease `2026-08-15T20:56:25Z`: #1664 F7 evidence `ed3f78e0d` passed fresh features Tier-A at
+`4a65a2670`; four exact-content receipts are PASS/SUFFICIENT and the environmental red remains.
+Preflight is empty after three older readable run workspaces moved recoverably to
+`/tmp/netscript-preattempt6-quarantine.9mNpwE`. Attempt 6 holds the singleton runtime lease at topic
+`ac1ec35cf`: run one scaffold.runtime with managed Chrome 151, audit, then fresh-browser only on PASS
+plus clean audit; no retry/evaluator. #1671 S2 `ca7ade409` passed fixes Tier-A at `ac0b2c4c3`; S3 is
+active on exactly the two docs pages, with S4, metadata, #1348, and #1466 untouched. #1666 merged-main
+content `8c03d8629` has twelve exact-head PASS receipts and remains unpushed until its append-only
+integration evidence is complete.

@@ -748,3 +748,12 @@ implementation thread.
   `@ts-expect-error` markers to pin the S2 defect after recording the base RED. S2 must remove them
   and replace them with positive exact-union and code-specific-data assertions before claiming the
   error channel is preserved.
+
+- **A clean runtime preflight includes readable stale workspaces too:** unreadable residue is the
+  scanner hazard, but readable plugin-smoke trees still make lease ownership ambiguous. Move each
+  exact run-owned tree to recoverable quarantine before a new attempt; do not delete or use broad
+  cleanup.
+- **A retry receipt can validate environmental causality without erasing the red:** #1664's two test
+  receipts have the same 4,256 total results; only the scanner failure flipped, from 4236/1/19 to
+  4237/0/19 after quarantine. Preserve both, exclude the red only in the declared passing evidence
+  set, and require exact-head equality without a mismatch waiver.

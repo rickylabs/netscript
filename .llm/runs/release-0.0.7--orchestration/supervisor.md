@@ -929,3 +929,14 @@ and the exact-head check, then preserved a 4236/1/19 root-test red caused by unr
 residue. Features recoverably quarantined it at `/tmp/netscript-f7-quarantine.iXF6fb`, recorded
 checkpoint `d81b99143`, and released one exact-content test retry plus the remaining two cheap gates
 on PASS. No runtime lease, attempt 6, readiness action, issue tick, or #1663/#1651 mutation exists.
+
+
+At 20:56Z, #1664 F7 recovery is fully reviewed: evidence `ed3f78e0d`, comment `5304173729`, and
+features Tier-A `4a65a2670` prove four exact-content PASS/SUFFICIENT receipts while preserving the
+4236/1/19 environmental red. After Aspire/Docker/process/port/residue preflight, three older readable
+run-owned workspaces were moved to recoverable quarantine `/tmp/netscript-preattempt6-quarantine.9mNpwE`.
+Features checkpoint `ac1ec35cf` now holds the singleton attempt-6 lease: one `scaffold.runtime` with
+the verified managed Chrome 151 override, cleanup/audit, then `fresh-browser` only on PASS and a clean
+inter-gate audit. #1671 S2 `ca7ade409` passed fresh fixes Tier-A at `ac0b2c4c3`; S3 alone is released
+to the same author for the two docs pages, with S4 and metadata still held. #1666 current-main union
+`8c03d8629` has twelve exact-head PASS receipts and is assembling append-only evidence before push.

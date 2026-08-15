@@ -1564,14 +1564,14 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb",
-      "currentPrHeadSha": "dc034d680b53c2845e9b82f73c6c709f2c51e2b3",
+      "currentPrHeadSha": "ca7ade409be0cc0c064e75f5bfa1bd109e06d013",
       "issueNumbers": [1350],
       "implementerAgentId": "01a006f3-ae2d-7941-bd17-2ac71dd3d0f0",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/sdk-typed-error-channel",
       "worktree": "/home/codex/repos/netscript-007-leaf-typed-error",
       "prNumber": 1671,
-      "implementationState": "slice_1_tier_a_pass_same_original_author_slice_2_active",
+      "implementationState": "slice_2_tier_a_pass_same_original_author_slice_3_active",
       "initialPlanHeadSha": "c7a6f3d32009cfe9344ab8ed613f1c54c205b07f",
       "initialPlanCommentUrl": "https://github.com/rickylabs/netscript/pull/1671#issuecomment-5303978621",
       "scopeOwnershipRuling": "approve packages/sdk/src/ports/service-client.ts as sixth path; deny packages/contracts/src/public/mod.ts and every NetScriptProcedureMeta definition/export; preserve the fourth generic as Record<never, never>; seventh path requires rescope",
@@ -1609,16 +1609,28 @@
           "validation": "one structured base RED captured TS18046 unknown and TS2339 never without rerun; exact six literal keys plus Record<never, never> compile assertions; fresh Tier-A reran 105-file check with zero diagnostics, focused doctest 2/0, and Contracts plus SDK 77/0"
         },
         "s2": {
-          "state": "active_same_original_author",
+          "state": "complete_tier_a_pass",
+          "headSha": "ca7ade409be0cc0c064e75f5bfa1bd109e06d013",
+          "topicCheckpointSha": "ac0b2c4c3",
+          "commentUrl": "https://github.com/rickylabs/netscript/pull/1671#issuecomment-5304171376",
           "authorizedPaths": [
             "packages/sdk/src/client/errors.ts",
             "packages/sdk/src/ports/service-client.ts",
             "packages/sdk/tests/readme-doctest_test.ts"
           ],
-          "constraints": "preserve SafeFailure<TError = ThrowableError>; convert both S1 @ts-expect-error markers to positive exact-union/data assertions; use public oRPC types; no SDK zod map, ambient redeclaration, seventh path, NetScriptProcedureMeta, docs, or runtime"
+          "constraints": "preserve SafeFailure<TError = ThrowableError>; convert both S1 @ts-expect-error markers to positive exact-union/data assertions; use public oRPC types; no SDK zod map, ambient redeclaration, seventh path, NetScriptProcedureMeta, docs, or runtime",
+          "validation": "fresh Tier-A verified all suppressions absent, exact six-code and code-specific-data assertions genuine, S1 RED wording preserved, 105-file check zero diagnostics, doctest 3/0, Contracts plus SDK 78/0, lint and format clean"
+        },
+        "s3": {
+          "state": "active_same_original_author",
+          "authorizedPaths": [
+            "docs/site/services-sdk/sdk.md",
+            "docs/site/services-sdk/how-to/discover-services.md"
+          ],
+          "constraints": "one compile-accurate defined/non-defined failure narrative using delivered public API; schema-derived code-specific data; no product/test change, metadata claim, seventh path, or final S4 gates"
         }
       },
-      "nextGate": "fresh fixes Tier-A after S2; no slice 3 before PASS",
+      "nextGate": "fresh fixes Tier-A after S3; no slice 4 before PASS",
       "expensiveGateContract": "no runtime lease; no Aspire, Docker, e2e:cli, browser, or runtime gate during plan evaluation",
       "receiptRefs": []
     },
@@ -1689,14 +1701,14 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
-      "currentPrHeadSha": "885f352e77439e1f846be1f99971c398f6865e75",
+      "currentPrHeadSha": "ed3f78e0d87784b1869166bd2574737c62fac0af",
       "issueNumbers": [1355, 1360],
       "implementerAgentId": "01a004f9-f033-7592-a0bc-63927753fb43",
       "implementerRoute": "openai / gpt-5.6-sol / high / approval never / dangerFullAccess",
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "f7_product_pushed_environmental_test_red_recovery_active",
+      "implementationState": "f7_tier_a_pass_attempt_6_singleton_runtime_lease_active",
       "dispatchTopicHeadSha": "0d0ba1b7a404c847acba2daed40c69d282906f69",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
@@ -1913,8 +1925,21 @@
             "scannerChanged": false
           },
           "f7RecoveryTopicCheckpointSha": "d81b99143",
-          "f7RecoveryState": "same_original_sol_high_author_running_exact_content_test_attempt2_then_remaining_two_gates_on_pass",
+          "f7RecoveryState": "complete_pass_tier_a_pass",
           "f7RecoveryContract": "preserve f7-test.json red; run f7-test-attempt2 from a clean exact-content checkout with gitHead == actualGitHead and no mismatch waiver; only on PASS run publish-dry-run then arch-check at the same content; attach evidence and stop for fresh Tier-A before runtime lease",
+          "f7FinalEvidenceHeadSha": "ed3f78e0d87784b1869166bd2574737c62fac0af",
+          "f7FinalEvidenceCommentUrl": "https://github.com/rickylabs/netscript/pull/1664#issuecomment-5304173729",
+          "f7ReplacementReceiptState": "PASS and SUFFICIENT at immutable content e45144db6: retained check; test-attempt2 4237/0/19 with total 4256; publish-dry-run; arch-check; original 4236/1/19 test red preserved and excluded as superseded evidence",
+          "f7FinalTierAState": "PASS",
+          "f7FinalTierATopicCheckpointSha": "4a65a2670",
+          "attempt6LeaseState": "active_singleton_runtime_lease",
+          "attempt6LeaseGrantedAt": "2026-08-15T20:55:30.000Z",
+          "attempt6EvidenceHeadSha": "ed3f78e0d87784b1869166bd2574737c62fac0af",
+          "attempt6ContentHeadSha": "e45144db643f6bde85552a615812c8371e4ce792",
+          "attempt6TopicCheckpointSha": "ac1ec35cf",
+          "attempt6BrowserOverride": "/home/codex/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome — Google Chrome for Testing 151.0.7922.34",
+          "attempt6Preflight": "leaf clean and local == remote == PR; aspire ps []; aspire stop no AppHost; Docker zero; no AppHost/DCP/browser/runtime process or relevant listener; no unreadable residue; three older readable plugin-smoke trees recoverably moved to /tmp/netscript-preattempt6-quarantine.9mNpwE",
+          "attempt6Contract": "one suite-owned scaffold.runtime with strict managed-browser override; cleanup and independent Aspire/Docker/process/port/residue audit; fresh-browser once only on scaffold PASS plus clean audit; final cleanup/audit; no retry or evaluator",
           "attempt4Next": "superseded by attempt-5 terminal red and attribution recovery"
         }
       },
@@ -3058,6 +3083,52 @@
         "survivors": 0,
         "freshBrowser": "NOT_RUN"
       }
+    },
+    {
+      "id": "app-service-client-wiring-f6-runtime",
+      "state": "complete",
+      "lane": "features",
+      "leafId": "app-service-client-wiring",
+      "gateId": "scaffold.runtime_then_fresh-browser",
+      "preGateHead": "a8a160285d4f9bddb95a5dac6cfbde85e1265ebc",
+      "contentHead": "7fa29ad3ed10ad903b9cbbd518111e6bf2754761",
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-15T19:39:00.000Z",
+      "attempt": 5,
+      "scope": "run suite-owned scaffold.runtime once; mandatory cleanup/audit; fresh-browser only on PASS; no retry or evaluator",
+      "completedAt": "2026-08-15T19:47:30.000Z",
+      "verdict": "FAIL_FIX",
+      "summary": "scaffold.runtime passed 69 gates and failed behavior.service-client-refetch on DevTools target timeout; fresh-browser NOT_RUN",
+      "rawLogSha256": "ff349b40f7f70341934e170df7c67d147c0ed983173b41871421755ad55e062b",
+      "cleanup": {
+        "aspirePostcondition": "ok_empty",
+        "dockerPostcondition": "ok_empty",
+        "survivors": 0,
+        "freshBrowser": "NOT_RUN"
+      }
+    },
+    {
+      "id": "app-service-client-wiring-f7-runtime",
+      "state": "active",
+      "lane": "features",
+      "leafId": "app-service-client-wiring",
+      "gateId": "scaffold.runtime_then_fresh-browser",
+      "preGateHead": "ed3f78e0d87784b1869166bd2574737c62fac0af",
+      "contentHead": "e45144db643f6bde85552a615812c8371e4ce792",
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-15T20:55:30.000Z",
+      "attempt": 6,
+      "scope": "run suite-owned scaffold.runtime once with strict managed Chrome override; mandatory cleanup and independent Aspire/Docker/process/port/residue audit; only on PASS and clean audit run catalog fresh-browser once, then final cleanup/audit; no retry or evaluator",
+      "browserOverride": "/home/codex/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome",
+      "preflight": {
+        "leafState": "clean_local_remote_pr_equal",
+        "dockerContainers": 0,
+        "aspireApplicationProcesses": 0,
+        "relevantListeningPorts": 0,
+        "unreadableResidue": 0,
+        "otherLeaseOwners": 0,
+        "staleReadableResidue": "three exact run-owned trees moved recoverably to /tmp/netscript-preattempt6-quarantine.9mNpwE"
+      }
     }
   ],
   "canaryCheckpoints": [
@@ -3099,5 +3170,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T20:38:42.000Z"
+  "updatedAt": "2026-08-15T20:56:25.000Z"
 }
