@@ -40,6 +40,10 @@ The final evidence must also reproduce the raw `deno doc --lint
 packages/prisma-adapter-mysql/mod.ts` output and the raw package `deno publish --dry-run` file list
 at that same content head.
 
+Final content head: `3dee41263e5e34a9f59972edb43a345c8d4494c0`. All four receipts are PASS
+and attest that head. `acceptance-evidence.md` names the exact set, records the raw D7 outputs, and
+contains the recomputed `SUFFICIENT` verdict with no reasons.
+
 ## Outstanding cross-lane work
 
 - Acceptance box 1 is not discharged as worded: the evaluator ruled that the concrete class stays

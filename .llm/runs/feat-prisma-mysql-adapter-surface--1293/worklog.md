@@ -380,3 +380,19 @@ The publish set remains the same eight files; tests and examples remain excluded
 
 The final gate receipts and raw D7 evidence are added only after this content is committed, so each
 gate attests the immutable S3 content head rather than an uncommitted implementation tree.
+
+### Final evidence pass
+
+- Immutable content head: `3dee41263e5e34a9f59972edb43a345c8d4494c0`.
+- `check`: PASS, invocation `prisma-mysql-1293-check`.
+- `test`: PASS, invocation `prisma-mysql-1293-test` (4,181 passed, 0 failed, 19 ignored).
+- `publish-dry-run`: PASS, invocation `prisma-mysql-1293-publish-dry-run`.
+- `arch-check`: PASS, invocation `prisma-mysql-1293-arch-check`.
+- Recomputing `.llm/tools/gates/evidence-set.ts` with exactly the four receipt paths named in
+  `acceptance-evidence.md` returned `SUFFICIENT` with an empty reasons array.
+- The evaluator-required raw `deno doc --lint` and package-only `deno publish --dry-run` output is
+  pasted without omissions in `acceptance-evidence.md`. The publish set is eight files and excludes
+  the example.
+
+No `deno.lock`, `docs/**`, issue, or central-cluster state was changed. No evaluator or
+`scaffold.runtime` run was launched.
