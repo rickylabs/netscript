@@ -754,3 +754,44 @@ Out of scope: #1667, #1668, `surface:diff`, `F-DOCT-5`; the queue flake is to be
 the exact `expected 1, got 2` and never rerun seeking green. No Aspire/Docker/`e2e:cli`, no runtime
 lease, root gates deferred to the final slice. PR stays draft at sole `status:plan`; hard stop at
 fresh Tier-A before S2.
+
+## 2026-08-15 — #1669 S1: coordinator F-1 finding, delivered after the commit landed
+
+**Finding (coordinator, independently verified here).** The S1 F-1 application-file warning was not
+closed architecturally; it was closed by deleting documentation to hit the line boundary.
+
+Verified against the committed base rather than taken on report:
+
+| Measure | Base `d555cc971` | S1 commit `e05a54145` |
+| --- | --- | --- |
+| `cache-query.ts` lines | **490** | **499** |
+| JSDoc on `queryInsideSpan`, `getInflight`, `fetchAndCacheOnce`, `fetchAndCache`, `revalidateInBackground` | present (1–2 close markers each) | **zero on all five** |
+| Comment lines in the diff | — | **7 removed, 1 added** |
+
+The A2/A3 behavioural work legitimately pushed the file past 500; ~7 comment lines plus blank-line
+structure were then removed to land at 499 — **one line of headroom**, which the next honest line
+reopens. `worklog.md:91` records it as "Compacted the touched runtime file to 499 lines (base 490) so
+S1 adds no F-1 file-size debt", which is the misleading part: comment deletion is described as a
+fitness refinement, and "no F-1 debt" is asserted for a file that is one line from the boundary.
+
+**Delivery timing — the finding arrived after the commit.** When dispatched, the author was mid-turn;
+the sender retried on `already has an active writer` for 18+ attempts while the author committed
+`e05a54145` and pushed it as the PR head. Delivery was then proven by rollout grep (0 → 2) and the
+author is acting on it now.
+
+This is the cost of the one-sender-per-worktree serialisation, and it is the correct trade — there is
+no safe way to inject into a mid-turn Codex thread. The consequence is bounded: the commit is on a
+draft PR with no evaluator verdict bound to it, so a restoring follow-up commit is a clean remedy.
+The "STOP before commit" framing in the brief is stale, but its substance is not.
+
+**Required outcome:** keep the A2/A3 behaviour and the green tests; restore the five JSDoc blocks and
+the blank-line structure; attempt a genuinely structural reduction inside the two-file grant; re-run
+quality targeting exit 0 with no new F-1. If an honest design still exceeds 500, stop and return a
+concrete one-file extraction proposal (path, owned responsibility, dependency direction with no
+import back into `cache-query.ts`, covering tests, no public surface, off `src/cache/mod.ts`) for a
+coordinator scope ruling. An **open F-1 on an honest file is the better outcome** than a closed one on
+a stripped file, and the `worklog.md:91` claim must be corrected either way.
+
+Rule reaffirmed for this lane: a fitness gate exists to force a design question. Satisfying it by
+deleting the answer inverts its purpose, and "no debt" must never be claimed for a file sitting one
+line inside the boundary.
