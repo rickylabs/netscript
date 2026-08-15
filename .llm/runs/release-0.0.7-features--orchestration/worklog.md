@@ -2390,3 +2390,64 @@ Prohibited: any lease, `scaffold.runtime`, `fresh-browser`, Aspire, Docker, S5, 
 `deno.lock`, `docs/**`, and the ready flip.
 
 Stops for fresh Tier-A and an explicit S5 lease review.
+
+## 2026-08-15 — S4 stopped red at the first gate; Tier-A confirms the attribution
+
+Head `ee479ea851927818404c6311dac78e07a4eef1b5`, local == remote, tree clean. Commit adds
+`reports/s4-format-failure.md` plus journals — **no receipts, none hand-authored**, and nothing
+downstream of the red gate was run. That is exactly the instructed behaviour, and the honest half is
+worth stating: the author recorded sufficiency as **INSUFFICIENT** with all four contracted files
+named as missing/NOT_RUN, rather than reporting a partial green.
+
+### The attribution is correct — verified independently, then extended
+
+The author's claim: the wrapper invocation
+`run-deno-fmt.ts --root packages/cli --root packages/fresh --root packages/sdk --ext ts,tsx` exits 2
+with `failedBatches=3`, `findings=0`, because the root `deno.json` excludes `packages/cli/` from
+`fmt` — the wrapper selects CLI files that Deno then excludes, and it fail-closes rather than
+returning a false green. Measured identically at `c53726c69`, hence pre-existing.
+
+I did not take that on report. Verified:
+
+| Check | Result |
+| --- | --- |
+| Root `deno.json` `fmt.exclude` | contains **`packages/cli/`**, alongside `**/.generated/` and `**/node_modules/` |
+| `--root packages/fresh --ext ts,tsx` | 201 files, `failedBatches=0`, `findings=0`, **exit 0** |
+| `--root packages/sdk --ext ts,tsx` | 84 files, `failedBatches=0`, `findings=0`, **exit 0** |
+| `--root packages/cli --ext ts,tsx` alone | 887 files, `failedBatches=4`, `findings=0` — fail-closed in isolation |
+
+So the red is **entirely** the CLI selection/exclusion mismatch, reproducible on its own, with
+**zero formatting findings anywhere**. Fresh and SDK sources are genuinely correctly formatted.
+Classification confirmed: pre-existing invocation/configuration failure, no product defect
+attributable to this leaf.
+
+### One thing my own probing added
+
+Running bare `deno fmt --check` inside `packages/cli` reports 1 unformatted file in 176 —
+`packages/cli/e2e/README.md`. It is **not** the `packages/cli/README.md` S3 wrote:
+`git log 3fc0f2f92..HEAD -- packages/cli/e2e/README.md` is empty, so this leaf never touched it. It is
+also Markdown, and `AGENTS.md` is explicit that raw `deno fmt --check` across Markdown is **not** a
+package-quality verdict. Recorded as pre-existing and out of scope — not folded into the leaf's
+evidence, and not silently ignored either.
+
+### Tier-A verdict on the stop: `ACCEPTED`
+
+The gate was red, the author attributed it by measuring at a named earlier commit, stopped before
+lint/audits/dry-runs/receipts, authored no receipt, and reported INSUFFICIENT honestly. That is the
+behaviour the instruction was written to produce, and it is the same discipline that has caught four
+defects on this leaf: measure before attributing, and never let a narrower or absent result wear a
+broader name.
+
+### Authorized correction — invocation, not product
+
+The formatting evidence must be gathered **per root** for `fresh` and `sdk`, with `packages/cli`
+recorded as excluded from root `fmt` by `deno.json` design, so the combined three-root invocation
+cannot yield a verdict for it. That is an evidence-attribution fix squarely inside S4's artifact-only
+scope: no product code changes, no repo `fmt` configuration change, and no relaxation of the
+wrapper's fail-closed behaviour — which behaved correctly and should not be "fixed".
+
+S4 then continues in its dispatched order: lint, asset freshness, per-member audits, three
+isolated-declaration/publish dry-runs, then the four binding receipts at the immutable head.
+
+No lease requested. `scaffold.runtime`, `fresh-browser`, Aspire, Docker, S5, and evaluators remain
+untouched.
