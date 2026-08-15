@@ -261,3 +261,20 @@ The prescribed scoped format row was also unsatisfiable: root `deno.json` delibe
 failed closed at raw exit `2`. The topic orchestrator ruled the row **N/A — not applicable**, never
 passed, skipped, or waived. No alternate config, suppression, generated-file hand edit, or root
 configuration change was used.
+
+## 2026-08-15 — embedded CLI refresh required the deterministic MCP publish asset
+
+**Severity:** significant generated-surface correction; coordinator-authorized; no plan rescope and
+no scope growth beyond the derived output.
+
+The refreshed agent-docs gzip, provenance, and embedded CLI copy are direct inputs to
+`.llm/tools/generate-publish-assets.ts`. Their approved changes therefore made
+`packages/mcp/src/publish-assets.generated.ts` stale, which CI run `31870831715`, job
+`94979108152`, reported at the `publish-assets` gate. The topic orchestrator authorized only that
+deterministic generated target plus append-only run records for this third cascade layer.
+
+`deno task gen:publish-assets` returned raw exit `0` and moved only the authorized target with a
+4-insertion / 4-deletion delta. No docs content, measurement evidence, generator source, private
+input, canonical #1551 comment, lockfile, or other generated target changed. The post-commit durable
+receipt is intentionally the authoritative freshness proof because the gate's final diff must
+compare committed bytes with `HEAD`, not merely staged bytes with the index.

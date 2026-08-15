@@ -159,3 +159,22 @@ The diff-based durable barrel gate returned raw exit `1` while the target was un
 CI-equivalent receipt. After the single amendment commit, rerun the exact durable command against
 the committed head, explicitly push, post the structured PR comment, and stop for Tier-A review.
 Preserve the current PR lifecycle state and all issue/comment/pin boundaries.
+
+## Derived MCP publish-assets amendment
+
+CI run `31870831715`, job `94979108152`, exposed the final deterministic freshness layer after the
+agent-docs corpus and CLI embedded copy were refreshed. `deno task gen:publish-assets` returned raw
+exit `0` and moved only `packages/mcp/src/publish-assets.generated.ts` (4 insertions, 4 deletions),
+updating its embedded source commit from `6f9620c0c` to `c8e3f26d8` and its source bytes from
+259,530 to 260,939.
+
+Pre-commit validation is clean: scoped check, test, lint, format, `quality:gate`, and the MCP package
+publish dry-run each returned raw exit `0`; MCP tests report 136 passed. Root configuration makes
+both scoped lint and format applicable to `packages/mcp/src` (only the doctor fixture is excluded
+from lint), so no N/A substitution or alternate config was used.
+
+Next: prove diff and lock hygiene, commit the generated target plus the three append-only run
+artifacts, push by explicit refspec, then run the exact durable `publish-assets` gate against the
+committed head and all four freshness checks. Post their receipts and raw exits on PR #1652, then
+stop for Tier-A. No evaluated docs, evidence, pin, canonical comment, lifecycle state, or other
+generated surface may change.
