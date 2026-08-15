@@ -6,17 +6,18 @@
 | -------------- | ------------------------------------------------------------- |
 | Run ID         | `fix-sdk-cached-entry-swr--0.0.7-wave5`                       |
 | Branch         | `fix/sdk-cached-entry-swr`                                    |
-| Current phase  | `implement` — S2 content complete; freshness head pending     |
+| Current phase  | `implement` — S2 complete; pending fresh Tier-A               |
 | Archetype      | `3 — Runtime/Behavior` slice; SDK package remains Archetype 2 |
 | Scope overlays | `docs`                                                        |
 
 ## Current State
 
-PLAN-EVAL and both S1/S2-A Tier-A reviews passed. S2 implementation is complete: the baseline
-fresh-hit predicate is corrected without changing exports or accepted S1 behavior, the factory
-regression proves fresh/stale/expired branches, exactly two docs pages carry the truthful
-action-then-metadata contract, and exactly four generated mirrors changed. All pre-commit gates are
-terminal; the content must now be committed so the Git-diff-based freshness gates can judge it.
+PLAN-EVAL and both S1/S2-A Tier-A reviews passed. S2 implementation and validation are complete:
+the baseline fresh-hit predicate is corrected without changing exports or accepted S1 behavior,
+the factory regression proves fresh/stale/expired branches, exactly two docs pages carry the
+truthful action-then-metadata contract, and exactly four generated mirrors changed. All three
+freshness gates passed sequentially on unchanged committed content head
+`eba0b092416831f5fada679a1c21247d065ca521`.
 
 ## Completed
 
@@ -71,22 +72,19 @@ terminal; the content must now be committed so the Git-diff-based freshness gate
   zero findings; root tests are 4,206 passed, 0 failed, 19 ignored. The two doc-lint invocations
   remain exactly-three-diagnostic expected reds; surface diff remains the known 524-major baseline
   red; JSR F-DOCT-5 remains the known 13-child warning.
+- Re-ran agent-docs prose, assets-barrel, and publish-assets freshness sequentially after committing
+  the synchronized cascade. All three durable receipts are PASS at exact content head
+  `eba0b092416831f5fada679a1c21247d065ca521`, and the checks left the working tree clean.
 
 ## In Progress
 
-- The S2 content and preliminary evidence are ready to commit. The PR remains draft with sole
-  `status:plan`.
-- The first assets-barrel receipt is honestly red because it compares the authorized, regenerated
-  dirty mirror to pre-S2 `HEAD`. Commit this content, then run all three freshness gates sequentially
-  on that unchanged committed content head.
+- PR handoff only. The PR remains draft with sole `status:plan`; fresh Tier-A is coordinator-owned.
 
 ## Next Steps
 
-1. Commit the complete authorized S2 content plus this preliminary harness record.
-2. Run agent-docs, assets-barrel, and publish-assets freshness sequentially on that unchanged head.
-3. Record final receipts in an artifact-only commit, push explicitly, update/comment PR #1669, and
-   stop for fresh Tier-A.
-4. Separate-session IMPL-EVAL remains mandatory later; do not launch it in this session.
+1. Commit this final validation record as an artifact-only receipt commit.
+2. Push explicitly, update/comment PR #1669, and stop for fresh Tier-A.
+3. Separate-session IMPL-EVAL remains mandatory later; do not launch it in this session.
 
 ## Key Decisions
 
@@ -121,7 +119,7 @@ terminal; the content must now be committed so the Git-diff-based freshness gate
 | Static | PASS | Structured SDK check/lint/fmt: 84 files, 0 failed batches/occurrences/findings. |
 | Fitness | PASS for S1 | Re-run on 497-line documented source: `quality:gate` exit 0; repository scan 0 findings; SDK `FAIL=0`, no F-1, known F-16 `WARN=1`, `INFO=1`. |
 | Runtime | PASS | Focused cache tests 5/5; full SDK tests 68/68; 0 failed/ignored/unique failures. |
-| Consumer/docs | PASS except pre-commit Git-diff freshness | Factory 6/6; docs format/accuracy and agent-docs prose receipts PASS. First assets-barrel receipt RED only because the declared changed mirror is not committed yet; final three-head check pending. |
+| Consumer/docs | PASS | Factory 6/6; docs format/accuracy PASS for their asserted checks. Agent-docs prose, assets-barrel, and publish-assets freshness all PASS on unchanged committed content head `eba0b092416831f5fada679a1c21247d065ca521`. The retained pre-commit assets red records the earlier dirty-vs-HEAD sequencing state and is superseded by the committed-head PASS. |
 | Final/root | PASS with named baseline reds | Check 2,925 files/25 batches; tests 4,206 pass/0 fail/19 ignored; quality/arch/publish/specifiers PASS. Doc lint 3+3 and surface diff 524 majors remain pinned baseline red. |
 
 ## PLAN-EVAL Advisories for S2
@@ -145,7 +143,7 @@ terminal; the content must now be committed so the Git-diff-based freshness gate
 
 ## Open Questions
 
-- None. Only the post-commit freshness receipts and PR handoff remain.
+- None. Only the PR handoff and coordinator-owned fresh Tier-A remain.
 
 ## Drift and Debt
 
@@ -160,3 +158,5 @@ terminal; the content must now be committed so the Git-diff-based freshness gate
 - Initial S1 implementation `e05a54145` was pushed before the coordinator pre-review message
   arrived; its F-1 treatment is superseded by the documented structural-reduction repair recorded
   in the PR amendment receipt.
+- S2 content head `eba0b092416831f5fada679a1c21247d065ca521`; all three committed-head
+  freshness receipts attest this exact head.

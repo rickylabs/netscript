@@ -97,7 +97,7 @@ action in `src/query/query-factory.ts` into `src/cache/cache-query.ts`, and add 
 | 2026-08-15 | S2             | Loader regression         | Factory test proves fresh+flag makes 0 calls, expired with the flag false fetches once, and two overlapping stale+flag readers block on exactly one refresh and receive one persisted timestamp. |
 | 2026-08-15 | S2             | Published guidance        | Applied every disposition across exactly the two authorized pages. A4 explicitly contrasts default non-blocking SWR with the example's blocking flag; no prose implies that the factory lacks SWR. |
 | 2026-08-15 | S2             | Generated cascade         | Ran prose → barrel → publish-assets in order. Executed `git status --short`/`git diff --name-only` found exactly the four declared generated mirrors and no fifth tracked path. |
-| 2026-08-15 | S2             | Merge-readiness gates     | Scoped/root/runtime/docs/quality/publish gates completed; final freshness rerun awaits the committed S2 content head because `check:assets-barrel` compares generated output to `HEAD`. |
+| 2026-08-15 | S2             | Merge-readiness gates     | Scoped/root/runtime/docs/quality/publish gates completed. All three freshness gates then passed sequentially on unchanged committed content head `eba0b092416831f5fada679a1c21247d065ca521`. |
 
 ## Decisions
 
@@ -174,6 +174,9 @@ action in `src/query/query-factory.ts` into `src/cache/cache-query.ts`, and add 
 | Docs accuracy | **PASS** receipt (exit 0) | Script's own checks passed. Per A1, this receipt is not evidence for the chapter-3 page-level sentence. |
 | Agent-docs prose freshness | **PASS** receipt (exit 0) | Fresh with `stalePaths: []` on the generated content state. |
 | Assets-barrel freshness, pre-commit | **RED** receipt (exit 1) | Expected sequencing result: task regenerated the authorized dirty mirror then `git diff --exit-code` compared it with pre-S2 `HEAD`. Retained honestly; rerun is required only after committing this changed content state. |
+| Agent-docs prose freshness, committed head | **PASS** receipt (exit 0) | `sdk-cache-s2-head-agent-docs-prose`; receipt and actual Git head both `eba0b092416831f5fada679a1c21247d065ca521`; duration 13,278 ms. |
+| Assets-barrel freshness, committed head | **PASS** receipt (exit 0) | `sdk-cache-s2-head-assets-barrel`; receipt and actual Git head both `eba0b092416831f5fada679a1c21247d065ca521`; duration 767 ms. This supersedes the retained pre-commit sequencing red after the content-state change. |
+| Publish-assets freshness, committed head | **PASS** receipt (exit 0) | `sdk-cache-s2-head-publish-assets`; receipt and actual Git head both `eba0b092416831f5fada679a1c21247d065ca521`; duration 437 ms. |
 | Quality gate | **PASS** receipt (exit 0) | Repository scan 0 findings. SDK `FAIL=0 WARN=1 INFO=1`; the one warning is known F-16. `cache-query.ts` remains 497 lines with no F-1. |
 | Architecture check | **PASS** receipt (exit 0) | Dependency checks and all-roots doctrine scan exit 0; SDK known F-16 remains unchanged. |
 | Root publish dry-run | **PASS** receipt (exit 0) | Full workspace simulation completed successfully. |
@@ -184,16 +187,15 @@ action in `src/query/query-factory.ts` into `src/cache/cache-query.ts`, and add 
 | Cache-entrypoint doc lint | **EXPECTED RED** (exit 1) | Exactly 3 pinned `private-type-ref` diagnostics in `src/cache/kv-cache-store.ts`: `KvCacheStore`/`CacheStore` at `48:1`; `get`/`CacheKey` and `get`/`CacheStoreEntry` at `97:3`. Zero new; never a pass. |
 | Surface diff | **KNOWN BASELINE RED** (exit 1) | `verdict: major`, 524 undeclared majors from stale `public-surfaces.json`; no published export was added or changed by this leaf. Out of repair scope. |
 
-The post-commit `assets-barrel` and `publish-assets` freshness receipts remain pending so all three
-cascade checks can judge one committed content head. Aspire, Docker, and `e2e:cli` were not run and
-no runtime lease was acquired.
+All three post-commit cascade checks passed sequentially against unchanged content head
+`eba0b092416831f5fada679a1c21247d065ca521`; the working tree remained clean after each check.
+Aspire, Docker, and `e2e:cli` were not run and no runtime lease was acquired.
 
 ## Handoff Notes
 
-- S2 implementation is complete on exactly the authorized runtime predicate, factory test, two docs
-  pages, four generated mirrors, and run artifacts. `cache-query_test.ts` was not touched in S2.
-- After committing the content head, run the three freshness receipts sequentially without changing
-  either docs page or mirror. Then record their terminal results in an artifact-only receipt commit.
+- S2 implementation and its committed-head validation are complete on exactly the authorized
+  runtime predicate, factory test, two docs pages, four generated mirrors, and run artifacts.
+  `cache-query_test.ts` was not touched in S2.
 - A1 remains manual reviewer evidence: fresh Tier-A and later IMPL-EVAL must read the disposition
   table against the rendered page. The docs-accuracy PASS is explicitly not cited for that claim.
 - Stop after push and the S2 PR receipt for fresh Tier-A. Do not launch IMPL-EVAL or change the draft
