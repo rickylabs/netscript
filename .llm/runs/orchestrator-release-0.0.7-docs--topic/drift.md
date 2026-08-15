@@ -352,3 +352,56 @@ only `packages/cli/src/kernel/assets/agent-docs.generated.ts`, and proving `chec
 through the structured gate wrapper. Leaving the two assets refreshed while the embedded copy stays
 stale is the one outcome to avoid — it keeps CI red and leaves the CLI shipping a bundle that no
 longer matches the published docs.
+
+## 2026-08-15 — correction: this lane's "CI green 20/20" readiness conclusion was wrong
+
+**The claim.** After the `assets-barrel` amendment this orchestrator reported `pr-checks PASS` at
+`d24c3fa03` — "20 checks, 0 current failures" — and offered it as a readiness signal in both the
+topic journal and PR comment `5301061539`.
+
+**The contradiction.** GitHub Actions run `31870831715`, job `94979108152`, at that exact head, is a
+terminal `quality` **failure** at step **#15 "Publish asset freshness"**. The job completed at
+`2026-08-15T07:01:10Z`; this lane's `agentic:pr-checks` snapshot was taken at `07:01:11Z` — **one
+second later** — and did not reflect it. The tool was not wrong so much as raced; the error was this
+orchestrator's, for treating a single tool snapshot as a terminal CI verdict instead of confirming
+against the authoritative Actions run.
+
+**Why it matters beyond this instance.** The same mistake pattern has now appeared three times in
+this run: relaying a normalized digest without reproducing it, signing off cycle-1 Tier-A without
+tracing a `Measured` label to a published input, and now reporting CI green from a snapshot that a
+completed run contradicts. Each time the failure was accepting a convenient positive signal rather
+than confirming the underlying fact. The correction is not "distrust `pr-checks`" — it is that a
+readiness claim requires the terminal state of the specific workflow run at the exact head, read
+from Actions, and a snapshot taken within seconds of a job completing is not that.
+
+**Disposition.** Recorded append-only, correcting the record rather than editing the earlier claim.
+No readiness was ticked on the strength of the wrong conclusion: no Definition-of-Done box was
+checked, nothing was readied further, merged, relabelled, or started as a next leaf. The PR comment
+carrying the claim stays as posted; this entry is its correction.
+
+## 2026-08-15 — third cascade layer, and the full freshness closure enumerated
+
+`.llm/tools/generate-publish-assets.ts:34-43` lists `.llm/assets/agent-docs/prose.json.gz`,
+`provenance.json`, and `packages/cli/src/kernel/assets/agent-docs.generated.ts` among its inputs and
+emits `packages/mcp/src/publish-assets.generated.ts`. The two authorized amendments therefore
+invalidated a third derived asset. Reproduced locally: `deno task gen:publish-assets --check` exits
+`1` with "publish assets are stale: packages/mcp/src/publish-assets.generated.ts".
+
+Rather than fix one layer and wait to discover another, this lane enumerated and executed **every**
+freshness check in the repository before dispatching:
+
+| Check                     | Exit | State                 |
+| ------------------------- | ---- | --------------------- |
+| `check:agent-docs-prose`  | `0`  | closed at `d4a0a8340` |
+| `check:assets-barrel`     | `0`  | closed at `d24c3fa03` |
+| `check:publish-assets`    | `1`  | the remaining layer   |
+| `check:mcp-export-corpus` | `0`  | clean, not implicated |
+
+`publish-assets.generated.ts` is consumed by runtime code, not by another generator, so nothing
+regenerates from it. This is expected to be the terminal layer — stated as an evidence-backed
+expectation, not a guarantee; a fifth layer would be reportable information.
+
+The brief also declines to prescribe exact scoped fmt/lint invocations for `packages/mcp`. This lane
+has twice prescribed scoped wrappers on paths root `deno.json` excludes, and the author correctly
+refused both. The author is instead asked to check `fmt.exclude`/`lint.exclude` against
+`packages/mcp/**` first and record what actually applies.
