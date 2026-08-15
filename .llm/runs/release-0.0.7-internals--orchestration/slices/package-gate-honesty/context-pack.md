@@ -6,17 +6,18 @@
 | -------------- | -------------------------------------------------------------------- |
 | Run ID         | `release-0.0.7-internals--orchestration/slices/package-gate-honesty` |
 | Branch         | `fix/package-gate-honesty`                                           |
-| Current phase  | `plan-eval` handoff; hard stop                                       |
+| Current phase  | repaired plan; hard stop pending twelfth-path decision, then cycle 2 |
 | Archetype      | `6 — CLI / Tooling` (supporting MCP member A2)                       |
 | Scope overlays | `docs`                                                               |
 
 ## Current state
 
-Bootstrap, live issue research, source research, JSR surface scan, bounded plan, and Design
-checkpoint are complete. Draft PR #1663 targets immutable `main` base
-`05fc3132b6800a85eb6152691a961b658962571b`. The plan owns exactly six product/config files and
-requires formal PLAN-EVAL. No implementation is authorized, and the expensive gate has not been
-requested or run.
+PLAN-EVAL cycle 1 correctly returned `FAIL_PLAN` at evaluator commit `be2b18728`: root exclusion
+cannot affect the optimized wrappers' explicit argv. The coordinator granted an eleven-path rescope
+for child-only marker semantics plus nearest-config batching in both wrappers, and waived
+`scaffold.runtime` as `n/a`. The corrected proof selects 114: lint is green and fmt honestly reports
+one unformatted healthy fixture file. Its scratch-only repair is proved but awaits a twelfth-path
+grant. No checkout product/config implementation exists.
 
 ## Completed
 
@@ -26,26 +27,35 @@ requested or run.
 - All three issues re-read live.
 - Three cwd failures and MCP fmt config crash reproduced through structured wrappers.
 - `closeScoreGap` definition, consumption, and decorative test behavior traced.
-- Six-file plan and per-member JSR audit plan locked.
+- Eleven-path repaired plan and per-member JSR audit plan locked.
+- Exact no-extra-flag lint prototype green at 114; fmt reports exactly one genuine healthy-fixture
+  finding at 114; separate fmt/lint negative controls red with real findings; doctor 4/4; all
+  negative-control source files restored byte-exactly.
+- Scratch-only formatting of the pending twelfth path makes exact fmt green at 114 while lint and
+  doctor remain green.
 
 ## In progress
 
-- Awaiting topic-supervisor PLAN-EVAL after the research + plan handoff commit/comment.
+- Awaiting topic-supervisor disposition of the twelfth-path request, then Tier-A review and
+  separate-session PLAN-EVAL cycle 2.
 
 ## Next steps
 
-1. Topic supervisor launches a fresh native opposite-family Fable 5 medium PLAN-EVAL.
-2. If and only if verdict is `PASS`, coordinator grants implementation authority.
-3. Future implementation follows S1-S4; S4 requests the serialized `scaffold.runtime` mutex.
+1. Coordinator grants or rejects the proved
+   `packages/mcp/tests/fixtures/doctor/healthy/netscript.config.ts` twelfth path.
+2. Topic supervisor reviews the resulting reachable plan and launches PLAN-EVAL cycle 2 in a fresh
+   separate evaluator session.
+3. If and only if verdict is `PASS`, coordinator grants implementation authority.
+4. Future implementation follows S1-S4; `scaffold.runtime` remains waived `n/a` and must not run.
 
 ## Key decisions
 
-| Decision                             | Source         | Notes                                                                           |
-| ------------------------------------ | -------------- | ------------------------------------------------------------------------------- |
-| Root config excludes invalid fixture | plan L3/L4     | Exact standalone formatter command must work; fixture remains malformed/tested. |
-| Module-derived CLI paths             | plan L1/L2     | No ambient cwd and no weakened assertion.                                       |
-| `0.5` pinned both directions         | plan L5/L6     | Inside/outside identity conflict makes movement observable.                     |
-| Formal PLAN-EVAL required            | plan judgement | This thread cannot self-launch or self-certify.                                 |
+| Decision                                     | Source         | Notes                                                                   |
+| -------------------------------------------- | -------------- | ----------------------------------------------------------------------- |
+| Child marker + config batching owns boundary | plan L3/L4     | Both select 114; lint green; fmt exposes one real pending-path finding. |
+| Module-derived CLI paths                     | plan L1/L2     | No ambient cwd and no weakened assertion.                               |
+| `0.5` pinned both directions                 | plan L5/L6     | Inside/outside identity conflict makes movement observable.             |
+| Formal PLAN-EVAL required                    | plan judgement | This thread cannot self-launch or self-certify.                         |
 
 ## Authoritative product/config edit surface
 
@@ -55,28 +65,34 @@ requested or run.
 4. `packages/cli/e2e/src/application/gates/scaffold/run-documented-stream-example.ts`
 5. `packages/mcp/src/domain/docs/guidance-index.ts`
 6. `packages/mcp/tests/guidance-retrieval_test.ts`
+7. `.llm/tools/run-deno-fmt.ts`
+8. `.llm/tools/run-deno-fmt_test.ts`
+9. `.llm/tools/run-deno-lint.ts`
+10. `.llm/tools/run-deno-lint_test.ts`
+11. `packages/mcp/tests/fixtures/doctor/broken/.deno-fmt-lint-ignore`
 
 Everything else in the frozen outer bound is read-only, especially both docs sources and the broken
-fixture. A seventh path is rescope.
+fixture config. A twelfth path is rescope.
 
 ## Gates
 
-| Gate family | Current status               | Evidence                                       |
-| ----------- | ---------------------------- | ---------------------------------------------- |
-| Plan-Gate   | REQUIRED / NOT_RUN           | `plan.md`; evaluator absent by design.         |
-| Static      | NOT_RUN                      | No implementation.                             |
-| Fitness/JSR | planned                      | `research.md` and `plan.md` per-member tables. |
-| Runtime     | NOT_RUN                      | Coordinator mutex not granted.                 |
-| Consumer    | baseline failures reproduced | `worklog.md` research diagnostics.             |
+| Gate family | Current status                       | Evidence                                       |
+| ----------- | ------------------------------------ | ---------------------------------------------- |
+| Plan-Gate   | cycle 1 `FAIL_PLAN`; cycle 2 pending | `plan-eval.md`; repaired `plan.md`.            |
+| Static      | NOT_RUN                              | No implementation.                             |
+| Fitness/JSR | planned                              | `research.md` and `plan.md` per-member tables. |
+| Runtime     | N/A                                  | Explicit coordinator waiver; must not run.     |
+| Consumer    | baseline failures reproduced         | `worklog.md` research diagnostics.             |
 
 ## Open questions
 
-- None that change implementation. Only external authorization/mutex state remains.
+- Twelfth-path authority for the proved healthy-fixture formatting repair; implementation authority
+  then still depends on cycle-2 `PASS`.
 
 ## Drift and debt
 
-- Drift: coordinator thread file preseed; root task wrapper exclusion does not fix standalone
-  command.
+- Drift: R8 falsified by execution; authorized eleven-path rescope; rejected parent-family false
+  exclusion; corrected 114-file proof exposes one pending twelfth path.
 - Debt: no new/closed entry; named CLI/MCP baseline debt remains unchanged.
 
 ## Commits
