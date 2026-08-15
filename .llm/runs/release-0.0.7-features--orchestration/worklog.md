@@ -2268,3 +2268,40 @@ age, the browser fixture/task, and the two ruled package README notes
 
 Still withheld and unrequested: the expensive-gate lease. Both gates remain `NOT_RUN` and run only
 serially under one coordinator-granted lease, after all cheap gates and a pre-gate Tier-A.
+
+### S3 released — canonical hydration, omission coverage, browser fixture, ruled READMEs
+
+Coordinator accepted S2 Tier-A `PASS` at leaf `3669e9b8730dae3ef65b4dee02d5ce5770a467b7` and topic
+checkpoint `3eab955b1`, and released S3 on the same original author thread
+`01a004f9-f033-7592-a0bc-63927753fb43`.
+
+Exact surface, dispatched verbatim and capped: both `ServiceShowcaseLab` island templates
+(`.tsx.template` and `.memory.tsx.template`), `embedded.generated.ts` **via canonical regeneration**,
+`route-templates_test.ts`, `packages/cli/README.md`, `packages/fresh/tests/query-hydration-age_browser.ts`,
+the new `packages/fresh/tests/fixtures/query-hydration-age-browser/{main.ts,app.tsx,vite.config.ts}`,
+`packages/fresh/deno.json`, `packages/fresh/README.md`, and run artifacts.
+
+Four deliverables: canonical cache-age hydration in **both** islands — the actual #1360 fix, passing
+the already-computed `cachedAt` as `initialDataUpdatedAt` instead of using it only as a display
+label; generated-output omission coverage that fails if a future edit drops the option from either
+island; the public-wrapper browser fixture and its task wired in `packages/fresh/deno.json` but
+**not run**; and both ruled README notes, with the CLI README carrying the verb, result/overwrite
+contract, whole-command flags, pre-write contract failure including Aspire, expected contract
+path/export, `Enabled: false` policy, L1/L2 dialect, and the six-symbol plus namespace migration.
+
+The omission guard is the part that earns its place. The `initialDataUpdatedAt` seam shipped
+unexercised in the one example the scaffold designates as canonical, and a downstream consumer
+independently repeated the same mistake — threading `cachedAt` through three files and then
+discarding it. That is evidence the seam is undiscoverable rather than unwanted, so a test that fails
+when the option is dropped is worth more than the one-line fix it protects.
+
+Explicitly preserved: the direct `clientKey()` emission and all three C1 assertions, S2's add-path
+atomicity and its non-invocation-proving stub, and the `Enabled: false` policy.
+
+**Cheap gates only.** Focused CLI/Fresh `check`, `test`, `doc-lint`, and asset freshness with a
+canonical barrel regeneration. `fresh-browser`, `scaffold.runtime`, Aspire, and Docker are all
+prohibited, and no lease is requested. Full suite counts required, not subsets — S2-F2 was found
+precisely because a targeted subset was green while the suite was red.
+
+Stops at a Tier-A stop for fresh review and pre-expensive-gate convergence. No S4, no evaluator, no
+readiness.
