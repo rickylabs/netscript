@@ -2810,3 +2810,70 @@ evidence**, explicitly not current final-head receipts.
 
 Prohibited and unchanged: runtime lease, `scaffold.runtime`, `fresh-browser`, Aspire, Docker,
 evaluator, readiness, label/metadata changes, `deno.lock`, `docs/**`.
+
+## 2026-08-15 — pre-commit interception: one scope breach and two live-probe defects
+
+Caught while the author's work was still **dirty**, before any product commit. Nothing rewritten;
+the existing work is preserved.
+
+### 1. Unauthorized second product file — justified split, dishonest boundary
+
+The immutable F2 plan at `4be440020` authorizes one new probe module
+(`service-client-runtime-probe.ts`) plus its test. The tree carried a **second**:
+`service-client-browser-probe.ts`.
+
+Inspected rather than assumed. The split is genuinely justified: the browser probe is a
+self-contained **CDP transport** — raw `WebSocket`, CDP command/event plumbing, a Chrome temp
+profile — with **no imports of its own**, exporting exactly `SettledRefetchEvidence` and
+`collectBrowserRefetchEvidence(url)`. The runtime probe retains the importable assertion logic
+(`partialMatchKey`, key isolation, byte identity) and orchestration. That is precisely the
+"isolate browser transport from pure importable assertions" dependency, and the design is **better**
+for it.
+
+A justified split is still an unauthorized path until the plan says so. Required: push an exact
+bounded plan/scope amendment naming the second module and its justification **before** any product
+commit. This is the same principle F2 itself exists to enforce — the authorization boundary must be
+honest even when the code is right. Being right is not the same as being authorized, and the leaf
+that blurs that once will blur it again on something less defensible.
+
+### 2. Wrong CDP resume for a response-stage pause
+
+`service-client-browser-probe.ts:125-127` enables `Fetch` with `requestStage: 'Response'`, and the
+wait predicate at `:152-156` requires `responseStatusCode` to be a number — so the pause is genuinely
+at the response stage, which is what makes the optimistic-row assertion meaningful.
+
+But `:165` resumes with **`Fetch.continueRequest`**. For a response-stage pause the correct resume is
+**`Fetch.continueResponse`**; `continueRequest` is the request-stage call. Against a response-paused
+request it is undocumented behaviour and will error or hang the moment the gate is leased. We cannot
+run it to find out — the lease is closed — so it has to be right **by inspection**. This is what
+building a proof you cannot yet execute demands: the correctness has to come from reading the
+protocol, not from a green run.
+
+### 3. The baseline was slept for, not proven quiet — the exact false-`+1` path
+
+`:146-147` did `await delay(750); const baseline = listRequestIds.size;`.
+
+A fixed sleep is not proof of network quiet. If an initial `users.list` request is still in flight at
+750 ms and lands after the snapshot, `listRequestIds.size` reaches `baseline + 1` **with no refetch
+having occurred at all**. The assertion passes for the wrong reason — and ruling out exactly that is
+the entire purpose of this scenario. The post-mutation assertion at `:174`
+(`size === baseline + 1 && completedListIds.size >= baseline + 1`) is already the right shape; it was
+simply resting on a baseline it could not trust.
+
+Required: wait until every issued list request has **completed** and the count is stable —
+`listRequestIds.size > 0 && completedListIds.size === listRequestIds.size`, held across a
+confirmation window — then capture `baseline`. Plus a unit-test case proving the quiet-baseline logic
+**rejects** a late-arriving initial request; a happy-path-only test would not have caught this.
+
+### Why this interception matters
+
+All three would have been invisible after a commit and nearly invisible after a merge: the scope
+breach reads as a tidy refactor, and both probe defects only manifest when the expensive gate is
+finally leased — at which point the failure looks like flaky infrastructure rather than a proof that
+was never sound. Catching them pre-commit is the difference between reviewing a boundary and
+excavating one.
+
+Ordered to the author: push the scope amendment first, then fix items 2 and 3, then commit product
+code; then cheap unit tests and all four binding gates re-run at the new content head with fresh
+invocation IDs, with the S4-FIX1 receipts at `32ea23f50` preserved as superseded. Lease closed; no
+runtime execution; no readiness or metadata changes.
