@@ -345,3 +345,35 @@ The wider lesson is the one this session keeps repeating in different costumes: 
 running" and wrote "the host is clean". Reporting a narrower measurement in broader words is the same
 error as an allowlist miss reported as a host fact, and it is worth more vigilance in one's own
 evidence than in someone else's.
+
+## D-19 — supervisor audits mutate the leaf worktree and create cross-owner dirt (significant)
+
+**Date:** 2026-08-15. Running `agentic:leak-check` with `--worktree`/`--slice-dir` pointed at the leaf
+**regenerates** `.llm/runs/feat-app-service-client-wiring--1355/leak-report.md` in that worktree. Only
+the `Generated` timestamp and worktree line change, but the file becomes dirty in a tree the
+**author** owns, from a process the **supervisor** ran.
+
+This has now cost the lane twice:
+
+1. Before **attempt 6**, the leaf carried a modified `leak-report.md` from my audits, so the author
+   could not take an honest `gitHead == actualGitHead` receipt in place and had to create a fresh
+   detached checkout at the leased commit. It handled that correctly, but the work existed only
+   because of my dirt.
+2. Before the **F8** commit, my 21:33 Tier-A host audit regenerated it again after author evidence
+   head `2385cdb72`, creating a cross-owner diff that would otherwise have been swept into a
+   plan-only amendment as if it were author evidence.
+
+**The failure is one of ownership, not correctness.** The audit itself was valid and its result is
+recorded centrally. But a supervisor verifying a host should not leave a write in a worktree whose
+commits another agent signs — evidence provenance depends on each commit containing only what its
+author produced.
+
+**Standing rule for this lane:** supervisor host audits must not write into the leaf worktree.
+Point `--slice-dir`/`--worktree` at a supervisor-owned path, or run the audit from the topic worktree,
+or accept the report only from stdout without letting it persist into the leaf. If a leaf file is
+dirtied by a supervisor action anyway, it is restored **byte-for-byte to the author's HEAD** by the
+author and **excluded** from that author's commit — never preserved, and never explained away in the
+author's evidence as if it belonged there.
+
+Related: [[eval-verdict-head-must-equal-merge-head]] and D-17 are the same concern at different
+layers — what a commit or a lease *claims* must be exactly what it *contains*.
