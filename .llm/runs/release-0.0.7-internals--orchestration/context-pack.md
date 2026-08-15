@@ -100,8 +100,8 @@ runs at that exact SHA there are **0 pending, 0 failed**. No further main pollin
 - Codex thread `01a00443-abab-7261-8905-74ed71467929`, `openai · gpt-5.6-sol · medium`, route
   matched
 - Steering: `codex exec resume 01a00443-abab-7261-8905-74ed71467929 -- "<follow-up>"`
-- Draft PR **#1658** `fix(agentic): bind OpenHands dispatch claims and refusals` @ `ca2266ecb`,
-  `type:fix`/`area:tooling`/`status:research`, milestone `0.0.7`
+- Draft PR **#1658** `fix(agentic): bind OpenHands dispatch claims and refusals` @ **`cea999d18`**
+  (repaired plan head after rescope), `type:fix`/`area:tooling`/`status:research`, milestone `0.0.7`
 - Run dir
   `.llm/runs/release-0.0.7-internals--orchestration/slices/openhands-dispatch-claim-and-refusal/`
 - Closes exactly **#1611** (p1, dispatch helper must emit phase/head and acquire the existing claim)
@@ -121,8 +121,18 @@ no dispatch, no evaluator trigger, manual or by label.
 
 ### Blocking coordinator action
 
-The leaf stops after `plan.md` with its PLAN-EVAL judgement. That gate is the coordinator's to
-grant; this lane does not self-launch an evaluator.
+The leaf is at its plan stop with the **repaired** plan head
+**`cea999d18ea2c2d4a6208fc209ce744d9be1d194`**, Tier-A reviewed **PASS** (comment `5301190104`).
+Contract rescoped at central head `feaf2da311ccc4b15c210d25fda5ff1699b60576` to an **eight-path**
+mutation envelope; `openhands-phase-eval.yml` is read-only precedent, not an edit path.
+
+**Requested and awaiting: one fresh native Claude Opus 5 / medium Remote Control PLAN-EVAL** against
+`cea999d18`. Necessary — the leaf changes an atomic provider-spend claim boundary, workflow
+candidate selection, comment-write permissions, and externally visible refusal semantics, whose
+failure modes are silent refusal, recursion, and duplicate paid dispatch. This lane does not
+self-launch it, and implementation stays prohibited until `PASS`.
+
+No OpenHands dispatch and no evaluator label have been applied.
 
 ### Remaining internals queue after this leaf
 
