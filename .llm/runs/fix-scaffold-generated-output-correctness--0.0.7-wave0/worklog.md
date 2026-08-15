@@ -42,6 +42,11 @@
 | 2026-08-15T00:19:39Z | Slice 5 reconcile: the only new PR comment is the recorded slice-4 implementation evidence; #1262/#1263/#1588 remain open and PR #1654 remains draft at exactly one `status:impl`. No external finding or authorized lifecycle/scope change appeared. | live PR read; prior live issue reads |
 | 2026-08-15T03:56:02Z | T-1 bounded fix-up restored the removed MSSQL Aspire loopback regression case without changing the four-engine required/forbidden matrix. The case pins `tcp:` stripping, comma/port parsing with the `1433` default, `127.0.0.1`/`::1`/`[::1]` normalization, and empty-host fallback in generated MSSQL Prisma output. The source-only mutation stayed green because tests consume the embedded registry; regenerating the temporary mutation produced the expected RED, then both product files were restored to their original hashes before the final PASS. | `generators_test.ts`; structured RED/GREEN wrapper output; product-file hashes |
 | 2026-08-15T03:56:02Z | T-1 reconcile: PR #1654 remains open and draft at exactly one `status:impl`; its remote head was the immutable fix-up base `cab6d1feb8` before this commit, and the latest external input remained this thread's slice-5 comment. No lifecycle, scope, lease, issue-link, milestone, or closing-keyword change is authorized. | live PR read |
+| 2026-08-15T04:02:33Z | The coordinator granted the singleton `scaffold-generated-output-correctness-runtime` lease for one grouped #1262/#1263/#1588 pass from immutable head `ebad68c80`. | coordinator lease at central commit `9ee687ce0` |
+| 2026-08-15T04:40:28Z | Attempt 1 was classified as an infrastructure/transport interruption, not a verdict: its preserved suite log has 37 `gate-end` records, zero `suite-end`, and stops at `gate-start database.generate`. The coordinator removed its positively owned stopped containers and re-granted one clean retry. | `.llm/tmp/cli-e2e/plugin-smoke-20260815-060757.log`; coordinator reconciliation |
+| 2026-08-15T04:42:00Z | Correct fail-closed refusal: the requested `run-gate.ts --child-report` route could not represent `scaffold.runtime` because the gate is absent from the allowlist and the fixed command writes no standalone JSON report. No command ran, no catalog/argv changed, and no receipt was fabricated. The coordinator withdrew that over-specification and restored the approved suite-owned NDJSON receipt contract. | `.llm/tools/gates/catalog.ts`; `run-gate.ts`; correction brief |
+| 2026-08-15T04:53:51Z | Slice 6 retry reached one terminal `suite-end`: exact command raw exit 0, `passed=89 failed=0 skipped=0`. The live verifier proved the representative seeded row, missing GET/PATCH/DELETE defined 404/`NOT_FOUND` behavior, and all three OpenAPI 404 projections. | `receipts/scaffold-runtime.json`; `.llm/tmp/cli-e2e/plugin-smoke-20260815-064348.log` |
+| 2026-08-15T04:55:26Z | Post-run cleanup is exact and clean. The suite removed its three final containers; the run-owned labeled Aspire network and second Garnet anonymous volume were removed by exact identity after positive timestamp/creator correlation. Final `aspire ps` is empty, `docker ps -a` is empty, only built-in networks remain, volumes are empty, and leak-check reports no survivors. | `receipts/leak-check.json`; runtime receipt resource identity |
 
 ## Gate evidence
 
@@ -77,6 +82,8 @@
 | T-1 | `deno task quality:scan` | PASS, raw exit 0; 0 findings, 7 pre-existing bounded allowances |
 | T-1 | `deno task arch:check` | PASS, raw exit 0; no doctrine FAIL rows (warning-only baseline census retained) |
 | T-1 | `git diff --check` | PASS, raw exit 0; no whitespace errors |
+| 6 | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS, raw exit 0; terminal `suite-end`; 89 passed, 0 failed, 0 skipped; one authorized retry after the non-verdict transport interruption |
+| 6 | `deno task agentic:leak-check -- --slice-dir .llm/runs/fix-scaffold-generated-output-correctness--0.0.7-wave0 --worktree /home/codex/repos/netscript-007-leaf-scaffold-generated-output-correctness` | PASS, raw exit 0; Aspire/Docker probes `ok`; 0 survivors |
 
 ## Slice 2 test-consolidation accounting — T-1
 
@@ -92,14 +99,14 @@ altering any matrix entry or forbidden-symbol assertion.
 | `generates engine modules with adapter setup where required` | **Subsumed by the matrix.** | MSSQL `engineRequired` pins `PrismaMssql`, `MssqlClient`, and `normalizeMssqlUrl`; the same matrix iteration generates both engine-module and Prisma-config output while forbidding PostgreSQL/MySQL helpers. |
 | `constructs the sqlite engine module with the libsql driver adapter` | **Subsumed by the matrix.** | SQLite `engineRequired` pins `PrismaLibSql`, `SqliteClient`, and the exact config-key/file fallback; the retained dedicated case strengthens this with the typed client import, both `PrismaLibSql` construction sites, and the no-adapter prohibition. |
 
-`scaffold.runtime`, Aspire, and Docker remain forbidden until the coordinator-owned global
-expensive-gate lease is explicitly granted. The eventual one-pass verdict is shared by all three
-issues.
+The coordinator-owned lease was granted and consumed by the terminal slice-6 retry. Its one
+`suite-end` verdict is shared by all three issues; the interrupted first attempt remains explicitly
+non-verdict evidence and is not reused as acceptance.
 
 Red-first probes are defect evidence, not green gate receipts. Durable gate receipt generation
 begins only after an approved plan and implementation.
 
-Implementation note: PLAN-EVAL cycle 2 and implementation slices 2–5 are complete, but no
-Aspire/AppHost, Docker, `scaffold.runtime`, publish, or expensive-gate lease request has run. PR
-#1654 remains draft at exactly one phase label, `status:impl`; Tier-A review, slice 6, and
-IMPL-EVAL remain external stops.
+Implementation note: PLAN-EVAL cycle 2 and implementation slices 2–6 are complete. PR #1654
+remains draft at exactly one phase label, `status:impl`; substantive Tier-A review and a fresh
+opposite-family IMPL-EVAL remain external stops. No publish, merge, ready flip, or self-certification
+has occurred.

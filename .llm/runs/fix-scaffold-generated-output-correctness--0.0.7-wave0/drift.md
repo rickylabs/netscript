@@ -58,3 +58,32 @@ The amended design still requires a fresh native opposite-family PLAN-EVAL. The 
 the leaf to wait for the Claude allowance reset. This housekeeping turn does not launch an
 evaluator, implement product code, run gates, request an expensive-gate lease, or alter PR
 readiness.
+
+## 2026-08-15T04:42:00Z — fail-closed receipt over-specification withdrawn
+
+**Status: resolved without a gate attempt or source change.**
+
+The initial slice-6 brief requested `run-gate.ts --child-report`, but this immutable head has no
+`scaffold.runtime` entry in the durable gate allowlist and the exact approved CLI command emits its
+domain report only as the terminal suite-owned NDJSON `suite-end`. The implementation thread
+correctly refused to edit the catalog, add `--report`, or fabricate a receipt. The coordinator
+confirmed the mismatch and withdrew the over-specification. The approved PLAN-EVAL contract now
+applies directly: exact command unchanged, terminal suite record preserved as the grouped verdict.
+
+## 2026-08-15T04:55:26Z — interrupted attempt and terminal retry
+
+**Status: resolved; one terminal grouped verdict.**
+
+Attempt 1 is preserved at `.llm/tmp/cli-e2e/plugin-smoke-20260815-060757.log` and classified as an
+infrastructure/transport interruption: 37 `gate-end`, zero `suite-end`, last record
+`gate-start database.generate`. It is not a product failure and none of its partial passes are
+reused. Under the coordinator's one-retry correction, the same immutable head produced
+`.llm/tmp/cli-e2e/plugin-smoke-20260815-064348.log` with exactly one terminal `suite-end`, raw exit
+0, and 89/89 selected gates passing.
+
+The suite removed its final containers but left its labeled persistent network and the second
+Garnet anonymous volume. Positive ownership was established from the empty preflight, exact
+worktree-scoped AppHost/container identity, Aspire creator labels, container ID/timestamp, and
+volume creation time. Only those two artifacts were removed by exact name/ID. No foreign or
+unknown-owner resource was touched. Final Aspire, container, network, volume, and leak-check probes
+are clean. This is resource-cleanup evidence, not product drift.
