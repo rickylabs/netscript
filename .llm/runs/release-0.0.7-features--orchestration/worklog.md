@@ -4490,3 +4490,57 @@ does not exist, because the browser it claimed was missing is present. Correctin
 
 Fresh Tier-A before implementation; no attempt 6 until diagnostics and selection repair are both
 bound and reviewed; runtime lease stays free during planning.
+
+## 2026-08-15 — F7-C1 Tier-A: `PASS` at `a2e9515f5a430d53cff1e47d55d7916f3dc0db15`
+
+local == remote; **plan-only confirmed** — `git diff ff0ede997..a2e9515f5` outside `.llm/runs/` is
+empty. Two-path ceiling intact at `plan.md:747-748` and `:901-902`.
+
+### All five corrections landed
+
+| Correction | Verified |
+| --- | --- |
+| False premise removed | `:788` "The defect is executable allowlist/selection, **not environmental capability**" |
+| Measured evidence recorded | `:782-785` both managed paths with exact `Google Chrome for Testing 151.0.7922.10 / .34` version strings |
+| No skip | `:852` "There is no skip path"; `:919` "skip is not an outcome" |
+| Portable override, no versioned constants | `NETSCRIPT_E2E_BROWSER_EXECUTABLE`; `:813` forbids source constants and fallback candidates, naming `chromium-1232`/`1234` explicitly |
+| Bounded status/stderr diagnosis kept | `:915` requires naming override source/path, exit code 2, and a stderr sentinel, **"with no DevTools-timeout wording"** |
+
+### Three things the author did better than I specified
+
+1. **The no-hard-coding rule is made testable.** `:912` requires asserting that neither versioned
+   cache directory appears **in source or test**. I stated the prohibition; the author turned it into
+   an executable check, so the rule cannot rot silently.
+2. **Absence of fallback is proven by a call log, not by an error message.** `:914` requires "The
+   injected call log must prove no built-in candidate was probed after failure." Asserting only that
+   an error was raised would pass against an implementation that raised *and then* fell through.
+3. **The real defect is closed on the fallback path too.** `:848-850`: built-in candidates are
+   selected only after the same runnable/version probe succeeds, and present-but-unrunnable
+   candidates are "recorded in the final error rather than returned merely because `Deno.stat` found
+   a file." That is the actual root cause — the resolver returned a path because it **existed**, never
+   because it **ran**. Ignoring managed caches was the symptom; unverified selection was the defect.
+
+### The subtle case I had not named
+
+`:856-857`: an override that passes `--version` but **exits under the real headless argv** still fails
+loudly against that override and never falls back. `--version` success is not headless-run success,
+and without this an operator could set a valid-looking override and get the same opaque timeout we
+have been chasing for three attempts.
+
+### F6 is preserved, not regressed
+
+`:917` requires one bounded capture/status race, the same drain passed to `terminateBrowserProcess`,
+**"contain no discard sink"**, and all F6 natural-exit, active-SIGTERM, three-negative, and delegation
+proofs green. The startup swallow is removed without reintroducing the teardown swallow — the two
+fixes are explicitly held together rather than traded against each other.
+
+### Verdict
+
+**`PASS`.** The premise is corrected against measurement, the classification is right, the override
+is portable and its failure semantics are loud and unfalsifiable-by-fallback, the ceiling holds at two
+paths, and F6 survives intact.
+
+Implementation is **not** released by this review — per the coordinator, no attempt 6 and no lease
+until diagnostics and selection repair are both bound and reviewed. This review binds them; the
+product repair, its focused proofs, four fresh receipts at one content head, and a further Tier-A
+come next. Runtime lease stays free.
