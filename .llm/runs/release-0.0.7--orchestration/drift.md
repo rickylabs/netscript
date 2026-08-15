@@ -391,3 +391,22 @@ implementation thread.
   owner's clarified queue rule. One evaluator per topic remains binding, but a fixes evaluator may
   run while an internals evaluator is active. The coordinator granted #1661 cycle 2 without pausing
   #1658 and recorded both identities separately; no expensive runtime mutex was involved.
+
+## 2026-08-15T10:20:00Z — post-evaluation CI authority and runtime-gate foresight
+
+- **#1661 cross-package CI is a real correction, not flaky noise:** the focused AI evaluation passed
+  its contracted behavior, but the repository suite owns an additional packaging invariant in
+  `packages/cli`: optional TanStack MCP specifiers must be computed so generated projects, rather
+  than the static JSR graph, own resolution. A literal dynamic import violates that invariant. The
+  repair restores the computed form and expands focused evidence to the package that caught it; it
+  does not weaken or delete the assertion.
+- **A formal PASS does not immunize later product mutation:** the #1661 repair changes source after
+  cycle 2, so readiness is withdrawn until a fresh Tier-A and a proportionate fresh evaluator attest
+  the repaired head. This is a new bounded cycle caused by new CI evidence, not an endless loop.
+- **#1662 split-close is intentional:** the shipped product surface can merge after exact-head CI,
+  while #1293 stays open. Neither the issue's concrete-class wording nor its docs-owned #1112
+  criterion is silently rewritten or falsely checked.
+- **The next internals leaf declares an expensive gate before implementation:** `package-gate-honesty`
+  may plan `scaffold.runtime`, but cannot execute Aspire/Docker/Postgres without the coordinator's
+  cluster-wide mutex. The mutex is currently free; a future grant will be tied to a reviewed slice,
+  pre-gate head, and mandatory cleanup proof.

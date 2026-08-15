@@ -495,3 +495,23 @@
   containment, primary-error identity, and capability fallback were all reviewed. Topic checkpoint
   `38abbacaf` released S3. S3 content is pushed at `3dee41263`; exact-head structured final receipts
   are running, so the leaf remains non-terminal and no formal evaluator is yet authorized.
+
+## 2026-08-15T10:20:00Z — one shipment, one CI repair, one readiness gate, one new plan
+
+- Independently verified #1658 at exact head `bf0706298`: 21 terminal checks (7 success, 14 policy
+  skips), zero failures/active jobs, zero review threads, and `mergeState=CLEAN`. Squash-merged it
+  as `05fc3132b`; #1611 and #1613 auto-closed. The PR and both issues now carry exactly
+  `status:shipped`, and `origin/main` contains the merge.
+- The internals supervisor reconciled that terminal tuple at `9aabef2c9` and released its next
+  serial leaf, `package-gate-honesty` (#1604/#1618/#1622), on new preserved Codex author thread
+  `01a004ec-86a6-7c21-8886-81c09de099f5`. Its current authority is bootstrap/research/plan only.
+- #1661's Fable 5/medium cycle-2 evaluator passed at immutable commit `4766b258f`, comment
+  `5301708486`. Current exact-head Actions then failed one cross-package CLI packaging assertion
+  (4151 passed / 1 failed / 14 ignored): literal optional `@tanstack` imports had replaced the
+  required computed specifiers. The original Codex author is performing the bounded one-file
+  RED→GREEN restoration, with `packages/cli` and `packages/fresh` source kept read-only.
+- #1662's fresh Fable 5/medium evaluator passed at `f52aa471c`, comment `5301776738`, after
+  independently rerunning and reading the R1–R3, query compatibility, notifier, receipt, D7, and
+  split-close evidence. The PR is now non-draft with sole `status:ready-merge`; #1293 remains open
+  at `status:impl`, with its wording unchanged. Exact-head `check-test` and `quality` are active.
+- Runtime hygiene remains clean and the expensive-gate mutex is free.

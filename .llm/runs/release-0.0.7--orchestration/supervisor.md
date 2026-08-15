@@ -428,3 +428,15 @@ max; all topic supervisors remain their existing native Claude Opus 5/high Remot
 
 Two formal evaluators are valid concurrently because they occupy different topic slots. The shared
 Aspire/Docker/browser mutex is still free and all three active leaves avoid expensive runtime gates.
+
+## Live checkpoint — 2026-08-15T10:20:00Z
+
+| Lane | Current serial action | Hard boundary |
+| --- | --- | --- |
+| docs | Queue exhausted and parked at `0ca4c489f` | Do not invent post-freeze work |
+| internals | #1658 shipped as main `05fc3132b`; `package-gate-honesty` (#1604/#1618/#1622) is in bootstrap/research/plan on preserved Codex thread `01a004ec-…` | Stop at the plan gate; `scaffold.runtime` needs the coordinator's cluster-wide mutex before any run |
+| fixes | #1661 cycle-2 IMPL-EVAL passed, but exact-head CI exposed one real computed-import packaging regression; the original author is running the one-file RED→GREEN repair | Fresh Tier-A and a proportionate fresh formal evaluation are required after the product repair; no expensive gate |
+| features | #1662 IMPL-EVAL passed at evaluator head `f52aa471c`; PR is non-draft/`status:ready-merge` with readiness CI active | #1293 stays open and its owner wording stays unchanged; merge only after current exact-head checks are terminal green |
+
+Main is `05fc3132b6800a85eb6152691a961b658962571b`. Per-topic queues remain independent. Docker,
+Aspire application processes, Playwright, and Chromium are empty; the expensive-gate mutex is free.

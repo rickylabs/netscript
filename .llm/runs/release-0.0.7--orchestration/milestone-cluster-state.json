@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
-  "currentMainSha": "729386c567bfbd0b8c7f86a4ed09348f0a8a4ad8",
+  "currentMainSha": "05fc3132b6800a85eb6152691a961b658962571b",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -73,7 +73,7 @@
         "pid": 23955,
         "bridgeSessionId": "session_01HqFtKQtyJcHBEn1MghQdFX",
         "remoteControlUrl": "https://claude.ai/code/session_01HqFtKQtyJcHBEn1MghQdFX",
-        "topicHeadSha": "47ae3c73988f94654370935e821664df0d8cf828",
+        "topicHeadSha": "9aabef2c96f0de5c3bbff79bf3438f33a6c57c4d",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle"
@@ -115,7 +115,7 @@
         "pid": 26724,
         "bridgeSessionId": "session_014pCd2QWkCscgZpVdjcUPST",
         "remoteControlUrl": "https://claude.ai/code/session_014pCd2QWkCscgZpVdjcUPST",
-        "topicHeadSha": "a6cb21f023b258851ed2556c9802e2202dec77a5",
+        "topicHeadSha": "522a9149c1631b6567c89da04c1da6efa705b81e",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle"
@@ -166,7 +166,7 @@
         "sessionId": "19621a0b-c6a0-47c6-b826-93c1634a6875",
         "bridgeSessionId": "session_01LQBHX8KpA5aYtDraq46J8a",
         "remoteControlUrl": "https://claude.ai/code/session_01LQBHX8KpA5aYtDraq46J8a",
-        "topicHeadSha": "38abbacaf0874aeb14311de6f92d7ad1cfda9f9c",
+        "topicHeadSha": "2c9e79257b6999961b8f3cbdd08e764f9277b34a",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
         "legacyState": "parked_idle"
@@ -793,10 +793,10 @@
     {
       "id": "openhands-dispatch-claim-and-refusal",
       "lane": "internals",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "7737d8903bb2925c3fcefbda362168fe297eebd4",
-      "currentPrHeadSha": "f46d84630c54210a09ff4ed39537da1e66964a52",
+      "currentPrHeadSha": "bf07062987088809133ccacd380be6b016b511ed",
       "issueNumbers": [1611, 1613],
       "implementerAgentId": "01a00443-abab-7261-8905-74ed71467929",
       "branch": "fix/openhands-dispatch-claim-and-refusal",
@@ -804,7 +804,7 @@
       "prNumber": 1658,
       "bootstrapHeadSha": "ca2266ecb4fe0cdd8a47059b4bca39761840f3b3",
       "researchHeadSha": "670e37beaa723f1b54218149a2485dd6b3e741e3",
-      "implementationState": "formal_impl_eval_active",
+      "implementationState": "merged_and_lifecycle_normalized",
       "planRepairHeadSha": "cea999d18ea2c2d4a6208fc209ce744d9be1d194",
       "planRepairTierAState": "PASS",
       "planRepairTierACommentUrl": "https://github.com/rickylabs/netscript/pull/1658#issuecomment-5301190104",
@@ -854,7 +854,7 @@
       "slice5TierASignoffHeadSha": "f46d84630c54210a09ff4ed39537da1e66964a52",
       "slice5TierACommentUrl": "https://github.com/rickylabs/netscript/pull/1658#issuecomment-5301628196",
       "finalRootTest": "PASS: 4147 passed, 19 ignored, 0 failed in approximately 319 seconds",
-      "implementationEvaluationState": "active",
+      "implementationEvaluationState": "complete",
       "implementationEvaluationCycle": 1,
       "implementationEvaluatedHeadSha": "f46d84630c54210a09ff4ed39537da1e66964a52",
       "implementationEvaluatorAgentId": "740d2a3a-1677-459c-a6b1-a39398649d1a",
@@ -863,6 +863,17 @@
       "implementationEvaluatorRoute": "native claude-opus-5 / medium / Remote Control",
       "implementationEvaluationGrantedAt": "2026-08-15T09:38:04.000Z",
       "implementationEvaluationStartedAt": "2026-08-15T09:40:04.876Z",
+      "implementationEvaluationCompletedAt": "2026-08-15T09:54:05.000Z",
+      "implementationEvaluationVerdict": "PASS",
+      "implementationEvaluatorCommitSha": "8f62a61213df890101b6f7dfc07a042928f2d536",
+      "implementationEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1658#issuecomment-5301699397",
+      "postEvaluationDispositionHeadSha": "bf07062987088809133ccacd380be6b016b511ed",
+      "formalRoundTripDisposition": "the committed command-not-first-token production round-trip plus the separate formal producer-shape and phase-acceptance tests satisfy the literal criterion; a single combined formal case remains non-blocking follow-up",
+      "readinessState": "complete",
+      "readinessChecks": "21 terminal: 7 success, 14 policy skips, 0 failed, 0 active; 0 review threads; mergeState CLEAN",
+      "mergeCommitSha": "05fc3132b6800a85eb6152691a961b658962571b",
+      "mergedAt": "2026-08-15T10:13:45.000Z",
+      "issueCompletionState": "1611 and 1613 closed; PR and both issues have sole status:shipped",
       "fableAvailabilityProbe": {
         "state": "failed_pre_inference_zero_cycle",
         "agentId": "e58c5f01-8acc-4148-9fb6-74045e2bc5cd",
@@ -890,6 +901,26 @@
         ],
         "formalPlanEvaluationRequired": true
       },
+      "receiptRefs": []
+    },
+    {
+      "id": "package-gate-honesty",
+      "lane": "internals",
+      "phase": "planned",
+      "baseBranch": "main",
+      "headSha": "05fc3132b6800a85eb6152691a961b658962571b",
+      "currentPrHeadSha": null,
+      "issueNumbers": [1604, 1618, 1622],
+      "implementerAgentId": "01a004ec-86a6-7c21-8886-81c09de099f5",
+      "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
+      "branch": "fix/package-gate-honesty",
+      "worktree": "/home/codex/repos/netscript-007-package-gate",
+      "prNumber": null,
+      "implementationState": "bootstrap_research_plan_only",
+      "dispatchTopicHeadSha": "9aabef2c96f0de5c3bbff79bf3438f33a6c57c4d",
+      "expensiveGateContract": "scaffold.runtime is planned but forbidden until the coordinator grants the cluster-wide Aspire/Docker/Postgres mutex after the plan gate",
+      "planGate": "author must stop after bounded plan and report whether a fresh PLAN-EVAL is required",
+      "nextSerialLeaf": "reference-export-drift-gate (#1296)",
       "receiptRefs": []
     },
     {
@@ -949,7 +980,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "284dda90a17a13a7e5e8e9834e5411b58887131b",
-      "currentPrHeadSha": "df05344166adaeb2b8e2f2f6ec741e1032d29045",
+      "currentPrHeadSha": "4766b258f0d61108e4240720365b9ab078f6a111",
       "issueNumbers": [
         1448
       ],
@@ -957,7 +988,7 @@
       "branch": "fix/ai-mcp-pool-isolation",
       "worktree": "/home/codex/repos/netscript-007-leaf-ai-mcp-pool",
       "prNumber": 1661,
-      "implementationState": "formal_impl_eval_cycle_2_active",
+      "implementationState": "bounded_ci_repair_running",
       "scopeBlockerHeadSha": "1d4533462a088ad902ac7dd71be88764463fcd5d",
       "scopeRulingTopicHeadSha": "df20bb5a694ad95afd33ff5ca4f141a4199182f5",
       "scopeRulingLeafArtifactSha": "6db182503b219d76c7db23f89c71ec9e467c2f40",
@@ -991,12 +1022,26 @@
       "repairGreenHeadSha": "e4944309361fe18efea20be8a3df364bb8754d82",
       "repairTierASignoffHeadSha": "df05344166adaeb2b8e2f2f6ec741e1032d29045",
       "repairTierAState": "PASS",
-      "implementationEvaluationCycle2State": "active",
+      "implementationEvaluationCycle2State": "complete",
       "implementationEvaluationCycle2SourceHeadSha": "df05344166adaeb2b8e2f2f6ec741e1032d29045",
       "implementationEvaluatorCycle2AgentId": "eb7149da-1689-44af-970e-ddd6e78022fa",
       "implementationEvaluatorCycle2BackgroundAgentId": "eb7149da",
       "implementationEvaluatorCycle2BridgeSessionId": "cse_01CaAEKsH35CP2QgfNUVdXK1",
       "implementationEvaluatorCycle2Route": "native claude-fable-5 / medium / Remote Control",
+      "implementationEvaluationCycle2Verdict": "PASS",
+      "implementationEvaluatorCycle2CommitSha": "4766b258f0d61108e4240720365b9ab078f6a111",
+      "implementationEvaluationCycle2CommentUrl": "https://github.com/rickylabs/netscript/pull/1661#issuecomment-5301708486",
+      "ciFailure": {
+        "state": "current_failure_repair_running",
+        "runId": 31878428521,
+        "testedHeadSha": "973fae54cc4d1ebc348abb5372b1d855cd8b3139",
+        "artifact": "ci-check-test-gate-receipts-31878428521-1",
+        "result": "4151 passed, 1 failed, 14 ignored",
+        "failingTest": "packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts:261 — root-level scaffold runtime imports resolve in both package-source modes",
+        "cause": "literal optional @tanstack imports violated the computed-specifier packaging invariant",
+        "repairOwner": "preserved Codex author 01a0048d-61b0-76a2-8117-5f8ce0466495",
+        "repairBoundary": "restore both computed @tanstack specifiers in tanstack-connector.ts; keep the CLI assertion intact; fresh Tier-A and proportionate IMPL-EVAL required after push"
+      },
       "receiptRefs": []
     },
     {
@@ -1011,8 +1056,8 @@
       "implementerAgentId": "01a0048f-8d95-7682-a3ce-1c1926aba75c",
       "branch": "feat/prisma-mysql-adapter-surface",
       "worktree": "/home/codex/repos/netscript-007-features-1293",
-      "currentPrHeadSha": "3dee41263e5e34a9f59972edb43a345c8d4494c0",
-      "implementationState": "slice_3_evidence_running",
+      "currentPrHeadSha": "f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf",
+      "implementationState": "readiness_ci_active",
       "compatibilityDisposition": "preserve and wire the already-published PrismaMySqlOptions.onConnectionError hook; removal is not authorized",
       "planEvaluationState": "complete",
       "planEvaluatedHeadSha": "23c4d671b57282ddf2e5c3b834ac8e787d1dff09",
@@ -1034,7 +1079,23 @@
       "slice2TierAState": "PASS",
       "slice2Contract": "closed connection-error classifier, single contained notifier choke point, raw executeScript rejection, identity-preserving callback containment, notify-and-preserve capability fallback",
       "slice3ContentHeadSha": "3dee41263e5e34a9f59972edb43a345c8d4494c0",
-      "slice3State": "structured_receipts_running",
+      "slice3State": "complete_exact_head_receipts_pass",
+      "finalEvidenceHeadSha": "d8d255bdc103eb120cc7b8835dfe3ce870017c32",
+      "finalTierAState": "PASS",
+      "implementationEvaluationState": "complete",
+      "implementationEvaluationCycle": 1,
+      "implementationEvaluationSourceHeadSha": "d8d255bdc103eb120cc7b8835dfe3ce870017c32",
+      "implementationEvaluatorAgentId": "e64f33f0-c88e-4fc7-9e79-63c01fed94db",
+      "implementationEvaluatorBackgroundAgentId": "e64f33f0",
+      "implementationEvaluatorBridgeSessionId": "cse_01XrFMbPHpry6tL3v9ZmRsLK",
+      "implementationEvaluatorRoute": "native claude-fable-5 / medium / Remote Control",
+      "implementationEvaluationGrantedAt": "2026-08-15T10:11:15.000Z",
+      "implementationEvaluationCompletedAt": "2026-08-15T10:16:31.000Z",
+      "implementationEvaluationVerdict": "PASS",
+      "implementationEvaluatorCommitSha": "f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf",
+      "implementationEvaluationCommentUrl": "https://github.com/rickylabs/netscript/pull/1662#issuecomment-5301776738",
+      "readinessState": "active",
+      "readinessDisposition": "PR non-draft with sole status:ready-merge; #1293 remains open at status:impl with owner wording unchanged; merge awaits exact-head CI",
       "planEvaluatorTerminalMetadata": "stale working state; terminal response and exact pushed verdict commit independently verified by coordinator",
       "splitCloseContract": "product PR uses Part of #1293 and may merge on product gates while #1293 remains open; #1112 must rewrite and verify the docs example before box 4 and issue closure",
       "docsFollowUp": "#1112 and the prisma-adapter-mysql reference remain docs-owned and are not part of this product leaf",
@@ -1601,7 +1662,7 @@
     },
     {
       "id": "openhands-dispatch-claim-and-refusal-impl-eval-cycle-1",
-      "state": "active",
+      "state": "complete",
       "lane": "internals",
       "leafId": "openhands-dispatch-claim-and-refusal",
       "phase": "impl-eval",
@@ -1620,11 +1681,15 @@
       "leaseOwner": "codex-root-0.0.7",
       "grantedAt": "2026-08-15T09:38:04.000Z",
       "startedAt": "2026-08-15T09:40:04.876Z",
-      "routeResolution": "Fable availability probe e58c5f01 failed before inference with zero tokens and no mutation; this Opus fallback is cycle 1"
+      "routeResolution": "Fable availability probe e58c5f01 failed before inference with zero tokens and no mutation; this Opus fallback is cycle 1",
+      "completedAt": "2026-08-15T09:54:05.000Z",
+      "verdict": "PASS",
+      "evaluatorCommitSha": "8f62a61213df890101b6f7dfc07a042928f2d536",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1658#issuecomment-5301699397"
     },
     {
       "id": "ai-mcp-pool-isolation-impl-eval-cycle-2",
-      "state": "active",
+      "state": "complete",
       "lane": "fixes",
       "leafId": "ai-mcp-pool-isolation",
       "phase": "impl-eval",
@@ -1643,7 +1708,38 @@
       "leaseOwner": "codex-root-0.0.7",
       "grantedAt": "2026-08-15T09:52:40.000Z",
       "startedAt": "2026-08-15T09:52:52.080Z",
-      "evaluationFocus": "independently re-prove cycle-1 F-1 is closed by the RED-to-GREEN registration-signal lifetime repair"
+      "evaluationFocus": "independently re-prove cycle-1 F-1 is closed by the RED-to-GREEN registration-signal lifetime repair",
+      "completedAt": "2026-08-15T09:57:01.000Z",
+      "verdict": "PASS",
+      "evaluatorCommitSha": "4766b258f0d61108e4240720365b9ab078f6a111",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1661#issuecomment-5301708486"
+    },
+    {
+      "id": "prisma-mysql-adapter-surface-impl-eval-cycle-1",
+      "state": "complete",
+      "lane": "features",
+      "leafId": "prisma-mysql-adapter-surface",
+      "phase": "impl-eval",
+      "cycle": 1,
+      "sourceHead": "d8d255bdc103eb120cc7b8835dfe3ce870017c32",
+      "evaluatorAgentId": "e64f33f0-c88e-4fc7-9e79-63c01fed94db",
+      "backgroundAgentId": "e64f33f0",
+      "bridgeSessionId": "cse_01XrFMbPHpry6tL3v9ZmRsLK",
+      "remoteControlUrl": "https://claude.ai/code/session_01XrFMbPHpry6tL3v9ZmRsLK",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-fable-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-15T10:11:15.000Z",
+      "startedAt": "2026-08-15T10:11:25.517Z",
+      "evaluationFocus": "R1-R3 compliance, public query-contract compatibility, notifier boundary behavior, split-close truthfulness, exact-head receipts, raw D7 evidence, and scope hygiene",
+      "completedAt": "2026-08-15T10:16:31.000Z",
+      "verdict": "PASS",
+      "evaluatorCommitSha": "f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf",
+      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1662#issuecomment-5301776738"
     }
   ],
   "expensiveGates": [
@@ -1711,7 +1807,7 @@
     }
   ],
   "exactMainEvidence": {
-    "gitHead": "284dda90a17a13a7e5e8e9834e5411b58887131b",
+    "gitHead": "05fc3132b6800a85eb6152691a961b658962571b",
     "surface": "repository",
     "expectedGateIds": [
       "arch-check",
@@ -1737,5 +1833,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T09:53:39.454Z"
+  "updatedAt": "2026-08-15T10:20:00.000Z"
 }

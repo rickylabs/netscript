@@ -285,3 +285,15 @@ fresh cycle-2 evaluator `eb7149da-1689-44af-970e-ddd6e78022fa` / Fable 5 medium 
 active on that immutable head, bridge `cse_01CaAEKsH35CP2QgfNUVdXK1`. Features #1293 S2 is Tier-A
 PASS at `47ad48c9d`; S3 content `3dee41263` is running exact-head structured receipts. Internals'
 Opus evaluator remains active independently. Do not serialize these three topics against each other.
+
+Resume from the authoritative `2026-08-15T10:20:00Z` checkpoint. Main is
+`05fc3132b6800a85eb6152691a961b658962571b`: #1658 is merged and #1611/#1613 are closed with sole
+`status:shipped`. Internals has released `package-gate-honesty` (#1604/#1618/#1622) on Codex
+thread `01a004ec-…`, bootstrap/research/plan only; its eventual `scaffold.runtime` requires the
+coordinator mutex. Fixes #1661 cycle-2 evaluation passed but exact-head CI found the optional
+`@tanstack` computed-import invariant was regressed; the preserved original author is restoring it
+in one file before fresh Tier-A and a proportionate fresh evaluator. Features #1662 IMPL-EVAL passed
+at `f52aa471c`; it is non-draft/`status:ready-merge` with exact-head CI active, while #1293 stays
+open and unchanged for the owner-worded concrete-class criterion plus docs #1112. Preserve every
+topic supervisor and author thread, serialize only within topics, and keep the runtime mutex free
+until a documented gate asks for it.
