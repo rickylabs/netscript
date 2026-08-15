@@ -475,3 +475,163 @@ Deno.test('GitHub resolver supports tokenless forks against the fixed public own
   assertEquals(requestedUrl, 'https://api.github.com/repos/rickylabs/netscript/issues/1276');
   assertEquals(authorization, null);
 });
+
+Deno.test('public-any reports exported declarations and excludes local-only controls', async () => {
+  const root = await Deno.makeTempDir();
+  const packageRoot = join(root, 'packages/example');
+  await Deno.mkdir(packageRoot, { recursive: true });
+  await Deno.writeTextFile(
+    join(packageRoot, 'deno.json'),
+    JSON.stringify({ exports: './mod.ts' }),
+  );
+  await Deno.writeTextFile(
+    join(packageRoot, 'mod.ts'),
+    [
+      'export type Direct = any;',
+      'export type Multiline =',
+      '  | string',
+      '  | any;',
+      'export function load<',
+      '  Value = any,',
+      '>(',
+      '  value: Value,',
+      '): any {',
+      '  return value;',
+      '}',
+      'export interface PublicPort {',
+      '  payload: any;',
+      '}',
+      'export class PublicService {',
+      '  read(input: any): string {',
+      '    return String(input);',
+      '  }',
+      '  private hidden: any;',
+      '}',
+      'export const publicValue: any = source;',
+      'export function bodyOnly(): void { const hidden: any = source; }',
+      'export const prose = "any in a string is not a public type";',
+      '// any in exported API prose is not a type token',
+      'type Local = { payload: any };',
+      'function local(value: any): any { return value; }',
+      'class LocalService { field: any; }',
+    ].join('\n'),
+  );
+
+  const findings = await scanCodeQuality(['packages/example'], root);
+  assertEquals(
+    findings
+      .map((finding) => `${finding.rule}:${finding.file}:${finding.line}`)
+      .filter((finding) => finding.startsWith('public-any:')),
+    [
+      'public-any:packages/example/mod.ts:1',
+      'public-any:packages/example/mod.ts:4',
+      'public-any:packages/example/mod.ts:6',
+      'public-any:packages/example/mod.ts:9',
+      'public-any:packages/example/mod.ts:13',
+      'public-any:packages/example/mod.ts:16',
+      'public-any:packages/example/mod.ts:21',
+    ],
+  );
+});
+
+Deno.test('public-any follows named and star re-exports without exposing sibling locals', async () => {
+  const root = await Deno.makeTempDir();
+  const packageRoot = join(root, 'packages/example');
+  await Deno.mkdir(packageRoot, { recursive: true });
+  await Deno.writeTextFile(
+    join(packageRoot, 'deno.json'),
+    JSON.stringify({ exports: { '.': './mod.ts' } }),
+  );
+  await Deno.writeTextFile(
+    join(packageRoot, 'mod.ts'),
+    [
+      "export { PublicAlias } from './named.ts';",
+      "export * from './star.ts';",
+    ].join('\n'),
+  );
+  await Deno.writeTextFile(
+    join(packageRoot, 'named.ts'),
+    [
+      'export type PublicAlias = { value: any };',
+      'export type HiddenAlias = { value: any };',
+    ].join('\n'),
+  );
+  await Deno.writeTextFile(
+    join(packageRoot, 'star.ts'),
+    [
+      'export interface StarPort { send(value: any): void; }',
+      'type StarLocal = { value: any };',
+    ].join('\n'),
+  );
+
+  const findings = await scanCodeQuality(['packages/example'], root);
+  assertEquals(
+    findings
+      .map((finding) => `${finding.rule}:${finding.file}:${finding.line}`)
+      .filter((finding) => finding.startsWith('public-any:')),
+    [
+      'public-any:packages/example/named.ts:1',
+      'public-any:packages/example/star.ts:1',
+    ],
+  );
+  assertEquals(
+    findings
+      .filter((finding) => finding.rule === 'public-any')
+      .map((finding) => ({
+        kind: finding.declarationKind,
+        path: finding.exportPath,
+      })),
+    [
+      {
+        kind: 'type',
+        path: 'packages/example/mod.ts -> PublicAlias -> packages/example/named.ts -> PublicAlias',
+      },
+      {
+        kind: 'interface',
+        path: 'packages/example/mod.ts -> * -> packages/example/star.ts -> StarPort',
+      },
+    ],
+  );
+});
+
+Deno.test('public export graph fails closed for an unresolved local edge', async () => {
+  const root = await Deno.makeTempDir();
+  const packageRoot = join(root, 'packages/example');
+  await Deno.mkdir(packageRoot, { recursive: true });
+  await Deno.writeTextFile(
+    join(packageRoot, 'deno.json'),
+    JSON.stringify({ exports: './mod.ts' }),
+  );
+  await Deno.writeTextFile(join(packageRoot, 'mod.ts'), "export * from './missing.ts';\n");
+
+  const findings = await scanCodeQuality(['packages/example'], root);
+  assertEquals(findings.map((finding) => `${finding.rule}:${finding.file}:${finding.line}`), [
+    'public-export-unresolved:packages/example/mod.ts:1',
+  ]);
+});
+
+Deno.test('public-only any tokens require the same verified allowance record', async () => {
+  const root = await Deno.makeTempDir();
+  const packageRoot = join(root, 'packages/example');
+  await Deno.mkdir(packageRoot, { recursive: true });
+  await Deno.writeTextFile(
+    join(packageRoot, 'deno.json'),
+    JSON.stringify({ exports: './mod.ts' }),
+  );
+  await Deno.writeTextFile(
+    join(packageRoot, 'mod.ts'),
+    [
+      'export type Allowed = any; // quality-allow: #1276 — upstream public boundary',
+      'export type Malformed = any; // quality-allow: missing issue owner',
+    ].join('\n'),
+  );
+
+  const result = await scanCodeQualityDetailed(['packages/example'], root, {
+    allowanceIssueResolver: allowanceResolver(),
+  });
+  assertEquals(result.findings, []);
+  assertEquals(result.allowances.map((allowance) => allowance.issue), [1276]);
+  assertEquals(result.allowanceFailures.map((failure) => failure.kind), [
+    'malformed-registration',
+  ]);
+});

@@ -1,12 +1,16 @@
-import { relative, resolve } from 'jsr:@std/path@^1';
+import { dirname, relative, resolve } from '@std/path';
 import { extractFencedBlocks } from '../docs/snippet-extractor.ts';
 
 export type QualityRule =
   | 'explicit-any-ignore'
   | 'unsafe-cast'
   | 'explicit-any'
+  | 'public-any'
+  | 'public-export-unresolved'
   | 'plugin-name-check'
   | 'ts-error-suppression';
+
+export type PublicDeclarationKind = 'type' | 'interface' | 'function' | 'class' | 'value';
 
 export interface QualityFinding {
   readonly rule: QualityRule;
@@ -14,6 +18,8 @@ export interface QualityFinding {
   readonly line: number;
   readonly text: string;
   readonly fenceOrdinal?: number;
+  readonly declarationKind?: PublicDeclarationKind | 'export-edge';
+  readonly exportPath?: string;
 }
 
 const PLUGIN_NAMES = ['ai', 'auth', 'sagas', 'streams', 'triggers', 'workers'];
@@ -142,6 +148,560 @@ async function collect(path: string): Promise<string[]> {
     else if (entry.isFile && isScannable(child)) files.push(child);
   }
   return files;
+}
+
+interface SourceToken {
+  readonly value: string;
+  readonly kind: 'identifier' | 'string' | 'punctuation';
+  readonly line: number;
+}
+
+type ExportSelection = '*' | ReadonlySet<string>;
+
+interface PublicModuleRequest {
+  readonly file: string;
+  readonly selection: ExportSelection;
+  readonly exportPath: readonly string[];
+}
+
+interface PublicExportGraph {
+  readonly pending: PublicModuleRequest[];
+  readonly selections: Map<string, '*' | Set<string>>;
+}
+
+interface PublicAnyFinding extends QualityFinding {
+  readonly rule: 'public-any' | 'public-export-unresolved';
+  readonly declarationKind: PublicDeclarationKind | 'export-edge';
+  readonly exportPath: string;
+}
+
+interface NamedSpecifier {
+  readonly original: string;
+  readonly exported: string;
+}
+
+interface Declaration {
+  readonly kind: PublicDeclarationKind;
+  readonly kindIndex: number;
+  readonly name: string;
+}
+
+interface ImportBinding {
+  readonly imported: string;
+  readonly specifier: string;
+  readonly line: number;
+}
+
+function tokenizeSource(source: string): SourceToken[] {
+  const tokens: SourceToken[] = [];
+  let index = 0;
+  let line = 1;
+  while (index < source.length) {
+    const char = source[index];
+    if (char === '\n') {
+      line++;
+      index++;
+      continue;
+    }
+    if (/\s/.test(char)) {
+      index++;
+      continue;
+    }
+    if (source.startsWith('//', index)) {
+      index = source.indexOf('\n', index);
+      if (index < 0) break;
+      continue;
+    }
+    if (source.startsWith('/*', index)) {
+      const end = source.indexOf('*/', index + 2);
+      const slice = source.slice(index, end < 0 ? source.length : end + 2);
+      line += slice.match(/\n/g)?.length ?? 0;
+      index += slice.length;
+      continue;
+    }
+    if (char === '"' || char === "'" || char === '`') {
+      const quote = char;
+      const startLine = line;
+      let value = '';
+      index++;
+      while (index < source.length) {
+        const current = source[index];
+        if (current === '\n') line++;
+        if (current === '\\') {
+          value += current + (source[index + 1] ?? '');
+          index += 2;
+          continue;
+        }
+        if (current === quote) {
+          index++;
+          break;
+        }
+        value += current;
+        index++;
+      }
+      tokens.push({ value, kind: 'string', line: startLine });
+      continue;
+    }
+    if (/[A-Za-z_$]/.test(char)) {
+      const start = index++;
+      while (index < source.length && /[\w$]/.test(source[index])) index++;
+      tokens.push({ value: source.slice(start, index), kind: 'identifier', line });
+      continue;
+    }
+    const pair = source.slice(index, index + 2);
+    if (pair === '=>') {
+      tokens.push({ value: pair, kind: 'punctuation', line });
+      index += 2;
+      continue;
+    }
+    tokens.push({ value: char, kind: 'punctuation', line });
+    index++;
+  }
+  return tokens;
+}
+
+function matchingToken(
+  tokens: readonly SourceToken[],
+  start: number,
+  open: string,
+  close: string,
+): number {
+  let depth = 0;
+  for (let index = start; index < tokens.length; index++) {
+    if (tokens[index].value === open) depth++;
+    if (tokens[index].value === close && --depth === 0) return index;
+  }
+  return tokens.length - 1;
+}
+
+function braceDepths(tokens: readonly SourceToken[]): number[] {
+  const depths: number[] = [];
+  let depth = 0;
+  for (const token of tokens) {
+    depths.push(depth);
+    if (token.value === '{') depth++;
+    else if (token.value === '}') depth--;
+  }
+  return depths;
+}
+
+function namedSpecifiers(
+  tokens: readonly SourceToken[],
+  open: number,
+  close: number,
+): NamedSpecifier[] {
+  const result: NamedSpecifier[] = [];
+  let start = open + 1;
+  for (let index = start; index <= close; index++) {
+    if (index !== close && tokens[index].value !== ',') continue;
+    const identifiers = tokens.slice(start, index)
+      .filter((token) => token.kind === 'identifier')
+      .map((token) => token.value);
+    if (identifiers[0] === 'type' && identifiers.length > 1) identifiers.shift();
+    const asIndex = identifiers.indexOf('as');
+    if (identifiers.length > 0) {
+      result.push({
+        original: identifiers[0],
+        exported: asIndex >= 0 ? identifiers[asIndex + 1] : identifiers[0],
+      });
+    }
+    start = index + 1;
+  }
+  return result;
+}
+
+function declarationAt(tokens: readonly SourceToken[], start: number): Declaration | undefined {
+  let index = start;
+  if (tokens[index]?.value === 'export') index++;
+  while (['default', 'declare', 'abstract', 'async'].includes(tokens[index]?.value)) index++;
+  const keyword = tokens[index]?.value;
+  const kind = keyword === 'type' || keyword === 'interface' || keyword === 'function' ||
+      keyword === 'class'
+    ? keyword
+    : ['const', 'let', 'var'].includes(keyword)
+    ? 'value'
+    : undefined;
+  if (!kind) return undefined;
+  index++;
+  if (keyword === 'function' && tokens[index]?.value === '*') index++;
+  const name = tokens[index];
+  if (name?.kind !== 'identifier') return undefined;
+  return { kind, kindIndex: index - 1, name: name.value };
+}
+
+function selectionIncludes(selection: ExportSelection, name: string): boolean {
+  return selection === '*' || selection.has(name);
+}
+
+function anyTokensInClass(
+  tokens: readonly SourceToken[],
+  kindIndex: number,
+  bodyStart: number,
+  bodyEnd: number,
+): SourceToken[] {
+  const found = tokens.slice(kindIndex, bodyStart).filter((token) => token.value === 'any');
+  let index = bodyStart + 1;
+  while (index < bodyEnd) {
+    while (tokens[index]?.value === ';') index++;
+    const start = index;
+    let parens = 0;
+    let brackets = 0;
+    for (; index < bodyEnd; index++) {
+      const value = tokens[index].value;
+      if (value === '(') parens++;
+      else if (value === ')') parens--;
+      else if (value === '[') brackets++;
+      else if (value === ']') brackets--;
+      const boundary = parens === 0 && brackets === 0 && ['{', '=', ';'].includes(value);
+      if (!boundary) continue;
+      const header = tokens.slice(start, index);
+      const isPrivate = header.some((token) =>
+        token.value === 'private' || token.value === 'protected' || token.value === '#'
+      );
+      if (!isPrivate) found.push(...header.filter((token) => token.value === 'any'));
+      if (value === '{') index = matchingToken(tokens, index, '{', '}');
+      else if (value === '=') {
+        while (index < bodyEnd && tokens[index].value !== ';') index++;
+      }
+      index++;
+      break;
+    }
+  }
+  return found;
+}
+
+function declarationAnyTokens(
+  tokens: readonly SourceToken[],
+  depths: readonly number[],
+  declaration: Declaration,
+): SourceToken[] {
+  const { kind, kindIndex } = declaration;
+  if (kind === 'interface' || kind === 'class') {
+    const bodyStart = tokens.findIndex((token, index) =>
+      index > kindIndex && depths[index] === 0 && token.value === '{'
+    );
+    if (bodyStart < 0) return [];
+    const bodyEnd = matchingToken(tokens, bodyStart, '{', '}');
+    if (kind === 'class') return anyTokensInClass(tokens, kindIndex, bodyStart, bodyEnd);
+    return tokens.slice(kindIndex, bodyEnd + 1).filter((token) => token.value === 'any');
+  }
+
+  let end = tokens.length;
+  for (let index = kindIndex + 1; index < tokens.length; index++) {
+    if (depths[index] !== 0) continue;
+    const value = tokens[index].value;
+    if (kind === 'function' && (value === '{' || value === ';')) {
+      end = index;
+      break;
+    }
+    if (kind === 'value' && (value === '=' || value === ';')) {
+      end = index;
+      break;
+    }
+    if (kind === 'type' && value === ';') {
+      end = index;
+      break;
+    }
+  }
+  return tokens.slice(kindIndex, end).filter((token) => token.value === 'any');
+}
+
+async function existingFile(path: string): Promise<boolean> {
+  try {
+    return (await Deno.stat(path)).isFile;
+  } catch {
+    return false;
+  }
+}
+
+async function resolveLocalModule(file: string, specifier: string): Promise<string | undefined> {
+  if (!specifier.startsWith('.')) return undefined;
+  const target = resolve(dirname(file), specifier);
+  const candidates = /\.[cm]?[jt]sx?$/.test(target) ? [target] : [
+    target,
+    `${target}.ts`,
+    `${target}.tsx`,
+    resolve(target, 'mod.ts'),
+    resolve(target, 'index.ts'),
+  ];
+  for (const candidate of candidates) {
+    if (await existingFile(candidate)) return candidate;
+  }
+  return undefined;
+}
+
+async function collectDenoConfigs(path: string, configs: Set<string>): Promise<void> {
+  let stat: Deno.FileInfo;
+  try {
+    stat = await Deno.stat(path);
+  } catch {
+    return;
+  }
+  if (stat.isFile) {
+    if (path.endsWith('/deno.json') || path.endsWith('\\deno.json')) configs.add(path);
+    return;
+  }
+  for await (const entry of Deno.readDir(path)) {
+    if (entry.isDirectory && GENERATED_OR_VENDOR_DIRS.has(entry.name)) continue;
+    const child = resolve(path, entry.name);
+    if (entry.isDirectory) await collectDenoConfigs(child, configs);
+    else if (entry.isFile && entry.name === 'deno.json') configs.add(child);
+  }
+}
+
+async function publicEntries(paths: readonly string[], cwd: string): Promise<string[]> {
+  const configs = new Set<string>();
+  const boundary = resolve(cwd);
+  for (const path of paths) {
+    const absolute = resolve(cwd, path);
+    await collectDenoConfigs(absolute, configs);
+    let current = (await Deno.stat(absolute).catch(() => undefined))?.isDirectory
+      ? absolute
+      : dirname(absolute);
+    while (current === boundary || current.startsWith(`${boundary}/`)) {
+      const config = resolve(current, 'deno.json');
+      if (await existingFile(config)) configs.add(config);
+      if (current === boundary) break;
+      current = dirname(current);
+    }
+  }
+  const entries = new Set<string>();
+  for (const config of configs) {
+    const parsed = JSON.parse(await Deno.readTextFile(config)) as { exports?: unknown };
+    const values = typeof parsed.exports === 'string'
+      ? [parsed.exports]
+      : parsed.exports && typeof parsed.exports === 'object'
+      ? Object.values(parsed.exports)
+      : [];
+    for (const value of values) {
+      if (typeof value !== 'string') continue;
+      const entry = resolve(dirname(config), value);
+      if (/\.[cm]?[jt]sx?$/.test(entry) && await existingFile(entry)) entries.add(entry);
+    }
+  }
+  return [...entries].sort();
+}
+
+async function scanPublicAny(paths: readonly string[], cwd: string): Promise<PublicAnyFinding[]> {
+  const entryFiles = await publicEntries(paths, cwd);
+  const graph: PublicExportGraph = {
+    pending: entryFiles.map((file) => ({
+      file,
+      selection: '*',
+      exportPath: [relative(cwd, file).replaceAll('\\', '/')],
+    })),
+    selections: new Map(),
+  };
+  const findings = new Map<string, PublicAnyFinding>();
+
+  const enqueue = (
+    file: string,
+    selection: ExportSelection,
+    exportPath: readonly string[],
+  ): void => {
+    const previous = graph.selections.get(file);
+    if (previous === '*') return;
+    if (selection === '*') {
+      graph.selections.set(file, '*');
+      graph.pending.push({ file, selection, exportPath });
+      return;
+    }
+    const additions = new Set([...selection].filter((name) => !previous?.has(name)));
+    if (additions.size === 0) return;
+    const combined = new Set(previous ?? []);
+    additions.forEach((name) => combined.add(name));
+    graph.selections.set(file, combined);
+    graph.pending.push({ file, selection: additions, exportPath });
+  };
+  for (const request of graph.pending) graph.selections.set(request.file, '*');
+
+  const addUnresolved = (
+    file: string,
+    line: number,
+    text: string,
+    exportPath: readonly string[],
+  ): void => {
+    const relativeFile = relative(cwd, file).replaceAll('\\', '/');
+    const finding: PublicAnyFinding = {
+      rule: 'public-export-unresolved',
+      file: relativeFile,
+      line,
+      text,
+      declarationKind: 'export-edge',
+      exportPath: exportPath.join(' -> '),
+    };
+    findings.set(`${finding.rule}:${finding.file}:${finding.line}`, finding);
+  };
+
+  while (graph.pending.length > 0) {
+    const { file, selection, exportPath } = graph.pending.shift()!;
+    const source = await Deno.readTextFile(file);
+    const lines = source.split(/\r?\n/);
+    const tokens = tokenizeSource(source);
+    const depths = braceDepths(tokens);
+    const localExports = new Map<string, { readonly line: number; readonly exported: string }>();
+    const imports = new Map<string, ImportBinding>();
+    const declarations = new Map<string, Declaration>();
+
+    for (let index = 0; index < tokens.length; index++) {
+      if (depths[index] !== 0) continue;
+      const declaration = declarationAt(tokens, index);
+      if (declaration) declarations.set(declaration.name, declaration);
+
+      if (tokens[index].value === 'import') {
+        let cursor = index + 1;
+        if (tokens[cursor]?.value === 'type') cursor++;
+        const bindings: NamedSpecifier[] = [];
+        if (tokens[cursor]?.kind === 'identifier') {
+          bindings.push({ original: 'default', exported: tokens[cursor].value });
+          cursor++;
+          if (tokens[cursor]?.value === ',') cursor++;
+        }
+        if (tokens[cursor]?.value === '*') {
+          bindings.push({ original: '*', exported: tokens[cursor + 2]?.value });
+        } else if (tokens[cursor]?.value === '{') {
+          const close = matchingToken(tokens, cursor, '{', '}');
+          bindings.push(...namedSpecifiers(tokens, cursor, close));
+          cursor = close + 1;
+        }
+        while (
+          cursor < tokens.length && tokens[cursor].value !== 'from' && tokens[cursor].value !== ';'
+        ) {
+          cursor++;
+        }
+        const specifier = tokens[cursor]?.value === 'from' ? tokens[cursor + 1] : undefined;
+        if (specifier?.kind === 'string') {
+          for (const binding of bindings) {
+            imports.set(binding.exported, {
+              imported: binding.original,
+              specifier: specifier.value,
+              line: tokens[index].line,
+            });
+          }
+        }
+        continue;
+      }
+
+      if (tokens[index].value !== 'export') continue;
+      let cursor = index + 1;
+      if (tokens[cursor]?.value === 'type' && tokens[cursor + 1]?.value === '{') cursor++;
+      if (tokens[cursor]?.value === '*') {
+        const namespace = tokens[cursor + 1]?.value === 'as'
+          ? tokens[cursor + 2]?.value
+          : undefined;
+        while (cursor < tokens.length && tokens[cursor].value !== 'from') cursor++;
+        const specifier = tokens[cursor + 1];
+        const edgeIsPublic = namespace
+          ? selectionIncludes(selection, namespace)
+          : selection === '*' || selection.size > 0;
+        if (!edgeIsPublic || specifier?.kind !== 'string' || !specifier.value.startsWith('.')) {
+          continue;
+        }
+        const target = await resolveLocalModule(file, specifier.value);
+        if (!target) {
+          addUnresolved(
+            file,
+            tokens[index].line,
+            lines[tokens[index].line - 1]?.trim() ?? '',
+            [...exportPath, namespace ?? '*'],
+          );
+        } else {
+          enqueue(target, namespace ? '*' : selection, [
+            ...exportPath,
+            namespace ?? '*',
+            relative(cwd, target).replaceAll('\\', '/'),
+          ]);
+        }
+        continue;
+      }
+      if (tokens[cursor]?.value === '{') {
+        const close = matchingToken(tokens, cursor, '{', '}');
+        const specs = namedSpecifiers(tokens, cursor, close);
+        const from = tokens[close + 1]?.value === 'from' ? tokens[close + 2] : undefined;
+        for (const spec of specs) {
+          if (!selectionIncludes(selection, spec.exported)) continue;
+          if (from?.kind === 'string' && from.value.startsWith('.')) {
+            const target = await resolveLocalModule(file, from.value);
+            if (!target) {
+              addUnresolved(
+                file,
+                tokens[index].line,
+                lines[tokens[index].line - 1]?.trim() ?? '',
+                [...exportPath, spec.exported],
+              );
+            } else {
+              enqueue(target, new Set([spec.original]), [
+                ...exportPath,
+                spec.exported,
+                relative(cwd, target).replaceAll('\\', '/'),
+              ]);
+            }
+          } else if (!from) {
+            localExports.set(spec.original, {
+              line: tokens[index].line,
+              exported: spec.exported,
+            });
+          }
+        }
+        continue;
+      }
+
+      const direct = declarationAt(tokens, index);
+      if (direct) {
+        const publicName = tokens[index + 1]?.value === 'default' ? 'default' : direct.name;
+        if (selectionIncludes(selection, publicName)) {
+          localExports.set(direct.name, { line: tokens[index].line, exported: publicName });
+        }
+      }
+    }
+
+    for (const [name, exported] of localExports) {
+      const declaration = declarations.get(name);
+      if (declaration) {
+        for (const token of declarationAnyTokens(tokens, depths, declaration)) {
+          const relativeFile = relative(cwd, file).replaceAll('\\', '/');
+          const finding: PublicAnyFinding = {
+            rule: 'public-any',
+            file: relativeFile,
+            line: token.line,
+            text: lines[token.line - 1]?.trim() ?? '',
+            declarationKind: declaration.kind,
+            exportPath: [...exportPath, exported.exported].join(' -> '),
+          };
+          findings.set(`${finding.rule}:${finding.file}:${finding.line}`, finding);
+        }
+        continue;
+      }
+      const binding = imports.get(name);
+      if (binding) {
+        if (binding.specifier.startsWith('.')) {
+          const target = await resolveLocalModule(file, binding.specifier);
+          if (target) {
+            enqueue(target, binding.imported === '*' ? '*' : new Set([binding.imported]), [
+              ...exportPath,
+              exported.exported,
+              relative(cwd, target).replaceAll('\\', '/'),
+            ]);
+            continue;
+          }
+        } else {
+          // External imports are beyond the checked-in local graph. Their public
+          // types remain covered by the dependency package's own export roots.
+          continue;
+        }
+      }
+      addUnresolved(
+        file,
+        exported.line,
+        lines[exported.line - 1]?.trim() ?? '',
+        [...exportPath, exported.exported],
+      );
+    }
+  }
+
+  return [...findings.values()].sort((a, b) =>
+    a.file.localeCompare(b.file) || a.line - b.line || a.rule.localeCompare(b.rule)
+  );
 }
 
 /** State required from the durable issue that owns an allowance. */
@@ -332,6 +892,13 @@ export async function scanCodeQualityDetailed(
   options: QualityScanOptions = {},
 ): Promise<QualityScan> {
   const files = (await Promise.all(paths.map((path) => collect(resolve(cwd, path))))).flat();
+  const publicFindings = await scanPublicAny(paths, cwd);
+  const publicLocations = new Set(
+    publicFindings
+      .filter((finding) => finding.rule === 'public-any')
+      .map((finding) => `${finding.file}:${finding.line}`),
+  );
+  const suppressedPublicLocations = new Set<string>();
   const findings: QualityFinding[] = [];
   const allowances: QualityAllowance[] = [];
   const allowanceFailures: AllowancePolicyFailure[] = [];
@@ -347,9 +914,14 @@ export async function scanCodeQualityDetailed(
         if (allowanceMarkers.length > 0) {
           // A quality-allow only suppresses a line that would otherwise fire a
           // rule — an allowance on a clean line is dead weight, not counted.
-          if (!ruleFor(line.replace(/\/\/\s*quality-allow:.*$/, ''), normalized, tainted)) {
+          const locationKey = `${unit.sourcePath}:${unit.lineOffset + index + 1}`;
+          if (
+            !ruleFor(line.replace(/\/\/\s*quality-allow:.*$/, ''), normalized, tainted) &&
+            !publicLocations.has(locationKey)
+          ) {
             continue;
           }
+          suppressedPublicLocations.add(locationKey);
           const location = {
             file: unit.sourcePath,
             line: unit.lineOffset + index + 1,
@@ -386,6 +958,10 @@ export async function scanCodeQualityDetailed(
       }
     }
   }
+  findings.push(...publicFindings.filter((finding) =>
+    finding.rule !== 'public-any' ||
+    !suppressedPublicLocations.has(`${finding.file}:${finding.line}`)
+  ));
   findings.sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line);
   allowances.sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line);
 

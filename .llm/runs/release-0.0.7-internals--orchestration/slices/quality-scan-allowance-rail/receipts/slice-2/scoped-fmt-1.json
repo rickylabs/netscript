@@ -1,0 +1,44 @@
+{
+  "gateId": "fmt-check",
+  "invocationId": "quality-rail-s2-scoped-fmt-1",
+  "argv": [
+    "deno",
+    "task",
+    "fmt:check",
+    "--file",
+    ".llm/tools/quality/scan-code-quality.ts",
+    "--file",
+    ".llm/tools/quality/scan-code-quality_test.ts",
+    "--include",
+    "^(\\.llm/tools/quality/scan-code-quality(?:_test)?\\.ts)$",
+    "--exclude",
+    "a^"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-rail",
+  "gitHead": "3c398528996a715da8daebe04969e6aba90263e9",
+  "actualGitHead": "3c398528996a715da8daebe04969e6aba90263e9",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "db820760eae749f9263b7d2f3f49db4d17fc9da266d3ad7c0d4840485fa84180",
+  "lifecycleId": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069:quality-rail-s2-scoped-fmt-1:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-15T00:03:34.742Z",
+  "startedAt": "2026-08-15T00:03:34.745Z",
+  "finishedAt": "2026-08-15T00:03:35.308Z",
+  "durationMs": 563,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 418,
+    "sha256": "ed86dd6df72f2a8dad8ccb8ba73191ecb2becb06b84aa8b4c405b43040d4f350",
+    "tail": "{\"command\":\"deno fmt --check\",\"cwd\":\"/home/codex/repos/netscript-007-quality-rail\",\"mode\":\"check\",\"summary\":{\"filesSelected\":2,\"batches\":1,\"failedBatches\":1,\"findings\":1,\"ignoredFindings\":0},\"findings\":[{\"path\":\"/home/codex/repos/netscript-007-quality-rail/.llm/tools/quality/scan-code-quality.ts\",\"reason\":\"-    : [target, `${target}.ts`, `${target}.tsx`, resolve(target, 'mod.ts'), resolve(target, 'index.ts')];\"}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 487,
+    "sha256": "77c65579d9335e35e0679dbd917be6ea9976bb43f4f942a773406b5a6c7e59ec",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mfmt:check\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings '--file' '.llm/tools/quality/scan-code-quality.ts' '--file' '.llm/tools/quality/scan-code-quality_test.ts' '--include' '^(\\.llm/tools/quality/scan-code-quality(?:_test)?\\.ts)$' '--exclude' 'a^'\n",
+    "truncated": false
+  }
+}

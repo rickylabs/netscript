@@ -116,6 +116,43 @@ immutable base directly with landed Slice 1 commit `586b5513500caa1fd5ce07878f4b
 records exit 0. All other receipts record the pre-commit evaluator head and their exact argv; none
 is presented as a clean-worktree or supervisor sign-off receipt.
 
+### Slice 2 — exported/publicly reachable `any`
+
+The scanner now discovers checked-in package export roots, follows deterministic local named/star
+re-export and import/export edges, and applies a token-aware `public-any` rule to reachable type
+aliases, interfaces, function signatures, class public members, and explicitly typed exported
+values. Local-only declarations, comments, strings, private/protected class members, and
+implementation bodies remain outside this rule. Each public finding carries its declaration kind and
+reachable export path; an unresolvable local public edge fails closed as `public-export-unresolved`.
+External package edges remain outside the approved checked-in local graph and are covered from those
+packages' own export roots.
+
+Public-only findings use the same verified `quality-allow` record path as the existing line rules:
+the marker must parse, its owner must resolve open and milestoned, and the record counts against the
+fixed budget. A malformed marker cannot suppress the public rail. The focused suite preserves the
+docs-fence and all six soundness-fixture regressions from #1549.
+
+| Evidence                                                           | Outcome       | Exit | Receipt                                              |
+| ------------------------------------------------------------------ | ------------- | ---: | ---------------------------------------------------- |
+| RED public/local/re-export/unresolved matrix (21 pass, 3 fail)     | expected FAIL |    1 | `receipts/slice-2/red-public-any.json`               |
+| First implementation pass; external edges misclassified            | expected FAIL |    1 | `receipts/slice-2/focused-green-1.json`              |
+| Focused scanner suite (25 tests)                                   | PASS          |    0 | `receipts/slice-2/focused-green-binding.json`        |
+| Scoped structured check (2 files, actually fired)                  | PASS          |    0 | `receipts/slice-2/scoped-check-fired.json`           |
+| Root lint selection excluded `.llm` files; false-green refused     | expected FAIL |    2 | `receipts/slice-2/scoped-lint-1.json`                |
+| Checked-in lint config found the pre-existing inline import prefix | expected FAIL |    1 | `receipts/slice-2/scoped-lint-committed-config.json` |
+| Scoped structured lint with checked-in config (actually fired)     | PASS          |    0 | `receipts/slice-2/scoped-lint-fired.json`            |
+| Initial exact-source format check                                  | expected FAIL |    1 | `receipts/slice-2/scoped-fmt-1.json`                 |
+| Exact two-source structured format check (actually fired)          | PASS          |    0 | `receipts/slice-2/scoped-fmt-fired.json`             |
+| `quality:scan` (7 verified records, zero findings)                 | PASS          |    0 | `receipts/slice-2/quality-scan-binding.json`         |
+| `quality:scan:repo` (7 verified records, zero findings)            | PASS          |    0 | `receipts/slice-2/quality-scan-repo-binding.json`    |
+| `quality:gate` (`quality:scan` + `arch:check`, zero failures)      | PASS          |    0 | `receipts/slice-2/quality-gate-binding.json`         |
+
+The check/lint/format task cache inputs do not include `.llm/tools/quality/**`; unique harmless
+batch-size arguments forced the final wrapper processes to execute instead of accepting a cached
+task result. Formatting targeted only the two TypeScript sources and never the receipt directory.
+All binding receipts record `actualGitHead` = signed Slice 1 head
+`3c398528996a715da8daebe04969e6aba90263e9`; none names a stash or any non-history commit-ish.
+
 ## Reconcile notes
 
 - Live #1378 and #1545 are open in milestone 0.0.7; `origin/main` equals the approved baseline.
@@ -130,6 +167,9 @@ is presented as a clean-worktree or supervisor sign-off receipt.
   to `dd472102d` through merged #1644 only. Its diff does not overlap this leaf's authorized
   scanner/package/plugin/generated surfaces, so the locked base was retained and no rebase or #1644
   worktree/PR mutation occurred.
+- Slice 2 live reconcile: PR #1653 remains open and draft at milestone 0.0.7 with exactly
+  `status:impl`; its body still carries both closing keywords. Live #1378 and #1545 remain open. No
+  label, milestone, issue, base, or readiness mutation was made.
 
 ## Activity
 
@@ -163,15 +203,19 @@ is presented as a clean-worktree or supervisor sign-off receipt.
   E1 allowance-budget attestation against landed commit `586b5513500caa1fd5ce07878f4ba96606064555`,
   preserved the superseded stash-probe receipt, and stopped before Slice 2 pending supervisor
   sign-off.
+- 2026-08-15 — Slice 1 supervisor sign-off landed at `3c398528996a715da8daebe04969e6aba90263e9` (PR
+  comment `5299297798`). Captured Slice 2 RED-first proof, implemented the checked-in local export
+  graph and public-signature rule, preserved the corrective failed receipts, ran the named
+  structured gates, and stopped before Slice 3 for substantive Tier-A review.
 
 ## Plan-Gate state
 
 - Historical OpenRouter artifact: advisory `FAIL_PLAN` at `8a4709afe`; its D-2/D-3/D-4 findings are
   resolved by coordinator authority and its D-1 editorial finding is resolved in live #1545.
 - Current formal verdict: cycle 2 `PASS` in `plan-eval.md`, evaluator artifact commit `c694cfb311`.
-- Slice state: **Slice 1 is signed off.** Content passed substantive Tier-A review (PR comment
-  `5299267431`) and the E1 landed-head replacement receipt was independently re-run by the
-  supervisor. Slice 2 is authorized.
+- Slice state: **Slice 1 is signed off. Slice 2 implementation and evidence are complete and await
+  substantive Tier-A review.** Slice 3 has not started and is not authorized until supervisor
+  sign-off.
 
 ## Tier-A sign-off — Slice 1
 

@@ -4,14 +4,19 @@
 
 - Formal opposite-family PLAN-EVAL cycle 2 returned `PASS` and is committed at
   `c694cfb311d378f4796280649042c8c275c828ed`; implementation is authorized.
-- Slice 1 registers and verifies the seven allowances, sets both budgets to 7, updates the scanner
-  permissions, and regenerates the consumer bundle. It is stopped for substantive Tier-A review;
-  do not start Slice 2 or create a supervisor sign-off commit before that review.
+- Slice 1 is signed off at `3c398528996a715da8daebe04969e6aba90263e9` (PR comment `5299297798`). Its
+  seven-record registration, R-1 fail-closed resolver, R-2 `Backlog / Triage` acceptance, and
+  landed-head budget attestation do not need to be repeated.
+- Slice 2 implements the checked-in local export/re-export graph and token-aware `public-any`
+  enforcement in the scanner and focused test only. RED-first, focused 25/25, scoped
+  check/lint/format, `quality:scan`, `quality:scan:repo`, and `quality:gate` receipts are under
+  `receipts/slice-2/`; every binding gate exits 0 at the signed Slice 1 parent.
+- **Stop state:** Slice 2 now awaits substantive Tier-A review. Do not begin Slice 3 or create a
+  supervisor sign-off commit from the author lane.
 - Draft PR #1653 directly targets `main`, remains draft, and retains exactly `status:impl`.
 - Branch: `chore/quality-scan-allowance-rail`, no upstream. Base:
   `01e0960494c95ce56eb35892c211a095eb13e6ed`.
-- Fetched `origin/main` advanced to `dd472102d` only through merged #1644. No authorized leaf
-  surface overlaps that commit; this branch was not rebased and does not absorb #1644.
+- This branch was not rebased and does not absorb or mutate #1644.
 - No debt-registry or lock-file change has started. No runtime lease, merge, publication, ready
   transition, or central-state mutation occurred.
 
@@ -50,10 +55,10 @@ surface and was deliberately not edited during plan repair.
 ## Formal PLAN-EVAL result and next action
 
 Native Claude Opus 5 cycle 2 evaluated repaired head `09dfb092d` in separate session
-`b6c48f02-cb56-4dae-abfd-e46bdec05bd5` and returned `PASS`. The canonical verdict is
-`plan-eval.md`; the evaluator artifact commit is `c694cfb311d378f4796280649042c8c275c828ed` and
-the verdict comment is `5299133651`.
+`b6c48f02-cb56-4dae-abfd-e46bdec05bd5` and returned `PASS`. The canonical verdict is `plan-eval.md`;
+the evaluator artifact commit is `c694cfb311d378f4796280649042c8c275c828ed` and the verdict comment
+is `5299133651`.
 
-Next action: the topic orchestrator performs substantive Tier-A review of Slice 1. This author
-thread remains stopped before Slice 2. The final IMPL-EVAL remains a separate opposite-family
-session after all four slices and supervisor reviews.
+Next action: the topic orchestrator performs substantive Tier-A review of Slice 2 using the author
+commit and `receipts/slice-2/`. This author thread remains stopped before Slice 3. The final
+IMPL-EVAL remains a separate opposite-family session after all four slices and supervisor reviews.
