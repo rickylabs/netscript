@@ -724,3 +724,12 @@ path; the same author is repairing plan artifacts only. #1669 behavior head `e05
 but its 499-line F-1 claim is rejected because it deleted useful JSDoc/spacing to hit the threshold.
 The same author is restoring it and must reduce structurally within two files or return an exact
 one-file helper proposal for scope ruling. No runtime lease exists; #1663 remains owner-only.
+
+At 18:00Z, #1666 S2 is clean/pushed at `47ca22abe`; fresh internals Tier-A is active and S3 remains
+held. The three implementation paths expose the least-privilege named task, route `docs:accuracy`
+through it, and add one guarded repo-root Pages step without widening triggers; the live Pages build
+is still terminalizing. #1664's plan-only repair `630185e2c` passed fresh features Tier-A at topic
+`53f97644d`; the same preserved Sol/high author is implementing the unchanged 15-product/12-test F5
+ceiling with four fresh binding receipts before another Tier-A. #1669's same-author structural
+repair is active and has restored the useful JSDoc while consolidating duplicated cache-entry reads;
+S2 remains held. No runtime lease exists, and #1663's owner-only boundary is unchanged.

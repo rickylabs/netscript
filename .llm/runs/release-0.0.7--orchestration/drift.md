@@ -628,3 +628,12 @@ implementation thread.
   finished re-derivation but received an interruption before writing an artifact. Resuming the same
   evaluator history under a new Remote Control attachment preserves independence and cycle identity;
   launching a new evaluator or counting a third cycle would misstate what happened.
+- **A line-count gate must improve structure, not erase explanation:** #1669 briefly suppressed F-1
+  by deleting useful private-method JSDoc and blank-line structure. The accepted correction restores
+  those explanations and removes real duplicated cache-entry lookup/span logic instead. Threshold
+  compliance is evidence only when the code becomes simpler to own, not when prose is sacrificed to
+  make `wc` smaller.
+- **A named CI edge can be discoverability without duplicate enforcement:** #1666 already failed
+  closed through the aggregate docs-accuracy chain. Its S2 task and Pages label make that existing
+  policy independently runnable and visible; they must not cause the checker to execute twice in one
+  aggregate path or be described as enforcement that did not previously exist.

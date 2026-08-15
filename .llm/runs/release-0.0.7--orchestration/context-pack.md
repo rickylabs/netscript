@@ -604,3 +604,11 @@ review, with no product mutation. #1669 pushed S1 head `e05a54145`, but coordina
 restoring that content and must reduce structurally inside the two-file scope or propose one exact
 internal helper before any scope widening. No runtime lease, Aspire application, Docker container,
 or browser gate is active. #1663 remains untouched at its owner-only third-evaluator boundary.
+
+Newer checkpoint `2026-08-15T18:00:45Z`: #1666 S2 is clean/pushed at `47ca22abe`; fresh internals
+Tier-A is active and S3 stays held. #1664 plan repair `630185e2c` passed fresh features Tier-A at
+topic `53f97644d`; the same original Sol/high author is implementing F5 under the reviewed
+15-product/12-test ceiling, with fresh exact-head receipts and another Tier-A required before any
+runtime retry. #1669's same-author anti-gaming correction is structurally consolidating duplicate
+cache-entry reads with JSDoc restored; S2 remains held until commit/push and fresh fixes Tier-A. No
+runtime lease exists. #1663 and accepted #1651 option-1 keep-and-narrow remain unchanged.

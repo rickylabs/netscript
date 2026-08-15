@@ -991,14 +991,14 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
-      "currentPrHeadSha": "6788406036b0ce294262b626b5b3cf0f450df403",
+      "currentPrHeadSha": "47ca22abe94b9d2e54d3778edc8944094b227886",
       "issueNumbers": [1296],
       "implementerAgentId": "01a005d2-7c9d-7dd1-b6fc-531b72dc14e4",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/reference-export-drift-gate",
       "worktree": "/home/codex/repos/netscript-007-reference-export",
       "prNumber": 1666,
-      "implementationState": "s1_fresh_tier_a_pass_s2_named_task_and_pages_wiring_active_serially",
+      "implementationState": "s2_clean_pushed_awaiting_fresh_tier_a_s3_held",
       "planHeadSha": "9d0b4bf128ba52fcd52091ba50590661d09470c1",
       "scopeAmendmentHeadSha": "a3f6b87b599e778db950daf6ccaecd847c088d19",
       "tierAPlanState": "PASS_SA2",
@@ -1044,8 +1044,10 @@
           "validation": "fresh Tier-A independently reproduced fail-closed policy refusals, 168 Fresh UI exports plus exactly seven documented non-exports, non-empty structured check/test/lint/fmt selections, docs source format and docs accuracy green, and the unchanged nine-finding Contracts doc-lint baseline red"
         },
         "s2": {
-          "state": "active",
-          "scope": "named docs:exports-drift task, docs:accuracy fail-closed child invocation with output preservation, and one Pages workflow step from repository root behind the existing guard; no duplicate execution"
+          "state": "complete_awaiting_fresh_tier_a",
+          "headSha": "47ca22abe94b9d2e54d3778edc8944094b227886",
+          "scope": "named docs:exports-drift task, docs:accuracy fail-closed child invocation with output preservation, and one Pages workflow step from repository root behind the existing guard; no duplicate execution",
+          "validation": "author reports direct named task and aggregate green, workflow/source-format green, controlled drift nonzero with byte-exact restoration, and corrected single-execution audit; fresh internals Tier-A is active before S3"
         }
       },
       "expensiveGateContract": "no runtime lease; scaffold.runtime and fresh-browser are matrix n/a for this checker/docs/JSDoc/task/workflow-only leaf",
@@ -1466,14 +1468,14 @@
       "phase": "planned",
       "baseBranch": "main",
       "headSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
-      "currentPrHeadSha": "3204ffa98a7e4db932515851145538fe899f381b",
+      "currentPrHeadSha": "630185e2cd391203f07bb3ba6a1eece80fed25ec",
       "issueNumbers": [1355, 1360],
       "implementerAgentId": "01a004f9-f033-7592-a0bc-63927753fb43",
       "implementerRoute": "openai / gpt-5.6-sol / high / approval never / dangerFullAccess",
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "f5_plan_amendment_pushed_tier_a_fail_fix_transport_proofs_same_author_plan_repair_active_no_product_mutation",
+      "implementationState": "f5_a1_plan_repair_fresh_tier_a_pass_product_implementation_active_same_author_no_runtime_lease",
       "dispatchTopicHeadSha": "0d0ba1b7a404c847acba2daed40c69d282906f69",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
@@ -1505,10 +1507,11 @@
         "mark generate-aspire_test.ts as new"
       ],
       "f5PlanAmendmentHeadSha": "3204ffa98a7e4db932515851145538fe899f381b",
-      "f5PlanAmendmentTierAState": "FAIL_FIX",
-      "f5PlanAmendmentTierATopicCheckpointSha": "c8d3acb920f473d811bf150555a9448a5eae66c8",
+      "f5PlanAmendmentTierAState": "PASS_AFTER_A1",
+      "f5PlanAmendmentTierATopicCheckpointSha": "53f97644d4278bd794333260cf3d2f91d31e9af1",
+      "f5PlanRepairHeadSha": "630185e2cd391203f07bb3ba6a1eece80fed25ec",
       "f5PlanAmendmentSurface": "15 product plus 12 focused-test paths around an internal GeneratedSourceFormatterPort, ProcessPort stdin transport, four pre-write canonicalizing writer owners, and a cheap exact-12-path add/generate/full-fmt proof",
-      "f5PlanRepairRequired": "add executable piped-stdin timeout/kill closure, defined empty-content behavior, unknown-or-absent extension refusal, and justify or remove services-group.ts; plan artifacts only, then fresh Tier-A before product mutation",
+      "f5PlanRepairRequired": "closed at 630185e2c: executable EOF-before-timeout/kill closure, supported zero-byte passthrough, extension allowlist refusal before content inspection, and services-group dependency projection are bound; product implementation released under unchanged 15-product/12-test ceiling",
       "implementationSlices": {
         "s1": {
           "state": "complete_tier_a_pass",
@@ -2638,5 +2641,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T17:55:29.000Z"
+  "updatedAt": "2026-08-15T18:00:45.000Z"
 }

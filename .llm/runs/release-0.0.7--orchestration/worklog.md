@@ -1049,3 +1049,21 @@
   The same preserved author is restoring the documentation and must either reduce structurally
   within the two-file grant or return an exact one-file internal-helper proposal before widening.
   S2 remains blocked on fresh fixes Tier-A.
+
+## 2026-08-15T18:00:45Z — #1666 S2 lands; #1664 F5 implementation is released
+
+- #1666 S2 committed and explicitly pushed `47ca22abe`. The leaf is clean and local, remote, and PR
+  heads match. The exact implementation adds the least-privilege `docs:exports-drift` task, has
+  `docs:accuracy` invoke that named fail-closed child with output surfacing preserved, and adds one
+  guarded repo-root Pages step. The internals supervisor was recovered from an old prompt and is now
+  performing fresh Tier-A; S3 remains held until that verdict.
+- #1664 plan-only F5-A1 repair `630185e2c` binds the EOF-before-timeout proof, writer closure and
+  kill return, explicit supported-extension zero-byte behavior, fail-closed absent/unknown extension
+  handling, and the `services-group.ts` dependency-projection reason. Fresh features Tier-A returned
+  `PASS` at topic `53f97644d` and dispatched the same original Sol/high author under the unchanged
+  15-product/12-test ceiling. Four new exact-head receipts and a fresh Tier-A remain mandatory; no
+  runtime lease, Aspire, Docker, browser, or evaluator is authorized.
+- #1669's corrective working tree now restores all named method documentation and replaces duplicate
+  `getCachedData`/`getCachedEntry` store-read spans with one private cache-entry read path. It is 497
+  lines versus the 490-line base, an honest structural reduction with headroom. Commit/push and fresh
+  fixes Tier-A remain pending; S2 is still blocked.
