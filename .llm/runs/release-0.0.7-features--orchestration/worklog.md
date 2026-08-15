@@ -3469,3 +3469,52 @@ lease, correctly: a runtime failure needs review before a fix, exactly as the S4
 FAIL and baseline evidence is preserved unmodified — `s4-format-failure.md`,
 `s4-export-doc-failure.md`, `s4-test-failure.md`, the Fresh 45 and SDK 3 `PRE_EXISTING_FAIL` entries,
 and the separately named plugin-streams diagnostic. No other lane was touched. No evaluator launched.
+
+## 2026-08-15 — S5 disposition: the probe was wrong; F4 dispatched
+
+Coordinator proved the probe expectation is the defect and released the lease at `dbf87e379`.
+
+The proof ran against the preserved generated project *after* the failed invocation had reconciled
+its three helper files: two further consecutive identical `service generate` invocations both exited
+0 with the expected converged counts, and SHA-256 manifests of every `aspire/.helpers` file were
+identical before and after both. So the post-plugin invocation was **convergence after changed
+inputs** — the intervening plugin/runtime-schema/database gates moved what the helpers derive from —
+while **same-input idempotency holds**.
+
+That is the hypothesis I recorded at the S5 stop, now confirmed by measurement rather than by
+argument. It also vindicates having refuted the tempting "declared option never fires" reading: had I
+reported that as the root cause, the repair round would have been sent to rewire plumbing that was
+already correct, and the actual defect — an assertion placed one sequence position too early — would
+have survived the fix.
+
+### F4 dispatched, amendment-first
+
+**Step 1 is a separate pushed commit before any product mutation**: the disposition, the
+convergence-versus-idempotency proof, and the corrected assertion contract, recorded in the plan and
+run artifacts. The reasoning has to be durable independently of whether the repair succeeds.
+
+**The corrected contract:** the first post-plugin `service generate` **may** reconcile Aspire helpers
+while still preserving the two current clients (0 written, 2 skipped); snapshot the converged owned
+outputs there; then an **immediately consecutive identical** generate must produce zero clients, two
+skips, **zero** helper writes, and **byte-identical** owned outputs. The second invocation is where
+idempotency is genuinely observable, because only there are the inputs unchanged.
+
+**The negative/sequence test must still fail if a second identical write occurs** — the repair must
+not become a licence for unconditional rewriting. I required byte-identity of the snapshot rather
+than a zero count, because a count of zero can be satisfied by a no-op path that never compared
+anything. That is the same distinction as S2's non-invocation-proving stub: assert the cause, not
+just the absence.
+
+All prior evidence stays append-only — the S5 FAIL and its hashed raw log, the three S4 failure
+reports, every older receipt, and the carried Fresh 45 / SDK 3 baselines with plugin-streams named
+separately. A corrected probe does not retroactively make the S5 run green.
+
+Then affected cheap tests and four distinct exact-head binding receipts, sufficiency recomputed and
+named, and a stop for fresh features Tier-A. No new runtime lease, no `fresh-browser`, no evaluator
+until that passes.
+
+**D-17 recorded** on the head-movement lesson: the lease was granted against `8940e9266` but executed
+at `ab78eaa35`. Nothing was misattributed — the product content head was unchanged and the delta was
+run artifacts only — but a lease names a head so that what ran is provably what was authorized, and a
+head that can advance between grant and execution downgrades that proof to a judgement. Standing rule
+adopted: every preflight artifact is committed and pushed before readiness is reported.

@@ -296,3 +296,25 @@ pass the neutral config by **absolute path** and set `--batch-size` above the se
 then confirm `failedBatches: 0` before treating `findings: 0` as a verdict. A `findings: 0` with
 non-zero `failedBatches` is not a pass — it is a refusal, and reporting it as a pass would be the
 same overclaim this leaf corrected in its SDK doc-lint labelling.
+
+## D-17 — a leased evidence head moved after the grant (significant)
+
+**Date:** 2026-08-15. The S5 runtime lease was granted against leaf evidence head
+`8940e9266630a3cc5368153722747e45d30aec3b`, which I verified as local == remote == PR before
+dispatch. The suite then executed at `ab78eaa35c1753f9e8c526dbd234c7073758008b`, because the author
+committed preflight artifacts *after* the grant and before running the gate.
+
+Nothing was misattributed — the product content head `193e665ba` was unchanged and the
+content-to-execution delta was committed run artifacts only, so the gate did test the intended
+product. But the identity a lease is granted against should be the identity it executes at. A lease
+names a head so that what ran is provably what was authorized; if the head can advance between grant
+and execution, that guarantee is weakened to "the parts I checked did not change", which is a
+judgement rather than a proof.
+
+**Standing rule for this lane, adopted at coordinator instruction:** every preflight artifact must be
+committed **and pushed** before readiness is reported, so the head named in a lease request is
+already final. A lease request quoting a head that later moves is a request quoting a prediction.
+
+Related: [[eval-verdict-head-must-equal-merge-head]] is the same property one phase later — there the
+trap is a verdict certifying a head that is not the head merged; here it is a lease authorizing a
+head that is not the head executed.
