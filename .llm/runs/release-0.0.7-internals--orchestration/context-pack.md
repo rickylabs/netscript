@@ -115,9 +115,33 @@ Archetype `6-cli-tooling`; overlays `service` + `docs`. Surfaces:
 
 ### Blocking coordinator action
 
-The leaf stops after `plan.md` with its PLAN-EVAL judgement. **The evaluator grant is the
-coordinator's**; this lane does not self-launch one. `openhands-dispatch-claim-and-refusal` is next
-in the internals queue and must not be dispatched until #1542 reaches its serial stop.
+The leaf reached its serial stop at plan head **`da76d9d8440a969f0715ca035ea6304bbf039efd`**, draft
+PR **#1656**, with **`PLAN-EVAL: REQUIRED`**. It correctly did not self-launch an evaluator.
+
+Two items need coordinator disposition before the gate runs:
+
+1. **Evaluator route.** `plan.md:180` nominates **Fable 5 medium**. The reset `dispatch.json` marks
+   Fable as not pre-dispatched and requires an amendment recording genuine architectural or
+   exceptional necessity; Opus 5 is the normal route. Bind the route from `dispatch.json`, not from
+   the plan's prose.
+2. **Label lag.** PR #1656 has posted RESEARCH and PLAN comments but is still `status:research`.
+   This lane is barred from relabeling, so the advance to `status:plan-eval` is the coordinator's or
+   the leaf's own next-turn action.
+
+`openhands-dispatch-claim-and-refusal` stays queued and undispatched until #1542 clears its gate.
+
+### Plan summary (topic-supervisor reviewed)
+
+Narrows the contract's 10 outer-bound surfaces to **3**: create
+`.llm/tools/quality/check-root-coverage.ts` and its test, edit `deno.json`. Explicitly refuses
+`check-doctrine.ts`, scanner logic, `docs/site`, packages, plugins, workflows, doctrine, debt, and
+the lock, requiring rescope if any proves necessary.
+
+Supervisor-verified facts underpinning it: `discoverWorkspaceMembers()` reports 37 members, **35
+publishable**, all under `packages/**`/`plugins/**`, with non-published exactly `packages/bench` and
+`packages/cli/e2e` — matching D2's named exclusions. `quality:scan` uses the **descendant** root
+`packages/cli/src` while `quality:scan:repo` is already broad, so the gap sits in the task
+`quality:gate` chains, which is what D3 (descendant ≠ coverage) and D6 (broad roots) target.
 
 ## Open follow-ups from #1653 (neither blocks anything)
 
