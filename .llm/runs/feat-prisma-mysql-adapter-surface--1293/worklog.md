@@ -292,3 +292,74 @@ MINOR PrismaMySqlTransactionOptions: symbol added
 ```
 
 `PrismaMySqlAdapter` remains absent from the root snapshot.
+
+## S2 — connection-error predicate and notification boundaries
+
+- Starting head: `49fda0b77b4db4a91f1cb25e23b13e4bf1259699`.
+- `src/errors.ts` now defines the module-only `MYSQL_CONNECTION_ERROR_CODES` set and
+  `isConnectionError(error: unknown)` classifier. `MySqlError` includes `fatal?: boolean` without
+  broadening the pre-existing `isDriverError` predicate or error normalization.
+- `adapter.ts` has one module-level `notifyConnectionError(options, error)` function. The invocation
+  of `options.onConnectionError` inside it is the only callback call site in `src/`.
+- Callback throws are logged through `debug` and dropped. Raw rejections are rethrown by identity;
+  pooled/transaction query operations retain `DriverAdapterError` conversion.
+- The classifier/notifier covers capability fallback, pooled and transaction query/execute,
+  `executeScript`, acquisition/isolation/`BEGIN`, post-ready lifecycle rejection,
+  `COMMIT`/`ROLLBACK`, and disposal. Transaction start notifies only from the outer lifecycle catch.
+- `getCapabilities` has a module-only export so the fake-client test can exercise the same probe
+  function awaited by `PrismaMySqlAdapterFactory.connect`; it is not root re-exported.
+- Root-surface tests assert that `isConnectionError`, `MYSQL_CONNECTION_ERROR_CODES`, and
+  `getCapabilities` remain absent from the package API.
+
+### S2 behavior evidence
+
+- Package check: pass for the root and all five test files.
+- Package tests: 46 passed, 0 failed; 33 exercise connection boundaries and 7 exercise classifier
+  and mapping behavior.
+- Package lint and TypeScript format: zero findings.
+- Structured doc lint: zero findings, exit 0.
+- JSR helper: raw dry-run passes; its sole F-JSR-7 warning remains the known banner match.
+
+### Raw doc lint after S2
+
+Command:
+
+```text
+deno doc --lint packages/prisma-adapter-mysql/mod.ts
+```
+
+Raw output and exit code:
+
+```text
+Checked 1 file
+EXIT_CODE=0
+```
+
+### Raw publish dry-run after S2
+
+Command (cwd `packages/prisma-adapter-mysql`):
+
+```text
+deno publish --dry-run --allow-dirty
+```
+
+Raw output and exit code (terminal ANSI styling removed; no output omitted):
+
+```text
+Check mod.ts
+Checking for slow types in the public API...
+Check mod.ts
+Simulating publish of @netscript/prisma-adapter-mysql@0.0.6 with files:
+   file:///home/codex/repos/netscript-007-features-1293/packages/prisma-adapter-mysql/README.md (4.87KB)
+   file:///home/codex/repos/netscript-007-features-1293/packages/prisma-adapter-mysql/deno.json (677B)
+   file:///home/codex/repos/netscript-007-features-1293/packages/prisma-adapter-mysql/mod.ts (94B)
+   file:///home/codex/repos/netscript-007-features-1293/packages/prisma-adapter-mysql/src/adapter.ts (22.56KB)
+   file:///home/codex/repos/netscript-007-features-1293/packages/prisma-adapter-mysql/src/conversion.ts (8.1KB)
+   file:///home/codex/repos/netscript-007-features-1293/packages/prisma-adapter-mysql/src/errors.ts (5.96KB)
+   file:///home/codex/repos/netscript-007-features-1293/packages/prisma-adapter-mysql/src/mod.ts (1.49KB)
+   file:///home/codex/repos/netscript-007-features-1293/packages/prisma-adapter-mysql/src/types.ts (3.49KB)
+Success Dry run complete
+EXIT_CODE=0
+```
+
+The publish set remains the same eight files; tests and examples remain excluded.

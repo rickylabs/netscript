@@ -24,3 +24,11 @@ that workaround because the widened input admitted values `mapArg` cannot honor 
 `as SqlQuery` assertion hid the incompatibility. The fix-up therefore makes the package-owned type
 structurally exact, removes the overloads/assertion, and adds bidirectional compile-time guards.
 This entry records the discovery and superseded approach; the fix-up is authoritative.
+
+### Capability-probe test seam
+
+`PrismaMySqlAdapterFactory.connect()` creates mysql2 internally, so the S1 concrete-class seam alone
+cannot inject a fake client into the capability probe. S2 adds a module-only export to the existing
+`getCapabilities` function and tests it with a fake client, then constructs the connected adapter
+from the returned fallback capabilities. The factory calls that same function with its options.
+The helper is not root re-exported, and the root-surface test asserts its absence.

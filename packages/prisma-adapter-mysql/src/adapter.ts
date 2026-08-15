@@ -23,11 +23,34 @@ import { Debug, DriverAdapterError } from '@prisma/driver-adapter-utils';
 import type { Pool, PoolConnection, PoolOptions } from 'mysql2/promise';
 
 import { mapArg, mapColumnType, mapRow, type MySqlFieldInfo } from './conversion.ts';
-import { convertDriverError } from './errors.ts';
+import { convertDriverError, isConnectionError } from './errors.ts';
 import type { MySqlCapabilities, MySqlConnectionConfig, PrismaMySqlOptions } from './types.ts';
 
 const PACKAGE_NAME = '@netscript/prisma-adapter-mysql';
 const debug = Debug('prisma:driver-adapter:deno-mysql');
+
+type ConnectionErrorNotifier = (error: unknown) => void;
+
+function notifyConnectionError(
+  options: PrismaMySqlOptions | undefined,
+  error: unknown,
+): void {
+  if (!options?.onConnectionError || !isConnectionError(error)) {
+    return;
+  }
+
+  try {
+    options.onConnectionError(error as Error);
+  } catch (callbackError) {
+    debug('onConnectionError callback failed: %O', callbackError);
+  }
+}
+
+function createConnectionErrorNotifier(
+  options: PrismaMySqlOptions | undefined,
+): ConnectionErrorNotifier {
+  return (error: unknown): void => notifyConnectionError(options, error);
+}
 
 interface MysqlQueryableClient {
   query(sql: string, values?: readonly unknown[]): Promise<Record<string, unknown>[]>;
@@ -99,6 +122,7 @@ class MySqlQueryable<TClient extends MysqlQueryableClient> implements SqlQueryab
   constructor(
     protected client: TClient,
     protected getFields?: () => MySqlFieldInfo[] | undefined,
+    protected readonly notifyConnectionError: ConnectionErrorNotifier = () => {},
   ) {}
 
   /**
@@ -237,6 +261,7 @@ class MySqlQueryable<TClient extends MysqlQueryableClient> implements SqlQueryab
    */
   protected onError(error: unknown): never {
     debug('Error in performIO: %O', error);
+    this.notifyConnectionError(error);
     throw new DriverAdapterError(convertDriverError(error));
   }
 }
@@ -253,8 +278,9 @@ class MySqlTransaction extends MySqlQueryable<MysqlQueryableClient> implements T
     private conn: MysqlQueryableClient,
     options: TransactionOptions,
     private cleanup?: () => void,
+    notifyConnectionError: ConnectionErrorNotifier = () => {},
   ) {
-    super(conn);
+    super(conn, undefined, notifyConnectionError);
     this.options = options;
   }
 
@@ -271,6 +297,9 @@ class MySqlTransaction extends MySqlQueryable<MysqlQueryableClient> implements T
     try {
       await this.conn.execute('COMMIT');
       this.committed = true;
+    } catch (error) {
+      this.notifyConnectionError(error);
+      throw error;
     } finally {
       this.cleanup?.();
     }
@@ -289,6 +318,9 @@ class MySqlTransaction extends MySqlQueryable<MysqlQueryableClient> implements T
     try {
       await this.conn.execute('ROLLBACK');
       this.rolledBack = true;
+    } catch (error) {
+      this.notifyConnectionError(error);
+      throw error;
     } finally {
       this.cleanup?.();
     }
@@ -323,14 +355,19 @@ export class PrismaMySqlAdapter extends MySqlQueryable<MysqlPoolClient>
     private readonly capabilities: MySqlCapabilities,
     private readonly options: PrismaMySqlOptions | undefined = undefined,
   ) {
-    super(client);
+    super(client, undefined, createConnectionErrorNotifier(options));
   }
 
   /**
    * Execute a trusted SQL script.
    */
   async executeScript(script: string): Promise<void> {
-    await this.client.query(script);
+    try {
+      await this.client.query(script);
+    } catch (error) {
+      this.notifyConnectionError(error);
+      throw error;
+    }
   }
 
   /**
@@ -391,6 +428,7 @@ export class PrismaMySqlAdapter extends MySqlQueryable<MysqlPoolClient>
     // Handle errors from the connection lifecycle
     connectionLifecycle.catch((error: unknown) => {
       debug('%s Connection lifecycle error: %O', tag, error);
+      this.notifyConnectionError(error);
       // If connection wasn't ready yet, reject it
       connectionReady.reject(error);
     });
@@ -404,14 +442,19 @@ export class PrismaMySqlAdapter extends MySqlQueryable<MysqlPoolClient>
     };
 
     // Create and return the transaction object
-    return new MySqlTransaction(conn, options, cleanup);
+    return new MySqlTransaction(conn, options, cleanup, this.notifyConnectionError);
   }
 
   /**
    * Dispose of the adapter and close connections.
    */
   async dispose(): Promise<void> {
-    await this.client.close();
+    try {
+      await this.client.close();
+    } catch (error) {
+      this.notifyConnectionError(error);
+      throw error;
+    }
   }
 
   /**
@@ -609,7 +652,7 @@ export class PrismaMySqlAdapterFactory {
 
     // Detect server capabilities
     if (this.#capabilities === undefined) {
-      this.#capabilities = await getCapabilities(client);
+      this.#capabilities = await getCapabilities(client, this.#options);
     }
 
     return new PrismaMySqlAdapter(
@@ -718,8 +761,9 @@ function hasExecutionMetadata(
 /**
  * Detect MySQL server capabilities.
  */
-async function getCapabilities(
+export async function getCapabilities(
   client: MysqlQueryableClient,
+  options: PrismaMySqlOptions | undefined = undefined,
 ): Promise<MySqlCapabilities> {
   const tag = '[js::getCapabilities]';
 
@@ -735,6 +779,7 @@ async function getCapabilities(
     return capabilities;
   } catch (e) {
     debug(`${tag} Error while checking capabilities: %O`, e);
+    notifyConnectionError(options, e);
     return { supportsRelationJoins: false };
   }
 }

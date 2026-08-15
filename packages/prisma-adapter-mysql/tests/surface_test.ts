@@ -15,5 +15,8 @@ Deno.test('root surface exposes transaction options without the concrete adapter
 
   assertEquals(options, { usePhantomQuery: false });
   assertFalse('PrismaMySqlAdapter' in publicApi);
+  assertFalse('isConnectionError' in publicApi);
+  assertFalse('MYSQL_CONNECTION_ERROR_CODES' in publicApi);
+  assertFalse('getCapabilities' in publicApi);
   assertEquals(typeof PrismaMySqlAdapter, 'function');
 });
