@@ -250,3 +250,71 @@ evidence for a page-level narrative claim it does not check.
 
 S3 Tier-A **PASS** at `c7cba6d9b`. S4 final gates are **not** authorized by this review. No evaluator,
 no runtime lease, no #1348/#1466 mutation; PR draft at sole `status:plan`.
+
+---
+
+# Tier-A — S4 at `db8aadd9542c38a305efffbd7017c56d0abf4e01`
+
+| Field | Value |
+| --- | --- |
+| Head | `db8aadd9542c38a305efffbd7017c56d0abf4e01` — local == remote == PR, clean, draft, sole `status:plan` |
+| Commit | `db8aadd95 chore(harness): record blocked S4 gate receipt` |
+| Verdict on the **slice** | **PASS** — S4 behaved correctly |
+| Verdict on the **leaf** | **BLOCKED** — a real leaf-owned regression is open |
+
+## The slice did the right thing
+
+Scope is run-artifact-only: three existing files, **0** non-run-artifact paths, `deno.lock`
+**LOCK-IDENTICAL**. Receipts bind `gitHead == actualGitHead == c7cba6d9b` with `waiver: null`.
+Gates not reached are recorded honestly as `NOT_RUN` with the reason and the specific gate list, not
+silently omitted.
+
+Most importantly, the author **stopped rather than fixing source inside a run-artifact-only slice**.
+That is the fourth time an author in this lane has halted on a real boundary instead of widening, and
+it is the behaviour that keeps these verdicts worth anything.
+
+## The blocker — verified independently, not accepted from the receipt
+
+`sdk-raw-doc-lint`: **base `0ef48c2ec` = 3 diagnostics, head = 13**. I re-ran the combined SDK
+doc-lint at head and got **13**, matching. The ten added `private-type-ref` diagnostics are all
+attributable to this leaf's own S2 typed-error work:
+
+| Public type | now references private |
+| --- | --- |
+| `ServiceClientMethod` | `ThrowableError`, `ClientPromiseResult` |
+| `ServiceClientShape` | `ProcedureErrorFromNode` |
+| `SafeFailure` | `ThrowableError`, `NonDefinedSafeFailure`, `DefinedSafeFailure` |
+| `SafeResult` | `ThrowableError` |
+| `isDefinedError` | `NarrowDefined` |
+| `safe` | `ThrowableError`, `ClientPromiseResult` |
+
+A second receipt records `["baseContract","BaseContractErrors"]` added and `["baseContract","oc"]`
+removed on the contracts side.
+
+**This is a genuine regression on published surface**, not a baseline red. The SDK's public error API
+now references private types — precisely what `deno doc --lint` exists to catch and what JSR
+publishing and `isolatedDeclarations` care about. Classifying it `NEW LEAF-OWNED RED` rather than
+folding it into the known `F-DOCT-5`/pinned-baseline set is exactly right, and is the
+red-attribution discipline working in the direction that costs the leaf something rather than the
+direction that excuses it.
+
+## Why this cannot be fixed in S4
+
+Remedying it requires **source** changes — exporting the referenced types or restructuring the public
+signatures — and S4 is run-artifact-only by grant. The author correctly refused to edit S1/S2 product
+files to make its own gate green. That would have been the worst available outcome: a green gate
+bought with an unreviewed source edit inside a slice whose whole contract is "touch no source".
+
+## Not executed after the mandated stop
+
+Recorded as `NOT_RUN` with reasons: `contracts-jsr-audit`, `sdk-jsr-audit`,
+`netscript-jsr-specifiers`, and the selected export guards. These are outstanding, not passed.
+
+## Outcome
+
+S4 Tier-A **PASS on slice conduct**, but the **leaf is not merge-ready**. A new leaf-owned
+published-surface regression is open and needs a coordinator scope ruling for a bounded S5 — a
+source-touching slice authorized to resolve the ten new `private-type-ref` diagnostics — before
+formal IMPL-EVAL is worth spending. IMPL-EVAL is **not** requested at this head.
+
+No evaluator, no runtime lease, no label/issue/checkbox/ready/merge action, no #1348/#1466 mutation.
