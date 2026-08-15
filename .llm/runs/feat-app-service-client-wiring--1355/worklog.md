@@ -330,8 +330,8 @@ checked-in `leak-report.md` records no surviving Aspire resources, and the centr
 released before any repair.
 
 F3 is bounded to the existing service-client runtime probe, its unit test, the service/runtime suite
-ordering and order-sensitive registry test, plus run artifacts. The locked design reorders the
-already-owned standalone database codegen gate before the static probe, adds an explicit
+ordering and order-sensitive registry test, plus run artifacts. The locked design moves the static
+probe after the already-owned standalone database codegen gate at its canonical position, adds an explicit
 generated-schema precondition, derives separate inputs from the two real generated contract schemas,
 and replaces index-zero-only tail equality with own/cross resource-prefix and per-service input
 assertions. Exact design and negative tests are recorded in `plan.md`. No product file changes until

@@ -334,10 +334,12 @@ the leak report records no surviving Aspire resources, and the lease was release
 
 The missing schema is a lifecycle prerequisite, not probe-owned output. `GATE.DATABASE_CODEGEN` is
 already the canonical standalone/no-Aspire schema generator (`deno task db:generate` under the
-selected `database/<engine>` workspace), but both service and runtime suites currently select it
-after the service-client contract probe. S4-F3 moves that same gate before
-`GATE.GENERATED_SERVICE_CLIENT_CONTRACT` in both suites; it does not duplicate the command inside
-the probe and does not create a fake Zod module. The probe additionally calls exported
+selected `database/<engine>` workspace), but both service and runtime suites currently select the
+service-client contract probe before it. S4-F3 preserves database codegen at its existing canonical
+position—after the runtime suite's plugin/setup contributors—and moves
+`GATE.GENERATED_SERVICE_CLIENT_CONTRACT` immediately after it in both suites. It does not duplicate
+or prematurely trigger the command inside the probe and does not create a fake Zod module. The
+probe additionally calls exported
 `assertGeneratedServiceSchemaReady(projectRoot)` before importing helpers or writing the temporary
 consumer. It requires a real `database/<engine>/schema/.generated/zod/crud.ts` and emits the expected
 pattern when absent. The order-sensitive registry/probe tests require `database.codegen` before the
