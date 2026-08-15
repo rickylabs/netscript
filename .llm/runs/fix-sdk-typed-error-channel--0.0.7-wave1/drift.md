@@ -52,3 +52,13 @@
 - **Deferred:** Stale contracts/benchmark prose remains tracked follow-up debt outside this leaf.
 - **Phase effect:** The plan has no remaining must-resolve decision, but fresh Tier-A review and a
   separate PLAN-EVAL `PASS` remain hard stops before implementation.
+
+## 2026-08-15 — PLAN-EVAL corrects the out-of-scope prose classification
+
+- **What:** Original research grouped `packages/contracts/README.md` with benchmark prose that
+  describes the old erasure.
+- **Actual:** The contracts README says the common error map is applied, which remains true. Only
+  the benchmark reference README/router contain the stale erasure claim.
+- **Action:** Corrected existing research/plan/context artifacts. No new file or debt entry was
+  created; the coordinator owns any later issue for the benchmark prose.
+- **Scope:** Both locations remain outside the exact six-path ceiling; no product/docs edit here.

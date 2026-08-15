@@ -72,10 +72,18 @@ deno eval --check --unstable-kv "import { isDefinedError, safe } from './src/cli
 TS2339: Property 'code' does not exist on type 'never'.
 ```
 
-This RED proves the named defect because it fails only when `safe()` has erased the promise's error
-type and `isDefinedError()` therefore narrows that erased value to `never`. The implementation proof
-must strengthen it to use a real `baseContract` procedure and assert the exact six-code union plus
-schema-specific `data`; a broad `DefinedError<string, unknown>` would not satisfy the proof.
+The S1 real-export fixture sharpened the base RED with one structured check and recorded both
+diagnostics required by PLAN-EVAL:
+
+```text
+TS18046: 'discriminated.error' is of type 'unknown'.
+TS2339: Property 'code' does not exist on type 'never'.
+```
+
+Together they prove the named defect: direct discrimination still leaves `safe()`'s erased error as
+`unknown`, while `isDefinedError()` narrows that erased value to `never`. The later S2 proof must
+turn both green and assert the exact six-code union plus schema-specific `data`; a broad
+`DefinedError<string, unknown>` would not satisfy the proof.
 
 ## 2. Current contract guarantees and public surface
 
@@ -128,13 +136,14 @@ rg -n '\bServiceClient(Method|Shape|<)|Procedure(Output|Input)FromNode' \
 
 ### Outside `packages/sdk`
 
-| Consumer                           | Evidence                                                                                                                                                                                                                                    | Consequence                                                                                                                                                                  |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@netscript/fresh` diagnostics     | `packages/fresh/src/diagnostics/error/extract.ts:1-39`                                                                                                                                                                                      | Imports `isDefinedError`, then manually casts code/status. It must still compile and preserve runtime detection; it is the only non-SDK package source importing the helper. |
-| `@netscript/contracts/crud`        | `packages/contracts/crud/create-crud-contract.ts:29-44,109-117,350-379`                                                                                                                                                                     | Directly consumes public `baseContract` and `BaseContractRoute`; exact error/meta generics must remain assignable.                                                           |
-| Workers health soundness test      | `plugins/workers/services/src/routers/health-soundness_test.ts:3-53`                                                                                                                                                                        | Asserts `BaseContractRoute` handler inference; metadata/error tightening must not regress input/output soundness.                                                            |
-| CLI scaffold/template assertions   | `packages/cli/e2e/tests/application/gates/generated-router-template_test.ts:35-41`; `packages/cli/src/kernel/adapters/contracts/contract-source.ts:63-77`; `packages/cli/src/public/features/plugins/new/new-plugin-use-case.ts:390-416`    | Some generated contracts import root `baseContract`; the parser recognizes its route chain. No template change is planned.                                                   |
-| Benchmark/reference/docs consumers | `packages/bench/tasks/t1-storefront-api/rubric.md:16`; `packages/bench/tasks/t1-storefront-api/reference/README.md:45-47`; `packages/bench/tasks/t1-storefront-api/reference/netscript/router.ts:7-8`; `packages/contracts/README.md:13-76` | Several statements explicitly describe the current erasure. They become stale after repair but are tracked follow-up debt outside this leaf's exact six-path ceiling.        |
+| Consumer                         | Evidence                                                                                                                                                                                                                                 | Consequence                                                                                                                                                                   |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@netscript/fresh` diagnostics   | `packages/fresh/src/diagnostics/error/extract.ts:1-39`                                                                                                                                                                                   | Imports `isDefinedError`, then manually casts code/status. It must still compile and preserve runtime detection; it is the only non-SDK package source importing the helper.  |
+| `@netscript/contracts/crud`      | `packages/contracts/crud/create-crud-contract.ts:29-44,109-117,350-379`                                                                                                                                                                  | Directly consumes public `baseContract` and `BaseContractRoute`; exact error/meta generics must remain assignable.                                                            |
+| Workers health soundness test    | `plugins/workers/services/src/routers/health-soundness_test.ts:3-53`                                                                                                                                                                     | Asserts `BaseContractRoute` handler inference; metadata/error tightening must not regress input/output soundness.                                                             |
+| CLI scaffold/template assertions | `packages/cli/e2e/tests/application/gates/generated-router-template_test.ts:35-41`; `packages/cli/src/kernel/adapters/contracts/contract-source.ts:63-77`; `packages/cli/src/public/features/plugins/new/new-plugin-use-case.ts:390-416` | Some generated contracts import root `baseContract`; the parser recognizes its route chain. No template change is planned.                                                    |
+| Benchmark/reference consumers    | `packages/bench/tasks/t1-storefront-api/rubric.md:16`; `packages/bench/tasks/t1-storefront-api/reference/README.md:45-47`; `packages/bench/tasks/t1-storefront-api/reference/netscript/router.ts:7-8`                                    | The reference README/router explicitly describe the old erasure and are coordinator-owned follow-up debt outside this leaf's exact six-path ceiling; the rubric remains true. |
+| Contracts README                 | `packages/contracts/README.md:13-76`                                                                                                                                                                                                     | Says the common error map is applied. That remains true before and after this repair; PLAN-EVAL correctly found that the original research overstated this consumer.          |
 
 First-party plugin-core files found by the base-contract search define their own local
 `baseContract: ReturnType<typeof oc.errors>` rather than importing `@netscript/contracts`
@@ -206,6 +215,7 @@ unless `packages/sdk/src/ports/service-client.ts` is changed.
 2. **Resolved:** #1466 owns metadata definition, initialization, and export. #1350 preserves only
    the existing fourth `ContractBuilder` generic as `Record<never, never>` and makes no metadata
    semantic claim.
-3. **Safe to defer:** `packages/contracts/README.md` and benchmark reference prose remain tracked
-   follow-up debt. They are not authorized here. Any attempt to edit either location—or any other
-   seventh product/test/docs path—is a rescope requiring a fresh ruling.
+3. **Safe to defer:** benchmark reference prose remains coordinator-owned follow-up debt and is not
+   authorized here. `packages/contracts/README.md` is also outside scope but is not stale on this
+   point. Any attempt to edit either location—or any other seventh product/test/docs path—is a
+   rescope requiring a fresh ruling.

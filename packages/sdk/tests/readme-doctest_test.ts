@@ -1,4 +1,53 @@
+import { baseContract, CursorPaginationInputSchema, SuccessSchema } from '@netscript/contracts';
 import { assertEquals } from './test-helpers.ts';
+import { isDefinedError, safe, type ServiceClient } from '../mod.ts';
+
+type IsAny<T> = 0 extends (1 & T) ? true : false;
+type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true
+  : false;
+type Assert<T extends true> = T;
+
+type BaseErrorCode = keyof typeof baseContract['~orpc']['errorMap'];
+type ExpectedBaseErrorCode =
+  | 'NOT_FOUND'
+  | 'VALIDATION_ERROR'
+  | 'UNAUTHORIZED'
+  | 'FORBIDDEN'
+  | 'RATE_LIMITED'
+  | 'SERVICE_UNAVAILABLE';
+type _BaseErrorCodesPreserved = Assert<Equal<BaseErrorCode, ExpectedBaseErrorCode>>;
+type _UndeclaredBaseErrorRejected = Assert<
+  Equal<Extract<'NOT_DECLARED', BaseErrorCode>, never>
+>;
+
+type BaseMeta = typeof baseContract['~orpc']['meta'];
+type _BaseMetaIsNotAny = Assert<Equal<IsAny<BaseMeta>, false>>;
+type _EmptyBaseMetaSlotPreserved = Assert<Equal<BaseMeta, Record<never, never>>>;
+
+const typedErrorContract = {
+  list: baseContract
+    .route({ method: 'GET', path: '/typed-error-probe' })
+    .input(CursorPaginationInputSchema)
+    .output(SuccessSchema),
+};
+
+declare const typedErrorClient: ServiceClient<typeof typedErrorContract>;
+
+async function assertRealExportErrorChannel(): Promise<void> {
+  const discriminated = await safe(typedErrorClient.list({ limit: 10 }));
+  if (!discriminated.isSuccess && discriminated.isDefined) {
+    // @ts-expect-error S2 must preserve the promise error union through safe().
+    discriminated.error.code;
+  }
+
+  const guarded = await safe(typedErrorClient.list({ limit: 10 }));
+  if (!guarded.isSuccess && isDefinedError(guarded.error)) {
+    // @ts-expect-error S2 must make isDefinedError narrow to a real defined error.
+    guarded.error.code;
+  }
+}
+
+void assertRealExportErrorChannel;
 
 const README_PATH = new URL('../README.md', import.meta.url);
 
