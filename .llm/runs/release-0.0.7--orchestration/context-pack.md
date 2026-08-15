@@ -279,3 +279,9 @@ Codex author is performing the bounded registration-signal lifetime repair befor
 IMPL-EVAL cycle 2. Features #1293 S1 is accepted at `49fda0b77`; S2 is active with an intentionally
 dirty implementation tree. Preserve every existing author thread and all four native topic
 supervisors. Serialize within each topic only; no cluster-wide serialization and no duplicate gate.
+
+Newer exact transition at `2026-08-15T09:53:39Z`: #1661's repair is Tier-A PASS at `df0534416`, and
+fresh cycle-2 evaluator `eb7149da-1689-44af-970e-ddd6e78022fa` / Fable 5 medium / Remote Control is
+active on that immutable head, bridge `cse_01CaAEKsH35CP2QgfNUVdXK1`. Features #1293 S2 is Tier-A
+PASS at `47ad48c9d`; S3 content `3dee41263` is running exact-head structured receipts. Internals'
+Opus evaluator remains active independently. Do not serialize these three topics against each other.

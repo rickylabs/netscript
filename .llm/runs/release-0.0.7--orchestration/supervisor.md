@@ -416,3 +416,15 @@ authority. Topic supervisors remain native Claude Opus 5/high with Remote Contro
 The central evaluator singleton remains lane-local: internals may evaluate while fixes and features
 implement. No expensive runtime lease is held. Coordinator route remains GPT-5.6-SOL/high, never
 max; all topic supervisors remain their existing native Claude Opus 5/high Remote Control sessions.
+
+### Live transition — 2026-08-15T09:53:39Z
+
+| Lane | Current serial action | Gate boundary |
+| --- | --- | --- |
+| internals | #1658 Opus 5/medium IMPL-EVAL continues at `f46d84630` | Immutable evaluator verdict before lifecycle or next leaf |
+| fixes | #1661 fresh Fable 5/medium IMPL-EVAL cycle 2 at `df0534416` after Tier-A PASS | Cycle-2 verdict must independently close F-1; next leaf remains queued |
+| features | #1293 S3 content `3dee41263`; exact-head structured receipts running | Fresh final Tier-A only after clean pushed evidence head; no evaluator yet |
+| docs | Exhausted and parked at `0ca4c489f` | No cross-topic issue reassignment |
+
+Two formal evaluators are valid concurrently because they occupy different topic slots. The shared
+Aspire/Docker/browser mutex is still free and all three active leaves avoid expensive runtime gates.

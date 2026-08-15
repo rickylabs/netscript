@@ -387,3 +387,7 @@ implementation thread.
   require another one-word coordinator grant. The fixes supervisor's pause was corrected using the
   owner's standing full-autonomy mandate; only a genuine rescope or owner-only decision should stop
   the bounded repair lifecycle.
+- **Evaluator scope is lane-local:** the historical central singleton language was too broad for the
+  owner's clarified queue rule. One evaluator per topic remains binding, but a fixes evaluator may
+  run while an internals evaluator is active. The coordinator granted #1661 cycle 2 without pausing
+  #1658 and recorded both identities separately; no expensive runtime mutex was involved.

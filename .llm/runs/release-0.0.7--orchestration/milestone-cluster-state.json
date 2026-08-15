@@ -115,7 +115,7 @@
         "pid": 26724,
         "bridgeSessionId": "session_014pCd2QWkCscgZpVdjcUPST",
         "remoteControlUrl": "https://claude.ai/code/session_014pCd2QWkCscgZpVdjcUPST",
-        "topicHeadSha": "9eba5f3d8f0a2876ac7096fabee6efd09c5a3a3c",
+        "topicHeadSha": "a6cb21f023b258851ed2556c9802e2202dec77a5",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle"
@@ -166,7 +166,7 @@
         "sessionId": "19621a0b-c6a0-47c6-b826-93c1634a6875",
         "bridgeSessionId": "session_01LQBHX8KpA5aYtDraq46J8a",
         "remoteControlUrl": "https://claude.ai/code/session_01LQBHX8KpA5aYtDraq46J8a",
-        "topicHeadSha": "3b89090620c748093846f97ceb648b78aef98ef5",
+        "topicHeadSha": "38abbacaf0874aeb14311de6f92d7ad1cfda9f9c",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
         "legacyState": "parked_idle"
@@ -949,7 +949,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "284dda90a17a13a7e5e8e9834e5411b58887131b",
-      "currentPrHeadSha": "1bdb09e1387583415928da0867ceb321d1e2e178",
+      "currentPrHeadSha": "df05344166adaeb2b8e2f2f6ec741e1032d29045",
       "issueNumbers": [
         1448
       ],
@@ -957,7 +957,7 @@
       "branch": "fix/ai-mcp-pool-isolation",
       "worktree": "/home/codex/repos/netscript-007-leaf-ai-mcp-pool",
       "prNumber": 1661,
-      "implementationState": "fix_cycle_1_running",
+      "implementationState": "formal_impl_eval_cycle_2_active",
       "scopeBlockerHeadSha": "1d4533462a088ad902ac7dd71be88764463fcd5d",
       "scopeRulingTopicHeadSha": "df20bb5a694ad95afd33ff5ca4f141a4199182f5",
       "scopeRulingLeafArtifactSha": "6db182503b219d76c7db23f89c71ec9e467c2f40",
@@ -973,7 +973,7 @@
       "amendment2Contract": "readResource remains optional on McpTransportPort for packages/fresh compatibility, but is required and abort-aware on BaseMcpTransport and both published wrappers; stop(options) forwards the signal through both wrappers; cross-package Fresh check is mandatory",
       "publicContract": "additive synchronous I/O-free per-server snapshot keyed by serverId with McpConnectionState and last error; cancellable close takes a signal options bag; pool.stop settles per server",
       "implementationHeadSha": "3a4bc66c4832baf8f209e47cc08c3a336e2ff100",
-      "tierAState": "WITHDRAWN_FAIL_FIX",
+      "tierAState": "PASS_AFTER_FIX_CYCLE_1",
       "tierASignoffHeadSha": "e3c74d7aaf3b7734b5a44a5be248c01f004c21e5",
       "tierACommentUrl": "https://github.com/rickylabs/netscript/pull/1661#issuecomment-5301585728",
       "crossPackageFreshCheck": "PASS: 197 files, 0 failed batches",
@@ -987,6 +987,16 @@
       "implementationEvaluatorCommitSha": "8d6b4726cf6663ff3ca1a3c5f9a6fe1d20d300e9",
       "tierAWithdrawalHeadSha": "1bdb09e1387583415928da0867ceb321d1e2e178",
       "repairContract": "decouple the registration/discovery signal from later registered tool calls; prove calls succeed after registration abort while retaining discovery-abort coverage; align README startup-deadline guidance",
+      "repairRedHeadSha": "59eca06470932a4beb90d82ba8c4d3bd2eed17ae",
+      "repairGreenHeadSha": "e4944309361fe18efea20be8a3df364bb8754d82",
+      "repairTierASignoffHeadSha": "df05344166adaeb2b8e2f2f6ec741e1032d29045",
+      "repairTierAState": "PASS",
+      "implementationEvaluationCycle2State": "active",
+      "implementationEvaluationCycle2SourceHeadSha": "df05344166adaeb2b8e2f2f6ec741e1032d29045",
+      "implementationEvaluatorCycle2AgentId": "eb7149da-1689-44af-970e-ddd6e78022fa",
+      "implementationEvaluatorCycle2BackgroundAgentId": "eb7149da",
+      "implementationEvaluatorCycle2BridgeSessionId": "cse_01CaAEKsH35CP2QgfNUVdXK1",
+      "implementationEvaluatorCycle2Route": "native claude-fable-5 / medium / Remote Control",
       "receiptRefs": []
     },
     {
@@ -1001,8 +1011,8 @@
       "implementerAgentId": "01a0048f-8d95-7682-a3ce-1c1926aba75c",
       "branch": "feat/prisma-mysql-adapter-surface",
       "worktree": "/home/codex/repos/netscript-007-features-1293",
-      "currentPrHeadSha": "49fda0b77b4db4a91f1cb25e23b13e4bf1259699",
-      "implementationState": "slice_2_running",
+      "currentPrHeadSha": "3dee41263e5e34a9f59972edb43a345c8d4494c0",
+      "implementationState": "slice_3_evidence_running",
       "compatibilityDisposition": "preserve and wire the already-published PrismaMySqlOptions.onConnectionError hook; removal is not authorized",
       "planEvaluationState": "complete",
       "planEvaluatedHeadSha": "23c4d671b57282ddf2e5c3b834ac8e787d1dff09",
@@ -1020,6 +1030,11 @@
       "slice1RepairHeadSha": "49fda0b77b4db4a91f1cb25e23b13e4bf1259699",
       "slice1TierAState": "PASS",
       "slice1Contract": "module-only concrete adapter seam, exact upstream-compatible query input type, bidirectional assignability guards, clean doc lint and unchanged eight-file publish set",
+      "slice2HeadSha": "47ad48c9dcfe408e5de150fdb3a65d0f2111ee1f",
+      "slice2TierAState": "PASS",
+      "slice2Contract": "closed connection-error classifier, single contained notifier choke point, raw executeScript rejection, identity-preserving callback containment, notify-and-preserve capability fallback",
+      "slice3ContentHeadSha": "3dee41263e5e34a9f59972edb43a345c8d4494c0",
+      "slice3State": "structured_receipts_running",
       "planEvaluatorTerminalMetadata": "stale working state; terminal response and exact pushed verdict commit independently verified by coordinator",
       "splitCloseContract": "product PR uses Part of #1293 and may merge on product gates while #1293 remains open; #1112 must rewrite and verify the docs example before box 4 and issue closure",
       "docsFollowUp": "#1112 and the prisma-adapter-mysql reference remain docs-owned and are not part of this product leaf",
@@ -1606,6 +1621,29 @@
       "grantedAt": "2026-08-15T09:38:04.000Z",
       "startedAt": "2026-08-15T09:40:04.876Z",
       "routeResolution": "Fable availability probe e58c5f01 failed before inference with zero tokens and no mutation; this Opus fallback is cycle 1"
+    },
+    {
+      "id": "ai-mcp-pool-isolation-impl-eval-cycle-2",
+      "state": "active",
+      "lane": "fixes",
+      "leafId": "ai-mcp-pool-isolation",
+      "phase": "impl-eval",
+      "cycle": 2,
+      "sourceHead": "df05344166adaeb2b8e2f2f6ec741e1032d29045",
+      "evaluatorAgentId": "eb7149da-1689-44af-970e-ddd6e78022fa",
+      "backgroundAgentId": "eb7149da",
+      "bridgeSessionId": "cse_01CaAEKsH35CP2QgfNUVdXK1",
+      "remoteControlUrl": "https://claude.ai/code/session_01CaAEKsH35CP2QgfNUVdXK1",
+      "route": {
+        "provider": "native-claude",
+        "model": "claude-fable-5",
+        "effort": "medium",
+        "remoteControlRequired": true
+      },
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-15T09:52:40.000Z",
+      "startedAt": "2026-08-15T09:52:52.080Z",
+      "evaluationFocus": "independently re-prove cycle-1 F-1 is closed by the RED-to-GREEN registration-signal lifetime repair"
     }
   ],
   "expensiveGates": [
@@ -1699,5 +1737,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T09:41:25.789Z"
+  "updatedAt": "2026-08-15T09:53:39.454Z"
 }

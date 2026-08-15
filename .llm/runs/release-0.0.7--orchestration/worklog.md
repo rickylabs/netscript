@@ -479,3 +479,19 @@
   scalar union, correct optional/required fields, no cast, and bidirectional compile-time
   assignability guards. S1 is accepted and S2 classifier/notifier wiring is active in the same
   lane-local serial queue.
+
+## 2026-08-15T09:53:39Z — fixes cycle 2 and features S3 advance independently
+
+- Fixes #1661 completed its bounded RED-to-GREEN repair: regression head `59eca0647` reproduced the
+  post-registration-abort failure; `e49443093` decoupled call lifetime from discovery lifetime and
+  aligned the README. Fresh Tier-A ran the time-separated behavior itself and signed PASS at exact
+  head `df0534416`; topic checkpoint `a6cb21f02` is pushed.
+- Per-topic evaluator serialization permits fixes and internals gates concurrently. The coordinator
+  granted #1661 IMPL-EVAL cycle 2 and recorded fresh Fable 5/medium Remote Control evaluator
+  `eb7149da-1689-44af-970e-ddd6e78022fa`, bridge `cse_01CaAEKsH35CP2QgfNUVdXK1`, immutable
+  source `df0534416`, before any evaluator artifact mutation. The next fixes leaf remains queued.
+- Features #1293 S2 passed independent Tier-A at `47ad48c9d`: predicate coverage, notifier
+  choke-point placement, duplicate-notification risk, raw `executeScript` rejection, callback
+  containment, primary-error identity, and capability fallback were all reviewed. Topic checkpoint
+  `38abbacaf` released S3. S3 content is pushed at `3dee41263`; exact-head structured final receipts
+  are running, so the leaf remains non-terminal and no formal evaluator is yet authorized.
