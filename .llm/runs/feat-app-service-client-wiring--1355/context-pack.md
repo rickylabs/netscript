@@ -91,9 +91,11 @@ failed. Full pretty and suite-owned NDJSON logs are hashed and preserved. Mandat
 independent Aspire/Docker/process/port audits prove the host empty; only protected Aspire MCP
 helpers remain. The lease is released after cleanup. `fresh-browser` is NOT_RUN because the
 scaffold prerequisite failed. Coordinator follow-up establishes why startup was opaque: no Linux
-browser exists, the resolver selected Windows Chrome without WSL binfmt interop, that child exited 2
-with a shell/PE syntax error, and the probe discarded its stderr while ignoring early status. F7 is
-a plan-only, two-path diagnostic amendment; browser capability policy remains coordinator-owned.
+path in the six-entry allowlist exists, so the resolver selected Windows Chrome without WSL binfmt
+interop, that child exited 2 with a shell/PE syntax error, and the probe discarded its stderr while
+ignoring early status. A corrected measurement found two runnable Playwright-managed Linux Chromium
+151 binaries. F7-C1 therefore classifies an allowlist/selection defect plus a startup-diagnostic
+defect and binds a strict explicit override; it is not an environmental capability gap.
 
 ## Completed
 
@@ -140,16 +142,16 @@ a plan-only, two-path diagnostic amendment; browser capability policy remains co
   `publish-dry-run`, `arch-check`) passes at `7fa29ad3e` and recomputes SUFFICIENT. The original
   permission-denied `f6-test` stays append-only as a superseded environmental red outside the set.
 - Attempts 1–5 remain append-only. Attempt 5 exposes the next probe integration failure—no CDP
-  target—while preserving the unknown refetch verdict. The exact startup mechanism is now measured,
-  and F7 binds an observable, bounded status/stderr repair without changing executable resolution.
-  Its cleanup is complete, the host is empty, and the lease is released; no retry or browser gate
-  is authorized.
+  target—while preserving the unknown refetch verdict. F7-C1 supersedes the unreviewed F7 premise:
+  managed Linux Chromium exists, so the repair must select an explicitly configured executable and
+  retain bounded status/stderr diagnostics. Cleanup is complete, the host is empty, and the lease is
+  released; no retry or browser gate is authorized.
 
 ## Next Steps
 
-1. Commit and push only the F7 plan/run artifacts.
-2. Post `[PHASE: PLAN] [SLICE: F7]` with the exact two-path ceiling, bounded startup-diagnostic seam,
-   proof matrix, and open coordinator host-policy options.
+1. Commit and push only the F7-C1 plan/run artifacts.
+2. Post `[PHASE: PLAN] [SLICE: F7-C1]` with the exact two-path ceiling, strict
+   `NETSCRIPT_E2E_BROWSER_EXECUTABLE` semantics, bounded startup diagnostics, and proof matrix.
 3. Stop for fresh Tier-A. Do not mutate the two planned paths, request a lease, retry runtime, or
    start browser/evaluator work.
 
@@ -163,6 +165,7 @@ a plan-only, two-path diagnostic amendment; browser capability policy remains co
 | Direct `clientKey()` filter; no SDK overload        | PLAN-EVAL cycle 1      | Preserves SDK 0.0.6 compatibility and satisfies A6.            |
 | Client generator owns `apps/<app>/lib/<service>.ts` | PLAN-EVAL cycle 1      | Init-owned showcase remains separate but shares the template.  |
 | Disabled services receive owned modules             | PLAN-EVAL cycle 2 C2   | `Enabled` affects runtime registration, not source generation. |
+| Explicit browser override is strict                  | F7-C1                  | `NETSCRIPT_E2E_BROWSER_EXECUTABLE`; invalid values never fall back or skip. |
 
 ## Files Changed
 
@@ -195,7 +198,7 @@ a plan-only, two-path diagnostic amendment; browser capability policy remains co
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
 | Static      | F6 check, test-attempt2 (4,229/0/19), publish dry-run, and arch-check PASS at `7fa29ad3e`; exact four-file set SUFFICIENT. Original `f6-test` FAIL is preserved as superseded environmental evidence outside the set. | four named passing receipts; quarantine and recovery reports |
 | Fitness     | Terminal cycle-2 PLAN-EVAL `PASS`                                                                                                 | `plan-eval.md`               |
-| Runtime     | Attempt 5 `scaffold.runtime` FAIL: 69 passed / 1 failed / 0 skipped over 70 steps. Service-client and generated-format proofs PASS; missing WSL browser capability makes the selected child exit 2, while the leaf probe masks status/stderr behind a CDP timeout. Cleanup and independent host audit empty; lease released. | `reports/s5-attempt5-runtime-failure.md`; pretty + NDJSON logs; F7 amendment |
+| Runtime     | Attempt 5 `scaffold.runtime` FAIL: 69 passed / 1 failed / 0 skipped over 70 steps. Service-client and generated-format proofs PASS; the allowlist ignores runnable managed Linux Chromium, selects an unrunnable Windows PE, and masks status/stderr behind a CDP timeout. Cleanup and independent host audit empty; lease released. | `reports/s5-attempt5-runtime-failure.md`; pretty + NDJSON logs; F7-C1 amendment |
 | Consumer    | `fresh-browser` NOT_RUN because attempt-5 scaffold prerequisite failed; no catalog receipt exists and browser cleanup audit was not reached. | S5 conditional contract |
 
 ## Open Questions
@@ -204,9 +207,9 @@ a plan-only, two-path diagnostic amendment; browser capability policy remains co
   carries them with attribution and does not repair them inline.
 - The S2 service-suite `generated.deno-lint` expectation gap is resolved by the reviewed S4-FIX1
   test-only repair.
-- Browser capability disposition remains coordinator-owned: explicit precondition failure, a
-  recorded skip with changed acceptance semantics, or host provisioning. F7 chooses none, and no
-  attempt 6 is authorized.
+- No browser-policy fork remains: the load-bearing runtime gate must prove refetch using a validated
+  explicit managed-browser override. F7-C1 still authorizes no attempt 6 or lease before Tier-A and
+  implementation convergence.
 
 ## Drift and Debt
 

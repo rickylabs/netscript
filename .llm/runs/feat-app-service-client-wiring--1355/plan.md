@@ -765,27 +765,34 @@ may the existing four binding cheap gates be refreshed at the committed content 
 `scaffold.runtime`, `fresh-browser`, Aspire, Docker, evaluator, readiness change, or product repair
 is authorized by this amendment.
 
-## F7 amendment — observable browser startup failure
+## F7-C1 amendment — managed-browser selection and observable startup failure
 
-### Disposition and measured cause
+### Corrected disposition and measured cause
 
-S5 attempt 5 is an honest red and is still not a refetch-behavior verdict. Its opaque timeout is a
-leaf-caused startup-diagnostic defect layered over an environmental missing-browser-capability gap.
-The suite reached all 70 steps with 69 passed, 1 failed, and 0 skipped; F5's
-`generated.deno-fmt-check` and F4's `generated.service-client-contract` remained green. F6 also did
-what it was intended to do: teardown returned control to the probe, allowing the first actual
-startup verdict. The refetch scenario itself remains unknown because the browser never started and
-the probe never connected CDP, navigated, mutated, or counted a refetch.
+S5 attempt 5 is an honest red and is still not a refetch-behavior verdict. The suite reached all 70
+steps with 69 passed, 1 failed, and 0 skipped; F5's `generated.deno-fmt-check` and F4's
+`generated.service-client-contract` remained green. F6 also worked: teardown returned control to
+the probe, exposing the startup failure. No CDP connection, navigation, mutation, or request-count
+assertion ran, so refetch behavior remains unknown.
 
-Coordinator measurement closes the startup-mechanism question. None of the four Linux browser
-candidates in `findBrowserExecutable()` exists. The resolver therefore selects Windows Chrome,
-but this WSL instance has no `WSLInterop` or `WSLInterop-late` binfmt registration. The probe's exact
-browser argv exits immediately with code 2 while `/bin/sh` parses the PE executable and writes
-`Syntax error: word unexpected (expecting ")")` to stderr. The current probe continuously drains
-that pipe into a discard sink, never inspects early child status during startup, and consequently
-waits for a DevTools endpoint that can never appear before reporting only a timeout. The measured
-failure occurred before `--user-data-dir`, the loopback address, or any path translation could
-reach Chrome; Windows-path and `127.0.0.1` rewrites are explicitly rejected hypotheses.
+The earlier F7 premise was materially stale and is superseded before review. The host does have
+runnable managed Linux Chromium binaries, independently measured with successful `--version`:
+
+```text
+/home/codex/.cache/ms-playwright/chromium-1232/chrome-linux64/chrome
+  -> Google Chrome for Testing 151.0.7922.10
+/home/codex/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome
+  -> Google Chrome for Testing 151.0.7922.34
+```
+
+The defect is executable allowlist/selection, not environmental capability. None of the probe's
+four `/usr/bin/*` Linux candidates exists, while its six-entry list does not inspect or accept an
+explicit managed-browser path. It therefore falls through to Windows Chrome. This WSL instance has
+no `WSLInterop`/`WSLInterop-late` binfmt registration, so the exact browser argv exits 2 while
+`/bin/sh` parses the PE file and writes `Syntax error: word unexpected (expecting ")")`. The probe
+then compounds selection failure by draining that stderr into a discard sink, ignoring early child
+status, and reporting only a DevTools timeout. The child never bound the port; path translation and
+`127.0.0.1` handling remain refuted hypotheses.
 
 Attempt-5 evidence remains append-only:
 
@@ -799,77 +806,93 @@ All four earlier S5 attempts and their hashes, `receipts/f6-test.json` as a supe
 S4/F4/F5/F6 report and receipt, Fresh's 45 and SDK's 3 `PRE_EXISTING_FAIL` diagnostics, and the
 separately named plugin-streams diagnostic remain unchanged.
 
-### Locked diagnostic seam
+### Locked executable-selection boundary
 
-The later repair adds two small E2E-internal seams in
-`service-client-browser-probe.ts`; they may be exported only for the existing same-package focused
-test and must not be re-exported through a CLI package barrel:
+The portable override is the explicitly documented environment variable
+`NETSCRIPT_E2E_BROWSER_EXECUTABLE`. Versioned Playwright/Puppeteer cache paths are runtime values,
+never source constants or fallback candidates; neither `chromium-1232` nor `chromium-1234` may
+appear in either later code path. The name is documented in adjacent source JSDoc, selection errors,
+and focused tests without adding a README or third path.
+
+The later repair replaces the path-only resolver result with these E2E-internal, same-module seams:
 
 ```ts
-export interface BrowserStderrCapture {
+export const BROWSER_EXECUTABLE_ENV = 'NETSCRIPT_E2E_BROWSER_EXECUTABLE';
+
+export interface BrowserExecutableSelection {
+  readonly path: string;
+  readonly source: typeof BROWSER_EXECUTABLE_ENV | 'built-in allowlist';
+  readonly version: string;
+}
+
+export async function selectBrowserExecutable(
+  override: string | undefined = Deno.env.get(BROWSER_EXECUTABLE_ENV),
+  probe: (path: string) => Promise<string> = probeBrowserVersion,
+): Promise<BrowserExecutableSelection>
+```
+
+These exports are test seams only and are not re-exported through any CLI package barrel.
+`probeBrowserVersion` validates that the path exists, is a file, and—where Unix mode bits are
+available—has an execute bit before spawning `<path> --version`. The probe has a bounded timeout,
+captures bounded stdout/stderr, requires exit 0, and requires a recognizable Chrome/Chromium/Edge
+version string. Missing, non-file, non-executable, spawn failure, timeout, non-zero exit, and
+unrecognized output are distinct reasons in the error text.
+
+Override semantics are strict:
+
+- If `NETSCRIPT_E2E_BROWSER_EXECUTABLE` is present, including an empty value, only that value is
+  considered. Empty is invalid; a non-empty value is passed to `probeBrowserVersion`.
+- Any override failure throws an error naming the exact source
+  `NETSCRIPT_E2E_BROWSER_EXECUTABLE`, the supplied path (or `<empty>`), and the specific reason.
+  The built-in list is never consulted after an override was supplied.
+- If no override is present, the existing built-in candidates remain fallbacks, but a path is
+  selected only after the same runnable/version probe succeeds. Present-but-unrunnable candidates
+  are recorded in the final error rather than returned merely because `Deno.stat` found a file.
+- If no built-in is runnable, the error names the attempted candidates and tells the operator to
+  set `NETSCRIPT_E2E_BROWSER_EXECUTABLE`. There is no skip path.
+
+`collectBrowserRefetchEvidence` receives `BrowserExecutableSelection`, spawns `selection.path`, and
+carries `selection.source` and `selection.path` into every actual headless-startup error. Thus an
+override that passes `--version` but exits under the real headless argv still fails loudly against
+that override and never falls back.
+
+### Locked bounded startup diagnostics
+
+The correct F7 bounded-status design remains. One generic bounded capture serves both executable
+version probing and browser stderr:
+
+```ts
+export interface BoundedTextCapture {
   readonly drain: Promise<void>;
   text(): string;
 }
 
-export function captureBrowserStderr(
+export function captureBoundedText(
   stream: ReadableStream<Uint8Array>,
   maxBytes?: number,
-): BrowserStderrCapture
+): BoundedTextCapture
 
 export async function awaitBrowserStartup<TTarget>(
+  selection: BrowserExecutableSelection,
   target: Promise<TTarget>,
   status: Promise<Deno.CommandStatus>,
-  stderr: BrowserStderrCapture,
+  stderr: BoundedTextCapture,
 ): Promise<TTarget>
 ```
 
-`captureBrowserStderr` starts consuming the pipe immediately and continuously through one reader.
-It retains only the final `32 * 1024` bytes by default, never an unbounded transcript; once more
-than the limit has been observed, `text()` prefixes the decoded tail with an explicit truncation
-marker. Retaining the tail preserves the browser's terminal diagnostic while bounding memory. The
-raw `drain` promise remains failure-capable and is the same promise passed to F6's
-`terminateBrowserProcess`; there is no second reader and no `.catch(() => undefined)` or discard
-sink. `text()` is consumed for an error only after `drain` completes.
+`captureBoundedText` immediately and continuously drains through one reader while retaining only
+the final `32 * 1024` bytes by default. Truncation is explicit. The raw failure-capable drain is the
+same promise passed to F6's `terminateBrowserProcess`; there is no second reader, discard sink, or
+swallowed drain.
 
 `awaitBrowserStartup` races the existing `waitForDebugTarget(port)` promise against the one
-`child.status` promise captured immediately after spawn. If the target wins, startup proceeds
-unchanged and the still-running capture continues until F6 cleanup terminates the browser. If
-status wins first, the helper awaits `stderr.drain` and throws a startup error containing the exact
-numeric exit code, signal value, and bounded stderr text (or an explicit `<empty>` marker). It must
-not translate that result into, wrap it behind, or wait for the generic DevTools timeout. If the
-target promise itself times out while the child is still alive, the existing
-`timed out waiting for Chrome DevTools target` result remains the verdict; early-exit diagnostics
-do not erase a real live-child timeout.
-
-`collectBrowserRefetchEvidence` creates one bounded capture and one status promise at spawn, passes
-the target/status/capture to `awaitBrowserStartup`, and passes that same capture's `drain` to
-`terminateBrowserProcess` in the existing enclosing cleanup. F6's exact already-terminated
-discriminator, status/drain awaiting, CDP close, stable request baseline, response-stage resume,
-evidence shape, and all refetch assertions remain unchanged.
-
-This fixes the startup instance of the same swallow class F6 removed from teardown: a child-process
-error remains observable while its pipe is still drained. It does not merely replace the current
-line with a different sink.
-
-### Executable resolution and open host-policy decision
-
-The later F7 diagnostic repair does **not** change `findBrowserExecutable()`: no candidate order,
-Windows path, WSL path conversion, interop launcher, debugging address, or loopback behavior changes.
-The measured defect requiring code is loss of child status/stderr, and the diagnostic seam is valid
-regardless of which executable a future host can run.
-
-The missing host capability is coordinator-owned and remains open. F7 records, but does not choose,
-these materially different dispositions:
-
-| Coordinator option | Consequence |
-| --- | --- |
-| Fail an explicit capability precondition | The scaffold gate remains red, but it fails before spawn with a direct no-runnable-browser reason. Implementing this changes executable-resolution policy and requires a fresh ruled amendment even if it stays within the same source file. |
-| Skip with a recorded reason | The runtime suite no longer proves the load-bearing refetch scenario on this host. This changes gate/suite acceptance semantics and necessarily exceeds the two-path F7 ceiling; it requires explicit coordinator approval and a newly bounded plan. |
-| Provide a runnable Linux browser or register supported WSL interop | No repo policy change is needed; a later leased run can execute the real refetch scenario. Host provisioning and validation are external coordinator work. |
-
-Until the coordinator selects a policy or supplies the missing capability, no attempt 6 or
-expensive-gate lease is warranted. The diagnostic repair itself may be reviewed and cheaply proven
-without deciding that policy.
+`child.status` promise captured at spawn. Target-first proceeds normally. Status-first awaits the
+drain and throws with selection source/path, numeric exit code, signal, and bounded stderr (or
+`<empty>`), never the generic timeout. If the target promise rejects while status remains pending,
+the helper preserves that cause/text but enriches the error with selection source/path; it does not
+invent an exit status. F6's termination discriminator, CDP close, stable baseline, response-stage
+resume, evidence shape, and refetch assertions remain unchanged. This fixes the startup instance of
+the same swallow class F6 already removed from teardown.
 
 ### Exact later path ceiling
 
@@ -878,23 +901,26 @@ F7 implementation may modify exactly the two already-owned F6 paths:
 1. `packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts`
 2. `packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts`
 
-There is no new module, gate, suite, task, catalog, template, fixture, package barrel, SDK/Fresh,
-`docs/**`, or `deno.lock` path. `findBrowserExecutable()` behavior is excluded even though it lives
-in the first named file. A compiler-proven need for a third path, or any host-capability policy
-implementation, stops for another amendment and fresh Tier-A review.
+There is no new module, gate, suite, task, catalog, template, fixture, package barrel, README,
+SDK/Fresh, `docs/**`, or `deno.lock` path. A compiler-proven need for a third path stops for another
+amendment and fresh Tier-A review.
 
 ### Cheap deterministic proof matrix
 
-| Proof | Executable assertion in `service-client-runtime-probe_test.ts` |
+| Proof | Executable assertion/evidence |
 | --- | --- |
-| Immediate early exit | Spawn a real child that writes a unique stderr sentinel and exits with code 2. Start the same bounded capture, pass a never-resolving target promise plus the real `child.status` to `awaitBrowserStartup`, and require a rejection naming code 2 and the sentinel. Require the message not to contain `timed out waiting for Chrome DevTools target`. This reproduces the attempt-5 ordering without a browser. |
-| Bounded continuous drain | Spawn a child that writes more than 32 KiB, ending in a unique terminal sentinel, and exits. Require the early-exit error to carry the truncation marker and terminal sentinel while the retained stderr portion is bounded to the declared limit. This proves the pipe is drained rather than abandoned and cannot grow retained memory with a chatty browser. |
-| Live-child timeout distinction | With a still-pending status promise and a deterministic target promise that rejects with the existing DevTools timeout, require that exact timeout to propagate. This prevents the early-exit branch from relabeling a real live-child startup timeout. |
-| Production wiring and F6 preservation | Assert the source uses `captureBrowserStderr(child.stderr)`, captures `child.status`, delegates startup to `awaitBrowserStartup`, passes the same `.drain` to `terminateBrowserProcess`, and contains no `WritableStream({ write: () => undefined })` stderr sink. Rerun all existing F6 natural-exit, active-SIGTERM, three-negative, and cleanup-delegation proofs unchanged. |
+| Managed Linux binary | Record the coordinator's two successful Chrome-for-Testing 151 `--version` measurements above. After implementation, pass one measured path as the environment value—not a source literal—and require `selectBrowserExecutable()` to report source `NETSCRIPT_E2E_BROWSER_EXECUTABLE`, the exact supplied path, and a recognizable Google Chrome version. Assert neither versioned cache directory appears in source or test. |
+| Override precedence and success | Through the selector's injected probe seam, supply an override and a different would-be successful fallback. Require exactly one probe call for the override and the returned selection to retain override source/path/version. This fails if candidate search precedes or follows an explicit override. |
+| Invalid override, no fallback | Exercise empty, missing, non-executable, spawn-failing, timed-out/non-zero, and unrecognized-version overrides. Each rejection must name `NETSCRIPT_E2E_BROWSER_EXECUTABLE`, the exact path or `<empty>`, and its specific reason. The injected call log must prove no built-in candidate was probed after failure. |
+| Immediate headless exit | Spawn a real child that writes a unique stderr sentinel and exits 2. With override selection metadata and a never-resolving target, require an error naming the override source/path, code 2, and the sentinel, with no DevTools-timeout wording. |
+| Bounded continuous drain | Emit more than 32 KiB ending in a terminal sentinel. Require the truncation marker, retained tail bound, terminal sentinel, and completed drain. |
+| Live-child timeout and F6 | With status pending, require the selection-aware error to name override source/path and preserve the original target-timeout cause/text without claiming an exit code. Source wiring must use one bounded capture/status race, pass the same drain to `terminateBrowserProcess`, contain no discard sink, and keep all F6 natural-exit, active-SIGTERM, three-negative, and delegation proofs green. |
 
-After a later Tier-A release, only the focused deterministic test and ordinary cheap binding gates
-may run. This amendment authorizes no lease, `scaffold.runtime`, `fresh-browser`, Aspire, Docker,
-evaluator, readiness/metadata change, or product repair.
+The gate must prove settled refetch; skip is not an outcome. After a later Tier-A release and cheap
+convergence, a coordinator-granted lease must execute `scaffold.runtime` with the explicit managed
+Linux browser override and require `behavior.service-client-refetch` to pass before the conditional
+`fresh-browser` gate can run. This amendment itself authorizes no lease, expensive gate, Aspire,
+Docker, evaluator, readiness/metadata change, or product repair.
 
 ## Drift Watch
 

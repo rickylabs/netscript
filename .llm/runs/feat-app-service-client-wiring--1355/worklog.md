@@ -789,24 +789,30 @@ receipt exists because scaffold was red; the second browser cleanup audit is not
 Full evidence and attribution are in `reports/s5-attempt5-runtime-failure.md`. All earlier attempts,
 reports, receipts, and carried baselines remain append-only.
 
-## F7 plan amendment — observable browser startup failure
+## F7-C1 plan amendment — managed-browser selection and observable startup failure
 
-F7 is plan-only and awaits fresh Tier-A review. Coordinator measurement corrected attempt 5's
-previously unknown startup mechanism: no Linux browser candidate exists, Windows Chrome is selected,
-and missing WSL binfmt interop makes the exact child exit 2 with a shell/PE syntax error. The probe
-drained that diagnostic into a discard sink and did not inspect status while awaiting CDP, so it
-reported only a timeout. Path conversion and loopback handling are refuted and excluded.
+The unreviewed F7 plan at `ff0ede997` is superseded because its host-capability premise was stale.
+Coordinator measurement found two executable Playwright-managed Linux Chromium 151 binaries under
+`chromium-1232` and `chromium-1234`, both returning successful Google Chrome for Testing version
+strings. The runtime red is therefore an allowlist/selection defect: the six built-in candidates
+omit managed browsers and select Windows Chrome without WSL binfmt interop. The independent startup
+diagnostic defect then discards its code-2 shell/PE stderr and reports only a timeout. Path conversion
+and loopback handling remain refuted.
 
-The bounded later repair stays inside the existing F6 probe/test pair. One named capture drains
-stderr continuously while retaining only a 32 KiB tail; one named startup helper races the existing
-target promise against child status and reports early exit code/signal plus captured stderr. The
-same raw drain remains owned by F6 termination. Deterministic cheap proofs cover an immediate code-2
-exit with sentinel stderr, bounded chatty output, live-child timeout distinction, source wiring, and
-all existing F6 cases.
+The corrected later repair remains inside the existing F6 probe/test pair. The strict portable
+boundary is `NETSCRIPT_E2E_BROWSER_EXECUTABLE`; an explicit value is exclusively validated with a
+bounded `--version` probe and never falls back. Missing, empty, non-executable, start-failing,
+timed-out/non-zero, and unrecognized values name the environment source and exact path. Without an
+override, built-in candidates must pass the same runnable-version check before selection. Versioned
+cache paths remain runtime values and are prohibited from source/test literals.
 
-Executable resolution is unchanged. Explicit precondition failure, recorded skip, and host
-provisioning remain separate coordinator options with different acceptance consequences; F7 does
-not select one. The exact path ceiling and proof matrix are recorded in `plan.md` and
-`reports/f7-plan-amendment.md`. This slice changed run artifacts only and ran no test, gate, lease,
-browser, Aspire, Docker, evaluator, readiness action, or metadata action. All prior evidence remains
-append-only.
+The bounded startup repair remains: a 32 KiB tail capture continuously drains, and the target/status
+race reports selection source/path, exit code/signal, and stderr. Deterministic cheap proofs bind the
+managed-binary version measurement, override precedence and invalid no-fallback cases, immediate
+headless exit, retention bound, selection-aware live timeout, and all F6 cases. The runtime gate must
+prove refetch; there is no skip outcome.
+
+The exact path ceiling and proof matrix are recorded in `plan.md` and
+`reports/f7-plan-amendment.md`. This correction changed run artifacts only and ran no test, gate,
+lease, browser, Aspire, Docker, evaluator, readiness action, or metadata action. All prior evidence
+remains append-only.

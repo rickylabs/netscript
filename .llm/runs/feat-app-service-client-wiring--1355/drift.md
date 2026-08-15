@@ -117,18 +117,20 @@ current-state documentation.
   and fixtures unchanged.
 - **Evidence:** `plan.md` F5 amendment and `reports/f5-plan-amendment.md`.
 
-## 2026-08-15 — F7 browser startup diagnostics were swallowed
+## 2026-08-15 — F7-C1 corrects browser selection and swallowed startup diagnostics
 
-- **What:** Attempt 5 reduced an immediate browser-child failure to a generic DevTools timeout.
-- **Source:** coordinator measurement of the probe's exact argv and
-  `service-client-browser-probe.ts` startup pipe/status flow.
+- **What:** Attempt 5 reduced an immediate browser-child failure to a generic DevTools timeout, and
+  the first F7 amendment incorrectly classified the host as lacking Linux browser capability.
+- **Source:** corrected coordinator measurement of managed Chromium caches, the probe's exact argv,
+  and `service-client-browser-probe.ts` selection/pipe/status flow.
 - **Expected:** the browser child reaches CDP so the probe can judge settled refetch behavior, or
   startup failure reports actionable process evidence.
-- **Actual:** no Linux browser exists; Windows Chrome is selected without WSL binfmt interop and
-  exits 2 with a shell/PE syntax error. The probe drains stderr into a discard sink and does not
-  observe early status, so refetch behavior remains unknown.
+- **Actual:** runnable Playwright-managed Linux Chromium 151 binaries exist but are outside the
+  six-entry allowlist. The resolver therefore selects Windows Chrome without WSL binfmt interop;
+  it exits 2 with a shell/PE syntax error that the probe discards while ignoring early status.
+  Refetch behavior remains unknown.
 - **Severity:** significant
-- **Action:** pending Tier-A, retain bounded stderr while continuously draining, race target startup
-  against child status, and report code/signal/stderr on early exit. Do not change executable
-  resolution or select the coordinator-owned host-capability policy in this amendment.
-- **Evidence:** `plan.md` F7 amendment and `reports/f7-plan-amendment.md`.
+- **Action:** pending Tier-A, add strict `NETSCRIPT_E2E_BROWSER_EXECUTABLE` selection with no silent
+  fallback, runnable/version validation, and no versioned cache literals; retain bounded stderr,
+  race target startup against child status, and report source/path/code/signal/stderr on early exit.
+- **Evidence:** `plan.md` F7-C1 amendment and `reports/f7-plan-amendment.md`.

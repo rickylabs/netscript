@@ -1,39 +1,36 @@
-# F7 plan amendment — observable browser startup failure
+# F7-C1 plan amendment — managed-browser selection and observable startup failure
 
 ## Stop boundary
 
-This is a plan-only artifact. No source, test, template, fixture, generated asset, lockfile, or
-`docs/**` path changed. No test or gate ran; there was no browser, Aspire, Docker, evaluator,
-runtime lease, attempt 6, readiness transition, or metadata action.
+This corrects the unreviewed F7 plan at `ff0ede997`; its host-capability premise was stale. No
+source, test, template, fixture, generated asset, lockfile, README, or `docs/**` path changed. No
+test or gate ran; there was no browser, Aspire, Docker, evaluator, runtime lease, attempt 6,
+readiness transition, or metadata action.
 
-## Disposition and measured cause
+## Corrected measurement and classification
 
-S5 attempt 5 completed 70 steps with 69 passed, 1 failed, and 0 skipped. The two earlier runtime
-repairs remained proven: `generated.deno-fmt-check` and `generated.service-client-contract` passed,
-and F6 allowed the browser probe to return a real startup verdict instead of dying in teardown. The
-sole failure is still not a refetch-behavior verdict because no CDP connection, navigation,
-mutation, or request-count assertion ran.
+S5 attempt 5 completed 70 steps with 69 passed, 1 failed, and 0 skipped. F4/F5 stayed green, and F6
+allowed the probe to expose a startup verdict rather than dying in teardown. Refetch behavior is
+still unknown because no CDP connection, navigation, mutation, or request-count assertion ran.
 
-The opaque timeout is a leaf-caused diagnostic defect layered over an environmental capability gap:
-this host currently has no browser execution path the probe can successfully launch.
+The host has two measured runnable Linux Chromium binaries:
 
-Coordinator measurement establishes the mechanism without inference:
+```text
+/home/codex/.cache/ms-playwright/chromium-1232/chrome-linux64/chrome
+  -> Google Chrome for Testing 151.0.7922.10
+/home/codex/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome
+  -> Google Chrome for Testing 151.0.7922.34
+```
 
-1. No Linux browser candidate in the probe exists.
-2. The resolver selects Windows Chrome.
-3. This WSL instance has no `WSLInterop`/`WSLInterop-late` binfmt registration.
-4. The exact argv exits 2 immediately while `/bin/sh` parses the PE file and emits
-   `Syntax error: word unexpected (expecting ")")`.
-5. The probe drains stderr into a discard sink and does not observe early status while awaiting the
-   DevTools target, reducing an actionable child failure to a timeout.
+The probe's list contains neither and has no explicit override. Its `/usr/bin/*` entries are absent,
+so it selects Windows Chrome; missing WSL binfmt interop makes that child exit 2 with
+`Syntax error: word unexpected (expecting ")")`. The probe discards stderr and ignores early status,
+turning the selection error into a timeout. This is an allowlist/selection defect plus a startup
+diagnostic defect—not an environmental capability gap. Path translation and loopback remain
+refuted causes.
 
-The browser never ran, bound no port, and never received the user-data-dir or loopback arguments.
-Path translation and `127.0.0.1` handling are refuted hypotheses and are not planned changes.
-
-The attempt-5 pretty log remains
-`reports/s5-attempt5-scaffold-runtime-20260815-2139.log` with SHA-256
-`ff349b40f7f70341934e170df7c67d147c0ed983173b41871421755ad55e062b`; its suite-owned NDJSON remains
-`reports/s5-attempt5-scaffold-runtime-20260815-2139.ndjson` with SHA-256
+Attempt-5 pretty and NDJSON logs remain unchanged with SHA-256
+`ff349b40f7f70341934e170df7c67d147c0ed983173b41871421755ad55e062b` and
 `e35d6fbcbdfc0b046be3fec29fa5dee0b0369094645b75cb42fca1e0350bbc16`. All five attempt logs,
 `f6-test.json`, prior reports/receipts, and attributed Fresh/SDK baselines remain append-only.
 
@@ -44,44 +41,49 @@ Only these two already-owned paths may change after fresh Tier-A approval:
 1. `packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts`
 2. `packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts`
 
-No third path is planned. Although `findBrowserExecutable()` is in the first path, its candidate
-order and selection behavior are explicitly excluded. Any third path or host-policy implementation
-requires another amendment and Tier-A review.
+No third path is planned. No versioned Playwright/Puppeteer cache path may be hard-coded in either
+path. Any third path stops for another amendment and Tier-A review.
 
-## Named internal seams
+## Strict executable selection
 
-The probe module will own same-package E2E test seams named `captureBrowserStderr` and
-`awaitBrowserStartup`. They are not package-barrel exports.
+The portable override is `NETSCRIPT_E2E_BROWSER_EXECUTABLE`, documented in adjacent source JSDoc,
+errors, and focused tests. The same-module selector returns path, source, and validated browser
+version. It runs a bounded `<path> --version` probe and requires an existing executable file, a
+bounded successful launch, exit 0, and recognizable Chrome/Chromium/Edge output.
 
-`captureBrowserStderr(stream, maxBytes?)` immediately and continuously drains a
-`ReadableStream<Uint8Array>`, retains only the final 32 KiB by default, and exposes the raw
-failure-capable `drain` promise plus `text()`. Truncation is explicit in the text. The tail is chosen
-because the terminal browser diagnostic is the most actionable portion; bounded retention prevents
-a chatty child from consuming unbounded memory.
+If the variable is present, including empty, it is exclusive: empty, missing, non-file,
+non-executable, spawn-failing, timed-out, non-zero, or unrecognized values fail with the variable
+name, exact path or `<empty>`, and specific reason. There is never fallback after an explicit
+override. With no override, built-in candidates are selected only after the same runnable-version
+probe; a present Windows PE is not selectable merely because it exists. Exhaustion names failures
+and instructs the operator to set the override. There is no skip path.
 
-`awaitBrowserStartup(target, status, stderr)` races the existing DevTools-target promise against
-the child status captured at spawn. Target-first preserves current startup. Status-first awaits the
-stderr drain and rejects with numeric exit code, signal, and bounded stderr (or `<empty>`), never a
-DevTools timeout. A target timeout while status remains pending propagates unchanged. The same
-capture drain is later passed into F6's `terminateBrowserProcess`; no second reader, discard sink,
-or swallowed drain is allowed.
+The current measured cache paths are runtime environment values only. A future lease supplies one
+as `NETSCRIPT_E2E_BROWSER_EXECUTABLE`; the repository contains no `chromium-1232` or
+`chromium-1234` literal.
 
-## Open coordinator policy
+## Bounded startup diagnostics
 
-F7 does not decide whether the missing runnable-browser capability should be an explicit
-precondition failure, a recorded skip, or an environment provisioning requirement. Explicit fail
-would alter resolver policy; skip would weaken a load-bearing gate and exceed this ceiling; a Linux
-browser or supported interop is external host work. No new expensive lease is warranted until the
-coordinator chooses or supplies the capability.
+One `captureBoundedText` seam continuously drains a stream while retaining only its final 32 KiB
+with an explicit truncation marker. It supports bounded version output and replaces the browser
+stderr discard sink. `awaitBrowserStartup` races the DevTools-target promise against child status
+and takes the executable selection metadata. Early exit awaits the drain and reports override
+source/path, code, signal, and bounded stderr; a genuinely live-child target timeout propagates
+with its cause/text preserved and override source/path added, without inventing an exit status. The
+same raw drain continues into F6's `terminateBrowserProcess` and remains failure-capable. This is
+the startup occurrence of the swallow class F6 removed from teardown.
 
-## Cheap deterministic proof matrix
+## Cheap proof matrix
 
 | Scenario | Required assertion |
 | --- | --- |
-| Immediate exit | A real child writes a known stderr sentinel and exits 2. With a never-resolving target promise, the shared startup helper rejects with code 2 and the sentinel and does not contain the DevTools-timeout text. |
-| Bounded drain | A child writes more than the 32 KiB limit and ends with a sentinel. The rejection has a truncation marker and the tail sentinel, retained stderr stays within the limit, and the pipe reaches EOF. |
-| Live timeout | With status pending, a deterministic target-timeout rejection propagates unchanged, proving live timeout and early exit remain distinct. |
-| Wiring/F6 | Source assertions require the one bounded capture, status race, and shared raw drain; prohibit the discard sink; and rerun all existing F6 termination/negative/delegation tests unchanged. |
+| Managed binary | Preserve both measured Chrome-for-Testing 151 version results. Later pass one path as the environment value and require selector source/path plus recognizable version, while asserting neither versioned cache directory exists in source/test. |
+| Override precedence | Inject a probe with an override and another would-be fallback; require exactly one override call and returned override metadata. |
+| Invalid override | Empty, missing, non-executable, spawn-failing, timeout/non-zero, and unrecognized values each name the variable/path/reason, and the call log proves no fallback. |
+| Immediate startup exit | A real child writes sentinel stderr and exits 2; require override source/path, code, and stderr without timeout wording. |
+| Bounded drain | More than 32 KiB retains a bounded marked tail ending in the sentinel and reaches EOF. |
+| Live timeout/F6 | A pending status preserves the target-timeout cause/text, adds override source/path, and claims no exit code; source wiring has no discard sink, shares the raw drain with termination, and all F6 proofs remain green. |
 
-Only focused and ordinary cheap binding validation may follow a future implementation release. No
-runtime or browser gate is part of this amendment.
+The runtime gate must prove settled refetch; skip is not an outcome. Only focused and ordinary cheap
+binding validation may follow a future implementation release. A later expensive run requires a new
+lease and the explicit managed-browser override.
