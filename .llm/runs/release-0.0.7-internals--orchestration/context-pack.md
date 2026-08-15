@@ -80,12 +80,36 @@ gate.
 
 ## Next action
 
-Both dispatched gates are terminal `PASS`. Under the coordinator's post-gate grant, #1653
-implementation resumes on the **existing** Codex thread `019ffcc9-97d6-7602-bb7d-582ecc92b069`
-(`codex exec resume`, never a replacement `send-message-v2`), against the evaluator-approved plan,
-with the PR moved `status:plan-eval` → `status:impl`. Slices are bounded, each with structured
-`run-gate.ts` receipts and a Tier-A stop before the supervisor sign-off commit; no lane
-self-certifies.
+**Both dispatched gates are closed and #1653 implementation is complete.** All four planned slices
+landed, each with a supervisor Tier-A sign-off commit:
 
-Explicitly withheld from this lane: re-opening order 1, merging, publishing, and acquiring the
-expensive-gate mutex. #1644 stays parked at `status:impl` awaiting coordinator merge-readiness.
+| Slice                                                    | Implementation head | Sign-off commit |
+| -------------------------------------------------------- | ------------------- | --------------- |
+| S1 registration + fail-closed resolver                   | `586b55135`         | `3c3985289`     |
+| S2 `public-any` / `public-export-unresolved` enforcement | `f869a5bfe`         | `f9acdb426`     |
+| S3 consumer asset + JSR/debt evidence                    | `2977c8333`         | `83f7a1847`     |
+| S4 consumer portability restoration + final gates        | `71c264458`         | `2d5e4f5ae`     |
+
+Leaf head `2d5e4f5ae`, local = remote, worktree clean, PR #1653 draft at `status:impl`.
+
+The leaf is parked awaiting the **coordinator's IMPL-EVAL grant**. IMPL-EVAL is a formal gate
+needing a fresh separate opposite-family session on the reset dispatch route; this lane does not
+launch it. Readiness flip, `status:ready-merge`, PR-body box ticking, merge, and publication are all
+coordinator-owned.
+
+DoD stands at 10/12 truthfully tickable rows. The two open rows were Slice 4 Tier-A review (closed
+by `2d5e4f5ae`) and IMPL-EVAL (open).
+
+## Carried into IMPL-EVAL
+
+- **`explicit-any` vs `public-any` overlap** — the broad line-level classifier and the export-graph
+  rule now coexist. Locked plan behaviour that PLAN-EVAL passed, but confirm each violation is
+  reported once with the intended attribution.
+- **`D-12` import-specifier trade-off** — `.llm/tools/quality/scan-code-quality.ts` must keep the
+  inline `jsr:@std/path@^1` specifier because it ships to consumers via `agent-tools.generated.ts`.
+  A future lint pass over `.llm/tools/**` will want to "fix" it again; it must not. The binding
+  `test` gate is what protects this.
+- **Workers JSR baseline** — accepted exact-20 `private-type-ref`, owned by #1655 in 0.0.8, strict
+  no-increase, and never to be claimed green.
+- **Receipt head convention** — slice receipts attest the pre-commit parent, matching what IMPL-EVAL
+  already accepted on #1644.
