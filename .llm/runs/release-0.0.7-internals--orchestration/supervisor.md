@@ -155,3 +155,64 @@ around.
 
 Queued behind the WIP limit: wave 3 `jsdoc-example-compile-gate` (#1533) and
 `leak-check-process-descendants` (#1429); wave 4 `fresh-defer-test-capability` (#1557/#1601).
+
+
+## HANDOFF — low-credit checkpoint (2026-08-15T19:10:48Z)
+
+### State at pause
+
+| Item | Value |
+| ---- | ----- |
+| Topic branch head | `72040679859cfff4ff8fc98b67e5e0a35f09d380` — clean, pushed, local == remote |
+| Leaf #1666 head | `010da98a230503bb27b46eb0edc5e979929f7fb1` — clean, local == remote == PR |
+| #1666 implementation head | `4238670173271bca4281eba7db6c2030d046bc73` (test-only F1 repair) |
+| #1666 evidence head | `010da98a230503bb27b46eb0edc5e979929f7fb1` (artifacts-only) |
+| #1666 PR | OPEN, **draft**, `status:impl`, milestone `0.0.7`, `Closes #1296`, MERGEABLE |
+| #1663 | **parked untouched** at `194e22a3d`, owner-only exceptional-third-PLAN-EVAL boundary |
+| L-2 | deferred, undecided (root lint drops ~1,027 files incl. 700 in published `packages/cli`) |
+| Wave 3 | queued behind `activeImplementationSlicesPerLane: 2` |
+| Runtime lease | none held; `fresh-browser` N/A / waived, `NOT_RUN` |
+
+### IN FLIGHT — do not relaunch, attach to it
+
+**IMPL-EVAL cycle 2 for #1666 is live and mid-evaluation.** It was deliberately left running: it is
+doing legitimate work, and killing it would waste the cycle and risk being miscounted as a consumed
+evaluation.
+
+| Field | Value |
+| ----- | ----- |
+| Job | `7a3b4645` |
+| Session | `7a3b4645-5548-42e6-84fa-35c1f90158dd` |
+| PID | `519433` (cwd = `/home/codex/repos/netscript-007-reference-export`) |
+| Bridge | `cse_01MDMbe68iYvjHBLuUGKZqBS`, `bridgeOutboundOnly: false` |
+| Remote Control | https://claude.ai/code/session_01MDMbe68iYvjHBLuUGKZqBS |
+| Route | native `claude-fable-5` / effort `medium` / `--remote-control`, `providerEnv` empty |
+| Evaluating | implementation `423867017`, evidence `010da98a2` |
+| Scope | artifact-only: may write `impl-eval.md` (+ preserve `impl-eval-cycle-1.md`) and post one comment |
+| Cycle | 2 — cycle 1 returned `FAIL_FIX` at `4c09e9203` |
+
+### First recovery action
+
+1. Read `~/.claude/jobs/7a3b4645/state.json`. If `state` is still `working`, **wait** — do not
+   relaunch and do not start a replacement evaluator; a duplicate on one head is the failure this
+   lane has already had to unwind once.
+2. If terminal, confirm token stability across ~3 samples before acting, then verify its boundary:
+   the commit must touch only `impl-eval.md` (+ `impl-eval-cycle-1.md`) and the diff versus
+   `423867017` outside `.llm/runs/` must be empty.
+3. On **PASS** — return exact verdict commit + comment URL to the coordinator for IMPL-EVAL closure;
+   do **not** merge, flip ready, or check acceptance boxes (coordinator-owned at `ready-merge`).
+   Note the close-gate mapping: issue #1296 has **five** acceptance boxes while the plan's live table
+   folds the first two together.
+4. On **FAIL_FIX** — return the same Codex author, thread `01a005d2-7c9d-7dd1-b6fc-531b72dc14e4`,
+   for a bounded repair. Serialize: confirm no sender/codex holds the worktree first, then check the
+   resume output for `thread-store conflict` rather than assuming delivery.
+5. Release the evaluator session (`claude stop 7a3b4645`) once its verdict is pushed.
+
+### Standing constraints still in force
+
+No merge, publish, ready-flip, issue close, milestone change, central-cluster-state mutation, or
+release-writer lease. No Aspire/Docker/browser/`e2e:cli`/scaffold-runtime. Launch background Claude
+agents with **`--bg`** so the lease is recordable — `--remote-control` alone yields an interactive
+session with no job entry. Keep mutation/archive scratch **out of** `.llm/tmp/` or clean it
+explicitly: a source tarball there reintroduces forbidden command strings into the corpus scanned by
+`forbidden-commands_test.ts`.
