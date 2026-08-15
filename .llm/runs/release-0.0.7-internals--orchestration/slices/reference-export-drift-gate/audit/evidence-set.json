@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "immutableHead": "47ca22abe94b9d2e54d3778edc8944094b227886",
+  "surface": "reference-export-drift-gate S3",
+  "expectedGateIds": [
+    "arch-check",
+    "check",
+    "docs-accuracy",
+    "docs-source-format",
+    "publish-dry-run",
+    "quality-job",
+    "test"
+  ],
+  "receiptIds": [
+    "reference-export-s3-arch-check",
+    "reference-export-s3-check",
+    "reference-export-s3-docs-accuracy",
+    "reference-export-s3-docs-source-format",
+    "reference-export-s3-publish-dry-run",
+    "reference-export-s3-quality-job",
+    "reference-export-s3-test"
+  ],
+  "sufficiency": "SUFFICIENT",
+  "reasons": []
+}

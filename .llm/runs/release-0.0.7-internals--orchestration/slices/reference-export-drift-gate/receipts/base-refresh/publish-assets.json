@@ -1,0 +1,36 @@
+{
+  "gateId": "publish-assets",
+  "invocationId": "reference-export-base-refresh-publish-assets",
+  "argv": [
+    "deno",
+    "task",
+    "check:publish-assets"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-reference-export",
+  "gitHead": "8c03d862931b64573df9a4bac76ebf266e0ec175",
+  "actualGitHead": "8c03d862931b64573df9a4bac76ebf266e0ec175",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:875689",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "ac592ed8b1647b431995b6ab48f24f1c2e06a701d0210b3f2da4fbbe001cb296",
+  "lifecycleId": "worker:875689:reference-export-base-refresh-publish-assets:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T20:52:06.357Z",
+  "startedAt": "2026-08-15T20:52:06.360Z",
+  "finishedAt": "2026-08-15T20:52:06.746Z",
+  "durationMs": 386,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 198,
+    "sha256": "70bc4b06374ff6f561f02b223ee735b7bf25bb21e4a9811a8183d6279a83735b",
+    "tail": "Task check:publish-assets deno task gen:publish-assets --check\nTask gen:publish-assets deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-publish-assets.ts '--check'\n",
+    "truncated": false
+  }
+}

@@ -3,7 +3,7 @@
  *
  * @example
  * ```typescript
- * import { PaginationInputSchema, createPaginatedOutput } from '@netscript/contracts';
+ * import { PaginationInputSchema, createPaginatedOutput } from '@netscript/contracts/query';
  *
  * const usersListContract = baseContract
  *   .route({ method: 'GET', path: '/users' })

@@ -288,9 +288,9 @@ export async function runAccuracyCheck(): Promise<void> {
 
   const checkedFreshRootImports = await checkFreshRootImports('docs');
 
-  // Run the exports & symbols drift check as part of the accuracy verification
+  // Run the named exports & symbols drift task as part of the accuracy verification.
   const checkExportsCmd = new Deno.Command('deno', {
-    args: ['run', '--allow-all', '.llm/tools/docs/check-exports-drift.ts'],
+    args: ['task', 'docs:exports-drift'],
   });
   const { code: driftCode, stderr: driftStderr, stdout: driftStdout } = await checkExportsCmd
     .output();

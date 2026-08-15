@@ -1,0 +1,36 @@
+{
+  "gateId": "test",
+  "invocationId": "reference-export-fix1-test",
+  "argv": [
+    "deno",
+    "task",
+    "test"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-reference-export",
+  "gitHead": "4238670173271bca4281eba7db6c2030d046bc73",
+  "actualGitHead": "4238670173271bca4281eba7db6c2030d046bc73",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:568045",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "449bfca08072fe31c6f41e99b365827f1fc731cffa68ec95ee826fbd958ffa11",
+  "lifecycleId": "worker:568045:reference-export-fix1-test:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-15T18:44:01.456Z",
+  "startedAt": "2026-08-15T18:44:01.466Z",
+  "finishedAt": "2026-08-15T18:52:02.359Z",
+  "durationMs": 455980,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 1218,
+    "sha256": "2f25b1707f8698691e130fc4e1b5593585f749376696a9fdab1001f711f72d2a",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\"],\"cwd\":\"/home/codex/repos/netscript-007-reference-export\",\"exitCode\":1,\"durationMs\":455516,\"summary\":{\"passed\":4202,\"failed\":1,\"ignored\":19,\"totalResults\":4222,\"uniqueFailures\":1},\"failures\":[{\"message\":\"AssertionError: Values are not equal.\\n\\n\\n    [Diff] Actual / Expected\\n\\n\\n-   [\\n-     \\\".llm/tmp/refusal-mutants-full-423867017/source.tar: docker ps -aq\\\",\\n-     \\\".llm/tmp/refusal-mutants-full-423867017/source.tar: docker rm -f $(\\\",\\n-     \\\".llm/tmp/refusal-mutants-full-423867017/source.tar: docker container prune\\\",\\n-     \\\".llm/tmp/refusal-mutants-full-423867017/source.tar: docker system prune\\\",\\n-     \\\".llm/tmp/refusal-mutants-full-423867017/source.tar: aspire stop --all\\\",\\n-     \\\".llm/tmp/refusal-mutants-full-423867017/source.tar: xargs docker removal\\\",\\n-   ]\\n+   []\\n\\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\\n    at file://<cwd>/.llm/tools/agentic/teardown/forbidden-commands_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"repository contains no shared-host bulk teardown command\",\"file\":\"./.llm/tools/agentic/teardown/forbidden-commands_test.ts\",\"line\":14}]}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 101,
+    "sha256": "5ae7e9d1dade1dc447e471529cd4f870e6b8391091eb2b26d56244ed895c3917",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all\n",
+    "truncated": false
+  }
+}
