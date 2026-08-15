@@ -1,6 +1,20 @@
-import { baseContract, CursorPaginationInputSchema, SuccessSchema } from '@netscript/contracts';
-import { assertEquals } from './test-helpers.ts';
-import { isDefinedError, safe, type ServiceClient } from '../mod.ts';
+import {
+  baseContract,
+  CursorPaginationInputSchema,
+  type NotFoundErrorSchema,
+  SuccessSchema,
+  type ValidationErrorSchema,
+} from '@netscript/contracts';
+import { type ClientPromiseResult, ORPCError } from '@orpc/client';
+import { assert, assertEquals } from './test-helpers.ts';
+import {
+  type ContractSchemaOutput,
+  type DefinedError,
+  isDefinedError,
+  safe,
+  type SafeFailure,
+  type ServiceClient,
+} from '../mod.ts';
 
 type IsAny<T> = 0 extends (1 & T) ? true : false;
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true
@@ -36,18 +50,88 @@ declare const typedErrorClient: ServiceClient<typeof typedErrorContract>;
 async function assertRealExportErrorChannel(): Promise<void> {
   const discriminated = await safe(typedErrorClient.list({ limit: 10 }));
   if (!discriminated.isSuccess && discriminated.isDefined) {
-    // @ts-expect-error S2 must preserve the promise error union through safe().
-    discriminated.error.code;
+    type _SafePreservesExactErrorCode = Assert<
+      Equal<typeof discriminated.error.code, ExpectedBaseErrorCode>
+    >;
+    const preservedCode: ExpectedBaseErrorCode = discriminated.error.code;
+    void preservedCode;
+
+    if (discriminated.error.code === 'NOT_FOUND') {
+      type _SafePreservesNotFoundData = Assert<
+        Equal<
+          typeof discriminated.error.data,
+          ContractSchemaOutput<typeof NotFoundErrorSchema>
+        >
+      >;
+    }
+
+    if (discriminated.error.code === 'VALIDATION_ERROR') {
+      type _SafePreservesValidationData = Assert<
+        Equal<
+          typeof discriminated.error.data,
+          ContractSchemaOutput<typeof ValidationErrorSchema>
+        >
+      >;
+    }
   }
 
   const guarded = await safe(typedErrorClient.list({ limit: 10 }));
   if (!guarded.isSuccess && isDefinedError(guarded.error)) {
-    // @ts-expect-error S2 must make isDefinedError narrow to a real defined error.
-    guarded.error.code;
+    type _GuardNarrowsToExactDefinedError = Assert<
+      Equal<typeof guarded.error.code, ExpectedBaseErrorCode>
+    >;
+    const definedError: DefinedError<ExpectedBaseErrorCode> = guarded.error;
+    void definedError;
+
+    if (guarded.error.code === 'NOT_FOUND') {
+      type _GuardPreservesNotFoundData = Assert<
+        Equal<typeof guarded.error.data, ContractSchemaOutput<typeof NotFoundErrorSchema>>
+      >;
+    }
   }
 }
 
+type _PlainErrorRemainsNonDefined = Assert<
+  Equal<Extract<SafeFailure<Error>, { isDefined: false }>['error'], Error>
+>;
+type _PlainErrorRejectedFromDefinedArm = Assert<
+  Equal<Extract<SafeFailure<Error>, { isDefined: true }>['error'], never>
+>;
+
 void assertRealExportErrorChannel;
+
+Deno.test('safe preserves defined and non-defined failure identity', async () => {
+  const contractError = new ORPCError('NOT_FOUND', {
+    defined: true,
+    status: 404,
+    data: { resource: 'Order', id: 'ord_1' },
+  });
+  const contractFailure: ClientPromiseResult<never, typeof contractError> = Promise.reject(
+    contractError,
+  );
+  const definedResult = await safe(contractFailure);
+
+  assert(!definedResult.isSuccess, 'expected contract failure');
+  assert(definedResult.isDefined, 'expected a defined contract failure');
+  assertEquals(definedResult.error, contractError);
+  assertEquals(definedResult.data, undefined);
+  assertEquals(definedResult[0], contractError);
+  assertEquals(definedResult[1], undefined);
+  assertEquals(definedResult[2], true);
+  assertEquals(definedResult[3], false);
+
+  const plainError = new Error('network unavailable');
+  const plainResult = await safe(Promise.reject(plainError));
+
+  assert(!plainResult.isSuccess, 'expected plain failure');
+  assert(!plainResult.isDefined, 'plain errors must not become defined errors');
+  assertEquals(plainResult.error, plainError);
+  assertEquals(plainResult.data, undefined);
+  assertEquals(plainResult[0], plainError);
+  assertEquals(plainResult[1], undefined);
+  assertEquals(plainResult[2], false);
+  assertEquals(plainResult[3], false);
+});
 
 const README_PATH = new URL('../README.md', import.meta.url);
 

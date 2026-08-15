@@ -4,6 +4,9 @@
  * @module
  */
 
+import type { ClientPromiseResult, ThrowableError } from '@orpc/client';
+import type { ErrorFromErrorMap, ErrorMap } from '@orpc/contract';
+
 /**
  * Minimal structural representation of a standard-schema-compatible type.
  */
@@ -162,13 +165,18 @@ export interface ServiceRequestOptions {
   context?: ServiceClientContext;
 }
 
+type ProcedureErrorFromNode<TNode> = TNode extends {
+  readonly '~orpc': { readonly errorMap: infer TErrorMap extends ErrorMap };
+} ? ErrorFromErrorMap<TErrorMap>
+  : ThrowableError;
+
 /**
  * Typed service-client method derived from a contract procedure.
  */
-export type ServiceClientMethod<TInput, TOutput> = (
+export type ServiceClientMethod<TInput, TOutput, TError = ThrowableError> = (
   input: TInput,
   options?: ServiceRequestOptions,
-) => Promise<TOutput>;
+) => ClientPromiseResult<TOutput, TError>;
 
 /**
  * Compile-time marker that preserves the source contract for inference.
@@ -182,8 +190,11 @@ export interface ServiceClientContract<TContract extends ContractLike> {
  * Recursive callable/router shape for a typed service client.
  */
 export type ServiceClientShape<TContract extends ContractLike> = TContract extends
-  ContractProcedureLike
-  ? ServiceClientMethod<ProcedureInputFromNode<TContract>, ProcedureOutputFromNode<TContract>>
+  ContractProcedureLike ? ServiceClientMethod<
+    ProcedureInputFromNode<TContract>,
+    ProcedureOutputFromNode<TContract>,
+    ProcedureErrorFromNode<TContract>
+  >
   : {
     [K in keyof TContract]: TContract[K] extends ContractLike ? ServiceClient<TContract[K]> : never;
   };
