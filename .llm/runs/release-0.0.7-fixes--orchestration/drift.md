@@ -381,3 +381,46 @@ decision; the next fixes leaf stays queued.
 - **Coordinator decision required.** Options: purchase Codex credits; hold #1671 until the 2026-08-20
   reset; or authorize an alternative implementation lane for this leaf, which is a lane-policy
   escalation rather than a supervisor call.
+
+## 2026-08-15 — quota scope test: account-wide, not thread-local. #1671 parked.
+
+**Test as directed, run exactly once.** A **fresh** `gpt-5.6-sol` · medium session was launched in a
+**dedicated detached worktree** at the exact content head `db8aadd95`, on scratch branch
+`s4r/typed-error-amendment`, so the occupied leaf sender registry was untouched. New thread
+`01a00767-2533-7273-a4c6-47cad0f85a6d`.
+
+**Result: identical refusal.** The quota is **account-wide**, not thread-local. Exact evidence from
+the app-server stream:
+
+```json
+{"method":"account/rateLimits/updated","params":{"rateLimits":{"limitId":"premium",
+  "credits":{"hasCredits":false,"unlimited":false,"balance":"0"}}}}
+{"method":"error","params":{"error":{
+  "message":"You've hit your usage limit. Visit https://chatgpt.com/codex/settings/usage to purchase
+             more credits or try again at Aug 20th, 2026 5:31 AM.",
+  "codexErrorInfo":"usageLimitExceeded"},"willRetry":false,
+  "threadId":"01a00767-2533-7273-a4c6-47cad0f85a6d"}}
+{"method":"turn/completed","params":{"turn":{"status":"failed","durationMs":2147}}}
+```
+
+Key fields: `codexErrorInfo: usageLimitExceeded`, `willRetry: false`, `hasCredits: false`,
+`balance: "0"`, `limitId: premium`, turn `failed` after 2147 ms. A new thread in a new worktree
+changes nothing — the limit is on the account.
+
+**Parked safely.** The temporary worktree and scratch branch were removed; `s4r/*` was **never
+pushed** to origin. The leaf is unchanged and clean at
+`db8aadd9542c38a305efffbd7017c56d0abf4e01`, local == remote == PR #1671, `deno.lock`
+`LOCK-IDENTICAL`, draft at sole `status:plan`. #1348 and #1466 untouched. No runtime lease, no
+evaluator, no readiness or merge action.
+
+**No retries and no substitute authorship.** Retrying is futile until the reset, and the supervisor
+authoring the repair would breach the supervise-only boundary, the Claude-workflow prohibition on
+harness implementation slices, and the generator ≠ evaluator property this leaf's gates rest on.
+
+**Outstanding when capacity returns**, in order: S4-R plan-only amendment (finding → correction
+mapping, no suppressions) → fresh Tier-A → the focused three-file product repair → re-run raw
+Contracts/SDK doc-lint plus the four `NOT_RUN` gates (`contracts-jsr-audit`, `sdk-jsr-audit`,
+`netscript-jsr-specifiers`, selected export guards) → fresh Tier-A → formal IMPL-EVAL.
+
+**Coordinator decision:** purchase credits, wait for the 2026-08-20 05:31 reset, or authorize an
+alternative implementation lane — the last is a lane-policy escalation, not a supervisor call.
