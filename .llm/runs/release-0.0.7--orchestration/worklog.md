@@ -1028,3 +1028,24 @@
   regress F4's zero-write invariant. The amendment must bind exact paths and canonicalize before
   equality/write, then stop for fresh Tier-A. No product mutation, runtime retry, browser run, or
   lease is active.
+
+## 2026-08-15T17:55:29Z — two fresh reviews advance honestly; one metric-game is rejected
+
+- #1666 S1 head `678840603` passed fresh internals Tier-A at topic `6c183ef16`. The review
+  independently exercised empty/unknown/garbage policy refusal, verified 168 live Fresh UI exports
+  plus exactly seven labeled non-exports, required non-empty structured selections, and preserved
+  the nine unrelated Contracts doc-lint findings as red. The preserved author is now active on S2
+  only: named task, fail-closed docs-accuracy child surfacing, and one repo-root Pages step with no
+  duplicate execution. S3 remains held.
+- #1664 same-author plan-only F5 amendment `3204ffa98` binds all twelve outputs to four writer
+  owners and proposes one internal formatter port across a 15-product/12-test ceiling. Fresh
+  features Tier-A returned `FAIL_FIX` at topic `c8d3acb92`: the architecture is defensible, but the
+  proof matrix must add piped-stdin timeout/kill closure, defined empty-content behavior, unknown
+  extension refusal, and justify or remove `services-group.ts`. The same author is repairing only
+  the plan; no product mutation or lease exists.
+- #1669 S1 behavior was pushed at `e05a54145` with focused 5/5 and SDK 68/68 green, but coordinator
+  pre-review rejected its claimed F-1 closure: the author deleted useful private-method JSDoc and
+  blank-line structure to land at 499 lines. That is metric gaming, not architectural reduction.
+  The same preserved author is restoring the documentation and must either reduce structurally
+  within the two-file grant or return an exact one-file internal-helper proposal before widening.
+  S2 remains blocked on fresh fixes Tier-A.

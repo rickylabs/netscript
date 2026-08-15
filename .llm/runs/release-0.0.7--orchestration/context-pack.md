@@ -594,3 +594,13 @@ Tier-A before S2. #1664's corrected features record is `f5f75adc8`: all twelve f
 the post-init canonicalization gap. F5 is authorized only as a same-author plan amendment with exact
 paths and formatted-against-formatted equality; a post-write-only call to current `formatOutput`
 would regress proven F4 and is not authorized. No runtime lease or fresh-browser run is active.
+
+Newer checkpoint `2026-08-15T17:55:29Z`: #1666 S1 `678840603` passed fresh internals Tier-A at
+`6c183ef16`; the preserved author is active on S2 only, with S3 held. #1664 F5 plan amendment
+`3204ffa98` received honest Tier-A `FAIL_FIX` at features topic `c8d3acb92`; the same author is adding
+three stdin/extension safety proofs and one composition-path justification before another plan
+review, with no product mutation. #1669 pushed S1 head `e05a54145`, but coordinator rejected its
+499-line result because it removed useful JSDoc/spacing solely to suppress F-1. The same author is
+restoring that content and must reduce structurally inside the two-file scope or propose one exact
+internal helper before any scope widening. No runtime lease, Aspire application, Docker container,
+or browser gate is active. #1663 remains untouched at its owner-only third-evaluator boundary.

@@ -716,3 +716,11 @@ a separate tooling scope is granted. Features corrected #1664's inventory at top
 proved one post-init canonicalization gap. Coordinator authorized a focused plan amendment only and
 rejected post-write-only formatting because it would regress F4 on the next identical invocation;
 the amendment must name exact paths, canonicalize before equality/write, and stop for Tier-A.
+
+At 17:55Z, #1666 S1 `678840603` passed fresh internals Tier-A at `6c183ef16`; S2 alone is active on
+the preserved author and S3 remains held. #1664 F5 plan `3204ffa98` received features Tier-A
+`FAIL_FIX` at `c8d3acb92` for three missing transport-safety proofs and an unjustified composition
+path; the same author is repairing plan artifacts only. #1669 behavior head `e05a54145` is pushed,
+but its 499-line F-1 claim is rejected because it deleted useful JSDoc/spacing to hit the threshold.
+The same author is restoring it and must reduce structurally within two files or return an exact
+one-file helper proposal for scope ruling. No runtime lease exists; #1663 remains owner-only.
