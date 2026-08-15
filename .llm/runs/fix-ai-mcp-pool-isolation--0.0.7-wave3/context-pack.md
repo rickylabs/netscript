@@ -181,3 +181,12 @@ amendment.
   bound to every later registered tool call; README pattern fails after its own startup deadline.
   Contract, rulings 2/5/6, cross-package Fresh check, and all cheap gates re-verified green.
 - Next: F-1 RED→GREEN slice inside the authorized surface, then IMPL-EVAL cycle 2. PR stays draft.
+
+## 2026-08-15 — F-1 repair RED (append-only)
+
+- New regression requires a registered tool call to succeed after its registration discovery
+  signal aborts; focused structured wrapper raw exit `1` (0 passed, 1 failed with the captured
+  `AbortError`).
+- Discovery-time cancellation coverage remains intact and separate.
+- Next: remove the registration options from the registered-call closure, align README wording,
+  run the bounded gate set, and stop for a fresh independent Tier-A review.

@@ -69,3 +69,7 @@ Drift is append-only.
   add a read-only structured Fresh type-check to the gate evidence.
 - **Evidence:** Amendment 2 in `scope-ruling.md` at head
   `6db182503b219d76c7db23f89c71ec9e467c2f40`.
+
+- **Slice 5 publish graph:** the authorized connector replaced computed TanStack specifiers with
+  literal `import('@tanstack/ai-mcp')` and `import('@tanstack/ai-mcp/stdio')`; this unplanned but
+  in-surface change makes JSR rewriting analyzable and is proven clean by the publish dry run.

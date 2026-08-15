@@ -265,3 +265,18 @@ and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
 - No Aspire, Docker, browser, scaffold runtime, or CLI E2E command ran. Implementation is complete;
   exact next blocker is the topic orchestrator's substantive Tier-A review/sign-off, followed by a
   separately launched opposite-family IMPL-EVAL.
+
+## 2026-08-15 — IMPL-EVAL cycle 1 F-1 repair RED
+
+- Formal cycle 1 returned `FAIL_FIX` at evaluated head `e3c74d7aaf3b7734b5a44a5be248c01f004c21e5`:
+  the registration discovery signal was captured as the lifetime signal for every registered call.
+- Replaced the defect-encoding registered-call cancellation test with a regression requiring a
+  registered call to succeed after the registration discovery signal aborts. The separate
+  discovery-abort regression remains unchanged.
+- Structured focused RED command: `deno run --allow-read --allow-write --allow-run
+  .llm/tools/run-deno-test.ts -- --allow-all --filter "registered calls outlive the registration
+  discovery signal" packages/ai/tests/mcp_test.ts`.
+- Raw exit `1`: 0 passed, 1 failed with `AbortError: registration deadline` at the handler call.
+- `PLAN-EVAL: N/A` remains justified: the evaluator prescribed an exact three-file, mechanical
+  lifetime decoupling with no contract or architecture decision remaining.
+- No implementation or README change is included in this RED slice. No expensive gate ran.
