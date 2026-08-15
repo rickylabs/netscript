@@ -975,3 +975,56 @@ a coordinator ruling rather than silent absorption:
 No readiness, label, box, or merge action taken by this topic. Next fixes leaf
 (`sdk-typed-error-channel`, #1350) stays queued until #1669 merges and its shipped lifecycle is
 terminal.
+
+## 2026-08-15 — #1669 readiness mapping prepared (no mutation)
+
+Reconciled the terminal IMPL-EVAL PASS (`313cc08d5`, comment 5303850473) and built the coordinator
+readiness tuple. **No issue box, label, draft state, merge, or #1350 launch was touched.**
+
+**Generated closure re-verified at the current PR head `313cc08d5`** — not at the evaluated head:
+`check:assets-barrel`, `check:publish-assets`, `check:agent-docs-prose` all **PASS**, and the tree
+stays **0 modified** afterwards, so the four mirrors reproduce at the head that would actually merge.
+
+### Evidence base (stable URLs)
+
+| Ref | URL |
+| --- | --- |
+| PLAN-EVAL PASS | `.../pull/1669#issuecomment-5303412171` |
+| S1 complete | `.../pull/1669#issuecomment-5303493013` |
+| S1 F-1 amendment | `.../pull/1669#issuecomment-5303528330` |
+| S2 complete | `.../pull/1669#issuecomment-5303754598` |
+| IMPL-EVAL PASS | `.../pull/1669#issuecomment-5303850473` |
+| Content commit | `.../commit/eba0b0924` (predicate), `.../commit/e100ea205` (S1 honest F-1) |
+| Evidence commit | `.../commit/9aa54ae2d`, `.../commit/313cc08d5` |
+
+### Issue #1461 acceptance — index → evidence
+
+1. Fresh ⇒ zero upstream calls — `query-factory_test.ts:167` `assertEquals(clientCalls, 0)` with
+   `seeded-fresh` at `:160`; RED at pre-fix `ef3e43f06` was 5/1 "Expected seeded-fresh, got fetched".
+2. Missing ⇒ fetch once, current timestamp — same test, missing branch, `clientCalls === 1`.
+3. Stale ⇒ documented blocking/SWR policy — `seeded-stale` `:201`; blocking assert `:222`.
+4. Concurrent stale readers ⇒ exactly one refresh — `cache-query_test.ts:97`, sleep-free.
+5. `cachedAt` reflects refreshed value — `:222` "the blocking refresh must replace the stale timestamp".
+6. Published loader example has an executable regression — `query-factory_test.ts:129`, the loader
+   composition itself.
+
+### PR #1669 DoD — index → evidence
+
+1 PLAN-EVAL PASS → 5303412171 · 2–3 as issue 1–2 · 4 stale policies `:201`/`:222` · 5 overlapping
+readers `cache-query_test.ts:97` · 6 `cachedAt` `:222` · 7 loader regression `:129` · 8 chapter-3
+composition `03-sdk-cache-first-query.md:114-118` (**manual evidence per A1** — the `docs-accuracy`
+receipt must NOT be cited) · 9 four mirrors + three cascade checks on one content head, re-verified
+at `313cc08d5` · 10 gates recorded honestly incl. pinned known-reds · 11 IMPL-EVAL PASS → 5303850473.
+
+### Blockers, all coordinator-owned
+
+Draft; `status:plan` not `status:ready-merge`; PR **11** unchecked and issue #1461 **6** unchecked and
+still `status:triage`; CI vacuous while draft.
+
+### Corrections to surface with the tuple
+
+- The record's `surface:diff` **524** figure is wrong — **517** observed; the evaluator refuted the
+  figure while confirming the base==head conclusion.
+- Box 8 must cite manual evidence, never the `docs-accuracy` receipt.
+- Advisory needing a ruling, not silent widening: chapter 4, `layers.md`, and the homepage loaders are
+  still on the old shape — the same false-narrative class, on pages outside the exactly-two grant.
