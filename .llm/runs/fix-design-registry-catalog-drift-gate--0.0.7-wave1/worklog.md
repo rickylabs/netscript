@@ -437,3 +437,53 @@ Tier-A reviewer.
 - No expensive gate run or requested. Nothing implemented, nothing fixed. PR
   left `OPEN`, draft, exactly one `status:impl`. The run stops for coordinator
   readiness disposition.
+
+## Post-Evaluation Cleanup — Revert Redundant T-3 CI Expansion (2026-08-15)
+
+Formal IMPL-EVAL cycle 2 remains final **`PASS`** at
+`3d7819203f59e68eb5b45f6871a03c41ca43cd2f`; this cleanup is not cycle 3 and
+does not revise that verdict. `PLAN-EVAL: N/A`: the coordinator prescribed an exact three-path
+restore to current `origin/main` bytes with predetermined proofs and no design decision.
+
+### T-3 / G-1 correction
+
+The T-3 implementation was correct and correctly scoped to its then-authorized contract, but its
+root-cause rationale was false. Root `workspace: ["packages/*", …]` includes `packages/fresh-ui`.
+Both the Fresh UI manifest and the CLI design-asset template classify with `needsDeno: true`, so
+the required `ci.yml` `check-test` lane already runs the root test gate for either surface.
+`fresh-ui-quality.yml` has no test step; the T-3 wiring therefore added no drift-test coverage and
+only duplicated check/lint work. The three T-3 CI paths are restored to current `origin/main` bytes.
+
+### G-2 correction
+
+The inherited `fresh-browser` receipt proves the Fresh **form-navigation** regression only. It did
+not render the generated `/design/components` gallery and is not consumer proof for #1358.
+Accepted consumer proof is static: the decoded embedded barrel plus the symmetric manifest/catalog
+drift gate. Earlier wording that paired the leased browser receipt with gallery consumer proof is
+superseded by this correction; the receipt itself remains immutable and valid for its actual gate.
+
+### Cleanup proof table
+
+| Proof | Exact command | Raw exit | Result |
+| --- | --- | ---: | --- |
+| Restore authorized paths | `git checkout origin/main -- .github/workflows/fresh-ui-quality.yml .github/scripts/ci-classify-changes.ts .github/scripts/ci-classify-changes.test.ts` | 0 | Exactly three paths restored. |
+| Classifier ownership | `deno eval "import { decide } from './.github/scripts/ci-classify-changes.ts'; …"` for each required one-file PR diff | 0 | `needsDeno=true` for both `packages/fresh-ui/registry.manifest.ts` and the CLI `(design)` registry template. |
+| Root-discovery drift test | `deno test --allow-all --no-check --filter 'generated design catalog matches the Fresh UI registry manifest'` | 0 | 1 passed, 0 failed, 3523 filtered out. |
+| Structured root-discovery drift verdict | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all --no-check --filter 'generated design catalog matches the Fresh UI registry manifest'` | 0 | 1 passed, 0 failed. |
+| Scoped structured check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --file .github/scripts/ci-classify-changes.ts --file .github/scripts/ci-classify-changes.test.ts` | 0 | 2 files, 1 batch, 0 failed batches; wrapper supplied `--unstable-kv`. |
+| Cheap quality/architecture | `deno task quality:gate` | 0 | `quality:scan` returned `ok: true`; `arch:check` had no failures, only existing warnings. |
+| Embedded barrel freshness | `deno task check:assets-barrel` | 0 | Generator fixed point retained; no generated target moved. |
+
+The first root-test attempts yielded through the command transport and left three identical
+processes attributable to this cleanup. Only those exact PIDs were stopped; the final managed
+invocation produced the terminal exit-0 proof above. No unrelated process was touched.
+
+### Boundaries
+
+- Core #1358 product work, symmetric fixtures, generated CLI barrel, and all receipts are retained.
+- All product paths outside the three restored CI paths are unchanged from cleanup start head
+  `ab78faac5efcc7f050f6312b993197de137a9631`.
+- `deno.lock`, `packages/cli/deno.lock`, and `packages/fresh-ui/deno.lock` are unchanged.
+- No browser, `fresh-browser`, Aspire, Docker, scaffold runtime, or `e2e:cli` command ran.
+- This is automated cleanup evidence, not self-certification. Stop after commit, explicit-refspec
+  push, and one structured PR comment for fresh opposite-family Tier-A review of the cleanup delta.

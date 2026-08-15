@@ -137,3 +137,22 @@ corrections; R-1, N-3, O-1, O-2, O-3 and C-1 are concurred non-blocking. Current
 phase: **stopped for coordinator readiness disposition**. No further evaluator
 loop and no PLAN-EVAL. Nothing is authorized for readiness, labels, merge, issue
 mutation, or the next leaf.
+
+## Post-Evaluation T-3 Cleanup — 2026-08-15
+
+Cycle-2 `PASS` stands final; there is no cycle 3. The coordinator ordered the three T-3 CI paths
+restored to current `origin/main` after G-1 proved the amendment rationale false: root workspace
+discovery includes Fresh UI, both owned surfaces classify `needsDeno=true`, and required root
+`check-test` already executes the drift gate. The Fresh UI quality workflow has no test step, so
+the reverted wiring added only redundant check/lint work.
+
+G-2 is also corrected: the immutable `fresh-browser` receipt covers form navigation, not the
+generated gallery. #1358 consumer proof is the decoded 66-item embedded barrel plus the symmetric
+static drift gate accepted by the coordinator.
+
+Cleanup proofs are green: classifier exit 0 with both results true; root focused test and structured
+wrapper exit 0 (1 passed); scoped structured check exit 0; `quality:gate` exit 0; and
+`check:assets-barrel` exit 0 with no generated movement. Locks and all other product paths remain
+unchanged. Exact next blocker after commit/push/comment: fresh opposite-family Tier-A review limited
+to this cleanup delta. No evaluator, readiness, label, merge, issue, browser, Aspire, Docker,
+scaffold, E2E, or next-leaf action is authorized.

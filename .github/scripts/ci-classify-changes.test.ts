@@ -490,30 +490,6 @@ Deno.test('Fresh UI and Pages selectors distinguish tasks-only root config', () 
   assertEquals(toolchain.needsFreshUi, true);
 });
 
-Deno.test('POSITIVE: CLI design assets request the Fresh UI gate', async () => {
-  const path =
-    'packages/cli/src/kernel/assets/app/routes/(design)/design/(_shared)/registry.ts.template';
-  const decision = decide({ eventName: 'pull_request', files: [path], labels: [] });
-  assertEquals(decision.needsFreshUi, true);
-
-  const workflow = await Deno.readTextFile('.github/workflows/fresh-ui-quality.yml');
-  const ownedPathFilter = "      - 'packages/cli/src/kernel/assets/app/routes/(design)/**'";
-  assertEquals(
-    workflow.split(ownedPathFilter).length - 1,
-    2,
-    'pull_request and push must carry the same Fresh UI ownership path',
-  );
-});
-
-Deno.test('NEGATIVE: unrelated CLI changes do not request the Fresh UI gate', () => {
-  const decision = decide({
-    eventName: 'pull_request',
-    files: ['packages/cli/src/public/features/ui/list/list-ui-command.ts'],
-    labels: [],
-  });
-  assertEquals(decision.needsFreshUi, false);
-});
-
 Deno.test('managed-form browser selector is limited to Fresh and its owners', () => {
   for (
     const path of [

@@ -68,9 +68,6 @@ const CODE_PREFIXES = [
   'apps/',
 ] as const;
 
-/** CLI-owned generated design assets checked by the Fresh UI drift suite. */
-const FRESH_UI_CLI_DESIGN_ASSET_PREFIX = 'packages/cli/src/kernel/assets/app/routes/(design)/';
-
 /** Directory prefixes whose contents are docs / agent-context only. */
 const DOCS_PREFIXES = [
   'docs/',
@@ -284,8 +281,7 @@ export function classifyPath(
       surface: path.startsWith('packages/'),
       pages: (path.startsWith('packages/') || path.startsWith('plugins/')) &&
         !isPackageTestOnly(path),
-      freshUi: path.startsWith('packages/fresh-ui/') ||
-        path.startsWith(FRESH_UI_CLI_DESIGN_ASSET_PREFIX),
+      freshUi: path.startsWith('packages/fresh-ui/'),
       freshBrowser: path.startsWith('packages/fresh/'),
     };
   }
