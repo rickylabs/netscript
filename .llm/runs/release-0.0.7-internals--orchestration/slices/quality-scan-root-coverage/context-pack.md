@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `release-0.0.7-internals--orchestration/slices/quality-scan-root-coverage` |
 | Branch | `fix/quality-scan-root-coverage` |
-| Current phase | `impl` — slice 1 awaiting Tier-A |
+| Current phase | `impl` — slice 2 awaiting Tier-A |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `service`, `docs` |
 | Draft PR | `#1656` |
@@ -14,68 +14,72 @@
 
 ## Current state
 
-PLAN-EVAL cycle 1 passed at `3b95a004fe8bc5c022c7a2601fafef9a1216be68` against immutable plan
-`da76d9d8440a969f0715ca035ea6304bbf039efd`. Slice 1 is implemented with durable RED/GREEN
-evidence. Work stops for Tier-A before the `deno.json` binding slice.
+PLAN-EVAL cycle 1 passed at `3b95a004fe8bc5c022c7a2601fafef9a1216be68`. Slice 1 was signed off
+by the topic supervisor at `a258bcc8c6365e12ee33b7e6a4657f52140f6308`. Slice 2 now binds the
+checker before both scanners, broadens `quality:scan` to `packages`, and has durable RED/GREEN
+forwarding plus all four planned S2 gate receipts. Work stops for Tier-A before S3.
 
 ## Completed
 
-- Verified the evaluator head and the byte-identical approved plan; did not rebase.
-- Committed the S1 RED contract at `2c9aa89c0` and checker implementation at `22e35f4be`.
-- Added deterministic, fail-closed JSON for workspace census, named exclusions, configured-root
-  coverage, doctrine subset coverage, traversal disclosure, and errors.
-- Added nine tests for omission failure, ancestry direction, future broad-root coverage,
-  exclusions/boundary, deterministic ordering, malformed configuration, the locked live census,
-  structured CLI failure, and real `deno task` trailing-argument forwarding.
-- Kept `deno.json`, package/plugin sources, exports, dependencies, and lockfiles unchanged.
+- Preserved a reachable RED configuration commit `98360da7b`: the checker executes under a real
+  changed-file task invocation and rejects the 29 configured-root gaps before scanner execution.
+- Landed the green S2 binding at `15d894740`: both scan tasks invoke the checker first and
+  `quality:scan` uses `packages`, `plugins`, and `docs/site`.
+- Preserved `--max-allow 7`, all prior roots, and the scanner permissions
+  `--allow-net=api.github.com --allow-env=GITHUB_TOKEN,GH_TOKEN` byte-for-byte.
+- Rebound the live integration test to zero gaps/`ok:true`; moved structured CLI failure to an
+  intentionally incomplete temporary repository fixture.
+- Proved real forwarding: appended changed-file args reach the scanner, whose output reports
+  `mode:"changed-files"` and the exact single traversed path, after the checker reports green.
 
-## Key findings preserved
+## Current coverage facts
 
-- Published package/plugin denominator: 35 of 37 in-boundary workspace members. Non-published
-  declarations: `packages/bench` and `packages/cli/e2e`.
-- Current `quality:scan` still omits 29 package members until S2; `quality:scan:repo` omits zero.
-- `arch:check` dynamically exposes 36 doctrine roots and covers all 35 publishable denominator
-  members.
-- Scanner output owns actual mode/scanned paths. The checker separately reports configured roots
-  and explicitly says it did not observe traversal.
-- Parent-directory denominator boundary is named as `packages/**` + `plugins/**`; excluded workspace
-  member count and paths remain visible (currently zero).
+- Census: 37 workspace members, 37 inside the named boundary, 35 publishable.
+- Named non-publishable exclusions: `packages/bench`, `packages/cli/e2e`.
+- `quality:scan`: configured roots `docs/site`, `packages`, `plugins`; zero uncovered.
+- `quality:scan:repo`: configured roots `.llm/tools/fitness`, `.llm/tools/quality`, `docs/site`,
+  `packages`, `plugins`; zero uncovered.
+- Doctrine: 36 roots with all 35 publishable members covered.
+- Repository scans: zero findings, allowance count 7, no allowance failures.
 
 ## Exact edit surface status
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/tools/quality/check-root-coverage.ts` | S1 implemented | Fail-closed configured-root/doctrine coverage report. |
-| `.llm/tools/quality/check-root-coverage_test.ts` | S1 implemented | Nine semantic, live-invariant, and CLI-forwarding tests. |
-| `deno.json` | S2 pending | Broad `packages` root and checker binding in both scan tasks. |
+| `.llm/tools/quality/check-root-coverage.ts` | S1 complete; unchanged in S2 | Fail-closed coverage report. |
+| `.llm/tools/quality/check-root-coverage_test.ts` | S2 rebound | Green live binding plus permanent fixture-backed CLI failure. |
+| `deno.json` | S2 implemented | Checker-first task chains and broad package root. |
 
 Everything else in the frozen outer bound remains deliberately untouched.
-
-## Next steps
-
-1. Topic supervisor performs Tier-A review of S1 and its receipts.
-2. Only after a fresh resume, edit `deno.json` in S2 and prove both task bindings.
-3. Run the frozen final gate set in S3, then stop before coordinator-granted IMPL-EVAL.
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Plan-Gate | PASS cycle 1 | `plan-eval.md`, evaluator commit `3b95a004f` |
-| S1 focused test | RED 1; final GREEN 0 (9/9) | `receipts/slice-1/red-test.json`, `final-test.json` |
-| S1 static | final check 0; lint 0; fmt 0, all wrappers fired | `receipts/slice-1/final-{check,lint,fmt-check}.json` |
-| Publish/JSR | Empty touched-member denominator | S1 touches internal `.llm` files only; final dry run planned |
-| Docs | NOT FIRED | Frozen final gates planned for S3 |
+| S1 | Tier-A signed off | supervisor commit `a258bcc8c` |
+| S2 forwarding | RED 1; GREEN 0 | `receipts/slice-2/{red-forwarding,forwarding}.json` |
+| S2 focused test | PASS 0, 9/9 | `receipts/slice-2/test.json` |
+| S2 proving gates | all PASS 0 | `receipts/slice-2/{quality-scan,quality-scan-repo,arch-check,quality-gate}.json` |
+| Publish/JSR | Empty touched-member denominator | No publishable member changed; final dry run remains S3 |
+| S3 frozen final gates | NOT FIRED | Awaiting S2 Tier-A |
+
+## Next steps
+
+1. Topic supervisor performs Tier-A review of S2 and its receipts.
+2. Only after a fresh resume, run the frozen S3 final gate set and handoff checks.
+3. Stop before coordinator-granted formal IMPL-EVAL.
 
 ## Drift and debt
 
-- Drift: launcher pre-seed; historical doctrine omission already repaired on base; failed Fable
-  launch and amended native evaluator route. All are recorded in `drift.md`.
-- Debt: none created, closed, or modified. Existing package debt remains outside scope.
+- Drift: launcher pre-seed, historical doctrine omission already repaired, evaluator route failure
+  and amendment, plus the accepted report-field naming drift are recorded in `drift.md`.
+- The supervisor corrected an over-constrained S2 dispatch; the implemented test rebinding was
+  already inside the approved plan and therefore is not scope drift.
+- Debt: none created, closed, or modified.
 
-## Commits
+## S2 commits
 
-- `2c9aa89c0` — S1 RED contract test.
-- `22e35f4be` — S1 checker implementation plus durable RED receipt.
-- `a2f33ca4f` — structured CLI-failure case plus first terminal evidence/run-artifact checkpoint.
-- Final S1 receipt-only commit follows.
+- `98360da7b` — checker-first RED task wiring.
+- `15d894740` — broad-root binding, live test rebinding, fixture-backed CLI failure, RED receipt.
+- Final S2 evidence/run-artifact commit follows.

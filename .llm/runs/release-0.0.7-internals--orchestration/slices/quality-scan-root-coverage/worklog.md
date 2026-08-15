@@ -173,3 +173,56 @@ expected→actual mapping, the unchanged fields, the rationale, and an explicit 
 `boundary`, and `scannerTraversal` are advisory-driven additions rather than unplanned scope.
 
 Slice 2 is authorized.
+
+## Slice 2 — configured task binding
+
+The topic supervisor corrected an over-constrained S2 dispatch: the approved plan already permits
+`deno.json`, the same root-coverage test when its live assertion needs rebinding, and run artifacts.
+No rescope was required and no fourth path entered the slice.
+
+### Progress
+
+| Step | Commit | Result |
+| --- | --- | --- |
+| RED task wiring | `98360da7b` | Checker runs before the still-narrow scanner task; changed-file invocation exits 1 with 29 uncovered. |
+| Green binding | `15d894740` | `quality:scan` uses broad `packages`, `plugins`, `docs/site`; both tasks invoke the checker first. |
+| Live test rebinding | `15d894740` | Live integration expects zero gaps/`ok:true`; structured CLI failure uses an incomplete temp-repo fixture. |
+
+### Advisory A — wiring proof
+
+- `red-forwarding.json` invokes `deno task quality:scan --changed-file
+  .llm/tools/quality/check-root-coverage.ts` at the narrow-root commit. The checker emits the full
+  37/37/35 census and exits 1 on 29 uncovered members before the scanner can run.
+- `forwarding.json` repeats the exact changed-file invocation at the green binding. The checker emits
+  `ok:true`, both task gap arrays are empty, and the next JSON object is the scanner report with
+  `mode:"changed-files"` and `scanned:[".llm/tools/quality/check-root-coverage.ts"]`.
+- Both receipt stderr records show the appended `--changed-file` tokens after the final scanner
+  command and its preserved `--max-allow 7`; they never enter checker root parsing.
+
+### Gate results — slice 2
+
+| Gate | Exit | Commit attested | Receipt |
+| --- | ---: | --- | --- |
+| changed-file forwarding RED | 1 | `98360da7b` | `receipts/slice-2/red-forwarding.json` |
+| focused test (9/9) | 0 | `15d894740` | `receipts/slice-2/test.json` |
+| changed-file forwarding GREEN | 0 | `15d894740` | `receipts/slice-2/forwarding.json` |
+| quality scan | 0 | `15d894740` | `receipts/slice-2/quality-scan.json` |
+| repository quality scan | 0 | `15d894740` | `receipts/slice-2/quality-scan-repo.json` |
+| doctrine architecture check | 0 | `15d894740` | `receipts/slice-2/arch-check.json` |
+| composite quality gate | 0 | `15d894740` | `receipts/slice-2/quality-gate.json` |
+
+The normal scanner report records exact traversal roots `packages`, `plugins`, `docs/site`, zero
+findings, `allowCount:7`, and no allowance failures. The repo scanner records `packages`, `plugins`,
+`.llm/tools/fitness`, `.llm/tools/quality`, and `docs/site`, also with allowance count 7 and no
+failures. The checker reports 37/37/35, both named `publish:false` exclusions, zero gaps for both
+quality tasks, and 36 doctrine roots covering all 35 publishable members.
+
+JSR touched-publishable-member denominator remains empty. S2 changes only root task configuration,
+the internal test, and run evidence; no package/plugin export, dependency pin, runtime asset,
+`import.meta` read, or lockfile changed.
+
+### Handoff
+
+- S2 is stopped for topic-supervisor Tier-A review.
+- S3 and its frozen final gate set are not started.
+- No formal IMPL-EVAL has been launched.
