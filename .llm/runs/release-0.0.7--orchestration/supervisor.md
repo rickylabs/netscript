@@ -896,3 +896,21 @@ evaluator lease is terminal `PASS` at `313cc08d5` rather than active, and `curre
 actual shipped main `0ef48c2ec`. PID `391331` is only a native Claude background spare, not a live
 evaluation, so it remains untouched. This repair changes no topic supervisor, leaf, PR, issue, gate,
 or runtime lease.
+
+At 20:17Z, all three topic-local serial queues advanced independently. #1664 corrected the stale F7
+host premise at pushed plan head `a2e9515f5`, comment `5304036438`; features Tier-A passed at topic
+`8ec20d606` and released the same Sol/high author for exactly two paths plus four cheap receipts, with
+no runtime lease or attempt 6. #1666 pushed recovery evidence `b67414f4f`, comment `5304045867`: the
+supervisor-owned ignored hook transcript is recoverably quarantined with identical SHA-256
+`d0251bc2…ab2`, and the sole unchanged-head retry passed 4203/0/19 while the 4202/1/19 red remains.
+Fresh internals Tier-A is active. #1671 plan amendment `2fa2f71dc`, comment `5304017800`, passed fixes
+Tier-A at topic `6c9486004`; its sole Fable 5/medium Remote Control PLAN-EVAL is active in session
+`session_015RuDy1h3UiCkLzo1PLk5Sc`. #1663 and #1651 option 1 remain untouched.
+
+Follow-on at 20:23Z: #1671 PLAN-EVAL is terminal `PASS` at artifact-only `f76a3c45b`, comment
+`5304059808`, with route/session binding intact. Fixes released S1 only to the same Sol/medium author,
+carrying both RED diagnostics and the no-seventh-path/no-metadata-vocabulary constraints. #1666
+second Tier-A passed at topic `8933f58f2`; because idempotence was the one explicitly carried claim,
+the fresh delta evaluator must re-derive it. Exactly one Fable 5/medium Remote Control evaluator is
+active as job `f281b8cf`, PID 793975, session `session_01UDGunAVYYPRC6KBNxEwZWA`, over content
+`46528ae4c` and evidence `b67414f4f`. No readiness or runtime action is authorized.

@@ -1340,3 +1340,35 @@
   independent live evidence. The observed PID is a Claude background spare and was not stopped.
 - No supervisor, leaf worktree, PR/issue state, acceptance box, evaluator artifact, or runtime lease
   changed. This is an atomic control-plane truth repair only.
+
+## 2026-08-15T20:17:10Z — three topic-local queues cross reviewed boundaries
+
+- #1664's original author replaced the unreviewed false capability-gap F7 plan with pushed F7-C1
+  `a2e9515f5`, comment `5304036438`. Managed Linux Chromium 151 is executable; the defect is the
+  probe's unverified allowlist/selection plus discarded startup status/stderr. Features Tier-A
+  passed at `8ec20d606` and released exactly the existing probe/test paths to the same Sol/high
+  author. No runtime lease, attempt 6, Aspire, Docker, browser, or evaluator is authorized yet.
+- #1666's one unchanged-head root-test retry passed at content `46528ae4c` with 4203 passed, 0 failed,
+  19 ignored in 244980ms. Recovery head `b67414f4f` and comment `5304045867` retain the earlier
+  4202/1/19 red, attribute it to the internals supervisor's ignored hook transcript, and prove its
+  recoverable quarantine byte-identical at SHA-256 `d0251bc2…ab2`. Fresh second Tier-A is active;
+  delta IMPL-EVAL still follows and readiness remains revoked.
+- #1671 amendment `2fa2f71dc` is run-artifact-only, clean, pushed, and commented at `5304017800`.
+  It locks the six paths, denies the metadata barrel/vocabulary, preserves the empty fourth generic,
+  and retains the breaking disclosure. Fixes Tier-A passed at `6c9486004`; one separate Fable
+  5/medium Remote Control PLAN-EVAL is active as job `50898ac7`, PID 636411, session
+  `session_015RuDy1h3UiCkLzo1PLk5Sc`. Product implementation remains prohibited before PASS.
+
+## 2026-08-15T20:23:15Z — #1671 passes PLAN-EVAL; #1666 enters delta evaluation
+
+- #1671's sole Fable 5/medium Remote Control PLAN-EVAL returned `PASS` over `2fa2f71dc`; commit
+  `f76a3c45b` adds only `plan-eval.md`, is explicitly pushed, and comment `5304059808` is live.
+  Fixes released S1 only—`contract-primitives.ts`, `readme-doctest_test.ts`, and existing run
+  artifacts—to the same original author. Both TS18046/TS2339 REDs, contracts-exported schemas,
+  retained `SafeFailure` default, empty metadata slot, and the seventh-path refusal are binding.
+- #1666 second Tier-A passed at internals topic `8933f58f2`. It independently accepted the generated
+  cascade, coherent evidence, recovery receipt, quarantine, path/lock/publication/baseline-red and
+  NOT_RUN boundaries while naming idempotence as carried rather than re-executed. One fresh delta
+  IMPL-EVAL is therefore active as `f281b8cf`, PID 793975, Remote Control
+  `session_01UDGunAVYYPRC6KBNxEwZWA`, over content `46528ae4c` and evidence `b67414f4f` with
+  idempotence explicitly required. Readiness remains revoked and runtime remains untouched.

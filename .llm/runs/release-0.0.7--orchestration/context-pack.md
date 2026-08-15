@@ -742,3 +742,19 @@ Newer reconciliation `2026-08-15T19:57:21Z`: the #1669 evaluator lease record is
 at artifact `313cc08d5`/comment `5303850473`, matching its already-terminal leaf and shipped GitHub
 lifecycle. Cluster `currentMainSha` is corrected to live remote main `0ef48c2ec`. The remaining
 Claude PID is a background spare, not an evaluator, and is preserved. No lane or runtime lease moved.
+
+Newer transition `2026-08-15T20:17:10Z`: #1664 F7-C1 is corrected/pushed at `a2e9515f5`, Tier-A
+PASS at features topic `8ec20d606`, and the same Sol/high author is implementing only the reviewed
+probe/test paths before four cheap receipts and another Tier-A; no runtime lease or attempt 6.
+#1666 recovery `b67414f4f` preserves the 4202/1/19 supervisor-hook red and records the sole
+unchanged-head retry PASS at 4203/0/19; the exact hook event is recoverably quarantined outside the
+repo with identical `d0251bc2…ab2` hashes, and second internals Tier-A is active. #1671 amended plan
+`2fa2f71dc` passed fixes Tier-A at `6c9486004`; native Fable 5/medium Remote Control PLAN-EVAL job
+`50898ac7` is active at `session_015RuDy1h3UiCkLzo1PLk5Sc`. No product mutation before its PASS.
+
+Newer transition `2026-08-15T20:23:15Z`: #1671 PLAN-EVAL passed at artifact-only `f76a3c45b`,
+comment `5304059808`; S1 alone is active on the preserved Sol/medium author with both RED signatures,
+contracts-exported schemas, retained type default, empty metadata slot, and no seventh path. #1666
+second Tier-A passed at `8933f58f2`; fresh Fable 5/medium Remote Control delta IMPL-EVAL job
+`f281b8cf` is active at `session_01UDGunAVYYPRC6KBNxEwZWA` over `46528ae4c`/`b67414f4f`, with
+independent idempotence re-derivation load-bearing. No readiness or runtime lease.

@@ -723,3 +723,15 @@ implementation thread.
   comment, CI, merge, and issue lifecycle were all terminal while its separate evaluator-lease entry
   remained `active`. Reconcile the lease from those independent facts and distinguish a native Claude
   background spare from a live evaluator before considering process cleanup.
+- **Searching an allowlist is not searching the host:** #1664's probe found no Linux path in its six
+  candidates and fell through to Windows Chrome, but two managed Linux Chromium 151 binaries existed
+  and executed. Selection must validate runnability, provide a strict portable override, and retain
+  early status/stderr; an allowlist miss cannot be promoted into an environment-capability claim.
+- **Supervisor prose can become scanner input:** #1666's ignored unscoped hook transcript captured a
+  supervisor explanation containing a prohibited command literal, so the repository scanner correctly
+  failed unchanged generated content. Preserve the red, quarantine the exact transcript recoverably
+  without weakening the scanner, hash before/after, and allow only one unchanged-head retry.
+- **A checked umbrella item may conflict with its normative ownership header:** the first #1350 brief
+  copied a checked metadata sentence from #1348 but missed that the accepted amendment, target owner
+  comment, and live #1466 assign metadata vocabulary elsewhere. Formal planning must reconcile all live
+  authority surfaces before converting a checkbox into leaf ownership.
