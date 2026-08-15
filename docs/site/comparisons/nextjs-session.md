@@ -23,11 +23,10 @@ Freshness date: **2026-08-15**, the observation date in the checked-in aggregate
 
 - **Measured source:** EIS-Chat revision
   `5191de83f3da97559f21d8891c6c8afdf1cf473a`, using the published
-  [source manifest](https://github.com/rickylabs/netscript/blob/4e6d52b3d2cb0bf24aca9a47a67da46a213fef64/docs/site/comparisons/evidence/session-source-manifest.json)
-  and [aggregate output](https://github.com/rickylabs/netscript/blob/4e6d52b3d2cb0bf24aca9a47a67da46a213fef64/docs/site/comparisons/evidence/session-measurements.json).
-  The consumer's framework dependencies are pinned by that immutable revision. Their package
-  versions provide inspected context but are not fields in the published measurement payload, so
-  they are not repeated as measurement here.
+  [source manifest](https://github.com/rickylabs/netscript/blob/43c702b973a71b539ec16e4b93f2c7a2c09d9ab6/docs/site/comparisons/evidence/session-source-manifest.json)
+  and [aggregate output](https://github.com/rickylabs/netscript/blob/43c702b973a71b539ec16e4b93f2c7a2c09d9ab6/docs/site/comparisons/evidence/session-measurements.json).
+  The manifest records the inspected NetScript, Fresh, and Next.js versions, the relevant feature
+  flag state, and the inspection date.
 - **Inspected framework mapping:** Next.js `16.3.0`, pinned by the aggregate's absent-source record
   and the official [release](https://github.com/vercel/next.js/releases/tag/v16.3.0).
 - **Reproduction precondition:** an authorized reviewer needs a clean local checkout of the private
@@ -90,7 +89,7 @@ content is reproduced on this page.
 ## Reproducible static evidence
 
 **Measured.** The primary Session route is **94 physical / 92 nonblank lines**. Under measurement
-tool `1.0.0`, the complete declared surface produces:
+tool `1.1.0`, the complete declared surface produces:
 
 | Inclusion class | Files | Physical | Nonblank | Comment | Tokens |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -139,7 +138,7 @@ Primary references:
 
 ## Mechanism matrix
 
-| Responsibility | NetScript mechanism | Next.js `16.3.0` mechanism | Evidence | Loser overhead | Confidence | Version sensitivity | Follow-up |
+| Responsibility | NetScript mechanism | Next.js `16.3.0` mechanism | Evidence | Loser overhead | Confidence | Version sensitivity | Residual owner |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Dynamic route inputs | Generated route contract bound to `definePage`; callbacks receive typed path values. | App Router dynamic segments expose promise-based `params`. | **Inspected:** pinned consumer; NetScript public API; [dynamic segments](https://nextjs.org/docs/app/api-reference/file-conventions/dynamic-routes). | None established; outbound construction is a separate responsibility. | High: both input mechanisms are directly documented or inspected. | Generated-route and App Router parameter contracts may change across framework versions. | [Type continuity and diagnostics](https://github.com/rickylabs/netscript/issues/1646). |
 | Typed navigation construction | Generated route references construct page and partial targets; normal links retain progressive fallback. | `typedRoutes` types literal `Link` hrefs and navigation methods; dynamic non-literals may need an adapter or `Route` cast. | **Inspected:** pinned consumer and [Next.js TypeScript configuration](https://nextjs.org/docs/app/api-reference/config/typescript). | Next.js may expose an application adapter at a dynamic construction seam; comparative frequency is **deferred**. | Medium: the APIs are clear, but end-to-end diagnostics were not sampled. | Sensitive to route-generator output and Next.js typed-route support. | [Type continuity and diagnostics](https://github.com/rickylabs/netscript/issues/1646). |

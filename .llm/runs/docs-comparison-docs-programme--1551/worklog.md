@@ -66,6 +66,10 @@ The draft PR is partial and must say `Part of #1551`. Follow-ups #1645–#1650 o
 | 2026-08-15 | S3 case, xrefs, migration roadmap, and Concepts wiring authored. | case uses only S2 measured numbers, labels all other evidence, preserves the complete equivalence contract, and maps only case-proven migration concepts; `_data.ts` divergence recorded append-only |
 | 2026-08-15 | Early rendered-link verification found site-relative evidence JSON links unresolved. | evidence JSON is intentionally not copied to `_site`; links changed to immutable blobs at signed-off S2 commit `4e6d52b3d`, then the complete verifier passed |
 | 2026-08-15 | S3 docs audit and manual review completed. | all named commands raw exit `0`; 36,084 rendered links resolve across 229 pages; both roots render under Concepts; matrix, evidence, privacy, terminology, front matter, and cross-page consistency assertions pass |
+| 2026-08-15 | Formal IMPL-EVAL cycle 1 returned `FAIL_FIX`. | evaluated head `15429cf8487cfe3504ae0443fd435d2a72d4528b`; evaluator-only commit `e95f4838038a27a0f209d2ce37c9f53bd4ed4299`; verdict comment `5300794391`; two blocking and three minor findings accepted for bounded repair |
+| 2026-08-15 | Immutable evidence metadata repaired first. | tool `1.1.0`, manifest, aggregate, and tests add `frameworkVersions`, `featureFlags`, and `inspectedAt`; fixed-timestamp reproduction is byte-identical; normalized SHA-256 `3d9d2eeffdce67c34dbeb12275fae8889b00578793fedf2894672037c3e654d2`; prerequisite commit `43c702b973a71b539ec16e4b93f2c7a2c09d9ab6` pushed explicitly |
+| 2026-08-15 | Both canonical comments repaired in place. | Session comment `5265826161` now uses immutable `43c702b…` evidence permalinks and was updated at `2026-08-15T05:53:57Z`; Channel comment `5265971722` labels `181 / 178` inspected, restores the shared measured definition, and was updated at `2026-08-15T05:53:58Z`; no follow-up comment |
+| 2026-08-15 | Public case and final repair gates completed. | case evidence permalinks target `43c702b…`, tool metadata matches `1.1.0`, matrix says `Residual owner`; all applicable proportional gate rows raw exit `0`; lint remains N/A by deliberate root configuration |
 
 ## Gate log
 
@@ -193,6 +197,32 @@ aggregate; after deleting the declared `/observedAt` field, the normalized SHA-2
 | Canonical-comment consistency | compare case page with live comment `5265826161` and S2 authority | pin, counts, feature inventory, labels, deferrals | PASS | same pin, `94 / 92` measurement, generated routes, route-bound partials, cache-seed preservation, layout-faithful fallbacks, cold-navigation behavior, ownership boundaries, evidence labels, and deferred owners; no contradiction | yes |
 | Scope | raw changed-path enumeration from S3 baseline | complete S3 slice | PASS | seven planned non-drift paths plus anticipated `_data.ts` and required `drift.md`; no package/plugin, lock, S2 evidence, external input, or unrelated path | yes |
 
-No release gate, scaffold suite, E2E suite, expensive-gate lease, or evaluator has been run. S3
-stops here for topic-orchestrator Tier-A review; this generator does not self-certify or begin
-IMPL-EVAL.
+At the original S3 handoff, no release gate, scaffold suite, E2E suite, expensive-gate lease, or
+evaluator had been run. S3 stopped for topic-orchestrator Tier-A review without self-certification.
+
+### IMPL-EVAL cycle 1 repair
+
+| Gate / finding | Commands / procedure | Result | Findings |
+| --- | --- | --- | --- |
+| F1 — Channel evidence label | in-place edit and API readback of comment `5265971722` | PASS | `181 / 178` remains an honestly inspected count with its inline procedure; it is no longer called measured; the shared measured definition again requires a published script, pinned inputs, raw aggregate output, and environment metadata; no Channel evidence or remeasurement was added |
+| F2 — immutable evidence links | land evidence commit `43c702b973a71b539ec16e4b93f2c7a2c09d9ab6`, then edit comment `5265826161` and the Session case to use its SHA permalinks | PASS | both comment links and both page links resolve through the immutable evidence commit rather than a mutable branch or superseded S2 commit |
+| F3 — manifest metadata | regenerate at fixed `--observed-at`; `cmp`; normalize two alternate outputs by deleting `/observedAt`; tool tests | PASS | manifest and aggregate carry `frameworkVersions`, `featureFlags`, and `inspectedAt`; fixed-timestamp output is byte-identical; normalized SHA-256 is `3d9d2eeffdce67c34dbeb12275fae8889b00578793fedf2894672037c3e654d2`; aggregates are unchanged |
+| F4 — PR truthfulness | rewrite draft PR #1652 body after repository repair lands | PENDING external publication step | prepared body records landed P0/S1/S2/E0/S3 and cycle-1 repair, preserves `Part of #1551`, keeps Tier-A repair review and IMPL-EVAL cycle 2 unchecked, and does not change draft state or labels |
+| F5 — matrix terminology | inspect the case-study matrix against methodology section 5 | PASS | final column is `Residual owner`, matching the methodology contract |
+| Docs verifier | `rtk proxy deno task --cwd docs/site verify` | PASS / raw exit `0` | 644 files generated; 229 rendered pages pass semantics; all 36,084 internal links and 18 caveat markers resolve |
+| Source links | `rtk proxy deno task docs:links` | PASS / raw exit `0` | 103 docs sources; zero broken links, anchors, or enforced orphans |
+| Accuracy | `rtk proxy deno task docs:accuracy` | PASS / raw exit `0` | 201 published source pages pass; unrelated existing peer-dependency warning remains non-failing |
+| Tool check | exact structured `run-deno-check.ts` command for the measurement tool and test | PASS / raw exit `0` | two files, one batch, zero occurrences |
+| Tool lint | approved lint row | **N/A — not applicable** | root `deno.json` excludes `.llm/` from lint by deliberate repo-wide configuration; the wrapper correctly fails closed rather than reporting a false green. This is not passed, skipped, or waived |
+| Tool format | exact structured `run-deno-fmt.ts` command for the measurement tool and test | PASS / raw exit `0` | two files, one batch, zero findings |
+| Tool tests | exact structured `run-deno-test.ts` command for the measurement test | PASS / raw exit `0` | five passed, zero failed or ignored |
+| Diff hygiene | `git diff --check` | PASS / raw exit `0` | no whitespace errors before run-artifact recording; repeated after the artifacts below |
+| Lock hygiene | `git diff --exit-code origin/main -- deno.lock docs/site/deno.lock` | PASS / raw exit `0` | both lockfiles unchanged |
+| Publication/privacy | API readback plus JSON and changed-prose inspection | PASS | comment `5265826161` updated `2026-08-15T05:53:57Z`; comment `5265971722` updated `2026-08-15T05:53:58Z`; no follow-up, private contents, credentials, CSS, fixtures, domain models, or business prose added |
+
+The evaluator independently reconciled every S2 per-file aggregate, so this repair does not alter
+those totals or the immutable consumer pin. It corrects evidence metadata, labels, permalinks, PR
+state description, and matrix terminology only. The two-commit order is required because a page
+cannot contain a permalink to the not-yet-known SHA of its own commit: `43c702b…` creates the
+immutable evidence target, and the following docs/run-artifact commit links and records it. Stop
+after the draft-PR handoff for topic-orchestrator Tier-A review; do not launch IMPL-EVAL cycle 2.

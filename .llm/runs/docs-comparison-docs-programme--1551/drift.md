@@ -167,3 +167,34 @@ than added silently. S3 therefore adds `/migration/` to the existing Concepts ro
 alongside the pages that make the route resolve. This changes neither the approved information
 architecture nor milestone scope; it is the minimum file needed to satisfy the already-approved
 two-root acceptance statement. No package, plugin, lockfile, or additional content scope is added.
+
+## 2026-08-15 — IMPL-EVAL cycle 1 evidence/publication repair
+
+Severity: **significant** — blocking evidence-contract repair. Status: **resolved pending Tier-A
+review**. Rescope: **none**. Scope growth: **none**.
+
+Formal IMPL-EVAL cycle 1 returned `FAIL_FIX` on evaluated head `15429cf8487cfe3504ae0443fd435d2a72d4528b`
+and evaluator-only commit `e95f4838038a27a0f209d2ce37c9f53bd4ed4299`. It found that the Channel
+comment labeled `181 / 178` measured without published Channel inputs, the Session comment cited
+evidence through mutable branch refs, the Session manifest lacked three methodology-required
+metadata fields, the draft PR body no longer described the landed work, and the case matrix used
+`Follow-up` instead of the methodology's `Residual owner`. Formal PLAN-EVAL cycle 1 and the prior
+topic-orchestrator Tier-A review both passed over the defects.
+
+The repair keeps Channel evidence with residual owner #1649: the honest count and inline inspection
+procedure remain, but the label is `inspected` and the shared `measured` definition again requires a
+published script, pinned inputs, raw aggregate output, and environment metadata. No Channel evidence
+surface or remeasurement is added. The Session manifest and aggregate add only
+`frameworkVersions`, `featureFlags`, and `inspectedAt`; tool `1.1.0` and its tests carry those fields
+consistently. The six inclusion-class aggregates and immutable EIS-Chat pin remain unchanged. The
+timestamp-normalized digest changes from `b9e96ed2…` to
+`3d9d2eeffdce67c34dbeb12275fae8889b00578793fedf2894672037c3e654d2` solely because of the additive
+metadata and tool-version fields.
+
+Immutable evidence linking requires two commits: a document cannot embed the not-yet-known SHA of
+the commit that contains itself. Prerequisite commit `43c702b973a71b539ec16e4b93f2c7a2c09d9ab6`
+therefore creates the immutable evidence target; the following docs/run-artifact commit points the
+case page at that target and records the in-place comment edits. This is a sequencing correction,
+not a rescope or scope expansion. Both canonical comments are edited in place with no addendum or
+follow-up, the PR remains draft and partial, and formal IMPL-EVAL cycle 2 remains a separate
+opposite-family gate after topic-orchestrator Tier-A review.

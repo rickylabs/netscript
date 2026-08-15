@@ -2,10 +2,12 @@
 
 ## Current state
 
-Phase: S1, S2, and E0 are signed off by the topic orchestrator; E0 Tier-A PASS is at
-`54e1c3bff7efc5df9da51bc06a15976717fa0929`. Final slice S3 publishes the deferred Session case,
-migration index/roadmap, stable xrefs, and both Concepts roots. Its complete docs audit passes and
-the slice stops for topic-orchestrator Tier-A review. No IMPL-EVAL has been launched.
+Phase: S1, S2, E0, and S3 landed. Formal IMPL-EVAL cycle 1 returned `FAIL_FIX` on evaluated head
+`15429cf8487cfe3504ae0443fd435d2a72d4528b` (evaluator-only commit `e95f4838038a27a0f209d2ce37c9f53bd4ed4299`,
+verdict comment `5300794391`). The bounded five-finding repair is complete locally: evidence
+metadata is immutable at prerequisite commit `43c702b973a71b539ec16e4b93f2c7a2c09d9ab6`, both canonical
+comments are corrected in place, and the public case plus run record pass all applicable gates.
+The next stop is topic-orchestrator Tier-A review; formal IMPL-EVAL cycle 2 has not been launched.
 
 Branch/worktree: `docs/comparison-docs-programme` in
 `/home/codex/repos/netscript-007-docs-comparison`, no upstream. The re-baselined branch/remote head
@@ -48,8 +50,11 @@ No packages/plugins, locks/dependencies, consumer code copy, publication/release
 - `origin/master` has not advanced beyond that pin. `834a2b36a5c9ef4acf82f8f1f400522d8dab234b`
   has the same tree and is evidence-only, not a newer product baseline.
 - Canonical comment `5265826161` is the definitive current Session analysis and was updated in place
-  at `2026-08-15T04:58:05Z`; comment `5265971722` is the definitive current Channel/form analysis
-  and was updated in place at `2026-08-15T04:58:11Z`. No follow-up comment was posted.
+  at `2026-08-15T05:53:57Z`; its evidence URLs are immutable `43c702b…` permalinks. Comment
+  `5265971722` is the definitive current Channel/form analysis and was updated in place at
+  `2026-08-15T05:53:58Z`; its `181 / 178` count is inspected, not measured, and its measured legend
+  requires a published script, pinned inputs, raw aggregate output, and environment metadata. No
+  follow-up comment was posted.
 - Reproduced primary-route counts are Session `94 / 92` physical/nonblank (published claim
   `119 / 117`, inspected snapshot `121 / 119`) and Channel `181 / 178` (formerly `208 / 204`).
 - The pinned examples now prove generated route contracts, route-bound partials, layout-faithful
@@ -72,6 +77,12 @@ No packages/plugins, locks/dependencies, consumer code copy, publication/release
 - Every number in the case is carried from the S2 manifest/aggregate. The complete included total is
   `5 / 325 / 307 / 14 / 2,669` for files/physical/nonblank/comment/tokens; Next.js remains an absent
   source with every static measurement deferred.
+- Evidence tool `1.1.0`, the manifest, and the aggregate carry `frameworkVersions`, `featureFlags`,
+  and `inspectedAt`. Fixed-timestamp reproduction is byte-identical; after deleting `/observedAt`,
+  the normalized SHA-256 is `3d9d2eeffdce67c34dbeb12275fae8889b00578793fedf2894672037c3e654d2`.
+- The case and Session comment link the evidence through prerequisite commit `43c702b…`, never a
+  mutable branch ref or the superseded `4e6d52b…` evidence version. The matrix heading is
+  `Residual owner`, matching the methodology.
 - S3 adds the case-proven migration placeholder only. Full concept parity remains with #1650.
 - Both `/comparisons/` and `/migration/` render under Concepts. S3 had to touch `docs/site/_data.ts`
   because the approved S3 list omitted the sole Concepts-root registry; the anticipated significant,
@@ -104,7 +115,8 @@ Every slice is under 30 files, has a named gate, commits its worklog/context upd
 
 ## Next authorized action
 
-Commit and explicitly push the nine-path S3 slice, post one structured implementation comment on
-draft PR #1652, then stop for topic-orchestrator Tier-A review. Do not launch IMPL-EVAL or treat the
-generator's verification as certification. Keep `/home/codex/repos/eis-chat-007-input` strictly
-read-only.
+Commit and explicitly push the docs/run-artifact repair, rewrite draft PR #1652's body to its actual
+landed and cycle-1-failed state, post one structured repair comment, then stop for topic-orchestrator
+Tier-A review. Keep the PR draft at `status:impl`, preserve `Part of #1551`, and leave the Tier-A
+repair-review and IMPL-EVAL cycle-2 boxes unchecked. Do not launch cycle 2 or treat generator
+verification as certification. Keep `/home/codex/repos/eis-chat-007-input` strictly read-only.
