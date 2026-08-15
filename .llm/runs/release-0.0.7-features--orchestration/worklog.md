@@ -3025,3 +3025,36 @@ did, which is why this finding existed at all.
 **Verdict `PASS`.** F2 is closed. Expensive-Gate Release Condition 3 is now backed by executable
 proof rather than plan prose, Condition 4 remains satisfied, and cheap convergence is re-established
 at the corrected content head.
+
+## 2026-08-15 — S5 singleton runtime lease ACQUIRED
+
+Granted by `codex-root-0.0.7` at leaf head `b14975af7657869dfb36f5e07d2ef393c1ef989c`. Planned
+order is strictly serial: **`scaffold.runtime` first**, then — only after a terminal result and
+verified cleanup — **`fresh-browser`**. Never overlapping.
+
+### Pre-lease audit re-verified independently
+
+| Check | Result |
+| --- | --- |
+| Leaf tree | clean at `b14975af7` |
+| Docker containers | **zero** |
+| AppHost / DCP / `dotnet run` | **none** |
+| Listening ports (5000/5001/8080/17xxx/18xxx) | **none** |
+| Other lease owner | none |
+
+**One qualification to the granted audit, reported not touched.** The audit stated "no Aspire
+process". There are in fact **8 `aspire mcp start` processes** — ages ~1h36m and ~46m, under parents
+`11805/11817/11828/11839/11850` and `126106/126115/126694`. These are **Aspire MCP servers**, the
+editor/agent tooling integration, not an AppHost or DCP runtime. The substance of the audit holds —
+no distributed app is running — but the literal claim does not, and the difference matters because
+these belong to **sibling supervisors' sessions**, not to this lane.
+
+Under the resource-hygiene contract they are **foreign-owner resources: reported, never touched**.
+Killing them would break other lanes' tooling, and ownership is proven by path containment, which
+none of them satisfy for this run. If `scaffold.runtime` later reports a conflict, this is the first
+thing to re-read — but it is not a reason to pre-emptively clear anything.
+
+Cleanup contract for this lease: `--cleanup` on the scaffold suite; `agentic:leak-check` before,
+between, and after; `agentic:teardown` scoped only to positively proven run-owned resources; any
+foreign resource reported rather than removed. The lease returns only after a final clean
+Docker/Aspire/browser/port audit.
