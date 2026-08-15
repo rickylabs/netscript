@@ -251,3 +251,23 @@ for coordinator Tier-A.
   `a1522e6ecc98dd4232312385b0cea4e52f5fa4b2`.
 - Close-gate and all runtime/prohibited actions remain `NOT_RUN` / `NOT FIRED`. The author stops
   after the run-artifact commit, explicit-refspec push, and structured comment for fresh Tier-A.
+
+## SA-4 test attempt 2 — supervisor-attributed temp transcript
+
+- The supervisor attributed the sole original test red to ignored temp hook transcript
+  `.llm/tmp/claude/hooks/unscoped/events.jsonl`, line 177, timestamp `2026-08-15T19:11:51.339Z`,
+  `sessionId: null`. It is the supervisor's unscoped capture of supervisor prose quoting the
+  forbidden string, not generated product or tracked source.
+- The supervisor moved the exact subtree recoverably to
+  `/home/codex/.claude/jobs/f7691917/quarantine/sa4-hooks-unscoped/`. Pre- and post-move SHA-256 are
+  both `d0251bc2f8c78814724cb2e6c2460102260a39aadb3a21551b81244efbaceab2`; the destination retains
+  262,354 bytes, 180 lines, and mtime `2026-08-15 21:12:52 +0200`.
+- The original red receipt remains byte-unchanged: raw exit 1, 4,202 passed / 1 failed / 19 ignored
+  (4,222 total), SHA-256 `2715babef54414d6b30a89e31487088dec4c446ad9b4efc5ee769e9fc59262f7`.
+- Exactly one distinct attempt ran at detached immutable content head
+  `46528ae4c71b3744f0af64bd749d01d831f70c89`, invocation `reference-export-sa4-test-attempt2`. It
+  returned raw exit 0: 4,203 passed / 0 failed / 19 ignored, 4,222 total.
+- The authoritative twelve-gate evidence set now selects attempt 2 and recomputes `SUFFICIENT`; both
+  test receipts remain in the evidence index with exact totals. No third attempt ran.
+- No scanner, product/source/generated path, lock, runtime, close-gate, PR state, label, or issue
+  state changed.

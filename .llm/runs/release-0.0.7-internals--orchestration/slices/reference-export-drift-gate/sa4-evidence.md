@@ -27,12 +27,15 @@ SA-3.
 
 ## Head-bound receipts
 
-All twelve receipts in `receipts/sa4/` attest the same immutable content head.
+Thirteen receipt files in `receipts/sa4/` attest the same immutable content head. The authoritative
+twelve-gate evidence set selects `test-attempt2.json` for the `test` gate and retains the original
+red `test.json` append-only as diagnostic history.
 
 | Gate                      | Outcome  | Raw exit | Notable result                                                            |
 | ------------------------- | -------- | -------: | ------------------------------------------------------------------------- |
 | `check`                   | PASS     |        0 | Nonempty selection: 2,924 files, 25 batches, zero findings                |
-| `test`                    | **FAIL** |    **1** | 4,202 passed, 1 failed, 19 ignored; see honest red below                  |
+| `test` (original)         | **FAIL** |    **1** | 4,202 passed, 1 failed, 19 ignored; 4,222 total                           |
+| `test-attempt2`           | PASS     |        0 | 4,203 passed, 0 failed, 19 ignored; 4,222 total                           |
 | `quality-job`             | PASS     |        0 | CI quality composite green; existing dependency warnings retained         |
 | `arch-check`              | PASS     |        0 | Zero doctrine failures; existing WARN/INFO findings retained              |
 | `docs-source-format`      | PASS     |        0 | `Docs source format: OK` from `docs/site`                                 |
@@ -44,12 +47,36 @@ All twelve receipts in `receipts/sa4/` attest the same immutable content head.
 | `assets-barrel`           | PASS     |        0 | CLI asset barrel fresh; generator left no diff                            |
 | `publish-dry-run`         | PASS     |        0 | Workspace static simulation; 318,629 bytes of member/file output reviewed |
 
-The checked-in evidence-set evaluation is intentionally `INSUFFICIENT`, with the single reason
-`test did not pass (FAIL)`. The test receipt is not laundered: the sole failure is
-`repository contains no shared-host bulk teardown command`, which found
-`.llm/tmp/claude/hooks/unscoped/events.jsonl: aspire stop --all`. That scratch was not created or
-owned by this generation pass, so it was left alone. The earlier historical red
-`receipts/fix1/test.json` is also preserved unchanged.
+The checked-in evidence-set evaluation is now `SUFFICIENT` with no reasons after the one
+coordinator-authorized distinct attempt. The original red remains byte-unchanged at SHA-256
+`2715babef54414d6b30a89e31487088dec4c446ad9b4efc5ee769e9fc59262f7`; attempt 2 is a separate receipt
+with SHA-256 `855a1509c099c9e48adc04f220d5541164f49a5bb243f2cf522ff870046e0984`. The earlier
+historical red `receipts/fix1/test.json` is also preserved unchanged.
+
+### Original red attribution and recoverable quarantine
+
+- Offending scanned path: `.llm/tmp/claude/hooks/unscoped/events.jsonl`, an ignored temporary hook
+  transcript covered by `.gitignore`, not generated product or a tracked source.
+- Exact event: line 177, timestamp `2026-08-15T19:11:51.339Z`, `sessionId: null`. A corrected JSON
+  probe returned raw exit 0 and found the single forbidden string at `$.event.tool_input.command`.
+- Ownership: the supervisor's unscoped hook capture of a supervisor tool input. Its payload is the
+  supervisor's own prose documenting the earlier test contamination and quoting the forbidden
+  command. The generation slice did not create it.
+- The supervisor moved the exact subtree intact from `.llm/tmp/claude/hooks/unscoped/` to
+  `/home/codex/.claude/jobs/f7691917/quarantine/sa4-hooks-unscoped/`. The event was not edited and
+  the scanner was not weakened, narrowed, or excluded.
+- Supervisor-recorded pre-move SHA-256:
+  `d0251bc2f8c78814724cb2e6c2460102260a39aadb3a21551b81244efbaceab2`. Independently verified
+  post-move SHA-256: the identical
+  `d0251bc2f8c78814724cb2e6c2460102260a39aadb3a21551b81244efbaceab2`.
+- Destination evidence is recoverable and retains 262,354 bytes, 180 lines, and mtime
+  `2026-08-15 21:12:52 +0200`. The original scanned subtree is absent.
+- No product, source, generated cascade, export map, task, workflow, or lock diff was affected by
+  the transcript or its quarantine.
+
+A first narrow attribution probe used the nonexistent `timestamp` field instead of the transcript
+schema's `ts` field and returned raw exit 1; it made no attribution claim. The corrected probe used
+`ts` and returned raw exit 0 with the exact line/timestamp/session/match path above.
 
 `publish-dry-run` is static packaging and isolated-declaration evidence only. It does not prove a
 real publish, installation, remote dependency graph, or production behavior; no publish ran.
@@ -93,7 +120,8 @@ corrected CLI and MCP member runs both recorded raw publish exit 0 and raw nonem
 - Base, content-head, and working-tree `deno.lock` blob IDs are byte-identical:
   `a1522e6ecc98dd4232312385b0cea4e52f5fa4b2`.
 - Post-gate generated-output and lock diffs both returned raw exit 0.
-- No archive/tarball existed under `.llm/tmp/`; no foreign scratch was deleted.
+- No archive/tarball existed under `.llm/tmp/`. The supervisor's attributed transcript was moved
+  intact to the recoverable quarantine above; the implementation author did not edit or delete it.
 
 `fresh-browser` remains N/A / waived and `NOT_RUN`; no runtime lease exists. Close-gate is
 `NOT_RUN`. Aspire, Docker, browsers, `e2e:cli`, scaffold/runtime/service smokes, real publish,

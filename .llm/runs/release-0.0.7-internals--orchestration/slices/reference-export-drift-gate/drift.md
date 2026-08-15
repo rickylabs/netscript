@@ -71,3 +71,20 @@
   `0.0.6`.
 - **Boundary drift:** none. Seventeen-path and lock audits pass; fresh-browser and close-gate remain
   `NOT_RUN`, and all runtime/readiness/coordinator mutations remain `NOT FIRED`.
+
+## SA-4 — test red attribution and authorized attempt 2
+
+- **Attribution correction:** the original red was not merely foreign scratch of unknown origin. The
+  supervisor proved it was the supervisor's ignored unscoped hook capture of supervisor prose, at
+  line 177 / `2026-08-15T19:11:51.339Z` / `sessionId: null`. No generated or tracked source was
+  implicated.
+- **Recoverable quarantine:** the supervisor moved the intact hook subtree outside the repo to
+  `/home/codex/.claude/jobs/f7691917/quarantine/sa4-hooks-unscoped/`; pre/post SHA-256 are identical
+  at `d0251bc2f8c78814724cb2e6c2460102260a39aadb3a21551b81244efbaceab2`. The scanner was not
+  weakened and the event was not edited or deleted.
+- **Evidence resolution:** the one authorized distinct `test-attempt2` at content head `46528ae4c`
+  passed raw 0 with 4,203 passed / 0 failed / 19 ignored. The original raw-1 receipt remains
+  unchanged at 4,202 / 1 / 19; no third attempt ran. The authoritative evidence set now selects
+  attempt 2 and recomputes `SUFFICIENT` while indexing both receipts.
+- **Boundary drift:** none. No product/source/generated/lock change resulted from attribution or
+  quarantine; runtime, close-gate, PR-state, label, issue-box, and merge actions remain untouched.

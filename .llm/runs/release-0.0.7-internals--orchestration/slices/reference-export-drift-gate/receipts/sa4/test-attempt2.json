@@ -1,0 +1,36 @@
+{
+  "gateId": "test",
+  "invocationId": "reference-export-sa4-test-attempt2",
+  "argv": [
+    "deno",
+    "task",
+    "test"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-reference-export",
+  "gitHead": "46528ae4c71b3744f0af64bd749d01d831f70c89",
+  "actualGitHead": "46528ae4c71b3744f0af64bd749d01d831f70c89",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:783804",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "d8638cffe001e3f7fef6b5c51013a79ca71c5f834362756569030470493183ad",
+  "lifecycleId": "worker:783804:reference-export-sa4-test-attempt2:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T20:08:28.701Z",
+  "startedAt": "2026-08-15T20:08:28.704Z",
+  "finishedAt": "2026-08-15T20:12:50.222Z",
+  "durationMs": 244980,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 270,
+    "sha256": "533bc0f57d98519b2b9bc94fc487b9d71124589b51a5ea358ae4cc1fd93026a9",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\"],\"cwd\":\"/home/codex/repos/netscript-007-reference-export\",\"exitCode\":0,\"durationMs\":244868,\"summary\":{\"passed\":4203,\"failed\":0,\"ignored\":19,\"totalResults\":4222,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 101,
+    "sha256": "5ae7e9d1dade1dc447e471529cd4f870e6b8391091eb2b26d56244ed895c3917",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all\n",
+    "truncated": false
+  }
+}

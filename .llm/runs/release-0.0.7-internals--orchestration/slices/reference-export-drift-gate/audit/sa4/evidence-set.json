@@ -28,10 +28,8 @@
     "reference-export-sa4-publish-assets",
     "reference-export-sa4-publish-dry-run",
     "reference-export-sa4-quality-job",
-    "reference-export-sa4-test"
+    "reference-export-sa4-test-attempt2"
   ],
-  "sufficiency": "INSUFFICIENT",
-  "reasons": [
-    "test did not pass (FAIL)"
-  ]
+  "sufficiency": "SUFFICIENT",
+  "reasons": []
 }
