@@ -1162,3 +1162,55 @@ this lane, promote one or more of `#1645`–`#1650` out of Backlog, or mark the 
 cycle was relaunched for #1652.
 
 Immutable base for any next docs leaf: `e090f894ff3682405a36e4f896ffd2cc16f9a1f8`.
+
+## 2026-08-15 — #1660 terminal green at 615786c1a; merge withheld, coordinator is sole authority
+
+### Terminal CI, read from Actions at the exact head
+
+Head `615786c1a93c39e7f6b9a1b40b5cee39b163ff8a`. Run `31876605723` (`ci`) `completed/success` with
+**zero job failures**: `quality` success, `check-test` success, `close-gate` success,
+`classify changes` success, `core CI lane visibility` success, `deps-report` skipped. Sibling runs
+at the same head: `Code quality` success, `Deploy docs site to Pages` success;
+`public-surface-diff`, `e2e-cli`, and the OpenHands runner skipped. **Zero non-success terminal
+runs.**
+
+`check-test` is the job that failed the previous readiness run, and `close-gate` passing confirms
+the eight #1659 acceptance boxes were accepted with their evidence.
+
+PR #1660 observed as `state: open`, `draft: false`, `mergeable: true`, `mergeable_state: clean`,
+base `main`.
+
+### Tier-A made durable at the exact content head
+
+The census repair had gates run but no recorded review until `issuecomment-5301575337`. That comment
+now carries the invariant table establishing the failure as a test defect, the repaired assertion,
+the four gate exit codes, and the decisive check that `git diff e35824d41..615786c1a -- docs/site`
+is empty — the comparison pages were never edited to satisfy a test.
+
+### Merge withheld, and an authority conflict surfaced rather than resolved
+
+The owner instructed this lane directly to merge once finished so the pages could be reviewed on the
+published site. The coordinator subsequently stated it remains sole merge authority. Those
+instructions conflict.
+
+This lane followed the coordinator's restriction, on the reasoning that not merging is reversible
+while merging against an explicit prohibition is not — and surfaced the conflict to both rather than
+resolving it by following whichever instruction arrived most recently. Choosing silently between two
+authorities is not a call a topic orchestrator should make.
+
+### Lifecycle state disclosed, not reverted
+
+`draft: false`, `status:ready-merge`, and `impl-eval:skip` were set by this lane earlier, acting on
+the owner's merge instruction and before the coordinator's correction. They are left as-is:
+reverting is itself a lifecycle mutation, which the correction forbids. Disclosed on the PR so the
+state is not discovered later and mistaken for someone else's action.
+
+Also disclosed on the PR: **no formal IMPL-EVAL ran on #1660.** Tier-A is the only independent
+review this changeset has had, unlike #1652 which earned a cycle-2 `PASS`. `impl-eval:skip`
+suppresses the automatic ready-transition dispatch; it does not represent a waived evaluation.
+
+### Publication paths
+
+`/netscript/comparisons/frontend/` and `/netscript/comparisons/backend/`, plus the rewritten
+`/netscript/comparisons/` chooser. The site deploys from `main`, so these resolve only after a merge
+performed by the coordinator; until then they are paths rather than live links.
