@@ -119,20 +119,41 @@ contract.
 lease. And uniquely here: the leaf may **read** the OpenHands workflows but must not **fire** them —
 no dispatch, no evaluator trigger, manual or by label.
 
-### Blocking coordinator action
+### Current state — implementation authorized
 
-The leaf is at its plan stop with the **repaired** plan head
-**`cea999d18ea2c2d4a6208fc209ce744d9be1d194`**, Tier-A reviewed **PASS** (comment `5301190104`).
-Contract rescoped at central head `feaf2da311ccc4b15c210d25fda5ff1699b60576` to an **eight-path**
-mutation envelope; `openhands-phase-eval.yml` is read-only precedent, not an edit path.
+PLAN-EVAL returned **`PASS`** at evaluated head `cea999d18ea2c2d4a6208fc209ce744d9be1d194`;
+evaluator commit `e15d78588503f4a83d6322be9039abe1f52190a1` (artifact only), comment `5301255122`.
+Local = remote = PR = `e15d78588`. The original Codex author `01a00443-abab-7261-8905-74ed71467929`
+is resumed for **S1–S5**, one slice per turn with a Tier-A stop between each.
 
-**Requested and awaiting: one fresh native Claude Opus 5 / medium Remote Control PLAN-EVAL** against
-`cea999d18`. Necessary — the leaf changes an atomic provider-spend claim boundary, workflow
-candidate selection, comment-write permissions, and externally visible refusal semantics, whose
-failure modes are silent refusal, recursion, and duplicate paid dispatch. This lane does not
-self-launch it, and implementation stays prohibited until `PASS`.
+**Five PLAN-EVAL notes carried into implementation:**
 
-No OpenHands dispatch and no evaluator label have been applied.
+- **N1** — the S1-before-S4 rationale is wrong as written: `issue_comment` workflows and the trusted
+  policy checkout both resolve from the **default branch** (`openhands-agent.yml:164`), so no
+  intermediate commit on this branch affects live dispatch. The ordering stands on the **S4→S1 API
+  dependency**. My Tier-A review endorsed the wrong reasoning; correction owed in `worklog.md`.
+- **N2** — **`test` is the only proving gate with real coverage here.** `check`/`quality-job` walk
+  roots that exclude all eight paths, so three green receipts are **not** three independent proofs.
+  The new `dispatch-openhands_test.ts` is auto-discovered — **no ninth path**.
+- **N3** — refusal constants must avoid bare verdict tokens, or `agentic-lib.ts:939`
+  `HEURISTIC_TOKEN_RE` lets a watcher mine a refusal as a verdict.
+- **N4** — implement and assert **test-by-reason** the five denial reasons:
+  `command-not-first-token`, `invalid-command-argument`, `unknown-command-argument`,
+  `duplicate-command-argument`, `author-not-authorized`.
+- **N5** — post refusals with **`GITHUB_TOKEN`** under the new `issues: write` grant, not the
+  `permissions:`-unconstrained `secrets.PAT_TOKEN` (`openhands-agent.yml:174`), so the declared
+  minimal grant is the real ceiling.
+
+**Not this leaf's to take:** OpenHands dispatch or any evaluator trigger (it edits the dispatch
+surface — firing it spends real budget), Aspire, Docker, browser/desktop, E2E, expensive-gate lease.
+The plan gate is closed; no new PLAN-EVAL.
+
+### Evaluator session hygiene
+
+Evaluator sessions here linger in `state: blocked` with `firstTerminalAt: null` after delivering,
+pushing, and commenting — seen on `ee2825f2` (#1656) and `7d544aec` (#1658). **Reconcile verdicts
+from the durable artifacts** (evaluator commit, pushed head equality, structured PR comment), not
+from session state, then stop the session explicitly. Both are stopped; the lane is quiescent.
 
 ### Remaining internals queue after this leaf
 
