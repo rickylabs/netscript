@@ -27,17 +27,26 @@ Drift is append-only.
   widen this leaf.
 - **Evidence:** `research.md` finding 11.
 
-## 2026-08-15 — Supplied doc-lint diagnostic count not reproducible
+## 2026-08-15 — Doc-lint brief ambiguity corrected by the orchestrator
 
-- **What:** the brief pins raw SDK doc-lint at exactly six `private-type-ref` diagnostics.
-- **Source:** coordinator brief.
-- **Expected:** explicit raw full-export `deno doc --lint` exits 1 with six named diagnostics.
-- **Actual:** it exits 1 with three unique named diagnostics: `QueryClientPort` → `QueryClient`,
-  `createNetScriptQueryClient` → `QueryClient`, and
-  `DurableStreamProducerOptions["instrumentation"]` → `StreamsInstrumentation`. Root `mod.ts` alone
-  yields the first two. The structured full-export runner also identifies the same three unique
-  source diagnostics while showing their repetition through multiple entrypoints.
+- **What:** the brief's count of six compressed two separate expected-red invocations into one
+  number.
+- **Source:** coordinator brief, corrected by the orchestrator at plan head `7e5be1514`.
+- **Expected:** the original wording ambiguously pinned one raw SDK doc-lint invocation at six
+  diagnostics.
+- **Actual:** the combined 12-entrypoint invocation exits 1 with exactly three diagnostics:
+  `QueryClientPort` → private `QueryClient` (`src/ports/query-client.ts:41:1`),
+  `createNetScriptQueryClient` → private `QueryClient`
+  (`src/query-client/query-client-factory.ts:44:1`), and
+  `DurableStreamProducerOptions["instrumentation"]` → private `StreamsInstrumentation`
+  (`packages/plugin-streams-core/src/application/create-durable-stream.ts:41:3`). The cache-only
+  invocation separately exits 1 with exactly three diagnostics in `src/cache/kv-cache-store.ts`:
+  `KvCacheStore` → private `CacheStore` (`:48:1`), `KvCacheStore.prototype.get` → private `CacheKey`
+  (`:97:3`), and `KvCacheStore.prototype.get` → private `CacheStoreEntry` (`:97:3`). "Six" was the
+  sum of those two invocation counts; the combined invocation's `plugin-streams-core` diagnostic is
+  not this leaf's repair scope.
 - **Severity:** significant
-- **Action:** preserve the observed red set, never report a pass, and ask PLAN-EVAL/coordinator to
-  identify the command behind the six-diagnostic pin before merge-readiness reporting.
-- **Evidence:** commands and outputs summarized in `research.md` JSR scan and `worklog.md`.
+- **Action:** resolved — pin and run both invocations independently. Each must exit 1 with exactly
+  its three named diagnostics and no others; neither may be reported as a pass.
+- **Resolution:** brief ambiguity corrected by the orchestrator.
+- **Evidence:** `plan.md` validation rows 14a–14b and the orchestrator's correction at `7e5be1514`.
