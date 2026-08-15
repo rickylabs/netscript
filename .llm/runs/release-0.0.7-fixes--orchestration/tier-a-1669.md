@@ -318,3 +318,97 @@ commit touched no source at all, so S1's landed behaviour is intact at this head
 
 S2-A Tier-A **PASS** at `ef3e43f06`. Resuming the same original author for the single-line source
 correction and S2 continuation. No evaluator, no runtime lease, PR stays draft at sole `status:plan`.
+
+---
+
+# Tier-A — S2 final at `9aa54ae2d4f53c705b0309ed472abf7bbccebe41`
+
+| Field | Value |
+| --- | --- |
+| Head | `9aa54ae2d4f53c705b0309ed472abf7bbccebe41` — local == remote == PR, clean, draft, sole `status:plan` |
+| Commits | `eba0b0924 fix(sdk): honor stale-only fresh preference` (content), `9aa54ae2d docs(harness): record S2 validation` (evidence) |
+| Verdict | **PASS** — implementation complete across S1, S2-A, S2 |
+
+## Scope — exact, nothing undeclared
+
+`cache-query.ts`, `query-factory_test.ts`, the two authorized docs pages, **exactly** the four
+declared mirrors, and three run artifacts. **`packages/sdk/tests/cache/cache-query_test.ts` is
+untouched** — the ungranted path stayed ungranted, and the S2-A judgement that the factory surface
+would suffice is borne out below.
+
+## The S2-A correction — RED proven independently
+
+`cache-query.ts:165` now reads `if (isExpired || (!isFresh && preferFreshOnStale))`.
+
+I did not take the RED on report. A detached worktree at the pre-fix head `ef3e43f06` (predicate
+`isExpired || preferFreshOnStale`) with the new test copied in gives:
+
+```
+exitCode 1 — 5 passed / 1 failed
+"Expected seeded-fresh, got fetched"
+  published loader runs cache policy before reading persisted metadata (:129)
+```
+
+At `9aa54ae2d` the same test is **6 passed / 0 failed**. The defect and its fix are demonstrated on
+the real code path. Worktree removed afterwards; the leaf tree was never touched.
+
+All four branches are proven inside `query-factory_test.ts:129`, against a `MemoryCacheStore` with a
+seeded timestamp and a loader call counter: **fresh + `preferFreshOnStale: true` ⇒ `clientCalls === 0`**
+and `cachedAt === freshTimestamp` (the regression that was missing), missing ⇒ fetch, expired ⇒ fetch,
+stale ⇒ blocking refresh replacing the stale timestamp. The granted surface was sufficient.
+
+## S1 preserved
+
+497 lines; JSDoc intact on all five private methods (1/1/1/2/1); no F-1 finding. A2/A3 machinery
+untouched by the predicate edit.
+
+## Documentation contract
+
+The false clause "the stale entry refreshes in the background" is **gone**. Retained-line scoping text
+is present (`:17-18`: "`getCachedEntry(input)` is a separate KV-only metadata read and never
+schedules a refresh"); the API table entry is corrected (`:100`); the pure-read contract is stated
+(`:106`). The A4 posture clause is complete (`:114-118`): the loader composition, plus "The default
+callable action without the flag is the non-blocking SWR path; this loader chooses
+`preferFreshOnStale: true` so `cachedAt` reflects the refreshed value."
+
+Sweep of both authorized pages finds **no surviving same-class false claim**. One grep hit at
+`sdk.md:188` is a **negation** inside the corrected snippet — "getCachedEntry is a KV-only metadata
+read; it never fetches or revalidates" — and that snippet also preserves the fail-safe fallback
+`entry ?? { data, cachedAt: Date.now() }`.
+
+**A1 handled correctly:** `worklog.md:116-119,200` records the S2 page-level sentence as manual
+evidence and states explicitly that the `docs-accuracy` PASS "must not be cited as proof of that
+sentence". That is the supervisor error this topic made and the previous evaluator corrected; the run
+record now reflects the truth.
+
+## Cascade — idempotent, not merely generated
+
+All three freshness gates (`check:assets-barrel`, `check:publish-assets`, `check:agent-docs-prose`)
+**PASS**, and the working tree stays **clean** afterwards. Regeneration reproduces the committed
+mirrors rather than having been run once — the stronger form of the claim.
+
+## Gates — executed by this review
+
+| Gate | Result |
+| --- | --- |
+| `query-factory_test.ts` | **6 / 0** (pre-fix: 5 / 1) |
+| `packages/sdk` suite | **69 / 0** (68 at S1) |
+| check / lint / fmt (84 files) | 0 / 0 / 0 |
+| **root `deno task test`** | **4206 passed / 0 failed / 19 ignored** — no #1667 recurrence |
+| **root check, uncached wrapper** | **2925 files, 25 batches, 0 diagnostics** |
+| Raw doc-lint combined / cache | 3 / 3 — pins unchanged, both still expected-red |
+| `quality:scan` | `ok:true`, 0 findings, 7 known allowances |
+| `arch:check` | **FAIL=0** |
+
+Root check was re-run through the underlying wrapper rather than accepting a `deno task` cache line.
+
+## Receipt
+
+The structured implementation receipt is present on the PR:
+`[PHASE: IMPL] [VERDICT: COMPLETE]` at 2026-08-15T18:59:41Z naming head `9aa54ae2d…`. Nothing was
+missing and no author round-trip was needed to obtain it.
+
+## Outcome
+
+S2 Tier-A **PASS** at `9aa54ae2d`. Proceeding to a separate native Claude Fable 5 · medium · Remote
+Control IMPL-EVAL bound to this exact head. No runtime lease; PR remains draft at sole `status:plan`.
