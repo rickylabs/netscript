@@ -122,3 +122,63 @@ While verifying E-1 the topic orchestrator ran `deno task check:assets-barrel`, 
 tree. It was **reverted with `git checkout --` before dispatch**, restoring the committed stale
 state, so the repair delta is produced by the Codex author and not by the supervisor. Verified clean
 at `ca8773f66` with the barrel back to `total: 50` before the author was resumed.
+
+## Non-formal efficiency correction — the T-3 CI expansion is reverted
+
+Recorded by topic orchestrator `topic-fixes-0.0.7` on coordinator disposition after cycle-2 `PASS`
+(`ed9ee7663`). **Formal IMPL-EVAL cycle 2 `PASS` at head `3d7819203f59e68eb5b45f6871a03c41ca43cd2f`
+stands unchanged and final.** This is a post-evaluation efficiency cleanup, **not** a formal cycle,
+and there is no cycle 3.
+
+### G-1 — the T-3 amendment's recorded root cause was factually wrong
+
+Cycle-2 finding G-1, independently re-verified by this orchestrator:
+
+- Root `deno.json` declares `workspace: ["packages/*", …]`. `packages/fresh-ui` **is** matched by
+  `packages/*`. The earlier claim that it "is not a member of the root workspace" is **false** — it
+  came from filtering workspace entries for the literal string `fresh`, which a glob does not
+  contain. That is a bad probe, not a fact.
+- Executed from the repo root:
+  `deno test --allow-all --no-check --filter 'generated design catalog matches the Fresh UI registry manifest'`
+  → **1 passed, 0 failed, exit 0**. Root discovery reaches the drift gate.
+- The classifier sets `needsDeno = true` for **both** `packages/fresh-ui/registry.manifest.ts` and
+  the CLI design-asset template, and `ci.yml`'s required `check-test` job runs the root `test` gate
+  under that guard.
+
+So #1358's close-gated requirement — "the drift gate runs in CI on every change to
+`registry.manifest.ts` **or** the CLI design assets" — was **already satisfied before the T-3
+amendment existed**. The T-3 finding was blocking on a false premise.
+
+Sharper still: `fresh-ui-quality.yml`'s job runs `--gate check`, `--gate lint`,
+`fresh-ui-lock-regression`, and `clean-worktree`. **It has no test step**, so wiring the design
+assets into it added *zero* drift-gate coverage and only duplicated check/lint work on CLI design
+PRs — precisely the false-positive/noncritical CI expansion the owner asked to eliminate.
+
+### Disposition — revert exactly the three CI files
+
+`.github/workflows/fresh-ui-quality.yml`, `.github/scripts/ci-classify-changes.ts`, and
+`.github/scripts/ci-classify-changes.test.ts` return to their **current `origin/main` bytes**
+(`origin/main` = `e090f894ff3682405a36e4f896ffd2cc16f9a1f8`). No other product path changes.
+
+**All core #1358 work is retained**: the catalog template fix, the drift gate and its symmetric
+fixtures, and the regenerated `embedded.generated.ts` barrel with its `assets-barrel` receipt.
+
+### G-2 disposition — static consumer evidence accepted
+
+The inherited `fresh-browser` receipt is legitimate for what it covers, but it never rendered the
+generated design gallery — it is the **form-navigation** browser regression. Any run-artifact claim
+implying that receipt exercised the gallery is corrected. Consumer proof for #1358 rests on static
+evidence: the decoded barrel (66 ordered, field-exact items, the `ai` collection,
+`registryCollections`, exact `registryMeta`) plus the drift gate. No browser, Aspire, Docker,
+scaffold, or E2E run is authorized.
+
+### Orchestrator accountability
+
+This is the **second** analytical error by this topic orchestrator on this leaf, with the same root
+cause as the first: concluding from a narrow probe instead of executing the thing. The first was
+E-1 (verified template↔manifest semantics exhaustively, never asked whether the template is what
+ships). The second is G-1 (filtered workspace globs for a substring instead of running the root
+test). Both were caught by formal evaluation, which is the gate working — but the pattern is
+recorded here rather than left implicit, because a supervisor whose probes are weaker than its
+conclusions manufactures work for the lanes it supervises. The corrective rule: **execute the check;
+never infer a negative from a pattern match.**
