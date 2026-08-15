@@ -9,6 +9,7 @@ import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
 import { createServiceGenerateCommand } from './generate-service-command.ts';
 import { generateServiceClients } from './generate-service-clients.ts';
+import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
@@ -210,12 +211,16 @@ async function createHarness(
     }),
   );
   const template = new StringTemplateAdapter(fs);
+  const formatter: GeneratedSourceFormatterPort = {
+    formatContent: (_path, content) => Promise.resolve(`// canonical\n${content}`),
+    formatFiles: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
+  };
   return {
     fs,
     dependencies: {
       readProjectName: () => Promise.resolve('shop'),
       serviceResolver: new ServiceWorkspaceResolver(fs),
-      clientScaffolder: new ServiceClientScaffolder(new Scaffolder(template, fs), fs),
+      clientScaffolder: new ServiceClientScaffolder(new Scaffolder(template, fs), fs, formatter),
     },
   };
 }

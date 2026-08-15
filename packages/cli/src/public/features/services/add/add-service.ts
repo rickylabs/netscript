@@ -16,6 +16,7 @@ import {
   generateServiceClients,
   validateServiceClientContracts,
 } from '../generate/generate-service-clients.ts';
+import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 
 /** Dependencies used by the public add-service flow. */
 export interface AddServiceDependencies extends RenderServiceDependencies {
@@ -37,12 +38,16 @@ export interface AddServiceDependencies extends RenderServiceDependencies {
   /** Typed client/query module scaffolder. */
   readonly clientScaffolder?: ServiceClientScaffolder;
 
+  /** Pre-write canonicalizer for post-init generated source. */
+  readonly formatter: GeneratedSourceFormatterPort;
+
   /** Helper regeneration override for tests. */
   readonly regenerateHelpers?: (
     projectRoot: string,
     fs: FileSystemPort,
     scaffolder: ScaffolderPort,
     templateAdapter: TemplatePort,
+    options?: { readonly formatter?: GeneratedSourceFormatterPort },
   ) => Promise<readonly string[]>;
 }
 
@@ -96,6 +101,7 @@ export async function addService(
     dependencies.fs,
     dependencies.scaffolder,
     dependencies.templateAdapter,
+    { formatter: dependencies.formatter },
   );
 
   return {

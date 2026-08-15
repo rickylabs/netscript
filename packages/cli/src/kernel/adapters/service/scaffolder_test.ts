@@ -22,6 +22,7 @@ import { generateDenoJson } from '../../templates/workspace/deno-json.ts';
 import { PortAllocator } from './port-allocator.ts';
 import { ServiceScaffolder } from './scaffolder.ts';
 import { ServiceWorkspaceResolver } from './workspace-resolver.ts';
+import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
@@ -66,6 +67,41 @@ Deno.test('ServiceScaffolder creates a contract-bound service workspace', async 
   assertStringIncludes(mainContent, "port: parseInt(Deno.env.get('PORT') || '3000')");
 });
 
+Deno.test('ServiceScaffolder writes canonical content for every generated service file', async () => {
+  const { fs, scaffolder, templateAdapter } = createHarness();
+  const formattedPaths: string[] = [];
+  const formatter: GeneratedSourceFormatterPort = {
+    formatContent: (path, content) => {
+      formattedPaths.push(path);
+      return Promise.resolve(path.endsWith('.json') ? content : `// canonical\n${content}`);
+    },
+    formatFiles: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
+  };
+
+  await new ServiceScaffolder(scaffolder, fs, templateAdapter, formatter).scaffold({
+    projectName: 'my-app',
+    targetPath: '/project',
+    serviceName: 'payments',
+    servicePort: 3001,
+    importMode: 'jsr',
+    force: false,
+  });
+
+  assertEquals(formattedPaths, [
+    '/project/services/payments/deno.json',
+    '/project/services/payments/src/main.ts',
+    '/project/services/payments/src/router.ts',
+    '/project/services/payments/src/routers/health.ts',
+    '/project/services/payments/src/routers/v1.ts',
+  ]);
+  assertEquals(
+    (await fs.readFile('/project/services/payments/src/routers/v1.ts')).startsWith(
+      '// canonical\n',
+    ),
+    true,
+  );
+});
+
 Deno.test('shared contract scaffolder creates service contracts and aggregates v1 mod exports', async () => {
   const { fs, scaffolder, templateAdapter } = createHarness();
   await fs.writeFile('/project/deno.json', JSON.stringify({ workspace: ['./contracts'] }));
@@ -85,8 +121,7 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
       importMode: 'jsr',
       force: false,
       imports: {
-        '@database/zod':
-          '../database/postgres/schema/.generated/zod/crud.ts',
+        '@database/zod': '../database/postgres/schema/.generated/zod/crud.ts',
       },
     },
   });
@@ -185,7 +220,7 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
       ),
       Deno.writeTextFile(
         join(compileRoot, 'stubs', 'contracts.ts'),
-        "export const baseContract = { route: (_route: unknown) => ({ output: <T>(schema: T): T => schema }) };\n",
+        'export const baseContract = { route: (_route: unknown) => ({ output: <T>(schema: T): T => schema }) };\n',
       ),
       Deno.writeTextFile(
         join(compileRoot, 'stubs', 'crud.ts'),
@@ -224,6 +259,51 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
   } finally {
     await Deno.remove(compileRoot, { recursive: true });
   }
+});
+
+Deno.test('shared contract scaffolder canonicalizes the service contract and version aggregate', async () => {
+  const { fs, scaffolder, templateAdapter } = createHarness();
+  await fs.createDir('/project/contracts/versions/v1');
+  const formattedPaths: string[] = [];
+  const formatter: GeneratedSourceFormatterPort = {
+    formatContent: (path, content) => {
+      formattedPaths.push(path);
+      return Promise.resolve(`// canonical\n${content}`);
+    },
+    formatFiles: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
+  };
+  const contractScaffolder = createContractScaffolder({
+    scaffolder,
+    templateAdapter,
+    templateRegistry: new DefaultContractTemplateRegistry(),
+    versionRegistry: new ContractVersionRegistry(fs, formatter),
+    formatter,
+  });
+
+  await contractScaffolder.addServiceContract(
+    {
+      projectName: 'my-app',
+      targetPath: '/project',
+      importMode: 'jsr',
+      force: false,
+    },
+    { serviceName: 'payments', version: DEFAULT_CONTRACT_VERSION },
+  );
+
+  assertEquals(formattedPaths, [
+    '/project/contracts/versions/v1/payments.contract.ts',
+    '/project/contracts/versions/v1/mod.ts',
+  ]);
+  assertEquals(
+    (await fs.readFile('/project/contracts/versions/v1/payments.contract.ts')).startsWith(
+      '// canonical\n',
+    ),
+    true,
+  );
+  assertEquals(
+    (await fs.readFile('/project/contracts/versions/v1/mod.ts')).startsWith('// canonical\n'),
+    true,
+  );
 });
 
 Deno.test('PortAllocator assigns next available service port', async () => {

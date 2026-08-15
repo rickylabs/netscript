@@ -16,6 +16,7 @@ import { planServiceAdd } from './plan-service-add.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
 import { ServiceClientScaffolder } from '../../../../kernel/adapters/service/client-scaffolder.ts';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
+import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 
 // This flow renders root project metadata via sync template generators, which
 // require a previously-awaited registry hydration. The test drives the flow
@@ -48,6 +49,8 @@ describe('public add service flow', () => {
     await writeProjectFiles(fs);
     const templateAdapter = new StringTemplateAdapter(fs);
     const scaffolder = new Scaffolder(templateAdapter, fs);
+    const formatter = identityFormatter();
+    const helperOptions: unknown[] = [];
 
     const result = await addService({
       serviceName: 'billing',
@@ -66,12 +69,17 @@ describe('public add service flow', () => {
         scaffolder,
         templateAdapter,
         templateRegistry: new DefaultContractTemplateRegistry(),
-        versionRegistry: new ContractVersionRegistry(fs),
+        versionRegistry: new ContractVersionRegistry(fs, formatter),
         workspaceResolver: new ContractWorkspaceResolver(fs),
+        formatter,
       }),
-      serviceScaffolder: new ServiceScaffolder(scaffolder, fs, templateAdapter),
-      clientScaffolder: new ServiceClientScaffolder(scaffolder, fs),
-      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
+      serviceScaffolder: new ServiceScaffolder(scaffolder, fs, templateAdapter, formatter),
+      clientScaffolder: new ServiceClientScaffolder(scaffolder, fs, formatter),
+      formatter,
+      regenerateHelpers: (_root, _fs, _scaffolder, _template, options) => {
+        helperOptions.push(options);
+        return Promise.resolve(['/workspace/alpha/aspire/apphost.mts']);
+      },
     });
 
     const serviceDenoJson = JSON.parse(
@@ -89,6 +97,7 @@ describe('public add service flow', () => {
     assertEquals(rootDenoJson.workspace.includes('./services/billing'), true);
     assertStringIncludes(contractMod, './billing.contract.ts');
     assertEquals(result.helperFiles.length, 1);
+    assertEquals(helperOptions, [{ formatter }]);
     assertEquals(result.clientPath, '/workspace/alpha/apps/web/lib/billing.ts');
     if (!result.clientPath) throw new Error('Expected generated client path.');
     assertStringIncludes(
@@ -111,6 +120,7 @@ describe('public add service flow', () => {
     const originalWorkspace = await fs.readFile('/workspace/alpha/deno.json');
     const templateAdapter = new StringTemplateAdapter(fs);
     const scaffolder = new Scaffolder(templateAdapter, fs);
+    const formatter = identityFormatter();
 
     const error = await assertRejects(
       () =>
@@ -131,11 +141,13 @@ describe('public add service flow', () => {
             scaffolder,
             templateAdapter,
             templateRegistry: new DefaultContractTemplateRegistry(),
-            versionRegistry: new ContractVersionRegistry(fs),
+            versionRegistry: new ContractVersionRegistry(fs, formatter),
             workspaceResolver: new ContractWorkspaceResolver(fs),
+            formatter,
           }),
-          serviceScaffolder: new ServiceScaffolder(scaffolder, fs, templateAdapter),
-          clientScaffolder: new ServiceClientScaffolder(scaffolder, fs),
+          serviceScaffolder: new ServiceScaffolder(scaffolder, fs, templateAdapter, formatter),
+          clientScaffolder: new ServiceClientScaffolder(scaffolder, fs, formatter),
+          formatter,
           regenerateHelpers: async () => {
             await fs.writeFile('/workspace/alpha/aspire/apphost.mts', '// unexpected write\n');
             return ['/workspace/alpha/aspire/apphost.mts'];
@@ -159,6 +171,13 @@ describe('public add service flow', () => {
     );
   });
 });
+
+function identityFormatter(): GeneratedSourceFormatterPort {
+  return {
+    formatContent: (_path, content) => Promise.resolve(content),
+    formatFiles: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
+  };
+}
 
 async function writeProjectFiles(
   fs: MemoryFileSystemAdapter,

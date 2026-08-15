@@ -55,6 +55,7 @@ export function createServiceCommand(
           fs: dependencies.fs,
           scaffolder: dependencies.scaffolder,
           templateAdapter: dependencies.templateAdapter,
+          formatter: dependencies.serviceAddDependencies.formatter,
         },
         generateServiceClientsDependencies: {
           readProjectName: async (projectRoot) =>

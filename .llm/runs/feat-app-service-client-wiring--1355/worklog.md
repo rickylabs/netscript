@@ -568,3 +568,28 @@ projection edge from the root-constructed formatter into `service generate`'s
 
 No product/test/template/fixture file, gate, runtime, browser, lease, evaluator, lockfile, or
 `docs/**` path was touched during F5-A1.
+
+## F5 implementation — canonical content before compare/write
+
+Tier-A released the reviewed 15-product/12-test ceiling at `630185e2c`. The implementation adds the
+internal `GeneratedSourceFormatterPort` and one `DenoGeneratedSourceFormatter` adapter. Its content
+operation validates the target extension first, returns supported empty content without spawning,
+and otherwise runs Deno's generated-source policy over piped stdin. `DenoProcess` now writes the
+complete input, closes the writer, and then awaits output while the existing timeout covers the
+whole sequence. The EOF-marker timeout regression proves both writer closure and bounded kill/await.
+
+The client, Aspire-helper, contract/version, and service owners now canonicalize rendered content
+before their existing equality/write decision and persist the same canonical bytes. The root creates
+one formatter dependency; `services-group.ts` projects it into `service generate`'s Aspire half.
+Init bulk formatting and plugin/generate-aspire exact-file callers delegate through the same adapter
+without changing their distinct project/generated policies or warning/throw contracts. No public
+package export was added and no post-write formatter was introduced in either service command.
+
+Focused formatter/writer/command coverage passes 34 tests plus 3 BDD steps with zero failures. The
+new ordinary E2E test runs a real local `init` → `service add --name payments --with-client` →
+`service generate` sequence, verifies the exact 12 owned paths, passes exact-set `deno fmt --check`
+and the generated project's full `deno task fmt:check`, then proves the immediately repeated
+generate reports 0 client writes, 2 client skips, 0 Aspire writes, and byte-identical output. The
+neutral-config single-batch CLI lint and format wrappers each select 898 files and report zero
+findings; the first default lint invocation remains an exploratory fail-closed exclusion/batching
+observation, not a verdict. Binding exact-head receipts remain pending until the content commit.

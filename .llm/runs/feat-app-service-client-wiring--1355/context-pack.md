@@ -49,7 +49,10 @@ probe after it, fails explicitly if real generated Zod output is absent, derives
 inputs independently from their real generated contract schemas, and proves own/cross key-prefix
 behavior without tail equality. Focused check is clean, probe plus registry tests pass 29/0, and a
 no-Aspire/no-Docker replay of real database codegen plus only the static probe exits 0. No new lease
-or expensive command is authorized.
+or expensive command is authorized. After the later F4/S5 cycles and accepted F5-A1 plan repair,
+Tier-A released F5 implementation at `630185e2c`. Canonical content is now produced before every
+post-init service-owner comparison/write; focused coverage and the cheap exact-12 real-scaffold
+proof are green. Binding exact-head receipts are pending the immutable content commit.
 
 ## Completed
 
@@ -90,23 +93,20 @@ or expensive command is authorized.
 
 ## In Progress
 
-- F5 is a plan amendment only. The accepted root cause is the single init-only `formatOutput` seam:
-  init files are formatted, while the four post-init service writers compare and write raw rendered
-  content. The 12 failing outputs are mapped exactly to two clients, three payments-derived
-  contract/service files, and seven Aspire helpers. The locked repair canonicalizes rendered
-  content through Deno before equality/write and retains a separate bulk path operation for init.
-- Exact F5 product/test ceilings and cheap proofs are in `plan.md` and
-  `reports/f5-plan-amendment.md`. No product/test mutation, gate, lease, runtime, or browser action
-  is authorized until fresh Tier-A review.
-- F5-A1 adds the four required plan proofs: piped-stdin timeout/EOF closure, explicit empty-content
-  passthrough, fail-closed missing/unknown extensions, and the concrete `services-group.ts`
-  formatter-projection reason. The accepted ceiling itself is unchanged.
+- Tier-A released F5 product implementation at `630185e2c`. The internal formatter port, one Deno
+  adapter, stdin-capable process transport, four canonicalizing writer owners, and service-command
+  composition are implemented inside the exact ceiling.
+- Focused formatter/writer/service tests are green, including EOF-before-timeout, empty/unknown
+  extension behavior, dry-run, force, atomic prevalidation, and same-input idempotency.
+- The cheap real-scaffold proof verifies all 12 named post-init outputs, exact-set and full-project
+  formatting, zero/2/zero repeat counts, and byte identity. Binding exact-head receipts are next.
 
 ## Next Steps
 
-1. Commit and explicitly push only the F5-A1 amendment/run artifacts.
-2. Post the structured F5-A1 PLAN receipt and stop for fresh Tier-A review.
-3. Do not mutate product/tests or request a new expensive-gate lease before that review.
+1. Commit the F5 product/tests and current run evidence at a clean immutable content head.
+2. Run fresh exact-head `check`, `test`, `publish-dry-run`, and `arch-check` receipts serially.
+3. Recompute sufficiency over those four named receipts, commit/push evidence, post the F5 phase
+   comment, and stop for Tier-A. No expensive gate or lease is authorized.
 
 ## Key Decisions
 

@@ -5,6 +5,7 @@ import { renderTemplateAssetSync } from '../templates/template-asset.ts';
 import type { ScaffolderPort } from '../../ports/template-port.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
+import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 
 /** One fully validated generated service-client module. */
 export interface ServiceClientFilePlan {
@@ -37,6 +38,7 @@ export class ServiceClientScaffolder {
   constructor(
     private readonly scaffolder: ScaffolderPort,
     private readonly fs: FileSystemPort,
+    private readonly formatter: GeneratedSourceFormatterPort,
   ) {}
 
   /** Validate and render `apps/<app>/lib/<service>.ts` without writing it. */
@@ -73,10 +75,13 @@ export class ServiceClientScaffolder {
         { projectRoot, serviceName, contractPath, contractExport },
       );
     }
-    const content = renderTemplateAssetSync(TEMPLATE_KEYS.appRoutesExamplesServiceLibServiceQuery, {
-      name: projectName,
-      serviceName,
-    });
+    const content = await this.formatter.formatContent(
+      path,
+      renderTemplateAssetSync(TEMPLATE_KEYS.appRoutesExamplesServiceLibServiceQuery, {
+        name: projectName,
+        serviceName,
+      }),
+    );
     return { serviceName, path, content };
   }
 
