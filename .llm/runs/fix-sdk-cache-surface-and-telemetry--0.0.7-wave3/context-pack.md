@@ -53,10 +53,11 @@ An explicit downstream check found a fourth, out-of-scope stale generated file a
 
 ## Next Steps
 
-1. Commit and push only the CLI generated barrel plus repair run artifacts by explicit refspec.
-2. Post the bounded repair receipt and the fourth-link finding on PR #1665.
-3. Stop for the coordinator's scope ruling, fresh Tier-A, and asset-chain delta evaluation; do not
-   launch or arrange any evaluation.
+1. Commit and push only the MCP generated publish asset plus repair run artifacts by explicit
+   refspec.
+2. Post the fourth-link closure receipt on PR #1665.
+3. Stop for coordinator-run fresh Tier-A and final asset-chain delta evaluation; do not launch or
+   arrange either evaluation.
 
 ## Key Decisions
 
@@ -70,18 +71,18 @@ An explicit downstream check found a fourth, out-of-scope stale generated file a
 
 ## Files Changed
 
-The second bounded repair changes exactly `packages/cli/src/kernel/assets/agent-docs.generated.ts`
-plus run artifacts. It does not change the canonical prose assets, landed S1-S3 source/tests/docs,
-other barrels, or the out-of-scope stale MCP generated file.
+The final bounded repair changes exactly `packages/mcp/src/publish-assets.generated.ts` plus run
+artifacts. It does not change the canonical prose assets, CLI barrels, landed S1-S3
+source/tests/docs, or any hand-written package/plugin source.
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | Repair mixed | CLI check passes 883 files; CLI lint/fmt wrappers exit 2 because Deno excludes the targets, so no false pass is claimed |
+| Static | Final repair mixed | MCP check passes 115 files. Unfiltered MCP lint/fmt wrappers exit 1 at intentionally invalid doctor fixture configs with zero findings; excluding only those fixtures passes 110 files with zero findings |
 | Fitness | S3 PASS with non-blocking warnings | quality scan has no findings; architecture has zero failures; JSR retains two known warnings |
 | Runtime | S3 PASS | provider/docs proof 1/1; full SDK 66/66; repo-root 4,203 passed, 0 failed, 19 ignored |
-| Consumer | Repair PASS with reported next link | Agent-docs and assets-barrel checks pass; publish-assets check names one out-of-scope stale MCP generated file |
+| Consumer | Final cascade PASS | Agent-docs, assets-barrel, and publish-assets checks all pass on the same content state; no fifth checked-in mirror found |
 
 The supplemental repository-wide `surface:diff` invocation exits 1 against a stale workspace
 baseline and reports widespread signature changes in untouched packages; it is not represented as
@@ -90,8 +91,8 @@ a pass or as an S1-specific verdict. The direct S1 export proof is an empty diff
 
 ## Open Questions
 
-- Coordinator scope ruling for `packages/mcp/src/publish-assets.generated.ts`, followed by fresh
-  Tier-A and the proportionate asset-chain delta evaluation. This session arranges none of them.
+- None within implementation scope. Fresh Tier-A and the final asset-chain delta evaluation remain
+  coordinator-owned; this session arranges neither.
 
 ## Drift and Debt
 

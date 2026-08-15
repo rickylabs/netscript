@@ -94,6 +94,8 @@ behind `CacheStore`; it must not change source-query success semantics.
 | 2026-08-15 | Post-IMPL-EVAL repair | Validation | Agent-docs freshness and full docs-site verification pass; SDK lint/fmt remain clean; both raw doc-lint invocations retain exactly the pinned three-plus-three baseline diagnostics. No root/Aspire/Docker/CLI E2E or evaluator was run. |
 | 2026-08-15 | Second post-eval repair | CLI agent-docs barrel | Readiness CI exposed the third asset-chain link. `gen:assets-barrel` changed only `packages/cli/src/kernel/assets/agent-docs.generated.ts`; the immediate porcelain output named exactly that path. |
 | 2026-08-15 | Second post-eval repair | Downstream audit | `check:publish-assets` check-only mode found a fourth stale link at `packages/mcp/src/publish-assets.generated.ts`. It remains untouched and is reported for a new scope ruling. Whole-repo generator/consumer searches found no fifth checked-in generated artifact. |
+| 2026-08-15 | Final post-eval repair | MCP publish assets | Coordinator granted the fourth link. `gen:publish-assets` changed only `packages/mcp/src/publish-assets.generated.ts`; the immediate porcelain output named exactly that path. |
+| 2026-08-15 | Final post-eval repair | Cascade closure | Publish-assets, assets-barrel, and agent-docs freshness all pass together. MCP check passes. Unfiltered MCP lint/fmt wrappers hit intentionally invalid doctor fixture configs; excluding only those fixtures passes 110 files with zero findings. Exact six SDK doc-lint baseline diagnostics remain unchanged. An executed downstream search found no fifth checked-in mirror. |
 
 ## Decisions
 
@@ -149,6 +151,12 @@ authorized and this slice completed S3 within its exact four-file implementation
 | Second repair CLI lint/format wrappers | NOT A PASS | Both exit 2 because Deno excludes CLI targets; explicit one-file runs are also excluded. Diagnostic batch-size-1 lint additionally exposes seven unrelated E2E fixture catalog failures. |
 | Second repair raw doc lint | FAIL (expected baseline, no regression) | Both invocations retain exactly the pinned three-plus-three diagnostics; zero new |
 | Downstream publish-assets audit | FAIL (out-of-scope generated drift) | Exit 1 names only `packages/mcp/src/publish-assets.generated.ts`; no mutation performed |
+| Final repair publish-assets | PASS | Exit 0; canonical output is current |
+| Final repair assets barrel | PASS | Exit 0; all seven barrel outputs reproduce without a diff |
+| Final repair agent-docs freshness | PASS | Exit 0; `fresh=true`, `stalePaths=[]`, source commit `0fed4d7ff` |
+| Final repair MCP check wrapper | PASS | 115 files; one batch; zero failed batches or diagnostics |
+| Final repair MCP lint/format wrappers | RED at fixture config discovery; bounded supplemental PASS | Unfiltered 115-file runs exit 1 with zero findings because doctor fixtures intentionally carry invalid workspace configs; excluding only those fixtures passes 110 files with zero findings |
+| Final repair raw doc lint | FAIL (expected baseline, no regression) | Both invocations retain exactly the pinned three-plus-three diagnostics; zero new |
 
 ## Handoff Notes
 
@@ -167,3 +175,5 @@ authorized and this slice completed S3 within its exact four-file implementation
   `generated-assets-repair-report.md`; stop for the coordinator's fresh Tier-A and delta evaluation.
 - The second repair and the newly discovered fourth asset-chain link are recorded in
   `assets-barrel-repair-report.md`; the MCP generated file needs a separate scope ruling.
+- The coordinator granted and the final repair closed that fourth link. Evidence is recorded in
+  `publish-assets-link4-repair-report.md`; no fifth checked-in mirror was found.
