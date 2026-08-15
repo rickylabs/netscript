@@ -93,8 +93,8 @@ interface QueryResultWithMeta {
  * Base queryable class implementing common query logic.
  */
 class MySqlQueryable<TClient extends MysqlQueryableClient> implements SqlQueryable {
-  readonly provider = 'mysql' as const;
-  readonly adapterName = PACKAGE_NAME;
+  readonly provider: 'mysql' = 'mysql';
+  readonly adapterName: string = PACKAGE_NAME;
 
   constructor(
     protected client: TClient,
@@ -104,11 +104,15 @@ class MySqlQueryable<TClient extends MysqlQueryableClient> implements SqlQueryab
   /**
    * Execute a raw SQL query and return results.
    */
-  async queryRaw(query: SqlQuery): Promise<SqlResultSet> {
+  queryRaw(query: SqlQuery): Promise<SqlResultSet>;
+  queryRaw(query: PrismaMySqlQuery): Promise<PrismaMySqlResultSet>;
+  async queryRaw(
+    query: SqlQuery | PrismaMySqlQuery,
+  ): Promise<SqlResultSet> {
     const tag = '[js::query_raw]';
     debug(`${tag} %O`, query);
 
-    const result = await this.performIO(query);
+    const result = await this.performIO(query as SqlQuery);
 
     const fields = result.fields ?? [];
     const columnNames = fields.map((f) => f.name);
@@ -128,11 +132,13 @@ class MySqlQueryable<TClient extends MysqlQueryableClient> implements SqlQueryab
   /**
    * Execute a raw SQL statement and return affected row count.
    */
-  async executeRaw(query: SqlQuery): Promise<number> {
+  executeRaw(query: SqlQuery): Promise<number>;
+  executeRaw(query: PrismaMySqlQuery): Promise<number>;
+  async executeRaw(query: SqlQuery | PrismaMySqlQuery): Promise<number> {
     const tag = '[js::execute_raw]';
     debug(`${tag} %O`, query);
 
-    const result = await this.performIO(query);
+    const result = await this.performIO(query as SqlQuery);
     return result.affectedRows ?? 0;
   }
 
@@ -316,11 +322,12 @@ class MySqlTransaction extends MySqlQueryable<MysqlQueryableClient> implements T
  * const prisma = new PrismaClient({ adapter });
  * ```
  */
-class PrismaMySqlAdapter extends MySqlQueryable<MysqlPoolClient> implements SqlDriverAdapter {
+export class PrismaMySqlAdapter extends MySqlQueryable<MysqlPoolClient>
+  implements SqlDriverAdapter {
   constructor(
     client: MysqlPoolClient,
     private readonly capabilities: MySqlCapabilities,
-    private readonly options?: PrismaMySqlOptions,
+    private readonly options: PrismaMySqlOptions | undefined = undefined,
   ) {
     super(client);
   }
@@ -491,6 +498,14 @@ export interface PrismaMySqlConnectionInfo {
 }
 
 /**
+ * Options associated with a connected MySQL transaction.
+ */
+export interface PrismaMySqlTransactionOptions {
+  /** Whether Prisma should issue a phantom query for transaction coordination. */
+  usePhantomQuery: boolean;
+}
+
+/**
  * Connected transaction adapter returned by `startTransaction`.
  */
 export interface PrismaMySqlTransactionAdapter {
@@ -499,11 +514,11 @@ export interface PrismaMySqlTransactionAdapter {
   /** Adapter package name. */
   readonly adapterName: string;
   /** Prisma transaction options associated with this transaction. */
-  readonly options: TransactionOptions;
+  readonly options: PrismaMySqlTransactionOptions;
   /** Execute a raw SQL query. */
-  queryRaw(query: SqlQuery): Promise<SqlResultSet>;
+  queryRaw(query: PrismaMySqlQuery): Promise<PrismaMySqlResultSet>;
   /** Execute a raw SQL statement and return affected rows. */
-  executeRaw(query: SqlQuery): Promise<number>;
+  executeRaw(query: PrismaMySqlQuery): Promise<number>;
   /** Commit the transaction. */
   commit(): Promise<void>;
   /** Roll back the transaction. */
@@ -519,16 +534,16 @@ export interface PrismaMySqlConnectedAdapter {
   /** Adapter package name. */
   readonly adapterName: string;
   /** Execute a raw SQL query. */
-  queryRaw(query: SqlQuery): Promise<SqlResultSet>;
+  queryRaw(query: PrismaMySqlQuery): Promise<PrismaMySqlResultSet>;
   /** Execute a raw SQL statement and return affected rows. */
-  executeRaw(query: SqlQuery): Promise<number>;
+  executeRaw(query: PrismaMySqlQuery): Promise<number>;
   /** Execute a trusted SQL script. */
   executeScript(script: string): Promise<void>;
   /** Return connection details used by Prisma. */
   getConnectionInfo(): PrismaMySqlConnectionInfo;
   /** Start a transaction. */
   startTransaction(
-    isolationLevel?: IsolationLevel,
+    isolationLevel?: PrismaMySqlIsolationLevel,
   ): Promise<PrismaMySqlTransactionAdapter>;
   /** Close the underlying driver resources. */
   dispose(): Promise<void>;

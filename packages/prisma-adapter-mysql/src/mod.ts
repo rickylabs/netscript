@@ -46,6 +46,7 @@ export type {
   PrismaMySqlQuery,
   PrismaMySqlResultSet,
   PrismaMySqlTransactionAdapter,
+  PrismaMySqlTransactionOptions,
 } from './adapter.ts';
 
 export type {
