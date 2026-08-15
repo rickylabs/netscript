@@ -3389,3 +3389,83 @@ plugin-streams diagnostic all stay exactly as written. A green S5 does not retro
 S4.
 
 No evaluator, no S6, no other lane touched.
+
+## 2026-08-15 — S5 terminal: `scaffold.runtime` **FAIL**, `fresh-browser` NOT_RUN, host proven empty
+
+Leaf head `e1dcb726b983dd10981f4fc8df5ea8c638686e77`, local == remote. Lease `32df87c7c`.
+
+| Field | Value |
+| --- | --- |
+| Product content head | `193e665ba0592273622253e3e9a1ebfc019b1be9` |
+| Clean suite execution head | `ab78eaa35c1753f9e8c526dbd234c7073758008b` |
+| Command | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` |
+| Verdict | **FAIL**, raw exit 1, `passed=20 failed=1 skipped=0` |
+| Raw output | `reports/s5-scaffold-runtime-20260815-184907.log` |
+| `fresh-browser` | **NOT_RUN** — correctly gated on step 1 passing |
+
+**Gate class held.** No catalog entry and no `run-gate` receipt was created for `scaffold.runtime`;
+its evidence is the suite-owned raw log plus the lease record, exactly as ruled at T-1.
+
+**Log integrity verified independently.** I re-hashed the raw log:
+`e45934adc737626e6b5d05dc1c8dccbb8fb7c2cab0bab76b828520150206d225` — byte-identical to the recorded
+SHA-256. The evidence has not drifted since it was written.
+
+### The failure
+
+Gate `generated.service-client-contract` — "Prove idempotent two-service client and cache-key
+output". The probe required a later `service generate` to report `Wrote 0 Aspire helper files.` and
+observed:
+
+```text
+Wrote 0 service client modules.
+Skipped 2 current service client modules.
+Wrote 3 Aspire helper files.
+```
+
+Client modules were correctly idempotent — 0 written, 2 skipped. The Aspire half wrote 3.
+
+**Attribution: leaf-caused.** It cannot reproduce at `c53726c69` because the
+`generated.service-client-contract` gate and `service-client-runtime-probe.ts` do not exist there,
+and the old `service generate` had no client-generation, idempotency, `--dry-run`, or `--force`
+contract at all. So this is not carryable as a baseline.
+
+### Diagnosis so far — the obvious hypothesis is refuted
+
+My first hypothesis was the failure family this lane has hit repeatedly: a declared option whose
+effect never fires, like D-13's published-but-never-invoked `onConnectionError`. **It is wrong, and I
+checked rather than asserting it.** The plumbing is correct end to end:
+
+- `generate-service-command.ts:56-59` passes `{ projectRoot, dryRun, force }` into `generateAspire`;
+- `generate-aspire.ts:67-73` forwards `{ dryRun: request.dryRun, force: request.force }` to
+  `regenerateAspireHelpers`;
+- `workspace-mutator.ts:192` implements skip-if-identical —
+  `const changed = options.force || !await fs.exists(path) || …`.
+
+I briefly misread an earlier truncated grep as showing four positional arguments with the options
+dropped; reading the full call refuted that. Recording the correction because a wrong root cause
+handed to the repair round is worse than none.
+
+The likelier story, **stated as a hypothesis and not a finding**: the failure report notes the
+sequence was `scaffold.service-client-generate` (0 clients, 0 helpers) → **intervening
+plugin/runtime-schema/database gates** → the static probe. Those intervening gates plausibly mutate
+the inputs the Aspire helpers derive from, in which case the 3 rewrites are correct behaviour and the
+probe's `Wrote 0 Aspire helper files.` expectation is what is wrong. Whether the probe or the product
+is at fault is the repair round's determination, not mine, and I am explicitly not pre-judging it.
+
+### Mandatory cleanup — performed and independently re-verified
+
+Suite-owned `cleanup.aspire-stop` passed; run-owned teardown reported `applied: true` with no app
+hosts stopped, no containers removed, and nothing escalated. The author's post-run `leak-check` at
+`16:49:46Z` returned exit 0 with aspire `ok`, docker `ok`, `survivors: []`.
+
+**I ran `leak-check` again myself afterwards** and got the same: aspire `ok`, docker `ok`,
+`survivors: []`. The host is empty, verified twice by different actors, and the cleanup happened
+despite the gate failing — which was the point of making it unconditional.
+
+### Disposition
+
+The S5 gate sequence is terminal for this attempt. No product repair or retry was performed under the
+lease, correctly: a runtime failure needs review before a fix, exactly as the S4 gates did. All prior
+FAIL and baseline evidence is preserved unmodified — `s4-format-failure.md`,
+`s4-export-doc-failure.md`, `s4-test-failure.md`, the Fresh 45 and SDK 3 `PRE_EXISTING_FAIL` entries,
+and the separately named plugin-streams diagnostic. No other lane was touched. No evaluator launched.
