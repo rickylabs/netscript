@@ -403,3 +403,37 @@ non-blocking observations (receipt head vs review head, E-2 binding placement, p
 `packages/cli` fmt exclusion) recorded in `review-tier-a.md`. No source modified; no browser,
 Aspire, Docker, scaffold-runtime, or `e2e:cli` gate run — `docker ps -a` empty throughout. PR left
 `OPEN`, draft, exactly one `status:impl`; `Closes #1358` untouched; no issue mutated.
+## IMPL-EVAL — cycle 2, final (2026-08-15)
+
+Fresh separate session `1df19d27-ce81-4027-99ac-49f3b9ec26bc` (PID `299511`,
+bridge `session_018WYHfqzFKKve37TL7hsPQD`), native Claude Code `claude-opus-5` ·
+effort `medium` · `--remote-control` — owner-route amendment over
+`lane-policy.md`'s Fable 5 rendering, recorded in `evaluate.md`. Independent of
+the Codex author, the topic orchestrator, the cycle-1 evaluator, and the fresh
+Tier-A reviewer.
+
+**Verdict: `PASS`** at head `3d7819203f59e68eb5b45f6871a03c41ca43cd2f` (local ==
+`origin` == PR `headRefOid`). Full artifact: `evaluate.md` § "IMPL-EVAL — Cycle
+2".
+
+- **E-1 CLOSED** — the design catalog decoded out of the committed
+  `embedded.generated.ts` carries 66 ordered field-exact items, the `ai`
+  collection, `registryCollections` (8, ordered-equal), and exact
+  `registryMeta`. All 66 items land in a rendered gallery section (0 orphan
+  kinds).
+- **E-2 CLOSED** — `check:assets-barrel` bound in `plan.md`, structured `PASS`
+  receipt, wired into `ci.yml`, re-executed here at raw exit 0 with a clean tree
+  afterwards (the barrel is the generator's fixed point; no other generated
+  target moved).
+- Scope is exactly the twice-amended surface (17 paths); zero lock/config churn;
+  no suppression escape hatches. Ten gates re-executed, all green except the
+  pre-existing O-3 `fmt` exclusion.
+- New non-blocking findings: **G-1** (the T-3 amendment's recorded root cause is
+  false — fresh-ui _is_ a root workspace member and the drift gate already ran
+  via `check-test`; `fresh-ui-quality` runs no test step) and **G-2** (the
+  inherited `fresh-browser` receipt is legitimate but never covered this leaf's
+  changed workflow).
+- Concurred non-blocking: R-1, N-3, O-1, O-2, O-3, C-1.
+- No expensive gate run or requested. Nothing implemented, nothing fixed. PR
+  left `OPEN`, draft, exactly one `status:impl`. The run stops for coordinator
+  readiness disposition.

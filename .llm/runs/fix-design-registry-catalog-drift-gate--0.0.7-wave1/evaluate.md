@@ -361,3 +361,359 @@ obscure it:
    `e2e:cli`. Post-evaluation `docker ps -a` empty and `aspire ps` reports no AppHost.
 5. Nothing implemented and nothing fixed; every finding is reported for coordinator disposition.
 6. Only `evaluate.md` plus harness bookkeeping committed; the evaluated product tree is untouched.
+---
+
+# IMPL-EVAL — Cycle 2 (final cycle) — 2026-08-15
+
+Formal **IMPL-EVAL, cycle 2**, the final cycle. Fresh separate session,
+independent of all of: the Codex author `01a003f0-7821-7a10-a555-e619a9280479`
+(`gpt-5.6-sol`); the topic orchestrator `topic-fixes-0.0.7`, whose first Tier-A
+`PASS` on this leaf was wrong and was withdrawn; the cycle-1 IMPL-EVAL session
+`04897102-bcd6-4918-8b72-dc0151035883`; and the fresh Tier-A reviewer
+`f7b48b24-96b6-4e62-b1c6-37d6a9ac45e9`.
+
+No prior conclusion is inherited. The Tier-A `PASS_TO_IMPL_EVAL` on the E-1
+repair delta was treated strictly as an input to verify. Every claim below was
+re-derived by an executed command in this session.
+
+## Evaluator identity
+
+| Field                      | Value                                                        |
+| -------------------------- | ------------------------------------------------------------ |
+| Transport                  | Native first-party Claude Code, background session           |
+| Session ID                 | `1df19d27-ce81-4027-99ac-49f3b9ec26bc`                       |
+| Bridge / Remote Control ID | `session_018WYHfqzFKKve37TL7hsPQD`                           |
+| Remote Control URL         | `https://claude.ai/code/session_018WYHfqzFKKve37TL7hsPQD`    |
+| Job ID                     | `1df19d27`                                                   |
+| PID                        | `299511`                                                     |
+| cwd                        | `/home/codex/repos/netscript-007-leaf-design-registry-drift` |
+| Session name               | `NetScript 0.0.7 #1657 IMPL-EVAL c2`                         |
+
+The bridge ID is the `bridgeSessionId` (`session_…`) read from
+`~/.claude/sessions/299511.json`, not the `cse_…` form; only the
+sessions-registry form resolves as a Remote Control URL.
+
+## Route — requested, observed, amendment
+
+| Field         | Value                                                                                                                                                                                                            |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Requested     | native first-party Claude Code · `claude-opus-5` · effort `medium` · `/remote-control` enabled                                                                                                                   |
+| Observed      | `claude-opus-5` · effort `medium` · `--remote-control` present                                                                                                                                                   |
+| Route verdict | **matched**                                                                                                                                                                                                      |
+| Evidence      | `~/.claude/jobs/1df19d27/state.json` → `respawnFlags = ["--effort","medium","--permission-mode","bypassPermissions","--remote-control","--name","NetScript 0.0.7 #1657 IMPL-EVAL c2","--model","claude-opus-5"]` |
+
+**Owner-route amendment (recorded).** `.llm/harness/workflow/lane-policy.md`
+renders `formal_impl_evaluation` as _native opposite-family Claude · Fable 5 ·
+medium_ for Codex-authored work, and `supervisor.md` records that policy route.
+The coordinator **overrode** it for this gate and **explicitly forbade**
+substituting Fable, OpenRouter, or any other transport. This evaluation
+therefore ran on Opus 5 by owner instruction. Evaluator independence is
+unaffected: the generator lane is Codex/`gpt-5.6-sol`, and the Tier-A reviewer
+and cycle-1 evaluator are different sessions — no lane self-certifies.
+
+## Heads — independently resolved
+
+| Head                       | Value                                      | Verification                                                                         |
+| -------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------ |
+| Evaluated head             | `3d7819203f59e68eb5b45f6871a03c41ca43cd2f` | `git rev-parse HEAD`                                                                 |
+| Local branch ref           | `3d7819203f59e68eb5b45f6871a03c41ca43cd2f` | `git rev-parse fix/design-registry-catalog-drift-gate`                               |
+| `origin`                   | `3d7819203f59e68eb5b45f6871a03c41ca43cd2f` | `git fetch origin <branch>` → `git rev-parse FETCH_HEAD`                             |
+| PR #1657 `headRefOid`      | `3d7819203f59e68eb5b45f6871a03c41ca43cd2f` | `gh pr view 1657 --json headRefOid`                                                  |
+| Cycle-1 evaluated head     | `939e7311317365db7681de5e3c7c56a73412424e` | ancestor; verdict commit `a46b83831`, `FAIL_FIX`                                     |
+| E-1 product commit         | `4ca76fa751608ec1f0e2eab248fcd603f855272b` | ancestor                                                                             |
+| Browser-gated product head | `4a3c40321ac1e58aa337e02afeaa95fbc553ce7f` | ancestor                                                                             |
+| Tier-A reviewed head       | `acfb2d2064c057c6d805a2d36fcb09201ca247e5` | ancestor; `acfb2d206..HEAD` = `review-tier-a.md` + `worklog.md` only (artifact-only) |
+| Immutable base             | `da574111af05a5cded74250128b196fcab870274` | ancestor                                                                             |
+
+Local, `origin`, and PR agree three ways. Nothing refused. The evaluated
+worktree was clean at `3d7819203` before and after this evaluation.
+
+## E-1 closure — decoded from the shipped artifact, not inferred
+
+`packages/cli/src/kernel/assets/embedded.generated.ts` maps the key
+`app/routes/(design)/design/(_shared)/registry.ts.template` → `template_005`
+(barrel line 220). I imported the **committed** barrel, extracted that value,
+wrote it to a standalone module, and imported it — so the numbers below are
+parsed structure, never the `total: 66` literal.
+
+| Property                                            | Observed from the barrel                                                                                                  | Manifest  | Verdict                    |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | --------- | -------------------------- |
+| Design-catalog value                                | 15 404 bytes, **strictly equal** to the on-disk template                                                                  | —         | representation, not a fork |
+| `registryCatalog` entries                           | **66** (parsed), 66 unique                                                                                                | 66        | exact                      |
+| Ordered name equality                               | `true`                                                                                                                    | —         | exact                      |
+| `kind` / `layer` / `description` mismatches         | **0**                                                                                                                     | —         | exact                      |
+| `registryCollections`                               | **present**, **8** collections                                                                                            | 8         | exact                      |
+| Collection membership, ordered                      | `46 / 15 / 10 / 5 / 8 / 1 / 13 / 7`                                                                                       | identical | exact                      |
+| `ai` collection                                     | present, 15 items incl. `citation-chip`, `model-selector`, `tool-call-card`, `prompt-input`, `mcp-ui-widget`, `render-ui` | identical | exact                      |
+| `registryMeta` name / version / packageName / total | `fresh-ui-foundation` / `0.1.0` / `@netscript/fresh-ui` / `66`                                                            | identical | exact                      |
+
+**Gallery render coverage — an additional check neither prior pass ran.** A
+complete catalog is not sufficient on its own: `components-view.tsx.template`
+renders items only through five `SECTIONS` whose `kinds` are `component`,
+`block`, `island`, `style`, `theme`, `lib`, `support`. `hook` is in the
+`RegistryItemKind` union but in no section, so a `hook` item would be counted in
+`registryMeta.total` yet rendered nowhere — the same class of defect #1358
+exists to fix. I computed the kind distribution of the shipped catalog:
+`component 36, block 11, island 5, style 7, lib 4,
+support 2, theme 1`. **All 66
+items fall into a rendered section; 0 orphans** (components 36, blocks 11,
+islands 5, styles 7, foundation 7). No latent render omission remains.
+
+**E-1 is closed on the consumer path.** `netscript init` now scaffolds a gallery
+that declares and renders all 66 items with the AI collection visible.
+
+## E-2 closure — bound gate, receipt, re-executed exit code
+
+| Element                          | State | Evidence                                                                                                                                                                                                           |
+| -------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Bound in the validation plan     | yes   | `plan.md:166-177` — "E-1 Bounded Repair Amendment", S4 row names `deno task check:assets-barrel`; `plan.md:176-177` declares it a required leaf gate                                                               |
+| Structured receipt               | yes   | `receipts/assets-barrel.json` — `gateId assets-barrel`, `outcome PASS`, `exitCode 0`, `attempt 1`, `schemaVersion 1`, `gitHead == actualGitHead == 4ca76fa75`                                                      |
+| Re-executed by me at `3d7819203` | yes   | `deno task check:assets-barrel` → **raw exit 0**                                                                                                                                                                   |
+| Runs in CI                       | yes   | `.github/workflows/ci.yml:376-381` — `--gate assets-barrel --id quality-assets-barrel`, guarded by `env.RUN_DENO`; classifier returns `needsDeno: true` for `packages/cli/src/kernel/assets/embedded.generated.ts` |
+
+**Regenerated, not hand-edited — proven.** I ran the gate (whose first half is
+the mutating `gen:assets-barrel`) in a **detached scratch worktree** at
+`3d7819203`. `git status --porcelain` was empty **after** the generator ran: the
+committed bytes are the generator's fixed point, which a hand edit could not
+survive. The same run proves **no other generated target moved** — the gate's
+`git diff --exit-code` covers all seven generated paths (CLI skills /
+agent-tools / agent-docs, plugin embedded, `fresh-ui/registry.generated.ts`,
+`service/scalar.generated.ts`) and exited 0.
+
+## Amended scope integrity
+
+`git diff --name-status da574111a..HEAD` returns exactly **17** paths:
+
+| Class                                   |  Count | Paths                                                                                                                             |
+| --------------------------------------- | -----: | --------------------------------------------------------------------------------------------------------------------------------- |
+| Original frozen surfaces changed        | 2 of 4 | `…/(design)/design/(_shared)/registry.ts.template`, `packages/fresh-ui/tests/registry-doc-drift.test.ts`                          |
+| Original frozen surfaces byte-unchanged | 2 of 4 | `packages/cli/src/kernel/application/ui/registry.ts`, `packages/fresh-ui/registry.manifest.ts`                                    |
+| T-3 amendment                           |      3 | `.github/workflows/fresh-ui-quality.yml`, `.github/scripts/ci-classify-changes.ts`, `.github/scripts/ci-classify-changes.test.ts` |
+| E-1 amendment                           |      1 | `packages/cli/src/kernel/assets/embedded.generated.ts`                                                                            |
+| Run artifacts                           |     11 | `.llm/runs/<run-id>/**` incl. both receipts                                                                                       |
+
+Nothing outside the twice-amended surface changed.
+`git diff --name-only da574111a..HEAD` over `*deno.lock`, `*.lock`, `deno.json`
+and `**/deno.json` is **empty** — root, CLI and Fresh-UI locks and every config
+are untouched.
+`git diff --name-only 4a3c40321..HEAD -- packages plugins .github` returns four
+paths: the three T-3 CI files plus the barrel.
+
+No `// deno-lint-ignore`, `// quality-allow`, `as any`, `as unknown as`,
+`@ts-ignore`, or `@ts-expect-error` appears on any added line across `packages/`
+and `.github/`.
+
+## Gates re-executed in this session
+
+All run at `3d7819203` in a detached scratch worktree
+(`git worktree add --detach`, removed afterwards), so the evaluated worktree was
+never mutated. Raw exit codes only.
+
+| Gate                      | Command                                                                                                       | Raw exit | Result                                                                                         |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------- | -------: | ---------------------------------------------------------------------------------------------- |
+| Generated asset freshness | `deno task check:assets-barrel`                                                                               |    **0** | tree clean before and after                                                                    |
+| Drift gate (focused)      | `deno test --allow-read --lock=deno.lock --frozen tests/registry-doc-drift.test.ts` (cwd `packages/fresh-ui`) |    **0** | 5 passed / 0 failed                                                                            |
+| Classifier suite          | `deno test --allow-read --allow-write --allow-env .github/scripts/ci-classify-changes.test.ts`                |    **0** | 62 passed / 0 failed                                                                           |
+| Quality scan              | `deno task quality:scan`                                                                                      |    **0** | `{"ok":true,"findings":[],"allowCount":7,"allowanceFailures":[]}` — all 7 pre-existing `#1276` |
+| Architecture              | `deno task arch:check`                                                                                        |    **0** | INFO/WARN only, all pre-existing                                                               |
+| Publish asset freshness   | `deno task check:publish-assets`                                                                              |    **0** | —                                                                                              |
+| Structured check          | `run-deno-check.ts --root packages/cli/src/kernel/assets --ext ts`                                            |    **0** | 7 files, 0 findings                                                                            |
+| Structured lint           | `run-deno-lint.ts --root .github/scripts --ext ts`                                                            |    **0** | 11 files, 0 findings                                                                           |
+| Structured fmt            | `run-deno-fmt.ts --root packages/cli/src/kernel/assets --ext ts`                                              |        2 | `findings: 0`, `failedBatches: 1` — **O-3 reproduced**, see below                              |
+| CLI JSR audit             | `audit-jsr-package.ts --root packages/cli`                                                                    |    **0** | WARN-only                                                                                      |
+
+Expensive gates: **none run, none requested.** No `fresh-browser`, no lease, no
+Aspire, no Docker, no `e2e:cli`. `docker ps -a` reported zero containers after
+the evaluation.
+
+## Consumer gates
+
+| Consumer                          | Validation                                      | Result                   | Evidence                                                                                                                                                                                                                                                                                                                                             |
+| --------------------------------- | ----------------------------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Manifest ↔ source template        | own probe                                       | `PASS`                   | template is byte-identical to the barrel value verified above                                                                                                                                                                                                                                                                                        |
+| **Manifest ↔ shipped barrel**     | own probe, decoded from `embedded.generated.ts` | **`PASS`**               | 66/66 ordered, field-exact, 8/8 collections, `registryMeta` exact — the cycle-1 `FAIL` row is closed                                                                                                                                                                                                                                                 |
+| Scaffolded gallery renders all 66 | own kind/section coverage computation           | `PASS`                   | 0 orphan kinds; 36/11/5/7/7 across the five sections                                                                                                                                                                                                                                                                                                 |
+| Drift gate is real and symmetric  | source read + fixture execution                 | `PASS`                   | comparator names `manifest-only items`, `catalog-only items`, `changed items`, `manifest-only/catalog-only/changed collections`, `item order differs`, `collection order differs`, `changed registryMeta fields`; three negative fixtures are built in memory and call the same comparator as the live assertion — no source mutation, no lock churn |
+| CI trigger ownership (T-3)        | classifier executed directly                    | `PASS` with a correction | see G-1                                                                                                                                                                                                                                                                                                                                              |
+
+## Findings
+
+| Severity | Finding                                                                                                                 | Blocking |
+| -------- | ----------------------------------------------------------------------------------------------------------------------- | -------- |
+| —        | **E-1 — CLOSED.** The fix reaches the artifact the CLI ships.                                                           | no       |
+| —        | **E-2 — CLOSED.** Gate bound, receipt present, raw exit 0 re-executed.                                                  | no       |
+| low      | **G-1 (new)** — the T-3 amendment's recorded root cause is factually wrong, and the workflow it wired runs no test.     | no       |
+| low      | **G-2 (new)** — the inherited `fresh-browser` receipt is legitimate, but it never covered this leaf's changed workflow. | no       |
+| low      | R-1, N-3, O-1, O-2, O-3 — concurred, non-blocking.                                                                      | no       |
+| low      | C-1 — readiness precondition for the coordinator at the ready flip.                                                     | no       |
+
+### G-1 — the T-3 amendment's root cause is wrong; the delivered code is correct anyway
+
+`drift.md`'s significant T-3 amendment rests on four claims. Claim **4** — "the
+root `deno task test` cannot compensate: `packages/fresh-ui` is **not** a member
+of the root workspace" — is **false**, and claim **1**
+("`registry-doc-drift.test.ts` executes **only** through
+`fresh-ui-quality.yml`") is false as a consequence. Executed:
+
+- Root `deno.json` declares `workspace: ["packages/*", …]`; `packages/fresh-ui`
+  matches.
+- From the repo root,
+  `deno test --allow-all --no-check --filter 'generated design catalog matches the Fresh UI registry manifest'`
+  → `running 1 test from ./packages/fresh-ui/tests/registry-doc-drift.test.ts` …
+  `1 passed | 3525
+  filtered out`, raw exit 0. Root discovery reaches the drift
+  gate.
+- `.github/workflows/ci.yml:245-250` — the required `check-test` job runs
+  `--gate test --id check-test-test`, and
+  `GATE_CATALOG.test = ['deno','task','test']` at repo root. It is guarded by
+  `needs_deno`.
+- Classifier executed directly: `needsDeno` is **true** for both
+  `packages/fresh-ui/registry.manifest.ts` and
+  `packages/cli/src/kernel/assets/app/routes/(design)/design/(_shared)/registry.ts.template`.
+
+So the drift gate already ran pre-merge on **both** surfaces named in #1358's
+`gate:` box, before the T-3 amendment existed. Sharper still:
+`fresh-ui-quality.yml`'s `fresh-ui-quality` job runs exactly four steps —
+`--gate check`, `--gate lint`, `fresh-ui-lock-regression`, `clean-worktree`.
+**There is no test step**, so the workflow the T-3 repair wired the design
+assets into does not execute `registry-doc-drift.test.ts` at all. The T-3 change
+therefore adds Fresh-UI _type-check and lint_ coverage on CLI design-asset PRs —
+a real if modest gain — and **zero** drift-gate coverage.
+
+Why this is not blocking: the acceptance requirement ("the drift gate runs in CI
+on every change to `registry.manifest.ts` or the CLI design assets") is
+**satisfied at this head**, via the root `check-test` lane. The delivered T-3
+code is correct, correctly scoped (verified independently: the prefix
+`packages/cli/src/kernel/assets/app/routes/(design)/` matches the design assets,
+while `packages/cli/src/public/features/ui/list/list-ui-command.ts`,
+`packages/cli/bin/netscript.ts`, sibling asset templates and the lookalike
+`(designx)` prefix all stay `false` — unrelated CLI diffs are not broadened),
+tested, and harmless. Only the recorded rationale is wrong. Recorded so a future
+reader does not carry the false premise — "fresh-ui is outside the root
+workspace" — into another run, and so the coordinator knows the amendment bought
+less than its drift entry claims.
+
+### G-2 — the browser lease inheritance is legitimate; its coverage claim is not
+
+**Is the inheritance legitimate? Yes — say it plainly.** Three legs, each
+executed:
+
+1. `git diff --name-only 4a3c40321..HEAD -- packages plugins .github` returns
+   four paths: the three T-3 CI files and the barrel. `registry.ts.template` —
+   the browser-gated authored surface — has not moved since the lease was
+   consumed.
+2. The barrel is a _representation_, proven by equality rather than by argument:
+   its design-catalog value is byte-for-byte the on-disk template (15 404 === 15
+   404, strict equality `true`), and `gen:assets-barrel` reproduces it
+   deterministically. It carries no content a browser could observe that the
+   template does not already carry.
+3. The consumed lease cannot have been invalidated even in principle:
+   `receipts/fresh-browser.json` records `deno task test:browser` in
+   `cwd packages/fresh` running `tests/form-navigation_browser.ts`.
+
+**But leg 3 cuts both ways, and that is the finding.** I read that suite: it
+drives static fixtures under
+`packages/fresh/tests/fixtures/{form-navigation,route-binding}-browser/` and
+never invokes the CLI, never loads `EMBEDDED_TEMPLATE_CONTENT`, and never
+renders `/design/components`. So the `fresh-browser` receipt is not merely
+_unaffected_ by this leaf's change — it never had any contact with this leaf's
+changed workflow. The frontend overlay asks for browser validation of _changed
+workflows_; recording `fresh-browser` as this leaf's satisfied frontend/browser
+gate (`plan.md:129`, the `context-pack.md` Gates table, and cycle-1's fitness
+table) **overstates what was proven**. No browser has rendered the repaired
+gallery.
+
+Why this is not blocking, and not `FAIL_RESCOPE`:
+
+- #1358's defect is a data-content defect in a static, dependency-free
+  TypeScript module. The repaired artifact is proven exact against the manifest,
+  and I additionally proved every one of the 66 items lands in a rendered
+  gallery section. The residual risk is that a data-only addition to an existing
+  `.map()` breaks rendering — very low, and not something a form-navigation
+  browser suite would have caught either.
+- No existing browser suite renders the scaffolded design gallery. Proving it
+  would require `scaffold.runtime` / `e2e:cli` — **new scope**, forbidden by
+  this gate's hard constraints and explicitly excluded by the coordinator's
+  recorded gate-proportionality decision. Turning that into `FAIL_RESCOPE` would
+  overturn a coordinator decision on a risk the static evidence already covers.
+
+Recorded for the coordinator as a **coverage-accuracy correction**, not a repair
+request: the leaf's gate tables should not be read as "the repaired gallery was
+browser-verified".
+
+### Residuals — concurred
+
+- **R-1** (GitHub `paths:` glob with literal parentheses) — non-blocking;
+  cycle-1's correction stands (this PR's changed set independently matches four
+  other patterns in the same filter, so a green run here proves nothing about
+  the `(design)` glob). G-1 further reduces its weight: even if the glob never
+  matched, the drift gate still runs via the root lane.
+- **N-3** (`registryCollections` unconsumed by any generated route) —
+  non-blocking, consistent with LD-2's stated purpose. Now also true of the
+  shipped barrel.
+- **O-1** (receipt `gitHead` = `4ca76fa75`, not the review/eval head) —
+  informational and correct: everything after `4ca76fa75` is `.llm/runs/**`
+  only, and I re-executed the gate at `3d7819203` myself (raw exit 0).
+- **O-2** (the E-2 binding lives in the appended amendment table, not the
+  original nine-row Validation Plan) — bookkeeping only; appending is the
+  correct behaviour under the run's immutability rule.
+- **O-3** (structured `fmt` wrapper exits 2 on `packages/cli/src/kernel/assets`)
+  — **reproduced by me**: `findings: 0`, `failedBatches: 1`, "excluded by Deno;
+  refusing a false-green gate", because the root `fmt` config excludes
+  `packages/cli`. `deno.json` is byte-unchanged on this branch, so this is
+  pre-existing repository configuration and no formatting is owed by this delta.
+  The one changed `.ts` file is generator output at its fixed point.
+- **C-1** — all seven acceptance boxes on live #1358 are still `- [ ]`,
+  including the close-gated `gate:` box, while PR #1657's body carries
+  `Closes #1358`. Under protocol rule 12 that blocks a `status:ready-merge`
+  transition. It is **correct that they are unchecked now** (draft,
+  `status:impl`, issue mutation coordinator-owned). Unlike cycle 1, boxes 1–3
+  are now **true on the consumer path** and box 7 is true via the root
+  `check-test` lane, so all seven are checkable at the ready flip. Issue #1358
+  also still carries `status:triage`; realigning it is coordinator-owned.
+
+## Anti-pattern and debt delta
+
+| Item                                     | Status  | Evidence                                                                                                 |
+| ---------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| AP-18 (giant generated-string snapshots) | `CLEAR` | the gate asserts parsed semantic projections and named diffs                                             |
+| AP-19 (silent permissions)               | `CLEAR` | no new runtime permission; test-only `--allow-read`                                                      |
+| AP-25 (side effect in non-edge file)     | `CLEAR` | all file reading stays in the excluded test; no runtime `Deno.*` / `import.meta` added to published code |
+| New debt entries                         | 0       | both packages carry `Keep` verdicts; `arch:check` exit 0                                                 |
+| Deepened violations                      | 0       | `quality:scan` allowances unchanged at 7, all pre-existing `#1276`                                       |
+
+## Verdict
+
+| Field          | Value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Verdict**    | **`PASS`**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| Evaluated head | `3d7819203f59e68eb5b45f6871a03c41ca43cd2f`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| Cycle          | 2 of 2 — **final**. No PLAN-EVAL, no further evaluator loop.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Rationale      | Both cycle-1 blocking findings are closed and independently re-verified. **E-1**: the design catalog decoded out of the committed `embedded.generated.ts` — the only content source `TemplateRegistry` reads — carries 66 ordered, field-exact items, the `ai` collection, `registryCollections` with all eight collections ordered-equal by membership, and exact `registryMeta`; all 66 items land in a rendered gallery section. **E-2**: `check:assets-barrel` is bound in the plan, carries a structured `PASS` receipt, is wired into `ci.yml`, and returned raw exit 0 when I re-executed it — with an empty `git status` afterwards, proving the barrel is the generator's fixed point and that no other generated target moved. Scope is exactly the twice-amended surface and nothing more; the two untouched frozen product files are byte-unchanged; zero lock or config churn; no suppression escape hatches. Every re-executed gate is green. G-1 and G-2 are accuracy corrections to recorded rationale and coverage claims, not defects in the delivered work, and neither leaves a required gate failing or an acceptance criterion false. Under `verdict-definitions.md`: approved (twice-amended) scope complete, required static and fitness gates pass, runtime and consumer gates have evidence, no doctrine violation introduced or deepened, artifacts resumable — `PASS`. |
+| Stops for      | Coordinator readiness disposition only.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+
+### Coordinator decisions this evaluator did not take
+
+1. Ready flip, label change, merge, publish — not taken; PR left `OPEN`, draft,
+   exactly one `status:impl`.
+2. `Closes #1358` neither added nor removed; no issue closed; no acceptance box
+   checked; #1358 left at `status:triage`.
+3. Disposition of G-1 — correct or annotate the T-3 root-cause claim in
+   `drift.md`, and decide whether the lesson "a `paths:`-filter repair must be
+   traced to a job that actually runs the gate" is promoted.
+4. Disposition of G-2 — decide whether a scaffolded-gallery browser/E2E proof is
+   wanted before or after merge, or accepted as covered by static evidence.
+5. Disposition of R-1, N-3, O-1, O-2, O-3 — all recorded non-blocking.
+
+### Standing stops observed by this evaluator
+
+1. Nothing implemented, nothing fixed; every finding is reported for coordinator
+   disposition.
+2. No expensive gate run or requested: no `fresh-browser`, no lease, no Aspire,
+   no Docker, no `e2e:cli`. `docker ps -a` empty afterwards.
+3. `check:assets-barrel` and every other tree-touching command ran in a detached
+   scratch worktree, which was removed; the evaluated worktree was verified
+   clean at `3d7819203` before and after.
+4. No central coordinator state mutated; no next leaf begun.
+5. Only `evaluate.md` plus harness bookkeeping committed; the evaluated product
+   tree is untouched.
