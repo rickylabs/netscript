@@ -1748,3 +1748,45 @@ unverified.
 
 **#1112 is now unblocked** — the docs leaf has a shipped surface to write against, which is the
 prerequisite split-close described.
+
+### Next features leaf released — `app-service-client-wiring` (#1355 + #1360)
+
+| Field | Value |
+| --- | --- |
+| Worktree | `/home/codex/repos/netscript-007-features-1355` |
+| Branch | `feat/app-service-client-wiring` @ `3fc0f2f92`, **no upstream by design** |
+| Base | live `origin/main` tip `3fc0f2f9221a8246f0d26a26189bafb2647be08a` — the #1662 merge commit |
+| Codex thread | `01a004f9-f033-7592-a0bc-63927753fb43` |
+| Requested route | provider=openai · model=gpt-5.6-sol · effort=high |
+| Observed route | provider=openai · model=gpt-5.6-sol · effort=high |
+| Route verdict | **matched** — original/native routing preserved |
+| Brief | `slices/impl-1355.md`, staged at 7,489 bytes |
+| Steering | `codex exec resume 01a004f9-f033-7592-a0bc-63927753fb43 -- "<follow-up>"` |
+
+Launched through `launch-codex-slice.ts` after a `--dry-run` validating the brief, git safety
+(`upstream NONE`, `dirty 0`), the `--expect-base` match, and the explicit provider/model/effort
+triple. Thread record snapshotted to `slices/codex-thread-ids-1355.md`, and the previous leaf's to
+`codex-thread-ids-1293.md`, since the launcher overwrites the unsuffixed file on every dispatch.
+
+**Three deliberate differences from the #1293 leaf:**
+
+1. **The draft PR opens at the FIRST slice**, carrying `Closes #1355` and `Closes #1360`. Both
+   issues are wholly within scope, so this is a normal close — not split-close. This is the direct
+   fix for **D-15**: the per-slice comment trail now has an artefact to live in from the start,
+   rather than the rule silently lapsing because the PR did not yet exist.
+2. **Every issue citation must be re-verified at `3fc0f2f92`.** Both issues cite line numbers
+   verified at `fac9e339042c`, and the base has moved a long way since. #1293 is the precedent that
+   makes this non-negotiable — its stated gap 2 ("no connection-error hook") was simply false against
+   live code, and a leaf that had trusted the issue would have built the wrong thing.
+3. **The expensive gate is fenced.** This contract names six proving gates, including
+   **`scaffold.runtime`** and **`fresh-browser`**. `scaffold.runtime` is the repo's expensive gate,
+   explicitly not to be overlapped, and this lane holds **no lease**. The leaf must plan when it runs
+   and what it uniquely proves that nothing cheaper does, but may not run either gate without my
+   release; I request the lease from the coordinator only once the plan justifies it.
+
+Also required up front: a **backward-compatibility answer**. These templates have already generated
+code in existing scaffolded projects, so "what changes for someone who regenerates versus someone who
+does not, and is any of it breaking" is a real question for a generator fix, not a formality.
+
+The leaf stops after research and plan, and proposes both determinations — PLAN-EVAL necessity and
+expensive-gate timing — rather than deciding either.
