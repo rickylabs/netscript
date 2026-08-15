@@ -8,6 +8,9 @@ import type {
   McpToolResult,
 } from '../../ports/mcp-transport.ts';
 
+const TANSTACK_MCP_SPECIFIER = ['@tanstack', '/ai-mcp'].join('');
+const TANSTACK_MCP_STDIO_SPECIFIER = ['@tanstack', '/ai-mcp/stdio'].join('');
+
 interface TanstackHttpConnectorConfig extends McpConnectorConfig {
   readonly serverId: string;
   readonly url: string;
@@ -40,7 +43,7 @@ interface TanstackClient {
 export function createTanstackHttpConnector(): McpClientConnector {
   return async (config, options) => {
     options.signal.throwIfAborted();
-    const mcp = await import('@tanstack/ai-mcp');
+    const mcp = await import(TANSTACK_MCP_SPECIFIER);
     options.signal.throwIfAborted();
     const client = await settleWithSignal<TanstackClient>(
       mcp.createMCPClient({
@@ -65,8 +68,8 @@ export function createTanstackHttpConnector(): McpClientConnector {
 export function createTanstackStdioConnector(): McpClientConnector {
   return async (config, options) => {
     options.signal.throwIfAborted();
-    const mcp = await import('@tanstack/ai-mcp');
-    const stdio = await import('@tanstack/ai-mcp/stdio');
+    const mcp = await import(TANSTACK_MCP_SPECIFIER);
+    const stdio = await import(TANSTACK_MCP_STDIO_SPECIFIER);
     options.signal.throwIfAborted();
     const client = await settleWithSignal<TanstackClient>(
       mcp.createMCPClient({

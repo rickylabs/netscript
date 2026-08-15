@@ -73,3 +73,15 @@ Drift is append-only.
 - **Slice 5 publish graph:** the authorized connector replaced computed TanStack specifiers with
   literal `import('@tanstack/ai-mcp')` and `import('@tanstack/ai-mcp/stdio')`; this unplanned but
   in-surface change makes JSR rewriting analyzable and is proven clean by the publish dry run.
+
+## 2026-08-15 — O-3 correction: computed optional-runtime invariant restored
+
+- **Correction:** The preceding O-3 disposition was wrong. The computed specifiers are a deliberate
+  cross-package packaging invariant, not optional bookkeeping: they keep optional MCP outside the
+  static JSR graph so generated projects own runtime resolution.
+- **Observed regression:** Current `check-test` failed the CLI invariant test after slice 5 changed
+  both specifiers to literal dynamic imports.
+- **Action:** Restored both `['@tanstack', '/ai-mcp'].join('')` constants and their import sites in
+  the authorized connector; retained the CLI test unchanged.
+- **Evidence:** Structured CLI test raw exit `1` before restoration and `0` after; package publish
+  dry run raw exit `0` with expected unanalyzable-import warnings.

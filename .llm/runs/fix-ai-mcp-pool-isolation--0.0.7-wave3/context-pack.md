@@ -204,3 +204,17 @@ amendment.
   `deno.lock` remain unchanged. O-3 is recorded append-only in `drift.md`.
 - Stop for a fresh independent Tier-A review, then evaluator-owned IMPL-EVAL cycle 2. No expensive
   gate ran and no acceptance state was changed.
+
+## 2026-08-15 — Computed-specifier CI repair (append-only)
+
+- Current `check-test` caught that slice 5's literal TanStack imports broke the CLI-owned optional
+  runtime-resolution invariant. Exact CLI test was RED with raw exit `1` (18 pass / 1 fail).
+- Restored both computed TanStack constants and all dynamic-import uses without touching the CLI
+  test. The same test is GREEN with raw exit `0` (19 pass).
+- Final gates: MCP `0` (20 pass), AI check `0`, Fresh check `0`, CLI check `0`, quality `0`,
+  architecture `0`, doc lint `0`, package publish dry run `0`, connector lint `0`, connector fmt
+  `0`.
+- Product delta is one authorized connector file. CLI source, Fresh, package exports, and lock are
+  unchanged. The corrected O-3 disposition is appended to `drift.md`.
+- Existing review/evaluation PASS artifacts predate this delta. Stop for fresh Tier-A and a
+  proportionate fresh formal evaluation; no expensive gate or PR-state mutation occurred.

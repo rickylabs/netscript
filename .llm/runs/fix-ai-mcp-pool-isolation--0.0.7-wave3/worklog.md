@@ -307,3 +307,33 @@ and then the external boundary at `src/mcp/adapters/tanstack-connector.ts`.
   CLI E2E command ran.
 - Exact next blocker: fresh independent Tier-A review of this repair, followed by separately owned
   IMPL-EVAL cycle 2; this implementation session does not self-certify.
+
+## 2026-08-15 — Bounded CI repair: computed TanStack runtime specifiers
+
+- Current `check-test` CI at head `4766b258f0d61108e4240720365b9ab078f6a111` exposed a real
+  cross-package packaging regression: slice 5's literal TanStack imports violated the CLI-owned
+  invariant that optional MCP remains outside the static JSR graph.
+- Exact structured CLI test RED command: `deno run --allow-read --allow-write --allow-run
+  .llm/tools/run-deno-test.ts -- --allow-all
+  packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts`; raw exit `1` (18 passed, 1
+  failed) on `expected @netscript/ai to compute the @tanstack/ai-mcp runtime specifier`.
+- Restored both source-text computed constants using `['@tanstack', '/ai-mcp'].join('')` and
+  `['@tanstack', '/ai-mcp/stdio'].join('')`, and restored all three dynamic-import sites to use
+  those constants. The CLI invariant test was not changed.
+- Same structured CLI test GREEN: raw exit `0`, 19 passed / 0 failed.
+- Focused structured MCP suite raw exit `0` (20 passed). Structured checks: AI raw exit `0` (98
+  files), Fresh raw exit `0` (197 files, 2 batches), CLI raw exit `0` (883 files, 8 batches); each
+  wrapper used `--unstable-kv`.
+- `deno task quality:scan` raw exit `0`, no findings. `deno task arch:check` raw exit `0`, baseline
+  warnings only. Targeted connector lint and fmt wrappers each returned raw exit `0`.
+- `deno doc --lint packages/ai/mcp.ts` raw exit `0`. Package-local
+  `deno publish --dry-run --allow-dirty` raw exit `0`; its three expected
+  `unanalyzable-dynamic-import` warnings prove Deno did not pull the optional runtime specifiers
+  into the static publish graph, while the CLI invariant proves generated-project resolution.
+- Repair product delta is exactly `packages/ai/src/mcp/adapters/tanstack-connector.ts`.
+  `packages/cli`, `packages/fresh`, `packages/ai/deno.json`, and `deno.lock` quiet-diff checks each
+  returned raw exit `0` (unchanged); prohibited-pattern scan returned expected no-match exit `1`.
+- `PLAN-EVAL: N/A` remains justified for this exact mechanical restoration. No Aspire, Docker,
+  browser, scaffold runtime, or CLI E2E gate ran.
+- The prior Tier-A and IMPL-EVAL cycle 2 PASS predate this delta and do not certify it. Exact next
+  blocker is fresh Tier-A plus a proportionate fresh formal evaluation of this repair.
