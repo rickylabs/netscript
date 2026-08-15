@@ -2184,3 +2184,50 @@ preserved across the reorder.
 
 S3 remains unrequested and undispatched; it needs a coordinator grant regardless of this outcome. No
 expensive gate, no lease.
+
+### S2 Tier-A round 2 — C2 fix accepted; `FAIL_FIX` on S2-F2
+
+**C2 ordering fix accepted** at `f784606d0423bf2c82cafb8fd339b4196e086214`. `addService` now calls
+`validateServiceClientContracts` before `renderService` and before any write, with the reason stated
+in-code; the validation was **extracted into a shared pass** in `generate-service-clients.ts` and
+reused by both entry points rather than duplicated; no try/rollback.
+
+The new add-path test reproduces the probe scenario exactly and asserts the rejection names `orders`
+and its full expected contract path, appsettings and workspace `deno.json` byte-identical, and the
+new service dir and contract absent. The detail that makes it a genuine test: the injected
+`regenerateHelpers` stub **writes when called**, so `exists === false` proves **non-invocation**
+rather than mere absence. A plain absence check would pass for the wrong reason.
+
+Also verified: `deno check` clean; `check:assets-barrel` **exit 0 with a clean tree after
+regeneration** — the embedded barrel is genuinely fresh, confirmed by re-running the generator rather
+than trusting the diff, which is the `cli-asset-edits-need-barrel-regen` trap avoided.
+
+**S2-F2 — C1 satisfied in the template, but the test asserting the old contract was left behind.**
+
+Full suite at that head: `deno test --allow-all ./src/` → **597 passed, 1 failed**. The failure is
+`app route template rendering`, `packages/cli/src/kernel/templates/app/route-templates_test.ts:387`,
+expecting the rendered output to contain
+`import { bridgeInvalidation } from '@netscript/sdk/query-client';`.
+
+Causation proven rather than inferred: at `c53726c69` the template carried that import on line 3 and
+used it on line 11; at `f784606d0` it correctly emits
+`{ queryKey: …Queries.list.clientKey() } as const` on line 24 with no such import — exactly what C1
+required. The test now encodes the **pre-C1** contract and fails for the right reason.
+
+Not a baseline, and not deferrable to S3 merely because the file appears in S3's list: a slice does
+not hand over a red suite, and the assertion contradicts S2's own binding constraint.
+
+**Why this was worth catching rather than waving through.** The targeted suites I ran first —
+services, service adapters, aspire — were 24/24 green, and it would have been easy to call S2 green
+on those. The contracted evidence is the suite, not the subset I chose to run. Reporting a narrower
+result in broader terms is precisely the mislabel this lane made the author correct one turn earlier;
+doing it in my own Tier-A would have been worse.
+
+**The fix is also an opportunity.** Lines 385-386 of that test already assert the two *allowed*
+imports are present — half of C1's allowlist. Completing it there is the natural home: assert the
+`bridgeInvalidation` import is **absent**, assert the `@netscript/sdk/*` import specifier set
+**equals exactly** `{'@netscript/sdk/client','@netscript/sdk/query'}` (presence of two allowed imports
+does not catch a third being added — only set equality does), and assert the direct invalidation
+literal appears **after** `<svc>Queries` per C1's ordering clause.
+
+S3 remains unrequested and undispatched pending a coordinator grant. No expensive gate, no lease.
