@@ -1664,3 +1664,53 @@ transitively through the single shared notifier) are carried and non-blocking.
 The #1293 leaf is gate-complete: PLAN-EVAL `PASS`, Tier-A on every slice, IMPL-EVAL `PASS`, four
 exact-head receipts `SUFFICIENT`, close contract intact. **Merge authority is the coordinator's** and
 the PR lifecycle is not yet terminal, so `app-service-client-wiring` (#1355, #1360) stays queued.
+
+## 2026-08-15 — #1662 readiness transition reconciled; one label discrepancy reported
+
+### Terminal evaluator tuple, confirmed against live state
+
+| Field | Value | Verified |
+| --- | --- | --- |
+| Evaluator session | `e64f33f0-c88e-4fc7-9e79-63c01fed94db` | matches this lane's dispatch record |
+| Bridge | `cse_01XrFMbPHpry6tL3v9ZmRsLK` | matches |
+| Route | native Fable 5 · medium · Remote Control | requested = observed |
+| Evaluated head | `d8d255bdc` | matches the immutable evidence head |
+| Verdict | `PASS`, no substantive findings; E1–E4 editorial | matches `evaluate.md` |
+| Evaluator head | `f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf` | local == remote == live PR head |
+| Comment | `#issuecomment-5301776738` | present |
+| Review threads | 0 threads, 0 unanswered | `agentic:review-threads` → `PASS`, exit 0 |
+| Split-close body | `Part of #1293`, no closing keyword | re-verified |
+| #1293 | `OPEN`, `status:impl`, wording untouched | confirmed |
+| PR #1662 | `draft=false`, `OPEN`, milestone `0.0.7` | ready flip confirmed |
+
+### Discrepancy — the PR's lifecycle label is `status:impl-eval`, not `status:ready-merge`
+
+The coordinator's message states #1662 was normalized to "sole `status:ready-merge`". Live state says
+otherwise:
+
+```text
+labels = status:impl-eval, wave:v1, type:feat, gate:jsr, priority:p2, area:database, area:packages
+```
+
+Read twice, twenty seconds apart, from two independent sources — `gh pr view --json labels` and the
+raw `repos/rickylabs/netscript/issues/1662/labels` API — both returning `status:impl-eval`. This is
+not propagation lag.
+
+The **single-`status:` law holds** (exactly one lifecycle label, so the double-label failure this
+lane watches for did not occur). Only the value differs from the report.
+
+**Reported, not corrected.** The coordinator performed this relabel and holds the authority over it;
+this lane silently "fixing" a label to match a report would destroy the evidence that the two ever
+disagreed, which is the more valuable artefact. Flagged because merge and close-gate automation can
+key on `status:ready-merge` specifically, so a merge performed on the assumption that label is
+present may not behave as expected.
+
+### Readiness CI at the exact head — not yet terminal
+
+`agentic:pr-checks` at `f52aa471c`: `ok=true`, `currentFailures=0`, 58 checks —
+5 `success` current-pass, 13 `skipped` current-pass, 36 superseded, and **2 still `in_progress`**.
+Zero current failures is a true statement but not a terminal one; per D-6 a green rollup that is
+partly "nothing ran" is not itself gate evidence, and two pending jobs mean the set is not settled.
+Monitoring to terminal rather than reporting green early.
+
+**Not merging.** Merge is the coordinator's and is explicitly gated on terminal green.
