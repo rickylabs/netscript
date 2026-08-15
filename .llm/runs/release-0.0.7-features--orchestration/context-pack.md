@@ -1,10 +1,10 @@
 # Context pack — NetScript 0.0.7 features lane
 
-Status as of 2026-08-15: the owner's **keep-and-narrow** amendment for PR #1651 is **complete and
-signed off**. Tier-A returned `ACCEPTED_WITH_FINDINGS` (one editorial finding, closed) and the
-bounded final IMPL-EVAL returned terminal **`PASS`** with no substantive findings. Nothing is
-running in this lane. The PR is draft at `status:impl`; the ready-flip, the reply to owner comment
-`5300440887`, and merge all remain with the coordinator.
+Status as of 2026-08-15: **#1502 is shipped.** PR #1651 was squash-merged at its exact evaluated head
+`ec69100c8` as `284dda90a17a13a7e5e8e9834e5411b58887131b`, now the live `origin/main` tip. #1502 is
+`CLOSED` with 5/5 acceptance boxes and both issue and PR carry exactly `status:shipped`. The
+`rfc-plugin-cli-contribution` leaf is terminal. The lane has moved on to the next wave — see
+§ Active leaf.
 
 ## Control
 
@@ -21,15 +21,13 @@ Authoritative coordinator checkpoint: `eb46e33fb6493ce6ef5350f7abd6e4da51854577`
 
 ## Lane state
 
-- Live `origin/main` = `0b3ed5d5a6aea451318f120988c25dfa3993a2ab`; the coordinator's cluster state
-  records main as `e090f894f`. Either way it has **advanced** past the immutable dispatch base
-  `01e0960494c95ce56eb35892c211a095eb13e6ed` that PR #1651's `base.sha` still records. The leaf
-  discloses the advance; the prior IMPL-EVAL tested and confirmed it does not invalidate the RFC's
-  coupling findings.
+- Live `origin/main` = `284dda90a17a13a7e5e8e9834e5411b58887131b` — the #1651 merge commit itself.
+  It has advanced well past the immutable dispatch base `01e0960494c95ce56eb35892c211a095eb13e6ed`.
+  Any new leaf branches from the **live** tip, not from the frozen base.
 - Topic branch `orchestrator/release-0.0.7-features` carries orchestration evidence only.
-- Sole leaf: `rfc-plugin-cli-contribution` (#1502), draft PR **#1651**, head
-  `ec69100c89195adb776c4cef3724c8c3683c553c` (local = remote = PR), exactly one lifecycle label
-  `status:impl`, 0 review threads.
+- **Shipped leaf:** `rfc-plugin-cli-contribution` (#1502), PR **#1651** `MERGED` at head
+  `ec69100c89195adb776c4cef3724c8c3683c553c` → merge commit `284dda90a17a13a7e5e8e9834e5411b58887131b`.
+  Issue `CLOSED`, 5/5 acceptance, exactly one `status:shipped` on both issue and PR. Terminal.
 - Leaf worktree `/home/codex/repos/netscript-007-features-1502` is clean at the branch head with no
   upstream and no active agent.
 - Author thread `019ffcc5-d3e1-7c13-9815-e9956ec43683` is the **only** implementation session; it is
@@ -96,16 +94,13 @@ and identity-domain mapping — because writing them would make #1651 define com
 the same verdict assigns exclusively to RFC 0003. Full supersession table in `worklog.md`; shape of
 the drift in D-10.
 
-## Next actions belong to the coordinator
+## Carried into the next leaf
 
-1. **Decide the ready-flip and merge.** Every gate this lane owes is closed. Draft→ready is itself
-   an automation trigger, so sequence it deliberately.
-2. **Answer or resolve owner comment `5300440887`.** This lane never replied to it; the amendment
-   addresses it substantively but does not discharge it procedurally.
-3. **Optionally fold the two editorial notes.** Both are summary-text losses where the normative
-   substance survives elsewhere; neither warrants a formal cycle without coordinator authorization.
-4. **#1502 lifecycle label** still reads `status:research` (D-4); this lane's relabel grant covers
-   PR #1651 only.
+Two editorial notes from the #1502 IMPL-EVAL were merged unfixed and are **not** blockers:
+`rfcs/0000:213` lost "process execution" from a summary row (substance survives at `:841`/`:852`),
+and `:918` lost the "cannot stand in for a database transaction" sentence (substance survives as an
+ownership prohibition at `:816-822`). Fold them opportunistically if a later leaf touches that RFC;
+neither warrants its own change.
 
 ## Closed gate — PLAN-EVAL cycle 2 `PASS`
 
@@ -165,7 +160,7 @@ was never run and remains forbidden for this leaf.
 
 D-1 (Codex leaf mobile visibility unproven — deliberately not repaired, sibling blast radius),
 D-2 (contract/scope resolution, superseded route note), D-3 (Claude CLI 2.1.233 vs 2.1.231),
-D-4 (#1502 still `status:research` — reported; this lane's relabel grant covers PR #1651 only),
+D-4 (**closed** — the coordinator's ship relabel moved #1502 straight to `status:shipped`),
 D-5 (missing `task_complete` marker on the author thread — read idle from `codex-status`),
 D-6 (`pr-checks PASS` is an all-`skipped` set, not gate evidence),
 D-7 (a watcher exit is a wake signal only; verdicts come from committed artifacts),
@@ -173,5 +168,5 @@ D-8 (the IMPL-EVAL `PASS` predates its own merge gate),
 D-9 (Tier-A reviewer routing vs the reset contract — resolved in practice: this supervisor performs
 the opposite-family review),
 D-10 (the owner verdict narrows an amendment that was briefed wider),
-D-11 (the RFC's blanket non-assignability claim is false as written — **resolved** at `:922-926`),
+D-11 (**resolved** at `:922-926`),
 D-12 (a foreground Claude launch registers no job dir and cannot prove its own route).

@@ -970,3 +970,122 @@ comment created after that timestamp is the evaluator's own verdict comment at `
 or reviewer gate was raised inside the evaluation window, so this verdict does not repeat the D-8
 failure. It remains a verdict on the head it evaluated, not merge authority — the ready-flip and
 merge stay with the coordinator.
+
+## 2026-08-15T08:28Z — #1502 / PR #1651 shipped
+
+The coordinator exercised merge authority. Verified independently rather than reconciled from the
+report:
+
+| Field | Value | How verified |
+| --- | --- | --- |
+| Merged PR head | `ec69100c89195adb776c4cef3724c8c3683c553c` | `gh pr view 1651 -q .headRefOid` — **identical** to the evaluated verdict head |
+| Merge commit | `284dda90a17a13a7e5e8e9834e5411b58887131b` | `gh pr view 1651 -q .mergeCommit.oid` |
+| Merge mode / time | squash, `2026-08-15T08:28:46Z` | PR `state: MERGED`, `mergedAt` |
+| `origin/main` | `284dda90a` | `git fetch origin main && git rev-parse origin/main` — the merge commit **is** the live tip |
+| Commit subject | `docs(rfc): define typed plugin CLI contributions (#1651)` | `git log --oneline -1 284dda90a` |
+| Issue #1502 | `CLOSED` at `2026-08-15T08:28:47Z` | `gh issue view 1502` |
+| #1502 acceptance | **5/5 checked** | all five `- [x]` boxes read from the live issue body |
+| #1502 labels | exactly one `status:` — `status:shipped` | `area:cli, type:docs, area:plugins, priority:p0, rfc, status:shipped, epic:cli-contrib` |
+| PR #1651 labels | exactly one `status:` — `status:shipped` | `impl-eval:skip` **absent**, confirmed by enumeration not by report |
+
+The merged head is the exact head Tier-A signed and the bounded IMPL-EVAL passed — no drift between
+what was evaluated and what shipped, which is the trap `eval-verdict-head-must-equal-merge-head`
+exists to catch. The close-gate chain is intact end to end: `Closes #1502` in the body, five checked
+acceptance boxes, one `status:` label on each of the issue and the PR, and the issue closed one
+second after the merge.
+
+**D-4 is now closed.** #1502 no longer carries the stale `status:research`; the coordinator's relabel
+moved it directly to `status:shipped`.
+
+The `rfc-plugin-cli-contribution` leaf is terminal. Its worktree
+`/home/codex/repos/netscript-007-features-1502` and author thread
+`019ffcc5-d3e1-7c13-9815-e9956ec43683` are finished; the thread is preserved, not resumed. Nothing in
+this lane is running.
+
+## 2026-08-15 — frozen features queue inspected; next leaf selected
+
+The queue is **not** exhausted. `leaf-contracts.json` carries 16 features contracts — one
+coordinator checkpoint and 15 implementation leaves — covering exactly the 17 issues the lane owns
+per `briefs/topic-features/implement.md`. With #1502 shipped, **14 implementation leaves remain
+unshipped**.
+
+| Wave | Leaf | Issues | Archetype | State |
+| --- | --- | --- | --- | --- |
+| 0 | `rfc-a-stage0-ratification-board` | #1348 | 4-dsl-builder | coordinator checkpoint — no leaf PR, never closed by this lane |
+| 0 | `rfc-plugin-cli-contribution` | #1502 | 4-dsl-builder | **shipped** `284dda90a` |
+| 1 | **`prisma-mysql-adapter-surface`** | **#1293** | 2-integration | **selected — dispatched** |
+| 1 | `app-service-client-wiring` | #1355, #1360 | 2-integration | eligible, queued behind serialization |
+| 2 | `sdk-procedure-metadata` | #1466 | 4-dsl-builder | blocked by wave |
+| 2 | `workers-job-policy-metadata` | #1451 | 4-dsl-builder | blocked by wave |
+| 3 | `sdk-client-contribution-seam` | #1349 | 4-dsl-builder | blocked by wave |
+| 3 | `ui-resource-slice-generator` | #1354 | 6-cli-tooling | blocked by wave |
+| 4 | `sdk-auth-contribution-dogfood` | #1352 | 4-dsl-builder | blocked by wave |
+| 4 | `workers-job-payload-typing` | #1455 | 4-dsl-builder | blocked by wave |
+| 5 | `sdk-locale-contribution-proof` | #1467 | 4-dsl-builder | blocked by wave |
+| 6 | `plugin-service-context-factory` | #1452 | 5-plugin | blocked by wave |
+| 6 | `workers-execution-progress` | #1592 | 3-runtime-behavior | blocked by wave |
+| 7 | `ai-openai-responses-mapper` | #1591 | 2-integration | blocked by wave |
+| 7 | `fresh-client-navigation-coordinator` | #1590 | 4-dsl-builder | blocked by wave |
+| 8 | `fresh-ai-chat-response-options` | #1458 | 3-runtime-behavior | blocked by wave |
+
+### Why `prisma-mysql-adapter-surface` (#1293)
+
+Wave 1 is the lowest unshipped wave and holds exactly two leaves. Both are genuinely eligible —
+`milestone-dependency-dag.json` shows **zero incoming edges** for `issue:1293`, `issue:1355`, and
+`issue:1360`, so nothing gates either. Per-topic serialization allows one, so the tie is broken by
+contract order and size: #1293 is a single issue with a single package surface, while
+`app-service-client-wiring` spans two issues. #1293 goes first; `app-service-client-wiring` is next
+in line and needs no new eligibility check when this leaf terminates.
+
+All five candidate issues were confirmed live: #1293, #1355, #1360, #1451, #1466 are all `OPEN` on
+milestone `0.0.7` and unshipped.
+
+### What this leaf actually is, and the two boundaries it must respect
+
+#1293 is the lane's **first framework-source leaf** — a real published-surface change to
+`packages/prisma-adapter-mysql/`, not another document. Contract: archetype `2-integration`, file
+surfaces `deno.json`, `src/adapter.ts`, `src/types.ts`, proving gates `check`, `test`,
+`publish-dry-run`, `arch-check`, and `jsrAudit.applicable: true` with two named risks (audit public
+exports and exact `@netscript` pins; isolated-declaration dry-run rejecting runtime asset/
+`import.meta` reads).
+
+Two boundaries I flagged into the brief rather than leaving for the leaf to discover:
+
+1. **Acceptance box 4 is cross-lane.** "#1112's example rewritten against the shipped surface and
+   verified executable" points at #1112, a `type:docs` issue on milestone `0.0.7` that is **not** in
+   this lane's owned issue list. #1293 exists precisely because the docs lane previously made a
+   framework change it was not entitled to make. This leaf owns the framework surface and must not
+   close, edit, or claim #1112 — it hands the docs lane a shipped surface to write against. A
+   `Closes #1293` that reads as also closing #1112 would repeat the original error in mirror image.
+2. **The connection-error hook is API design, not a side effect.** The issue is explicit that the
+   docs lane's `onConnectionError` / `onError` shape was "reasonable in shape, but it must be
+   designed and reviewed as an API". That is the one place this leaf could need adversarial
+   planning.
+
+### PLAN-EVAL determination — deferred to evidence, not pre-decided
+
+`lane-policy.md:61-64` makes PLAN-EVAL **conditional** by owner decision (2026-08-08): required for
+genuinely complex or decision-heavy work, otherwise `PLAN-EVAL: N/A` when contract, scope,
+acceptance, and gates are complete. #1293's contract is complete, which points at N/A; the hook's
+API shape points the other way.
+
+Rather than pre-decide from outside the code, the leaf is briefed to research first and then
+**propose** the determination with evidence, stopping for my ruling before implementing. If the hook
+turns out to be a mechanical addition fully determined by the acceptance criteria, N/A is right and
+recorded with reasoning. If it forces a real design choice — options field versus override, or how
+it composes with Prisma's driver-adapter contract — that is decision-heavy and I will request a
+PLAN-EVAL dispatch grant from the coordinator. **I hold no standing evaluator-dispatch grant**; the
+reset contract reserves formal gates to explicit coordinator grants, and this lane has never
+launched one without.
+
+### Routes selected from policy, not invented
+
+| Lane | Route | Source |
+| --- | --- | --- |
+| Implementation | Codex · OpenAI · GPT-5.6 Sol · **high** (`complex_implementation`) | `lane-policy.md:28`; matches the features lane's preserved Codex route recorded in `topic-features/codex-thread-ids.md` |
+| Tier-A review | Claude · Fable 5 · **medium** (`review_codex_complex`), fallback Opus 5 · medium | `lane-policy.md` review-pairing ladder, effort-paired to Sol · high |
+| IMPL-EVAL | native opposite-family Fable 5 · medium, per-policy fallbacks | `lane-policy.md:46`; mandatory unless the owner waives |
+
+Fable 5's recorded allowance was exhausted earlier in this run (D-2), so the Opus 5 fallback is the
+realistic reviewer. Requested and observed routes will both be recorded; no route match will be
+claimed unless they match.
