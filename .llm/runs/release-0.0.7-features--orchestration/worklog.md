@@ -3590,3 +3590,81 @@ runtime lease was requested or taken; no evaluator launched.
 
 Per **D-17**, the readiness head is already final and pushed, so a lease granted against it cannot
 move before execution: **`6f813b0db35df38dcd9dc7f1ea333e997399fac0`**, local == remote == PR.
+
+## 2026-08-15 — S5 attempt-3 Tier-A: gate is **LEAF-CAUSED**, author attribution rejected
+
+Leaf head `09a771c8e828f28bf26b387097bdb6a203b3bebe`, local == remote. Lease `2da4e1b0e`, bound head
+`6f813b0db` — and **the executed head equals the bound head**, so D-17 held this attempt.
+
+`scaffold.runtime` **FAIL**, exit 1, `passed=32 failed=1 skipped=0`. F4's repaired
+`generated.service-client-contract` **passed** in 3,079 ms — the probe repair worked. The sole
+failure is `generated.deno-fmt-check`: `Found 12 not formatted files in 172 files`.
+
+### The author's attribution does not survive
+
+It classified the gate "pre-existing" by examining **one** file — `aspire/.helpers/register-plugins.mts`
+— confirming its generator is unchanged since `c53726c69`, and generalising to all twelve. One
+baseline path does not make twelve baseline. **Rejected.**
+
+The raw log preserved only the summary line, not the paths, so the author's own gate evidence could
+not support the classification either way. I reproduced the list from the **preserved generated
+project** at `.llm/tmp/cli-e2e/plugin-smoke-20260815-191609`, which survived `--cleanup`.
+
+### The exact 12 paths, classified
+
+| # | Path | Emitting generator | Changed by this leaf? | Class |
+| --- | --- | --- | --- | --- |
+| 1 | `apps/…-web/lib/users.ts` | `client-scaffolder.ts` | **YES** | **LEAF-CAUSED** |
+| 2 | `apps/…-web/lib/payments.ts` | `client-scaffolder.ts` | **YES** | **LEAF-CAUSED** |
+| 3-8 | `aspire/.helpers/{db-cli-mode,index,register-apps,register-background,register-infrastructure,register-plugins,register-tools}.mts` | `templates/aspire/**` | no — empty diff vs `c53726c69` | baseline |
+| 9 | `contracts/versions/v1/mod.ts` | contract adapter | no | leaf-**triggered**, see below |
+| 10 | `contracts/versions/v1/payments.contract.ts` | contract adapter | no | leaf-**triggered** |
+| 11 | `services/payments/src/routers/v1.ts` | service scaffolder | no | leaf-**triggered** |
+
+### Verdict: leaf-caused
+
+Items 1 and 2 are decisive. Both are emitted by
+`packages/cli/src/kernel/adapters/service/client-scaffolder.ts`, which **this leaf modified**, and
+the formatter's own diff shows the emission shape is the defect:
+
+```
+-import {
+-  UsersContractV1,
+-} from '@…/contracts';
++import { UsersContractV1 } from '@…/contracts';
+```
+
+The scaffolder emits a multi-line import for a single named import; `deno fmt` collapses it. Per the
+coordinator's rule — any leaf-added or leaf-modified generated artifact being unformatted makes the
+gate leaf-caused even when other paths are baseline — **the gate is leaf-caused.**
+
+Note that **`lib/users.ts` is unformatted too**, not only the leaf's `payments` scenario file. That
+rules out "only the new second service is affected": the emission defect applies to every client
+module the scaffolder writes, so it would reach any consumer of `--with-client`, not just this
+probe's fixture.
+
+### An asymmetry the repair round must resolve, not assume
+
+`contracts/versions/v1/payments.contract.ts` is unformatted while `users.contract.ts` — same
+generator, unchanged by this leaf — is **not** in the list. Same for `services/payments/**` versus
+`services/users/**`. So the `payments` artifacts differ from their `users` equivalents despite an
+identical generator.
+
+The plausible reading is that base-scaffold output gets a formatting pass that post-scaffold
+`service add` does not, making this pre-existing `service add` behaviour that the leaf's two-service
+scenario is the first to reach. **That is a hypothesis, not a finding** — the same discipline that
+kept me from reporting a wrong root cause at S5 attempt 1. It must be measured at `c53726c69` by
+adding a second service there, not inferred.
+
+### Bounded repair surface
+
+1. **Primary, leaf-caused:** the import emission in
+   `packages/cli/src/kernel/adapters/service/client-scaffolder.ts` — emit a single-line import for a
+   single named import so generated client modules are formatter-clean. Covers paths 1-2.
+2. **To determine first:** whether paths 9-11 reproduce at `c53726c69` when a second service is
+   added there. If yes, baseline; if no, extend the repair. Measure before deciding.
+3. **Out of scope:** paths 3-8, the six Aspire helpers. Their generators have an empty diff against
+   `c53726c69`; the author's evidence for those is sound and stands.
+
+No lease requested, no retry, no evaluator, no product mutation, no `fresh-browser`. Host was proven
+empty after the failed run and remains so.
