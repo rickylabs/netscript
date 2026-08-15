@@ -38,6 +38,8 @@
 | 2026-08-15T00:09:09Z | Slice 3 reconcile: the only new PR comment is the recorded slice-2 implementation evidence; #1262/#1263/#1588 remain open and PR #1654 remains draft at exactly one `status:impl`. No external finding or authorized lifecycle/scope change appeared. | live PR read; prior live issue reads |
 | 2026-08-15T00:13:41Z | Slice 4 gave the persistent generated router a defined `NOT_FOUND` path for missing GET rows, translated only Prisma `P2025` for update/delete, retained the already-green common 404 OpenAPI projection assertion, regenerated the embedded asset, and cleared its decisive and required package gates. | generated-router template tests; `quality:scan`; `arch:check` |
 | 2026-08-15T00:13:41Z | Slice 4 reconcile: the only new PR comment is the recorded slice-3 implementation evidence; #1262/#1263/#1588 remain open and PR #1654 remains draft at exactly one `status:impl`. No external finding or authorized lifecycle/scope change appeared. | live PR read; prior live issue reads |
+| 2026-08-15T00:19:39Z | Slice 5 extended the existing live database verifier to prove the generated `Seed User` list row, defined `NOT_FOUND` responses for a guaranteed-missing GET/PATCH/DELETE ID, and all three 404 OpenAPI projections in the later shared runtime execution. Its focused, structured check/test/lint/fmt and required package gates are green without starting a runtime. | focused verifier tests; structured wrappers; `quality:scan`; `arch:check` |
+| 2026-08-15T00:19:39Z | Slice 5 reconcile: the only new PR comment is the recorded slice-4 implementation evidence; #1262/#1263/#1588 remain open and PR #1654 remains draft at exactly one `status:impl`. No external finding or authorized lifecycle/scope change appeared. | live PR read; prior live issue reads |
 
 ## Gate evidence
 
@@ -55,6 +57,12 @@
 | 4 | `deno task quality:scan` | PASS, raw exit 0; 0 findings, 7 pre-existing bounded allowances |
 | 4 | `deno task arch:check` | PASS, raw exit 0; no doctrine FAIL rows (warning-only baseline census retained) |
 | 4 | `deno task gen:assets-barrel` | PASS, raw exit 0; generated mirror refreshed without hand editing |
+| 5 | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts` | PASS, raw exit 0; 9 passed, 0 failed |
+| 5 | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --file packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts --file packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts --ext ts` | PASS, raw exit 0; 2 files, 0 diagnostics; `--unstable-kv` applied by the wrapper |
+| 5 | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --file packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts --file packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts --ext ts` | PASS, raw exit 0; 2 files, 0 findings |
+| 5 | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts --file packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts --ext ts` | PASS, raw exit 0; 2 files, 0 findings |
+| 5 | `deno task quality:scan` | PASS, raw exit 0; 0 findings, 7 pre-existing bounded allowances |
+| 5 | `deno task arch:check` | PASS, raw exit 0; no doctrine FAIL rows (warning-only baseline census retained) |
 
 `scaffold.runtime`, Aspire, and Docker remain forbidden until the coordinator-owned global
 expensive-gate lease is explicitly granted. The eventual one-pass verdict is shared by all three
@@ -63,6 +71,7 @@ issues.
 Red-first probes are defect evidence, not green gate receipts. Durable gate receipt generation
 begins only after an approved plan and implementation.
 
-Implementation note: PLAN-EVAL cycle 2 is complete, but no Aspire/AppHost, Docker,
-`scaffold.runtime`, publish, or expensive-gate lease request has run. PR #1654 remains draft at
-exactly one phase label, `status:impl`; Tier-A review, slice 6, and IMPL-EVAL remain external stops.
+Implementation note: PLAN-EVAL cycle 2 and implementation slices 2–5 are complete, but no
+Aspire/AppHost, Docker, `scaffold.runtime`, publish, or expensive-gate lease request has run. PR
+#1654 remains draft at exactly one phase label, `status:impl`; Tier-A review, slice 6, and
+IMPL-EVAL remain external stops.

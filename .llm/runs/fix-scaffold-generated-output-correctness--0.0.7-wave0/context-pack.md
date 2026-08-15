@@ -43,6 +43,14 @@
 - Slice 4 gives persistent generated GET/update/delete by-id handlers the contract-defined
   `NOT_FOUND` path, narrows Prisma translation to `P2025`, and retains regression coverage for the
   already-green common 404 OpenAPI projection. Memory showcase routers remain excluded.
+- Slice 4 landed as `589a01a550bbfd4c558d5cca2c6eee003123c255` with its decisive template tests,
+  regenerated embedded asset, `quality:scan`, and `arch:check` green.
+- Slice 5 prepares the existing live database verifier to require the generated `Seed User` row,
+  defined `NOT_FOUND` wire responses for guaranteed-missing GET/PATCH/DELETE operations, and a 404
+  OpenAPI response for each operation. Its focused deterministic test covers the full request
+  sequence without starting the runtime.
+- Implementation slices 2–5 are complete. Slice 6 remains unstarted and lease-blocked pending the
+  topic orchestrator's substantive Tier-A review and explicit singleton expensive-gate grant.
 - Opposite-family IMPL-EVAL remains mandatory after implementation and Tier-A review.
 - Same-thread steering must use the exact Deno-suite command in `codex-thread-ids.md`; direct
   `codex exec resume` is prohibited.
