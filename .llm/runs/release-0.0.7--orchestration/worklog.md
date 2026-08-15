@@ -686,3 +686,17 @@
   exactly the six pinned red diagnostics. Coordinator released S2 only: real Deno KV persistence
   failure isolation with RED-before/GREEN-after and awaited `closeKv()`/`resetKv()` teardown. S3
   and every expensive gate remain fenced.
+
+## 2026-08-15T12:36:26Z — #1664 S3 passes and artifact-only S4 begins
+
+- #1664 S3 is fresh Tier-A `PASS` at leaf `1df8a5274`, features checkpoint `c91c2084a`. The
+  supervisor independently reproduced the complete CLI source suite at 598/0, verified clean
+  canonical asset regeneration, both island-specific `initialDataUpdatedAt` guards, the public
+  Fresh browser task wiring, the two ruled package README notes, and preservation of the earlier
+  C1 import/invalidation assertions plus S2 add-path pre-write atomicity.
+- Coordinator completed the pre-expensive convergence review and released S4 only on the preserved
+  Sol/high author. S4 is artifact-only: per-member CLI/Fresh/SDK exact-pin, export/doc, JSR and
+  isolated publish audits followed by four immutable-head catalog receipts (`check`, `test`,
+  `publish-dry-run`, `arch-check`). A red result must stop for exact attribution; it cannot trigger
+  an inline product repair. `scaffold.runtime`, `fresh-browser`, Aspire, Docker, S5, and every
+  evaluator remain explicitly unauthorized and the singleton runtime lease remains free.

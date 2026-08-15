@@ -390,3 +390,14 @@ authorized. #1665 S1 is Tier-A PASS at `0e4e26c51`, fixes topic `f6f8f0fcb`; the
 executing S2 only with a real in-memory Deno KV RED/GREEN proof and awaited singleton teardown.
 #1663 remains unchanged at its exceptional-final-evaluator owner boundary. Preserve all native
 topic supervisors and original Codex authors; serialization remains per topic only.
+
+Resume from the newer `2026-08-15T12:36:26Z` transition. Main remains `baf1cdf67`. #1664 S3 is
+Tier-A PASS at leaf `1df8a5274`, features topic `c91c2084a`; full CLI 598/0, Fresh cheap gates,
+asset freshness, both cache-age omission guards, and all earlier generator constraints were
+independently rechecked. The same Sol/high author is now running S4 artifact-only convergence:
+three per-member public/publish audit sets and the four immutable-head cheap receipts. Any red gate
+must stop for attribution and scoped review. No runtime lease exists and `scaffold.runtime`,
+`fresh-browser`, Aspire, Docker, S5, and evaluation remain forbidden. #1665 is independently
+rerunning the full root check/test after tightening KV initialization inside the mandatory
+`try/finally`; its earlier green receipts were correctly invalidated rather than reused. #1663
+remains at the genuine owner-only exceptional-evaluator boundary.
