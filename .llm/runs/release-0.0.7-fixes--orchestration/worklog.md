@@ -428,3 +428,52 @@ Both carried red gates remain red and must not be described otherwise: `surface:
 
 Still recommended and still not filed by this session: a tracked issue for the `packages/queue`
 `typed-queue_test.ts` DLQ timing flake.
+
+## 2026-08-15 — #1665 delta IMPL-EVAL terminal PASS; readiness CI running
+
+| Field | Value |
+| --- | --- |
+| Verdict | **PASS**, blocking items **none**; two non-blocking advisories |
+| Evaluation head | `7549d9fc052e604212f12e617b05085a061f9e0b` (delta `0fed4d7ff..7549d9fc0`) |
+| Artifact commit | `72d57229f28e3010c43d76fbecd3b3082680804f`, artifact-only |
+| Evaluator | job `08eb7184`, session `08eb7184-7a14-4976-8421-1e4d5b13163a`, PID `128297`, bridge `session_01Jc8aRcLQFVyVWKogq6SaFC` |
+| Route | requested/observed `claude-fable-5` · `medium` · `--remote-control` — **matched** |
+| PR comment | posted 2026-08-15T15:46:26Z |
+
+**It performed the decisive check rather than trusting reported hashes.** It regenerated the corpus
+itself, `gunzip | sha256sum`-ed the committed asset to
+`6df99eb856ebf1cd8b1daf6bd610a6f3ee4db804c41e465ca5be500ef35853fe`, and `bytesEqual`-ed it against
+the freshly built canonical corpus — a full byte comparison. It diffed the two `.files` arrays
+(**181 entries, none added or removed**) and confirmed regeneration at HEAD is byte-identical with a
+clean tree afterward, committing nothing it regenerated.
+
+It also answered the question that hash agreement alone cannot: **which entries actually changed**.
+Exactly two — `pages/web-layer/query-bridge/index.md` (the authorized source edit) and
+`llms-full.txt` (its derived aggregate). That is the source-to-generated fidelity claim proven at
+content level, not merely at checksum level.
+
+Advisories, both non-blocking and both correct: `provenance.sourceCommit` records `0fed4d7ff` (the
+rendered tree) rather than the repair commit — generator behaviour, not drift; and `impl-eval.md`
+appears in the `9a26c107a..HEAD` range because it landed at `0fed4d7ff`, not because the repair added
+it.
+
+**Product preservation still holds at the evaluator's artifact head:**
+`git diff 9a26c107a..72d57229f -- packages/ plugins/ docs/ tools/ deno.json deno.lock` is **empty**,
+so the prior product IMPL-EVAL PASS remains bound to the tree CI is now testing.
+
+## Readiness state
+
+The PR is now **non-draft** and real CI is running at `72d57229f` — the first genuine validation this
+branch has had, since every earlier "green" was green-by-skip while it was a draft. Current: 5 pass,
+13 skipping, **2 pending** (`check-test`, `quality`, run `31893659579`). `quality` is the job that
+carries the `check:agent-docs-prose` step that failed at `0fed4d7ff`, so it is the direct retest of
+this repair. `MERGEABLE`/`BLOCKED` purely on those pending checks. PR acceptance boxes now read
+**0 unchecked**.
+
+Outstanding before merge: terminal CI green at this exact head; issue-side acceptance boxes; and the
+`status:impl-eval` → ready-merge progression. Merge remains the coordinator's.
+
+The two pre-existing baseline reds are unchanged and must not be called green: `surface:diff` (stale
+`baselines/public-surfaces.json`, identical MAJOR sets base↔head) and JSR `F-DOCT-5` (13 children at
+base and head). The `packages/queue` `typed-queue_test.ts` flake remains unfiled and still warrants a
+tracked issue.
