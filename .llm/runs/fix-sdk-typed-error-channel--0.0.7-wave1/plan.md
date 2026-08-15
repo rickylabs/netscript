@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------------------------------------------------------------------------- |
 | Run ID         | `fix-sdk-typed-error-channel--0.0.7-wave1`                                                                  |
 | Branch         | `fix/sdk-typed-error-channel`                                                                               |
-| Phase          | `plan` — blocked pending scope/ownership ruling, then PLAN-EVAL                                             |
+| Phase          | `plan` — coordinator-amended; awaiting fresh Tier-A review, then separate PLAN-EVAL                         |
 | Target         | `packages/contracts`, `packages/sdk`, and two published docs pages                                          |
 | Archetype      | `1 — Small Contract` for this bounded contract slice (the SDK package remains doctrine Archetype 2 overall) |
 | Scope overlays | `docs`                                                                                                      |
@@ -93,18 +93,14 @@ const baseContract: ContractBuilder<
   Schema<unknown, unknown>,
   Schema<unknown, unknown>,
   BaseContractErrors,
-  TApprovedMeta
+  Record<never, never>
 > = /* explicit builder chain */;
 ```
 
-`TApprovedMeta` is the only unlocked part because the live ownership sources conflict:
-
-- if #1466 remains owner, it is `Record<never, never>` and #1350 only ensures the four-generic
-  spelling does not block #1466;
-- if the slice brief supersedes #1466, it is `NetScriptProcedureMeta & Record<never, never>` and the
-  builder initializes that metadata as RFC 0001 requires.
-
-The error-map choice itself is locked: `typeof commonErrorMap`, never open `ErrorMap`.
+Both generic choices are locked: errors use `typeof commonErrorMap`, never open `ErrorMap`; the
+fourth slot remains explicitly `Record<never, never>`. This leaf proves the metadata slot is present
+and not widened to `any`/`unknown`, but assigns no fields or semantics to it. #1466 will later
+replace that slot with its owned vocabulary.
 
 ## Breaking-change verdict
 
@@ -119,15 +115,12 @@ minor line with explicit migration notes; it must not be described as a patch-co
 
 ## What becomes public
 
-- Error-only ruling: **no new SDK or contracts export names**. Existing `baseContract`,
-  `BaseContract`, `BaseContractRoute`, `BaseContractOutputRoute`, `DefinedError`, `SafeSuccess`,
-  `SafeFailure`, `SafeResult`, `safe`, `isDefinedError`, and client types acquire corrected
-  signatures.
-- Metadata-in-#1350 ruling: RFC 0001 requires three new root contracts exports:
-  `NetScriptAuthenticationRequirement`, `NetScriptProcedureMeta`, and the metadata-aware
-  `baseContract` type. The types originate in `contract-primitives.ts`, but the curated root barrel
-  must explicitly export them. No internal helper or upstream adapter type becomes public.
+- **No new SDK or contracts export names.** Existing `baseContract`, `BaseContract`,
+  `BaseContractRoute`, `BaseContractOutputRoute`, `DefinedError`, `SafeSuccess`, `SafeFailure`,
+  `SafeResult`, `safe`, `isDefinedError`, and client types acquire corrected signatures.
 - No new SDK barrel, subpath, helper export, or error code is added.
+- No metadata type, field vocabulary, initialization, root export, or semantic fixture is
+  introduced; those belong to #1466.
 
 ## Source authority by decision
 
@@ -137,27 +130,23 @@ minor line with explicit migration notes; it must not be described as a patch-co
 | Contract vs preparation failures stay separate         | RFC error model at `rfcs/0001-sdk-client-contributions.md:1032-1088`.                                                                                                                          |
 | Four-generic explicit builder; no `ReturnType` erasure | RFC metadata section at `rfcs/0001-sdk-client-contributions.md:347-370`.                                                                                                                       |
 | Safe result discriminates defined/non-defined          | Accepted issue target plus upstream v1.14.6 `deno doc`; the issue's older prose is used only where it agrees with merged RFC.                                                                  |
-| Metadata ownership                                     | **Unresolved conflict:** lane brief says #1350; RFC says Stage 0 chooses; live #1466 and #1350 comment say #1466. Topic orchestrator must rule.                                                |
+| Metadata ownership                                     | Coordinator ruling: #1466 owns definition, initialization, and export; #1350 preserves only the empty fourth generic slot.                                                                     |
 
-## Declared scope and required expansion
+## Exact six-path ceiling
 
-### Authorized five files
+These are the complete authorized product/test/docs paths:
 
 1. `packages/contracts/src/application/contract-primitives.ts`
 2. `packages/sdk/src/client/errors.ts`
-3. `packages/sdk/tests/readme-doctest_test.ts`
-4. `docs/site/services-sdk/sdk.md`
-5. `docs/site/services-sdk/how-to/discover-services.md`
+3. `packages/sdk/src/ports/service-client.ts`
+4. `packages/sdk/tests/readme-doctest_test.ts`
+5. `docs/site/services-sdk/sdk.md`
+6. `docs/site/services-sdk/how-to/discover-services.md`
 
-### Must resolve now — required sixth/seventh files
-
-| File                                       | Why required                                                                                                                                      | Status                                                       |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `packages/sdk/src/ports/service-client.ts` | It is where `TError` is erased to `Promise<TOutput>`; without changing its procedure/client algebra, `safe()` cannot infer a real contract error. | Scope expansion requested; no implementation until approved. |
-| `packages/contracts/src/public/mod.ts`     | Required only if this leaf owns RFC metadata: the curated root barrel cannot expose the three mandated types otherwise.                           | Scope/ownership ruling requested.                            |
-
-Potential published prose that becomes factually stale (`packages/contracts/README.md` and benchmark
-reference text) is also reported for a ruling; it will not be edited without authorization.
+This ceiling is exact. A seventh product, test, or docs path is a rescope requiring a fresh
+coordinator ruling. In particular, `packages/contracts/src/public/mod.ts`,
+`packages/contracts/README.md`, and the benchmark reference files are not authorized. The stale
+prose remains tracked follow-up debt rather than being absorbed into this leaf.
 
 ## Planned docs dispositions
 
@@ -199,31 +188,46 @@ Negative assertions must prove:
 - `NOT_DECLARED` is rejected by `keyof baseContract['~orpc']['errorMap']`;
 - a non-oRPC `Error` remains in the `isDefined: false` arm and does not narrow;
 - the exact `data` type changes with `code` (for example NOT_FOUND vs VALIDATION_ERROR);
-- if metadata is approved here, `meta.access.authentication` survives builder → procedure → client
-  type inspection, and removing any link makes the fixture fail.
+- `typeof baseContract['~orpc']['meta']` is exactly `Record<never, never>` rather than `any` or
+  `unknown`, proving the fourth generic slot was retained without assigning metadata semantics.
+
+The metadata probe names no production vocabulary: it compares the existing `~orpc.meta` type to
+`Record<never, never>` in the compile-only fixture. It does not define fields, initialize metadata,
+export a type, or claim the later #1466 metadata flow is proven.
+
+```ts
+type IsAny<T> = 0 extends (1 & T) ? true : false;
+type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true
+  : false;
+type Assert<T extends true> = T;
+
+type BaseMeta = typeof baseContract['~orpc']['meta'];
+type _MetaIsNotAny = Assert<Equal<IsAny<BaseMeta>, false>>;
+type _MetaSlotPreserved = Assert<Equal<BaseMeta, Record<never, never>>>;
+```
 
 The test is meaningful because it is red at this base for the issue's named `never` erasure. A new
 test written only after the implementation or one using ambient re-declarations is insufficient.
 
-## Commit slices (blocked until rulings and PLAN-EVAL PASS)
+## Commit slices (blocked until fresh Tier-A review and PLAN-EVAL PASS)
 
-| # | What the slice proves                                                                                                                                 | Files                                                                                         | Proving gate                                              |
-| - | ----------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| 1 | RED fixture uses real exports and fails with the named TS2339; then the four-generic builder retains exact error keys (and approved metadata owner).  | `contract-primitives.ts`, `readme-doctest_test.ts`; plus `src/public/mod.ts` only if approved | Focused structured test/check; negative type assertions   |
-| 2 | A real service method carries its contract error into `safe()`, whose result and `isDefinedError` preserve literal code/data and reject plain errors. | `errors.ts`, `readme-doctest_test.ts`; plus required `ports/service-client.ts` if approved    | Focused structured test/check; exact base RED turns green |
-| 3 | Both published pages tell one consistent, compile-accurate error story, including non-defined failure handling.                                       | the two authorized docs pages                                                                 | `docs-source-format`, `docs-accuracy`, doctest            |
-| 4 | Published surfaces remain curated and all package gates are recorded without laundering known reds.                                                   | run artifacts only                                                                            | full selected validation set below                        |
+| # | What the slice proves                                                                                                                                                                                                             | Files                                                            | Proving gate                                              |
+| - | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------- |
+| 1 | RED fixture uses real exports and fails with TS2339; then the four-generic builder retains all six error keys and the empty fourth metadata slot without defining metadata vocabulary.                                            | `contract-primitives.ts`, `readme-doctest_test.ts`               | Focused structured test/check; negative type assertions   |
+| 2 | A real service method carries its six-literal contract error union into `safe()`; `SafeResult`/`isDefinedError` preserve code-specific data, reject plain errors, and the client port remains compatible with existing consumers. | `errors.ts`, `ports/service-client.ts`, `readme-doctest_test.ts` | Focused structured test/check; exact base RED turns green |
+| 3 | Both published pages tell one consistent, compile-accurate error story, including non-defined failure handling.                                                                                                                   | `sdk.md`, `how-to/discover-services.md`                          | `docs-source-format`, `docs-accuracy`, doctest            |
+| 4 | Published surfaces remain curated and all package gates are recorded without laundering known reds.                                                                                                                               | run artifacts only                                               | full selected validation set below                        |
 
 ## Validation plan
 
-Structured wrappers are the verdict source. Exact arguments may be refined after the scope ruling,
-but the gate set is locked:
+Structured wrappers are the verdict source. The gate set is locked; command filters may be
+mechanically finalized after PLAN-EVAL but cannot expand the six-path edit ceiling:
 
 | Order | Gate           | Planned command/evidence                                                                                                                 | Expected result                                                                               |
 | ----- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | 1     | RED            | Structured focused test/check on the real-surface fixture before implementation                                                          | FAIL with TS2339 `code` on `never`; record once                                               |
 | 2     | Check          | `.llm/tools/run-deno-check.ts` scoped to affected TS, with `--unstable-kv`                                                               | PASS after implementation                                                                     |
-| 3     | Test           | `.llm/tools/run-deno-test.ts -- --allow-all packages/sdk/tests/readme-doctest_test.ts` plus affected package tests selected after ruling | PASS; if `typed-queue_test.ts` hits #1667 `expected 1, got 2`, report once and do not rerun   |
+| 3     | Test           | `.llm/tools/run-deno-test.ts -- --allow-all packages/sdk/tests/readme-doctest_test.ts` plus affected package consumer tests               | PASS; if `typed-queue_test.ts` hits #1667 `expected 1, got 2`, report once and do not rerun   |
 | 4     | Lint           | `.llm/tools/run-deno-lint.ts` scoped to affected package TS                                                                              | PASS                                                                                          |
 | 5     | Format         | `.llm/tools/run-deno-fmt.ts --ext ts,tsx` scoped to affected package TS                                                                  | PASS                                                                                          |
 | 6     | Quality        | `deno task quality:scan`                                                                                                                 | PASS for the leaf diff                                                                        |
@@ -244,7 +248,7 @@ No Aspire, Docker, runtime lease, or `e2e:cli` gate is applicable or permitted.
 | `DefinedError.defined: true` is incompatible with upstream boolean marker | Normalize by intersection only after extracting the original upstream-shaped union; retain original literal code/data.                                      |
 | Public failure `null` → `undefined` breaks consumers                      | Declare breaking change explicitly, search construction/assertions repo-wide, document migration, release in 0.0.7 rather than calling it patch-compatible. |
 | Tight builder annotation breaks CRUD/plugin/handler inference             | Run named internal/external consumer checks from research §3 and preserve default generics.                                                                 |
-| Metadata work duplicates #1466                                            | Hard stop pending topic-orchestrator ownership ruling.                                                                                                      |
+| Empty metadata slot is accidentally omitted or widened                    | Explicit four-generic annotation plus an exact `Record<never, never>` compile assertion; no metadata fields or exports.                                     |
 | One corrected sentence leaves false surrounding prose                     | Apply every disposition in research §4 and run docs accuracy over whole pages.                                                                              |
 | JSR helper false-positive banner is reported as new slow type             | Use raw publish output as authority and record helper vs raw distinction.                                                                                   |
 
@@ -254,8 +258,7 @@ No Aspire, Docker, runtime lease, or `e2e:cli` gate is applicable or permitted.
   algebra.
 - Avoid AP-14: do not re-export upstream helpers/types; only use an upstream type internally where
   the hidden promise error marker requires identity.
-- Avoid AP-22: no new barrel; amend only the existing curated contracts barrel if metadata is
-  approved.
+- Avoid AP-22: no new barrel and no change to the curated contracts barrel.
 - Avoid AP-25: all contract/error helpers remain side-effect-free.
 - Required Archetype-1 gates: F-1, F-5, F-6, F-7, F-8, F-10, F-11, F-12, F-14, F-15, F-16, F-17,
   F-18, F-19, plus package `quality:scan`, `arch:check`, docs overlay gates, publish dry-run, and
@@ -269,10 +272,13 @@ No Aspire, Docker, runtime lease, or `e2e:cli` gate is applicable or permitted.
   and must not be reported as green or as leaf regressions.
 - No new error codes, client construction seam (#1349), server raising behavior (#1263), oRPC v2,
   type-soundness sweep (#1278), plugin-local base-contract repair, or generated reference rewrite.
+- Metadata definition, initialization, export, and semantic flow remain #1466 scope. Stale
+  contracts/benchmark prose is tracked follow-up debt; neither category may consume a seventh path
+  in this leaf without a fresh ruling.
 
 ## Plan-Gate state
 
-`PLAN-EVAL` is selected and is a hard stop. Before the topic orchestrator launches it, the two “must
-resolve now” questions must be answered: required `service-client.ts` scope and metadata/#1466
-ownership (including barrel scope). Until then this plan is complete as a rescope report but is not
-implementable.
+The coordinator ruling resolves every “must resolve now” decision. Stale out-of-scope prose and
+#1466 metadata semantics are explicitly safe to defer. A fresh Tier-A reviews this amended head;
+then `PLAN-EVAL` runs in a separate session and remains a hard stop. No implementation may begin
+until that evaluator returns `PASS`.

@@ -23,6 +23,8 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 ## Owner constraints
 
 - Plan-first. This session must not implement or launch an evaluator.
-- The declared product/doc change surface is exactly five files. Any required sixth file is a
-  rescope and stops implementation pending a topic-orchestrator ruling.
+- The product/test/docs surface is exactly the six paths enumerated in `plan.md`; any seventh path
+  is a rescope requiring a fresh coordinator ruling.
+- #1466 owns all metadata vocabulary, initialization, and exports. This leaf preserves only the
+  existing empty fourth generic slot and must not touch the contracts public barrel.
 - No Aspire, Docker, `e2e:cli`, runtime lease, lock deletion, cache deletion, or reload.

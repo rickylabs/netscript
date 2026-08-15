@@ -17,8 +17,8 @@
   error/meta generics corrected in place.
 - Existing: `DefinedError`, `SafeSuccess`, `SafeFailure`, `SafeResult`, `safe`, `isDefinedError`,
   and `ServiceClient*` — exact error channel corrected in place.
-- Conditional on ownership ruling: `NetScriptAuthenticationRequirement` and `NetScriptProcedureMeta`
-  become new contracts root exports because RFC 0001 requires them.
+- Existing contract builder metadata slot stays explicitly `Record<never, never>`; no metadata
+  vocabulary, initialization, or export is introduced.
 - No internal helper, adapter, upstream module, or additional subpath becomes public.
 
 ### Domain vocabulary
@@ -30,7 +30,7 @@
   adding the runtime-proven `defined: true` marker.
 - `SafeResult<TOutput,TError>` — success, non-defined failure, and defined failure discriminated by
   `isSuccess`/`isDefined`.
-- `NetScriptProcedureMeta` — conditional on the ownership ruling; exact RFC 0001 shape.
+- No metadata domain vocabulary in this leaf; #1466 owns it.
 
 ### Ports
 
@@ -44,7 +44,7 @@
 
 ### Commit slices
 
-See `plan.md` “Commit slices.” All implementation slices are blocked pending scope ruling and
+See `plan.md` “Commit slices.” All implementation slices are blocked pending fresh Tier-A review and
 PLAN-EVAL PASS.
 
 ### Deferred scope
@@ -67,6 +67,7 @@ second code union is hand-maintained.
 | 2026-08-15 | Plan  | RED                | Executed TS2339 `error.code` on `never` with `deno eval --check --unstable-kv`.                                                             |
 | 2026-08-15 | Plan  | Consumer scan      | Executed whole-repo searches; identified `@netscript/fresh`, CRUD, query/desktop/type fixtures, CLI/template, docs, and baseline consumers. |
 | 2026-08-15 | Plan  | Rescope            | Required out-of-scope `service-client.ts`; conditional contracts barrel; live #1466 ownership conflict. Stopped all product work.           |
+| 2026-08-15 | Plan  | Amendment          | Coordinator authorized the sixth client-port path, assigned metadata vocabulary to #1466, denied the barrel, and locked six paths.          |
 
 ## Gate results
 
@@ -79,5 +80,5 @@ second code union is hand-maintained.
 
 ## Handoff
 
-Topic orchestrator should rule first on the two scope/ownership questions in `plan.md`, then send
-the resolved plan to a separate PLAN-EVAL session. This generator must not self-evaluate.
+Fresh Tier-A reviews this amended head first; a separate PLAN-EVAL session follows only after that
+review. This generator must not self-evaluate or implement before `PASS`.
