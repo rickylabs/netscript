@@ -176,3 +176,54 @@ mandatory and separate after implementation.
 - Do not treat green automated gates as Tier-A sign-off.
 - Exact blocker: obtain a fresh coordinator lease for `fresh-browser`; after that gate, the topic
   orchestrator owns substantive Tier-A review/sign-off and a separate opposite-family IMPL-EVAL.
+
+## Leased `fresh-browser` Gate — 2026-08-15
+
+The coordinator granted exactly one pass for PR #1657 at immutable product head
+`4a3c40321ac1e58aa337e02afeaa95fbc553ce7f`. The gate was invoked once, reached a terminal verdict,
+and was not retried.
+
+### Preflight
+
+| Check | Raw exit | Evidence |
+| --- | --- | --- |
+| Local tree/head | 0 | Clean; HEAD `4a3c40321ac1e58aa337e02afeaa95fbc553ce7f`. |
+| Remote branch | 0 | `origin` branch resolved to the same immutable head. |
+| Draft PR #1657 | 0 | PR head matched the immutable head; PR remained draft. |
+| Browser runtime cache | 0 | `chromium-1232`, `chromium-1234`, and matching headless-shell caches already present; no installation needed. |
+| Chromium/Playwright processes | 0 | Actual-process match count `0`. |
+| Receipt uniqueness | 0 | `receipts/fresh-browser.json` did not exist before invocation. |
+
+### Terminal Verdict
+
+Exact command:
+
+```text
+deno run --allow-read --allow-write --allow-run --allow-env \
+  .llm/tools/gates/run-gate.ts --gate fresh-browser --id fresh-browser-1657 \
+  --cwd packages/fresh \
+  --output .llm/runs/fix-design-registry-catalog-drift-gate--0.0.7-wave1/receipts/fresh-browser.json
+```
+
+| Field | Value |
+| --- | --- |
+| Raw exit code | `0` |
+| Receipt outcome | `PASS` |
+| Receipt path | `.llm/runs/fix-design-registry-catalog-drift-gate--0.0.7-wave1/receipts/fresh-browser.json` |
+| Receipt `gitHead` / `actualGitHead` | `4a3c40321ac1e58aa337e02afeaa95fbc553ce7f` / same |
+| Attempt | `1` |
+| Duration | `33292ms` |
+| Child verdict | 2 passed, 0 failed |
+| Playwright installation | Not needed; existing cached Chromium was used. |
+
+### Post-gate Cleanup Proof
+
+| Check | Raw exit | Output |
+| --- | --- | --- |
+| Chromium/Playwright processes | 0 | Actual-process match count `0`; no survivor attributable to the gate. |
+| `aspire ps` | 0 | `No running AppHost found.` |
+| `docker ps -a` | 0 | Header only; zero containers. |
+| Lock diff from leased head | 0 | `deno.lock`, CLI lock, and Fresh UI lock unchanged. |
+
+No product source changed during the leased gate. Automated evidence is not Tier-A review or
+IMPL-EVAL; this implementation thread stops after committing/pushing the receipt and bookkeeping.

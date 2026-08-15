@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-design-registry-catalog-drift-gate--0.0.7-wave1` |
 | Branch | `fix/design-registry-catalog-drift-gate` |
-| Current phase | `gate — fresh-browser lease boundary` |
+| Current phase | `review handoff — Tier-A grant required` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `frontend` |
 
@@ -16,7 +16,9 @@ The immutable base and branch identity are verified. Red research measured 66 li
 50 generated gallery entries/declared total, 16 manifest-only names, and 0 catalog-only names. S1
 projects all 66 authoritative items in order, declares total 66, and includes all eight ordered
 collection memberships. S2 adds the semantic live gate and named symmetric/field negative fixtures.
-All authorized non-browser gates pass; `fresh-browser` is the exact coordinator-lease boundary.
+All authorized non-browser gates pass. The coordinator-leased, exactly-once `fresh-browser` gate
+also passed at immutable product head `4a3c40321ac1e58aa337e02afeaa95fbc553ce7f`, with a durable
+receipt and clean post-gate process/Aspire/Docker state.
 
 ## Completed
 
@@ -32,17 +34,18 @@ All authorized non-browser gates pass; `fresh-browser` is the exact coordinator-
   Fresh UI package tests pass.
 - Completed authorized check/lint/fmt, quality, architecture, JSR audit, exact-pin, and publish
   dry-run gates with raw exit 0.
+- Completed the one-pass leased `fresh-browser` gate: receipt outcome `PASS`, raw exit 0, 2 passed,
+  0 failed; no Playwright install or surviving process/container/AppHost.
 
 ## In Progress
 
-- S2 bookkeeping, commit, explicit-refspec push, and structured PR comment.
+- Commit/push the browser receipt and gate bookkeeping, then post the structured PR gate comment.
 
 ## Next Steps
 
-1. Commit and push S2; post its exact raw-exit evidence while retaining sole `status:impl`.
-2. Stop and obtain a fresh coordinator lease before running `fresh-browser`.
-3. Hand off to the topic orchestrator for substantive Tier-A review/sign-off, then the separately
-   owned opposite-family IMPL-EVAL.
+1. Hand off to the topic orchestrator for substantive Tier-A review/sign-off.
+2. Await a separate coordinator grant for the opposite-family IMPL-EVAL.
+3. Do not mark ready, relabel, merge, or begin another leaf from this implementation thread.
 
 ## Key Decisions
 
@@ -59,6 +62,7 @@ All authorized non-browser gates pass; `fresh-browser` is the exact coordinator-
 | `.llm/runs/fix-design-registry-catalog-drift-gate--0.0.7-wave1/*` | new | Coordinator thread identity preserved; mandatory harness artifacts added. |
 | `packages/cli/src/kernel/assets/app/routes/(design)/design/(_shared)/registry.ts.template` | changed | Complete ordered item/meta/collection projection. |
 | `packages/fresh-ui/tests/registry-doc-drift.test.ts` | changed | Semantic live comparison and named symmetric/field negative fixtures. |
+| `.llm/runs/fix-design-registry-catalog-drift-gate--0.0.7-wave1/receipts/fresh-browser.json` | new | Durable exactly-once gate receipt at leased product head. |
 
 ## Gates
 
@@ -66,13 +70,13 @@ All authorized non-browser gates pass; `fresh-browser` is the exact coordinator-
 | --- | --- | --- |
 | Static | PASS | Focused 5/5, Fresh UI 172/172, CLI/Fresh UI checks, focused lint/fmt: exit 0 |
 | Fitness | PASS | `quality:scan`, `arch:check`, both JSR audits/publish dry-runs: exit 0 |
-| Runtime | lease-blocked | Aspire/Docker/E2E/browser not run |
-| Consumer | static PASS; browser lease-blocked | 66/66 items and 8/8 collections exact; `fresh-browser` not run |
+| Runtime | PASS for leased gate | `fresh-browser` receipt PASS, exit 0; 2/2 tests; post-process count 0 |
+| Consumer | PASS | 66/66 items and 8/8 collections exact; leased browser gate PASS |
 
 ## Open Questions
 
-- None for implementation. `fresh-browser` is now the remaining proving gate and requires a fresh
-  coordinator lease.
+- Implementation and automated gates are complete. Exact blocker: topic-orchestrator Tier-A
+  substantive review/sign-off, followed only by a separately granted opposite-family IMPL-EVAL.
 
 ## Drift and Debt
 
