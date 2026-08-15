@@ -577,3 +577,35 @@ Two contract details flagged for the plan phase rather than left to trip the aut
 lists `docs/site/_site/capabilities/sdk/index.md`, which is under the Lume **build output** directory
 `_site` and is therefore generated rather than source, and `docs/sdk`, which may not exist as a path.
 The plan must resolve both before touching either.
+
+### Dispatch — `sdk-cached-entry-swr` (#1461)
+
+| Field | Value |
+| --- | --- |
+| Thread | `01a00646-82a9-7ec2-88e7-16dea98a58fa` (launched 2026-08-15T18:34:39Z) |
+| Worktree | `/home/codex/repos/netscript-007-leaf-cached-entry` |
+| Branch | `fix/sdk-cached-entry-swr`, base `main@3e8e146a4` (the #1665 merge commit) |
+| Route requested / observed | openai · `gpt-5.6-sol` · medium — **matched** |
+| Pre-launch git safety | `head=3e8e146a4 upstream=NONE dirty=0` |
+| Brief | 8397 bytes, contract-valid, staged `/home/codex/cached-entry-brief.md` |
+| Phase | research/plan-only; PLAN-EVAL warranted (published-surface either/or) |
+
+**Caught before dispatch rather than by CI:** two of the contract's four `fileSurfaces` do not exist
+at this base — `docs/sdk` and `docs/site/_site/capabilities/sdk/index.md` — and `docs/site/_site/` is
+the Lume **build output** directory, so it is generated and must never be hand-edited. The brief
+instructs the author to locate the real published example, state a corrected surface list, and treat
+any location outside the contract as a scope-boundary stop rather than a licence to widen.
+
+**#1461 is a genuine contract decision**, which is why it is plan-first: the issue offers docs-only
+correction *or* a new `queryEntry()` API, and option 2 adds published surface. Its acceptance also
+demands *exactly one* refresh under concurrent stale readers, and the issue notes the background
+revalidation path bypasses the inflight map — so a real concurrent test is required, not a sequential
+approximation.
+
+**The #1665 cascade lesson is applied up front.** The brief carries the proven four-link
+`derivedAssetCascadePaths` chain, its ordering constraint (`gen:publish-assets` consumes the CLI
+barrel), and the requirement that all three `check:*` gates be green simultaneously on one content
+head — plus the three known-red gates (#1668 corpus, `surface:diff`, `F-DOCT-5`) marked not-to-touch
+and never-to-report-green, and the #1667 flake pre-briefed with its signature.
+
+WIP after dispatch: 1 implementation leaf, 0 evaluators. No lease held.
