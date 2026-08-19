@@ -34,3 +34,5 @@ mandatory on the ship PR.
 | U4 | Bootsharp pipeline end-to-end on Linux | PASS | bin/bootsharp artifacts + bootsharp.jsonl |
 | U5 | RFC fmt + zero TBD + link integrity (1 prose false-positive `/dev/kvm` triaged) | PASS | gate command output |
 | U5 | Fitness/quality gates | N/A | no packages/plugins source touched |
+
+| U6 | IMPL-EVAL (separate session, OpenHands DeepSeek, head 7806c7e) | **PASS** | PR #1685 verdict comment; mirrored in evaluate.md; zero blocking findings |
