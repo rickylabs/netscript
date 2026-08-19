@@ -66,3 +66,5 @@ story, measured tables, unresolved questions.
 | T4 | Official wasmbuild pipeline end-to-end | PASS | lib/ artifacts + P5 acc-asserted series |
 | T5 | RFC fmt + zero TBD + link integrity (2 checker false-positives triaged: `.so/.dylib/.dll`, `denoland/deno` are prose) | PASS | fmt-clean; grep TBD = 0; path check |
 | T5 | Fitness/quality gates | N/A | no packages/plugins source touched |
+
+| T6 | IMPL-EVAL (separate session, OpenHands DeepSeek, head b0cd3d4) | **PASS** | PR #1683 verdict comment; mirrored in evaluate.md; LOW wording finding applied in close commit |

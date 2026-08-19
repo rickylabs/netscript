@@ -13,8 +13,7 @@
 - **What:** `docs/site/background-processing/workers.md:218-231` documents three runner modes
   with web-worker ("one V8 isolate per worker, ~20-40 MB each; WORKERS_CONCURRENCY sets the
   process pool size for parallel job execution") as scaffold default. In code, `WorkerPool`
-  wraps `InProcessJobRunner` (`plugins/workers/worker/job-runner-pool.ts:25-40`), `poolSize`/
-  `workerUrl` are never read, and no Web Worker is instantiated anywhere in `plugins/workers` +
+  wraps `InProcessJobRunner` (`plugins/workers/worker/job-runner-pool.ts:25-40`), `poolSize` is accepted unused, `workerUrl` is read but never materialized into an isolate, and no Web Worker is instantiated anywhere in `plugins/workers` +
   `packages/plugin-workers-core` (grep evidence in research R9). The `worker.ts:156` log line
   "Starting with Web Worker pool (N workers)" is misleading.
 - **Expected:** Docs describe implemented behavior. **Actual:** Job execution is single-isolate

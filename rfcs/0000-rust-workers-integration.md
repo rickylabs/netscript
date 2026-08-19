@@ -39,8 +39,8 @@ and reject direct rusty_v8/deno_core embedding.
 Three measured facts define the problem:
 
 1. **Today's worker cannot use the machine for job compute.** `WorkerPool` wraps
-   `InProcessJobRunner` (`plugins/workers/worker/job-runner-pool.ts:25-40`); its `poolSize` and
-   `workerUrl` options are accepted but never read; there are **zero Web Worker instantiations** in
+   `InProcessJobRunner` (`plugins/workers/worker/job-runner-pool.ts:25-40`); its `poolSize` option is accepted unused and
+   `workerUrl` is read (worker.ts:113) but not honored for isolate creation; there are **zero Web Worker instantiations** in
    `plugins/workers` + `packages/plugin-workers-core`; the `WORKER_RUNTIMES` values
    (`packages/plugin-workers-core/src/domain/constants.ts:83`) are vocabulary without
    implementation. Measured consequence (results-parallel.md, P1): K CPU-bound jobs run at 4.5
