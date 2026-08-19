@@ -31,3 +31,21 @@ pre-registered criteria (plan.md L5).
   explicitly or the sweep silently serializes.
 - Deno gates `/proc` reads behind `--allow-all`; external `/usr/bin/time -v` is the portable
   peak-RSS probe for sandboxed subprocesses.
+
+## Addendum — runs 2 and 3 (same session, same branch lineage)
+
+- **Run 2 (rust-workers, PR #1683, merged):**
+  `.llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--rust-workers-rfc/` —
+  `rfcs/0000-rust-workers-integration.md`. Key findings: documented web-worker runner mode
+  unimplemented (→ #1684, with oRPC message-port resolution for the pool protocol); nonblocking
+  FFI onto Rust threads = 17.6× throughput at <5 ms event-loop jitter; wasmbuild verified at
+  native speed; rusty_v8/deno_core embedding rejected on cadence/archival facts. IMPL-EVAL PASS.
+- **Run 3 (dotnet, PR #1685):**
+  `.llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--dotnet-rfc/` —
+  `rfcs/0000-dotnet-task-runtime-paths.md`. Key findings: 45× dispatch-mode spread inside the
+  existing dotnet TaskType (file-based 284 ms vs NativeAOT 6.3 ms / 3.4 MB with native compute);
+  Bootsharp verified on Linux at native speed in Deno; cross-language sandbox matrix (monty /
+  Rust-WASI / Bootsharp / Hyperlight / adapter-level Landlock-bwrap). IMPL-EVAL PASS.
+- Series lessons promoted-candidate: the deferred-push + branch-restart + post-verdict
+  artifact-only-commit protocol worked three times; close-gate needs the body complete BEFORE the
+  head's CI run (rerun-by-bookkeeping-push is the workaround absent `gh run rerun`).
