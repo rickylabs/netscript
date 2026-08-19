@@ -1,61 +1,46 @@
-# Context Pack: <target>
+# Context Pack — claude-harness-profile-rfc-benchmark-shzhgv--scriptc-rfc-bench
 
-## Run Metadata
+Resumable summary. Read `supervisor.md` (identity + lane overrides), `plan.md` (locked
+decisions L1–L7), `drift.md` (D-1..D-6), `worklog.md` (Design + slice log + gate table).
 
-| Field          | Value                                            |
-| -------------- | ------------------------------------------------ |
-| Run ID         | `<run-id>`                                       |
-| Branch         | `<branch>`                                       |
-| Current phase  | `<plan/plan-eval/implement/gate/evaluate/close>` |
-| Archetype      | `<N - name or N/A>`                              |
-| Scope overlays | `<frontend/service/docs/none>`                   |
+## State (2026-08-19, post-S9)
 
-## Current State
+- **Branch:** `claude/harness-profile-rfc-benchmark-shzhgv`; draft PR **#1678**; labels
+  `type:docs area:plugins area:docs rfc ci:skip-e2e ci:skip-scaffold` + one `status:*`.
+- **Done:** S1 bootstrap, S2 research (F1–F17), S3 plan+design (PLAN-EVAL: N/A per L7),
+  S4 workloads (exact cross-language identity), S5 harness (production dispatch path in-process
+  on local Deno KV; three drift findings D-4/D-5/D-6), S6 protocol (32 series × 320 exec,
+  0 failures), S7 boundary (wasm/ffi/in-process), S8 `results/results.md` (script-generated),
+  S9 RFC `rfcs/0000-scriptc-task-runtime-adapter.md` (Draft) with all gates green (see worklog
+  gate table).
+- **Remaining:** S10 close (session record, PR body/DoD refresh, IMPL phase comment) +
+  **IMPL-EVAL handoff** — mandatory, separate session, cloud draft→ready automation route
+  (supervisor.md); this session does not self-certify.
 
-<Short resumable summary of what is true now.>
+## Headline results (full tables: `results/results.md`; raw: `results/raw/*.jsonl`)
 
-## Completed
+- Queue e2e p50 short c=1: A-deno 108.0 ms → B-scriptc 64.0 ms (**40.7%**; C control 65.5).
+- Executor-side p50: 50.6 → 6.8 ms (7.4×); Rust 4.9 ms. Direct spawn: 45.7 / 6.1 / 4.4 ms.
+- RSS: deno 43.4 MB vs scriptc 2.5 MB vs Rust 2.2 MB (17×/20×). Throughput short: A caps ~69/s,
+  native subjects 125–165/s (then queue-bound).
+- scriptc compute = JS speed, not native: long 225 ms ≈ in-process V8 219 ms; Rust 53 ms; wasm
+  54 ms. Boundary: subprocess ~5-6 ms/invocation; wasm 0.55 cold / 0.54 warm; ffi 0.48 warm
+  (`--allow-ffi` works on stable 2.9.5).
+- Pre-registered L5 "built-in defensible" branch **fired**; RFC verdict = phased adoption
+  (recipe + experimental customAdapters now; first-class gated on scriptc maturity #173 etc.).
 
-- <completed section>
+## Follow-up candidates (post evaluator review)
 
-## In Progress
+- File issues for **D-4** (queue path drops correlation/trace env for task subprocesses — doc
+  says injected) and **D-5** (named-queue collision on shared local Deno KV database).
+- `deno compile` measured comparison (RFC unresolved question).
+- #1679 monty spike (separate issue, already filed).
 
-- <current section>
+## Rerun instructions
 
-## Next Steps
-
-1. <next action>
-
-## Key Decisions
-
-| Decision     | Source                 | Notes     |
-| ------------ | ---------------------- | --------- |
-| `<decision>` | `<plan/doctrine/code>` | `<notes>` |
-
-## Files Changed
-
-| Path     | Status                  | Notes     |
-| -------- | ----------------------- | --------- |
-| `<path>` | `<changed/new/deleted>` | `<notes>` |
-
-## Gates
-
-| Gate family | Current status | Evidence     |
-| ----------- | -------------- | ------------ |
-| Static      | `<status>`     | `<evidence>` |
-| Fitness     | `<status>`     | `<evidence>` |
-| Runtime     | `<status>`     | `<evidence>` |
-| Consumer    | `<status>`     | `<evidence>` |
-
-## Open Questions
-
-- <question>
-
-## Drift and Debt
-
-- Drift: `<summary or none>`
-- Debt: `<summary or none>`
-
-## Commits
-
-- See the draft PR's commit list + per-slice PR comments (V3 retired `commits.md`).
+Toolchain: Deno 2.9.5, scriptc 0.0.32 (npm -g), clang, rustc, GNU time (`apt install time`).
+From repo root: `deno run --allow-all <run-dir>/bench/verify-workloads.ts` (builds + gates),
+`bash <run-dir>/bench/harness/run-all.sh` (full protocol; ~14 min on 4 cores),
+`deno run --allow-all --unstable-ffi <run-dir>/bench/boundary/run-boundary.ts`,
+`deno run --allow-read --allow-write <run-dir>/bench/harness/report.ts`.
+Comparability requires `results/environment.json` pins to match.
