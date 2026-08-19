@@ -51,6 +51,15 @@ helpers, test harnesses that drive enqueue→TaskResult without external service
   `rfcs/*.md` draft. The RFC's Reference-level section *describes* the
   `@netscript/plugin-workers-core/executor` surface but does not modify it.
 
+## Related filings from this run
+
+- **#1679** `feat(workers): evaluate pydantic/monty as the sandboxed Python task runtime`
+  (owner-requested, 2026-08-19; Backlog / Triage). Monty is the Python-flavored instance of the
+  in-process sandboxed execution boundary this run's RFC studies for native/WASM tasks; the RFC
+  references #1679 as future work under the same `TaskRuntimeAdapterLike` seam and the
+  `workers-non-deno-task-sandbox-boundary` debt. Duplicate check performed: no prior monty/python-
+  sandbox issue existed.
+
 ## Open questions
 
 - Which queue provider gives the most representative through-the-queue numbers without Docker
