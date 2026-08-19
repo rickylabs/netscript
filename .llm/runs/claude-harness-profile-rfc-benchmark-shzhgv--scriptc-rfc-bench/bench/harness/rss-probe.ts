@@ -34,7 +34,16 @@ function arg(name: string, fallback: string): string {
   return i >= 0 && Deno.args[i + 1] ? Deno.args[i + 1] : fallback;
 }
 
-async function timeV(cmd: string[]): Promise<{ maxRssKb: number; wallMs: number }> {
+type TimeVSample = {
+  maxRssKb: number;
+  wallMs: number;
+  userCpuS: number;
+  sysCpuS: number;
+  volCtxSw: number;
+  involCtxSw: number;
+};
+
+async function timeV(cmd: string[]): Promise<TimeVSample> {
   const t0 = performance.now();
   const c = new Deno.Command('/usr/bin/time', {
     args: ['-v', ...cmd],
@@ -45,9 +54,19 @@ async function timeV(cmd: string[]): Promise<{ maxRssKb: number; wallMs: number 
   const wallMs = performance.now() - t0;
   const err = new TextDecoder().decode(stderr);
   if (code !== 0) throw new Error(`probe exited ${code}: ${err.slice(0, 200)}`);
-  const m = err.match(/Maximum resident set size \(kbytes\): (\d+)/);
-  if (!m) throw new Error('no RSS line in time -v output');
-  return { maxRssKb: Number(m[1]), wallMs };
+  const num = (re: RegExp) => {
+    const m = err.match(re);
+    if (!m) throw new Error(`missing field ${re} in time -v output`);
+    return Number(m[1]);
+  };
+  return {
+    maxRssKb: num(/Maximum resident set size \(kbytes\): (\d+)/),
+    wallMs,
+    userCpuS: num(/User time \(seconds\): ([\d.]+)/),
+    sysCpuS: num(/System time \(seconds\): ([\d.]+)/),
+    volCtxSw: num(/Voluntary context switches: (\d+)/),
+    involCtxSw: num(/Involuntary context switches: (\d+)/),
+  };
 }
 
 const spawns = Number(arg('spawns', '30'));
@@ -56,8 +75,8 @@ const lines: string[] = [];
 lines.push(JSON.stringify({ kind: 'meta', probe: 'cold-spawn-rss', spawns, n: Number(N), startedAt: new Date().toISOString() }));
 for (const probe of PROBES) {
   for (let i = 0; i < spawns; i++) {
-    const { maxRssKb, wallMs } = await timeV(probe.cmd);
-    lines.push(JSON.stringify({ kind: 'rss', id: probe.id, seq: i, maxRssKb, wallMs }));
+    const s = await timeV(probe.cmd);
+    lines.push(JSON.stringify({ kind: 'rss', id: probe.id, seq: i, ...s }));
   }
   console.log(`${probe.id}: ${spawns} spawns done`);
 }

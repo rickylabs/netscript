@@ -51,7 +51,8 @@ async function loadSeries(): Promise<Series[]> {
   const out: Series[] = [];
   for await (const entry of Deno.readDir(RAW)) {
     if (!entry.name.endsWith('.jsonl') || entry.name.startsWith('smoke') ||
-      entry.name.startsWith('boundary') || entry.name.startsWith('rss-probe')) continue;
+      entry.name.startsWith('boundary') || entry.name.startsWith('rss-probe') ||
+      entry.name.startsWith('sys_') || entry.name.startsWith('scale_')) continue;
     const lines = (await Deno.readTextFile(`${RAW}/${entry.name}`)).trim().split('\n').map((l) => JSON.parse(l));
     const meta = lines.find((l) => l.kind === 'meta') as SeriesMeta & { kind: string };
     const execs = lines.filter((l) => l.kind === 'exec') as ExecRec[];
@@ -135,27 +136,70 @@ async function main(): Promise<void> {
   w('| A-deno | (sandboxed — cannot self-report; see rss-probe below and drift D-6) | | | |');
   w('');
 
-  // RSS probe
+  // RSS + CPU probe
   try {
     const probeLines = (await Deno.readTextFile(`${RAW}/rss-probe.jsonl`)).trim().split('\n').map((l) => JSON.parse(l));
-    const byId = new Map<string, { rss: number[]; wall: number[] }>();
+    type ProbeAcc = { rss: number[]; wall: number[]; cpu: number[]; invol: number[] };
+    const byId = new Map<string, ProbeAcc>();
     for (const l of probeLines.filter((x) => x.kind === 'rss')) {
-      const e = byId.get(l.id) ?? { rss: [], wall: [] };
+      const e = byId.get(l.id) ?? { rss: [], wall: [], cpu: [], invol: [] };
       e.rss.push(l.maxRssKb);
       e.wall.push(l.wallMs);
+      if (typeof l.userCpuS === 'number') e.cpu.push((l.userCpuS + l.sysCpuS) * 1000);
+      if (typeof l.involCtxSw === 'number') e.invol.push(l.involCtxSw);
       byId.set(l.id, e);
     }
     w('## Cold-spawn probe (`/usr/bin/time -v`, direct spawn, 100k workload, 30 reps)');
     w('');
-    w('| Command | max RSS median (KB) | max RSS p95 | wall p50 (ms) |');
-    w('| --- | --- | --- | --- |');
+    w('| Command | max RSS median (KB) | max RSS p95 | wall p50 (ms) | CPU p50 (user+sys, ms) | invol. ctx-switches p50 |');
+    w('| --- | --- | --- | --- | --- | --- |');
     for (const [id, e] of byId) {
       const rs = [...e.rss].sort((a, b) => a - b);
       const ws = [...e.wall].sort((a, b) => a - b);
-      w(`| ${id} | ${pct(rs, 50)} | ${pct(rs, 95)} | ${f1(pct(ws, 50))} |`);
+      const cs = [...e.cpu].sort((a, b) => a - b);
+      const is = [...e.invol].sort((a, b) => a - b);
+      w(`| ${id} | ${pct(rs, 50)} | ${pct(rs, 95)} | ${f1(pct(ws, 50))} | ${cs.length ? f1(pct(cs, 50)) : 'n/a'} | ${is.length ? pct(is, 50) : 'n/a'} |`);
     }
     w('');
   } catch { w('_rss-probe.jsonl missing_'); w(''); }
+
+  // Scale probes: system CPU + aggregate subprocess RSS under concurrency
+  try {
+    const scaleRows: string[] = [];
+    for await (const entry of Deno.readDir(RAW)) {
+      const m = entry.name.match(/^sys_(.+)_c(\d+)\.jsonl$/);
+      if (!m) continue;
+      const [_, subject, conc] = m;
+      const sysLines = (await Deno.readTextFile(`${RAW}/${entry.name}`)).trim().split('\n').map((l) => JSON.parse(l));
+      const samples = sysLines.filter((x) => x.kind === 'sample');
+      const summary = sysLines.find((x) => x.kind === 'summary');
+      const seriesFile = `${RAW}/scale_${subject}_c${conc}.jsonl`;
+      const seriesLines = (await Deno.readTextFile(seriesFile)).trim().split('\n').map((l) => JSON.parse(l));
+      const execs = seriesLines.filter((x) => x.kind === 'exec' && x.status === 'completed');
+      const e2e = execs.filter((x: { warmup: boolean }) => !x.warmup).map((x: { endToEndMs: number }) => x.endToEndMs).sort((a: number, b: number) => a - b);
+      const cpuPcts = samples.map((s) => s.cpuPct).sort((a, b) => a - b);
+      const aggRss = samples.map((s) => s.taskProcRssKb).sort((a, b) => a - b);
+      const procCounts = samples.map((s) => s.taskProcCount).sort((a, b) => a - b);
+      const cpuSecondsTotal = summary ? summary.busyJiffies / summary.clkTck : NaN;
+      const cpuMsPerExec = (cpuSecondsTotal * 1000) / execs.length;
+      scaleRows.push(
+        `| ${subject} | ${conc} | ${execs.length} | ${f1(pct(cpuPcts, 50))} | ${f1(pct(cpuPcts, 95))} | ${pct(procCounts, 95)} | ${Math.round(pct(aggRss, 95) / 1024)} | ${f1(cpuMsPerExec)} | ${f1(pct(e2e, 50))} |`,
+      );
+    }
+    if (scaleRows.length) {
+      w('## Scale probe — system CPU + aggregate task-subprocess RSS under concurrency');
+      w('');
+      w('Sampler: 100 ms interval, all-core busy-jiffy CPU%, RSS summed over live task');
+      w('subprocesses matched by cmdline. CPU ms/exec = whole-series busy CPU (all processes,');
+      w('host + subprocesses + queue machinery) / completed executions incl. warmup — a system-');
+      w('level cost-per-message, not the subprocess CPU alone (that is the cold-spawn column).');
+      w('');
+      w('| Subject | c | n | sys CPU%% p50 | p95 | live procs p95 | agg subprocess RSS p95 (MB) | CPU ms/exec | e2e p50 (ms) |');
+      w('| --- | --- | --- | --- | --- | --- | --- | --- | --- |');
+      for (const row of scaleRows.sort()) w(row);
+      w('');
+    }
+  } catch (e) { w(`_scale probe data incomplete: ${e instanceof Error ? e.message : String(e)}_`); w(''); }
 
   // Boundary
   try {

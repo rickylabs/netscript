@@ -27,12 +27,15 @@ binaries with [scriptc](https://scriptc.dev) and dispatch them through the worke
 the entire per-message runtime cost of the `deno` TaskType — executor-side p50 drops from 50.6 ms to
 6.8 ms (7.4×) on a 100k-iteration workload — and 17× of per-subprocess memory (43.4 MB → 2.5 MB peak
 RSS). End-to-end through the queue the improvement is 40.7% (108.0 → 64.0 ms p50), because dispatch
-itself costs ~57 ms and dominates the native subjects' latency. The pre-registered performance
-criteria for "built-in defensible" **fired** (≥20% e2e and ≥5× RSS). This RFC nevertheless
-recommends **phased adoption**: ship the recipe and an experimental `customAdapters` adapter now,
-and gate first-class TaskType promotion on scriptc maturity milestones (JSR support, stable npm
-handling, a post-0.0.x stability commitment) — the performance case is proven; the vocabulary
-commitment is what should wait.
+itself costs ~57 ms and dominates the native subjects' latency. Under fanout the CPU axis separates
+hardest: the deno runtime saturates all four host cores from 16 in-flight tasks (95–100% system CPU;
+~57–73 ms of system CPU per message) while the scriptc binary holds the same load at ~32–37% CPU
+(~11–16 ms per message, ~5×) with ≤5 MB of aggregate live subprocess memory versus ~252 MB. The
+pre-registered performance criteria for "built-in defensible" **fired** (≥20% e2e and ≥5× RSS). This
+RFC nevertheless recommends **phased adoption**: ship the recipe and an experimental
+`customAdapters` adapter now, and gate first-class TaskType promotion on scriptc maturity milestones
+(JSR support, stable npm handling, a post-0.0.x stability commitment) — the performance case is
+proven; the vocabulary commitment is what should wait.
 
 ## Motivation
 
@@ -201,6 +204,27 @@ What the full tables in `results.md` add:
 - **RSS.** Task self-report medians: B/C 2.4 MB, D 2.1 MB; cold-spawn probe: deno 43.4 MB (sandboxed
   and `--allow-all` within 0.3% of each other — the permission flags are not the cost), scriptc 2.5
   MB, Rust 2.2 MB. Ratio A:B ≈ **17×**.
+- **CPU and aggregate memory at scale** (`results.md` § scale probe; 100 ms sampler over full reruns
+  of the short-workload queue series):
+
+  | Metric (short workload, queue mode)                | A `deno`                          | B scriptc | D Rust   |
+  | -------------------------------------------------- | --------------------------------- | --------- | -------- |
+  | Subprocess CPU per exec (cold-spawn user+sys, p50) | 40–50 ms                          | < 10 ms¹  | < 10 ms¹ |
+  | System CPU per message (all processes, c=16–64)    | 57–73 ms                          | 11–16 ms  | ~10 ms   |
+  | System CPU utilization p50 @ c=16 / c=64           | **95% / 95%** (4 cores saturated) | 32% / 37% | — / 32%  |
+  | Aggregate live-subprocess RSS p95 @ c=64           | **252 MB** (10 live procs)        | ≤ 5 MB²   | ≤ 2 MB²  |
+
+  ¹ Below GNU time's 10 ms accounting resolution. ² Native tasks live ~7 ms — far under the 100 ms
+  sampling interval — so few are ever caught "live"; per-process transient RSS is the cold-spawn row
+  (2.5 / 2.2 MB). The contrast with A is that deno tasks live long enough (~50 ms) to stack up under
+  fanout.
+
+  The CPU axis is the sharpest at-scale differentiator: the deno runtime **saturates the 4-core host
+  from c=16** — runtime startup work, not task compute, consumes the machine — which is exactly why
+  its throughput plateaus at ~69 tasks/s. The native subjects deliver 2.2× the throughput while
+  leaving ~60% CPU headroom (their ceiling is queue/dispatch, not CPU). At ~5× less system CPU per
+  message, the same worker host sustains roughly 5× the message rate — or the same rate on a
+  fraction of the compute — before horizontal scaling is needed.
 
 ### The two-axis design space
 

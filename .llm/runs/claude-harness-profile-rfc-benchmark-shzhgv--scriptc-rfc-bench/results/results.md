@@ -1,6 +1,6 @@
 # Benchmark results — scriptc task runtime vs polyglot baselines
 
-Generated 2026-08-19T21:20:35.445Z by `bench/harness/report.ts` from `results/raw/*.jsonl`.
+Generated 2026-08-19T22:10:37.393Z by `bench/harness/report.ts` from `results/raw/*.jsonl`.
 All numbers computed from raw samples; percentiles are nearest-rank. Series: warmup 20
 discarded, measured completions only. See plan.md L1-L5 for locked methodology and
 pre-registered verdict criteria; drift.md D-2/D-5 for hosting/backend substitutions.
@@ -96,12 +96,29 @@ pre-registered verdict criteria; drift.md D-2/D-5 for hosting/backend substituti
 
 ## Cold-spawn probe (`/usr/bin/time -v`, direct spawn, 100k workload, 30 reps)
 
-| Command | max RSS median (KB) | max RSS p95 | wall p50 (ms) |
-| --- | --- | --- | --- |
-| A-deno-sandboxed | 43400 | 43808 | 45.2 |
-| A-deno-allow-all | 43280 | 43536 | 44.3 |
-| B-scriptc | 2524 | 2616 | 5.0 |
-| D-rust | 2152 | 2280 | 3.3 |
+| Command | max RSS median (KB) | max RSS p95 | wall p50 (ms) | CPU p50 (user+sys, ms) | invol. ctx-switches p50 |
+| --- | --- | --- | --- | --- | --- |
+| A-deno-sandboxed | 43236 | 43784 | 48.8 | 40.0 | 1 |
+| A-deno-allow-all | 43200 | 43520 | 50.8 | 50.0 | 1 |
+| B-scriptc | 2548 | 2652 | 5.0 | 0.0 | 0 |
+| D-rust | 2092 | 2224 | 3.4 | 0.0 | 0 |
+
+## Scale probe — system CPU + aggregate task-subprocess RSS under concurrency
+
+Sampler: 100 ms interval, all-core busy-jiffy CPU%, RSS summed over live task
+subprocesses matched by cmdline. CPU ms/exec = whole-series busy CPU (all processes,
+host + subprocesses + queue machinery) / completed executions incl. warmup — a system-
+level cost-per-message, not the subprocess CPU alone (that is the cold-spawn column).
+
+| Subject | c | n | sys CPU%% p50 | p95 | live procs p95 | agg subprocess RSS p95 (MB) | CPU ms/exec | e2e p50 (ms) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| A-deno | 1 | 320 | 16.3 | 26.2 | 1 | 39 | 73.3 | 109.2 |
+| A-deno | 16 | 320 | 95.3 | 100.0 | 7 | 177 | 57.0 | 229.7 |
+| A-deno | 64 | 320 | 95.0 | 100.0 | 10 | 252 | 57.0 | 1008.0 |
+| B-scriptc | 1 | 320 | 5.0 | 11.6 | 1 | 0 | 16.2 | 61.7 |
+| B-scriptc | 16 | 320 | 31.7 | 42.9 | 1 | 2 | 11.9 | 113.7 |
+| B-scriptc | 64 | 320 | 36.6 | 55.8 | 2 | 5 | 11.2 | 369.8 |
+| D-rust | 64 | 320 | 31.7 | 47.6 | 0 | 0 | 10.1 | 347.9 |
 
 ## Execution-boundary microbenchmarks (in-process, labeled DIRECT — not queue numbers)
 

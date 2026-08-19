@@ -208,3 +208,25 @@ closed-union sites + `registerTask` schema validation); no framework source touc
 | S9 | doc:lint | N/A | `deno task doc:lint` is the package `deno doc` lint (run-deno-doc-lint.ts --root packages/...), does not cover rfcs/ markdown — open decision resolved |
 | S9 | Fitness gates F-1..F-19 / quality:scan / arch:check | N/A | no `packages/`/`plugins/` source modified — diff vs main touches only `.llm/runs/` + `rfcs/` |
 | S10 | IMPL-EVAL (separate session, OpenHands DeepSeek V4 Flash, head 13e212e) | **PASS** | PR #1678 verdict comment 2026-08-19T21:43Z; mirrored in `evaluate.md`; 2 low non-blocking findings tracked there |
+
+### S11 — owner-review amendment: CPU + aggregate RAM at concurrency (2026-08-19)
+
+Owner review on PR #1678 (pre-merge): benchmark lacked CPU usage and aggregate RAM under
+concurrency. Amendment (owner-authorized head move after IMPL-EVAL PASS):
+
+- `rss-probe.ts` extended: user/sys CPU + context switches per cold spawn (30 reps rerun).
+- New `system-sampler.ts` (100 ms: all-core CPU%, summed live task-subprocess RSS by cmdline
+  match, proc count, system used mem) + `run-scale-probe.sh` — full 320-exec reruns of queue
+  short series for A/B at c={1,16,64} and D at c=64, sampler attached, 0 failures.
+- Two sampler defects found+fixed during the slice: /proc/stat needs `--allow-all` (D-6 class);
+  sampler self-match via its own argv (excluded self/harness pids; first contaminated data set
+  discarded and rerun).
+- Headline: A-deno saturates 4 cores from c=16 (95-100% sys CPU; 57-73 ms system CPU/message;
+  40-50 ms subprocess CPU/exec; 252 MB p95 aggregate live RSS at c=64) vs B-scriptc 32-37% CPU,
+  11-16 ms/message, <10 ms/exec (below GNU-time resolution), ≤5 MB aggregate; D-rust ~10 ms/message.
+- `report.ts` gained cold-spawn CPU columns + scale-probe section; results.md regenerated
+  (still fully script-generated); RFC Summary + Measured-behavior updated; fmt re-clean.
+
+| Slice | Gate | Result | Evidence |
+| --- | --- | --- | --- |
+| S11 | Scale-probe completeness (7 sampled series × 320 exec, 0 failures) + self-match exclusion verified (B agg RSS ≤5 MB vs 52 MB contaminated) | PASS | run-scale-probe log; sys_*.jsonl; results.md § scale probe |
