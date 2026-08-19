@@ -32,6 +32,10 @@
 | F11 | Open debt central to the RFC: `workers-non-deno-task-sandbox-boundary` (DEBT_ACCEPTED) — non-Deno runtimes inherit worker-host OS privileges; docs caveat marker `arch-debt:workers-non-deno-task-sandbox-boundary` in the add-a-task-runtime-adapter how-to. Close gate: documented enforced per-task sandbox **or** public API models it as a permanent trust boundary. Also relevant: `PLUGIN-RUNTIME-ADAPTER-RELOCATION` (#172d, workers = reference impl), `CRON-SUBSYSTEM-DUP` (mapped to a future RFC), `workers-private-type-ref-1655`. | `.llm/harness/debt/arch-debt.md` lines 1413, 1836, 1511, 2307 |
 | F12 | Rust toolchain in-container: rustc 1.94.1, cargo, clippy; installed target `x86_64-unknown-linux-gnu` only (wasm32 targets addable via rustup for subject E fallback; `Deno.dlopen` FFI needs a `cdylib` with C ABI — subject F). | `rustc --version`, `rustup target list --installed` |
 | F13 | WORKER_RUNTIMES runner modes: `in-process`, `web-worker` (scaffold default, `WORKERS_CONCURRENCY`), `subprocess`; config knobs `concurrency`, `mode`, `queueProvider`, `jobsDir`/`tasksDir`. Tasks share queue/retry/telemetry machinery with jobs; "the difference is purely the execution surface". | `docs/site/background-processing/workers.md` |
+| F14 | **Dispatch path (trigger → result), exact:** API router enqueues `TaskMessage` via `getTaskQueue()` = `createQueue<TaskMessage>('tasks')` (`plugins/workers/services/src/routers/tasks.ts:77`, `router-context.ts:81`). `Worker.start()` → `startTaskQueueListener` (`plugins/workers/worker/queue-consumer.ts:50-73`, supervised listener) → `processWorkerTask` (`plugins/workers/worker/job-dispatcher.ts:192`): task-registry lookup → idempotency claim → `executionState.create/start` → `taskExecutor.execute(taskDef, { env: { TASK_ID, TASK_PAYLOAD }, timeout })` → `executionState.complete` + idempotency mark/release. | file:line refs quoted |
+| F15 | **Queue backend needs no Docker.** `createQueue` auto-discovery priority is RabbitMQ > Redis > **Deno KV (default, always available)**; with no Aspire env vars it uses local Deno KV (SQLite) **native queue operations** (`Deno.Kv.enqueue`/`listenQueue`); KV-polling only for remote KV Connect. Worker-side state (`KvExecutionState`, `KvTaskRegistry`, `KvWorkerIdempotencyStore`) rides `getKv()` (`plugins/workers/services/src/service-runtime.ts:81-87`), which auto-discovers the same way (local Deno KV default). `packages/queue/testing/memory-queue.ts` exists for pure-memory tests. | `packages/queue/factory/create-queue.ts:99-106,147-148`; `packages/kv/application/shared.ts:117` |
+| F16 | **Executor internals:** `MultiRuntimeTaskExecutor.execute` wraps every execution in an OTel span + instrumentation, resolves `customAdapters[task.type]` **before** the built-in map (`multi-runtime-task-executor.ts:116-122`), and `TaskDefinition.type` is `string` — so a custom `'scriptc'` TaskType needs **zero framework changes**: `createDefaultTaskExecutor({ customAdapters: { scriptc: adapter } })` (`:184-192`). Contract `TaskRuntimeAdapterLike = { id; runtime: TaskType \| null; supports(task); execute(task, options): Promise<TaskResult> }` (`executor-types.ts:106-111`). `TaskResult` carries `duration` (ms, adapter-measured), `result` = **parseJsonLastLine(stdout)**, `exitCode`, `attempt` (`executor-types.ts:90-103`). | file:line refs quoted |
+| F17 | **Adapter mechanics:** all built-ins share `RuntimeAdapterBase` (`supports` = type match + entrypoint present) → `DaxProcessRunner.runProcess`: dax spawn, env = host env ∪ `task.env` ∪ `options.env` ∪ `TRACEPARENT`/`TRACESTATE`/`CORRELATION_ID`, per-line streamed capture with log classification, `.timeout(ms).noThrow()`, exit 126/127 special-cased. `deno` command = `deno run <permission flags> [--import-map] <entrypoint> <args>` with **`--allow-all` when `.permissions()` absent** (`permission-flags.ts:5`); `executable` command = the entrypoint itself + args (`argv-builder.ts:118-125`) — a scriptc/Rust binary is dispatched with **zero** adapter-added overhead vs any other binary. | `runtime-adapter-base.ts`, `dax-process-runner.ts:89-98,152-189`, `argv-builder.ts:7-22,118-125` |
 
 ## Feasibility (container constraints → benchmark tier)
 
@@ -42,8 +46,16 @@ queue → `MultiRuntimeTaskExecutor` → adapter → subprocess → TaskResult �
 `@netscript/plugin-workers-core` and is exercised **in-process from the repo workspace** with a
 repo-native queue provider. End-to-end numbers are labeled "in-process worker runtime, not
 Aspire-hosted"; the executor-side `duration` numbers are host-independent.
-**[PENDING — dispatch-path map from Explore agent: exact queue provider choice, trigger path
-helpers, test harnesses that drive enqueue→TaskResult without external services.]**
+**Resolved (F14–F17):** the real dispatch path runs fully in this container. The benchmark boots
+`Worker` (from `plugins/workers/worker/mod.ts`) with `KvTaskRegistry`/`KvExecutionState`/
+`KvWorkerIdempotencyStore` over local Deno KV, enqueues `TaskMessage`s on
+`createQueue<TaskMessage>('tasks')` — the **same call the API router makes** — and measures
+enqueue→`executionState.complete` end-to-end plus the adapter-measured `TaskResult.duration`.
+The queue backend is local Deno KV **native queue ops** (the documented default provider absent
+RabbitMQ/Redis), so queue semantics (at-least-once, retry, idempotency claims, telemetry spans)
+are the production code path; only the hosting (Aspire AppHost, separate service processes) and
+the backend tier (KV vs RabbitMQ/Redis) differ, and both substitutions are stated in the RFC's
+methodology + threats-to-validity sections.
 
 ## jsr-audit surface scan (package/plugin waves)
 
@@ -62,8 +74,8 @@ helpers, test harnesses that drive enqueue→TaskResult without external service
 
 ## Open questions
 
-- Which queue provider gives the most representative through-the-queue numbers without Docker
-  (in-memory vs KV-backed)? → close from dispatch-path map; state the choice + its bias in the RFC.
+- ~~Which queue provider without Docker?~~ **Closed:** local Deno KV native queue ops — the
+  documented default provider (F15), not a test double; bias vs RabbitMQ/Redis stated in RFC.
 - Where does the queue provider become the bottleneck in the concurrency sweep (1/4/16/64)? →
   answer empirically; the RFC's verdict hinges on spawn-tax share of end-to-end latency.
 - scriptc WASM target unbuildable here (no Zig): is Rust `wasm32` an acceptable stand-in for the
