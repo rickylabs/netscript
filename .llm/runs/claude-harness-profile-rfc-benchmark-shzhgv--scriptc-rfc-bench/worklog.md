@@ -207,3 +207,4 @@ closed-union sites + `registerTask` schema validation); no framework source touc
 | S9 | Markdown fmt (scoped, single file) | PASS | `deno fmt --check rfcs/0000-scriptc-task-runtime-adapter.md` clean (RFC 0002 is fmt-clean precedent; template itself is not) |
 | S9 | doc:lint | N/A | `deno task doc:lint` is the package `deno doc` lint (run-deno-doc-lint.ts --root packages/...), does not cover rfcs/ markdown — open decision resolved |
 | S9 | Fitness gates F-1..F-19 / quality:scan / arch:check | N/A | no `packages/`/`plugins/` source modified — diff vs main touches only `.llm/runs/` + `rfcs/` |
+| S10 | IMPL-EVAL (separate session, OpenHands DeepSeek V4 Flash, head 13e212e) | **PASS** | PR #1678 verdict comment 2026-08-19T21:43Z; mirrored in `evaluate.md`; 2 low non-blocking findings tracked there |
