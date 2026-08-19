@@ -115,9 +115,30 @@ Run dir + supervisor identity + drift D-1..D-3. Gate: n/a (scaffolding).
 `research.md` F1–F17; firsthand scriptc verification; dispatch-path map; #1679 filed and linked.
 Gate: findings verifiable by quoted file:line / commands (spot-checkable).
 
+### S4 — workloads + correctness gate
+
+Files: `bench/tasks/task-deno.ts` (A), `bench/tasks/task-scriptc.ts` (B/C source),
+`bench/tasks/rust-lcg/` (D bin + cdylib + wasm lib), `bench/verify-workloads.ts`.
+Binaries land in gitignored `bench/tasks/build/` (reproducible from committed sources).
+
+Gate run (first attempt, 2026-08-19):
+
+```text
+A-deno / B-C-scriptc / D-rust / E-wasm-core — short acc=846234426, long acc=777999478 — all OK
+task-scriptc-native 584192 B · task-rust-native 319760 B · liblcg.so 316984 B · lcg.wasm 270 B
+S4 gate: PASS
+```
+
+Notes: scriptc binary grew from 422 KB (smoke) to 584 KB with `node:fs` linked in. scriptc
+compiled the `/proc/self/status` read statically without complaint (R5 retired). Slice review
+(A1): numeric-exactness argument verified against all four sources (constants + loop identical;
+u64/f64 intermediates < 2^53); contract compliance (argv+env in, last-JSON-line out,
+CORRELATION_ID passthrough) checked per variant.
+
 ## Gate results
 
 (filled per slice as they land)
 
 | Slice | Gate | Result | Evidence |
 | --- | --- | --- | --- |
+| S4 | Cross-variant result identity + builds | PASS | verify-workloads output above; rerun command in file header |
