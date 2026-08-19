@@ -32,7 +32,7 @@ pre-registered criteria (plan.md L5).
 - Deno gates `/proc` reads behind `--allow-all`; external `/usr/bin/time -v` is the portable
   peak-RSS probe for sandboxed subprocesses.
 
-## Addendum — runs 2 and 3 (same session, same branch lineage)
+## Addendum — runs 2, 3 and 4 (same session, same branch lineage)
 
 - **Run 2 (rust-workers, PR #1683, merged):**
   `.llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--rust-workers-rfc/` —
@@ -46,6 +46,15 @@ pre-registered criteria (plan.md L5).
   existing dotnet TaskType (file-based 284 ms vs NativeAOT 6.3 ms / 3.4 MB with native compute);
   Bootsharp verified on Linux at native speed in Deno; cross-language sandbox matrix (monty /
   Rust-WASI / Bootsharp / Hyperlight / adapter-level Landlock-bwrap). IMPL-EVAL PASS.
+- **Run 4 (golang, PR #1686):**
+  `.llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--golang-rfc/` —
+  `rfcs/0000-golang-task-runtime-paths.md`. Key findings: plain `go build` binary through the
+  existing `executable` TaskType is Rust-class on every axis (6.2 ms exec-wall / 2.2 MB /
+  3.9 ms cold spawn) with the lowest-ceremony toolchain of the series; official `js/wasm` +
+  `wasm_exec.js` bridge verified native-class in Deno (54.4 ms, boot 76.6 ms); c-shared FFI
+  hazards documented, G2 recommended; series close: sandbox matrix Go row + recorded
+  no-Python-RFC decision (python3 probe row; monty #1679 owns the remaining questions).
+  IMPL-EVAL PASS (run 32313667459).
 - Series lessons promoted-candidate: the deferred-push + branch-restart + post-verdict
   artifact-only-commit protocol worked three times; close-gate needs the body complete BEFORE the
   head's CI run (rerun-by-bookkeeping-push is the workaround absent `gh run rerun`).
