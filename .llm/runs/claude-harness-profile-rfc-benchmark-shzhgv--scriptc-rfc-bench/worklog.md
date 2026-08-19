@@ -135,6 +135,41 @@ compiled the `/proc/self/status` read statically without complaint (R5 retired).
 u64/f64 intermediates < 2^53); contract compliance (argv+env in, last-JSON-line out,
 CORRELATION_ID passthrough) checked per variant.
 
+### S5 — bench harness through the real dispatch path
+
+Files: `bench/harness/run-series.ts` (series runner: queue + direct modes, fresh-KV isolation,
+measuring executor decorator, mutation-hook completion capture, SIGINT/deadline lifecycle),
+`bench/harness/rss-probe.ts` (cold-spawn peak RSS via `/usr/bin/time -v`).
+
+Findings & fixes during the slice (all recorded as drift):
+
+1. `Worker.start()` parks on the jobs listener for the worker's lifetime (worker.ts:196-204) —
+   first hang; fixed by not awaiting.
+2. **D-5**: on shared local Deno KV, the Worker's jobs listener steals 'tasks' messages (single
+   KV queue per database, envelope has no queue name) — second hang, message lost. Fix: harness
+   boots `startTaskQueueListener` + `processWorkerTask` with contexts mirrored verbatim from
+   `worker.ts:315-349`; listener/dispatcher/executor/queue/state remain production code.
+3. **D-4**: queue path forwards no correlation/trace context to task subprocesses
+   (job-dispatcher.ts:234) — doc/behavior mismatch, confirmed empirically.
+4. **D-6**: Deno gates `/proc` reads behind `--allow-all` → sandboxed subject A cannot
+   self-report VmHWM; external rss-probe added (with an `A-deno-allow-all` production-default
+   variant).
+5. Registry `TaskDefinition` is the full domain shape — `maxConcurrency` defaults to **1** and
+   would have silently capped the c-sweep; set to 128, `maxRetries` 0.
+
+Smoke evidence (queue mode, c=1, warmup 2 + measure 8, exit 0, 0 failures):
+
+```text
+C-executable-control short: executorWall ≈ 7-8 ms, endToEnd ≈ 48-95 ms, vmHwm ≈ 2.4 MB
+A-deno              short: executorWall ≈ 49-50 ms, endToEnd ≈ 88-128 ms
+D-rust direct mode  short: executorWall ≈ 5.5 ms (e2e ≈ executor, as expected)
+acc = 846234426 everywhere (matches S4 reference)
+```
+
+`deno check --unstable-kv` clean on the runner. Slice review (A1): context mirror
+compared field-by-field against `worker.ts` builders; measuring decorator verified to add only
+a Map write per execution; enqueue window logic re-checked for the c>1 case.
+
 ## Gate results
 
 (filled per slice as they land)
@@ -142,3 +177,4 @@ CORRELATION_ID passthrough) checked per variant.
 | Slice | Gate | Result | Evidence |
 | --- | --- | --- | --- |
 | S4 | Cross-variant result identity + builds | PASS | verify-workloads output above; rerun command in file header |
+| S5 | Queue-path smoke (10 execs, A + C) + direct smoke (D) + typecheck | PASS | see S5 notes below |

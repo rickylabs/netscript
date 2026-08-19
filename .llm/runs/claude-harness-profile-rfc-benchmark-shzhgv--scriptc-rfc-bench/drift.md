@@ -50,3 +50,33 @@ documentation.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** research.md § Findings.
+
+## 2026-08-19 — D-4: Worker dispatch does not forward correlation/trace context to task subprocesses
+
+- **What:** `processWorkerTask` calls `taskExecutor.execute(taskDef, { env: { TASK_ID, TASK_PAYLOAD }, timeout })` without `correlationId`/`traceparent`/`tracestate` options, so `runProcess` never injects `CORRELATION_ID`/`TRACEPARENT` env into queue-triggered task subprocesses.
+- **Source:** `plugins/workers/worker/job-dispatcher.ts:234-240`; `packages/plugin-workers-core/src/executor/adapters/dax-process-runner.ts:89-98`; confirmed empirically (task output `correlationId: null` in smoke runs).
+- **Expected:** `docs/site/background-processing/polyglot-tasks.md` documents `CORRELATION_ID`/`TRACEPARENT` as injected by the runtime.
+- **Actual:** Injection happens only when the caller passes those options (e.g. direct executor use); the queue path drops them even though `TaskMessage.correlationId` is present.
+- **Severity:** significant (doc/behavior mismatch + likely upstream bug)
+- **Action:** propose-update — surfaced in PR; candidate follow-up issue after evaluator review.
+- **Evidence:** file:line above; smoke JSONL in run dir.
+
+## 2026-08-19 — D-5: Named queues collide on a shared local Deno KV database
+
+- **What:** With the default local Deno KV provider, `createQueue('jobs')` and `createQueue('tasks')` on the same KV database each register `kv.listenQueue` on their own connection; Deno KV has ONE queue per database and the adapter envelope (`packages/queue/adapters/_envelope.ts`) carries no queue name, so messages are delivered to whichever listener wins — the Worker's jobs listener consumed 'tasks' messages ("Processing job 'undefined' … Workers KV key contains unsupported part: undefined") and the message was lost to the task listener.
+- **Source:** Observed in S5 smoke (worker-based boot); `packages/queue/adapters/deno-kv.adapter.ts` (no name filtering), `_envelope.ts` (no queueName field).
+- **Expected:** Named queues are isolated per name on every provider.
+- **Actual:** Isolation holds on Redis/RabbitMQ (real named queues) but not on a shared local Deno KV database — affects DB-less local dev running worker + task listeners in one process.
+- **Severity:** significant (upstream bug candidate in @netscript/queue local-KV provider)
+- **Action:** propose-update — benchmark harness boots the task listener only (contexts mirrored verbatim from `worker.ts:315-349`); candidate follow-up issue.
+- **Evidence:** smoke log excerpt in worklog S5; harness comment in `bench/harness/run-series.ts`.
+
+## 2026-08-19 — D-6: Sandboxed deno tasks cannot self-report RSS (/proc gated behind --allow-all)
+
+- **What:** `Deno.readTextFileSync('/proc/self/status')` fails with `NotCapable: Requires all access to "/proc/self/status", run again with the --allow-all flag` even under `--allow-read=/proc`.
+- **Source:** Empirical (deno 2.9.5); reproduced standalone.
+- **Expected:** Benchmark plan had every subject self-report VmHWM.
+- **Actual:** Subject A (sandboxed) reports `vmHwmKb: null`; per-subject cold-spawn peak RSS measured externally via `/usr/bin/time -v` (`bench/harness/rss-probe.ts`), including an `A-deno-allow-all` variant matching the production no-permissions default.
+- **Severity:** minor (methodology adjustment; also an RFC-relevant sandbox datum)
+- **Action:** accept
+- **Evidence:** error string above; rss-probe.ts.
