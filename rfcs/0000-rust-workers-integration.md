@@ -39,9 +39,10 @@ and reject direct rusty_v8/deno_core embedding.
 Three measured facts define the problem:
 
 1. **Today's worker cannot use the machine for job compute.** `WorkerPool` wraps
-   `InProcessJobRunner` (`plugins/workers/worker/job-runner-pool.ts:25-40`); its `poolSize` option is accepted unused and
-   `workerUrl` is read (worker.ts:113) but not honored for isolate creation; there are **zero Web Worker instantiations** in
-   `plugins/workers` + `packages/plugin-workers-core`; the `WORKER_RUNTIMES` values
+   `InProcessJobRunner` (`plugins/workers/worker/job-runner-pool.ts:25-40`); its `poolSize` option
+   is accepted unused and `workerUrl` is read (worker.ts:113) but not honored for isolate creation;
+   there are **zero Web Worker instantiations** in `plugins/workers` +
+   `packages/plugin-workers-core`; the `WORKER_RUNTIMES` values
    (`packages/plugin-workers-core/src/domain/constants.ts:83`) are vocabulary without
    implementation. Measured consequence (results-parallel.md, P1): K CPU-bound jobs run at 4.5
    jobs/s at every K, and the event loop is blocked for the full duration (jitter ≈ wall: 878 ms at
@@ -241,9 +242,15 @@ itself behind a flag. Tiers 1–2 are recipes.
 
 ## Unresolved questions
 
-- Tier 3 pool mechanics: dispatch protocol (postMessage vs MessageChannel), backpressure, and
-  whether the pool serves tasks' in-process modes too — needs its own design doc at implementation
-  time (this RFC bounds the win/cost, not the design).
+- Tier 3 pool mechanics — the dispatch-protocol half is **resolved by owner input**: use oRPC's
+  message-port adapter (`RPCHandler` from `@orpc/server/message-port` with `handler.upgrade(self)`
+  in the pool isolate; `RPCLink({ port: worker })` in the host — orpc.dev/docs/adapters/web-workers)
+  rather than hand-rolled postMessage or raw MessageChannel plumbing. NetScript already depends on
+  the oRPC stack (root catalog `@orpc/*`; the workers plugin's contracts are oRPC contract
+  definitions, `packages/plugin-workers-core/src/contracts/v1/workers.contract-definition.ts`), so
+  the pool's job-dispatch contract becomes one more typed oRPC contract over a different transport —
+  zero new dependency, wrap-don't-reinvent. Still open: backpressure policy and whether the pool
+  serves tasks' in-process modes too (#1684's design scope).
 - P4's blocking-pool concurrency ceiling (waves at K=8 suggest a 4-thread pool on this host):
   confirm whether `DENO_UNSTABLE_*`/tokio sizing applies before publishing the sizing rule.
 - Large-payload economics: at what buffer size do WASM/FFI boundary copies erase the compute win?
