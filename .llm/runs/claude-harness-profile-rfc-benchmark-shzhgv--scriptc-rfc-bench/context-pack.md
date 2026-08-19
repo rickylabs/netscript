@@ -13,9 +13,9 @@ decisions L1–L7), `drift.md` (D-1..D-6), `worklog.md` (Design + slice log + ga
   0 failures), S7 boundary (wasm/ffi/in-process), S8 `results/results.md` (script-generated),
   S9 RFC `rfcs/0000-scriptc-task-runtime-adapter.md` (Draft) with all gates green (see worklog
   gate table).
-- **Remaining:** S10 close (session record, PR body/DoD refresh, IMPL phase comment) +
-  **IMPL-EVAL handoff** — mandatory, separate session, cloud draft→ready automation route
-  (supervisor.md); this session does not self-certify.
+- **IMPL-EVAL: PASS** (OpenHands DeepSeek V4 Flash, run 32304295923, evaluated head 13e212e;
+  mirrored in `evaluate.md`). PR at `status:ready-merge`, all DoD boxes checked with evidence.
+  Post-verdict commits are run-artifact-only (deliverable diff vs 13e212e empty).
 
 ## Headline results (full tables: `results/results.md`; raw: `results/raw/*.jsonl`)
 
@@ -31,8 +31,9 @@ decisions L1–L7), `drift.md` (D-1..D-6), `worklog.md` (Design + slice log + ga
 
 ## Follow-up candidates (post evaluator review)
 
-- File issues for **D-4** (queue path drops correlation/trace env for task subprocesses — doc
-  says injected) and **D-5** (named-queue collision on shared local Deno KV database).
+- ~~File D-4/D-5 issues~~ **Done:** #1681 (D-4), #1682 (D-5); RFC tracking issue **#1680**
+  (evaluator finding 1). Wording nit ("~57 ms" → 58-62 ms) folds into the Discussion-transition
+  edit, tracked in #1680.
 - `deno compile` measured comparison (RFC unresolved question).
 - #1679 monty spike (separate issue, already filed).
 

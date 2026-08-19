@@ -58,7 +58,7 @@ documentation.
 - **Expected:** `docs/site/background-processing/polyglot-tasks.md` documents `CORRELATION_ID`/`TRACEPARENT` as injected by the runtime.
 - **Actual:** Injection happens only when the caller passes those options (e.g. direct executor use); the queue path drops them even though `TaskMessage.correlationId` is present.
 - **Severity:** significant (doc/behavior mismatch + likely upstream bug)
-- **Action:** propose-update — surfaced in PR; candidate follow-up issue after evaluator review.
+- **Action:** propose-update — **filed as #1681** after IMPL-EVAL confirmation.
 - **Evidence:** file:line above; smoke JSONL in run dir.
 
 ## 2026-08-19 — D-5: Named queues collide on a shared local Deno KV database
@@ -68,7 +68,7 @@ documentation.
 - **Expected:** Named queues are isolated per name on every provider.
 - **Actual:** Isolation holds on Redis/RabbitMQ (real named queues) but not on a shared local Deno KV database — affects DB-less local dev running worker + task listeners in one process.
 - **Severity:** significant (upstream bug candidate in @netscript/queue local-KV provider)
-- **Action:** propose-update — benchmark harness boots the task listener only (contexts mirrored verbatim from `worker.ts:315-349`); candidate follow-up issue.
+- **Action:** propose-update — harness boots the task listener only (contexts mirrored verbatim from `worker.ts:315-349`); **filed as #1682** after IMPL-EVAL confirmation.
 - **Evidence:** smoke log excerpt in worklog S5; harness comment in `bench/harness/run-series.ts`.
 
 ## 2026-08-19 — D-6: Sandboxed deno tasks cannot self-report RSS (/proc gated behind --allow-all)
