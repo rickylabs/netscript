@@ -34,3 +34,10 @@ K5 may legitimately fail (then T1 is signal-only, honestly); K6 must not touch p
 PLAN-EVAL: cycle 1 FAIL_PLAN (checklist-form; 6 fixes applied in f4ae089) → cycle 2 **PASS**
 (run 32343592955, head f4ae089, all 8 plan-gate boxes; no required amendments). Hard stop
 lifted; slice trail proceeds S5→S9. Mirror: plan-eval.md.
+
+## Spike slices (post PLAN-EVAL PASS)
+
+| Slice | Spike | Verdict (pre-registered criteria) | Evidence |
+| --- | --- | --- | --- |
+| S5 | K1 frame transport | **ADOPT sentinel-stdout** — 10/10 reps, 200/200 frames recovered (go + python3), 10000 log lines intact, deterministic malformed-diagnostic count (2504 planted lookalikes), ~125 MB/s demux over 1.25 GB hostile output/rep. Spec rule derived: demux MUST sentinel-scan the byte stream (line-anchored v1 lost 8–44 frames/rep to frames embedded in unterminated >PIPE_BUF log lines — kept as v1-lesson row). fd-3 branch **infeasible on Deno host** (Deno.Command has no extra-fd API) — socket transports (K3) are the alternative. | results/raw/k1.jsonl |
+| S5 | K2 token delivery | **ADOPT env-pointer + bootstrap token for T0/T1** — /proc environ mode 0400 (same-uid-only); Deno clearEnv+env delivers exact allowlist (canary not leaked; only runtime-self-set LC_CTYPE appears — CPython PEP-538); stdin-first-frame verified (python3 27.1 ms p50 incl. interpreter start, sh 1.7 ms) as T2 per-dispatch mechanism. Bonus finding: sandboxed deno tasks cannot read /proc at all (--allow-all gate, run-1 D-6 lineage) — further limits environ snooping from sandboxed tasks. | results/raw/k2.jsonl |
