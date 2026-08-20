@@ -1,5 +1,31 @@
 # IMPL-EVAL — claude-harness-profile-rfc-benchmark-shzhgv--polyglot-protocol-rfc
 
+## Cycle 3 — (pending re-dispatch after cycle-2 fixes)
+
+## Cycle 2 — FAIL_FIX on the S10 revision head (2026-08-20)
+
+| Field | Value |
+| --- | --- |
+| Evaluator session | OpenHands cloud run 32358375889 (separate session) |
+| Model / route | `openrouter/deepseek/deepseek-v4-flash-0731` (draft→ready re-dispatch, R5-D-7 mandate) |
+| Evaluated head | 45b134a (S10 revision, 319→803 lines) |
+| Verdict | `OPENHANDS_VERDICT: FAIL_FIX` — design judged "substantively sound and reference-complete" (Zod 4.4.3 snippets hand-tested; seam file:line cites verified; K1–K6 figures re-checked; L1–L8 intact; fmt-clean, zero TBD); four doc/bookkeeping fixes owed |
+
+### Findings → disposition (cycle-2 fix commit)
+
+1. **F1 (medium)** corpus count "34-file" wrong (32 per `research-sources/`) — **fixed** in RFC
+   Summary + Prior art; PR body aligned in the same pass.
+2. **F2 (medium)** stale context-pack resume point (still "S9 complete") — **fixed**: resume
+   point now records S10, the eval-cycle history, and the pending cycle-3 re-dispatch.
+3. **F3 (low)** stale PR body (no S10 slice; presented the superseded 70d101a PASS as final)
+   — **fixed**: body rewritten for the S10 head; DoD verdict box re-opened pending cycle 3.
+4. **F4 (low)** bare-basename seam cite — **fixed**: full path
+   `packages/plugin-workers-core/src/executor/multi-runtime-task-executor.ts:195-205`.
+
+Eval-loop accounting: first FAIL_FIX of the IMPL-EVAL loop (limit two before escalation).
+
+## Cycle 1 — PASS on the pre-revision head (superseded by R5-D-7, kept as record)
+
 **Verdict: PASS** (`OPENHANDS_VERDICT: PASS`)
 
 | Field | Value |

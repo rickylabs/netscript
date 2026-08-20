@@ -1,14 +1,18 @@
 # Context pack — polyglot-protocol-rfc (run 5)
 
-Resume point: **S9 complete — RFC authored (`rfcs/0000-polyglot-task-protocol.md`), gates
-green (G1/G2), PLAN-EVAL PASS on record; awaiting IMPL-EVAL verdict on PR #1687, then the
-close routine (evaluate.md mirror, DoD tick, status:ready-merge, bookkeeping push).**
+Resume point: **S10 revision cycle — owner review R5-D-7 rejected the S9 report-shaped RFC;
+S10 rewrote it as a full architectural design (803 lines: wire Zod schemas, ports, package
+map, per-seam integration table, five-wave plan). IMPL-EVAL history: PASS on 70d101a
+(superseded, covered pre-revision head only) → re-dispatch on 45b134a returned FAIL_FIX
+(4 doc fixes: corpus count 34→32, this context-pack refresh, PR body staleness, full-path
+seam cite) → fixes applied, cycle-3 re-dispatch requested. Close routine re-runs on the
+cycle-3 verdict; owner's Codex Sol Max adversarial pass follows the re-eval.**
 
 - Branch `claude/harness-profile-rfc-benchmark-shzhgv` restarted on post-#1686 main; draft PR
   **#1687** (labels type:docs area:plugins area:docs rfc ci:skip-e2e ci:skip-scaffold
   status:research, milestone Backlog/Triage).
 - Run dir: `.llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--polyglot-protocol-rfc/`.
-  Corpus: `research-sources/` (32+ files, committed). Synthesis: `research.md`.
+  Corpus: `research-sources/` (32 files, committed). Synthesis: `research.md`.
 - Owner rulings (supervisor.md): Fable 5 end-to-end; Opus 5 medium = aggregation only;
   PLAN-EVAL required; IMPL-EVAL via draft→ready automation; owner adds Codex GPT 5.6 Sol Max
   adversarial pass; corpus lives in run dir; RFCs 1–4 get citizenship addenda post-RFC-5

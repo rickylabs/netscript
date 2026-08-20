@@ -33,7 +33,7 @@ black-box runner contract — while a JS job handler gets
   from the engine audit.
 
 Every quantitative claim traces to the run directory
-`.llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--polyglot-protocol-rfc/` (34-file ratified
+`.llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--polyglot-protocol-rfc/` (32-file ratified
 corpus, engine audit, six pre-registered spikes K1–K6 — all resolved on their primary criteria; see
 [Appendix A](#appendix-a--measured-evidence)). Headline cost: the full T1 contract adds **+0.41 ms**
 to the 7.6 ms exec-wall p50 of a Go task through the production dispatch path, with host-side
@@ -458,10 +458,10 @@ Per-seam plan (every touched file, with its defect linkage):
 | `executor-types.ts:90-104` (`TaskResult`)                                                                   | additive: `outcome?: TaskOutcomeV1` (typed union below), `resultRaw?: string` (bounded), `status` widened to the new vocabulary. Existing fields untouched — every current consumer keeps compiling                                                                                       | D-8, D-13       |
 
 **Preserved unchanged:** `MultiRuntimeTaskExecutor` and its adapter map
-(`multi-runtime-task-executor.ts:195-205`), every `RuntimeAdapterBase` subclass, the queue listener
-(`queue-consumer.ts`), `createQueue` providers, and the registry storage layout. The decorator
-composes at the same place the run-1–5 measuring executor did — which is exactly why K4 could
-measure it without engine edits.
+(`packages/plugin-workers-core/src/executor/multi-runtime-task-executor.ts:195-205`), every
+`RuntimeAdapterBase` subclass, the queue listener (`queue-consumer.ts`), `createQueue` providers,
+and the registry storage layout. The decorator composes at the same place the run-1–5 measuring
+executor did — which is exactly why K4 could measure it without engine edits.
 
 ### Type safety
 
@@ -740,7 +740,7 @@ registry seam; each is independently revertible.
 
 ## Prior art
 
-Ratified 34-file corpus (`research-sources/`): Faktory/Sidekiq (closed envelope, BEAT control
+Ratified 32-file corpus (`research-sources/`): Faktory/Sidekiq (closed envelope, BEAT control
 channel, cleanse caps), Celery v2 (lineage headers), BullMQ sandboxed processors (child IPC, zombie
 rules), AWS Lambda Runtime API (env bootstrap, reserved namespace, absolute deadlines), LSP
 (capability negotiation, `$/` tiering, two-phase shutdown), Temporal (task tokens, heartbeat-carried
