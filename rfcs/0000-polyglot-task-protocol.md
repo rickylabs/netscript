@@ -29,8 +29,9 @@ black-box runner contract — while a JS job handler gets
 - **three conformance tiers** (T0 legacy-forever, T1 structured one-shot, T2 long-lived duplex
   worker) whose achievement is **computed by a conformance suite**, never asserted;
 - a **port/adapter package architecture** following the `plugin-auth-core` blueprint, and a staged
-  five-wave engine integration plan that structurally retires defect classes D-1..D-10/D-12/D-13
-  from the engine audit.
+  five-wave engine integration plan that structurally retires defect classes D-1..D-9, D-12, D-13,
+  and D-14 from the engine audit (D-10 buffer capping and D-11 slot accounting stay supervisor-side
+  engine fixes outside the wave plan).
 
 Every quantitative claim traces to the run directory
 `.llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--polyglot-protocol-rfc/` (32-file ratified
@@ -673,6 +674,11 @@ and is consumed incrementally. Bars cite the spike numbers they must reproduce.
 | W3 `structured-outcomes` | demux in `interpretOutcome`, outcome union, status vocabulary, abort/kill ladder, error cleanse caps                                      | D-3, D-4, D-6, D-7, D-8, D-13, D-14 | `t1.*` result/exit cases green; K5 cancel bar (<100 ms p95) reproduced in-plugin                                               |
 | W4 `citizen-surface`     | citizen contracts + router, token store (mint/verify/fence), progress mutation + throttle + stream chain, `reportProgress` rewire         | D-12                                | K6 chain re-measured **in-plugin incl. SSE** (replica caveat discharged); K3 auth cases green; scoped-KV jail property tests   |
 | W5 `t2-worker`           | peer channel, init/negotiation, ping control, two-phase shutdown, pool integration with #1684                                             | —                                   | `t2.*` cases green; zombie-rule fault injection; soak: 24 h worker, zero leaked processes (`agentic:leak-check` clean)         |
+
+Deliberately outside the five-wave retirement: **D-10** (unbounded runner stdout buffering — the
+frame cap and artifacts route reduce exposure, but the buffer-capping fix itself is a
+supervisor-side engine bug) and **D-11** (slot accounting — out-of-scope register item 10). Both
+remain tracked engine issues.
 
 Cross-wave: conformance harness grows with each wave (it is each wave's acceptance instrument);
 shims (`plugins/workers/shims/*`) land with W3 and are CI-gated from then on; the D-register issues

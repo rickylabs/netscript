@@ -1,6 +1,27 @@
 # IMPL-EVAL — claude-harness-profile-rfc-benchmark-shzhgv--polyglot-protocol-rfc
 
-## Cycle 3 — (pending re-dispatch after cycle-2 fixes)
+## Cycle 3 — FAIL_FIX on the fixed head (2026-08-20)
+
+| Field | Value |
+| --- | --- |
+| Evaluator session | OpenHands cloud run 32359981617 (separate session) |
+| Evaluated head | c45d6c1 |
+| Verdict | `OPENHANDS_VERDICT: FAIL_FIX` — all four cycle-2 fixes confirmed applied; every seam cite + spike figure re-verified; ONE moderate finding |
+
+### Finding → disposition
+
+**F-1 (moderate)**: Summary line 32 claimed the wave plan retires "D-1..D-10/D-12/D-13", but the
+wave/seam tables retire exactly D-1..D-9, D-12, D-13, D-14 (D-10 not wave-retired; D-14 is) —
+**fixed**: Summary corrected, and an explicit "deliberately outside the five-wave retirement"
+note for D-10/D-11 added under the wave table.
+
+### Eval-loop accounting
+
+Second FAIL_FIX of the IMPL-EVAL loop → the two-failure limit is reached. Per
+`evaluator/plan-protocol.md`, escalated to the owner with the fix applied rather than
+self-dispatching a fourth cycle: owner decides between a final re-dispatch or folding
+verification into the planned Codex Sol Max adversarial pass.
+
 
 ## Cycle 2 — FAIL_FIX on the S10 revision head (2026-08-20)
 
