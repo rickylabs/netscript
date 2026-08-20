@@ -1,8 +1,8 @@
 # Context pack — polyglot-protocol-rfc (run 5)
 
-Resume point: **S9 complete — RFC authored, gates green; awaiting IMPL-EVAL verdict on PR #1687, then close routine.**
-tension register, pre-register verdict criteria + out-of-scope register) → PLAN-EVAL dispatch
-(`status:plan-eval` on PR #1687, separate session, REQUIRED) → spikes → RFC authoring.
+Resume point: **S9 complete — RFC authored (`rfcs/0000-polyglot-task-protocol.md`), gates
+green (G1/G2), PLAN-EVAL PASS on record; awaiting IMPL-EVAL verdict on PR #1687, then the
+close routine (evaluate.md mirror, DoD tick, status:ready-merge, bookkeeping push).**
 
 - Branch `claude/harness-profile-rfc-benchmark-shzhgv` restarted on post-#1686 main; draft PR
   **#1687** (labels type:docs area:plugins area:docs rfc ci:skip-e2e ci:skip-scaffold
