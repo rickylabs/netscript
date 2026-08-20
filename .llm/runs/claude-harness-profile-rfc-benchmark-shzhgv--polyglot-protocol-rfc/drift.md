@@ -76,3 +76,11 @@
   above as attempted-and-blocked; no workflow or `models.ts` change made. The qwen pass
   doubles as the closing verification for the IMPL-EVAL two-failure escalation.
   **Status:** resolved — dispatched to qwen3.8-max.
+- **Update (attempt-1 stall + re-dispatch):** qwen attempt 1 (run 32398533310, trigger comment
+  5359497426) ran healthily for ~90 min (evidence read complete, attack scenarios started) then
+  produced no log output from 19:06Z onward (100+ min silent, log length frozen) — stalled
+  mid-model-call. Cancel via API returned 403 (integration token lacks the permission), so the
+  zombie run was left to time out and an identical re-dispatch was posted (trigger comment
+  5361496818, attempt 2, same brief/head 4242a46). The re-dispatch note in the trigger declares
+  attempt 2's verdict the one of record if attempt 1 ever posts late.
+  **Status:** attempt 2 in flight.
