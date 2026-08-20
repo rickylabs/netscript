@@ -135,9 +135,9 @@ BullMQ zombie rule: a worker that fails `init` must exit, be killed, and never b
 Verbs: enqueue (idempotency-key + delay, Restate `Call`/`OneWayCall` shapes), scoped KV
 (prefix-jailed), stream publish (topic-scoped), execution status query, async completion (Temporal
 detached-handle pattern), artifacts (the binary channel — frames stay text). K3 measured the
-round-trip at **0.42–0.70 ms p50** and proved the elegant part: for deno-type tasks, exact-port
-`--allow-net=127.0.0.1:PORT` scoping _is_ the access gate — a wrongly scoped task is denied by the
-permission system before authentication even runs.
+round-trip at **0.49 ms p50 (sandboxed deno) / 0.67 ms p50 (python3)** and proved the elegant part:
+for deno-type tasks, exact-port `--allow-net=127.0.0.1:PORT` scoping _is_ the access gate — a
+wrongly scoped task is denied by the permission system before authentication even runs.
 
 ## Reference-level explanation
 
