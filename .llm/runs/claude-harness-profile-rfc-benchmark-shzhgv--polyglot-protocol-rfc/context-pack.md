@@ -1,6 +1,6 @@
 # Context pack — polyglot-protocol-rfc (run 5)
 
-Resume point: **research phase complete**; next = plan.md (lock decisions from research.md §6
+Resume point: **S9 complete — RFC authored, gates green; awaiting IMPL-EVAL verdict on PR #1687, then close routine.**
 tension register, pre-register verdict criteria + out-of-scope register) → PLAN-EVAL dispatch
 (`status:plan-eval` on PR #1687, separate session, REQUIRED) → spikes → RFC authoring.
 
