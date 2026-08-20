@@ -21,6 +21,12 @@ code only**; engine implementation is follow-up waves (see out-of-scope register
   capability negotiation, in-band cancel/ping-reply control bits, checkpoint, two-phase
   shutdown, per-dispatch attempt tokens.
 - Tier is **computed from conformance-case results**, never asserted (research.md §5).
+- **Checkpoint channel rule (T-5 lock, PLAN-EVAL cycle-1 fix 2)**: checkpoint state ≤ 8 KB
+  serialized rides the next attempt's envelope (`retryContext.checkpoint`); 8 KB–256 KB is
+  delivered as an inbound frame after init (T2) or is truncated-to-ref in T1; > 256 KB must go
+  through the loopback artifacts route with the envelope carrying only the artifact ref. Caps
+  are protocol constants, validated by K1 (frame path) and counted inside the K4 overhead
+  budget; the RFC states the caps normatively.
 
 ## L2 — Locked: two-surface architecture
 
@@ -29,6 +35,13 @@ extendTimeout, checkpoint, init/shutdown); ecosystem access (enqueue, scoped KV,
 publish, status query, async completion, artifacts) is an authenticated **loopback oRPC
 surface** shared by every tier, reusing the existing workers contracts/zod stack. Decision rule
 and forbidden list per `research-sources/callback-surface-analysis.md`.
+
+**T-4 lock (PLAN-EVAL cycle-1 fix 1)**: the loopback surface is **canonical for citizen reads
+and writes in every tier, including T2** — T2 workers do NOT get in-band citizen verbs on the
+peer channel in protocol v1. One surface keeps the capability-token verification path single
+and the conformance matrix honest (Temporal thin-channel precedent). In-band citizen reads are
+reserved as a named v2 extension in the fenced extension space, contingent on measured loopback
+latency pain that v1 does not presume.
 
 ## L3 — Locked: envelope + context
 
@@ -125,9 +138,46 @@ The RFC's recommendation section must follow these, whatever they yield:
    it; integration stays in #1684.
 9. **oRPC v1→v2 migration** of the workers plugin — spikes run against v1; the RFC notes v2
    deltas where they matter.
+10. **D-11 slot accounting (T-8)** — deferred to the supervisor-side maxConcurrency fix
+    (engine bug lane). Protocol v1 makes slot accounting supervisor-internal and reserves no
+    slot verbs; a Hatchet-style protocol-visible slot surface is a T2 v2 candidate that must
+    align with that fix, not precede it (PLAN-EVAL cycle-1 fix 3).
 
 If a reviewer/evaluator believes any of these is actually the point of the request, that is a
 FAIL_RESCOPE conversation, not a silent scope change.
+
+## Commit slices (PLAN-EVAL cycle-1 fix 4)
+
+| Slice | Proves | Gate | Files |
+| --- | --- | --- | --- |
+| S1 (landed 37eee0e, 232d654) | Run bootstrapped with owner lane overrides; PR #1687 open | PR + labels + phase comment | supervisor.md |
+| S2 (landed f621f27) | External corpus ratified, 8 groups + engine audit, critic pass | workflow 18/18, failed_groups=[] | research-sources/ (25 files) |
+| S3 (landed 51060df, d011621) | Critic gaps closed; synthesis complete | workflow 7/7; research gates table | research-sources/ round 2, research.md, worklog.md, context-pack.md |
+| S4 (landed 2a8fb8b + this amendment) | Plan locked; PLAN-EVAL PASS | PLAN-EVAL verdict on PR | plan.md, worklog.md, plan-eval.md |
+| S5 | K1 frame transport + K2 token delivery criteria evaluated | K1/K2 pre-registered criteria; results raw+scripted | bench/spikes/{k1,k2}/, results/raw/ |
+| S6 | K3 loopback reachability + K5 stdin duplex criteria evaluated | K3/K5 criteria; sandbox matrix recorded | bench/spikes/{k3,k5}/, results/raw/ |
+| S7 | K4 overhead through REAL dispatch path + K6 progress replica | K4 bar (≤1.0ms exec-wall delta, ≤5% e2e c=16); K6 SSE ≤500ms p95 | bench/spikes/{k4,k6}/, results/raw/ |
+| S8 | Spike verdicts synthesized, drift recorded | G1 (0 unexplained failures; script-generated results.md) | results/results-spikes.md, drift.md, worklog.md |
+| S9 | RFC authored honoring L9; gates green; IMPL-EVAL handoff | G2 (fmt-clean, zero TBD, claims traced) | rfcs/0000-polyglot-task-protocol.md, context-pack.md |
+
+Slice count 9 (< 30); each carries its own gate and PR comment per the commit-trail rule.
+
+## Risk register (PLAN-EVAL cycle-1 fix 5)
+
+| Risk | Likelihood | Mitigation |
+| --- | --- | --- |
+| K4 overhead bar missed → protocol eats the series' execution wins | medium | Pre-declared envelope drop-to-meet list in spike doc; narrowing is a recorded drift decision (L8), never a widened budget |
+| K5 stdin duplex fails on buffered runtimes (python) → T1 cancellation signal-only | medium | Pre-registered "else" branch; Restate request/response precedent licenses signal-only honestly; RFC states it |
+| K3 loopback unreachable under sandbox flags → T0 citizenship channel-only | low-med | Criteria branch pre-registered (L9-3); deferral is explicit RFC content, not silence |
+| K6 replica drifts from real mutation path → progress claims unsound | medium | Replica mirrors file:line-cited seam (audit §1/§5); RFC marks the shape MEASURED-ON-REPLICA until the implementation wave validates in-plugin |
+| K1 sentinel collision in adversarial logs → misrouted frames | low | 10k-line adversarial corpus incl. sentinel-lookalike/binary/interleaved writes; misroute=0 criterion; fd-3 fallback branch |
+| Second FAIL_PLAN → 2-cycle cap escalation | low | Cycle-1 fixes are checklist-form and fully applied; escalate to owner with unresolved items if cycle 2 fails |
+| Series merge timing (this PR spans phases while owner merges serially) | low | Deferred-push/branch-restart protocol proven 4×; commit-trail per slice keeps the PR reviewable at any point |
+| UNVERIFIED corpus items leaking into normative RFC text | low | research.md §7 register + L9-5 gate; every normative claim cites corpus, spike, or is a marked design assertion |
+
+jsr-audit: **N/A** — docs-only PR; no package/plugin surface changes (G4). The jsr-audit
+applies to the protocol/adapters implementation waves, each in its own run (PLAN-EVAL cycle-1
+fix 6).
 
 ## Gates
 
