@@ -1,0 +1,6 @@
+{"kind":"meta","bench":"k6-progress-chain","startedAt":"2026-08-20T07:46:29.369Z"}
+{"kind":"mode","label":"steady-10evs","evPerSec":10,"framesIn":30,"flushes":30,"delivered":30,"coalesceRatio":1,"latP50Ms":92,"latP95Ms":93.9,"maxMs":94.7,"kvRecordBytes":82,"pass":true}
+{"kind":"mode","label":"burst-100evs","evPerSec":100,"framesIn":200,"flushes":21,"delivered":21,"coalesceRatio":9.52,"latP50Ms":8.1,"latP95Ms":12,"maxMs":53.7,"kvRecordBytes":84,"pass":true}
+{"kind":"honesty","stateApi":"KvExecutionState exposes create/complete/get only — no progress mutation exists (D-12 confirmed at API level); the KV write replicates the PROPOSED progress() shape","streamTransport":"durable-stream producer requires the Aspire-hosted streams service URL; loopback HTTP sink stands in (transport cost bounded by K3: ~0.5 ms p50)","sseNotExercised":true}
+{"kind":"verdict","pass":true,"decision":"Chain shape MEASURED-ON-REPLICA: latency and coalescing meet the bar; RFC cites shape + numbers with replica caveat"}
+{"kind":"summary","finishedAt":"2026-08-20T07:46:34.809Z"}
