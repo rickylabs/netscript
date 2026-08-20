@@ -69,3 +69,10 @@
   policy code; honoring the Grok lane requires an owner-merged workflow allowlist change
   (issue_comment runs execute the MAIN-ref workflow, so a PR-branch edit cannot unblock it).
   Escalated to owner with options. **Status:** blocked on owner.
+- **Update (owner ruling, resolved):** owner chose the open-model fallback — dispatch the
+  adversarial pass to `openrouter/qwen/qwen3.8-max` (allowlisted at both enforcement layers;
+  the broader-eval open model per lane policy). Same brief and dual-verdict contract as the
+  Grok trigger, review head refreshed to the current tip. The Grok exception stays recorded
+  above as attempted-and-blocked; no workflow or `models.ts` change made. The qwen pass
+  doubles as the closing verification for the IMPL-EVAL two-failure escalation.
+  **Status:** resolved — dispatched to qwen3.8-max.
