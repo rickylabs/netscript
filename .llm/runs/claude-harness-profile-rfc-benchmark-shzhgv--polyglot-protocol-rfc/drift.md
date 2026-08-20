@@ -36,3 +36,14 @@
   hygiene that churn is REVERTED, not committed — the spike resolves at run time and nothing
   committed depends on the lock entry. **Severity:** trivial. **Action:** accept; lock kept
   clean.
+
+## 2026-08-20 — R5-D-7: Owner content review — RFC shape rejected (report, not design)
+- Owner review (pre-adversarial-pass): the RFC is grounded in the research but reads as a
+  findings report; an RFC must be an architectural design proposal — concrete APIs, code,
+  proposed packages, worker-plugin integration, refactor list, type safety, extension model.
+  Cross-check against `rfcs/0000-template.md` ("detailed enough that an implementer could
+  build it and a reviewer could spot holes") and the accepted-RFC bar (0001: 1611 lines,
+  40 code fences, ports/type-algebra/staged-plan sections) confirms the gap. **Severity:**
+  significant (deliverable quality). **Action:** revision slice S10 — full reference-level
+  redesign; IMPL-EVAL must be re-dispatched on the revised head (prior PASS pinned to
+  70d101a does not cover the rewrite); adversarial pass deferred until after revision.
