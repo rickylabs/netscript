@@ -46,9 +46,13 @@ specifics in core).
 - Once RFC-5 is ready, **revisit RFCs 1–4** (scriptc, rust-workers, dotnet, golang) with
   per-language citizenship deep-dives against the protocol (the "citizenship addendum" pattern) —
   a follow-up slice/run after RFC-5 stabilizes, not part of the initial RFC-5 draft.
-- Research lane: owner authorized **Claude dynamic workflows with Opus 5 medium agents** to
-  ratify external sources at scale (extracts to `.llm/tmp/docs/`, cited in research.md). Workflow
-  is generator-side research tooling only; evaluator separation unchanged.
+- Research lane: owner authorized **Claude dynamic workflows** with the split ruled 2026-08-20:
+  **Opus 5 medium agents aggregate sources only**; **Fable agents analyze / reverse-engineer /
+  deep-dive**. Workflow is generator-side research tooling only; evaluator separation unchanged.
+- Research corpus destination (owner, 2026-08-20): the aggregate output (raw extracts + per-group
+  analyses) lives **in this run dir** under `research-sources/` — agents write to the
+  `.llm/tmp/docs/` scratch first, and the synthesis slice relocates everything here so the corpus
+  is committed with the run and citable by path from `research.md`.
 
 ## Process corrections carried into this run
 
