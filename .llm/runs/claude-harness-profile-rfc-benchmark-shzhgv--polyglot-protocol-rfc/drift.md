@@ -31,4 +31,8 @@
 
 ## 2026-08-20 — R5-D-6: zod import from run-dir modules
 - Bare `zod` is not in the root import map for run-dir modules; spike imports `npm:zod@4`
-  directly (same major the workspace pins). **Severity:** trivial. **Action:** accept.
+  directly (same major the workspace pins). Running the spike adds one alias line to
+  `deno.lock` (`npm:zod@4` -> already-locked 4.4.3, no new packages); per AGENTS.md lock
+  hygiene that churn is REVERTED, not committed — the spike resolves at run time and nothing
+  committed depends on the lock entry. **Severity:** trivial. **Action:** accept; lock kept
+  clean.
