@@ -62,3 +62,10 @@
 - Limitation: the openhands-agent workflow parses no effort token; "high" effort is carried in
   the prompt instructions + route-identity note, not as an API reasoning parameter.
   **Severity:** minor (recorded exception). **Action:** dispatched; verdict to evaluate.md.
+- **Update (dispatch failed):** run 32381286650 rejected the trigger in 25 s — the workflow
+  itself hard-codes the open-evaluator allowlist (`openhands-agent.yml` "Resolve trigger"
+  step: minimax-m3 / deepseek-v4-flash-0731 / qwen3.8-max) and threw "model is not in the
+  approved open-evaluator allowlist: openrouter/x-ai/grok-4.6". The guard is main-branch
+  policy code; honoring the Grok lane requires an owner-merged workflow allowlist change
+  (issue_comment runs execute the MAIN-ref workflow, so a PR-branch edit cannot unblock it).
+  Escalated to owner with options. **Status:** blocked on owner.
