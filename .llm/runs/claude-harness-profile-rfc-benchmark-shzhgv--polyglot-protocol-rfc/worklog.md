@@ -21,8 +21,15 @@
 
 ## Design
 
-(To be recorded at plan checkpoint — after PLAN-EVAL scope lock. Tension register research.md §6
-enumerates the open design decisions; none locked yet.)
+Checkpoint (pre-PLAN-EVAL): plan.md locks L1–L7 (tiers computed from conformance; two-surface
+architecture; closed versioned envelope with context; structured errors + terminal discipline;
+reserved env namespace + per-attempt opaque token; capability negotiation over version
+handshake with yanked registry; auth-blueprint package split). L8 defines six spikes (K1–K6)
+with pre-registered decision criteria; L9 pre-registers the RFC's own verdict criteria; the
+out-of-scope register applies the completeness-probe correction. Design risks named: K4
+overhead bar is the series-credibility gate (protocol must not eat the 6ms exec-wall class);
+K5 may legitimately fail (then T1 is signal-only, honestly); K6 must not touch plugin source
+(replica harness). All decisions trace to research.md §2–§6 corpus citations.
 
-PLAN-EVAL: **required** (supervisor.md lane table) — not yet dispatched; hard stop before
-implementation slices.
+PLAN-EVAL: **required** — dispatched via `openhands` + `status:plan-eval` on PR #1687. Hard
+stop: no L8 spike slice starts before PASS.
