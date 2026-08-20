@@ -47,3 +47,18 @@
   significant (deliverable quality). **Action:** revision slice S10 — full reference-level
   redesign; IMPL-EVAL must be re-dispatched on the revised head (prior PASS pinned to
   70d101a does not cover the rewrite); adversarial pass deferred until after revision.
+
+## 2026-08-20 — R5-D-8: Owner lane change — adversarial pass to Grok 4.6 high via OpenHands
+- Owner ruling (chat): dispatch the adversarial review to `openrouter/x-ai/grok-4.6` (high
+  effort) through OpenHands instead of the Codex Sol Max session; the pass doubles as the
+  closing verification for the IMPL-EVAL two-failure escalation (head 02b1c6e).
+- Exception recorded: this is a CLOSED/paid model on OpenHands — the skill/dispatcher
+  fail-closed guard (OPEN_EVALUATOR_MODEL_IDS) prohibits it to protect the owner's OpenRouter
+  balance; the owner's explicit instruction IS the cost authorization. The enforced dispatcher
+  rejects the model by design, so the trigger was hand-authored as a PR comment from the owner
+  account (the skill's compatibility path). `x-ai/grok-4.6` verified live on the OpenRouter
+  model registry before dispatch; config pin `models.ts:54` (grok: 4.5) left untouched — this
+  is a one-shot owner exception, not a route change.
+- Limitation: the openhands-agent workflow parses no effort token; "high" effort is carried in
+  the prompt instructions + route-identity note, not as an API reasoning parameter.
+  **Severity:** minor (recorded exception). **Action:** dispatched; verdict to evaluate.md.
