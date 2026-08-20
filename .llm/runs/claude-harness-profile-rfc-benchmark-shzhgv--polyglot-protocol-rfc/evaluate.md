@@ -1,5 +1,46 @@
 # IMPL-EVAL — claude-harness-profile-rfc-benchmark-shzhgv--polyglot-protocol-rfc
 
+## Adversarial pass (owner-commissioned, R5-D-8) — CONCERNS / FAIL_FIX (2026-08-20)
+
+| Field | Value |
+| --- | --- |
+| Evaluator session | OpenHands cloud run 32398533310 (separate session; presumed-stalled "attempt 1" that in fact completed after 4 h 21 m — one very long model call, see drift R5-D-8) |
+| Model / route | `openrouter/qwen/qwen3.8-max` (owner fallback ruling after the Grok 4.6 allowlist rejection) |
+| Review head | 4242a46 (RFC byte-identical to 02b1c6e; evaluator verified this itself) |
+| Verdict | `ADVERSARIAL_VERDICT: CONCERNS` → `OPENHANDS_VERDICT: FAIL_FIX` |
+| Of-record note | The attempt-2 trigger's "attempt 2 governs" clause is SUPERSEDED — its premise (attempt 1 dead) proved false; this completed attempt-1 review on the correct head is the verdict of record. Attempt 2 (run 32416122194) is a duplicate to be cancelled/ignored. |
+
+Architecture explicitly survived attack (tiers, two surfaces, sentinel framing, terminal
+discipline, error model, doctrine-compliant package split — OBSERVATION-1/3). Findings are
+spec-text repairs, all four MAJORs verified by the supervisor against RFC/spike sources
+before disposition:
+
+1. **MAJOR-1** — terminal `result` frames > FRAME_MAX_BYTES (4096) are unrepresentable: edge
+   table demotes them to log ⇒ synthesized `unknown-failure` on a successful run; no size
+   ladder for results (checkpoints have one); T0→T1 upgrade shrinks representable results.
+   VERIFIED (RFC :343, :658, :311-315).
+2. **MAJOR-2** — RETRY/attempt/checkpoint vocabulary has no executor in the five-wave plan;
+   W2's D-5 retirement over-claims (increment-on-retry half retired by nothing). VERIFIED
+   (wave table :670-676, :576).
+3. **MAJOR-3** — normative progress throttle `min(0.8×timeout, 30 s)` (:454) contradicts the
+   K6 replica that validates it (100 ms latest-wins flush, run-k6.ts:66-74); W4 bar unmeetable
+   under the normative constant. VERIFIED (both sources re-read).
+4. **MAJOR-4** — token `exp` fixed TTL (600/3600 s, :551) vs unbounded task timeout; no
+   refresh verb; `GET /v1/credentials` (bootstrap-token-only, :513) not stated attempt-fenced
+   ⇒ potential fence bypass. VERIFIED (grep: no refresh/renew verb exists).
+
+MINOR-1 (K4 +0.41 ms headline is within recomputed 95% CI of zero; host-side 0.06–0.10 ms is
+the robust number), MINOR-2 (edge-table "resolved" vs Unresolved-question contradiction on
+redelivery fencing; tokens never fence engine-side writes), MINOR-3 (no crash-window /
+at-least-once statement for terminal frames), MINOR-4 (four SDK-author ambiguities: deadline
+vs buffered result ordering, T2 frame↔attempt correlation binding, "leases" undefined,
+credentials-route consumer unidentified).
+
+Disposition: returned to owner with a proposed S11 revision slice (all findings are text-level
+per the evaluator's own assessment). This pass closes the IMPL-EVAL two-failure escalation's
+verification question: the eval-loop mechanics were sound, and the independent pass surfaced
+findings the formal cycles did not.
+
 ## Cycle 3 — FAIL_FIX on the fixed head (2026-08-20)
 
 | Field | Value |

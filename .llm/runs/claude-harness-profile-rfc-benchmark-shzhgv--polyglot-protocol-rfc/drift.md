@@ -84,3 +84,15 @@
   5361496818, attempt 2, same brief/head 4242a46). The re-dispatch note in the trigger declares
   attempt 2's verdict the one of record if attempt 1 ever posts late.
   **Status:** attempt 2 in flight.
+- **Update (correction — attempt 1 was NOT dead):** run 32398533310 completed successfully at
+  21:58Z after 4 h 21 m — the 2 h 52 m log silence was one very long model call, not a hang;
+  the stall diagnosis was wrong. It delivered the full adversarial review on head 4242a46:
+  `ADVERSARIAL_VERDICT: CONCERNS` / `OPENHANDS_VERDICT: FAIL_FIX` (4 MAJOR + 4 MINOR, all four
+  MAJORs supervisor-verified; record in evaluate.md). The attempt-2 "of record" clause is
+  superseded (its premise was attempt-1 death): attempt 1 IS the verdict of record. Attempt 2
+  (run 32416122194) started at 21:59Z as a now-redundant duplicate; supervisor cancel calls
+  403 (integration token cannot cancel runs) — owner asked to cancel it from the Actions UI;
+  any output it produces is supplementary, not of record. Lesson: OpenHands log-tail silence
+  is NOT a reliable liveness signal for long single completions; check run conclusion before
+  declaring a stall.
+  **Status:** verdict of record received; disposition returned to owner (S11 proposal).
