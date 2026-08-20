@@ -31,5 +31,6 @@ overhead bar is the series-credibility gate (protocol must not eat the 6ms exec-
 K5 may legitimately fail (then T1 is signal-only, honestly); K6 must not touch plugin source
 (replica harness). All decisions trace to research.md §2–§6 corpus citations.
 
-PLAN-EVAL: **required** — dispatched via `openhands` + `status:plan-eval` on PR #1687. Hard
-stop: no L8 spike slice starts before PASS.
+PLAN-EVAL: cycle 1 FAIL_PLAN (checklist-form; 6 fixes applied in f4ae089) → cycle 2 **PASS**
+(run 32343592955, head f4ae089, all 8 plan-gate boxes; no required amendments). Hard stop
+lifted; slice trail proceeds S5→S9. Mirror: plan-eval.md.

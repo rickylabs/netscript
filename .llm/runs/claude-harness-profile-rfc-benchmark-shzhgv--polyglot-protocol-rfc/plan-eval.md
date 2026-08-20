@@ -25,7 +25,20 @@
 6. jsr-audit N/A line → **applied** (docs-only PR under G4; audits belong to implementation
    waves).
 
-## Cycle 2 — (pending re-dispatch)
+## Cycle 2 — PASS (2026-08-20)
 
-Re-submission via `openhands` + `status:plan-eval` on PR #1687 after the amendment commit.
-Hard stop before L8 spike slices remains in force.
+| Field | Value |
+| --- | --- |
+| Evaluator session | OpenHands cloud run 32343592955 (separate session) |
+| Model / route | `openrouter/minimax/minimax-m3` |
+| Evaluated head | f4ae089 |
+| Verdict | **`OPENHANDS_VERDICT: PASS`** — all 8 plan-gate boxes satisfied; all six cycle-1 amendments verified at head; no required amendments |
+
+Evaluator spot-checks: engine-audit file:line cites verified against the working tree
+(`job-dispatcher.ts:234-240`, `dax-process-runner.ts:89-98`); two-surface model judged
+precedent-aligned; tier computation (not assertion) confirmed; D-9 closure via reserved env
+namespace confirmed; false-done audit clean (implementation/defect-fixes/harness/addenda all
+pre-declared follow-up). Release risk: zero code risk, docs-only.
+
+**Hard stop lifted** — slice trail proceeds S5 (K1+K2) → S6 (K3+K5) → S7 (K4+K6) → S8 spike
+verdicts → S9 RFC authoring.
