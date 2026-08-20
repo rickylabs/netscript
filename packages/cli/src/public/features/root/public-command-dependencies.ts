@@ -1,8 +1,4 @@
-import {
-  AstExtractor,
-  FilesystemWalker,
-  RegistryEmitter,
-} from '@netscript/plugin/sdk';
+import { AstExtractor, FilesystemWalker, RegistryEmitter } from '@netscript/plugin/sdk';
 
 import {
   findProjectRoot as findDeployProjectRoot,
@@ -21,6 +17,7 @@ import { DatabaseScaffolder } from '../../../kernel/adapters/database/scaffolder
 import { DatabaseWorkspaceMutator } from '../../../kernel/adapters/database/workspace-mutator.ts';
 import { resolveManifest } from '../../../kernel/adapters/deploy/commands/manifest-command.ts';
 import { DenoProcess } from '../../../kernel/adapters/runtime/process/deno-process.ts';
+import { DenoGeneratedSourceFormatter } from '../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { DenoFileSystem } from '../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { DryRunFileSystemAdapter } from '../../../kernel/adapters/scaffold/dry-run-fs.ts';
 import { CliffyPrompt } from '../../../kernel/adapters/runtime/prompt/cliffy-prompt.ts';
@@ -68,6 +65,7 @@ import { AspireAppHostDoctorInspector } from '../../../kernel/adapters/aspire/ap
 import { fetchJsrExportMap } from '../../infra/jsr/fetch-jsr-export-map.ts';
 import { resolveUiAppRoot as resolveUiAppRootFromWorkspace } from '../../../kernel/application/ui/resolve-ui-app-root.ts';
 import type { UiAppRootResolver } from '../../presentation/support.ts';
+import type { GeneratedSourceFormatterPort } from '../../../kernel/ports/generated-source-formatter-port.ts';
 
 /** Dependencies shared by public command groups. */
 export interface PublicCommandDependencies {
@@ -123,6 +121,7 @@ export interface PublicCommandDependencies {
     readonly contractScaffolder: ReturnType<typeof createContractScaffolder>;
     readonly serviceScaffolder: ServiceScaffolder;
     readonly clientScaffolder: ServiceClientScaffolder;
+    readonly formatter: GeneratedSourceFormatterPort;
   };
   /** Dependencies for plugin install. */
   readonly pluginInstallDependencies: {
@@ -190,6 +189,7 @@ export function createPublicCommandDependencies(
 ): PublicCommandDependencies {
   const fs = new DenoFileSystem();
   const process = new DenoProcess();
+  const generatedSourceFormatter = new DenoGeneratedSourceFormatter(process);
   const prompt = new CliffyPrompt();
   const templateAdapter = new StringTemplateAdapter(fs);
   const scaffolder = new Scaffolder(templateAdapter, fs);
@@ -222,11 +222,18 @@ export function createPublicCommandDependencies(
       scaffolder,
       templateAdapter,
       templateRegistry: new DefaultContractTemplateRegistry(),
-      versionRegistry: new ContractVersionRegistry(fs),
+      versionRegistry: new ContractVersionRegistry(fs, generatedSourceFormatter),
       workspaceResolver: new ContractWorkspaceResolver(fs),
+      formatter: generatedSourceFormatter,
     }),
-    serviceScaffolder: new ServiceScaffolder(scaffolder, fs, templateAdapter),
-    clientScaffolder: new ServiceClientScaffolder(scaffolder, fs),
+    serviceScaffolder: new ServiceScaffolder(
+      scaffolder,
+      fs,
+      templateAdapter,
+      generatedSourceFormatter,
+    ),
+    clientScaffolder: new ServiceClientScaffolder(scaffolder, fs, generatedSourceFormatter),
+    formatter: generatedSourceFormatter,
   };
   const createInitContext = (initFs: FileSystemPort): InitPipelineContext => {
     const initTemplateAdapter = new StringTemplateAdapter(initFs);

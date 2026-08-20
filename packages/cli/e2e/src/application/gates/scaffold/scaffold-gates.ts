@@ -3,6 +3,7 @@ import { PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import type { RunContext } from '../../../domain/run-context.ts';
 import type { PluginSuiteState } from '../../builders/scaffold/plugin-suite-state.ts';
+import { generatedAppName } from './generated-app-name.ts';
 import { cli, commandGate } from './gate-factory.ts';
 import { createPluginInstallGates } from './plugin-install-gates.ts';
 
@@ -71,6 +72,45 @@ export function createScaffoldGates(state: PluginSuiteState): readonly GateDefin
       scaffoldInitCommand,
     ),
     commandGate(
+      GATE.SCAFFOLD_SERVICE_CLIENT_ADD,
+      'Add a second service with typed client helpers',
+      GATE_PHASE.SCAFFOLD,
+      (context) =>
+        cli(
+          context,
+          'service',
+          'add',
+          '--name',
+          'payments',
+          '--with-client',
+          '--project-root',
+          context.project.projectRoot,
+        ),
+    ),
+    commandGate(
+      GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE,
+      'Reconcile service client and Aspire output',
+      GATE_PHASE.SCAFFOLD,
+      (context) =>
+        cli(context, 'service', 'generate', '--project-root', context.project.projectRoot),
+    ),
+    commandGate(
+      GATE.GENERATED_SERVICE_CLIENT_CONTRACT,
+      'Prove idempotent two-service client and cache-key output',
+      GATE_PHASE.SCAFFOLD,
+      (context) => [
+        'deno',
+        'run',
+        '-A',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/service-client-runtime-probe.ts`,
+        'static',
+        context.project.projectRoot,
+        generatedAppName(context),
+        JSON.stringify(cli(context)),
+      ],
+      (context) => context.project.projectRoot,
+    ),
+    commandGate(
       GATE.SERVICE_LIST,
       'List generated services',
       GATE_PHASE.SCAFFOLD,
@@ -102,6 +142,22 @@ export function createScaffoldGates(state: PluginSuiteState): readonly GateDefin
       'List configured plugins',
       GATE_PHASE.SCAFFOLD,
       (context) => cli(context, 'plugin', 'list', '--project-root', context.project.projectRoot),
+    ),
+    commandGate(
+      GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH,
+      'Prove settled users update invalidates and refetches its list once',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '-A',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/service-client-runtime-probe.ts`,
+        'browser',
+        context.project.projectRoot,
+        generatedAppName(context),
+        context.project.appHost,
+      ],
+      (context) => context.project.projectRoot,
     ),
   ];
 }

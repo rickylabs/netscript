@@ -179,6 +179,27 @@ sides reuse the same oRPC contract instead of a hand-maintained bindings declara
 The always-current symbol list is
 [`deno doc jsr:@netscript/fresh@<version>`](https://jsr.io/@netscript/fresh/doc).
 
+### Preserve server cache age during hydration
+
+When a loader supplies `initialData` to an island query, also pass the timestamp at which that
+snapshot was loaded as `initialDataUpdatedAt`. The public `useQuery` wrapper seeds both the value and
+that timestamp into the shared client, so `staleTime` is measured from the server load instead of
+from browser hydration:
+
+```tsx
+useQuery({
+  queryKey: ordersQueries.list.clientKey(input),
+  queryFn: () => ordersClient.list(input),
+  initialData: props.initialOrders,
+  initialDataUpdatedAt: props.cachedAt,
+  staleTime: 15_000,
+});
+```
+
+An older server snapshot can therefore refetch immediately on hydration, while a snapshot still
+inside `staleTime` remains fresh. Omitting `initialDataUpdatedAt` makes TanStack Query treat the
+snapshot as newly loaded in the browser and discards its real cache age.
+
 ## Docs
 
 - **Web layer — pages, forms, islands, streaming**:

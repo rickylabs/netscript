@@ -1,0 +1,37 @@
+{
+  "gateId": "test",
+  "invocationId": "app-service-client-wiring-s4-f2-test",
+  "argv": [
+    "deno",
+    "task",
+    "test"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-features-1355",
+  "gitHead": "787cfa9281e3b57d5662ea24a5edf169b4275ce0",
+  "actualGitHead": "787cfa9281e3b57d5662ea24a5edf169b4275ce0",
+  "timeoutMs": 3600000,
+  "runnerIdentity": "worker:193278",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "712926b1a81fce6adb1556bca241e4dd1a3d76b45b4420ef13ff0f74b851a51d",
+  "lifecycleId": "worker:193278:app-service-client-wiring-s4-f2-test:1",
+  "outcome": "INTERRUPTED",
+  "claimedAt": "2026-08-15T15:40:12.687Z",
+  "startedAt": "2026-08-15T15:40:12.690Z",
+  "finishedAt": "2026-08-15T15:41:20.565Z",
+  "durationMs": 65272,
+  "exitCode": 143,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 127,
+    "sha256": "d8c71713aba1eb302702bcf55c321886c40fa2beba1801afb19ff811dd358567",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mtest\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all\n",
+    "truncated": false
+  },
+  "reason": "Process interrupted by runner signal"
+}
