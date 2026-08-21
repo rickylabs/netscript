@@ -41,6 +41,54 @@ per the evaluator's own assessment). This pass closes the IMPL-EVAL two-failure 
 verification question: the eval-loop mechanics were sound, and the independent pass surfaced
 findings the formal cycles did not.
 
+### Supplementary review — attempt 2 (run 32416122194, completed 02:10Z, ~5h21m)
+
+The duplicate dispatch was not cancelled and completed with its own full review (same model,
+same head 4242a46): `ADVERSARIAL_VERDICT: CONCERNS` / `OPENHANDS_VERDICT: FAIL_FIX`, 0 BLOCKER /
+6 MAJOR / 7 MINOR / 6 OBSERVATION. Status: SUPPLEMENTARY — the of-record verdict remains
+attempt 1's (recorded above); per the supervisor contract only findings absent from the
+of-record review are folded into the S11 scope. Convergence signal: both independent passes
+found the same retry-engine hole (A1 = MAJOR-2) and the same throttle contradiction
+(A6 = MAJOR-3), and both judged the architecture sound.
+
+Novel findings folded into S11 scope (attempt-2 ids):
+
+- **A2** — redelivery identity unspecified: today each delivery creates a NEW execution record
+  (job-dispatcher.ts:192-245), so attempt-token fencing (step 3) verifies BOTH the live and the
+  redelivered attempt (each "current" in its own record) — the fenced race the edge table
+  promises is not fenced; plus no ordering rule between the two terminal channels (result frame
+  vs `POST /v1/executions/:id/complete`) over an unguarded read-modify-write `#transition`.
+- **A3** — bootstrap-token scope contradiction (":457 per-boot" vs ":535 per-task env") and the
+  credentials exchange not bound to the presenting execution ⇒ cross-task confused-deputy that
+  voids capability scoping. (Sharpens of-record MAJOR-4B into a concrete break.)
+- **A4** — frame/envelope size limits are transport-dependent but legislated universally:
+  T2 checkpoint "8–256 KB via inbound frame" contradicts the 4096-byte frame MUST; envelope
+  payload has NO size bound while env delivery hits MAX_ARG_STRLEN (128 KiB Linux) and the
+  32,767-char Windows env block. (Complements of-record MAJOR-1, which covered result frames.)
+- **A5** — `resultSchema` validation failure has no semantics (payload analogue is specified at
+  :662; the result mirror is silent) — four RFC-conformant divergent behaviors demonstrated.
+- **M1** — cancellation ladder gaps: no `graceMs` default, no SIGTERM→SIGKILL interval, no
+  drain-to-EOF-before-finalize rule (a buffered terminal frame can be discarded on kill).
+- **M2** — duplicate-terminal logs `Protocol.TerminalMissing` (wrong constant; no duplicate
+  member in the vocabulary).
+- **M3** — T2 init silence: demotion vs zombie-kill unresolved; no detection timeout.
+- **M4** — conformance exclusion authority undefined (self-exclusion ⇒ tier inflation).
+- **M5** — token-invalidation trigger list incomplete (lease requeue is not `behavior:RETRY`;
+  GC-paused worker's token stays valid while its replacement runs).
+- **M6** — attempt arithmetic undefined (0- vs 1-based; bump on redelivery?; `retry.remaining`
+  semantics).
+- **M7** — Summary "closed envelope" vs normative `.loose()` open-world MUST — say
+  "closed-vocabulary envelope".
+- **O1/O3/O4 notes** — scope the K4 bar as a c=1 statement and stop citing the c16 delta as an
+  improvement; add the envPassthrough footnote to Goal 2; W1 watch-item: confirm arch:check
+  tolerates `testing/` in a published package.
+
+Attempt-2 items NOT novel (already of-record): A1 (=MAJOR-2), A6 (=MAJOR-3), its O1 (=MINOR-1),
+credentials-consumer ambiguity (=MINOR-4.4), engine-write fencing overlap (=MINOR-2/3).
+
+Consolidated S11 scope: of-record MAJOR-1..4 + MINOR-1..4 PLUS the novel items above.
+All remain RFC-text edits per both evaluators; no spike re-runs required.
+
 ## Cycle 3 — FAIL_FIX on the fixed head (2026-08-20)
 
 | Field | Value |
