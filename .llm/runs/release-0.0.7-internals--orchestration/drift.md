@@ -135,3 +135,30 @@ artifacts.
   leaf would have lost three evaluation cycles.
 - **Evidence:** `git ls-remote origin refs/heads/fix/package-gate-honesty` = `65c5e1ac4`;
   `git cat-file -t 65c5e1ac4` = commit; recreated worktree `rev-parse HEAD` = `65c5e1ac4`, clean.
+
+## 2026-08-23 — S1 dispatch killed mid-turn by supervisor tooling; recovered by same-thread resume
+
+- **What:** The first #1663 S1 dispatch died mid-turn. Supervisor error, not an agent failure.
+- **Source:** I sent `agentic:codex-resume` through Claude Code's Bash `run_in_background: true`.
+  That harness task *owns* the process, and `codex-resume` stays attached to the child turn — so
+  when the background task was stopped, the SIGTERM propagated to the agent. This is the same defect
+  as wrapping an attached launch in `timeout`, which this lane already had written down; the
+  background-task form was not recognised as the same trap.
+- **Expected:** Backgrounding a launch detaches it.
+- **Actual:** The message **had** landed and the turn had begun real S1 work (scanning `.llm/tmp`
+  for its earlier marker/`nearestConfig` prototype) before it was killed. Diagnosis was initially
+  wrong in the other direction: `agentic:codex-status` reported `state: working`, which I first read
+  as proof the turn survived. It is a last-known sample, not a liveness proof. The rollout jsonl mtime
+  frozen across six 30s samples is what settled it — no `task_complete`, no error event, exactly the
+  documented SIGTERM signature.
+- **Severity:** supervisor tooling defect; zero work lost
+- **Action:** Nothing was committed and the leaf stayed clean at `62811a9dd`, so recovery was a
+  same-thread `codex-resume` with the stop condition restated and the interrupted context handed
+  back, so the recovered turn does not re-research. **No second sender was created** — a rival send
+  at this worktree is forbidden; resume of the same thread is the allowed path. Relaunched with
+  `nohup … & disown`, which is the only true detachment.
+- **Lesson promoted** to the operating memory `never-timeout-wrap-agent-launch`: harness-managed
+  background tasks own the process exactly like `timeout` does, and thread liveness must be settled
+  by sampling rollout mtime rather than by reading the `state` field.
+- **Evidence:** frozen rollout mtime `1787489671` across six samples; leaf head unchanged and tree
+  clean at recovery; detached resume pid `778876`.
