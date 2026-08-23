@@ -232,3 +232,43 @@ narrower (carries `_input`/`_output`/`parse`/`safeParse`), not a structural mirr
 Docs-lane read on that: both refutations point away from widening the published contracts surface, so
 the resolution is a coordinator ruling on the boundary, not a docs change. #1671 is parked pending it;
 leaf and PR unmodified at `bd97a7c03a`. This lane opens nothing and takes no scope.
+
+### Forward hook fired — exposure route is merge-blocking on this lane's gate, 2026-08-23
+
+The forward hook I left with the fixes lane ("if a ruling changes what `@netscript/contracts` or
+`@netscript/sdk` publish, that lands on `docs:exports-drift` with contracts in **complete** mode")
+was executed, not left hypothetical. Recorded at `33c1288d2` on `orchestrator/release-0.0.7-fixes`,
+`tier-a-1671.md` § F1 addendum. Probe at `9634735bc0` + the leaf's six paths + exactly the three
+ruled type-only re-exports in `packages/contracts/src/public/mod.ts`, nothing else:
+
+```
+Coverage [contracts]: mode=complete; omitted-symbol-groups=0
+Symbol Drift Error [contracts]: docs/site/reference/contracts/index.md OMITS exported symbol 'BaseContractErrors'
+Symbol Drift Error [contracts]: docs/site/reference/contracts/index.md OMITS exported symbol 'ContractBuilder'
+Symbol Drift Error [contracts]: docs/site/reference/contracts/index.md OMITS exported symbol 'Schema'
+Exports & Symbols drift check: FAIL   (exit 1)
+```
+
+The identical probe **without** the three re-exports is PASS/exit 0, so the three errors are
+attributable to the ruled correction alone. This is merge-blocking at `pages.yml:143-145`, not an
+advisory count — a different class from the `deno doc --lint` diagnostics (10 → 21).
+
+**Docs-lane position on the repair path, since it is this lane's surface.** Clearing those three
+errors means adding rows for `ContractBuilder` and `Schema` to
+`docs/site/reference/contracts/index.md`. This lane's read: **do not.** That page is the
+consumer-facing statement of what `@netscript/contracts` publishes *as its own surface*. Adding rows
+for an upstream oRPC builder class and a standard-schema alias would tell consumers NetScript owns
+and stabilises those types, and would put NetScript's reference docs on the hook for upstream's
+builder algebra. That is a doctrine decision about the published surface, not a lint repair — and it
+reaches the same barrel growth the ruling forbids, from the opposite direction. The gate is behaving
+correctly here: it is refusing to let an unowned type enter the published surface silently.
+
+Consistent with the fixes lane's recommendation 2 (withdraw the exposure ruling, land S4-R #11 plus
+the ten SDK corrections under the existing three-file ceiling, file a #1670-precedent follow-up for
+the residual), which changes no exported symbol name in either package and therefore clears
+`docs:exports-drift` cleanly. This lane authors nothing and files nothing; the ruling is the
+coordinator's.
+
+Standing arrangement confirmed with the fixes lane: nothing currently live changes either package's
+published surface, and this lane hears from them before any readiness attempt if an exposure variant
+is revived.
