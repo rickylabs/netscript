@@ -6,7 +6,7 @@
 | -------------- | ---------------------------------------------------------- |
 | Run ID         | `fix-sdk-typed-error-channel--0.0.7-wave1`                 |
 | Branch         | `fix/sdk-typed-error-channel`                              |
-| Current phase  | `implementation` — S8 A1–A4 prose corrections complete; awaiting focused delta re-review |
+| Current phase  | `implementation` — S9 generated cascade complete; awaiting separate review |
 | Archetype      | `1 — Small Contract` slice                                 |
 | Scope overlays | `docs`                                                     |
 
@@ -14,14 +14,14 @@
 
 PLAN-EVAL is terminal PASS at evaluator commit `f76a3c45b`; S1-S3, S5, and S6 passed their separate
 reviews. IMPL-EVAL returned `PASS-WITH-FINDINGS` at `bcc9f393d`; S7 addressed medium finding F1's
-consumer-doc half. The focused amendment review at `7b0024967` then returned
-`ACCEPT-WITH-FINDINGS`; S8 closes its bounded A1–A4 prose findings on both published pages. The
-migration tables now disclose the literal `SafeFailure` arms and exact-six `baseContract` key space,
-the old `safe()` signature is described precisely, and the bare-promise characteristic uses only
-exported vocabulary. Immutable S8 content head is
-`8e568e49f3b4cff21ead698591abce2db0ec5f5c`; all selected docs/export/scope gates pass there. PR
-#1692 remains the active draft. #1466 still owns metadata definition/export; no metadata vocabulary
-or acceptance claim was introduced.
+consumer-doc half. The focused amendment review at `7b0024967` returned `ACCEPT-WITH-FINDINGS`, S8
+closed A1–A4, and the opposite-family delta review then passed at starting head `587ade9f3`. S9
+refreshes the deterministic generated cascade made stale by the S7/S8 docs edits. Two full ordered
+runs produced the same four outputs byte-for-byte; all freshness, export, and 78 Contracts/SDK tests
+pass at immutable generated-content head `120172c466bf6a3d18da80012145347072377513`. PR #1692 was
+externally observed as ready with `status:ready-merge` at S9 start; the generator left that
+supervisor-owned state untouched because S9 forbids readiness/label mutation. #1466 still owns
+metadata definition/export; no metadata vocabulary or acceptance claim was introduced.
 
 ## Completed
 
@@ -45,11 +45,14 @@ or acceptance claim was introduced.
   #1693 backing for deferred prose plus the `ThrowableError` substitution decision.
 - S8 A1–A4 prose corrections: literal failure arms and exact-six key-space disclosures on both
   pages, precise old `safe()` signature, and exported-only F4 vocabulary.
+- S8 opposite-family A1–A4 delta review PASS at `587ade9f3`.
+- S9 deterministic agent-docs prose → CLI barrel → publish-assets regeneration, with four measured
+  generated paths and two byte-identical complete runs.
 
 ## Next steps
 
-1. Stop after the S8 push and PR #1692 phase receipt.
-2. The separate opposite-family focused A1–A4 delta re-review is coordinator-owned.
+1. Stop after the S9 push and PR #1692 phase receipt.
+2. Any S9 review or further CI/readiness action is coordinator-owned.
 3. Do not self-review, self-certify, request evaluation, flip readiness, or merge.
 
 ## Key decisions
@@ -69,6 +72,10 @@ or acceptance claim was introduced.
 - `packages/sdk/src/ports/service-client.ts`
 - `packages/sdk/tests/readme-doctest_test.ts`
 - `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`
+- `.llm/assets/agent-docs/prose.json.gz`
+- `.llm/assets/agent-docs/provenance.json`
+- `packages/cli/src/kernel/assets/agent-docs.generated.ts`
+- `packages/mcp/src/publish-assets.generated.ts`
 - `docs/site/services-sdk/sdk.md`
 - `docs/site/services-sdk/how-to/discover-services.md`
 - existing files under `.llm/runs/fix-sdk-typed-error-channel--0.0.7-wave1/`
@@ -107,6 +114,13 @@ or acceptance claim was introduced.
 - S8 `check:mcp-export-corpus`: PASS with unchanged SHA-256 `a8f0779228987ed7…`.
 - S8 base-to-head `packages/` and `plugins/` path diff: empty; `deno.lock` and generated corpus
   byte-identical.
+- S9 deterministic cascade: PASS; four measured generated outputs, identical SHA-256 values after
+  each of two full ordered runs.
+- S9 `check:agent-docs-prose`, `check:assets-barrel`, and `check:publish-assets`: PASS at immutable
+  generated-content head `120172c46`.
+- S9 `check:mcp-export-corpus` and `docs:exports-drift`: PASS; semantic corpus SHA-256 remains
+  `a8f0779228987ed7…`.
+- S9 Contracts + SDK suites: PASS, 78 passed / 0 failed.
 
 ## Open questions
 

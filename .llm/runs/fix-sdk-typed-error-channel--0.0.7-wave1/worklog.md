@@ -1777,3 +1777,177 @@ All final commands below ran at immutable content head
 No product, plugin, test, metadata, reference-doc, lock, generated-corpus, PR-body, or supervisor
 comment change was made. No runtime lease, evaluator, review request, label, checkbox, readiness,
 issue mutation, or merge action was performed.
+
+## 2026-08-23 — S9 agent-docs generated cascade
+
+S9 started from the coordinator-specified, clean head
+`587ade9f30e619410a4192daadab137b0548eb88`. That head contains the separate opposite-family A1–A4
+delta-review PASS for S8. CI run `32631459037`, quality job `97174828651`, had failed only because
+S7/S8 changed two `docs/site` inputs without refreshing the downstream agent-docs bundle.
+
+The canonical cascade was run in its dependency order, without hand editing:
+
+1. `deno task gen:agent-docs-prose`
+2. `deno task gen:assets-barrel`
+3. `deno task gen:publish-assets`
+
+### Measured generated path set
+
+The first complete cascade produced this exact `git status --porcelain=v1` set, and the second
+complete cascade retained it:
+
+```text
+ M .llm/assets/agent-docs/prose.json.gz
+ M .llm/assets/agent-docs/provenance.json
+ M packages/cli/src/kernel/assets/agent-docs.generated.ts
+ M packages/mcp/src/publish-assets.generated.ts
+```
+
+No `docs/site/**`, test, non-generated package source, or `deno.lock` path changed. The generated
+content commit is:
+
+```json
+{
+  "commit": "120172c466bf6a3d18da80012145347072377513",
+  "subject": "chore(assets): regenerate agent-docs prose and derived assets",
+  "cause": "S7/S8 SDK docs changes made the agent-docs prose bundle and its derived barrels stale",
+  "handEdited": false
+}
+```
+
+### Determinism — complete cascade pass 1 versus pass 2
+
+Every measured path was byte-identical after the two full ordered runs:
+
+```json
+{
+  "outcome": "PASS",
+  "runs": 2,
+  "paths": [
+    {
+      "path": ".llm/assets/agent-docs/prose.json.gz",
+      "pass1Sha256": "5082cf83b11ddfe64ac26f1c37c719074c55e244382ade26d310861b53348df0",
+      "pass2Sha256": "5082cf83b11ddfe64ac26f1c37c719074c55e244382ade26d310861b53348df0"
+    },
+    {
+      "path": ".llm/assets/agent-docs/provenance.json",
+      "pass1Sha256": "fee682e73c243a207fd8e83557d5a96a62acf95f7ec1f3c14294e3908289e8b7",
+      "pass2Sha256": "fee682e73c243a207fd8e83557d5a96a62acf95f7ec1f3c14294e3908289e8b7"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/agent-docs.generated.ts",
+      "pass1Sha256": "b838cd7505b10ba0f24c0da3c8836ceed1a9ab1e975168d1fc0bbdd20b05246a",
+      "pass2Sha256": "b838cd7505b10ba0f24c0da3c8836ceed1a9ab1e975168d1fc0bbdd20b05246a"
+    },
+    {
+      "path": "packages/mcp/src/publish-assets.generated.ts",
+      "pass1Sha256": "5fec4b20254a3fa9fa7d1f0dad4bdad10b00d41e9737da96711a2956f5ca90c3",
+      "pass2Sha256": "5fec4b20254a3fa9fa7d1f0dad4bdad10b00d41e9737da96711a2956f5ca90c3"
+    }
+  ]
+}
+```
+
+### Exact-head structured gate receipts
+
+All selected gates ran at immutable generated-content head
+`120172c466bf6a3d18da80012145347072377513`. An initial durable-runner preflight used the abbreviated
+SHA `120172c46` and was rejected before gate execution because the runner requires exact string
+equality. No receipt was produced by that rejected invocation. Every evidence-bearing invocation
+below uses the full SHA and has `gitHead == actualGitHead`, with no waiver.
+
+```json
+{
+  "gateId": "agent-docs-prose",
+  "invocationId": "sdk-typed-error-s9-agent-docs-prose",
+  "gitHead": "120172c466bf6a3d18da80012145347072377513",
+  "actualGitHead": "120172c466bf6a3d18da80012145347072377513",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "durationMs": 12160,
+  "requestHash": "9c24d015c0c7d72d724e0e4010be07cf3c7faae01ccbdd6c2c57e2d0549275a8",
+  "fresh": true,
+  "stalePaths": []
+}
+```
+
+```json
+{
+  "gateId": "assets-barrel",
+  "invocationId": "sdk-typed-error-s9-assets-barrel",
+  "gitHead": "120172c466bf6a3d18da80012145347072377513",
+  "actualGitHead": "120172c466bf6a3d18da80012145347072377513",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "durationMs": 717,
+  "requestHash": "57ec4456cfbca0a889aba6c5d395bf015da244e36140a98b93871567ee4c5a39"
+}
+```
+
+```json
+{
+  "gateId": "publish-assets",
+  "invocationId": "sdk-typed-error-s9-publish-assets",
+  "gitHead": "120172c466bf6a3d18da80012145347072377513",
+  "actualGitHead": "120172c466bf6a3d18da80012145347072377513",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "durationMs": 315,
+  "requestHash": "a10cf114c57501fc9d391b35a009d7beca76250784c361472f77f6ac0bf17f8b"
+}
+```
+
+```json
+{
+  "gateId": "check:mcp-export-corpus",
+  "gitHead": "120172c466bf6a3d18da80012145347072377513",
+  "actualGitHead": "120172c466bf6a3d18da80012145347072377513",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "unchanged": true,
+  "sha256": "a8f0779228987ed7e304dc032d45d1488b0cfb651b088d563c1e17fbafa2fb0b",
+  "generatedFileSha256": "f7bbc8925481e8682f84f9057263387030838e6bc7ee366c56e98a9b2829f904",
+  "packageCount": 35,
+  "subpathCount": 270,
+  "symbolCount": 7611
+}
+```
+
+```json
+{
+  "gateId": "docs:exports-drift",
+  "gitHead": "120172c466bf6a3d18da80012145347072377513",
+  "actualGitHead": "120172c466bf6a3d18da80012145347072377513",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "summary": "Exports & Symbols drift check: PASS"
+}
+```
+
+```json
+{
+  "gateId": "contracts-sdk-tests",
+  "command": ["deno", "test", "--reporter=tap", "--allow-all", "packages/contracts", "packages/sdk"],
+  "gitHead": "120172c466bf6a3d18da80012145347072377513",
+  "actualGitHead": "120172c466bf6a3d18da80012145347072377513",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "durationMs": 5601,
+  "summary": { "passed": 78, "failed": 0, "ignored": 0, "totalResults": 78, "uniqueFailures": 0 }
+}
+```
+
+After the checks, the worktree was clean. `deno.lock` remained byte-identical at SHA-256
+`edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`. The MCP export corpus did
+not move; no decoded attribution was needed.
+
+At S9 start, PR #1692 was externally observed as ready with sole `status:ready-merge`, despite the
+brief describing it as draft. S9 forbids readiness and label mutations, so this generator did not
+change that supervisor-owned state. No runtime lease, evaluator, review, issue, checkbox, metadata,
+or merge action was performed.

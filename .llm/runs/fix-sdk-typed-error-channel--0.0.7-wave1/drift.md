@@ -175,3 +175,26 @@
   byte-identical. The corpus guard retains SHA-256
   `a8f0779228987ed7e304dc032d45d1488b0cfb651b088d563c1e17fbafa2fb0b`.
 - **Outcome:** Documentation-only precision repair; no product-contract or public-surface change.
+
+## 2026-08-23 — S9 resolves the agent-docs generated cascade
+
+- **Trigger:** CI run `32631459037`, quality job `97174828651`, failed only
+  `check:agent-docs-prose` because the S7/S8 `docs/site` edits are inputs to the generated prose
+  bundle.
+- **Scope ruling:** The coordinator explicitly authorized whatever the three canonical generators
+  write, including derived generated `packages/**` assets. This supersedes the earlier slice-local
+  prohibition on package paths only for S9 generator output; product/docs source remains frozen.
+- **Measured output:** Exactly four paths changed: `.llm/assets/agent-docs/prose.json.gz`,
+  `.llm/assets/agent-docs/provenance.json`,
+  `packages/cli/src/kernel/assets/agent-docs.generated.ts`, and
+  `packages/mcp/src/publish-assets.generated.ts`.
+- **Determinism:** Two complete prose → assets-barrel → publish-assets cascades produced identical
+  SHA-256 values for every measured output. No generated file was hand-edited.
+- **Surface isolation:** The MCP export corpus remained unchanged at semantic SHA-256
+  `a8f0779228987ed7e304dc032d45d1488b0cfb651b088d563c1e17fbafa2fb0b`; `deno.lock`, docs source,
+  tests, and non-generated package source did not move.
+- **External-state drift:** At S9 start, PR #1692 was already ready and carried sole
+  `status:ready-merge`, while the S9 brief described it as draft. Because readiness/label mutation
+  is explicitly forbidden, the generator recorded the observed state and did not alter it.
+- **Outcome:** Pure deterministic generated cascade; all selected S9 gates pass at content head
+  `120172c466bf6a3d18da80012145347072377513`.
