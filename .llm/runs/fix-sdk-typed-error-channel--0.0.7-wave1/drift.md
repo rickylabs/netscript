@@ -157,3 +157,21 @@
   exported `SafeFailure`, `safe`, `isDefinedError`, and `DefinedError` vocabulary. Do not edit the
   supervisor-owned PR body/comment or any package/plugin/test/generated/lock path.
 - **Severity:** documentation precision; no product-contract change.
+
+## 2026-08-23 — S8 A1–A4 prose corrections completed without surface drift
+
+- **Resolution:** Both consumer migration tables now disclose the old single `SafeFailure` arm
+  becoming literal defined/non-defined arms and the open `baseContract` key space tightening to the
+  exact six codes. They precisely distinguish the old `SafeResult<TOutput>` default from old
+  `safe<TOutput>`, which had no `TError` parameter.
+- **Published vocabulary:** The bare-promise characteristic in the SDK page now uses only exported
+  `SafeFailure`, `safe`, `isDefinedError`, and `DefinedError` vocabulary; private implementation
+  names and the test path are absent.
+- **Preserved claims:** The tuple form remains explicitly available, while the documented migration
+  continues to recommend literal discriminant branching. All earlier 0.0.7 breaking disclosures
+  remain intact.
+- **Scope proof:** Relative to S8 base `34eb1f5245d578dce01c88046aa22f8f6deabf02`, no
+  `packages/` or `plugins/` path changed; `deno.lock` and the generated export corpus are
+  byte-identical. The corpus guard retains SHA-256
+  `a8f0779228987ed7e304dc032d45d1488b0cfb651b088d563c1e17fbafa2fb0b`.
+- **Outcome:** Documentation-only precision repair; no product-contract or public-surface change.

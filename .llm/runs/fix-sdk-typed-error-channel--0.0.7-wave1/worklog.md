@@ -1640,3 +1640,140 @@ All final commands below ran at immutable content head
 not inferred from that gate. No package, test, reference-doc, lock, or generated-corpus file was
 changed. No runtime lease, evaluator, review request, label, checkbox, readiness, issue mutation, or
 merge action was performed.
+
+## 2026-08-23 — S8 amendment-review prose corrections A1–A4
+
+Starting head: `34eb1f5245d578dce01c88046aa22f8f6deabf02`. The focused opposite-family
+amendment review at `7b0024967` returned `ACCEPT-WITH-FINDINGS`; S8 corrects its four bounded prose
+findings without changing product, tests, generated output, or the lock.
+
+### Finding dispositions
+
+| Finding | Correction on both consumer pages |
+| --- | --- |
+| A1 — `SafeFailure` arm change omitted | The migration tables now state that the old single failure arm exposed `isDefined: boolean`, while 0.0.7 exposes literal `false` and `true` arms. Consumers that typed the property as an undifferentiated boolean or narrowed one arm must branch on the literal. |
+| A2 — `baseContract` key-space tightening omitted | The tables now state the open error-map key space is the exact six-code union: `NOT_FOUND`, `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMITED`, and `SERVICE_UNAVAILABLE`. Comparing against an undeclared code is now a type error—both an intended safety benefit and a consumer break. |
+| A3 — private vocabulary in the F4 explanation | The SDK page now uses only exported `SafeFailure`, `safe`, `isDefinedError`, and `DefinedError` vocabulary. It retains the exact behavior: a bare promise's defined arm is unreachable to the type checker but may occur at runtime, so the promise must carry contract error typing for a typed defined arm. Private helper/type names and the test path were removed. |
+| A4 — old `safe()` signature overstated | The tables now say old `SafeFailure`/`SafeResult` defaulted `TError` to `unknown`, while old `safe<TOutput>` had no `TError` parameter and inherited that default through `SafeResult<TOutput>`. |
+
+The existing sentence “The tuple form has **not** been removed” is byte-for-byte retained on both
+pages. The `null` → `undefined`, `unknown` → `Error`, `ServiceClientMethod`, `PromiseLike` → marked
+`Promise`, discriminated-result migration, and explicit pre-1.0/not-patch-compatible disclosures are
+also retained.
+
+### Breaking-marked content commit
+
+```json
+{
+  "commit": "8e568e49f3b4cff21ead698591abce2db0ec5f5c",
+  "subject": "docs(sdk)!: complete typed-error migration disclosure",
+  "breakingFooter": "BREAKING CHANGE: SafeFailure now has literal defined and non-defined arms, and baseContract rejects error codes outside its six declared literals. This extends the documented 0.0.7 pre-1.0 migration; it is not patch-compatible. See PR #1692.",
+  "debtReference": "Refs #1693"
+}
+```
+
+### Exact-head structured gate receipts
+
+All final commands below ran at immutable content head
+`8e568e49f3b4cff21ead698591abce2db0ec5f5c`:
+
+```json
+{
+  "gateId": "check:mcp-export-corpus",
+  "gitHead": "8e568e49f3b4cff21ead698591abce2db0ec5f5c",
+  "actualGitHead": "8e568e49f3b4cff21ead698591abce2db0ec5f5c",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "unchanged": true,
+  "sha256": "a8f0779228987ed7e304dc032d45d1488b0cfb651b088d563c1e17fbafa2fb0b",
+  "packageCount": 35,
+  "subpathCount": 270,
+  "symbolCount": 7611
+}
+```
+
+```json
+{
+  "gateId": "s8-packages-plugins-scope",
+  "command": "git diff --name-only 34eb1f5245d578dce01c88046aa22f8f6deabf02..HEAD -- packages/ plugins/",
+  "gitHead": "8e568e49f3b4cff21ead698591abce2db0ec5f5c",
+  "actualGitHead": "8e568e49f3b4cff21ead698591abce2db0ec5f5c",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "paths": [],
+  "denoLock": "BYTE_IDENTICAL",
+  "exportCorpusGeneratedFile": "BYTE_IDENTICAL"
+}
+```
+
+```json
+{
+  "gateId": "docs:snippets",
+  "gitHead": "8e568e49f3b4cff21ead698591abce2db0ec5f5c",
+  "actualGitHead": "8e568e49f3b4cff21ead698591abce2db0ec5f5c",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "census": {
+    "scanned": 581,
+    "ts": 213,
+    "tsx": 78,
+    "typescript": 7,
+    "tsLike": 298,
+    "tier1": 36,
+    "checked": 22,
+    "exempt": 14,
+    "outsideFloor": 262,
+    "malformed": 0
+  }
+}
+```
+
+```json
+{
+  "gateId": "docs:accuracy",
+  "invocationId": "sdk-typed-error-s8-docs-accuracy",
+  "gitHead": "8e568e49f3b4cff21ead698591abce2db0ec5f5c",
+  "actualGitHead": "8e568e49f3b4cff21ead698591abce2db0ec5f5c",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "durationMs": 8275,
+  "requestHash": "248e287e45996f0342949331ff5c4dc2bc3869f435fd6e5e4f49dbf6ba62a36e",
+  "summary": "199 published source pages; 91/91 root/direct public commands from 149 recursive paths",
+  "nonBlockingExistingWarning": "@tanstack/ai-preact expects @tanstack/ai ^0.41.0; resolved 0.39.1"
+}
+```
+
+```json
+{
+  "gateId": "docs:links",
+  "gitHead": "8e568e49f3b4cff21ead698591abce2db0ec5f5c",
+  "actualGitHead": "8e568e49f3b4cff21ead698591abce2db0ec5f5c",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "docs": 103,
+  "brokenLinks": 0,
+  "brokenAnchors": 0,
+  "orphans": 0
+}
+```
+
+```json
+{
+  "gateId": "docs:exports-drift",
+  "gitHead": "8e568e49f3b4cff21ead698591abce2db0ec5f5c",
+  "actualGitHead": "8e568e49f3b4cff21ead698591abce2db0ec5f5c",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "summary": "Exports & Symbols drift check: PASS"
+}
+```
+
+No product, plugin, test, metadata, reference-doc, lock, generated-corpus, PR-body, or supervisor
+comment change was made. No runtime lease, evaluator, review request, label, checkbox, readiness,
+issue mutation, or merge action was performed.
