@@ -102,3 +102,36 @@ artifacts.
   author. #1663 stays draft at `65c5e1ac4`, `status:plan-eval`, awaiting owner disposition.
 - **Evidence:** `plan-eval.md` §5-§7 at `65c5e1ac4`; supervisor reproduction and bounds audit in
   `worklog.md`; PR #1663 phase comment and rewritten Validation/Harness sections.
+
+## 2026-08-23 — Owner granted the cycle-3 F1 fix; Tier-A stands in for the plan gate
+
+- **What:** After the third `FAIL_PLAN`, the owner granted the fix as a **directed author
+  amendment**, with the topic supervisor's Tier-A review standing in for the plan gate.
+- **Source:** Owner disposition of the cycle-3 escalation.
+- **Expected:** A third `FAIL_PLAN` returns the leaf to the owner with no further evaluator.
+- **Actual:** The owner disposed it by granting the repair rather than parking the leaf. No cycle 4
+  and no fourth evaluator exists; the gate is discharged by Tier-A instead.
+- **Severity:** authorized process exception
+- **Action:** Resume the preserved Codex author `01a004ec-86a6-7c21-8886-81c09de099f5` under
+  `briefs/1663-plan-amendment-owner-granted.md` for an artifact-only amendment; supervisor performs
+  fresh Tier-A afterwards. Implementation stays blocked until that Tier-A passes.
+- **Evidence:** `briefs/1663-plan-amendment-owner-granted.md`; `plan-eval.md` §5 at `65c5e1ac4`.
+
+## 2026-08-23 — Leaf worktree deleted by unrelated host cleanup; recreated with no loss
+
+- **What:** `/home/codex/repos/netscript-007-package-gate` was removed from disk and deregistered
+  from `git worktree list`, and the local `fix/package-gate-honesty` branch ref was deleted, within
+  minutes of the cycle-3 evaluator being released.
+- **Source:** Not this lane. `git worktree prune` reported nothing stale, so the removal was a clean
+  `worktree remove`, consistent with one of the host's `cleanup-agent` sessions.
+- **Expected:** A leaf worktree persists until its lane retires it.
+- **Actual:** No work was lost. The evaluator had pushed by explicit refspec, so `origin/…` held
+  `65c5e1ac4`; the commit object was still reachable; PR #1663 was untouched at the same head.
+- **Severity:** infrastructure event, zero data loss
+- **Action:** Re-fetched the branch, recreated the worktree from `origin/fix/package-gate-honesty`
+  at exactly `65c5e1ac4` (clean, all run artifacts and `codex-thread-ids.md` restored), and left the
+  branch **without** an upstream per this leaf's recorded push rule. The author's 4 MB rollout is
+  intact. **Lesson: the explicit-refspec push rule is what made this a non-event** — an unpushed
+  leaf would have lost three evaluation cycles.
+- **Evidence:** `git ls-remote origin refs/heads/fix/package-gate-honesty` = `65c5e1ac4`;
+  `git cat-file -t 65c5e1ac4` = commit; recreated worktree `rev-parse HEAD` = `65c5e1ac4`, clean.
