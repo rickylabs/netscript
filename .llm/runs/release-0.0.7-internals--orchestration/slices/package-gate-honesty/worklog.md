@@ -19,10 +19,11 @@
   consumer receives marker-aware, nearest-config-batched lint selection.
 - `@netscript/mcp` keeps `GUIDANCE_RANKING_POLICY` internal to its source graph; only the rationale
   comment and test change.
-- Root Deno configuration carries the top-level doctor-family exclusion to stop raw root formatter
-  walks from reverting fixture-local-default formatting, but removes the `fmt:check` task's
-  wrapper-level family exclusion. The top-level entry does not satisfy standalone wrapper
-  acceptance.
+- Root Deno configuration appends the doctor family to the existing `fmt.exclude` list solely to
+  stop raw `deno fmt` walks from reverting fixture-local-default formatting. It does not use
+  top-level `exclude`, must not affect `check`/`lint`/`test` selection, and removes the `fmt:check`
+  task's wrapper-level family exclusion. Root `lint.exclude` retains its doctor entry because nested
+  config precedence keeps explicitly named healthy files genuinely linted.
 - The optimized fmt/lint wrappers gain two shared conventions: a marker excludes only its own
   subtree, and selected files are grouped by effective nearest Deno config before explicit argv is
   built. Nearest-config lookup is memoized per normalized directory before root-scale use.
@@ -51,20 +52,20 @@
 
 ### Commit slices
 
-| #  | Slice                                                                                                                                                    | Gate                                                                                                                                       | Exact files                                       |
-| -- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
-| S1 | Make optimized MCP fmt/lint selection marker- and config-aware while retaining every unmarked sibling; regenerate the published CLI consumer tool asset. | Both exact wrappers green at 114 + marked/unmarked/config-batch tests + negative controls + doctor/semantic proof + `check:assets-barrel`. | Eight exact S1 paths in `plan.md`                 |
-| S2 | Make all three CLI tests package-cwd independent without weakening assertions.                                                                           | Structured targeted 6/6 + exact package task + docs gates; final runtime consumer in S4.                                                   | Three exact CLI files in `plan.md`                |
-| S3 | Pin close-score policy on both sides and record rationale.                                                                                               | Targeted test + widen/narrow RED controls + scoped MCP/quality gates.                                                                      | `guidance-index.ts`; `guidance-retrieval_test.ts` |
-| S4 | Integrated evidence for the applicable frozen gate set.                                                                                                  | Static/test/docs/publish/JSR/generated-asset freshness gates; `scaffold.runtime` recorded coordinator-waived `n/a`.                        | Run artifacts/evidence only                       |
+| #  | Slice                                                                                                                                                                                    | Gate                                                                                                                                                                          | Exact files                                       |
+| -- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| S1 | Make optimized MCP fmt/lint selection marker- and config-aware while retaining every unmarked sibling; preserve doctor check coverage; regenerate the published CLI consumer tool asset. | Both exact wrappers green at 114 + marked/unmarked/config-batch equality tests + doctor scoped check 5/0 + negative controls + doctor/semantic proof + `check:assets-barrel`. | Eight exact S1 paths in `plan.md`                 |
+| S2 | Make all three CLI tests package-cwd independent without weakening assertions.                                                                                                           | Structured targeted 6/6 + exact package task + docs gates; final runtime consumer in S4.                                                                                      | Three exact CLI files in `plan.md`                |
+| S3 | Pin close-score policy on both sides and record rationale.                                                                                                                               | Targeted test + widen/narrow RED controls + scoped MCP/quality gates.                                                                                                         | `guidance-index.ts`; `guidance-retrieval_test.ts` |
+| S4 | Integrated evidence for the applicable frozen gate set.                                                                                                                                  | Static/test/docs/publish/JSR/generated-asset freshness gates; `scaffold.runtime` recorded coordinator-waived `n/a`.                                                           | Run artifacts/evidence only                       |
 
 ### Deferred scope
 
 - Any fourteenth product/config path, other wrapper/CI change, docs edit, malformed-fixture repair,
   public API change, dependency update, or algorithm change.
 - `scaffold.runtime`, Aspire, Docker, and `e2e:cli`; the gate is waived `n/a`, not pending.
-- All implementation until Tier-A/owner escalation disposes the cycle-2 `FAIL_PLAN`; no cycle 3 is
-  requested or assumed.
+- All implementation until the topic supervisor completes the owner-authorized Tier-A stand-in
+  review. Cycle 3 was final; no cycle 4 or further evaluator exists.
 
 ### Contributor path
 
@@ -90,6 +91,8 @@ score order. Then prove both green behavior and a controlled red mutation throug
 | 2026-08-15 | plan      | final 114-file proof       | Both exact no-extra-flag wrappers green; all four healthy TS files individually named selected; doctor/parsed meaning/hash/negative-control requirements proved.                                                                                                   |
 | 2026-08-15 | plan-eval | cycle 2                    | `FAIL_PLAN` at evaluator commit `c415daad2`: planned lint-wrapper bytes also ship in the published CLI asset barrel; ordinary two-cycle allowance exhausted.                                                                                                       |
 | 2026-08-15 | plan      | thirteenth-path grant      | Coordinator granted canonical regeneration of exactly `agent-tools.generated.ts`, required generated-asset freshness, removal of the root task-level parent skip, corrected fixture-style wording, and nearest-config memoization. No implementation file changed. |
+| 2026-08-23 | plan-eval | cycle 3 final              | Owner-authorized `FAIL_PLAN` at `65c5e1ac4`: prior repairs and 114/2 acceptance passed, but planned top-level `exclude` silently removed all five doctor TS files from `deno check`. No cycle 4 exists.                                                            |
+| 2026-08-23 | plan      | owner-granted F1 amendment | Keep thirteen paths; move raw-walk protection to the existing `fmt.exclude` list, add explicit config-precedence/check-coverage obligations, retain justified `lint.exclude`, and hand off to Tier-A as the final plan gate.                                       |
 
 ## Decisions
 
@@ -97,6 +100,7 @@ score order. Then prove both green behavior and a controlled red mutation throug
 | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
 | Child-only marker + memoized nearest-config batching | Only the marked broken subtree may leave selection; grouping prevents config poisoning while keeping all four healthy files visible, and directory memoization makes the same rule viable at root scale. | plan L3/L4/L11; corrected pre-plan proof |
 | Canonically regenerated published lint asset         | `run-deno-lint.ts` is embedded in published CLI source; freshness and consumer behavior must be explicit.                                                                                                | cycle-2 F1; plan L7                      |
+| Section-scoped fmt exclusion only                    | Top-level root exclusion silently drops doctor files from `deno check`; existing `fmt.exclude` protects only raw formatter walks.                                                                        | cycle-3 F1; plan L3/L10                  |
 | Module-derived paths                                 | Package cwd is the defect; module location is stable.                                                                                                                                                    | plan L1/L2                               |
 | Bidirectional score controls                         | Current identity ordering masks both threshold directions.                                                                                                                                               | research R10-R12; plan L5/L6             |
 | Formal PLAN-EVAL                                     | Multi-member/config/docs/JSR/runtime interactions are decision-heavy.                                                                                                                                    | run-loop §4; plan judgement              |
@@ -115,6 +119,8 @@ score order. Then prove both green behavior and a controlled red mutation throug
 | Coordinator granted the exact formatting-only twelfth path after the honest 114-file finding.                       | significant authorized rescope | yes                |
 | Cycle 2 exposed the published lint-wrapper asset and generated freshness gate omitted by the twelve-path plan.      | significant plan correction    | yes                |
 | Coordinator granted the generated barrel as exact path thirteen and ruled on root task exclusion/style wording.     | significant authorized rescope | yes                |
+| Cycle 3 proved the planned top-level exclusion causes a silent five-file `deno check` coverage regression.          | significant plan correction    | yes                |
+| Owner granted the in-path `fmt.exclude` amendment and Tier-A stand-in review; no fourth evaluator.                  | significant authorized fix     | yes                |
 
 ## Gate results
 
@@ -172,9 +178,10 @@ The original bytes are correctly formatted under root options (`singleQuote: tru
 the wrapper correctly applies `healthy/deno.json` as the nearest authoritative config. Because that
 fixture config has no `fmt` options, Deno defaults (double quotes, width 80) apply and the same
 bytes are fixture-local-default-style-invalid. Three healthy TS files already pass those defaults.
-The coordinator granted this exact formatting-only twelfth path after the scratch proof. The
-top-level root exclusion is retained so raw root formatter walks cannot flip the normalized file
-back to root style. The planned change is exactly:
+The coordinator granted this exact formatting-only twelfth path after the scratch proof. The doctor
+family is appended to the existing root `fmt.exclude` array so only raw `deno fmt` walks are kept
+from flipping the normalized file back to root style; top-level `exclude` is forbidden because it
+silently drops doctor files from `deno check`. The planned change is exactly:
 
 ```diff
 -const config: { readonly plugins: readonly string[] } = { plugins: ['workers'] };
@@ -202,6 +209,20 @@ prototype and running `deno task gen:assets-barrel` exited 0 and changed only
 This proof is recorded at `plan-eval.md` §7. The checkout generated file remains untouched. Future
 implementation must regenerate it canonically and never hand-edit it.
 
+### Executed cycle-3 exclusion-key proof (archive copies, not checkout)
+
+The final evaluator and topic supervisor independently reproduced the key asymmetry on Deno 2.9.5:
+
+| Planned config shape                             | Fmt/lint result                                                                                                                | Check result                                                                                                                                             | Verdict                  |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| Doctor family in top-level root `exclude`        | Exact fmt/lint remain green at 114/2 because nested config takes precedence for explicit argv.                                 | Direct healthy check prints `Warning No matching files found` at exit 0; mixed checks silently omit it; the wrapper may count 115 while Deno checks 110. | Rejected false green.    |
+| Doctor family appended to existing `fmt.exclude` | Raw `deno fmt` walk remains protected; exact fmt/lint stay green at 114/2; root `fmt:check` is 2038/36 with no failed batches. | Direct checks emit both healthy/broken `Check` lines; scoped doctor wrapper reports `filesSelected:5, failedBatches:0`.                                  | Owner-granted amendment. |
+
+Nested `deno.json` precedence applies to explicitly named `fmt`/`lint` files but not `deno check`.
+Root `lint.exclude` therefore keeps the doctor entry: the healthy lint negative still fires through
+the nested config. The unrelated `.llm/` lint exclusion remains deferred. L11 tests compare config
+grouping and batch membership with and without memoization; timing is not the assertion.
+
 ### Static gates
 
 | Gate                 | Command or check                                      | Result | Notes                                                        |
@@ -210,10 +231,10 @@ implementation must regenerate it canonically and never hand-edit it.
 
 ### Fitness gates
 
-| Gate             | Result                | Evidence                                       | Notes                                                                                                                                     |
-| ---------------- | --------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Plan-Gate        | cycle 2 `FAIL_PLAN`   | `plan-eval.md` at evaluator commit `c415daad2` | Ordinary two-cycle allowance exhausted; plan repaired for Tier-A/owner escalation, with no cycle 3 requested.                             |
-| JSR surface scan | PASS (planning input) | `research.md` JSR section                      | No export/API shape delta, but the published CLI embedded tool text/hash delta is now explicit; both members receive full planned audits. |
+| Gate             | Result                    | Evidence                                       | Notes                                                                                                                                     |
+| ---------------- | ------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Plan-Gate        | cycle 3 final `FAIL_PLAN` | `plan-eval.md` at evaluator commit `65c5e1ac4` | Owner granted the bounded F1 amendment; no cycle 4/further evaluator. Topic-supervisor Tier-A review stands in for the plan gate.         |
+| JSR surface scan | PASS (planning input)     | `research.md` JSR section                      | No export/API shape delta, but the published CLI embedded tool text/hash delta is now explicit; both members receive full planned audits. |
 
 ### Runtime gates
 
@@ -229,9 +250,9 @@ implementation must regenerate it canonically and never hand-edit it.
 
 ## Handoff notes
 
-- Tier-A should review the repaired thirteen-path plan: child-only marker plus memoized
-  nearest-config batching, all four healthy files retained, fixture-local-default normalization,
-  task-level parent exclusion removed, and canonical published-asset regeneration/freshness.
-- No implementation authority exists until Tier-A/owner escalation disposes the exhausted cycle-2
-  `FAIL_PLAN`. This thread does not request or assume cycle 3; `scaffold.runtime` is waived and must
-  not run.
+- Tier-A should review the owner-amended thirteen-path plan: child-only marker plus memoized
+  nearest-config batching, existing `fmt.exclude` raw-walk boundary, doctor check coverage 5/0,
+  retained healthy lint coverage, fixture-local normalization, task-level parent exclusion removed,
+  and canonical published-asset regeneration/freshness.
+- No implementation authority exists until that Tier-A stand-in review passes. There is no cycle 4
+  or further evaluator; `scaffold.runtime` is waived and must not run.

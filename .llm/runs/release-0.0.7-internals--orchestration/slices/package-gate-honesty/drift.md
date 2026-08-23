@@ -172,3 +172,50 @@ documentation.
 - **Action:** repair and publish run artifacts only, then stop for Tier-A/owner review. Do not
   request or assume another evaluator run and do not implement.
 - **Evidence:** Repaired thirteen-path plan and this commit's worklog/context pack.
+
+## 2026-08-23 — Owner-authorized final PLAN-EVAL found top-level exclusion check loss
+
+- **What:** Cycle 3 confirmed the thirteen-path repair and 114/2 fmt/lint acceptance, then proved
+  that the planned doctor-family entry in top-level root `exclude` silently removes all five doctor
+  TS files from `deno check`.
+- **Source:** Owner-authorized final PLAN-EVAL at evaluator commit `65c5e1ac4`, independently
+  reproduced by the topic supervisor on Deno 2.9.5.
+- **Expected:** The prior drift entry described top-level `exclude` as a raw-formatter-walk boundary
+  that would not alter other gate coverage.
+- **Actual:** Direct check of an excluded file warns `No matching files found` at exit 0; mixed
+  batches omit it while staying green; the check wrapper can count 115 selected while Deno checks
+  only 110. Nested config precedence rescues explicitly named fmt/lint files but does not apply to
+  check.
+- **Severity:** significant final plan finding
+- **Action:** supersede—not rewrite—the prior top-level-exclusion conclusion. Never place the doctor
+  family in top-level `exclude`.
+- **Evidence:** `plan-eval.md` §5 and research R17.
+
+## 2026-08-23 — Owner granted existing-`fmt.exclude` amendment and Tier-A stand-in gate
+
+- **What:** The owner granted the bounded correction inside the already-authorized `deno.json` path:
+  append the doctor family to the existing `fmt.exclude` list, not a second duplicate key, and add
+  explicit check-coverage and config-precedence obligations.
+- **Source:** Owner-granted amendment brief for #1663 after cycle-3 `FAIL_PLAN`.
+- **Expected:** A raw `deno fmt` walk must not revert fixture-local-default formatting, while
+  check/lint/test selection remains intact.
+- **Actual:** The evaluator's executed alternative preserves raw fmt-walk protection; exact fmt and
+  lint remain 114/2 green; root `fmt:check` remains 2038/36 green; scoped doctor check reports
+  `filesSelected:5, failedBatches:0`. Root `lint.exclude` keeps its doctor entry because nested
+  config precedence makes the healthy lint negative fire; its `.llm/` entry remains deferred.
+- **Severity:** significant owner-authorized amendment
+- **Action:** retain the thirteen-path surface, amend plan/worklog/context/PR only, and stop for the
+  topic supervisor's Tier-A review. Memoization tests compare grouping equality with and without the
+  cache rather than timing. There is no cycle 4 or further evaluator.
+- **Evidence:** Repaired plan L3/L10/L11, S1, gate row 1, risk row 2, and PR DoD row 3.
+
+## 2026-08-23 — Worktree recreated from the pushed branch without rollout loss
+
+- **What:** An unrelated host cleanup deleted the leaf worktree after cycle 3 completed.
+- **Source:** Topic-supervisor handoff.
+- **Expected:** The plan author resumes on the exact evaluated branch state.
+- **Actual:** The supervisor recreated `/home/codex/repos/netscript-007-package-gate` from origin at
+  `65c5e1ac47646328a54d553c838a9059928139c3`; the tree was clean and all run artifacts were present.
+- **Severity:** minor operational drift
+- **Action:** accept; no recovery mutation or lost commit.
+- **Evidence:** pre-edit `git rev-parse HEAD` and `git status --short` in this resume.
