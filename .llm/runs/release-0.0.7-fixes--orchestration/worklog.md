@@ -1612,3 +1612,65 @@ expected numbers stated so the author reproduces rather than re-derives and stop
 
 Next: exact-head receipt review, fresh Tier-A at the S6 head, then one fresh opposite-family IMPL-EVAL.
 No merge, no readiness.
+
+## 2026-08-23 — S6 reviewed, gates discharged, IMPL-EVAL dispatched at `bcc9f393d`
+
+**S6 landed and pushed.** local == remote == PR #1692 head
+`bcc9f393d993cd5468015c883c8b0dc6a5b6dc62`, clean, draft, sole `status:impl`. Two commits:
+`b427e0354 chore(mcp): refresh SDK export signatures` and `bcc9f393d docs(harness): record S6 export
+corpus receipt`.
+
+**Author was checked, not assumed idle.** When the corpus file sat dirty, `agentic:codex-status`
+reported the thread **`working`** ("Testing git diff numstat and status", then "Verifying patch
+application with diff") — the brief's own instruction to reproduce the delta proof before committing.
+No recovery was performed and no second sender was started; polling was replaced by
+`.llm/tools/harness/watch-run.ts` on the leaf run dir.
+
+**Scope — exact.** S6 touches 4 paths: **one** product path (the generated corpus) and three existing
+run artifacts. Full leaf surface vs new main is 7 paths: four source/test, one derived artifact, two
+`docs/site/services-sdk/` pages from S3. `public/mod.ts` untouched, no `docs/site/reference/` page,
+zero suppressions or unsafe casts.
+
+**Corpus verified by identity.** The author's committed artifact is **byte-identical** to the one
+Tier-A generated independently — sha256 `f7bbc8925481e868…` on both sides. Decoded delta on the
+committed object: **0 added exports, 0 removed, 5 changed signatures**, all `@netscript/sdk`
+(`SafeFailure`, `SafeResult`, `ServiceClientMethod`, `isDefinedError`, `safe`), metadata unchanged.
+The coordinator's original criterion, met at the commit.
+
+**Withheld gate set fully discharged at this head** — nothing remains `NOT_RUN`:
+`check:mcp-export-corpus` **PASS exit 0** (was exit 1); contracts doc-lint **9 = base 9**; sdk **3 =
+base 3**; `baseContract`'s only private ref the pinned `oc`; `docs:exports-drift` **PASS exit 0**;
+`check:netscript-jsr-specifiers` PASS (2361 scanned, 0 failures); `deno check` 0 errors across
+`contracts/mod.ts`, `contracts/crud.ts`, `sdk/mod.ts`; contracts+sdk suites **78/0**; mcp suites
+**136/0**; both `deno publish --dry-run` exit 0; lint 0/0; fmt 0 findings, **0 failed batches**.
+
+`docs:exports-drift` now runs **natively in the leaf** and is an executed receipt at the exact head.
+Before the rebase the task did not exist there (it arrived with #1666, post-dating the old base), so it
+had to be run on `main` + the leaf's paths. The docs lane flagged exactly this transition; it is
+re-confirmed rather than carried over.
+
+**Tier-A PASS** recorded at `eb57b416e`.
+
+**IMPL-EVAL dispatched.** Route per `lane-policy.md` line 46 — Codex work evaluates on **native
+opposite-family Fable 5 · medium**.
+
+| Field | Value |
+| --- | --- |
+| Session | `12a40996-93dc-4889-a848-670dd3669366`, PID `687913` |
+| Worktree | `/home/codex/repos/netscript-007-eval-1692` — **detached, evaluator-only**, at the exact head |
+| Route requested | `claude-fable-5` · medium · Remote Control |
+| Route **observed** | argv `--model claude-fable-5 --effort medium --remote-control --permission-mode bypassPermissions` — **matched** |
+| Brief | 5742 bytes, sha256 `4fcff4c8f1a88804…`, **verified present in argv** (not swallowed by a variadic flag) |
+
+Route was proven from `/proc/687913/cmdline`, **not** from the session registry, which reports
+`model: null` / `effort: null` — registry population lag, and precisely why argv is the authority here.
+`bridgeSessionId` is still null, so Remote Control has not attached yet; that affects mobile visibility,
+not the evaluation.
+
+Generator separation holds: generator is Codex thread `01a006f3-…`, not resumed; the evaluator has its
+own worktree and never enters the author's.
+
+**Route correction carried forward:** the author's observed effort is **high**, not the `medium` this
+topic reported at S5 dispatch.
+
+Next: evaluator verdict, then report exact head/verdict to the coordinator. No merge, no readiness.
