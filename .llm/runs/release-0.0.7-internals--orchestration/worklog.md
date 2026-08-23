@@ -625,3 +625,39 @@ plan gate is the evaluator's call, not mine.
 preserved, generator/evaluator separation holds in both directions, and every cycle-2 finding and
 advisory is absorbed or discharged. The owner-authorized third and final PLAN-EVAL is worth
 spending. Brief written to `briefs/1663-plan-eval-cycle-3.md`.
+
+## 2026-08-23 — #1663 PLAN-EVAL cycle 3 dispatched; identity recorded before any evaluator mutation
+
+| Field                           | Value                                                                                                                                 |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Phase                           | PLAN-EVAL cycle 3 — third and **final**, owner-authorized                                                                             |
+| Session ID                      | `0f7c4fdf-1023-43ce-8a4d-3c24fa16cd64`                                                                                                |
+| Agent short                     | `0f7c4fdf`                                                                                                                            |
+| `bridgeSessionId`               | `cse_012zvXzGwbKFLMTqNLRZVhBR` (non-empty, `bridgeOutboundOnly: false`)                                                               |
+| Remote Control URL              | `https://claude.ai/code/session_012zvXzGwbKFLMTqNLRZVhBR`                                                                             |
+| Backend / `providerEnv`         | `daemon` / `{}` — native Anthropic, not a gateway session                                                                             |
+| cwd                             | `/home/codex/repos/netscript-007-package-gate`                                                                                        |
+| CLI version                     | `2.1.241`                                                                                                                             |
+| Requested route                 | `formal_plan_evaluation`: native Anthropic / Fable 5 / medium / `--remote-control`                                                    |
+| Observed route (`respawnFlags`) | `--effort medium --remote-control --permission-mode bypassPermissions --name "NetScript 0.0.7 #1663 PLAN-EVAL c3" --model claude-fable-5` |
+| Route verdict                   | **matched**                                                                                                                           |
+| Launch authority                | `briefs/1663-plan-eval-cycle-3.md`                                                                                                    |
+| Launch log                      | `$CLAUDE_JOB_DIR/tmp/c3-launch.log` — `backgrounded · 0f7c4fdf`, launch exit 0                                                        |
+
+Independence holds: `0f7c4fdf` is a fresh session, not the Codex author thread
+`01a004ec-86a6-7c21-8886-81c09de099f5`, not this supervisor `f7691917-…`, and not either prior
+evaluator (`9078ecb6-…`, `517ac0e7-…`). The dead registered agent `9078ecb6` was not resumed.
+
+Head was still unmutated at `194e22a3d` at launch, the worktree was clean, and no rival process held
+the leaf worktree as cwd. Tokens climbed 172 → 1,043 across the first sample, so real inference is
+confirmed rather than assumed.
+
+The launch was not piped and not timeout-wrapped: a pipe holds the pipeline open after `claude --bg`
+detaches, and a wrapper timeout kills the launch rather than the slice. Both are recorded launch
+defects in this lane.
+
+Evaluator bounds as briefed: run artifacts only, commit, explicit-refspec push of
+`fix/package-gate-honesty`, and truthful PR evidence on #1663 — a deliberate widening over cycle 2's
+artifact-only bound. No product mutation before `PASS`, and none after: implementation belongs to
+the preserved Codex author, not the evaluator. No `scaffold.runtime`/Aspire/Docker/`e2e:cli`, no
+merge, ready flip, relabel, issue mutation, central-state edit, or lease.
