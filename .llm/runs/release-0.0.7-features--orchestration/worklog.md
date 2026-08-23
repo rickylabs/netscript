@@ -5089,3 +5089,88 @@ every prior red — four S5 attempt logs, `f6-test.json`, `f7-test.json` — is 
 **Next:** F8 implementation is not released by this verdict. It needs a dispatch to an implementation
 owner, and the Codex family remains blocked until 2026-08-20, so the route decision is the
 coordinator's.
+
+## 2026-08-23 — F8 fresh Tier-A ACCEPT; implementation dispatched to the restored Codex author
+
+Supervisor restored. Resumed #1664 at exact head `20337441788b4e2341b0474d6297bec1ddd33b80` from
+`/home/codex/repos/netscript-007-features-1355`. Reviewer/orchestrator only — not the author, not
+the evaluator.
+
+### Reconciling the PLAN-EVAL `PASS` with attempt-6's 69/1/0
+
+Independently re-derived rather than accepted. Full review: `slices/tier-a-plan-review-1355-f8.md`.
+
+- Three-way identity verified: local `HEAD` == `git ls-remote origin` == PR #1664 `headRefOid` ==
+  `20337441788…`; tree clean; PR OPEN/draft.
+- Diff `2385cdb72..20337441788` is six run-artifact paths. A filter for `^(packages|plugins|docs)/`
+  and `deno.lock` returns nothing. `leak-report.md` **does not appear in the numstat at all** — the
+  strongest available proof the provenance restore was byte-identical to the author blob.
+- Attempt-6 tally from the NDJSON: **69 gate-end records, 68 passed, 1 failed, 0 skipped**. The one
+  red is `behavior.service-client-refetch`, `code 143`, `durationMs 900030`, `timedOut: false`,
+  empty stdout/stderr tails. `timedOut: false` at 900,030 ms confirms the kill came from the suite's
+  **outer command boundary**, not the gate's own timeout.
+- Grep for `cdp|websocket|Page.enable|Network.enable|Fetch.enable|Runtime.evaluate|Page.navigate|
+  continueResponse` across the whole ledger: **zero matches**. The "cannot distinguish" claim is
+  honest and now verified, not relayed.
+
+The two facts are not opposed. The `PASS` does not rest on the runtime evidence and does not pretend
+to: 68 green gates do not make the 69th diagnosable. The amendment declines to classify the live
+refetch behavior and bounds both primitives on **code measurement** instead. The red stays red and
+stays unattributed.
+
+### The two defects, verified from source
+
+Only three `new Promise` sites exist in the 605-line probe. `:79` `connect` settles solely on
+`onopen`/`onerror`; `:93` `send` settles solely via `#pending` on a matching id in `#receive`; `:604`
+`delay` is a `setTimeout`. All three `while` loops (`:102`, `:467`, `:551`) carry explicit bounds
+against `TIMEOUT_MS = 20_000`; both `Promise.race` sites (`:338`, `:410`) race a timer or
+`child.status`. The amendment's identification is exactly right and exactly complete for that class.
+`#receive:124` already returns early on an unknown id, so the contract's late-response-inert
+requirement is achievable against the existing receive path.
+
+### Path ceiling proven sufficient
+
+`CdpClient` is **not exported** today (`:62`), so a seam is required. `packages/cli/deno.json`
+excludes `e2e/` from publish; `packages/cli/e2e/deno.json` is `"publish": false`; `e2e/mod.ts` does
+not re-export the probe. A same-module export touches no publish surface, barrel, or JSR API. **No
+third path is forced.**
+
+### Findings
+
+No blocking findings. Two recorded:
+
+- **R1 (carried, not a blocker).** The PLAN-EVAL matrix marks `terminateBrowserProcess` bounded;
+  that is generous — `await child.status` (`:448`) and `await drain` (`:449`) have no timer. It is
+  correctly out of F8 scope: F6-owned code with passing tests, and unreachable while `connect`/`send`
+  hang first. Widening F8 now would be the exact plausibility-driven creep the amendment earned its
+  `PASS` by refusing. Recorded for a later leaf.
+- **R2 (honest limitation).** Git `author`/`committer` is `Rickylabs <eric.chautems@gmail.com>` for
+  every agent here, so commit metadata cannot prove which agent signed the verdict. Provenance rests
+  on the session record (evaluator `aed7b4ad-54d3-4cfb-b496-43c717a9b39d`), and the one-file/174-line
+  scope is consistent with it. Recorded so the record does not overstate what git proves.
+
+The evaluator judged `4255a57b9`; the only delta to `20337441788` is the verdict file itself, so the
+`PASS` covers current plan content with no unreviewed drift.
+
+**Disposition: ACCEPT** — implementation only. No lease, readiness, merge, publish, or attempt 7.
+
+### Codex quota restored — the blocker recorded on 2026-08-15 has expired
+
+`0c705a0cb`/`db2aa93b2` recorded an account-level Codex block until **2026-08-20 05:31**. Today is
+**2026-08-23**; the window has passed. `agentic:codex-status` shows live `gpt-5.6-sol` threads,
+including the coordinator `019ffaa3-32ae-7b02-92a5-d7ae146d8cbd` actively working. The quota-driven
+reroutes are therefore no longer necessary and the canonical implementer lane is available again.
+`agentic:runtime doctor` reports `no_change`, 18 components, 0 sessions.
+
+### Dispatch
+
+Routed to the **original F8 author thread** `01a004f9-f033-7592-a0bc-63927753fb43`, which already
+owns the leaf worktree's sender — avoiding the `duplicate_sender_risk` that correctly refused a
+second sender there on 2026-08-15, and preserving thread continuity. Generator ≠ evaluator holds
+(author ≠ Minimax M3), and the supervisor neither authors nor certifies.
+
+Brief: `slices/impl-1355-f8.md`, staged at `/home/codex/ns1355-f8-brief.md`. Two paths only, the
+20-second diagnostic connect/send contract, six required proofs, a hard stop if a third path is
+compiler-proven, and the full prohibition set including attempt 7 and `scaffold.runtime`. The author
+runs only the focused deterministic file; this supervisor collects the four exact-head receipts after
+the explicit push.
