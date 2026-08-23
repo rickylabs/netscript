@@ -1556,3 +1556,59 @@ with no method list, so `startInflight()`/`readCachedEntry()` do not make it fal
 `check-test` pending; one `scaffold CI lane visibility` instance `CANCELLED` by concurrency supersession
 with two `SKIPPED` siblings. `mergeable: MERGEABLE`, `mergeStateStatus: BLOCKED` pending the outstanding
 check.
+
+## 2026-08-23 — #1691 merged; #1671 closed by my own error and replaced by #1692; S6 dispatched
+
+**#1691 merged.** All checks green (8 SUCCESS, 0 failed, `mergeStateStatus: CLEAN`), squash-merged at
+`2026-08-23T08:18:02Z` as main `61bfd858d20f3bf61e7ee45b5646537af567f247`. Verified afterwards:
+`check:mcp-export-corpus` is **PASS exit 0 on new main**, sha256 `458428529a12cfb1…`, where it was exit 1
+before. Prerequisite discharged.
+
+**#1671 was closed unmerged — my error, stated plainly.** Merging #1691 closed it as a side effect
+because the #1691 body I wrote contained the literal token `close #1671` inside the sentence
+*disclaiming* a closing keyword: "This PR does **not** close #1671 and carries no closing keyword."
+GitHub's parser matches the token and does not read negation. `merged: false`, `closed_at`
+`2026-08-23T08:18:03Z` — one second after the merge.
+
+**Lesson, worth promoting:** never write the literal `close #N` / `fixes #N` / `resolves #N` token in a PR
+body **even to deny it**. Write "does not carry a closing keyword for #N". AGENTS.md already warns that
+the *absence* of a keyword strands issues; this is the mirror failure — an accidental keyword closes a PR
+that was mid-flight.
+
+**Rebase.** Leaf rebased `--onto 61bfd858d` from `0ef48c2ec`; all ten commits replayed, **zero
+conflicts**. New head `9cdba6321ea3f2d5af20f269b6bd81393dbd84d3`. Content identity proven: the leaf's own
+diff over `packages/` and `docs/` is **byte-identical** before and after
+(`0ef48c2ec..2d806b245` vs `61bfd858d..9cdba6321`). Force-push was lease-protected against the exact
+prior head; recorded plainly because it is a history rewrite on a pushed branch.
+
+**#1692 opened** as the replacement — same branch, same canonical author thread, base `61bfd858d`, head
+`9cdba6321`, draft, `Closes #1350`, labels `type:fix` `area:sdk` `priority:p1` sole `status:impl`,
+milestone `0.0.7`. Reopening #1671 was refused by GitHub because its head had been rewritten. #1671
+annotated as superseded; its stale S5 comment repaired in place to flag the orphaned SHAs, point at
+#1692, and separate what is still true from what is not.
+
+**Gates re-executed at `9cdba6321`:** contracts doc-lint **9 = base 9**, sdk **3 = base 3**,
+`baseContract`'s only private ref the pinned `oc`; suites **78/0**; `deno check` clean on
+`contracts/mod.ts`, `contracts/crud.ts`, `sdk/mod.ts`; `check:netscript-jsr-specifiers` PASS (2361
+scanned, 0 failures); `deno publish --dry-run` **0 errors, exit 0** on both packages.
+
+**The S6 precondition now PASSES.** `check:mcp-export-corpus` is red again at the new head — and this
+time it is legitimately the leaf's. With #1691's unrelated drift removed from the equation, the decoded
+delta is:
+
+| Criterion | Result |
+| --- | --- |
+| Determinism | **PASS** — byte-identical across two clean runs, sha256 `f7bbc8925481e868…` |
+| Paths mutated | **1** |
+| Added / removed exports | **0 / 0** |
+| Changed signatures | **5**, all `@netscript/sdk`: `SafeFailure`, `SafeResult`, `ServiceClientMethod`, `isDefinedError`, `safe` |
+| `schemaVersion` / `frameworkVersion` / `surfaces` | unchanged |
+
+That is exactly the coordinator's original criterion — "only the already-approved public signature
+changes with no new exports" — which failed before only because of the nine foreign exports. Its
+if-and-only-if precondition is met, so **S6 dispatched** to the same canonical author thread
+`01a006f3-…`: one derived-artifact path plus run artifacts, nothing else, comment on **#1692**, with the
+expected numbers stated so the author reproduces rather than re-derives and stops if they differ.
+
+Next: exact-head receipt review, fresh Tier-A at the S6 head, then one fresh opposite-family IMPL-EVAL.
+No merge, no readiness.
