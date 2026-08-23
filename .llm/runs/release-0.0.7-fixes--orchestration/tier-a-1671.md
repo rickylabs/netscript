@@ -997,3 +997,49 @@ packages. No gate remains `NOT_RUN`, and the single formerly-blocking red is now
 and no authorized change remains that would move it, so a verdict bound here cannot be stranded.
 
 No merge, readiness flip, label, checkbox, metadata, or `#1348`/`#1466` mutation. No runtime lease.
+
+---
+
+# IMPL-EVAL — **PASS-WITH-FINDINGS** at `bcc9f393d`; artifact head `1772dfdf9`
+
+| Field | Value |
+| --- | --- |
+| Verdict | **PASS-WITH-FINDINGS** (harness `PASS`; no `FAIL_*` condition met) |
+| Evaluated head | `bcc9f393d993cd5468015c883c8b0dc6a5b6dc62` |
+| Current head | `1772dfdf9f26a9c7ed76f196e93505732696fb30` — evaluator artifact only; **non-run-artifact diff from the evaluated head is empty**, so the verdict is not stranded |
+| Route | `claude-fable-5` · medium, session `12a40996-…`, own detached worktree — **matched** (argv) |
+| PR comment | `2026-08-23T08:45:23Z`, 13 884 bytes |
+
+The evaluator did **not** push over the leaf, wrote one artifact path, removed its scratch probes and
+its own base-control worktree, and confirmed head identity four ways before evaluating. It re-derived
+the six codes **from source** rather than from the test's expectation constant, and independently
+reproduced the corpus decode. All seven claims it was asked to test were confirmed except claim 5,
+which became F1.
+
+Notable: it produced a **stronger** control than this topic's — three-way, including a base-worktree run
+showing `TS2344` + `TS2571` + `TS2339`, i.e. exactly the two RED texts PLAN-EVAL advisory A1 predicted.
+
+## Findings and disposition
+
+| ID | Sev | Finding | Disposition |
+| --- | --- | --- | --- |
+| **F1** | **Medium** — blocks a later `status:ready-merge`, not this draft | Breaking-change disclosure existed **only** in `plan.md`/`worklog.md`. PR body, all 12 commit messages, and both docs pages carried no breaking or migration statement; PR is `type:fix`, commits are `fix(...)` with no `!`/`BREAKING CHANGE`. `plan.md:251` requires explicit declaration plus migration. | **Partly repaired now.** The PR body was **mine** — I wrote #1692's replacement body and omitted it. A full breaking-change table plus migration is now in the body, including the explicit statement that `surface:diff` must not be cited as corroboration. **Commit messages and the two docs pages remain unrepaired** and need a coordinator ruling: amending 12 commit messages means another history rewrite, and adding migration prose to the docs pages is a product-docs slice. |
+| F2 | Low | `safe()` narrowed `PromiseLike<TOutput>` → `Promise<TOutput> & { __error?: … }`; non-`Promise` thenables now rejected (`TS2345`), never enumerated as a consumer-visible break. | Now enumerated in the PR body's breaking table with a `Promise.resolve(...)` migration note. |
+| F3 | Low | `ThrowableError → Error` foreclosure recorded but with no follow-up pointer for the day `Registry.throwableError` augmentation is wanted. | **Open** — recommend folding into the same follow-up as F5 rather than a third issue. |
+| F4 | Low | For an untyped `Promise<T>`, the `isDefined: true` arm types `error` as `never` while `createSafeFailure` can still return `isDefined: true` at runtime — typed-unreachable, runtime-reachable. Deliberate (the leaf asserts it) but a behavioural difference from the base's `isDefined: boolean` arm. | **Open** — coordinator call whether this needs documenting before the cut. |
+| F5 | Low | PLAN-EVAL A4 asked for a debt entry so the bench-prose follow-up is literally "tracked"; `drift.md:25` says "remains tracked follow-up debt" while `:35-36` says no debt entry was created. The word "tracked" is currently unbacked. | **Open** — this topic owns filing it; recommend one issue covering F5 + F3. |
+| F6 | Info | `surface:diff` 532 → 531 is a `deno doc` rendering loss; correctly recorded as a false negative and must not be cited as a clean surface result at cut time. | Now also stated in the PR body so it is visible outside harness artifacts. |
+
+The evaluator also recorded one item as **unverifiable rather than as a finding**: it could not confirm
+`## SKILL` chapters in agent briefs because the leaf run dir stores no briefs (they live in this
+orchestration run dir). That restraint is correct — absence of evidence in the place it looked is not
+evidence of absence.
+
+## Outcome
+
+**IMPL-EVAL PASS-WITH-FINDINGS.** No `FAIL_*` condition. The leaf is not ready-merge while F1's
+commit-message and docs-page halves stand, and this topic does **not** flip readiness. F1's PR-body half
+is repaired; F3/F4/F5 are open and returned to the coordinator with recommendations.
+
+No merge, readiness flip, label, checkbox, metadata, or `#1348`/`#1466` mutation. Evaluator worktree
+removed.
