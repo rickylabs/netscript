@@ -1142,3 +1142,35 @@ was created to eliminate.
   Pre-existing, outside the thirteen paths, and adjacent to the deferred L-2 item. Coordinator's.
 - **O2** — `gates:test` needs a real `.git`, so it is environmentally red on archive copies at both
   base and head and green in the worktree. A useful note for future evaluators of this lane.
+
+## 2026-08-23 — #1663 S5 Tier-A review: PASS; sign-off at `cfa055bb8` (F1 closed)
+
+Owner granted one micro-slice for advisory F1. One file, `packages/mcp/tests/guidance-retrieval_test.ts`
+— already in the granted thirteen. One line: outside control `9.75` → `9.9375`. No assertion touched;
+the expected order array is unchanged because `10.5 − 9.9375 = 0.5625` is still outside the `0.5`
+band.
+
+My mutation sweep at `cfa055bb8`, with `guidance-index.ts` restored byte-exact afterwards:
+
+| `closeScoreGap` | exit | note                                        |
+| --------------- | ---- | ------------------------------------------- |
+| `0.5`           | 0    | correct value, green                        |
+| `0.51`, `0.55`  | 0    | residual blind band, expected               |
+| **`0.5625`**    | **1** | new lower edge of detection                |
+| **`0.6`**       | **1** | **passed before S5 — the F1 hole is closed** |
+| `0.75`, `5`     | 1    | still detected                              |
+| `0.49`, `0.4`   | 1    | narrowing still pinned exactly              |
+
+Blind band narrowed from `(0.5, 0.75)` — width `0.25` — to `(0.5, 0.5625)`, width `0.0625`, which is
+**below** the `≈0.0749` regeneration movement recorded in the rationale comment. So a
+regeneration-sized widening is now detectable, which is the threat #1622 actually names. The residual
+band is real and stated rather than papered over: `0.51` and `0.55` still pass.
+
+MCP tests 136/0; `quality:scan` `ok: true`, findings `[]`, `allowCount: 7`.
+
+**Deviation, mine not the author's:** I told it to keep the slice tight for speed, so it committed the
+test file alone without the usual per-slice `worklog.md`/`context-pack.md` update. That is a departure
+from the per-slice artifact rule; recording it here rather than re-dispatching for a bookkeeping edit.
+
+**Tier-A PASS.** F1 is closed. Next: delta IMPL-EVAL over `cfa055bb8`, since the prior `PASS` named
+`cf31de902`.
