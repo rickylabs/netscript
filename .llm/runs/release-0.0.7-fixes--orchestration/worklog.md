@@ -1527,10 +1527,17 @@ occurrences in `docs/site/reference/ai/index.md`) and `PrismaMySqlTransactionOpt
 
 Checked here directly: `check-exports-drift.ts` polices **8** packages — `config`, `contracts`,
 `fresh-ui`, `plugin`, `queue`, `sdk`, `service`, `telemetry` — and `@netscript/ai` and
-`@netscript/prisma-adapter-mysql` appear **zero** times in it, against **37** reference pages under
-`docs/site/reference/`. So `docs:exports-drift` **cannot** flag this drift — not now, not ever. #1666
-built a real gate over roughly a quarter of the surface; this is the first concrete instance of what the
-uncovered pages do silently.
+`@netscript/prisma-adapter-mysql` appear **zero** times in it. So `docs:exports-drift` **cannot** flag
+this drift — not now, not ever. #1666 built a real gate over roughly a quarter of the surface; this is
+the first concrete instance of what the uncovered pages do silently.
+
+**Denominator corrected to 36, not 37** (docs lane precision, verified here). `docs/site/reference/`
+holds 37 entries: **36 package directories**, every one carrying an `index.md`, **plus** the top-level
+`docs/site/reference/index.md` landing page. The landing page is not a package surface and is not
+something `AUTHORITATIVE_MAPPING` could gate, so it does not belong in the denominator. The figure for
+the ruling is **8 of 36 package reference pages policed, 28 uncovered**. The uncovered count is 28
+either way; only the denominator moves — but 8/37 and 8/36 imply different things about whether the
+landing page is in scope, so it is fixed before it reaches a ruling.
 
 **Not absorbed, and deliberately so.** This is pre-existing main drift that #1691 made *visible*, not
 drift #1691 introduced. Folding it in would be the same scope error this topic refused on #1671's
