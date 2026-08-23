@@ -6,7 +6,7 @@
 | -------------- | -------------------------------------------------------------------- |
 | Run ID         | `release-0.0.7-internals--orchestration/slices/package-gate-honesty` |
 | Branch         | `fix/package-gate-honesty`                                           |
-| Current phase  | S2 implemented; pending fresh Tier-A slice review                    |
+| Current phase  | S3 implemented; pending fresh Tier-A slice review                    |
 | Archetype      | `6 — CLI / Tooling` (supporting MCP member A2)                       |
 | Scope overlays | `docs`                                                               |
 
@@ -25,8 +25,8 @@ nearest-config memoization. The owner-authorized final cycle 3 then returned `FA
 five doctor TS files from `deno check`. The owner granted the in-path correction to the existing
 `fmt.exclude` list. The topic supervisor then returned Tier-A PASS at amended plan head `62811a9dd`,
 discharging the plan gate under the owner exception. S1 was implemented and signed off at
-`4b988a381`. S2 is now implemented over exactly its three authorized CLI paths and awaits fresh
-Tier-A slice review; S3 and S4 have not started.
+`4b988a381`; S2 was implemented and signed off at `22dc3906e`. S3 is now implemented over exactly
+its two authorized MCP paths and awaits fresh Tier-A slice review; S4 has not started.
 
 ## Completed
 
@@ -70,16 +70,26 @@ Tier-A slice review; S3 and S4 have not started.
   and quality gate pass while both docs sources and `deno.lock` remain byte-identical.
 - The wrong-directory negative control fails at 3 passed / 3 failed, then restores all three files
   byte-exactly and returns to 6/6; a read-only scratch sentinel also fails closed.
+- Tier-A signed off S2 at `22dc3906e` after independently reproducing its cwd, assertion-retention,
+  canonical package-test, and negative-control evidence.
+- S3 keeps `closeScoreGap: 0.5`, records its measured gap/headroom/regeneration rationale, and uses
+  exact-binary score differences to make both boundary directions observable through order.
+- The implemented guidance test is green at 7/0; controlled widening to `5` and narrowing to `0.25`
+  each produce raw exit 1 at 6/1, restore the policy source byte-exactly, and return to 7/0.
+- MCP scoped check/test/lint/fmt pass at 115/136/114/114 non-empty selections; quality gate is green
+  with allowance baseline 7.
+- The MCP public `deno doc --json` surface remains byte-identical at 175 symbols; only an internal
+  published-source comment changed and the ranking policy remains unexported.
 
 ## In progress
 
-- Finalizing the single S2 commit, explicit push, and `[PHASE: IMPL]` PR comment before stopping for
+- Finalizing the single S3 commit, explicit push, and `[PHASE: IMPL]` PR comment before stopping for
   the fresh Tier-A slice review.
 
 ## Next steps
 
-1. Topic supervisor performs the fresh Tier-A review of the pushed S2 commit.
-2. S3 may begin only when separately dispatched after that review; S4 remains a later slice.
+1. Topic supervisor performs the fresh Tier-A review of the pushed S3 commit.
+2. S4 may begin only when separately dispatched after that review.
 3. `scaffold.runtime` remains waived `n/a` and must not run.
 
 ## Key decisions
@@ -115,17 +125,18 @@ fixture config. A fourteenth path is rescope.
 
 ## Gates
 
-| Gate family | Current status                      | Evidence                                         |
-| ----------- | ----------------------------------- | ------------------------------------------------ |
-| Plan-Gate   | DISCHARGED                          | Tier-A PASS at amended head `62811a9dd`.         |
-| Static      | S1 + S2 focused gates PASS          | S2 cwd tests 6/6 both roots; package task 828/0. |
-| Fitness/JSR | quality PASS; full audits remain S4 | Allowance baseline 7; no S2 API shape change.    |
-| Runtime     | N/A                                 | Explicit coordinator waiver; must not run.       |
-| Consumer    | S2 acceptance PASS                  | Exact package-cwd CLI task exit 0.               |
+| Gate family | Current status                      | Evidence                                        |
+| ----------- | ----------------------------------- | ----------------------------------------------- |
+| Plan-Gate   | DISCHARGED                          | Tier-A PASS at amended head `62811a9dd`.        |
+| Static      | S1–S3 focused gates PASS            | S3 guidance 7/0; MCP 115/136/114/114.           |
+| Fitness/JSR | quality PASS; full audits remain S4 | Allowance 7; MCP public fingerprint unchanged.  |
+| Runtime     | N/A                                 | Explicit coordinator waiver; must not run.      |
+| Consumer    | S2 + S3 acceptance PASS             | CLI package task and boundary mutations proven. |
 
 ## Open questions
 
-- None. Fresh Tier-A S2 review is the required stop point; no cycle 4 or further evaluator exists.
+- None. Fresh Tier-A S3 review is the required stop point; no cycle 4 or further plan evaluator
+  exists.
 
 ## Drift and debt
 

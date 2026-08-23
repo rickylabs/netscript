@@ -73,12 +73,12 @@ Configure the runtime project with explicit service settings.
   },
 ] as const;
 
-Deno.test('guidance close-score groups use stable documents without chaining or flattening same-page scores', () => {
+Deno.test('guidance close-score boundary reorders exact-inside candidates without absorbing an early outside slug', () => {
   const ranked = [
-    rankedSection('pages/beta', 'highest', 10.4),
-    rankedSection('pages/alpha', 'stronger', 10.2),
-    rankedSection('pages/alpha', 'weaker', 10.1),
-    rankedSection('pages/gamma', 'outside-leader-band', 9.8),
+    rankedSection('pages/beta', 'highest', 10.5),
+    rankedSection('pages/alpha', 'stronger', 10.125),
+    rankedSection('pages/alpha', 'exact-boundary', 10),
+    rankedSection('pages/00-outside', 'just-outside', 9.75),
   ];
 
   orderGuidanceSections(ranked, []);
@@ -87,9 +87,9 @@ Deno.test('guidance close-score groups use stable documents without chaining or 
     ranked.map(({ entry }) => `${entry.slug}#${entry.section}`),
     [
       'pages/alpha#stronger',
-      'pages/alpha#weaker',
+      'pages/alpha#exact-boundary',
       'pages/beta#highest',
-      'pages/gamma#outside-leader-band',
+      'pages/00-outside#just-outside',
     ],
   );
 });

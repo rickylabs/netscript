@@ -384,3 +384,58 @@ The two read-only docs hashes remain
 byte-identical at `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.
 `scaffold.runtime` remains coordinator-waived `n/a`; no Aspire, Docker, `e2e:cli`, mutex request, or
 substitute runtime smoke was taken.
+
+## 2026-08-23 — S3 bidirectional `closeScoreGap` pinning after S2 sign-off
+
+The topic supervisor signed off S2 at `22dc3906e53c6f5d560a8afdaab5acc6ca8b3862` after independently
+reproducing its package-cwd, repository-cwd, canonical package-test, and negative-control evidence.
+S3 changed exactly the two MCP paths named by plan S3; S4 remains untouched.
+
+### Implementation
+
+- `guidance-index.ts` retains `closeScoreGap: 0.5` and adds only the locked empirical rationale:
+  measured candidate gap ≈`0.3019801982`, headroom ≈`0.1980198018`, and regeneration movement
+  ≈`0.0748587452`. No ranking algorithm, type, export, or policy value changed.
+- `guidance-retrieval_test.ts` retains its semantic order assertion but replaces the decorative
+  scores with exactly representable controls: leader `10.5`, inside candidates `10.125` and `10.0`
+  (the exact boundary), and early-sorting outside candidate `9.75` (`0.5 + 0.25` from the leader).
+  The assertion observes order rather than floating-point equality, snapshots, or implementation
+  details.
+- No existing assertion was deleted, skipped, or weakened; the one order assertion now fails for
+  movement on either side of the boundary.
+
+### Executed S3 evidence
+
+All exit codes were read directly from the invoked process, never through a pipeline.
+
+| Obligation                 | Result | Evidence                                                                                                                                                                                                                                                                                            |
+| -------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Baseline targeted test     | PASS   | Before S3, structured guidance test exit 0; 7 passed / 0 failed.                                                                                                                                                                                                                                    |
+| Implemented targeted test  | PASS   | At unchanged `closeScoreGap: 0.5`, structured guidance test exit 0; 7 passed / 0 failed.                                                                                                                                                                                                            |
+| Widening negative control  | PASS   | Controlled `0.5 → 5` mutation produced raw exit 1; 6 passed / 1 failed. The failure showed `pages/00-outside#just-outside` incorrectly absorbed ahead of the intended close group.                                                                                                                  |
+| Widening restoration       | PASS   | Exact inverse patch restored `guidance-index.ts` to SHA-256 `16449b0f613eb62a8b3ca353ed56ab81807149eb033a51ee36ebf98379465aef`; targeted test returned 7/0.                                                                                                                                         |
+| Narrowing negative control | PASS   | Controlled `0.5 → 0.25` mutation produced raw exit 1; 6 passed / 1 failed. The failure showed `pages/beta#highest` remaining ahead of the exact-boundary reorder.                                                                                                                                   |
+| Narrowing restoration      | PASS   | Exact inverse patch restored the same source hash `16449b0f613eb62a8b3ca353ed56ab81807149eb033a51ee36ebf98379465aef`; targeted test returned 7/0.                                                                                                                                                   |
+| MCP scoped check           | PASS   | Non-empty selection: 115 files / 1 batch / 0 failed batches.                                                                                                                                                                                                                                        |
+| MCP scoped test            | PASS   | Non-empty selection: 136 passed / 0 failed / 0 ignored.                                                                                                                                                                                                                                             |
+| MCP scoped lint            | PASS   | Non-empty selection: 114 files / 2 config batches / 0 failed batches / zero findings.                                                                                                                                                                                                               |
+| MCP scoped fmt             | PASS   | Non-empty selection: 114 files / 2 config batches / 0 failed batches / zero findings.                                                                                                                                                                                                               |
+| Quality gate               | PASS   | `deno task quality:gate` exit 0; quality findings empty, `allowCount: 7`, and doctrine checks have no failures.                                                                                                                                                                                     |
+| MCP public surface         | PASS   | `deno doc --json packages/mcp/mod.ts` remains byte-identical at SHA-256 `d6d32d69d128451b7fd0185b65de2ba832ba60124ad3ee0e3ff9aec2a4c256c5`, with 175 public symbols; `GUIDANCE_RANKING_POLICY`, `GuidanceRankingPolicy`, and `orderGuidanceSections` remain absent from the package export surface. |
+
+The only published-source delta in S3 is the empirical comment beside the unchanged internal policy.
+The test file is not a public export, no runtime asset or `import.meta` read was added, and
+`deno.lock` remains byte-identical at
+`edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.
+
+### Post-slice reconcile
+
+PR #1663 remains a draft at `status:impl` with `type:fix`, `area:tooling`, milestone `0.0.7`, and
+the exact `Closes #1604`, `Closes #1618`, and `Closes #1622` keywords. All three issues remain open,
+as required before the close gate. The PR body still carries its plan-era unchecked S1–S3 tracking
+rows and validation prose; this implementation slice was not authorized to mutate PR-body or issue
+checkbox state, so the PHASE comment is the live evidence surface and final checklist reconciliation
+remains with the supervisor/S4. No new reviewer comment required a code or plan readjustment.
+
+`scaffold.runtime` remains coordinator-waived `n/a`; no Aspire, Docker, `e2e:cli`, lease request, or
+substitute runtime smoke was taken.
