@@ -1328,3 +1328,39 @@ simultaneously not a gate risk.
 
 Docs lane confirms EXHAUSTED/PARKED at allocation [1551], withdrew its finding-2 recommendation, and
 takes no scope. No merge, readiness flip, label, checkbox, or product/docs mutation from this lane.
+
+## 2026-08-23 — #1671 finding restated: the gates are correct, not obstructive
+
+Docs lane returned a written position on its own surface (`docs/site/reference/contracts/index.md`)
+plus a sharper reading of the three failure modes. This topic checked the load-bearing claim rather
+than adopting it: the page's opening prose states "This page is written against the package's public
+surface reported by `deno doc`", and the gate declares
+`mode=complete; reason="…complete published-symbol inventory"` with `documented-non-export-groups=0`
+— a strict two-way inventory. So adding `ContractBuilder`/`Schema` rows would assert, in NetScript's
+consumer-facing surface statement, that NetScript owns and stabilises oRPC's builder class and its
+standard-schema alias. Claim holds; position adopted.
+
+**Reframing adopted, and it corrects this topic's own presentation.** I had been stacking the three
+failure modes as accumulating cost — "the exposure route is more expensive than the residue." The
+correct statement is that `docs:exports-drift` is not obstructing the route, it is doing its job:
+refusing to let an unowned type enter the published surface silently. A gate clearable only by
+asserting ownership of someone else's type is saying the change is wrong, not that the gate needs an
+exemption. **Failure mode 3 is the finding; modes 1 and 2 are symptoms** — two independent detectors
+reporting one fact, that the ruled correction moves a dependency's internals across NetScript's
+published boundary.
+
+So the coordinator's choice is not "one residual diagnostic versus a costlier fix". It is: accept a
+bounded, already-substituted private-type reference, or decide that NetScript publishes oRPC's builder
+algebra. Only the first is in scope for a fix leaf.
+
+Docs lane concurs on recommendation (2) for an independent reason — it changes no exported symbol name
+in either package, so it clears `docs:exports-drift` without anyone deciding what NetScript claims to
+publish, leaving that doctrine question open for a deliberate ruling instead of settling it as a side
+effect. Both lanes reach the same recommendation by different routes; neither is owed the outcome.
+
+Standing arrangement confirmed both ways: nothing live changes either package's published surface; if
+an exposure variant is revived, this topic notifies the docs lane before any readiness attempt and
+re-runs the contracts-`complete`-mode expectation. Docs stays EXHAUSTED/PARKED at [1551].
+
+#1671 unchanged: parked at `bd97a7c03a`, no implementation authorized, no merge, readiness flip,
+label, checkbox, or product/docs mutation.

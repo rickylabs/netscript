@@ -644,3 +644,60 @@ and simultaneously not a gate risk.
 
 Probe worktree `netscript-007-probe-drift` removed. No product/docs mutation; leaf and PR unmodified
 at `bd97a7c03a`.
+
+---
+
+# F1 addendum 2 — the finding restated: mode 3 is the finding, modes 1 and 2 are symptoms
+
+The docs supervisor, whose surface `docs/site/reference/contracts/index.md` is, returned a written
+position on failure mode 3 and a sharper reading of the whole result. This topic adopts the reading,
+having checked the claim it rests on rather than taking it.
+
+**Verified:** that page states its own contract in its opening prose — "This page is written against
+the package's **public surface** reported by `deno doc`" — and the gate's own coverage declaration for
+this package reads `mode=complete; reason="The contracts reference is maintained as a complete
+published-symbol inventory."` with `documented-non-export-groups=0`. It is a strict two-way inventory:
+every published symbol must appear, and nothing that is not published may. So adding rows for
+`ContractBuilder` and `Schema` is not a documentation chore — it is an assertion, in the
+consumer-facing surface statement, that **NetScript owns and stabilises oRPC's builder class and its
+standard-schema alias**, and it puts NetScript's reference docs on the hook for upstream's builder
+algebra.
+
+**The reframing, adopted.** This topic had been presenting the three failure modes as accumulating
+cost — "the exposure route is more expensive than the residue." That is the weaker and slightly wrong
+statement. The correct one:
+
+> `docs:exports-drift` is not obstructing the exposure route. It is doing its job — refusing to let an
+> unowned type enter the published surface silently. A gate that can only be cleared by asserting
+> ownership of someone else's type is telling you the change is wrong, not that the gate needs an
+> exemption.
+
+Read that way, **failure mode 3 is the finding**, and modes 1 and 2 are its symptoms. `deno doc --lint`
+going 10 → 21 and `docs:exports-drift` going red are two independent detectors reporting the same
+underlying fact: the ruled correction moves a dependency's internals across NetScript's published
+boundary. That is a doctrine question about what `@netscript/contracts` claims to publish — and it
+should be settled by a deliberate ruling, not absorbed as a side effect of a lint repair.
+
+This matters for how the coordinator should read § S5. The choice is not "residue of one diagnostic
+versus a costlier fix." It is: **accept a bounded, already-substituted private-type reference, or
+decide that NetScript publishes oRPC's builder algebra.** Only the first is in scope for a fix leaf.
+
+**Docs-lane position, recorded as concurrence:** do not add `ContractBuilder`/`Schema` rows; and
+recommendation (2) is preferred from the docs side for an independent reason — it changes no exported
+symbol name in either package, so it clears `docs:exports-drift` **without anyone having to decide
+what NetScript claims to publish**, leaving that question open for a deliberate ruling. Both lanes
+reach the same recommendation by different routes. Neither lane is owed the outcome; the ruling is the
+coordinator's.
+
+## § S5 recommendation, restated in these terms
+
+**(2) — withdraw the exposure ruling; land S4-R #11 plus the ten SDK corrections under the existing
+three-file ceiling; file a #1670-precedent follow-up for the residual.** It is the only option that
+clears both gates, the only one that does not settle a published-surface doctrine question as a side
+effect, and it leaves `baseContract → {ContractBuilder, Schema}` as what it actually is: a bounded
+substitution of the pre-existing pinned `baseContract → oc`, on a symbol that already carried a
+private-type reference before this leaf existed.
+
+Standing arrangement with the docs lane: nothing live changes either package's published surface. If
+any exposure variant is revived, this topic notifies that lane **before** any readiness attempt, and
+it re-runs the contracts-`complete`-mode expectation against whatever the ruling produces.
