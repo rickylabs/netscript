@@ -1,5 +1,22 @@
 # IMPL-EVAL — claude-harness-profile-rfc-benchmark-shzhgv--polyglot-protocol-rfc
 
+## Re-verification cycle 1 on the S11 head — FAIL_FIX (2026-08-23)
+
+| Field | Value |
+| --- | --- |
+| Evaluator session | OpenHands cloud run 32624659415 (separate session; formal IMPL-EVAL via draft→ready automation, post-owner-approval round) |
+| Model / route | `openrouter/deepseek/deepseek-v4-flash-0731` |
+| Evaluated head | 410f4f2 (S11) |
+| Verdict | `OPENHANDS_VERDICT: FAIL_FIX` — one moderate finding; all other gates clean (fmt, zero TBD, spike evidence re-summed, seam cites verified, docs-only diff confirmed, no false-done entries) |
+
+**Finding 1 (moderate)** — stale M2 occurrence: the "Duplicate `result` frames" edge-case row
+still logged `Protocol.TerminalMissing` while the S11-updated Terminal-frame discipline,
+first-terminal-wins rule, constant registry, and the sibling completion-API race row all use
+`Protocol.TerminalDuplicate` for the same event — an internal contradiction at the head.
+**Fixed** (S11b): the row now uses `Protocol.TerminalDuplicate`; `Protocol.TerminalMissing`
+remains registry-valid for the absent-terminal `unknown-failure` case only. FMT re-checked
+clean; re-dispatch on the amended head.
+
 ## Adversarial pass (owner-commissioned, R5-D-8) — CONCERNS / FAIL_FIX (2026-08-20)
 
 | Field | Value |
