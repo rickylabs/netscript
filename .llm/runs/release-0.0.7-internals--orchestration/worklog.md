@@ -1001,3 +1001,75 @@ suite is still 7 tests.
 
 **Tier-A PASS.** Sign-off is the supervisor's. S4 — the integrated gate, publish, docs and JSR pass —
 is cleared as the final slice, after which mandatory separate-session IMPL-EVAL applies.
+
+## 2026-08-23 — #1663 S4 Tier-A slice review: PASS (with one registered-debt escalation) at `cf31de902`
+
+| Field  | Value                                                                 |
+| ------ | --------------------------------------------------------------------- |
+| Slice  | S4 — integrated gates, publish, docs, JSR (final slice)               |
+| Commit | `cf31de902e530a5874fdd074338cb6f7b16167f9` (local = remote = PR head) |
+
+### Bounds
+
+Three run artifacts only. `git diff --name-only fd508978c cf31de902` excluding the run dir is
+**empty** — S4 changed no product content, so its receipts legitimately attest the implementation
+parent `fd508978c`, the same evidence shape #1644 established.
+
+**The full slice arc `05fc3132b..cf31de902` touches exactly thirteen product paths** — identical to
+the contract table. No fourteenth path was taken across four slices and three evaluation cycles.
+
+### Spot-checks of the recorded matrix (mine, on archive copies)
+
+| Claim                        | Recorded                          | My measurement                        |
+| ---------------------------- | --------------------------------- | ------------------------------------- |
+| Root `fmt:check`             | 2,038 selected / 36 batches / 0 failed / 0 findings | **identical**, exit 0 |
+| Doctor check coverage        | exactly 5 selected / 0 failed     | verified in S1 and S3 reviews         |
+| `quality:scan` `allowCount`  | 7                                 | verified at S3; product tree unchanged |
+| Full arc product paths       | thirteen                          | **thirteen**                          |
+
+The 2,038 count is above the 2,034 baseline this lane recorded earlier, which is the A1 removal
+visible in the number: the `fmt:check` task no longer skips the doctor family.
+
+The author's own conduct is worth recording: it reported a receipt-path mistake it made (treating an
+atomic-JSON output path as a directory), removed the ignored scratch receipt, and reran every gate
+rather than keeping the first output. It also forced an explicit batch size specifically so the run
+could not be satisfied by task-cache output. That is the opposite of the false-green behaviour this
+leaf exists to eliminate.
+
+### The one red gate — verified pre-existing baseline, not a regression
+
+`package-gate-honesty-s4-doc-lint-mcp-fd508978` is **raw exit 1**: `packages/mcp` export entrypoints
+`./cli.ts` and `./mod.ts` each report one `private-type-ref`; `./openapi-projection.ts` passes.
+
+**I reproduced this independently at both ends of the change**, on separate archive copies:
+
+| Ref                          | `./cli.ts` | `./mod.ts` | `./openapi-projection.ts` |
+| ---------------------------- | ---------- | ---------- | -------------------------- |
+| base `05fc3132b`             | exit 1     | exit 1     | exit 0                     |
+| head `cf31de902`             | exit 1     | exit 1     | exit 0                     |
+
+Identical. This PR neither caused nor deepened it. The author reported it as red and did **not**
+attempt a product fix inside evidence-only S4, which was exactly the instructed behaviour.
+
+**Disposition.** It does not block this leaf — an unchanged baseline is not a regression, and the
+plan's JSR row explicitly anticipated reporting existing doc-completeness debt honestly rather than
+silently greening it. But it is **not** covered by the plan's named baseline debt list
+(CLI public doc completeness; MCP horizontal-shape `MCP-A6-V2-SHAPE`; MCP tool-contract file size;
+CLI E2E scaffold cardinality), and `arch-debt.md` carries no `private-type-ref` entry for
+`packages/mcp`. By the plan's own rule — "any newly discovered doctrine or JSR finding that cannot
+be fixed inside the thirteen-path surface is `FAIL_DEBT`/rescope, **not an implicit waiver**" — this
+must be **explicitly registered**, not passed over. The precedent exists: `arch-debt.md` already
+registers `aspire-public-schema-doc-lint` for 32 equivalent pre-existing diagnostics.
+
+Registering it edits shared `.llm/harness/debt/arch-debt.md`, which is outside this leaf's thirteen
+paths and outside this lane's authority. **Escalated to the coordinator/owner**: register an
+`arch-debt.md` entry (or file a 0.0.8 issue) before the close gate. This lane does not self-waive it
+and does not edit shared debt state.
+
+### Verdict
+
+**Tier-A PASS.** All four slices are landed and signed off; the thirteen-path contract held exactly.
+The single red gate is a verified unchanged baseline with an escalated registration requirement, not
+a defect in this work. Next and mandatory: separate-session IMPL-EVAL, which must be briefed that
+the MCP doc-lint red is known baseline with base-vs-head proof, so it is not scored as a regression.
+Merge, draft→ready, relabel, and the close gate remain coordinator-owned.

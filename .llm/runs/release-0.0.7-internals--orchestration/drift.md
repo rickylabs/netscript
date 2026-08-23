@@ -162,3 +162,25 @@ artifacts.
   by sampling rollout mtime rather than by reading the `state` field.
 - **Evidence:** frozen rollout mtime `1787489671` across six samples; leaf head unchanged and tree
   clean at recovery; detached resume pid `778876`.
+
+## 2026-08-23 — Unregistered MCP export-map doc-lint debt surfaced by #1663 S4
+
+- **What:** `deno doc --lint` on `packages/mcp` export entrypoints is red — `./cli.ts` and `./mod.ts`
+  each report one `private-type-ref`; `./openapi-projection.ts` passes.
+- **Source:** S4 receipt `package-gate-honesty-s4-doc-lint-mcp-fd508978`, independently reproduced by
+  the topic supervisor on separate archive copies of base and head.
+- **Expected:** The plan's JSR row anticipated only the *named* baseline debts (CLI doc completeness,
+  `MCP-A6-V2-SHAPE`, MCP tool-contract size, CLI E2E cardinality).
+- **Actual:** Identical 1/1/0 entrypoint exits at base `05fc3132b` and head `cf31de902`, so it is a
+  pre-existing baseline this PR neither caused nor deepened — but it is **not** in the plan's named
+  list and `arch-debt.md` has no `private-type-ref` entry for `packages/mcp`.
+- **Severity:** merge-gate disposition; unchanged baseline, not a regression
+- **Action:** Does **not** block the leaf. But per the plan's own rule a newly discovered finding that
+  cannot be fixed inside the thirteen-path surface is `FAIL_DEBT`/rescope and **not an implicit
+  waiver**, so it must be explicitly registered. Registration edits shared
+  `.llm/harness/debt/arch-debt.md`, outside this leaf's paths and this lane's authority —
+  **escalated to the coordinator/owner** to register an entry or file a 0.0.8 issue before the close
+  gate. Precedent: `aspire-public-schema-doc-lint` registers 32 equivalent pre-existing diagnostics.
+  The IMPL-EVAL brief must name this as known-red baseline with the base-vs-head proof so the
+  evaluator does not score it a regression.
+- **Evidence:** supervisor base-vs-head table in `worklog.md`; S4 commit-bound receipt.
