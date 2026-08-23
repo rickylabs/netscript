@@ -81,3 +81,24 @@ artifacts.
 - **Severity:** minor process correction
 - **Action:** discharged before evaluator dispatch so the evaluator observes a truthful phase.
 - **Evidence:** `gh pr view 1663 --json labels` → `type:fix, area:tooling, status:plan-eval`.
+
+## 2026-08-23 — #1663 third and final PLAN-EVAL returned FAIL_PLAN; leaf parked for owner
+
+- **What:** The owner-authorized cycle-3 evaluator returned `FAIL_PLAN` at `65c5e1ac4` against
+  evaluated head `194e22a3d`.
+- **Source:** Separate-session native Fable 5 evaluator `0f7c4fdf-1023-43ce-8a4d-3c24fa16cd64`;
+  blocking finding reproduced independently by this supervisor on Deno 2.9.5.
+- **Expected:** The repaired thirteen-path plan absorbed every cycle-2 finding, which cycle 3
+  confirmed by execution.
+- **Actual:** A new blocking defect. Root **top-level** `exclude` silently removes the five doctor
+  fixture TS files from `deno check` explicit argv — `deno check <excluded file>` returns
+  `Warning No matching files found` at exit 0, and mixed batches drop the file while still reporting
+  green. Nested-config precedence rescues `fmt`/`lint` but not `check`, so the plan's own `deno.json`
+  edit would create the false-green class the leaf exists to eliminate. Fix is bounded: append to
+  the existing root `fmt.exclude` list (`deno.json:206-210`) instead; no fourteenth path is forced.
+- **Severity:** blocking plan defect; process gate exhausted
+- **Action:** **Stop.** Three `FAIL_PLAN` cycles are spent and no fourth evaluator is authorized.
+  This lane does not repair the plan, dispatch another evaluator, or resume the preserved Codex
+  author. #1663 stays draft at `65c5e1ac4`, `status:plan-eval`, awaiting owner disposition.
+- **Evidence:** `plan-eval.md` §5-§7 at `65c5e1ac4`; supervisor reproduction and bounds audit in
+  `worklog.md`; PR #1663 phase comment and rewritten Validation/Harness sections.

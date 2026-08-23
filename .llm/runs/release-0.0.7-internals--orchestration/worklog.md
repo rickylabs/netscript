@@ -661,3 +661,74 @@ Evaluator bounds as briefed: run artifacts only, commit, explicit-refspec push o
 artifact-only bound. No product mutation before `PASS`, and none after: implementation belongs to
 the preserved Codex author, not the evaluator. No `scaffold.runtime`/Aspire/Docker/`e2e:cli`, no
 merge, ready flip, relabel, issue mutation, central-state edit, or lease.
+
+## 2026-08-23 — #1663 PLAN-EVAL cycle 3 returned `FAIL_PLAN` at `65c5e1ac4`; leaf returns to the owner
+
+| Field                | Value                                                                              |
+| -------------------- | ---------------------------------------------------------------------------------- |
+| Verdict              | **`FAIL_PLAN`** — third and final cycle                                            |
+| Evaluated head       | `194e22a3d0aaefe68922ed7a378aafb651a72dff`                                         |
+| Verdict commit       | `65c5e1ac47646328a54d553c838a9059928139c3`                                          |
+| Branch/PR head now   | `65c5e1ac4` (local = `git ls-remote` = PR #1663 `headRefOid`)                       |
+| Evaluator session    | `0f7c4fdf-1023-43ce-8a4d-3c24fa16cd64`, released (`stopped 0f7c4fdf`) at 39,907 tok |
+| PR phase comment     | posted, `[PHASE: PLAN-EVAL] [VERDICT: CHANGES_REQUESTED]`                          |
+
+### Evaluator bounds — verified by me, not accepted on assertion
+
+`git diff --name-status 194e22a3d 65c5e1ac4` is exactly two paths, both run artifacts: new
+`plan-eval-cycle-2.md` and modified `plan-eval.md`. **Zero product or config mutation**, so the "no
+product mutation before `PASS`" bound held. Cycle 2 was preserved **bit-identical** — sha256 of
+`65c5e1ac4:plan-eval-cycle-2.md` equals sha256 of `194e22a3d:plan-eval.md`
+(`3d54469686be0b16aa00fd863948c5ceab04737e42b532b5ace425a2dec6a678`) — and `plan-eval-cycle-1.md`
+was not touched. Worktree clean at exit. PR remains **draft**, base `main`, milestone `0.0.7`,
+labels unchanged at `type:fix` / `area:tooling` / `status:plan-eval`. No merge, ready flip, relabel,
+issue mutation, central-state edit, or lease. No `scaffold.runtime`/Aspire/Docker/`e2e:cli`. The
+evaluator used its widened authority exactly as briefed: commit, explicit-refspec push, and a
+truthful rewrite of the PR body's Validation/Harness sections plus one phase comment.
+
+### The blocking finding — reproduced independently by this supervisor
+
+Cycle 3 confirmed by execution that cycle-2's F1 and advisories A1/A2/A4 are genuinely absorbed, and
+that no fourteenth path is forced. It then found a **new** blocking defect, F1: the plan's
+surface-table `deno.json` row adds the doctor fixture family to root **top-level `exclude`**, which
+silently removes the five doctor fixture TS files from `deno check`.
+
+I reproduced the mechanism myself on Deno 2.9.5 in a scratch project, independent of the evaluator's
+archive copies. With root `{ "exclude": ["sub/"] }` and a nested `sub/deno.json`:
+
+- `deno check sub/ok.ts` → `Warning No matching files found`, **EXIT 0** — the file is not checked
+  and the command is still green.
+- `deno check main.ts sub/ok.ts` → only `Check main.ts`; `sub/ok.ts` silently dropped, EXIT 0.
+- Control with the root exclusion removed → both files `Check`ed.
+
+So the nested-config precedence that rescues `fmt`/`lint` explicit argv (my T-1) **does not extend
+to `deno check`**. Root `deno task check` type-checks all five doctor fixture files today; under the
+planned edit it would keep reporting green over five files Deno never opened, while the scoped
+wrapper still counts them as selected. That is the same false-green class #1618 and research R9
+condemn, and the class cycle-2's A1 had just removed from `fmt:check` — introduced by the very edit
+the plan describes as "only" protecting fixture-local formatting. The finding is correct and
+blocking; the plan gate is properly unchecked on "decisions locked" and the open-decision sweep.
+
+T-1 was folded into F1 rather than dismissed: the plan's key choice is wrong **because** the
+precedence rule was never written down and checked per subcommand. T-2 was confirmed by execution
+and is advisory only — the healthy files really are linted through nested-config precedence, so
+L3's "lint becomes green" is a true green and no `lint.exclude` edit is required.
+
+The evaluator's executed alternative keeps the fix inside the already-granted `deno.json` path:
+append the entry to the existing root `fmt.exclude` list (`deno.json:206-210`) instead of top-level
+`exclude`, which it proved restores `deno check` coverage (`filesSelected:5, failedBatches:0`) while
+leaving raw-walk protection and both 114/2 wrapper acceptances green.
+
+### Disposition — owner's, not this lane's
+
+Three `FAIL_PLAN` cycles are now spent: `be2b18728`, `c415daad2`, `65c5e1ac4`. The owner authorized
+exactly one third and final cycle and no fourth. **This lane stops here.** I have not repaired the
+plan, not dispatched another evaluator, and not resumed the preserved Codex author
+`01a004ec-86a6-7c21-8886-81c09de099f5` — implementing against a failed plan gate would be the
+process failure the gate exists to prevent. #1663 is parked, draft, at `65c5e1ac4`, awaiting owner
+disposition.
+
+The internals queue behind it is unchanged: wave 3 `jsdoc-example-compile-gate` (#1533) and
+`leak-check-process-descendants` (#1429); wave 4 `fresh-defer-test-capability` (#1557/#1601). L-2
+remains deferred until #1663 is terminal, and #1663 is **not** terminal — it is parked on an owner
+decision.
