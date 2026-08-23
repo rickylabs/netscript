@@ -1073,3 +1073,72 @@ The single red gate is a verified unchanged baseline with an escalated registrat
 a defect in this work. Next and mandatory: separate-session IMPL-EVAL, which must be briefed that
 the MCP doc-lint red is known baseline with base-vs-head proof, so it is not scored as a regression.
 Merge, draft→ready, relabel, and the close gate remain coordinator-owned.
+
+## 2026-08-23 — #1663 IMPL-EVAL `PASS` at `e52c2f0e6`; advisory F1 verified; supervisor correction
+
+| Field            | Value                                                                |
+| ---------------- | -------------------------------------------------------------------- |
+| Verdict          | **`PASS`**                                                           |
+| Evaluated head   | `cf31de902e530a5874fdd074338cb6f7b16167f9`                           |
+| Verdict commit   | `e52c2f0e6997f087bb55c12e685ee25d02bb49ea` (only `evaluate.md`)      |
+| Evaluator        | `99fea668-e784-4438-a529-a72044913932`, bridge `cse_01NVjLWd1SSvj1fAsUn17Eoh` |
+| Route            | native Anthropic Fable 5 · medium · `--remote-control`, `providerEnv {}` — requested == observed |
+| Independence     | not the author, not this supervisor, not any of the three plan evaluators |
+
+Bounds clean: run artifacts only, tree clean, pushed by explicit refspec, phase comment posted, no
+relabel / ready flip / checkbox mutation.
+
+It re-derived rather than trusting receipts or my tables — separate `base/`, `head/`, `mut/`,
+`gapmut/` archive extractions — and independently confirmed the MCP doc-lint red as identical at
+base and head, judging the escalated debt registration adequate and due before `status:ready-merge`.
+
+### Supervisor correction to the S3 sign-off
+
+**My S3 review overstated the widening side.** I wrote that the suite "pins the value at precisely
+`0.5`". That is true for narrowing, which I probed at `0.4` — just below the exact-boundary gap. It
+is **not** true for widening: my only widening probe was `0.5 → 5`, a 10× jump, which is exactly the
+coarse-probe mistake this leaf exists to catch. The evaluator swept the band instead. I reproduced
+its sweep independently:
+
+| `closeScoreGap` | exit | result             |
+| --------------- | ---- | ------------------ |
+| `0.51`          | 0    | 7 passed / 0 failed |
+| `0.6`           | 0    | 7 passed / 0 failed |
+| `0.7`           | 0    | 7 passed / 0 failed |
+| `0.75`          | 1    | 6 passed / 1 failed |
+| `1.0`           | 1    | 6 passed / 1 failed |
+
+Restored byte-exact. So widening is pinned only at **`≥ 0.75`**; the whole `(0.5, 0.75)` band is
+undetected.
+
+**Why this matters beyond bookkeeping.** The rationale comment this very PR added records real
+headroom ≈`0.198` and regeneration movement ≈`0.075`. The concrete threat #1622 names — widening the
+gap to absorb a regeneration flip — lands squarely inside the undetected band. A widening to `0.6`
+or `0.7` is both realistic and green. The guard fires, so it is coarse rather than dead, but it does
+not cover the threat that motivated it.
+
+The evaluator is right that this does not block: #1622's acceptance boxes are met as written, and
+`plan.md` L5 plus the risk row explicitly authorise "a deliberately larger outside epsilon" for
+float safety. It is advisory, correctly classified.
+
+### Disposition — owner's call, recorded not decided
+
+The fix is one line inside the **already-granted** path
+`packages/mcp/tests/guidance-retrieval_test.ts`: move or duplicate the outside control to
+`0.5 + 0.0625` (score `9.9375`, exactly representable, so the float-safety rationale is preserved),
+shrinking the widening band below the recorded headroom. No fourteenth path.
+
+The cost is real: a further slice invalidates the evaluated head `cf31de902` and requires a delta
+IMPL-EVAL over the new head. That trade — accept a guard that is coarse against its own stated
+threat, versus spend one micro-slice plus a delta evaluation — is the owner's, and the evaluator
+explicitly assigned it there. **Recommendation: take the S5 micro-slice**, because a guard that
+cannot detect the specific movement its own rationale predicts is the #1622 defect class this leaf
+was created to eliminate.
+
+### Also recorded
+
+- **O1** — root `lint` task (`deno.json:151`) and `lint.exclude` (`:186`) still exclude the whole
+  doctor family, so the four healthy files are linted only through the scoped wrapper form.
+  Pre-existing, outside the thirteen paths, and adjacent to the deferred L-2 item. Coordinator's.
+- **O2** — `gates:test` needs a real `.git`, so it is environmentally red on archive copies at both
+  base and head and green in the worktree. A useful note for future evaluators of this lane.
