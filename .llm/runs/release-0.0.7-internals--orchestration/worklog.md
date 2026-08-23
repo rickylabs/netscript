@@ -949,3 +949,55 @@ The author's `[PHASE: IMPL]` comment matches my measurements on every number, in
 **Tier-A PASS.** Sign-off is the supervisor's, not the implementer's. S3 (`closeScoreGap` pinning)
 is cleared to dispatch. `scaffold.runtime` remains coordinator-waived `n/a` and was neither run nor
 substituted; the helper's focused semantic test is the applicable consumer proof.
+
+## 2026-08-23 — #1663 S3 Tier-A slice review: PASS; supervisor sign-off at `fd508978c`
+
+| Field  | Value                                                                 |
+| ------ | --------------------------------------------------------------------- |
+| Slice  | S3 — `closeScoreGap` bidirectional pinning (#1622)                    |
+| Commit | `fd508978c743b864e5d07f510d971178b376ccbc` (local = remote = PR head) |
+
+### Bounds
+
+Four files: the **two authorized S3 paths** plus two run artifacts. `guidance-index.ts` changes by
+**comment only** — no export line and no value line touched, `closeScoreGap` still `0.5`, so the
+`@netscript/mcp` published-source delta is exactly the comment the JSR row promised.
+
+### The decisive delta
+
+My pre-slice baseline showed #1622 was **not** "pinned by no test" — it was pinned on one side only:
+
+| `closeScoreGap` mutation | Baseline `22dc3906e` (mine)      | After `fd508978c` (mine) |
+| ------------------------ | --------------------------------- | -------------------------- |
+| unchanged `0.5`          | 7 passed / 0 failed               | 7 passed / 0 failed        |
+| **widen → `5`** (10×)    | **7 passed / 0 failed — undetected** | **EXIT 1 — detected**   |
+| narrow → `0.4`           | (baseline used `0.01`: exit 1)    | **EXIT 1 — detected**      |
+
+The widening hole is closed. The narrowing probe is also *tighter* than my baseline's: `0.4` is just
+below the exact-boundary gap, so the test pins the value at precisely `0.5` rather than merely
+"somewhere above `0.01`". `guidance-index.ts` restored **byte-exact** after both mutations
+(`sha256 16449b0f…65aef`) with a green rerun.
+
+### Why the fixture design actually works
+
+All four scores are exactly representable dyadic rationals — `10.5`, `10.125`, `10`, `9.75` — so the
+floating-point ambiguity the plan's risk register warned about cannot arise. With leader `10.5` and
+gap `0.5` the inside band is `score >= 10.0`, so `exact-boundary` at exactly `10` sits on the
+inclusive edge and any narrowing ejects it. The outside case is named `pages/00-outside` so it sorts
+alphabetically **first**: if the gap widens it is absorbed into the close-score group and jumps to
+the front, which is what makes widening observable as a reorder. Order is asserted, never raw
+floating equality. No assertion was deleted — the `assertEquals` is retained and extended, and the
+suite is still 7 tests.
+
+### Gates I ran
+
+- MCP package tests **136 passed / 0 failed**.
+- MCP scoped check `filesSelected:115, failedBatches:0`; lint `114/2/0`; fmt `114/2/0` — all exit 0.
+  The **115 vs 114 asymmetry is the S1 design confirmed at package scope**: the marker governs
+  fmt/lint selection only, while `deno check` still sees all five doctor fixture files.
+- `deno task quality:scan` → `ok: true`, findings `[]`, **`allowCount: 7`** — unchanged.
+
+### Verdict
+
+**Tier-A PASS.** Sign-off is the supervisor's. S4 — the integrated gate, publish, docs and JSR pass —
+is cleared as the final slice, after which mandatory separate-session IMPL-EVAL applies.
