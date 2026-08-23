@@ -891,3 +891,61 @@ that I could not reproduce.
 **Tier-A PASS.** This sign-off commit is the supervisor's, not the implementer's — no lane
 self-certifies. S2 (the three cwd-independent CLI tests) is cleared to dispatch. `scaffold.runtime`
 remains coordinator-waived `n/a`; mandatory separate-session IMPL-EVAL still applies after S4.
+
+## 2026-08-23 — #1663 S2 Tier-A slice review: PASS; supervisor sign-off at `22dc3906e`
+
+| Field  | Value                                                                     |
+| ------ | ------------------------------------------------------------------------- |
+| Slice  | S2 — CLI cwd-independence (#1604)                                         |
+| Commit | `22dc3906e53c6f5d560a8afdaab5acc6ca8b3862` (local = remote = PR head)     |
+| Review | `git archive 22dc3906e` copy under supervisor job tmp; checkout untouched |
+
+### Bounds
+
+Five files: the **three authorized S2 paths** plus two run artifacts. `docs/` untouched — the two
+read-only doc sources are still read and executed, never rewritten. No `Deno.cwd()` anywhere in the
+three owned files.
+
+### The review question that mattered: were assertions weakened?
+
+**No.** This was the tempting wrong fix and it was not taken.
+
+- `service-env-gates_test.ts` — the only change is `Deno.stat(script)` → `Deno.stat(resolve(REPO_ROOT, script))`.
+  `commandOf(gate)` is **untouched**, so production gate command arguments are preserved exactly as
+  L2 requires, and both assertions (`assert(script, …)` and `assert(stat.isFile, …)`) survive
+  verbatim. `REPO_ROOT` was already module-derived in this file, so the fix uses what was there.
+- `quickstart-command-drift_test.ts` — only the path is anchored. The marker regex, command
+  extraction, and `assertEquals` parity assertions are unchanged.
+- `run-documented-stream-example.ts` — anchors **both** `DOC_PATH` and a new `SCRATCH_ROOT`, so the
+  `.llm/tmp` scratch directory is no longer cwd-sensitive. That was the risk row the plan raised
+  about fixing only the doc read; it is closed, not deferred.
+
+Anchor depths check out by hand: 7 levels from the helper (`scaffold→gates→application→src→e2e→cli→packages→root`)
+and 5 from the quickstart test (`presentation→tests→e2e→cli→packages→root`).
+
+### Deltas against the baseline I measured before the slice
+
+| Probe                                            | Baseline `4b988a381` (mine)                                | After `22dc3906e` (mine)   |
+| ------------------------------------------------ | ---------------------------------------------------------- | ---------------------------- |
+| Three targeted files from `packages/cli` cwd     | **3 passed / 3 failed**, exit 1, three root-relative `NotFound` | **6 passed / 0 failed**, exit 0 |
+| Same three files from **repository root** cwd    | not baselined                                              | **6 passed / 0 failed**, exit 0 |
+| `deno task --cwd packages/cli test` (#1604 acceptance) | red by construction                                  | **828 passed (533 steps) / 0 failed**, exit 0, 2m50s |
+| Scoped fmt / lint / check over the three files   | —                                                          | `filesSelected:3, failedBatches:0` each, zero findings |
+
+Green from **both** cwds is the property that distinguishes a real fix from a relocated defect, and
+it holds.
+
+### Negative control — the anchors are load-bearing
+
+I changed the quickstart anchor from five levels to four and reran: `NotFound … packages/docs/site/quickstart.vto`,
+**0 passed / 1 failed**, exit 1. Then restored byte-exactly (`sha256 a67b748e…040b1`, equal to the
+committed blob). So the test genuinely resolves the file it names rather than passing for an
+unrelated reason.
+
+The author's `[PHASE: IMPL]` comment matches my measurements on every number, including the 828/0.
+
+### Verdict
+
+**Tier-A PASS.** Sign-off is the supervisor's, not the implementer's. S3 (`closeScoreGap` pinning)
+is cleared to dispatch. `scaffold.runtime` remains coordinator-waived `n/a` and was neither run nor
+substituted; the helper's focused semantic test is the applicable consumer proof.
