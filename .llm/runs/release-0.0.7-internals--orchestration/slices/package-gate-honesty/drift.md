@@ -238,3 +238,19 @@ documentation.
 - **Evidence:** healthy SHA-256 before/after
   `c1c2431fac016345102d3dc1f637ac945537b16e7d162c95e1d34964665d92fb`; final status contains only the
   eight authorized implementation paths plus run artifacts.
+
+## 2026-08-23 — S4 surfaced unchanged MCP export-map doc-lint debt
+
+- **What:** The S4 plan expected full export-map doc lint as part of the JSR gate, but the MCP
+  entrypoint-level run is red.
+- **Source:** Receipt `package-gate-honesty-s4-doc-lint-mcp-fd508978`.
+- **Expected:** All MCP export entrypoints exit 0 with no new doc-lint diagnostic.
+- **Actual:** `./cli.ts` and `./mod.ts` each exit 1 with one `private-type-ref` diagnostic;
+  `./openapi-projection.ts` exits 0. The exact command produces the identical 1/1/0 result on an
+  immutable archive of base `05fc3132b6800a85eb6152691a961b658962571b`.
+- **Severity:** merge-gate disposition required; unchanged baseline, not a regression from this PR.
+- **Action:** report the gate as red. Evidence-only S4 did not mutate MCP product code or invent a
+  fourteenth path. The topic supervisor owns whether the baseline needs separate debt registration
+  or blocks the later IMPL-EVAL.
+- **Evidence:** commit-bound receipt plus raw base-archive reproduction; MCP isolated-declaration
+  check and member/root publish dry-runs independently pass.

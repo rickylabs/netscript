@@ -6,7 +6,7 @@
 | -------------- | -------------------------------------------------------------------- |
 | Run ID         | `release-0.0.7-internals--orchestration/slices/package-gate-honesty` |
 | Branch         | `fix/package-gate-honesty`                                           |
-| Current phase  | S3 implemented; pending fresh Tier-A slice review                    |
+| Current phase  | S4 evidence recorded; pending final Tier-A slice review              |
 | Archetype      | `6 — CLI / Tooling` (supporting MCP member A2)                       |
 | Scope overlays | `docs`                                                               |
 
@@ -25,8 +25,10 @@ nearest-config memoization. The owner-authorized final cycle 3 then returned `FA
 five doctor TS files from `deno check`. The owner granted the in-path correction to the existing
 `fmt.exclude` list. The topic supervisor then returned Tier-A PASS at amended plan head `62811a9dd`,
 discharging the plan gate under the owner exception. S1 was implemented and signed off at
-`4b988a381`; S2 was implemented and signed off at `22dc3906e`. S3 is now implemented over exactly
-its two authorized MCP paths and awaits fresh Tier-A slice review; S4 has not started.
+`4b988a381`; S2 was implemented and signed off at `22dc3906e`; S3 was implemented and signed off at
+`fd508978c`. S4 has executed the commit-bound matrix without product/config mutation. All required
+gates pass except full MCP export-map doc lint, which fails identically on the immutable base and is
+reported as baseline red for supervisor disposition.
 
 ## Completed
 
@@ -80,16 +82,27 @@ its two authorized MCP paths and awaits fresh Tier-A slice review; S4 has not st
   with allowance baseline 7.
 - The MCP public `deno doc --json` surface remains byte-identical at 175 symbols; only an internal
   published-source comment changed and the ranking policy remains unexported.
+- Tier-A signed off S3 at `fd508978c` after independently reproducing both boundary mutations and
+  the quality/MCP evidence.
+- S4 commit-bound check, test, quality, generated-asset, docs, exact-pin, isolated-declaration, and
+  member/root publish gates pass at the signed-off S3 head. Doctor coverage is exactly 5 checked;
+  healthy formatter coverage is exactly 4 selected; quality allowance count remains 7.
+- The published CLI delta is honestly limited to embedded lint-wrapper text and bundle hash in the
+  canonical generated asset; installed consumers receive child-marker and nearest-config batching
+  semantics without an export/API/binary-command change.
+- Full MCP export-map doc lint was executed and is red on two entrypoints with one private type
+  reference each; the exact failure reproduces on immutable base `05fc3132b`.
 
 ## In progress
 
-- Finalizing the single S3 commit, explicit push, and `[PHASE: IMPL]` PR comment before stopping for
-  the fresh Tier-A slice review.
+- Finalizing the evidence-only S4 commit, explicit push, and `[PHASE: IMPL]` PR comment before the
+  final Tier-A slice review.
 
 ## Next steps
 
-1. Topic supervisor performs the fresh Tier-A review of the pushed S3 commit.
-2. S4 may begin only when separately dispatched after that review.
+1. Topic supervisor performs the final Tier-A review of the pushed S4 evidence commit and disposes
+   the unchanged-base MCP doc-lint red.
+2. A separate-session IMPL-EVAL remains mandatory after Tier-A; this thread must not launch it.
 3. `scaffold.runtime` remains waived `n/a` and must not run.
 
 ## Key decisions
@@ -125,18 +138,18 @@ fixture config. A fourteenth path is rescope.
 
 ## Gates
 
-| Gate family | Current status                      | Evidence                                        |
-| ----------- | ----------------------------------- | ----------------------------------------------- |
-| Plan-Gate   | DISCHARGED                          | Tier-A PASS at amended head `62811a9dd`.        |
-| Static      | S1–S3 focused gates PASS            | S3 guidance 7/0; MCP 115/136/114/114.           |
-| Fitness/JSR | quality PASS; full audits remain S4 | Allowance 7; MCP public fingerprint unchanged.  |
-| Runtime     | N/A                                 | Explicit coordinator waiver; must not run.      |
-| Consumer    | S2 + S3 acceptance PASS             | CLI package task and boundary mutations proven. |
+| Gate family | Current status                        | Evidence                                        |
+| ----------- | ------------------------------------- | ----------------------------------------------- |
+| Plan-Gate   | DISCHARGED                            | Tier-A PASS at amended head `62811a9dd`.        |
+| Static      | S1–S3 focused gates PASS              | S3 guidance 7/0; MCP 115/136/114/114.           |
+| Fitness/JSR | PASS except MCP doc lint baseline RED | Audits/publish pass; MCP entrypoint lint 1/1/0. |
+| Runtime     | N/A                                   | Explicit coordinator waiver; must not run.      |
+| Consumer    | S2 + S3 acceptance PASS               | CLI package task and boundary mutations proven. |
 
 ## Open questions
 
-- None. Fresh Tier-A S3 review is the required stop point; no cycle 4 or further plan evaluator
-  exists.
+- Topic-supervisor disposition of the unchanged-base MCP export-map doc-lint failure before the
+  mandatory separate-session IMPL-EVAL. S4 did not repair it because product edits were forbidden.
 
 ## Drift and debt
 
@@ -144,8 +157,10 @@ fixture config. A fourteenth path is rescope.
   proof; authorized formatting-only twelfth path; cycle-2 published-asset discovery; authorized
   generated thirteenth path; corrected root-vs-fixture formatting semantics; cycle-3 top-level
   exclusion check regression; owner-granted existing-`fmt.exclude` amendment; raw formatter
-  non-TypeScript collateral restored during S1 validation.
-- Debt: no new/closed entry; named CLI/MCP baseline debt remains unchanged.
+  non-TypeScript collateral restored during S1 validation; unchanged-base MCP export-map doc-lint
+  red surfaced during S4.
+- Debt: no entry was added or closed; registered CLI baseline debt remains unchanged, and the
+  unregistered MCP doc-lint baseline is awaiting supervisor disposition.
 
 ## Commits
 

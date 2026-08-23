@@ -439,3 +439,75 @@ remains with the supervisor/S4. No new reviewer comment required a code or plan 
 
 `scaffold.runtime` remains coordinator-waived `n/a`; no Aspire, Docker, `e2e:cli`, lease request, or
 substitute runtime smoke was taken.
+
+## 2026-08-23 — S4 integrated evidence after S3 sign-off
+
+S4 changed no product or configuration file. Every structured receipt below attests the signed-off
+S3 head `fd508978c743b864e5d07f510d971178b376ccbc`; the receipt command also verified that the
+actual checkout head matched the requested head. Exit codes were read directly, never through a
+pipeline. The initial receipt-output path was mistakenly treated as a directory even though the
+store writes one atomic JSON file; that ignored scratch receipt was removed and every gate was rerun
+to a unique JSON pathname before any result was accepted.
+
+### Commit-bound gate matrix
+
+| Gate / obligation           | Result              | Receipt ID and evidence                                                                                                                                                                                                                                                                                                                                             |
+| --------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Root check                  | PASS                | `package-gate-honesty-s4-check-root-batch120-fd508978`; 2,922 selected / 25 batches / 0 failed. The explicit default batch size forced a real run rather than accepting task-cache output.                                                                                                                                                                          |
+| Doctor check coverage       | PASS                | `package-gate-honesty-s4-check-doctor-five-fd508978`; exactly 5 selected / 1 batch / 0 failed. This is positive coverage evidence, not a warning-only or omitted-file exit 0.                                                                                                                                                                                       |
+| Targeted tests              | PASS                | `package-gate-honesty-s4-test-targeted-fd508978`; wrapper, doctor-family, guidance, and three CLI cwd files: 37 passed / 0 failed.                                                                                                                                                                                                                                  |
+| MCP package tests           | PASS                | `package-gate-honesty-s4-test-mcp-fd508978`; 136 passed / 0 failed.                                                                                                                                                                                                                                                                                                 |
+| Exact CLI acceptance        | PASS                | `package-gate-honesty-s4-test-cli-exact-fd508978`; exact package task: 828 tests (533 steps) / 0 failed.                                                                                                                                                                                                                                                            |
+| Quality job                 | PASS                | `package-gate-honesty-s4-quality-job-fd508978`; `deno task ci:quality` exit 0. Dedicated receipts below prove formatter and allowance behavior even when unchanged task inputs are cached.                                                                                                                                                                          |
+| Quality gate                | PASS                | `package-gate-honesty-s4-quality-gate-fd508978`; quality and doctrine gate exit 0, with only registered doctrine warnings.                                                                                                                                                                                                                                          |
+| Quality allowance scan      | PASS                | `package-gate-honesty-s4-quality-scan-fd508978`; findings empty, allowance failures empty, `allowCount: 7`.                                                                                                                                                                                                                                                         |
+| Root source fmt             | PASS                | `package-gate-honesty-s4-fmt-root-batch200-fd508978`; 2,038 selected / 36 config batches / 0 failed / 0 findings. The task-level doctor-family exclusion is absent.                                                                                                                                                                                                 |
+| Owned MCP/tool TS fmt       | PASS                | `package-gate-honesty-s4-fmt-owned-nine-fd508978`; the root task's intentional `packages/cli` exclusion leaves 6 selected MCP/wrapper files / 2 config batches / 0 failed / 0 findings. A direct explicit-argv check selected all 9 owned TS files, including the 3 CLI E2E files, and exited 0; S2's commit-bound scoped receipt already covers those 3 CLI files. |
+| Healthy doctor fmt coverage | PASS                | `package-gate-honesty-s4-fmt-doctor-healthy-four-fd508978`; exactly 4 selected / 1 batch / 0 failed / 0 findings. Selected files were `.netscript/generated/plugin-ai/agents.registry.ts`, `.netscript/generated/plugin-ai/tools.registry.ts`, `.netscript/generated/plugin-workers/job-registry.ts`, and `netscript.config.ts`.                                    |
+| Generated asset freshness   | PASS                | `package-gate-honesty-s4-assets-barrel-fd508978`; canonical generation followed by `check:assets-barrel` reproduced the checkout byte-exactly.                                                                                                                                                                                                                      |
+| Docs source format          | PASS                | `package-gate-honesty-s4-docs-source-format-fd508978`; docs-site source-format task exit 0. A separate explicit `deno fmt --check` selected all 9 owned TS paths; the two docs sources are handled by this Vento/Markdown-aware gate.                                                                                                                               |
+| Docs accuracy               | PASS                | `package-gate-honesty-s4-docs-accuracy-fd508978`; exit 0, including 4 saga pages, 199 published pages, 181 shipped corpus files, and 91/91 root/direct commands. Both docs hashes remained unchanged.                                                                                                                                                               |
+| Exact JSR specifiers        | PASS                | `package-gate-honesty-s4-jsr-specifiers-fd508978`; 2,361 scanned / 1 registered allowance / 0 ranges / 0 failures.                                                                                                                                                                                                                                                  |
+| CLI export-map doc lint     | PASS                | `package-gate-honesty-s4-doc-lint-cli-fd508978`; all three CLI export entrypoints passed with no new diagnostic. Registered CLI doc-completeness debt remains open; S4 does not claim its closure.                                                                                                                                                                  |
+| MCP export-map doc lint     | **FAIL — BASELINE** | `package-gate-honesty-s4-doc-lint-mcp-fd508978`; raw exit 1. `./cli.ts` and `./mod.ts` each report one `private-type-ref`; `./openapi-projection.ts` passes. The exact command reproduced the same 1/1/0 entrypoint exits on an immutable `05fc3132b` archive. No product fix was attempted in evidence-only S4.                                                    |
+| MCP isolated declarations   | PASS                | `package-gate-honesty-s4-check-mcp-exports-isolated-fd508978`; all 3 export entrypoints selected / 1 batch / 0 failed under the root isolated-declaration configuration.                                                                                                                                                                                            |
+| CLI member dry run          | PASS                | `package-gate-honesty-s4-publish-cli-fd508978`; published list inspected and dry run completed.                                                                                                                                                                                                                                                                     |
+| MCP member dry run          | PASS                | `package-gate-honesty-s4-publish-mcp-fd508978`; published list inspected and dry run completed.                                                                                                                                                                                                                                                                     |
+| Root publish dry run        | PASS                | `package-gate-honesty-s4-publish-root-fd508978`; all members completed.                                                                                                                                                                                                                                                                                             |
+| Pre-artifact clean tree     | PASS                | `package-gate-honesty-s4-clean-pre-artifacts-fd508978`; `git status --porcelain` empty at the attested implementation head.                                                                                                                                                                                                                                         |
+| `scaffold.runtime`          | **N/A**             | Coordinator waiver for this surface. No Aspire, Docker, `e2e:cli`, substitute smoke, or lease request occurred.                                                                                                                                                                                                                                                     |
+
+The matrix is intentionally not represented as all-green: full MCP export-map doc lint is an
+executed, unchanged-base red. Repairing its private type references would require product work
+outside S4, so it is handed to the topic supervisor for disposition rather than hidden or fixed as
+an unplanned fourteenth path.
+
+### JSR and published-surface audit
+
+- `@netscript/cli` retains exactly six internal imports and every one is pinned to exact `0.0.6`:
+  aspire, config, fresh-ui, mcp, plugin, and sdk. Its export-map files, package config, and binary
+  command files are unchanged from the immutable base. `isolatedDeclarations: false` and the
+  registered public-doc-completeness debt are reported as baseline, not converted to green or
+  claimed closed.
+- The CLI publish list contains 643 files and includes `src/kernel/assets/agent-tools.generated.ts`.
+  Across the seven canonical generated assets, only that file differs from base: 2 insertions / 2
+  deletions. Its embedded lint-wrapper text gains the child-marker and memoized nearest-config
+  batching behavior, and `EMBEDDED_AGENT_TOOL_BUNDLE_HASH` changes from
+  `746673d921fbd609c80de44df7c537fc29c4bdf9de16cf273cd60a84638f4f6c` to
+  `500b69409d5eda19e44e7659005b9d0b20badfafe1fda855039c8483da29b5fb`. Upgrading installed consumers
+  therefore changes lint selection/batching semantics, but no export, API, or binary-command shape.
+  The generated string constant remains the delivery mechanism; no top-level runtime filesystem
+  read, import attribute, or `import.meta` dependency was added.
+- `@netscript/mcp` retains its three exact `0.0.6` internal imports (aspire plus two telemetry
+  subpaths), the same three export-map entry files, and an unchanged public API. The changed
+  published guidance source contains only the empirical policy comment and statically contains no
+  `import.meta`, `fromFileUrl`, `Deno.read*`, or runtime-asset dependency. S2's module-relative
+  reads remain confined to publish-excluded `packages/cli/e2e/**`.
+- Direct package JSR audits both exited 0, member/root publish dry-runs passed, and native slow-type
+  checks passed. The generic audit report still echoes Deno's informational “checking for slow
+  types” line as a warning; this is existing audit-parser behavior, not a new slow-type diagnostic.
+  Release preflight passed text-import, import-attribute, file-URL/`import.meta`, and self-import
+  scans.
+- `broken/deno.json` remains deliberately malformed at SHA-256
+  `6815999dbd68bd1ab5bb137b59808cb1f1a38fb3393c9133721f439c0ad37361`; `deno.lock` remains
+  byte-identical at `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.
