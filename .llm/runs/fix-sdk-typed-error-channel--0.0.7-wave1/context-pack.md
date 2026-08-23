@@ -6,20 +6,19 @@
 | -------------- | ---------------------------------------------------------- |
 | Run ID         | `fix-sdk-typed-error-channel--0.0.7-wave1`                 |
 | Branch         | `fix/sdk-typed-error-channel`                              |
-| Current phase  | `implementation` — S4 stopped; S4-R amended with finding→correction mapping, 1 finding unresolved |
+| Current phase  | `implementation` — S5 source repair committed; stopped on fifth-path export-corpus drift |
 | Archetype      | `1 — Small Contract` slice                                 |
 | Scope overlays | `docs`                                                     |
 
 ## Current state
 
-PLAN-EVAL is terminal PASS at evaluator commit `f76a3c45b`; S1-S3 each passed fresh Tier-A. The
-delivered product preserves the exact six-key contract error union through the real `ServiceClient`
-promise marker, `safe()`, and `isDefinedError()`, and the two published docs pages carry one
-compile-accurate narrative. S4 root check/test, scoped lint/format, quality, architecture, docs,
-surface attribution, and publish dry-runs completed. Raw doc lint then proved new leaf-owned
-private-type-reference findings (Contracts 9 -> 11; SDK 3 -> 13), so S4 stopped without product
-changes. #1466 still owns metadata definition/export; no metadata vocabulary or acceptance claim was
-introduced.
+PLAN-EVAL is terminal PASS at evaluator commit `f76a3c45b`; S1-S3 each passed fresh Tier-A. S5
+implemented the coordinator-verified `baseContract` instantiation expression and all ten SDK
+public-signature corrections. Focused check, 78 package tests, lint, format, and doc-lint baseline
+parity are proven. The immutable content head is `622218ac38150a2e3345149ca5b11bf823256734`.
+The final matrix then stopped because `check:mcp-export-corpus` requires updating a fifth product
+path outside S5. #1466 still owns metadata definition/export; no metadata vocabulary or acceptance
+claim was introduced.
 
 ## Completed
 
@@ -39,21 +38,13 @@ introduced.
 
 ## Next steps
 
-1. S4-R (separate plan-only Claude session, `worklog.md` § S4-R) mapped all 13 new findings to
-   corrections; 12 of 13 resolve cleanly (all 10 SDK; `BaseContractErrors` and `Schema` in contracts).
-   `baseContract → ContractBuilder` is unresolved and needs a coordinator ruling: authorize a narrow
-   `src/public/mod.ts` re-export of `ContractBuilder`/`Schema`, or accept it as permanent leaf-owned
-   known-red debt.
-2. Once the coordinator rules on `ContractBuilder`, the correction is a fresh authorized product slice
-   over the same three files (`contract-primitives.ts`, `errors.ts`, `service-client.ts`); S4-R itself
-   remains run-artifact-only, same as S4.
-3. Two items are flagged as "reasoned, not `deno check`-proven" in S4-R and need verification at
-   implementation time: (a) `oc.errors(commonErrorMap)` still type-checks once `commonErrorMap` is
-   built from the public `ContractSchema`-typed schema aliases instead of the private Zod-typed ones;
-   (b) `ContractBuilder`'s generic constraint accepts `ContractSchema<unknown,unknown>` in the
-   pre-`.input()`/`.output()` position.
-4. After the repair lands, rerun the incomplete final matrix (JSR audits, specifier/export guards)
-   at a newly locked immutable content head.
+1. Coordinator ruling is required for the stale generated export corpus. Its path is
+   `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`, a fifth
+   product path outside S5.
+2. Do not regenerate or edit that corpus until a new slice explicitly authorizes it, or the
+   coordinator rules the guard inapplicable.
+3. After that ruling, resume the incomplete exact-head matrix: both JSR audits, remaining export
+   guards, publish dry-runs, and surface attribution.
 
 ## Key decisions
 
@@ -88,10 +79,11 @@ No docs/S3-S4 product file was modified.
 - S4 raw `surface:diff`: known base RED plus exactly 15 authorized signature changes; after
   subtracting those changes the 972-finding base/head sets have identical SHA-256 digests.
 - S4 raw doc lint: blocking new RED; Contracts 9 -> 11 and SDK 3 -> 13.
-- JSR audits and selected specifier/export guards: NOT RUN after the mandated S4 stop.
-- S4-R (plan-only): 12/13 findings mapped to type-safe corrections (SDK 10/10, contracts 2/3);
-  `baseContract -> ContractBuilder` unresolved pending coordinator ruling. No gate was (re-)executed;
-  this is a mapping, not a rerun.
+- S5 exact-head quality gate (including quality scan + arch check): PASS.
+- S5 NetScript JSR specifier guard: PASS, 2,361 files, zero failures.
+- S5 doc lint: Contracts 9 and SDK 3, exact pinned baseline parity with zero new findings.
+- S5 selected export-corpus guard: RED; generated corpus stale, requires an unauthorized fifth
+  product path. Remaining JSR/publish/surface/export gates: NOT RUN after the mandated stop.
 
 ## Open questions
 

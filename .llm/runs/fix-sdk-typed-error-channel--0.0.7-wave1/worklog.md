@@ -1139,3 +1139,230 @@ resolves cleanly to **0 new** (all 10 findings dispositioned without residue).
 - It does not add, suppress, or ignore any doc-lint diagnostic.
 - It does not touch `packages/contracts/src/public/mod.ts`, `#1348`, or `#1466`.
 - It does not tick any PR checkbox or change `status:` labels.
+
+## S5 — source repair receipt: stopped on fifth-path export-corpus drift
+
+S5 started from the coordinator-specified head
+`bd97a7c03a3fe9b9c2534fd53c9fb0518801bb31`. The implementation content was committed as
+`622218ac38150a2e3345149ca5b11bf823256734` before the head-bound final gates. Four and only four
+authorized product/test paths changed:
+
+1. `packages/contracts/src/application/contract-primitives.ts`
+2. `packages/sdk/src/client/errors.ts`
+3. `packages/sdk/src/ports/service-client.ts`
+4. `packages/sdk/tests/readme-doctest_test.ts`
+
+`deno.lock` remained byte-identical to the S5 starting head. No metadata vocabulary,
+`NetScriptProcedureMeta`, barrel export, lint suppression, runtime lease, Aspire, Docker, or
+`e2e:cli` was introduced or run.
+
+### Delivered public-signature corrections
+
+- `baseContract` uses the coordinator-verified instantiation expression
+  `ReturnType<typeof oc.errors<Readonly<{...the exact six-entry map...}>>>`. Its six data schemas
+  are public `ContractObjectSchema<X, X>` types. The fourth builder slot still resolves exactly to
+  `Record<never, never>`. `ContractBuilder` is no longer imported; raw doc lint shows the only
+  `baseContract` private reference is the pinned `oc` baseline.
+- Findings #1/#4/#6/#8 replace the leaf-new `ThrowableError` defaults with `Error`. This is a
+  **declared design decision**, not a notational claim: the repo-wide unaugmented oRPC `Registry`
+  makes `ThrowableError` resolve to `Error` today, but spelling `Error` forecloses a downstream
+  `Registry.throwableError` augmentation for these leaf-new signatures. The coordinator explicitly
+  accepted that trade-off for S5.
+- Findings #2/#3 inline the literal non-defined and defined `SafeFailure` arms while leaving the
+  private helper aliases available only to the non-exported constructor.
+- Finding #5 inlines the exact `isDefinedError` predicate target.
+- Findings #7/#9 inline `Promise<TOutput> & { __error?: { type: TError } }` in `safe` and
+  `ServiceClientMethod`.
+- Finding #10 structurally derives each defined error from the procedure's `~orpc.errorMap` and
+  `ContractSchemaOutput`, plus the plain `Error` arm.
+- Findings #7/#9/#10 are a **bounded accepted coupling**, not purely notational. Named drift risk:
+  **if oRPC renames `__error`, `TError` inference degrades silently**. Duplication is limited to the
+  two public promise signatures; no helper was exported to hide it.
+- S4-R #11/#12 were not implemented. They are superseded/refuted by the verified `baseContract`
+  annotation. `packages/contracts/src/public/mod.ts` remains untouched.
+
+### One-shot type-level RED and retained GREEN
+
+The temporary base-style assertion used `ReturnType<typeof oc.errors>` while the adjacent delivered
+assertion read `baseContract` through `@netscript/contracts`. The structured run was executed once
+and was not rerun for tidier output:
+
+```json
+{
+  "exitCode": 1,
+  "command": "deno check --unstable-kv <files>",
+  "selection": { "filesSelected": 1, "batches": 1, "failedBatches": 1 },
+  "summary": {
+    "totalOccurrences": 1,
+    "uniqueOccurrences": 1,
+    "uniqueCodes": 1,
+    "uniquePaths": 1
+  },
+  "groups": [{
+    "code": "TS2344",
+    "message": "Type 'false' does not satisfy the constraint 'true'.",
+    "count": 1,
+    "path": "packages/sdk/tests/readme-doctest_test.ts",
+    "location": "49:3",
+    "assertion": "Equal<keyof ReturnType<typeof oc.errors>['~orpc']['errorMap'], ExpectedBaseErrorCode>"
+  }],
+  "greenInSameRun": {
+    "packageEntrypointAssertion": "Equal<keyof typeof baseContract['~orpc']['errorMap'], ExpectedBaseErrorCode>",
+    "guards": ["IsAny<BaseErrorCode> is false", "[BaseErrorCode] is not [never]", "NOT_FOUND data retains .shape"],
+    "diagnostics": 0
+  }
+}
+```
+
+The temporary base assertion and its `oc` import were then removed. The exact-six, non-`any`,
+non-`never`, undeclared-code rejection, `.shape` retention, and empty-meta-slot assertions remain in
+the checked-in test. Final structured check:
+
+```json
+{
+  "exitCode": 0,
+  "command": "deno check --unstable-kv <files>",
+  "selection": { "filesSelected": 4, "batches": 4, "failedBatches": 0 },
+  "files": [
+    "packages/contracts/mod.ts",
+    "packages/contracts/crud.ts",
+    "packages/sdk/mod.ts",
+    "packages/sdk/tests/readme-doctest_test.ts"
+  ],
+  "summary": { "totalOccurrences": 0, "uniqueOccurrences": 0, "uniqueCodes": 0, "uniquePaths": 0 }
+}
+```
+
+### Focused structured verdicts
+
+```json
+{
+  "gateId": "contracts-doc-lint-all-entrypoints",
+  "outcome": "RED_BASELINE_PARITY",
+  "exitCode": 1,
+  "entrypoints": ["./crud.ts", "./mod.ts", "./query.ts", "./transform.ts"],
+  "combinedPrivateTypeRef": 9,
+  "newLeafFindings": 0,
+  "baseContractPrivateRefs": ["oc"]
+}
+```
+
+```json
+{
+  "gateId": "sdk-doc-lint-all-entrypoints",
+  "outcome": "RED_BASELINE_PARITY",
+  "exitCode": 1,
+  "entrypointCount": 12,
+  "combinedPrivateTypeRef": 3,
+  "newLeafFindings": 0
+}
+```
+
+```json
+{
+  "gateId": "contracts-sdk-tests",
+  "outcome": "PASS",
+  "exitCode": 0,
+  "summary": { "passed": 78, "failed": 0, "ignored": 0, "totalResults": 78, "uniqueFailures": 0 },
+  "typedQueue1667Encountered": false
+}
+```
+
+```json
+{
+  "gateId": "scoped-lint",
+  "outcome": "PASS",
+  "exitCode": 0,
+  "selection": { "roots": ["packages/contracts", "packages/sdk"], "filesSelected": 105, "batches": 1 },
+  "summary": { "totalOccurrences": 0, "uniqueOccurrences": 0, "uniqueRules": 0, "uniquePaths": 0 }
+}
+```
+
+```json
+{
+  "gateId": "scoped-fmt",
+  "outcome": "PASS",
+  "exitCode": 0,
+  "selection": { "roots": ["packages/contracts", "packages/sdk"], "filesSelected": 105, "batches": 1 },
+  "summary": { "failedBatches": 0, "findings": 0, "ignoredFindings": 0 }
+}
+```
+
+### Exact-head durable receipts executed before the scope stop
+
+```json
+{
+  "gateId": "quality-gate",
+  "gitHead": "622218ac38150a2e3345149ca5b11bf823256734",
+  "actualGitHead": "622218ac38150a2e3345149ca5b11bf823256734",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "durationMs": 10237,
+  "requestHash": "bdc703d10280f46ebde0b4b0db97bf1a2b97101fbbae8361cf54b9b2f60fa645",
+  "contains": ["quality:scan", "arch:check"]
+}
+```
+
+```json
+{
+  "gateId": "netscript-jsr-specifiers",
+  "gitHead": "622218ac38150a2e3345149ca5b11bf823256734",
+  "actualGitHead": "622218ac38150a2e3345149ca5b11bf823256734",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "durationMs": 955,
+  "requestHash": "ed50e53c41b10327b74c79060ed7ac6e64976b81040a71ad04924cdb1e03ff79",
+  "summary": { "scanned": 2361, "allowances": 1, "ranges": 0, "failures": 0 }
+}
+```
+
+### Blocking selected export guard — fifth product path required
+
+At exact content head `622218ac38150a2e3345149ca5b11bf823256734`, the read-only canonical export
+corpus check failed:
+
+```json
+{
+  "gateId": "docs-exports-drift / check:mcp-export-corpus",
+  "gitHead": "622218ac38150a2e3345149ca5b11bf823256734",
+  "actualGitHead": "622218ac38150a2e3345149ca5b11bf823256734",
+  "waiver": null,
+  "outcome": "RED",
+  "exitCode": 1,
+  "message": "MCP export-surface corpus is stale; run deno task gen:mcp-export-corpus",
+  "requiredAdditionalPath": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+  "classification": "LEAF-OWNED GENERATED-SURFACE DRIFT; fifth product path requires coordinator rescope"
+}
+```
+
+The generated file was not regenerated or edited. The gate catalog has no dedicated
+`check:mcp-export-corpus` entry, so this stop-triggering diagnostic was executed by its canonical
+read-only task rather than misrepresented as a `run-gate.ts` receipt. That limitation is reported,
+not waived.
+
+Per the explicit fifth-path stop rule, the rest of the S5 matrix was not executed after this
+finding:
+
+```json
+{
+  "gitHead": "622218ac38150a2e3345149ca5b11bf823256734",
+  "actualGitHead": "622218ac38150a2e3345149ca5b11bf823256734",
+  "waiver": null,
+  "outcome": "NOT_RUN",
+  "reason": "Selected export guard requires an unauthorized fifth product path",
+  "gates": [
+    "contracts-jsr-audit",
+    "sdk-jsr-audit (known F-DOCT-5 remains pre-existing red)",
+    "remaining selected export guards",
+    "workspace and raw package publish dry-runs",
+    "surface:diff attribution"
+  ]
+}
+```
+
+No claim is made that `surface:diff` proves `baseContract`: its `deno doc` declaration rendering
+drops the instantiation argument, so the signal is a known tooling false negative. The published
+change remains fully disclosed as breaking, including `SafeFailure` arm changes and failure
+`null` → `undefined` consumer impact.
