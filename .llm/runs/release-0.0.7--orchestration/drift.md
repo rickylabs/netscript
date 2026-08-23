@@ -827,3 +827,8 @@ implementation thread.
   changed CLI source defect. Exact-head evidence must include path-selection proof for the changed
   subtree; regenerate receipts after the correction rather than carrying forward green JSON from an
   earlier content head.
+- **Runtime residue ownership is broader than the active leaf:** attempt-7 preflight found three
+  unreadable Postgres directories in old unregistered plugin-smoke trees outside #1664. Docker and
+  owning processes were absent, so the exact enclosing runs were quarantined recoverably before the
+  lease. An empty active leaf alone is insufficient when repository scanners can traverse sibling
+  workspaces.

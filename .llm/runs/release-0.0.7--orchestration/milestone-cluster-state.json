@@ -1812,14 +1812,14 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
-      "currentPrHeadSha": "20337441788b4e2341b0474d6297bec1ddd33b80",
+      "currentPrHeadSha": "388f2b642a0d6e0ece4e346ea60f857928409beb",
       "issueNumbers": [1355, 1360],
       "implementerAgentId": "01a004f9-f033-7592-a0bc-63927753fb43",
       "implementerRoute": "openai / gpt-5.6-sol / high / approval never / dangerFullAccess",
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "f8_plan_provenance_repaired_and_minimax_plan_eval_pass_awaiting_fresh_tier_a_then_two_path_product_repair",
+      "implementationState": "f8_two_path_repair_and_second_tier_a_pass_attempt7_singleton_runtime_lease_granted",
       "dispatchTopicHeadSha": "0d0ba1b7a404c847acba2daed40c69d282906f69",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
@@ -2074,7 +2074,20 @@
           "f8PlanEvaluationState": "complete_pass",
           "f8PlanEvaluationHeadSha": "20337441788b4e2341b0474d6297bec1ddd33b80",
           "f8PlanEvaluationVerdict": "PASS",
-          "f8NextGate": "fresh features Tier-A over the corrected F8 plan/evaluator artifact, then exactly the approved browser-probe source and runtime-probe test repair; attempt 7 remains prohibited until repair receipts and second Tier-A",
+          "f8NextGate": "superseded by the exact two-path correction, replacement exact-content-head receipts, and second fresh Tier-A; attempt 7 is now separately leased once",
+          "f8InitialProductHeadSha": "3299992e4e1cfc329c808b9034e91598bf758522",
+          "f8ScopedCleanlinessRepairHeadSha": "4f50b5a026120b5a3b0195fa1b6f495f08e2b46c",
+          "f8FinalEvidenceHeadSha": "388f2b642a0d6e0ece4e346ea60f857928409beb",
+          "f8ReplacementReceiptState": "PASS and SUFFICIENT at immutable content 4f50b5a02: focused browser probe 25/0; check, test, publish-dry-run, arch-check, scoped CLI lint, and scoped CLI fmt all exit 0 with exact gitHead == actualGitHead; superseded 3299992e4 receipts retained append-only",
+          "f8FinalTierAState": "PASS",
+          "f8FinalTierAProof": "fresh features review accepted only the two approved CDP paths, independently verified separate deterministic 20-second connect/send timeout behavior and timer/listener/pending-ID cleanup, caught then verified the bounded scoped lint/fmt correction, recomputed the named four-receipt set SUFFICIENT, and recorded supervisor evidence separately from author commits",
+          "attempt7LeaseState": "granted_single_attempt_runtime_active",
+          "attempt7LeaseGrantedAt": "2026-08-23T07:51:33.000Z",
+          "attempt7PreGateEvidenceHeadSha": "388f2b642a0d6e0ece4e346ea60f857928409beb",
+          "attempt7ContentHeadSha": "4f50b5a026120b5a3b0195fa1b6f495f08e2b46c",
+          "attempt7BrowserOverride": "/home/codex/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome — Google Chrome for Testing 151.0.7922.34",
+          "attempt7Preflight": "leaf clean and local == remote == PR; aspire ps []; Docker zero; no AppHost/DCP/browser/runtime process or relevant listener; three foreign stale unregistered July/August plugin-smoke trees with no process/container owner moved recoverably to /tmp/netscript-preattempt7-quarantine.rJlScq; unreadable residue zero after quarantine",
+          "attempt7Contract": "one suite-owned scaffold.runtime with strict managed-browser override; cleanup and independent Aspire/Docker/process/port/residue audit; fresh-browser once only on scaffold PASS plus clean audit; final cleanup/audit; no retry; fresh IMPL-EVAL only after terminal green evidence",
           "attempt4Next": "superseded by attempt-5 terminal red and attribution recovery"
         }
       },
@@ -3367,6 +3380,29 @@
         "quarantine": "/tmp/netscript-s5-a6-quarantine-20260815-4M9v8k",
         "freshBrowser": "NOT_RUN"
       }
+    },
+    {
+      "id": "app-service-client-wiring-f8-runtime",
+      "state": "active",
+      "lane": "features",
+      "leafId": "app-service-client-wiring",
+      "gateId": "scaffold.runtime_then_fresh-browser",
+      "preGateHead": "388f2b642a0d6e0ece4e346ea60f857928409beb",
+      "contentHead": "4f50b5a026120b5a3b0195fa1b6f495f08e2b46c",
+      "leaseOwner": "codex-root-0.0.7",
+      "grantedAt": "2026-08-23T07:51:33.000Z",
+      "attempt": 7,
+      "scope": "run suite-owned scaffold.runtime once with strict managed Chrome override; mandatory cleanup and independent Aspire/Docker/process/port/residue audit; only on PASS and clean audit run catalog fresh-browser once, then final cleanup/audit; no retry; evaluator remains downstream",
+      "browserOverride": "/home/codex/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome",
+      "preflight": {
+        "leafState": "clean_local_remote_pr_equal",
+        "dockerContainers": 0,
+        "aspireApplicationProcesses": 0,
+        "relevantListeningPorts": 0,
+        "unreadableResidue": 0,
+        "otherLeaseOwners": 0,
+        "staleResidue": "three exact foreign unregistered plugin-smoke trees with no process/container owner moved recoverably to /tmp/netscript-preattempt7-quarantine.rJlScq"
+      }
     }
   ],
   "canaryCheckpoints": [
@@ -3408,5 +3444,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-23T07:38:31.000Z"
+  "updatedAt": "2026-08-23T07:51:33.000Z"
 }

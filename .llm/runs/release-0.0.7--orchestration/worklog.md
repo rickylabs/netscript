@@ -1620,3 +1620,25 @@
   fresh Tier-A.
 - Rechecked the singleton-runtime preflight: Aspire `[]`, Docker empty, no relevant AppHost/DCP,
   browser, runtime-probe processes, or listeners. The lease remains free rather than pre-granted.
+
+## 2026-08-23T07:51:33Z — #1664 F8 converges and attempt 7 receives one singleton lease
+
+- The same canonical author limited F8 to the approved browser-probe source and runtime-probe test.
+  The first product head `3299992e4` proved the new CDP connect/send timeout behavior but fresh
+  features Tier-A found a real scoped lint/format defect that the broad repository tasks exclude.
+  The bounded correction is `4f50b5a02`; no third product path or behavior rescope occurred.
+- Supervisor-owned replacement evidence is separately attributed at pushed PR head `388f2b642`.
+  At immutable content `4f50b5a02`, the focused file passes 25/0 and exact-head check, root test,
+  publish dry-run, architecture, scoped CLI lint, and scoped CLI format all exit 0. The explicitly
+  named binding set recomputes `SUFFICIENT`; superseded receipts remain append-only. Second fresh
+  Tier-A is `PASS`.
+- The final preflight proved leaf local == remote == PR, Aspire `[]`, Docker zero, no AppHost/DCP,
+  browser/runtime process or relevant listener, and an executable managed Chromium 151 override.
+  Three foreign July/August plugin-smoke trees were unregistered, had no process/container owner,
+  and contained the only unreadable Postgres residue; their exact enclosing runs were moved
+  recoverably to `/tmp/netscript-preattempt7-quarantine.rJlScq`, after which the unreadable scan is
+  empty.
+- The coordinator granted exactly one attempt-7 lease at evidence head `388f2b642`, content head
+  `4f50b5a02`. Run suite-owned `scaffold.runtime` once with the managed-browser override, audit and
+  clean exactly, run `fresh-browser` once only if scaffold passes and the inter-gate audit is empty,
+  then perform final cleanup. No retry is implied; IMPL-EVAL remains downstream of terminal green.

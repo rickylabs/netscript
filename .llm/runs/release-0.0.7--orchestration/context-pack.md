@@ -868,3 +868,18 @@ original #1664 author corrects only scoped lint/format cleanliness on top of pro
 not leased. Fixes is active at topic `e3c446fadc`; the initial #1671 public-export correction was
 execution-refuted and withdrawn, and an instantiated generic return annotation is the current
 bounded probe. Aspire and Docker are empty and the singleton runtime lease is free.
+
+## Resume checkpoint — 2026-08-23T07:51:33Z
+
+#1664 F8 is green at bounded content `4f50b5a02` and separately attributed evidence head
+`388f2b642`: 25/0 focused tests plus exact-head check, root test, publish dry-run, architecture,
+scoped CLI lint, and scoped CLI formatting all pass; the named binding set is SUFFICIENT and second
+fresh features Tier-A is PASS. After an empty Aspire/Docker/process/listener audit and recoverable
+quarantine of three proven-stale unregistered plugin-smoke trees, the coordinator granted the sole
+runtime lease for one attempt 7. Run `scaffold.runtime` once with the managed Chromium override;
+run `fresh-browser` once only after scaffold PASS plus an empty inter-gate audit; never retry.
+
+#1671's canonical existing author is active from exact remote head `bd97a7c03a` under the verified
+three-product/one-test S5 brief. The public-barrel ruling stays withdrawn. Next is author push, fresh
+fixes Tier-A, withheld contracts/sdk JSR plus specifier/export gates, then fresh opposite-family
+IMPL-EVAL. #1663 stays parked at its final evaluator boundary; docs stays exhausted.
