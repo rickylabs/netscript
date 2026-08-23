@@ -1294,3 +1294,44 @@ Verified live rather than assumed:
 Recorded for accuracy: a byte comparison of the intended file against the live body reported a
 difference of exactly **one trailing newline**, which `gh --jq '.body'` appends on extraction. Content
 is identical; this is an artifact of the read, not of the write.
+
+## Acceptance-evidence block converted to YAML — `2026-08-23`
+
+Readiness preflight surfaced a real format bug: `acceptance-evidence` is parsed as a **strict YAML
+subset**, so the prose `BOX` block could not parse. The fenced block was replaced with valid YAML;
+nothing outside the fence changed.
+
+Shape: `issue: 1350`, then `entries:` with seven `- box:` / `evidence:` pairs, every value a
+**single-line double-quoted scalar** — no multiline YAML anywhere.
+
+Verified before applying:
+
+- **All seven `box` values match live #1350 character-for-character.** Compared programmatically against
+  the issue body's checkbox lines, not transcribed by hand: 7 live boxes, 7 YAML boxes, all `EXACT`.
+- `yaml.safe_load` parses; seven entries; every `evidence` non-empty (321–697 chars).
+- Substantive evidence preserved across all seven: exact head `587ade9f3…`, base `61bfd858d…`,
+  IMPL-EVAL head `bcc9f393d…`, delta head `7a880c018…`, the gate counts (deno check 0, suites 78/0,
+  doc-lint 9=9 and 3=3, specifiers 2361/0, publish 0/0, corpus sha `a8f0779228987ed7`), the 10→21
+  barrel-exposure measurement, and all three evaluator comment URLs.
+- **Diff outside the fence is empty** — head lines 1–81 identical, tail identical. Fence count still 2.
+- Closing-keyword scan → exactly `Closes #1350`. DoD **9/0**. Stale heads **0**.
+
+Required validation, executed:
+
+```text
+GITHUB_TOKEN=… deno run --allow-env --allow-net .llm/tools/validation/mirror-acceptance-evidence.ts \
+  --repo rickylabs/netscript --pr 1692 --dry-run --pretty
+
+acceptance-mirror DRY-RUN: #1350
+provenance: head=587ade9f30e619410a4192daadab137b0548eb88 evaluated=2026-08-23T09:35:22.609Z
+snapshot: #1350 updated=2026-08-23T09:33:20Z bodySha256=d0b341668d828444cf965c126b71b7fae009c7aca1c1017e701ba627869cd92e
+notice: Closing reference #1350 classified as issue; retained for acceptance mirroring.
+exit 0
+```
+
+**DRY-RUN resolves to #1350 with no parse or mapping error**, and the provenance head it reports equals
+the PR head. The `notice` line is informational — the closing reference was classified and retained, not
+rejected.
+
+PR state unchanged: head `587ade9f30e619410a4192daadab137b0548eb88`, **draft**, `OPEN`, labels untouched.
+No readiness, checkbox, issue, or merge action.
