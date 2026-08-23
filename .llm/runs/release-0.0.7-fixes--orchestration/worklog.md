@@ -1507,3 +1507,45 @@ request; silence will not be treated as review. CI is the gate.
 Next: merge #1691 when checks are green and it is eligible, then update main, rebase #1671, confirm its
 four source/test paths plus run artifacts only, rerun the withheld gates and fresh Tier-A at the new
 head, and request one fresh opposite-family IMPL-EVAL.
+
+## 2026-08-23 — docs lane reviewed #1691: no objection; surfaces an ungateable reference-page gap
+
+The docs supervisor took the eyeball on #1691 because the export surface is its own, recorded at
+`8a8628c2d`. **No objection, and an explicit "do not widen it."**
+
+**Attribution corroborated independently.** It confirmed the `@netscript/sdk` `CacheQuery` entry is not
+#1671's from evidence it already held: `packages/sdk/src/cache/cache-query.ts` moved in the
+`baf1cdf67..9634735bc` range via #1665 (`3e8e146a4`) and #1669 (`0ef48c2ec`), and #1671 touches no cache
+file. Two independent routes to the same conclusion, so the "nine exports **plus** eleven changed
+signatures, not exactly nine" correction stands.
+
+**Its finding, verified by this topic rather than accepted.** The nine corpus export entries are **five
+distinct symbols**, and all five are absent from their reference pages at `main@9634735bc0`:
+`McpReadResourceResult`, `McpResourceContent`, `McpServerStatus`, `McpTransportPoolSnapshot` (0
+occurrences in `docs/site/reference/ai/index.md`) and `PrismaMySqlTransactionOptions` (0 in
+`docs/site/reference/prisma-adapter-mysql/index.md`). Both pages exist.
+
+Checked here directly: `check-exports-drift.ts` polices **8** packages — `config`, `contracts`,
+`fresh-ui`, `plugin`, `queue`, `sdk`, `service`, `telemetry` — and `@netscript/ai` and
+`@netscript/prisma-adapter-mysql` appear **zero** times in it, against **37** reference pages under
+`docs/site/reference/`. So `docs:exports-drift` **cannot** flag this drift — not now, not ever. #1666
+built a real gate over roughly a quarter of the surface; this is the first concrete instance of what the
+uncovered pages do silently.
+
+**Not absorbed, and deliberately so.** This is pre-existing main drift that #1691 made *visible*, not
+drift #1691 introduced. Folding it in would be the same scope error this topic refused on #1671's
+reference rows — a one-file generated regeneration turning into a docs-surface expansion, destroying the
+single property that makes #1691 reviewable. **#1691 stays at one file.**
+
+Neither lane filed anything: the milestone is frozen. Surfaced to the coordinator as a **post-0.0.7
+candidate** — extend `AUTHORITATIVE_MAPPING`, or deliberately record which of the 28 uncovered pages are
+out of scope and why. Coordinator's call.
+
+Also cleared by that lane: the `reference/sdk/index.md` `CacheQuery` row is a one-line class description
+with no method list, so `startInflight()`/`readCachedEntry()` do not make it false, and `sdk` is
+`entrypoints-only` regardless.
+
+**#1691 CI so far:** `close-gate`, `code-quality`, `quality`, `build`, both `classify` jobs **pass**;
+`check-test` pending; one `scaffold CI lane visibility` instance `CANCELLED` by concurrency supersession
+with two `SKIPPED` siblings. `mergeable: MERGEABLE`, `mergeStateStatus: BLOCKED` pending the outstanding
+check.
