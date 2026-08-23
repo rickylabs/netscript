@@ -78,7 +78,7 @@ Deno.test('guidance close-score boundary reorders exact-inside candidates withou
     rankedSection('pages/beta', 'highest', 10.5),
     rankedSection('pages/alpha', 'stronger', 10.125),
     rankedSection('pages/alpha', 'exact-boundary', 10),
-    rankedSection('pages/00-outside', 'just-outside', 9.75),
+    rankedSection('pages/00-outside', 'just-outside', 9.9375),
   ];
 
   orderGuidanceSections(ranked, []);
