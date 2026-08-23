@@ -90,5 +90,33 @@ does not degrade registry failures other than an unpublished 404 ... ok
 ok | 10 passed | 0 failed
 ```
 
-The final required gate outputs follow after validation.
+## Required validation
 
+```text
+rtk proxy deno task check
+{"selection":{"filesSelected":2894,"batches":25,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+exit 0
+
+rtk proxy deno task test
+ok | 3280 passed (622 steps) | 0 failed | 17 ignored (7m8s)
+exit 0
+
+rtk proxy deno task lint
+{"selection":{"filesSelected":2019,"batches":11},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+exit 0
+
+rtk proxy deno task fmt:check
+{"summary":{"filesSelected":2019,"batches":11,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+exit 0
+
+deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx
+{"selection":{"filesSelected":870,"batches":8,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+exit 0
+
+rtk proxy deno task quality:gate
+quality:scan: {"ok":true,"mode":"repository","findings":[]}
+arch:check: exit 0 (existing WARN/INFO findings only; every doctrine root reports FAIL=0)
+exit 0
+```
+
+`git diff --stat -- deno.lock packages/fresh-ui/deno.lock` produced no output.

@@ -227,3 +227,164 @@ propagated to a neighbour.
    applies to containers and worktrees.
 
 Reported to the peer lanes rather than left for them to discover a dead watcher.
+
+### F-4 — `gh pr checks` renders `cancelled` as `fail`, and a red check can mean nothing ran `[observed]`
+
+PR #1603 showed four red checks. None were code defects:
+
+| Check | `gh pr checks` | Actual | Cause |
+| --- | --- | --- | --- |
+| `close-gate` | fail | failure | `Setup Deno` — GitHub-release CDN `socket hang up` |
+| `surface-diff` | fail | failure | same, twice through the action's own backoff |
+| `scaffold-runtime` | fail | **cancelled** | zero steps executed |
+| `scaffold-runtime-sqlite` | fail | **cancelled** | zero steps executed |
+
+Two lessons, both about not reading a verdict as a judgement:
+
+1. **`cancelled` is presented identically to `fail`.** The scaffold tiers had an empty `steps` array —
+   they never evaluated the change at all. Only `gh api .../jobs --jq '.conclusion'` distinguishes
+   them. Steering on the rendered column alone would have sent a slice to debug a scaffold failure
+   that did not exist.
+2. **Confirm external before retrying.** `fix/1549` and `fix/1576` were failing in the same window
+   on the same step, which is what makes this an incident rather than a property of #1603. The test
+   is other branches, not intuition — and it costs one API call.
+
+Retry is the correct response, but not immediately: the second `surface-diff` attempt failed the
+same way ~8 minutes later, so back-to-back retries just consume rounds. `scaffold-static` passed at
+1m42s **during** the outage, so it is partial, not total.
+
+**Release relevance:** a canary cut during this window would fail its own `Setup Deno` and read as a
+publish defect. Check this before blaming the payload.
+
+### F-5 — I steered from a truncated listing, having been warned about exactly that `[observed]`
+
+I ran `ls -la <slice-dir> | tail -5`, saw only `implement/plan/research/supervisor/worklog`, and
+concluded W3-J had cited a nonexistent `evidence.md` in both its worklog and PR body — a fabricated
+citation on a release-critical p0. I drafted a blocking correction accusing it of that.
+
+`evidence.md` existed the whole time. `ls` sorts alphabetically and `evidence.md` sorts **before**
+`implement.md`, so `tail -5` cut off precisely the file I was looking for. A concurrent repo-wide
+`find` returned the true answer and contradicted me before I sent the correction.
+
+This is `agent-milestone-orchestrator` § Supervision pitfalls — *never steer or merge from a
+truncated log* — committed by the orchestrator that had the rule loaded. The pitfall is not about
+`head -14` specifically; **any** lossy view can invert a verdict. When testing whether a thing
+exists, `ls -la <dir>/<file>` or `test -f` answers the question asked; a truncated directory listing
+answers a different one.
+
+Cost: near-zero, because the artifact check landed before the correction was sent. Had it gone out,
+a correct slice would have been sent to re-derive evidence it had already produced, and the
+accusation would have been in its thread permanently.
+
+### F-6 — the #1594 defect reproduced live, twice, on this milestone's own PRs `[observed]`
+
+Two independent recursive self-triggers were observed on PR #1603 while evaluating it, both from the
+`issue_comment` event, both from workflow-authored comments rather than human ones:
+
+| Duplicate run | Created | Jobs | Outcome | Spend |
+| --- | --- | --- | --- | --- |
+| `31624029906` | 2026-08-12T17:43:12Z, 18s after the trigger comment | **0** | cancelled at run level | none |
+| `31625413947` | 2026-08-12T17:59:52Z, 17s after generation `29356827659` began | **0** | cancelled by the owner before the agent job started | none |
+
+The second is the sharper reproduction: the intentional run `31625391423` posted its **Running
+summary**, and that summary comment itself spawned a second run. The production trigger tests the
+comment body with an unanchored `contains()`, so a status comment that merely *quotes* the invocation
+token re-enters the workflow. This is exactly acceptance box 3 of #1594 — *workflow-authored
+acknowledgement/summary bodies must not recursively dispatch*.
+
+**Why "no spend" is not reassurance.** Neither duplicate billed anything, but in both cases that was
+luck or human reflex, not a refusal: run-level cancellation landed before the `agent` job started,
+and the second was cancelled manually by the owner. Had either duplicate's `agent` job started
+first, it would have billed. This is precisely why #1594 § invariant 2 rejects a `concurrency:`
+block as a fix — `cancel-in-progress` stops a job that has *already begun paying*. The refusal has
+to happen at the claim, before the trigger comment.
+
+**Evidence quality note.** A cancelled run showing `conclusion=cancelled` with `total_jobs=0` is the
+signature of "prevented before spend"; a duplicate that reached `total_jobs>=1` with a started
+`agent` job would be a realised double-spend. Check `total_jobs`, not the conclusion string — the
+two read identically in `gh pr checks` (see F-4).
+
+Forwarded to the W3-I writer for inclusion in #1599's committed evidence, since this is live
+production confirmation of the defect that PR fixes.
+
+### F-7 — I nearly duplicated another lane's active work by reasoning from an unassigned issue `[observed]`
+
+The docs lane reported `main` red on the published-JSDoc codename guard (bare `#1589` in
+`packages/cli/.../netscript-web-runtime-closure.ts:6`) and filed **#1612** rather than absorbing the
+fix — correct, since hiding a red main inside a docs PR would have concealed it going into a cut.
+
+I verified the defect independently (the line is present on `origin/main@6aee2b414`), then reasoned:
+p1, milestone 0.0.6, `packages/cli`, **assignees: none**, blocks the stable cut I coordinate,
+therefore mine. I wrote a slice brief and launched a Codex leaf against a reused worktree.
+
+**Internals already owned it**, with an active canonical leaf at `/home/codex/repos/ns006-jsdoc` on
+`fix/1612-published-jsdoc-codename`.
+
+What limited the damage was luck, not judgement: the launcher rejected my invocation
+(`Unknown argument: --launch-arg`, exit 2) before any session started. Had the flag form been right,
+two agents would have edited the same file on two branches, and the second PR would have surfaced as
+a conflict or a redundant merge on a release-critical path.
+
+**The rule this establishes.** An unassigned issue is not an unowned issue. Assignment is a
+*lagging* signal — a lane that has already cut a worktree and launched a leaf has not necessarily
+touched the GitHub assignee field. Before claiming cross-lane work, check for a live worktree and
+branch (`git branch --list '*<issue>*'` shows a `+` prefix when a branch is checked out in another
+worktree — that prefix is the tell), and announce the claim to the owning lane before launching.
+
+Cleanup performed and verified: launch process absent, no remote branch, no PR, local duplicate
+branch `fix/1612-jsdoc-codename` deleted, brief directory removed, internals' branch untouched.
+
+### F-8 — CORRECTION: F-6 was wrong. The "live reproductions" were not reproductions `[observed]`
+
+F-6 recorded three duplicate runs as live reproductions of #1594's double-spend, and that record was
+forwarded into PR #1599's **committed** evidence. It is wrong, and the error is mine.
+
+**What I checked, and what it shows.** The comment that created each duplicate run is a
+workflow-authored status summary. Its body:
+
+```
+<!-- openhands-agent-summary -->
+<!-- openhands-run: {"run_id":31630430298,"attempt":1,"conclusion":"running"} -->
+## OpenHands Agent — Running
+…
+```
+
+It contains **zero** occurrences of the `@`-prefixed invocation token — only
+`openhands-agent-summary`, which has no `@`. Verified on all three pairs
+(`gh api .../comments --jq '.body|test("@openhands-agent")'` → `false` for every summary).
+
+So the pre-fix `contains(comment.body, '@openhands-agent')` predicate would **not** have matched, the
+`authorize`/`agent` job would have been skipped, and no spend was possible. The duplicate runs are
+the ordinary GitHub behaviour that **every** `issue_comment` creates a workflow run whose jobs then
+skip on the `if:` condition — which is exactly why every other agent run in the same listings shows
+`skipped`.
+
+| Claim in F-6 / committed evidence | Reality |
+| --- | --- |
+| "the summary comment spawned a duplicate via the unanchored substring test" | The summary does not contain the token; the predicate never matched |
+| "Either duplicate could have billed if the agent job had started first" | The job would have been **skipped**, not billed |
+| "production red-before evidence for acceptance box 3" | It is not production evidence of anything; box 3 rests on its unit test, which the evaluator verified independently |
+| Cancellation "prevented" the spend | Cancellation was unnecessary; the runs were inert |
+
+**What remains true and unaffected:**
+
+- The **original** incident is real: `31615108125` and `31615110254`, one second apart, **1 job
+  each** — both reached a job. That is the genuine claim race #1594 was filed for.
+- The unanchored `contains()` is a real weakness: a comment that genuinely *does* contain the token —
+  a human quoting it in prose, or fallback provenance quoting the original command — would dispatch.
+  That is acceptance boxes 1 and 2, and those tests are real.
+- The fix at `4989d0d7b` is correct and still needed. Executed against the real summary body, the new
+  predicate returns `command-not-first-token` for OWNER/MEMBER/COLLABORATOR, while a genuine trigger
+  still returns `authorized-command`. Prevention holds; no over-rejection.
+
+**Root cause of my error.** I reasoned from *shape* — two runs, seconds apart, one cancelled — and
+from the fact that a summary comment plausibly *could* re-enter an unanchored predicate. I never
+checked whether the body actually contained the token. `total_jobs=0` was the visible signal and I
+read it as "cancelled before it could spend" when it equally means "inert, jobs skipped". I even
+wrote the job-count discriminator into the record while missing that it did not distinguish the two
+cases I needed to tell apart.
+
+**The rule.** A duplicate run is evidence of a dispatch defect only if the triggering body would have
+satisfied the trigger predicate. Test the body against the predicate; do not infer the mechanism from
+timing. `conclusion=cancelled` + `total_jobs=0` is **not** proof of a prevented spend — it is equally
+consistent with a run that was never going to spend.

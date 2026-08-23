@@ -32,5 +32,12 @@ source edits; these standalone run artifacts were materialized after the negativ
 
 ## Gates
 
-Gate results are appended after the required validation pass; exact defect proof is in `evidence.md`.
-
+- Focused regression tests: 10 passed, 0 failed.
+- Root check: 2,894 files, 25 batches, 0 failed batches.
+- Root test: 3,280 passed (622 steps), 17 ignored, 0 failed.
+- Root lint: 2,019 files, 0 findings.
+- Root format check: 2,019 files, 0 findings.
+- Scoped CLI check: 870 files, 8 batches, 0 failed batches.
+- Required `quality:gate`: exit 0; scan findings empty and doctrine failures zero.
+- Lockfile diff: empty for `deno.lock` and `packages/fresh-ui/deno.lock`.
+- Exact four-step defect proof, including the full published-version path, is in `evidence.md`.
