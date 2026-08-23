@@ -32,7 +32,7 @@
       "orchestratorAgentId": "topic-docs-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "recovery_pending",
+        "state": "active",
         "worktree": "/home/codex/repos/netscript-007-docs",
         "branch": "orchestrator/release-0.0.7-docs",
         "requestedModel": "claude-opus-5",
@@ -40,18 +40,18 @@
         "remoteControlRequired": true,
         "observedModel": "claude-opus-5",
         "observedEffort": "high",
-        "backgroundAgentId": "fcf04b0f",
-        "sessionId": "fcf04b0f-3c2f-4844-9508-84c52ce8298c",
-        "pid": 23964,
-        "bridgeSessionId": "session_01PLRauSHN1PnvrNF2ucefF6",
-        "remoteControlUrl": "https://claude.ai/code/session_01PLRauSHN1PnvrNF2ucefF6",
-        "topicHeadSha": "5c4ccd8fec2b415b373c875c3b02a6f896fcdc3e",
-        "queueState": "exhausted_parked",
-        "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
+        "backgroundAgentId": "36288ff6",
+        "sessionId": "36288ff6-96bf-459b-8b1e-f289eab242e3",
+        "pid": 369038,
+        "bridgeSessionId": "session_01PMQqcnqEbKKQQz2ipLNf7K",
+        "remoteControlUrl": "https://claude.ai/code/session_01PMQqcnqEbKKQQz2ipLNf7K",
+        "topicHeadSha": "844acea2732354d96e13d91e3d1a7236118db9ec",
+        "queueState": "recovery_audit_active",
+        "attachmentVerifiedAt": "2026-08-23T07:13:13.000Z",
         "legacyCodexThreadId": "019ffcc0-e19b-71d1-95ce-8c72559eb026",
         "legacyState": "parked_offline",
         "recoveryDetectedAt": "2026-08-23T06:59:37.000Z",
-        "recoveryFinding": "recorded native Claude PID and Remote Control session are absent; clean topic worktree retained for exact-session replacement"
+        "recoveryFinding": "replacement Claude Opus 5/high supervisor is live at the exact clean topic checkpoint with bidirectional Remote Control active"
       },
       "issueNumbers": [
         1551
@@ -62,7 +62,7 @@
       "orchestratorAgentId": "topic-internals-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "recovery_pending",
+        "state": "active",
         "worktree": "/home/codex/repos/netscript-007-internals",
         "branch": "orchestrator/release-0.0.7-internals",
         "requestedModel": "claude-opus-5",
@@ -70,17 +70,17 @@
         "remoteControlRequired": true,
         "observedModel": "claude-opus-5",
         "observedEffort": "high",
-        "backgroundAgentId": "f7691917",
-        "sessionId": "f7691917-0be2-4bcd-8839-43d3fc809c34",
-        "pid": 23955,
-        "bridgeSessionId": "session_01HqFtKQtyJcHBEn1MghQdFX",
-        "remoteControlUrl": "https://claude.ai/code/session_01HqFtKQtyJcHBEn1MghQdFX",
-        "topicHeadSha": "abb015cb7a6c0e7c4dcda2589844fcfc2739b467",
-        "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
+        "backgroundAgentId": "e6b8765b",
+        "sessionId": "e6b8765b-bdfe-460a-9df4-06f258cf7421",
+        "pid": 567666,
+        "bridgeSessionId": "session_01EBeJtKdeuAZAiWt5PGJvPH",
+        "remoteControlUrl": "https://claude.ai/code/session_01EBeJtKdeuAZAiWt5PGJvPH",
+        "topicHeadSha": "27c9d433bcec756a0c88825c4aed46d2c6895f54",
+        "attachmentVerifiedAt": "2026-08-23T07:13:13.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
         "legacyState": "parked_idle",
         "recoveryDetectedAt": "2026-08-23T06:59:37.000Z",
-        "recoveryFinding": "recorded native Claude PID and Remote Control session are absent; clean topic worktree retained for exact-session replacement"
+        "recoveryFinding": "replacement Claude Opus 5/high supervisor is live at the exact clean topic checkpoint with bidirectional Remote Control active"
       },
       "issueNumbers": [
         1296,
@@ -106,7 +106,7 @@
       "orchestratorAgentId": "topic-fixes-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "recovery_pending",
+        "state": "active",
         "worktree": "/home/codex/repos/netscript-007-fixes",
         "branch": "orchestrator/release-0.0.7-fixes",
         "requestedModel": "claude-opus-5",
@@ -114,17 +114,17 @@
         "remoteControlRequired": true,
         "observedModel": "claude-opus-5",
         "observedEffort": "high",
-        "backgroundAgentId": "c7597d28",
-        "sessionId": "c7597d28-6774-44c9-aa00-b8b40b776165",
-        "pid": 26724,
-        "bridgeSessionId": "session_014pCd2QWkCscgZpVdjcUPST",
-        "remoteControlUrl": "https://claude.ai/code/session_014pCd2QWkCscgZpVdjcUPST",
-        "topicHeadSha": "a374977d8a4ad7af68919afa508ec1107d7f4221",
-        "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
+        "backgroundAgentId": "b4853b58",
+        "sessionId": "b4853b58-fc3d-4cd6-816a-7e2b2ea4c979",
+        "pid": 567678,
+        "bridgeSessionId": "session_01XmfcnZVCo7NfkhWBuToAiV",
+        "remoteControlUrl": "https://claude.ai/code/session_01XmfcnZVCo7NfkhWBuToAiV",
+        "topicHeadSha": "15f9084ad1261843e1a9f56e7f0fabba6f764165",
+        "attachmentVerifiedAt": "2026-08-23T07:13:13.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
         "legacyState": "parked_idle",
         "recoveryDetectedAt": "2026-08-23T06:59:37.000Z",
-        "recoveryFinding": "recorded native Claude PID and Remote Control session are absent; clean topic worktree retained for exact-session replacement"
+        "recoveryFinding": "replacement Claude Opus 5/high supervisor is live at the exact clean topic checkpoint with bidirectional Remote Control active"
       },
       "issueNumbers": [
         1093,
@@ -160,7 +160,7 @@
       "orchestratorAgentId": "topic-features-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "recovery_pending",
+        "state": "active",
         "worktree": "/home/codex/repos/netscript-007-features",
         "branch": "orchestrator/release-0.0.7-features",
         "requestedModel": "claude-opus-5",
@@ -168,16 +168,17 @@
         "remoteControlRequired": true,
         "observedModel": "claude-opus-5",
         "observedEffort": "high",
-        "backgroundAgentId": "19621a0b",
-        "sessionId": "19621a0b-c6a0-47c6-b826-93c1634a6875",
-        "bridgeSessionId": "session_01LQBHX8KpA5aYtDraq46J8a",
-        "remoteControlUrl": "https://claude.ai/code/session_01LQBHX8KpA5aYtDraq46J8a",
-        "topicHeadSha": "f436df086129f4e9f23afc5a4e0b1b7c996acdd5",
-        "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
+        "backgroundAgentId": "1b0e2b10",
+        "sessionId": "1b0e2b10-b32e-46f0-b202-13d67fe9a9d3",
+        "pid": 567688,
+        "bridgeSessionId": "session_018K6Cs9HBAeSvKNjkyQ72bf",
+        "remoteControlUrl": "https://claude.ai/code/session_018K6Cs9HBAeSvKNjkyQ72bf",
+        "topicHeadSha": "db818aed7075be59fe691cbd7e1865535300f01c",
+        "attachmentVerifiedAt": "2026-08-23T07:13:13.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
         "legacyState": "parked_idle",
         "recoveryDetectedAt": "2026-08-23T06:59:37.000Z",
-        "recoveryFinding": "recorded native Claude PID and Remote Control session are absent; clean topic worktree retained for exact-session replacement"
+        "recoveryFinding": "replacement Claude Opus 5/high supervisor is live at the exact clean topic checkpoint with bidirectional Remote Control active"
       },
       "issueNumbers": [
         1293,
@@ -3357,5 +3358,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-23T06:59:37.000Z"
+  "updatedAt": "2026-08-23T07:14:02.000Z"
 }

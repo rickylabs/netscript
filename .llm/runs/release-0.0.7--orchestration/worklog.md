@@ -1540,3 +1540,25 @@
 - No evaluator, expensive-runtime, or release-writer lease is active. Aspire reports no resources.
   Eleven stopped five-day-old Docker helpers are proven stale and approved for exact removal. The
   coordinator route is GPT-5.6-SOL/high—never max—and this recovery preserves that correction.
+
+## 2026-08-23T07:14:02Z — public state repaired, stale resources pruned, supervisors restored
+
+- Rewrote #1664 and #1671 PR descriptions to their real current checkpoints. Replaced malformed
+  #1671 comment `5304357008` in place and advanced its sole lifecycle label from `status:plan` to
+  `status:impl`. Normalized merged #1666 and closed #1296 to `status:shipped`.
+- Removed the 11 exact stopped Postgres/Redis/Garnet container IDs after an empty Aspire audit;
+  Docker and Aspire both verify empty afterward. No broad container prune or process kill was used.
+- Ownership-audited the dirty 0.0.6 fixes worktree. Its dirty paths contained no newly matched secret
+  material, its unique 1,365-line harness recovery was committed and explicitly pushed as
+  `archive/release-0.0.6-fixes-orchestration-20260823` at `b3a789b6e`, and only then was the worktree
+  removed. Reduced registered worktrees from 31 to 12: the central run, four topics, three active
+  leaves, current main, two unrelated open-PR worktrees, and one unrelated live detached worker.
+- Restored four Claude Opus 5/high supervisors from the exact docs/internals/fixes/features topic
+  worktrees. All four report `working`, the requested model/effort, and active bidirectional Remote
+  Control. New bridges are `session_01PMQqcnqEbKKQQz2ipLNf7K`,
+  `session_01EBeJtKdeuAZAiWt5PGJvPH`, `session_01XmfcnZVCo7NfkhWBuToAiV`, and
+  `session_018K6Cs9HBAeSvKNjkyQ72bf`. Accepted ownership is unchanged.
+- Dispatched internals to the owner-authorized #1663 third/final evaluator boundary, features to
+  fresh #1664 F8 Tier-A before the two-path CDP repair, fixes to the coordinator-approved narrow
+  #1671 public-signature correction, and docs to read-only compatibility drift review. Their serial
+  queues are lane-local and all four lanes may progress independently.
