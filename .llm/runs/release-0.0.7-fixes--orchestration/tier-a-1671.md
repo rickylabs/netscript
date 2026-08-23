@@ -701,3 +701,103 @@ private-type reference before this leaf existed.
 Standing arrangement with the docs lane: nothing live changes either package's published surface. If
 any exposure variant is revived, this topic notifies that lane **before** any readiness attempt, and
 it re-runs the contracts-`complete`-mode expectation against whatever the ruling produces.
+
+---
+
+# Tier-A — S5 bounded probe: instantiated generic return annotation. **PASS — acceptance target MET**
+
+Coordinator ruling: withdraw the external `ContractBuilder`/`Schema` barrel exposure (the 10 → 21
+result is blocking) and probe an instantiated generic return annotation before falling back to option
+2. Executed. **The acceptance target is met, so no fallback is taken.**
+
+## The verified form
+
+```ts
+export const baseContract: ReturnType<
+  typeof oc.errors<
+    Readonly<{
+      NOT_FOUND: Readonly<{ status: 404; message: 'Resource not found'; data: ContractObjectSchema<NotFoundError, NotFoundError> }>;
+      … five more …
+    }>
+  >
+> = oc.errors(commonErrorMap);
+```
+
+TypeScript **instantiation expressions** (`typeof fn<T>` in a type query) are the mechanism. The base
+form `ReturnType<typeof oc.errors>` collapses the type parameter to its `ErrorMap` upper bound —
+which is exactly the erasure #1350 exists to fix. Supplying the type argument keeps the parameter
+instantiated, so the exact six-literal union survives while the annotation names **no** oRPC builder
+type at all. `ContractBuilder` is no longer even imported.
+
+## Measurements — all executed at `9634735bc0` + the leaf's six paths
+
+| Measure | Base | Leaf as landed | **Instantiated** | Target |
+| --- | --- | --- | --- | --- |
+| contracts private-type-ref (all 4 entrypoints) | **9** | 11 | **9** | parity ✅ |
+| `baseContract` references | `oc` (pinned) | `ContractBuilder`, `Schema`, `BaseContractErrors` | **`oc` only** | ✅ |
+| new private references | — | 3 | **0** | ✅ |
+| external builder barrel growth | — | required | **none** | ✅ |
+
+Per-file distribution is identical to base: 8 in `contract-primitives.ts`, 1 in
+`create-crud-contract.ts`. **Exact baseline parity with at most the already-pinned
+`baseContract → oc`.**
+
+| Gate | Result |
+| --- | --- |
+| `deno check` — `contracts/mod.ts`, `contracts/crud.ts`, `sdk/mod.ts` | **PASS** |
+| `packages/contracts` + `packages/sdk` suites | **78 / 0** |
+| `docs:exports-drift` | **PASS**, exit 0 |
+| `deno publish --dry-run` (contracts, slow-types) | **PASS**, exit 0 |
+| lint / fmt (`packages/contracts`) | **0 / 0** |
+
+## Exact union — proven non-vacuously
+
+Asserted directly on `baseContract` through the package entrypoint, not via the SDK path:
+`keyof` its `~orpc.errorMap` is `Equal<>`-exactly the six literals, with `IsAny` and `[never]` guards
+so the assertion cannot pass trivially, plus a `.shape` retention assertion.
+
+**Control:** the same assertion against the **base** `ReturnType<typeof oc.errors>` annotation fails
+with `TS2344 — Type 'false' does not satisfy the constraint 'true'`. So the assertion detects the
+erasure it is designed to detect; passing under the instantiated form is real evidence, not a
+tautology.
+
+## Correction to this topic's own § S5 F3
+
+**§ S5 F3 said "correction #11 is sound." That verification was too narrow and the claim was wrong as
+stated.** It was checked against `packages/contracts/mod.ts` only. `crud.ts` is a separate entrypoint,
+and #11's `typeof <PascalCaseAlias>` formulation **breaks it** — 5 × `TS2345`, because the public
+PascalCase aliases are declared `ContractSchema<…>` while `CrudRoute` requires `ContractObjectSchema`,
+so the widening drops the `.shape` member.
+
+The corrected formulation names the public **type** `ContractObjectSchema<X, X>` directly instead of
+`typeof <alias>`. It preserves `.shape`, still names only public NetScript types, and passes all four
+entrypoints. This is the S4-R "verification owed" item genuinely discharged — the earlier pass
+discharged it only for one of four entrypoints.
+
+## Caveat that must not be spun — `surface:diff` gains a false negative
+
+`deno doc` renders the annotation as `ReturnType<typeof oc.errors>`, **dropping the instantiation
+argument**. `surface-diff.ts` hashes `deno doc` declarations, so the `baseContract`
+"export signature changed" major disappears: undeclared majors go 532 → **531**, and the single
+delta is exactly that entry.
+
+**This is a tooling false negative, not a reduction in real breakingness.** The resolved type did
+change relative to base — the control above proves it. The consumer-visible behaviour is governed by
+the compiler and the emitted declaration (both verified: `deno check` resolves the six codes through
+the package entrypoint; JSR slow-types accepts the explicit annotation), not by `deno doc`'s display
+string.
+
+Two obligations follow and are carried into the S5 brief: the breaking-change disclosure stays at
+**full strength** and must not be softened on the strength of `531 < 532`; and the `surface:diff`
+count for `baseContract` must be reported as **not a valid signal** for this symbol rather than as a
+clean result.
+
+## Outcome
+
+**Tier-A PASS.** Acceptance target met: baseline parity, only the pinned `baseContract → oc`, zero new
+private references, zero barrel growth, exact six-code union preserved and proven. Option 2 is **not**
+taken. Verified patch recorded at `briefs/1671-s5/verified-baseContract-annotation.patch`.
+
+Proceeding to dispatch exactly one canonical implementation agent for the minimum repair (this
+annotation plus the ten SDK corrections) under the existing three-file product ceiling.
+`docs/site/reference/sdk/index.md` stays out of this leaf. No merge, no readiness.
