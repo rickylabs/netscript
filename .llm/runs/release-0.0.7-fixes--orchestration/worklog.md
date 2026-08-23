@@ -1674,3 +1674,58 @@ own worktree and never enters the author's.
 topic reported at S5 dispatch.
 
 Next: evaluator verdict, then report exact head/verdict to the coordinator. No merge, no readiness.
+
+## 2026-08-23 — #1692 SHIPPED; #1350 closed COMPLETED; fixes topic parked
+
+**Terminal.** PR #1692 merged `2026-08-23T09:58:53Z` as squash commit
+`c73d361eea14a7f40702638638e492f2ca961a59` from source head
+`686bae07b2bc66353b2eec9dd56baa0779a63a20`. Verified independently: `origin/main` is now
+`c73d361ee`, one commit above `61bfd858d` (#1691). 21 check runs terminal, zero failures, close-gate
+PASS, zero open review threads, mirror idempotent.
+
+**`Closes #1350` worked.** #1350 is `CLOSED` / `COMPLETED` with **7 of 7** acceptance boxes checked.
+Worth recording against this run's own history: the closing keyword behaved correctly here precisely
+because the body carries exactly one — the same mechanism that, written *negated* into #1691's body,
+closed #1671 unmerged. One token, two opposite outcomes, decided entirely by placement.
+
+**Reconciled to shipped.** `#1350` and `#1692` both moved `status:ready-merge` → **`status:shipped`**,
+each now carrying exactly one `status:` label. #1350 retains `type:fix`, `priority:p1`, `area:sdk`,
+`area:contracts`, `area:docs`, `epic:sdk-client-contrib`; #1692 retains `type:fix`, `priority:p1`,
+`area:sdk`, `breaking`, `impl-eval:skip`.
+
+## What this leaf delivered
+
+`baseContract` keeps its exact six-literal error union through `safe()` and `isDefinedError()`, via a
+TypeScript **instantiation expression** (`ReturnType<typeof oc.errors<…>>`) that preserves the codes
+while naming no oRPC builder type. Both packages ended at **exact doc-lint baseline parity** —
+contracts 9 = 9, sdk 3 = 3 — with `baseContract`'s only private-type reference the pre-existing pinned
+`oc`. `packages/contracts/src/public/mod.ts` was never touched.
+
+## What this lane got wrong, kept for the next run
+
+1. **A negated closing keyword still closes.** `close #1671` inside a sentence disclaiming it cost a
+   live PR. Never write the literal token near an issue number, even to deny it.
+2. **Two grep-precision near-misses in consecutive slices** — `\|` alternation passed to `grep -E`,
+   and a fixed-string search defeated by `**not**` bold *inside* the phrase. Both would have filed a
+   false finding against a correct author. A zero count is a question, not an answer.
+3. **A denied option is not a refuted one.** The barrel-exposure route had been rejected on scope and
+   was never tested for efficacy; measuring it showed 10 → 21 diagnostics. Test the mechanism before
+   spending a ruling on it.
+4. **Verify per-entrypoint, not per-package.** "#11 is sound" was checked against `contracts/mod.ts`
+   alone; `crud.ts` failed with 5 × `TS2345`.
+5. **A tool that stops reporting a break has not removed it.** `surface:diff` went 532 → 531 because
+   `deno doc` drops the instantiation argument — a false negative, recorded as one.
+
+## Prerequisite and follow-ups
+
+- **#1691** — the pre-existing export-corpus staleness, split out rather than absorbed, merged as
+  `61bfd858d`. Absorbing it would have made this leaf the silent carrier for 9 foreign exports.
+- **#1690** — reference/sdk emphasis debt, explicitly non-blocking, rows verified accurate.
+- **#1693** — `ThrowableError → Error` decision record plus the previously unbacked bench-prose debt.
+
+## Parked
+
+Fixes topic parked. Per coordinator: **worktrees and branches left in place** — cleanup is the
+coordinator's. `/home/codex/repos/netscript-007-leaf-typed-error` (author) and
+`/home/codex/repos/netscript-007-eval-1692` (evaluator) remain, both clean, along with branch
+`fix/sdk-typed-error-channel`. No runtime lease held; no containers started by this lane.
