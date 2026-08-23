@@ -302,10 +302,20 @@ PrismaMySqlTransactionOptions  docs/site/reference/prisma-adapter-mysql/index.md
 ```
 
 Both pages exist. **Neither package is in `AUTHORITATIVE_MAPPING`**, so `docs:exports-drift` cannot
-flag this — not now, not ever. The structural shape: **36 reference pages under
-`docs/site/reference/`, 8 packages policed** (`fresh-ui`, `plugin`, `config`, `contracts`, `queue`,
-`sdk`, `service`, `telemetry`). #1666 built a real gate and covered a quarter of the surface; the
-other 28 pages drift silently, and this is the first concrete instance caught.
+flag this — not now, not ever. The structural shape: **8 of 36 package reference pages policed**
+(`fresh-ui`, `plugin`, `config`, `contracts`, `queue`, `sdk`, `service`, `telemetry`), **28
+uncovered**. #1666 built a real gate and covered a quarter of the surface; this is the first
+concrete instance of what the uncovered pages do silently.
+
+Denominator counted exactly, because it decides the shape of any ruling: `docs/site/reference/` holds
+**37 entries = 36 package directories** — every one carrying an `index.md`, none missing — **plus the
+top-level `docs/site/reference/index.md` landing page**. The landing page is not a package surface and
+is not something `AUTHORITATIVE_MAPPING` could gate, so it is **correctly out of scope** and does not
+belong in the denominator. `28 uncovered` is identical under either count, so this changes no
+conclusion — but `8/37` would silently assert the landing page is a gateable surface someone forgot,
+where `8/36` says it is deliberately not one. For a ruling phrased as "extend the mapping, or record
+what is deliberately out of scope", that distinction decides what gets built. The fixes lane carried
+the corrected figure upward at `982276ab6`.
 
 Checked and **clear**, so it is not part of the finding: the `sdk` `CacheQuery` row
 (`reference/sdk/index.md:86`) is a one-line class description with no method list, so
