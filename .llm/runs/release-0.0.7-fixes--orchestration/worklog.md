@@ -1405,3 +1405,55 @@ failure or as licence to widen #1671.
 
 Next: exact-head receipt review after the author's explicit push, then the withheld
 JSR/specifier/export gates, then a fresh opposite-family IMPL-EVAL. No merge, no readiness.
+
+## 2026-08-23 — #1671 S5 Tier-A PASS at `2d806b245`; S6 corpus precondition FAILS; IMPL-EVAL withheld
+
+Author S5 landed clean and explicitly pushed: local == remote == PR `2d806b245632dc16adaf04d740ade96395a82f73`,
+draft, sole `status:impl`. Phase comment `2026-08-23T07:58:01Z` binds both the head and the content head
+`622218ac38…` — reconciled. Full record in `tier-a-1671.md` § S5.
+
+**Tier-A PASS.** Seven paths, zero fifth product paths, `public/mod.ts` untouched, no docs, no
+reference page. Zero suppressions, zero unsafe casts, zero metadata vocabulary; `ContractBuilder` has
+zero remaining references in `packages/contracts/src`. The contracts diff matches the Tier-A-verified
+patch byte-for-byte. Independently measured, not accepted from the receipt: contracts doc-lint **9 =
+base 9**, sdk **3 = base 3**, `baseContract`'s only private reference the pinned `oc`; suites **78/0**;
+lint 0/0; fmt 0/0; `check:netscript-jsr-specifiers` PASS (2361 scanned, 0 failures); `deno publish
+--dry-run` PASS on both packages; `docs:exports-drift` PASS; `@netscript/service` exact-pinned.
+
+Two honesty notes recorded rather than smoothed. `docs:exports-drift` **cannot run inside the leaf
+worktree** — the task arrived with #1666, which post-dates the leaf's base — so its bare exit 1 there is
+a missing task, not a red; it was run on `main@9634735bc0` + the leaf's six paths, where it passes. And
+there is **no runnable `contracts-jsr-audit`/`sdk-jsr-audit` gate**: `jsr-audit` is a skill, so its
+executable surface is publish-dry-run + `deno doc --lint` + specifier guard + pin hygiene, all four
+executed and green. This lane does not claim to have run two gates that do not exist.
+
+**S6 precondition executed and FAILED.** Determinism **PASS** (two clean regenerations, byte-identical
+sha256). Exactly-one-path **PASS**. "Delta reflects only approved signature changes with no new
+exports" **FAIL**.
+
+The decisive fact: `check:mcp-export-corpus` is **already RED at `main@9634735bc0`** — exit 1, identical
+message, no leaf involved. The corpus is a gzip/base64 blob, so it was decoded to JSON and compared on
+symbol identity:
+
+| Attribution | Changed signatures | New exports |
+| --- | --- | --- |
+| Leaf-attributable | **5** (the approved ones) | **0** |
+| Baseline-only | — | **9** |
+| What an S6 commit would carry | 5 | **9** |
+
+The nine belong to `@netscript/ai` (eight MCP symbols across `./mcp` and `./ports`) and
+`@netscript/prisma-adapter-mysql`. An S6 would make #1671 the silent carrier for two other packages'
+un-regenerated export surface — precisely what "no new exports" exists to prevent. The ruling's
+conditional was "if and only if that proof passes"; it does not, so **S6 was not dispatched and the
+canonical author was not resumed again**. Reporting the failed conditional is compliance with that
+ruling, not an owner pause.
+
+**IMPL-EVAL withheld, deliberately.** If a corpus change is later authorized the head moves, and a
+verdict bound to `2d806b245` would be stranded on a stale head — the failure this lane has a standing
+rule against. The leaf is IMPL-EVAL-ready the moment the corpus question is settled.
+
+Recommendation: regenerate the corpus in a **standalone non-leaf change** touching only the generated
+path, since the staleness is repo-wide and owned by other packages. #1671 then needs no S6 and its head
+stays `2d806b245`.
+
+No merge, readiness, label, checkbox, metadata, or `#1348`/`#1466` mutation; no runtime lease.

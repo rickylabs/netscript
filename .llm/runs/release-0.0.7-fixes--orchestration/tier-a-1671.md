@@ -801,3 +801,111 @@ taken. Verified patch recorded at `briefs/1671-s5/verified-baseContract-annotati
 Proceeding to dispatch exactly one canonical implementation agent for the minimum repair (this
 annotation plus the ten SDK corrections) under the existing three-file product ceiling.
 `docs/site/reference/sdk/index.md` stays out of this leaf. No merge, no readiness.
+
+---
+
+# Tier-A — S5 at `2d806b245632dc16adaf04d740ade96395a82f73`
+
+| Field | Value |
+| --- | --- |
+| Head | `2d806b245632dc16adaf04d740ade96395a82f73` — local == remote == PR `headRefOid`, clean, draft, sole `status:impl` |
+| Commits | `622218ac3 fix(sdk): publish typed error signatures`; `2d806b245 docs(harness): record S5 export drift stop` |
+| Author comment | `2026-08-23T07:58:01Z`, binds both `2d806b245…` and content head `622218ac38…` — reconciled |
+| Verdict on the **slice** | **PASS** |
+| Verdict on the **S6 corpus precondition** | **FAIL — proof does not pass; S6 not dispatched** |
+
+## Scope — exact
+
+Seven paths: three product (`contract-primitives.ts`, `errors.ts`, `service-client.ts`), one test
+(`readme-doctest_test.ts`), three existing run artifacts. **Zero** fifth product paths. `public/mod.ts`
+untouched, no `docs/`, no `docs/site/reference/sdk/index.md`.
+
+Prohibition sweep over added lines: **0** `@ts-ignore`/`@ts-expect-error`/`deno-lint-ignore`, **0**
+`as any`/`as unknown as`, **0** `NetScriptProcedureMeta`. `ContractBuilder` has **zero** remaining
+references anywhere in `packages/contracts/src`.
+
+The contracts diff matches the Tier-A-verified patch **byte-for-byte**, including the import removal.
+
+## Gates — executed by this review, not accepted from the receipt
+
+| Gate | Result |
+| --- | --- |
+| `contracts` doc-lint, all 4 entrypoints | **9** — base 9, **exact parity** |
+| `sdk` doc-lint, all entrypoints | **3** — base 3, **exact parity, 0 new** |
+| `baseContract` private refs | **only `oc`** (already pinned) — no `ContractBuilder`, `Schema`, or `BaseContractErrors` |
+| missing-jsdoc / other, both packages | 0 / 0 |
+| `packages/contracts` + `packages/sdk` suites | **78 / 0** |
+| lint (contracts / sdk) | 0 / 0 |
+| fmt (contracts / sdk) | 0 / 0 |
+| `check:netscript-jsr-specifiers` | **PASS** — scanned 2361, allowances 1, ranges 0, failures 0 |
+| `deno publish --dry-run` contracts (slow-types) | **PASS**, exit 0 |
+| `deno publish --dry-run` sdk (slow-types) | **PASS**, exit 0 |
+| `docs:exports-drift` | **PASS**, exit 0 |
+| JSR pin hygiene | `@netscript/service` exact-pinned `jsr:…@0.0.6`; `zod` via `catalog:` (npm-only, correct) |
+
+Two honesty notes. **`docs:exports-drift` cannot be run inside the leaf worktree** — the task arrived
+with `2dd1a75ef` (#1666), which post-dates the leaf's base `0ef48c2ec`, so `deno task` prints the task
+list and exits 1. It was run the honest way, on `main@9634735bc0` + the leaf's six product/docs paths,
+where it **passes**. Reporting that bare exit 1 as a leaf red would have been wrong.
+
+**There is no runnable `contracts-jsr-audit` / `sdk-jsr-audit` gate.** `jsr-audit` is a skill, not a
+catalog command; its executable surface is publish-dry-run, `deno doc --lint`, the specifier guard, and
+pin hygiene — all four executed above and all green. This review does **not** claim to have run two
+named gates that do not exist.
+
+## The S6 export-corpus precondition — proof executed, and it fails
+
+The ruling required, before any S6: prove **determinism**, **exactly-one-path mutation**, and that the
+corpus delta reflects **only the already-approved public signature changes with no new exports**.
+
+| Criterion | Result |
+| --- | --- |
+| Determinism | **PASS** — two independent regenerations from a clean tree produced byte-identical output, sha256 `f7bbc8925481e868…` both times |
+| Exactly-one-path mutation | **PASS** — `git status` shows only `export-surface-corpus.generated.ts` modified |
+| Delta = approved signature changes only, **no new exports** | **FAIL** — see below |
+
+The corpus is a gzip/base64 blob, so a file diff proves nothing; it was decoded to JSON on both sides
+and compared on symbol identity.
+
+**The decisive fact: `check:mcp-export-corpus` is already RED at `main@9634735bc0`** — exit 1, the
+identical "corpus is stale" message, with no leaf involved. Regenerating at base alone moves the
+decoded corpus by **121 lines** and adds **9 exported symbols**.
+
+| Attribution | Changed signatures | New exports | Removed |
+| --- | --- | --- | --- |
+| **Leaf-attributable** (base-regen → head-regen) | **5** | **0** | **0** |
+| **Baseline-only** (base-committed → base-regen) | — | **9** | 0 |
+| **What an S6 commit would carry** (base-committed → head-regen) | 5 | **9** | 0 |
+
+The leaf's own five are exactly the approved changes — `isDefinedError`, `safe`, `SafeFailure`,
+`SafeResult`, `ServiceClientMethod` — and it introduces **zero** new exports. The nine new exports are
+someone else's: eight `@netscript/ai` MCP symbols (`McpReadResourceResult`, `McpResourceContent`,
+`McpServerStatus`, `McpTransportPoolSnapshot`, across `./mcp` and `./ports`) and one
+`@netscript/prisma-adapter-mysql` (`PrismaMySqlTransactionOptions`).
+
+So the criterion **passes for the leaf's contribution and fails for the commit**. An S6 here would
+silently make #1671 the carrier for two other packages' un-regenerated export surface — the exact
+outcome "no new exports" exists to prevent. The ruling's own conditional is "if and only if that proof
+passes", and it does not, so **S6 is not dispatched** and the canonical author is not resumed again.
+
+`baseContract` does **not** appear in the corpus delta at all, consistent with the already-recorded
+`deno doc` false negative: the renderer drops the instantiation argument, so the corpus cannot see the
+annotation change either.
+
+## Outcome
+
+**S5 Tier-A PASS at `2d806b245`.** Every leaf-attributable gate is green and doc-lint is at exact
+baseline parity in both packages. The single red — `check:mcp-export-corpus` — is **proven
+pre-existing at main**, not leaf-owned.
+
+**IMPL-EVAL is not requested at this head**, and deliberately so: if the coordinator later authorizes a
+corpus change the head moves, and a verdict bound to `2d806b245` would be stranded on a stale head —
+the failure mode this lane already has a standing rule against. The leaf is otherwise IMPL-EVAL-ready
+the moment the corpus question is settled.
+
+Recommended: regenerate the corpus in a **standalone non-leaf change** (or an internals-lane leaf) that
+touches only the generated path, since the staleness is repo-wide and owned by `@netscript/ai` and
+`@netscript/prisma-adapter-mysql`. #1671 then needs no S6 at all and its head stays `2d806b245`.
+
+No merge, readiness flip, label, checkbox, metadata, or `#1348`/`#1466` mutation. No runtime lease. All
+probe work in disposable detached worktrees, all removed.
