@@ -732,3 +732,66 @@ The internals queue behind it is unchanged: wave 3 `jsdoc-example-compile-gate` 
 `leak-check-process-descendants` (#1429); wave 4 `fresh-defer-test-capability` (#1557/#1601). L-2
 remains deferred until #1663 is terminal, and #1663 is **not** terminal — it is parked on an owner
 decision.
+
+## 2026-08-23 — #1663 owner-granted amendment reviewed: Tier-A PASS; plan gate discharged at `62811a9dd`
+
+| Field                | Value                                                                            |
+| -------------------- | -------------------------------------------------------------------------------- |
+| Amended head         | `62811a9dd454c81524dd142b00d95196439fb5c2`                                        |
+| Author               | preserved Codex thread `01a004ec-86a6-7c21-8886-81c09de099f5` (`gpt-5.6-sol`/med) |
+| Prior head           | `65c5e1ac4` (cycle-3 `FAIL_PLAN`)                                                 |
+| Gate disposition     | **Tier-A stand-in PASS** under the owner's grant — no cycle 4, no fourth evaluator |
+
+### Bounds — verified
+
+`git diff --name-status 65c5e1ac4 62811a9dd` is five run artifacts (`plan.md`, `research.md`,
+`worklog.md`, `context-pack.md`, `drift.md`). **Zero product or config mutation** — the `deno.json`
+change is planned, not made, which is the correct posture for a plan amendment. All three preserved
+verdicts (`plan-eval.md`, `plan-eval-cycle-1.md`, `plan-eval-cycle-2.md`) are untouched. Tree clean,
+pushed by explicit refspec, PR still draft, labels and milestone unchanged. Author reported
+truthfully and stopped without starting implementation, as briefed.
+
+### Amendment content — all seven required items present
+
+1. Surface-table `deno.json` row now appends to the **existing** root `fmt.exclude` list, "never
+   top-level `exclude` and never a second shadowed `fmt.exclude` key" — the JSON last-key-wins trap
+   is named explicitly.
+2. L3 and L10 both state the nearest-config precedence rule **and** that it does not extend to
+   `deno check`.
+3. The exclusion's role is re-scoped to raw `deno fmt` walk protection only, with "must not affect
+   `check`, `lint`, or `test` selection".
+4. Gate row 1 and S1 both carry the check-coverage obligation, and gate row 1 closes the exact hole:
+   "a warning-only/omitted file is failure, not green."
+5. Propagated to the open-decision row, risk register, PR S1 checklist, Validation, Drift, and DoD
+   row 3.
+6. A-T2 stated in both the surface row and L3; the deferred `.llm/` L-2 entry is explicitly left out
+   of scope.
+7. A-mem folded into L11: tests assert grouping and batch membership with and without the cache,
+   "not timing".
+
+Surface is still exactly **thirteen** paths, byte-identical to the pre-amendment list. No fourteenth.
+
+### Independent verification of the fix mechanism (mine, Deno 2.9.5, scratch project)
+
+I did not take the evaluator's alternative on trust. With root `{ "fmt": { "exclude": ["sub/"] } }`
+and a nested `sub/deno.json`:
+
+| Probe                                        | Result                                                          |
+| -------------------------------------------- | --------------------------------------------------------------- |
+| `deno check sub/ok.ts`                       | `Check sub/ok.ts`, EXIT 0 — **coverage preserved**              |
+| `deno check main.ts sub/ok.ts`               | both `Check`ed — no silent drop from mixed batches              |
+| raw `deno fmt --check .`                     | `Checked 2 files`; the unformatted `sub/ok.ts` skipped — **raw-walk protection intact** |
+| `deno fmt --check sub/ok.ts` (explicit argv) | nested config wins; reports the real finding, EXIT 1            |
+| `deno lint sub/ok.ts`                        | unaffected by `fmt.exclude`                                     |
+
+Compare the top-level `exclude` control from my earlier probe: `deno check sub/ok.ts` →
+`Warning No matching files found` at EXIT 0. The amendment moves the plan from the key that silently
+drops files at green to the key that keeps `check` honest while still protecting raw walks. All four
+properties the plan needs hold simultaneously.
+
+### Verdict
+
+**Tier-A PASS.** Under the owner's grant this discharges the plan gate for #1663. Implementation is
+unblocked. Slices run one at a time through the preserved Codex author, each followed by a fresh
+Tier-A slice review before its sign-off — no lane self-certifies, and `scaffold.runtime` stays
+coordinator-waived `n/a` with no lease requested.
