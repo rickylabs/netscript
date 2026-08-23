@@ -1580,3 +1580,19 @@
   plus the superseded local 0.0.6 branch and duplicate S4-R ref. Preserved all open-PR branches,
   active topic/leaf branches, the recoverable 0.0.6 archive branch, current main, and the unrelated
   live detached worker.
+
+## 2026-08-23T07:30:31Z — #1663 third and final PLAN-EVAL returns `FAIL_PLAN`
+
+- Fresh Fable 5/medium Remote Control evaluator `0f7c4fdf` completed at artifact head
+  `65c5e1ac47646328a54d553c838a9059928139c3`, comment `5384846259`, with local/remote/PR identity,
+  a clean checkout, run-artifact-only mutation, and explicit push all verified.
+- It re-executed and accepted the cycle-2 barrel, formatter, batching, negative-control, doctor,
+  malformed-config, and lint-precedence proofs. It then found one new load-bearing defect: the plan's
+  top-level `deno.json` `exclude` silently removes all five doctor fixture files from explicit
+  `deno check`, including mixed batches, while the wrapper continues to report them as selected.
+  That would create the same false green this leaf exists to remove.
+- The executed correction is bounded within the existing thirteen paths: append the doctor family to
+  the existing root `fmt.exclude`, state that nearest-config precedence differs for check versus
+  fmt/lint, and add an exact five-file check-coverage proof. This was the explicitly final cycle;
+  #1663 returns to the owner boundary and no fourth evaluator is authorized. No product mutation
+  occurred. #1664 and #1671 continue independently.
