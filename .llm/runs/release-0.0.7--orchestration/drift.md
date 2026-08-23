@@ -840,3 +840,20 @@ implementation thread.
   deterministic, but the nine additions reproduced on main and belonged to existing AI/MySQL export
   changes. Carrying them inside #1671 would hide cross-package debt. Repair the corpus in a standalone
   single-generated-file prerequisite, merge it, then rebase and evaluate the typed-error leaf.
+- **Literal issue-closing prose can mutate PR state:** #1671 was closed without merge when a
+  prerequisite description used a literal closing keyword. Continue preserved work in a replacement
+  PR, repair the public record in place, and keep closing syntax only where the intended issue is the
+  merge target.
+- **A docs-source edit owns its deterministic generated cascade:** #1692's human docs correction
+  made the agent-docs prose corpus stale. Regenerate the four canonical derived files, prove a second
+  run byte-identical, and move all exact-head acceptance evidence to the regenerated head.
+- **Exact-head acceptance evidence expires after even deterministic repair:** the S8 receipts were
+  valid for `587ade9f3`, but S9 changed the head. The close gate, mirror dry-run, thread audit, full CI,
+  and public acceptance map were therefore rerun at `686bae07b` before merge.
+- **Verify remote merge before treating local cleanup errors as merge failure:** #1692's squash merge
+  succeeded even though automatic deletion of the locally checked-out branch failed. Query PR and
+  main state first, then remove the proven-terminal worktree and branches explicitly.
+- **Cleanup terminal evaluators by exact ownership, not supervisor-wide process names:** the formal
+  evaluator left helpers whose cwd pointed into a removed evaluator tree. Those exact PIDs were
+  stopped after containment proof while all four topic supervisors and their Remote Control bridges
+  were preserved.

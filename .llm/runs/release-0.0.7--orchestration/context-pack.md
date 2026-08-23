@@ -900,3 +900,33 @@ leaf must not carry them. The fixes supervisor is executing a serial prerequisit
 that may change only the single generated corpus path; deterministic, focused checks and normal
 review precede merge. Then rebase #1671, rerun withheld JSR/specifier/export/publish gates plus fresh
 Tier-A, and request one fresh opposite-family IMPL-EVAL. No owner pause or runtime lease applies.
+
+## Atomic recovery closure — 2026-08-23T10:02:00Z
+
+The coordinator transport is reconciled to Codex Desktop Remote Control on GPT-5.6-SOL/high;
+`max` is explicitly forbidden. The four accepted Claude topic supervisors remain alive, parked at
+their clean checkpoints, and retain their original ownership: docs `f836bdc96`, internals
+`11a33d95f`, features `5c5589ee5`, and fixes `f98863862`. No topic supervisor was relaunched or
+repurposed during transport repair.
+
+#1666 is reconciled as merged at `2dd1a75ef55637816b80e04462cc26fa89631b12` and #1296 is closed.
+#1663 used the owner-authorized third and final exceptional PLAN-EVAL and is terminal `FAIL_PLAN` at
+evaluator `65c5e1ac47646328a54d553c838a9059928139c3`; a fourth cycle is forbidden. #1664 attempt 7 is
+terminal behavior red at evidence `a257807d8` with `68/1/0`; the CDP bounds worked, the fresh-browser
+gate stayed withheld, and the runtime lease was released after exact cleanup.
+
+#1671 was accidentally closed by a literal closing token in prerequisite prose, so its bounded work
+continued as replacement PR #1692. The final architecture uses an instantiated
+`ReturnType<typeof oc.errors<...>>` boundary and does not transfer ContractBuilder, Schema,
+BaseContractErrors, public-barrel, metadata, or export-corpus ownership. Tier-A, contracts/sdk JSR,
+specifier, export, publish, docs, amendment, delta-review, and formal IMPL-EVAL gates passed. A final
+deterministic generated-agent-docs cascade moved the exact head to
+`686bae07b2bc66353b2eec9dd56baa0779a63a20`; all 21 exact-head checks were green. #1692 was squash
+merged as `c73d361eea14a7f40702638638e492f2ca961a59`, #1350 closed completed, and #1693 records the
+accepted residual evaluator follow-up.
+
+The environment is reduced to live ownership: Docker has zero containers, Aspire reports `[]`, the
+terminal evaluator and its exact deleted-cwd helpers are stopped, the clean #1692 leaf/evaluator
+worktrees and topic branches are removed, the audited `netscript-006-fixes` tree is absent, and no
+harness run on main is older than 21 days. Nine registered worktrees remain because each is a live
+supervisor, open-PR, central, main, or unrelated owned workspace.

@@ -1664,3 +1664,27 @@
   exports, not #1671. The coordinator rejected silent carriage in #1671 and authorized a serial,
   single-generated-file prerequisite from exact main; after its focused review and merge, #1671
   will rebase and finish the withheld gates at its new exact head.
+
+## 2026-08-23T10:02:00Z — recovered terminal lanes, #1692 shipped, environment reduced to live ownership
+
+- Reconciled the coordinator to Codex Desktop Remote Control on GPT-5.6-SOL/high, with `max`
+  explicitly forbidden. Preserved the four Claude topic supervisors, their accepted topic ownership,
+  clean checkpoints, and Remote Control transports; no supervisor was relaunched for coordinator
+  transport repair.
+- Reconciled #1666 as merged at `2dd1a75ef55637816b80e04462cc26fa89631b12`, closing #1296. Recorded
+  #1663's owner-authorized third/final `FAIL_PLAN` and #1664's attributable `68/1/0` attempt-7
+  behavior red as terminal outcomes, with no unauthorized fourth planning cycle or runtime retry.
+- Continued the #1671 work through replacement PR #1692 after the original PR was accidentally
+  closed by literal closing prose. Chose the narrow instantiated `ReturnType<typeof oc.errors<...>>`
+  boundary, retained plugin CLI architecture, and excluded public-barrel and generated-corpus debt.
+- Completed fresh Tier-A, contracts/sdk JSR, specifier/export/publish checks, formal opposite-family
+  IMPL-EVAL, focused documentation amendment, amendment review, and delta review. Dispositioned the
+  accepted residual findings into #1693 and rewrote the PR/issue acceptance record in place.
+- Fixed the real exact-head `agent-docs-prose` red with the canonical deterministic four-file S9
+  generated cascade. At evidence `686bae07b2bc66353b2eec9dd56baa0779a63a20`, all 21 checks, local
+  close gate, idempotent mirror dry-run, and zero-thread audit passed. Squash-merged #1692 as
+  `c73d361eea14a7f40702638638e492f2ca961a59`; #1350 is closed completed and shipped.
+- Removed only proven-terminal residue: stopped the exact evaluator helpers with deleted-worktree
+  cwd ownership, removed the clean #1692 leaf/evaluator worktrees and branches, and confirmed the
+  audited old `netscript-006-fixes` tree is absent. Docker is empty, Aspire reports `[]`, main has no
+  harness run older than 21 days, and the remaining nine worktrees are live-owned.
