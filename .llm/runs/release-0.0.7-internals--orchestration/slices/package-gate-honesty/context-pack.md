@@ -6,7 +6,7 @@
 | -------------- | -------------------------------------------------------------------- |
 | Run ID         | `release-0.0.7-internals--orchestration/slices/package-gate-honesty` |
 | Branch         | `fix/package-gate-honesty`                                           |
-| Current phase  | owner-granted cycle-3 F1 amendment pending Tier-A stand-in review    |
+| Current phase  | S1 implemented; pending fresh Tier-A slice review                    |
 | Archetype      | `6 — CLI / Tooling` (supporting MCP member A2)                       |
 | Scope overlays | `docs`                                                               |
 
@@ -23,7 +23,9 @@ generated barrel as path thirteen and ruled on root task selection, fixture-styl
 nearest-config memoization. The owner-authorized final cycle 3 then returned `FAIL_PLAN` at
 `65c5e1ac4`: the planned top-level exclusion preserved fmt/lint acceptance but silently removed all
 five doctor TS files from `deno check`. The owner granted the in-path correction to the existing
-`fmt.exclude` list. No checkout product/config/generated implementation exists.
+`fmt.exclude` list. The topic supervisor then returned Tier-A PASS at amended plan head `62811a9dd`,
+discharging the plan gate under the owner exception. S1 is implemented over exactly its eight
+authorized paths and awaits fresh Tier-A slice review; S2–S4 have not started.
 
 ## Completed
 
@@ -47,17 +49,26 @@ five doctor TS files from `deno check`. The owner granted the in-path correction
 - Cycle 3 independently re-proved the prior repair at 114/2 and exposed the top-level-exclude check
   regression. Its executed `fmt.exclude` alternative preserves raw-walk protection, exact fmt/lint
   acceptance, root `fmt:check`, and scoped doctor check coverage at 5 selected / 0 failed batches.
+- Tier-A passed the owner-amended plan at `62811a9dd`; the plan gate is discharged.
+- S1 implements child-only marker selection, memoized nearest-config batching in both wrappers,
+  bidirectional/group-membership tests, exact root formatter configuration, formatting-only healthy
+  normalization, and canonical CLI asset regeneration.
+- Exact MCP fmt and lint are green at 114 selected / 2 config batches / 0 failed batches; all four
+  healthy TS files remain individually selected through both wrappers.
+- Scoped doctor check is green at exactly 5 selected / 0 failed; wrapper plus doctor tests are
+  24/24; doctor behavior remains 4/4; the malformed fixture hash is unchanged.
+- Honest fmt and lint negative controls produced real findings and were restored byte-exactly; root
+  `fmt:check` is green at 2038/36/0 and the quality gate is green.
 
 ## In progress
 
-- Awaiting topic-supervisor Tier-A review, which the owner designated as the final plan gate.
+- Finalizing the single S1 commit, post-commit generated-asset freshness receipt, explicit push, and
+  `[PHASE: IMPL]` PR comment before stopping for the fresh Tier-A slice review.
 
 ## Next steps
 
-1. Topic supervisor reviews the owner-amended thirteen-path plan; there is no cycle 4 or further
-   evaluator.
-2. If and only if Tier-A passes the amendment, the separately dispatched S1 implementation may
-   begin.
+1. Topic supervisor performs the fresh Tier-A review of the pushed S1 commit.
+2. S2 may begin only when separately dispatched after that review; S3 and S4 remain later slices.
 3. `scaffold.runtime` remains waived `n/a` and must not run.
 
 ## Key decisions
@@ -93,25 +104,25 @@ fixture config. A fourteenth path is rescope.
 
 ## Gates
 
-| Gate family | Current status                             | Evidence                                       |
-| ----------- | ------------------------------------------ | ---------------------------------------------- |
-| Plan-Gate   | cycle 3 final `FAIL_PLAN`; Tier-A stand-in | `plan-eval.md`; owner-amended `plan.md`.       |
-| Static      | NOT_RUN                                    | No implementation.                             |
-| Fitness/JSR | planned                                    | `research.md` and `plan.md` per-member tables. |
-| Runtime     | N/A                                        | Explicit coordinator waiver; must not run.     |
-| Consumer    | baseline failures reproduced               | `worklog.md` research diagnostics.             |
+| Gate family | Current status                      | Evidence                                          |
+| ----------- | ----------------------------------- | ------------------------------------------------- |
+| Plan-Gate   | DISCHARGED                          | Tier-A PASS at amended head `62811a9dd`.          |
+| Static      | S1 focused gates PASS               | 114/2 fmt+lint; check 5/0; tests 24/24.           |
+| Fitness/JSR | quality PASS; full audits remain S4 | No API shape change; published asset regenerated. |
+| Runtime     | N/A                                 | Explicit coordinator waiver; must not run.        |
+| Consumer    | baseline failures reproduced        | `worklog.md` research diagnostics.                |
 
 ## Open questions
 
-- None that change implementation shape; implementation authority depends on the owner-designated
-  Tier-A stand-in review. No cycle 4 or further evaluator exists.
+- None. Fresh Tier-A S1 review is the required stop point; no cycle 4 or further evaluator exists.
 
 ## Drift and debt
 
 - Drift: R8 falsified by execution; rejected parent-family false exclusion; corrected 114-file
   proof; authorized formatting-only twelfth path; cycle-2 published-asset discovery; authorized
   generated thirteenth path; corrected root-vs-fixture formatting semantics; cycle-3 top-level
-  exclusion check regression; owner-granted existing-`fmt.exclude` amendment.
+  exclusion check regression; owner-granted existing-`fmt.exclude` amendment; raw formatter
+  non-TypeScript collateral restored during S1 validation.
 - Debt: no new/closed entry; named CLI/MCP baseline debt remains unchanged.
 
 ## Commits

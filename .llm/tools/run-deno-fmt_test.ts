@@ -1,6 +1,11 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
 
-import { type BatchResult, crashedBatches, formatFailedBatches } from './run-deno-fmt.ts';
+import {
+  type BatchResult,
+  buildConfigBatches,
+  crashedBatches,
+  formatFailedBatches,
+} from './run-deno-fmt.ts';
 
 const CRASH = 'error: Failed to parse "workspace" configuration.';
 
@@ -89,6 +94,101 @@ Deno.test('formatFailedBatches strips ANSI and reports every crashed batch', () 
   assertStringIncludes(rendered, 'boom a');
   assertStringIncludes(rendered, 'boom b');
   assertEquals(rendered.includes(esc), false);
+});
+
+Deno.test('CLI skips only a marked subtree and still selects its unmarked sibling', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await Deno.mkdir(`${root}/marked`);
+    await Deno.mkdir(`${root}/unmarked`);
+    await Deno.writeTextFile(`${root}/marked/.deno-fmt-lint-ignore`, 'deliberately invalid\n');
+    await Deno.writeTextFile(`${root}/marked/deno.json`, '{"workspace":true}\n');
+    await Deno.writeTextFile(`${root}/marked/hidden.ts`, 'export const hidden=1;\n');
+    await Deno.writeTextFile(`${root}/unmarked/visible.ts`, 'export const visible = 1;\n');
+
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        '--allow-read',
+        '--allow-run',
+        new URL('./run-deno-fmt.ts', import.meta.url).pathname,
+        '--cwd',
+        root,
+        '--root',
+        '.',
+        '--ext',
+        'ts',
+      ],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+
+    assertEquals(output.code, 0);
+    const report = JSON.parse(new TextDecoder().decode(output.stdout));
+    assertEquals(report.summary.filesSelected, 1);
+    assertEquals(report.summary.batches, 1);
+    assertEquals(report.summary.failedBatches, 0);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('config batches preserve membership with and without directory memoization', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await Deno.mkdir(`${root}/root-style`);
+    await Deno.mkdir(`${root}/nested`);
+    await Deno.writeTextFile(`${root}/deno.json`, '{"fmt":{"singleQuote":true}}\n');
+    await Deno.writeTextFile(`${root}/nested/deno.json`, '{"fmt":{"singleQuote":false}}\n');
+    await Deno.writeTextFile(
+      `${root}/root-style/value.ts`,
+      "export const rootValue = 'root';\n",
+    );
+    await Deno.writeTextFile(
+      `${root}/nested/value.ts`,
+      'export const nestedValue = "nested";\n',
+    );
+
+    const files = ['nested/value.ts', 'root-style/value.ts'];
+    const uncached = await buildConfigBatches(files, root, 200);
+    const cached = await buildConfigBatches(files, root, 200, undefined, new Map());
+    assertEquals(cached, uncached);
+    assertEquals(uncached.map((batch) => batch.files), [
+      ['nested/value.ts'],
+      ['root-style/value.ts'],
+    ]);
+
+    const explicit = await buildConfigBatches(files, root, 1, 'deno.json', new Map());
+    assertEquals(explicit.map((batch) => batch.files), [
+      ['nested/value.ts'],
+      ['root-style/value.ts'],
+    ]);
+    assertEquals(new Set(explicit.map((batch) => batch.config)).size, 1);
+
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        '--allow-read',
+        '--allow-run',
+        new URL('./run-deno-fmt.ts', import.meta.url).pathname,
+        '--cwd',
+        root,
+        '--root',
+        '.',
+        '--ext',
+        'ts',
+      ],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(output.code, 0);
+    const report = JSON.parse(new TextDecoder().decode(output.stdout));
+    assertEquals(report.summary.filesSelected, 2);
+    assertEquals(report.summary.batches, 2);
+    assertEquals(report.summary.failedBatches, 0);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
 });
 
 Deno.test('CLI refuses an empty format selection', async () => {

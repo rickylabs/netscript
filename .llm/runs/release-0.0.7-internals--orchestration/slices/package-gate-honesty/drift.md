@@ -219,3 +219,22 @@ documentation.
 - **Severity:** minor operational drift
 - **Action:** accept; no recovery mutation or lost commit.
 - **Evidence:** pre-edit `git rev-parse HEAD` and `git status --short` in this resume.
+
+## 2026-08-23 — Raw formatter walk touched non-S1 files; collateral restored
+
+- **What:** The S1 raw-walk protection proof used `deno fmt packages/mcp` after recording the
+  healthy fixture hash.
+- **Source:** S1 implementation validation after Tier-A discharged the plan gate.
+- **Expected:** The existing root `fmt.exclude` entry would keep the fixture-local healthy config
+  byte-identical while allowing an honest raw directory walk.
+- **Actual:** The healthy config stayed byte-identical as required. The raw command also selected
+  and formatted four non-TypeScript files outside the eight-path S1 surface: the MCP README, an
+  OpenAPI fixture, and two telemetry fixtures. This is broader than the source-TypeScript quality
+  surface and is why raw root/directory fmt is not the package-quality verdict.
+- **Severity:** minor validation-command collateral, fully restored
+- **Action:** restored exactly those four command-created changes from pre-S1 `HEAD`, asserted
+  `git diff --exit-code` for each, retained no out-of-surface mutation, and continued using the
+  structured `--ext ts,tsx` wrapper as the formatter verdict.
+- **Evidence:** healthy SHA-256 before/after
+  `c1c2431fac016345102d3dc1f637ac945537b16e7d162c95e1d34964665d92fb`; final status contains only the
+  eight authorized implementation paths plus run artifacts.

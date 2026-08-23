@@ -256,3 +256,74 @@ grouping and batch membership with and without memoization; timing is not the as
   and canonical published-asset regeneration/freshness.
 - No implementation authority exists until that Tier-A stand-in review passes. There is no cycle 4
   or further evaluator; `scaffold.runtime` is waived and must not run.
+
+## 2026-08-23 — S1 implementation after Tier-A plan discharge
+
+The topic supervisor returned `TIER-A PASS` for amended plan head
+`62811a9dd454c81524dd142b00d95196439fb5c2`. Under the owner's cycle-3 exception, that review
+discharged the plan gate. S1 was then implemented as one bounded slice over exactly the eight paths
+named by plan S1; S2–S4 remain untouched.
+
+### Implementation
+
+- `deno.json`: removed the doctor-family wrapper exclusion from the `fmt:check` task and appended
+  the family to the single existing `fmt.exclude` array. No top-level `exclude` or duplicate
+  `fmt.exclude` key was introduced, so check/lint/test selection remains intact while raw formatter
+  walks cannot rewrite fixture-local formatting to root style.
+- Both optimized wrappers recognize child-only `.deno-fmt-lint-ignore`, skip only its containing
+  subtree, resolve the effective nearest `deno.json`/`deno.jsonc`, memoize that result per
+  directory, and batch selected files by config before invoking Deno. Explicit `--config` remains
+  one group.
+- Both wrapper test suites assert marked-child exclusion, unmarked-sibling selection, identical
+  config-group membership with and without memoization, explicit-config grouping, and independent
+  execution of two config groups.
+- Added the marker only under `doctor/broken/`; the deliberately malformed sibling `deno.json`
+  remains byte-identical.
+- Normalized `doctor/healthy/netscript.config.ts` to its authoritative fixture-local default style.
+  Its imported value remains `{"plugins":["workers"]}`.
+- Regenerated `packages/cli/src/kernel/assets/agent-tools.generated.ts` only through
+  `deno task gen:assets-barrel`, updating the embedded lint-wrapper text and bundle hash.
+
+### Executed S1 evidence
+
+All exit codes below were read from the direct process, never from a pipeline.
+
+| Obligation                         | Result | Evidence                                                                                                                                                                                                                      |
+| ---------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Exact MCP fmt, no extra flags      | PASS   | exit 0; `filesSelected:114`, `batches:2`, `failedBatches:0`, `findings:0`.                                                                                                                                                    |
+| Exact MCP lint, no extra flags     | PASS   | exit 0; `filesSelected:114`, `batches:2`, `failedBatches:0`, zero findings.                                                                                                                                                   |
+| Four healthy files remain selected | PASS   | Each of `healthy/netscript.config.ts`, `healthy/.netscript/generated/plugin-ai/agents.registry.ts`, `tools.registry.ts`, and `plugin-workers/job-registry.ts` returned 1 selected / 1 batch / 0 failed through both wrappers. |
+| Doctor check coverage              | PASS   | Scoped check selected exactly 5 files with 1 batch and 0 failed batches; no warning-only or omitted-file green.                                                                                                               |
+| Focused tests                      | PASS   | Both wrapper suites plus `doctor-families_test.ts`: 24 passed / 0 failed / 0 ignored; doctor family remains 4/4.                                                                                                              |
+| Focused changed-source check       | PASS   | 5 selected / 1 batch / 0 failed batches.                                                                                                                                                                                      |
+| Root `fmt:check`                   | PASS   | 2038 selected / 36 batches / 0 failed batches / 0 findings.                                                                                                                                                                   |
+| Quality gate                       | PASS   | `deno task quality:gate` exit 0; quality scan clean, allowance baseline 7 unchanged, architecture checks have no failures.                                                                                                    |
+| Fixture integrity                  | PASS   | `broken/deno.json` SHA-256 remains `6815999dbd68bd1ab5bb137b59808cb1f1a38fb3393c9133721f439c0ad37361`; healthy parsed value unchanged.                                                                                        |
+
+Negative controls remained honest and were restored byte-exactly:
+
+- A single-quote formatting defect in real selected MCP source made the exact fmt wrapper exit 1 at
+  114/2 with one failed batch and one named finding; root `fmt:check` also exited 1 with the same
+  finding. Restoration returned the file to SHA-256
+  `c1c2431fac016345102d3dc1f637ac945537b16e7d162c95e1d34964665d92fb`, and exact fmt returned
+  114/2/0.
+- An unused binding in the same real selected source made exact lint exit 1 at 114/2 with one failed
+  batch and a real `no-unused-vars` finding. Byte-exact restoration returned the same SHA-256, and
+  exact lint returned 114/2/0.
+
+A raw `deno fmt packages/mcp` walk left the protected healthy fixture byte-identical but also
+formatted four non-TypeScript files outside S1. Those four command-created collateral changes were
+immediately restored from `HEAD` and verified clean. This limitation is recorded append-only in
+`drift.md`; the structured TypeScript-only wrapper remains the package-quality verdict.
+
+The root-config lint wrapper over `.llm/tools` honestly refused with exit 2 because the existing
+root `lint.exclude` omits `.llm/` (deferred L-2), not because of a finding in S1. A focused
+diagnostic under an explicit valid config selected all five changed TypeScript inputs and passed
+with 0 failed batches. This diagnostic does not substitute for the required exact no-extra-flag MCP
+lint acceptance above.
+
+The pre-commit `check:assets-barrel` comparison was expectedly red because it compares generated
+bytes to `HEAD` while the canonical S1 regeneration is still uncommitted; its diff named only the
+authorized generated barrel. The freshness verdict will be rerun against the S1 commit before push.
+`scaffold.runtime` remains coordinator-waived `n/a`; no Aspire, Docker, `e2e:cli`, or lease action
+was taken.

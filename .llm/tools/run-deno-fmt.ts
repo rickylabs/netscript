@@ -33,9 +33,17 @@ interface FormatFinding {
 
 export interface BatchResult {
   files: string[];
+  config?: string;
   exitCode: number;
   output: string;
 }
+
+export interface ConfigBatch {
+  files: string[];
+  config?: string;
+}
+
+export type NearestConfigCache = Map<string, string | null>;
 
 interface OutputReport {
   command: string;
@@ -63,6 +71,8 @@ const SKIP_DIRS = new Set([
 ]);
 const ANSI_PATTERN = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
 const NO_TARGET_FILES_MESSAGE = 'No target files found.';
+const IGNORE_MARKER = '.deno-fmt-lint-ignore';
+const DENO_CONFIG_NAMES = ['deno.json', 'deno.jsonc'] as const;
 
 function printHelp(): void {
   console.log([
@@ -236,6 +246,39 @@ function resolveFromCwd(cwd: string, path: string): string {
   return normalizePath(`${cwd.replace(/[/\\]+$/, '')}/${path.replace(/^[/\\]+/, '')}`);
 }
 
+function joinPath(directory: string, name: string): string {
+  return `${directory.replace(/[/\\]+$/, '')}/${name}`;
+}
+
+function directoryName(path: string): string {
+  const normalized = normalizePath(path);
+  if (normalized === '/') return '/';
+  if (/^[A-Za-z]:\/?$/.test(normalized)) return `${normalized.slice(0, 2)}/`;
+
+  const trimmed = normalized.replace(/\/+$/, '');
+  const separator = trimmed.lastIndexOf('/');
+  if (separator < 0) return '.';
+  if (separator === 0) return '/';
+
+  const parent = trimmed.slice(0, separator);
+  return /^[A-Za-z]:$/.test(parent) ? `${parent}/` : parent;
+}
+
+async function isFile(path: string): Promise<boolean> {
+  return await Deno.stat(path).then((info) => info.isFile).catch(() => false);
+}
+
+async function isInsideMarkedSubtree(path: string): Promise<boolean> {
+  let directory = directoryName(path);
+
+  while (true) {
+    if (await isFile(joinPath(directory, IGNORE_MARKER))) return true;
+    const parent = directoryName(directory);
+    if (parent === directory) return false;
+    directory = parent;
+  }
+}
+
 function relativePath(cwd: string, path: string): string {
   const normalizedCwd = normalizePath(cwd).replace(/\/+$/, '');
   const normalizedPath = normalizePath(path);
@@ -267,11 +310,14 @@ async function collectRoot(root: string, options: Options, output: Set<string>):
 
   if (info.isFile) {
     const relative = relativePath(options.cwd, absolute);
-    if (matchesFilters(relative, options)) output.add(relative);
+    if (matchesFilters(relative, options) && !await isInsideMarkedSubtree(absolute)) {
+      output.add(relative);
+    }
     return;
   }
 
   if (!info.isDirectory) return;
+  if (await isFile(joinPath(absolute, IGNORE_MARKER))) return;
 
   for await (const entry of Deno.readDir(absolute)) {
     if (entry.isDirectory && SKIP_DIRS.has(entry.name)) continue;
@@ -294,8 +340,11 @@ async function collectFiles(options: Options): Promise<string[]> {
 
   for (const file of options.files) {
     const target = resolveFromCwd(options.cwd, file);
-    const relative = relativePath(options.cwd, await Deno.realPath(target).catch(() => target));
-    if (matchesFilters(relative, options)) output.add(relative);
+    const absolute = await Deno.realPath(target).catch(() => target);
+    const relative = relativePath(options.cwd, absolute);
+    if (matchesFilters(relative, options) && !await isInsideMarkedSubtree(absolute)) {
+      output.add(relative);
+    }
   }
 
   return [...output].sort((left, right) => left.localeCompare(right));
@@ -309,12 +358,70 @@ function chunk<T>(items: T[], size: number): T[][] {
   return chunks;
 }
 
-async function runBatch(files: string[], options: Options): Promise<BatchResult> {
+async function nearestConfig(
+  file: string,
+  cwd: string,
+  cache?: NearestConfigCache,
+): Promise<string | undefined> {
+  let directory = directoryName(resolveFromCwd(cwd, file));
+  const visited: string[] = [];
+
+  while (true) {
+    if (cache?.has(directory)) {
+      const cached = cache.get(directory) ?? undefined;
+      for (const visitedDirectory of visited) cache.set(visitedDirectory, cached ?? null);
+      return cached;
+    }
+
+    visited.push(directory);
+    for (const name of DENO_CONFIG_NAMES) {
+      const candidate = joinPath(directory, name);
+      if (await isFile(candidate)) {
+        for (const visitedDirectory of visited) cache?.set(visitedDirectory, candidate);
+        return candidate;
+      }
+    }
+
+    const parent = directoryName(directory);
+    if (parent === directory) {
+      for (const visitedDirectory of visited) cache?.set(visitedDirectory, null);
+      return undefined;
+    }
+    directory = parent;
+  }
+}
+
+/** Group files by effective nearest Deno config, then preserve that grouping while batching. */
+export async function buildConfigBatches(
+  files: string[],
+  cwd: string,
+  batchSize: number,
+  explicitConfig?: string,
+  cache?: NearestConfigCache,
+): Promise<ConfigBatch[]> {
+  const groups = new Map<string, ConfigBatch>();
+
+  for (const file of files) {
+    const config = explicitConfig
+      ? resolveFromCwd(cwd, explicitConfig)
+      : await nearestConfig(file, cwd, cache);
+    const key = config ?? '';
+    const group = groups.get(key) ?? { files: [], config };
+    group.files.push(file);
+    groups.set(key, group);
+  }
+
+  return [...groups.values()].flatMap((group) =>
+    chunk(group.files, batchSize).map((files) => ({ files, config: group.config }))
+  );
+}
+
+async function runBatch(batch: ConfigBatch, options: Options): Promise<BatchResult> {
   const args = [
     'fmt',
     ...(options.check ? ['--check'] : []),
-    ...(options.config ? ['--config', options.config] : []),
-    ...files,
+    ...(batch.config ? ['--config', batch.config] : []),
+    ...batch.files,
   ];
   const result = await new Deno.Command('deno', {
     args,
@@ -324,7 +431,8 @@ async function runBatch(files: string[], options: Options): Promise<BatchResult>
   }).output();
 
   return {
-    files,
+    files: batch.files,
+    config: batch.config,
     exitCode: result.code,
     output: new TextDecoder().decode(result.stdout) + new TextDecoder().decode(result.stderr),
   };
@@ -423,11 +531,17 @@ async function main(): Promise<void> {
   );
 
   const files = await collectFiles(options);
-  const batches = chunk(files, options.batchSize);
+  const batches = await buildConfigBatches(
+    files,
+    options.cwd,
+    options.batchSize,
+    options.config,
+    new Map(),
+  );
   const results: BatchResult[] = [];
 
   for (const batch of batches) {
-    if (batch.length === 0) continue;
+    if (batch.files.length === 0) continue;
     results.push(await runBatch(batch, options));
   }
 
