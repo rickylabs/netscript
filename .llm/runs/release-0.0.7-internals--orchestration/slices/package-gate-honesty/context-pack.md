@@ -162,6 +162,26 @@ fixture config. A fourteenth path is rescope.
 - Debt: no entry was added or closed; registered CLI baseline debt remains unchanged, and the
   unregistered MCP doc-lint baseline is awaiting supervisor disposition.
 
+## S5 — owner-granted micro-slice after IMPL-EVAL advisory F1
+
+- Head `cfa055bb8285406e92bd7b9a8f1e12637149d67e`; one line in
+  `packages/mcp/tests/guidance-retrieval_test.ts` (already inside the granted thirteen paths):
+  outside control `pages/00-outside#just-outside` moved from score `9.75` to `9.9375`.
+- Why: the S3 guard pinned narrowing exactly but pinned widening only at `>= 0.75`, leaving
+  `(0.5, 0.75)` undetected — wider than the `~0.198` headroom and `~0.0749` regeneration movement
+  recorded in `guidance-index.ts`.
+- Result: widening now detected at `>= 0.5625`, including `0.6` which passed before. Narrowing at
+  `0.49`/`0.4` still fails. Residual blind band `(0.5, 0.5625)`, width `0.0625` — stated openly, and
+  judged sound by the delta evaluator because absorbing one regeneration step needs `>= ~0.0749`,
+  which lands at `>= 0.575`, inside the detected region.
+- Gates: MCP tests 136/0; `quality:scan` `allowCount: 7`; `guidance-index.ts` restored byte-exact
+  after every mutation.
+- Tier-A PASS (supervisor). **Delta IMPL-EVAL `PASS`** at `b456f53f7`, session
+  `117c4b77`, written to `evaluate-delta.md`; the prior full IMPL-EVAL `PASS` at `cf31de902`
+  remains preserved in `evaluate.md`.
+
+**Latest slice is S5, not S4.** Branch head after the delta verdict is `b456f53f7`.
+
 ## Commits
 
 - Draft PR commit list + phase comments are authoritative; no `commits.md`.

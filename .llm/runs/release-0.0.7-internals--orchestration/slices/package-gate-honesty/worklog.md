@@ -511,3 +511,27 @@ an unplanned fourteenth path.
 - `broken/deno.json` remains deliberately malformed at SHA-256
   `6815999dbd68bd1ab5bb137b59808cb1f1a38fb3393c9133721f439c0ad37361`; `deno.lock` remains
   byte-identical at `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.
+
+## S5 — outside-control tightening (owner-granted, post-IMPL-EVAL)
+
+Head `cfa055bb8`. One line in `packages/mcp/tests/guidance-retrieval_test.ts`: outside control
+`9.75` → `9.9375`. No assertion changed; the expected order array is unchanged because
+`10.5 − 9.9375 = 0.5625` is still outside the `0.5` band.
+
+Supervisor mutation sweep, `guidance-index.ts` restored byte-exact after:
+
+| `closeScoreGap` | exit | note                                         |
+| --------------- | ---- | -------------------------------------------- |
+| `0.5`           | 0    | correct value                                |
+| `0.51`, `0.55`  | 0    | residual blind band, disclosed               |
+| `0.5625`        | 1    | new detection edge                           |
+| `0.6`           | 1    | **passed before S5 — F1 hole closed**        |
+| `0.75`, `5`     | 1    | still detected                               |
+| `0.49`, `0.4`   | 1    | narrowing still pinned exactly               |
+
+MCP tests 136/0; `quality:scan` `ok`, `allowCount: 7`. Tier-A PASS; delta IMPL-EVAL `PASS` at
+`b456f53f7` (`evaluate-delta.md`), prior full verdict preserved in `evaluate.md`.
+
+Backfilled per delta-eval advisory A1: `cfa055bb8` itself carried no run-artifact update because the
+supervisor traded that for speed at owner request, leaving `context-pack.md` one slice behind the
+branch. Corrected here and in `context-pack.md`.
