@@ -1211,3 +1211,67 @@ avoiding the literal negated closing-token that closed #1671), rewrite stale #16
 `5304357008` in place, and report the final head plus readiness evidence.
 
 Readiness, labels, checkboxes, merge, and runtime remain the coordinator's. PR stays draft.
+
+---
+
+# Final public record at `587ade9f30e619410a4192daadab137b0548eb88`
+
+| Field | Value |
+| --- | --- |
+| Head | `587ade9f30e619410a4192daadab137b0548eb88` — local == remote == PR #1692, clean, **draft** |
+| Delta re-review | **PASS on A1–A4**, "no over-claim or under-claim found in the corrected text. No new finding." — comment `5385289186` |
+| Labels observed | `type:fix`, `area:sdk`, `priority:p1`, `breaking`, sole `status:impl` — `breaking` was added by the coordinator; not this topic |
+
+## Receipts re-executed at the exact final head
+
+Every gate was re-run at `587ade9f3` rather than carried over from `7a880c018`, so the PR body's
+"at the exact PR head" claim is literally true rather than inherited:
+
+| Gate | Result |
+| --- | --- |
+| `deno check` (`contracts/mod.ts`, `contracts/crud.ts`, `sdk/mod.ts`) | **0 errors** |
+| contracts + sdk suites | **78 / 0** |
+| lint contracts / sdk | 0 / 0 |
+| doc-lint parity | contracts **9 = 9**, sdk **3 = 3** |
+| `check:netscript-jsr-specifiers` | scanned 2361, failures **0** |
+| `deno publish --dry-run` contracts / sdk | exit **0** / **0** |
+| `docs:exports-drift` | **PASS exit 0** |
+| `check:mcp-export-corpus` | **PASS exit 0**, sha256 `a8f0779228987ed7…` unchanged since S6 |
+
+## PR #1692 body — rewritten completely
+
+Verified on the **live** body after applying, not on the draft file:
+
+- closing-keyword scan → exactly one match, `Closes #1350`. **No negated-token trap.**
+- Definition of Done → **9 checked, 0 unchecked**
+- acceptance mapping → **7 `BOX` entries**, one per #1350 acceptance box, each citing executed evidence
+  and the real comment ids (`5385128267` IMPL-EVAL, `5385236468` amendment review, `5385289186` delta
+  review)
+- stale-head scan (`2d806b245|9cdba6321|1772dfdf9|34eb1f524`) → **0 occurrences**
+
+It also carries A4's second half, which was this topic's to fix and had not been: the base
+`isDefinedError` return was `error is Extract<T, DefinedError>`, not `error is DefinedError` — verified
+at base `errors.ts:75`.
+
+## #1671 comment `5304357008` — rewritten in place
+
+The comment pinned `bd97a7c03a…` (rewritten by the rebase, no longer on the branch), recorded the
+barrel-exposure ruling as though it had been adopted, and listed the JSR/specifier/export gates as
+`NOT_RUN`. All three were stale. Rewritten to state that the exposure route was **refuted at 10 → 21**
+and withdrawn, that the instantiation expression was used instead, that every listed gate is now green,
+and why the PR is closed unmerged. Original text preserved verbatim beneath a divider rather than
+deleted. Trap scan on the new body returned **empty**.
+
+## Delegated, in place
+
+The evaluator was asked to rewrite its **own** IMPL-EVAL comment `5385128267` in place — first line
+exactly `**[PHASE: IMPL-EVAL] [VERDICT: PASS]**`, PASS-WITH-FINDINGS history preserved rather than
+retconned, F1–F5 / A1–A4 dispositions stated, delta review linked, and **no second IMPL-EVAL phase
+comment**. It was given the closing-token trap explicitly, with the scan command, because that trap has
+already cost this lane one PR.
+
+## Not done, and not this topic's to do
+
+No readiness flip, no label change, no issue checkbox tick, no merge, no runtime lease. `#1350`'s seven
+boxes remain unticked — the mapping is evidence for the coordinator's close-gate, not a substitute for
+it. `#1348` / `#1466` untouched.
