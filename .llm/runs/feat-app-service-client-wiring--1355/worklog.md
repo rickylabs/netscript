@@ -1089,3 +1089,50 @@ remain untouched.
 
 **Attempt 7 is not granted and is not this supervisor's to grant.** The reviewed green head is
 reported to the coordinator for the lease decision.
+
+## 2026-08-23 — S5 attempt 7 executed once under coordinator lease; runtime red, now attributable
+
+**Supervisor-generated.** Full report: `reports/s5-attempt7-runtime-failure.md`.
+
+Lease `6c5d54082f9dc80a9fe8f0b00176eccad651f0eb`. Executed exactly once at leased evidence head
+`388f2b642` (content `4f50b5a02`) in a dedicated detached checkout, clean before the gate, strict
+`NETSCRIPT_E2E_BROWSER_EXECUTABLE` (`Google Chrome for Testing 151.0.7922.34`), suite-owned command.
+**No retry.**
+
+Raw exit **1**; **68 passed / 1 failed / 0 skipped**; sole red `behavior.service-client-refetch` at
+**60,134 ms** — against attempt 6's exit `143` at **900,030 ms** with empty stderr. Attempt 7 emits a
+full stack trace naming `waitUntil :623` → `waitForExpression :610` →
+`collectBrowserRefetchEvidence :286`, timing out on the optimistic-row expression (`Seed User*` after
+the Rename click). `cleanup.aspire-stop` PASS; `generated.service-client-contract` and
+`generated.deno-fmt-check` PASS (F4/F5 hold).
+
+**Neither CDP bound fired** — zero matches for `CDP WebSocket connection` / `CDP response to` in
+either artifact. The transport connected and every command settled, and the failing assertion is a
+DOM expression evaluated inside the page, so the browser genuinely ran. Therefore attempt 7 does
+**not** prove F8 repaired attempt 6's hang; it proves the transport was healthy this run and that the
+stall did not recur. F8 delivered attributability, which was its stated purpose. The remaining red is
+a behavioral question about the optimistic-update/refetch path, and is not classified here as a pass
+or fail of that feature.
+
+`fresh-browser` was **not run** — the lease conditioned it on a `scaffold.runtime` PASS, which did
+not occur.
+
+### The inter-gate audit read empty and was wrong
+
+`cleanup.aspire-stop` PASS and `leak-check` `survivors: []` **both missed** three surviving
+`aspire-managed` processes (`646406`, `646408`, `646415`), found only by a cwd-containment sweep, all
+rooted in this run's worktree and orphaned to the WSL `/init` relay. Path containment proved
+run-ownership; foreign siblings (`tmux`, `claude`, `codex`, `browser_crashpad`) were left untouched.
+All three **ignored SIGTERM** and required SIGKILL with containment re-verified before each signal.
+
+The one run-owned unreadable residue (`.data/postgres/18/docker`, mode 700, container-uid) was then
+**moved, not deleted**, with its exact enclosing tree to
+`/tmp/netscript-s5-a7-quarantine.Cy2tNS/plugin-smoke-20260823-095547` (843 MB, recoverable).
+
+Post-quarantine re-audit is empty on every class: unreadable 0, processes 0, containers 0, ports 0,
+`leak-check` aspire ok / docker ok / survivors []. `leak-check` wrote to a scratch slice dir
+throughout, so the leaf's `leak-report.md` was never regenerated — the 2026-08-15 contamination was
+not repeated.
+
+No product or test mutation, evaluator, readiness/merge/metadata action, relabel, or issue mutation.
+All prior quarantines and reds remain append-only. Stopped for the coordinator's IMPL-EVAL decision.
