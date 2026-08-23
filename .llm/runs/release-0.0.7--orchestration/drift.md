@@ -832,3 +832,11 @@ implementation thread.
   owning processes were absent, so the exact enclosing runs were quarantined recoverably before the
   lease. An empty active leaf alone is insufficient when repository scanners can traverse sibling
   workspaces.
+- **Suite cleanup plus the standard leak-check can both miss reparented Aspire children:** attempt 7
+  reported both green while three `aspire-managed` processes remained under the WSL init relay.
+  Worktree-cwd containment provided exact ownership; targeted cleanup and a second independent sweep
+  are required before a runtime lease is released.
+- **A generated-corpus red is not automatically leaf-owned:** #1671's one-file regeneration was
+  deterministic, but the nine additions reproduced on main and belonged to existing AI/MySQL export
+  changes. Carrying them inside #1671 would hide cross-package debt. Repair the corpus in a standalone
+  single-generated-file prerequisite, merge it, then rebase and evaluate the typed-error leaf.

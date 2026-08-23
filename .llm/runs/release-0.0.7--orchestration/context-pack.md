@@ -883,3 +883,20 @@ run `fresh-browser` once only after scaffold PASS plus an empty inter-gate audit
 three-product/one-test S5 brief. The public-barrel ruling stays withdrawn. Next is author push, fresh
 fixes Tier-A, withheld contracts/sdk JSR plus specifier/export gates, then fresh opposite-family
 IMPL-EVAL. #1663 stays parked at its final evaluator boundary; docs stays exhausted.
+
+## Resume checkpoint — 2026-08-23T08:11:10Z
+
+#1664 attempt 7 is terminal red and its singleton lease is released. Exact evidence head is
+`a257807d883`: `68/1/0`, exit 1, sole failure `behavior.service-client-refetch` after 60,134 ms while
+waiting for optimistic `Seed User*` DOM state. Managed Chrome and CDP connect/send succeeded; neither
+F8 bound fired. `fresh-browser`, retry, IMPL-EVAL, readiness, and merge remain withheld. Three
+run-owned orphaned Aspire helpers missed by both standard cleanups were reaped by exact PID after cwd
+ownership proof; the 843 MB residue moved recoverably to `/tmp/netscript-s5-a7-quarantine.Cy2tNS`;
+all final environment audits are empty.
+
+#1671 stays at clean pushed evidence `2d806b245` with its exact four source/test paths. Its generated
+export-corpus guard is red for nine already-existing AI/MySQL exports that reproduce on main, so the
+leaf must not carry them. The fixes supervisor is executing a serial prerequisite from exact main
+that may change only the single generated corpus path; deterministic, focused checks and normal
+review precede merge. Then rebase #1671, rerun withheld JSR/specifier/export/publish gates plus fresh
+Tier-A, and request one fresh opposite-family IMPL-EVAL. No owner pause or runtime lease applies.

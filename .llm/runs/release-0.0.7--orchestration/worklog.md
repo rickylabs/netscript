@@ -1642,3 +1642,25 @@
   `4f50b5a02`. Run suite-owned `scaffold.runtime` once with the managed-browser override, audit and
   clean exactly, run `fresh-browser` once only if scaffold passes and the inter-gate audit is empty,
   then perform final cleanup. No retry is implied; IMPL-EVAL remains downstream of terminal green.
+
+## 2026-08-23T08:11:10Z — #1664 attempt 7 reaches an attributable behavior red and releases cleanly
+
+- The singleton attempt ran exactly once at immutable evidence `388f2b642` / content `4f50b5a02`.
+  Suite result: `68 PASS / 1 FAIL / 0 skipped`, exit 1. The sole red is
+  `behavior.service-client-refetch` after 60,134 ms: Chrome launched, CDP connected, all commands
+  settled, and the in-page expression never observed the optimistic `Seed User*` row after Rename.
+  Neither new CDP timeout fired. F8 therefore delivered attribution and cut the prior silent
+  900,030 ms stop to a named boundary, without claiming causal proof for attempt 6.
+- `fresh-browser` is `NOT_RUN`; no retry, evaluator, readiness, or merge is authorized. Supervisor
+  evidence is clean, explicitly pushed at `a257807d8`, and posted at comment `5384987561`. The PR
+  description was rewritten in place to this exact terminal checkpoint.
+- The suite cleanup and standard leak-check both missed three orphaned run-owned Aspire helpers.
+  Cwd containment proved ownership; all three ignored SIGTERM and were removed by exact PID only
+  after containment was rechecked. The exact 843 MB run residue was moved recoverably—not deleted—to
+  `/tmp/netscript-s5-a7-quarantine.Cy2tNS`. Final Aspire, Docker, process, port, and unreadable scans
+  are empty, so the singleton runtime lease is released.
+- #1671's export-corpus stop was independently reproduced on `main`: deterministic regeneration
+  changes one generated file, but its nine additions belong to already-existing AI and MySQL
+  exports, not #1671. The coordinator rejected silent carriage in #1671 and authorized a serial,
+  single-generated-file prerequisite from exact main; after its focused review and merge, #1671
+  will rebase and finish the withheld gates at its new exact head.
