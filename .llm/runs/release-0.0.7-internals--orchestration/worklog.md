@@ -795,3 +795,31 @@ properties the plan needs hold simultaneously.
 unblocked. Slices run one at a time through the preserved Codex author, each followed by a fresh
 Tier-A slice review before its sign-off — no lane self-certifies, and `scaffold.runtime` stays
 coordinator-waived `n/a` with no lease requested.
+
+## 2026-08-23 — Independent S1 baselines captured at `62811a9dd` (before the slice lands)
+
+Measured by me on a `git archive 62811a9dd` copy under the supervisor's job tmp, while the author
+worked in the leaf worktree — the archive reads the object store, not the working tree, so the two
+do not interfere. Recorded **before** S1 commits so the Tier-A slice review compares against numbers
+I measured rather than numbers the implementer reports.
+
+| Baseline probe                                       | Measured at `62811a9dd`                                                              |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Doctor fixture TS files                              | **5** (1 under `broken/`, 4 under `healthy/`)                                        |
+| `deno check --unstable-kv` over all five             | all five `Check` lines, **EXIT 0** — the coverage that exists today                   |
+| Exact fmt wrapper `--root packages/mcp --ext ts,tsx` | **EXIT 1**, `Failed to parse "workspace" configuration … invalid type: string "packages/*"` |
+| Exact lint wrapper, same shape                       | **EXIT 1**, identical crash                                                           |
+
+The two wrapper failures are the #1604/#1618 defect itself: the deliberately malformed
+`broken/deno.json` (`{ "workspace": "packages/*" }`) crashes config resolution for the whole batch.
+
+**What S1 must therefore prove, stated as a delta against my own numbers, not the author's:**
+
+1. Both exact wrappers move EXIT 1 → **EXIT 0** at `filesSelected: 114`, two batches,
+   `failedBatches: 0`, with all four healthy TS files individually proven selected.
+2. The doctor `deno check` baseline is **unchanged** — still five files, still EXIT 0. This is the
+   cycle-3 regression guard: a `Warning No matching files found` or a missing `Check` line at exit 0
+   is failure, not green.
+
+Property 2 is the one that had no baseline before this run, which is precisely how the top-level
+`exclude` defect survived two evaluation cycles undetected.
