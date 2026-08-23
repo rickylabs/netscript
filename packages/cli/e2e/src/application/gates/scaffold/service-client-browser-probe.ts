@@ -98,18 +98,10 @@ export class CdpClient {
     const timeoutMs = options.timeoutMs ?? TIMEOUT_MS;
     const socket = (options.createSocket ?? ((candidate) => new WebSocket(candidate)))(url);
     await new Promise<void>((resolve, reject) => {
-      let timeoutId: ReturnType<typeof setTimeout> | undefined;
-      const settle = (action: () => void) => {
-        clearTimeout(timeoutId);
+      const timeoutId = setTimeout(() => {
         socket.onopen = null;
         socket.onerror = null;
-        action();
-      };
-      timeoutId = setTimeout(() => {
-        socket.onopen = null;
-        socket.onerror = null;
-        const timeoutMessage =
-          `CDP WebSocket connection to ${url} timed out after ${timeoutMs} ms`;
+        const timeoutMessage = `CDP WebSocket connection to ${url} timed out after ${timeoutMs} ms`;
         try {
           socket.close();
           reject(new Error(timeoutMessage));
@@ -121,6 +113,12 @@ export class CdpClient {
           );
         }
       }, timeoutMs);
+      const settle = (action: () => void) => {
+        clearTimeout(timeoutId);
+        socket.onopen = null;
+        socket.onerror = null;
+        action();
+      };
       socket.onopen = () => settle(resolve);
       socket.onerror = () => settle(() => reject(new Error(`failed to connect to ${url}`)));
     });

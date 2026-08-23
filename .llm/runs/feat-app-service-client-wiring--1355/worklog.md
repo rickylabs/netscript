@@ -999,3 +999,30 @@ selection/startup/bounded-drain/no-cache-literal proofs ran in that same file an
 proof was omitted. No third code path, stage logging, retry, reconnect, runtime attempt, browser,
 Aspire, Docker, lease, binding gate, evaluator, readiness, metadata, issue, quarantine, lockfile, or
 docs mutation occurred. The Tier-A supervisor owns the four post-push binding receipts.
+
+## F8 correction — scoped lint and format cleanliness restored
+
+Tier-A accepted the F8 transport behavior and all six proofs at `3299992e4`, then attributed one
+slice-caused `prefer-const` diagnostic and one formatting finding to the connection-timeout block.
+The correction changes only
+`packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts`: `timeoutId` is
+now the `const` result of `setTimeout` declared before `settle`, and the formatter owns the
+`timeoutMessage` wrapping. The focused test file did not need a change.
+
+The timeout callback still detaches both connection handlers, closes the injected socket, and
+rejects close failures with their cause. Both open/error settlements still clear the timer. The
+connection and response diagnostic strings, pending-id deletion-before-rejection, and
+`#receive` timer cancellation remain unchanged.
+
+Required scoped evidence:
+
+| Command | Result |
+| --- | --- |
+| `run-deno-lint.ts --root packages/cli/e2e --ext ts` | PASS — 175 files, 1 batch, 0 occurrences/findings |
+| `run-deno-fmt.ts --root packages/cli/e2e --ext ts` | PASS — 175 files, 1 batch, 0 failed batches, 0 findings |
+| focused `service-client-runtime-probe_test.ts` wrapper | PASS — 25 passed / 0 failed / 0 ignored |
+
+The six untracked supervisor-owned `f8-*.json` receipts present before this correction were not
+staged, edited, replaced, or interpreted as author-owned evidence. No exclusion pattern, test,
+third product path, runtime, browser, Aspire, Docker, lease, readiness, metadata, issue, quarantine,
+lockfile, or docs mutation occurred.
