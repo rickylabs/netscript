@@ -9,8 +9,8 @@ is in flight. This file is the resumable record.
 | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
 | Lane allocation (`milestone-cluster-state.json`) | `[1551]` — closed/completed, `status:shipped`                                                                          |
 | Docs-lane issues still open                      | **none**                                                                                                               |
-| Latest `main` (2026-08-15 reconciliation)        | `baf1cdf67a4e931af17b4772ddf6101f36152184` — this lane's last merge `729386c56` is three commits behind it            |
-| Supervisor                                       | native Claude Opus 5 / high, session `fcf04b0f-3c2f-4844-9508-84c52ce8298c`, bridge `session_01SBHRTmr6ddueUYzCbcXrRV` |
+| Latest `main` (2026-08-23 reconciliation)        | `9634735bc09123b0e69e7438ea4ec763462aa072` — this lane's last merge `729386c56` is seven commits behind it            |
+| Supervisor                                       | native Claude Opus 5 / high, session `36288ff6-96bf-459b-8b1e-f289eab242e3`, bridge `cse_01PMQqcnqEbKKQQz2ipLNf7K` |
 | Topic branch                                     | `orchestrator/release-0.0.7-docs`, push by explicit refspec only                                                       |
 
 ## What shipped
@@ -60,12 +60,16 @@ snippets were type-checked in scratch fixtures.
    run came from gates the repository excludes by configuration.
 5. **A docs change invalidates three generated layers** — agent-docs bundle → CLI assets barrel →
    MCP publish assets. Regenerate all three in the same slice; do not let CI discover them one at a
-   time.
+   time. Precision added 2026-08-23: the three have *distinct* sources, so check which actually
+   fires before demanding a regen. `agent-docs.generated.ts` is fed from
+   `.llm/assets/agent-docs/{prose.json.gz,provenance.json}` (docs/site-derived);
+   `publish-assets.generated.ts` embeds `packages/mcp/README.md` only; `embedded.generated.ts`
+   tracks the CLI scaffold assets. A `packages/<other>/README.md` edit fires none of them.
 
 ## If this lane is reactivated
 
-Branch from **current `origin/main`**, not from this lane's last merge — as of the 2026-08-15
-reconciliation that is `baf1cdf67a4e931af17b4772ddf6101f36152184`; re-read it before dispatch rather
+Branch from **current `origin/main`**, not from this lane's last merge — as of the 2026-08-23
+reconciliation that is `9634735bc09123b0e69e7438ea4ec763462aa072`; re-read it before dispatch rather
 than trusting this line. `729386c567bfbd0b8c7f86a4ed09348f0a8a4ad8` is only the immutable head this
 lane shipped. The preserved Codex author threads are
 `019ffcc9-16c2-7573-b7f6-d627172408e8` (#1652 leaf, merged worktree) and
