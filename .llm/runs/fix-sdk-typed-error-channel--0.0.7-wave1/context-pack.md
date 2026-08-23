@@ -6,19 +6,20 @@
 | -------------- | ---------------------------------------------------------- |
 | Run ID         | `fix-sdk-typed-error-channel--0.0.7-wave1`                 |
 | Branch         | `fix/sdk-typed-error-channel`                              |
-| Current phase  | `implementation` — S6 derived export corpus generated and checked; awaiting Tier-A |
+| Current phase  | `implementation` — S7 breaking/migration docs amendment complete; awaiting focused review |
 | Archetype      | `1 — Small Contract` slice                                 |
 | Scope overlays | `docs`                                                     |
 
 ## Current state
 
-PLAN-EVAL is terminal PASS at evaluator commit `f76a3c45b`; S1-S3 and S5 each passed fresh Tier-A.
-PR #1691 repaired unrelated main-branch export-corpus drift and merged as `61bfd858d`; this branch
-was rebased onto it. S6 then regenerated the one newly authorized derived path for this leaf's five
-SDK signature changes. The immutable S6 content head is
-`b427e035488e5eabd9f3a92870787006aa9a6813`; the canonical corpus check passes there. PR #1692 is
-the active draft replacement for accidentally closed PR #1671. #1466 still owns metadata
-definition/export; no metadata vocabulary or acceptance claim was introduced.
+PLAN-EVAL is terminal PASS at evaluator commit `f76a3c45b`; S1-S3, S5, and S6 passed their separate
+reviews. IMPL-EVAL returned `PASS-WITH-FINDINGS` at `bcc9f393d`; S7 addresses medium finding F1's
+remaining consumer-doc half after the topic supervisor repaired the PR body. Both published SDK
+pages now state the complete 0.0.7 breaking/migration contract, and the SDK hub documents the bare
+`Promise` defined-arm characteristic. Immutable S7 content head is
+`29c9e40aad391381e79afa92a6052cbcd07d9a4a`; all selected docs/export/scope gates pass there. PR
+#1692 remains the active draft. #1466 still owns metadata definition/export; no metadata vocabulary
+or acceptance claim was introduced.
 
 ## Completed
 
@@ -35,11 +36,16 @@ definition/export; no metadata vocabulary or acceptance claim was introduced.
   carry the procedure error map without a local schema shim or ambient declaration.
 - S2 literal failure arms, real positive assertions, runtime identity test, and focused consumer
   compatibility checks/tests.
+- S3 coherent two-page typed-error narrative and compile-accurate discriminated examples.
+- S5 public-signature doc-lint corrections and exact-six-code type proof.
+- S6 deterministic derived MCP export-corpus refresh.
+- S7 explicit 0.0.7 breaking/migration disclosure on both pages, F4 bare-promise behavior note, and
+  #1693 backing for deferred prose plus the `ThrowableError` substitution decision.
 
 ## Next steps
 
-1. Stop after the S6 push and PR #1692 phase receipt.
-2. A fresh Tier-A review and separate opposite-family IMPL-EVAL are coordinator-owned next steps.
+1. Stop after the S7 push and PR #1692 phase receipt.
+2. The separate opposite-family focused amendment review is coordinator-owned.
 3. Do not self-review, self-certify, request evaluation, flip readiness, or merge.
 
 ## Key decisions
@@ -58,9 +64,10 @@ definition/export; no metadata vocabulary or acceptance claim was introduced.
 - `packages/sdk/src/client/errors.ts`
 - `packages/sdk/src/ports/service-client.ts`
 - `packages/sdk/tests/readme-doctest_test.ts`
+- `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`
+- `docs/site/services-sdk/sdk.md`
+- `docs/site/services-sdk/how-to/discover-services.md`
 - existing files under `.llm/runs/fix-sdk-typed-error-channel--0.0.7-wave1/`
-
-No docs/S3-S4 product file was modified.
 
 ## Gates
 
@@ -87,15 +94,20 @@ No docs/S3-S4 product file was modified.
 - S6 `check:mcp-export-corpus`: PASS at immutable content head `b427e0354`.
 - S6 MCP scoped lint/format: pre-existing tooling RED, exit 1 with zero findings in each wrapper;
   no source fix attempted.
+- S7 `docs:snippets`: PASS; 581 fences scanned, 22 Tier-1 snippets compiled, zero malformed.
+- S7 docs source format and docs accuracy: PASS at immutable content head `29c9e40aa`.
+- S7 `docs:exports-drift` and `check:mcp-export-corpus`: PASS; generated corpus unchanged.
+- S7 base-to-head `packages/` path diff: empty; `deno.lock` byte-identical.
 
 ## Open questions
 
 - Live service integration tests requiring a runtime lease were not run because this slice forbids a
-  lease. Benchmark reference prose remains coordinator-owned follow-up debt.
+  lease. Deferred benchmark/reference prose is tracked by coordinator-filed follow-up #1693.
 
 ## Drift and debt
 
 - Drift: earlier scope/ownership conflicts and the README research correction are recorded in the
   append-only `drift.md`.
-- Debt: no new debt accepted.
+- Debt: #1693 now backs the deferred benchmark/reference prose and tracks later re-evaluation of the
+  accepted `ThrowableError` → `Error` substitution decision.
 - Commit trail: draft PR commit list plus phase comment; no `commits.md`.

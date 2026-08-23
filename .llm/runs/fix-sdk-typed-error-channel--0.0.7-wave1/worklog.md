@@ -1485,3 +1485,158 @@ Scope verification against the S6 starting head found exactly one changed produc
 `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`. The four S5
 source/test paths and `deno.lock` remained byte-identical. No runtime lease, Aspire, Docker,
 `e2e:cli`, evaluator, issue/label/checkbox/readiness, or merge action was performed.
+
+## S7 — consumer-visible breaking and migration disclosure
+
+S7 started from the coordinator-specified head
+`1772dfdf9f26a9c7ed76f196e93505732696fb30` after IMPL-EVAL returned
+`PASS-WITH-FINDINGS` on `bcc9f393d`. The topic supervisor had already repaired the PR-body half of
+F1. Per the coordinator ruling, S7 did not rewrite the twelve existing commits; instead, the new
+consumer-facing amendment commit carries both a `docs(sdk)!` marker and a `BREAKING CHANGE:` footer.
+
+### Published migration disclosure
+
+Both authorized pages now contain an explicit **0.0.7 intentional pre-1.0 breaking change; not
+patch-compatible** section. Each page gives the same complete migration matrix:
+
+1. `SafeFailure` / `SafeResult` failure payload: the second tuple slot and object `data` property
+   move from `null` to `undefined`, including the concrete
+   `failure.data === null` → `failure.data === undefined` migration.
+2. The `TError` default for `SafeFailure`, `SafeResult`, and `safe` moves from `unknown` to `Error`.
+3. `ServiceClientMethod<TInput, TOutput>` becomes
+   `ServiceClientMethod<TInput, TOutput, TError = Error>` and returns
+   `Promise<TOutput> & { __error?: { type: TError } }`; the optional phantom marker is identified as
+   the mechanism `safe()` uses to recover the procedure error type.
+4. `safe()` no longer accepts `PromiseLike<TOutput>`; its parameter is
+   `Promise<TOutput> & { __error?: { type: TError } }`. Non-`Promise` thenables now produce
+   `TS2345`, with `Promise.resolve(thenable)` as the migration.
+5. The documented result-handling path is `result.isSuccess` followed by `result.isDefined`, so a
+   non-defined failure cannot fall through as success.
+6. Tuple destructuring remains supported because the success/failure shapes remain
+   tuple-and-object intersections; the docs explicitly do not claim tuple removal.
+
+The SDK hub also documents the pre-cut F4 characteristic: a bare `Promise` defaults `TError` to
+`Error`, so the `isDefined: true` arm has `error: never` because
+`Extract<Error, DefinedErrorLike>` is empty. That arm is unreachable to the type checker but can be
+returned at runtime when an `ORPCError` with `defined: true` rejects the bare promise. A
+service-client promise carrying contract error typing is required for a typed defined-error arm.
+The text points to the existing `_PlainErrorRejectedFromDefinedArm` assertion without changing the
+test.
+
+The earlier drift entries no longer contradict each other: both now point to #1693 as the backing
+follow-up for deferred benchmark/reference prose, and record that the same issue tracks later
+re-evaluation of the accepted `ThrowableError` → `Error` substitution decision.
+
+### Breaking-marked content commit
+
+```json
+{
+  "commit": "29c9e40aad391381e79afa92a6052cbcd07d9a4a",
+  "subject": "docs(sdk)!: disclose 0.0.7 typed-error breaking changes and migration",
+  "breakingFooter": "BREAKING CHANGE: SafeFailure/SafeResult failure payload changes null -> undefined, default TError changes unknown -> Error, and safe() no longer accepts non-Promise thenables. Pre-1.0 intentional break; not patch-compatible. See PR #1692.",
+  "debtReference": "Refs #1693"
+}
+```
+
+### Exact-head structured gate receipts
+
+All final commands below ran at immutable content head
+`29c9e40aad391381e79afa92a6052cbcd07d9a4a`:
+
+```json
+{
+  "gateId": "docs:snippets",
+  "gitHead": "29c9e40aad391381e79afa92a6052cbcd07d9a4a",
+  "actualGitHead": "29c9e40aad391381e79afa92a6052cbcd07d9a4a",
+  "outcome": "PASS",
+  "exitCode": 0,
+  "census": {
+    "scanned": 581,
+    "ts": 213,
+    "tsx": 78,
+    "typescript": 7,
+    "tsLike": 298,
+    "tier1": 36,
+    "checked": 22,
+    "exempt": 14,
+    "outsideFloor": 262,
+    "malformed": 0
+  }
+}
+```
+
+```json
+{
+  "gateId": "docs-source-format",
+  "invocationId": "sdk-typed-error-s7-source-format",
+  "gitHead": "29c9e40aad391381e79afa92a6052cbcd07d9a4a",
+  "actualGitHead": "29c9e40aad391381e79afa92a6052cbcd07d9a4a",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "durationMs": 223,
+  "requestHash": "b92bd2a4471968dd3d58219ab2200a368a2fca2703fce03206a12105d23142cf",
+  "stdout": "Docs source format: OK"
+}
+```
+
+```json
+{
+  "gateId": "docs-accuracy",
+  "invocationId": "sdk-typed-error-s7-docs-accuracy",
+  "gitHead": "29c9e40aad391381e79afa92a6052cbcd07d9a4a",
+  "actualGitHead": "29c9e40aad391381e79afa92a6052cbcd07d9a4a",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "durationMs": 8640,
+  "requestHash": "743dcd4a345037ec14c817c7f3bed19febdcf2a664570e9bdab2fc1dc8ff5cd6",
+  "summary": "199 published source pages; 91/91 root/direct public commands from 149 recursive paths",
+  "nonBlockingExistingWarning": "@tanstack/ai-preact peer @tanstack/ai constraint mismatch"
+}
+```
+
+```json
+{
+  "gateId": "docs:exports-drift",
+  "gitHead": "29c9e40aad391381e79afa92a6052cbcd07d9a4a",
+  "actualGitHead": "29c9e40aad391381e79afa92a6052cbcd07d9a4a",
+  "outcome": "PASS",
+  "exitCode": 0,
+  "summary": "Exports & Symbols drift check: PASS"
+}
+```
+
+```json
+{
+  "gateId": "check:mcp-export-corpus",
+  "gitHead": "29c9e40aad391381e79afa92a6052cbcd07d9a4a",
+  "actualGitHead": "29c9e40aad391381e79afa92a6052cbcd07d9a4a",
+  "outcome": "PASS",
+  "exitCode": 0,
+  "unchanged": true,
+  "sha256": "a8f0779228987ed7e304dc032d45d1488b0cfb651b088d563c1e17fbafa2fb0b",
+  "packageCount": 35,
+  "subpathCount": 270,
+  "symbolCount": 7611
+}
+```
+
+```json
+{
+  "gateId": "s7-packages-scope",
+  "command": "git diff --name-only 1772dfdf9f26a9c7ed76f196e93505732696fb30..HEAD -- packages/",
+  "gitHead": "29c9e40aad391381e79afa92a6052cbcd07d9a4a",
+  "actualGitHead": "29c9e40aad391381e79afa92a6052cbcd07d9a4a",
+  "outcome": "PASS",
+  "exitCode": 0,
+  "paths": [],
+  "denoLock": "BYTE_IDENTICAL",
+  "exportCorpusGeneratedFile": "BYTE_IDENTICAL"
+}
+```
+
+`docs:accuracy` proves only the invariants its script checks; the page-level migration narrative is
+not inferred from that gate. No package, test, reference-doc, lock, or generated-corpus file was
+changed. No runtime lease, evaluator, review request, label, checkbox, readiness, issue mutation, or
+merge action was performed.
