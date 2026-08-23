@@ -318,3 +318,184 @@ source-touching slice authorized to resolve the ten new `private-type-ref` diagn
 formal IMPL-EVAL is worth spending. IMPL-EVAL is **not** requested at this head.
 
 No evaluator, no runtime lease, no label/issue/checkbox/ready/merge action, no #1348/#1466 mutation.
+
+---
+
+# Tier-A — S5 rebaseline + narrow architectural correction at `bd97a7c03a3fe9b9c2534fd53c9fb0518801bb31`
+
+| Field | Value |
+| --- | --- |
+| Leaf head | `bd97a7c03a3fe9b9c2534fd53c9fb0518801bb31` — local == remote == PR `headRefOid`, clean, draft, sole `status:impl` |
+| Branch base | `main@0ef48c2ec` | Current main | `9634735bc09123b0e69e7438ea4ec763462aa072` |
+| PR #1671 | `OPEN`, `isDraft: true`, `mergeable: MERGEABLE`, `mergeStateStatus: CLEAN` |
+| Verdict on the **rebaseline** | **PASS** |
+| Verdict on the **ruled correction** | **FAIL — mechanism refuted by execution** |
+
+## Rebaseline — the baseline is inert
+
+`main` advanced five commits (`0ef48c2ec` → `9634735bc0`). Exactly **four** paths under `packages/`
+changed, one line each, all JSDoc `@example` import specifiers
+(`@netscript/contracts` → `@netscript/contracts/query` | `/transform`, from #1666's gate-reference
+drift repair). Zero semantic contact with any of this leaf's files.
+
+Re-measured, not argued — `deno doc --lint` at main `9634735bc0` in a detached measurement worktree:
+
+| Package | Base @ `9634735bc0` | Leaf head @ `bd97a7c03a` | Delta |
+| --- | --- | --- | --- |
+| `packages/contracts` | **9** private-type-ref | **11** | +3 new / −1 (`baseContract → oc`) = **net +2** |
+| `packages/sdk` | **3** private-type-ref | **13** | **+10** |
+
+These are byte-identical to the counts S4 recorded against the **old** base `0ef48c2ec`. The
+rebaseline therefore changes nothing about finding attribution: the 13 leaf-owned findings are the
+same 13, and the S4-R correction map's inputs survive intact. Rebaseline **PASS**.
+
+Recorded plainly: **no history rewrite was performed.** The branch remains based on `0ef48c2ec`. It
+does not need rebasing — GitHub already reports `MERGEABLE`/`CLEAN` against current `main` — and
+force-pushing the leaf branch is outside this supervisor's git authority. "Rebaseline" is executed
+here in its harness sense: re-establish the baseline measurement against current `main` and re-verify
+the correction against it. If the coordinator wants an actual history rebase, that is a separate
+instruction and a separate authorization.
+
+## F1 (blocking) — the ruled mechanism makes the problem twice as bad
+
+The ruling authorizes exposing, from `packages/contracts/src/public/mod.ts`, only the public type
+names required by `baseContract`'s existing signature. That signature
+(`contract-primitives.ts:112-117`) names exactly three flaggable identifiers: **`ContractBuilder`**,
+**`Schema`** (×2), and **`BaseContractErrors`** (`Record<never, never>` is a TS built-in and is never
+flagged).
+
+Probed directly in a disposable worktree at the exact leaf head — added precisely those three as
+type-only re-exports, changed nothing else, measured:
+
+| State | `packages/contracts/mod.ts` private-type-ref |
+| --- | --- |
+| Leaf head, unmodified | **10** |
+| Leaf head + the three ruled re-exports | **21** |
+
+The count **doubled**. The cause is structural, not incidental: `deno doc --lint` checks a private
+type's own body only when that type is itself an exported root. Exporting `ContractBuilder` promotes
+it from a leaf reference into a linted root, and its body then contributes ten further diagnostics —
+`ContractProcedure`, `ErrorMap`, `Meta`, `Route`, `MergedErrorMap`, `ContractProcedureBuilder`,
+`ContractProcedureBuilderWithInput`, `ContractProcedureBuilderWithOutput`, `ContractRouterBuilder`,
+`HTTPPath`, `ContractRouter`, `EnhancedContractRouter`, `ContractBuilderDef`. `Schema` adds
+`StandardSchemaV1`; `BaseContractErrors` adds `MergedErrorMap` and `commonErrorMap`.
+
+Closing that cascade means re-exporting `@orpc/contract`'s entire builder algebra through NetScript's
+curated public barrel — exactly the "wider barrel growth" the same ruling forbids. There is no bounded
+stopping point: each layer names the next.
+
+Worth recording because it is the sort of thing that gets missed twice: **S4-R's own probe finding #2
+documents the precise mechanism that defeats this ruling** — "it does not recurse into a flagged
+private type's own body ... because `BaseContractErrors` itself isn't a root symbol being linted from
+that entrypoint." The map established the rule and never applied it to option 1, because option 1 had
+been rejected on *scope* grounds (forbidden fourth file) and so was never tested for *efficacy*. A
+denied option is not a refuted one, and this lane just spent a coordinator ruling on the difference.
+
+## F2 (blocking for the plan as written) — correction #12 does not type-check
+
+S4-R #12 proposes replacing `Schema<unknown, unknown>` with NetScript's own
+`ContractSchema<unknown, unknown>`, on the reasoning that `ContractSchema` is a public structural
+mirror of `StandardSchemaV1`. Executed:
+
+```text
+deno check --unstable-kv packages/contracts/mod.ts
+TS2322 [ERROR]: Type 'ContractBuilder<Schema<unknown, unknown>, ...>' is not assignable to
+type 'ContractBuilder<ContractSchema<unknown, unknown>, ...>'.
+  Type 'StandardSchemaV1<unknown, unknown>' is missing the following properties from
+  type 'ContractSchema<unknown, unknown>': _input, _output, parse, safeParse
+```
+
+`ContractSchema` is strictly **narrower** than `Schema`, not equivalent — it carries Zod-specific
+members (`_input`, `_output`, `parse`, `safeParse`) that the standard-schema interface does not have.
+The map recorded this as "reasoned, not `deno check`-proven". The reasoning was wrong. #12 is refuted.
+
+## F3 (confirmed sound) — correction #11 holds, and the owed verification is now executed
+
+Inlining `BaseContractErrors`' body as a `Readonly<{...}>` literal over the six **public** PascalCase
+schema aliases, with `Schema<unknown, unknown>` left in place:
+
+| Gate | Result |
+| --- | --- |
+| `deno check --unstable-kv packages/contracts/mod.ts` | **PASS** |
+| `packages/contracts/mod.ts` private-type-ref | 10 → **9** |
+
+This discharges the verification S4-R explicitly owed: `oc.errors(commonErrorMap)`'s constraint does
+accept the map once the annotation's `data:` slots widen from `ContractObjectSchema` to
+`ContractSchema`, because the former is assignable to the latter. #11 is real, not notional.
+
+## F4 — the achievable floor on contracts is baseline **+1**, not zero
+
+With #11 applied, #12 refuted and #13 unresolvable, `baseContract` retains two flagged names —
+`ContractBuilder` and `Schema` — against the one it removed (`oc`):
+
+| | contracts total |
+| --- | --- |
+| Base `9634735bc0` | 9 |
+| Leaf head today | 11 |
+| Leaf head + #11 (best available under the three-file ceiling) | **10** |
+
+So the residue is **one** diagnostic over baseline. Two mitigating facts belong in the record rather
+than being spun: `baseContract → ContractBuilder` is a **one-for-one substitution** for the
+pre-existing pinned `baseContract → oc` on the same symbol, and `Schema` is **already** a
+baseline-referenced private name in this same file (`BaseContractOutputRoute → Schema`), so the +1 is
+a second reference to a name the public surface already carries — not a new kind of coupling, and not
+a new dependency edge.
+
+Stated plainly: the premise behind the ruling — that `baseContract → ContractBuilder` would become
+"new permanent private-type-reference debt" — is close to, but not exactly, right. It is a
+**substitution** of pinned debt, at a net cost of one additional diagnostic, and the proposed cure
+costs eleven.
+
+## F5 (non-blocking) — the map rejects for `ContractBuilder` what it accepts elsewhere
+
+#13 rejects locally reconstructing `ContractBuilder` because doing so would be "permanently coupled to
+oRPC's exact internal shape and guaranteed to drift on the next `@orpc/contract` version bump"
+(AP-1/AP-9). Corrections **#7/#9** and **#10** do precisely that at smaller scale — #7/#9 hand-copy
+oRPC's phantom marker `Promise<T> & { __error?: { type: E } }`, and #10 reconstructs oRPC's
+`ErrorMap` → error-union derivation from `~orpc.errorMap`.
+
+The trade is defensible: those surfaces are a few lines against a fifteen-member builder algebra. But
+the plan must carry it as a **bounded, accepted coupling with a named drift risk** — "if oRPC renames
+`__error`, `TError` inference degrades silently" — rather than under the map's current
+"purely notational" framing. A silent inference degradation is the failure mode this leaf exists to
+prevent.
+
+## F6 (non-blocking) — the `ThrowableError → Error` swap is a design decision, not a rename
+
+Verified against the installed `.d.ts`: `@orpc/shared` defines
+`ThrowableError = Registry extends { throwableError: infer T } ? T : Error`, and a repo-wide search
+for `declare module '@orpc/*'` returns **zero** augmentations. It resolves to exactly `Error` today,
+so the map's factual claim is correct.
+
+But `Registry` is a **consumer** extension point that `@orpc/shared` exports for exactly this purpose.
+Hardcoding `Error` forecloses downstream augmentation permanently. The mitigating fact is that these
+SDK signatures are leaf-new — the SDK baseline is 3 findings, none on `SafeFailure`, `safe`, or
+`isDefinedError` — so this forecloses a capability on **new** API rather than regressing existing
+behaviour. That makes it acceptable and cheap, and it still belongs in the plan as a declared
+decision rather than inside a list of notational rewrites.
+
+Also verified: `deno.lock` pins `@orpc/contract@1.14.6`, matching the version S4-R verified against
+(the cache also holds 1.14.7/8/13, which are not the resolved versions).
+
+## Outcome
+
+**Rebaseline PASS. Ruled correction FAIL.** No implementation agent is authorized at this head: the
+ruled mechanism is refuted by execution, and dispatching an author against it would have spent a
+canonical implementation slice producing a doubled diagnostic count.
+
+Options returned to the coordinator, in preference order:
+
+1. **Withdraw the exposure ruling; land #11 + the ten SDK corrections under the existing three-file
+   ceiling.** Result: contracts 10 (base 9, residue +1), SDK 3 (base 3, **0 new**). No fourth file, no
+   barrel growth, no new export names. Requires F2's #12 dropped from the map, and F5/F6 restated as
+   accepted couplings.
+2. **(1) plus a follow-up issue** for the residual `baseContract → {ContractBuilder, Schema}`, on the
+   #1669 → #1670 precedent, so the substitution is tracked rather than absorbed silently.
+3. Accept the residue with no follow-up.
+
+This topic recommends **(2)**.
+
+No evaluator requested, no runtime lease, no label/issue/checkbox/readiness/merge action, no
+`#1348`/`#1466` mutation, no product file touched. All probe work was performed in disposable
+detached worktrees (`netscript-007-probe-1671`, `netscript-007-baseline-9634735`), both removed; the
+leaf worktree and PR remain at `bd97a7c03a`, unmodified.

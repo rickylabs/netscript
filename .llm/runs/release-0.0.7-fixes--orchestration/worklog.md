@@ -1211,3 +1211,55 @@ generator ≠ evaluator across a route where both native families are unavailabl
 Terminal PASS is required before the three-product-file repair is released — and that repair remains
 on the Codex route regardless, so no outside-plan product implementation is authorized by this
 routing.
+
+## 2026-08-23 — #1671 rebaselined; ruled correction refuted by execution; implementation NOT authorized
+
+Fixes topic restored and re-serialized on this lane only. Full record in `tier-a-1671.md` § S5.
+
+**Rebaseline PASS.** `main` advanced `0ef48c2ec` → `9634735bc0` (5 commits). Only four `packages/`
+paths changed, one JSDoc `@example` import-specifier line each (#1666 gate-reference drift). Re-measured
+`deno doc --lint` at the new base in a detached worktree: contracts **9**, SDK **3** — byte-identical
+to the counts S4 recorded against the old base. The 13 leaf-owned findings and the S4-R correction
+map survive rebaselining unchanged. No history rewrite performed; PR #1671 is already
+`MERGEABLE`/`CLEAN` against current `main`, and force-pushing the leaf is outside this supervisor's
+git authority.
+
+**The coordinator's narrow architectural correction is refuted.** Probed at the exact leaf head:
+adding exactly the three type names `baseContract`'s signature requires (`ContractBuilder`, `Schema`,
+`BaseContractErrors`) as type-only re-exports from `packages/contracts/src/public/mod.ts` takes
+`packages/contracts/mod.ts` from **10 → 21** private-type-ref diagnostics. Exporting a type promotes
+it to a linted root, so its own body is then checked; `ContractBuilder` alone contributes ten more,
+and closing the cascade means re-exporting `@orpc/contract`'s whole builder algebra — the wider barrel
+growth the same ruling forbids. S4-R's own probe finding #2 states the mechanism that defeats this;
+option 1 had been rejected on scope grounds and so was never tested for efficacy. A denied option is
+not a refuted one.
+
+**Two further executed findings on the map itself.** #12 (`Schema` → `ContractSchema`) **does not
+type-check** — `TS2322`, `StandardSchemaV1` is missing `_input`/`_output`/`parse`/`safeParse`;
+`ContractSchema` is narrower, not a mirror, and the map recorded this as reasoned rather than proven.
+#11 (inline `BaseContractErrors` over the six public PascalCase aliases) **is sound** — `deno check`
+PASS and 10 → 9, discharging the `oc.errors` constraint verification the map owed.
+
+**Achievable floor is baseline +1, not zero.** With #11 in and #12/#13 out, `baseContract` keeps
+`ContractBuilder` + `Schema` against the removed `oc`: contracts 10 vs base 9, SDK 0 new. The
+`ContractBuilder` finding is a one-for-one substitution of the pinned `baseContract → oc`, and
+`Schema` is already baseline-referenced in the same file by `BaseContractOutputRoute`. The ruling's
+premise was near-right — this is substituted pinned debt at a cost of one diagnostic, and the proposed
+cure costs eleven.
+
+Recorded non-blocking: the map rejects structural reconstruction for `ContractBuilder` (AP-1/AP-9
+drift) while accepting it for `ClientPromiseResult` and `ProcedureErrorFromNode` — defensible on size,
+but it must be carried as a bounded coupling with a named drift risk, not as "purely notational". And
+the `ThrowableError → Error` default swap is a real design decision: verified `Registry` is
+un-augmented repo-wide so it resolves to `Error` today, but `Registry` is a consumer extension point
+and hardcoding forecloses it — acceptable only because these SDK signatures are leaf-new.
+
+**No implementation agent dispatched.** Dispatching one against a refuted mechanism would have spent a
+canonical slice producing a doubled diagnostic count. Three options returned to the coordinator;
+this topic recommends withdrawing the exposure ruling, landing #11 + the ten SDK corrections under the
+existing three-file ceiling, and filing a follow-up for the residual on the #1669 → #1670 precedent.
+
+Withheld gates (`contracts-jsr-audit`, `sdk-jsr-audit`, `netscript-jsr-specifiers`, export guards)
+remain `NOT_RUN` — they are downstream of a repair that is not yet authorized. No IMPL-EVAL requested;
+no evaluator, no runtime lease, no label/issue/checkbox/readiness/merge action, no `#1348`/`#1466`
+mutation, no product file touched. Probe worktrees removed; leaf and PR unmodified at `bd97a7c03a`.
