@@ -30,8 +30,16 @@ type ExpectedBaseErrorCode =
   | 'RATE_LIMITED'
   | 'SERVICE_UNAVAILABLE';
 type _BaseErrorCodesPreserved = Assert<Equal<BaseErrorCode, ExpectedBaseErrorCode>>;
+type _BaseErrorCodeIsNotAny = Assert<Equal<IsAny<BaseErrorCode>, false>>;
+type _BaseErrorCodeIsNotNever = Assert<
+  Equal<[BaseErrorCode] extends [never] ? true : false, false>
+>;
 type _UndeclaredBaseErrorRejected = Assert<
   Equal<Extract<'NOT_DECLARED', BaseErrorCode>, never>
+>;
+type BaseNotFoundDataSchema = typeof baseContract['~orpc']['errorMap']['NOT_FOUND']['data'];
+type _BaseNotFoundShapePreserved = Assert<
+  Equal<'shape' extends keyof BaseNotFoundDataSchema ? true : false, true>
 >;
 
 type BaseMeta = typeof baseContract['~orpc']['meta'];
