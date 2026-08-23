@@ -1130,3 +1130,84 @@ recovered evaluator (`NetScript 0.0.7 #1692 IMPL-EVAL`, Fable 5, own detached wo
 head), scoped explicitly as an amendment review and **not** a second full IMPL-EVAL.
 
 PR remains **draft**. No merge, label, checkbox, readiness, metadata, or `#1348`/`#1466` mutation.
+
+---
+
+# Tier-A — S8 prose corrections at `7a880c01804d566c28424f3b70254a296fdd3f15`. **PASS**
+
+| Field | Value |
+| --- | --- |
+| Head | `7a880c01804d566c28424f3b70254a296fdd3f15` — local == remote == PR, clean, **draft** |
+| Commits | `8e568e49f docs(sdk)!: complete typed-error migration disclosure`; `7a880c018 docs(harness): record S8 prose correction receipts` |
+| Verdict | **PASS** |
+
+## Scope
+
+Five paths: two docs pages, three existing run artifacts.
+`git diff --name-only 34eb1f524 HEAD -- packages/ plugins/ deno.lock` → **empty**.
+
+## A1–A4 — each verified against source, not against the finding text
+
+**A1 closed.** Both migration tables now carry the arm change. Base anchor confirmed independently and
+supplied to the author because the finding had not cited it: at `61bfd858d`,
+`errors.ts:39` is `SafeFailure<TError = unknown> = [TError, null, boolean, false] & {…}` — the third
+tuple slot is literally `boolean`, which *is* the single-arm shape. Both pages state the move to two
+literal-discriminated arms.
+
+**A2 closed.** Both pages carry the `baseContract` key-space tightening, on the basis of
+`plan.md:108-111` ("intentionally rejects consumers that treated undeclared codes as valid"), framed as
+both the intended benefit and a break.
+
+**A3 closed.** `sdk.md` now contains **zero** occurrences of `DefinedErrorLike`, `createSafeFailure`,
+`readme-doctest`, or `_PlainErrorRejected`. The F4 substance is retained in published vocabulary.
+
+**A4 closed on the docs half.** Both pages now read: "`SafeFailure` and `SafeResult` defaulted `TError`
+to `unknown`; `safe<TOutput>` had no `TError` parameter and returned `SafeResult<TOutput>`, inheriting
+that default." Verified against base `errors.ts:49` and `:86` — `safe<TOutput>(promise:
+PromiseLike<TOutput>): Promise<SafeResult<TOutput>>` genuinely has **no** `TError` parameter.
+The `isDefinedError` half (base `:75` is `error is Extract<T, DefinedError>`, not `error is
+DefinedError`) lives in the **PR body**, which is this topic's to rewrite, and is deferred to that step
+by ruling.
+
+**Preserved.** "The tuple form has **not** been removed" is present on both pages
+(`sdk.md:279`, `discover-services.md:193`).
+
+## A near-miss worth recording — second of this slice
+
+The check for that preserved wording returned **0** on both pages using the fixed string
+`not been removed`, and read as a regression the author had introduced. It was not: the text is
+`**not** been removed` — markdown bold *inside* the phrase. Combined with the earlier malformed
+`grep -E '\|'` alternation at S7, this lane has now had **two** grep-precision near-misses in
+consecutive slices, both of which would have filed a false finding against a correct author. Both were
+caught by reading the source instead of trusting the count. The operative lesson is the S3 one restated:
+derive from source, and treat a zero-count as a question rather than an answer.
+
+## Receipts at this exact head
+
+| Gate | Result |
+| --- | --- |
+| `check:mcp-export-corpus` | **PASS exit 0**, sha256 `a8f0779228987ed7…` — **unchanged from S6/S7**, proving no published signature moved |
+| `docs:exports-drift` | **PASS exit 0** |
+| `docs:snippets` | **exit 0** |
+| `docs:accuracy` | **PASS** |
+| `docs:links` | broken-links 0, broken-anchors 0 |
+| `packages/` + `plugins/` + `deno.lock` diff | **empty** |
+
+`8e568e49f` carries `docs(sdk)!` plus a `BREAKING CHANGE:` footer that now also names the arm change
+and the undeclared-code rejection, with `Refs #1693`. The twelve original commits remain unrewritten.
+
+Unchanged and still not claimed: `docs/site` markdown formatting is not gateable (no `deno fmt` step in
+`pages.yml`; nested config is not a workspace member), and CI on a docs-only push skips the product
+lanes, so it is not a merge signal.
+
+## Outcome
+
+**S8 Tier-A PASS.** Focused **A1–A4 delta re-review** dispatched to the same Fable evaluator, worktree
+moved to this head, scoped explicitly as a delta — not another IMPL-EVAL and not a re-review of the
+already-closed F-series.
+
+Pending that verdict: rewrite #1692's body to final truth (including A4's `isDefinedError` half, and
+avoiding the literal negated closing-token that closed #1671), rewrite stale #1671 comment
+`5304357008` in place, and report the final head plus readiness evidence.
+
+Readiness, labels, checkboxes, merge, and runtime remain the coordinator's. PR stays draft.
