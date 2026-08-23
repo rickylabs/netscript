@@ -1335,3 +1335,98 @@ rejected.
 
 PR state unchanged: head `587ade9f30e619410a4192daadab137b0548eb88`, **draft**, `OPEN`, labels untouched.
 No readiness, checkbox, issue, or merge action.
+
+---
+
+# Tier-A — S9 generated cascade at `686bae07b2bc66353b2eec9dd56baa0779a63a20`. **PASS**
+
+| Field | Value |
+| --- | --- |
+| Content head | `686bae07b2bc66353b2eec9dd56baa0779a63a20` — local == remote == PR #1692 |
+| Commits | `120172c46 chore(assets): regenerate agent-docs prose and derived assets`; `686bae07b docs(harness): record S9 generated-cascade receipts` |
+| Verdict | **PASS** |
+
+## Root cause — reproduced before dispatch
+
+CI run `32631459037`, quality job `97174828651`, failed only at `check:agent-docs-prose`
+("Agent docs prose is stale: prose.json.gz, provenance.json"). Reproduced at the leaf head, exit 1.
+S7/S8 edited `docs/site/services-sdk/*.md`; the prose bundle is generated **from** `docs/site`, so
+correct source edits left the derivative stale. The cascade was traced from the tool sources before
+briefing — `generate-cli-assets-barrel.ts:382,:389` **reads** `provenance.json` and `prose.json.gz`, so
+the barrel must be regenerated after the prose bundle, never before.
+
+## Measured changed paths — not predicted
+
+```text
+.llm/assets/agent-docs/prose.json.gz
+.llm/assets/agent-docs/provenance.json
+packages/cli/src/kernel/assets/agent-docs.generated.ts
+packages/mcp/src/publish-assets.generated.ts
++ 3 existing run artifacts
+```
+
+**Four** generated outputs, not the seven barrel targets — the other three were genuinely unchanged.
+No `docs/site` edit, no non-generated `packages/**` source, no test, no `deno.lock`.
+
+## Independently reproduced — the strongest available check
+
+The whole cascade was re-run in a disposable worktree at this head and the four outputs hashed:
+**byte-identical to the committed versions**, and `git status` after regeneration was **empty**. So the
+commit is exactly what the generators produce — no hand-edit, and no derived path was missed.
+
+## Gates at this exact head
+
+| Gate | Result |
+| --- | --- |
+| `check:agent-docs-prose` | **PASS exit 0** — the failing gate, now green |
+| `check:assets-barrel` | **PASS exit 0** |
+| `check:publish-assets` | **PASS exit 0** |
+| `check:mcp-export-corpus` | **PASS exit 0**, sha256 `a8f0779228987ed7…` — **unchanged**, so the generated asset changes did not move the published corpus |
+| `docs:exports-drift` | **PASS exit 0** |
+| contracts + sdk suites | **78 / 0** |
+| doc-lint parity | contracts **9 = 9**, sdk **3 = 3** |
+
+## Public claims retargeted to the new head
+
+Seven `587ade9f3…` references in the PR body moved to `686bae07b…`; the three historical heads
+(`bcc9f393d…` IMPL-EVAL, `7a880c018…` delta review, `61bfd858d…` base) were **preserved**, since those
+name the heads actually evaluated. Box 6's evidence extended with the S9 receipts. Re-verified live:
+YAML parses (`issue: 1350`, 7 entries), closing-keyword scan → only `Closes #1350`, DoD **9/0**, 2 fences.
+
+**Acceptance mirror preflight at the new head:** `acceptance-mirror DRY-RUN: no changes`,
+`provenance: head=686bae07b2bc66353b2eec9dd56baa0779a63a20`, exit 0.
+
+## Readiness posture — changed outside this lane, and recorded
+
+`#1350`'s seven boxes are **already all ticked** (7 checked / 0 unchecked; issue still `OPEN`), applied
+at `2026-08-23T09:35:45Z` — between this topic's two mirror preflights and **not by this lane**. The
+current preflight's "no changes" is the correct idempotent result, not a failure to mirror.
+
+Timeline, all actor `rickylabs` (the shared account, so attribution cannot separate sessions — what is
+certain is that **this lane performed none of them**):
+
+| At | Event |
+| --- | --- |
+| `09:15:17Z` | labeled `ci:full`, `breaking` |
+| `09:16:59Z` | unlabeled `ci:full` |
+| `09:33:20Z` | `status:impl` → `status:ready-merge`, labeled `impl-eval:skip` |
+| `09:36:13Z` | **`ready_for_review`** — draft flipped |
+| `09:35:45Z` | `#1350` acceptance boxes ticked |
+
+**Worth the coordinator's attention:** every one of those was established against head `587ade9f3…`,
+which S9 has since superseded. The readiness posture and the acceptance ticks were therefore bound to a
+head that is no longer the tip — the stranded-evidence pattern this lane has a standing rule against.
+The PR body has now been retargeted to `686bae07b…` and the mirror preflight confirms consistency at
+that head, so the evidence is current again. This topic did not flip readiness and has not reverted it,
+because reverting is equally a readiness action.
+
+**CI at the new head:** 6 passed, 0 failed, `check-test` still pending; `mergeable: MERGEABLE`,
+`mergeStateStatus: BLOCKED` on that outstanding check. Not yet a merge signal.
+
+## Outcome
+
+**S9 Tier-A PASS.** No fresh formal IMPL-EVAL requested — the change is a deterministic generated
+derivative, independently reproduced byte-identical, with the published export corpus provably
+unmoved. Focused exact-head verification is recorded above in place of one.
+
+No merge, no readiness change, no label change, no issue mutation by this lane.
