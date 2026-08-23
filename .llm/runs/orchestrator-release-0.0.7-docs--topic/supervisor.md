@@ -147,15 +147,23 @@ a 0.0.7 commitment, none needs docs/site coverage. Docs lane takes no scope from
    names and — for `checkSymbols: true` packages — exported *symbol names* only, never signatures.
    #1671 changes no entrypoint and adds/removes no exported symbol name in `@netscript/sdk`
    (`checkSymbols: false`) or `@netscript/contracts` (`checkSymbols: true`).
-3. **Ungated reference/guide divergence — recommend extending the leaf.** #1671 rewrites the
-   golden-path example in `services-sdk/sdk.md` from tuple destructuring + `isDefinedError` narrowing
-   to the discriminant form (`result.isSuccess`, then `result.isDefined`) and drops the
-   `isDefinedError` import from the example. `docs/site/reference/sdk/index.md` — untouched by #1671 —
-   is the third page documenting this API and still presents `isDefinedError` (line 40) as the
-   narrowing entry point, plus `SafeResult` (58) and `SafeFailure` (60). After merge, reference and
-   guide teach two contracts for one API, and nothing catches it: symbol names are unchanged and
-   `docs:snippets` compiles fenced code, not table rows. This is a 2–3 row edit; keeping it inside
-   #1671 avoids creating docs debt this lane would otherwise inherit.
+3. **Ungated reference/guide divergence.** #1671 rewrites the golden-path example in
+   `services-sdk/sdk.md` from tuple destructuring + `isDefinedError` narrowing to the discriminant
+   form (`result.isSuccess`, then `result.isDefined`) and drops the `isDefinedError` import from the
+   example. `docs/site/reference/sdk/index.md` — untouched by #1671 — is the third page documenting
+   this API and still frames around the tuple form: `isDefinedError` (line 40), `SafeResult` (58),
+   `SafeFailure` (60). Nothing catches the gap: symbol names are unchanged and `docs:snippets`
+   compiles fenced code, not table rows.
+
+   **Corrected 2026-08-23 after the fixes lane's audit — see § Advisory outcome.** My first wording,
+   "reference and guide teach two contracts for one API", overstated it, and the "fold ~3 rows into
+   #1671" recommendation was wrong. All three rows remain factually **true** at the leaf head, and
+   they are **verbatim the package's own JSDoc** (`packages/sdk/src/client/errors.ts:68-70`,
+   `:75-77`) — verified against source. So this is cross-page emphasis debt, not contradiction, and
+   editing the rows without the JSDoc would *create* source-to-reference drift where none exists.
+   It is a rows-plus-JSDoc change, i.e. a 7th and 8th path against `plan.md:146`'s six-path ceiling.
+   Correctly declined by the fixes lane and routed to the coordinator as a #1670-precedent
+   follow-up.
 4. **Existing snippets stay compilable.** `SafeSuccess`, `NonDefinedSafeFailure`, and
    `DefinedSafeFailure` remain tuple-and-object intersections, so `const [error, result] = await
    safe(...)` still destructures. Two silent narrowings land: the failure payload slot moves
@@ -188,3 +196,39 @@ comparison merge `729386c56` (run `31876977043`, job `quality`).
 
 No merge, publish, readiness flip, runtime lease, relabel, or self-certification performed. Lane
 remains EXHAUSTED / PARKED with allocation `[1551]`.
+
+### Advisory outcome — fixes lane audit, 2026-08-23
+
+The fixes supervisor audited all three findings rather than accepting them; recorded at `4ff7f3772`
+on `orchestrator/release-0.0.7-fixes`, `.llm/runs/release-0.0.7-fixes--orchestration/tier-a-1671.md`
+§ Cross-lane advisory. Net: findings 1 and 3 upheld, finding 2 upheld as debt with my framing
+corrected and my scope recommendation declined.
+
+- **Finding 1 — upheld and upgraded from reasoning to execution.** They confirmed `pages.yml:143-145`
+  gained the blocking step in `2dd1a75ef`, post-dating merge-base `0ef48c2ec`. I *read*
+  `check-exports-drift.ts` and predicted a pass; they *ran* it, applying the leaf's six product/docs
+  paths onto a detached worktree at main `9634735bc0`: `Coverage [contracts]: mode=complete`,
+  `Coverage [sdk]: mode=entrypoints-only`, `omitted-symbol-groups=0` both, drift check **PASS**
+  (exit 0). Mechanism refinement worth carrying: sdk runs **entrypoints-only**, so its reference-page
+  symbol rows are never checked at all — stronger than "no changed name tripped `checkSymbols`", and
+  it is precisely why finding 2's gap is ungated. By-product: the six leaf paths apply cleanly onto
+  current main with zero product conflict.
+- **Finding 2 — my framing corrected, scope correctly declined.** See the correction inline above.
+- **Finding 3 — upheld; their measurement is wider than mine.** My three are a subset: the withheld
+  gate covers **10** new SDK diagnostics (mine plus `ThrowableError` ×4, `ClientPromiseResult` ×2,
+  `ProcedureErrorFromNode`). My "zero on current main in `client/errors.ts`" matches their base
+  measurement; the SDK-wide baseline is 3, all outside that module.
+
+**Result for this lane's review surface — the `ContractBuilder` question is now answered negatively.**
+The coordinator's proposed fix (export the type names `baseContract`'s signature needs from
+`packages/contracts/src/public/mod.ts`) is **refuted**: probed at the exact leaf head, `contracts/mod.ts`
+goes 10 → 21 private-type-ref diagnostics, because exporting a type promotes it to a linted root whose
+own body is then checked — `ContractBuilder` alone adds ten (`ContractProcedure`, `ErrorMap`, `Meta`,
+`Route`, `ContractRouterBuilder`, `ContractBuilderDef`, …). Closing that cascade means re-exporting
+`@orpc/contract`'s whole builder algebra into NetScript's published surface. Also refuted: S4-R
+correction #12 (`Schema` → `ContractSchema`) fails `deno check` with TS2322 — `ContractSchema` is
+narrower (carries `_input`/`_output`/`parse`/`safeParse`), not a structural mirror.
+
+Docs-lane read on that: both refutations point away from widening the published contracts surface, so
+the resolution is a coordinator ruling on the boundary, not a docs change. #1671 is parked pending it;
+leaf and PR unmodified at `bd97a7c03a`. This lane opens nothing and takes no scope.
