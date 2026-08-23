@@ -1366,3 +1366,122 @@ No claim is made that `surface:diff` proves `baseContract`: its `deno doc` decla
 drops the instantiation argument, so the signal is a known tooling false negative. The published
 change remains fully disclosed as breaking, including `SafeFailure` arm changes and failure
 `null` → `undefined` consumer impact.
+
+## S6 — derived MCP export-corpus refresh
+
+S6 started from the coordinator-specified rebased head
+`9cdba6321ea3f2d5af20f269b6bd81393dbd84d3`. PR #1691 had separately repaired the export corpus
+against `main` and merged as `61bfd858d20f3bf61e7ee45b5646537af567f247`; after that rebase, the
+only remaining corpus drift was the five approved SDK signature changes from this leaf. PR #1692
+replaces accidentally closed PR #1671 for the same branch and work.
+
+The canonical generator was run twice without hand-editing the output. Both runs emitted identical
+structured provenance:
+
+```json
+{
+  "command": "deno task gen:mcp-export-corpus",
+  "runs": 2,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "byteIdentical": true,
+  "generatedFileSha256": "f7bbc8925481e8682f84f9057263387030838e6bc7ee366c56e98a9b2829f904",
+  "embeddedCorpus": {
+    "schemaVersion": 1,
+    "frameworkVersion": "0.0.6",
+    "sha256": "a8f0779228987ed7e304dc032d45d1488b0cfb651b088d563c1e17fbafa2fb0b",
+    "uncompressedBytes": 2134032,
+    "compressedBytes": 309455,
+    "packageCount": 35,
+    "subpathCount": 270,
+    "symbolCount": 7611
+  }
+}
+```
+
+The gzip/base64 payload was decoded before commit and compared to the starting-head payload by the
+identity tuple `(packageName, subpath, symbol)`. This is the semantic evidence; the generated-file
+text diff is not treated as proof:
+
+```json
+{
+  "gateId": "mcp-export-corpus-semantic-delta",
+  "outcome": "PASS",
+  "schemaVersionUnchanged": true,
+  "frameworkVersionUnchanged": true,
+  "surfacesUnchanged": true,
+  "surfaceCount": { "before": 270, "after": 270 },
+  "entryCount": { "before": 7611, "after": 7611 },
+  "addedExports": 0,
+  "removedExports": 0,
+  "changedSignatureCount": 5,
+  "changedSignatures": [
+    "@netscript/sdk:.#SafeFailure",
+    "@netscript/sdk:.#SafeResult",
+    "@netscript/sdk:.#ServiceClientMethod",
+    "@netscript/sdk:.#isDefinedError",
+    "@netscript/sdk:.#safe"
+  ],
+  "jsDocChanges": 0
+}
+```
+
+The generator output was committed alone as immutable content commit
+`b427e035488e5eabd9f3a92870787006aa9a6813`. The canonical check was then reproduced at that exact
+head:
+
+```json
+{
+  "gateId": "check:mcp-export-corpus",
+  "gitHead": "b427e035488e5eabd9f3a92870787006aa9a6813",
+  "actualGitHead": "b427e035488e5eabd9f3a92870787006aa9a6813",
+  "waiver": null,
+  "outcome": "PASS",
+  "exitCode": 0,
+  "schemaVersion": 1,
+  "frameworkVersion": "0.0.6",
+  "sha256": "a8f0779228987ed7e304dc032d45d1488b0cfb651b088d563c1e17fbafa2fb0b",
+  "packageCount": 35,
+  "subpathCount": 270,
+  "symbolCount": 7611
+}
+```
+
+The scoped package lint/format wrappers reproduced the coordinator-declared pre-existing tooling
+red at the same immutable content head. They each exited `1` with zero findings. Their actual local
+failure detail was an early Deno workspace-configuration parse error (`packages/*` read as a string
+where `WorkspaceConfig` was expected), so neither command reached a source diagnostic. This is
+reported as tooling red, not as a formatting or lint regression:
+
+```json
+{
+  "gitHead": "b427e035488e5eabd9f3a92870787006aa9a6813",
+  "actualGitHead": "b427e035488e5eabd9f3a92870787006aa9a6813",
+  "waiver": null,
+  "gates": [
+    {
+      "gateId": "mcp-scoped-lint",
+      "outcome": "RED_PRE_EXISTING_TOOLING",
+      "exitCode": 1,
+      "filesSelected": 115,
+      "batches": 1,
+      "findings": 0,
+      "failure": "Failed to parse workspace configuration"
+    },
+    {
+      "gateId": "mcp-scoped-fmt",
+      "outcome": "RED_PRE_EXISTING_TOOLING",
+      "exitCode": 1,
+      "filesSelected": 115,
+      "batches": 1,
+      "findings": 0,
+      "failure": "Failed to parse workspace configuration"
+    }
+  ]
+}
+```
+
+Scope verification against the S6 starting head found exactly one changed product path:
+`packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`. The four S5
+source/test paths and `deno.lock` remained byte-identical. No runtime lease, Aspire, Docker,
+`e2e:cli`, evaluator, issue/label/checkbox/readiness, or merge action was performed.

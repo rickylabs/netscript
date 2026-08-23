@@ -118,3 +118,23 @@
 - **Scope:** No product/test/docs/lock file was touched to produce this mapping. `#1348`/`#1466`
   untouched. The repair itself remains a fresh, separately authorized implementation slice; this
   session did not implement it.
+
+## 2026-08-23 — S6 resolves the export-corpus scope stop after upstream separation
+
+- **Resolution:** The S5 stop was confirmed correct. The unrelated main-branch corpus drift was
+  split into PR #1691 and merged as `61bfd858d20f3bf61e7ee45b5646537af567f247`; the leaf branch
+  was rebased onto it. The coordinator then authorized the generated MCP corpus as S6's sole product
+  path.
+- **Leaf attribution:** Decoded base-vs-head comparison now shows only this leaf's five approved
+  `@netscript/sdk` signature changes (`SafeFailure`, `SafeResult`, `ServiceClientMethod`,
+  `isDefinedError`, and `safe`), with zero additions/removals and unchanged corpus metadata and
+  surface identities.
+- **Workflow drift:** PR #1671 was accidentally closed unmerged when PR #1691's prose contained a
+  literal closing token. PR #1692 is its draft replacement for the same branch and implementation.
+- **Action:** Regenerated the derived artifact only via `deno task gen:mcp-export-corpus`; no manual
+  edit. The canonical check passes at immutable content commit `b427e0354`.
+- **Known red:** The MCP scoped lint and format wrappers each exit 1 with zero findings. Locally the
+  wrapper failure detail is an early workspace-configuration parse error, so it is retained as the
+  coordinator-declared pre-existing tooling red rather than attributed to the generated content.
+- **Scope:** The four S5 source/test files, `deno.lock`, public barrels, docs, #1348, and #1466 were
+  untouched. No second S6 product path was introduced.

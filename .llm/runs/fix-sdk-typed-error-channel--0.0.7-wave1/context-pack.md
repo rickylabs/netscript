@@ -6,19 +6,19 @@
 | -------------- | ---------------------------------------------------------- |
 | Run ID         | `fix-sdk-typed-error-channel--0.0.7-wave1`                 |
 | Branch         | `fix/sdk-typed-error-channel`                              |
-| Current phase  | `implementation` — S5 source repair committed; stopped on fifth-path export-corpus drift |
+| Current phase  | `implementation` — S6 derived export corpus generated and checked; awaiting Tier-A |
 | Archetype      | `1 — Small Contract` slice                                 |
 | Scope overlays | `docs`                                                     |
 
 ## Current state
 
-PLAN-EVAL is terminal PASS at evaluator commit `f76a3c45b`; S1-S3 each passed fresh Tier-A. S5
-implemented the coordinator-verified `baseContract` instantiation expression and all ten SDK
-public-signature corrections. Focused check, 78 package tests, lint, format, and doc-lint baseline
-parity are proven. The immutable content head is `622218ac38150a2e3345149ca5b11bf823256734`.
-The final matrix then stopped because `check:mcp-export-corpus` requires updating a fifth product
-path outside S5. #1466 still owns metadata definition/export; no metadata vocabulary or acceptance
-claim was introduced.
+PLAN-EVAL is terminal PASS at evaluator commit `f76a3c45b`; S1-S3 and S5 each passed fresh Tier-A.
+PR #1691 repaired unrelated main-branch export-corpus drift and merged as `61bfd858d`; this branch
+was rebased onto it. S6 then regenerated the one newly authorized derived path for this leaf's five
+SDK signature changes. The immutable S6 content head is
+`b427e035488e5eabd9f3a92870787006aa9a6813`; the canonical corpus check passes there. PR #1692 is
+the active draft replacement for accidentally closed PR #1671. #1466 still owns metadata
+definition/export; no metadata vocabulary or acceptance claim was introduced.
 
 ## Completed
 
@@ -38,13 +38,9 @@ claim was introduced.
 
 ## Next steps
 
-1. Coordinator ruling is required for the stale generated export corpus. Its path is
-   `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`, a fifth
-   product path outside S5.
-2. Do not regenerate or edit that corpus until a new slice explicitly authorizes it, or the
-   coordinator rules the guard inapplicable.
-3. After that ruling, resume the incomplete exact-head matrix: both JSR audits, remaining export
-   guards, publish dry-runs, and surface attribution.
+1. Stop after the S6 push and PR #1692 phase receipt.
+2. A fresh Tier-A review and separate opposite-family IMPL-EVAL are coordinator-owned next steps.
+3. Do not self-review, self-certify, request evaluation, flip readiness, or merge.
 
 ## Key decisions
 
@@ -84,6 +80,13 @@ No docs/S3-S4 product file was modified.
 - S5 doc lint: Contracts 9 and SDK 3, exact pinned baseline parity with zero new findings.
 - S5 selected export-corpus guard: RED; generated corpus stale, requires an unauthorized fifth
   product path. Remaining JSR/publish/surface/export gates: NOT RUN after the mandated stop.
+- S6 generator determinism: PASS; two byte-identical runs, generated-file SHA-256
+  `f7bbc8925481e8682f84f9057263387030838e6bc7ee366c56e98a9b2829f904`.
+- S6 semantic corpus attribution: PASS; 0 added, 0 removed, exactly five changed SDK signatures,
+  with schema/framework/surfaces unchanged.
+- S6 `check:mcp-export-corpus`: PASS at immutable content head `b427e0354`.
+- S6 MCP scoped lint/format: pre-existing tooling RED, exit 1 with zero findings in each wrapper;
+  no source fix attempted.
 
 ## Open questions
 
