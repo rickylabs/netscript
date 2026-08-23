@@ -1026,3 +1026,66 @@ The six untracked supervisor-owned `f8-*.json` receipts present before this corr
 staged, edited, replaced, or interpreted as author-owned evidence. No exclusion pattern, test,
 third product path, runtime, browser, Aspire, Docker, lease, readiness, metadata, issue, quarantine,
 lockfile, or docs mutation occurred.
+
+## 2026-08-23 — F8 supervisor evidence (Tier-A owned, not author-authored)
+
+**Provenance notice.** Every byte in this section and in the twelve `receipts/f8-*.json` files is
+**supervisor-generated**, committed by the features Tier-A supervisor under its own signature. It is
+recorded here rather than folded into an author commit, because an unattributed supervisor write
+inside an author-signed commit is exactly the defect that cost this leaf a full correction cycle on
+2026-08-15. The author authored `3299992e4` and `4f50b5a02` and nothing else here.
+
+### Attempt 1 — `3299992e4` (superseded content head)
+
+Focused file 25/25. Four contracted binding gates all `PASS` at that exact head; the named
+four-receipt set recomputed `SUFFICIENT`, zero reasons.
+
+Tier-A nevertheless returned **CHANGES_REQUESTED** on a non-gated regression: under the scoped
+wrappers on `--root packages/cli/e2e`, the probe source carried a `prefer-const` lint occurrence
+(`timeoutId` never reassigned, `:101`) and one `deno fmt` finding at `const timeoutMessage =`. Both
+were **clean at the prior head `20337441788`** under the identical command, proving the slice
+introduced them.
+
+`receipts/f8-lint.json` and `receipts/f8-fmt-check.json` both record `PASS` at that same head — not
+a contradiction: `deno task lint` and `deno task fmt:check` both exclude `^(packages/(cli)|…)`, so
+all of `packages/cli` sits outside the repo quality gates and CI could not have caught this. The
+finding was real, non-gated, and returned because attempt 7 is expensive and a lease should not be
+spent on a head worth amending.
+
+### Attempt 2 — `4f50b5a026120b5a3b0195fa1b6f495f08e2b46c` (current content head)
+
+The author reordered `const timeoutId = setTimeout(...)` ahead of `const settle = …` and let the
+formatter settle the message line: 8 insertions, 10 deletions, source file only, test file untouched.
+Semantics verified unchanged — the timeout still detaches `onopen`/`onerror` before rejecting, still
+closes through the injected seam, a failing `close()` still rejects with its cause, `settle` still
+clears the timer on both paths, and both diagnostic strings are byte-identical.
+
+| Evidence | Result at `4f50b5a02` |
+| --- | --- |
+| scoped lint (`--root packages/cli/e2e`) | 0 occurrences |
+| scoped fmt (`--root packages/cli/e2e`) | 0 findings |
+| focused probe test file | **25 passed / 0 failed**, 545 ms |
+| `check` | `PASS` |
+| `test` | `PASS` |
+| `publish-dry-run` | `PASS` |
+| `arch-check` | `PASS` |
+| `lint` | `PASS` |
+| `fmt-check` | `PASS` |
+
+Sufficiency recomputed over the **explicitly named** four-receipt attempt-2 set:
+`SUFFICIENT`, zero reasons, `immutableHead 4f50b5a026120b5a3b0195fa1b6f495f08e2b46c`. The set was
+named file-by-file rather than globbed, and every receipt satisfies `gitHead == actualGitHead ==`
+that head.
+
+The attempt-1 receipts are **retained append-only** as the superseded record.
+
+### Resource state
+
+No `scaffold.runtime`, no browser, no Aspire apphost, no Docker container, and no lease were used at
+any point. `docker ps -a` is empty and no `apphost`/`chrome`/`chromium` process exists. The only
+Aspire processes on the host are `aspire mcp start` MCP servers, which are not run-owned. All four
+quarantines, the six S5 attempt histories, `receipts/f6-test.json`, and `receipts/f7-test.json`
+remain untouched.
+
+**Attempt 7 is not granted and is not this supervisor's to grant.** The reviewed green head is
+reported to the coordinator for the lease decision.
