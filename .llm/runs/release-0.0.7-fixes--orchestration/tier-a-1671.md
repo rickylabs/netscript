@@ -1043,3 +1043,90 @@ is repaired; F3/F4/F5 are open and returned to the coordinator with recommendati
 
 No merge, readiness flip, label, checkbox, metadata, or `#1348`/`#1466` mutation. Evaluator worktree
 removed.
+
+---
+
+# Tier-A — S7 amendment at `7b00249673bf1eaac5af14f000869e378b999c71` (PR #1692). **PASS**
+
+| Field | Value |
+| --- | --- |
+| Head | `7b00249673bf1eaac5af14f000869e378b999c71` — local == remote == PR `headRefOid`, clean, **draft**, sole `status:impl` |
+| Commits | `29c9e40aa docs(sdk)!: disclose 0.0.7 typed-error breaking changes and migration`; `7b0024967 docs(harness): record S7 migration disclosure receipts` |
+| Verdict | **PASS** |
+
+## Scope — exact, and the load-bearing check
+
+Five paths: two docs pages plus three existing run artifacts.
+**`git diff --name-only 1772dfdf9 7b0024967 -- packages/` is EMPTY** — no product, no test, and no
+`export-surface-corpus.generated.ts`. That is the coordinator's binding constraint and it holds.
+
+## Commit marker
+
+The twelve earlier commits are **not** rewritten, per ruling. `29c9e40aa` carries `docs(sdk)!` plus a
+`BREAKING CHANGE:` footer naming the `null → undefined` payload change, the `unknown → Error` default,
+and the thenable rejection, declared as a pre-1.0 intentional break, with `Refs #1693`.
+
+## F1 closure — verified against content, not against a grep
+
+Both pages carry all six required items. Recorded because it nearly became a false finding: this
+topic's first coverage sweep reported **0 hits** for `breaking`, `patch-compatible`, and `phantom` on
+both pages and looked like a gap. The sweep was **malformed** — `\|` alternation was passed to
+`grep -E`, which matches a literal pipe rather than alternating. Re-run with fixed-string matching:
+
+| Term | `sdk.md` | `discover-services.md` |
+| --- | --- | --- |
+| `breaking` / `patch-compatible` / `pre-1.0` | 1 / 1 / 3 | 1 / 1 / 1 |
+| `__error` / `phantom` | 2 / 1 | 2 / 1 |
+| `PromiseLike` / `TS2345` / `Promise.resolve` | 1 / 1 / 1 | 1 / 1 / 1 |
+
+Reading the prose confirms it: both the tuple slot and the `data` property are described as moving
+`null → undefined`; defaults `unknown → Error`; `ServiceClientMethod<TInput, TOutput, TError = Error>`
+with the `__error` marker explained as what lets `safe()` recover `TError`; the `PromiseLike` →
+`Promise` narrowing with `TS2345` and the `Promise.resolve(thenable)` remedy; tuple → discriminated
+migration with a concrete `data === null` → `data === undefined` line; and an explicit
+"intentional pre-1.0 breaking change and is not patch-compatible".
+
+It also does **not** over-claim: "The tuple form has **not** been removed — every success and failure
+arm remains a tuple-and-object intersection, so destructuring still works." That is correct and is the
+opposite error the brief guarded against.
+
+**F4 closed** — `sdk.md` § "Bare promises and the defined-error arm" documents the arm as unreachable
+in the type system yet reachable at runtime, names `_PlainErrorRejectedFromDefinedArm`, and gives the
+consumer consequence (pass a promise carrying contract error typing). Written as a characteristic, not
+a bug.
+
+**F3 + F5 closed** — issue **#1693** filed covering both; `drift.md` references it twice, resolving the
+`:25` vs `:35-36` contradiction.
+
+## Gates — executed at this exact head
+
+| Gate | Result |
+| --- | --- |
+| `check:mcp-export-corpus` | **PASS exit 0**, sha256 `a8f0779228987ed7…` — **byte-identical to the S6 reading**, proving no published signature moved |
+| `docs:exports-drift` | **PASS exit 0** |
+| `docs:snippets` | **exit 0** |
+| `docs:accuracy` | **PASS** — 199 published source pages, 181 corpus files |
+| `docs:links` | **PASS** — docs=103, broken-links 0, broken-anchors 0, orphans 0 |
+
+## Two gaps stated rather than papered over
+
+**Markdown formatting of `docs/site` is not gateable here.** `pages.yml` contains **no** `deno fmt`
+step, and raw `deno fmt` refuses the files from both config roots because `docs/site/deno.json` is not
+a workspace member ("No target files found"). The structured wrapper correctly refused a false-green
+("1 batch matched the wrapper selection but were excluded by Deno; refusing a false-green gate"). No
+receipt exists and none is claimed.
+
+**CI at this head is 2 passed / 19 SKIPPED, 0 failed** — the docs-only classifier skipped the product
+lanes (`check-test`, `quality`, `code-quality`, `close-gate`). That is **not a merge signal** and is not
+presented as one. It is sound for a draft: S7 touched zero `packages/` paths, so the product content is
+byte-identical to the S6 head and the S6 product gate results describe this head's product exactly. A
+full run will be required before any readiness flip.
+
+## Outcome
+
+**S7 Tier-A PASS.** F1, F3, F4, F5 closed; F2 was folded into the PR body's breaking table; F6 is
+stated in both the PR body and the docs. Focused opposite-family amendment review dispatched to the
+recovered evaluator (`NetScript 0.0.7 #1692 IMPL-EVAL`, Fable 5, own detached worktree recreated at this
+head), scoped explicitly as an amendment review and **not** a second full IMPL-EVAL.
+
+PR remains **draft**. No merge, label, checkbox, readiness, metadata, or `#1348`/`#1466` mutation.
