@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "01e0960494c95ce56eb35892c211a095eb13e6ed",
-  "currentMainSha": "0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb",
+  "currentMainSha": "9634735bc09123b0e69e7438ea4ec763462aa072",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -32,7 +32,7 @@
       "orchestratorAgentId": "topic-docs-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "active",
+        "state": "recovery_pending",
         "worktree": "/home/codex/repos/netscript-007-docs",
         "branch": "orchestrator/release-0.0.7-docs",
         "requestedModel": "claude-opus-5",
@@ -49,7 +49,9 @@
         "queueState": "exhausted_parked",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e19b-71d1-95ce-8c72559eb026",
-        "legacyState": "parked_offline"
+        "legacyState": "parked_offline",
+        "recoveryDetectedAt": "2026-08-23T06:59:37.000Z",
+        "recoveryFinding": "recorded native Claude PID and Remote Control session are absent; clean topic worktree retained for exact-session replacement"
       },
       "issueNumbers": [
         1551
@@ -60,7 +62,7 @@
       "orchestratorAgentId": "topic-internals-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "active",
+        "state": "recovery_pending",
         "worktree": "/home/codex/repos/netscript-007-internals",
         "branch": "orchestrator/release-0.0.7-internals",
         "requestedModel": "claude-opus-5",
@@ -76,7 +78,9 @@
         "topicHeadSha": "abb015cb7a6c0e7c4dcda2589844fcfc2739b467",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1b5-74f0-96eb-cdeb298d6b17",
-        "legacyState": "parked_idle"
+        "legacyState": "parked_idle",
+        "recoveryDetectedAt": "2026-08-23T06:59:37.000Z",
+        "recoveryFinding": "recorded native Claude PID and Remote Control session are absent; clean topic worktree retained for exact-session replacement"
       },
       "issueNumbers": [
         1296,
@@ -102,7 +106,7 @@
       "orchestratorAgentId": "topic-fixes-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "active",
+        "state": "recovery_pending",
         "worktree": "/home/codex/repos/netscript-007-fixes",
         "branch": "orchestrator/release-0.0.7-fixes",
         "requestedModel": "claude-opus-5",
@@ -118,7 +122,9 @@
         "topicHeadSha": "a374977d8a4ad7af68919afa508ec1107d7f4221",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1ae-7b70-b3b8-8804ebd6f773",
-        "legacyState": "parked_idle"
+        "legacyState": "parked_idle",
+        "recoveryDetectedAt": "2026-08-23T06:59:37.000Z",
+        "recoveryFinding": "recorded native Claude PID and Remote Control session are absent; clean topic worktree retained for exact-session replacement"
       },
       "issueNumbers": [
         1093,
@@ -154,7 +160,7 @@
       "orchestratorAgentId": "topic-features-0.0.7",
       "controller": {
         "runtime": "claude",
-        "state": "active",
+        "state": "recovery_pending",
         "worktree": "/home/codex/repos/netscript-007-features",
         "branch": "orchestrator/release-0.0.7-features",
         "requestedModel": "claude-opus-5",
@@ -169,7 +175,9 @@
         "topicHeadSha": "f436df086129f4e9f23afc5a4e0b1b7c996acdd5",
         "attachmentVerifiedAt": "2026-08-14T23:00:08.000Z",
         "legacyCodexThreadId": "019ffcc0-e1d2-7850-a308-354b670c6f3d",
-        "legacyState": "parked_idle"
+        "legacyState": "parked_idle",
+        "recoveryDetectedAt": "2026-08-23T06:59:37.000Z",
+        "recoveryFinding": "recorded native Claude PID and Remote Control session are absent; clean topic worktree retained for exact-session replacement"
       },
       "issueNumbers": [
         1293,
@@ -918,7 +926,7 @@
       "prNumber": 1663,
       "bootstrapHeadSha": "25c29575c",
       "planHeadSha": "df1d7a96d7fd4ecca0bd61710ba90ff67449da0b",
-      "implementationState": "cycle_2_repair_tier_a_pass_awaiting_owner_exceptional_final_plan_eval_no_product_mutation",
+      "implementationState": "cycle_2_repair_tier_a_pass_owner_authorized_exceptional_final_plan_eval_pending_no_product_mutation",
       "dispatchTopicHeadSha": "b5f72901d0f30d56046c7f7241e09fb8cb3bfcad",
       "expensiveGateContract": "scaffold.runtime is matrix n/a and coordinator-waived for this surface; no lease may be requested and no runtime gate is executed",
       "planGate": "author must stop after bounded plan and report whether a fresh PLAN-EVAL is required",
@@ -926,7 +934,13 @@
       "tierAPlanHeadSha": "194e22a3d0aaefe68922ed7a378aafb651a72dff",
       "tierAPlanTopicCheckpointSha": "b2e0529be",
       "tierAPlanFinding": "PASS after cycle-2 repair: exact thirteen-path plan, generated CLI barrel/publish delta and freshness gate declared, task-level doctor skip removed, root formatter boundary retained, 114-file and negative-control invariants preserved",
-      "planEvaluationState": "owner_exception_required_for_one_final_cycle_after_two_failures",
+      "planEvaluationState": "owner_authorized_exceptional_final_cycle_3_pending",
+      "ownerExceptionalPlanEvaluationAuthorization": {
+        "authorizedAt": "2026-08-23T06:59:37.000Z",
+        "scope": "one third and final fresh PLAN-EVAL over repaired plan head 194e22a3d; no product mutation before PASS",
+        "route": "fresh native claude-fable-5 / medium / Remote Control",
+        "outcomeContract": "PASS releases bounded implementation after fresh internals Tier-A reconciliation; FAIL_PLAN returns to owner escalation without a fourth cycle"
+      },
       "planEvaluatorAgentId": "517ac0e7",
       "planEvaluatorBackgroundAgentId": "517ac0e7",
       "planEvaluatorBridgeSessionId": "cse_01McQHBVtbuX4WYDsaVXEYAn",
@@ -988,7 +1002,7 @@
     {
       "id": "reference-export-drift-gate",
       "lane": "internals",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
       "currentPrHeadSha": "92988da30a4468f5ea77ea4e5a3e243469f92e52",
@@ -998,7 +1012,7 @@
       "branch": "fix/reference-export-drift-gate",
       "worktree": "/home/codex/repos/netscript-007-reference-export",
       "prNumber": 1666,
-      "implementationState": "quality_repair_cycle_5_pass_readiness_attempt_3_exact_head_ci_active",
+      "implementationState": "merged_after_cycle_5_pass_and_terminal_exact_head_ci",
       "planHeadSha": "9d0b4bf128ba52fcd52091ba50590661d09470c1",
       "scopeAmendmentHeadSha": "a3f6b87b599e778db950daf6ccaecd847c088d19",
       "tierAPlanState": "PASS_SA2",
@@ -1200,13 +1214,16 @@
       "implementationEvaluationCycle5CommentUrl": "https://github.com/rickylabs/netscript/pull/1666#issuecomment-5304391856",
       "implementationEvaluationCycle5Proof": "independent changed-files quality selected all nine changed source paths with zero findings; 12 focused tests and six targeted mutations pass; malformed top-level values fail closed; root check 2925 files and root test 4217/0/19 pass; the four publication outputs and deno.lock remain byte-identical to integration content",
       "readinessAttempt3HeadSha": "92988da30a4468f5ea77ea4e5a3e243469f92e52",
-      "readinessAttempt3State": "ready_non_draft_exact_head_ci_active",
+      "readinessAttempt3State": "complete_terminal_green_merged",
       "readinessAttempt3Contract": "PR body rewritten to final repair/evaluator heads; zero unanswered review threads; live mirror dry-run and local close-gate PASS; status:ready-merge applied while draft with attributed impl-eval:skip retained; merge only after every exact-head check, including changed-source code-quality, is terminal green or an intentional policy skip",
       "readinessAttempt3CommentUrl": "https://github.com/rickylabs/netscript/pull/1666#issuecomment-5304405717",
       "readinessAttempt3CiRunId": 31910676720,
       "readinessAttempt3QualityRunId": 31910676700,
-      "sa4NextGate": "wait for terminal truthful exact-head CI at 92988da30, then coordinator merge and shipped-label reconciliation only if zero current failures remain",
+      "sa4NextGate": "complete; PR merged at exact evaluated head and issue #1296 closed",
       "expensiveGateContract": "no runtime lease; scaffold.runtime and fresh-browser are matrix n/a for this checker/docs/JSDoc/task/workflow-only leaf",
+      "mergeCommitSha": "2dd1a75ef55637816b80e04462cc26fa89631b12",
+      "mergedAt": "2026-08-15T22:30:51.000Z",
+      "issueCompletionState": "#1296 closed at 2026-08-15T22:30:52Z; shipped-label reconciliation pending recovery",
       "receiptRefs": []
     },
     {
@@ -1617,14 +1634,14 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb",
-      "currentPrHeadSha": "db8aadd9542c38a305efffbd7017c56d0abf4e01",
+      "currentPrHeadSha": "bd97a7c03a3fe9b9c2534fd53c9fb0518801bb31",
       "issueNumbers": [1350],
       "implementerAgentId": "01a006f3-ae2d-7941-bd17-2ac71dd3d0f0",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/sdk-typed-error-channel",
       "worktree": "/home/codex/repos/netscript-007-leaf-typed-error",
       "prNumber": 1671,
-      "implementationState": "slice_4_stopped_on_leaf_owned_doc_lint_red_plan_maintenance_rerouted_after_account_wide_codex_quota",
+      "implementationState": "s4r_plan_only_amendment_pushed_12_of_13_findings_mapped_awaiting_coordinator_architectural_ruling_and_fresh_review",
       "initialPlanHeadSha": "c7a6f3d32009cfe9344ab8ed613f1c54c205b07f",
       "initialPlanCommentUrl": "https://github.com/rickylabs/netscript/pull/1671#issuecomment-5303978621",
       "scopeOwnershipRuling": "approve packages/sdk/src/ports/service-client.ts as sixth path; deny packages/contracts/src/public/mod.ts and every NetScriptProcedureMeta definition/export; preserve the fourth generic as Record<never, never>; seventh path requires rescope",
@@ -1699,8 +1716,11 @@
       "codexQuotaState": "account_wide_usage_limit_verified_by_fresh_thread_01a00767_2533_7273_a4c6_47cad0f85a6d_until_2026_08_20_05_31",
       "s4rPlanMaintenanceRoute": "canonical documentation_review: fresh native Claude Sonnet 5/high in a dedicated detached exact-head worktree; run artifacts only; supervisor neither authors nor self-certifies",
       "s4rPlanEvaluationRoute": "canonical native-quota PLAN-EVAL fallback: fresh Minimax M3/high over OpenRouter; generator session differs from evaluator session",
-      "productRepairCapacityBoundary": "the later three-product-file repair remains parked on canonical Codex implementation until the 2026-08-20 05:31 reset; no outside-plan product implementation authorized",
-      "nextGate": "complete the artifact-only S4-R amendment and fresh Minimax PLAN-EVAL; on PASS park at the canonical Codex product-repair capacity boundary",
+      "s4rPlanAmendmentHeadSha": "bd97a7c03a3fe9b9c2534fd53c9fb0518801bb31",
+      "s4rPlanAmendmentResult": "run-artifact-only mapping resolves 12 of 13 new private-type references; baseContract to ContractBuilder remains unresolved inside the prior no-public-barrel ceiling",
+      "s4rGitHubCommentState": "malformed literal local-path body at comment 5304357008; rewrite in place during recovery",
+      "productRepairCapacityBoundary": "expired on 2026-08-20 05:31; canonical Codex implementation capacity must be re-probed before product dispatch",
+      "nextGate": "coordinator rules the narrow ContractBuilder correction, repairs the malformed comment and stale PR body, obtains fresh fixes Tier-A and formal plan acceptance, then releases a bounded canonical Codex product slice",
       "expensiveGateContract": "no runtime lease; no Aspire, Docker, e2e:cli, browser, or runtime gate during plan evaluation",
       "receiptRefs": []
     },
@@ -1771,14 +1791,14 @@
       "phase": "implementing",
       "baseBranch": "main",
       "headSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
-      "currentPrHeadSha": "d8d5ee61924d0c3c7ed657ab96f610bc142cfd6a",
+      "currentPrHeadSha": "20337441788b4e2341b0474d6297bec1ddd33b80",
       "issueNumbers": [1355, 1360],
       "implementerAgentId": "01a004f9-f033-7592-a0bc-63927753fb43",
       "implementerRoute": "openai / gpt-5.6-sol / high / approval never / dangerFullAccess",
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355",
       "prNumber": 1664,
-      "implementationState": "f8_plan_intermediate_provenance_correction_rerouted_after_account_wide_codex_quota",
+      "implementationState": "f8_plan_provenance_repaired_and_minimax_plan_eval_pass_awaiting_fresh_tier_a_then_two_path_product_repair",
       "dispatchTopicHeadSha": "0d0ba1b7a404c847acba2daed40c69d282906f69",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
       "tierAPlanState": "PASS",
@@ -2029,6 +2049,11 @@
           "codexQuotaState": "account-wide usageLimitExceeded verified by fresh detached Sol/high thread 01a00766-3240-7dd0-91df-7e335142f0cb; reset 2026-08-20 05:31; no more Codex retries",
           "f8CorrectiveRoute": "canonical chore_code: fresh separate native Claude Opus 5/medium agent in a dedicated detached exact-head worktree; supervisor neither authors nor self-certifies",
           "f8PlanEvaluationRoute": "canonical native-quota PLAN-EVAL fallback: fresh Minimax M3/high over OpenRouter; terminal PASS required before the later product repair",
+          "f8ProvenanceRepairHeadSha": "4255a57b926c6c67a6996d5a7b4a3a11489239e7",
+          "f8PlanEvaluationState": "complete_pass",
+          "f8PlanEvaluationHeadSha": "20337441788b4e2341b0474d6297bec1ddd33b80",
+          "f8PlanEvaluationVerdict": "PASS",
+          "f8NextGate": "fresh features Tier-A over the corrected F8 plan/evaluator artifact, then exactly the approved browser-probe source and runtime-probe test repair; attempt 7 remains prohibited until repair receipts and second Tier-A",
           "attempt4Next": "superseded by attempt-5 terminal red and attribution recovery"
         }
       },
@@ -3332,5 +3357,5 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-08-15T21:42:53.000Z"
+  "updatedAt": "2026-08-23T06:59:37.000Z"
 }

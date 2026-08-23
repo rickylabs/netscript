@@ -838,3 +838,23 @@ artifact-only routes: #1664 F8 provenance correction via fresh canonical Claude 
 `documentation_review`, then fresh Minimax PLAN-EVAL. Supervisors do not author or self-certify.
 #1671 product repair waits for canonical Codex capacity; #1663 remains the sole owner-only exceptional
 third-evaluator boundary.
+
+## Recovery continuation — 2026-08-23T06:59:37Z
+
+The live recovery baseline is `origin/main` `9634735bc09123b0e69e7438ea4ec763462aa072`.
+#1666 is merged through `2dd1a75ef55637816b80e04462cc26fa89631b12`, with exact leaf head
+`92988da30` and #1296 closed. Its stale shipped labels still need normalization. Four subsequent RFC
+merges are external drift and do not silently expand the frozen milestone scope.
+
+The executable lane fronts are: #1663 exact plan head `194e22a3d` with one owner-authorized third and
+final Fable 5/medium Remote Control PLAN-EVAL; #1664 F8 PASS head `20337441788…`, followed by fresh
+Tier-A and the two approved CDP paths only; #1671 remote S4-R head `bd97a7c03a…`, where the
+coordinator must resolve the sole `ContractBuilder` reference and then complete withheld JSR/export
+gates plus IMPL-EVAL. The #1664 and #1671 PR descriptions and #1671 comment `5304357008` require
+truthful in-place repair before their next public checkpoint.
+
+All former supervisor PIDs are absent. Relaunch exactly four Claude Opus 5/high topic supervisors
+with `/remote-control`, preserving docs/internals/fixes/features ownership and lane-local serial
+queues. Lanes may proceed concurrently. The primary coordinator remains GPT-5.6-SOL/high, never max.
+Aspire is empty, the runtime/evaluator/writer leases are free, and only proven stale Docker/worktree
+resources may be removed. Preserve and archive the unique dirty 0.0.6 harness worktree before removal.

@@ -1003,3 +1003,19 @@ M3/high PLAN-EVAL via the native-quota fallback. Topic supervisors remain review
 may not self-certify. #1671's later product repair remains on the canonical Codex route after reset;
 no outside-plan product route is authorized. #1663's exceptional third-evaluator decision remains
 owner-only and untouched.
+
+## Recovery instruction — 2026-08-23T06:59:37Z
+
+The previous four topic supervisors are no longer live. Relaunch docs, internals, fixes, and features
+from their clean topic worktrees as Claude Opus 5/high Remote Control sessions. Do not change accepted
+topic ownership and do not convert a supervisor into an author or evaluator. Each supervisor enforces
+a serial queue inside its own lane; independent lanes continue concurrently.
+
+Internals resumes #1663 at the immutable third-and-final evaluator boundary now explicitly authorized
+by the owner. Features resumes #1664 at F8 PASS and must perform fresh Tier-A before the two approved
+CDP files. Fixes resumes #1671 at S4-R and awaits the coordinator's narrow `ContractBuilder` boundary
+ruling before product mutation. Docs has no active author slice and should audit relevant main drift
+and documentation consequences without silently taking new milestone scope.
+
+The primary coordinator transport is this GPT-5.6-SOL/high Remote Control task; max effort is not
+authorized. No supervisor may grant itself an expensive-runtime, evaluator, or release-writer lease.

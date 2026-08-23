@@ -804,3 +804,16 @@ implementation thread.
   the earlier readiness snapshot. #1666 refreshed the final body, review threads, acceptance mirror,
   close-gate, status ordering, and exact-head CI at `92988da30`; the earlier broad green cannot stand
   in for the new changed-source quality run.
+- **A persisted controller is not a live supervisor:** all four topic checkpoints remained clean, but
+  their recorded PIDs and Remote Control transports had disappeared. Recovery must mark the stale
+  attachments explicitly, relaunch at the same ownership boundary, and record new transport IDs
+  before dispatching more work.
+- **Elapsed quota boundaries must be re-probed, not inherited:** the Codex capacity proof expired on
+  2026-08-20. It remains historical evidence for the earlier stop, but cannot block work resumed on
+  2026-08-23 without a fresh probe.
+- **Post-checkpoint main advances are drift, not implicit milestone intake:** #1666 belongs to the
+  frozen cut and is reconciled as merged; the four later RFC merges are captured for rebase and
+  compatibility review but do not acquire lane ownership merely by appearing on main.
+- **Cleanup requires two kinds of proof:** stopped five-day-old run helpers with no Aspire resources
+  are disposable; a dirty old worktree containing unique harness history is not. Archive its unique
+  content to a recoverable branch before removing the registration.

@@ -1516,3 +1516,27 @@
   fresh Minimax PLAN-EVAL fallback. Both supervisors remain non-authors and neither lane may
   self-certify. #1671's later three-product-file repair remains parked on canonical Codex until reset;
   no outside-plan product implementation is authorized.
+
+## 2026-08-23T06:59:37Z — atomic coordinator recovery checkpoint
+
+- Reconciled the frozen ledger with live GitHub and `origin/main`. Main is now
+  `9634735bc09123b0e69e7438ea4ec763462aa072`: #1666 merged at exact leaf head `92988da30` through
+  merge commit `2dd1a75ef55637816b80e04462cc26fa89631b12`, and #1296 closed. Four later RFC merges are
+  recorded as external main drift, not silently added to the frozen 0.0.7 inventory.
+- Reconciled #1664 at `20337441788…`: the F8 provenance repair and independent Minimax PLAN-EVAL
+  are terminal `PASS`. The lane is released for a fresh features Tier-A review, then only the two
+  approved CDP timeout paths, cheap exact-head receipts, a second Tier-A review, and—only if green—
+  a separately leased attempt 7.
+- Reconciled #1671 at remote amendment head `bd97a7c03a…`. S4-R maps 12 of 13 private references;
+  the remaining `baseContract -> ContractBuilder` boundary is coordinator-owned. Its public PR body
+  and comment `5304357008` are stale/malformed and must be rewritten in place before implementation
+  resumes. The expired August 20 Codex-capacity boundary is no longer treated as current evidence.
+- Owner explicitly authorized exactly one third and final exceptional #1663 PLAN-EVAL. It remains a
+  fresh, opposite-family Fable 5/medium Remote Control evaluation of the immutable repaired plan; a
+  third `FAIL_PLAN` returns to the owner and no fourth evaluator is authorized.
+- All four recorded topic-supervisor processes and Remote Control bridges are absent. Their accepted
+  ownership is unchanged; each controller is marked `recovery_pending` until relaunched from its
+  exact clean checkpoint. Serialization is per supervisor lane, never global across independent lanes.
+- No evaluator, expensive-runtime, or release-writer lease is active. Aspire reports no resources.
+  Eleven stopped five-day-old Docker helpers are proven stale and approved for exact removal. The
+  coordinator route is GPT-5.6-SOL/high—never max—and this recovery preserves that correction.
