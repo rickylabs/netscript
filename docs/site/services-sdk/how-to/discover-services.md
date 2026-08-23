@@ -175,6 +175,25 @@ contract; it is not an open bag and it is not `any`. `isDefinedError(failure.err
 predicate form for an already typed failure union. It preserves the defined members present in
 that union rather than promoting arbitrary `unknown` values into contract errors.
 
+### Migrating typed-error handling to 0.0.7
+
+The typed-error channel in **0.0.7 is an intentional pre-1.0 breaking change and is not
+patch-compatible**. Migrate callers with all of these changes in view:
+
+| Surface | Before 0.0.7 | 0.0.7 and later |
+| --- | --- | --- |
+| `SafeFailure` / `SafeResult` failure payload | The second tuple slot and object `data` property were `null`. | Both are `undefined`: `[error, undefined, isDefined, false]` and `{ error, data: undefined, ... }`. |
+| Default error type | `SafeFailure`, `SafeResult`, and `safe` defaulted `TError` to `unknown`. | They default `TError` to `Error`. |
+| `ServiceClientMethod` | `ServiceClientMethod<TInput, TOutput>` returned `Promise<TOutput>`. | `ServiceClientMethod<TInput, TOutput, TError = Error>` returns `Promise<TOutput> & { __error?: { type: TError } }`; the optional phantom marker lets `safe()` recover `TError`. |
+| `safe(promise)` input | Accepted `PromiseLike<TOutput>`. | Requires `Promise<TOutput> & { __error?: { type: TError } }`. A non-`Promise` thenable now fails with `TS2345`; pass `Promise.resolve(thenable)` instead. |
+| Result handling | Tuple destructuring such as `const [error, result] = await safe(...)` was the common idiom. | Branch on `result.isSuccess` first, then `result.isDefined`, as in Step 4. |
+
+The tuple form has **not** been removed: both result arms remain tuple-and-object intersections, so
+destructuring still works. The discriminated form is the documented path because it prevents a
+plain or transport error from falling through as successful data and preserves code-specific
+contract error typing. For the concrete payload migration, replace
+`if (failure.data === null)` with `if (failure.data === undefined)`.
+
 ## Many services at once — `defineServices`
 
 When the caller talks to several services, `defineServices` builds the clients (plus

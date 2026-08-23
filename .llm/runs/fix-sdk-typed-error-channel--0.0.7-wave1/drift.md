@@ -49,7 +49,8 @@
 - **Metadata:** #1466 owns definition, initialization, export, and semantic proof. #1350 retains
   only the explicit fourth generic slot as `Record<never, never>` and introduces no vocabulary.
 - **Denied:** The contracts public barrel and all metadata export work.
-- **Deferred:** Stale contracts/benchmark prose remains tracked follow-up debt outside this leaf.
+- **Deferred:** Adjacent benchmark/reference prose remains outside this leaf and is now tracked by
+  #1693, which also backs the accepted `ThrowableError` → `Error` decision for later re-evaluation.
 - **Phase effect:** The plan has no remaining must-resolve decision, but fresh Tier-A review and a
   separate PLAN-EVAL `PASS` remain hard stops before implementation.
 
@@ -59,8 +60,9 @@
   describes the old erasure.
 - **Actual:** The contracts README says the common error map is applied, which remains true. Only
   the benchmark reference README/router contain the stale erasure claim.
-- **Action:** Corrected existing research/plan/context artifacts. No new file or debt entry was
-  created; the coordinator owns any later issue for the benchmark prose.
+- **Action:** Corrected existing research/plan/context artifacts. No debt entry was created during
+  PLAN-EVAL; follow-up #1693 now backs the benchmark/reference prose debt and the accepted
+  `ThrowableError` → `Error` substitution decision.
 - **Scope:** Both locations remain outside the exact six-path ceiling; no product/docs edit here.
 
 ## 2026-08-15 — S4 raw doc-lint findings exceed the pinned baselines

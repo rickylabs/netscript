@@ -248,6 +248,38 @@ export async function loadUser(id: string) {
 It preserves the defined members present in that input type; it does not turn an arbitrary
 `unknown` value into one of the contract's declared errors.
 
+### Bare promises and the defined-error arm
+
+When a promise carries no contract error type, `TError` falls back to `Error`. In that case the
+`isDefined: true` arm types `error` as `never`, because
+`Extract<Error, DefinedErrorLike>` is empty. The arm is therefore unreachable in the type system,
+but it can still be reached at runtime: if an `ORPCError` whose `defined` property is `true` rejects
+that bare promise, `createSafeFailure` returns `isDefined: true`.
+
+This is a deliberate characteristic of the API. To make the defined-error arm available to the
+type checker, pass `safe()` a promise carrying contract error typing, such as the promise returned
+by a service-client method, rather than a bare `Promise`. The SDK type fixture asserts this boundary
+as `_PlainErrorRejectedFromDefinedArm` in `readme-doctest_test.ts`.
+
+### Migrating to 0.0.7
+
+The typed-error channel in **0.0.7 is an intentional pre-1.0 breaking change and is not
+patch-compatible**. Existing SDK consumers should account for all of these signature changes:
+
+| Surface | Before 0.0.7 | 0.0.7 and later |
+| --- | --- | --- |
+| `SafeFailure` / `SafeResult` failure payload | The second tuple slot and object `data` property were `null`. | Both are `undefined`: `[error, undefined, isDefined, false]` and `{ error, data: undefined, ... }`. |
+| Default error type | `SafeFailure`, `SafeResult`, and `safe` defaulted `TError` to `unknown`. | They default `TError` to `Error`. |
+| `ServiceClientMethod` | `ServiceClientMethod<TInput, TOutput>` returned `Promise<TOutput>`. | `ServiceClientMethod<TInput, TOutput, TError = Error>` returns `Promise<TOutput> & { __error?: { type: TError } }`; the optional phantom marker lets `safe()` recover `TError`. |
+| `safe(promise)` input | Accepted `PromiseLike<TOutput>`. | Requires `Promise<TOutput> & { __error?: { type: TError } }`. A non-`Promise` thenable now fails with `TS2345`; pass `Promise.resolve(thenable)` instead. |
+| Result handling | Tuple destructuring such as `const [error, result] = await safe(...)` was the common idiom. | Branch on `result.isSuccess` first, then `result.isDefined`, as in the example above. |
+
+The tuple form has **not** been removed: every success and failure arm remains a tuple-and-object
+intersection, so destructuring still works. The discriminated form is the documented path because
+it keeps non-defined failures distinct from success and narrows contract-defined errors. For the
+payload migration, change a check such as `if (failure.data === null)` to
+`if (failure.data === undefined)`.
+
 ## Production notes
 
 {{ comp callout { type: "important", title: "/cache and /discovery are server-only" } }}
