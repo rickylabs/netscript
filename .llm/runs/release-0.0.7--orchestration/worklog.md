@@ -1562,3 +1562,21 @@
   fresh #1664 F8 Tier-A before the two-path CDP repair, fixes to the coordinator-approved narrow
   #1671 public-signature correction, and docs to read-only compatibility drift review. Their serial
   queues are lane-local and all four lanes may progress independently.
+
+## 2026-08-23T07:22:11Z — #1663 final evaluator active; stale branch cleanup closes
+
+- Fresh internals Tier-A passed at topic commit `f681020d5`, independently rechecking immutable leaf
+  head `194e22a3d`, both prior `FAIL_PLAN` verdicts, generator/evaluator separation, every cycle-2
+  finding, and the nearest-config precedence observations T-1/T-2. Dispatch checkpoint is
+  `c7432d4c6`.
+- The one owner-authorized third and final evaluator is active as fresh native Fable 5/medium job
+  `0f7c4fdf`, full session `0f7c4fdf-1023-43ce-8a4d-3c24fa16cd64`, bridge
+  `cse_012zvXzGwbKFLMTqNLRZVhBR`, URL
+  `https://claude.ai/code/session_012zvXzGwbKFLMTqNLRZVhBR`. Daemon state proves
+  `bridgeOutboundOnly:false` and exact model/effort/Remote Control flags. It is run-artifact-only;
+  no product mutation is authorized. A terminal `FAIL_PLAN` returns to the owner and no fourth cycle
+  exists.
+- Deleted 14 remote branches only after exact merged-PR proof, and removed their stale local refs
+  plus the superseded local 0.0.6 branch and duplicate S4-R ref. Preserved all open-PR branches,
+  active topic/leaf branches, the recoverable 0.0.6 archive branch, current main, and the unrelated
+  live detached worker.
