@@ -51,3 +51,33 @@ artifacts.
 | 2026-08-15T14:50Z | **L-2 re-measured on current main and it is materially larger than recorded — escalating it from an `.llm/` lint gap to an unlinted **published package**. Recorded L-2 said root `lint.exclude` drops `.llm/`. On `baf1cdf67` the exclusion list is **four** entries — `.llm/`, `tools/`, `packages/cli/`, `packages/mcp/tests/fixtures/doctor/` — and `deno lint <root>` returns **No target files found (raw exit 1)** for **all four**. Scale: **700** ts/tsx files under `packages/cli/src`, **316** under `.llm/tools`, **11** under `tools/` — roughly **1,027 files invisible to `deno lint`**, including an entire published member. `packages/cli/deno.json` has **no `lint` block and no lint task**, so the package does not lint itself either. | `deno lint` per root (exit 1, no target files); file counts; `packages/cli/deno.json` |
 | 2026-08-15T14:52Z | **The exclusion is doubled, and the CI receipt inherits it.** Root task `lint` runs `run-deno-lint.ts --root packages --root plugins`, so `.llm/` and `tools/` are **not selection roots at all**, independent of config; it then applies a **task-level** `--exclude` regex removing `packages/cli` and the doctor fixtures, and root `lint.exclude` **separately** lists `packages/cli/`. CI's `quality-lint` gate resolves through `catalog.ts:31` (`lint: ['deno','task','lint']`) to exactly that task — so the green `lint.receipt.json` is green **over files Deno never opened**. Same doubled shape #1663 found in `fmt:check`, which fixes it for the doctor fixtures only. **Not asserted:** that excluding `packages/cli` was accidental — it may be deliberate debt, and that scope call is the coordinator's, not mine. | root `deno.json` tasks.lint + lint.exclude; `.llm/tools/gates/catalog.ts:31`; `ci.yml:338-344` |
 | 2026-08-15T16:30Z | **My A1 premise ("the drift checker is wired to nothing") was false and propagated into the dispatch brief, the leaf research, a PR comment, an issue comment, and two coordinator reports.** Root cause: I grepped only `deno.json` and `.github/workflows/`, but the wiring is a `Deno.Command` spawn at `check-accuracy-and-discoverability.ts:291-301`. Corrected truth: the checker is **enforced fail-closed in CI** via `ci.yml:366` → `catalog.ts:59` → `docs:accuracy` → child spawn, in the `quality` job gated on non-draft. The residual gap is **discoverability** (no named task, no named step, no runbook), not enforcement. **Rule going forward: never conclude "nothing runs X" from grepping config files alone — a spawn lives in code, so grep the whole tree or trace the runner.** | `check-accuracy-and-discoverability.ts:291-301`; `ci.yml:282,366`; `catalog.ts:59` |
+
+## 2026-08-23 — Owner authorized one third and final PLAN-EVAL for #1663
+
+- **What:** The ordinary two-cycle plan-gate allowance was exhausted on 2026-08-15 with two
+  `FAIL_PLAN` verdicts. The owner restored this lane and authorized **exactly one** third and final
+  PLAN-EVAL cycle for #1663.
+- **Source:** Owner escalation to the restored internals topic supervisor.
+- **Expected:** `gates/plan-gate.md:40` allows two `FAIL_PLAN` cycles, then escalation to the user
+  with no further evaluator run.
+- **Actual:** The owner disposed the escalation by granting one bounded exception rather than
+  returning the leaf. A third `FAIL_PLAN` returns the leaf to the owner; no fourth evaluator is
+  authorized.
+- **Severity:** authorized process exception
+- **Action:** Tier-A checkpoint first (PASS, recorded in `worklog.md`), then dispatch one fresh
+  native Claude Fable 5 / medium / Remote Control formal evaluator against immutable head
+  `194e22a3d`. The evaluator may edit run artifacts, commit, explicitly push the PR branch, and
+  rewrite/post truthful PR evidence — a deliberate widening over cycle 2's artifact-only bound. No
+  product mutation before `PASS`.
+- **Evidence:** `briefs/1663-plan-eval-cycle-3.md`; Tier-A checkpoint section in `worklog.md`.
+
+## 2026-08-23 — PR #1663 status label corrected (cycle-2 advisory A3 discharged)
+
+- **What:** PR #1663 carried `status:plan`; the phase and both evaluator briefs say `status:plan-eval`.
+- **Source:** PLAN-EVAL cycle 2 advisory A3, which named this the supervisor's to fix.
+- **Expected:** Exactly one `status:` label, matching the live phase.
+- **Actual:** Label set moved to `type:fix`, `area:tooling`, `status:plan-eval`. Head, draft state,
+  base, and milestone untouched.
+- **Severity:** minor process correction
+- **Action:** discharged before evaluator dispatch so the evaluator observes a truthful phase.
+- **Evidence:** `gh pr view 1663 --json labels` → `type:fix, area:tooling, status:plan-eval`.

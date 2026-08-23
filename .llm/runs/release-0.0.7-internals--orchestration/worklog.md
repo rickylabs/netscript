@@ -528,3 +528,100 @@ is required.
   locked; otherwise it must request the same serialized evaluator slot.
 - Every leaf remains draft. No topic action may merge, publish, mutate central cluster state, or
   claim release authority.
+
+## 2026-08-23 — #1663 Tier-A checkpoint of the repaired thirteen-path plan: PASS
+
+Owner escalation restored this lane and authorized **exactly one third and final** PLAN-EVAL for
+#1663. Before spending it, I ran a fresh Tier-A checkpoint of the immutable repaired plan. I am the
+reviewer/orchestrator only: I did not author, evaluate, merge, publish, flip readiness, or grant a
+lease, and I mutated no product path.
+
+### Head immutability
+
+| Check                                                      | Observed                                     |
+| ---------------------------------------------------------- | -------------------------------------------- |
+| Local `HEAD` (`/home/codex/repos/netscript-007-package-gate`) | `194e22a3d0aaefe68922ed7a378aafb651a72dff` |
+| `git ls-remote origin refs/heads/fix/package-gate-honesty` | `194e22a3d0aaefe68922ed7a378aafb651a72dff`   |
+| PR #1663 `headRefOid`                                      | `194e22a3d0aaefe68922ed7a378aafb651a72dff`   |
+| `git status --short`                                       | empty                                        |
+| `git diff --name-only 05fc3132b 194e22a3d` outside run dir | none — 9 files, all run artifacts, +1341/-0  |
+| Rival processes with the leaf worktree as cwd              | none                                         |
+
+Requested resume head equals the observed head exactly. No product or config path has been mutated
+since the immutable base `05fc3132b`.
+
+### Two prior FAIL_PLAN verdicts — verified
+
+| Cycle | Artifact               | Evaluator commit | Evaluator session                      | Route                      | Verdict     |
+| ----- | ---------------------- | ---------------- | -------------------------------------- | -------------------------- | ----------- |
+| 1     | `plan-eval-cycle-1.md` | `be2b18728`      | `9078ecb6-e8b3-4d4f-b85c-cb28a1cb34be` | Fable 5 / medium / RC      | `FAIL_PLAN` |
+| 2     | `plan-eval.md`         | `c415daad2`      | `517ac0e7-9951-40ec-ab48-d0175a6d7ebb` | Fable 5 / medium / RC      | `FAIL_PLAN` |
+
+Both verdict lines read `FAIL_PLAN` in their own `## Verdict` sections. Cycle 1 was preserved
+bit-identical (213 lines) by cycle 2 rather than overwritten. The two-cycle allowance
+(`gates/plan-gate.md:40`) is genuinely exhausted, so the owner grant — not this lane — is what
+authorizes cycle 3.
+
+### Generator/evaluator separation — verified at the commit level
+
+The plan's author is Codex thread `01a004ec-86a6-7c21-8886-81c09de099f5` (`gpt-5.6-sol`, medium).
+Both evaluators are distinct fresh Claude sessions, neither the author nor this supervisor
+(`f7691917-…`), and cycle 2 was not cycle 1. Separation holds bidirectionally in the commit trail:
+
+- Evaluator commits touched **only** eval artifacts — `be2b18728` = `plan-eval.md` alone;
+  `c415daad2` = `plan-eval.md` + `plan-eval-cycle-1.md`. Neither touched `plan.md`.
+- Repair commits `ccf256884` and `194e22a3d` touched **no** `plan-eval*` file. No evaluator repaired
+  the plan it judged, and the author did not edit a verdict.
+
+### Cycle-2 findings — absorption checked, not accepted on assertion
+
+Cycle 2's single blocking finding was F1 (the planned `.llm/tools/run-deno-lint.ts` edit changes
+published `@netscript/cli` bytes through the generated asset barrel). The repaired plan absorbs it
+across the surface table (path 13), L7, S1, S4, gate row 4, the `@netscript/cli` JSR row, a risk
+row, and a `drift.md` grant entry. I confirmed F1's basis in the tree: `run-deno-lint` text is
+embedded in `packages/cli/src/kernel/assets/agent-tools.generated.ts`, and
+`check:assets-barrel` (`deno.json:115`) diffs that exact file — so path 13 is required, not
+defensive. Advisories A1 (`fmt:check` doctor-family `--exclude` removal — basis confirmed at
+`deno.json:139`), A2 (L10/R14 rewording) and A4 (new L11 memoization) are each absorbed. **A3 was
+mine and is now discharged**: PR #1663 carried `status:plan`; I moved it to `status:plan-eval`.
+
+### Independent tree verification at this head
+
+Twelve of the thirteen bound paths exist and the marker
+`packages/mcp/tests/fixtures/doctor/broken/.deno-fmt-lint-ignore` is correctly the sole new file.
+`broken/deno.json` is `{ "workspace": "packages/*" }` — a bare string, which is precisely the
+deliberate malformation that produced cycle 1's `invalid type: string "packages/*", expected struct
+WorkspaceConfig` crash — and its SHA-256 is still
+`6815999dbd68bd1ab5bb137b59808cb1f1a38fb3393c9133721f439c0ad37361`. `healthy/deno.json` is the valid
+array form with no `fmt` options, so Deno defaults (double quotes, width 80) govern it, which makes
+L10's "root-style-valid but fixture-local-default-style-invalid" mechanically correct rather than
+merely plausible. `healthy/` holds exactly four TS files and none matches either `.generated/`
+exclusion, so the plan's "all four remain selected" is reachable. `closeScoreGap: 0.5` at
+`guidance-index.ts:42`.
+
+### New evidence I executed (scratch projects only; checkout untouched)
+
+On Deno 2.9.5, config `exclude` applies **even to explicitly passed file argv**: with root config
+excluding `sub/`, both `deno lint sub/bad.ts` and `deno fmt --check sub/bad.ts` return
+`error: No target files found`, exit 1. **But** when `sub/` carries its own `deno.json`, that nested
+config becomes effective and the root excludes do not apply — lint reported the real
+`no-explicit-any` and fmt the real diff. Since
+`packages/mcp/tests/fixtures/doctor/healthy/deno.json` exists, the four healthy files escape
+root-level exclusion under explicit argv.
+
+This nearest-config precedence is the rule that makes the plan's two simultaneous claims
+non-contradictory — a new top-level root `exclude` entry for the doctor family, and a green
+114-file/two-batch/`failedBatches: 0` wrapper acceptance. The plan asserts both conclusions but
+never states the precedence they rest on (**T-1**). Separately, root `lint.exclude`
+(`deno.json:182-187`) also lists `packages/mcp/tests/fixtures/doctor/`; the plan states the fate of
+the fmt task-level exclusion but is silent on the symmetric lint config-level one while L3 asserts
+"lint becomes green" (**T-2**). T-1 indicates T-2 is probably not rework-forcing. Both are handed to
+the evaluator as items to verify, **not** as supervisor conclusions and not as a Tier-A block — the
+plan gate is the evaluator's call, not mine.
+
+### Tier-A verdict
+
+**PASS.** The head is immutable and product-clean, both prior `FAIL_PLAN` verdicts are genuine and
+preserved, generator/evaluator separation holds in both directions, and every cycle-2 finding and
+advisory is absorbed or discharged. The owner-authorized third and final PLAN-EVAL is worth
+spending. Brief written to `briefs/1663-plan-eval-cycle-3.md`.
