@@ -1174,3 +1174,35 @@ from the per-slice artifact rule; recording it here rather than re-dispatching f
 
 **Tier-A PASS.** F1 is closed. Next: delta IMPL-EVAL over `cfa055bb8`, since the prior `PASS` named
 `cf31de902`.
+
+## 2026-08-23 — #1663 delta IMPL-EVAL `PASS` at `b456f53f7`; F1 closed; leaf artifacts backfilled
+
+| Field          | Value                                                                |
+| -------------- | -------------------------------------------------------------------- |
+| Verdict        | **`PASS`** (delta scope)                                             |
+| Evaluated head | `cfa055bb8285406e92bd7b9a8f1e12637149d67e`                           |
+| Verdict commit | `b456f53f7477043d864021adbaf3d40c542d4ad1` (only `evaluate-delta.md`) |
+| Evaluator      | `117c4b77`, fresh, independent of all six prior agents               |
+
+Bounds clean; the prior full verdict `evaluate.md` and all three `plan-eval*` files untouched, so the
+verdict history is intact.
+
+**It made a sharper argument than mine on the residual band.** I justified stopping at
+`(0.5, 0.5625)` by comparing width `0.0625` against the `≈0.0749` regeneration movement. The
+evaluator went further: absorbing even one regeneration step requires widening to
+`0.5 + 0.0749 ≈ 0.575`, which is **above** `0.5625` and therefore inside the detected region — so a
+widening confined to the blind band has **no attacking use at all**. It also noted that perfect
+tightness on the widening side would require asserting the exact constant, which is a tautology
+rather than a control. That is a better reason to stop here than the one I recorded, and I am
+adopting it.
+
+**Advisory A1 was mine to fix and is fixed.** `cfa055bb8` carried no run-artifact update because I
+traded that for speed at the owner's request, leaving the leaf `context-pack.md` claiming S4 was the
+last slice — which would mislead a resumer. Backfilled in leaf commit `e764be162`: S5 row plus the
+mutation sweep in `worklog.md`, and an S5 section in `context-pack.md` stating the branch head and
+that both verdicts are preserved. Leaf head is now `e764be162`, pushed.
+
+**#1663 implementation is complete.** Five slices landed, each Tier-A signed off; full IMPL-EVAL
+`PASS` at `cf31de902` and delta `PASS` at `cfa055bb8`. Remaining before `status:ready-merge`, none of
+it this lane's: register the unchanged-baseline MCP `deno doc --lint` debt (owner/coordinator), then
+draft→ready, close-gate acceptance mirrors, and merge.
