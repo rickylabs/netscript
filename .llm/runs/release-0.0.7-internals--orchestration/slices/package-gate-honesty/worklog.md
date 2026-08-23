@@ -327,3 +327,60 @@ bytes to `HEAD` while the canonical S1 regeneration is still uncommitted; its di
 authorized generated barrel. The freshness verdict will be rerun against the S1 commit before push.
 `scaffold.runtime` remains coordinator-waived `n/a`; no Aspire, Docker, `e2e:cli`, or lease action
 was taken.
+
+## 2026-08-23 — S2 CLI cwd-independence after S1 sign-off
+
+The topic supervisor signed off S1 at `4b988a381ea9278bcf1b1bc43cf73c0f8691d87a` after independently
+reproducing its evidence. S2 then changed exactly the three CLI test/helper paths named by plan S2;
+S3 and S4 remain untouched.
+
+### Implementation
+
+- `service-env-gates_test.ts` keeps every production gate command argument unchanged and resolves
+  only the filesystem-existence check against its already module-derived repository root.
+- `quickstart-command-drift_test.ts` reads the repository-owned quickstart through a module-relative
+  file URL converted with `fromFileUrl`; its command-parity assertion is unchanged.
+- `run-documented-stream-example.ts` anchors both the documentation read and `.llm/tmp` scratch root
+  to the helper module. Extraction, execution, cleanup, and proof behavior are unchanged.
+- Neither docs source was rewritten. No assertion was removed or weakened, and no ambient
+  `Deno.cwd()` dependency was introduced.
+
+### Executed S2 evidence
+
+All exit codes were read directly from the invoked process, never through a pipeline.
+
+| Obligation                                   | Result | Evidence                                                                                                                                                                                                                                                              |
+| -------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Three targeted files from `packages/cli` cwd | PASS   | Structured test exit 0; 6 passed / 0 failed / 0 ignored. This is the exact inverse of the measured 3/3 baseline.                                                                                                                                                      |
+| Same three files from repository-root cwd    | PASS   | Structured test exit 0; 6 passed / 0 failed / 0 ignored.                                                                                                                                                                                                              |
+| Canonical package test command               | PASS   | Exact `deno task --cwd packages/cli test` exit 0; 828 passed (533 steps) / 0 failed.                                                                                                                                                                                  |
+| Scoped check                                 | PASS   | Exactly 3 owned TS files selected; 1 batch / 0 failed batches.                                                                                                                                                                                                        |
+| Scoped lint                                  | PASS   | Exactly 3 owned TS files selected; 1 batch / 0 failed batches / zero findings.                                                                                                                                                                                        |
+| Scoped fmt                                   | PASS   | Exactly 3 owned TS files selected; 1 batch / 0 failed batches / zero findings.                                                                                                                                                                                        |
+| Docs accuracy                                | PASS   | `deno task docs:accuracy` exit 0; accuracy/discoverability checks passed.                                                                                                                                                                                             |
+| Docs source format                           | PASS   | Authoritative nested command `deno task --cwd docs/site check:source-format` exit 0; `Docs source format: OK`. An initial root `deno task check:source-format` honestly exited 1 because that task exists only in `docs/site/deno.json`; it is not counted as a pass. |
+| Quality gate                                 | PASS   | `deno task quality:gate` exit 0; root coverage and architecture checks have no failures, quality findings are empty, allowance baseline remains 7.                                                                                                                    |
+
+### Fail-loud negative control and restoration
+
+The three repository-read anchors were temporarily shifted exactly one directory toward the module,
+while the scratch anchor remained untouched. The package-cwd structured test then exited 1 with 3
+passed / 3 failed and three concrete failures: service verification attempted
+`packages/packages/cli/...`, quickstart attempted `packages/docs/site/quickstart.vto`, and the
+stream helper attempted `packages/docs/site/durable-workflows/streams.md`. The control was restored
+through an exact inverse patch; the three implemented file hashes returned byte-for-byte to:
+
+- service-env test: `7493e6a3de76e659ea5f413402c9bf9ff9080ef38e231c57aaf31140ea77382f`
+- quickstart drift test: `a67b748e7ba1825cce4ff77d27e2db0203f23f9825562385779c1f13ba7040b1`
+- documented-stream helper: `9bb3fe2219eda0ce64ad65e75da456dc24125a143d16e3370cdc97beac9c1761`
+
+The restored package-cwd suite then returned 6/0 again. A separate read-only sentinel control proved
+all four correct targets (`REPO_ROOT`, quickstart, streams, scratch) exist and all four
+corresponding one-directory-wrong targets do not; it created no wrong scratch tree.
+
+The two read-only docs hashes remain
+`de948fb2b31beca104ce8a3c9294fbf4bc67338db096ee88ead3387610db6300` (quickstart) and
+`bcb945f1ac93eb670ddf7ed04a3e8d1299b559b3f4a535b503483944e9e7da49` (streams). `deno.lock` remains
+byte-identical at `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.
+`scaffold.runtime` remains coordinator-waived `n/a`; no Aspire, Docker, `e2e:cli`, mutex request, or
+substitute runtime smoke was taken.

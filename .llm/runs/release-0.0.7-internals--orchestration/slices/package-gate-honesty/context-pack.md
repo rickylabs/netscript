@@ -6,7 +6,7 @@
 | -------------- | -------------------------------------------------------------------- |
 | Run ID         | `release-0.0.7-internals--orchestration/slices/package-gate-honesty` |
 | Branch         | `fix/package-gate-honesty`                                           |
-| Current phase  | S1 implemented; pending fresh Tier-A slice review                    |
+| Current phase  | S2 implemented; pending fresh Tier-A slice review                    |
 | Archetype      | `6 — CLI / Tooling` (supporting MCP member A2)                       |
 | Scope overlays | `docs`                                                               |
 
@@ -24,8 +24,9 @@ nearest-config memoization. The owner-authorized final cycle 3 then returned `FA
 `65c5e1ac4`: the planned top-level exclusion preserved fmt/lint acceptance but silently removed all
 five doctor TS files from `deno check`. The owner granted the in-path correction to the existing
 `fmt.exclude` list. The topic supervisor then returned Tier-A PASS at amended plan head `62811a9dd`,
-discharging the plan gate under the owner exception. S1 is implemented over exactly its eight
-authorized paths and awaits fresh Tier-A slice review; S2–S4 have not started.
+discharging the plan gate under the owner exception. S1 was implemented and signed off at
+`4b988a381`. S2 is now implemented over exactly its three authorized CLI paths and awaits fresh
+Tier-A slice review; S3 and S4 have not started.
 
 ## Completed
 
@@ -59,16 +60,26 @@ authorized paths and awaits fresh Tier-A slice review; S2–S4 have not started.
   24/24; doctor behavior remains 4/4; the malformed fixture hash is unchanged.
 - Honest fmt and lint negative controls produced real findings and were restored byte-exactly; root
   `fmt:check` is green at 2038/36/0 and the quality gate is green.
+- Tier-A signed off S1 at `4b988a381` after independently reproducing its wrapper, check, generated
+  asset, quality, and test evidence.
+- S2 anchors repository-owned CLI verification/docs/scratch paths to their modules without changing
+  production gate command arguments or weakening assertions.
+- The three focused CLI files pass from both package and repository cwd at 6/6; exact
+  `deno task --cwd packages/cli test` passes at 828 tests (533 steps) / 0 failed.
+- S2 scoped check/lint/fmt each select exactly 3 files and pass; docs accuracy, docs source format,
+  and quality gate pass while both docs sources and `deno.lock` remain byte-identical.
+- The wrong-directory negative control fails at 3 passed / 3 failed, then restores all three files
+  byte-exactly and returns to 6/6; a read-only scratch sentinel also fails closed.
 
 ## In progress
 
-- Finalizing the single S1 commit, post-commit generated-asset freshness receipt, explicit push, and
-  `[PHASE: IMPL]` PR comment before stopping for the fresh Tier-A slice review.
+- Finalizing the single S2 commit, explicit push, and `[PHASE: IMPL]` PR comment before stopping for
+  the fresh Tier-A slice review.
 
 ## Next steps
 
-1. Topic supervisor performs the fresh Tier-A review of the pushed S1 commit.
-2. S2 may begin only when separately dispatched after that review; S3 and S4 remain later slices.
+1. Topic supervisor performs the fresh Tier-A review of the pushed S2 commit.
+2. S3 may begin only when separately dispatched after that review; S4 remains a later slice.
 3. `scaffold.runtime` remains waived `n/a` and must not run.
 
 ## Key decisions
@@ -104,17 +115,17 @@ fixture config. A fourteenth path is rescope.
 
 ## Gates
 
-| Gate family | Current status                      | Evidence                                          |
-| ----------- | ----------------------------------- | ------------------------------------------------- |
-| Plan-Gate   | DISCHARGED                          | Tier-A PASS at amended head `62811a9dd`.          |
-| Static      | S1 focused gates PASS               | 114/2 fmt+lint; check 5/0; tests 24/24.           |
-| Fitness/JSR | quality PASS; full audits remain S4 | No API shape change; published asset regenerated. |
-| Runtime     | N/A                                 | Explicit coordinator waiver; must not run.        |
-| Consumer    | baseline failures reproduced        | `worklog.md` research diagnostics.                |
+| Gate family | Current status                      | Evidence                                         |
+| ----------- | ----------------------------------- | ------------------------------------------------ |
+| Plan-Gate   | DISCHARGED                          | Tier-A PASS at amended head `62811a9dd`.         |
+| Static      | S1 + S2 focused gates PASS          | S2 cwd tests 6/6 both roots; package task 828/0. |
+| Fitness/JSR | quality PASS; full audits remain S4 | Allowance baseline 7; no S2 API shape change.    |
+| Runtime     | N/A                                 | Explicit coordinator waiver; must not run.       |
+| Consumer    | S2 acceptance PASS                  | Exact package-cwd CLI task exit 0.               |
 
 ## Open questions
 
-- None. Fresh Tier-A S1 review is the required stop point; no cycle 4 or further evaluator exists.
+- None. Fresh Tier-A S2 review is the required stop point; no cycle 4 or further evaluator exists.
 
 ## Drift and debt
 
