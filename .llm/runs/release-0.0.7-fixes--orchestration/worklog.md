@@ -1364,3 +1364,44 @@ re-runs the contracts-`complete`-mode expectation. Docs stays EXHAUSTED/PARKED a
 
 #1671 unchanged: parked at `bd97a7c03a`, no implementation authorized, no merge, readiness flip,
 label, checkbox, or product/docs mutation.
+
+## 2026-08-23 — #1671 S5 dispatched to the canonical author; #1690 filed
+
+**Coordinator ruling executed.** External `ContractBuilder`/`Schema` barrel exposure withdrawn on the
+measured 10 → 21 result. Bounded probe of the instantiated generic return annotation run first:
+**acceptance target MET** (contracts doc-lint 9 = base 9, `baseContract`'s only private reference the
+already-pinned `oc`, zero new private references, zero barrel growth, exact six-code union preserved
+and proven non-vacuously against a failing control). Option 2 therefore **not** taken. Full record in
+`tier-a-1671.md` § S5 bounded probe.
+
+**S5 dispatched.** The one-sender-per-worktree guard fired on a fresh launch
+(`duplicate_sender_risk`) — correctly, because the original author `01a006f3-ae2d-7941-bd17-2ac71dd3d0f0`
+still owns `/home/codex/repos/netscript-007-leaf-typed-error`. Resumed that thread rather than
+starting a second sender, so route identity is inherited and unchanged (`openai` · `gpt-5.6-sol` ·
+medium). Dry-run validated first: `git-safety` clean at `bd97a7c03`, `upstream=NONE`, `dirty=0`,
+brief 10 654 bytes. Launch was **not** timeout-wrapped.
+
+| Field | Value |
+| --- | --- |
+| Thread | `01a006f3-ae2d-7941-bd17-2ac71dd3d0f0` (resumed) |
+| Brief | `briefs/1671-s5/implement.md` — verified diff inlined, because the author's worktree is on the leaf branch and cannot read the orchestration run dir |
+| Product ceiling | three files + one test file; a fifth product path is a rescope |
+| Denied and restated | barrel growth, metadata vocabulary, lint allowances, `docs/site/reference/sdk/index.md`, `#1348`/`#1466` |
+
+The brief carries the two traps this topic already hit, so the author does not re-walk them: the
+error-map literal must name the public type `ContractObjectSchema<X, X>` rather than
+`typeof <PascalCaseAlias>` (the alias form drops `.shape` and fails `crud.ts` with 5 × `TS2345`, which
+`contracts/mod.ts` alone does not catch), and `ContractSchema` is not substitutable for oRPC's
+`Schema` (`TS2322`). It also carries the `surface:diff` caveat as an obligation: `deno doc` drops the
+instantiation argument, so the `baseContract` major disappears (532 → 531) — a **tooling false
+negative**, and the breaking-change disclosure stays at full strength.
+
+**#1690 filed** — `docs(reference/sdk): align error-handling emphasis between the reference page and
+package JSDoc`, `Backlog / Triage`, `type:docs` `area:sdk` `priority:p3` `status:triage`. The separate
+exact follow-up the coordinator directed, on the #1670 precedent. It records that the three rows are
+**accurate**, that the gap is ungated because `sdk` runs `entrypoints-only`, and that a fix is
+rows-**plus**-JSDoc rather than three rows — so it cannot later be misread as a #1350 acceptance
+failure or as licence to widen #1671.
+
+Next: exact-head receipt review after the author's explicit push, then the withheld
+JSR/specifier/export gates, then a fresh opposite-family IMPL-EVAL. No merge, no readiness.
