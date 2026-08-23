@@ -40,9 +40,98 @@ Slices S1–S4 already landed. S5 is the final **source** slice.
 
 ## Task 1 — the `baseContract` annotation (verified; apply as given)
 
-Apply `briefs/1671-s5/verified-baseContract-annotation.patch` from the orchestration run dir. It has
-already been executed end-to-end by Tier-A against `main@9634735bc0` + this leaf's content. Apply the
-**same** form; if you believe it needs to change, stop and report rather than improvising.
+The exact verified diff is inlined below. It has already been executed end-to-end by Tier-A against
+`main@9634735bc0` + this leaf's content, **including `deno fmt`**, so it is already in post-`fmt`
+shape — apply it as given. If you believe it needs to change, stop and report rather than
+improvising.
+
+```diff
+diff --git a/packages/contracts/src/application/contract-primitives.ts b/packages/contracts/src/application/contract-primitives.ts
+index 8be140a4f..9111a37be 100644
+--- a/packages/contracts/src/application/contract-primitives.ts
++++ b/packages/contracts/src/application/contract-primitives.ts
+@@ -1,12 +1,20 @@
+ import { oc } from '@orpc/contract';
+ import type {
+   AnySchema,
+-  ContractBuilder,
+   ContractProcedureBuilderWithInputOutput,
+   ContractProcedureBuilderWithOutput,
+   MergedErrorMap,
+   Schema,
+ } from '@orpc/contract';
++import type { ContractObjectSchema } from '../domain/schema-types.ts';
++import type {
++  ForbiddenError,
++  NotFoundError,
++  RateLimitError,
++  ServiceUnavailableError,
++  UnauthorizedError,
++  ValidationError,
++} from '../domain/schemas.ts';
+ import {
+   forbiddenErrorSchema,
+   notFoundErrorSchema,
+@@ -109,11 +117,53 @@ const commonErrorMap: CommonErrorMap = {
+  *   .output(z.object({ items: z.array(z.unknown()) }));
+  * ```
+  */
+-export const baseContract: ContractBuilder<
+-  Schema<unknown, unknown>,
+-  Schema<unknown, unknown>,
+-  BaseContractErrors,
+-  Record<never, never>
++export const baseContract: ReturnType<
++  typeof oc.errors<
++    Readonly<{
++      NOT_FOUND: Readonly<
++        {
++          status: 404;
++          message: 'Resource not found';
++          data: ContractObjectSchema<NotFoundError, NotFoundError>;
++        }
++      >;
++      VALIDATION_ERROR: Readonly<
++        {
++          status: 422;
++          message: 'Validation failed';
++          data: ContractObjectSchema<ValidationError, ValidationError>;
++        }
++      >;
++      UNAUTHORIZED: Readonly<
++        {
++          status: 401;
++          message: 'Authentication required';
++          data: ContractObjectSchema<UnauthorizedError, UnauthorizedError>;
++        }
++      >;
++      FORBIDDEN: Readonly<
++        {
++          status: 403;
++          message: 'Access denied';
++          data: ContractObjectSchema<ForbiddenError, ForbiddenError>;
++        }
++      >;
++      RATE_LIMITED: Readonly<
++        {
++          status: 429;
++          message: 'Too many requests';
++          data: ContractObjectSchema<RateLimitError, RateLimitError>;
++        }
++      >;
++      SERVICE_UNAVAILABLE: Readonly<
++        {
++          status: 503;
++          message: 'Service temporarily unavailable';
++          data: ContractObjectSchema<ServiceUnavailableError, ServiceUnavailableError>;
++        }
++      >;
++    }>
++  >
+ > = oc.errors(commonErrorMap);
+ 
+ /**
+```
 
 Mechanism: TypeScript **instantiation expressions**. `ReturnType<typeof oc.errors>` (the pre-leaf
 base) collapses the type parameter to its `ErrorMap` upper bound and **erases the six literal codes**
